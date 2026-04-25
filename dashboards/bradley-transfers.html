@@ -8,16 +8,18 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=3">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=4">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=6">
 </head>
 <body>
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <a href="/staff-dashboard.html" class="back-link">&larr; Staff Dashboard</a>
-        </div>
+        <nav class="bt-breadcrumb" aria-label="Breadcrumb">
+            <a href="/staff-dashboard.html">Staff Dashboard</a>
+            <span class="bt-breadcrumb-sep">&rsaquo;</span>
+            <span class="bt-breadcrumb-current">Transfer Queue</span>
+        </nav>
     </div>
 
     <!-- Tab Container -->
@@ -27,8 +29,6 @@
             <button class="tab-button active">Transfer Queue</button>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
-            <a class="tab-button tab-button-link" href="/dashboards/art-hub-ruth.html">Ruth's Queue</a>
-            <a class="tab-button tab-button-link" href="/art-tools/ae-art-dashboard.html">AE Dashboard</a>
         </div>
 
         <!-- Tab Content -->
@@ -38,7 +38,7 @@
                 <div class="bt-header-row">
                     <div>
                         <h2 class="tab-title" style="margin-bottom:4px;">
-                            <i class="fas fa-truck" style="color:#4a6fa5;"></i> Supacolor Transfer Queue
+                            <i class="fas fa-truck" style="color:#4a6fa5;"></i> Bradley's Supacolor Transfer Queue
                         </h2>
                         <div class="bt-subtitle">Heat-transfer orders for T-shirts &middot; Bradley's purchasing queue</div>
                     </div>

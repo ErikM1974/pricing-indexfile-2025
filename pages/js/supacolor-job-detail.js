@@ -176,6 +176,10 @@
 
         $('sjd-job-number').textContent = '#' + (j.Supacolor_Job_Number || '—');
 
+        // Breadcrumb current-page label (Staff Dashboard › Supacolor Orders › #639515)
+        var crumbCurrent = document.getElementById('bt-breadcrumb-current');
+        if (crumbCurrent) crumbCurrent.textContent = '#' + (j.Supacolor_Job_Number || '—');
+
         // Status badge
         var badge = $('sjd-status-badge');
         var status = j.Status || 'Unknown';

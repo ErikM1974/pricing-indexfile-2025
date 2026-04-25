@@ -502,3 +502,48 @@
     .bt-filter-input { flex: 1; min-width: 0; }
     .bt-filter-meta { margin-left: 0; }
 }
+
+/* ── Breadcrumb (sits inside .minimal-header where back-link used to be) ── */
+.bt-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+    flex-wrap: wrap;
+    line-height: 1.3;
+}
+.bt-breadcrumb a {
+    color: white;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+.bt-breadcrumb a:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: white;
+    text-decoration: none;
+}
+.bt-breadcrumb-sep {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    user-select: none;
+}
+.bt-breadcrumb-current {
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    white-space: nowrap;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media (max-width: 600px) {
+    .bt-breadcrumb { font-size: 12px; gap: 4px; }
+    .bt-breadcrumb a, .bt-breadcrumb-current { padding: 3px 6px; }
+    .bt-breadcrumb-current { max-width: 140px; }
+}

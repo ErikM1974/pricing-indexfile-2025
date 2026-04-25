@@ -1513,6 +1513,11 @@
             return;
         }
 
+        // Fill the breadcrumb's current-page label with the transfer ID right
+        // away (it's known from the URL — no need to wait for the fetch).
+        var crumbCurrent = $('bt-breadcrumb-current');
+        if (crumbCurrent) crumbCurrent.textContent = state.transferId;
+
         loadUser();
 
         // Wire up close buttons on all modals
