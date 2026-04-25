@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=6">
 </head>
 <body>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
 
-                <!-- Status Stats Chips -->
+                <!-- Status Stats Chips (v3.1 simplified — dropped PO_Created + Received) -->
                 <div id="bt-stats-row" class="bt-stats-row">
                     <div class="bt-stat-chip bt-stat-chip--requested" data-status="Requested">
                         <span class="bt-stat-count" id="bt-stat-requested">&mdash;</span>
@@ -62,17 +62,9 @@
                         <span class="bt-stat-count" id="bt-stat-ordered">&mdash;</span>
                         <span class="bt-stat-label">Ordered</span>
                     </div>
-                    <div class="bt-stat-chip bt-stat-chip--po" data-status="PO_Created">
-                        <span class="bt-stat-count" id="bt-stat-po">&mdash;</span>
-                        <span class="bt-stat-label">PO Created</span>
-                    </div>
                     <div class="bt-stat-chip bt-stat-chip--shipped" data-status="Shipped">
                         <span class="bt-stat-count" id="bt-stat-shipped">&mdash;</span>
                         <span class="bt-stat-label">Shipped</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--received" data-status="Received">
-                        <span class="bt-stat-count" id="bt-stat-received">&mdash;</span>
-                        <span class="bt-stat-label">Received</span>
                     </div>
                     <div class="bt-stat-chip bt-stat-chip--rush" id="bt-stat-rush-chip" data-rush="true">
                         <span class="bt-stat-count" id="bt-stat-rush">&mdash;</span>
@@ -80,7 +72,7 @@
                     </div>
                 </div>
 
-                <!-- Filter Bar -->
+                <!-- Filter Bar (v3.1 simplified — dropped Rep dropdown; rep is on each card) -->
                 <div class="bt-filter-bar">
                     <div class="bt-filter-group">
                         <label class="bt-filter-label">Status:</label>
@@ -88,22 +80,14 @@
                             <option value="">All Active</option>
                             <option value="Requested">Requested</option>
                             <option value="Ordered">Ordered</option>
-                            <option value="PO_Created">PO Created</option>
                             <option value="Shipped">Shipped</option>
-                            <option value="Received">Received</option>
                             <option value="On_Hold">On Hold</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
                     <div class="bt-filter-group">
                         <label class="bt-filter-label">Search:</label>
-                        <input type="text" id="bt-filter-search" class="bt-filter-input" placeholder="Company, design #, transfer ID...">
-                    </div>
-                    <div class="bt-filter-group">
-                        <label class="bt-filter-label">Rep:</label>
-                        <select id="bt-filter-rep" class="bt-filter-input">
-                            <option value="">All Reps</option>
-                        </select>
+                        <input type="text" id="bt-filter-search" class="bt-filter-input" placeholder="Company, design #, rep, transfer ID...">
                     </div>
                     <div class="bt-filter-group bt-filter-toggle">
                         <label>
@@ -332,6 +316,6 @@
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=8"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=10"></script>
 </body>
 </html>

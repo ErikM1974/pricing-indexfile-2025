@@ -110,15 +110,15 @@
     // ── Rendering ────────────────────────────────────────────────────
     function renderStats() {
         var s = state.stats;
-        $('bt-stat-requested').textContent = s.Requested || 0;
-        $('bt-stat-ordered').textContent = s.Ordered || 0;
-        $('bt-stat-po').textContent = s.PO_Created || 0;
-        $('bt-stat-shipped').textContent = s.Shipped || 0;
-        $('bt-stat-received').textContent = s.Received || 0;
+        var byId = function (id) { return document.getElementById(id); };
+        if (byId('bt-stat-requested')) byId('bt-stat-requested').textContent = s.Requested || 0;
+        if (byId('bt-stat-ordered')) byId('bt-stat-ordered').textContent = s.Ordered || 0;
+        if (byId('bt-stat-shipped')) byId('bt-stat-shipped').textContent = s.Shipped || 0;
+        // PO_Created + Received chips dropped in v3.1 — guard against missing elements.
         var rushCount = state.allTransfers.filter(function (t) {
             return isRush(t) && t.Status !== 'Received' && t.Status !== 'Cancelled';
         }).length;
-        $('bt-stat-rush').textContent = rushCount;
+        if (byId('bt-stat-rush')) byId('bt-stat-rush').textContent = rushCount;
     }
 
     function isRush(t) {
@@ -166,62 +166,72 @@
         return status;
     }
 
+    /**
+     * Simplified card (v3.1, 2026-04-25). Shows ONLY what Bradley actually
+     * needs: ID, age, status, what came from Steve (design#/company/rep/
+     * transfer-type), and Supacolor # if auto-link populated it. Dropped:
+     * Qty/Size (NULL in v3 paste-links flow), ShopWorks PO# (ShopWorks-side,
+     * not Bradley's concern), reorder badge (v3 dropped reorder mode).
+     */
     function renderCard(t) {
         var ageHours = getAgeHours(t.Requested_At);
         var rushClass = isRush(t) ? ' bt-card--rush' : '';
         var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt"></i> RUSH</span>' : '';
-        var reorderBadge = t.Is_Reorder ? '<span class="tas-reorder-badge"><i class="fas fa-redo"></i> REORDER</span>' : '';
         var lineCountPill = (t.line_count && t.line_count > 1)
-            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' lines</span>'
+            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' transfers</span>'
             : '';
 
-        // Delete menu only available pre-Supacolor (before Bradley places the order).
-        // After that, Cancel (from detail page) is the correct action.
+        // Delete menu only pre-Supacolor (before order placed). Post-order
+        // → Cancel from the detail page (preserves audit).
         var canDelete = t.Status === 'Requested' || t.Status === 'On_Hold';
         var deleteMenu = canDelete ?
             '<button class="bt-card-menu-btn" data-action="delete" title="Delete (mistake)" aria-label="Delete transfer">' +
                 '<i class="fas fa-trash"></i>' +
             '</button>' : '';
 
-        // For reorders, prominently surface the Supacolor #; hide the (empty) Qty/Size fields
-        // since they live in the child lines table and can't be summarized cleanly on one line.
-        var qtyDisplay = (t.line_count && t.line_count > 1)
-            ? t.line_count + ' lines'
-            : ((t.Quantity || '—') + (t.Transfer_Size ? ' &middot; ' + escapeHtml(t.Transfer_Size) : ''));
+        // Subtitle with Steve-provided info: Sales Rep + Transfer Type
+        var subtitleParts = [];
+        if (t.Sales_Rep_Name || t.Sales_Rep_Email) {
+            subtitleParts.push('<i class="fas fa-user"></i> ' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email));
+        }
+        if (t.Transfer_Type) {
+            subtitleParts.push('<strong>' + escapeHtml(t.Transfer_Type) + '</strong>');
+        }
+        var subtitle = subtitleParts.length
+            ? '<div class="bt-card-subtitle">' + subtitleParts.join(' &middot; ') + '</div>'
+            : '';
+
+        // Supacolor # link — shown only after auto-link fires (or manual override).
+        // Click goes to live Supacolor job detail page.
+        var scLink = t.Supacolor_Order_Number
+            ? '<a class="bt-card-sc-link" href="/dashboards/supacolor-orders.html" onclick="event.stopPropagation()">' +
+                'Supacolor #' + escapeHtml(t.Supacolor_Order_Number) + ' <i class="fas fa-external-link-alt"></i>' +
+              '</a>'
+            : '';
 
         return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
             '<div class="bt-card-header">' +
                 '<span class="bt-card-id">' + escapeHtml(t.ID_Transfer || '') + '</span>' +
                 '<div class="bt-card-header-right">' +
+                    rushBadge +
                     '<span class="bt-card-age ' + ageClass(ageHours) + '">' + formatAge(ageHours) + '</span>' +
+                    '<span class="bt-badge ' + statusBadgeClass(t.Status) + '">' + escapeHtml(statusLabel(t.Status || 'Requested')) + '</span>' +
                     deleteMenu +
                 '</div>' +
             '</div>' +
-            '<div>' +
-                '<h3 class="bt-card-title">' + escapeHtml(t.Company_Name || 'No company') + '</h3>' +
-                '<div class="bt-card-design">' +
-                    (t.Design_Number ? 'Design #' + escapeHtml(t.Design_Number) : 'No design #') +
-                    (t.Customer_Name ? ' &middot; ' + escapeHtml(t.Customer_Name) : '') +
-                '</div>' +
+            '<div class="bt-card-body">' +
+                '<h3 class="bt-card-title">' +
+                    (t.Design_Number ? '#' + escapeHtml(t.Design_Number) + ' &middot; ' : '') +
+                    escapeHtml(t.Company_Name || 'No company') +
+                '</h3>' +
+                subtitle +
+                (t.Customer_Name && t.Customer_Name !== t.Company_Name
+                    ? '<div class="bt-card-design">' + escapeHtml(t.Customer_Name) + '</div>'
+                    : '') +
             '</div>' +
-            '<div class="bt-card-meta">' +
-                '<span class="bt-card-meta-label">Qty:</span>' +
-                '<span class="bt-card-meta-value">' + qtyDisplay + '</span>' +
-                '<span class="bt-card-meta-label">Rep:</span>' +
-                '<span class="bt-card-meta-value">' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email || '—') + '</span>' +
-                (t.Supacolor_Order_Number ?
-                    '<span class="bt-card-meta-label">SC #:</span>' +
-                    '<span class="bt-card-meta-value">' + escapeHtml(t.Supacolor_Order_Number) + '</span>' : '') +
-                (t.ShopWorks_PO_Number ?
-                    '<span class="bt-card-meta-label">PO #:</span>' +
-                    '<span class="bt-card-meta-value">' + escapeHtml(t.ShopWorks_PO_Number) + '</span>' : '') +
-            '</div>' +
-            '<div class="bt-card-footer">' +
-                '<span class="bt-badge ' + statusBadgeClass(t.Status) + '">' + escapeHtml(statusLabel(t.Status || 'Requested')) + '</span>' +
-                rushBadge +
-                reorderBadge +
-                lineCountPill +
-            '</div>' +
+            (scLink || lineCountPill
+                ? '<div class="bt-card-footer">' + lineCountPill + scLink + '</div>'
+                : '') +
         '</div>';
     }
 
@@ -291,10 +301,14 @@
                        String(t.Design_Number || '').toLowerCase().includes(q) ||
                        (t.ID_Transfer || '').toLowerCase().includes(q) ||
                        (t.Supacolor_Order_Number || '').toLowerCase().includes(q) ||
-                       (t.ShopWorks_PO_Number || '').toLowerCase().includes(q);
+                       // v3.1: search now covers rep names + emails too (Rep dropdown removed)
+                       (t.Sales_Rep_Name || '').toLowerCase().includes(q) ||
+                       (t.Sales_Rep_Email || '').toLowerCase().includes(q);
             });
         }
 
+        // f.rep filter retained for backward compat with any legacy ?view= caller,
+        // but the dropdown is gone in v3.1; search-by-text covers rep names.
         if (f.rep) {
             list = list.filter(function (t) { return t.Sales_Rep_Email === f.rep; });
         }
@@ -317,30 +331,13 @@
         renderGrid();
     }
 
-    function populateRepFilter() {
-        var reps = {};
-        state.allTransfers.forEach(function (t) {
-            if (t.Sales_Rep_Email) {
-                reps[t.Sales_Rep_Email] = t.Sales_Rep_Name || t.Sales_Rep_Email;
-            }
-        });
-        var select = $('bt-filter-rep');
-        var current = select.value;
-        // Preserve "All Reps" option + add sorted unique reps
-        var options = ['<option value="">All Reps</option>'];
-        Object.keys(reps).sort(function (a, b) {
-            return reps[a].localeCompare(reps[b]);
-        }).forEach(function (email) {
-            options.push('<option value="' + escapeHtml(email) + '">' + escapeHtml(reps[email]) + '</option>');
-        });
-        select.innerHTML = options.join('');
-        if (current) select.value = current;
-    }
+    // populateRepFilter() removed in v3.1 — rep is now visible on each card,
+    // and search-by-text covers rep names too. The dropdown was overkill for
+    // a queue with ~5 unique reps.
 
     // ── Refresh ──────────────────────────────────────────────────────
     async function refresh() {
         await Promise.all([fetchTransfers(), fetchStats()]);
-        populateRepFilter();
         renderStats();
         applyFilters();
     }
@@ -496,10 +493,7 @@
             state.filters.search = e.target.value;
             applyFilters();
         });
-        $('bt-filter-rep').addEventListener('change', function (e) {
-            state.filters.rep = e.target.value;
-            applyFilters();
-        });
+        // Rep dropdown removed in v3.1 — search-by-text covers rep names
         $('bt-filter-rush-only').addEventListener('change', function (e) {
             state.filters.rushOnly = e.target.checked;
             applyFilters();
@@ -508,7 +502,6 @@
             state.filters = { status: '', search: '', rep: '', rushOnly: false };
             $('bt-filter-status').value = '';
             $('bt-filter-search').value = '';
-            $('bt-filter-rep').value = '';
             $('bt-filter-rush-only').checked = false;
             applyFilters();
         });

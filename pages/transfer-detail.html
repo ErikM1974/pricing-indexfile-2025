@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=1">
-    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=5">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=6">
 </head>
 <body>
     <div class="minimal-header">
@@ -68,24 +68,18 @@
                         </div>
                     </div>
 
-                    <!-- Specs Panel -->
-                    <div class="td-card">
-                        <div class="td-card-header">
-                            <h3><i class="fas fa-ruler-combined"></i> Order Specs</h3>
-                            <button class="bt-btn bt-btn--link bt-btn--small" id="td-edit-specs-btn">
-                                <i class="fas fa-pen"></i> Edit
-                            </button>
-                        </div>
-                        <div class="td-card-body" id="td-specs-panel"></div>
-                    </div>
+                    <!-- Specs Panel removed in v3.1 (2026-04-25) — Qty/Press/W/H/Notes
+                         fields are NULL in v3 paste-links flow. Per-line dimensions
+                         live in Transfer_Order_Lines and the Live Supacolor Status
+                         card below shows what Bradley actually placed. Kept hidden
+                         div with the original ID so any leftover JS targeting it
+                         doesn't crash. -->
+                    <div id="td-specs-panel" style="display:none;"></div>
 
-                    <!-- Supacolor / PO Panel -->
-                    <div class="td-card">
-                        <div class="td-card-header">
-                            <h3><i class="fas fa-receipt"></i> Order Tracking</h3>
-                        </div>
-                        <div class="td-card-body" id="td-tracking-panel"></div>
-                    </div>
+                    <!-- Tracking Panel removed in v3.1 — merged into Live Supacolor
+                         Status card. Tracking#/Carrier/Ship Method are auto-populated
+                         by transfer-status-mirror.js from the Supacolor API sync. -->
+                    <div id="td-tracking-panel" style="display:none;"></div>
 
                     <!-- Live Supacolor Status (populated from Supacolor_Jobs once linked) -->
                     <div class="td-card" id="td-supacolor-live-card" style="display:none;">
@@ -489,6 +483,6 @@
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=14"></script>
-    <script src="/pages/js/transfer-detail.js?v=10"></script>
+    <script src="/pages/js/transfer-detail.js?v=12"></script>
 </body>
 </html>

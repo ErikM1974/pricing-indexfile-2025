@@ -262,9 +262,12 @@
             (r.Rush_Reason ? '<div class="td-meta-item"><span class="td-meta-label">Rush Reason</span><span class="td-meta-value">' + escapeHtml(r.Rush_Reason) + '</span></div>' : '');
 
         renderArtworkPanel();
-        renderSpecsPanel();
-        renderTrackingPanel();
-        renderSupacolorLiveStatus();  // Part D.1 — fetches + renders linked Supacolor_Jobs
+        // renderSpecsPanel() removed in v3.1 — Order Specs panel deprecated
+        // (Qty/Press/W/H fields are NULL in v3 paste-links flow; per-line data
+        // lives on Transfer_Order_Lines + the Live Supacolor card below).
+        // renderTrackingPanel() removed in v3.1 — merged into Live Supacolor
+        // Status card (transfer-status-mirror auto-populates the same data).
+        renderSupacolorLiveStatus();  // Part D.1 — linked Supacolor_Jobs (now the canonical tracking view)
         renderActionsPanel();
         renderTimeline();
     }
@@ -583,6 +586,18 @@
         $('td-tracking-panel').innerHTML = html;
     }
 
+    /**
+     * v3.1 simplified actions panel (2026-04-25). Most status flips happen
+     * automatically now: auto-link sets Status=Ordered + Supacolor#, status-mirror
+     * sets Status=Shipped + tracking. Bradley's remaining manual actions are:
+     *   - Manual Supacolor# entry — fallback when auto-link missed (was "Mark as Ordered")
+     *   - Hold / Resume — pause workflow
+     *   - Rush toggle — escalate priority
+     *   - Cancel — preserve audit, terminate
+     *   - Delete — hard-delete pre-Supacolor mistakes
+     * Removed: Add ShopWorks PO# (ShopWorks-side, not Bradley's), Mark as Shipped
+     * (auto-mirror handles it), Mark as Received (auto-mirror handles it).
+     */
     function renderActionsPanel() {
         var r = state.record;
         var status = r.Status || 'Requested';
@@ -598,17 +613,22 @@
 
         var actions = [];
 
-        // Next-step button (context-sensitive, primary style)
-        if (status === 'Requested') {
-            actions.push({ id: 'td-act-ordered', icon: 'paper-plane', label: 'Mark as Ordered', variant: 'primary', modal: 'td-ordered-modal' });
-        } else if (status === 'Ordered') {
-            actions.push({ id: 'td-act-po', icon: 'file-invoice-dollar', label: 'Add ShopWorks PO #', variant: 'primary', modal: 'td-po-modal' });
-        } else if (status === 'PO_Created') {
-            actions.push({ id: 'td-act-shipped', icon: 'truck', label: 'Mark as Shipped', variant: 'primary', modal: 'td-shipped-modal' });
-        } else if (status === 'Shipped') {
-            actions.push({ id: 'td-act-received', icon: 'check-circle', label: 'Mark as Received', variant: 'primary', action: 'received' });
-        } else if (status === 'On_Hold') {
-            actions.push({ id: 'td-act-resume', icon: 'play', label: 'Resume (→ Requested)', variant: 'primary', action: 'resume' });
+        // Manual Supacolor # fallback — only useful pre-link (Status=Requested or
+        // On_Hold). Once linked, the API drives the rest. Re-labeled to make it
+        // clear this is a fallback, not the primary path.
+        if (status === 'Requested' || status === 'On_Hold') {
+            actions.push({
+                id: 'td-act-ordered',
+                icon: 'link',
+                label: 'Manual link to Supacolor #',
+                variant: 'primary',
+                modal: 'td-ordered-modal'
+            });
+        }
+
+        // Resume from On_Hold
+        if (status === 'On_Hold') {
+            actions.push({ id: 'td-act-resume', icon: 'play', label: 'Resume', variant: 'primary', action: 'resume' });
         }
 
         // Always-available side actions
@@ -624,8 +644,7 @@
         });
         actions.push({ id: 'td-act-cancel', icon: 'times-circle', label: 'Cancel Transfer', variant: 'danger', modal: 'td-cancel-modal' });
 
-        // Hard-delete: only available before Bradley has placed a Supacolor order.
-        // For legitimate mid-flight backouts, use Cancel (preserves audit trail).
+        // Hard-delete pre-Supacolor only. Post-order → Cancel (preserves audit).
         if (status === 'Requested' || status === 'On_Hold') {
             actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
         }
@@ -647,8 +666,6 @@
                 var action = btn.getAttribute('data-action');
                 if (modalId) {
                     openModal(modalId);
-                } else if (action === 'received') {
-                    handleSimpleStatus('Received', 'Marked as Received.');
                 } else if (action === 'hold') {
                     handleSimpleStatus('On_Hold', 'Put on hold.');
                 } else if (action === 'resume') {
@@ -1288,7 +1305,10 @@
         setupPasteZone('ordered');
         setupPasteZone('shipped');
 
-        $('td-edit-specs-btn').addEventListener('click', openSpecsModal);
+        // td-edit-specs-btn removed in v3.1 — Edit Specs modal deprecated.
+        // Guard against missing element so legacy bookmarks don't error.
+        var editSpecsBtn = document.getElementById('td-edit-specs-btn');
+        if (editSpecsBtn) editSpecsBtn.addEventListener('click', openSpecsModal);
         $('td-add-comment-btn').addEventListener('click', handleCommentSubmit);
         $('td-comment-input').addEventListener('keydown', function (e) {
             // Cmd/Ctrl+Enter to submit
