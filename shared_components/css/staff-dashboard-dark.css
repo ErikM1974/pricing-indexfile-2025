@@ -438,6 +438,29 @@ body {
     color: white;
 }
 
+/* Workflow strip — dark mode */
+.tool-workflow {
+    background: rgba(96, 165, 250, 0.06);
+    border-color: rgba(96, 165, 250, 0.30);
+}
+.tool-workflow:hover {
+    background: rgba(96, 165, 250, 0.12);
+    border-color: rgba(96, 165, 250, 0.55);
+}
+.tool-workflow-label {
+    color: var(--text-muted, #9ca3af);
+}
+.tool-workflow-arrow {
+    color: var(--accent-blue);
+}
+.tool-workflow .tool-btn {
+    background: var(--card-dark);
+    border-color: transparent;
+}
+.tool-workflow:hover .tool-btn {
+    border-color: rgba(96, 165, 250, 0.25);
+}
+
 /* Tool dropdown dark mode */
 .tool-dropdown-btn {
     background: var(--accent-blue);

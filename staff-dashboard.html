@@ -13,10 +13,10 @@
 
     <!-- Dashboard Styles -->
     <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
-    <link href="/shared_components/css/staff-dashboard-layout.css" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-layout.css?v=20260425a" rel="stylesheet">
     <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
     <!-- Dark Mode Theme -->
-    <link href="/shared_components/css/staff-dashboard-dark.css" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-dark.css?v=20260425a" rel="stylesheet">
 </head>
 <body>
     <!-- Loading Overlay -->
@@ -274,9 +274,20 @@
                                 <span class="tool-category-title">Frequently Used Tools</span>
                             </div>
                             <div class="tool-buttons">
+                                <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders.
+                                     Visually groups two sequential steps in the transfer flow. -->
+                                <div class="tool-workflow" aria-label="Transfer workflow">
+                                    <div class="tool-workflow-label">
+                                        <i class="fas fa-route"></i> Transfer Workflow
+                                    </div>
+                                    <div class="tool-workflow-row">
+                                        <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck"></i> Bradley's Transfer Queue</a>
+                                        <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                                        <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
+                                    </div>
+                                </div>
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette"></i> AE Dashboard</a>
                                 <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart"></i> Purchasing</a>
-                                <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck"></i> Bradley's Transfer Queue</a>
                                 <a href="/pages/order-form.html" class="tool-btn"><i class="fas fa-file-invoice"></i> Order Form</a>
                             </div>
                         </div>
@@ -369,7 +380,6 @@
                             <div class="tool-buttons">
                                 <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush"></i> Steve's Queue</a>
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass"></i> Ruth's Queue</a>
-                                <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
                                 <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-microscope"></i> DST Stitch Viewer</a>
                                 <a href="/pages/mockup-generator.html" class="tool-btn"><i class="fas fa-magic"></i> Mockup Generator</a>
                                 <a href="/dashboards/portal-directory.html" class="tool-btn tool-btn--green"><i class="fas fa-globe"></i> Customer Portals</a>

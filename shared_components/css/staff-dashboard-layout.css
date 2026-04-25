@@ -513,6 +513,67 @@
     letter-spacing: -0.01em;
 }
 
+/* ── Workflow Strip ──────────────────────────────────────
+ * Visually groups buttons that are sequential steps in a workflow
+ * (e.g. Bradley's Transfer Queue → Supacolor API Orders).
+ * Lives inside .tool-buttons; grabs its own full row via flex-basis.
+ * Pattern reusable across the dashboard for any 2-3 step flow.
+ */
+.tool-workflow {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 12px 10px;
+    background: rgba(74, 111, 165, 0.05);
+    border: 1px dashed rgba(74, 111, 165, 0.30);
+    border-radius: 8px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    margin-bottom: 0.25rem;
+}
+.tool-workflow:hover {
+    background: rgba(74, 111, 165, 0.10);
+    border-color: rgba(74, 111, 165, 0.55);
+}
+.tool-workflow-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted, #6b7280);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.tool-workflow-label i {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+.tool-workflow-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.tool-workflow-arrow {
+    color: var(--wsu-crimson, #4a6fa5);
+    font-size: 0.75rem;
+    opacity: 0.6;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.tool-workflow:hover .tool-workflow-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+}
+.tool-workflow .tool-btn {
+    border-color: transparent;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.tool-workflow:hover .tool-btn {
+    border-color: rgba(74, 111, 165, 0.25);
+}
+
 /* ── Category Accent Borders ─────────────────────────── */
 .tool-category--pricing { border-left: 3px solid var(--wsu-crimson); }
 .tool-category--art     { border-left: 3px solid #10b981; }
