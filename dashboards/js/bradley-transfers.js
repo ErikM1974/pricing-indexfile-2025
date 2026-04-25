@@ -202,11 +202,14 @@
             : '';
 
         // Supacolor # link — shown only after auto-link fires (or manual override).
-        // Click goes to live Supacolor job detail page.
+        // Click handler (in renderGrid below) resolves the numeric ID_Job via
+        // /api/supacolor-jobs/by-number and navigates straight to the live
+        // Supacolor job detail page. Lazy resolution keeps initial render fast
+        // (no N+1 lookups across cards).
         var scLink = t.Supacolor_Order_Number
-            ? '<a class="bt-card-sc-link" href="/dashboards/supacolor-orders.html" onclick="event.stopPropagation()">' +
+            ? '<button type="button" class="bt-card-sc-link" data-sc-number="' + escapeHtml(t.Supacolor_Order_Number) + '" title="Open Supacolor job">' +
                 'Supacolor #' + escapeHtml(t.Supacolor_Order_Number) + ' <i class="fas fa-external-link-alt"></i>' +
-              '</a>'
+              '</button>'
             : '';
 
         return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
@@ -251,7 +254,10 @@
         grid.innerHTML = list.map(renderCard).join('');
         $('bt-result-count').textContent = list.length + ' transfer' + (list.length === 1 ? '' : 's');
 
-        // Wire up card clicks — delete button takes priority; rest of card navigates.
+        // Wire up card clicks — three click targets, in priority order:
+        //   1. Delete button → open hard-delete modal
+        //   2. Supacolor # link → resolve numeric ID + navigate to SC job detail
+        //   3. Anywhere else on the card → navigate to Transfer detail page
         grid.querySelectorAll('.bt-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 var deleteBtn = e.target.closest('.bt-card-menu-btn[data-action="delete"]');
@@ -260,10 +266,53 @@
                     openDeleteModal(card.getAttribute('data-id'));
                     return;
                 }
+                var scLink = e.target.closest('.bt-card-sc-link');
+                if (scLink) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    navigateToSupacolorJob(scLink, scLink.getAttribute('data-sc-number'));
+                    return;
+                }
                 var id = card.getAttribute('data-id');
                 window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(id);
             });
         });
+    }
+
+    /**
+     * Resolve a Supacolor_Job_Number (the business key Bradley sees, e.g.
+     * "639515") to its numeric ID_Job (Caspio PK), then navigate to the
+     * live Supacolor job detail page. Uses the existing
+     * /api/supacolor-jobs/by-number/:jobNumber endpoint.
+     *
+     * Falls back to the Supacolor list page (pre-filtered by search) if
+     * resolution fails.
+     */
+    async function navigateToSupacolorJob(btnEl, jobNumber) {
+        if (!jobNumber) return;
+        var origLabel = btnEl.innerHTML;
+        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(jobNumber);
+        btnEl.disabled = true;
+        try {
+            var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(jobNumber));
+            var data = await resp.json();
+            // Endpoint returns data.job (not data.record — verified 2026-04-25).
+            // Defensively check both shapes in case the contract changes.
+            var job = (data && (data.job || data.record)) || null;
+            if (resp.ok && data && data.success && job && job.ID_Job) {
+                window.location.href = '/pages/supacolor-job-detail.html?id=' + encodeURIComponent(job.ID_Job);
+                return;
+            }
+            // Not found in our local mirror — drop into the list with the
+            // jobNumber pre-filled in search so user can find it manually.
+            console.warn('[bradley-transfers] Supacolor job #' + jobNumber + ' not found in local mirror; falling back to list view.');
+            window.location.href = '/dashboards/supacolor-orders.html?search=' + encodeURIComponent(jobNumber);
+        } catch (err) {
+            console.error('[bradley-transfers] Supacolor lookup failed:', err);
+            btnEl.innerHTML = origLabel;
+            btnEl.disabled = false;
+            showToast('Could not open Supacolor job: ' + err.message, 'error');
+        }
     }
 
     // ── Filtering ────────────────────────────────────────────────────

@@ -599,6 +599,17 @@
 
     // ── Init ───────────────────────────────────────────────────────────
     async function init() {
+        // Honor ?search=XXX URL param so other pages (e.g. Bradley's queue
+        // card SC link fallback) can deep-link straight into a filtered view.
+        try {
+            var urlParams = new URLSearchParams(window.location.search);
+            var initialSearch = urlParams.get('search');
+            if (initialSearch) {
+                state.filters.search = initialSearch;
+                $('sc-filter-search').value = initialSearch;
+            }
+        } catch (e) { /* old browsers — no-op */ }
+
         // Filter wiring
         $('sc-filter-status').addEventListener('change', function (e) {
             state.filters.status = e.target.value;
