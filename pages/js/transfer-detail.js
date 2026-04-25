@@ -821,36 +821,40 @@
         var r = state.record;
         var status = r.Status || 'Requested';
         var panel = $('td-actions-panel');
+        var card = panel ? panel.closest('.td-card') : null;
 
-        if (status === 'Received' || status === 'Cancelled') {
-            panel.innerHTML = '<div class="td-terminal-notice">' +
-                '<i class="fas fa-' + (status === 'Received' ? 'check-circle' : 'ban') + '"></i>' +
-                'This transfer is <strong>' + statusLabel(status) + '</strong> and closed for further action.' +
-                '</div>';
+        // v3.2 (2026-04-25): hide the entire Actions card once the transfer has
+        // been placed with Supacolor. Post-Order, the Live Supacolor Status
+        // panel is the source of truth and the remaining mutate actions
+        // (Hold/Rush/Cancel) had little real-world value — On Hold can't pause
+        // Supacolor, Rush is decided upstream, and a real cancel needs to
+        // happen on Supacolor's side. Bradley's page becomes pure tracking.
+        if (status !== 'Requested' && status !== 'On_Hold') {
+            if (card) card.style.display = 'none';
+            panel.innerHTML = '';
             return;
         }
+        if (card) card.style.display = '';
 
         var actions = [];
 
         // Manual Supacolor # fallback — only useful pre-link (Status=Requested or
         // On_Hold). Once linked, the API drives the rest. Re-labeled to make it
         // clear this is a fallback, not the primary path.
-        if (status === 'Requested' || status === 'On_Hold') {
-            actions.push({
-                id: 'td-act-ordered',
-                icon: 'link',
-                label: 'Manual link to Supacolor #',
-                variant: 'primary',
-                modal: 'td-ordered-modal'
-            });
-        }
+        actions.push({
+            id: 'td-act-ordered',
+            icon: 'link',
+            label: 'Manual link to Supacolor #',
+            variant: 'primary',
+            modal: 'td-ordered-modal'
+        });
 
         // Resume from On_Hold
         if (status === 'On_Hold') {
             actions.push({ id: 'td-act-resume', icon: 'play', label: 'Resume', variant: 'primary', action: 'resume' });
         }
 
-        // Always-available side actions
+        // Always-available side actions (still pre-Order at this point)
         if (status !== 'On_Hold') {
             actions.push({ id: 'td-act-hold', icon: 'pause', label: 'Put On Hold', variant: 'default', action: 'hold' });
         }
@@ -864,9 +868,7 @@
         actions.push({ id: 'td-act-cancel', icon: 'times-circle', label: 'Cancel Transfer', variant: 'danger', modal: 'td-cancel-modal' });
 
         // Hard-delete pre-Supacolor only. Post-order → Cancel (preserves audit).
-        if (status === 'Requested' || status === 'On_Hold') {
-            actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
-        }
+        actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
 
         panel.innerHTML = '<div class="td-actions-grid">' +
             actions.map(function (a) {
