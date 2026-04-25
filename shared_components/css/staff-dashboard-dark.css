@@ -438,27 +438,69 @@ body {
     color: white;
 }
 
-/* Workflow strip — dark mode */
+/* Workflow strip — dark mode (modernized 2026-04-25) */
 .tool-workflow {
-    background: rgba(96, 165, 250, 0.06);
-    border-color: rgba(96, 165, 250, 0.30);
+    background:
+        linear-gradient(135deg,
+            rgba(96, 165, 250, 0.10) 0%,
+            rgba(96, 165, 250, 0.04) 100%);
+    border-color: rgba(96, 165, 250, 0.22);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.tool-workflow::before {
+    background: var(--accent-blue, #60a5fa);
+    opacity: 0.7;
 }
 .tool-workflow:hover {
-    background: rgba(96, 165, 250, 0.12);
-    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow:
+        0 8px 24px -8px rgba(96, 165, 250, 0.45),
+        0 2px 4px rgba(0, 0, 0, 0.30);
 }
+.tool-workflow:hover::before { opacity: 1; }
+
 .tool-workflow-label {
-    color: var(--text-muted, #9ca3af);
+    color: rgba(96, 165, 250, 0.85);
 }
-.tool-workflow-arrow {
-    color: var(--accent-blue);
-}
+
 .tool-workflow .tool-btn {
-    background: var(--card-dark);
-    border-color: transparent;
+    background: var(--card-dark, #1f2937);
+    border-color: rgba(96, 165, 250, 0.20);
+    color: var(--text-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
-.tool-workflow:hover .tool-btn {
-    border-color: rgba(96, 165, 250, 0.25);
+.tool-workflow .tool-btn:hover {
+    border-color: rgba(96, 165, 250, 0.55);
+    color: var(--accent-blue, #60a5fa);
+    background: var(--card-dark, #1f2937);
+    box-shadow: 0 4px 12px -2px rgba(96, 165, 250, 0.35);
+}
+
+.tool-workflow .tool-btn:first-of-type,
+.tool-workflow-row > .tool-btn:first-of-type {
+    /* Override the light-mode gradient with a darker accent gradient */
+    background: linear-gradient(135deg,
+        var(--accent-blue, #3b82f6) 0%,
+        #1d4ed8 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow:
+        0 4px 14px -2px rgba(59, 130, 246, 0.55),
+        0 1px 2px rgba(0, 0, 0, 0.30);
+}
+.tool-workflow .tool-btn:first-of-type:hover,
+.tool-workflow-row > .tool-btn:first-of-type:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, var(--accent-blue, #3b82f6) 100%);
+    box-shadow:
+        0 8px 24px -4px rgba(59, 130, 246, 0.65),
+        0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.tool-workflow-arrow {
+    background: rgba(96, 165, 250, 0.18);
+    color: var(--accent-blue, #60a5fa);
+}
+.tool-workflow:hover .tool-workflow-arrow {
+    background: rgba(96, 165, 250, 0.32);
 }
 
 /* Tool dropdown dark mode */

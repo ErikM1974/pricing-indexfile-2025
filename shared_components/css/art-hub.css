@@ -4322,68 +4322,135 @@ input.cbSearchButton {
  *   </div>
  */
 .tool-workflow {
+    /* Soft elevated card on a faint accent-tinted ground — replaces the
+     * old dashed-debug-box look. Subtle left accent stripe, smooth shadow
+     * lift on hover. */
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 10px 14px 12px;
+    gap: 10px;
+    padding: 14px 18px 16px 22px;
     margin-bottom: 16px;
-    background: var(--art-theme-bg, rgba(0, 0, 0, 0.03));
-    border: 1px dashed var(--art-theme, #6b7280);
-    border-radius: 10px;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    background:
+        linear-gradient(135deg,
+            color-mix(in srgb, var(--art-theme, #4a6fa5) 7%, white) 0%,
+            color-mix(in srgb, var(--art-theme, #4a6fa5) 2%, white) 100%);
+    border: 1px solid color-mix(in srgb, var(--art-theme, #4a6fa5) 18%, white);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tool-workflow::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 3px;
+    border-radius: 0 3px 3px 0;
+    background: var(--art-theme, #4a6fa5);
+    opacity: 0.55;
+    transition: opacity 0.25s ease;
 }
 .tool-workflow:hover {
-    background: var(--art-theme-bg-hover, rgba(0, 0, 0, 0.05));
+    box-shadow:
+        0 8px 24px -8px color-mix(in srgb, var(--art-theme, #4a6fa5) 30%, transparent),
+        0 2px 4px rgba(0, 0, 0, 0.04);
+    transform: translateY(-1px);
 }
-.tool-workflow-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--art-theme-dark, #4b5563);
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-}
-.tool-workflow-label i {
-    font-size: 0.75rem;
+.tool-workflow:hover::before {
     opacity: 0.85;
 }
+
+.tool-workflow-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--art-theme, #4b5563);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.75;
+}
+.tool-workflow-label i {
+    font-size: 0.8rem;
+    opacity: 1;
+}
+
 .tool-workflow-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem;
-}
-.tool-workflow-arrow {
-    color: var(--art-theme, #6b7280);
-    font-size: 0.85rem;
-    opacity: 0.6;
-    user-select: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.tool-workflow:hover .tool-workflow-arrow {
-    opacity: 1;
-    transform: translateX(2px);
+    gap: 0;            /* gaps managed by arrow margins for tighter chain */
 }
 
-/* First button in a workflow strip is the entry action — give it a
- * primary CTA treatment (filled accent) so users know where the flow
- * starts. Subsequent buttons stay secondary. Theme-aware via --art-theme. */
+/* Pill-button styling overrides default .tool-btn for a more refined look */
+.tool-workflow .tool-btn {
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-decoration: none;          /* explicit override — kills <a> underline bleed */
+    border: 1px solid color-mix(in srgb, var(--art-theme, #4a6fa5) 22%, white);
+    background: white;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tool-workflow .tool-btn:hover {
+    border-color: color-mix(in srgb, var(--art-theme, #4a6fa5) 50%, white);
+    color: var(--art-theme-dark, #33537d);
+    background: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--art-theme, #4a6fa5) 25%, transparent);
+}
+
+/* First button in a workflow strip is the entry action — gradient + glow */
 .tool-workflow .tool-btn:first-of-type,
 .tool-workflow-row > .tool-btn:first-of-type {
-    background: var(--art-theme, #4a6fa5);
+    background: linear-gradient(135deg,
+        var(--art-theme, #4a6fa5) 0%,
+        var(--art-theme-dark, #33537d) 100%);
     color: white;
-    border-color: var(--art-theme, #4a6fa5);
+    border-color: transparent;
     font-weight: 600;
+    box-shadow:
+        0 4px 14px -2px color-mix(in srgb, var(--art-theme, #4a6fa5) 50%, transparent),
+        0 1px 2px rgba(0, 0, 0, 0.08);
 }
 .tool-workflow .tool-btn:first-of-type:hover,
 .tool-workflow-row > .tool-btn:first-of-type:hover {
-    background: var(--art-theme-dark, #33537d);
-    border-color: var(--art-theme-dark, #33537d);
+    background: linear-gradient(135deg,
+        var(--art-theme-dark, #33537d) 0%,
+        var(--art-theme, #4a6fa5) 100%);
     color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 24px -4px color-mix(in srgb, var(--art-theme, #4a6fa5) 60%, transparent),
+        0 2px 4px rgba(0, 0, 0, 0.10);
+}
+
+/* Arrow connector — chevron in a soft pill between buttons */
+.tool-workflow-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    margin: 0 6px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--art-theme, #4a6fa5) 12%, transparent);
+    color: var(--art-theme-dark, var(--art-theme, #4a6fa5));
+    font-size: 0.7rem;
+    user-select: none;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tool-workflow:hover .tool-workflow-arrow {
+    background: color-mix(in srgb, var(--art-theme, #4a6fa5) 22%, transparent);
+    transform: translateX(2px);
 }
 
 /* ── Tab group divider ───────────────────────────────────────
