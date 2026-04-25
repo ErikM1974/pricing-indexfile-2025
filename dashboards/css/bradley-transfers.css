@@ -10,6 +10,19 @@
     --bt-theme-rgba-10: rgba(74, 111, 165, 0.1);
     --bt-theme-rgba-15: rgba(74, 111, 165, 0.15);
 
+    /* Map onto art-hub.css's --art-theme variables so .minimal-header,
+     * .tab-button.active, etc. pick up Bradley's navy palette. Without these
+     * Bradley's pages render the header with no background (white-on-white). */
+    --art-theme: #4a6fa5;
+    --art-theme-dark: #33537d;
+    --art-theme-light: #eaf0f9;
+    --art-theme-hover: #33537d;
+    --art-theme-bg: #f4f7fb;
+    --art-theme-bg-hover: #eaf0f9;
+    --art-theme-bg-selected: #dbe5f1;
+    --art-theme-rgba-10: rgba(74, 111, 165, 0.1);
+    --art-theme-rgba-15: rgba(74, 111, 165, 0.15);
+
     --bt-status-requested: #d97706;     /* amber — awaiting Bradley */
     --bt-status-ordered: #2563eb;       /* blue — sent to Supacolor */
     --bt-status-po: #7c3aed;            /* purple — PO created */
