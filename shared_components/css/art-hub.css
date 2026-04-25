@@ -4257,6 +4257,54 @@ input.cbSearchButton {
 .broken-status--submitted { background: #fce7f3; color: #9d174d; }
 .broken-status--revision-requested { background: #fde68a; color: #78350f; }
 
+/* ── Breadcrumb (sits inside .minimal-header where back-link used to be) ──
+ * White on art-theme background. Last segment is a non-link "current" pill.
+ * Used across all art-hub-* pages for consistent navigation.
+ */
+.bt-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.92);
+    flex-wrap: wrap;
+    line-height: 1.3;
+}
+.bt-breadcrumb a {
+    color: white;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+.bt-breadcrumb a:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: white;
+    text-decoration: none;
+}
+.bt-breadcrumb-sep {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 13px;
+    user-select: none;
+}
+.bt-breadcrumb-current {
+    color: white;
+    font-weight: 600;
+    padding: 4px 8px;
+    background: rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    white-space: nowrap;
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+@media (max-width: 600px) {
+    .bt-breadcrumb { font-size: 12px; gap: 4px; }
+    .bt-breadcrumb a, .bt-breadcrumb-current { padding: 3px 6px; }
+    .bt-breadcrumb-current { max-width: 160px; }
+}
+
 /* ── Workflow Strip ──────────────────────────────────────────
  * Visually groups buttons that are sequential steps in a workflow
  * (e.g. Send to Supacolor → My Transfer Queue → API Orders).
@@ -4317,4 +4365,43 @@ input.cbSearchButton {
 .tool-workflow:hover .tool-workflow-arrow {
     opacity: 1;
     transform: translateX(2px);
+}
+
+/* First button in a workflow strip is the entry action — give it a
+ * primary CTA treatment (filled accent) so users know where the flow
+ * starts. Subsequent buttons stay secondary. Theme-aware via --art-theme. */
+.tool-workflow .tool-btn:first-of-type,
+.tool-workflow-row > .tool-btn:first-of-type {
+    background: var(--art-theme, #4a6fa5);
+    color: white;
+    border-color: var(--art-theme, #4a6fa5);
+    font-weight: 600;
+}
+.tool-workflow .tool-btn:first-of-type:hover,
+.tool-workflow-row > .tool-btn:first-of-type:hover {
+    background: var(--art-theme-dark, #33537d);
+    border-color: var(--art-theme-dark, #33537d);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Tab group divider ───────────────────────────────────────
+ * Visually separates internal page-switch tabs from cross-link tabs
+ * (full navigation away). Mark the first cross-link tab with the
+ * `tab-button-link--first-external` modifier; CSS draws a thin
+ * dashed divider on its left edge.
+ */
+.tab-button-link--first-external {
+    margin-left: 12px;
+    position: relative;
+}
+.tab-button-link--first-external::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 12%;
+    bottom: 12%;
+    width: 0;
+    border-left: 1px dashed rgba(0, 0, 0, 0.18);
 }

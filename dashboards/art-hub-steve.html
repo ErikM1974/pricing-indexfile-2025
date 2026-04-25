@@ -7,7 +7,7 @@
     <title>Artist Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <style>:root { --art-theme: #009900; --art-theme-dark: #006600; --art-theme-light: #f0f9f0; --art-theme-hover: #009900; --art-theme-bg: #f0f9f0; --art-theme-bg-hover: #e6f7e6; --art-theme-bg-selected: #e0f5e0; --art-theme-rgba-15: rgba(0,153,0,0.15); --art-theme-rgba-10: rgba(0,153,0,0.1); }</style>
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=17">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=18">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -16,19 +16,41 @@
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
-        <div style="display:flex; align-items:center; gap:8px;">
-            <a href="/staff-dashboard.html" class="back-link">&larr; Staff Dashboard</a>
-        </div>
+        <nav class="bt-breadcrumb" aria-label="Breadcrumb">
+            <a href="/staff-dashboard.html">Staff Dashboard</a>
+            <span class="bt-breadcrumb-sep">&rsaquo;</span>
+            <span class="bt-breadcrumb-current">Steve's Queue</span>
+        </nav>
     </div>
 
     <!-- Tab Container -->
     <div class="tab-container">
-        <!-- Tab Buttons -->
+        <!-- Transfer Workflow strip lives ABOVE the tab row so it's
+             visible on every inner tab, not just Gallery. -->
+        <div class="tool-workflow" aria-label="Transfer workflow">
+            <div class="tool-workflow-label">
+                <i class="fas fa-route"></i> Transfer Workflow
+            </div>
+            <div class="tool-workflow-row">
+                <button type="button" id="steve-send-supacolor-btn" class="tool-btn" title="Pick files from your Box folder and send to Bradley for Supacolor">
+                    <i class="fas fa-paper-plane"></i> Send to Supacolor
+                </button>
+                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                <a href="/dashboards/bradley-transfers.html?view=steve" class="tool-btn"><i class="fas fa-truck"></i> My Transfer Queue</a>
+                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
+            </div>
+        </div>
+
+        <!-- Tab Buttons — first 3 are internal page-switch tabs;
+             remaining tabs marked with .tab-button-link--external open
+             other dashboards. The first external tab gets a small visual
+             divider via .tab-button-link--first-external. -->
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
             <button class="tab-button" onclick="showTab('express', event)">Express Submit Form</button>
             <button class="tab-button" onclick="showTab('requirements', event)">Art Requirements & Fees</button>
-            <a class="tab-button tab-button-link" href="/dashboards/bradley-transfers.html?view=steve">My Transfer Queue</a>
+            <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/bradley-transfers.html?view=steve">My Transfer Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
             <a class="tab-button tab-button-link" href="/dashboards/monogram-dashboard.html">Monogram Dashboard</a>
@@ -38,21 +60,6 @@
         <div class="tab-content">
             <!-- Gallery Tab -->
             <div id="gallery-tab" class="tab-pane active">
-                <!-- Transfer Workflow strip — Send → My Queue → API Orders -->
-                <div class="tool-workflow" aria-label="Transfer workflow">
-                    <div class="tool-workflow-label">
-                        <i class="fas fa-route"></i> Transfer Workflow
-                    </div>
-                    <div class="tool-workflow-row">
-                        <button type="button" id="steve-send-supacolor-btn" class="tool-btn" title="Pick files from your Box folder and send to Bradley for Supacolor">
-                            <i class="fas fa-paper-plane"></i> Send to Supacolor
-                        </button>
-                        <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
-                        <a href="/dashboards/bradley-transfers.html?view=steve" class="tool-btn"><i class="fas fa-truck"></i> My Transfer Queue</a>
-                        <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
-                        <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
-                    </div>
-                </div>
                 <!-- Broken Mockups Health Check Widget (populated by art-hub-steve.js) -->
                 <div id="steve-broken-mockups-widget" style="display:none;"></div>
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
