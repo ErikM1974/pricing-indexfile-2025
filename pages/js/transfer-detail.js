@@ -167,7 +167,23 @@
     }
 
     // ── User Identity ────────────────────────────────────────────────
+    // Priority: staff-dashboard sessionStorage (Caspio auth) → legacy
+    // localStorage → null (modal fires lazily on first action). Anyone who
+    // logged into the staff dashboard and clicked through never sees the
+    // "Who are you?" prompt — their Caspio identity is consumed automatically.
     function loadUser() {
+        var sessName = sessionStorage.getItem('nwca_user_name');
+        var sessEmail = sessionStorage.getItem('nwca_user_email');
+        if (sessName && sessEmail) {
+            state.user = { email: sessEmail, name: sessName };
+            $('td-user-display').textContent = sessName;
+            // Mirror to localStorage so re-opening via bookmark (sessionStorage
+            // cleared on tab close) still skips the modal.
+            localStorage.setItem('transfer_user_email', sessEmail);
+            localStorage.setItem('transfer_user_name', sessName);
+            return state.user;
+        }
+
         var email = localStorage.getItem('transfer_user_email');
         var name = localStorage.getItem('transfer_user_name');
         if (email && name) {
