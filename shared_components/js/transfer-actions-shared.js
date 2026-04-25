@@ -493,6 +493,21 @@
                         '<div class="tas-modal-intro">' +
                             'Search your Box art folder by design # or company name. Click a folder to pick the transfer + mockup files.' +
                         '</div>' +
+                        // Live checklist — auto-checks as Steve adds the right files.
+                        // Yellow when either is missing; green when both present.
+                        '<div id="tas-checklist" class="tas-checklist tas-checklist--incomplete">' +
+                            '<div class="tas-checklist-title">Bradley needs both:</div>' +
+                            '<div class="tas-checklist-items">' +
+                                '<div class="tas-checklist-item" data-key="transfer">' +
+                                    '<span class="tas-checklist-marker"><i class="fas fa-circle"></i></span>' +
+                                    '<span class="tas-checklist-text"><strong>Working file</strong> &mdash; the actual transfer artwork (PNG / PDF / AI)</span>' +
+                                '</div>' +
+                                '<div class="tas-checklist-item" data-key="mockup">' +
+                                    '<span class="tas-checklist-marker"><i class="fas fa-circle"></i></span>' +
+                                    '<span class="tas-checklist-text"><strong>Mockup</strong> &mdash; so AI vision can pre-fill sales rep, customer, garment for Bradley</span>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
                         '<form id="tas-send-form" class="tas-form">' +
                             // ── Picker: search box + folder/file results ──
                             '<div class="tas-picker">' +
@@ -519,6 +534,12 @@
                                     '<strong>\ud83d\udea8 RUSH order</strong>' +
                                     '<span class="tas-muted"> \u2014 Bradley sees a red flag on his queue</span>' +
                                 '</label>' +
+                            '</div>' +
+                            // Soft warning when Steve has a transfer but no mockup —
+                            // doesn't block submit, just makes the consequence visible.
+                            '<div id="tas-mockup-warning" class="tas-mockup-warning" style="display:none;">' +
+                                '<i class="fas fa-exclamation-triangle"></i>' +
+                                '<span>No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.</span>' +
                             '</div>' +
                             '<div class="tas-form-actions">' +
                                 '<button type="button" class="tas-btn tas-btn--secondary tas-modal-cancel">Cancel</button>' +
@@ -1012,7 +1033,39 @@
         var hasTransfer = modalState.linkRows.some(function (r) {
             return r.status === 'ok' && r.analysis && r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'transfer';
         });
+        var hasMockup = modalState.linkRows.some(function (r) {
+            return r.status === 'ok' && r.analysis && r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'mockup';
+        });
         btn.disabled = !hasTransfer;
+        renderFileChecklist(hasTransfer, hasMockup);
+        toggleMockupWarning(hasTransfer && !hasMockup);
+    }
+
+    // Update the live checklist that shows whether Steve has both file types.
+    // Called from updateSubmitButton on every paste/file change.
+    function renderFileChecklist(hasTransfer, hasMockup) {
+        var checklist = $('#tas-checklist');
+        if (!checklist) return;
+
+        function setItem(key, done) {
+            var item = checklist.querySelector('.tas-checklist-item[data-key="' + key + '"]');
+            if (!item) return;
+            item.classList.toggle('tas-checklist-item--done', !!done);
+            var marker = item.querySelector('.tas-checklist-marker i');
+            if (marker) marker.className = done ? 'fas fa-check-circle' : 'fas fa-circle';
+        }
+        setItem('transfer', hasTransfer);
+        setItem('mockup', hasMockup);
+
+        var bothDone = hasTransfer && hasMockup;
+        checklist.classList.toggle('tas-checklist--complete', bothDone);
+        checklist.classList.toggle('tas-checklist--incomplete', !bothDone);
+    }
+
+    function toggleMockupWarning(show) {
+        var warn = $('#tas-mockup-warning');
+        if (!warn) return;
+        warn.style.display = show ? '' : 'none';
     }
 
     // ── Open / Close ─────────────────────────────────────────────────
@@ -1187,7 +1240,13 @@
 
             closeModal();
             var linesStr = lines.length > 1 ? (' (' + lines.length + ' transfers)') : '';
-            showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + linesStr + '.', 'success');
+            // If Steve sent without a mockup, append a nudge so he sees the
+            // consequence right at confirmation (not later when Bradley pings him).
+            var noMockupNudge = (mockups.length === 0)
+                ? ' — ⚠ No mockup attached, Bradley will fill in sales rep manually.'
+                : '';
+            var toastType = (mockups.length === 0) ? 'warning' : 'success';
+            showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + linesStr + '.' + noMockupNudge, toastType);
 
             var recordForEmail = Object.assign({}, createData.record, { _lines: createData.lines || lines });
             // v3: pass mockup vision extras so the submit email includes

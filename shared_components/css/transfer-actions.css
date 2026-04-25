@@ -421,6 +421,88 @@
 .bt-toast--success { border-left-color: #059669; }
 .bt-toast--error { border-left-color: var(--tas-rush); }
 .bt-toast--info { border-left-color: var(--tas-theme); }
+.bt-toast--warning { border-left-color: #d97706; background: #fef3c7; color: #78350f; }
+
+/* ── File checklist (Steve modal v3.3) ────────────────────────────────
+ * Live "what Bradley needs" reminder that auto-checks as Steve adds files.
+ * Yellow when incomplete, green when both items checked.
+ */
+.tas-checklist {
+    margin: 12px 0 4px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.tas-checklist--incomplete {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.tas-checklist--complete {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+.tas-checklist-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 6px;
+}
+.tas-checklist-items {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.tas-checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13px;
+    color: #374151;
+    line-height: 1.4;
+}
+.tas-checklist-marker {
+    flex-shrink: 0;
+    width: 16px;
+    margin-top: 2px;
+    color: #d1d5db;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+.tas-checklist-item--done .tas-checklist-marker {
+    color: #16a34a;
+}
+.tas-checklist-item--done .tas-checklist-text {
+    color: #14532d;
+}
+
+/* ── Mockup-missing soft warning (above Send button) ──────────────── */
+.tas-mockup-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-left: 3px solid #d97706;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #92400e;
+    line-height: 1.4;
+}
+.tas-mockup-warning i {
+    color: #d97706;
+    font-size: 14px;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+.tas-mockup-warning strong {
+    color: #78350f;
+}
+
 @keyframes tas-toast-in {
     from { transform: translateX(100%); opacity: 0; }
     to { transform: translateX(0); opacity: 1; }
