@@ -12,9 +12,10 @@
     'use strict';
 
     // Steve is always Steve on this dashboard — preset identity so the
-    // modal doesn't prompt for email on submit.
+    // modal doesn't prompt for email on submit. Email is the shared art-dept
+    // alias (no individual steve@ mailbox exists).
     var STEVE_USER = {
-        email: 'steve@nwcustomapparel.com',
+        email: 'art@nwcustomapparel.com',
         name: 'Steve Deland'
     };
 

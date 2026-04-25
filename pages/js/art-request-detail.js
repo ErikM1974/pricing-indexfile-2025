@@ -967,7 +967,7 @@
                         Sales_Rep_Email: req.Sales_Rep || req.User_Email || '',
                         Sales_Rep_Name: req.Sales_Rep_Name || ''
                     },
-                    requestedBy: { email: 'steve@nwcustomapparel.com', name: 'Steve Deland' }
+                    requestedBy: { email: 'art@nwcustomapparel.com', name: 'Steve Deland' }
                 });
             });
         }
