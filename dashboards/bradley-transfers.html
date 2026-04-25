@@ -46,9 +46,6 @@
                         <button id="bt-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
                             <i class="fas fa-sync-alt"></i> Refresh
                         </button>
-                        <button id="bt-new-transfer-btn" class="bt-btn bt-btn--primary">
-                            <i class="fas fa-plus"></i> New Transfer
-                        </button>
                     </div>
                 </div>
 
@@ -108,176 +105,6 @@
         </div>
     </div>
 
-    <!-- New Transfer Modal (placeholder — full implementation in Phase 2 via transfer-actions-shared.js) -->
-    <div id="bt-new-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content">
-            <div class="bt-modal-header">
-                <h3><i class="fas fa-plus-circle"></i> New Transfer Order</h3>
-                <button class="bt-modal-close" id="bt-new-modal-close">&times;</button>
-            </div>
-            <div class="bt-modal-body">
-                <div class="bt-modal-intro">
-                    Manual transfer entry &mdash; use for artwork that bypassed Art Hub.
-                    If the design is in Art Hub, use the "Send to Supacolor" button there instead (cleaner traceability).
-                </div>
-                <form id="bt-new-transfer-form" class="bt-form">
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Design Number *</label>
-                            <input type="text" name="Design_Number" required placeholder="e.g. 61234">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Design ID (optional)</label>
-                            <input type="number" name="Design_ID" placeholder="ArtRequests ID_Design">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Company Name *</label>
-                            <input type="text" name="Company_Name" required>
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Customer Name</label>
-                            <input type="text" name="Customer_Name">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Sales Rep Email *</label>
-                            <input type="email" name="Sales_Rep_Email" required>
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Sales Rep Name</label>
-                            <input type="text" name="Sales_Rep_Name">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Quantity *</label>
-                            <input type="number" name="Quantity" required min="1">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Transfer Size</label>
-                            <input type="text" name="Transfer_Size" placeholder="e.g. 11x14">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Press Count</label>
-                            <input type="number" name="Press_Count" min="1" value="1">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Primary File URL (Box link) *</label>
-                            <input type="url" name="Working_File_URL" placeholder="https://app.box.com/s/..." required>
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Primary File Name</label>
-                            <input type="text" name="Working_File_Name" placeholder="e.g. ABC_Logo.ai">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>File Type</label>
-                            <select name="Working_File_Type">
-                                <option value="">-- select --</option>
-                                <option value="AI">AI</option>
-                                <option value="CDR">CDR</option>
-                                <option value="PDF">PDF</option>
-                                <option value="JPEG">JPEG</option>
-                                <option value="PNG">PNG</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Additional File 1 URL (optional)</label>
-                            <input type="url" name="Additional_File_1_URL" placeholder="https://app.box.com/s/...">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Additional File 1 Name</label>
-                            <input type="text" name="Additional_File_1_Name">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Additional File 2 URL (optional)</label>
-                            <input type="url" name="Additional_File_2_URL" placeholder="https://app.box.com/s/...">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Additional File 2 Name</label>
-                            <input type="text" name="Additional_File_2_Name">
-                        </div>
-                    </div>
-                    <!-- Print Specs (Supacolor-aligned) -->
-                    <div class="bt-form-row" style="grid-template-columns: 1fr 1fr 1fr;">
-                        <div class="bt-form-field">
-                            <label>Transfer Type</label>
-                            <select name="Transfer_Type">
-                                <option value="">—</option>
-                                <option value="Supa-Classic">Supa-Classic</option>
-                                <option value="Full Color Gang Sheet">Full Color Gang Sheet</option>
-                                <option value="DTF">DTF (Direct to Film)</option>
-                                <option value="One Color">One Color</option>
-                                <option value="Supa-Soft">Supa-Soft</option>
-                                <option value="Reflective">Reflective</option>
-                                <option value="Glow in Dark">Glow in Dark</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Fabric Target</label>
-                            <select name="Fabric_Target">
-                                <option value="">—</option>
-                                <option value="Dark">Dark</option>
-                                <option value="Light">Light</option>
-                                <option value="Either">Either</option>
-                            </select>
-                        </div>
-                        <div class="bt-form-field">
-                            <label># of Colors</label>
-                            <input type="number" name="Color_Count" min="1" max="8">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field bt-form-field--full">
-                            <label>Primary Color / PMS</label>
-                            <input type="text" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field bt-form-field--full">
-                            <label>Additional Colors (one per line)</label>
-                            <textarea name="Additional_Colors" rows="2" placeholder="PMS 2945C&#10;PMS 1235C"></textarea>
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field bt-form-field--full">
-                            <label>File Notes / Special Instructions</label>
-                            <textarea name="File_Notes" rows="3" placeholder="Print direction, sizing notes, etc."></textarea>
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field bt-form-field--inline">
-                            <label>
-                                <input type="checkbox" name="Is_Rush" id="bt-new-rush-toggle"> This is a RUSH order
-                            </label>
-                        </div>
-                        <div class="bt-form-field" id="bt-new-rush-details" style="display:none;">
-                            <label>Needed By</label>
-                            <input type="date" name="Needed_By_Date">
-                        </div>
-                    </div>
-                    <div class="bt-form-actions">
-                        <button type="button" class="bt-btn bt-btn--secondary" id="bt-new-modal-cancel">Cancel</button>
-                        <button type="submit" class="bt-btn bt-btn--primary">
-                            <i class="fas fa-paper-plane"></i> Create Transfer
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Delete confirmation modal (hard-delete, for mistakes) -->
     <div id="bt-delete-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:480px;">
@@ -316,6 +143,6 @@
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=11"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=12"></script>
 </body>
 </html>

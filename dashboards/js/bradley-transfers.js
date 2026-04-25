@@ -75,19 +75,6 @@
         }
     }
 
-    async function createTransfer(payload) {
-        var resp = await fetch(API_BASE + '/api/transfer-orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-        var data = await resp.json();
-        if (!resp.ok || !data.success) {
-            throw new Error(data.error || 'HTTP ' + resp.status);
-        }
-        return data.record;
-    }
-
     async function hardDeleteTransfer(idTransfer, body) {
         // ?hard=true tells the backend to physically remove the Transfer_Orders row
         // + cascade Transfer_Notes. Does NOT touch Supacolor_Jobs (separate API-owned table).
@@ -405,48 +392,6 @@
         }, 4000);
     }
 
-    // ── New Transfer Modal ───────────────────────────────────────────
-    function openNewModal() {
-        $('bt-new-modal').style.display = 'flex';
-        $('bt-new-transfer-form').reset();
-        $('bt-new-rush-details').style.display = 'none';
-    }
-
-    function closeNewModal() {
-        $('bt-new-modal').style.display = 'none';
-    }
-
-    async function handleNewTransferSubmit(e) {
-        e.preventDefault();
-        var form = e.target;
-        var data = new FormData(form);
-        var payload = {};
-        data.forEach(function (value, key) {
-            if (key === 'Is_Rush') {
-                payload.Is_Rush = true;
-            } else if (key === 'Quantity' || key === 'Press_Count' || key === 'Design_ID' || key === 'Color_Count') {
-                if (value) payload[key] = parseInt(value, 10);
-            } else if (value) {
-                payload[key] = value;
-            }
-        });
-        if (!payload.Is_Rush) payload.Is_Rush = false;
-
-        // Bradley is the requestor when creating manually
-        payload.Requested_By = 'bradley@nwcustomapparel.com';
-        payload.Requested_By_Name = 'Bradley (manual)';
-
-        try {
-            var created = await createTransfer(payload);
-            closeNewModal();
-            showToast('Transfer ' + (created.ID_Transfer || '') + ' created.', 'success');
-            await refresh();
-        } catch (err) {
-            console.error('Create failed:', err);
-            showToast('Could not create transfer: ' + err.message, 'error');
-        }
-    }
-
     // ── Delete modal ─────────────────────────────────────────────────
     var deleteTargetId = null;
 
@@ -520,10 +465,6 @@
                 if (subtitleEl) subtitleEl.textContent = 'Transfers Steve sent to Bradley — follow them through to shipment';
                 var tabActive = document.querySelector('.tab-button.active');
                 if (tabActive) tabActive.textContent = "Steve's Transfers";
-
-                // Hide "New Transfer" button — Steve doesn't create manual entries here
-                var newBtn = document.getElementById('bt-new-transfer-btn');
-                if (newBtn) newBtn.style.display = 'none';
             }
         } catch (err) {
             console.warn('[bradley-transfers] applyViewModeFromUrl failed:', err.message);
@@ -575,18 +516,6 @@
             refresh();
             showToast('Refreshed.', 'info');
         });
-        $('bt-new-transfer-btn').addEventListener('click', openNewModal);
-
-        // Modal
-        $('bt-new-modal-close').addEventListener('click', closeNewModal);
-        $('bt-new-modal-cancel').addEventListener('click', closeNewModal);
-        $('bt-new-modal').addEventListener('click', function (e) {
-            if (e.target === $('bt-new-modal')) closeNewModal();
-        });
-        $('bt-new-rush-toggle').addEventListener('change', function (e) {
-            $('bt-new-rush-details').style.display = e.target.checked ? '' : 'none';
-        });
-        $('bt-new-transfer-form').addEventListener('submit', handleNewTransferSubmit);
 
         // Delete modal wiring
         $('bt-delete-modal-close').addEventListener('click', closeDeleteModal);
