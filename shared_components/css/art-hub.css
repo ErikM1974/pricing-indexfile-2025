@@ -4256,3 +4256,65 @@ input.cbSearchButton {
 .broken-status--in-progress { background: #dbeafe; color: #1e40af; }
 .broken-status--submitted { background: #fce7f3; color: #9d174d; }
 .broken-status--revision-requested { background: #fde68a; color: #78350f; }
+
+/* ── Workflow Strip ──────────────────────────────────────────
+ * Visually groups buttons that are sequential steps in a workflow
+ * (e.g. Send to Supacolor → My Transfer Queue → API Orders).
+ * Theme-aware: uses --art-theme so each art-hub page inherits its
+ * own accent (Steve's green, Ruth's purple, AE's crimson).
+ *
+ * HTML pattern:
+ *   <div class="tool-workflow">
+ *     <div class="tool-workflow-label"><i class="fas fa-route"></i> Workflow Name</div>
+ *     <div class="tool-workflow-row">
+ *       <a class="tool-btn">Step 1</a>
+ *       <span class="tool-workflow-arrow"><i class="fas fa-arrow-right"></i></span>
+ *       <a class="tool-btn">Step 2</a>
+ *     </div>
+ *   </div>
+ */
+.tool-workflow {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px 12px;
+    margin-bottom: 16px;
+    background: var(--art-theme-bg, rgba(0, 0, 0, 0.03));
+    border: 1px dashed var(--art-theme, #6b7280);
+    border-radius: 10px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.tool-workflow:hover {
+    background: var(--art-theme-bg-hover, rgba(0, 0, 0, 0.05));
+}
+.tool-workflow-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--art-theme-dark, #4b5563);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.tool-workflow-label i {
+    font-size: 0.75rem;
+    opacity: 0.85;
+}
+.tool-workflow-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+.tool-workflow-arrow {
+    color: var(--art-theme, #6b7280);
+    font-size: 0.85rem;
+    opacity: 0.6;
+    user-select: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.tool-workflow:hover .tool-workflow-arrow {
+    opacity: 1;
+    transform: translateX(2px);
+}

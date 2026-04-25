@@ -143,6 +143,11 @@
     <!-- Toast container -->
     <div id="bt-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/bradley-transfers.js?v=12"></script>
+    <!-- EmailJS + TransferActions shared module — provide openSendModal() for
+         the "+ Send Another" button injected by ?view=steve. EmailJS is
+         needed so the submit notification email actually fires. -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=15"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=13"></script>
 </body>
 </html>

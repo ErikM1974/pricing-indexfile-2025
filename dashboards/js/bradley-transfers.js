@@ -96,13 +96,35 @@
 
     // ── Rendering ────────────────────────────────────────────────────
     function renderStats() {
-        var s = state.stats;
         var byId = function (id) { return document.getElementById(id); };
+
+        // When a requester filter is active (e.g. ?view=steve), the
+        // server-side state.stats counts ALL transfers — not Steve's. Compute
+        // locally from state.allTransfers so the chips reflect the user's
+        // own slice. Falls back to state.stats when no filter is set.
+        var s;
+        var rushCount;
+        var rushSource;
+        var reqEmails = (state.filters && state.filters.requesterEmails) || [];
+        if (reqEmails.length) {
+            var lower = reqEmails.map(function (e) { return e.toLowerCase(); });
+            var mine = state.allTransfers.filter(function (t) {
+                return lower.indexOf((t.Requested_By || '').toLowerCase()) >= 0;
+            });
+            s = { Requested: 0, Ordered: 0, Shipped: 0 };
+            mine.forEach(function (t) {
+                if (s[t.Status] !== undefined) s[t.Status] += 1;
+            });
+            rushSource = mine;
+        } else {
+            s = state.stats || {};
+            rushSource = state.allTransfers;
+        }
         if (byId('bt-stat-requested')) byId('bt-stat-requested').textContent = s.Requested || 0;
         if (byId('bt-stat-ordered')) byId('bt-stat-ordered').textContent = s.Ordered || 0;
         if (byId('bt-stat-shipped')) byId('bt-stat-shipped').textContent = s.Shipped || 0;
         // PO_Created + Received chips dropped in v3.1 — guard against missing elements.
-        var rushCount = state.allTransfers.filter(function (t) {
+        rushCount = rushSource.filter(function (t) {
             return isRush(t) && t.Status !== 'Received' && t.Status !== 'Cancelled';
         }).length;
         if (byId('bt-stat-rush')) byId('bt-stat-rush').textContent = rushCount;
@@ -465,10 +487,44 @@
                 if (subtitleEl) subtitleEl.textContent = 'Transfers Steve sent to Bradley — follow them through to shipment';
                 var tabActive = document.querySelector('.tab-button.active');
                 if (tabActive) tabActive.textContent = "Steve's Transfers";
+
+                // Inject "+ Send Another to Bradley" CTA into the header actions
+                // row, alongside the existing Refresh button. Saves Steve a
+                // bounce back to art-hub-steve when he wants to fire a follow-up.
+                injectSendAnotherButton();
             }
         } catch (err) {
             console.warn('[bradley-transfers] applyViewModeFromUrl failed:', err.message);
         }
+    }
+
+    // Inject a primary CTA into the header actions row when ?view=steve
+    // is active. Clicking opens the same Send-to-Supacolor modal Steve
+    // uses on his hub. Keeps Steve on this page for follow-up submissions.
+    function injectSendAnotherButton() {
+        var actionsRow = document.querySelector('.bt-header-actions');
+        if (!actionsRow || document.getElementById('bt-send-another-btn')) return;
+        var btn = document.createElement('button');
+        btn.id = 'bt-send-another-btn';
+        btn.className = 'bt-btn bt-btn--primary';
+        btn.title = 'Open the Send-to-Supacolor modal to fire another transfer';
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Another to Bradley';
+        btn.addEventListener('click', function () {
+            if (!window.TransferActions || typeof window.TransferActions.openSendModal !== 'function') {
+                showToast('Send modal isn\'t loaded — refresh the page.', 'error');
+                return;
+            }
+            window.TransferActions.openSendModal({
+                requestedBy: { email: 'art@nwcustomapparel.com', name: 'Steve Deland' },
+                enableLines: true,
+                onSuccess: function (record) {
+                    console.log('[?view=steve] transfer created:', record.ID_Transfer);
+                    refresh();
+                }
+            });
+        });
+        // Place it BEFORE Refresh so it's the leftmost (most prominent) action.
+        actionsRow.insertBefore(btn, actionsRow.firstChild);
     }
 
     // ── Wire Up ──────────────────────────────────────────────────────
