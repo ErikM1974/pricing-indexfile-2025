@@ -183,7 +183,12 @@
                 ' alt="' + company + ' mockup" loading="lazy"' +
                 ' onerror="window.SteveGallery.handleThumbError(this)">';
         } else {
-            thumbHtml = '<div class="card-thumb-empty"><span class="pill">No mockup</span></div>';
+            // Status-aware empty message — "Completed — no mockup file" reads as
+            // a legitimate end-state (text-only jobs, rework, etc.) rather than
+            // implying Steve forgot to upload. Active states stay "No mockup yet".
+            var doneStates = (sKey === 'approved' || sKey === 'completed');
+            var emptyMsg = doneStates ? 'Completed — no mockup file' : 'No mockup yet';
+            thumbHtml = '<div class="card-thumb-empty"><span class="pill">' + emptyMsg + '</span></div>';
         }
 
         var badges = '';
