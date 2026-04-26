@@ -94,6 +94,28 @@
         return String(ot || '');
     }
 
+    // Resolve a sales rep email/identifier to a first name for the card header.
+    // Tries window.ArtActions.resolveRep(email).displayName first (the registered
+    // human-readable name), then falls back to capitalized email local-part
+    // ("erik@nwcustomapparel.com" → "Erik"). Returns '' if no rep on record.
+    function getRepFirstName(salesRep) {
+        if (!salesRep) return '';
+        var raw = String(salesRep).trim();
+        if (!raw) return '';
+        if (window.ArtActions && typeof window.ArtActions.resolveRep === 'function') {
+            try {
+                var resolved = window.ArtActions.resolveRep(raw);
+                if (resolved && resolved.displayName) {
+                    return String(resolved.displayName).split(/\s+/)[0];
+                }
+            } catch (e) { /* fall through to email parse */ }
+        }
+        // Fallback: take the email local-part and capitalize it.
+        var local = raw.split('@')[0];
+        if (!local) return '';
+        return local.charAt(0).toUpperCase() + local.slice(1).toLowerCase();
+    }
+
     // Image-only extensions for AE-uploaded files (PDF/EPS/AI render as 0-width
     // <img> and trip onerror, so we filter upfront to keep thumbnails clean).
     var IMG_EXT_RE = /\.(png|jpe?g|gif|webp|bmp|svg)$/i;
@@ -173,13 +195,13 @@
 
     // ── Render: card ──────────────────────────────────────────────────────
     function buildCard(req) {
-        var designId   = String(req.ID_Design || '');
-        var company    = escapeHtml(req.CompanyName || 'Unknown');
-        var designNum  = escapeHtml(req.Design_Num_SW || '');
-        var statusRaw  = normalizeStatus(req.Status);
-        var sKey       = statusRaw.toLowerCase().replace(/\s+/g, '-');
-        var rep        = escapeHtml(req.Sales_Rep || '');
-        var revCount   = req.Revision_Count || 0;
+        var designId      = String(req.ID_Design || '');
+        var company       = escapeHtml(req.CompanyName || 'Unknown');
+        var designNum     = escapeHtml(req.Design_Num_SW || '');
+        var statusRaw     = normalizeStatus(req.Status);
+        var sKey          = statusRaw.toLowerCase().replace(/\s+/g, '-');
+        var repFirstName  = escapeHtml(getRepFirstName(req.Sales_Rep));
+        var revCount      = req.Revision_Count || 0;
         var due        = getDueBadge(req.Due_Date);
         var orderType  = getOrderType(req);
         var rushBadge  = isRush(req.Is_Rush);
@@ -234,7 +256,19 @@
             '<div class="card-header">' +
                 '<div class="card-header-left">' +
                     '<div class="card-company">' + company + '</div>' +
-                    (designNum ? '<div class="card-design-number">#' + designNum + '</div>' : '') +
+                    // Rep first name appended to the design# line via inline span
+                    // with a faint dot separator (see .card-rep-name in art-hub.css).
+                    // Keeps the header 2 lines tall and gives Steve "which job + whose
+                    // AE" in one glance. Replaces the redundant "Rep:" meta line that
+                    // used to live below the thumbnail (removed 2026-04-26).
+                    (designNum
+                        ? '<div class="card-design-number">#' + designNum +
+                            (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '') +
+                          '</div>'
+                        : (repFirstName
+                            ? '<div class="card-design-number"><span class="card-rep-name card-rep-name--standalone">' + repFirstName + '</span></div>'
+                            : '')
+                    ) +
                 '</div>' +
                 '<div class="card-header-right">' +
                     '<span class="status-pill status-pill--' + sKey + '">' + escapeHtml(statusRaw) + '</span>' +
@@ -242,9 +276,6 @@
             '</div>' +
             '<div class="card-thumb">' + thumbHtml + '</div>' +
             '<div class="card-body">' +
-                '<div class="card-meta">' +
-                    (rep ? '<div class="card-meta-row"><span class="card-meta-label">Rep:</span> ' + rep + '</div>' : '') +
-                '</div>' +
                 (badges ? '<div class="card-badges">' + badges + '</div>' : '') +
                 // 3 actions in workflow order: Send Mockup → Complete → Log Time.
                 // Labels shortened 2026-04-26 so all 3 fit on one row at typical

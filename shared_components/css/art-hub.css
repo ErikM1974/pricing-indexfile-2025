@@ -4423,6 +4423,31 @@ input.cbSearchButton {
     text-decoration: underline;
 }
 
+/* ── Steve gallery card: rep first name appended to design# in header ───
+ * Format: "#35525 · Nika" — design# is the primary ID (inherits existing
+ * .card-design-number color), rep is slightly muted context with a faint
+ * middle-dot separator. Replaces the old "Rep: ..." meta line that used
+ * to live below the thumbnail (removed 2026-04-26). Header background is
+ * the art-theme green, so all text is white at varying alpha. */
+.mockup-card .card-rep-name {
+    color: rgba(255, 255, 255, 0.78);
+    font-weight: 400;
+    margin-left: 4px;
+}
+.mockup-card .card-rep-name::before {
+    content: "·";
+    color: rgba(255, 255, 255, 0.45);
+    margin-right: 6px;
+}
+/* Standalone variant: when there's no design# to anchor against, the rep
+ * shows alone in the design# slot. Drop the leading dot in that case. */
+.mockup-card .card-rep-name--standalone {
+    margin-left: 0;
+}
+.mockup-card .card-rep-name--standalone::before {
+    content: none;
+}
+
 /* ── Broken Mockups Modal: toolbar (bulk recover + refresh) ──────────── */
 .bml-toolbar {
     display: flex;
