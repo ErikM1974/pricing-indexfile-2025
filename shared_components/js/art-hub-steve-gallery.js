@@ -246,15 +246,19 @@
                     (rep ? '<div class="card-meta-row"><span class="card-meta-label">Rep:</span> ' + rep + '</div>' : '') +
                 '</div>' +
                 (badges ? '<div class="card-badges">' + badges + '</div>' : '') +
-                // 3 actions: Send for Approval, Log Time, Mark Complete.
-                // Notes button removed 2026-04-26 — it was dead (called
+                // 3 actions in workflow order: Send Mockup → Complete → Log Time.
+                // Labels shortened 2026-04-26 so all 3 fit on one row at typical
+                // card widths (was wrapping to 2 rows with "Send for Approval"
+                // and "Mark Complete"). "Send Mockup" matches what the modal
+                // calls itself; "Complete" drops the redundant "Mark" verb.
+                // Notes button removed earlier — that button called
                 // window.openNotesPanel which is defined inside art-hub-steve.js's
-                // IIFE and never exposed globally). Notes are added on the detail
-                // page's "Notes & Activity" panel; no need to surface them here.
+                // IIFE and never exposed globally. Notes are added on the detail
+                // page's "Notes & Activity" panel.
                 '<div class="card-actions">' +
-                    '<button type="button" class="sg-btn sg-btn--primary" data-action="send-approval">Send for Approval</button>' +
+                    '<button type="button" class="sg-btn sg-btn--primary" data-action="send-approval">Send Mockup</button>' +
+                    '<button type="button" class="sg-btn sg-btn--success" data-action="mark-complete">Complete</button>' +
                     '<button type="button" class="sg-btn" data-action="log-time">Log Time</button>' +
-                    '<button type="button" class="sg-btn sg-btn--success" data-action="mark-complete">Mark Complete</button>' +
                 '</div>' +
             '</div>' +
         '</article>';
