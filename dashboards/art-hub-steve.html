@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=23">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=24">
     <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=16">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=7">
@@ -87,7 +87,6 @@
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
             <button class="tab-button" onclick="showTab('express', event)">Express Submit Form</button>
-            <button class="tab-button" onclick="showTab('requirements', event)">Art Requirements & Fees</button>
             <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/bradley-transfers.html?view=steve">My Transfer Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
@@ -103,6 +102,11 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                     <h2 class="tab-title" style="margin-bottom:0;">Art Request Gallery</h2>
                     <div style="display:flex; align-items:center; gap:10px;">
+                        <a href="/pages/art-billing-reference.html" target="_blank" rel="noopener"
+                           class="sg-reference-link"
+                           title="Billing codes (GRT-50/GRT-75), file format requirements, file definitions">
+                            &#128218; Reference &#x2197;
+                        </a>
                         <div class="view-toggle" id="steve-view-toggle">
                             <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleKanbanView('grid')">
                                 <span class="view-toggle-icon">&#9638;</span> Grid
@@ -129,347 +133,6 @@
                 <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500073092d827fb74d968d9d/emb"></script>
             </div>
 
-            <!-- Art Requirements & Fees Tab -->
-            <div id="requirements-tab" class="tab-pane">
-                <h2 class="tab-title">Art File Requirements & Fee Structure</h2>
-
-                <!-- ShopWorks Billing Codes Section -->
-                <div class="billing-codes-section">
-                    <div class="billing-codes-header">
-                        <div class="billing-codes-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                            </svg>
-                        </div>
-                        <h3 class="billing-codes-title">ShopWorks Billing Codes - Quick Reference</h3>
-                    </div>
-
-                    <div class="billing-codes-grid">
-                        <!-- GRT-50 Card -->
-                        <div class="billing-code-card">
-                            <div class="billing-code-header billing-code-header--green">
-                                <div>
-                                    <div class="billing-code-pn">GRT-50</div>
-                                    <div class="billing-code-subtitle">Part Number for Base Art Fee</div>
-                                </div>
-                                <div class="billing-code-price">$50</div>
-                            </div>
-                            <div class="billing-code-body">
-                                <div class="billing-code-body-title">Logo Mockup & Print Review</div>
-                                <div class="billing-code-body-desc">
-                                    Includes a mockup of your logo on the ordered products for preview, and a print readiness check for clarity and sizing.
-                                </div>
-                                <div class="callout callout--blue">
-                                    <div class="callout-label callout-label--blue">When to Use:</div>
-                                    <ul>
-                                        <li>Customer supplied art needs re-work</li>
-                                        <li>Mockup on customer preferred garments</li>
-                                        <li>Preparing digital files for print</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- GRT-75 Card -->
-                        <div class="billing-code-card">
-                            <div class="billing-code-header billing-code-header--blue">
-                                <div>
-                                    <div class="billing-code-pn">GRT-75</div>
-                                    <div class="billing-code-subtitle">Part Number for Hourly Design</div>
-                                </div>
-                                <div class="billing-code-price">$75/hr</div>
-                            </div>
-                            <div class="billing-code-body">
-                                <div class="billing-code-body-title">Graphic Design Services</div>
-                                <div class="billing-code-body-desc">
-                                    Billed in 15-minute increments. Covers essential tasks like T-shirt graphic design, custom artwork and creative work.
-                                </div>
-                                <div class="callout callout--amber">
-                                    <div class="callout-label callout-label--amber">Billing Increments:</div>
-                                    <div class="increments-grid">
-                                        <span>15 minutes:</span><span class="amount">$18.75</span>
-                                        <span>30 minutes:</span><span class="amount">$37.50</span>
-                                        <span>45 minutes:</span><span class="amount">$56.25</span>
-                                        <span>60 minutes:</span><span class="amount">$75.00</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pro-tip-box">
-                        <div class="pro-tip-inner">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#009900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 11l3 3L22 4"></path>
-                                <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
-                            </svg>
-                            <div class="pro-tip-text">
-                                <strong>Pro Tip:</strong> Always enter these part numbers in ShopWorks when billing for art services. This ensures accurate invoicing and proper tracking of design work.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Navigation -->
-                <div class="quick-nav">
-                    <button class="quick-nav-btn" onclick="document.getElementById('file-requirements').scrollIntoView({behavior: 'smooth'})">
-                        File Requirements
-                    </button>
-                    <button class="quick-nav-btn" onclick="document.getElementById('file-definitions').scrollIntoView({behavior: 'smooth'})">
-                        File Definitions
-                    </button>
-                    <button class="quick-nav-btn" onclick="document.getElementById('fee-structure').scrollIntoView({behavior: 'smooth'})">
-                        Fee Structure
-                    </button>
-                </div>
-
-                <!-- Section 1: File Requirements by Method -->
-                <div id="file-requirements" class="req-section">
-                    <h3 class="req-section-title">Art File Requirements by Decoration Method</h3>
-
-                    <div class="file-req-grid">
-                        <!-- DTG Card -->
-                        <div class="file-req-card">
-                            <div class="file-req-card-header">DTG</div>
-                            <div class="file-req-card-body">
-                                <h4>1. Vector Art</h4>
-                                <ul>
-                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
-                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
-                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
-                                </ul>
-                                <div class="file-req-highlight">
-                                    <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>4. .PDF</strong> (saved and sent as editable)
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Screenprint Card -->
-                        <div class="file-req-card">
-                            <div class="file-req-card-header">Screenprint</div>
-                            <div class="file-req-card-body">
-                                <h4>1. Vector Art</h4>
-                                <ul>
-                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
-                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
-                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Transfers Card -->
-                        <div class="file-req-card">
-                            <div class="file-req-card-header">Transfers</div>
-                            <div class="file-req-card-body">
-                                <h4>1. Vector Art</h4>
-                                <ul>
-                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
-                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
-                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
-                                </ul>
-                                <div class="file-req-highlight">
-                                    <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>4. .PDF</strong> (saved and sent as editable)
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Embroidery Card -->
-                        <div class="file-req-card">
-                            <div class="file-req-card-header">Embroidery</div>
-                            <div class="file-req-card-body">
-                                <h4>1. Vector Art</h4>
-                                <ul>
-                                    <li><strong>.CDR</strong> (Coreldraw) Any Version</li>
-                                    <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
-                                    <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
-                                </ul>
-                                <div class="file-req-highlight">
-                                    <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>3. .JPG</strong> 300 DPI (Picture File w/ background)
-                                </div>
-                                <div class="file-req-item">
-                                    <strong>4. .PDF</strong> (saved and sent as editable)
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2: File Definitions -->
-                <div id="file-definitions" class="req-section">
-                    <h3 class="req-section-title">Art File Definitions</h3>
-
-                    <div class="file-def-grid">
-                        <!-- Picture Files Column -->
-                        <div>
-                            <h4 class="file-def-column-header">Picture Files</h4>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--png">.PNG</span>
-                                    <span class="file-def-type-label">(Portable Network Graphic)</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    Used for website development. <span class="highlight-blue">Transparent Background</span>
-                                </p>
-                            </div>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--jpg">.JPG</span>
-                                    <span class="file-def-type-label">(Joint Photographic Group)</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    Used for digital images across the internet and social media
-                                </p>
-                            </div>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--psd">.PSD</span>
-                                    <span class="file-def-type-label">(Photoshop Document)</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    File created in Adobe Photoshop with layers. All Layers are editable and can be saved in layers or combined into a single image.
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Vector Files Column -->
-                        <div>
-                            <h4 class="file-def-column-header">Vector Files</h4>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--ai">.AI</span>
-                                    <span class="file-def-type-label">(Adobe Illustrator)</span>
-                                    <span class="vector-tag">Vector</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    File created in Adobe Illustrator with layers. All Layers are editable and can be saved in layers or combined into a single image.
-                                </p>
-                            </div>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--cdr">.CDR</span>
-                                    <span class="file-def-type-label">(Coreldraw)</span>
-                                    <span class="vector-tag">Vector</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    File created in Coreldraw with layers. All Layers are editable and can be saved in layers or combined into a single image.
-                                </p>
-                            </div>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--pdf">.PDF</span>
-                                    <span class="file-def-type-label">(Portable Document File)</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    Used for sending document and text formatting independent of proprietary software applications. If saved and sent as editable, it is <span class="highlight-pink">Vector</span> art.
-                                </p>
-                            </div>
-
-                            <div class="file-def-card">
-                                <div class="file-def-card-header">
-                                    <span class="file-def-badge file-def-badge--eps">.EPS</span>
-                                    <span class="file-def-type-label">(Encapsulated Postscript)</span>
-                                </div>
-                                <p class="file-def-desc">
-                                    .EPS files are an old standard that was used in print. It is <span class="highlight-pink">Vector</span> based and will work for the most part but not an ideal <span class="highlight-pink">Vector</span> file.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3: Fee Structure -->
-                <div id="fee-structure" class="req-section">
-                    <h3 class="req-section-title">Art Fee Structure</h3>
-
-                    <div class="fee-grid">
-                        <!-- Base Fee Card -->
-                        <div class="fee-card-primary">
-                            <div class="fee-amount">$50.00</div>
-                            <div class="fee-label">Base Art Fee</div>
-                            <div class="fee-includes">
-                                <div class="fee-includes-title">This includes:</div>
-                                <div class="fee-includes-item">
-                                    <span class="numbered-circle">1</span>
-                                    <span>Customer supplied art that needs Re-work</span>
-                                </div>
-                                <div class="fee-includes-item">
-                                    <span class="numbered-circle">2</span>
-                                    <span>Customer supplied art that needs Mockup on customer preferred Garments</span>
-                                </div>
-                                <div class="fee-includes-item">
-                                    <span class="numbered-circle">3</span>
-                                    <span>Prepare digital art files for Print</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Hourly Rate Card -->
-                        <div class="fee-card-secondary">
-                            <div class="fee-amount">$75.00</div>
-                            <div class="fee-label">Per Hour Rate</div>
-                            <div class="fee-desc">Art fee per hour. Charged per 1/4 hour increments above initial art fee.</div>
-
-                            <div class="fee-increments-box">
-                                <div class="fee-increments-title">Time Increment Pricing:</div>
-                                <div class="fee-increments-grid">
-                                    <span class="time-label">15 min:</span>
-                                    <span class="time-price">$18.75</span>
-                                    <span class="time-label">30 min:</span>
-                                    <span class="time-price">$37.50</span>
-                                    <span class="time-label">45 min:</span>
-                                    <span class="time-price">$56.25</span>
-                                </div>
-                            </div>
-
-                            <div class="callout callout--orange callout--spaced">
-                                <div class="callout-label callout-label--orange">Additional Work Includes:</div>
-                                <div class="callout-text">Additional Mockups, Edits, Complex Revisions, etc.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Important Note -->
-                    <div class="important-note">
-                        <div class="important-note-inner">
-                            <div class="important-note-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                                </svg>
-                            </div>
-                            <div>
-                                <div class="important-note-title">Important Billing Information</div>
-                                <div class="important-note-text">
-                                    All art fees are billable to the customer. Please inform customers of potential art charges when files require modification or enhancement. Time tracking begins after the initial setup fee.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -586,7 +249,7 @@
     <script src="/shared_components/js/transfer-actions-shared.js?v=15"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=1"></script>
-    <script src="/shared_components/js/art-hub-steve.js?v=32"></script>
+    <script src="/shared_components/js/art-hub-steve.js?v=33"></script>
     <script src="/shared_components/js/art-hub-steve-gallery.js?v=5"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
 </body>

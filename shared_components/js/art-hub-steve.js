@@ -67,8 +67,12 @@
 
         const tabMap = {
             'gallery':      { index: 0, pane: 'gallery-tab' },
-            'express':      { index: 1, pane: 'express-tab' },
-            'requirements': { index: 2, pane: 'requirements-tab' }
+            'express':      { index: 1, pane: 'express-tab' }
+            // 'requirements' tab removed 2026-04-26 — content extracted to
+            // /pages/art-billing-reference.html (linked from gallery toolbar).
+            // If localStorage.artistDashboardTab still says 'requirements' from
+            // before, the lookup returns undefined and the `if (tab)` guard below
+            // gracefully no-ops, leaving the active tab on its default (Gallery).
         };
 
         const tab = tabMap[tabName];

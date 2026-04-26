@@ -4403,6 +4403,26 @@ input.cbSearchButton {
     50%      { box-shadow: 0 2px 14px rgba(220, 38, 38, 0.45); }
 }
 
+/* ── Steve gallery toolbar: small "Reference" link ────────────────────
+ * Replaces the old "Art Requirements & Fees" tab (extracted to
+ * /pages/art-billing-reference.html on 2026-04-26). Sits in the gallery
+ * toolbar between the title and the Grid/Board toggle as an unobtrusive
+ * link — Steve almost never needs it, but one click away when he does. */
+.sg-reference-link {
+    color: #6b7280;
+    font-size: 12.5px;
+    text-decoration: none;
+    padding: 4px 10px;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.sg-reference-link:hover {
+    background: #f3f4f6;
+    color: #009900;
+    text-decoration: underline;
+}
+
 /* ── Broken Mockups Modal: toolbar (bulk recover + refresh) ──────────── */
 .bml-toolbar {
     display: flex;
