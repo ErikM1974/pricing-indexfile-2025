@@ -246,10 +246,14 @@
                     (rep ? '<div class="card-meta-row"><span class="card-meta-label">Rep:</span> ' + rep + '</div>' : '') +
                 '</div>' +
                 (badges ? '<div class="card-badges">' + badges + '</div>' : '') +
+                // 3 actions: Send for Approval, Log Time, Mark Complete.
+                // Notes button removed 2026-04-26 — it was dead (called
+                // window.openNotesPanel which is defined inside art-hub-steve.js's
+                // IIFE and never exposed globally). Notes are added on the detail
+                // page's "Notes & Activity" panel; no need to surface them here.
                 '<div class="card-actions">' +
                     '<button type="button" class="sg-btn sg-btn--primary" data-action="send-approval">Send for Approval</button>' +
                     '<button type="button" class="sg-btn" data-action="log-time">Log Time</button>' +
-                    '<button type="button" class="sg-btn" data-action="view-notes">Notes</button>' +
                     '<button type="button" class="sg-btn sg-btn--success" data-action="mark-complete">Mark Complete</button>' +
                 '</div>' +
             '</div>' +
@@ -458,12 +462,6 @@
                 } else if (action === 'log-time') {
                     if (window.ArtActions && window.ArtActions.showArtTimeModal) {
                         window.ArtActions.showArtTimeModal(designId, '', company.trim(), refresh);
-                    }
-                } else if (action === 'view-notes') {
-                    if (typeof window.openNotesPanel === 'function') {
-                        window.openNotesPanel(designId, company.trim());
-                    } else if (window.ArtActions && window.ArtActions.openNotesPanel) {
-                        window.ArtActions.openNotesPanel(designId, company.trim());
                     }
                 } else if (action === 'mark-complete') {
                     if (confirm('Mark "' + company.trim() + '" complete?')) {
