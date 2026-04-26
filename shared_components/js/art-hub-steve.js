@@ -2192,6 +2192,11 @@
 
     // ── Skeleton Loading: Show placeholder cards while Caspio loads ──
     function showSkeletonCards() {
+        // Caspio gallery replaced 2026-04-25 — SteveGallery handles its own
+        // loading state (renders cards directly after fetch resolves). The legacy
+        // skeleton appended to #gallery-tab as a sibling of #steve-grid-view,
+        // which now stacks below the real grid creating dead skeleton clutter.
+        if (window.SteveGallery) return;
         const galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab || galleryTab.querySelector('.card')) return;
         const grid = galleryTab.querySelector('[class*="grid"], [class*="Gallery"], table');
