@@ -94,10 +94,28 @@
         return String(ot || '');
     }
 
+    // Image-only extensions for AE-uploaded files (PDF/EPS/AI render as 0-width
+    // <img> and trip onerror, so we filter upfront to keep thumbnails clean).
+    var IMG_EXT_RE = /\.(png|jpe?g|gif|webp|bmp|svg)$/i;
+    function isImagePath(path) {
+        return path && IMG_EXT_RE.test(String(path));
+    }
+
+    // Pull up to 2 AE-uploaded image thumbnails (CDN_Link, CDN_Link_Two paired
+    // with File_Upload_One, File_Upload_Two for extension check).
+    function getAeArtworkUrls(req) {
+        var pairs = [
+            { url: req.CDN_Link,     path: req.File_Upload_One },
+            { url: req.CDN_Link_Two, path: req.File_Upload_Two }
+        ];
+        return pairs.filter(function (p) { return p.url && isImagePath(p.path); })
+                    .map(function (p) { return p.url; });
+    }
+
     // ── Fetch ─────────────────────────────────────────────────────────────
     function fetchRequests() {
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 
@@ -183,12 +201,27 @@
                 ' alt="' + company + ' mockup" loading="lazy"' +
                 ' onerror="window.SteveGallery.handleThumbError(this)">';
         } else {
-            // Status-aware empty message — "Completed — no mockup file" reads as
-            // a legitimate end-state (text-only jobs, rework, etc.) rather than
-            // implying Steve forgot to upload. Active states stay "No mockup yet".
-            var doneStates = (sKey === 'approved' || sKey === 'completed');
-            var emptyMsg = doneStates ? 'Completed — no mockup file' : 'No mockup yet';
-            thumbHtml = '<div class="card-thumb-empty"><span class="pill">' + emptyMsg + '</span></div>';
+            // No mockup yet — fall back to up to 2 AE-uploaded artwork thumbnails
+            // (CDN_Link / CDN_Link_Two from /Artwork/{filename}). Steve sees what
+            // the customer wants without clicking into the detail page.
+            var aeUrls = getAeArtworkUrls(req);
+            if (aeUrls.length > 0) {
+                var imgs = aeUrls.map(function (u) {
+                    return '<img src="' + escapeHtml(u) + '" alt="AE artwork" loading="lazy" onerror="this.style.display=\'none\'">';
+                }).join('');
+                thumbHtml =
+                    '<div class="card-thumb-ae card-thumb-ae--' + aeUrls.length + '">' +
+                        '<div class="card-thumb-ae-label">AE Artwork</div>' +
+                        '<div class="card-thumb-ae-grid">' + imgs + '</div>' +
+                    '</div>';
+            } else {
+                // Status-aware empty message — "Completed — no mockup file" reads as
+                // a legitimate end-state (text-only jobs, rework, etc.) rather than
+                // implying Steve forgot to upload. Active states stay "No mockup yet".
+                var doneStates = (sKey === 'approved' || sKey === 'completed');
+                var emptyMsg = doneStates ? 'Completed — no mockup file' : 'No mockup yet';
+                thumbHtml = '<div class="card-thumb-empty"><span class="pill">' + emptyMsg + '</span></div>';
+            }
         }
 
         var badges = '';
