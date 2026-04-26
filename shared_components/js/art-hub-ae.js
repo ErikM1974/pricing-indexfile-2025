@@ -528,30 +528,34 @@
 
         var bar = document.createElement('div');
         bar.id = 'ae-status-summary';
-        bar.style.cssText = 'display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;';
+        bar.className = 'status-summary';
 
+        // Map pills to design-system status-stat modifiers (Ruth's queue uses
+        // the same classes — leading dot + active glow come from CSS tokens).
         var pills = [
-            { label: 'Needs Review', count: counts.needsReview, bg: '#fff7ed', border: '#fed7aa', color: '#d97706' },
-            { label: 'Submitted', count: counts.submitted, bg: '#f8f5ff', border: '#e9e0f5', color: '#666' },
-            { label: 'In Progress', count: counts.inProgress, bg: '#eff6ff', border: '#bfdbfe', color: '#666' },
-            { label: 'Completed', count: counts.completed, bg: '#ecfdf5', border: '#a7f3d0', color: '#666' },
-            { label: 'Other', count: counts.other, bg: '#f9fafb', border: '#e5e7eb', color: '#666' }
+            { label: 'Needs Review', count: counts.needsReview, modifier: 'needs-review' },
+            { label: 'Submitted',    count: counts.submitted,    modifier: 'submitted' },
+            { label: 'In Progress',  count: counts.inProgress,   modifier: 'in-progress' },
+            { label: 'Completed',    count: counts.completed,    modifier: 'completed' },
+            { label: 'Other',        count: counts.other,        modifier: 'other' }
         ];
 
         pills.forEach(function (p) {
             if (p.count === 0) return;
             var pill = document.createElement('div');
-            pill.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;background:' + p.bg + ';border:1px solid ' + p.border + ';';
-            pill.innerHTML = '<span style="font-weight:700;font-size:16px;color:' + p.color + ';">' + p.count + '</span>'
-                + '<span style="font-weight:500;color:#666;">' + p.label + '</span>';
+            pill.className = 'status-stat status-stat--' + p.modifier;
+            pill.title = p.label;
+            pill.innerHTML =
+                '<span class="status-stat-count">' + p.count + '</span>' +
+                '<span class="status-stat-label">' + p.label + '</span>';
             pill.addEventListener('click', function () {
                 if (currentStatusFilter === p.label) {
                     currentStatusFilter = '';
-                    pill.style.outline = '';
+                    pill.classList.remove('active');
                 } else {
                     currentStatusFilter = p.label;
-                    bar.querySelectorAll('div').forEach(function (d) { d.style.outline = ''; });
-                    pill.style.outline = '2px solid ' + p.color;
+                    bar.querySelectorAll('.status-stat').forEach(function (d) { d.classList.remove('active'); });
+                    pill.classList.add('active');
                 }
                 applyFilters();
             });

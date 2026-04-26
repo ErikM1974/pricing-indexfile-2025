@@ -93,21 +93,22 @@ var MockupAeGallery = (function () {
             else if (s === 'approved') counts.approved++;
         });
 
-        var html = '<div class="status-summary" style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">';
+        // Status summary — uses design-system .status-stat classes (matches Ruth's queue)
+        html += '<div class="status-summary">';
         if (counts.awaitingApproval > 0) {
-            html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa;font-size:14px;cursor:pointer;" onclick="MockupAeGallery.filterByStatus(\'Awaiting Approval\')">'
-                + '<span style="font-weight:700;font-size:18px;color:#d97706;">' + counts.awaitingApproval + '</span>'
-                + '<span style="font-weight:500;color:#92400e;">Needs Your Review</span></div>';
+            html += '<div class="status-stat status-stat--awaiting-approval" title="Needs Your Review" onclick="MockupAeGallery.filterByStatus(\'Awaiting Approval\')">'
+                + '<span class="status-stat-count">' + counts.awaitingApproval + '</span>'
+                + '<span class="status-stat-label">Needs Your Review</span></div>';
         }
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#f8f5ff;border:1px solid #e9e0f5;font-size:14px;">'
-            + '<span style="font-weight:700;font-size:18px;">' + counts.submitted + '</span>'
-            + '<span style="font-weight:500;color:#666;">Submitted</span></div>';
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#eff6ff;border:1px solid #bfdbfe;font-size:14px;">'
-            + '<span style="font-weight:700;font-size:18px;">' + counts.inProgress + '</span>'
-            + '<span style="font-weight:500;color:#666;">In Progress</span></div>';
-        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-radius:8px;background:#ecfdf5;border:1px solid #a7f3d0;font-size:14px;">'
-            + '<span style="font-weight:700;font-size:18px;">' + counts.approved + '</span>'
-            + '<span style="font-weight:500;color:#666;">Approved</span></div>';
+        html += '<div class="status-stat status-stat--submitted" title="Submitted">'
+            + '<span class="status-stat-count">' + counts.submitted + '</span>'
+            + '<span class="status-stat-label">Submitted</span></div>';
+        html += '<div class="status-stat status-stat--in-progress" title="In Progress">'
+            + '<span class="status-stat-count">' + counts.inProgress + '</span>'
+            + '<span class="status-stat-label">In Progress</span></div>';
+        html += '<div class="status-stat status-stat--completed" title="Approved">'
+            + '<span class="status-stat-count">' + counts.approved + '</span>'
+            + '<span class="status-stat-label">Approved</span></div>';
         html += '</div>';
 
         // Search + Rep filter bar

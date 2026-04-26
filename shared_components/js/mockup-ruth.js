@@ -179,24 +179,43 @@
         const summaryEl = document.getElementById('status-summary');
         if (summaryEl) {
             summaryEl.innerHTML = `
-                <div class="status-stat" title="Submitted">
-                    <span class="status-stat-count">${counts.submitted}</span>
+                <div class="status-stat status-stat--submitted" title="Submitted">
+                    <span class="status-stat-count" data-stat="submitted">${counts.submitted}</span>
                     <span class="status-stat-label">Submitted</span>
                 </div>
-                <div class="status-stat" title="In Progress">
-                    <span class="status-stat-count">${counts.inProgress}</span>
+                <div class="status-stat status-stat--in-progress" title="In Progress">
+                    <span class="status-stat-count" data-stat="inProgress">${counts.inProgress}</span>
                     <span class="status-stat-label">In Progress</span>
                 </div>
-                <div class="status-stat" title="Awaiting Approval">
-                    <span class="status-stat-count">${counts.awaitingApproval}</span>
+                <div class="status-stat status-stat--awaiting-approval" title="Awaiting Approval">
+                    <span class="status-stat-count" data-stat="awaitingApproval">${counts.awaitingApproval}</span>
                     <span class="status-stat-label">Awaiting Approval</span>
                 </div>
-                <div class="status-stat" title="Revision Requested">
-                    <span class="status-stat-count">${counts.revisionRequested}</span>
+                <div class="status-stat status-stat--revision-requested" title="Revision Requested">
+                    <span class="status-stat-count" data-stat="revisionRequested">${counts.revisionRequested}</span>
                     <span class="status-stat-label">Revisions</span>
                 </div>
             `;
+            popChangedCounts(counts);
         }
+    }
+
+    // Pop animation when a count value changes between renders.
+    // Module-level cache so we only pop on actual deltas, not first render.
+    var __ruthPrevCounts = null;
+    function popChangedCounts(counts) {
+        if (!__ruthPrevCounts) { __ruthPrevCounts = Object.assign({}, counts); return; }
+        Object.keys(counts).forEach(function (k) {
+            if (counts[k] !== __ruthPrevCounts[k]) {
+                var el = document.querySelector('.status-stat-count[data-stat="' + k + '"]');
+                if (!el) return;
+                el.classList.remove('status-stat-count--pop');
+                // Force reflow so re-adding the class restarts the animation
+                void el.offsetWidth;
+                el.classList.add('status-stat-count--pop');
+            }
+        });
+        __ruthPrevCounts = Object.assign({}, counts);
     }
 
     // ── Search Filter ─────────────────────────────────────────────────────

@@ -147,16 +147,16 @@ var ArtAeGallery = (function () {
             + '</div>'
             + '</div>';
 
-        // Status summary pills
-        html += '<div class="status-summary" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">';
+        // Status summary pills — design-system .status-stat classes (matches Ruth + AE Steve Mockups)
+        html += '<div class="status-summary">';
         if (counts.awaitingApproval > 0) {
-            html += statusPill(counts.awaitingApproval, 'Needs Review', 'Awaiting Approval', '#fff7ed', '#fed7aa', '#d97706', '#92400e');
+            html += statusPill(counts.awaitingApproval, 'Needs Review', 'Awaiting Approval', 'awaiting-approval');
         }
-        html += statusPill(counts.submitted, 'Submitted', 'Submitted', '#fdf2f8', '#fce7f3', '#be185d', '#831843');
-        html += statusPill(counts.inProgress, 'In Progress', 'In Progress', '#eff6ff', '#bfdbfe', '#2563eb', '#1e40af');
-        html += statusPill(counts.completed, 'Completed', 'Completed', '#ecfdf5', '#a7f3d0', '#059669', '#065f46');
+        html += statusPill(counts.submitted, 'Submitted', 'Submitted', 'submitted');
+        html += statusPill(counts.inProgress, 'In Progress', 'In Progress', 'in-progress');
+        html += statusPill(counts.completed, 'Completed', 'Completed', 'completed');
         if (counts.other > 0) {
-            html += statusPill(counts.other, 'Other', null, '#f9fafb', '#e5e7eb', '#6b7280', '#374151');
+            html += statusPill(counts.other, 'Other', null, 'other');
         }
         html += '</div>';
 
@@ -243,13 +243,13 @@ var ArtAeGallery = (function () {
         fetchRequests();
     }
 
-    function statusPill(count, label, filterValue, bg, border, numColor, textColor) {
+    function statusPill(count, label, filterValue, modifier) {
         var clickAttr = filterValue
-            ? ' onclick="ArtAeGallery.filterByStatus(\'' + filterValue + '\')" style="cursor:pointer;'
-            : ' style="';
-        return '<div' + clickAttr + 'display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;background:' + bg + ';border:1px solid ' + border + ';font-size:14px;">'
-            + '<span style="font-weight:700;font-size:18px;color:' + numColor + ';">' + count + '</span>'
-            + '<span style="font-weight:500;color:' + textColor + ';">' + label + '</span></div>';
+            ? ' onclick="ArtAeGallery.filterByStatus(\'' + filterValue + '\')"'
+            : '';
+        return '<div class="status-stat status-stat--' + modifier + '" title="' + label + '"' + clickAttr + '>'
+            + '<span class="status-stat-count">' + count + '</span>'
+            + '<span class="status-stat-label">' + label + '</span></div>';
     }
 
     function buildCard(req) {

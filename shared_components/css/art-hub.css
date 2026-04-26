@@ -1,18 +1,80 @@
 /* ==========================================================================
    Art Hub Dashboard - Shared Styles
-   Used by: art-hub-steve.html, ae-dashboard.html
+   Used by: art-hub-steve.html, art-hub-ruth.html, ae-dashboard.html
 
    Theme colors set per-page via :root custom properties:
-     --art-theme        Primary color (green #009900 or crimson #981e32)
+     --art-theme        Primary color (green #009900, purple #6B46C1, crimson #981e32)
      --art-theme-light  Light tint for backgrounds
      --art-theme-hover  Hover state for back-link
+
+   2026 design-system tokens declared below — themeless, additive.
+   Every queue dashboard inherits from these. Per-page :root only
+   overrides --art-theme* family.
    ========================================================================== */
+
+/* ---------- 2026 Design Tokens ---------- */
+:root {
+    /* Surface hierarchy (page → card → inset) */
+    --surface-page:     #f7f8fa;
+    --surface-card:     #ffffff;
+    --surface-elevated: #fcfcfd;
+    --surface-inset:    #f3f4f6;
+    --surface-hover:    #f9fafb;
+
+    /* Neutral ramp */
+    --gray-50:  #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+
+    /* Elevation — stacked low-blur */
+    --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
+    --shadow-md: 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06);
+    --shadow-lg: 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08);
+    --shadow-glow-theme: 0 0 0 4px color-mix(in srgb, var(--art-theme) 14%, transparent);
+
+    /* Spacing (4-base) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* Radius — purposeful */
+    --radius-sm:   4px;    /* badges */
+    --radius-md:   8px;    /* inputs, sub-panels */
+    --radius-lg:   12px;   /* cards */
+    --radius-xl:   16px;   /* hero / workflow strip */
+    --radius-pill: 999px;
+
+    /* Semantic state — pills, status strips, count chips */
+    --state-info:    #2563eb; --state-info-bg:    #eff6ff;
+    --state-success: #059669; --state-success-bg: #ecfdf5;
+    --state-warning: #d97706; --state-warning-bg: #fffbeb;
+    --state-danger:  #dc2626; --state-danger-bg:  #fef2f2;
+    --state-violet:  #7c3aed; --state-violet-bg:  #f5f3ff;
+
+    /* Motion */
+    --ease-out:  cubic-bezier(.2,.8,.2,1);
+    --dur-fast:  120ms;
+    --dur-base:  200ms;
+}
 
 /* ---------- Base ---------- */
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    background-color: #f5f5f5;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--surface-page);
 }
 
 /* ---------- Header ---------- */
@@ -55,36 +117,41 @@ body {
 .tab-buttons {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 4px;
     margin-bottom: 20px;
-    background: white;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: var(--surface-card);
+    padding: 6px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
     position: relative;
     flex-wrap: wrap;
 }
 
 .tab-button {
-    background: #f0f0f0;
+    background: transparent;
     border: none;
-    padding: 10px 16px;
-    font-size: 15px;
+    padding: 8px 14px;
+    font-size: 14px;
     font-weight: 500;
+    font-family: inherit;
     cursor: pointer;
-    border-radius: 6px;
-    transition: all 0.3s;
-    color: #333;
+    border-radius: var(--radius-md);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    color: var(--gray-700);
     white-space: nowrap;
+    letter-spacing: -0.005em;
 }
 
 .tab-button:hover {
-    background: #e0e0e0;
+    background: var(--gray-100);
+    color: var(--gray-900);
 }
 
 .tab-button.active {
     background: var(--art-theme);
     color: white;
+    box-shadow: var(--shadow-glow-theme);
 }
 
 /* Tab button that navigates to another page rather than switching an in-page tab.
@@ -92,7 +159,7 @@ body {
    hinted as a link via the external-arrow and slightly lighter default color. */
 .tab-button-link {
     text-decoration: none;
-    color: #333;
+    color: var(--gray-700);
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -103,7 +170,7 @@ body {
     opacity: 0.55;
     margin-left: 2px;
 }
-.tab-button-link:hover { background: #e0e0e0; color: #000; }
+.tab-button-link:hover { background: var(--gray-100); color: var(--gray-900); }
 .tab-button-link:hover::after { opacity: 0.85; }
 
 /* ---------- Tab Content ---------- */
@@ -1234,18 +1301,35 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 
 /* --- Card Structure --- */
 .card {
-    border: 1px solid #dde1e6;
-    border-radius: 10px;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: var(--radius-lg, 12px);
     overflow: hidden;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background-color: var(--surface-card, #fff);
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    transition: transform var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1)),
+                box-shadow var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1));
     display: flex;
     flex-direction: column;
     position: relative; /* anchors .card-missing-badge */
     /* No height:100% — let cards size naturally so short cards
        don't get 100+px of dead whitespace in a mixed-content row */
 }
+
+/* 2026 Status Top-Strip — replaces left border on Caspio gallery cards.
+   Caspio outputs .card--<status> classes; per-status overrides below. */
+.card::before {
+    content: '';
+    display: block;
+    height: 3px;
+    background: var(--gray-200, #e5e7eb);
+}
+.card--submitted::before          { background: var(--state-violet,  #7c3aed); }
+.card--in-progress::before        { background: var(--state-info,    #2563eb); }
+.card--awaiting-approval::before  { background: var(--state-warning, #d97706); }
+.card--revision-requested::before { background: var(--state-danger,  #dc2626); }
+.card--approved::before           { background: var(--state-success, #059669); }
+.card--completed::before          { background: var(--state-success, #22c55e); }
+.card--cancel::before             { background: var(--gray-400,      #9ca3af); }
 
 /* Per-card "File missing" badge — overlays top-right so Steve can spot which
    specific cards need Box recovery without scrolling the broken-mockups modal. */
@@ -1675,26 +1759,23 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     color: var(--art-theme);
 }
 
-/* ---------- Status Left Border Colors (All Cards) ---------- */
-.card--submitted          { border-left: 3px solid #7c3aed; }
-.card--in-progress        { border-left: 3px solid #2563eb; }
-.card--awaiting-approval  { border-left: 3px solid #d97706; }
-.card--revision-requested { border-left: 3px solid #dc2626; }
-.card--approved           { border-left: 3px solid #059669; }
-.card--completed          { border-left: 3px solid #22c55e; opacity: 0.8; }
-.card--cancel             { border-left: 3px solid #9ca3af; opacity: 0.65; }
+/* ---------- Status Indicator (was left border, now top-strip) ----------
+   Per-status colors live on .card--<state>::before (see Card Structure above).
+   Completed/Cancel keep opacity dimming as a secondary cue. */
+.card--completed { opacity: 0.85; }
+.card--cancel    { opacity: 0.65; }
 
 /* ---------- Card Hover Lift + Status Glow ---------- */
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
 }
-.card--submitted:hover          { box-shadow: 0 8px 25px rgba(124,58,237,0.2); }
-.card--in-progress:hover        { box-shadow: 0 8px 25px rgba(37,99,235,0.2); }
-.card--awaiting-approval:hover  { box-shadow: 0 8px 25px rgba(217,119,6,0.2); }
-.card--revision-requested:hover { box-shadow: 0 8px 25px rgba(220,38,38,0.2); }
-.card--approved:hover           { box-shadow: 0 8px 25px rgba(5,150,105,0.2); }
-.card--completed:hover          { box-shadow: 0 8px 25px rgba(34,197,94,0.15); }
+.card--submitted:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(124,58,237,.10); }
+.card--in-progress:hover        { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(37,99,235,.10); }
+.card--awaiting-approval:hover  { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(217,119,6,.10); }
+.card--revision-requested:hover { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(220,38,38,.10); }
+.card--approved:hover           { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(5,150,105,.10); }
+.card--completed:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(34,197,94,.10); }
 
 /* ---------- Staggered Card Entry Animation ---------- */
 @keyframes fadeSlideUp {
