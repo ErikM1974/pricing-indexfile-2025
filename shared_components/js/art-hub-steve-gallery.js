@@ -136,8 +136,12 @@
 
     // ── Fetch ─────────────────────────────────────────────────────────────
     function fetchRequests() {
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
+        // Sales_Rep || User_Email per the established convention (MEMORY.md note
+        // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
+        // empty and User_Email holds the AE email — without User_Email in the
+        // SELECT the rep first name in the card header has nothing to resolve.
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 
@@ -200,7 +204,9 @@
         var designNum     = escapeHtml(req.Design_Num_SW || '');
         var statusRaw     = normalizeStatus(req.Status);
         var sKey          = statusRaw.toLowerCase().replace(/\s+/g, '-');
-        var repFirstName  = escapeHtml(getRepFirstName(req.Sales_Rep));
+        // Sales_Rep || User_Email per MEMORY.md convention. On most recent
+        // records Sales_Rep is empty and User_Email holds the AE address.
+        var repFirstName  = escapeHtml(getRepFirstName(req.Sales_Rep || req.User_Email));
         var revCount      = req.Revision_Count || 0;
         var due        = getDueBadge(req.Due_Date);
         var orderType  = getOrderType(req);
