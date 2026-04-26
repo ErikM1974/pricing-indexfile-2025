@@ -94,7 +94,7 @@ var MockupAeGallery = (function () {
         });
 
         // Status summary — uses design-system .status-stat classes (matches Ruth's queue)
-        html += '<div class="status-summary">';
+        var html = '<div class="status-summary">';
         if (counts.awaitingApproval > 0) {
             html += '<div class="status-stat status-stat--awaiting-approval" title="Needs Your Review" onclick="MockupAeGallery.filterByStatus(\'Awaiting Approval\')">'
                 + '<span class="status-stat-count">' + counts.awaitingApproval + '</span>'
