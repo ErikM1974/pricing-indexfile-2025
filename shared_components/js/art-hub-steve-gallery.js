@@ -286,9 +286,19 @@
     }
 
     function handleThumbError(img) {
+        // Image had a src that failed to load → the Box link is broken (file
+        // deleted, fileId stale, shared-link expired). Distinct from "no mockup
+        // ever uploaded" — show a clear warning and direct staff to re-upload.
+        // Card-level click handler already opens /art-request/{id} in a new tab,
+        // where the detail page has the Re-upload button.
         try {
             var thumb = img.parentNode;
-            thumb.innerHTML = '<div class="card-thumb-empty"><span class="pill">No mockup</span></div>';
+            thumb.innerHTML =
+                '<div class="card-thumb-broken" title="Click card to open detail page and re-upload">' +
+                    '<div class="card-thumb-broken-icon">&#9888;</div>' +
+                    '<div class="card-thumb-broken-title">Link broken</div>' +
+                    '<div class="card-thumb-broken-hint">Click to re-upload</div>' +
+                '</div>';
         } catch (e) { /* defensive — img may already be detached */ }
     }
 

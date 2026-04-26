@@ -26,6 +26,10 @@
         #steve-grid-view .sg-count { font-size:13px; color: var(--gray-500,#6b7280); margin-left:auto; }
         #steve-grid-view #steve-gallery-status { margin-bottom: 16px; }
         #steve-grid-view .card-thumb-empty { display:flex; align-items:center; justify-content:center; height:180px; background: var(--gray-100,#f3f4f6); color: var(--gray-400,#9ca3af); }
+        #steve-grid-view .card-thumb-broken { display:flex; flex-direction:column; align-items:center; justify-content:center; height:180px; background: var(--state-danger-bg,#fef2f2); color: var(--state-danger,#dc2626); border-top: 1px dashed var(--state-danger,#dc2626); border-bottom: 1px dashed var(--state-danger,#dc2626); cursor: pointer; }
+        #steve-grid-view .card-thumb-broken-icon { font-size: 28px; line-height: 1; margin-bottom: 6px; }
+        #steve-grid-view .card-thumb-broken-title { font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+        #steve-grid-view .card-thumb-broken-hint { font-size: 11px; font-weight: 500; margin-top: 2px; opacity: 0.85; }
         #steve-grid-view .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
         #steve-grid-view .sg-btn { padding:6px 12px; border:1px solid var(--gray-200,#e5e7eb); background: var(--surface-card,#fff); color: var(--gray-700,#374151); border-radius: var(--radius-md,8px); font-size:12.5px; font-weight:500; font-family:inherit; cursor:pointer; transition: background var(--dur-base,200ms) var(--ease-out), border-color var(--dur-base,200ms) var(--ease-out); }
         #steve-grid-view .sg-btn:hover { background: var(--gray-100,#f3f4f6); border-color: var(--gray-300,#d1d5db); }
@@ -577,7 +581,7 @@
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=1"></script>
     <script src="/shared_components/js/art-hub-steve.js?v=31"></script>
-    <script src="/shared_components/js/art-hub-steve-gallery.js?v=2"></script>
+    <script src="/shared_components/js/art-hub-steve-gallery.js?v=3"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
 </body>
 </html>
