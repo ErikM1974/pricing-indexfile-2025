@@ -2520,24 +2520,35 @@
             return;
         }
 
-        var label = data.broken === 1
-            ? '<strong>1</strong> art request has a missing Box file'
-            : '<strong>' + data.broken + '</strong> art requests have missing Box files';
-
-        widget.innerHTML = '<div class="broken-mockups-banner">'
-            + '<div class="broken-mockups-icon">\u26a0</div>'
-            + '<div class="broken-mockups-text">'
-            + '<div class="broken-mockups-title">Broken Box mockups detected</div>'
-            + '<div class="broken-mockups-sub">' + label
-            + ' (scanned ' + data.checked + ' records). '
-            + 'Re-upload to fix before customers see them.</div>'
-            + '</div>'
-            + '<button type="button" class="broken-mockups-btn" id="broken-mockups-review-btn">'
-            + 'Review Broken (' + data.broken + ')</button>'
-            + '</div>';
+        widget.style.display = '';
+        // Compact pulsing pill \u2014 replaces the verbose banner. Click \u2192 modal
+        // with per-row Auto-recover / Open in Box / Re-upload actions.
+        var label = data.broken === 1 ? 'broken Box mockup' : 'broken Box mockups';
+        widget.innerHTML = '<button type="button" class="broken-mockups-pill" id="broken-mockups-review-btn"'
+            + ' aria-label="Review broken Box mockups">'
+            +   '<span class="broken-mockups-pill-icon" aria-hidden="true">\u26a0</span>'
+            +   '<span class="broken-mockups-pill-text">'
+            +     '<strong>' + data.broken + '</strong> ' + label
+            +   '</span>'
+            +   '<span class="broken-mockups-pill-cta">Review &amp; recover \u2192</span>'
+            + '</button>';
 
         document.getElementById('broken-mockups-review-btn').addEventListener('click', openBrokenMockupsModal);
     }
+
+    // \u2500\u2500 Broken-Mockups Modal: per-row actions + bulk recover \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    // Each row has 3 actions:
+    //   Auto-recover \u2014 POST /api/art-requests/:pkId/auto-recover-mockup.
+    //                  Searches the design's Box folder for a replacement
+    //                  image and rewrites Caspio. Same algorithm as the
+    //                  v556 backfill (~97% hit rate when a folder exists).
+    //   Open in Box  \u2014 Opens app.box.com/file/{fileId} in a new tab. If the
+    //                  file is in Box trash (within 30-day retention), Box
+    //                  lands on the Restore screen.
+    //   Re-upload    \u2014 POST /api/art-requests/:designId/upload-mockup with
+    //                  targetSlotField so the broken slot is overwritten on
+    //                  purpose (the empty-slot guard would otherwise 409).
+    // Bulk button at the top runs Auto-recover on every row at once.
 
     function openBrokenMockupsModal() {
         if (!brokenMockupsData) return;
@@ -2548,95 +2559,475 @@
         var overlay = document.createElement('div');
         overlay.id = 'broken-mockups-modal';
         overlay.className = 'broken-mockups-overlay';
+        overlay.innerHTML = bmlBuildModalHtml(brokenMockupsData);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
 
-        var rows = brokenMockupsData.results.map(function (r) {
-            var dateStr = '';
-            if (r.dateCreated) {
-                try {
-                    var d = new Date(r.dateCreated);
-                    if (!isNaN(d.getTime())) {
-                        dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                    }
-                } catch (e) { /* ignore */ }
-            }
-            var rep = r.salesRep ? (ArtActions.resolveRep(r.salesRep).displayName || r.salesRep) : '';
-            var slotLabels = (r.brokenSlots || [])
-                .map(function (s) { return friendlySlotLabel(s.field); })
-                .join(', ');
-            var statusClass = 'broken-status--' + (r.status || '').toLowerCase().replace(/\s+/g, '-');
+        bmlWireEvents(overlay);
+    }
 
-            return '<tr class="broken-mockups-row">'
-                + '<td class="broken-mockups-cell">'
-                + '<a href="/art-request/' + encodeURIComponent(r.designId)
-                + '" target="_blank" class="broken-mockups-link">#'
-                + escapeHtml(String(r.designId)) + '</a>'
-                + '</td>'
-                + '<td class="broken-mockups-cell">' + escapeHtml(r.companyName || '(no name)') + '</td>'
-                + '<td class="broken-mockups-cell">' + escapeHtml(rep || '\u2014') + '</td>'
-                + '<td class="broken-mockups-cell">'
-                + '<span class="broken-status-pill ' + statusClass + '">'
-                + escapeHtml(r.status || '\u2014') + '</span>'
-                + '</td>'
-                + '<td class="broken-mockups-cell broken-mockups-cell--muted">' + escapeHtml(dateStr) + '</td>'
-                + '<td class="broken-mockups-cell broken-mockups-cell--muted">' + escapeHtml(slotLabels) + '</td>'
-                + '<td class="broken-mockups-cell">'
-                + '<a href="/art-request/' + encodeURIComponent(r.designId)
-                + '" target="_blank" class="broken-mockups-action-btn">Open \u2192</a>'
-                + '</td>'
-                + '</tr>';
-        }).join('');
+    function bmlBuildModalHtml(data) {
+        var rows = (data.results || []).map(bmlBuildRowHtml).join('');
+        var bulkLabel = data.broken === 1
+            ? 'Auto-recover this 1'
+            : 'Auto-recover all ' + data.broken;
+        var cachedNote = data.cached ? ' (10-min cache)' : '';
 
-        var cachedNote = brokenMockupsData.cached
-            ? ' (cached up to 10 min \u2014 <a href="#" id="broken-mockups-refresh" class="broken-mockups-refresh-link">refresh now</a>)'
-            : '';
-
-        overlay.innerHTML = '<div class="broken-mockups-modal">'
+        return '<div class="broken-mockups-modal">'
             + '<div class="broken-mockups-modal-header">'
-            + '<h3>Broken Box Mockups (' + brokenMockupsData.broken + ')</h3>'
-            + '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close">&times;</button>'
+            +   '<h3>\ud83d\udeab Broken Box Mockups (' + data.broken + ')</h3>'
+            +   '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
             + '</div>'
             + '<div class="broken-mockups-modal-sub">'
-            + 'Scanned ' + brokenMockupsData.checked + ' active art requests '
-            + '(' + brokenMockupsData.uniqueFileIds + ' Box files checked)' + cachedNote + '. '
-            + 'Each row links to the art request \u2014 click Open, then use the Re-upload button on the broken slot.'
+            +   'Scanned ' + data.checked + ' active art requests \u00b7 ' + data.uniqueFileIds + ' Box files checked'
+            +   escapeHtml(cachedNote) + '. '
+            +   'Try <strong>Auto-recover</strong> first \u2014 it usually finds a replacement in the same Box folder.'
             + '</div>'
-            + '<div class="broken-mockups-modal-body">'
-            + '<table class="broken-mockups-table">'
-            + '<thead><tr>'
-            + '<th>Design</th><th>Company</th><th>Rep</th><th>Status</th><th>Created</th><th>Broken slots</th><th></th>'
-            + '</tr></thead>'
-            + '<tbody>' + rows + '</tbody>'
-            + '</table>'
+            + '<div class="bml-toolbar">'
+            +   '<button type="button" class="bml-bulk-btn" id="bml-bulk-recover">\u26a1 ' + escapeHtml(bulkLabel) + '</button>'
+            +   '<button type="button" class="bml-refresh-btn" id="bml-refresh">\u21bb Refresh list</button>'
+            +   '<span class="bml-toolbar-spacer"></span>'
             + '</div>'
+            + '<div class="broken-mockups-modal-body bml-row-list">' + rows + '</div>'
             + '</div>';
+    }
 
-        document.body.appendChild(overlay);
-
-        function close() { overlay.remove(); document.body.style.overflow = ''; }
-        overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
-        document.getElementById('broken-mockups-modal-close').addEventListener('click', close);
-        document.addEventListener('keydown', function escListener(e) {
-            if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escListener); }
-        });
-
-        var refreshLink = document.getElementById('broken-mockups-refresh');
-        if (refreshLink) {
-            refreshLink.addEventListener('click', function (e) {
-                e.preventDefault();
-                refreshLink.textContent = 'refreshing...';
-                fetch(API_BASE + '/api/art-requests/broken-mockups?refresh=true')
-                    .then(function (r) { return r.json(); })
-                    .then(function (data) {
-                        brokenMockupsData = data;
-                        renderBrokenMockupsWidget(data);
-                        close();
-                        if (data.broken > 0) openBrokenMockupsModal();
-                    })
-                    .catch(function () { refreshLink.textContent = 'refresh failed'; });
-            });
+    function bmlBuildRowHtml(rec) {
+        var dateStr = '';
+        if (rec.dateCreated) {
+            try {
+                var d = new Date(rec.dateCreated);
+                if (!isNaN(d.getTime())) {
+                    dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            } catch (e) { /* ignore */ }
+        }
+        var rep = '';
+        if (rec.salesRep && window.ArtActions && window.ArtActions.resolveRep) {
+            rep = window.ArtActions.resolveRep(rec.salesRep).displayName || rec.salesRep;
+        } else if (rec.salesRep) {
+            rep = rec.salesRep;
         }
 
-        document.body.style.overflow = 'hidden';
+        var slots = rec.brokenSlots || [];
+        var primarySlot = slots[0] || {};
+        var primaryFileId = String(primarySlot.fileId || '');
+        var slotLabels = slots.map(function (s) { return friendlySlotLabel(s.field); }).join(', ');
+        var statusKey = (rec.status || '').toLowerCase().replace(/\s+/g, '-');
+        var statusClass = 'broken-status--' + statusKey;
+        var statusText = rec.status || '\u2014';
+        var primarySlotField = String(primarySlot.field || '');
+        var designNumSw = String(rec.designNumSw || rec.designId || '');
+        var company = rec.companyName || '';
+
+        var fileIdLine = primaryFileId
+            ? ' \u00b7 fileId: <code class="bml-fileid-code">' + escapeHtml(primaryFileId) + '</code>'
+                + ' <button type="button" class="bml-copy" data-copy="' + escapeHtml(primaryFileId)
+                + '" title="Copy fileId" aria-label="Copy fileId">\ud83d\udccb</button>'
+            : '';
+        var boxUrl = primaryFileId
+            ? 'https://app.box.com/file/' + encodeURIComponent(primaryFileId)
+            : '';
+
+        return '<article class="bml-row" '
+            +   'data-pk-id="' + escapeHtml(String(rec.pkId)) + '" '
+            +   'data-design-id="' + escapeHtml(String(rec.designId)) + '" '
+            +   'data-design-num-sw="' + escapeHtml(designNumSw) + '" '
+            +   'data-company="' + escapeHtml(company) + '" '
+            +   'data-slot-field="' + escapeHtml(primarySlotField) + '" '
+            +   'data-file-id="' + escapeHtml(primaryFileId) + '">'
+            +   '<div class="bml-row__head">'
+            +     '<a class="bml-row__title" href="/art-request/' + encodeURIComponent(rec.designId)
+            +       '" target="_blank" rel="noopener" title="Open detail page">'
+            +       '<span class="bml-row__company">' + escapeHtml(company || '(no company)') + '</span>'
+            +       '<span class="bml-row__design">#' + escapeHtml(designNumSw) + '</span>'
+            +     '</a>'
+            +     '<span class="broken-status-pill ' + statusClass + '">' + escapeHtml(statusText) + '</span>'
+            +   '</div>'
+            +   '<div class="bml-row__meta">'
+            +     (rep ? '<span>Rep: ' + escapeHtml(rep) + '</span>' : '')
+            +     (dateStr ? (rep ? ' \u00b7 ' : '') + 'Created ' + escapeHtml(dateStr) : '')
+            +     (slotLabels ? ' \u00b7 Broken: ' + escapeHtml(slotLabels) : '')
+            +     fileIdLine
+            +   '</div>'
+            +   '<div class="bml-row__actions">'
+            +     '<button type="button" class="bml-action bml-action--recover" data-action="recover">\u26a1 Auto-recover</button>'
+            +     (boxUrl ? '<a class="bml-action bml-action--box" href="' + boxUrl + '" target="_blank" rel="noopener" title="Opens Box \u2014 lands on Restore screen if file is in trash">\ud83d\udd17 Open in Box</a>' : '')
+            +     '<button type="button" class="bml-action bml-action--reupload" data-action="reupload">\ud83d\udce4 Re-upload</button>'
+            +   '</div>'
+            +   '<div class="bml-row__dropzone" hidden>'
+            +     '<input type="file" class="bml-file-input" accept="image/*,application/pdf,.svg,.eps,.ai" hidden>'
+            +     '<div class="bml-dropzone-prompt">\ud83d\udce5 Drop file here or <span class="bml-dropzone-link">click to choose</span></div>'
+            +     '<div class="bml-dropzone-hint">Will overwrite the broken slot. Image, PDF, SVG, AI, or EPS.</div>'
+            +   '</div>'
+            +   '<div class="bml-row__result" hidden></div>'
+            + '</article>';
+    }
+
+    function bmlWireEvents(overlay) {
+        function close() {
+            overlay.remove();
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', escListener);
+        }
+        function escListener(e) { if (e.key === 'Escape') close(); }
+
+        // Backdrop click closes
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        var closeBtn = overlay.querySelector('#broken-mockups-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        document.addEventListener('keydown', escListener);
+
+        // Bulk recover
+        var bulkBtn = overlay.querySelector('#bml-bulk-recover');
+        if (bulkBtn) bulkBtn.addEventListener('click', function () {
+            bmlActionRecoverAll(overlay, bulkBtn);
+        });
+
+        // Refresh list \u2014 bypass cache, rebuild modal
+        var refreshBtn = overlay.querySelector('#bml-refresh');
+        if (refreshBtn) refreshBtn.addEventListener('click', function () {
+            var orig = refreshBtn.innerHTML;
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '\u23f3 Refreshing...';
+            bmlReloadFromServer().then(function () {
+                close();
+                if (brokenMockupsData && brokenMockupsData.broken > 0) {
+                    openBrokenMockupsModal();
+                }
+            }).catch(function () {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = orig;
+            });
+        });
+
+        // Delegated click handler \u2014 covers copy buttons, action buttons,
+        // dropzone clicks (which trigger the hidden file input).
+        overlay.addEventListener('click', function (e) {
+            var copyBtn = e.target.closest('.bml-copy');
+            if (copyBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                var text = copyBtn.dataset.copy || '';
+                try {
+                    navigator.clipboard.writeText(text);
+                    var orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '\u2713';
+                    setTimeout(function () { copyBtn.innerHTML = orig; }, 1200);
+                } catch (err) { /* clipboard not available \u2014 silently no-op */ }
+                return;
+            }
+
+            var actionBtn = e.target.closest('.bml-action[data-action]');
+            if (actionBtn) {
+                e.preventDefault();
+                var row = actionBtn.closest('.bml-row');
+                if (!row) return;
+                var action = actionBtn.dataset.action;
+                if (action === 'recover') return bmlActionRecover(row);
+                if (action === 'reupload') return bmlActionReupload(row);
+                return;
+            }
+
+            var dropzone = e.target.closest('.bml-row__dropzone');
+            if (dropzone && !e.target.classList.contains('bml-file-input')) {
+                var input = dropzone.querySelector('.bml-file-input');
+                if (input) input.click();
+            }
+        });
+
+        // File input change \u2192 upload (covers click-to-choose flow)
+        overlay.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('bml-file-input')) return;
+            var row = e.target.closest('.bml-row');
+            if (!row) return;
+            var file = e.target.files && e.target.files[0];
+            if (file) bmlPerformUpload(row, file);
+        });
+
+        // Drag-and-drop into a dropzone
+        overlay.addEventListener('dragover', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (!dz || dz.hidden) return;
+            e.preventDefault();
+            dz.classList.add('is-dragover');
+        });
+        overlay.addEventListener('dragleave', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (dz) dz.classList.remove('is-dragover');
+        });
+        overlay.addEventListener('drop', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (!dz || dz.hidden) return;
+            e.preventDefault();
+            dz.classList.remove('is-dragover');
+            var row = dz.closest('.bml-row');
+            var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (row && file) bmlPerformUpload(row, file);
+        });
+    }
+
+    function bmlActionRecover(row) {
+        var pkId = row.dataset.pkId;
+        var designNumber = row.dataset.designNumSw;
+        var companyName = row.dataset.company || '';
+
+        if (!pkId) {
+            return bmlSetRowState(row, 'error', 'Missing pkId');
+        }
+        if (!designNumber) {
+            return bmlSetRowState(row, 'error',
+                'Missing Design # \u2014 cannot search Box folder. Try Re-upload.');
+        }
+
+        bmlSetRowState(row, 'recovering');
+        fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ designNumber: designNumber, companyName: companyName })
+        })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+        .then(function (resp) { bmlApplyResultToRow(row, resp.body); })
+        .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
+    }
+
+    function bmlActionReupload(row) {
+        var dz = row.querySelector('.bml-row__dropzone');
+        if (!dz) return;
+        dz.hidden = !dz.hidden;
+        if (!dz.hidden) {
+            try { dz.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { /* defensive */ }
+        }
+    }
+
+    function bmlPerformUpload(row, file) {
+        var pkId = row.dataset.pkId;
+        var designId = row.dataset.designId;
+        var companyName = row.dataset.company || '';
+        var slotField = row.dataset.slotField || '';
+        if (!pkId || !designId) {
+            return bmlSetRowState(row, 'error', 'Missing record info on row');
+        }
+
+        bmlSetRowState(row, 'uploading', { fileName: file.name });
+
+        var fd = new FormData();
+        fd.append('file', file);
+        fd.append('pkId', pkId);
+        fd.append('companyName', companyName);
+        // targetSlotField tells the upload route to overwrite a specific slot
+        // rather than write to the first empty one. Required here because the
+        // target slot is occupied by a broken URL \u2014 the empty-slot guard would
+        // otherwise reject with 409 SLOTS_FULL.
+        if (slotField) fd.append('targetSlotField', slotField);
+
+        fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/upload-mockup', {
+            method: 'POST',
+            body: fd
+        })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+        .then(function (resp) {
+            if (resp.ok && resp.body && resp.body.success) {
+                bmlSetRowState(row, 'reuploaded', resp.body);
+                bmlScheduleRowFadeAndRefresh(row);
+            } else {
+                var msg = (resp.body && resp.body.error) || ('HTTP ' + resp.ok);
+                bmlSetRowState(row, 'error', msg);
+            }
+        })
+        .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
+    }
+
+    function bmlActionRecoverAll(overlay, bulkBtn) {
+        var rows = Array.prototype.slice.call(overlay.querySelectorAll('.bml-row'));
+        if (rows.length === 0) return;
+
+        if (!confirm('Run auto-recover on all ' + rows.length + ' broken link'
+                + (rows.length === 1 ? '' : 's') + '? Recovered records fade out;'
+                + ' ones with no folder match stay for manual Re-upload.')) {
+            return;
+        }
+
+        var records = rows.map(function (row) {
+            return {
+                pkId: row.dataset.pkId,
+                designNumber: row.dataset.designNumSw,
+                companyName: row.dataset.company
+            };
+        });
+
+        bulkBtn.disabled = true;
+        var origLabel = bulkBtn.innerHTML;
+        bulkBtn.innerHTML = '\u23f3 Searching ' + rows.length + ' Box folder'
+            + (rows.length === 1 ? '' : 's') + '...';
+        rows.forEach(function (row) { bmlSetRowState(row, 'recovering'); });
+
+        fetch(API_BASE + '/api/art-requests/auto-recover-mockups-bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ records: records })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            (data.results || []).forEach(function (result) {
+                var pkSafe = (window.CSS && CSS.escape)
+                    ? CSS.escape(String(result.pkId))
+                    : String(result.pkId);
+                var row = overlay.querySelector('.bml-row[data-pk-id="' + pkSafe + '"]');
+                if (row) bmlApplyResultToRow(row, result);
+            });
+            bulkBtn.innerHTML = '\u2713 Recovered ' + data.recovered + ' of ' + data.total;
+            setTimeout(function () {
+                bulkBtn.disabled = false;
+                bulkBtn.innerHTML = origLabel;
+            }, 3500);
+        })
+        .catch(function (err) {
+            bulkBtn.disabled = false;
+            bulkBtn.innerHTML = origLabel;
+            rows.forEach(function (row) { bmlSetRowState(row, 'error', err.message || String(err)); });
+        });
+    }
+
+    // Map the auto-recover route's response shape to a row state. Used by
+    // both single and bulk paths so the result UI is consistent.
+    function bmlApplyResultToRow(row, body) {
+        if (!body || !body.status) {
+            return bmlSetRowState(row, 'error', (body && body.error) || 'Unknown response');
+        }
+        if (body.status === 'recovered') {
+            bmlSetRowState(row, 'recovered', body);
+            bmlScheduleRowFadeAndRefresh(row);
+        } else if (body.status === 'no-folder') {
+            bmlSetRowState(row, 'no-folder');
+        } else if (body.status === 'empty-folder') {
+            bmlSetRowState(row, 'empty-folder', body);
+        } else if (body.status === 'no-match') {
+            bmlSetRowState(row, 'no-match', body);
+        } else {
+            bmlSetRowState(row, 'error', body.error || 'Unknown status: ' + body.status);
+        }
+    }
+
+    // Mutate a row's UI to reflect the current state of its async action.
+    // State machine: idle \u2192 recovering | uploading \u2192 recovered | reuploaded
+    //                       | no-folder | empty-folder | no-match | error
+    function bmlSetRowState(row, state, payload) {
+        var stateClasses = ['is-recovering', 'is-recovered', 'is-error', 'is-no-folder',
+                            'is-empty-folder', 'is-no-match', 'is-uploading', 'is-reuploaded'];
+        stateClasses.forEach(function (c) { row.classList.remove(c); });
+        row.classList.add('is-' + state);
+
+        var resultEl = row.querySelector('.bml-row__result');
+        var actionsEl = row.querySelector('.bml-row__actions');
+        var dropzoneEl = row.querySelector('.bml-row__dropzone');
+
+        var html = '';
+        var actionsDisabled = false;
+
+        if (state === 'recovering') {
+            html = '<span class="bml-spinner"></span> Searching Box folder...';
+            actionsDisabled = true;
+            if (dropzoneEl) dropzoneEl.hidden = true;
+        } else if (state === 'recovered') {
+            var conf = (payload && payload.confidence) ? ' (' + payload.confidence + ' confidence)' : '';
+            var fileName = (payload && payload.newFileName) ? ' \u2014 ' + payload.newFileName : '';
+            html = '<span class="bml-result bml-result--ok">\u2705 Recovered'
+                + escapeHtml(conf + fileName) + ' \u2014 reloading...</span>';
+            actionsDisabled = true;
+        } else if (state === 'reuploaded') {
+            html = '<span class="bml-result bml-result--ok">\u2705 Re-uploaded \u2014 reloading...</span>';
+            actionsDisabled = true;
+        } else if (state === 'no-folder') {
+            html = '<span class="bml-result bml-result--warn">\u26a0 No matching folder in Box.'
+                + ' Use <strong>Re-upload</strong> to attach a new file.</span>';
+        } else if (state === 'empty-folder') {
+            var folderName = (payload && payload.folder && payload.folder.name) ? payload.folder.name : '';
+            html = '<span class="bml-result bml-result--warn">\u26a0 Folder "' + escapeHtml(folderName)
+                + '" has no images. Use <strong>Re-upload</strong>.</span>';
+        } else if (state === 'no-match') {
+            var cands = (payload && payload.candidates && payload.candidates.length)
+                ? ' (saw: ' + payload.candidates.map(escapeHtml).join(', ') + ')'
+                : '';
+            html = '<span class="bml-result bml-result--warn">\u26a0 No filename match in Box folder'
+                + cands + '. Use <strong>Re-upload</strong>.</span>';
+        } else if (state === 'uploading') {
+            var fname = (payload && payload.fileName) ? payload.fileName : 'file';
+            html = '<span class="bml-spinner"></span> Uploading ' + escapeHtml(fname) + ' to Box...';
+            actionsDisabled = true;
+        } else if (state === 'error') {
+            var msg = (typeof payload === 'string') ? payload : 'Unknown error';
+            html = '<span class="bml-result bml-result--error">\u274c ' + escapeHtml(msg) + '</span>';
+        }
+
+        if (resultEl) {
+            resultEl.innerHTML = html;
+            resultEl.hidden = !html;
+        }
+        if (actionsEl) {
+            Array.prototype.slice.call(actionsEl.querySelectorAll('button'))
+                .forEach(function (btn) { btn.disabled = actionsDisabled; });
+        }
+    }
+
+    // Debounce timer shared across rows so a bulk recover triggers ONE
+    // background refresh after the dust settles, not one per row.
+    var _bmlPendingFadeTimer = null;
+    function bmlScheduleRowFadeAndRefresh(row) {
+        setTimeout(function () {
+            row.classList.add('is-fading-out');
+            setTimeout(function () {
+                if (row && row.parentNode) row.remove();
+                bmlMaybeShowEmptyState();
+            }, 400);
+        }, 1200);
+
+        if (_bmlPendingFadeTimer) clearTimeout(_bmlPendingFadeTimer);
+        _bmlPendingFadeTimer = setTimeout(function () {
+            _bmlPendingFadeTimer = null;
+            bmlReloadFromServer().then(function () {
+                // Repaint the gallery cards behind the modal so recovered cards
+                // lose their red border and load a thumbnail.
+                if (window.SteveGallery && typeof window.SteveGallery.refresh === 'function') {
+                    try { window.SteveGallery.refresh(); } catch (e) { /* gallery may not be active in board view */ }
+                }
+                applyMissingBadgesToAllCards();
+            }).catch(function () { /* network blip \u2014 next dashboard load will catch up */ });
+        }, 2000);
+    }
+
+    // When the last row fades out, swap the modal body for a celebratory
+    // empty state instead of leaving a blank white box.
+    function bmlMaybeShowEmptyState() {
+        var overlay = document.getElementById('broken-mockups-modal');
+        if (!overlay) return;
+        var rows = overlay.querySelectorAll('.bml-row');
+        if (rows.length > 0) return;
+        var modalBody = overlay.querySelector('.broken-mockups-modal-body');
+        if (modalBody) {
+            modalBody.innerHTML = '<div class="bml-empty-state">'
+                + '<div class="bml-empty-state-icon">\u2728</div>'
+                + '<div class="bml-empty-state-title">All broken links resolved!</div>'
+                + '<div class="bml-empty-state-sub">Nice work \u2014 the gallery will refresh momentarily.</div>'
+                + '</div>';
+        }
+    }
+
+    function bmlReloadFromServer() {
+        return fetch(API_BASE + '/api/art-requests/broken-mockups?refresh=true')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                brokenMockupsData = data;
+                brokenDesignIds = new Map();
+                (data.results || []).forEach(function (r) {
+                    if (r && r.designId != null) {
+                        brokenDesignIds.set(String(r.designId), r.brokenSlots || []);
+                    }
+                });
+                renderBrokenMockupsWidget(data);
+            });
     }
 
     function friendlySlotLabel(field) {

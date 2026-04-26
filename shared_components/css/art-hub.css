@@ -4357,6 +4357,293 @@ input.cbSearchButton {
 .broken-status--in-progress { background: #dbeafe; color: #1e40af; }
 .broken-status--submitted { background: #fce7f3; color: #9d174d; }
 .broken-status--revision-requested { background: #fde68a; color: #78350f; }
+.broken-status--approved { background: #d1fae5; color: #065f46; }
+.broken-status--completed { background: #d1fae5; color: #065f46; }
+
+/* ── Broken Mockups: pulsing pill (replaces verbose banner v2026.04.27) ───
+ * Compact CTA pinned at the top of Steve's gallery tab. Click → modal with
+ * per-row Auto-recover / Open in Box / Re-upload actions. Pulses red so the
+ * eye catches it immediately when N > 0.
+ */
+.broken-mockups-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    margin-bottom: 14px;
+    background: linear-gradient(90deg, #fef2f2 0%, #fee2e2 100%);
+    border: 1px solid #fca5a5;
+    border-left: 4px solid #dc2626;
+    border-radius: 999px;
+    color: #991b1b;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    animation: bml-pill-pulse 2.4s ease-in-out infinite;
+    box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12);
+}
+.broken-mockups-pill:hover {
+    background: linear-gradient(90deg, #fee2e2 0%, #fecaca 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+}
+.broken-mockups-pill:active { transform: translateY(0); }
+.broken-mockups-pill-icon { font-size: 18px; line-height: 1; }
+.broken-mockups-pill-text strong { font-size: 14px; }
+.broken-mockups-pill-cta {
+    margin-left: 4px;
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+}
+@keyframes bml-pill-pulse {
+    0%, 100% { box-shadow: 0 2px 6px rgba(220, 38, 38, 0.12); }
+    50%      { box-shadow: 0 2px 14px rgba(220, 38, 38, 0.45); }
+}
+
+/* ── Broken Mockups Modal: toolbar (bulk recover + refresh) ──────────── */
+.bml-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #fff7ed;
+    border-bottom: 1px solid #fed7aa;
+    flex-wrap: wrap;
+}
+.bml-bulk-btn {
+    background: #ea580c;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+.bml-bulk-btn:hover:not(:disabled) { background: #c2410c; }
+.bml-bulk-btn:active:not(:disabled) { transform: translateY(1px); }
+.bml-bulk-btn:disabled { background: #fdba74; cursor: not-allowed; }
+.bml-refresh-btn {
+    background: #fff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.bml-refresh-btn:hover:not(:disabled) { background: #f1f5f9; }
+.bml-refresh-btn:disabled { color: #94a3b8; cursor: not-allowed; }
+.bml-toolbar-spacer { flex: 1; }
+.bml-toolbar-meta { font-size: 12px; color: #64748b; }
+
+/* ── Broken Mockups Modal: row-based body (replaces the old <table>) ── */
+.bml-row-list { padding: 0; }
+.bml-row {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.2s, opacity 0.4s, transform 0.4s;
+}
+.bml-row:hover { background: #fffbeb; }
+.bml-row.is-fading-out {
+    opacity: 0;
+    transform: scaleY(0.85);
+    background: #f0fdf4;
+}
+.bml-row.is-recovering,
+.bml-row.is-uploading { background: #eff6ff; }
+.bml-row.is-recovered,
+.bml-row.is-reuploaded { background: #f0fdf4; }
+.bml-row.is-no-folder,
+.bml-row.is-empty-folder,
+.bml-row.is-no-match { background: #fffbeb; }
+.bml-row.is-error { background: #fef2f2; }
+
+.bml-row__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.bml-row__title {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    color: #1f2937;
+    text-decoration: none;
+    flex: 1;
+    min-width: 0;
+}
+.bml-row__title:hover { color: #009900; }
+.bml-row__title:hover .bml-row__company { text-decoration: underline; }
+.bml-row__company {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bml-row__design {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.bml-row__meta {
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+.bml-fileid-code {
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 11px;
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #334155;
+}
+.bml-copy {
+    background: none;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #475569;
+    transition: background 0.15s;
+    line-height: 1.3;
+}
+.bml-copy:hover { background: #f1f5f9; }
+
+/* ── Broken Mockups Modal: per-row action buttons ────────────────────── */
+.bml-row__actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.bml-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-decoration: none;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+    line-height: 1.3;
+    background: #fff;
+}
+.bml-action:disabled { cursor: not-allowed; opacity: 0.55; }
+.bml-action:active:not(:disabled) { transform: translateY(1px); }
+.bml-action--recover {
+    background: #fff7ed;
+    color: #c2410c;
+    border-color: #fdba74;
+}
+.bml-action--recover:hover:not(:disabled) {
+    background: #fed7aa;
+    border-color: #ea580c;
+}
+.bml-action--box {
+    background: #eff6ff;
+    color: #0061d5;
+    border-color: #bfdbfe;
+}
+.bml-action--box:hover {
+    background: #dbeafe;
+    border-color: #0061d5;
+}
+.bml-action--reupload {
+    background: #f0fdf4;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+.bml-action--reupload:hover:not(:disabled) {
+    background: #dcfce7;
+    border-color: #16a34a;
+}
+
+/* ── Broken Mockups Modal: drop zone (toggled by Re-upload button) ───── */
+.bml-row__dropzone {
+    margin-top: 10px;
+    padding: 18px 14px;
+    border: 2px dashed #86efac;
+    border-radius: 8px;
+    background: #f0fdf4;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+.bml-row__dropzone:hover { background: #dcfce7; }
+.bml-row__dropzone.is-dragover {
+    background: #bbf7d0;
+    border-color: #16a34a;
+    border-style: solid;
+}
+.bml-dropzone-prompt {
+    font-size: 13px;
+    color: #166534;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.bml-dropzone-link {
+    text-decoration: underline;
+    color: #15803d;
+}
+.bml-dropzone-hint {
+    font-size: 11px;
+    color: #65a30d;
+}
+
+/* ── Broken Mockups Modal: per-row result line ───────────────────────── */
+.bml-row__result {
+    margin-top: 10px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.bml-result {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+.bml-result--ok { background: #dcfce7; color: #166534; }
+.bml-result--warn { background: #fef3c7; color: #92400e; }
+.bml-result--error { background: #fee2e2; color: #991b1b; }
+.bml-spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #e2e8f0;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+}
+
+/* ── Broken Mockups Modal: empty state when all broken links resolved ── */
+.bml-empty-state {
+    padding: 40px 20px;
+    text-align: center;
+}
+.bml-empty-state-icon { font-size: 36px; margin-bottom: 8px; }
+.bml-empty-state-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #166534;
+    margin-bottom: 4px;
+}
+.bml-empty-state-sub { font-size: 13px; color: #64748b; }
 
 /* ── Breadcrumb (sits inside .minimal-header where back-link used to be) ──
  * White on art-theme background. Last segment is a non-link "current" pill.
