@@ -232,12 +232,19 @@ var MockupAeGallery = (function () {
         }
 
         var repName = resolveRepName(mockup.Submitted_By || '');
+        // First whitespace-token only — the inline header treatment uses the
+        // first name for at-a-glance scanning ("#40018 · Taneisha"). data-rep
+        // attribute keeps the full repName since the rep filter dropdown
+        // matches against the full resolveRepName() output.
+        var repFirstName = repName ? escapeHtml(String(repName).split(/\s+/)[0]) : '';
 
         return '<div class="mockup-card" data-mockup-id="' + id + '" data-rep="' + escapeHtml(repName) + '" style="cursor:pointer;">'
             + '<div class="card-header">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
-            + '    <div class="card-design-number">#' + designNum + '</div>'
+            + '    <div class="card-design-number">#' + designNum
+            +        (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '')
+            +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'
             + '    <span class="status-pill ' + statusClass + '">' + escapeHtml(status) + '</span>'
@@ -247,7 +254,8 @@ var MockupAeGallery = (function () {
             + '<div class="card-body">'
             + (designName ? '<div class="card-design-name">' + designName + '</div>' : '')
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
-            + (repName ? '<div class="card-meta-row"><span class="card-meta-label">REP</span> ' + escapeHtml(repName) + '</div>' : '')
+            // REP meta-row removed 2026-04-26 — rep promoted to header inline
+            // with designNum (see card-design-number block above).
             + '</div>'
             + '<div class="card-footer">'
             + '  <span class="card-date">' + submittedDate + '</span>'

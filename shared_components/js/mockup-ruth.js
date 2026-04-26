@@ -388,12 +388,17 @@
             }
         }
 
-        // AE display name (extract before @)
+        // AE first-name extraction. Used both inline in the card header (next to
+        // #design_num) and in the deprecated "From:" meta line below — see
+        // "Steve gallery rep header" pattern (v2026.04.26.10). Take the local-part
+        // of the email (or the raw name for non-email Submitted_By values), then
+        // pull just the first whitespace-separated token, then capitalize.
         let aeDisplay = '';
         if (submittedBy) {
             const atIdx = submittedBy.indexOf('@');
-            aeDisplay = atIdx > 0 ? submittedBy.substring(0, atIdx) : submittedBy;
-            aeDisplay = aeDisplay.charAt(0).toUpperCase() + aeDisplay.slice(1);
+            let raw = atIdx > 0 ? submittedBy.substring(0, atIdx) : submittedBy;
+            raw = String(raw).split(/\s+/)[0]; // first token only — drops surnames
+            aeDisplay = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
         }
 
         const thumbUrl = mockup.Box_Mockup_1 || '';
@@ -425,7 +430,7 @@
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
-                    <div class="card-design-number">#${designNum}</div>
+                    <div class="card-design-number">#${designNum}${aeDisplay ? `<span class="card-rep-name">${escapeHtml(aeDisplay)}</span>` : ''}</div>
                 </div>
                 <div class="card-header-right">
                     <span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
@@ -435,7 +440,6 @@
             <div class="card-body">
                 ${designName ? `<div class="card-design-name">${designName}</div>` : ''}
                 <div class="card-meta">
-                    ${aeDisplay ? `<div class="card-meta-row"><span class="card-meta-label">From:</span> ${escapeHtml(aeDisplay)}</div>` : ''}
                     ${mockup.Garment_Info ? `<div class="card-meta-row"><span class="card-meta-label">Garment:</span> ${escapeHtml(mockup.Garment_Info)}</div>` : ''}
                     ${mockup.Print_Location ? `<div class="card-meta-row"><span class="card-meta-label">Location:</span> ${escapeHtml(mockup.Print_Location)}</div>` : ''}
                     ${dimensions ? `<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ${escapeHtml(dimensions)}</div>` : ''}

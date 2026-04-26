@@ -263,7 +263,12 @@ var ArtAeGallery = (function () {
         var createdDate = formatDate(req.Date_Created);
         var contact = escapeHtml(req.Full_Name_Contact || '');
         var revCount = req.Revision_Count || 0;
-        var salesRep = escapeHtml(req.Sales_Rep || extractRepFromEmail(req.User_Email));
+        // Sales_Rep || User_Email (email-local capitalized) per MEMORY.md convention.
+        // First whitespace-token only — full names like "Erik Mickelson" become "Erik"
+        // for the inline header treatment (#designNum · Erik). Same pattern as
+        // Steve's gallery (v2026.04.26.10).
+        var rawRep = req.Sales_Rep || extractRepFromEmail(req.User_Email);
+        var repFirstName = rawRep ? escapeHtml(String(rawRep).split(/\s+/)[0]) : '';
         var artMinutes = req.Art_Minutes || 0;
         var quotedArt = req.Prelim_Charges;
         var actualArt = req.Amount_Art_Billed;
@@ -316,10 +321,8 @@ var ArtAeGallery = (function () {
             ? '<div class="card-meta-row"><span class="card-meta-label">CONTACT</span> ' + contact + '</div>'
             : '';
 
-        // Sales rep
-        var repHtml = salesRep
-            ? '<div class="card-meta-row"><span class="card-meta-label">REP</span> ' + salesRep + '</div>'
-            : '';
+        // Rep meta-row removed 2026-04-26 — promoted to header inline with
+        // designNum (see card-design-number block below). Keeps cards tighter.
 
         var elapsedBadge = (typeof ElapsedTimeUtils !== 'undefined')
             ? ElapsedTimeUtils.getStatusElapsedBadge(status, req, 'art')
@@ -329,7 +332,9 @@ var ArtAeGallery = (function () {
             + '<div class="card-header" style="background:var(--art-theme, #981e32);">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
-            + '    <div class="card-design-number">#' + designNum + '</div>'
+            + '    <div class="card-design-number">#' + designNum
+            +        (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '')
+            +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'
             + '    <span class="status-pill ' + statusClass + '">' + escapeHtml(status) + '</span>'
@@ -342,7 +347,6 @@ var ArtAeGallery = (function () {
             + '</div>'
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
             + contactHtml
-            + repHtml
             + artChargeHtml
             + (elapsedBadge ? '<div style="margin-top:6px;">' + elapsedBadge + '</div>' : '')
             + '</div>'
