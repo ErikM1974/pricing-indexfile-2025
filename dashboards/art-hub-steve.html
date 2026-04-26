@@ -6,14 +6,39 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Artist Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <style>:root { --art-theme: #009900; --art-theme-dark: #006600; --art-theme-light: #f0f9f0; --art-theme-hover: #009900; --art-theme-bg: #f0f9f0; --art-theme-bg-hover: #e6f7e6; --art-theme-bg-selected: #e0f5e0; --art-theme-rgba-15: rgba(0,153,0,0.15); --art-theme-rgba-10: rgba(0,153,0,0.1); }</style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=22">
+    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=16">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=7">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Inline theme :root MUST come AFTER mockup-ruth.css so Steve's green
+         tokens override Ruth's purple defaults (cascade: later declarations win
+         at equal specificity). Same pattern as ae-dashboard.html. -->
+    <style>:root { --art-theme: #009900; --art-theme-dark: #006600; --art-theme-light: #f0f9f0; --art-theme-hover: #009900; --art-theme-bg: #f0f9f0; --art-theme-bg-hover: #e6f7e6; --art-theme-bg-selected: #e0f5e0; --art-theme-rgba-15: rgba(0,153,0,0.15); --art-theme-rgba-10: rgba(0,153,0,0.1); }</style>
+    <!-- Steve gallery layout (toolbar + status row + grid + load more) -->
+    <style>
+        #steve-grid-view .sg-toolbar { display:flex; align-items:center; gap:12px; margin: 4px 0 14px; flex-wrap:wrap; }
+        #steve-grid-view #steve-gallery-search { flex:1; min-width:240px; max-width:380px; padding:8px 12px; border:1px solid var(--gray-200,#e5e7eb); border-radius: var(--radius-md,8px); font: inherit; font-size:14px; background: var(--surface-card,#fff); }
+        #steve-grid-view #steve-gallery-search:focus { outline:none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }
+        #steve-grid-view .sg-count { font-size:13px; color: var(--gray-500,#6b7280); margin-left:auto; }
+        #steve-grid-view #steve-gallery-status { margin-bottom: 16px; }
+        #steve-grid-view .card-thumb-empty { display:flex; align-items:center; justify-content:center; height:180px; background: var(--gray-100,#f3f4f6); color: var(--gray-400,#9ca3af); }
+        #steve-grid-view .card-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+        #steve-grid-view .sg-btn { padding:6px 12px; border:1px solid var(--gray-200,#e5e7eb); background: var(--surface-card,#fff); color: var(--gray-700,#374151); border-radius: var(--radius-md,8px); font-size:12.5px; font-weight:500; font-family:inherit; cursor:pointer; transition: background var(--dur-base,200ms) var(--ease-out), border-color var(--dur-base,200ms) var(--ease-out); }
+        #steve-grid-view .sg-btn:hover { background: var(--gray-100,#f3f4f6); border-color: var(--gray-300,#d1d5db); }
+        #steve-grid-view .sg-btn--primary { background: var(--art-theme); color: white; border-color: var(--art-theme); }
+        #steve-grid-view .sg-btn--primary:hover { background: var(--art-theme-dark); border-color: var(--art-theme-dark); color:#fff; }
+        #steve-grid-view .sg-btn--success { background: var(--state-success-bg,#ecfdf5); color: var(--state-success,#059669); border-color: var(--state-success,#059669); }
+        #steve-grid-view .sg-btn--success:hover { background: var(--state-success,#059669); color:#fff; }
+        #steve-grid-view .sg-btn--active { background: var(--art-theme); color:#fff; border-color: var(--art-theme); }
+        #steve-grid-view .sg-load-more-wrap { text-align:center; padding: 16px 0 32px; }
+        #steve-grid-view #steve-gallery-load-more { padding:10px 24px; font-size: 14px; }
+        #steve-grid-view .sg-empty { grid-column:1/-1; text-align:center; padding: 60px 20px; color: var(--gray-500,#6b7280); font-size:15px; }
+        #steve-grid-view .sg-error { padding:40px; text-align:center; color: var(--state-danger,#dc2626); }
+    </style>
 </head>
 <body>
     <div class="minimal-header">
@@ -78,10 +103,11 @@
                         </div>
                     </div>
                 </div>
-                <!-- Caspio Gallery DataPage Embed -->
-                <div id="steve-grid-view">
-                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a28d5718e81646dd900b/emb"></script>
-                </div>
+                <!-- JS-rendered gallery (replaced Caspio DataPage 2026-04-25).
+                     SteveGallery.mount() populates this container on DOMContentLoaded
+                     unless localStorage.steveViewPreference === 'board'.
+                     See: shared_components/js/art-hub-steve-gallery.js -->
+                <div id="steve-grid-view"></div>
                 <!-- Kanban Board View -->
                 <div id="steve-kanban-board" class="kanban-board"></div>
             </div>
@@ -550,7 +576,8 @@
     <script src="/shared_components/js/transfer-actions-shared.js?v=15"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=1"></script>
-    <script src="/shared_components/js/art-hub-steve.js?v=29"></script>
+    <script src="/shared_components/js/art-hub-steve.js?v=30"></script>
+    <script src="/shared_components/js/art-hub-steve-gallery.js?v=2"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
 </body>
 </html>

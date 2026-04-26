@@ -1234,9 +1234,29 @@ body {
 }
 
 /* ==========================================================================
-   Gallery Tab — Caspio Card Layout
+   ⚠ LEGACY CASPIO GALLERY STYLES (lines 1236–~1700)
+   ==========================================================================
+   Steve's gallery was migrated from Caspio DataPage to JS-rendered grid on
+   2026-04-25 (see shared_components/js/art-hub-steve-gallery.js + Steve's HTML
+   at dashboards/art-hub-steve.html). These rules target Caspio class names
+   (.cbResultSetPanel*, .cbColumnar*, .card, .card--<status>, .image-container,
+   .info-grid, etc.) that no longer render on Steve's page.
+
+   KEPT FOR NOW because:
+   - Bradley's Transfers page (/dashboards/bradley-transfers.html) still embeds
+     Caspio DataPages and may share these class names through cascade
+   - Supacolor Orders (/dashboards/supacolor-orders.html) likewise
+   - Removing 530+ lines without auditing those two pages risks regression
+
+   FUTURE CLEANUP: A separate PR should audit Bradley + Supacolor for any
+   dependency on these rules, then delete this entire block. No frontend on
+   Steve's page references them anymore.
+   ========================================================================== */
+
+/* ==========================================================================
+   Gallery Tab — Caspio Card Layout (LEGACY — see banner above)
    Migrated from DataPage inline styles → external for maintainability
-   Used by: art-hub-steve.html (Caspio "Artist Gallery- STEVE-2025")
+   Used by: (formerly) art-hub-steve.html, now Bradley + Supacolor only
    ========================================================================== */
 
 /* --- Caspio Layout Fixes (hide default field labels/data) --- */

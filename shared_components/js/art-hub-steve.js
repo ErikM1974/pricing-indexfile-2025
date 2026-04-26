@@ -865,6 +865,9 @@
     var currentSteveSearchText = '';
 
     function injectSearchBar() {
+        // Caspio gallery replaced 2026-04-25 — SteveGallery owns the search input now.
+        // No-op when the new module is loaded; left defined for any straggling callers.
+        if (window.SteveGallery) return;
         if (document.getElementById('steve-search-bar')) return;
         var galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab) return;
@@ -909,6 +912,10 @@
 
     // ── MutationObserver: Watch for Caspio gallery cards ────────────────
     function processCards() {
+        // Caspio gallery replaced 2026-04-25 — SteveGallery renders cards directly,
+        // no Caspio DOM to enhance. Bail out early so the MutationObserver and any
+        // legacy callers don't blow up looking for `.cbResultSetPanel`.
+        if (window.SteveGallery) return;
         const galleryTab = document.getElementById('gallery-tab');
         if (!galleryTab) return;
 
@@ -1902,8 +1909,15 @@
         } else {
             gridView.style.display = '';
             boardView.classList.remove('active');
-            // Process cards when switching back to grid (skipped while board was active)
-            processCards();
+            // Grid view = JS-rendered gallery (replaced Caspio 2026-04-25).
+            // SteveGallery.mount() is idempotent; refresh() re-fetches /api/artrequests.
+            if (window.SteveGallery) {
+                window.SteveGallery.mount();
+                window.SteveGallery.refresh();
+            } else {
+                // Fallback to legacy Caspio enhancement (gallery script not loaded)
+                if (typeof processCards === 'function') processCards();
+            }
         }
     };
 
