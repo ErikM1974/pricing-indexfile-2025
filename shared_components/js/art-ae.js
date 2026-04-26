@@ -91,7 +91,15 @@ var ArtAeGallery = (function () {
                 var company = (r.CompanyName || '').toLowerCase();
                 var designNum = (r.Design_Num_SW || r.Design_Number || '').toLowerCase();
                 var contact = (r.Full_Name_Contact || '').toLowerCase();
-                return company.indexOf(term) !== -1 || designNum.indexOf(term) !== -1 || contact.indexOf(term) !== -1;
+                // Rep first name (Sales_Rep || User_Email local-part) — lets the
+                // user filter by typing "Nika" or by clicking a rep name in any
+                // card header (which fills the search box).
+                var rawRep = r.Sales_Rep || extractRepFromEmail(r.User_Email);
+                var repFirst = rawRep ? String(rawRep).split(/\s+/)[0].toLowerCase() : '';
+                return company.indexOf(term) !== -1
+                    || designNum.indexOf(term) !== -1
+                    || contact.indexOf(term) !== -1
+                    || (repFirst && repFirst.indexOf(term) !== -1);
             });
         }
         return list;
@@ -140,7 +148,7 @@ var ArtAeGallery = (function () {
         // Search bar
         html += '<div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">'
             + '<div style="flex:1;min-width:200px;max-width:340px;position:relative;">'
-            + '<input type="text" id="art-ae-search" placeholder="Search company, design #, or contact..." '
+            + '<input type="text" id="art-ae-search" placeholder="Search company, design #, contact, or rep..." '
             + 'value="' + escapeHtml(searchTerm) + '" '
             + 'style="width:100%;padding:8px 12px 8px 34px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">'
             + '<span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:16px;">&#128269;</span>'
@@ -217,6 +225,22 @@ var ArtAeGallery = (function () {
             card.addEventListener('click', function (e) {
                 // Don't navigate if they clicked a link
                 if (e.target.closest('a')) return;
+                // Click rep name → fill search box, filter to that rep. Stops
+                // propagation so the card-level click below doesn't navigate.
+                var repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
+                if (repBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var name = repBtn.dataset.rep || '';
+                    var input = document.getElementById('art-ae-search');
+                    if (input && name) {
+                        var current = input.value.trim().toLowerCase();
+                        input.value = (current === name.toLowerCase()) ? '' : name;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.focus();
+                    }
+                    return;
+                }
                 var id = card.dataset.designId;
                 if (id) window.location.href = '/art-request/' + id + '?view=ae';
             });
@@ -333,7 +357,7 @@ var ArtAeGallery = (function () {
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
             + '    <div class="card-design-number">#' + designNum
-            +        (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '')
+            +        (repFirstName ? '<span class="card-rep-name" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span>' : '')
             +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'

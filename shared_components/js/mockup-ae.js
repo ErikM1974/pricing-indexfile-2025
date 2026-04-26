@@ -131,7 +131,13 @@ var MockupAeGallery = (function () {
                 (m.Company_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
                 (m.Design_Number || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
                 (m.Design_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                String(m.ID || '').indexOf(currentSearchText) !== -1
+                String(m.ID || '').indexOf(currentSearchText) !== -1 ||
+                // Rep name match — lets the user filter by typing "Nika" or
+                // by clicking a rep name in any card header (which fills
+                // this same search input). The dropdown filter still uses
+                // the full resolveRepName() match above.
+                (m.Submitted_By || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
+                resolveRepName(m.Submitted_By || '').toLowerCase().indexOf(currentSearchText) !== -1
             );
             return matchRep && matchSearch;
         });
@@ -179,7 +185,23 @@ var MockupAeGallery = (function () {
 
         // Wire card clicks
         container.querySelectorAll('.mockup-card').forEach(function (card) {
-            card.addEventListener('click', function () {
+            card.addEventListener('click', function (e) {
+                // Click rep name → fill search box, filter to that AE.
+                // Stops propagation so the navigation below doesn't fire.
+                var repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
+                if (repBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var name = repBtn.dataset.rep || '';
+                    var input = document.getElementById('mockup-ae-search');
+                    if (input && name) {
+                        var current = input.value.trim().toLowerCase();
+                        input.value = (current === name.toLowerCase()) ? '' : name;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.focus();
+                    }
+                    return;
+                }
                 var id = card.dataset.mockupId;
                 if (id) window.location.href = '/mockup/' + id + '?view=ae';
             });
@@ -243,7 +265,7 @@ var MockupAeGallery = (function () {
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
             + '    <div class="card-design-number">#' + designNum
-            +        (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '')
+            +        (repFirstName ? '<span class="card-rep-name" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span>' : '')
             +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'

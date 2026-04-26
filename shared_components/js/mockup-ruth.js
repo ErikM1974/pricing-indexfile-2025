@@ -430,7 +430,7 @@
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
-                    <div class="card-design-number">#${designNum}${aeDisplay ? `<span class="card-rep-name">${escapeHtml(aeDisplay)}</span>` : ''}</div>
+                    <div class="card-design-number">#${designNum}${aeDisplay ? `<span class="card-rep-name" data-action="filter-rep" data-rep="${escapeHtml(aeDisplay)}" title="Click to filter by ${escapeHtml(aeDisplay)}">${escapeHtml(aeDisplay)}</span>` : ''}</div>
                 </div>
                 <div class="card-header-right">
                     <span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
@@ -461,6 +461,23 @@
             card.addEventListener('click', function (e) {
                 // Don't navigate if clicking a button or link
                 if (e.target.closest('button') || e.target.closest('a')) return;
+                // Click rep name → fill search box, filter to that AE. Search
+                // already matches Submitted_By (lines 275, 691) so no filter
+                // logic change needed — just populating the input is enough.
+                const repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
+                if (repBtn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const name = repBtn.dataset.rep || '';
+                    const input = document.getElementById('ruth-search-input');
+                    if (input && name) {
+                        const current = input.value.trim().toLowerCase();
+                        input.value = (current === name.toLowerCase()) ? '' : name;
+                        input.dispatchEvent(new Event('input', { bubbles: true }));
+                        input.focus();
+                    }
+                    return;
+                }
                 const id = this.dataset.mockupId;
                 if (id) window.location.href = `/mockup/${id}`;
             });

@@ -267,12 +267,16 @@
                     // Keeps the header 2 lines tall and gives Steve "which job + whose
                     // AE" in one glance. Replaces the redundant "Rep:" meta line that
                     // used to live below the thumbnail (removed 2026-04-26).
+                    // Rep span carries data-action="filter-rep" + data-rep so the
+                    // delegated grid click handler can fill the search box with
+                    // the rep first name and filter to that rep's cards. See
+                    // mount() for the click + getFiltered() for the search match.
                     (designNum
                         ? '<div class="card-design-number">#' + designNum +
-                            (repFirstName ? '<span class="card-rep-name">' + repFirstName + '</span>' : '') +
+                            (repFirstName ? '<span class="card-rep-name" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span>' : '') +
                           '</div>'
                         : (repFirstName
-                            ? '<div class="card-design-number"><span class="card-rep-name card-rep-name--standalone">' + repFirstName + '</span></div>'
+                            ? '<div class="card-design-number"><span class="card-rep-name card-rep-name--standalone" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span></div>'
                             : '')
                     ) +
                 '</div>' +
@@ -307,12 +311,17 @@
         return allRequests.filter(function (r) {
             // Status filter
             if (currentStatus !== 'all' && statusKey(r) !== currentStatus) return false;
-            // Search filter
+            // Search filter — matches company, design#, ID, and rep first name
+            // (resolved from Sales_Rep || User_Email). Lets the user filter
+            // by typing "Nika" or by clicking a rep name in any card header
+            // (which fills the search box).
             if (q) {
+                var rep = getRepFirstName(r.Sales_Rep || r.User_Email).toLowerCase();
                 var hay = (
                     (r.CompanyName || '') + ' ' +
                     (r.Design_Num_SW || '') + ' ' +
-                    String(r.ID_Design || '')
+                    String(r.ID_Design || '') + ' ' +
+                    rep
                 ).toLowerCase();
                 if (hay.indexOf(q) === -1) return false;
             }
@@ -448,7 +457,7 @@
 
         host.innerHTML =
             '<div class="sg-toolbar">' +
-                '<input type="search" id="steve-gallery-search" placeholder="Search company, design #, or ID..." autocomplete="off">' +
+                '<input type="search" id="steve-gallery-search" placeholder="Search company, design #, rep, or ID..." autocomplete="off">' +
                 '<button type="button" id="steve-gallery-archive" class="sg-btn">Show Archive</button>' +
                 '<span id="steve-gallery-count" class="sg-count"></span>' +
             '</div>' +
@@ -487,6 +496,26 @@
         // Card + action button clicks — delegated
         var grid = document.getElementById('steve-gallery-grid');
         grid.addEventListener('click', function (e) {
+            // Click rep name → fill search box with the rep first name. Filter
+            // happens automatically via the search input's debounced listener.
+            var repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
+            if (repBtn) {
+                e.preventDefault();
+                e.stopPropagation();
+                var name = repBtn.dataset.rep || '';
+                var searchInput = document.getElementById('steve-gallery-search');
+                if (searchInput && name) {
+                    // If the search already shows this rep, treat the click as
+                    // "clear filter" — toggle behavior.
+                    var current = searchInput.value.trim().toLowerCase();
+                    searchInput.value = (current === name.toLowerCase()) ? '' : name;
+                    // Fire the same input event the typed search uses, so the
+                    // existing 120ms debounce + applySearch() pipeline runs.
+                    searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+                    searchInput.focus();
+                }
+                return;
+            }
             var btn = e.target.closest('button[data-action]');
             if (btn) {
                 e.preventDefault();

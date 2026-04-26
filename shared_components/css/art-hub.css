@@ -4433,6 +4433,19 @@ input.cbSearchButton {
     color: rgba(255, 255, 255, 0.78);
     font-weight: 400;
     margin-left: 4px;
+    /* Clickable filter: click the rep name to populate the search box and
+     * filter cards to that rep's work. Cursor + hover underline make the
+     * affordance discoverable; the click handler lives in each gallery's
+     * delegated event listener (Steve, Ruth, AE Steve Mockups, AE Ruth
+     * Mockups). Added 2026-04-26. */
+    cursor: pointer;
+    transition: color 0.15s, text-decoration-color 0.15s;
+    text-decoration: underline transparent;
+    text-underline-offset: 2px;
+}
+.mockup-card .card-rep-name:hover {
+    color: rgba(255, 255, 255, 0.98);
+    text-decoration-color: rgba(255, 255, 255, 0.7);
 }
 .mockup-card .card-rep-name::before {
     content: "·";
