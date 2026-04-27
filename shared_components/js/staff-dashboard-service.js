@@ -950,6 +950,23 @@ const StaffDashboardService = (function() {
     // Tracks specific premium garments sold by Nika and Taneisha
     // =====================================================
 
+    // Bounded fetch — prevents the dashboard from hanging on a slow Caspio or
+    // ManageOrders proxy. AbortError surfaces as a "timed out" message in callers.
+    async function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                throw new Error(`Request timed out after ${timeoutMs / 1000}s: ${url}`);
+            }
+            throw err;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     /**
      * Garment Tracker Configuration
      * Fetched from backend API — single source of truth in config/garment-tracker-config.js
@@ -965,7 +982,7 @@ const StaffDashboardService = (function() {
         if (_garmentTrackerConfig) return _garmentTrackerConfig;
 
         const url = `${API_CONFIG.baseURL}/garment-tracker/config`;
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url, {}, 10000);
         if (!response.ok) {
             throw new Error(`Failed to fetch garment tracker config: ${response.status}`);
         }
@@ -993,15 +1010,23 @@ const StaffDashboardService = (function() {
         return cfg;
     }
 
-    // Backward-compatible accessor (sync fallback if config already loaded)
+    // Backward-compatible accessor (sync fallback if config already loaded).
+    // Callers MUST `await getGarmentTrackerConfig()` before reading from this Proxy —
+    // we surface empty arrays / a throwing getDateRange() if they don't, instead of
+    // silently returning a stale hardcoded quarter (which masked sync failures).
     const GARMENT_TRACKER_CONFIG = new Proxy({}, {
         get: function(target, prop) {
             if (!_garmentTrackerConfig) {
-                console.warn('[GarmentTracker] Config not yet loaded, returning empty');
+                console.warn(`[GarmentTracker] Config not loaded — caller forgot to await getGarmentTrackerConfig() before reading "${String(prop)}"`);
                 if (prop === 'premiumItems') return [];
                 if (prop === 'richardsonStyles') return [];
                 if (prop === 'trackedReps') return [];
-                if (prop === 'getDateRange') return () => ({ start: '2026-01-01', end: '2026-03-31' });
+                if (prop === 'excludedOrderTypeIds') return [];
+                if (prop === 'excludedCustomerIds') return [];
+                if (prop === 'itemGroups') return [];
+                if (prop === 'getDateRange') {
+                    return () => { throw new Error('Garment tracker config not loaded — call getGarmentTrackerConfig() first'); };
+                }
                 return undefined;
             }
             if (prop === 'premiumItems') return _garmentTrackerConfig.premiumItemsList;
@@ -1017,7 +1042,9 @@ const StaffDashboardService = (function() {
      */
     async function fetchLineItems(orderNo) {
         const url = `${API_CONFIG.baseURL}/manageorders/lineitems/${orderNo}`;
-        const response = await fetch(url);
+        // ManageOrders can be slow under load — give it a generous bound but still cap it
+        // so a single hung request can't lock up the whole sync loop.
+        const response = await fetchWithTimeout(url, {}, 30000);
         if (!response.ok) {
             throw new Error(`Failed to fetch line items: ${response.status}`);
         }
@@ -1236,7 +1263,10 @@ const StaffDashboardService = (function() {
 
         console.log(`[GarmentTracker] Loading from table for ${dateRange.start} to ${dateRange.end}`);
 
-        const response = await fetch(url);
+        const response = await fetchWithTimeout(url, {}, 20000);
+        if (!response.ok) {
+            throw new Error(`Failed to load garment tracker table: ${response.status}`);
+        }
         const data = await response.json();
 
         if (!data.success) {
@@ -1255,6 +1285,14 @@ const StaffDashboardService = (function() {
      * @returns {Object} Aggregated tracker data
      */
     function aggregateFromTable(records) {
+        // Find most recent TrackedAt to surface "last sync" in the UI footer.
+        // String compare works because Caspio returns ISO 8601.
+        let lastSync = null;
+        for (const r of records) {
+            const t = r.TrackedAt;
+            if (t && (!lastSync || t > lastSync)) lastSync = t;
+        }
+
         const trackerData = {
             byRep: {},
             totals: { premium: {}, richardson: 0 },
@@ -1263,6 +1301,7 @@ const StaffDashboardService = (function() {
                 ordersProcessed: records.length,
                 totalOrders: records.length,
                 fetchedAt: new Date().toISOString(),
+                lastSync,
                 source: 'table',
                 dateRange: GARMENT_TRACKER_CONFIG.getDateRange()
             }
@@ -1316,7 +1355,8 @@ const StaffDashboardService = (function() {
         const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
 
         try {
-            const response = await fetch(url);
+            const response = await fetchWithTimeout(url, {}, 20000);
+            if (!response.ok) return [];
             const data = await response.json();
             if (!data.success) return [];
             return data.records || [];
@@ -1348,9 +1388,14 @@ const StaffDashboardService = (function() {
 
         // Get all invoiced orders for the year
         const allOrders = await fetchOrders(dateRange.start, dateRange.end);
+        // Mirror legacy loadGarmentTrackerData() and backend sync script: blacklist filter,
+        // not whitelist. Config exposes excludedOrderTypeIds, never orderTypeIds.
+        const excludedTypes = GARMENT_TRACKER_CONFIG.excludedOrderTypeIds || [];
+        const excludedCustomers = GARMENT_TRACKER_CONFIG.excludedCustomerIds || [];
         const repOrders = allOrders.filter(order =>
             GARMENT_TRACKER_CONFIG.trackedReps.includes(order.CustomerServiceRep) &&
-            GARMENT_TRACKER_CONFIG.orderTypeIds.includes(order.id_OrderType)
+            !excludedTypes.includes(order.id_OrderType) &&
+            !excludedCustomers.includes(order.id_Customer)
         );
 
         progressCallback?.(`Processing ${repOrders.length} orders...`);
@@ -1458,11 +1503,11 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Object>} Response from API
      */
     async function postGarmentRecord(record) {
-        const response = await fetch(`${API_CONFIG.baseURL}/garment-tracker`, {
+        const response = await fetchWithTimeout(`${API_CONFIG.baseURL}/garment-tracker`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(record)
-        });
+        }, 30000);
         if (!response.ok) {
             throw new Error(`Failed to post garment record: ${response.status}`);
         }
@@ -1474,11 +1519,12 @@ const StaffDashboardService = (function() {
      * Called on dashboard load to ensure archive stays current even if Heroku Scheduler fails
      */
     async function archiveGarmentTrackerToArchive() {
-        const response = await fetch(`${API_CONFIG.baseURL}/garment-tracker/archive-from-live`, {
+        // 60s ceiling — archive endpoint upserts every live record, can be slow on big quarters.
+        const response = await fetchWithTimeout(`${API_CONFIG.baseURL}/garment-tracker/archive-from-live`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({})
-        });
+        }, 60000);
         if (!response.ok) {
             throw new Error(`Archive sync failed: ${response.status}`);
         }

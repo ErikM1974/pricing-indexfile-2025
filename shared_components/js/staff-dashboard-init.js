@@ -656,6 +656,26 @@ const StaffDashboardInit = (function() {
         return div.innerHTML;
     }
 
+    // Compact relative time ("3 minutes ago", "2 hours ago", "yesterday").
+    // Caspio strips the trailing Z from ISO timestamps — append it before parsing
+    // or Date treats it as local time and shows wildly wrong offsets.
+    function formatRelativeTime(isoString) {
+        if (!isoString) return 'never';
+        const normalized = /Z$|[+-]\d{2}:?\d{2}$/.test(isoString) ? isoString : isoString + 'Z';
+        const then = new Date(normalized).getTime();
+        if (!Number.isFinite(then)) return 'unknown';
+        const diffSec = Math.max(0, Math.round((Date.now() - then) / 1000));
+        if (diffSec < 60) return 'just now';
+        const diffMin = Math.round(diffSec / 60);
+        if (diffMin < 60) return `${diffMin} minute${diffMin === 1 ? '' : 's'} ago`;
+        const diffHr = Math.round(diffMin / 60);
+        if (diffHr < 24) return `${diffHr} hour${diffHr === 1 ? '' : 's'} ago`;
+        const diffDay = Math.round(diffHr / 24);
+        if (diffDay === 1) return 'yesterday';
+        if (diffDay < 30) return `${diffDay} days ago`;
+        return new Date(normalized).toLocaleDateString();
+    }
+
     /**
      * Manual refresh button handler
      */
@@ -983,11 +1003,11 @@ const StaffDashboardInit = (function() {
             const data = await StaffDashboardService.loadGarmentTrackerFromTable();
             console.log('[GarmentTracker] Loaded from table');
             renderGarmentTracker(data);
-
-            // Background archive to permanent table (safety net in case Heroku Scheduler misses)
-            StaffDashboardService.archiveGarmentTrackerToArchive()
-                .then(() => console.log('[GarmentTracker] Background archive sync complete'))
-                .catch(e => console.warn('[GarmentTracker] Background archive failed (non-critical):', e.message));
+            // Note: archive-from-live used to fire here on every page load. Removed —
+            // Heroku Scheduler runs `archive-from-live` daily (6 AM PT) which is
+            // the source of truth. The client-side call cost ~1 GET + 1 upsert per
+            // live record per page view; on a busy quarter that was hundreds of
+            // wasted HTTP calls. Manual Sync button still triggers the cron path.
         } catch (error) {
             console.warn('[GarmentTracker] Table load failed, showing sync prompt:', error.message);
             container.innerHTML = `
@@ -1175,13 +1195,22 @@ const StaffDashboardInit = (function() {
             </tr>
         `;
 
+        const meta = data.metadata || {};
+        const recordCount = meta.ordersProcessed || 0;
+        const syncLabel = meta.lastSync
+            ? `Last synced: ${formatRelativeTime(meta.lastSync)}`
+            : `Never synced this quarter — click <i class="fas fa-cloud-download-alt"></i> to populate`;
+        const countLabel = recordCount > 0
+            ? `${recordCount} record${recordCount === 1 ? '' : 's'}`
+            : 'No qualifying orders yet';
+
         html += `
                     </tbody>
                 </table>
             </div>
             <div class="garment-tracker-footer">
                 <span class="garment-tracker-meta">
-                    ${data.metadata.ordersProcessed} of ${data.metadata.totalOrders} orders processed
+                    ${syncLabel} &middot; ${countLabel}
                 </span>
             </div>
         `;
