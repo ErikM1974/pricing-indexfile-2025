@@ -1410,6 +1410,13 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 
 ---
 
+### Quote Update Race Condition — DELETE-then-INSERT Risks Data Loss (archived 2026-04-27)
+**Problem:** `updateQuote()` deleted ALL items then re-inserted. Browser crash mid-insert = permanent data loss.
+**Solution:** Reversed to insert-then-delete. Only delete old items if ALL new inserts succeed.
+**Prevention:** For replace-all operations, write new data first, verify, then remove old.
+
+---
+
 ### Mockup Approve Button Unresponsive — Disabled Attribute Blocks Click Handler (archived 2026-04-27)
 **Problem:** AE (Taneisha) clicks "Approve Mockup" button but nothing happens. No toast, no error, no feedback.
 **Root Cause:** Button rendered with `disabled` HTML attribute (`mockup-detail.js:314`). Disabled buttons don't fire click events, so the existing guard toast ("Please click a mockup image to select it first") never ran.
