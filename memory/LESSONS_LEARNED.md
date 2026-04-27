@@ -196,14 +196,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### Mockup Approve Button Unresponsive — Disabled Attribute Blocks Click Handler
-**Problem:** AE (Taneisha) clicks "Approve Mockup" button but nothing happens. No toast, no error, no feedback.
-**Root Cause:** Button rendered with `disabled` HTML attribute (`mockup-detail.js:314`). Disabled buttons don't fire click events, so the existing guard toast ("Please click a mockup image to select it first") never ran.
-**Solution:** Removed `disabled` from both AE (`:314`) and customer (`:267`) approve buttons. Click handlers already have proper guards for missing selection.
-**Prevention:** Never use `disabled` to enforce a workflow step if the click handler already has guard logic with user feedback. Use the handler's toast/error message instead.
-
----
-
 ### SanMar Sync Upsert Bug — `makeCaspioRequest` Returns Array, Code Checks `.Result`
 **Problem:** Caspio SanMar tables had only 7 orders (should be hundreds). Backfill processes hung indefinitely. Every sync created duplicates instead of updating existing records.
 **Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
@@ -298,3 +290,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** Heroku builds a new slug and marks the release live in metadata, but the running dyno keeps serving the previous slug until either (a) a dyno cycle (~24h), (b) a dyno crash, or (c) a manual restart. Cause is suspected to be Node's in-process module cache + slug-file mtime caching in Express `sendFile`. Content-Length and Etag stayed identical across the old and new slug because the only change was a 1-char version string (same byte count).
 **Solution:** Run `heroku ps:restart --app sanmar-inventory-app` immediately after deploy if served content doesn't match pushed content within 30 seconds.
 **Prevention:** After every `/deploy`, verify live content with `curl -s <production-url> | grep '?v='` against the local file. If mismatched → `heroku ps:restart`. Can add this as a final automated step in the deploy skill. Do NOT chase this with browser cache-bust tricks — the issue is server-side.
+
+---
+
+### Garment Tracker Cron Silently Dropped Every Record for Weeks (2026-04-27)
+**Problem:** Q2 2026 dashboard showed "0 of 0 orders processed" at day 27 of the quarter. Manual sync also produced nothing. Daily Heroku Scheduler `sync-garment-tracker` had been firing at 1 PM UTC the whole time — logs said `Status: SUCCESS` every run.
+**Root Cause:** Three failures stacked. (1) Sync script POSTed `Quarter` and `Year` fields to `/api/garment-tracker`; the live `GarmentTracker` Caspio table only had those columns on the **archive** table — Caspio rejected with 500 `ColumnNotFound`. (2) The proxy POST handler ate the error as a generic "Failed to create/update record" so logs showed no detail. (3) The script's bottom line was a hard-coded `console.log('Status: SUCCESS')` — it never inspected `liveErrors`, so red was indistinguishable from green in scheduler logs. The dashboard's Sync button had a separate-but-related TypeError bug (referenced `GARMENT_TRACKER_CONFIG.orderTypeIds` which doesn't exist) so the operator escape hatch was also broken. Result: cron writes 100% failed, no observable signal, no user-fixable path.
+**Solution:** (a) Added `Quarter` Text(255) + `Year` Number columns to the live `GarmentTracker` table. (b) Whitelisted POST body fields at the route layer (`ALLOWED_LIVE_FIELDS` in `garment-tracker.js`) so unknown fields drop silently and known-bad ones can't repeat the schema mismatch. (c) Forwarded Caspio's `Code`/`Message`/`RequestId` in 500 responses for diagnosability. (d) Made the script's Status reflect actual error counts (`PARTIAL` if any `liveErrors` or failed orders) and `process.exit(2)` on `liveErrors > 0` so Heroku Scheduler shows red. (e) Bumped retry cap 3→5 and max backoff 8s→32s for ManageOrders 429 clusters. (f) Fixed the frontend Sync button filter to use `excludedOrderTypeIds` + `excludedCustomerIds` (the legacy load and backend script were already correct).
+**Prevention:** Never write a cron summary line that reports SUCCESS unconditionally — the SUCCESS line is the **only signal** the scheduler reads, so it must be tied to actual error counters and `process.exit` non-zero on real failures. When a backend route is a thin Caspio passthrough, **whitelist body fields and propagate Caspio's structured error in the response** so a future schema drift surfaces in one log line, not three layers of "Failed to create/update record". Watch for the pattern where a daily-sync architecture means *no individual user* sees the breakage — silent failures live longer there than anywhere else.

@@ -1407,3 +1407,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** `mockup-detail.js` sent `design_size: designSize || 'Not specified'` and the modal input only pre-filled from `Design_Size`, ignoring the separately-stored `Logo_Width`/`Logo_Height` on the same record.
 **Solution:** Pre-fill chain in the Send-to-Customer modal: `Design_Size` → `Logo_Width × Logo_Height` → blank. Email fallback changed to `'N/A'` (short, fits the 50%-width cell).
 **Prevention:** When a single email field has multiple possible sources on the record, walk the fallback chain in the code that populates it. Friendly fallback strings ("N/A") beat clinical ones ("Not specified") when customers see them.
+
+---
+
+### Mockup Approve Button Unresponsive — Disabled Attribute Blocks Click Handler (archived 2026-04-27)
+**Problem:** AE (Taneisha) clicks "Approve Mockup" button but nothing happens. No toast, no error, no feedback.
+**Root Cause:** Button rendered with `disabled` HTML attribute (`mockup-detail.js:314`). Disabled buttons don't fire click events, so the existing guard toast ("Please click a mockup image to select it first") never ran.
+**Solution:** Removed `disabled` from both AE (`:314`) and customer (`:267`) approve buttons. Click handlers already have proper guards for missing selection.
+**Prevention:** Never use `disabled` to enforce a workflow step if the click handler already has guard logic with user feedback. Use the handler's toast/error message instead.
