@@ -114,7 +114,7 @@ var MockupAeGallery = (function () {
         // Search + Rep filter bar
         var repOptions = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
         html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);flex-wrap:wrap;">';
-        html += '<input type="text" id="mockup-ae-search" placeholder="Search company, design #, or ID..." style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:220px;">';
+        html += '<input type="text" id="mockup-ae-search" placeholder="Search company, design #, or ID..." value="' + escapeHtml(currentSearchText || '') + '" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:220px;">';
         html += '<label style="font-size:13px;font-weight:600;color:#64748b;white-space:nowrap;margin-left:8px;">Rep:</label>';
         html += '<select id="mockup-ae-rep-filter" style="padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;">';
         repOptions.forEach(function (name) {
@@ -125,22 +125,7 @@ var MockupAeGallery = (function () {
         html += '</div>';
 
         // Card grid — filter by rep + search
-        var displayMockups = allMockups.filter(function (m) {
-            var matchRep = currentRepFilter === 'All' || resolveRepName(m.Submitted_By || '') === currentRepFilter;
-            var matchSearch = !currentSearchText || (
-                (m.Company_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                (m.Design_Number || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                (m.Design_Name || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                String(m.ID || '').indexOf(currentSearchText) !== -1 ||
-                // Rep name match — lets the user filter by typing "Nika" or
-                // by clicking a rep name in any card header (which fills
-                // this same search input). The dropdown filter still uses
-                // the full resolveRepName() match above.
-                (m.Submitted_By || '').toLowerCase().indexOf(currentSearchText) !== -1 ||
-                resolveRepName(m.Submitted_By || '').toLowerCase().indexOf(currentSearchText) !== -1
-            );
-            return matchRep && matchSearch;
-        });
+        var displayMockups = getDisplayMockups();
 
         html += '<div class="mockup-grid">';
         displayMockups.forEach(function (m) {
@@ -150,14 +135,7 @@ var MockupAeGallery = (function () {
 
         container.innerHTML = html;
 
-        // Update count
-        var countSpan = document.getElementById('mockup-ae-rep-count');
-        if (countSpan) {
-            var isFiltered = currentRepFilter !== 'All' || currentSearchText;
-            countSpan.textContent = isFiltered
-                ? displayMockups.length + ' of ' + allMockups.length + ' mockups'
-                : allMockups.length + ' mockups';
-        }
+        updateCountSpan(displayMockups);
 
         // Wire rep filter change
         var repSelect = document.getElementById('mockup-ae-rep-filter');
@@ -169,7 +147,9 @@ var MockupAeGallery = (function () {
             });
         }
 
-        // Wire text search
+        // Wire text search — call renderCards() (not render()) so the input
+        // element itself isn't destroyed on every keystroke. Same pattern as
+        // art-ae.js's search wiring.
         var searchInput = document.getElementById('mockup-ae-search');
         if (searchInput) {
             var searchTimer = null;
@@ -177,13 +157,68 @@ var MockupAeGallery = (function () {
                 clearTimeout(searchTimer);
                 var input = this;
                 searchTimer = setTimeout(function () {
-                    currentSearchText = input.value.trim().toLowerCase();
-                    render();
+                    // Preserve original casing in storage so the value="" attribute
+                    // shows what the user actually typed after a full re-render.
+                    // The filter helper lowercases at compare time.
+                    currentSearchText = input.value.trim();
+                    renderCards();
                 }, 200);
             });
         }
 
-        // Wire card clicks
+        wireCardClicks(container);
+    }
+
+    // Filter helper — shared by render() and renderCards() so the rep + search
+    // logic isn't duplicated. Returns the visible mockup subset.
+    function getDisplayMockups() {
+        var searchLc = (currentSearchText || '').toLowerCase();
+        return allMockups.filter(function (m) {
+            var matchRep = currentRepFilter === 'All' || resolveRepName(m.Submitted_By || '') === currentRepFilter;
+            var matchSearch = !searchLc || (
+                (m.Company_Name || '').toLowerCase().indexOf(searchLc) !== -1 ||
+                (m.Design_Number || '').toLowerCase().indexOf(searchLc) !== -1 ||
+                (m.Design_Name || '').toLowerCase().indexOf(searchLc) !== -1 ||
+                String(m.ID || '').indexOf(searchLc) !== -1 ||
+                // Rep name match — lets the user filter by typing "Nika" or
+                // by clicking a rep name in any card header (which fills
+                // this same search input). The dropdown filter still uses
+                // the full resolveRepName() match above.
+                (m.Submitted_By || '').toLowerCase().indexOf(searchLc) !== -1 ||
+                resolveRepName(m.Submitted_By || '').toLowerCase().indexOf(searchLc) !== -1
+            );
+            return matchRep && matchSearch;
+        });
+    }
+
+    function updateCountSpan(displayMockups) {
+        var countSpan = document.getElementById('mockup-ae-rep-count');
+        if (!countSpan) return;
+        var isFiltered = currentRepFilter !== 'All' || currentSearchText;
+        countSpan.textContent = isFiltered
+            ? displayMockups.length + ' of ' + allMockups.length + ' mockups'
+            : allMockups.length + ' mockups';
+    }
+
+    // Re-render only the cards grid + count. Leaves the toolbar (search input
+    // + rep dropdown) untouched so typing into the search box doesn't destroy
+    // the input element mid-keystroke. Mirrors art-ae.js:207.
+    function renderCards() {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        var grid = container.querySelector('.mockup-grid');
+        if (!grid) return;
+
+        var displayMockups = getDisplayMockups();
+        var html = '';
+        displayMockups.forEach(function (m) { html += buildCard(m); });
+        grid.innerHTML = html;
+
+        updateCountSpan(displayMockups);
+        wireCardClicks(container);
+    }
+
+    function wireCardClicks(container) {
         container.querySelectorAll('.mockup-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 // Click rep name → fill search box, filter to that AE.
