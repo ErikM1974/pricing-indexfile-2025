@@ -848,11 +848,532 @@
             </div>`).join('');
     }
 
+    // ─── Broken Box Mockups widget ───────────────────────────────────────
+    // Sister of art-hub-steve.js's broken-mockups widget. Polls
+    // /api/mockups/broken-mockups on init; if any rows have Box files that
+    // 404, surfaces a pulsing pill above the queue. Click → modal with
+    // per-row Auto-recover / Open in Box / Re-upload + bulk recover.
+    //
+    // Reuses the .broken-mockups-* / .bml-* CSS already loaded by art-hub.css
+    // for Steve's widget. UI grammar matches Steve's so the team learns it once.
+    //
+    // Data model difference: Steve's results have 1 broken slot per record;
+    // Ruth's records can have multiple. We FLATTEN data.results into one
+    // "row" per (id, slotField) pair so each row corresponds to one
+    // recovery operation.
+
+    var brokenMockupsData = null;
+    var brokenIds = new Set();
+
+    var SLOT_LABELS = {
+        Box_Mockup_1: 'Mockup 1', Box_Mockup_2: 'Mockup 2', Box_Mockup_3: 'Mockup 3',
+        Box_Mockup_4: 'Mockup 4', Box_Mockup_5: 'Mockup 5', Box_Mockup_6: 'Mockup 6',
+        Box_Reference_File: 'Reference File'
+    };
+    function friendlySlotLabel(field) { return SLOT_LABELS[field] || field; }
+
+    // Each row in the modal is a single (id, slotField) pair so the action
+    // buttons map 1:1 to one Caspio update. Records with N broken slots
+    // produce N rows, each with its own Auto-recover button.
+    function flattenBrokenSlots(data) {
+        var rows = [];
+        (data.results || []).forEach(function (rec) {
+            (rec.brokenSlots || []).forEach(function (slot) {
+                rows.push({
+                    id: rec.id,
+                    designNumber: rec.designNumber,
+                    companyName: rec.companyName,
+                    salesRep: rec.salesRep,
+                    status: rec.status,
+                    submittedDate: rec.submittedDate,
+                    slotField: slot.field,
+                    fileId: slot.fileId
+                });
+            });
+        });
+        return rows;
+    }
+
+    function loadBrokenMockupsWidget() {
+        var widget = document.getElementById('ruth-broken-mockups-widget');
+        if (!widget) return;
+
+        widget.style.display = '';
+        widget.innerHTML = '<div class="broken-mockups-loading">'
+            + '<span class="broken-mockups-spinner"></span>'
+            + 'Checking mockup files in Box...'
+            + '</div>';
+
+        fetch(API_BASE + '/api/mockups/broken-mockups')
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                brokenMockupsData = data;
+                brokenIds = new Set();
+                (data.results || []).forEach(function (r) {
+                    if (r && r.id != null) brokenIds.add(String(r.id));
+                });
+                renderBrokenMockupsWidget(data);
+            })
+            .catch(function (err) {
+                console.warn('[Ruth broken-mockups] check failed:', err.message);
+                widget.style.display = 'none';
+            });
+    }
+
+    function renderBrokenMockupsWidget(data) {
+        var widget = document.getElementById('ruth-broken-mockups-widget');
+        if (!widget) return;
+        if (!data || data.broken === 0) {
+            widget.innerHTML = '';
+            widget.style.display = 'none';
+            return;
+        }
+        widget.style.display = '';
+        var label = data.broken === 1 ? 'broken Box mockup' : 'broken Box mockups';
+        widget.innerHTML = '<button type="button" class="broken-mockups-pill" id="ruth-broken-pill"'
+            + ' aria-label="Review broken Box mockups">'
+            +   '<span class="broken-mockups-pill-icon" aria-hidden="true">⚠</span>'
+            +   '<span class="broken-mockups-pill-text">'
+            +     '<strong>' + data.broken + '</strong> ' + label
+            +   '</span>'
+            +   '<span class="broken-mockups-pill-cta">Review &amp; recover →</span>'
+            + '</button>';
+        document.getElementById('ruth-broken-pill').addEventListener('click', openBrokenMockupsModal);
+    }
+
+    function openBrokenMockupsModal() {
+        if (!brokenMockupsData) return;
+        var rows = flattenBrokenSlots(brokenMockupsData);
+        if (rows.length === 0) return;
+
+        var existing = document.getElementById('broken-mockups-modal');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'broken-mockups-modal';
+        overlay.className = 'broken-mockups-overlay';
+        overlay.innerHTML = bmlBuildModalHtml(brokenMockupsData, rows);
+        document.body.appendChild(overlay);
+        document.body.style.overflow = 'hidden';
+
+        bmlWireEvents(overlay);
+    }
+
+    function bmlBuildModalHtml(data, rows) {
+        var rowsHtml = rows.map(bmlBuildRowHtml).join('');
+        var bulkLabel = rows.length === 1
+            ? 'Auto-recover this 1'
+            : 'Auto-recover all ' + rows.length;
+        return '<div class="broken-mockups-modal">'
+            + '<div class="broken-mockups-modal-header">'
+            +   '<h3>🚫 Broken Box Mockups (' + rows.length + ')</h3>'
+            +   '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
+            + '</div>'
+            + '<div class="broken-mockups-modal-sub">'
+            +   'Scanned ' + data.checked + ' active mockups · ' + data.uniqueFileIds + ' Box files checked. '
+            +   'Try <strong>Auto-recover</strong> first — it usually finds a replacement in the same Box folder.'
+            + '</div>'
+            + '<div class="bml-toolbar">'
+            +   '<button type="button" class="bml-bulk-btn" id="bml-bulk-recover">⚡ ' + escapeHtml(bulkLabel) + '</button>'
+            +   '<button type="button" class="bml-refresh-btn" id="bml-refresh">↻ Refresh list</button>'
+            + '</div>'
+            + '<div class="broken-mockups-modal-body bml-row-list">' + rowsHtml + '</div>'
+            + '</div>';
+    }
+
+    function bmlBuildRowHtml(row) {
+        var dateStr = '';
+        if (row.submittedDate) {
+            try {
+                var d = new Date(row.submittedDate);
+                if (!isNaN(d.getTime())) {
+                    dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                }
+            } catch (e) { /* ignore */ }
+        }
+        var rep = row.salesRep || '';
+        var company = row.companyName || '';
+        var fileId = String(row.fileId || '');
+        var statusKey = (row.status || '').toLowerCase().replace(/\s+/g, '-');
+        var statusClass = 'broken-status--' + statusKey;
+        var statusText = row.status || '—';
+
+        var fileIdLine = fileId
+            ? ' · fileId: <code class="bml-fileid-code">' + escapeHtml(fileId) + '</code>'
+                + ' <button type="button" class="bml-copy" data-copy="' + escapeHtml(fileId)
+                + '" title="Copy fileId" aria-label="Copy fileId">📋</button>'
+            : '';
+        var boxUrl = fileId ? 'https://app.box.com/file/' + encodeURIComponent(fileId) : '';
+
+        return '<article class="bml-row" '
+            +   'data-id="' + escapeHtml(String(row.id)) + '" '
+            +   'data-design-number="' + escapeHtml(String(row.designNumber || '')) + '" '
+            +   'data-company="' + escapeHtml(company) + '" '
+            +   'data-slot-field="' + escapeHtml(String(row.slotField || '')) + '" '
+            +   'data-file-id="' + escapeHtml(fileId) + '">'
+            +   '<div class="bml-row__head">'
+            +     '<a class="bml-row__title" href="/mockup/' + encodeURIComponent(row.id)
+            +       '" target="_blank" rel="noopener" title="Open detail page">'
+            +       '<span class="bml-row__company">' + escapeHtml(company || '(no company)') + '</span>'
+            +       '<span class="bml-row__design">#' + escapeHtml(String(row.designNumber || '')) + '</span>'
+            +     '</a>'
+            +     '<span class="broken-status-pill ' + statusClass + '">' + escapeHtml(statusText) + '</span>'
+            +   '</div>'
+            +   '<div class="bml-row__meta">'
+            +     (rep ? '<span>Rep: ' + escapeHtml(rep) + '</span>' : '')
+            +     (dateStr ? (rep ? ' · ' : '') + 'Submitted ' + escapeHtml(dateStr) : '')
+            +     ' · Broken: ' + escapeHtml(friendlySlotLabel(row.slotField))
+            +     fileIdLine
+            +   '</div>'
+            +   '<div class="bml-row__actions">'
+            +     '<button type="button" class="bml-action bml-action--recover" data-action="recover">⚡ Auto-recover</button>'
+            +     (boxUrl ? '<a class="bml-action bml-action--box" href="' + boxUrl + '" target="_blank" rel="noopener" title="Opens Box — lands on Restore screen if file is in trash">🔗 Open in Box</a>' : '')
+            +     '<button type="button" class="bml-action bml-action--reupload" data-action="reupload">📤 Re-upload</button>'
+            +   '</div>'
+            +   '<div class="bml-row__dropzone" hidden>'
+            +     '<input type="file" class="bml-file-input" accept="image/*,application/pdf,.svg,.eps,.ai" hidden>'
+            +     '<div class="bml-dropzone-prompt">📥 Drop file here or <span class="bml-dropzone-link">click to choose</span></div>'
+            +     '<div class="bml-dropzone-hint">Will overwrite the broken slot. Image, PDF, SVG, AI, or EPS.</div>'
+            +   '</div>'
+            +   '<div class="bml-row__result" hidden></div>'
+            + '</article>';
+    }
+
+    function bmlWireEvents(overlay) {
+        function close() {
+            overlay.remove();
+            document.body.style.overflow = '';
+            document.removeEventListener('keydown', escListener);
+        }
+        function escListener(e) { if (e.key === 'Escape') close(); }
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) close();
+        });
+        var closeBtn = overlay.querySelector('#broken-mockups-modal-close');
+        if (closeBtn) closeBtn.addEventListener('click', close);
+        document.addEventListener('keydown', escListener);
+
+        var bulkBtn = overlay.querySelector('#bml-bulk-recover');
+        if (bulkBtn) bulkBtn.addEventListener('click', function () {
+            bmlActionRecoverAll(overlay, bulkBtn);
+        });
+
+        var refreshBtn = overlay.querySelector('#bml-refresh');
+        if (refreshBtn) refreshBtn.addEventListener('click', function () {
+            var orig = refreshBtn.innerHTML;
+            refreshBtn.disabled = true;
+            refreshBtn.innerHTML = '⏳ Refreshing...';
+            bmlReloadFromServer().then(function () {
+                close();
+                if (brokenMockupsData && brokenMockupsData.broken > 0) openBrokenMockupsModal();
+            }).catch(function () {
+                refreshBtn.disabled = false;
+                refreshBtn.innerHTML = orig;
+            });
+        });
+
+        overlay.addEventListener('click', function (e) {
+            var copyBtn = e.target.closest('.bml-copy');
+            if (copyBtn) {
+                e.preventDefault(); e.stopPropagation();
+                var text = copyBtn.dataset.copy || '';
+                try {
+                    navigator.clipboard.writeText(text);
+                    var orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '✓';
+                    setTimeout(function () { copyBtn.innerHTML = orig; }, 1200);
+                } catch (err) { /* ignore */ }
+                return;
+            }
+            var actionBtn = e.target.closest('.bml-action[data-action]');
+            if (actionBtn) {
+                e.preventDefault();
+                var row = actionBtn.closest('.bml-row');
+                if (!row) return;
+                if (actionBtn.dataset.action === 'recover') return bmlActionRecover(row);
+                if (actionBtn.dataset.action === 'reupload') return bmlActionReupload(row);
+                return;
+            }
+            var dropzone = e.target.closest('.bml-row__dropzone');
+            if (dropzone && !e.target.classList.contains('bml-file-input')) {
+                var input = dropzone.querySelector('.bml-file-input');
+                if (input) input.click();
+            }
+        });
+
+        overlay.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('bml-file-input')) return;
+            var row = e.target.closest('.bml-row');
+            if (!row) return;
+            var file = e.target.files && e.target.files[0];
+            if (file) bmlPerformUpload(row, file);
+        });
+
+        overlay.addEventListener('dragover', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (!dz || dz.hidden) return;
+            e.preventDefault();
+            dz.classList.add('is-dragover');
+        });
+        overlay.addEventListener('dragleave', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (dz) dz.classList.remove('is-dragover');
+        });
+        overlay.addEventListener('drop', function (e) {
+            var dz = e.target.closest('.bml-row__dropzone');
+            if (!dz || dz.hidden) return;
+            e.preventDefault();
+            dz.classList.remove('is-dragover');
+            var row = dz.closest('.bml-row');
+            var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+            if (row && file) bmlPerformUpload(row, file);
+        });
+    }
+
+    function bmlActionRecover(row) {
+        var id = row.dataset.id;
+        var designNumber = row.dataset.designNumber;
+        var companyName = row.dataset.company || '';
+        var slotField = row.dataset.slotField;
+
+        if (!id || !slotField) return bmlSetRowState(row, 'error', 'Missing record info on row');
+        if (!designNumber) {
+            return bmlSetRowState(row, 'error',
+                'Missing Design # — cannot search Box folder. Try Re-upload.');
+        }
+
+        bmlSetRowState(row, 'recovering');
+        fetch(API_BASE + '/api/mockups/' + encodeURIComponent(id) + '/auto-recover-mockup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slotField: slotField, designNumber: designNumber, companyName: companyName })
+        })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+        .then(function (resp) { bmlApplyResultToRow(row, resp.body); })
+        .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
+    }
+
+    function bmlActionReupload(row) {
+        var dz = row.querySelector('.bml-row__dropzone');
+        if (!dz) return;
+        dz.hidden = !dz.hidden;
+        if (!dz.hidden) {
+            try { dz.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) { /* */ }
+        }
+    }
+
+    function bmlPerformUpload(row, file) {
+        var id = row.dataset.id;
+        var companyName = row.dataset.company || '';
+        var slotField = row.dataset.slotField;
+        var designNumber = row.dataset.designNumber || '';
+        if (!id || !slotField) return bmlSetRowState(row, 'error', 'Missing record info on row');
+
+        bmlSetRowState(row, 'uploading', { fileName: file.name });
+
+        var fd = new FormData();
+        fd.append('file', file);
+        fd.append('companyName', companyName);
+        fd.append('slot', slotField);
+        if (designNumber) fd.append('designNumber', designNumber);
+
+        fetch(API_BASE + '/api/mockups/' + encodeURIComponent(id) + '/upload-file', {
+            method: 'POST',
+            body: fd
+        })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+        .then(function (resp) {
+            if (resp.ok && resp.body && resp.body.success) {
+                bmlSetRowState(row, 'reuploaded', resp.body);
+                bmlScheduleRowFadeAndRefresh(row);
+            } else {
+                var msg = (resp.body && resp.body.error) || ('HTTP ' + resp.ok);
+                bmlSetRowState(row, 'error', msg);
+            }
+        })
+        .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
+    }
+
+    function bmlActionRecoverAll(overlay, bulkBtn) {
+        var rows = Array.prototype.slice.call(overlay.querySelectorAll('.bml-row'));
+        if (rows.length === 0) return;
+
+        if (!confirm('Run auto-recover on all ' + rows.length + ' broken slot'
+                + (rows.length === 1 ? '' : 's') + '? Recovered records fade out;'
+                + ' ones with no folder match stay for manual Re-upload.')) {
+            return;
+        }
+
+        var entries = rows.map(function (row) {
+            return {
+                id: row.dataset.id,
+                slotField: row.dataset.slotField,
+                designNumber: row.dataset.designNumber,
+                companyName: row.dataset.company
+            };
+        });
+
+        bulkBtn.disabled = true;
+        var origLabel = bulkBtn.innerHTML;
+        bulkBtn.innerHTML = '⏳ Searching ' + rows.length + ' Box folder'
+            + (rows.length === 1 ? '' : 's') + '...';
+        rows.forEach(function (row) { bmlSetRowState(row, 'recovering'); });
+
+        fetch(API_BASE + '/api/mockups/auto-recover-mockups-bulk', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ entries: entries })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            (data.results || []).forEach(function (result, idx) {
+                // Match results to rows by index — same order, same length.
+                var row = rows[idx];
+                if (row) bmlApplyResultToRow(row, result);
+            });
+            bulkBtn.innerHTML = '✓ Recovered ' + data.recovered + ' of ' + data.total;
+            setTimeout(function () {
+                bulkBtn.disabled = false;
+                bulkBtn.innerHTML = origLabel;
+            }, 3500);
+        })
+        .catch(function (err) {
+            bulkBtn.disabled = false;
+            bulkBtn.innerHTML = origLabel;
+            rows.forEach(function (row) { bmlSetRowState(row, 'error', err.message || String(err)); });
+        });
+    }
+
+    function bmlApplyResultToRow(row, body) {
+        if (!body || !body.status) {
+            return bmlSetRowState(row, 'error', (body && body.error) || 'Unknown response');
+        }
+        if (body.status === 'recovered') {
+            bmlSetRowState(row, 'recovered', body);
+            bmlScheduleRowFadeAndRefresh(row);
+        } else if (body.status === 'no-folder') {
+            bmlSetRowState(row, 'no-folder');
+        } else if (body.status === 'empty-folder') {
+            bmlSetRowState(row, 'empty-folder', body);
+        } else if (body.status === 'no-match') {
+            bmlSetRowState(row, 'no-match', body);
+        } else {
+            bmlSetRowState(row, 'error', body.error || 'Unknown status: ' + body.status);
+        }
+    }
+
+    function bmlSetRowState(row, state, payload) {
+        var stateClasses = ['is-recovering', 'is-recovered', 'is-error', 'is-no-folder',
+                            'is-empty-folder', 'is-no-match', 'is-uploading', 'is-reuploaded'];
+        stateClasses.forEach(function (c) { row.classList.remove(c); });
+        row.classList.add('is-' + state);
+
+        var resultEl = row.querySelector('.bml-row__result');
+        var actionsEl = row.querySelector('.bml-row__actions');
+        var dropzoneEl = row.querySelector('.bml-row__dropzone');
+        var html = '';
+        var actionsDisabled = false;
+
+        if (state === 'recovering') {
+            html = '<span class="bml-spinner"></span> Searching Box folder...';
+            actionsDisabled = true;
+            if (dropzoneEl) dropzoneEl.hidden = true;
+        } else if (state === 'recovered') {
+            var conf = (payload && payload.confidence) ? ' (' + payload.confidence + ' confidence)' : '';
+            var fileName = (payload && payload.newFileName) ? ' — ' + payload.newFileName : '';
+            html = '<span class="bml-result bml-result--ok">✅ Recovered'
+                + escapeHtml(conf + fileName) + ' — reloading...</span>';
+            actionsDisabled = true;
+        } else if (state === 'reuploaded') {
+            html = '<span class="bml-result bml-result--ok">✅ Re-uploaded — reloading...</span>';
+            actionsDisabled = true;
+        } else if (state === 'no-folder') {
+            html = '<span class="bml-result bml-result--warn">⚠ No matching folder in Box.'
+                + ' Use <strong>Re-upload</strong> to attach a new file.</span>';
+        } else if (state === 'empty-folder') {
+            var folderName = (payload && payload.folder && payload.folder.name) ? payload.folder.name : '';
+            html = '<span class="bml-result bml-result--warn">⚠ Folder "' + escapeHtml(folderName)
+                + '" has no images. Use <strong>Re-upload</strong>.</span>';
+        } else if (state === 'no-match') {
+            var cands = (payload && payload.candidates && payload.candidates.length)
+                ? ' (saw: ' + payload.candidates.map(escapeHtml).join(', ') + ')'
+                : '';
+            html = '<span class="bml-result bml-result--warn">⚠ No filename match in Box folder'
+                + cands + '. Use <strong>Re-upload</strong>.</span>';
+        } else if (state === 'uploading') {
+            var fname = (payload && payload.fileName) ? payload.fileName : 'file';
+            html = '<span class="bml-spinner"></span> Uploading ' + escapeHtml(fname) + ' to Box...';
+            actionsDisabled = true;
+        } else if (state === 'error') {
+            var msg = (typeof payload === 'string') ? payload : 'Unknown error';
+            html = '<span class="bml-result bml-result--error">❌ ' + escapeHtml(msg) + '</span>';
+        }
+
+        if (resultEl) {
+            resultEl.innerHTML = html;
+            resultEl.hidden = !html;
+        }
+        if (actionsEl) {
+            Array.prototype.slice.call(actionsEl.querySelectorAll('button'))
+                .forEach(function (btn) { btn.disabled = actionsDisabled; });
+        }
+    }
+
+    var _bmlPendingFadeTimer = null;
+    function bmlScheduleRowFadeAndRefresh(row) {
+        setTimeout(function () {
+            row.classList.add('is-fading-out');
+            setTimeout(function () {
+                if (row && row.parentNode) row.remove();
+                bmlMaybeShowEmptyState();
+            }, 400);
+        }, 1200);
+
+        if (_bmlPendingFadeTimer) clearTimeout(_bmlPendingFadeTimer);
+        _bmlPendingFadeTimer = setTimeout(function () {
+            _bmlPendingFadeTimer = null;
+            bmlReloadFromServer().catch(function () { /* next page load catches up */ });
+        }, 2000);
+    }
+
+    function bmlMaybeShowEmptyState() {
+        var overlay = document.getElementById('broken-mockups-modal');
+        if (!overlay) return;
+        var rows = overlay.querySelectorAll('.bml-row');
+        if (rows.length > 0) return;
+        var modalBody = overlay.querySelector('.broken-mockups-modal-body');
+        if (modalBody) {
+            modalBody.innerHTML = '<div class="bml-empty-state">'
+                + '<div class="bml-empty-state-icon">✨</div>'
+                + '<div class="bml-empty-state-title">All broken links resolved!</div>'
+                + '<div class="bml-empty-state-sub">Nice work — the queue will refresh momentarily.</div>'
+                + '</div>';
+        }
+    }
+
+    function bmlReloadFromServer() {
+        return fetch(API_BASE + '/api/mockups/broken-mockups?refresh=true')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                brokenMockupsData = data;
+                brokenIds = new Set();
+                (data.results || []).forEach(function (r) {
+                    if (r && r.id != null) brokenIds.add(String(r.id));
+                });
+                renderBrokenMockupsWidget(data);
+            });
+    }
+
     // ── Init ─────────────────────────────────────────────────────────────
     function init() {
         setCurrentDate();
         showSkeletonCards();
         fetchMockups();
+        loadBrokenMockupsWidget(); // Health check: surface mockups whose Box files are gone
 
         // Always default to Grid view on page load
 
