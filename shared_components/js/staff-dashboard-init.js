@@ -340,6 +340,7 @@ const StaffDashboardInit = (function() {
         if (days === 7) return 'Last 7 Days';
         if (days === 30) return 'Last 30 Days';
         if (days === 60) return 'Last 60 Days';
+        if (days === 90) return 'Last 90 Days';
         return `Last ${days} Days`;
     }
 

@@ -735,6 +735,12 @@ const StaffDashboardService = (function() {
      * Load all dashboard metrics at once
      * OPTIMIZED: Fetches orders only ONCE per period to avoid 429 rate limits
      * Previously made 5 API calls, now makes only 2
+     *
+     * Window note: The "60-day ManageOrders retention" warning that's shown up
+     * in this codebase is for *write* operations (push API). The /orders read
+     * endpoint actually retains 12+ months in practice — verified for 7D / 30D
+     * / 60D / 90D / YTD queries. So 90D works on the same direct path; no
+     * archive hybrid needed.
      */
     async function loadAllMetrics(days = 30) {
         isLoading = true;
