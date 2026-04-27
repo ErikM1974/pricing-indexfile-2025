@@ -723,62 +723,62 @@ const StaffDashboardInit = (function() {
     }
 
     /**
-     * Fetch YTD revenue for sales goal using HYBRID approach:
-     * - Last 60 days: Live from ManageOrders (source of truth, handles invoice updates)
-     * - Older than 60 days: Caspio archive (permanent storage)
+     * Fetch YTD revenue for the sales-goal banner.
      *
-     * This ensures invoice changes within 60 days are always reflected,
-     * while historical data is preserved forever in Caspio.
+     * Reads from NW_Daily_Sales_By_Rep (the per-rep archive that's been
+     * reconciled against the ShopWorks "Sales by Sales Rep" CSV) so the
+     * banner always agrees with the Team Performance widget. Tops up with
+     * a live ManageOrders fetch for any days not yet archived (typically
+     * just today, since the rolling cron runs at 14:00 UTC nightly).
+     *
+     * Previously this hit the older DailySalesArchive table (company-wide)
+     * which had stale Jan-Feb totals from before the reconciliation —
+     * banner read ~$17k high. Switching to the per-rep YTD endpoint plus
+     * a thin live cap is a single source of truth for both widgets.
      */
     async function loadYTDForSalesGoal() {
         try {
-            const today = new Date();
-            const year = today.getFullYear();
-            const yearStart = `${year}-01-01`;
-            const todayStr = today.toISOString().split('T')[0];
-
-            // Calculate 60-day boundary
-            const sixtyDaysAgo = new Date(today);
-            sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-            const boundaryDate = sixtyDaysAgo.toISOString().split('T')[0];
+            const year = new Date().getFullYear();
+            const todayStr = new Date().toISOString().split('T')[0];
 
             let ytdRevenue = 0;
 
-            // Part 1: Archived data OLDER than 60 days (from Caspio)
-            // Only applies after ~March 1 when Jan data starts expiring
-            if (boundaryDate > yearStart) {
+            // Part 1: Archived YTD per-rep totals (already reconciled to CSV truth)
+            let lastArchivedDate = null;
+            try {
+                const archive = await StaffDashboardService.fetchYTDPerRepFromArchive(year);
+                ytdRevenue += archive.totalRevenue || 0;
+                lastArchivedDate = archive.lastArchivedDate || null;
+                console.log(`YTD Archive (per-rep, through ${lastArchivedDate}): $${(archive.totalRevenue || 0).toFixed(2)}`);
+            } catch (e) {
+                console.warn('Could not fetch per-rep YTD archive:', e.message);
+            }
+
+            // Part 2: Live top-up — anything after lastArchivedDate up through today.
+            // Usually just today (cron archives yesterday). Falls back to year-start
+            // if archive is empty so the banner still shows something useful.
+            const liveStart = lastArchivedDate
+                ? new Date(new Date(lastArchivedDate).getTime() + 86400000).toISOString().split('T')[0]
+                : `${year}-01-01`;
+            if (liveStart <= todayStr) {
                 try {
-                    const archivedData = await StaffDashboardService.fetchArchivedSales(
-                        yearStart,
-                        boundaryDate
-                    );
-                    ytdRevenue += archivedData.summary?.totalRevenue || 0;
-                    console.log(`YTD Archive (${yearStart} to ${boundaryDate}): $${(archivedData.summary?.totalRevenue || 0).toFixed(2)}`);
+                    const liveOrders = await StaffDashboardService.fetchOrders(liveStart, todayStr);
+                    const liveRevenue = liveOrders.reduce((sum, o) =>
+                        sum + (parseFloat(o.cur_SubTotal) || 0), 0);
+                    ytdRevenue += liveRevenue;
+                    console.log(`YTD Live (${liveStart} to ${todayStr}): $${liveRevenue.toFixed(2)} from ${liveOrders.length} orders`);
                 } catch (e) {
-                    console.warn('Could not fetch archived data:', e.message);
+                    console.error('Could not fetch live top-up data:', e.message);
                 }
             }
 
-            // Part 2: Live data from last 60 days (from ManageOrders - source of truth)
-            const liveStartDate = boundaryDate > yearStart ? boundaryDate : yearStart;
-            try {
-                const liveOrders = await StaffDashboardService.fetchOrders(liveStartDate, todayStr);
-                const liveRevenue = liveOrders.reduce((sum, o) =>
-                    sum + (parseFloat(o.cur_SubTotal) || 0), 0);
-                ytdRevenue += liveRevenue;
-                console.log(`YTD Live (${liveStartDate} to ${todayStr}): $${liveRevenue.toFixed(2)} from ${liveOrders.length} orders`);
-            } catch (e) {
-                console.error('Could not fetch live data:', e.message);
-            }
-
-            // Part 3: Archive days about to fall off (55-60 days ago)
-            // Single unified function handles both company-wide and per-rep archival,
-            // fetching orders once per day instead of twice (was 12 API calls, now 6)
+            // Background: keep the legacy 55-60-days-ago archive backstops running.
+            // Cheap and harmless — preserves the safety net even though we no longer
+            // read from DailySalesArchive in this banner.
             archiveSoonToExpireDaysAll().catch(e =>
                 console.warn('Background archiving failed:', e.message)
             );
 
-            // Update banner
             console.log(`YTD Total: $${ytdRevenue.toFixed(2)}`);
             updateSalesGoal(ytdRevenue);
         } catch (error) {
