@@ -210,6 +210,40 @@ class RepCRMService {
     }
 
     /**
+     * Fetch this rep's YTD total from the per-rep archive (NW_Daily_Sales_By_Rep).
+     * This is the same source the staff dashboard's Team Performance widget uses,
+     * so the CRM headline matches it instead of summing per-account YTD_Sales_2026
+     * (which lags `sync_sales` cron and creates trust-eroding gaps).
+     */
+    async fetchYTDPerRepFromArchive(year = new Date().getFullYear(), retries = 3) {
+        const apiBase = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        const response = await fetch(`${apiBase}/api/caspio/daily-sales-by-rep/ytd?year=${year}`);
+
+        if (response.status === 429 && retries > 0) {
+            const waitTime = (4 - retries) * 5000;
+            console.warn(`[RepCRM] Per-rep archive fetch rate limited (429), retrying in ${waitTime / 1000}s...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return this.fetchYTDPerRepFromArchive(year, retries - 1);
+        }
+
+        if (!response.ok) {
+            throw new Error(`Per-rep archive returned ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        // Match this rep by full-name prefix (e.g. repName="Taneisha" → "Taneisha Clark").
+        const repPrefix = (this.repName || '').toLowerCase();
+        const repRow = (data.reps || []).find(r =>
+            (r.name || '').toLowerCase().startsWith(repPrefix)
+        );
+        return {
+            total: repRow ? (repRow.totalRevenue || 0) : null,
+            orders: repRow ? (repRow.totalOrders || 0) : null,
+            lastArchivedDate: data.lastArchivedDate || null
+        };
+    }
+
+    /**
      * Fetch archived daily sales for a date range
      */
     async fetchArchivedSalesByCustomer(startDate, endDate) {
@@ -476,6 +510,8 @@ class RepCRMController {
         // State
         this.filteredAccounts = [];
         this.searchDebounceTimer = null;
+        // archiveYTD = { total, orders, lastArchivedDate } once fetched, null on failure
+        this.archiveYTD = null;
 
         // Bind methods
         this.handleSearch = this.handleSearch.bind(this);
@@ -494,8 +530,25 @@ class RepCRMController {
             await this.loadAccounts();
             this.updateStats();
             this.renderAccounts();
+
+            // Fire per-rep archive fetch in the background — re-render stats when it lands.
+            // Non-blocking so the accounts list doesn't wait on a second API round-trip.
+            this.loadArchiveYTD().then(() => this.updateStats());
         } catch (error) {
             this.showError('Unable to load accounts. Please refresh the page or contact support.');
+        }
+    }
+
+    /**
+     * Load this rep's authoritative YTD total from the per-rep archive.
+     * Silent fallback on failure — display path keeps showing the per-account sum.
+     */
+    async loadArchiveYTD() {
+        try {
+            this.archiveYTD = await this.service.fetchYTDPerRepFromArchive();
+        } catch (error) {
+            console.warn('[RepCRM] Per-rep archive fetch failed; falling back to per-account total:', error.message);
+            this.archiveYTD = null;
         }
     }
 
@@ -831,9 +884,18 @@ class RepCRMController {
         }
 
         // Sales Breakdown by Tier
+        // Headline reads from the per-rep archive when available (matches the staff
+        // dashboard's Team Performance widget exactly). Falls back to the per-account
+        // sum if the archive fetch failed — the page stays usable either way.
+        const archiveTotal = (this.archiveYTD && typeof this.archiveYTD.total === 'number')
+            ? this.archiveYTD.total
+            : null;
+        const displayTotal = (archiveTotal !== null) ? archiveTotal : stats.ytdRevenue;
         if (this.elements.ytdTotal) {
-            this.elements.ytdTotal.textContent = this.formatCurrency(stats.ytdRevenue);
+            this.elements.ytdTotal.textContent = this.formatCurrency(displayTotal);
         }
+        this._renderArchiveHint();
+        this._renderReconciliationLine(archiveTotal, stats.ytdRevenue);
         if (this.elements.goldRevenue) {
             this.elements.goldRevenue.textContent = this.formatCurrency(stats.goldRevenue);
             this.elements.goldCount.textContent = `${stats.goldTier} account${stats.goldTier !== 1 ? 's' : ''}`;
@@ -864,6 +926,68 @@ class RepCRMController {
             this.elements.unclassifiedRevenue.textContent = this.formatCurrency(stats.unclassifiedRevenue);
             this.elements.unclassifiedCount.textContent = `${stats.unclassified} account${stats.unclassified !== 1 ? 's' : ''}`;
         }
+    }
+
+    /**
+     * Inject "Per-rep archive through {date}" subline below the section title.
+     * Idempotent — removes any prior hint before re-inserting. Same visual pattern
+     * as the staff dashboard's Team Performance freshness indicator.
+     */
+    _renderArchiveHint() {
+        const existing = document.getElementById('crmArchiveHint');
+        if (existing) existing.remove();
+        if (!this.archiveYTD || !this.archiveYTD.lastArchivedDate) return;
+
+        const sectionTitle = document.querySelector('.sales-breakdown-section .section-title');
+        if (!sectionTitle) return;
+
+        const formatted = this._formatArchiveDate(this.archiveYTD.lastArchivedDate);
+        const hint = document.createElement('div');
+        hint.id = 'crmArchiveHint';
+        hint.style.cssText = 'display:flex;align-items:center;gap:6px;color:#6b7280;font-size:11px;margin:2px 0 6px;';
+        hint.innerHTML = '<i class="fas fa-database" style="font-size:10px;"></i><span>Per-rep archive through ' + this._escape(formatted) + '</span>';
+        sectionTitle.insertAdjacentElement('afterend', hint);
+    }
+
+    /**
+     * Inject "Tiers below sum to $X · $Y pending account sync" line under the
+     * Total YTD card, only when the archive total differs materially from the
+     * per-account tier sum. Honest disclosure of the sync-lag gap.
+     */
+    _renderReconciliationLine(archiveTotal, perAccountTotal) {
+        const existing = document.getElementById('crmReconciliationLine');
+        if (existing) existing.remove();
+        if (typeof archiveTotal !== 'number') return;
+
+        const gap = archiveTotal - perAccountTotal;
+        if (Math.abs(gap) <= 1) return;
+
+        const salesTotal = document.querySelector('.sales-breakdown-section .sales-total');
+        if (!salesTotal) return;
+
+        const tierSumStr = this.formatCurrency(perAccountTotal);
+        const gapStr = this.formatCurrency(Math.abs(gap));
+        const message = gap > 0
+            ? `Tiers below sum to ${tierSumStr} · ${gapStr} pending account sync`
+            : `Tiers below sum to ${tierSumStr} · ${gapStr} ahead of archive`;
+
+        const line = document.createElement('div');
+        line.id = 'crmReconciliationLine';
+        line.style.cssText = 'color:#9ca3af;font-size:11px;margin-top:4px;text-align:right;';
+        line.textContent = message;
+        salesTotal.insertAdjacentElement('afterend', line);
+    }
+
+    _formatArchiveDate(dateStr) {
+        if (!dateStr) return '';
+        // Append T00:00:00 to avoid UTC-shift turning YYYY-MM-DD into prior day
+        const d = new Date(dateStr + 'T00:00:00');
+        if (isNaN(d.getTime())) return dateStr;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    _escape(s) {
+        return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     }
 
     /**

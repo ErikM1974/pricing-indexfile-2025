@@ -457,6 +457,7 @@ class HouseAccountsController {
             statWeb: document.getElementById('stat-web'),
             statJim: document.getElementById('stat-jim'),
             statHouse: document.getElementById('stat-house'),
+            statOther: document.getElementById('stat-other'),
 
             // Filters
             searchInput: document.getElementById('filter-search'),
@@ -770,6 +771,40 @@ class HouseAccountsController {
             const houseSales = salesByAssignee['House']?.revenue || 0;
             this.elements.statHouse.textContent = formatSales(houseSales);
         }
+        // "Other" surfaces orders the API counts but the 5 standard buckets miss
+        // (e.g. orders on house customers written by Nika/Taneisha or non-standard
+        // assignee names). Without this card the per-assignee stats silently fail
+        // to sum to YTD Sales — same trust problem as the rep CRM tier mismatch.
+        if (this.elements.statOther) {
+            const otherSales = salesByAssignee['Other']?.revenue || 0;
+            this.elements.statOther.textContent = formatSales(otherSales);
+        }
+        this._renderLiveDataSubline(sales);
+    }
+
+    /**
+     * Inject "Live YTD across N house accounts · M orders" under the stats grid.
+     * Idempotent — removes any prior subline before re-inserting. Mirrors the
+     * freshness pattern from rep-crm.js but labeled as live (no archive cron).
+     */
+    _renderLiveDataSubline(sales) {
+        const existing = document.getElementById('houseDataSubline');
+        if (existing) existing.remove();
+
+        const grid = document.getElementById('stats-grid');
+        if (!grid || !sales) return;
+
+        const accounts = Number(sales.accountsTracked) || 0;
+        const orders = Number(sales.totalOrders) || 0;
+        if (!accounts && !orders) return;
+
+        const line = document.createElement('div');
+        line.id = 'houseDataSubline';
+        line.style.cssText = 'display:flex;align-items:center;gap:6px;color:#6b7280;font-size:11px;margin:6px 0 0;';
+        line.innerHTML = '<i class="fas fa-bolt" style="font-size:10px;"></i><span>Live YTD across ' +
+            accounts + ' house account' + (accounts === 1 ? '' : 's') +
+            ' · ' + orders + ' order' + (orders === 1 ? '' : 's') + '</span>';
+        grid.insertAdjacentElement('afterend', line);
     }
 
     /**
