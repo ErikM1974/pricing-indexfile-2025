@@ -201,6 +201,13 @@ const StaffDashboardService = (function() {
      * Fetch orders from ShopWorks ManageOrders API
      * Uses date_Invoiced to get orders invoiced within the date range
      * (More accurate for sales reporting than date_Ordered)
+     *
+     * Timeout: 30s ceiling via AbortController. The backend proxy has a 4-hour
+     * stale-while-revalidate cache so steady-state responses are sub-second; cold
+     * misses can take 10-20s through the proxy's ManageOrders fetch. Anything
+     * past 30s means the proxy router would have 503'd anyway, or the connection
+     * is genuinely stalled (dyno cold-start, network blip, ManageOrders down).
+     * Without this, a stalled connection hangs the dashboard indefinitely.
      */
     async function fetchOrders(startDate, endDate, refresh = false, retries = 2) {
         const url = new URL(API_CONFIG.baseURL + API_CONFIG.endpoints.orders);
@@ -210,7 +217,20 @@ const StaffDashboardService = (function() {
             url.searchParams.append('refresh', 'true');
         }
 
-        const response = await fetch(url.toString());
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 30000);
+
+        let response;
+        try {
+            response = await fetch(url.toString(), { signal: controller.signal });
+        } catch (err) {
+            if (err.name === 'AbortError') {
+                throw new Error('Request timed out (30s) — ShopWorks is slow, try refreshing in a minute');
+            }
+            throw err;
+        } finally {
+            clearTimeout(timer);
+        }
 
         // Retry on 429 rate limit (consistent with rep-crm.js and house-accounts.js)
         if (response.status === 429 && retries > 0) {
@@ -724,24 +744,32 @@ const StaffDashboardService = (function() {
             const currentRange = getDateRange(days);
             const lastYearRange = getLastYearRangeForDays(days);
 
-            // Fetch orders ONCE per period (2 API calls instead of 5)
+            // Run the two fetches in parallel — they're independent (different
+            // date ranges) and previously ran sequentially, doubling cold-cache
+            // wall time for no benefit. Promise.allSettled lets the optional
+            // last-year fetch fail without taking down the required current fetch.
+            const t0 = performance.now();
+            const [currentResult, lastYearResult] = await Promise.allSettled([
+                fetchOrders(currentRange.start, currentRange.end),
+                fetchOrders(lastYearRange.start, lastYearRange.end)
+            ]);
+            console.log(`[Service] fetched current+last-year in ${Math.round(performance.now() - t0)} ms`);
+
             let currentOrders = [];
             let lastYearOrders = [];
             let fetchError = null;
 
-            try {
-                // Fetch current period - this is required
-                currentOrders = await fetchOrders(currentRange.start, currentRange.end);
-            } catch (e) {
-                console.error('Failed to fetch current orders:', e.message);
-                fetchError = e;
+            if (currentResult.status === 'fulfilled') {
+                currentOrders = currentResult.value;
+            } else {
+                console.error('Failed to fetch current orders:', currentResult.reason?.message);
+                fetchError = currentResult.reason;
             }
 
-            try {
-                // Fetch last year - optional, for comparison
-                lastYearOrders = await fetchOrders(lastYearRange.start, lastYearRange.end);
-            } catch (e) {
-                console.warn('Could not load last year data for comparison:', e.message);
+            if (lastYearResult.status === 'fulfilled') {
+                lastYearOrders = lastYearResult.value;
+            } else {
+                console.warn('Could not load last year data for comparison:', lastYearResult.reason?.message);
                 // Continue without last year data
             }
 
