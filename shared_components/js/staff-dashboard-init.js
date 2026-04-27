@@ -519,18 +519,18 @@ const StaffDashboardInit = (function() {
             dateRangeEl.textContent = `${teamData.dateRange.startFormatted} - ${teamData.dateRange.endFormatted}`;
         }
 
-        // Show warning if CRM override failed (Rule #4: no silent API failures)
-        const existingWarning = document.getElementById('teamCrmWarning');
-        if (teamData && teamData.crmOverrideApplied === false) {
-            if (!existingWarning && titleEl) {
-                titleEl.insertAdjacentHTML('afterend',
-                    '<div id="teamCrmWarning" style="display:flex;align-items:center;gap:6px;padding:4px 8px;background:#fff3cd;color:#856404;border-radius:4px;font-size:12px;margin:4px 0 8px;">' +
-                    '<i class="fas fa-exclamation-triangle"></i>' +
-                    '<span>CRM data unavailable \u2014 Nika/Taneisha totals may differ from their dashboards</span></div>'
-                );
-            }
-        } else if (existingWarning) {
-            existingWarning.remove();
+        // Show "archive through" hint when the hybrid load reports a cutoff. Tells the
+        // operator how stale the persisted data is \u2014 if the daily cron stops firing,
+        // this date stops advancing and the gap is visible without digging into logs.
+        const existingHint = document.getElementById('teamArchiveHint');
+        if (existingHint) existingHint.remove();
+        if (teamData && teamData.isHybrid && teamData.lastArchivedDate && titleEl) {
+            const archived = StaffDashboardService.formatDateForDisplay(teamData.lastArchivedDate);
+            titleEl.insertAdjacentHTML('afterend',
+                '<div id="teamArchiveHint" style="display:flex;align-items:center;gap:6px;padding:2px 0;color:#6b7280;font-size:11px;margin:2px 0 6px;">' +
+                '<i class="fas fa-database" style="font-size:10px;"></i>' +
+                `<span>Archive through ${escapeHtml(archived)} \u00b7 live data: today</span></div>`
+            );
         }
 
         if (!container) return;
@@ -917,28 +917,12 @@ const StaffDashboardInit = (function() {
                 mergedTotals[name].orders += data.orders;
             }
 
-            // 3.5 Override Nika and Taneisha with CRM totals for exact match with their dashboards
-            let crmOverrideApplied = true;
-            try {
-                const crmTotals = await StaffDashboardService.fetchRepCRMTotals();
-                for (const [repName, data] of Object.entries(crmTotals)) {
-                    if (data.totalSales !== null) {
-                        if (!mergedTotals[repName]) {
-                            mergedTotals[repName] = { revenue: 0, orders: 0, firstNames: new Set() };
-                        }
-                        // Override revenue with CRM total for exact match with rep's CRM dashboard.
-                        // NOTE: Order count still comes from ManageOrders hybrid (who WROTE the order),
-                        // while revenue now comes from CRM (customers ASSIGNED to the rep).
-                        // These can briefly diverge between sync-sales runs. The Gap Report
-                        // on the House Accounts page helps diagnose authority conflicts.
-                        mergedTotals[repName].revenue = data.totalSales;
-                        console.log(`[TeamPerformance] Using CRM total for ${repName}: $${data.totalSales.toFixed(2)}`);
-                    }
-                }
-            } catch (e) {
-                console.warn('[TeamPerformance] Could not fetch CRM totals, using hybrid values:', e.message);
-                crmOverrideApplied = false;
-            }
+            // (CRM territory-view override removed 2026-04-27 — was dead code: the
+            // /api/crm-proxy/* routes require x-crm-api-secret which the browser
+            // can't safely send, so this path always 401'd and fell through to the
+            // hybrid totals shown here. Per product decision, "orders written by
+            // rep" is the canonical Team Performance metric, which is what the
+            // hybrid path produces. See LESSONS_LEARNED.md.)
 
             // 4. Format for display (same structure as processTeamPerformanceYTD)
             const reps = Object.entries(mergedTotals)
@@ -966,7 +950,6 @@ const StaffDashboardInit = (function() {
                 totalReps: reps.length,
                 topPerformer: reps[0] || null,
                 period: '2026 YTD',
-                crmOverrideApplied,
                 dateRange: {
                     start: `${new Date().getFullYear()}-01-01`,
                     end: today,
