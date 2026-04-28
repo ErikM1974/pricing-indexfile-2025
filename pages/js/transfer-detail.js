@@ -618,44 +618,10 @@
         var r = state.record;
         var panel = $('td-artwork-panel');
 
-        // Multi-file flow: state.files comes from backend GET (which synthesizes
-        // from legacy flat columns when no child rows exist). Client-side
-        // synthesis duplicated here so the page still renders correctly when
-        // talking to a backend version that pre-dates the synthesis (e.g.,
-        // production Heroku before the v=ON_ROLLOUT deploy).
+        // Backend GET returns `files: []` synthesized from legacy flat columns
+        // when no child rows exist (caspio-pricing-proxy v591+). Single source
+        // of truth — no client-side fallback duplication.
         var allFiles = state.files || [];
-        if (allFiles.length === 0) {
-            if (r.Working_File_URL) {
-                allFiles.push({
-                    File_Order: 1,
-                    File_Type: 'working',
-                    File_URL: r.Working_File_URL,
-                    File_Name: r.Working_File_Name || null,
-                    File_MIME: r.Working_File_Type || null,
-                    Box_File_ID: r.Box_File_ID || null,
-                    Thumbnail_URL: null
-                });
-            }
-            if (r.Additional_File_1_URL) {
-                allFiles.push({
-                    File_Order: 2,
-                    // Legacy slot 1 was reserved for the mockup.
-                    File_Type: 'mockup',
-                    File_URL: r.Additional_File_1_URL,
-                    File_Name: r.Additional_File_1_Name || null,
-                    Thumbnail_URL: null
-                });
-            }
-            if (r.Additional_File_2_URL) {
-                allFiles.push({
-                    File_Order: 3,
-                    File_Type: 'reference',
-                    File_URL: r.Additional_File_2_URL,
-                    File_Name: r.Additional_File_2_Name || null,
-                    Thumbnail_URL: null
-                });
-            }
-        }
         var workingFiles = allFiles.filter(function (f) { return f.File_Type !== 'mockup'; });
         var mockupFile = allFiles.find(function (f) { return f.File_Type === 'mockup'; });
 
