@@ -763,6 +763,10 @@ app.get('/staff-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
 });
 
+app.get('/staff-dashboard-v2.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff-dashboard-v2.html'));
+});
+
 app.get('/bundle-orders-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
 });
