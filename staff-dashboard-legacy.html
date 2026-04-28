@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Staff Tools Portal - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Dashboard Styles -->
+    <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-layout.css?v=20260425b" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
+    <!-- Dark Mode Theme -->
+    <link href="/shared_components/css/staff-dashboard-dark.css?v=20260425b" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Verifying authentication...</div>
+    </div>
+
+    <!-- Hidden Caspio Authentication Container -->
+    <div class="caspio-auth" style="display: none;">
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
+    <!-- Price alert removed 2026-04-09 (was stale Jan 5 notice) -->
+
+    <div class="dashboard-container">
+        <!-- =====================================================
+             SIDEBAR NAVIGATION (Preserved from original)
+             ===================================================== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo-link" title="Go to main site">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="company-logo">
+                </a>
+                <div class="company-name">Staff Portal</div>
+                <div class="company-year">2026</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-content">
+                    <!-- Company Policies -->
+                    <div class="nav-section" data-section="policies">
+                        <a href="/pages/policies-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>📋</span>
+                                    <span>Company Policies</span>
+                                </div>
+                                <span>→</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Training -->
+                    <div class="nav-section collapsed" data-section="training">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>📖</span>
+                                <span>Training</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/pages/data-entry-guide.html" class="nav-link"><span>ShopWorks Data Entry Guide</span></a>
+                            <a href="/training/customer-service.html" class="nav-link"><span>Customer Service Manual</span></a>
+                            <a href="/training/sales-coordinator-manual.html" class="nav-link"><span>Sales Coordinator Manual</span></a>
+                            <a href="/training/quick-reference-tips.html" class="nav-link"><span>Quick Hitter Tips Archive</span></a>
+                            <a href="/training/training-games-hub.html" class="nav-link"><span>Training Games Hub</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Office Assistant -->
+                    <div class="nav-section collapsed" data-section="office-assistant">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>👩‍💼</span>
+                                <span>Office Assistant</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/training/adriyella-daily-report.html" class="nav-link"><span>Adriyella's Bonus Tracker</span></a>
+                            <a href="/training/thank-you-card-guide.html" class="nav-link"><span>Thank You Card Guide</span></a>
+                            <a href="/training/google-review-guide.html" class="nav-link"><span>Google Review Guide</span></a>
+                            <a href="/training/lead-sheet-guide.html" class="nav-link"><span>Lead Sheet Guide</span></a>
+                            <a href="/training/art-approval-guide.html" class="nav-link"><span>Art Approval Guide</span></a>
+                            <a href="/training/bonus-policy.html" class="nav-link"><span>Erik's Bonus Policy</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Employee Bundles -->
+                    <div class="nav-section collapsed" data-section="employee-bundles">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>🏷️</span>
+                                <span>Employee Bundles</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/DrainPro-Bundle.html" class="nav-link"><span>Drain-Pro</span></a>
+                            <a href="/streich-bros-bundle.html" class="nav-link"><span>Streich Bros</span></a>
+                            <a href="/wcttr-bundle.html" class="nav-link"><span>WCTTR</span></a>
+                            <a href="/christmas-bundles.html" class="nav-link"><span>Christmas Bundles</span></a>
+                        </div>
+                    </div>
+
+                    <!-- Inksoft Transform Tool -->
+                    <div class="nav-section" data-section="inksoft-trans">
+                        <a href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/" target="_blank" class="nav-section-header-link">
+                            <div class="nav-section-header">
+                                <div class="nav-section-title">
+                                    <span>🔄</span>
+                                    <span>Inksoft Transform</span>
+                                </div>
+                                <span>→</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Administration -->
+                    <div class="nav-section collapsed" data-section="admin">
+                        <div class="nav-section-header" onclick="toggleSidebarSection(this.parentElement)">
+                            <div class="nav-section-title">
+                                <span>⚙️</span>
+                                <span>Administration</span>
+                            </div>
+                            <span class="chevron">▼</span>
+                        </div>
+                        <div class="nav-section-content">
+                            <a href="/sanmar-vendor-portal.html" class="nav-link"><span>Sanmar Vendor Portal</span></a>
+                            <a href="/admin/announcements-create.html" class="nav-link"><span>Create Announcements</span></a>
+                            <a href="/admin/announcements-manage.html" class="nav-link"><span>Manage Announcements</span></a>
+                            <a href="/universal-records-admin.html" class="nav-link"><span>Universal Records Admin</span></a>
+                            <a href="/training/adriyella-admin.html" class="nav-link"><span>Adriyella Task Admin</span></a>
+                            <a href="/dashboards/commission-structure.html" class="nav-link"><span>Commission Structure</span></a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- =====================================================
+             MAIN CONTENT AREA
+             ===================================================== -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Staff Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <!-- Celebrations Widget -->
+                    <div class="celebrations-widget">
+                        <div class="celebration-item" onclick="toggleCelebrationDropdown('birthday', event)" title="View upcoming birthdays">
+                            <span class="celebration-icon">🎂</span>
+                            <span class="celebration-count" id="birthdayCount">0</span>
+                            <span class="celebration-label">Birthdays</span>
+                            <div class="celebration-dropdown" id="birthdayDropdown">
+                                <div class="celebration-dropdown-header">
+                                    <i class="fas fa-birthday-cake"></i> Upcoming Birthdays
+                                </div>
+                                <div class="celebration-list" id="birthdayList"></div>
+                                <div class="celebration-view-all" onclick="showStaffDirectory('birthdays')">
+                                    <i class="fas fa-users"></i> View All Staff Birthdays
+                                </div>
+                            </div>
+                        </div>
+                        <div class="celebration-item" onclick="toggleCelebrationDropdown('anniversary', event)" title="View work anniversaries">
+                            <span class="celebration-icon">🏆</span>
+                            <span class="celebration-count" id="anniversaryCount">0</span>
+                            <span class="celebration-label">Anniversaries</span>
+                            <div class="celebration-dropdown" id="anniversaryDropdown">
+                                <div class="celebration-dropdown-header">
+                                    <i class="fas fa-trophy"></i> Work Anniversaries
+                                </div>
+                                <div class="celebration-list" id="anniversaryList"></div>
+                                <div class="celebration-view-all" onclick="showStaffDirectory('anniversaries')">
+                                    <i class="fas fa-users"></i> View All Staff Anniversaries
+                                </div>
+                            </div>
+                        </div>
+                        <div class="celebration-item staff-directory-btn" onclick="showStaffDirectory('all')" title="View staff directory">
+                            <span class="celebration-icon">👥</span>
+                            <span class="celebration-label">Staff</span>
+                        </div>
+                    </div>
+
+                    <div class="user-welcome" id="userWelcome" style="display: none;">
+                        <span class="welcome-text">Welcome,</span>
+                        <span class="user-name" id="userName"></span>
+                    </div>
+
+                    <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out-link" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Sign Out</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Partial Data Warning (shown when API returns incomplete data) -->
+            <div id="partialDataWarning" style="display: none; padding: 0 1.5rem;"></div>
+
+            <!-- 2026 Sales Goal Banner -->
+            <div class="sales-goal-banner">
+                <div class="sales-goal-content">
+                    <div class="sales-goal-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <div class="sales-goal-info">
+                        <div class="sales-goal-title">2026 Annual Sales Goal</div>
+                        <div class="sales-goal-amount">$3,000,000</div>
+                    </div>
+                    <div class="sales-goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="goalCurrent">$0</span> <span class="goal-percent">(<span id="goalPercent">0</span>%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Zones Container -->
+            <div class="dashboard-zones">
+
+                <!-- =====================================================
+                     ZONE 1: ANNOUNCEMENTS HERO
+                     Training/Process updates with visual prominence
+                     ===================================================== -->
+                <section class="zone-announcements">
+                    <div class="announcements-hero" id="announcementsHero">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                    <div class="announcements-list" id="announcementsList">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     ZONE 2: QUICK ACCESS TOOLS
+                     Primary action area - Quote builders, calculators
+                     ===================================================== -->
+                <section class="zone-quick-access">
+                    <div class="zone-header">
+                        <h2 class="zone-title">
+                            <i class="fas fa-bolt"></i>
+                            Quick Access Tools
+                        </h2>
+                    </div>
+
+                    <div class="quick-access-grid">
+                        <!-- ── Frequently Used Tools ───────────────────── -->
+                        <div class="tool-category tool-category--pricing">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-clipboard-list"></i>
+                                </div>
+                                <span class="tool-category-title">Frequently Used Tools</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders.
+                                     Visually groups two sequential steps in the transfer flow. -->
+                                <div class="tool-workflow" aria-label="Transfer workflow">
+                                    <div class="tool-workflow-label">
+                                        <i class="fas fa-route"></i> Transfer Workflow
+                                    </div>
+                                    <div class="tool-workflow-row">
+                                        <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck"></i> Bradley's Transfer Queue</a>
+                                        <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                                        <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
+                                    </div>
+                                </div>
+                                <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette"></i> AE Dashboard</a>
+                                <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart"></i> Purchasing</a>
+                                <a href="/pages/order-form.html" class="tool-btn"><i class="fas fa-file-invoice"></i> Order Form</a>
+                            </div>
+                        </div>
+
+                        <!-- ── Ask Barnaby (Quote Builders) ─────────────── -->
+                        <div class="tool-category barnaby-theme">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon barnaby-icon">
+                                    <svg viewBox="0 0 32 32" fill="currentColor" class="barnaby-svg">
+                                        <ellipse cx="16" cy="5" rx="4" ry="4.5"/>
+                                        <path d="M12 9c-1 0-2 1-2 2v7l-4 3v7h4v-5l3-2v10h4V17h2v14h4V21l3 2v5h4v-7l-4-3V11c0-1-1-2-2-2h-2l1 5-3-1v-4h-6v4l-3 1 1-5h-2z"/>
+                                    </svg>
+                                </div>
+                                <span class="tool-category-title">Ask Barnaby</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt"></i> Emb / Cap / Patch</a>
+                                <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print"></i> DTG</a>
+                                <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group"></i> Screen Print</a>
+                                <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire"></i> DTF</a>
+                                <a href="/dashboards/quote-management.html" class="tool-btn barnaby-accent">
+                                    <i class="fas fa-list-alt"></i> Quote Management
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- ── Pricing Tools (Manual + Contract + Customer Supplied) ── -->
+                        <div class="tool-category tool-category--pricing">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-calculator"></i>
+                                </div>
+                                <span class="tool-category-title">Pricing Tools</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator"></i> Manual Pricing 2026</a>
+                                <a href="/calculators/compare-pricing.html" class="tool-btn"><i class="fas fa-search-dollar"></i> Pricing by Style</a>
+                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list"></i> Service Prices</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-plus-circle"></i> Additional Logo</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-ruler"></i> Stitch Pricing</a>
+                                <a href="/calculators/dtg-contract/" class="tool-btn"><i class="fas fa-handshake"></i> Contract DTG</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-cemb" class="tool-btn"><i class="fas fa-handshake"></i> Contract Embroidery</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=decg" class="tool-btn"><i class="fas fa-box-open"></i> Customer Supplied Emb (DECG)</a>
+                                <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-box-open"></i> Customer Supplied Screen Print</a>
+                            </div>
+                        </div>
+
+                        <!-- ── Specialty & Quick Links ──────────────────── -->
+                        <div class="tool-category tool-category--pricing">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <span class="tool-category-title">Specialty & Quick Links</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/embroidered-emblem/" class="tool-btn"><i class="fas fa-certificate"></i> Emblems</a>
+                                <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn"><i class="fas fa-mug-hot"></i> Laser Tumbler</a>
+                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn"><i class="fas fa-sticky-note"></i> Stickers</a>
+                                <a href="/calculators/webstores.html" class="tool-btn"><i class="fas fa-store"></i> Webstore</a>
+                                <a href="/calculators/richardson-2025.html" class="tool-btn"><i class="fas fa-hat-cowboy"></i> Richardson Non-Sanmar</a>
+                                <a href="/pages/3-day-tees.html" class="tool-btn tool-btn--green"><i class="fas fa-clock"></i> 3-Day Tees</a>
+                                <a href="/pages/top-sellers-showcase.html" class="tool-btn"><i class="fas fa-trophy"></i> Top Sellers</a>
+                            </div>
+                        </div>
+
+                        <!-- ── Design Library ──────────────────────────── -->
+                        <div class="tool-category tool-category--design">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-swatchbook"></i>
+                                </div>
+                                <span class="tool-category-title">Design Library</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/pages/design-gallery.html" class="tool-btn"><i class="fas fa-images"></i> Design Gallery</a>
+                                <a href="/dashboards/digitized-designs.html" class="tool-btn" id="digitizedDesignBtn"><i class="fas fa-th-list"></i> Digitized Designs</a>
+                                <a href="/dashboards/old-designs.html" class="tool-btn"><i class="fas fa-box-archive"></i> Old Designs Archive</a>
+                            </div>
+                        </div>
+
+                        <!-- ── Art Department ──────────────────────────── -->
+                        <div class="tool-category tool-category--art">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <span class="tool-category-title">Art Department</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush"></i> Steve's Queue</a>
+                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass"></i> Ruth's Queue</a>
+                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-microscope"></i> DST Stitch Viewer</a>
+                                <a href="/pages/mockup-generator.html" class="tool-btn"><i class="fas fa-magic"></i> Mockup Generator</a>
+                                <a href="/dashboards/portal-directory.html" class="tool-btn tool-btn--green"><i class="fas fa-globe"></i> Customer Portals</a>
+                            </div>
+                        </div>
+
+                        <!-- ── Forms, Shipping & Reference ─────────────── -->
+                        <div class="tool-category tool-category--admin">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-clipboard"></i>
+                                </div>
+                                <span class="tool-category-title">Forms, Shipping & Reference</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font"></i> Monogram Dashboard</a>
+                                <a href="/dashboards/names-numbers-dashboard.html" class="tool-btn tool-btn--blue"><i class="fas fa-users"></i> Names & Numbers</a>
+                                <a href="/pages/box-labels.html" class="tool-btn tool-btn--blue"><i class="fas fa-box"></i> Box Labels</a>
+                                <a href="/pages/data-entry-guide.html" class="tool-btn"><i class="fas fa-book-open"></i> Data Entry Guide</a>
+                                <a href="/dashboards/reports/price-audit-report.html" class="tool-btn"><i class="fas fa-chart-bar"></i> Price Audit Report</a>
+                            </div>
+                        </div>
+
+                        <!-- ── CRM (Role-based access) ─────────────────── -->
+                        <div class="tool-category tool-category--crm">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-address-book"></i>
+                                </div>
+                                <span class="tool-category-title">CRM</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/taneisha-crm.html" onclick="navigateToCRM(event, '/dashboards/taneisha-crm.html')" class="tool-btn crm-link tool-btn--purple">
+                                    <i class="fas fa-user-tie"></i> Taneisha's Accounts
+                                </a>
+                                <a href="/dashboards/nika-crm.html" onclick="navigateToCRM(event, '/dashboards/nika-crm.html')" class="tool-btn crm-link tool-btn--cyan">
+                                    <i class="fas fa-user-tie"></i> Nika's Accounts
+                                </a>
+                                <a href="/dashboards/house-accounts.html" onclick="navigateToCRM(event, '/dashboards/house-accounts.html')" class="tool-btn crm-link tool-btn--gray">
+                                    <i class="fas fa-home"></i> House Accounts
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- ── Recent Policies (collapsed by default) ──── -->
+                        <div class="tool-category policies-category">
+                            <div class="tool-category-header collapsible-header" data-toggle="policies">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <span class="tool-category-title">Recent Policies</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </div>
+                            <div class="tool-buttons policies-content collapsed" id="policies-content">
+                                <div class="policy-mini-list">
+                                    <a href="/pages/policies-hub.html#sales-office" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">Sales & Office Procedures</div>
+                                            <div class="policy-mini-date">Updated Oct 31, 2025</div>
+                                        </div>
+                                        <span class="policy-mini-badge">NEW</span>
+                                    </a>
+                                    <a href="/pages/policies-hub.html#customer-notification" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">Customer Notification SOP</div>
+                                            <div class="policy-mini-date">Updated Sep 16, 2025</div>
+                                        </div>
+                                    </a>
+                                    <a href="/pages/policies-hub.html#ltm-decision" class="policy-mini-card">
+                                        <div class="policy-mini-icon">
+                                            <i class="fas fa-balance-scale"></i>
+                                        </div>
+                                        <div class="policy-mini-content">
+                                            <div class="policy-mini-title">LTM Order Decision Algorithm</div>
+                                            <div class="policy-mini-date">Updated Sep 09, 2025</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =====================================================
+                     ZONE 3: SALES METRICS
+                     ShopWorks API - Revenue, Team Performance
+                     ===================================================== -->
+                <section class="zone-metrics">
+                    <!-- Revenue Card -->
+                    <div class="metrics-revenue-card">
+                        <div class="metrics-revenue-header">
+                            <span class="metrics-revenue-title" id="revenueTitle">Revenue: Last 7 Days</span>
+                            <div class="date-range-toggle">
+                                <button class="date-range-btn active" data-days="7">7D</button>
+                                <button class="date-range-btn" data-days="30">30D</button>
+                                <button class="date-range-btn" data-days="60">60D</button>
+                                <button class="date-range-btn" data-days="90">90D</button>
+                            </div>
+                        </div>
+                        <div class="metrics-revenue-value" id="ytdRevenue">
+                            <span class="skeleton skeleton-value"></span>
+                        </div>
+                        <div class="metrics-date-range" id="dateRangeDisplay">
+                            <!-- Populated by JS: "Dec 1, 2025 - Dec 31, 2025" -->
+                        </div>
+                        <div class="metrics-revenue-comparison">
+                            <span class="metrics-comparison-badge positive" id="ytdGrowth">
+                                <i class="fas fa-arrow-up"></i> --
+                            </span>
+                            <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
+                        </div>
+                    </div>
+
+                    <!-- Team Performance Card - 2026 YTD -->
+                    <div class="metrics-team-card">
+                        <div class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="teamPerformanceTitle">
+                                    <i class="fas fa-users"></i>
+                                    Team Performance: 2026 YTD
+                                </h3>
+                                <div class="metrics-date-range" id="teamDateRange"></div>
+                            </div>
+                            <div class="refresh-control">
+                                <button class="refresh-btn" onclick="StaffDashboardInit.loadMetrics(true)" title="Refresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="rep-list" id="salesTeamList">
+                            <!-- Populated by JavaScript -->
+                            <div class="metrics-loading">
+                                <div class="loading"></div>
+                                <span>Loading from ShopWorks...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Production Schedule Predictor Widget -->
+                    <div class="widget-collapsible production-widget-card" data-widget="production">
+                        <div class="widget-header">
+                            <h3 class="widget-title">
+                                <i class="fas fa-chart-line"></i>
+                                Production Turnaround
+                            </h3>
+                            <span id="production-season-badge" class="season-badge"></span>
+                            <i class="fas fa-chevron-down widget-toggle"></i>
+                        </div>
+                        <div class="widget-content">
+                            <div id="production-predictor-grid" class="production-predictor-grid">
+                                <!-- Dynamic content rendered by renderProductionSchedule() -->
+                                <div class="production-loading">Loading predictions...</div>
+                            </div>
+                            <div class="production-footer">
+                                <span class="production-meta">
+                                    <i class="fas fa-database"></i>
+                                    Based on <span id="production-record-count">4,631</span> historical completions
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Garment Tracker Card (spans full width below Revenue and Team Performance) -->
+                    <div class="garment-tracker-card">
+                        <div class="garment-tracker-header">
+                            <div class="garment-tracker-title-group">
+                                <h3 class="garment-tracker-title">
+                                    <i class="fas fa-tshirt"></i>
+                                    Garment Tracker
+                                </h3>
+                                <div class="garment-tracker-date" id="garmentTrackerDateRange">
+                                    Q1 2026 (Jan 1 - Mar 31)
+                                </div>
+                            </div>
+                            <div class="refresh-control">
+                                <span class="sync-status" id="garmentSyncStatus"></span>
+                                <button class="sync-btn" onclick="StaffDashboardInit.syncGarmentTracker()" title="Sync from Orders">
+                                    <i class="fas fa-cloud-download-alt"></i>
+                                </button>
+                                <button class="refresh-btn" onclick="StaffDashboardInit.refreshGarmentTracker()" title="Refresh from Table">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="garment-tracker-content" id="garmentTrackerContent">
+                            <div class="metrics-loading">
+                                <div class="loading"></div>
+                                <span>Loading garment data...</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div><!-- End dashboard-zones -->
+        </main>
+    </div><!-- End dashboard-container -->
+
+    <!-- =====================================================
+         SAMPLE ANNOUNCEMENTS DATA
+         (Replace with API call in production)
+         ===================================================== -->
+    <script>
+        // Sample announcements data - replace with API call
+        var staffAnnouncementsData = [
+            {
+                id: 'ann-001',
+                type: 'training',
+                title: 'New LTM Order Policy Update',
+                preview: 'Framework for handling Less-Than-Minimum orders: existing vs. new customers, upselling, and referrals.',
+                content: 'Full policy details available in the policies hub.',
+                date: '2025-09-09'
+            },
+            {
+                id: 'ann-002',
+                type: 'process',
+                title: 'Customer Notification SOP Updated',
+                preview: 'Standard procedure for notifying customers when orders are ready for pickup, including ShopWorks logging.',
+                date: '2025-09-16'
+            },
+            {
+                id: 'ann-003',
+                type: 'general',
+                title: 'Welcome to the New Dashboard!',
+                preview: 'We\'ve redesigned the staff dashboard for better usability. Quick access tools are now front and center.',
+                date: '2025-12-31'
+            }
+        ];
+    </script>
+
+    <!-- =====================================================
+         STAFF DIRECTORY MODAL
+         ===================================================== -->
+    <div class="staff-modal-overlay" id="staffDirectoryModal" onclick="closeStaffDirectory(event)">
+        <div class="staff-modal" onclick="event.stopPropagation()">
+            <div class="staff-modal-header">
+                <h2><i class="fas fa-users"></i> Staff Directory</h2>
+                <button class="staff-modal-close" onclick="closeStaffDirectory()">&times;</button>
+            </div>
+            <div class="staff-modal-filters">
+                <button class="staff-filter-btn active" onclick="filterStaffDirectory('all')">All Staff</button>
+                <button class="staff-filter-btn" onclick="filterStaffDirectory('active')">Active</button>
+                <button class="staff-filter-btn" onclick="filterStaffDirectory('birthdays')">Upcoming Birthdays</button>
+                <button class="staff-filter-btn" onclick="filterStaffDirectory('anniversaries')">Anniversaries</button>
+            </div>
+            <div class="staff-modal-content">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th>Start Date</th>
+                            <th>Years</th>
+                            <th>Birthday</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffTableBody">
+                        <!-- Populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         EXTERNAL JAVASCRIPT
+         ===================================================== -->
+    <!-- Dashboard Services -->
+    <script src="/shared_components/js/staff-dashboard-employees.js"></script>
+    <script src="/shared_components/js/staff-dashboard-service.js"></script>
+    <script src="/shared_components/js/staff-dashboard-announcements.js"></script>
+    <!-- Production Schedule Predictor -->
+    <script src="/shared_components/js/production-schedule-stats.js"></script>
+    <script src="/shared_components/js/production-schedule-predictor.js"></script>
+    <script src="/shared_components/js/staff-dashboard-init.js"></script>
+
+    <!-- Caspio Authentication Script -->
+    <script>
+        // =====================================================
+        // CASPIO AUTHENTICATION CHECK
+        // =====================================================
+        const LOGIN_URL = '/dashboards/staff-login.html';
+        const AUTH_TIMEOUT = 8000; // 8 seconds to wait for Caspio
+        let authCheckComplete = false;
+        let portalInitialized = false;
+
+        function checkCaspioAuth() {
+            // Look for authenticated user data from Caspio
+            const firstName = document.getElementById('auth-firstname')?.textContent?.trim();
+            const email = document.getElementById('auth-email')?.textContent?.trim();
+
+            // Check if we have valid auth data (Caspio populates these fields when logged in)
+            // Skip if tokens are still present (not yet processed by Caspio)
+            if (firstName && firstName !== '' && !firstName.includes('[@authfield') && !firstName.includes('@authfield')) {
+                // User is authenticated
+                authCheckComplete = true;
+                initializePortal();
+                return true;
+            }
+
+            // Also check window.caspioUser (set by some Caspio DataPages)
+            if (window.caspioUser && window.caspioUser.firstName) {
+                authCheckComplete = true;
+                initializePortal();
+                return true;
+            }
+
+            return false;
+        }
+
+        function initializePortal() {
+            // Prevent double initialization
+            if (portalInitialized) return;
+            portalInitialized = true;
+
+            // Get user info from DOM or caspioUser object
+            let firstName, lastName, email, role;
+
+            if (window.caspioUser && window.caspioUser.firstName) {
+                firstName = window.caspioUser.firstName;
+                lastName = window.caspioUser.lastName || '';
+                email = window.caspioUser.email || '';
+                role = window.caspioUser.role || 'Staff';
+            } else {
+                firstName = document.getElementById('auth-firstname')?.textContent?.trim() || '';
+                lastName = document.getElementById('auth-lastname')?.textContent?.trim() || '';
+                email = document.getElementById('auth-email')?.textContent?.trim() || '';
+                role = document.getElementById('auth-role')?.textContent?.trim() || 'Staff';
+            }
+
+            // Hide loading overlay
+            const overlay = document.getElementById('loadingOverlay');
+            if (overlay) {
+                overlay.classList.add('fade-out');
+            }
+
+            // Store user info for use elsewhere
+            const fullName = firstName + (lastName ? ' ' + lastName : '');
+            sessionStorage.setItem('nwca_user_name', fullName);
+            sessionStorage.setItem('nwca_user_email', email);
+            sessionStorage.setItem('nwca_user_role', role);
+
+            // Show welcome message with user name
+            if (firstName && firstName !== '') {
+                const userNameEl = document.getElementById('userName');
+                const userWelcomeEl = document.getElementById('userWelcome');
+                if (userNameEl && userWelcomeEl) {
+                    userNameEl.textContent = firstName;
+                    userWelcomeEl.style.display = 'flex';
+                }
+            }
+
+            console.log('[Auth] Dashboard loaded for:', firstName);
+        }
+
+        // CRM Session Management - establish session before navigating to CRM dashboards
+        async function navigateToCRM(event, targetUrl) {
+            event.preventDefault();
+
+            // Get user info from sessionStorage (set during initializePortal)
+            const userName = sessionStorage.getItem('nwca_user_name');
+            const userEmail = sessionStorage.getItem('nwca_user_email');
+
+            if (!userName) {
+                // Not logged in, let server handle redirect
+                window.location.href = targetUrl;
+                return;
+            }
+
+            try {
+                // Show loading state on clicked link
+                const link = event.currentTarget;
+                const originalText = link.innerHTML;
+                link.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                link.style.pointerEvents = 'none';
+
+                // Establish CRM session with backend
+                const response = await fetch('/api/crm-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: userName, email: userEmail })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    console.log('[CRM] Session established for:', data.firstName, 'with permissions:', data.permissions);
+                    window.location.href = targetUrl;
+                } else if (response.status === 403) {
+                    // User not authorized for CRM
+                    link.innerHTML = originalText;
+                    link.style.pointerEvents = '';
+                    alert(data.message || 'You do not have permission to access this dashboard.');
+                } else {
+                    // Other error - let server handle it
+                    window.location.href = targetUrl;
+                }
+            } catch (error) {
+                console.error('[CRM] Error establishing session:', error);
+                // On error, let server handle the redirect
+                window.location.href = targetUrl;
+            }
+        }
+
+        function redirectToLogin() {
+            if (!authCheckComplete) {
+                console.log('[Auth] Not authenticated, redirecting to login');
+                window.location.href = LOGIN_URL;
+            }
+        }
+
+        // Caspio DataPageReady Event Listener
+        document.addEventListener('DataPageReady', function(event) {
+            console.log('[Auth] Caspio DataPage Ready');
+            // Check auth when DataPage loads
+            setTimeout(checkCaspioAuth, 100);
+        });
+
+        // Listen for the custom caspioUserReady event
+        window.addEventListener('caspioUserReady', function(event) {
+            console.log('[Auth] Caspio user ready event received:', event.detail);
+            if (!authCheckComplete) {
+                checkCaspioAuth();
+            }
+        });
+
+        // Wait for page load then check auth with retry mechanism
+        window.addEventListener('load', function() {
+            let retryCount = 0;
+            const maxRetries = 10;
+
+            function attemptInitialization() {
+                // Check if Caspio has set the user data
+                if (checkCaspioAuth()) {
+                    console.log('[Auth] Caspio user data found, portal initialized');
+                } else if (retryCount < maxRetries) {
+                    retryCount++;
+                    console.log(`[Auth] Waiting for Caspio user data... attempt ${retryCount}/${maxRetries}`);
+                    setTimeout(attemptInitialization, 500);
+                } else {
+                    // Fallback: show dashboard anyway (matches old behavior)
+                    console.log('[Auth] Max retries reached, initializing with fallback');
+                    authCheckComplete = true;
+                    initializePortal();
+                }
+            }
+
+            // Start checking after initial delay
+            setTimeout(attemptInitialization, 1000);
+        });
+
+        // Fallback timeout - if no auth after timeout, show dashboard anyway
+        setTimeout(function() {
+            if (!authCheckComplete) {
+                console.log('[Auth] Timeout reached, initializing with fallback');
+                authCheckComplete = true;
+                initializePortal();
+            }
+        }, AUTH_TIMEOUT);
+    </script>
+
+    <!-- Sidebar Toggle Function (minimal inline for critical functionality) -->
+    <script>
+        function toggleSidebarSection(section) {
+            section.classList.toggle('collapsed');
+            // Save state
+            const states = {};
+            document.querySelectorAll('.nav-section').forEach(s => {
+                const id = s.dataset.section;
+                if (id) states[id] = s.classList.contains('collapsed');
+            });
+            localStorage.setItem('staffDashboard_sidebarStates', JSON.stringify(states));
+        }
+
+        // Restore sidebar states on load
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const states = JSON.parse(localStorage.getItem('staffDashboard_sidebarStates') || '{}');
+                Object.entries(states).forEach(([id, collapsed]) => {
+                    const section = document.querySelector(`[data-section="${id}"]`);
+                    if (section) section.classList.toggle('collapsed', collapsed);
+                });
+            } catch (e) {}
+
+            // Initialize celebrations
+            if (window.StaffDashboardEmployees) {
+                StaffDashboardEmployees.initCelebrations();
+                StaffDashboardEmployees.renderBirthdayList('birthdayList');
+                StaffDashboardEmployees.renderAnniversaryList('anniversaryList');
+            }
+
+        });
+
+        // =====================================================
+        // CELEBRATION DROPDOWN FUNCTIONS
+        // =====================================================
+
+        function toggleCelebrationDropdown(type, event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById(type + 'Dropdown');
+            const allDropdowns = document.querySelectorAll('.celebration-dropdown');
+
+            // Close all other dropdowns
+            allDropdowns.forEach(dd => {
+                if (dd.id !== type + 'Dropdown') {
+                    dd.classList.remove('open');
+                }
+            });
+
+            // Toggle the clicked dropdown
+            if (dropdown) {
+                dropdown.classList.toggle('open');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.celebration-item')) {
+                document.querySelectorAll('.celebration-dropdown').forEach(dd => {
+                    dd.classList.remove('open');
+                });
+            }
+        });
+
+        // =====================================================
+        // STAFF DIRECTORY FUNCTIONS
+        // =====================================================
+
+        let currentStaffFilter = 'all';
+
+        function showStaffDirectory(filter = 'all') {
+            currentStaffFilter = filter;
+            const modal = document.getElementById('staffDirectoryModal');
+            if (modal) {
+                modal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+                filterStaffDirectory(filter);
+
+                // Update active filter button
+                document.querySelectorAll('.staff-filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.toLowerCase().includes(filter) ||
+                        (filter === 'all' && btn.textContent === 'All Staff')) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            // Close celebration dropdowns
+            document.querySelectorAll('.celebration-dropdown').forEach(dd => {
+                dd.classList.remove('open');
+            });
+        }
+
+        function closeStaffDirectory(event) {
+            if (event && event.target !== event.currentTarget) return;
+            const modal = document.getElementById('staffDirectoryModal');
+            if (modal) {
+                modal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function filterStaffDirectory(filter) {
+            currentStaffFilter = filter;
+            const tbody = document.getElementById('staffTableBody');
+            if (!tbody || !window.StaffDashboardEmployees) return;
+
+            // Update filter buttons
+            document.querySelectorAll('.staff-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target?.classList.add('active');
+
+            let employees = StaffDashboardEmployees.getAllEmployeesForDirectory();
+
+            // Apply filter
+            if (filter === 'active') {
+                employees = employees.filter(emp => emp.status.type === 'active');
+            } else if (filter === 'birthdays') {
+                const upcoming = StaffDashboardEmployees.getUpcomingBirthdays(30);
+                const upcomingNames = upcoming.map(e => e.firstName + ' ' + e.lastName);
+                employees = employees.filter(emp => upcomingNames.includes(emp.fullName));
+            } else if (filter === 'anniversaries') {
+                const upcoming = StaffDashboardEmployees.getUpcomingAnniversaries(30);
+                const upcomingNames = upcoming.map(e => e.firstName + ' ' + e.lastName);
+                employees = employees.filter(emp => upcomingNames.includes(emp.fullName));
+            }
+
+            // Render table
+            tbody.innerHTML = employees.map(emp => {
+                const statusClass = emp.status.type === 'active' ? 'status-active' :
+                    emp.status.type === 'leaving' ? 'status-leaving' : 'status-former';
+                return `
+                    <tr class="${emp.status.type === 'former' ? 'row-former' : ''}">
+                        <td><strong>${emp.fullName}</strong></td>
+                        <td>${emp.position}</td>
+                        <td>${emp.formattedStartDate}</td>
+                        <td>${emp.yearsOfService}</td>
+                        <td>${emp.formattedBirthday}</td>
+                        <td><span class="status-badge ${statusClass}">${emp.status.label}</span></td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-message">No employees match the current filter.</td></tr>';
+            }
+        }
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeStaffDirectory();
+            }
+        });
+    </script>
+</body>
+</html>

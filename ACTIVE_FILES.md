@@ -522,8 +522,8 @@ cap-embroidery-fix.css
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/dashboards/staff-dashboard.html` | Main staff dashboard (legacy) | Multiple inline | ⚠️ Legacy |
-| `/dashboards/staff-dashboard-v2.html` | **NEW** Redesigned dashboard with 4-zone layout | staff-dashboard-*.js/css | ✅ Active |
+| `/staff-dashboard.html` | **NEW (2026-04-28 cut-over)** Main staff dashboard — v2 design (oklch palette, NW green accent, Inter + JetBrains Mono, Tweaks drawer). All existing back-links from index.html, admin/, calculators/, training/ pages resolve here. | staff-dashboard-v2-tokens.css, staff-dashboard-v2.css, staff-dashboard-v2-tweaks.js, staff-dashboard-v2-extras.js + legacy staff-dashboard-*.js services | ✅ Active |
+| `/staff-dashboard-legacy.html` | Pre-cut-over staff dashboard, kept as 90-day safety net. `/staff-dashboard-v2.html` 301-redirects to canonical. | Legacy CSS + staff-dashboard-*.js | 🗄️ Legacy (delete ~2026-07-28) |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
@@ -590,6 +590,10 @@ cap-embroidery-fix.css
 | `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |
 | `/shared_components/js/production-schedule-stats.js` | Precomputed turnaround stats from 819 records | ✅ Active |
 | `/shared_components/js/production-schedule-predictor.js` | Prediction engine for turnaround times | ✅ Active |
+| `/shared_components/css/staff-dashboard-v2-tokens.css` | **NEW (2026-04-28)** Design tokens for v2 dashboard (oklch palette, NW green, dark/light themes, density). Remaps legacy `--bg-dark`/`--card-*`/`--accent-blue`/etc. so existing CSS picks up new colors. | 🧪 Testing |
+| `/shared_components/css/staff-dashboard-v2.css` | **NEW (2026-04-28)** v2 visual overrides — typography (Inter + JetBrains Mono), refined cards/buttons/sidebar, NW green accent throughout, Tweaks drawer styles. Layered after legacy CSS. | 🧪 Testing |
+| `/shared_components/js/staff-dashboard-v2-tweaks.js` | **NEW (2026-04-28)** Floating Tweaks drawer (accent/density — Light theme stripped per Erik). Persists to `localStorage['nwca-staff-dash-v2-tweaks']`. Exposes `window.StaffDashboardV2Tweaks.{get,set,reset}`. Applied early to avoid theme flicker. | 🧪 Testing |
+| `/shared_components/js/staff-dashboard-v2-extras.js` | **NEW (2026-04-28)** v2 extras: populates `#revenueStats` (orders + AOV) from `StaffDashboardService.getMetrics()` cache; makes Specialty & Quick Links / Forms, Shipping & Reference tool categories collapsible by default with localStorage persistence. | 🧪 Testing |
 
 ### Dashboard Reports
 | File | Purpose | Status |
