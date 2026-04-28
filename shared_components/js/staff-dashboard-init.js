@@ -790,18 +790,12 @@ const StaffDashboardInit = (function() {
 
     /**
      * Archive days 55-60 ago to ensure they're saved before falling off
-     * ManageOrders' 60-day retention window.
-     * Runs in background on dashboard load.
-     */
-    /**
-     * Unified archival: fetches orders ONCE per day and archives both
-     * company-wide totals and per-rep breakdowns from the same data.
-     * Runs in background on dashboard load (days 55-60 ago buffer).
+     * ManageOrders' 60-day retention window. Per-rep only — the legacy
+     * company-wide DailySalesArchive was retired on 2026-04-28 (no consumers).
      */
     async function archiveSoonToExpireDaysAll() {
         const today = new Date();
         const year = today.getFullYear();
-        let companyArchived = 0;
         let perRepArchived = 0;
 
         for (let daysAgo = 55; daysAgo <= 60; daysAgo++) {
@@ -812,16 +806,8 @@ const StaffDashboardInit = (function() {
             if (date.getFullYear() !== year) continue;
 
             try {
-                // Single fetch per day (was two separate fetches before)
                 const orders = await StaffDashboardService.fetchOrders(dateStr, dateStr);
 
-                // Company-wide archive
-                const revenue = orders.reduce((sum, o) =>
-                    sum + (parseFloat(o.cur_SubTotal) || 0), 0);
-                await StaffDashboardService.archiveDailySales(dateStr, revenue, orders.length);
-                companyArchived++;
-
-                // Per-rep archive (reuse same orders data)
                 const repTotals = {};
                 for (const order of orders) {
                     const repName = StaffDashboardService.normalizeRepName(order.CustomerServiceRep) || 'Unassigned';
@@ -847,8 +833,8 @@ const StaffDashboardInit = (function() {
             }
         }
 
-        if (companyArchived > 0 || perRepArchived > 0) {
-            console.log(`Archived ${companyArchived} company + ${perRepArchived} per-rep days (55-60 days ago) to Caspio`);
+        if (perRepArchived > 0) {
+            console.log(`Archived ${perRepArchived} per-rep days (55-60 days ago) to Caspio`);
         }
     }
 
