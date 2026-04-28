@@ -770,6 +770,7 @@
         card.style.cursor = 'pointer';
         card.addEventListener('click', (e) => {
             if (e.target.closest('.footer-section, .footer-info-row, .card-details-link')) return;
+            try { sessionStorage.setItem('artHubReturnTo', '/dashboards/art-hub-steve.html'); } catch (err) {}
             window.open('/art-request/' + designId, '_blank');
         });
     }
@@ -1788,6 +1789,7 @@
         // Click toast body to open detail page
         toast.querySelector('.art-notif-toast-content').addEventListener('click', (e) => {
             if (e.target.classList.contains('art-notif-toast-close')) return;
+            try { sessionStorage.setItem('artHubReturnTo', '/dashboards/art-hub-steve.html'); } catch (err) {}
             window.open('/art-request/' + notification.designId, '_blank');
         });
 
@@ -2077,6 +2079,7 @@
             if (!card) return;
             var designId = card.dataset.designId;
             if (!designId) return;
+            try { sessionStorage.setItem('artHubReturnTo', '/dashboards/art-hub-steve.html'); } catch (err) {}
             window.open('/art-request/' + encodeURIComponent(designId), '_blank');
         }
 

@@ -91,12 +91,26 @@
         var backLink = document.querySelector('.ard-back-link');
         if (!backLink) return;
         var ref = document.referrer || '';
+        var stickyReturn = '';
+        try { stickyReturn = sessionStorage.getItem('artHubReturnTo') || ''; } catch (e) {}
+        // URL view-param wins — AE/customer links opened from email must never
+        // be hijacked by Steve's sessionStorage flag.
+        var viewParam = new URLSearchParams(window.location.search).get('view');
+        if (viewParam === 'ae') {
+            backLink.textContent = '← Back to AE Dashboard';
+            backLink.href = '/dashboards/ae-dashboard.html';
+            return;
+        }
+        if (viewParam === 'customer') return; // back link hidden later by customer-view block
         if (ref.indexOf('/dashboards/art-hub-steve') !== -1) {
             backLink.textContent = '\u2190 Back to Art Hub';
             backLink.href = '/dashboards/art-hub-steve.html';
         } else if (ref.indexOf('/ae-dashboard') !== -1 || ref.indexOf('/dashboards/ae-dashboard') !== -1) {
             backLink.textContent = '\u2190 Back to AE Dashboard';
             backLink.href = '/dashboards/ae-dashboard.html';
+        } else if (stickyReturn === '/dashboards/art-hub-steve.html') {
+            backLink.textContent = '\u2190 Back to Art Hub';
+            backLink.href = '/dashboards/art-hub-steve.html';
         } else if (window.opener || (window.history.length <= 2 && !ref)) {
             backLink.textContent = '\u2190 Close Tab';
             backLink.href = '#';

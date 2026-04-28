@@ -180,6 +180,26 @@
     isAeView = urlParams.get('view') === 'ae';
     var isCustomerView = urlParams.get('view') === 'customer';
 
+    // ── Smart Back Navigation (runs before view-mode branches) ──────────
+    // AE view + customer view re-assign textContent/href below and override.
+    (function setupBackNavigation() {
+        var backLink = document.getElementById('pmd-back-link');
+        if (!backLink) return;
+        // URL view-param wins — AE/customer links opened from email must never
+        // be hijacked by Steve's sessionStorage flag.
+        if (isAeView || isCustomerView) return;
+        var ref = document.referrer || '';
+        var stickyReturn = '';
+        try { stickyReturn = sessionStorage.getItem('artHubReturnTo') || ''; } catch (e) {}
+        if (ref.indexOf('/dashboards/art-hub-steve') !== -1 || stickyReturn === '/dashboards/art-hub-steve.html') {
+            backLink.textContent = '← Back to Art Hub';
+            backLink.href = '/dashboards/art-hub-steve.html';
+        } else if (ref.indexOf('/art-hub-ruth') !== -1) {
+            backLink.textContent = '← Back to Dashboard';
+            backLink.href = '/art-hub-ruth.html';
+        }
+    })();
+
     // Adjust header for AE view
     if (isAeView) {
         var headerTitle = document.getElementById('pmd-header-title');

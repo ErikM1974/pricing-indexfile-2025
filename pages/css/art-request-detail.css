@@ -35,18 +35,35 @@ body {
 .ard-header-text h1 {
     font-size: 20px;
     font-weight: 600;
-    margin-bottom: 2px;
+    margin-bottom: 6px;
 }
 
 .ard-back-link {
-    color: rgba(255,255,255,0.85);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,255,255,0.18);
+    color: #fff;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
 
 .ard-back-link:hover {
-    color: white;
-    text-decoration: underline;
+    background: #fff;
+    color: #006600;
+    text-decoration: none;
+    transform: translateX(-2px);
+}
+
+@media (max-width: 640px) {
+    .ard-back-link {
+        font-size: 13px;
+        padding: 4px 10px;
+    }
 }
 
 /* ── Loading ────────────────────────────────────────── */
