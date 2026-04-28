@@ -189,6 +189,34 @@
         var lineCountPill = (t.line_count && t.line_count > 1)
             ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' transfers</span>'
             : '';
+        // File-count pill — shown when ≥2 files are attached. Single-file rows
+        // (the common case) stay clean. file_count comes from the includeLineCount
+        // batch on the list endpoint (caspio-pricing-proxy v=ON_ROLLOUT). Fallback
+        // counts the legacy flat columns for backend versions that pre-date the
+        // child-table aggregation.
+        var fileCountValue = t.file_count;
+        if (fileCountValue === undefined || fileCountValue === null) {
+            fileCountValue = 0;
+            if (t.Working_File_URL) fileCountValue++;
+            if (t.Additional_File_1_URL) fileCountValue++;
+            if (t.Additional_File_2_URL) fileCountValue++;
+        }
+        var fileCountPill = (fileCountValue > 1)
+            ? '<span class="bt-pill bt-pill--files"><i class="fas fa-paperclip"></i> ' + fileCountValue + ' files</span>'
+            : '';
+
+        // Mockup thumbnail — left-aligned hero on the card.
+        // Source priority: backend-supplied mockup_thumbnail_url → legacy
+        // Additional_File_1_URL (fallback for backend versions that pre-date
+        // the synthesis logic) → placeholder icon.
+        var thumbUrl = t.mockup_thumbnail_url || t.Additional_File_1_URL || null;
+        var thumb;
+        if (thumbUrl) {
+            thumb = '<img class="bt-card-thumb" src="' + escapeHtml(thumbUrl) +
+                '" alt="" loading="lazy" onerror="this.classList.add(\'bt-card-thumb--err\');this.removeAttribute(\'src\');">';
+        } else {
+            thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image"></i></div>';
+        }
 
         // Delete menu only pre-Supacolor (before order placed). Post-order
         // → Cancel from the detail page (preserves audit).
@@ -231,18 +259,21 @@
                     deleteMenu +
                 '</div>' +
             '</div>' +
-            '<div class="bt-card-body">' +
-                '<h3 class="bt-card-title">' +
-                    (t.Design_Number ? '#' + escapeHtml(t.Design_Number) + ' &middot; ' : '') +
-                    escapeHtml(t.Company_Name || 'No company') +
-                '</h3>' +
-                subtitle +
-                (t.Customer_Name && t.Customer_Name !== t.Company_Name
-                    ? '<div class="bt-card-design">' + escapeHtml(t.Customer_Name) + '</div>'
-                    : '') +
+            '<div class="bt-card-body bt-card-body--with-thumb">' +
+                thumb +
+                '<div class="bt-card-body-text">' +
+                    '<h3 class="bt-card-title">' +
+                        (t.Design_Number ? '#' + escapeHtml(t.Design_Number) + ' &middot; ' : '') +
+                        escapeHtml(t.Company_Name || 'No company') +
+                    '</h3>' +
+                    subtitle +
+                    (t.Customer_Name && t.Customer_Name !== t.Company_Name
+                        ? '<div class="bt-card-design">' + escapeHtml(t.Customer_Name) + '</div>'
+                        : '') +
+                '</div>' +
             '</div>' +
-            (scLink || lineCountPill
-                ? '<div class="bt-card-footer">' + lineCountPill + scLink + '</div>'
+            (scLink || lineCountPill || fileCountPill
+                ? '<div class="bt-card-footer">' + lineCountPill + fileCountPill + scLink + '</div>'
                 : '') +
         '</div>';
     }

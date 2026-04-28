@@ -27,7 +27,11 @@
     // ── Config ───────────────────────────────────────────────────────
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    var MAX_FILES = 3;
+    // Multi-file flow (v2026.04.28): the modal accepts up to MAX_WORKING_FILES
+    // working files + 1 mockup. Hard stop at 20 so Steve can't paste a folder
+    // index and accidentally send hundreds of rows; soft warn at 10.
+    var MAX_WORKING_FILES = 20;
+    var SOFT_WARN_FILES = 10;
 
     // EmailJS (shared with art-actions-shared.js)
     var EMAILJS_SERVICE_ID = 'service_jgrave3';
@@ -225,49 +229,77 @@
 
     /**
      * Pre-render the files list as HTML for inclusion in emails.
-     * Supports primary + up to 2 additional files.
+     *
+     * Multi-file flow: prefers `record._files` (in-memory pass-through from
+     * handleSubmit) or `record.files` (from backend GET) when present. Falls
+     * back to the legacy flat columns for old rows.
      */
     function buildFilesHtml(record) {
         // Reorders intentionally carry no files — the reorder_banner_html explains why.
-        // Return empty string so the EmailJS template's {{{files_html}}} collapses cleanly.
         if (record && record.Is_Reorder) return '';
 
-        var files = [];
-        if (record.Working_File_URL) {
-            files.push({
-                label: 'Primary' + (record.Working_File_Type ? ' (' + record.Working_File_Type + ')' : ''),
-                name: record.Working_File_Name || 'primary file',
-                url: record.Working_File_URL
+        var src = (record && (record._files || record.files)) || null;
+        var workingFiles = [];
+        var mockupFile = null;
+
+        if (Array.isArray(src) && src.length > 0) {
+            // Post-migration: child-table rows or in-memory pass-through.
+            src.forEach(function (f) {
+                if (!f || !f.File_URL) return;
+                if (f.File_Type === 'mockup') {
+                    if (!mockupFile) mockupFile = f;
+                } else {
+                    workingFiles.push(f);
+                }
             });
-        }
-        if (record.Additional_File_1_URL) {
-            files.push({
-                label: 'Additional 1',
-                name: record.Additional_File_1_Name || 'file 2',
-                url: record.Additional_File_1_URL
-            });
-        }
-        if (record.Additional_File_2_URL) {
-            files.push({
-                label: 'Additional 2',
-                name: record.Additional_File_2_Name || 'file 3',
-                url: record.Additional_File_2_URL
-            });
+        } else {
+            // Legacy fallback: flat columns on the parent.
+            if (record.Working_File_URL) {
+                workingFiles.push({
+                    File_Name: record.Working_File_Name || 'primary file',
+                    File_URL: record.Working_File_URL,
+                    File_MIME: record.Working_File_Type || null
+                });
+            }
+            if (record.Additional_File_1_URL) {
+                // Legacy slot 1 was reserved for the mockup.
+                mockupFile = {
+                    File_Name: record.Additional_File_1_Name || 'mockup',
+                    File_URL: record.Additional_File_1_URL
+                };
+            }
+            if (record.Additional_File_2_URL) {
+                workingFiles.push({
+                    File_Name: record.Additional_File_2_Name || 'additional file',
+                    File_URL: record.Additional_File_2_URL
+                });
+            }
         }
 
-        // Heading is bundled here so the template only needs {{{files_html}}} —
-        // when there are no files (reorder OR edge case) the whole section vanishes.
-        var heading = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Working Files</h3>';
-
-        if (files.length === 0) {
-            return heading +
+        if (workingFiles.length === 0 && !mockupFile) {
+            return '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Working Files</h3>' +
                 '<div style="padding:10px 12px;background:#fef3c7;border:1px solid #fbbf24;border-radius:6px;font-size:13px;color:#92400e;">No working files attached.</div>';
         }
-        return heading + files.map(function (f) {
-            return '<div style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:6px;font-size:13px;">' +
-                   '<strong>' + escapeHtml(f.label) + ':</strong> ' + escapeHtml(f.name) +
-                   ' · <a href="' + escapeHtml(f.url) + '" style="color:#4a6fa5;">Open in Box →</a></div>';
-        }).join('');
+
+        var workingHeading = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Working Files (' + workingFiles.length + ')</h3>';
+        var workingBlock = workingFiles.length === 0 ? '' :
+            workingHeading + workingFiles.map(function (f, i) {
+                var sub = f.File_MIME ? ' (' + escapeHtml(f.File_MIME) + ')' : '';
+                return '<div style="padding:10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:6px;margin-bottom:6px;font-size:13px;">' +
+                       '<strong>#' + (i + 1) + ':</strong> ' + escapeHtml(f.File_Name || 'file') + sub +
+                       ' · <a href="' + escapeHtml(f.File_URL) + '" style="color:#4a6fa5;">Open in Box →</a></div>';
+            }).join('');
+
+        var mockupBlock = '';
+        if (mockupFile) {
+            mockupBlock = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Mockup</h3>' +
+                '<div style="padding:10px 12px;background:#eff6ff;border:1px solid #93c5fd;border-radius:6px;margin-bottom:6px;font-size:13px;">' +
+                    '<strong>📷 Mockup:</strong> ' + escapeHtml(mockupFile.File_Name || 'mockup') +
+                    ' · <a href="' + escapeHtml(mockupFile.File_URL) + '" style="color:#4a6fa5;">Open in Box →</a>' +
+                '</div>';
+        }
+
+        return workingBlock + mockupBlock;
     }
 
     /**
@@ -824,7 +856,24 @@
 
     function newLinkRow() {
         _rowIdCounter++;
-        return { id: 'tas-link-' + _rowIdCounter, url: '', status: 'idle', analysis: null, error: null };
+        // userType: optional manual override of the auto-detected file type.
+        //   'working' | 'mockup' | null. When null, falls back to filenameParsed.type
+        //   (with 'transfer' normalized to 'working' for the backend's File_Type enum).
+        return { id: 'tas-link-' + _rowIdCounter, url: '', status: 'idle', analysis: null, error: null, userType: null };
+    }
+
+    /**
+     * Resolve the effective file type for a row, applying userType override or
+     * falling back to the filename-parsed type. Returns 'working' | 'mockup' | 'reference'.
+     * (Backend File_Type enum: 'working', 'mockup', 'reference'. Filename parser
+     * uses 'transfer' which we translate to 'working' here.)
+     */
+    function effectiveFileType(row) {
+        if (!row || !row.analysis) return 'working';
+        if (row.userType) return row.userType;
+        var parsedType = row.analysis.filenameParsed && row.analysis.filenameParsed.type;
+        if (parsedType === 'mockup') return 'mockup';
+        return 'working'; // 'transfer' or anything else
     }
 
     function addLinkRow(focusAfter) {
@@ -864,7 +913,7 @@
         } else if (row.status === 'err') {
             statusBlock = '<div class="tas-row-status tas-row-status--err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(row.error || 'Analysis failed') + '</div>';
         } else if (row.status === 'ok' && row.analysis) {
-            statusBlock = renderAnalysisCard(row.analysis);
+            statusBlock = renderAnalysisCard(row.analysis, row);
         }
 
         return '<div class="tas-link-row" data-row-id="' + escapeHtml(row.id) + '">' +
@@ -876,11 +925,13 @@
         '</div>';
     }
 
-    function renderAnalysisCard(a) {
+    function renderAnalysisCard(a, row) {
         var parsed = a.filenameParsed || {};
-        var type = parsed.type || 'file';
-        var badgeIcon = type === 'mockup' ? 'image' : 'file-image';
-        var badgeLabel = type === 'mockup' ? 'Mockup' : 'Transfer';
+        // Effective type respects Steve's manual override (row.userType).
+        var effective = row ? effectiveFileType(row) : (parsed.type === 'mockup' ? 'mockup' : 'working');
+        var cardType = effective === 'mockup' ? 'mockup' : 'transfer';
+        var badgeIcon = effective === 'mockup' ? 'image' : 'file-image';
+        var badgeLabel = effective === 'mockup' ? 'Mockup' : 'Working file';
 
         var sizeStr = a.sizeBytes ? formatBytes(a.sizeBytes) : '';
         var pxStr = (a.pixelWidth && a.pixelHeight) ? (a.pixelWidth + '\u00d7' + a.pixelHeight + 'px') : '';
@@ -891,7 +942,7 @@
         var metaLine = [a.mimeType || 'file', sizeStr, pxStr, dpiStr, physStr].filter(Boolean).join(' \u00b7 ');
 
         var placementLine = '';
-        if (type === 'transfer' && parsed.placementLabel) {
+        if (effective === 'working' && parsed.placementLabel) {
             placementLine = '<div class="tas-row-place"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(parsed.placementLabel) + '</div>';
         }
 
@@ -902,10 +953,27 @@
                 '</div>';
         }
 
-        return '<div class="tas-row-card tas-row-card--' + escapeHtml(type) + '">' +
+        // Manual type toggle \u2014 Steve can override the auto-classification.
+        // Two segmented buttons: Working / Mockup. Reference type is implicit (not surfaced).
+        var typeToggle = '';
+        if (row) {
+            var rid = escapeHtml(row.id);
+            typeToggle =
+                '<div class="tas-row-type-toggle" role="group" aria-label="File type">' +
+                    '<button type="button" class="tas-type-btn ' + (effective === 'working' ? 'tas-type-btn--active' : '') + '" data-action="set-type" data-row-id="' + rid + '" data-type="working">' +
+                        '<i class="fas fa-file-image"></i> Working' +
+                    '</button>' +
+                    '<button type="button" class="tas-type-btn ' + (effective === 'mockup' ? 'tas-type-btn--active' : '') + '" data-action="set-type" data-row-id="' + rid + '" data-type="mockup">' +
+                        '<i class="fas fa-image"></i> Mockup' +
+                    '</button>' +
+                '</div>';
+        }
+
+        return '<div class="tas-row-card tas-row-card--' + escapeHtml(cardType) + '">' +
             '<div class="tas-row-head">' +
                 '<span class="tas-row-badge"><i class="fas fa-' + escapeHtml(badgeIcon) + '"></i> ' + escapeHtml(badgeLabel) + '</span>' +
                 '<span class="tas-row-filename">' + escapeHtml(a.fileName || '') + '</span>' +
+                typeToggle +
             '</div>' +
             '<div class="tas-row-meta">' + escapeHtml(metaLine) + '</div>' +
             placementLine +
@@ -917,9 +985,11 @@
         var container = $('#tas-mockup-summary');
         if (!container) return;
 
-        var mockupAnalysis = modalState.linkRows
-            .map(function (r) { return r.analysis; })
-            .find(function (a) { return a && a.filenameParsed && a.filenameParsed.type === 'mockup'; });
+        // Pick the row whose effective type is 'mockup' (respects manual toggle).
+        var mockupRow = modalState.linkRows.find(function (r) {
+            return r.status === 'ok' && r.analysis && effectiveFileType(r) === 'mockup';
+        });
+        var mockupAnalysis = mockupRow ? mockupRow.analysis : null;
 
         if (!mockupAnalysis) {
             container.style.display = 'none';
@@ -982,6 +1052,19 @@
                 if (row) row.url = this.value;
             });
         });
+        // Working / Mockup type toggle — manual override of auto-classification.
+        $$('.tas-type-btn[data-action="set-type"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var rowId = this.getAttribute('data-row-id');
+                var newType = this.getAttribute('data-type');
+                var row = modalState.linkRows.find(function (r) { return r.id === rowId; });
+                if (!row) return;
+                row.userType = newType;
+                renderLinkRows();
+                updateSubmitButton();
+                renderMockupSummary();
+            });
+        });
     }
 
     function onLinkChange(rowId) {
@@ -1030,15 +1113,63 @@
     function updateSubmitButton() {
         var btn = $('#tas-submit-btn');
         if (!btn) return;
-        var hasTransfer = modalState.linkRows.some(function (r) {
-            return r.status === 'ok' && r.analysis && r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'transfer';
+        // Count effective types (respects userType override)
+        var workingCount = 0;
+        var mockupCount = 0;
+        modalState.linkRows.forEach(function (r) {
+            if (r.status !== 'ok' || !r.analysis) return;
+            var t = effectiveFileType(r);
+            if (t === 'working') workingCount++;
+            else if (t === 'mockup') mockupCount++;
         });
-        var hasMockup = modalState.linkRows.some(function (r) {
-            return r.status === 'ok' && r.analysis && r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'mockup';
-        });
-        btn.disabled = !hasTransfer;
+        var hasTransfer = workingCount > 0;
+        var hasMockup = mockupCount > 0;
+        // Block submit on too-many-mockups (single-mockup rule).
+        // Backend would also reject, but a client-side block is faster + clearer.
+        var tooManyMockups = mockupCount > 1;
+        // Soft cap on working files
+        var tooManyWorking = workingCount > MAX_WORKING_FILES;
+        btn.disabled = !hasTransfer || tooManyMockups || tooManyWorking;
         renderFileChecklist(hasTransfer, hasMockup);
-        toggleMockupWarning(hasTransfer && !hasMockup);
+        renderWarnings(hasTransfer, hasMockup, workingCount, mockupCount);
+    }
+
+    /**
+     * Single source of truth for the #tas-mockup-warning slot. Priority:
+     *   1. mockupCount > 1 → "only one mockup allowed" (blocks submit)
+     *   2. workingCount > MAX → "too many working files" (blocks submit)
+     *   3. workingCount > SOFT → "that's a lot of files" (info, no block)
+     *   4. has working but no mockup → "no mockup, sales rep won't auto-fill"
+     *   5. otherwise hide
+     */
+    function renderWarnings(hasTransfer, hasMockup, workingCount, mockupCount) {
+        var warn = $('#tas-mockup-warning');
+        if (!warn) return;
+        if (mockupCount > 1) {
+            warn.style.display = '';
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+                '<span>Only <strong>one mockup</strong> is allowed per transfer. Toggle the extras to "Working" before sending.</span>';
+            return;
+        }
+        if (workingCount > MAX_WORKING_FILES) {
+            warn.style.display = '';
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+                '<span>Too many working files (' + workingCount + '). Max ' + MAX_WORKING_FILES + ' per transfer.</span>';
+            return;
+        }
+        if (workingCount > SOFT_WARN_FILES) {
+            warn.style.display = '';
+            warn.innerHTML = '<i class="fas fa-info-circle"></i>' +
+                '<span>That’s a lot of working files (' + workingCount + '). Bradley will see them all on his queue card.</span>';
+            return;
+        }
+        if (hasTransfer && !hasMockup) {
+            warn.style.display = '';
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+                '<span>No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.</span>';
+            return;
+        }
+        warn.style.display = 'none';
     }
 
     // Update the live checklist that shows whether Steve has both file types.
@@ -1062,11 +1193,6 @@
         checklist.classList.toggle('tas-checklist--incomplete', !bothDone);
     }
 
-    function toggleMockupWarning(show) {
-        var warn = $('#tas-mockup-warning');
-        if (!warn) return;
-        warn.style.display = show ? '' : 'none';
-    }
 
     // ── Open / Close ─────────────────────────────────────────────────
 
@@ -1129,15 +1255,22 @@
         }
 
         var good = modalState.linkRows.filter(function (r) { return r.status === 'ok' && r.analysis; });
-        var transfers = good
-            .filter(function (r) { return r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'transfer'; })
-            .map(function (r) { return r.analysis; });
-        var mockups = good
-            .filter(function (r) { return r.analysis.filenameParsed && r.analysis.filenameParsed.type === 'mockup'; })
-            .map(function (r) { return r.analysis; });
+        // Multi-file flow: split rows by EFFECTIVE type (respects manual toggle override).
+        var workingRows = good.filter(function (r) { return effectiveFileType(r) === 'working'; });
+        var mockupRows = good.filter(function (r) { return effectiveFileType(r) === 'mockup'; });
+        var transfers = workingRows.map(function (r) { return r.analysis; });
+        var mockups = mockupRows.map(function (r) { return r.analysis; });
 
         if (transfers.length === 0) {
-            showToast('Need at least one transfer file before sending.', 'error');
+            showToast('Need at least one working file before sending.', 'error');
+            return;
+        }
+        if (mockups.length > 1) {
+            showToast('Only one mockup allowed per transfer. Toggle the extras to "Working" first.', 'error');
+            return;
+        }
+        if (transfers.length > MAX_WORKING_FILES) {
+            showToast('Too many working files (' + transfers.length + '). Max ' + MAX_WORKING_FILES + ' per transfer.', 'error');
             return;
         }
 
@@ -1175,6 +1308,40 @@
                 };
             });
 
+            // Build the multi-file children array. Order: working files (in submit
+            // order) first, mockup last. Backend assigns File_Order = 1..N.
+            // Thumbnail_URL uses the same /api/box/thumbnail/{id} proxy as the
+            // Steve gallery (v557) so Bradley's queue card can render it directly.
+            var filesPayload = transfers.map(function (t) {
+                return {
+                    File_Type: 'working',
+                    File_URL: t.sharedLink,
+                    File_Name: t.fileName,
+                    File_MIME: t.mimeType || null,
+                    Box_File_ID: t.fileId,
+                    Thumbnail_URL: t.fileId ? (API_BASE + '/api/box/thumbnail/' + encodeURIComponent(t.fileId)) : null,
+                    Width_Px: t.pixelWidth || null,
+                    Height_Px: t.pixelHeight || null,
+                    Width_In: t.physicalWidthIn || null,
+                    Height_In: t.physicalHeightIn || null,
+                    File_Notes: (t.filenameParsed && t.filenameParsed.placementLabel) || null
+                };
+            });
+            if (mockup) {
+                filesPayload.push({
+                    File_Type: 'mockup',
+                    File_URL: mockup.sharedLink,
+                    File_Name: mockup.fileName,
+                    File_MIME: mockup.mimeType || null,
+                    Box_File_ID: mockup.fileId,
+                    Thumbnail_URL: mockup.fileId ? (API_BASE + '/api/box/thumbnail/' + encodeURIComponent(mockup.fileId)) : null,
+                    Width_Px: mockup.pixelWidth || null,
+                    Height_Px: mockup.pixelHeight || null,
+                    Width_In: mockup.physicalWidthIn || null,
+                    Height_In: mockup.physicalHeightIn || null
+                });
+            }
+
             var payload = {
                 Design_Number: parsed.designNumber,
                 Company_Name: parsed.customer,
@@ -1188,6 +1355,13 @@
                 Requested_By: user.email,
                 Requested_By_Name: user.name,
                 lines: lines,
+                files: filesPayload,
+                // Legacy flat columns — still populated for back-compat reads on
+                // any code path that hasn't migrated to files[] yet (e.g., the
+                // mockup-detail and art-request-detail status badges, EmailJS
+                // template fallback). The first working file = primary,
+                // mockup goes in slot 1, second working in slot 2 (matches the
+                // pre-migration schema).
                 Working_File_URL: primary.sharedLink,
                 Working_File_Name: primary.fileName,
                 Working_File_Type: primary.mimeType,
@@ -1207,7 +1381,9 @@
                 console.log('[DRYRUN] POST /api/transfer-orders', payload);
                 var fakeRecord = Object.assign({ ID_Transfer: 'ST-DRYRUN-0000' }, payload);
                 delete fakeRecord.lines;
+                delete fakeRecord.files;
                 fakeRecord._lines = lines;
+                fakeRecord._files = filesPayload;
                 var overrides = { to_email: BRADLEY_EMAIL, cc_email: user.email };
                 if (isRush) {
                     overrides.rush_subject_suffix = ' \ud83d\udea8 RUSH';
@@ -1239,16 +1415,27 @@
             }
 
             closeModal();
-            var linesStr = lines.length > 1 ? (' (' + lines.length + ' transfers)') : '';
+            // Build a count summary: "(3 working files + mockup)" / "(1 working file)" / etc.
+            var filesStr;
+            if (transfers.length > 1 && mockups.length) {
+                filesStr = ' (' + transfers.length + ' working files + mockup)';
+            } else if (transfers.length > 1) {
+                filesStr = ' (' + transfers.length + ' working files)';
+            } else {
+                filesStr = lines.length > 1 ? (' (' + lines.length + ' transfers)') : '';
+            }
             // If Steve sent without a mockup, append a nudge so he sees the
             // consequence right at confirmation (not later when Bradley pings him).
             var noMockupNudge = (mockups.length === 0)
                 ? ' — ⚠ No mockup attached, Bradley will fill in sales rep manually.'
                 : '';
             var toastType = (mockups.length === 0) ? 'warning' : 'success';
-            showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + linesStr + '.' + noMockupNudge, toastType);
+            showToast('Transfer ' + (createData.record.ID_Transfer || '') + ' sent to Bradley' + filesStr + '.' + noMockupNudge, toastType);
 
-            var recordForEmail = Object.assign({}, createData.record, { _lines: createData.lines || lines });
+            var recordForEmail = Object.assign({}, createData.record, {
+                _lines: createData.lines || lines,
+                _files: createData.files || filesPayload
+            });
             // v3: pass mockup vision extras so the submit email includes
             // garment + transfer type (fields we don't persist to Caspio).
             var visionExtras = vision ? {

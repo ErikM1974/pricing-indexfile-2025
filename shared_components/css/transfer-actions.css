@@ -795,6 +795,36 @@
 .tas-row-card--mockup .tas-row-badge { background: #f3e8ff; color: #6b21a8; }
 .tas-row-card--transfer .tas-row-badge { background: #dcfce7; color: #14532d; }
 
+/* Working / Mockup type toggle on each picked file's analysis card. */
+.tas-row-type-toggle {
+    display: inline-flex;
+    border: 1px solid #cbd5e1;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #f8fafc;
+    margin-left: auto;
+}
+.tas-type-btn {
+    background: transparent;
+    border: none;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.12s, color 0.12s;
+}
+.tas-type-btn:hover { background: #e2e8f0; color: #1e293b; }
+.tas-type-btn + .tas-type-btn { border-left: 1px solid #cbd5e1; }
+.tas-type-btn--active {
+    background: #4a6fa5;
+    color: white;
+}
+.tas-type-btn--active:hover { background: #3b5a8a; color: white; }
+
 .tas-row-filename {
     font-size: 13px;
     color: #1e293b;

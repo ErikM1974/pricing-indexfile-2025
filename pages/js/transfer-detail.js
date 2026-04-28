@@ -26,6 +26,10 @@
         record: null,
         notes: [],
         lines: [], // Transfer_Order_Lines child rows (v2026.04.24 multi-line support)
+        files: [], // Transfer_Order_Files child rows (v2026.04.28 multi-file support).
+                   // Backend returns synthesized rows from legacy flat columns when
+                   // no child rows exist, so this is always non-empty for any
+                   // transfer that has at least one file attached.
         user: null, // { email, name }
         // Extracted-from-screenshot values that aren't shown in the modal forms —
         // saved to the record alongside a status transition (Carrier, Shipping_Method,
@@ -614,34 +618,48 @@
         var r = state.record;
         var panel = $('td-artwork-panel');
 
-        // Collect up to 3 files (primary + 2 additional)
-        var files = [];
-        if (r.Working_File_URL) {
-            files.push({
-                url: r.Working_File_URL,
-                name: r.Working_File_Name || 'Primary file',
-                type: r.Working_File_Type || '',
-                label: 'Primary'
-            });
+        // Multi-file flow: state.files comes from backend GET (which synthesizes
+        // from legacy flat columns when no child rows exist). Client-side
+        // synthesis duplicated here so the page still renders correctly when
+        // talking to a backend version that pre-dates the synthesis (e.g.,
+        // production Heroku before the v=ON_ROLLOUT deploy).
+        var allFiles = state.files || [];
+        if (allFiles.length === 0) {
+            if (r.Working_File_URL) {
+                allFiles.push({
+                    File_Order: 1,
+                    File_Type: 'working',
+                    File_URL: r.Working_File_URL,
+                    File_Name: r.Working_File_Name || null,
+                    File_MIME: r.Working_File_Type || null,
+                    Box_File_ID: r.Box_File_ID || null,
+                    Thumbnail_URL: null
+                });
+            }
+            if (r.Additional_File_1_URL) {
+                allFiles.push({
+                    File_Order: 2,
+                    // Legacy slot 1 was reserved for the mockup.
+                    File_Type: 'mockup',
+                    File_URL: r.Additional_File_1_URL,
+                    File_Name: r.Additional_File_1_Name || null,
+                    Thumbnail_URL: null
+                });
+            }
+            if (r.Additional_File_2_URL) {
+                allFiles.push({
+                    File_Order: 3,
+                    File_Type: 'reference',
+                    File_URL: r.Additional_File_2_URL,
+                    File_Name: r.Additional_File_2_Name || null,
+                    Thumbnail_URL: null
+                });
+            }
         }
-        if (r.Additional_File_1_URL) {
-            files.push({
-                url: r.Additional_File_1_URL,
-                name: r.Additional_File_1_Name || 'Additional file 1',
-                type: '',
-                label: 'Additional 1'
-            });
-        }
-        if (r.Additional_File_2_URL) {
-            files.push({
-                url: r.Additional_File_2_URL,
-                name: r.Additional_File_2_Name || 'Additional file 2',
-                type: '',
-                label: 'Additional 2'
-            });
-        }
+        var workingFiles = allFiles.filter(function (f) { return f.File_Type !== 'mockup'; });
+        var mockupFile = allFiles.find(function (f) { return f.File_Type === 'mockup'; });
 
-        if (files.length === 0) {
+        if (allFiles.length === 0) {
             if (r.Is_Reorder) {
                 panel.innerHTML = '<div class="td-empty-panel" style="background:#f0fdf4;border-left:3px solid #16a34a;padding:10px 14px;color:#166534;"><i class="fas fa-info-circle"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
             } else {
@@ -651,28 +669,49 @@
         }
 
         var html = '';
-        files.forEach(function (f, idx) {
-            var isImage = /\.(jpe?g|png|gif|webp)$/i.test(f.name);
-            html += '<div class="td-artwork-file-group" style="margin-bottom:' + (idx < files.length - 1 ? '12px' : '0') + ';">';
-            if (isImage) {
-                html += '<img src="' + escapeHtml(f.url) + '" alt="' + escapeHtml(f.name) + '" class="td-artwork-preview" onerror="this.style.display=\'none\';">';
-            }
-            html += '<div class="td-artwork-file">' +
-                        '<div style="flex:1; min-width:0;">' +
-                            '<div class="td-artwork-filename">' +
-                                '<span class="td-artwork-badge">' + escapeHtml(f.label) + '</span> ' +
-                                escapeHtml(f.name) +
-                            '</div>' +
-                            (f.type ? '<div class="td-artwork-meta">' + escapeHtml(f.type) + '</div>' : '') +
+
+        // Mockup hero — full-width thumbnail at top, click → Box file.
+        if (mockupFile) {
+            var mockupName = mockupFile.File_Name || 'mockup';
+            var mockupUrl = mockupFile.File_URL || '#';
+            var thumbSrc = mockupFile.Thumbnail_URL || mockupFile.File_URL;
+            html += '<div class="td-artwork-mockup-hero">' +
+                        '<a href="' + escapeHtml(mockupUrl) + '" target="_blank" rel="noopener" class="td-artwork-mockup-link">' +
+                            '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(mockupName) + '" class="td-artwork-mockup-img" onerror="this.classList.add(\'td-artwork-mockup-img--err\'); this.removeAttribute(\'src\');">' +
+                        '</a>' +
+                        '<div class="td-artwork-mockup-meta">' +
+                            '<span class="td-artwork-badge td-artwork-badge--mockup"><i class="fas fa-image"></i> Mockup</span> ' +
+                            escapeHtml(mockupName) +
+                            ' <a href="' + escapeHtml(mockupUrl) + '" target="_blank" rel="noopener" class="td-artwork-open-link"><i class="fas fa-external-link-alt"></i> Open</a>' +
                         '</div>' +
-                        '<div class="td-artwork-actions">' +
-                            '<a href="' + escapeHtml(f.url) + '" target="_blank" rel="noopener" class="bt-btn bt-btn--secondary bt-btn--small">' +
-                                '<i class="fas fa-external-link-alt"></i> Open' +
-                            '</a>' +
-                        '</div>' +
-                    '</div>' +
                     '</div>';
-        });
+        }
+
+        // Working files grid — one tile per working file.
+        if (workingFiles.length > 0) {
+            html += '<h4 class="td-artwork-section-heading">Working Files (' + workingFiles.length + ')</h4>';
+            html += '<div class="td-artwork-files-grid">';
+            workingFiles.forEach(function (f) {
+                var name = f.File_Name || 'file';
+                var url = f.File_URL || '#';
+                var mime = f.File_MIME || '';
+                var isImage = /\.(jpe?g|png|gif|webp)$/i.test(name) ||
+                    /^image\//i.test(mime);
+                var thumbSrc = f.Thumbnail_URL || (isImage ? url : null);
+                var thumb = thumbSrc
+                    ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" class="td-artwork-tile-thumb" onerror="this.parentElement.innerHTML = \'<div class=&quot;td-artwork-tile-thumb td-artwork-tile-thumb--placeholder&quot;><i class=&quot;fas fa-file&quot;></i></div>\';">'
+                    : '<div class="td-artwork-tile-thumb td-artwork-tile-thumb--placeholder"><i class="fas fa-file"></i></div>';
+                html += '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-artwork-tile" title="' + escapeHtml(name) + '">' +
+                            thumb +
+                            '<div class="td-artwork-tile-meta">' +
+                                '<div class="td-artwork-tile-name">' + escapeHtml(name) + '</div>' +
+                                (mime ? '<div class="td-artwork-tile-mime">' + escapeHtml(mime) + '</div>' : '') +
+                            '</div>' +
+                        '</a>';
+            });
+            html += '</div>';
+        }
+
         panel.innerHTML = html;
     }
 
@@ -1488,6 +1527,7 @@
             state.record = data.record;
             state.notes = data.notes || [];
             state.lines = Array.isArray(data.lines) ? data.lines : [];
+            state.files = Array.isArray(data.files) ? data.files : [];
             $('td-loading').style.display = 'none';
             $('td-error').style.display = 'none';
             $('td-main').style.display = '';
