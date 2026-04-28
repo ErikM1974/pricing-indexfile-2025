@@ -51,6 +51,9 @@ tests/orders/
 # Local configuration
 .claude/settings.local.json
 .claude/agents/brand-guidelines-creator.md
+.claude/plans/
+.claude/scheduled_tasks.lock
+.claude/worktrees/
 
 # Specific legacy/deleted files
 shared_components/js/dtg-page-setup-diagnostic.js
@@ -92,4 +95,6 @@ tests/scripts/show-service-codes.js
 tests/ui/test-step1-final.html
 Art-Hub-Dashboard-Update.pptx
 System-Updates-April-10-2026.pptx
+Morning-Huddle-*.pptx
+tests/caspio-datapages.json
 .claude/settings.local.json
