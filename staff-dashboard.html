@@ -8,17 +8,24 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- Dashboard Styles -->
+    <!-- Dashboard Styles (legacy — v2 layers overrides on top) -->
     <link href="/shared_components/css/dashboard-styles.css" rel="stylesheet">
     <link href="/shared_components/css/staff-dashboard-layout.css?v=20260425b" rel="stylesheet">
     <link href="/shared_components/css/staff-dashboard-widgets.css" rel="stylesheet">
-    <!-- Dark Mode Theme -->
     <link href="/shared_components/css/staff-dashboard-dark.css?v=20260425b" rel="stylesheet">
+
+    <!-- v2 design system: tokens (must load BEFORE v2 overrides), then refined visuals -->
+    <link href="/shared_components/css/staff-dashboard-v2-tokens.css?v=20260428" rel="stylesheet">
+    <link href="/shared_components/css/staff-dashboard-v2.css?v=20260428" rel="stylesheet">
 </head>
-<body>
+<body data-theme="dark" data-accent="green" data-density="comfy">
+    <!-- v2 tweaks: applied early to avoid theme flicker. Mounts FAB + drawer on DOMContentLoaded. -->
+    <script src="/shared_components/js/staff-dashboard-v2-tweaks.js?v=20260428"></script>
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
@@ -497,6 +504,8 @@
                             </span>
                             <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
                         </div>
+                        <!-- v2: order count + AOV inline stats (populated by staff-dashboard-v2-extras.js) -->
+                        <div class="metrics-revenue-stats" id="revenueStats" aria-live="polite"></div>
                     </div>
 
                     <!-- Team Performance Card - 2026 YTD -->
@@ -661,6 +670,8 @@
     <script src="/shared_components/js/production-schedule-stats.js"></script>
     <script src="/shared_components/js/production-schedule-predictor.js"></script>
     <script src="/shared_components/js/staff-dashboard-init.js"></script>
+    <!-- v2 extras: revenue stats inline + collapsible tool categories. Loads after legacy init. -->
+    <script src="/shared_components/js/staff-dashboard-v2-extras.js?v=20260428"></script>
 
     <!-- Caspio Authentication Script -->
     <script>

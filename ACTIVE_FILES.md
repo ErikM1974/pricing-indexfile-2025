@@ -522,8 +522,8 @@ cap-embroidery-fix.css
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/staff-dashboard.html` | Main staff dashboard (currently linked from index.html) | Legacy CSS + staff-dashboard-*.js | ✅ Active |
-| `/staff-dashboard-v2.html` | **NEW (2026-04-28)** CSS-refactor of staff dashboard — same HTML/JS, new design tokens (oklch palette, NW green accent, Inter + JetBrains Mono, theme/accent/density Tweaks panel). Build alongside; cut over via index.html when approved. | staff-dashboard-v2-tokens.css, staff-dashboard-v2.css, staff-dashboard-v2-tweaks.js + all legacy staff-dashboard JS | 🧪 Testing |
+| `/staff-dashboard.html` | **NEW (2026-04-28 cut-over)** Main staff dashboard — v2 design (oklch palette, NW green accent, Inter + JetBrains Mono, Tweaks drawer). All existing back-links from index.html, admin/, calculators/, training/ pages resolve here. | staff-dashboard-v2-tokens.css, staff-dashboard-v2.css, staff-dashboard-v2-tweaks.js, staff-dashboard-v2-extras.js + legacy staff-dashboard-*.js services | ✅ Active |
+| `/staff-dashboard-legacy.html` | Pre-cut-over staff dashboard, kept as 90-day safety net. `/staff-dashboard-v2.html` 301-redirects to canonical. | Legacy CSS + staff-dashboard-*.js | 🗄️ Legacy (delete ~2026-07-28) |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |

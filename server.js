@@ -763,8 +763,15 @@ app.get('/staff-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
 });
 
+// Cut-over (2026-04-28): old v2 URL redirects to canonical so any saved
+// bookmarks of /staff-dashboard-v2.html still land on the live dashboard.
 app.get('/staff-dashboard-v2.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard-v2.html'));
+  res.redirect(301, '/staff-dashboard.html');
+});
+
+// Legacy dashboard kept accessible for ~90 days as a safety net post cut-over.
+app.get('/staff-dashboard-legacy.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff-dashboard-legacy.html'));
 });
 
 app.get('/bundle-orders-dashboard.html', (req, res) => {
