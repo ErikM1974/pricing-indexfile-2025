@@ -216,6 +216,20 @@
 .sc-ship-date {
     line-height: 1.2;
 }
+.sc-ship-expected {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #fef3c7;
+    color: #92400e;
+    font-variant-numeric: tabular-nums;
+    width: fit-content;
+}
+.sc-ship-expected i { font-size: 10px; opacity: 0.8; }
 /* Tracking pill under the shipped date. Clickable when carrier is known
    (opens carrier tracking page in new tab); static text otherwise. */
 .sc-track-pill {

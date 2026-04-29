@@ -55,6 +55,18 @@
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
     }
 
+    // Add N business days (M-F) to a date. Returns a new Date.
+    function addBusinessDays(d, n) {
+        var cur = new Date(d);
+        var added = 0;
+        while (added < n) {
+            cur.setDate(cur.getDate() + 1);
+            var dow = cur.getDay();
+            if (dow !== 0 && dow !== 6) added++;
+        }
+        return cur;
+    }
+
     // Count business days between two dates (M-F, weekend excluded).
     // Signed — negative if `to` is before `from` (i.e. overdue).
     // Same-day returns 0.
@@ -146,9 +158,26 @@
     // Build the Shipped cell content — date on top, tracking pill below.
     // Tracking pill is a <span> (not nested <a>) with a delegated click handler
     // in renderTable() to open the carrier page without triggering row navigation.
+    // FedEx LA → Milton WA averages ~1 biz day in our data; round up to 2 for
+    // a safe "expected" ETA. Matches what Mikalah eyeballs.
+    var EXPECTED_TRANSIT_DAYS = 2;
+
     function shippedCellHtml(j) {
         var dateHtml = '<div class="sc-ship-date">' + escapeHtml(formatDate(j.Date_Shipped)) + '</div>';
-        if (!j.Tracking_Number) return dateHtml;
+
+        // Expected receive line — only when Supacolor has shipped AND we
+        // haven't received yet. Once received, the actual date lives in the
+        // Received column; no point repeating an estimate.
+        var expectedHtml = '';
+        var shipped = parseDate(j.Date_Shipped);
+        if (shipped && !j.Date_Received) {
+            var expected = addBusinessDays(shipped, EXPECTED_TRANSIT_DAYS);
+            expectedHtml = '<div class="sc-ship-expected">' +
+                '<i class="fas fa-clock"></i> Expected ' + escapeHtml(formatDate(expected.toISOString())) +
+            '</div>';
+        }
+
+        if (!j.Tracking_Number) return dateHtml + expectedHtml;
 
         var carrierLabel = j.Carrier ? escapeHtml(j.Carrier) : 'Tracking';
         var trackingUrl = trackingUrlFromCarrier(j.Carrier, j.Tracking_Number);
@@ -161,7 +190,8 @@
                 '<i class="fas fa-truck"></i> ' +
                 escapeHtml(carrierLabel) + ' ' +
                 escapeHtml(j.Tracking_Number) +
-            '</span>';
+            '</span>' +
+            expectedHtml;
     }
 
     // ── API ────────────────────────────────────────────────────────────
