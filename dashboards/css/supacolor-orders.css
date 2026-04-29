@@ -150,9 +150,18 @@
     white-space: nowrap;
 }
 .sc-cell--received {
-    color: #6c757d;
+    color: #198754;
     font-size: 13px;
     font-variant-numeric: tabular-nums;
+    font-weight: 500;
+}
+.sc-received-check {
+    font-size: 11px;
+    margin-right: 2px;
+}
+.sc-row--header .sc-cell--received {
+    color: #6c757d;
+    font-weight: 700;
 }
 .sc-cell--shipped {
     color: #6c757d;
