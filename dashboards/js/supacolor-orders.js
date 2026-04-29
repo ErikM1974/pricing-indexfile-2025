@@ -255,6 +255,7 @@
                 '<div class="sc-cell sc-cell--job">#' + escapeHtml(j.Supacolor_Job_Number || '—') + '</div>' +
                 '<div class="sc-cell sc-cell--po">' + escapeHtml(j.PO_Number || '') + '</div>' +
                 '<div class="sc-cell sc-cell--desc">' + escapeHtml(j.Description || '') + '</div>' +
+                '<div class="sc-cell sc-cell--received">' + escapeHtml(formatDate(j.Date_Received)) + '</div>' +
                 '<div class="sc-cell sc-cell--status">' +
                     '<span class="sc-status-badge sc-status-badge--' + statusClass + '">' +
                         escapeHtml(j.Status || '') +
@@ -271,6 +272,7 @@
                     '<div class="sc-cell sc-cell--job">Job #</div>' +
                     '<div class="sc-cell sc-cell--po">PO</div>' +
                     '<div class="sc-cell sc-cell--desc">Description</div>' +
+                    '<div class="sc-cell sc-cell--received">Received</div>' +
                     '<div class="sc-cell sc-cell--status">Status</div>' +
                     '<div class="sc-cell sc-cell--shipped">Shipped</div>' +
                     '<div class="sc-cell sc-cell--chevron"></div>' +

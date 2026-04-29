@@ -99,7 +99,7 @@
 }
 .sc-row {
     display: grid;
-    grid-template-columns: 110px 110px 1fr 110px 130px 24px;
+    grid-template-columns: 110px 110px 1fr 110px 110px 130px 24px;
     gap: 16px;
     align-items: center;
     padding: 14px 20px;
@@ -148,6 +148,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.sc-cell--received {
+    color: #6c757d;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
 }
 .sc-cell--shipped {
     color: #6c757d;
@@ -382,7 +387,7 @@
         gap: 10px;
         padding: 12px 14px;
     }
-    .sc-cell--po, .sc-cell--shipped { display: none; }
+    .sc-cell--po, .sc-cell--shipped, .sc-cell--received { display: none; }
     .sc-cell--desc { font-size: 13px; }
     .sc-preview-row {
         grid-template-columns: 70px 1fr 80px;
