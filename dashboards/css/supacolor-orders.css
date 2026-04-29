@@ -145,9 +145,29 @@
     font-size: 11px;
 }
 .sc-cell--desc {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    overflow: hidden;
+}
+.sc-customer-line {
+    font-weight: 600;
+    color: #2c3e50;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.sc-order-meta {
+    font-size: 11px;
+    color: #6c757d;
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.sc-row--header .sc-cell--desc {
+    display: block;
 }
 .sc-cell--received {
     color: #198754;

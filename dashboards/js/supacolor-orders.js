@@ -197,7 +197,7 @@
             if (f.status && j.Status !== f.status) return false;
 
             if (search) {
-                var hay = [j.Supacolor_Job_Number, j.PO_Number, j.Description]
+                var hay = [j.Supacolor_Job_Number, j.PO_Number, j.Description, j.Customer_Name]
                     .filter(Boolean).join(' ').toLowerCase();
                 if (hay.indexOf(search) === -1) return false;
             }
@@ -254,7 +254,18 @@
             return '<a href="' + detailUrl + '" class="sc-row">' +
                 '<div class="sc-cell sc-cell--job">#' + escapeHtml(j.Supacolor_Job_Number || '—') + '</div>' +
                 '<div class="sc-cell sc-cell--po">' + escapeHtml(j.PO_Number || '') + '</div>' +
-                '<div class="sc-cell sc-cell--desc">' + escapeHtml(j.Description || '') + '</div>' +
+                '<div class="sc-cell sc-cell--desc">' +
+                    '<div class="sc-customer-line">' +
+                        escapeHtml(j.Customer_Name || j.Description || '—') +
+                    '</div>' +
+                    ((j.id_Order || j.Order_Due_Date)
+                        ? '<div class="sc-order-meta">' +
+                            (j.id_Order ? '#' + escapeHtml(String(j.id_Order)) : '') +
+                            (j.id_Order && j.Order_Due_Date ? ' &middot; ' : '') +
+                            (j.Order_Due_Date ? 'Due ' + escapeHtml(formatDate(j.Order_Due_Date)) : '') +
+                          '</div>'
+                        : '') +
+                '</div>' +
                 '<div class="sc-cell sc-cell--received">' +
                     (j.Date_Received
                         ? '<i class="fas fa-check sc-received-check"></i> ' + escapeHtml(formatDate(j.Date_Received))
@@ -275,7 +286,7 @@
                 '<div class="sc-row sc-row--header">' +
                     '<div class="sc-cell sc-cell--job">Job #</div>' +
                     '<div class="sc-cell sc-cell--po">PO</div>' +
-                    '<div class="sc-cell sc-cell--desc">Description</div>' +
+                    '<div class="sc-cell sc-cell--desc">Customer</div>' +
                     '<div class="sc-cell sc-cell--received">Received</div>' +
                     '<div class="sc-cell sc-cell--status">Status</div>' +
                     '<div class="sc-cell sc-cell--shipped">Shipped</div>' +
