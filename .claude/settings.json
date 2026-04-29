@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__Claude_Preview__preview_list",
+      "mcp__Claude_Preview__preview_inspect",
+      "mcp__Claude_Preview__preview_network",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Claude_in_Chrome__read_console_messages",
+      "Bash(heroku config:get *)",
+      "Bash(heroku releases *)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-active-files.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
