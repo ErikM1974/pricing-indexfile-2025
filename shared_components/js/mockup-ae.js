@@ -18,6 +18,10 @@ var MockupAeGallery = (function () {
     var allMockups = [];
     var currentRepFilter = sessionStorage.getItem('ae_dashboard_rep_filter') || 'All';
     var currentSearchText = '';
+    // Bucket filter: 'needs-review' | 'with-ruth' | 'done' | 'all'.
+    // null on first render — render() picks 'needs-review' if there's anything
+    // to review, else 'all'. After that the user owns it.
+    var currentBucketFilter = null;
 
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
@@ -45,6 +49,7 @@ var MockupAeGallery = (function () {
             + '<div class="mockup-loading-spinner" style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:#6B46C1;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
             + 'Loading mockups...</div>';
 
+        currentBucketFilter = null;
         fetchMockups();
     }
 
@@ -82,34 +87,22 @@ var MockupAeGallery = (function () {
             return;
         }
 
-        // Status summary
-        var counts = { submitted: 0, inProgress: 0, awaitingApproval: 0, revisionRequested: 0, approved: 0 };
-        allMockups.forEach(function (m) {
-            var s = (m.Status || '').toLowerCase();
-            if (s === 'submitted') counts.submitted++;
-            else if (s === 'in progress') counts.inProgress++;
-            else if (s === 'awaiting approval') counts.awaitingApproval++;
-            else if (s === 'revision requested') counts.revisionRequested++;
-            else if (s === 'approved') counts.approved++;
-        });
+        // Bucket counts. normalizeStatus() maps null/blank/typos → 'Submitted'
+        // so they fall into 'with-ruth' (the catch-all bucket) and never vanish.
+        var counts = countByBucket(allMockups);
 
-        // Status summary — uses design-system .status-stat classes (matches Ruth's queue)
-        var html = '<div class="status-summary">';
-        if (counts.awaitingApproval > 0) {
-            html += '<div class="status-stat status-stat--awaiting-approval" title="Needs Your Review" onclick="MockupAeGallery.filterByStatus(\'Awaiting Approval\')">'
-                + '<span class="status-stat-count">' + counts.awaitingApproval + '</span>'
-                + '<span class="status-stat-label">Needs Your Review</span></div>';
+        // First render: pick the default. If the AE has nothing to review,
+        // open on All so they see their full pipeline instead of an empty state.
+        if (currentBucketFilter === null) {
+            currentBucketFilter = (counts.needsReview > 0) ? 'needs-review' : 'all';
         }
-        html += '<div class="status-stat status-stat--submitted" title="Submitted">'
-            + '<span class="status-stat-count">' + counts.submitted + '</span>'
-            + '<span class="status-stat-label">Submitted</span></div>';
-        html += '<div class="status-stat status-stat--in-progress" title="In Progress">'
-            + '<span class="status-stat-count">' + counts.inProgress + '</span>'
-            + '<span class="status-stat-label">In Progress</span></div>';
-        html += '<div class="status-stat status-stat--completed" title="Approved">'
-            + '<span class="status-stat-count">' + counts.approved + '</span>'
-            + '<span class="status-stat-label">Approved</span></div>';
-        html += '</div>';
+
+        // 4-bucket status summary. AE-centric labels:
+        //   Needs Your Review = Awaiting Approval (only thing AE acts on)
+        //   With Ruth         = Submitted + In Progress + Revision Requested (waiting)
+        //   Done              = Approved + Completed
+        //   All               = escape hatch, always visible
+        var html = buildBucketChipsHtml(counts);
 
         // Search + Rep filter bar
         var repOptions = ['All', 'Taneisha', 'Nika', 'Ruthie', 'Erik'];
@@ -128,9 +121,20 @@ var MockupAeGallery = (function () {
         var displayMockups = getDisplayMockups();
 
         html += '<div class="mockup-grid">';
-        displayMockups.forEach(function (m) {
-            html += buildCard(m);
-        });
+        if (displayMockups.length === 0) {
+            // Friendly empty state — most relevant when "Needs Your Review" was
+            // the default and is empty ("you're all caught up"), but also covers
+            // empty rep/search/bucket combinations.
+            var msg = (currentBucketFilter === 'needs-review')
+                ? "You're all caught up — nothing waiting for your review."
+                : 'No mockups match this filter.';
+            html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">'
+                + msg + '</div>';
+        } else {
+            displayMockups.forEach(function (m) {
+                html += buildCard(m);
+            });
+        }
         html += '</div>';
 
         container.innerHTML = html;
@@ -166,6 +170,21 @@ var MockupAeGallery = (function () {
             });
         }
 
+        // Wire bucket chip clicks. Click any chip → switch the bucket filter.
+        // Re-runs render() so the chip's .active state and the count of visible
+        // cards update together (renderCards alone would leave the chip styling stale).
+        var summary = container.querySelector('.status-summary');
+        if (summary) {
+            summary.addEventListener('click', function (e) {
+                var chip = e.target.closest('.status-stat[data-bucket]');
+                if (!chip) return;
+                var key = chip.dataset.bucket;
+                if (!key || key === currentBucketFilter) return;
+                currentBucketFilter = key;
+                render();
+            });
+        }
+
         wireCardClicks(container);
     }
 
@@ -174,6 +193,9 @@ var MockupAeGallery = (function () {
     function getDisplayMockups() {
         var searchLc = (currentSearchText || '').toLowerCase();
         return allMockups.filter(function (m) {
+            var matchBucket = currentBucketFilter === 'all'
+                || currentBucketFilter === null
+                || bucketFor(m.Status) === currentBucketFilter;
             var matchRep = currentRepFilter === 'All' || resolveRepName(m.Submitted_By || '') === currentRepFilter;
             var matchSearch = !searchLc || (
                 (m.Company_Name || '').toLowerCase().indexOf(searchLc) !== -1 ||
@@ -187,8 +209,56 @@ var MockupAeGallery = (function () {
                 (m.Submitted_By || '').toLowerCase().indexOf(searchLc) !== -1 ||
                 resolveRepName(m.Submitted_By || '').toLowerCase().indexOf(searchLc) !== -1
             );
-            return matchRep && matchSearch;
+            return matchBucket && matchRep && matchSearch;
         });
+    }
+
+    // Map a Caspio status to its display bucket. The fallthrough → 'with-ruth'
+    // is the safety net: if normalizeStatus() can't classify a value (null,
+    // blank, typo), the mockup still appears in a visible chip rather than
+    // vanishing from the gallery.
+    function bucketFor(status) {
+        var s = normalizeStatus(status);
+        if (s === 'Awaiting Approval') return 'needs-review';
+        if (s === 'Approved' || s === 'Completed') return 'done';
+        return 'with-ruth';
+    }
+
+    function countByBucket(mockups) {
+        var counts = { needsReview: 0, withRuth: 0, done: 0, all: 0 };
+        mockups.forEach(function (m) {
+            counts.all++;
+            var b = bucketFor(m.Status);
+            if (b === 'needs-review') counts.needsReview++;
+            else if (b === 'done') counts.done++;
+            else counts.withRuth++;
+        });
+        // Safety assertion — every mockup must land in exactly one bucket.
+        var sum = counts.needsReview + counts.withRuth + counts.done;
+        if (sum !== counts.all) {
+            console.warn('[MockupAeGallery] bucket sum ' + sum + ' !== total ' + counts.all
+                + ' — some mockups were not categorized. Check normalizeStatus().');
+        }
+        return counts;
+    }
+
+    function buildBucketChipsHtml(counts) {
+        var chips = [
+            { key: 'needs-review', label: 'Needs Your Review', count: counts.needsReview, modifier: 'needs-review' },
+            { key: 'with-ruth',    label: 'With Ruth',         count: counts.withRuth,    modifier: 'with-ruth' },
+            { key: 'done',         label: 'Done',              count: counts.done,        modifier: 'done' },
+            { key: 'all',          label: 'All',               count: counts.all,         modifier: 'all' }
+        ];
+        var html = '<div class="status-summary">';
+        chips.forEach(function (c) {
+            var active = currentBucketFilter === c.key ? ' active' : '';
+            html += '<div class="status-stat status-stat--' + c.modifier + active + '" '
+                + 'data-bucket="' + c.key + '" title="' + escapeHtml(c.label) + '">'
+                + '<span class="status-stat-count" data-stat="' + c.key + '">' + c.count + '</span>'
+                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></div>';
+        });
+        html += '</div>';
+        return html;
     }
 
     function updateCountSpan(displayMockups) {
@@ -211,7 +281,15 @@ var MockupAeGallery = (function () {
 
         var displayMockups = getDisplayMockups();
         var html = '';
-        displayMockups.forEach(function (m) { html += buildCard(m); });
+        if (displayMockups.length === 0) {
+            var msg = (currentBucketFilter === 'needs-review')
+                ? "You're all caught up — nothing waiting for your review."
+                : 'No mockups match this filter.';
+            html = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">'
+                + msg + '</div>';
+        } else {
+            displayMockups.forEach(function (m) { html += buildCard(m); });
+        }
         grid.innerHTML = html;
 
         updateCountSpan(displayMockups);
@@ -322,31 +400,11 @@ var MockupAeGallery = (function () {
             + '</div>';
     }
 
+    // Legacy API — externals may still call this. Translate the requested
+    // status to its bucket so the bucket UI stays consistent.
     function filterByStatus(status) {
-        var container = document.getElementById(containerId);
-        if (!container) return;
-
-        var filtered = allMockups.filter(function (m) { return m.Status === status; });
-
-        var html = '<div style="margin-bottom:16px;">'
-            + '<button onclick="MockupAeGallery.init(\'' + containerId + '\')" '
-            + 'style="padding:6px 14px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;">'
-            + '&larr; Show All</button>'
-            + '<span style="margin-left:12px;font-size:14px;color:#666;">Showing: <strong>' + escapeHtml(status) + '</strong> (' + filtered.length + ')</span>'
-            + '</div>';
-
-        html += '<div class="mockup-grid">';
-        filtered.forEach(function (m) { html += buildCard(m); });
-        html += '</div>';
-
-        container.innerHTML = html;
-
-        container.querySelectorAll('.mockup-card').forEach(function (card) {
-            card.addEventListener('click', function () {
-                var id = card.dataset.mockupId;
-                if (id) window.location.href = '/mockup/' + id + '?view=ae';
-            });
-        });
+        currentBucketFilter = bucketFor(status);
+        render();
     }
 
     function escapeHtml(str) {

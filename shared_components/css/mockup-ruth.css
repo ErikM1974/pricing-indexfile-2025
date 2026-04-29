@@ -252,6 +252,12 @@ body {
 .status-stat--completed::before          { background: var(--state-success, #059669); }
 .status-stat--needs-review::before       { background: var(--state-warning, #d97706); }
 .status-stat--other::before              { background: var(--gray-400,      #9ca3af); }
+/* AE-view buckets (mockup-ae.js + art-ae.js): roll up granular statuses
+   into 4 chips. needs-review reuses the warning amber dot above. */
+.status-stat--with-ruth::before          { background: var(--state-info,    #2563eb); }
+.status-stat--with-steve::before         { background: var(--state-info,    #2563eb); }
+.status-stat--done::before               { background: var(--state-success, #059669); }
+.status-stat--all::before                { background: var(--gray-400,      #9ca3af); }
 
 .status-stat:hover {
     background: var(--surface-hover, #f9fafb);

@@ -628,10 +628,11 @@
             addAuditIndicator(card);
         });
 
-        // Inject filter bar and status summary, then apply filters
-        injectRepFilter();
-        buildStatusSummary();
-        applyFilters();
+        // Filter bar + status summary are now owned by art-ae.js (the modern
+        // gallery that replaced the Caspio DataPage). Calling injectRepFilter()
+        // and buildStatusSummary() here injected a duplicate, conflicting chip
+        // set above the new bucket chips, so AEs saw two competing filter UIs
+        // and couldn't tell what was selected. Disabled v2026.04.29.
     }
 
     // ── MutationObserver: Watch for Caspio gallery cards in view-tab ──

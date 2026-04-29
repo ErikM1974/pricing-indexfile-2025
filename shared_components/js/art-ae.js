@@ -25,6 +25,10 @@ var ArtAeGallery = (function () {
     var searchTerm = '';
     var showAll = false;
     var showArchive = false;
+    // Bucket filter: 'needs-review' | 'with-steve' | 'done' | 'all'.
+    // null on first render — render() picks 'needs-review' if there's anything
+    // to review, else 'all'. After that the user owns it.
+    var currentBucketFilter = null;
 
     function getDateFrom(days) {
         var cutoff = new Date();
@@ -44,6 +48,7 @@ var ArtAeGallery = (function () {
         activeFilter = null;
         searchTerm = '';
         showAll = false;
+        currentBucketFilter = null;
         fetchRequests();
     }
 
@@ -78,11 +83,38 @@ var ArtAeGallery = (function () {
             });
     }
 
+    // Map a Caspio status to its display bucket. Fallthrough → 'with-steve'
+    // is the safety net: null/blank/typo'd statuses still appear in a chip
+    // rather than vanishing from the gallery.
+    function bucketFor(status) {
+        var s = normalizeStatus(status);
+        if (s === 'Awaiting Approval') return 'needs-review';
+        if (s === 'Approved' || s === 'Completed') return 'done';
+        return 'with-steve';
+    }
+
+    function countByBucket(requests) {
+        var counts = { needsReview: 0, withSteve: 0, done: 0, all: 0 };
+        requests.forEach(function (r) {
+            counts.all++;
+            var b = bucketFor(r.Status);
+            if (b === 'needs-review') counts.needsReview++;
+            else if (b === 'done') counts.done++;
+            else counts.withSteve++;
+        });
+        var sum = counts.needsReview + counts.withSteve + counts.done;
+        if (sum !== counts.all) {
+            console.warn('[ArtAeGallery] bucket sum ' + sum + ' !== total ' + counts.all
+                + ' — some requests were not categorized. Check normalizeStatus().');
+        }
+        return counts;
+    }
+
     function getFilteredRequests() {
         var list = allRequests;
-        if (activeFilter) {
+        if (currentBucketFilter && currentBucketFilter !== 'all') {
             list = list.filter(function (r) {
-                return normalizeStatus(r.Status) === activeFilter;
+                return bucketFor(r.Status) === currentBucketFilter;
             });
         }
         if (searchTerm) {
@@ -117,16 +149,15 @@ var ArtAeGallery = (function () {
             return;
         }
 
-        // Count statuses
-        var counts = { submitted: 0, inProgress: 0, awaitingApproval: 0, completed: 0, other: 0 };
-        allRequests.forEach(function (r) {
-            var s = normalizeStatus(r.Status);
-            if (s === 'Submitted') counts.submitted++;
-            else if (s === 'In Progress') counts.inProgress++;
-            else if (s === 'Awaiting Approval') counts.awaitingApproval++;
-            else if (s === 'Completed') counts.completed++;
-            else counts.other++;
-        });
+        // Bucket counts. normalizeStatus() maps null/blank/typos → 'Submitted'
+        // so they fall into 'with-steve' (the catch-all bucket) and never vanish.
+        var counts = countByBucket(allRequests);
+
+        // First render: pick the default. If the AE has nothing to review,
+        // open on All so they see their full pipeline instead of an empty state.
+        if (currentBucketFilter === null) {
+            currentBucketFilter = (counts.needsReview > 0) ? 'needs-review' : 'all';
+        }
 
         var html = '';
 
@@ -155,28 +186,26 @@ var ArtAeGallery = (function () {
             + '</div>'
             + '</div>';
 
-        // Status summary pills — design-system .status-stat classes (matches Ruth + AE Steve Mockups)
+        // 4-bucket status summary. AE-centric labels:
+        //   Needs Your Review = Awaiting Approval (only thing AE acts on)
+        //   With Steve        = Submitted + In Progress + Revision Requested (waiting)
+        //   Done              = Approved + Completed
+        //   All               = escape hatch, always visible
+        var bucketChips = [
+            { key: 'needs-review', label: 'Needs Your Review', count: counts.needsReview, modifier: 'needs-review' },
+            { key: 'with-steve',   label: 'With Steve',        count: counts.withSteve,   modifier: 'with-steve' },
+            { key: 'done',         label: 'Done',              count: counts.done,        modifier: 'done' },
+            { key: 'all',          label: 'All',               count: counts.all,         modifier: 'all' }
+        ];
         html += '<div class="status-summary">';
-        if (counts.awaitingApproval > 0) {
-            html += statusPill(counts.awaitingApproval, 'Needs Review', 'Awaiting Approval', 'awaiting-approval');
-        }
-        html += statusPill(counts.submitted, 'Submitted', 'Submitted', 'submitted');
-        html += statusPill(counts.inProgress, 'In Progress', 'In Progress', 'in-progress');
-        html += statusPill(counts.completed, 'Completed', 'Completed', 'completed');
-        if (counts.other > 0) {
-            html += statusPill(counts.other, 'Other', null, 'other');
-        }
+        bucketChips.forEach(function (c) {
+            var active = currentBucketFilter === c.key ? ' active' : '';
+            html += '<div class="status-stat status-stat--' + c.modifier + active + '" '
+                + 'data-bucket="' + c.key + '" title="' + escapeHtml(c.label) + '">'
+                + '<span class="status-stat-count">' + c.count + '</span>'
+                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></div>';
+        });
         html += '</div>';
-
-        // Filter indicator
-        if (activeFilter) {
-            html += '<div style="margin-bottom:12px;">'
-                + '<button onclick="ArtAeGallery.clearFilter()" '
-                + 'style="padding:6px 14px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;">'
-                + '&larr; Show All</button>'
-                + '<span style="margin-left:12px;font-size:14px;color:#666;">Showing: <strong>' + escapeHtml(activeFilter) + '</strong></span>'
-                + '</div>';
-        }
 
         // Card grid
         var filtered = getFilteredRequests();
@@ -197,6 +226,21 @@ var ArtAeGallery = (function () {
             searchInput.addEventListener('input', function () {
                 searchTerm = this.value.trim();
                 renderCards();
+            });
+        }
+
+        // Wire bucket chip clicks. Click any chip → switch the bucket filter.
+        // Re-runs render() so the chip's .active state and the count of visible
+        // cards update together.
+        var summary = container.querySelector('.status-summary');
+        if (summary) {
+            summary.addEventListener('click', function (e) {
+                var chip = e.target.closest('.status-stat[data-bucket]');
+                if (!chip) return;
+                var key = chip.dataset.bucket;
+                if (!key || key === currentBucketFilter) return;
+                currentBucketFilter = key;
+                render();
             });
         }
 
@@ -251,6 +295,7 @@ var ArtAeGallery = (function () {
         showArchive = !showArchive;
         activeFilter = null;
         searchTerm = '';
+        currentBucketFilter = null;
         fetchRequests();
     }
 
@@ -431,13 +476,15 @@ var ArtAeGallery = (function () {
         return { text: formatDate(dueDateStr), cssClass: '' };
     }
 
+    // Legacy API — externals may still call these. Translate the requested
+    // status to its bucket so the bucket UI stays consistent.
     function filterByStatus(status) {
-        activeFilter = status;
+        currentBucketFilter = bucketFor(status);
         render();
     }
 
     function clearFilter() {
-        activeFilter = null;
+        currentBucketFilter = 'all';
         render();
     }
 
