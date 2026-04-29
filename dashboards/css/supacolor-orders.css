@@ -169,6 +169,26 @@
 .sc-row--header .sc-cell--desc {
     display: block;
 }
+.sc-due-risk {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    width: fit-content;
+}
+.sc-due-risk i { font-size: 10px; }
+.sc-due-risk--overdue  { background: #fee2e2; color: #b91c1c; }
+.sc-due-risk--risk     { background: #fee2e2; color: #b91c1c; }
+.sc-due-risk--tight    { background: #ffedd5; color: #b45309; }
+.sc-due-risk--invoiced { background: #dcfce7; color: #166534; }
+.sc-subtitle-meta {
+    color: #6c757d;
+    font-weight: 500;
+}
 .sc-cell--received {
     color: #198754;
     font-size: 13px;

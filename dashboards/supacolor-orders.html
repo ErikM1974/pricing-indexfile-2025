@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=22">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=6">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=7">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=8">
 </head>
 <body>
     <div class="minimal-header">
@@ -43,7 +43,7 @@
                             </span>
                             <span style="font-size:inherit; color:inherit;">API Orders</span>
                         </h2>
-                        <div class="bt-subtitle">Live mirror of our Supacolor heat-transfer jobs &middot; Synced every 10 min from supacolor.com</div>
+                        <div class="bt-subtitle">Live mirror of our Supacolor heat-transfer jobs &middot; Synced every 10 min from supacolor.com <span id="sc-avg-transit" class="sc-subtitle-meta"></span></div>
                     </div>
                     <div class="bt-header-actions">
                         <button id="sc-refresh-btn" class="bt-btn bt-btn--primary" title="Reload the jobs list">
@@ -166,6 +166,6 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=12"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=15"></script>
 </body>
 </html>

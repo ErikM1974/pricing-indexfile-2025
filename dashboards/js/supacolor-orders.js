@@ -45,6 +45,89 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // Parse Caspio ISO date (with or without trailing Z), normalize to local
+    // midnight. Returns null on invalid input.
+    function parseDate(iso) {
+        if (!iso) return null;
+        var s = iso.length === 19 ? iso + 'Z' : iso;
+        var d = new Date(s);
+        if (isNaN(d.getTime())) return null;
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    // Count business days between two dates (M-F, weekend excluded).
+    // Signed — negative if `to` is before `from` (i.e. overdue).
+    // Same-day returns 0.
+    function businessDaysBetween(from, to) {
+        if (!from || !to) return null;
+        var sign = 1;
+        var a = from, b = to;
+        if (b < a) { sign = -1; a = to; b = from; }
+        var days = 0;
+        var cur = new Date(a);
+        while (cur < b) {
+            cur.setDate(cur.getDate() + 1);
+            var dow = cur.getDay(); // 0=Sun, 6=Sat
+            if (dow !== 0 && dow !== 6) days++;
+        }
+        return days * sign;
+    }
+
+    // Average business-day transit (Supacolor ship → NWCA receive) computed
+    // across the loaded job set. Outliers (>14 biz days) skipped — likely
+    // re-prints or data oddities, not representative.
+    function computeAvgTransit(jobs) {
+        var deltas = [];
+        for (var i = 0; i < jobs.length; i++) {
+            var j = jobs[i];
+            var s = parseDate(j.Date_Shipped);
+            var r = parseDate(j.Date_Received);
+            if (!s || !r) continue;
+            var d = businessDaysBetween(s, r);
+            if (d == null || d < 0 || d > 14) continue;
+            deltas.push(d);
+        }
+        if (!deltas.length) return null;
+        var sum = 0;
+        for (var k = 0; k < deltas.length; k++) sum += deltas[k];
+        return { avg: sum / deltas.length, count: deltas.length };
+    }
+
+    // Returns a {level, text} risk descriptor or null when no badge should show.
+    // Levels: 'invoiced' | 'overdue' | 'risk' | 'tight'.
+    // 'invoiced' is a positive "all done" pill — short-circuits all risk math.
+    function formatMoney(n) {
+        if (n == null || isNaN(n)) return '';
+        return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Returns a {level, text} risk descriptor or null when no badge should show.
+    // Levels: 'invoiced' | 'overdue' | 'risk'. Quiet by design: only flag jobs
+    // that are invoiced (positive), overdue, or due within 2 working days.
+    // Anything further out stays clean — keeps the dashboard high-signal.
+    function computeDueRisk(j, avgTransitBizDays, today) {
+        if (j.Status === 'Cancelled') return null;
+        if (j.Order_Invoiced_Date) {
+            var totalStr = j.Order_Invoice_Total != null ? ' · ' + formatMoney(j.Order_Invoice_Total) : '';
+            return { level: 'invoiced', text: 'Invoiced Completed' + totalStr };
+        }
+        var due = parseDate(j.Order_Due_Date);
+        if (!due) return null;
+        var avail = businessDaysBetween(today, due);
+        if (avail == null) return null;
+
+        // Skip badges for jobs received & due >5 biz days ago — assume shipped to customer.
+        if (j.Date_Received && avail < -5) return null;
+
+        if (avail < 0) {
+            return { level: 'overdue', text: 'Overdue ' + Math.abs(avail) + 'd' };
+        }
+        if (avail <= 2) {
+            return { level: 'risk', text: 'Due in ' + avail + ' biz day' + (avail === 1 ? '' : 's') };
+        }
+        return null;
+    }
+
     // Carrier → tracking-URL mapping. Duplicated (intentionally) from
     // shared_components/js/transfer-actions-shared.js where the same function
     // is scoped inside an IIFE and not exported. Keeping a local copy avoids
@@ -223,6 +306,16 @@
         $('sc-stat-cancelled').textContent  = state.stats.Cancelled || 0;
         var total = active + (state.stats.Closed || 0) + (state.stats.Cancelled || 0);
         $('sc-stat-total').textContent = total;
+
+        // Average FedEx transit (Supacolor LA → NWCA Milton) — business days,
+        // computed across the loaded job set, surfaced under the title.
+        var transit = computeAvgTransit(state.allJobs);
+        var slot = $('sc-avg-transit');
+        if (slot) {
+            slot.textContent = transit
+                ? '· Avg transit ' + transit.avg.toFixed(1) + ' business days (n=' + transit.count + ')'
+                : '';
+        }
     }
 
     function renderTable() {
@@ -243,6 +336,11 @@
         var start = (state.currentPage - 1) * PAGE_SIZE;
         var pageJobs = jobs.slice(start, start + PAGE_SIZE);
 
+        // Compute avg transit + today once per render — used by the per-row risk badge
+        var transit = computeAvgTransit(state.allJobs);
+        var avgTransit = transit ? transit.avg : 2;
+        var today = new Date(); today = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
         var rows = pageJobs.map(function (j) {
             // Closed → green, Cancelled → red, everything else (Open, Ganged,
             // In Production, etc.) → blue "active" styling
@@ -250,6 +348,18 @@
                             : j.Status === 'Cancelled' ? 'cancelled'
                             : 'open';
             var detailUrl = '/pages/supacolor-job-detail.html?id=' + encodeURIComponent(j.ID_Job);
+
+            var risk = computeDueRisk(j, avgTransit, today);
+            var riskIcon = !risk ? ''
+                : risk.level === 'invoiced' ? 'fa-circle-check'
+                : risk.level === 'overdue'  ? 'fa-circle-exclamation'
+                :                             'fa-triangle-exclamation';
+            var riskHtml = risk
+                ? '<div class="sc-due-risk sc-due-risk--' + risk.level + '">' +
+                      '<i class="fas ' + riskIcon + '"></i> ' +
+                      escapeHtml(risk.text) +
+                  '</div>'
+                : '';
 
             return '<a href="' + detailUrl + '" class="sc-row">' +
                 '<div class="sc-cell sc-cell--job">#' + escapeHtml(j.Supacolor_Job_Number || '—') + '</div>' +
@@ -265,6 +375,7 @@
                             (j.Order_Due_Date ? 'Due ' + escapeHtml(formatDate(j.Order_Due_Date)) : '') +
                           '</div>'
                         : '') +
+                    riskHtml +
                 '</div>' +
                 '<div class="sc-cell sc-cell--received">' +
                     (j.Date_Received
