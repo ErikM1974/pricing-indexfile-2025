@@ -1,7 +1,8 @@
 # Active Files Registry
-**Last Updated:** 2026-02-27
-**Total Active Files:** ~320 (includes all calculators, quote builders, dashboards, CRM, design gallery, DST viewer, 3-Day Tees, and testing suite)
+**Last Updated:** 2026-04-29
+**Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
+**Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
 
@@ -14,16 +15,47 @@
 | `app-modern.js` | Main application logic | index.html | Move to shared_components |
 | `app-new.js` | New app version | Unknown | Verify if needed |
 | `autocomplete-new.js` | Search autocomplete | index.html | Move to shared_components |
+| `brands.js` | Brands listing page logic | brands.html | Move to shared_components |
+| `brands-flyout.js` | Brands flyout/dropdown menu (header nav) | index.html, multiple | Move to shared_components |
 | `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
 | `cart.js` | Cart functionality | cart.html | Move to shared_components |
 | `cart-ui.js` | Cart UI components | cart.html | Move to shared_components |
 | `cart-price-recalculator.js` | Price recalculation | cart.html | Move to shared_components |
 | `catalog-search.js` | Catalog search | index.html | Move to shared_components |
-| `dp5-helper.js` | Helper functions | Unknown | Verify if needed |
+| `dp5-helper.js` | Helper functions (root copy — see also `/shared_components/js/dp5-helper.js`) | Unknown | Verify if needed |
 | `order-form-pdf.js` | PDF generation | cart.html | Move to shared_components |
-| `pricing-matrix-api.js` | Pricing API | cart.html | Move to shared_components |
+| `pricing-matrix-api.js` | Pricing API (root copy — see also `/shared_components/js/pricing-matrix-api.js`) | cart.html | Move to shared_components |
 | `product-search-service.js` | Product search | index.html, multiple | Move to shared_components |
 | `utils.js` | Utility functions | Multiple pages | Move to shared_components |
+
+### Root-Level HTML & Backend (not migrated to subdirs)
+
+| File | Purpose | Notes | Status |
+|------|---------|-------|--------|
+| `/index.html` | Main catalog page | See "Main Pages" section | ✅ Active |
+| `/cart.html` | Shopping cart | See "Main Pages" section | ✅ Active |
+| `/product.html` | Product display page | See "Main Pages" section | ✅ Active |
+| `/brands.html` | Brands listing page | brands.js, brands.css, brands-flyout.js | ✅ Active |
+| `/staff-dashboard.html` | Staff dashboard v2 (canonical) | See "Dashboard & Admin" section | ✅ Active |
+| `/staff-dashboard-legacy.html` | Pre-cut-over staff dashboard (90-day soak) | 🗄️ Legacy (delete ~2026-07-28) | 🗄️ Legacy |
+| `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
+| `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
+| `/jest.config.js` | Jest test runner config (used by `tests/jest/`) | Jest | ⚙️ Tooling |
+
+### Root-Level Stylesheets (legacy location)
+
+| File | Purpose | Used By | Future Action |
+|------|---------|---------|---------------|
+| `main.css` | Primary global styles | index.html | Move to shared_components |
+| `main-redesign.css` | 2025 redesign styles | index.html | Move to shared_components |
+| `cart-styles.css` | Cart page styles | cart.html | Move to shared_components |
+| `gallery-styles.css` | Product gallery styles | index.html, product.html | Move to shared_components |
+| `pricing-pages.css` | Shared pricing page styles | Pricing pages | Move to shared_components |
+| `pricing-pages-enhanced.css` | Enhanced pricing page styles | Pricing pages | Move to shared_components |
+| `product-styles.css` | Product page styles | product.html | Move to shared_components |
+| `modern-search-interface.css` | Modern search UI styles | index.html | Move to shared_components |
+| `catalog-search.css` | Catalog search styles | index.html | Move to shared_components |
+| `brands.css` | Brands page styles | brands.html | Move to shared_components |
 
 ## 🎯 Core Entry Points
 
@@ -113,6 +145,33 @@
 | `/pages/js/box-labels.js` | Box management logic — API calls, drag/drop, PDF generation | SortableJS CDN, jsPDF CDN, JsBarcode CDN | ✅ Active |
 | `/pages/css/box-labels.css` | Box labels page styling — production-floor UI | — | ✅ Active |
 
+### Customer Portal (NEW 2026-03-21)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/customer-portal.html` | Customer-facing portal at `/portal/:customerId` — mockups + art requests, no login (URL = token) | customer-portal.js, customer-portal.css, app-config.js | ✅ Active |
+| `/pages/js/customer-portal.js` | Portal controller — fetches mockups + art requests by customer ID | /api/mockups, /api/artrequests | ✅ Active |
+| `/pages/css/customer-portal.css` | Portal styling (responsive cards, branded) | — | ✅ Active |
+
+### Mockup Detail Page (NEW 2026-04)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/mockup-detail.html` | Single-mockup detail page — full image, design info, history | mockup-detail.js, mockup-detail.css | ✅ Active |
+| `/pages/js/mockup-detail.js` | Mockup detail controller — fetches record + thumbnails, history timeline | /api/mockups/:id | ✅ Active |
+| `/pages/css/mockup-detail.css` | Mockup detail styling | — | ✅ Active |
+
+### Supacolor Job Detail (NEW 2026-04)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/supacolor-job-detail.html` | Single Supacolor job detail page — sync status, line items | supacolor-job-detail.js, supacolor-job-detail.css | ✅ Active |
+| `/pages/js/supacolor-job-detail.js` | Supacolor job detail controller — fetches job, sync trigger, status badges | /api/supacolor-jobs/:jobNumber | ✅ Active |
+| `/pages/css/supacolor-job-detail.css` | Supacolor job detail styling (matches dashboard theme) | — | ✅ Active |
+
+### Embroidery Contract Pricing (Page-Level Assets)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/embroidery-contract-pricing.js` | Contract embroidery pricing logic for shareable customer page | /api/embroidery-costs, app-config.js | ✅ Active |
+| `/pages/embroidery-contract-pricing.css` | Contract embroidery pricing page styles | — | ✅ Active |
+
 ## 📊 Calculators & Quote Builders
 
 ### Unified Manual Pricing Calculator
@@ -140,7 +199,8 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/dtg-pricing.html` | DTG pricing calculator | dtg-adapter.js, dtg-pricing-service.js | ✅ Active |
-| `/calculators/dtg-manual-pricing.html` | Manual DTG pricing | dtg-config.js | ✅ Active |
+| `/calculators/dtg-manual-pricing.html` | ~~DELETED~~ Manual DTG pricing — superseded by `/calculators/manual-pricing.html` (unified) | — | ❌ Deleted |
+| `/calculators/archive/manual-pricing-deprecated/dtg-manual-pricing.html` | Archived pre-unification DTG manual calculator | — | 📦 Archived |
 | `/quote-builders/dtg-quote-builder.html` | DTG Quote Builder 2026 (Excel-style) | dtg-quote-pricing.js | ✅ Active |
 | `/shared_components/js/dtg-quote-builder.js` | DTG quote builder controller | DTGQuotePricing class | ✅ Active |
 | `/shared_components/js/dtg-quote-pricing.js` | DTG quote pricing engine | Caspio API | ✅ Active |
@@ -153,7 +213,8 @@
 #### DTF Pricing Calculator (Customer-facing)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pricing/dtf/index.html` | DTF pricing page | dtf-pricing-calculator.js | ✅ Active |
+| `/calculators/dtf-pricing.html` | DTF pricing page | dtf-pricing-calculator.js, dtf-pricing-service.js | ✅ Active |
+| `/pricing/dtf/index.html` | ~~PATH NEVER EXISTED~~ — actual DTF page is at `/calculators/dtf-pricing.html` | — | ❌ Stale path |
 | `/shared_components/js/dtf-pricing-calculator.js` | DTF calculator UI & pricing logic | dtf-pricing-service.js, DTFConfig | ✅ Active |
 | `/shared_components/js/dtf-pricing-service.js` | API data fetcher & transformer | Caspio API | ✅ Active |
 | `/shared_components/js/dtf-integration.js` | Coordinates calculator, adapter, events | dtf-pricing-calculator.js | ✅ Active |
@@ -231,10 +292,21 @@
 ### Special Calculators
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/christmas-bundles.html` | Christmas bundle | product-search-service.js | ✅ Active |
+| `/calculators/christmas-bundles.html` | Christmas bundle | christmas-bundle-service.js, product-search-service.js | ✅ Active |
+| `/calculators/christmas-bundle-service.js` | Christmas bundle pricing/quote service | base-quote-service.js | ✅ Active |
+| `/calculators/christmas-bundle-emailjs-template.html` | EmailJS HTML template for Christmas bundle | EmailJS service | ✅ Active |
 | `/calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html` | BCA bundle (Oct 2025 promo - archived) | breast-cancer-bundle-service.js | 📦 Archived |
-| `/calculators/safety-stripe-creator.html` | Safety stripes | safety-stripe-calculator.js | ✅ Active |
+| `/calculators/archive/seasonal-2025/breast-cancer-awareness-bundle-tailwind.html` | BCA bundle Tailwind variant | breast-cancer-bundle-service.js | 📦 Archived |
+| `/calculators/archive/seasonal-2025/breast-cancer-bundle-service.js` | BCA bundle quote/email service | EmailJS | 📦 Archived |
+| `/calculators/archive/seasonal-2025/breast-cancer-sales-email.html` | BCA promotional email body | EmailJS | 📦 Archived |
+| `/calculators/safety-stripe-creator.html` | Safety stripes creator (drag-drop config builder) | safety-stripe-calculator.js, safety-stripe-creator-service.js | ✅ Active |
+| `/calculators/safety-stripe-calculator.js` | Safety stripes pricing logic | screenprint-pricing-service.js | ✅ Active |
+| `/calculators/safety-stripe-creator-service.js` | Safety stripes quote save/email service | base-quote-service.js, EmailJS | ✅ Active |
 | `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
+| `/calculators/art-invoice-service-v2.js` | Art invoice creation/save/email service (v2) | Caspio API, EmailJS | ✅ Active |
+| `/calculators/art-invoice-emailjs-template.html` | EmailJS HTML template for art invoices | EmailJS service | ✅ Active |
+| `/calculators/embroidery-manual-service.js` | Embroidery manual pricing service (used by unified manual calculator) | embroidery-pricing-service.js | ✅ Active |
+| `/calculators/leatherette-patch-quote-service.js` | Leatherette patch (PATCH) quote save service | base-quote-service.js | ✅ Active |
 
 ### DTG Contract Pricing (Customer-facing)
 | File | Purpose | Dependencies | Status |
@@ -261,6 +333,7 @@
 | `/calculators/embroidered-emblem/emblem-calculator.js` | Emblem calculator logic | — | ✅ Active |
 | `/calculators/embroidered-emblem/emblem-quote-service.js` | Emblem quote save service | base-quote-service.js | ✅ Active |
 | `/calculators/embroidered-emblem/embroidered-emblem-styles.css` | Emblem page styles | — | ✅ Active |
+| `/calculators/embroidered-emblem/emblem-calculator-missing-styles.css` | Emblem calculator supplemental/fix styles | emblem-calculator.js | ✅ Active |
 
 ### Laser Tumbler & Sticker Calculators
 | File | Purpose | Dependencies | Status |
@@ -287,9 +360,14 @@
 |------|---------|--------------|--------|
 | `/calculators/embroidery-pricing-all/index.html` | Unified AL/CEMB + DECG pricing page | embroidery-pricing-all.js, .css | ✅ Active |
 | `/calculators/embroidery-pricing.html` | Embroidery pricing calculator (garment + cap) | embroidery-pricing-service.js | ✅ Active |
-| `/calculators/archive/embroidery-customer/*` | DECG standalone calculator | - | 📦 Archived |
-| `/calculators/archive/embroidery-contract/*` | Contract embroidery calculator | - | 📦 Archived |
+| `/calculators/archive/embroidery-customer/*` | DECG standalone calculator (3 files: index.html, embroidery-customer-calculator.js, embroidery-customer-styles.css) | - | 📦 Archived |
+| `/calculators/archive/embroidery-contract/*` | Contract embroidery calculator (5 files: index.html, embroidery-contract-calculator.js, embroidery-quote-service.js, embroidery-contract-fix.css, embroidery-contract-styles.css) | - | 📦 Archived |
 | `/calculators/archive/embroidery-pricing.html` | Old embroidery pricing page | - | 📦 Archived |
+| `/calculators/archive/manual-pricing-deprecated/*` | Pre-unification manual calculators (5 HTML: dtg, dtf, embroidery, screenprint, cap-embroidery — superseded by `/calculators/manual-pricing.html`) | - | 📦 Archived |
+| `/calculators/archive/cap-embroidery-manual-pricing.html` | Pre-unification cap embroidery manual calculator | cap-embroidery-manual-service.js | 📦 Archived |
+| `/calculators/archive/cap-embroidery-pricing-integrated.html` | Pre-unification integrated cap embroidery pricing | - | 📦 Archived |
+| `/calculators/archive/cap-embroidery-manual-service.js` | Cap embroidery manual service (archived) | - | 📦 Archived |
+| `/calculators/archive/cap-embroidery-fix.css` | Cap embroidery fix styles (archived) | - | 📦 Archived |
 
 **AL/CEMB Pricing (Additional Logo / Contract Embroidery):**
 - Garments: 5K base, $13→$5 (1-7 to 72+), +$1.00/1K
@@ -416,6 +494,171 @@
 - `AcceptedByName` (Text) - Name of person accepting
 - `AcceptedByEmail` (Text) - Email of person accepting
 
+### Cap Embroidery Quote System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/cap-embroidery-pricing-logic.js` | Cap embroidery pricing logic (shared between manual + quote builder) | embroidery-pricing-service.js | ✅ Active |
+| `/shared_components/js/cap-embroidery-pricing-service.js` | Cap embroidery Caspio data adapter | Caspio API | ✅ Active |
+| `/shared_components/js/cap-quote-builder.js` | Cap quote builder controller | CapQuotePricing class | ✅ Active |
+| `/shared_components/js/cap-quote-logos.js` | Cap quote logo card management (positions, stitch tiers) | — | ✅ Active |
+| `/shared_components/js/cap-quote-pricing.js` | Cap quote pricing engine (LTM, stitch surcharges) | Caspio API | ✅ Active |
+| `/shared_components/js/cap-quote-products.js` | Cap quote product row manager | SanMar API | ✅ Active |
+| `/shared_components/js/cap-quote-service.js` | Cap quote save/update/email service | Caspio API, EmailJS | ✅ Active |
+
+### Art Invoice System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/art-invoice-config.js` | Art invoice business constants (tiers, defaults) | — | ✅ Active |
+| `/shared_components/js/art-invoice-creator.js` | Art invoice creator UI controller | art-invoice-config.js, EmailJS | ✅ Active |
+| `/shared_components/js/art-invoice-utils.js` | Shared art invoice utility functions | — | ✅ Active |
+| `/shared_components/js/art-invoice-viewer.js` | Art invoice viewer / PDF rendering | jsPDF | ✅ Active |
+
+### Art Hub Extended
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/art-hub-steve-gallery.js` | **NEW** JS-rendered Steve gallery (replaces Caspio DataPage 2026-04-25) — exposes `window.SteveGallery` | /api/art-requests, /api/box/shared-image | ✅ Active |
+
+### DTG Extended Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/dtg-config.js` | DTG location/print settings configuration | — | ✅ Active |
+| `/shared_components/js/dtg-integration.js` | DTG calculator/adapter coordinator | dtg-pricing-service.js | ✅ Active |
+| `/shared_components/js/dtg-page-setup.js` | DTG pricing page initialization | — | ✅ Active |
+| `/shared_components/js/dtg-pricing-service.js` | DTG pricing Caspio data adapter | Caspio API | ✅ Active |
+| `/shared_components/js/dtg-product-recommendations.js` | DTG-tested product suggestions | — | ✅ Active |
+| `/shared_components/js/dtg-product-recommendations-modal.js` | Modal UI for DTG product recommendations | dtg-product-recommendations.js | ✅ Active |
+
+### DTF Extended Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/dtf-quote-adapter.js` | DTF quote data adapter | dtf-pricing-service.js | ✅ Active |
+| `/shared_components/js/dtf-quote-page.js` | DTF quote page initialization | — | ✅ Active |
+
+### Embroidery Extended Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/embroidery-customization-options.js` | Embroidery customization options UI (logo placements, AL toggles) | — | ✅ Active |
+| `/shared_components/js/embroidery-enhanced-loading.js` | Embroidery page loading animations | — | ✅ Active |
+| `/shared_components/js/embroidery-quote-builder.js` | Legacy/extracted embroidery quote builder controller | EmbroideryQuotePricing class | ✅ Active |
+
+### Screen Print Extended Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/screenprint-manual-pricing.js` | Screen print manual pricing service (used by unified manual calculator) | screenprint-pricing-service.js | ✅ Active |
+| `/shared_components/js/screenprint-quote-builder.js` | Legacy/extracted screen print quote builder controller | ScreenprintQuotePricing class | ✅ Active |
+| `/shared_components/js/screenprint-shopworks-guide-generator.js` | Screen print ShopWorks order guide generator | shopworks-guide-generator.js | ✅ Active |
+
+### Universal Components (header, gallery, grid)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/universal-cart-header.js` | Universal cart header (icon + item count) | cart.js, app-config.js | ✅ Active |
+| `/shared_components/js/universal-header-component.js` | Universal page header (logo, nav, search) | brands-flyout.js | ✅ Active |
+| `/shared_components/js/universal-image-gallery.js` | Universal product image gallery | — | ✅ Active |
+| `/shared_components/js/universal-pricing-grid.js` | Universal pricing grid (tiered pricing display) | — | ✅ Active |
+| `/shared_components/js/universal-product-display.js` | Universal product display (info, swatches, decoration selector) | — | ✅ Active |
+
+### Product Search & Filtering
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/product-category-filter.js` | Single source of truth for cap-vs-flat-headwear classification | — | ✅ Active |
+| `/shared_components/js/product-filters.js` | Product filter UI (size, color, brand, etc.) | — | ✅ Active |
+| `/shared_components/js/product-grid.js` | Product grid display + lazy load | — | ✅ Active |
+| `/shared_components/js/product-pricing-ui.js` | Product pricing UI rendering | universal-pricing-grid.js | ✅ Active |
+| `/shared_components/js/product-recommendations.js` | Product recommendation engine | — | ✅ Active |
+| `/shared_components/js/product-search.js` | Product search UI | product-search-service.js | ✅ Active |
+| `/shared_components/js/exact-match-search.js` | Optimized exact-style-number search for sales reps | /api/products/search | ✅ Active |
+
+### ShopWorks Integration Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/edp-generator-service.js` | OnSite 7 EDP file generator (External Data Processor format) | — | ✅ Active |
+| `/shared_components/js/shopworks-edp-generator.js` | ShopWorks-specific EDP wrapper | edp-generator-service.js | ✅ Active |
+| `/shared_components/js/shopworks-guide-generator.js` | Generic ShopWorks order guide generator | — | ✅ Active |
+| `/shared_components/js/manageorders-customer-service.js` | ManageOrders customer lookup service | /api/manageorders/customers | ✅ Active |
+| `/shared_components/js/manageorders-inventory-service.js` | ManageOrders inventory queries | /api/manageorders/inventory | ✅ Active |
+
+### Mockup Workflow Services
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/mockup-ae.js` | AE mockup workflow logic (review, send, approve) | — | ✅ Active |
+| `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing) | — | ✅ Active |
+| `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
+
+### Sample Order System
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/sample-inventory-service.js` | Real-time SanMar inventory check for sample products | /api/sanmar/inventory | ✅ Active |
+| `/shared_components/js/sample-order-service.js` | Free sample order submission to ShopWorks (customer #2791, $0.01/sample) | /api/manageorders, EmailJS | ✅ Active |
+
+### Pricing Matrix & Calculator Helpers
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/pricing-calculator.js` | Generic pricing calculator helper | — | ✅ Active |
+| `/shared_components/js/pricing-matrix-api.js` | Pricing matrix API client (shared_components copy) | Caspio API | ✅ Active |
+| `/shared_components/js/pricing-matrix-capture.js` | Captures pricing matrix from hidden Caspio iframe | Caspio datapage | ✅ Active |
+| `/shared_components/js/pricing-pages.js` | Shared logic for pricing pages (legacy) | — | ✅ Active |
+| `/shared_components/js/calculator-inventory.js` | Collapsible warehouse inventory grid (auto-attaches to color swatches) | /api/sanmar/inventory | ✅ Active |
+| `/shared_components/js/sku-validation-service.js` | SanMar→ShopWorks SKU validation + 2XL→`_2X` translation | — | ✅ Active |
+
+### Additional Logo (AL) Helpers
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/additional-logo-cap-simple.js` | Simple AL pricing for cap quote builder | embroidery-pricing-service.js | ✅ Active |
+| `/shared_components/js/additional-logo-embroidery-simple.js` | Simple AL pricing for embroidery quote builder | embroidery-pricing-service.js | ✅ Active |
+
+### UI Utilities & Helpers
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/toast-notifications.js` | Toast notification system (success/error/info) | — | ✅ Active |
+| `/shared_components/js/elapsed-time-utils.js` | Elapsed-time badges with urgency tiers (Fresh / Waiting / Overdue) — used by all art/mockup dashboards | — | ✅ Active |
+| `/shared_components/js/enhanced-loading-animations.js` | Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |
+| `/shared_components/js/manual-mode-indicator.js` | Visual banner shown when pricing pages are in manual cost override mode | — | ✅ Active |
+| `/shared_components/js/header-button-functions.js` | Header button helper functions (shareQuote, etc.) | — | ✅ Active |
+| `/shared_components/js/cart-drawer.js` | Slide-in cart drawer UI | cart.js | ✅ Active |
+| `/shared_components/js/confetti.js` | Canvas-based confetti animation (lightweight, no library) | — | ✅ Active |
+| `/shared_components/js/quote-indicator-manager.js` | Persistent quote-indicator widget (collapsible, real-time updates) | — | ✅ Active |
+| `/shared_components/js/design-thumbnail-service.js` | Fetch design thumbnails from `Shopworks_Thumbnail_Report` (cached) | /api/thumbnails | ✅ Active |
+| `/shared_components/js/jds-api-service.js` | JDS Industries API service (laser tumblers, 1hr cache) | /api/jds | ✅ Active |
+| `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
+| `/shared_components/js/dp5-helper.js` | Embroidery pricing UI helper — bridges hidden Caspio matrix to custom UI | Caspio datapage | ✅ Active |
+
+### Staff Auth & Misc Dashboards
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/staff-auth-helper.js` | Staff auth gate (Caspio role lookup) — used by quote-audit and staff-only pages | /api/staff/auth | ✅ Active |
+| `/shared_components/js/staff-dashboard-employees.js` | Staff dashboard employee list/widget | /api/employees | ✅ Active |
+| `/shared_components/js/monogram-dashboard.js` | Monogram dashboard controller | — | ✅ Active |
+
+### Test/Dev Utilities (in shared_components/js — TODO move to /tests/)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/shared_components/js/order-service-test-extended.js` | Extended order service tests | sample-order-service.js | ⚠️ Move to /tests/ |
+| `/shared_components/js/order-service-test-utilities.js` | Order service test utilities | — | ⚠️ Move to /tests/ |
+
+### Product Page Modules (`/product/`)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/product/app.js` | Product page main app | components/*, services/* | ✅ Active |
+| `/product/components/decoration-selector.js` | Decoration method selector (DTG/EMB/SP/etc.) | — | ✅ Active |
+| `/product/components/gallery.js` | Product image gallery | — | ✅ Active |
+| `/product/components/image-zoom.js` | Image zoom/pan component | — | ✅ Active |
+| `/product/components/info.js` | Product info display (title, brand, description) | — | ✅ Active |
+| `/product/components/inventory.js` | Product inventory display (per size/color) | services/api.js | ✅ Active |
+| `/product/components/inventory-summary.js` | Inventory summary widget | — | ✅ Active |
+| `/product/components/pricing.js` | Product pricing display | — | ✅ Active |
+| `/product/components/quote-modal.js` | Quote modal (request quote from product page) | services/quote-service.js | ✅ Active |
+| `/product/components/search.js` | In-page product search | — | ✅ Active |
+| `/product/components/swatches.js` | Color swatch picker | — | ✅ Active |
+| `/product/js/decoration-selector.js` | Legacy decoration selector (likely orphan — verify) | — | ⚠️ Verify |
+| `/product/services/api.js` | Product API service (fetch product, inventory, pricing) | Caspio API | ✅ Active |
+| `/product/services/email-service.js` | Product page email service (quote request emails) | EmailJS | ✅ Active |
+| `/product/services/quote-service.js` | Product page quote service (save quote to Caspio) | base-quote-service.js | ✅ Active |
+| `/product/services/state.js` | Product page state management | — | ✅ Active |
+| `/product/styles/product.css` | Product page core styles | — | ✅ Active |
+| `/product/styles/product-2025.css` | Product page 2025 redesign styles | — | ✅ Active |
+| `/product/styles/product-redesign.css` | Product page redesign overlay styles | — | ✅ Active |
+| `/product/styles/quote-modal.css` | Quote modal styles (request quote from product page) | — | ✅ Active |
+
 ## 🎨 Stylesheets
 
 ### Core CSS Files
@@ -423,11 +666,75 @@
 |------|---------|---------|--------|
 | `/shared_components/css/universal-header.css` | Header styles | All pages | ✅ Active |
 | `/shared_components/css/universal-calculator-theme.css` | Calculator theme | All calculators | ✅ Active |
-| `/shared_components/css/embroidery-quote-builder.css` | Embroidery styles | Quote builders | ✅ Active |
-| `/shared_components/css/quote-builder-unified-step1.css` | Step 1 styles | Quote builders | ✅ Active |
+| `/shared_components/css/embroidery-quote-builder.css` | ~~DELETED~~ — replaced by `embroidery-quote-builder-extracted.css` (2026-01-27) | — | ❌ Deleted |
+| `/shared_components/css/embroidery-quote-builder-extracted.css` | Embroidery quote builder styles (2026-01-27 extraction) | Embroidery quote builder | ✅ Active |
+| `/shared_components/css/quote-builder-unified-step1.css` | ~~DELETED~~ — superseded by `quote-builder-common.css` (2026-01-27) | — | ❌ Deleted |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
-| `/shared_components/css/quote-builder-step2-modern.css` | **NEW** Modern Step 2 styles (2025 refactor) | Embroidery & Cap quote builders | ✅ Active |
+| `/shared_components/css/dtg-quote-builder-extracted.css` | DTG quote builder extracted styles (2026-01-27) | DTG quote builder | ✅ Active |
+| `/shared_components/css/screenprint-quote-builder-extracted.css` | Screenprint quote builder extracted styles (2026-01-27) | Screenprint quote builder | ✅ Active |
+| `/shared_components/css/quote-builder-step2-modern.css` | ~~DELETED~~ — Step 2 styles merged into `quote-builder-common.css` | — | ❌ Deleted |
+| `/shared_components/css/quote-builder-common.css` | **Shared** quote builder styles (2026-03 unification — common to all 4 builders) | All 4 quote builders | ✅ Active |
 | `/shared_components/css/quote-share-modal.css` | **NEW** Shareable URL modal styles (2026 consolidation) | All quote builders | ✅ Active |
+| `/shared_components/css/quote-print.css` | Quote print styles (PDF export) | All quote builders | ✅ Active |
+| `/shared_components/css/quote-system.css` | Quote system shared styles | All quote builders | ✅ Active |
+
+### Calculator & Pricing Stylesheets
+| File | Purpose | Used By | Status |
+|------|---------|---------|--------|
+| `/shared_components/css/calculator-base.css` | Calculator base styles (foundation for all calc pages) | All calculators | ✅ Active |
+| `/shared_components/css/calculator-modern-enhancements.css` | Modern calculator enhancements (2026 refresh) | All calculators | ✅ Active |
+| `/shared_components/css/shared-pricing-styles.css` | Shared pricing display styles | All pricing pages | ✅ Active |
+| `/shared_components/css/screenprint-pricing-clean.css` | Clean screen print pricing styles | Screen print calculator | ✅ Active |
+| `/shared_components/css/screenprint-pricing-tables.css` | Screen print pricing tables | Screen print calculator | ✅ Active |
+| `/shared_components/css/screenprint-toggle-styles.css` | Screen print toggle styles | Screen print calculator | ✅ Active |
+| `/shared_components/css/screenprint-safety-stripes.css` | Safety stripes feature styles | Screen print + safety stripe creator | ✅ Active |
+| `/shared_components/css/safety-stripe-creator.css` | Safety stripe creator styles | safety-stripe-creator.html | ✅ Active |
+| `/shared_components/css/dtf-calculator.css` | DTF calculator styles | DTF pricing calculator | ✅ Active |
+| `/shared_components/css/dtf-calculator-fix.css` | DTF calculator style fixes | DTF pricing calculator | ✅ Active |
+| `/shared_components/css/dtf-outline-override.css` | DTF outline override styles | DTF pricing calculator | ✅ Active |
+| `/shared_components/css/dtg-brand-override.css` | DTG brand color overrides | DTG quote builder | ✅ Active |
+| `/shared_components/css/dtg-ltm-quantity-input.css` | DTG LTM quantity input styles | DTG calculators | ✅ Active |
+| `/shared_components/css/laser-tumbler-simple.css` | Laser tumbler simple flow styles | Laser tumbler calculator | ✅ Active |
+| `/calculators/screenprint-manual-fix.css` | Screen print manual calculator fix styles | Manual pricing calculator | ✅ Active |
+
+### Universal & Component Stylesheets
+| File | Purpose | Used By | Status |
+|------|---------|---------|--------|
+| `/shared_components/css/universal-image-gallery.css` | Universal image gallery styles | Product pages | ✅ Active |
+| `/shared_components/css/universal-pricing-components.css` | Universal pricing component styles | Pricing pages | ✅ Active |
+| `/shared_components/css/universal-pricing-grid.css` | Universal pricing grid styles | Pricing pages | ✅ Active |
+| `/shared_components/css/universal-pricing-header.css` | Universal pricing header styles | Pricing pages | ✅ Active |
+| `/shared_components/css/universal-pricing-layout.css` | Universal pricing layout styles | Pricing pages | ✅ Active |
+| `/shared_components/css/universal-product-display.css` | Universal product display styles | Product pages | ✅ Active |
+| `/shared_components/css/universal-quick-quote.css` | Universal quick quote styles | Quote builders | ✅ Active |
+| `/shared_components/css/universal-toggle-pricing.css` | Universal toggle pricing styles | Pricing pages | ✅ Active |
+| `/shared_components/css/universal-ltm-quantity-input.css` | Universal LTM quantity input styles | All quote builders | ✅ Active |
+| `/shared_components/css/additional-logo-pricing-table.css` | Additional logo pricing table styles | Cap + embroidery quote builders | ✅ Active |
+| `/shared_components/css/color-picker-shared.css` | Shared color picker styles | All quote builders | ✅ Active |
+| `/shared_components/css/product-thumbnail-modal.css` | Product thumbnail modal styles | All quote builders | ✅ Active |
+| `/shared_components/css/image-modal.css` | Generic image modal styles | Multiple pages | ✅ Active |
+| `/shared_components/css/cart-drawer.css` | Cart drawer slide-in styles | Cart UI | ✅ Active |
+| `/shared_components/css/dashboard-styles.css` | Shared dashboard styles | All dashboards | ✅ Active |
+| `/shared_components/css/kanban.css` | Kanban board shared styles (4 boards: art-hub, transfers, supacolor, etc.) | All kanban dashboards | ✅ Active |
+| `/shared_components/css/art-hub.css` | Art Hub design tokens + shared styles (2026 design system) | art-hub-steve, art-hub-ruth, ae-dashboard, bradley-transfers | ✅ Active |
+| `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
+| `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
+| `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
+| `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
+| `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
+| `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
+| `/shared_components/css/force-green-theme.css` | Force NWCA green theme override | Multiple pages | ✅ Active |
+| `/shared_components/css/modern-enhancements.css` | Modern UI enhancement overlays | Multiple pages | ✅ Active |
+| `/shared_components/css/staff-dashboard-layout.css` | Staff dashboard layout (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
+| `/shared_components/css/staff-dashboard-widgets.css` | Staff dashboard widgets (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
+| `/shared_components/css/staff-dashboard-dark.css` | Staff dashboard dark theme (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
+| `/shared_components/css/staff-dashboard-v2.css` | Staff dashboard v2 styles | staff-dashboard.html | ✅ Active |
+| `/shared_components/css/staff-dashboard-v2-tokens.css` | Staff dashboard v2 design tokens | staff-dashboard.html | ✅ Active |
+| `/shared_components/css/names-numbers.css` | Names & Numbers roster manager styles | names-numbers.html + dashboard | ✅ Active |
+| `/shared_components/css/monogram-form.css` | Monogram form styles | monogram-form.html | ✅ Active |
+| `/shared_components/css/old-designs.css` | Old designs archive styles | old-designs.html | ✅ Active |
+| `/shared_components/css/customer-lookup.css` | Customer lookup autocomplete styles | All quote builders | ✅ Active |
+| `/shared_components/css/shopworks-import.css` | ShopWorks import modal styles | Embroidery quote builder | ✅ Active |
 
 ### 🧮 Manual Calculator CSS Architecture
 
@@ -518,6 +825,16 @@ cap-embroidery-fix.css
 | `/memory/CRM_DASHBOARD_AUTH.md` | CRM dashboard role-based auth (sessions + API proxy) | ✅ Active |
 
 ## 📂 Dashboard & Admin
+
+### New Dashboard Pages (NEW 2026-04)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/dashboards/portal-directory.html` | Customer portal directory — index of customer portals | portal-directory.js, portal-directory.css | ✅ Active |
+| `/dashboards/js/portal-directory.js` | Portal directory controller — customer list, search | /api/customers | ✅ Active |
+| `/dashboards/css/portal-directory.css` | Portal directory styles | — | ✅ Active |
+| `/dashboards/supacolor-orders.html` | Supacolor orders dashboard — local mirror of Supacolor jobs | supacolor-orders.js, supacolor-orders.css, kanban.css | ✅ Active |
+| `/dashboards/js/supacolor-orders.js` | Supacolor orders controller — sync trigger, kanban view, filters | /api/supacolor-jobs | ✅ Active |
+| `/dashboards/css/supacolor-orders.css` | Supacolor orders dashboard styles | kanban.css | ✅ Active |
 
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
@@ -662,6 +979,27 @@ cap-embroidery-fix.css
 
 ## 📊 Statistics
 
+**As of 2026-04-29 audit (filesystem totals — see header for scope):**
+- Active code files: **575** (296 HTML, 269 JS, 195 CSS — `tests/` excluded)
+- Per directory:
+  - `shared_components/js/`: 146 files (largest single dir)
+  - `calculators/` (incl. archive): 84 files
+  - `pages/` (incl. js/, css/, order-form/, services/, utils/): 76 files
+  - `shared_components/css/`: 61 files
+  - `dashboards/` (incl. js/, css/, reports/): 39 files
+  - `training/`: 38 files
+  - Root (HTML/JS/CSS only): 34 files
+  - `product/` (incl. components/, services/, styles/, js/): 20 files
+  - `scripts/` (incl. safety-tools/): 20 files
+  - `mockups/`: 11 files
+  - `policies/`: 8 files
+  - `email-templates/`: 7 files
+  - `quote-builders/`: 6 files
+  - `tools/`, `templates/`: 5 each
+  - `admin/`, `art-tools/`, `vendor-portals/`: 3-4 each
+  - `employee-bundles/`, `richardson-caps/`: 2 each
+
+
 ### File Count by Type
 - **HTML Files:** ~120
 - **JavaScript Files:** ~130
@@ -685,6 +1023,93 @@ cap-embroidery-fix.css
 | Multiple JS files | Hardcoded API URLs (149 instances) | High |
 
 ## 📁 Additional Directories
+
+### Training Materials (`/training/` — 38 files)
+
+Operational guides, training modules, and Adriyella's daily-task tooling. Most are standalone HTML pages with embedded JS/CSS.
+
+| File | Purpose | Status |
+|------|---------|--------|
+| `/training/adriyella-admin.html` | Adriyella admin landing page | ✅ Active |
+| `/training/adriyella-admin-dashboard.html` | Adriyella admin dashboard | ✅ Active |
+| `/training/adriyella-billing-dashboard.html` | Adriyella billing dashboard | ✅ Active |
+| `/training/adriyella-bonus-calculator.html` | Adriyella bonus calculator | ✅ Active |
+| `/training/adriyella-bonus-report.html` | Adriyella bonus report | ✅ Active |
+| `/training/adriyella-daily-report.html` | Adriyella daily report | ✅ Active |
+| `/training/adriyella-daily-tasks.html` | Adriyella daily tasks (v1) | ✅ Active |
+| `/training/adriyella-daily-tasks-v2.html` | Adriyella daily tasks (v2 — current) | ✅ Active |
+| `/training/adriyella-task-history.html` | Adriyella task history view | ✅ Active |
+| `/training/adriyella-test-guide.html` | Adriyella test guide | ✅ Active |
+| `/training/adriyella-performance-utils.js` | Adriyella performance utility functions | ✅ Active |
+| `/training/adriyella-task-service.js` | Adriyella task service (Caspio CRUD) | ✅ Active |
+| `/training/api-test-runner.html` | API test runner harness | ✅ Active |
+| `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
+| `/training/bonus-policy.html` | Bonus policy reference | ✅ Active |
+| `/training/cap-training.html` | Cap embroidery training | ✅ Active |
+| `/training/customer-categorization-training.html` | Customer categorization training | ✅ Active |
+| `/training/customer-service.html` | Customer service training | ✅ Active |
+| `/training/get-to-know-erik.html` | "Get to know Erik" intro page | ✅ Active |
+| `/training/google-review-guide.html` | Google review request guide | ✅ Active |
+| `/training/lead-email-templates.html` | Lead email templates | ✅ Active |
+| `/training/lead-follow-up-guide.html` | Lead follow-up guide | ✅ Active |
+| `/training/lead-sheet-guide.html` | Lead sheet guide | ✅ Active |
+| `/training/lead-source-training.html` | Lead source training | ✅ Active |
+| `/training/nwca-language-reference.html` | NWCA language/terminology reference | ✅ Active |
+| `/training/quick-reference-tips.html` | Quick reference tips | ✅ Active |
+| `/training/sales-coordinator-manual.html` | Sales coordinator manual | ✅ Active |
+| `/training/sales-coordinator-training-schedule.html` | Sales coordinator training schedule | ✅ Active |
+| `/training/sales-tax-code-trainer.html` | Sales tax code trainer | ✅ Active |
+| `/training/shopworks-customer-setup.html` | ShopWorks customer setup guide | ✅ Active |
+| `/training/shopworks-customer-setup-enhanced.html` | ShopWorks customer setup (enhanced) | ✅ Active |
+| `/training/shopworks-customer-setup-working.html` | ShopWorks customer setup (working draft) | ⚠️ Verify |
+| `/training/shopworks-embroidery-order-type.html` | ShopWorks embroidery order type guide | ✅ Active |
+| `/training/shopworks-notes.html` | ShopWorks notes reference | ✅ Active |
+| `/training/shopworks-sales-tax-training.html` | ShopWorks sales tax training | ✅ Active |
+| `/training/team-match-game.html` | Team match game (training) | ✅ Active |
+| `/training/test.html` | Test page (likely scratch — verify) | ⚠️ Verify |
+| `/training/thank-you-card-guide.html` | Thank-you card guide | ✅ Active |
+| `/training/training-engine-base.js` | Training engine base class | ✅ Active |
+| `/training/training-games-hub.html` | Training games hub | ✅ Active |
+| `/training/server.js` | Local training server (dev only) | ⚙️ Tooling |
+| `/training/simple-server.js` | Simple training server (dev only) | ⚙️ Tooling |
+
+### Mockups & Prototypes (`/mockups/` — 11 files)
+
+UI/UX prototypes used during design iteration. Not in production routes.
+
+| File | Purpose | Status |
+|------|---------|--------|
+| `/mockups/dtg-3-step-mockup.html` | DTG 3-step ordering flow mockup | 🎨 Prototype |
+| `/mockups/dtg-3-step-complete.html` | DTG 3-step complete state mockup | 🎨 Prototype |
+| `/mockups/dtg-location-mockup.html` | DTG location selector mockup | 🎨 Prototype |
+| `/mockups/dtg-location-mockup-real-image.html` | DTG location mockup (real image variant) | 🎨 Prototype |
+| `/mockups/dtg-location-mockup-with-images.html` | DTG location mockup (with images) | 🎨 Prototype |
+| `/mockups/dtg-location-selector-final.html` | DTG location selector (final design) | 🎨 Prototype |
+| `/mockups/edit-ruth-mockup.html` | Ruth mockup edit prototype | 🎨 Prototype |
+| `/mockups/product-page-complete-mockup.html` | Product page complete mockup | 🎨 Prototype |
+| `/mockups/staff-portal-mockup-1.html` | Staff portal mockup variant 1 | 🎨 Prototype |
+| `/mockups/staff-portal-mockup-2.html` | Staff portal mockup variant 2 | 🎨 Prototype |
+| `/mockups/staff-portal-mockup-3.html` | Staff portal mockup variant 3 | 🎨 Prototype |
+
+### Other Active Directories (file-count summary)
+
+These directories contain code but aren't enumerated at file level — list grows on demand.
+
+| Directory | File Count | Contents |
+|-----------|-----------|----------|
+| `/admin/` | 4 HTML | Announcements admin, BOGO promo admin, universal records admin |
+| `/art-tools/` | 3 HTML | AE art dashboard, AE submit art, art approval |
+| `/email-templates/` | 7 HTML | EmailJS templates: BCA customer email, xmas bundle, ready, embroidery, sample request, screenprint customer |
+| `/employee-bundles/` | 2 HTML | streich-bros-bundle, wcttr-bundle |
+| `/policies/` (root-level) | 8 HTML | Bundle kitting xmas, customer notification SOP, DTG artwork checklist, LTM fee policy, LTM order decision algorithm, payment terms, retail-vs-wholesale policy, sales office procedures |
+| `/richardson-caps/` | 1 HTML + 1 JS | view-combination-caps.html, scripts/richardson-combination-caps-manual.js |
+| `/scripts/` | 14 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, etc. |
+| `/scripts/safety-tools/` | 7 JS | auto-recovery, comprehensive-test-suite, dependency-mapper, error-monitor, file-access-monitor, safe-delete, validate-critical-paths |
+| `/templates/` | 4 HTML + 1 JS | Calculator template, email template, emblem email template, laser tumbler EmailJS template, quote service template |
+| `/tools/` | 5 HTML | Cap layout mockup, CSS diagnostic, decoration selector mockup, diagnose-css-override, diagnose-search-issue |
+| `/vendor-portals/` | 3 HTML | sanmar-credits, sanmar-invoices, sanmar-vendor-portal |
+| `/config/` | 1 JS | app.config.js (central configuration) |
+| `/temp/` | 1 JS | verify-dtg-pricing.js (likely cruft — verify and remove) |
 
 ### Support & Documentation
 | Directory | Purpose | Status | Notes |
