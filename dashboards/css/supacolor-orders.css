@@ -230,6 +230,11 @@
     width: fit-content;
 }
 .sc-ship-expected i { font-size: 10px; opacity: 0.8; }
+
+/* "Arriving Today" stat chip — matches the amber Expected ETA pill so the
+   visual link is obvious: "this card filters to those rows." */
+.bt-stat-chip--arriving { border-left-color: #f59e0b; }
+.bt-stat-chip--arriving .bt-stat-count { color: #b45309; }
 /* Tracking pill under the shipped date. Clickable when carrier is known
    (opens carrier tracking page in new tab); static text otherwise. */
 .sc-track-pill {

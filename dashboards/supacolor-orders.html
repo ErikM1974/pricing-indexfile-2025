@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=22">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=6">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=9">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=10">
 </head>
 <body>
     <div class="minimal-header">
@@ -66,6 +66,10 @@
                     <div class="bt-stat-chip bt-stat-chip--ordered bt-stat-chip--clickable selected" data-view="active" role="button" tabindex="0" title="Show active jobs">
                         <span class="bt-stat-count" id="sc-stat-open">&mdash;</span>
                         <span class="bt-stat-label">Active</span>
+                    </div>
+                    <div class="bt-stat-chip bt-stat-chip--arriving bt-stat-chip--clickable" data-view="arriving" role="button" tabindex="0" title="Shipped from Supacolor, expected today or earlier, not yet received">
+                        <span class="bt-stat-count" id="sc-stat-arriving">&mdash;</span>
+                        <span class="bt-stat-label">Arriving Today</span>
                     </div>
                     <div class="bt-stat-chip bt-stat-chip--received bt-stat-chip--clickable" data-view="closed" role="button" tabindex="0" title="Show closed jobs">
                         <span class="bt-stat-count" id="sc-stat-closed">&mdash;</span>
@@ -166,6 +170,6 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=16"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=17"></script>
 </body>
 </html>

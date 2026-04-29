@@ -85,6 +85,28 @@
         return days * sign;
     }
 
+    // True when a job has shipped from Supacolor, has not yet been received,
+    // and its 2-biz-day ETA is today or earlier — i.e. Mikalah should be
+    // watching for it at the dock.
+    //
+    // Bounded to recently-shipped jobs (last ARRIVING_LOOKBACK_BIZ_DAYS) to
+    // avoid sweeping up old jobs whose Date_Received was simply never marked
+    // in PurchaseOrders — those are data gaps, not packages in transit.
+    var ARRIVING_LOOKBACK_BIZ_DAYS = 5;
+    function isArrivingTodayOrEarlier(j, today) {
+        if (j.Date_Received || j.Status === 'Cancelled') return false;
+        var shipped = parseDate(j.Date_Shipped);
+        if (!shipped) return false;
+        if (businessDaysBetween(shipped, today) > ARRIVING_LOOKBACK_BIZ_DAYS) return false;
+        var expected = addBusinessDays(shipped, EXPECTED_TRANSIT_DAYS);
+        return expected <= today;
+    }
+
+    function todayLocalMidnight() {
+        var t = new Date();
+        return new Date(t.getFullYear(), t.getMonth(), t.getDate());
+    }
+
     // Average business-day transit (Supacolor ship → NWCA receive) computed
     // across the loaded job set. Outliers (>14 biz days) skipped — likely
     // re-prints or data oddities, not representative.
@@ -106,22 +128,13 @@
     }
 
     // Returns a {level, text} risk descriptor or null when no badge should show.
-    // Levels: 'invoiced' | 'overdue' | 'risk' | 'tight'.
-    // 'invoiced' is a positive "all done" pill — short-circuits all risk math.
-    function formatMoney(n) {
-        if (n == null || isNaN(n)) return '';
-        return '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    // Returns a {level, text} risk descriptor or null when no badge should show.
     // Levels: 'invoiced' | 'overdue' | 'risk'. Quiet by design: only flag jobs
     // that are invoiced (positive), overdue, or due within 2 working days.
     // Anything further out stays clean — keeps the dashboard high-signal.
     function computeDueRisk(j, avgTransitBizDays, today) {
         if (j.Status === 'Cancelled') return null;
         if (j.Order_Invoiced_Date) {
-            var totalStr = j.Order_Invoice_Total != null ? ' · ' + formatMoney(j.Order_Invoice_Total) : '';
-            return { level: 'invoiced', text: 'Invoiced Completed' + totalStr };
+            return { level: 'invoiced', text: 'Invoiced Completed' };
         }
         var due = parseDate(j.Order_Due_Date);
         if (!due) return null;
@@ -295,14 +308,17 @@
     function applyFilters() {
         var f = state.filters;
         var search = f.search.toLowerCase().trim();
+        var today = todayLocalMidnight();
 
         state.filteredJobs = state.allJobs.filter(function (j) {
             // View filter (driven by the clickable stat cards):
             //   active    = anything that isn't Closed/Cancelled (Open, Ganged, etc.)
+            //   arriving  = shipped, not received, ETA today or earlier
             //   closed    = Closed only (Cancelled has its own bucket now)
             //   cancelled = Cancelled only
             //   all       = no view filter
             if (f.view === 'active'    && (j.Status === 'Closed' || j.Status === 'Cancelled')) return false;
+            if (f.view === 'arriving'  && !isArrivingTodayOrEarlier(j, today)) return false;
             if (f.view === 'closed'    && j.Status !== 'Closed') return false;
             if (f.view === 'cancelled' && j.Status !== 'Cancelled') return false;
 
@@ -336,6 +352,15 @@
         $('sc-stat-cancelled').textContent  = state.stats.Cancelled || 0;
         var total = active + (state.stats.Closed || 0) + (state.stats.Cancelled || 0);
         $('sc-stat-total').textContent = total;
+
+        // Arriving Today: shipped + not received + ETA ≤ today (Mikalah's watch list).
+        var todayMid = todayLocalMidnight();
+        var arrivingCount = 0;
+        for (var i = 0; i < state.allJobs.length; i++) {
+            if (isArrivingTodayOrEarlier(state.allJobs[i], todayMid)) arrivingCount++;
+        }
+        var arrivingSlot = $('sc-stat-arriving');
+        if (arrivingSlot) arrivingSlot.textContent = arrivingCount;
 
         // Average FedEx transit (Supacolor LA → NWCA Milton) — business days,
         // computed across the loaded job set, surfaced under the title.
@@ -428,7 +453,7 @@
                     '<div class="sc-cell sc-cell--job">Job #</div>' +
                     '<div class="sc-cell sc-cell--po">PO</div>' +
                     '<div class="sc-cell sc-cell--desc">Customer</div>' +
-                    '<div class="sc-cell sc-cell--received">Received</div>' +
+                    '<div class="sc-cell sc-cell--received">Mikalah Received</div>' +
                     '<div class="sc-cell sc-cell--status">Status</div>' +
                     '<div class="sc-cell sc-cell--shipped">Shipped</div>' +
                     '<div class="sc-cell sc-cell--chevron"></div>' +
