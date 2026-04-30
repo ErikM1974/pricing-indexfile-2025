@@ -1155,7 +1155,8 @@ class HouseAccountsController {
                     // Find the most recent Last_Sync_Date
                     let latestSync = null;
                     accounts.forEach(acc => {
-                        const syncDate = acc.Last_Sync_Date ? new Date(acc.Last_Sync_Date) : null;
+                        // Caspio Last_Sync_Date is Pacific wall-clock — resolve via shared helper.
+                        const syncDate = acc.Last_Sync_Date ? (window.CaspioDate ? window.CaspioDate.parse(acc.Last_Sync_Date) : new Date(acc.Last_Sync_Date)) : null;
                         if (syncDate && (!latestSync || syncDate > latestSync)) {
                             latestSync = syncDate;
                         }

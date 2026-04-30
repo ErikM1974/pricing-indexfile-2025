@@ -205,8 +205,9 @@
         var sub = $('sjd-shipped-sub');
         sub.textContent = '';
         if (j.Date_Shipped && j.Requested_Ship_Date) {
-            var shipped = new Date((j.Date_Shipped.length === 19 ? j.Date_Shipped + 'Z' : j.Date_Shipped));
-            var requested = new Date((j.Requested_Ship_Date.length === 19 ? j.Requested_Ship_Date + 'Z' : j.Requested_Ship_Date));
+            // Caspio naive timestamps are Pacific wall-clock — resolve via the shared helper.
+            var shipped = window.CaspioDate ? window.CaspioDate.parse(j.Date_Shipped) : new Date(j.Date_Shipped);
+            var requested = window.CaspioDate ? window.CaspioDate.parse(j.Requested_Ship_Date) : new Date(j.Requested_Ship_Date);
             if (!isNaN(shipped) && !isNaN(requested)) {
                 var diffDays = Math.round((shipped - requested) / (1000 * 60 * 60 * 24));
                 if (diffDays === 0) { sub.textContent = 'On time'; sub.className = 'sjd-timeline-sub sjd-timeline-sub--ontime'; }
@@ -434,8 +435,8 @@
 
         // Sort newest first
         var sorted = events.slice().sort(function (a, b) {
-            var ta = a.Event_At ? new Date((a.Event_At.length === 19 ? a.Event_At + 'Z' : a.Event_At)).getTime() : 0;
-            var tb = b.Event_At ? new Date((b.Event_At.length === 19 ? b.Event_At + 'Z' : b.Event_At)).getTime() : 0;
+            var ta = a.Event_At && window.CaspioDate ? (window.CaspioDate.parse(a.Event_At) || new Date(0)).getTime() : 0;
+            var tb = b.Event_At && window.CaspioDate ? (window.CaspioDate.parse(b.Event_At) || new Date(0)).getTime() : 0;
             return tb - ta;
         });
 

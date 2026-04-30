@@ -847,7 +847,10 @@
             // Customer approval elapsed time (shown on any status)
             var custElapsedHtml = '';
             if (mockup.Customer_Approval_Sent_Date) {
-                var custElapsed = getElapsedText(new Date(mockup.Customer_Approval_Sent_Date));
+                // Pass the raw Caspio string — getElapsedText routes through
+                // window.CaspioDate.parse which handles Pacific server time.
+                // Wrapping in `new Date()` here would skip that fix.
+                var custElapsed = getElapsedText(mockup.Customer_Approval_Sent_Date);
                 custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
             }
 
@@ -860,7 +863,7 @@
                 aeBar.style.display = '';
                 var aeElapsedHtml = '';
                 if (mockup.Approval_Sent_Date) {
-                    var aeElapsed = getElapsedText(new Date(mockup.Approval_Sent_Date));
+                    var aeElapsed = getElapsedText(mockup.Approval_Sent_Date);
                     aeElapsedHtml = ' <span class="approval-elapsed ' + aeElapsed.cssClass + '" style="margin-left:8px;" title="' + escapeHtml(formatDate(mockup.Approval_Sent_Date)) + '">(sent ' + escapeHtml(aeElapsed.text) + ')</span>';
                 }
 

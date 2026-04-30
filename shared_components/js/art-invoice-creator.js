@@ -1008,7 +1008,10 @@ function updateInvoicePreview() {
     const projectType = safeGetElementValue('projectType', 'Design Work');
     const complexity = safeGetElementValue('complexity', 'Standard');
     const artistName = 'Steve Deland';
-    const requestDate = selectedRequest.Date_Created ? new Date(selectedRequest.Date_Created).toLocaleDateString() : 'N/A';
+    // Caspio Date_Created is Pacific wall-clock — resolve via CaspioDate (loaded by host page).
+    const requestDate = selectedRequest.Date_Created
+        ? (window.CaspioDate ? window.CaspioDate.formatDate(selectedRequest.Date_Created, { fallback: 'N/A' }) : new Date(selectedRequest.Date_Created).toLocaleDateString())
+        : 'N/A';
     const completionDate = new Date().toLocaleDateString();
     
     // Get service items and calculate totals
