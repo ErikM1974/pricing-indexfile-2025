@@ -46,7 +46,6 @@
 
     // ── Tab Switching ───────────────────────────────────────────────
 
-    var VISIBLE_TABS = ['submit', 'view', 'mockup-ruth', 'digitizing'];
     var DROPDOWN_TABS = ['review', 'requirements'];
 
     var TAB_PANE_MAP = {
@@ -58,27 +57,112 @@
         'review': 'review-tab'
     };
 
+    // Two-tier nav: section → pages. Single source of truth.
+    var SECTIONS = {
+        steve: {
+            label: 'Steve', sub: 'Graphic Arts',
+            pages: [
+                { id: 'submit', label: 'Submit Artwork to Steve' },
+                { id: 'view',   label: 'Steve Mockups' }
+            ]
+        },
+        ruth: {
+            label: 'Ruth', sub: 'Digitizing',
+            pages: [
+                { id: 'mockup-ruth', label: 'Submit Artwork to Ruth' },
+                { id: 'digitizing',  label: 'Ruth Mockups' }
+            ]
+        },
+        transfers: {
+            label: 'Transfers', sub: 'Supacolor',
+            pages: [
+                { id: 'supacolor-link', label: 'Supacolor API Orders', href: '/dashboards/supacolor-orders.html' }
+            ]
+        },
+        personalization: {
+            label: 'Personalization', sub: 'Names · Numbers · Monogram',
+            pages: [
+                { id: 'names-link',    label: 'Names & Numbers',     href: '/dashboards/names-numbers-dashboard.html' },
+                { id: 'monogram-link', label: 'Monogram Dashboard',  href: '/dashboards/monogram-dashboard.html' }
+            ]
+        }
+    };
+
+    var IN_PAGE_TAB_TO_SECTION = {
+        'submit': 'steve',
+        'view': 'steve',
+        'mockup-ruth': 'ruth',
+        'digitizing': 'ruth'
+        // 'review' and 'requirements' live in More dropdown, no section ownership
+    };
+
+    var aeNavState = { section: 'steve' };
+
+    function escapeHtmlSafe(str) {
+        if (str == null) return '';
+        var div = document.createElement('div');
+        div.textContent = String(str);
+        return div.innerHTML;
+    }
+
+    function renderAeNavSub(activePageId) {
+        var subRow = document.getElementById('aeNavSub');
+        if (!subRow) return;
+        var sec = SECTIONS[aeNavState.section];
+        if (!sec) return;
+
+        // Preserve the More dropdown that already lives in the sub row
+        var moreDropdown = subRow.querySelector('.more-dropdown');
+
+        // Build sub-tabs HTML
+        var html = sec.pages.map(function (p) {
+            var isActive = (!p.href && p.id === activePageId) ? ' is-active' : '';
+            var external = p.href ? ' ae-nav__sub-tab--external' : '';
+            if (p.href) {
+                return '<a class="ae-nav__sub-tab' + external + '" href="' + escapeHtmlSafe(p.href) + '" data-page="' + escapeHtmlSafe(p.id) + '">' +
+                       escapeHtmlSafe(p.label) + '</a>';
+            }
+            return '<button type="button" class="ae-nav__sub-tab' + isActive + '" role="tab" data-page="' + escapeHtmlSafe(p.id) + '">' +
+                   escapeHtmlSafe(p.label) + '</button>';
+        }).join('');
+
+        subRow.innerHTML = html + '<span class="ae-nav__sub-spacer"></span>';
+        if (moreDropdown) subRow.appendChild(moreDropdown);
+    }
+
+    function setActiveSection(sectionId, opts) {
+        if (!SECTIONS[sectionId]) return;
+        aeNavState.section = sectionId;
+        document.querySelectorAll('.ae-nav__section').forEach(function (btn) {
+            var match = btn.dataset.section === sectionId;
+            btn.classList.toggle('is-active', match);
+            if (match) btn.setAttribute('aria-selected', 'true');
+            else btn.removeAttribute('aria-selected');
+        });
+        var activePageId = (opts && opts.activePageId) || null;
+        renderAeNavSub(activePageId);
+    }
+
     window.showTab = function (tabName) {
-        // Remove active class from all buttons and panes
-        document.querySelectorAll('.tab-button').forEach(function (btn) { btn.classList.remove('active'); });
+        // Remove active states
         document.querySelectorAll('.dropdown-item').forEach(function (item) { item.classList.remove('active'); });
         document.querySelectorAll('.tab-pane').forEach(function (pane) { pane.classList.remove('active'); });
 
-        var visibleIndex = VISIBLE_TABS.indexOf(tabName);
-
-        if (visibleIndex !== -1) {
-            var buttons = document.querySelectorAll('.tab-button');
-            if (buttons[visibleIndex]) buttons[visibleIndex].classList.add('active');
+        var owningSection = IN_PAGE_TAB_TO_SECTION[tabName];
+        if (owningSection) {
+            // Activate the owning section + sub-tab
+            setActiveSection(owningSection, { activePageId: tabName });
             var moreBtn = document.getElementById('moreButton');
             if (moreBtn) moreBtn.classList.remove('active');
         } else {
+            // Dropdown tab (Review / Requirements). Mark More button active.
             var dropdownItems = document.querySelectorAll('.dropdown-item');
             var dropdownIndex = DROPDOWN_TABS.indexOf(tabName);
             if (dropdownIndex !== -1 && dropdownItems[dropdownIndex]) {
                 dropdownItems[dropdownIndex].classList.add('active');
-                var moreBtn2 = document.getElementById('moreButton');
-                if (moreBtn2) moreBtn2.classList.add('active');
             }
+            var moreBtn2 = document.getElementById('moreButton');
+            if (moreBtn2) moreBtn2.classList.add('active');
         }
 
         if (TAB_PANE_MAP.hasOwnProperty(tabName)) {
@@ -86,25 +170,61 @@
             if (pane) pane.classList.add('active');
         }
 
-        // Load review tab data on switch
         if (tabName === 'review') loadReviewTab();
 
         localStorage.setItem('aeDashboardTab', tabName);
     };
 
+    // ── AeNav: wire section + sub-tab clicks ───────────────────────
+    function initAeNav() {
+        // Tier 1: section tabs
+        document.querySelectorAll('.ae-nav__section').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var sectionId = btn.dataset.section;
+                if (!SECTIONS[sectionId]) return;
+                var firstPage = SECTIONS[sectionId].pages[0];
+                if (firstPage.href) {
+                    // External-link section (Transfers / Personalization with single page)
+                    setActiveSection(sectionId, { activePageId: null });
+                    // Don't navigate yet — let user click the sub-tab. Just clear pane state.
+                    document.querySelectorAll('.tab-pane').forEach(function (pane) { pane.classList.remove('active'); });
+                    document.querySelectorAll('.dropdown-item').forEach(function (item) { item.classList.remove('active'); });
+                    var moreBtn = document.getElementById('moreButton');
+                    if (moreBtn) moreBtn.classList.remove('active');
+                } else {
+                    showTab(firstPage.id);
+                }
+            });
+        });
+
+        // Tier 2: sub-tab clicks (delegated — re-renders replace the buttons)
+        var subRow = document.getElementById('aeNavSub');
+        if (subRow) {
+            subRow.addEventListener('click', function (e) {
+                var tab = e.target.closest('.ae-nav__sub-tab');
+                if (!tab) return;
+                var pageId = tab.dataset.page;
+                if (tab.tagName === 'A') {
+                    // External link — let the browser navigate.
+                    return;
+                }
+                if (TAB_PANE_MAP.hasOwnProperty(pageId)) {
+                    showTab(pageId);
+                }
+            });
+        }
+    }
+
     // Restore saved tab on load
     document.addEventListener('DOMContentLoaded', function () {
+        initAeNav();
+
         var savedTab = localStorage.getItem('aeDashboardTab');
-        if (savedTab) {
-            // Fallback to submit if saved tab no longer exists (e.g., removed mockup-tab)
-            if (!TAB_PANE_MAP.hasOwnProperty(savedTab)) {
-                savedTab = 'submit';
-                localStorage.setItem('aeDashboardTab', savedTab);
-            }
-            if (savedTab !== 'submit') {
-                showTab(savedTab);
-            }
+        if (!savedTab || !TAB_PANE_MAP.hasOwnProperty(savedTab)) {
+            savedTab = 'submit';
+            localStorage.setItem('aeDashboardTab', savedTab);
         }
+        showTab(savedTab);
     });
 
     // ── Note Modals ────────────────────────────────────────────────

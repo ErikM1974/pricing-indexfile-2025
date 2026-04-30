@@ -1,0 +1,246 @@
+/**
+ * ae-nav-v2.css — AE Dashboard two-tier navigation
+ *
+ * Tier 1: Section tabs (Steve / Ruth / Transfers / Personalization)
+ * Tier 2: Sub-tabs for the active section (renders in-page tabs or links)
+ *
+ * Scoped under .ae-nav so it does not collide with legacy .tab-button rules
+ * in art-hub.css (still used by art-hub-steve.html / art-hub-ruth.html).
+ */
+
+.ae-nav {
+    --ae-maroon: #981e32;
+    --ae-maroon-deep: #7a1828;
+    --ae-maroon-soft: #f4e4e7;
+    --ae-maroon-tint: #fbf3f4;
+    --ae-ink: #1a1414;
+    --ae-ink-2: #4a4244;
+    --ae-ink-3: #756a6c;
+    --ae-line: #e6dedf;
+    --ae-line-2: #f0eaeb;
+
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: white;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+/* ── TIER 1: Section tabs ───────────────────────────────────────────── */
+
+.ae-nav__sections {
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    background: var(--ae-maroon-tint);
+    border-bottom: 1px solid var(--ae-line);
+}
+
+.ae-nav__section {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    padding: 14px 20px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    position: relative;
+    color: var(--ae-ink-3);
+    border-bottom: 3px solid transparent;
+    font-family: inherit;
+    transition: background 120ms ease, color 120ms ease;
+    min-width: 0;
+}
+
+.ae-nav__section:hover {
+    color: var(--ae-ink);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.ae-nav__section.is-active {
+    color: var(--ae-maroon);
+    border-bottom-color: var(--ae-maroon);
+    background: white;
+}
+
+.ae-nav__section-label {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+}
+
+.ae-nav__section-sub {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    opacity: 0.85;
+    line-height: 1.2;
+}
+
+.ae-nav__section-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+}
+
+/* ── TIER 2: Sub-tabs ───────────────────────────────────────────────── */
+
+.ae-nav__sub {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 16px;
+    background: white;
+    border-bottom: 1px solid var(--ae-line);
+    height: 44px;
+    position: relative;
+}
+
+.ae-nav__sub-tab {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    background: transparent;
+    padding: 0 14px;
+    height: 44px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ae-ink-2);
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 120ms ease, background 120ms ease;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.ae-nav__sub-tab:hover {
+    color: var(--ae-ink);
+    background: var(--ae-maroon-tint);
+}
+
+.ae-nav__sub-tab.is-active {
+    color: var(--ae-maroon);
+    font-weight: 600;
+    border-bottom-color: var(--ae-maroon);
+}
+
+.ae-nav__sub-tab--external::after {
+    content: "↗";
+    font-size: 11px;
+    opacity: 0.6;
+    margin-left: 2px;
+}
+
+.ae-nav__sub-spacer {
+    flex: 1;
+}
+
+/* ── Badges (counts) ────────────────────────────────────────────────── */
+
+.ae-nav .ae-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    font-weight: 700;
+    line-height: 1;
+    font-size: 10px;
+    padding: 1px 6px;
+    min-width: 16px;
+    height: 16px;
+}
+
+.ae-nav .ae-badge--maroon {
+    background: var(--ae-maroon);
+    color: white;
+}
+
+.ae-nav .ae-badge--soft {
+    background: var(--ae-maroon-soft);
+    color: var(--ae-maroon);
+}
+
+/* Badges hidden by default in V1 — counts will be wired up in a follow-up */
+.ae-nav__section-badge[hidden],
+.ae-nav__sub-tab .ae-badge[hidden] {
+    display: none !important;
+}
+
+/* ── More dropdown — preserved on the right of the sub-tab row ──────── */
+
+.ae-nav__sub .more-dropdown {
+    margin-left: auto;
+    position: relative;
+}
+
+.ae-nav__sub .more-button {
+    appearance: none;
+    border: 1px solid var(--ae-line);
+    background: white;
+    cursor: pointer;
+    padding: 0 14px;
+    height: 32px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ae-ink-2);
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.ae-nav__sub .more-button:hover {
+    background: var(--ae-maroon-tint);
+    color: var(--ae-ink);
+    border-color: var(--ae-maroon-soft);
+}
+
+.ae-nav__sub .more-button.open,
+.ae-nav__sub .more-button.active {
+    background: var(--ae-maroon);
+    color: white;
+    border-color: var(--ae-maroon);
+}
+
+.ae-nav__sub .more-button svg {
+    transition: transform 150ms ease;
+}
+
+.ae-nav__sub .more-button.open svg {
+    transform: rotate(180deg);
+}
+
+/* ── Responsive: stack tighter on narrow screens ────────────────────── */
+
+@media (max-width: 720px) {
+    .ae-nav__sections {
+        padding: 0 8px;
+        overflow-x: auto;
+    }
+
+    .ae-nav__section {
+        padding: 12px 14px 10px;
+    }
+
+    .ae-nav__section-label {
+        font-size: 14px;
+    }
+
+    .ae-nav__section-sub {
+        font-size: 10px;
+    }
+
+    .ae-nav__sub {
+        padding: 0 8px;
+        overflow-x: auto;
+    }
+}

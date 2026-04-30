@@ -722,6 +722,7 @@
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
 | `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
+| `/shared_components/css/ae-nav-v2.css` | **NEW** AE Dashboard two-tier navigation (Tier 1: Steve/Ruth/Transfers/Personalization sections; Tier 2: sub-tabs) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
 | `/shared_components/css/force-green-theme.css` | Force NWCA green theme override | Multiple pages | ✅ Active |
 | `/shared_components/css/modern-enhancements.css` | Modern UI enhancement overlays | Multiple pages | ✅ Active |

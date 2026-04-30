@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=17">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=3">
     <link rel="stylesheet" href="/shared_components/css/mockup-submit-form.css?v=4">
+    <link rel="stylesheet" href="/shared_components/css/ae-nav-v2.css?v=1">
     <style>:root { --art-theme: #981e32; --art-theme-dark: #7a1828; --art-theme-light: #b92c43; --art-theme-bg: #fff5f5; --art-theme-bg-hover: #fce8ec; --art-theme-bg-selected: #fde2e8; --art-theme-rgba-15: rgba(152,30,50,0.15); --art-theme-rgba-10: rgba(152,30,50,0.1); --art-theme-hover: #981e32; }</style>
 </head>
 <body>
@@ -29,53 +30,75 @@
     
     <!-- Tab Container -->
     <div class="tab-container">
-        <!-- Tab Buttons -->
-        <div class="tab-buttons">
-            <!-- Visible Tabs -->
-            <button class="tab-button active" onclick="showTab('submit')">Submit Artwork to Steve</button>
-            <button class="tab-button" onclick="showTab('view')">Steve Mockups</button>
-            <button class="tab-button" onclick="showTab('mockup-ruth')">Submit Artwork to Ruth</button>
-            <button class="tab-button" onclick="showTab('digitizing')">Ruth Mockups</button>
-            <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
-            <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
-            <a class="tab-button tab-button-link" href="/dashboards/monogram-dashboard.html">Monogram Dashboard</a>
+        <!-- Two-Tier Navigation (V1) -->
+        <nav class="ae-nav" aria-label="AE Dashboard navigation">
 
-            <!-- More Dropdown -->
-            <div class="more-dropdown" style="margin-left: auto;">
-                <button class="more-button" onclick="toggleMoreDropdown()" id="moreButton">
-                    More
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+            <!-- TIER 1 — Sections -->
+            <div class="ae-nav__sections" role="tablist" id="aeNavSections">
+                <button class="ae-nav__section is-active" role="tab" aria-selected="true" data-section="steve">
+                    <span class="ae-nav__section-label">Steve</span>
+                    <span class="ae-nav__section-sub">Graphic Arts</span>
+                    <span class="ae-nav__section-badge" hidden>
+                        <span class="ae-badge ae-badge--maroon" data-count="steve">0</span>
+                    </span>
                 </button>
+                <button class="ae-nav__section" role="tab" data-section="ruth">
+                    <span class="ae-nav__section-label">Ruth</span>
+                    <span class="ae-nav__section-sub">Digitizing</span>
+                    <span class="ae-nav__section-badge" hidden>
+                        <span class="ae-badge ae-badge--soft" data-count="ruth">0</span>
+                    </span>
+                </button>
+                <button class="ae-nav__section" role="tab" data-section="transfers">
+                    <span class="ae-nav__section-label">Transfers</span>
+                    <span class="ae-nav__section-sub">Supacolor</span>
+                    <span class="ae-nav__section-badge" hidden>
+                        <span class="ae-badge ae-badge--maroon" data-count="transfers">0</span>
+                    </span>
+                </button>
+                <button class="ae-nav__section" role="tab" data-section="personalization">
+                    <span class="ae-nav__section-label">Personalization</span>
+                    <span class="ae-nav__section-sub">Names · Numbers · Monogram</span>
+                </button>
+            </div>
 
-                <div class="dropdown-menu" id="moreDropdown">
-                    <!-- Tools Section -->
-                    <div class="dropdown-category">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+            <!-- TIER 2 — Sub-tabs (rendered by AeNav module) + preserved More dropdown -->
+            <div class="ae-nav__sub" role="tablist" id="aeNavSub">
+                <span class="ae-nav__sub-spacer"></span>
+                <div class="more-dropdown">
+                    <button class="more-button" onclick="toggleMoreDropdown()" id="moreButton" type="button">
+                        More
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 12 15 18 9"></polyline>
                         </svg>
-                        Tools
+                    </button>
+                    <div class="dropdown-menu" id="moreDropdown">
+                        <div class="dropdown-category">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4caf50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                            </svg>
+                            Tools
+                        </div>
+                        <button class="dropdown-item" onclick="showTab('review'); closeMoreDropdown();" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                            Review Mockups
+                        </button>
+                        <button class="dropdown-item" onclick="showTab('requirements'); closeMoreDropdown();" type="button">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                            </svg>
+                            Art Requirements & Fees
+                        </button>
                     </div>
-                    <button class="dropdown-item" onclick="showTab('review'); closeMoreDropdown();">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        Review Mockups
-                    </button>
-                    <button class="dropdown-item" onclick="showTab('requirements'); closeMoreDropdown();">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
-                        Art Requirements & Fees
-                    </button>
                 </div>
             </div>
-        </div>
+        </nav>
         
         <!-- Tab Content -->
         <div class="tab-content">
@@ -535,7 +558,7 @@
     <script src="/shared_components/js/customer-lookup-service.js"></script>
     <script src="/shared_components/js/staff-auth-helper.js"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=20260424c"></script>
-    <script src="/shared_components/js/ae-dashboard.js?v=11"></script>
+    <script src="/shared_components/js/ae-dashboard.js?v=12"></script>
     <script src="/shared_components/js/screenshot-fill.js?v=2"></script>
     <script src="/shared_components/js/ae-submit-form.js?v=9"></script>
     <script src="/shared_components/js/art-hub-ae.js?v=9"></script>
