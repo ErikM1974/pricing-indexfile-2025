@@ -560,6 +560,15 @@
                                 '</button>' +
                             '</details>' +
                             '<div id="tas-mockup-summary" class="tas-mockup-summary" style="display:none;"></div>' +
+                            '<div class="tas-form-row tas-form-row--design">' +
+                                '<label for="tas-design-number" class="tas-design-label">' +
+                                    'Design #' +
+                                    '<span id="tas-design-source" class="tas-muted tas-design-source"></span>' +
+                                '</label>' +
+                                '<input type="text" id="tas-design-number" name="Design_Number" ' +
+                                    'class="tas-input" inputmode="numeric" maxlength="10" ' +
+                                    'placeholder="Auto-filled from filename or mockup" autocomplete="off">' +
+                            '</div>' +
                             '<div class="tas-form-row tas-form-row--rush">' +
                                 '<label class="tas-checkbox-label">' +
                                     '<input type="checkbox" id="tas-rush" name="Is_Rush"> ' +
@@ -602,6 +611,17 @@
         if (addBtn) addBtn.addEventListener('click', function () { addLinkRow(true); });
         var form = $('#tas-send-form');
         if (form) form.addEventListener('submit', handleSubmit);
+
+        // Clear the manual-design-# error border the moment Steve starts typing,
+        // and update the source hint to reflect that the value is now manual.
+        var designInput = $('#tas-design-number');
+        if (designInput) {
+            designInput.addEventListener('input', function () {
+                this.classList.remove('tas-input--error');
+                var hint = $('#tas-design-source');
+                if (hint) hint.textContent = this.value.trim() ? '(manual)' : '';
+            });
+        }
 
         // Picker: debounced search on keyup
         var searchInput = $('#tas-picker-search-input');
@@ -1029,6 +1049,43 @@
             '<table class="tas-mockup-summary-table">' +
             rows.map(function (r) { return '<tr><td class="tas-label">' + r.label + '</td><td>' + r.value + '</td></tr>'; }).join('') +
             '</table>';
+        syncDesignNumberInput();
+    }
+
+    // Auto-fill the manual Design # input with the best available auto-extracted
+    // value, but only if Steve hasn't typed his own value. Priority: parsed
+    // filename > mockup vision. If neither has a number, leave the input empty
+    // and surface a hint so Steve knows he needs to type one.
+    function syncDesignNumberInput() {
+        var el = $('#tas-design-number');
+        var hint = $('#tas-design-source');
+        if (!el) return;
+        if (el.value.trim()) {
+            // User has typed — leave value alone, but still refresh the hint.
+            if (hint) hint.textContent = '(manual)';
+            return;
+        }
+        var rows = modalState.linkRows || [];
+        var fromFilename = null, fromVision = null;
+        rows.forEach(function (r) {
+            if (!r.analysis) return;
+            if (!fromFilename && r.analysis.filenameParsed && r.analysis.filenameParsed.designNumber) {
+                fromFilename = r.analysis.filenameParsed.designNumber;
+            }
+            if (!fromVision && r.analysis.mockupVision && r.analysis.mockupVision.designNumber) {
+                fromVision = r.analysis.mockupVision.designNumber;
+            }
+        });
+        var auto = fromFilename || fromVision;
+        if (auto) {
+            el.value = String(auto);
+            el.classList.remove('tas-input--error');
+            if (hint) hint.textContent = fromFilename ? '(from filename)' : '(from mockup)';
+        } else if (hint) {
+            // Only nag if there's something to analyze
+            var hasAnyAnalysis = rows.some(function (r) { return r.analysis; });
+            hint.textContent = hasAnyAnalysis ? '(not detected — please enter)' : '';
+        }
     }
 
     function wireLinkRowEvents() {
@@ -1108,6 +1165,9 @@
         renderLinkRows();
         updateSubmitButton();
         renderMockupSummary();
+        // renderMockupSummary already calls syncDesignNumberInput when a mockup is
+        // present; call it directly too so we cover the working-files-only path.
+        syncDesignNumberInput();
     }
 
     function updateSubmitButton() {
@@ -1207,6 +1267,10 @@
         renderLinkRows();
         var rushEl = $('#tas-rush');
         if (rushEl) rushEl.checked = false;
+        var designEl = $('#tas-design-number');
+        if (designEl) { designEl.value = ''; designEl.classList.remove('tas-input--error'); }
+        var designSrc = $('#tas-design-source');
+        if (designSrc) designSrc.textContent = '';
         var summary = $('#tas-mockup-summary');
         if (summary) { summary.style.display = 'none'; summary.innerHTML = ''; }
         var pasteDetails = $('#tas-paste-details');
@@ -1280,10 +1344,48 @@
 
         try {
             var primary = transfers[0];
-            var parsed = primary.filenameParsed;
+            // Defensive: backend's analyze-link returns success:true with a null
+            // filenameParsed when the filename doesn't match the parser regex.
+            // Without this guard, every payload field below throws.
+            var parsed = primary.filenameParsed || {};
             var mockup = mockups[0];
             var vision = mockup && mockup.mockupVision ? mockup.mockupVision : null;
             var repMatch = mockup && mockup.salesRepMatch ? mockup.salesRepMatch : null;
+
+            // Don't blindly trust transfers[0] for design # / customer — fall
+            // back to the first working file whose filename actually parsed,
+            // then to mockup-vision, then to whatever Steve typed manually.
+            var firstParsedTransfer = transfers.find(function (t) {
+                return t.filenameParsed && t.filenameParsed.designNumber;
+            });
+            var parsedFallback = (firstParsedTransfer && firstParsedTransfer.filenameParsed) || {};
+
+            var manualDesignEl = $('#tas-design-number');
+            var manualDesignNumber = (manualDesignEl && manualDesignEl.value || '').trim();
+
+            var designNumber =
+                manualDesignNumber ||
+                parsed.designNumber ||
+                parsedFallback.designNumber ||
+                (vision && vision.designNumber) ||
+                null;
+
+            var companyName =
+                parsed.customer ||
+                parsedFallback.customer ||
+                (vision && vision.customerName) ||
+                '';
+
+            if (!designNumber) {
+                showToast('Could not determine design # from filenames or mockup. Enter it manually.', 'error');
+                if (manualDesignEl) {
+                    manualDesignEl.classList.add('tas-input--error');
+                    manualDesignEl.focus();
+                }
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
+                return;
+            }
 
             var isRush = !!($('#tas-rush') && $('#tas-rush').checked);
 
@@ -1343,9 +1445,9 @@
             }
 
             var payload = {
-                Design_Number: parsed.designNumber,
-                Company_Name: parsed.customer,
-                Customer_Name: (vision && vision.customerName) || parsed.customer,
+                Design_Number: designNumber,
+                Company_Name: companyName,
+                Customer_Name: (vision && vision.customerName) || companyName,
                 Sales_Rep_Name: repMatch ? repMatch.name : (vision ? vision.salesRep : ''),
                 Sales_Rep_Email: repMatch ? repMatch.email : '',
                 Transfer_Type: vision ? vision.transferType : null,

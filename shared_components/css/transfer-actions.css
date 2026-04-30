@@ -312,6 +312,46 @@
 }
 .tas-form-row--3col { grid-template-columns: 1fr 1fr 1fr; }
 .tas-form-row--rush { grid-template-columns: 1fr 1fr; align-items: end; }
+.tas-form-row--design {
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+.tas-design-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--tas-text);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.2;
+}
+.tas-design-source {
+    font-size: 11px;
+    font-weight: normal;
+}
+.tas-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--tas-border);
+    border-radius: 5px;
+    font: inherit;
+    background: #fff;
+    box-sizing: border-box;
+}
+.tas-input:focus {
+    outline: none;
+    border-color: var(--tas-primary, #2e7d32);
+    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.15);
+}
+.tas-input--error {
+    border-color: #dc2626 !important;
+    background: #fef2f2;
+}
+.tas-input--error:focus {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
 .tas-form-field {
     display: flex;
     flex-direction: column;
