@@ -133,7 +133,11 @@
     async function fetchMockups() {
         showLoading(true);
         try {
-            const resp = await fetch(`${API_BASE}/api/mockups?orderBy=Submitted_Date DESC&limit=500`);
+            // Sort by ID DESC, not Submitted_Date — recent records have null
+            // Submitted_Date (Caspio field type changed away from auto-populated
+            // Timestamp) and would otherwise sort to the bottom of the queue.
+            // ID is auto-increment, always populated, monotonic by submission.
+            const resp = await fetch(`${API_BASE}/api/mockups?orderBy=ID DESC&limit=500`);
             if (!resp.ok) throw new Error(`API returned ${resp.status}`);
             const data = await resp.json();
             allMockups = data.records || [];

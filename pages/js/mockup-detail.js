@@ -457,7 +457,11 @@
 
         // Fetch fresh list in background
         var repFilter = sessionStorage.getItem('ae_mockup_rep_filter') || '';
-        var apiUrl = API_BASE + '/api/mockups?orderBy=Submitted_Date DESC&limit=500';
+        // Sort by ID DESC, not Submitted_Date — recent records have null
+        // Submitted_Date (Caspio field type changed away from auto-populated
+        // Timestamp) and would otherwise mess up prev/next nav order.
+        // ID is auto-increment, always populated, monotonic by submission.
+        var apiUrl = API_BASE + '/api/mockups?orderBy=ID DESC&limit=500';
         if (repFilter && repFilter !== 'All') {
             if (REP_EMAIL_MAP[repFilter]) {
                 apiUrl += '&submittedBy=' + encodeURIComponent(REP_EMAIL_MAP[repFilter]);
