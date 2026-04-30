@@ -47,6 +47,129 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode }) {
 
 const PAPER_SIZES = ['XS','S','M','L','XL','2XL','3XL','4XL'];
 
+const PF_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const _companySearchCache = new Map(); // "q.toLowerCase()" → [contact, ...]
+
+// Map Caspio's "Sales_Rep" text ("Nika Lao", "Taneisha Clark", ...) to the
+// PaperForm's <select> value slug ("nika", "taneisha", ...). Unknown reps
+// (e.g. "House") return '' — callers should fall back to existing salesRep.
+function mapSalesRep(name) {
+  if (!name) return '';
+  const n = String(name).toLowerCase();
+  if (n.includes('nika'))     return 'nika';
+  if (n.includes('taneisha')) return 'taneisha';
+  if (n.includes('erik'))     return 'erik';
+  if (n.includes('ruth'))     return 'ruth';
+  if (n.includes('jim'))      return 'jim';
+  return '';
+}
+
+async function searchCompanyContacts(query) {
+  const q = (query || '').trim();
+  if (q.length < 2) return [];
+  const key = q.toLowerCase();
+  if (_companySearchCache.has(key)) return _companySearchCache.get(key);
+  try {
+    const r = await fetch(`${PF_API_BASE}/api/company-contacts-2026/search?q=${encodeURIComponent(q)}&limit=10`);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const results = Array.isArray(data?.contacts) ? data.contacts : [];
+    _companySearchCache.set(key, results);
+    return results;
+  } catch (err) {
+    console.error('[OrderForm] company-contacts search failed:', err);
+    return []; // visible empty state — no silent cache fallback (CLAUDE.md rule #4)
+  }
+}
+
+// Typeahead for the Company field. Mirrors ProductCombobox in line-items.jsx —
+// debounced, arrow-key nav, click-outside close, no silent fallback.
+// Picking a contact calls onPick(contact) so the parent can fan-fill the form.
+function CompanyCombobox({ value, onChange, onPick }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(value || '');
+  const [active, setActive] = useState(0);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const wrap = useRef(null);
+
+  useEffect(() => { setQuery(value || ''); }, [value]);
+
+  useEffect(() => {
+    function handler(e) {
+      if (wrap.current && !wrap.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  useEffect(() => {
+    const q = (query || '').trim();
+    if (q.length < 2) { setMatches([]); return; }
+    let cancelled = false;
+    setLoading(true);
+    const handle = setTimeout(async () => {
+      const results = await searchCompanyContacts(q);
+      if (cancelled) return;
+      setMatches(results || []);
+      setActive(0);
+      setLoading(false);
+    }, 200);
+    return () => { cancelled = true; clearTimeout(handle); };
+  }, [query]);
+
+  function pick(c) {
+    onPick(c);
+    setQuery(c.Company_Name || '');
+    setOpen(false);
+  }
+
+  function onKey(e) {
+    if (!open) return;
+    if (e.key === 'ArrowDown')      { e.preventDefault(); setActive(a => Math.min(a + 1, matches.length - 1)); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); setActive(a => Math.max(a - 1, 0)); }
+    else if (e.key === 'Enter')     { if (matches[active]) { e.preventDefault(); pick(matches[active]); } }
+    else if (e.key === 'Escape')    { setOpen(false); }
+  }
+
+  return (
+    <div className="combobox" ref={wrap} style={{position:'relative'}}>
+      <input
+        className="p-in"
+        value={query}
+        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); setActive(0); }}
+        onFocus={() => setOpen(true)}
+        onKeyDown={onKey}
+        autoComplete="off"
+      />
+      {open && (
+        <div className="combobox-menu">
+          {loading && matches.length === 0 ? (
+            <div className="combobox-empty">Searching customers…</div>
+          ) : matches.length > 0 ? matches.map((c, i) => (
+            <div
+              key={`${c.ID_Contact}-${i}`}
+              className={"combobox-item" + (i === active ? ' active' : '')}
+              onMouseEnter={() => setActive(i)}
+              onMouseDown={(e) => { e.preventDefault(); pick(c); }}
+            >
+              <div className="style-no">{c.Company_Name}</div>
+              <div className="desc">
+                {c.ct_NameFull || ''}
+                {c.City || c.State ? ` · ${[c.City, c.State].filter(Boolean).join(', ')}` : ''}
+              </div>
+            </div>
+          )) : (query || '').trim().length >= 2 ? (
+            <div className="combobox-empty">No matches for "{query}" — keep typing to add a new customer</div>
+          ) : (
+            <div className="combobox-empty">Type at least 2 characters…</div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, customerMode = false, draftId = null, staffFilled = [] }) {
   const lockSalesRep = customerMode && staffFilled.includes('salesRep');
   const lockPO       = customerMode && staffFilled.includes('po');
@@ -156,7 +279,23 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
       <div className="p-info">
         <div className="p-cell">
           <div className="lbl">Company</div>
-          <input className="p-in" value={info.company} onChange={e => update('company', e.target.value)} />
+          <CompanyCombobox
+            value={info.company}
+            onChange={(v) => update('company', v)}
+            onPick={(c) => setInfo({
+              ...info,
+              company:    c.Company_Name || '',
+              phone:      c.Company_Phone || info.phone || '',
+              buyerFirst: c.NameFirst || '',
+              buyerLast:  c.NameLast || '',
+              email:      c.Email || '',
+              address:    c.Address || '',
+              city:       c.City || '',
+              state:      c.State || '',
+              zip:        c.Zip || '',
+              salesRep:   mapSalesRep(c.Sales_Rep) || info.salesRep,
+            })}
+          />
         </div>
         <div className="p-cell">
           <div className="lbl">Phone</div>
