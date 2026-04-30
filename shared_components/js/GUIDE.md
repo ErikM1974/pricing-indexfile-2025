@@ -31,6 +31,7 @@
 | `staff-auth-helper.js` | Staff authentication helper |
 | `INTEGRATION-EXAMPLE.js` | Integration reference/docs (not runtime) |
 | `fetch-timeout.js` | Global fetch() wrapper with 15s timeout |
+| `caspio-date-utils.js` | Parse Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). `window.CaspioDate.parse/formatDateTime/formatDate/formatAge`. Use this — never `+ 'Z'`. |
 
 ## DTG System
 

@@ -15,18 +15,26 @@
      * @param {Date|string} date - The date to calculate from
      * @returns {{ text: string, cssClass: string }} | null if invalid date
      */
-    // Caspio strips the Z from ISO dates — append it to ensure UTC parsing
-    function ensureUTC(date) {
-        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(date) && !date.endsWith('Z') && date.indexOf('+') === -1 && date.indexOf('-', 10) === -1) {
-            return date + 'Z';
+    // Resolve Caspio timestamps via the shared CaspioDate helper. Caspio's
+    // naive timestamps are Pacific server wall-clock — see caspio-date-utils.js
+    // for the full story. The local fallback below preserves behaviour if
+    // caspio-date-utils.js isn't loaded on a page (Date constructor on a
+    // naive string parses as local time, not UTC, which is "right enough"
+    // for any viewer also on Pacific).
+    function parseDate(date) {
+        if (!date) return null;
+        if (date instanceof Date) return isNaN(date.getTime()) ? null : date;
+        if (window.CaspioDate && typeof window.CaspioDate.parse === 'function') {
+            return window.CaspioDate.parse(date);
         }
-        return date;
+        var d = new Date(date);
+        return isNaN(d.getTime()) ? null : d;
     }
 
     function getElapsedText(date) {
         if (!date) return null;
-        var d = (date instanceof Date) ? date : new Date(ensureUTC(date));
-        if (isNaN(d.getTime())) return null;
+        var d = parseDate(date);
+        if (!d) return null;
 
         var now = new Date();
         var diffMs = now - d;
@@ -60,8 +68,8 @@
      */
     function getCompactElapsed(date) {
         if (!date) return null;
-        var d = (date instanceof Date) ? date : new Date(ensureUTC(date));
-        if (isNaN(d.getTime())) return null;
+        var d = parseDate(date);
+        if (!d) return null;
 
         var now = new Date();
         var diffMs = now - d;

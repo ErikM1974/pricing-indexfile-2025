@@ -137,14 +137,19 @@
 
     function getAgeHours(dateStr) {
         if (!dateStr) return 0;
-        // Caspio strips Z suffix — append if missing (memory gotcha)
-        var normalized = dateStr.endsWith('Z') ? dateStr : dateStr + 'Z';
-        var created = new Date(normalized);
-        return (Date.now() - created.getTime()) / (1000 * 60 * 60);
+        // Caspio naive timestamps are Pacific wall-clock, not UTC. Resolve via
+        // the shared CaspioDate helper so DST + offset are correct.
+        var d = window.CaspioDate ? window.CaspioDate.parse(dateStr) : new Date(dateStr);
+        if (!d || isNaN(d.getTime())) return 0;
+        return (Date.now() - d.getTime()) / (1000 * 60 * 60);
     }
 
     function formatAge(hours) {
-        if (hours < 1) return 'just now';
+        if (hours < 1) {
+            var minutes = Math.floor(hours * 60);
+            if (minutes < 1) return 'just now';
+            return minutes + 'm ago';
+        }
         if (hours < 24) return Math.floor(hours) + 'h ago';
         var days = Math.floor(hours / 24);
         return days === 1 ? '1 day ago' : days + ' days ago';
@@ -402,8 +407,10 @@
             var rushA = isRush(a) ? 0 : 1;
             var rushB = isRush(b) ? 0 : 1;
             if (rushA !== rushB) return rushA - rushB;
-            var dateA = new Date((a.Requested_At || '') + (a.Requested_At && !a.Requested_At.endsWith('Z') ? 'Z' : '')).getTime() || 0;
-            var dateB = new Date((b.Requested_At || '') + (b.Requested_At && !b.Requested_At.endsWith('Z') ? 'Z' : '')).getTime() || 0;
+            var dA = window.CaspioDate ? window.CaspioDate.parse(a.Requested_At) : null;
+            var dB = window.CaspioDate ? window.CaspioDate.parse(b.Requested_At) : null;
+            var dateA = dA ? dA.getTime() : 0;
+            var dateB = dB ? dB.getTime() : 0;
             return dateA - dateB;
         });
 

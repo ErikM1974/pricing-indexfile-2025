@@ -90,7 +90,8 @@ class NamesNumbersDashboard {
 
         tbody.innerHTML = rosters.map(r => {
             const statusCls = (r.Status || 'draft').toLowerCase().replace(/\s+/g, '-');
-            const modified = r.ModifiedAt ? new Date(r.ModifiedAt + 'Z').toLocaleDateString() : '-';
+            // Caspio naive timestamps are Pacific wall-clock — resolve via CaspioDate.
+            const modified = window.CaspioDate ? (window.CaspioDate.formatDate(r.ModifiedAt, { fallback: '-' })) : (r.ModifiedAt ? new Date(r.ModifiedAt).toLocaleDateString() : '-');
             return `<tr onclick="window.location='/pages/names-numbers.html?load=${r.ID_Roster}'">
                 <td><strong>${this.esc(r.RosterName || 'Untitled')}</strong></td>
                 <td>${this.esc(r.CompanyName || '')}</td>

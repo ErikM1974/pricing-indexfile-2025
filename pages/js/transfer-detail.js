@@ -60,37 +60,19 @@
         return rec.Is_Rush === true || rec.Is_Rush === 'true' || rec.Is_Rush === 'Yes' || rec.Is_Rush === 1;
     }
 
-    function normalizeDate(dateStr) {
-        if (!dateStr) return null;
-        // Caspio strips Z suffix — append if missing
-        return dateStr.endsWith('Z') ? dateStr : dateStr + 'Z';
+    // Caspio timestamp parser lives in shared_components/js/caspio-date-utils.js
+    // (window.CaspioDate). The local helpers below thin-wrap it for readability.
+    function parseCaspioDate(dateStr) {
+        return window.CaspioDate ? window.CaspioDate.parse(dateStr) : (dateStr ? new Date(dateStr) : null);
     }
-
     function formatDateTime(dateStr) {
-        if (!dateStr) return '—';
-        var d = new Date(normalizeDate(dateStr));
-        if (isNaN(d.getTime())) return '—';
-        return d.toLocaleString('en-US', {
-            month: 'short', day: 'numeric', year: 'numeric',
-            hour: 'numeric', minute: '2-digit'
-        });
+        return window.CaspioDate ? window.CaspioDate.formatDateTime(dateStr) : (dateStr || '—');
     }
-
     function formatDate(dateStr) {
-        if (!dateStr) return '—';
-        var d = new Date(normalizeDate(dateStr));
-        if (isNaN(d.getTime())) return '—';
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return window.CaspioDate ? window.CaspioDate.formatDate(dateStr) : (dateStr || '—');
     }
-
     function formatAge(dateStr) {
-        if (!dateStr) return '';
-        var d = new Date(normalizeDate(dateStr));
-        var hours = (Date.now() - d.getTime()) / (1000 * 60 * 60);
-        if (hours < 1) return 'just now';
-        if (hours < 24) return Math.floor(hours) + 'h ago';
-        var days = Math.floor(hours / 24);
-        return days === 1 ? '1 day ago' : days + ' days ago';
+        return window.CaspioDate ? window.CaspioDate.formatAge(dateStr) : '';
     }
 
     function statusBadgeClass(status) {
@@ -431,8 +413,8 @@
         if (!history || !history.length) return '';
         // Newest first; show 5, collapse the rest into <details>.
         var sorted = history.slice().sort(function (a, b) {
-            var ta = a.Event_At ? new Date(normalizeDate(a.Event_At)).getTime() : 0;
-            var tb = b.Event_At ? new Date(normalizeDate(b.Event_At)).getTime() : 0;
+            var ta = a.Event_At ? (parseCaspioDate(a.Event_At) || new Date(0)).getTime() : 0;
+            var tb = b.Event_At ? (parseCaspioDate(b.Event_At) || new Date(0)).getTime() : 0;
             return tb - ta;
         });
         var first = sorted.slice(0, 5);
@@ -921,7 +903,7 @@
 
     function renderTimeline() {
         var list = state.notes.slice().sort(function (a, b) {
-            return new Date(normalizeDate(a.Created_At)) - new Date(normalizeDate(b.Created_At));
+            return (parseCaspioDate(a.Created_At) || 0) - (parseCaspioDate(b.Created_At) || 0);
         });
         if (list.length === 0) {
             $('td-timeline').innerHTML = '<div class="td-empty-panel" style="padding:12px 0;">No activity yet.</div>';
