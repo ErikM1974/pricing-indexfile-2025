@@ -14,6 +14,9 @@ function App() {
     address: '', city: '', state: '', zip: '',
     po: '', salesRep: '', dateIn: new Date().toISOString().slice(0, 10), dateDue: '',
     terms: 'Prepaid', // default payment terms (Pay On Pickup | Prepaid)
+    // Set by CompanyCombobox after a pick. `contacts` drives the Name-cell ContactPicker;
+    // when empty, the cell falls back to manual First/Last/Email inputs.
+    contacts: [], contactId: '',
   });
 
   // Line items

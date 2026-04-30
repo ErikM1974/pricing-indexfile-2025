@@ -534,6 +534,23 @@ body {
   border-bottom: 1px solid var(--line);
   margin-bottom: 4px;
 }
+.combobox--company .combobox-menu::before { content: 'Search company'; }
+
+/* Contact picker (rendered in the Name cell after a company is picked) */
+.contact-picker { display: flex; flex-direction: column; gap: 4px; }
+.contact-picker .p-in { width: 100%; }
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--accent, #2563eb);
+  cursor: pointer;
+  text-align: left;
+  align-self: flex-start;
+}
+.link-btn:hover { text-decoration: underline; }
 .combobox-item {
   padding: 10px 12px;
   display: grid;

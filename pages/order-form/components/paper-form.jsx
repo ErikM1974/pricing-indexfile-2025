@@ -64,7 +64,7 @@ function mapSalesRep(name) {
   return '';
 }
 
-async function searchCompanyContacts(query) {
+async function searchCompanies(query) {
   const q = (query || '').trim();
   if (q.length < 2) return [];
   const key = q.toLowerCase();
@@ -73,18 +73,19 @@ async function searchCompanyContacts(query) {
     const r = await fetch(`${PF_API_BASE}/api/company-contacts-2026/search?q=${encodeURIComponent(q)}&limit=10`);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
-    const results = Array.isArray(data?.contacts) ? data.contacts : [];
+    const results = Array.isArray(data?.companies) ? data.companies : [];
     _companySearchCache.set(key, results);
     return results;
   } catch (err) {
-    console.error('[OrderForm] company-contacts search failed:', err);
+    console.error('[OrderForm] company search failed:', err);
     return []; // visible empty state — no silent cache fallback (CLAUDE.md rule #4)
   }
 }
 
 // Typeahead for the Company field. Mirrors ProductCombobox in line-items.jsx —
 // debounced, arrow-key nav, click-outside close, no silent fallback.
-// Picking a contact calls onPick(contact) so the parent can fan-fill the form.
+// Picking a company calls onPick(company) where company is the grouped record
+// returned by /company-contacts-2026/search (includes nested contacts[]).
 function CompanyCombobox({ value, onChange, onPick }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState(value || '');
@@ -109,7 +110,7 @@ function CompanyCombobox({ value, onChange, onPick }) {
     let cancelled = false;
     setLoading(true);
     const handle = setTimeout(async () => {
-      const results = await searchCompanyContacts(q);
+      const results = await searchCompanies(q);
       if (cancelled) return;
       setMatches(results || []);
       setActive(0);
@@ -133,7 +134,7 @@ function CompanyCombobox({ value, onChange, onPick }) {
   }
 
   return (
-    <div className="combobox" ref={wrap} style={{position:'relative'}}>
+    <div className="combobox combobox--company" ref={wrap} style={{position:'relative'}}>
       <input
         className="p-in"
         value={query}
@@ -146,26 +147,53 @@ function CompanyCombobox({ value, onChange, onPick }) {
         <div className="combobox-menu">
           {loading && matches.length === 0 ? (
             <div className="combobox-empty">Searching customers…</div>
-          ) : matches.length > 0 ? matches.map((c, i) => (
-            <div
-              key={`${c.ID_Contact}-${i}`}
-              className={"combobox-item" + (i === active ? ' active' : '')}
-              onMouseEnter={() => setActive(i)}
-              onMouseDown={(e) => { e.preventDefault(); pick(c); }}
-            >
-              <div className="style-no">{c.Company_Name}</div>
-              <div className="desc">
-                {c.ct_NameFull || ''}
-                {c.City || c.State ? ` · ${[c.City, c.State].filter(Boolean).join(', ')}` : ''}
+          ) : matches.length > 0 ? matches.map((c, i) => {
+            const loc = [c.City, c.State].filter(Boolean).join(', ');
+            const contactCount = (c.contacts || []).length;
+            return (
+              <div
+                key={`${c.id_Customer}-${i}`}
+                className={"combobox-item" + (i === active ? ' active' : '')}
+                onMouseEnter={() => setActive(i)}
+                onMouseDown={(e) => { e.preventDefault(); pick(c); }}
+              >
+                <div className="style-no">{c.Company_Name}</div>
+                <div className="desc">
+                  {loc || '—'}
+                  {contactCount > 0 ? ` · ${contactCount} contact${contactCount === 1 ? '' : 's'}` : ' · no email contacts'}
+                </div>
               </div>
-            </div>
-          )) : (query || '').trim().length >= 2 ? (
+            );
+          }) : (query || '').trim().length >= 2 ? (
             <div className="combobox-empty">No matches for "{query}" — keep typing to add a new customer</div>
           ) : (
             <div className="combobox-empty">Type at least 2 characters…</div>
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+// Renders inside the Name cell when a company has been picked AND the company
+// has at least one emailable contact. Single <select> + a "+ New contact"
+// link to drop back into manual First/Last/Email entry.
+function ContactPicker({ contacts, contactId, onPickContact, onManualEntry }) {
+  return (
+    <div className="contact-picker">
+      <select
+        className="p-in"
+        value={contactId || ''}
+        onChange={(e) => onPickContact(e.target.value)}
+      >
+        {contacts.map(c => (
+          <option key={c.ID_Contact} value={String(c.ID_Contact)}>
+            {c.ct_NameFull || `${c.NameFirst} ${c.NameLast}`.trim() || '(unnamed)'}
+            {c.Email ? ` — ${c.Email}` : ''}
+          </option>
+        ))}
+      </select>
+      <button type="button" className="link-btn" onClick={onManualEntry}>+ New contact</button>
     </div>
   );
 }
@@ -281,20 +309,33 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           <div className="lbl">Company</div>
           <CompanyCombobox
             value={info.company}
-            onChange={(v) => update('company', v)}
-            onPick={(c) => setInfo({
-              ...info,
-              company:    c.Company_Name || '',
-              phone:      c.Company_Phone || info.phone || '',
-              buyerFirst: c.NameFirst || '',
-              buyerLast:  c.NameLast || '',
-              email:      c.Email || '',
-              address:    c.Address || '',
-              city:       c.City || '',
-              state:      c.State || '',
-              zip:        c.Zip || '',
-              salesRep:   mapSalesRep(c.Sales_Rep) || info.salesRep,
-            })}
+            onChange={(v) => {
+              // Free typing — clear contact picker so user can switch back to manual entry.
+              if (v !== info.company) {
+                setInfo({ ...info, company: v, contacts: [], contactId: '' });
+              } else {
+                update('company', v);
+              }
+            }}
+            onPick={(c) => {
+              const cs = Array.isArray(c.contacts) ? c.contacts : [];
+              const top = cs[0] || null;
+              setInfo({
+                ...info,
+                company:    c.Company_Name || '',
+                phone:      c.Company_Phone || '',
+                address:    c.Address || '',
+                city:       c.City || '',
+                state:      c.State || '',
+                zip:        c.Zip || '',
+                salesRep:   mapSalesRep(c.Sales_Rep) || info.salesRep,
+                contacts:   cs,
+                contactId:  top ? String(top.ID_Contact) : '',
+                buyerFirst: top ? (top.NameFirst || '') : '',
+                buyerLast:  top ? (top.NameLast || '')  : '',
+                email:      top ? (top.Email || '')     : '',
+              });
+            }}
           />
         </div>
         <div className="p-cell">
@@ -307,15 +348,34 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         </div>
 
         <div className="p-cell">
-          <div className="lbl">Name (first / last)</div>
-          <div className="p-name-row">
-            <input className="p-in" value={info.buyerFirst} onChange={e => update('buyerFirst', e.target.value)} placeholder="First" />
-            <input className="p-in" value={info.buyerLast} onChange={e => update('buyerLast', e.target.value)} placeholder="Last" />
-          </div>
+          <div className="lbl">{(info.contacts && info.contacts.length > 0) ? `Contact at ${info.company || 'company'}` : 'Name (first / last)'}</div>
+          {(info.contacts && info.contacts.length > 0) ? (
+            <ContactPicker
+              contacts={info.contacts}
+              contactId={info.contactId}
+              onPickContact={(id) => {
+                const c = info.contacts.find(x => String(x.ID_Contact) === String(id));
+                if (!c) return;
+                setInfo({
+                  ...info,
+                  contactId:  String(c.ID_Contact),
+                  buyerFirst: c.NameFirst || '',
+                  buyerLast:  c.NameLast || '',
+                  email:      c.Email || '',
+                });
+              }}
+              onManualEntry={() => setInfo({ ...info, contacts: [], contactId: '', buyerFirst: '', buyerLast: '', email: '' })}
+            />
+          ) : (
+            <div className="p-name-row">
+              <input className="p-in" value={info.buyerFirst} onChange={e => update('buyerFirst', e.target.value)} placeholder="First" />
+              <input className="p-in" value={info.buyerLast} onChange={e => update('buyerLast', e.target.value)} placeholder="Last" />
+            </div>
+          )}
         </div>
         <div className="p-cell">
           <div className="lbl">Email</div>
-          <input className="p-in" value={info.email} onChange={e => update('email', e.target.value)} />
+          <input className="p-in" value={info.email} onChange={e => update('email', e.target.value)} readOnly={!!(info.contacts && info.contacts.length > 0)} />
         </div>
         <div className="p-cell">
           <div className="lbl">Date due</div>
