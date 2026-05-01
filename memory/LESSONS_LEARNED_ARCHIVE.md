@@ -4,6 +4,18 @@
 
 ---
 
+## Bug: 1-Cent Tax Rounding Error in Quote PDF Totals (archived 2026-05-01)
+
+**Problem:** PDF total off by $0.01. Components summed correctly but total didn't match.
+
+**Root Cause:** Tax computed as raw float, displayed rounded, but added to total unrounded. IEEE 754 rounding.
+
+**Solution:** `Math.round(subtotal * taxRate * 100) / 100` — round tax to cents BEFORE summing.
+
+**Prevention:** Round each component to cents first, then sum. Never sum unrounded floats. (This rule still lives in CLAUDE.md "Top Critical Gotchas".)
+
+---
+
 ## Bug: `sed` Line Deletion Breaks Multi-Line Statements — Orphaned Object Properties (2026-03-22)
 
 **Problem:** [Pricing Index] Using `sed -i '/console\.log/d'` to bulk-remove debug logs broke DTG and Screenprint builders with `SyntaxError: Unexpected token ':'`. Product search completely stopped working.
