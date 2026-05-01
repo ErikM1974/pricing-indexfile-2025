@@ -247,6 +247,42 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
       // re-run when availableSizes resolves
       JSON.stringify(rowBreakdown?.extras?.availableSizes || [])]);
 
+  // ----- Stale alias-key migration -----
+  // The bundle resolves AFTER the rep starts typing. If they enter qty in
+  // the 2XL column for a ladies style (L500, etc.) before the bundle says
+  // "this product uses XXL not 2XL", the qty lands in row.sizes['2XL'].
+  // When the bundle resolves, the alias kicks in: input now reads
+  // row.sizes['XXL'] (empty) and the pricing engine can't price '2XL'
+  // (bundle.sizes lists 'XXL'). The qty appears to vanish + breakdown row
+  // says SKIPPED (NO PRICE).
+  //
+  // Fix: when availSet changes, walk the standard grid columns and migrate
+  // any orphan entries to their effective key. Only fires when the column
+  // key isn't in availSet AND a value exists under it AND the alias slot
+  // is empty (so we never clobber real data).
+  useEffect(() => {
+    const extras = rowBreakdown?.extras || {};
+    const availableSizesNow = extras.availableSizes || null;
+    if (!availableSizesNow || !availableSizesNow.length) return;
+    const availSetNow = new Set(availableSizesNow.map(s => String(s).toUpperCase()));
+    const sizes = row.sizes || {};
+    const migrations = [];
+    PAPER_SIZES.forEach(col => {
+      const eff = effectiveSizeKey(col, availSetNow);
+      if (eff && eff !== col && sizes[col] != null && sizes[eff] == null) {
+        migrations.push([col, eff]);
+      }
+    });
+    if (migrations.length === 0) return;
+    const next = { ...sizes };
+    migrations.forEach(([from, to]) => {
+      next[to] = next[from];
+      delete next[from];
+    });
+    update({ sizes: next });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(rowBreakdown?.extras?.availableSizes || [])]);
+
   // ----- Auto-pricing display state -----
   const hasAutoPrice = !!(rowBreakdown && !rowBreakdown.error && rowBreakdown.rowSubtotal > 0);
   const showAutoPriceCell = hasAutoPrice && !row.priceOverride;
@@ -513,7 +549,6 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               return (
                 <td key={s} className="sz-out-of-stock" title={`Local warehouse shows 0 in stock for ${row.colorName || 'this color'} ${effectiveKey} — switch to manual cost (click $) to override`}>
                   <span className="sz-oos">0 STK</span>
-                  {isAliased && <span className="sz-alias-label">{effectiveKey}</span>}
                 </td>
               );
             }
@@ -544,9 +579,9 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                 {notStockedLocally && (
                   <span className="sz-inv-badge sz-inv-not-local" title={cellTitle}>SanMar</span>
                 )}
-                {isAliased && (
-                  <span className="sz-alias-label" title={`This product carries ${effectiveKey} (no separate ${s})`}>{effectiveKey}</span>
-                )}
+                {/* In-cell alias label removed (was redundant — the breakdown
+                    row below the order line already shows the actual stored
+                    size + suffixed PN, e.g. "L500_XXL XXL × 1"). */}
               </td>
             );
           })}
