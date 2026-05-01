@@ -2390,17 +2390,20 @@
                 + '<div class="pmd-field-row pmd-field-row--editable">'
                 + '  <span class="pmd-field-label">Logo Width</span>'
                 + '  <input type="text" class="pmd-inline-input" id="pmd-logo-width" placeholder="e.g. 4" value="' + escapeHtml(mockup.Logo_Width || '') + '">'
+                + '  <span class="pmd-save-status" id="pmd-logo-width-status"></span>'
                 + '</div>'
                 + '<div class="pmd-field-row pmd-field-row--editable">'
                 + '  <span class="pmd-field-label">Logo Height</span>'
                 + '  <input type="text" class="pmd-inline-input" id="pmd-logo-height" placeholder="e.g. 3.5" value="' + escapeHtml(mockup.Logo_Height || '') + '">'
+                + '  <span class="pmd-save-status" id="pmd-logo-height-status"></span>'
                 + '</div>'
                 + '<div class="pmd-field-row pmd-field-row--editable">'
                 + '  <span class="pmd-field-label">Stitch Count</span>'
                 + '  <input type="text" inputmode="numeric" class="pmd-inline-input" id="pmd-stitch-count" placeholder="e.g. 8500" value="' + escapeHtml(mockup.Stitch_Count != null && mockup.Stitch_Count !== '' ? (isNaN(parseInt(mockup.Stitch_Count, 10)) ? String(mockup.Stitch_Count) : parseInt(mockup.Stitch_Count, 10).toLocaleString()) : '') + '">'
+                + '  <span class="pmd-save-status" id="pmd-stitch-count-status"></span>'
                 + '</div>'
                 + '<div class="pmd-field-row pmd-field-row--editable" style="flex-direction:column;gap:4px;">'
-                + '  <span class="pmd-field-label">Thread Colors</span>'
+                + '  <span class="pmd-field-label">Thread Colors <span class="pmd-save-status" id="pmd-thread-colors-status"></span></span>'
                 + '  <div class="pmd-thread-input-wrapper">'
                 + '    <input type="text" class="pmd-inline-input pmd-thread-input" id="pmd-thread-colors" placeholder="Type to search colors..." value="' + escapeHtml(mockup.Thread_Colors || '') + '">'
                 + '    <div class="pmd-thread-suggestions" id="pmd-thread-suggestions"></div>'
@@ -2477,7 +2480,16 @@
     }
 
     // ── Inline Field Save ────────────────────────────────────────────────
+    function setInlineSaveStatus(el, modifier, text) {
+        if (!el) return;
+        el.textContent = text || '';
+        el.className = 'pmd-save-status' + (modifier ? ' pmd-save-status--' + modifier : '');
+    }
+
     function saveInlineField(fieldName, value, inputEl) {
+        var statusEl = inputEl ? document.getElementById(inputEl.id + '-status') : null;
+        setInlineSaveStatus(statusEl, 'saving', 'Saving…');
+
         var updateData = {};
         updateData[fieldName] = value;
         fetch(API_BASE + '/api/mockups/' + mockupId, {
@@ -2492,7 +2504,10 @@
             }
             // Update local state
             if (currentMockup) currentMockup[fieldName] = value;
+            setInlineSaveStatus(statusEl, 'saved', '✓ Saved');
+            setTimeout(function () { setInlineSaveStatus(statusEl, '', ''); }, 2500);
         }).catch(function (err) {
+            setInlineSaveStatus(statusEl, 'failed', '✗ Failed');
             showToast('Failed to save: ' + err.message, 'error');
         });
     }
