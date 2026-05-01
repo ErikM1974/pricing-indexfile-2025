@@ -945,6 +945,81 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
   );
 }
 
+// ---------------------------------------------------------------------------
+// RowTierPills — thin pill strip rendered ABOVE each priced PaperRow showing
+// the price tiers in N6 design style: each pill is "$PRICE SIZE-RANGE",
+// surcharge tiers tinted spruce-green. Sizes are grouped by shared price and
+// only ordered sizes are shown. Renders nothing when:
+//   - no breakdown / no qty
+//   - manual override (one flat price — no tiers to show)
+// Manual override case is handled by RowBreakdownLine's "Manual override" prefix
+// already, so a tier-pills row would be redundant.
+// ---------------------------------------------------------------------------
+function RowTierPills({ row, rowBreakdown }) {
+  if (!row || !rowBreakdown || rowBreakdown.error) return null;
+  if (row.priceOverride) return null;
+  const sizes = row.sizes || {};
+  const totalQty = Object.values(sizes).reduce((a, v) => a + (Number(v) || 0), 0);
+  if (!totalQty) return null;
+
+  // Build the canonical size order BEFORE grouping into tiers so each tier's
+  // sizes come out in visual order naturally:
+  //   1. Standard sizes (XS-4XL) in PAPER_SIZES order — same as the column grid
+  //   2. Non-standard sizes (5XL+, OSFA, LT/XLT, etc.) in NON_STANDARD_SIZES order
+  //   3. Custom sizes (cap S/M-L/XL, pants 3030/3032/...) in row insertion order —
+  //      the row's sizes-object is built in availability order from the bundle, so
+  //      Object.keys() preserves that. Avoids alphabetical sort flipping S/M after L/XL.
+  const sizeKeys = Object.keys(sizes);
+  const sizeKeyIdx = new Map(sizeKeys.map((k, i) => [k, i]));
+  const sortIdx = (sz) => {
+    const std = PAPER_SIZES.indexOf(sz);
+    if (std !== -1) return std;
+    const nss = NON_STANDARD_SIZES.indexOf(sz);
+    if (nss !== -1) return PAPER_SIZES.length + nss;
+    return PAPER_SIZES.length + NON_STANDARD_SIZES.length + (sizeKeyIdx.get(sz) ?? 9999);
+  };
+  const orderedKeys = sizeKeys.sort((a, b) => sortIdx(a) - sortIdx(b));
+
+  // Group ordered sizes by unit price. Iteration order = canonical visual order.
+  const tiers = new Map();
+  orderedKeys.forEach(sz => {
+    const qty = Number(sizes[sz]) || 0;
+    if (!qty) return;
+    const unit = rowBreakdown.unitPriceBySize?.[sz];
+    if (!Number.isFinite(Number(unit)) || Number(unit) <= 0) return;
+    const key = Number(unit).toFixed(2);
+    if (!tiers.has(key)) tiers.set(key, { price: Number(unit), sizes: [] });
+    tiers.get(key).sizes.push(sz);
+  });
+  if (tiers.size === 0) return null;
+
+  // Sort tiers by price ascending so cheapest (base) tier is first.
+  const tierList = [...tiers.values()].sort((a, b) => a.price - b.price);
+
+  const basePrice = tierList[0].price;
+
+  return (
+    <tr className="pf-tier-row">
+      <td colSpan={14}>
+        <span className="pf-tier-pills">
+          {tierList.map((t, i) => {
+            const isSurcharge = t.price > basePrice;
+            const range = t.sizes.length === 1
+              ? prettyPrintSize(t.sizes[0])
+              : `${prettyPrintSize(t.sizes[0])}–${prettyPrintSize(t.sizes[t.sizes.length - 1])}`;
+            return (
+              <span key={i} className={"pf-tier-pill" + (isSurcharge ? ' pf-tier-pill--surcharge' : '')}>
+                <span className="pf-tier-price">{fmt$(t.price)}</span>
+                <span className="pf-tier-range">{range}</span>
+              </span>
+            );
+          })}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
 const PAPER_SIZES = ['XS','S','M','L','XL','2XL','3XL','4XL'];
 
 // SIZE ALIASES — for products whose bundle reports a non-standard size that
@@ -1549,6 +1624,17 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         <tbody>
           {visibleRows.slice(0, 14).flatMap((r, i) => {
             const rb = breakdown?.byRow?.get?.(r.id) || null;
+            // Tier-pill strip rendered ABOVE the data row when this row has
+            // an auto-priced breakdown with at least one tier. Skipped on
+            // manual override (RowBreakdownLine's "Manual override" prefix
+            // already conveys that all sizes are at one flat price).
+            const tierEl = rb && !rb.error ? (
+              <RowTierPills
+                key={`${r.id}-tp`}
+                row={r}
+                rowBreakdown={rb}
+              />
+            ) : null;
             const rowEl = (
               <PaperRow
                 key={r.id}
@@ -1573,7 +1659,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 customerMode={customerMode}
               />
             ) : null;
-            return bdEl ? [rowEl, bdEl] : [rowEl];
+            return [tierEl, rowEl, bdEl].filter(Boolean);
           })}
         </tbody>
       </table>

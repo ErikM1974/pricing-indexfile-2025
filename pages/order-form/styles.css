@@ -1797,6 +1797,62 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
    actual SKU/qty/price segments that will land in ShopWorks. Updated
    2026-05-01: tighter accent left-border, body font for prose, mono only
    for the SKU + numbers (so it reads as data not as a wall of text). */
+/* Tier-pill row (N6 design from Claude Designer 2026-05-01) — sits ABOVE
+   each priced data row. Each pill shows "$PRICE SIZE-RANGE", grouped by
+   shared price across ordered sizes. Surcharge tiers use spruce-green so
+   the price step at 2XL/3XL/etc. reads at a glance.
+   Replaces the always-visible upcharge chip + ⓘ tooltip from the prior
+   redesign with a more readable, scannable pattern. */
+tr.pf-tier-row {
+  background: transparent;
+}
+tr.pf-tier-row > td {
+  border: 0;
+  padding: 4px 12px 0 30px;
+  vertical-align: bottom;
+  height: auto !important;
+}
+.pf-tier-pills {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.pf-tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  padding: 1px 6px;
+  background: color-mix(in oklab, var(--ink-4) 6%, white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.pf-tier-pill .pf-tier-price { font-weight: 700; }
+.pf-tier-pill .pf-tier-range {
+  font-weight: 500;
+  color: var(--ink-3);
+  border-left: 1px solid var(--line);
+  padding-left: 4px;
+  margin-left: 1px;
+}
+.pf-tier-pill--surcharge {
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, white);
+  border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+}
+.pf-tier-pill--surcharge .pf-tier-range {
+  color: color-mix(in oklab, var(--accent) 60%, var(--ink-3));
+  border-left-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+}
+
 tr.pf-breakdown-row {
   background: transparent;
 }
@@ -1875,7 +1931,8 @@ tr.pf-breakdown-row--manual > td {
 /* Hide breakdown row entirely when printing — print-sheet.jsx handles its own
    per-tier split with PN labels in a more print-friendly layout. */
 @media print {
-  tr.pf-breakdown-row { display: none; }
+  tr.pf-breakdown-row,
+  tr.pf-tier-row { display: none; }
 }
 
 /* Row tier badge — small pill in the bottom-right corner of the description
