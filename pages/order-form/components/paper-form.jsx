@@ -553,7 +553,10 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             onClick={() => setMcpOpen(o => !o)}
             title={row.manualMode ? 'Manual cost mode — click to clear' : 'Style not in SanMar? Click to enter blank cost manually'}
             aria-label="Manual cost"
-          >$</button>
+          >
+            <span className="manual-cost-icon" aria-hidden="true">✎</span>
+            {row.manualMode && <span className="manual-cost-label">manual</span>}
+          </button>
           {row.manualMode && <ManualCostPill row={row} onClear={clearManualCost} />}
           {mcpOpen && (
             <div className="manual-cost-prompt-wrap">
@@ -769,38 +772,54 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
         {showAutoPriceCell ? (
           <button
             type="button"
-            className={"t-in num auto-priced" + (showUpchargeChip ? ' has-upcharge' : '')}
+            className="t-in num auto-priced"
             onClick={() => update({ priceOverride: true, price: headlineUnit ? headlineUnit.toFixed(2) : '' })}
-            title="Auto-priced — click to override. Headline shows base (S/M/L/XL) price; upcharges are added per size automatically."
+            title={showUpchargeChip
+              ? `Auto-priced — click to override. Upcharges: ${upchargeChipText}`
+              : 'Auto-priced — click to override. Headline shows base (S/M/L/XL) price; upcharges are added per size automatically.'}
           >
             <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
-            <span className="auto-badge">auto</span>
-            {showUpchargeChip && (
-              <span className="upcharge-chip" title="Upcharges applied to bigger sizes">{upchargeChipText}</span>
-            )}
+            <span className="auto-badge">
+              auto{showUpchargeChip && (
+                <span
+                  className="upcharge-info"
+                  aria-label={`Upcharges: ${upchargeChipText}`}
+                  title={`Upcharges: ${upchargeChipText}`}
+                >ⓘ</span>
+              )}
+            </span>
           </button>
         ) : (
-          <div className={"manual-price-cell" + (showUpchargeChip ? ' has-upcharge' : '')}>
+          <div className="manual-price-cell">
             <input
               className="t-in num"
               inputMode="decimal"
               value={row.price || ''}
               onChange={e => update({ price: e.target.value.replace(/[^0-9.]/g, '') })}
               placeholder=""
+              title={showUpchargeChip
+                ? `Manual price — auto-pricing would apply: ${upchargeChipText}`
+                : ''}
             />
-            {row.priceOverride && hasAutoPrice && (
-              <button
-                type="button"
-                className="restore-auto-link"
-                onClick={() => update({ priceOverride: false, price: '' })}
-                title="Use auto-calculated price"
-              >restore auto</button>
-            )}
-            {/* Upcharge chip persists in override mode — informational only since
-                the manual price applies uniformly to all sizes. */}
-            {showUpchargeChip && (
-              <span className="upcharge-chip upcharge-chip--manual" title="Auto-pricing would apply these upcharges">
-                {upchargeChipText}
+            {(row.manualMode || row.priceOverride) && (
+              <span className="manual-price-meta">
+                <span className="auto-badge auto-badge--manual">
+                  manual{showUpchargeChip && (
+                    <span
+                      className="upcharge-info"
+                      aria-label={`Auto-pricing would apply: ${upchargeChipText}`}
+                      title={`Auto-pricing would apply: ${upchargeChipText}`}
+                    >ⓘ</span>
+                  )}
+                </span>
+                {row.priceOverride && hasAutoPrice && (
+                  <button
+                    type="button"
+                    className="restore-auto-link"
+                    onClick={() => update({ priceOverride: false, price: '' })}
+                    title="Use auto-calculated price"
+                  >restore auto</button>
+                )}
               </span>
             )}
           </div>
@@ -863,40 +882,63 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
   const isOverride = !!row.priceOverride;
   const manualUnit = Number(row.price) || 0;
 
-  // Render each group as an inline span.
+  // Compute summary (count + total) for the prefix. Skipped groups don't add
+  // to the total. Override mode applies manualUnit to every group.
+  let pricedCount = 0;
+  let runningTotal = 0;
+  sortedGroups.forEach(g => {
+    if (g.skipped && !isOverride) return;
+    const groupQty = g.sizes.reduce((a, s) => a + s.qty, 0);
+    const unit = isOverride ? manualUnit : g.unit;
+    pricedCount += 1;
+    runningTotal += unit * groupQty;
+  });
+
+  // Render each group as an inline span. Format choices:
+  //   qty = 1: "{PN} ${unit}"               (no × or = math — trivial)
+  //   qty > 1: "{PN} × {qty} = ${lineTotal}" (math kept — not trivial)
+  // Skipped groups always show qty so the rep sees "still need a price".
   const segments = sortedGroups.map((g, i) => {
     const groupQty = g.sizes.reduce((a, s) => a + s.qty, 0);
     const sizeList = g.sizes.map(s => prettyPrintSize(s.size)).join('/');
+    const showSizeList = sizeList && sizeList !== g.partNumber.replace(partBase, '').replace('_', '');
     if (g.skipped && !isOverride) {
       return (
         <span key={i} className="pf-bd-seg pf-bd-seg--skip">
           <strong>{g.partNumber}</strong>
-          <span className="pf-bd-sizes">{sizeList}</span>
-          × {groupQty}
+          {showSizeList && <span className="pf-bd-sizes">{sizeList}</span>}
+          {' × '}{groupQty}
           <span className="pf-bd-skip-tag">skipped (no price)</span>
         </span>
       );
     }
-    // Override mode: every group uses the manual unit.
     const unit = isOverride ? manualUnit : g.unit;
     const lineTotal = unit * groupQty;
     return (
       <span key={i} className="pf-bd-seg">
         <strong>{g.partNumber}</strong>
-        {sizeList && sizeList !== g.partNumber.replace(partBase, '').replace('_','') && (
-          <span className="pf-bd-sizes">{sizeList}</span>
-        )}
-        × {groupQty} @ {fmt$(unit)} = {fmt$(lineTotal)}
+        {showSizeList && <span className="pf-bd-sizes">{sizeList}</span>}
+        {groupQty === 1
+          ? <> {fmt$(unit)}</>
+          : <> × {groupQty} = {fmt$(lineTotal)}</>}
       </span>
     );
   });
+
+  // Summary phrase: "ShopWorks (5 SKUs · $226.00):" or "Manual override
+  // (5 SKUs · $250.00):" — the count is the priced-group count (skipped
+  // groups don't add to the total but still render as segments).
+  const skuLabel = pricedCount === 1 ? '1 SKU' : `${pricedCount} SKUs`;
+  const summaryText = pricedCount > 0
+    ? `${skuLabel} · ${fmt$(runningTotal)}`
+    : skuLabel;
+  const prefixText = isOverride ? 'Manual override' : 'ShopWorks';
 
   return (
     <tr className={"pf-breakdown-row" + (isOverride ? ' pf-breakdown-row--manual' : '')}>
       <td colSpan={14}>
         <span className="pf-bd-arrow">↳</span>
-        {isOverride && <span className="pf-bd-prefix">Manual override:</span>}
-        {!isOverride && <span className="pf-bd-prefix">Splits to ShopWorks:</span>}
+        <span className="pf-bd-prefix">{prefixText} ({summaryText}):</span>
         <span className="pf-bd-segments">{segments.reduce((acc, seg, i) => i === 0 ? [seg] : [...acc, <span key={`d${i}`} className="pf-bd-dot"> · </span>, seg], [])}</span>
       </td>
     </tr>
