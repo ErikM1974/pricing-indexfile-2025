@@ -1780,6 +1780,38 @@ function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
 //   - Order-level: date_OrderRequestedToShip, date_OrderDropDead
 // Duplicating in a note created exactly the redundancy Erik flagged.
 
+// Notes To Purchasing — line-by-line list for the sourcing team to pull
+// from SanMar. One line per (style, color, size) at the qty + price the
+// rep priced. Mirrors Python Inksoft's pattern (transform.py:840-855)
+// so production teams have the same shape across both order paths.
+function buildPurchasingNote({ rows }) {
+  const lines = ['Line Items:'];
+  (rows || []).forEach(r => {
+    if (!r || !r.style) return;
+    const sizes = r.sizes || {};
+    Object.keys(sizes).forEach(sz => {
+      const q = Number(sizes[sz]) || 0;
+      if (!q) return;
+      const colorPart = r.colorName ? ` - ${r.colorName}` : '';
+      const pricePart = r.price ? ` @ $${Number(r.price).toFixed(2)}` : '';
+      lines.push(`${r.style}${colorPart} - ${sz} × ${q}${pricePart}`);
+    });
+  });
+  return lines.length > 1 ? lines.join('\n') : '';
+}
+
+// On Packing List — customer-visible note that prints on the packing
+// slip. Short, friendly, and gives the customer their order # for any
+// follow-up questions. Don't include internal data here.
+function buildPackingListNote({ info, extOrderId }) {
+  const company = (info.company || '').trim();
+  return [
+    'Thank you for your order!',
+    company ? `— ${company}` : null,
+    extOrderId ? `Order #: ${extOrderId}` : null,
+  ].filter(Boolean).join('\n');
+}
+
 function buildArtNote({ info, files }) {
   const parts = [];
   if (info.artNotes) parts.push(info.artNotes);
@@ -2104,16 +2136,19 @@ app.post('/api/submit-order-form', async (req, res) => {
         linkNote: (f.placements || []).join(', ')
       }));
 
-    // --- Notes (3-way split + optional art) ---
-    // Each block lands on a different ShopWorks screen for a different role:
-    //   Notes On Order      → CSR/AR: order audit, CRM customer ID, tax account
-    //   Notes To Production → production: stitch/location + garment breakdown
-    //   Notes To Art        → art team (only if rep added art notes/files)
+    // --- Notes (5-way split, all targeting separate ShopWorks tabs) ---
+    // Each block lands on a different ShopWorks screen for a different role.
+    // Verified against the live order #141671 notes UI (Erik's screenshots).
     //
-    // Shipping data goes to MO's structured fields (ShippingAddresses,
-    // date_OrderRequestedToShip, date_OrderDropDead) — no redundant note.
-    // Customer name/email/phone/PO/sales-rep go to MO's structured Contact*,
-    // CustomerPurchaseOrder, CustomerServiceRep — no redundant note.
+    //   Notes On Order        → CSR/AR header: order audit, CRM Customer ID, tax account
+    //   Notes To Production   → production team: stitch/location + garment breakdown
+    //   Notes To Purchasing   → sourcing team: line-by-line PN + color + size + price
+    //   Notes On Packing List → CUSTOMER-VISIBLE: thank-you note on the packing slip
+    //   Notes To Art          → art team (only when rep added art notes or files)
+    //
+    // NOT sent (intentional — already in MO structured fields):
+    //   - Shipping (ShippingAddresses[], date_OrderRequestedToShip, date_OrderDropDead)
+    //   - Contact info (Contact*, CustomerPurchaseOrder, CustomerServiceRep)
     const notesBlocks = [];
     const orderNote = buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId });
     if (orderNote) notesBlocks.push({ type: 'Notes On Order', note: orderNote });
@@ -2121,17 +2156,38 @@ app.post('/api/submit-order-form', async (req, res) => {
     const productionNote = buildProductionNote({ rows, breakdown, methodNotesBlock });
     if (productionNote) notesBlocks.push({ type: 'Notes To Production', note: productionNote });
 
+    const purchasingNote = buildPurchasingNote({ rows });
+    if (purchasingNote) notesBlocks.push({ type: 'Notes To Purchasing', note: purchasingNote });
+
+    const packingListNote = buildPackingListNote({ info, extOrderId });
+    if (packingListNote) notesBlocks.push({ type: 'Notes On Packing List', note: packingListNote });
+
     if (info.artNotes || (Array.isArray(files) && files.length)) {
       const artNote = buildArtNote({ info, files });
       if (artNote) notesBlocks.push({ type: 'Notes To Art', note: artNote });
     }
 
+    // Build the order Description field — populates ShopWorks's
+    // Order Information > Description (visible in order list views).
+    // Format: "EMBROIDERY · Left Chest · 8,000 stitches" — gives ShopWorks
+    // staff a method-at-a-glance summary without opening the order.
+    const orderDescription = String(methodNotesBlock || '')
+      .split('\n')[0]                    // first line of method block
+      .trim()
+      || (rows && rows.length ? `Order — ${rows.length} line${rows.length === 1 ? '' : 's'}` : '');
+
     // --- Canonical camelCase payload — same shape proxy's manageorders-push-client expects ---
     const manageOrdersPayload = {
       orderNumber: extOrderId,
       customerPurchaseOrder: info.po || extOrderId,
+      // Order-level Description — ShopWorks shows this in the order header.
+      description: orderDescription,
       customer: {
         company: info.company || '',
+        // CRM Customer ID — proxy can use this as ExtCustomerID for repeat-
+        // customer matching in ShopWorks (Forma Construction always lands
+        // on the same customer record across multiple orders).
+        companyId: info.companyId || '',
         firstName: info.buyerFirst || '',
         lastName: info.buyerLast || '',
         email: info.email || '',
