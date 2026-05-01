@@ -51,29 +51,32 @@
 (function () {
   // Standard sizes that map to the base SKU with no suffix.
   const BASE_SKU_SIZES = new Set(['S', 'M', 'L', 'XL']);
-  // 2XL/XXL collapse to short form `_2X` to match the ManageOrders inventory
-  // database. (XXL exists for ladies styles but the inventory DB still
-  // accepts the short form.)
-  const SHORT_FORM_2XL = new Set(['2XL', 'XXL']);
-  // Sizes that map to a literal `_<size>` suffix.
+  // Sizes that map to a literal `_<size>` suffix — matches ShopWorks's
+  // Size Translation Table modifier column (which appends per-size).
+  // 2XL → _2X (short form, per Inksoft Size Translation CSV)
+  // XXL → _XXL (full form — used by ladies' L-prefix styles, distinct SKU)
+  // 3XL → _3X (short form, like 2XL — verified live against inventory DB)
+  // Slash sizes (S/M, M/L, L/XL, 2/3X) preserved literally for caps.
   const LITERAL_SUFFIX_SIZES = new Set([
-    'XS', '3XL', '4XL', '5XL', '6XL', '7XL',
-    '2XS', 'XXS',
-    'LT', 'XLT', '2XLT', '3XLT', '4XLT',
-    'OSFA',
-    'YS', 'YM', 'YL', 'YXL',
-    'S/M', 'M/L', 'L/XL', '2/3X',  // caps fitted — slash is part of the SKU
+    'XS', 'XXL',                               // _XS, _XXL (ladies use _XXL)
+    'XXS', '2XS',                              // extended-small ladies/junior
+    'LT', 'XLT', '2XLT', '3XLT', '4XLT',       // tall variants — TLJ754, PC61T
+    'OSFA',                                    // caps OSFA
+    'YS', 'YM', 'YL', 'YXL',                   // youth
+    'S/M', 'M/L', 'L/XL', '2/3X',              // caps fitted — slash is part of SKU
   ]);
-  // Inventory DB uses short form for extended sizes too: 3XL → _3X, 4XL → _4X.
-  const SHORTEN_TO_X = new Set(['3XL', '4XL', '5XL', '6XL', '7XL']);
+  // Sizes that shorten to _<digit>X form (matches Inksoft Size Translation CSV
+  // and the live ManageOrders inventory database):
+  //   2XL → _2X, 3XL → _3X, 4XL → _4X, 5XL → _5X, 6XL → _6X, 7XL → _7X
+  // (XXL is NOT in this set — it stays _XXL because it's a separate ladies SKU.)
+  const SHORTEN_TO_X = new Set(['2XL', '3XL', '4XL', '5XL', '6XL', '7XL']);
 
   function orderFormSizeSuffix(partNumber, size) {
     if (!partNumber || !size) return partNumber || '';
     const base = String(partNumber).trim();
     const s = String(size).trim().toUpperCase();
     if (BASE_SKU_SIZES.has(s)) return base;             // S, M, L, XL → base SKU
-    if (SHORT_FORM_2XL.has(s)) return `${base}_2X`;     // 2XL/XXL → _2X
-    if (SHORTEN_TO_X.has(s)) return `${base}_${s.replace('XL', 'X')}`;  // 3XL→_3X, etc.
+    if (SHORTEN_TO_X.has(s)) return `${base}_${s.replace('XL', 'X')}`;  // 2XL→_2X, 3XL→_3X, etc.
     if (LITERAL_SUFFIX_SIZES.has(s)) return `${base}_${s}`;
     // Pants W×L numeric (3232, 3434, etc.) — pass through.
     if (/^\d{4}$/.test(s)) return `${base}_${s}`;
