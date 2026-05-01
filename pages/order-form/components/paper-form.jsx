@@ -187,6 +187,32 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const totalDollars = showAutoPriceCell ? rowSubtotalDollars : (row.priceOverride ? overrideTotal : 0);
   const showTotalDollars = totalDollars > 0;
 
+  // ----- Size-grid mode -----
+  // Different products have different size models. The XS-4XL grid is wrong
+  // for caps (OSFA-only, like Richardson 112) and useless for stickers /
+  // emblems (single-qty rows). Detect the right mode from availableSizes and
+  // render a collapsed cell when the standard grid doesn't apply.
+  //   'standard'   — XS-4XL columns + Other sizes picker (default)
+  //   'cap-osfa'   — single OSFA cell spanning the size area (most caps)
+  //   'single-qty' — single Qty cell (stickers, emblems)
+  // Falls back to 'standard' until the bundle resolves so the rep can start
+  // typing right away. Once availableSizes comes back, the mode locks in.
+  const sizeMode = (() => {
+    if (row.deco === 'sticker' || row.deco === 'emblem') return 'single-qty';
+    if (!availableSizes || !availableSizes.length) return 'standard';
+    const upper = availableSizes.map(s => String(s).toUpperCase());
+    if (upper.length === 1 && upper[0] === 'OSFA') return 'cap-osfa';
+    return 'standard';
+  })();
+  // The "size key" for collapsed modes — what key in row.sizes carries the qty.
+  // For caps it's 'OSFA' (so orderFormSizeSuffix produces the _OSFA suffix).
+  // For sticker/emblem we use 'STK'/'EMB' for the row.sizes key.
+  const collapsedSizeKey = sizeMode === 'cap-osfa' ? 'OSFA'
+                         : row.deco === 'sticker' ? 'STK'
+                         : row.deco === 'emblem' ? 'EMB'
+                         : null;
+  const collapsedQty = collapsedSizeKey ? (row.sizes?.[collapsedSizeKey] || '') : '';
+
   function applyManualCost({ manualCost, itemType }) {
     update({
       manualMode: true,
@@ -264,25 +290,58 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
           )}
         </div>
       </td>
-      {PAPER_SIZES.map(s => {
-        // Gray out sizes the picked product doesn't come in (e.g. PC61 has no XS).
-        // Don't disable the input — the rep should still be able to type if they
-        // know the product actually does come in that size and our data is wrong.
-        const upper = s.toUpperCase();
-        const unavailable = availSet && !availSet.has(upper);
-        return (
-          <td key={s} className={unavailable ? 'sz-unavail' : ''}>
+      {sizeMode === 'cap-osfa' || sizeMode === 'single-qty' ? (
+        // Collapsed grid for caps and stickers/emblems — single qty cell that
+        // visually spans XS-4XL + Other (9 columns). Other rows in the table
+        // keep the standard layout because <colgroup> defines fixed widths
+        // and only this <td> uses colspan.
+        <td colSpan={9} className={"size-collapsed size-collapsed--" + sizeMode}>
+          <div className="size-collapsed-inner">
+            <span className="size-collapsed-label">
+              {sizeMode === 'cap-osfa' ? 'OSFA' : 'Qty'}
+            </span>
             <input
-              className={"t-in num" + (unavailable ? ' t-in--dim' : '')}
+              className="t-in num size-collapsed-qty"
               inputMode="numeric"
-              value={row.sizes[s] || ''}
-              onChange={e => setSize(s, e.target.value)}
-              title={unavailable ? `${row.style || 'this product'} doesn't come in ${s}` : ''}
+              value={collapsedQty}
+              onChange={e => {
+                // Strip non-digits, store under the right size key. Other size
+                // keys are cleared so the row's sizes map stays clean.
+                const v = e.target.value.replace(/[^0-9]/g, '');
+                const next = {};
+                if (v) next[collapsedSizeKey] = v;
+                update({ sizes: next });
+              }}
+              placeholder="—"
             />
-          </td>
-        );
-      })}
-      <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} availableSizes={availableSizes} /></td>
+            {sizeMode === 'cap-osfa' && (
+              <span className="size-collapsed-hint">One Size Fits All</span>
+            )}
+          </div>
+        </td>
+      ) : (
+        <>
+          {PAPER_SIZES.map(s => {
+            // Gray out sizes the picked product doesn't come in (e.g. PC61 has no XS).
+            // Don't disable the input — the rep should still be able to type if they
+            // know the product actually does come in that size and our data is wrong.
+            const upper = s.toUpperCase();
+            const unavailable = availSet && !availSet.has(upper);
+            return (
+              <td key={s} className={unavailable ? 'sz-unavail' : ''}>
+                <input
+                  className={"t-in num" + (unavailable ? ' t-in--dim' : '')}
+                  inputMode="numeric"
+                  value={row.sizes[s] || ''}
+                  onChange={e => setSize(s, e.target.value)}
+                  title={unavailable ? `${row.style || 'this product'} doesn't come in ${s}` : ''}
+                />
+              </td>
+            );
+          })}
+          <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} availableSizes={availableSizes} /></td>
+        </>
+      )}
       <td>
         {showAutoPriceCell ? (
           <button

@@ -78,11 +78,24 @@
   // ---------------------------------------------------------------------------
   // Pure per-row pricing.
   // tier / ltmPP come from formCtx.totalQty (form-wide aggregate).
+  //
+  // Even when qty=0 (rep just typed a style, hasn't filled qty yet) we still
+  // populate `extras.availableSizes` + `capOrFlat` so the form's size grid
+  // can morph to the right shape (e.g. OSFA-only for Richardson 112) the
+  // moment a style resolves. Otherwise the rep would face a chicken-and-egg
+  // problem: no qty → no breakdown → no availableSizes → grid can't morph.
   // ---------------------------------------------------------------------------
   function priceRow({ row, formCtx, bundle, capOrFlat }) {
     const out = S.emptyRowBreakdown();
+    const sizingPreview = bundle?.uniqueSizes && bundle.uniqueSizes.length
+      ? { availableSizes: bundle.uniqueSizes, capOrFlat, manualMode: !!row.manualMode }
+      : null;
     const totalQty = Number(formCtx?.totalQty) || 0;
-    if (!totalQty) { out.error = null; return out; }
+    if (!totalQty) {
+      // Sizing-only preview: form needs availableSizes to render the grid.
+      if (sizingPreview) out.extras = sizingPreview;
+      return out;
+    }
     if (!bundle?.pricing) { out.error = 'No pricing bundle'; return out; }
 
     const tier = S.tierForQty(totalQty, S.EMBROIDERY_TIERS);
@@ -149,15 +162,20 @@
   async function aggregate({ rows, formCtx }) {
     const out = S.emptyOrderBreakdown();
     out.totalQty = S.totalQtyAcrossRows(rows);
-    if (!out.totalQty) return out;
-    out.tier = S.tierForQty(out.totalQty, S.EMBROIDERY_TIERS);
+    // No early-exit when totalQty=0 — we still need to resolve bundles for
+    // rows with style only, so the form can publish availableSizes/capOrFlat
+    // to the UI and morph the size grid (e.g. OSFA-only for Richardson 112).
+    if (out.totalQty) out.tier = S.tierForQty(out.totalQty, S.EMBROIDERY_TIERS);
 
     // Fetch all bundles in parallel — registry-level cache means second call
     // for the same (capOrFlat, style) is instant.
+    //
+    // Targets include rows with style+manualMode REGARDLESS of qty so the form
+    // can publish availableSizes + capOrFlat to the UI even before the rep
+    // enters a qty. priceRow() returns a sizing-only preview (rowSubtotal=0)
+    // for those rows; the breakdown row UI suppresses itself when subtotal=0.
     const targets = (rows || []).filter(r => {
       if (!r) return false;
-      const hasQty = Object.values(r.sizes || {}).some(v => Number(v) > 0);
-      if (!hasQty) return false;
       const hasStyle = !!(r.style && r.style.trim());
       const hasManual = !!r.manualMode && Number(r.manualCost) > 0;
       return hasStyle || hasManual;

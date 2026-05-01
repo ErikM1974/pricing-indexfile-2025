@@ -1526,6 +1526,54 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 .t-in--dim { color: var(--ink-3); }
 .t-in--dim::placeholder { color: var(--ink-4); }
 
+/* Collapsed size grid — for caps (OSFA) and stickers/emblems (single qty).
+   Replaces the XS-4XL columns + Other picker with one centered input. The
+   colspan=9 means the table layout doesn't shift; other rows keep their
+   normal grid. Subtle accent background signals "this row is different". */
+td.size-collapsed {
+  background: color-mix(in oklab, var(--accent-soft) 50%, white);
+  border-left: 1px solid color-mix(in oklab, var(--accent) 18%, var(--line));
+  padding: 0;
+}
+td.size-collapsed--cap-osfa { background: color-mix(in oklab, #ddd6fe 30%, white); }   /* slight purple — caps */
+td.size-collapsed--single-qty { background: color-mix(in oklab, #fde68a 25%, white); } /* slight amber — stickers/emblems */
+.size-collapsed-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 6px 14px;
+  height: 100%;
+}
+.size-collapsed-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.size-collapsed-qty {
+  width: 70px !important;
+  text-align: center;
+  font-size: 16px !important;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid color-mix(in oklab, var(--accent) 28%, var(--line)) !important;
+  background: var(--surface) !important;
+}
+.size-collapsed-qty:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.size-collapsed-hint {
+  font-size: 10px;
+  font-style: italic;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+}
+
 /* NonStandardSizePicker availability hint */
 .nss-menu-hint {
   font-size: 10px;
