@@ -104,13 +104,34 @@
       void tier; // referenced for possible future use
     }
 
+    // DTF size upcharges — same convention as embroidery/DTG: relative dollar
+    // upcharges over the base size, additive on top of perPieceUnit. Pulled
+    // from the bundle's sellingPriceDisplayAddOns map (or fall back to no
+    // upcharges if the bundle doesn't expose them).
+    const upchargeMap = bundle?.sellingPriceDisplayAddOns || bundle?.upcharges || {};
+    const availableSizes = (bundle?.uniqueSizes && bundle.uniqueSizes.length)
+      ? bundle.uniqueSizes
+      : Object.keys(upchargeMap);
+    const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0] || 'S';
+    const baseAbs = Number(upchargeMap[baseSizeKey] || 0);
+
     Object.keys(row.sizes || {}).forEach(sizeKey => {
       const qty = Number(row.sizes[sizeKey]) || 0;
       if (!qty) return;
-      out.unitPriceBySize[sizeKey] = perPieceUnit;
-      const lineSubtotal = perPieceUnit * qty;
-      out.sizeBreakdown.push({ size: sizeKey, qty, unitPrice: perPieceUnit, lineSubtotal });
+      const sizeAbs = Number(upchargeMap[sizeKey] || 0);
+      const relativeUp = Math.max(0, sizeAbs - baseAbs);
+      const unit = perPieceUnit + relativeUp;
+      out.unitPriceBySize[sizeKey] = unit;
+      const lineSubtotal = unit * qty;
+      out.sizeBreakdown.push({ size: sizeKey, qty, unitPrice: unit, lineSubtotal });
       out.rowSubtotal += lineSubtotal;
+    });
+
+    // Sizing metadata for display
+    const sizeUpcharges = {};
+    Object.keys(upchargeMap).forEach(sz => {
+      const rel = Number(upchargeMap[sz] || 0) - baseAbs;
+      if (rel > 0) sizeUpcharges[sz] = rel;
     });
 
     out.tier = tierForQty(totalQty);
@@ -119,6 +140,10 @@
       locationCount,
       primarySize,
       manualMode: !!row.manualMode,
+      availableSizes,
+      baseSizeKey,
+      basePrice: perPieceUnit,
+      sizeUpcharges,
     };
     return out;
   }

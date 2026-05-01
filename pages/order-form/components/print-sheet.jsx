@@ -7,25 +7,65 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
   const supported = !!breakdown?.supported;
   const byRow = breakdown?.byRow;
 
-  // Build per-row qty/$ totals — pulls computed prices from breakdown when
-  // available, falls back to row.price when manual.
-  const rowsWithTotal = rows.map(r => {
-    let qty = 0;
-    Object.values(r.sizes || {}).forEach(v => { qty += Number(v) || 0; });
-    let lineDollar = 0;
-    let unitDollar = 0;
+  // Build print-ready rows. When auto-pricing is active and the row spans
+  // multiple price tiers (e.g. S/M/L/XL @ $25 + 2XL @ $27 + 3XL @ $28), the
+  // print sheet auto-splits it into one printed line per tier — matching the
+  // embroidery quote builder's invoice convention. Each tier shows just its
+  // sizes' qtys with the tier's unit price and line subtotal.
+  const printRows = [];
+  rows.forEach(r => {
+    if (!r) return;
     const rb = byRow?.get?.(r.id);
-    if (rb && !rb.error && rb.rowSubtotal > 0 && !r.priceOverride) {
-      lineDollar = rb.rowSubtotal;
-      unitDollar = qty > 0 ? lineDollar / qty : 0;
-    } else if (r.price) {
-      unitDollar = Number(r.price) || 0;
-      lineDollar = unitDollar * qty;
+    let totalQty = 0;
+    Object.values(r.sizes || {}).forEach(v => { totalQty += Number(v) || 0; });
+    if (totalQty === 0) return;
+
+    if (rb && !rb.error && rb.rowSubtotal > 0 && !r.priceOverride && rb.unitPriceBySize) {
+      // Group sizes by their unit price → one printed line per group.
+      // Skip sizes the product doesn't price (e.g. PC61 doesn't sell XS — the
+      // method module's priceRow leaves unitPriceBySize.XS undefined). Those
+      // sizes appear in the form's grayed-out cells but shouldn't print as
+      // $0 lines or push to ShopWorks.
+      const buckets = new Map();   // unitPriceKey → { unit, sizes: { sz: qty } }
+      Object.keys(r.sizes).forEach(sz => {
+        const qty = Number(r.sizes[sz]) || 0;
+        if (!qty) return;
+        const rawUnit = rb.unitPriceBySize[sz];
+        if (rawUnit == null || !Number.isFinite(Number(rawUnit)) || Number(rawUnit) <= 0) return;
+        const unit = Number(rawUnit);
+        const key = unit.toFixed(2);
+        if (!buckets.has(key)) buckets.set(key, { unit, sizes: {} });
+        buckets.get(key).sizes[sz] = qty;
+      });
+      const sortedBuckets = [...buckets.values()].sort((a, b) => a.unit - b.unit);
+      sortedBuckets.forEach((b, idx) => {
+        let q = 0; Object.values(b.sizes).forEach(v => { q += Number(v) || 0; });
+        printRows.push({
+          id: `${r.id}-tier-${idx}`,
+          style: idx === 0 ? r.style : '',
+          color: idx === 0 ? (r.color || r.colorName || '') : '',
+          desc:  idx === 0 ? r.desc : '',
+          sizes: b.sizes,
+          total: q,
+          unitDollar: b.unit,
+          lineDollar: b.unit * q,
+          _continuation: idx > 0,
+        });
+      });
+    } else {
+      // Manual price OR no auto-pricing → single printed line summing all sizes.
+      const unit = Number(r.price) || 0;
+      printRows.push({
+        ...r,
+        color: r.color || r.colorName || '',
+        total: totalQty,
+        unitDollar: unit,
+        lineDollar: unit * totalQty,
+      });
     }
-    return { ...r, total: qty, lineDollar, unitDollar };
   });
 
-  const padded = [...rowsWithTotal];
+  const padded = [...printRows];
   while (padded.length < 14) padded.push({ id: 'blank-' + padded.length, style: '', color: '', desc: '', sizes: {}, total: 0, lineDollar: 0, unitDollar: 0, _blank: true });
 
   const designNo = info.designNumber || files.map(f => f.designNo).filter(Boolean).join(', ');

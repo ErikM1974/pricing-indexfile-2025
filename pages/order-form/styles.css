@@ -1484,21 +1484,58 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   background: linear-gradient(180deg, color-mix(in oklab, var(--accent-soft) 80%, white), color-mix(in oklab, var(--accent-soft) 50%, white));
   border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--line));
   cursor: pointer;
-  text-align: right;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--ink);
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1px;
   width: 100%;
-  padding-right: 8px;
+  padding: 4px 8px;
+  text-align: right;
+  min-height: 36px;
+}
+.t-in.auto-priced .auto-priced-money { font-size: 13px; line-height: 1.15; }
+.t-in.auto-priced.has-upcharge { padding-top: 3px; padding-bottom: 3px; }
+.t-in.auto-priced .upcharge-chip {
+  display: block;
+  width: 100%;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, white);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 .t-in.auto-priced:hover {
   background: linear-gradient(180deg, color-mix(in oklab, var(--accent-soft) 90%, white), color-mix(in oklab, var(--accent-soft) 60%, white));
   border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+}
+
+/* Unavailable size cell — grayed out (rep can still type if our data is wrong) */
+.sz-unavail { background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in oklab, var(--ink-4) 14%, transparent) 4px 5px); }
+.t-in--dim { color: var(--ink-3); }
+.t-in--dim::placeholder { color: var(--ink-4); }
+
+/* NonStandardSizePicker availability hint */
+.nss-menu-hint {
+  font-size: 10px;
+  color: var(--ink-3);
+  background: var(--accent-soft);
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: -2px -2px 4px -2px;
+  font-style: italic;
+  line-height: 1.4;
 }
 .auto-badge {
   display: inline-block;

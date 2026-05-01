@@ -15,7 +15,12 @@ const ALL_DECOS = [
 // opens a small menu of remaining non-standard sizes. Each picked size becomes
 // an inline qty input. All sizes flow into row.sizes[] and push to MO with the
 // correct _<size> suffix via orderFormSizeSuffix() in server.js.
-function NonStandardSizePicker({ row, onChange }) {
+//
+// `availableSizes` (optional) — array of sizes the picked product actually
+// comes in (from the pricing-bundle). When provided, the "+ Add" menu only
+// shows non-standard sizes that are valid for this product (e.g. PC61 →
+// only 5XL/6XL, no Tall/Youth/OSFA). Without it, all non-standard sizes show.
+function NonStandardSizePicker({ row, onChange, availableSizes }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef(null);
 
@@ -33,7 +38,15 @@ function NonStandardSizePicker({ row, onChange }) {
   const enteredNonStd = Object.keys(sizes)
     .filter(k => !standardSet.has(k) && k in sizes)
     .sort((a, b) => NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b));
-  const remaining = NON_STANDARD_SIZES.filter(s => !(s in sizes));
+  // Filter the remaining list by what the product actually offers, when known.
+  const availSet = (availableSizes && availableSizes.length)
+    ? new Set(availableSizes.map(s => String(s).toUpperCase()))
+    : null;
+  const remaining = NON_STANDARD_SIZES.filter(s => {
+    if (s in sizes) return false;
+    if (availSet && !availSet.has(s.toUpperCase())) return false;
+    return true;
+  });
 
   function setSize(s, v) {
     const next = { ...sizes };
@@ -71,8 +84,15 @@ function NonStandardSizePicker({ row, onChange }) {
       <button type="button" className="nss-add-btn" onClick={() => setOpen(o => !o)}>+ Add</button>
       {open && (
         <div className="nss-menu">
+          {availSet && (
+            <div className="nss-menu-hint">
+              Available for this product: {availableSizes.join(', ')}
+            </div>
+          )}
           {remaining.length === 0 ? (
-            <div className="nss-menu-empty">All non-standard sizes added</div>
+            <div className="nss-menu-empty">
+              {availSet ? 'No non-standard sizes available for this product' : 'All non-standard sizes added'}
+            </div>
           ) : (
             <div className="nss-menu-grid">
               {remaining.map(s => (
@@ -114,8 +134,25 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const hasAutoPrice = !!(rowBreakdown && !rowBreakdown.error && rowBreakdown.rowSubtotal > 0);
   const showAutoPriceCell = hasAutoPrice && !row.priceOverride;
   const rowSubtotalDollars = rowBreakdown?.rowSubtotal || 0;
-  // Price cell display: weighted-average unit when sizes have different upcharges.
+  // Per-size sizing metadata from the method module (when available).
+  // basePrice = headline (S/M/L/XL price), sizeUpcharges = relative upcharges
+  // for 2XL+, availableSizes = which sizes the product actually comes in.
+  const extras = rowBreakdown?.extras || {};
+  const basePrice = Number.isFinite(Number(extras.basePrice)) ? Number(extras.basePrice) : null;
+  const sizeUpcharges = extras.sizeUpcharges || {};
+  const availableSizes = extras.availableSizes || null;
+  const availSet = (availableSizes && availableSizes.length)
+    ? new Set(availableSizes.map(s => String(s).toUpperCase()))
+    : null;
+  // Headline unit: prefer the bundle's base price (S/M/L/XL); if unavailable
+  // (e.g. cap OSFA, sticker, emblem), fall back to weighted average.
   const avgUnit = (showAutoPriceCell && total > 0) ? rowSubtotalDollars / total : 0;
+  const headlineUnit = (basePrice != null) ? basePrice : avgUnit;
+  // Which upcharged sizes actually have qty entered? Only those need to show
+  // in the chip — no point cluttering with "+$2 2XL" when there's no 2XL qty.
+  const usedUpchargedSizes = Object.keys(sizeUpcharges)
+    .filter(sz => Number(row.sizes?.[sz]) > 0);
+  const hasUpchargeChip = showAutoPriceCell && usedUpchargedSizes.length > 0;
 
   function applyManualCost({ manualCost, itemType }) {
     update({
@@ -194,20 +231,44 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
           )}
         </div>
       </td>
-      {PAPER_SIZES.map(s => (
-        <td key={s}><input className="t-in num" inputMode="numeric" value={row.sizes[s] || ''} onChange={e => setSize(s, e.target.value)} /></td>
-      ))}
-      <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} /></td>
+      {PAPER_SIZES.map(s => {
+        // Gray out sizes the picked product doesn't come in (e.g. PC61 has no XS).
+        // Don't disable the input — the rep should still be able to type if they
+        // know the product actually does come in that size and our data is wrong.
+        const upper = s.toUpperCase();
+        const unavailable = availSet && !availSet.has(upper);
+        return (
+          <td key={s} className={unavailable ? 'sz-unavail' : ''}>
+            <input
+              className={"t-in num" + (unavailable ? ' t-in--dim' : '')}
+              inputMode="numeric"
+              value={row.sizes[s] || ''}
+              onChange={e => setSize(s, e.target.value)}
+              title={unavailable ? `${row.style || 'this product'} doesn't come in ${s}` : ''}
+            />
+          </td>
+        );
+      })}
+      <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} availableSizes={availableSizes} /></td>
       <td>
         {showAutoPriceCell ? (
           <button
             type="button"
-            className="t-in num auto-priced"
-            onClick={() => update({ priceOverride: true, price: avgUnit ? avgUnit.toFixed(2) : '' })}
-            title="Auto-priced — click to override"
+            className={"t-in num auto-priced" + (hasUpchargeChip ? ' has-upcharge' : '')}
+            onClick={() => update({ priceOverride: true, price: headlineUnit ? headlineUnit.toFixed(2) : '' })}
+            title="Auto-priced — click to override. Headline shows base (S/M/L/XL) price; upcharges are added per size automatically."
           >
-            {fmt$(avgUnit)}
+            <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
             <span className="auto-badge">auto</span>
+            {hasUpchargeChip && (
+              <span className="upcharge-chip" title="Upcharges applied to bigger sizes">
+                {usedUpchargedSizes
+                  .sort((a, b) => PAPER_SIZES.indexOf(a) - PAPER_SIZES.indexOf(b)
+                    || NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b))
+                  .map(sz => `+$${Number(sizeUpcharges[sz]).toFixed(0)} ${sz}`)
+                  .join(' · ')}
+              </span>
+            )}
           </button>
         ) : (
           <div className="manual-price-cell">

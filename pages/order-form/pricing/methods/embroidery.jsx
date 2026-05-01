@@ -109,6 +109,23 @@
       out.rowSubtotal += lineSubtotal;
     });
 
+    // Sizing metadata for display: which sizes this product comes in, and the
+    // relative upcharges so the UI can render "+$2 2XL · +$3 3XL". Base price
+    // is the standard (S or first sortOrder) tier price — the headline.
+    const availableSizes = (bundle.uniqueSizes && bundle.uniqueSizes.length)
+      ? bundle.uniqueSizes
+      : Object.keys(bundle.pricing?.[tier] || {});
+    const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0];
+    const basePrice = bundle.pricing?.[tier]?.[baseSizeKey] != null
+      ? S.roundPrice(bundle.pricing[tier][baseSizeKey] + ltmPP, rule)
+      : null;
+    const baseAbs = Number(bundle.sellingPriceDisplayAddOns?.[baseSizeKey] || 0);
+    const sizeUpcharges = {};
+    Object.keys(bundle.sellingPriceDisplayAddOns || {}).forEach(sz => {
+      const rel = Number(bundle.sellingPriceDisplayAddOns[sz] || 0) - baseAbs;
+      if (rel > 0) sizeUpcharges[sz] = rel;
+    });
+
     out.tier   = tier;
     out.extras = {
       capOrFlat,
@@ -117,6 +134,11 @@
       primaryLocation: formCtx?.decoConfig?.primaryLocation || 'Left Chest',
       manualMode: !!row.manualMode,
       manualCost: row.manualMode ? Number(row.manualCost) || 0 : 0,
+      // Display metadata for the price-cell breakdown chip + size-picker filter
+      availableSizes,
+      baseSizeKey,
+      basePrice,
+      sizeUpcharges,    // { size: relative_upcharge_dollars }
     };
     return out;
   }

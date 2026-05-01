@@ -120,11 +120,28 @@
       out.rowSubtotal += lineSubtotal;
     });
 
+    // Sizing metadata for display: available sizes + relative upcharges.
+    const availableSizes = Object.keys(priced.unitPriceBySize || {});
+    const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0];
+    const basePrice = priced.unitPriceBySize?.[baseSizeKey] != null
+      ? priced.unitPriceBySize[baseSizeKey] + ltmPP
+      : null;
+    const baseAbs = Number(bundle?.upcharges?.[baseSizeKey] || 0);
+    const sizeUpcharges = {};
+    Object.keys(bundle?.upcharges || {}).forEach(sz => {
+      const rel = Number(bundle.upcharges[sz] || 0) - baseAbs;
+      if (rel > 0) sizeUpcharges[sz] = rel;
+    });
+
     out.tier = tier;
     out.extras = {
       locationCombo: combo,
       ltmPerPiece: ltmPP,
       manualMode: !!row.manualMode,
+      availableSizes,
+      baseSizeKey,
+      basePrice,
+      sizeUpcharges,
     };
     return out;
   }

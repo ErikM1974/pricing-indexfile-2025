@@ -103,6 +103,19 @@
       out.rowSubtotal += lineSubtotal;
     });
 
+    // Sizing metadata: SP `primaryRow.prices` is per-size, so we derive the
+    // available sizes + upcharges by diffing each size's price from the base
+    // (S or first-listed) size.
+    const availableSizes = Object.keys(primaryRow.prices || {});
+    const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0];
+    const baseRawPrice = Number(primaryRow.prices?.[baseSizeKey]) || 0;
+    const basePrice = Math.ceil((baseRawPrice + addPP + ltmPP) * 2) / 2;
+    const sizeUpcharges = {};
+    availableSizes.forEach(sz => {
+      const rel = Number(primaryRow.prices[sz]) - baseRawPrice;
+      if (rel > 0) sizeUpcharges[sz] = rel;
+    });
+
     out.tier = tier;
     out.extras = {
       frontColors: loc.front,
@@ -112,6 +125,10 @@
       ltmPerPiece: ltmPP,
       additionalPerPiece: addPP,
       manualMode: !!row.manualMode,
+      availableSizes,
+      baseSizeKey,
+      basePrice,
+      sizeUpcharges,
     };
     return out;
   }
