@@ -1724,10 +1724,11 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   ];
   if (draftId) lines.push(`Draft/Share Link: ${draftId}`);
   lines.push('');
-  // Company + CRM Customer ID — quick reference so AE can jump from this
+  // Company + CRM Company ID — quick reference so AE can jump from this
   // order to the company's CRM record without searching by name.
+  // Erik asked for this labeled as "Company ID" (matches the form's term).
   if (info.company || info.companyId) {
-    const idPart = info.companyId ? `  ·  Customer ID: ${info.companyId}` : '';
+    const idPart = info.companyId ? `  ·  Company ID: ${info.companyId}` : '';
     lines.push(`Company: ${info.company || 'N/A'}${idPart}`);
     lines.push('');
   }
