@@ -67,6 +67,21 @@
         if (!sz) return;
         bySize[sz] = Number(s.totalQty) || 0;
       });
+
+      // Mirror size-name aliases so the form's render code can look up either
+      // name and find the data. The Caspio pricing bundle for ladies styles
+      // (L500, L420, …) uses '2XL' as the size key, but the SanMar inventory
+      // API for those same styles returns 'XXL'. Without this mirror, the
+      // form's standard 2XL column hits an undefined bySize['2XL'] and the
+      // badge never renders. Conditional — only mirrors when one key is set
+      // and the other isn't, so a (hypothetical) product that genuinely
+      // returns both keys with different counts won't be silently merged.
+      const ALIAS_PAIRS = [['2XL', 'XXL']];
+      for (const [a, b] of ALIAS_PAIRS) {
+        if (bySize[a] != null && bySize[b] == null) bySize[b] = bySize[a];
+        if (bySize[b] != null && bySize[a] == null) bySize[a] = bySize[b];
+      }
+
       const result = {
         bySize,
         status: 'ok',
