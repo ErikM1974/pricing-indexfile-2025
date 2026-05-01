@@ -1892,37 +1892,53 @@ tr.pf-breakdown-row--manual > td {
   tr.pf-breakdown-row { display: none; }
 }
 
-/* Row tier badge — small pill in description cell when row has a computed
-   breakdown. Updated 2026-05-01: switched to filled accent color so it
-   reads as a confident "this is your pricing tier" label rather than the
-   washed-out grey it was before. */
+/* Row tier badge — small pill in the bottom-right corner of the description
+   cell when row has a computed breakdown. Absolutely positioned so it
+   doesn't get squeezed by the flex layout (which was making it wrap into
+   3 lines). NWCA brand green (--accent = spruce) with white text — clear
+   visual presence without dominating the description. */
 .row-tier-badge {
-  display: inline-block;
+  position: absolute;
+  bottom: 3px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #fff;
-  background: linear-gradient(135deg,
-    color-mix(in oklab, var(--accent) 88%, #fff) 0%,
-    var(--accent) 100%);
+  background: var(--accent);    /* NWCA spruce green — the brand accent */
   border: 0;
   padding: 2px 7px;
   border-radius: 4px;
-  margin-top: 4px;
-  vertical-align: top;
-  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 0 0 1px color-mix(in oklab, var(--accent) 50%, #000) inset;
   font-variant-numeric: tabular-nums;
+  pointer-events: none;          /* tooltip-only, doesn't intercept clicks on textarea */
+  user-select: none;
+  z-index: 1;
 }
 /* "CAP" suffix when product is a flat headwear (cap embroidery pricing) —
-   thin outline pill that reads as a modifier, not a separate tier. */
+   thin outlined chip inside the pill, reads as a modifier not a tier. */
 .row-tier-badge .row-tier-cap {
   display: inline-block;
-  margin-left: 4px;
   padding: 0 4px;
-  font-size: 8.5px;
-  background: rgba(255,255,255,0.22);
-  border-radius: 3px;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.25);
+  border-radius: 2px;
+  font-weight: 700;
+}
+/* The desc-cell needs to be a positioning context so the absolute badge
+   anchors to it. Also adds padding-bottom on the textarea so the typed
+   text doesn't run under the badge. */
+.p-table td .desc-cell {
+  position: relative;
+}
+.p-table td .desc-cell textarea.t-in-desc {
+  padding-bottom: 18px;          /* leave room for the corner badge */
 }
 
 .pf-row.pf-row--priced .nss-td,
