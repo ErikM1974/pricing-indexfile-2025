@@ -1801,18 +1801,6 @@ function buildPurchasingNote({ rows }) {
   return lines.length > 1 ? lines.join('\n') : '';
 }
 
-// On Packing List — customer-visible note that prints on the packing
-// slip. Short, friendly, and gives the customer their order # for any
-// follow-up questions. Don't include internal data here.
-function buildPackingListNote({ info, extOrderId }) {
-  const company = (info.company || '').trim();
-  return [
-    'Thank you for your order!',
-    company ? `— ${company}` : null,
-    extOrderId ? `Order #: ${extOrderId}` : null,
-  ].filter(Boolean).join('\n');
-}
-
 function buildArtNote({ info, files }) {
   const parts = [];
   if (info.artNotes) parts.push(info.artNotes);
@@ -2137,15 +2125,22 @@ app.post('/api/submit-order-form', async (req, res) => {
         linkNote: (f.placements || []).join(', ')
       }));
 
-    // --- Notes (5-way split, all targeting separate ShopWorks tabs) ---
+    // --- Notes (4-way split, all targeting separate ShopWorks tabs) ---
     // Each block lands on a different ShopWorks screen for a different role.
     // Verified against the live order #141671 notes UI (Erik's screenshots).
     //
     //   Notes On Order        → CSR/AR header: order audit, CRM Customer ID, tax account
     //   Notes To Production   → production team: stitch/location + garment breakdown
     //   Notes To Purchasing   → sourcing team: line-by-line PN + color + size + price
-    //   Notes On Packing List → CUSTOMER-VISIBLE: thank-you note on the packing slip
     //   Notes To Art          → art team (only when rep added art notes or files)
+    //
+    // ShopWorks's API only accepts these 9 note types: Notes On Order,
+    // Notes To Art, Notes To Purchasing, Notes To Subcontract, Notes To
+    // Production, Notes To Receiving, Notes To Shipping, Notes To Accounting,
+    // Notes On Customer (new customers only). "Notes On Packing List" is NOT
+    // a valid type — packing-slip output is a ShopWorks template concern,
+    // not a note type. Pushing it caused the proxy's note validator to
+    // reject the entire array.
     //
     // NOT sent (intentional — already in MO structured fields):
     //   - Shipping (ShippingAddresses[], date_OrderRequestedToShip, date_OrderDropDead)
@@ -2159,9 +2154,6 @@ app.post('/api/submit-order-form', async (req, res) => {
 
     const purchasingNote = buildPurchasingNote({ rows });
     if (purchasingNote) notesBlocks.push({ type: 'Notes To Purchasing', note: purchasingNote });
-
-    const packingListNote = buildPackingListNote({ info, extOrderId });
-    if (packingListNote) notesBlocks.push({ type: 'Notes On Packing List', note: packingListNote });
 
     if (info.artNotes || (Array.isArray(files) && files.length)) {
       const artNote = buildArtNote({ info, files });

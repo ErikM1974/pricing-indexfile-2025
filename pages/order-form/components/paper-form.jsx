@@ -547,26 +547,13 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               ...(row.style && row.style !== p.style ? { colorName: '', catalogColor: '' } : {})
             })}
           />
-          <button
-            type="button"
-            className={"manual-cost-toggle" + (row.manualMode ? ' on' : '')}
-            onClick={() => setMcpOpen(o => !o)}
-            title={row.manualMode ? 'Manual cost mode — click to clear' : 'Style not in SanMar? Click to enter blank cost manually'}
-            aria-label="Manual cost"
-          >
-            <span className="manual-cost-icon" aria-hidden="true">✎</span>
-            {row.manualMode && <span className="manual-cost-label">manual</span>}
-          </button>
-          {row.manualMode && <ManualCostPill row={row} onClear={clearManualCost} />}
-          {mcpOpen && (
-            <div className="manual-cost-prompt-wrap">
-              <ManualCostPrompt
-                row={row}
-                onApply={applyManualCost}
-                onCancel={() => setMcpOpen(false)}
-              />
-            </div>
-          )}
+          {/* Manual-cost UI (✎ toggle, ManualCostPill, ManualCostPrompt) was
+              removed 2026-05-01 per Erik — reps don't use it. State + handlers
+              (manualMode, mcpOpen, applyManualCost, clearManualCost) are kept
+              live in case any saved row already has manualMode=true; the
+              price cell still routes those into the manual-input branch
+              below. To bring the affordance back, restore the button + popover
+              JSX from git history. */}
         </div>
       </td>
       <td>

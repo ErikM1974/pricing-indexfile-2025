@@ -1808,53 +1808,81 @@ tr.pf-tier-row {
 }
 tr.pf-tier-row > td {
   border: 0;
-  padding: 4px 12px 0 30px;
+  padding: 6px 12px 2px 30px;   /* a touch more breathing room above the data row */
   vertical-align: bottom;
   height: auto !important;
 }
 .pf-tier-pills {
   display: inline-flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 5px;
   align-items: center;
 }
+/* Pill anatomy:
+     [ $54.00 │ S–XL ]
+       price    range
+   The price is the primary number (heavier weight, ink-color, larger).
+   The range is secondary metadata (lighter weight, smaller, tracked-out).
+   A 1px hairline divider separates the two so the eye lands on the price. */
 .pf-tier-pill {
   display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  align-items: baseline;
+  gap: 7px;
   font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  padding: 1px 6px;
-  background: color-mix(in oklab, var(--ink-4) 6%, white);
-  border: 1px solid var(--line);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  padding: 3px 10px;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--ink-4) 3%, white) 0%,
+    color-mix(in oklab, var(--ink-4) 8%, white) 100%);
+  border: 1px solid color-mix(in oklab, var(--line) 92%, var(--ink-4));
   border-radius: 999px;
   white-space: nowrap;
-  line-height: 1.4;
+  line-height: 1.35;
+  box-shadow:
+    0 1px 0 rgba(20, 60, 30, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-.pf-tier-pill .pf-tier-price { font-weight: 700; }
+.pf-tier-pill .pf-tier-price {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
 .pf-tier-pill .pf-tier-range {
-  font-weight: 500;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   color: var(--ink-3);
-  border-left: 1px solid var(--line);
-  padding-left: 4px;
-  margin-left: 1px;
+  border-left: 1px solid color-mix(in oklab, var(--line) 70%, var(--ink-4));
+  padding-left: 7px;
 }
 .pf-tier-pill--surcharge {
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 8%, white);
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent) 5%, white) 0%,
+    color-mix(in oklab, var(--accent) 12%, white) 100%);
   border-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--accent) 10%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
+.pf-tier-pill--surcharge .pf-tier-price { color: var(--accent); }
 .pf-tier-pill--surcharge .pf-tier-range {
-  color: color-mix(in oklab, var(--accent) 60%, var(--ink-3));
-  border-left-color: color-mix(in oklab, var(--accent) 30%, var(--line));
+  color: color-mix(in oklab, var(--accent) 65%, var(--ink-3));
+  border-left-color: color-mix(in oklab, var(--accent) 35%, var(--line));
 }
 
-tr.pf-breakdown-row {
-  background: transparent;
+/* Splits-to-ShopWorks row hidden 2026-05-01 per Erik — reps don't need to
+   see the per-PN breakdown in the form (it's still pushed to ShopWorks
+   correctly via the order payload). The row JSX still renders so the
+   component tree stays intact; CSS removes it from layout. The rules below
+   for .pf-bd-* / .pf-bd-seg-* are kept dormant in case the row is ever
+   un-hidden. */
+tr.pf-breakdown-row,
+tr.pf-breakdown-row--manual {
+  display: none;
 }
 tr.pf-breakdown-row > td {
   border: 0;

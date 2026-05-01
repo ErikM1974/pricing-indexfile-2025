@@ -6,18 +6,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-## Quote Builder Calculations
-
----
-
-### 1-Cent Tax Rounding Error in Quote PDF Totals
-**Problem:** PDF total off by $0.01. Components summed correctly but total didn't match.
-**Root Cause:** Tax computed as raw float, displayed rounded, but added to total unrounded. IEEE 754 rounding.
-**Solution:** `Math.round(subtotal * taxRate * 100) / 100` — round tax to cents BEFORE summing.
-**Prevention:** Round each component to cents first, then sum. Never sum unrounded floats.
-
----
-
 ## Pricing Architecture
 
 ### ALWAYS Pull Pricing From Caspio API — Never Hardcode
@@ -296,3 +284,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Solution:** (1) Hardened the per-rep table's daily cron to do **rolling 60-day re-archive + phantom-delete** so within-window drift self-heals nightly. (2) Built `scripts/reconcile-rep-baseline-from-csv.js` to one-shot fix the locked pre-window using a ShopWorks CSV (parses with latin-1 to handle 0xFF bytes, trims rep names so `House` and `House ` collapse, dry-run by default, deletes Jan 1 → Feb 25 rows then upserts one CSV-derived baseline per rep dated Feb 25). After this NW_Daily_Sales_By_Rep matched CSV exactly to the dollar. (3) **Re-pointed the sales-goal banner to read from the per-rep YTD endpoint plus a thin live ManageOrders top-up for unarchived days** — single source of truth for both widgets. The legacy `DailySalesArchive` is no longer read by the staff dashboard (background writes still run as a safety net but nothing consumes them).
 **Prevention:** When a metric appears in more than one place on the same screen, **all consumers must read from the same source — period**. Two tables holding "the same" data is a guarantee they'll drift; pick one canonical store. Quarterly truth-up against an external authoritative source (in our case, the ShopWorks CSV via `npm run reconcile-rep-baseline -- --csv "<path>" --apply`) catches everything that aged past the auto-sync window. When a metric is "by definition correct" but obviously wrong, look for a parallel data path you forgot existed.
 **Follow-up (2026-04-27, commit `e35eba65`):** Same divergence existed off-dashboard too — Taneisha/Nika CRM headlines summed `Accounts.YTD_Sales_2026` (refreshed by `sync_sales`) while the staff dashboard widget read `NW_Daily_Sales_By_Rep`, leaving Erik with two reconciled-but-different totals per rep. `dashboards/js/rep-crm.js` now reads the per-rep archive for the headline (background fetch on init), shows the archive-through date, and prints a reconciliation line when the tier sum diverges in either direction. House Accounts page had the analogous "stat cards don't sum to headline" bug — the API returned an "Other" assignee bucket the UI silently dropped (~$5K hidden); added the 6th card. Same lesson, three more surfaces: pick one source per metric, surface the gap when the breakdown can't fully reconcile.
+
+---
+
+### Order Form ShopWorks Push: Invented Note Type "Notes On Packing List" (2026-05-01)
+**Problem:** Every Order Form push to ShopWorks failed with `Invalid note type: "Notes On Packing List". Valid types: Notes On Order, Notes To Art, Notes To Purchasing, Notes To Subcontract, Notes To Production, Notes To Receiving, Notes To Shipping, Notes To Accounting, Notes On Customer`. Banner showed at the bottom of the form, no order landed.
+**Root Cause:** [server.js:2164](server.js:2164) constructed a fifth notes block tagged `type: 'Notes On Packing List'` for a customer-visible thank-you string built by `buildPackingListNote()` ([server.js:1807](server.js:1807)). That string is **not** in ShopWorks's official 9-type taxonomy ([memory/MANAGEORDERS_API_GUIDE_OFFICIAL.md:153](memory/MANAGEORDERS_API_GUIDE_OFFICIAL.md:153)) — the developer treated it as a note type when it's actually a ShopWorks template-output concern. The proxy validates the WHOLE notes array; one invalid type aborts the entire push.
+**Solution:** Deleted `buildPackingListNote()` and the corresponding `notesBlocks.push({ type: 'Notes On Packing List', ... })` entry. Updated the routing-comment block from "5-way split" to "4-way split" with explicit warning about the 9 valid types. Order Form now pushes Order / Production / Purchasing / Art notes only — same pattern 3-Day Tees uses successfully ([server.js:1580](server.js:1580)).
+**Prevention:** When constructing a ManageOrders notes array, **the `type` value must be one of the 9 from `MANAGEORDERS_API_GUIDE_OFFICIAL.md` — verbatim**. There is no "Packing List", "Customer Receipt", "Hold Note", etc. type — those are ShopWorks UI/print-template concerns, not API note types. The proxy rejects unknown types with a banner that lists the valid set; treat that as the canonical source. Print-slip messages should be configured in ShopWorks's packing-slip template (or omitted), not pushed via the notes array.
