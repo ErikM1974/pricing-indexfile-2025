@@ -181,7 +181,7 @@ function NonStandardSizePicker({ row, onChange, availableSizes, inventory }) {
 // per-size unit prices for this row), the Price cell shows a representative
 // auto-price with an "auto" badge. Clicking it switches to manual override
 // (sets row.priceOverride=true). Total cell shows $ instead of qty.
-function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox, rowBreakdown }) {
+function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox, rowBreakdown, onInventoryChange }) {
   const [mcpOpen, setMcpOpen] = useState(false);
   // Per-size SanMar inventory map — { 'S': 3229, 'M': 7045, 'XL': 1245, ... }
   // populated by the effect below when style + catalogColor are set.
@@ -239,8 +239,15 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
     inv.getInventoryForRow(row.style, catalogColor, sizes).then(result => {
       if (cancelled) return;
       setInventory(result);
+      // Surface to parent so submit() can do a stock-confirmation check
+      // across all rows. Optional callback — parent isn't required to wire it.
+      if (typeof onInventoryChange === 'function') onInventoryChange(row.id, result);
     }).catch(() => {
-      if (!cancelled) setInventory({ bySize: {}, status: 'unknown' });
+      if (!cancelled) {
+        const empty = { bySize: {}, status: 'unknown' };
+        setInventory(empty);
+        if (typeof onInventoryChange === 'function') onInventoryChange(row.id, empty);
+      }
     });
     return () => { cancelled = true; };
   }, [row.style, row.catalogColor, row.colorName, row.color, row.manualMode, row.deco,
@@ -544,14 +551,11 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             const invAvailable = inventory.bySize?.[effectiveKey];
             const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
             const notStockedLocally = inventory.status === 'not-stocked-local';
-            const isOutOfStock = invKnown && Number(invAvailable) === 0;
-            if (isOutOfStock) {
-              return (
-                <td key={s} className="sz-out-of-stock" title={`Local warehouse shows 0 in stock for ${row.colorName || 'this color'} ${effectiveKey} — switch to manual cost (click $) to override`}>
-                  <span className="sz-oos">0 STK</span>
-                </td>
-              );
-            }
+            // Out-of-stock used to hard-block this cell. Now a soft warning:
+            // input stays enabled (rep may know about backorder, drop-ship,
+            // future replenishment), badge shows red "0", submit-time modal
+            // confirms before pushing to ShopWorks. Matches custom-sizes /
+            // NSSP behavior for consistency. See submit() handler.
             const cellQty = Number(row.sizes[effectiveKey]) || 0;
             const klass = invKnown
               ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
@@ -925,6 +929,48 @@ function ContactPicker({ contacts, contactId, onPickContact, onManualEntry }) {
   );
 }
 
+// Stock confirmation modal — shown when the rep clicks submit and one or
+// more sizes have qty > 0 but SanMar shows 0 stock. Lists the offending
+// items and asks "Proceed anyway?". Reps may know about backorders, drop-
+// ships, or extended lead times so we don't hard-block.
+function StockConfirmModal({ items, onConfirm, onCancel }) {
+  // Close on ESC. Listener attached only while modal is open.
+  useEffect(() => {
+    function onKey(e) { if (e.key === 'Escape') onCancel(); }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onCancel]);
+
+  return (
+    <div className="stock-confirm-backdrop" onClick={onCancel} role="dialog" aria-modal="true">
+      <div className="stock-confirm-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="scm-head">
+          <span className="scm-head-icon" aria-hidden="true">⚠</span>
+          <h3 className="scm-title">Stock confirmation needed</h3>
+        </div>
+        <p className="scm-body">
+          {items.length === 1 ? '1 size shows' : `${items.length} sizes show`} <strong>0 in stock</strong> at SanMar today.
+          These may need backorder, drop-ship, or extended lead time. Continue anyway?
+        </p>
+        <ul className="scm-list">
+          {items.map((it, idx) => (
+            <li key={idx} className="scm-item">
+              <span className="scm-item-style">{it.style}</span>
+              <span className="scm-item-color">{it.color || '(no color)'}</span>
+              <span className="scm-item-size">{it.size} × {it.qty}</span>
+              <span className="scm-item-stock">0 in stock</span>
+            </li>
+          ))}
+        </ul>
+        <div className="scm-actions">
+          <button type="button" className="btn ghost" onClick={onCancel}>Cancel</button>
+          <button type="button" className="btn primary" onClick={onConfirm}>Proceed anyway</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, decoConfig = {}, setDecoConfig = () => {}, breakdown = null, customerMode = false, draftId = null, staffFilled = [] }) {
   const lockSalesRep = customerMode && staffFilled.includes('salesRep');
   const lockPO       = customerMode && staffFilled.includes('po');
@@ -990,6 +1036,13 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
   const [shareUrl, setShareUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [lightboxUrl, setLightboxUrl] = useState(null);
+  // Stock-confirmation modal — populated when submit() finds 0-stock items
+  // the rep is ordering. Shape: { items: [{style, color, size, qty, available}], onConfirm, onCancel }
+  const [stockConfirm, setStockConfirm] = useState(null);
+  // Per-row inventory snapshot — submit() needs to look up each row's
+  // current bySize map to detect 0-stock cells. We collect into this Map
+  // every time a row's inventory state lands. Keyed by row.id.
+  const inventoryByRowRef = useRef(new Map());
 
   // Close lightbox on ESC. Listener only attached while it's open.
   useEffect(() => {
@@ -999,6 +1052,60 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     return () => document.removeEventListener('keydown', onKey);
   }, [lightboxUrl]);
 
+  // Walk all rows + their stored sizes, find any (style, color, size, qty)
+  // where SanMar shows 0 stock for that exact size. Used by submit() to
+  // surface a confirmation modal before pushing to ShopWorks. Skips manual-
+  // mode rows (rep is overriding) and sticker/emblem (no SanMar fulfillment).
+  function findZeroStockOrders() {
+    const out = [];
+    (rows || []).forEach(r => {
+      if (!r) return;
+      if (r.manualMode) return;
+      if (r.deco === 'sticker' || r.deco === 'emblem') return;
+      const inv = inventoryByRowRef.current.get(r.id);
+      if (!inv || inv.status !== 'ok' || !inv.bySize) return;
+      Object.entries(r.sizes || {}).forEach(([sz, qStr]) => {
+        const q = Number(qStr) || 0;
+        if (!q) return;
+        const avail = inv.bySize[sz];
+        if (Number.isFinite(Number(avail)) && Number(avail) === 0) {
+          out.push({
+            style: r.style || '?',
+            color: r.colorName || r.color || '',
+            size: sz,
+            qty: q,
+            available: 0,
+          });
+        }
+      });
+    });
+    return out;
+  }
+
+  async function performSubmit() {
+    setSubmitting(true);
+    try {
+      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown });
+      if (res.ok) {
+        const modeLabel = res.mode === 'mock' ? 'mock mode (backend unreachable)' : 'ShopWorks';
+        let text = `✓ Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}`;
+        const skipped = Array.isArray(res.skippedLines) ? res.skippedLines : [];
+        if (skipped.length) {
+          const summary = skipped.map(s => `${s.style} ${s.size} (${s.quantity})`).join(', ');
+          text += ` · ⚠ Skipped (no pricing): ${summary}`;
+        }
+        setCaspioMsg({ kind: skipped.length ? 'warn' : 'ok', text });
+        // Success/warn auto-dismiss after 12s. Errors stay until dismissed.
+        setTimeout(() => setCaspioMsg(null), 12000);
+      } else {
+        setCaspioMsg({ kind: 'err', text: `✗ ShopWorks push failed: ${res.error}${res.detail ? ' — ' + res.detail : ''}` });
+        // No auto-dismiss on errors — rep needs to read the message.
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function submit() {
     if (submitting) return;
     if (!canSubmit) {
@@ -1006,28 +1113,17 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
       setTimeout(() => setCaspioMsg(null), 5000);
       return;
     }
-    setSubmitting(true);
-    try {
-      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown });
-      if (res.ok) {
-        const modeLabel = res.mode === 'mock' ? 'mock mode (backend unreachable)' : 'ShopWorks';
-        let text = `Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}`;
-        // Surface any sizes the engine couldn't price (e.g. PC61 XS) so the
-        // rep knows what didn't make it into ShopWorks. They can re-submit
-        // with a manual price override if those sizes were intentional.
-        const skipped = Array.isArray(res.skippedLines) ? res.skippedLines : [];
-        if (skipped.length) {
-          const summary = skipped.map(s => `${s.style} ${s.size} (${s.quantity})`).join(', ');
-          text += ` · ⚠ Skipped (no pricing): ${summary}`;
-        }
-        setCaspioMsg({ kind: skipped.length ? 'warn' : 'ok', text });
-      } else {
-        setCaspioMsg({ kind: 'err', text: `ShopWorks push failed: ${res.error}` });
-      }
-    } finally {
-      setSubmitting(false);
-      setTimeout(() => setCaspioMsg(null), 9000);
+    // Pre-flight: any 0-stock items? If so, confirm before pushing.
+    const zeroStock = findZeroStockOrders();
+    if (zeroStock.length > 0) {
+      setStockConfirm({
+        items: zeroStock,
+        onConfirm: () => { setStockConfirm(null); performSubmit(); },
+        onCancel:  () => { setStockConfirm(null); },
+      });
+      return;
     }
+    await performSubmit();
   }
 
   async function generateCustomerLink() {
@@ -1241,6 +1337,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 customerMode={customerMode}
                 onLightbox={setLightboxUrl}
                 rowBreakdown={rb}
+                onInventoryChange={(id, inv) => inventoryByRowRef.current.set(id, inv)}
               />
             );
             // Append the breakdown line directly under each priced row so the
@@ -1356,11 +1453,22 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         </div>
       )}
 
-      {/* Caspio status */}
+      {/* Caspio / submit status — kind: 'ok' | 'warn' | 'err'.
+          Errors get an explicit close button so reps can read them without
+          worrying about an auto-dismiss timer. ok/warn auto-dismiss in submit(). */}
       {caspioMsg && (
-        <div className={"caspio-banner " + (caspioMsg.kind === 'ok' ? 'ok' : 'err')} style={{marginTop:16}}>
+        <div className={"caspio-banner " + (caspioMsg.kind === 'ok' ? 'ok' : (caspioMsg.kind === 'warn' ? 'warn' : 'err'))} style={{marginTop:16}}>
           <Icon name={caspioMsg.kind === 'ok' ? 'check' : 'info'} size={16}/>
-          <span>{caspioMsg.text}</span>
+          <span style={{flex:'1 1 auto'}}>{caspioMsg.text}</span>
+          {caspioMsg.kind === 'err' && (
+            <button
+              type="button"
+              className="caspio-banner-close"
+              onClick={() => setCaspioMsg(null)}
+              aria-label="Dismiss"
+              title="Dismiss"
+            >×</button>
+          )}
         </div>
       )}
 
@@ -1398,12 +1506,21 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           </button>
         )}
         <button
-          className="btn primary"
+          className={"btn primary" + (submitting ? ' is-submitting' : '')}
           onClick={submit}
           disabled={submitting || !canSubmit}
           title={!canSubmit ? 'Add at least one row with a style and quantity' : ''}
         >
-          {customerMode ? 'Submit order' : 'Push to ShopWorks'} <Icon name="check" size={14}/>
+          {submitting ? (
+            <>
+              <span className="btn-spinner" aria-hidden="true" />
+              {customerMode ? 'Submitting…' : 'Pushing to ShopWorks…'}
+            </>
+          ) : (
+            <>
+              {customerMode ? 'Submit order' : 'Push to ShopWorks'} <Icon name="check" size={14}/>
+            </>
+          )}
         </button>
       </div>
 
@@ -1421,6 +1538,14 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             onClick={(e) => e.stopPropagation()}
           />
         </div>
+      )}
+
+      {stockConfirm && (
+        <StockConfirmModal
+          items={stockConfirm.items}
+          onConfirm={stockConfirm.onConfirm}
+          onCancel={stockConfirm.onCancel}
+        />
       )}
 
     </div>

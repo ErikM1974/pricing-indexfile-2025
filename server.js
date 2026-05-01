@@ -1679,6 +1679,134 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 //   - Uses OF-MMDD-nn as ExtOrderID when submitted via a customer share link
 // ============================================================================
 
+// ============================================================================
+// Notes builders — split a single order's metadata into ShopWorks's four
+// note "types", each shown on a different screen to a different role:
+//
+//   Notes On Order      → CSR / front desk: customer info, source, tax account
+//   Notes To Production → production team: method/stitch/location, garment qty breakdown
+//   Notes To Shipping   → shipping/receiving: ship method, address, due date
+//   Notes To Art        → art team: art notes + file links (only when present)
+//
+// Pattern adopted from Python Inksoft/web/transform.py:build_notes_array().
+// ============================================================================
+
+// NWCA's tax account lookup. The order form ships at one rate (10.1% Milton, WA);
+// out-of-state and pickup orders go to their own GL accounts per AR's setup.
+function getTaxAccount(state, isCustomerPickup) {
+  if (isCustomerPickup) return { code: '2200',     label: 'Customer Pickup — Milton, WA 10.1%' };
+  if (state && state.toUpperCase() !== 'WA') return { code: '2202', label: 'Out of State Sales' };
+  return { code: '2200.101', label: 'WA Sales Tax 10.1%' };
+}
+
+function buildOrderNote({ info, breakdown, methodNotesBlock, draftId, ship, orderNotes, extOrderId }) {
+  const submittedAt = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const customerName = `${info.buyerFirst || ''} ${info.buyerLast || ''}`.trim() || 'N/A';
+  const breakdownLine = breakdown?.supported
+    ? `\nSubtotal: $${(Number(breakdown.subtotal) || 0).toFixed(2)} · Total qty: ${breakdown.totalQty || 0}${breakdown.tier ? ' · Tier ' + breakdown.tier : ''}`
+    : '';
+  // Tax account derived from ship-to state (or billing fallback). Customer
+  // pickup is identified by ship.method === 'willcall' (matches the form's UI).
+  const isPickup = ship && ship.method === 'willcall';
+  const taxState = (ship && ship.state) || (info && info.state) || '';
+  const taxAccount = getTaxAccount(taxState, isPickup);
+  const expectedTax = breakdown?.supported && Number(breakdown.subtotal) > 0
+    ? `\nExpected Tax: $${(Number(breakdown.subtotal) * 0.101).toFixed(2)}`
+    : '';
+  return [
+    `ONLINE ORDER FORM`,
+    `Source: NWCA-OrderForm  ·  Order: ${extOrderId || 'pending'}`,
+    `Submitted: ${submittedAt}`,
+    draftId ? `Draft/Share Link: ${draftId}` : null,
+    breakdownLine.trim() ? '' : null,
+    breakdownLine.trim(),
+    ``,
+    `Customer: ${customerName}`,
+    `Company: ${info.company || 'N/A'}`,
+    `Email: ${info.email || ''}`,
+    `Phone: ${info.phone || ''}`,
+    `PO: ${info.po || 'N/A'}`,
+    `Sales Rep: ${info.salesRep || 'N/A'}`,
+    `Date Due: ${info.dateDue || 'N/A'}`,
+    ``,
+    `Order Notes: ${orderNotes || 'None'}`,
+    ``,
+    `──────────────────────`,
+    `Tax Account: ${taxAccount.code} (${taxAccount.label})${isPickup ? '' : (taxState && taxState.toUpperCase() === 'WA' ? expectedTax : '\nNo tax due (out of state)')}`,
+  ].filter(s => s !== null).join('\n');
+}
+
+function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
+  const headerLines = [];
+  const block = String(methodNotesBlock || '').trim();
+  if (block) headerLines.push(block);
+  // Garment breakdown: one line per row, listing each size×qty pair using
+  // the stored row.sizes keys (so ladies XXL appears as 'XXL', not '2XL').
+  const rowLines = [];
+  (rows || []).forEach(r => {
+    if (!r || !r.style) return;
+    const sizes = r.sizes || {};
+    const pairs = Object.keys(sizes)
+      .filter(k => Number(sizes[k]) > 0)
+      .map(k => `${k}×${Number(sizes[k])}`);
+    if (pairs.length === 0) return;
+    const totalQty = pairs.reduce((s, p) => s + Number(p.split('×')[1] || 0), 0);
+    const colorPart = r.colorName ? ` ${r.colorName}` : '';
+    rowLines.push(`• ${r.style}${colorPart}: ${pairs.join(', ')} (${totalQty} pcs)`);
+  });
+  const parts = [];
+  if (headerLines.length) parts.push(headerLines.join('\n'));
+  if (rowLines.length) {
+    if (parts.length) parts.push(''); // blank line between header and breakdown
+    parts.push('Garment breakdown:');
+    parts.push(...rowLines);
+  }
+  return parts.join('\n');
+}
+
+function buildShippingNote({ info, ship }) {
+  const dueLine = `DUE: ${info.dateDue || 'N/A'}`;
+  const isPickup = ship && ship.method === 'willcall';
+  if (isPickup) {
+    return [
+      `*** CUSTOMER PICKUP ***`,
+      `Pickup at: NWCA, 2025 Freeman Rd E, Milton, WA 98354`,
+      info.email ? `Notify when ready: ${info.email}` : null,
+      ``,
+      dueLine,
+    ].filter(s => s !== null).join('\n');
+  }
+  const method = ship && ship.method === 'other' ? 'Other' : 'UPS Ground';
+  const customerName = `${info.buyerFirst || ''} ${info.buyerLast || ''}`.trim();
+  const shipAddr = (ship && ship.address) || info.address || '';
+  const shipCity = (ship && ship.city) || info.city || '';
+  const shipState = (ship && ship.state) || info.state || '';
+  const shipZip = (ship && ship.zip) || info.zip || '';
+  const lines = [dueLine, ``, `Ship Method: ${method}`, `Ship to:`];
+  if (info.company) lines.push(`  ${info.company}`);
+  if (customerName) lines.push(`  ${customerName}`);
+  if (shipAddr) lines.push(`  ${shipAddr}`);
+  if (shipCity || shipState || shipZip) {
+    lines.push(`  ${[shipCity, shipState, shipZip].filter(Boolean).join(' ').trim()}`);
+  }
+  if (info.phone) lines.push(`Phone: ${info.phone}`);
+  return lines.join('\n');
+}
+
+function buildArtNote({ info, files }) {
+  const parts = [];
+  if (info.artNotes) parts.push(info.artNotes);
+  if (Array.isArray(files) && files.length) {
+    parts.push(files.map(f => {
+      const placements = (f.placements || []).join(', ');
+      const designNo = f.designNo ? ` (#${f.designNo})` : '';
+      const colors = f.colors ? ` — Colors: ${f.colors}` : '';
+      return `${f.name || 'file'}${designNo}: ${placements}${colors}`;
+    }).join('\n'));
+  }
+  return parts.join('\n\n');
+}
+
 // Generate Order Form order ID — OF-NNNN (globally sequential, zero-padded to 4 digits).
 // Reuses the proxy's race-safe counter endpoint that Embroidery uses (same as EMB-2026-N).
 // Response shape: { prefix: "OF", year: 2026, sequence: 42 } → we return "OF-0042".
@@ -1989,24 +2117,26 @@ app.post('/api/submit-order-form', async (req, res) => {
         linkNote: (f.placements || []).join(', ')
       }));
 
-    // --- Notes ---
+    // --- Notes (4-way split, pattern adopted from Python Inksoft) ---
+    // Each block is built by a small helper above. Each lands on a different
+    // ShopWorks screen for a different role:
+    //   Notes On Order      → CSR/front desk: customer + tax account
+    //   Notes To Production → production: stitch/location + garment breakdown
+    //   Notes To Shipping   → shipping/receiving: method + address + due
+    //   Notes To Art        → art team (only if rep added art notes/files)
     const notesBlocks = [];
-    // Method-specific context block (e.g. "EMBROIDERY · 8,000 stitches · Tier 24-47").
-    // Frontend builds this via each method module's buildNotesBlock(). When present,
-    // it's prepended to the header so production sees pricing context first.
-    const decoBlock = String(methodNotesBlock || '').trim();
-    const breakdownLine = breakdown?.supported
-      ? `\nSubtotal: $${(Number(breakdown.subtotal) || 0).toFixed(2)} · Total qty: ${breakdown.totalQty || 0}${breakdown.tier ? ' · Tier ' + breakdown.tier : ''}`
-      : '';
-    const headerNote = `${decoBlock ? decoBlock + '\n\n' : ''}ONLINE ORDER FORM\nSource: NWCA-OrderForm${draftId ? `\nDraft/Share Link: ${draftId}` : ''}${breakdownLine}\n\nCustomer: ${info.buyerFirst || ''} ${info.buyerLast || ''}\nCompany: ${info.company || 'N/A'}\nEmail: ${info.email || ''}\nPhone: ${info.phone || ''}\nPO: ${info.po || 'N/A'}\nSales Rep: ${info.salesRep || 'N/A'}\nDate Due: ${info.dateDue || 'N/A'}\n\nOrder Notes: ${orderNotes || 'None'}`;
-    notesBlocks.push({ type: 'Notes On Order', note: headerNote });
-    if (info.artNotes || attachments.length) {
-      const artLines = [];
-      if (info.artNotes) artLines.push(info.artNotes);
-      if (files.length) {
-        artLines.push(files.map(f => `${f.name || 'file'}${f.designNo ? ' (#' + f.designNo + ')' : ''}: ${(f.placements || []).join(', ')}${f.colors ? ' — Colors: ' + f.colors : ''}`).join('\n'));
-      }
-      notesBlocks.push({ type: 'Notes To Art', note: artLines.join('\n\n') });
+    const orderNote = buildOrderNote({ info, breakdown, methodNotesBlock, draftId, ship, orderNotes, extOrderId });
+    if (orderNote) notesBlocks.push({ type: 'Notes On Order', note: orderNote });
+
+    const productionNote = buildProductionNote({ rows, breakdown, methodNotesBlock });
+    if (productionNote) notesBlocks.push({ type: 'Notes To Production', note: productionNote });
+
+    const shippingNote = buildShippingNote({ info, ship });
+    if (shippingNote) notesBlocks.push({ type: 'Notes To Shipping', note: shippingNote });
+
+    if (info.artNotes || (Array.isArray(files) && files.length)) {
+      const artNote = buildArtNote({ info, files });
+      if (artNote) notesBlocks.push({ type: 'Notes To Art', note: artNote });
     }
 
     // --- Canonical camelCase payload — same shape proxy's manageorders-push-client expects ---

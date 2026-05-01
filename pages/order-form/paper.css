@@ -519,11 +519,29 @@
   border-radius: 6px;
   font-size: 13px;
 }
-.caspio-banner.ok { }
+.caspio-banner.ok {
+  /* Stronger green for "submitted to ShopWorks" success — was barely
+     distinguishable from neutral. Reps need to actually see the win. */
+  background: oklch(0.96 0.05 145);
+  border-color: oklch(0.55 0.15 145 / 0.4);
+  color: oklch(0.32 0.12 145);
+  font-weight: 500;
+  padding: 12px 16px;
+  font-size: 14px;
+}
+.caspio-banner.warn {
+  background: oklch(0.97 0.06 80);
+  border-color: oklch(0.65 0.16 80 / 0.4);
+  color: oklch(0.38 0.13 70);
+  font-size: 13px;
+}
 .caspio-banner.err {
   background: oklch(0.97 0.03 28);
   border-color: oklch(0.55 0.18 28 / 0.3);
   color: oklch(0.35 0.15 28);
+  /* Errors stay until dismissed — make them easy to read */
+  font-size: 14px;
+  padding: 12px 16px;
 }
 .caspio-banner .icon { flex: 0 0 auto; }
 .caspio-banner code {
@@ -532,6 +550,107 @@
   background: rgba(255,255,255,0.6);
   padding: 1px 5px;
   border-radius: 3px;
+}
+.caspio-banner-close {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 0;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  padding: 0 4px;
+  border-radius: 50%;
+  width: 24px; height: 24px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.caspio-banner-close:hover { opacity: 1; background: rgba(0,0,0,0.06); }
+
+/* Submit-button spinner — shown inside the primary "Push to ShopWorks"
+   button while the request is in flight. CSS-only rotation so we don't
+   need to ship an SVG. */
+.btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: btnspin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: -2px;
+}
+.btn.primary.is-submitting { opacity: 0.85; }
+@keyframes btnspin { to { transform: rotate(360deg); } }
+
+/* Stock-confirmation modal — backdrop + centered dialog. Triggered from
+   submit() when one or more sizes show 0 SanMar stock. */
+.stock-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  padding: 24px;
+  animation: scmFadeIn 0.15s ease-out;
+}
+@keyframes scmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.stock-confirm-modal {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.25), 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 24px 28px 20px;
+  font-size: 14px;
+  color: var(--ink);
+}
+.scm-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.scm-head-icon {
+  font-size: 22px;
+  background: oklch(0.95 0.08 80);
+  color: oklch(0.45 0.15 70);
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 0 auto;
+}
+.scm-title { margin: 0; font-size: 17px; font-weight: 600; }
+.scm-body { margin: 0 0 14px; line-height: 1.5; color: var(--ink-2); }
+.scm-list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.scm-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+.scm-item-style { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
+.scm-item-color { color: var(--ink-2); }
+.scm-item-size { font-family: var(--font-mono); }
+.scm-item-stock { color: oklch(0.45 0.18 28); font-weight: 600; font-size: 12px; }
+.scm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 /* Paper row hover */
