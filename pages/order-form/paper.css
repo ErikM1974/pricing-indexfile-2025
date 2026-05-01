@@ -287,11 +287,14 @@
 .p-table .total-head { font-size: 10.5px; }
 /* Column widths sized for landscape (11in paper). Style/Color/Desc widened so
    full text fits without aggressive truncation. */
-.p-table col.c-style { width: 7.5%; }
-.p-table col.c-color { width: 13%; }
-.p-table col.c-desc  { width: 20%; }
+.p-table col.c-style { width: 9%; }    /* fits 6+ char styles like "PC61LS", "J790ST" without truncation */
+.p-table col.c-color { width: 12%; }
+.p-table col.c-desc  { width: 19%; }
 .p-table col.c-sz    { width: 4.2%; } /* × 8 = 33.6% */
 .p-table col.c-other { width: 11%; }   /* "Other sizes" — room for non-std size chips */
+/* Style cell input fills its td so longer codes (J790ST, PC61LS) show fully */
+.p-table .sel-wrap .style-cell .combobox { flex: 1 1 auto; min-width: 0; }
+.p-table .sel-wrap .style-cell .combobox .cell-input { width: 100%; }
 .p-table col.c-price { width: 6%; }
 .p-table col.c-total { width: 8.4%; }
 /* Non-standard size cell — let it flow without forcing min-height */

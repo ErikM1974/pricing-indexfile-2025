@@ -130,6 +130,24 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   function update(patch) { onChange({ ...row, ...patch }); }
   function setSize(s, v) { update({ sizes: { ...row.sizes, [s]: v.replace(/[^0-9]/g, '') } }); }
 
+  // ----- Description auto-fill from product API -----
+  // When the rep types a style without picking from the autocomplete dropdown,
+  // ProductCombobox.onPick never fires and row.desc stays empty. Detect a
+  // valid resolved style (the bundle came back, evidenced by row.imageUrl OR
+  // a successful breakdown) and fill the description from /api/product-colors.
+  // Only writes when desc is empty — never overwrites the rep's typing.
+  useEffect(() => {
+    if (!row.style || row.desc) return;
+    if (!window.fetchProductInfo) return;
+    let cancelled = false;
+    window.fetchProductInfo(row.style).then(info => {
+      if (cancelled) return;
+      const title = (info?.productTitle || '').trim();
+      if (title && !row.desc) update({ desc: title });
+    }).catch(() => { /* silent */ });
+    return () => { cancelled = true; };
+  }, [row.style]);
+
   // ----- Auto-pricing display state -----
   const hasAutoPrice = !!(rowBreakdown && !rowBreakdown.error && rowBreakdown.rowSubtotal > 0);
   const showAutoPriceCell = hasAutoPrice && !row.priceOverride;
@@ -150,9 +168,24 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const headlineUnit = (basePrice != null) ? basePrice : avgUnit;
   // Which upcharged sizes actually have qty entered? Only those need to show
   // in the chip — no point cluttering with "+$2 2XL" when there's no 2XL qty.
+  // Show the chip in BOTH auto and manual-override modes so the rep keeps
+  // sight of the upcharges even after they've typed a custom price.
   const usedUpchargedSizes = Object.keys(sizeUpcharges)
     .filter(sz => Number(row.sizes?.[sz]) > 0);
-  const hasUpchargeChip = showAutoPriceCell && usedUpchargedSizes.length > 0;
+  const showUpchargeChip = (rowBreakdown && !rowBreakdown.error && usedUpchargedSizes.length > 0);
+  const upchargeChipText = showUpchargeChip
+    ? usedUpchargedSizes
+        .sort((a, b) => PAPER_SIZES.indexOf(a) - PAPER_SIZES.indexOf(b)
+          || NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b))
+        .map(sz => `+$${Number(sizeUpcharges[sz]).toFixed(0)} ${sz}`)
+        .join(' · ')
+    : '';
+  // Total cell: always show $ when there's any pricing (auto OR manual override).
+  // Manual override applies the rep's typed price uniformly across all sizes.
+  const manualUnit = Number(row.price) || 0;
+  const overrideTotal = manualUnit * total;
+  const totalDollars = showAutoPriceCell ? rowSubtotalDollars : (row.priceOverride ? overrideTotal : 0);
+  const showTotalDollars = totalDollars > 0;
 
   function applyManualCost({ manualCost, itemType }) {
     update({
@@ -254,24 +287,18 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
         {showAutoPriceCell ? (
           <button
             type="button"
-            className={"t-in num auto-priced" + (hasUpchargeChip ? ' has-upcharge' : '')}
+            className={"t-in num auto-priced" + (showUpchargeChip ? ' has-upcharge' : '')}
             onClick={() => update({ priceOverride: true, price: headlineUnit ? headlineUnit.toFixed(2) : '' })}
             title="Auto-priced — click to override. Headline shows base (S/M/L/XL) price; upcharges are added per size automatically."
           >
             <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
             <span className="auto-badge">auto</span>
-            {hasUpchargeChip && (
-              <span className="upcharge-chip" title="Upcharges applied to bigger sizes">
-                {usedUpchargedSizes
-                  .sort((a, b) => PAPER_SIZES.indexOf(a) - PAPER_SIZES.indexOf(b)
-                    || NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b))
-                  .map(sz => `+$${Number(sizeUpcharges[sz]).toFixed(0)} ${sz}`)
-                  .join(' · ')}
-              </span>
+            {showUpchargeChip && (
+              <span className="upcharge-chip" title="Upcharges applied to bigger sizes">{upchargeChipText}</span>
             )}
           </button>
         ) : (
-          <div className="manual-price-cell">
+          <div className={"manual-price-cell" + (showUpchargeChip ? ' has-upcharge' : '')}>
             <input
               className="t-in num"
               inputMode="decimal"
@@ -287,14 +314,108 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                 title="Use auto-calculated price"
               >restore auto</button>
             )}
+            {/* Upcharge chip persists in override mode — informational only since
+                the manual price applies uniformly to all sizes. */}
+            {showUpchargeChip && (
+              <span className="upcharge-chip upcharge-chip--manual" title="Auto-pricing would apply these upcharges">
+                {upchargeChipText}
+              </span>
+            )}
           </div>
         )}
       </td>
       <td>
-        {showAutoPriceCell
-          ? <input className="t-in total t-in-money" value={fmt$(rowSubtotalDollars)} readOnly tabIndex={-1} />
+        {/* Total cell: always $ when there's pricing (auto or manual override).
+            Falls back to qty only when there's no pricing at all. */}
+        {showTotalDollars
+          ? <input className="t-in total t-in-money" value={fmt$(totalDollars)} readOnly tabIndex={-1} />
           : <input className="t-in total" value={total || ''} readOnly tabIndex={-1} />
         }
+      </td>
+    </tr>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// RowBreakdownLine — thin italic row directly below each priced PaperRow that
+// makes the ShopWorks line-item split visible in the form. Same data the MO
+// push uses (breakdown.unitPriceBySize keyed by size, then routed through the
+// shared orderFormSizeSuffix() to derive the per-PN partition).
+//
+// Format: "{PN} × {qty} @ ${unit} (${lineTotal}) · {PN} × {qty} @ ${unit} ..."
+// Skipped sizes (engine has no price) listed at the end with "skipped".
+// Manual override mode: "Manual override: {PN} × {qty} ... — all @ ${manualPrice}"
+// ---------------------------------------------------------------------------
+function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
+  if (!row || !rowBreakdown || rowBreakdown.error) return null;
+  const sizes = row.sizes || {};
+  const totalQty = Object.values(sizes).reduce((a, v) => a + (Number(v) || 0), 0);
+  if (!totalQty) return null;
+  const partBase = (row.style || '').trim() || 'MISC';
+  const suffixFn = window.orderFormSizeSuffix || ((p, s) => `${p}_${s}`);
+
+  // Group sizes by ShopWorks part number (from suffix function), accumulating
+  // qty + tracking unit price (auto-priced) or skip flag (no price in engine).
+  const groups = new Map();   // partNumber -> { sizes: [{size,qty}], unit, skipped }
+  Object.keys(sizes).forEach(sz => {
+    const qty = Number(sizes[sz]) || 0;
+    if (!qty) return;
+    const pn = suffixFn(partBase, sz);
+    const unit = rowBreakdown.unitPriceBySize?.[sz];
+    const hasUnit = Number.isFinite(Number(unit)) && Number(unit) > 0;
+    const key = pn + (hasUnit ? '@' + Number(unit).toFixed(2) : '@skip');
+    if (!groups.has(key)) {
+      groups.set(key, { partNumber: pn, sizes: [], unit: hasUnit ? Number(unit) : 0, skipped: !hasUnit });
+    }
+    groups.get(key).sizes.push({ size: sz, qty });
+  });
+
+  if (groups.size === 0) return null;
+
+  // Sort groups: priced first (cheapest → most expensive), skipped last.
+  const sortedGroups = [...groups.values()].sort((a, b) => {
+    if (a.skipped !== b.skipped) return a.skipped ? 1 : -1;
+    return a.unit - b.unit;
+  });
+
+  const isOverride = !!row.priceOverride;
+  const manualUnit = Number(row.price) || 0;
+
+  // Render each group as an inline span.
+  const segments = sortedGroups.map((g, i) => {
+    const groupQty = g.sizes.reduce((a, s) => a + s.qty, 0);
+    const sizeList = g.sizes.map(s => s.size).join('/');
+    if (g.skipped && !isOverride) {
+      return (
+        <span key={i} className="pf-bd-seg pf-bd-seg--skip">
+          <strong>{g.partNumber}</strong>
+          <span className="pf-bd-sizes">{sizeList}</span>
+          × {groupQty}
+          <span className="pf-bd-skip-tag">skipped (no price)</span>
+        </span>
+      );
+    }
+    // Override mode: every group uses the manual unit.
+    const unit = isOverride ? manualUnit : g.unit;
+    const lineTotal = unit * groupQty;
+    return (
+      <span key={i} className="pf-bd-seg">
+        <strong>{g.partNumber}</strong>
+        {sizeList && sizeList !== g.partNumber.replace(partBase, '').replace('_','') && (
+          <span className="pf-bd-sizes">{sizeList}</span>
+        )}
+        × {groupQty} @ {fmt$(unit)} = {fmt$(lineTotal)}
+      </span>
+    );
+  });
+
+  return (
+    <tr className={"pf-breakdown-row" + (isOverride ? ' pf-breakdown-row--manual' : '')}>
+      <td colSpan={14}>
+        <span className="pf-bd-arrow">↳</span>
+        {isOverride && <span className="pf-bd-prefix">Manual override:</span>}
+        {!isOverride && <span className="pf-bd-prefix">Splits to ShopWorks:</span>}
+        <span className="pf-bd-segments">{segments.reduce((acc, seg, i) => i === 0 ? [seg] : [...acc, <span key={`d${i}`} className="pf-bd-dot"> · </span>, seg], [])}</span>
       </td>
     </tr>
   );
@@ -757,18 +878,33 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           </tr>
         </thead>
         <tbody>
-          {visibleRows.slice(0, 14).map((r, i) => (
-            <PaperRow
-              key={r.id}
-              row={r}
-              idx={i}
-              onChange={(next) => onRowChange(i, next)}
-              canRemove={rows.length > 1}
-              customerMode={customerMode}
-              onLightbox={setLightboxUrl}
-              rowBreakdown={breakdown?.byRow?.get?.(r.id) || null}
-            />
-          ))}
+          {visibleRows.slice(0, 14).flatMap((r, i) => {
+            const rb = breakdown?.byRow?.get?.(r.id) || null;
+            const rowEl = (
+              <PaperRow
+                key={r.id}
+                row={r}
+                idx={i}
+                onChange={(next) => onRowChange(i, next)}
+                canRemove={rows.length > 1}
+                customerMode={customerMode}
+                onLightbox={setLightboxUrl}
+                rowBreakdown={rb}
+              />
+            );
+            // Append the breakdown line directly under each priced row so the
+            // ShopWorks-bound part numbers stay visible. Returns null when the
+            // row has no qty / no breakdown — RowBreakdownLine guards itself.
+            const bdEl = rb && !rb.error ? (
+              <RowBreakdownLine
+                key={`${r.id}-bd`}
+                row={r}
+                rowBreakdown={rb}
+                customerMode={customerMode}
+              />
+            ) : null;
+            return bdEl ? [rowEl, bdEl] : [rowEl];
+          })}
         </tbody>
       </table>
 

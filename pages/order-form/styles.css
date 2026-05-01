@@ -1573,6 +1573,117 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 }
 .restore-auto-link:hover { color: var(--accent-hover); }
 
+/* Upcharge chip variant when row is in manual override mode — same look as
+   the auto-priced chip but rendered below the manual <input> instead of
+   inside the auto-priced button. */
+.manual-price-cell .upcharge-chip {
+  display: block;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 10%, white);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+.manual-price-cell .upcharge-chip--manual {
+  /* When showing under a manual override, dim slightly to signal "informational only" */
+  opacity: 0.85;
+  font-style: italic;
+}
+
+/* ===========================================================
+   Breakdown row — thin italic <tr> directly under each priced
+   data row. Spans the full table width via colspan=14. Shows
+   the ShopWorks part-number split exactly as it'll be pushed.
+   =========================================================== */
+
+tr.pf-breakdown-row {
+  background: color-mix(in oklab, var(--accent-soft) 35%, white);
+}
+tr.pf-breakdown-row > td {
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid color-mix(in oklab, var(--accent) 40%, var(--line));
+  padding: 4px 12px 6px;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--ink-2);
+  vertical-align: top;
+  height: auto !important;
+  white-space: normal;
+}
+tr.pf-breakdown-row--manual > td {
+  background: color-mix(in oklab, #faf5ff 70%, white);  /* purple tint matches manual-cost pill */
+  border-left-color: #c084fc;
+}
+.pf-bd-arrow {
+  display: inline-block;
+  margin-right: 6px;
+  color: var(--accent);
+  font-style: normal;
+  font-weight: 700;
+}
+.pf-bd-prefix {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-right: 8px;
+}
+.pf-bd-segments {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 11px;
+  color: var(--ink);
+}
+.pf-bd-seg {
+  display: inline;
+  white-space: nowrap;
+}
+.pf-bd-seg strong {
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+.pf-bd-sizes {
+  margin: 0 4px 0 4px;
+  color: var(--ink-3);
+  font-style: italic;
+}
+.pf-bd-dot {
+  color: var(--ink-4);
+  margin: 0 2px;
+  font-style: normal;
+}
+.pf-bd-seg--skip {
+  color: var(--ink-3);
+}
+.pf-bd-skip-tag {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+
+/* Hide breakdown row entirely when printing — print-sheet.jsx handles its own
+   per-tier split with PN labels in a more print-friendly layout. */
+@media print {
+  tr.pf-breakdown-row { display: none; }
+}
+
 /* Row tier badge — small pill in description cell when row has a computed breakdown */
 .row-tier-badge {
   display: inline-block;

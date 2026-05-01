@@ -38,11 +38,25 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
         buckets.get(key).sizes[sz] = qty;
       });
       const sortedBuckets = [...buckets.values()].sort((a, b) => a.unit - b.unit);
+      // Derive the ShopWorks part-number for each bucket from the FIRST size
+      // in the bucket — buckets group sizes by unit price, and sizes within
+      // the same price tier always share the same suffix family (S/M/L/XL
+      // share base SKU; 2XL/3XL/4XL each get their own _2X/_3XL/_4XL).
+      // Loaded as window.orderFormSizeSuffix from the shared module.
+      const suffixFn = (typeof window !== 'undefined' && window.orderFormSizeSuffix)
+        ? window.orderFormSizeSuffix
+        : ((p, s) => `${p}_${s}`);
       sortedBuckets.forEach((b, idx) => {
         let q = 0; Object.values(b.sizes).forEach(v => { q += Number(v) || 0; });
+        const firstSize = Object.keys(b.sizes)[0] || '';
+        const partNumber = r.style ? suffixFn(r.style, firstSize) : '';
         printRows.push({
           id: `${r.id}-tier-${idx}`,
-          style: idx === 0 ? r.style : '',
+          // Show the per-tier ShopWorks PN on every line — production reading
+          // the printed page should see EXACTLY what's pushed to MO. The
+          // "style" cell shows the SKU; first row also carries color + desc;
+          // continuation rows leave color/desc blank to keep the page clean.
+          style: partNumber,
           color: idx === 0 ? (r.color || r.colorName || '') : '',
           desc:  idx === 0 ? r.desc : '',
           sizes: b.sizes,

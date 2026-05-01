@@ -182,9 +182,13 @@ function RowTierBadge({ rowBreakdown }) {
   const tier = rowBreakdown.tier;
   const cap  = rowBreakdown.extras?.capOrFlat;
   if (!tier) return null;
+  // Only call out "· cap" — embroidery's cap-vs-flat machine routing is the
+  // useful case to surface. "flat" is internal jargon (every garment is
+  // flat by default) so we drop it from the badge text.
+  const isCap = cap === 'cap';
   return (
-    <span className="row-tier-badge" title={`Tier ${tier}${cap ? ' · ' + cap : ''}`}>
-      Tier {tier}{cap ? ` · ${cap}` : ''}
+    <span className="row-tier-badge" title={`Pricing tier: ${tier} pcs${isCap ? ' · cap embroidery' : ''}`}>
+      Tier {tier}{isCap ? ' · cap' : ''}
     </span>
   );
 }

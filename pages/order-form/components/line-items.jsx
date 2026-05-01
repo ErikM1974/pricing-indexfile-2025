@@ -31,20 +31,36 @@ async function searchStyles(query) {
   }
 }
 
+// Returns the colors array (back-compat default). The full product info,
+// including productTitle / productDescription, is also exposed via
+// fetchProductInfo() for description auto-fill in PaperRow.
 async function fetchColors(styleNumber) {
+  const info = await fetchProductInfo(styleNumber);
+  return info.colors;
+}
+
+// Returns { colors, productTitle, productDescription } for the style.
+// Same /api/product-colors endpoint and same cache as fetchColors — when
+// the cache hits, both functions return the same data.
+async function fetchProductInfo(styleNumber) {
   const sn = String(styleNumber || '').trim().toUpperCase();
-  if (!sn) return [];
+  const empty = { colors: [], productTitle: '', productDescription: '' };
+  if (!sn) return empty;
   if (_colorsCache.has(sn)) return _colorsCache.get(sn);
   try {
     const r = await fetch(`${API_BASE}/api/product-colors?styleNumber=${encodeURIComponent(sn)}`);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
-    const colors = (data && data.colors) || [];
-    _colorsCache.set(sn, colors);
-    return colors;
+    const result = {
+      colors:             (data && data.colors) || [],
+      productTitle:       (data && data.productTitle) || '',
+      productDescription: (data && data.PRODUCT_DESCRIPTION) || '',
+    };
+    _colorsCache.set(sn, result);
+    return result;
   } catch (err) {
     console.error('[OrderForm] product-colors failed:', err);
-    return [];
+    return empty;
   }
 }
 
@@ -152,7 +168,16 @@ function ProductCombobox({ value, desc, onPick, onChange, onDescChange }) {
         className="cell-input mono"
         placeholder="Type style # or name…"
         value={query}
-        onChange={(e) => { setQuery(e.target.value); onChange(e.target.value); setOpen(true); setActive(0); }}
+        onChange={(e) => {
+          // SanMar style numbers are uppercase by convention. Auto-upcase as
+          // the rep types so "j790" displays + sends as "J790" (and the
+          // pricing engine matches case-insensitive queries either way).
+          const v = e.target.value.toUpperCase();
+          setQuery(v);
+          onChange(v);
+          setOpen(true);
+          setActive(0);
+        }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKey}
       />
@@ -444,4 +469,4 @@ function LineItems({ rows, setRows }) {
   );
 }
 
-Object.assign(window, { LineItems, makeBlankRow, SIZES, DECOS, ProductCombobox, ColorSelect, fetchColors, searchStyles });
+Object.assign(window, { LineItems, makeBlankRow, SIZES, DECOS, ProductCombobox, ColorSelect, fetchColors, fetchProductInfo, searchStyles, NON_STANDARD_SIZES });

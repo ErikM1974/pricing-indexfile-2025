@@ -1682,21 +1682,9 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 // Part-number size-suffix helper (matches memory/MANAGEORDERS_COMPLETE_REFERENCE.md §Size Modifier Reference).
 // Keep in sync with the proxy's manageorders-push-client normalizer — the proxy also appends suffixes,
 // but we append here too so logs at this layer show the final SKU form.
-function orderFormSizeSuffix(partNumber, size) {
-  if (!partNumber || !size) return partNumber || '';
-  const base = String(partNumber).trim();
-  const s = String(size).trim().toUpperCase();
-  // 2XL uses short form _2X — verified from 15,152-row ShopWorks CSV
-  if (s === '2XL' || s === 'XXL') {
-    // XXL is ladies/womens ONLY — can't disambiguate here without gender context,
-    // so default to the men's/unisex _2X which covers 2,123 products.
-    return `${base}_2X`;
-  }
-  if (['XS','3XL','4XL','5XL','6XL','7XL','LT','XLT','2XLT','3XLT','4XLT','OSFA','YS','YM','YL','YXL'].includes(s)) {
-    return `${base}_${s}`;
-  }
-  return base; // S, M, L, XL → no suffix
-}
+// Shared with the order form's frontend breakdown row. Editing the suffix
+// rules → edit shared_components/js/order-form-size-suffix.js (single source).
+const { orderFormSizeSuffix } = require('./shared_components/js/order-form-size-suffix.js');
 
 // Generate Order Form order ID — OF-NNNN (globally sequential, zero-padded to 4 digits).
 // Reuses the proxy's race-safe counter endpoint that Embroidery uses (same as EMB-2026-N).
