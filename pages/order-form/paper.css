@@ -287,16 +287,21 @@
 .p-table .total-head { font-size: 10.5px; }
 /* Column widths sized for landscape (11in paper). Style/Color/Desc widened so
    full text fits without aggressive truncation. */
-.p-table col.c-style { width: 9%; }    /* fits 6+ char styles like "PC61LS", "J790ST" without truncation */
+/* 2026-05-01: rebalanced — Style and Desc widened so 6-7 char styles
+   ("CTB151", "S608ES") and long product names ("Carhartt Canvas Work
+   Dungaree") fit on one line. Size cells trim slightly (still fit 3-digit
+   qty); Total trims since single-row totals rarely exceed $9,999.
+   Sum: 12 + 12 + 22 + 8×3.8 + 11 + 6 + 6.6 = 100% */
+.p-table col.c-style { width: 12%; }   /* fits CTB151, RS3321, S608ES, K500ES, CAR54T, PC61T */
 .p-table col.c-color { width: 12%; }
-.p-table col.c-desc  { width: 19%; }
-.p-table col.c-sz    { width: 4.2%; } /* × 8 = 33.6% */
+.p-table col.c-desc  { width: 22%; }   /* fits "Carhartt Canvas Work Dungaree" without wrap */
+.p-table col.c-sz    { width: 3.8%; }  /* × 8 = 30.4% */
 .p-table col.c-other { width: 11%; }   /* "Other sizes" — room for non-std size chips */
 /* Style cell input fills its td so longer codes (J790ST, PC61LS) show fully */
 .p-table .sel-wrap .style-cell .combobox { flex: 1 1 auto; min-width: 0; }
 .p-table .sel-wrap .style-cell .combobox .cell-input { width: 100%; }
 .p-table col.c-price { width: 6%; }
-.p-table col.c-total { width: 8.4%; }
+.p-table col.c-total { width: 6.6%; }
 /* Non-standard size cell — let it flow without forcing min-height */
 .p-table td.nss-td { padding: 0; vertical-align: middle; }
 
@@ -653,9 +658,36 @@
   margin-top: 4px;
 }
 
-/* Paper row hover */
+/* Paper row hover — stronger highlight + accent left-border so reps can
+   track which row their cursor's in on a long order. */
 .p-table tbody tr:hover {
-  background: color-mix(in oklab, var(--accent) 3%, #fff);
+  background: color-mix(in oklab, var(--accent) 6%, #fff);
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+
+/* Focus ring on size + qty + price inputs — clean accent halo, no
+   layout shift. Keeps the standard browser outline for accessibility
+   on non-form elements. */
+.p-table td .t-in:focus,
+.p-table td input:focus,
+.p-table td textarea:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 22%, transparent);
+}
+
+/* Inventory badge dimming — fade to 45% on cells the rep hasn't focused
+   so their eyes find the cells with qty entered. Out-of-stock and
+   overflow badges stay full opacity (they carry warnings). */
+.p-table td .sz-inv-badge {
+  transition: opacity 0.15s ease;
+}
+.p-table td:not(.sz-out-of-stock):not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-badge:not(.sz-inv-over):not(.sz-inv-low) {
+  opacity: 0.45;
+}
+.p-table td:hover .sz-inv-badge,
+.p-table td:focus-within .sz-inv-badge {
+  opacity: 1;
 }
 
 @media (max-width: 720px) {

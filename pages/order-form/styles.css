@@ -1804,17 +1804,21 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
    the ShopWorks part-number split exactly as it'll be pushed.
    =========================================================== */
 
+/* Splits-to-ShopWorks line — appears below each priced row with the
+   actual SKU/qty/price segments that will land in ShopWorks. Updated
+   2026-05-01: tighter accent left-border, body font for prose, mono only
+   for the SKU + numbers (so it reads as data not as a wall of text). */
 tr.pf-breakdown-row {
-  background: color-mix(in oklab, var(--accent-soft) 35%, white);
+  background: color-mix(in oklab, var(--accent-soft) 25%, white);
 }
 tr.pf-breakdown-row > td {
   border: 0;
-  border-bottom: 1px solid var(--line);
-  border-left: 3px solid color-mix(in oklab, var(--accent) 40%, var(--line));
-  padding: 4px 12px 6px;
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 80%, var(--accent));
+  border-left: 2px solid var(--accent);
+  padding: 5px 12px 6px;
   font-size: 11px;
-  font-style: italic;
-  line-height: 1.45;
+  font-style: normal;
+  line-height: 1.5;
   color: var(--ink-2);
   vertical-align: top;
   height: auto !important;
@@ -1822,14 +1826,17 @@ tr.pf-breakdown-row > td {
 }
 tr.pf-breakdown-row--manual > td {
   background: color-mix(in oklab, #faf5ff 70%, white);  /* purple tint matches manual-cost pill */
-  border-left-color: #c084fc;
+  border-left-color: #a855f7;
 }
 .pf-bd-arrow {
   display: inline-block;
   margin-right: 6px;
   color: var(--accent);
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
+  font-size: 10px;
+  position: relative;
+  top: -1px;
 }
 .pf-bd-prefix {
   font-style: normal;
@@ -1885,20 +1892,37 @@ tr.pf-breakdown-row--manual > td {
   tr.pf-breakdown-row { display: none; }
 }
 
-/* Row tier badge — small pill in description cell when row has a computed breakdown */
+/* Row tier badge — small pill in description cell when row has a computed
+   breakdown. Updated 2026-05-01: switched to filled accent color so it
+   reads as a confident "this is your pricing tier" label rather than the
+   washed-out grey it was before. */
 .row-tier-badge {
   display: inline-block;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-2);
-  background: color-mix(in oklab, var(--accent-soft) 80%, white);
-  border: 1px solid color-mix(in oklab, var(--accent) 18%, var(--line));
-  padding: 1px 6px;
-  border-radius: 3px;
+  color: #fff;
+  background: linear-gradient(135deg,
+    color-mix(in oklab, var(--accent) 88%, #fff) 0%,
+    var(--accent) 100%);
+  border: 0;
+  padding: 2px 7px;
+  border-radius: 4px;
   margin-top: 4px;
   vertical-align: top;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+  font-variant-numeric: tabular-nums;
+}
+/* "CAP" suffix when product is a flat headwear (cap embroidery pricing) —
+   thin outline pill that reads as a modifier, not a separate tier. */
+.row-tier-badge .row-tier-cap {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  font-size: 8.5px;
+  background: rgba(255,255,255,0.22);
+  border-radius: 3px;
 }
 
 .pf-row.pf-row--priced .nss-td,
@@ -2077,5 +2101,227 @@ tr.pf-breakdown-row--manual > td {
 @media (max-width: 760px) {
   .totals-panel { grid-template-columns: 1fr; }
   .totals-panel-grid { grid-column: 1; }
+}
+
+/* ========================================================================
+   BulkSizePicker — used in custom-sizes mode for products with many
+   variants (pants W×L: PT20=72, CTB17=46). Replaces the mass-grid
+   layout that wasted ~40% of the form's vertical space. Single + Add
+   button until rep picks; chips appear inline as picked.
+   ======================================================================== */
+
+.bulk-picker {
+  position: relative;
+  width: 100%;
+}
+.bulk-picker-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 8px;
+  align-items: center;
+  min-height: 40px;
+}
+
+/* Chip — one entered W×L size with its qty input + remove button. Lives
+   inline in the size column, expands as the rep adds more sizes. */
+.bulk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: color-mix(in oklab, var(--accent) 8%, #fff);
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--line));
+  border-radius: 6px;
+  padding: 3px 4px 3px 8px;
+  font-size: 11.5px;
+  white-space: nowrap;
+  position: relative;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.bulk-chip:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.bulk-chip-label {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-weight: 600;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+.bulk-chip-qty {
+  width: 32px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding: 2px 2px;
+  outline: 0;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.bulk-chip-qty::placeholder { color: #cbd5e1; font-weight: 400; }
+.bulk-chip-qty:focus {
+  background: rgba(255,255,255,0.7);
+  border-radius: 3px;
+}
+.bulk-chip-remove {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  color: #94a3b8;
+  padding: 0 4px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bulk-chip-remove:hover { color: #b91c1c; background: rgba(185, 28, 28, 0.08); }
+/* Inventory under each chip — same look as the standard-grid badge but
+   positioned below the chip's row instead of below the cell. */
+.bulk-chip-inv {
+  display: block;
+  position: absolute;
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* "+ Add size" button — shown when no sizes picked, also persists after
+   sizes added so reps can keep adding. Distinct from existing buttons:
+   dotted border, accent-tinted, small caret. */
+.bulk-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: 1px dashed color-mix(in oklab, var(--accent) 40%, var(--line));
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+.bulk-add-btn:hover {
+  background: color-mix(in oklab, var(--accent) 8%, #fff);
+  border-color: var(--accent);
+  border-style: solid;
+}
+.bulk-add-caret { font-size: 10px; opacity: 0.7; }
+
+/* Picker dropdown — opens on click, closes on outside-click or ESC.
+   Filterable grid of every available size with inventory below each. */
+.bulk-picker-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, var(--line));
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.15), 0 2px 6px rgba(0,0,0,0.05);
+  z-index: 100;
+  max-height: 380px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.bulk-picker-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in oklab, var(--accent) 4%, #fff);
+}
+.bulk-picker-filter {
+  flex: 1 1 auto;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--ink);
+}
+.bulk-picker-filter:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
+}
+.bulk-picker-count {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.bulk-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 6px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  max-height: 320px;
+}
+.bulk-picker-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 6px 4px;
+  min-height: 44px;
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.1s ease, border-color 0.1s ease;
+}
+.bulk-picker-cell:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent) 10%, #fff);
+  border-color: var(--accent);
+}
+.bulk-picker-cell:disabled,
+.bulk-picker-cell--entered {
+  background: color-mix(in oklab, var(--accent) 4%, #f8fafc);
+  border-color: color-mix(in oklab, var(--accent) 18%, var(--line));
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.bulk-picker-cell-size {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.bulk-picker-cell-inv {
+  font-size: 10px;
+  color: #16a34a;          /* green for in-stock */
+  font-variant-numeric: tabular-nums;
+}
+.bulk-picker-cell-inv.is-oos {
+  color: #dc2626;          /* red for out-of-stock */
+}
+.bulk-picker-empty {
+  padding: 24px 16px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13px;
+  font-style: italic;
 }
 
