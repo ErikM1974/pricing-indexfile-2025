@@ -1779,11 +1779,27 @@ app.post('/api/submit-order-form', async (req, res) => {
       ship = {},
       orderNotes = '',
       files = [],
-      draftId         // present when submitted from a shared customer link
+      draftId,                 // present when submitted from a shared customer link
+      decoConfig = {},         // form-wide method config from the order form
+      breakdown = null,        // computed pricing breakdown { byRow: { rowId: {unitPriceBySize, ...} }, subtotal, ... }
+      methodNotesBlock = '',   // method-specific context (frontend-built)
+      designNumbers = []       // array of design # strings to look up in ShopWorks
     } = req.body || {};
 
     if (!info.email && !info.company) {
       return res.status(400).json({ success: false, error: 'Missing contact info (email or company required)' });
+    }
+
+    // Empty-submit guard — at least one row must have a style (or manualMode) AND qty > 0.
+    const hasUsableRow = (rows || []).some(r => {
+      if (!r) return false;
+      const hasQty = Object.values(r.sizes || {}).some(v => Number(v) > 0);
+      const hasStyle = !!(r.style && String(r.style).trim());
+      const hasManual = !!r.manualMode && Number(r.manualCost) > 0;
+      return hasQty && (hasStyle || hasManual);
+    });
+    if (!hasUsableRow) {
+      return res.status(400).json({ success: false, error: 'No line items with style and quantity' });
     }
 
     const isDryRun = req.query.dryRun === '1' || req.query.dryRun === 'true';
@@ -1825,12 +1841,15 @@ app.post('/api/submit-order-form', async (req, res) => {
           CompanyName: info.company || '',
           CustomerEmail: info.email || '',
           Phone: info.phone || '',
-          TotalQuantity: 0,
-          SubtotalAmount: 0,
-          LTMFeeTotal: 0,
-          TotalAmount: 0,
+          // Pull dollar fields from breakdown (computed by frontend pricing modules).
+          // breakdown.grandTotal is subtotal-before-tax; breakdown.subtotal is the
+          // same thing the order form's Totals Panel shows. Tax is left to OnSite.
+          TotalQuantity:   Number(breakdown?.totalQty) || 0,
+          SubtotalAmount:  Number(breakdown?.subtotal) || 0,
+          LTMFeeTotal:     Number(breakdown?.ltmTotal) || 0,
+          TotalAmount:     Number(breakdown?.grandTotal || breakdown?.subtotal) || 0,
           ExpiresAt: formattedExpiresAt,
-          Notes: JSON.stringify({ info, rows, ship, orderNotes, files, staffFilled: [], submitFlow: 'staff-direct' })
+          Notes: JSON.stringify({ info, rows, ship, orderNotes, files, decoConfig, staffFilled: [], submitFlow: 'staff-direct' })
         };
         const createResp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions', {
           method: 'POST',
@@ -1868,11 +1887,21 @@ app.post('/api/submit-order-form', async (req, res) => {
       const desc = r.desc || r.style || 'Custom Apparel';
       const color = r.colorName || r.color || '';        // display name — proxy stores as PartColor
       const catalogColor = r.catalogColor || r.color || ''; // CATALOG_COLOR for inventory mapping
-      const price = Number(r.price || 0) || 0;
+      const fallbackPrice = Number(r.price || 0) || 0;
+      // Per-row pricing breakdown carries auto-computed unit prices per size.
+      // When the rep clicked the price cell to override (priceOverride=true),
+      // we honor the manually-typed `r.price` instead. Otherwise prefer the
+      // computed unit price for this specific size.
+      const rowBreakdown = breakdown?.byRow?.[r.id];
       const sizes = r.sizes || {};
       Object.keys(sizes).forEach(sz => {
         const qty = parseInt(sizes[sz] || 0, 10);
         if (!qty) return;
+        let price = fallbackPrice;
+        if (!r.priceOverride && rowBreakdown && !rowBreakdown.error) {
+          const computedUnit = rowBreakdown?.unitPriceBySize?.[sz];
+          if (Number.isFinite(Number(computedUnit))) price = Number(computedUnit);
+        }
         lineItems.push({
           partNumber: orderFormSizeSuffix(partBase, sz),
           description: desc,
@@ -1888,12 +1917,35 @@ app.post('/api/submit-order-form', async (req, res) => {
     // --- Designs: one per decoration method present in rows, artwork URLs attached ---
     // DesignType IDs per memory/MANAGEORDERS_COMPLETE_REFERENCE.md:
     //   3 = standard embroidery/screenprint, 45 = DTG
-    const DESIGN_TYPE_ID = { embroidery: 3, screenprint: 3, dtg: 45, dtf: 3 };
-    const DESIGN_LABEL   = { embroidery: 'Embroidery', screenprint: 'Screen Print', dtg: 'DTG', dtf: 'DTF Transfer' };
+    //   Stickers + Emblems route as 3 with method noted in design name (TBD ShopWorks IDs)
+    const DESIGN_TYPE_ID = { embroidery: 3, screenprint: 3, dtg: 45, dtf: 3, sticker: 3, emblem: 3 };
+    const DESIGN_LABEL   = { embroidery: 'Embroidery', screenprint: 'Screen Print', dtg: 'DTG', dtf: 'DTF Transfer', sticker: 'Stickers', emblem: 'Embroidered Emblems' };
     const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
+
+    // Design # lookup — when the rep typed numbers in the Design # field, try
+    // to resolve each one to an existing ShopWorks id_Design via the proxy's
+    // design-lookup endpoint. Best-effort: 404/network failures fall back to
+    // the generic-design behavior (no regression). Per MANAGEORDERS_COMPLETE_REFERENCE.md:
+    // known → { id_Design: N }, unknown → omit (proxy creates a new design).
+    const designIdMap = {};  // designNumber → id_Design
+    if (Array.isArray(designNumbers) && designNumbers.length) {
+      await Promise.all(designNumbers.map(async (num) => {
+        const safeNum = String(num).replace(/[^0-9A-Z\-]/gi, '');
+        if (!safeNum) return;
+        try {
+          const r = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/embroidery-designs/lookup?designNumber=${encodeURIComponent(safeNum)}`);
+          if (!r.ok) return;
+          const j = await r.json().catch(() => null);
+          const id = j?.id_Design ?? j?.ID_Design ?? j?.results?.[0]?.id_Design;
+          if (Number.isFinite(Number(id))) designIdMap[safeNum] = Number(id);
+        } catch (_) { /* best-effort */ }
+      }));
+    }
+    const linkedIdDesigns = Object.values(designIdMap);
+
     const designs = methodsUsed.map((method) => {
       const hostedFiles = files.filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
-      return {
+      const base = {
         name: `${info.company || 'Order'} — ${DESIGN_LABEL[method] || method}`,
         externalId: `${extOrderId}-${method.toUpperCase()}`,
         productColor: [...new Set(rows.filter(r => r.deco === method).map(r => r.colorName || r.color).filter(Boolean))].join(', '),
@@ -1907,6 +1959,13 @@ app.post('/api/submit-order-form', async (req, res) => {
           notes: f.colors ? `Colors: ${f.colors}` : ''
         }))
       };
+      // Attach known id_Design references per CLAUDE.md MANAGEORDERS pattern.
+      // For methods that primarily use this lookup (embroidery), pass the array
+      // so the proxy can link rather than create a new generic design.
+      if (linkedIdDesigns.length && (method === 'embroidery' || method === 'screenprint' || method === 'dtf')) {
+        base.linkedDesigns = linkedIdDesigns.map(id => ({ id_Design: id }));
+      }
+      return base;
     });
 
     // --- Attachments: only hosted URLs (not base64 previews) ---
@@ -1920,7 +1979,14 @@ app.post('/api/submit-order-form', async (req, res) => {
 
     // --- Notes ---
     const notesBlocks = [];
-    const headerNote = `ONLINE ORDER FORM\nSource: NWCA-OrderForm${draftId ? `\nDraft/Share Link: ${draftId}` : ''}\n\nCustomer: ${info.buyerFirst || ''} ${info.buyerLast || ''}\nCompany: ${info.company || 'N/A'}\nEmail: ${info.email || ''}\nPhone: ${info.phone || ''}\nPO: ${info.po || 'N/A'}\nSales Rep: ${info.salesRep || 'N/A'}\nDate Due: ${info.dateDue || 'N/A'}\n\nOrder Notes: ${orderNotes || 'None'}`;
+    // Method-specific context block (e.g. "EMBROIDERY · 8,000 stitches · Tier 24-47").
+    // Frontend builds this via each method module's buildNotesBlock(). When present,
+    // it's prepended to the header so production sees pricing context first.
+    const decoBlock = String(methodNotesBlock || '').trim();
+    const breakdownLine = breakdown?.supported
+      ? `\nSubtotal: $${(Number(breakdown.subtotal) || 0).toFixed(2)} · Total qty: ${breakdown.totalQty || 0}${breakdown.tier ? ' · Tier ' + breakdown.tier : ''}`
+      : '';
+    const headerNote = `${decoBlock ? decoBlock + '\n\n' : ''}ONLINE ORDER FORM\nSource: NWCA-OrderForm${draftId ? `\nDraft/Share Link: ${draftId}` : ''}${breakdownLine}\n\nCustomer: ${info.buyerFirst || ''} ${info.buyerLast || ''}\nCompany: ${info.company || 'N/A'}\nEmail: ${info.email || ''}\nPhone: ${info.phone || ''}\nPO: ${info.po || 'N/A'}\nSales Rep: ${info.salesRep || 'N/A'}\nDate Due: ${info.dateDue || 'N/A'}\n\nOrder Notes: ${orderNotes || 'None'}`;
     notesBlocks.push({ type: 'Notes On Order', note: headerNote });
     if (info.artNotes || attachments.length) {
       const artLines = [];
@@ -2038,6 +2104,62 @@ app.post('/api/submit-order-form', async (req, res) => {
 
     if (ok) {
       console.log('[Order Form Submit] ✓ Pushed', extOrderId, '→', shopWorksId);
+
+      // Best-effort: save one quote_items row per (row, size) for line-level
+      // audit history + analytics. Same schema as DTG/Embroidery/SP/DTF quote
+      // builders. Failure here doesn't fail the order — push already succeeded.
+      try {
+        if (breakdown?.supported && breakdown.byRow) {
+          const QUOTE_ITEMS_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items';
+          const decoMethod = decoConfig?.method || rows.find(r => r?.deco)?.deco || '';
+          const cfg = decoConfig || {};
+          const primaryLocation = cfg.primaryLocation || cfg.locationCombo || cfg.size || '';
+          let lineNumber = 1;
+          for (const r of rows) {
+            if (!r) continue;
+            const rb = breakdown.byRow[r.id];
+            if (!rb || rb.error) continue;
+            const sizes = r.sizes || {};
+            for (const sz of Object.keys(sizes)) {
+              const qty = parseInt(sizes[sz] || 0, 10);
+              if (!qty) continue;
+              const finalUnit = Number(rb.unitPriceBySize?.[sz] ?? 0);
+              const baseUnit  = Math.max(0, finalUnit - Number(rb.extras?.ltmPerPiece || 0));
+              const item = {
+                QuoteID: extOrderId,
+                LineNumber: lineNumber++,
+                StyleNumber: r.style || '',
+                ProductName: r.desc || r.style || '',
+                Color: r.colorName || r.color || '',
+                ColorCode: r.catalogColor || '',
+                EmbellishmentType: decoMethod,
+                PrintLocation: primaryLocation,
+                PrintLocationName: primaryLocation,
+                Quantity: qty,
+                HasLTM: rb.tier === '1-7' || rb.tier === '1-23' || rb.tier === '10-23',
+                BaseUnitPrice: Number(baseUnit.toFixed(4)),
+                LTMPerUnit:    Number((rb.extras?.ltmPerPiece || 0).toFixed(4)),
+                FinalUnitPrice: Number(finalUnit.toFixed(2)),
+                LineTotal:      Number((finalUnit * qty).toFixed(2)),
+                SizeBreakdown:  JSON.stringify({ [sz]: qty }),
+                PricingTier:    rb.tier || '',
+                ImageURL:       r.imageUrl || '',
+              };
+              try {
+                await fetch(QUOTE_ITEMS_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(item),
+                });
+              } catch (_) { /* per-line failure is non-fatal */ }
+            }
+          }
+          console.log('[Order Form Submit] quote_items saved for', extOrderId, '(', lineNumber - 1, 'lines )');
+        }
+      } catch (e) {
+        console.warn('[Order Form Submit] quote_items save failed (non-fatal):', e.message);
+      }
+
       return res.json({ success: true, extOrderId, shopWorksId, mode: 'live' });
     } else {
       console.error('[Order Form Submit] Push failed:', result);

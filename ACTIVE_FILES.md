@@ -133,6 +133,17 @@
 | `/pages/order-form/styles.css` | Order form base styles | — | ✅ Active |
 | `/pages/order-form/paper.css` | Order form paper-layout styles | — | ✅ Active |
 | `/pages/order-form/print.css` | Order form print layout | — | ✅ Active |
+| `/pages/order-form/pricing/shared.js` | Order Form pricing — shared utilities (rounding, tier helpers, error/breakdown shapes, totalQty, tax/deposit) | — | ✅ Active |
+| `/pages/order-form/pricing/registry.js` | Order Form pricing — method registry + dispatcher (register/getMethod/priceForm/bundle cache, customer-mode manualCost guard) | shared.js | ✅ Active |
+| `/pages/order-form/pricing/methods/embroidery.jsx` | Order Form pricing — Embroidery method (cap+flat auto-detect, LTM-builtin, 8K-stitch single logo MVP, ConfigBar) — VERIFIED LIVE | EmbroideryPricingService, CapEmbroideryPricingService, ProductCategoryFilter, registry.js, shared.js | ✅ Active |
+| `/pages/order-form/components/totals.jsx` | Order Form pricing UI — DecoConfigStrip, TotalsPanel (subtotal/tax/deposit/total + tier badge + LTM callout), RowTierBadge, BetaChip (dismissible), ManualCostPill, ManualCostPrompt | registry.js, common.jsx | ✅ Active |
+| `/pages/order-form/pricing/methods/screenprint.jsx` | Order Form pricing — Screen Print method (front/back/sleeve color counts + white underbase, ConfigBar) — BETA chip until verified vs `/pricing/screen-print` | ScreenPrintPricingService, registry.js, shared.js | ✅ Active |
+| `/pages/order-form/pricing/methods/dtg.jsx` | Order Form pricing — DTG method (location combo dropdown 9 codes, LTM under 24, ConfigBar) — BETA chip until verified vs `/pricing/dtg` | DTGPricingService, registry.js, shared.js | ✅ Active |
+| `/pages/order-form/pricing/methods/dtf.jsx` | Order Form pricing — DTF method (front/back/sleeve transfer-size pickers, multi-location labor + freight, ConfigBar) — BETA chip until verified vs `/pricing/dtf` | DTFPricingService, registry.js, shared.js | ✅ Active |
+| `/shared_components/js/sticker-pricing-service.js` | Sticker pricing service — fetches `/api/sticker-pricing` Caspio table; falls back to inline grid (4 sizes × 10 qty tiers) until backend route + `Sticker_Pricing` table are deployed | — | ✅ Active |
+| `/shared_components/js/emblem-pricing-service.js` | Embroidered emblem/patch pricing service — fetches `/api/emblem-pricing`; falls back to inline grid (16 sizes × 10 qty tiers + LTM/digitizing/add-on rules) until Caspio table is deployed | — | ✅ Active |
+| `/pages/order-form/pricing/methods/sticker.jsx` | Order Form pricing — Stickers method (form-wide size dropdown 2x2/3x3/4x4/5x5 + new artwork checkbox, ConfigBar) — BETA chip until verified | StickerPricingService, registry.js, shared.js | ✅ Active |
+| `/pages/order-form/pricing/methods/emblem.jsx` | Order Form pricing — Emblems/Patches method (form-wide width/height + metallic/velcro/extra-colors/new-design add-ons, ConfigBar) — BETA chip until verified | EmblemPricingService, registry.js, shared.js | ✅ Active |
 | `/pages/top-sellers-product.css` | Top sellers product page styles | — | ✅ Active |
 | `/pages/css/policies-hub.css` | Policies hub page styles | — | ✅ Active |
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |

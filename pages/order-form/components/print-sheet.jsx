@@ -1,18 +1,53 @@
-// Print sheet — mirrors the paper form layout using current form state
-function PrintSheet({ info, rows, ship, orderNotes, files }) {
+// Print sheet — mirrors the paper form layout using current form state.
+// When auto-pricing is active (breakdown.supported), the printed sheet shows
+// per-row $ totals, an order subtotal, estimated tax, grand total, and 50%
+// deposit line. Without auto-pricing it falls back to qty-only behavior.
+function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, breakdown = null }) {
   const decoSet = new Set(rows.map(r => r.deco));
-  const rowsWithTotal = rows.map(r => {
-    let t = 0;
-    SIZES.forEach(s => { t += Number(r.sizes[s] || 0); });
-    t += Number(r.otherSize || 0);
-    return { ...r, total: t };
-  });
-  // Pad to 14 rows like original
-  const padded = [...rowsWithTotal];
-  while (padded.length < 14) padded.push({ id: 'blank-' + padded.length, style: '', color: '', desc: '', sizes: {}, otherSize: '', total: 0, _blank: true });
+  const supported = !!breakdown?.supported;
+  const byRow = breakdown?.byRow;
 
-  const designNo = files.map(f => f.designNo).filter(Boolean).join(', ');
+  // Build per-row qty/$ totals — pulls computed prices from breakdown when
+  // available, falls back to row.price when manual.
+  const rowsWithTotal = rows.map(r => {
+    let qty = 0;
+    Object.values(r.sizes || {}).forEach(v => { qty += Number(v) || 0; });
+    let lineDollar = 0;
+    let unitDollar = 0;
+    const rb = byRow?.get?.(r.id);
+    if (rb && !rb.error && rb.rowSubtotal > 0 && !r.priceOverride) {
+      lineDollar = rb.rowSubtotal;
+      unitDollar = qty > 0 ? lineDollar / qty : 0;
+    } else if (r.price) {
+      unitDollar = Number(r.price) || 0;
+      lineDollar = unitDollar * qty;
+    }
+    return { ...r, total: qty, lineDollar, unitDollar };
+  });
+
+  const padded = [...rowsWithTotal];
+  while (padded.length < 14) padded.push({ id: 'blank-' + padded.length, style: '', color: '', desc: '', sizes: {}, total: 0, lineDollar: 0, unitDollar: 0, _blank: true });
+
+  const designNo = info.designNumber || files.map(f => f.designNo).filter(Boolean).join(', ');
   const placements = [...new Set(files.flatMap(f => f.placements || []))].join(', ');
+
+  // Currency formatter — local to this file to avoid coupling with totals.jsx.
+  const usd = (n) => Number(n || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+
+  // Deco context line — "EMBROIDERY · 8,000 stitches · Tier 24-47 · Left Chest"
+  const decoContext = (() => {
+    if (!supported || !breakdown?.tier) return '';
+    const method = decoConfig?.method || '';
+    const label  = window.OrderFormPricing?.getMethod?.(method)?.label || method.toUpperCase();
+    const parts = [`${label.toUpperCase()}`];
+    if (method === 'embroidery' && decoConfig?.stitchCount) {
+      parts.push(`${Number(decoConfig.stitchCount).toLocaleString()} stitches`);
+    }
+    if (decoConfig?.primaryLocation) parts.push(decoConfig.primaryLocation);
+    parts.push(`Tier ${breakdown.tier}`);
+    parts.push(`${breakdown.totalQty} pcs`);
+    return parts.join(' · ');
+  })();
 
   return (
     <div className="print-sheet" id="print-sheet">
@@ -50,8 +85,11 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
         <div className="cell" style={{ padding: 0 }}>
           <div className="deco-flags">
             <div className="flag"><span className={"ps-chk" + (decoSet.has('embroidery') ? ' on' : '')}></span> Embroidery</div>
-            <div className="flag"><span className={"ps-chk" + (decoSet.has('dtg') ? ' on' : '')}></span> DTG Printing</div>
             <div className="flag"><span className={"ps-chk" + (decoSet.has('screenprint') ? ' on' : '')}></span> Screen Printing</div>
+            <div className="flag"><span className={"ps-chk" + (decoSet.has('dtg') ? ' on' : '')}></span> DTG Printing</div>
+            <div className="flag"><span className={"ps-chk" + (decoSet.has('dtf') ? ' on' : '')}></span> DTF Transfer</div>
+            <div className="flag"><span className={"ps-chk" + (decoSet.has('sticker') ? ' on' : '')}></span> Stickers</div>
+            <div className="flag"><span className={"ps-chk" + (decoSet.has('emblem') ? ' on' : '')}></span> Emblems</div>
           </div>
         </div>
 
@@ -59,6 +97,11 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
         <div className="cell"></div>
         <div className="cell"></div>
       </div>
+
+      {/* Deco context — under info grid, only when auto-pricing is live */}
+      {decoContext && (
+        <div className="ps-deco-context">{decoContext}</div>
+      )}
 
       {/* Payment notice */}
       <div className="ps-notice">
@@ -81,7 +124,6 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
           <col className="c-color"/>
           <col className="c-desc"/>
           <col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/>
-          <col className="c-other"/>
           <col className="c-price"/>
           <col className="c-total"/>
         </colgroup>
@@ -98,7 +140,6 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
             <th className="num">2XL</th>
             <th className="num">3XL</th>
             <th className="num">4XL</th>
-            <th className="num">Other</th>
             <th className="num">Price</th>
             <th className="ps-total-head">Total</th>
           </tr>
@@ -107,7 +148,7 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
           {padded.slice(0, 14).map((r, i) => (
             <tr key={r.id}>
               <td>{r.style}</td>
-              <td>{r.color}</td>
+              <td>{r.color || r.colorName}</td>
               <td className="desc">{r.desc}</td>
               <td className="num">{r.sizes?.XS || ''}</td>
               <td className="num">{r.sizes?.S || ''}</td>
@@ -117,13 +158,41 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
               <td className="num">{r.sizes?.['2XL'] || ''}</td>
               <td className="num">{r.sizes?.['3XL'] || ''}</td>
               <td className="num">{r.sizes?.['4XL'] || ''}</td>
-              <td className="num">{r.otherSize || ''}</td>
-              <td className="num">{r.price ? '$' + r.price : ''}</td>
-              <td className="total">{r.total || ''}</td>
+              <td className="num">{r.unitDollar ? usd(r.unitDollar) : (r.price ? '$' + r.price : '')}</td>
+              <td className="total">{r.lineDollar ? usd(r.lineDollar) : (r.total || '')}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Totals strip — printed only when auto-pricing computed something */}
+      {supported && breakdown.subtotal > 0 && (
+        <div className="ps-totals">
+          <div className="ps-totals-row">
+            <span>Subtotal {breakdown.totalQty ? `(${breakdown.totalQty} pcs)` : ''}</span>
+            <span>{usd(breakdown.subtotal)}</span>
+          </div>
+          {breakdown.taxEstimate > 0 && (
+            <div className="ps-totals-row ps-totals-row--dim">
+              <span>Estimated tax (10.1%)</span>
+              <span>{usd(breakdown.taxEstimate)}</span>
+            </div>
+          )}
+          <div className="ps-totals-row ps-totals-row--total">
+            <span>Total {breakdown.taxEstimate > 0 ? '(estimated)' : ''}</span>
+            <span>{usd((breakdown.subtotal || 0) + (breakdown.taxEstimate || 0))}</span>
+          </div>
+          <div className="ps-totals-row ps-totals-row--deposit">
+            <span>50% deposit due</span>
+            <span>{usd(breakdown.depositDue)}</span>
+          </div>
+          {breakdown.tier === '1-7' && (
+            <div className="ps-totals-row ps-totals-row--note">
+              <span>LTM ($50) built into per-piece pricing.</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer: Notes / Shipping */}
       <div className="ps-footer">
@@ -149,7 +218,7 @@ function PrintSheet({ info, rows, ship, orderNotes, files }) {
       <div className="ps-design-row">
         <div className="cell"><div className="lbl">Design #</div><div className="val">{designNo}</div></div>
         <div className="cell"><div className="lbl">Logo placement(s)</div><div className="val">{placements}</div></div>
-        <div className="cell"></div>
+        <div className="cell"><div className="lbl">Art / production notes</div><div className="val">{info.artNotes || ''}</div></div>
       </div>
 
       {/* Signature */}

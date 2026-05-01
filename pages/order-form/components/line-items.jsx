@@ -61,8 +61,15 @@ function makeBlankRow() {
     deco: '',
     // Sizes can hold any of the standard SIZES keys plus any NON_STANDARD_SIZES
     // (OSFA, YS-YXL, LT-4XLT, 5XL-7XL). Each maps cleanly to a ShopWorks Size0X
-    // column via orderFormSizeSuffix() in server.js.
+    // column via orderFormSizeSuffix() in server.js. Sticker / emblem rows
+    // use a single key 'STK' / 'EMB' to hold the qty.
     sizes: {},
+    // Auto-pricing state (populated by app.jsx recompute effect via breakdown):
+    rowDecoConfig: {},     // method-owned per-row config (e.g. {capOrFlat: 'auto'} for embroidery)
+    priceOverride: false,  // true once rep clicks the auto-priced cell to type a custom value
+    manualMode: false,     // true when the style isn't in SanMar OR rep toggled manual mode
+    manualCost: '',        // blank cost (decoded as Number) when manualMode
+    price: '',             // legacy manual price field (kept for back-compat with non-supported decos)
   };
 }
 
@@ -284,9 +291,7 @@ function SizeCell({ value, onChange }) {
 function LineRow({ row, onChange, onRemove, canRemove }) {
   const total = useMemo(() => {
     let t = 0;
-    SIZES.forEach(s => { const n = Number(row.sizes[s] || 0); if (n) t += n; });
-    const other = Number(row.otherSize || 0);
-    if (other) t += other;
+    Object.values(row.sizes || {}).forEach(v => { t += Number(v) || 0; });
     return t;
   }, [row]);
 
@@ -325,14 +330,6 @@ function LineRow({ row, onChange, onRemove, canRemove }) {
           <SizeCell value={row.sizes[s]} onChange={(v) => setSize(s, v)} />
         </div>
       ))}
-      <div className="sz">
-        <input
-          className="li-size-input"
-          placeholder="—"
-          value={row.otherSize}
-          onChange={(e) => update({ otherSize: e.target.value })}
-        />
-      </div>
       <div className="total li-total">{total || '—'}</div>
       <div>
         <button
@@ -380,18 +377,16 @@ function LineItems({ rows, setRows }) {
   const grandTotal = useMemo(() => {
     let t = 0;
     rows.forEach(r => {
-      SIZES.forEach(s => { t += Number(r.sizes[s] || 0); });
-      t += Number(r.otherSize || 0);
+      Object.values(r.sizes || {}).forEach(v => { t += Number(v) || 0; });
     });
     return t;
   }, [rows]);
 
   const decoBreakdown = useMemo(() => {
-    const b = { embroidery: 0, screenprint: 0, dtg: 0 };
+    const b = { embroidery: 0, screenprint: 0, dtg: 0, dtf: 0, sticker: 0, emblem: 0 };
     rows.forEach(r => {
       let t = 0;
-      SIZES.forEach(s => { t += Number(r.sizes[s] || 0); });
-      t += Number(r.otherSize || 0);
+      Object.values(r.sizes || {}).forEach(v => { t += Number(v) || 0; });
       b[r.deco] = (b[r.deco] || 0) + t;
     });
     return b;
@@ -406,7 +401,6 @@ function LineItems({ rows, setRows }) {
           <div>Color</div>
           <div>Description</div>
           {SIZES.map(s => <div key={s} className="sz">{s}</div>)}
-          <div className="sz">Other</div>
           <div className="total">Total</div>
           <div></div>
         </div>

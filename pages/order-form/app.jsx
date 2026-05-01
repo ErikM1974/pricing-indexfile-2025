@@ -41,6 +41,18 @@ function App() {
   // Order notes
   const [orderNotes, setOrderNotes] = useState('');
 
+  // Decoration config — form-wide settings for the active method (stitch count
+  // + primary location for embroidery; color counts for SP; etc.). Reseeded
+  // when toggleDeco picks a different method (see paper-form.jsx).
+  const [decoConfig, setDecoConfig] = useState({});
+
+  // Computed pricing breakdown — recomputed (debounced 300ms) whenever rows /
+  // decoConfig / customerMode changes. Source of truth for $ totals.
+  const _zeroBreakdown = (window.OrderFormPricingShared
+    ? window.OrderFormPricingShared.emptyOrderBreakdown()
+    : { supported: false, byRow: new Map(), totalQty: 0, tier: null, subtotal: 0, ltmTotal: 0, taxEstimate: 0, depositDue: 0, grandTotal: 0, fees: [], errors: [] });
+  const [breakdown, setBreakdown] = useState(_zeroBreakdown);
+
   // Tweaks panel
   const [tweaksOpen, setTweaksOpen] = useState(false);
 
@@ -59,11 +71,45 @@ function App() {
       if (Array.isArray(draft.files)) setFiles(draft.files);
       setStaffFilled(draft.staffFilled || []);
       setDraftStatus(draft.status);
+      // Reseed decoConfig from saved rows (form-wide deco) so auto-pricing
+      // resumes for the customer view.
+      if (Array.isArray(draft.rows) && draft.rows.length) {
+        const firstDeco = draft.rows.find(r => r && r.deco)?.deco || '';
+        if (firstDeco && window.OrderFormPricing?.hasMethod(firstDeco)) {
+          const mod = window.OrderFormPricing.getMethod(firstDeco);
+          setDecoConfig({ method: firstDeco, ...(mod.defaultFormConfig?.() || {}) });
+        }
+      }
     }).catch(err => {
       console.error('[OrderForm] Failed to load draft:', err);
     });
     return () => { cancelled = true; };
   }, [draftId]);
+
+  // Auto-pricing recompute. Debounced 300ms. Pulls breakdown from the active
+  // method module via the registry. Breakdown is the source of truth for $
+  // totals — rows stay focused on user input (style, sizes, manual flags).
+  useEffect(() => {
+    const reg = window.OrderFormPricing;
+    const S   = window.OrderFormPricingShared;
+    const deco = decoConfig?.method || '';
+    if (!deco || !reg?.hasMethod(deco)) {
+      setBreakdown(prev => prev.supported ? S.emptyOrderBreakdown() : prev);
+      return;
+    }
+    let cancelled = false;
+    const totalQty = S.totalQtyAcrossRows(rows);
+    const formCtx = { deco, decoConfig, info, ship, totalQty, customerMode };
+    const t = setTimeout(async () => {
+      try {
+        const result = await reg.priceForm({ rows, formCtx });
+        if (!cancelled) setBreakdown(result);
+      } catch (err) {
+        if (!cancelled) console.error('[OrderForm] priceForm failed:', err);
+      }
+    }, 300);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [rows, decoConfig, customerMode]);
 
   useEffect(() => {
     function onMsg(e) {
@@ -77,18 +123,19 @@ function App() {
     return () => window.removeEventListener('message', onMsg);
   }, []);
 
-  // Summary aggregates
+  // Summary aggregates — qty only (dollar totals come from `breakdown`).
+  // Walks all keys in row.sizes (standard XS-4XL plus any non-standard:
+  // OSFA / youth / tall / 5-7XL / non-garment STK / EMB).
   const totals = useMemo(() => {
     let grand = 0;
-    const byDeco = { embroidery: 0, screenprint: 0, dtg: 0 };
+    const byDeco = { embroidery: 0, screenprint: 0, dtg: 0, dtf: 0, sticker: 0, emblem: 0 };
     rows.forEach(r => {
       let t = 0;
-      SIZES.forEach(s => { t += Number(r.sizes[s] || 0); });
-      t += Number(r.otherSize || 0);
+      Object.values(r.sizes || {}).forEach(v => { t += Number(v) || 0; });
       grand += t;
       byDeco[r.deco] = (byDeco[r.deco] || 0) + t;
     });
-    const filledRows = rows.filter(r => r.style || r.desc || Object.values(r.sizes).some(v => v)).length;
+    const filledRows = rows.filter(r => r.style || r.desc || Object.values(r.sizes || {}).some(v => v)).length;
     return { grand, byDeco, filledRows };
   }, [rows]);
 
@@ -132,6 +179,8 @@ function App() {
           ship={ship} setShip={setShip}
           orderNotes={orderNotes} setOrderNotes={setOrderNotes}
           files={files} setFiles={setFiles}
+          decoConfig={decoConfig} setDecoConfig={setDecoConfig}
+          breakdown={breakdown}
           customerMode={customerMode}
           draftId={draftId}
           staffFilled={staffFilled}
@@ -149,7 +198,7 @@ function App() {
       </div>
 
       {/* Print-only paper form */}
-      <PrintSheet info={info} rows={rows} ship={ship} orderNotes={orderNotes} files={files} />
+      <PrintSheet info={info} rows={rows} ship={ship} orderNotes={orderNotes} files={files} decoConfig={decoConfig} breakdown={breakdown} />
     </>
   );
 }

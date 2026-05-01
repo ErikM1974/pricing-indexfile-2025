@@ -1,3 +1,15 @@
+// All six decoration methods exposed in the deco-checkbox cell.
+// First four are 1:1 with the existing DECOS in line-items.jsx; sticker and
+// emblem are non-garment methods that ship with their own pricing modules.
+const ALL_DECOS = [
+  { key: 'embroidery',  label: 'Embroidery' },
+  { key: 'screenprint', label: 'Screen Print' },
+  { key: 'dtg',         label: 'DTG' },
+  { key: 'dtf',         label: 'DTF' },
+  { key: 'sticker',     label: 'Stickers' },
+  { key: 'emblem',      label: 'Emblems' },
+];
+
 // Popover picker for non-standard sizes (OSFA, youth, tall, 5XL+). Renders inline
 // chips for any non-standard sizes already entered, plus a "+ Add" button that
 // opens a small menu of remaining non-standard sizes. Each picked size becomes
@@ -80,8 +92,15 @@ function NonStandardSizePicker({ row, onChange }) {
 }
 
 // Paper-style form view — boxed fields, looks like the original PDF but editable.
-function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox }) {
-  // Total = sum across ALL keys in row.sizes (standard + non-standard).
+//
+// Auto-pricing: when `rowBreakdown` exists (active method module computed
+// per-size unit prices for this row), the Price cell shows a representative
+// auto-price with an "auto" badge. Clicking it switches to manual override
+// (sets row.priceOverride=true). Total cell shows $ instead of qty.
+function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox, rowBreakdown }) {
+  const [mcpOpen, setMcpOpen] = useState(false);
+
+  // Total qty across all sizes — same as before.
   const total = useMemo(() => {
     let t = 0;
     Object.values(row.sizes || {}).forEach(v => { t += Number(v || 0); });
@@ -91,18 +110,57 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   function update(patch) { onChange({ ...row, ...patch }); }
   function setSize(s, v) { update({ sizes: { ...row.sizes, [s]: v.replace(/[^0-9]/g, '') } }); }
 
+  // ----- Auto-pricing display state -----
+  const hasAutoPrice = !!(rowBreakdown && !rowBreakdown.error && rowBreakdown.rowSubtotal > 0);
+  const showAutoPriceCell = hasAutoPrice && !row.priceOverride;
+  const rowSubtotalDollars = rowBreakdown?.rowSubtotal || 0;
+  // Price cell display: weighted-average unit when sizes have different upcharges.
+  const avgUnit = (showAutoPriceCell && total > 0) ? rowSubtotalDollars / total : 0;
+
+  function applyManualCost({ manualCost, itemType }) {
+    update({
+      manualMode: true,
+      manualCost,
+      rowDecoConfig: { ...(row.rowDecoConfig || {}), capOrFlat: itemType === 'cap' ? 'cap' : 'flat' },
+    });
+    setMcpOpen(false);
+  }
+
+  function clearManualCost() {
+    update({ manualMode: false, manualCost: '', rowDecoConfig: { ...(row.rowDecoConfig || {}), capOrFlat: 'auto' } });
+  }
+
   return (
-    <tr>
+    <tr className={hasAutoPrice ? 'pf-row pf-row--priced' : 'pf-row'}>
       <td className="sel-wrap">
-        <ProductCombobox
-          value={row.style}
-          onChange={(v) => update({ style: v })}
-          onPick={(p) => update({
-            style: p.style,
-            desc: row.desc || p.desc || '',
-            ...(row.style && row.style !== p.style ? { colorName: '', catalogColor: '' } : {})
-          })}
-        />
+        <div className="style-cell">
+          <ProductCombobox
+            value={row.style}
+            onChange={(v) => update({ style: v })}
+            onPick={(p) => update({
+              style: p.style,
+              desc: row.desc || p.desc || '',
+              ...(row.style && row.style !== p.style ? { colorName: '', catalogColor: '' } : {})
+            })}
+          />
+          <button
+            type="button"
+            className={"manual-cost-toggle" + (row.manualMode ? ' on' : '')}
+            onClick={() => setMcpOpen(o => !o)}
+            title={row.manualMode ? 'Manual cost mode — click to clear' : 'Style not in SanMar? Click to enter blank cost manually'}
+            aria-label="Manual cost"
+          >$</button>
+          {row.manualMode && <ManualCostPill row={row} onClear={clearManualCost} />}
+          {mcpOpen && (
+            <div className="manual-cost-prompt-wrap">
+              <ManualCostPrompt
+                row={row}
+                onApply={applyManualCost}
+                onCancel={() => setMcpOpen(false)}
+              />
+            </div>
+          )}
+        </div>
       </td>
       <td>
         <ColorSelect
@@ -131,16 +189,52 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             value={row.desc}
             onChange={e => update({ desc: e.target.value })}
           />
+          {rowBreakdown && !rowBreakdown.error && rowBreakdown.tier && (
+            <RowTierBadge rowBreakdown={rowBreakdown} />
+          )}
         </div>
       </td>
       {PAPER_SIZES.map(s => (
         <td key={s}><input className="t-in num" inputMode="numeric" value={row.sizes[s] || ''} onChange={e => setSize(s, e.target.value)} /></td>
       ))}
       <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} /></td>
-      {!customerMode && (
-        <td><input className="t-in num" inputMode="decimal" value={row.price || ''} onChange={e => update({ price: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="" /></td>
-      )}
-      <td><input className="t-in total" value={total || ''} readOnly tabIndex={-1} /></td>
+      <td>
+        {showAutoPriceCell ? (
+          <button
+            type="button"
+            className="t-in num auto-priced"
+            onClick={() => update({ priceOverride: true, price: avgUnit ? avgUnit.toFixed(2) : '' })}
+            title="Auto-priced — click to override"
+          >
+            {fmt$(avgUnit)}
+            <span className="auto-badge">auto</span>
+          </button>
+        ) : (
+          <div className="manual-price-cell">
+            <input
+              className="t-in num"
+              inputMode="decimal"
+              value={row.price || ''}
+              onChange={e => update({ price: e.target.value.replace(/[^0-9.]/g, '') })}
+              placeholder=""
+            />
+            {row.priceOverride && hasAutoPrice && (
+              <button
+                type="button"
+                className="restore-auto-link"
+                onClick={() => update({ priceOverride: false, price: '' })}
+                title="Use auto-calculated price"
+              >restore auto</button>
+            )}
+          </div>
+        )}
+      </td>
+      <td>
+        {showAutoPriceCell
+          ? <input className="t-in total t-in-money" value={fmt$(rowSubtotalDollars)} readOnly tabIndex={-1} />
+          : <input className="t-in total" value={total || ''} readOnly tabIndex={-1} />
+        }
+      </td>
     </tr>
   );
 }
@@ -298,13 +392,24 @@ function ContactPicker({ contacts, contactId, onPickContact, onManualEntry }) {
   );
 }
 
-function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, customerMode = false, draftId = null, staffFilled = [] }) {
+function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, decoConfig = {}, setDecoConfig = () => {}, breakdown = null, customerMode = false, draftId = null, staffFilled = [] }) {
   const lockSalesRep = customerMode && staffFilled.includes('salesRep');
   const lockPO       = customerMode && staffFilled.includes('po');
-  const decoSet = new Set(rows.map(r => r.deco).filter(Boolean));
+  const activeDeco = decoConfig?.method || rows.find(r => r?.deco)?.deco || '';
+  const decoSet = new Set([activeDeco].filter(Boolean));
   function toggleDeco(key) {
-    const next = rows.map(r => ({ ...r, deco: key }));
-    setRows(next);
+    // Single-deco form: clicking the active method again clears it; clicking
+    // a different method swaps. Reseed decoConfig from the new method's
+    // defaults so the ConfigBar shows the right inputs.
+    const becomingActive = activeDeco !== key;
+    const nextDeco = becomingActive ? key : '';
+    setRows(rows.map(r => ({ ...r, deco: nextDeco })));
+    if (becomingActive) {
+      const mod = window.OrderFormPricing?.getMethod?.(key);
+      setDecoConfig({ method: key, ...(mod?.defaultFormConfig?.() || {}) });
+    } else {
+      setDecoConfig({});
+    }
   }
   function update(k, v) { setInfo({ ...info, [k]: v }); }
   function updateShip(k, v) { setShip({ ...ship, [k]: v }); }
@@ -312,7 +417,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
 
   const totals = useMemo(() => {
     let grand = 0;
-    const byDeco = { embroidery: 0, screenprint: 0, dtg: 0 };
+    const byDeco = { embroidery: 0, screenprint: 0, dtg: 0, dtf: 0, sticker: 0, emblem: 0 };
     rows.forEach(r => {
       let t = 0;
       Object.values(r.sizes || {}).forEach(v => { t += Number(v || 0); });
@@ -320,6 +425,16 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
       byDeco[r.deco] = (byDeco[r.deco] || 0) + t;
     });
     return { grand, byDeco };
+  }, [rows]);
+
+  // Submit guard: at least one row must have a style (or manual cost) AND qty > 0.
+  const canSubmit = useMemo(() => {
+    return rows.some(r => {
+      const hasQty = Object.values(r?.sizes || {}).some(v => Number(v) > 0);
+      const hasStyle = !!(r?.style && r.style.trim());
+      const hasManual = !!r?.manualMode && Number(r?.manualCost) > 0;
+      return hasQty && (hasStyle || hasManual);
+    });
   }, [rows]);
 
   // Pad to at least 14 rows visible for a paper-form feel
@@ -353,9 +468,14 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
 
   async function submit() {
     if (submitting) return;
+    if (!canSubmit) {
+      setCaspioMsg({ kind: 'err', text: 'Add at least one row with a style and quantity before submitting.' });
+      setTimeout(() => setCaspioMsg(null), 5000);
+      return;
+    }
     setSubmitting(true);
     try {
-      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId });
+      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown });
       if (res.ok) {
         const modeLabel = res.mode === 'mock' ? 'mock mode (backend unreachable)' : 'ShopWorks';
         setCaspioMsg({ kind: 'ok', text: `Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}` });
@@ -372,7 +492,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     if (submitting) return;
     setSubmitting(true);
     try {
-      const res = await window.nwOrderAPI.saveDraft({ info, rows, ship, orderNotes, files });
+      const res = await window.nwOrderAPI.saveDraft({ info, rows, ship, orderNotes, files, decoConfig });
       if (res && res.success && res.draftId) {
         const url = `${window.location.origin}/order-form/${res.draftId}`;
         setShareUrl(url);
@@ -506,7 +626,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           </select>
         </div>
         <div className="p-cell deco-cell">
-          {DECOS.map(d => (
+          {ALL_DECOS.map(d => (
             <label key={d.key} className={"p-deco" + (decoSet.has(d.key) ? ' on' : '')}>
               <input type="checkbox" checked={decoSet.has(d.key)} onChange={() => toggleDeco(d.key)} />
               <span className="p-chk"></span>
@@ -534,6 +654,17 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         </div>
       </div>
 
+      {/* Deco config strip — renders the active method's ConfigBar (stitch
+          count + location for embroidery, ink colors for SP, etc.) plus a
+          dismissible Beta chip for non-verified methods. Hidden when no
+          deco is selected. Pricing pages this strip mirrors are linked from
+          each method's `referenceUrl`. */}
+      <DecoConfigStrip
+        deco={activeDeco}
+        decoConfig={decoConfig}
+        setDecoConfig={setDecoConfig}
+      />
+
       {/* Garments table */}
       <table className="p-table">
         <colgroup>
@@ -541,7 +672,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           <col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/>
           <col className="c-sz"/><col className="c-sz"/><col className="c-sz"/><col className="c-sz"/>
           <col className="c-other"/>
-          {!customerMode && <col className="c-price"/>}
+          <col className="c-price"/>
           <col className="c-total"/>
         </colgroup>
         <thead>
@@ -551,7 +682,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             <th className="left">Description</th>
             <th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th><th>4XL</th>
             <th className="nss-head">Other sizes</th>
-            {!customerMode && <th>Price</th>}
+            <th>Price</th>
             <th className="total-head">Total</th>
           </tr>
         </thead>
@@ -565,10 +696,19 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
               canRemove={rows.length > 1}
               customerMode={customerMode}
               onLightbox={setLightboxUrl}
+              rowBreakdown={breakdown?.byRow?.get?.(r.id) || null}
             />
           ))}
         </tbody>
       </table>
+
+      {/* Totals panel — slim, right-aligned summary; renders empty placeholders when no qty yet */}
+      <TotalsPanel
+        deco={activeDeco}
+        decoConfig={decoConfig}
+        breakdown={breakdown}
+        customerMode={customerMode}
+      />
 
       {/* Footer: Notes / Shipping */}
       <div className="p-footer">
@@ -626,11 +766,20 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         <Artwork files={files} setFiles={setFiles} />
       </div>
 
-      {/* Design # row */}
+      {/* Design # row — Design # is editable so reps can link to existing
+          ShopWorks designs by number. Backend looks up id_Design and attaches
+          {id_Design: N} to the MO push instead of creating a generic design.
+          Empty `info.designNumber` falls back to whatever's parsed from
+          uploaded artwork (files[].designNo). */}
       <div className="p-design">
         <div className="p-cell">
-          <div className="lbl">Design #</div>
-          <input className="p-in" value={files.map(f=>f.designNo).filter(Boolean).join(', ')} readOnly />
+          <div className="lbl">Design # <span style={{fontSize:9,color:'var(--ink-3)',marginLeft:6}}>(known design? type the # to link in ShopWorks)</span></div>
+          <input
+            className="p-in"
+            value={info.designNumber ?? files.map(f=>f.designNo).filter(Boolean).join(', ')}
+            onChange={e => update('designNumber', e.target.value)}
+            placeholder="e.g. 12345 — comma-separated for multiple"
+          />
         </div>
         <div className="p-cell">
           <div className="lbl">Logo placement(s)</div>
@@ -691,7 +840,12 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             <Icon name="upload" size={14}/> Get customer link
           </button>
         )}
-        <button className="btn primary" onClick={submit} disabled={submitting}>
+        <button
+          className="btn primary"
+          onClick={submit}
+          disabled={submitting || !canSubmit}
+          title={!canSubmit ? 'Add at least one row with a style and quantity' : ''}
+        >
           {customerMode ? 'Submit order' : 'Push to ShopWorks'} <Icon name="check" size={14}/>
         </button>
       </div>

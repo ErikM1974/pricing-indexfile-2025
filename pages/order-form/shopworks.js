@@ -20,10 +20,38 @@ window.nwOrderAPI = (function () {
       color: r.color || '',
       colorName: r.colorName || '',
       catalogColor: r.catalogColor || '',
+      imageUrl: r.imageUrl || '',
       deco: r.deco || '',
       sizes: r.sizes || {},
-      otherSize: r.otherSize || '',
-      price: r.price || ''
+      // Auto-pricing wiring:
+      price: r.price || '',                    // legacy manual price (stays as fallback)
+      priceOverride: !!r.priceOverride,        // true when rep typed over auto price
+      manualMode: !!r.manualMode,              // true when style not in SanMar / blank cost mode
+      manualCost: r.manualCost || '',
+      rowDecoConfig: r.rowDecoConfig || {},    // per-row method-owned config (e.g. capOrFlat)
+    };
+  }
+
+  // Convert breakdown.byRow (Map) to a plain object the backend can JSON-parse.
+  // Keys are row.id, values are { unitPriceBySize, rowSubtotal, tier, extras, error? }.
+  function serializableBreakdown(b) {
+    if (!b) return null;
+    const byRow = {};
+    if (b.byRow && typeof b.byRow.forEach === 'function') {
+      b.byRow.forEach((v, k) => { byRow[k] = v; });
+    }
+    return {
+      supported:    !!b.supported,
+      byRow,
+      totalQty:     b.totalQty || 0,
+      tier:         b.tier || null,
+      subtotal:     b.subtotal || 0,
+      ltmTotal:     b.ltmTotal || 0,
+      taxEstimate:  b.taxEstimate || 0,
+      depositDue:   b.depositDue || 0,
+      grandTotal:   b.grandTotal || 0,
+      fees:         b.fees || [],
+      errors:       b.errors || [],
     };
   }
 
@@ -42,13 +70,33 @@ window.nwOrderAPI = (function () {
   }
 
   function buildBody(order, extras) {
-    const { info, rows, ship, orderNotes, files } = order;
+    const { info, rows, ship, orderNotes, files, decoConfig, breakdown } = order;
+    // Build the method-specific notes block (frontend builds, backend prepends
+    // it to the existing "Notes On Order" header). Lets each method describe
+    // itself ("EMBROIDERY · 8,000 stitches · Tier 24-47 · Left Chest").
+    let methodNotesBlock = '';
+    try {
+      const reg = window.OrderFormPricing;
+      const m   = reg?.getMethod?.(decoConfig?.method);
+      if (m?.buildNotesBlock && breakdown) {
+        const formCtx = { deco: decoConfig.method, decoConfig, info, ship, totalQty: breakdown.totalQty || 0 };
+        methodNotesBlock = m.buildNotesBlock({ formCtx, breakdown }) || '';
+      }
+    } catch (e) { /* non-fatal — notes are advisory */ }
+    // Design number(s) for ShopWorks id_Design lookup. info.designNumber can
+    // be comma-separated.
+    const designNumbers = String(info?.designNumber || '')
+      .split(',').map(s => s.trim()).filter(Boolean);
     return {
       info: { ...info },
       rows: (rows || []).map(serializableRow),
       ship: { ...ship },
       orderNotes: orderNotes || '',
       files: (files || []).map(serializableFile),
+      decoConfig: decoConfig || {},
+      breakdown: serializableBreakdown(breakdown),
+      methodNotesBlock,
+      designNumbers,
       ...(extras || {})
     };
   }
