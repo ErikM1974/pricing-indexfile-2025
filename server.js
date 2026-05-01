@@ -1857,7 +1857,10 @@ app.post('/api/submit-order-form', async (req, res) => {
     }
 
     // --- Build lineItems (one row × qty-bearing size = one line item) ---
-    const SIZES = ['XS','S','M','L','XL','2XL','3XL','4XL'];
+    // Iterate every size key on the row (standard XS-4XL plus any non-standard
+    // entries: OSFA, YS-YXL, LT-4XLT, 5XL-7XL). orderFormSizeSuffix() routes each
+    // to the correct ShopWorks part-number suffix; the proxy's size-translation
+    // table maps the size string to the correct Size01-06 column on the line item.
     const lineItems = [];
     rows.forEach(r => {
       if (!r || (!r.style && !r.desc && !r.sizes)) return;
@@ -1866,8 +1869,9 @@ app.post('/api/submit-order-form', async (req, res) => {
       const color = r.colorName || r.color || '';        // display name — proxy stores as PartColor
       const catalogColor = r.catalogColor || r.color || ''; // CATALOG_COLOR for inventory mapping
       const price = Number(r.price || 0) || 0;
-      SIZES.forEach(sz => {
-        const qty = parseInt(r.sizes?.[sz] || 0, 10);
+      const sizes = r.sizes || {};
+      Object.keys(sizes).forEach(sz => {
+        const qty = parseInt(sizes[sz] || 0, 10);
         if (!qty) return;
         lineItems.push({
           partNumber: orderFormSizeSuffix(partBase, sz),
@@ -1879,18 +1883,6 @@ app.post('/api/submit-order-form', async (req, res) => {
           price: price
         });
       });
-      const other = parseInt(r.otherSize || 0, 10);
-      if (other) {
-        lineItems.push({
-          partNumber: partBase,
-          description: desc,
-          color: color,
-          catalogColor: catalogColor,
-          size: 'Other',
-          quantity: other,
-          price: price
-        });
-      }
     });
 
     // --- Designs: one per decoration method present in rows, artwork URLs attached ---

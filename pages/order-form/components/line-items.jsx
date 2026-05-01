@@ -59,10 +59,21 @@ function makeBlankRow() {
     availableColors: [],  // populated on pick
     imageUrl: '',         // model thumbnail for the chosen style+color (digital view only)
     deco: '',
+    // Sizes can hold any of the standard SIZES keys plus any NON_STANDARD_SIZES
+    // (OSFA, YS-YXL, LT-4XLT, 5XL-7XL). Each maps cleanly to a ShopWorks Size0X
+    // column via orderFormSizeSuffix() in server.js.
     sizes: {},
-    otherSize: '',
   };
 }
+
+// Sizes available beyond the standard grid (XS-4XL). Each maps to a part-number
+// suffix per server.js:orderFormSizeSuffix() so MO push routes them correctly.
+const NON_STANDARD_SIZES = [
+  'OSFA',
+  'YS', 'YM', 'YL', 'YXL',
+  'LT', 'XLT', '2XLT', '3XLT', '4XLT',
+  '5XL', '6XL', '7XL',
+];
 
 function ProductCombobox({ value, desc, onPick, onChange, onDescChange }) {
   const [open, setOpen] = useState(false);

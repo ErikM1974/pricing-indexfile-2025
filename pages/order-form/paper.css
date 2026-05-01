@@ -287,13 +287,15 @@
 .p-table .total-head { font-size: 10.5px; }
 /* Column widths sized for landscape (11in paper). Style/Color/Desc widened so
    full text fits without aggressive truncation. */
-.p-table col.c-style { width: 8%; }
-.p-table col.c-color { width: 14%; }
-.p-table col.c-desc  { width: 22%; }
-.p-table col.c-sz    { width: 4.4%; } /* × 8 = 35.2% */
-.p-table col.c-other { width: 5.5%; }
-.p-table col.c-price { width: 6.5%; }
+.p-table col.c-style { width: 7.5%; }
+.p-table col.c-color { width: 13%; }
+.p-table col.c-desc  { width: 20%; }
+.p-table col.c-sz    { width: 4.2%; } /* × 8 = 33.6% */
+.p-table col.c-other { width: 11%; }   /* "Other sizes" — room for non-std size chips */
+.p-table col.c-price { width: 6%; }
 .p-table col.c-total { width: 8.4%; }
+/* Non-standard size cell — let it flow without forcing min-height */
+.p-table td.nss-td { padding: 0; vertical-align: middle; }
 
 .p-table td .t-in {
   width: 100%;

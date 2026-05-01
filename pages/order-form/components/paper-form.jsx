@@ -1,9 +1,90 @@
+// Popover picker for non-standard sizes (OSFA, youth, tall, 5XL+). Renders inline
+// chips for any non-standard sizes already entered, plus a "+ Add" button that
+// opens a small menu of remaining non-standard sizes. Each picked size becomes
+// an inline qty input. All sizes flow into row.sizes[] and push to MO with the
+// correct _<size> suffix via orderFormSizeSuffix() in server.js.
+function NonStandardSizePicker({ row, onChange }) {
+  const [open, setOpen] = useState(false);
+  const wrap = useRef(null);
+
+  useEffect(() => {
+    function handler(e) { if (wrap.current && !wrap.current.contains(e.target)) setOpen(false); }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const sizes = row.sizes || {};
+  const standardSet = new Set(PAPER_SIZES);
+  // Show a chip for any non-standard size key that's been added — even if qty
+  // is still empty, so the user has a place to type the qty. Key is removed
+  // (and chip disappears) only via the × button.
+  const enteredNonStd = Object.keys(sizes)
+    .filter(k => !standardSet.has(k) && k in sizes)
+    .sort((a, b) => NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b));
+  const remaining = NON_STANDARD_SIZES.filter(s => !(s in sizes));
+
+  function setSize(s, v) {
+    const next = { ...sizes };
+    if (v) next[s] = v.replace(/[^0-9]/g, '');
+    else delete next[s];
+    onChange({ sizes: next });
+  }
+
+  function addSize(s) {
+    onChange({ sizes: { ...sizes, [s]: '' } });
+    setOpen(false);
+  }
+
+  return (
+    <div className="nss-cell" ref={wrap}>
+      {enteredNonStd.map(s => (
+        <span key={s} className="nss-chip">
+          <span className="nss-chip-label">{s}</span>
+          <input
+            className="nss-chip-qty"
+            inputMode="numeric"
+            value={sizes[s] || ''}
+            onChange={(e) => setSize(s, e.target.value)}
+            placeholder="0"
+          />
+          <button
+            type="button"
+            className="nss-chip-remove"
+            onClick={() => setSize(s, '')}
+            aria-label={`Remove ${s}`}
+            tabIndex={-1}
+          >×</button>
+        </span>
+      ))}
+      <button type="button" className="nss-add-btn" onClick={() => setOpen(o => !o)}>+ Add</button>
+      {open && (
+        <div className="nss-menu">
+          {remaining.length === 0 ? (
+            <div className="nss-menu-empty">All non-standard sizes added</div>
+          ) : (
+            <div className="nss-menu-grid">
+              {remaining.map(s => (
+                <button
+                  type="button"
+                  key={s}
+                  className="nss-menu-item"
+                  onMouseDown={(e) => { e.preventDefault(); addSize(s); }}
+                >{s}</button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Paper-style form view — boxed fields, looks like the original PDF but editable.
 function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox }) {
+  // Total = sum across ALL keys in row.sizes (standard + non-standard).
   const total = useMemo(() => {
     let t = 0;
-    PAPER_SIZES.forEach(s => { t += Number(row.sizes[s] || 0); });
-    t += Number(row.otherSize || 0);
+    Object.values(row.sizes || {}).forEach(v => { t += Number(v || 0); });
     return t;
   }, [row]);
 
@@ -55,7 +136,7 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
       {PAPER_SIZES.map(s => (
         <td key={s}><input className="t-in num" inputMode="numeric" value={row.sizes[s] || ''} onChange={e => setSize(s, e.target.value)} /></td>
       ))}
-      <td><input className="t-in num" value={row.otherSize || ''} onChange={e => update({ otherSize: e.target.value.replace(/[^0-9]/g, '') })} /></td>
+      <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} /></td>
       {!customerMode && (
         <td><input className="t-in num" inputMode="decimal" value={row.price || ''} onChange={e => update({ price: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="" /></td>
       )}
@@ -234,8 +315,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     const byDeco = { embroidery: 0, screenprint: 0, dtg: 0 };
     rows.forEach(r => {
       let t = 0;
-      SIZES.forEach(s => { t += Number(r.sizes[s] || 0); });
-      t += Number(r.otherSize || 0);
+      Object.values(r.sizes || {}).forEach(v => { t += Number(v || 0); });
       grand += t;
       byDeco[r.deco] = (byDeco[r.deco] || 0) + t;
     });
@@ -470,7 +550,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             <th className="left">Color</th>
             <th className="left">Description</th>
             <th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>2XL</th><th>3XL</th><th>4XL</th>
-            <th>Other</th>
+            <th className="nss-head">Other sizes</th>
             {!customerMode && <th>Price</th>}
             <th className="total-head">Total</th>
           </tr>
