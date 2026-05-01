@@ -1518,27 +1518,23 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   min-height: 36px;
 }
 .t-in.auto-priced .auto-priced-money { font-size: 13px; line-height: 1.15; }
-.t-in.auto-priced.has-upcharge { padding-top: 3px; padding-bottom: 3px; }
-.t-in.auto-priced .upcharge-chip {
-  display: block;
-  width: 100%;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 10%, white);
-  border-radius: 3px;
-  padding: 1px 4px;
-  margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-}
 .t-in.auto-priced:hover {
   background: linear-gradient(180deg, color-mix(in oklab, var(--accent-soft) 90%, white), color-mix(in oklab, var(--accent-soft) 60%, white));
   border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
 }
+/* Tiny ⓘ glyph appended to the AUTO/MANUAL chip when upcharges apply.
+   Native title= tooltip on the parent reveals the full upcharge text on
+   hover (e.g. "+$1 2XLT · +$2 3XLT · +$3 4XLT") — zero JS popover. */
+.upcharge-info {
+  display: inline-block;
+  margin-left: 3px;
+  font-size: 10px;
+  line-height: 1;
+  color: var(--accent);
+  cursor: help;
+  vertical-align: 0.5px;
+}
+.auto-badge--manual .upcharge-info { color: #7e22ce; }
 
 /* Unavailable size cell — hard-blocked. Renders <span class="sz-na">N/A</span>
    instead of an <input>, so no keystroke can land. Rep clicks the $ icon
@@ -1739,7 +1735,9 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
   line-height: 1.4;
 }
 .auto-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1749,6 +1747,10 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
   padding: 1px 4px;
   border-radius: 3px;
   flex-shrink: 0;
+}
+.auto-badge--manual {
+  color: #7e22ce;
+  background: color-mix(in oklab, #c084fc 18%, white);
 }
 .t-in.t-in-money { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
 
@@ -1774,28 +1776,15 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
 }
 .restore-auto-link:hover { color: var(--accent-hover); }
 
-/* Upcharge chip variant when row is in manual override mode — same look as
-   the auto-priced chip but rendered below the manual <input> instead of
-   inside the auto-priced button. */
-.manual-price-cell .upcharge-chip {
-  display: block;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 10%, white);
-  border-radius: 3px;
-  padding: 1px 4px;
+/* Manual-price meta row — sits under the <input> showing the MANUAL chip
+   (with optional ⓘ for upcharge tooltip) and the "restore auto" link
+   side-by-side. Mirrors the auto-priced cell's compactness. */
+.manual-price-cell .manual-price-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
   margin-top: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-.manual-price-cell .upcharge-chip--manual {
-  /* When showing under a manual override, dim slightly to signal "informational only" */
-  opacity: 0.85;
-  font-style: italic;
 }
 
 /* ===========================================================
@@ -1809,57 +1798,54 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
    2026-05-01: tighter accent left-border, body font for prose, mono only
    for the SKU + numbers (so it reads as data not as a wall of text). */
 tr.pf-breakdown-row {
-  background: color-mix(in oklab, var(--accent-soft) 25%, white);
+  background: transparent;
 }
 tr.pf-breakdown-row > td {
   border: 0;
-  border-bottom: 1px solid color-mix(in oklab, var(--line) 80%, var(--accent));
-  border-left: 2px solid var(--accent);
-  padding: 5px 12px 6px;
-  font-size: 11px;
+  border-bottom: 1px solid var(--line);
+  padding: 3px 12px 4px 30px;
+  font-size: 10px;
   font-style: normal;
-  line-height: 1.5;
-  color: var(--ink-2);
+  line-height: 1.45;
+  color: var(--ink-3);
   vertical-align: top;
   height: auto !important;
   white-space: normal;
 }
 tr.pf-breakdown-row--manual > td {
-  background: color-mix(in oklab, #faf5ff 70%, white);  /* purple tint matches manual-cost pill */
-  border-left-color: #a855f7;
+  background: color-mix(in oklab, #faf5ff 40%, white);
 }
 .pf-bd-arrow {
   display: inline-block;
-  margin-right: 6px;
-  color: var(--accent);
+  margin-right: 4px;
+  color: var(--ink-4);
   font-style: normal;
-  font-weight: 600;
+  font-weight: 400;
   font-size: 10px;
   position: relative;
-  top: -1px;
+  top: 0;
 }
 .pf-bd-prefix {
   font-style: normal;
   font-weight: 600;
   font-size: 10px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   color: var(--ink-3);
-  margin-right: 8px;
+  margin-right: 6px;
 }
 .pf-bd-segments {
   font-family: var(--font-mono);
   font-style: normal;
-  font-size: 11px;
-  color: var(--ink);
+  font-size: 10px;
+  color: var(--ink-2);
 }
 .pf-bd-seg {
   display: inline;
   white-space: nowrap;
 }
 .pf-bd-seg strong {
-  color: var(--accent-ink);
-  font-weight: 700;
+  color: var(--ink);
+  font-weight: 600;
 }
 .pf-bd-sizes {
   margin: 0 4px 0 4px;
@@ -1958,23 +1944,38 @@ tr.pf-breakdown-row--manual > td {
   background: transparent;
   border: 1px solid var(--line);
   border-radius: 4px;
-  width: 22px;
   height: 22px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-2);
+  min-width: 22px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-3);
   cursor: pointer;
   flex-shrink: 0;
-  padding: 0;
+  padding: 0 4px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 3px;
+  line-height: 1;
 }
-.manual-cost-toggle:hover { background: var(--surface-2); color: var(--ink); }
+.manual-cost-toggle .manual-cost-icon {
+  font-size: 12px;
+  line-height: 1;
+  display: inline-block;
+  transform: translateY(-0.5px);
+}
+.manual-cost-toggle .manual-cost-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.manual-cost-toggle:hover { background: var(--surface-2); color: var(--ink); border-color: var(--ink-4); }
 .manual-cost-toggle.on {
   background: #faf5ff;
   border-color: #c084fc;
   color: #7e22ce;
+  padding: 0 6px;
 }
 
 .manual-cost-pill {

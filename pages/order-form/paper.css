@@ -296,11 +296,11 @@
 .p-table col.c-color { width: 12%; }
 .p-table col.c-desc  { width: 21%; }   /* fits "Carhartt Canvas Work Dungaree" */
 .p-table col.c-sz    { width: 3.8%; }  /* × 8 = 30.4% */
-.p-table col.c-other { width: 10.6%; } /* "Other sizes" — room for chips */
+.p-table col.c-other { width: 9.6%; } /* "Other sizes" — room for chips */
 /* Style cell input fills its td so longer codes (J790ST, PC61LS) show fully */
 .p-table .sel-wrap .style-cell .combobox { flex: 1 1 auto; min-width: 0; }
 .p-table .sel-wrap .style-cell .combobox .cell-input { width: 100%; }
-.p-table col.c-price { width: 6%; }
+.p-table col.c-price { width: 7%; }
 .p-table col.c-total { width: 8%; }    /* fits $1,234.56 + comma */
 /* Non-standard size cell — let it flow without forcing min-height */
 .p-table td.nss-td { padding: 0; vertical-align: middle; }
@@ -682,8 +682,36 @@
 .p-table td .sz-inv-badge {
   transition: opacity 0.15s ease;
 }
-.p-table td:not(.sz-out-of-stock):not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-badge:not(.sz-inv-over):not(.sz-inv-low) {
-  opacity: 0.45;
+/* DEFAULT (resting state, plenty/green): collapse the badge to a tiny
+   coloured dot. Hide the digits and render a 6px ● via ::before so the cell
+   carries an at-a-glance "stock OK" indicator without a wall of numbers
+   under every row. Amber/red/zero/over/unknown badges stay as numbers — they
+   carry warnings. Hover/focus the cell to reveal the digit count.
+   Implementation note: we hide the digits via `color: transparent` +
+   `font-size: 1px` (not 0 — Chrome doesn't transition font-size:0 reliably
+   when it's also the parent of a ::before pseudo). The digit is invisible
+   either way; the dot is rendered via ::before at 6px. */
+.p-table td:not(.sz-out-of-stock):not(.sz-overflow):not(:focus-within):not(:hover)
+  .sz-inv-badge.sz-inv-good {
+  color: transparent;
+  text-indent: -9999px;        /* nuke the digit text completely (no Chrome flicker) */
+  overflow: hidden;
+}
+.p-table td:not(.sz-out-of-stock):not(.sz-overflow):not(:focus-within):not(:hover)
+  .sz-inv-badge.sz-inv-good::before {
+  content: '●';
+  display: block;
+  text-indent: 0;
+  font-size: 6px;
+  line-height: 1;
+  color: #15803d;             /* matches sz-inv-good green */
+  margin-top: 1px;
+}
+/* Unknown / not-stocked-locally — keep a soft 0.6 opacity (not a dot, since
+   they aren't "OK" — they're "no data"). Hover restores full opacity. */
+.p-table td:not(:focus-within):not(:hover) .sz-inv-badge.sz-inv-unknown,
+.p-table td:not(:focus-within):not(:hover) .sz-inv-badge.sz-inv-not-local {
+  opacity: 0.6;
 }
 .p-table td:hover .sz-inv-badge,
 .p-table td:focus-within .sz-inv-badge {
