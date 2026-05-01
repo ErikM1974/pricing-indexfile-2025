@@ -39,7 +39,7 @@ function prettyPrintSize(s) {
 // pricing-bundle). The picker pulls its options FROM this list, filtered
 // to anything not already in the standard XS-4XL grid. No hardcoded size
 // list — whatever SanMar lists for the product is what shows.
-function NonStandardSizePicker({ row, onChange, availableSizes }) {
+function NonStandardSizePicker({ row, onChange, availableSizes, inventory }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef(null);
 
@@ -94,25 +94,40 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
 
   return (
     <div className="nss-cell" ref={wrap}>
-      {enteredNonStd.map(s => (
-        <span key={s} className="nss-chip">
-          <span className="nss-chip-label">{prettyPrintSize(s)}</span>
-          <input
-            className="nss-chip-qty"
-            inputMode="numeric"
-            value={sizes[s] || ''}
-            onChange={(e) => setSize(s, e.target.value)}
-            placeholder="0"
-          />
-          <button
-            type="button"
-            className="nss-chip-remove"
-            onClick={() => setSize(s, '')}
-            aria-label={`Remove ${s}`}
-            tabIndex={-1}
-          >×</button>
-        </span>
-      ))}
+      {enteredNonStd.map(s => {
+        // SanMar inventory badge for non-standard sizes (5XL, 6XL, XXL, etc.).
+        // Same lookup pattern as the standard grid cells — keys match the
+        // SanMar endpoint's named-size response.
+        const invAvailable = inventory?.bySize?.[s];
+        const invKnown = inventory?.status === 'ok' && Number.isFinite(Number(invAvailable));
+        const cellQty = Number(sizes[s]) || 0;
+        const klass = invKnown && window.OrderFormInventory
+          ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
+          : 'unknown';
+        return (
+          <span key={s} className="nss-chip">
+            <span className="nss-chip-label">{prettyPrintSize(s)}</span>
+            <input
+              className="nss-chip-qty"
+              inputMode="numeric"
+              value={sizes[s] || ''}
+              onChange={(e) => setSize(s, e.target.value)}
+              placeholder="0"
+              title={invKnown ? `SanMar stock: ${invAvailable.toLocaleString()} ${prettyPrintSize(s)}` : ''}
+            />
+            <button
+              type="button"
+              className="nss-chip-remove"
+              onClick={() => setSize(s, '')}
+              aria-label={`Remove ${s}`}
+              tabIndex={-1}
+            >×</button>
+            {invKnown && (
+              <span className={`sz-inv-badge sz-inv-${klass} nss-chip-inv`}>{invAvailable.toLocaleString()}</span>
+            )}
+          </span>
+        );
+      })}
       <button type="button" className="nss-add-btn" onClick={() => setOpen(o => !o)}>+ Add</button>
       {open && (
         <div className="nss-menu">
@@ -392,9 +407,23 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               }}
               placeholder="—"
             />
-            {sizeMode === 'cap-osfa' && (
-              <span className="size-collapsed-hint">One Size Fits All</span>
-            )}
+            {sizeMode === 'cap-osfa' && (() => {
+              // Inventory badge for OSFA — only render for cap-osfa, not single-qty
+              // (sticker/emblem are custom products, not SanMar fulfillment).
+              const invAvailable = inventory.bySize?.['OSFA'];
+              const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
+              return (
+                <>
+                  <span className="size-collapsed-hint">One Size Fits All</span>
+                  {invKnown && (
+                    <span
+                      className={`sz-inv-badge sz-inv-${window.OrderFormInventory.classifyInventory(Number(collapsedQty) || 0, invAvailable)}`}
+                      title={`SanMar stock: ${invAvailable.toLocaleString()} OSFA`}
+                    >{invAvailable.toLocaleString()}</span>
+                  )}
+                </>
+              );
+            })()}
           </div>
         </td>
       ) : sizeMode === 'custom-sizes' ? (
@@ -402,10 +431,17 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
         // standard sizing (fitted caps S/M/L/XL, fitted-exact 7 1/8 etc.,
         // pants W×L, anything else SanMar reports). One labeled qty input
         // per available size; spans colspan=9 same as cap-osfa.
+        // Inventory badge per cell — same SanMar lookup as the standard grid.
         <td colSpan={9} className="size-collapsed size-collapsed--custom-sizes">
           <div className="size-collapsed-inner size-collapsed-inner--multi">
             {availableSizes.map(sz => {
               const key = String(sz);
+              const invAvailable = inventory.bySize?.[key];
+              const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
+              const cellQty = Number(row.sizes?.[key]) || 0;
+              const klass = invKnown
+                ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
+                : 'unknown';
               return (
                 <label key={key} className="size-custom-cell">
                   <span className="size-custom-label">{prettyPrintSize(key)}</span>
@@ -420,7 +456,11 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                       update({ sizes: next });
                     }}
                     placeholder="—"
+                    title={invKnown ? `SanMar stock: ${invAvailable.toLocaleString()} ${prettyPrintSize(key)}` : ''}
                   />
+                  {invKnown && (
+                    <span className={`sz-inv-badge sz-inv-${klass}`}>{invAvailable.toLocaleString()}</span>
+                  )}
                 </label>
               );
             })}
@@ -489,7 +529,7 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               </td>
             );
           })}
-          <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} availableSizes={availableSizes} /></td>
+          <td className="nss-td"><NonStandardSizePicker row={row} onChange={update} availableSizes={availableSizes} inventory={inventory} /></td>
         </>
       )}
       <td>

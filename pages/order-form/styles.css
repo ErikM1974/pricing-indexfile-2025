@@ -807,6 +807,25 @@ body {
   border-radius: 50%;
 }
 .nss-chip-remove:hover { color: #b02020; background: rgba(176,32,32,0.08); }
+
+/* Inventory badge inside an Other-sizes chip (5XL/6XL/XXL etc.). The
+   standard `.sz-inv-badge` rule positions the badge below the input via
+   `display:block` — inside a chip we want it inline so the chip stays
+   tidy on one line. Show it after the X remove button. */
+.nss-chip-inv {
+  display: inline !important;
+  margin-left: 2px !important;
+  margin-top: 0 !important;
+  font-size: 9px;
+  padding: 0 3px;
+  border-radius: 6px;
+  background: rgba(0,0,0,0.04);
+}
+
+/* Inventory badges inside the custom-sizes mini-grid (tall sizes, fitted
+   caps, pants W×L). The qty inputs stack vertically inside their .size-
+   custom-cell label, so the badge under the input is fine — the existing
+   .sz-inv-badge rule already does display:block. No override needed. */
 .nss-add-btn {
   border: 1px dashed #bbb;
   background: #fff;
