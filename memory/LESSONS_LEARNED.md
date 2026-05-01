@@ -81,11 +81,14 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### OnSite Needs Pre-Suffixed PNs for Extended Sizes
-**Problem:** Extended sizes lost suffix — J790 should be J790_2X for 2XL.
-**Root Cause:** OnSite's Size Translation Table only assigns columns, never modifies PN.
-**Solution:** Use `getPartNumber(item.StyleNumber, size)` for all LinesOE entries.
-**Prevention:** Always use `getPartNumber()` from `size-suffix-config.js`.
+### OnSite Size Translation Table Appends Suffixes — Send BASE PN (CORRECTED 2026-05-01)
+**Problem:** Order Form's first real ShopWorks import showed double-suffixed PNs: `PC61Y_XS_XS`, `112_OSFA_OSFA`, `NE1000_S_M_S/M`. This entry previously said "Size Translation Table only assigns columns" — that was wrong.
+**Root Cause:** OnSite's Size Translation Table has an "OnSite Part Number Modifier" column that **does append** the configured suffix (`_XS`, `_2X`, `_3XL`, …) to the incoming PN, in addition to mapping the size to Size01-06. Pre-suffixing on the client causes a double-stamp.
+**Solution:** Push the BASE PN + plain size string (`PC61Y` + `XS`); OnSite produces `PC61Y_XS`. Fix landed in `server.js` `/api/submit-order-form` line-items builder.
+**Prevention:**
+  - For **MO push payloads**: send base PN, plain size — never pre-suffix.
+  - For **frontend display + SanMar inventory API**: the suffixed PN is still correct (SanMar's catalog lists each extended size as its own SKU). `orderFormSizeSuffix()` is the right helper for those paths.
+  - For other integrations using `getPartNumber()`: verify whether your push target's translation table also appends modifiers before pre-suffixing in code.
 
 ---
 
@@ -117,13 +120,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Problem:** Full design blocks caused ShopWorks to create duplicate designs.
 **Solution:** Known design → `{id_Design: parseInt(number)}`. Unknown → `Designs: []` (empty, let humans handle).
 **Prevention:** Always link by ID. Don't auto-create placeholder records.
-
----
-
-### All Sizes Showing as Adult/S (id_Integration Must Be Valid)
-**Problem:** Imported orders show correct product but every item is Adult/S.
-**Root Cause:** Missing or zero `id_Integration` — ShopWorks doesn't know which Size Translation Table.
-**Prevention:** Every store config MUST have valid `id_Integration`. Check for `"id_Integration": 0`.
 
 ---
 

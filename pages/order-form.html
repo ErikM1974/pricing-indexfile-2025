@@ -37,9 +37,10 @@
 <script src="../shared_components/js/sticker-pricing-service.js?v=20260502-1"></script>
 <script src="../shared_components/js/emblem-pricing-service.js?v=20260502-1"></script>
 
-<!-- ShopWorks size-suffix mapping (PC61 → PC61_2X / PC61_3XL etc.) shared
-     with server.js so the form's breakdown row + the MO push agree. -->
-<script src="../shared_components/js/order-form-size-suffix.js?v=20260502-2"></script>
+<!-- ShopWorks size-suffix mapping (PC61 → PC61_2XL / PC61_3XL etc.) — used
+     for breakdown-row display + SanMar inventory check. The MO push itself
+     sends BASE PNs; ShopWorks's Size Translation Table appends the modifier. -->
+<script src="../shared_components/js/order-form-size-suffix.js?v=20260502-3"></script>
 
 <!-- SanMar inventory — ManageOrders service + order-form's multi-SKU wrapper.
      Powers the per-size stock badges and out-of-stock blocking on each row. -->

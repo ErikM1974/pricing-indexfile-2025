@@ -1669,7 +1669,7 @@ New browser form at `/pages/order-form.html`. Staff-facing by default; supports 
 
 5. **`id_Artist: 224` is the integration default, not a 3-Day Tees artifact.** Set at OnSite connection level ("Artist Created By: 224"). Every order through this integration inherits it unless `designs[n].artistId` is explicitly passed. Safe to leave for the Order Form.
 
-6. **Size Translation Table in OnSite integration config confirms size suffixes.** Webstore `2XL` → modifier `_2X`; `3XL`/`4XL`/`5XL`/`6XL`/`XS` → full-form `_3XL`/`_4XL`/`_5XL`/`_6XL`/`_XS`. `server.js` `orderFormSizeSuffix()` produces matching SKUs (e.g. `PC54_2X` for 2XL). Verified in live push JSON.
+6. **Size Translation Table in OnSite integration config APPENDS suffixes — DO NOT pre-suffix on push (CORRECTED 2026-05-01).** The integration's "OnSite Part Number Modifier" column actively appends modifiers on ingest: `2XL` → `_2X`; `3XL`/`4XL`/`5XL`/`6XL`/`XS` → `_3XL`/`_4XL`/`_5XL`/`_6XL`/`_XS`. **Push the BASE part number** (`PC61Y`, `112`, `NE1000`) plus the plain `size` field — OnSite produces `PC61Y_XS`, `112_OSFA`, `NE1000_S/M`. Pre-suffixing in code → double-stamp (`PC61Y_XS_XS`). The frontend breakdown row + `inventory-check.js` STILL use `orderFormSizeSuffix()` because (a) display must match what OnSite eventually outputs and (b) the SanMar inventory API genuinely requires the suffixed PN — only this push is base-PN.
 
 ---
 

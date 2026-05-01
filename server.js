@@ -1679,13 +1679,6 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 //   - Uses OF-MMDD-nn as ExtOrderID when submitted via a customer share link
 // ============================================================================
 
-// Part-number size-suffix helper (matches memory/MANAGEORDERS_COMPLETE_REFERENCE.md §Size Modifier Reference).
-// Keep in sync with the proxy's manageorders-push-client normalizer — the proxy also appends suffixes,
-// but we append here too so logs at this layer show the final SKU form.
-// Shared with the order form's frontend breakdown row. Editing the suffix
-// rules → edit shared_components/js/order-form-size-suffix.js (single source).
-const { orderFormSizeSuffix } = require('./shared_components/js/order-form-size-suffix.js');
-
 // Generate Order Form order ID — OF-NNNN (globally sequential, zero-padded to 4 digits).
 // Reuses the proxy's race-safe counter endpoint that Embroidery uses (same as EMB-2026-N).
 // Response shape: { prefix: "OF", year: 2026, sequence: 42 } → we return "OF-0042".
@@ -1865,9 +1858,11 @@ app.post('/api/submit-order-form', async (req, res) => {
 
     // --- Build lineItems (one row × qty-bearing size = one line item) ---
     // Iterate every size key on the row (standard XS-4XL plus any non-standard
-    // entries: OSFA, YS-YXL, LT-4XLT, 5XL-7XL). orderFormSizeSuffix() routes each
-    // to the correct ShopWorks part-number suffix; the proxy's size-translation
-    // table maps the size string to the correct Size01-06 column on the line item.
+    // entries: OSFA, YS-YXL, LT-4XLT, 5XL-7XL). We send the BASE part number
+    // + plain size string; ShopWorks's Size Translation Table on ingest both
+    // (a) maps the size to the correct Size01-06 column AND (b) appends the
+    // configured per-size modifier (`_XS`, `_2X`, `_3XL`, …) to the PN.
+    // Pre-suffixing here would double-stamp it (PC61Y_XS_XS).
     const lineItems = [];
     const skippedLines = [];   // sizes with qty>0 the engine couldn't price — returned to caller
     rows.forEach(r => {
@@ -1913,8 +1908,14 @@ app.post('/api/submit-order-form', async (req, res) => {
           console.warn('[Order Form Submit] Skipping unpriced line:', partBase, sz, 'qty=' + qty);
           return;
         }
+        // Send the BASE part number + plain size. ShopWorks's Size Translation
+        // Table appends the per-size modifier (`_XS`, `_2X`, `_3XL`, etc.) on
+        // ingest. Pre-suffixing here would double-stamp it (PC61Y_XS_XS).
+        // The frontend breakdown row + inventory wrapper still use
+        // orderFormSizeSuffix() — display + SanMar inventory needs the
+        // suffixed PN. Only this MO push uses the base PN.
         lineItems.push({
-          partNumber: orderFormSizeSuffix(partBase, sz),
+          partNumber: partBase,
           description: desc,
           color: color,
           catalogColor: catalogColor,
