@@ -1,123 +1,84 @@
-// Order Form — SanMar inventory check.
+// Order Form — SanMar nationwide inventory check.
 //
-// Wraps ManageOrdersInventoryService with the order-form's specific needs:
-//   1. Multi-SKU fan-out — base PN gives Size01-06 = XS-2XL; extended sizes
-//      (3XL/4XL/OSFA/fitted/W×L) need separate queries with the suffixed PN.
-//      Each suffixed PN has a single size, so its `totalStock` IS that size's
-//      inventory regardless of which Size0N column it occupies in ShopWorks.
-//   2. Color resolution — endpoint requires CATALOG_COLOR. We trust the
-//      row's `catalogColor` first, fall back to `colorName`, treat both
-//      missing as "unknown" (graceful — no badge, no block).
-//   3. Result shape: { bySize: { 'S': 3229, '2XL': 145, 'OSFA': 12, '?'.. },
-//      cacheAge, status: 'ok' | 'unknown' | 'error' }.
+// Replaces the older multi-SKU fan-out against /api/manageorders/inventorylevels
+// (NWCA local warehouse, color filter silently ignored, hardcoded Size01-06
+// mapping) with a single call to /api/sanmar/inventory/{style}?color=X — the
+// endpoint already used by calculator-inventory.js + the product page.
 //
-// Caching: leverages the service's built-in 5-min Map cache per
-// (partNumber, color) — same fan-out across many rows costs nothing after
-// the first.
+// Why the switch (verified live 2026-05-01):
+//   - The MO endpoint ignores PartColor → all colors return identical numbers.
+//   - The MO endpoint Size01-06 mapping is wrong for extended PNs (Size05 of
+//     PC61_2X means "2XL stock for that variant", not "XL stock").
+//   - The SanMar endpoint honors color server-side, returns ALL sizes in one
+//     response with REAL size labels (S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL,
+//     XXL, S/M, L/XL, OSFA, …) — no suffix mapping needed at all.
+//   - PC61 Fiery Red: MO endpoint says 0 / SanMar endpoint says 33,419. Erik's
+//     test caught this discrepancy.
+//
+// The endpoint expects CATALOG_COLOR (e.g. "Deep Marine"), not COLOR_NAME. The
+// form stores `row.catalogColor` after a color pick. Falls back to colorName
+// for legacy drafts; if both empty, returns "unknown" (graceful — no badges).
+//
+// Caching: 5-minute Map cache keyed by `style::catalogColor` so quickly
+// switching back-and-forth between two colors doesn't re-hit the API.
 
 (function () {
-  let _svc = null;
-  function svc() {
-    if (!_svc) _svc = new window.ManageOrdersInventoryService();
-    return _svc;
-  }
-
-  // Sizes the BASE PN's Size01-06 mapping covers natively.
-  const BASE_PN_SIZES = new Set(['XS', 'S', 'M', 'L', 'XL', '2XL']);
+  const BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+  const CACHE_TTL_MS = 5 * 60 * 1000;
+  const cache = new Map();
 
   /**
    * Fetch per-size inventory for a row.
-   * @param {string} style - the rep-typed style (e.g. PC61, NE1000, 112)
-   * @param {string} catalogColor - SanMar API color value (e.g. AthMar)
-   * @param {string[]} sizesNeeded - which sizes the form has columns for
-   * @returns {Promise<{ bySize: Object, cacheAge: string, status: string }>}
+   * @param {string} style          The base style number (e.g. PC61, NE1000, 112)
+   * @param {string} catalogColor   SanMar CATALOG_COLOR (e.g. "Deep Marine", "Fiery Red")
+   * @param {string[]} _sizesNeeded  Ignored — endpoint returns all sizes for the color.
+   *                                 Kept for backward-compat with the old wrapper signature.
+   * @returns {Promise<{bySize, status, grandTotal, cacheAge}>}
    */
-  async function getInventoryForRow(style, catalogColor, sizesNeeded) {
+  async function getInventoryForRow(style, catalogColor, _sizesNeeded) {
     const styleU = String(style || '').trim().toUpperCase();
     const colorU = String(catalogColor || '').trim();
-    const sizes = (sizesNeeded || []).map(s => String(s).toUpperCase());
-    if (!styleU || !colorU || !sizes.length) {
-      return { bySize: {}, cacheAge: '', status: 'unknown' };
+    if (!styleU || !colorU) {
+      return { bySize: {}, status: 'unknown', grandTotal: 0, cacheAge: '' };
     }
 
-    const bySize = {};
-    let cacheAge = '';
-    let anyOk = false;
-    let anyError = false;
-    let anyNotStockedLocally = false;
-    const carriedColorsAcrossQueries = new Set();
+    const cacheKey = `${styleU}::${colorU}`;
+    const cached = cache.get(cacheKey);
+    if (cached && (Date.now() - cached.t) < CACHE_TTL_MS) {
+      return cached.data;
+    }
 
-    // Helper: assign inventory val to a size, but never overwrite a non-zero
-    // value with zero (defensive against partial fetches).
-    const assign = (sz, val) => {
-      const n = Number(val) || 0;
-      if (bySize[sz] == null) bySize[sz] = n;
-      else if (n > 0) bySize[sz] = n;
-    };
-
-    // 1) Base PN — gives XS/S/M/L/XL/2XL via the service's hard-coded
-    //    Size01-06 mapping. Only fetch if the row needs any of those sizes.
-    const wantsBaseSizes = sizes.some(s => BASE_PN_SIZES.has(s));
-    if (wantsBaseSizes) {
-      try {
-        const base = await svc().checkInventory(styleU, colorU);
-        if (base?.notStockedLocally) {
-          anyNotStockedLocally = true;
-          (base.carriedColors || []).forEach(c => carriedColorsAcrossQueries.add(c));
-        } else if (base?.sizeBreakdown) {
-          anyOk = true;
-          if (base.cacheAge) cacheAge = base.cacheAge;
-          Object.entries(base.sizeBreakdown).forEach(([sz, n]) => {
-            if (sizes.includes(sz)) assign(sz, n);
-          });
+    const url = `${BASE_URL}/api/sanmar/inventory/${encodeURIComponent(styleU)}?color=${encodeURIComponent(colorU)}`;
+    try {
+      const r = await fetch(url);
+      if (!r.ok) {
+        // 404 = style/color combo doesn't exist at SanMar — gracefully unknown.
+        if (r.status === 404) {
+          const result = { bySize: {}, status: 'unknown', grandTotal: 0, cacheAge: '' };
+          cache.set(cacheKey, { t: Date.now(), data: result });
+          return result;
         }
-      } catch (e) {
-        anyError = true;
+        return { bySize: {}, status: 'error', grandTotal: 0, cacheAge: '' };
       }
-    }
-
-    // 2) Extended / non-standard sizes — query each suffixed PN. The
-    //    suffixed PN has a single size variant, so its `totalStock` IS the
-    //    inventory for that size (regardless of which Size0N slot ShopWorks
-    //    uses internally for that PN).
-    const extras = sizes.filter(s => !BASE_PN_SIZES.has(s));
-    if (extras.length > 0) {
-      const suffixFn = window.orderFormSizeSuffix || ((p, s) => `${p}_${s}`);
-      const fanOut = extras.map(async (sz) => {
-        const pn = suffixFn(styleU, sz);
-        if (pn === styleU) return; // S/M/L/XL go to base; no suffix produced
-        try {
-          const r = await svc().checkInventory(pn, colorU);
-          if (r?.notStockedLocally) {
-            anyNotStockedLocally = true;
-            (r.carriedColors || []).forEach(c => carriedColorsAcrossQueries.add(c));
-          } else if (r?.sizeBreakdown != null || r?.totalStock != null) {
-            anyOk = true;
-            if (r.cacheAge && !cacheAge) cacheAge = r.cacheAge;
-            assign(sz, r.totalStock);
-          }
-        } catch (e) { anyError = true; }
+      const data = await r.json();
+      const bySize = {};
+      (data.inventory || []).forEach(s => {
+        const sz = String(s.size || '').trim();
+        if (!sz) return;
+        bySize[sz] = Number(s.totalQty) || 0;
       });
-      await Promise.all(fanOut);
+      const result = {
+        bySize,
+        status: 'ok',
+        grandTotal: Number(data.grandTotal) || 0,
+        cacheAge: 'live',
+      };
+      cache.set(cacheKey, { t: Date.now(), data: result });
+      return result;
+    } catch (err) {
+      console.warn('[OrderFormInventory] Fetch failed for', styleU, colorU, err);
+      return { bySize: {}, status: 'error', grandTotal: 0, cacheAge: '' };
     }
-
-    // Status precedence (most-specific wins):
-    //   ok                — at least one query returned matching-color stock
-    //   not-stocked-local — color not carried locally, but other colors are
-    //                       (form should show "Not stocked locally — carried: X, Y")
-    //   error             — all queries failed (network) — graceful, no badges
-    //   unknown           — no data / nothing to query — graceful, no badges
-    let status = 'unknown';
-    if (anyOk) status = 'ok';
-    else if (anyNotStockedLocally) status = 'not-stocked-local';
-    else if (anyError) status = 'error';
-
-    return {
-      bySize,
-      cacheAge,
-      status,
-      carriedColors: Array.from(carriedColorsAcrossQueries).sort(),
-    };
   }
 
   // Render-friendly classifier — returns 'good' | 'low' | 'over' | 'oos' | 'unknown'.
