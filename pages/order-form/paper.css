@@ -271,7 +271,7 @@
   padding: 0;
   text-align: left;
   vertical-align: middle;
-  height: 50px;
+  height: 56px;
 }
 .p-table thead th {
   background: #fafafa;
@@ -327,6 +327,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+/* Description textarea — 2-line stacking so long product names like
+   "Port & Co Women's Core Cotton Tee" wrap fully instead of truncating. */
+.p-table td .desc-cell textarea.t-in-desc {
+  white-space: normal;
+  text-overflow: clip;
+  overflow: hidden;
+  resize: none;
+  line-height: 1.25;
+  min-height: 38px;
+  max-height: 56px;
+  font-family: inherit;
+  font-size: 13px;
+}
+.p-table td .desc-cell textarea.t-in-desc:focus {
+  overflow: auto;             /* if user types something massive, allow scroll on focus */
+  background: color-mix(in oklab, var(--accent) 8%, #fff);
+  box-shadow: inset 0 -2px 0 var(--accent);
 }
 .p-table td .desc-cell .row-thumb {
   flex: 0 0 40px;

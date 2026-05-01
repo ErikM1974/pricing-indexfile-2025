@@ -1,5 +1,5 @@
 // Paper-style form view — boxed fields, looks like the original PDF but editable.
-function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode }) {
+function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox }) {
   const total = useMemo(() => {
     let t = 0;
     PAPER_SIZES.forEach(s => { t += Number(row.sizes[s] || 0); });
@@ -33,11 +33,23 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode }) {
       <td>
         <div className="desc-cell">
           {row.imageUrl && (
-            <a className="row-thumb" href={row.imageUrl} target="_blank" rel="noopener" title="Open full image">
+            <button
+              type="button"
+              className="row-thumb-btn"
+              onClick={() => onLightbox && onLightbox(row.imageUrl)}
+              title="Click to view full image"
+              aria-label="View product image"
+            >
               <img src={row.imageUrl} alt="" loading="lazy" />
-            </a>
+            </button>
           )}
-          <input className="t-in" value={row.desc} onChange={e => update({ desc: e.target.value })} title={row.desc} />
+          <textarea
+            className="t-in t-in-desc"
+            rows={2}
+            placeholder="Description"
+            value={row.desc}
+            onChange={e => update({ desc: e.target.value })}
+          />
         </div>
       </td>
       {PAPER_SIZES.map(s => (
@@ -249,6 +261,15 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
   const [caspioMsg, setCaspioMsg] = useState(null);
   const [shareUrl, setShareUrl] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [lightboxUrl, setLightboxUrl] = useState(null);
+
+  // Close lightbox on ESC. Listener only attached while it's open.
+  useEffect(() => {
+    if (!lightboxUrl) return;
+    function onKey(e) { if (e.key === 'Escape') setLightboxUrl(null); }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [lightboxUrl]);
 
   async function submit() {
     if (submitting) return;
@@ -463,6 +484,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
               onChange={(next) => onRowChange(i, next)}
               canRemove={rows.length > 1}
               customerMode={customerMode}
+              onLightbox={setLightboxUrl}
             />
           ))}
         </tbody>
@@ -593,6 +615,22 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           {customerMode ? 'Submit order' : 'Push to ShopWorks'} <Icon name="check" size={14}/>
         </button>
       </div>
+
+      {lightboxUrl && (
+        <div className="lightbox" onClick={() => setLightboxUrl(null)} role="dialog" aria-modal="true">
+          <button
+            type="button"
+            className="lightbox-close"
+            onClick={() => setLightboxUrl(null)}
+            aria-label="Close image"
+          >×</button>
+          <img
+            src={lightboxUrl}
+            alt="Product image"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
 
     </div>
   );

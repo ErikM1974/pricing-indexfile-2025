@@ -264,12 +264,15 @@ body.print-preview .print-sheet {
 body:not(.print-preview) .print-toolbar { display: none; }
 @media print { .print-toolbar { display: none !important; } }
 
-/* Hide screen-only swatch / product thumbnails on print */
+/* Hide screen-only swatch / product thumbnails / lightbox on print */
 @media print {
   .row-thumb { display: none !important; }
+  .row-thumb-btn { display: none !important; }
   .color-swatch { display: none !important; }
   .color-caret { display: none !important; }
   .color-select-menu { display: none !important; }
+  .lightbox { display: none !important; }
+  .lightbox-close { display: none !important; }
 }
 
 /* Stylized logo mark for the print sheet (no raster) */
