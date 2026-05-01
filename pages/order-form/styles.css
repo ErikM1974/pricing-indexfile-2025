@@ -1535,8 +1535,9 @@ td.size-collapsed {
   border-left: 1px solid color-mix(in oklab, var(--accent) 18%, var(--line));
   padding: 0;
 }
-td.size-collapsed--cap-osfa { background: color-mix(in oklab, #ddd6fe 30%, white); }   /* slight purple — caps */
-td.size-collapsed--single-qty { background: color-mix(in oklab, #fde68a 25%, white); } /* slight amber — stickers/emblems */
+td.size-collapsed--cap-osfa { background: color-mix(in oklab, #ddd6fe 30%, white); }       /* slight purple — caps */
+td.size-collapsed--single-qty { background: color-mix(in oklab, #fde68a 25%, white); }     /* slight amber — stickers/emblems */
+td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, white); }   /* slight blue — non-standard sizes */
 .size-collapsed-inner {
   display: flex;
   align-items: center;
@@ -1572,6 +1573,46 @@ td.size-collapsed--single-qty { background: color-mix(in oklab, #fde68a 25%, whi
   font-style: italic;
   color: var(--ink-3);
   letter-spacing: 0.02em;
+}
+
+/* Custom-sizes mini-grid — one labeled qty input per size, flexed across
+   the span. Each cell stacks its size label above a tight qty input. */
+.size-collapsed-inner--multi {
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 8px;
+  justify-content: center;
+}
+.size-custom-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 56px;
+}
+.size-custom-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.size-custom-qty {
+  width: 50px !important;
+  padding: 4px 6px !important;
+  text-align: center;
+  font-size: 14px !important;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--line)) !important;
+  background: var(--surface) !important;
+}
+.size-custom-qty:focus {
+  outline: none;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 
 /* NonStandardSizePicker availability hint */

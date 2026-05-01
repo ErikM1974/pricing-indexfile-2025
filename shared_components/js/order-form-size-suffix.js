@@ -20,15 +20,30 @@
 // the base unchanged. The function is stateless and safe to call repeatedly.
 
 (function () {
+  // Standard sizes that map to the base SKU with no suffix.
+  const BASE_SKU_SIZES = new Set(['S', 'M', 'L', 'XL']);
+  // Sizes that map to a literal `_<size>` suffix (verified against the CSV).
+  const LITERAL_SUFFIX_SIZES = new Set([
+    'XS', '3XL', '4XL', '5XL', '6XL', '7XL',
+    'LT', 'XLT', '2XLT', '3XLT', '4XLT',
+    'OSFA',
+    'YS', 'YM', 'YL', 'YXL',
+  ]);
+
   function orderFormSizeSuffix(partNumber, size) {
     if (!partNumber || !size) return partNumber || '';
     const base = String(partNumber).trim();
     const s = String(size).trim().toUpperCase();
+    if (BASE_SKU_SIZES.has(s)) return base;             // S, M, L, XL → base SKU
     if (s === '2XL' || s === 'XXL') return `${base}_2X`;
-    if (['XS','3XL','4XL','5XL','6XL','7XL','LT','XLT','2XLT','3XLT','4XLT','OSFA','YS','YM','YL','YXL'].includes(s)) {
-      return `${base}_${s}`;
-    }
-    return base; // S, M, L, XL → base SKU
+    if (LITERAL_SUFFIX_SIZES.has(s)) return `${base}_${s}`;
+    // Fitted / custom sizes (NE1000 S/M, M/L, L/XL · fitted exact 7 1/8 ·
+    // hat sizes 6 7/8 etc.) — sanitize: replace runs of slash/space with a
+    // single underscore. The breakdown row in the order form surfaces the
+    // exact PN being pushed so anomalies are easy to spot. If ShopWorks
+    // uses a different convention for any of these, change this fallback.
+    const sanitized = s.replace(/[\s\/\\\-]+/g, '_').replace(/^_+|_+$/g, '');
+    return sanitized ? `${base}_${sanitized}` : base;
   }
 
   // Browser: expose as a global. Node (server.js): export as a module.

@@ -188,25 +188,34 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const showTotalDollars = totalDollars > 0;
 
   // ----- Size-grid mode -----
-  // Different products have different size models. The XS-4XL grid is wrong
-  // for caps (OSFA-only, like Richardson 112) and useless for stickers /
-  // emblems (single-qty rows). Detect the right mode from availableSizes and
-  // render a collapsed cell when the standard grid doesn't apply.
-  //   'standard'   — XS-4XL columns + Other sizes picker (default)
-  //   'cap-osfa'   — single OSFA cell spanning the size area (most caps)
-  //   'single-qty' — single Qty cell (stickers, emblems)
+  // Different products have different size models. Detect the right mode
+  // from availableSizes + deco method:
+  //   'standard'      — XS-4XL columns + Other picker (most garments)
+  //   'cap-osfa'      — single OSFA cell (Richardson 112, NE201, etc.)
+  //   'custom-sizes'  — horizontal mini-grid of whatever sizes the product
+  //                     actually offers (NE1000: S/M, M/L, L/XL · fitted-
+  //                     exact caps · pants W×L · anything else SanMar lists)
+  //   'single-qty'    — sticker / emblem rows (one qty cell)
   // Falls back to 'standard' until the bundle resolves so the rep can start
   // typing right away. Once availableSizes comes back, the mode locks in.
+  const STANDARD_GRID_SIZES = new Set(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']);
   const sizeMode = (() => {
     if (row.deco === 'sticker' || row.deco === 'emblem') return 'single-qty';
     if (!availableSizes || !availableSizes.length) return 'standard';
     const upper = availableSizes.map(s => String(s).toUpperCase());
     if (upper.length === 1 && upper[0] === 'OSFA') return 'cap-osfa';
+    // If ANY of the product's sizes match the standard XS-4XL grid, render
+    // the standard grid (the rest get added via the "+ Add" picker which
+    // already filters to availableSizes). Only when ZERO standard sizes
+    // apply (e.g. fitted caps with only S/M, M/L, L/XL) do we morph the
+    // grid completely.
+    const hasAnyStandard = upper.some(s => STANDARD_GRID_SIZES.has(s));
+    if (!hasAnyStandard) return 'custom-sizes';
     return 'standard';
   })();
   // The "size key" for collapsed modes — what key in row.sizes carries the qty.
-  // For caps it's 'OSFA' (so orderFormSizeSuffix produces the _OSFA suffix).
-  // For sticker/emblem we use 'STK'/'EMB' for the row.sizes key.
+  // For OSFA caps it's 'OSFA'. For sticker/emblem 'STK'/'EMB'. For custom-
+  // sizes mode each size gets its own key (S/M, L/XL, etc.) — no single key.
   const collapsedSizeKey = sizeMode === 'cap-osfa' ? 'OSFA'
                          : row.deco === 'sticker' ? 'STK'
                          : row.deco === 'emblem' ? 'EMB'
@@ -317,6 +326,35 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             {sizeMode === 'cap-osfa' && (
               <span className="size-collapsed-hint">One Size Fits All</span>
             )}
+          </div>
+        </td>
+      ) : sizeMode === 'custom-sizes' ? (
+        // Custom-sizes mode — horizontal mini-grid for products with non-
+        // standard sizing (fitted caps S/M/L/XL, fitted-exact 7 1/8 etc.,
+        // pants W×L, anything else SanMar reports). One labeled qty input
+        // per available size; spans colspan=9 same as cap-osfa.
+        <td colSpan={9} className="size-collapsed size-collapsed--custom-sizes">
+          <div className="size-collapsed-inner size-collapsed-inner--multi">
+            {availableSizes.map(sz => {
+              const key = String(sz);
+              return (
+                <label key={key} className="size-custom-cell">
+                  <span className="size-custom-label">{key}</span>
+                  <input
+                    className="t-in num size-custom-qty"
+                    inputMode="numeric"
+                    value={row.sizes?.[key] || ''}
+                    onChange={e => {
+                      const v = e.target.value.replace(/[^0-9]/g, '');
+                      const next = { ...row.sizes };
+                      if (v) next[key] = v; else delete next[key];
+                      update({ sizes: next });
+                    }}
+                    placeholder="—"
+                  />
+                </label>
+              );
+            })}
           </div>
         </td>
       ) : (
