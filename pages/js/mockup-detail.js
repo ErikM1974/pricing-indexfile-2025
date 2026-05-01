@@ -2286,6 +2286,13 @@
             logoDimensions = mockup.Logo_Height + ' tall';
         }
 
+        // Build stitch count display string with thousands separators
+        var stitchCountDisplay = '';
+        if (mockup.Stitch_Count != null && mockup.Stitch_Count !== '') {
+            var sc = parseInt(mockup.Stitch_Count, 10);
+            stitchCountDisplay = isNaN(sc) ? String(mockup.Stitch_Count) : sc.toLocaleString();
+        }
+
         if (isCustomerView) {
             // Customer sees expanded info
             fields = [
@@ -2295,6 +2302,7 @@
                 { label: 'Application', value: mockup.Mockup_Type },
                 { label: 'Placement', value: mockup.Print_Location },
                 { label: 'Logo Dimensions', value: logoDimensions },
+                { label: 'Stitch Count', value: stitchCountDisplay },
                 { label: 'Design Size', value: mockup.Design_Size },
                 { label: 'Work Order', value: mockup.Work_Order_Number },
                 { label: 'Size Specs', value: mockup.Size_Specs },
@@ -2309,6 +2317,7 @@
                 { label: 'Garment', value: buildGarmentDisplayValue(mockup) },
                 { label: 'Placement', value: mockup.Print_Location },
                 { label: 'Logo Dimensions', value: logoDimensions },
+                { label: 'Stitch Count', value: stitchCountDisplay },
                 { label: 'Design Size', value: mockup.Design_Size },
                 { label: 'Thread Colors', value: mockup.Thread_Colors },
                 { label: 'Size Specs', value: mockup.Size_Specs },
@@ -2386,6 +2395,10 @@
                 + '  <span class="pmd-field-label">Logo Height</span>'
                 + '  <input type="text" class="pmd-inline-input" id="pmd-logo-height" placeholder="e.g. 3.5" value="' + escapeHtml(mockup.Logo_Height || '') + '">'
                 + '</div>'
+                + '<div class="pmd-field-row pmd-field-row--editable">'
+                + '  <span class="pmd-field-label">Stitch Count</span>'
+                + '  <input type="text" inputmode="numeric" class="pmd-inline-input" id="pmd-stitch-count" placeholder="e.g. 8500" value="' + escapeHtml(mockup.Stitch_Count != null && mockup.Stitch_Count !== '' ? (isNaN(parseInt(mockup.Stitch_Count, 10)) ? String(mockup.Stitch_Count) : parseInt(mockup.Stitch_Count, 10).toLocaleString()) : '') + '">'
+                + '</div>'
                 + '<div class="pmd-field-row pmd-field-row--editable" style="flex-direction:column;gap:4px;">'
                 + '  <span class="pmd-field-label">Thread Colors</span>'
                 + '  <div class="pmd-thread-input-wrapper">'
@@ -2400,6 +2413,7 @@
             // Auto-save on blur for width/height
             var widthInput = document.getElementById('pmd-logo-width');
             var heightInput = document.getElementById('pmd-logo-height');
+            var stitchInput = document.getElementById('pmd-stitch-count');
             var threadInput = document.getElementById('pmd-thread-colors');
 
             if (widthInput) {
@@ -2410,6 +2424,15 @@
             if (heightInput) {
                 heightInput.addEventListener('blur', function () {
                     saveInlineField('Logo_Height', this.value.trim(), this);
+                });
+            }
+            if (stitchInput) {
+                stitchInput.addEventListener('blur', function () {
+                    var raw = this.value.replace(/[^0-9]/g, '');
+                    // Integer column: send null to clear, parsed int otherwise
+                    var val = raw === '' ? null : parseInt(raw, 10);
+                    this.value = val == null ? '' : val.toLocaleString();
+                    saveInlineField('Stitch_Count', val, this);
                 });
             }
             if (threadInput) {
