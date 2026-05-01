@@ -287,21 +287,21 @@
 .p-table .total-head { font-size: 10.5px; }
 /* Column widths sized for landscape (11in paper). Style/Color/Desc widened so
    full text fits without aggressive truncation. */
-/* 2026-05-01: rebalanced — Style and Desc widened so 6-7 char styles
-   ("CTB151", "S608ES") and long product names ("Carhartt Canvas Work
-   Dungaree") fit on one line. Size cells trim slightly (still fit 3-digit
-   qty); Total trims since single-row totals rarely exceed $9,999.
-   Sum: 12 + 12 + 22 + 8×3.8 + 11 + 6 + 6.6 = 100% */
+/* 2026-05-01: rebalanced (revised) — Style and Desc widened so 6-7 char
+   styles ("CTB151", "S608ES") and long product names ("Carhartt Canvas
+   Work Dungaree") fit on one line. Total bumped back up so $240.00 and
+   $1,234.56 fit comfortably (Erik: was getting cut to "$240.0").
+   Sum: 12 + 12 + 21 + 8×3.8 + 10.6 + 6 + 8 = 100% */
 .p-table col.c-style { width: 12%; }   /* fits CTB151, RS3321, S608ES, K500ES, CAR54T, PC61T */
 .p-table col.c-color { width: 12%; }
-.p-table col.c-desc  { width: 22%; }   /* fits "Carhartt Canvas Work Dungaree" without wrap */
+.p-table col.c-desc  { width: 21%; }   /* fits "Carhartt Canvas Work Dungaree" */
 .p-table col.c-sz    { width: 3.8%; }  /* × 8 = 30.4% */
-.p-table col.c-other { width: 11%; }   /* "Other sizes" — room for non-std size chips */
+.p-table col.c-other { width: 10.6%; } /* "Other sizes" — room for chips */
 /* Style cell input fills its td so longer codes (J790ST, PC61LS) show fully */
 .p-table .sel-wrap .style-cell .combobox { flex: 1 1 auto; min-width: 0; }
 .p-table .sel-wrap .style-cell .combobox .cell-input { width: 100%; }
 .p-table col.c-price { width: 6%; }
-.p-table col.c-total { width: 6.6%; }
+.p-table col.c-total { width: 8%; }    /* fits $1,234.56 + comma */
 /* Non-standard size cell — let it flow without forcing min-height */
 .p-table td.nss-td { padding: 0; vertical-align: middle; }
 
