@@ -424,6 +424,13 @@
             dimensions = mockup.Size_Specs; // fallback for legacy records that only have the combined string
         }
 
+        // Stitch count — formatted with thousands separator
+        let stitchCountText = '';
+        if (mockup.Stitch_Count != null && mockup.Stitch_Count !== '') {
+            const sc = parseInt(mockup.Stitch_Count, 10);
+            stitchCountText = isNaN(sc) ? String(mockup.Stitch_Count) : sc.toLocaleString();
+        }
+
         // Status class for left border + hover glow
         const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
         const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
@@ -447,6 +454,7 @@
                     ${mockup.Garment_Info ? `<div class="card-meta-row"><span class="card-meta-label">Garment:</span> ${escapeHtml(mockup.Garment_Info)}</div>` : ''}
                     ${mockup.Print_Location ? `<div class="card-meta-row"><span class="card-meta-label">Location:</span> ${escapeHtml(mockup.Print_Location)}</div>` : ''}
                     ${dimensions ? `<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ${escapeHtml(dimensions)}</div>` : ''}
+                    ${stitchCountText ? `<div class="card-meta-row"><span class="card-meta-label">Stitches:</span> ${escapeHtml(stitchCountText)}</div>` : ''}
                 </div>
                 ${badges ? `<div class="card-badges">${badges}</div>` : ''}
             </div>
@@ -779,9 +787,15 @@
                 else if (m.Logo_Width) kanbanDim = m.Logo_Width + '" wide';
                 else if (m.Logo_Height) kanbanDim = m.Logo_Height + '" tall';
                 else if (m.Size_Specs) kanbanDim = m.Size_Specs;
+                var kanbanStitch = '';
+                if (m.Stitch_Count != null && m.Stitch_Count !== '') {
+                    var ks = parseInt(m.Stitch_Count, 10);
+                    kanbanStitch = isNaN(ks) ? String(m.Stitch_Count) : ks.toLocaleString();
+                }
                 if (isRushM) badges += '<span class="kanban-card-badge kanban-card-badge--rush">&#128293; RUSH</span>';
                 if (mockupType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(mockupType) + '</span>';
                 if (kanbanDim) badges += '<span class="kanban-card-badge kanban-card-badge--dim">📐 ' + escapeHtml(kanbanDim) + '</span>';
+                if (kanbanStitch) badges += '<span class="kanban-card-badge kanban-card-badge--dim">🧵 ' + escapeHtml(kanbanStitch) + '</span>';
                 if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
                 var thumbHtml = '';
