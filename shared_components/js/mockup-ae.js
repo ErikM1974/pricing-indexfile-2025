@@ -336,6 +336,17 @@ var MockupAeGallery = (function () {
         var submittedDate = formatDate(mockup.Submitted_Date);
         var revCount = mockup.Revision_Count || 0;
 
+        // Logo dimensions + stitch count — Ruth fills these in; AE reads.
+        var dimensions = '';
+        if (mockup.Logo_Width && mockup.Logo_Height) dimensions = mockup.Logo_Width + '" × ' + mockup.Logo_Height + '"';
+        else if (mockup.Logo_Width) dimensions = mockup.Logo_Width + '" wide';
+        else if (mockup.Logo_Height) dimensions = mockup.Logo_Height + '" tall';
+        var stitchCountText = '';
+        if (mockup.Stitch_Count != null && mockup.Stitch_Count !== '') {
+            var sc = parseInt(mockup.Stitch_Count, 10);
+            stitchCountText = isNaN(sc) ? String(mockup.Stitch_Count) : sc.toLocaleString();
+        }
+
         var badges = '';
         if (mockupType) {
             mockupType.split(', ').forEach(function (t) {
@@ -392,6 +403,10 @@ var MockupAeGallery = (function () {
             + thumbHtml
             + '<div class="card-body">'
             + (designName ? '<div class="card-design-name">' + designName + '</div>' : '')
+            + ((dimensions || stitchCountText) ? '<div class="card-meta">'
+                + (dimensions ? '<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ' + escapeHtml(dimensions) + '</div>' : '')
+                + (stitchCountText ? '<div class="card-meta-row"><span class="card-meta-label">Stitches:</span> ' + escapeHtml(stitchCountText) + '</div>' : '')
+                + '</div>' : '')
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
             // REP meta-row removed 2026-04-26 — rep promoted to header inline
             // with designNum (see card-design-number block above).
@@ -511,7 +526,18 @@ var MockupAeGallery = (function () {
         var badges = '';
         var mockupType = m.Mockup_Type || '';
         var revCount = m.Revision_Count || 0;
+        var kanbanDim = '';
+        if (m.Logo_Width && m.Logo_Height) kanbanDim = m.Logo_Width + '" × ' + m.Logo_Height + '"';
+        else if (m.Logo_Width) kanbanDim = m.Logo_Width + '" wide';
+        else if (m.Logo_Height) kanbanDim = m.Logo_Height + '" tall';
+        var kanbanStitch = '';
+        if (m.Stitch_Count != null && m.Stitch_Count !== '') {
+            var ks = parseInt(m.Stitch_Count, 10);
+            kanbanStitch = isNaN(ks) ? String(m.Stitch_Count) : ks.toLocaleString();
+        }
         if (mockupType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(mockupType) + '</span>';
+        if (kanbanDim) badges += '<span class="kanban-card-badge kanban-card-badge--dim">📐 ' + escapeHtml(kanbanDim) + '</span>';
+        if (kanbanStitch) badges += '<span class="kanban-card-badge kanban-card-badge--dim">🧵 ' + escapeHtml(kanbanStitch) + '</span>';
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
         var thumbHtml = '';
