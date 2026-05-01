@@ -264,6 +264,14 @@ body.print-preview .print-sheet {
 body:not(.print-preview) .print-toolbar { display: none; }
 @media print { .print-toolbar { display: none !important; } }
 
+/* Hide screen-only swatch / product thumbnails on print */
+@media print {
+  .row-thumb { display: none !important; }
+  .color-swatch { display: none !important; }
+  .color-caret { display: none !important; }
+  .color-select-menu { display: none !important; }
+}
+
 /* Stylized logo mark for the print sheet (no raster) */
 .ps-logo {
   width: 44pt; height: 44pt;

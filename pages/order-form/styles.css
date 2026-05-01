@@ -551,6 +551,129 @@ body {
   align-self: flex-start;
 }
 .link-btn:hover { text-decoration: underline; }
+
+/* Color picker — custom dropdown so we can show swatches next to color names.
+   Lives inside a <td>, so we hug the cell tightly and reserve room for a caret on the right. */
+.color-select { position: relative; height: 100%; width: 100%; }
+.color-select-button {
+  width: 100%;
+  height: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 18px 4px 6px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  color: #141414;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.color-select-button:hover { background: rgba(0,0,0,0.02); }
+.color-select-button:focus-visible { background: color-mix(in oklab, var(--accent, #1b4d2b) 8%, #fff); box-shadow: inset 0 -2px 0 var(--accent, #1b4d2b); }
+.color-select-button .color-caret {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 9px;
+  color: #888;
+}
+/* Swatches — bigger inside the cell so users can read the color, smaller in the menu rows. */
+.color-swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  border: 1px solid #d4d4d4;
+  background: #fafafa;
+  flex: 0 0 20px;
+  object-fit: cover;
+}
+.color-select-button .color-swatch { flex: 0 0 18px; width: 18px; height: 18px; }
+.color-select-item .color-swatch { flex: 0 0 22px; width: 22px; height: 22px; }
+.color-swatch.placeholder { background: repeating-linear-gradient(45deg, #f4f4f4 0 4px, #fafafa 4px 8px); }
+.color-name {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;        /* lets ellipsis kick in inside flex */
+  font-size: 12.5px;
+  line-height: 1.2;
+}
+.color-select-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 220px;
+  max-width: 320px;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid var(--line, #e0e0e0);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 4px;
+}
+.color-select-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.color-select-item:hover, .color-select-item.active { background: rgba(0,0,0,0.05); }
+.color-select-item.active { font-weight: 600; }
+
+/* Description cell with leading product thumbnail.
+   Row is 44px tall (paper.css) so a 38px thumb leaves vertical breathing room. */
+.desc-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 100%;
+  padding: 3px 4px;
+  box-sizing: border-box;
+}
+.desc-cell .t-in {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 6px;
+  font-size: 12.5px;
+  line-height: 1.25;
+  white-space: nowrap;       /* truncate cleanly; full text visible in input on focus */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.desc-cell .t-in:focus { white-space: normal; }
+.row-thumb {
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line, #e0e0e0);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+.row-thumb:hover { border-color: var(--accent, #1b4d2b); }
+.row-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* fill the square cleanly; model crop looks tighter */
+}
 .combobox-item {
   padding: 10px 12px;
   display: grid;

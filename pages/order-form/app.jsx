@@ -8,11 +8,19 @@ function App() {
   const [staffFilled, setStaffFilled] = useState([]);
   const [draftStatus, setDraftStatus] = useState(null);
 
+  // Default Date Due = today + 21 days. Staff can override; once they touch
+  // the field, we stop auto-bumping it as Date In changes.
+  const _today = new Date();
+  const _due = new Date(_today.getTime() + 21 * 86400000);
+
   // Customer info
   const [info, setInfo] = useState({
     company: '', buyerFirst: '', buyerLast: '', email: '', phone: '',
     address: '', city: '', state: '', zip: '',
-    po: '', salesRep: '', dateIn: new Date().toISOString().slice(0, 10), dateDue: '',
+    po: '',
+    salesRep: '',
+    dateIn: _today.toISOString().slice(0, 10),
+    dateDue: _due.toISOString().slice(0, 10),
     terms: 'Prepaid', // default payment terms (Pay On Pickup | Prepaid)
     // Set by CompanyCombobox after a pick. `contacts` drives the Name-cell ContactPicker;
     // when empty, the cell falls back to manual First/Last/Email inputs.

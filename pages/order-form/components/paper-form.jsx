@@ -27,11 +27,18 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode }) {
         <ColorSelect
           style={row.style}
           colorName={row.colorName || row.color || ''}
-          onPick={({ colorName, catalogColor }) => update({ colorName, catalogColor, color: colorName })}
+          onPick={({ colorName, catalogColor, imageUrl }) => update({ colorName, catalogColor, color: colorName, imageUrl: imageUrl || '' })}
         />
       </td>
       <td>
-        <input className="t-in" value={row.desc} onChange={e => update({ desc: e.target.value })} />
+        <div className="desc-cell">
+          {row.imageUrl && (
+            <a className="row-thumb" href={row.imageUrl} target="_blank" rel="noopener" title="Open full image">
+              <img src={row.imageUrl} alt="" loading="lazy" />
+            </a>
+          )}
+          <input className="t-in" value={row.desc} onChange={e => update({ desc: e.target.value })} title={row.desc} />
+        </div>
       </td>
       {PAPER_SIZES.map(s => (
         <td key={s}><input className="t-in num" inputMode="numeric" value={row.sizes[s] || ''} onChange={e => setSize(s, e.target.value)} /></td>

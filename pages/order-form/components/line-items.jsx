@@ -57,7 +57,8 @@ function makeBlankRow() {
     colorName: '',        // COLOR_NAME — shown in UI
     catalogColor: '',     // CATALOG_COLOR — sent to ShopWorks / inventory
     availableColors: [],  // populated on pick
-    deco: 'embroidery',
+    imageUrl: '',         // model thumbnail for the chosen style+color (digital view only)
+    deco: '',
     sizes: {},
     otherSize: '',
   };
@@ -164,9 +165,13 @@ function ProductCombobox({ value, desc, onPick, onChange, onDescChange }) {
 
 // Color dropdown — populates from /api/product-colors once a style is picked.
 // Stores CATALOG_COLOR (for ShopWorks/inventory) + displays COLOR_NAME (per CLAUDE.md two-field rule).
+// Custom dropdown so we can render swatch images next to each color (native <option> can't).
 function ColorSelect({ style, colorName, onPick }) {
   const [colors, setColors] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const wrap = useRef(null);
+
   useEffect(() => {
     if (!style) { setColors([]); return; }
     let cancelled = false;
@@ -174,14 +179,24 @@ function ColorSelect({ style, colorName, onPick }) {
     fetchColors(style).then(list => { if (!cancelled) { setColors(list); setLoading(false); } });
     return () => { cancelled = true; };
   }, [style]);
-  function onChange(e) {
-    const name = e.target.value;
-    const match = colors.find(c => (c.COLOR_NAME || '') === name);
+
+  useEffect(() => {
+    function handler(e) {
+      if (wrap.current && !wrap.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  function pick(c) {
     onPick({
-      colorName: name,
-      catalogColor: (match && (match.CATALOG_COLOR || name)) || name,
+      colorName: c.COLOR_NAME || '',
+      catalogColor: c.CATALOG_COLOR || c.COLOR_NAME || '',
+      imageUrl: c.FRONT_MODEL || c.MAIN_IMAGE_URL || c.FRONT_FLAT || '',
     });
+    setOpen(false);
   }
+
   if (!style) {
     return <input className="t-in" value={colorName || ''} onChange={e => onPick({ colorName: e.target.value, catalogColor: e.target.value })} placeholder="Pick style first" />;
   }
@@ -192,13 +207,48 @@ function ColorSelect({ style, colorName, onPick }) {
     // Fallback — free text when SanMar lookup returned nothing.
     return <input className="t-in" value={colorName || ''} onChange={e => onPick({ colorName: e.target.value, catalogColor: e.target.value })} placeholder="Color" />;
   }
+
+  const selected = colors.find(c => (c.COLOR_NAME || '') === (colorName || ''));
+
   return (
-    <select className="t-in" value={colorName || ''} onChange={onChange}>
-      <option value="">—</option>
-      {colors.map(c => (
-        <option key={c.CATALOG_COLOR || c.COLOR_NAME} value={c.COLOR_NAME}>{c.COLOR_NAME}</option>
-      ))}
-    </select>
+    <div className="color-select" ref={wrap}>
+      <button
+        type="button"
+        className="t-in color-select-button"
+        onClick={() => setOpen(o => !o)}
+        title={colorName || 'Pick a color'}
+      >
+        {selected && selected.COLOR_SQUARE_IMAGE && (
+          <img className="color-swatch" src={selected.COLOR_SQUARE_IMAGE} alt="" />
+        )}
+        <span className="color-name">{colorName || '—'}</span>
+        <span className="color-caret">▾</span>
+      </button>
+      {open && (
+        <div className="color-select-menu">
+          <div
+            className={"color-select-item" + (!colorName ? ' active' : '')}
+            onMouseDown={(e) => { e.preventDefault(); pick({ COLOR_NAME: '', CATALOG_COLOR: '' }); }}
+          >
+            <span className="color-swatch placeholder" />
+            <span className="color-name">—</span>
+          </div>
+          {colors.map(c => (
+            <div
+              key={c.CATALOG_COLOR || c.COLOR_NAME}
+              className={"color-select-item" + (c.COLOR_NAME === colorName ? ' active' : '')}
+              onMouseDown={(e) => { e.preventDefault(); pick(c); }}
+            >
+              {c.COLOR_SQUARE_IMAGE
+                ? <img className="color-swatch" src={c.COLOR_SQUARE_IMAGE} alt="" loading="lazy" />
+                : <span className="color-swatch placeholder" />
+              }
+              <span className="color-name">{c.COLOR_NAME}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
