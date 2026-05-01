@@ -188,7 +188,7 @@ function RowTierBadge({ rowBreakdown }) {
   const isCap = cap === 'cap';
   return (
     <span className="row-tier-badge" title={`Pricing tier: ${tier} pcs${isCap ? ' · cap embroidery' : ''}`}>
-      Tier {tier}{isCap ? ' · cap' : ''}
+      Tier {tier}{isCap && <span className="row-tier-cap">CAP</span>}
     </span>
   );
 }

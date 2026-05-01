@@ -175,6 +175,163 @@ function NonStandardSizePicker({ row, onChange, availableSizes, inventory }) {
   );
 }
 
+// BulkSizePicker — used in custom-sizes mode for products with too many
+// size variants to fit inline (PT20 has 72 W×L combos; CTB17 has 46).
+// Renders as a single "+ Add size" button until the rep picks. Once a size
+// is chosen, it appears as an inline chip with a qty input. Replaces the
+// old mass-grid layout that wasted ~40% of the form's vertical space.
+//
+// Picker dropdown: filterable grid of all available sizes, each showing
+// the SanMar inventory count below. Click a cell to add it as a chip.
+//
+// Pricing/storage: writes to row.sizes[<size>] just like the inline mode
+// did. The pricing engine + ShopWorks push see no difference.
+function BulkSizePicker({ row, onChange, availableSizes, inventory }) {
+  const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState('');
+  const wrap = useRef(null);
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    function onDocClick(e) { if (wrap.current && !wrap.current.contains(e.target)) setOpen(false); }
+    function onKey(e) { if (e.key === 'Escape') { setOpen(false); setFilter(''); } }
+    if (open) {
+      document.addEventListener('mousedown', onDocClick);
+      document.addEventListener('keydown', onKey);
+      // Auto-focus the filter input when the picker opens
+      setTimeout(() => filterRef.current?.focus(), 50);
+    }
+    return () => {
+      document.removeEventListener('mousedown', onDocClick);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const sizes = row.sizes || {};
+  const enteredSizes = Object.keys(sizes).filter(k => Number(sizes[k]) > 0 || sizes[k] === '');
+
+  function setSizeQty(s, v) {
+    const next = { ...sizes };
+    if (v) next[s] = v.replace(/[^0-9]/g, '');
+    else delete next[s];
+    onChange({ sizes: next });
+  }
+
+  function addSize(s) {
+    onChange({ sizes: { ...sizes, [s]: '' } });
+    setOpen(false);
+    setFilter('');
+  }
+
+  function removeSize(s) {
+    const next = { ...sizes };
+    delete next[s];
+    onChange({ sizes: next });
+  }
+
+  // Filter the picker grid: match against pretty-printed AND raw size codes
+  // so the rep can type "32" and find both "32×30" (W×L) and any plain "32".
+  const filterLower = filter.trim().toLowerCase();
+  const filteredAvailable = (availableSizes || []).filter(s => {
+    if (!filterLower) return true;
+    const raw = String(s).toLowerCase();
+    const pretty = prettyPrintSize(s).toLowerCase();
+    return raw.includes(filterLower) || pretty.includes(filterLower);
+  });
+
+  return (
+    <div className="bulk-picker" ref={wrap}>
+      <div className="bulk-picker-chips">
+        {enteredSizes.map(s => {
+          const inv = inventory?.bySize?.[s];
+          const invKnown = inventory?.status === 'ok' && Number.isFinite(Number(inv));
+          const cellQty = Number(sizes[s]) || 0;
+          const klass = invKnown && window.OrderFormInventory
+            ? window.OrderFormInventory.classifyInventory(cellQty, inv)
+            : 'unknown';
+          return (
+            <span key={s} className="bulk-chip">
+              <span className="bulk-chip-label">{prettyPrintSize(s)}</span>
+              <input
+                className="bulk-chip-qty"
+                inputMode="numeric"
+                value={sizes[s] ?? ''}
+                onChange={(e) => setSizeQty(s, e.target.value)}
+                placeholder="0"
+                title={invKnown ? `SanMar stock: ${inv.toLocaleString()} ${prettyPrintSize(s)}` : ''}
+              />
+              <button
+                type="button"
+                className="bulk-chip-remove"
+                onClick={() => removeSize(s)}
+                aria-label={`Remove ${prettyPrintSize(s)}`}
+                tabIndex={-1}
+              >×</button>
+              {invKnown && (
+                <span className={`sz-inv-badge sz-inv-${klass} bulk-chip-inv`}>{inv.toLocaleString()}</span>
+              )}
+            </span>
+          );
+        })}
+        <button
+          type="button"
+          className="bulk-add-btn"
+          onClick={() => setOpen(o => !o)}
+          aria-expanded={open}
+        >
+          + Add size <span className="bulk-add-caret" aria-hidden="true">▾</span>
+        </button>
+      </div>
+
+      {open && (
+        <div className="bulk-picker-menu" role="dialog" aria-label="Add a size to this row">
+          <div className="bulk-picker-head">
+            <input
+              ref={filterRef}
+              type="text"
+              className="bulk-picker-filter"
+              placeholder="Filter sizes (try '32' for 32×N or N×32)…"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+            <span className="bulk-picker-count">
+              {filteredAvailable.length} of {(availableSizes || []).length} sizes
+            </span>
+          </div>
+          {filteredAvailable.length === 0 ? (
+            <div className="bulk-picker-empty">No sizes match "{filter}"</div>
+          ) : (
+            <div className="bulk-picker-grid">
+              {filteredAvailable.map(s => {
+                const inv = inventory?.bySize?.[s];
+                const invKnown = inventory?.status === 'ok' && Number.isFinite(Number(inv));
+                const isAlreadyEntered = s in sizes;
+                return (
+                  <button
+                    type="button"
+                    key={s}
+                    className={"bulk-picker-cell" + (isAlreadyEntered ? ' bulk-picker-cell--entered' : '')}
+                    onMouseDown={(e) => { e.preventDefault(); if (!isAlreadyEntered) addSize(s); }}
+                    title={invKnown ? `SanMar stock: ${inv.toLocaleString()}${isAlreadyEntered ? ' (already added)' : ''}` : (isAlreadyEntered ? 'Already added' : '')}
+                    disabled={isAlreadyEntered}
+                  >
+                    <span className="bulk-picker-cell-size">{prettyPrintSize(s)}</span>
+                    {invKnown && (
+                      <span className={"bulk-picker-cell-inv" + (Number(inv) === 0 ? ' is-oos' : '')}>
+                        {Number(inv) === 0 ? '0' : inv.toLocaleString()}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // Paper-style form view — boxed fields, looks like the original PDF but editable.
 //
 // Auto-pricing: when `rowBreakdown` exists (active method module computed
@@ -486,44 +643,60 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
         </td>
       ) : sizeMode === 'custom-sizes' ? (
         // Custom-sizes mode — horizontal mini-grid for products with non-
-        // standard sizing (fitted caps S/M/L/XL, fitted-exact 7 1/8 etc.,
-        // pants W×L, anything else SanMar reports). One labeled qty input
-        // per available size; spans colspan=9 same as cap-osfa.
-        // Inventory badge per cell — same SanMar lookup as the standard grid.
-        <td colSpan={9} className="size-collapsed size-collapsed--custom-sizes">
-          <div className="size-collapsed-inner size-collapsed-inner--multi">
-            {availableSizes.map(sz => {
-              const key = String(sz);
-              const invAvailable = inventory.bySize?.[key];
-              const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
-              const cellQty = Number(row.sizes?.[key]) || 0;
-              const klass = invKnown
-                ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
-                : 'unknown';
-              return (
-                <label key={key} className="size-custom-cell">
-                  <span className="size-custom-label">{prettyPrintSize(key)}</span>
-                  <input
-                    className="t-in num size-custom-qty"
-                    inputMode="numeric"
-                    value={row.sizes?.[key] || ''}
-                    onChange={e => {
-                      const v = e.target.value.replace(/[^0-9]/g, '');
-                      const next = { ...row.sizes };
-                      if (v) next[key] = v; else delete next[key];
-                      update({ sizes: next });
-                    }}
-                    placeholder="—"
-                    title={invKnown ? `SanMar stock: ${invAvailable.toLocaleString()} ${prettyPrintSize(key)}` : ''}
-                  />
-                  {invKnown && (
-                    <span className={`sz-inv-badge sz-inv-${klass}`}>{invAvailable.toLocaleString()}</span>
-                  )}
-                </label>
-              );
-            })}
-          </div>
-        </td>
+        // standard sizing. Two layouts based on size count:
+        //
+        //   ≤ 12 sizes (fitted caps S/M/L/XL, tall LT-4XLT, fitted-exact
+        //   7 1/8 etc., toddler 2T-6T) — INLINE GRID. All cells visible at
+        //   once, like before.
+        //
+        //   > 12 sizes (pants W×L: PT20=72, CTB17=46, etc.) — BULK PICKER.
+        //   Empty until rep picks; chips appear inline as picked. Avoids
+        //   the 70-cell mass-grid that dominated the form's vertical space.
+        availableSizes.length > 12 ? (
+          <td colSpan={9} className="size-collapsed size-collapsed--bulk">
+            <BulkSizePicker
+              row={row}
+              onChange={update}
+              availableSizes={availableSizes}
+              inventory={inventory}
+            />
+          </td>
+        ) : (
+          <td colSpan={9} className="size-collapsed size-collapsed--custom-sizes">
+            <div className="size-collapsed-inner size-collapsed-inner--multi">
+              {availableSizes.map(sz => {
+                const key = String(sz);
+                const invAvailable = inventory.bySize?.[key];
+                const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
+                const cellQty = Number(row.sizes?.[key]) || 0;
+                const klass = invKnown
+                  ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
+                  : 'unknown';
+                return (
+                  <label key={key} className="size-custom-cell">
+                    <span className="size-custom-label">{prettyPrintSize(key)}</span>
+                    <input
+                      className="t-in num size-custom-qty"
+                      inputMode="numeric"
+                      value={row.sizes?.[key] || ''}
+                      onChange={e => {
+                        const v = e.target.value.replace(/[^0-9]/g, '');
+                        const next = { ...row.sizes };
+                        if (v) next[key] = v; else delete next[key];
+                        update({ sizes: next });
+                      }}
+                      placeholder="—"
+                      title={invKnown ? `SanMar stock: ${invAvailable.toLocaleString()} ${prettyPrintSize(key)}` : ''}
+                    />
+                    {invKnown && (
+                      <span className={`sz-inv-badge sz-inv-${klass}`}>{invAvailable.toLocaleString()}</span>
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          </td>
+        )
       ) : (
         <>
           {PAPER_SIZES.map(s => {
