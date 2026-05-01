@@ -10,16 +10,35 @@ const ALL_DECOS = [
   { key: 'emblem',      label: 'Emblems' },
 ];
 
-// Popover picker for non-standard sizes (OSFA, youth, tall, 5XL+). Renders inline
-// chips for any non-standard sizes already entered, plus a "+ Add" button that
-// opens a small menu of remaining non-standard sizes. Each picked size becomes
-// an inline qty input. All sizes flow into row.sizes[] and push to MO with the
-// correct _<size> suffix via orderFormSizeSuffix() in server.js.
+// Pretty-print an uncommon SanMar size code for display. Internal storage
+// (row.sizes keys) uses the raw SanMar code; this is just for the rep's eyes.
+//   "3030"  → "30×30"   (pants waist × length)
+//   "3432"  → "34×32"
+//   "5/6T"  → "5/6T"    (left as-is, already readable)
+//   "S/M"   → "S/M"     (left as-is)
+// Anything else passes through unchanged.
+function prettyPrintSize(s) {
+  const raw = String(s || '').trim();
+  if (!raw) return raw;
+  // 4-digit numeric → W×L pants. Validate both halves are 2 digits.
+  if (/^\d{4}$/.test(raw)) {
+    return `${raw.slice(0, 2)}×${raw.slice(2)}`;
+  }
+  return raw;
+}
+
+// Popover picker for non-standard sizes. Renders inline chips for any non-
+// standard sizes already entered, plus a "+ Add" button that opens a menu
+// of remaining sizes the product offers (5XL, 6XL, 8XL, 10XL, LT, XLT, MT,
+// ST, XST, XXS, 2XS, MR, SR, LR, XLR, LL, XLL, etc. — anything SanMar
+// reports). Each picked size becomes an inline qty input. All sizes flow
+// into row.sizes[] and push to MO with the correct _<size> suffix via
+// the shared orderFormSizeSuffix() module.
 //
-// `availableSizes` (optional) — array of sizes the picked product actually
-// comes in (from the pricing-bundle). When provided, the "+ Add" menu only
-// shows non-standard sizes that are valid for this product (e.g. PC61 →
-// only 5XL/6XL, no Tall/Youth/OSFA). Without it, all non-standard sizes show.
+// `availableSizes` — array of sizes the picked product comes in (from the
+// pricing-bundle). The picker pulls its options FROM this list, filtered
+// to anything not already in the standard XS-4XL grid. No hardcoded size
+// list — whatever SanMar lists for the product is what shows.
 function NonStandardSizePicker({ row, onChange, availableSizes }) {
   const [open, setOpen] = useState(false);
   const wrap = useRef(null);
@@ -32,21 +51,34 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
 
   const sizes = row.sizes || {};
   const standardSet = new Set(PAPER_SIZES);
-  // Show a chip for any non-standard size key that's been added — even if qty
-  // is still empty, so the user has a place to type the qty. Key is removed
-  // (and chip disappears) only via the × button.
+
+  // Display order for non-standard sizes — used both for the "+ Add" menu
+  // ordering and for sorting the chips inline. Falls back to alphabetical
+  // for sizes not in the priority list.
+  const SORT_PRIORITY = ['5XL','6XL','7XL','8XL','9XL','10XL','XXL',
+                         'XXS','2XS',
+                         'OSFA',
+                         'LT','XLT','2XLT','3XLT','4XLT','MT','ST','XST',
+                         'YS','YM','YL','YXL','YXS',
+                         'SR','MR','LR','XLR','2XLR','3XLR','4XLR','5XLR','6XLR',
+                         'LL','XLL','2XLL','3XLL','XXXL',
+                         'NB','06M','12M','18M','24M',
+                         '2T','3T','4T','5T','5/6T','6T'];
+  const sortIdx = sz => {
+    const i = SORT_PRIORITY.indexOf(String(sz).toUpperCase());
+    return i === -1 ? 999 + String(sz).charCodeAt(0) : i;
+  };
+
   const enteredNonStd = Object.keys(sizes)
-    .filter(k => !standardSet.has(k) && k in sizes)
-    .sort((a, b) => NON_STANDARD_SIZES.indexOf(a) - NON_STANDARD_SIZES.indexOf(b));
-  // Filter the remaining list by what the product actually offers, when known.
-  const availSet = (availableSizes && availableSizes.length)
-    ? new Set(availableSizes.map(s => String(s).toUpperCase()))
-    : null;
-  const remaining = NON_STANDARD_SIZES.filter(s => {
-    if (s in sizes) return false;
-    if (availSet && !availSet.has(s.toUpperCase())) return false;
-    return true;
-  });
+    .filter(k => !standardSet.has(k.toUpperCase()) && k in sizes)
+    .sort((a, b) => sortIdx(a) - sortIdx(b));
+
+  // Picker options: pull dynamically from availableSizes, filter to anything
+  // not already in the standard XS-4XL grid AND not already entered.
+  const remaining = (availableSizes || [])
+    .filter(s => !standardSet.has(String(s).toUpperCase()))
+    .filter(s => !(s in sizes))
+    .sort((a, b) => sortIdx(a) - sortIdx(b));
 
   function setSize(s, v) {
     const next = { ...sizes };
@@ -64,7 +96,7 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
     <div className="nss-cell" ref={wrap}>
       {enteredNonStd.map(s => (
         <span key={s} className="nss-chip">
-          <span className="nss-chip-label">{s}</span>
+          <span className="nss-chip-label">{prettyPrintSize(s)}</span>
           <input
             className="nss-chip-qty"
             inputMode="numeric"
@@ -84,14 +116,16 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
       <button type="button" className="nss-add-btn" onClick={() => setOpen(o => !o)}>+ Add</button>
       {open && (
         <div className="nss-menu">
-          {availSet && (
+          {availableSizes && availableSizes.length > 0 && (
             <div className="nss-menu-hint">
-              Available for this product: {availableSizes.join(', ')}
+              Available for this product: {availableSizes.map(prettyPrintSize).join(', ')}
             </div>
           )}
           {remaining.length === 0 ? (
             <div className="nss-menu-empty">
-              {availSet ? 'No non-standard sizes available for this product' : 'All non-standard sizes added'}
+              {availableSizes && availableSizes.length
+                ? 'No non-standard sizes available for this product'
+                : 'Pick a style first to see available sizes'}
             </div>
           ) : (
             <div className="nss-menu-grid">
@@ -101,7 +135,7 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
                   key={s}
                   className="nss-menu-item"
                   onMouseDown={(e) => { e.preventDefault(); addSize(s); }}
-                >{s}</button>
+                >{prettyPrintSize(s)}</button>
               ))}
             </div>
           )}
@@ -339,7 +373,7 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               const key = String(sz);
               return (
                 <label key={key} className="size-custom-cell">
-                  <span className="size-custom-label">{key}</span>
+                  <span className="size-custom-label">{prettyPrintSize(key)}</span>
                   <input
                     className="t-in num size-custom-qty"
                     inputMode="numeric"
@@ -481,7 +515,7 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
   // Render each group as an inline span.
   const segments = sortedGroups.map((g, i) => {
     const groupQty = g.sizes.reduce((a, s) => a + s.qty, 0);
-    const sizeList = g.sizes.map(s => s.size).join('/');
+    const sizeList = g.sizes.map(s => prettyPrintSize(s.size)).join('/');
     if (g.skipped && !isOverride) {
       return (
         <span key={i} className="pf-bd-seg pf-bd-seg--skip">
