@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-04-29
-**Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-05-01
+**Total Active Files:** 582 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -864,7 +864,7 @@ cap-embroidery-fix.css
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
 | `/dashboards/js/rep-crm.js` | **SHARED** CRM service/controller (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
-| `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
+| `/dashboards/js/rep-calendar.js` | ~~DELETED~~ Calendar logic — no longer on disk; CRM dashboards use inline calendar (removed before 2026-05-01 audit) | — | ❌ Deleted |
 | `/dashboards/house-accounts.html` | **NEW** House Account assignment dashboard | house-accounts.js, house-accounts.css | ✅ Active |
 | `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
@@ -907,8 +907,8 @@ cap-embroidery-fix.css
 | `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/screenshot-fill.js` | ShopWorks screenshot paste → AI vision → auto-fill art request form | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |
-| `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
-| `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
+| `/dashboards/css/taneisha-crm.css` | ~~DELETED~~ Deprecated CRM styles — no longer on disk (removed before 2026-05-01 audit) | — | ❌ Deleted |
+| `/dashboards/js/taneisha-crm.js` | ~~DELETED~~ Deprecated CRM JS — no longer on disk (removed before 2026-05-01 audit) | — | ❌ Deleted |
 
 ### Staff Dashboard V2 Files (2025-12-31 Redesign)
 | File | Purpose | Status |
@@ -1051,12 +1051,12 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/adriyella-bonus-report.html` | Adriyella bonus report | ✅ Active |
 | `/training/adriyella-daily-report.html` | Adriyella daily report | ✅ Active |
 | `/training/adriyella-daily-tasks.html` | Adriyella daily tasks (v1) | ✅ Active |
-| `/training/adriyella-daily-tasks-v2.html` | Adriyella daily tasks (v2 — current) | ✅ Active |
+| `/training/adriyella-daily-tasks-v2.html` | ~~DELETED~~ Adriyella daily tasks v2 — no longer on disk (removed before 2026-05-01 audit) | ❌ Deleted |
 | `/training/adriyella-task-history.html` | Adriyella task history view | ✅ Active |
 | `/training/adriyella-test-guide.html` | Adriyella test guide | ✅ Active |
 | `/training/adriyella-performance-utils.js` | Adriyella performance utility functions | ✅ Active |
 | `/training/adriyella-task-service.js` | Adriyella task service (Caspio CRUD) | ✅ Active |
-| `/training/api-test-runner.html` | API test runner harness | ✅ Active |
+| `/training/api-test-runner.html` | ~~DELETED~~ API test runner harness — no longer on disk (removed before 2026-05-01 audit) | ❌ Deleted |
 | `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
 | `/training/bonus-policy.html` | Bonus policy reference | ✅ Active |
 | `/training/cap-training.html` | Cap embroidery training | ✅ Active |
@@ -1084,8 +1084,8 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/thank-you-card-guide.html` | Thank-you card guide | ✅ Active |
 | `/training/training-engine-base.js` | Training engine base class | ✅ Active |
 | `/training/training-games-hub.html` | Training games hub | ✅ Active |
-| `/training/server.js` | Local training server (dev only) | ⚙️ Tooling |
-| `/training/simple-server.js` | Simple training server (dev only) | ⚙️ Tooling |
+| `/training/server.js` | ~~DELETED~~ Local training server (dev only) — no longer on disk (removed before 2026-05-01 audit) | ❌ Deleted |
+| `/training/simple-server.js` | ~~DELETED~~ Simple training server (dev only) — no longer on disk (removed before 2026-05-01 audit) | ❌ Deleted |
 
 ### Mockups & Prototypes (`/mockups/` — 11 files)
 
@@ -1117,7 +1117,7 @@ These directories contain code but aren't enumerated at file level — list grow
 | `/employee-bundles/` | 2 HTML | streich-bros-bundle, wcttr-bundle |
 | `/policies/` (root-level) | 8 HTML | Bundle kitting xmas, customer notification SOP, DTG artwork checklist, LTM fee policy, LTM order decision algorithm, payment terms, retail-vs-wholesale policy, sales office procedures |
 | `/richardson-caps/` | 1 HTML + 1 JS | view-combination-caps.html, scripts/richardson-combination-caps-manual.js |
-| `/scripts/` | 14 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, etc. |
+| `/scripts/` | 13 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, match-marketing-pos, etc. |
 | `/scripts/safety-tools/` | 7 JS | auto-recovery, comprehensive-test-suite, dependency-mapper, error-monitor, file-access-monitor, safe-delete, validate-critical-paths |
 | `/templates/` | 4 HTML + 1 JS | Calculator template, email template, emblem email template, laser tumbler EmailJS template, quote service template |
 | `/tools/` | 5 HTML | Cap layout mockup, CSS diagnostic, decoration selector mockup, diagnose-css-override, diagnose-search-issue |
