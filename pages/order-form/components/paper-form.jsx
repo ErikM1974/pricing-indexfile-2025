@@ -69,14 +69,29 @@ function NonStandardSizePicker({ row, onChange, availableSizes, inventory }) {
     return i === -1 ? 999 + String(sz).charCodeAt(0) : i;
   };
 
+  // Aliased keys are handled by the standard grid (e.g. XXL appears under
+  // the 2XL column for ladies styles). Skip them in the picker so the same
+  // value doesn't render in two places at once.
+  // Guard: only treat the key as aliased if the standard column it maps
+  // to is NOT also a native available size on this product. If a product
+  // somehow carries BOTH 2XL and XXL, treat them as separate.
+  const availSetForAlias = new Set((availableSizes || []).map(s => String(s).toUpperCase()));
+  const isAliased = (k) => {
+    const colKey = columnKeyForAliasedSize(k);
+    if (!colKey) return false;
+    return !availSetForAlias.has(colKey.toUpperCase());
+  };
+
   const enteredNonStd = Object.keys(sizes)
-    .filter(k => !standardSet.has(k.toUpperCase()) && k in sizes)
+    .filter(k => !standardSet.has(k.toUpperCase()) && !isAliased(k) && k in sizes)
     .sort((a, b) => sortIdx(a) - sortIdx(b));
 
   // Picker options: pull dynamically from availableSizes, filter to anything
-  // not already in the standard XS-4XL grid AND not already entered.
+  // not already in the standard XS-4XL grid AND not aliased to a standard
+  // column AND not already entered.
   const remaining = (availableSizes || [])
     .filter(s => !standardSet.has(String(s).toUpperCase()))
+    .filter(s => !isAliased(s))
     .filter(s => !(s in sizes))
     .sort((a, b) => sortIdx(a) - sortIdx(b));
 
@@ -471,53 +486,56 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
           {PAPER_SIZES.map(s => {
             // Three states for each size cell:
             //   1. UNAVAILABLE — product doesn't come in this size (bundle.uniqueSizes
-            //      doesn't include it). Render N/A — hard block.
+            //      doesn't include it AND no alias is available). Render N/A.
             //   2. OUT-OF-STOCK — product carries the size but SanMar inventory = 0.
-            //      Render "0 in stock" — hard block too.
-            //   3. AVAILABLE — render an <input>, badge underneath shows the
-            //      per-size count + green/amber/red coloring.
+            //   3. AVAILABLE — render an <input>, badge shows per-size count.
             //
-            // Escape hatch for both blocked states: rep clicks the $ icon in
-            // the style cell to switch the row to manual-cost mode (manual mode
-            // skips both availability AND inventory filters).
-            const upper = s.toUpperCase();
-            const unavailable = availSet && !availSet.has(upper);
-            if (unavailable) {
+            // ALIASING: ladies styles (L500, L420, ...) carry XXL where unisex
+            // carries 2XL. effectiveSizeKey() resolves the column key to the
+            // bundle's true key — for L500's 2XL column, we read+write under
+            // 'XXL'. The column header still says "2XL" so reps see what they
+            // expect; a small "(XXL)" subscript below the cell makes the alias
+            // visible. Pricing engines + ShopWorks push see XXL (the truth).
+            const effectiveKey = effectiveSizeKey(s, availSet);
+            const isAliased = effectiveKey != null && effectiveKey !== s;
+            if (effectiveKey == null) {
               return (
                 <td key={s} className="sz-unavail" title={`${row.style || 'this product'} doesn't come in ${s} — switch to manual cost (click $) to override`}>
                   <span className="sz-na">N/A</span>
                 </td>
               );
             }
-            const invAvailable = inventory.bySize?.[s];
+            const invAvailable = inventory.bySize?.[effectiveKey];
             const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
             const notStockedLocally = inventory.status === 'not-stocked-local';
             const isOutOfStock = invKnown && Number(invAvailable) === 0;
             if (isOutOfStock) {
               return (
-                <td key={s} className="sz-out-of-stock" title={`Local warehouse shows 0 in stock for ${row.colorName || 'this color'} ${s} — switch to manual cost (click $) to override`}>
+                <td key={s} className="sz-out-of-stock" title={`Local warehouse shows 0 in stock for ${row.colorName || 'this color'} ${effectiveKey} — switch to manual cost (click $) to override`}>
                   <span className="sz-oos">0 STK</span>
+                  {isAliased && <span className="sz-alias-label">{effectiveKey}</span>}
                 </td>
               );
             }
-            const cellQty = Number(row.sizes[s]) || 0;
+            const cellQty = Number(row.sizes[effectiveKey]) || 0;
             const klass = invKnown
               ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
               : 'unknown';
             const overflow = klass === 'over';
             const carriedList = (inventory.carriedColors || []).join(', ');
+            const aliasNote = isAliased ? ` (this product uses ${effectiveKey})` : '';
             const cellTitle = invKnown
-              ? `Local stock: ${invAvailable.toLocaleString()} ${s}${overflow ? ' — exceeds available' : ''}`
+              ? `SanMar stock: ${invAvailable.toLocaleString()} ${effectiveKey}${overflow ? ' — exceeds available' : ''}${aliasNote}`
               : (notStockedLocally
                   ? `${row.colorName || 'This color'} not stocked at NWCA — order from SanMar. ${carriedList ? `Carried locally: ${carriedList}` : ''}`
-                  : '');
+                  : aliasNote);
             return (
               <td key={s} className={overflow ? 'sz-overflow' : ''}>
                 <input
                   className="t-in num"
                   inputMode="numeric"
-                  value={row.sizes[s] || ''}
-                  onChange={e => setSize(s, e.target.value)}
+                  value={row.sizes[effectiveKey] || ''}
+                  onChange={e => setSize(effectiveKey, e.target.value)}
                   title={cellTitle}
                 />
                 {invKnown && (
@@ -525,6 +543,9 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                 )}
                 {notStockedLocally && (
                   <span className="sz-inv-badge sz-inv-not-local" title={cellTitle}>SanMar</span>
+                )}
+                {isAliased && (
+                  <span className="sz-alias-label" title={`This product carries ${effectiveKey} (no separate ${s})`}>{effectiveKey}</span>
                 )}
               </td>
             );
@@ -671,6 +692,52 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
 }
 
 const PAPER_SIZES = ['XS','S','M','L','XL','2XL','3XL','4XL'];
+
+// SIZE ALIASES — for products whose bundle reports a non-standard size that
+// is *equivalent* to a standard grid column. Today we know of one case:
+// ladies L-prefix styles (L500, L420, etc.) carry XXL where unisex carries
+// 2XL. Without this, the form's 2XL column hard-blocks (N/A) on those
+// products and reps assume "out of stock" → lost order. With this, typing
+// in the 2XL column for L500 stores under XXL (the bundle's true key) so
+// pricing + ShopWorks push are unchanged.
+//
+// Verified against the SanMar Integration Pricelist (14,775 SKUs, 2026-05):
+// no product carries BOTH 2XL and XXL — they're mutually exclusive. The
+// effectiveSizeKey() helper below guards anyway: it only aliases when the
+// column key is absent from the bundle AND the alias is present.
+const SIZE_ALIASES = {
+  '2XL': ['XXL'],   // ladies styles use XXL where unisex uses 2XL
+};
+
+// Resolve a standard-grid column key to the actual size key the product
+// carries. Returns:
+//   - the columnKey itself if the bundle has it natively
+//   - an alias key if the bundle has the alias but not the column key
+//   - null if neither — render as N/A (truly not carried)
+// availSet is a Set of UPPER-cased size strings from bundle.uniqueSizes.
+function effectiveSizeKey(columnKey, availSet) {
+  if (!availSet || availSet.size === 0) return columnKey;  // bundle not loaded
+  const upper = String(columnKey).toUpperCase();
+  if (availSet.has(upper)) return columnKey;
+  const aliases = SIZE_ALIASES[upper] || [];
+  for (const a of aliases) {
+    if (availSet.has(a)) return a;
+  }
+  return null;
+}
+
+// Inverse: given a stored size key (e.g. 'XXL'), return the standard
+// column it should appear under (e.g. '2XL'), or null if it should stay
+// in the Other Sizes picker. Used by NonStandardSizePicker to hide
+// aliased keys so XXL doesn't appear as both a 2XL cell + an Other-sizes
+// chip on the same row.
+function columnKeyForAliasedSize(storedKey) {
+  const upper = String(storedKey).toUpperCase();
+  for (const [col, aliases] of Object.entries(SIZE_ALIASES)) {
+    if (aliases.includes(upper)) return col;
+  }
+  return null;
+}
 
 const PF_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 const _companySearchCache = new Map(); // "q.toLowerCase()" → [contact, ...]

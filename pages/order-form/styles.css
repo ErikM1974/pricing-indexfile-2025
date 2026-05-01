@@ -1588,6 +1588,26 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
    reps notice without alarm. */
 .sz-inv-not-local { color: #475569; font-style: italic; font-size: 8px; letter-spacing: 0.04em; }
 
+/* Aliased size label — shown below a standard-grid cell when the product
+   carries a different size key (e.g. ladies L500 uses XXL where the 2XL
+   column maps to). Tells the rep "you typed in 2XL, this product calls it
+   XXL — don't worry, ShopWorks gets the right SKU." Subtle but visible. */
+.sz-alias-label {
+  display: block;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 8.5px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  color: #6366f1;            /* indigo — distinct from stock badge greens/reds */
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 3px;
+  padding: 0 3px;
+  margin-top: 1px;
+  line-height: 1.3;
+  font-weight: 600;
+  user-select: none;
+}
+
 /* When qty exceeds available stock, the size input itself gets a red
    border so the cell-level warning catches the eye even if the badge
    below is missed. */
