@@ -113,7 +113,13 @@ window.nwOrderAPI = (function () {
       });
       const json = await r.json().catch(() => ({}));
       if (r.ok && json.success) {
-        return { ok: true, mode: json.mode || 'live', orderId: json.extOrderId, shopWorksId: json.shopWorksId || null };
+        return {
+          ok: true,
+          mode: json.mode || 'live',
+          orderId: json.extOrderId,
+          shopWorksId: json.shopWorksId || null,
+          skippedLines: Array.isArray(json.skippedLines) ? json.skippedLines : [],
+        };
       }
       return { ok: false, error: json.error || `HTTP ${r.status}`, detail: json.detail };
     } catch (err) {

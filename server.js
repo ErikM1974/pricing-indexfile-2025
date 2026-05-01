@@ -1881,6 +1881,7 @@ app.post('/api/submit-order-form', async (req, res) => {
     // to the correct ShopWorks part-number suffix; the proxy's size-translation
     // table maps the size string to the correct Size01-06 column on the line item.
     const lineItems = [];
+    const skippedLines = [];   // sizes with qty>0 the engine couldn't price — returned to caller
     rows.forEach(r => {
       if (!r || (!r.style && !r.desc && !r.sizes)) return;
       const partBase = (r.style || 'MISC').trim();
@@ -1893,14 +1894,36 @@ app.post('/api/submit-order-form', async (req, res) => {
       // we honor the manually-typed `r.price` instead. Otherwise prefer the
       // computed unit price for this specific size.
       const rowBreakdown = breakdown?.byRow?.[r.id];
+      const isAutoPriced = !r.priceOverride && rowBreakdown && !rowBreakdown.error && breakdown?.supported;
       const sizes = r.sizes || {};
       Object.keys(sizes).forEach(sz => {
         const qty = parseInt(sizes[sz] || 0, 10);
         if (!qty) return;
         let price = fallbackPrice;
-        if (!r.priceOverride && rowBreakdown && !rowBreakdown.error) {
+        let priceFromBreakdown = false;
+        if (isAutoPriced) {
           const computedUnit = rowBreakdown?.unitPriceBySize?.[sz];
-          if (Number.isFinite(Number(computedUnit))) price = Number(computedUnit);
+          if (Number.isFinite(Number(computedUnit)) && Number(computedUnit) > 0) {
+            price = Number(computedUnit);
+            priceFromBreakdown = true;
+          }
+        }
+        // Skip auto-priced lines where the engine has no price for this size
+        // (e.g. rep typed XS=2 for PC61, which doesn't carry XS). This stops
+        // ShopWorks getting a $0 ghost line. The form's grayed cell + tooltip
+        // already warned the rep; the rep can force the line by clicking the
+        // price cell to switch to manual override. Manual-price rows pass
+        // through at whatever the rep typed (even $0).
+        if (isAutoPriced && !priceFromBreakdown) {
+          skippedLines.push({
+            style: partBase,
+            color: color,
+            size: sz,
+            quantity: qty,
+            reason: 'No price available for this size in the pricing engine',
+          });
+          console.warn('[Order Form Submit] Skipping unpriced line:', partBase, sz, 'qty=' + qty);
+          return;
         }
         lineItems.push({
           partNumber: orderFormSizeSuffix(partBase, sz),
@@ -2060,7 +2083,7 @@ app.post('/api/submit-order-form', async (req, res) => {
     // Dry-run short-circuit: returns the payload without pushing. For debugging + smoke tests.
     if (req.query.dryRun === '1' || req.query.dryRun === 'true') {
       console.log('[Order Form Submit] dryRun=1 — not forwarding to ManageOrders');
-      return res.json({ success: true, mode: 'dry-run', extOrderId, payload: manageOrdersPayload });
+      return res.json({ success: true, mode: 'dry-run', extOrderId, payload: manageOrdersPayload, skippedLines });
     }
 
     const MANAGEORDERS_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create';
@@ -2160,7 +2183,7 @@ app.post('/api/submit-order-form', async (req, res) => {
         console.warn('[Order Form Submit] quote_items save failed (non-fatal):', e.message);
       }
 
-      return res.json({ success: true, extOrderId, shopWorksId, mode: 'live' });
+      return res.json({ success: true, extOrderId, shopWorksId, mode: 'live', skippedLines });
     } else {
       console.error('[Order Form Submit] Push failed:', result);
       return res.status(502).json({ success: false, extOrderId, error: result.error || 'ShopWorks submission failed', detail: result });

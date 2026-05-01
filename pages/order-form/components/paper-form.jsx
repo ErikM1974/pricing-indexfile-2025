@@ -539,7 +539,16 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
       const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown });
       if (res.ok) {
         const modeLabel = res.mode === 'mock' ? 'mock mode (backend unreachable)' : 'ShopWorks';
-        setCaspioMsg({ kind: 'ok', text: `Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}` });
+        let text = `Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}`;
+        // Surface any sizes the engine couldn't price (e.g. PC61 XS) so the
+        // rep knows what didn't make it into ShopWorks. They can re-submit
+        // with a manual price override if those sizes were intentional.
+        const skipped = Array.isArray(res.skippedLines) ? res.skippedLines : [];
+        if (skipped.length) {
+          const summary = skipped.map(s => `${s.style} ${s.size} (${s.quantity})`).join(', ');
+          text += ` · ⚠ Skipped (no pricing): ${summary}`;
+        }
+        setCaspioMsg({ kind: skipped.length ? 'warn' : 'ok', text });
       } else {
         setCaspioMsg({ kind: 'err', text: `ShopWorks push failed: ${res.error}` });
       }
