@@ -1699,41 +1699,50 @@ function getTaxAccount(state, isCustomerPickup) {
   return { code: '2200.101', label: 'WA Sales Tax 10.1%' };
 }
 
-function buildOrderNote({ info, breakdown, methodNotesBlock, draftId, ship, orderNotes, extOrderId }) {
+function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId }) {
+  // Note content is intentionally LEAN — anything that ManageOrders has a
+  // structured field for is omitted (customer name → Contact*; PO →
+  // CustomerPurchaseOrder; sales rep → CustomerServiceRep; due date →
+  // date_OrderDropDead; ship method → ShippingAddresses[].ShipMethod;
+  // billing/shipping addresses → Customer/ShippingAddresses). Only items
+  // that aren't in structured fields land here:
+  //   - Order ID + submit timestamp (audit trail)
+  //   - CRM Customer ID (NWCA's company ID — helps AE jump from order to
+  //     customer record without searching by name)
+  //   - Order Notes (free-form rep input)
+  //   - Tax Account / Expected Tax (AR can't get this from MO directly)
   const submittedAt = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  const customerName = `${info.buyerFirst || ''} ${info.buyerLast || ''}`.trim() || 'N/A';
-  const breakdownLine = breakdown?.supported
-    ? `\nSubtotal: $${(Number(breakdown.subtotal) || 0).toFixed(2)} · Total qty: ${breakdown.totalQty || 0}${breakdown.tier ? ' · Tier ' + breakdown.tier : ''}`
-    : '';
-  // Tax account derived from ship-to state (or billing fallback). Customer
-  // pickup is identified by ship.method === 'willcall' (matches the form's UI).
   const isPickup = ship && ship.method === 'willcall';
   const taxState = (ship && ship.state) || (info && info.state) || '';
   const taxAccount = getTaxAccount(taxState, isPickup);
   const expectedTax = breakdown?.supported && Number(breakdown.subtotal) > 0
     ? `\nExpected Tax: $${(Number(breakdown.subtotal) * 0.101).toFixed(2)}`
     : '';
-  return [
+  const lines = [
     `ONLINE ORDER FORM`,
-    `Source: NWCA-OrderForm  ·  Order: ${extOrderId || 'pending'}`,
-    `Submitted: ${submittedAt}`,
-    draftId ? `Draft/Share Link: ${draftId}` : null,
-    breakdownLine.trim() ? '' : null,
-    breakdownLine.trim(),
-    ``,
-    `Customer: ${customerName}`,
-    `Company: ${info.company || 'N/A'}`,
-    `Email: ${info.email || ''}`,
-    `Phone: ${info.phone || ''}`,
-    `PO: ${info.po || 'N/A'}`,
-    `Sales Rep: ${info.salesRep || 'N/A'}`,
-    `Date Due: ${info.dateDue || 'N/A'}`,
-    ``,
-    `Order Notes: ${orderNotes || 'None'}`,
-    ``,
-    `──────────────────────`,
-    `Tax Account: ${taxAccount.code} (${taxAccount.label})${isPickup ? '' : (taxState && taxState.toUpperCase() === 'WA' ? expectedTax : '\nNo tax due (out of state)')}`,
-  ].filter(s => s !== null).join('\n');
+    `Order: ${extOrderId || 'pending'}  ·  Submitted: ${submittedAt}`,
+  ];
+  if (draftId) lines.push(`Draft/Share Link: ${draftId}`);
+  lines.push('');
+  // Company + CRM Customer ID — quick reference so AE can jump from this
+  // order to the company's CRM record without searching by name.
+  if (info.company || info.companyId) {
+    const idPart = info.companyId ? `  ·  Customer ID: ${info.companyId}` : '';
+    lines.push(`Company: ${info.company || 'N/A'}${idPart}`);
+    lines.push('');
+  }
+  lines.push(`Order Notes: ${orderNotes || 'None'}`);
+  lines.push('');
+  lines.push(`──────────────────────`);
+  if (isPickup) {
+    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})${expectedTax}`);
+  } else if (taxState && taxState.toUpperCase() === 'WA') {
+    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})${expectedTax}`);
+  } else {
+    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})`);
+    lines.push(`No tax due (out of state)`);
+  }
+  return lines.join('\n');
 }
 
 function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
@@ -1764,34 +1773,12 @@ function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
   return parts.join('\n');
 }
 
-function buildShippingNote({ info, ship }) {
-  const dueLine = `DUE: ${info.dateDue || 'N/A'}`;
-  const isPickup = ship && ship.method === 'willcall';
-  if (isPickup) {
-    return [
-      `*** CUSTOMER PICKUP ***`,
-      `Pickup at: NWCA, 2025 Freeman Rd E, Milton, WA 98354`,
-      info.email ? `Notify when ready: ${info.email}` : null,
-      ``,
-      dueLine,
-    ].filter(s => s !== null).join('\n');
-  }
-  const method = ship && ship.method === 'other' ? 'Other' : 'UPS Ground';
-  const customerName = `${info.buyerFirst || ''} ${info.buyerLast || ''}`.trim();
-  const shipAddr = (ship && ship.address) || info.address || '';
-  const shipCity = (ship && ship.city) || info.city || '';
-  const shipState = (ship && ship.state) || info.state || '';
-  const shipZip = (ship && ship.zip) || info.zip || '';
-  const lines = [dueLine, ``, `Ship Method: ${method}`, `Ship to:`];
-  if (info.company) lines.push(`  ${info.company}`);
-  if (customerName) lines.push(`  ${customerName}`);
-  if (shipAddr) lines.push(`  ${shipAddr}`);
-  if (shipCity || shipState || shipZip) {
-    lines.push(`  ${[shipCity, shipState, shipZip].filter(Boolean).join(' ').trim()}`);
-  }
-  if (info.phone) lines.push(`Phone: ${info.phone}`);
-  return lines.join('\n');
-}
+// NOTE: buildShippingNote() was removed (2026-05-01). All shipping data is
+// already populated in MO's structured fields:
+//   - ShippingAddresses[]: ShipAddress01/02, ShipCity, ShipState, ShipZip,
+//     ShipCompany, ShipMethod, ShipCountry
+//   - Order-level: date_OrderRequestedToShip, date_OrderDropDead
+// Duplicating in a note created exactly the redundancy Erik flagged.
 
 function buildArtNote({ info, files }) {
   const parts = [];
@@ -2117,22 +2104,22 @@ app.post('/api/submit-order-form', async (req, res) => {
         linkNote: (f.placements || []).join(', ')
       }));
 
-    // --- Notes (4-way split, pattern adopted from Python Inksoft) ---
-    // Each block is built by a small helper above. Each lands on a different
-    // ShopWorks screen for a different role:
-    //   Notes On Order      → CSR/front desk: customer + tax account
+    // --- Notes (3-way split + optional art) ---
+    // Each block lands on a different ShopWorks screen for a different role:
+    //   Notes On Order      → CSR/AR: order audit, CRM customer ID, tax account
     //   Notes To Production → production: stitch/location + garment breakdown
-    //   Notes To Shipping   → shipping/receiving: method + address + due
     //   Notes To Art        → art team (only if rep added art notes/files)
+    //
+    // Shipping data goes to MO's structured fields (ShippingAddresses,
+    // date_OrderRequestedToShip, date_OrderDropDead) — no redundant note.
+    // Customer name/email/phone/PO/sales-rep go to MO's structured Contact*,
+    // CustomerPurchaseOrder, CustomerServiceRep — no redundant note.
     const notesBlocks = [];
-    const orderNote = buildOrderNote({ info, breakdown, methodNotesBlock, draftId, ship, orderNotes, extOrderId });
+    const orderNote = buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId });
     if (orderNote) notesBlocks.push({ type: 'Notes On Order', note: orderNote });
 
     const productionNote = buildProductionNote({ rows, breakdown, methodNotesBlock });
     if (productionNote) notesBlocks.push({ type: 'Notes To Production', note: productionNote });
-
-    const shippingNote = buildShippingNote({ info, ship });
-    if (shippingNote) notesBlocks.push({ type: 'Notes To Shipping', note: shippingNote });
 
     if (info.artNotes || (Array.isArray(files) && files.length)) {
       const artNote = buildArtNote({ info, files });
