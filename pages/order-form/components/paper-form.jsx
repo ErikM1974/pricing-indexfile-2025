@@ -153,6 +153,11 @@ function NonStandardSizePicker({ row, onChange, availableSizes }) {
 // (sets row.priceOverride=true). Total cell shows $ instead of qty.
 function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLightbox, rowBreakdown }) {
   const [mcpOpen, setMcpOpen] = useState(false);
+  // Per-size SanMar inventory map — { 'S': 3229, 'M': 7045, 'XL': 1245, ... }
+  // populated by the effect below when style + catalogColor are set.
+  // status: 'ok' (we have data), 'unknown' (nothing to query / fetch failed
+  // gracefully), 'loading' (request in flight).
+  const [inventory, setInventory] = useState({ bySize: {}, status: 'unknown' });
 
   // Total qty across all sizes — same as before.
   const total = useMemo(() => {
@@ -181,6 +186,36 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
     }).catch(() => { /* silent */ });
     return () => { cancelled = true; };
   }, [row.style]);
+
+  // ----- SanMar inventory check -----
+  // When style + color resolve, fan out inventory queries and populate
+  // `inventory.bySize` for the size-cell badges. Skipped in manual-cost mode
+  // (rep is overriding, no SanMar fulfillment) and for sticker/emblem
+  // (custom products, not SanMar).
+  useEffect(() => {
+    if (!row.style || row.manualMode) return;
+    if (row.deco === 'sticker' || row.deco === 'emblem') return;
+    const catalogColor = row.catalogColor || row.colorName || row.color || '';
+    if (!catalogColor) return;
+    // Sizes the form has columns for, derived from breakdown extras when
+    // available. If extras isn't ready yet, default to standard XS-4XL.
+    const sizes = (rowBreakdown?.extras?.availableSizes && rowBreakdown.extras.availableSizes.length)
+      ? rowBreakdown.extras.availableSizes
+      : ['XS','S','M','L','XL','2XL','3XL','4XL'];
+    const inv = window.OrderFormInventory;
+    if (!inv) return;
+    let cancelled = false;
+    setInventory(prev => ({ ...prev, status: 'loading' }));
+    inv.getInventoryForRow(row.style, catalogColor, sizes).then(result => {
+      if (cancelled) return;
+      setInventory(result);
+    }).catch(() => {
+      if (!cancelled) setInventory({ bySize: {}, status: 'unknown' });
+    });
+    return () => { cancelled = true; };
+  }, [row.style, row.catalogColor, row.colorName, row.color, row.manualMode, row.deco,
+      // re-run when availableSizes resolves
+      JSON.stringify(rowBreakdown?.extras?.availableSizes || [])]);
 
   // ----- Auto-pricing display state -----
   const hasAutoPrice = !!(rowBreakdown && !rowBreakdown.error && rowBreakdown.rowSubtotal > 0);
@@ -394,20 +429,53 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
       ) : (
         <>
           {PAPER_SIZES.map(s => {
-            // Gray out sizes the picked product doesn't come in (e.g. PC61 has no XS).
-            // Don't disable the input — the rep should still be able to type if they
-            // know the product actually does come in that size and our data is wrong.
+            // Three states for each size cell:
+            //   1. UNAVAILABLE — product doesn't come in this size (bundle.uniqueSizes
+            //      doesn't include it). Render N/A — hard block.
+            //   2. OUT-OF-STOCK — product carries the size but SanMar inventory = 0.
+            //      Render "0 in stock" — hard block too.
+            //   3. AVAILABLE — render an <input>, badge underneath shows the
+            //      per-size count + green/amber/red coloring.
+            //
+            // Escape hatch for both blocked states: rep clicks the $ icon in
+            // the style cell to switch the row to manual-cost mode (manual mode
+            // skips both availability AND inventory filters).
             const upper = s.toUpperCase();
             const unavailable = availSet && !availSet.has(upper);
+            if (unavailable) {
+              return (
+                <td key={s} className="sz-unavail" title={`${row.style || 'this product'} doesn't come in ${s} — switch to manual cost (click $) to override`}>
+                  <span className="sz-na">N/A</span>
+                </td>
+              );
+            }
+            const invAvailable = inventory.bySize?.[s];
+            const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
+            const isOutOfStock = invKnown && Number(invAvailable) === 0;
+            if (isOutOfStock) {
+              return (
+                <td key={s} className="sz-out-of-stock" title={`SanMar shows 0 in stock for ${row.colorName || 'this color'} ${s} — switch to manual cost (click $) to override`}>
+                  <span className="sz-oos">0 STK</span>
+                </td>
+              );
+            }
+            const cellQty = Number(row.sizes[s]) || 0;
+            const klass = invKnown
+              ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
+              : 'unknown';
+            const overflow = klass === 'over';
             return (
-              <td key={s} className={unavailable ? 'sz-unavail' : ''}>
+              <td key={s} className={overflow ? 'sz-overflow' : ''}>
                 <input
-                  className={"t-in num" + (unavailable ? ' t-in--dim' : '')}
+                  className="t-in num"
                   inputMode="numeric"
                   value={row.sizes[s] || ''}
                   onChange={e => setSize(s, e.target.value)}
-                  title={unavailable ? `${row.style || 'this product'} doesn't come in ${s}` : ''}
+                  title={invKnown ? `Stock: ${invAvailable.toLocaleString()} ${s}${overflow ? ' — exceeds available' : ''}` : ''}
                 />
+                {invKnown && (
+                  <span className={`sz-inv-badge sz-inv-${klass}`}>{invAvailable.toLocaleString()}</span>
+                )}
               </td>
             );
           })}

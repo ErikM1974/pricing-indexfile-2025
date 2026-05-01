@@ -127,9 +127,12 @@
       out.rowSubtotal += lineSubtotal;
     });
 
-    // Sizing metadata for display
+    // Sizing metadata for display — scope upcharges to product's actual sizes
+    // so reps don't see "+$2 2XL" on products that don't carry 2XL.
+    const availableSet = new Set(availableSizes.map(s => String(s).toUpperCase()));
     const sizeUpcharges = {};
     Object.keys(upchargeMap).forEach(sz => {
+      if (!availableSet.has(String(sz).toUpperCase())) return;
       const rel = Number(upchargeMap[sz] || 0) - baseAbs;
       if (rel > 0) sizeUpcharges[sz] = rel;
     });

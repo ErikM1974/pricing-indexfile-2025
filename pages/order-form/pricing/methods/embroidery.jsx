@@ -132,9 +132,17 @@
     const basePrice = bundle.pricing?.[tier]?.[baseSizeKey] != null
       ? S.roundPrice(bundle.pricing[tier][baseSizeKey] + ltmPP, rule)
       : null;
+    // Scope upcharges to sizes the product actually offers. The bundle's
+    // sellingPriceDisplayAddOns map is global (lists upcharges for every
+    // possible extended size — 2XL/3XL/4XL/2XLT/XXL/etc.) regardless of
+    // what the picked product carries. Without this filter, PC61Y (youth,
+    // S-XL only) would show a misleading "+$2 2XL" chip even though youth
+    // doesn't have 2XL.
     const baseAbs = Number(bundle.sellingPriceDisplayAddOns?.[baseSizeKey] || 0);
+    const availableSet = new Set(availableSizes.map(s => String(s).toUpperCase()));
     const sizeUpcharges = {};
     Object.keys(bundle.sellingPriceDisplayAddOns || {}).forEach(sz => {
+      if (!availableSet.has(String(sz).toUpperCase())) return;
       const rel = Number(bundle.sellingPriceDisplayAddOns[sz] || 0) - baseAbs;
       if (rel > 0) sizeUpcharges[sz] = rel;
     });

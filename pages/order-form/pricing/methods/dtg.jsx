@@ -126,9 +126,13 @@
     const basePrice = priced.unitPriceBySize?.[baseSizeKey] != null
       ? priced.unitPriceBySize[baseSizeKey] + ltmPP
       : null;
+    // Scope upcharges to product's actual sizes — bundle.upcharges may list
+    // global extended-size upcharges that don't apply to this product.
     const baseAbs = Number(bundle?.upcharges?.[baseSizeKey] || 0);
+    const availableSet = new Set(availableSizes.map(s => String(s).toUpperCase()));
     const sizeUpcharges = {};
     Object.keys(bundle?.upcharges || {}).forEach(sz => {
+      if (!availableSet.has(String(sz).toUpperCase())) return;
       const rel = Number(bundle.upcharges[sz] || 0) - baseAbs;
       if (rel > 0) sizeUpcharges[sz] = rel;
     });

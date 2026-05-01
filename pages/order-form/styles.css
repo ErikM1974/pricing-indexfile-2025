@@ -1521,10 +1521,79 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
 }
 
-/* Unavailable size cell — grayed out (rep can still type if our data is wrong) */
-.sz-unavail { background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in oklab, var(--ink-4) 14%, transparent) 4px 5px); }
+/* Unavailable size cell — hard-blocked. Renders <span class="sz-na">N/A</span>
+   instead of an <input>, so no keystroke can land. Rep clicks the $ icon
+   next to the style cell to switch to manual-cost mode if SanMar data is
+   wrong (manual mode opens the full XS-4XL grid). */
+.sz-unavail {
+  background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in oklab, var(--ink-4) 14%, transparent) 4px 5px);
+  cursor: not-allowed;
+  text-align: center;
+  vertical-align: middle;
+}
+.sz-na {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: center;
+  line-height: 1.6;
+  user-select: none;
+}
 .t-in--dim { color: var(--ink-3); }
 .t-in--dim::placeholder { color: var(--ink-4); }
+
+/* Inventory badges (under each size cell) — green/amber/red based on
+   requested-vs-available. Tiny mono font, non-intrusive but always
+   visible so reps see at-a-glance which sizes have headroom. */
+.sz-inv-badge {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  margin-top: 1px;
+  line-height: 1.2;
+  user-select: none;
+  color: var(--ink-3);
+}
+.sz-inv-good  { color: #15803d; }       /* green — qty <= avail and avail high */
+.sz-inv-low   { color: #b45309; }       /* amber — qty close to avail */
+.sz-inv-over  { color: #b91c1c; font-weight: 700; }  /* red — qty > avail */
+.sz-inv-unknown { color: var(--ink-4); font-style: italic; }
+
+/* When qty exceeds available stock, the size input itself gets a red
+   border so the cell-level warning catches the eye even if the badge
+   below is missed. */
+td.sz-overflow > input.t-in {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 1px #b91c1c inset;
+  background: color-mix(in oklab, #fee2e2 35%, white);
+}
+
+/* Out-of-stock cell (avail=0) — same N/A treatment as unavailable, with
+   "0 in stock" label so the rep knows it's a stock issue (not a size
+   doesn't-exist issue). */
+td.sz-out-of-stock {
+  background: repeating-linear-gradient(135deg, transparent 0 4px, color-mix(in oklab, #fee2e2 50%, transparent) 4px 5px);
+  cursor: not-allowed;
+  text-align: center;
+}
+.sz-oos {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #b91c1c;
+  text-align: center;
+  line-height: 1.6;
+  user-select: none;
+}
 
 /* Collapsed size grid — for caps (OSFA) and stickers/emblems (single qty).
    Replaces the XS-4XL columns + Other picker with one centered input. The
