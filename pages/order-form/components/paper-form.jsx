@@ -1176,9 +1176,11 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           <CompanyCombobox
             value={info.company}
             onChange={(v) => {
-              // Free typing — clear contact picker so user can switch back to manual entry.
+              // Free typing — clear contact picker so user can switch back
+              // to manual entry. Also clear companyId since the typed name
+              // no longer matches the previously-picked CRM record.
               if (v !== info.company) {
-                setInfo({ ...info, company: v, contacts: [], contactId: '' });
+                setInfo({ ...info, company: v, companyId: '', contacts: [], contactId: '' });
               } else {
                 update('company', v);
               }
@@ -1189,6 +1191,11 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
               setInfo({
                 ...info,
                 company:    c.Company_Name || '',
+                // Capture the CRM customer ID at pick time. Surfaces to the
+                // AE in Notes On Order and (eventually) lets the proxy use
+                // it as ExtCustomerID for proper ShopWorks customer matching
+                // across repeat orders.
+                companyId:  c.id_Customer ? String(c.id_Customer) : '',
                 phone:      c.Company_Phone || '',
                 address:    c.Address || '',
                 city:       c.City || '',
