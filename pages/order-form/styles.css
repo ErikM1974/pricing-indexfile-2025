@@ -1564,6 +1564,10 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 .sz-inv-low   { color: #b45309; }       /* amber — qty close to avail */
 .sz-inv-over  { color: #b91c1c; font-weight: 700; }  /* red — qty > avail */
 .sz-inv-unknown { color: var(--ink-4); font-style: italic; }
+/* Color not carried at NWCA's local warehouse but exists at SanMar — no
+   block, just a hint that we'll have to order it in. Subdued slate so
+   reps notice without alarm. */
+.sz-inv-not-local { color: #475569; font-style: italic; font-size: 8px; letter-spacing: 0.04em; }
 
 /* When qty exceeds available stock, the size input itself gets a red
    border so the cell-level warning catches the eye even if the badge

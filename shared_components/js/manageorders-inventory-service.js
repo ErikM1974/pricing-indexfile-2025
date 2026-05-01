@@ -64,7 +64,31 @@ class ManageOrdersInventoryService {
                 };
             }
 
-            const inventory = data.result[0];
+            // The proxy's `?PartColor=` query param is silently ignored —
+            // the endpoint returns ALL colors in stock for the given part.
+            // Filter client-side by exact (case-insensitive, trimmed) match
+            // on the `Color` field. Falls back to first record only if no
+            // color was requested. If a color was requested but not found,
+            // return a "not stocked locally" status so the form can show
+            // an honest message instead of another color's stock numbers.
+            let inventory;
+            if (color) {
+                const wantColor = String(color).trim().toLowerCase();
+                inventory = data.result.find(r => String(r.Color || '').trim().toLowerCase() === wantColor);
+                if (!inventory) {
+                    const carriedColors = [...new Set(data.result.map(r => r.Color).filter(Boolean))];
+                    console.warn(`[ManageOrdersInventory] ${partNumber} not stocked locally in "${color}". Carried: ${carriedColors.join(', ')}`);
+                    return {
+                        available: false,
+                        message: `Not stocked locally in ${color}`,
+                        notStockedLocally: true,   // distinguishes from "0 in stock"
+                        carriedColors,
+                        totalStock: 0
+                    };
+                }
+            } else {
+                inventory = data.result[0];
+            }
 
             // Calculate total stock across all sizes
             const totalStock =

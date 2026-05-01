@@ -44,6 +44,8 @@
     let cacheAge = '';
     let anyOk = false;
     let anyError = false;
+    let anyNotStockedLocally = false;
+    const carriedColorsAcrossQueries = new Set();
 
     // Helper: assign inventory val to a size, but never overwrite a non-zero
     // value with zero (defensive against partial fetches).
@@ -59,7 +61,10 @@
     if (wantsBaseSizes) {
       try {
         const base = await svc().checkInventory(styleU, colorU);
-        if (base?.sizeBreakdown) {
+        if (base?.notStockedLocally) {
+          anyNotStockedLocally = true;
+          (base.carriedColors || []).forEach(c => carriedColorsAcrossQueries.add(c));
+        } else if (base?.sizeBreakdown) {
           anyOk = true;
           if (base.cacheAge) cacheAge = base.cacheAge;
           Object.entries(base.sizeBreakdown).forEach(([sz, n]) => {
@@ -83,7 +88,10 @@
         if (pn === styleU) return; // S/M/L/XL go to base; no suffix produced
         try {
           const r = await svc().checkInventory(pn, colorU);
-          if (r?.sizeBreakdown != null || r?.totalStock != null) {
+          if (r?.notStockedLocally) {
+            anyNotStockedLocally = true;
+            (r.carriedColors || []).forEach(c => carriedColorsAcrossQueries.add(c));
+          } else if (r?.sizeBreakdown != null || r?.totalStock != null) {
             anyOk = true;
             if (r.cacheAge && !cacheAge) cacheAge = r.cacheAge;
             assign(sz, r.totalStock);
@@ -93,15 +101,23 @@
       await Promise.all(fanOut);
     }
 
-    // Status:
-    //   ok      — at least one query succeeded and we have data for some sizes
-    //   unknown — no data found / nothing to query — graceful: no badges, no block
-    //   error   — all queries failed (e.g. network down) — graceful too
+    // Status precedence (most-specific wins):
+    //   ok                — at least one query returned matching-color stock
+    //   not-stocked-local — color not carried locally, but other colors are
+    //                       (form should show "Not stocked locally — carried: X, Y")
+    //   error             — all queries failed (network) — graceful, no badges
+    //   unknown           — no data / nothing to query — graceful, no badges
     let status = 'unknown';
     if (anyOk) status = 'ok';
+    else if (anyNotStockedLocally) status = 'not-stocked-local';
     else if (anyError) status = 'error';
 
-    return { bySize, cacheAge, status };
+    return {
+      bySize,
+      cacheAge,
+      status,
+      carriedColors: Array.from(carriedColorsAcrossQueries).sort(),
+    };
   }
 
   // Render-friendly classifier — returns 'good' | 'low' | 'over' | 'oos' | 'unknown'.

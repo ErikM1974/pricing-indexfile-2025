@@ -451,10 +451,11 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             }
             const invAvailable = inventory.bySize?.[s];
             const invKnown = inventory.status === 'ok' && Number.isFinite(Number(invAvailable));
+            const notStockedLocally = inventory.status === 'not-stocked-local';
             const isOutOfStock = invKnown && Number(invAvailable) === 0;
             if (isOutOfStock) {
               return (
-                <td key={s} className="sz-out-of-stock" title={`SanMar shows 0 in stock for ${row.colorName || 'this color'} ${s} — switch to manual cost (click $) to override`}>
+                <td key={s} className="sz-out-of-stock" title={`Local warehouse shows 0 in stock for ${row.colorName || 'this color'} ${s} — switch to manual cost (click $) to override`}>
                   <span className="sz-oos">0 STK</span>
                 </td>
               );
@@ -464,6 +465,12 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               ? window.OrderFormInventory.classifyInventory(cellQty, invAvailable)
               : 'unknown';
             const overflow = klass === 'over';
+            const carriedList = (inventory.carriedColors || []).join(', ');
+            const cellTitle = invKnown
+              ? `Local stock: ${invAvailable.toLocaleString()} ${s}${overflow ? ' — exceeds available' : ''}`
+              : (notStockedLocally
+                  ? `${row.colorName || 'This color'} not stocked at NWCA — order from SanMar. ${carriedList ? `Carried locally: ${carriedList}` : ''}`
+                  : '');
             return (
               <td key={s} className={overflow ? 'sz-overflow' : ''}>
                 <input
@@ -471,10 +478,13 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                   inputMode="numeric"
                   value={row.sizes[s] || ''}
                   onChange={e => setSize(s, e.target.value)}
-                  title={invKnown ? `Stock: ${invAvailable.toLocaleString()} ${s}${overflow ? ' — exceeds available' : ''}` : ''}
+                  title={cellTitle}
                 />
                 {invKnown && (
                   <span className={`sz-inv-badge sz-inv-${klass}`}>{invAvailable.toLocaleString()}</span>
+                )}
+                {notStockedLocally && (
+                  <span className="sz-inv-badge sz-inv-not-local" title={cellTitle}>SanMar</span>
                 )}
               </td>
             );
