@@ -461,10 +461,21 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const availSet = (availableSizes && availableSizes.length)
     ? new Set(availableSizes.map(s => String(s).toUpperCase()))
     : null;
-  // Headline unit: prefer the bundle's base price (S/M/L/XL); if unavailable
-  // (e.g. cap OSFA, sticker, emblem), fall back to weighted average.
+  // Headline unit: the row's effective per-piece price (line subtotal ÷ qty).
+  // For rows whose sizes span multiple price tiers (S-XL at $78 + 2XL at $80
+  // + 3XL at $81 + 4XL at $82), this is the honest blended cost — every
+  // size's actual price weighted by its qty. The N6 tier pills above the row
+  // carry the per-size breakdown, so the rep can always see how the avg was
+  // built. Single-tier rows (all sizes at one price) compute to that exact
+  // price, so simple cases read identically to before.
+  //
+  // overrideDefault: when a rep clicks the cell to type a custom price, we
+  // pre-fill the input with the BASE size price (clean whole-dollar number)
+  // rather than the avg (which can have ugly cents like $78.82). They almost
+  // always retype anyway; this is just a friendlier starting point.
   const avgUnit = (showAutoPriceCell && total > 0) ? rowSubtotalDollars / total : 0;
-  const headlineUnit = (basePrice != null) ? basePrice : avgUnit;
+  const headlineUnit = (avgUnit > 0) ? avgUnit : (basePrice != null ? basePrice : 0);
+  const overrideDefault = (basePrice != null) ? basePrice : headlineUnit;
   // Which upcharged sizes actually have qty entered? Only those need to show
   // in the chip — no point cluttering with "+$2 2XL" when there's no 2XL qty.
   // Show the chip in BOTH auto and manual-override modes so the rep keeps
@@ -760,18 +771,18 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
           <button
             type="button"
             className="t-in num auto-priced"
-            onClick={() => update({ priceOverride: true, price: headlineUnit ? headlineUnit.toFixed(2) : '' })}
+            onClick={() => update({ priceOverride: true, price: overrideDefault ? overrideDefault.toFixed(2) : '' })}
             title={showUpchargeChip
-              ? `Auto-priced — click to override. Upcharges: ${upchargeChipText}`
-              : 'Auto-priced — click to override. Headline shows base (S/M/L/XL) price; upcharges are added per size automatically.'}
+              ? `Avg per piece: ${fmt$(headlineUnit)} (${fmt$(rowSubtotalDollars)} ÷ ${total} pcs). Sizes span tiers — see pills above for per-size pricing. Click to enter a flat manual price.`
+              : 'Auto-priced — all sizes at this price. Click to enter a flat manual price.'}
           >
             <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
             <span className="auto-badge">
               auto{showUpchargeChip && (
                 <span
                   className="upcharge-info"
-                  aria-label={`Upcharges: ${upchargeChipText}`}
-                  title={`Upcharges: ${upchargeChipText}`}
+                  aria-label={`Avg ${fmt$(headlineUnit)} blends ${total} pieces across tiers. Pills above show per-size prices.`}
+                  title={`Avg ${fmt$(headlineUnit)} blends ${total} pieces across tiers. Pills above show per-size prices.`}
                 >ⓘ</span>
               )}
             </span>
