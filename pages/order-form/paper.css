@@ -168,10 +168,12 @@
 }
 .p-cell:nth-child(3n) { border-right: 0; }
 .p-cell .lbl {
-  font-size: 9.5px;
-  color: #000;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  line-height: 1.2;
 }
 .p-cell .p-in {
   width: 100%;
@@ -189,13 +191,22 @@
 }
 .p-cell .p-in::placeholder { color: #bbb; font-style: italic; }
 
-/* Special: decoration cell with checkboxes */
+/* Special: decoration cell with checkboxes.
+   The decoration method drives all pricing on the form, so it's THE most
+   consequential field — visual weight reflects that. Soft accent-tinted
+   background + accent-tinted inset border separate it from neighbouring
+   fields without breaking the bordered-grid look of the rest of the
+   header. The active method's pill turns full spruce green. */
 .p-cell.deco-cell {
   padding: 5px 8px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 3px 10px;
   align-content: center;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent) 4%, white) 0%,
+    color-mix(in oklab, var(--accent) 7%, white) 100%);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 18%, transparent);
 }
 .p-deco {
   display: flex;
@@ -204,15 +215,22 @@
   cursor: pointer;
   font-size: 12.5px;
   user-select: none;
+  padding: 2px 6px;
+  border-radius: 999px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.p-deco:hover {
+  background: color-mix(in oklab, var(--accent) 10%, white);
 }
 .p-deco input { position: absolute; opacity: 0; pointer-events: none; }
 .p-chk {
-  width: 13px; height: 13px;
-  border: 1px solid #000;
+  width: 14px; height: 14px;
+  border: 1.5px solid color-mix(in oklab, var(--accent) 45%, var(--ink-3));
+  border-radius: 3px;
   display: inline-grid; place-items: center;
-  flex: 0 0 13px;
+  flex: 0 0 14px;
   background: #fff;
-  transition: background .1s;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 .p-chk::after {
   content: '';
@@ -220,18 +238,24 @@
   color: var(--accent);
   opacity: 0;
 }
+.p-deco.on {
+  background: color-mix(in oklab, var(--accent) 14%, white);
+  color: var(--accent-ink, var(--accent));
+  font-weight: 600;
+}
 .p-deco.on .p-chk {
-  background: color-mix(in oklab, var(--accent) 14%, #fff);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 .p-deco.on .p-chk::after {
   content: '✓';
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--accent);
+  font-size: 11px;
+  font-weight: 900;
+  color: #fff;
   opacity: 1;
   line-height: 1;
   position: relative;
-  top: -1px;
+  top: 0;
 }
 
 /* Payment notice row */

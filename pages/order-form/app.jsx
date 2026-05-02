@@ -27,8 +27,16 @@ function App() {
     contacts: [], contactId: '',
   });
 
-  // Line items
-  const [rows, setRows] = useState([makeBlankRow(), makeBlankRow(), makeBlankRow()]);
+  // Line items — pre-tagged with the default decoration method (embroidery)
+  // so the rep doesn't have to remember to check Embroidery before they start
+  // entering styles. Most NWCA orders are embroidery; reps switching to
+  // another method click the appropriate checkbox which propagates via
+  // toggleDeco() in paper-form.jsx (re-tags every row to the new method).
+  const [rows, setRows] = useState([
+    { ...makeBlankRow(), deco: 'embroidery' },
+    { ...makeBlankRow(), deco: 'embroidery' },
+    { ...makeBlankRow(), deco: 'embroidery' },
+  ]);
 
   // Artwork
   const [files, setFiles] = useState([]);
@@ -44,7 +52,17 @@ function App() {
   // Decoration config — form-wide settings for the active method (stitch count
   // + primary location for embroidery; color counts for SP; etc.). Reseeded
   // when toggleDeco picks a different method (see paper-form.jsx).
-  const [decoConfig, setDecoConfig] = useState({});
+  //
+  // Defaults to Embroidery + 8000 stitches + Left Chest because that's
+  // ~80% of NWCA orders. Reps used to forget to check a method, then type
+  // line items, then wonder why pricing didn't compute. With the default
+  // pre-selected, the common case "just works" and reps switching to
+  // SP/DTG/DTF/Sticker/Emblem still click their method as before.
+  const [decoConfig, setDecoConfig] = useState({
+    method: 'embroidery',
+    stitchCount: 8000,
+    primaryLocation: 'Left Chest',
+  });
 
   // Computed pricing breakdown — recomputed (debounced 300ms) whenever rows /
   // decoConfig / customerMode changes. Source of truth for $ totals.

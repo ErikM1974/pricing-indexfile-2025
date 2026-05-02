@@ -539,18 +539,34 @@ body {
 /* Contact picker (rendered in the Name cell after a company is picked) */
 .contact-picker { display: flex; flex-direction: column; gap: 4px; }
 .contact-picker .p-in { width: 100%; }
+/* "+ New contact" affordance — was a plain text link that read as page
+   chrome. Now a subtle accent-tinted pill that reads as a clickable
+   button without competing with primary actions. Same width as the
+   text was, so layout doesn't shift. */
 .link-btn {
-  background: none;
-  border: 0;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 3px;
+  background: color-mix(in oklab, var(--accent) 8%, white);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, var(--line));
+  padding: 2px 9px;
+  border-radius: 999px;
   font: inherit;
-  font-size: 11px;
-  color: var(--accent, #2563eb);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--accent);
   cursor: pointer;
   text-align: left;
-  align-self: flex-start;
+  margin-top: 2px;
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
-.link-btn:hover { text-decoration: underline; }
+.link-btn:hover {
+  background: color-mix(in oklab, var(--accent) 14%, white);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+  text-decoration: none;
+}
 
 /* Color picker — custom dropdown so we can show swatches next to color names.
    Lives inside a <td>, so we hug the cell tightly and reserve room for a caret on the right. */
@@ -599,12 +615,21 @@ body {
 .color-swatch.placeholder { background: repeating-linear-gradient(45deg, #f4f4f4 0 4px, #fafafa 4px 8px); }
 .color-name {
   flex: 1 1 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;        /* lets ellipsis kick in inside flex */
-  font-size: 12.5px;
+  min-width: 0;
+  font-size: 12px;
   line-height: 1.2;
+  /* 2-line clamp so multi-word color names like "Biscuit/True Navy",
+     "Brilliant Orange", "Forest Green Heather" show in full instead of
+     truncating to "Biscuit/ Tru…". Short names stay on one line — only
+     long names consume the second. Falls back to ellipsis on the second
+     line if a name somehow exceeds 2 lines (rare). Standard `display:
+     -webkit-box` + `line-clamp` works in every browser we ship to. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 .color-select-menu {
   position: absolute;
@@ -770,56 +795,136 @@ body {
 .nss-chip {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  background: color-mix(in oklab, var(--accent, #1b4d2b) 8%, #fff);
-  border: 1px solid color-mix(in oklab, var(--accent, #1b4d2b) 30%, #ddd);
-  border-radius: 10px;
-  padding: 1px 2px 1px 6px;
-  line-height: 1.1;
+  gap: 4px;
+  /* Soft spruce-tinted gradient so the chip reads as a polished pill, not
+     a flat color block. Border at 25% accent stays subtle; deepens on hover. */
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent) 5%, white) 0%,
+    color-mix(in oklab, var(--accent) 12%, white) 100%);
+  border: 1px solid color-mix(in oklab, var(--accent) 25%, var(--line));
+  border-radius: 999px;
+  padding: 2px 4px 2px 9px;
+  line-height: 1.15;
   font-size: 11px;
   white-space: nowrap;
+  box-shadow:
+    0 1px 0 rgba(20, 60, 30, 0.025),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.nss-chip:hover,
+.nss-chip:focus-within {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+  box-shadow:
+    0 1px 2px rgba(20, 60, 30, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 .nss-chip-label {
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--font-mono, ui-monospace, monospace);
-  color: var(--accent, #1b4d2b);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--accent);
 }
 .nss-chip-qty {
-  width: 28px;
+  width: 26px;
   border: 0;
   background: transparent;
   font: inherit;
-  font-size: 11.5px;
+  font-size: 12px;
+  font-weight: 600;
   text-align: center;
-  padding: 1px 2px;
+  padding: 1px 0;
   outline: 0;
+  color: var(--ink);
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  border-radius: 4px;
 }
-.nss-chip-qty:focus { background: rgba(255,255,255,0.7); border-radius: 3px; }
+.nss-chip-qty:focus {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 30%, var(--line));
+}
 .nss-chip-remove {
   border: 0;
   background: transparent;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
-  color: #777;
-  padding: 0 3px;
+  color: var(--ink-3);
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: 50%;
+  transition: color 0.12s ease, background-color 0.12s ease;
 }
-.nss-chip-remove:hover { color: #b02020; background: rgba(176,32,32,0.08); }
+.nss-chip-remove:hover {
+  color: #b02020;
+  background: rgba(176, 32, 32, 0.10);
+}
 
-/* Inventory badge inside an Other-sizes chip (5XL/6XL/XXL etc.). The
-   standard `.sz-inv-badge` rule positions the badge below the input via
-   `display:block` — inside a chip we want it inline so the chip stays
-   tidy on one line. Show it after the X remove button. */
-.nss-chip-inv {
-  display: inline !important;
-  margin-left: 2px !important;
-  margin-top: 0 !important;
+/* Inventory badge inside an Other-sizes chip (5XL/6XL/XXL etc.). When a
+   rep adds a non-standard size, the actual stock count is the whole point
+   — they're explicitly choosing a less-common size and want to know what's
+   available. So this badge OPTS OUT of the green-dot collapse rule that
+   standard-grid badges use, and always shows the number. The shape rules
+   below use a class-only selector (no `.sz-inv-*` modifier) so the per-
+   state COLOR rules further down win the cascade cleanly. */
+/* Shape rules — !important on text-indent / overflow / color / bg / border
+   because paper.css's standard-grid dot-collapse rule (`.p-table
+   td:not(...):not(...) .sz-inv-badge.sz-inv-good { color: transparent;
+   text-indent: -9999px; overflow: hidden }`) carries higher native
+   specificity (7,1) than any pure class chain. !important is the right
+   tool here — we're EXPLICITLY opting this NSS-chip badge out of the
+   collapse, since a rep adding 5XL/6XL/XXL by hand wants the actual
+   stock count, not a colored dot. */
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv {
+  display: inline-flex !important;
+  align-items: center;
+  margin: 0 1px 0 2px !important;
   font-size: 9px;
-  padding: 0 3px;
-  border-radius: 6px;
-  background: rgba(0,0,0,0.04);
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  text-indent: 0 !important;
+  overflow: visible !important;
+  /* Default (unknown / fallback) palette — get overridden by sz-inv-* below */
+  color: var(--ink-3) !important;
+  background: color-mix(in oklab, var(--ink-4) 8%, white) !important;
+  border: 1px solid color-mix(in oklab, var(--line) 80%, var(--ink-4)) !important;
+}
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv::before {
+  content: none !important;
+}
+/* Per-state colors — also !important to consistently win over the
+   collapse-rule's transparent color.
+
+   2026-05-02 update: HIDE the inventory badge entirely when state is
+   "good" / "unknown" / "not-local" — those carry no warning, so showing
+   "1,489" on a chip with qty=0 is just noise. SHOW only for warnings:
+   low (amber), over (red), zero/out (red). Matches the standard-grid
+   pattern where green/plenty inventory collapses to a dot too — the rep
+   only sees inventory when it matters. */
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv.sz-inv-good,
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv.sz-inv-unknown,
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv.sz-inv-not-local {
+  display: none !important;
+}
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv.sz-inv-low {
+  color: #b45309 !important;
+  background: color-mix(in oklab, #b45309 6%, white) !important;
+  border-color: color-mix(in oklab, #b45309 22%, var(--line)) !important;
+}
+.p-table td .nss-chip .sz-inv-badge.nss-chip-inv.sz-inv-over {
+  color: #b91c1c !important;
+  background: color-mix(in oklab, #b91c1c 6%, white) !important;
+  border-color: color-mix(in oklab, #b91c1c 28%, var(--line)) !important;
+  font-weight: 700;
 }
 
 /* Inventory badges inside the custom-sizes mini-grid (tall sizes, fitted
@@ -827,21 +932,24 @@ body {
    custom-cell label, so the badge under the input is fine — the existing
    .sz-inv-badge rule already does display:block. No override needed. */
 .nss-add-btn {
-  border: 1px dashed #bbb;
+  border: 1px dashed color-mix(in oklab, var(--line) 60%, var(--ink-4));
   background: #fff;
-  color: #555;
+  color: var(--ink-3);
   font: inherit;
   font-size: 10.5px;
-  padding: 2px 7px;
-  border-radius: 10px;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
+  transition: border-color 0.12s ease, color 0.12s ease, background-color 0.12s ease;
 }
 .nss-add-btn:hover {
-  border-color: var(--accent, #1b4d2b);
-  color: var(--accent, #1b4d2b);
-  background: color-mix(in oklab, var(--accent, #1b4d2b) 6%, #fff);
+  border-style: solid;
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+  color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 4%, white);
 }
 .nss-menu {
   position: absolute;
@@ -1500,41 +1608,52 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
    =========================================================== */
 
 .t-in.auto-priced {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--accent-soft) 80%, white), color-mix(in oklab, var(--accent-soft) 50%, white));
-  border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--line));
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent-soft) 75%, white) 0%,
+    color-mix(in oklab, var(--accent-soft) 45%, white) 100%);
+  border: 1px solid color-mix(in oklab, var(--accent) 28%, var(--line));
   cursor: pointer;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-weight: 600;
   color: var(--ink);
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;          /* horizontal center inside the price column */
   justify-content: center;
-  gap: 1px;
+  gap: 3px;
   width: 100%;
-  padding: 4px 8px;
-  text-align: right;
+  padding: 5px 8px;
+  text-align: center;           /* match the column header + manual input alignment */
   min-height: 36px;
+  border-radius: 6px;
+  box-shadow:
+    0 1px 0 rgba(20, 60, 30, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
 }
-.t-in.auto-priced .auto-priced-money { font-size: 13px; line-height: 1.15; }
+.t-in.auto-priced .auto-priced-money {
+  font-size: 13px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
 .t-in.auto-priced:hover {
-  background: linear-gradient(180deg, color-mix(in oklab, var(--accent-soft) 90%, white), color-mix(in oklab, var(--accent-soft) 60%, white));
-  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent-soft) 85%, white) 0%,
+    color-mix(in oklab, var(--accent-soft) 55%, white) 100%);
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+  box-shadow:
+    0 1px 2px rgba(20, 60, 30, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
-/* Tiny ⓘ glyph appended to the AUTO/MANUAL chip when upcharges apply.
-   Native title= tooltip on the parent reveals the full upcharge text on
-   hover (e.g. "+$1 2XLT · +$2 3XLT · +$3 4XLT") — zero JS popover. */
-.upcharge-info {
-  display: inline-block;
-  margin-left: 3px;
-  font-size: 10px;
-  line-height: 1;
-  color: var(--accent);
-  cursor: help;
-  vertical-align: 0.5px;
-}
-.auto-badge--manual .upcharge-info { color: #7e22ce; }
+/* `.upcharge-info` (the ⓘ glyph) and `.auto-badge` / `.auto-badge--manual`
+   were removed from the price-cell JSX 2026-05-02. Their CSS rules are
+   left in place but now apply to nothing — keeping them avoids breaking
+   any third-party screenshot/PDF tooling that might still reference the
+   selectors, and any future "form-level manual mode" toggle could
+   reuse the .auto-badge--manual styling. Safe to delete in a future
+   cleanup pass. */
 
 /* Unavailable size cell — hard-blocked. Renders <span class="sz-na">N/A</span>
    instead of an <input>, so no keystroke can land. Rep clicks the $ icon
@@ -1738,19 +1857,23 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
   display: inline-flex;
   align-items: center;
   gap: 0;
-  font-size: 9px;
+  font-size: 8.5px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.10em;
   text-transform: uppercase;
   color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 12%, white);
-  padding: 1px 4px;
-  border-radius: 3px;
+  background: color-mix(in oklab, var(--accent) 14%, white);
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, var(--line));
+  padding: 1px 6px;
+  border-radius: 999px;
   flex-shrink: 0;
+  line-height: 1.4;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 .auto-badge--manual {
   color: #7e22ce;
   background: color-mix(in oklab, #c084fc 18%, white);
+  border-color: color-mix(in oklab, #c084fc 35%, var(--line));
 }
 .t-in.t-in-money { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
 
@@ -1758,33 +1881,50 @@ td.size-collapsed--custom-sizes { background: color-mix(in oklab, #bfdbfe 25%, w
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   align-items: stretch;
 }
-.restore-auto-link {
-  background: transparent;
-  border: 0;
-  color: var(--accent);
-  font-size: 9px;
-  cursor: pointer;
-  padding: 0;
-  text-decoration: underline;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  align-self: flex-end;
-}
-.restore-auto-link:hover { color: var(--accent-hover); }
 
-/* Manual-price meta row — sits under the <input> showing the MANUAL chip
-   (with optional ⓘ for upcharge tooltip) and the "restore auto" link
-   side-by-side. Mirrors the auto-priced cell's compactness. */
+/* "restore auto" — a tiny outlined button next to the MANUAL chip, NOT an
+   underlined link. Reads as an action affordance ("press me to undo"),
+   matches the chip's pill shape, and stops looking like a stray banner. */
+.restore-auto-link {
+  background: #fff;
+  border: 1px solid color-mix(in oklab, var(--accent) 30%, var(--line));
+  color: var(--accent);
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+.restore-auto-link:hover {
+  background: color-mix(in oklab, var(--accent) 8%, white);
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+  color: var(--accent-hover, var(--accent));
+}
+.restore-auto-link:active {
+  background: color-mix(in oklab, var(--accent) 14%, white);
+}
+
+/* Manual-price meta row — sits under the <input>. Holds the MANUAL chip
+   (with optional ⓘ tooltip) and the "restore auto" button side-by-side,
+   right-aligned to match the price cell's number-on-the-right alignment.
+   Both children are pill-shaped and the same height, so the row reads as
+   a tidy two-control cluster instead of a banner blob. */
 .manual-price-cell .manual-price-meta {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 6px;
-  margin-top: 2px;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 1px;
 }
 
 /* ===========================================================
@@ -1974,33 +2114,45 @@ tr.pf-breakdown-row--manual > td {
   right: 4px;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   white-space: nowrap;
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--accent);    /* NWCA spruce green — the brand accent */
+  /* Subtle vertical gradient on the spruce so it reads as a polished badge,
+     not a flat block. The deep-green inset border + soft drop shadow give
+     it weight without screaming for attention. */
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent) 88%, white) 0%,
+    var(--accent) 100%);
   border: 0;
-  padding: 2px 7px;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 0 0 1px color-mix(in oklab, var(--accent) 50%, #000) inset;
+  padding: 3px 8px;
+  border-radius: 999px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.10),
+    0 0 0 1px color-mix(in oklab, var(--accent) 60%, #000) inset,
+    0 1px 0 rgba(255, 255, 255, 0.20) inset;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
   pointer-events: none;          /* tooltip-only, doesn't intercept clicks on textarea */
   user-select: none;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
   z-index: 1;
 }
 /* "CAP" suffix when product is a flat headwear (cap embroidery pricing) —
    thin outlined chip inside the pill, reads as a modifier not a tier. */
 .row-tier-badge .row-tier-cap {
   display: inline-block;
-  padding: 0 4px;
+  padding: 1px 5px;
   font-size: 8px;
-  letter-spacing: 0.08em;
-  background: rgba(255,255,255,0.25);
-  border-radius: 2px;
+  letter-spacing: 0.10em;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px;
   font-weight: 700;
+  text-shadow: none;
 }
 /* The desc-cell needs to be a positioning context so the absolute badge
    anchors to it. Also adds padding-bottom on the textarea so the typed
