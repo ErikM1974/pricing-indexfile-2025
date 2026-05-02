@@ -1886,6 +1886,22 @@ app.post('/api/order-form-drafts', async (req, res) => {
   }
 });
 
+// Sales-rep slug → full name. The form's <select> in paper-form.jsx:1562
+// stores a lowercase login slug ("taneisha") as the value because that's
+// the legacy convention. ShopWorks's CustomerServiceRep field displays
+// whatever string we send verbatim, so without translation the rep shows
+// up as "taneisha" instead of "Taneisha Clark". Mapping is kept here
+// (server-side) instead of changing the dropdown value because saved
+// drafts in the Caspio quote_sessions table already use slugs — flipping
+// the dropdown values would orphan those drafts.
+const SALES_REP_FULL_NAMES = {
+  nika: 'Nika Lao',
+  taneisha: 'Taneisha Clark',
+  erik: 'Erik Mickelson',
+  ruth: 'Ruth Nhoung',
+  jim: 'Jim Mickelson',
+};
+
 // POST /api/submit-order-form — Submit an order-form to ShopWorks.
 // Accepts the frontend state verbatim + optional draftId for share-link flow.
 app.post('/api/submit-order-form', async (req, res) => {
@@ -2063,11 +2079,21 @@ app.post('/api/submit-order-form', async (req, res) => {
     });
 
     // --- Designs: one per decoration method present in rows, artwork URLs attached ---
-    // DesignType IDs per memory/MANAGEORDERS_COMPLETE_REFERENCE.md:
-    //   3 = standard embroidery/screenprint, 45 = DTG
-    //   Stickers + Emblems route as 3 with method noted in design name (TBD ShopWorks IDs)
-    const DESIGN_TYPE_ID = { embroidery: 3, screenprint: 3, dtg: 45, dtf: 3, sticker: 3, emblem: 3 };
+    // DesignType IDs per Erik's "design type translation.csv" (2026-05-02).
+    // PRIOR VALUES WERE WRONG — only DTG was correct. All other methods
+    // were sending design type 3 ("standard"), which doesn't exist in
+    // ShopWorks's design taxonomy. Authoritative IDs from CSV:
+    //   1 = Screenprint, 2 = Embroidery, 4 = Advertising Specialty (Stickers),
+    //   5 = Emblem, 8 = Transfer (DTF), 45 = DTG
+    const DESIGN_TYPE_ID = { embroidery: 2, screenprint: 1, dtg: 45, dtf: 8, sticker: 4, emblem: 5 };
     const DESIGN_LABEL   = { embroidery: 'Embroidery', screenprint: 'Screen Print', dtg: 'DTG', dtf: 'DTF Transfer', sticker: 'Stickers', emblem: 'Embroidered Emblems' };
+    // OrderType IDs per Erik's "order type mapping.csv" (2026-05-02).
+    // Each method routes to a specific ShopWorks order type so production
+    // queues (Custom Embroidery, Screen Print Subcontract, Digital Printing,
+    // etc.) populate correctly. Mixed-method orders fall back to 41
+    // ("Order Type on Form") since no single category fits.
+    const ORDER_TYPE_ID = { embroidery: 5, screenprint: 21, dtg: 7, dtf: 8, sticker: 13, emblem: 18 };
+    const ORDER_TYPE_DEFAULT = 41;  // "Order Type on Form" — generic / mixed
     const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
 
     // Design # lookup — when the rep typed numbers in the Design # field, try
@@ -2237,18 +2263,38 @@ app.post('/api/submit-order-form', async (req, res) => {
         subtotal: 0, rushFee: 0, salesTax: 0, shipping: 0, grandTotal: 0
       },
       payments: [],
-      // Source/sales-rep fields — the proxy maps CustomerServiceRep → ShopWorks CSR
+      // Source/sales-rep fields — the proxy maps CustomerServiceRep → ShopWorks CSR.
+      // SALES_REP_FULL_NAMES translates the form's dropdown slug
+      // ("taneisha") to the canonical full name ("Taneisha Clark") that
+      // ShopWorks displays. Falls back to whatever's in info.salesRep so
+      // unknown values pass through (better than swallowing them).
       extSource: 'NWCA-OrderForm',
-      salesRep: info.salesRep || '',
+      salesRep: SALES_REP_FULL_NAMES[info.salesRep] || info.salesRep || '',
       // Payment terms — one of: "Prepaid" (default) | "Pay On Pickup"
       terms: info.terms || 'Prepaid',
       // Proxy expects camelCase names matching manageorders-push-client: orderDate, requestedShipDate, dropDeadDate
       orderDate: info.dateIn || new Date().toISOString().slice(0, 10),
       requestedShipDate: info.dateDue || info.dateIn || new Date().toISOString().slice(0, 10),
       dropDeadDate: info.dateDue || '',
-      // Webstore customer routing — real customer info in Contact fields (per MANAGEORDERS_COMPLETE_REFERENCE §5)
-      idCustomer: 2791,
-      idOrderType: 6
+      // Customer routing — when the rep picked a known company from
+      // autocomplete, info.companyId carries the real ShopWorks id_Customer
+      // (e.g. 1276 for Aaberg's Rentals). Falls back to 2791 (catch-all
+      // "Online Order Form Customer") for brand-new typed names.
+      idCustomer: Number(info.companyId) || 2791,
+      // OrderType per the order's primary decoration method. Single-method
+      // orders pick the matching ShopWorks queue; mixed-method orders
+      // (rare — a rep checks both Embroidery + Screenprint) fall back to
+      // 41 ("Order Type on Form") since no single category fits.
+      idOrderType: methodsUsed.length === 1
+        ? (ORDER_TYPE_ID[methodsUsed[0]] || ORDER_TYPE_DEFAULT)
+        : ORDER_TYPE_DEFAULT,
+      // APISource: routes orders to the new "Order Form" ShopWorks
+      // ManageOrders integration (set its APISource = "OrderForm" too).
+      // Existing "Northwest Embroidery-Store" integration with blank
+      // APISource keeps pulling per current behavior — see plan note about
+      // potential temporary duplicate ingestion until that integration
+      // also gets a tag.
+      apiSource: 'OrderForm'
     };
 
     console.log('[Order Form Submit] Pushing', extOrderId, 'lines:', lineItems.length, 'designs:', designs.length);
