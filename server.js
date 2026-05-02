@@ -2128,26 +2128,21 @@ app.post('/api/submit-order-form', async (req, res) => {
     const ORDER_TYPE_DEFAULT = 6;  // Online Store — fallback when no method picked
     const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
 
-    // Design # lookup — when the rep typed numbers in the Design # field, try
-    // to resolve each one to an existing ShopWorks id_Design via the proxy's
-    // design-lookup endpoint. Best-effort: 404/network failures fall back to
-    // the generic-design behavior (no regression). Per MANAGEORDERS_COMPLETE_REFERENCE.md:
-    // known → { id_Design: N }, unknown → omit (proxy creates a new design).
-    const designIdMap = {};  // designNumber → id_Design
-    if (Array.isArray(designNumbers) && designNumbers.length) {
-      await Promise.all(designNumbers.map(async (num) => {
-        const safeNum = String(num).replace(/[^0-9A-Z\-]/gi, '');
-        if (!safeNum) return;
-        try {
-          const r = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/embroidery-designs/lookup?designNumber=${encodeURIComponent(safeNum)}`);
-          if (!r.ok) return;
-          const j = await r.json().catch(() => null);
-          const id = j?.id_Design ?? j?.ID_Design ?? j?.results?.[0]?.id_Design;
-          if (Number.isFinite(Number(id))) designIdMap[safeNum] = Number(id);
-        } catch (_) { /* best-effort */ }
-      }));
-    }
-    const linkedIdDesigns = Object.values(designIdMap);
+    // Design # → id_Design resolution.
+    //
+    // CASPIO TABLE INSIGHT (Erik confirmed 2026-05-02): the
+    // `Design_Lookup_2026` table's `Design_Number` column IS ShopWorks's
+    // `id_Design` value — they're the same integer under different column
+    // names (the table's `ID_Unique` column is empty). So the autocomplete's
+    // pick of design 9449 means we pass `id_Design: 9449` to ShopWorks
+    // directly, no second lookup needed.
+    //
+    // The rep can also type a free-form design# from memory; we accept any
+    // integer between 1 and 999999. Non-numeric input falls through to
+    // Designs:[] (Phase A behavior — no orphan creation).
+    const linkedIdDesigns = (Array.isArray(designNumbers) ? designNumbers : [])
+      .map(n => Number(String(n || '').trim()))
+      .filter(n => Number.isInteger(n) && n > 0 && n < 1000000);
 
     // Designs[]: ONLY emit when at least one design# resolved to a real
     // ShopWorks id_Design. Otherwise return [] so ShopWorks doesn't create
