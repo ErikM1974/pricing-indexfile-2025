@@ -1719,6 +1719,27 @@ New browser form at `/pages/order-form.html`. Staff-facing by default; supports 
 - Size handling: server does `orderFormSizeSuffix()` (in `server.js`) — `2XL → _2X`, `3XL → _3XL`, etc. Same conventions as §Size Modifier Reference.
 - Artwork uploaded to `POST /api/files/upload` on caspio-proxy (same as 3-Day Tees), hosted URL sent as `imageUrl` + `mediaUrl`.
 
+**Design auto-link (Phase B, v906 2026-05-02):**
+- The form has a "Design #" autocomplete next to Sales Rep that fetches `/api/digitized-designs/by-customer?customerId=N` when the company is picked.
+- **Key insight**: Caspio's `Design_Lookup_2026.Design_Number` IS ShopWorks's `id_Design` (same integer, different column name — the table's `ID_Unique` column is empty). So when rep picks design 9449, the order pushes with `idDesign: 9449` and ShopWorks links to the existing design row. No secondary lookup, no orphan, no duplicate.
+- Empty design# → `Designs: []` (no design attached; rep links in ShopWorks if needed). Erik's preference: better to leave blank than create orphans.
+- Non-numeric typed input ("abc") also → `Designs: []` (filter at server.js).
+- Frontend cache: 5 min in-memory per `customerId`, in-flight dedupe so two focus events don't double-fetch.
+- ⚠️ A latent bug was fixed: server.js was calling `/api/embroidery-designs/lookup` (404 — wrong path; correct is `/api/digitized-designs/lookup`). Design# resolution had been silently failing on every push since the form launched. Phase A's `Designs:[]` fallback masked it. v906 replaces the HTTP fetch with direct integer validation.
+
+**Sales Rep → Employee ID mapping (Phase A, v906 2026-05-02):**
+The form's `id_EmpCreatedBy` is now mapped per the picked Sales Rep (was hardcoded 2 / Erik for every order):
+
+| Form slug | Display | id_EmpCreatedBy |
+|---|---|---|
+| jim | Jim Mickelson | 1 |
+| erik | Erik Mickelson | 2 |
+| ruth | Ruthie Nhoung | 24 |
+| nika | Nika Lao | 169 |
+| taneisha | Taneisha Clark | 281 |
+
+Note: form's slug `ruth` → display "Ruthie Nhoung" (ShopWorks's exact spelling). Slug stays `ruth` for back-compat with saved drafts.
+
 **ShopWorks integration setup (2026-05-02):**
 - New integration "Order Form" created alongside existing "Northwest Embroidery-Store"
 - Both share URL `manageordersapi.com/onsite` (ManageOrders SaaS endpoint, fixed)
