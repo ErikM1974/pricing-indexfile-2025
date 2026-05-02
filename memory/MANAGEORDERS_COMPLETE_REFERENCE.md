@@ -1695,16 +1695,17 @@ New browser form at `/pages/order-form.html`. Staff-facing by default; supports 
 - `payments: []` (paid offline via invoice — no Stripe)
 - `taxTotal: 0`, `cur_Shipping: 0` (OnSite calculates; tax flags set by proxy)
 - **`idCustomer: Number(info.companyId) || 2791`** — when the rep picks a known company from the autocomplete (Caspio CompanyContactsMerge2026), `info.companyId` carries the real ShopWorks `id_Customer` (e.g. 1276 for Aaberg's). Falls back to 2791 catch-all for brand-new typed names. **Proxy now strips the Customer{...} block when idCustomer is non-default** to avoid overwriting canonical billing records with form-typed data.
-- **`idOrderType` per primary decoration method** (mixed-method orders fall back to 41):
-  | Method | OrderType ID |
-  |---|---|
-  | Embroidery | 5 (Custom Embroidery) |
-  | Screen Print | 21 (Screen Print Subcontract) |
-  | DTG | 7 (Digital Printing) |
-  | DTF | 8 (Transfers) |
-  | Stickers | 13 (Laser/Ad Specialties) |
-  | Emblems | 18 (Emblem) |
-  | _mixed/default_ | 41 (Order Type on Form) |
+- **`idOrderType` per decoration method** (CORRECTED 2026-05-02 after OF-0027 — original CSV had every ID wrong; verified against the live ShopWorks Order Types list):
+  | Method | OrderType ID | ShopWorks Name | Revenue Account |
+  |---|---|---|---|
+  | Embroidery | **21** | Custom Embroidery | 4050 Custom Embroidered Sales |
+  | Screen Print | **13** | Screen Print Subcontract | 4200 Subcontract Screenprinted Sales |
+  | DTG | **5** | Digital Printing | 4001 Digital Printing Sales |
+  | DTF | **18** | Transfers | 4005 Transfer Sales |
+  | Stickers | **41** | Laser/Ad Specialties | 4400 Ad Specialty Sales |
+  | Emblems | **7** | Emblem | 4002 Emblem Sales |
+  | _no method picked_ | **6** | Online Store | 4003 Online Store Sales |
+  - Per Erik 2026-05-02: ShopWorks does NOT allow mixed order types. An order is single-method; we take `methodsUsed[0]`. If the form UI ever lets a multi-method order through, the first method wins.
 - **`id_DesignType` per method (CORRECTED 2026-05-02 — old values were wrong for everything except DTG)**:
   | Method | Design Type ID |
   |---|---|
