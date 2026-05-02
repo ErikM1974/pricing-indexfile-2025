@@ -358,18 +358,26 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
 
   // ----- Description auto-fill from product API -----
   // When the rep types a style without picking from the autocomplete dropdown,
-  // ProductCombobox.onPick never fires and row.desc stays empty. Detect a
-  // valid resolved style (the bundle came back, evidenced by row.imageUrl OR
-  // a successful breakdown) and fill the description from /api/product-colors.
-  // Only writes when desc is empty — never overwrites the rep's typing.
+  // ProductCombobox.onPick never fires and row.desc would stay empty. This
+  // effect fills it from /api/product-colors. It also REFRESHES on style
+  // change so a rep who picks 111 then changes the style to 112FP gets the
+  // 112FP description (was bug: stale 111 desc stuck under PartNumber 112FP
+  // — see OF-0025).
+  //
+  // descSource gates the refresh: 'auto' (default) lets us overwrite,
+  // 'manual' (set when the rep types in the desc textarea) leaves their
+  // edit alone forever.
   useEffect(() => {
-    if (!row.style || row.desc) return;
+    if (!row.style) return;
+    if (row.descSource === 'manual' && row.desc) return;  // honor rep edits
     if (!window.fetchProductInfo) return;
     let cancelled = false;
     window.fetchProductInfo(row.style).then(info => {
       if (cancelled) return;
       const title = (info?.productTitle || '').trim();
-      if (title && !row.desc) update({ desc: title });
+      if (!title) return;
+      if (row.descSource === 'manual' && row.desc) return; // re-check after async
+      if (title !== row.desc) update({ desc: title, descSource: 'auto' });
     }).catch(() => { /* silent */ });
     return () => { cancelled = true; };
   }, [row.style]);
@@ -554,7 +562,12 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             onChange={(v) => update({ style: v })}
             onPick={(p) => update({
               style: p.style,
-              desc: row.desc || p.desc || '',
+              // Refresh desc unless the rep typed it manually. Same logic as
+              // the auto-fill effect — descSource='auto' means it's safe to
+              // overwrite when the underlying style changes.
+              ...(row.descSource === 'manual' && row.desc
+                ? {}
+                : { desc: p.desc || '', descSource: 'auto' }),
               ...(row.style && row.style !== p.style ? { colorName: '', catalogColor: '' } : {})
             })}
           />
@@ -592,7 +605,12 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             rows={2}
             placeholder="Description"
             value={row.desc}
-            onChange={e => update({ desc: e.target.value })}
+            onChange={e => {
+              const v = e.target.value;
+              // Mark manual when rep types something; reset to 'auto' when
+              // they clear the field (so the next style change re-auto-fills).
+              update({ desc: v, descSource: v.trim() ? 'manual' : 'auto' });
+            }}
           />
           {rowBreakdown && !rowBreakdown.error && rowBreakdown.tier && (
             <RowTierBadge rowBreakdown={rowBreakdown} />

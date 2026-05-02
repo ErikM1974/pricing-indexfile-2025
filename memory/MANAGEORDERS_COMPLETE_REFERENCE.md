@@ -597,7 +597,7 @@ Nested customer information. Only used when creating NEW customers.
 | Field | Type | Required | Description | Example |
 |-------|------|----------|-------------|---------|
 | `PartNumber` | string | **YES** | Product SKU with size modifier | `"PC54"`, `"PC54_2X"` |
-| `Color` | string | No | Color name | `"Red"` |
+| `Color` | string | No | **CATALOG_COLOR** (mainframe code), NOT COLOR_NAME — see ⚠️ rule below | `"Bk/Bk/LtGy"`, `"BrillOrng"` |
 | `Description` | string | No | Product description | |
 | `Size` | string | No | Size (OnSite translates) | `"XL"`, `"2XL"` |
 | `Qty` | string | **YES** | Quantity | `"5"` |
@@ -624,6 +624,39 @@ Nested customer information. Only used when creating NEW customers.
 
 ---
 
+### ⚠️ `Color` Field MUST Be CATALOG_COLOR (mainframe code), NOT COLOR_NAME
+
+**Rule:** Send the abbreviated mainframe code (`"Bk/Bk/LtGy"`, `"BrillOrng"`) — same as Caspio's `CATALOG_COLOR` column. **Never send the friendly display name** (`"Black/ Black/ Light Grey"`, `"Brilliant Orange"`).
+
+**Why:**
+- ShopWorks must forward the `Color` value verbatim on the SanMar PO. If the value isn't a SanMar mainframe code, ShopWorks tries to translate via its own internal product table — and any translation miss produces a bad SanMar PO that gets rejected.
+- **SanMar's PromoStandards `getProduct.colorName` IS the abbreviated mainframe code** — it's not a "friendly" alias. Verified for style 112 (2026-05-02): all 112 Caspio `CATALOG_COLOR` values match SanMar's `colorName` 1:1 (`Bk/Bk/LtGy`, `HotPink/Wh`, `Biscuit/TB`, `Wht/Wht/Rd`, …). So Caspio's `CATALOG_COLOR` IS the SanMar key.
+
+**Implementation (single chokepoint):**
+The proxy's `transformLineItems()` in [`caspio-pricing-proxy/lib/manageorders-push-client.js:279`](../../caspio-pricing-proxy/lib/manageorders-push-client.js) is the only place the outbound `Color` field is built:
+```js
+Color: item.catalogColor || item.color || '',   // prefer mainframe code; fall back for legacy callers
+```
+- Order form sends both `color` (display, for QuoteItems audit) and `catalogColor` (mainframe code, for ShopWorks).
+- Legacy callers (3-Day Tees push, embroidery push) that don't send `catalogColor` keep working through the `|| item.color` fallback.
+
+**Other places this rule applies:**
+- SanMar inventory query (`/api/sanmar/inventory/:style?color=…`) — pass CATALOG_COLOR
+- SanMar sellable check — pass CATALOG_COLOR
+- ManageOrders `/inventorylevels?Color=…` — pass CATALOG_COLOR
+- **Reserve `COLOR_NAME` strictly for UI display** (customer quotes, line-item display, dropdown labels)
+
+**How to audit a style:**
+```bash
+curl 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar/product-colors/<STYLE>' | jq '.activeColors'
+```
+Compare the returned `colorName` values against Caspio's `CATALOG_COLOR` rows. Mismatches = drift candidates worth investigating.
+
+**History:**
+- 2026-05-02 — proxy v606. Switched outbound `Color` from `item.color` to `item.catalogColor || item.color`. Root cause of intermittent SanMar rejections on Richardson 112 caps. See [LESSONS_LEARNED.md](LESSONS_LEARNED.md) "ShopWorks PO `Color` Field Must Be CATALOG_COLOR".
+
+---
+
 ### Designs Array
 
 Artwork/design information.
@@ -632,13 +665,32 @@ Artwork/design information.
 |-------|------|-------------|
 | `DesignName` | string | Design name |
 | `ExtDesignID` | string | External design ID |
-| `id_Design` | number | OnSite design ID |
+| `id_Design` | number | OnSite design ID — **OMIT entirely when unknown; do NOT send `0`** (see ⚠️ rule below) |
 | `id_DesignType` | number | Design type (3=standard, 45=DTG) |
 | `id_Artist` | number | Artist assignment ID |
-| `ForProductColor` | string | Applicable colors |
+| `ForProductColor` | string | Applicable colors — **use CATALOG_COLOR codes**, comma-separated; should list ALL colors the design covers (see ⚠️ rule below) |
 | `VendorDesignID` | string | Vendor's design ID |
 | `CustomField01-05` | string | Custom fields |
 | `Locations` | array | Print location details |
+
+#### ⚠️ `id_Design` MUST be omitted (not 0) when unknown
+
+Sending `id_Design: 0` makes ShopWorks attach line items to a **sentinel orphan-design row** instead of creating a fresh design from `DesignName + ExtDesignID`. The proxy's `transformDesigns()` ([`caspio-pricing-proxy/lib/manageorders-push-client.js:372`](../../caspio-pricing-proxy/lib/manageorders-push-client.js)) uses a conditional spread to enforce this:
+```js
+const resolvedDesignId = design.idDesign || design.id_Design;
+const transformedDesign = {
+  DesignName: ...,
+  ExtDesignID: ...,
+  ...(resolvedDesignId ? { id_Design: resolvedDesignId } : {}),  // omit when 0/null/undefined
+  ...
+};
+```
+
+**Caller contract** (Pricing Index `server.js`): set `base.idDesign = N` (singular) on each design entry when a real ShopWorks design ID is resolved via `/api/embroidery-designs/lookup`. The proxy reads `idDesign` / `id_Design` (singular) — `linkedDesigns` (array) is currently a no-op, kept only for future multi-design# support. Fixed in proxy v607 + Pricing Index 2026-05-02.
+
+#### ⚠️ `ForProductColor` MUST use CATALOG_COLOR codes (not COLOR_NAME) AND list ALL colors
+
+Same rule as `LinesOE.Color` — abbreviated mainframe codes (`Bk/Bk/LtGy`, `HotPink/Wh`), not friendly display names. Caller side: `[...new Set(rows.map(r => r.catalogColor || r.colorName || r.color).filter(Boolean))].join(', ')`. **Don't filter rows by `deco === method`** — that drops rows where `deco` defaulted to embroidery without being explicitly stamped, which made OF-0025's design list only 3 of 11 colors. Filter as `r => !r.deco || r.deco === method` instead.
 
 **Locations Array (nested in Designs):**
 | Field | Type | Description |

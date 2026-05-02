@@ -1441,3 +1441,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Problem:** Imported orders show correct product but every item is Adult/S.
 **Root Cause:** Missing or zero `id_Integration` — ShopWorks doesn't know which Size Translation Table.
 **Prevention:** Every store config MUST have valid `id_Integration`. Check for `"id_Integration": 0`.
+
+---
+
+### Heroku Dyno Serves Stale Slug After Successful Release (archived 2026-05-02, originally 2026-04-24)
+**Problem:** After `git push heroku main` completed and Heroku reported `Released vN`, the live site kept serving the previous slug — `/art-request/:id` returned HTML with `?v=20260423b` even though the repo on Heroku had `?v=20260424a`. `Last-Modified` header showed the prior deploy time. Browser hard-reloads, cache-bust query params, and `Cache-Control: no-cache` all failed to fix it. Only `heroku ps:restart` cleared it (took ~15s after restart to serve fresh content).
+**Root Cause:** Heroku builds a new slug and marks the release live in metadata, but the running dyno keeps serving the previous slug until either (a) a dyno cycle (~24h), (b) a dyno crash, or (c) a manual restart. Cause is suspected to be Node's in-process module cache + slug-file mtime caching in Express `sendFile`. Content-Length and Etag stayed identical across the old and new slug because the only change was a 1-char version string (same byte count).
+**Solution:** Run `heroku ps:restart --app sanmar-inventory-app` immediately after deploy if served content doesn't match pushed content within 30 seconds.
+**Prevention:** After every `/deploy`, verify live content with `curl -s <production-url> | grep '?v='` against the local file. If mismatched → `heroku ps:restart`. Can add this as a final automated step in the deploy skill. Do NOT chase this with browser cache-bust tricks — the issue is server-side.
