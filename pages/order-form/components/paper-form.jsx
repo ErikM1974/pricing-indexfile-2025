@@ -1563,7 +1563,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             <option value="">—</option>
             <option value="nika">Nika Lao</option>
             <option value="erik">Erik Mickelson</option>
-            <option value="ruth">Ruth Nhoung</option>
+            <option value="ruth">Ruthie Nhoung</option>
             <option value="taneisha">Taneisha Clark</option>
             <option value="jim">Jim Mickelson</option>
           </select>
