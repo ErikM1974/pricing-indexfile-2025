@@ -767,25 +767,23 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
         </>
       )}
       <td>
+        {/* Per-row AUTO/MANUAL badges removed 2026-05-02 per Erik — every row is
+            auto by default; if a row was manually overridden the rep sees the
+            RESTORE AUTO pill (which is the actual signal). The badge text was
+            redundant noise on every line. The price cell is still:
+              - a clickable button when auto (click → flips to manual input)
+              - a typeable input when override is active, with RESTORE AUTO
+            so all functionality is preserved; only the badge JSX is gone. */}
         {showAutoPriceCell ? (
           <button
             type="button"
             className="t-in num auto-priced"
             onClick={() => update({ priceOverride: true, price: overrideDefault ? overrideDefault.toFixed(2) : '' })}
             title={showUpchargeChip
-              ? `Avg per piece: ${fmt$(headlineUnit)} (${fmt$(rowSubtotalDollars)} ÷ ${total} pcs). Sizes span tiers — see pills above for per-size pricing. Click to enter a flat manual price.`
+              ? `Avg per piece: ${fmt$(headlineUnit)} (${fmt$(rowSubtotalDollars)} ÷ ${total} pcs). Sizes span tiers — see tier pills above the row for per-size pricing. Click to enter a flat manual price.`
               : 'Auto-priced — all sizes at this price. Click to enter a flat manual price.'}
           >
             <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
-            <span className="auto-badge">
-              auto{showUpchargeChip && (
-                <span
-                  className="upcharge-info"
-                  aria-label={`Avg ${fmt$(headlineUnit)} blends ${total} pieces across tiers. Pills above show per-size prices.`}
-                  title={`Avg ${fmt$(headlineUnit)} blends ${total} pieces across tiers. Pills above show per-size prices.`}
-                >ⓘ</span>
-              )}
-            </span>
           </button>
         ) : (
           <div className="manual-price-cell">
@@ -799,25 +797,14 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                 ? `Manual price — auto-pricing would apply: ${upchargeChipText}`
                 : ''}
             />
-            {(row.manualMode || row.priceOverride) && (
+            {row.priceOverride && hasAutoPrice && (
               <span className="manual-price-meta">
-                <span className="auto-badge auto-badge--manual">
-                  manual{showUpchargeChip && (
-                    <span
-                      className="upcharge-info"
-                      aria-label={`Auto-pricing would apply: ${upchargeChipText}`}
-                      title={`Auto-pricing would apply: ${upchargeChipText}`}
-                    >ⓘ</span>
-                  )}
-                </span>
-                {row.priceOverride && hasAutoPrice && (
-                  <button
-                    type="button"
-                    className="restore-auto-link"
-                    onClick={() => update({ priceOverride: false, price: '' })}
-                    title="Use auto-calculated price"
-                  >restore auto</button>
-                )}
+                <button
+                  type="button"
+                  className="restore-auto-link"
+                  onClick={() => update({ priceOverride: false, price: '' })}
+                  title="Use auto-calculated price"
+                >restore auto</button>
               </span>
             )}
           </div>
@@ -1280,7 +1267,12 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
   }
   function update(k, v) { setInfo({ ...info, [k]: v }); }
   function updateShip(k, v) { setShip({ ...ship, [k]: v }); }
-  function addRow() { setRows([...rows, makeBlankRow()]); }
+  function addRow() {
+    // Inherit the form's currently-selected deco so a rep adding rows
+    // mid-order doesn't end up with a row tagged to the default method
+    // when they're actually working on a different one.
+    setRows([...rows, { ...makeBlankRow(), deco: activeDeco || 'embroidery' }]);
+  }
 
   const totals = useMemo(() => {
     let grand = 0;
