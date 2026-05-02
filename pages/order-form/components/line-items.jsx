@@ -69,6 +69,7 @@ function makeBlankRow() {
     id: crypto.randomUUID ? crypto.randomUUID() : String(Math.random()),
     style: '',
     desc: '',
+    descSource: 'auto',   // 'auto' = product API can refresh on style change; 'manual' = rep typed it, leave alone
     color: '',            // legacy free-text (pre-SanMar drafts)
     colorName: '',        // COLOR_NAME — shown in UI
     catalogColor: '',     // CATALOG_COLOR — sent to ShopWorks / inventory
@@ -331,7 +332,13 @@ function LineRow({ row, onChange, onRemove, canRemove }) {
         <ProductCombobox
           value={row.style}
           onChange={(v) => update({ style: v })}
-          onPick={(p) => update({ style: p.style, desc: row.desc || p.desc })}
+          onPick={(p) => update({
+            style: p.style,
+            // Honor manual desc edits; otherwise refresh from the new style's product info.
+            ...(row.descSource === 'manual' && row.desc
+              ? { desc: row.desc }
+              : { desc: p.desc || '', descSource: 'auto' })
+          })}
         />
       </div>
       <div>

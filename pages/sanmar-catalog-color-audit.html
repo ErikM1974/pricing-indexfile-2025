@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>SanMar Catalog Color Audit — NWCA</title>
+  <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/pages/sanmar-catalog-color-audit.css?v=20260502">
+</head>
+<body>
+  <header class="page-head">
+    <div>
+      <h1>SanMar Catalog Color Audit</h1>
+      <p class="sub">Diff Caspio's <code>Sanmar_Bulk_251816_Feb2024</code> against SanMar's live <code>mainframeColor</code>. Read-only.</p>
+    </div>
+    <a class="back-link" href="/staff-dashboard.html">← Staff Dashboard</a>
+  </header>
+
+  <section class="run-bar">
+    <label for="style-input">Style #</label>
+    <input id="style-input" type="text" value="112" autocomplete="off" spellcheck="false">
+    <button id="run-btn" type="button">Run audit</button>
+    <span id="run-status" class="status"></span>
+  </section>
+
+  <section id="summary" class="summary" hidden>
+    <div class="card sum-sync">
+      <div class="num" id="sum-sync">0</div>
+      <div class="lbl">In sync</div>
+    </div>
+    <div class="card sum-mismatch">
+      <div class="num" id="sum-mismatch">0</div>
+      <div class="lbl">Caspio mismatch <span class="hint">(rejection candidates)</span></div>
+    </div>
+    <div class="card sum-orphan">
+      <div class="num" id="sum-orphan">0</div>
+      <div class="lbl">Caspio orphan <span class="hint">(SanMar dropped it)</span></div>
+    </div>
+    <div class="card sum-only">
+      <div class="num" id="sum-sanmar-only">0</div>
+      <div class="lbl">SanMar only <span class="hint">(new colors)</span></div>
+    </div>
+    <div class="card sum-drift">
+      <div class="num" id="sum-drift">0</div>
+      <div class="lbl">Internal drift <span class="hint">(Caspio rows disagree with themselves)</span></div>
+    </div>
+  </section>
+
+  <section id="meta" class="meta" hidden>
+    <span><strong>Style:</strong> <span id="meta-style">—</span></span>
+    <span><strong>Caspio rows:</strong> <span id="meta-caspio-rows">—</span></span>
+    <span><strong>Caspio unique colors:</strong> <span id="meta-caspio-colors">—</span></span>
+    <span><strong>SanMar live colors:</strong> <span id="meta-sanmar-colors">—</span></span>
+    <span><strong>Generated:</strong> <span id="meta-generated">—</span></span>
+    <span id="meta-api-error" class="api-error" hidden></span>
+  </section>
+
+  <section class="bucket" id="bkt-mismatch" hidden>
+    <div class="bucket-head">
+      <h2>Caspio Mismatches <span class="count" id="cnt-mismatch">0</span></h2>
+      <button class="copy-btn" data-target="mismatch" type="button">Copy CSV</button>
+    </div>
+    <p class="bucket-note">Caspio's CATALOG_COLOR (and SANMAR_MAINFRAME_COLOR) don't match SanMar's current mainframeColor. <strong>These are the values likely getting rejected by SanMar.</strong></p>
+    <div class="table-wrap"><table id="tbl-mismatch"></table></div>
+  </section>
+
+  <section class="bucket" id="bkt-drift" hidden>
+    <div class="bucket-head">
+      <h2>Internal Drift <span class="count" id="cnt-drift">0</span></h2>
+      <button class="copy-btn" data-target="drift" type="button">Copy CSV</button>
+    </div>
+    <p class="bucket-note">Within Caspio: <code>CATALOG_COLOR</code> ≠ <code>SANMAR_MAINFRAME_COLOR</code> on the same row. Pre-existing data inconsistency.</p>
+    <div class="table-wrap"><table id="tbl-drift"></table></div>
+  </section>
+
+  <section class="bucket" id="bkt-orphan" hidden>
+    <div class="bucket-head">
+      <h2>Caspio Orphans <span class="count" id="cnt-orphan">0</span></h2>
+      <button class="copy-btn" data-target="orphan" type="button">Copy CSV</button>
+    </div>
+    <p class="bucket-note">Color exists in Caspio but SanMar's API didn't return it for this style. Likely discontinued by SanMar.</p>
+    <div class="table-wrap"><table id="tbl-orphan"></table></div>
+  </section>
+
+  <section class="bucket" id="bkt-sanmaronly" hidden>
+    <div class="bucket-head">
+      <h2>SanMar Only <span class="count" id="cnt-sanmaronly">0</span></h2>
+      <button class="copy-btn" data-target="sanmaronly" type="button">Copy CSV</button>
+    </div>
+    <p class="bucket-note">SanMar lists these mainframe colors but Caspio has no row. New colors not yet imported.</p>
+    <div class="table-wrap"><table id="tbl-sanmaronly"></table></div>
+  </section>
+
+  <section class="bucket" id="bkt-sync" hidden>
+    <div class="bucket-head">
+      <h2>In Sync <span class="count" id="cnt-sync">0</span></h2>
+    </div>
+    <p class="bucket-note">Caspio matches SanMar. No action needed.</p>
+    <div class="table-wrap"><table id="tbl-sync"></table></div>
+  </section>
+
+  <script src="/pages/sanmar-catalog-color-audit.js?v=20260502"></script>
+</body>
+</html>

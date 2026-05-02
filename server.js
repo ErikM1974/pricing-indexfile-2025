@@ -2096,7 +2096,18 @@ app.post('/api/submit-order-form', async (req, res) => {
       const base = {
         name: `${info.company || 'Order'} — ${DESIGN_LABEL[method] || method}`,
         externalId: `${extOrderId}-${method.toUpperCase()}`,
-        productColor: [...new Set(rows.filter(r => r.deco === method).map(r => r.colorName || r.color).filter(Boolean))].join(', '),
+        // ForProductColor (proxy maps `productColor` → `ForProductColor`):
+        // Use CATALOG_COLOR codes (matches the LinesOE.Color rule from proxy v606)
+        // and include rows whose deco isn't explicitly set — those default to
+        // the form's primary method (embroidery) and were silently dropped from
+        // this aggregation before, which left ShopWorks with a Design that only
+        // referenced 3 of 11 colors on multi-row orders. See OF-0025.
+        productColor: [...new Set(
+          rows
+            .filter(r => !r.deco || r.deco === method)
+            .map(r => r.catalogColor || r.colorName || r.color)
+            .filter(Boolean)
+        )].join(', '),
         designTypeId: DESIGN_TYPE_ID[method] || 3,
         locations: (hostedFiles.length ? hostedFiles : [{ name: 'placeholder' }]).map((f, i) => ({
           location: (f.placements && f.placements[0]) || 'Left Chest',
@@ -2110,8 +2121,15 @@ app.post('/api/submit-order-form', async (req, res) => {
       // Attach known id_Design references per CLAUDE.md MANAGEORDERS pattern.
       // For methods that primarily use this lookup (embroidery), pass the array
       // so the proxy can link rather than create a new generic design.
+      // ALSO: when exactly one design# resolves, set base.idDesign (singular)
+      // so the proxy's transformDesigns() actually reads it. The proxy only
+      // looks at `idDesign`/`id_Design` on the design object — `linkedDesigns`
+      // is currently a no-op until multi-design# support lands. Without this
+      // singular alias, even a successful design# lookup silently dropped to
+      // id_Design:0 in the ShopWorks payload (orphan).
       if (linkedIdDesigns.length && (method === 'embroidery' || method === 'screenprint' || method === 'dtf')) {
         base.linkedDesigns = linkedIdDesigns.map(id => ({ id_Design: id }));
+        if (linkedIdDesigns.length === 1) base.idDesign = linkedIdDesigns[0];
       }
       return base;
     });

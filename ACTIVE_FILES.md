@@ -151,6 +151,13 @@
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |
 | `/pages/policies/dtg-artwork-checklist.html` | DTG artwork preparation checklist | — | ✅ Active |
 
+### SanMar Catalog Color Audit (NEW 2026-05-02)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/sanmar-catalog-color-audit.html` | Diagnostic page — diffs Caspio `Sanmar_Bulk_251816_Feb2024` vs SanMar's live `mainframeColor` per style. Read-only, surfaces rejection candidates for ShopWorks→SanMar PO pushes | sanmar-catalog-color-audit.js, sanmar-catalog-color-audit.css | ✅ Active |
+| `/pages/sanmar-catalog-color-audit.js` | Audit page controller — fetches `/api/sanmar/catalog-color-audit/:style`, renders 5 buckets (inSync / caspioMismatch / caspioOrphan / sanmarOnly / internalDrift), Copy-CSV per bucket | /api/sanmar/catalog-color-audit (proxy) | ✅ Active |
+| `/pages/sanmar-catalog-color-audit.css` | Audit page styles — summary cards, bucket tables, sticky headers | — | ✅ Active |
+
 ### Box Labels - Shipping & Receiving (NEW 2026-04-01)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
