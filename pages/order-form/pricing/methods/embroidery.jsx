@@ -77,7 +77,13 @@
 
   // ---------------------------------------------------------------------------
   // Pure per-row pricing.
-  // tier / ltmPP come from formCtx.totalQty (form-wide aggregate).
+  // Tier / LTM come from the row's CATEGORY-SPECIFIC qty bucket — caps and
+  // garments tier independently per the embroidery quote builder rule
+  // (CLAUDE.md "Mixed Quote Tier Separation"). The aggregate() function
+  // pre-computes `formCtx._embCapQty` and `formCtx._embGarmentQty`; this
+  // function picks the right bucket based on `capOrFlat`. Falls back to
+  // form-wide totalQty if the buckets aren't present (back-compat path,
+  // shouldn't happen in production).
   //
   // Even when qty=0 (rep just typed a style, hasn't filled qty yet) we still
   // populate `extras.availableSizes` + `capOrFlat` so the form's size grid
@@ -90,19 +96,30 @@
     const sizingPreview = bundle?.uniqueSizes && bundle.uniqueSizes.length
       ? { availableSizes: bundle.uniqueSizes, capOrFlat, manualMode: !!row.manualMode }
       : null;
-    const totalQty = Number(formCtx?.totalQty) || 0;
-    if (!totalQty) {
+    // Use category-specific qty for tier + LTM. capOrFlat='cap' → only count
+    // other caps; 'flat' → only count garments. NEVER combine — caps and
+    // garments are separate quantity discount streams.
+    const capQty = Number(formCtx?._embCapQty);
+    const garmentQty = Number(formCtx?._embGarmentQty);
+    const haveBuckets = Number.isFinite(capQty) || Number.isFinite(garmentQty);
+    const effectiveQty = haveBuckets
+      ? (capOrFlat === 'cap' ? (capQty || 0) : (garmentQty || 0))
+      : (Number(formCtx?.totalQty) || 0);
+    if (!effectiveQty) {
       // Sizing-only preview: form needs availableSizes to render the grid.
       if (sizingPreview) out.extras = sizingPreview;
       return out;
     }
     if (!bundle?.pricing) { out.error = 'No pricing bundle'; return out; }
 
-    const tier = S.tierForQty(totalQty, S.EMBROIDERY_TIERS);
-    if (!tier) { out.error = `No tier for qty ${totalQty}`; return out; }
+    const tier = S.tierForQty(effectiveQty, S.EMBROIDERY_TIERS);
+    if (!tier) { out.error = `No tier for qty ${effectiveQty}`; return out; }
     if (!bundle.pricing[tier]) { out.error = `No pricing for tier ${tier}`; return out; }
 
-    const ltmPP   = (tier === '1-7' && totalQty > 0) ? (50 / totalQty) : 0;
+    // LTM is per-CATEGORY too: 5 garments + 3 caps under the tier-1-7 threshold
+    // both get $50 LTM distributed within their own bucket. Matches the
+    // embroidery quote builder rule (CLAUDE.md sync rule).
+    const ltmPP   = (tier === '1-7' && effectiveQty > 0) ? (50 / effectiveQty) : 0;
     const rule    = bundle?.apiData?.rulesR?.RoundingMethod
                   || bundle?.rulesData?.RoundingMethod
                   || (capOrFlat === 'cap' ? 'HalfDollarUp' : 'CeilDollar');
@@ -194,6 +211,23 @@
       catch (err) { return { row: r, error: err?.message || String(err) }; }
     }));
 
+    // Partition rows into caps vs garments and tally each bucket separately.
+    // CLAUDE.md "Mixed Quote Tier Separation" rule: caps and garments cannot
+    // share a quantity discount tier. priceRow() consumes these via formCtx.
+    let capQty = 0, garmentQty = 0;
+    fetched.forEach(({ row, capOrFlat: cof, error }) => {
+      if (error || !cof) return;
+      const rq = S.rowQty(row);
+      if (cof === 'cap') capQty += rq;
+      else garmentQty += rq;
+    });
+    formCtx._embCapQty = capQty;
+    formCtx._embGarmentQty = garmentQty;
+    out.capQty = capQty;
+    out.garmentQty = garmentQty;
+    out.capTier = capQty > 0 ? S.tierForQty(capQty, S.EMBROIDERY_TIERS) : null;
+    out.garmentTier = garmentQty > 0 ? S.tierForQty(garmentQty, S.EMBROIDERY_TIERS) : null;
+
     fetched.forEach(({ row, bundle, capOrFlat, error }) => {
       if (error || !bundle) {
         out.errors.push({ rowId: row.id, message: error || 'No bundle' });
@@ -206,7 +240,12 @@
     });
 
     // LTM total (for display only) — already baked into per-piece prices.
-    if (out.tier === '1-7') out.ltmTotal = 50;
+    // Each category that lands in tier 1-7 carries its own $50 LTM, so a
+    // mixed order with 5 garments + 3 caps shows $100 total LTM.
+    let ltmTotal = 0;
+    if (out.garmentTier === '1-7') ltmTotal += 50;
+    if (out.capTier === '1-7') ltmTotal += 50;
+    out.ltmTotal = ltmTotal;
 
     out.grandTotal = out.subtotal; // tax/deposit added by registry
     return out;
@@ -219,14 +258,35 @@
     const cfg = formCtx?.decoConfig || {};
     const stitch = cfg.stitchCount || 8000;
     const loc    = cfg.primaryLocation || 'Left Chest';
-    const tier   = breakdown?.tier || '?';
-    const qty    = breakdown?.totalQty || 0;
-    const ltmLine = breakdown?.tier === '1-7'
-      ? `LTM: $50 distributed across ${qty} pieces (built into per-piece pricing)`
-      : 'No LTM';
+
+    // Caps and garments tier independently. When the order has both, show
+    // both tiers + qtys. When only one category, show that one.
+    const capQty = Number(breakdown?.capQty) || 0;
+    const garmentQty = Number(breakdown?.garmentQty) || 0;
+    const capTier = breakdown?.capTier || null;
+    const garmentTier = breakdown?.garmentTier || null;
+
+    const tierLines = [];
+    if (garmentQty > 0) {
+      const ltm = garmentTier === '1-7'
+        ? `(LTM $50 distributed across ${garmentQty} garments)` : '';
+      tierLines.push(`Garments — Tier ${garmentTier || '?'} · ${garmentQty} pcs ${ltm}`.trim());
+    }
+    if (capQty > 0) {
+      const ltm = capTier === '1-7'
+        ? `(LTM $50 distributed across ${capQty} caps)` : '';
+      tierLines.push(`Caps — Tier ${capTier || '?'} · ${capQty} pcs ${ltm}`.trim());
+    }
+    // Fallback for unexpected shape (no buckets populated): use the
+    // legacy single-tier line so we never push an empty notes block.
+    if (tierLines.length === 0) {
+      const tier = breakdown?.tier || '?';
+      const qty  = breakdown?.totalQty || 0;
+      tierLines.push(`Tier ${tier} · ${qty} pcs`);
+    }
     return [
       `EMBROIDERY · ${stitch.toLocaleString()} stitches · ${loc}`,
-      `Tier ${tier} · ${qty} pcs · ${ltmLine}`,
+      ...tierLines,
     ].join('\n');
   }
 
