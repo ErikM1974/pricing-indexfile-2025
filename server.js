@@ -1894,12 +1894,32 @@ app.post('/api/order-form-drafts', async (req, res) => {
 // (server-side) instead of changing the dropdown value because saved
 // drafts in the Caspio quote_sessions table already use slugs — flipping
 // the dropdown values would orphan those drafts.
+//
+// Note: 'ruth' slug → 'Ruthie Nhoung' to match ShopWorks's Employee record
+// (ID 24). The form's dropdown LABEL also says "Ruthie Nhoung" but the
+// internal slug stays 'ruth' for back-compat with saved drafts.
 const SALES_REP_FULL_NAMES = {
   nika: 'Nika Lao',
   taneisha: 'Taneisha Clark',
   erik: 'Erik Mickelson',
-  ruth: 'Ruth Nhoung',
+  ruth: 'Ruthie Nhoung',
   jim: 'Jim Mickelson',
+};
+
+// Sales-rep slug → ShopWorks Employee ID for id_EmpCreatedBy on the
+// order. Per Erik's screenshot of ShopWorks Employees (2026-05-02):
+//   Jim Mickelson      = 1
+//   Erik Mickelson     = 2
+//   Ruthie Nhoung      = 24
+//   Nika Lao           = 169
+//   Taneisha Clark     = 281
+// Unknown rep falls back to 2 (Erik) so orders never land on Employee 0.
+const SALES_REP_EMP_IDS = {
+  jim: 1,
+  erik: 2,
+  ruth: 24,
+  nika: 169,
+  taneisha: 281,
 };
 
 // POST /api/submit-order-form — Submit an order-form to ShopWorks.
@@ -2129,7 +2149,16 @@ app.post('/api/submit-order-form', async (req, res) => {
     }
     const linkedIdDesigns = Object.values(designIdMap);
 
-    const designs = methodsUsed.map((method) => {
+    // Designs[]: ONLY emit when at least one design# resolved to a real
+    // ShopWorks id_Design. Otherwise return [] so ShopWorks doesn't create
+    // a new orphan design from DesignName/ExtDesignID — the sales rep links
+    // the design manually in ShopWorks's UI when they review the order.
+    // Erik's preference (2026-05-02 after OF-0027/0028 reviewed):
+    //   "if there isn't a design we shouldn't create a new one, just leave
+    //    it blank and the sales rep can select the design inside shopworks".
+    // This prevents the orphan-design accumulation we observed on every
+    // order push since the form launched.
+    const designs = linkedIdDesigns.length === 0 ? [] : methodsUsed.map((method) => {
       const hostedFiles = files.filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
       const base = {
         name: `${info.company || 'Order'} — ${DESIGN_LABEL[method] || method}`,
@@ -2293,6 +2322,10 @@ app.post('/api/submit-order-form', async (req, res) => {
       // (e.g. 1276 for Aaberg's Rentals). Falls back to 2791 (catch-all
       // "Online Order Form Customer") for brand-new typed names.
       idCustomer: Number(info.companyId) || 2791,
+      // Employee Created By — maps the picked Sales Rep to their ShopWorks
+      // Employee ID so the order header says "created by Taneisha" not
+      // "created by Erik". Fallback 2 (Erik) for unknown reps.
+      idEmpCreatedBy: SALES_REP_EMP_IDS[info.salesRep] || 2,
       // OrderType per the order's decoration method. Per Erik (2026-05-02)
       // ShopWorks doesn't allow mixed order types, so an order has one
       // method. We take methodsUsed[0]; if the form UI ever lets a
