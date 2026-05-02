@@ -2087,13 +2087,25 @@ app.post('/api/submit-order-form', async (req, res) => {
     //   5 = Emblem, 8 = Transfer (DTF), 45 = DTG
     const DESIGN_TYPE_ID = { embroidery: 2, screenprint: 1, dtg: 45, dtf: 8, sticker: 4, emblem: 5 };
     const DESIGN_LABEL   = { embroidery: 'Embroidery', screenprint: 'Screen Print', dtg: 'DTG', dtf: 'DTF Transfer', sticker: 'Stickers', emblem: 'Embroidered Emblems' };
-    // OrderType IDs per Erik's "order type mapping.csv" (2026-05-02).
-    // Each method routes to a specific ShopWorks order type so production
-    // queues (Custom Embroidery, Screen Print Subcontract, Digital Printing,
-    // etc.) populate correctly. Mixed-method orders fall back to 41
-    // ("Order Type on Form") since no single category fits.
-    const ORDER_TYPE_ID = { embroidery: 5, screenprint: 21, dtg: 7, dtf: 8, sticker: 13, emblem: 18 };
-    const ORDER_TYPE_DEFAULT = 41;  // "Order Type on Form" — generic / mixed
+    // OrderType IDs verified against the live ShopWorks Order Types list
+    // (Erik's screenshots, 2026-05-02). The earlier CSV had every ID wrong
+    // except none — all six methods were sending to the wrong production
+    // queue. Caught after OF-0027 sent id_OrderType=5 and ShopWorks
+    // displayed "Digital Printing" instead of the expected "Embroidery".
+    //
+    //   21 = Custom Embroidery       (account 4050 Custom Embroidered Sales)
+    //   13 = Screen Print Subcontract (account 4200 Subcontract Screenprinted Sales)
+    //   5  = Digital Printing         (account 4001 Digital Printing Sales)
+    //   18 = Transfers                (account 4005 Transfer Sales)
+    //   41 = Laser/Ad Specialties     (account 4400 Ad Specialty Sales)
+    //   7  = Emblem                   (account 4002 Emblem Sales)
+    //   6  = Online Store fallback    (account 4003) — only used when no method selected
+    //
+    // Per Erik (2026-05-02): order types CANNOT be mixed in ShopWorks, so
+    // an order has exactly one decoration method. We use methodsUsed[0]
+    // and let the form's UI guard against multi-method submissions.
+    const ORDER_TYPE_ID = { embroidery: 21, screenprint: 13, dtg: 5, dtf: 18, sticker: 41, emblem: 7 };
+    const ORDER_TYPE_DEFAULT = 6;  // Online Store — fallback when no method picked
     const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
 
     // Design # lookup — when the rep typed numbers in the Design # field, try
@@ -2281,13 +2293,12 @@ app.post('/api/submit-order-form', async (req, res) => {
       // (e.g. 1276 for Aaberg's Rentals). Falls back to 2791 (catch-all
       // "Online Order Form Customer") for brand-new typed names.
       idCustomer: Number(info.companyId) || 2791,
-      // OrderType per the order's primary decoration method. Single-method
-      // orders pick the matching ShopWorks queue; mixed-method orders
-      // (rare — a rep checks both Embroidery + Screenprint) fall back to
-      // 41 ("Order Type on Form") since no single category fits.
-      idOrderType: methodsUsed.length === 1
-        ? (ORDER_TYPE_ID[methodsUsed[0]] || ORDER_TYPE_DEFAULT)
-        : ORDER_TYPE_DEFAULT,
+      // OrderType per the order's decoration method. Per Erik (2026-05-02)
+      // ShopWorks doesn't allow mixed order types, so an order has one
+      // method. We take methodsUsed[0]; if the form UI ever lets a
+      // multi-method order through, the first method wins (better than
+      // misrouting everything to a generic default).
+      idOrderType: ORDER_TYPE_ID[methodsUsed[0]] || ORDER_TYPE_DEFAULT,
       // APISource: routes orders to the new "Order Form" ShopWorks
       // ManageOrders integration (set its APISource = "OrderForm" too).
       // Existing "Northwest Embroidery-Store" integration with blank
