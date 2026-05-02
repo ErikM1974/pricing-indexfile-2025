@@ -1687,16 +1687,51 @@ New browser form at `/pages/order-form.html`. Staff-facing by default; supports 
 
 **ID format (both flows identical):** `OF-NNNN` — zero-padded 4 digits, globally sequential, allocated via the proxy's `/api/quote-sequence/OF` endpoint (same race-safe counter Embroidery uses — see `shared_components/js/embroidery-quote-service.js:69`). Grows past 9999 naturally as more digits. Fallback to `OF-<timestamp>` if the counter endpoint is down. Year-scoped at the counter (resets Jan 1) — idempotency check on `Status === 'Processed'` catches any accidental cross-year collision.
 
-**Payload differentiators vs 3-Day Tees:**
+**Payload differentiators vs 3-Day Tees (UPDATED 2026-05-02 with proxy v608 + main v903+):**
 - `ExtSource: "NWCA-OrderForm"` (the proxy's hardcoded `ONSITE_DEFAULTS.ExtSource` actually overrides this to `"NWCA"` at push time — filter via `CustomerPurchaseOrder` prefix `OF-…` or the Notes header instead)
+- `apiSource: "OrderForm"` → ShopWorks `APISource` field, routes to the dedicated **"Order Form" ManageOrders integration** (separate from the existing "Northwest Embroidery-Store" integration which handles 3-Day Tees + embroidery push). Set the new integration's APISource field to `"OrderForm"` verbatim.
 - `ExtOrderID` = `OF-NNNN` (identical shape for staff-direct and share-link submits — after proxy prepends, becomes `NWCA-OF-0042` in ShopWorks)
 - `rushOrder: false`
 - `payments: []` (paid offline via invoice — no Stripe)
 - `taxTotal: 0`, `cur_Shipping: 0` (OnSite calculates; tax flags set by proxy)
-- `idCustomer: 2791`, `idOrderType: 6` (webstore routing — real contact goes in `ContactNameFirst/Last/Email/Phone`)
-- Decorations map: `embroidery/screenprint → designTypeId 3`, `dtg → 45`, `dtf → 3`
+- **`idCustomer: Number(info.companyId) || 2791`** — when the rep picks a known company from the autocomplete (Caspio CompanyContactsMerge2026), `info.companyId` carries the real ShopWorks `id_Customer` (e.g. 1276 for Aaberg's). Falls back to 2791 catch-all for brand-new typed names. **Proxy now strips the Customer{...} block when idCustomer is non-default** to avoid overwriting canonical billing records with form-typed data.
+- **`idOrderType` per primary decoration method** (mixed-method orders fall back to 41):
+  | Method | OrderType ID |
+  |---|---|
+  | Embroidery | 5 (Custom Embroidery) |
+  | Screen Print | 21 (Screen Print Subcontract) |
+  | DTG | 7 (Digital Printing) |
+  | DTF | 8 (Transfers) |
+  | Stickers | 13 (Laser/Ad Specialties) |
+  | Emblems | 18 (Emblem) |
+  | _mixed/default_ | 41 (Order Type on Form) |
+- **`id_DesignType` per method (CORRECTED 2026-05-02 — old values were wrong for everything except DTG)**:
+  | Method | Design Type ID |
+  |---|---|
+  | Screenprint | 1 |
+  | Embroidery | 2 |
+  | Stickers | 4 (Advertising Specialty) |
+  | Emblem | 5 |
+  | DTF | 8 (Transfer) |
+  | DTG | 45 |
+- **Sales rep**: `info.salesRep` is a slug (`"taneisha"`); server.js translates via `SALES_REP_FULL_NAMES` → full name (`"Taneisha Clark"`) before sending. Authoritative table: see [server.js](../../../OneDrive%20-%20Northwest%20Custom%20Apparel/2025/Pricing%20Index%20File%202025/server.js) above the `/api/submit-order-form` route handler.
 - Size handling: server does `orderFormSizeSuffix()` (in `server.js`) — `2XL → _2X`, `3XL → _3XL`, etc. Same conventions as §Size Modifier Reference.
 - Artwork uploaded to `POST /api/files/upload` on caspio-proxy (same as 3-Day Tees), hosted URL sent as `imageUrl` + `mediaUrl`.
+
+**ShopWorks integration setup (2026-05-02):**
+- New integration "Order Form" created alongside existing "Northwest Embroidery-Store"
+- Both share URL `manageordersapi.com/onsite` (ManageOrders SaaS endpoint, fixed)
+- New integration's **Supplemental Settings**:
+  - APISource = `OrderForm` (routing key — must match what we send in payload)
+  - Customer Number = blank (form supplies via `idCustomer`)
+  - Order Type ID = blank (form supplies via `idOrderType`)
+  - Employee Created By = blank (defaults to 2; future: tie to picked rep)
+  - DesignType ID = blank (form supplies via `id_DesignType` per method)
+  - Company Location ID = 2 (NWCA Milton — kept)
+  - Artist Created By = 224 (kept)
+  - ProductClass = 1 (kept)
+  - Tax: Tax_10.1 / 2200.101 (Milton 10.1%, same as existing)
+- ⚠️ **Known transitional issue**: existing "Northwest Embroidery-Store" integration has APISource blank, which per ShopWorks tooltip means it pulls **all** orders. This means order-form orders may be duplicate-ingested by both integrations during the soak period. To finalize cleanup, set the existing integration's APISource to `Embroidery` (or similar) AND update 3-Day Tees + embroidery push code to send matching APISource — coordinate as a follow-up change.
 
 **Customer-view locks (when opened via `/order-form/OF-…`):**
 - Sales Rep dropdown: disabled
