@@ -173,14 +173,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### SanMar Sync Upsert Bug — `makeCaspioRequest` Returns Array, Code Checks `.Result`
-**Problem:** Caspio SanMar tables had only 7 orders (should be hundreds). Backfill processes hung indefinitely. Every sync created duplicates instead of updating existing records.
-**Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
-**Solution:** Changed all 6 checks from `existing.Result.length` to `Array.isArray(existing) && existing.length > 0`. Also fixed backfill line item dedup (was blind POST with silent catch → proper GET/PUT/POST upsert).
-**Prevention:** `makeCaspioRequest` unwraps `.Result` — never check `.Result` on its return value. When writing Caspio upsert logic, always test with `Array.isArray()`. Add this to common-gotchas.md.
-
----
-
 ### Screen Print Quote Reprices at WORST Tier When Qty Crosses 576 (2026-04-23)
 **Problem:** Nika's quote at 500 pcs showed PC68H=$22.00 / PC55=$14.50. Added 100 long-sleeve (600 total) — prices jumped to PC68H=$30.50 / PC55=$20.50 / PC55LS=$26.50. More qty → higher price.
 **Root Cause:** Caspio `tiersR` for ScreenPrint only caps the top tier at `MaxQuantity=576` (DTG/DTF/EMB use 99999). At 600 pcs, the tier `find()` in `screenprint-quote-builder.js:2858` matched NO tier, then `|| primaryPricing.tiers[0]` fell back to the 13-36 tier (MarginDenom 0.45 — the HIGHEST margin). Same buggy `|| tiers[0]` fallback at line 2874 for additional location.
@@ -298,3 +290,8 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 3. **Stale description on style change** — [paper-form.jsx:365](pages/order-form/components/paper-form.jsx:365) auto-fill effect bailed when `row.desc` was non-empty, so picking 111 then changing to 112FP kept "Richardson Garment Washed Trucker 111" under PartNumber 112FP. Fix: added `descSource: 'auto' | 'manual'` row field. Auto-fill only refreshes when source is `'auto'`; the textarea onChange flips to `'manual'` when rep types and back to `'auto'` when they clear it. Same gate added to ProductCombobox `onPick` in both `paper-form.jsx` and `line-items.jsx`.
 
 **Pattern lesson:** When auditing a payload-shape bug, read the WHOLE payload — adjacent fields built by the same code path often have related bugs. The Color/CATALOG_COLOR fix would have shipped clean if I'd stopped there, but `id_Design`, `ForProductColor`, and `Description` were all silently wrong on the same OF-0025 push.
+
+**Follow-up #2 (2026-05-02 evening, proxy v608 + main v903→v907):** Three more findings while wiring the Order Form's dedicated ShopWorks integration:
+1. **OrderType + DesignType IDs were ALL wrong from the source CSV.** OF-0027 displayed "Digital Printing" instead of expected "Custom Embroidery" because Erik's CSV mapped `Embroidery → 5` but in the live ShopWorks Order Types table ID 5 is "Digital Printing". Verified all 7 IDs against a screenshot of ShopWorks's actual Order Types list (correct: emb=21, sp=13, dtg=5, dtf=18, sticker=41, emblem=7, default=6). **Lesson:** when given a "mapping CSV" by the customer, verify against the live system before deploying — column header pairings can be ambiguous and the live system is the source of truth, not the spreadsheet.
+2. **Caspio's `Design_Lookup_2026.Design_Number` IS ShopWorks's `id_Design`.** The 155K-row table holds the same integer ShopWorks uses internally, just under a different column name (`ID_Unique` is empty). So when the rep picks design 9449 from the autocomplete, server.js can pass `idDesign: 9449` directly to ManageOrders — no secondary lookup table or ManageOrders historical pull needed. Saved ~half day. **Lesson:** before building a mapping/lookup endpoint, check whether the "external" key is already the same integer as the "internal" one.
+3. **`/api/embroidery-designs/lookup` had been silently 404'ing on every order push for months.** server.js was calling that path; the real route is `/api/digitized-designs/lookup`. Phase A's `Designs:[]` orphan-prevention masked the failure. **Lesson:** HTTP failures should not silently fall back to a "default" path — log the 404 OR fail the request. A typo'd URL with a quiet catch hid the bug for the entire form's lifetime.
