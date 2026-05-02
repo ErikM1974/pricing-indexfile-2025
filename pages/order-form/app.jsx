@@ -19,6 +19,7 @@ function App() {
     address: '', city: '', state: '', zip: '',
     po: '',
     salesRep: '',
+    designNumber: '',  // Order-level design # → resolves to ShopWorks id_Design at submit; empty means no design attached (rep links in ShopWorks)
     dateIn: _today.toISOString().slice(0, 10),
     dateDue: _due.toISOString().slice(0, 10),
     terms: 'Prepaid', // default payment terms (Pay On Pickup | Prepaid)

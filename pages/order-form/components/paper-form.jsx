@@ -1568,6 +1568,25 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             <option value="jim">Jim Mickelson</option>
           </select>
         </div>
+        <div className="p-cell">
+          <div className="lbl">Design #</div>
+          {window.DesignAutocomplete ? (
+            <window.DesignAutocomplete
+              customerId={info.companyId}
+              value={info.designNumber}
+              onChange={v => update('designNumber', v)}
+              disabled={customerMode}
+            />
+          ) : (
+            <input
+              className="p-in mono"
+              placeholder="Design #"
+              value={info.designNumber || ''}
+              onChange={e => update('designNumber', e.target.value)}
+              disabled={customerMode}
+            />
+          )}
+        </div>
         <div className="p-cell deco-cell">
           {ALL_DECOS.map(d => (
             <label key={d.key} className={"p-deco" + (decoSet.has(d.key) ? ' on' : '')}>
