@@ -2674,3 +2674,325 @@ tr.pf-breakdown-row--manual > td {
   font-style: italic;
 }
 
+
+/* ===========================================================
+   Add-On Picker (Phase 2b 2026-05-03)
+   Fees + services dropdown. Renders between line items and
+   totals panel. Active chips strip + button + modal + toast.
+   =========================================================== */
+
+.addon-picker {
+  margin: 14px 0 4px;
+}
+
+.addon-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+.addon-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: var(--nwca-green, #4f7a3d);
+  color: #fff;
+  border: 1px solid var(--nwca-green-dk, #3d6230);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.addon-add-btn:hover:not(:disabled) {
+  background: var(--nwca-green-dk, #3d6230);
+}
+.addon-add-btn:disabled {
+  background: #9ca3af;
+  border-color: #6b7280;
+  cursor: wait;
+}
+.addon-add-plus {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.addon-strip-empty {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.addon-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 4px 9px;
+  background: #ecfdf5;
+  border: 1px solid #6ee7b7;
+  border-left-width: 3px;
+  border-left-color: var(--nwca-green, #4f7a3d);
+  border-radius: 5px;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.addon-chip-name {
+  font-weight: 600;
+  color: #064e3b;
+}
+.addon-chip-sub {
+  color: #6b7280;
+  font-size: 10.5px;
+}
+.addon-chip-total {
+  font-weight: 700;
+  color: #047857;
+}
+.addon-chip-scope {
+  color: #9ca3af;
+  font-size: 10px;
+  font-style: italic;
+}
+.addon-chip-x {
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  color: #047857;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.addon-chip-x:hover {
+  background: #d1fae5;
+  color: #b91c1c;
+}
+
+/* Modal --------------------------------------------------- */
+
+.addon-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 20px 20px;
+}
+.addon-modal {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.addon-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 14px;
+}
+.addon-modal-close {
+  background: transparent;
+  border: 0;
+  font-size: 16px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.addon-modal-close:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+.addon-modal-body {
+  overflow-y: auto;
+  padding: 12px 20px 20px;
+}
+.addon-modal-section {
+  margin-top: 14px;
+}
+.addon-modal-section:first-child { margin-top: 0; }
+.addon-modal-section-head {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.addon-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px;
+}
+.addon-modal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: 8px 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: background 0.1s, border-color 0.1s;
+  gap: 2px;
+}
+.addon-modal-item:hover:not(.disabled) {
+  border-color: var(--nwca-green, #4f7a3d);
+  background: #f0fdf4;
+}
+.addon-modal-item.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+.addon-modal-item-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10.5px;
+  color: var(--nwca-green-dk, #3d6230);
+  font-weight: 700;
+}
+.addon-modal-item-name {
+  font-size: 12.5px;
+  color: #1f2937;
+  font-weight: 500;
+}
+.addon-modal-item-price {
+  font-size: 11px;
+  color: #6b7280;
+}
+.addon-modal-item-reason {
+  font-size: 10px;
+  color: #b91c1c;
+  font-style: italic;
+}
+
+/* Params dialog ------------------------------------------- */
+
+.addon-params {
+  padding: 4px 0;
+}
+.addon-params-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 12px;
+}
+.addon-params-head strong {
+  font-size: 14px;
+  color: #1f2937;
+}
+.addon-params-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.addon-params-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 12px;
+}
+.addon-params-field > span:first-child {
+  flex: 0 0 130px;
+  color: #4b5563;
+  font-weight: 500;
+}
+.addon-params-field em {
+  color: #9ca3af;
+  font-style: italic;
+}
+.addon-params-field input,
+.addon-params-field select {
+  flex: 1 1 auto;
+  padding: 5px 9px;
+  font-size: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-family: inherit;
+}
+.addon-params-field input:focus,
+.addon-params-field select:focus {
+  outline: 2px solid var(--nwca-green, #4f7a3d);
+  outline-offset: -1px;
+  border-color: var(--nwca-green, #4f7a3d);
+}
+.addon-params-suffix {
+  flex: 0 0 auto;
+  color: #6b7280;
+  font-size: 12px;
+}
+.addon-params-hint {
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+  margin: 6px 0 0 140px;
+}
+.addon-params-preview {
+  margin: 14px 0 8px;
+  padding: 10px 12px;
+  background: #f0fdf4;
+  border-left: 3px solid var(--nwca-green, #4f7a3d);
+  border-radius: 4px;
+  font-size: 13px;
+  color: #064e3b;
+}
+.addon-params-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Toast --------------------------------------------------- */
+
+.addon-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #1f2937;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  z-index: 2000;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  animation: addonToastIn 0.18s ease-out;
+}
+@keyframes addonToastIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
