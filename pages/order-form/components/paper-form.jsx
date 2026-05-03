@@ -1691,6 +1691,19 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         </tbody>
       </table>
 
+      {/* Add-on picker (Phase 2b 2026-05-03) — fees + services dropdown.
+          Renders below the line items table, above totals so the rep
+          sees their fees factored into the order before the grand total.
+          Hidden in customerMode (customers don't pick fees). */}
+      {!customerMode && window.AddOnPicker && (
+        <window.AddOnPicker
+          addOns={addOns}
+          setAddOns={setAddOns}
+          rows={rows}
+          breakdown={breakdown}
+        />
+      )}
+
       {/* Totals panel — slim, right-aligned summary; renders empty placeholders when no qty yet */}
       <TotalsPanel
         deco={activeDeco}
