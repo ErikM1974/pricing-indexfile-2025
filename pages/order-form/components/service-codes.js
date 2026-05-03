@@ -150,7 +150,7 @@
     // Hard product-type rules from Service_Codes.DisplayName / ServiceCode
     // (Service_Codes itself doesn't have a capOrFlat column; we infer.)
     const capOnly  = ['3D-EMB', 'Laser Patch', 'AL-CAP', 'AS-CAP', 'DECC', 'CTR-Cap', 'SECC'];
-    const flatOnly = ['SEG', 'AL', 'AS-Garm', 'DECG', 'DECG-FB', 'CTR-Garmt'];
+    const flatOnly = ['SEG', 'AL', 'AS-Garm', 'DECG', 'DECG-FB', 'CTR-Garmt', 'CDP'];
 
     if (capOnly.includes(code))  return capOrFlat === 'cap';
     if (flatOnly.includes(code)) return capOrFlat === 'flat';

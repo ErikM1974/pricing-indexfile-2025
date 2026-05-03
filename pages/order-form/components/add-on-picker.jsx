@@ -17,7 +17,7 @@
   // when no garment rows).
   const SETUP_FEES        = new Set(['GRT-50', 'GRT-75', 'DD', 'DDE', 'DDT', 'DT']);
   const PER_CAP_ADDONS    = new Set(['3D-EMB', 'Laser Patch', 'AL-CAP', 'AS-CAP', 'SECC']);
-  const PER_GARMENT_ADDONS= new Set(['AL', 'AS-Garm', 'SEG', 'DECG', 'DECG-FB']);
+  const PER_GARMENT_ADDONS= new Set(['AL', 'AS-Garm', 'SEG', 'DECG', 'DECG-FB', 'CDP']);
   // Anything not in the three above buckets falls into Order-Level Fees.
 
   const CATEGORY_ORDER = ['Setup Fees', 'Per-Cap Add-ons', 'Per-Garment Add-ons', 'Order-Level Fees'];
@@ -159,10 +159,10 @@
     const [qty, setQty] = useState(() => {
       // Sensible default qty:
       // - per-row: that row's qty (let user override)
-      // - per-piece (Monogram, Name/Number, HW-SURCHG): 1, rep enters
+      // - per-piece (Monogram): 1, rep enters
       // - flat order-level: 1
       if (eligibleRows.length) return rowQty(eligibleRows[0]);
-      if (code === 'Monogram' || code === 'Name/Number' || code === 'HW-SURCHG') return 1;
+      if (code === 'Monogram') return 1;
       return 1;
     });
     const [percent, setPercent] = useState(25);
@@ -233,7 +233,7 @@
     }, [method, code, qty, percent, hours, amount, unitPrice, service, breakdown]);
 
     function confirm() {
-      const scope = (isPerCap || isPerGarment || code === 'Monogram' || code === 'Name/Number')
+      const scope = (isPerCap || isPerGarment || code === 'Monogram')
         ? (rowId ? { rowId } : 'order')
         : 'order';
       const params = {};

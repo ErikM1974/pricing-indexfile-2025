@@ -1755,9 +1755,51 @@ Note: form's slug `ruth` → display "Ruthie Nhoung" (ShopWorks's exact spelling
   - Tax: Tax_10.1 / 2200.101 (Milton 10.1%, same as existing)
 - ⚠️ **Known transitional issue**: existing "Northwest Embroidery-Store" integration has APISource blank, which per ShopWorks tooltip means it pulls **all** orders. This means order-form orders may be duplicate-ingested by both integrations during the soak period. To finalize cleanup, set the existing integration's APISource to `Embroidery` (or similar) AND update 3-Day Tees + embroidery push code to send matching APISource — coordinate as a follow-up change.
 
-**Add-On System (Phase 2 SHIPPED 2026-05-03, v909→v912):**
+**Add-On System (Phase 2 SHIPPED 2026-05-03, v909→v912 → v913 + proxy v609 sync):**
 
-Reps can attach 31 NWCA fee/service codes to an order via the picker UI. Each add-on becomes a separate ShopWorks LinesOE entry alongside the garment lines.
+Reps can attach **29 NWCA fee/service codes** to an order via the picker UI. Each add-on becomes a separate ShopWorks LinesOE entry alongside the garment lines.
+
+**Canonical service code list (source of truth: ShopWorks part numbers, verified by Erik 2026-05-03):**
+
+| # | Code | Description | Preprint Group |
+|---|---|---|---|
+| 1 | SEG | Sew emblems to garments | Sewing |
+| 2 | DECG | Direct Embroider Customer Supplied | Embroidery |
+| 3 | DECC | Direct Embroider Customer Supplied | Embroidery |
+| 4 | Monogram | Dir. Embroider Names on Garments | Embroidery |
+| 5 | RUSH | Rush Charge | Fees |
+| 6 | Freight | Freight Charges | Fees |
+| 7 | DD | Digitizing Setup | Digitizing |
+| 8 | DDE | Edit Digitizing | Digitizing |
+| 9 | DDT | Text Digitizing Setup Fee | Digitizing |
+| 10 | AL | Additional Logo Garment | Embroidery |
+| 11 | DT | Transfer Customer design and run | Fees |
+| 12 | Discount | Customer Discount | Fees |
+| 13 | Pallet | Pallet Change | Digital Print |
+| 14 | Art | Art Charges | Graphic Art |
+| 15 | AS-Garm | Additional Stitches in Garment Logo | Embroidery |
+| 16 | CDP | Customer Supplied Shirts Digital Print | Digital Print |
+| 17 | AS-CAP | Additional Stitches in Cap Logo | Embroidery |
+| 18 | LTM | Less Than Minimum Fee | Embroidery |
+| 19 | CTR-Garmt | Contract Embroidered Garments | Embroidery |
+| 20 | CTR-Cap | Contract Embroidered Caps | Embroidery |
+| 21 | AL-CAP | Additional Logo CAP | Embroidery |
+| 22 | DECG-FB | Full Back Embroidery | Embroidery |
+| 23 | 3D-EMB | 3D Puff Embroidery | Embroidery |
+| 24 | GRT-50 | Logo Mockup & Print Review | GRT (Graphic) |
+| 25 | GRT-75 | Graphic design services | GRT (Graphic) |
+| 26 | SPRESET | Screen Reset Charge | Screenprint (LPP) |
+| 27 | SPSU | New Screen Set Up Charge | Screenprint (LPP) |
+| 28 | Laser Patch | Laser Faux Leather Patch | Embroidery |
+| 29 | SECC | Sew emblems to caps | Sewing |
+
+**Case rule:** All three layers (Caspio Service_Codes table, proxy `KNOWN_FEE_PNS`, frontend picker) carry the EXACT mixed-case spelling from the table above. ShopWorks part numbers are case-sensitive on the receiving end. Proxy comparison normalizes via `isKnownFeeCode()` (case-insensitive helper, [config/manageorders-emb-config.js](../caspio-pricing-proxy/config/manageorders-emb-config.js)) so case-mismatched callers still route to LinesOE correctly — but the value sent to ShopWorks preserves the canonical spelling.
+
+**LTM is auto-baked, not a picker code** — distributed into per-piece pricing for embroidery `qty <= 7`. The Caspio row exists for legacy reasons but reps don't add it manually.
+
+**Removed 2026-05-03 (verified to NOT exist in ShopWorks):** HW-SURCHG, Name/Number — hard-deleted from Caspio (PK 222 + 142). Removed from picker constants in `add-on-picker.jsx`. If a heavyweight surcharge or name/number service is needed in the future, the SW part must be created first, then added to the canonical list.
+
+**Size:"S" stamping rule (proxy v609, 2026-05-03):** [`transformLineItems()`](../caspio-pricing-proxy/lib/manageorders-push-client.js) detects fee/service lines via `isKnownFeeCode(item.partNumber)` and stamps `Size: "S"` plus puts qty in `Size01` (zeros Size02-06). Each ShopWorks service part has Size Restriction = `S` only. Without this stamp, the empty `Size` value falls through ShopWorks's Size Translation Table to its default (last column / "Other XXXL"), violating the part's Size Restriction. Garment/cap lines unchanged — they still translate via SIZE_MAPPING (S/M/L/XL/2XL→_2X/3XL→_3XL/etc.).
 
 **Data flow:**
 1. Form load → [service-codes.js](pages/order-form/components/service-codes.js) hits `/api/service-codes` → caches 31 service definitions (1h TTL)
@@ -1788,13 +1830,15 @@ Reps can attach 31 NWCA fee/service codes to an order via the picker UI. Each ad
 |---|---|---|
 | AL | /api/al-pricing | `garments.basePrices[tier] + max(0, stitches - 8000) / 1000 × 1.25` |
 | AL-CAP | /api/al-pricing | `caps.basePrices[tier] + max(0, stitches - 5000) / 1000 × 1.00` |
-| AS-Garm | /api/al-pricing | `max(0, stitches - 8000) / 1000 × 1.25` (no base — just delta) |
-| AS-CAP | /api/al-pricing | `max(0, stitches - 5000) / 1000 × 1.00` (no base — just delta) |
+| AS-Garm | /api/pricing-bundle?method=EMB | **Flat tier**: $0 ≤10K, $4 ≤15K, $10 ≤25K (reads `Embroidery_Costs` `ItemType='AS-Garm'`+`TierLabel='ALL'`) |
+| AS-CAP | /api/pricing-bundle?method=EMB | **Flat tier**: $0 ≤10K, $4 ≤15K, $10 ≤25K (reads `Embroidery_Costs` `ItemType='AS-Cap'`+`TierLabel='ALL'`) |
 | DECG | /api/decg-pricing | `garments.basePrices[tier]` |
 | DECC | /api/decg-pricing | `caps.basePrices[tier]` |
 | DECG-FB | /api/decg-pricing | `fullBack.ratesPerThousand[tier] × max(stitches, 25000) / 1000` |
 | CTR-Garmt | /api/contract-pricing | `garments.perThousandRates[tier] × stitches / 1000` |
 | CTR-Cap | /api/contract-pricing | `caps.perThousandRates[tier] × stitches / 1000` |
+
+**Critical:** AS-Garm/AS-CAP are NOT part of the AL family. They use a different Caspio source and a different formula. Conflating them caused OF-0032 to overcharge AS-CAP by ~$5/cap on a 10K-stitch design (correct = $0). Fixed in main v913 (Phase 2d.1) via `asStitchSurcharge()` helper. **Canonical NWCA AS policy:** flat-tier $0/$4/$10 same scale for caps and garments, switching to DECG-FB above 25K.
 
 **Pricing parity verification (Phase 2d, 2026-05-03):**
 - 13 representative scenarios tested across all 9 TIERED codes covering tier boundaries (1-7, 24-47, 72+) and stitch transitions (base, 50% over, 88% over)
@@ -1802,7 +1846,7 @@ Reps can attach 31 NWCA fee/service codes to an order via the picker UI. Each ad
 - Methodology: hit each API, run both code paths against the response, compare `Math.abs(qb - of) < 0.01`
 - Re-run verification when any of these change: Service_Codes table, AL/DECG/Contract pricing tables, tiered-pricing.js formulas, embroidery-quote-pricing.js formulas
 
-**KNOWN_FEE_PNS proxy whitelist** ([caspio-pricing-proxy/config/manageorders-emb-config.js:56-62](../caspio-pricing-proxy/config/manageorders-emb-config.js#L56)) — 29 of 31 service codes pre-approved for ShopWorks LinesOE. Codes outside this set still flow through the order form push but the embroidery-push transformer routes them to notes instead of LinesOE.
+**KNOWN_FEE_PNS proxy whitelist** ([caspio-pricing-proxy/config/manageorders-emb-config.js:56](../caspio-pricing-proxy/config/manageorders-emb-config.js#L56)) — all 29 canonical service codes pre-approved for ShopWorks LinesOE. Codes outside this set fall through to Notes On Order in the embroidery-push transformer ([lib/embroidery-push-transformer.js:202](../caspio-pricing-proxy/lib/embroidery-push-transformer.js#L202)). Membership check uses `isKnownFeeCode()` for case-insensitive matching.
 
 **ORDER_LEVEL_FEES** (TAX, SHIP, DISCOUNT) — per the embroidery push config; these are order-header fields, never LinesOE entries. The Order Form handles TAX/SHIP at the order level too.
 

@@ -4,6 +4,22 @@
 
 ---
 
+## Bug: Cap Embroidery Manual-Cost Override Was Unauthenticated (archived 2026-05-03)
+**Problem:** [shared_components/js/cap-embroidery-pricing-service.js:18-34](shared_components/js/cap-embroidery-pricing-service.js:18) read `?manualCost=...` from the URL without checking the host. A customer visiting `https://teamnwca.com/calculators/cap-embroidery-pricing-integrated.html?manualCost=0.01` saw fake $0.01 cap prices on the public calculator. Discovered during the Embroidery Pricing Audit while comparing the cap service to the flat service. The flat embroidery service ([embroidery-pricing-service.js:18-22](shared_components/js/embroidery-pricing-service.js:18)) had had this gate since launch — the cap service was a copy-paste miss.
+**Root Cause:** When the cap service was forked from the flat service, the `getManualCostOverride()` method was copied without the `host === 'localhost' || host.endsWith('.herokuapp.com')` internal-only check. Two services with identical-looking signatures had different security postures.
+**Solution:** Copied the 3-line host gate verbatim into `cap-embroidery-pricing-service.js`. Verified via local preview: localhost still allows override (staff use); teamnwca.com / nwcustomapparel.com return null. Deployed in main app v908 on 2026-05-03.
+**Prevention:** When forking a public-facing pricing service to support a new product type, **diff the security/auth surface** of the source before stamping the copy. Look for: host-gate, sessionStorage validation, URL parameter sanitization. Add a pre-commit grep check or unit test that asserts every pricing service has `getManualCostOverride()` returning null on non-internal hosts.
+
+---
+
+## Bug: LTM Display Mode — Builtin vs Separate Math Must Match (archived 2026-05-03)
+**Problem:** DTG/SCP builtin: row total != unit price x qty. DTF separate: LTM double-counted.
+**Root Cause:** Subtotal calc didn't branch by display mode; fee row duplicated baked-in amount.
+**Solution:** Branch subtotal by mode. Both modes must produce identical grand totals.
+**Prevention:** Trace ALL paths: unit price, row total, subtotal, grand total, tax, discount.
+
+---
+
 ## Bug: 1-Cent Tax Rounding Error in Quote PDF Totals (archived 2026-05-01)
 
 **Problem:** PDF total off by $0.01. Components summed correctly but total didn't match.
