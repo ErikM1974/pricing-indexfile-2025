@@ -521,6 +521,61 @@
       setAddOns(next);
     }
 
+    // Phase 2c part 2 (drag-drop scope reassignment) — chips are draggable;
+    // dropping a chip onto a row's drop zone OR the order-level drop zone
+    // updates the scope without removing the chip. Per-row services dropped
+    // on order-level fail with a toast; vice versa works.
+    const [dragIdx, setDragIdx] = useState(null);
+    const [dragOverScope, setDragOverScope] = useState(null);  // 'order' | rowId | null
+
+    function reassignScope(idx, newScope) {
+      if (idx == null) return;
+      const a = addOns[idx];
+      if (!a) return;
+      const sc = window.OrderFormServiceCodes?.get?.(a.code);
+      const isPerCap     = PER_CAP_ADDONS.has(a.code);
+      const isPerGarment = PER_GARMENT_ADDONS.has(a.code);
+
+      // Validate target. Per-cap services need a cap row; per-garment need
+      // a garment row. Order-level codes (DD, GRT-50, RUSH, etc.) can drop
+      // anywhere but we keep them as 'order' regardless.
+      if (newScope !== 'order') {
+        const targetRow = rows.find(r => r.id === newScope);
+        const targetCof = rowCapOrFlat(targetRow, breakdown);
+        if (isPerCap && targetCof !== 'cap')      { setToast('3D Puff / Laser / AL-CAP only on cap rows'); return; }
+        if (isPerGarment && targetCof !== 'flat') { setToast('Garment add-on only on garment rows'); return; }
+        if (window.OrderFormServiceCodes?.isOrderLevel?.(a.code)) {
+          // Order-level codes ignore row reassignment — pin them at 'order'.
+          setToast(`${a.code} is order-level (can't pin to a row)`);
+          return;
+        }
+      }
+
+      const next = [...addOns];
+      next[idx] = { ...a, scope: newScope === 'order' ? 'order' : { rowId: newScope } };
+      setAddOns(next);
+      const where = newScope === 'order' ? 'order' : `row ${rowLabel(rows.find(r => r.id === newScope)).slice(0, 14)}`;
+      setToast(`Moved ${a.code} → ${where}`);
+    }
+
+    // Drop zones: one for order-level, one per row. Visible during drag.
+    const draggingActive = dragIdx != null;
+    const orderZoneActive = draggingActive && dragOverScope === 'order';
+
+    function onDragStart(idx, e) {
+      setDragIdx(idx);
+      e.dataTransfer.effectAllowed = 'move';
+      // Some browsers require setData to enable dragging.
+      try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) {}
+    }
+    function onDragEnd() { setDragIdx(null); setDragOverScope(null); }
+    function onDropAt(scope, e) {
+      e.preventDefault();
+      reassignScope(dragIdx, scope);
+      setDragIdx(null);
+      setDragOverScope(null);
+    }
+
     return (
       <div className="addon-picker">
         <div className="addon-strip">
@@ -544,7 +599,15 @@
               ? 'order'
               : (a.scope?.rowId ? `row ${rowLabel(rows.find(r => r.id === a.scope.rowId)).slice(0, 14)}` : '');
             return (
-              <span key={a.id || i} className="addon-chip" title={sc?.DisplayName || a.code}>
+              <span
+                key={a.id || i}
+                className={'addon-chip' + (dragIdx === i ? ' addon-chip-dragging' : '')}
+                title={`Drag to reassign · ${sc?.DisplayName || a.code}`}
+                draggable={true}
+                onDragStart={(e) => onDragStart(i, e)}
+                onDragEnd={onDragEnd}
+              >
+                <span className="addon-chip-grip" aria-hidden>⋮⋮</span>
                 <span className="addon-chip-name">{sc?.DisplayName || a.code}</span>
                 <span className="addon-chip-sub">{sub}</span>
                 {total != null && <span className="addon-chip-total">{fmt$(total)}</span>}
@@ -558,7 +621,53 @@
               </span>
             );
           })}
+
+          {/* Order-level drop zone — only visible while dragging */}
+          {draggingActive && (
+            <span
+              className={'addon-dropzone' + (orderZoneActive ? ' addon-dropzone-active' : '')}
+              onDragOver={(e) => { e.preventDefault(); setDragOverScope('order'); }}
+              onDragLeave={() => setDragOverScope(null)}
+              onDrop={(e) => onDropAt('order', e)}
+            >
+              ↳ Drop here for order-level
+            </span>
+          )}
         </div>
+
+        {/* Per-row drop zones — render one for each row that has qty.
+            Visible only while dragging. Validates scope eligibility on drop. */}
+        {draggingActive && (capRows.length > 0 || garmentRows.length > 0) && (
+          <div className="addon-row-zones">
+            <span className="addon-row-zones-label">Drop to reassign:</span>
+            {[...capRows, ...garmentRows].map(r => {
+              const cof = rowCapOrFlat(r, breakdown);
+              const a = addOns[dragIdx] || {};
+              const isPerCap = PER_CAP_ADDONS.has(a.code);
+              const isPerGarment = PER_GARMENT_ADDONS.has(a.code);
+              const isOrderLvl = window.OrderFormServiceCodes?.isOrderLevel?.(a.code);
+              const eligible = !isOrderLvl && (
+                (!isPerCap && !isPerGarment) ||
+                (isPerCap && cof === 'cap') ||
+                (isPerGarment && cof === 'flat')
+              );
+              return (
+                <span
+                  key={r.id}
+                  className={'addon-dropzone'
+                    + (dragOverScope === r.id ? ' addon-dropzone-active' : '')
+                    + (!eligible ? ' addon-dropzone-disabled' : '')}
+                  onDragOver={(e) => { if (eligible) { e.preventDefault(); setDragOverScope(r.id); } }}
+                  onDragLeave={() => setDragOverScope(null)}
+                  onDrop={(e) => eligible && onDropAt(r.id, e)}
+                  title={eligible ? '' : (isOrderLvl ? 'Order-level codes pin at order' : `Wrong row type (${cof})`)}
+                >
+                  {rowLabel(r).slice(0, 18)} · {cof === 'cap' ? '🧢' : '👕'} {rowQty(r)}
+                </span>
+              );
+            })}
+          </div>
+        )}
 
         {modalOpen && (
           <Modal

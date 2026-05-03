@@ -1755,6 +1755,57 @@ Note: form's slug `ruth` → display "Ruthie Nhoung" (ShopWorks's exact spelling
   - Tax: Tax_10.1 / 2200.101 (Milton 10.1%, same as existing)
 - ⚠️ **Known transitional issue**: existing "Northwest Embroidery-Store" integration has APISource blank, which per ShopWorks tooltip means it pulls **all** orders. This means order-form orders may be duplicate-ingested by both integrations during the soak period. To finalize cleanup, set the existing integration's APISource to `Embroidery` (or similar) AND update 3-Day Tees + embroidery push code to send matching APISource — coordinate as a follow-up change.
 
+**Add-On System (Phase 2 SHIPPED 2026-05-03, v909→v912):**
+
+Reps can attach 31 NWCA fee/service codes to an order via the picker UI. Each add-on becomes a separate ShopWorks LinesOE entry alongside the garment lines.
+
+**Data flow:**
+1. Form load → [service-codes.js](pages/order-form/components/service-codes.js) hits `/api/service-codes` → caches 31 service definitions (1h TTL)
+2. Form load → [tiered-pricing.js](pages/order-form/components/tiered-pricing.js) preloads `/api/al-pricing` + `/api/decg-pricing` + `/api/contract-pricing` (5min TTL)
+3. Rep clicks "+ Add fee or service" in [add-on-picker.jsx](pages/order-form/components/add-on-picker.jsx) → categorized modal opens (Setup Fees / Per-Cap / Per-Garment / Order-Level)
+4. Rep picks service → ParamsDialog collects required inputs per `PricingMethod`:
+   - `FIXED`/`FLAT`: just confirm
+   - `TIERED`: row + qty + stitch input → auto-resolves unit price via `tiered-pricing.resolveSync()`. Manual override allowed.
+   - `CALCULATED` (RUSH): percent input (default 25). Live preview against current subtotal.
+   - `HOURLY` (Art): hours input. Live preview against $75/hr rate.
+   - `PASSTHROUGH` (Freight, Pallet, Discount, CDP): rep enters dollar amount.
+5. Confirm → `addOrReplace()` enforces order-level singleton (replace + toast); per-row appends.
+6. Active chips display on form between line items + totals. Drag-reassign supported (chip → row or chip → order-level).
+7. Submit → server.js iterates `addOns`, looks up Service_Codes, computes price per `PricingMethod`, appends to `lineItems` array. Proxy → ShopWorks LinesOE.
+
+**Pricing-method resolver (server.js):**
+| Method | Source | Formula |
+|---|---|---|
+| FIXED | Service_Codes.SellPrice | `sellPrice` |
+| FLAT | Service_Codes.SellPrice | `sellPrice` (qty=1 typical) |
+| TIERED | picker's `params.unitPrice` (auto or manual) | rep-supplied; resolver in tiered-pricing.js auto-fills picker |
+| CALCULATED (RUSH) | server-side | `subtotal × params.percent / 100` |
+| HOURLY | Service_Codes.SellPrice (rate) | `sellPrice × params.hours` |
+| PASSTHROUGH | `params.amount` | rep-supplied |
+
+**TIERED auto-resolve (tiered-pricing.js):**
+| Code | API | Formula (per piece) |
+|---|---|---|
+| AL | /api/al-pricing | `garments.basePrices[tier] + max(0, stitches - 8000) / 1000 × 1.25` |
+| AL-CAP | /api/al-pricing | `caps.basePrices[tier] + max(0, stitches - 5000) / 1000 × 1.00` |
+| AS-Garm | /api/al-pricing | `max(0, stitches - 8000) / 1000 × 1.25` (no base — just delta) |
+| AS-CAP | /api/al-pricing | `max(0, stitches - 5000) / 1000 × 1.00` (no base — just delta) |
+| DECG | /api/decg-pricing | `garments.basePrices[tier]` |
+| DECC | /api/decg-pricing | `caps.basePrices[tier]` |
+| DECG-FB | /api/decg-pricing | `fullBack.ratesPerThousand[tier] × max(stitches, 25000) / 1000` |
+| CTR-Garmt | /api/contract-pricing | `garments.perThousandRates[tier] × stitches / 1000` |
+| CTR-Cap | /api/contract-pricing | `caps.perThousandRates[tier] × stitches / 1000` |
+
+**Pricing parity verification (Phase 2d, 2026-05-03):**
+- 13 representative scenarios tested across all 9 TIERED codes covering tier boundaries (1-7, 24-47, 72+) and stitch transitions (base, 50% over, 88% over)
+- All 13 produced `delta = 0` between Order Form's resolveSync() and Quote Builder's reference formulas (embroidery-quote-pricing.js:2099-2102)
+- Methodology: hit each API, run both code paths against the response, compare `Math.abs(qb - of) < 0.01`
+- Re-run verification when any of these change: Service_Codes table, AL/DECG/Contract pricing tables, tiered-pricing.js formulas, embroidery-quote-pricing.js formulas
+
+**KNOWN_FEE_PNS proxy whitelist** ([caspio-pricing-proxy/config/manageorders-emb-config.js:56-62](../caspio-pricing-proxy/config/manageorders-emb-config.js#L56)) — 29 of 31 service codes pre-approved for ShopWorks LinesOE. Codes outside this set still flow through the order form push but the embroidery-push transformer routes them to notes instead of LinesOE.
+
+**ORDER_LEVEL_FEES** (TAX, SHIP, DISCOUNT) — per the embroidery push config; these are order-header fields, never LinesOE entries. The Order Form handles TAX/SHIP at the order level too.
+
 **Customer-view locks (when opened via `/order-form/OF-…`):**
 - Sales Rep dropdown: disabled
 - PO # input: readonly

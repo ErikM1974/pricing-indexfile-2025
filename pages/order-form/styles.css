@@ -2996,3 +2996,74 @@ tr.pf-breakdown-row--manual > td {
   from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Drag-drop scope reassignment (Phase 2c part 2 2026-05-03)
+   Each chip is draggable; drop on a row zone or the order-level zone
+   below the chip strip to reassign without removing. */
+.addon-chip[draggable="true"] {
+  cursor: grab;
+}
+.addon-chip[draggable="true"]:active,
+.addon-chip-dragging {
+  cursor: grabbing;
+  opacity: 0.55;
+  outline: 2px dashed var(--nwca-green-dk, #3d6230);
+  outline-offset: 1px;
+}
+.addon-chip-grip {
+  color: #9ca3af;
+  font-size: 10px;
+  letter-spacing: -2px;
+  margin-right: 2px;
+  user-select: none;
+  cursor: grab;
+}
+
+.addon-dropzone {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  background: #fffbeb;
+  border: 2px dashed #f59e0b;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #92400e;
+  font-weight: 500;
+  font-style: italic;
+  cursor: copy;
+  transition: background 0.1s, border-color 0.1s;
+  user-select: none;
+}
+.addon-dropzone-active {
+  background: #fef3c7;
+  border-color: #d97706;
+  color: #78350f;
+  font-style: normal;
+}
+.addon-dropzone-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  border-color: #d1d5db;
+  color: #6b7280;
+  background: #f9fafb;
+}
+
+.addon-row-zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding: 6px 10px;
+  margin-top: 4px;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+}
+.addon-row-zones-label {
+  font-size: 10.5px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  margin-right: 4px;
+}
