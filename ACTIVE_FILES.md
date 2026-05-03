@@ -130,6 +130,10 @@
 | `/pages/order-form/components/print-sheet.jsx` | Print-only paper form layout | common.jsx | ✅ Active |
 | `/pages/order-form/components/common.jsx` | Shared icons, logo, field/section wrappers | — | ✅ Active |
 | `/pages/order-form/components/tweaks.jsx` | Accent/font/layout tweaks panel | — | ✅ Active |
+| `/pages/order-form/components/service-codes.js` | Order Form add-on services client (Phase 2a 2026-05-03) — fetches `/api/service-codes` (31 services), caches 1h, exposes `window.OrderFormServiceCodes` with `addOrReplace()` singleton enforcement, `appliesTo()` cap/garment guard, `resolvedPrice()` for FIXED/FLAT/HOURLY/CALCULATED/PASSTHROUGH | `/api/service-codes` proxy endpoint | ✅ Active |
+| `/pages/order-form/components/add-on-picker.jsx` | Order Form add-on picker UI (Phase 2b 2026-05-03) — modal + chip strip + params dialog. Renders between line items table and totals panel. Categorized list (Setup Fees / Per-Cap / Per-Garment / Order-Level), greyed-out for non-matching product types, per-method param fields, toast notifications | service-codes.js, tiered-pricing.js | ✅ Active |
+| `/pages/order-form/components/tiered-pricing.js` | Order Form TIERED add-on resolver (Phase 2c 2026-05-03) — fetches `/api/al-pricing`, `/api/decg-pricing`, `/api/contract-pricing`, exposes `window.OrderFormTieredPricing.resolveSync()` for picker auto-fill of AL, AL-CAP, AS-Garm, AS-CAP, DECG, DECC, DECG-FB, CTR-Garmt, CTR-Cap unit prices | `/api/al-pricing`, `/api/decg-pricing`, `/api/contract-pricing` proxy endpoints | ✅ Active |
+| `/pages/order-form/components/design-autocomplete.jsx` | Order Form Design # autocomplete (Phase B 2026-05-02) — fetches `/api/digitized-designs/by-customer`, autocomplete dropdown with last-used-date sort, picks → `info.designNumber` → server resolves to ShopWorks `id_Design` | `/api/digitized-designs/by-customer` | ✅ Active |
 | `/pages/order-form/styles.css` | Order form base styles | — | ✅ Active |
 | `/pages/order-form/paper.css` | Order form paper-layout styles | — | ✅ Active |
 | `/pages/order-form/print.css` | Order form print layout | — | ✅ Active |
