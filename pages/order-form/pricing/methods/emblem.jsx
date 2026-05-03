@@ -172,6 +172,11 @@
     );
   }
 
+  // Phase 3 — rail filter. Emblem services + universals.
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['EMBLEM', 'UNIVERSAL'], customerOverrides);
+  }
+
   window.OrderFormPricing.register('emblem', {
     method: 'emblem',
     label: 'Emblems',
@@ -187,5 +192,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();

@@ -208,6 +208,60 @@
   }
 
   /**
+   * Phase 3 — group services by RailGroup column for the rail UI.
+   * Empty / missing RailGroup falls into "Other" bucket.
+   *
+   * @param {Array} services  output of getRailServices()
+   * @returns {Object}        { 'Stitch Surcharges': [...], 'Cap Extras': [...], ... }
+   */
+  function groupedByRailGroup(services) {
+    const groups = {};
+    (services || []).forEach(s => {
+      const g = String(s.RailGroup || 'Other').trim() || 'Other';
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(s);
+    });
+    // Sort within each group by RailOrder (already done by filterRailServices,
+    // but enforce here in case caller passed unsorted input)
+    Object.keys(groups).forEach(g => {
+      groups[g].sort((a, b) => (Number(a.RailOrder) || 0) - (Number(b.RailOrder) || 0));
+    });
+    return groups;
+  }
+
+  /**
+   * Phase 3 — fetch a customer's per-service overrides from Accounts table.
+   * Returns object keyed by ServiceCode: { "AS-CAP": { tier: "Mid" } }.
+   * Empty object if none / customer not found / fetch fails.
+   *
+   * Reads `service_overrides_json` field added in Phase 3a.
+   * Used by ServiceRail to apply per-customer tier suggestions.
+   *
+   * @param {string|number} customerId
+   * @returns {Promise<Object>}
+   */
+  async function getCustomerOverrides(customerId) {
+    if (!customerId) return {};
+    try {
+      const r = await fetch(`${API_BASE}/api/accounts/${encodeURIComponent(customerId)}`);
+      if (!r.ok) return {};
+      const json = await r.json();
+      const acct = json?.data || json;
+      const raw = acct?.service_overrides_json || acct?.ServiceOverridesJSON || '';
+      if (!raw) return {};
+      try {
+        return typeof raw === 'object' ? raw : JSON.parse(raw);
+      } catch (_) {
+        console.warn('[OrderForm] customer overrides JSON parse failed for', customerId);
+        return {};
+      }
+    } catch (err) {
+      console.warn('[OrderForm] getCustomerOverrides failed:', err);
+      return {};
+    }
+  }
+
+  /**
    * Public API exposed via window.OrderFormServiceCodes
    */
   window.OrderFormServiceCodes = {
@@ -218,6 +272,8 @@
     isOrderLevel,
     newAddOnId,
     addOrReplace,
+    groupedByRailGroup,
+    getCustomerOverrides,
     // Cached items getter for direct iteration in UI
     all: () => _cached ? [..._cached] : [],
   };

@@ -216,6 +216,11 @@
     );
   }
 
+  // Phase 3 — rail filter. DTG services + universals (CDP for customer-supplied).
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['DTG', 'UNIVERSAL'], customerOverrides);
+  }
+
   window.OrderFormPricing.register('dtg', {
     method: 'dtg',
     label: 'DTG',
@@ -231,5 +236,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();

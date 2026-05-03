@@ -285,6 +285,28 @@
     return STITCH_AWARE.has(code);
   }
 
+  /**
+   * Phase 3 — locate the Caspio Service_Codes row for a given AS family + tier.
+   * Used by the rail's tier cards to pull the right row's PK_ID + SellPrice.
+   *
+   * After the Phase 3a migration, AS-CAP and AS-Garm each have THREE rows
+   * (Tier='Standard'/'Mid'/'Large'). Each row's SellPrice is the canonical
+   * NWCA flat-tier value: $0 / $4 / $10.
+   *
+   * @param {string} family  'AS-CAP' or 'AS-Garm'
+   * @param {string} tier    'Standard' | 'Mid' | 'Large'
+   * @returns {Object|null}  the Service_Codes row, or null if not found
+   */
+  function serviceCodeForTier(family, tier) {
+    const SC = window.OrderFormServiceCodes;
+    if (!SC?.all) return null;
+    const all = SC.all();
+    return all.find(s =>
+      s.ServiceCode === family &&
+      String(s.Tier || '').toLowerCase() === String(tier || '').toLowerCase()
+    ) || null;
+  }
+
   window.OrderFormTieredPricing = {
     preload,
     resolve,
@@ -295,6 +317,7 @@
     isStitchAware,
     asStitchSurcharge,
     asTierName,
+    serviceCodeForTier,
     fetchAlPricing,
     fetchDecgPricing,
     fetchContractPricing,

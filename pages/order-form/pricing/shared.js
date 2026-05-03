@@ -111,6 +111,34 @@ window.OrderFormPricingShared = (function () {
     return { tax, total, deposit };
   }
 
+  // ---------------------------------------------------------------------------
+  // Phase 3 — Service Rail filter helper.
+  //
+  // Each method engine's getRailServices() boils down to: filter Service_Codes
+  // by IsActive + Visible, then by an allowed ServiceType set, apply per-customer
+  // overrides, sort by RailGroup + RailOrder. This is identical across methods
+  // — only the allowed types differ — so it lives here.
+  //
+  // Usage from a method engine:
+  //   getRailServices(formCtx, customerOverrides) {
+  //     return S.filterRailServices(['EMBROIDERY','DIGITIZING','UNIVERSAL'], customerOverrides);
+  //   }
+  // ---------------------------------------------------------------------------
+  function filterRailServices(allowedTypes, customerOverrides = {}) {
+    const SC = window.OrderFormServiceCodes;
+    if (!SC?.all) return [];
+    const allowed = new Set((allowedTypes || []).map(t => String(t).toUpperCase()));
+    const all = SC.all() || [];
+    return all
+      .filter(s => s.IsActive !== false && s.Visible !== false)
+      .filter(s => allowed.has(String(s.ServiceType || '').toUpperCase()))
+      .map(s => ({ ...s, ...(customerOverrides[s.ServiceCode] || {}) }))
+      .sort((a, b) =>
+        String(a.RailGroup || '').localeCompare(String(b.RailGroup || '')) ||
+        (Number(a.RailOrder) || 0) - (Number(b.RailOrder) || 0)
+      );
+  }
+
   return {
     safeNumber,
     roundPrice,
@@ -122,5 +150,6 @@ window.OrderFormPricingShared = (function () {
     emptyOrderBreakdown,
     WA_TAX_RATE,
     computeTaxAndDeposit,
+    filterRailServices,
   };
 })();

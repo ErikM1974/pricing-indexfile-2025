@@ -222,6 +222,11 @@
     );
   }
 
+  // Phase 3 — rail filter. Screen print services + universals.
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['SCREENPRINT', 'UNIVERSAL'], customerOverrides);
+  }
+
   window.OrderFormPricing.register('screenprint', {
     method: 'screenprint',
     label: 'Screen Print',
@@ -237,5 +242,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();

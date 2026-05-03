@@ -440,6 +440,14 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Phase 3 — Service Rail filter. Embroidery shows its own services, plus
+  // digitizing setup fees and universal order fees (RUSH, Freight, etc.).
+  // ---------------------------------------------------------------------------
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['EMBROIDERY', 'DIGITIZING', 'UNIVERSAL'], customerOverrides);
+  }
+
+  // ---------------------------------------------------------------------------
   // Register
   // ---------------------------------------------------------------------------
   window.OrderFormPricing.register('embroidery', {
@@ -457,5 +465,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();

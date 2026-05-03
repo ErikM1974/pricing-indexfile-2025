@@ -134,6 +134,11 @@
     );
   }
 
+  // Phase 3 — rail filter. Sticker services + universals.
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['STICKER', 'UNIVERSAL'], customerOverrides);
+  }
+
   window.OrderFormPricing.register('sticker', {
     method: 'sticker',
     label: 'Stickers',
@@ -149,5 +154,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();

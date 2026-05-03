@@ -225,6 +225,11 @@
     );
   }
 
+  // Phase 3 — rail filter. DTF services + universals.
+  function getRailServices(formCtx, customerOverrides = {}) {
+    return S.filterRailServices(['DTF', 'UNIVERSAL'], customerOverrides);
+  }
+
   window.OrderFormPricing.register('dtf', {
     method: 'dtf',
     label: 'DTF',
@@ -240,5 +245,6 @@
     aggregate,
     buildNotesBlock,
     buildDesignContext,
+    getRailServices,
   });
 })();
