@@ -77,8 +77,19 @@
         return Number.isFinite(amt) ? amt * (qty || 1) : null;
       }
       case 'TIERED': {
-        const u = Number(addOn?.params?.unitPrice);
-        return Number.isFinite(u) ? u * qty : null;
+        // Phase 2c: auto-resolve via window.OrderFormTieredPricing if loaded.
+        // Falls back to params.unitPrice (manual override / Phase 2b path).
+        const tp = window.OrderFormTieredPricing;
+        let unit = null;
+        if (tp?.isTiered?.(sc.ServiceCode)) {
+          unit = tp.resolveSync(sc.ServiceCode, {
+            qty,
+            tier: tp.tierForQty(qty),
+            stitchCount: Number(addOn?.params?.stitchCount) || 8000,
+          });
+        }
+        if (unit == null) unit = Number(addOn?.params?.unitPrice);
+        return Number.isFinite(unit) ? unit * qty : null;
       }
       default:
         return null;
@@ -101,8 +112,20 @@
       return `pass-through ${fmt$(addOn?.params?.amount || 0)}`;
     }
     if (method === 'TIERED') {
-      const u = Number(addOn?.params?.unitPrice);
-      return Number.isFinite(u) ? `${fmt$(u)}/ea × ${qty}` : `tiered (set price)`;
+      const tp = window.OrderFormTieredPricing;
+      let unit = null;
+      if (tp?.isTiered?.(sc.ServiceCode)) {
+        unit = tp.resolveSync(sc.ServiceCode, {
+          qty,
+          tier: tp.tierForQty(qty),
+          stitchCount: Number(addOn?.params?.stitchCount) || 8000,
+        });
+      }
+      if (unit == null) unit = Number(addOn?.params?.unitPrice);
+      const isAuto = !!(tp?.isTiered?.(sc.ServiceCode) && Number.isFinite(unit) && !addOn?.params?.unitPriceOverride);
+      return Number.isFinite(unit)
+        ? `${fmt$(unit)}/ea${isAuto ? ' (auto)' : ''} × ${qty}`
+        : `tiered (set price)`;
     }
     if (qty <= 1) return `${fmt$(sell)} flat`;
     return `${fmt$(sell)}/ea × ${qty}`;
@@ -146,6 +169,41 @@
     const [hours, setHours] = useState(1);
     const [amount, setAmount] = useState(0);
     const [unitPrice, setUnitPrice] = useState(0);
+    const [unitPriceOverride, setUnitPriceOverride] = useState(false);
+
+    // Stitch count for TIERED services that use it (AL, AL-CAP, AS-Garm,
+    // AS-CAP, DECG-FB, CTR-Garmt, CTR-Cap). Defaults to the form's primary
+    // stitch count when available, falling back to 8000.
+    const tp = window.OrderFormTieredPricing;
+    const formStitchCount = Number(breakdown?.formCtx?.decoConfig?.stitchCount) || 8000;
+    const [stitchCount, setStitchCount] = useState(() => {
+      if (code === 'AL-CAP' || code === 'AS-CAP') return Math.max(formStitchCount, 5000);
+      return Math.max(formStitchCount, 8000);
+    });
+
+    // Auto-resolve TIERED unit price when row/qty/stitch changes (unless
+    // rep manually overrode). Phase 2c: replaces the manual entry from 2b.
+    useEffect(() => {
+      if (method !== 'TIERED' || !tp) return;
+      if (unitPriceOverride) return;
+      const resolved = tp.resolveSync(code, {
+        qty: Number(qty) || 0,
+        tier: tp.tierForQty(Number(qty) || 0),
+        stitchCount: Number(stitchCount) || 8000,
+      });
+      if (Number.isFinite(resolved)) {
+        setUnitPrice(resolved);
+      } else {
+        // Cache cold — kick the async fetch and re-trigger via setState.
+        tp.resolve(code, {
+          qty: Number(qty) || 0,
+          tier: tp.tierForQty(Number(qty) || 0),
+          stitchCount: Number(stitchCount) || 8000,
+        }).then(v => {
+          if (Number.isFinite(v) && !unitPriceOverride) setUnitPrice(v);
+        });
+      }
+    }, [method, code, qty, stitchCount, unitPriceOverride]);
 
     // Update row's qty default when row changes
     function pickRow(id) {
@@ -182,7 +240,14 @@
       if (method === 'CALCULATED' && code === 'RUSH') params.percent = Number(percent) || 25;
       if (method === 'HOURLY') params.hours = Number(hours) || 0;
       if (method === 'PASSTHROUGH') params.amount = Number(amount) || 0;
-      if (method === 'TIERED') params.unitPrice = Number(unitPrice) || 0;
+      if (method === 'TIERED') {
+        // Phase 2c: persist stitch count (so chip can re-resolve on row qty
+        // change) AND the unit price snapshot at confirm-time. Mark whether
+        // it was a manual override so the chip can show "auto" badge.
+        if (tp?.isStitchAware?.(code)) params.stitchCount = Number(stitchCount) || 8000;
+        params.unitPrice = Number(unitPrice) || 0;
+        if (unitPriceOverride) params.unitPriceOverride = true;
+      }
       const entry = { code, qty: Number(qty) || (method === 'CALCULATED' || method === 'PASSTHROUGH' ? 1 : 0), scope };
       if (Object.keys(params).length) entry.params = params;
       onConfirm(entry);
@@ -219,11 +284,40 @@
           </label>
         )}
 
-        {method === 'TIERED' && (
+        {method === 'TIERED' && tp?.isStitchAware?.(code) && (
           <label className="addon-params-field">
-            <span>Unit price $ <em>(manual — auto-lookup in v2)</em></span>
-            <input type="number" min="0" step="0.5" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} />
+            <span>Stitch count</span>
+            <input type="number" min="0" step="500" value={stitchCount} onChange={e => setStitchCount(e.target.value)} />
+            <span className="addon-params-suffix">stitches</span>
           </label>
+        )}
+
+        {method === 'TIERED' && (
+          <>
+            <label className="addon-params-field">
+              <span>Unit price $</span>
+              <input
+                type="number" min="0" step="0.01" value={unitPrice}
+                onChange={e => { setUnitPrice(e.target.value); setUnitPriceOverride(true); }}
+              />
+              {!unitPriceOverride && tp?.isTiered?.(code) && (
+                <span className="addon-params-suffix" style={{color: 'var(--nwca-green-dk, #3d6230)', fontWeight: 600}}>auto</span>
+              )}
+              {unitPriceOverride && (
+                <button
+                  type="button"
+                  onClick={() => setUnitPriceOverride(false)}
+                  style={{fontSize: 10, padding: '2px 6px', background: '#f3f4f6', border: '1px solid #d1d5db', borderRadius: 3, cursor: 'pointer'}}
+                  title="Reset to auto-resolved price"
+                >reset auto</button>
+              )}
+            </label>
+            <div className="addon-params-hint">
+              {tp?.isTiered?.(code)
+                ? tp.formulaLabel(code, { qty, tier: tp.tierForQty(qty), stitchCount })
+                : 'Manual price entry'}
+            </div>
+          </>
         )}
 
         {method === 'CALCULATED' && code === 'RUSH' && (
@@ -384,7 +478,9 @@
     const [toast, setToast] = useState(null);
     const [loaded, setLoaded] = useState(false);
 
-    // Fetch service codes once on mount.
+    // Fetch service codes once on mount. Also kick off TIERED pricing
+    // preload (Phase 2c) so AL/AL-CAP/etc. resolve synchronously when the
+    // rep opens the picker the first time. Cache TTL is 5 min.
     useEffect(() => {
       let cancelled = false;
       window.OrderFormServiceCodes?.fetch?.().then(items => {
@@ -392,6 +488,7 @@
         setServices(items || []);
         setLoaded(true);
       });
+      window.OrderFormTieredPricing?.preload?.();
       return () => { cancelled = true; };
     }, []);
 
