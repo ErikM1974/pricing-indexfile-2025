@@ -25,7 +25,7 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
-<script src="order-form/shopworks.js?v=20260502-2"></script>
+<script src="order-form/shopworks.js?v=20260503-1"></script>
 
 <!-- Pricing engines (existing + new sticker/emblem services) — must load before the registry -->
 <script src="../shared_components/js/product-category-filter.js?v=20260502-1"></script>
@@ -62,14 +62,17 @@
 
 <!-- Component scripts (transpiled from JSX in-browser by Babel standalone) -->
 <script type="text/babel" data-presets="react" src="order-form/components/common.jsx?v=20260422-2"></script>
+<!-- Service_Codes client (Phase 2a 2026-05-03) — plain JS, not JSX. Loaded
+     before paper-form.jsx so window.OrderFormServiceCodes is available. -->
+<script src="order-form/components/service-codes.js?v=20260503-1"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/design-autocomplete.jsx?v=20260502-1"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/line-items.jsx?v=20260502-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/totals.jsx?v=20260502-3"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/artwork.jsx?v=20260422-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/tweaks.jsx?v=20260422-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/print-sheet.jsx?v=20260502-3"></script>
-<script type="text/babel" data-presets="react" src="order-form/components/paper-form.jsx?v=20260502-21"></script>
-<script type="text/babel" data-presets="react" src="order-form/app.jsx?v=20260502-3"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/paper-form.jsx?v=20260503-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/app.jsx?v=20260503-1"></script>
 
 </body>
 </html>
