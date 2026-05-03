@@ -181,14 +181,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### SanMar→ShopWorks Style Normalization — _OSFA and _S/M Suffixes Not Stripped
-**Problem:** SanMar order matching failed for orders with `_OSFA`, `_S/M`, `_L/XL` part number suffixes. 36 orders had empty id_Order.
-**Root Cause:** The regex `/_\d?[xXsSmMlL]+$/i` only handled `_2X`/`_3XL` style suffixes. `NE1020_S/M`, `BG517_OSFA` stayed un-normalized, never matching SanMar's base style `NE1020`/`BG517`.
-**Solution:** Added `replace(/_(OSFA|S\/M|L\/XL|ONE SIZE)$/i, '')` before the existing regex. Also: backfill missing SanMar items via poSearch, paginate all Caspio queries, add live ManageOrders API fallback for orders missing from Caspio cache.
-**Prevention:** When adding new size suffix patterns to ShopWorks, update the normalization regex in `sanmar-orders.js` (3 instances — search `baseStyle =`).
-
----
-
 ### Caspio v3 Pagination: q.limit + q.pageNumber = Overlapping Pages
 **Problem:** `fetchAllCaspioPages` returned only 1000 of 2794 ManageOrders_LineItems. Style index had 634 styles instead of 715.
 **Root Cause:** Caspio v3 API: `q.limit` + `q.pageNumber` causes overlapping pages. Pages 2+ return partial duplicates of page 1.
@@ -295,3 +287,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 1. **OrderType + DesignType IDs were ALL wrong from the source CSV.** OF-0027 displayed "Digital Printing" instead of expected "Custom Embroidery" because Erik's CSV mapped `Embroidery → 5` but in the live ShopWorks Order Types table ID 5 is "Digital Printing". Verified all 7 IDs against a screenshot of ShopWorks's actual Order Types list (correct: emb=21, sp=13, dtg=5, dtf=18, sticker=41, emblem=7, default=6). **Lesson:** when given a "mapping CSV" by the customer, verify against the live system before deploying — column header pairings can be ambiguous and the live system is the source of truth, not the spreadsheet.
 2. **Caspio's `Design_Lookup_2026.Design_Number` IS ShopWorks's `id_Design`.** The 155K-row table holds the same integer ShopWorks uses internally, just under a different column name (`ID_Unique` is empty). So when the rep picks design 9449 from the autocomplete, server.js can pass `idDesign: 9449` directly to ManageOrders — no secondary lookup table or ManageOrders historical pull needed. Saved ~half day. **Lesson:** before building a mapping/lookup endpoint, check whether the "external" key is already the same integer as the "internal" one.
 3. **`/api/embroidery-designs/lookup` had been silently 404'ing on every order push for months.** server.js was calling that path; the real route is `/api/digitized-designs/lookup`. Phase A's `Designs:[]` orphan-prevention masked the failure. **Lesson:** HTTP failures should not silently fall back to a "default" path — log the 404 OR fail the request. A typo'd URL with a quiet catch hid the bug for the entire form's lifetime.
+
+---
+
+### Cap Embroidery Manual-Cost Override Was Unauthenticated (2026-05-03)
+**Problem:** [shared_components/js/cap-embroidery-pricing-service.js:18-34](shared_components/js/cap-embroidery-pricing-service.js:18) read `?manualCost=...` from the URL without checking the host. A customer visiting `https://teamnwca.com/calculators/cap-embroidery-pricing-integrated.html?manualCost=0.01` saw fake $0.01 cap prices on the public calculator. Discovered during the Embroidery Pricing Audit while comparing the cap service to the flat service. The flat embroidery service ([embroidery-pricing-service.js:18-22](shared_components/js/embroidery-pricing-service.js:18)) had had this gate since launch — the cap service was a copy-paste miss.
+**Root Cause:** When the cap service was forked from the flat service, the `getManualCostOverride()` method was copied without the `host === 'localhost' || host.endsWith('.herokuapp.com')` internal-only check. Two services with identical-looking signatures had different security postures.
+**Solution:** Copied the 3-line host gate verbatim into `cap-embroidery-pricing-service.js`. Verified via local preview: localhost still allows override (staff use); teamnwca.com / nwcustomapparel.com return null. Deployed in main app v908 on 2026-05-03.
+**Prevention:** When forking a public-facing pricing service to support a new product type, **diff the security/auth surface** of the source before stamping the copy. Look for: host-gate, sessionStorage validation, URL parameter sanitization. Add a pre-commit grep check or unit test that asserts every pricing service has `getManualCostOverride()` returning null on non-internal hosts. Also: **stitch-surcharge formulas differ by category** (caps use $1.00/1K above 5K base; flats use $1.25/1K above 8K base; the cap bundle's `allEmbroideryCostsR` has NO surcharge brackets while the flat bundle has 'ALL' tier deltas at 10K/15K/25K) — when porting variable-stitch pricing to a new surface, verify against the Quote Builder's `embroidery-quote-pricing.js:2099` formula. Both rates are bigger lessons about copy-paste-with-modification: assume the source has invariants you might not notice.

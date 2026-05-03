@@ -1457,3 +1457,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
 **Solution:** Changed all 6 checks from `existing.Result.length` to `Array.isArray(existing) && existing.length > 0`. Also fixed backfill line item dedup (was blind POST with silent catch → proper GET/PUT/POST upsert).
 **Prevention:** `makeCaspioRequest` unwraps `.Result` — never check `.Result` on its return value. When writing Caspio upsert logic, always test with `Array.isArray()`.
+
+---
+
+### SanMar→ShopWorks Style Normalization — _OSFA and _S/M Suffixes Not Stripped (archived 2026-05-03)
+**Problem:** SanMar order matching failed for orders with `_OSFA`, `_S/M`, `_L/XL` part number suffixes. 36 orders had empty id_Order.
+**Root Cause:** The regex `/_\d?[xXsSmMlL]+$/i` only handled `_2X`/`_3XL` style suffixes. `NE1020_S/M`, `BG517_OSFA` stayed un-normalized, never matching SanMar's base style `NE1020`/`BG517`.
+**Solution:** Added `replace(/_(OSFA|S\/M|L\/XL|ONE SIZE)$/i, '')` before the existing regex. Also: backfill missing SanMar items via poSearch, paginate all Caspio queries, add live ManageOrders API fallback for orders missing from Caspio cache.
+**Prevention:** When adding new size suffix patterns to ShopWorks, update the normalization regex in `sanmar-orders.js` (3 instances — search `baseStyle =`).
