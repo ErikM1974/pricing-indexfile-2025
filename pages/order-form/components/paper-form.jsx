@@ -1264,7 +1264,7 @@ function StockConfirmModal({ items, onConfirm, onCancel }) {
   );
 }
 
-function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, decoConfig = {}, setDecoConfig = () => {}, breakdown = null, customerMode = false, draftId = null, staffFilled = [] }) {
+function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, setOrderNotes, files, setFiles, decoConfig = {}, setDecoConfig = () => {}, addOns = [], setAddOns = () => {}, breakdown = null, customerMode = false, draftId = null, staffFilled = [] }) {
   const lockSalesRep = customerMode && staffFilled.includes('salesRep');
   const lockPO       = customerMode && staffFilled.includes('po');
   const activeDeco = decoConfig?.method || rows.find(r => r?.deco)?.deco || '';
@@ -1383,7 +1383,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
   async function performSubmit() {
     setSubmitting(true);
     try {
-      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown });
+      const res = await window.nwOrderAPI.submitOrder({ info, rows, ship, orderNotes, files, draftId, decoConfig, breakdown, addOns });
       if (res.ok) {
         const modeLabel = res.mode === 'mock' ? 'mock mode (backend unreachable)' : 'ShopWorks';
         let text = `✓ Order ${res.orderId} — submitted to ${modeLabel}${res.shopWorksId ? ' · SW# ' + res.shopWorksId : ''}`;
@@ -1428,7 +1428,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     if (submitting) return;
     setSubmitting(true);
     try {
-      const res = await window.nwOrderAPI.saveDraft({ info, rows, ship, orderNotes, files, decoConfig });
+      const res = await window.nwOrderAPI.saveDraft({ info, rows, ship, orderNotes, files, decoConfig, addOns });
       if (res && res.success && res.draftId) {
         const url = `${window.location.origin}/order-form/${res.draftId}`;
         setShareUrl(url);

@@ -42,6 +42,17 @@ function App() {
   // Artwork
   const [files, setFiles] = useState([]);
 
+  // Add-on services (Phase 2a 2026-05-03) — fees pushed to ShopWorks as
+  // additional LinesOE entries. Each entry: { id, code, qty, scope, params? }.
+  // scope: 'order' for order-level singletons (DD, GRT-50, RUSH, etc.) or
+  //        { rowId: 'r1' } for per-row attachments (3D Puff on a cap row).
+  // The submit handler in server.js iterates this array and adds fee
+  // line items via `resolvedPrice()` from window.OrderFormServiceCodes.
+  // Singleton enforcement (replace order-level duplicates) lives in
+  // window.OrderFormServiceCodes.addOrReplace() — UI in Phase 2b will
+  // call it. Phase 2a path: add via console for end-to-end smoke test.
+  const [addOns, setAddOns] = useState([]);
+
   // Shipping
   const [ship, setShip] = useState({
     method: 'ups', address: '', city: '', state: '', zip: '', notes: '',
@@ -161,6 +172,19 @@ function App() {
   function update(field, v) { setInfo({ ...info, [field]: v }); }
   function updateShip(field, v) { setShip({ ...ship, [field]: v }); }
 
+  // Phase 2a 2026-05-03 — expose state setters on window for end-to-end
+  // smoke testing of the add-on submit path before the UI lands in 2b.
+  // Usage from browser devtools console:
+  //   window.OrderFormApp.setAddOns([
+  //     { id: 'a1', code: '3D-EMB', qty: 24, scope: { rowId: 'r1' } },
+  //     { id: 'a2', code: 'GRT-50', qty: 1, scope: 'order' },
+  //   ]);
+  // This is safe in production: setAddOns just feeds React state — same as
+  // any UI interaction would. Phase 2b removes the need by adding a UI.
+  React.useEffect(() => {
+    window.OrderFormApp = { addOns, setAddOns, info, rows, breakdown };
+  }, [addOns, info, rows, breakdown]);
+
   return (
     <>
       <header className="topbar screen-only">
@@ -199,6 +223,7 @@ function App() {
           orderNotes={orderNotes} setOrderNotes={setOrderNotes}
           files={files} setFiles={setFiles}
           decoConfig={decoConfig} setDecoConfig={setDecoConfig}
+          addOns={addOns} setAddOns={setAddOns}
           breakdown={breakdown}
           customerMode={customerMode}
           draftId={draftId}

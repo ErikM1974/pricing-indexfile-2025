@@ -70,7 +70,7 @@ window.nwOrderAPI = (function () {
   }
 
   function buildBody(order, extras) {
-    const { info, rows, ship, orderNotes, files, decoConfig, breakdown } = order;
+    const { info, rows, ship, orderNotes, files, decoConfig, breakdown, addOns } = order;
     // Build the method-specific notes block (frontend builds, backend prepends
     // it to the existing "Notes On Order" header). Lets each method describe
     // itself ("EMBROIDERY · 8,000 stitches · Tier 24-47 · Left Chest").
@@ -87,6 +87,19 @@ window.nwOrderAPI = (function () {
     // be comma-separated.
     const designNumbers = String(info?.designNumber || '')
       .split(',').map(s => s.trim()).filter(Boolean);
+    // Add-on services (Phase 2a 2026-05-03) — pass through verbatim. The
+    // server-side submit handler iterates these and appends fee LinesOE
+    // entries to the ManageOrders payload via resolvedPrice() lookups
+    // against the Service_Codes table. UI for adding these lands in 2b.
+    const cleanAddOns = (Array.isArray(addOns) ? addOns : [])
+      .filter(a => a && typeof a.code === 'string' && a.code)
+      .map(a => ({
+        id: String(a.id || ''),
+        code: String(a.code),
+        qty: Number(a.qty) || 0,
+        scope: a.scope === 'order' ? 'order' : (a.scope?.rowId ? { rowId: String(a.scope.rowId) } : 'order'),
+        params: (a.params && typeof a.params === 'object') ? { ...a.params } : undefined,
+      }));
     return {
       info: { ...info },
       rows: (rows || []).map(serializableRow),
@@ -97,6 +110,7 @@ window.nwOrderAPI = (function () {
       breakdown: serializableBreakdown(breakdown),
       methodNotesBlock,
       designNumbers,
+      addOns: cleanAddOns,
       ...(extras || {})
     };
   }
