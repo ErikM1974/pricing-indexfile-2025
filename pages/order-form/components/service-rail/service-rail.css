@@ -259,14 +259,17 @@
 .rail-card--order        { border-left: 3px solid #e03030; }
 
 /* Standard tier card — shows "INCLUDED" badge, isn't draggable since adding
-   a $0 surcharge line item is meaningless. */
+   a $0 surcharge line item is meaningless. Phase 6: clearer visual cue +
+   inline hint so reps don't waste time trying to drag it. */
 .rail-card--standard {
   background: #f1f8f4;
-  cursor: default;
+  cursor: not-allowed;
+  opacity: 0.85;
 }
 .rail-card--standard:hover {
   transform: none;
   box-shadow: none;
+  opacity: 0.95; /* slight lift on hover so the card feels alive but not interactive */
 }
 .rail-card--included-badge {
   display: inline-block;
@@ -278,6 +281,14 @@
   border-radius: 3px;
   margin-left: 4px;
   letter-spacing: 0.3px;
+}
+.rail-card--standard-hint {
+  display: block;
+  font-size: 10px;
+  color: #1f6a32;
+  font-style: italic;
+  margin-top: 2px;
+  font-weight: 500;
 }
 
 /* Inline inputs on TIERED / HOURLY / PASSTHROUGH cards */
@@ -430,6 +441,19 @@ body.rail-dragging .pf-row--rail-over td {
 }
 .pf-row--just-dropped {
   animation: pf-row-drop-success 800ms ease-out;
+}
+
+/* Phase 6 — drop rejected shake. When a rep tries to drop a cap-scoped card
+   on a garment row (or vice versa), the row shakes briefly to communicate
+   the rejection. Without this the rep sees no feedback and assumes the
+   drag-drop is broken. */
+@keyframes pf-row-drop-rejected {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-3px); }
+  40%, 80% { transform: translateX(3px); }
+}
+.pf-row--rail-rejected {
+  animation: pf-row-drop-rejected 320ms ease-in-out;
 }
 
 /* Rail card — enhanced hover lift + drag visual */

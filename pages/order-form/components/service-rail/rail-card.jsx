@@ -245,7 +245,7 @@
         onDragEnd={handleDragEnd}
         onClick={handleClick}
         title={isStandardTier
-          ? `${title} — included, no surcharge needed`
+          ? `Standard tier — included in base price, no surcharge needed. Drag Mid or Large for higher stitch counts.`
           : isTouch
             ? `Tap to select, then tap a row`
             : `Drag onto ${groupCls.includes('cap') ? 'a cap row' : groupCls.includes('garment') ? 'a garment row' : 'the order'}`}
@@ -267,6 +267,11 @@
           <div className="rail-card-price">
             {priceLabel}<span className="rail-card-price--suffix">{priceSuffix}</span>
           </div>
+        )}
+        {isStandardTier && (
+          <span className="rail-card--standard-hint">
+            ✓ No surcharge — included in base price
+          </span>
         )}
 
         {/* Stitch input for AL/AL-CAP/DECG-FB/CTR-* */}

@@ -353,6 +353,7 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   // ServiceRail (set via useEffect there).
   const [railDragging, setRailDragging] = useState(false);
   const [railOver, setRailOver] = useState(false);
+  const [railRejected, setRailRejected] = useState(false);  // Phase 6 — shake on rejection
   useEffect(() => {
     function onStart() { setRailDragging(true); }
     function onEnd() { setRailDragging(false); setRailOver(false); }
@@ -364,33 +365,96 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
     };
   }, []);
 
-  // Eligibility: read scope from the dragged payload + this row's capOrFlat
+  // Phase 6 — robust cap/flat detection. Mirrors the embroidery engine's
+  // detectCapOrFlat() (pricing/methods/embroidery.jsx:35) so eligibility works
+  // even when a row has no qty, no breakdown, or a pricing error. Without
+  // this fallback, rows in those states had `extras.capOrFlat === undefined`
+  // → eligibility returned false → `e.preventDefault()` never fired →
+  // browser silently rejected drops with no feedback. The bug Erik hit on
+  // v917.
+  //
+  // Returns null for genuinely ambiguous rows (style typed but no desc loaded
+  // yet, e.g. when /api/product-colors 404s). Eligibility treats null as
+  // "allow either type" — better to let the rep place the chip than to
+  // silently reject. They'll catch wrong placements visually.
+  function detectRowKind() {
+    // Layer 1: explicit override on the row
+    const override = row?.rowDecoConfig?.capOrFlat;
+    if (override === 'cap' || override === 'flat') return override;
+    // Layer 2: pricing breakdown's resolved value (when available + valid)
+    const fromBreakdown = rowBreakdown?.extras?.capOrFlat;
+    if (fromBreakdown === 'cap' || fromBreakdown === 'flat') return fromBreakdown;
+    // Layer 3: ProductCategoryFilter on style + description
+    const F = window.ProductCategoryFilter;
+    const product = {
+      label: row?.desc || '',
+      value: row?.style || '',
+      PRODUCT_TITLE: row?.desc || '',
+    };
+    if (F?.isFlatHeadwear?.(product)) return 'flat';
+    if (F?.isStructuredCap?.(product)) return 'cap';
+    // Layer 4: OSFA-only sizes → cap (oddball products without keyword match)
+    const sizeKeys = Object.keys(row?.sizes || {}).filter(k => Number(row.sizes[k]) > 0);
+    if (sizeKeys.length && sizeKeys.every(k => k === 'OSFA')) return 'cap';
+    // Layer 5: known NWCA cap-style prefixes (covers product-colors API failures
+    // where desc never loads). Non-exhaustive but covers the common cases.
+    const styleUpper = String(row?.style || '').toUpperCase();
+    if (/^(112|7706|3100|NE\d|C\d{3}|YP\d|FF\d)/.test(styleUpper)) return 'cap';
+    // Genuinely ambiguous — let the rep decide via the drop. Returning null
+    // means railEligible() allows the drop regardless of card scope.
+    return null;
+  }
+
   function railEligible() {
     const payload = window.__railDragPayload;
     if (!payload) return false;
     const scopeOf = window.OrderFormDropZone_scopeOf;
     const sc = scopeOf ? scopeOf(payload.service.ServiceCode) : 'any';
     if (sc === 'any') return true; // universal/order-level can drop anywhere
-    const kind = rowBreakdown?.extras?.capOrFlat;
+    const kind = detectRowKind();
+    if (kind == null) return true; // ambiguous — trust the rep
     if (sc === 'cap') return kind === 'cap';
     if (sc === 'flat') return kind === 'flat';
     return true;
   }
   function handleRailDragOver(e) {
-    if (!railDragging || !railEligible()) return;
-    e.preventDefault();
-    setRailOver(true);
+    if (!railDragging) return;
+    if (railEligible()) {
+      e.preventDefault();
+      setRailOver(true);
+    }
+    // For ineligible: don't preventDefault (drop won't fire) — but the
+    // shake feedback is triggered onDrop attempt below
   }
   function handleRailDragLeave() { setRailOver(false); }
   function handleRailDrop(e) {
+    if (!railEligible()) {
+      // Drop rejected — show shake + console warn for debugging.
+      // Note: e.preventDefault wasn't called in dragOver for ineligible rows,
+      // so this drop handler shouldn't fire normally. But some browsers fire
+      // it anyway, and we set the shake on dragOver if we detect attempted
+      // drop. Safe to handle both paths.
+      const payload = window.__railDragPayload;
+      const code = payload?.service?.ServiceCode;
+      console.warn(`[ServiceRail] Drop rejected on row ${row.id}: ${code} requires ${window.OrderFormDropZone_scopeOf?.(code)}, this row is ${detectRowKind()}`);
+      return;
+    }
     e.preventDefault();
     setRailOver(false);
-    if (!railEligible() || !window.__railHandleDrop) return;
+    if (!window.__railHandleDrop) return;
     window.__railHandleDrop({
       zoneType: 'row',
       rowId: row.id,
-      rowKind: rowBreakdown?.extras?.capOrFlat || 'flat',
+      rowKind: detectRowKind(),
     });
+  }
+  // Trigger shake + warn when the rep hovers over an ineligible row with a
+  // dragged card — runs alongside dragOver since the drop event won't fire.
+  function handleRailDragEnter() {
+    if (railDragging && !railEligible()) {
+      setRailRejected(true);
+      setTimeout(() => setRailRejected(false), 320);
+    }
   }
 
   // Total qty across all sizes — same as before.
@@ -605,11 +669,13 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   if (railDragging) {
     trCls += railEligible() ? ' pf-row--rail-eligible' : ' pf-row--rail-ineligible';
     if (railOver) trCls += ' pf-row--rail-over';
+    if (railRejected) trCls += ' pf-row--rail-rejected';
   }
 
   return (
     <tr
       className={trCls}
+      onDragEnter={handleRailDragEnter}
       onDragOver={handleRailDragOver}
       onDragLeave={handleRailDragLeave}
       onDrop={handleRailDrop}
