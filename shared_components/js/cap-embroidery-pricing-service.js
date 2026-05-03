@@ -12,10 +12,23 @@ class CapEmbroideryPricingService {
     }
 
     /**
-     * Check for manual cost override from URL parameter or sessionStorage
-     * @returns {number|null} Manual cost or null if not set
+     * Check for manual cost override from URL parameter or sessionStorage.
+     *
+     * SECURITY: gated to internal hosts only (mirrors EmbroideryPricingService:18-22).
+     * Without this gate, anyone visiting
+     *   teamnwca.com/calculators/cap-embroidery-pricing-integrated.html?manualCost=0.01
+     * would see fake $0.01 cap prices on the public-facing calculator. The flat
+     * embroidery service has had this guard since launch; the cap service was
+     * a copy-paste miss. Fixed 2026-05-03.
+     *
+     * @returns {number|null} Manual cost or null if not set / not internal
      */
     getManualCostOverride() {
+        // Only allow manual cost override on localhost/internal (staff-only feature)
+        const host = window.location.hostname;
+        const isInternal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.herokuapp.com');
+        if (!isInternal) return null;
+
         const urlParams = new URLSearchParams(window.location.search);
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {

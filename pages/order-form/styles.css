@@ -1609,6 +1609,30 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   text-align: right;
   line-height: 1.35;
 }
+/* Embroidery >8K-stitch warning (Phase 1.3 2026-05-03 — until Phase 4 ports
+   the Quote Builder's surcharge formula). Bright amber, full-row width so
+   the rep can't miss it before submitting an under-billed order. */
+.dcs-warn {
+  flex: 1 1 100%;
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: #fff7e6;
+  border: 1px solid #ffba38;
+  border-left-width: 4px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #663c00;
+  font-weight: 500;
+}
+.dcs-warn a {
+  color: #663c00;
+  text-decoration: underline;
+  font-weight: 600;
+}
+.dcs-warn a:hover {
+  color: #4a2a00;
+}
 .dcs-hint-inline {
   font-size: 10px;
   color: var(--ink-3);
