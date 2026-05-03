@@ -111,6 +111,18 @@ function TotalsPanel({ deco, decoConfig, breakdown, customerMode }) {
   const tier       = breakdown?.tier;
   const errors     = breakdown?.errors || [];
 
+  // Phase 5.2 — pulse animation on grand total when a rail card lands
+  const { useState, useEffect } = React;
+  const [pulseTotal, setPulseTotal] = useState(false);
+  useEffect(() => {
+    function onDrop() {
+      setPulseTotal(true);
+      setTimeout(() => setPulseTotal(false), 750);
+    }
+    window.addEventListener('railDropSuccess', onDrop);
+    return () => window.removeEventListener('railDropSuccess', onDrop);
+  }, []);
+
   const decoLabel = (() => {
     const m = window.OrderFormPricing?.getMethod?.(deco);
     return m?.label || (deco ? deco.charAt(0).toUpperCase() + deco.slice(1) : '');
@@ -144,7 +156,7 @@ function TotalsPanel({ deco, decoConfig, breakdown, customerMode }) {
         </div>
         <div className="tp-row tp-row--total">
           <span className="tp-lbl">Total {tax > 0 ? <span className="tp-dim">(estimated)</span> : null}</span>
-          <span className="tp-val">{fmt$(grand)}</span>
+          <span className={'tp-val' + (pulseTotal ? ' total-counter--pulse' : '')}>{fmt$(grand)}</span>
         </div>
         <div className="tp-row tp-row--deposit">
           <span className="tp-lbl">50% deposit due</span>

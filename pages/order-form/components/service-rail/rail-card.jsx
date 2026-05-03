@@ -57,7 +57,7 @@
    * @param {boolean} [props.selected]   true when card is tap-selected on touch (Phase 3f)
    * @param {boolean} [props.isTouch]    true on touch devices (no hover capability)
    */
-  function RailCard({ service, onDragStart, onDragEnd, onTap, suggested, dragging, selected, isTouch }) {
+  function RailCard({ service, onDragStart, onDragEnd, onTap, suggested, dragging, selected, isTouch, nudge }) {
     const code = service.ServiceCode;
     const tier = service.Tier || '';
     const method = String(service.PricingMethod || '').toUpperCase();
@@ -191,7 +191,13 @@
       dragging ? 'dragging' : '',
       suggested ? 'rail-card--suggested' : '',
       selected ? 'rail-card--selected' : '',
+      nudge ? 'rail-card--nudge' : '',
     ].filter(Boolean).join(' ');
+
+    // Phase 5.3 — ShopWorks PartNumber preview text. Shows the exact value
+    // that will land in LinesOE on submit. Useful for transparency + training.
+    const swPartNumber = code; // ShopWorks PartNumber == ServiceCode
+    const swDisplayName = service.DisplayName || code;
 
     // Title (display name, falls back to code)
     const title = service.DisplayName || code;
@@ -244,6 +250,13 @@
             ? `Tap to select, then tap a row`
             : `Drag onto ${groupCls.includes('cap') ? 'a cap row' : groupCls.includes('garment') ? 'a garment row' : 'the order'}`}
       >
+        {/* Phase 5.3 — ShopWorks part preview tooltip on hover */}
+        {!isStandardTier && (
+          <div className="rail-card-sw-preview">
+            <span className="rail-card-sw-preview-label">ShopWorks:</span>
+            {swPartNumber} · {swDisplayName.slice(0, 32)}
+          </div>
+        )}
         <div className="rail-card-head">
           <span className="rail-card-code">{code}{tier ? ` ${tier}` : ''}</span>
           {!isStandardTier && <span className="rail-card-grip" aria-hidden>⋮⋮</span>}

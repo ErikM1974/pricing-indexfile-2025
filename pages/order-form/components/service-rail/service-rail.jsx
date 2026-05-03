@@ -44,11 +44,28 @@
     const [customerOverrides, setCustomerOverrides] = useState({});
     const [dragPayload, setDragPayload] = useState(null); // { service, qty, scope, params }
     const [selectedCard, setSelectedCard] = useState(null); // mobile tap-to-select
+    const [searchQuery, setSearchQuery] = useState(''); // Phase 5.4 filter
 
     // Detect touch device (no hover capability) — switches to tap-tap UX
     const isTouch = useMemo(() =>
       typeof window !== 'undefined' && window.matchMedia?.('(hover: none)')?.matches,
     []);
+
+    // Phase 5.1 — empty-state nudge. Pulse the first non-Standard card when
+    // the rep has no add-ons yet AND hasn't dismissed the nudge this session.
+    const NUDGE_KEY = 'orderForm.serviceRail.nudgeDismissed.v1';
+    const [nudgeDismissed, setNudgeDismissed] = useState(() => {
+      try { return sessionStorage.getItem(NUDGE_KEY) === 'true'; }
+      catch (_) { return false; }
+    });
+    const showNudge = !nudgeDismissed && (addOns?.length || 0) === 0;
+    // Dismiss nudge on first drag/tap interaction
+    useEffect(() => {
+      if ((addOns?.length || 0) > 0 && !nudgeDismissed) {
+        try { sessionStorage.setItem(NUDGE_KEY, 'true'); } catch (_) {}
+        setNudgeDismissed(true);
+      }
+    }, [addOns]);
 
     // Load services from the active method's engine. Re-run when method
     // changes or when addOns mutate (so suggested badges can refresh).
@@ -81,11 +98,34 @@
       SC.getCustomerOverrides(customerId).then(o => setCustomerOverrides(o || {}));
     }, [customerId]);
 
+    // Phase 5.4 — apply search filter before grouping
+    const filteredServices = useMemo(() => {
+      const q = searchQuery.trim().toLowerCase();
+      if (!q) return services;
+      return services.filter(s => {
+        const code = String(s.ServiceCode || '').toLowerCase();
+        const name = String(s.DisplayName || '').toLowerCase();
+        const tier = String(s.Tier || '').toLowerCase();
+        return code.includes(q) || name.includes(q) || tier.includes(q);
+      });
+    }, [services, searchQuery]);
+
     // Group services by RailGroup
     const grouped = useMemo(() => {
       const SC = window.OrderFormServiceCodes;
-      return SC?.groupedByRailGroup?.(services) || { Other: services };
-    }, [services]);
+      return SC?.groupedByRailGroup?.(filteredServices) || { Other: filteredServices };
+    }, [filteredServices]);
+
+    // Track the first non-Standard card across all sections for the nudge
+    const nudgeTargetPK = useMemo(() => {
+      if (!showNudge) return null;
+      for (const name of SECTION_ORDER) {
+        const list = grouped[name] || [];
+        const first = list.find(s => s.Tier !== 'Standard');
+        if (first) return first.PK_ID;
+      }
+      return null;
+    }, [grouped, showNudge]);
 
     // Cap vs flat detection per row (lifted from add-on-picker.jsx pattern).
     // Used to validate drop-zone eligibility.
@@ -234,6 +274,32 @@
           <span className="rail-method-badge">{deco}</span>
         </div>
 
+        {/* Phase 5.4 — search filter input */}
+        <div className="rail-search">
+          <input
+            className="rail-search-input"
+            type="text"
+            placeholder="Filter services…"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+          />
+          {searchQuery ? (
+            <button
+              className="rail-search-clear"
+              type="button"
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear filter"
+            >×</button>
+          ) : (
+            <span className="rail-search-icon" aria-hidden>🔍</span>
+          )}
+        </div>
+
+        {/* Empty filter result state */}
+        {searchQuery && Object.values(grouped).every(arr => arr.length === 0) && (
+          <div className="rail-empty">No services match "{searchQuery}"</div>
+        )}
+
         {/* Render each section in canonical order; skip empty groups */}
         {SECTION_ORDER.map(name => {
           const list = grouped[name] || [];
@@ -247,6 +313,7 @@
                   dragging={dragPayload && dragPayload.service.PK_ID === s.PK_ID}
                   selected={selectedCard && selectedCard.service.PK_ID === s.PK_ID}
                   isTouch={isTouch}
+                  nudge={s.PK_ID === nudgeTargetPK}
                   onDragStart={onDragStart}
                   onDragEnd={onDragEnd}
                   onTap={onTapCard}
