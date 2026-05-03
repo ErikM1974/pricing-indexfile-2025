@@ -1609,9 +1609,8 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
   text-align: right;
   line-height: 1.35;
 }
-/* Embroidery >8K-stitch warning (Phase 1.3 2026-05-03 — until Phase 4 ports
-   the Quote Builder's surcharge formula). Bright amber, full-row width so
-   the rep can't miss it before submitting an under-billed order. */
+/* Embroidery >8K-stitch warning (legacy — still referenced by other code paths
+   for now; superseded by .dcs-tier below for the embroidery ConfigBar). */
 .dcs-warn {
   flex: 1 1 100%;
   margin-top: 6px;
@@ -1632,6 +1631,104 @@ hr.rule { border: 0; border-top: 1px solid var(--line); margin: 28px 0; }
 }
 .dcs-warn a:hover {
   color: #4a2a00;
+}
+
+/* Stitch surcharge tier indicator — Phase 2d.2 (2026-05-03).
+   Shows the canonical NWCA flat-tier policy in real-time as rep types
+   stitchCount. Color-coded: green (Standard/no surcharge), amber (Mid),
+   orange (Large), red (Full Back territory). Each non-Standard tier
+   includes a one-click Apply button that creates AS-CAP/AS-Garm add-on
+   line items per row. Replaces the old confusing "use Quote Builder"
+   warning. */
+.dcs-tier {
+  flex: 1 1 100%;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  border: 1px solid;
+  border-left-width: 4px;
+}
+.dcs-tier-badge {
+  font-weight: 700;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.dcs-tier-text {
+  flex: 1 1 auto;
+  font-weight: 500;
+}
+.dcs-tier-text strong { font-weight: 700; }
+.dcs-tier-text a {
+  text-decoration: underline;
+  font-weight: 600;
+  color: inherit;
+}
+.dcs-tier-apply {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  border: 1px solid;
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+.dcs-tier-apply:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+}
+.dcs-tier-apply:active {
+  transform: translateY(0);
+}
+
+/* Standard tier — green, no action needed */
+.dcs-tier--ok {
+  background: #e8f7ee;
+  border-color: #2f9e44;
+  color: #1f6a32;
+}
+
+/* Mid tier — amber, one-click apply +$4 */
+.dcs-tier--mid {
+  background: #fff7e6;
+  border-color: #ffba38;
+  color: #663c00;
+}
+.dcs-tier--mid .dcs-tier-apply {
+  background: #ffba38;
+  border-color: #cc8a00;
+  color: #663c00;
+}
+.dcs-tier--mid .dcs-tier-apply:hover {
+  background: #ffa400;
+}
+
+/* Large tier — orange, one-click apply +$10 */
+.dcs-tier--lg {
+  background: #ffe8d4;
+  border-color: #e87a00;
+  color: #5a2e00;
+}
+.dcs-tier--lg .dcs-tier-apply {
+  background: #e87a00;
+  border-color: #b85e00;
+  color: #fff;
+}
+.dcs-tier--lg .dcs-tier-apply:hover {
+  background: #cc6900;
+}
+
+/* Full Back territory — red, route to Quote Builder */
+.dcs-tier--fb {
+  background: #ffe5e5;
+  border-color: #e03030;
+  color: #6a1414;
 }
 .dcs-hint-inline {
   font-size: 10px;

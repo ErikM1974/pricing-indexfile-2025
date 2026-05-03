@@ -307,12 +307,71 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Stitch surcharge tier classifier — mirrors the canonical NWCA policy
+  // stored in Caspio Embroidery_Costs (rows ItemType='AS-Cap'/'AS-Garm').
+  //
+  //   ≤ 10,000 stitches → Standard tier ($0, included in base price)
+  //   ≤ 15,000          → Mid tier (+$4 per piece)
+  //   ≤ 25,000          → Large tier (+$10 per piece)
+  //   > 25,000          → Full Back territory (use Quote Builder for DECG-FB)
+  //
+  // Same scale for caps and garments (Erik confirmed 2026-05-03). Same
+  // formula as Quote Builder's getStitchSurcharge() (embroidery-quote-pricing.js:814).
+  // ---------------------------------------------------------------------------
+  function classifyStitchTier(stitchCount) {
+    const n = Number(stitchCount) || 0;
+    if (n <= 10000) return { tier: 'Standard', surcharge: 0,  level: 'ok',  hint: 'Included in base price' };
+    if (n <= 15000) return { tier: 'Mid',      surcharge: 4,  level: 'mid', hint: 'Add AS-CAP / AS-Garm' };
+    if (n <= 25000) return { tier: 'Large',    surcharge: 10, level: 'lg',  hint: 'Add AS-CAP / AS-Garm' };
+    return { tier: 'Full Back', surcharge: null, level: 'fb',  hint: 'Use Quote Builder for DECG-FB pricing' };
+  }
+
+  // Apply the current tier as AS-CAP (per cap row) and AS-Garm (per garment row)
+  // add-on entries. Removes any existing AS surcharge entries first so re-apply
+  // after a stitch-count change replaces (not stacks).
+  function applyStitchSurchargeFromConfig(stitchCount) {
+    const app = window.OrderFormApp;
+    if (!app) { console.warn('[embroidery] OrderFormApp not exposed yet'); return; }
+    const { rows, breakdown, addOns, setAddOns } = app;
+    const tierInfo = classifyStitchTier(stitchCount);
+    if (tierInfo.level === 'ok' || tierInfo.level === 'fb') return;
+
+    // Strip prior AS-CAP/AS-Garm entries — re-apply with current tier
+    const cleaned = (addOns || []).filter(a => a.code !== 'AS-CAP' && a.code !== 'AS-Garm');
+
+    const mkId = () => 'addon_' + Math.random().toString(36).slice(2, 10);
+    const newEntries = [];
+    (rows || []).forEach(r => {
+      const rb = breakdown?.byRow?.get?.(r.id) || breakdown?.byRow?.[r.id];
+      const cof = rb?.extras?.capOrFlat;
+      const rowQty = Object.values(r?.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+      if (rowQty <= 0 || (cof !== 'cap' && cof !== 'flat')) return;
+      newEntries.push({
+        id: mkId(),
+        code: cof === 'cap' ? 'AS-CAP' : 'AS-Garm',
+        qty: rowQty,
+        scope: { rowId: r.id },
+        params: { stitchCount: Number(stitchCount), unitPrice: tierInfo.surcharge },
+      });
+    });
+    if (newEntries.length === 0) {
+      // No qualifying rows — alert the rep so they can add rows first
+      console.warn('[embroidery] No cap/garment rows with qty>0 to attach surcharge to');
+      return;
+    }
+    setAddOns([...cleaned, ...newEntries]);
+  }
+
+  // ---------------------------------------------------------------------------
   // ConfigBar — renders inline under the deco checkboxes when Embroidery is on.
+  // Includes the smart tier indicator + one-click Apply button when surcharge
+  // is needed.
   // ---------------------------------------------------------------------------
   function ConfigBar({ config, setConfig }) {
     const stitch = config.stitchCount ?? 8000;
     const loc    = config.primaryLocation ?? 'Left Chest';
-    const overBase = Number(stitch) > 8000;
+    const tierInfo = classifyStitchTier(stitch);
+
     return (
       <div className="deco-config-strip emb-config" data-method="embroidery">
         <div className="dcs-field">
@@ -334,24 +393,47 @@
             {PRIMARY_LOCATIONS.map(L => <option key={L} value={L}>{L}</option>)}
           </select>
         </div>
-        {overBase ? (
-          // 2026-05-03 (Phase 1.3 partial): the stitch input exists but the
-          // per-1K surcharge isn't yet plumbed into priceRow(). The bundle has
-          // tier-base costs at 8K + 'ALL' surcharge brackets at 10K/15K/25K
-          // for flats, BUT the cap bundle has NO surcharge brackets — and the
-          // Quote Builder uses a different per-1K formula ($1.00/1K cap vs
-          // $1.25/1K flat above different base counts). Wiring the wrong
-          // formula here would create the exact profit leak we're trying to
-          // fix. Phase 4 will port the QB's surcharge logic over carefully.
-          // Until then, warn the rep so they know the Order Form's price for
-          // >8K stitches is the 8K price (under-billed by ~$4/pc at 12K, more
-          // at higher counts).
-          <div className="dcs-warn" role="alert">
-            ⚠️ Stitch surcharge not yet calculated in Order Form — for orders above 8,000 stitches use the <a href="/quote-builders/embroidery-quote-builder.html" target="_blank" rel="noopener">Embroidery Quote Builder</a> to get correct pricing, then transcribe into ShopWorks.
-          </div>
-        ) : null}
+
+        {/* Smart tier indicator. Always visible — green at low stitches gives
+            positive feedback that no surcharge is needed; amber/orange at
+            higher stitches shows exactly what to add and offers a one-click
+            Apply. The math is canonical NWCA flat-tier policy (Caspio
+            Embroidery_Costs AS-Cap/AS-Garm rows) — same as Quote Builder. */}
+        <div className={`dcs-tier dcs-tier--${tierInfo.level}`} role="status">
+          {tierInfo.level === 'ok' && (
+            <>
+              <span className="dcs-tier-badge">✓ Standard tier</span>
+              <span className="dcs-tier-text">{stitch.toLocaleString()} stitches · {tierInfo.hint}</span>
+            </>
+          )}
+          {(tierInfo.level === 'mid' || tierInfo.level === 'lg') && (
+            <>
+              <span className="dcs-tier-badge">⚠ {tierInfo.tier} tier</span>
+              <span className="dcs-tier-text">
+                {stitch.toLocaleString()} stitches · <strong>+${tierInfo.surcharge} per piece</strong> surcharge needed
+              </span>
+              <button
+                type="button"
+                className="dcs-tier-apply"
+                onClick={() => applyStitchSurchargeFromConfig(stitch)}
+                title="Adds AS-CAP per cap row + AS-Garm per garment row at the matching tier price. Re-click after changing stitch count to refresh."
+              >
+                Apply +${tierInfo.surcharge}/pc surcharge
+              </button>
+            </>
+          )}
+          {tierInfo.level === 'fb' && (
+            <>
+              <span className="dcs-tier-badge">🔴 Full Back</span>
+              <span className="dcs-tier-text">
+                {stitch.toLocaleString()} stitches · use <a href="/quote-builders/embroidery-quote-builder.html" target="_blank" rel="noopener">Quote Builder</a> for DECG-FB pricing (above 25K is full-back coverage)
+              </span>
+            </>
+          )}
+        </div>
+
         <div className="dcs-hint">
-          8,000 stitches included · Cap vs flat auto-detected per product · v2: per-row stitch + extra-stitch surcharge + multiple logos
+          ≤10K Standard ($0) · ≤15K Mid (+$4) · ≤25K Large (+$10) · &gt;25K Full Back · Cap vs flat auto-detected per row
         </div>
       </div>
     );
