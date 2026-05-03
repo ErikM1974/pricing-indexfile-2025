@@ -1,0 +1,286 @@
+// Order Form Service Rail — RailCard component (Phase 3c, 2026-05-03).
+//
+// One draggable card per Service_Codes row. Renders differently based on
+// PricingMethod:
+//
+//   FIXED       → static price label, drag triggers
+//   FLAT        → same as FIXED (qty=1 typical)
+//   TIERED      → inline stitch input + live-resolved price (AL, AL-CAP,
+//                 DECG-FB, CTR-Garmt, CTR-Cap). Plus the special tier-card
+//                 mode (AS-CAP/AS-Garm Standard/Mid/Large — dragged whole)
+//   CALCULATED  → percent display (RUSH 25% default)
+//   HOURLY      → hours input (Art $75/hr × N)
+//   PASSTHROUGH → amount input (Freight, Pallet, Discount, CDP)
+//
+// The card emits onDragStart with a payload that ServiceRail consumes:
+//   { service, qty, scope, params: { stitchCount?, percent?, hours?, amount?, unitPrice? } }
+//
+// Standard tier cards (AS-CAP/AS-Garm Tier='Standard', SellPrice=$0) are
+// rendered as informational chips — the rep doesn't need to drag $0 onto
+// anything. They show "INCLUDED" badge instead of a drag handle.
+
+(function () {
+  'use strict';
+  const { useState, useMemo, useEffect } = React;
+
+  // PricingMethod variants that need an inline stitch input on the card.
+  const STITCH_INPUT_CODES = new Set([
+    'AL', 'AL-CAP', 'DECG-FB', 'CTR-Garmt', 'CTR-Cap',
+  ]);
+
+  // Code → group accent class. Looked up from RailGroup column at render time.
+  function groupClassFor(group) {
+    const g = String(group || '').toLowerCase();
+    if (g.includes('stitch')) return 'rail-card--stitch';
+    if (g.includes('cap'))    return 'rail-card--cap';
+    if (g.includes('garment'))return 'rail-card--garment';
+    if (g.includes('setup'))  return 'rail-card--setup';
+    if (g.includes('order'))  return 'rail-card--order';
+    return '';
+  }
+
+  function fmt$(n) {
+    const v = Number(n);
+    if (!Number.isFinite(v)) return '$0';
+    if (v === Math.floor(v)) return `$${v}`;
+    return `$${v.toFixed(2)}`;
+  }
+
+  /**
+   * @param {Object} props
+   * @param {Object} props.service       Service_Codes row
+   * @param {Function} props.onDragStart fired with payload { service, qty, scope, params }
+   * @param {Function} props.onDragEnd
+   * @param {boolean} [props.suggested]  per-customer auto-suggest hint (Phase 4 only)
+   * @param {boolean} [props.dragging]   true when this card is currently being dragged
+   */
+  function RailCard({ service, onDragStart, onDragEnd, suggested, dragging }) {
+    const code = service.ServiceCode;
+    const tier = service.Tier || '';
+    const method = String(service.PricingMethod || '').toUpperCase();
+    const sell = Number(service.SellPrice) || 0;
+    const isStandardTier = (tier === 'Standard');
+
+    // TIERED stitch input state (AL/AL-CAP/DECG-FB/CTR-*)
+    const isStitchInput = STITCH_INPUT_CODES.has(code);
+    const defaultStitches = useMemo(() => {
+      if (code === 'AL-CAP') return 5000;
+      if (code === 'DECG-FB') return 25000;
+      return 8000;
+    }, [code]);
+    const [stitchCount, setStitchCount] = useState(defaultStitches);
+
+    // CALCULATED (RUSH) percent
+    const [percent, setPercent] = useState(25);
+
+    // HOURLY (Art) hours
+    const [hours, setHours] = useState(1);
+
+    // PASSTHROUGH amount
+    const [amount, setAmount] = useState(0);
+
+    // Live-computed price for TIERED stitch-input cards
+    const livePrice = useMemo(() => {
+      if (!isStitchInput) return null;
+      const tp = window.OrderFormTieredPricing;
+      if (!tp) return null;
+      // Use a typical 24-qty for tier resolution
+      const v = tp.resolveSync(code, { stitchCount: Number(stitchCount) || 0, qty: 24 });
+      return Number.isFinite(v) ? v : null;
+    }, [code, stitchCount, isStitchInput]);
+
+    // Drag start handler — builds the payload that ServiceRail consumes
+    function handleDragStart(e) {
+      if (isStandardTier) { e.preventDefault(); return; } // can't drag $0 included tier
+
+      const payload = { service: { ...service }, qty: 0, scope: null, params: {} };
+
+      // Different methods package differently
+      switch (method) {
+        case 'FIXED':
+        case 'FLAT':
+          payload.params = { unitPrice: sell };
+          break;
+        case 'TIERED':
+          // For AS-CAP/AS-Garm tier rows: SellPrice IS the resolved price
+          if (tier && (code === 'AS-CAP' || code === 'AS-Garm')) {
+            payload.params = { tier, unitPrice: sell };
+          } else {
+            // AL/AL-CAP/DECG-FB/CTR-*: use the typed stitchCount + livePrice
+            payload.params = {
+              stitchCount: Number(stitchCount) || 0,
+              unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
+            };
+          }
+          break;
+        case 'CALCULATED':
+          payload.params = { percent: Number(percent) || 25 };
+          break;
+        case 'HOURLY':
+          payload.params = { hours: Number(hours) || 1, unitPrice: sell };
+          break;
+        case 'PASSTHROUGH':
+          payload.params = { amount: Number(amount) || 0 };
+          break;
+      }
+
+      // Set DataTransfer with code so drop zones can do eligibility check
+      e.dataTransfer.effectAllowed = 'copy';
+      try {
+        e.dataTransfer.setData('text/plain', code);
+      } catch (_) {}
+
+      onDragStart && onDragStart(payload);
+    }
+
+    function handleDragEnd() {
+      onDragEnd && onDragEnd();
+    }
+
+    const groupCls = groupClassFor(service.RailGroup);
+    const tierCls = isStandardTier ? 'rail-card--standard'
+                  : tier === 'Mid' ? 'rail-card--mid'
+                  : tier === 'Large' ? 'rail-card--large'
+                  : '';
+
+    const cls = [
+      'rail-card',
+      groupCls,
+      tierCls,
+      dragging ? 'dragging' : '',
+      suggested ? 'rail-card--suggested' : '',
+    ].filter(Boolean).join(' ');
+
+    // Title (display name, falls back to code)
+    const title = service.DisplayName || code;
+
+    // Price label varies by method
+    let priceLabel = '';
+    let priceSuffix = '';
+    switch (method) {
+      case 'FIXED':
+        priceLabel = fmt$(sell);
+        priceSuffix = service.PerUnit ? ` ${service.PerUnit}` : '';
+        break;
+      case 'FLAT':
+        priceLabel = fmt$(sell);
+        priceSuffix = ' per order';
+        break;
+      case 'TIERED':
+        if (tier && (code === 'AS-CAP' || code === 'AS-Garm')) {
+          priceLabel = isStandardTier ? '$0' : `+${fmt$(sell)}`;
+          priceSuffix = ' per piece';
+        } else {
+          priceLabel = livePrice != null ? fmt$(livePrice) : '—';
+          priceSuffix = ' per piece';
+        }
+        break;
+      case 'CALCULATED':
+        priceLabel = `${percent}%`;
+        priceSuffix = ' of subtotal';
+        break;
+      case 'HOURLY':
+        priceLabel = `${fmt$(sell)}/hr × ${hours}h`;
+        priceSuffix = ` = ${fmt$(sell * hours)}`;
+        break;
+      case 'PASSTHROUGH':
+        priceLabel = amount ? fmt$(amount) : '$0';
+        priceSuffix = ' (rep enters)';
+        break;
+    }
+
+    return (
+      <div
+        className={cls}
+        draggable={!isStandardTier}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        title={isStandardTier ? `${title} — included, no surcharge needed` : `Drag onto ${groupCls.includes('cap') ? 'a cap row' : groupCls.includes('garment') ? 'a garment row' : 'the order'}`}
+      >
+        <div className="rail-card-head">
+          <span className="rail-card-code">{code}{tier ? ` ${tier}` : ''}</span>
+          {!isStandardTier && <span className="rail-card-grip" aria-hidden>⋮⋮</span>}
+          {isStandardTier && <span className="rail-card--included-badge">INCLUDED</span>}
+        </div>
+        <div className="rail-card-name">{title}</div>
+        {!isStandardTier && (
+          <div className="rail-card-price">
+            {priceLabel}<span className="rail-card-price--suffix">{priceSuffix}</span>
+          </div>
+        )}
+
+        {/* Stitch input for AL/AL-CAP/DECG-FB/CTR-* */}
+        {isStitchInput && (
+          <div className="rail-card-input-row">
+            <label className="rail-card-input-label">Stitches:</label>
+            <input
+              className="rail-card-input rail-card-input--num"
+              type="number"
+              min="0"
+              step="500"
+              value={stitchCount}
+              onChange={e => setStitchCount(e.target.value)}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+            />
+          </div>
+        )}
+
+        {/* RUSH percent input */}
+        {method === 'CALCULATED' && code === 'RUSH' && (
+          <div className="rail-card-input-row">
+            <label className="rail-card-input-label">Percent:</label>
+            <input
+              className="rail-card-input rail-card-input--num"
+              type="number"
+              min="0"
+              max="100"
+              step="5"
+              value={percent}
+              onChange={e => setPercent(e.target.value)}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+            />
+            <span style={{ fontSize: 10, color: '#868e96' }}>%</span>
+          </div>
+        )}
+
+        {/* Art hours input */}
+        {method === 'HOURLY' && (
+          <div className="rail-card-input-row">
+            <label className="rail-card-input-label">Hours:</label>
+            <input
+              className="rail-card-input rail-card-input--num"
+              type="number"
+              min="0"
+              step="0.5"
+              value={hours}
+              onChange={e => setHours(e.target.value)}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+            />
+          </div>
+        )}
+
+        {/* PASSTHROUGH amount input */}
+        {method === 'PASSTHROUGH' && (
+          <div className="rail-card-input-row">
+            <label className="rail-card-input-label">$:</label>
+            <input
+              className="rail-card-input rail-card-input--num"
+              type="number"
+              min="0"
+              step="0.01"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+            />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  window.OrderFormRailCard = RailCard;
+})();

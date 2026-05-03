@@ -1444,8 +1444,27 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     }
   }
 
+  // Phase 3 — Service Rail wrap. Renders a 2-column grid: left rail with
+  // draggable service cards, right side is the existing paper form. Rail
+  // is hidden in customerMode (customer doesn't add services) and when no
+  // deco method is active. Falls back to single-column on narrow screens
+  // (CSS media query at 1100px).
+  const ServiceRail = window.OrderFormServiceRail;
+  const showRail = !customerMode && activeDeco && ServiceRail;
+
   return (
-    <div className="paper">
+    <div className={showRail ? 'of-layout' : 'of-layout of-layout--no-rail'}>
+      {showRail && (
+        <ServiceRail
+          deco={activeDeco}
+          rows={rows}
+          breakdown={breakdown}
+          addOns={addOns}
+          setAddOns={setAddOns}
+          customerId={info.companyId}
+        />
+      )}
+      <div className="of-form paper">
       {/* Header */}
       <div className="p-header">
         <div className="p-brand">
@@ -1896,6 +1915,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         />
       )}
 
+      </div>{/* /.of-form.paper */}
     </div>
   );
 }
