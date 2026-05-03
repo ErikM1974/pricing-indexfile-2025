@@ -2174,9 +2174,24 @@ app.post('/api/submit-order-form', async (req, res) => {
 
         if (unitPrice == null) continue;  // unresolved — skip rather than push $0
 
+        // Phase 7 — for additional-logo codes (AL, AL-CAP, DECG-FB, CTR-*),
+        // build a DisplayAsDescription that includes the position + stitches.
+        // Production sees "AL · Right Sleeve · 5,000 stitches" inline on the
+        // work order's LinesOE row, so they know exactly where each logo goes
+        // without cross-referencing the design's Locations[] array.
+        const positionCodes = new Set(['AL', 'AL-CAP', 'DECG-FB', 'CTR-Garmt', 'CTR-Cap']);
+        let displayDescription = '';
+        if (positionCodes.has(a.code)) {
+          const pos = a?.params?.position || (a.code === 'DECG-FB' ? 'Full Back' : '');
+          const stitches = Number(a?.params?.stitchCount) || 0;
+          const parts = [pos, stitches > 0 ? `${stitches.toLocaleString()} stitches` : ''].filter(Boolean);
+          displayDescription = parts.join(' · ');
+        }
+
         lineItems.push({
           partNumber: a.code,
           description: sc.DisplayName || a.code,
+          displayDescription,  // empty string for non-position codes (proxy passes through verbatim)
           color: '',           // services don't carry color
           catalogColor: '',
           size: '',            // services don't carry size
@@ -2243,6 +2258,39 @@ app.post('/api/submit-order-form', async (req, res) => {
     // order push since the form launched.
     const designs = linkedIdDesigns.length === 0 ? [] : methodsUsed.map((method) => {
       const hostedFiles = files.filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
+      // Primary location entries (from uploaded artwork files OR placeholder).
+      const primaryLocations = (hostedFiles.length ? hostedFiles : [{ name: 'placeholder' }]).map((f, i) => ({
+        location: (f.placements && f.placements[0]) || 'Left Chest',
+        colors: f.colors || '',
+        code: f.designNo || `${method.slice(0,3).toUpperCase()}-${i + 1}`,
+        imageUrl: f.hostedUrl || f.preview || '',
+        customField01: f.hostedUrl || f.preview || '',
+        notes: f.colors ? `Colors: ${f.colors}` : ''
+      }));
+
+      // Phase 7 — append additional-logo locations from add-ons.
+      // For each AL/AL-CAP/DECG-FB/CTR-* addon with a position param, push
+      // a Locations[] entry so ShopWorks's production view shows all logo
+      // positions on this design (not just the primary). Sequential codes
+      // (EMB-2, EMB-3, …) follow the primary's EMB-1 numbering.
+      const positionCodes = new Set(['AL', 'AL-CAP', 'DECG-FB', 'CTR-Garmt', 'CTR-Cap']);
+      const addonLocations = [];
+      let nextLocCode = primaryLocations.length + 1;
+      const methodPrefix = method.slice(0, 3).toUpperCase();
+      (Array.isArray(addOns) ? addOns : []).forEach(a => {
+        if (!a || !positionCodes.has(a.code)) return;
+        const pos = a?.params?.position || (a.code === 'DECG-FB' ? 'Full Back' : 'Additional');
+        const stitches = Number(a?.params?.stitchCount) || 0;
+        addonLocations.push({
+          location: pos,
+          colors: '',
+          code: `${methodPrefix}-${nextLocCode++}`,
+          imageUrl: '',
+          customField01: '',
+          notes: stitches > 0 ? `${stitches.toLocaleString()} stitches · ${a.code}` : a.code,
+        });
+      });
+
       const base = {
         name: `${info.company || 'Order'} — ${DESIGN_LABEL[method] || method}`,
         externalId: `${extOrderId}-${method.toUpperCase()}`,
@@ -2259,14 +2307,7 @@ app.post('/api/submit-order-form', async (req, res) => {
             .filter(Boolean)
         )].join(', '),
         designTypeId: DESIGN_TYPE_ID[method] || 3,
-        locations: (hostedFiles.length ? hostedFiles : [{ name: 'placeholder' }]).map((f, i) => ({
-          location: (f.placements && f.placements[0]) || 'Left Chest',
-          colors: f.colors || '',
-          code: f.designNo || `${method.slice(0,3).toUpperCase()}-${i + 1}`,
-          imageUrl: f.hostedUrl || f.preview || '',
-          customField01: f.hostedUrl || f.preview || '',
-          notes: f.colors ? `Colors: ${f.colors}` : ''
-        }))
+        locations: [...primaryLocations, ...addonLocations],
       };
       // Attach known id_Design references per CLAUDE.md MANAGEORDERS pattern.
       // For methods that primarily use this lookup (embroidery), pass the array

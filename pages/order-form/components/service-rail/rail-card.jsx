@@ -28,6 +28,35 @@
     'AL', 'AL-CAP', 'DECG-FB', 'CTR-Garmt', 'CTR-Cap',
   ]);
 
+  // Phase 7 — codes that represent ADDITIONAL LOGOS (separate from primary).
+  // Each gets a position dropdown so production knows where to embroider.
+  // The position flows into ShopWorks Designs[].Locations[] + LinesOE
+  // DisplayAsDescription on submit.
+  const POSITION_INPUT_CODES = new Set([
+    'AL', 'AL-CAP', 'DECG-FB', 'CTR-Garmt', 'CTR-Cap',
+  ]);
+
+  // Position options per code family. AL = additional GARMENT logo, AL-CAP =
+  // additional CAP logo, DECG-FB = full back (implicit position).
+  const GARMENT_POSITIONS = [
+    'Right Sleeve', 'Left Sleeve', 'Right Chest', 'Center Chest',
+    'Back Yoke', 'Hood', 'Right Pocket', 'Left Pocket', 'Custom',
+  ];
+  const CAP_POSITIONS = [
+    'Hat Back', 'Hat Side (Left)', 'Hat Side (Right)', 'Visor', 'Crown', 'Custom',
+  ];
+  function positionsFor(code) {
+    if (code === 'AL-CAP' || code === 'CTR-Cap') return CAP_POSITIONS;
+    if (code === 'AL' || code === 'CTR-Garmt') return GARMENT_POSITIONS;
+    if (code === 'DECG-FB') return ['Full Back'];
+    return [];
+  }
+  function defaultPositionFor(code) {
+    if (code === 'AL-CAP' || code === 'CTR-Cap') return 'Hat Back';
+    if (code === 'DECG-FB') return 'Full Back';
+    return 'Right Sleeve';  // AL / CTR-Garmt default
+  }
+
   // Code → group accent class. Looked up from RailGroup column at render time.
   function groupClassFor(group) {
     const g = String(group || '').toLowerCase();
@@ -82,6 +111,13 @@
     // PASSTHROUGH amount
     const [amount, setAmount] = useState(0);
 
+    // Phase 7 — position for additional logos (AL/AL-CAP/DECG-FB/CTR-*).
+    // Drives Designs[].Locations[] in the ShopWorks push so production knows
+    // where each additional logo goes. Defaults are smart per code family.
+    const hasPositionInput = POSITION_INPUT_CODES.has(code);
+    const [position, setPosition] = useState(() => defaultPositionFor(code));
+    const positionOptions = useMemo(() => positionsFor(code), [code]);
+
     // Live-computed price for TIERED stitch-input cards
     const livePrice = useMemo(() => {
       if (!isStitchInput) return null;
@@ -110,9 +146,11 @@
             payload.params = { tier, unitPrice: sell };
           } else {
             // AL/AL-CAP/DECG-FB/CTR-*: use the typed stitchCount + livePrice
+            // + position (Phase 7) so server.js can route to Designs[].Locations[]
             payload.params = {
               stitchCount: Number(stitchCount) || 0,
               unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
+              position: position || defaultPositionFor(code),
             };
           }
           break;
@@ -156,6 +194,7 @@
             payload.params = {
               stitchCount: Number(stitchCount) || 0,
               unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
+              position: position || defaultPositionFor(code),
             };
           }
           break;
@@ -288,6 +327,28 @@
               onClick={e => e.stopPropagation()}
               onMouseDown={e => e.stopPropagation()}
             />
+          </div>
+        )}
+
+        {/* Phase 7 — Position dropdown for additional logos. Production needs
+            to know where each AL/AL-CAP/DECG-FB lands. Default is smart per
+            code (Hat Back for caps, Right Sleeve for garments, Full Back for
+            DECG-FB). Hidden for DECG-FB since it's implicitly "Full Back". */}
+        {hasPositionInput && code !== 'DECG-FB' && positionOptions.length > 0 && (
+          <div className="rail-card-input-row">
+            <label className="rail-card-input-label">Position:</label>
+            <select
+              className="rail-card-input"
+              value={position}
+              onChange={e => setPosition(e.target.value)}
+              onClick={e => e.stopPropagation()}
+              onMouseDown={e => e.stopPropagation()}
+              style={{ width: 'auto', minWidth: '90px' }}
+            >
+              {positionOptions.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
           </div>
         )}
 
