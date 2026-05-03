@@ -61,13 +61,75 @@
   function fetchAlPricing()       { return fetchCached(`${API_BASE}/api/al-pricing`); }
   function fetchDecgPricing()     { return fetchCached(`${API_BASE}/api/decg-pricing`); }
   function fetchContractPricing() { return fetchCached(`${API_BASE}/api/contract-pricing`); }
+  function fetchEmbBundle()       { return fetchCached(`${API_BASE}/api/pricing-bundle?method=EMB`); }
 
   /**
-   * Pre-warm all three caches. Call on form load so subsequent picker clicks
-   * resolve synchronously.
+   * Pre-warm all four caches. Call on form load so subsequent picker clicks
+   * resolve synchronously. EMB bundle is needed for AS-Garm/AS-CAP flat-tier
+   * surcharge resolution (separate from AL's per-1K formula).
    */
   async function preload() {
-    await Promise.all([fetchAlPricing(), fetchDecgPricing(), fetchContractPricing()]);
+    await Promise.all([
+      fetchAlPricing(),
+      fetchDecgPricing(),
+      fetchContractPricing(),
+      fetchEmbBundle(),
+    ]);
+  }
+
+  /**
+   * Resolve AS-Garm / AS-CAP flat-tier stitch surcharge.
+   *
+   * NWCA's canonical AS surcharge policy (Erik confirmed 2026-05-03):
+   *   ≤ 10,000 stitches → $0 (Standard, included in base price)
+   *   10,001–15,000     → $4 per piece (Mid)
+   *   15,001–25,000     → $10 per piece (Large)
+   *   > 25,000          → use DECG-FB service (Full Back)
+   *
+   * Source of truth: Caspio Embroidery_Costs table, rows where
+   * ItemType='AS-Cap' or 'AS-Garm' AND TierLabel='ALL'. Same data + formula
+   * the Quote Builder uses (embroidery-quote-pricing.js:169-181 + :814).
+   *
+   * @param {number} stitchCount  Total stitches in the primary logo
+   * @param {string} itemType     'AS-Cap' or 'AS-Garm'
+   * @returns {number|null}       Per-piece surcharge dollars, or null if cache cold
+   */
+  function asStitchSurcharge(stitchCount, itemType) {
+    const data = _cache[`${API_BASE}/api/pricing-bundle?method=EMB`]?.data;
+    if (!data?.allEmbroideryCostsR) return null;
+
+    const rows = data.allEmbroideryCostsR
+      .filter(c => c.ItemType === itemType && c.TierLabel === 'ALL')
+      .sort((a, b) => Number(a.StitchCount) - Number(b.StitchCount));
+
+    if (rows.length < 2) return null;  // Need both Mid + Large rows from Caspio
+
+    // rows[0] = Mid threshold (e.g. StitchCount=10000, EmbroideryCost=4)
+    // rows[1] = Large threshold (e.g. StitchCount=15000, EmbroideryCost=10)
+    const stitches = Number(stitchCount) || 0;
+    if (stitches <= Number(rows[0].StitchCount)) return 0;
+    if (stitches <= Number(rows[1].StitchCount)) return Number(rows[0].EmbroideryCost);
+    return Number(rows[1].EmbroideryCost);  // Large tier capped (>25K → DECG-FB territory)
+  }
+
+  /**
+   * Human-readable name of the AS tier a stitch count falls into.
+   * Used by formulaLabel() for the picker preview.
+   */
+  function asTierName(stitchCount) {
+    const data = _cache[`${API_BASE}/api/pricing-bundle?method=EMB`]?.data;
+    const rows = (data?.allEmbroideryCostsR || [])
+      .filter(c => c.ItemType === 'AS-Cap' && c.TierLabel === 'ALL')
+      .sort((a, b) => Number(a.StitchCount) - Number(b.StitchCount));
+    const stitches = Number(stitchCount) || 0;
+    // Fallback thresholds match Caspio defaults if rows aren't loaded yet.
+    const midMax   = rows[0]?.StitchCount ? Number(rows[0].StitchCount) : 10000;
+    const largeMax = rows[1]?.StitchCount ? Number(rows[1].StitchCount) : 15000;
+    const midFee   = rows[0]?.EmbroideryCost != null ? Number(rows[0].EmbroideryCost) : 4;
+    const largeFee = rows[1]?.EmbroideryCost != null ? Number(rows[1].EmbroideryCost) : 10;
+    if (stitches <= midMax)   return `Standard ($0)`;
+    if (stitches <= largeMax) return `Mid (+$${midFee})`;
+    return `Large (+$${largeFee})`;
   }
 
   /**
@@ -103,11 +165,24 @@
     const tier = ctx.tier || tierForQty(ctx.qty || 0);
     const stitchCount = Number(ctx.stitchCount) || 8000;
 
-    // AL family — uses /api/al-pricing
-    if (code === 'AL' || code === 'AL-CAP' || code === 'AS-Garm' || code === 'AS-CAP') {
+    // AS family — flat-tier surcharge from Caspio Embroidery_Costs (NOT the
+    // AL formula). Different service, different pricing model. See
+    // memory/MANAGEORDERS_COMPLETE_REFERENCE.md §Stitch Surcharge Policy.
+    if (code === 'AS-Garm') {
+      const v = asStitchSurcharge(stitchCount, 'AS-Garm');
+      return v == null ? null : Number(v);
+    }
+    if (code === 'AS-CAP') {
+      const v = asStitchSurcharge(stitchCount, 'AS-Cap');
+      return v == null ? null : Number(v);
+    }
+
+    // AL family — uses /api/al-pricing (Additional Logo: per-1K linear above
+    // 5K cap / 8K garm base). Distinct from AS family above.
+    if (code === 'AL' || code === 'AL-CAP') {
       const data = _cache[`${API_BASE}/api/al-pricing`]?.data;
       if (!data) return null;
-      const isCap = (code === 'AL-CAP' || code === 'AS-CAP');
+      const isCap = (code === 'AL-CAP');
       const block = isCap ? data.caps : data.garments;
       if (!block) return null;
       const baseStitches = block.baseStitches || (isCap ? 5000 : 8000);
@@ -115,10 +190,6 @@
       const extra = Math.max(0, stitchCount - baseStitches);
       const stitchDelta = (extra / 1000) * upcharge;
 
-      if (code === 'AS-Garm' || code === 'AS-CAP') {
-        // Just the stitch surcharge — no base logo cost.
-        return Number(stitchDelta.toFixed(2));
-      }
       // AL or AL-CAP — base logo + stitch delta.
       const tierBase = block.basePrices?.[tier];
       if (tierBase == null) return null;
@@ -164,7 +235,9 @@
    */
   async function resolve(code, ctx = {}) {
     // Preload the right endpoint based on code family.
-    if (code === 'AL' || code === 'AL-CAP' || code === 'AS-Garm' || code === 'AS-CAP') {
+    if (code === 'AS-Garm' || code === 'AS-CAP') {
+      await fetchEmbBundle();
+    } else if (code === 'AL' || code === 'AL-CAP') {
       await fetchAlPricing();
     } else if (code === 'DECG' || code === 'DECC' || code === 'DECG-FB') {
       await fetchDecgPricing();
@@ -184,8 +257,8 @@
     switch (code) {
       case 'AL':       return `Base ${tier} + ${stitches > 8000 ? `${stitches - 8000} extra stitches` : 'no extras'}`;
       case 'AL-CAP':   return `Cap base ${tier} + ${stitches > 5000 ? `${stitches - 5000} extra stitches` : 'no extras'}`;
-      case 'AS-Garm':  return `Garment stitch surcharge — ${Math.max(0, stitches - 8000)} above 8K`;
-      case 'AS-CAP':   return `Cap stitch surcharge — ${Math.max(0, stitches - 5000)} above 5K`;
+      case 'AS-Garm':  return `Garment stitch surcharge — ${stitches.toLocaleString()} stitches → ${asTierName(stitches)} tier`;
+      case 'AS-CAP':   return `Cap stitch surcharge — ${stitches.toLocaleString()} stitches → ${asTierName(stitches)} tier`;
       case 'DECG':     return `Garment supplied · tier ${tier}`;
       case 'DECC':     return `Cap supplied · tier ${tier}`;
       case 'DECG-FB':  return `Full back · tier ${tier} · ${Math.max(stitches, 25000)} stitches`;
@@ -220,8 +293,11 @@
     tierForQty,
     isTiered,
     isStitchAware,
+    asStitchSurcharge,
+    asTierName,
     fetchAlPricing,
     fetchDecgPricing,
     fetchContractPricing,
+    fetchEmbBundle,
   };
 })();
