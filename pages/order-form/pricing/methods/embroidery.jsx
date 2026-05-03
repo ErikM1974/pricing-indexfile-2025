@@ -120,9 +120,16 @@
     // both get $50 LTM distributed within their own bucket. Matches the
     // embroidery quote builder rule (CLAUDE.md sync rule).
     const ltmPP   = (tier === '1-7' && effectiveQty > 0) ? (50 / effectiveQty) : 0;
+    // Rounding rule: prefer the Caspio-supplied rule (in production both cap +
+    // flat services pull it from the EmbroideryRules table, so the surfaces
+    // agree). Fallback HARMONIZED with embroidery-quote-pricing.js — both cap
+    // and flat default to HalfDollarUp (matches Quote Builder's roundCapPrice +
+    // roundPrice behavior). Previously the fallback used CeilDollar for flat
+    // garments, which produced a $0.50/piece divergence vs Quote Builder when
+    // Caspio was silent on rules. Fixed 2026-05-03.
     const rule    = bundle?.apiData?.rulesR?.RoundingMethod
                   || bundle?.rulesData?.RoundingMethod
-                  || (capOrFlat === 'cap' ? 'HalfDollarUp' : 'CeilDollar');
+                  || 'HalfDollarUp';
 
     Object.keys(row.sizes || {}).forEach(sizeKey => {
       const qty = Number(row.sizes[sizeKey]) || 0;
@@ -305,6 +312,7 @@
   function ConfigBar({ config, setConfig }) {
     const stitch = config.stitchCount ?? 8000;
     const loc    = config.primaryLocation ?? 'Left Chest';
+    const overBase = Number(stitch) > 8000;
     return (
       <div className="deco-config-strip emb-config" data-method="embroidery">
         <div className="dcs-field">
@@ -326,6 +334,22 @@
             {PRIMARY_LOCATIONS.map(L => <option key={L} value={L}>{L}</option>)}
           </select>
         </div>
+        {overBase ? (
+          // 2026-05-03 (Phase 1.3 partial): the stitch input exists but the
+          // per-1K surcharge isn't yet plumbed into priceRow(). The bundle has
+          // tier-base costs at 8K + 'ALL' surcharge brackets at 10K/15K/25K
+          // for flats, BUT the cap bundle has NO surcharge brackets — and the
+          // Quote Builder uses a different per-1K formula ($1.00/1K cap vs
+          // $1.25/1K flat above different base counts). Wiring the wrong
+          // formula here would create the exact profit leak we're trying to
+          // fix. Phase 4 will port the QB's surcharge logic over carefully.
+          // Until then, warn the rep so they know the Order Form's price for
+          // >8K stitches is the 8K price (under-billed by ~$4/pc at 12K, more
+          // at higher counts).
+          <div className="dcs-warn" role="alert">
+            ⚠️ Stitch surcharge not yet calculated in Order Form — for orders above 8,000 stitches use the <a href="/quote-builders/embroidery-quote-builder.html" target="_blank" rel="noopener">Embroidery Quote Builder</a> to get correct pricing, then transcribe into ShopWorks.
+          </div>
+        ) : null}
         <div className="dcs-hint">
           8,000 stitches included · Cap vs flat auto-detected per product · v2: per-row stitch + extra-stitch surcharge + multiple logos
         </div>

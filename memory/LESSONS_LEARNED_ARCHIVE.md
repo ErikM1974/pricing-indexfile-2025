@@ -1449,3 +1449,11 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** Heroku builds a new slug and marks the release live in metadata, but the running dyno keeps serving the previous slug until either (a) a dyno cycle (~24h), (b) a dyno crash, or (c) a manual restart. Cause is suspected to be Node's in-process module cache + slug-file mtime caching in Express `sendFile`. Content-Length and Etag stayed identical across the old and new slug because the only change was a 1-char version string (same byte count).
 **Solution:** Run `heroku ps:restart --app sanmar-inventory-app` immediately after deploy if served content doesn't match pushed content within 30 seconds.
 **Prevention:** After every `/deploy`, verify live content with `curl -s <production-url> | grep '?v='` against the local file. If mismatched → `heroku ps:restart`. Can add this as a final automated step in the deploy skill. Do NOT chase this with browser cache-bust tricks — the issue is server-side.
+
+---
+
+### SanMar Sync Upsert Bug — `makeCaspioRequest` Returns Array, Code Checks `.Result` (archived 2026-05-02)
+**Problem:** Caspio SanMar tables had only 7 orders (should be hundreds). Backfill processes hung indefinitely. Every sync created duplicates instead of updating existing records.
+**Root Cause:** `makeCaspioRequest()` in `src/utils/caspio.js:100` returns `response.data.Result` (the array directly). But all 6 upsert locations in `sanmar-orders.js` and `sanmar-invoices.js` checked `existing.Result` — which is `undefined` on an array. Every existence check failed, causing INSERT instead of UPDATE.
+**Solution:** Changed all 6 checks from `existing.Result.length` to `Array.isArray(existing) && existing.length > 0`. Also fixed backfill line item dedup (was blind POST with silent catch → proper GET/PUT/POST upsert).
+**Prevention:** `makeCaspioRequest` unwraps `.Result` — never check `.Result` on its return value. When writing Caspio upsert logic, always test with `Array.isArray()`.
