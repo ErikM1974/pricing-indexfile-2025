@@ -1877,6 +1877,54 @@ Reps can attach **29 NWCA fee/service codes** to an order via the picker UI. Eac
 
 ---
 
+## Service Rail Architecture (Phase 3, SHIPPED 2026-05-03, v915–v916)
+
+Replaces the bottom-of-form dropdown picker with a sticky left-side drag-and-drop catalog. Reps drag service cards directly onto product rows or an order-level zone — McDonald's-style point-and-click order entry.
+
+**Caspio `Service_Codes` table (Phase 3a additions):**
+
+| Column | Type | Purpose |
+|---|---|---|
+| `RailGroup` | text | UI section: "Stitch Surcharges", "Cap Extras", "Garment Extras", "Setup Fees", "Order Fees" |
+| `RailOrder` | number | Sort order within group (1, 2, 3...) |
+| `Tier` | text | "Standard" / "Mid" / "Large" (only for AS-CAP / AS-Garm 3-row split) |
+| `Visible` | yes/no | Admin can hide a service from rail without deleting (LTM is hidden — auto-baked) |
+
+**AS surcharge 3-row split:** `AS-CAP` and `AS-Garm` each have 3 Caspio rows now (Standard $0, Mid $4, Large $10) with the canonical NWCA flat-tier prices baked in. ShopWorks still receives PartNumber `AS-CAP` / `AS-Garm` (one canonical part); the `DisplayAsDescription` carries the tier label. Picking from the rail = picking the tier directly.
+
+**Method-aware filtering:** each pricing engine declares `getRailServices()` returning the filtered Service_Codes subset. Implementation in [shared.js `filterRailServices()`](pages/order-form/pricing/shared.js); per-method allow-lists:
+- embroidery → `['EMBROIDERY','DIGITIZING','UNIVERSAL']`
+- screenprint → `['SCREENPRINT','UNIVERSAL']`
+- dtg → `['DTG','UNIVERSAL']`
+- dtf / sticker / emblem → `['<METHOD>','UNIVERSAL']`
+
+Universal services (RUSH, Freight, Discount, Pallet, Art, GRT-50, GRT-75, DT) appear on every method.
+
+**Drag-and-drop architecture:**
+- Cards are `<div draggable=true>` (HTML5 native, no library)
+- ServiceRail component manages drag state; on dragStart it sets `window.__railDragPayload` and dispatches `railDragStart` CustomEvent
+- PaperRow listens for the event, reads payload, decides eligibility (`scopeOf(code)` → cap/flat/any), shows visual feedback (`pf-row--rail-eligible` green outline / `pf-row--rail-ineligible` red dim)
+- Drop calls `window.__railHandleDrop({zoneType, rowId, rowKind})` — exposed by ServiceRail via useEffect
+- ServiceRail also renders fallback drop zones in the rail itself (per-row + order-level) for the case where the rep drags back into the rail
+
+**Mobile/iPad fallback:** `(hover: none)` media query detects touch devices. Cards become non-draggable; instead, `onClick` triggers `onTap(payload)` which sets selectedCard state. Same `__railDragPayload` + dispatch flow — rows visually respond identically. Tap row to place. Tap same card again to cancel.
+
+**Drop bounce + chip slide-in:** CSS keyframe animations on `.pf-row--just-dropped` (800ms green flash on the affected row) and `.addon-chip--just-added` (slide from left).
+
+**Files:**
+- [components/service-rail/service-rail.jsx](pages/order-form/components/service-rail/service-rail.jsx) — orchestrator
+- [components/service-rail/rail-section.jsx](pages/order-form/components/service-rail/rail-section.jsx) — collapsible groups
+- [components/service-rail/rail-card.jsx](pages/order-form/components/service-rail/rail-card.jsx) — 6 PricingMethod renderers (FIXED/FLAT/TIERED/CALCULATED/HOURLY/PASSTHROUGH)
+- [components/service-rail/drop-zone.jsx](pages/order-form/components/service-rail/drop-zone.jsx) — eligibility validator (also exports `scopeOf()`)
+- [components/service-rail/service-rail.css](pages/order-form/components/service-rail/service-rail.css) — all rail + drop styles
+- [components/paper-form.jsx](pages/order-form/components/paper-form.jsx) — wraps in `.of-layout` 2-col grid; PaperRow has rail drop handlers
+
+**Add-on-picker.jsx is now deprecated** but stays in code as a fallback. Trigger button is hidden when rail is mounted. Will delete in Phase 4.
+
+**Per-customer auto-suggest deferred to Phase 4** (no `Accounts` Caspio table — needs to be created or use a different data home like `nwca-accounts` Heroku app).
+
+---
+
 ## API Response Codes
 
 | Code | Meaning | Action |

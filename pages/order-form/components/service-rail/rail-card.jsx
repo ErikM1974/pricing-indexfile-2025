@@ -51,10 +51,13 @@
    * @param {Object} props.service       Service_Codes row
    * @param {Function} props.onDragStart fired with payload { service, qty, scope, params }
    * @param {Function} props.onDragEnd
+   * @param {Function} [props.onTap]     mobile tap-to-select handler (Phase 3f)
    * @param {boolean} [props.suggested]  per-customer auto-suggest hint (Phase 4 only)
    * @param {boolean} [props.dragging]   true when this card is currently being dragged
+   * @param {boolean} [props.selected]   true when card is tap-selected on touch (Phase 3f)
+   * @param {boolean} [props.isTouch]    true on touch devices (no hover capability)
    */
-  function RailCard({ service, onDragStart, onDragEnd, suggested, dragging }) {
+  function RailCard({ service, onDragStart, onDragEnd, onTap, suggested, dragging, selected, isTouch }) {
     const code = service.ServiceCode;
     const tier = service.Tier || '';
     const method = String(service.PricingMethod || '').toUpperCase();
@@ -137,6 +140,44 @@
       onDragEnd && onDragEnd();
     }
 
+    // Phase 3f — build payload for tap-to-select (same shape as drag).
+    // Reuses the same per-method packaging logic as handleDragStart.
+    function buildPayload() {
+      if (isStandardTier) return null;
+      const payload = { service: { ...service }, qty: 0, scope: null, params: {} };
+      switch (method) {
+        case 'FIXED':
+        case 'FLAT':
+          payload.params = { unitPrice: sell }; break;
+        case 'TIERED':
+          if (tier && (code === 'AS-CAP' || code === 'AS-Garm')) {
+            payload.params = { tier, unitPrice: sell };
+          } else {
+            payload.params = {
+              stitchCount: Number(stitchCount) || 0,
+              unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
+            };
+          }
+          break;
+        case 'CALCULATED':
+          payload.params = { percent: Number(percent) || 25 }; break;
+        case 'HOURLY':
+          payload.params = { hours: Number(hours) || 1, unitPrice: sell }; break;
+        case 'PASSTHROUGH':
+          payload.params = { amount: Number(amount) || 0 }; break;
+      }
+      return payload;
+    }
+
+    function handleClick(e) {
+      // Only handle tap on touch devices — desktop relies on drag
+      if (!isTouch) return;
+      // Don't trigger when clicking inputs inside the card
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
+      const payload = buildPayload();
+      if (payload && onTap) onTap(payload);
+    }
+
     const groupCls = groupClassFor(service.RailGroup);
     const tierCls = isStandardTier ? 'rail-card--standard'
                   : tier === 'Mid' ? 'rail-card--mid'
@@ -149,6 +190,7 @@
       tierCls,
       dragging ? 'dragging' : '',
       suggested ? 'rail-card--suggested' : '',
+      selected ? 'rail-card--selected' : '',
     ].filter(Boolean).join(' ');
 
     // Title (display name, falls back to code)
@@ -192,10 +234,15 @@
     return (
       <div
         className={cls}
-        draggable={!isStandardTier}
+        draggable={!isStandardTier && !isTouch}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        title={isStandardTier ? `${title} — included, no surcharge needed` : `Drag onto ${groupCls.includes('cap') ? 'a cap row' : groupCls.includes('garment') ? 'a garment row' : 'the order'}`}
+        onClick={handleClick}
+        title={isStandardTier
+          ? `${title} — included, no surcharge needed`
+          : isTouch
+            ? `Tap to select, then tap a row`
+            : `Drag onto ${groupCls.includes('cap') ? 'a cap row' : groupCls.includes('garment') ? 'a garment row' : 'the order'}`}
       >
         <div className="rail-card-head">
           <span className="rail-card-code">{code}{tier ? ` ${tier}` : ''}</span>

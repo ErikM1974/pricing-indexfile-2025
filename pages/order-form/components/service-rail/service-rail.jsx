@@ -43,6 +43,12 @@
     const [services, setServices] = useState([]);
     const [customerOverrides, setCustomerOverrides] = useState({});
     const [dragPayload, setDragPayload] = useState(null); // { service, qty, scope, params }
+    const [selectedCard, setSelectedCard] = useState(null); // mobile tap-to-select
+
+    // Detect touch device (no hover capability) — switches to tap-tap UX
+    const isTouch = useMemo(() =>
+      typeof window !== 'undefined' && window.matchMedia?.('(hover: none)')?.matches,
+    []);
 
     // Load services from the active method's engine. Re-run when method
     // changes or when addOns mutate (so suggested badges can refresh).
@@ -109,9 +115,37 @@
 
     function onDragStart(payload) {
       setDragPayload(payload);
+      setSelectedCard(null); // clear tap-selection if drag starts
+      // Phase 3e — broadcast drag state to the form's row renderer so rows
+      // can show inline drop overlays.
+      window.__railDragPayload = payload;
+      document.body.classList.add('rail-dragging');
+      window.dispatchEvent(new CustomEvent('railDragStart', { detail: payload }));
+    }
+
+    // Phase 3f — tap-to-select for touch devices.
+    // Tap a card → enters "selected" state (matches drag payload). Rows pick
+    // it up via the same window.__railDragPayload + railDragStart event the
+    // desktop drag uses. Tap a row → places. Tap empty → cancels.
+    function onTapCard(payload) {
+      if (selectedCard && selectedCard.service.PK_ID === payload.service.PK_ID) {
+        // Tap same card again → cancel selection
+        setSelectedCard(null);
+        window.__railDragPayload = null;
+        document.body.classList.remove('rail-dragging');
+        window.dispatchEvent(new CustomEvent('railDragEnd'));
+        return;
+      }
+      setSelectedCard(payload);
+      window.__railDragPayload = payload;
+      document.body.classList.add('rail-dragging');
+      window.dispatchEvent(new CustomEvent('railDragStart', { detail: payload }));
     }
     function onDragEnd() {
       setDragPayload(null);
+      window.__railDragPayload = null;
+      document.body.classList.remove('rail-dragging');
+      window.dispatchEvent(new CustomEvent('railDragEnd'));
     }
 
     /**
@@ -119,8 +153,11 @@
      * scope='order' for order-level, otherwise rowId is set.
      */
     function handleDrop({ zoneType, rowId, rowKind }) {
-      if (!dragPayload) return;
-      const { service, params } = dragPayload;
+      // Read payload from local state OR window global (when called from
+      // paper-form's row drop handlers).
+      const payload = dragPayload || window.__railDragPayload;
+      if (!payload) return;
+      const { service, params } = payload;
       const code = service.ServiceCode;
       const SC = window.OrderFormServiceCodes;
 
@@ -132,8 +169,6 @@
         qty = r ? rowQty(r) : 1;
         scope = { rowId };
       } else {
-        // Order-level. Use total qty for scope, but most order-level codes
-        // are qty=1 conceptually.
         qty = 1;
         scope = 'order';
       }
@@ -145,14 +180,28 @@
         params: { ...params },
       };
 
-      // Use the existing addOrReplace helper to enforce singleton rule
       const result = SC?.addOrReplace?.(addOns || [], entry);
       if (result) {
         setAddOns(result.next);
-        // Phase 3e will add a toast/animation here
+        // Phase 3e — drop bounce signal: dispatch event that paper-form's
+        // row + the new chip can listen to for animation
+        window.dispatchEvent(new CustomEvent('railDropSuccess', {
+          detail: { code, scope, rowId, ts: Date.now() },
+        }));
       }
       setDragPayload(null);
+      window.__railDragPayload = null;
+      document.body.classList.remove('rail-dragging');
     }
+
+    // Expose drop handler globally so paper-form's row drop zones can call it.
+    // Re-bound on every render so the closure captures the latest addOns/setAddOns.
+    useEffect(() => {
+      window.__railHandleDrop = handleDrop;
+      return () => {
+        // Don't null on unmount — another instance may have remounted by then
+      };
+    });
 
     // Empty state — no method selected, or method has no services
     if (!deco) {
@@ -196,8 +245,11 @@
                   key={`${s.PK_ID}-${s.Tier || ''}`}
                   service={s}
                   dragging={dragPayload && dragPayload.service.PK_ID === s.PK_ID}
+                  selected={selectedCard && selectedCard.service.PK_ID === s.PK_ID}
+                  isTouch={isTouch}
                   onDragStart={onDragStart}
                   onDragEnd={onDragEnd}
+                  onTap={onTapCard}
                 />
               ))}
             </RailSection>

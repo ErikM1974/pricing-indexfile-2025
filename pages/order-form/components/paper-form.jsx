@@ -346,6 +346,53 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   // gracefully), 'loading' (request in flight).
   const [inventory, setInventory] = useState({ bySize: {}, status: 'unknown' });
 
+  // Phase 3e — Service Rail drop target state. When a rail card is being
+  // dragged anywhere on the page, rows become drop targets. Visual feedback:
+  // green outline on eligible rows, red on incompatible (e.g. AS-CAP onto
+  // a tee row). On drop, invokes window.__railHandleDrop which lives in
+  // ServiceRail (set via useEffect there).
+  const [railDragging, setRailDragging] = useState(false);
+  const [railOver, setRailOver] = useState(false);
+  useEffect(() => {
+    function onStart() { setRailDragging(true); }
+    function onEnd() { setRailDragging(false); setRailOver(false); }
+    window.addEventListener('railDragStart', onStart);
+    window.addEventListener('railDragEnd', onEnd);
+    return () => {
+      window.removeEventListener('railDragStart', onStart);
+      window.removeEventListener('railDragEnd', onEnd);
+    };
+  }, []);
+
+  // Eligibility: read scope from the dragged payload + this row's capOrFlat
+  function railEligible() {
+    const payload = window.__railDragPayload;
+    if (!payload) return false;
+    const scopeOf = window.OrderFormDropZone_scopeOf;
+    const sc = scopeOf ? scopeOf(payload.service.ServiceCode) : 'any';
+    if (sc === 'any') return true; // universal/order-level can drop anywhere
+    const kind = rowBreakdown?.extras?.capOrFlat;
+    if (sc === 'cap') return kind === 'cap';
+    if (sc === 'flat') return kind === 'flat';
+    return true;
+  }
+  function handleRailDragOver(e) {
+    if (!railDragging || !railEligible()) return;
+    e.preventDefault();
+    setRailOver(true);
+  }
+  function handleRailDragLeave() { setRailOver(false); }
+  function handleRailDrop(e) {
+    e.preventDefault();
+    setRailOver(false);
+    if (!railEligible() || !window.__railHandleDrop) return;
+    window.__railHandleDrop({
+      zoneType: 'row',
+      rowId: row.id,
+      rowKind: rowBreakdown?.extras?.capOrFlat || 'flat',
+    });
+  }
+
   // Total qty across all sizes — same as before.
   const total = useMemo(() => {
     let t = 0;
@@ -553,8 +600,20 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
     update({ manualMode: false, manualCost: '', rowDecoConfig: { ...(row.rowDecoConfig || {}), capOrFlat: 'auto' } });
   }
 
+  // Build row className with rail drop-target visuals when applicable
+  let trCls = hasAutoPrice ? 'pf-row pf-row--priced' : 'pf-row';
+  if (railDragging) {
+    trCls += railEligible() ? ' pf-row--rail-eligible' : ' pf-row--rail-ineligible';
+    if (railOver) trCls += ' pf-row--rail-over';
+  }
+
   return (
-    <tr className={hasAutoPrice ? 'pf-row pf-row--priced' : 'pf-row'}>
+    <tr
+      className={trCls}
+      onDragOver={handleRailDragOver}
+      onDragLeave={handleRailDragLeave}
+      onDrop={handleRailDrop}
+    >
       <td className="sel-wrap">
         <div className="style-cell">
           <ProductCombobox

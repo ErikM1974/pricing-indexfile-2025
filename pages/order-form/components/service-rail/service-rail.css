@@ -392,3 +392,72 @@
   outline-offset: 1px;
   box-shadow: 0 4px 12px rgba(47, 158, 68, 0.2);
 }
+
+/* ==========================================================================
+   Phase 3e — drop target visuals on form rows.
+   When a rail card is being dragged, line-item rows become drop targets.
+   ========================================================================== */
+
+/* Subtle indicator that the row is currently a drop target */
+body.rail-dragging .pf-row--rail-eligible {
+  background: rgba(47, 158, 68, 0.04);
+  outline: 2px dashed rgba(47, 158, 68, 0.3);
+  outline-offset: -2px;
+  cursor: copy;
+}
+body.rail-dragging .pf-row--rail-eligible td {
+  border-color: rgba(47, 158, 68, 0.3);
+}
+body.rail-dragging .pf-row--rail-ineligible {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* Active hover state when a drop would land here */
+body.rail-dragging .pf-row--rail-over {
+  background: rgba(47, 158, 68, 0.12);
+  outline: 2px solid #2f9e44;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 1px #2f9e44;
+}
+body.rail-dragging .pf-row--rail-over td {
+  border-color: #2f9e44;
+}
+
+/* Drop success animation — adds a temporary glow to the affected row */
+@keyframes pf-row-drop-success {
+  0%   { background: rgba(47, 158, 68, 0.35); }
+  100% { background: transparent; }
+}
+.pf-row--just-dropped {
+  animation: pf-row-drop-success 800ms ease-out;
+}
+
+/* Rail card — enhanced hover lift + drag visual */
+.rail-card:not(.rail-card--standard):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.06);
+  border-color: #adb5bd;
+}
+
+/* Drag preview on the source card */
+.rail-card.dragging {
+  opacity: 0.35;
+  filter: grayscale(0.3);
+  transform: scale(0.97);
+  box-shadow: none;
+}
+
+/* Slide-in animation for newly-added chips (used by add-on-picker chip strip) */
+@keyframes addon-chip-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.addon-chip--just-added {
+  animation: addon-chip-slide-in 280ms ease-out;
+}
