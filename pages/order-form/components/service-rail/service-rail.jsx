@@ -325,10 +325,20 @@
       const code = service.ServiceCode;
       const SC = window.OrderFormServiceCodes;
 
-      // Determine qty from scope
+      // Determine qty + scope. Phase 7a (2026-05-03) — order-level codes
+      // (DD, GRT-50, RUSH, Freight, EMB-NEW-DESIGN, STK-NEW-ART, etc. —
+      // see ORDER_LEVEL_CODES in service-codes.js) ALWAYS resolve to
+      // scope='order' + qty=1, regardless of which zone caught the drop.
+      // Otherwise dropping DD (FIXED $100) onto an empty row gave qty=0
+      // and a $0 line total, and dropping it onto a populated row gave
+      // qty=8 → $800 for what should be a single $100 setup fee.
+      const isOrderLvl = SC?.isOrderLevel?.(code);
       let qty = 1;
       let scope;
-      if (zoneType === 'row') {
+      if (isOrderLvl) {
+        qty = 1;
+        scope = 'order';
+      } else if (zoneType === 'row') {
         const r = (rows || []).find(x => x.id === rowId);
         qty = r ? rowQty(r) : 1;
         scope = { rowId };

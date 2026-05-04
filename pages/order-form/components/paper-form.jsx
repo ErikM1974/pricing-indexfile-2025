@@ -2224,18 +2224,18 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             const rowAddOns = (addOns || []).filter(a =>
               a && a.scope && typeof a.scope === 'object' && a.scope.rowId === r.id
             );
-            // Phase 5b (2026-05-03) — also surface order-level CONFIGURATOR
-            // addons (e.g. DTF-FRONT, DTF-BACK, EMB-METALLIC) under the FIRST
-            // row of the matching deco. This gives the rep an accessible
-            // inline editor for params like transferSize. Only the first
-            // matching row gets these — subsequent rows aren't duplicated.
+            // Phase 5b (2026-05-03) — surface order-level CONFIGURATOR addons
+            // (DTF-FRONT, EMB-METALLIC, etc.) under the FIRST row of the
+            // matching deco so the rep has an inline editor for params.
+            // Phase 7a (2026-05-03) — extended to ALL order-level addons
+            // (DD, GRT-50, RUSH, Freight, EMB-NEW-DESIGN, STK-NEW-ART, ...)
+            // so they appear as visible sub-row line items, not just chips
+            // buried at the bottom. Same AddOnSubRow component handles all
+            // pricing methods via shared addOnLineTotal — FIXED/FLAT show
+            // their dollar value, CONFIGURATOR shows "Markup", etc.
             const isFirstOfDeco = i === visibleRows.findIndex(rr => rr?.deco === r.deco && (rr.style || rr.desc || Object.values(rr.sizes || {}).some(v => Number(v) > 0)));
-            const orderConfiguratorAddOns = isFirstOfDeco
-              ? (addOns || []).filter(a => {
-                  if (!a || a.scope !== 'order') return false;
-                  const sc = window.OrderFormServiceCodes?.get?.(a.code);
-                  return String(sc?.PricingMethod || '').toUpperCase() === 'CONFIGURATOR';
-                })
+            const orderLevelSubRowAddOns = isFirstOfDeco
+              ? (addOns || []).filter(a => a && a.scope === 'order')
               : [];
             const subItemsEls = [
               ...rowAddOns.map(a => (
@@ -2248,7 +2248,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                   onRemove={() => setAddOns(prev => prev.filter(x => x.id !== a.id))}
                 />
               )),
-              ...orderConfiguratorAddOns.map(a => (
+              ...orderLevelSubRowAddOns.map(a => (
                 <AddOnSubRow
                   key={`${r.id}-orderSub-${a.id}`}
                   addOn={a}
