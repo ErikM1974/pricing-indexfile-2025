@@ -399,7 +399,7 @@
         const subtotal = poloLine + towelLine;
         // Summer Bonus is FREE on top — not subtracted from total. We show the value to anchor the offer.
         const DIGITIZING_VALUE = 100;
-        const GOLF_BAG_VALUE = 189; // OGIO Vision 2.0 MSRP
+        const GOLF_BAG_VALUE = 239; // OGIO Vision 2.0 — value with embroidered logo
         const bonusValue = DIGITIZING_VALUE + GOLF_BAG_VALUE;
 
         container.innerHTML = `
@@ -439,7 +439,7 @@
                 </div>
                 <ul class="example-package__bonus-list">
                     <li><strong>$100 logo digitizing</strong> &mdash; one-time setup fee waived</li>
-                    <li><strong>OGIO Vision 2.0 Golf Bag</strong> ($189 value) embroidered with your logo &mdash; yours to give to the organizer or use as a winner&rsquo;s prize</li>
+                    <li><strong>OGIO Vision 2.0 Golf Bag</strong> ($239 value) embroidered with your logo &mdash; yours to give to the organizer or use as a winner&rsquo;s prize</li>
                 </ul>
             </div>
             <p class="example-package__caveat">
@@ -753,6 +753,112 @@
 
         // Background-load all pricing in parallel
         loadAllPricing();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+// Sticky anchor nav — slides in once visitor scrolls past the hero
+(function stickyNav() {
+    function init() {
+        const nav = document.querySelector('[data-sticky-nav]');
+        const hero = document.querySelector('.hero');
+        if (!nav || !hero || !('IntersectionObserver' in window)) return;
+
+        const observer = new IntersectionObserver(([entry]) => {
+            nav.classList.toggle('is-visible', !entry.isIntersecting);
+        }, {
+            rootMargin: '-80px 0px 0px 0px',
+            threshold: 0
+        });
+
+        observer.observe(hero);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+
+// Team-photo lightbox — click any team card image to open a full-screen viewer
+(function teamLightbox() {
+    function init() {
+        const lb = document.querySelector('[data-lightbox]');
+        const triggers = [...document.querySelectorAll('.team__card .team__card-image')];
+        if (!lb || !triggers.length) return;
+
+        const lbImg = lb.querySelector('.lightbox__image');
+        const lbCap = lb.querySelector('.lightbox__caption');
+        const closeBtn = lb.querySelector('.lightbox__close');
+        const prevBtn = lb.querySelector('.lightbox__prev');
+        const nextBtn = lb.querySelector('.lightbox__next');
+
+        let currentIndex = -1;
+        let lastFocused = null;
+
+        function open(index) {
+            if (index < 0 || index >= triggers.length) return;
+            currentIndex = index;
+            const trigger = triggers[index];
+            const sourceImg = trigger.querySelector('img');
+            const figcap = trigger.closest('.team__card').querySelector('figcaption');
+            if (!sourceImg) return;
+            lbImg.src = sourceImg.src;
+            lbImg.alt = sourceImg.alt || '';
+            lbCap.textContent = figcap ? figcap.textContent.trim() : '';
+            lb.classList.add('is-open');
+            lb.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+            lastFocused = document.activeElement;
+            closeBtn.focus();
+        }
+
+        function close() {
+            lb.classList.remove('is-open');
+            lb.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            lbImg.src = '';
+            if (lastFocused && typeof lastFocused.focus === 'function') {
+                lastFocused.focus();
+            }
+        }
+
+        function navigate(delta) {
+            const next = (currentIndex + delta + triggers.length) % triggers.length;
+            open(next);
+        }
+
+        triggers.forEach((trigger, i) => {
+            trigger.setAttribute('role', 'button');
+            trigger.setAttribute('tabindex', '0');
+            trigger.setAttribute('aria-label', 'View larger photo');
+            trigger.addEventListener('click', () => open(i));
+            trigger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    open(i);
+                }
+            });
+        });
+
+        closeBtn.addEventListener('click', close);
+        prevBtn.addEventListener('click', () => navigate(-1));
+        nextBtn.addEventListener('click', () => navigate(1));
+        lb.addEventListener('click', (e) => {
+            if (e.target === lb) close();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (!lb.classList.contains('is-open')) return;
+            if (e.key === 'Escape') close();
+            else if (e.key === 'ArrowLeft') navigate(-1);
+            else if (e.key === 'ArrowRight') navigate(1);
+        });
     }
 
     if (document.readyState === 'loading') {

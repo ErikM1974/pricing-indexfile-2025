@@ -21,7 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="../shared_components/css/golf-tournament-showcase.css?v=20260504e">
+    <link rel="stylesheet" href="../shared_components/css/golf-tournament-showcase.css?v=20260504n">
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="../shared_components/js/embroidery-pricing-service.js?v=20260504"></script>
@@ -52,6 +52,21 @@
     </div>
 </header>
 
+<nav class="sticky-nav" aria-label="Page sections" data-sticky-nav>
+    <div class="sticky-nav__inner">
+        <ul class="sticky-nav__links">
+            <li><a href="#showcase"><i class="fas fa-shirt"></i> Apparel</a></li>
+            <li><a href="#pricing"><i class="fas fa-tag"></i> Pricing</a></li>
+            <li><a href="#how-it-works"><i class="fas fa-list-check"></i> How It Works</a></li>
+            <li><a href="#faq"><i class="fas fa-circle-question"></i> FAQ</a></li>
+        </ul>
+        <a href="#quote-form" class="sticky-nav__cta">
+            Get a Quote
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</nav>
+
 <section class="hero hero--has-image">
     <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388271"
          alt="Tournament team in matching embroidered Patriot polos and caps"
@@ -59,7 +74,7 @@
          fetchpriority="high">
     <div class="hero__overlay"></div>
     <div class="hero__inner">
-        <div class="hero__eyebrow"><i class="fas fa-golf-ball-tee"></i> Summer 2026 Tournament Season</div>
+        <div class="hero__eyebrow"><i class="fas fa-golf-ball-tee"></i> Summer 2026 &middot; Tournament Specialists Since 1977</div>
         <h1 class="hero__headline">Outfit Your Summer Golf Tournament</h1>
         <p class="hero__sub">
             Premium embroidered apparel for June, July &amp; August company tournaments &mdash;
@@ -68,28 +83,47 @@
         </p>
 
         <div class="hero__bonus-grid">
-            <div class="hero__bonus-card">
-                <div class="hero__bonus-icon">&#128176;</div>
+            <div class="hero__bonus-card hero__bonus-card--digitize">
+                <div class="hero__bonus-portrait">
+                    <span class="hero__bonus-portrait-badge">Since<br>1998</span>
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388550"
+                         alt="Ruthie digitizing a logo at our Milton, WA shop"
+                         class="hero__bonus-portrait-img"
+                         loading="eager"
+                         width="160" height="160">
+                </div>
+                <div class="hero__bonus-portrait-caption">
+                    <i class="fas fa-scissors"></i> Ruthie &middot; Master Digitizer
+                </div>
                 <div class="hero__bonus-card-label">FREE WITH $2,000+ ORDERS</div>
                 <div class="hero__bonus-card-title">$100 Logo Digitizing</div>
-                <div class="hero__bonus-card-sub">One-time setup fee &mdash; on us</div>
+                <div class="hero__bonus-card-sub"><strong>28 years</strong> digitizing logos in Milton &mdash; on us</div>
             </div>
             <a href="golf-tournament-product.html?style=425044" class="hero__bonus-card hero__bonus-card--feature hero__bonus-card--link">
-                <img src="https://cdnm.sanmar.com/catalog/images/425044.jpg"
-                     alt="OGIO Vision 2.0 Golf Bag"
-                     class="hero__bonus-card-image"
-                     loading="eager">
+                <div class="hero__bonus-card-imagewrap">
+                    <span class="hero__bonus-value-badge">$239 value</span>
+                    <img src="https://cdnm.sanmar.com/catalog/images/425044.jpg"
+                         alt="OGIO Vision 2.0 Golf Bag"
+                         class="hero__bonus-card-image"
+                         loading="eager">
+                </div>
                 <div class="hero__bonus-card-label">FREE WITH $2,000+ ORDERS</div>
                 <div class="hero__bonus-card-title">OGIO Vision 2.0 Golf Bag</div>
-                <div class="hero__bonus-card-sub">Embroidered with your logo &mdash; $189 value. Give it to your organizer or the tournament winner.</div>
+                <div class="hero__bonus-card-sub">Embroidered with your logo. Give it to your organizer or the tournament winner.</div>
                 <div class="hero__bonus-card-cta">View bag details &rarr;</div>
             </a>
         </div>
 
-        <a href="#quote-form" class="hero__cta">
-            Get My Tournament Quote
-            <i class="fas fa-arrow-right"></i>
-        </a>
+        <div class="hero__cta-row">
+            <a href="#quote-form" class="hero__cta">
+                Get My Tournament Quote
+                <i class="fas fa-arrow-right"></i>
+            </a>
+            <a href="#showcase" class="hero__cta hero__cta--ghost">
+                Browse Apparel
+                <i class="fas fa-arrow-down"></i>
+            </a>
+        </div>
 
         <div class="hero__trust">
             Trusted by Pacific NW companies since 1977
@@ -116,7 +150,170 @@
     </div>
 </section>
 
-<section class="how">
+<section class="heritage">
+    <div class="heritage__inner">
+        <div class="heritage__intro">
+            <div class="heritage__eyebrow">Family-run since 1977</div>
+            <h2 class="heritage__title">A real factory. Real people. Right here in Milton.</h2>
+            <p class="heritage__sub">No middleman. No overseas. The same family running the same shop &mdash; embroidering for Pacific Northwest companies since 1977.</p>
+        </div>
+        <div class="heritage__stats">
+            <div class="heritage__stat heritage__stat--with-photo">
+                <div class="heritage__stat-num">49</div>
+                <div class="heritage__stat-label">Years in business</div>
+                <div class="heritage__stat-sub">Family-run since 1977</div>
+                <div class="heritage__stat-photo">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388650"
+                         alt="NWCA's original embroidery floor — Tajima multi-head running in the early days"
+                         loading="lazy">
+                </div>
+            </div>
+            <div class="heritage__stat heritage__stat--with-photo">
+                <div class="heritage__stat-num">200+</div>
+                <div class="heritage__stat-label">Tournaments outfitted</div>
+                <div class="heritage__stat-sub">Pacific Northwest companies trust us with their season</div>
+                <div class="heritage__stat-photo heritage__stat-photo--logo">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388675"
+                         alt="Twin Lakes Golf &amp; Country Club — embroidered tournament logo"
+                         loading="lazy">
+                </div>
+            </div>
+            <div class="heritage__stat heritage__stat--with-photo">
+                <div class="heritage__stat-num">100%</div>
+                <div class="heritage__stat-label">Embroidered in-house</div>
+                <div class="heritage__stat-sub">Every stitch happens in our Milton shop &mdash; no decoration outsourced</div>
+                <div class="heritage__stat-photo">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388681"
+                         alt="Patriot caps lined up on our multi-head embroidery machine in Milton"
+                         loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="team">
+    <div class="team__inner">
+        <div class="team__intro">
+            <div class="team__eyebrow">Meet the team</div>
+            <h2 class="team__title">The people behind your tournament gear</h2>
+            <p class="team__sub">Same family. Same shop. Same people taking care of Pacific Northwest companies year after year.</p>
+        </div>
+
+        <div class="team__grid">
+            <figure class="team__card team__card--featured">
+                <div class="team__card-image">
+                    <div class="team__card-ribbon">Founder &middot; Since 1977</div>
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388633"
+                         alt="Owner Jim Mickelson holding a paper jacquard tape from 1977"
+                         loading="lazy">
+                </div>
+                <figcaption>Owner Jim Mickelson with a paper jacquard tape we used to run embroidery machines &mdash; before personal computers existed.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/_Bradley%20Silent%20Soldier.png?ver=1"
+                         alt="Bradley accepts the Silent Soldier Award from Ruthie"
+                         loading="lazy">
+                </div>
+                <figcaption>Bradley earns Ruthie&rsquo;s &ldquo;Silent Soldier&rdquo; Award &mdash; flawless books, every single day.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388630"
+                         alt="Team in custom Valentine's sweatshirts"
+                         loading="lazy">
+                </div>
+                <figcaption>Custom Valentine&rsquo;s sweatshirts &mdash; we wear our own work.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388622"
+                         alt="Big truck parking at our Milton showroom"
+                         loading="lazy">
+                </div>
+                <figcaption>Plenty of parking. Bring the big truck. Stop by our Milton showroom.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388618"
+                         alt="Erik congratulates Nika at the Christmas party"
+                         loading="lazy">
+                </div>
+                <figcaption>Christmas party 2025 &mdash; Erik congratulates Nika on crossing $1.25M in sales.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388614"
+                         alt="Team night at the Daffodil Bowl"
+                         loading="lazy">
+                </div>
+                <figcaption>Team night at the Daffodil Bowl &mdash; April 2026.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388611"
+                         alt="Fourth of July celebration in the factory"
+                         loading="lazy">
+                </div>
+                <figcaption>Fourth of July, factory edition.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388602"
+                         alt="Production Manager Ruthie with her nephew Antonio"
+                         loading="lazy">
+                </div>
+                <figcaption>Production Manager Ruthie with her nephew Antonio. Real family. Real shop.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388646"
+                         alt="Taneisha, Ruthie, and Adriyella dressed as cats for Halloween"
+                         loading="lazy">
+                </div>
+                <figcaption>Halloween at NWCA &mdash; Taneisha, Ruthie, and Adriyella going all-in as cats.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388645"
+                         alt="The NWCA team in matching red Christmas attire"
+                         loading="lazy">
+                </div>
+                <figcaption>Christmas team photo &mdash; the whole crew, in matching red.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388640"
+                         alt="The NWCA team outdoors in summer"
+                         loading="lazy">
+                </div>
+                <figcaption>The NWCA team soaking up the summer sunshine.</figcaption>
+            </figure>
+
+            <figure class="team__card">
+                <div class="team__card-image">
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388636"
+                         alt="Jeff, on the NWCA team since 2005"
+                         loading="lazy">
+                </div>
+                <figcaption>Jeff has been on the team since 2005 &mdash; Fife High grad, here every Thursday like clockwork.</figcaption>
+            </figure>
+        </div>
+    </div>
+</section>
+
+<section class="how" id="how-it-works">
     <div class="how__inner">
         <h2 class="section-title">How It Works</h2>
         <p class="section-sub">Plan ahead &mdash; standard turnaround is 14 business days from logo approval.</p>
@@ -148,7 +345,7 @@
             <strong>Summer 2026 Tournament Bonus.</strong>
             Place an order with a subtotal of <strong>$2,000 or more</strong> by <strong>August 31, 2026</strong>
             and we&rsquo;ll cover your <strong>$100 logo digitizing fee</strong> &mdash; plus
-            a <strong><a href="golf-tournament-product.html?style=425044" class="bonus-band__link">free embroidered OGIO Vision 2.0 golf bag</a></strong> ($189 value) is yours to keep.
+            a <strong><a href="golf-tournament-product.html?style=425044" class="bonus-band__link">free embroidered OGIO Vision 2.0 golf bag</a></strong> ($239 value) is yours to keep.
             Give it to your tournament organizer, hand it to the winner, or take it home yourself.
         </div>
     </div>
@@ -165,7 +362,7 @@
         <div class="tournament-proof__grid">
             <article class="proof-card">
                 <div class="proof-card__image">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/The%20Cougar%20Classic%20Golf%20Tournament%20-%20Edited.jpg?ver=1"
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388514"
                          alt="WSU Cougar Classic — embroidered tournament logo close-up"
                          loading="lazy" width="800" height="800">
                 </div>
@@ -174,7 +371,7 @@
 
             <article class="proof-card">
                 <div class="proof-card__image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388204"
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388508"
                          alt="F22 Raptor 14th Annual Golf Tournament — embroidered logo close-up"
                          loading="lazy" width="800" height="800">
                 </div>
@@ -183,7 +380,7 @@
 
             <article class="proof-card">
                 <div class="proof-card__image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388197"
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388532"
                          alt="Tucci &amp; Sons Golf Classic — embroidered logo close-up"
                          loading="lazy" width="800" height="800">
                 </div>
@@ -192,7 +389,7 @@
 
             <article class="proof-card">
                 <div class="proof-card__image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388190"
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388516"
                          alt="Don James Tournament Classic — embroidered logo close-up"
                          loading="lazy" width="800" height="800">
                 </div>
@@ -201,7 +398,7 @@
 
             <article class="proof-card">
                 <div class="proof-card__image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388184"
+                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388462"
                          alt="Viking Rams Golf Tournament — embroidered logo close-up"
                          loading="lazy" width="800" height="800">
                 </div>
@@ -241,7 +438,7 @@
     </div>
 </section>
 
-<section class="example-package">
+<section class="example-package" id="pricing">
     <div class="example-package__inner">
         <h2 class="section-title section-title--white">A 72-Player Tournament Package</h2>
         <p class="section-sub section-sub--white">
@@ -354,7 +551,7 @@
     </div>
 </section>
 
-<section class="faq">
+<section class="faq" id="faq">
     <div class="faq__inner">
         <h2 class="section-title">Common Questions</h2>
 
@@ -380,7 +577,7 @@
 
         <details class="faq__item">
             <summary>How do I claim the free golf bag?</summary>
-            <p>It&rsquo;s automatic. When your tournament order subtotal hits <strong>$2,000 or more</strong> by August 31, 2026, we throw in an OGIO Vision 2.0 Golf Bag ($189 value) embroidered with your tournament logo. Give it to your tournament organizer, hand it to the winner of the scramble, raffle it off, or keep it for yourself &mdash; your call. No coupon code, no fine print.</p>
+            <p>It&rsquo;s automatic. When your tournament order subtotal hits <strong>$2,000 or more</strong> by August 31, 2026, we throw in an OGIO Vision 2.0 Golf Bag ($239 value) embroidered with your tournament logo. Give it to your tournament organizer, hand it to the winner of the scramble, raffle it off, or keep it for yourself &mdash; your call. No coupon code, no fine print.</p>
         </details>
 
         <details class="faq__item">
@@ -435,6 +632,22 @@
     </div>
 </footer>
 
-<script src="../shared_components/js/golf-tournament-showcase.js?v=20260504"></script>
+<div class="lightbox" data-lightbox role="dialog" aria-modal="true" aria-label="Photo viewer" aria-hidden="true">
+    <button type="button" class="lightbox__close" aria-label="Close (Esc)">
+        <i class="fas fa-xmark"></i>
+    </button>
+    <button type="button" class="lightbox__prev" aria-label="Previous photo (Left arrow)">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <figure class="lightbox__content">
+        <img class="lightbox__image" src="" alt="">
+        <figcaption class="lightbox__caption"></figcaption>
+    </figure>
+    <button type="button" class="lightbox__next" aria-label="Next photo (Right arrow)">
+        <i class="fas fa-chevron-right"></i>
+    </button>
+</div>
+
+<script src="../shared_components/js/golf-tournament-showcase.js?v=20260504d"></script>
 </body>
 </html>
