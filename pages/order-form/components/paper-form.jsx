@@ -778,6 +778,10 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
               update({ desc: v, descSource: v.trim() ? 'manual' : 'auto' });
             }}
           />
+          {/* Tier badge sits as the trailing flex child after the textarea —
+              shrinks to its content width and can never overlap the desc text
+              (vs. the prior position:absolute corner placement that
+              collided with wrapped product names). */}
           {rowBreakdown && !rowBreakdown.error && rowBreakdown.tier && (
             <RowTierBadge rowBreakdown={rowBreakdown} />
           )}

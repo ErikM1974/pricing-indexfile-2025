@@ -795,7 +795,7 @@ body {
 .nss-chip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;                        /* 2026-05-04 — was 4px, tightened to fit 2 chips in narrower cell */
   /* Soft spruce-tinted gradient so the chip reads as a polished pill, not
      a flat color block. Border at 25% accent stays subtle; deepens on hover. */
   background: linear-gradient(180deg,
@@ -803,7 +803,7 @@ body {
     color-mix(in oklab, var(--accent) 12%, white) 100%);
   border: 1px solid color-mix(in oklab, var(--accent) 25%, var(--line));
   border-radius: 999px;
-  padding: 2px 4px 2px 9px;
+  padding: 2px 3px 2px 7px;        /* 2026-05-04 — was 2px 4px 2px 9px */
   line-height: 1.15;
   font-size: 11px;
   white-space: nowrap;
@@ -827,7 +827,7 @@ body {
   color: var(--accent);
 }
 .nss-chip-qty {
-  width: 26px;
+  width: 22px;                     /* 2026-05-04 — was 26px, tightened to fit narrower chip */
   border: 0;
   background: transparent;
   font: inherit;
@@ -2440,12 +2440,16 @@ tr.pf-subitem-row--auto .pf-subitem-code::after {
    doesn't get squeezed by the flex layout (which was making it wrap into
    3 lines). NWCA brand green (--accent = spruce) with white text — clear
    visual presence without dominating the description. */
+/* 2026-05-04 — moved from absolute corner placement to inline trailing chip
+   inside .desc-cell. Now flex-shrinks to content width and can never
+   overlap the description text (was: bottom: 3px right: 4px caused
+   collisions with wrapped product names like "Richardson Five-Panel
+   Champ Trucker Cap"). flex: 0 0 auto keeps it from being squeezed. */
 .row-tier-badge {
-  position: absolute;
-  bottom: 3px;
-  right: 4px;
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
+  align-self: center;
   gap: 5px;
   white-space: nowrap;
   font-size: 9px;
@@ -2468,10 +2472,8 @@ tr.pf-subitem-row--auto .pf-subitem-code::after {
     0 1px 0 rgba(255, 255, 255, 0.20) inset;
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1, 'lnum' 1;
-  pointer-events: none;          /* tooltip-only, doesn't intercept clicks on textarea */
   user-select: none;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
-  z-index: 1;
 }
 /* "CAP" suffix when product is a flat headwear (cap embroidery pricing) —
    thin outlined chip inside the pill, reads as a modifier not a tier. */
@@ -2486,15 +2488,8 @@ tr.pf-subitem-row--auto .pf-subitem-code::after {
   font-weight: 700;
   text-shadow: none;
 }
-/* The desc-cell needs to be a positioning context so the absolute badge
-   anchors to it. Also adds padding-bottom on the textarea so the typed
-   text doesn't run under the badge. */
-.p-table td .desc-cell {
-  position: relative;
-}
-.p-table td .desc-cell textarea.t-in-desc {
-  padding-bottom: 18px;          /* leave room for the corner badge */
-}
+/* 2026-05-04 — desc-cell no longer needs to be a positioning context
+   (badge is inline, not absolute). Padding-bottom hack removed too. */
 
 .pf-row.pf-row--priced .nss-td,
 .pf-row.pf-row--priced .desc-cell { /* cosmetic: subtle tint when row is priced */ }

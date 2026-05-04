@@ -317,17 +317,19 @@
    $1,234.56 fit comfortably (Erik: was getting cut to "$240.0").
    Sum: 12 + 12 + 21 + 8×3.8 + 10.6 + 6 + 8 = 100% */
 .p-table col.c-style { width: 12%; }   /* fits CTB151, RS3321, S608ES, K500ES, CAR54T, PC61T */
-.p-table col.c-color { width: 12%; }
+.p-table col.c-color { width: 9.6%; }  /* 2026-05-04 — re-allocated 2.4% to .c-other for chip room */
 .p-table col.c-desc  { width: 21%; }   /* fits "Carhartt Canvas Work Dungaree" */
 .p-table col.c-sz    { width: 3.8%; }  /* × 8 = 30.4% */
-.p-table col.c-other { width: 9.6%; } /* "Other sizes" — room for chips */
+.p-table col.c-other { width: 12%; }   /* 2026-05-04 — bumped from 9.6% to fit 2 chips + Add button */
 /* Style cell input fills its td so longer codes (J790ST, PC61LS) show fully */
 .p-table .sel-wrap .style-cell .combobox { flex: 1 1 auto; min-width: 0; }
 .p-table .sel-wrap .style-cell .combobox .cell-input { width: 100%; }
 .p-table col.c-price { width: 7%; }
 .p-table col.c-total { width: 8%; }    /* fits $1,234.56 + comma */
-/* Non-standard size cell — let it flow without forcing min-height */
-.p-table td.nss-td { padding: 0; vertical-align: middle; }
+/* Non-standard size cell — let it flow without forcing min-height.
+   overflow: hidden is the safety net so any extreme chip overflow clips
+   inside the column rather than visually bleeding into Price. */
+.p-table td.nss-td { padding: 0; vertical-align: middle; overflow: hidden; }
 
 .p-table td .t-in {
   width: 100%;
