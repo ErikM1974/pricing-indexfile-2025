@@ -45,6 +45,17 @@
     if (F?.isStructuredCap(product)) return 'cap';
     const sizeKeys = Object.keys(row?.sizes || {}).filter(k => Number(row.sizes[k]) > 0);
     if (sizeKeys.length && sizeKeys.every(k => k === 'OSFA')) return 'cap';
+    // Phase 7c (2026-05-03) — style-prefix fallback. ProductCategoryFilter's
+    // keyword match relies on row.desc which only populates after
+    // /api/product-colors resolves. When that endpoint 404s (some niche
+    // styles aren't in the SanMar catalog) OR before it resolves, the
+    // earlier checks all return false and we'd default to 'flat'. The
+    // prefix regex catches common NWCA cap-style patterns immediately.
+    // Mirrors PaperRow#detectRowKind in paper-form.jsx so cap detection is
+    // consistent between the row drop-zone eligibility check and the
+    // primary-logo default. Non-exhaustive — extend as new cap lines are added.
+    const styleUpper = String(row?.style || '').toUpperCase();
+    if (/^(112|7706|3100|NE\d|C\d{3}|YP\d|FF\d)/.test(styleUpper)) return 'cap';
     return 'flat';
   }
 
@@ -177,12 +188,16 @@
     // order-level formCtx.decoConfig (the "default for new rows" seed). Once
     // the rep edits inline (Primary logo sub-row), the row's value goes
     // sticky and stops tracking the order-level default.
+    //
+    // Phase 7c (2026-05-03) — cap-aware default for primary position. Caps
+    // don't have a "Left Chest" — defaulting them to the order-level seed
+    // (typically Left Chest for garment-heavy orders) is wrong. Caps default
+    // to "Hat Front", garments inherit the order-level seed.
     const rowPrimaryStitch = Number.isFinite(Number(row?.rowDecoConfig?.primaryStitchCount))
       ? Number(row.rowDecoConfig.primaryStitchCount)
       : (Number(formCtx?.decoConfig?.stitchCount) || 8000);
     const rowPrimaryPosition = row?.rowDecoConfig?.primaryPosition
-      || formCtx?.decoConfig?.primaryLocation
-      || 'Left Chest';
+      || (capOrFlat === 'cap' ? 'Hat Front' : (formCtx?.decoConfig?.primaryLocation || 'Left Chest'));
 
     out.extras = {
       capOrFlat,
@@ -456,6 +471,9 @@
     // with the ConfigBar select above.
     primaryLocations: PRIMARY_LOCATIONS,
     classifyStitchTier,
+    // Phase 7c (2026-05-03) — exposed so paper-form.jsx can compute the
+    // cap-aware default primary position for each row.
+    detectCapOrFlat,
     ConfigBar,
     tierForQty: (qty) => S.tierForQty(qty, S.EMBROIDERY_TIERS),
     fetchBundle: fetchBundleForRow,

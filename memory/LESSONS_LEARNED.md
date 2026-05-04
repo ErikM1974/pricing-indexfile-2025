@@ -129,6 +129,14 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix
+**Problem:** After deleting an orphan `1-23` tier from `Pricing_Tiers` (EmbroideryCaps), `/api/pricing-bundle?method=CAP` *still* returned the orphan, and `[CapEmbroideryPricingService] No 8000 stitch cost found for tier 1-23` kept firing on the order form.
+**Root Cause:** Sept 2025 commit `c160648` ("fix: add missing 1-23 tier") added a `response.tiersR.unshift({ TierLabel: '1-23', ... })` shim in `caspio-pricing-proxy/src/routes/pricing.js` to paper over a missing Caspio row. The 5-tier migration later split `1-23` into `1-7` + `8-23` and the shim was never removed — so even after the data was correct, the proxy clobbered it with the orphan on every CAP/CAP-AL response. Heroku log confirmed `Total records fetched: 5` from Caspio, but response had 6.
+**Solution:** Removed the shim block (proxy v612). Bundle now returns Caspio reality.
+**Prevention:** When backfilling missing data via proxy injection, leave a `// REMOVE WHEN <X> IS FIXED IN CASPIO` marker. Audit such shims any time the underlying table changes shape (tier migration, schema rename, etc.). Verify the *response* matches the *table* — not just the table.
+
+---
+
 ## JavaScript Patterns
 
 ### Falsy-Zero Bug (Use ?? Instead of ||)

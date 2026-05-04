@@ -1124,13 +1124,23 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
 // Replaces the order-level nudge that lived in embroidery's ConfigBar pre-
 // Phase 4b — now contextual per row.
 // ---------------------------------------------------------------------------
-function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifyStitchTier, onChange, customerMode, isFilled, autoSurchargePresent }) {
+function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifyStitchTier, detectCapOrFlat, onChange, customerMode, isFilled, autoSurchargePresent }) {
   if (!isFilled || deco !== 'embroidery') return null;
   const positions = (primaryLocations && primaryLocations.length)
     ? primaryLocations
     : ['Left Chest', 'Right Chest', 'Center Chest', 'Hat Front', 'Hat Back'];
   const seedStitch = Number(decoConfig?.stitchCount) || 8000;
-  const seedPos    = decoConfig?.primaryLocation || 'Left Chest';
+  // Phase 7c (2026-05-03) — cap-aware default. Caps default to "Hat Front"
+  // (the natural primary location for headwear) instead of inheriting the
+  // order-level seed which is typically "Left Chest" for garment-heavy
+  // orders. Once the rep manually picks a position, that sticks via
+  // rowDecoConfig.primaryPosition and overrides the default.
+  const isCap = (typeof detectCapOrFlat === 'function')
+    ? detectCapOrFlat(row) === 'cap'
+    : false;
+  const seedPos = isCap
+    ? 'Hat Front'
+    : (decoConfig?.primaryLocation || 'Left Chest');
   const stitch = Number.isFinite(Number(row?.rowDecoConfig?.primaryStitchCount))
     ? Number(row.rowDecoConfig.primaryStitchCount)
     : seedStitch;
@@ -2230,6 +2240,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 deco={r.deco}
                 primaryLocations={embMethod?.primaryLocations}
                 classifyStitchTier={embMethod?.classifyStitchTier}
+                detectCapOrFlat={embMethod?.detectCapOrFlat}
                 onChange={(next) => onRowChange(i, next)}
                 customerMode={customerMode}
                 isFilled={isFilled}

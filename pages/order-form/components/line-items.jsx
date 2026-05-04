@@ -49,6 +49,13 @@ async function fetchProductInfo(styleNumber) {
   if (_colorsCache.has(sn)) return _colorsCache.get(sn);
   try {
     const r = await fetch(`${API_BASE}/api/product-colors?styleNumber=${encodeURIComponent(sn)}`);
+    if (r.status === 404) {
+      // Partial style during typing — proxy correctly says "no such product".
+      // Cache the empty result so the same prefix isn't re-fetched on every keystroke.
+      _colorsCache.set(sn, empty);
+      console.debug('[OrderForm] product-colors 404 (partial/unknown style):', sn);
+      return empty;
+    }
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const data = await r.json();
     const result = {
