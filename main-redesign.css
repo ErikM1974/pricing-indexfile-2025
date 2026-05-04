@@ -4142,3 +4142,204 @@
         justify-content: center;
     }
 }
+
+/* ============================================================
+   Golf Tournament Promo Banner
+   Modifier classes layered on top of .rush-service-banner
+   ============================================================ */
+.golf-promo-banner {
+    /* Deeper fairway gradient — distinguishes from the bright 3DT green */
+    background: linear-gradient(135deg, #0f3a1f 0%, #1a472a 45%, #3a7d44 100%);
+    border-bottom-color: #fbbf24;
+}
+
+.golf-promo-badge {
+    background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+    color: #1a472a;
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+
+.golf-promo-cta {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #1a472a;
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.45);
+}
+
+.golf-promo-cta:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(251, 191, 36, 0.6);
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+}
+
+/* Inline link inside the slim banner subhead (e.g. "OGIO Vision 2.0 golf bag") */
+.rush-inline-link {
+    color: #fef3c7;
+    text-decoration: underline;
+    text-decoration-color: rgba(251, 191, 36, 0.6);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 2px;
+    font-weight: 700;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.rush-inline-link:hover,
+.rush-inline-link:focus {
+    color: #fbbf24;
+    text-decoration-color: #fbbf24;
+}
+
+/* ============================================================
+   Featured Services — 3-card row below the main hero
+   3DT, Tournament, Webstores
+   ============================================================ */
+.featured-services {
+    max-width: 1280px;
+    margin: 0 auto 4rem;
+    padding: 0 2rem;
+}
+
+.featured-services__inner { text-align: center; }
+
+.featured-services .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1a472a;
+    margin-bottom: 0.5rem;
+}
+
+.featured-services .section-subtitle {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+}
+
+.featured-services__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    text-align: left;
+}
+
+.service-card {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    padding: 1.75rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.25s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(26, 71, 42, 0.18);
+    border-color: #4cb354;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--accent, #4cb354);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.service-card:hover::before { transform: scaleX(1); }
+
+.service-card--3dt      { --accent: #ff6b35; }
+.service-card--golf     { --accent: #fbbf24; }
+.service-card--webstore { --accent: #4cb354; }
+
+.service-card__icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    color: #1a472a;
+    margin-bottom: 1rem;
+}
+
+.service-card__badge {
+    display: inline-block;
+    align-self: flex-start;
+    background: #f3f4f6;
+    color: #374151;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+}
+
+.service-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1a472a;
+    margin-bottom: 0.5rem;
+}
+
+.service-card__desc {
+    color: #4b5563;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    flex: 1;
+    margin-bottom: 1rem;
+}
+
+.service-card__cta {
+    color: #1a472a;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: gap 0.2s ease;
+}
+
+.service-card:hover .service-card__cta {
+    gap: 0.75rem;
+    color: #4cb354;
+}
+
+.cta-arrow {
+    display: inline-block;
+    font-size: 1.125em;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.service-card:hover .cta-arrow,
+.golf-promo-cta:hover .cta-arrow {
+    transform: translateX(3px);
+}
+
+@media (max-width: 1024px) {
+    .featured-services__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+    .featured-services__grid { grid-template-columns: 1fr; }
+    .featured-services { padding: 0 1rem; margin-bottom: 2.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .service-card,
+    .service-card::before,
+    .service-card__cta { transition: none; }
+}

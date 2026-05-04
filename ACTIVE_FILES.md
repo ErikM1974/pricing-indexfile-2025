@@ -77,6 +77,8 @@
 | `/pages/webstore-info.html` | Webstore information | Various | ✅ Active |
 | `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
+| `/pages/golf-tournaments-2026.html` | **NEW** Summer 2026 golf tournament campaign landing page (MailChimp funnel target) | golf-tournament-showcase.js, .css, embroidery-pricing-service.js, EmailJS | ✅ Active |
+| `/pages/golf-tournament-product.html` | **NEW** Per-style detail page (colors/sizes/full pricing) — linked from golf-tournaments-2026.html product cards | golf-tournament-product.js, .css, embroidery-pricing-service.js | ✅ Active |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
 | `/pages/embroidery-contract-pricing.html` | **NEW** Shareable contract embroidery pricing page | embroidery-contract-pricing.js, embroidery-contract-pricing.css | ✅ Active |
 | `/pages/data-entry-guide.html` | **NEW** ShopWorks data entry guide with API-driven service prices | data-entry-guide.js, data-entry-guide.css, app-config.js | ✅ Active |
@@ -433,6 +435,8 @@
 | `/shared_components/js/dtg-adapter.js` | DTG pricing adapter | DTG, DTF systems | ✅ Active |
 | `/shared_components/js/dtf-adapter.js` | DTF pricing adapter | DTF system | ✅ Active |
 | `/shared_components/js/embroidery-pricing-service.js` | Embroidery adapter | Embroidery system | ✅ Active |
+| `/shared_components/js/golf-tournament-showcase.js` | **NEW** Golf tournament landing page logic — fetches Garment Tracker config + live embroidery pricing, renders product grid, handles EmailJS lead capture | embroidery-pricing-service.js, EmailJS, /api/garment-tracker/config, /api/pricing-bundle | ✅ Active |
+| `/shared_components/js/golf-tournament-product.js` | **NEW** Product detail page logic — fetches /api/products/search for colors/sizes/description + embroidery pricing for full tier table | embroidery-pricing-service.js, /api/products/search, /api/pricing-bundle | ✅ Active |
 
 ### Quote System Components
 | File | Purpose | Used By | Status |
@@ -702,6 +706,8 @@
 | `/shared_components/css/embroidery-quote-builder-extracted.css` | Embroidery quote builder styles (2026-01-27 extraction) | Embroidery quote builder | ✅ Active |
 | `/shared_components/css/quote-builder-unified-step1.css` | ~~DELETED~~ — superseded by `quote-builder-common.css` (2026-01-27) | — | ❌ Deleted |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ✅ Active |
+| `/shared_components/css/golf-tournament-showcase.css` | **NEW** Golf tournament landing page styles (golf theme — fairway greens, sand accents, gold offer ribbon) | golf-tournaments-2026.html, golf-tournament-product.html | ✅ Active |
+| `/shared_components/css/golf-tournament-product.css` | **NEW** Product detail page styles (gallery, color swatches, size pills, volume pricing table) — layered on top of showcase.css | golf-tournament-product.html | ✅ Active |
 | `/shared_components/css/dtg-quote-builder-extracted.css` | DTG quote builder extracted styles (2026-01-27) | DTG quote builder | ✅ Active |
 | `/shared_components/css/screenprint-quote-builder-extracted.css` | Screenprint quote builder extracted styles (2026-01-27) | Screenprint quote builder | ✅ Active |
 | `/shared_components/css/quote-builder-step2-modern.css` | ~~DELETED~~ — Step 2 styles merged into `quote-builder-common.css` | — | ❌ Deleted |
