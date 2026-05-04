@@ -145,6 +145,140 @@ function App() {
     return () => { cancelled = true; clearTimeout(t); };
   }, [rows, decoConfig, customerMode, addOns]);
 
+  // Phase 7b (2026-05-03) — auto-apply AS-CAP/AS-Garm MID/LARGE stitch
+  // surcharges per row based on each row's primary stitch count. Reps were
+  // forgetting to drag the surcharge after typing >10K stitches → undercharge.
+  // This effect watches rows + addOns + decoConfig and keeps the right
+  // surcharge attached to each row. Runs idempotent (only setAddOns when
+  // there's an actual change). Marks auto entries with params._auto=true so
+  // the auto-remove logic doesn't touch manually-dragged surcharges. If the
+  // rep manually drags ANY AS-CAP/AS-Garm on a row, the auto entry yields
+  // (manual takes precedence — we delete our auto entry on that row).
+  //
+  // Tier mapping (matches the canonical NWCA flat-tier policy):
+  //    ≤ 10,000 stitches → no surcharge (Standard, included)
+  //    10,001 – 15,000  → MID  (+$4/pc)
+  //    15,001 – 25,000  → LARGE (+$10/pc)
+  //    > 25,000         → DECG-FB territory — NOT auto-added (rep uses Quote Builder)
+  useEffect(() => {
+    if (decoConfig?.method !== 'embroidery') return;
+    const F = window.ProductCategoryFilter;
+    function detectCapOrFlat(row) {
+      const override = row?.rowDecoConfig?.capOrFlat;
+      if (override === 'cap' || override === 'flat') return override;
+      const product = { label: row?.desc || '', value: row?.style || '', PRODUCT_TITLE: row?.desc || '' };
+      if (F?.isFlatHeadwear?.(product)) return 'flat';
+      if (F?.isStructuredCap?.(product)) return 'cap';
+      const sizeKeys = Object.keys(row?.sizes || {}).filter(k => Number(row.sizes[k]) > 0);
+      if (sizeKeys.length && sizeKeys.every(k => k === 'OSFA')) return 'cap';
+      // Last-chance prefix match for known cap styles when desc hasn't loaded
+      const styleUpper = String(row?.style || '').toUpperCase();
+      if (/^(112|7706|3100|NE\d|C\d{3}|YP\d|FF\d)/.test(styleUpper)) return 'cap';
+      return 'flat'; // default to garment — matches embroidery.jsx convention
+    }
+    function rowQty(row) {
+      return Object.values(row?.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+    }
+    function isFilled(row) {
+      return !!(row.style || row.desc || rowQty(row) > 0);
+    }
+    function findTierRow(code, tier) {
+      const all = window.OrderFormServiceCodes?.all?.() || [];
+      return all.find(s => s.ServiceCode === code && s.Tier === tier);
+    }
+
+    const seedStitch = Number(decoConfig?.stitchCount) || 8000;
+    const next = [...addOns];
+    let changed = false;
+
+    for (const row of rows) {
+      if (row.deco !== 'embroidery') continue;
+      if (!isFilled(row)) continue;
+
+      const stitch = Number.isFinite(Number(row?.rowDecoConfig?.primaryStitchCount))
+        ? Number(row.rowDecoConfig.primaryStitchCount)
+        : seedStitch;
+      const cof = detectCapOrFlat(row);
+      if (!cof) continue;
+
+      const desiredCode = cof === 'cap' ? 'AS-CAP' : 'AS-Garm';
+      const desiredTier = stitch <= 10000 ? null
+                       : stitch <= 15000 ? 'Mid'
+                       : stitch <= 25000 ? 'Large'
+                       : null;
+
+      const existingAutoIdx = next.findIndex(a =>
+        (a.code === 'AS-CAP' || a.code === 'AS-Garm') &&
+        a.scope && typeof a.scope === 'object' &&
+        a.scope.rowId === row.id &&
+        a.params?._auto === true
+      );
+      const hasManual = next.some(a =>
+        (a.code === 'AS-CAP' || a.code === 'AS-Garm') &&
+        a.scope && typeof a.scope === 'object' &&
+        a.scope.rowId === row.id &&
+        a.params?._auto !== true
+      );
+      if (hasManual) {
+        if (existingAutoIdx >= 0) { next.splice(existingAutoIdx, 1); changed = true; }
+        continue;
+      }
+      if (desiredTier === null) {
+        if (existingAutoIdx >= 0) { next.splice(existingAutoIdx, 1); changed = true; }
+        continue;
+      }
+
+      const tierRow = findTierRow(desiredCode, desiredTier);
+      if (!tierRow) continue; // service-codes not loaded yet — try again next render
+      const desiredUnitPrice = Number(tierRow.SellPrice) || (desiredTier === 'Mid' ? 4 : 10);
+      const desiredQty = rowQty(row) || 0;
+
+      if (existingAutoIdx >= 0) {
+        const existing = next[existingAutoIdx];
+        const codeChange = existing.code !== desiredCode;
+        const tierChange = existing.params?.tier !== desiredTier;
+        const qtyChange  = existing.qty !== desiredQty;
+        const priceChange = Number(existing.params?.unitPrice) !== desiredUnitPrice;
+        if (codeChange || tierChange || qtyChange || priceChange) {
+          next[existingAutoIdx] = {
+            ...existing,
+            code: desiredCode,
+            qty: desiredQty,
+            params: { ...(existing.params || {}), tier: desiredTier, unitPrice: desiredUnitPrice, _auto: true },
+          };
+          changed = true;
+        }
+      } else {
+        next.push({
+          id: `auto_${row.id}_${desiredCode}`,
+          code: desiredCode,
+          qty: desiredQty,
+          scope: { rowId: row.id },
+          params: { tier: desiredTier, unitPrice: desiredUnitPrice, _auto: true },
+        });
+        changed = true;
+      }
+    }
+
+    // Cleanup pass: drop auto entries whose row no longer qualifies (deleted,
+    // method changed, no longer filled). Walks backwards so splice indices
+    // stay stable.
+    const validRowIds = new Set(
+      rows.filter(r => r.deco === 'embroidery' && isFilled(r)).map(r => r.id)
+    );
+    for (let i = next.length - 1; i >= 0; i--) {
+      const a = next[i];
+      if (!a?.params?._auto) continue;
+      if (a.code !== 'AS-CAP' && a.code !== 'AS-Garm') continue;
+      if (!a.scope || typeof a.scope !== 'object' || !validRowIds.has(a.scope.rowId)) {
+        next.splice(i, 1);
+        changed = true;
+      }
+    }
+
+    if (changed) setAddOns(next);
+  }, [rows, addOns, decoConfig]);
+
   useEffect(() => {
     function onMsg(e) {
       const m = e.data;

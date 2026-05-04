@@ -2383,6 +2383,34 @@ tr.pf-subitem-row--primary > td {
 .pf-primary-nudge--mid { color: #b25e00; }
 .pf-primary-nudge--lg  { color: #a04600; }
 .pf-primary-nudge--fb  { color: #b51e1e; }
+/* Phase 7b — when the surcharge is auto-applied, the nudge color flips to
+   green to communicate "this is handled" rather than "you need to act". */
+.pf-primary-nudge--auto.pf-primary-nudge--mid,
+.pf-primary-nudge--auto.pf-primary-nudge--lg {
+  color: #1f6a32;
+  font-weight: 600;
+}
+
+/* Phase 7b — auto-applied addon sub-row gets a subtle green tint so reps
+   can tell at a glance that it was added by the system, not by them.
+   Tap-to-confirm ✕ still works the same way. */
+tr.pf-subitem-row--auto > td {
+  background: linear-gradient(to right, color-mix(in oklab, #2f9e44 5%, white) 0%, #ffffff 70%);
+}
+tr.pf-subitem-row--auto .pf-subitem-code::after {
+  content: 'auto';
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #d4f0dd;
+  color: #1f6a32;
+  border-radius: 3px;
+  vertical-align: 1px;
+}
 .pf-primary-nudge a {
   color: inherit;
   font-weight: 600;

@@ -1124,7 +1124,7 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
 // Replaces the order-level nudge that lived in embroidery's ConfigBar pre-
 // Phase 4b — now contextual per row.
 // ---------------------------------------------------------------------------
-function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifyStitchTier, onChange, customerMode, isFilled }) {
+function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifyStitchTier, onChange, customerMode, isFilled, autoSurchargePresent }) {
   if (!isFilled || deco !== 'embroidery') return null;
   const positions = (primaryLocations && primaryLocations.length)
     ? primaryLocations
@@ -1139,6 +1139,11 @@ function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifySt
   const tierInfo = (typeof classifyStitchTier === 'function')
     ? classifyStitchTier(stitch)
     : { level: stitch <= 10000 ? 'ok' : (stitch <= 15000 ? 'mid' : (stitch <= 25000 ? 'lg' : 'fb')), tier: '?', surcharge: 0 };
+  // Phase 7b — when an auto-applied surcharge is in place for this row, the
+  // nudge text switches from "⚠ Drag MID surcharge from rail" to "✓ MID
+  // surcharge auto-added" so the rep knows it's already handled. The actual
+  // sub-row sits below with a ✕ button if they want to remove it.
+  const showAutoNudge = autoSurchargePresent && (tierInfo.level === 'mid' || tierInfo.level === 'lg');
 
   function setRowDeco(patch) {
     onChange({ ...row, rowDecoConfig: { ...(row.rowDecoConfig || {}), ...patch } });
@@ -1172,10 +1177,12 @@ function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifySt
           />
           <span className="pf-subitem-meta-dot">stitches</span>
           {tierInfo.level !== 'ok' && (
-            <span className={`pf-primary-nudge pf-primary-nudge--${tierInfo.level}`}>
+            <span className={`pf-primary-nudge pf-primary-nudge--${tierInfo.level}` + (showAutoNudge ? ' pf-primary-nudge--auto' : '')}>
               {tierInfo.level === 'fb'
                 ? <>🔴 Full Back — use Quote Builder for DECG-FB</>
-                : <>⚠ Drag <strong>{tierInfo.tier.toUpperCase()}</strong> stitch surcharge from rail (+${tierInfo.surcharge}/pc)</>
+                : showAutoNudge
+                  ? <>✓ <strong>{tierInfo.tier.toUpperCase()}</strong> surcharge auto-added (+${tierInfo.surcharge}/pc) — tap ✕ to remove</>
+                  : <>⚠ Drag <strong>{tierInfo.tier.toUpperCase()}</strong> stitch surcharge from rail (+${tierInfo.surcharge}/pc)</>
               }
             </span>
           )}
@@ -1218,13 +1225,26 @@ function AddOnSubRow({ addOn, breakdown, customerMode, onChange, onRemove }) {
     timerRef.current = setTimeout(() => setPending(false), 2000);
   }
 
-  const sc = window.OrderFormServiceCodes?.get?.(addOn.code) || null;
+  // Phase 7b (2026-05-03) — tier-aware service-code lookup for AS-CAP/AS-Garm
+  // addons. These have multiple Caspio rows sharing the same ServiceCode but
+  // different Tier values (Standard / Mid / Large). The plain get(code) call
+  // returns whichever row Caspio listed first, which gives the wrong
+  // DisplayName + SellPrice. When the addon's params include a tier, look up
+  // the tier-specific row instead so the sub-row label + price are correct.
+  let sc = window.OrderFormServiceCodes?.get?.(addOn.code) || null;
+  const _params0 = addOn.params || {};
+  if (_params0.tier && (addOn.code === 'AS-CAP' || addOn.code === 'AS-Garm')) {
+    const all = window.OrderFormServiceCodes?.all?.() || [];
+    const tierSpecific = all.find(s => s.ServiceCode === addOn.code && s.Tier === _params0.tier);
+    if (tierSpecific) sc = tierSpecific;
+  }
   const code = addOn.code || '';
   const label = sc?.DisplayName || code;
   const params = addOn.params || {};
   const method = String(sc?.PricingMethod || '').toUpperCase();
   const sell = Number(sc?.SellPrice) || 0;
   const qty = Number(addOn.qty) || 0;
+  const isAuto = !!params._auto;
 
   // Phase 4c (2026-05-03) — inline editing of TIERED addon params. POSITION
   // and STITCH_COUNT are sourced from the rail-card single-source-of-truth
@@ -1342,7 +1362,7 @@ function AddOnSubRow({ addOn, breakdown, customerMode, onChange, onRemove }) {
   const editable = !customerMode && (isPositionInputCode || isStitchInputCode || isTransferSizeCode || isColorCountCode);
 
   return (
-    <tr className="pf-subitem-row">
+    <tr className={'pf-subitem-row' + (isAuto ? ' pf-subitem-row--auto' : '')}>
       <td colSpan={14}>
         <div className="pf-subitem-inner">
           <span className="pf-subitem-arrow" aria-hidden>↳</span>
@@ -2193,6 +2213,15 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             // editing inline persists to row.rowDecoConfig (sticky).
             const isFilled = !!(r.style || r.desc || Object.values(r.sizes || {}).some(v => Number(v) > 0));
             const embMethod = (window.OrderFormPricing?.getMethod?.('embroidery')) || null;
+            // Phase 7b — flag whether this row already has an AUTO-applied
+            // AS-CAP/AS-Garm surcharge so the primary-logo nudge can switch
+            // to "✓ auto-added" instead of "⚠ Drag MID surcharge from rail".
+            const autoSurchargePresent = (addOns || []).some(a =>
+              (a?.code === 'AS-CAP' || a?.code === 'AS-Garm') &&
+              a?.scope && typeof a.scope === 'object' &&
+              a.scope.rowId === r.id &&
+              a?.params?._auto === true
+            );
             const primaryEl = (
               <PrimaryLogoSubRow
                 key={`${r.id}-primary`}
@@ -2204,6 +2233,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 onChange={(next) => onRowChange(i, next)}
                 customerMode={customerMode}
                 isFilled={isFilled}
+                autoSurchargePresent={autoSurchargePresent}
               />
             );
             // Append the breakdown line directly under each priced row so the
