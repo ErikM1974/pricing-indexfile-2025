@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EmailJS Template — Golf Tournament Lead Alert (template_golf_lead)</title>
+<!--
+
+  ============================================================
+  EmailJS Template: template_golf_lead
+  ============================================================
+
+  WHAT THIS IS
+  ------------
+  The internal "new tournament lead" email that fires whenever
+  someone submits the form on /pages/golf-tournaments-2026.html.
+
+  HOW TO INSTALL
+  --------------
+  1. Open https://dashboard.emailjs.com → Email Templates → Create
+  2. Template ID:      template_golf_lead
+  3. Service:          service_1c4k67j  (existing service, also used by Christmas Bundles)
+  4. Subject line:     {{lead_score_emoji}} GOLF LEAD ({{lead_score}}): {{company_name}} — {{player_count}} players, {{tournament_date}}
+  5. To Email:         {{to_email}}
+  6. Reply-To:         {{reply_to}}
+  7. From Name:        NWCA Golf Tournament Lead
+  8. Content tab:
+       - HTML version:        copy everything from <body> through </body> below
+       - Plain-text version:  copy the <pre>...</pre> block at the bottom of this file
+
+  PREVIEW
+  -------
+  Open this file in your browser:
+  http://localhost:3000/pages/golf-tournament-lead-emailjs-template.html
+  All the {{variable}} placeholders will show as raw text — that's expected.
+  EmailJS will substitute them when an email is sent.
+
+  AVAILABLE VARIABLES (already wired in the form code)
+  ----------------------------------------------------
+  to_email             taneisha+nika+erik
+  reply_to             customer's email (so reply goes straight to them)
+  quote_id             e.g. GOLF0504-1
+  lead_score           HOT / WARM / STANDARD
+  lead_score_emoji     🔥 / 🟡 / 🟢
+  customer_name        from form
+  customer_email       from form
+  customer_phone       from form
+  company_name         from form (tournament/company name)
+  tournament_date      "July 2026" (formatted)
+  player_count         24 / 48 / 72 / 144 / other
+  interests            comma-separated list of checked items
+  notes                customer's notes (optional)
+  submitted_at         pacific time formatted timestamp
+  utm_source           e.g. mailchimp, homepage, bag-detail
+  utm_campaign         e.g. golf-2026-q2
+  utm_medium           e.g. banner, hero, card, bonus-callout
+  talking_points       auto-generated based on lead score
+
+-->
+</head>
+<body style="margin:0;padding:0;background-color:#f3f4f6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1a472a;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f3f4f6;padding:24px 0;">
+  <tr><td align="center">
+    <table width="640" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e5e7eb;">
+
+      <!-- Lead score header -->
+      <tr><td style="background:linear-gradient(135deg,#1a472a 0%,#3a7d44 100%);padding:24px 28px;color:#ffffff;">
+        <div style="font-size:14px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.9;margin-bottom:6px;">
+          {{lead_score_emoji}} {{lead_score}} LEAD &middot; {{quote_id}}
+        </div>
+        <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;line-height:1.25;">
+          {{company_name}}
+        </div>
+        <div style="font-size:14px;opacity:0.9;margin-top:6px;">
+          {{player_count}} players &middot; {{tournament_date}}
+        </div>
+      </td></tr>
+
+      <!-- Quick action bar -->
+      <tr><td style="padding:18px 28px;background:#f0fdf4;border-bottom:1px solid #bbf7d0;">
+        <table width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="font-size:14px;color:#1a472a;">
+            <strong>Reply to this email</strong> to respond directly to {{customer_name}}.
+          </td>
+          <td align="right" style="font-size:13px;">
+            <a href="tel:{{customer_phone}}" style="background:#1a472a;color:#ffffff;padding:8px 14px;border-radius:6px;text-decoration:none;font-weight:600;display:inline-block;">📞 Call now</a>
+          </td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Customer info -->
+      <tr><td style="padding:24px 28px 8px 28px;">
+        <h2 style="margin:0 0 12px 0;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#6b7280;">Customer</h2>
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.7;">
+          <tr><td width="120" style="color:#6b7280;">Name</td><td style="color:#1a472a;font-weight:600;">{{customer_name}}</td></tr>
+          <tr><td style="color:#6b7280;">Company</td><td style="color:#1a472a;font-weight:600;">{{company_name}}</td></tr>
+          <tr><td style="color:#6b7280;">Email</td><td><a href="mailto:{{customer_email}}" style="color:#1a472a;font-weight:600;text-decoration:none;">{{customer_email}}</a></td></tr>
+          <tr><td style="color:#6b7280;">Phone</td><td><a href="tel:{{customer_phone}}" style="color:#1a472a;font-weight:600;text-decoration:none;">{{customer_phone}}</a></td></tr>
+        </table>
+      </td></tr>
+
+      <!-- Tournament info -->
+      <tr><td style="padding:8px 28px;">
+        <h2 style="margin:18px 0 12px 0;font-size:13px;text-transform:uppercase;letter-spacing:0.05em;color:#6b7280;">Tournament</h2>
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:15px;line-height:1.7;">
+          <tr><td width="120" style="color:#6b7280;vertical-align:top;">Date</td><td style="color:#1a472a;font-weight:600;">{{tournament_date}}</td></tr>
+          <tr><td style="color:#6b7280;vertical-align:top;">Player count</td><td style="color:#1a472a;font-weight:600;">{{player_count}}</td></tr>
+          <tr><td style="color:#6b7280;vertical-align:top;">Interested in</td><td style="color:#1a472a;">{{interests}}</td></tr>
+          <tr><td style="color:#6b7280;vertical-align:top;">Notes</td><td style="color:#1a472a;">{{notes}}</td></tr>
+        </table>
+      </td></tr>
+
+      <!-- Talking points (gold callout) -->
+      <tr><td style="padding:8px 28px 24px 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr><td style="background:#fef3c7;border-left:4px solid #fbbf24;padding:16px 18px;border-radius:4px;">
+            <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.08em;color:#92400e;font-weight:700;margin-bottom:8px;">
+              💡 Suggested talking points
+            </div>
+            <div style="font-size:14px;line-height:1.55;color:#1a472a;">
+              {{talking_points}}
+            </div>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- Attribution + meta -->
+      <tr><td style="padding:8px 28px 24px 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="font-size:12px;color:#6b7280;border-top:1px solid #e5e7eb;padding-top:12px;">
+          <tr><td style="padding-top:12px;">
+            <strong>Quote ID:</strong> {{quote_id}}<br>
+            <strong>Submitted:</strong> {{submitted_at}}<br>
+            <strong>Source:</strong> {{utm_source}} &middot; {{utm_campaign}} &middot; {{utm_medium}}
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background:#f9fafb;padding:16px 28px;border-top:1px solid #e5e7eb;text-align:center;font-size:12px;color:#6b7280;">
+        Northwest Custom Apparel &middot; sales@nwcustomapparel.com &middot; 253-922-5793<br>
+        Lead saved to Caspio quote_sessions table — searchable by Quote ID.
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+
+<!--
+  ============================================================
+  PLAIN-TEXT FALLBACK (paste into EmailJS's plain-text content tab)
+  ============================================================
+  This is also what Zapier should parse to extract fields for Slack.
+  Don't include the <pre> tags — just the contents.
+-->
+<pre style="display:none;">
+{{lead_score_emoji}} {{lead_score}} LEAD — {{company_name}}
+
+Quote ID:     {{quote_id}}
+Submitted:    {{submitted_at}}
+
+CUSTOMER
+  Name:       {{customer_name}}
+  Company:    {{company_name}}
+  Email:      {{customer_email}}
+  Phone:      {{customer_phone}}
+
+TOURNAMENT
+  Date:       {{tournament_date}}
+  Players:    {{player_count}}
+  Interests:  {{interests}}
+  Notes:      {{notes}}
+
+TALKING POINTS
+  {{talking_points}}
+
+ATTRIBUTION
+  Source:     {{utm_source}}
+  Campaign:   {{utm_campaign}}
+  Medium:     {{utm_medium}}
+
+Reply to this email to respond directly to {{customer_name}}.
+Lead saved to Caspio quote_sessions table.
+</pre>
+
+</body>
+</html>
