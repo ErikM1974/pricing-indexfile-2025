@@ -82,7 +82,10 @@
                onError={(e) => { e.target.style.display = 'none'; }} />
           <div className="cav-header-brand-text">
             <span className="cav-brand-line">Northwest Custom Apparel</span>
-            <span className="cav-brand-sub">Since 1977 · Milton, WA</span>
+            <span className="cav-brand-sub">Since 1977 · Family-owned</span>
+            <span className="cav-brand-addr">2025 Freeman Road East</span>
+            <span className="cav-brand-addr">Milton, Washington 98354</span>
+            <span className="cav-brand-addr cav-brand-addr--mono">253-922-5793</span>
           </div>
         </div>
         <div className="cav-header-order">
@@ -350,40 +353,69 @@
   }
 
   // ---------- action bar ----------
-  function CavActions({ draftId, draftStatus }) {
-    const isApproved = draftStatus === 'Approved';
+  // Phase D.3 (2026-05-04) — Approve button now flips the Caspio session
+  // status to 'Approved' via window.nwOrderAPI.approveDraft. Email/SMS
+  // notification to the sales rep is the next step ("wire email on the
+  // final thing" — D.3.1).
+  function CavActions({ draftId, draftStatus, onLocalStatusChange }) {
+    const initiallyApproved = draftStatus === 'Approved';
+    const [approving, setApproving] = useState(false);
+    const [approved, setApproved] = useState(initiallyApproved);
+    const [approveError, setApproveError] = useState('');
     const [requestOpen, setRequestOpen] = useState(false);
+    const isApproved = approved || initiallyApproved;
 
-    function handleApprove() {
-      // Phase D.3 — wire to server; for D.2, smoke test only
-      alert('Approve flow ships in Phase D.3. Your sales rep will follow up directly for now.');
+    async function handleApprove() {
+      if (isApproved || approving) return;
+      if (!window.nwOrderAPI?.approveDraft) {
+        setApproveError('Approval is temporarily unavailable. Please call your sales rep at 253-922-5793.');
+        return;
+      }
+      setApproving(true);
+      setApproveError('');
+      try {
+        await window.nwOrderAPI.approveDraft(draftId);
+        setApproved(true);
+        if (typeof onLocalStatusChange === 'function') onLocalStatusChange('Approved');
+        // Smooth-scroll back to the top so the green "Approved" pill is
+        // immediately visible — confirms the action without a popup.
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
+      } catch (err) {
+        console.error('[CAV] approve failed:', err);
+        setApproveError(`Could not record your approval: ${err.message || 'unknown error'}. Please call 253-922-5793.`);
+      } finally {
+        setApproving(false);
+      }
     }
     function handlePrint() { window.print(); }
 
     return (
       <section className="cav-card cav-actions">
-        <h2 className="cav-card-title">Approve this order</h2>
+        <h2 className="cav-card-title">{isApproved ? 'Order approved' : 'Approve this order'}</h2>
         <p className="cav-actions-blurb">
-          Review the order above. When everything looks right, click Approve.
-          Anything you'd like changed? Use Request Changes — your sales rep
-          gets the note immediately.
+          {isApproved
+            ? 'Thank you — your sales rep has been notified and will be in touch shortly to confirm production timing.'
+            : 'Review the order above. When everything looks right, click Approve. Anything you’d like changed? Use Request Changes — your sales rep gets the note immediately.'
+          }
         </p>
         <div className="cav-actions-row">
           <button
             type="button"
             className="cav-btn cav-btn--primary"
             onClick={handleApprove}
-            disabled={isApproved}
+            disabled={isApproved || approving}
           >
-            {isApproved ? '✓ Approved' : 'Approve order'}
+            {isApproved ? '✓ Approved' : (approving ? 'Approving…' : 'Approve order')}
           </button>
-          <button
-            type="button"
-            className="cav-btn cav-btn--secondary"
-            onClick={() => setRequestOpen(o => !o)}
-          >
-            Request changes
-          </button>
+          {!isApproved && (
+            <button
+              type="button"
+              className="cav-btn cav-btn--secondary"
+              onClick={() => setRequestOpen(o => !o)}
+            >
+              Request changes
+            </button>
+          )}
           <button
             type="button"
             className="cav-btn cav-btn--ghost"
@@ -392,7 +424,12 @@
             Print / Save PDF
           </button>
         </div>
-        {requestOpen && (
+        {approveError && (
+          <div className="cav-approve-error" role="alert">
+            {approveError}
+          </div>
+        )}
+        {requestOpen && !isApproved && (
           <div className="cav-changes-form">
             <textarea
               className="cav-changes-text"
@@ -400,7 +437,7 @@
               rows={4}
             />
             <div className="cav-changes-help">
-              Phase D.3 will send this directly to your sales rep. For now, please reply to your quote email or call <strong>253-922-5793</strong>.
+              Sales-rep email handoff ships in the next step. For now, please reply to your quote email or call <strong>253-922-5793</strong>.
             </div>
           </div>
         )}
@@ -415,10 +452,14 @@
     const visibleRows = useMemo(() => (rows || []).filter(isVisibleRow), [rows]);
     const byRow = breakdown?.byRow;
     const getBreakdown = (id) => (byRow?.get?.(id) ?? byRow?.[id] ?? null);
+    // Local-only status mirror so the header pill flips green the moment the
+    // customer clicks Approve, without waiting for a full draft reload.
+    const [localStatus, setLocalStatus] = useState(draftStatus);
+    const effectiveStatus = localStatus || draftStatus;
 
     return (
       <div className="cav">
-        <CavHeader info={info} draftId={draftId} draftStatus={draftStatus} />
+        <CavHeader info={info} draftId={draftId} draftStatus={effectiveStatus} />
         <CavInfoCard info={info} ship={ship} />
 
         <div className="cav-main">
@@ -448,10 +489,14 @@
           <CavSummary breakdown={breakdown} />
         </div>
 
-        <CavActions draftId={draftId} draftStatus={draftStatus} />
+        <CavActions
+          draftId={draftId}
+          draftStatus={effectiveStatus}
+          onLocalStatusChange={setLocalStatus}
+        />
 
         <footer className="cav-footer">
-          <div className="cav-footer-line">Northwest Custom Apparel · 2025 Freeman Rd E, Milton WA 98354</div>
+          <div className="cav-footer-line">Northwest Custom Apparel · 2025 Freeman Road East, Milton, Washington 98354</div>
           <div className="cav-footer-line">253-922-5793 · sales@nwcustomapparel.com · nwcustomapparel.com</div>
         </footer>
       </div>

@@ -70,6 +70,22 @@
   margin-top: 2px;
 }
 
+.cav-brand-addr {
+  font-size: 12px;
+  color: var(--ink-2, #475569);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.cav-brand-addr--mono {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 11.5px;
+  margin-top: 4px;
+  color: var(--accent, #2f6f3f);
+  font-weight: 600;
+}
+
 .cav-header-order {
   text-align: right;
   display: flex;
@@ -638,6 +654,17 @@
 }
 .cav-btn--ghost:hover {
   background: var(--line, #e5e7eb);
+}
+
+.cav-approve-error {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #991b1b;
+  line-height: 1.5;
 }
 
 .cav-changes-form {

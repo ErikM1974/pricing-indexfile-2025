@@ -1886,6 +1886,65 @@ app.post('/api/order-form-drafts', async (req, res) => {
   }
 });
 
+// POST /api/order-form-drafts/:draftId/approve
+// Phase D.3 (2026-05-04) — Customer-facing Approve action. Looks up the
+// quote_session by QuoteID (e.g. OF-0035), then PUTs Status='Approved'
+// via Caspio. Returns the timestamp + status so the customer's view
+// can reflect the approval immediately. EmailJS notification to the
+// sales rep is wired in a follow-up step per Erik's "wire email on
+// the final thing" instruction.
+app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
+  try {
+    const draftId = String(req.params.draftId || '').trim();
+    if (!/^OF-\d+$/.test(draftId)) {
+      return res.status(400).json({ success: false, error: 'Invalid draft ID format' });
+    }
+    const PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+    // 1. Look up the session by QuoteID to get its PK_ID
+    const lookupUrl = `${PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(draftId)}`;
+    const lookupRes = await fetch(lookupUrl);
+    if (!lookupRes.ok) {
+      const txt = await lookupRes.text();
+      console.error(`[Order Form Approve] Lookup failed for ${draftId}:`, txt);
+      return res.status(502).json({ success: false, error: 'Lookup failed', detail: txt });
+    }
+    const sessions = await lookupRes.json();
+    const session = Array.isArray(sessions) ? sessions[0] : sessions;
+    if (!session || !session.PK_ID) {
+      return res.status(404).json({ success: false, error: 'Draft not found' });
+    }
+    if (session.Status === 'Approved') {
+      return res.json({ success: true, draftId, status: 'Approved', alreadyApproved: true });
+    }
+
+    // 2. PUT Status='Approved' via the proxy's quote_sessions update route
+    const putUrl = `${PROXY}/api/quote_sessions/${session.PK_ID}`;
+    const putRes = await fetch(putUrl, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Status: 'Approved' })
+    });
+    if (!putRes.ok) {
+      const txt = await putRes.text();
+      console.error(`[Order Form Approve] Update failed for ${draftId}:`, txt);
+      return res.status(502).json({ success: false, error: 'Update failed', detail: txt });
+    }
+
+    console.log(`[Order Form Approve] ✓ ${draftId} approved`);
+    res.json({
+      success: true,
+      draftId,
+      status: 'Approved',
+      approvedAt: new Date().toISOString(),
+      // Email + SMS notification to sales rep ships in the next phase.
+    });
+  } catch (err) {
+    console.error('[Order Form Approve] Error:', err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // Sales-rep slug → full name. The form's <select> in paper-form.jsx:1562
 // stores a lowercase login slug ("taneisha") as the value because that's
 // the legacy convention. ShopWorks's CustomerServiceRep field displays

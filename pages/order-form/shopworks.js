@@ -188,6 +188,21 @@ window.nwOrderAPI = (function () {
     };
   }
 
+  // Phase D.3 (2026-05-04) — Customer-facing Approve action. Flips the
+  // quote_session Status to 'Approved' via server.js (which talks to the
+  // proxy's PUT /api/quote_sessions/:pkid).
+  async function approveDraft(draftId) {
+    const safe = String(draftId || '').trim();
+    if (!/^OF-\d+$/.test(safe)) throw new Error('Invalid draft ID format');
+    const r = await fetch(`/api/order-form-drafts/${encodeURIComponent(safe)}/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const json = await r.json().catch(() => ({}));
+    if (!r.ok || !json.success) throw new Error(json.error || `HTTP ${r.status}`);
+    return json; // { success, draftId, status, approvedAt }
+  }
+
   // Always live against our backend — no browser-side ManageOrders creds needed.
-  return { submitOrder, saveDraft, loadDraft, isLive: true };
+  return { submitOrder, saveDraft, loadDraft, approveDraft, isLive: true };
 })();
