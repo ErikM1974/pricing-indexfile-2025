@@ -1,9 +1,13 @@
 // Order-Form Pricing — Screen Print.
 //
-// Beta chip until verified against /pricing/screen-print. Wraps
-// ScreenPrintPricingService — same engine the production page and quote
-// builder use. Form-wide config: front colors + back colors + sleeve colors,
-// each 0-6, with optional white underbase per location.
+// Phase 5c (2026-05-03) — color steppers + white-underbase checkbox migrated
+// to drag-and-drop rail cards. Each location (Front/Back/Sleeve) is now a
+// CONFIGURATOR virtual card with a `colorCount` param edited inline on the
+// row sub-row. White underbase is a separate toggle card. Pricing math
+// unchanged (still wraps ScreenPrintPricingService) — we just translate the
+// dropped addOns back into the engine's expected `{frontColors, backColors,
+// sleeveColors, whiteUnderbase}` shape before running aggregate. Verified
+// after the migration.
 
 (function () {
   const { useState } = React;
@@ -11,6 +15,95 @@
 
   let _svc = null;
   function svc() { return _svc ||= new window.ScreenPrintPricingService(); }
+
+  // Phase 5c — virtual rail cards. Front/Back/Sleeve each carry a colorCount
+  // param (default 1) edited inline. UNDERBASE is a boolean toggle (drop =
+  // on, ✕ = off). All four are CONFIGURATOR — markup baked into per-piece
+  // by the existing pricing service, no separate line items.
+  const VIRTUAL_CARDS = [
+    {
+      ServiceCode: 'SP-FRONT',
+      DisplayName: 'Front Print',
+      ServiceType: 'SCREENPRINT',
+      RailGroup: 'SP Locations',
+      RailOrder: 10,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'colors per location',
+      IsActive: true,
+      Visible: true,
+      _spLocation: 'front',
+      _defaultColorCount: 1,
+      _hasColorCountInput: true,
+    },
+    {
+      ServiceCode: 'SP-BACK',
+      DisplayName: 'Back Print',
+      ServiceType: 'SCREENPRINT',
+      RailGroup: 'SP Locations',
+      RailOrder: 20,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'colors per location',
+      IsActive: true,
+      Visible: true,
+      _spLocation: 'back',
+      _defaultColorCount: 1,
+      _hasColorCountInput: true,
+    },
+    {
+      ServiceCode: 'SP-SLEEVE',
+      DisplayName: 'Sleeve Print',
+      ServiceType: 'SCREENPRINT',
+      RailGroup: 'SP Locations',
+      RailOrder: 30,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'colors per location',
+      IsActive: true,
+      Visible: true,
+      _spLocation: 'sleeve',
+      _defaultColorCount: 1,
+      _hasColorCountInput: true,
+    },
+    {
+      ServiceCode: 'SP-UNDERBASE',
+      DisplayName: 'White Underbase',
+      ServiceType: 'SCREENPRINT',
+      RailGroup: 'SP Extras',
+      RailOrder: 10,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: '+1 effective front color',
+      IsActive: true,
+      Visible: true,
+      _spLocation: 'underbase',
+    },
+  ];
+  if (window.OrderFormServiceCodes?.registerVirtual) {
+    window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
+  }
+
+  // Translate SP addOns into the {frontColors, backColors, sleeveColors,
+  // whiteUnderbase} shape the existing pricing math expects. Drops with no
+  // colorCount fall back to _defaultColorCount → 1.
+  function configFromAddOns(addOns) {
+    const out = { frontColors: 0, backColors: 0, sleeveColors: 0, whiteUnderbase: false };
+    (addOns || []).forEach(a => {
+      if (!a?.code) return;
+      const sc = window.OrderFormServiceCodes?.get?.(a.code);
+      const loc = sc?._spLocation;
+      if (loc === 'underbase') {
+        out.whiteUnderbase = true;
+        return;
+      }
+      if (loc === 'front' || loc === 'back' || loc === 'sleeve') {
+        const colors = Math.max(1, Math.min(6, Number(a?.params?.colorCount) || sc?._defaultColorCount || 1));
+        out[`${loc}Colors`] = colors;
+      }
+    });
+    return out;
+  }
 
   // Bundle is the same as flat embroidery — call svc.fetchPricingData(style)
   // OR generateManualPricingData(blankCost) for manual mode.
@@ -52,7 +145,7 @@
     };
   }
 
-  function priceRow({ row, formCtx, bundle }) {
+  function priceRow({ row, formCtx, bundle, spConfig }) {
     const out = S.emptyRowBreakdown();
     const totalQty = Number(formCtx?.totalQty) || 0;
     if (!totalQty) return out;
@@ -61,7 +154,13 @@
     const tier = tierForQtyFromBundle(totalQty, bundle);
     if (!tier) { out.error = `No SP tier for qty ${totalQty}`; return out; }
 
-    const loc = activeLocations(formCtx?.decoConfig);
+    // Phase 5c — config sourced from CONFIGURATOR addOns; falls back to
+    // formCtx.decoConfig for legacy drafts saved before the migration.
+    const loc = activeLocations(spConfig || formCtx?.decoConfig);
+    if (loc.front === 0 && loc.back === 0 && loc.sleeve === 0) {
+      out.error = 'Drag at least one SP location from the rail (Front / Back / Sleeve)';
+      return out;
+    }
     // Effective front colors: white underbase counts as +1 (same convention as quote builder)
     const frontEffective = loc.front > 0 ? loc.front + (loc.whiteUnderbase ? 1 : 0) : 0;
     const frontKey = String(frontEffective);
@@ -133,10 +232,18 @@
     return out;
   }
 
-  async function aggregate({ rows, formCtx }) {
+  async function aggregate({ rows, formCtx, addOns }) {
     const out = S.emptyOrderBreakdown();
     out.totalQty = S.totalQtyAcrossRows(rows);
     if (!out.totalQty) return out;
+
+    // Phase 5c — resolve {frontColors, backColors, sleeveColors,
+    // whiteUnderbase} from CONFIGURATOR addOns once per aggregate. Falls
+    // back to legacy decoConfig when no SP- addons are present.
+    const spAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('SP-'));
+    const spConfig = spAddOns.length > 0
+      ? configFromAddOns(addOns)
+      : (formCtx?.decoConfig || {});
 
     const targets = (rows || []).filter(r => {
       if (!r) return false;
@@ -158,7 +265,7 @@
         out.byRow.set(row.id, { ...S.emptyRowBreakdown(), error: error || 'No bundle' });
         return;
       }
-      const rb = priceRow({ row, formCtx, bundle });
+      const rb = priceRow({ row, formCtx, bundle, spConfig });
       out.byRow.set(row.id, rb);
       out.subtotal += rb.rowSubtotal;
       if (!out.tier) out.tier = rb.tier;
@@ -168,8 +275,9 @@
     return out;
   }
 
-  function buildNotesBlock({ formCtx, breakdown }) {
-    const cfg = formCtx?.decoConfig || {};
+  function buildNotesBlock({ formCtx, breakdown, addOns }) {
+    const spAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('SP-'));
+    const cfg = spAddOns.length > 0 ? configFromAddOns(addOns) : (formCtx?.decoConfig || {});
     const front = Number(cfg.frontColors || 0);
     const back  = Number(cfg.backColors || 0);
     const sleeve = Number(cfg.sleeveColors || 0);
@@ -188,35 +296,19 @@
     return { designTypeId: 3, primaryLocation: 'Front', method: 'screenprint' };
   }
 
-  // ConfigBar — front/back/sleeve color steppers with white underbase
-  function ColorStepper({ label, value, onChange }) {
-    const v = Math.max(0, Math.min(6, Number(value) || 0));
-    return (
-      <div className="dcs-field">
-        <label className="dcs-lbl">{label}</label>
-        <button type="button" className="dcs-btn" onClick={() => onChange(Math.max(0, v - 1))} aria-label={`Decrease ${label}`}>−</button>
-        <input className="dcs-input dcs-input--num" type="number" min="0" max="6" value={v} onChange={(e) => onChange(Math.max(0, Math.min(6, Number(e.target.value) || 0)))} />
-        <button type="button" className="dcs-btn" onClick={() => onChange(Math.min(6, v + 1))} aria-label={`Increase ${label}`}>+</button>
-      </div>
-    );
-  }
-
-  function ConfigBar({ config, setConfig }) {
-    const front = config.frontColors ?? 1;
-    const back  = config.backColors ?? 0;
-    const sleeve = config.sleeveColors ?? 0;
-    const ub = !!config.whiteUnderbase;
+  // Phase 5c — SP ConfigBar shrinks to caption + hint. The 3 color steppers
+  // and the white-underbase checkbox moved to drag-and-drop rail cards
+  // (SP-FRONT/BACK/SLEEVE/UNDERBASE). Each location card carries a
+  // colorCount param edited inline on the row sub-row.
+  function ConfigBar() {
     return (
       <div className="deco-config-strip" data-method="screenprint">
-        <ColorStepper label="Front colors" value={front} onChange={(v) => setConfig({ ...config, frontColors: v })} />
-        <ColorStepper label="Back colors"  value={back}  onChange={(v) => setConfig({ ...config, backColors: v })} />
-        <ColorStepper label="Sleeve colors" value={sleeve} onChange={(v) => setConfig({ ...config, sleeveColors: v })} />
-        <label className="dcs-checkbox">
-          <input type="checkbox" checked={ub} onChange={(e) => setConfig({ ...config, whiteUnderbase: e.target.checked })} />
-          <span>White underbase (front)</span>
-        </label>
+        <div className="dcs-caption" aria-hidden>
+          Drag SP locations from the rail (Front / Back / Sleeve) — set color count inline.
+          Drop White Underbase if needed.
+        </div>
         <div className="dcs-hint">
-          Each location with colors {'>'} 0 counts as a print location · v2: per-row config
+          Each location with colors {'>'} 0 counts as a print location.
         </div>
       </div>
     );
@@ -230,10 +322,16 @@
   window.OrderFormPricing.register('screenprint', {
     method: 'screenprint',
     label: 'Screen Print',
-    verified: false,
-    betaNote: 'Cross-check totals against /pricing/screen-print before sending to ShopWorks',
+    // Phase 5c — verified after the addon migration. Color counts +
+    // underbase resolved from CONFIGURATOR addOns; pricing math
+    // (ScreenPrintPricingService primary + additional location lookups)
+    // unchanged. Pricing parity with /pricing/screen-print preserved.
+    verified: true,
+    betaNote: '',
     referenceUrl: '/pricing/screen-print',
-    defaultFormConfig: () => ({ frontColors: 1, backColors: 0, sleeveColors: 0, whiteUnderbase: false }),
+    // Phase 5c — defaults empty; locations come from addOns. Legacy drafts
+    // with frontColors/etc. fields still work via aggregate fallback.
+    defaultFormConfig: () => ({}),
     defaultRowConfig:  () => ({}),
     ConfigBar,
     tierForQty: () => null, // tier resolution requires a bundle — shown by aggregate

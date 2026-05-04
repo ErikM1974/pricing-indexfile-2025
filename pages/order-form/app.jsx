@@ -119,6 +119,10 @@ function App() {
   // Auto-pricing recompute. Debounced 300ms. Pulls breakdown from the active
   // method module via the registry. Breakdown is the source of truth for $
   // totals — rows stay focused on user input (style, sizes, manual flags).
+  //
+  // Phase 4e (2026-05-03) — addOns are now folded into priceForm() so the
+  // breakdown reflects per-row + order-level extras. Recomputes whenever
+  // addOns change so adding/removing/editing a sub-row updates totals live.
   useEffect(() => {
     const reg = window.OrderFormPricing;
     const S   = window.OrderFormPricingShared;
@@ -132,14 +136,14 @@ function App() {
     const formCtx = { deco, decoConfig, info, ship, totalQty, customerMode };
     const t = setTimeout(async () => {
       try {
-        const result = await reg.priceForm({ rows, formCtx });
+        const result = await reg.priceForm({ rows, formCtx, addOns });
         if (!cancelled) setBreakdown(result);
       } catch (err) {
         if (!cancelled) console.error('[OrderForm] priceForm failed:', err);
       }
     }, 300);
     return () => { cancelled = true; clearTimeout(t); };
-  }, [rows, decoConfig, customerMode]);
+  }, [rows, decoConfig, customerMode, addOns]);
 
   useEffect(() => {
     function onMsg(e) {

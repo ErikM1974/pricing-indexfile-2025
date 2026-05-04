@@ -93,14 +93,17 @@
     const sell = Number(service.SellPrice) || 0;
     const isStandardTier = (tier === 'Standard');
 
-    // TIERED stitch input state (AL/AL-CAP/DECG-FB/CTR-*)
+    // TIERED stitch input state (AL/AL-CAP/DECG-FB/CTR-*).
+    // Phase 4d (2026-05-03) — the on-card stitch INPUT was removed. The card
+    // now drags with a sensible default stitch count, and the rep edits
+    // inline on the row sub-row (paper-form.jsx#AddOnSubRow). The default
+    // value still drives the card's displayed "from $X/pc" price hint.
     const isStitchInput = STITCH_INPUT_CODES.has(code);
     const defaultStitches = useMemo(() => {
       if (code === 'AL-CAP') return 5000;
       if (code === 'DECG-FB') return 25000;
       return 8000;
     }, [code]);
-    const [stitchCount, setStitchCount] = useState(defaultStitches);
 
     // CALCULATED (RUSH) percent
     const [percent, setPercent] = useState(25);
@@ -113,20 +116,70 @@
 
     // Phase 7 — position for additional logos (AL/AL-CAP/DECG-FB/CTR-*).
     // Drives Designs[].Locations[] in the ShopWorks push so production knows
-    // where each additional logo goes. Defaults are smart per code family.
+    // where each additional logo goes. Phase 4d removed the on-card position
+    // dropdown — drop with default position, edit inline on the sub-row.
     const hasPositionInput = POSITION_INPUT_CODES.has(code);
-    const [position, setPosition] = useState(() => defaultPositionFor(code));
-    const positionOptions = useMemo(() => positionsFor(code), [code]);
 
-    // Live-computed price for TIERED stitch-input cards
+    // Live-computed price for TIERED stitch-input cards. Computed at the
+    // default stitch count (the card no longer takes user input here);
+    // becomes a "from $X/pc" hint that helps reps gauge cost before dropping.
+    //
+    // Phase 4d (2026-05-03) — added `liveTick` so the price reactively
+    // recomputes once tieredPricing.preload() resolves. Pre-Phase-4d the
+    // on-card stitch input's state change masked this race; with the input
+    // gone, we need an explicit trigger.
+    const [liveTick, setLiveTick] = useState(0);
+    useEffect(() => {
+      if (!isStitchInput) return;
+      const tp = window.OrderFormTieredPricing;
+      if (!tp?.preload) return;
+      let cancelled = false;
+      tp.preload().then(() => {
+        if (!cancelled) setLiveTick(t => t + 1);
+      }).catch(() => {});
+      return () => { cancelled = true; };
+    }, [isStitchInput]);
     const livePrice = useMemo(() => {
       if (!isStitchInput) return null;
       const tp = window.OrderFormTieredPricing;
       if (!tp) return null;
       // Use a typical 24-qty for tier resolution
-      const v = tp.resolveSync(code, { stitchCount: Number(stitchCount) || 0, qty: 24 });
+      const v = tp.resolveSync(code, { stitchCount: defaultStitches, qty: 24 });
       return Number.isFinite(v) ? v : null;
-    }, [code, stitchCount, isStitchInput]);
+    }, [code, defaultStitches, isStitchInput, liveTick]);
+
+    // Phase 6a (2026-05-03) — build a custom drag preview ghost. Replaces
+    // the browser's default snapshot of the entire `.rail-card` element
+    // with a compact pill ("AL-CAP · Additional Logo Cap"). The ghost is
+    // attached for the OS drag image, then auto-removed from the DOM after
+    // the OS has captured it. Position offset (-12, -12) puts the cursor
+    // near the top-left of the pill so the rep can clearly see what they
+    // grabbed without it obscuring the drop target underneath.
+    function buildDragGhost(displayCode, displayLabel) {
+      const ghost = document.createElement('div');
+      ghost.className = 'rail-drag-ghost';
+      ghost.setAttribute('aria-hidden', 'true');
+      const codeEl = document.createElement('span');
+      codeEl.className = 'rail-drag-ghost-code';
+      codeEl.textContent = displayCode;
+      const labelEl = document.createElement('span');
+      labelEl.className = 'rail-drag-ghost-label';
+      labelEl.textContent = displayLabel;
+      ghost.appendChild(codeEl);
+      ghost.appendChild(labelEl);
+      // Off-screen so the user never sees the placeholder DOM node — only
+      // the OS drag image rendered FROM it.
+      ghost.style.position = 'fixed';
+      ghost.style.top = '-9999px';
+      ghost.style.left = '-9999px';
+      document.body.appendChild(ghost);
+      // Auto-cleanup after the OS finishes capturing (a single tick is
+      // plenty — the drag image is a static snapshot, not a live element).
+      setTimeout(() => {
+        if (ghost.parentNode) ghost.parentNode.removeChild(ghost);
+      }, 0);
+      return ghost;
+    }
 
     // Drag start handler — builds the payload that ServiceRail consumes
     function handleDragStart(e) {
@@ -145,12 +198,14 @@
           if (tier && (code === 'AS-CAP' || code === 'AS-Garm')) {
             payload.params = { tier, unitPrice: sell };
           } else {
-            // AL/AL-CAP/DECG-FB/CTR-*: use the typed stitchCount + livePrice
-            // + position (Phase 7) so server.js can route to Designs[].Locations[]
+            // AL/AL-CAP/DECG-FB/CTR-*: drop with sensible defaults — rep
+            // edits stitch count + position inline on the row sub-row
+            // (paper-form.jsx#AddOnSubRow). Phase 4d removed the on-card
+            // inputs in favor of post-drop inline editing.
             payload.params = {
-              stitchCount: Number(stitchCount) || 0,
+              stitchCount: defaultStitches,
               unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
-              position: position || defaultPositionFor(code),
+              position: defaultPositionFor(code),
             };
           }
           break;
@@ -163,6 +218,12 @@
         case 'PASSTHROUGH':
           payload.params = { amount: Number(amount) || 0 };
           break;
+        case 'CONFIGURATOR':
+          // Phase 5a — emblem METALLIC/VELCRO/EXTRA-COLOR cards. Drop just
+          // toggles a flag (or adds a count) inside the method's aggregate.
+          // No params needed beyond the code itself.
+          payload.params = {};
+          break;
       }
 
       // Set DataTransfer with code so drop zones can do eligibility check
@@ -170,6 +231,16 @@
       try {
         e.dataTransfer.setData('text/plain', code);
       } catch (_) {}
+
+      // Phase 6a — custom drag image. Tier cards include their tier in the
+      // code chip ("AS-CAP MID"); other cards just show the code.
+      try {
+        const ghostCode = tier && (code === 'AS-CAP' || code === 'AS-Garm')
+          ? `${code} ${tier}`
+          : code;
+        const ghost = buildDragGhost(ghostCode, service.DisplayName || code);
+        e.dataTransfer.setDragImage(ghost, 12, 12);
+      } catch (_) { /* setDragImage unsupported — fall back to default */ }
 
       onDragStart && onDragStart(payload);
     }
@@ -192,9 +263,9 @@
             payload.params = { tier, unitPrice: sell };
           } else {
             payload.params = {
-              stitchCount: Number(stitchCount) || 0,
+              stitchCount: defaultStitches,
               unitPrice: Number.isFinite(livePrice) ? livePrice : 0,
-              position: position || defaultPositionFor(code),
+              position: defaultPositionFor(code),
             };
           }
           break;
@@ -204,6 +275,8 @@
           payload.params = { hours: Number(hours) || 1, unitPrice: sell }; break;
         case 'PASSTHROUGH':
           payload.params = { amount: Number(amount) || 0 }; break;
+        case 'CONFIGURATOR':
+          payload.params = {}; break;
       }
       return payload;
     }
@@ -215,6 +288,27 @@
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL') return;
       const payload = buildPayload();
       if (payload && onTap) onTap(payload);
+    }
+
+    // Phase 6e (2026-05-03) — keyboard activation. Tab focuses the card,
+    // Enter/Space selects it (same path as touch tap), Escape cancels the
+    // selection. Skip when the focus is inside an input on the card so
+    // typing into a stitch/percent/hours input doesn't accidentally trigger.
+    function handleKeyDown(e) {
+      if (isStandardTier) return;
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const payload = buildPayload();
+        if (payload && onTap) onTap(payload);
+      } else if (e.key === 'Escape' && selected) {
+        e.preventDefault();
+        // Re-fire onTap with the same card → service-rail's onTapCard
+        // toggles off when called twice with the same PK_ID, so this acts
+        // as a deselect.
+        const payload = buildPayload();
+        if (payload && onTap) onTap(payload);
+      }
     }
 
     const groupCls = groupClassFor(service.RailGroup);
@@ -258,8 +352,17 @@
           priceLabel = isStandardTier ? '$0' : `+${fmt$(sell)}`;
           priceSuffix = ' per piece';
         } else {
-          priceLabel = livePrice != null ? fmt$(livePrice) : '—';
-          priceSuffix = ' per piece';
+          // Phase 4d — show "from $X/pc · {default}K" since the rep can no
+          // longer set stitches on the card. Makes it clear the displayed
+          // price is a baseline that will adjust based on inline edits.
+          if (livePrice != null) {
+            priceLabel = `from ${fmt$(livePrice)}`;
+            const defK = Math.round(defaultStitches / 1000);
+            priceSuffix = `/pc · default ${defK}K stitches`;
+          } else {
+            priceLabel = '—';
+            priceSuffix = ' per piece';
+          }
         }
         break;
       case 'CALCULATED':
@@ -274,6 +377,13 @@
         priceLabel = amount ? fmt$(amount) : '$0';
         priceSuffix = ' (rep enters)';
         break;
+      case 'CONFIGURATOR':
+        // Phase 5a — show the % markup hint (e.g. "+25% per piece") instead
+        // of a dollar amount. The markup is baked into the row's per-piece
+        // price by the method's aggregate, not a separate line item.
+        priceLabel = service.PerUnit || 'configurator';
+        priceSuffix = '';
+        break;
     }
 
     return (
@@ -283,6 +393,13 @@
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={isStandardTier ? -1 : 0}
+        role="button"
+        aria-label={isStandardTier
+          ? `${title} — included, no action needed`
+          : `${title} — press Enter to select, then Tab to a row and press Enter again to place`}
+        aria-pressed={selected ? true : undefined}
         title={isStandardTier
           ? `Standard tier — included in base price, no surcharge needed. Drag Mid or Large for higher stitch counts.`
           : isTouch
@@ -313,42 +430,14 @@
           </span>
         )}
 
-        {/* Stitch input for AL/AL-CAP/DECG-FB/CTR-* */}
+        {/* Phase 4d (2026-05-03) — on-card stitch + position inputs were
+            REMOVED. Cards drop with sensible defaults (e.g. AL-CAP @ 5K
+            stitches at Hat Back); the rep edits both fields inline on the
+            row sub-row (paper-form.jsx#AddOnSubRow). Single edit surface,
+            less rail-card chrome. */}
         {isStitchInput && (
-          <div className="rail-card-input-row">
-            <label className="rail-card-input-label">Stitches:</label>
-            <input
-              className="rail-card-input rail-card-input--num"
-              type="number"
-              min="0"
-              step="500"
-              value={stitchCount}
-              onChange={e => setStitchCount(e.target.value)}
-              onClick={e => e.stopPropagation()}
-              onMouseDown={e => e.stopPropagation()}
-            />
-          </div>
-        )}
-
-        {/* Phase 7 — Position dropdown for additional logos. Production needs
-            to know where each AL/AL-CAP/DECG-FB lands. Default is smart per
-            code (Hat Back for caps, Right Sleeve for garments, Full Back for
-            DECG-FB). Hidden for DECG-FB since it's implicitly "Full Back". */}
-        {hasPositionInput && code !== 'DECG-FB' && positionOptions.length > 0 && (
-          <div className="rail-card-input-row">
-            <label className="rail-card-input-label">Position:</label>
-            <select
-              className="rail-card-input"
-              value={position}
-              onChange={e => setPosition(e.target.value)}
-              onClick={e => e.stopPropagation()}
-              onMouseDown={e => e.stopPropagation()}
-              style={{ width: 'auto', minWidth: '90px' }}
-            >
-              {positionOptions.map(p => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
+          <div className="rail-card-edit-hint" aria-hidden>
+            edit stitches + position after drop
           </div>
         )}
 
@@ -409,4 +498,16 @@
   }
 
   window.OrderFormRailCard = RailCard;
+  // Phase 4c (2026-05-03) — export the position/stitch helpers so the row
+  // sub-row UI in paper-form.jsx can use the same data without duplication.
+  // Single source of truth for "which codes are stitchable / positionable
+  // and what positions they accept" lives here.
+  window.OrderFormRailCardHelpers = {
+    STITCH_INPUT_CODES,
+    POSITION_INPUT_CODES,
+    GARMENT_POSITIONS,
+    CAP_POSITIONS,
+    positionsFor,
+    defaultPositionFor,
+  };
 })();

@@ -139,6 +139,123 @@ window.OrderFormPricingShared = (function () {
       );
   }
 
+  // ---------------------------------------------------------------------------
+  // Phase 4e (2026-05-03) — single source of truth for addon line-total math.
+  //
+  // Mirrors the per-method routing inside add-on-picker.jsx#chipLineTotal +
+  // paper-form.jsx#AddOnSubRow. Used by both the display layer (so a sub-row
+  // shows the correct total) and the registry's priceForm rollup (so the
+  // breakdown.subtotal includes addons before tax/deposit). Keeping ONE
+  // function ensures the row's total cell, the totals panel, the AddOnSubRow,
+  // and the ShopWorks push all agree on the same number.
+  //
+  // The `breakdown` argument is needed only for RUSH (CALCULATED) which is a
+  // percentage of subtotal. For non-RUSH addons, breakdown is unused.
+  // ---------------------------------------------------------------------------
+  function addOnLineTotal(addOn, sc, breakdown) {
+    if (!addOn || !sc) return 0;
+    const method = String(sc.PricingMethod || '').toUpperCase();
+    const sell = Number(sc.SellPrice) || 0;
+    const qty = Number(addOn.qty) || 0;
+    const params = addOn.params || {};
+    const code = addOn.code;
+
+    if (method === 'TIERED') {
+      // AS-CAP/AS-Garm tier rows ship with frozen tier+unitPrice from rail-card
+      if (Number.isFinite(Number(params.unitPrice)) && (code === 'AS-CAP' || code === 'AS-Garm')) {
+        return Number(params.unitPrice) * qty;
+      }
+      const tp = window.OrderFormTieredPricing;
+      let unit = 0;
+      if (tp?.isTiered?.(code)) {
+        const sync = tp.resolveSync(code, {
+          qty,
+          tier: tp.tierForQty(qty),
+          stitchCount: Number(params.stitchCount) || 8000,
+        });
+        if (Number.isFinite(sync)) unit = Number(sync);
+      }
+      if (!unit && Number.isFinite(Number(params.unitPrice))) unit = Number(params.unitPrice);
+      return unit * qty;
+    }
+    if (method === 'FIXED' || method === 'FLAT') {
+      return sell * qty;
+    }
+    if (method === 'CALCULATED' && code === 'RUSH') {
+      const pct = Number(params.percent ?? 25) / 100;
+      // RUSH bills on the subtotal SNAPSHOTTED before RUSH was added back in
+      // (set by applyAddOnsToBreakdown). Falls back to subtotal pre-Phase-4e.
+      const base = Number(breakdown?.subtotalForRush ?? breakdown?.subtotal) || 0;
+      return base * pct;
+    }
+    if (method === 'HOURLY') {
+      const hrs = Number(params.hours) || 0;
+      return sell * hrs;
+    }
+    if (method === 'PASSTHROUGH') {
+      const amt = Number(params.amount) || 0;
+      return amt * Math.max(qty, 1);
+    }
+    // Phase 5a — CONFIGURATOR addons (emblem METALLIC/VELCRO/etc.) toggle
+    // an internal flag in the method's aggregate(); the markup is baked
+    // into the per-piece price, so the addon itself contributes $0 to the
+    // separate-line-item total. The sub-row UI shows "+25% per piece"
+    // text instead of a dollar value.
+    if (method === 'CONFIGURATOR') return 0;
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Phase 4e — apply per-row + order-level addOns to a breakdown produced by
+  // a method's aggregate(). Mutates `breakdown` in place:
+  //   - For row-scoped addOns: adds to byRow[rowId].rowSubtotal AND breakdown.subtotal
+  //   - For order-level addOns: adds to breakdown.subtotal only
+  //
+  // RUSH (CALCULATED, percentage-of-subtotal) is processed LAST so it sees
+  // the post-rollup subtotal and bills accurately on the full job. PASSTHROUGH
+  // addons (Discount, Freight, Pallet) compute before RUSH so the discount
+  // reduces what RUSH bills against — matches NWCA convention.
+  //
+  // Idempotent: calling twice should NOT double-count; we mark with a flag.
+  // ---------------------------------------------------------------------------
+  function applyAddOnsToBreakdown(breakdown, addOns) {
+    if (!breakdown || breakdown._addOnsApplied) return;
+    if (!Array.isArray(addOns) || addOns.length === 0) {
+      breakdown._addOnsApplied = true;
+      return;
+    }
+    const SC = window.OrderFormServiceCodes;
+    if (!SC) { breakdown._addOnsApplied = true; return; }
+
+    const rushQueue = [];
+    for (const a of addOns) {
+      if (!a?.code) continue;
+      if (a.code === 'RUSH') { rushQueue.push(a); continue; }
+      const sc = SC.get?.(a.code);
+      if (!sc) continue;
+      const lineTotal = addOnLineTotal(a, sc, breakdown) || 0;
+      if (a.scope && typeof a.scope === 'object' && a.scope.rowId) {
+        const rb = breakdown.byRow?.get?.(a.scope.rowId)
+                || (breakdown.byRow && breakdown.byRow[a.scope.rowId]);
+        if (rb) rb.rowSubtotal = (rb.rowSubtotal || 0) + lineTotal;
+      }
+      breakdown.subtotal = (breakdown.subtotal || 0) + lineTotal;
+    }
+    // RUSH last — uses the post-rollup, pre-RUSH subtotal so it bills on the
+    // full base+addons amount. Snapshot lives on breakdown.subtotalForRush so
+    // the display layer can recompute the same value (otherwise display would
+    // see breakdown.subtotal already including RUSH and double-count it).
+    breakdown.subtotalForRush = breakdown.subtotal || 0;
+    for (const a of rushQueue) {
+      const sc = SC.get?.(a.code);
+      if (!sc) continue;
+      const lineTotal = addOnLineTotal(a, sc, breakdown) || 0;
+      breakdown.subtotal = (breakdown.subtotal || 0) + lineTotal;
+    }
+    breakdown.grandTotal = breakdown.subtotal;
+    breakdown._addOnsApplied = true;
+  }
+
   return {
     safeNumber,
     roundPrice,
@@ -151,5 +268,7 @@ window.OrderFormPricingShared = (function () {
     WA_TAX_RATE,
     computeTaxAndDeposit,
     filterRailServices,
+    addOnLineTotal,
+    applyAddOnsToBreakdown,
   };
 })();

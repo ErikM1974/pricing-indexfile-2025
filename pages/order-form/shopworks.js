@@ -80,7 +80,10 @@ window.nwOrderAPI = (function () {
       const m   = reg?.getMethod?.(decoConfig?.method);
       if (m?.buildNotesBlock && breakdown) {
         const formCtx = { deco: decoConfig.method, decoConfig, info, ship, totalQty: breakdown.totalQty || 0 };
-        methodNotesBlock = m.buildNotesBlock({ formCtx, breakdown }) || '';
+        // Phase 4b/5a — pass `rows` (embroidery per-row primary logos) and
+        // `addOns` (emblem CONFIGURATOR addons resolve into markup notes).
+        // Methods ignore params they don't use.
+        methodNotesBlock = m.buildNotesBlock({ formCtx, breakdown, rows, addOns }) || '';
       }
     } catch (e) { /* non-fatal — notes are advisory */ }
     // Design number(s) for ShopWorks id_Design lookup. info.designNumber can

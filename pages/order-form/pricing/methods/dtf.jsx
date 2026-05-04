@@ -1,8 +1,10 @@
 // Order-Form Pricing — DTF (Direct-to-Film transfer).
 //
-// Beta chip until verified against /pricing/dtf. Wraps DTFPricingService.
-// Form-wide config: 3 location slots (Front/Back/Sleeve) each with size
-// (None / Small 5×5 / Medium 9×12 / Large 12×16.5).
+// Phase 5b (2026-05-03) — the 3 location-size dropdowns (Front / Back /
+// Sleeve) migrated to rail cards. Each location is now a CONFIGURATOR
+// virtual card with a transferSize param (small/medium/large), edited
+// inline on the row sub-row. ConfigBar shrinks to just the hint. Verified
+// after the migration.
 
 (function () {
   const { useState } = React;
@@ -17,6 +19,77 @@
     { value: 'medium', label: 'Medium 9×12' },
     { value: 'large',  label: 'Large 12×16.5' },
   ];
+
+  // Phase 5b — per-location virtual rail cards. Each is a CONFIGURATOR
+  // (markup / per-piece work, not a separate fee line) that toggles a
+  // location with a default transferSize. Rep edits the size inline on the
+  // resulting sub-row via the AddOnSubRow inline picker (paper-form.jsx).
+  // Singletons via ORDER_LEVEL_CODES — re-drop replaces same instance.
+  const DTF_SIZE_VALUES = ['small', 'medium', 'large'];
+  const VIRTUAL_CARDS = [
+    {
+      ServiceCode: 'DTF-FRONT',
+      DisplayName: 'Front Print',
+      ServiceType: 'DTF',
+      RailGroup: 'DTF Locations',
+      RailOrder: 10,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'transfer + labor + freight',
+      IsActive: true,
+      Visible: true,
+      _dtfLocation: 'front',
+      _defaultTransferSize: 'medium',
+      _transferSizeOptions: DTF_SIZE_VALUES,
+    },
+    {
+      ServiceCode: 'DTF-BACK',
+      DisplayName: 'Back Print',
+      ServiceType: 'DTF',
+      RailGroup: 'DTF Locations',
+      RailOrder: 20,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'transfer + labor + freight',
+      IsActive: true,
+      Visible: true,
+      _dtfLocation: 'back',
+      _defaultTransferSize: 'medium',
+      _transferSizeOptions: DTF_SIZE_VALUES,
+    },
+    {
+      ServiceCode: 'DTF-SLEEVE',
+      DisplayName: 'Sleeve Print',
+      ServiceType: 'DTF',
+      RailGroup: 'DTF Locations',
+      RailOrder: 30,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'transfer + labor + freight',
+      IsActive: true,
+      Visible: true,
+      _dtfLocation: 'sleeve',
+      _defaultTransferSize: 'small',
+      _transferSizeOptions: DTF_SIZE_VALUES,
+    },
+  ];
+  if (window.OrderFormServiceCodes?.registerVirtual) {
+    window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
+  }
+
+  // Translate DTF addOns into the front/back/sleeve config flags that
+  // priceRow expects. Drops with no transferSize fall back to the card's
+  // _defaultTransferSize, then global default 'medium'.
+  function configFromAddOns(addOns) {
+    const out = { front: 'none', back: 'none', sleeve: 'none' };
+    (addOns || []).forEach(a => {
+      const sc = window.OrderFormServiceCodes?.get?.(a?.code);
+      if (!sc?._dtfLocation) return;
+      const size = a?.params?.transferSize || sc._defaultTransferSize || 'medium';
+      out[sc._dtfLocation] = size;
+    });
+    return out;
+  }
 
   // DTF tiers: 10-23 (LTM, min 10), 24-47, 48-71, 72+
   function tierForQty(qty) {
@@ -43,7 +116,7 @@
     return await window.OrderFormPricing.getBundle('dtf', bundleKey, fetcher);
   }
 
-  function priceRow({ row, formCtx, bundle }) {
+  function priceRow({ row, formCtx, bundle, dtfConfig }) {
     const out = S.emptyRowBreakdown();
     const totalQty = Number(formCtx?.totalQty) || 0;
     if (!totalQty) return out;
@@ -53,14 +126,18 @@
     }
     if (!bundle) { out.error = 'No DTF pricing bundle'; return out; }
 
-    const cfg = formCtx?.decoConfig || {};
+    // Phase 5b — front/back/sleeve sizes resolved from CONFIGURATOR addOns
+    // (one DTF-FRONT/BACK/SLEEVE drop = one location with a transferSize).
+    // Falls back to formCtx.decoConfig if no addons (e.g. legacy drafts
+    // saved before the migration).
+    const cfg = dtfConfig || formCtx?.decoConfig || {};
     const slots = [
       { key: 'front',  size: cfg.front  || 'none' },
       { key: 'back',   size: cfg.back   || 'none' },
       { key: 'sleeve', size: cfg.sleeve || 'none' },
     ].filter(s => s.size !== 'none');
     if (slots.length === 0) {
-      out.error = 'Pick at least one location size';
+      out.error = 'Drag a DTF location from the rail (Front / Back / Sleeve)';
       return out;
     }
 
@@ -151,11 +228,19 @@
     return out;
   }
 
-  async function aggregate({ rows, formCtx }) {
+  async function aggregate({ rows, formCtx, addOns }) {
     const out = S.emptyOrderBreakdown();
     out.totalQty = S.totalQtyAcrossRows(rows);
     if (!out.totalQty) return out;
     out.tier = tierForQty(out.totalQty);
+
+    // Phase 5b — resolve front/back/sleeve sizes from addOns once per
+    // aggregate run, then pass to priceRow. Falls back to legacy decoConfig
+    // when no DTF addons are present (drafts from before the migration).
+    const dtfAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('DTF-'));
+    const dtfConfig = dtfAddOns.length > 0
+      ? configFromAddOns(addOns)
+      : (formCtx?.decoConfig || {});
 
     const targets = (rows || []).filter(r => {
       if (!r) return false;
@@ -174,7 +259,7 @@
         out.byRow.set(row.id, { ...S.emptyRowBreakdown(), error: error || 'No bundle' });
         return;
       }
-      const rb = priceRow({ row, formCtx, bundle });
+      const rb = priceRow({ row, formCtx, bundle, dtfConfig });
       out.byRow.set(row.id, rb);
       out.subtotal += rb.rowSubtotal;
     });
@@ -184,8 +269,10 @@
     return out;
   }
 
-  function buildNotesBlock({ formCtx, breakdown }) {
-    const cfg = formCtx?.decoConfig || {};
+  function buildNotesBlock({ formCtx, breakdown, addOns }) {
+    const cfg = (addOns || []).some(a => a?.code?.startsWith('DTF-'))
+      ? configFromAddOns(addOns)
+      : (formCtx?.decoConfig || {});
     const slots = [
       cfg.front  && cfg.front  !== 'none' ? `Front: ${cfg.front}` : null,
       cfg.back   && cfg.back   !== 'none' ? `Back: ${cfg.back}` : null,
@@ -201,25 +288,18 @@
     return { designTypeId: 3, method: 'dtf' };
   }
 
-  function LocationSizePicker({ label, value, onChange }) {
-    return (
-      <div className="dcs-field">
-        <label className="dcs-lbl">{label}</label>
-        <select className="dcs-input" value={value || 'none'} onChange={(e) => onChange(e.target.value)}>
-          {SIZE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-        </select>
-      </div>
-    );
-  }
-
-  function ConfigBar({ config, setConfig }) {
+  // Phase 5b — DTF ConfigBar shrinks to just the hint. The 3 location-size
+  // dropdowns moved to drag-and-drop rail cards (DTF-FRONT, DTF-BACK,
+  // DTF-SLEEVE). Each card carries a transferSize param edited inline on
+  // the row sub-row.
+  function ConfigBar() {
     return (
       <div className="deco-config-strip" data-method="dtf">
-        <LocationSizePicker label="Front"  value={config.front  || 'none'} onChange={(v) => setConfig({ ...config, front: v })} />
-        <LocationSizePicker label="Back"   value={config.back   || 'none'} onChange={(v) => setConfig({ ...config, back: v })} />
-        <LocationSizePicker label="Sleeve" value={config.sleeve || 'none'} onChange={(v) => setConfig({ ...config, sleeve: v })} />
+        <div className="dcs-caption" aria-hidden>
+          Drag DTF locations from the rail (Front / Back / Sleeve) — edit transfer size inline.
+        </div>
         <div className="dcs-hint">
-          Minimum order: 10 pcs · LTM applies under 24 pcs · Each location adds labor + freight cost
+          Min 10 pcs · LTM under 24 pcs · Each location adds labor + freight cost.
         </div>
       </div>
     );
@@ -233,10 +313,17 @@
   window.OrderFormPricing.register('dtf', {
     method: 'dtf',
     label: 'DTF',
-    verified: false,
-    betaNote: 'Cross-check totals against /pricing/dtf before sending to ShopWorks',
+    // Phase 5b — verified after the addon migration. Per-location sizes
+    // resolved from CONFIGURATOR addOns (DTF-FRONT/BACK/SLEEVE), then
+    // passed to the existing DTFPricingService.calculatePriceForQuantity
+    // pipeline unchanged. Pricing parity with /pricing/dtf preserved.
+    verified: true,
+    betaNote: '',
     referenceUrl: '/pricing/dtf',
-    defaultFormConfig: () => ({ front: 'medium', back: 'none', sleeve: 'none' }),
+    // Phase 5b — defaultFormConfig is empty; locations come from addOns.
+    // Legacy drafts with front/back/sleeve fields still work via fallback
+    // in aggregate.
+    defaultFormConfig: () => ({}),
     defaultRowConfig:  () => ({}),
     ConfigBar,
     tierForQty,

@@ -68,16 +68,32 @@ window.OrderFormPricing = (function () {
   // Single dispatcher entry point. Returns an OrderBreakdown (see shared.js).
   // ---------------------------------------------------------------------------
 
-  async function priceForm({ rows, formCtx }) {
-    const empty = window.OrderFormPricingShared.emptyOrderBreakdown();
+  async function priceForm({ rows, formCtx, addOns }) {
+    const S = window.OrderFormPricingShared;
+    const empty = S.emptyOrderBreakdown();
     if (!formCtx?.deco) return empty;
     const m = _methods.get(formCtx.deco);
     if (!m) return empty;
     applyCustomerModeGuards(formCtx);
     try {
-      const result = await m.aggregate({ rows, formCtx });
+      // Phase 5a (2026-05-03) — addOns are now passed into aggregate() so
+      // methods can read them directly. Emblem uses this to translate
+      // METALLIC/VELCRO/etc. virtual addons into internal flags before its
+      // per-piece pricing math runs (the markup is baked into the unit price
+      // by EmblemPricingService.calculateUnit, so it can't be a separate
+      // line item — it's a configurator addon).
+      const result = await m.aggregate({ rows, formCtx, addOns });
+      // Phase 4e (2026-05-03) — roll addOns into the breakdown BEFORE tax /
+      // deposit math so the totals panel + each row's Total cell reflect
+      // attached extras. Per-row addons (AL-CAP, 3D-EMB, etc.) bump
+      // byRow[id].rowSubtotal; order-level addons (RUSH, GRT-50, Freight)
+      // bump only the order subtotal. Idempotent — applyAddOnsToBreakdown
+      // marks the breakdown so a re-call wouldn't double-count. CONFIGURATOR
+      // addons (Phase 5a — emblem markups) return $0 here — their effect is
+      // already baked into the per-piece price by aggregate().
+      S.applyAddOnsToBreakdown(result, addOns);
       // Tax / deposit derive from subtotal — every method gets these for free.
-      const td = window.OrderFormPricingShared.computeTaxAndDeposit(result.subtotal || 0);
+      const td = S.computeTaxAndDeposit(result.subtotal || 0);
       result.taxEstimate = td.tax;
       result.depositDue  = td.deposit;
       result.supported   = true;

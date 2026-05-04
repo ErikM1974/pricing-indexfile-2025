@@ -2570,6 +2570,34 @@ app.post('/api/submit-order-form', async (req, res) => {
         console.warn('[Order Form Submit] quote_items save failed (non-fatal):', e.message);
       }
 
+      // Phase 6c (2026-05-03) — track customer service history. After every
+      // successful ShopWorks push, upsert one row in Customer_Service_History
+      // per addOn so the next time this customer's name shows up on an order,
+      // their most-used services float to the top of the rail. Best-effort —
+      // wrapped in try/catch so a tracking failure NEVER blocks submission.
+      try {
+        const company = (info?.company || '').trim();
+        const uniqueCodes = Array.isArray(addOns)
+          ? Array.from(new Set(addOns.filter(a => a?.code).map(a => String(a.code))))
+          : [];
+        if (company && uniqueCodes.length > 0) {
+          const HIST_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-form/customer-suggestions/history';
+          // Fire all upserts in parallel — Caspio handles concurrent writes
+          // fine since the table's composite unique index serializes the
+          // (Customer_Company, Service_Code) pair.
+          await Promise.allSettled(uniqueCodes.map(code =>
+            fetch(HIST_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ company, serviceCode: code, orderId: extOrderId }),
+            }).catch(() => null)
+          ));
+          console.log('[Order Form Submit] Customer_Service_History tracked', uniqueCodes.length, 'codes for', company);
+        }
+      } catch (e) {
+        console.warn('[Order Form Submit] Customer_Service_History upsert failed (non-fatal):', e.message);
+      }
+
       return res.json({ success: true, extOrderId, shopWorksId, mode: 'live', skippedLines });
     } else {
       console.error('[Order Form Submit] Push failed:', result);

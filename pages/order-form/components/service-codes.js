@@ -31,6 +31,11 @@
 
   let _inFlight = null;
   let _cached = null;
+  // Phase 5a (2026-05-03) — method-local virtual codes. Methods (e.g. emblem)
+  // can register cards that aren't in Caspio's Service_Codes table yet, so
+  // we can ship the rail UX without a database round-trip. Virtual codes
+  // are merged into all() / get() lookups exactly like Caspio rows.
+  const _virtual = new Map();  // ServiceCode → record
 
   // Read sessionStorage cache on first load (survives within the form session).
   try {
@@ -82,8 +87,26 @@
    * @returns {Object|null}
    */
   function get(code) {
-    if (!_cached || !code) return null;
+    if (!code) return null;
+    // Virtual codes win — methods can override Caspio entries during Phase 5
+    // migration (e.g. emblem's METALLIC vs an eventual Caspio entry).
+    if (_virtual.has(code)) return _virtual.get(code);
+    if (!_cached) return null;
     return _cached.find(s => s.ServiceCode === code) || null;
+  }
+
+  /**
+   * Phase 5a — register method-local virtual service codes. Used by methods
+   * (emblem, sticker, etc.) to ship rail cards that aren't in Caspio yet.
+   * Virtual codes participate in all() / get() / addOrReplace lookups exactly
+   * like real Caspio rows. Re-registering the same code overwrites.
+   * @param {Object|Array<Object>} codes  one record or an array
+   */
+  function registerVirtual(codes) {
+    const arr = Array.isArray(codes) ? codes : [codes];
+    arr.forEach(c => {
+      if (c && c.ServiceCode) _virtual.set(c.ServiceCode, { ...c, _virtual: true });
+    });
   }
 
   /**
@@ -172,6 +195,21 @@
     'Art',                       // art charges (hourly, but order-level by convention)
     'DT',                        // design transfer
     'SPSU', 'SPRESET',           // screen print one-time fees
+    // Phase 5a — emblem boolean configurators (one drop = on; drop again
+    // replaces same instance; ✕ removes). EXTRA-COLOR is intentionally
+    // OMITTED — it's stackable (each drop = +1 extra color).
+    'EMB-METALLIC', 'EMB-VELCRO',
+    'EMB-NEW-DESIGN',            // one new-design fee per order
+    // Phase 5b — sticker + DTF singletons.
+    'STK-NEW-ART',               // one $50 setup per order
+    'DTF-FRONT', 'DTF-BACK', 'DTF-SLEEVE',  // one location per slot
+    // Phase 5c — screenprint singletons (one per location, plus underbase
+    // toggle). Color count is per-card via params.colorCount.
+    'SP-FRONT', 'SP-BACK', 'SP-SLEEVE', 'SP-UNDERBASE',
+    // Phase 5d — DTG location singletons. Multiple different locations
+    // stack into a combo (e.g. LC + FB = "LC_FB"). Each individual
+    // location is one-per-order.
+    'DTG-LC', 'DTG-FF', 'DTG-JF', 'DTG-FB', 'DTG-JB',
   ]);
 
   function isOrderLevel(code) {
@@ -230,6 +268,45 @@
   }
 
   /**
+   * Phase 6c (2026-05-03) — fetch usage-history-based service suggestions
+   * for a customer. Backed by Caspio `Customer_Service_History` table via
+   * /api/order-form/customer-suggestions (caspio-pricing-proxy). Returns an
+   * array of `{ code, usedCount, lastUsed, lastOrderId }` sorted by
+   * usedCount DESC, lastUsed DESC. Empty array when:
+   *   - company is blank
+   *   - customer has no history (new customer)
+   *   - fetch fails
+   *
+   * Cached per-company for 5 minutes. Same TTL pattern as fetchServiceCodes.
+   *
+   * @param {string} company  Customer company name (case + whitespace insensitive)
+   * @param {Object} options  { limit = 10 }
+   * @returns {Promise<Array>}
+   */
+  const _suggestCache = new Map();
+  const SUGGEST_TTL_MS = 5 * 60 * 1000;
+  async function getCustomerSuggestions(company, options = {}) {
+    const co = String(company || '').trim();
+    if (!co) return [];
+    const limit = Math.max(1, Math.min(50, Number(options.limit) || 10));
+    const cacheKey = `${co.toLowerCase()}|${limit}`;
+    const hit = _suggestCache.get(cacheKey);
+    if (hit && Date.now() - hit.t < SUGGEST_TTL_MS) return hit.v;
+    try {
+      const url = `${API_BASE}/api/order-form/customer-suggestions?company=${encodeURIComponent(co)}&limit=${limit}`;
+      const r = await fetch(url);
+      if (!r.ok) return [];
+      const json = await r.json();
+      const arr = Array.isArray(json?.suggestions) ? json.suggestions : [];
+      _suggestCache.set(cacheKey, { v: arr, t: Date.now() });
+      return arr;
+    } catch (err) {
+      console.warn('[OrderForm] getCustomerSuggestions failed:', err);
+      return [];
+    }
+  }
+
+  /**
    * Phase 3 — fetch a customer's per-service overrides from Accounts table.
    * Returns object keyed by ServiceCode: { "AS-CAP": { tier: "Mid" } }.
    * Empty object if none / customer not found / fetch fails.
@@ -274,7 +351,14 @@
     addOrReplace,
     groupedByRailGroup,
     getCustomerOverrides,
-    // Cached items getter for direct iteration in UI
-    all: () => _cached ? [..._cached] : [],
+    getCustomerSuggestions,
+    registerVirtual,
+    // Cached items getter for direct iteration in UI. Virtual codes are
+    // appended so the rail filter sees them too.
+    all: () => {
+      const fromCaspio = _cached ? [..._cached] : [];
+      const fromVirtual = Array.from(_virtual.values());
+      return [...fromCaspio, ...fromVirtual];
+    },
   };
 })();

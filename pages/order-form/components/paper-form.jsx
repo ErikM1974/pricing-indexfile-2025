@@ -457,6 +457,36 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
     }
   }
 
+  // Phase 6d (2026-05-03) — tap-to-place handler. On touch devices the OS
+  // doesn't fire dragOver/drop events, so we route a click event through
+  // the same drop pipeline. The rail's tap-to-select sets
+  // window.__railDragPayload + adds body.rail-dragging, which is the same
+  // state the desktop drag uses. Phase 6e — same path also handles keyboard
+  // Enter/Space when the row is focused while a card is selected.
+  function handleRowClickPlace(e) {
+    if (!railDragging) return;
+    if (!window.__railDragPayload) return;
+    if (!railEligible()) {
+      setRailRejected(true);
+      setTimeout(() => setRailRejected(false), 320);
+      return;
+    }
+    e.stopPropagation();
+    if (window.__railHandleDrop) {
+      window.__railHandleDrop({
+        zoneType: 'row',
+        rowId: row.id,
+        rowKind: detectRowKind(),
+      });
+    }
+  }
+  function handleRowKeyDownPlace(e) {
+    if (!railDragging) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    handleRowClickPlace(e);
+  }
+
   // Total qty across all sizes — same as before.
   const total = useMemo(() => {
     let t = 0;
@@ -679,6 +709,13 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
       onDragOver={handleRailDragOver}
       onDragLeave={handleRailDragLeave}
       onDrop={handleRailDrop}
+      onClick={handleRowClickPlace}
+      onKeyDown={handleRowKeyDownPlace}
+      tabIndex={railDragging && railEligible() ? 0 : undefined}
+      role={railDragging ? 'button' : undefined}
+      aria-label={railDragging
+        ? (railEligible() ? `Place selected service on row` : `Cannot place selected service on this row`)
+        : undefined}
     >
       <td className="sel-wrap">
         <div className="style-cell">
@@ -1068,6 +1105,332 @@ function RowBreakdownLine({ row, rowBreakdown, customerMode }) {
         <span className="pf-bd-arrow">↳</span>
         <span className="pf-bd-prefix">{prefixText} ({summaryText}):</span>
         <span className="pf-bd-segments">{segments.reduce((acc, seg, i) => i === 0 ? [seg] : [...acc, <span key={`d${i}`} className="pf-bd-dot"> · </span>, seg], [])}</span>
+      </td>
+    </tr>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// PrimaryLogoSubRow — Phase 4b (2026-05-03). Indented sub-row rendered under
+// each EMBROIDERY product row that has been filled (style/desc/qty). Shows
+// the row's primary logo position + stitch count, both inline-editable.
+//
+// Defaults track the order-level seed (formCtx.decoConfig) until the rep
+// edits inline — at which point the value sticks on row.rowDecoConfig and
+// stops following the order-level value.
+//
+// Over-10K nudge appears next to the stitch count when the primary exceeds
+// the included threshold, pointing the rep at the right rail surcharge card.
+// Replaces the order-level nudge that lived in embroidery's ConfigBar pre-
+// Phase 4b — now contextual per row.
+// ---------------------------------------------------------------------------
+function PrimaryLogoSubRow({ row, decoConfig, deco, primaryLocations, classifyStitchTier, onChange, customerMode, isFilled }) {
+  if (!isFilled || deco !== 'embroidery') return null;
+  const positions = (primaryLocations && primaryLocations.length)
+    ? primaryLocations
+    : ['Left Chest', 'Right Chest', 'Center Chest', 'Hat Front', 'Hat Back'];
+  const seedStitch = Number(decoConfig?.stitchCount) || 8000;
+  const seedPos    = decoConfig?.primaryLocation || 'Left Chest';
+  const stitch = Number.isFinite(Number(row?.rowDecoConfig?.primaryStitchCount))
+    ? Number(row.rowDecoConfig.primaryStitchCount)
+    : seedStitch;
+  const pos = row?.rowDecoConfig?.primaryPosition || seedPos;
+
+  const tierInfo = (typeof classifyStitchTier === 'function')
+    ? classifyStitchTier(stitch)
+    : { level: stitch <= 10000 ? 'ok' : (stitch <= 15000 ? 'mid' : (stitch <= 25000 ? 'lg' : 'fb')), tier: '?', surcharge: 0 };
+
+  function setRowDeco(patch) {
+    onChange({ ...row, rowDecoConfig: { ...(row.rowDecoConfig || {}), ...patch } });
+  }
+
+  return (
+    <tr className="pf-subitem-row pf-subitem-row--primary">
+      <td colSpan={14}>
+        <div className="pf-subitem-inner">
+          <span className="pf-subitem-arrow" aria-hidden>↳</span>
+          <span className="pf-subitem-code">Primary logo</span>
+          <select
+            className="pf-primary-pos"
+            value={pos}
+            disabled={!!customerMode}
+            onChange={e => setRowDeco({ primaryPosition: e.target.value })}
+            title="Where this row's primary logo goes"
+          >
+            {positions.map(L => <option key={L} value={L}>{L}</option>)}
+          </select>
+          <span className="pf-subitem-meta-dot">·</span>
+          <input
+            className="pf-primary-stitch"
+            type="number"
+            min="0"
+            step="500"
+            value={stitch}
+            disabled={!!customerMode}
+            onChange={e => setRowDeco({ primaryStitchCount: Number(e.target.value) || 0 })}
+            title="Stitch count for this row's primary logo"
+          />
+          <span className="pf-subitem-meta-dot">stitches</span>
+          {tierInfo.level !== 'ok' && (
+            <span className={`pf-primary-nudge pf-primary-nudge--${tierInfo.level}`}>
+              {tierInfo.level === 'fb'
+                ? <>🔴 Full Back — use Quote Builder for DECG-FB</>
+                : <>⚠ Drag <strong>{tierInfo.tier.toUpperCase()}</strong> stitch surcharge from rail (+${tierInfo.surcharge}/pc)</>
+              }
+            </span>
+          )}
+          <span className="pf-subitem-unit"></span>
+          <span className="pf-subitem-total pf-subitem-total--included">Included</span>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// AddOnSubRow — Phase 4a (2026-05-03). Indented sub-row rendered under a
+// PaperRow for each row-scoped addOn. Mirrors RowBreakdownLine structurally
+// (single <tr> with colSpan=14) but is VISIBLE — pf-breakdown-row has been
+// hidden in CSS for a while.
+//
+// Pricing math mirrors AddOnPicker's chipLineTotal (add-on-picker.jsx:55-100)
+// — the same TIERED → params.unitPrice fallback, the same RUSH percent math,
+// HOURLY rate × hours, etc. Single source of truth lives in
+// service-codes.js#resolvedPrice on the server side; client mirrors are kept
+// synchronized at PR review time.
+//
+// Click-to-confirm delete: first ✕ click flips the button to "Remove?" for
+// 2 seconds; second click within that window commits the removal. No modal.
+// ---------------------------------------------------------------------------
+function AddOnSubRow({ addOn, breakdown, customerMode, onChange, onRemove }) {
+  const [pending, setPending] = useState(false);
+  const timerRef = useRef(null);
+  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current); }, []);
+
+  function handleX() {
+    if (pending) {
+      if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+      onRemove();
+      return;
+    }
+    setPending(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setPending(false), 2000);
+  }
+
+  const sc = window.OrderFormServiceCodes?.get?.(addOn.code) || null;
+  const code = addOn.code || '';
+  const label = sc?.DisplayName || code;
+  const params = addOn.params || {};
+  const method = String(sc?.PricingMethod || '').toUpperCase();
+  const sell = Number(sc?.SellPrice) || 0;
+  const qty = Number(addOn.qty) || 0;
+
+  // Phase 4c (2026-05-03) — inline editing of TIERED addon params. POSITION
+  // and STITCH_COUNT are sourced from the rail-card single-source-of-truth
+  // (window.OrderFormRailCardHelpers) so the same lists power both the rail
+  // card config + the row sub-row inline edit.
+  const helpers = window.OrderFormRailCardHelpers || {};
+  const isStitchInputCode = helpers.STITCH_INPUT_CODES?.has?.(code);
+  const isPositionInputCode = helpers.POSITION_INPUT_CODES?.has?.(code);
+  const positionOptions = isPositionInputCode && helpers.positionsFor
+    ? helpers.positionsFor(code)
+    : [];
+  // Phase 5b — generic inline size picker for cards that declare
+  // _transferSizeOptions on their service record (e.g. DTF-FRONT/BACK/SLEEVE).
+  // The selected value lives at addOn.params.transferSize; the method's
+  // aggregate consumes it to drive its own pricing config.
+  const transferSizeOptions = Array.isArray(sc?._transferSizeOptions) ? sc._transferSizeOptions : null;
+  const isTransferSizeCode = !!transferSizeOptions && transferSizeOptions.length > 0;
+  // Phase 5c — inline color count input for SP location cards. Range 1-6,
+  // step 1. Default sourced from the service's _defaultColorCount.
+  const isColorCountCode = !!sc?._hasColorCountInput;
+
+  // Recompute unit price when the rep edits stitch count. Keeps the displayed
+  // total in sync with the live tiered pricing engine instead of stale-frozen
+  // params.unitPrice values.
+  function recomputeUnit(nextStitch) {
+    const tp = window.OrderFormTieredPricing;
+    if (tp?.isTiered?.(code)) {
+      const sync = tp.resolveSync(code, {
+        qty,
+        tier: tp.tierForQty(qty),
+        stitchCount: Number(nextStitch) || 8000,
+      });
+      if (Number.isFinite(sync)) return Number(sync);
+    }
+    return Number(params.unitPrice) || 0;
+  }
+
+  function setStitch(next) {
+    if (typeof onChange !== 'function') return;
+    const stitchCount = Number(next) || 0;
+    const unitPrice = recomputeUnit(stitchCount);
+    onChange({
+      ...addOn,
+      params: { ...(addOn.params || {}), stitchCount, unitPrice },
+    });
+  }
+  function setPosition(next) {
+    if (typeof onChange !== 'function') return;
+    onChange({
+      ...addOn,
+      params: { ...(addOn.params || {}), position: next },
+    });
+  }
+  function setTransferSize(next) {
+    if (typeof onChange !== 'function') return;
+    onChange({
+      ...addOn,
+      params: { ...(addOn.params || {}), transferSize: next },
+    });
+  }
+  function setColorCount(next) {
+    if (typeof onChange !== 'function') return;
+    const colorCount = Math.max(1, Math.min(6, Number(next) || 1));
+    onChange({
+      ...addOn,
+      params: { ...(addOn.params || {}), colorCount },
+    });
+  }
+
+  // Phase 4e (2026-05-03) — total via the shared addOnLineTotal helper so
+  // the row sub-row, the order-level subtotal, and the ShopWorks push all
+  // agree on the same number. Unit + label remain locally computed for
+  // display only (the helper returns a single line total).
+  const total = (window.OrderFormPricingShared?.addOnLineTotal?.(addOn, sc, breakdown)) || 0;
+  let unit = qty > 0 ? total / qty : 0;
+  let unitLabel = '';
+  // Phase 5a — CONFIGURATOR cards (emblem METALLIC/VELCRO/EXTRA-COLOR)
+  // toggle a flag in the method aggregate; the markup is baked into the
+  // per-piece price, so the addon row contributes $0 to the rolled-up
+  // totals. Display the PerUnit hint instead of a price math expression.
+  const isConfigurator = method === 'CONFIGURATOR';
+  if (isConfigurator) {
+    unit = 0;
+    unitLabel = sc?.PerUnit || 'configurator — markup baked into per-piece';
+  } else if (method === 'TIERED') {
+    unitLabel = qty > 1 ? `${fmt$(unit)}/pc × ${qty}` : `${fmt$(unit)} flat`;
+  } else if (method === 'FIXED' || method === 'FLAT') {
+    unitLabel = qty > 1 ? `${fmt$(unit)}/pc × ${qty}` : `${fmt$(unit)} flat`;
+  } else if (method === 'CALCULATED' && code === 'RUSH') {
+    const pct = Number(params.percent ?? 25);
+    unit = total;
+    // Note: breakdown.subtotal here already includes the rolled-up non-RUSH
+    // addons (Phase 4e). RUSH's percent is computed against that combined
+    // figure, matching what the order will bill.
+    unitLabel = `${pct}% of order subtotal`;
+  } else if (method === 'HOURLY') {
+    const hrs = Number(params.hours) || 0;
+    unit = sell;
+    unitLabel = `${fmt$(sell)}/hr × ${hrs} hrs`;
+  } else if (method === 'PASSTHROUGH') {
+    const amt = Number(params.amount) || 0;
+    unit = amt;
+    unitLabel = qty > 1 ? `${fmt$(unit)} × ${qty}` : `pass-through ${fmt$(unit)}`;
+  } else {
+    unitLabel = qty > 1 ? `${fmt$(unit)} × ${qty}` : `${fmt$(unit)}`;
+  }
+
+  // For non-editable codes, keep the static meta string (FIXED 3D-EMB, etc.).
+  // For editable codes, the position dropdown + stitch input replace the
+  // static meta. Hours/percent/amount for HOURLY/RUSH/PASSTHROUGH stay as
+  // static text for now — those edits land in Phase 4d (drop dialog).
+  const staticMeta = [];
+  if (!isPositionInputCode && params.position) staticMeta.push(params.position);
+  if (!isStitchInputCode && params.stitchCount) staticMeta.push(Number(params.stitchCount).toLocaleString() + ' stitches');
+  const editable = !customerMode && (isPositionInputCode || isStitchInputCode || isTransferSizeCode || isColorCountCode);
+
+  return (
+    <tr className="pf-subitem-row">
+      <td colSpan={14}>
+        <div className="pf-subitem-inner">
+          <span className="pf-subitem-arrow" aria-hidden>↳</span>
+          <span className="pf-subitem-code">{label}</span>
+          {isPositionInputCode && positionOptions.length > 0 && (
+            <select
+              className="pf-primary-pos"
+              value={params.position || (helpers.defaultPositionFor ? helpers.defaultPositionFor(code) : '')}
+              disabled={!!customerMode}
+              onChange={e => setPosition(e.target.value)}
+              title="Where this logo goes on the product"
+            >
+              {positionOptions.map(L => <option key={L} value={L}>{L}</option>)}
+            </select>
+          )}
+          {isPositionInputCode && isStitchInputCode && (
+            <span className="pf-subitem-meta-dot">·</span>
+          )}
+          {isStitchInputCode && (
+            <>
+              <input
+                className="pf-primary-stitch"
+                type="number"
+                min="0"
+                step="500"
+                value={Number(params.stitchCount) || 0}
+                disabled={!!customerMode}
+                onChange={e => setStitch(e.target.value)}
+                title="Stitch count for this logo"
+              />
+              <span className="pf-subitem-meta-dot">stitches</span>
+            </>
+          )}
+          {isTransferSizeCode && (
+            <select
+              className="pf-primary-pos"
+              value={params.transferSize || sc?._defaultTransferSize || transferSizeOptions[0]}
+              disabled={!!customerMode}
+              onChange={e => setTransferSize(e.target.value)}
+              title="Transfer size"
+            >
+              {transferSizeOptions.map(opt => (
+                <option key={opt} value={opt}>
+                  {opt === 'small'  ? 'Small 5×5'
+                 : opt === 'medium' ? 'Medium 9×12'
+                 : opt === 'large'  ? 'Large 12×16.5'
+                 : opt}
+                </option>
+              ))}
+            </select>
+          )}
+          {isColorCountCode && (
+            <>
+              <input
+                className="pf-primary-stitch"
+                type="number"
+                min="1"
+                max="6"
+                step="1"
+                value={Number(params.colorCount) || sc?._defaultColorCount || 1}
+                disabled={!!customerMode}
+                onChange={e => setColorCount(e.target.value)}
+                title="Number of colors at this location"
+                style={{ width: 60 }}
+              />
+              <span className="pf-subitem-meta-dot">colors</span>
+            </>
+          )}
+          {staticMeta.length > 0 && !editable && (
+            <span className="pf-subitem-meta">{staticMeta.join(' · ')}</span>
+          )}
+          <span className="pf-subitem-unit">{unitLabel}</span>
+          {isConfigurator
+            ? <span className="pf-subitem-total pf-subitem-total--included">Markup</span>
+            : <span className="pf-subitem-total">{fmt$(total)}</span>
+          }
+          {!customerMode && (
+            <button
+              type="button"
+              className={'pf-subitem-x' + (pending ? ' pf-subitem-x--confirm' : '')}
+              onClick={handleX}
+              title={pending ? 'Click again to confirm removal' : 'Remove this add-on'}
+              aria-label={`Remove ${code}`}
+            >
+              {pending ? 'Remove?' : '✕'}
+            </button>
+          )}
+        </div>
       </td>
     </tr>
   );
@@ -1575,6 +1938,7 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
   // deco method is active. Falls back to single-column on narrow screens
   // (CSS media query at 1100px).
   const ServiceRail = window.OrderFormServiceRail;
+  const RailDropToast = window.OrderFormRailDropToast;
   const showRail = !customerMode && activeDeco && ServiceRail;
 
   return (
@@ -1587,8 +1951,13 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           addOns={addOns}
           setAddOns={setAddOns}
           customerId={info.companyId}
+          customerCompany={info.company}
         />
       )}
+      {/* Phase 4d (2026-05-03) — drop confirmation toast. Floating pill that
+          appears whenever an addon lands; auto-dismisses after 2.4s. Hidden
+          in customer mode (customers don't see drop-related UI). */}
+      {RailDropToast && <RailDropToast customerMode={customerMode} />}
       <div className="of-form paper">
       {/* Header */}
       <div className="p-header">
@@ -1819,6 +2188,24 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 onInventoryChange={(id, inv) => inventoryByRowRef.current.set(id, inv)}
               />
             );
+            // Phase 4b (2026-05-03) — primary logo sub-row, only for filled
+            // embroidery rows. Defaults to the order-level seed in decoConfig;
+            // editing inline persists to row.rowDecoConfig (sticky).
+            const isFilled = !!(r.style || r.desc || Object.values(r.sizes || {}).some(v => Number(v) > 0));
+            const embMethod = (window.OrderFormPricing?.getMethod?.('embroidery')) || null;
+            const primaryEl = (
+              <PrimaryLogoSubRow
+                key={`${r.id}-primary`}
+                row={r}
+                decoConfig={decoConfig}
+                deco={r.deco}
+                primaryLocations={embMethod?.primaryLocations}
+                classifyStitchTier={embMethod?.classifyStitchTier}
+                onChange={(next) => onRowChange(i, next)}
+                customerMode={customerMode}
+                isFilled={isFilled}
+              />
+            );
             // Append the breakdown line directly under each priced row so the
             // ShopWorks-bound part numbers stay visible. Returns null when the
             // row has no qty / no breakdown — RowBreakdownLine guards itself.
@@ -1830,7 +2217,49 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 customerMode={customerMode}
               />
             ) : null;
-            return [tierEl, rowEl, bdEl].filter(Boolean);
+            // Phase 4a (2026-05-03) — sub-rows for each row-scoped addOn.
+            // One <tr> per addon attached to this row. Drag from the rail
+            // already creates these entries (Phase 3); now they're visible
+            // under their parent product instead of buried in fee chips.
+            const rowAddOns = (addOns || []).filter(a =>
+              a && a.scope && typeof a.scope === 'object' && a.scope.rowId === r.id
+            );
+            // Phase 5b (2026-05-03) — also surface order-level CONFIGURATOR
+            // addons (e.g. DTF-FRONT, DTF-BACK, EMB-METALLIC) under the FIRST
+            // row of the matching deco. This gives the rep an accessible
+            // inline editor for params like transferSize. Only the first
+            // matching row gets these — subsequent rows aren't duplicated.
+            const isFirstOfDeco = i === visibleRows.findIndex(rr => rr?.deco === r.deco && (rr.style || rr.desc || Object.values(rr.sizes || {}).some(v => Number(v) > 0)));
+            const orderConfiguratorAddOns = isFirstOfDeco
+              ? (addOns || []).filter(a => {
+                  if (!a || a.scope !== 'order') return false;
+                  const sc = window.OrderFormServiceCodes?.get?.(a.code);
+                  return String(sc?.PricingMethod || '').toUpperCase() === 'CONFIGURATOR';
+                })
+              : [];
+            const subItemsEls = [
+              ...rowAddOns.map(a => (
+                <AddOnSubRow
+                  key={`${r.id}-sub-${a.id}`}
+                  addOn={a}
+                  breakdown={breakdown}
+                  customerMode={customerMode}
+                  onChange={(next) => setAddOns(prev => prev.map(x => x.id === a.id ? next : x))}
+                  onRemove={() => setAddOns(prev => prev.filter(x => x.id !== a.id))}
+                />
+              )),
+              ...orderConfiguratorAddOns.map(a => (
+                <AddOnSubRow
+                  key={`${r.id}-orderSub-${a.id}`}
+                  addOn={a}
+                  breakdown={breakdown}
+                  customerMode={customerMode}
+                  onChange={(next) => setAddOns(prev => prev.map(x => x.id === a.id ? next : x))}
+                  onRemove={() => setAddOns(prev => prev.filter(x => x.id !== a.id))}
+                />
+              )),
+            ];
+            return [tierEl, rowEl, primaryEl, bdEl, ...subItemsEls].filter(Boolean);
           })}
         </tbody>
       </table>

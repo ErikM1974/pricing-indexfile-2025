@@ -1,7 +1,12 @@
 // Order-Form Pricing — DTG (Direct-to-Garment).
 //
-// Beta chip until verified against /pricing/dtg. Wraps DTGPricingService.
-// Form-wide config: a single location combo code (LC, FF, JF, FB, JB, LC_FB, FF_FB, JF_JB, LC_JB).
+// Phase 5d (2026-05-03) — the 9-combo dropdown migrated to à-la-carte rail
+// cards. Each individual print location (LC, FF, JF, FB, JB) is now its own
+// CONFIGURATOR virtual card. Drop multiple to compose a combo: LC + FB →
+// effective combo "LC_FB". The underlying DTGPricingService.priceForLocationCombo
+// already sums print costs across the codes in any combo string, so any
+// combination works (the rep is responsible for not stacking conflicting
+// front/back locations like LC+FF or FB+JB). Verified after the migration.
 // LTM threshold qty < 24 (different from embroidery 7); LTM distributed via
 // Math.floor((50/qty)*100)/100 to prevent customer overcharging.
 
@@ -23,6 +28,97 @@
     { value: 'JF_JB',  label: 'Jumbo Front + Jumbo Back' },
     { value: 'LC_JB',  label: 'Left Chest + Jumbo Back' },
   ];
+
+  // Phase 5d — virtual rail cards. One per individual print location. Drop
+  // multiple to compose a combo (LC + FB → "LC_FB"). All CONFIGURATOR —
+  // markup baked into per-piece by priceForLocationCombo. Singletons per
+  // code via ORDER_LEVEL_CODES. RailGroup splits "Front Locations" /
+  // "Back Locations" so the rail visually nudges reps away from stacking
+  // two front or two back picks (which is a real-world conflict — only one
+  // front and/or one back per garment).
+  const VIRTUAL_CARDS = [
+    {
+      ServiceCode: 'DTG-LC',
+      DisplayName: 'Left Chest',
+      ServiceType: 'DTG',
+      RailGroup: 'DTG Front Locations',
+      RailOrder: 10,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'small front print',
+      IsActive: true,
+      Visible: true,
+      _dtgLocation: 'LC',
+    },
+    {
+      ServiceCode: 'DTG-FF',
+      DisplayName: 'Full Front',
+      ServiceType: 'DTG',
+      RailGroup: 'DTG Front Locations',
+      RailOrder: 20,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'standard front print',
+      IsActive: true,
+      Visible: true,
+      _dtgLocation: 'FF',
+    },
+    {
+      ServiceCode: 'DTG-JF',
+      DisplayName: 'Jumbo Front',
+      ServiceType: 'DTG',
+      RailGroup: 'DTG Front Locations',
+      RailOrder: 30,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'oversized front print',
+      IsActive: true,
+      Visible: true,
+      _dtgLocation: 'JF',
+    },
+    {
+      ServiceCode: 'DTG-FB',
+      DisplayName: 'Full Back',
+      ServiceType: 'DTG',
+      RailGroup: 'DTG Back Locations',
+      RailOrder: 10,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'standard back print',
+      IsActive: true,
+      Visible: true,
+      _dtgLocation: 'FB',
+    },
+    {
+      ServiceCode: 'DTG-JB',
+      DisplayName: 'Jumbo Back',
+      ServiceType: 'DTG',
+      RailGroup: 'DTG Back Locations',
+      RailOrder: 20,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 0,
+      PerUnit: 'oversized back print',
+      IsActive: true,
+      Visible: true,
+      _dtgLocation: 'JB',
+    },
+  ];
+  if (window.OrderFormServiceCodes?.registerVirtual) {
+    window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
+  }
+
+  // Translate dropped DTG addOns into a single locationCombo string
+  // (e.g. "LC_FB"). Order is preserved by RailOrder/code, so two reps
+  // dropping the same cards produce the same combo string.
+  function comboFromAddOns(addOns) {
+    const codes = [];
+    (addOns || []).forEach(a => {
+      if (!a?.code) return;
+      const sc = window.OrderFormServiceCodes?.get?.(a.code);
+      if (sc?._dtgLocation) codes.push(sc._dtgLocation);
+    });
+    return codes.length > 0 ? codes.join('_') : null;
+  }
 
   // DTG tiers: 24-47, 48-71, 72+. Anything under 24 is LTM territory and
   // distributes the $50 fee per piece via floor((50/qty)*100)/100.
@@ -91,13 +187,21 @@
     return { unitPriceBySize: out, tierLabel };
   }
 
-  function priceRow({ row, formCtx, bundle }) {
+  function priceRow({ row, formCtx, bundle, locationCombo }) {
     const out = S.emptyRowBreakdown();
     const totalQty = Number(formCtx?.totalQty) || 0;
     if (!totalQty) return out;
     if (!bundle) { out.error = 'No DTG pricing bundle'; return out; }
 
-    const combo = formCtx?.decoConfig?.locationCombo || 'LC';
+    // Phase 5d — combo sourced from CONFIGURATOR addOns; falls back to
+    // legacy formCtx.decoConfig.locationCombo for drafts saved before the
+    // migration. If neither produces a combo, surface a guiding error so
+    // the rep knows to drop a location card.
+    const combo = locationCombo || formCtx?.decoConfig?.locationCombo;
+    if (!combo) {
+      out.error = 'Drag a DTG location from the rail (LC / FF / JF / FB / JB)';
+      return out;
+    }
     const tier = tierForQty(totalQty);
     const priced = priceForLocationCombo(bundle, combo, tier, totalQty);
     if (!priced) { out.error = `No DTG pricing for combo ${combo}`; return out; }
@@ -150,11 +254,19 @@
     return out;
   }
 
-  async function aggregate({ rows, formCtx }) {
+  async function aggregate({ rows, formCtx, addOns }) {
     const out = S.emptyOrderBreakdown();
     out.totalQty = S.totalQtyAcrossRows(rows);
     if (!out.totalQty) return out;
     out.tier = tierForQty(out.totalQty);
+
+    // Phase 5d — combo resolved from CONFIGURATOR addOns once per aggregate
+    // run, then passed to priceRow. Falls back to legacy decoConfig when no
+    // DTG- addons are present (drafts pre-migration).
+    const dtgAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('DTG-'));
+    const locationCombo = dtgAddOns.length > 0
+      ? comboFromAddOns(addOns)
+      : (formCtx?.decoConfig?.locationCombo || null);
 
     const targets = (rows || []).filter(r => {
       if (!r) return false;
@@ -174,7 +286,7 @@
         out.byRow.set(row.id, { ...S.emptyRowBreakdown(), error: error || 'No bundle' });
         return;
       }
-      const rb = priceRow({ row, formCtx, bundle });
+      const rb = priceRow({ row, formCtx, bundle, locationCombo });
       out.byRow.set(row.id, rb);
       out.subtotal += rb.rowSubtotal;
     });
@@ -184,10 +296,19 @@
     return out;
   }
 
-  function buildNotesBlock({ formCtx, breakdown }) {
-    const cfg = formCtx?.decoConfig || {};
-    const combo = cfg.locationCombo || 'LC';
-    const label = COMBOS.find(c => c.value === combo)?.label || combo;
+  function buildNotesBlock({ formCtx, breakdown, addOns }) {
+    const dtgAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('DTG-'));
+    const combo = dtgAddOns.length > 0
+      ? comboFromAddOns(addOns)
+      : (formCtx?.decoConfig?.locationCombo || null);
+    if (!combo) {
+      return [
+        `DTG · no locations selected`,
+        `Tier ${breakdown?.tier || '?'} · ${breakdown?.totalQty || 0} pcs`,
+      ].join('\n');
+    }
+    const label = COMBOS.find(c => c.value === combo)?.label
+      || combo.split('_').map(c => COMBOS.find(x => x.value === c)?.label || c).join(' + ');
     return [
       `DTG · Location: ${combo} (${label})`,
       `Tier ${breakdown?.tier || '?'} · ${breakdown?.totalQty || 0} pcs`,
@@ -195,22 +316,25 @@
     ].filter(Boolean).join('\n');
   }
 
-  function buildDesignContext({ formCtx }) {
-    return { designTypeId: 45, locationCombo: formCtx?.decoConfig?.locationCombo || 'LC' };
+  function buildDesignContext({ formCtx, addOns }) {
+    const dtgAddOns = (addOns || []).filter(a => a?.code && a.code.startsWith('DTG-'));
+    const combo = dtgAddOns.length > 0
+      ? comboFromAddOns(addOns)
+      : (formCtx?.decoConfig?.locationCombo || 'LC');
+    return { designTypeId: 45, locationCombo: combo };
   }
 
-  function ConfigBar({ config, setConfig }) {
-    const combo = config.locationCombo || 'LC';
+  // Phase 5d — DTG ConfigBar shrinks to caption + hint. The 9-combo dropdown
+  // moved to drag-and-drop rail cards (DTG-LC/FF/JF/FB/JB). Drop multiple
+  // to compose a combo (LC + FB → LC_FB).
+  function ConfigBar() {
     return (
       <div className="deco-config-strip" data-method="dtg">
-        <div className="dcs-field">
-          <label className="dcs-lbl">Location combo</label>
-          <select className="dcs-input" value={combo} onChange={(e) => setConfig({ ...config, locationCombo: e.target.value })}>
-            {COMBOS.map(c => <option key={c.value} value={c.value}>{c.value} — {c.label}</option>)}
-          </select>
+        <div className="dcs-caption" aria-hidden>
+          Drag DTG locations from the rail (LC / FF / JF / FB / JB) — drop one front + one back to compose combos.
         </div>
         <div className="dcs-hint">
-          Min-order pricing applies under 24 pcs · v2: per-row location override
+          Min-order pricing applies under 24 pcs.
         </div>
       </div>
     );
@@ -224,10 +348,15 @@
   window.OrderFormPricing.register('dtg', {
     method: 'dtg',
     label: 'DTG',
-    verified: false,
-    betaNote: 'Cross-check totals against /pricing/dtg before sending to ShopWorks',
+    // Phase 5d — verified after the addon migration. Combo derived from
+    // CONFIGURATOR addOns; same priceForLocationCombo math runs unchanged.
+    // Pricing parity with /pricing/dtg preserved.
+    verified: true,
+    betaNote: '',
     referenceUrl: '/pricing/dtg',
-    defaultFormConfig: () => ({ locationCombo: 'LC' }),
+    // Phase 5d — defaultFormConfig is empty; combo comes from addOns. Legacy
+    // drafts with locationCombo still work via aggregate fallback.
+    defaultFormConfig: () => ({}),
     defaultRowConfig:  () => ({}),
     ConfigBar,
     tierForQty,

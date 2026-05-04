@@ -58,6 +58,10 @@
     const sell = Number(sc.SellPrice) || 0;
     const qty = Number(addOn.qty) || 0;
     const subtotal = Number(breakdown?.subtotal) || 0;
+    // Phase 5a — CONFIGURATOR cards have no separate dollar contribution
+    // (markup is baked into per-piece via aggregate). Returning null here
+    // suppresses the chip's $X total display.
+    if (method === 'CONFIGURATOR') return null;
     switch (method) {
       case 'FIXED':
       case 'FLAT':
@@ -101,6 +105,9 @@
     const method = String(sc.PricingMethod || '').toUpperCase();
     const sell = Number(sc.SellPrice) || 0;
     const qty = Number(addOn.qty) || 0;
+    // Phase 5a — CONFIGURATOR cards show their PerUnit hint ("+25% per
+    // piece") instead of "$X/ea" since they have no per-unit dollar value.
+    if (method === 'CONFIGURATOR') return sc.PerUnit || 'markup';
     if (method === 'CALCULATED' && sc.ServiceCode === 'RUSH') {
       const pct = Number(addOn?.params?.percent ?? 25);
       return `${pct}% of subtotal`;

@@ -172,11 +172,23 @@
     });
 
     out.tier   = tier;
+    // Phase 4b (2026-05-03) — primary logo position + stitch count is now
+    // PER-ROW. Each row reads from its own rowDecoConfig, falling back to the
+    // order-level formCtx.decoConfig (the "default for new rows" seed). Once
+    // the rep edits inline (Primary logo sub-row), the row's value goes
+    // sticky and stops tracking the order-level default.
+    const rowPrimaryStitch = Number.isFinite(Number(row?.rowDecoConfig?.primaryStitchCount))
+      ? Number(row.rowDecoConfig.primaryStitchCount)
+      : (Number(formCtx?.decoConfig?.stitchCount) || 8000);
+    const rowPrimaryPosition = row?.rowDecoConfig?.primaryPosition
+      || formCtx?.decoConfig?.primaryLocation
+      || 'Left Chest';
+
     out.extras = {
       capOrFlat,
       ltmPerPiece: ltmPP,
-      stitchCount: formCtx?.decoConfig?.stitchCount || 8000,
-      primaryLocation: formCtx?.decoConfig?.primaryLocation || 'Left Chest',
+      stitchCount: rowPrimaryStitch,
+      primaryLocation: rowPrimaryPosition,
       manualMode: !!row.manualMode,
       manualCost: row.manualMode ? Number(row.manualCost) || 0 : 0,
       // Display metadata for the price-cell breakdown chip + size-picker filter
@@ -260,11 +272,16 @@
 
   // ---------------------------------------------------------------------------
   // Notes block + design context for ManageOrders push.
+  //
+  // Phase 4b (2026-05-03) — per-row primary logos. The notes block now
+  // walks each row's resolved primary (position + stitches) and groups rows
+  // that share the same config. Falls back to the order-level seed when no
+  // rows are populated yet (cold-start path).
   // ---------------------------------------------------------------------------
-  function buildNotesBlock({ formCtx, breakdown }) {
+  function buildNotesBlock({ formCtx, breakdown, rows }) {
     const cfg = formCtx?.decoConfig || {};
-    const stitch = cfg.stitchCount || 8000;
-    const loc    = cfg.primaryLocation || 'Left Chest';
+    const seedStitch = cfg.stitchCount || 8000;
+    const seedLoc    = cfg.primaryLocation || 'Left Chest';
 
     // Caps and garments tier independently. When the order has both, show
     // both tiers + qtys. When only one category, show that one.
@@ -291,18 +308,61 @@
       const qty  = breakdown?.totalQty || 0;
       tierLines.push(`Tier ${tier} · ${qty} pcs`);
     }
+
+    // Per-row primary logo lines. Group rows by (position, stitchCount) so
+    // an order with all rows at "Left Chest · 8K" gets one line, but a
+    // mixed order shows each distinct config. Rows without a style yet
+    // are skipped (they have no row to label).
+    const headerLines = [];
+    const visibleRows = (rows || []).filter(r =>
+      r?.deco === 'embroidery' && (r.style || r.desc || Object.values(r.sizes || {}).some(v => Number(v) > 0))
+    );
+    if (visibleRows.length > 0) {
+      const groups = new Map();  // "Left Chest|8000" → { stitch, loc, count, sample }
+      visibleRows.forEach(r => {
+        const stitch = Number.isFinite(Number(r?.rowDecoConfig?.primaryStitchCount))
+          ? Number(r.rowDecoConfig.primaryStitchCount) : seedStitch;
+        const loc = r?.rowDecoConfig?.primaryPosition || seedLoc;
+        const key = `${loc}|${stitch}`;
+        if (!groups.has(key)) groups.set(key, { stitch, loc, rows: [] });
+        groups.get(key).rows.push(r.style || '?');
+      });
+      [...groups.values()].forEach(g => {
+        const sty = g.rows.length === 1 ? g.rows[0] : `${g.rows.length} rows`;
+        headerLines.push(`EMBROIDERY · ${g.stitch.toLocaleString()} stitches · ${g.loc} (${sty})`);
+      });
+    } else {
+      // Cold start — no rows populated yet. Use seed values for the notes header.
+      headerLines.push(`EMBROIDERY · ${seedStitch.toLocaleString()} stitches · ${seedLoc}`);
+    }
+
     return [
-      `EMBROIDERY · ${stitch.toLocaleString()} stitches · ${loc}`,
+      ...headerLines,
       ...tierLines,
     ].join('\n');
   }
 
-  function buildDesignContext({ formCtx }) {
+  function buildDesignContext({ formCtx, rows }) {
+    // Phase 4b — design context derives from the FIRST embroidery row's
+    // primary logo (if any), falling back to the order-level seed. Most
+    // orders are uniform (one design across all rows), so this matches
+    // historical behavior. Multi-design orders still get a single id_Design
+    // resolved server-side from the order-level designNumber field; this
+    // context just supplies the position/stitch hints.
     const cfg = formCtx?.decoConfig || {};
+    const firstRow = (rows || []).find(r =>
+      r?.deco === 'embroidery' && r?.rowDecoConfig
+        && (r.rowDecoConfig.primaryPosition || Number.isFinite(Number(r.rowDecoConfig.primaryStitchCount)))
+    );
+    const stitch = Number.isFinite(Number(firstRow?.rowDecoConfig?.primaryStitchCount))
+      ? Number(firstRow.rowDecoConfig.primaryStitchCount)
+      : (cfg.stitchCount || 8000);
+    const position = firstRow?.rowDecoConfig?.primaryPosition
+      || cfg.primaryLocation || 'Left Chest';
     return {
       designTypeId: 3,
-      primaryLocation: cfg.primaryLocation || 'Left Chest',
-      stitchCount: cfg.stitchCount || 8000,
+      primaryLocation: position,
+      stitchCount: stitch,
     };
   }
 
@@ -326,56 +386,27 @@
     return { tier: 'Full Back', surcharge: null, level: 'fb',  hint: 'Use Quote Builder for DECG-FB pricing' };
   }
 
-  // Apply the current tier as AS-CAP (per cap row) and AS-Garm (per garment row)
-  // add-on entries. Removes any existing AS surcharge entries first so re-apply
-  // after a stitch-count change replaces (not stacks).
-  function applyStitchSurchargeFromConfig(stitchCount) {
-    const app = window.OrderFormApp;
-    if (!app) { console.warn('[embroidery] OrderFormApp not exposed yet'); return; }
-    const { rows, breakdown, addOns, setAddOns } = app;
-    const tierInfo = classifyStitchTier(stitchCount);
-    if (tierInfo.level === 'ok' || tierInfo.level === 'fb') return;
-
-    // Strip prior AS-CAP/AS-Garm entries — re-apply with current tier
-    const cleaned = (addOns || []).filter(a => a.code !== 'AS-CAP' && a.code !== 'AS-Garm');
-
-    const mkId = () => 'addon_' + Math.random().toString(36).slice(2, 10);
-    const newEntries = [];
-    (rows || []).forEach(r => {
-      const rb = breakdown?.byRow?.get?.(r.id) || breakdown?.byRow?.[r.id];
-      const cof = rb?.extras?.capOrFlat;
-      const rowQty = Object.values(r?.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
-      if (rowQty <= 0 || (cof !== 'cap' && cof !== 'flat')) return;
-      newEntries.push({
-        id: mkId(),
-        code: cof === 'cap' ? 'AS-CAP' : 'AS-Garm',
-        qty: rowQty,
-        scope: { rowId: r.id },
-        params: { stitchCount: Number(stitchCount), unitPrice: tierInfo.surcharge },
-      });
-    });
-    if (newEntries.length === 0) {
-      // No qualifying rows — alert the rep so they can add rows first
-      console.warn('[embroidery] No cap/garment rows with qty>0 to attach surcharge to');
-      return;
-    }
-    setAddOns([...cleaned, ...newEntries]);
-  }
-
   // ---------------------------------------------------------------------------
-  // ConfigBar — renders inline under the deco checkboxes when Embroidery is on.
-  // Includes the smart tier indicator + one-click Apply button when surcharge
-  // is needed.
+  // ConfigBar — DEFAULTS for new rows (Phase 4b, 2026-05-03). Each product row
+  // now carries its own primary logo position + stitch count via
+  // row.rowDecoConfig (rendered as an editable "Primary logo" sub-row in
+  // paper-form.jsx#PrimaryLogoSubRow). The order-level inputs here are the
+  // SEED — new rows inherit these values until the rep edits the row's sub-row.
+  //
+  // The over-10K nudge moved to PrimaryLogoSubRow (per-row, contextual). The
+  // ConfigBar stays focused on its one job: setting defaults.
   // ---------------------------------------------------------------------------
   function ConfigBar({ config, setConfig }) {
     const stitch = config.stitchCount ?? 8000;
     const loc    = config.primaryLocation ?? 'Left Chest';
-    const tierInfo = classifyStitchTier(stitch);
 
     return (
       <div className="deco-config-strip emb-config" data-method="embroidery">
+        <div className="dcs-caption" aria-hidden>
+          Defaults for new rows — each row can override below
+        </div>
         <div className="dcs-field">
-          <label className="dcs-lbl">Stitches</label>
+          <label className="dcs-lbl">Default stitches</label>
           <input
             className="dcs-input dcs-input--num"
             type="number" min="0" step="500"
@@ -384,7 +415,7 @@
           />
         </div>
         <div className="dcs-field">
-          <label className="dcs-lbl">Primary location</label>
+          <label className="dcs-lbl">Default primary location</label>
           <select
             className="dcs-input"
             value={loc}
@@ -392,48 +423,6 @@
           >
             {PRIMARY_LOCATIONS.map(L => <option key={L} value={L}>{L}</option>)}
           </select>
-        </div>
-
-        {/* Smart tier indicator. Always visible — green at low stitches gives
-            positive feedback that no surcharge is needed; amber/orange at
-            higher stitches shows exactly what to add and offers a one-click
-            Apply. The math is canonical NWCA flat-tier policy (Caspio
-            Embroidery_Costs AS-Cap/AS-Garm rows) — same as Quote Builder. */}
-        <div className={`dcs-tier dcs-tier--${tierInfo.level}`} role="status">
-          {tierInfo.level === 'ok' && (
-            <>
-              <span className="dcs-tier-badge">✓ Standard tier</span>
-              <span className="dcs-tier-text">{stitch.toLocaleString()} stitches · {tierInfo.hint}</span>
-            </>
-          )}
-          {(tierInfo.level === 'mid' || tierInfo.level === 'lg') && (
-            <>
-              <span className="dcs-tier-badge">⚠ {tierInfo.tier} tier</span>
-              <span className="dcs-tier-text">
-                {stitch.toLocaleString()} stitches · <strong>+${tierInfo.surcharge} per piece</strong> surcharge needed
-              </span>
-              <button
-                type="button"
-                className="dcs-tier-apply"
-                onClick={() => applyStitchSurchargeFromConfig(stitch)}
-                title="Adds AS-CAP per cap row + AS-Garm per garment row at the matching tier price. Re-click after changing stitch count to refresh."
-              >
-                Apply +${tierInfo.surcharge}/pc surcharge
-              </button>
-            </>
-          )}
-          {tierInfo.level === 'fb' && (
-            <>
-              <span className="dcs-tier-badge">🔴 Full Back</span>
-              <span className="dcs-tier-text">
-                {stitch.toLocaleString()} stitches · use <a href="/quote-builders/embroidery-quote-builder.html" target="_blank" rel="noopener">Quote Builder</a> for DECG-FB pricing (above 25K is full-back coverage)
-              </span>
-            </>
-          )}
-        </div>
-
-        <div className="dcs-hint">
-          ≤10K Standard ($0) · ≤15K Mid (+$4) · ≤25K Large (+$10) · &gt;25K Full Back · Cap vs flat auto-detected per row
         </div>
       </div>
     );
@@ -457,7 +446,16 @@
     betaNote: '',
     referenceUrl: '/pricing/embroidery',
     defaultFormConfig: () => ({ stitchCount: 8000, primaryLocation: 'Left Chest' }),
+    // Phase 4b — defaultRowConfig leaves primaryStitchCount/primaryPosition
+    // UNDEFINED on purpose. priceRow + PrimaryLogoSubRow read these via the
+    // formCtx fallback chain, so unstamped rows track the order-level seed
+    // until the rep edits inline (which then makes the value sticky).
     defaultRowConfig:  () => ({ capOrFlat: 'auto' }),
+    // Phase 4b — exposed so paper-form.jsx#PrimaryLogoSubRow can render the
+    // inline position dropdown without duplicating the array. Kept in sync
+    // with the ConfigBar select above.
+    primaryLocations: PRIMARY_LOCATIONS,
+    classifyStitchTier,
     ConfigBar,
     tierForQty: (qty) => S.tierForQty(qty, S.EMBROIDERY_TIERS),
     fetchBundle: fetchBundleForRow,

@@ -9,10 +9,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Work+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-<link rel="stylesheet" href="order-form/styles.css?v=20260503-4" />
+<link rel="stylesheet" href="order-form/styles.css?v=20260503-5" />
 <link rel="stylesheet" href="order-form/paper.css?v=20260502-6" />
 <link rel="stylesheet" href="order-form/print.css?v=20260502-1" />
-<link rel="stylesheet" href="order-form/components/service-rail/service-rail.css?v=20260503-4" />
+<link rel="stylesheet" href="order-form/components/service-rail/service-rail.css?v=20260503-5" />
 </head>
 <body class="layout-single">
 
@@ -26,7 +26,7 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
-<script src="order-form/shopworks.js?v=20260503-1"></script>
+<script src="order-form/shopworks.js?v=20260503-2"></script>
 
 <!-- Pricing engines (existing + new sticker/emblem services) — must load before the registry -->
 <script src="../shared_components/js/product-category-filter.js?v=20260502-1"></script>
@@ -49,45 +49,45 @@
 <script src="order-form/inventory/inventory-check.js?v=20260502-4"></script>
 
 <!-- Order-form pricing substrate (registry + shared utilities) -->
-<script src="order-form/pricing/shared.js?v=20260503-1"></script>
-<script src="order-form/pricing/registry.js?v=20260502-1"></script>
+<script src="order-form/pricing/shared.js?v=20260503-2"></script>
+<script src="order-form/pricing/registry.js?v=20260503-1"></script>
 
 <!-- Method modules — each registers itself with OrderFormPricing on load.
      Order doesn't matter between methods, but they must come AFTER registry.js. -->
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/embroidery.jsx?v=20260503-3"></script>
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/screenprint.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/dtg.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/dtf.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/sticker.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/pricing/methods/emblem.jsx?v=20260503-1"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/embroidery.jsx?v=20260503-4"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/screenprint.jsx?v=20260503-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/dtg.jsx?v=20260503-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/dtf.jsx?v=20260503-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/sticker.jsx?v=20260503-2"></script>
+<script type="text/babel" data-presets="react" src="order-form/pricing/methods/emblem.jsx?v=20260503-2"></script>
 
 <!-- Component scripts (transpiled from JSX in-browser by Babel standalone) -->
 <script type="text/babel" data-presets="react" src="order-form/components/common.jsx?v=20260422-2"></script>
 <!-- Service_Codes client (Phase 2a 2026-05-03) — plain JS, not JSX. Loaded
      before paper-form.jsx so window.OrderFormServiceCodes is available. -->
-<script src="order-form/components/service-codes.js?v=20260503-3"></script>
+<script src="order-form/components/service-codes.js?v=20260503-4"></script>
 <!-- TIERED add-on resolver (Phase 2c 2026-05-03) — fetches AL/DECG/Contract
      pricing endpoints and provides resolveSync() for the picker to auto-
      compute unit prices. Plain JS; loaded before add-on-picker.jsx. -->
 <script src="order-form/components/tiered-pricing.js?v=20260503-3"></script>
 <!-- Add-On Picker (Phase 2b 2026-05-03) — must load AFTER service-codes.js
      and tiered-pricing.js so both helpers are registered when picker mounts. -->
-<script type="text/babel" data-presets="react" src="order-form/components/add-on-picker.jsx?v=20260503-4"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/add-on-picker.jsx?v=20260503-5"></script>
 <!-- Phase 3 Service Rail (2026-05-03) — left-side drag-and-drop service catalog.
      Components must load AFTER service-codes.js + tiered-pricing.js (already
      above) and BEFORE paper-form.jsx (which mounts ServiceRail). -->
 <script type="text/babel" data-presets="react" src="order-form/components/service-rail/drop-zone.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/components/service-rail/rail-card.jsx?v=20260503-5"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/service-rail/rail-card.jsx?v=20260503-6"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/service-rail/rail-section.jsx?v=20260503-1"></script>
-<script type="text/babel" data-presets="react" src="order-form/components/service-rail/service-rail.jsx?v=20260503-3"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/service-rail/service-rail.jsx?v=20260503-4"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/design-autocomplete.jsx?v=20260502-1"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/line-items.jsx?v=20260502-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/totals.jsx?v=20260503-1"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/artwork.jsx?v=20260422-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/tweaks.jsx?v=20260422-2"></script>
 <script type="text/babel" data-presets="react" src="order-form/components/print-sheet.jsx?v=20260502-3"></script>
-<script type="text/babel" data-presets="react" src="order-form/components/paper-form.jsx?v=20260503-6"></script>
-<script type="text/babel" data-presets="react" src="order-form/app.jsx?v=20260503-1"></script>
+<script type="text/babel" data-presets="react" src="order-form/components/paper-form.jsx?v=20260503-7"></script>
+<script type="text/babel" data-presets="react" src="order-form/app.jsx?v=20260503-2"></script>
 
 </body>
 </html>
