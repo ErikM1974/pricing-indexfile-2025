@@ -1889,10 +1889,8 @@ app.post('/api/order-form-drafts', async (req, res) => {
 // POST /api/order-form-drafts/:draftId/approve
 // Phase D.3 (2026-05-04) — Customer-facing Approve action. Looks up the
 // quote_session by QuoteID (e.g. OF-0035), then PUTs Status='Approved'
-// via Caspio. Returns the timestamp + status so the customer's view
-// can reflect the approval immediately. EmailJS notification to the
-// sales rep is wired in a follow-up step per Erik's "wire email on
-// the final thing" instruction.
+// via Caspio. Returns rich data the frontend can use to fire an EmailJS
+// notification to the sales rep + erik@ (D.3.1).
 app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
   try {
     const draftId = String(req.params.draftId || '').trim();
@@ -1901,7 +1899,7 @@ app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
     }
     const PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-    // 1. Look up the session by QuoteID to get its PK_ID
+    // 1. Look up the session by QuoteID to get its PK_ID + Notes payload
     const lookupUrl = `${PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(draftId)}`;
     const lookupRes = await fetch(lookupUrl);
     if (!lookupRes.ok) {
@@ -1914,8 +1912,25 @@ app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
     if (!session || !session.PK_ID) {
       return res.status(404).json({ success: false, error: 'Draft not found' });
     }
+
+    // Pull info + rows out of the embedded JSON Notes blob so we can return
+    // rep email + customer details + total to the client for EmailJS.
+    let parsed = {};
+    try { parsed = JSON.parse(session.Notes || '{}'); } catch (_) { parsed = {}; }
+    const info = parsed.info || {};
+    const repSlug = String(info.salesRep || '').toLowerCase();
+    const repEmail = SALES_REP_EMAILS[repSlug] || 'erik@nwcustomapparel.com';
+    const repName = SALES_REP_FULL_NAMES[repSlug] || info.salesRep || 'Sales Team';
+
     if (session.Status === 'Approved') {
-      return res.json({ success: true, draftId, status: 'Approved', alreadyApproved: true });
+      return res.json({
+        success: true,
+        draftId,
+        status: 'Approved',
+        alreadyApproved: true,
+        rep_email: repEmail,
+        rep_name: repName,
+      });
     }
 
     // 2. PUT Status='Approved' via the proxy's quote_sessions update route
@@ -1931,13 +1946,20 @@ app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
       return res.status(502).json({ success: false, error: 'Update failed', detail: txt });
     }
 
-    console.log(`[Order Form Approve] ✓ ${draftId} approved`);
+    console.log(`[Order Form Approve] ✓ ${draftId} approved → notifying ${repEmail}`);
     res.json({
       success: true,
       draftId,
       status: 'Approved',
       approvedAt: new Date().toISOString(),
-      // Email + SMS notification to sales rep ships in the next phase.
+      // Fields the frontend feeds into EmailJS template_order_approved.
+      // Frontend fires the email — server-side we just return the data.
+      rep_email: repEmail,
+      rep_name: repName,
+      customer_name: [info.buyerFirst, info.buyerLast].filter(Boolean).join(' ') || session.CustomerName || '',
+      customer_company: info.company || session.CompanyName || '',
+      customer_email: info.email || session.CustomerEmail || '',
+      customer_phone: info.phone || session.Phone || '',
     });
   } catch (err) {
     console.error('[Order Form Approve] Error:', err);
@@ -1963,6 +1985,18 @@ const SALES_REP_FULL_NAMES = {
   erik: 'Erik Mickelson',
   ruth: 'Ruthie Nhoung',
   jim: 'Jim Mickelson',
+};
+
+// Sales-rep slug → email. Used by the /approve route (D.3.1) to
+// identify the recipient when EmailJS notifies the rep that the
+// customer has approved the order. erik@ catches anything that's not
+// in the table so notifications never silently drop.
+const SALES_REP_EMAILS = {
+  nika: 'nika@nwcustomapparel.com',
+  taneisha: 'taneisha@nwcustomapparel.com',
+  erik: 'erik@nwcustomapparel.com',
+  ruth: 'ruth@nwcustomapparel.com',
+  jim: 'jim@nwcustomapparel.com',
 };
 
 // Sales-rep slug → ShopWorks Employee ID for id_EmpCreatedBy on the

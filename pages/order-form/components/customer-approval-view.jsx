@@ -353,11 +353,64 @@
   }
 
   // ---------- action bar ----------
-  // Phase D.3 (2026-05-04) — Approve button now flips the Caspio session
-  // status to 'Approved' via window.nwOrderAPI.approveDraft. Email/SMS
-  // notification to the sales rep is the next step ("wire email on the
-  // final thing" — D.3.1).
-  function CavActions({ draftId, draftStatus, onLocalStatusChange }) {
+  // Phase D.3 (2026-05-04) — Approve button flips the Caspio session
+  // status to 'Approved' via window.nwOrderAPI.approveDraft.
+  //
+  // Phase D.3.1 (2026-05-04) — After server success, fires EmailJS to
+  // notify the sales rep + erik@. Template `template_order_approved` on
+  // service `service_jgrave3`. Email failure does NOT roll back the
+  // approval — the source of truth is the Caspio status flip; the email
+  // is a courtesy notification on top.
+  const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+  const EMAILJS_SERVICE_ID = 'service_jgrave3';
+  const EMAILJS_TEMPLATE_APPROVED = 'template_order_approved';
+
+  // Helper that builds the params and sends. Designed to never throw —
+  // worst case logs to console and returns false.
+  async function sendApprovalEmail({ draftId, response, totalAmount, totalQty, customerName, customerCompany, customerEmail, customerPhone, summaryHtml }) {
+    if (typeof window.emailjs === 'undefined') {
+      console.warn('[CAV] EmailJS SDK not loaded — skipping notification');
+      return false;
+    }
+    try {
+      window.emailjs.init(EMAILJS_PUBLIC_KEY);
+      const params = {
+        // Recipient(s) — server returned the rep slug→email mapping
+        to_email: response?.rep_email || 'erik@nwcustomapparel.com',
+        rep_name: response?.rep_name || 'Sales Team',
+        // Order identity
+        draft_id: draftId,
+        order_number: draftId,
+        approved_at: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }),
+        // Customer
+        customer_name: customerName || response?.customer_name || '',
+        customer_company: customerCompany || response?.customer_company || '',
+        customer_email: customerEmail || response?.customer_email || '',
+        customer_phone: customerPhone || response?.customer_phone || '',
+        // Totals
+        total_amount: totalAmount || '$0.00',
+        total_qty: totalQty || 0,
+        // Order summary HTML (line items)
+        summary_html: summaryHtml || '',
+        // Branding / convenience
+        company_name: 'Northwest Custom Apparel',
+        company_phone: '253-922-5793',
+        share_url: `${window.location.origin}/pages/order-form.html?draftId=${encodeURIComponent(draftId)}`,
+        reply_to: customerEmail || 'sales@nwcustomapparel.com',
+      };
+      console.log(`[CAV] Sending approval email to ${params.to_email}…`);
+      await window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_APPROVED, params);
+      console.log('[CAV] ✓ Approval email sent');
+      return true;
+    } catch (err) {
+      // EmailJS template missing / network failure — log but don't bubble.
+      // The approval is already saved server-side; this is a courtesy ping.
+      console.error('[CAV] Approval email failed (non-blocking):', err?.text || err?.message || err);
+      return false;
+    }
+  }
+
+  function CavActions({ draftId, draftStatus, onLocalStatusChange, onSendEmail }) {
     const initiallyApproved = draftStatus === 'Approved';
     const [approving, setApproving] = useState(false);
     const [approved, setApproved] = useState(initiallyApproved);
@@ -374,9 +427,17 @@
       setApproving(true);
       setApproveError('');
       try {
-        await window.nwOrderAPI.approveDraft(draftId);
+        const response = await window.nwOrderAPI.approveDraft(draftId);
         setApproved(true);
         if (typeof onLocalStatusChange === 'function') onLocalStatusChange('Approved');
+        // D.3.1 — Fire the email AFTER the Caspio status is locked in.
+        // Don't await; let it run in the background so the UI confirms
+        // the approval without a delay. Email failure is non-blocking
+        // (already approved in Caspio — the rep can also see the new
+        // Status field directly).
+        if (typeof onSendEmail === 'function') {
+          onSendEmail(response).catch(err => console.error('[CAV] email send error (non-blocking):', err));
+        }
         // Smooth-scroll back to the top so the green "Approved" pill is
         // immediately visible — confirms the action without a popup.
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (_) {}
@@ -457,6 +518,37 @@
     const [localStatus, setLocalStatus] = useState(draftStatus);
     const effectiveStatus = localStatus || draftStatus;
 
+    // D.3.1 — Build the EmailJS payload from the same render data the
+    // customer just looked at. summaryHtml is a plain HTML <ul> the rep
+    // sees in the notification email — no styling, just the products.
+    async function handleSendApprovalEmail(serverResponse) {
+      const tax = breakdown?.taxEstimate || 0;
+      const grand = (breakdown?.grandTotal || 0) + tax;
+      const totalQty = breakdown?.totalQty || 0;
+      const lines = visibleRows.map(r => {
+        const rb = getBreakdown(r.id);
+        const subtotal = rb?.rowSubtotal || 0;
+        const qty = Object.values(r.sizes || {}).reduce((a, v) => a + (Number(v) || 0), 0);
+        const sizeStr = sizesLine(r, rb);
+        const style = (r.style || (r.manualMode ? 'Custom item' : '')).replace(/[<>&]/g, ' ');
+        const desc = (r.desc || '').replace(/[<>&]/g, ' ');
+        return `<li><strong>${style}</strong>${desc ? ' — ' + desc : ''} (${sizeStr}) · ${qty} pcs · ${fmt$(subtotal)}</li>`;
+      }).join('');
+      const summaryHtml = `<ul style="margin:0;padding-left:18px;">${lines}</ul>`;
+
+      return sendApprovalEmail({
+        draftId,
+        response: serverResponse,
+        totalAmount: fmt$(grand),
+        totalQty,
+        customerName: [info?.buyerFirst, info?.buyerLast].filter(Boolean).join(' '),
+        customerCompany: info?.company || '',
+        customerEmail: info?.email || '',
+        customerPhone: info?.phone || '',
+        summaryHtml,
+      });
+    }
+
     return (
       <div className="cav">
         <CavHeader info={info} draftId={draftId} draftStatus={effectiveStatus} />
@@ -493,6 +585,7 @@
           draftId={draftId}
           draftStatus={effectiveStatus}
           onLocalStatusChange={setLocalStatus}
+          onSendEmail={handleSendApprovalEmail}
         />
 
         <footer className="cav-footer">
