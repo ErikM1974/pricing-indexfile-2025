@@ -610,20 +610,24 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
   const availSet = (availableSizes && availableSizes.length)
     ? new Set(availableSizes.map(s => String(s).toUpperCase()))
     : null;
-  // Headline unit: the row's effective per-piece price (line subtotal ÷ qty).
-  // For rows whose sizes span multiple price tiers (S-XL at $78 + 2XL at $80
-  // + 3XL at $81 + 4XL at $82), this is the honest blended cost — every
-  // size's actual price weighted by its qty. The N6 tier pills above the row
-  // carry the per-size breakdown, so the rep can always see how the avg was
-  // built. Single-tier rows (all sizes at one price) compute to that exact
-  // price, so simple cases read identically to before.
+  // Headline unit: the row's BASE per-piece price (S-XL chip / OSFA / first
+  // available size — the rounded whole-dollar number that matches the tier
+  // pills). For rows whose sizes span price tiers (S-XL at $78 + 2XL at $80
+  // + 3XL at $81), the headline reads as the base ($78) and the upcharge
+  // chip below carries the "+$2 2XL · +$3 3XL" detail. The Total column
+  // always uses the per-size precise sum, so totals stay accurate.
+  //
+  // 2026-05-04 — switched from blended-avg to base-price. Blended avg
+  // ($473 ÷ 6 pcs = $78.83) was math-honest but read as un-rounded against
+  // the rounded chips. Reps want the headline to match the chip.
+  //
+  // avgUnit kept as a fallback for rows where the method module didn't
+  // populate basePrice (sticker/emblem single-qty paths).
   //
   // overrideDefault: when a rep clicks the cell to type a custom price, we
-  // pre-fill the input with the BASE size price (clean whole-dollar number)
-  // rather than the avg (which can have ugly cents like $78.82). They almost
-  // always retype anyway; this is just a friendlier starting point.
+  // pre-fill the input with the BASE size price (clean whole-dollar number).
   const avgUnit = (showAutoPriceCell && total > 0) ? rowSubtotalDollars / total : 0;
-  const headlineUnit = (avgUnit > 0) ? avgUnit : (basePrice != null ? basePrice : 0);
+  const headlineUnit = (basePrice != null && basePrice > 0) ? basePrice : avgUnit;
   const overrideDefault = (basePrice != null) ? basePrice : headlineUnit;
   // Which upcharged sizes actually have qty entered? Only those need to show
   // in the chip — no point cluttering with "+$2 2XL" when there's no 2XL qty.
@@ -960,7 +964,7 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
             className="t-in num auto-priced"
             onClick={() => update({ priceOverride: true, price: overrideDefault ? overrideDefault.toFixed(2) : '' })}
             title={showUpchargeChip
-              ? `Avg per piece: ${fmt$(headlineUnit)} (${fmt$(rowSubtotalDollars)} ÷ ${total} pcs). Sizes span tiers — see tier pills above the row for per-size pricing. Click to enter a flat manual price.`
+              ? `Base price: ${fmt$(headlineUnit)} per piece. Larger sizes upcharge — see chip below. Row total: ${fmt$(rowSubtotalDollars)} (${total} pcs). Click to enter a flat manual price.`
               : 'Auto-priced — all sizes at this price. Click to enter a flat manual price.'}
           >
             <span className="auto-priced-money">{fmt$(headlineUnit)}</span>
