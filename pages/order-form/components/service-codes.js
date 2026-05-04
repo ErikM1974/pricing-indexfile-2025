@@ -26,7 +26,10 @@
   const API_BASE = window.APP_CONFIG?.API?.BASE_URL
     || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
   const ENDPOINT = `${API_BASE}/api/service-codes`;
-  const CACHE_KEY = 'orderForm.serviceCodes.v1';
+  // 2026-05-04 — bumped v1 → v2 to force re-fetch after Caspio Service_Codes
+  // update (Pallet ServiceType: UNIVERSAL → DTG). Existing sessions otherwise
+  // hold a 1h-stale cache that incorrectly shows Pallet on embroidery rails.
+  const CACHE_KEY = 'orderForm.serviceCodes.v2';
   const CACHE_TTL_MS = 60 * 60 * 1000;  // 1h — service prices change rarely
 
   let _inFlight = null;

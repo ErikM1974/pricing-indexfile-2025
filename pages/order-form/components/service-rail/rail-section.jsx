@@ -10,6 +10,9 @@
   const { useState, useEffect } = React;
 
   const COLLAPSE_KEY = 'orderForm.serviceRail.collapsedGroups.v1';
+  // 2026-05-04 — separate "explicitly expanded" set so we can default-collapse
+  // big sections (>5 cards) without forgetting that the user opened one.
+  const EXPAND_KEY = 'orderForm.serviceRail.expandedGroups.v1';
 
   function readCollapsedSet() {
     try {
@@ -20,6 +23,17 @@
   function writeCollapsedSet(set) {
     try {
       sessionStorage.setItem(COLLAPSE_KEY, JSON.stringify(Array.from(set)));
+    } catch (_) { /* quota — fine */ }
+  }
+  function readExpandedSet() {
+    try {
+      const raw = sessionStorage.getItem(EXPAND_KEY);
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch (_) { return new Set(); }
+  }
+  function writeExpandedSet(set) {
+    try {
+      sessionStorage.setItem(EXPAND_KEY, JSON.stringify(Array.from(set)));
     } catch (_) { /* quota — fine */ }
   }
 
@@ -41,14 +55,35 @@
    * @param {number} props.count     for the count badge
    */
   function RailSection({ name, children, count }) {
-    const [collapsed, setCollapsed] = useState(() => readCollapsedSet().has(name));
+    // 2026-05-04 — default-collapsed when the section has > 5 cards AND the
+    // user hasn't explicitly toggled it (sessionStorage tracks both
+    // collapsed AND explicitly-expanded sets so a rep who opens a tall
+    // section doesn't have to re-open it on every render). Sections with
+    // ≤ 5 cards default expanded for instant scan.
+    const [collapsed, setCollapsed] = useState(() => {
+      const set = readCollapsedSet();
+      if (set.has(name)) return true;
+      const expandedSet = readExpandedSet();
+      if (expandedSet.has(name)) return false;
+      return Number(count) > 5;
+    });
     const variant = groupVariant(name);
 
     function toggle() {
-      const set = readCollapsedSet();
-      if (collapsed) set.delete(name);
-      else set.add(name);
-      writeCollapsedSet(set);
+      const collapseSet = readCollapsedSet();
+      const expandSet = readExpandedSet();
+      if (collapsed) {
+        // Expanding — clear from collapsed set, mark as explicitly expanded
+        // so the >5-cards default-collapse rule doesn't re-collapse it next
+        // render.
+        collapseSet.delete(name);
+        expandSet.add(name);
+      } else {
+        collapseSet.add(name);
+        expandSet.delete(name);
+      }
+      writeCollapsedSet(collapseSet);
+      writeExpandedSet(expandSet);
       setCollapsed(!collapsed);
     }
 

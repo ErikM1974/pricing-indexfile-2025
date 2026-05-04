@@ -117,7 +117,7 @@
    ========================================================================== */
 
 .rail-section {
-  margin-bottom: 14px;
+  margin-bottom: 10px;            /* 2026-05-04 — was 14px, tighter density */
   border-left: 3px solid;
   padding-left: 8px;
 }
@@ -184,11 +184,16 @@
   background: white;
   border: 1px solid #dee2e6;
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 6px 9px;               /* 2026-05-04 — was 8px 10px, denser POS-style cards */
   font-size: 12px;
   cursor: grab;
   transition: box-shadow 100ms ease-out, transform 100ms ease-out;
   position: relative;
+}
+
+.rail-section-body {
+  /* 2026-05-04 — tighter inter-card gap to match compact card density */
+  gap: 4px;
 }
 
 .rail-card:hover {
@@ -267,18 +272,22 @@
 .rail-card--setup        { border-left: 3px solid #6c757d; }
 .rail-card--order        { border-left: 3px solid #e03030; }
 
-/* Standard tier card — shows "INCLUDED" badge, isn't draggable since adding
-   a $0 surcharge line item is meaningless. Phase 6: clearer visual cue +
-   inline hint so reps don't waste time trying to drag it. */
+/* 2026-05-04 — Standard tier card refresh.
+   These show a "✓ included" status and aren't draggable. Reduced footprint:
+   half the previous height, single-line read so reps scan past instantly.
+   Hint is now a tooltip (title attribute on the card) instead of an inline
+   block. */
 .rail-card--standard {
   background: #f1f8f4;
   cursor: not-allowed;
-  opacity: 0.85;
+  opacity: 0.7;
+  padding: 4px 9px;               /* shorter than regular cards */
+  border-color: #d4e8db;
 }
 .rail-card--standard:hover {
   transform: none;
   box-shadow: none;
-  opacity: 0.95; /* slight lift on hover so the card feels alive but not interactive */
+  opacity: 0.85;
 }
 .rail-card--included-badge {
   display: inline-block;
@@ -291,13 +300,9 @@
   margin-left: 4px;
   letter-spacing: 0.3px;
 }
+/* Hide the inline hint — moved to tooltip. Cleaner single-line card. */
 .rail-card--standard-hint {
-  display: block;
-  font-size: 10px;
-  color: #1f6a32;
-  font-style: italic;
-  margin-top: 2px;
-  font-weight: 500;
+  display: none;
 }
 
 /* Inline inputs on TIERED / HOURLY / PASSTHROUGH cards */
