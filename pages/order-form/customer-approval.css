@@ -1,0 +1,706 @@
+/* Customer Approval View — Phase D.2 (2026-05-04)
+ *
+ * Scoped to .cav root. Doesn't touch styles.css / paper.css / service-rail.css.
+ * Uses existing design tokens (--accent, --ink, --line, etc.) defined in
+ * styles.css :root.
+ *
+ * Layout:
+ *   ≥ 1100 px → 2-column grid (items 1fr | summary 360px sticky)
+ *   < 1100 px → single column, summary inline at the bottom
+ *   < 600 px  → mobile, generous touch targets
+ */
+
+.cav {
+  --cav-pad: 24px;
+  --cav-gap: 16px;
+  --cav-radius: 12px;
+  --cav-card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+  font-family: var(--font-body, 'Instrument Sans', system-ui, sans-serif);
+  color: var(--ink, #1f2937);
+  background: var(--paper-bg, #fafaf8);
+}
+
+/* ============================================================
+   Header
+   ============================================================ */
+
+.cav-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid var(--accent, #2f6f3f);
+}
+
+.cav-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.cav-logo {
+  width: 56px;
+  height: auto;
+  flex: 0 0 auto;
+}
+
+.cav-header-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.cav-brand-line {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--accent, #2f6f3f);
+  letter-spacing: -0.01em;
+}
+
+.cav-brand-sub {
+  font-size: 11px;
+  color: var(--ink-3, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+
+.cav-header-order {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.cav-eyebrow {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ink-3, #94a3b8);
+  font-weight: 600;
+}
+
+.cav-order-num {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: 32px;
+  margin: 0;
+  color: var(--ink, #1f2937);
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.cav-header-meta {
+  font-size: 13px;
+  color: var(--ink-2, #475569);
+  margin-top: 2px;
+}
+
+.cav-header-company { font-weight: 600; }
+.cav-header-buyer   { color: var(--ink-3, #94a3b8); margin-left: 4px; }
+
+.cav-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-top: 6px;
+  white-space: nowrap;
+}
+
+.cav-status-pill--pending {
+  background: color-mix(in oklab, var(--accent, #2f6f3f) 12%, white);
+  color: var(--accent-ink, #1d4429);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent, #2f6f3f) 25%, transparent);
+}
+
+.cav-status-pill--approved {
+  background: var(--accent, #2f6f3f);
+  color: white;
+}
+
+/* ============================================================
+   Cards (shared)
+   ============================================================ */
+
+.cav-card {
+  background: white;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: var(--cav-radius);
+  padding: var(--cav-pad);
+  box-shadow: var(--cav-card-shadow);
+  margin-bottom: var(--cav-gap);
+}
+
+.cav-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2, #475569);
+  margin: 0 0 16px;
+}
+
+/* ============================================================
+   Info card
+   ============================================================ */
+
+.cav-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px 24px;
+}
+
+.cav-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cav-info-item--wide { grid-column: 1 / -1; }
+
+.cav-info-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  color: var(--ink-3, #94a3b8);
+}
+
+.cav-info-val {
+  font-size: 14px;
+  color: var(--ink, #1f2937);
+  word-break: break-word;
+}
+
+.cav-info-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 13px;
+}
+
+/* ============================================================
+   Main 2-column layout (items left, summary right) — desktop
+   ============================================================ */
+
+.cav-main {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: var(--cav-gap);
+}
+
+.cav-items-col {
+  min-width: 0;
+}
+
+@media (max-width: 1100px) {
+  .cav-main {
+    grid-template-columns: 1fr;
+  }
+  .cav-summary {
+    position: static !important;
+  }
+}
+
+/* ============================================================
+   Line item card
+   ============================================================ */
+
+.cav-item {
+  display: grid;
+  grid-template-columns: 140px 1fr 200px;
+  gap: 20px;
+  align-items: start;
+}
+
+.cav-item-photo {
+  background: #f8fafc;
+  border-radius: 8px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line, #e5e7eb);
+}
+
+.cav-item-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cav-item-photo-placeholder {
+  font-size: 11px;
+  color: var(--ink-3, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cav-item-body {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cav-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cav-item-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cav-item-style {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent, #2f6f3f);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cav-item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink, #1f2937);
+  line-height: 1.3;
+}
+
+.cav-tier-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: linear-gradient(180deg,
+    color-mix(in oklab, var(--accent, #2f6f3f) 88%, white) 0%,
+    var(--accent, #2f6f3f) 100%);
+  color: white;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.cav-tier-cap {
+  font-size: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  border-radius: 999px;
+  padding: 1px 5px;
+  letter-spacing: 0.10em;
+}
+
+.cav-item-color,
+.cav-item-sizes {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cav-item-color .cav-info-lbl,
+.cav-item-sizes .cav-info-lbl {
+  flex: 0 0 auto;
+  width: 50px;
+}
+
+.cav-sizes-text {
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-size: 13px;
+  color: var(--ink-2, #475569);
+  font-variant-numeric: tabular-nums;
+}
+
+.cav-item-deco {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-2, #475569);
+  padding: 8px 12px;
+  background: color-mix(in oklab, var(--accent, #2f6f3f) 5%, white);
+  border-radius: 6px;
+  border: 1px solid color-mix(in oklab, var(--accent, #2f6f3f) 15%, var(--line, #e5e7eb));
+  width: fit-content;
+}
+
+.cav-deco-icon {
+  color: var(--accent, #2f6f3f);
+  font-size: 8px;
+}
+
+.cav-item-addons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 12px;
+  color: var(--ink-2, #475569);
+}
+
+.cav-item-addons li {
+  padding: 4px 0;
+  border-top: 1px dashed var(--line, #e5e7eb);
+}
+
+.cav-addon-name {
+  font-weight: 600;
+}
+
+.cav-upcharges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cav-upcharge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: color-mix(in oklab, var(--accent, #2f6f3f) 8%, white);
+  border: 1px solid color-mix(in oklab, var(--accent, #2f6f3f) 18%, var(--line, #e5e7eb));
+  border-radius: 999px;
+  font-size: 11px;
+  font-family: var(--font-mono, 'JetBrains Mono', ui-monospace, monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink, #1d4429);
+}
+
+.cav-upcharge-chip em {
+  font-style: normal;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+}
+
+.cav-item-price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  border-left: 1px solid var(--line, #e5e7eb);
+  padding-left: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cav-item-each {
+  font-size: 13px;
+  color: var(--ink-2, #475569);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.cav-item-each-amt {
+  font-weight: 700;
+  color: var(--ink, #1f2937);
+  font-size: 16px;
+}
+
+.cav-item-each-suffix {
+  font-size: 11px;
+  color: var(--ink-3, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cav-item-qty {
+  font-size: 12px;
+  color: var(--ink-3, #94a3b8);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cav-item-total {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--accent, #2f6f3f);
+  margin-top: 4px;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 760px) {
+  .cav-item {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .cav-item-photo {
+    width: 100%;
+    max-width: 180px;
+  }
+  .cav-item-price {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--line, #e5e7eb);
+    padding-top: 12px;
+    text-align: left;
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+}
+
+/* ============================================================
+   Summary card
+   ============================================================ */
+
+.cav-summary {
+  position: sticky;
+  top: 24px;
+  align-self: flex-start;
+}
+
+.cav-sum-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 6px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.cav-sum-row--small {
+  font-size: 12px;
+  color: var(--ink-2, #475569);
+}
+
+.cav-sum-lbl {
+  color: var(--ink-2, #475569);
+}
+
+.cav-sum-val {
+  font-weight: 600;
+  color: var(--ink, #1f2937);
+}
+
+.cav-sum-dim {
+  font-size: 11px;
+  color: var(--ink-3, #94a3b8);
+  font-weight: 400;
+}
+
+.cav-sum-divider {
+  height: 1px;
+  background: var(--line, #e5e7eb);
+  margin: 12px 0 8px;
+}
+
+.cav-sum-row--total {
+  padding: 8px 0;
+}
+.cav-sum-row--total .cav-sum-lbl {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2, #475569);
+}
+.cav-sum-row--total .cav-sum-val {
+  font-family: var(--font-display, 'Instrument Serif', Georgia, serif);
+  font-size: 32px;
+  color: var(--accent, #2f6f3f);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.cav-sum-row--deposit {
+  font-size: 12px;
+  color: var(--ink-3, #94a3b8);
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--line, #e5e7eb);
+}
+
+.cav-sum-note {
+  margin: 16px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-3, #94a3b8);
+  font-style: italic;
+}
+
+/* ============================================================
+   Notes card
+   ============================================================ */
+
+.cav-notes-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2, #475569);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.cav-empty {
+  text-align: center;
+  color: var(--ink-3, #94a3b8);
+  padding: 48px 24px;
+}
+
+.cav-empty p { margin: 0; font-size: 14px; }
+
+/* ============================================================
+   Action card (Approve / Request changes / Print)
+   ============================================================ */
+
+.cav-actions {
+  margin-top: 24px;
+  border-color: color-mix(in oklab, var(--accent, #2f6f3f) 25%, var(--line, #e5e7eb));
+}
+
+.cav-actions-blurb {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2, #475569);
+}
+
+.cav-actions-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 80ms ease-out, box-shadow 120ms ease-out, background-color 120ms ease-out;
+  font-family: inherit;
+  letter-spacing: 0.02em;
+}
+
+.cav-btn:hover { transform: translateY(-1px); }
+.cav-btn:active { transform: translateY(0); }
+.cav-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.cav-btn--primary {
+  background: var(--accent, #2f6f3f);
+  color: white;
+  min-width: 200px;
+  box-shadow: 0 2px 4px rgba(47, 111, 63, 0.2);
+}
+.cav-btn--primary:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--accent, #2f6f3f) 92%, black);
+  box-shadow: 0 4px 8px rgba(47, 111, 63, 0.25);
+}
+
+.cav-btn--secondary {
+  background: white;
+  color: var(--accent-ink, #1d4429);
+  border-color: color-mix(in oklab, var(--accent, #2f6f3f) 35%, var(--line, #e5e7eb));
+}
+.cav-btn--secondary:hover {
+  background: color-mix(in oklab, var(--accent, #2f6f3f) 6%, white);
+}
+
+.cav-btn--ghost {
+  background: transparent;
+  color: var(--ink-2, #475569);
+}
+.cav-btn--ghost:hover {
+  background: var(--line, #e5e7eb);
+}
+
+.cav-changes-form {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line, #e5e7eb);
+}
+
+.cav-changes-text {
+  width: 100%;
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1.4;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.cav-changes-text:focus {
+  outline: none;
+  border-color: var(--accent, #2f6f3f);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent, #2f6f3f) 18%, transparent);
+}
+
+.cav-changes-help {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-3, #94a3b8);
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .cav-actions-row { flex-direction: column; }
+  .cav-btn { width: 100%; min-width: 0; }
+  .cav-btn--primary { order: -1; }  /* Approve at the top on mobile */
+}
+
+/* ============================================================
+   Footer
+   ============================================================ */
+
+.cav-footer {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line, #e5e7eb);
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-3, #94a3b8);
+  line-height: 1.6;
+}
+
+.cav-footer-line { font-variant-numeric: tabular-nums; }
+
+/* ============================================================
+   Print
+   ============================================================ */
+
+@media print {
+  .cav { background: white; padding: 0; max-width: none; }
+  .cav-actions, .cav-changes-form { display: none !important; }
+  .cav-summary { position: static !important; }
+  .cav-card { box-shadow: none; break-inside: avoid; }
+  .cav-item { break-inside: avoid; }
+}

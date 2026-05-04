@@ -341,33 +341,53 @@ function App() {
 
       <TweaksPanel open={tweaksOpen} />
 
-      {/* Paper-style form view */}
-      <div className="paper-wrap screen-only">
-        <div className="paper-toolbar">
-          <span className="status">
-            <span className="dot"/>
-            {customerMode
-              ? `Customer view · ${draftId}${draftStatus ? ' · ' + draftStatus : ''}`
-              : 'Staff · Draft · Auto-saves locally'}
-          </span>
-          <span style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--ink-3)'}}>
-            ShopWorks · NWCA-OrderForm
-          </span>
+      {/* 2026-05-04 Phase D.2 — Customer view gets the polished
+          CustomerApprovalView (cards, branded header, summary, approval CTA)
+          instead of the staff PaperForm. Falls back to PaperForm if the new
+          component fails to load (defensive). */}
+      {customerMode && window.CustomerApprovalView ? (
+        <div className="paper-wrap screen-only">
+          <window.CustomerApprovalView
+            info={info}
+            rows={rows}
+            ship={ship}
+            orderNotes={orderNotes}
+            decoConfig={decoConfig}
+            addOns={addOns}
+            breakdown={breakdown}
+            draftId={draftId}
+            draftStatus={draftStatus}
+            files={files}
+          />
         </div>
-        <PaperForm
-          info={info} setInfo={setInfo}
-          rows={rows} setRows={setRows}
-          ship={ship} setShip={setShip}
-          orderNotes={orderNotes} setOrderNotes={setOrderNotes}
-          files={files} setFiles={setFiles}
-          decoConfig={decoConfig} setDecoConfig={setDecoConfig}
-          addOns={addOns} setAddOns={setAddOns}
-          breakdown={breakdown}
-          customerMode={customerMode}
-          draftId={draftId}
-          staffFilled={staffFilled}
-        />
-      </div>
+      ) : (
+        <div className="paper-wrap screen-only">
+          <div className="paper-toolbar">
+            <span className="status">
+              <span className="dot"/>
+              {customerMode
+                ? `Customer view · ${draftId}${draftStatus ? ' · ' + draftStatus : ''}`
+                : 'Staff · Draft · Auto-saves locally'}
+            </span>
+            <span style={{fontFamily:'var(--font-mono)',fontSize:11,color:'var(--ink-3)'}}>
+              ShopWorks · NWCA-OrderForm
+            </span>
+          </div>
+          <PaperForm
+            info={info} setInfo={setInfo}
+            rows={rows} setRows={setRows}
+            ship={ship} setShip={setShip}
+            orderNotes={orderNotes} setOrderNotes={setOrderNotes}
+            files={files} setFiles={setFiles}
+            decoConfig={decoConfig} setDecoConfig={setDecoConfig}
+            addOns={addOns} setAddOns={setAddOns}
+            breakdown={breakdown}
+            customerMode={customerMode}
+            draftId={draftId}
+            staffFilled={staffFilled}
+          />
+        </div>
+      )}
 
       {/* Print preview toolbar */}
       <div className="print-toolbar">
