@@ -1840,10 +1840,23 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     });
   }, [rows]);
 
-  // Pad to at least 14 rows visible for a paper-form feel
-  const visibleRows = rows.length < 14
-    ? [...rows, ...Array.from({ length: 14 - rows.length }, () => makeBlankRow())]
-    : rows;
+  // Pad to at least 14 rows visible for a paper-form feel (staff view only).
+  // 2026-05-04 Phase D.1 — In customer mode, only show rows that represent a
+  // real product the customer is approving: must have BOTH a style AND at
+  // least one non-zero size qty. Manual-mode rows (rep typed a custom cost
+  // for a non-SanMar product) qualify on manualMode + qty too. Staff need
+  // blank rows to type into; customers see only the actual order.
+  const visibleRows = customerMode
+    ? rows.filter(r => {
+        if (!r) return false;
+        const hasQty = Object.values(r.sizes || {}).some(v => Number(v) > 0);
+        if (!hasQty) return false;
+        const hasProduct = (r.style && r.style.trim()) || (r.manualMode && Number(r.manualCost) > 0);
+        return !!hasProduct;
+      })
+    : (rows.length < 14
+      ? [...rows, ...Array.from({ length: 14 - rows.length }, () => makeBlankRow())]
+      : rows);
 
   // Ensure padding rows get real ids when edited
   function onRowChange(idx, next) {
