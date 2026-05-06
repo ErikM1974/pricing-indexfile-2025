@@ -620,6 +620,7 @@
 | `/shared_components/js/mockup-ae.js` | AE mockup workflow logic (review, send, approve) | — | ✅ Active |
 | `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing) | — | ✅ Active |
 | `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
+| `/shared_components/js/sticker-banner-submit-form.js` | **NEW** AE Sticker/Banner art-request intake form (posts to /api/artrequests with Item_Type=Sticker/Banner + structured Item_Specs_Notes block) | /api/artrequests, /api/files/upload, EmailJS | ✅ Active |
 
 ### Sample Order System
 | File | Purpose | Dependencies | Status |
@@ -762,6 +763,7 @@
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
 | `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
+| `/shared_components/css/sticker-banner-submit-form.css` | **NEW** Sticker/Banner intake form + Item-Type pill bar styles (ae-dashboard Submit Artwork tab) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-nav-v2.css` | **NEW** AE Dashboard two-tier navigation (Tier 1: Steve/Ruth/Transfers/Personalization sections; Tier 2: sub-tabs) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
 | `/shared_components/css/force-green-theme.css` | Force NWCA green theme override | Multiple pages | ✅ Active |

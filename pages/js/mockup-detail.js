@@ -25,6 +25,66 @@
         return url;
     }
 
+    // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
+    // When a Box thumbnail URL returns 404, automatically fire Ruth's
+    // recovery route — searches the design's Box folder for a replacement
+    // and rewrites Caspio. ~97% of breaks self-heal silently.
+    var _autoRecoverState = {
+        attempted: Object.create(null),  // {id+slotField: true}
+        fired: 0,
+        cap: 8  // higher than art-request page since up to 7 slots per record
+    };
+
+    function autoRecoverMockupInBackground(thumb, img) {
+        if (!currentMockup) return;
+        var mockupId = currentMockup.ID || currentMockup.PK_ID;
+        var designNumber = currentMockup.Design_Number || '';
+        var companyName = currentMockup.Company_Name || '';
+        // Resolve the slot field — try slotKey first, then fieldKey (set by render path).
+        var slotField = (thumb && thumb.dataset && (thumb.dataset.slotKey || thumb.dataset.fieldKey)) || '';
+        if (!mockupId || !designNumber || !slotField) return;
+
+        var dedupKey = mockupId + '|' + slotField;
+        if (_autoRecoverState.attempted[dedupKey]) return;
+        if (_autoRecoverState.fired >= _autoRecoverState.cap) return;
+        _autoRecoverState.attempted[dedupKey] = true;
+        _autoRecoverState.fired++;
+
+        fetch(API_BASE + '/api/mockups/' + encodeURIComponent(mockupId) + '/auto-recover-mockup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                slotField: slotField,
+                designNumber: String(designNumber),
+                companyName: companyName
+            })
+        })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+        .then(function (resp) {
+            if (resp.ok && resp.body && resp.body.success && resp.body.newUrl
+                    && resp.body.confidence === 'high') {
+                refreshMockupSlotAfterRecovery(thumb, img, resp.body.newUrl, slotField);
+                if (currentMockup) currentMockup[slotField] = resp.body.newUrl;
+            }
+        })
+        .catch(function () { /* silent — broken card already visible */ });
+    }
+
+    function refreshMockupSlotAfterRecovery(thumb, img, newUrl, slotField) {
+        if (!thumb) return;
+        var overlay = thumb.querySelector('.pmd-slot-broken-overlay');
+        if (overlay) overlay.parentNode.removeChild(overlay);
+        thumb.classList.remove('is-broken');
+        delete thumb.dataset.brokenRendered;
+        if (img) {
+            img.dataset.headChecked = '';   // reset so a future error can re-check
+            img.dataset.proxyAttempted = '';
+            img.setAttribute('data-original-src', newUrl);
+            img.src = newUrl;
+            img.style.display = '';
+        }
+    }
+
     /**
      * Handle image error — try Box proxy fallback for broken shared/static URLs,
      * or detect a 404 on our proxy URL (file truly gone from Box) and surface a "broken" state.
@@ -38,14 +98,23 @@
             return;
         }
 
-        // Proxy URL failure — HEAD check to distinguish missing-file 404 from transient errors
-        if (originalSrc.indexOf('/api/box/thumbnail/') !== -1 && !img.dataset.headChecked) {
+        // HEAD-check both modern proxy URLs AND legacy Box URLs so all formats
+        // can trigger Layer 3 auto-heal. Recovery util doesn't need to know
+        // the URL format — it searches the design's folder by Design#/company.
+        var isMockupUrl = originalSrc.indexOf('/api/box/thumbnail/') !== -1
+            || originalSrc.indexOf('/api/box/shared-image') !== -1
+            || /\bbox\.com\/(?:shared\/static\/|s\/|file\/)/i.test(originalSrc);
+        if (isMockupUrl && !img.dataset.headChecked) {
             img.dataset.headChecked = '1';
             fetch(originalSrc, { method: 'HEAD' })
                 .then(function (resp) {
                     if (resp.status === 404) {
                         var thumb = img.closest('.pmd-gallery-slot, .pmd-box-panel-item, .pmd-lightbox-content, .pmd-slot');
-                        if (thumb) markMockupSlotBroken(thumb, img);
+                        if (thumb) {
+                            markMockupSlotBroken(thumb, img);
+                            // Layer 3: kick off background recovery — silent self-heal
+                            autoRecoverMockupInBackground(thumb, img);
+                        }
                         return;
                     }
                     img.style.display = 'none';

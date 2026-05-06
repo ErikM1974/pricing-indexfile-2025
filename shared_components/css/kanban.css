@@ -205,6 +205,9 @@
 }
 .kanban-card-badge--rev { background: #fef2f2; color: #dc2626; }
 .kanban-card-badge--type { background: #eff6ff; color: #2563eb; }
+/* Item-Type badges (Sticker/Banner extension, 2026-05-06) — Garment renders no badge */
+.kanban-card-badge--sticker { background: #fce7f3; color: #9d174d; font-weight: 700; }
+.kanban-card-badge--banner { background: #dbeafe; color: #1e40af; font-weight: 700; }
 .kanban-card-badge--dim { background: #ecfdf5; color: #047857; font-family: 'Courier New', monospace; }
 .kanban-card-badge--rush {
     background: #dc2626 !important;
