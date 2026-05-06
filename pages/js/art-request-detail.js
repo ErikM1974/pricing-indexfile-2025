@@ -253,6 +253,34 @@
             ? Object.values(req.Order_Type).join(', ')
             : req.Order_Type;
         setText('ard-order-type', orderType);
+
+        // Item-type rendering (Sticker/Banner extension, 2026-05-06).
+        // NULL Item_Type → 'Garment' (default — no badge, no spec card).
+        // Sticker/Banner → render badge + Item_Type field + spec card with
+        // the structured Item_Specs_Notes block.
+        const itemType = resolveItemType(req.Item_Type);
+        if (itemType === 'Sticker' || itemType === 'Banner') {
+            const badgeEl = document.getElementById('ard-item-type-badge');
+            if (badgeEl) {
+                const emoji = itemType === 'Sticker' ? '🏷️' : '🎌';
+                badgeEl.textContent = emoji + ' ' + itemType;
+                badgeEl.className = 'ard-item-type-badge ard-item-type-badge--' + itemType.toLowerCase();
+                badgeEl.style.display = '';
+            }
+            const itField = document.getElementById('ard-item-type-field');
+            if (itField) itField.style.display = '';
+            setText('ard-item-type', itemType);
+
+            const specsRaw = req.Item_Specs_Notes || '';
+            if (specsRaw && specsRaw.trim()) {
+                const specCard = document.getElementById('ard-item-spec-card');
+                const specBlock = document.getElementById('ard-item-spec-block');
+                const specHeader = document.getElementById('ard-item-spec-header');
+                if (specCard) specCard.style.display = '';
+                if (specBlock) specBlock.textContent = specsRaw;
+                if (specHeader) specHeader.textContent = itemType + ' Specs';
+            }
+        }
         setText('ard-due-date', formatDate(req.Due_Date));
         setText('ard-date-created', formatDate(req.Date_Created));
 
@@ -943,6 +971,20 @@
         var modal = document.getElementById('ard-edit-modal');
         if (!modal) return;
 
+        // Item_Type-aware field visibility (Sticker/Banner extension, 2026-05-06).
+        // For Garment: show garment fields, hide item-specs textarea.
+        // For Sticker/Banner: hide garment fields, show item-specs textarea.
+        var itemType = resolveItemType(req.Item_Type);
+        var isGarment = itemType === 'Garment';
+        modal.querySelectorAll('.ard-edit-garment-only').forEach(function (el) {
+            el.style.display = isGarment ? '' : 'none';
+        });
+        modal.querySelectorAll('.ard-edit-itemspec-only').forEach(function (el) {
+            el.style.display = isGarment ? 'none' : '';
+        });
+        var specsTextarea = document.getElementById('ard-edit-item-specs');
+        if (specsTextarea) specsTextarea.value = req.Item_Specs_Notes || '';
+
         // Populate fields with current values
         var dueDateRaw = req.Due_Date || '';
         if (dueDateRaw) {
@@ -1026,13 +1068,27 @@
         // On Hold is no longer toggled here — it lives in the bar-mounted toggle
         // (renderOnHoldBar) so AEs can flip it without opening the Edit modal.
 
-        // Garment fields — compare individually (Caspio column names)
-        if (g1.style !== (originalReq.GarmentStyle || '')) updates.GarmentStyle = g1.style;
-        if (g1.color !== (originalReq.GarmentColor || '')) updates.GarmentColor = g1.color;
-        if (g2.style !== (originalReq.Garm_Style_2 || '')) updates.Garm_Style_2 = g2.style;
-        if (g2.color !== (originalReq.Garm_Color_2 || '')) updates.Garm_Color_2 = g2.color;
-        if (g3.style !== (originalReq.Garm_Style_3 || '')) updates.Garm_Style_3 = g3.style;
-        if (g3.color !== (originalReq.Garm_Color_3 || '')) updates.Garm_Color_3 = g3.color;
+        // Item-type-aware diff (Sticker/Banner extension, 2026-05-06).
+        // For Garment: compare garment fields. For Sticker/Banner: compare
+        // Item_Specs_Notes textarea instead.
+        var itemTypeAtSave = resolveItemType(originalReq.Item_Type);
+        if (itemTypeAtSave === 'Garment') {
+            // Garment fields — compare individually (Caspio column names)
+            if (g1.style !== (originalReq.GarmentStyle || '')) updates.GarmentStyle = g1.style;
+            if (g1.color !== (originalReq.GarmentColor || '')) updates.GarmentColor = g1.color;
+            if (g2.style !== (originalReq.Garm_Style_2 || '')) updates.Garm_Style_2 = g2.style;
+            if (g2.color !== (originalReq.Garm_Color_2 || '')) updates.Garm_Color_2 = g2.color;
+            if (g3.style !== (originalReq.Garm_Style_3 || '')) updates.Garm_Style_3 = g3.style;
+            if (g3.color !== (originalReq.Garm_Color_3 || '')) updates.Garm_Color_3 = g3.color;
+        } else {
+            var specsEl = document.getElementById('ard-edit-item-specs');
+            if (specsEl) {
+                var newSpecs = specsEl.value;
+                if (newSpecs !== (originalReq.Item_Specs_Notes || '')) {
+                    updates.Item_Specs_Notes = newSpecs;
+                }
+            }
+        }
 
         if (Object.keys(updates).length === 0) {
             document.getElementById('ard-edit-modal').style.display = 'none';
@@ -1062,7 +1118,8 @@
                 Garm_Style_3: 'Garment 3', Garm_Color_3: 'Garment 3 Color',
                 Prelim_Charges: 'Prelim Charges', Additional_Services: 'Additional Services',
                 First_name: 'First Name', Last_name: 'Last Name',
-                Email_Contact: 'Email', Phone: 'Phone'
+                Email_Contact: 'Email', Phone: 'Phone',
+                Item_Type: 'Item Type', Item_Specs_Notes: 'Item Specs'
             };
             Object.keys(updates).filter(function(k) { return k !== 'NOTES'; }).forEach(function(k) {
                 noteLines.push((fieldLabels[k] || k) + ': ' + updates[k]);
@@ -4265,6 +4322,14 @@
     function setText(id, value) {
         const el = document.getElementById(id);
         if (el) el.textContent = value || '--';
+    }
+
+    // Item_Type → 'Garment' | 'Sticker' | 'Banner'. NULL/blank/anything else
+    // collapses to 'Garment' so legacy rows render as today (single source of
+    // truth — same fallback used in art-hub-steve-gallery.js + art-ae.js).
+    function resolveItemType(raw) {
+        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        return 'Garment';
     }
 
     function formatDate(dateStr) {

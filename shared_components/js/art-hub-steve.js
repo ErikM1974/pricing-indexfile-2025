@@ -1950,8 +1950,10 @@
         // Note: Is_Rush is optional — added once the Caspio column exists.
         // If the select references a column Caspio doesn't have, the API 500s.
         // We fetch with Is_Rush and transparently fall back without it on 500.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush';
-        var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Is_Rush';
+        var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type';
+        // 2-level fallback if Item_Type doesn't exist in Caspio yet
+        var selectFieldsLegacy = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
             + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF;
         var url = baseUrl + '&select=' + selectFields;
@@ -1963,6 +1965,15 @@
                     console.warn('[Kanban] fetch 500 with Is_Rush — retrying without it');
                     return fetch(baseUrl + '&select=' + selectFieldsFallback, { signal: signal })
                         .then(function (r2) {
+                            if (r2.status === 500) {
+                                // Item_Type also unknown — strip it and retry with legacy set
+                                console.warn('[Kanban] fetch 500 with Item_Type — retrying without it');
+                                return fetch(baseUrl + '&select=' + selectFieldsLegacy, { signal: signal })
+                                    .then(function (r3) {
+                                        if (!r3.ok) throw new Error('API returned ' + r3.status);
+                                        return r3.json();
+                                    });
+                            }
                             if (!r2.ok) throw new Error('API returned ' + r2.status);
                             return r2.json();
                         });
@@ -2023,6 +2034,13 @@
         var isRushReq = isRush(req.Is_Rush);
         var badges = '';
         if (isRushReq) badges += '<span class="kanban-card-badge kanban-card-badge--rush">&#128293; RUSH</span>';
+        // Item-type badge (Sticker/Banner only — Garment is the implicit default)
+        var itVal = (req.Item_Type === 'Sticker' || req.Item_Type === 'Banner') ? req.Item_Type : null;
+        if (itVal) {
+            var itEmoji = itVal === 'Sticker' ? '\u{1F3F7}' : '\u{1F38C}';
+            var itCls = itVal === 'Sticker' ? 'kanban-card-badge--sticker' : 'kanban-card-badge--banner';
+            badges += '<span class="kanban-card-badge ' + itCls + '" title="' + itVal + ' request">' + itEmoji + ' ' + itVal + '</span>';
+        }
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 

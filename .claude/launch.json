@@ -6,7 +6,8 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["server.js"],
       "port": 3000,
-      "autoPort": false
+      "autoPort": false,
+      "cwd": "."
     },
     {
       "name": "caspio-proxy",

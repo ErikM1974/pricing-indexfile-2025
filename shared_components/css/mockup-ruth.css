@@ -618,6 +618,19 @@ body {
     flex: 0 0 6px;
 }
 
+/* Item-Type badges (Sticker/Banner extension, 2026-05-06) — Garment is the
+ * implicit default and renders no badge. */
+.card-badge--sticker {
+    background: #fce7f3;
+    color: #9d174d;
+    font-weight: 600;
+}
+.card-badge--banner {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+}
+
 .card-badge--revision {
     background: var(--state-danger-bg, #fef2f2);
     color: var(--state-danger, #dc2626);

@@ -123,6 +123,14 @@
         return path && IMG_EXT_RE.test(String(path));
     }
 
+    // Item_Type → 'Garment' / 'Sticker' / 'Banner'. NULL or anything else
+    // collapses to 'Garment' so legacy rows render as today (single source of
+    // truth for the fallback rule, matches the rule in art-ae.js + mockup-detail).
+    function resolveItemType(raw) {
+        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        return 'Garment';
+    }
+
     // Pull up to 2 AE-uploaded image thumbnails (CDN_Link, CDN_Link_Two paired
     // with File_Upload_One, File_Upload_Two for extension check).
     function getAeArtworkUrls(req) {
@@ -140,8 +148,12 @@
         // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
         // empty and User_Email holds the AE email — without User_Email in the
         // SELECT the rep first name in the card header has nothing to resolve.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        // 2-level fallback for legacy ArtRequests installs that don't have
+        // Item_Type yet — strip it and retry. NULL Item_Type = treated as
+        // 'Garment' at render time (see resolveItemType()).
+        var selectLegacy = selectFallback.replace(',Item_Type', '');
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 
@@ -152,7 +164,15 @@
             .then(function (resp) {
                 if (resp.status === 500) {
                     return fetch(baseUrl + '&select=' + selectFallback, { signal: fetchInflight.signal })
-                        .then(function (r2) { if (!r2.ok) throw new Error('API ' + r2.status); return r2.json(); });
+                        .then(function (r2) {
+                            if (r2.status === 500) {
+                                // Item_Type field doesn't exist in Caspio yet — degrade gracefully.
+                                return fetch(baseUrl + '&select=' + selectLegacy, { signal: fetchInflight.signal })
+                                    .then(function (r3) { if (!r3.ok) throw new Error('API ' + r3.status); return r3.json(); });
+                            }
+                            if (!r2.ok) throw new Error('API ' + r2.status);
+                            return r2.json();
+                        });
                 }
                 if (!resp.ok) throw new Error('API ' + resp.status);
                 return resp.json();
@@ -268,6 +288,14 @@
         }
 
         var badges = '';
+        // Item-type badge — Sticker / Banner / Garment (NULL → Garment).
+        // Garment is the default — only render the badge when something else.
+        var itemType = resolveItemType(req.Item_Type);
+        if (itemType === 'Sticker' || itemType === 'Banner') {
+            var itEmoji = itemType === 'Sticker' ? '\u{1F3F7}' : '\u{1F38C}';
+            var itCls = itemType === 'Sticker' ? 'card-badge--sticker' : 'card-badge--banner';
+            badges += '<span class="card-badge ' + itCls + '" title="' + itemType + ' request">' + itEmoji + ' ' + itemType + '</span>';
+        }
         if (rushBadge)        badges += '<span class="card-badge card-badge--rush">RUSH</span>';
         if (orderType)        badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0)     badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';

@@ -11,9 +11,10 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=26">
     <link rel="stylesheet" href="/shared_components/css/ae-submit-form.css?v=4">
-    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=19">
-    <link rel="stylesheet" href="/shared_components/css/kanban.css?v=3">
+    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=20">
+    <link rel="stylesheet" href="/shared_components/css/kanban.css?v=4">
     <link rel="stylesheet" href="/shared_components/css/mockup-submit-form.css?v=4">
+    <link rel="stylesheet" href="/shared_components/css/sticker-banner-submit-form.css?v=1">
     <link rel="stylesheet" href="/shared_components/css/ae-nav-v2.css?v=1">
     <style>:root { --art-theme: #981e32; --art-theme-dark: #7a1828; --art-theme-light: #b92c43; --art-theme-bg: #fff5f5; --art-theme-bg-hover: #fce8ec; --art-theme-bg-selected: #fde2e8; --art-theme-rgba-15: rgba(152,30,50,0.15); --art-theme-rgba-10: rgba(152,30,50,0.1); --art-theme-hover: #981e32; }</style>
 </head>
@@ -105,8 +106,33 @@
             <!-- Submit Art Steve Tab -->
             <div id="submit-tab" class="tab-pane active">
                 <h2 class="tab-title">Submit Artwork to Steve</h2>
-                <!-- Caspio Submit Form DataPage Embed -->
-                <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
+
+                <!-- Item-Type Pill Row (Sticker/Banner extension, 2026-05-06) -->
+                <!-- Garment = legacy Caspio DataPage (unchanged). -->
+                <!-- Sticker/Banner = custom form posting to /api/artrequests with Item_Type set. -->
+                <div class="ae-item-type-bar" role="tablist" aria-label="Choose item type">
+                    <span class="ae-item-type-label">Item Type:</span>
+                    <button type="button" class="ae-item-pill is-active" role="tab" data-item-type="Garment" aria-selected="true">
+                        <span class="ae-item-pill-icon">&#128085;</span>
+                        <span class="ae-item-pill-label">Garment</span>
+                    </button>
+                    <button type="button" class="ae-item-pill" role="tab" data-item-type="Sticker" aria-selected="false">
+                        <span class="ae-item-pill-icon">&#127991;&#65039;</span>
+                        <span class="ae-item-pill-label">Sticker</span>
+                    </button>
+                    <button type="button" class="ae-item-pill" role="tab" data-item-type="Banner" aria-selected="false">
+                        <span class="ae-item-pill-icon">&#127884;</span>
+                        <span class="ae-item-pill-label">Banner</span>
+                    </button>
+                </div>
+
+                <!-- Garment workflow — existing Caspio DataPage embed, unchanged -->
+                <div id="garment-form-container" data-item-section="Garment">
+                    <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e150009f0e9f9d4ff3457dae47/emb"></script>
+                </div>
+
+                <!-- Sticker / Banner workflow — custom form, hidden by default -->
+                <div id="sticker-banner-form-container" data-item-section="StickerBanner" hidden></div>
             </div>
             
             <!-- Art Requirements & Fees Tab -->
@@ -565,13 +591,51 @@
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
     <script src="/shared_components/js/mockup-ae.js?v=19"></script>
-    <script src="/shared_components/js/art-ae.js?v=9"></script>
+    <script src="/shared_components/js/art-ae.js?v=10"></script>
     <script src="/shared_components/js/mockup-submit-form.js?v=11"></script>
+    <script src="/shared_components/js/sticker-banner-submit-form.js?v=1"></script>
     <script>
         // Initialize galleries and submit form
         if (typeof ArtAeGallery !== 'undefined') ArtAeGallery.init('art-ae-gallery');
         if (typeof MockupAeGallery !== 'undefined') MockupAeGallery.init('mockup-ae-gallery');
         if (typeof MockupSubmitForm !== 'undefined') MockupSubmitForm.init('mockup-submit-container');
+
+        // ── Item-Type Pill: switch between Garment (Caspio DataPage) and Sticker/Banner (custom form) ──
+        (function () {
+            var pills = document.querySelectorAll('.ae-item-pill');
+            var garmentBox = document.getElementById('garment-form-container');
+            var sbBox = document.getElementById('sticker-banner-form-container');
+            var sbInited = false;
+
+            function showGarment() {
+                if (garmentBox) garmentBox.hidden = false;
+                if (sbBox) sbBox.hidden = true;
+            }
+
+            function showStickerBanner(itemType) {
+                if (garmentBox) garmentBox.hidden = true;
+                if (sbBox) sbBox.hidden = false;
+                if (typeof StickerBannerSubmitForm === 'undefined') return;
+                if (!sbInited) {
+                    StickerBannerSubmitForm.init('sticker-banner-form-container');
+                    sbInited = true;
+                }
+                StickerBannerSubmitForm.setItemType(itemType);
+            }
+
+            pills.forEach(function (pill) {
+                pill.addEventListener('click', function () {
+                    var type = pill.getAttribute('data-item-type');
+                    pills.forEach(function (p) {
+                        var active = (p === pill);
+                        p.classList.toggle('is-active', active);
+                        p.setAttribute('aria-selected', active ? 'true' : 'false');
+                    });
+                    if (type === 'Garment') showGarment();
+                    else showStickerBanner(type);
+                });
+            });
+        })();
     </script>
 </body>
 </html>

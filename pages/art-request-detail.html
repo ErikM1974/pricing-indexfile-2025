@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=27">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=28">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=13">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
 </head>
@@ -50,6 +50,8 @@
         <div class="ard-title-row">
             <h2 class="ard-design-id" id="ard-design-id"></h2>
             <div class="ard-badges">
+                <!-- Item-type badge (Sticker/Banner extension, 2026-05-06) — Garment renders no badge -->
+                <span class="ard-item-type-badge" id="ard-item-type-badge" style="display:none;"></span>
                 <span class="ard-status-badge" id="ard-status-badge"></span>
                 <span class="ard-revision-badge" id="ard-revision-badge" style="display:none;"></span>
                 <button type="button" class="ard-rush-toggle" id="ard-rush-toggle" style="display:none;"
@@ -90,21 +92,27 @@
                             <label for="ard-edit-due-date">Due Date</label>
                             <input type="date" id="ard-edit-due-date">
                         </div>
-                        <div class="ard-edit-field">
+                        <!-- Garment-only edit fields — hidden when Item_Type is Sticker/Banner -->
+                        <div class="ard-edit-field ard-edit-garment-only">
                             <label for="ard-edit-placement">Garment Placement</label>
                             <input type="text" id="ard-edit-placement" placeholder="e.g. Cap Front, Left Chest">
                         </div>
-                        <div class="ard-edit-field">
+                        <div class="ard-edit-field ard-edit-garment-only">
                             <label for="ard-edit-garment1">Garment 1 (Style - Color)</label>
                             <input type="text" id="ard-edit-garment1" placeholder="e.g. 112 - heather grey/royall">
                         </div>
-                        <div class="ard-edit-field">
+                        <div class="ard-edit-field ard-edit-garment-only">
                             <label for="ard-edit-garment2">Garment 2 (Style - Color)</label>
                             <input type="text" id="ard-edit-garment2" placeholder="Optional">
                         </div>
-                        <div class="ard-edit-field">
+                        <div class="ard-edit-field ard-edit-garment-only">
                             <label for="ard-edit-garment3">Garment 3 (Style - Color)</label>
                             <input type="text" id="ard-edit-garment3" placeholder="Optional">
+                        </div>
+                        <!-- Sticker/Banner-only edit field — hidden when Item_Type is Garment -->
+                        <div class="ard-edit-field ard-edit-full-width ard-edit-itemspec-only" style="display:none;">
+                            <label for="ard-edit-item-specs">Item Specs (size, material, finish, etc.)</label>
+                            <textarea id="ard-edit-item-specs" rows="8" placeholder="STICKER REQUEST&#10;Size: 3&quot; × 3&quot;&#10;Material: Vinyl — Matte&#10;..."></textarea>
                         </div>
                         <div class="ard-edit-field ard-edit-full-width">
                             <label for="ard-edit-instructions">Instructions</label>
@@ -152,6 +160,10 @@
                         <div class="ard-field">
                             <span class="ard-label">Sales Rep</span>
                             <span class="ard-value" id="ard-sales-rep">--</span>
+                        </div>
+                        <div class="ard-field" id="ard-item-type-field" style="display:none;">
+                            <span class="ard-label">Item Type</span>
+                            <span class="ard-value" id="ard-item-type">--</span>
                         </div>
                         <div class="ard-field">
                             <span class="ard-label">Order Type</span>
@@ -265,6 +277,16 @@
                     <div class="ard-card-header">Notes from Submitter</div>
                     <div class="ard-card-body">
                         <p class="ard-notes-text" id="ard-submitter-notes"></p>
+                    </div>
+                </div>
+
+                <!-- Item Specs Card (Sticker/Banner extension, 2026-05-06) -->
+                <!-- Shown only when Item_Type is Sticker or Banner. Renders the
+                     structured Item_Specs_Notes block from the AE intake form. -->
+                <div class="ard-card" id="ard-item-spec-card" style="display:none;">
+                    <div class="ard-card-header" id="ard-item-spec-header">Specs</div>
+                    <div class="ard-card-body">
+                        <pre class="ard-item-spec-block" id="ard-item-spec-block"></pre>
                     </div>
                 </div>
             </div>
@@ -596,6 +618,6 @@
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=20260424c"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=17"></script>
-    <script src="/pages/js/art-request-detail.js?v=20260506a"></script>
+    <script src="/pages/js/art-request-detail.js?v=20260506b"></script>
 </body>
 </html>

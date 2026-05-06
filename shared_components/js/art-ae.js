@@ -17,7 +17,15 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Item_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    // Legacy fallback for installs that don't have Item_Type yet — strip it
+    // and retry. NULL Item_Type → 'Garment' at render time (resolveItemType).
+    var SELECT_FIELDS_LEGACY = SELECT_FIELDS.replace(',Item_Type', '');
+
+    function resolveItemType(raw) {
+        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        return 'Garment';
+    }
 
     var containerId = null;
     var allRequests = [];
@@ -64,6 +72,14 @@ var ArtAeGallery = (function () {
 
         fetch(url)
             .then(function (r) {
+                if (r.status === 500) {
+                    // Caspio rejects unknown q.select fields with 500 — retry without Item_Type
+                    var legacyUrl = url.replace('&select=' + SELECT_FIELDS, '&select=' + SELECT_FIELDS_LEGACY);
+                    return fetch(legacyUrl).then(function (r2) {
+                        if (!r2.ok) throw new Error('API returned ' + r2.status);
+                        return r2.json();
+                    });
+                }
                 if (!r.ok) throw new Error('API returned ' + r.status);
                 return r.json();
             })
@@ -373,6 +389,13 @@ var ArtAeGallery = (function () {
 
         // Badges
         var badges = '';
+        // Item-type badge — only when not Garment (default)
+        var itemType = resolveItemType(req.Item_Type);
+        if (itemType === 'Sticker' || itemType === 'Banner') {
+            var itEmoji = itemType === 'Sticker' ? '\u{1F3F7}' : '\u{1F38C}';
+            var itCls = itemType === 'Sticker' ? 'card-badge--sticker' : 'card-badge--banner';
+            badges += '<span class="card-badge ' + itCls + '" title="' + itemType + ' request">' + itEmoji + ' ' + itemType + '</span>';
+        }
         if (orderType) {
             badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';
         }
