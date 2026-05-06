@@ -793,6 +793,31 @@
         document.getElementById('ard-edit-last-name').value = req.Last_name || req.Last_Name || '';
         document.getElementById('ard-edit-email').value = req.Email_Contact || req.Email || '';
 
+        // On Hold section
+        var holdToggle = document.getElementById('ard-edit-on-hold-toggle');
+        var holdDetails = document.getElementById('ard-edit-on-hold-details');
+        var holdSince = document.getElementById('ard-edit-on-hold-since');
+        if (holdToggle && holdDetails) {
+            holdToggle.checked = !!req.Is_On_Hold;
+            document.getElementById('ard-edit-on-hold-note').value = req.On_Hold_Note || '';
+            holdDetails.style.display = holdToggle.checked ? 'block' : 'none';
+            if (holdSince) {
+                if (req.Is_On_Hold && req.On_Hold_Since) {
+                    var since = new Date(req.On_Hold_Since);
+                    holdSince.style.display = 'block';
+                    holdSince.textContent = 'On hold since ' + since.toLocaleDateString(undefined,
+                        { year: 'numeric', month: 'short', day: 'numeric' });
+                } else {
+                    holdSince.style.display = 'none';
+                }
+            }
+            // Reveal/hide reason field as toggle flips. Use onchange (not addEventListener)
+            // so re-opening the modal doesn't stack listeners.
+            holdToggle.onchange = function () {
+                holdDetails.style.display = this.checked ? 'block' : 'none';
+            };
+        }
+
         modal.style.display = 'flex';
 
         // Close handlers
@@ -838,7 +863,8 @@
             { key: 'Additional_Services', el: 'ard-edit-addl-services', orig: originalReq.Additional_Services || '' },
             { key: 'First_name', el: 'ard-edit-first-name', orig: originalReq.First_name || '' },
             { key: 'Last_name', el: 'ard-edit-last-name', orig: originalReq.Last_name || '' },
-            { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' }
+            { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' },
+            { key: 'On_Hold_Note', el: 'ard-edit-on-hold-note', orig: originalReq.On_Hold_Note || '' }
         ];
 
         fields.forEach(function (f) {
@@ -847,6 +873,16 @@
                 updates[f.key] = newVal;
             }
         });
+
+        // Boolean diff for the Is_On_Hold toggle (proxy auto-stamps On_Hold_Since)
+        var holdToggleEl = document.getElementById('ard-edit-on-hold-toggle');
+        if (holdToggleEl) {
+            var newOnHold = holdToggleEl.checked;
+            var origOnHold = !!originalReq.Is_On_Hold;
+            if (newOnHold !== origOnHold) {
+                updates.Is_On_Hold = newOnHold;
+            }
+        }
 
         // Garment fields — compare individually (Caspio column names)
         if (g1.style !== (originalReq.GarmentStyle || '')) updates.GarmentStyle = g1.style;
@@ -884,7 +920,8 @@
                 Garm_Style_3: 'Garment 3', Garm_Color_3: 'Garment 3 Color',
                 Prelim_Charges: 'Prelim Charges', Additional_Services: 'Additional Services',
                 First_name: 'First Name', Last_name: 'Last Name',
-                Email_Contact: 'Email', Phone: 'Phone'
+                Email_Contact: 'Email', Phone: 'Phone',
+                Is_On_Hold: 'On Hold', On_Hold_Note: 'On Hold Reason'
             };
             Object.keys(updates).filter(function(k) { return k !== 'NOTES'; }).forEach(function(k) {
                 noteLines.push((fieldLabels[k] || k) + ': ' + updates[k]);

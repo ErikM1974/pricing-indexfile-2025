@@ -988,3 +988,25 @@ body {
     .status-summary { flex-direction: column; }
     .user-profile { display: none; }
 }
+
+/* ============================================================
+   On Hold — design is paused, customer not ready to commit yet
+   Shared across all galleries that use .mockup-card / .status-pill / .status-stat
+   ============================================================ */
+.status-pill--on-hold {
+    color: var(--gray-500, #6b7280);
+    background: var(--gray-100, #f3f4f6);
+    border-color: var(--gray-200, #e5e7eb);
+}
+
+.status-stat--on-hold::before { background: var(--gray-400, #9ca3af); }
+
+.mockup-card--on-hold {
+    /* Skip the staggered fadeSlideUp entrance animation — its end-state of
+       opacity:1 with fill-mode 'both' beats this rule otherwise. On-hold cards
+       appear instantly at the muted opacity. */
+    animation: none;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+}
+.mockup-card--on-hold:hover { opacity: 0.92; }   /* restore on hover so AEs can read details */

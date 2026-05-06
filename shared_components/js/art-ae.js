@@ -17,7 +17,7 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
 
     var containerId = null;
     var allRequests = [];
@@ -94,15 +94,21 @@ var ArtAeGallery = (function () {
     }
 
     function countByBucket(requests) {
-        var counts = { needsReview: 0, withSteve: 0, done: 0, all: 0 };
+        var counts = { needsReview: 0, withSteve: 0, done: 0, onHold: 0, all: 0 };
         requests.forEach(function (r) {
             counts.all++;
+            // On-hold designs get their own bucket and are EXCLUDED from the
+            // 4 status buckets — keeps "Needs Your Review" backlog accurate.
+            if (r.Is_On_Hold) {
+                counts.onHold++;
+                return;
+            }
             var b = bucketFor(r.Status);
             if (b === 'needs-review') counts.needsReview++;
             else if (b === 'done') counts.done++;
             else counts.withSteve++;
         });
-        var sum = counts.needsReview + counts.withSteve + counts.done;
+        var sum = counts.needsReview + counts.withSteve + counts.done + counts.onHold;
         if (sum !== counts.all) {
             console.warn('[ArtAeGallery] bucket sum ' + sum + ' !== total ' + counts.all
                 + ' — some requests were not categorized. Check normalizeStatus().');
@@ -112,11 +118,16 @@ var ArtAeGallery = (function () {
 
     function getFilteredRequests() {
         var list = allRequests;
-        if (currentBucketFilter && currentBucketFilter !== 'all') {
+        if (currentBucketFilter === 'on-hold') {
+            // 'On Hold' chip → only on-hold designs, regardless of underlying status
+            list = list.filter(function (r) { return !!r.Is_On_Hold; });
+        } else if (currentBucketFilter && currentBucketFilter !== 'all') {
+            // Status buckets exclude on-hold (they shouldn't pollute "Needs Review" etc.)
             list = list.filter(function (r) {
-                return bucketFor(r.Status) === currentBucketFilter;
+                return !r.Is_On_Hold && bucketFor(r.Status) === currentBucketFilter;
             });
         }
+        // 'all' shows everything including on-hold (existing behavior preserved)
         if (searchTerm) {
             var term = searchTerm.toLowerCase();
             list = list.filter(function (r) {
@@ -195,6 +206,7 @@ var ArtAeGallery = (function () {
             { key: 'needs-review', label: 'Needs Your Review', count: counts.needsReview, modifier: 'needs-review' },
             { key: 'with-steve',   label: 'With Steve',        count: counts.withSteve,   modifier: 'with-steve' },
             { key: 'done',         label: 'Done',              count: counts.done,        modifier: 'done' },
+            { key: 'on-hold',      label: 'On Hold',           count: counts.onHold,      modifier: 'on-hold' },
             { key: 'all',          label: 'All',               count: counts.all,         modifier: 'all' }
         ];
         html += '<div class="status-summary">';
@@ -327,6 +339,11 @@ var ArtAeGallery = (function () {
         var designNum = escapeHtml(req.Design_Num_SW || req.Design_Number || '—');
         var status = normalizeStatus(req.Status);
         var statusClass = 'status-pill--' + status.toLowerCase().replace(/\s+/g, '-');
+        var isOnHold = !!req.Is_On_Hold;
+        var onHoldClass = isOnHold ? ' mockup-card--on-hold' : '';
+        var onHoldPillHtml = isOnHold
+            ? '<span class="status-pill status-pill--on-hold" title="' + escapeHtml(req.On_Hold_Note || 'On hold — customer paused this design') + '">On Hold</span> '
+            : '';
         var orderType = parseOrderType(req.Order_Type);
         var dueDate = req.Due_Date;
         var createdDate = formatDate(req.Date_Created);
@@ -397,7 +414,7 @@ var ArtAeGallery = (function () {
             ? ElapsedTimeUtils.getStatusElapsedBadge(status, req, 'art')
             : '';
 
-        return '<div class="mockup-card art-card" data-design-id="' + designId + '" style="cursor:pointer;">'
+        return '<div class="mockup-card art-card' + onHoldClass + '" data-design-id="' + designId + '" style="cursor:pointer;">'
             + '<div class="card-header" style="background:var(--art-theme, #981e32);">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
@@ -406,6 +423,7 @@ var ArtAeGallery = (function () {
             +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'
+            + '    ' + onHoldPillHtml
             + '    <span class="status-pill ' + statusClass + '">' + escapeHtml(status) + '</span>'
             + '  </div>'
             + '</div>'

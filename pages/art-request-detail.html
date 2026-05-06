@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=25">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=26">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=13">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
 </head>
@@ -125,6 +125,21 @@
                         <div class="ard-edit-field">
                             <label for="ard-edit-email">Contact Email</label>
                             <input type="email" id="ard-edit-email">
+                        </div>
+                        <div class="ard-edit-field ard-edit-full-width ard-on-hold-section">
+                            <label class="ard-toggle">
+                                <input type="checkbox" id="ard-edit-on-hold-toggle">
+                                <span class="ard-toggle-slider"></span>
+                                <span class="ard-toggle-text">
+                                    <span class="ard-toggle-label">Put on Hold</span>
+                                    <span class="ard-toggle-help">Customer paused — keep the design but hide from the active queue</span>
+                                </span>
+                            </label>
+                            <div id="ard-edit-on-hold-details" style="display:none; margin-top:0.875rem;">
+                                <label for="ard-edit-on-hold-note">Reason / customer status</label>
+                                <textarea id="ard-edit-on-hold-note" rows="3" placeholder="e.g. Waiting on customer's logo from designer · Budget approval pending · Customer following up in Q3"></textarea>
+                                <div class="ard-on-hold-since" id="ard-edit-on-hold-since" style="display:none;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -596,6 +611,6 @@
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=20260424c"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=17"></script>
-    <script src="/pages/js/art-request-detail.js?v=20260428a"></script>
+    <script src="/pages/js/art-request-detail.js?v=20260505a"></script>
 </body>
 </html>
