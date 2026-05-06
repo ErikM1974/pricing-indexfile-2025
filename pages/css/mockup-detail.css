@@ -3347,7 +3347,12 @@ body {
 }
 .pmd-on-hold-saved--visible { opacity: 1; }
 
-/* Page-wide gray-out when held */
+/* Page-wide gray-out when held — dims everything BELOW the on-hold bar
+   (timeline, approval workflow, revision banner, two-column grid) so the
+   only fully-visible interactive element is the on-hold toggle itself. */
+.pmd-content--on-hold .pmd-timeline-container,
+.pmd-content--on-hold .pmd-action-bar,
+.pmd-content--on-hold .pmd-revision-banner,
 .pmd-content--on-hold .pmd-grid {
     opacity: 0.55;
     transition: opacity 0.3s ease;

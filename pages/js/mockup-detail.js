@@ -661,7 +661,10 @@
         // Info fields
         renderInfoFields(mockup);
 
-        // AE Edit button (all non-completed statuses) + On Hold bar to its left
+        // AE Edit + On Hold bar — mounted at the TOP of the content (above the
+        // approval workflow bar) so the on-hold state is the first thing AEs see.
+        // Always renders for non-completed statuses regardless of approval state,
+        // so AEs can put any mockup on hold (not just Awaiting Approval ones).
         if (isAeView) {
             var statusForEdit = (mockup.Status || '').toLowerCase();
             if (statusForEdit !== 'completed') {
@@ -669,9 +672,11 @@
                 editBar.className = 'pmd-ae-edit-bar';
                 editBar.innerHTML = buildOnHoldBarHtml(mockup)
                     + '<button type="button" class="pmd-ae-edit-btn" id="pmd-ae-edit-btn">Edit Request</button>';
-                var infoCard = document.getElementById('pmd-info-fields');
-                if (infoCard && infoCard.parentNode) {
-                    infoCard.parentNode.insertBefore(editBar, infoCard.nextSibling);
+                // Insert BEFORE the AE approval action bar so the on-hold toggle
+                // sits above Approve/Request Changes/Send to Customer.
+                var aeActionBar = document.getElementById('pmd-ae-action-bar');
+                if (aeActionBar && aeActionBar.parentNode) {
+                    aeActionBar.parentNode.insertBefore(editBar, aeActionBar);
                 }
                 document.getElementById('pmd-ae-edit-btn').addEventListener('click', function () {
                     openMockupEditModal(mockup);
@@ -1018,10 +1023,12 @@
                 custElapsedHtml = ' <span class="approval-elapsed pmd-customer-elapsed ' + custElapsed.cssClass + '" title="Sent to customer ' + escapeHtml(formatDate(mockup.Customer_Approval_Sent_Date)) + '">(customer sent ' + escapeHtml(custElapsed.text) + ')</span>';
             }
 
-            // Send to Customer + Copy Link + Send to Supacolor buttons (shared across statuses)
+            // Send to Customer + Copy Link buttons (shared across statuses).
+            // Send to Supacolor removed from AE view 2026-05-06 — that's a Ruth/Steve
+            // action, not an AE action. Ruth still has her own Supacolor button via
+            // the pmd-ruth-action-bar branch below.
             var sendCopyButtons = '<button class="pmd-action-btn pmd-action-btn--send" id="pmd-btn-send-customer" title="Send approval email to customer">Send to Customer</button>'
-                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>'
-                + '<button class="pmd-action-btn pmd-action-btn--supacolor" id="pmd-btn-send-supacolor" title="Pick Box files and send to Bradley for Supacolor"><span style="display:inline-flex;align-items:center;gap:6px;">&#128230; Send to Supacolor</span></button>';
+                + '<button class="pmd-action-btn pmd-action-btn--copy" id="pmd-btn-copy-link" title="Copy customer approval link">Copy Customer Link</button>';
 
             if (statusLower === 'awaitingapproval') {
                 aeBar.style.display = '';
