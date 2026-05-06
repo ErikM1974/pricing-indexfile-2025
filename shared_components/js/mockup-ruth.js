@@ -113,7 +113,8 @@
         const tabMap = {
             'queue':     { index: 0, pane: 'queue-tab' },
             'completed': { index: 1, pane: 'completed-tab' },
-            'billing':   { index: 2, pane: 'billing-tab' }
+            'on-hold':   { index: 2, pane: 'on-hold-tab' },
+            'billing':   { index: 3, pane: 'billing-tab' }
         };
 
         const tab = tabMap[tabName];
@@ -182,10 +183,12 @@
         // Update badge counts on tabs
         const queueBadge = document.getElementById('queue-count');
         const completedBadge = document.getElementById('completed-count');
+        const onHoldBadge = document.getElementById('on-hold-count');
         const queueTotal = counts.submitted + counts.inProgress + counts.awaitingApproval + counts.revisionRequested;
 
         if (queueBadge) queueBadge.textContent = queueTotal;
         if (completedBadge) completedBadge.textContent = counts.approved;
+        if (onHoldBadge) onHoldBadge.textContent = counts.onHold;
 
         // Update status summary bar — adds an "On Hold" stat tile alongside
         // the workflow status counts. Display only (not interactive); on-hold
@@ -278,16 +281,19 @@
     function renderCards() {
         const queueGrid = document.getElementById('queue-grid');
         const completedGrid = document.getElementById('completed-grid');
+        const onHoldGrid = document.getElementById('on-hold-grid');
 
         if (!queueGrid || !completedGrid) return;
 
         injectSearchBar();
 
-        // Filter mockups. On-hold mockups are paused — they don't belong in
-        // either queue or completed (they're parked). Visible only on the All
-        // tab (which doesn't go through this filter) with their muted card styling.
+        // Filter mockups. On-hold mockups are paused — they don't appear in
+        // either the queue or completed grids. They get their own dedicated tab
+        // so Ruth can see paused work when she wants to without it cluttering
+        // her active backlog.
         let queueMockups = allMockups.filter(m => !m.Is_On_Hold && QUEUE_STATUSES.includes(m.Status));
         let completedMockups = allMockups.filter(m => !m.Is_On_Hold && COMPLETED_STATUSES.includes(m.Status));
+        let onHoldMockups = allMockups.filter(m => !!m.Is_On_Hold);
 
         // Apply text search
         if (ruthSearchText) {
@@ -297,13 +303,14 @@
             };
             queueMockups = queueMockups.filter(matchFn);
             completedMockups = completedMockups.filter(matchFn);
+            onHoldMockups = onHoldMockups.filter(matchFn);
         }
 
         // Update search count
         const countSpan = document.getElementById('ruth-search-count');
         if (countSpan) {
             const total = allMockups.length;
-            const shown = queueMockups.length + completedMockups.length;
+            const shown = queueMockups.length + completedMockups.length + onHoldMockups.length;
             countSpan.textContent = ruthSearchText ? shown + ' of ' + total + ' mockups' : total + ' mockups';
         }
 
@@ -332,6 +339,21 @@
                 </div>`;
         } else {
             completedGrid.innerHTML = completedMockups.map(m => buildCard(m, false)).join('');
+        }
+
+        // Render on-hold (paused mockups, AE-managed)
+        if (onHoldGrid) {
+            if (onHoldMockups.length === 0) {
+                onHoldGrid.innerHTML = `
+                    <div class="mockup-empty" style="grid-column: 1 / -1;">
+                        <div class="mockup-empty-icon">&#9989;</div>
+                        <div class="mockup-empty-text">No mockups currently on hold.</div>
+                    </div>`;
+            } else {
+                // Pass showActions=false — Ruth can view paused mockups but not act on them
+                // until the AE flips them back to active.
+                onHoldGrid.innerHTML = onHoldMockups.map(m => buildCard(m, false)).join('');
+            }
         }
 
         // Stagger card entry animations

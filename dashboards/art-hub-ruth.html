@@ -40,6 +40,9 @@
             <button class="tab-button" onclick="showTab('completed')">
                 Completed <span id="completed-count" class="tab-badge">0</span>
             </button>
+            <button class="tab-button" onclick="showTab('on-hold')">
+                On Hold <span id="on-hold-count" class="tab-badge">0</span>
+            </button>
             <button class="tab-button" onclick="showTab('billing')">Billing Codes</button>
             <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
@@ -88,6 +91,15 @@
             <div id="completed-tab" class="tab-pane">
                 <h2 class="tab-title">Completed Mockups</h2>
                 <div id="completed-grid" class="mockup-grid"></div>
+            </div>
+
+            <!-- On Hold Tab — customer-paused mockups (AE-managed) -->
+            <div id="on-hold-tab" class="tab-pane">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <h2 class="tab-title" style="margin-bottom:0;">On Hold</h2>
+                    <div style="font-size:13px;color:#6b7280;font-style:italic;">Customer-paused mockups. Reach out to the AE if anything here should resume.</div>
+                </div>
+                <div id="on-hold-grid" class="mockup-grid"></div>
             </div>
 
             <!-- Billing Codes Tab -->
@@ -179,6 +191,6 @@
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
-    <script src="/shared_components/js/mockup-ruth.js?v=24"></script>
+    <script src="/shared_components/js/mockup-ruth.js?v=25"></script>
 </body>
 </html>
