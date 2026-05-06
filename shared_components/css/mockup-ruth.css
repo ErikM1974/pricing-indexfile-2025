@@ -1014,6 +1014,39 @@ body {
 
 .status-stat--on-hold::before { background: var(--gray-400, #9ca3af); }
 
+/* Link Broken chip (Steve gallery) — replaces the legacy pulsing pill.
+   Red theme to read as "needs attention", subtle pulsing dot to draw eye
+   without being disruptive. Click filters the grid to broken cards AND
+   programmatically opens the bulk-recover modal owned by art-hub-steve.js. */
+.status-stat--broken {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+.status-stat--broken::before {
+    background: #dc2626;
+    animation: sg-broken-pulse 1.6s ease-in-out infinite;
+}
+.status-stat--broken:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+.status-stat--broken.active {
+    background: #dc2626;
+    border-color: #b91c1c;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+}
+.status-stat--broken.active::before {
+    background: rgba(255, 255, 255, 0.95);
+    animation: none;  /* the active state is already loud — quiet the dot */
+}
+@keyframes sg-broken-pulse {
+    0%, 100% { opacity: 1;   transform: scale(1); }
+    50%      { opacity: 0.55; transform: scale(0.85); }
+}
+
 .mockup-card--on-hold {
     /* Skip the staggered fadeSlideUp entrance animation — its end-state of
        opacity:1 with fill-mode 'both' beats this rule otherwise. On-hold cards

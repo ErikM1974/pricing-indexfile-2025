@@ -28,10 +28,15 @@
     // Module state
     var allRequests = [];        // last fetched array
     var currentSearch = '';
-    var currentStatus = 'all';   // 'all' | 'submitted' | 'in-progress' | 'awaiting-approval' | 'revision-requested' | 'approved' | 'completed'
+    var currentStatus = 'all';   // 'all' | 'submitted' | 'in-progress' | 'awaiting-approval' | 'revision-requested' | 'approved' | 'completed' | 'on-hold' | 'broken'
     var displayCount = INITIAL_DISPLAY;
     var archiveActive = false;
     var fetchInflight = null;
+    // Layer 3.5 — broken-link chip data (mirrors steve.js's brokenDesignIds Map).
+    // Populated from /api/art-requests/broken-mockups; consumed by the chip
+    // count + the 'broken' filter in getFiltered().
+    var brokenDesignIdSet = new Set();      // Set<string designId> for O(1) hit-test
+    var brokenFetchInflight = null;
 
     // ── Helpers (local copies of art-hub-steve.js fns to keep this module standalone) ──
     function escapeHtml(s) {
@@ -199,6 +204,16 @@
             if (counts[k] !== undefined) counts[k]++;
         });
 
+        // Broken count = unique designIds in the broken-mockups list that also
+        // appear in the current allRequests fetch (so archived/filtered records
+        // don't inflate the count).
+        var brokenCount = 0;
+        if (brokenDesignIdSet.size > 0) {
+            allRequests.forEach(function (r) {
+                if (brokenDesignIdSet.has(String(r.ID_Design))) brokenCount++;
+            });
+        }
+
         var pills = [
             { key: 'all',                  label: 'All',                modifier: 'other' },
             { key: 'submitted',            label: 'Submitted',          modifier: 'submitted' },
@@ -207,22 +222,54 @@
             { key: 'revision-requested',   label: 'Revisions',          modifier: 'revision-requested' },
             { key: 'approved',             label: 'Approved',           modifier: 'completed' },
             { key: 'completed',            label: 'Completed',          modifier: 'completed' },
-            { key: 'on-hold',              label: 'On Hold',            modifier: 'on-hold' }
+            { key: 'on-hold',              label: 'On Hold',            modifier: 'on-hold' },
+            { key: 'broken',               label: 'Link Broken',        modifier: 'broken', count: brokenCount }
         ];
 
         var html = '';
         pills.forEach(function (p) {
+            // Broken chip uses its dedicated count; everyone else uses the bucket count.
+            var n = (p.key === 'broken') ? p.count : counts[p.key];
             // Hide zero-count chips except 'all'
-            if (p.key !== 'all' && counts[p.key] === 0) return;
+            if (p.key !== 'all' && n === 0) return;
             var isActive = currentStatus === p.key;
             html += '<div class="status-stat status-stat--' + p.modifier + (isActive ? ' active' : '') +
                 '" data-status-key="' + p.key + '" title="' + escapeHtml(p.label) + '">' +
-                '<span class="status-stat-count">' + counts[p.key] + '</span>' +
+                '<span class="status-stat-count">' + n + '</span>' +
                 '<span class="status-stat-label">' + escapeHtml(p.label) + '</span></div>';
         });
 
         var wrap = document.getElementById('steve-gallery-status');
         if (wrap) wrap.innerHTML = html;
+    }
+
+    // ── Broken-mockups fetch (powers the Link Broken chip) ─────────────────
+    // Reuses the same endpoint art-hub-steve.js polls for the legacy pill
+    // (which we hide once the chip renders). Backend has a 10-min cache so
+    // the duplicate call is essentially free.
+    function fetchBrokenMockups() {
+        if (brokenFetchInflight) return brokenFetchInflight;
+        // ?status=all so the chip count matches what's actually visible in the
+        // gallery (which renders Completed/Approved cards too). Without this,
+        // the chip undercounts and Steve sees broken thumbs the chip doesn't.
+        brokenFetchInflight = fetch(API_BASE + '/api/art-requests/broken-mockups?status=all')
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var next = new Set();
+                (data && data.results || []).forEach(function (r) {
+                    if (r && r.designId != null) next.add(String(r.designId));
+                });
+                brokenDesignIdSet = next;
+                brokenFetchInflight = null;
+            })
+            .catch(function (err) {
+                console.warn('[SteveGallery] broken-mockups fetch failed:', err && err.message);
+                brokenFetchInflight = null;
+            });
+        return brokenFetchInflight;
     }
 
     // ── Render: card ──────────────────────────────────────────────────────
@@ -354,7 +401,12 @@
         var q = currentSearch.toLowerCase();
         return allRequests.filter(function (r) {
             // Status filter
-            if (currentStatus === 'on-hold') {
+            if (currentStatus === 'broken') {
+                // 'Link Broken' chip → only designs whose Box file currently 404s.
+                // Bypasses on-hold exclusion: a broken link on a paused design is
+                // still broken and should appear here.
+                if (!brokenDesignIdSet.has(String(r.ID_Design))) return false;
+            } else if (currentStatus === 'on-hold') {
                 // 'On Hold' chip → only on-hold designs (regardless of underlying status)
                 if (!r.Is_On_Hold) return false;
             } else if (currentStatus !== 'all') {
@@ -428,23 +480,78 @@
         displayCount = INITIAL_DISPLAY;
         renderStatusChips();
         renderGrid();
+        // When the user clicks the Link Broken chip, also pop the existing
+        // bulk-recover modal owned by art-hub-steve.js. Hidden pill button
+        // is the bridge — clicking it re-opens the same modal Steve already
+        // knows. Non-fatal if the button isn't present (e.g. steve.js not loaded).
+        if (currentStatus === 'broken') {
+            var pillBtn = document.getElementById('broken-mockups-review-btn');
+            if (pillBtn && typeof pillBtn.click === 'function') {
+                try { pillBtn.click(); } catch (e) { /* defensive */ }
+            }
+        }
     }
+
+    // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
+    // Cap auto-recover fires per page-load + dedup per pkId so a wave of broken
+    // thumbnails doesn't hammer the Box Search API.
+    var _galleryAutoRecover = {
+        attempted: Object.create(null),
+        fired: 0,
+        cap: 10
+    };
 
     function handleThumbError(img) {
         // Image had a src that failed to load → the Box link is broken (file
-        // deleted, fileId stale, shared-link expired). Distinct from "no mockup
-        // ever uploaded" — show a clear warning and direct staff to re-upload.
-        // Card-level click handler already opens /art-request/{id} in a new tab,
-        // where the detail page has the Re-upload button.
+        // deleted, fileId stale, shared-link expired). Show a clear warning,
+        // then kick off background auto-recovery — ~97% of breaks self-heal
+        // when the design's Box folder still has the file.
+        var thumb;
         try {
-            var thumb = img.parentNode;
+            thumb = img.parentNode;
             thumb.innerHTML =
                 '<div class="card-thumb-broken" title="Click card to open detail page and re-upload">' +
                     '<div class="card-thumb-broken-icon">&#9888;</div>' +
                     '<div class="card-thumb-broken-title">Link broken</div>' +
                     '<div class="card-thumb-broken-hint">Click to re-upload</div>' +
                 '</div>';
-        } catch (e) { /* defensive — img may already be detached */ }
+        } catch (e) { return; /* img already detached */ }
+
+        // Background auto-recover ─────────────────────────────────────
+        try {
+            var card = thumb && thumb.closest ? thumb.closest('.mockup-card') : null;
+            var designId = card && card.dataset ? card.dataset.designId : '';
+            if (!designId) return;
+            var req = allRequests.filter(function (r) { return String(r.ID_Design) === String(designId); })[0];
+            if (!req || !req.PK_ID || !req.Design_Num_SW) return;
+            var pkId = req.PK_ID;
+            if (_galleryAutoRecover.attempted[pkId]) return;
+            if (_galleryAutoRecover.fired >= _galleryAutoRecover.cap) return;
+            _galleryAutoRecover.attempted[pkId] = true;
+            _galleryAutoRecover.fired++;
+
+            fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    designNumber: String(req.Design_Num_SW),
+                    companyName: req.CompanyName || ''
+                })
+            })
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
+            .then(function (resp) {
+                if (resp.ok && resp.body && resp.body.success && resp.body.newUrl
+                        && resp.body.confidence === 'high' && thumb && thumb.parentNode) {
+                    // Mutate the in-memory record so a re-render keeps the URL.
+                    req.Box_File_Mockup = resp.body.newUrl;
+                    // Swap the broken card for a fresh image without touching the rest of the card.
+                    thumb.innerHTML = '<img src="' + resp.body.newUrl + '"' +
+                        ' alt="' + (req.CompanyName || 'mockup') + '" loading="lazy"' +
+                        ' onerror="window.SteveGallery.handleThumbError(this)">';
+                }
+            })
+            .catch(function () { /* silent — broken state already shown */ });
+        } catch (err) { /* defensive — never break the page on recovery failure */ }
     }
 
     function markComplete(designId, btn) {
@@ -467,9 +574,15 @@
     }
 
     function refresh() {
+        // Kick off broken-mockups fetch in parallel with the main requests
+        // fetch — neither needs to block the other; the chip count just
+        // updates after both resolve via the second renderStatusChips call.
+        var brokenP = fetchBrokenMockups();
         return fetchRequests().then(function () {
             renderStatusChips();
             renderGrid();
+            // Re-render chips once broken data lands so the count updates.
+            return brokenP.then(renderStatusChips, renderStatusChips);
         }).catch(function (err) {
             if (err && err.name === 'AbortError') return;
             console.error('[SteveGallery] fetch failed:', err);

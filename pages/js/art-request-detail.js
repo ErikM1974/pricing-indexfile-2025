@@ -1873,6 +1873,67 @@
         }
     }
 
+    // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
+    // When a Box thumbnail URL returns 404, automatically fire the same
+    // recovery routine that Steve's "Auto-recover" modal button uses. ~97%
+    // of broken links self-heal silently within seconds — staff only see
+    // the red broken card for the genuinely-unrecoverable ~3%.
+    //
+    // Constraints:
+    //  • Only fires for Box_File_Mockup (the only slot the backend route
+    //    currently rewrites — see recover-broken-mockup.js:152).
+    //  • Per-design dedup so the same recovery doesn't fire twice.
+    //  • Per-page-load cap of 5 to protect against Box rate-limits if a
+    //    mass-broken event hits the gallery.
+    var _autoRecoverState = {
+        attempted: Object.create(null),  // {pkId:true} — already tried this load
+        fired: 0,
+        cap: 5
+    };
+
+    function autoRecoverInBackground(thumb, fieldKey) {
+        // Only Box_File_Mockup is recoverable today (route writes that field only).
+        if (fieldKey !== 'Box_File_Mockup') return;
+        if (!currentRequest) return;
+        var pkId = currentRequest.PK_ID;
+        var designNumber = currentRequest.Design_Num_SW || currentRequest.Design_Number;
+        var companyName = currentRequest.CompanyName || '';
+        if (!pkId || !designNumber) return;
+        if (_autoRecoverState.attempted[pkId]) return;
+        if (_autoRecoverState.fired >= _autoRecoverState.cap) return;
+        _autoRecoverState.attempted[pkId] = true;
+        _autoRecoverState.fired++;
+
+        fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ designNumber: String(designNumber), companyName: companyName })
+        })
+        .then(function (r) {
+            return r.json().then(function (j) { return { ok: r.ok, body: j }; });
+        })
+        .then(function (resp) {
+            if (resp.ok && resp.body && resp.body.success && resp.body.newUrl) {
+                // High confidence only — medium can be wrong file in the same folder.
+                if (resp.body.confidence === 'high') {
+                    refreshSlotAfterRecovery(thumb, resp.body.newUrl, fieldKey);
+                    if (currentRequest) currentRequest[fieldKey] = resp.body.newUrl;
+                }
+            }
+            // Anything else: leave the broken card visible so staff can act.
+        })
+        .catch(function () { /* silent — broken card already visible */ });
+    }
+
+    /** Swap a broken thumb back to a filled-image thumb after a successful recovery. */
+    function refreshSlotAfterRecovery(brokenThumb, newUrl, fieldKey) {
+        if (!brokenThumb || !brokenThumb.parentNode) return;
+        var fieldDef = MOCKUP_SLOTS.filter(function (s) { return s.key === fieldKey; })[0];
+        if (!fieldDef) return;
+        var fresh = renderFilledThumb(newUrl, fieldDef, true);
+        brokenThumb.parentNode.replaceChild(fresh, brokenThumb);
+    }
+
     /**
      * Handle image load failure — try Box proxy fallback for broken shared/static URLs,
      * or detect a 404 on our proxy URL (file truly gone from Box) and surface a "broken" slot.
@@ -1881,7 +1942,10 @@
         var originalSrc = img.getAttribute('data-original-src') || img.src;
         var placeholder = img.nextElementSibling;
 
-        // Check if this is a Box shared/static URL that we can proxy
+        // First retry for legacy /shared/static/ URLs: try the shared-image
+        // converter proxy. Box's CDN sometimes serves the static URL as an HTML
+        // login redirect rather than image bytes — the converter resolves it
+        // server-side. If that also 404s we fall through to mark the slot broken.
         if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
             img.dataset.proxyAttempted = '1';
             var proxyUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
@@ -1889,14 +1953,26 @@
             return; // Let the proxy attempt load; if it also fails, we'll fall through again
         }
 
-        // Proxy URL failure — HEAD check to tell "Box file missing (404)" from transient errors
-        if (originalSrc.indexOf('/api/box/thumbnail/') !== -1 && !img.dataset.headChecked) {
+        // Confirm the failure is a true 404 (not transient / 5xx / blocked) before
+        // marking broken. We HEAD-check both modern proxy URLs AND legacy Box URLs
+        // so legacy-format records also self-heal at display-time.
+        var isMockupUrl = originalSrc.indexOf('/api/box/thumbnail/') !== -1
+            || originalSrc.indexOf('/api/box/shared-image') !== -1
+            || /\bbox\.com\/(?:shared\/static\/|s\/|file\/)/i.test(originalSrc);
+        if (isMockupUrl && !img.dataset.headChecked) {
             img.dataset.headChecked = '1';
             fetch(originalSrc, { method: 'HEAD' })
                 .then(function (resp) {
                     if (resp.status === 404) {
                         var thumb = img.closest('.ard-gallery-thumb');
-                        if (thumb) markSlotBroken(thumb);
+                        if (thumb) {
+                            markSlotBroken(thumb);
+                            // Layer 3: kick off background recovery — silent self-heal
+                            // when the design's Box folder still has the file. Works
+                            // regardless of URL format because the auto-recover route
+                            // searches by Design# / company, not by current URL.
+                            autoRecoverInBackground(thumb, thumb.dataset.fieldKey || '');
+                        }
                         return;
                     }
                     // Non-404 — fall through to placeholder badge

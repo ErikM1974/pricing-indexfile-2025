@@ -2545,9 +2545,13 @@
             return;
         }
 
-        widget.style.display = '';
-        // Compact pulsing pill \u2014 replaces the verbose banner. Click \u2192 modal
-        // with per-row Auto-recover / Open in Box / Re-upload actions.
+        // Pill UI is hidden (the new gallery chip is the visible source of truth
+        // \u2014 see art-hub-steve-gallery.js renderStatusChips, "Link Broken" chip).
+        // We still keep the hidden #broken-mockups-review-btn in the DOM so the
+        // gallery chip can programmatically click it to open the bulk-recover
+        // modal (`openBrokenMockupsModal`). The modal + per-row actions are
+        // unchanged.
+        widget.style.display = 'none';
         var label = data.broken === 1 ? 'broken Box mockup' : 'broken Box mockups';
         widget.innerHTML = '<button type="button" class="broken-mockups-pill" id="broken-mockups-review-btn"'
             + ' aria-label="Review broken Box mockups">'
@@ -2654,12 +2658,21 @@
             ? 'https://app.box.com/file/' + encodeURIComponent(primaryFileId)
             : '';
 
+        // Carry ALL broken slot fields on the row (since 2026-05-06 — recovery
+        // util is now slot-aware, see recover-broken-mockup.js). Records with
+        // multiple broken slots fire one recovery call per slot. The legacy
+        // single `data-slot-field` (primary slot only) is kept for the
+        // Re-upload flow which still operates on one slot at a time.
+        var allSlotFields = slots.map(function (s) { return String(s.field || ''); }).filter(Boolean);
+        var brokenSlotsJson = JSON.stringify(allSlotFields);
+
         return '<article class="bml-row" '
             +   'data-pk-id="' + escapeHtml(String(rec.pkId)) + '" '
             +   'data-design-id="' + escapeHtml(String(rec.designId)) + '" '
             +   'data-design-num-sw="' + escapeHtml(designNumSw) + '" '
             +   'data-company="' + escapeHtml(company) + '" '
             +   'data-slot-field="' + escapeHtml(primarySlotField) + '" '
+            +   'data-broken-slots="' + escapeHtml(brokenSlotsJson) + '" '
             +   'data-file-id="' + escapeHtml(primaryFileId) + '">'
             +   '<div class="bml-row__head">'
             +     '<a class="bml-row__title" href="/art-request/' + encodeURIComponent(rec.designId)
@@ -2807,15 +2820,51 @@
                 'Missing Design # \u2014 cannot search Box folder. Try Re-upload.');
         }
 
+        // Records with N broken slots \u2192 fire N recovery calls (one per slot).
+        // The recovery util only writes one slot per invocation (see
+        // recover-broken-mockup.js). Falls back to the legacy single-slot
+        // field if data-broken-slots is absent (older modal markup).
+        var brokenSlots = [];
+        try {
+            brokenSlots = JSON.parse(row.dataset.brokenSlots || '[]');
+        } catch (e) { /* parse failure \u2192 fall through to fallback */ }
+        if (!brokenSlots.length && row.dataset.slotField) {
+            brokenSlots = [row.dataset.slotField];
+        }
+        if (!brokenSlots.length) {
+            // Last resort \u2014 kick off Box_File_Mockup recovery, which is what the
+            // old behavior did when slotField was unspecified.
+            brokenSlots = [undefined];
+        }
+
         bmlSetRowState(row, 'recovering');
-        fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ designNumber: designNumber, companyName: companyName })
-        })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
-        .then(function (resp) { bmlApplyResultToRow(row, resp.body); })
-        .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
+        var calls = brokenSlots.map(function (slotField) {
+            var body = { designNumber: designNumber, companyName: companyName };
+            if (slotField) body.slotField = slotField;
+            return fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(function (r) {
+                return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; });
+            });
+        });
+
+        Promise.all(calls)
+            .then(function (results) {
+                // Aggregate: fully recovered if every slot recovered. Otherwise
+                // surface the worst non-recovered status so the user sees what's
+                // still wrong (no-folder beats empty-folder beats no-match).
+                var bodies = results.map(function (r) { return r.body || {}; });
+                var allRecovered = bodies.every(function (b) { return b.status === 'recovered'; });
+                if (allRecovered) {
+                    // Use the first recovered body for the row's display payload.
+                    return bmlApplyResultToRow(row, bodies[0]);
+                }
+                var worst = bodies.find(function (b) { return b.status !== 'recovered'; }) || bodies[0];
+                return bmlApplyResultToRow(row, worst);
+            })
+            .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
     }
 
     function bmlActionReupload(row) {
@@ -2875,39 +2924,78 @@
             return;
         }
 
-        var records = rows.map(function (row) {
-            return {
-                pkId: row.dataset.pkId,
-                designNumber: row.dataset.designNumSw,
-                companyName: row.dataset.company
-            };
+        // Flatten rows \u2192 entries: one entry per (record, brokenSlotField).
+        // A record with N broken slots produces N entries. Bulk endpoint
+        // accepts up to 50 entries per call; we cap defensively here.
+        var entries = [];
+        rows.forEach(function (row) {
+            var pkId = row.dataset.pkId;
+            var designNumber = row.dataset.designNumSw;
+            var companyName = row.dataset.company;
+            if (!pkId || !designNumber) return;
+            var slots = [];
+            try { slots = JSON.parse(row.dataset.brokenSlots || '[]'); } catch (e) { /* fall through */ }
+            if (!slots.length && row.dataset.slotField) slots = [row.dataset.slotField];
+            if (!slots.length) slots = [undefined]; // fallback: util defaults to Box_File_Mockup
+            slots.forEach(function (slotField) {
+                var entry = { pkId: pkId, designNumber: designNumber, companyName: companyName };
+                if (slotField) entry.slotField = slotField;
+                entries.push(entry);
+            });
         });
+        if (entries.length === 0) return;
+        if (entries.length > 50) {
+            // Defensive \u2014 shouldn't happen with realistic record counts but the
+            // route will 400 if exceeded, so trim and warn the user.
+            console.warn('[bmlActionRecoverAll] Trimming', entries.length, 'entries to 50 (route limit)');
+            entries = entries.slice(0, 50);
+        }
 
         bulkBtn.disabled = true;
         var origLabel = bulkBtn.innerHTML;
-        bulkBtn.innerHTML = '\u23f3 Searching ' + rows.length + ' Box folder'
-            + (rows.length === 1 ? '' : 's') + '...';
+        bulkBtn.innerHTML = '\u23f3 Searching ' + entries.length + ' slot'
+            + (entries.length === 1 ? '' : 's') + '...';
         rows.forEach(function (row) { bmlSetRowState(row, 'recovering'); });
 
         fetch(API_BASE + '/api/art-requests/auto-recover-mockups-bulk', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ records: records })
+            body: JSON.stringify({ records: entries })
         })
         .then(function (r) { return r.json(); })
         .then(function (data) {
+            // Group results by pkId so we can roll up multi-slot recoveries
+            // into a single row state. A record's row is "recovered" only if
+            // ALL its slots recovered; otherwise it shows the worst status.
+            var byPk = {};
             (data.results || []).forEach(function (result) {
-                var pkSafe = (window.CSS && CSS.escape)
-                    ? CSS.escape(String(result.pkId))
-                    : String(result.pkId);
-                var row = overlay.querySelector('.bml-row[data-pk-id="' + pkSafe + '"]');
-                if (row) bmlApplyResultToRow(row, result);
+                var key = String(result.pkId);
+                if (!byPk[key]) byPk[key] = [];
+                byPk[key].push(result);
             });
-            bulkBtn.innerHTML = '\u2713 Recovered ' + data.recovered + ' of ' + data.total;
+            Object.keys(byPk).forEach(function (pk) {
+                var pkSafe = (window.CSS && CSS.escape) ? CSS.escape(pk) : pk;
+                var row = overlay.querySelector('.bml-row[data-pk-id="' + pkSafe + '"]');
+                if (!row) return;
+                var slotResults = byPk[pk];
+                var allRec = slotResults.every(function (r) { return r.status === 'recovered'; });
+                if (allRec) {
+                    bmlApplyResultToRow(row, slotResults[0]);
+                } else {
+                    var worst = slotResults.find(function (r) { return r.status !== 'recovered'; }) || slotResults[0];
+                    bmlApplyResultToRow(row, worst);
+                }
+            });
+            // Roll up: count of records (not entries) where every slot recovered.
+            var recordsRecovered = Object.keys(byPk).filter(function (pk) {
+                return byPk[pk].every(function (r) { return r.status === 'recovered'; });
+            }).length;
+            bulkBtn.innerHTML = '\u2713 Recovered ' + recordsRecovered + ' of ' + Object.keys(byPk).length
+                + ' (' + data.recovered + '/' + data.total + ' slots)';
             setTimeout(function () {
                 bulkBtn.disabled = false;
                 bulkBtn.innerHTML = origLabel;
-            }, 3500);
+            }, 4500);
         })
         .catch(function (err) {
             bulkBtn.disabled = false;
