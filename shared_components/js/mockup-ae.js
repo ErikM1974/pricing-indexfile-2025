@@ -197,9 +197,17 @@ var MockupAeGallery = (function () {
     function getDisplayMockups() {
         var searchLc = (currentSearchText || '').toLowerCase();
         return allMockups.filter(function (m) {
-            var matchBucket = currentBucketFilter === 'all'
-                || currentBucketFilter === null
-                || bucketFor(m.Status) === currentBucketFilter;
+            var matchBucket;
+            if (currentBucketFilter === 'on-hold') {
+                // 'On Hold' chip → only on-hold mockups, regardless of status
+                matchBucket = !!m.Is_On_Hold;
+            } else if (currentBucketFilter === 'all' || currentBucketFilter === null) {
+                // 'All' includes on-hold (existing behavior preserved)
+                matchBucket = true;
+            } else {
+                // Status buckets exclude on-hold — paused mockups don't pollute counts
+                matchBucket = !m.Is_On_Hold && bucketFor(m.Status) === currentBucketFilter;
+            }
             var matchRep = currentRepFilter === 'All' || resolveRepName(m.Submitted_By || '') === currentRepFilter;
             var matchSearch = !searchLc || (
                 (m.Company_Name || '').toLowerCase().indexOf(searchLc) !== -1 ||
@@ -229,16 +237,22 @@ var MockupAeGallery = (function () {
     }
 
     function countByBucket(mockups) {
-        var counts = { needsReview: 0, withRuth: 0, done: 0, all: 0 };
+        var counts = { needsReview: 0, withRuth: 0, done: 0, onHold: 0, all: 0 };
         mockups.forEach(function (m) {
             counts.all++;
+            // On-hold mockups get their own bucket and are excluded from status buckets
+            // — paused mockups shouldn't pollute "Needs Your Review" backlogs.
+            if (m.Is_On_Hold) {
+                counts.onHold++;
+                return;
+            }
             var b = bucketFor(m.Status);
             if (b === 'needs-review') counts.needsReview++;
             else if (b === 'done') counts.done++;
             else counts.withRuth++;
         });
         // Safety assertion — every mockup must land in exactly one bucket.
-        var sum = counts.needsReview + counts.withRuth + counts.done;
+        var sum = counts.needsReview + counts.withRuth + counts.done + counts.onHold;
         if (sum !== counts.all) {
             console.warn('[MockupAeGallery] bucket sum ' + sum + ' !== total ' + counts.all
                 + ' — some mockups were not categorized. Check normalizeStatus().');
@@ -251,6 +265,7 @@ var MockupAeGallery = (function () {
             { key: 'needs-review', label: 'Needs Your Review', count: counts.needsReview, modifier: 'needs-review' },
             { key: 'with-ruth',    label: 'With Ruth',         count: counts.withRuth,    modifier: 'with-ruth' },
             { key: 'done',         label: 'Done',              count: counts.done,        modifier: 'done' },
+            { key: 'on-hold',      label: 'On Hold',           count: counts.onHold,      modifier: 'on-hold' },
             { key: 'all',          label: 'All',               count: counts.all,         modifier: 'all' }
         ];
         var html = '<div class="status-summary">';
@@ -335,6 +350,13 @@ var MockupAeGallery = (function () {
         var mockupType = escapeHtml(mockup.Mockup_Type || '');
         var submittedDate = formatDate(mockup.Submitted_Date);
         var revCount = mockup.Revision_Count || 0;
+        // On-hold overlay — mirrors art-ae.js. Pill renders next to status pill,
+        // .mockup-card--on-hold drops opacity to 0.65.
+        var isOnHold = !!mockup.Is_On_Hold;
+        var onHoldClass = isOnHold ? ' mockup-card--on-hold' : '';
+        var onHoldPillHtml = isOnHold
+            ? '<span class="status-pill status-pill--on-hold" title="' + escapeHtml(mockup.On_Hold_Note || 'On hold — customer paused this mockup') + '">On Hold</span> '
+            : '';
 
         // Logo dimensions + stitch count — Ruth fills these in; AE reads.
         var dimensions = '';
@@ -388,7 +410,7 @@ var MockupAeGallery = (function () {
         // matches against the full resolveRepName() output.
         var repFirstName = repName ? escapeHtml(String(repName).split(/\s+/)[0]) : '';
 
-        return '<div class="mockup-card" data-mockup-id="' + id + '" data-rep="' + escapeHtml(repName) + '" style="cursor:pointer;">'
+        return '<div class="mockup-card' + onHoldClass + '" data-mockup-id="' + id + '" data-rep="' + escapeHtml(repName) + '" style="cursor:pointer;">'
             + '<div class="card-header">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
@@ -397,6 +419,7 @@ var MockupAeGallery = (function () {
             +      '</div>'
             + '  </div>'
             + '  <div class="card-header-right">'
+            + '    ' + onHoldPillHtml
             + '    <span class="status-pill ' + statusClass + '">' + escapeHtml(status) + '</span>'
             + '  </div>'
             + '</div>'

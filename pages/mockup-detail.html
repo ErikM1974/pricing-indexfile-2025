@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=42">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=43">
     <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=1">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
 </head>
@@ -329,6 +329,21 @@
                         <label for="pmd-edit-ae-notes">AE Instructions</label>
                         <textarea id="pmd-edit-ae-notes" rows="4"></textarea>
                     </div>
+                    <div class="pmd-edit-field pmd-edit-full pmd-on-hold-section">
+                        <label class="pmd-toggle">
+                            <input type="checkbox" id="pmd-edit-on-hold-toggle">
+                            <span class="pmd-toggle-slider"></span>
+                            <span class="pmd-toggle-text">
+                                <span class="pmd-toggle-label">Put on Hold</span>
+                                <span class="pmd-toggle-help">Customer paused — keep the mockup but hide from Ruth's active queue</span>
+                            </span>
+                        </label>
+                        <div id="pmd-edit-on-hold-details" style="display:none; margin-top:0.875rem;">
+                            <label for="pmd-edit-on-hold-note">Reason / customer status</label>
+                            <textarea id="pmd-edit-on-hold-note" rows="3" placeholder="e.g. Waiting on customer's logo from designer · Budget approval pending · Customer following up in Q3"></textarea>
+                            <div class="pmd-on-hold-since" id="pmd-edit-on-hold-since" style="display:none;"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="pmd-edit-footer">
@@ -347,6 +362,6 @@
     <script src="/shared_components/js/transfer-actions-shared.js?v=17"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
-    <script src="/pages/js/mockup-detail.js?v=78"></script>
+    <script src="/pages/js/mockup-detail.js?v=79"></script>
 </body>
 </html>

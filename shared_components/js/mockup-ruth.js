@@ -159,10 +159,18 @@
             inProgress: 0,
             awaitingApproval: 0,
             revisionRequested: 0,
-            approved: 0
+            approved: 0,
+            onHold: 0
         };
 
         allMockups.forEach(m => {
+            // On-hold mockups get their own count and are excluded from the
+            // status-specific buckets (so Ruth's "Submitted" backlog isn't
+            // inflated by paused work).
+            if (m.Is_On_Hold) {
+                counts.onHold++;
+                return;
+            }
             const s = (m.Status || '').toLowerCase();
             if (s === 'submitted') counts.submitted++;
             else if (s === 'in progress') counts.inProgress++;
@@ -179,7 +187,9 @@
         if (queueBadge) queueBadge.textContent = queueTotal;
         if (completedBadge) completedBadge.textContent = counts.approved;
 
-        // Update status summary bar
+        // Update status summary bar — adds an "On Hold" stat tile alongside
+        // the workflow status counts. Display only (not interactive); on-hold
+        // mockups are visible on the All tab with their muted card styling.
         const summaryEl = document.getElementById('status-summary');
         if (summaryEl) {
             summaryEl.innerHTML = `
@@ -198,6 +208,10 @@
                 <div class="status-stat status-stat--revision-requested" title="Revision Requested">
                     <span class="status-stat-count" data-stat="revisionRequested">${counts.revisionRequested}</span>
                     <span class="status-stat-label">Revisions</span>
+                </div>
+                <div class="status-stat status-stat--on-hold" title="On Hold (customer paused)">
+                    <span class="status-stat-count" data-stat="onHold">${counts.onHold}</span>
+                    <span class="status-stat-label">On Hold</span>
                 </div>
             `;
             popChangedCounts(counts);
@@ -269,9 +283,11 @@
 
         injectSearchBar();
 
-        // Filter mockups
-        let queueMockups = allMockups.filter(m => QUEUE_STATUSES.includes(m.Status));
-        let completedMockups = allMockups.filter(m => COMPLETED_STATUSES.includes(m.Status));
+        // Filter mockups. On-hold mockups are paused — they don't belong in
+        // either queue or completed (they're parked). Visible only on the All
+        // tab (which doesn't go through this filter) with their muted card styling.
+        let queueMockups = allMockups.filter(m => !m.Is_On_Hold && QUEUE_STATUSES.includes(m.Status));
+        let completedMockups = allMockups.filter(m => !m.Is_On_Hold && COMPLETED_STATUSES.includes(m.Status));
 
         // Apply text search
         if (ruthSearchText) {
@@ -435,16 +451,24 @@
         const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
         const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
         const rushClass = isRushMockup ? ' mockup-card--rush' : '';
+        // On-hold overlay — visibility only, AE owns the toggle via the
+        // mockup detail edit modal. Pill renders next to status pill;
+        // .mockup-card--on-hold drops opacity to 0.65.
+        const isOnHold = !!mockup.Is_On_Hold;
+        const onHoldClass = isOnHold ? ' mockup-card--on-hold' : '';
+        const onHoldPillHtml = isOnHold
+            ? `<span class="status-pill status-pill--on-hold" title="${escapeHtml(mockup.On_Hold_Note || 'On hold — customer paused this mockup')}">On Hold</span> `
+            : '';
 
         return `
-        <div class="mockup-card ${cardStatusClass}${rushClass}" data-mockup-id="${id}" data-work-order="${workOrder}">
+        <div class="mockup-card ${cardStatusClass}${rushClass}${onHoldClass}" data-mockup-id="${id}" data-work-order="${workOrder}">
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
                     <div class="card-design-number">#${designNum}${aeDisplay ? `<span class="card-rep-name" data-action="filter-rep" data-rep="${escapeHtml(aeDisplay)}" title="Click to filter by ${escapeHtml(aeDisplay)}">${escapeHtml(aeDisplay)}</span>` : ''}</div>
                 </div>
                 <div class="card-header-right">
-                    <span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
+                    ${onHoldPillHtml}<span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
                 </div>
             </div>
             ${thumbHtml}

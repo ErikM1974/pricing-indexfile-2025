@@ -341,6 +341,30 @@
         safeSet('pmd-edit-thread-colors', mockup.Thread_Colors || '');
         safeSet('pmd-edit-ae-notes', mockup.AE_Notes || '');
 
+        // On Hold section — populate toggle + reason + "since" date display
+        var holdToggle = document.getElementById('pmd-edit-on-hold-toggle');
+        var holdDetails = document.getElementById('pmd-edit-on-hold-details');
+        var holdSince = document.getElementById('pmd-edit-on-hold-since');
+        if (holdToggle && holdDetails) {
+            holdToggle.checked = !!mockup.Is_On_Hold;
+            safeSet('pmd-edit-on-hold-note', mockup.On_Hold_Note || '');
+            holdDetails.style.display = holdToggle.checked ? 'block' : 'none';
+            if (holdSince) {
+                if (mockup.Is_On_Hold && mockup.On_Hold_Since) {
+                    var since = new Date(mockup.On_Hold_Since);
+                    holdSince.style.display = 'block';
+                    holdSince.textContent = 'On hold since ' + since.toLocaleDateString(undefined,
+                        { year: 'numeric', month: 'short', day: 'numeric' });
+                } else {
+                    holdSince.style.display = 'none';
+                }
+            }
+            // onchange (not addEventListener) so re-opening doesn't stack listeners
+            holdToggle.onchange = function () {
+                holdDetails.style.display = this.checked ? 'block' : 'none';
+            };
+        }
+
         modal.style.display = 'flex';
 
         safeOn('pmd-edit-close', function () { modal.style.display = 'none'; });
@@ -364,7 +388,8 @@
             { key: 'Design_Size', el: 'pmd-edit-design-size', orig: originalMockup.Design_Size || '' },
             { key: 'Due_Date', el: 'pmd-edit-due-date', orig: originalMockup.Due_Date ? new Date(originalMockup.Due_Date).toISOString().split('T')[0] : '' },
             { key: 'Thread_Colors', el: 'pmd-edit-thread-colors', orig: originalMockup.Thread_Colors || '' },
-            { key: 'AE_Notes', el: 'pmd-edit-ae-notes', orig: originalMockup.AE_Notes || '' }
+            { key: 'AE_Notes', el: 'pmd-edit-ae-notes', orig: originalMockup.AE_Notes || '' },
+            { key: 'On_Hold_Note', el: 'pmd-edit-on-hold-note', orig: originalMockup.On_Hold_Note || '' }
         ];
 
         var updates = {};
@@ -376,6 +401,17 @@
                 changedNames.push(f.key);
             }
         });
+
+        // Boolean diff for the on-hold toggle (proxy auto-stamps On_Hold_Since)
+        var holdToggleEl = document.getElementById('pmd-edit-on-hold-toggle');
+        if (holdToggleEl) {
+            var newOnHold = holdToggleEl.checked;
+            var origOnHold = !!originalMockup.Is_On_Hold;
+            if (newOnHold !== origOnHold) {
+                updates.Is_On_Hold = newOnHold;
+                changedNames.push('Is_On_Hold');
+            }
+        }
 
         if (Object.keys(updates).length === 0) {
             document.getElementById('pmd-edit-modal').style.display = 'none';
