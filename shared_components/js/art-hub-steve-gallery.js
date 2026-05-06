@@ -140,8 +140,8 @@
         // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
         // empty and User_Email holds the AE email — without User_Email in the
         // SELECT the rep first name in the card header has nothing to resolve.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 
@@ -165,9 +165,16 @@
 
     // ── Render: status filter chips ────────────────────────────────────────
     function renderStatusChips() {
-        var counts = { all: 0, submitted: 0, 'in-progress': 0, 'awaiting-approval': 0, 'revision-requested': 0, approved: 0, completed: 0 };
+        var counts = { all: 0, submitted: 0, 'in-progress': 0, 'awaiting-approval': 0, 'revision-requested': 0, approved: 0, completed: 0, 'on-hold': 0 };
         allRequests.forEach(function (r) {
             counts.all++;
+            // On-hold designs get their own chip and are EXCLUDED from the
+            // status counts — keeps Steve's "Awaiting Approval" backlog accurate
+            // (mirrors the AE-dashboard pattern from Phase 2).
+            if (r.Is_On_Hold) {
+                counts['on-hold']++;
+                return;
+            }
             var k = statusKey(r);
             if (counts[k] !== undefined) counts[k]++;
         });
@@ -179,7 +186,8 @@
             { key: 'awaiting-approval',    label: 'Awaiting Approval',  modifier: 'awaiting-approval' },
             { key: 'revision-requested',   label: 'Revisions',          modifier: 'revision-requested' },
             { key: 'approved',             label: 'Approved',           modifier: 'completed' },
-            { key: 'completed',            label: 'Completed',          modifier: 'completed' }
+            { key: 'completed',            label: 'Completed',          modifier: 'completed' },
+            { key: 'on-hold',              label: 'On Hold',            modifier: 'on-hold' }
         ];
 
         var html = '';
@@ -212,6 +220,13 @@
         var orderType  = getOrderType(req);
         var rushBadge  = isRush(req.Is_Rush);
         var rushCls    = rushBadge ? ' mockup-card--rush' : '';
+        // On-hold overlay (Phase 3) — visibility only, AE owns the toggle.
+        // Pill renders next to status pill; opacity drops via .mockup-card--on-hold.
+        var isOnHold      = !!req.Is_On_Hold;
+        var onHoldCls     = isOnHold ? ' mockup-card--on-hold' : '';
+        var onHoldPillHtml = isOnHold
+            ? '<span class="status-pill status-pill--on-hold" title="' + escapeHtml(req.On_Hold_Note || 'On hold — customer paused this design') + '">On Hold</span> '
+            : '';
 
         var mockupUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
         var thumbHtml;
@@ -258,7 +273,7 @@
         if (revCount > 0)     badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
         if (due.text)         badges += '<span class="card-badge ' + due.cls + '">' + escapeHtml(due.text) + '</span>';
 
-        return '<article class="mockup-card mockup-card--' + sKey + rushCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '">' +
+        return '<article class="mockup-card mockup-card--' + sKey + rushCls + onHoldCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '">' +
             '<div class="card-header">' +
                 '<div class="card-header-left">' +
                     '<div class="card-company">' + company + '</div>' +
@@ -281,6 +296,7 @@
                     ) +
                 '</div>' +
                 '<div class="card-header-right">' +
+                    onHoldPillHtml +
                     '<span class="status-pill status-pill--' + sKey + '">' + escapeHtml(statusRaw) + '</span>' +
                 '</div>' +
             '</div>' +
@@ -310,7 +326,16 @@
         var q = currentSearch.toLowerCase();
         return allRequests.filter(function (r) {
             // Status filter
-            if (currentStatus !== 'all' && statusKey(r) !== currentStatus) return false;
+            if (currentStatus === 'on-hold') {
+                // 'On Hold' chip → only on-hold designs (regardless of underlying status)
+                if (!r.Is_On_Hold) return false;
+            } else if (currentStatus !== 'all') {
+                // Granular status chips exclude on-hold so paused designs don't
+                // pollute Steve's status backlogs.
+                if (r.Is_On_Hold) return false;
+                if (statusKey(r) !== currentStatus) return false;
+            }
+            // 'all' shows everything including on-hold (matches Phase 2 behavior)
             // Search filter — matches company, design#, ID, and rep first name
             // (resolved from Sales_Rep || User_Email). Lets the user filter
             // by typing "Nika" or by clicking a rep name in any card header
