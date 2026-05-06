@@ -341,29 +341,8 @@
         safeSet('pmd-edit-thread-colors', mockup.Thread_Colors || '');
         safeSet('pmd-edit-ae-notes', mockup.AE_Notes || '');
 
-        // On Hold section — populate toggle + reason + "since" date display
-        var holdToggle = document.getElementById('pmd-edit-on-hold-toggle');
-        var holdDetails = document.getElementById('pmd-edit-on-hold-details');
-        var holdSince = document.getElementById('pmd-edit-on-hold-since');
-        if (holdToggle && holdDetails) {
-            holdToggle.checked = !!mockup.Is_On_Hold;
-            safeSet('pmd-edit-on-hold-note', mockup.On_Hold_Note || '');
-            holdDetails.style.display = holdToggle.checked ? 'block' : 'none';
-            if (holdSince) {
-                if (mockup.Is_On_Hold && mockup.On_Hold_Since) {
-                    var since = new Date(mockup.On_Hold_Since);
-                    holdSince.style.display = 'block';
-                    holdSince.textContent = 'On hold since ' + since.toLocaleDateString(undefined,
-                        { year: 'numeric', month: 'short', day: 'numeric' });
-                } else {
-                    holdSince.style.display = 'none';
-                }
-            }
-            // onchange (not addEventListener) so re-opening doesn't stack listeners
-            holdToggle.onchange = function () {
-                holdDetails.style.display = this.checked ? 'block' : 'none';
-            };
-        }
+        // On Hold UI moved out of the modal — see renderOnHoldBar() below for the
+        // bar-mounted toggle that lives next to the Edit Request button.
 
         modal.style.display = 'flex';
 
@@ -388,8 +367,7 @@
             { key: 'Design_Size', el: 'pmd-edit-design-size', orig: originalMockup.Design_Size || '' },
             { key: 'Due_Date', el: 'pmd-edit-due-date', orig: originalMockup.Due_Date ? new Date(originalMockup.Due_Date).toISOString().split('T')[0] : '' },
             { key: 'Thread_Colors', el: 'pmd-edit-thread-colors', orig: originalMockup.Thread_Colors || '' },
-            { key: 'AE_Notes', el: 'pmd-edit-ae-notes', orig: originalMockup.AE_Notes || '' },
-            { key: 'On_Hold_Note', el: 'pmd-edit-on-hold-note', orig: originalMockup.On_Hold_Note || '' }
+            { key: 'AE_Notes', el: 'pmd-edit-ae-notes', orig: originalMockup.AE_Notes || '' }
         ];
 
         var updates = {};
@@ -402,16 +380,8 @@
             }
         });
 
-        // Boolean diff for the on-hold toggle (proxy auto-stamps On_Hold_Since)
-        var holdToggleEl = document.getElementById('pmd-edit-on-hold-toggle');
-        if (holdToggleEl) {
-            var newOnHold = holdToggleEl.checked;
-            var origOnHold = !!originalMockup.Is_On_Hold;
-            if (newOnHold !== origOnHold) {
-                updates.Is_On_Hold = newOnHold;
-                changedNames.push('Is_On_Hold');
-            }
-        }
+        // On Hold is no longer toggled here — it lives in the bar-mounted toggle
+        // (renderOnHoldBar) so AEs can flip it without opening the Edit modal.
 
         if (Object.keys(updates).length === 0) {
             document.getElementById('pmd-edit-modal').style.display = 'none';
@@ -664,6 +634,11 @@
         // Rush toggle (mark / unmark)
         renderRushToggle(mockup);
 
+        // On Hold visual state — pill in title row + page-wide gray-out.
+        // Visible to ALL views; the toggle itself only renders for AE view
+        // inside the edit bar (see below).
+        applyOnHoldVisuals(mockup);
+
         // Action bars
         renderActionBars(mockup, notes);
 
@@ -686,13 +661,14 @@
         // Info fields
         renderInfoFields(mockup);
 
-        // AE Edit button (all non-completed statuses)
+        // AE Edit button (all non-completed statuses) + On Hold bar to its left
         if (isAeView) {
             var statusForEdit = (mockup.Status || '').toLowerCase();
             if (statusForEdit !== 'completed') {
                 var editBar = document.createElement('div');
                 editBar.className = 'pmd-ae-edit-bar';
-                editBar.innerHTML = '<button type="button" class="pmd-ae-edit-btn" id="pmd-ae-edit-btn">Edit Request</button>';
+                editBar.innerHTML = buildOnHoldBarHtml(mockup)
+                    + '<button type="button" class="pmd-ae-edit-btn" id="pmd-ae-edit-btn">Edit Request</button>';
                 var infoCard = document.getElementById('pmd-info-fields');
                 if (infoCard && infoCard.parentNode) {
                     infoCard.parentNode.insertBefore(editBar, infoCard.nextSibling);
@@ -700,6 +676,8 @@
                 document.getElementById('pmd-ae-edit-btn').addEventListener('click', function () {
                     openMockupEditModal(mockup);
                 });
+                // Wire the on-hold toggle/reason after they're in the DOM
+                wireOnHoldBar(mockup);
             }
         }
 
@@ -748,6 +726,156 @@
         if (typeof v === 'boolean') return v;
         var s = String(v).trim().toLowerCase();
         return s === 'yes' || s === 'y' || s === 'true' || s === '1';
+    }
+
+    // ── On Hold visuals (title-row pill + page-wide gray-out) ──────────────
+    // Visible to ALL views. The interactive toggle only renders for AE views
+    // (see buildOnHoldBarHtml + wireOnHoldBar below).
+    function applyOnHoldVisuals(mockup) {
+        var content = document.querySelector('.pmd-content');
+        if (!content) return;
+        var isOn = !!mockup.Is_On_Hold;
+        content.classList.toggle('pmd-content--on-hold', isOn);
+
+        var existing = document.getElementById('pmd-on-hold-pill');
+        if (isOn) {
+            var titleText = mockup.On_Hold_Note ? ('On hold — ' + mockup.On_Hold_Note) : 'On hold (customer paused this mockup)';
+            if (!existing) {
+                var pill = document.createElement('span');
+                pill.id = 'pmd-on-hold-pill';
+                pill.className = 'pmd-on-hold-pill';
+                pill.title = titleText;
+                pill.textContent = 'On Hold';
+                var statusBadge = document.getElementById('pmd-status-badge');
+                if (statusBadge && statusBadge.parentNode) {
+                    statusBadge.parentNode.insertBefore(pill, statusBadge.nextSibling);
+                }
+            } else {
+                existing.title = titleText;
+            }
+        } else if (existing) {
+            existing.remove();
+        }
+    }
+
+    // ── On Hold bar (bar-mounted toggle next to Edit Request) ──────────────
+    function buildOnHoldBarHtml(mockup) {
+        var isOn = !!mockup.Is_On_Hold;
+        var sinceText = '';
+        if (isOn && mockup.On_Hold_Since) {
+            var d = new Date(mockup.On_Hold_Since);
+            if (!isNaN(d)) {
+                sinceText = 'On hold since ' + d.toLocaleDateString(undefined,
+                    { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        }
+        return ''
+            + '<div class="pmd-on-hold-bar' + (isOn ? ' pmd-on-hold-bar--active' : '') + '" id="pmd-on-hold-bar">'
+            +     '<label class="pmd-on-hold-toggle">'
+            +         '<input type="checkbox" id="pmd-on-hold-checkbox"' + (isOn ? ' checked' : '') + '>'
+            +         '<span class="pmd-on-hold-slider"></span>'
+            +         '<span class="pmd-on-hold-label">' + (isOn ? 'On Hold' : 'Put on Hold') + '</span>'
+            +     '</label>'
+            +     '<div class="pmd-on-hold-details" id="pmd-on-hold-details" style="display:' + (isOn ? 'block' : 'none') + ';">'
+            +         '<textarea id="pmd-on-hold-reason" rows="2" placeholder="Reason &mdash; auto-saves when you click out (e.g. Waiting on customer logo &middot; Q3 budget approval)">' + escapeHtml(mockup.On_Hold_Note || '') + '</textarea>'
+            +         '<div class="pmd-on-hold-meta">'
+            +             '<span class="pmd-on-hold-since" id="pmd-on-hold-since">' + escapeHtml(sinceText) + '</span>'
+            +             '<span class="pmd-on-hold-saved" id="pmd-on-hold-saved"></span>'
+            +         '</div>'
+            +     '</div>'
+            + '</div>';
+    }
+
+    function wireOnHoldBar(mockup) {
+        var checkbox = document.getElementById('pmd-on-hold-checkbox');
+        var bar = document.getElementById('pmd-on-hold-bar');
+        var details = document.getElementById('pmd-on-hold-details');
+        var label = bar && bar.querySelector('.pmd-on-hold-label');
+        var reasonField = document.getElementById('pmd-on-hold-reason');
+        var sinceEl = document.getElementById('pmd-on-hold-since');
+        var savedEl = document.getElementById('pmd-on-hold-saved');
+        var content = document.querySelector('.pmd-content');
+        if (!checkbox || !bar || !details || !reasonField) return;
+
+        var lastSavedReason = reasonField.value;
+
+        checkbox.addEventListener('change', async function () {
+            var isOn = checkbox.checked;
+            bar.classList.toggle('pmd-on-hold-bar--active', isOn);
+            details.style.display = isOn ? 'block' : 'none';
+            if (label) label.textContent = isOn ? 'On Hold' : 'Put on Hold';
+            if (content) content.classList.toggle('pmd-content--on-hold', isOn);
+
+            try {
+                var resp = await fetch(API_BASE + '/api/mockups/' + mockupId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Is_On_Hold: isOn,
+                        On_Hold_Note: isOn ? (reasonField.value || '') : ''
+                    })
+                });
+                if (!resp.ok) throw new Error('API ' + resp.status);
+
+                mockup.Is_On_Hold = isOn;
+                if (isOn) {
+                    mockup.On_Hold_Since = new Date().toISOString();
+                    if (sinceEl) {
+                        sinceEl.textContent = 'On hold since ' + new Date().toLocaleDateString(undefined,
+                            { year: 'numeric', month: 'short', day: 'numeric' });
+                    }
+                    applyOnHoldVisuals(mockup);
+                    setTimeout(function () { reasonField.focus(); }, 50);
+                } else {
+                    mockup.On_Hold_Since = null;
+                    mockup.On_Hold_Note = '';
+                    reasonField.value = '';
+                    lastSavedReason = '';
+                    if (sinceEl) sinceEl.textContent = '';
+                    applyOnHoldVisuals(mockup);
+                }
+                flashSaved(savedEl, isOn ? '✓ On hold' : '✓ Resumed');
+            } catch (err) {
+                console.error('On Hold toggle failed:', err);
+                checkbox.checked = !isOn;
+                bar.classList.toggle('pmd-on-hold-bar--active', !isOn);
+                details.style.display = !isOn ? 'block' : 'none';
+                if (label) label.textContent = !isOn ? 'On Hold' : 'Put on Hold';
+                if (content) content.classList.toggle('pmd-content--on-hold', !isOn);
+                alert('Failed to update on-hold status: ' + err.message);
+            }
+        });
+
+        reasonField.addEventListener('blur', async function () {
+            if (!checkbox.checked) return;
+            var newReason = reasonField.value;
+            if (newReason === lastSavedReason) return;
+            try {
+                var resp = await fetch(API_BASE + '/api/mockups/' + mockupId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ On_Hold_Note: newReason })
+                });
+                if (!resp.ok) throw new Error('API ' + resp.status);
+                lastSavedReason = newReason;
+                mockup.On_Hold_Note = newReason;
+                flashSaved(savedEl, '✓ Saved');
+            } catch (err) {
+                console.error('On Hold reason save failed:', err);
+                if (savedEl) {
+                    savedEl.textContent = '⚠ Save failed';
+                    savedEl.classList.add('pmd-on-hold-saved--visible');
+                    setTimeout(function () { savedEl.classList.remove('pmd-on-hold-saved--visible'); }, 3000);
+                }
+            }
+        });
+    }
+
+    function flashSaved(el, text) {
+        if (!el) return;
+        el.textContent = text || '✓ Saved';
+        el.classList.add('pmd-on-hold-saved--visible');
+        setTimeout(function () { el.classList.remove('pmd-on-hold-saved--visible'); }, 2000);
     }
 
     // ── Rush Toggle (mark / unmark) ────────────────────────────────────────

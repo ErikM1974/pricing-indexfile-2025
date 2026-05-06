@@ -228,6 +228,12 @@
         // Rush toggle (renders for every request — clickable to mark/clear rush)
         renderRushToggle(req);
 
+        // On Hold visual state — read-only badge in the title row + page-wide
+        // gray-out. The interactive toggle lives in the AE action bar (see
+        // renderOnHoldBar). Visible to ALL views (AE, Steve, customer) so
+        // anyone reading the page sees instantly that this design is paused.
+        applyOnHoldVisuals(req);
+
         // Request type badge (Mockup)
         if (req.Request_Type && req.Request_Type.toLowerCase() === 'mockup') {
             const typeBadge = document.createElement('span');
@@ -535,6 +541,164 @@
         });
     }
 
+    // ── On Hold visuals (title-row pill + page-wide gray-out) ───────────
+    // Visible to ALL views (AE, Steve, customer). The interactive toggle
+    // only renders for AE — see buildOnHoldBarHtml + wireOnHoldBar below.
+    function applyOnHoldVisuals(req) {
+        var content = document.querySelector('.ard-content');
+        if (!content) return;
+        var isOn = !!req.Is_On_Hold;
+        content.classList.toggle('ard-content--on-hold', isOn);
+
+        // Title-row pill (insert next to the status badge if held; remove if not)
+        var existing = document.getElementById('ard-on-hold-pill');
+        if (isOn) {
+            var titleText = req.On_Hold_Note ? ('On hold — ' + req.On_Hold_Note) : 'On hold (customer paused this design)';
+            if (!existing) {
+                var pill = document.createElement('span');
+                pill.id = 'ard-on-hold-pill';
+                pill.className = 'ard-on-hold-pill';
+                pill.title = titleText;
+                pill.textContent = 'On Hold';
+                var statusBadge = document.getElementById('ard-status-badge');
+                if (statusBadge && statusBadge.parentNode) {
+                    statusBadge.parentNode.insertBefore(pill, statusBadge.nextSibling);
+                }
+            } else {
+                existing.title = titleText;
+            }
+        } else if (existing) {
+            existing.remove();
+        }
+    }
+
+    // ── On Hold bar (mounted into the AE Status Bar — toggle + reason field) ──
+    // Returns the HTML string to be unshifted into the buttons array of
+    // renderAeStatusBar (lives left of Edit Request, right of any status label).
+    function buildOnHoldBarHtml(req) {
+        var isOn = !!req.Is_On_Hold;
+        var sinceText = '';
+        if (isOn && req.On_Hold_Since) {
+            var d = new Date(req.On_Hold_Since);
+            if (!isNaN(d)) {
+                sinceText = 'On hold since ' + d.toLocaleDateString(undefined,
+                    { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+        }
+        return ''
+            + '<div class="ard-on-hold-bar' + (isOn ? ' ard-on-hold-bar--active' : '') + '" id="ard-on-hold-bar">'
+            +     '<label class="ard-on-hold-toggle">'
+            +         '<input type="checkbox" id="ard-on-hold-checkbox"' + (isOn ? ' checked' : '') + '>'
+            +         '<span class="ard-on-hold-slider"></span>'
+            +         '<span class="ard-on-hold-label">' + (isOn ? 'On Hold' : 'Put on Hold') + '</span>'
+            +     '</label>'
+            +     '<div class="ard-on-hold-details" id="ard-on-hold-details" style="display:' + (isOn ? 'block' : 'none') + ';">'
+            +         '<textarea id="ard-on-hold-reason" rows="2" placeholder="Reason &mdash; auto-saves when you click out (e.g. Waiting on customer logo &middot; Q3 budget approval)">' + escapeHtml(req.On_Hold_Note || '') + '</textarea>'
+            +         '<div class="ard-on-hold-meta">'
+            +             '<span class="ard-on-hold-since" id="ard-on-hold-since">' + escapeHtml(sinceText) + '</span>'
+            +             '<span class="ard-on-hold-saved" id="ard-on-hold-saved"></span>'
+            +         '</div>'
+            +     '</div>'
+            + '</div>';
+    }
+
+    // Wire up the on-hold bar (called after innerHTML is set in renderAeStatusBar)
+    function wireOnHoldBar(req) {
+        var checkbox = document.getElementById('ard-on-hold-checkbox');
+        var bar = document.getElementById('ard-on-hold-bar');
+        var details = document.getElementById('ard-on-hold-details');
+        var label = bar && bar.querySelector('.ard-on-hold-label');
+        var reasonField = document.getElementById('ard-on-hold-reason');
+        var sinceEl = document.getElementById('ard-on-hold-since');
+        var savedEl = document.getElementById('ard-on-hold-saved');
+        var content = document.querySelector('.ard-content');
+        if (!checkbox || !bar || !details || !reasonField) return;
+
+        var lastSavedReason = reasonField.value;
+
+        // Toggle change → PUT Is_On_Hold + show/hide details + apply gray-out
+        checkbox.addEventListener('change', async function () {
+            var isOn = checkbox.checked;
+            bar.classList.toggle('ard-on-hold-bar--active', isOn);
+            details.style.display = isOn ? 'block' : 'none';
+            if (label) label.textContent = isOn ? 'On Hold' : 'Put on Hold';
+            if (content) content.classList.toggle('ard-content--on-hold', isOn);
+
+            try {
+                var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/fields', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        Is_On_Hold: isOn,
+                        On_Hold_Note: isOn ? (reasonField.value || '') : ''
+                    })
+                });
+                if (!resp.ok) throw new Error('API ' + resp.status);
+
+                // Update local req state
+                req.Is_On_Hold = isOn;
+                if (isOn) {
+                    req.On_Hold_Since = new Date().toISOString();
+                    if (sinceEl) {
+                        sinceEl.textContent = 'On hold since ' + new Date().toLocaleDateString(undefined,
+                            { year: 'numeric', month: 'short', day: 'numeric' });
+                    }
+                    applyOnHoldVisuals(req);          // add title-row pill
+                    setTimeout(function () { reasonField.focus(); }, 50);
+                } else {
+                    req.On_Hold_Since = null;
+                    req.On_Hold_Note = '';
+                    reasonField.value = '';
+                    lastSavedReason = '';
+                    if (sinceEl) sinceEl.textContent = '';
+                    applyOnHoldVisuals(req);          // remove title-row pill
+                }
+                flashSaved(savedEl, isOn ? '✓ On hold' : '✓ Resumed');
+            } catch (err) {
+                console.error('On Hold toggle failed:', err);
+                // Revert UI
+                checkbox.checked = !isOn;
+                bar.classList.toggle('ard-on-hold-bar--active', !isOn);
+                details.style.display = !isOn ? 'block' : 'none';
+                if (label) label.textContent = !isOn ? 'On Hold' : 'Put on Hold';
+                if (content) content.classList.toggle('ard-content--on-hold', !isOn);
+                alert('Failed to update on-hold status: ' + err.message);
+            }
+        });
+
+        // Reason field blur → save text only (no Is_On_Hold change → server preserves timestamp)
+        reasonField.addEventListener('blur', async function () {
+            if (!checkbox.checked) return;
+            var newReason = reasonField.value;
+            if (newReason === lastSavedReason) return;
+            try {
+                var resp = await fetch(API_BASE + '/api/art-requests/' + designId + '/fields', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ On_Hold_Note: newReason })
+                });
+                if (!resp.ok) throw new Error('API ' + resp.status);
+                lastSavedReason = newReason;
+                req.On_Hold_Note = newReason;
+                flashSaved(savedEl, '✓ Saved');
+            } catch (err) {
+                console.error('On Hold reason save failed:', err);
+                if (savedEl) {
+                    savedEl.textContent = '⚠ Save failed';
+                    savedEl.classList.add('ard-on-hold-saved--visible');
+                    setTimeout(function () { savedEl.classList.remove('ard-on-hold-saved--visible'); }, 3000);
+                }
+            }
+        });
+    }
+
+    function flashSaved(el, text) {
+        if (!el) return;
+        el.textContent = text || '✓ Saved';
+        el.classList.add('ard-on-hold-saved--visible');
+        setTimeout(function () { el.classList.remove('ard-on-hold-saved--visible'); }, 2000);
+    }
+
     // ── AE Status Bar (all statuses) ────────────────────────────────────
     function renderAeStatusBar(req, statusClean, notes) {
         var bar = document.getElementById('ard-ae-status-bar');
@@ -566,7 +730,15 @@
         }
         // Note: awaitingapproval is handled by the existing ard-action-bar above
 
+        // On Hold bar — always prepended so it sits to the LEFT of the
+        // status-specific buttons + Edit Request. AE-only (this whole bar
+        // only renders for AE views).
+        buttons.unshift(buildOnHoldBarHtml(req));
+
         bar.innerHTML = '<div class="ard-ae-status-inner">' + buttons.join('') + '</div>';
+
+        // Wire on-hold toggle + reason blur handlers (after innerHTML is set)
+        wireOnHoldBar(req);
 
         // Wire up "Mark In Progress" button
         var workingBtn = document.getElementById('ard-ae-btn-working');
@@ -793,30 +965,8 @@
         document.getElementById('ard-edit-last-name').value = req.Last_name || req.Last_Name || '';
         document.getElementById('ard-edit-email').value = req.Email_Contact || req.Email || '';
 
-        // On Hold section
-        var holdToggle = document.getElementById('ard-edit-on-hold-toggle');
-        var holdDetails = document.getElementById('ard-edit-on-hold-details');
-        var holdSince = document.getElementById('ard-edit-on-hold-since');
-        if (holdToggle && holdDetails) {
-            holdToggle.checked = !!req.Is_On_Hold;
-            document.getElementById('ard-edit-on-hold-note').value = req.On_Hold_Note || '';
-            holdDetails.style.display = holdToggle.checked ? 'block' : 'none';
-            if (holdSince) {
-                if (req.Is_On_Hold && req.On_Hold_Since) {
-                    var since = new Date(req.On_Hold_Since);
-                    holdSince.style.display = 'block';
-                    holdSince.textContent = 'On hold since ' + since.toLocaleDateString(undefined,
-                        { year: 'numeric', month: 'short', day: 'numeric' });
-                } else {
-                    holdSince.style.display = 'none';
-                }
-            }
-            // Reveal/hide reason field as toggle flips. Use onchange (not addEventListener)
-            // so re-opening the modal doesn't stack listeners.
-            holdToggle.onchange = function () {
-                holdDetails.style.display = this.checked ? 'block' : 'none';
-            };
-        }
+        // On Hold UI moved out of the modal — see renderOnHoldBar() below for the
+        // bar-mounted toggle that lives next to the Edit Request button.
 
         modal.style.display = 'flex';
 
@@ -863,8 +1013,7 @@
             { key: 'Additional_Services', el: 'ard-edit-addl-services', orig: originalReq.Additional_Services || '' },
             { key: 'First_name', el: 'ard-edit-first-name', orig: originalReq.First_name || '' },
             { key: 'Last_name', el: 'ard-edit-last-name', orig: originalReq.Last_name || '' },
-            { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' },
-            { key: 'On_Hold_Note', el: 'ard-edit-on-hold-note', orig: originalReq.On_Hold_Note || '' }
+            { key: 'Email_Contact', el: 'ard-edit-email', orig: originalReq.Email_Contact || originalReq.Email || '' }
         ];
 
         fields.forEach(function (f) {
@@ -874,15 +1023,8 @@
             }
         });
 
-        // Boolean diff for the Is_On_Hold toggle (proxy auto-stamps On_Hold_Since)
-        var holdToggleEl = document.getElementById('ard-edit-on-hold-toggle');
-        if (holdToggleEl) {
-            var newOnHold = holdToggleEl.checked;
-            var origOnHold = !!originalReq.Is_On_Hold;
-            if (newOnHold !== origOnHold) {
-                updates.Is_On_Hold = newOnHold;
-            }
-        }
+        // On Hold is no longer toggled here — it lives in the bar-mounted toggle
+        // (renderOnHoldBar) so AEs can flip it without opening the Edit modal.
 
         // Garment fields — compare individually (Caspio column names)
         if (g1.style !== (originalReq.GarmentStyle || '')) updates.GarmentStyle = g1.style;
@@ -920,8 +1062,7 @@
                 Garm_Style_3: 'Garment 3', Garm_Color_3: 'Garment 3 Color',
                 Prelim_Charges: 'Prelim Charges', Additional_Services: 'Additional Services',
                 First_name: 'First Name', Last_name: 'Last Name',
-                Email_Contact: 'Email', Phone: 'Phone',
-                Is_On_Hold: 'On Hold', On_Hold_Note: 'On Hold Reason'
+                Email_Contact: 'Email', Phone: 'Phone'
             };
             Object.keys(updates).filter(function(k) { return k !== 'NOTES'; }).forEach(function(k) {
                 noteLines.push((fieldLabels[k] || k) + ': ' + updates[k]);

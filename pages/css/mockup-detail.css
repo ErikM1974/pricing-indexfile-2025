@@ -174,8 +174,11 @@ body {
 /* ── AE Edit Button ───────────────────────────────────── */
 .pmd-ae-edit-bar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
     padding: 8px 0;
+    flex-wrap: wrap;
 }
 .pmd-ae-edit-btn {
     padding: 8px 18px;
@@ -3209,115 +3212,150 @@ body {
     text-overflow: ellipsis;
 }
 
-/* ────────────────────────────────────────────────────────────
-   On Hold toggle inside the Mockup Edit modal
-   Mirrors the same UX used in the art-request-detail Edit modal.
-   ──────────────────────────────────────────────────────────── */
+/* ============================================================
+   On Hold workflow — bar-mounted toggle + page-wide gray-out
+   (mirrors art-request-detail.css with `pmd-` prefix)
+   ============================================================ */
 
-.pmd-on-hold-section {
-    background: #f9fafb;
-    padding: 1rem 1.125rem;
-    border-radius: 8px;
-    border-left: 3px solid #9ca3af;
-    margin-top: 0.5rem;
+.pmd-on-hold-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 8px;
+    background: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    cursor: help;
+}
+.pmd-on-hold-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #9ca3af;
+    flex: 0 0 6px;
 }
 
-.pmd-toggle {
+.pmd-on-hold-bar {
     display: flex;
-    align-items: flex-start;
-    gap: 0.875rem;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 460px;
+}
+.pmd-on-hold-bar--active {
+    background: #fffbeb;
+    border-color: #fcd34d;
+}
+
+.pmd-on-hold-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
     user-select: none;
 }
-
-.pmd-toggle input[type="checkbox"] {
+.pmd-on-hold-toggle input[type="checkbox"] {
     position: absolute;
     opacity: 0;
     pointer-events: none;
     width: 0;
     height: 0;
 }
-
-.pmd-toggle-slider {
+.pmd-on-hold-slider {
     flex: 0 0 auto;
     position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
+    width: 40px;
+    height: 22px;
     background: #d1d5db;
     border-radius: 999px;
     transition: background 0.2s ease;
-    margin-top: 2px;
 }
-
-.pmd-toggle-slider::before {
+.pmd-on-hold-slider::before {
     content: "";
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: #ffffff;
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease;
 }
-
-.pmd-toggle input:checked + .pmd-toggle-slider { background: #6b7280; }
-.pmd-toggle input:checked + .pmd-toggle-slider::before { transform: translateX(20px); }
-
-.pmd-toggle input:focus-visible + .pmd-toggle-slider {
+.pmd-on-hold-toggle input:checked + .pmd-on-hold-slider { background: #d97706; }
+.pmd-on-hold-toggle input:checked + .pmd-on-hold-slider::before { transform: translateX(18px); }
+.pmd-on-hold-toggle input:focus-visible + .pmd-on-hold-slider {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
 }
-
-.pmd-toggle-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    line-height: 1.4;
-}
-
-.pmd-toggle-label {
-    font-size: 14px;
+.pmd-on-hold-label {
+    font-size: 13.5px;
     font-weight: 600;
     color: #1f2937;
 }
+.pmd-on-hold-bar--active .pmd-on-hold-label { color: #92400e; }
 
-.pmd-toggle-help {
-    font-size: 12.5px;
-    color: #6b7280;
+.pmd-on-hold-details {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
 }
-
-#pmd-edit-on-hold-details label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: #4b5563;
-    margin-bottom: 0.375rem;
-}
-
-#pmd-edit-on-hold-note {
+.pmd-on-hold-details textarea {
     width: 100%;
-    padding: 0.5rem 0.625rem;
+    padding: 6px 9px;
     border: 1px solid #d1d5db;
     border-radius: 6px;
+    background: #ffffff;
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 13px;
     line-height: 1.4;
     resize: vertical;
-    min-height: 60px;
+    min-height: 50px;
 }
-
-#pmd-edit-on-hold-note:focus {
+.pmd-on-hold-details textarea:focus {
     outline: none;
-    border-color: #6b7280;
-    box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.15);
+    border-color: #d97706;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
 }
+.pmd-on-hold-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    line-height: 1.3;
+}
+.pmd-on-hold-since { color: #6b7280; font-style: italic; }
+.pmd-on-hold-saved {
+    color: #059669;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.pmd-on-hold-saved--visible { opacity: 1; }
 
-.pmd-on-hold-since {
-    margin-top: 0.5rem;
-    font-size: 12.5px;
-    color: #6b7280;
-    font-style: italic;
+/* Page-wide gray-out when held */
+.pmd-content--on-hold .pmd-grid {
+    opacity: 0.55;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.pmd-content--on-hold .pmd-ae-edit-bar,
+.pmd-content--on-hold .pmd-on-hold-bar { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 600px) {
+    .pmd-on-hold-bar { max-width: 100%; }
 }
