@@ -55,12 +55,51 @@
     // backend's /api/transfer-orders/analyze-link cracks each one into
     // {filename parse, image metadata, mockup vision, sales rep resolve}.
     // We just hold the per-row analysis state here.
+    //
+    // v2026.05.07 — method-aware modal: the same UI handles two flows
+    //   • method='Supacolor'   (default) — heat transfers, links to Supacolor API
+    //   • method='Screen Print'           — screen-print artwork to L&P Printing
+    //                                        (no API; Bradley relays manually)
+    // modalState.method drives copy + payload differences. Default Supacolor
+    // for back-compat with all existing callers.
     var modalState = {
         injected: false,
         opts: null,
+        method: 'Supacolor',
         linkRows: [] // [{ id, url, status: 'idle'|'analyzing'|'ok'|'err', analysis, error }]
     };
     var _rowIdCounter = 0;
+
+    // Default subcontract vendor for screen-print orders.
+    // Single value today; future-proofed as a column on Transfer_Orders.
+    var DEFAULT_SP_VENDOR = 'L&P Printing';
+
+    // Method-specific copy & template IDs. Single source of truth so
+    // openSendModal/handleSubmit/sendTransferRequestedEmail all stay in sync.
+    var METHOD_CONFIG = {
+        'Supacolor': {
+            title: 'Send to Supacolor',
+            intro: 'Search your Box art folder by design # or company name. Click a folder to pick the transfer + mockup files.',
+            workingChecklist: 'the actual transfer artwork (PNG / PDF / AI)',
+            mockupChecklist: 'so AI vision can pre-fill sales rep, customer, garment for Bradley',
+            submitLabel: 'Send to Bradley',
+            warnNoMockup: 'No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.',
+            emailTemplate: 'transfer_requested'
+        },
+        'Screen Print': {
+            title: 'Send Screen Print to Bradley',
+            intro: 'Search your Box art folder by design # or company name. Pick the screen-print artwork + mockup. Bradley will relay to L&P Printing.',
+            workingChecklist: 'the screen print artwork (PNG / PDF / AI / EPS)',
+            mockupChecklist: 'so AI vision can pre-fill sales rep, customer, garment for Bradley',
+            submitLabel: 'Send to Bradley',
+            warnNoMockup: 'No mockup detected. Bradley will get the artwork but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.',
+            emailTemplate: 'screenprint_requested'
+        }
+    };
+
+    function getMethodConfig(method) {
+        return METHOD_CONFIG[method] || METHOD_CONFIG['Supacolor'];
+    }
 
     // ── DOM helpers ──────────────────────────────────────────────────
     function $(sel, root) { return (root || document).querySelector(sel); }
@@ -86,6 +125,45 @@
         var ext = (name.split('.').pop() || '').toUpperCase();
         var map = { JPG: 'JPEG', JPEG: 'JPEG', PNG: 'PNG', AI: 'AI', CDR: 'CDR', PDF: 'PDF', PSD: 'PSD', EPS: 'EPS' };
         return map[ext] || ext;
+    }
+
+    /**
+     * Format the screenPrint vision result into a readable text block for the
+     * SP_Notes textarea. Mirrors Steve's mockup section verbatim — one line per
+     * location with the ink chart + per-row totals when available.
+     *
+     * Input: { locations: [{code, label, colors:[], flashes, screens, prints, qualifier}] }
+     * Output: multi-line plain-text block (may include emoji ⚡ for flashes? — kept ASCII)
+     */
+    function formatScreenPrintSpecs(sp) {
+        if (!sp || !Array.isArray(sp.locations) || sp.locations.length === 0) return '';
+        var lines = ['Print Specs (auto-extracted from mockup):'];
+        sp.locations.forEach(function (loc) {
+            var code = loc.code || '?';
+            var qualifier = loc.qualifier ? ' (' + loc.qualifier + ')' : '';
+            var colors = (loc.colors || []).join(', ') || '—';
+            var totals = [];
+            if (loc.screens != null) totals.push(loc.screens + ' screens');
+            if (loc.prints != null) totals.push(loc.prints + ' prints');
+            if (loc.flashes != null) totals.push(loc.flashes + ' flashes');
+            var totalsStr = totals.length ? ' — ' + totals.join(' · ') : '';
+            lines.push('• ' + code + qualifier + ': ' + colors + totalsStr);
+        });
+        // Global totals line (when present alongside per-row totals)
+        var globalParts = [];
+        if (sp.screens != null && !sp.locations.some(function (l) { return l.screens != null; })) {
+            globalParts.push(sp.screens + ' screens');
+        }
+        if (sp.prints != null && !sp.locations.some(function (l) { return l.prints != null; })) {
+            globalParts.push(sp.prints + ' prints');
+        }
+        if (sp.flashes != null && !sp.locations.some(function (l) { return l.flashes != null; })) {
+            globalParts.push(sp.flashes + ' flashes');
+        }
+        if (globalParts.length) {
+            lines.push('Totals: ' + globalParts.join(' · '));
+        }
+        return lines.join('\n');
     }
 
     // ── EmailJS notifications ────────────────────────────────────────
@@ -168,6 +246,12 @@
             reorder_banner_html: isReorder ? buildReorderBanner(record) : '',
             // Legacy param — emit empty so mid-rollout EmailJS template doesn't error.
             print_specs_html: record.Primary_Color ? buildPrintSpecsHtml(record) : '',
+            // Method-aware defaults (overrides may replace). Empty strings keep
+            // EmailJS happy when the template references {{sp_notes_block_html}} etc.
+            method: record.Method || 'Supacolor',
+            sp_vendor: record.SP_Vendor || '',
+            sp_notes: record.SP_Notes || '',
+            sp_notes_block_html: '',
             cc_email: ''
         };
         if (overrides) {
@@ -384,11 +468,18 @@
      *   Shape: { garmentColorStyle: string, transferType: string }
      */
     function sendTransferRequestedEmail(record, requestedBy, visionExtras) {
+        // Method-aware: Screen Print uses a separate EmailJS template that
+        // references L&P instead of Supacolor and surfaces SP_Notes prominently.
+        var method = (record && record.Method) || 'Supacolor';
+        var cfg = getMethodConfig(method);
+
         var overrides = {
             to_email: BRADLEY_EMAIL,
             to_name: 'Bradley',
             cc_email: requestedBy && requestedBy.email ? requestedBy.email : '',
-            requested_by_name: requestedBy && requestedBy.name ? requestedBy.name : 'Art Department'
+            requested_by_name: requestedBy && requestedBy.name ? requestedBy.name : 'Art Department',
+            method: method,
+            sp_vendor: record.SP_Vendor || ''
         };
         if (record.Is_Rush) {
             overrides.rush_subject_suffix = ' 🚨 RUSH';
@@ -405,6 +496,13 @@
                 '<div style="white-space:pre-wrap;background:#eff6ff;padding:10px 14px;border-left:3px solid #3b82f6;border-radius:4px;font-size:13px;">' +
                 escapeHtml(record.Special_Instructions) + '</div>';
         }
+        // Screen-print: surface SP_Notes (Steve's instructions for L&P) as its own block.
+        if (record.SP_Notes) {
+            overrides.sp_notes_block_html = '<h3 style="color:#4a6fa5;font-size:15px;margin:18px 0 8px;">Special Instructions for L&P</h3>' +
+                '<div style="white-space:pre-wrap;background:#f0f9ff;padding:10px 14px;border-left:3px solid #0ea5e9;border-radius:4px;font-size:13px;">' +
+                escapeHtml(record.SP_Notes) + '</div>';
+            overrides.sp_notes = record.SP_Notes;
+        }
         // v3 overrides: only populated when the caller has the mockup vision
         // extraction in hand (i.e. the initial submit from handleSubmit — the
         // only path that currently provides visionExtras).
@@ -419,7 +517,7 @@
                 overrides.transfer_type = visionExtras.transferType;
             }
         }
-        return sendEmail('transfer_requested', buildEmailParams(record, overrides));
+        return sendEmail(cfg.emailTemplate, buildEmailParams(record, overrides));
     }
 
     /**
@@ -568,6 +666,16 @@
                                 '<input type="text" id="tas-design-number" name="Design_Number" ' +
                                     'class="tas-input" inputmode="numeric" maxlength="10" ' +
                                     'placeholder="Auto-filled from filename or mockup" autocomplete="off">' +
+                            '</div>' +
+                            // Screen-print only: special instructions for L&P. Hidden
+                            // when method='Supacolor'. openSendModal toggles visibility.
+                            '<div class="tas-form-row tas-form-row--sp-notes" id="tas-sp-notes-row" style="display:none;">' +
+                                '<label class="tas-design-label" for="tas-sp-notes">' +
+                                    'Special Instructions for L&P' +
+                                    '<span class="tas-muted"> (optional)</span>' +
+                                '</label>' +
+                                '<textarea id="tas-sp-notes" name="SP_Notes" class="tas-input" rows="3" ' +
+                                    'placeholder="Special inks (metallic, glow, puff), underbase, ink type (plastisol/discharge), oversize prints, anything L&P needs to know"></textarea>' +
                             '</div>' +
                             '<div class="tas-form-row tas-form-row--rush">' +
                                 '<label class="tas-checkbox-label">' +
@@ -1037,18 +1145,59 @@
                 : escapeHtml(v.salesRep) + ' <span class="tas-crm-miss"><i class="fas fa-question-circle"></i> not in CRM</span>')
             : '<span class="tas-muted">(not detected)</span>';
 
+        // Method-aware row set: Supacolor shows Transfer Type; Screen Print
+        // hides it (vision didn't extract it) and renders the ink-chart block below.
+        var sp = v.screenPrint || null;
+        var isSp = modalState.method === 'Screen Print';
         var rows = [
             { label: 'Design', value: escapeHtml(v.designNumber || '\u2014') },
             { label: 'Customer', value: escapeHtml(v.customerName || '\u2014') },
             { label: 'Sales Rep', value: repLine },
-            { label: 'Garment', value: escapeHtml(v.garmentColorStyle || '\u2014') },
-            { label: 'Transfer', value: escapeHtml(v.transferType || '\u2014') }
+            { label: 'Garment', value: escapeHtml(v.garmentColorStyle || '\u2014') }
         ];
+        if (!isSp) {
+            rows.push({ label: 'Transfer', value: escapeHtml(v.transferType || '\u2014') });
+        } else if (v.sizePlacement) {
+            rows.push({ label: 'Placement', value: escapeHtml(v.sizePlacement) });
+        }
+
+        // Build the per-location ink chart (Screen Print only). Mirrors Steve's
+        // mockup section so he can sanity-check the extraction at a glance.
+        var spChartHtml = '';
+        if (isSp && sp && Array.isArray(sp.locations) && sp.locations.length > 0) {
+            var locRows = sp.locations.map(function (loc) {
+                var code = escapeHtml(loc.code || '?');
+                var qualifier = loc.qualifier ? ' <span class="tas-muted">(' + escapeHtml(loc.qualifier) + ')</span>' : '';
+                var colors = (loc.colors || []).map(function (c, i) {
+                    var pill = '<span class="tas-sp-ink">' + escapeHtml(c) + '</span>';
+                    // Insert a flash glyph between pills when this location has flashes.
+                    // We don't know exact positions from a count \u2014 convention: print
+                    // pills space-separated, flashes between consecutive ones.
+                    return pill;
+                }).join('<span class="tas-sp-flash" title="Flash"> &raquo; </span>');
+                if (!colors) colors = '<span class="tas-muted">no inks</span>';
+                var totals = [];
+                if (loc.screens != null) totals.push(loc.screens + ' screens');
+                if (loc.prints != null) totals.push(loc.prints + ' prints');
+                if (loc.flashes != null) totals.push(loc.flashes + ' flashes');
+                var totalsStr = totals.length ? '<div class="tas-sp-totals">' + escapeHtml(totals.join(' \u00b7 ')) + '</div>' : '';
+                return '<tr>' +
+                    '<td class="tas-label tas-sp-loc">' + code + qualifier + '</td>' +
+                    '<td class="tas-sp-inks">' + colors + totalsStr + '</td>' +
+                '</tr>';
+            }).join('');
+            spChartHtml = '<div class="tas-sp-chart">' +
+                '<div class="tas-mockup-summary-head" style="margin-top:10px;"><i class="fas fa-print"></i> Print Specs</div>' +
+                '<table class="tas-mockup-summary-table tas-sp-chart-table">' + locRows + '</table>' +
+                '</div>';
+        }
+
         container.style.display = '';
         container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot"></i> Extracted from mockup</div>' +
             '<table class="tas-mockup-summary-table">' +
             rows.map(function (r) { return '<tr><td class="tas-label">' + r.label + '</td><td>' + r.value + '</td></tr>'; }).join('') +
-            '</table>';
+            '</table>' +
+            spChartHtml;
         syncDesignNumberInput();
     }
 
@@ -1148,10 +1297,13 @@
         renderLinkRows();
 
         try {
+            // Pass current modal method so backend swaps the Claude vision prompt:
+            // 'Supacolor' → existing prompt (transfer type, garment, etc.)
+            // 'Screen Print' → SP prompt (per-location ink chart, screens/prints/flashes)
             var resp = await fetch(API_BASE + '/api/transfer-orders/analyze-link', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ url: row.url })
+                body: JSON.stringify({ url: row.url, method: modalState.method || 'Supacolor' })
             });
             var data = await resp.json();
             if (!resp.ok || !data.success) throw new Error(data.error || ('HTTP ' + resp.status));
@@ -1260,7 +1412,32 @@
         opts = opts || {};
         injectModal();
         modalState.opts = opts;
+        modalState.method = opts.method || 'Supacolor';
         modalState.linkRows = [];
+
+        // Apply method-specific copy to title, intro, checklist, submit button.
+        // The same DOM element handles both flows; only text/visibility changes.
+        var cfg = getMethodConfig(modalState.method);
+        var titleEl = $('#tas-modal-title');
+        if (titleEl) {
+            var titleIcon = modalState.method === 'Screen Print' ? 'print' : 'paper-plane';
+            titleEl.innerHTML = '<i class="fas fa-' + titleIcon + '"></i> ' + cfg.title;
+        }
+        var introEl = document.querySelector('#tas-modal .tas-modal-intro');
+        if (introEl) introEl.textContent = cfg.intro;
+        var workItem = document.querySelector('#tas-checklist .tas-checklist-item[data-key="transfer"] .tas-checklist-text');
+        if (workItem) workItem.innerHTML = '<strong>Working file</strong> &mdash; ' + cfg.workingChecklist;
+        var mockItem = document.querySelector('#tas-checklist .tas-checklist-item[data-key="mockup"] .tas-checklist-text');
+        if (mockItem) mockItem.innerHTML = '<strong>Mockup</strong> &mdash; ' + cfg.mockupChecklist;
+        var submitBtn = $('#tas-submit-btn');
+        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + cfg.submitLabel;
+
+        // Toggle SP notes section visibility + reset its value
+        var spNotesRow = $('#tas-sp-notes-row');
+        var spNotesEl = $('#tas-sp-notes');
+        if (spNotesRow) spNotesRow.style.display = modalState.method === 'Screen Print' ? '' : 'none';
+        if (spNotesEl) spNotesEl.value = '';
+
         // Don't pre-populate a blank URL row — the picker is primary now.
         // If Steve opens the <details> "paste manually" fallback, it'll show
         // a fresh row at that point. Old renders get cleared here.
@@ -1444,13 +1621,32 @@
                 });
             }
 
+            // Method-aware payload. For Screen Print: skip vision's Transfer_Type
+            // (L&P uses different print methods than Supacolor — plastisol /
+            // discharge / 4-color process / specialty); add SP_Notes + SP_Vendor.
+            var isScreenPrint = modalState.method === 'Screen Print';
+            var spNotesEl = $('#tas-sp-notes');
+            var spNotes = (isScreenPrint && spNotesEl) ? (spNotesEl.value || '').trim() : '';
+
+            // Auto-prepend the formatted print specs from the mockup vision.
+            // Preserves anything Steve manually typed by separating with a blank
+            // line. If the auto-block is already in the textarea (e.g. Steve
+            // re-submits), don't re-prepend.
+            if (isScreenPrint && vision && vision.screenPrint) {
+                var autoBlock = formatScreenPrintSpecs(vision.screenPrint);
+                if (autoBlock && spNotes.indexOf('Print Specs (auto-extracted from mockup):') === -1) {
+                    spNotes = spNotes ? (autoBlock + '\n\n' + spNotes) : autoBlock;
+                }
+            }
+
             var payload = {
+                Method: modalState.method,
                 Design_Number: designNumber,
                 Company_Name: companyName,
                 Customer_Name: (vision && vision.customerName) || companyName,
                 Sales_Rep_Name: repMatch ? repMatch.name : (vision ? vision.salesRep : ''),
                 Sales_Rep_Email: repMatch ? repMatch.email : '',
-                Transfer_Type: vision ? vision.transferType : null,
+                Transfer_Type: (isScreenPrint || !vision) ? null : vision.transferType,
                 Status: 'Requested',
                 Is_Rush: isRush,
                 Is_Reorder: false,
@@ -1476,6 +1672,11 @@
             if (transfers[1]) {
                 payload.Additional_File_2_URL = transfers[1].sharedLink;
                 payload.Additional_File_2_Name = transfers[1].fileName;
+            }
+            // Screen-print only fields. Backend ignores these on Supacolor rows.
+            if (isScreenPrint) {
+                payload.SP_Vendor = DEFAULT_SP_VENDOR;
+                if (spNotes) payload.SP_Notes = spNotes;
             }
 
             // Dry-run short-circuit for local verification
@@ -1594,11 +1795,13 @@
     // Takes the first non-cancelled transfer matched by mockupId OR designNumber.
     // Returns a Promise<boolean> — true if a badge was rendered, false if no transfer exists.
 
-    function statusBadgeMeta(status) {
+    function statusBadgeMeta(status, method) {
+        // Method-aware "Ordered" label — Screen Print rows go to L&P, not Supacolor.
+        var orderedLabel = method === 'Screen Print' ? 'Ordered from L&P' : 'Ordered from Supacolor';
         // Map Transfer_Orders.Status → { label, color, icon }
         var map = {
             'Requested':  { label: 'Submitted to Bradley',        color: '#f59e0b', bg: '#fef3c7', icon: 'paper-plane' },
-            'Ordered':    { label: 'Ordered from Supacolor',      color: '#3b82f6', bg: '#dbeafe', icon: 'shopping-cart' },
+            'Ordered':    { label: orderedLabel,                  color: '#3b82f6', bg: '#dbeafe', icon: 'shopping-cart' },
             'PO_Created': { label: 'PO Created',                  color: '#8b5cf6', bg: '#ede9fe', icon: 'file-invoice-dollar' },
             'Shipped':    { label: 'Shipped',                     color: '#22c55e', bg: '#dcfce7', icon: 'truck' },
             'Received':   { label: 'Received at NWCA',            color: '#16a34a', bg: '#d1fae5', icon: 'check-circle' },
@@ -1642,7 +1845,7 @@
     }
 
     function badgeHtml(transfer) {
-        var meta = statusBadgeMeta(transfer.Status);
+        var meta = statusBadgeMeta(transfer.Status, transfer.Method);
         var trackUrl = trackingUrlFromCarrier(transfer.Carrier, transfer.Tracking_Number);
         var trackingBlock = '';
         if (transfer.Tracking_Number) {

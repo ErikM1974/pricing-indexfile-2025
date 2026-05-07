@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Bradley's Transfers - Supacolor Queue</title>
+    <title>Bradley's Screen Print Queue</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=22">
@@ -18,7 +18,7 @@
         <nav class="bt-breadcrumb" aria-label="Breadcrumb">
             <a href="/staff-dashboard.html">Staff Dashboard</a>
             <span class="bt-breadcrumb-sep">&rsaquo;</span>
-            <span class="bt-breadcrumb-current">Transfer Queue</span>
+            <span class="bt-breadcrumb-current">Screen Print Queue</span>
         </nav>
     </div>
 
@@ -26,8 +26,8 @@
     <div class="tab-container">
         <!-- Tab Buttons (cross-links to other art dashboards) -->
         <div class="tab-buttons">
-            <button class="tab-button active">Bradley's Transfer Queue</button>
-            <a class="tab-button tab-button-link" href="/dashboards/bradley-screenprint.html">Screen Print Queue</a>
+            <button class="tab-button active">Bradley's Screen Print Queue</button>
+            <a class="tab-button tab-button-link" href="/dashboards/bradley-transfers.html">Supacolor Transfers</a>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
         </div>
@@ -39,9 +39,9 @@
                 <div class="bt-header-row">
                     <div>
                         <h2 class="tab-title" style="margin-bottom:4px;">
-                            <i class="fas fa-truck" style="color:#4a6fa5;"></i> Bradley's Supacolor Transfer Queue
+                            <i class="fas fa-print" style="color:#4a6fa5;"></i> Bradley's Screen Print Queue
                         </h2>
-                        <div class="bt-subtitle">Heat-transfer orders for T-shirts &middot; Bradley's purchasing queue</div>
+                        <div class="bt-subtitle">Screen-print artwork from Steve &middot; relay to L&amp;P Printing</div>
                     </div>
                     <div class="bt-header-actions">
                         <button id="bt-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
@@ -50,7 +50,7 @@
                     </div>
                 </div>
 
-                <!-- Status Stats Chips (v3.1 simplified — dropped PO_Created + Received) -->
+                <!-- Status Stats Chips -->
                 <div id="bt-stats-row" class="bt-stats-row">
                     <div class="bt-stat-chip bt-stat-chip--requested" data-status="Requested">
                         <span class="bt-stat-count" id="bt-stat-requested">&mdash;</span>
@@ -70,7 +70,7 @@
                     </div>
                 </div>
 
-                <!-- Filter Bar (v3.1 simplified — dropped Rep dropdown; rep is on each card) -->
+                <!-- Filter Bar -->
                 <div class="bt-filter-bar">
                     <div class="bt-filter-group">
                         <label class="bt-filter-label">Status:</label>
@@ -79,6 +79,7 @@
                             <option value="Requested">Requested</option>
                             <option value="Ordered">Ordered</option>
                             <option value="Shipped">Shipped</option>
+                            <option value="Received">Received</option>
                             <option value="On_Hold">On Hold</option>
                             <option value="Cancelled">Cancelled</option>
                         </select>
@@ -99,7 +100,7 @@
                 <!-- Grid View -->
                 <div id="bt-grid" class="bt-grid">
                     <div class="bt-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading transfers...
+                        <i class="fas fa-spinner fa-spin"></i> Loading screen-print orders...
                     </div>
                 </div>
             </div>
@@ -110,12 +111,12 @@
     <div id="bt-delete-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:480px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-trash"></i> Permanently Delete Transfer</h3>
+                <h3><i class="fas fa-trash"></i> Permanently Delete Screen Print Order</h3>
                 <button class="bt-modal-close" id="bt-delete-modal-close">&times;</button>
             </div>
             <div class="bt-modal-body">
                 <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
-                    <strong id="bt-delete-modal-target">This transfer</strong> will be <strong>removed entirely</strong>. No audit trail is kept. Use this only for test entries, duplicates, or mistakes. For real cancellations, open the transfer and use "Cancel Transfer" instead.
+                    <strong id="bt-delete-modal-target">This order</strong> will be <strong>removed entirely</strong>. No audit trail is kept. Use this only for test entries, duplicates, or mistakes. For real cancellations, open the order and use "Cancel" instead.
                 </div>
                 <form id="bt-delete-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
@@ -133,7 +134,7 @@
                         </div>
                     </div>
                     <div class="bt-form-actions">
-                        <button type="button" class="bt-btn bt-btn--secondary" id="bt-delete-modal-cancel">Keep Transfer</button>
+                        <button type="button" class="bt-btn bt-btn--secondary" id="bt-delete-modal-cancel">Keep Order</button>
                         <button type="submit" class="bt-btn bt-btn--danger">Delete Permanently</button>
                     </div>
                 </form>
@@ -150,6 +151,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=20"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/dashboards/js/bradley-transfers.js?v=18"></script>
+    <script src="/dashboards/js/bradley-screenprint.js?v=2"></script>
 </body>
 </html>
