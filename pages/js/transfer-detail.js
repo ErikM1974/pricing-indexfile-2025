@@ -60,6 +60,11 @@
         return rec.Is_Rush === true || rec.Is_Rush === 'true' || rec.Is_Rush === 'Yes' || rec.Is_Rush === 1;
     }
 
+    // Method-aware branching. Default 'Supacolor' for legacy rows where Method is null.
+    function isScreenPrint(rec) {
+        return !!(rec && rec.Method === 'Screen Print');
+    }
+
     // Extract ShopWorks PO digits from any plausible Bradley typing pattern.
     // Mirrors backend extractPoDigits() in caspio-pricing-proxy/src/utils/transfer-auto-link.js
     // and the queue-card client helper in dashboards/js/bradley-transfers.js.
@@ -241,6 +246,20 @@
     function renderAll() {
         var r = state.record;
 
+        // Repoint breadcrumb to the right queue based on Method.
+        // Screen Print rows came from /dashboards/bradley-screenprint.html;
+        // Supacolor rows (default) came from /dashboards/bradley-transfers.html.
+        var crumbLink = document.querySelector('.bt-breadcrumb a[href*="bradley-"]');
+        if (crumbLink) {
+            if (isScreenPrint(r)) {
+                crumbLink.setAttribute('href', '/dashboards/bradley-screenprint.html');
+                crumbLink.textContent = 'Screen Print Queue';
+            } else {
+                crumbLink.setAttribute('href', '/dashboards/bradley-transfers.html');
+                crumbLink.textContent = 'Transfer Queue';
+            }
+        }
+
         // Header card
         var headerCard = document.querySelector('.td-header-card');
         headerCard.classList.toggle('td-rush', isRush(r));
@@ -275,6 +294,7 @@
 
         renderPoBanner();              // Phase 3 — PO# entry banner above the grid
         renderArtworkPanel();
+        renderScreenPrintPanel();      // SP-only — vendor + Special Instructions card
         // renderSpecsPanel() removed in v3.1 — Order Specs panel deprecated
         // (Qty/Press/W/H fields are NULL in v3 paste-links flow; per-line data
         // lives on Transfer_Order_Lines + the Live Supacolor card below).
@@ -283,6 +303,49 @@
         renderSupacolorLiveStatus();  // Part D.1 — linked Supacolor_Jobs (now the canonical tracking view)
         renderActionsPanel();
         renderTimeline();
+    }
+
+    // ── Screen Print panel ───────────────────────────────────────────
+    // Replaces the Live Supacolor Status card for Method='Screen Print' rows.
+    // Shows vendor (L&P Printing) + Steve's Special Instructions free-text.
+    // Injected into #td-supacolor-live-card so the layout slot is reused;
+    // renderSupacolorLiveStatus() bails out for SP rows so they don't fight.
+    function renderScreenPrintPanel() {
+        var r = state.record;
+        var card = $('td-supacolor-live-card');
+        var panel = $('td-supacolor-live-panel');
+        if (!card || !panel) return;
+
+        if (!isScreenPrint(r)) {
+            // Supacolor row — let renderSupacolorLiveStatus() take over.
+            return;
+        }
+
+        // Show the card with SP-specific copy.
+        card.style.display = '';
+        var header = card.querySelector('.td-card-header h3');
+        if (header) header.innerHTML = '<i class="fas fa-print"></i> Screen Print Order';
+        var headerHint = card.querySelector('.td-card-header-hint');
+        if (headerHint) headerHint.textContent = 'Manual relay to vendor (no API)';
+
+        var vendor = escapeHtml(r.SP_Vendor || 'L&P Printing');
+        var rows = ['<dl class="td-specs-grid">'];
+        rows.push('<dt>Vendor</dt><dd><strong>' + vendor + '</strong></dd>');
+        if (r.ShopWorks_PO_Number) {
+            rows.push('<dt>ShopWorks PO</dt><dd><span class="td-po-badge">' + escapeHtml(r.ShopWorks_PO_Number) + '</span></dd>');
+        }
+        if (r.Tracking_Number) {
+            rows.push('<dt>Tracking</dt><dd>' + escapeHtml(r.Tracking_Number) + '</dd>');
+        }
+        rows.push('</dl>');
+
+        if (r.SP_Notes) {
+            rows.push('<h4 class="td-artwork-section-heading" style="margin-top:14px;">Special Instructions for L&P</h4>' +
+                '<div style="white-space:pre-wrap;background:#f0f9ff;padding:10px 14px;border-left:3px solid #0ea5e9;border-radius:4px;font-size:13px;color:#0c4a6e;">' +
+                escapeHtml(r.SP_Notes) + '</div>');
+        }
+
+        panel.innerHTML = rows.join('');
     }
 
     // ── Carrier tracking URL helpers ─────────────────────────────────
@@ -500,6 +563,10 @@
         var card = $('td-supacolor-live-card');
         var panel = $('td-supacolor-live-panel');
         if (!card || !panel) return;
+
+        // Method='Screen Print' rows don't have a Supacolor job to look up.
+        // renderScreenPrintPanel() owns the same DOM slot for those rows.
+        if (isScreenPrint(r)) return;
 
         // Hide the card unless we have a linked Supacolor job#
         var num = r.Supacolor_Order_Number;
@@ -836,14 +903,19 @@
         var status = r.Status || 'Requested';
         var panel = $('td-actions-panel');
         var card = panel ? panel.closest('.td-card') : null;
+        var sp = isScreenPrint(r);
 
-        // v3.2 (2026-04-25): hide the entire Actions card once the transfer has
-        // been placed with Supacolor. Post-Order, the Live Supacolor Status
-        // panel is the source of truth and the remaining mutate actions
-        // (Hold/Rush/Cancel) had little real-world value — On Hold can't pause
-        // Supacolor, Rush is decided upstream, and a real cancel needs to
-        // happen on Supacolor's side. Bradley's page becomes pure tracking.
-        if (status !== 'Requested' && status !== 'On_Hold') {
+        // Supacolor (default): hide the actions card once Ordered — the API
+        // mirror auto-flips Shipped/Received from upstream.
+        // Screen Print: keep the card visible through Ordered + Shipped so
+        // Bradley can manually advance the status (no upstream API).
+        var hideCard;
+        if (sp) {
+            hideCard = (status === 'Received' || status === 'Cancelled');
+        } else {
+            hideCard = (status !== 'Requested' && status !== 'On_Hold');
+        }
+        if (hideCard) {
             if (card) card.style.display = 'none';
             panel.innerHTML = '';
             return;
@@ -852,26 +924,65 @@
 
         var actions = [];
 
-        // Manual Supacolor # fallback — only useful pre-link (Status=Requested or
-        // On_Hold). Once linked, the API drives the rest. Re-labeled to make it
-        // clear this is a fallback, not the primary path.
-        actions.push({
-            id: 'td-act-ordered',
-            icon: 'link',
-            label: 'Manual link to Supacolor #',
-            variant: 'primary',
-            modal: 'td-ordered-modal'
-        });
+        // Pre-Order primary action: SP shows "Mark as Ordered" (free-text PO entry
+        // happens via the banner above), Supacolor shows "Manual link" fallback.
+        if (status === 'Requested' || status === 'On_Hold') {
+            if (sp) {
+                // For SP, the PO banner above is the primary path. The action panel
+                // here just covers the case where Bradley wants to mark Ordered
+                // without entering a PO right now.
+                actions.push({
+                    id: 'td-act-ordered',
+                    icon: 'paper-plane',
+                    label: 'Mark as Ordered',
+                    variant: 'primary',
+                    modal: 'td-ordered-modal'
+                });
+            } else {
+                actions.push({
+                    id: 'td-act-ordered',
+                    icon: 'link',
+                    label: 'Manual link to Supacolor #',
+                    variant: 'primary',
+                    modal: 'td-ordered-modal'
+                });
+            }
+        }
 
-        // Resume from On_Hold
+        // SP-only: post-Order manual transitions (no auto-mirror to L&P).
+        if (sp && status === 'Ordered') {
+            actions.push({
+                id: 'td-act-shipped',
+                icon: 'truck',
+                label: 'Mark as Shipped',
+                variant: 'primary',
+                modal: 'td-shipped-modal'
+            });
+        }
+        if (sp && status === 'Shipped') {
+            actions.push({
+                id: 'td-act-received',
+                icon: 'check-circle',
+                label: 'Mark as Received',
+                variant: 'primary',
+                action: 'received'
+            });
+        }
+
+        // Resume from On_Hold (both methods)
         if (status === 'On_Hold') {
             actions.push({ id: 'td-act-resume', icon: 'play', label: 'Resume', variant: 'primary', action: 'resume' });
         }
 
-        // Always-available side actions (still pre-Order at this point)
-        if (status !== 'On_Hold') {
+        // Hold (pre-Order only)
+        if ((status === 'Requested') && !sp) {
             actions.push({ id: 'td-act-hold', icon: 'pause', label: 'Put On Hold', variant: 'default', action: 'hold' });
         }
+        if (status === 'Requested' && sp) {
+            actions.push({ id: 'td-act-hold', icon: 'pause', label: 'Put On Hold', variant: 'default', action: 'hold' });
+        }
+
+        // Rush toggle — available on all non-terminal statuses
         actions.push({
             id: 'td-act-rush',
             icon: 'bolt',
@@ -879,10 +990,12 @@
             variant: 'rush',
             action: 'rush'
         });
-        actions.push({ id: 'td-act-cancel', icon: 'times-circle', label: 'Cancel Transfer', variant: 'danger', modal: 'td-cancel-modal' });
+        actions.push({ id: 'td-act-cancel', icon: 'times-circle', label: 'Cancel ' + (sp ? 'Order' : 'Transfer'), variant: 'danger', modal: 'td-cancel-modal' });
 
-        // Hard-delete pre-Supacolor only. Post-order → Cancel (preserves audit).
-        actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
+        // Hard-delete pre-order only (both methods).
+        if (status === 'Requested' || status === 'On_Hold') {
+            actions.push({ id: 'td-act-delete', icon: 'trash', label: 'Delete (mistake)', variant: 'danger-outline', modal: 'td-delete-modal' });
+        }
 
         panel.innerHTML = '<div class="td-actions-grid">' +
             actions.map(function (a) {
@@ -905,6 +1018,8 @@
                     handleSimpleStatus('On_Hold', 'Put on hold.');
                 } else if (action === 'resume') {
                     handleSimpleStatus('Requested', 'Resumed.');
+                } else if (action === 'received') {
+                    handleSimpleStatus('Received', 'Marked as Received.');
                 } else if (action === 'rush') {
                     openRushModal(!isRush(state.record));
                 }
@@ -1317,7 +1432,25 @@
         var hasSupa  = !!(r.Supacolor_Order_Number && String(r.Supacolor_Order_Number).trim() !== '');
         var canEnter = (r.Status === 'Requested' || r.Status === 'On_Hold');
 
-        // Decide visibility & state
+        // Method='Screen Print' has no Supacolor link — simpler 2-state banner:
+        // EMPTY (no PO yet) → "Enter PO# to mark Ordered". CONFIRMED (PO entered) →
+        // green "Ordered" header. No PENDING / cron-link UI.
+        if (isScreenPrint(r)) {
+            if (poDigits) {
+                renderScreenPrintPoBannerConfirmed(banner, poDigits);
+            } else if (canEnter) {
+                renderScreenPrintPoBannerEmpty(banner);
+            } else {
+                banner.style.display = 'none';
+                banner.className = 'td-po-banner';
+                banner.innerHTML = '';
+                return;
+            }
+            banner.style.display = '';
+            return;
+        }
+
+        // Supacolor (default) — original 3-state machine.
         if (poDigits && hasSupa) {
             renderPoBannerLinked(banner, poDigits, r.Supacolor_Order_Number);
         } else if (poDigits) {
@@ -1331,6 +1464,79 @@
             return;
         }
         banner.style.display = '';
+    }
+
+    // ── Screen Print PO banner variants ──────────────────────────────
+    // Simpler than Supacolor — no auto-link cron, no "Linking…" pending state.
+    // Bradley enters the ShopWorks PO# at the moment he relays to L&P, status
+    // flips Ordered, done.
+
+    function renderScreenPrintPoBannerEmpty(banner) {
+        banner.className = 'td-po-banner td-po-banner--empty';
+        banner.innerHTML =
+            '<div class="td-po-banner-header">' +
+                '<div class="td-po-banner-icon"><i class="fas fa-print"></i></div>' +
+                '<div>' +
+                    '<h2 class="td-po-banner-title">Ready to send to L&P?</h2>' +
+                    '<p class="td-po-banner-help">Enter the <strong>ShopWorks PO#</strong> you used when you relayed this to L&P. We&rsquo;ll mark this <strong>Ordered</strong>.</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="td-po-banner-form">' +
+                '<div class="td-po-input-group">' +
+                    '<label class="td-po-input-label" for="td-po-input">ShopWorks PO #</label>' +
+                    '<input id="td-po-input" type="text" inputmode="numeric" autocomplete="off" class="td-po-input" placeholder="Paste anything &mdash; e.g. 112898 BW" aria-describedby="td-po-preview">' +
+                    '<div id="td-po-preview" class="td-po-preview" aria-live="polite">Type or paste a 5+ digit PO number</div>' +
+                '</div>' +
+                '<div class="td-po-banner-actions">' +
+                    '<button type="button" id="td-po-submit-btn" class="td-po-submit" disabled>' +
+                        '<i class="fas fa-paper-plane"></i> Mark as Ordered' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+
+        var input = $('td-po-input');
+        var preview = $('td-po-preview');
+        var submitBtn = $('td-po-submit-btn');
+
+        function updatePreview() {
+            var digits = extractPoDigits(input.value);
+            if (digits) {
+                preview.textContent = 'Detected: ' + digits;
+                preview.className = 'td-po-preview td-po-preview--match';
+                submitBtn.disabled = false;
+            } else {
+                preview.textContent = input.value
+                    ? 'Need a 5+ digit number — try pasting again'
+                    : 'Type or paste a 5+ digit PO number';
+                preview.className = 'td-po-preview';
+                submitBtn.disabled = true;
+            }
+        }
+        input.addEventListener('input', updatePreview);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                e.preventDefault();
+                submitBtn.click();
+            }
+        });
+        submitBtn.addEventListener('click', handlePoBannerSubmit);
+
+        if (window.location.hash === '#enter-po') {
+            setTimeout(function () {
+                input.focus();
+                input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 100);
+        }
+    }
+
+    function renderScreenPrintPoBannerConfirmed(banner, poDigits) {
+        banner.className = 'td-po-banner td-po-banner--linked';
+        banner.innerHTML =
+            '<div class="td-po-banner-icon"><i class="fas fa-check-circle"></i></div>' +
+            '<div>' +
+                '<h2 class="td-po-banner-title">Ordered &mdash; <code>PO ' + poDigits + ' BW</code> sent to L&P</h2>' +
+                '<p class="td-po-banner-help">Use the actions panel below to mark Shipped (when L&P gives you a tracking #) or Received (when it lands).</p>' +
+            '</div>';
     }
 
     function renderPoBannerEmpty(banner) {
