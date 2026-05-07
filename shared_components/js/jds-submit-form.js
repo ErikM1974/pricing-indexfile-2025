@@ -629,12 +629,27 @@ var JDSSubmitForm = (function () {
             + '      <div class="jds-row">'
             + '        <div class="jds-field">'
             + '          <label class="jds-field-label">Company Name <span class="jds-required">*</span></label>'
-            + '          <input type="text" class="jds-input" id="jds-company" placeholder="Type company name to search..." autocomplete="off">'
+            + '          <input type="text" class="jds-input" id="jds-company" placeholder="Type 3+ letters to search customers..." autocomplete="off">'
+            + '          <span class="jds-field-hint">Type to search. Pick from the dropdown to auto-fill contact + email.</span>'
             + '          <span class="jds-error-msg" id="jds-company-error">Company name is required</span>'
             + '        </div>'
             + '        <div class="jds-field">'
             + '          <label class="jds-field-label">Sales Rep</label>'
-            + '          <input type="text" class="jds-input" id="jds-sales-rep" placeholder="Auto-filled from login">'
+            //   Canonical 9-option list — matches all 4 quote builders
+            //   (dtg/dtf/emb/scp). Defaults to logged-in user via StaffAuthHelper.
+            //   Submit logic reads option.text (display name) not value (email)
+            //   so Sales_Rep column stays consistent with existing rows.
+            + '          <select class="jds-input" id="jds-sales-rep">'
+            + '            <option value="sales@nwcustomapparel.com">General Sales</option>'
+            + '            <option value="adriyella@nwcustomapparel.com">Adriyella</option>'
+            + '            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>'
+            + '            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>'
+            + '            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>'
+            + '            <option value="nika@nwcustomapparel.com">Nika Lao</option>'
+            + '            <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>'
+            + '            <option value="art@nwcustomapparel.com">Steve Deland</option>'
+            + '            <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>'
+            + '          </select>'
             + '        </div>'
             + '      </div>'
             + '      <input type="hidden" id="jds-customer-id">'
@@ -873,18 +888,15 @@ var JDSSubmitForm = (function () {
     }
 
     function initSalesRep() {
-        var repInput = document.getElementById('jds-sales-rep');
-        if (!repInput) return;
-        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn()) {
-            var name = StaffAuthHelper.getLoggedInStaffName();
-            if (name) {
-                repInput.value = name;
-                repInput.readOnly = true;
-                return;
-            }
+        // Sales Rep is a <select> dropdown (matches all 4 quote builders).
+        // StaffAuthHelper.autoSelectSalesRep matches by email value, falling
+        // back to email-from-name lookup via STAFF_EMAIL_MAP. If no login
+        // session exists, dropdown defaults to first option ("General Sales").
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn) {
+            try {
+                StaffAuthHelper.autoSelectSalesRep('jds-sales-rep');
+            } catch (_e) { /* no-op — first option remains selected */ }
         }
-        repInput.readOnly = false;
-        repInput.placeholder = 'Enter your name';
     }
 
     // ── File handling ──────────────────────────────────────────────────────
@@ -1009,7 +1021,13 @@ var JDSSubmitForm = (function () {
         var customerId = parseInt(document.getElementById('jds-customer-id').value) || 0;
         var aeName = getSubmitterName();
         var aeEmail = getSubmitterEmail();
-        var salesRep = getVal('jds-sales-rep') || aeName;
+        // Sales Rep dropdown: option.value is email, option.text is display
+        // name. Sales_Rep column stores display names (matches existing rows
+        // + what art-hub-steve-gallery getRepFirstName() expects).
+        var repSel = document.getElementById('jds-sales-rep');
+        var salesRep = (repSel && repSel.selectedIndex >= 0)
+            ? repSel.options[repSel.selectedIndex].text
+            : aeName;
 
         var firstName = '';
         var lastName = '';
