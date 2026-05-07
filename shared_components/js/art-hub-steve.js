@@ -1950,9 +1950,9 @@
         // Note: Is_Rush is optional — added once the Caspio column exists.
         // If the select references a column Caspio doesn't have, the API 500s.
         // We fetch with Is_Rush and transparently fall back without it on 500.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Is_Rush';
-        var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type';
-        // 2-level fallback if Item_Type doesn't exist in Caspio yet
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Is_Rush';
+        var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU';
+        // 2-level fallback if Item_Type / JDS_SKU don't exist in Caspio yet
         var selectFieldsLegacy = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200'
             + '&dateCreatedFrom=' + KANBAN_DATE_CUTOFF;

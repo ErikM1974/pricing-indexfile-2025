@@ -1,0 +1,808 @@
+/* jds-submit-form.css
+ * Styling for the JDS vendor-product intake form on the AE dashboard
+ * (Submit Artwork to Steve tab, 4th pill).
+ *
+ * Class prefix: .jds-*
+ * Theme: warm amber/brown to read as "engraving / decoration vendor".
+ */
+
+/* ── Container ───────────────────────────────────────────────────────── */
+
+.jds-container {
+    max-width: 980px;
+    margin: 0 auto;
+    font-family: inherit;
+}
+
+/* Header banner */
+.jds-banner {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #92400e 0%, #5a2a07 100%);
+}
+
+.jds-banner-emoji {
+    font-size: 40px;
+    line-height: 1;
+}
+
+.jds-banner-text h3 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.jds-banner-text p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.95;
+    line-height: 1.4;
+}
+
+/* Empty / error state */
+.jds-empty {
+    padding: 32px 20px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    background: #f9fafb;
+    border: 1px dashed #e5e7eb;
+    border-radius: 10px;
+}
+
+.jds-empty--error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+/* Section header */
+.jds-section-header {
+    margin: 14px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #f3f4f6;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+}
+
+/* Search bar */
+.jds-search-bar {
+    margin-bottom: 18px;
+}
+
+.jds-search-input {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1f2937;
+    box-sizing: border-box;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.jds-search-input:focus {
+    outline: none;
+    border-color: #92400e;
+    box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
+}
+
+/* Breadcrumb */
+.jds-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.jds-breadcrumb-sep {
+    color: #d1d5db;
+}
+
+.jds-breadcrumb-current {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.jds-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #92400e;
+    font-family: inherit;
+    font-size: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.jds-link:hover {
+    color: #5a2a07;
+}
+
+/* ── Category grid (landing) ──────────────────────────────────────────── */
+/* Flex (not grid) so a single-card view doesn't balloon to full container
+ * width. Cards keep a tight 200-240px range regardless of count. */
+
+.jds-category-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.jds-category-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 14px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: all 0.15s;
+    /* Fixed-ish width — flex-grow:0 prevents single-card balloon. */
+    flex: 0 0 220px;
+    max-width: 240px;
+}
+
+.jds-category-card:hover {
+    border-color: #92400e;
+    box-shadow: 0 4px 14px rgba(146, 64, 14, 0.12);
+    transform: translateY(-1px);
+}
+
+/* ── Product grid ─────────────────────────────────────────────────────── */
+/* Same flex pattern — cards stay 200-220px regardless of how many are shown. */
+
+.jds-product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.jds-product-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: all 0.15s;
+    flex: 0 0 200px;
+    max-width: 220px;
+}
+
+.jds-product-card:hover {
+    border-color: #92400e;
+    box-shadow: 0 4px 14px rgba(146, 64, 14, 0.12);
+    transform: translateY(-1px);
+}
+
+.jds-card-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 220px;
+    background: #f9fafb;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.jds-card-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.jds-card-thumb-empty {
+    font-size: 36px;
+    color: #d1d5db;
+}
+
+.jds-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.jds-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.jds-card-sku {
+    font-size: 12px;
+    color: #92400e;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.jds-card-count {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.jds-card-imprint {
+    font-size: 11px;
+    color: #6b7280;
+    background: #fef3c7;
+    border-radius: 4px;
+    padding: 3px 6px;
+    margin-top: 4px;
+    display: inline-block;
+    line-height: 1.3;
+}
+
+/* Family-tile badge — "17 colors / variants" pill on a multi-SKU product family card */
+.jds-card-family-badge {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 3px 8px;
+    background: #92400e;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+.jds-product-card--family {
+    border-color: #fcd34d;
+}
+
+.jds-product-card--family:hover {
+    border-color: #92400e;
+    background: #fffbeb;
+}
+
+/* ── Selected-product card (form view) ────────────────────────────────── */
+
+.jds-selected-card {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fef9e6 100%);
+    border: 1.5px solid #fcd34d;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.jds-selected-thumb {
+    width: 160px;
+    height: 160px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid #fde68a;
+}
+
+.jds-selected-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.jds-selected-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.jds-selected-cat {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #92400e;
+    font-weight: 600;
+}
+
+.jds-selected-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.3;
+}
+
+.jds-selected-sku {
+    font-size: 13px;
+    color: #5a2a07;
+}
+
+.jds-selected-imprint {
+    font-size: 13px;
+    color: #1f2937;
+    margin-top: 6px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 6px;
+    line-height: 1.4;
+}
+
+.jds-change-btn {
+    align-self: flex-start;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+/* Live block (price + inventory) */
+.jds-live-block {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.jds-live-loading {
+    color: #92400e;
+    font-style: italic;
+}
+
+.jds-live-warn {
+    color: #92400e;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.jds-live-stock {
+    font-weight: 600;
+    color: #047857;
+    margin-bottom: 6px;
+}
+
+.jds-out {
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.jds-live-tier-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.jds-live-tier-table th,
+.jds-live-tier-table td {
+    text-align: left;
+    padding: 4px 8px;
+    border-bottom: 1px solid #fde68a;
+}
+
+.jds-live-tier-table th {
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+}
+
+.jds-live-tier-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.jds-live-tier-table td:last-child {
+    font-weight: 600;
+    color: #1f2937;
+    text-align: right;
+}
+
+/* ── Form card (mirrors .sbf-form-card) ───────────────────────────────── */
+
+.jds-form-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.jds-form-header {
+    padding: 14px 22px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 15px;
+}
+
+.jds-form-body {
+    padding: 22px;
+}
+
+/* Field grid */
+.jds-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.jds-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.jds-field-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.jds-required {
+    color: #92400e;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+.jds-field-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.jds-input,
+.jds-select,
+.jds-textarea {
+    padding: 9px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.jds-input:focus,
+.jds-select:focus,
+.jds-textarea:focus {
+    outline: none;
+    border-color: #92400e;
+    box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
+}
+
+.jds-input.jds-error,
+.jds-select.jds-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.jds-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.jds-error-msg {
+    display: none;
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+/* Tip callout */
+.jds-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    color: #78350f;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 8px 0 16px;
+}
+
+.jds-tip-icon {
+    font-size: 16px;
+    flex: 0 0 auto;
+}
+
+/* File drop zone */
+.jds-file-drop {
+    padding: 24px;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: all 0.15s;
+}
+
+.jds-file-drop:hover,
+.jds-file-drop--active {
+    border-color: #92400e;
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.jds-file-drop-icon {
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.jds-file-drop-hint {
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 6px;
+}
+
+.jds-file-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.jds-file-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.jds-file-name {
+    flex: 1;
+    color: #1f2937;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jds-file-size {
+    color: #6b7280;
+    font-size: 12px;
+    flex: 0 0 auto;
+}
+
+.jds-file-remove {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: none;
+    background: #e5e7eb;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    flex: 0 0 auto;
+}
+
+.jds-file-remove:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+/* Rush toggle */
+.jds-rush-row {
+    margin: 8px 0 14px;
+}
+
+.jds-rush-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #fff;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 10px;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.jds-rush-toggle:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.jds-rush-toggle--active {
+    background: #fef2f2;
+    border-color: #ef4444;
+    border-style: solid;
+    color: #ef4444;
+}
+
+.jds-rush-icon {
+    font-size: 16px;
+}
+
+.jds-rush-label {
+    font-weight: 600;
+}
+
+.jds-rush-hint {
+    font-size: 12px;
+    opacity: 0.85;
+}
+
+/* Submit row */
+.jds-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 8px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.jds-submit-btn {
+    padding: 12px 26px;
+    background: #92400e;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+
+.jds-submit-btn:hover {
+    background: #5a2a07;
+}
+
+.jds-submit-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+.jds-submit-status {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* Success state */
+.jds-success {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.jds-success-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+}
+
+.jds-success h3 {
+    margin: 0 0 10px;
+    font-size: 22px;
+    color: #059669;
+    font-weight: 600;
+}
+
+.jds-success p {
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 0 auto 20px;
+    max-width: 460px;
+}
+
+.jds-success-link {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 0 8px 8px 0;
+    background: #059669;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.jds-success-link:hover {
+    background: #047857;
+}
+
+.jds-success-another {
+    padding: 10px 20px;
+    background: #fff;
+    color: #92400e;
+    border: 1.5px solid #92400e;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.jds-success-another:hover {
+    background: #92400e;
+    color: #fff;
+}
+
+/* Toast (matches sbf pattern) */
+.jds-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 22px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 9999;
+    max-width: 80%;
+    text-align: center;
+}
+
+.jds-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.jds-toast--info { background: #1f2937; }
+.jds-toast--error { background: #ef4444; }
+.jds-toast--success { background: #059669; }
+
+/* AE pill — JDS variant accent (when active uses default red theme via .ae-item-pill.is-active) */
+
+/* Responsive */
+@media (max-width: 700px) {
+    .jds-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .jds-banner {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    .jds-selected-card {
+        grid-template-columns: 1fr;
+        position: static;
+    }
+    .jds-selected-thumb {
+        width: 100%;
+        height: 220px;
+    }
+}
