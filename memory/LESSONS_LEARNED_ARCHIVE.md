@@ -4,6 +4,23 @@
 
 ---
 
+## Bug: Box Mockup Images Not Loading — Shared/Static URLs Return 404 (archived 2026-05-07, superseded by box-url-rules.md)
+**Problem:** Mockup images across Art Hub (art request detail, mockup detail, AE/Ruth dashboards, approval modals) showed broken images or "JPG" badge placeholders.
+**Root Cause:** Box `download_url` values using `/content/` or shared/static URLs intermittently return 404. The original `onerror` handler only showed a fallback badge, never retried via an alternate path.
+**Solution:** Added proxy fallback in `renderFilledThumb()` onerror: when a Box URL fails, retry via backend `/api/box/shared-image` proxy endpoint. Applied across 6 files (art-request-detail.js, mockup-detail.js, art-actions-shared.js, art-ae.js, mockup-ae.js, mockup-ruth.js).
+**Prevention:** Box download URLs are unreliable for direct browser loading. Always implement a proxy fallback for Box image URLs. The backend proxy can use authenticated API access which succeeds where public URLs fail.
+
+---
+
+## Bug: Box Proxy Thumbnail URLs — getFileExtension Returns Garbage, HTTP Mixed Content (archived 2026-05-07, superseded by box-url-rules.md)
+**Problem:** Reference File images showed purple badge "COM/API/BOX/THUMBNAIL/2196733276592" instead of image. Downloads blocked as "can't be downloaded securely."
+**Root Cause 1:** `getFileExtension()` returned everything after last `.` in proxy URLs — `com/api/box/thumbnail/...` is not a valid extension but code treated it as non-image.
+**Root Cause 2:** Backend stored proxy URLs as HTTP (Heroku `req.protocol` behind LB). HTTPS page blocks HTTP resources.
+**Solution:** Guard in `getFileExtension()` (reject ext with `/` or >10 chars). Added `normalizeBoxProxyUrl()` to rebuild with HTTPS API_BASE. Download redirects to `/api/box/download/:id` for full-res.
+**Prevention:** Any `getFileExtension()` must guard against API endpoint URLs. Any URL stored by backend must use `config.app.publicUrl` or be normalized client-side.
+
+---
+
 ## Bug: Cap Embroidery Manual-Cost Override Was Unauthenticated (archived 2026-05-03)
 **Problem:** [shared_components/js/cap-embroidery-pricing-service.js:18-34](shared_components/js/cap-embroidery-pricing-service.js:18) read `?manualCost=...` from the URL without checking the host. A customer visiting `https://teamnwca.com/calculators/cap-embroidery-pricing-integrated.html?manualCost=0.01` saw fake $0.01 cap prices on the public calculator. Discovered during the Embroidery Pricing Audit while comparing the cap service to the flat service. The flat embroidery service ([embroidery-pricing-service.js:18-22](shared_components/js/embroidery-pricing-service.js:18)) had had this gate since launch — the cap service was a copy-paste miss.
 **Root Cause:** When the cap service was forked from the flat service, the `getManualCostOverride()` method was copied without the `host === 'localhost' || host.endsWith('.herokuapp.com')` internal-only check. Two services with identical-looking signatures had different security postures.
