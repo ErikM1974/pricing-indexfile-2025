@@ -60,6 +60,16 @@
         return rec.Is_Rush === true || rec.Is_Rush === 'true' || rec.Is_Rush === 'Yes' || rec.Is_Rush === 1;
     }
 
+    // Extract ShopWorks PO digits from any plausible Bradley typing pattern.
+    // Mirrors backend extractPoDigits() in caspio-pricing-proxy/src/utils/transfer-auto-link.js
+    // and the queue-card client helper in dashboards/js/bradley-transfers.js.
+    // Accepts "112898", "112898 BW", "BW 112898", "PO# 112898 BW", etc.
+    function extractPoDigits(poNumber) {
+        if (poNumber === null || poNumber === undefined) return null;
+        var m = String(poNumber).match(/(\d{5,})/);
+        return m ? parseInt(m[1], 10) : null;
+    }
+
     // Caspio timestamp parser lives in shared_components/js/caspio-date-utils.js
     // (window.CaspioDate). The local helpers below thin-wrap it for readability.
     function parseCaspioDate(dateStr) {
@@ -263,6 +273,7 @@
             (r.Needed_By_Date ? '<div class="td-meta-item"><span class="td-meta-label">Needed By</span><span class="td-meta-value">' + escapeHtml(formatDate(r.Needed_By_Date)) + '</span></div>' : '') +
             (r.Rush_Reason ? '<div class="td-meta-item"><span class="td-meta-label">Rush Reason</span><span class="td-meta-value">' + escapeHtml(r.Rush_Reason) + '</span></div>' : '');
 
+        renderPoBanner();              // Phase 3 — PO# entry banner above the grid
         renderArtworkPanel();
         // renderSpecsPanel() removed in v3.1 — Order Specs panel deprecated
         // (Qty/Press/W/H fields are NULL in v3 paste-links flow; per-line data
@@ -1285,6 +1296,171 @@
         } catch (err) {
             console.error(err);
             showToast('Failed: ' + err.message, 'error');
+        }
+    }
+
+    // ── PO# Banner — Bradley's primary "mark as ordered" path ────────
+    //
+    // Banner state machine driven entirely by record fields (no separate UI
+    // state). Renders 1 of 3 variants:
+    //   • EMPTY    — Status=Requested/On_Hold AND no ShopWorks_PO_Number
+    //   • PENDING  — ShopWorks_PO_Number present BUT no Supacolor_Order_Number
+    //                (auto-link cron will fire within 10 min)
+    //   • LINKED   — Both ShopWorks_PO_Number AND Supacolor_Order_Number set
+    // Hidden entirely for terminal statuses (Cancelled) without a PO.
+
+    function renderPoBanner() {
+        var banner = $('td-po-banner');
+        if (!banner) return;
+        var r = state.record || {};
+        var poDigits = extractPoDigits(r.ShopWorks_PO_Number);
+        var hasSupa  = !!(r.Supacolor_Order_Number && String(r.Supacolor_Order_Number).trim() !== '');
+        var canEnter = (r.Status === 'Requested' || r.Status === 'On_Hold');
+
+        // Decide visibility & state
+        if (poDigits && hasSupa) {
+            renderPoBannerLinked(banner, poDigits, r.Supacolor_Order_Number);
+        } else if (poDigits) {
+            renderPoBannerPending(banner, poDigits);
+        } else if (canEnter) {
+            renderPoBannerEmpty(banner);
+        } else {
+            banner.style.display = 'none';
+            banner.className = 'td-po-banner';
+            banner.innerHTML = '';
+            return;
+        }
+        banner.style.display = '';
+    }
+
+    function renderPoBannerEmpty(banner) {
+        banner.className = 'td-po-banner td-po-banner--empty';
+        banner.innerHTML =
+            '<div class="td-po-banner-header">' +
+                '<div class="td-po-banner-icon"><i class="fas fa-bolt"></i></div>' +
+                '<div>' +
+                    '<h2 class="td-po-banner-title">Ready to order on Supacolor?</h2>' +
+                    '<p class="td-po-banner-help">Enter the <strong>ShopWorks PO#</strong> you just used. We’ll mark this <strong>Ordered</strong> and auto-link the Supacolor job within ~10 min.</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="td-po-banner-form">' +
+                '<div class="td-po-input-group">' +
+                    '<label class="td-po-input-label" for="td-po-input">ShopWorks PO #</label>' +
+                    '<input id="td-po-input" type="text" inputmode="numeric" autocomplete="off" class="td-po-input" placeholder="Paste anything — e.g. 112898 BW" aria-describedby="td-po-preview">' +
+                    '<div id="td-po-preview" class="td-po-preview" aria-live="polite">Type or paste a 5+ digit PO number</div>' +
+                '</div>' +
+                '<div class="td-po-banner-actions">' +
+                    '<button type="button" id="td-po-submit-btn" class="td-po-submit" disabled>' +
+                        '<i class="fas fa-paper-plane"></i> Mark as Ordered &amp; Link' +
+                    '</button>' +
+                    '<button type="button" id="td-po-fallback-btn" class="td-po-fallback-link">' +
+                        'No PO yet? Mark as Ordered with Supacolor # instead' +
+                    '</button>' +
+                '</div>' +
+            '</div>';
+
+        // Wire up live preview + submit
+        var input = $('td-po-input');
+        var preview = $('td-po-preview');
+        var submitBtn = $('td-po-submit-btn');
+        var fallbackBtn = $('td-po-fallback-btn');
+
+        function updatePreview() {
+            var digits = extractPoDigits(input.value);
+            if (digits) {
+                preview.textContent = 'Detected: ' + digits;
+                preview.className = 'td-po-preview td-po-preview--match';
+                submitBtn.disabled = false;
+            } else {
+                preview.textContent = input.value
+                    ? 'Need a 5+ digit number — try pasting again'
+                    : 'Type or paste a 5+ digit PO number';
+                preview.className = 'td-po-preview';
+                submitBtn.disabled = true;
+            }
+        }
+        input.addEventListener('input', updatePreview);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                e.preventDefault();
+                submitBtn.click();
+            }
+        });
+        submitBtn.addEventListener('click', handlePoBannerSubmit);
+        // Fallback opens the existing legacy "Mark as Ordered" modal
+        // (which captures Supacolor # directly + skips the auto-link path).
+        fallbackBtn.addEventListener('click', function () {
+            var modal = document.getElementById('td-ordered-modal');
+            if (modal) modal.style.display = '';
+        });
+
+        // Auto-focus if URL hash is #enter-po (queue card "Enter PO#" button sets this)
+        if (window.location.hash === '#enter-po') {
+            setTimeout(function () {
+                input.focus();
+                input.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 100);
+        }
+    }
+
+    function renderPoBannerPending(banner, poDigits) {
+        banner.className = 'td-po-banner td-po-banner--pending';
+        banner.innerHTML =
+            '<div class="td-po-banner-icon"><i class="fas fa-circle-notch fa-spin"></i></div>' +
+            '<div>' +
+                '<h2 class="td-po-banner-title">Ordered — PO ' + poDigits + ' BW</h2>' +
+                '<p class="td-po-banner-help">Linking to Supacolor on next sync (within 10 min). The auto-link cron matches your PO digits to <code>Supacolor_Jobs.PO_Number</code> automatically.</p>' +
+            '</div>';
+    }
+
+    function renderPoBannerLinked(banner, poDigits, supaNumber) {
+        banner.className = 'td-po-banner td-po-banner--linked';
+        var supaSafe = escapeHtml(String(supaNumber));
+        banner.innerHTML =
+            '<div class="td-po-banner-icon"><i class="fas fa-check-circle"></i></div>' +
+            '<div>' +
+                '<h2 class="td-po-banner-title">Ordered — <code>PO ' + poDigits + ' BW</code> → Supacolor #' + supaSafe + '</h2>' +
+                '<p class="td-po-banner-help">Linked and tracking. Live status syncs from Supacolor every 10 min.</p>' +
+            '</div>';
+    }
+
+    async function handlePoBannerSubmit() {
+        var input = $('td-po-input');
+        var submitBtn = $('td-po-submit-btn');
+        if (!input || !submitBtn) return;
+        var digits = extractPoDigits(input.value);
+        if (!digits) return;
+
+        await ensureUserIdentified();
+
+        submitBtn.disabled = true;
+        var originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        try {
+            // Phase 1 backend extension: PUT /status with status='Ordered' + shopworksPO
+            // writes ShopWorks_PO_Number (re-stamped as "<digits> BW") AND flips status.
+            // Auto-link cron picks up the PO digits on its next 10-min run.
+            await apiPut('/api/transfer-orders/' + encodeURIComponent(state.transferId) + '/status', {
+                status: 'Ordered',
+                author: state.user.email,
+                authorName: state.user.name,
+                shopworksPO: String(digits),
+                notes: 'PO entered via queue card; awaiting Supacolor auto-link.'
+            });
+            showToast('PO ' + digits + ' BW saved — marked as Ordered. Auto-link will fire within 10 min.', 'success');
+            await load();
+
+            // Fire the EmailJS notification — same hook the legacy Ordered modal uses
+            // so the sales rep + Steve get notified regardless of which path Bradley used.
+            if (window.TransferActions && window.TransferActions.sendTransferOrderedEmail) {
+                window.TransferActions.sendTransferOrderedEmail(state.record, state.user);
+            }
+        } catch (err) {
+            console.error(err);
+            showToast('Failed: ' + err.message, 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
         }
     }
 

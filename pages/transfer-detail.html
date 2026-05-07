@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=14">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=6">
-    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=8">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=9">
     <link rel="stylesheet" href="/shared_components/css/product-thumbnail-modal.css?v=1">
 </head>
 <body>
@@ -58,6 +58,19 @@
                 </div>
                 <div class="td-header-meta" id="td-header-meta"></div>
             </div>
+
+            <!-- ── PO# Entry Banner (Bradley's primary "mark as ordered" path) ──
+                 Three states rendered by renderPoBanner() in transfer-detail.js:
+                   • EMPTY    (Status='Requested' or 'On_Hold', no PO yet)
+                              → input form for ShopWorks PO# + "Mark as Ordered" button
+                   • PENDING  (PO entered, no Supacolor link yet)
+                              → "Linking…" amber status; auto-link cron will fire within 10 min
+                   • LINKED   (PO entered AND Supacolor_Order_Number populated)
+                              → green confirmation with link to Supacolor job
+                 Banner is hidden for Shipped/Received/Cancelled (status-past-Ordered) cards
+                 unless the PO + Supacolor are present (then show LINKED state for transparency).
+                 -->
+            <div class="td-po-banner" id="td-po-banner" style="display:none;"></div>
 
             <!-- Two-column layout -->
             <div class="td-grid">
@@ -490,6 +503,6 @@
     <script src="/shared_components/js/transfer-actions-shared.js?v=17"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=2"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/pages/js/transfer-detail.js?v=20"></script>
+    <script src="/pages/js/transfer-detail.js?v=21"></script>
 </body>
 </html>
