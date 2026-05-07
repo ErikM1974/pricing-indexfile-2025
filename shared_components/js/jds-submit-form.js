@@ -867,17 +867,24 @@ var JDSSubmitForm = (function () {
         customerLookup = new CustomerLookupService({ maxResults: 10 });
         customerLookup.bindToInput('jds-company', {
             onSelect: function (contact) {
+                // CustomerLookupService passes contacts in the legacy response
+                // shape from /api/company-contacts/search:
+                //   ct_NameFull            (e.g. "Bob Rowe")
+                //   ContactNumbersEmail    (e.g. "rrowe@wesleyhomes.org")
+                //   id_Customer / CustomerCompanyName
+                // Auto-fill skips empty contact fields only — if the AE has
+                // already typed something, we don't clobber their input.
                 selectedContact = contact;
                 document.getElementById('jds-customer-id').value = contact.id_Customer || '';
                 document.getElementById('jds-company').classList.remove('jds-error');
                 document.getElementById('jds-company-error').style.display = 'none';
                 var nameEl = document.getElementById('jds-contact-name');
                 var emailEl = document.getElementById('jds-contact-email');
-                if (contact.first_name && nameEl && !nameEl.value) {
-                    nameEl.value = (contact.first_name + ' ' + (contact.last_name || '')).trim();
+                if (contact.ct_NameFull && nameEl && !nameEl.value) {
+                    nameEl.value = contact.ct_NameFull;
                 }
-                if (contact.email && emailEl && !emailEl.value) {
-                    emailEl.value = contact.email;
+                if (contact.ContactNumbersEmail && emailEl && !emailEl.value) {
+                    emailEl.value = contact.ContactNumbersEmail;
                 }
             },
             onClear: function () {
