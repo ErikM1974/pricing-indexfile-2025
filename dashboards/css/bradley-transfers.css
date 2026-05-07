@@ -310,6 +310,83 @@
     color: var(--bt-text-muted);
 }
 
+/* ── PO# row (between title and subtitle) ─────────────────────
+ * Three states:
+ *   1. Has digits + linked    → bold mono number, no pill
+ *   2. Has digits + pending   → bold mono number + amber "Linking…" pill
+ *   3. Empty (Requested/Hold) → outlined button "Enter PO# to order"
+ */
+.bt-card-po {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 2px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bt-text);
+}
+.bt-card-po-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--bt-text-muted);
+    background: var(--bt-theme-light);
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.bt-card-po-number {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--bt-text);
+}
+.bt-card-po-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-family: inherit;
+    letter-spacing: 0;
+}
+.bt-card-po-pending .fa-spin {
+    font-size: 10px;
+}
+
+/* Empty state — outlined button that opens the PO entry flow */
+button.bt-card-po--empty {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 4px 0 2px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bt-theme);
+    background: #fff;
+    border: 1.5px dashed var(--bt-theme);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    font-family: inherit;
+}
+button.bt-card-po--empty:hover {
+    background: var(--bt-theme);
+    color: #fff;
+    border-style: solid;
+}
+button.bt-card-po--empty:focus {
+    outline: 2px solid var(--bt-theme);
+    outline-offset: 2px;
+}
+
 .bt-card-meta {
     display: grid;
     grid-template-columns: auto 1fr;

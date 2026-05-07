@@ -45,6 +45,16 @@
             .replace(/'/g, '&#039;');
     }
 
+    // Extract ShopWorks PO digits from any plausible Bradley typing pattern.
+    // Mirrors backend extractPoDigits() in caspio-pricing-proxy/src/utils/transfer-auto-link.js.
+    // Accepts "112898", "112898 BW", "BW 112898", "PO# 112898 BW", etc.
+    // Returns null if no qualifying 5+ digit run is found.
+    function extractPoDigits(poNumber) {
+        if (poNumber === null || poNumber === undefined) return null;
+        var m = String(poNumber).match(/(\d{5,})/);
+        return m ? parseInt(m[1], 10) : null;
+    }
+
     // ── API ──────────────────────────────────────────────────────────
     async function fetchTransfers() {
         try {
@@ -234,6 +244,33 @@
             ? '<div class="bt-card-subtitle">' + subtitleParts.join(' &middot; ') + '</div>'
             : '';
 
+        // PO# row — three states (entered+linked / entered+pending-link / empty).
+        // Bradley enters the ShopWorks PO# at the moment he places the Supacolor
+        // order; that PO# drives the auto-link's Step A0 deterministic match.
+        // When ShopWorks_PO_Number is set but Supacolor_Order_Number isn't yet,
+        // show a "Linking…" pill — the auto-link cron picks it up within ~10 min.
+        var poDigits = extractPoDigits(t.ShopWorks_PO_Number);
+        var poRow;
+        if (poDigits) {
+            var linkPending = !t.Supacolor_Order_Number;
+            poRow =
+                '<div class="bt-card-po">' +
+                    '<span class="bt-card-po-label">PO</span>' +
+                    '<span class="bt-card-po-number">' + poDigits + ' BW</span>' +
+                    (linkPending ? '<span class="bt-card-po-pending"><i class="fas fa-circle-notch fa-spin"></i> Linking…</span>' : '') +
+                '</div>';
+        } else if (t.Status === 'Requested' || t.Status === 'On_Hold') {
+            poRow =
+                '<button type="button" class="bt-card-po bt-card-po--empty"' +
+                    ' data-action="enter-po"' +
+                    ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
+                    ' title="Enter the ShopWorks PO# to mark this as Ordered and auto-link the Supacolor job">' +
+                    '<i class="fas fa-keyboard"></i> Enter PO# to order' +
+                '</button>';
+        } else {
+            poRow = '';
+        }
+
         // Supacolor # link — shown only after auto-link fires (or manual override).
         // Click handler (in renderGrid below) resolves the numeric ID_Job via
         // /api/supacolor-jobs/by-number and navigates straight to the live
@@ -297,6 +334,7 @@
                         (t.Design_Number ? '#' + escapeHtml(t.Design_Number) + ' &middot; ' : '') +
                         escapeHtml(t.Company_Name || 'No company') +
                     '</h3>' +
+                    poRow +
                     subtitle +
                     (t.Customer_Name && t.Customer_Name !== t.Company_Name
                         ? '<div class="bt-card-design">' + escapeHtml(t.Customer_Name) + '</div>'
@@ -325,17 +363,27 @@
         grid.innerHTML = list.map(renderCard).join('');
         $('bt-result-count').textContent = list.length + ' transfer' + (list.length === 1 ? '' : 's');
 
-        // Wire up card clicks — four click targets, in priority order:
+        // Wire up card clicks — five click targets, in priority order:
         //   1. Delete button → open hard-delete modal
-        //   2. Manual link/relink chip (unlinked or stale) → open Supacolor link modal
-        //   3. Live Supacolor # link → resolve numeric ID + navigate to SC job detail
-        //   4. Anywhere else on the card → navigate to Transfer detail page
+        //   2. Enter PO# button → navigate to detail page with #enter-po hash
+        //      (Phase 3 detail-page banner will auto-focus the input on that hash)
+        //   3. Manual link/relink chip (unlinked or stale) → open Supacolor link modal
+        //   4. Live Supacolor # link → resolve numeric ID + navigate to SC job detail
+        //   5. Anywhere else on the card → navigate to Transfer detail page
         grid.querySelectorAll('.bt-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 var deleteBtn = e.target.closest('.bt-card-menu-btn[data-action="delete"]');
                 if (deleteBtn) {
                     e.stopPropagation();
                     openDeleteModal(card.getAttribute('data-id'));
+                    return;
+                }
+                var enterPoBtn = e.target.closest('.bt-card-po--empty[data-action="enter-po"]');
+                if (enterPoBtn) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    var poTransferId = enterPoBtn.getAttribute('data-id-transfer');
+                    window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(poTransferId) + '#enter-po';
                     return;
                 }
                 var unlinkedChip = e.target.closest('.bt-card-sc-link--unlinked');
