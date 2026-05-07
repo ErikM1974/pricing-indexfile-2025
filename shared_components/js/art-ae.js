@@ -17,13 +17,14 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Item_Type,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-    // Legacy fallback for installs that don't have Item_Type yet — strip it
-    // and retry. NULL Item_Type → 'Garment' at render time (resolveItemType).
-    var SELECT_FIELDS_LEGACY = SELECT_FIELDS.replace(',Item_Type', '');
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    // Legacy fallback for installs that don't have Item_Type / JDS_SKU yet —
+    // strip them and retry. NULL Item_Type → 'Garment' at render time
+    // (resolveItemType).
+    var SELECT_FIELDS_LEGACY = SELECT_FIELDS.replace(',Item_Type', '').replace(',JDS_SKU', '');
 
     function resolveItemType(raw) {
-        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
         return 'Garment';
     }
 
@@ -395,6 +396,9 @@ var ArtAeGallery = (function () {
             var itEmoji = itemType === 'Sticker' ? '\u{1F3F7}' : '\u{1F38C}';
             var itCls = itemType === 'Sticker' ? 'card-badge--sticker' : 'card-badge--banner';
             badges += '<span class="card-badge ' + itCls + '" title="' + itemType + ' request">' + itEmoji + ' ' + itemType + '</span>';
+        } else if (itemType === 'JDS') {
+            var jdsTitle = req.JDS_SKU ? ('JDS request — ' + req.JDS_SKU) : 'JDS vendor product request';
+            badges += '<span class="card-badge card-badge--jds" title="' + escapeHtml(jdsTitle) + '">\u{1F3AF} JDS' + (req.JDS_SKU ? ' · ' + escapeHtml(req.JDS_SKU) : '') + '</span>';
         }
         if (orderType) {
             badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';

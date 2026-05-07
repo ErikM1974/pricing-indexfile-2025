@@ -618,8 +618,8 @@ body {
     flex: 0 0 6px;
 }
 
-/* Item-Type badges (Sticker/Banner extension, 2026-05-06) — Garment is the
- * implicit default and renders no badge. */
+/* Item-Type badges (Sticker/Banner extension, 2026-05-06; JDS extension, 2026-05-06)
+ * — Garment is the implicit default and renders no badge. */
 .card-badge--sticker {
     background: #fce7f3;
     color: #9d174d;
@@ -629,6 +629,42 @@ body {
     background: #dbeafe;
     color: #1e40af;
     font-weight: 600;
+}
+.card-badge--jds {
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+}
+
+/* JDS catalog product thumbnail (used when no mockup yet but the request has
+ * a JDS_SKU we can resolve to a catalog ThumbnailURL). Mirrors .card-thumb-ae
+ * styling so Steve still recognizes the card layout. */
+.card-thumb-jds {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #fffbeb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.card-thumb-jds img {
+    max-width: 92%;
+    max-height: 92%;
+    object-fit: contain;
+}
+.card-thumb-jds-label {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    padding: 2px 8px;
+    background: rgba(146, 64, 14, 0.92);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
 }
 
 .card-badge--revision {

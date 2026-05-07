@@ -123,12 +123,36 @@
         return path && IMG_EXT_RE.test(String(path));
     }
 
-    // Item_Type → 'Garment' / 'Sticker' / 'Banner'. NULL or anything else
-    // collapses to 'Garment' so legacy rows render as today (single source of
-    // truth for the fallback rule, matches the rule in art-ae.js + mockup-detail).
+    // Item_Type → 'Garment' / 'Sticker' / 'Banner' / 'JDS'. NULL or anything
+    // else collapses to 'Garment' so legacy rows render as today (single
+    // source of truth for the fallback rule, matches the rule in art-ae.js
+    // + mockup-detail).
     function resolveItemType(raw) {
-        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
         return 'Garment';
+    }
+
+    // JDS catalog SKU → thumbnail map, populated lazily after first fetch.
+    // Lets the card render the JDS product image when there's no mockup yet.
+    var jdsCatalogBySku = {};
+    var jdsCatalogLoaded = false;
+    function loadJdsCatalog() {
+        if (jdsCatalogLoaded || typeof JDSCatalogService === 'undefined') return;
+        jdsCatalogLoaded = true;
+        try {
+            var svc = new JDSCatalogService();
+            svc.listAll().then(function (rows) {
+                (rows || []).forEach(function (r) {
+                    if (r && r.SKU) jdsCatalogBySku[String(r.SKU).toLowerCase()] = r;
+                });
+                // Re-render so JDS cards pick up the catalog thumbnail.
+                if (typeof renderGrid === 'function') renderGrid();
+            }).catch(function () { /* fail silent — fallback chain still works */ });
+        } catch (_e) { /* ignore */ }
+    }
+    function getJdsCatalogRow(sku) {
+        if (!sku) return null;
+        return jdsCatalogBySku[String(sku).toLowerCase()] || null;
     }
 
     // Pull up to 2 AE-uploaded image thumbnails (CDN_Link, CDN_Link_Two paired
@@ -148,12 +172,12 @@
         // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
         // empty and User_Email holds the AE email — without User_Email in the
         // SELECT the rep first name in the card header has nothing to resolve.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         // 2-level fallback for legacy ArtRequests installs that don't have
-        // Item_Type yet — strip it and retry. NULL Item_Type = treated as
-        // 'Garment' at render time (see resolveItemType()).
-        var selectLegacy = selectFallback.replace(',Item_Type', '');
+        // Item_Type or JDS_SKU yet — strip them and retry. NULL Item_Type =
+        // treated as 'Garment' at render time (see resolveItemType()).
+        var selectLegacy = selectFallback.replace(',Item_Type', '').replace(',JDS_SKU', '');
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 
@@ -264,11 +288,26 @@
                 ' alt="' + company + ' mockup" loading="lazy"' +
                 ' onerror="window.SteveGallery.handleThumbError(this)">';
         } else {
+            // No mockup yet — for JDS items, prefer the JDS catalog/live thumbnail
+            // (Steve sees the actual product Erik picked) before falling back to
+            // AE-uploaded artwork thumbnails.
+            var jdsThumb = null;
+            if (resolveItemType(req.Item_Type) === 'JDS' && req.JDS_SKU) {
+                var jdsRow = getJdsCatalogRow(req.JDS_SKU);
+                if (jdsRow) {
+                    jdsThumb = jdsRow.ThumbnailURL || null;
+                }
+            }
             // No mockup yet — fall back to up to 2 AE-uploaded artwork thumbnails
             // (CDN_Link / CDN_Link_Two from /Artwork/{filename}). Steve sees what
             // the customer wants without clicking into the detail page.
             var aeUrls = getAeArtworkUrls(req);
-            if (aeUrls.length > 0) {
+            if (jdsThumb) {
+                thumbHtml = '<div class="card-thumb-jds">'
+                    + '<img src="' + escapeHtml(jdsThumb) + '" alt="' + company + ' JDS product" loading="lazy" onerror="this.parentNode.style.display=\'none\'">'
+                    + '<div class="card-thumb-jds-label">JDS · ' + escapeHtml(req.JDS_SKU) + '</div>'
+                    + '</div>';
+            } else if (aeUrls.length > 0) {
                 var imgs = aeUrls.map(function (u) {
                     return '<img src="' + escapeHtml(u) + '" alt="AE artwork" loading="lazy" onerror="this.style.display=\'none\'">';
                 }).join('');
@@ -288,13 +327,16 @@
         }
 
         var badges = '';
-        // Item-type badge — Sticker / Banner / Garment (NULL → Garment).
+        // Item-type badge — Sticker / Banner / JDS / Garment (NULL → Garment).
         // Garment is the default — only render the badge when something else.
         var itemType = resolveItemType(req.Item_Type);
         if (itemType === 'Sticker' || itemType === 'Banner') {
             var itEmoji = itemType === 'Sticker' ? '\u{1F3F7}' : '\u{1F38C}';
             var itCls = itemType === 'Sticker' ? 'card-badge--sticker' : 'card-badge--banner';
             badges += '<span class="card-badge ' + itCls + '" title="' + itemType + ' request">' + itEmoji + ' ' + itemType + '</span>';
+        } else if (itemType === 'JDS') {
+            var jdsTitle = req.JDS_SKU ? ('JDS request — ' + req.JDS_SKU) : 'JDS vendor product request';
+            badges += '<span class="card-badge card-badge--jds" title="' + escapeHtml(jdsTitle) + '">\u{1F3AF} JDS' + (req.JDS_SKU ? ' · ' + escapeHtml(req.JDS_SKU) : '') + '</span>';
         }
         if (rushBadge)        badges += '<span class="card-badge card-badge--rush">RUSH</span>';
         if (orderType)        badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';
@@ -507,6 +549,9 @@
         var host = document.getElementById('steve-grid-view');
         if (!host) return;
         mounted = true;
+
+        // Kick off JDS catalog load so JDS card thumbnails resolve once it lands.
+        loadJdsCatalog();
 
         host.innerHTML =
             '<div class="sg-toolbar">' +
