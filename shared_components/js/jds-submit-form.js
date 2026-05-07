@@ -45,6 +45,13 @@ var JDSSubmitForm = (function () {
     var liveProduct = null;         // live JDS API response (price, inventory)
     var liveError = null;           // string if live call failed (still allow submit)
 
+    // SKU → thumbnail URL map. Catalog rows have ThumbnailURL blank by default
+    // so the picker grid fetches live JDS thumbnails in one batch via
+    // POST /api/jds/products on first catalog load. Module-level cache so
+    // re-renders (back/forward navigation) don't refetch.
+    var jdsThumbBySku = {};
+    var jdsThumbsInflight = false;
+
     var referenceFiles = [];
     var selectedContact = null;
     var isRush = false;
@@ -80,11 +87,106 @@ var JDSSubmitForm = (function () {
                 allCatalog = results[1] || [];
                 if (view === 'categories') renderCategoriesView();
                 if (view === 'products') renderProductsView();
+
+                // Kick off batch JDS thumbnail fetch for every SKU. Don't block
+                // the initial render — pictures pop in once they arrive.
+                var skus = allCatalog
+                    .map(function (r) { return r && r.SKU; })
+                    .filter(function (s) { return !!s; });
+                if (skus.length) {
+                    loadJdsThumbnailsForSkus(skus).then(rerenderCurrentView);
+                }
             })
             .catch(function (err) {
                 console.error('[JDSSubmitForm] Catalog load failed:', err);
                 renderEmptyState('Failed to load JDS catalog: ' + (err.message || 'unknown error'));
             });
+    }
+
+    /**
+     * Batch-fetch live JDS thumbnails for an array of SKUs, populating the
+     * module-level jdsThumbBySku map. Hits POST /api/jds/products which is
+     * already 1-hour cached server-side. Idempotent — safe to call repeatedly;
+     * re-uses inflight promise if a fetch is already running.
+     */
+    var jdsThumbsPromise = null;
+    function loadJdsThumbnailsForSkus(skus) {
+        if (jdsThumbsPromise) return jdsThumbsPromise;
+        if (!skus || !skus.length) return Promise.resolve(jdsThumbBySku);
+        jdsThumbsInflight = true;
+        jdsThumbsPromise = fetch(API_BASE + '/api/jds/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ skus: skus })
+        })
+            .then(function (r) {
+                if (!r.ok) throw new Error('JDS batch fetch ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                var products = (data && data.result) || [];
+                products.forEach(function (p) {
+                    if (!p || !p.sku) return;
+                    var thumb = (p.images && p.images.thumbnail) || p.thumbnail;
+                    if (thumb && thumb !== 'unavailable') {
+                        jdsThumbBySku[String(p.sku).toLowerCase()] = thumb;
+                    }
+                });
+                jdsThumbsInflight = false;
+                return jdsThumbBySku;
+            })
+            .catch(function (err) {
+                console.warn('[JDSSubmitForm] Batch thumbnail fetch failed:', err);
+                jdsThumbsInflight = false;
+                jdsThumbsPromise = null; // allow retry on next render
+                return jdsThumbBySku;
+            });
+        return jdsThumbsPromise;
+    }
+
+    /**
+     * Resolve the best available thumbnail URL for a catalog row:
+     * 1. Catalog ThumbnailURL override (if set)
+     * 2. Live JDS API thumbnail from the cached batch fetch
+     * 3. null (caller renders the empty placeholder)
+     */
+    function getThumbForRow(row) {
+        if (!row) return null;
+        if (row.ThumbnailURL) return row.ThumbnailURL;
+        var sku = row.SKU && String(row.SKU).toLowerCase();
+        return sku ? (jdsThumbBySku[sku] || null) : null;
+    }
+
+    /**
+     * Re-render whichever view is currently mounted. Used after async events
+     * (thumbnails arrive, catalog refresh) to pick up new state without
+     * dropping any already-loaded data.
+     *
+     * Skips form view: re-rendering the form would lose the AE's typed input.
+     * Instead, we update just the selected-card thumbnail in place.
+     */
+    function rerenderCurrentView() {
+        if (view === 'categories') renderCategoriesView();
+        else if (view === 'products') renderProductsView();
+        else if (view === 'variants') renderVariantsView();
+        else if (view === 'form' && selectedRow) updateSelectedThumb();
+    }
+
+    /**
+     * Surgical update of just the .jds-selected-thumb img inside the form
+     * view, preserving the AE's typed input. Pulls thumbnail from the row
+     * cache (catalog override → live JDS batch → live single-product fetch).
+     */
+    function updateSelectedThumb() {
+        if (!selectedRow) return;
+        var wrap = document.querySelector('.jds-selected-thumb');
+        if (!wrap) return;
+        var src = getThumbForRow(selectedRow)
+            || (liveProduct && liveProduct.images && liveProduct.images.thumbnail)
+            || '';
+        if (src && src !== 'unavailable') {
+            wrap.innerHTML = '<img src="' + escapeHtml(src) + '" alt="">';
+        }
     }
 
     // ── Render: Categories ─────────────────────────────────────────────────
@@ -128,8 +230,17 @@ var JDSSubmitForm = (function () {
             return;
         }
         grid.innerHTML = allCategories.map(function (c) {
-            var thumb = c.sampleThumbnail
-                ? '<img src="' + escapeHtml(c.sampleThumbnail) + '" alt="" loading="lazy">'
+            // Sample thumbnail: server-provided (catalog ThumbnailURL override)
+            // OR first matching SKU's live JDS thumbnail from the batch cache.
+            var sample = c.sampleThumbnail;
+            if (!sample) {
+                var firstInCat = allCatalog.find(function (r) {
+                    return String(r.Category || '').toLowerCase() === String(c.category || '').toLowerCase();
+                });
+                if (firstInCat) sample = getThumbForRow(firstInCat);
+            }
+            var thumb = sample
+                ? '<img src="' + escapeHtml(sample) + '" alt="" loading="lazy">'
                 : '<div class="jds-card-thumb-empty">\u{1F4E6}</div>';
             return ''
                 + '<button type="button" class="jds-category-card" data-category="' + escapeHtml(c.category) + '">'
@@ -213,9 +324,10 @@ var JDSSubmitForm = (function () {
             byFamily[key].rows.push(row);
         });
         // Pick a representative thumbnail + displayName for each family group.
+        // Falls through getThumbForRow → catalog override → live JDS batch.
         groups.forEach(function (g) {
             var first = g.rows[0];
-            g.thumbnail = first.ThumbnailURL || null;
+            g.thumbnail = getThumbForRow(first);
             g.displayName = first.DisplayName || first.SKU || '';
             // If family contains "X — Color" naming convention (em dash before
             // the color), strip the color suffix for the family-tile label.
@@ -268,8 +380,9 @@ var JDSSubmitForm = (function () {
      */
     function buildGroupCardHtml(group) {
         var first = group.rows[0];
-        var thumb = group.thumbnail
-            ? '<img src="' + escapeHtml(group.thumbnail) + '" alt="" loading="lazy">'
+        var thumbSrc = group.thumbnail || getThumbForRow(first);
+        var thumb = thumbSrc
+            ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" loading="lazy">'
             : '<div class="jds-card-thumb-empty">\u{1F4E6}</div>';
 
         if (group.rows.length === 1) {
@@ -320,8 +433,9 @@ var JDSSubmitForm = (function () {
      * Search results don't collapse to families — every match is an individual SKU.
      */
     function buildProductCardHtml(row) {
-        var thumb = row.ThumbnailURL
-            ? '<img src="' + escapeHtml(row.ThumbnailURL) + '" alt="" loading="lazy">'
+        var thumbSrc = getThumbForRow(row);
+        var thumb = thumbSrc
+            ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" loading="lazy">'
             : '<div class="jds-card-thumb-empty">\u{1F4E6}</div>';
         var imprint = row.ImprintArea
             ? '<div class="jds-card-imprint">' + escapeHtml(row.ImprintArea) + '</div>'
@@ -397,8 +511,9 @@ var JDSSubmitForm = (function () {
      * Same click target shape as the solo product card (data-sku).
      */
     function buildVariantCardHtml(row) {
-        var thumb = row.ThumbnailURL
-            ? '<img src="' + escapeHtml(row.ThumbnailURL) + '" alt="" loading="lazy">'
+        var thumbSrc = getThumbForRow(row);
+        var thumb = thumbSrc
+            ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" loading="lazy">'
             : '<div class="jds-card-thumb-empty">\u{1F4E6}</div>';
         // If DisplayName has " — Color" suffix, isolate the color for emphasis.
         var name = row.DisplayName || row.SKU || '';
@@ -434,7 +549,16 @@ var JDSSubmitForm = (function () {
             .then(function (product) {
                 liveProduct = product || null;
                 liveError = null;
+                // Cache the live thumbnail so subsequent navigations skip the
+                // single-product fetch (and any other view that renders this
+                // SKU's card gets the image).
+                if (product && product.images && product.images.thumbnail
+                    && product.images.thumbnail !== 'unavailable'
+                    && product.sku) {
+                    jdsThumbBySku[String(product.sku).toLowerCase()] = product.images.thumbnail;
+                }
                 updateLiveBlock();
+                updateSelectedThumb();
             })
             .catch(function (err) {
                 console.warn('[JDSSubmitForm] Live JDS fetch failed for', sku, err);
@@ -451,7 +575,7 @@ var JDSSubmitForm = (function () {
         if (!container || !selectedRow) return;
 
         var row = selectedRow;
-        var thumbSrc = row.ThumbnailURL
+        var thumbSrc = getThumbForRow(row)
             || (liveProduct && liveProduct.images && liveProduct.images.thumbnail)
             || '';
 

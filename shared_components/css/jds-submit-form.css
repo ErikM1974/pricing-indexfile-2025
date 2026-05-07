@@ -131,10 +131,12 @@
 }
 
 /* ── Category grid (landing) ──────────────────────────────────────────── */
+/* Flex (not grid) so a single-card view doesn't balloon to full container
+ * width. Cards keep a tight 200-240px range regardless of count. */
 
 .jds-category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 14px;
 }
 
@@ -151,6 +153,9 @@
     text-align: left;
     font-family: inherit;
     transition: all 0.15s;
+    /* Fixed-ish width — flex-grow:0 prevents single-card balloon. */
+    flex: 0 0 220px;
+    max-width: 240px;
 }
 
 .jds-category-card:hover {
@@ -160,10 +165,11 @@
 }
 
 /* ── Product grid ─────────────────────────────────────────────────────── */
+/* Same flex pattern — cards stay 200-220px regardless of how many are shown. */
 
 .jds-product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
 
@@ -179,6 +185,8 @@
     text-align: left;
     font-family: inherit;
     transition: all 0.15s;
+    flex: 0 0 200px;
+    max-width: 220px;
 }
 
 .jds-product-card:hover {
@@ -190,6 +198,7 @@
 .jds-card-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
+    max-height: 220px;
     background: #f9fafb;
     border-radius: 8px;
     display: flex;
