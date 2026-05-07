@@ -239,11 +239,46 @@
         // /api/supacolor-jobs/by-number and navigates straight to the live
         // Supacolor job detail page. Lazy resolution keeps initial render fast
         // (no N+1 lookups across cards).
-        var scLink = t.Supacolor_Order_Number
-            ? '<button type="button" class="bt-card-sc-link" data-sc-number="' + escapeHtml(t.Supacolor_Order_Number) + '" title="Open Supacolor job">' +
-                'Supacolor #' + escapeHtml(t.Supacolor_Order_Number) + ' <i class="fas fa-external-link-alt"></i>' +
-              '</button>'
-            : '';
+        //
+        // Stale-link warning: when the linked Supacolor job is Cancelled or
+        // missing from our mirror (supacolor_status), render the chip in red
+        // with a warning icon — Bradley clicks to open the link modal and
+        // re-link to a different job#.
+        //
+        // Unlinked: render an outlined "Link to Supacolor #…" chip so Bradley
+        // can manually pin the job# (auto-link by company name + PO will
+        // populate it automatically when possible — this chip is the fallback).
+        var scLink;
+        var scStatus = t.supacolor_status; // attached by backend when includeLineCount=true
+        var isStale = !!t.Supacolor_Order_Number && (scStatus === 'Cancelled' || scStatus === '__not_found__');
+        if (t.Supacolor_Order_Number) {
+            var staleClass = isStale ? ' bt-card-sc-link--stale' : '';
+            var staleTitle = isStale
+                ? (scStatus === 'Cancelled'
+                    ? 'Supacolor job was cancelled — click to re-link'
+                    : 'Supacolor job missing from local mirror — click to re-link')
+                : 'Open Supacolor job';
+            var staleIcon = isStale ? '<i class="fas fa-exclamation-triangle"></i> ' : '';
+            scLink = '<button type="button" class="bt-card-sc-link' + staleClass + '"' +
+                ' data-sc-number="' + escapeHtml(t.Supacolor_Order_Number) + '"' +
+                ' data-sc-stale="' + (isStale ? '1' : '0') + '"' +
+                ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
+                ' title="' + escapeHtml(staleTitle) + '">' +
+                staleIcon + 'Supacolor #' + escapeHtml(t.Supacolor_Order_Number) +
+                ' <i class="fas fa-external-link-alt"></i>' +
+                '</button>';
+        } else if (t.Status === 'Requested' || t.Status === 'Ordered' || t.Status === 'On_Hold') {
+            // Only offer manual linking on non-terminal statuses. Cancelled/Received
+            // transfers shouldn't be re-linked — they're done.
+            scLink = '<button type="button" class="bt-card-sc-link bt-card-sc-link--unlinked"' +
+                ' data-action="link-supacolor"' +
+                ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
+                ' title="Link this transfer to a Supacolor job number">' +
+                '<i class="fas fa-link"></i> Link to Supacolor #…' +
+                '</button>';
+        } else {
+            scLink = '';
+        }
 
         return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
             '<div class="bt-card-header">' +
@@ -290,10 +325,11 @@
         grid.innerHTML = list.map(renderCard).join('');
         $('bt-result-count').textContent = list.length + ' transfer' + (list.length === 1 ? '' : 's');
 
-        // Wire up card clicks — three click targets, in priority order:
+        // Wire up card clicks — four click targets, in priority order:
         //   1. Delete button → open hard-delete modal
-        //   2. Supacolor # link → resolve numeric ID + navigate to SC job detail
-        //   3. Anywhere else on the card → navigate to Transfer detail page
+        //   2. Manual link/relink chip (unlinked or stale) → open Supacolor link modal
+        //   3. Live Supacolor # link → resolve numeric ID + navigate to SC job detail
+        //   4. Anywhere else on the card → navigate to Transfer detail page
         grid.querySelectorAll('.bt-card').forEach(function (card) {
             card.addEventListener('click', function (e) {
                 var deleteBtn = e.target.closest('.bt-card-menu-btn[data-action="delete"]');
@@ -302,16 +338,174 @@
                     openDeleteModal(card.getAttribute('data-id'));
                     return;
                 }
+                var unlinkedChip = e.target.closest('.bt-card-sc-link--unlinked');
+                if (unlinkedChip) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    openLinkSupacolorModal(unlinkedChip.getAttribute('data-id-transfer'), null);
+                    return;
+                }
                 var scLink = e.target.closest('.bt-card-sc-link');
                 if (scLink) {
                     e.stopPropagation();
                     e.preventDefault();
-                    navigateToSupacolorJob(scLink, scLink.getAttribute('data-sc-number'));
+                    var stale = scLink.getAttribute('data-sc-stale') === '1';
+                    if (stale) {
+                        // Stale link: open the relink modal instead of navigating to a dead page.
+                        openLinkSupacolorModal(
+                            scLink.getAttribute('data-id-transfer'),
+                            scLink.getAttribute('data-sc-number')
+                        );
+                    } else {
+                        navigateToSupacolorJob(scLink, scLink.getAttribute('data-sc-number'));
+                    }
                     return;
                 }
                 var id = card.getAttribute('data-id');
                 window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(id);
             });
+        });
+    }
+
+    /**
+     * Open a small modal that lets Bradley type a Supacolor job # to link
+     * (or re-link, when `currentNumber` is provided) to a transfer.
+     *
+     * Validation: hits /api/supacolor-jobs/by-number/:jobNumber to confirm
+     * the job exists in our local mirror before saving. If the user types a
+     * job # that hasn't been synced yet, we tell them to run the dashboard
+     * Refresh on the Supacolor page first — saving an unsynced number would
+     * leave the link broken until the next 10-min cron tick.
+     *
+     * Save: PUT /api/transfer-orders/:id with {Supacolor_Order_Number}.
+     */
+    function openLinkSupacolorModal(idTransfer, currentNumber) {
+        if (!idTransfer) return;
+        var existing = document.getElementById('bt-link-sc-modal');
+        if (existing) existing.remove();
+
+        var modal = document.createElement('div');
+        modal.id = 'bt-link-sc-modal';
+        modal.className = 'bt-lscm-overlay';
+        var heading = currentNumber ? 'Re-link Supacolor Job' : 'Link Supacolor Job';
+        var helpText = currentNumber
+            ? 'The current link to <strong>#' + escapeHtml(currentNumber) + '</strong> looks stale (cancelled or missing from our mirror). Enter the new job number.'
+            : 'Enter the Supacolor job # for this transfer. Auto-link will populate this on its own when possible — use this if it didn\'t.';
+        modal.innerHTML =
+            '<div class="bt-lscm-card" role="dialog" aria-modal="true" aria-labelledby="bt-link-sc-heading">' +
+                '<button type="button" class="bt-lscm-close" data-action="close" aria-label="Close">&times;</button>' +
+                '<h2 id="bt-link-sc-heading" class="bt-lscm-heading">' + escapeHtml(heading) + '</h2>' +
+                '<p class="bt-lscm-help">' + helpText + '</p>' +
+                '<label class="bt-lscm-label" for="bt-link-sc-input">Supacolor job # (e.g. 640003)</label>' +
+                '<input type="text" id="bt-link-sc-input" class="bt-lscm-input" inputmode="numeric"' +
+                    ' value="' + escapeHtml(currentNumber || '') + '"' +
+                    ' placeholder="e.g. 640003" autocomplete="off">' +
+                '<div id="bt-link-sc-feedback" class="bt-lscm-feedback" aria-live="polite"></div>' +
+                '<div class="bt-lscm-actions">' +
+                    '<button type="button" class="bt-btn bt-btn--link" data-action="close">Cancel</button>' +
+                    '<button type="button" class="bt-btn bt-btn--primary" data-action="save" disabled>Save link</button>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(modal);
+
+        var input = modal.querySelector('#bt-link-sc-input');
+        var saveBtn = modal.querySelector('[data-action="save"]');
+        var feedback = modal.querySelector('#bt-link-sc-feedback');
+
+        function close() { modal.remove(); }
+        modal.querySelectorAll('[data-action="close"]').forEach(function (btn) {
+            btn.addEventListener('click', close);
+        });
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) close();
+        });
+        document.addEventListener('keydown', function escHandler(ev) {
+            if (ev.key === 'Escape') {
+                close();
+                document.removeEventListener('keydown', escHandler);
+            }
+        });
+
+        var validateTimer = null;
+        var lastValidatedNumber = null;
+        function validate() {
+            var num = String(input.value || '').trim();
+            saveBtn.disabled = true;
+            if (!num) {
+                feedback.textContent = '';
+                feedback.className = 'bt-lscm-feedback';
+                return;
+            }
+            if (!/^\d+$/.test(num)) {
+                feedback.textContent = 'Job # must be digits only.';
+                feedback.className = 'bt-lscm-feedback bt-lscm-feedback--error';
+                return;
+            }
+            if (num === lastValidatedNumber) return;
+            feedback.textContent = 'Checking…';
+            feedback.className = 'bt-lscm-feedback';
+            fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num))
+                .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, data: j }; }); })
+                .then(function (res) {
+                    if (String(input.value || '').trim() !== num) return; // user kept typing
+                    lastValidatedNumber = num;
+                    var job = res.data && (res.data.job || res.data.record);
+                    if (res.ok && res.data && res.data.success && job) {
+                        var customerHint = job.Description ? ' &middot; ' + escapeHtml(job.Description) : '';
+                        feedback.innerHTML = '<i class="fas fa-check-circle"></i> Found in mirror &middot; Status: <strong>' +
+                            escapeHtml(job.Status || 'Open') + '</strong>' + customerHint;
+                        feedback.className = 'bt-lscm-feedback bt-lscm-feedback--ok';
+                        saveBtn.disabled = false;
+                    } else if (res.status === 404) {
+                        feedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Job #' + escapeHtml(num) +
+                            ' not found in our mirror. Try refreshing the Supacolor dashboard first, or save anyway if you\'re sure.';
+                        feedback.className = 'bt-lscm-feedback bt-lscm-feedback--warn';
+                        saveBtn.disabled = false;
+                    } else {
+                        feedback.textContent = 'Lookup failed: ' + (res.data && res.data.error || ('HTTP ' + res.status));
+                        feedback.className = 'bt-lscm-feedback bt-lscm-feedback--error';
+                    }
+                })
+                .catch(function (err) {
+                    if (String(input.value || '').trim() !== num) return;
+                    feedback.textContent = 'Lookup failed: ' + err.message;
+                    feedback.className = 'bt-lscm-feedback bt-lscm-feedback--error';
+                });
+        }
+        input.addEventListener('input', function () {
+            clearTimeout(validateTimer);
+            validateTimer = setTimeout(validate, 300);
+        });
+        input.focus();
+        if (currentNumber) validate();
+
+        saveBtn.addEventListener('click', async function () {
+            var num = String(input.value || '').trim();
+            if (!num || !/^\d+$/.test(num)) return;
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving…';
+            try {
+                var resp = await fetch(API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Supacolor_Order_Number: num })
+                });
+                var data = await resp.json();
+                if (!resp.ok || !data.success) {
+                    throw new Error(data.error || ('HTTP ' + resp.status));
+                }
+                showToast('Linked to Supacolor #' + num, 'success');
+                close();
+                // Refresh — the next render will pull live status + tracking.
+                await fetchTransfers();
+                applyFilters();
+                renderGrid();
+            } catch (err) {
+                console.error('[bradley-transfers] Link save failed:', err);
+                showToast('Could not save link: ' + err.message, 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save link';
+            }
         });
     }
 
