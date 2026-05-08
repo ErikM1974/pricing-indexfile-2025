@@ -1075,11 +1075,19 @@ var JDSSubmitForm = (function () {
                     notes = notes + '\n\nAE Instructions:\n' + instructions;
                 }
 
+                // Order_Type = Decoration Method on JDS records — Steve sees
+                // the decoration at a glance in Request Info on the detail
+                // page without opening the Specs card. Fall back to 'JDS'
+                // if somehow blank (validation should keep this from being
+                // empty since Decoration Method is a required field).
+                var decoration = getVal('jds-decoration');
+
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: 'JDS',
                     JDS_SKU: selectedRow.SKU,
+                    Order_Type: decoration || 'JDS',
                     Item_Specs_Notes: notes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,
@@ -1093,7 +1101,14 @@ var JDSSubmitForm = (function () {
                     Revision_Count: 0
                 };
 
-                if (customerId > 0) payload.id_Customer = customerId;
+                if (customerId > 0) {
+                    payload.id_Customer = customerId;
+                    // CompanyContactsMerge2026.id_Customer comes from the
+                    // ManageOrders/ShopWorks sync, so the same value goes to
+                    // Shopwork_customer_number — that's what the dashboard's
+                    // ShopWorks References card reads for Customer #.
+                    payload.Shopwork_customer_number = String(customerId);
+                }
                 if (workOrder) payload.Order_Num_SW = workOrder;
 
                 var slots = ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'];

@@ -279,17 +279,43 @@
             if (itField) itField.style.display = '';
             setText('ard-item-type', itemType + skuSuffix);
 
-            const specsRaw = req.Item_Specs_Notes || '';
-            if (specsRaw && specsRaw.trim()) {
-                const specCard = document.getElementById('ard-item-spec-card');
-                const specBlock = document.getElementById('ard-item-spec-block');
-                const specHeader = document.getElementById('ard-item-spec-header');
-                if (specCard) specCard.style.display = '';
-                if (specBlock) specBlock.textContent = specsRaw;
-                if (specHeader) {
-                    specHeader.textContent = (itemType === 'JDS')
-                        ? 'JDS Product Specs'
-                        : itemType + ' Specs';
+            const specCard = document.getElementById('ard-item-spec-card');
+            const specBlock = document.getElementById('ard-item-spec-block');
+            const specHeader = document.getElementById('ard-item-spec-header');
+
+            if (itemType === 'JDS') {
+                // Prefer dedicated JDS_* columns → labeled rows that match
+                // the rest of the dashboard's label/value styling. Fall back
+                // to Item_Specs_Notes <pre> for legacy records (e.g. #52890
+                // submitted before the columns were added to Caspio).
+                const hasJdsSpecColumns = !!(
+                    req.JDS_Design_Name ||
+                    req.JDS_Color ||
+                    req.JDS_Placement ||
+                    req.JDS_Quantity
+                );
+                if (hasJdsSpecColumns && specCard && specBlock) {
+                    specCard.style.display = '';
+                    if (specHeader) specHeader.textContent = 'JDS Product Specs';
+                    const rows = buildJdsSpecRows(req);
+                    specBlock.outerHTML = rows.map(function (r) {
+                        return '<div class="ard-field">' +
+                            '<span class="ard-label">' + escapeHtml(r.label) + '</span>' +
+                            '<span class="ard-value">' + escapeHtml(r.value) + '</span>' +
+                            '</div>';
+                    }).join('');
+                } else if ((req.Item_Specs_Notes || '').trim() && specCard && specBlock) {
+                    specCard.style.display = '';
+                    if (specHeader) specHeader.textContent = 'JDS Product Specs';
+                    specBlock.textContent = req.Item_Specs_Notes;
+                }
+            } else {
+                // Sticker / Banner — free-form spec text rendered as <pre>.
+                const specsRaw = req.Item_Specs_Notes || '';
+                if (specsRaw && specsRaw.trim() && specCard && specBlock) {
+                    specCard.style.display = '';
+                    specBlock.textContent = specsRaw;
+                    if (specHeader) specHeader.textContent = itemType + ' Specs';
                 }
             }
         }
@@ -4410,6 +4436,31 @@
     function setText(id, value) {
         const el = document.getElementById(id);
         if (el) el.textContent = value || '--';
+    }
+
+    /**
+     * Build the labeled rows shown in the JDS Product Specs card. Each row
+     * is { label, value } — caller renders them as .ard-field divs to match
+     * the rest of the dashboard's label/value styling.
+     *
+     * Decoration is sourced from Order_Type (the JDS form writes the
+     * Decoration Method into that column — Erik's call so Steve can see
+     * "Laser Engrave" / "UV Print" / etc. at a glance in Request Info).
+     * Order_Type can occasionally come back as a Caspio enum object like
+     * {'6':'Transfer'}; coerce to a flat string before rendering.
+     */
+    function buildJdsSpecRows(req) {
+        const rows = [];
+        if (req.JDS_SKU) rows.push({ label: 'SKU', value: req.JDS_SKU });
+        if (req.JDS_Design_Name) rows.push({ label: 'Design Name', value: req.JDS_Design_Name });
+        const decoration = (req.Order_Type && typeof req.Order_Type === 'object')
+            ? Object.values(req.Order_Type).join(', ')
+            : req.Order_Type;
+        if (decoration) rows.push({ label: 'Decoration', value: decoration });
+        if (req.JDS_Color) rows.push({ label: 'Color', value: req.JDS_Color });
+        if (req.JDS_Placement) rows.push({ label: 'Imprint Area', value: req.JDS_Placement });
+        if (req.JDS_Quantity) rows.push({ label: 'Est. Quantity', value: String(req.JDS_Quantity) });
+        return rows;
     }
 
     // Item_Type → 'Garment' | 'Sticker' | 'Banner' | 'JDS'. NULL/blank/anything
