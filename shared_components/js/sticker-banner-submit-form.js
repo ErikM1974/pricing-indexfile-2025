@@ -645,18 +645,20 @@ var StickerBannerSubmitForm = (function () {
             .then(function (uploaded) {
                 statusEl.textContent = 'Creating request...';
 
-                var notes = buildItemSpecsNotes();
-                if (instructions) {
-                    notes = notes + '\n\nAE Instructions:\n' + instructions;
+                // Design name has no dedicated column on ArtRequests — fold it
+                // into Item_Specs_Notes so Steve sees it. Posting Design_Name
+                // returns 404 FieldNotFound from Caspio.
+                var specsNotes = buildItemSpecsNotes();
+                if (designName) {
+                    specsNotes = 'Design Name: ' + designName + '\n\n' + specsNotes;
                 }
 
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: currentItemType,
-                    Item_Specs_Notes: buildItemSpecsNotes(),
+                    Item_Specs_Notes: specsNotes,
                     NOTES: instructions || '',
-                    Design_Name: designName,
                     Due_Date: dueDate,
                     First_name: firstName,
                     Last_name: lastName,

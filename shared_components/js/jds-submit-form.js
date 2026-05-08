@@ -1048,7 +1048,13 @@ var JDSSubmitForm = (function () {
             .then(function (uploaded) {
                 statusEl.textContent = 'Creating request...';
 
+                // Design name has no dedicated column on ArtRequests — fold it
+                // into Item_Specs_Notes so Steve sees it. Posting Design_Name
+                // returns 404 FieldNotFound from Caspio.
                 var notes = buildItemSpecsNotes();
+                if (designName) {
+                    notes = 'Design Name: ' + designName + '\n\n' + notes;
+                }
                 if (instructions) {
                     notes = notes + '\n\nAE Instructions:\n' + instructions;
                 }
@@ -1060,7 +1066,6 @@ var JDSSubmitForm = (function () {
                     JDS_SKU: selectedRow.SKU,
                     Item_Specs_Notes: notes,
                     NOTES: instructions || '',
-                    Design_Name: designName,
                     Due_Date: dueDate,
                     First_name: firstName,
                     Last_name: lastName,
