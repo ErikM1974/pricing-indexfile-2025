@@ -89,6 +89,9 @@
             + '.ccp-item-meta {'
             + '  font-size: 11px; color: #9ca3af; flex-shrink: 0;'
             + '}'
+            + '.ccp-item-id {'
+            + '  font-size: 12px; font-weight: 400; color: #9ca3af; margin-left: 4px;'
+            + '}'
             + '.ccp-empty, .ccp-loading {'
             + '  padding: 16px 12px; text-align: center; color: #6b7280; font-size: 13px;'
             + '}'
@@ -197,7 +200,9 @@
         if (cached && Date.now() - cached.timestamp < this._cacheTTL) {
             return Promise.resolve(cached.data);
         }
-        var url = this.baseURL + '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName) + '&limit=10';
+        // limit=25 matches the backend's max — covers companies like NWCA
+        // with 10+ contacts. Cap was raised from 10 → 25 on 2026-05-08.
+        var url = this.baseURL + '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName) + '&limit=25';
         return fetch(url)
             .then(function (r) {
                 if (!r.ok) throw new Error('by-company ' + r.status);
@@ -245,6 +250,20 @@
         });
         companies = companies.slice(0, this.maxCompaniesShown);
 
+        // Flag rows whose CustomerCompanyName collides with another row in
+        // the same result set so the renderer can disambiguate them with
+        // #id_Customer. Caspio sometimes has multiple distinct customer
+        // records with the same display name (legacy + new, etc.) — without
+        // this the AE can't tell them apart in the dropdown.
+        var nameCounts = {};
+        companies.forEach(function (co) {
+            var k = (co.CustomerCompanyName || '').toLowerCase();
+            nameCounts[k] = (nameCounts[k] || 0) + 1;
+        });
+        companies.forEach(function (co) {
+            co._isDup = nameCounts[(co.CustomerCompanyName || '').toLowerCase()] > 1;
+        });
+
         var topContacts = contacts.slice(0, this.maxContactsShown);
 
         var recent = readRecent();
@@ -279,9 +298,16 @@
             html += '<div class="ccp-section-header">Companies</div>';
             grouped.companies.forEach(function (c, i) {
                 var meta = c.count > 1 ? c.count + ' contacts ›' : 'view contacts ›';
+                // Append #id_Customer when this name clashes with another
+                // company in the same result set — lets the AE pick the
+                // right one between e.g. two "Northwest Custom Apparel"
+                // records that have different ShopWorks IDs.
+                var idTag = (c._isDup && c.id_Customer)
+                    ? ' <span class="ccp-item-id">#' + escapeHtml(String(c.id_Customer)) + '</span>'
+                    : '';
                 html += '<div class="ccp-item" data-kind="company" data-index="' + i + '">'
                     + '  <div class="ccp-item-body">'
-                    + '    <div class="ccp-item-primary">' + escapeHtml(c.CustomerCompanyName) + '</div>'
+                    + '    <div class="ccp-item-primary">' + escapeHtml(c.CustomerCompanyName) + idTag + '</div>'
                     + '  </div>'
                     + '  <div class="ccp-item-meta">' + escapeHtml(meta) + '</div>'
                     + '</div>';
@@ -441,6 +467,13 @@
 
         // Click handler on the dropdown
         dropdown.addEventListener('mousedown', function (e) {
+            // Stop propagation so the document-level "click-outside-to-close"
+            // listener (added below) doesn't fire. Important: when we render
+            // Stage 2 by mutating dropdown.innerHTML, the original click target
+            // becomes detached, so dropdown.contains(e.target) returns false
+            // in the document handler — which would close the dropdown right
+            // before Stage 2 finishes loading.
+            e.stopPropagation();
             // mousedown rather than click — input.blur fires before click otherwise
             // and can hide the dropdown before the click registers.
             var backEl = e.target.closest('[data-action="back"]');
