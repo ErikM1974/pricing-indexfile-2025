@@ -1045,7 +1045,23 @@ var JDSSubmitForm = (function () {
         }
 
         uploadFilesSequentially()
-            .then(function (uploaded) {
+            .then(function (upload) {
+                // Abort the submission if ANY attached file failed to upload.
+                // Creating the art request anyway would silently strand the
+                // AE's artwork (Steve sees a request with empty file slots
+                // and no idea something was attempted). Better to fail fast
+                // and let the AE retry — their typed input is preserved
+                // because we don't re-render the form view.
+                if (upload.failedFiles && upload.failedFiles.length > 0) {
+                    var msg = upload.failedFiles.length === 1
+                        ? 'Could not upload "' + upload.failedFiles[0] + '" — please retry'
+                        : 'Could not upload ' + upload.failedFiles.length + ' files (' + upload.failedFiles.join(', ') + ') — please retry';
+                    var err = new Error(msg);
+                    err.code = 'UPLOAD_FAILED';
+                    throw err;
+                }
+                var uploaded = upload.results;
+
                 statusEl.textContent = 'Creating request...';
 
                 // Design name has no dedicated column on ArtRequests — fold it
@@ -1109,17 +1125,38 @@ var JDSSubmitForm = (function () {
                 console.error('[JDSSubmitForm] Submit error:', err);
                 btn.disabled = false;
                 statusEl.textContent = '';
-                showToast('Submission failed: ' + err.message, 'error');
+                // Upload failures already have a complete user-facing message
+                // ("Could not upload …"). Don't double-up with a "Submission
+                // failed:" prefix that misleads the AE into thinking the art
+                // request was created when it wasn't.
+                var toastMsg = (err && err.code === 'UPLOAD_FAILED')
+                    ? err.message
+                    : 'Submission failed: ' + err.message;
+                showToast(toastMsg, 'error');
             });
     }
 
+    /**
+     * Upload reference files one-by-one to /api/files/upload. Resolves to
+     * { results, failedFiles } where failedFiles is the list of File.name
+     * values that didn't make it. The caller (handleSubmit) aborts the whole
+     * submission if anything failed — we'd rather have the AE retry than
+     * create an art request with missing artwork (which is what was happening
+     * before this guard: silent upload failures, "Submitted!" toast, Steve
+     * sees a request with no files).
+     */
     function uploadFilesSequentially() {
-        if (referenceFiles.length === 0) return Promise.resolve([]);
+        if (referenceFiles.length === 0) {
+            return Promise.resolve({ results: [], failedFiles: [] });
+        }
         var results = [];
+        var failedFiles = [];
         var statusEl = document.getElementById('jds-submit-status');
 
         function uploadNext(idx) {
-            if (idx >= referenceFiles.length) return Promise.resolve(results);
+            if (idx >= referenceFiles.length) {
+                return Promise.resolve({ results: results, failedFiles: failedFiles });
+            }
             var f = referenceFiles[idx];
             if (statusEl) statusEl.textContent = 'Uploading file ' + (idx + 1) + ' of ' + referenceFiles.length + '...';
             var fd = new FormData();
@@ -1130,19 +1167,25 @@ var JDSSubmitForm = (function () {
                         return r.text().then(function (body) {
                             console.warn('Upload failed for ' + f.name + ':', r.status, body);
                             results.push(null);
+                            failedFiles.push(f.name);
                         });
                     }
                     return r.json().then(function (data) {
                         if (data && data.success) {
                             results.push({ fileName: data.fileName, externalKey: data.externalKey });
                         } else {
+                            // 200 OK but server reported a logical failure
+                            // (e.g. { success: false, error: '...' }).
+                            console.warn('Upload reported failure for ' + f.name + ':', data && data.error);
                             results.push(null);
+                            failedFiles.push(f.name);
                         }
                     });
                 })
                 .catch(function (err) {
                     console.warn('Upload error for ' + f.name + ':', err);
                     results.push(null);
+                    failedFiles.push(f.name);
                 })
                 .then(function () { return uploadNext(idx + 1); });
         }

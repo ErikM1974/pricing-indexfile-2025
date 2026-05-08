@@ -254,22 +254,30 @@
             : req.Order_Type;
         setText('ard-order-type', orderType);
 
-        // Item-type rendering (Sticker/Banner extension, 2026-05-06).
+        // Item-type rendering (Sticker/Banner 2026-05-06, JDS 2026-05-08).
         // NULL Item_Type → 'Garment' (default — no badge, no spec card).
-        // Sticker/Banner → render badge + Item_Type field + spec card with
-        // the structured Item_Specs_Notes block.
+        // Sticker / Banner / JDS → render badge + Item_Type field + spec card
+        // with the structured Item_Specs_Notes block.
         const itemType = resolveItemType(req.Item_Type);
-        if (itemType === 'Sticker' || itemType === 'Banner') {
+        if (itemType === 'Sticker' || itemType === 'Banner' || itemType === 'JDS') {
+            // JDS uses 🎯 to match the Steve gallery + AE list convention.
+            const emoji = itemType === 'Sticker' ? '🏷️'
+                        : itemType === 'Banner'  ? '🎌'
+                        : '🎯';
+            // For JDS, append the SKU to the badge + field so Steve can spot
+            // the product without opening the spec card. For Sticker/Banner
+            // the type alone is enough — they don't have an analogous code.
+            const skuSuffix = (itemType === 'JDS' && req.JDS_SKU) ? ' · ' + req.JDS_SKU : '';
+
             const badgeEl = document.getElementById('ard-item-type-badge');
             if (badgeEl) {
-                const emoji = itemType === 'Sticker' ? '🏷️' : '🎌';
-                badgeEl.textContent = emoji + ' ' + itemType;
+                badgeEl.textContent = emoji + ' ' + itemType + skuSuffix;
                 badgeEl.className = 'ard-item-type-badge ard-item-type-badge--' + itemType.toLowerCase();
                 badgeEl.style.display = '';
             }
             const itField = document.getElementById('ard-item-type-field');
             if (itField) itField.style.display = '';
-            setText('ard-item-type', itemType);
+            setText('ard-item-type', itemType + skuSuffix);
 
             const specsRaw = req.Item_Specs_Notes || '';
             if (specsRaw && specsRaw.trim()) {
@@ -278,7 +286,11 @@
                 const specHeader = document.getElementById('ard-item-spec-header');
                 if (specCard) specCard.style.display = '';
                 if (specBlock) specBlock.textContent = specsRaw;
-                if (specHeader) specHeader.textContent = itemType + ' Specs';
+                if (specHeader) {
+                    specHeader.textContent = (itemType === 'JDS')
+                        ? 'JDS Product Specs'
+                        : itemType + ' Specs';
+                }
             }
         }
         setText('ard-due-date', formatDate(req.Due_Date));
@@ -4400,11 +4412,14 @@
         if (el) el.textContent = value || '--';
     }
 
-    // Item_Type → 'Garment' | 'Sticker' | 'Banner'. NULL/blank/anything else
-    // collapses to 'Garment' so legacy rows render as today (single source of
-    // truth — same fallback used in art-hub-steve-gallery.js + art-ae.js).
+    // Item_Type → 'Garment' | 'Sticker' | 'Banner' | 'JDS'. NULL/blank/anything
+    // else collapses to 'Garment' so legacy rows render as today. Keep this
+    // rule in sync with art-hub-steve-gallery.js + art-ae.js — when the JDS
+    // intake form shipped the gallery + AE list were updated but this copy
+    // was missed, which made every JDS request look like a near-empty Garment
+    // job in the detail view.
     function resolveItemType(raw) {
-        if (raw === 'Sticker' || raw === 'Banner') return raw;
+        if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
         return 'Garment';
     }
 

@@ -3601,6 +3601,11 @@ body.ard-customer-view .ard-footer {
     color: #1e40af;
 }
 
+.ard-item-type-badge--jds {
+    background: #fef3c7;
+    color: #92400e;
+}
+
 /* Spec card — pre-block render of Item_Specs_Notes (preserves intake formatting) */
 .ard-item-spec-block {
     margin: 0;
