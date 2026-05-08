@@ -28,6 +28,7 @@ var MockupSubmitForm = (function () {
     var currentRequestType = 'New Digitizing'; // or 'Mockup Request'
     var customerLookup = null;
     var selectedContact = null;
+    var selectedDesign = null;
     var isRush = false;
 
     // Garment style/color state — up to 4 rows
@@ -44,10 +45,55 @@ var MockupSubmitForm = (function () {
         wireEvents();
         initToggle();
         initCompanyAutocomplete();
+        initDesignNameAutocomplete();
+        initDueDateDefault();
         initSalesRep();
         loadLocations();
         loadThreadColors();
         renderGarmentRows();
+    }
+
+    // ── Design Name autocomplete (customer-scoped, newest first) ────────────
+    // Ruth's form has both msf-design-name AND msf-design-number — picking
+    // a design from the autocomplete fills BOTH fields. Saves the AE from
+    // having to remember the design number for repeat customers.
+    function initDesignNameAutocomplete() {
+        if (typeof DesignNamePicker === 'undefined') return;
+        DesignNamePicker.bind({
+            inputId: 'msf-design-name',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('msf-customer-id').value, 10) || 0;
+            },
+            onSelect: function (design) {
+                selectedDesign = design;
+                // Also fill the design number field — unique to Ruth's form.
+                var numEl = document.getElementById('msf-design-number');
+                if (numEl && design.designNumber) {
+                    numEl.value = String(design.designNumber);
+                    numEl.classList.remove('msf-error');
+                }
+            },
+            onClear: function () { selectedDesign = null; }
+        });
+        // Free-typing should clear the selection (so we don't keep a stale
+        // designNumber when the AE edits the name back to something else).
+        var nameEl = document.getElementById('msf-design-name');
+        if (nameEl) {
+            nameEl.addEventListener('input', function () {
+                if (selectedDesign && nameEl.value.trim() !== (selectedDesign.designName || '').trim()) {
+                    selectedDesign = null;
+                }
+            });
+        }
+    }
+
+    // ── Default Due Date to today + 2 business days ─────────────────────────
+    function initDueDateDefault() {
+        if (typeof window.NWCA_DateUtils === 'undefined') return;
+        var dueDate = document.getElementById('msf-due-date');
+        if (dueDate && !dueDate.value) {
+            dueDate.value = window.NWCA_DateUtils.addBusinessDays(2);
+        }
     }
 
     // ── Build Form HTML ────────────────────────────────────────────────────
@@ -1169,6 +1215,7 @@ var MockupSubmitForm = (function () {
         selectedThreadColors = [];
         referenceFiles = [];
         selectedContact = null;
+        selectedDesign = null;
         currentRequestType = 'New Digitizing';
         garmentRows = [{ style: '', color: '', colors: [], swatch: '' }];
 
@@ -1177,6 +1224,8 @@ var MockupSubmitForm = (function () {
         wireEvents();
         initToggle();
         initCompanyAutocomplete();
+        initDesignNameAutocomplete();
+        initDueDateDefault();
         initSalesRep();
         loadLocations();
         renderGarmentRows();

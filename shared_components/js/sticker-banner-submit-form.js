@@ -35,6 +35,7 @@ var StickerBannerSubmitForm = (function () {
     var referenceFiles = [];          // Array of File objects (max 4)
     var customerLookup = null;
     var selectedContact = null;
+    var selectedDesign = null;
     var isRush = false;
 
     // ── Init ───────────────────────────────────────────────────────────────
@@ -56,6 +57,8 @@ var StickerBannerSubmitForm = (function () {
         container.innerHTML = buildFormHtml();
         wireEvents();
         initCompanyAutocomplete();
+        initDesignNameAutocomplete();
+        initDueDateDefault();
         initSalesRep();
         // Suggest sensible defaults for Application/Use based on item type
         if (currentItemType === 'Sticker') {
@@ -435,6 +438,42 @@ var StickerBannerSubmitForm = (function () {
         });
     }
 
+    // ── Design Name autocomplete (customer-scoped, newest first) ────────────
+    function initDesignNameAutocomplete() {
+        if (typeof DesignNamePicker === 'undefined') return;
+        DesignNamePicker.bind({
+            inputId: 'sbf-design-name',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('sbf-customer-id').value, 10) || 0;
+            },
+            onSelect: function (design) {
+                selectedDesign = design;
+                document.getElementById('sbf-design-name').classList.remove('sbf-error');
+                var errEl = document.getElementById('sbf-design-name-error');
+                if (errEl) errEl.style.display = 'none';
+            },
+            onClear: function () { selectedDesign = null; }
+        });
+        // Free-typing should clear any stale picked design.
+        var input = document.getElementById('sbf-design-name');
+        if (input) {
+            input.addEventListener('input', function () {
+                if (selectedDesign && input.value.trim() !== (selectedDesign.designName || '').trim()) {
+                    selectedDesign = null;
+                }
+            });
+        }
+    }
+
+    // ── Default Due Date to today + 2 business days ─────────────────────────
+    function initDueDateDefault() {
+        if (typeof window.NWCA_DateUtils === 'undefined') return;
+        var dueDate = document.getElementById('sbf-due-date');
+        if (dueDate && !dueDate.value) {
+            dueDate.value = window.NWCA_DateUtils.addBusinessDays(2);
+        }
+    }
+
     // ── Sales Rep Auto-fill ─────────────────────────────────────────────────
     function initSalesRep() {
         var repInput = document.getElementById('sbf-sales-rep');
@@ -694,6 +733,14 @@ var StickerBannerSubmitForm = (function () {
                     payload.Shopwork_customer_number = String(customerId);
                 }
                 if (workOrder) payload.Order_Num_SW = workOrder;
+
+                // If the AE picked an existing design from the autocomplete
+                // (and the input still matches that design name), carry the
+                // ShopWorks design number through to the new ArtRequest.
+                if (selectedDesign && selectedDesign.designNumber
+                    && designName === (selectedDesign.designName || '').trim()) {
+                    payload.Design_Num_SW = String(selectedDesign.designNumber);
+                }
 
                 // Attach uploaded file paths to File_Upload_One..Four. Caspio formula
                 // fields (CDN_Link, CDN_Link_Two, ...) auto-derive from these paths.

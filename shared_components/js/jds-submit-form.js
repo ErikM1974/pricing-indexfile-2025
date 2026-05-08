@@ -54,6 +54,7 @@ var JDSSubmitForm = (function () {
 
     var referenceFiles = [];
     var selectedContact = null;
+    var selectedDesign = null;
     var isRush = false;
 
     // ── Init ───────────────────────────────────────────────────────────────
@@ -760,8 +761,52 @@ var JDSSubmitForm = (function () {
 
         wireFormEvents();
         initCompanyAutocomplete();
+        initDesignNameAutocomplete();
+        initDueDateDefault();
         initSalesRep();
         updateLiveBlock();
+    }
+
+    // ── Design Name autocomplete (customer-scoped, newest first) ────────────
+    // Queries Design_Lookup_2026 via /api/digitized-designs/search-all and
+    // shows ONLY designs for the picked company (no cross-customer leakage).
+    // Picking a design caches it on selectedDesign so the submit handler
+    // can include Design_Num_SW in the payload.
+    function initDesignNameAutocomplete() {
+        if (typeof DesignNamePicker === 'undefined') return;
+        DesignNamePicker.bind({
+            inputId: 'jds-design-name',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('jds-customer-id').value, 10) || 0;
+            },
+            onSelect: function (design) {
+                selectedDesign = design;
+                // Clear the validation error if the AE had been flagged
+                document.getElementById('jds-design-name').classList.remove('jds-error');
+                var errEl = document.getElementById('jds-design-name-error');
+                if (errEl) errEl.style.display = 'none';
+            },
+            onClear: function () { selectedDesign = null; }
+        });
+        // Free-typing should clear any stale picked design so we don't write
+        // a wrong Design_Num_SW.
+        var input = document.getElementById('jds-design-name');
+        if (input) {
+            input.addEventListener('input', function () {
+                if (selectedDesign && input.value.trim() !== (selectedDesign.designName || '').trim()) {
+                    selectedDesign = null;
+                }
+            });
+        }
+    }
+
+    // ── Default Due Date to today + 2 business days (skip weekends) ─────────
+    function initDueDateDefault() {
+        if (typeof window.NWCA_DateUtils === 'undefined') return;
+        var dueDate = document.getElementById('jds-due-date');
+        if (dueDate && !dueDate.value) {
+            dueDate.value = window.NWCA_DateUtils.addBusinessDays(2);
+        }
     }
 
     function selOpt(actual, candidate) {
@@ -1121,6 +1166,15 @@ var JDSSubmitForm = (function () {
                     payload.Shopwork_customer_number = String(customerId);
                 }
                 if (workOrder) payload.Order_Num_SW = workOrder;
+
+                // If the AE picked a design from the autocomplete (and the
+                // input still matches that design name), carry the existing
+                // ShopWorks design number through to the new ArtRequest.
+                // Solves part of Taneisha's "design # is missing" report.
+                if (selectedDesign && selectedDesign.designNumber
+                    && designName === (selectedDesign.designName || '').trim()) {
+                    payload.Design_Num_SW = String(selectedDesign.designNumber);
+                }
 
                 var slots = ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'];
                 uploaded.forEach(function (u, i) {
