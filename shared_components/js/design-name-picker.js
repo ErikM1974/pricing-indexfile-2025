@@ -40,9 +40,11 @@
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     var MIN_SEARCH_LEN = 2;
     var DEBOUNCE_MS = 250;
-    var MAX_RESULTS = 25;
+    var MAX_RESULTS = 25;       // search-all query param + browse display cap
+    var BROWSE_DISPLAY_CAP = 25; // top N from /by-customer to show in browse mode
     var CACHE_TTL = 5 * 60 * 1000;
     var searchCache = new Map();
+    var byCustomerCache = new Map();  // customerId → { data, timestamp }
     var debounceTimer = null;
 
     function escapeHtml(str) {
@@ -77,6 +79,38 @@
             })
             .catch(function (err) {
                 console.warn('[DesignNamePicker] search failed:', err);
+                return [];
+            });
+    }
+
+    /**
+     * Fetch ALL designs for the customer (no query). Powers the browse-on-focus
+     * mode — when the AE clicks the empty Design Name field, we show this
+     * customer's recent designs immediately so they don't have to type
+     * something to discover what's available.
+     */
+    function fetchByCustomer(customerId) {
+        var key = String(customerId);
+        var cached = byCustomerCache.get(key);
+        if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+            return Promise.resolve(cached.data);
+        }
+        var url = DEFAULT_BASE_URL + '/api/digitized-designs/by-customer?customerId=' + encodeURIComponent(key);
+        return fetch(url)
+            .then(function (r) {
+                if (!r.ok) throw new Error('by-customer ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                var results = (data && data.results) || [];
+                byCustomerCache.set(key, { data: results, timestamp: Date.now() });
+                if (byCustomerCache.size > 30) {
+                    byCustomerCache.delete(byCustomerCache.keys().next().value);
+                }
+                return results;
+            })
+            .catch(function (err) {
+                console.warn('[DesignNamePicker] by-customer failed:', err);
                 return [];
             });
     }
@@ -128,12 +162,18 @@
             show();
         }
 
-        function renderResults(results, query) {
+        function renderResults(results, mode) {
+            // mode = 'browse' | 'search' — drives the section header text
             if (!results.length) {
-                renderEmpty('No matching designs for this customer');
+                renderEmpty(mode === 'browse'
+                    ? 'No designs on file for this customer yet'
+                    : 'No matching designs for this customer');
                 return;
             }
-            var html = '<div class="ccp-section-header">Designs (newest first)</div>';
+            var heading = (mode === 'browse')
+                ? 'Recent designs (newest first)'
+                : 'Designs matching your search';
+            var html = '<div class="ccp-section-header">' + heading + '</div>';
             results.forEach(function (d, i) {
                 html += '<div class="ccp-item" data-kind="design" data-index="' + i + '">'
                     + '  <div class="ccp-item-body">'
@@ -148,34 +188,45 @@
 
         function loadAndRender() {
             var q = input.value.trim();
-            if (q.length < MIN_SEARCH_LEN) {
-                hide();
-                return;
-            }
             var customerId = getCustomerId();
             if (!customerId) {
+                // No company selected yet — same hint regardless of input state.
                 renderEmpty('Pick a company first to see their designs');
                 return;
             }
+            if (q.length < MIN_SEARCH_LEN) {
+                // Browse mode — fetch the customer's full design list and show
+                // the newest N. Lets the AE discover existing designs without
+                // having to type something blind.
+                dropdown.innerHTML = '<div class="ccp-loading">Loading designs for this customer…</div>';
+                show();
+                fetchByCustomer(customerId).then(function (raw) {
+                    var sorted = applyScopeAndSort(raw, customerId);
+                    lastResults = sorted.slice(0, BROWSE_DISPLAY_CAP);
+                    renderResults(lastResults, 'browse');
+                });
+                return;
+            }
+            // Search mode — filter by the typed query.
             dropdown.innerHTML = '<div class="ccp-loading">Searching designs…</div>';
             show();
             fetchDesigns(q, customerId).then(function (raw) {
                 lastResults = applyScopeAndSort(raw, customerId);
-                renderResults(lastResults, q);
+                renderResults(lastResults, 'search');
             });
         }
 
-        // Input event — debounced search
+        // Input event — debounced (covers both typing-to-filter and clearing
+        // the field, which falls back to browse mode).
         input.addEventListener('input', function () {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(loadAndRender, DEBOUNCE_MS);
         });
 
-        // Focus — re-show dropdown if there's already a query
+        // Focus — always open the dropdown. Empty input → browse mode shows
+        // recent designs immediately. Non-empty → search mode.
         input.addEventListener('focus', function () {
-            if (input.value.trim().length >= MIN_SEARCH_LEN) {
-                loadAndRender();
-            }
+            loadAndRender();
         });
 
         // Click handler on the dropdown — same propagation-stop pattern
