@@ -273,29 +273,36 @@ var MockupSubmitForm = (function () {
         if (asterisk) asterisk.style.display = 'none';
     }
 
-    // ── Company Autocomplete ────────────────────────────────────────────────
+    // ── Company picker (hybrid grouped pattern, company-only mode) ─────────
+    // Ruth's form has no separate Contact Name / Email fields, so we run
+    // the picker in company-only mode (no contactInputId / emailInputId).
+    // Click on a company in Stage 1 finalizes the selection; the dropdown
+    // doesn't drill into a Stage 2 contact list. Contacts that match the
+    // typed query still appear in the dropdown — clicking one fills the
+    // company + customerId from that contact's company.
     function initCompanyAutocomplete() {
-        if (typeof CustomerLookupService === 'undefined') {
+        if (typeof CompanyContactPicker === 'undefined') {
+            console.warn('[MockupSubmitForm] CompanyContactPicker not loaded — falling back to plain inputs.');
             return;
         }
-
-        customerLookup = new CustomerLookupService({ maxResults: 10 });
-        customerLookup.bindToInput('msf-company', {
-            onSelect: function (contact) {
-                selectedContact = contact;
-                document.getElementById('msf-customer-id').value = contact.id_Customer || '';
-
-                // Clear error state
+        customerLookup = new CompanyContactPicker();
+        customerLookup.bindPair({
+            companyInputId: 'msf-company',
+            customerIdHiddenId: 'msf-customer-id',
+            // No contactInputId / emailInputId — the form doesn't have
+            // those fields. Picker auto-detects this and skips Stage 2.
+            onSelect: function (selection) {
+                selectedContact = selection.contact || null;
+                var customerId = selection.customerId || 0;
                 document.getElementById('msf-company').classList.remove('msf-error');
-                document.getElementById('msf-company-error').style.display = 'none';
-
-                // Show warning if no customer ID
+                var errEl = document.getElementById('msf-company-error');
+                if (errEl) errEl.style.display = 'none';
+                // Show warning if the company picker didn't yield a real customerId
                 var warn = document.getElementById('msf-customer-id-warning');
-                if (warn) warn.style.display = (contact.id_Customer && contact.id_Customer > 0) ? 'none' : 'block';
+                if (warn) warn.style.display = (customerId > 0) ? 'none' : 'block';
             },
             onClear: function () {
                 selectedContact = null;
-                document.getElementById('msf-customer-id').value = '';
                 var warn = document.getElementById('msf-customer-id-warning');
                 if (warn) warn.style.display = 'none';
             }

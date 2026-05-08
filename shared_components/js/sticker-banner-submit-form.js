@@ -405,34 +405,32 @@ var StickerBannerSubmitForm = (function () {
         if (submitBtn) submitBtn.addEventListener('click', handleSubmit);
     }
 
-    // ── Company Autocomplete ────────────────────────────────────────────────
+    // ── Company + Contact picker (hybrid grouped pattern) ──────────────────
+    // Replaces the wall-of-duplicates CustomerLookupService.bindToInput with
+    // CompanyContactPicker — single search box, grouped Companies + Contacts
+    // sections, click-through to Stage 2 contact list per company. The picker
+    // writes Company + Contact + Email + customerId directly; we just wire
+    // callbacks for form-specific side-effects (clearing the error state,
+    // caching the selected contact for the submit handler).
     function initCompanyAutocomplete() {
-        if (typeof CustomerLookupService === 'undefined') return;
-
-        customerLookup = new CustomerLookupService({ maxResults: 10 });
-        customerLookup.bindToInput('sbf-company', {
-            onSelect: function (contact) {
-                selectedContact = contact;
-                document.getElementById('sbf-customer-id').value = contact.id_Customer || '';
+        if (typeof CompanyContactPicker === 'undefined') {
+            console.warn('[StickerBannerSubmitForm] CompanyContactPicker not loaded — falling back to plain inputs.');
+            return;
+        }
+        customerLookup = new CompanyContactPicker();
+        customerLookup.bindPair({
+            companyInputId: 'sbf-company',
+            contactInputId: 'sbf-contact-name',
+            emailInputId: 'sbf-contact-email',
+            customerIdHiddenId: 'sbf-customer-id',
+            onSelect: function (selection) {
+                selectedContact = selection.contact || null;
                 document.getElementById('sbf-company').classList.remove('sbf-error');
-                document.getElementById('sbf-company-error').style.display = 'none';
-                // Auto-fill contact name + email from selected company contact.
-                // CustomerLookupService passes contacts in the legacy response
-                // shape from /api/company-contacts/search: ct_NameFull and
-                // ContactNumbersEmail. Skip empty fields only — don't clobber
-                // text the AE may have already typed.
-                var nameEl = document.getElementById('sbf-contact-name');
-                var emailEl = document.getElementById('sbf-contact-email');
-                if (contact.ct_NameFull && nameEl && !nameEl.value) {
-                    nameEl.value = contact.ct_NameFull;
-                }
-                if (contact.ContactNumbersEmail && emailEl && !emailEl.value) {
-                    emailEl.value = contact.ContactNumbersEmail;
-                }
+                var errEl = document.getElementById('sbf-company-error');
+                if (errEl) errEl.style.display = 'none';
             },
             onClear: function () {
                 selectedContact = null;
-                document.getElementById('sbf-customer-id').value = '';
             }
         });
     }

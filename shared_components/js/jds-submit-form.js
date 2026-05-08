@@ -861,35 +861,32 @@ var JDSSubmitForm = (function () {
         if (submitBtn) submitBtn.addEventListener('click', handleSubmit);
     }
 
-    // ── Company autocomplete ────────────────────────────────────────────────
+    // ── Company + Contact picker (hybrid grouped pattern) ──────────────────
+    // Replaces the wall-of-duplicates CustomerLookupService.bindToInput with
+    // CompanyContactPicker — single search box, grouped Companies + Contacts
+    // sections, click-through to Stage 2 contact list per company.
+    // The picker writes Company + Contact + Email + customerId directly; we
+    // just wire callbacks for form-specific side-effects (clearing the error
+    // state, cacheing the selected contact for the submit handler).
     function initCompanyAutocomplete() {
-        if (typeof CustomerLookupService === 'undefined') return;
-        customerLookup = new CustomerLookupService({ maxResults: 10 });
-        customerLookup.bindToInput('jds-company', {
-            onSelect: function (contact) {
-                // CustomerLookupService passes contacts in the legacy response
-                // shape from /api/company-contacts/search:
-                //   ct_NameFull            (e.g. "Bob Rowe")
-                //   ContactNumbersEmail    (e.g. "rrowe@wesleyhomes.org")
-                //   id_Customer / CustomerCompanyName
-                // Auto-fill skips empty contact fields only — if the AE has
-                // already typed something, we don't clobber their input.
-                selectedContact = contact;
-                document.getElementById('jds-customer-id').value = contact.id_Customer || '';
+        if (typeof CompanyContactPicker === 'undefined') {
+            console.warn('[JDSSubmitForm] CompanyContactPicker not loaded — falling back to plain inputs.');
+            return;
+        }
+        customerLookup = new CompanyContactPicker();
+        customerLookup.bindPair({
+            companyInputId: 'jds-company',
+            contactInputId: 'jds-contact-name',
+            emailInputId: 'jds-contact-email',
+            customerIdHiddenId: 'jds-customer-id',
+            onSelect: function (selection) {
+                selectedContact = selection.contact || null;
                 document.getElementById('jds-company').classList.remove('jds-error');
-                document.getElementById('jds-company-error').style.display = 'none';
-                var nameEl = document.getElementById('jds-contact-name');
-                var emailEl = document.getElementById('jds-contact-email');
-                if (contact.ct_NameFull && nameEl && !nameEl.value) {
-                    nameEl.value = contact.ct_NameFull;
-                }
-                if (contact.ContactNumbersEmail && emailEl && !emailEl.value) {
-                    emailEl.value = contact.ContactNumbersEmail;
-                }
+                var errEl = document.getElementById('jds-company-error');
+                if (errEl) errEl.style.display = 'none';
             },
             onClear: function () {
                 selectedContact = null;
-                document.getElementById('jds-customer-id').value = '';
             }
         });
     }
