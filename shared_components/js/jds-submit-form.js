@@ -1143,9 +1143,14 @@ var JDSSubmitForm = (function () {
                 return resp.json();
             })
             .then(function (result) {
-                var record = result && result.request;
-                var resultRow = record && record.Result && record.Result[0];
-                var designId = resultRow && (resultRow.ID_Design || resultRow.PK_ID);
+                // Backend returns the post-create record at result.record
+                // (canonical, since v2026.05.08.5). Fall back to the legacy
+                // result.request.Result[0] shape just in case the form is
+                // running against an older proxy version.
+                var record = (result && result.record)
+                    || (result && result.request && result.request.Result && result.request.Result[0])
+                    || null;
+                var designId = record && (record.ID_Design || record.PK_ID);
                 statusEl.textContent = 'Notifying Steve...';
                 sendNotificationEmails(designId, companyName, designName, aeName, aeEmail);
                 showSuccess(designId, companyName);
@@ -1260,10 +1265,10 @@ var JDSSubmitForm = (function () {
         if (!body) return;
         body.innerHTML = '<div class="jds-success">'
             + '<div class="jds-success-icon">✅</div>'
-            + '<h3>JDS Request Submitted!</h3>'
+            + '<h3>JDS Request Submitted!' + (designId ? ' <span class="jds-success-id">Design #' + escapeHtml(String(designId)) + '</span>' : '') + '</h3>'
             + '<p>Your JDS art request for <strong>' + escapeHtml(companyName) + '</strong> '
             + 'has been sent to Steve. He will create the mockup and notify you when it\'s ready.</p>'
-            + (designId ? '<a href="/mockup/' + designId + '?view=ae" class="jds-success-link">View Request →</a>' : '')
+            + (designId ? '<a href="/art-request/' + designId + '?view=ae" class="jds-success-link">View Request →</a>' : '')
             + '<button type="button" class="jds-success-another" id="jds-another-btn">Submit Another</button>'
             + '</div>';
         var anotherBtn = document.getElementById('jds-another-btn');
