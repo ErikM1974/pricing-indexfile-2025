@@ -1082,12 +1082,26 @@ var JDSSubmitForm = (function () {
                 // empty since Decoration Method is a required field).
                 var decoration = getVal('jds-decoration');
 
+                // Quantity is a Number column on Caspio — empty string would
+                // 400 the POST. Send null when blank so Caspio stores NULL.
+                var quantityRaw = getVal('jds-quantity');
+                var quantityVal = quantityRaw ? (parseInt(quantityRaw, 10) || null) : null;
+
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: 'JDS',
                     JDS_SKU: selectedRow.SKU,
                     Order_Type: decoration || 'JDS',
+                    // Dedicated JDS spec columns added to Caspio 2026-05-08.
+                    // The detail page renders these as labeled rows in the
+                    // JDS Product Specs card (build JDS spec rows helper).
+                    // Item_Specs_Notes is still built and sent below as a
+                    // backstop / human-readable single-pane view.
+                    JDS_Design_Name: designName || '',
+                    JDS_Color: getVal('jds-engrave-color'),
+                    JDS_Placement: getVal('jds-imprint-placement'),
+                    JDS_Quantity: quantityVal,
                     Item_Specs_Notes: notes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,
