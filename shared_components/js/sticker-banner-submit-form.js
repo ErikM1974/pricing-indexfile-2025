@@ -120,17 +120,24 @@ var StickerBannerSubmitForm = (function () {
             + '      </div>'
             + '    </div>'
 
-            // ShopWorks Design # — REQUIRED, primary entry point. AE types
-            // the number first; reverse lookup auto-fills the Design Name
-            // when the number resolves in Design_Lookup_2026. For brand-new
-            // designs not yet in ShopWorks, the AE can type any number and
-            // fill Design Name manually below.
-            + '    <div class="sbf-field">'
-            + '      <label class="sbf-field-label">ShopWorks Design # <span class="sbf-required">*</span></label>'
-            + '      <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '      <span class="sbf-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
-            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-error">Design # is required</span>'
-            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            // ShopWorks references — Design # (required) + Work Order #
+            // (optional) paired in one row. Both link the AE intake to
+            // existing records in the ShopWorks ERP. Work Order picker is
+            // browse-on-focus (shows recent orders for the picked customer);
+            // Design # has reverse-lookup on blur to auto-fill Design Name.
+            + '    <div class="sbf-row">'
+            + '      <div class="sbf-field">'
+            + '        <label class="sbf-field-label">ShopWorks Design # <span class="sbf-required">*</span></label>'
+            + '        <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '        <span class="sbf-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
+            + '        <span class="sbf-error-msg" id="sbf-design-num-sw-error">Design # is required</span>'
+            + '        <span class="sbf-error-msg" id="sbf-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            + '      </div>'
+            + '      <div class="sbf-field">'
+            + '        <label class="sbf-field-label">Work Order # (optional)</label>'
+            + '        <input type="text" class="sbf-input" id="sbf-work-order" placeholder="ShopWorks order #">'
+            + '        <span class="sbf-field-hint">Click to browse this customer\'s recent orders. Picking one auto-fills Design # + Design Name if blank.</span>'
+            + '      </div>'
             + '    </div>'
 
             // Design name + Due date
@@ -148,16 +155,10 @@ var StickerBannerSubmitForm = (function () {
 
             + (isSticker ? buildStickerSpecsHtml() : buildBannerSpecsHtml())
 
-            // Quantity + Work Order
-            + '    <div class="sbf-row">'
-            + '      <div class="sbf-field">'
-            + '        <label class="sbf-field-label">Estimated Quantity</label>'
-            + '        <input type="number" class="sbf-input" id="sbf-quantity" placeholder="e.g. 250" min="1" step="1">'
-            + '      </div>'
-            + '      <div class="sbf-field">'
-            + '        <label class="sbf-field-label">Work Order # (optional)</label>'
-            + '        <input type="text" class="sbf-input" id="sbf-work-order" placeholder="ShopWorks order #">'
-            + '      </div>'
+            // Estimated Quantity (Work Order # moved up to pair with Design #)
+            + '    <div class="sbf-field">'
+            + '      <label class="sbf-field-label">Estimated Quantity</label>'
+            + '      <input type="number" class="sbf-input" id="sbf-quantity" placeholder="e.g. 250" min="1" step="1">'
             + '    </div>'
 
             // Instructions

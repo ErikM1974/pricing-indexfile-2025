@@ -667,16 +667,23 @@ var JDSSubmitForm = (function () {
             + '        </div>'
             + '      </div>'
 
-            //   ShopWorks Design # — REQUIRED, primary entry point. AE types
-            //   the number first; reverse lookup auto-fills the Design Name
-            //   when the number resolves. New designs not yet in ShopWorks:
-            //   AE types any number, fills Design Name manually below.
-            + '      <div class="jds-field">'
-            + '        <label class="jds-field-label">ShopWorks Design # <span class="jds-required">*</span></label>'
-            + '        <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '        <span class="jds-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
-            + '        <span class="jds-error-msg" id="jds-design-num-sw-error">Design # is required</span>'
-            + '        <span class="jds-error-msg" id="jds-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            //   ShopWorks references — Design # (required) + Work Order #
+            //   (optional) paired in one row. Both link the AE intake to
+            //   ShopWorks ERP records. Work Order picker is browse-on-focus;
+            //   Design # has reverse-lookup on blur to auto-fill Design Name.
+            + '      <div class="jds-row">'
+            + '        <div class="jds-field">'
+            + '          <label class="jds-field-label">ShopWorks Design # <span class="jds-required">*</span></label>'
+            + '          <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '          <span class="jds-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
+            + '          <span class="jds-error-msg" id="jds-design-num-sw-error">Design # is required</span>'
+            + '          <span class="jds-error-msg" id="jds-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            + '        </div>'
+            + '        <div class="jds-field">'
+            + '          <label class="jds-field-label">Work Order # (optional)</label>'
+            + '          <input type="text" class="jds-input" id="jds-work-order" placeholder="ShopWorks order #">'
+            + '          <span class="jds-field-hint">Click to browse this customer\'s recent orders. Picking one auto-fills Design # + Design Name if blank.</span>'
+            + '        </div>'
             + '      </div>'
 
             //   Design name + Due date
@@ -716,17 +723,11 @@ var JDSSubmitForm = (function () {
             + '        <span class="jds-field-hint">Pre-filled from catalog. AE can adjust per job.</span>'
             + '      </div>'
 
-            //   Quantity + Work Order
-            + '      <div class="jds-row">'
-            + '        <div class="jds-field">'
-            + '          <label class="jds-field-label">Estimated Quantity</label>'
-            + '          <input type="number" class="jds-input" id="jds-quantity" placeholder="e.g. 144" min="1" step="1">'
-            + '          <span class="jds-field-hint">Drives the live tier display in the summary card.</span>'
-            + '        </div>'
-            + '        <div class="jds-field">'
-            + '          <label class="jds-field-label">Work Order # (optional)</label>'
-            + '          <input type="text" class="jds-input" id="jds-work-order" placeholder="ShopWorks order #">'
-            + '        </div>'
+            //   Estimated Quantity (Work Order # moved up to pair with Design #)
+            + '      <div class="jds-field">'
+            + '        <label class="jds-field-label">Estimated Quantity</label>'
+            + '        <input type="number" class="jds-input" id="jds-quantity" placeholder="e.g. 144" min="1" step="1">'
+            + '        <span class="jds-field-hint">Drives the live tier display in the summary card.</span>'
             + '      </div>'
 
             //   Instructions
