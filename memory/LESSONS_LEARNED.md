@@ -308,6 +308,38 @@ Two pre-`resolveToProxyUrl` bugs archived 2026-05-07: (1) Box `download_url` sha
 
 ---
 
+### Caspio multi-select List columns are unwritable via REST API + Triggered Actions (2026-05-09)
+**Problem:** AE intake forms (JDS, Sticker, Banner) tried writing `Order_Type: 'Roland Stickers'` (or array `['Roland Stickers']`) to ArtRequests. Caspio returned `InvalidInputValue: ... Order_Type` (500). Even Caspio's visual Triggered Action builder hid multi-select fields from assignment-target dropdowns — the trigger workaround we tried also didn't work.
+**Root Cause:** `Order_Type` is a `List - String` multi-select column. Caspio's REST API and Triggered Action builder both lack the internal encoding the DataPage UI uses for these columns. Reads return the dict shape `{'9': 'Roland Stickers'}`; writes need a wire format we can't produce externally.
+**Solution:** Parallel-column workaround. Added `Order_Type_Source` (Text 255) to ArtRequests in Caspio admin. New REST forms write `Order_Type_Source`; legacy Garment DataPage continues writing `Order_Type`. Each record has exactly one populated; never both. Dashboards coalesce on read: `req.Order_Type || req.Order_Type_Source` in [art-hub-steve-gallery.js getOrderType()](shared_components/js/art-hub-steve-gallery.js), [art-ae.js getOrderType()](shared_components/js/art-ae.js), [pages/js/art-request-detail.js](pages/js/art-request-detail.js) (Order Type display + JDS Specs decoration row).
+**Prevention:** **Never include a Caspio `List - String` multi-select column in a REST POST payload — the entire submission will 500.** The same parallel-column + dashboard-coalesce pattern applies to any future multi-select that needs REST writes. Pattern documented in caspio-pricing-proxy/memory/MEMORY.md → "CASPIO MULTI-SELECT WRITES".
+
+---
+
+### `resolveItemType` helper drift across 3 files — JDS records rendered as Garment on detail page (2026-05-08)
+**Problem:** New `Item_Type='JDS'` records correctly displayed JDS badge + SKU on Steve's gallery and the AE list, but the Art Request Detail page rendered them as Garment — Item Type badge hidden, JDS Specs card hidden, all the structured info packed into `Item_Specs_Notes` was invisible.
+**Root Cause:** Three separate copies of `resolveItemType()` exist: [art-hub-steve-gallery.js:135](shared_components/js/art-hub-steve-gallery.js), [art-ae.js:26](shared_components/js/art-ae.js), and [pages/js/art-request-detail.js:4406](pages/js/art-request-detail.js). When JDS shipped, the first two were updated to recognize `'JDS'` as a valid item type; the detail-page copy was missed. Steve gallery's comment claimed it was the "single source of truth … same fallback used in art-ae.js + mockup-detail" — but `art-request-detail.js` was never updated.
+**Solution:** Updated all 3 to recognize `'JDS'` (alongside the existing Sticker/Banner). Added a code comment in each file cross-referencing the others.
+**Prevention:** When extending the item-type taxonomy (or any other shared enum/helper), grep for the helper name and update every copy. Better long-term: factor `resolveItemType` into a shared module — but that touches load order across multiple HTML host pages, so it's a separate cleanup task.
+
+---
+
+### Silent file-upload failures created orphaned art requests (2026-05-08)
+**Problem:** AE submitted a Sticker request with a reference image; the request landed in Caspio with empty `File_Upload_One`. The form showed "Submitted!" success despite the upload silently failing. Steve saw an art request with no artwork and no way to know files were ever attempted.
+**Root Cause:** `uploadFilesSequentially()` in JDS / Sticker / Banner forms swallowed upload errors with `results.push(null)` and proceeded to create the ArtRequest. Failures came from things like 409 FILE_EXISTS (Caspio Artwork folder is global — generic filenames collide across customers) or transient network issues.
+**Solution:** Track failed file names in `failedFiles[]` alongside `results[]`. After the upload phase, if `failedFiles.length > 0`, abort the submission with a clear `Could not upload "<filename>" — please retry` toast and re-enable the submit button. The AE's typed input is preserved (form view isn't re-rendered) so they can retry without losing work. The 409 case is also handled server-side now: `files-simple.js` retries once with a timestamp suffix on collisions.
+**Prevention:** **Never silently swallow upload errors when the upload is the user's primary intent.** Hard-fail the whole submission, surface the failure, let the user retry. Same pattern applies to any "submit form with attachments" flow — abort before the create-record step if any attachment failed.
+
+---
+
+### EmailJS `template_art_note_added` requires `header_emoji` + `header_title` in every caller (2026-05-09)
+**Problem:** The shared EmailJS template was originally hardcoded with `📝 Note Added` in the blue header bar. Steve's brain registered "note added" even when the email was actually announcing a brand-new submission, customer approval, or status change — the visual didn't match the actual context.
+**Root Cause:** Single template + multiple distinct notification contexts (note added, new submission, customer approval, AE edit, etc.) all rendered the same hardcoded header.
+**Solution:** Updated the template HTML to use `{{header_emoji}} {{header_title}}` instead of `📝 Note Added`, and prefixed the subject line with `{{header_emoji}}`. Then updated all **26** `emailjs.send()` calls across **9 files** to pass both variables — context-specific for new-submission flows (🎯 JDS, 🏷️ Sticker, 🎌 Banner, 🎨 Mockup, 👕 Garment, ✅ Confirmation, 📨 Sales-rep FYI), default `📝` for legacy note-added flows.
+**Prevention:** **When adding a new caller of `template_art_note_added`, ALWAYS pass `header_emoji` and `header_title`** (not optional — EmailJS doesn't fall back gracefully and would render `{{header_emoji}} {{header_title}}` literally). Grep for `'template_art_note_added'` and verify every site passes both variables. Files affected today: art-request-detail, mockup-detail, art-hub-steve, art-actions-shared, ae-submit-form, jds-submit-form, mockup-ruth, mockup-submit-form, sticker-banner-submit-form. Also: new shared components (CompanyContactPicker, DesignNamePicker, WorkOrderPicker) and `nwca-date-utils.js` shipped 2026-05-08 — see [shared_components/js/GUIDE.md](shared_components/js/GUIDE.md) (if present) or grep for the file names to find usage.
+
+---
+
 ### JDS + Sticker/Banner intake 500: payload sent `Design_Name` to a column that doesn't exist on ArtRequests (2026-05-08)
 **Problem:** Every AE submission via the JDS intake form on the AE dashboard returned `Submission failed: Failed to create art request (500)`. Sticker/Banner intake (same 2026-05-06 deploy) had the same latent bug; just hadn't been exercised.
 **Root Cause:** Both [jds-submit-form.js](shared_components/js/jds-submit-form.js) and [sticker-banner-submit-form.js](shared_components/js/sticker-banner-submit-form.js) POSTed `Design_Name: designName` to `/api/artrequests`. `Design_Name` exists on `Design_Lookup_2026` and `Digitizing_Mockups` — but **not on `ArtRequests`**. Caspio returned `404 FieldNotFound — Cannot perform operation because the following field(s) do not exist: 'Design_Name'`. The proxy's POST handler ([art.js:251-254](../caspio-pricing-proxy/src/routes/art.js#L251)) catches and re-emits as a generic 500, hiding Caspio's actual error from the browser. False lead burned an hour: a hypothesis based on missing-`JDS_SKU` was wrong; that column is present.
