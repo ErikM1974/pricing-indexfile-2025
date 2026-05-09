@@ -46,11 +46,45 @@ var MockupSubmitForm = (function () {
         initToggle();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
+        initWorkOrderAutocomplete();
         initDueDateDefault();
         initSalesRep();
         loadLocations();
         loadThreadColors();
         renderGarmentRows();
+    }
+
+    // ── Work Order # autocomplete (browse-on-focus, MO-backed) ──────────────
+    // Picks from this customer's recent ShopWorks orders. Smart-fills BOTH
+    // msf-design-name AND msf-design-number from the picked order, but ONLY
+    // if those fields are still empty — preserves the AE's typed input.
+    function initWorkOrderAutocomplete() {
+        if (typeof WorkOrderPicker === 'undefined') return;
+        WorkOrderPicker.bind({
+            inputId: 'msf-work-order',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('msf-customer-id').value, 10) || 0;
+            },
+            onSelect: function (order) {
+                var nameEl = document.getElementById('msf-design-name');
+                var numEl = document.getElementById('msf-design-number');
+                if (nameEl && !nameEl.value.trim() && order.DesignName) {
+                    nameEl.value = order.DesignName;
+                }
+                if (numEl && !numEl.value.trim() && order.id_Design) {
+                    numEl.value = String(order.id_Design);
+                    numEl.classList.remove('msf-error');
+                }
+                if (order.id_Design && order.DesignName) {
+                    selectedDesign = {
+                        designNumber: order.id_Design,
+                        designName: order.DesignName,
+                        company: order.CustomerName,
+                        customerId: order.id_Customer
+                    };
+                }
+            }
+        });
     }
 
     // ── Design Name autocomplete (customer-scoped, newest first) ────────────
@@ -1225,6 +1259,7 @@ var MockupSubmitForm = (function () {
         initToggle();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
+        initWorkOrderAutocomplete();
         initDueDateDefault();
         initSalesRep();
         loadLocations();

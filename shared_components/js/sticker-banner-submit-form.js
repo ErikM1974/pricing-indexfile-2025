@@ -58,6 +58,7 @@ var StickerBannerSubmitForm = (function () {
         wireEvents();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
+        initWorkOrderAutocomplete();
         initDueDateDefault();
         initSalesRep();
         // Suggest sensible defaults for Application/Use based on item type
@@ -472,6 +473,37 @@ var StickerBannerSubmitForm = (function () {
         if (dueDate && !dueDate.value) {
             dueDate.value = window.NWCA_DateUtils.addBusinessDays(2);
         }
+    }
+
+    // ── Work Order # autocomplete (browse-on-focus, MO-backed) ──────────────
+    // Picks from this customer's recent ShopWorks orders. Smart-fills the
+    // Design Name from the picked order's DesignName, but ONLY if it's
+    // still empty — preserves the AE's typed input.
+    function initWorkOrderAutocomplete() {
+        if (typeof WorkOrderPicker === 'undefined') return;
+        WorkOrderPicker.bind({
+            inputId: 'sbf-work-order',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('sbf-customer-id').value, 10) || 0;
+            },
+            onSelect: function (order) {
+                var nameEl = document.getElementById('sbf-design-name');
+                if (nameEl && !nameEl.value.trim() && order.DesignName) {
+                    nameEl.value = order.DesignName;
+                    if (order.id_Design) {
+                        selectedDesign = {
+                            designNumber: order.id_Design,
+                            designName: order.DesignName,
+                            company: order.CustomerName,
+                            customerId: order.id_Customer
+                        };
+                    }
+                    nameEl.classList.remove('sbf-error');
+                    var errEl = document.getElementById('sbf-design-name-error');
+                    if (errEl) errEl.style.display = 'none';
+                }
+            }
+        });
     }
 
     // ── Sales Rep Auto-fill ─────────────────────────────────────────────────

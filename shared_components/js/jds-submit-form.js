@@ -762,9 +762,45 @@ var JDSSubmitForm = (function () {
         wireFormEvents();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
+        initWorkOrderAutocomplete();
         initDueDateDefault();
         initSalesRep();
         updateLiveBlock();
+    }
+
+    // ── Work Order # autocomplete (browse-on-focus, MO-backed) ──────────────
+    // Picks from this customer's recent ShopWorks orders. Smart-fills the
+    // Design Name + Design Number from the picked order's id_Design /
+    // DesignName, but ONLY if those fields are still empty — preserves the
+    // AE's typed input.
+    function initWorkOrderAutocomplete() {
+        if (typeof WorkOrderPicker === 'undefined') return;
+        WorkOrderPicker.bind({
+            inputId: 'jds-work-order',
+            getCustomerId: function () {
+                return parseInt(document.getElementById('jds-customer-id').value, 10) || 0;
+            },
+            onSelect: function (order) {
+                // Smart-fill design fields only when empty.
+                var nameEl = document.getElementById('jds-design-name');
+                if (nameEl && !nameEl.value.trim() && order.DesignName) {
+                    nameEl.value = order.DesignName;
+                    // Mirror what DesignNamePicker.onSelect does — cache the
+                    // design so the submit handler injects Design_Num_SW.
+                    if (order.id_Design) {
+                        selectedDesign = {
+                            designNumber: order.id_Design,
+                            designName: order.DesignName,
+                            company: order.CustomerName,
+                            customerId: order.id_Customer
+                        };
+                    }
+                    nameEl.classList.remove('jds-error');
+                    var errEl = document.getElementById('jds-design-name-error');
+                    if (errEl) errEl.style.display = 'none';
+                }
+            }
+        });
     }
 
     // ── Design Name autocomplete (customer-scoped, newest first) ────────────
