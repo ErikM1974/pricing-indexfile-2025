@@ -291,5 +291,48 @@
         };
     }
 
-    global.DesignNamePicker = { bind: bind };
+    /**
+     * Reverse lookup: given a Design # (e.g. 40445), fetch the design record
+     * from /api/digitized-designs/lookup so callers can auto-fill the
+     * Design Name field. Returns the design object or null.
+     *
+     * Used by the AE intake forms' Design # input — when the AE types a
+     * design number, the form looks it up and fills Design Name (with
+     * customer-mismatch warning if applicable).
+     */
+    var lookupByNumberCache = new Map();
+
+    function lookupByNumber(designNumber) {
+        var key = String(designNumber || '').trim();
+        if (!key || !/^\d+(\.\d+)?$/.test(key)) {
+            return Promise.resolve(null);
+        }
+        var cached = lookupByNumberCache.get(key);
+        if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+            return Promise.resolve(cached.data);
+        }
+        var url = DEFAULT_BASE_URL + '/api/digitized-designs/lookup?designs=' + encodeURIComponent(key);
+        return fetch(url)
+            .then(function (r) {
+                if (!r.ok) throw new Error('lookup ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                var found = (data && data.designs && data.designs[key]) || null;
+                lookupByNumberCache.set(key, { data: found, timestamp: Date.now() });
+                if (lookupByNumberCache.size > 50) {
+                    lookupByNumberCache.delete(lookupByNumberCache.keys().next().value);
+                }
+                return found;
+            })
+            .catch(function (err) {
+                console.warn('[DesignNamePicker] lookupByNumber failed:', err);
+                return null;
+            });
+    }
+
+    global.DesignNamePicker = {
+        bind: bind,
+        lookupByNumber: lookupByNumber
+    };
 })(typeof window !== 'undefined' ? window : this);

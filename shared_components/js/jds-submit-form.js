@@ -682,10 +682,12 @@ var JDSSubmitForm = (function () {
 
             //   ShopWorks Design # (optional) — auto-fills when AE picks
             //   from the Design Name autocomplete; AE can also type directly.
+            //   Reverse lookup on blur populates the Design Name when found.
             + '      <div class="jds-field">'
             + '        <label class="jds-field-label">ShopWorks Design # <span class="jds-field-hint-inline">(optional)</span></label>'
             + '        <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '        <span class="jds-field-hint">Auto-fills when you pick an existing design above. Type to override.</span>'
+            + '        <span class="jds-field-hint">Auto-fills when you pick an existing design above. Type a number and tab out to look it up.</span>'
+            + '        <span class="jds-error-msg" id="jds-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
             + '      </div>'
 
             //   Decoration spec block
@@ -771,6 +773,7 @@ var JDSSubmitForm = (function () {
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
         initWorkOrderAutocomplete();
+        initDesignNumLookup();
         initDueDateDefault();
         initSalesRep();
         updateLiveBlock();
@@ -850,6 +853,61 @@ var JDSSubmitForm = (function () {
                 }
             });
         }
+    }
+
+    // ── Reverse lookup on Design # ───────────────────────────────────────
+    // When the AE types a design number and tabs out of the field, look it
+    // up against Design_Lookup_2026. If found AND the design's customer
+    // matches the picked one → auto-fill Design Name (only if empty).
+    // If the design's customer DOESN'T match → show a warning so the AE
+    // can double-check rather than mis-attribute the design.
+    function initDesignNumLookup() {
+        if (typeof DesignNamePicker === 'undefined') return;
+        var numEl = document.getElementById('jds-design-num-sw');
+        var nameEl = document.getElementById('jds-design-name');
+        var warnEl = document.getElementById('jds-design-num-sw-warning');
+        if (!numEl || !nameEl) return;
+
+        function clearWarn() {
+            if (warnEl) { warnEl.style.display = 'none'; warnEl.textContent = ''; }
+        }
+        function showWarn(msg) {
+            if (!warnEl) return;
+            warnEl.textContent = msg;
+            warnEl.style.display = 'block';
+        }
+
+        numEl.addEventListener('blur', function () {
+            var num = (numEl.value || '').trim();
+            if (!num) { clearWarn(); return; }
+            DesignNamePicker.lookupByNumber(num).then(function (design) {
+                if (!design) { clearWarn(); return; }
+                var pickedCustomer = parseInt(document.getElementById('jds-customer-id').value, 10) || 0;
+                var designCustomer = parseInt(design.customerId, 10) || 0;
+                if (pickedCustomer && designCustomer && pickedCustomer !== designCustomer) {
+                    // Mismatch — surface a warning, don't auto-fill silently.
+                    showWarn('Design #' + num + ' belongs to ' + (design.company || 'a different customer')
+                        + ' — not the customer you picked. Double-check before submitting.');
+                    return;
+                }
+                clearWarn();
+                if (!nameEl.value.trim() && design.designName) {
+                    nameEl.value = design.designName;
+                    selectedDesign = {
+                        designNumber: design.designNumber,
+                        designName: design.designName,
+                        company: design.company,
+                        customerId: design.customerId
+                    };
+                    nameEl.classList.remove('jds-error');
+                    var errEl = document.getElementById('jds-design-name-error');
+                    if (errEl) errEl.style.display = 'none';
+                }
+            });
+        });
+
+        // Clear the warning as soon as the AE edits the number again.
+        numEl.addEventListener('input', clearWarn);
     }
 
     // ── Default Due Date to today + 2 business days (skip weekends) ─────────

@@ -59,6 +59,7 @@ var StickerBannerSubmitForm = (function () {
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
         initWorkOrderAutocomplete();
+        initDesignNumLookup();
         initDueDateDefault();
         initSalesRep();
         // Suggest sensible defaults for Application/Use based on item type
@@ -134,10 +135,12 @@ var StickerBannerSubmitForm = (function () {
 
             // ShopWorks Design # (optional) — auto-fills when AE picks
             // from the Design Name autocomplete; AE can also type directly.
+            // Reverse lookup on blur populates the Design Name when found.
             + '    <div class="sbf-field">'
             + '      <label class="sbf-field-label">ShopWorks Design # (optional)</label>'
             + '      <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '      <span class="sbf-field-hint">Auto-fills when you pick an existing design above. Type to override.</span>'
+            + '      <span class="sbf-field-hint">Auto-fills when you pick an existing design above. Type a number and tab out to look it up.</span>'
+            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
             + '    </div>'
 
             + (isSticker ? buildStickerSpecsHtml() : buildBannerSpecsHtml())
@@ -487,6 +490,57 @@ var StickerBannerSubmitForm = (function () {
         if (dueDate && !dueDate.value) {
             dueDate.value = window.NWCA_DateUtils.addBusinessDays(2);
         }
+    }
+
+    // ── Reverse lookup on Design # ───────────────────────────────────────
+    // AE types a design number → on blur, look up Design_Lookup_2026.
+    // If found AND customer matches → auto-fill Design Name (only if empty).
+    // If customer mismatches → warn rather than auto-fill.
+    function initDesignNumLookup() {
+        if (typeof DesignNamePicker === 'undefined') return;
+        var numEl = document.getElementById('sbf-design-num-sw');
+        var nameEl = document.getElementById('sbf-design-name');
+        var warnEl = document.getElementById('sbf-design-num-sw-warning');
+        if (!numEl || !nameEl) return;
+
+        function clearWarn() {
+            if (warnEl) { warnEl.style.display = 'none'; warnEl.textContent = ''; }
+        }
+        function showWarn(msg) {
+            if (!warnEl) return;
+            warnEl.textContent = msg;
+            warnEl.style.display = 'block';
+        }
+
+        numEl.addEventListener('blur', function () {
+            var num = (numEl.value || '').trim();
+            if (!num) { clearWarn(); return; }
+            DesignNamePicker.lookupByNumber(num).then(function (design) {
+                if (!design) { clearWarn(); return; }
+                var pickedCustomer = parseInt(document.getElementById('sbf-customer-id').value, 10) || 0;
+                var designCustomer = parseInt(design.customerId, 10) || 0;
+                if (pickedCustomer && designCustomer && pickedCustomer !== designCustomer) {
+                    showWarn('Design #' + num + ' belongs to ' + (design.company || 'a different customer')
+                        + ' — not the customer you picked. Double-check before submitting.');
+                    return;
+                }
+                clearWarn();
+                if (!nameEl.value.trim() && design.designName) {
+                    nameEl.value = design.designName;
+                    selectedDesign = {
+                        designNumber: design.designNumber,
+                        designName: design.designName,
+                        company: design.company,
+                        customerId: design.customerId
+                    };
+                    nameEl.classList.remove('sbf-error');
+                    var errEl = document.getElementById('sbf-design-name-error');
+                    if (errEl) errEl.style.display = 'none';
+                }
+            });
+        });
+
+        numEl.addEventListener('input', clearWarn);
     }
 
     // ── Work Order # autocomplete (browse-on-focus, MO-backed) ──────────────
