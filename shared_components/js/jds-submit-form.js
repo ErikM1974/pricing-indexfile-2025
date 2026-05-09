@@ -1206,11 +1206,16 @@ var JDSSubmitForm = (function () {
         var aeEmail = getSubmitterEmail();
         // Sales Rep dropdown: option.value is email, option.text is display
         // name. Sales_Rep column stores display names (matches existing rows
-        // + what art-hub-steve-gallery getRepFirstName() expects).
+        // + what art-hub-steve-gallery getRepFirstName() expects). Capture
+        // both — name for the column, email for the notification CC when
+        // the AE is submitting on behalf of someone else.
         var repSel = document.getElementById('jds-sales-rep');
         var salesRep = (repSel && repSel.selectedIndex >= 0)
             ? repSel.options[repSel.selectedIndex].text
             : aeName;
+        var salesRepEmail = (repSel && repSel.selectedIndex >= 0)
+            ? repSel.options[repSel.selectedIndex].value
+            : '';
 
         var firstName = '';
         var lastName = '';
@@ -1343,7 +1348,7 @@ var JDSSubmitForm = (function () {
                     || null;
                 var designId = record && (record.ID_Design || record.PK_ID);
                 statusEl.textContent = 'Notifying Steve...';
-                sendNotificationEmails(designId, companyName, designName, aeName, aeEmail);
+                sendNotificationEmails(designId, companyName, designName, aeName, aeEmail, salesRep, salesRepEmail);
                 showSuccess(designId, companyName);
             })
             .catch(function (err) {
@@ -1417,7 +1422,7 @@ var JDSSubmitForm = (function () {
         return uploadNext(0);
     }
 
-    function sendNotificationEmails(designId, companyName, designName, aeName, aeEmail) {
+    function sendNotificationEmails(designId, companyName, designName, aeName, aeEmail, salesRepName, salesRepEmail) {
         if (typeof emailjs === 'undefined') return;
         try {
             emailjs.init('4qSbDO-SQs19TbP80');
@@ -1434,6 +1439,7 @@ var JDSSubmitForm = (function () {
                 from_name: aeName
             }).catch(function () {});
 
+            // AE confirmation (the person who actually submitted)
             if (aeEmail && aeEmail !== STEVE_EMAIL) {
                 emailjs.send('service_jgrave3', 'template_art_note_added', {
                     to_email: aeEmail,
@@ -1442,6 +1448,25 @@ var JDSSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'Your JDS art request' + skuFragment + ' for ' + companyName + ' ("' + designName + '") was submitted to Steve.',
                     note_type: 'Submission Confirmation',
+                    detail_link: detailLink + '?view=ae',
+                    from_name: 'NWCA Art Department'
+                }).catch(function () {});
+            }
+
+            // Sales-rep CC — when the AE submitted on behalf of a different
+            // sales rep, also notify that rep so they're in the loop. Skip
+            // when salesRepEmail matches Steve (already notified) or matches
+            // the submitter (already got the AE confirmation above).
+            if (salesRepEmail
+                && salesRepEmail !== STEVE_EMAIL
+                && salesRepEmail !== aeEmail) {
+                emailjs.send('service_jgrave3', 'template_art_note_added', {
+                    to_email: salesRepEmail,
+                    to_name: salesRepName || 'Sales Rep',
+                    design_id: designId || 'NEW',
+                    company_name: companyName,
+                    note_text: 'A JDS art request' + skuFragment + ' for ' + companyName + ' ("' + designName + '") was submitted to Steve on your behalf by ' + aeName + '.',
+                    note_type: 'Submission FYI (Sales Rep)',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});

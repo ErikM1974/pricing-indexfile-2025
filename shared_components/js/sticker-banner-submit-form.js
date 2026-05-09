@@ -796,6 +796,13 @@ var StickerBannerSubmitForm = (function () {
         var aeName = getSubmitterName();
         var aeEmail = getSubmitterEmail();
         var salesRep = document.getElementById('sbf-sales-rep').value.trim() || aeName;
+        // Resolve sales-rep email via the shared StaffAuthHelper map. Used
+        // as a CC recipient when the AE submits on behalf of someone else.
+        // Returns '' if the typed name doesn't match the map (graceful skip).
+        var salesRepEmail = '';
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.STAFF_EMAIL_MAP) {
+            salesRepEmail = StaffAuthHelper.STAFF_EMAIL_MAP[salesRep] || '';
+        }
 
         var firstName = '';
         var lastName = '';
@@ -912,7 +919,7 @@ var StickerBannerSubmitForm = (function () {
                 var designId = record && (record.ID_Design || record.PK_ID);
 
                 statusEl.textContent = 'Notifying Steve...';
-                sendNotificationEmails(designId, companyName, designName, aeName, aeEmail);
+                sendNotificationEmails(designId, companyName, designName, aeName, aeEmail, salesRep, salesRepEmail);
                 showSuccess(designId, companyName);
             })
             .catch(function (err) {
@@ -991,7 +998,7 @@ var StickerBannerSubmitForm = (function () {
         return uploadNext(0);
     }
 
-    function sendNotificationEmails(designId, companyName, designName, aeName, aeEmail) {
+    function sendNotificationEmails(designId, companyName, designName, aeName, aeEmail, salesRepName, salesRepEmail) {
         if (typeof emailjs === 'undefined') return;
         try {
             emailjs.init('4qSbDO-SQs19TbP80');
@@ -1009,7 +1016,7 @@ var StickerBannerSubmitForm = (function () {
                 from_name: aeName
             }).catch(function () {});
 
-            // Confirmation to AE
+            // AE confirmation (the person who actually submitted)
             if (aeEmail && aeEmail !== STEVE_EMAIL) {
                 emailjs.send('service_jgrave3', 'template_art_note_added', {
                     to_email: aeEmail,
@@ -1018,6 +1025,25 @@ var StickerBannerSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'Your ' + subjectFragment + ' for ' + companyName + ' (\"' + designName + '\") was submitted to Steve.',
                     note_type: 'Submission Confirmation',
+                    detail_link: detailLink + '?view=ae',
+                    from_name: 'NWCA Art Department'
+                }).catch(function () {});
+            }
+
+            // Sales-rep CC — when the AE submitted on behalf of a different
+            // sales rep, also notify that rep so they're in the loop. Skip
+            // when salesRepEmail matches Steve (already notified) or matches
+            // the submitter (already got the AE confirmation above).
+            if (salesRepEmail
+                && salesRepEmail !== STEVE_EMAIL
+                && salesRepEmail !== aeEmail) {
+                emailjs.send('service_jgrave3', 'template_art_note_added', {
+                    to_email: salesRepEmail,
+                    to_name: salesRepName || 'Sales Rep',
+                    design_id: designId || 'NEW',
+                    company_name: companyName,
+                    note_text: 'A ' + subjectFragment.toLowerCase() + ' for ' + companyName + ' (\"' + designName + '\") was submitted to Steve on your behalf by ' + aeName + '.',
+                    note_type: 'Submission FYI (Sales Rep)',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});
