@@ -738,10 +738,20 @@ var StickerBannerSubmitForm = (function () {
                     specsNotes = 'Design Name: ' + designName + '\n\n' + specsNotes;
                 }
 
+                // Order_Type maps to Caspio's Order_Type multi-select dropdown.
+                // 'Roland Stickers' already exists in the dropdown (use as-is).
+                // 'Banner' is gated on Erik adding it as an option in Caspio
+                // admin — until then Caspio will store the value but won't
+                // display it in the Datasheet. Submission still succeeds.
+                var orderTypeForItem = (currentItemType === 'Sticker')
+                    ? 'Roland Stickers'
+                    : 'Banner';
+
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: currentItemType,
+                    Order_Type: orderTypeForItem,
                     Item_Specs_Notes: specsNotes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,
