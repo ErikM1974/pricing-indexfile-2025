@@ -1268,10 +1268,14 @@ var JDSSubmitForm = (function () {
                     Status: 'Submitted',
                     Item_Type: 'JDS',
                     JDS_SKU: selectedRow.SKU,
-                    // Order_Type is a Caspio multi-select List column —
-                    // requires an array of label strings, not a plain
-                    // string (which 500s with InvalidInputValue).
-                    Order_Type: [decoration || 'JDS'],
+                    // Order_Type intentionally OMITTED — Caspio's multi-select
+                    // List column rejects every REST write format we've tried
+                    // (plain string, array, etc.) with InvalidInputValue.
+                    // The legacy Garment DataPage writes successfully through
+                    // a Caspio internal mechanism not exposed via REST. Steve
+                    // picks Order_Type manually in the Caspio Datasheet for
+                    // new submissions. Decoration is captured in Item_Specs_Notes
+                    // ("Decoration: Laser Engrave") so info isn't lost.
                     // Dedicated JDS spec columns added to Caspio 2026-05-08.
                     // The detail page renders these as labeled rows in the
                     // JDS Product Specs card (build JDS spec rows helper).

@@ -836,20 +836,20 @@ var StickerBannerSubmitForm = (function () {
                     specsNotes = 'Design Name: ' + designName + '\n\n' + specsNotes;
                 }
 
-                // Order_Type maps to Caspio's Order_Type multi-select dropdown.
-                // Caspio's multi-select List columns require an ARRAY of
-                // label strings — plain strings are rejected with
-                // InvalidInputValue (500). 'Roland Stickers' already
-                // exists in the dropdown; 'Banner' was added 2026-05-09.
-                var orderTypeForItem = (currentItemType === 'Sticker')
-                    ? 'Roland Stickers'
-                    : 'Banner';
+                // Order_Type intentionally OMITTED — Caspio's multi-select
+                // List column rejects every REST write format we've tried
+                // (plain string, array, etc.) with InvalidInputValue. The
+                // legacy Garment DataPage writes successfully through a
+                // Caspio internal mechanism not exposed via REST. Steve
+                // picks Order_Type ('Roland Stickers' / 'Banner') manually
+                // in the Caspio Datasheet for new submissions. Item_Type
+                // ('Sticker' / 'Banner') already differentiates these from
+                // garment requests.
 
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: currentItemType,
-                    Order_Type: [orderTypeForItem],
                     Item_Specs_Notes: specsNotes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,
