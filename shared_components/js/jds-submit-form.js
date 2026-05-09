@@ -667,27 +667,29 @@ var JDSSubmitForm = (function () {
             + '        </div>'
             + '      </div>'
 
+            //   ShopWorks Design # — REQUIRED, primary entry point. AE types
+            //   the number first; reverse lookup auto-fills the Design Name
+            //   when the number resolves. New designs not yet in ShopWorks:
+            //   AE types any number, fills Design Name manually below.
+            + '      <div class="jds-field">'
+            + '        <label class="jds-field-label">ShopWorks Design # <span class="jds-required">*</span></label>'
+            + '        <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '        <span class="jds-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
+            + '        <span class="jds-error-msg" id="jds-design-num-sw-error">Design # is required</span>'
+            + '        <span class="jds-error-msg" id="jds-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            + '      </div>'
+
             //   Design name + Due date
             + '      <div class="jds-row">'
             + '        <div class="jds-field">'
             + '          <label class="jds-field-label">Design Name <span class="jds-required">*</span></label>'
-            + '          <input type="text" class="jds-input" id="jds-design-name" placeholder="e.g. Lincoln Lynx Logo Engrave">'
+            + '          <input type="text" class="jds-input" id="jds-design-name" placeholder="Auto-fills from Design # above, or type for a new design">'
             + '          <span class="jds-error-msg" id="jds-design-name-error">Design name is required</span>'
             + '        </div>'
             + '        <div class="jds-field">'
             + '          <label class="jds-field-label">Due Date</label>'
             + '          <input type="date" class="jds-input" id="jds-due-date">'
             + '        </div>'
-            + '      </div>'
-
-            //   ShopWorks Design # (optional) — auto-fills when AE picks
-            //   from the Design Name autocomplete; AE can also type directly.
-            //   Reverse lookup on blur populates the Design Name when found.
-            + '      <div class="jds-field">'
-            + '        <label class="jds-field-label">ShopWorks Design # <span class="jds-field-hint-inline">(optional)</span></label>'
-            + '        <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '        <span class="jds-field-hint">Auto-fills when you pick an existing design above. Type a number and tab out to look it up.</span>'
-            + '        <span class="jds-error-msg" id="jds-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
             + '      </div>'
 
             //   Decoration spec block
@@ -906,8 +908,15 @@ var JDSSubmitForm = (function () {
             });
         });
 
-        // Clear the warning as soon as the AE edits the number again.
-        numEl.addEventListener('input', clearWarn);
+        // Clear warning + required-error as soon as the AE edits the number.
+        numEl.addEventListener('input', function () {
+            clearWarn();
+            if (numEl.value.trim()) {
+                numEl.classList.remove('jds-error');
+                var requiredErr = document.getElementById('jds-design-num-sw-error');
+                if (requiredErr) requiredErr.style.display = 'none';
+            }
+        });
     }
 
     // ── Default Due Date to today + 2 business days (skip weekends) ─────────
@@ -1107,6 +1116,20 @@ var JDSSubmitForm = (function () {
             document.getElementById('jds-company').classList.remove('jds-error');
             document.getElementById('jds-company-error').style.display = 'none';
         }
+
+        // Design # is now required (was optional). Primary entry point —
+        // AE types it first, Design Name auto-fills via reverse lookup.
+        var designNumSw = (document.getElementById('jds-design-num-sw').value || '').trim();
+        var numErrEl = document.getElementById('jds-design-num-sw-error');
+        if (!designNumSw) {
+            document.getElementById('jds-design-num-sw').classList.add('jds-error');
+            if (numErrEl) numErrEl.style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('jds-design-num-sw').classList.remove('jds-error');
+            if (numErrEl) numErrEl.style.display = 'none';
+        }
+
         var designName = document.getElementById('jds-design-name').value.trim();
         if (!designName) {
             document.getElementById('jds-design-name').classList.add('jds-error');

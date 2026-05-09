@@ -120,27 +120,30 @@ var StickerBannerSubmitForm = (function () {
             + '      </div>'
             + '    </div>'
 
+            // ShopWorks Design # — REQUIRED, primary entry point. AE types
+            // the number first; reverse lookup auto-fills the Design Name
+            // when the number resolves in Design_Lookup_2026. For brand-new
+            // designs not yet in ShopWorks, the AE can type any number and
+            // fill Design Name manually below.
+            + '    <div class="sbf-field">'
+            + '      <label class="sbf-field-label">ShopWorks Design # <span class="sbf-required">*</span></label>'
+            + '      <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '      <span class="sbf-field-hint">Type the number and tab out — Design Name fills automatically if it exists. New design? Type a new number, then fill Design Name below.</span>'
+            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-error">Design # is required</span>'
+            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
+            + '    </div>'
+
             // Design name + Due date
             + '    <div class="sbf-row">'
             + '      <div class="sbf-field">'
             + '        <label class="sbf-field-label">Design Name <span class="sbf-required">*</span></label>'
-            + '        <input type="text" class="sbf-input" id="sbf-design-name" placeholder="e.g. Lincoln Lynx Logo Sticker">'
+            + '        <input type="text" class="sbf-input" id="sbf-design-name" placeholder="Auto-fills from Design # above, or type for a new design">'
             + '        <span class="sbf-error-msg" id="sbf-design-name-error">Design name is required</span>'
             + '      </div>'
             + '      <div class="sbf-field">'
             + '        <label class="sbf-field-label">Due Date</label>'
             + '        <input type="date" class="sbf-input" id="sbf-due-date">'
             + '      </div>'
-            + '    </div>'
-
-            // ShopWorks Design # (optional) — auto-fills when AE picks
-            // from the Design Name autocomplete; AE can also type directly.
-            // Reverse lookup on blur populates the Design Name when found.
-            + '    <div class="sbf-field">'
-            + '      <label class="sbf-field-label">ShopWorks Design # (optional)</label>'
-            + '      <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
-            + '      <span class="sbf-field-hint">Auto-fills when you pick an existing design above. Type a number and tab out to look it up.</span>'
-            + '      <span class="sbf-error-msg" id="sbf-design-num-sw-warning" style="color:#92400e;background:#fef3c7;border-color:#fcd34d;"></span>'
             + '    </div>'
 
             + (isSticker ? buildStickerSpecsHtml() : buildBannerSpecsHtml())
@@ -540,7 +543,14 @@ var StickerBannerSubmitForm = (function () {
             });
         });
 
-        numEl.addEventListener('input', clearWarn);
+        numEl.addEventListener('input', function () {
+            clearWarn();
+            if (numEl.value.trim()) {
+                numEl.classList.remove('sbf-error');
+                var requiredErr = document.getElementById('sbf-design-num-sw-error');
+                if (requiredErr) requiredErr.style.display = 'none';
+            }
+        });
     }
 
     // ── Work Order # autocomplete (browse-on-focus, MO-backed) ──────────────
@@ -642,6 +652,21 @@ var StickerBannerSubmitForm = (function () {
         } else {
             document.getElementById('sbf-company').classList.remove('sbf-error');
             document.getElementById('sbf-company-error').style.display = 'none';
+        }
+
+        // Design # is now required (was optional). It's the primary entry
+        // point — AE types it first, Design Name auto-fills via reverse
+        // lookup on blur. Forces every submission to carry a ShopWorks
+        // design number so Steve can wire it to the right design record.
+        var designNumSw = (document.getElementById('sbf-design-num-sw').value || '').trim();
+        var numErrEl = document.getElementById('sbf-design-num-sw-error');
+        if (!designNumSw) {
+            document.getElementById('sbf-design-num-sw').classList.add('sbf-error');
+            if (numErrEl) numErrEl.style.display = 'block';
+            valid = false;
+        } else {
+            document.getElementById('sbf-design-num-sw').classList.remove('sbf-error');
+            if (numErrEl) numErrEl.style.display = 'none';
         }
 
         var designName = document.getElementById('sbf-design-name').value.trim();
