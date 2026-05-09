@@ -595,6 +595,8 @@
                             company_name: mockup.Company_Name || 'Unknown',
                             note_text: 'Ruth has started working on your mockup request for ' + (mockup.Company_Name || 'Unknown'),
                             note_type: 'In Progress',
+                            header_emoji: '⏳',
+                            header_title: 'In Progress',
                             detail_link: 'https://www.teamnwca.com/mockup/' + mockupId + '?view=ae',
                             from_name: 'Ruth (Digitizing)'
                         }).catch(function () {});

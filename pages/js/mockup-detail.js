@@ -4273,13 +4273,16 @@
                         toName = getAeDisplayName(toEmail);
                     }
                     emailjs.init('4qSbDO-SQs19TbP80');
+                    var humanNoteType = noteType.replace(/_/g, ' ');
                     emailjs.send('service_jgrave3', 'template_art_note_added', {
                         to_email: toEmail,
                         to_name: toName,
                         design_id: designId,
                         company_name: company,
                         note_text: text,
-                        note_type: noteType.replace(/_/g, ' '),
+                        note_type: humanNoteType,
+                        header_emoji: '📝',
+                        header_title: humanNoteType,
                         detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + (isAeView ? '' : '?view=ae'),
                         from_name: authorName
                     }).catch(function () { /* fire-and-forget */ });
@@ -5191,6 +5194,8 @@
                 company_name: currentMockup.Company_Name || 'Unknown',
                 note_text: params.note_text,
                 note_type: params.note_type,
+                header_emoji: params.header_emoji || '📝',
+                header_title: params.header_title || params.note_type,
                 detail_link: params.detail_link,
                 from_name: params.from_name || 'Mockup System'
             }).then(function () {

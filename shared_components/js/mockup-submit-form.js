@@ -1088,6 +1088,8 @@ var MockupSubmitForm = (function () {
                             company_name: companyName,
                             note_text: 'New ' + currentRequestType + ' submitted for ' + companyName,
                             note_type: 'New Submission',
+                            header_emoji: '🎨',
+                            header_title: 'New ' + currentRequestType + ' Request',
                             detail_link: SITE_ORIGIN + '/mockup/' + (newId || ''),
                             from_name: getSubmitterName()
                         }).catch(function () {});
@@ -1103,6 +1105,8 @@ var MockupSubmitForm = (function () {
                                 company_name: companyName,
                                 note_text: 'Your ' + currentRequestType + ' request for ' + companyName + ' has been submitted to Ruth.',
                                 note_type: 'Submission Confirmation',
+                                header_emoji: '✅',
+                                header_title: 'Request Submitted',
                                 detail_link: SITE_ORIGIN + '/mockup/' + (newId || '') + '?view=ae',
                                 from_name: 'NWCA Art Department'
                             }).catch(function () {});

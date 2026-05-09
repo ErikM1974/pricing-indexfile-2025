@@ -1005,6 +1005,8 @@ var StickerBannerSubmitForm = (function () {
             var detailLink = SITE_ORIGIN + '/mockup/' + (designId || '');
             var subjectFragment = currentItemType + ' Art Request';
             // Notify Steve
+            // Sticker → 🏷️, Banner → 🎌 (matches dashboard badge convention)
+            var typeEmoji = (currentItemType === 'Sticker') ? '🏷️' : '🎌';
             emailjs.send('service_jgrave3', 'template_art_note_added', {
                 to_email: STEVE_EMAIL,
                 to_name: 'Steve',
@@ -1012,6 +1014,8 @@ var StickerBannerSubmitForm = (function () {
                 company_name: companyName,
                 note_text: 'New ' + subjectFragment + ' from ' + aeName + ' for ' + companyName + ' — "' + designName + '"',
                 note_type: 'New ' + currentItemType + ' Submission',
+                header_emoji: typeEmoji,
+                header_title: 'New ' + currentItemType + ' Art Request',
                 detail_link: detailLink,
                 from_name: aeName
             }).catch(function () {});
@@ -1025,6 +1029,8 @@ var StickerBannerSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'Your ' + subjectFragment + ' for ' + companyName + ' (\"' + designName + '\") was submitted to Steve.',
                     note_type: 'Submission Confirmation',
+                    header_emoji: '✅',
+                    header_title: 'Request Submitted',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});
@@ -1044,6 +1050,8 @@ var StickerBannerSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'A ' + subjectFragment.toLowerCase() + ' for ' + companyName + ' (\"' + designName + '\") was submitted to Steve on your behalf by ' + aeName + '.',
                     note_type: 'Submission FYI (Sales Rep)',
+                    header_emoji: '📨',
+                    header_title: 'Art Request — FYI',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});

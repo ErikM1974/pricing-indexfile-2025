@@ -200,6 +200,8 @@
                         company_name: companyName,
                         note_text: 'Design #' + designId + ' has been reopened — Steve is making additional changes.',
                         note_type: 'Status Update',
+                        header_emoji: '🔄',
+                        header_title: 'Status Update',
                         detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                         from_name: 'Steve — Art Department'
                     }).catch(function (err) { console.warn('Reopen email failed:', err); });

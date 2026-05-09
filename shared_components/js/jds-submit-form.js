@@ -1435,6 +1435,8 @@ var JDSSubmitForm = (function () {
                 company_name: companyName,
                 note_text: 'New JDS Art Request' + skuFragment + ' from ' + aeName + ' for ' + companyName + ' — "' + designName + '"',
                 note_type: 'New JDS Submission',
+                header_emoji: '🎯',
+                header_title: 'New JDS Art Request',
                 detail_link: detailLink,
                 from_name: aeName
             }).catch(function () {});
@@ -1448,6 +1450,8 @@ var JDSSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'Your JDS art request' + skuFragment + ' for ' + companyName + ' ("' + designName + '") was submitted to Steve.',
                     note_type: 'Submission Confirmation',
+                    header_emoji: '✅',
+                    header_title: 'Request Submitted',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});
@@ -1467,6 +1471,8 @@ var JDSSubmitForm = (function () {
                     company_name: companyName,
                     note_text: 'A JDS art request' + skuFragment + ' for ' + companyName + ' ("' + designName + '") was submitted to Steve on your behalf by ' + aeName + '.',
                     note_type: 'Submission FYI (Sales Rep)',
+                    header_emoji: '📨',
+                    header_title: 'Art Request — FYI',
                     detail_link: detailLink + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () {});

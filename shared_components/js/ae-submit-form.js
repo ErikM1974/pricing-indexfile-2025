@@ -253,6 +253,8 @@
                 company_name: companyName || 'Unknown',
                 note_text: 'New art request submitted for ' + (companyName || 'Unknown') + ' (Design #' + designId + ')',
                 note_type: 'New Submission',
+                header_emoji: '👕',
+                header_title: 'New Garment Art Request',
                 detail_link: SITE_ORIGIN + '/art-request/' + designId,
                 from_name: 'AE Dashboard'
             }).catch(function () { /* fire-and-forget */ });
@@ -272,6 +274,8 @@
                     company_name: companyName || 'Unknown',
                     note_text: 'Your art request for ' + (companyName || 'Unknown') + ' (Design #' + designId + ') has been submitted to Steve.',
                     note_type: 'Submission Confirmation',
+                    header_emoji: '✅',
+                    header_title: 'Request Submitted',
                     detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                     from_name: 'NWCA Art Department'
                 }).catch(function () { /* fire-and-forget */ });

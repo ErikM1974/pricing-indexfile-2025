@@ -886,6 +886,8 @@
                             company_name: company,
                             note_text: aeUser.firstName + ' reopened art request for ' + company + ' #' + designId + '. Additional changes are needed.',
                             note_type: 'Reopened',
+                            header_emoji: '🔓',
+                            header_title: 'Reopened',
                             detail_link: SITE_ORIGIN + '/art-request/' + designId,
                             from_name: aeUser.noteBy
                         }, EMAILJS_PUBLIC_KEY).catch(function (err) { console.warn('Reopen email to Steve failed:', err); });
@@ -897,6 +899,8 @@
                             company_name: company,
                             note_text: 'You reopened ' + company + ' #' + designId + '. Steve has been notified.',
                             note_type: 'Reopen Confirmation',
+                            header_emoji: '✅',
+                            header_title: 'Reopen Confirmation',
                             detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                             from_name: 'NWCA Art System'
                         }, EMAILJS_PUBLIC_KEY).catch(function (err) { console.warn('Reopen AE confirmation email failed:', err); });
@@ -1195,6 +1199,8 @@
                     company_name: company,
                     note_text: 'AE updated request details for ' + company + ' #' + designId + '. Please review the changes.',
                     note_type: 'AE Edit',
+                    header_emoji: '✏️',
+                    header_title: 'AE Edit',
                     detail_link: SITE_ORIGIN + '/art-request/' + designId,
                     from_name: aeUser.noteBy || 'AE'
                 }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -1208,6 +1214,8 @@
                     company_name: company,
                     note_text: 'Your edits to ' + company + ' #' + designId + ' have been saved and Steve has been notified.',
                     note_type: 'AE Edit Confirmation',
+                    header_emoji: '✅',
+                    header_title: 'AE Edit Confirmation',
                     detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                     from_name: 'NWCA Art System'
                 }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -1569,6 +1577,8 @@
                         company_name: company,
                         note_text: 'Final approved mockup has been set for ' + company + ' #' + designId + '. Ready for production.',
                         note_type: 'Production Ready',
+                        header_emoji: '🏭',
+                        header_title: 'Production Ready',
                         detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                         from_name: 'Steve'
                     }, EMAILJS_PUBLIC_KEY).catch(function () {});
@@ -2460,6 +2470,8 @@
                             company_name: boxCompany,
                             note_text: (boxAeUser.noteBy || 'AE') + ' uploaded an additional art file for ' + boxCompany + ' #' + designId + '. Please review.',
                             note_type: 'Additional Art File Uploaded',
+                            header_emoji: '📎',
+                            header_title: 'Additional Art File',
                             detail_link: SITE_ORIGIN + '/art-request/' + designId,
                             from_name: boxAeUser.noteBy || 'AE'
                         }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -2586,6 +2598,8 @@
                     company_name: company,
                     note_text: (aeUser.noteBy || 'AE') + ' uploaded an additional art file for ' + company + ' #' + designId + '. Please review.',
                     note_type: 'Additional Art File Uploaded',
+                    header_emoji: '📎',
+                    header_title: 'Additional Art File',
                     detail_link: SITE_ORIGIN + '/art-request/' + designId,
                     from_name: aeUser.noteBy || 'AE'
                 }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -3800,6 +3814,7 @@
             ? 'Customer approved mockup for ' + company + ' (Design #' + designId + ')'
             : 'Customer requested changes for ' + company + ' (Design #' + designId + ')';
         var noteType = type === 'approved' ? 'Customer Approval' : 'Customer Revision Request';
+        var headerEmoji = type === 'approved' ? '✅' : '🔁';
 
         // Notify Steve
         emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
@@ -3809,6 +3824,8 @@
             company_name: company,
             note_text: noteText,
             note_type: noteType,
+            header_emoji: headerEmoji,
+            header_title: noteType,
             detail_link: SITE_ORIGIN + '/art-request/' + designId,
             from_name: 'Customer'
         }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -3827,6 +3844,8 @@
                 company_name: company,
                 note_text: noteText,
                 note_type: noteType,
+                header_emoji: headerEmoji,
+                header_title: noteType,
                 detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                 from_name: 'Customer'
             }, EMAILJS_PUBLIC_KEY).catch(function (err) {
@@ -4172,6 +4191,8 @@
                     company_name: currentRequest ? currentRequest.CompanyName : 'Unknown',
                     note_text: 'Your revision request was sent to Steve for ' + (currentRequest ? currentRequest.CompanyName : '') + ' #' + designId,
                     note_type: 'Revision Confirmation',
+                    header_emoji: '✅',
+                    header_title: 'Revision Request Sent',
                     detail_link: window.location.origin + '/art-request/' + designId + '?view=ae',
                     from_name: 'Steve — Art Department'
                 }, EMAILJS_PUBLIC_KEY)
@@ -4407,6 +4428,8 @@
                             design_id: designId,
                             company_name: currentRequest.CompanyName || '',
                             note_type: noteType,
+                            header_emoji: '📝',
+                            header_title: noteType,
                             note_text: noteText,
                             detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
                             from_name: 'Steve (Art Dept)'

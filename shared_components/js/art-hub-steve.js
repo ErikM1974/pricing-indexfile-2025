@@ -353,6 +353,8 @@
             design_id: designId,
             company_name: companyName,
             note_type: noteType,
+            header_emoji: '📝',
+            header_title: noteType,
             note_text: noteText,
             from_name: 'Art Department',
             detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae'
