@@ -132,6 +132,14 @@ var StickerBannerSubmitForm = (function () {
             + '      </div>'
             + '    </div>'
 
+            // ShopWorks Design # (optional) — auto-fills when AE picks
+            // from the Design Name autocomplete; AE can also type directly.
+            + '    <div class="sbf-field">'
+            + '      <label class="sbf-field-label">ShopWorks Design # (optional)</label>'
+            + '      <input type="text" class="sbf-input" id="sbf-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '      <span class="sbf-field-hint">Auto-fills when you pick an existing design above. Type to override.</span>'
+            + '    </div>'
+
             + (isSticker ? buildStickerSpecsHtml() : buildBannerSpecsHtml())
 
             // Quantity + Work Order
@@ -449,6 +457,12 @@ var StickerBannerSubmitForm = (function () {
             },
             onSelect: function (design) {
                 selectedDesign = design;
+                // Auto-fill the Design # field with the picked design's
+                // ShopWorks number. AE can edit it after if they want.
+                var numEl = document.getElementById('sbf-design-num-sw');
+                if (numEl && design.designNumber) {
+                    numEl.value = String(design.designNumber);
+                }
                 document.getElementById('sbf-design-name').classList.remove('sbf-error');
                 var errEl = document.getElementById('sbf-design-name-error');
                 if (errEl) errEl.style.display = 'none';
@@ -488,6 +502,7 @@ var StickerBannerSubmitForm = (function () {
             },
             onSelect: function (order) {
                 var nameEl = document.getElementById('sbf-design-name');
+                var numEl = document.getElementById('sbf-design-num-sw');
                 if (nameEl && !nameEl.value.trim() && order.DesignName) {
                     nameEl.value = order.DesignName;
                     if (order.id_Design) {
@@ -501,6 +516,9 @@ var StickerBannerSubmitForm = (function () {
                     nameEl.classList.remove('sbf-error');
                     var errEl = document.getElementById('sbf-design-name-error');
                     if (errEl) errEl.style.display = 'none';
+                }
+                if (numEl && !numEl.value.trim() && order.id_Design) {
+                    numEl.value = String(order.id_Design);
                 }
             }
         });
@@ -739,10 +757,10 @@ var StickerBannerSubmitForm = (function () {
                 }
 
                 // Order_Type maps to Caspio's Order_Type multi-select dropdown.
-                // 'Roland Stickers' already exists in the dropdown (use as-is).
-                // 'Banner' is gated on Erik adding it as an option in Caspio
-                // admin — until then Caspio will store the value but won't
-                // display it in the Datasheet. Submission still succeeds.
+                // Caspio's multi-select List columns require an ARRAY of
+                // label strings — plain strings are rejected with
+                // InvalidInputValue (500). 'Roland Stickers' already
+                // exists in the dropdown; 'Banner' was added 2026-05-09.
                 var orderTypeForItem = (currentItemType === 'Sticker')
                     ? 'Roland Stickers'
                     : 'Banner';
@@ -751,7 +769,7 @@ var StickerBannerSubmitForm = (function () {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: currentItemType,
-                    Order_Type: orderTypeForItem,
+                    Order_Type: [orderTypeForItem],
                     Item_Specs_Notes: specsNotes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,
@@ -776,13 +794,12 @@ var StickerBannerSubmitForm = (function () {
                 }
                 if (workOrder) payload.Order_Num_SW = workOrder;
 
-                // If the AE picked an existing design from the autocomplete
-                // (and the input still matches that design name), carry the
-                // ShopWorks design number through to the new ArtRequest.
-                if (selectedDesign && selectedDesign.designNumber
-                    && designName === (selectedDesign.designName || '').trim()) {
-                    payload.Design_Num_SW = String(selectedDesign.designNumber);
-                }
+                // Design_Num_SW: read from the visible input. Auto-filled
+                // on autocomplete pick; AE can also free-type. Trim and
+                // only send when non-empty.
+                var designNumSw = (document.getElementById('sbf-design-num-sw') || {}).value;
+                designNumSw = (designNumSw || '').trim();
+                if (designNumSw) payload.Design_Num_SW = designNumSw;
 
                 // Attach uploaded file paths to File_Upload_One..Four. Caspio formula
                 // fields (CDN_Link, CDN_Link_Two, ...) auto-derive from these paths.

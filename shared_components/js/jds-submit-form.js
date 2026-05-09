@@ -680,6 +680,14 @@ var JDSSubmitForm = (function () {
             + '        </div>'
             + '      </div>'
 
+            //   ShopWorks Design # (optional) — auto-fills when AE picks
+            //   from the Design Name autocomplete; AE can also type directly.
+            + '      <div class="jds-field">'
+            + '        <label class="jds-field-label">ShopWorks Design # <span class="jds-field-hint-inline">(optional)</span></label>'
+            + '        <input type="text" class="jds-input" id="jds-design-num-sw" placeholder="e.g. 40445" autocomplete="off">'
+            + '        <span class="jds-field-hint">Auto-fills when you pick an existing design above. Type to override.</span>'
+            + '      </div>'
+
             //   Decoration spec block
             + '      <div class="jds-section-header">Decoration Spec</div>'
             + '      <div class="jds-row">'
@@ -783,10 +791,9 @@ var JDSSubmitForm = (function () {
             onSelect: function (order) {
                 // Smart-fill design fields only when empty.
                 var nameEl = document.getElementById('jds-design-name');
+                var numEl = document.getElementById('jds-design-num-sw');
                 if (nameEl && !nameEl.value.trim() && order.DesignName) {
                     nameEl.value = order.DesignName;
-                    // Mirror what DesignNamePicker.onSelect does — cache the
-                    // design so the submit handler injects Design_Num_SW.
                     if (order.id_Design) {
                         selectedDesign = {
                             designNumber: order.id_Design,
@@ -798,6 +805,9 @@ var JDSSubmitForm = (function () {
                     nameEl.classList.remove('jds-error');
                     var errEl = document.getElementById('jds-design-name-error');
                     if (errEl) errEl.style.display = 'none';
+                }
+                if (numEl && !numEl.value.trim() && order.id_Design) {
+                    numEl.value = String(order.id_Design);
                 }
             }
         });
@@ -817,6 +827,12 @@ var JDSSubmitForm = (function () {
             },
             onSelect: function (design) {
                 selectedDesign = design;
+                // Auto-fill the Design # field with the picked design's
+                // ShopWorks number. AE can edit it after if they want.
+                var numEl = document.getElementById('jds-design-num-sw');
+                if (numEl && design.designNumber) {
+                    numEl.value = String(design.designNumber);
+                }
                 // Clear the validation error if the AE had been flagged
                 document.getElementById('jds-design-name').classList.remove('jds-error');
                 var errEl = document.getElementById('jds-design-name-error');
@@ -1170,7 +1186,10 @@ var JDSSubmitForm = (function () {
                     Status: 'Submitted',
                     Item_Type: 'JDS',
                     JDS_SKU: selectedRow.SKU,
-                    Order_Type: decoration || 'JDS',
+                    // Order_Type is a Caspio multi-select List column —
+                    // requires an array of label strings, not a plain
+                    // string (which 500s with InvalidInputValue).
+                    Order_Type: [decoration || 'JDS'],
                     // Dedicated JDS spec columns added to Caspio 2026-05-08.
                     // The detail page renders these as labeled rows in the
                     // JDS Product Specs card (build JDS spec rows helper).
@@ -1203,14 +1222,14 @@ var JDSSubmitForm = (function () {
                 }
                 if (workOrder) payload.Order_Num_SW = workOrder;
 
-                // If the AE picked a design from the autocomplete (and the
-                // input still matches that design name), carry the existing
-                // ShopWorks design number through to the new ArtRequest.
-                // Solves part of Taneisha's "design # is missing" report.
-                if (selectedDesign && selectedDesign.designNumber
-                    && designName === (selectedDesign.designName || '').trim()) {
-                    payload.Design_Num_SW = String(selectedDesign.designNumber);
-                }
+                // Design_Num_SW: read directly from the visible input. The
+                // input is auto-filled when the AE picks from the Design Name
+                // autocomplete or the Work Order autocomplete, but the AE
+                // can also type a value manually for designs not surfaced by
+                // the lookup. Trim whitespace; only send if non-empty.
+                var designNumSw = (document.getElementById('jds-design-num-sw') || {}).value;
+                designNumSw = (designNumSw || '').trim();
+                if (designNumSw) payload.Design_Num_SW = designNumSw;
 
                 var slots = ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'];
                 uploaded.forEach(function (u, i) {
