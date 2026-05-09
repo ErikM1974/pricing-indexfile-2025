@@ -836,20 +836,21 @@ var StickerBannerSubmitForm = (function () {
                     specsNotes = 'Design Name: ' + designName + '\n\n' + specsNotes;
                 }
 
-                // Order_Type intentionally OMITTED — Caspio's multi-select
-                // List column rejects every REST write format we've tried
-                // (plain string, array, etc.) with InvalidInputValue. The
-                // legacy Garment DataPage writes successfully through a
-                // Caspio internal mechanism not exposed via REST. Steve
-                // picks Order_Type ('Roland Stickers' / 'Banner') manually
-                // in the Caspio Datasheet for new submissions. Item_Type
-                // ('Sticker' / 'Banner') already differentiates these from
-                // garment requests.
+                // Order_Type (List-String multi-select) is REST-unwriteable
+                // — Caspio rejects every format we've tried. Workaround:
+                // write to Order_Type_Source (plain Text 255) instead.
+                // Dashboards coalesce both columns: Garment DataPage writes
+                // Order_Type, new REST forms write Order_Type_Source, never
+                // both for the same record. See MEMORY.md "Critical Patterns".
+                var orderTypeSource = (currentItemType === 'Sticker')
+                    ? 'Roland Stickers'
+                    : 'Banner';
 
                 var payload = {
                     CompanyName: companyName,
                     Status: 'Submitted',
                     Item_Type: currentItemType,
+                    Order_Type_Source: orderTypeSource,
                     Item_Specs_Notes: specsNotes,
                     NOTES: instructions || '',
                     Due_Date: dueDate,

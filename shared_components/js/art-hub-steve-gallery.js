@@ -94,9 +94,16 @@
     }
 
     function getOrderType(req) {
-        if (!req.Order_Type) return '';
-        var ot = typeof req.Order_Type === 'object' ? Object.values(req.Order_Type)[0] : req.Order_Type;
-        return String(ot || '');
+        // Coalesce Order_Type (legacy Garment DataPage multi-select dict) with
+        // Order_Type_Source (new REST forms — plain Text 255). Each record has
+        // exactly one populated; never both. The multi-select REST limitation
+        // forced the parallel column. See MEMORY.md "Critical Patterns".
+        if (req.Order_Type) {
+            var ot = typeof req.Order_Type === 'object' ? Object.values(req.Order_Type)[0] : req.Order_Type;
+            return String(ot || '');
+        }
+        if (req.Order_Type_Source) return String(req.Order_Type_Source);
+        return '';
     }
 
     // Resolve a sales rep email/identifier to a first name for the card header.
@@ -177,12 +184,17 @@
         // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
         // empty and User_Email holds the AE email — without User_Email in the
         // SELECT the rep first name in the card header has nothing to resolve.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         // 2-level fallback for legacy ArtRequests installs that don't have
-        // Item_Type or JDS_SKU yet — strip them and retry. NULL Item_Type =
-        // treated as 'Garment' at render time (see resolveItemType()).
-        var selectLegacy = selectFallback.replace(',Item_Type', '').replace(',JDS_SKU', '');
+        // Item_Type, JDS_SKU, or Order_Type_Source yet — strip them and retry.
+        // NULL Item_Type = treated as 'Garment' at render time (see
+        // resolveItemType()). NULL Order_Type_Source = coalesce falls back to
+        // Order_Type which will exist on every install.
+        var selectLegacy = selectFallback
+            .replace(',Item_Type', '')
+            .replace(',JDS_SKU', '')
+            .replace(',Order_Type_Source', '');
         var dateClause = archiveActive ? '' : '&dateCreatedFrom=' + DATE_CUTOFF;
         var baseUrl = API_BASE + '/api/artrequests?orderBy=Date_Created DESC&limit=200' + dateClause;
 

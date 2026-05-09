@@ -249,9 +249,19 @@
         const repResolved = resolveRepName(repEmail);
         setText('ard-sales-rep', repResolved);
         // Order_Type can be an object like {'6':'Transfer'} from Caspio
-        const orderType = req.Order_Type && typeof req.Order_Type === 'object'
-            ? Object.values(req.Order_Type).join(', ')
-            : req.Order_Type;
+        // Order_Type comes from the legacy Garment DataPage as a multi-select
+        // dict ({'9':'Roland Stickers'}). Order_Type_Source comes from the new
+        // REST forms (JDS/Sticker/Banner) as a plain string. Each record has
+        // exactly one populated; never both. Coalesce for display.
+        // See MEMORY.md "Critical Patterns" (Caspio multi-select writes).
+        let orderType;
+        if (req.Order_Type) {
+            orderType = typeof req.Order_Type === 'object'
+                ? Object.values(req.Order_Type).join(', ')
+                : req.Order_Type;
+        } else if (req.Order_Type_Source) {
+            orderType = req.Order_Type_Source;
+        }
         setText('ard-order-type', orderType);
 
         // Item-type rendering (Sticker/Banner 2026-05-06, JDS 2026-05-08).
@@ -4453,9 +4463,17 @@
         const rows = [];
         if (req.JDS_SKU) rows.push({ label: 'SKU', value: req.JDS_SKU });
         if (req.JDS_Design_Name) rows.push({ label: 'Design Name', value: req.JDS_Design_Name });
-        const decoration = (req.Order_Type && typeof req.Order_Type === 'object')
-            ? Object.values(req.Order_Type).join(', ')
-            : req.Order_Type;
+        // Decoration: Order_Type is the legacy multi-select; new JDS records
+        // write Order_Type_Source instead (REST can't write multi-selects).
+        // Coalesce both. See MEMORY.md "Critical Patterns".
+        let decoration;
+        if (req.Order_Type) {
+            decoration = (typeof req.Order_Type === 'object')
+                ? Object.values(req.Order_Type).join(', ')
+                : req.Order_Type;
+        } else if (req.Order_Type_Source) {
+            decoration = req.Order_Type_Source;
+        }
         if (decoration) rows.push({ label: 'Decoration', value: decoration });
         if (req.JDS_Color) rows.push({ label: 'Color', value: req.JDS_Color });
         if (req.JDS_Placement) rows.push({ label: 'Imprint Area', value: req.JDS_Placement });

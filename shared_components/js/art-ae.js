@@ -17,11 +17,14 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
     // Legacy fallback for installs that don't have Item_Type / JDS_SKU yet —
     // strip them and retry. NULL Item_Type → 'Garment' at render time
     // (resolveItemType).
-    var SELECT_FIELDS_LEGACY = SELECT_FIELDS.replace(',Item_Type', '').replace(',JDS_SKU', '');
+    var SELECT_FIELDS_LEGACY = SELECT_FIELDS
+        .replace(',Item_Type', '')
+        .replace(',JDS_SKU', '')
+        .replace(',Order_Type_Source', '');
 
     function resolveItemType(raw) {
         if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
@@ -361,7 +364,7 @@ var ArtAeGallery = (function () {
         var onHoldPillHtml = isOnHold
             ? '<span class="status-pill status-pill--on-hold" title="' + escapeHtml(req.On_Hold_Note || 'On hold — customer paused this design') + '">On Hold</span> '
             : '';
-        var orderType = parseOrderType(req.Order_Type);
+        var orderType = getOrderType(req);
         var dueDate = req.Due_Date;
         var createdDate = formatDate(req.Date_Created);
         var contact = escapeHtml(req.Full_Name_Contact || '');
@@ -498,6 +501,18 @@ var ArtAeGallery = (function () {
         return String(val);
     }
 
+    /**
+     * Coalesce Order_Type (legacy Garment DataPage multi-select) with
+     * Order_Type_Source (new REST forms — plain Text 255). Each record has
+     * exactly one populated; never both. The multi-select REST limitation
+     * forced the parallel column. See MEMORY.md "Critical Patterns".
+     */
+    function getOrderType(req) {
+        var fromMulti = parseOrderType(req && req.Order_Type);
+        if (fromMulti) return fromMulti;
+        return (req && req.Order_Type_Source) ? String(req.Order_Type_Source) : '';
+    }
+
     function extractRepFromEmail(email) {
         if (!email) return '';
         var name = email.split('@')[0];
@@ -587,11 +602,7 @@ var ArtAeGallery = (function () {
         var revCount = req.Revision_Count || 0;
         var due = getDueBadge(req.Due_Date);
 
-        var orderType = '';
-        if (req.Order_Type) {
-            var ot = typeof req.Order_Type === 'object' ? Object.values(req.Order_Type)[0] : req.Order_Type;
-            orderType = String(ot || '');
-        }
+        var orderType = getOrderType(req);
 
         var badges = '';
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
