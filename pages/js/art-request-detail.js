@@ -57,6 +57,64 @@
         return emailOrName;
     }
 
+    /**
+     * Email the sales rep when their design is put on hold or resumed.
+     * Slack already fires from the backend (slack-art-status-notify ⏸️) — this
+     * fills the parity gap so the rep gets it in their inbox too. Reason text is
+     * inlined so the rep can act without opening the page first.
+     *
+     * Fires ONLY on the actual checkbox flip (false→true or true→false). Reason-
+     * only edits (typing in the textarea while already on hold) don't email — those
+     * are minor refinements and would be chatty.
+     */
+    function notifyOnHoldChange(designId, req, isOn, reasonText, actorName) {
+        if (typeof emailjs === 'undefined') return;
+
+        var salesRep = (req && (req.Sales_Rep || req.User_Email)) || '';
+        if (!salesRep) return;
+
+        var repName = resolveRepName(salesRep);
+        var repEmail = REP_MAP[repName] || salesRep;
+        if (!repEmail || repEmail.indexOf('@') === -1) return;
+
+        var companyName = (req && req.CompanyName) || '';
+        var actor = actorName || 'Art team';
+        var trimmedReason = (reasonText || '').trim();
+
+        var noteText, noteType, headerEmoji, headerTitle;
+        if (isOn) {
+            noteText = actor + ' put design #' + designId + ' for ' + companyName + ' on hold'
+                + (trimmedReason ? ' — Reason: ' + trimmedReason : '.');
+            noteType = 'On Hold';
+            headerEmoji = '⏸️'; // ⏸️
+            headerTitle = 'Design on Hold';
+        } else {
+            noteText = actor + ' resumed design #' + designId + ' for ' + companyName
+                + ' — work is back in progress.';
+            noteType = 'Resumed';
+            headerEmoji = '▶️'; // ▶️
+            headerTitle = 'Design Resumed';
+        }
+
+        try {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+            emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
+                to_email: repEmail,
+                to_name: repName,
+                design_id: designId,
+                company_name: companyName,
+                note_text: noteText,
+                note_type: noteType,
+                header_emoji: headerEmoji,
+                header_title: headerTitle,
+                detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
+                from_name: actor
+            }).catch(function (err) { console.warn('On-hold email failed (non-blocking):', err); });
+        } catch (e) {
+            console.warn('On-hold notify failed (non-blocking):', e);
+        }
+    }
+
     // Image extensions that browsers can render natively
     const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'tiff', 'tif'];
 
@@ -588,8 +646,11 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        Is_Rush: !!turnOn,
-                        Rush_Requested_At: turnOn ? new Date().toISOString() : null
+                        Is_Rush: !!turnOn
+                        // Rush_Requested_At intentionally omitted — Caspio Timestamp field,
+                        // auto-populated server-side and read-only via REST. Sending it
+                        // returns AlterReadOnlyData 500. See MEMORY.md "Rush Flag" rule
+                        // and mockup-submit-form.js:1023 for the matching pattern.
                     })
                 });
                 if (!resp.ok) throw new Error('API ' + resp.status);
@@ -730,6 +791,11 @@
                     applyOnHoldVisuals(req);          // remove title-row pill
                 }
                 flashSaved(savedEl, isOn ? '✓ On hold' : '✓ Resumed');
+
+                // Email the sales rep on the flip — Slack already fires from the
+                // backend (slack-art-status-notify ⏸️). Reason text comes from
+                // the textarea since the user typed it before flipping the toggle.
+                notifyOnHoldChange(designId, req, isOn, reasonField.value, getLoggedInUser().name);
             } catch (err) {
                 console.error('On Hold toggle failed:', err);
                 // Revert UI

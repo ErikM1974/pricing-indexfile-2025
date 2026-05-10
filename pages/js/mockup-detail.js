@@ -978,8 +978,11 @@
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    Is_Rush: !!turnOn,
-                    Rush_Requested_At: turnOn ? new Date().toISOString() : null
+                    Is_Rush: !!turnOn
+                    // Rush_Requested_At intentionally omitted — Caspio Timestamp field,
+                    // auto-populated server-side and read-only via REST (returns
+                    // AlterReadOnlyData 500). Backend mockup-routes.js strips it via
+                    // READ_ONLY_FIELDS, but we omit it here too as the primary defense.
                 })
             })
             .then(function (resp) {

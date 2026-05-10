@@ -309,10 +309,69 @@
 }
 
 .sbf-file-drop-icon {
-    font-size: 28px;
-    margin-bottom: 6px;
+    width: 44px;
+    height: 38px;
+    margin: 0 auto 8px;
+    display: block;
+    color: #9ca3af;
 }
 
+.sbf-file-drop-cta {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.sbf-file-drop-sub {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.sbf-file-drop-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.sbf-file-drop-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #d1d5db;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.sbf-file-drop-dot--filled {
+    background: #10b981;
+    border-color: #10b981;
+    transform: scale(1.1);
+}
+
+.sbf-file-drop-types {
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* Capacity-reached visual: dim + neutralize hover so it reads as "no more room". */
+.sbf-file-drop--full {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f3f4f6;
+}
+.sbf-file-drop--full:hover,
+.sbf-file-drop--full.sbf-file-drop--active {
+    border-color: #d1d5db;
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Legacy hint class kept for backwards compat — superseded by .sbf-file-drop-sub. */
 .sbf-file-drop-hint {
     font-size: 12px;
     color: #9ca3af;

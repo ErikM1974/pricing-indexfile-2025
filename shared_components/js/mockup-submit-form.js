@@ -280,14 +280,28 @@ var MockupSubmitForm = (function () {
             + '      <textarea class="msf-textarea" id="msf-instructions" placeholder="Special instructions for Ruth..."></textarea>'
             + '    </div>'
 
-            // File Upload (multi-file)
+            // File Upload — multi-file dropzone with 5-layer affordance:
+            // (1) stacked-papers SVG icon, (2) bold plural CTA,
+            // (3) promoted up-front capacity subtext, (4) slot-dot indicator,
+            // (5) dynamic CTA text via updateFileDropState().
             + '    <div class="msf-field">'
             + '      <label class="msf-field-label">Reference Files</label>'
             + '      <div class="msf-file-drop" id="msf-file-drop">'
-            + '        <div class="msf-file-drop-icon">&#128206;</div>'
-            + '        <div>Click to upload or drag &amp; drop</div>'
-            + '        <div style="font-size:12px;color:#aaa;margin-top:4px;">.DST, .EMB, .AI, .EPS, .PDF, images — max 4 files, 20MB each</div>'
+            + '        <svg class="msf-file-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
+            + '          <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>'
+            + '          <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>'
+            + '          <rect x="14" y="2" width="20" height="24" rx="2" fill="#ffffff"></rect>'
+            + '        </svg>'
+            + '        <div class="msf-file-drop-cta" id="msf-file-drop-cta">Drop files here</div>'
+            + '        <div class="msf-file-drop-sub" id="msf-file-drop-sub">or click to browse — up to 4 files</div>'
+            + '        <div class="msf-file-drop-dots" id="msf-file-drop-dots">'
+            + '          <span class="msf-file-drop-dot"></span>'
+            + '          <span class="msf-file-drop-dot"></span>'
+            + '          <span class="msf-file-drop-dot"></span>'
+            + '          <span class="msf-file-drop-dot"></span>'
+            + '        </div>'
             + '      </div>'
+            + '      <div class="msf-file-drop-types">.DST, .EMB, .AI, .EPS, .PDF, images · 20MB each</div>'
             + '      <input type="file" id="msf-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg" multiple>'
             + '      <div id="msf-file-preview-area"></div>'
             + '    </div>'
@@ -818,6 +832,7 @@ var MockupSubmitForm = (function () {
             referenceFiles.push(file);
         }
         renderFileList();
+        updateFileDropState();
         // Reset file input so same file can be re-selected
         document.getElementById('msf-file-input').value = '';
     }
@@ -825,6 +840,40 @@ var MockupSubmitForm = (function () {
     function removeFile(index) {
         referenceFiles.splice(index, 1);
         renderFileList();
+        updateFileDropState();
+    }
+
+    /**
+     * Keep the dropzone CTA, subtext, and slot dots in sync with referenceFiles.
+     * Three states: empty (0), partial (1-3), full (4). Replaces the old
+     * "X more files can be added" footer line below the file list — that signal
+     * now lives inside the dropzone itself for stronger visual reinforcement.
+     */
+    function updateFileDropState() {
+        var dropEl = document.getElementById('msf-file-drop');
+        var ctaEl = document.getElementById('msf-file-drop-cta');
+        var subEl = document.getElementById('msf-file-drop-sub');
+        var dotsEl = document.getElementById('msf-file-drop-dots');
+        if (!dropEl || !ctaEl || !subEl || !dotsEl) return;
+
+        var n = referenceFiles.length;
+        var remaining = MAX_FILES - n;
+        if (n === 0) {
+            ctaEl.textContent = 'Drop files here';
+            subEl.textContent = 'or click to browse — up to ' + MAX_FILES + ' files';
+        } else if (n < MAX_FILES) {
+            ctaEl.textContent = 'Add another file';
+            subEl.textContent = remaining + ' more can be added';
+        } else {
+            ctaEl.textContent = 'All ' + MAX_FILES + ' slots filled';
+            subEl.textContent = 'Remove a file to add another';
+        }
+
+        var dots = dotsEl.querySelectorAll('.msf-file-drop-dot');
+        for (var i = 0; i < dots.length; i++) {
+            dots[i].classList.toggle('msf-file-drop-dot--filled', i < n);
+        }
+        dropEl.classList.toggle('msf-file-drop--full', n >= MAX_FILES);
     }
 
     function renderFileList() {
@@ -844,11 +893,8 @@ var MockupSubmitForm = (function () {
                 + '<span class="msf-file-remove" data-file-index="' + i + '">&times;</span>'
                 + '</div>';
         }
-        if (referenceFiles.length < MAX_FILES) {
-            html += '<div style="font-size:12px;color:#888;margin-top:4px;">'
-                + (MAX_FILES - referenceFiles.length) + ' more file' + (MAX_FILES - referenceFiles.length > 1 ? 's' : '') + ' can be added'
-                + '</div>';
-        }
+        // "X more can be added" is now shown in the dropzone itself via
+        // updateFileDropState() — no longer duplicated below the file list.
         previewArea.innerHTML = html;
 
         // Wire up remove buttons

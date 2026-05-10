@@ -743,14 +743,29 @@ var JDSSubmitForm = (function () {
             + '        For files larger than 20MB, upload to Box and paste the link in instructions.'
             + '      </div>'
 
-            //   File upload
+            //   File upload — multi-file dropzone with 5-layer affordance:
+            //   (1) stacked-papers SVG icon, (2) bold plural CTA,
+            //   (3) promoted up-front capacity subtext, (4) slot-dot indicator,
+            //   (5) dynamic CTA text that updates as files are added/removed.
+            //   updateFileDropState() in the JS keeps subtext, dots, and CTA in sync.
             + '      <div class="jds-field">'
             + '        <label class="jds-field-label">Reference Files (logo, sketches, photos)</label>'
             + '        <div class="jds-file-drop" id="jds-file-drop">'
-            + '          <div class="jds-file-drop-icon">\u{1F4CE}</div>'
-            + '          <div>Click to upload or drag &amp; drop</div>'
-            + '          <div class="jds-file-drop-hint">.AI, .EPS, .PDF, .PNG, .JPG, .SVG &mdash; max 4 files, 20MB each</div>'
+            + '          <svg class="jds-file-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
+            + '            <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>'
+            + '            <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>'
+            + '            <rect x="14" y="2" width="20" height="24" rx="2" fill="#ffffff"></rect>'
+            + '          </svg>'
+            + '          <div class="jds-file-drop-cta" id="jds-file-drop-cta">Drop files here</div>'
+            + '          <div class="jds-file-drop-sub" id="jds-file-drop-sub">or click to browse — up to 4 files</div>'
+            + '          <div class="jds-file-drop-dots" id="jds-file-drop-dots">'
+            + '            <span class="jds-file-drop-dot"></span>'
+            + '            <span class="jds-file-drop-dot"></span>'
+            + '            <span class="jds-file-drop-dot"></span>'
+            + '            <span class="jds-file-drop-dot"></span>'
+            + '          </div>'
             + '        </div>'
+            + '        <div class="jds-file-drop-types">.AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each</div>'
             + '        <input type="file" id="jds-file-input" style="display:none;" accept="image/*,.pdf,.eps,.ai,.svg" multiple>'
             + '        <div id="jds-file-preview-area"></div>'
             + '      </div>'
@@ -1069,8 +1084,10 @@ var JDSSubmitForm = (function () {
     }
 
     // ── File handling ──────────────────────────────────────────────────────
+    var MAX_FILES = 4;
+
     function addReferenceFiles(fileList) {
-        var allowed = 4 - referenceFiles.length;
+        var allowed = MAX_FILES - referenceFiles.length;
         for (var i = 0; i < fileList.length && i < allowed; i++) {
             var f = fileList[i];
             if (f.size > 20 * 1024 * 1024) {
@@ -1080,6 +1097,39 @@ var JDSSubmitForm = (function () {
             referenceFiles.push(f);
         }
         renderFilePreviews();
+        updateFileDropState();
+    }
+
+    /**
+     * Keep the dropzone CTA, subtext, and slot dots in sync with referenceFiles.
+     * Called after every add/remove so the user sees the multi-file capacity at
+     * every interaction. Three states: empty (0), partial (1-3), full (4).
+     */
+    function updateFileDropState() {
+        var dropEl = document.getElementById('jds-file-drop');
+        var ctaEl = document.getElementById('jds-file-drop-cta');
+        var subEl = document.getElementById('jds-file-drop-sub');
+        var dotsEl = document.getElementById('jds-file-drop-dots');
+        if (!dropEl || !ctaEl || !subEl || !dotsEl) return;
+
+        var n = referenceFiles.length;
+        var remaining = MAX_FILES - n;
+        if (n === 0) {
+            ctaEl.textContent = 'Drop files here';
+            subEl.textContent = 'or click to browse — up to ' + MAX_FILES + ' files';
+        } else if (n < MAX_FILES) {
+            ctaEl.textContent = 'Add another file';
+            subEl.textContent = remaining + ' more can be added';
+        } else {
+            ctaEl.textContent = 'All ' + MAX_FILES + ' slots filled';
+            subEl.textContent = 'Remove a file to add another';
+        }
+
+        var dots = dotsEl.querySelectorAll('.jds-file-drop-dot');
+        for (var i = 0; i < dots.length; i++) {
+            dots[i].classList.toggle('jds-file-drop-dot--filled', i < n);
+        }
+        dropEl.classList.toggle('jds-file-drop--full', n >= MAX_FILES);
     }
 
     function renderFilePreviews() {
@@ -1101,6 +1151,7 @@ var JDSSubmitForm = (function () {
                 var i = parseInt(btn.getAttribute('data-idx'));
                 referenceFiles.splice(i, 1);
                 renderFilePreviews();
+                updateFileDropState();
             });
         });
     }

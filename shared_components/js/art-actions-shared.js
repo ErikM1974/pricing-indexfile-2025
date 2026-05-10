@@ -1423,6 +1423,18 @@
                 })
             }).catch(function () { /* fire-and-forget */ });
 
+            // 4. Slack ping #art-notifications so the team has shared visibility
+            // that this design got nudged. Backend resolves Caspio fields and
+            // formats the message.
+            fetch(API_BASE + '/api/art-requests/' + designId + '/reminder-sent', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    aeName: getLoggedInUser().name || 'AE',
+                    recipientEmail: rep.email || ''
+                })
+            }).catch(function () { /* fire-and-forget */ });
+
             buttonEl.textContent = 'Reminder Sent!';
             buttonEl.style.background = '#28a745';
             var newCount = (parseInt(buttonEl.getAttribute('data-reminder-count') || '0') + 1);
