@@ -9,7 +9,10 @@
       "mcp__Claude_Preview__preview_snapshot",
       "mcp__Claude_in_Chrome__read_console_messages",
       "Bash(heroku config:get *)",
-      "Bash(heroku releases *)"
+      "Bash(heroku releases *)",
+      "Bash(node -e ' *)",
+      "Bash(find /c/Users/erik -name \"files.js\" -path \"*caspio-pricing-proxy*\" -not -path \"*/node_modules/*\" 2>/dev/null | head -5)",
+      "Read(//c/Users/erik/**)"
     ]
   },
   "hooks": {
@@ -24,6 +27,13 @@
           }
         ]
       }
+    ]
+  },
+  "worktree": {
+    "symlinkDirectories": [
+      "node_modules",
+      ".cache",
+      ".heroku"
     ]
   }
 }
