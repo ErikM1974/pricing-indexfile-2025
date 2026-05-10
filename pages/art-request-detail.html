@@ -280,6 +280,32 @@
                     </div>
                 </div>
 
+                <!-- JDS Product Card (2026-05-10) -->
+                <!-- Shown only when Item_Type='JDS'. Pulls the catalog
+                     ThumbnailURL + DisplayName + Category from
+                     /api/jds-catalog/:sku and gives Steve a one-click image
+                     download so he can start the mockup without leaving the
+                     page. Fallback messages if SKU missing or not in catalog. -->
+                <div class="ard-card" id="ard-jds-product-card" style="display:none;">
+                    <div class="ard-card-header">JDS Product</div>
+                    <div class="ard-card-body">
+                        <div class="ard-jds-product-layout" id="ard-jds-product-layout" style="display:none;">
+                            <div class="ard-jds-product-thumb-wrap">
+                                <img id="ard-jds-product-img" class="ard-jds-product-img" src="" alt="JDS catalog image">
+                            </div>
+                            <div class="ard-jds-product-meta">
+                                <div class="ard-jds-product-name" id="ard-jds-product-name"></div>
+                                <div class="ard-jds-product-category" id="ard-jds-product-category"></div>
+                                <a id="ard-jds-product-download" class="ard-jds-product-download" href="#" download="">
+                                    <span class="ard-jds-product-download-icon">⬇</span>
+                                    <span>Download Image</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ard-jds-product-message" id="ard-jds-product-message" style="display:none;"></div>
+                    </div>
+                </div>
+
                 <!-- Item Specs Card (Sticker/Banner extension, 2026-05-06) -->
                 <!-- Shown only when Item_Type is Sticker or Banner. Renders the
                      structured Item_Specs_Notes block from the AE intake form. -->

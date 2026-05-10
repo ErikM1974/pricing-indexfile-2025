@@ -257,6 +257,83 @@ body {
     padding: 18px;
 }
 
+/* JDS Product card — image + meta side-by-side, with download CTA. Visible
+   only when Item_Type='JDS'. Image is clickable for full-size lightbox. */
+.ard-jds-product-layout {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+.ard-jds-product-thumb-wrap {
+    flex: 0 0 140px;
+    width: 140px;
+    height: 140px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ard-jds-product-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transition: transform 0.15s ease;
+}
+.ard-jds-product-img:hover {
+    transform: scale(1.03);
+}
+.ard-jds-product-meta {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+.ard-jds-product-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+    line-height: 1.3;
+    word-break: break-word;
+}
+.ard-jds-product-category {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.ard-jds-product-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    padding: 8px 14px;
+    background: #16a34a;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    align-self: flex-start;
+    transition: background 0.15s;
+}
+.ard-jds-product-download:hover {
+    background: #15803d;
+    color: #fff;
+}
+.ard-jds-product-download-icon {
+    font-size: 14px;
+}
+.ard-jds-product-message {
+    font-size: 13px;
+    color: #6b7280;
+    padding: 8px 0;
+    line-height: 1.5;
+}
+
 /* Field Rows */
 .ard-field {
     display: flex;

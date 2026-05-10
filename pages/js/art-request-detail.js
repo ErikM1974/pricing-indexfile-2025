@@ -377,6 +377,10 @@
                     if (specHeader) specHeader.textContent = 'JDS Product Specs';
                     specBlock.textContent = req.Item_Specs_Notes;
                 }
+
+                // JDS Product card — fetch the catalog row to populate image +
+                // download link. Async; doesn't block other render work.
+                renderJdsProductCard(req);
             } else {
                 // Sticker / Banner — free-form spec text rendered as <pre>.
                 const specsRaw = req.Item_Specs_Notes || '';
@@ -4548,6 +4552,129 @@
      * Order_Type can occasionally come back as a Caspio enum object like
      * {'6':'Transfer'}; coerce to a flat string before rendering.
      */
+    /**
+     * Populate the JDS Product card (catalog image + download link) for the
+     * request's JDS_SKU. Called only when Item_Type='JDS'. Two-step lookup:
+     *
+     *   1. /api/jds-catalog/:sku — if ThumbnailURL is set, use it as the
+     *      override for all 3 surfaces (display + lightbox + download).
+     *   2. /api/jds/products/:sku (live JDS API) — gives 3 image variants:
+     *        - result.thumbnail (300×300) → card display (fast page load)
+     *        - result.image     (full)    → lightbox + download (Steve uses
+     *                                       this in Photoshop for mockups)
+     *
+     * Display name + category prefer the catalog (curated by Erik) and fall
+     * back to result.name from the JDS API. Three render states:
+     *   - SKU missing on the request          → "No JDS SKU recorded"
+     *   - Both endpoints fail / no image      → fallback message with SKU
+     *   - happy path                          → image + name + category + DL
+     */
+    function renderJdsProductCard(req) {
+        const card = document.getElementById('ard-jds-product-card');
+        const layout = document.getElementById('ard-jds-product-layout');
+        const messageEl = document.getElementById('ard-jds-product-message');
+        if (!card || !layout || !messageEl) return;
+
+        card.style.display = '';
+        const sku = (req.JDS_SKU || '').trim();
+        if (!sku) {
+            layout.style.display = 'none';
+            messageEl.style.display = '';
+            messageEl.textContent = 'No JDS SKU recorded on this request.';
+            return;
+        }
+
+        layout.style.display = 'none';
+        messageEl.style.display = '';
+        messageEl.textContent = 'Loading JDS catalog image…';
+
+        // Fetch both endpoints in parallel — catalog wins if it has an
+        // override URL, otherwise fall through to the live JDS API for the
+        // 3-variant image set. Catalog 404 is fine; we still try JDS API.
+        const catalogP = fetch(API_BASE + '/api/jds-catalog/' + encodeURIComponent(sku))
+            .then(function (resp) { return resp.ok ? resp.json() : null; })
+            .catch(function () { return null; });
+        const jdsP = fetch(API_BASE + '/api/jds/products/' + encodeURIComponent(sku))
+            .then(function (resp) { return resp.ok ? resp.json() : null; })
+            .catch(function () { return null; });
+
+        Promise.all([catalogP, jdsP]).then(function (results) {
+            const catalogRow = (results[0] && results[0].result) || {};
+            const jdsRow = (results[1] && results[1].result) || {};
+            const jdsImages = jdsRow.images || {};
+
+            const catalogOverride = (catalogRow.ThumbnailURL || '').trim();
+            // displayUrl = small for fast page load (card thumbnail)
+            // bigUrl    = full size for lightbox + download (Photoshop-grade)
+            // When Erik populates a catalog ThumbnailURL, it's used for both.
+            const displayUrl = catalogOverride || jdsImages.thumbnail || jdsRow.thumbnail || jdsImages.full || jdsRow.image || '';
+            const bigUrl = catalogOverride || jdsImages.full || jdsRow.image || jdsImages.thumbnail || jdsRow.thumbnail || '';
+            const displayName = catalogRow.DisplayName || jdsRow.name || '';
+            const category = catalogRow.Category || '';
+
+            if (!displayUrl) {
+                messageEl.textContent = 'No catalog image available for SKU ' + sku
+                    + (displayName ? ' (' + displayName + ')' : '')
+                    + '. Look it up on jdsindustries.com.';
+                return;
+            }
+
+            // Render the happy path.
+            messageEl.style.display = 'none';
+            layout.style.display = '';
+
+            const img = document.getElementById('ard-jds-product-img');
+            const nameEl = document.getElementById('ard-jds-product-name');
+            const catEl = document.getElementById('ard-jds-product-category');
+            const dlEl = document.getElementById('ard-jds-product-download');
+
+            if (img) {
+                img.src = displayUrl;
+                img.alt = displayName || sku;
+                img.style.cursor = 'pointer';
+                img.onclick = function () {
+                    if (typeof openLightbox === 'function') {
+                        // Lightbox uses the full-size variant — Steve can
+                        // visually verify the SKU before downloading.
+                        openLightbox(bigUrl, (displayName || sku) + (category ? ' — ' + category : ''));
+                    }
+                };
+            }
+            if (nameEl) {
+                nameEl.textContent = displayName ? (sku + ' — ' + displayName) : sku;
+            }
+            if (catEl) {
+                catEl.textContent = category;
+                catEl.style.display = category ? '' : 'none';
+            }
+            if (dlEl) {
+                // Download always uses the full-size image. Filename built
+                // from SKU + DisplayName so Steve's downloads folder reads
+                // like "LTM762-Polar_Camel_16_oz_Pint_Orange.png".
+                dlEl.href = bigUrl;
+                let ext = '.png';
+                try {
+                    const path = bigUrl.split('?')[0].split('#')[0];
+                    const dot = path.lastIndexOf('.');
+                    if (dot !== -1) {
+                        const candidate = path.substring(dot).toLowerCase();
+                        if (/^\.(jpe?g|png|gif|webp|svg)$/.test(candidate)) ext = candidate;
+                    }
+                } catch (_e) { /* keep default */ }
+                const safeName = (displayName || '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+                dlEl.download = sku + (safeName ? '-' + safeName : '') + ext;
+                // Some hosts strip the download attribute on cross-origin
+                // responses (Cloudinary doesn't here, but defensively); a
+                // right-click → Save As fallback always works.
+                dlEl.target = '_blank';
+                dlEl.rel = 'noopener';
+            }
+        }).catch(function (err) {
+            console.warn('[JDS Product card] lookup failed:', err);
+            messageEl.textContent = 'Couldn’t load JDS catalog image (' + sku + '). Check your connection or look it up on jdsindustries.com.';
+        });
+    }
+
     function buildJdsSpecRows(req) {
         const rows = [];
         if (req.JDS_SKU) rows.push({ label: 'SKU', value: req.JDS_SKU });
