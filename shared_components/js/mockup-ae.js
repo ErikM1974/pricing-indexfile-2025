@@ -192,11 +192,28 @@ var MockupAeGallery = (function () {
         wireCardClicks(container);
     }
 
+    /**
+     * Sort comparator that puts the longest-waiting Awaiting-Approval mockup
+     * at the top — urgency-first ordering for the AE's action queue.
+     * Items without an Approval_Sent_Date sort to the bottom (we don't know
+     * how urgent they are, so they yield to ones we can measure).
+     * Used only inside the 'needs-review' bucket; other buckets keep the
+     * default ID DESC fetch order so look-up flows feel familiar.
+     */
+    function sortByLongestWaiting(a, b) {
+        var aTime = a.Approval_Sent_Date ? new Date(a.Approval_Sent_Date).getTime() : NaN;
+        var bTime = b.Approval_Sent_Date ? new Date(b.Approval_Sent_Date).getTime() : NaN;
+        if (isNaN(aTime) && isNaN(bTime)) return 0;
+        if (isNaN(aTime)) return 1;   // a → bottom
+        if (isNaN(bTime)) return -1;  // a → top
+        return aTime - bTime;          // ASC: oldest first (most urgent at top)
+    }
+
     // Filter helper — shared by render() and renderCards() so the rep + search
     // logic isn't duplicated. Returns the visible mockup subset.
     function getDisplayMockups() {
         var searchLc = (currentSearchText || '').toLowerCase();
-        return allMockups.filter(function (m) {
+        var list = allMockups.filter(function (m) {
             var matchBucket;
             if (currentBucketFilter === 'on-hold') {
                 // 'On Hold' chip → only on-hold mockups, regardless of status
@@ -223,6 +240,13 @@ var MockupAeGallery = (function () {
             );
             return matchBucket && matchRep && matchSearch;
         });
+        // Bucket-aware sort: Needs Your Review = urgency queue (oldest waiting
+        // at top). Other buckets keep the fetched ID DESC order since they're
+        // look-up / history flows where newest-first is correct.
+        if (currentBucketFilter === 'needs-review') {
+            list = list.slice().sort(sortByLongestWaiting);
+        }
+        return list;
     }
 
     // Map a Caspio status to its display bucket. The fallthrough → 'with-ruth'

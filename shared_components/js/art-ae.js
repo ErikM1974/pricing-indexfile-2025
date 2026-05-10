@@ -136,6 +136,23 @@ var ArtAeGallery = (function () {
         return counts;
     }
 
+    /**
+     * Sort comparator that puts the longest-waiting Awaiting-Approval request
+     * at the top — urgency-first ordering for the AE's action queue.
+     * Items without an Approval_Sent_Date sort to the bottom (we don't know
+     * how urgent they are, so they yield to ones we can measure).
+     * Used only inside the 'needs-review' bucket; other buckets keep the
+     * default Date_Created DESC fetch order so look-up flows feel familiar.
+     */
+    function sortByLongestWaiting(a, b) {
+        var aTime = a.Approval_Sent_Date ? new Date(a.Approval_Sent_Date).getTime() : NaN;
+        var bTime = b.Approval_Sent_Date ? new Date(b.Approval_Sent_Date).getTime() : NaN;
+        if (isNaN(aTime) && isNaN(bTime)) return 0;
+        if (isNaN(aTime)) return 1;   // a → bottom
+        if (isNaN(bTime)) return -1;  // a → top
+        return aTime - bTime;          // ASC: oldest first (most urgent at top)
+    }
+
     function getFilteredRequests() {
         var list = allRequests;
         if (currentBucketFilter === 'on-hold') {
@@ -164,6 +181,12 @@ var ArtAeGallery = (function () {
                     || contact.indexOf(term) !== -1
                     || (repFirst && repFirst.indexOf(term) !== -1);
             });
+        }
+        // Bucket-aware sort: Needs Your Review = urgency queue (oldest waiting
+        // at top). Other buckets keep the fetched Date_Created DESC order
+        // since they're look-up / history flows where newest-first is correct.
+        if (currentBucketFilter === 'needs-review') {
+            list = list.slice().sort(sortByLongestWaiting);
         }
         return list;
     }
