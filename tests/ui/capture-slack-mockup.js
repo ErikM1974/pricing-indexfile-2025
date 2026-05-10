@@ -1,6 +1,9 @@
 /**
  * Ad-hoc Puppeteer script to render a Slack-style DM mockup image
- * matching the real rendering Erik shared (from Zapier → Slack).
+ * matching the real rendering Erik shared. Originally targeted Zapier-sent
+ * messages (RUSH STEVE/RUTH still come from Zapier); after the 2026-05-08
+ * migration, most messages come from the NWCA Backend Alerts app via direct
+ * incoming webhooks. Visual styling is identical for both senders.
  */
 const puppeteer = require('puppeteer');
 const path = require('path');
@@ -103,7 +106,7 @@ const HTML = `
       <div class="field-row"><span class="label">Submitted by:</span><span class="link">taneisha@nwcustomapparel.com</span></div>
       <div class="field-row" style="margin-top:8px;"><span class="label">View:</span><span class="link">https://www.teamnwca.com/mockup/53</span></div>
     </div>
-    <div class="sent-by">Sent by Zapier</div>
+    <div class="sent-by">Sent by NWCA Backend Alerts</div>
   </div>
 </body>
 </html>
