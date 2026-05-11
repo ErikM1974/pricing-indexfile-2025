@@ -61,7 +61,20 @@
                 <button type="button" class="jmc-logo-remove" id="jmc-logo-remove" title="Remove">×</button>
             </div>
             <div class="jmc-logo-tip" id="jmc-logo-tip" style="display:none;">
-                <strong>Tip:</strong> Transparent PNGs and SVGs work best. JPGs and white-background PNGs will auto-detect the dark logo against the background.
+                <strong>Best results:</strong> single-color <strong>black-on-white</strong> or <strong>black-on-transparent</strong> (SVG, PNG, JPG).<br>
+                Multi-color logos with shadows, white-on-dark logos, and photos may not engrave cleanly.
+            </div>
+        </section>
+
+        <!-- Complexity warning panel — shown when detectLogoIssues() finds the
+             uploaded file is likely to render poorly (multi-color, white-on-
+             white, or photo-like). Hidden by default; revealed by JS. -->
+        <section class="jmc-warning" id="jmc-logo-warning" style="display:none;">
+            <div class="jmc-warning-title" id="jmc-logo-warning-title">⚠ Warning</div>
+            <div class="jmc-warning-body" id="jmc-logo-warning-body"></div>
+            <div class="jmc-warning-actions">
+                <button type="button" class="jmc-warning-btn jmc-warning-btn--secondary" id="jmc-logo-warning-reupload">Upload different logo</button>
+                <button type="button" class="jmc-warning-btn jmc-warning-btn--primary" id="jmc-logo-warning-continue">Continue anyway →</button>
             </div>
         </section>
 

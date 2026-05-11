@@ -368,6 +368,144 @@ var JdsTumblerTemplate = (function () {
         };
     }
 
+    /**
+     * Detect whether an uploaded logo is likely to render poorly in the
+     * single-color engrave pipeline. Browser-side pixel sampling, no AI.
+     * Returns an array of issue codes (empty = looks good):
+     *
+     *   'white-on-white'  — opaque image with almost all bright pixels (logo
+     *                       designed for dark backgrounds, no dark pixels to
+     *                       threshold against). Failure mode confirmed on the
+     *                       Emily's Market sample (2026-05-11).
+     *   'multi-color'     — 4+ distinct color clusters at coarse quantization.
+     *                       Drop shadows + overlapping color regions collapse
+     *                       into a silver blob. Failure mode confirmed on the
+     *                       Shakey's Pizza and Barista Betties samples.
+     *   'photo'           — 50+ distinct colors at fine quantization. Photo-
+     *                       realistic images can't engrave as a binary stencil.
+     *
+     * Algorithm: render to a 200×200 canvas (downsampled for speed), sample
+     * 500 random pixels, run three independent checks. All cheap math, runs
+     * in <50ms on a typical browser.
+     *
+     * @param {HTMLImageElement|HTMLCanvasElement} logoSource — loaded image
+     * @returns {string[]} issue codes
+     */
+    function detectLogoIssues(logoSource) {
+        var w = logoSource.naturalWidth || logoSource.width;
+        var h = logoSource.naturalHeight || logoSource.height;
+        if (!w || !h) return [];
+
+        // Downsample to 200×200 for cheap sampling — preserves color
+        // distribution without paying the cost of reading 4K image data.
+        var size = 200;
+        var canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(logoSource, 0, 0, size, size);
+
+        var img;
+        try {
+            img = ctx.getImageData(0, 0, size, size);
+        } catch (e) {
+            // Cross-origin canvas — can't read pixels. Bail rather than block.
+            return [];
+        }
+        var data = img.data;
+
+        // Random pixel sampling — 500 points is plenty for distribution stats
+        var samples = [];
+        var sampleCount = 500;
+        for (var i = 0; i < sampleCount; i++) {
+            var px = Math.floor(Math.random() * size * size) * 4;
+            samples.push({
+                r: data[px],
+                g: data[px + 1],
+                b: data[px + 2],
+                a: data[px + 3]
+            });
+        }
+
+        var issues = [];
+
+        // ── Check 1: white-on-white ─────────────────────────────────────
+        // Image is fully opaque, nearly all pixels are very bright, AND
+        // there are essentially no dark pixels to use as the logo silhouette.
+        // The "no dark pixels" condition is critical — without it, this fires
+        // on legitimate black-text-on-white logos (which have lots of white
+        // background BUT also have some black text pixels). Confirmed via
+        // West Coast Truck logo test: 500 samples, most are white but ~5%
+        // are dark text — that 5% IS the logo, so we should let it render.
+        var opaqueCount = samples.filter(function (p) { return p.a > 250; }).length;
+        var brightCount = samples.filter(function (p) {
+            var luma = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+            return luma > 230;
+        }).length;
+        var darkCount = samples.filter(function (p) {
+            var luma = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+            return luma < 100 && p.a > 128;
+        }).length;
+        if (opaqueCount / sampleCount > 0.95
+            && brightCount / sampleCount > 0.9
+            && darkCount / sampleCount < 0.005) {
+            issues.push('white-on-white');
+        }
+
+        // ── Check 2: multi-color complexity ─────────────────────────────
+        // Count distinct color buckets after coarse quantization. Bucket
+        // each pixel to nearest 64-step grid (4 levels per channel = 64
+        // possible colors max). Many distinct buckets → multi-color logo.
+        // Skip near-transparent samples (alpha < 128) — those are background.
+        //
+        // Don't count WHITE-ish buckets as "color" — most logos have white
+        // background which is its own bucket, and counting it inflates the
+        // "color count" by 1. A truly multi-color brand logo will have
+        // 4+ NON-WHITE distinct color buckets (e.g. Shakey's: red + yellow
+        // + black + the white text). Threshold lowered to 1% to catch
+        // smaller-area accent colors like Shakey's yellow PIZZA panel.
+        var colorBuckets = {};
+        samples.forEach(function (p) {
+            if (p.a < 128) return;
+            var key = (p.r >> 6) + '-' + (p.g >> 6) + '-' + (p.b >> 6);
+            colorBuckets[key] = (colorBuckets[key] || 0) + 1;
+        });
+        // Buckets that hold >1% of samples and aren't pure white background
+        var significantBuckets = Object.keys(colorBuckets).filter(function (k) {
+            if (colorBuckets[k] / sampleCount <= 0.01) return false;
+            // Exclude the "white-ish" bucket (3-3-3 in our 4-level grid).
+            // That bucket represents the background; a logo with text on
+            // a white card legitimately has 1 white bucket and shouldn't
+            // be flagged just for that.
+            if (k === '3-3-3') return false;
+            return true;
+        });
+        // 3+ non-white color regions = high risk of blobbing. Catches Shakey's
+        // (red + yellow + black panels), Barista Betties (2 teals + edges),
+        // and similar multi-color brand logos. Single-color text logos like
+        // Thundercats or West Coast only have ONE non-white bucket (black)
+        // and pass through clean.
+        if (significantBuckets.length >= 3) {
+            issues.push('multi-color');
+        }
+
+        // ── Check 3: photo-likely ───────────────────────────────────────
+        // Many distinct colors at fine quantization (32-step grid = 512
+        // possible colors). Photos always hit 50+; clean logos rarely
+        // exceed 20 even with anti-aliasing.
+        var fineBuckets = {};
+        samples.forEach(function (p) {
+            if (p.a < 128) return;
+            var key = (p.r >> 5) + '-' + (p.g >> 5) + '-' + (p.b >> 5);
+            fineBuckets[key] = true;
+        });
+        if (Object.keys(fineBuckets).length >= 50) {
+            issues.push('photo');
+        }
+
+        return issues;
+    }
+
     return {
         MASK: MASK,
         SAMPLE_STRIP: SAMPLE_STRIP,
@@ -376,6 +514,7 @@ var JdsTumblerTemplate = (function () {
         paintMaskedArea: paintMaskedArea,
         buildEngravedLogo: buildEngravedLogo,
         drawLogoCentered: drawLogoCentered,
-        getMaskCoords: getMaskCoords
+        getMaskCoords: getMaskCoords,
+        detectLogoIssues: detectLogoIssues
     };
 })();

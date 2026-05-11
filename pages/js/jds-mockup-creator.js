@@ -194,6 +194,25 @@
         var dropZone = document.getElementById('jmc-drop-zone');
         var fileInput = document.getElementById('jmc-file-input');
         var removeBtn = document.getElementById('jmc-logo-remove');
+        var warnContinue = document.getElementById('jmc-logo-warning-continue');
+        var warnReupload = document.getElementById('jmc-logo-warning-reupload');
+
+        if (warnContinue) {
+            warnContinue.addEventListener('click', function () {
+                // AE accepted the warning — reveal the rest of the flow.
+                // Keep the warning panel visible above the preview as a
+                // reminder that the result may not be production-quality.
+                revealSizeAndDownload();
+                render();
+            });
+        }
+        if (warnReupload) {
+            warnReupload.addEventListener('click', function () {
+                clearLogo();
+                hideLogoWarning();
+                fileInput.click();
+            });
+        }
 
         if (dropZone) {
             dropZone.addEventListener('click', function () { fileInput.click(); });
@@ -243,16 +262,27 @@
                     info.style.display = '';
                     nameEl.textContent = file.name;
                 }
-                // Show the tip only for opaque formats where auto-silhouette runs
+                // Tip copy is now general best-practice guidance — show on
+                // every upload as a reminder of what works well, regardless
+                // of file format. The warning panel handles the specific
+                // "your logo will fail" cases via detectLogoIssues below.
                 if (tip) {
-                    var needsTip = /\.jpe?g$/i.test(file.name);
-                    tip.style.display = needsTip ? '' : 'none';
+                    tip.style.display = '';
                 }
 
-                document.getElementById('jmc-size-step').style.display = '';
-                document.getElementById('jmc-download-step').style.display = '';
-
-                render();
+                // Run complexity detection BEFORE revealing the size/download
+                // sections. If the logo is likely to fail (multi-color, white-
+                // on-white, photo), show a tailored warning + Continue-anyway
+                // gate. The AE can still proceed if they want, but they get a
+                // clear up-front explanation of why the result may look bad.
+                var issues = JdsTumblerTemplate.detectLogoIssues(img);
+                if (issues.length > 0) {
+                    showLogoWarning(issues);
+                } else {
+                    hideLogoWarning();
+                    revealSizeAndDownload();
+                    render();
+                }
             };
             img.onerror = function () {
                 toast('Couldn\'t read that logo file. Try another format.', 'error');
@@ -265,6 +295,63 @@
         reader.readAsDataURL(file);
     }
 
+    /**
+     * Show the complexity warning panel with copy tailored to the detected
+     * issues. Two buttons: "Continue anyway" reveals the size/download steps
+     * and renders the (likely imperfect) mockup; "Upload different" clears
+     * the file so the AE can try again. Warning persists in a visible state
+     * above the preview as a reminder if the user chose to continue.
+     */
+    function showLogoWarning(issueCodes) {
+        var panel = document.getElementById('jmc-logo-warning');
+        var titleEl = document.getElementById('jmc-logo-warning-title');
+        var bodyEl = document.getElementById('jmc-logo-warning-body');
+        if (!panel || !titleEl || !bodyEl) return;
+
+        // Pick the most user-actionable issue first if multiple fire
+        var primary = issueCodes[0];
+        if (issueCodes.indexOf('white-on-white') !== -1) primary = 'white-on-white';
+        else if (issueCodes.indexOf('photo') !== -1) primary = 'photo';
+        else if (issueCodes.indexOf('multi-color') !== -1) primary = 'multi-color';
+
+        var copy = {
+            'white-on-white': {
+                title: '⚠ This logo looks like white-on-white',
+                body: 'This logo appears to be designed to overlay <strong>dark backgrounds</strong> — it\'s mostly white with no dark/transparent areas the engraving tool can detect.<br><br>' +
+                      '<strong>Fix:</strong> Ask the customer for a <strong>black-on-white version</strong>, or open the logo in Preview/Photoshop, swap white→black, and save as a transparent PNG.'
+            },
+            'multi-color': {
+                title: '⚠ This logo has multiple colors',
+                body: 'Laser engraving is <strong>single-color only</strong> (silver on coated tumblers). Multi-color logos with drop shadows or overlapping fills collapse into a "silver blob" because every color region becomes the same fill.<br><br>' +
+                      '<strong>Fix:</strong> Ask the customer for a <strong>one-color version</strong> of the logo (the brand guidelines usually include one), or have Steve simplify it in Photoshop first.'
+            },
+            'photo': {
+                title: '⚠ This looks like a photograph',
+                body: 'Laser engraving is a <strong>binary stencil</strong> — etched or not etched. Photos and detailed illustrations can\'t be reproduced as engraving and always look like muddy patches.<br><br>' +
+                      '<strong>Fix:</strong> Ask the customer for a <strong>vector logo</strong> (.SVG or .AI file) instead of a photo.'
+            }
+        };
+
+        var c = copy[primary] || copy['multi-color'];
+        titleEl.innerHTML = c.title;
+        bodyEl.innerHTML = c.body;
+        panel.style.display = '';
+
+        // Hide size/download until user resolves the warning
+        document.getElementById('jmc-size-step').style.display = 'none';
+        document.getElementById('jmc-download-step').style.display = 'none';
+    }
+
+    function hideLogoWarning() {
+        var panel = document.getElementById('jmc-logo-warning');
+        if (panel) panel.style.display = 'none';
+    }
+
+    function revealSizeAndDownload() {
+        document.getElementById('jmc-size-step').style.display = '';
+        document.getElementById('jmc-download-step').style.display = '';
+    }
+
     function clearLogo() {
         logoImage = null;
         logoFileName = '';
@@ -274,6 +361,7 @@
         document.getElementById('jmc-logo-tip').style.display = 'none';
         document.getElementById('jmc-size-step').style.display = 'none';
         document.getElementById('jmc-download-step').style.display = 'none';
+        hideLogoWarning();
         render();
     }
 
