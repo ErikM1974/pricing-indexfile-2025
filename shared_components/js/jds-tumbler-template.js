@@ -503,6 +503,28 @@ var JdsTumblerTemplate = (function () {
             issues.push('photo');
         }
 
+        // ── Check 4: medium-gray only ───────────────────────────────────
+        // Opaque image with NO dark pixels (luma <100) AND significant mid-
+        // luma content (100-230). The luma-threshold silhouette extractor
+        // expects DARK pixels as the logo; gray-only logos fall in the edge-
+        // gradient zone and render as faded/translucent shapes that may be
+        // hard to read on the tumbler. Confirmed via Northwest Raiders test
+        // case — medium-gray shield logo on white background, no dark areas.
+        //
+        // The white-on-white check above requires brightCount > 90% which
+        // means midCount < 10%; this check requires midCount > 15%, so the
+        // two are mutually exclusive (no double-fire).
+        var midCount = samples.filter(function (p) {
+            if (p.a < 128) return false;
+            var luma = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+            return luma >= 100 && luma <= 230;
+        }).length;
+        if (opaqueCount / sampleCount > 0.95
+            && darkCount / sampleCount < 0.005
+            && midCount / sampleCount > 0.15) {
+            issues.push('medium-gray-only');
+        }
+
         return issues;
     }
 

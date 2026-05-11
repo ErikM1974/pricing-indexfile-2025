@@ -312,6 +312,7 @@
         var primary = issueCodes[0];
         if (issueCodes.indexOf('white-on-white') !== -1) primary = 'white-on-white';
         else if (issueCodes.indexOf('photo') !== -1) primary = 'photo';
+        else if (issueCodes.indexOf('medium-gray-only') !== -1) primary = 'medium-gray-only';
         else if (issueCodes.indexOf('multi-color') !== -1) primary = 'multi-color';
 
         var copy = {
@@ -329,6 +330,11 @@
                 title: '⚠ This looks like a photograph',
                 body: 'Laser engraving is a <strong>binary stencil</strong> — etched or not etched. Photos and detailed illustrations can\'t be reproduced as engraving and always look like muddy patches.<br><br>' +
                       '<strong>Fix:</strong> Ask the customer for a <strong>vector logo</strong> (.SVG or .AI file) instead of a photo.'
+            },
+            'medium-gray-only': {
+                title: '⚠ This logo is rendered in medium gray',
+                body: 'Laser engraving needs <strong>high-contrast black</strong> artwork to read cleanly. Medium-gray logos render as faded or translucent silhouettes that may be hard to see on the tumbler.<br><br>' +
+                      '<strong>Fix:</strong> Ask the customer for a <strong>black-on-white version</strong> of this logo, or open the file in Preview/Photoshop and darken the gray to pure black.'
             }
         };
 
