@@ -84,6 +84,7 @@
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
 | `/pages/embroidery-contract-pricing.html` | **NEW** Shareable contract embroidery pricing page | embroidery-contract-pricing.js, embroidery-contract-pricing.css | ✅ Active |
 | `/pages/data-entry-guide.html` | **NEW** ShopWorks data entry guide with API-driven service prices | data-entry-guide.js, data-entry-guide.css, app-config.js | ✅ Active |
+| `/pages/jds-mockup-creator.html` | **NEW** Standalone JDS Polar Camel tumbler mockup creator — AEs/Steve pick a color, drop a logo, download a customer-approval mockup. Canvas-based compositing, no backend or AI calls. | jds-mockup-creator.js, jds-mockup-creator.css, jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
 | `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
 | `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
 | `/pages/design-gallery.html` | **NEW** Standalone design gallery — search 39K+ digitized designs | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ✅ Active |
@@ -621,6 +622,9 @@
 | `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing) | — | ✅ Active |
 | `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
 | `/shared_components/js/sticker-banner-submit-form.js` | **NEW** AE Sticker/Banner art-request intake form (posts to /api/artrequests with Item_Type=Sticker/Banner + structured Item_Specs_Notes block) | /api/artrequests, /api/files/upload, EmailJS | ✅ Active |
+| `/shared_components/js/jds-tumbler-template.js` | **NEW** Algorithm module for JDS Tumbler Mockup Creator — mask coords, color sampling, engrave-color resolver, logo silhouette extractor. Shared by standalone page and (Phase 2) art-request integration. | (none — pure canvas logic) | ✅ Active |
+| `/pages/js/jds-mockup-creator.js` | **NEW** Standalone JDS Mockup Creator page logic — color picker, file upload (PNG/JPG/SVG), live canvas preview, drag-to-reposition, size slider, full-res PNG download. | jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
+| `/pages/css/jds-mockup-creator.css` | **NEW** Standalone JDS Mockup Creator styling — two-column layout, color swatch grid, drop zone, canvas frame, brand maroon accent. | jds-mockup-creator.html | ✅ Active |
 
 ### Sample Order System
 | File | Purpose | Dependencies | Status |

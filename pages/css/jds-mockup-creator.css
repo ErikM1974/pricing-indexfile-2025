@@ -1,0 +1,398 @@
+/* jds-mockup-creator.css — Layout + styling for the JDS Tumbler Mockup Creator.
+ *
+ * Two-column desktop layout (controls left, canvas right) that stacks vertically
+ * on mobile. Brand-aligned with the rest of the AE dashboard (maroon accent,
+ * Inter/system font, soft cards with subtle shadows).
+ */
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: #f9fafb;
+    color: #111827;
+    line-height: 1.5;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.jmc-header {
+    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+    color: #fff;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.jmc-header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.jmc-logo {
+    height: 48px;
+    width: auto;
+    background: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+.jmc-header-text { flex: 1; }
+.jmc-header-text h1 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 700;
+}
+.jmc-header-text p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.85;
+}
+.jmc-back {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.jmc-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Main grid layout ───────────────────────────────────────────────── */
+.jmc-main {
+    max-width: 1400px;
+    margin: 24px auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: minmax(320px, 380px) 1fr;
+    gap: 24px;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .jmc-main {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ── Controls column ────────────────────────────────────────────────── */
+.jmc-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.jmc-step {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.jmc-step-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.jmc-step-num {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #7f1d1d;
+    color: #fff;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.jmc-step-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ── Color swatch grid ──────────────────────────────────────────────── */
+.jmc-swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+.jmc-swatch-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #6b7280;
+    padding: 16px;
+    font-size: 13px;
+}
+.jmc-swatch {
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
+    overflow: hidden;
+    background: #f3f4f6;
+}
+.jmc-swatch:hover {
+    transform: scale(1.05);
+    border-color: #7f1d1d;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.jmc-swatch--active {
+    border-color: #7f1d1d;
+    border-width: 3px;
+    box-shadow: 0 0 0 2px rgba(127, 29, 29, 0.2);
+}
+.jmc-swatch-fill {
+    position: absolute;
+    inset: 0;
+}
+.jmc-swatch-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    font-size: 9px;
+    text-align: center;
+    padding: 2px 0;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.jmc-selected-label {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.jmc-selected-sku {
+    font-weight: 600;
+    color: #7f1d1d;
+    margin-right: 6px;
+}
+.jmc-selected-name {
+    color: #374151;
+}
+
+/* ── Drop zone (logo upload) ────────────────────────────────────────── */
+.jmc-drop-zone {
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    color: #6b7280;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.jmc-drop-zone:hover,
+.jmc-drop-zone--active {
+    border-color: #7f1d1d;
+    background: #fef2f2;
+    color: #7f1d1d;
+}
+.jmc-drop-icon {
+    width: 44px;
+    height: 38px;
+    margin: 0 auto 8px;
+    display: block;
+    color: #9ca3af;
+}
+.jmc-drop-cta {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+.jmc-drop-sub {
+    font-size: 12px;
+    color: #6b7280;
+}
+.jmc-logo-info {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+}
+.jmc-logo-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #374151;
+}
+.jmc-logo-remove {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 6px;
+}
+.jmc-logo-remove:hover { color: #dc2626; }
+.jmc-logo-tip {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+/* ── Size slider ────────────────────────────────────────────────────── */
+.jmc-size-label {
+    display: block;
+    font-size: 13px;
+    color: #374151;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+.jmc-size-slider {
+    width: 100%;
+    margin: 4px 0 8px;
+}
+.jmc-size-hint {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ── Download button ────────────────────────────────────────────────── */
+.jmc-download-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s;
+}
+.jmc-download-btn:hover {
+    background: #15803d;
+}
+.jmc-download-icon {
+    font-size: 16px;
+}
+.jmc-download-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* ── Preview column ─────────────────────────────────────────────────── */
+.jmc-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.jmc-preview-frame {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.jmc-preview-empty {
+    color: #9ca3af;
+    text-align: center;
+    font-size: 15px;
+}
+.jmc-canvas {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    cursor: grab;
+    user-select: none;
+}
+.jmc-canvas:active {
+    cursor: grabbing;
+}
+.jmc-preview-loading {
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+}
+.jmc-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #7f1d1d;
+    border-radius: 50%;
+    animation: jmc-spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+@keyframes jmc-spin {
+    to { transform: rotate(360deg); }
+}
+.jmc-preview-error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.jmc-preview-caption {
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+    padding: 0 8px;
+}
+
+/* ── Toast ──────────────────────────────────────────────────────────── */
+.jmc-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #111827;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.25s, opacity 0.25s;
+    z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+.jmc-toast--show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+.jmc-toast--error {
+    background: #b91c1c;
+}
+.jmc-toast--success {
+    background: #16a34a;
+}
