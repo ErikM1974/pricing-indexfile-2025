@@ -377,12 +377,20 @@ var JdsTumblerTemplate = (function () {
      *                       designed for dark backgrounds, no dark pixels to
      *                       threshold against). Failure mode confirmed on the
      *                       Emily's Market sample (2026-05-11).
-     *   'multi-color'     — 4+ distinct color clusters at coarse quantization.
-     *                       Drop shadows + overlapping color regions collapse
-     *                       into a silver blob. Failure mode confirmed on the
-     *                       Shakey's Pizza and Barista Betties samples.
+     *   'multi-color'     — 2+ chromatic color buckets OR 3+ non-white buckets
+     *                       at coarse quantization. Drop shadows + overlapping
+     *                       color regions collapse into a silver blob. Failure
+     *                       mode confirmed on Shakey's, Barista Betties, and
+     *                       Korum Ford (two-blue outlined letters, 2026-05-11).
      *   'photo'           — 50+ distinct colors at fine quantization. Photo-
      *                       realistic images can't engrave as a binary stencil.
+     *   'dark-background' — >50% of opaque pixels are very dark (luma<40). The
+     *                       silhouette algorithm assumes light/transparent bg;
+     *                       reversed renders the whole bounding box as silver
+     *                       with the design appearing as cutouts. Failure mode
+     *                       confirmed on Kingfisher Charters (2026-05-11).
+     *   'medium-gray-only'— opaque image with no dark pixels but significant
+     *                       mid-luma content. Renders faded/translucent.
      *
      * Algorithm: render to a 200×200 canvas (downsampled for speed), sample
      * 500 random pixels, run three independent checks. All cheap math, runs
@@ -480,12 +488,25 @@ var JdsTumblerTemplate = (function () {
             if (k === '3-3-3') return false;
             return true;
         });
-        // 3+ non-white color regions = high risk of blobbing. Catches Shakey's
-        // (red + yellow + black panels), Barista Betties (2 teals + edges),
-        // and similar multi-color brand logos. Single-color text logos like
-        // Thundercats or West Coast only have ONE non-white bucket (black)
-        // and pass through clean.
-        if (significantBuckets.length >= 3) {
+        // Filter to "chromatic" buckets — those where at least one RGB channel
+        // bucket differs from another (chroma >= 1 at 4-level quantization).
+        // Pure grayscale buckets (black, dark gray, light gray, white) all
+        // have chroma=0 because R=G=B; anti-aliasing edges on a clean black
+        // logo also fall here. This filter catches outlined-with-similar-hue
+        // logos like Korum Ford (dark navy + light blue = 2 chromatic but
+        // only 2 non-white buckets total — below the legacy >=3 threshold).
+        var chromaticBuckets = significantBuckets.filter(function (k) {
+            var parts = k.split('-').map(Number);
+            return Math.max.apply(null, parts) - Math.min.apply(null, parts) >= 1;
+        });
+
+        // Fires when:
+        //   2+ chromatic buckets (Korum's two blues, Shakey's red+yellow+black,
+        //     Barista Betties' two teals, Kingfisher's blue+red)
+        //   OR 3+ non-white buckets (legacy: catches multi-shade grayscale)
+        // Single-color text logos (Thundercats, West Coast, Manke) have 1
+        // non-white bucket = pass. KM Resorts (1 olive) has 1 chromatic = pass.
+        if (chromaticBuckets.length >= 2 || significantBuckets.length >= 3) {
             issues.push('multi-color');
         }
 
@@ -503,7 +524,24 @@ var JdsTumblerTemplate = (function () {
             issues.push('photo');
         }
 
-        // ── Check 4: medium-gray only ───────────────────────────────────
+        // ── Check 4: dark-background ────────────────────────────────────
+        // Image has a DARK background (>50% of opaque pixels are very dark,
+        // luma < 40). The silhouette algorithm assumes the design is dark on
+        // a light/transparent background — when reversed, the entire mockup
+        // area renders as silver with the actual design appearing as
+        // confusing cutouts. Confirmed via Kingfisher Charters sample
+        // (2026-05-11): blue script + red ornament on solid black bg.
+        var veryDarkCount = samples.filter(function (p) {
+            if (p.a < 128) return false;
+            var luma = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
+            return luma < 40;
+        }).length;
+        if (opaqueCount / sampleCount > 0.95
+            && veryDarkCount / Math.max(opaqueCount, 1) > 0.5) {
+            issues.push('dark-background');
+        }
+
+        // ── Check 5: medium-gray only ───────────────────────────────────
         // Opaque image with NO dark pixels (luma <100) AND significant mid-
         // luma content (100-230). The luma-threshold silhouette extractor
         // expects DARK pixels as the logo; gray-only logos fall in the edge-
@@ -514,10 +552,17 @@ var JdsTumblerTemplate = (function () {
         // The white-on-white check above requires brightCount > 90% which
         // means midCount < 10%; this check requires midCount > 15%, so the
         // two are mutually exclusive (no double-fire).
+        // Count NEAR-GRAY mid-luma pixels. The chroma filter (max-min < 30) is
+        // critical — without it, any logo whose main color happens to land at
+        // mid-luma (olive green, dark red, dusty rose, …) trips this check.
+        // True grays have R≈G≈B so chroma is ~0. Caught 2026-05-11 via the
+        // KM Resorts olive-green logo regressing into this bucket.
         var midCount = samples.filter(function (p) {
             if (p.a < 128) return false;
             var luma = 0.299 * p.r + 0.587 * p.g + 0.114 * p.b;
-            return luma >= 100 && luma <= 230;
+            if (luma < 100 || luma > 230) return false;
+            var chroma = Math.max(p.r, p.g, p.b) - Math.min(p.r, p.g, p.b);
+            return chroma < 30;
         }).length;
         if (opaqueCount / sampleCount > 0.95
             && darkCount / sampleCount < 0.005

@@ -308,9 +308,14 @@
         var bodyEl = document.getElementById('jmc-logo-warning-body');
         if (!panel || !titleEl || !bodyEl) return;
 
-        // Pick the most user-actionable issue first if multiple fire
+        // Pick the most user-actionable issue first if multiple fire.
+        // dark-background ranks above multi-color because Kingfisher-style
+        // logos hit BOTH (dark bg + blue+red accents), but fixing the
+        // background is the actionable step — the multi-color issue often
+        // disappears once the customer sends the version without the bg.
         var primary = issueCodes[0];
         if (issueCodes.indexOf('white-on-white') !== -1) primary = 'white-on-white';
+        else if (issueCodes.indexOf('dark-background') !== -1) primary = 'dark-background';
         else if (issueCodes.indexOf('photo') !== -1) primary = 'photo';
         else if (issueCodes.indexOf('medium-gray-only') !== -1) primary = 'medium-gray-only';
         else if (issueCodes.indexOf('multi-color') !== -1) primary = 'multi-color';
@@ -335,6 +340,11 @@
                 title: '⚠ This logo is rendered in medium gray',
                 body: 'Laser engraving needs <strong>high-contrast black</strong> artwork to read cleanly. Medium-gray logos render as faded or translucent silhouettes that may be hard to see on the tumbler.<br><br>' +
                       '<strong>Fix:</strong> Ask the customer for a <strong>black-on-white version</strong> of this logo, or open the file in Preview/Photoshop and darken the gray to pure black.'
+            },
+            'dark-background': {
+                title: '⚠ This logo has a dark background',
+                body: 'Laser engraving works on a <strong>light or transparent</strong> background — the tool reads dark pixels as the design to engrave. With a dark background, the entire mockup area would render as one big silver patch, with the actual design showing as confusing cutouts.<br><br>' +
+                      '<strong>Fix:</strong> Ask the customer for a <strong>transparent PNG</strong> (background removed) or the <strong>inverted version</strong> (dark design on a light background). Most brand kits include both.'
             }
         };
 
