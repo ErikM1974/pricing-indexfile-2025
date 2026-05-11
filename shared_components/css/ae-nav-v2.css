@@ -86,6 +86,31 @@
     right: 8px;
 }
 
+/* External-link variant — looks like a section button but navigates to a
+   separate page instead of toggling an in-page tab pane. Used for the JDS
+   Mockup Creator entry. Adds a subtle ↗ arrow indicator and disables the
+   active treatment (the link never becomes the "selected" section). */
+.ae-nav__section--link {
+    text-decoration: none;
+}
+.ae-nav__section--link::after {
+    content: "\2197"; /* ↗ */
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 11px;
+    opacity: 0.45;
+    transition: opacity 120ms ease;
+}
+.ae-nav__section--link:hover::after {
+    opacity: 0.9;
+}
+.ae-nav__section--link.is-active {
+    color: var(--ae-ink-3);
+    border-bottom-color: transparent;
+    background: transparent;
+}
+
 /* ── TIER 2: Sub-tabs ───────────────────────────────────────────────── */
 
 .ae-nav__sub {
