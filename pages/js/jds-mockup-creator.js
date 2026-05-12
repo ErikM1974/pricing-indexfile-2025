@@ -462,9 +462,11 @@
         // 1. Draw tumbler base
         ctx.drawImage(tumblerImage, 0, 0, w, h);
 
-        // 2. Paint the masked area (clears the placeholder logo)
+        // 2. Paint the masked area (clears the placeholder logo). Pass the
+        // SKU code so the v4 noise overlay seeds deterministically per SKU
+        // (repeat renders of the same tumbler are byte-identical).
         try {
-            JdsTumblerTemplate.paintMaskedArea(ctx, w, h);
+            JdsTumblerTemplate.paintMaskedArea(ctx, w, h, selectedSku);
         } catch (err) {
             console.error('[jds-mockup-creator] Mask paint failed:', err);
             showError('Canvas access blocked — cross-origin issue with the tumbler image.');
@@ -509,7 +511,7 @@
         ctx.drawImage(tumblerImage, 0, 0, DOWNLOAD_SIZE, DOWNLOAD_SIZE);
 
         try {
-            JdsTumblerTemplate.paintMaskedArea(ctx, DOWNLOAD_SIZE, DOWNLOAD_SIZE);
+            JdsTumblerTemplate.paintMaskedArea(ctx, DOWNLOAD_SIZE, DOWNLOAD_SIZE, selectedSku);
         } catch (err) {
             toast('Render failed: ' + err.message, 'error');
             return;
