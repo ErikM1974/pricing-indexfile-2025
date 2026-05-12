@@ -110,23 +110,14 @@ var JdsTumblerTemplate = (function () {
     var EDGE_SAMPLE_W = 24;
 
     /**
-     * Body-center reference sample — used in addition to the per-row edge
-     * samples to give the patch a realistic cylindrical lighting profile.
+     * Body-center reference sample — used by v4's triangular lerp. v5
+     * doesn't use it directly (inpainting handles centering automatically),
+     * but it's kept exposed for tests and any future tuning.
      *
-     * The per-row left/right edge sampling captures the cylinder's edge-
-     * shadow zone (darker, less saturated). Lerping linearly between two
-     * edge colors gives a patch with NO brightness peak in the middle,
-     * making it look "hazy" compared to the real cylinder which has a
-     * natural brightness/saturation peak at its horizontal center.
-     *
-     * This constant defines a clean horizontal slab below the mask (between
-     * the mask bottom at y=1220 and the rib decoration start at ~y=1240)
-     * at the body's horizontal center (~x=895). Sampling here once per
-     * render gives us the "true" cylinder center color for the SKU. The
-     * patch interior then triangular-lerps from left edge → CENTER_REF →
-     * right edge, producing the real cylinder lighting profile.
-     *
-     * Verified clean on all 16 mockup-eligible SKUs (2026-05-11).
+     * Defines a clean horizontal slab below the mask (between the mask
+     * bottom at y=1140 and the rib decoration start at ~y=1240) at the
+     * body's horizontal center (~x=895). Verified clean on all 16
+     * mockup-eligible SKUs.
      */
     var CENTER_REF_SAMPLE = {
         x: 815,
@@ -134,6 +125,24 @@ var JdsTumblerTemplate = (function () {
         w: 160,
         h: 16
     };
+
+    /**
+     * v5 vertical-band inpainting reference zones.
+     *
+     * ABOVE_REF_BAND: y=420-435 (16 source-px tall). Sits just below the
+     * steel lid base (~y=400) and just above the mask top (y=440). At
+     * y<420 the lid reflection contaminates the middle 30-70% of body
+     * width; at y>=440 we're inside the mask (no clean body).
+     *
+     * BELOW_REF_BAND: y=1145-1215 (70 source-px tall). Sits between the
+     * placeholder logo bottom (~y=1100-1140 across SKUs) and the rib
+     * decoration start (~y=1240). 70 rows gives the inpainting algorithm
+     * plenty of grain variation when cycling source rows.
+     *
+     * Both bands verified clean across all 16 mockup-eligible SKUs.
+     */
+    var ABOVE_REF_BAND = { y: 420, h: 16 };
+    var BELOW_REF_BAND = { y: 1145, h: 70 };
 
     /**
      * Tumbler-color engrave palette. JDS's EngraveColor field uses two
@@ -164,39 +173,47 @@ var JdsTumblerTemplate = (function () {
      * Render the cleared imprint zone onto the given canvas context. Assumes
      * ctx already has the source tumbler image drawn at the canvas's full size.
      *
-     * Algorithm (v4, 2026-05-11 — triangular lerp + cylindrical lighting + noise + luma correction):
-     *   1. Sample a body-CENTER reference color from a clean band below the
-     *      mask (CENTER_REF_SAMPLE) — represents the cylinder's brightness
-     *      peak, which the per-row edge samples never reach.
-     *   2. Sample reference luminosity from clean bands ABOVE and BELOW the
-     *      mask (used by step 7 — luminosity correction).
-     *   3. Read the full mask Y range from the canvas in one getImageData call.
-     *   4. For each row: scan body left/right edges (handles cylinder taper),
-     *      sample a slab 20 source-px inside each edge (deeper than v3's 8px
-     *      — skips AA residue for better saturation).
-     *   5. TRIANGULAR 3-point lerp: leftEdge → CENTER_REF → rightEdge across
-     *      the mask width. Reproduces the real cylindrical lighting profile
-     *      (dark edges, bright/saturated middle). Fixes v3's hazy-middle.
-     *   6. Apply low-amplitude Gaussian noise overlay (σ≈3, ~1.2% luma jitter)
-     *      seeded deterministically from SKU code — mimics powder-coat grain.
-     *   7. Match the patch's overall luminosity to the surrounding body
-     *      (clamped to [0.85, 1.15] ratio) — final correction for systematic
-     *      mismatches the per-row sampling can't predict.
-     *   8. Apply asymmetric feather (40px cubic top/bottom, 24px linear sides)
+     * Algorithm (v5, 2026-05-12 — vertical-band inpainting from clean source body):
+     *
+     * Instead of synthesizing patch colors from edge samples (v3) or per-row
+     * edge + center-reference (v4), v5 lerps SOURCE PIXELS from two clean
+     * body bands: one ABOVE the mask (between the steel lid and the
+     * placeholder logo zone) and one BELOW (between the placeholder bottom
+     * and the rib decoration).
+     *
+     * Steps:
+     *   1. Read two clean body bands as ImageData:
+     *      - ABOVE: y=420-435 (16 source-px) just below the steel lid
+     *      - BELOW: y=1145-1215 (70 source-px) between placeholder + ribs
+     *   2. Detect body left/right bounds in each band's middle row.
+     *   3. Read the full mask Y range in one getImageData call.
+     *   4. For each pixel (X, Y) in the mask:
+     *      a. Find this row's body bounds (handles cylinder taper)
+     *      b. Compute the pixel's body-relative X position (0..1)
+     *      c. Map to absolute X in each reference band using its body bounds
+     *      d. Pick a source row in each band by cycling (py % bandHeight) —
+     *         spreads grain pattern across patch rows, prevents visible
+     *         repetition from using a single source row
+     *      e. Lerp the two source pixels by vertical position (ty = py/mask.h)
+     *      f. Copy the original row's alpha (preserves cylinder silhouette)
+     *   5. Apply asymmetric feather (40px cubic top/bottom, 24px linear sides)
      *      and composite onto the main canvas.
      *
-     * Why this beats v3: v3's edge-only sampling captured the cylinder's
-     * edge-shadow zone exclusively. Lerping two edge colors produced a patch
-     * uniformly at edge brightness, missing the cylinder's natural center
-     * peak. The patch looked "hazy / cloudy" against the brighter real-
-     * cylinder middle. CENTER_REF + triangular lerp restores the brightness
-     * peak; noise restores texture grain; luma correction snaps residual
-     * mismatch to surrounding body.
+     * Why this beats v4: v4's per-row + CENTER_REF triangular lerp produced
+     * good center matching (±1 luma) but couldn't reproduce the cylinder's
+     * NATURAL grain texture or the asymmetric brightness profile the body
+     * actually has (peaks at ~35% and ~65% across body width on these JDS
+     * images, dim center). v5 copies real body pixels, so by construction:
+     *   - Color matches the body exactly at the same body-relative X
+     *   - Grain pattern matches (we ARE using real grain pixels)
+     *   - Per-row lighting profile matches (each source row carries its own)
+     *   - Vertical color shift through the mask is smooth (Y lerp)
+     * No procedural noise is needed; no luminosity correction is needed.
      *
      * @param {CanvasRenderingContext2D} ctx — canvas with tumbler already drawn
      * @param {number} sourceW — source image width (scales the reference coords)
      * @param {number} sourceH — source image height
-     * @param {string} [sku]   — SKU code for deterministic noise seed
+     * @param {string} [sku]   — SKU code (unused in v5; was noise seed in v4)
      */
     function paintMaskedArea(ctx, sourceW, sourceH, sku) {
         var sx = sourceW / 1800;
@@ -208,41 +225,59 @@ var JdsTumblerTemplate = (function () {
             h: Math.round(MASK.h * sy)
         };
 
-        // Edge-sampling params scaled to the canvas resolution
-        var edgeInset = Math.max(4, Math.round(EDGE_INSET * Math.min(sx, sy)));
-        var edgeSampleW = Math.max(8, Math.round(EDGE_SAMPLE_W * Math.min(sx, sy)));
+        // Step 1: Read the two clean reference bands.
+        // ABOVE: y=420-435 — verified clean across all 16 SKUs (above this
+        //   y the steel-lid reflection contaminates the middle 30-70% of
+        //   body width; below y=440 we're inside the mask).
+        // BELOW: y=1145-1215 — verified clean (between placeholder bottom at
+        //   y~1100 and rib decoration start at ~y=1240).
+        var aboveY = Math.round(ABOVE_REF_BAND.y * sy);
+        var aboveH = Math.max(4, Math.round(ABOVE_REF_BAND.h * sy));
+        var belowY = Math.round(BELOW_REF_BAND.y * sy);
+        var belowH = Math.max(8, Math.round(BELOW_REF_BAND.h * sy));
 
-        // Step 1: Sample CENTER_REF color from clean band below mask. This
-        // is the "cylinder brightness peak" reference that anchors the
-        // triangular lerp's middle waypoint. Falls back to a per-row middle
-        // sample if the band is somehow out of bounds.
-        var centerRef = sampleAverageColor(ctx, sourceW, sourceH, {
-            x: Math.round(CENTER_REF_SAMPLE.x * sx),
-            y: Math.round(CENTER_REF_SAMPLE.y * sy),
-            w: Math.round(CENTER_REF_SAMPLE.w * sx),
-            h: Math.round(CENTER_REF_SAMPLE.h * sy)
-        });
+        var aboveImg, belowImg;
+        try {
+            aboveImg = ctx.getImageData(0, aboveY, sourceW, aboveH);
+            belowImg = ctx.getImageData(0, belowY, sourceW, belowH);
+        } catch (e) {
+            // Cross-origin block — bail (page will surface a Canvas error)
+            return;
+        }
 
-        // Step 2: Reference luminosity from clean bands ABOVE + BELOW mask.
-        // Used by step 7 to correct any systematic over/under-brightness.
-        // Above-mask band: 60 source-px tall, ending 10 source-px above mask top.
-        // Below-mask band: 60 source-px tall, starting 10 source-px below mask bottom.
-        var refLuma = sampleSurroundingLuma(ctx, sourceW, sourceH, mask, sx, sy);
+        // Step 2: Detect body bounds in each band's middle row.
+        var aboveBounds = findRowBodyBounds(aboveImg.data, Math.floor(aboveH / 2), sourceW);
+        var belowBounds = findRowBodyBounds(belowImg.data, Math.floor(belowH / 2), sourceW);
+        if (!aboveBounds || !belowBounds) {
+            return;
+        }
+        var aboveBodyW = aboveBounds.right - aboveBounds.left;
+        var belowBodyW = belowBounds.right - belowBounds.left;
 
-        // Step 3: Read the full mask Y range from the canvas in ONE call. Per-row
-        // getImageData would be ~350 separate Canvas API hits at preview size.
+        // CRITICAL: Average all rows of each band into a SINGLE per-X smooth
+        // row. Using individual source rows + py-cycling produced visible
+        // 2-pixel banding because adjacent band rows can have wildly different
+        // luma at the same X (e.g., lid-reflection bleed makes one row bright,
+        // the next dim). Averaging smooths color while preserving the per-X
+        // cylinder lighting profile. Procedural noise restores grain after.
+        // Verified 2026-05-12: cycling produced 70+ luma swings every 2 patch
+        // rows on LTM763 around the 65% body-relative X position.
+        var aboveAvg = averageBandRows(aboveImg.data, aboveH, sourceW);
+        var belowAvg = averageBandRows(belowImg.data, belowH, sourceW);
+
+        // Step 3: Read the mask Y range in one call.
         var rowSpan = ctx.getImageData(0, mask.y, sourceW, mask.h);
         var rowData = rowSpan.data;
         var rowW = rowSpan.width;
 
         var patch = ctx.createImageData(mask.w, mask.h);
         var pData = patch.data;
-        var lastCol = Math.max(1, mask.w - 1);
 
+        // Step 4: Per-pixel inpaint.
         for (var py = 0; py < mask.h; py++) {
             var rowOffset = py * rowW * 4;
 
-            // Find body left/right edges for this row (first/last opaque pixel)
+            // This mask row's body bounds (handles cylinder taper)
             var leftX = -1, rightX = -1;
             for (var x = 0; x < rowW; x++) {
                 if (rowData[rowOffset + x * 4 + 3] > 200) {
@@ -251,53 +286,18 @@ var JdsTumblerTemplate = (function () {
                 }
             }
             if (leftX === -1) {
-                // No body in this row — leave the patch row fully transparent
+                // No body — clear row to transparent
                 for (var ppx0 = 0; ppx0 < mask.w; ppx0++) {
                     pData[(py * mask.w + ppx0) * 4 + 3] = 0;
                 }
                 continue;
             }
+            var bodyW = rightX - leftX;
+            if (bodyW <= 0) continue;
 
-            // Sample left edge tint: average a slab `edgeSampleW` wide starting
-            // `edgeInset` pixels inside the body's leftmost opaque pixel.
-            var lSlabStart = leftX + edgeInset;
-            var lSlabEnd = lSlabStart + edgeSampleW;
-            var lr = 0, lg = 0, lb = 0, lcount = 0;
-            for (var lx = lSlabStart; lx < lSlabEnd && lx < rowW; lx++) {
-                var li = rowOffset + lx * 4;
-                if (rowData[li + 3] > 200) {
-                    lr += rowData[li]; lg += rowData[li + 1]; lb += rowData[li + 2];
-                    lcount++;
-                }
-            }
-            if (lcount === 0) { lr = lg = lb = 0; lcount = 1; }
-            var lColR = lr / lcount, lColG = lg / lcount, lColB = lb / lcount;
+            // Vertical lerp position within mask (0 at top, 1 at bottom)
+            var ty = mask.h > 1 ? py / (mask.h - 1) : 0;
 
-            // Sample right edge tint: same slab, just inside body's rightmost edge.
-            var rSlabEnd = rightX - edgeInset;
-            var rSlabStart = rSlabEnd - edgeSampleW;
-            var rr = 0, rg = 0, rb = 0, rcount = 0;
-            for (var rx = rSlabStart; rx < rSlabEnd && rx >= 0; rx++) {
-                var ri = rowOffset + rx * 4;
-                if (rowData[ri + 3] > 200) {
-                    rr += rowData[ri]; rg += rowData[ri + 1]; rb += rowData[ri + 2];
-                    rcount++;
-                }
-            }
-            if (rcount === 0) { rr = lColR; rg = lColG; rb = lColB; rcount = 1; }
-            var rColR = rr / rcount, rColG = rg / rcount, rColB = rb / rcount;
-
-            // Step 5: Triangular 3-point lerp through CENTER_REF.
-            //   t < 0.5  →  leftEdge → centerRef  (left half of the patch)
-            //   t >= 0.5 →  centerRef → rightEdge (right half of the patch)
-            // This reproduces the cylinder's lighting profile: dark/desaturated
-            // at edges, bright/saturated in the middle. v3's linear lerp
-            // missed the middle peak and produced a uniformly hazy patch.
-            // If centerRef sampling failed (off-canvas, etc), fall back to
-            // the linear lerp's midpoint (matches v3 behavior for that row).
-            var cR = centerRef ? centerRef.r : (lColR + rColR) / 2;
-            var cG = centerRef ? centerRef.g : (lColG + rColG) / 2;
-            var cB = centerRef ? centerRef.b : (lColB + rColB) / 2;
             for (var ppx = 0; ppx < mask.w; ppx++) {
                 var srcX = mask.x + ppx;
                 var srcAlpha = (srcX >= 0 && srcX < rowW) ? rowData[rowOffset + srcX * 4 + 3] : 0;
@@ -306,22 +306,43 @@ var JdsTumblerTemplate = (function () {
                     pData[pidx + 3] = 0;
                     continue;
                 }
-                var t = ppx / lastCol;
-                var rOut, gOut, bOut;
-                if (t < 0.5) {
-                    var wL = t * 2; // 0..1 across left half
-                    rOut = lColR + (cR - lColR) * wL;
-                    gOut = lColG + (cG - lColG) * wL;
-                    bOut = lColB + (cB - lColB) * wL;
-                } else {
-                    var wR = (t - 0.5) * 2; // 0..1 across right half
-                    rOut = cR + (rColR - cR) * wR;
-                    gOut = cG + (rColG - cG) * wR;
-                    bOut = cB + (rColB - cB) * wR;
-                }
-                pData[pidx]     = Math.round(rOut);
-                pData[pidx + 1] = Math.round(gOut);
-                pData[pidx + 2] = Math.round(bOut);
+
+                // Body-relative X position (0 at body's left, 1 at body's right)
+                var bodyRelX = (srcX - leftX) / bodyW;
+                if (bodyRelX < 0) bodyRelX = 0;
+                else if (bodyRelX > 1) bodyRelX = 1;
+
+                // Map to absolute X in each reference band's averaged row.
+                var aboveX = aboveBounds.left + Math.round(bodyRelX * aboveBodyW);
+                var belowX = belowBounds.left + Math.round(bodyRelX * belowBodyW);
+                if (aboveX < 0) aboveX = 0;
+                else if (aboveX >= sourceW) aboveX = sourceW - 1;
+                if (belowX < 0) belowX = 0;
+                else if (belowX >= sourceW) belowX = sourceW - 1;
+
+                // Read averaged-band pixels (single smooth row per band)
+                var aboveIdx = aboveX * 4;
+                var belowIdx = belowX * 4;
+
+                var ar = aboveAvg[aboveIdx];
+                var ag = aboveAvg[aboveIdx + 1];
+                var ab = aboveAvg[aboveIdx + 2];
+                var aa = aboveAvg[aboveIdx + 3];
+
+                var brc = belowAvg[belowIdx];
+                var bgc = belowAvg[belowIdx + 1];
+                var bbc = belowAvg[belowIdx + 2];
+                var bac = belowAvg[belowIdx + 3];
+
+                // If a reference pixel landed on a transparent area, fall
+                // back to the other band's pixel.
+                if (aa < 128 && bac >= 128) { ar = brc; ag = bgc; ab = bbc; }
+                else if (bac < 128 && aa >= 128) { brc = ar; bgc = ag; bbc = ab; }
+
+                // Lerp vertically by Y position within mask
+                pData[pidx]     = Math.round(ar + (brc - ar) * ty);
+                pData[pidx + 1] = Math.round(ag + (bgc - ag) * ty);
+                pData[pidx + 2] = Math.round(ab + (bbc - ab) * ty);
                 pData[pidx + 3] = srcAlpha;
             }
         }
@@ -333,37 +354,78 @@ var JdsTumblerTemplate = (function () {
         patchCanvas.height = mask.h;
         patchCanvas.getContext('2d').putImageData(patch, 0, 0);
 
-        // Step 6: Powder-coat noise overlay. Deterministic seed from SKU so
-        // repeat renders are byte-identical (important: AE preview vs
-        // customer-side preview must match if both screenshot the result).
+        // v5.1: Band-averaging removed the natural grain that single-row
+        // sampling preserved. Re-add subtle Gaussian noise (σ=2 luma, ~0.8%
+        // amplitude) so the patch surface doesn't look unnaturally smooth.
+        // Deterministic seed from SKU keeps repeat renders byte-identical.
         applyNoiseOverlay(patchCanvas, sku || 'default');
 
-        // Step 7: Luminosity correction — DISABLED for v4 ship.
-        // Live verification on 5 SKUs (2026-05-11) showed `sampleSurroundingLuma`'s
-        // "above mask" band lands in the shiny steel-lid zone (y=370-430),
-        // contaminating the reference luma by 50-100+ units. The correction
-        // then pulled patches OFF the (good) CENTER_REF target by 8-22 luma.
-        // Triangular lerp through CENTER_REF alone gets patch-center within
-        // ±3 luma of target — no correction needed. Helper retained below in
-        // case a future SKU with reliable above-mask body zone needs it.
-        if (false && refLuma > 0) {
-            correctLuminosity(patchCanvas, refLuma);
-        }
-
         // Asymmetric feather. Top/bottom uses cubic easing because the eye
-        // picks up linear-gradient banding at wider feather radii. We can't
-        // make the feather TOO wide — at >40 source px the feather erodes
-        // into the placeholder logo zone and re-exposes JDS's stock logo
-        // through the alpha gradient. 40px is the sweet spot: enough fade
-        // to hide minor mismatches, narrow enough to keep the placeholder
-        // fully covered. Sides are narrowest because per-row sampling
-        // matches body color exactly at the row's edges.
+        // picks up linear-gradient banding at wider feather radii. Sides
+        // are narrower because per-row sampling matches body color exactly
+        // at the row's edges.
         var fScale = Math.min(sx, sy);
         var featherTop = Math.max(20, Math.round(40 * fScale));
         var featherBottom = Math.max(20, Math.round(40 * fScale));
         var featherLR = Math.max(12, Math.round(24 * fScale));
 
         applyFeatheredCopy(ctx, patchCanvas, mask.x, mask.y, mask.w, mask.h, featherTop, featherBottom, featherLR);
+    }
+
+    /**
+     * Find the leftmost and rightmost opaque pixel in row `rowIdx` of an
+     * RGBA ImageData byte array. Returns null if the row has no opaque
+     * pixels.
+     */
+    function findRowBodyBounds(data, rowIdx, width) {
+        var offset = rowIdx * width * 4;
+        var L = -1, R = -1;
+        for (var x = 0; x < width; x++) {
+            if (data[offset + x * 4 + 3] > 200) {
+                if (L === -1) L = x;
+                R = x;
+            }
+        }
+        return L === -1 ? null : { left: L, right: R };
+    }
+
+    /**
+     * Average all opaque rows of an RGBA ImageData band into a single
+     * row-sized RGBA byte array. For each X column, averages R/G/B/A
+     * across only the pixels that were opaque (a > 200) in the source.
+     *
+     * Used by v5 to collapse the multi-row reference bands into smooth
+     * per-X color profiles. Without this averaging, the algorithm picks
+     * up row-to-row variation (e.g., lid-reflection bleed alternating
+     * with clean body) that produces visible 2-pixel banding when adjacent
+     * patch rows sample adjacent source rows.
+     *
+     * @returns {Uint8ClampedArray} length = width * 4
+     */
+    function averageBandRows(data, rowCount, width) {
+        var out = new Uint8ClampedArray(width * 4);
+        for (var x = 0; x < width; x++) {
+            var rSum = 0, gSum = 0, bSum = 0, aSum = 0, n = 0;
+            for (var ry = 0; ry < rowCount; ry++) {
+                var idx = (ry * width + x) * 4;
+                if (data[idx + 3] > 200) {
+                    rSum += data[idx];
+                    gSum += data[idx + 1];
+                    bSum += data[idx + 2];
+                    aSum += data[idx + 3];
+                    n++;
+                }
+            }
+            if (n > 0) {
+                out[x * 4]     = Math.round(rSum / n);
+                out[x * 4 + 1] = Math.round(gSum / n);
+                out[x * 4 + 2] = Math.round(bSum / n);
+                out[x * 4 + 3] = Math.round(aSum / n);
+            } else {
+                out[x * 4 + 3] = 0; // transparent
+            }
+        }
+        return out;
     }
 
     /**
@@ -884,7 +946,7 @@ var JdsTumblerTemplate = (function () {
         var img = ctx.getImageData(0, 0, w, h);
         var data = img.data;
         var rng = makeSeededRng(seedStr);
-        var sigma = 3;
+        var sigma = 2; // v5.1 — 0.8% luma jitter (less than v4's 3 since color is now more accurate)
         for (var i = 0; i < data.length; i += 4) {
             if (data[i + 3] > 0) {
                 var n = gaussian(rng) * sigma;
@@ -974,6 +1036,8 @@ var JdsTumblerTemplate = (function () {
         EDGE_INSET: EDGE_INSET,
         EDGE_SAMPLE_W: EDGE_SAMPLE_W,
         CENTER_REF_SAMPLE: CENTER_REF_SAMPLE,
+        ABOVE_REF_BAND: ABOVE_REF_BAND,
+        BELOW_REF_BAND: BELOW_REF_BAND,
         getEngraveColor: getEngraveColor,
         paintMaskedArea: paintMaskedArea,
         buildEngravedLogo: buildEngravedLogo,
