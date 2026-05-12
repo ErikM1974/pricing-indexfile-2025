@@ -134,15 +134,20 @@ var JdsTumblerTemplate = (function () {
      * y<420 the lid reflection contaminates the middle 30-70% of body
      * width; at y>=440 we're inside the mask (no clean body).
      *
-     * BELOW_REF_BAND: y=1145-1215 (70 source-px tall). Sits between the
-     * placeholder logo bottom (~y=1100-1140 across SKUs) and the rib
-     * decoration start (~y=1240). 70 rows gives the inpainting algorithm
-     * plenty of grain variation when cycling source rows.
+     * BELOW_REF_BAND: y=1195-1234 (40 source-px tall). v5.3 fix — was
+     * originally y=1145-1214 (70 rows) but LTM767 Miss Kiki's TIKI palm
+     * trunks extend down to y=1184 on the trunks at x=820, x=925.
+     * That made palm pixels MAJORITY at those columns, defeating the
+     * v5.2 median-based outlier filter (median itself fell in palm-color
+     * range). Per-Y luma scan on LTM767 confirms transition to clean body
+     * at y=1185+; we start the band 10 source-px past that buffer at
+     * y=1195. Band ends at y=1234, ~6 rows before the rib decoration
+     * pattern intensifies (~y=1240+).
      *
      * Both bands verified clean across all 16 mockup-eligible SKUs.
      */
     var ABOVE_REF_BAND = { y: 420, h: 16 };
-    var BELOW_REF_BAND = { y: 1145, h: 70 };
+    var BELOW_REF_BAND = { y: 1195, h: 40 };
 
     /**
      * Tumbler-color engrave palette. JDS's EngraveColor field uses two
