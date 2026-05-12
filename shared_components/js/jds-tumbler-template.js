@@ -390,40 +390,89 @@ var JdsTumblerTemplate = (function () {
     }
 
     /**
-     * Average all opaque rows of an RGBA ImageData band into a single
-     * row-sized RGBA byte array. For each X column, averages R/G/B/A
-     * across only the pixels that were opaque (a > 200) in the source.
+     * Collapse all opaque rows of a band into a single per-X smooth row,
+     * using OUTLIER-only rejection to drop placeholder-logo bleed-through
+     * without destroying legitimate cylinder highlights.
      *
-     * Used by v5 to collapse the multi-row reference bands into smooth
-     * per-X color profiles. Without this averaging, the algorithm picks
-     * up row-to-row variation (e.g., lid-reflection bleed alternating
-     * with clean body) that produces visible 2-pixel banding when adjacent
-     * patch rows sample adjacent source rows.
+     * Per-X algorithm:
+     *   1. Collect opaque (R, G, B, luma) tuples across all band rows
+     *   2. Compute median luma for the column
+     *   3. Drop pixels with luma > median + 30 (placeholder silver typically
+     *      sits 50-100 luma above body color; cylinder natural highlights
+     *      stay within ~15 luma of median)
+     *   4. Mean-average whatever's kept
+     *
+     * Initial trimmed-mean approach (drop fixed top 35%) was too aggressive
+     * for uncontaminated SKUs — it dropped the body's own cylinder peaks
+     * along with any placeholder pixels, pulling patch luma down by 10-15
+     * units. Outlier-only rejection preserves the data when there's nothing
+     * to remove, and only kicks in when there's a real placeholder bleed.
+     *
+     * Verified 2026-05-12 on LTM767: palm trees at x=811-826 and x=919-933
+     * in the below-band (y=1145-1214) produced visible streaks; the median+30
+     * filter drops them while leaving clean SKUs untouched.
      *
      * @returns {Uint8ClampedArray} length = width * 4
      */
     function averageBandRows(data, rowCount, width) {
         var out = new Uint8ClampedArray(width * 4);
+        // Reusable scratch buffers — avoid per-X allocation
+        var rs = new Uint8Array(rowCount);
+        var gs = new Uint8Array(rowCount);
+        var bs = new Uint8Array(rowCount);
+        var ls = new Float32Array(rowCount);
+        var sortBuf = new Float32Array(rowCount);
+
         for (var x = 0; x < width; x++) {
-            var rSum = 0, gSum = 0, bSum = 0, aSum = 0, n = 0;
+            // Collect opaque pixel values at this X across all band rows
+            var n = 0;
             for (var ry = 0; ry < rowCount; ry++) {
                 var idx = (ry * width + x) * 4;
                 if (data[idx + 3] > 200) {
-                    rSum += data[idx];
-                    gSum += data[idx + 1];
-                    bSum += data[idx + 2];
-                    aSum += data[idx + 3];
+                    rs[n] = data[idx];
+                    gs[n] = data[idx + 1];
+                    bs[n] = data[idx + 2];
+                    ls[n] = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
                     n++;
                 }
             }
-            if (n > 0) {
-                out[x * 4]     = Math.round(rSum / n);
-                out[x * 4 + 1] = Math.round(gSum / n);
-                out[x * 4 + 2] = Math.round(bSum / n);
-                out[x * 4 + 3] = Math.round(aSum / n);
-            } else {
-                out[x * 4 + 3] = 0; // transparent
+            if (n === 0) { out[x * 4 + 3] = 0; continue; }
+
+            // Median luma — copy then insertion-sort for small n
+            for (var c = 0; c < n; c++) sortBuf[c] = ls[c];
+            for (var i = 1; i < n; i++) {
+                var key = sortBuf[i];
+                var j = i - 1;
+                while (j >= 0 && sortBuf[j] > key) {
+                    sortBuf[j + 1] = sortBuf[j];
+                    j--;
+                }
+                sortBuf[j + 1] = key;
             }
+            var medianL = sortBuf[Math.floor(n / 2)];
+
+            // Outlier threshold: median + 30 luma
+            var threshold = medianL + 30;
+
+            var rSum = 0, gSum = 0, bSum = 0, kept = 0;
+            for (var k = 0; k < n; k++) {
+                if (ls[k] <= threshold) {
+                    rSum += rs[k];
+                    gSum += gs[k];
+                    bSum += bs[k];
+                    kept++;
+                }
+            }
+            if (kept === 0) {
+                // Should never happen since median is always <= threshold,
+                // but be defensive — fall back to a simple mean.
+                for (var f = 0; f < n; f++) { rSum += rs[f]; gSum += gs[f]; bSum += bs[f]; }
+                kept = n;
+            }
+            out[x * 4]     = Math.round(rSum / kept);
+            out[x * 4 + 1] = Math.round(gSum / kept);
+            out[x * 4 + 2] = Math.round(bSum / kept);
+            out[x * 4 + 3] = 255;
         }
         return out;
     }
