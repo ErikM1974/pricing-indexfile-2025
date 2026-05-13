@@ -265,6 +265,33 @@
     background: #c7d2fe;
     color: #3730a3;
 }
+
+/* 2026-05-13 — Whole-cell click affordance for the Shipped column.
+   When a tracking URL is available, clicking ANYWHERE in the cell (date,
+   tracking pill, Expected … line) opens the carrier tracking page. The
+   cursor and hover state hint at the larger hit zone so Mikalah doesn't
+   have to aim for the pill specifically. JS handler (cell-level) prevents
+   the row's <a href="…detail"> from firing for this cell only. */
+.sc-cell--shipped--track {
+    cursor: pointer;
+    border-radius: 6px;
+    margin: -4px -8px;
+    padding: 4px 8px;
+    transition: background-color 0.15s ease;
+}
+.sc-cell--shipped--track:hover {
+    background: #eef2ff;
+}
+.sc-cell--shipped--track:hover .sc-track-pill--link {
+    /* Pill already has its own hover — reset to base so the pill doesn't
+       look "double-hovered" when the parent cell is also highlighted. */
+    background: #eef2ff;
+    color: #4338ca;
+}
+.sc-cell--shipped--track:hover .sc-ship-date {
+    color: #4338ca;
+}
+
 .sc-cell--chevron {
     color: #adb5bd;
     text-align: right;

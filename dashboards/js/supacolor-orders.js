@@ -456,6 +456,24 @@
                   '</div>'
                 : '';
 
+            // 2026-05-13: Mikalah was confused that only the tracking PILL
+            // opened the carrier page — clicking the date or "Expected …"
+            // line in the same cell went to the detail page instead.
+            // Resolution: make the ENTIRE Shipped cell click through to the
+            // carrier tracking page (Amazon-style "Track Package" affordance).
+            // Rest of the row still navigates to detail. We compute the URL
+            // here at the row level so we can stamp it as data-track-url on
+            // the cell wrapper; shippedCellHtml() still computes it internally
+            // for the pill — harmless duplication, kept for backward-compat
+            // (the pill keeps its data-track-url for older selectors).
+            var rowTrackUrl = j.Tracking_Number
+                ? trackingUrlFromCarrier(j.Carrier, j.Tracking_Number, j.Shipping_Method)
+                : '';
+            var shippedCellClass = 'sc-cell sc-cell--shipped' + (rowTrackUrl ? ' sc-cell--shipped--track' : '');
+            var shippedCellAttrs = rowTrackUrl
+                ? ' data-track-url="' + escapeHtml(rowTrackUrl) + '" title="Click to track shipment"'
+                : '';
+
             return '<a href="' + detailUrl + '" class="sc-row">' +
                 '<div class="sc-cell sc-cell--job">#' + escapeHtml(j.Supacolor_Job_Number || '—') + '</div>' +
                 '<div class="sc-cell sc-cell--po">' + escapeHtml(j.PO_Number || '') + '</div>' +
@@ -482,7 +500,7 @@
                         escapeHtml(j.Status || '') +
                     '</span>' +
                 '</div>' +
-                '<div class="sc-cell sc-cell--shipped">' + shippedCellHtml(j) + '</div>' +
+                '<div class="' + shippedCellClass + '"' + shippedCellAttrs + '>' + shippedCellHtml(j) + '</div>' +
                 '<div class="sc-cell sc-cell--chevron"><i class="fas fa-chevron-right"></i></div>' +
             '</a>';
         }).join('');
@@ -501,10 +519,15 @@
                 rows +
             '</div>';
 
-        // Delegated click handler for tracking pills — open carrier page in a new
-        // tab and stop the click from bubbling to the row's <a href="...detail">.
-        wrap.querySelectorAll('.sc-track-pill--link').forEach(function (pill) {
-            pill.addEventListener('click', function (e) {
+        // 2026-05-13: Click anywhere in the Shipped cell (date, tracking pill,
+        // or "Expected …" line) opens the carrier tracking page in a new tab.
+        // Replaces the previous pill-only handler — Mikalah was clicking the
+        // date and ending up on the detail page. e.stopPropagation prevents
+        // the row's <a href="…/detail"> link from firing for this cell only;
+        // other cells (Job #, PO, Customer, Status, chevron) still navigate
+        // to the detail page as before.
+        wrap.querySelectorAll('.sc-cell--shipped--track').forEach(function (cell) {
+            cell.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 var url = this.getAttribute('data-track-url');
