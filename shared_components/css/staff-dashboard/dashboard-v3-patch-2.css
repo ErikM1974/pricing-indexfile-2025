@@ -242,3 +242,99 @@
   margin-right: 4px;
   display: inline-block;
 }
+
+/* ── 12. Welcome chip + Sales Goal hero card (2026-05-13) ──────────────
+   The "v3 BETA" pill was retired today (we're out of beta, cutover done).
+   In its place, the .user-welcome element moves into .header-left and gets
+   re-skinned as a small green pill matching the pace-badge visual language.
+   The Sales Goal banner also gets centered + glow-shadow treatment so it
+   reads as the page's headline KPI, not a thin utility strip.
+
+   Lives in patch-2 (not the Claude Designer theme file) so the upstream-
+   handoff option stays clean. Loads after the theme so the cascade wins
+   without any !important.
+*/
+
+/* ── 12a. Welcome chip — next to the page title ─────────────────────── */
+.user-welcome--chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 12px;
+  padding: 4px 10px;
+  background: var(--nw-green-soft);
+  border: 1px solid var(--nw-green-dim);
+  border-radius: 999px;
+  color: var(--nw-green-hi);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  /* Override the .user-welcome flex-shrink:0 rule at line 154/159 — already
+     compatible since flex-shrink doesn't affect inline-flex sizing here.
+     The .hide-mobile class on the element keeps it hidden under 720px. */
+}
+.user-welcome--chip .welcome-text {
+  color: var(--nw-green-hi);
+  text-transform: uppercase;
+}
+.user-welcome--chip .user-name {
+  color: var(--nw-green-hi);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── 12b. Sales Goal hero — centered, larger, glowy ─────────────────── */
+.sales-goal-banner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 20px 28px;
+  box-shadow:
+    0 0 0 1px rgba(34, 197, 94, 0.18),
+    0 8px 32px -8px rgba(34, 197, 94, 0.30),
+    var(--shadow-card);
+}
+.sales-goal-row {
+  justify-content: center;
+}
+/* The "$3.0M" goal label — slightly larger than the base 15px so it reads
+   as a meaningful number, not metadata. */
+.sales-goal-amount {
+  font-size: 18px;
+}
+/* The YTD dollar value ($971,153) — this is the page's primary KPI, so
+   it gets the biggest weight. ~22px keeps it readable without making the
+   banner feel cartoonish. */
+.sales-goal-current {
+  font-size: 22px;
+}
+/* Thicker, wider progress bar so the green fill feels substantial. The
+   theme's existing gradient + glow on .progress-fill carries over. */
+.sales-goal-progress {
+  height: 12px;
+  min-width: 280px;
+  max-width: 460px;
+  border-radius: 6px;
+}
+.sales-goal-progress .progress-fill {
+  border-radius: 6px;
+  animation: goalPulse 3s ease-in-out infinite;
+}
+
+@keyframes goalPulse {
+  0%, 100% { box-shadow: 0 0 12px var(--nw-green-glow); }
+  50%      { box-shadow: 0 0 20px var(--nw-green-glow); }
+}
+
+/* Narrow viewports — relax the centering so the banner doesn't crush
+   against tiny gutters. The theme's existing mobile rule at line 948
+   shrinks the row font; this preserves the spread. */
+@media (max-width: 720px) {
+  .sales-goal-banner {
+    max-width: 100%;
+    padding: 14px 18px;
+  }
+  .sales-goal-amount  { font-size: 15px; }
+  .sales-goal-current { font-size: 17px; }
+  .sales-goal-progress { min-width: 160px; max-width: 100%; height: 10px; }
+}

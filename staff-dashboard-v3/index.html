@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-2900-announcefilter">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-2900-announcefilter">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-2900-announcefilter">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-2900-announcefilter">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3000-headerpolish">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-2900-announcefilter">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3000-headerpolish">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-2900-announcefilter">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3000-headerpolish">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-2900-announcefilter"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3000-headerpolish"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>
@@ -227,7 +227,15 @@
                         <i class="fas fa-bars" aria-hidden="true"></i>
                     </button>
                     <h1 class="page-title">Staff Dashboard</h1>
-                    <span class="metrics-comparison-badge" title="You're viewing the v3 parallel build. Use the v2 fallback at /staff-dashboard-v2.html if needed.">v3 BETA</span>
+                    <!-- Welcome chip — moved here from header-right 2026-05-13 so the
+                         user's name lands near the title where their eye starts.
+                         auth-controller.js unhides #userWelcome + fills #userName
+                         once Caspio resolves. The .user-welcome--chip modifier
+                         scopes the green-pill styling defined in patch-2.css. -->
+                    <div class="user-welcome user-welcome--chip hide-mobile" id="userWelcome" style="display: none;">
+                        <span class="welcome-text">Welcome,</span>
+                        <span class="user-name" id="userName"></span>
+                    </div>
                 </div>
                 <div class="header-right">
 
@@ -251,11 +259,6 @@
                                 <i class="fas fa-table" aria-hidden="true"></i> Open Staff Directory
                             </button>
                         </div>
-                    </div>
-
-                    <div class="user-welcome hide-mobile" id="userWelcome" style="display: none;">
-                        <span class="welcome-text">Welcome,</span>
-                        <span class="user-name" id="userName"></span>
                     </div>
 
                     <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out-link" title="Sign out">
