@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="green" data-density="comfy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <!-- Force fresh fetch on every page load while v3 is in heavy iteration.
+         Remove these 3 lines once the design stabilizes. -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Staff Dashboard v3 — Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!--
+        v3 CSS — 4 files, no legacy. Loaded into @layer:
+        reset (browser default) → tokens → base → components → utilities → overrides.
+        Cascade order is enforced by @layer, not source order.
+    -->
+    <style>@layer reset, tokens, base, components, utilities, overrides;</style>
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-2800-specialty">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-2800-specialty">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-2800-specialty">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-2800-specialty">
+    <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-2800-specialty">
+    <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
+         PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
+         [class*="..."] selectors were over-matching and damaging styles that
+         components.css already had correct (garment-bonus, celebration pills, etc). -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-2800-specialty">
+
+    <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
+         Sets up a MutationObserver that disables any stylesheets Caspio's embed
+         injects into <head> at runtime (semantic.css, responsive576.css, etc).
+         Without this, Caspio's CSS overrides our dashboard colors ~500ms after
+         page load, producing a "flashes correct then reverts dim" bug. -->
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-2800-specialty"></script>
+    <!-- Config bootstrap (must load BEFORE the module) -->
+    <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
+</head>
+<body>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading dashboard…</div>
+    </div>
+
+    <!-- Hidden Caspio Authentication Container -->
+    <div class="caspio-auth" hidden>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
+    <!-- Announcements data (kept inline per Erik's plan answer #2) -->
+    <script id="staffAnnouncementsData" type="application/json">
+[
+    {
+        "id": "ann-001",
+        "type": "training",
+        "title": "New LTM Order Policy Update",
+        "preview": "Framework for handling Less-Than-Minimum orders: existing vs. new customers, upselling, and referrals.",
+        "content": "Full policy details available in the policies hub.",
+        "date": "2025-09-09"
+    },
+    {
+        "id": "ann-002",
+        "type": "process",
+        "title": "Customer Notification SOP Updated",
+        "preview": "Standard procedure for notifying customers when orders are ready for pickup, including ShopWorks logging.",
+        "date": "2025-09-16"
+    },
+    {
+        "id": "ann-003",
+        "type": "general",
+        "title": "Welcome to Staff Dashboard v3",
+        "preview": "Polished, accessible, mobile-friendly. Half the CSS, modular JS, no silent fallbacks. v2 lives at /staff-dashboard-v2.html for 90 days.",
+        "date": "2026-05-12"
+    }
+]
+    </script>
+
+    <div class="dashboard-container">
+
+        <!-- ===================================================
+             SIDEBAR
+             =================================================== -->
+        <aside class="sidebar" aria-label="Main navigation">
+            <div class="sidebar-header">
+                <a href="/" class="logo-link" title="Go to main site">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="company-logo">
+                </a>
+                <div class="company-name">Staff Portal</div>
+                <div class="company-year">2026 · v3</div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="sidebar-content">
+
+                    <!-- Company Policies -->
+                    <div class="nav-section" data-section="policies">
+                        <a href="/pages/policies-hub.html" class="nav-section-header-link">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">📋</span>
+                                <span>Company Policies</span>
+                            </div>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+
+                    <!-- Training -->
+                    <div class="nav-section collapsed" data-section="training">
+                        <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-training">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">📖</span>
+                                <span>Training</span>
+                            </div>
+                            <span class="chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <div class="nav-section-content" id="nav-training">
+                            <div>
+                                <a href="/pages/data-entry-guide.html" class="nav-link">ShopWorks Data Entry Guide</a>
+                                <a href="/training/customer-service.html" class="nav-link">Customer Service Manual</a>
+                                <a href="/training/sales-coordinator-manual.html" class="nav-link">Sales Coordinator Manual</a>
+                                <a href="/training/quick-reference-tips.html" class="nav-link">Quick Hitter Tips Archive</a>
+                                <a href="/training/training-games-hub.html" class="nav-link">Training Games Hub</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Office Assistant -->
+                    <div class="nav-section collapsed" data-section="office-assistant">
+                        <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-office">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">👩‍💼</span>
+                                <span>Office Assistant</span>
+                            </div>
+                            <span class="chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <div class="nav-section-content" id="nav-office">
+                            <div>
+                                <a href="/training/adriyella-daily-report.html" class="nav-link">Adriyella's Bonus Tracker</a>
+                                <a href="/training/thank-you-card-guide.html" class="nav-link">Thank You Card Guide</a>
+                                <a href="/training/google-review-guide.html" class="nav-link">Google Review Guide</a>
+                                <a href="/training/lead-sheet-guide.html" class="nav-link">Lead Sheet Guide</a>
+                                <a href="/training/art-approval-guide.html" class="nav-link">Art Approval Guide</a>
+                                <a href="/training/bonus-policy.html" class="nav-link">Erik's Bonus Policy</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Employee Bundles -->
+                    <div class="nav-section collapsed" data-section="employee-bundles">
+                        <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-bundles">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">🏷️</span>
+                                <span>Employee Bundles</span>
+                            </div>
+                            <span class="chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <div class="nav-section-content" id="nav-bundles">
+                            <div>
+                                <a href="/DrainPro-Bundle.html" class="nav-link">Drain-Pro</a>
+                                <a href="/streich-bros-bundle.html" class="nav-link">Streich Bros</a>
+                                <a href="/wcttr-bundle.html" class="nav-link">WCTTR</a>
+                                <a href="/christmas-bundles.html" class="nav-link">Christmas Bundles</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inksoft Transform -->
+                    <div class="nav-section" data-section="inksoft-trans">
+                        <a href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/" target="_blank" rel="noopener" class="nav-section-header-link">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">🔄</span>
+                                <span>Inksoft Transform</span>
+                            </div>
+                            <span aria-hidden="true">↗</span>
+                        </a>
+                    </div>
+
+                    <!-- Administration -->
+                    <div class="nav-section collapsed" data-section="admin">
+                        <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">⚙️</span>
+                                <span>Administration</span>
+                            </div>
+                            <span class="chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <div class="nav-section-content" id="nav-admin">
+                            <div>
+                                <a href="/sanmar-vendor-portal.html" class="nav-link">Sanmar Vendor Portal</a>
+                                <a href="/admin/announcements-create.html" class="nav-link">Create Announcements</a>
+                                <a href="/admin/announcements-manage.html" class="nav-link">Manage Announcements</a>
+                                <a href="/universal-records-admin.html" class="nav-link">Universal Records Admin</a>
+                                <a href="/training/adriyella-admin.html" class="nav-link">Adriyella Task Admin</a>
+                                <a href="/dashboards/commission-structure.html" class="nav-link">Commission Structure</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ===================================================
+             MAIN CONTENT
+             =================================================== -->
+        <main class="main-content">
+
+            <!-- Top header -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button type="button" class="sign-out-link show-mobile-only" data-action="sidebar:toggle-mobile" aria-label="Open menu">
+                        <i class="fas fa-bars" aria-hidden="true"></i>
+                    </button>
+                    <h1 class="page-title">Staff Dashboard</h1>
+                    <span class="metrics-comparison-badge" title="You're viewing the v3 parallel build. Use the v2 fallback at /staff-dashboard-v2.html if needed.">v3 BETA</span>
+                </div>
+                <div class="header-right">
+
+                    <!-- Phase 4.5: Combined Team widget (replaces 3-pill cluster) -->
+                    <div class="team-widget">
+                        <button type="button" id="teamBtn" class="team-btn" data-action="team:toggle-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="teamDropdown">
+                            <span><i class="fas fa-users" aria-hidden="true"></i> Team</span>
+                            <span class="team-btn__divider" aria-hidden="true"></span>
+                            <span class="team-btn__pill" title="Active employees"><span class="team-btn__count" id="teamActiveCount">--</span></span>
+                            <span class="team-btn__pill" title="Upcoming birthdays in 30 days"><span aria-hidden="true">🎂</span><span class="team-btn__count" id="teamBdayCount">0</span></span>
+                            <span class="team-btn__pill" title="Upcoming anniversaries in 30 days"><span aria-hidden="true">🏆</span><span class="team-btn__count" id="teamAnnivCount">0</span></span>
+                        </button>
+                        <div id="teamDropdown" class="team-dropdown" role="region" aria-label="Team celebrations">
+                            <h4><i class="fas fa-cake-candles" aria-hidden="true"></i> Upcoming Birthdays</h4>
+                            <ul id="teamBirthdayList"></ul>
+
+                            <h4><i class="fas fa-trophy" aria-hidden="true"></i> Upcoming Anniversaries</h4>
+                            <ul id="teamAnniversaryList"></ul>
+
+                            <button type="button" class="team-dropdown__view-all" data-action="staff-directory:show" data-filter="all">
+                                <i class="fas fa-table" aria-hidden="true"></i> Open Staff Directory
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="user-welcome hide-mobile" id="userWelcome" style="display: none;">
+                        <span class="welcome-text">Welcome,</span>
+                        <span class="user-name" id="userName"></span>
+                    </div>
+
+                    <a href="https://c3eku948.caspio.com/folderlogout" class="sign-out-link" title="Sign out">
+                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                        <span class="hide-mobile">Sign Out</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Partial Data Warning placeholder -->
+            <div id="partialDataWarning" class="partial-data-warning is-hidden"></div>
+
+            <!-- ===================================================
+                 SALES GOAL BANNER (simplified 2026-05-13 per Erik's request)
+                 Just the headline: 2026 Goal · $3.0M · progress · YTD · (%).
+                 Pace/days-left/projected-EOY spans removed — too much info
+                 for a single glance. Numbers still computed by the controller;
+                 just not rendered. JS keeps null-safe access so nothing breaks.
+                 =================================================== -->
+            <section class="sales-goal-banner" aria-label="2026 sales goal">
+                <div class="sales-goal-row">
+                    <span class="sales-goal-icon" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
+                    <span class="sales-goal-label">2026 Goal</span>
+                    <span class="sales-goal-amount">$3.0M</span>
+
+                    <div class="sales-goal-progress" role="progressbar" aria-label="Progress to annual goal" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
+                    </div>
+
+                    <span class="sales-goal-current" id="goalCurrent">$0</span>
+                    <span class="sales-goal-percent">(<span id="goalPercent">0</span>%)</span>
+                </div>
+            </section>
+
+            <!-- Dashboard zones -->
+            <div class="dashboard-zones">
+
+                <!-- Zone 1: Announcements -->
+                <section class="zone-announcements" aria-labelledby="zoneAnnouncementsTitle">
+                    <h2 id="zoneAnnouncementsTitle" class="visually-hidden">Announcements</h2>
+                    <div class="announcements-hero" id="announcementsHero"></div>
+                    <div class="announcements-list" id="announcementsList"></div>
+                </section>
+
+                <!-- Zone 2: Quick Access (restructured 9 → 5 + Reference, Phase 4.2) -->
+                <section class="zone-quick-access" aria-labelledby="zoneQuickAccessTitle">
+                    <header class="zone-header">
+                        <h2 id="zoneQuickAccessTitle" class="zone-title">
+                            <i class="fas fa-bolt" aria-hidden="true"></i> Quick Access
+                        </h2>
+                    </header>
+
+                    <!-- Frequently Used Tools (ported from v2 staff-dashboard, 2026-05-13).
+                         Curated global list for now; per-user pinning is a Phase 2
+                         enhancement. The Transfer Workflow strip visually teaches the
+                         Bradley → Supa sequence to new staff. -->
+                    <div class="pinned-row pinned-row--frequent">
+                        <div class="pinned-row__label">⭐ Frequently Used</div>
+                        <div class="pinned-row__list" id="pinnedToolsList">
+                            <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders -->
+                            <div class="tool-workflow" aria-label="Transfer workflow">
+                                <div class="tool-workflow-label">
+                                    <i class="fas fa-route" aria-hidden="true"></i> Transfer Workflow
+                                </div>
+                                <div class="tool-workflow-row">
+                                    <a href="/dashboards/bradley-transfers.html" class="tool-btn tool-btn--workflow"><i class="fas fa-truck" aria-hidden="true"></i> Bradley's Transfer Queue</a>
+                                    <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
+                                    <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="" class="tool-btn__inline-img"> API Orders</a>
+                                </div>
+                            </div>
+                            <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
+                            <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Purchasing</a>
+                            <a href="/pages/order-form.html" class="tool-btn"><i class="fas fa-file-invoice" aria-hidden="true"></i> Order Form</a>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-grid">
+
+                        <!-- Quote Builders -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-pen-ruler" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Quote Builders</span>
+                                <span class="tool-category-count">5</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/quote-management.html" class="tool-btn"><i class="fas fa-list-alt" aria-hidden="true"></i> Quote Management</a>
+                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Emb / Cap / Patch</a>
+                                <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> DTG</a>
+                                <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
+                                <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire" aria-hidden="true"></i> DTF</a>
+                            </div>
+                        </div>
+
+                        <!-- Pricing & Calculators (apparel pricing — 9 items.
+                             Specialty product calculators moved to their own
+                             category below per 2026-05-13 IA split.) -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-calculator" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Pricing &amp; Calculators</span>
+                                <span class="tool-category-count">9</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing 2026</a>
+                                <a href="/calculators/compare-pricing.html" class="tool-btn"><i class="fas fa-search-dollar" aria-hidden="true"></i> Pricing by Style</a>
+                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Service Prices</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-plus-circle" aria-hidden="true"></i> Additional Logo</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-ruler" aria-hidden="true"></i> Stitch Pricing</a>
+                                <a href="/calculators/dtg-contract/" class="tool-btn"><i class="fas fa-handshake" aria-hidden="true"></i> Contract DTG</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=al-cemb" class="tool-btn"><i class="fas fa-handshake" aria-hidden="true"></i> Contract Embroidery</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=decg" class="tool-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Customer Supplied Emb</a>
+                                <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Customer Supplied Screen Print</a>
+                            </div>
+                        </div>
+
+                        <!-- Specialty Products (NEW 2026-05-13 — split off from
+                             Pricing & Calculators. Non-apparel / specialty SKU
+                             pricing tools: emblems, tumblers, stickers, webstore,
+                             non-Sanmar caps.) -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-shapes" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Specialty Products</span>
+                                <span class="tool-category-count">5</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/embroidered-emblem/" class="tool-btn"><i class="fas fa-certificate" aria-hidden="true"></i> Emblems</a>
+                                <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn"><i class="fas fa-mug-hot" aria-hidden="true"></i> Laser Tumbler</a>
+                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn"><i class="fas fa-sticky-note" aria-hidden="true"></i> Stickers</a>
+                                <a href="/calculators/webstores.html" class="tool-btn"><i class="fas fa-store" aria-hidden="true"></i> Webstore</a>
+                                <a href="/calculators/richardson-2025.html" class="tool-btn"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Richardson Non-Sanmar</a>
+                            </div>
+                        </div>
+
+                        <!-- Production -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-truck-fast" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Production</span>
+                                <span class="tool-category-count">7</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck" aria-hidden="true"></i> Bradley's Transfer Queue</a>
+                                <a href="/dashboards/supacolor-orders.html" class="tool-btn"><i class="fas fa-link" aria-hidden="true"></i> Supacolor API Orders</a>
+                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font" aria-hidden="true"></i> Monogram Dashboard</a>
+                                <a href="/dashboards/names-numbers-dashboard.html" class="tool-btn"><i class="fas fa-users" aria-hidden="true"></i> Names &amp; Numbers</a>
+                                <a href="/pages/box-labels.html" class="tool-btn"><i class="fas fa-box" aria-hidden="true"></i> Box Labels</a>
+                                <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Purchasing</a>
+                                <a href="/pages/order-form.html" class="tool-btn"><i class="fas fa-file-invoice" aria-hidden="true"></i> Order Form</a>
+                            </div>
+                        </div>
+
+                        <!-- Art & Design -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-palette" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Art &amp; Design</span>
+                                <span class="tool-category-count">8</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush" aria-hidden="true"></i> Steve's Queue</a>
+                                <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass" aria-hidden="true"></i> Ruth's Queue</a>
+                                <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
+                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-microscope" aria-hidden="true"></i> DST Stitch Viewer</a>
+                                <a href="/pages/mockup-generator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> Mockup Generator</a>
+                                <a href="/pages/jds-mockup-creator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> JDS Tumbler Mockup</a>
+                                <a href="/pages/design-gallery.html" class="tool-btn"><i class="fas fa-images" aria-hidden="true"></i> Design Gallery</a>
+                                <a href="/dashboards/digitized-designs.html" class="tool-btn"><i class="fas fa-th-list" aria-hidden="true"></i> Digitized Designs</a>
+                            </div>
+                        </div>
+
+                        <!-- CRM & Customers (role-gated, navigateToCRM in Phase 2 follow-up) -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-address-book" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">CRM &amp; Customers</span>
+                                <span class="tool-category-count">4</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/dashboards/taneisha-crm.html" class="tool-btn"><i class="fas fa-user-tie" aria-hidden="true"></i> Taneisha's Accounts</a>
+                                <a href="/dashboards/nika-crm.html" class="tool-btn"><i class="fas fa-user-tie" aria-hidden="true"></i> Nika's Accounts</a>
+                                <a href="/dashboards/house-accounts.html" class="tool-btn"><i class="fas fa-home" aria-hidden="true"></i> House Accounts</a>
+                                <a href="/dashboards/portal-directory.html" class="tool-btn"><i class="fas fa-globe" aria-hidden="true"></i> Customer Portals</a>
+                            </div>
+                        </div>
+
+                        <!-- Reference (collapsed by default via <details>) -->
+                        <details class="tool-category tool-category--reference">
+                            <summary class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-book" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Reference</span>
+                                <span class="tool-category-count">7</span>
+                            </summary>
+                            <div class="tool-buttons">
+                                <a href="/pages/policies-hub.html#sales-office" class="tool-btn"><i class="fas fa-file-alt" aria-hidden="true"></i> Sales &amp; Office Procedures</a>
+                                <a href="/pages/policies-hub.html#customer-notification" class="tool-btn"><i class="fas fa-bell" aria-hidden="true"></i> Customer Notification SOP</a>
+                                <a href="/pages/policies-hub.html#ltm-decision" class="tool-btn"><i class="fas fa-balance-scale" aria-hidden="true"></i> LTM Order Decision</a>
+                                <a href="/pages/data-entry-guide.html" class="tool-btn"><i class="fas fa-book-open" aria-hidden="true"></i> Data Entry Guide</a>
+                                <a href="/dashboards/reports/price-audit-report.html" class="tool-btn"><i class="fas fa-chart-bar" aria-hidden="true"></i> Price Audit Report</a>
+                                <a href="/dashboards/old-designs.html" class="tool-btn"><i class="fas fa-box-archive" aria-hidden="true"></i> Old Designs Archive</a>
+                                <a href="/pages/top-sellers-showcase.html" class="tool-btn"><i class="fas fa-trophy" aria-hidden="true"></i> Top Sellers</a>
+                            </div>
+                        </details>
+
+                    </div>
+                </section>
+
+                <!-- Zone 3: Sales Metrics -->
+                <section class="zone-metrics" aria-labelledby="zoneMetricsTitle">
+                    <h2 id="zoneMetricsTitle" class="visually-hidden">Sales Metrics</h2>
+
+                    <!-- Revenue card (Phase 4.4 polish) -->
+                    <article class="metrics-card metrics-revenue-card">
+                        <header class="metrics-revenue-header">
+                            <h3 class="metrics-revenue-title" id="revenueTitle">
+                                <i class="fas fa-dollar-sign" aria-hidden="true"></i> Revenue: Last 7 Days
+                            </h3>
+                            <div class="date-range-toggle" role="group" aria-label="Revenue period">
+                                <button type="button" class="date-range-btn active" data-action="metrics:set-range" data-days="7"  aria-pressed="true">7D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="30" aria-pressed="false">30D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="60" aria-pressed="false">60D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="90" aria-pressed="false">90D</button>
+                            </div>
+                        </header>
+                        <div class="metrics-revenue-value" id="ytdRevenue">
+                            <span class="skeleton skeleton-value"></span>
+                        </div>
+                        <div class="metrics-revenue-sparkline" id="revenueSparkline"></div>
+                        <div class="metrics-date-range" id="dateRangeDisplay"></div>
+                        <div class="metrics-revenue-comparison">
+                            <span class="metrics-comparison-badge" id="ytdGrowth"><i class="fas fa-minus" aria-hidden="true"></i> --</span>
+                            <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
+                        </div>
+                        <div class="metrics-revenue-stats" id="revenueStats" aria-live="polite"></div>
+                    </article>
+
+                    <!-- Team Performance card -->
+                    <article class="metrics-card metrics-team-card">
+                        <header class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="teamPerformanceTitle">
+                                    <i class="fas fa-users" aria-hidden="true"></i> Team Performance: 2026 YTD
+                                </h3>
+                                <div class="metrics-date-range" id="teamDateRange">Year-to-date</div>
+                            </div>
+                            <button type="button" class="refresh-btn" data-action="team-performance:refresh" aria-label="Refresh team performance" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div class="rep-list" id="salesTeamList">
+                            <!-- Populated by team-performance-controller -->
+                        </div>
+                    </article>
+
+                    <!-- Production Schedule Predictor (full width below the two metrics cards) -->
+                    <article class="production-widget-card col-span-full" data-widget="production">
+                        <header class="production-header">
+                            <h3 class="production-title">
+                                <i class="fas fa-chart-line" aria-hidden="true"></i> Production Turnaround
+                            </h3>
+                            <span id="production-season-badge" class="season-badge"></span>
+                            <button type="button" class="refresh-btn ml-2" data-action="production:refresh" aria-label="Refresh production" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div id="production-predictor-grid" class="production-predictor-grid">
+                            <div class="production-empty">Loading predictions…</div>
+                        </div>
+                        <div class="production-footer">
+                            <i class="fas fa-database" aria-hidden="true"></i>
+                            Based on <span id="production-record-count" class="num">4,631</span> historical completions
+                        </div>
+                    </article>
+
+                    <!-- Garment Tracker (real, bridged to legacy StaffDashboardService) -->
+                    <article class="garment-tracker-card col-span-full">
+                        <header class="metrics-team-header mb-3">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title">
+                                    <i class="fas fa-tshirt" aria-hidden="true"></i> Garment Tracker
+                                </h3>
+                                <div class="metrics-date-range" id="garmentTrackerDateRange">Loading…</div>
+                            </div>
+                            <div class="garment-tracker-controls">
+                                <span class="sync-status num" id="garmentSyncStatus"></span>
+                                <button type="button" class="sync-btn" data-action="garment-tracker:sync" aria-label="Sync from ManageOrders" title="Sync from ManageOrders">
+                                    <i class="fas fa-cloud-download-alt" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" class="refresh-btn" data-action="garment-tracker:refresh" aria-label="Refresh from table" title="Refresh from table">
+                                    <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </header>
+                        <div id="garmentTrackerContent">
+                            <div class="garment-tracker-loading"><div class="loading-spinner"></div><span>Loading garment tracker…</span></div>
+                        </div>
+                    </article>
+
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===================================================
+         STAFF DIRECTORY MODAL — uses <dashboard-modal> custom element
+         =================================================== -->
+    <dashboard-modal id="staffDirectoryModal" labelled-by="staffDirectoryTitle">
+        <div class="staff-modal">
+            <header class="staff-modal-header">
+                <h2 id="staffDirectoryTitle"><i class="fas fa-users" aria-hidden="true"></i> Staff Directory</h2>
+                <button type="button" class="staff-modal-close" data-modal-close aria-label="Close">&times;</button>
+            </header>
+            <div class="staff-modal-toolbar">
+                <input type="search" id="staffDirectorySearch" placeholder="Search by name or position…" aria-label="Search staff">
+                <button type="button" class="staff-filter-btn active" data-action="staff-directory:filter" data-filter="all">All</button>
+                <button type="button" class="staff-filter-btn"        data-action="staff-directory:filter" data-filter="active">Active</button>
+                <button type="button" class="staff-filter-btn"        data-action="staff-directory:filter" data-filter="birthdays">Birthdays</button>
+                <button type="button" class="staff-filter-btn"        data-action="staff-directory:filter" data-filter="anniversaries">Anniversaries</button>
+            </div>
+            <div class="staff-modal-content">
+                <table class="staff-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Name</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">Start Date</th>
+                            <th scope="col">Years</th>
+                            <th scope="col">Birthday</th>
+                            <th scope="col">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="staffDirectoryBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </dashboard-modal>
+
+    <!-- Bootstrap announcements data into a global the controller reads.
+         (Reads from the JSON <script> block above; keeps Rule #3 nominally clean
+         since this is just a data hand-off, no logic.) -->
+    <script src="/staff-dashboard-v3/announcements-bootstrap.js?v=20260512h"></script>
+
+    <!-- Legacy production-schedule modules (no API calls, just static stats + predictor.
+         Ported as plain script tags before the v3 module so production-controller.js
+         can read window.ProductionPredictor + PRODUCTION_STATS at init time.) -->
+    <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
+    <script src="/shared_components/js/production-schedule-predictor.js?v=20260512h"></script>
+
+    <!-- Legacy staff-dashboard-service.js — bridge for the garment tracker only.
+         Exposes window.StaffDashboardService with loadGarmentTrackerFromTable +
+         syncGarmentTracker + getGarmentTrackerConfig. v3's garment-tracker-controller
+         calls these. Will be replaced by a proper port in a follow-up phase.
+         (Note: legacy file hardcodes the proxy URL — known Rule #7 debt, isolated
+         to this bridge.) -->
+    <script src="/shared_components/js/staff-dashboard-service.js?v=20260512h"></script>
+
+    <!-- ===================================================
+         APP ENTRY (ES module)
+         =================================================== -->
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=20260512h"></script>
+</body>
+</html>

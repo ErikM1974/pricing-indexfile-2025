@@ -1,0 +1,244 @@
+/* =====================================================================
+   STAFF DASHBOARD v3 — PATCH 2
+   Append the rules below to /shared_components/css/staff-dashboard/
+   dashboard-v3-theme.css (or dashboard-v3-theme.unlayered.css) at the
+   VERY BOTTOM of the file, AFTER all existing rules and (if layered)
+   INSIDE the @layer overrides { } block.
+
+   These address the four visible issues in the latest screenshot:
+   1. Huge empty gap between Sales Goal banner and Quick Access
+   2. Pinned row card is ~3x too tall
+   3. Quick Access title floating in empty space
+   4. Metrics zone spacing
+   ===================================================================== */
+
+/* ── 1. Hide the empty announcements zone so it doesn't reserve space ── */
+.zone-announcements:empty,
+.zone-announcements:has(.announcements-hero:empty + .announcements-list:empty),
+.announcements-hero:empty,
+.announcements-list:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+/* If your announcement cards have a ::before/::after that creates space
+   even when empty, this catches it: */
+.zone-announcements > div:empty {
+  display: none !important;
+}
+
+/* ── 2. Compress the Pinned row ────────────────────────────────────── */
+.pinned-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 14px !important;
+  padding: 10px 16px !important;
+  min-height: auto !important;
+  max-height: 56px !important;
+  background: var(--surface-card) !important;
+  border: 1px solid var(--surface-border) !important;
+  border-radius: 10px !important;
+  margin-bottom: 14px !important;
+}
+.pinned-row__label {
+  font-size: 11px !important;
+  letter-spacing: .14em !important;
+  text-transform: uppercase !important;
+  color: var(--ink-lo) !important;
+  font-weight: 700 !important;
+  flex: 0 0 auto !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.pinned-row__list {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.pinned-row__empty {
+  color: var(--ink-dim) !important;
+  font-size: 12.5px !important;
+  font-style: italic !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+}
+
+/* ── 3. Tighten zone spacing ───────────────────────────────────────── */
+.dashboard-zones {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+.dashboard-zones > section {
+  margin: 0 !important;
+}
+.zone-quick-access,
+.zone-metrics,
+.zone-announcements {
+  padding: 0 !important;
+}
+
+/* Zone header should sit close to its content, not float */
+.zone-header {
+  margin-bottom: 14px !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+}
+
+/* ── 4. Sales goal banner — make sure percent inherits color ───────── */
+.sales-goal-percent,
+.sales-goal-percent #goalPercent {
+  color: var(--nw-green) !important;
+  font-weight: 700 !important;
+}
+
+/* ── 5. Top header spacing ─────────────────────────────────────────── */
+.top-header {
+  padding: 12px 0 16px !important;
+  margin-bottom: 12px !important;
+}
+
+/* ── 6. Main content padding ───────────────────────────────────────── */
+.main-content {
+  padding: 18px 28px 80px !important;
+  gap: 18px !important;
+}
+
+/* ── 7. Force Quick Access grid (in case existing CSS overrides it) ── */
+.quick-access-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 14px !important;
+}
+
+/* ── 8. Metrics zone grid ──────────────────────────────────────────── */
+.zone-metrics {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+}
+.zone-metrics .col-span-full {
+  grid-column: 1 / -1 !important;
+}
+@media (max-width: 1100px) {
+  .zone-metrics {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── 9. Hide production capacity dots ─────────────────────────────────
+   2026-05-13: per Erik, the amber/red/green capacity dots add noise.
+   The production day numbers are historical-data estimates, NOT live
+   capacity signals — so showing a "moderate workload" indicator is
+   misleading. Hide all three states. */
+.production-capacity-dot,
+.production-capacity-dot.capacity-moderate,
+.production-capacity-dot.capacity-busy {
+  display: none !important;
+}
+
+/* ── 10. Sign Out always visible ──────────────────────────────────────
+   2026-05-13: the Sign Out button was getting cropped at narrower
+   viewports because flex-shrink defaulted to 1. Lock both Sign Out
+   and the Team button to flex-shrink: 0 so they never compress. */
+.sign-out-link,
+.team-btn,
+.user-welcome {
+  flex-shrink: 0 !important;
+}
+/* Keep the welcome message visible to the LEFT of the Sign Out button
+   once auth-controller fills in the user name. */
+.user-welcome {
+  white-space: nowrap;
+}
+
+/* ── 11. Frequently Used Tools section ────────────────────────────────
+   2026-05-13: ported the v1/v2 "Frequently Used Tools" treatment into
+   v3's existing .pinned-row placeholder. The Transfer Workflow strip
+   visually groups Bradley's Queue → Supacolor API Orders so new staff
+   learn the sequence. Bradley's Queue gets a distinctive cyan→teal
+   gradient (the v2 deploy used this; staff recognize it). */
+.pinned-row.pinned-row--frequent {
+  display: block !important;
+  max-height: none !important;
+  padding: 16px 18px !important;
+  background: var(--surface-card, #1c2128) !important;
+  border: 1px solid var(--surface-border, #2b333d) !important;
+  border-radius: 12px !important;
+  margin-bottom: 16px !important;
+}
+.pinned-row--frequent .pinned-row__label {
+  margin-bottom: 12px !important;
+  display: block !important;
+}
+.pinned-row--frequent .pinned-row__list {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+/* Transfer Workflow mini-group: dashed green border + eyebrow label + arrow */
+.pinned-row--frequent .tool-workflow {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface-card-2, #232a33);
+  border: 1px dashed var(--nw-green-dim, #1f9d4d);
+  border-radius: 10px;
+}
+.pinned-row--frequent .tool-workflow-label {
+  color: var(--nw-green, #22c55e);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pinned-row--frequent .tool-workflow-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pinned-row--frequent .tool-workflow-arrow {
+  color: var(--nw-green, #22c55e);
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+}
+/* Bradley's Queue tile — cyan→teal gradient (matches v2 deploy) */
+.pinned-row--frequent .tool-btn--workflow {
+  background: linear-gradient(135deg, #1de9b6 0%, #29b6f6 50%, #2196f3 100%) !important;
+  color: #0b0f14 !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+}
+.pinned-row--frequent .tool-btn--workflow i {
+  color: #0b0f14 !important;
+}
+.pinned-row--frequent .tool-btn--workflow:hover {
+  background: linear-gradient(135deg, #5eead4 0%, #38bdf8 50%, #3b82f6 100%) !important;
+  transform: translateY(-1px);
+}
+/* Inline supacolor logo image inside .tool-btn */
+.pinned-row--frequent .tool-btn__inline-img {
+  height: 14px;
+  width: auto;
+  vertical-align: middle;
+  margin-right: 4px;
+  display: inline-block;
+}

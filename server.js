@@ -774,6 +774,32 @@ app.get('/staff-dashboard-legacy.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'staff-dashboard-legacy.html'));
 });
 
+// v3 parallel build (2026-05-12). Serves the new modular dashboard at
+// /staff-dashboard-v3/. Live page at /staff-dashboard.html stays untouched.
+// At cutover (90-day soak), this becomes the canonical dashboard and v2
+// moves to /staff-dashboard-v2.html as the fallback.
+// v3 dashboard HTML route — explicit no-cache headers so iterative CSS/JS
+// changes always reach the browser (2026-05-13: stop the cache fights).
+function noCacheHeaders(res) {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+}
+app.get('/staff-dashboard-v3/', (req, res) => {
+  noCacheHeaders(res);
+  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+});
+app.get('/staff-dashboard-v3', (req, res) => {
+  res.redirect(301, '/staff-dashboard-v3/');
+});
+app.get('/staff-dashboard-v3/index.html', (req, res) => {
+  noCacheHeaders(res);
+  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+});
+// Static assets under /staff-dashboard-v3/ (config.js, announcements-bootstrap.js)
+// Reuse staticOptions so these also send no-cache headers.
+app.use('/staff-dashboard-v3', express.static(path.join(__dirname, 'staff-dashboard-v3'), staticOptions));
+
 app.get('/bundle-orders-dashboard.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
 });

@@ -6,6 +6,16 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+## Dashboard / UI
+
+### Caspio Embed Script Overrides Host Page CSS (2026-05-13)
+**Problem:** Staff Dashboard v3 rendered correctly for ~500ms then "reverted" to dim grey. Sidebar, sales-goal pace pill, body text all overridden after page load.
+**Root Cause:** The Caspio auth DataPage embed (`<script src=".../emb">`) injects 4 stylesheets into `<head>` at runtime AFTER our dashboard CSS — `semantic.css`, `responsive576.css`, `responsive1024.css`, and a per-DataPage CSS. Cascade order: Caspio's CSS wins (later in source). Headless preview never reproduced it because Caspio's embed silently aborts with no live auth.
+**Solution:** `staff-dashboard-v3/caspio-isolation.js` — non-module script in `<head>` BEFORE the Caspio embed runs. Sets up `MutationObserver` that catches every `<link>` Caspio injects with `caspio.com` in href, sets `disabled = true` + `media = "not all"`. Caspio JS still runs and populates auth fields; only its CSS is blocked.
+**Prevention:** Any future page embedding a Caspio DataPage MUST include `caspio-isolation.js` (or equivalent) early in `<head>`. Full details + reusable pattern + test plan in [CASPIO_CSS_ISOLATION.md](./CASPIO_CSS_ISOLATION.md).
+
+---
+
 ## Pricing Architecture
 
 ### ALWAYS Pull Pricing From Caspio API — Never Hardcode

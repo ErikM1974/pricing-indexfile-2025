@@ -1,0 +1,237 @@
+/* =====================================================
+   STAFF DASHBOARD v3 — DESIGN TOKENS
+   Single source of truth for color, type, space, motion,
+   z-index, focus, density. Built on oklch + NW green.
+
+   Loaded into @layer tokens by index.html so every other
+   layer (base, components, utilities, overrides) wins
+   over plain unscoped resets but loses to explicit overrides.
+   ===================================================== */
+
+@layer tokens {
+
+:root {
+    /* =================================================
+       Type families
+       ================================================= */
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* Discrete type ramp (replaces ad-hoc rems) */
+    --font-size-xs:      0.6875rem; /* 11px — eyebrow labels */
+    --font-size-sm:      0.75rem;   /* 12px — meta */
+    --font-size-md:      0.875rem;  /* 14px — body */
+    --font-size-base:    1rem;      /* 16px — default */
+    --font-size-lg:      1.125rem;  /* 18px — emphasized body */
+    --font-size-xl:      1.25rem;   /* 20px — page subtitle */
+    --font-size-2xl:     1.5rem;    /* 24px — section title */
+    --font-size-display: 2.25rem;   /* 36px — hero KPI numbers */
+
+    --line-height-tight: 1.1;
+    --line-height-base:  1.5;
+    --line-height-loose: 1.75;
+
+    --font-weight-regular: 400;
+    --font-weight-medium:  500;
+    --font-weight-semibold: 600;
+    --font-weight-bold:    700;
+
+    /* =================================================
+       NW green family — single brand accent
+       ================================================= */
+    --nw-50:  oklch(96% 0.04 150);
+    --nw-100: oklch(92% 0.07 150);
+    --nw-300: oklch(78% 0.13 150);
+    --nw-500: oklch(62% 0.16 150);
+    --nw-600: oklch(54% 0.16 150);
+    --nw-700: oklch(46% 0.14 150);
+    --nw-900: oklch(28% 0.08 150);
+
+    /* =================================================
+       Space scale (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 px)
+       ================================================= */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+    --space-9: 96px;
+
+    /* =================================================
+       Radius
+       ================================================= */
+    --radius-sm:   6px;
+    --radius-md:   10px;
+    --radius-lg:   14px;
+    --radius-xl:   20px;
+    --radius-pill: 999px;
+    --radius-card: var(--radius-md); /* semantic alias */
+
+    /* =================================================
+       Motion
+       ================================================= */
+    --motion-fast: 120ms;
+    --motion-base: 200ms;
+    --motion-slow: 320ms;
+
+    --ease-out:        cubic-bezier(.2, .7, .3, 1);
+    --ease-spring:     cubic-bezier(.34, 1.56, .64, 1);
+    --ease-emphasized: cubic-bezier(.2, 0, 0, 1);
+
+    /* =================================================
+       Z-index scale
+       ================================================= */
+    --z-base:    0;
+    --z-sticky:  100;
+    --z-overlay: 500;
+    --z-modal:   1000;
+    --z-toast:   2000;
+    --z-fab:     9000;
+
+    /* =================================================
+       Density (applies to both themes)
+       ================================================= */
+}
+
+[data-density="compact"] {
+    --pad-card:    14px;
+    --gap-row:     8px;
+    --row-h:       32px;
+    --kpi-pad:     18px;
+    --tool-pad-y:  0.55rem;
+    --tool-pad-x:  0.75rem;
+    --tool-font:   0.8125rem;
+    --zone-pad:    1rem;
+    --zone-gap:    1rem;
+}
+[data-density="comfy"] {
+    --pad-card:    20px;
+    --gap-row:     12px;
+    --row-h:       40px;
+    --kpi-pad:     24px;
+    --tool-pad-y:  0.75rem;
+    --tool-pad-x:  1rem;
+    --tool-font:   0.875rem;
+    --zone-pad:    1.5rem;
+    --zone-gap:    1.5rem;
+}
+
+/* =====================================================
+   DARK THEME (default)
+   ===================================================== */
+[data-theme="dark"] {
+    /* 2026-05-13 Round 3: aligned to Claude Design's "Garment Tracker" mock.
+       Hex over oklch — predictable Windows rendering. Surfaces are flatter
+       (less elevation contrast) because hierarchy lives in TEXT shades, not
+       surface stacks. */
+    --bg:        #0b0f14;  /* page floor */
+    --bg-elev:   #14181e;  /* sidebar + header */
+    --bg-card:   #1c2128;  /* card surface (matches design exactly) */
+    --bg-card-2: #232a33;  /* slight elevation — buttons, row hover */
+    --bg-input:  #1c2128;  /* form inputs */
+    --line:      #3a4452;  /* strong visible separators */
+    --line-soft: #2b333d;  /* card borders */
+
+    /* TEXT TOKENS — 2026-05-13 Round 3: graded ink scale from Claude Design.
+       Off-white primary + cooler grays for hierarchy. Counter-intuitive but
+       it works because the surface is consistent (#1c2128) — different shades
+       give visual hierarchy between primary (names) / secondary (categories)
+       / tertiary (meta) without forcing everything to flat white. */
+    --text:      #e6edf3;   /* primary — product names, hero numbers */
+    --text-2:    #b6c0cc;   /* secondary — category headers, table headers */
+    --text-3:    #8a94a3;   /* tertiary — meta, prices like "$8.00/ea" */
+    --text-dim:  #6b7280;   /* disabled, empty-cell dashes */
+
+    --text-on-card:   #e6edf3;
+    --text-on-card-2: #b6c0cc;
+
+    /* EMPHASIS tokens — NW green for card titles + hero KPI numbers + accents.
+       Aligned to Claude Design's #22c55e and #1f9d4d shades. */
+    --text-emphasis:       #22c55e;   /* NW spring green — titles, hero numbers */
+    --text-emphasis-soft:  #1f9d4d;   /* NW darker green — borders, hover */
+    --accent:    #22c55e;
+    --accent-2:  #7ee2a8;
+    --accent-bg: rgba(34, 197, 94, 0.12);
+    --good:      oklch(70% 0.16 150);
+    --warn:      oklch(75% 0.15 70);
+    --bad:       oklch(65% 0.20 25);
+    --info:      oklch(70% 0.13 240);
+    --shadow-1:  0 1px 0 0 oklch(100% 0 0 / .04) inset, 0 1px 2px oklch(0% 0 0 / .4);
+    --shadow-2:  0 8px 24px oklch(0% 0 0 / .35);
+    --shadow-3:  0 20px 40px oklch(0% 0 0 / .5);
+
+    /* Focus ring — accessibility critical */
+    --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+/* =====================================================
+   LIGHT THEME (shipped but not exposed in picker;
+   future-proofs eventual light option)
+   ===================================================== */
+[data-theme="light"] {
+    --bg:        oklch(98.5% 0.003 250);
+    --bg-elev:   oklch(100% 0 0);
+    --bg-card:   oklch(100% 0 0);
+    --bg-card-2: oklch(97% 0.004 250);
+    --bg-input:  oklch(97% 0.005 250);
+    --line:      oklch(90% 0.005 250);
+    --line-soft: oklch(94% 0.004 250);
+    --text:      #1a1a20;
+    --text-2:    #44444c;
+    --text-3:    #666670;
+    --text-dim:  #8a8a92;
+    --text-on-card:   #1a1a20;
+    --text-on-card-2: #44444c;
+    --accent:    var(--nw-700);
+    --accent-2:  var(--nw-600);
+    --accent-bg: oklch(94% 0.07 150);
+    --good:      oklch(48% 0.16 150);
+    --warn:      oklch(60% 0.15 70);
+    --bad:       oklch(52% 0.20 25);
+    --info:      oklch(50% 0.14 240);
+    --shadow-1:  0 1px 0 0 oklch(100% 0 0 / .9) inset, 0 1px 2px oklch(0% 0 0 / .04);
+    --shadow-2:  0 12px 28px oklch(0% 0 0 / .08);
+    --shadow-3:  0 20px 40px oklch(0% 0 0 / .10);
+
+    --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
+}
+
+/* =====================================================
+   ACCENT OVERRIDES — 2026-05-13 Round 3: locked to NW green only.
+   The accent picker was removed from the Tweaks panel; these overrides
+   are kept for legacy data-accent attributes but all resolve to the
+   same Claude-Design NW green so any value works identically.
+   ===================================================== */
+[data-theme="dark"][data-accent="green"]  { --accent: #22c55e; --accent-2: #7ee2a8; --accent-bg: rgba(34, 197, 94, 0.12); }
+[data-theme="dark"][data-accent="blue"]   { --accent: #22c55e; --accent-2: #7ee2a8; --accent-bg: rgba(34, 197, 94, 0.12); }
+[data-theme="dark"][data-accent="violet"] { --accent: #22c55e; --accent-2: #7ee2a8; --accent-bg: rgba(34, 197, 94, 0.12); }
+[data-theme="dark"][data-accent="amber"]  { --accent: #22c55e; --accent-2: #7ee2a8; --accent-bg: rgba(34, 197, 94, 0.12); }
+
+[data-theme="light"][data-accent="green"]  { --accent: oklch(46% 0.14 150); --accent-2: oklch(54% 0.16 150); --accent-bg: oklch(94% 0.07 150); }
+[data-theme="light"][data-accent="blue"]   { --accent: oklch(46% 0.14 240); --accent-2: oklch(54% 0.16 240); --accent-bg: oklch(94% 0.07 240); }
+[data-theme="light"][data-accent="violet"] { --accent: oklch(46% 0.14 290); --accent-2: oklch(54% 0.16 290); --accent-bg: oklch(94% 0.07 290); }
+[data-theme="light"][data-accent="amber"]  { --accent: oklch(56% 0.14 70);  --accent-2: oklch(64% 0.16 70);  --accent-bg: oklch(95% 0.07 70); }
+
+/* =====================================================
+   SEMANTIC ALIAS LAYER — components reference these
+   so future themes don't need to rename anything.
+   ===================================================== */
+:root {
+    --surface-base:   var(--bg);
+    --surface-elev:   var(--bg-elev);
+    --surface-card:   var(--bg-card);
+    --surface-card-2: var(--bg-card-2);
+    --surface-input:  var(--bg-input);
+    --text-base:      var(--text);
+    --text-muted:     var(--text-2);
+    --text-soft:      var(--text-3);
+    --text-faint:     var(--text-dim);
+    --border-base:    var(--line);
+    --border-soft:    var(--line-soft);
+    --accent-fg:      #ffffff; /* on-accent text */
+}
+
+}
