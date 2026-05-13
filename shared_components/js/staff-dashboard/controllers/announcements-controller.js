@@ -2,11 +2,20 @@
    STAFF DASHBOARD v3 — ANNOUNCEMENTS CONTROLLER
    Reads from window.staffAnnouncementsData (set by index.html).
    Per Erik's plan answer #2, data stays inline-hardcoded.
+
+   v3 cutover (2026-05-13): pre-cutover announcements are hidden
+   automatically. Only items dated on or after MIN_VISIBLE_DATE
+   render. Lets Erik add new announcements without having to
+   manually archive the old ones — they just stop appearing.
    ===================================================== */
 
 import { register }   from '../core/dashboard-events.js';
 import { store }      from '../core/dashboard-store.js';
 import { escapeHtml, formatLongDate } from '../core/dashboard-ui-utils.js';
+
+// Anything dated BEFORE this is treated as archive and hidden.
+// Bump this whenever you want to clean-slate the announcements.
+const MIN_VISIBLE_DATE = '2026-05-13';
 
 const PRIORITY_TYPES = {
     urgent:   { label: 'Urgent',          icon: 'fa-circle-exclamation', cls: 'urgent' },
@@ -92,9 +101,15 @@ export function renderAnnouncements() {
 }
 
 export function initAnnouncements() {
-    announcements = Array.isArray(window.staffAnnouncementsData)
+    const raw = Array.isArray(window.staffAnnouncementsData)
         ? window.staffAnnouncementsData
         : [];
+    // Filter out pre-cutover items so the dashboard starts clean.
+    // String comparison is safe because dates are ISO (YYYY-MM-DD).
+    announcements = raw.filter((a) => {
+        if (!a || typeof a.date !== 'string') return false;
+        return a.date >= MIN_VISIBLE_DATE;
+    });
     loadDismissed();
     renderAnnouncements();
 }
