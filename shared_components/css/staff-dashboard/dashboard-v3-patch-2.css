@@ -377,3 +377,36 @@
   0%   { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
+
+/* ── 13. Tool button "coming soon" state (2026-05-13 Round 3) ──────────
+   Reserves dashboard slots for calculators that aren't built yet (e.g.
+   Customer Supplied DTF, Customer Supplied DTG). Renders as a <span>
+   (not an <a>) so it's not navigable. Visually greyed out + a small
+   amber "Coming soon" pill anchored top-right, so reps see the roadmap
+   without clicking into a broken page. When the calculator ships, swap
+   <span class="tool-btn tool-btn--soon"> → <a class="tool-btn"> and
+   drop the class — no other markup change needed. */
+.tool-btn--soon {
+  position: relative;
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;        /* belt + suspenders alongside no href */
+}
+.tool-btn--soon::after {
+  content: "Coming soon";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 2px 8px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: #fef3c7;          /* matches the modifier-tab amber palette */
+  color: #92400e;
+  border: 1px solid #fcd34d;
+  border-radius: 999px;
+  white-space: nowrap;
+  /* Prevent the pill from being clipped by the button's own overflow */
+  z-index: 1;
+}

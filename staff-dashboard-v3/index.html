@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3500-vocab">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3500-vocab">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3500-vocab">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3500-vocab">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3600-cusupplied">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3500-vocab">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3600-cusupplied">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3500-vocab">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3600-cusupplied">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3500-vocab"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3600-cusupplied"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>
@@ -370,39 +370,66 @@
                                     <i class="fas fa-calculator" aria-hidden="true"></i>
                                 </div>
                                 <span class="tool-category-title">Pricing &amp; Calculators</span>
-                                <span class="tool-category-count">4</span>
+                                <span class="tool-category-count">3</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing 2026</a>
                                 <a href="/calculators/compare-pricing.html" class="tool-btn"><i class="fas fa-search-dollar" aria-hidden="true"></i> Pricing by Style</a>
                                 <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Service Prices</a>
-                                <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Customer Supplied Screen Print</a>
                             </div>
                         </div>
 
-                        <!-- Corporate Embroidery (NEW 2026-05-13 Round 2) —
-                             retail / B2B end-user embroidery pricing. Industry-standard
-                             term for direct-business customers (companies ordering
-                             uniforms, branded apparel, events, promo). The 3 buttons
-                             deep-link to the 3 retail-tier tabs on embroidery-pricing-all.
-                             Tab keys verified against the JS whitelist; no silent
-                             fallbacks. -->
+                        <!-- Corporate Embroidery (Round 2, trimmed in Round 3) —
+                             retail / B2B end-user embroidery pricing on NWCA blanks.
+                             "Customer Supplied Garments" moved out to the new
+                             Customer Supplied category since it's labor-only — a
+                             different economic model from the NWCA-blank flow.
+                             What's left: Add Logo (NWCA blanks) + Additional
+                             Stitches modifier. Tab keys verified against JS whitelist. -->
                         <div class="tool-category">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-tshirt" aria-hidden="true"></i>
                                 </div>
                                 <span class="tool-category-title">Corporate Embroidery</span>
-                                <span class="tool-category-count">3</span>
+                                <span class="tool-category-count">2</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-tag" aria-hidden="true"></i> Additional Logo</a>
-                                <a href="/calculators/embroidery-pricing-all/?tab=decg-retail" class="tool-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Customer Supplied Garments</a>
                                 <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Additional Stitches</a>
                             </div>
                         </div>
 
-                        <!-- Contract (NEW 2026-05-13 Round 2) — B2B wholesale segment.
+                        <!-- Customer Supplied (NEW 2026-05-13 Round 3) — retail /
+                             end-user labor-only segment. Customer brings own garments;
+                             we only charge for decoration. Distinct economic model
+                             from Corporate (we sell blank + decorate) and Contract
+                             (wholesale partner brings blanks at discount rate).
+                             Previously fragmented across Corporate Embroidery and
+                             Pricing & Calculators — now consolidated.
+                             Brief method names follow the Specialty Products pattern
+                             (category title implies "Customer Supplied" prefix).
+                             DTF and DTG are roadmap slots with disabled "Coming soon"
+                             pills — render as <span> so they're non-clickable.
+                             When those calculator pages ship, swap the spans for
+                             <a> tags with the right href; no other markup change. -->
+                        <div class="tool-category">
+                            <div class="tool-category-header">
+                                <div class="tool-category-icon">
+                                    <i class="fas fa-box-open" aria-hidden="true"></i>
+                                </div>
+                                <span class="tool-category-title">Customer Supplied</span>
+                                <span class="tool-category-count">4</span>
+                            </div>
+                            <div class="tool-buttons">
+                                <a href="/calculators/embroidery-pricing-all/?tab=decg-retail" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Embroidery</a>
+                                <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
+                                <span class="tool-btn tool-btn--soon" aria-disabled="true" title="Coming soon — for now use Manual Pricing 2026"><i class="fas fa-fire" aria-hidden="true"></i> DTF</span>
+                                <span class="tool-btn tool-btn--soon" aria-disabled="true" title="Coming soon — for now use Manual Pricing 2026"><i class="fas fa-print" aria-hidden="true"></i> DTG</span>
+                            </div>
+                        </div>
+
+                        <!-- Contract (Round 2) — B2B wholesale segment.
                              Decorator-to-decorator / ASI distributors / Ruthie partners
                              who bring their own blanks. Industry-standard "Contract"
                              label. Two buttons: Contract Embroidery deep-links to the
