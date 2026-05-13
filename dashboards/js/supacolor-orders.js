@@ -157,15 +157,51 @@
     // shared_components/js/transfer-actions-shared.js where the same function
     // is scoped inside an IIFE and not exported. Keeping a local copy avoids
     // dragging in the whole transfer module for 10 lines of logic.
-    function trackingUrlFromCarrier(carrier, tracking) {
+    //
+    // 2026-05-13: Hardened against empty Carrier. Supacolor's API sometimes
+    // returns Carrier="" even though Shipping_Method is set (e.g. stamps_com
+    // packages). We now also infer from shippingMethod, then from the
+    // tracking number's format as a last resort. Mikalah reported clicking
+    // a 9434…-prefix USPS tracking opened the detail page instead of USPS.
+    function inferCarrier(carrier, shippingMethod, tracking) {
+        var src = (String(carrier || '') + ' ' + String(shippingMethod || '')).toLowerCase();
+        if (src.indexOf('fedex') >= 0) return 'fedex';
+        if (src.indexOf('ups') >= 0)   return 'ups';
+        if (src.indexOf('usps') >= 0 || src.indexOf('stamps') >= 0 || src.indexOf('priority mail') >= 0) return 'usps';
+        if (src.indexOf('dhl') >= 0)   return 'dhl';
+        // Last-resort inference from tracking number format. Patterns from
+        // each carrier's public docs:
+        //   FedEx Ground/Express: 12 or 15 digits (numeric)
+        //   USPS Domestic:        20-22 digits, often starts with 9
+        //   UPS:                  starts with 1Z then 16 chars (letters+digits)
+        //   DHL Express:          10 or 11 digits
+        var t = String(tracking || '').replace(/\s+/g, '');
+        if (/^1Z[A-Z0-9]{16}$/i.test(t))      return 'ups';
+        if (/^9\d{19,21}$/.test(t))           return 'usps';
+        if (/^\d{12}$|^\d{15}$/.test(t))      return 'fedex';
+        if (/^\d{10,11}$/.test(t))            return 'dhl';
+        return '';
+    }
+
+    function trackingUrlFromCarrier(carrier, tracking, shippingMethod) {
         if (!tracking) return '';
-        var c = String(carrier || '').toLowerCase();
+        var c = inferCarrier(carrier, shippingMethod, tracking);
         var t = encodeURIComponent(tracking);
-        if (c.indexOf('fedex') >= 0) return 'https://www.fedex.com/fedextrack/?tracknumbers=' + t;
-        if (c.indexOf('ups') >= 0) return 'https://www.ups.com/track?tracknum=' + t;
-        if (c.indexOf('usps') >= 0) return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + t;
-        if (c.indexOf('dhl') >= 0) return 'https://www.dhl.com/en/express/tracking.html?AWB=' + t;
+        if (c === 'fedex') return 'https://www.fedex.com/fedextrack/?tracknumbers=' + t;
+        if (c === 'ups')   return 'https://www.ups.com/track?tracknum=' + t;
+        if (c === 'usps')  return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + t;
+        if (c === 'dhl')   return 'https://www.dhl.com/en/express/tracking.html?AWB=' + t;
         return ''; // unknown carrier → no clickable link (text still shown)
+    }
+
+    function displayCarrierLabel(carrier, shippingMethod, tracking) {
+        if (carrier) return carrier;
+        var c = inferCarrier(carrier, shippingMethod, tracking);
+        if (c === 'fedex') return 'FedEx';
+        if (c === 'ups')   return 'UPS';
+        if (c === 'usps')  return 'USPS';
+        if (c === 'dhl')   return 'DHL';
+        return 'Tracking';
     }
 
     // Build the Shipped cell content — date on top, tracking pill below.
@@ -192,8 +228,12 @@
 
         if (!j.Tracking_Number) return dateHtml + expectedHtml;
 
-        var carrierLabel = j.Carrier ? escapeHtml(j.Carrier) : 'Tracking';
-        var trackingUrl = trackingUrlFromCarrier(j.Carrier, j.Tracking_Number);
+        // 2026-05-13: pass Shipping_Method too so empty-Carrier rows
+        // (e.g. stamps_com USPS) still get a clickable link to the right
+        // carrier's tracking page. Falls back to tracking-number format
+        // inference when both fields are blank.
+        var carrierLabel = escapeHtml(displayCarrierLabel(j.Carrier, j.Shipping_Method, j.Tracking_Number));
+        var trackingUrl = trackingUrlFromCarrier(j.Carrier, j.Tracking_Number, j.Shipping_Method);
         var pillClass = 'sc-track-pill' + (trackingUrl ? ' sc-track-pill--link' : '');
         var pillAttrs = trackingUrl
             ? ' data-track-url="' + escapeHtml(trackingUrl) + '" title="Open in ' + carrierLabel + ' tracking"'
@@ -201,7 +241,7 @@
         return dateHtml +
             '<span class="' + pillClass + '"' + pillAttrs + '>' +
                 '<i class="fas fa-truck"></i> ' +
-                escapeHtml(carrierLabel) + ' ' +
+                carrierLabel + ' ' +    // already escaped above
                 escapeHtml(j.Tracking_Number) +
             '</span>' +
             expectedHtml;
