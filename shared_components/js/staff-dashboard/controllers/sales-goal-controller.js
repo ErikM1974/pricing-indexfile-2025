@@ -39,19 +39,23 @@ export function setYtdTotal(ytdAmount, meta = {}) {
 function render() {
     const goal = ANNUAL_GOAL;
     const daysLeft = daysRemainingInYear();
+    const banner = document.querySelector('.sales-goal-banner');
 
     // Days-left countdown is data-independent — always render.
     const daysEl = els.daysLeft();
     if (daysEl) daysEl.textContent = `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`;
 
     if (lastYtd == null) {
-        // No real YTD data yet — show honest placeholders, not bogus pace numbers.
+        // No real YTD data yet — show a friendly loading state instead of
+        // "—" + "(—%)" which reads as broken when the YTD fetch fails or is
+        // in-flight. The .is-loading class on .sales-goal-banner hides the
+        // .sales-goal-percent paren entirely (CSS in dashboard-v3-patch-2.css)
+        // and italicizes .sales-goal-current to carry the "Loading…" copy.
+        if (banner) banner.classList.add('is-loading');
         const progress = els.progress();
         if (progress) progress.style.width = '0%';
         const current = els.current();
-        if (current) current.textContent = '—';
-        const percent = els.percent();
-        if (percent) percent.textContent = '—';
+        if (current) current.textContent = 'Loading YTD…';
         const paceEl = els.pace();
         if (paceEl) {
             paceEl.className = 'sales-goal-pace';
@@ -61,6 +65,9 @@ function render() {
         if (projEl) projEl.textContent = 'Projected EOY —';
         return;
     }
+
+    // Data has landed — drop the loading-state styling.
+    if (banner) banner.classList.remove('is-loading');
 
     const ytd = lastYtd;
     const pct = ytd / goal;

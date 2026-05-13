@@ -338,3 +338,42 @@
   .sales-goal-current { font-size: 17px; }
   .sales-goal-progress { min-width: 160px; max-width: 100%; height: 10px; }
 }
+
+/* ── 12c. Sales Goal empty/loading state (2026-05-13) ───────────────────
+   Triggered by .is-loading on .sales-goal-banner — added by the controller
+   when YTD data hasn't arrived yet (initial load OR backend outage).
+   Without this, the banner shows "$3.0M · — · (—%)" which looks broken.
+   With this, it shows "$3.0M · [shimmer bar] · Loading YTD…" — clearly a
+   pending state, not a bug.
+
+   The HTML ships with .is-loading already set so there's no flash of
+   broken-looking content before the controller runs. */
+.sales-goal-banner.is-loading .sales-goal-percent {
+  display: none;
+}
+.sales-goal-banner.is-loading .sales-goal-current {
+  font-size: 14px;
+  color: var(--ink-md);
+  font-style: italic;
+  letter-spacing: .02em;
+  font-weight: 500;
+}
+.sales-goal-banner.is-loading .progress-fill {
+  /* Override the normal goalPulse animation with a left-to-right shimmer
+     while data is pending. Width stays 0% (set by controller) so the bar
+     itself is empty — the shimmer plays over the empty track background. */
+  background: linear-gradient(90deg,
+    transparent 0%,
+    var(--nw-green-dim) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: goalShimmer 1.6s ease-in-out infinite;
+  width: 100% !important;
+  opacity: 0.6;
+}
+
+@keyframes goalShimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

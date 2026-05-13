@@ -95,9 +95,23 @@ function waitForAuth() {
 }
 
 export async function initAuth() {
+    console.info('[auth] Waiting for Caspio user…');
     const user = await waitForAuth();
     if (user) {
+        // Log just enough to confirm the welcome chip should light up —
+        // never log the full user object (PII / email).
+        console.info('[auth] Caspio user resolved:', {
+            firstname: user.firstname,
+            hasEmail: !!user.email,
+            role: user.role,
+        });
         applyUserToUI(user);
+    } else {
+        console.warn(
+            '[auth] No Caspio user after 8s — Welcome chip will stay hidden. ' +
+            'Check that the hidden #caspio-auth div exists in the DOM and that ' +
+            'the user has an active Caspio session at c3eku948.caspio.com.'
+        );
     }
     hideLoadingOverlay();
     return user;

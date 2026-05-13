@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3000-headerpolish">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3000-headerpolish">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3000-headerpolish">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3100-emptystate">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3100-emptystate">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3100-emptystate">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3100-emptystate">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3100-emptystate">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3000-headerpolish">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3100-emptystate">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3000-headerpolish"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3100-emptystate"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>
@@ -278,7 +278,9 @@
                  for a single glance. Numbers still computed by the controller;
                  just not rendered. JS keeps null-safe access so nothing breaks.
                  =================================================== -->
-            <section class="sales-goal-banner" aria-label="2026 sales goal">
+            <!-- Banner ships with .is-loading so it never flashes the "—" + "(—%)"
+                 broken-looking state. Controller removes the class when YTD lands. -->
+            <section class="sales-goal-banner is-loading" aria-label="2026 sales goal">
                 <div class="sales-goal-row">
                     <span class="sales-goal-icon" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
                     <span class="sales-goal-label">2026 Goal</span>
@@ -288,7 +290,9 @@
                         <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
                     </div>
 
-                    <span class="sales-goal-current" id="goalCurrent">$0</span>
+                    <!-- Initial copy matches the .is-loading state so there's no
+                         flash of "$0" before the controller renders "Loading YTD…". -->
+                    <span class="sales-goal-current" id="goalCurrent">Loading YTD…</span>
                     <span class="sales-goal-percent">(<span id="goalPercent">0</span>%)</span>
                 </div>
             </section>
