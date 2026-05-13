@@ -16,6 +16,23 @@ const POLL_TIMEOUT_MS = 8000;
 const AUTH_FIELDS = ['firstname', 'lastname', 'email', 'role'];
 
 function readAuthFields() {
+    // Path 1: window.caspioUser — set by Caspio's embed JS when the DataPage
+    // authenticates the user. This is what v2 used as its primary path and
+    // what Caspio currently populates on teamnwca.com (verified via console
+    // log "[CASPIO] User authenticated: Erik" 2026-05-13). Note Caspio uses
+    // camelCase keys (firstName); normalize to our lowercase field names.
+    if (typeof window !== 'undefined' && window.caspioUser && window.caspioUser.firstName) {
+        return {
+            firstname: window.caspioUser.firstName,
+            lastname:  window.caspioUser.lastName  || '',
+            email:     window.caspioUser.email     || '',
+            role:      window.caspioUser.role      || '',
+        };
+    }
+
+    // Path 2: DOM placeholders — some Caspio configurations populate
+    // [@authfield:First_Name] text in the hidden #caspio-auth div instead.
+    // Kept as a fallback so we work in both modes.
     const result = {};
     for (const field of AUTH_FIELDS) {
         const el = document.getElementById(`auth-${field}`);
