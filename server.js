@@ -47,6 +47,12 @@ dotenv.config();
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
+// STAFF DASHBOARD ROUTING (hard cutover 2026-05-13)
+//   L770  /staff-dashboard.html         → v3 canonical (serves staff-dashboard-v3/index.html)
+//   L775  /staff-dashboard-v2.html      → v2 safety net (serves staff-dashboard.html)
+//   L780  /staff-dashboard-legacy.html  → v1 (delete ~2026-07-28)
+//   L786  /staff-dashboard-v3/          → v3 dedicated URL (kept for old bookmarks)
+//
 // LEGACY REDIRECTS
 //   L657  /calculators/embroidery-contract* → embroidery-pricing-all
 //   L662  /staff-dashboard.html → /dashboards/
@@ -758,33 +764,38 @@ app.get('/calculators/embroidery-contract*', (req, res) => {
   res.redirect(301, '/calculators/embroidery-pricing-all/?tab=al-cemb');
 });
 
-// Serve specific HTML files from their locations
-app.get('/staff-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
-});
-
-// Cut-over (2026-04-28): old v2 URL redirects to canonical so any saved
-// bookmarks of /staff-dashboard-v2.html still land on the live dashboard.
-app.get('/staff-dashboard-v2.html', (req, res) => {
-  res.redirect(301, '/staff-dashboard.html');
-});
-
-// Legacy dashboard kept accessible for ~90 days as a safety net post cut-over.
-app.get('/staff-dashboard-legacy.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard-legacy.html'));
-});
-
-// v3 parallel build (2026-05-12). Serves the new modular dashboard at
-// /staff-dashboard-v3/. Live page at /staff-dashboard.html stays untouched.
-// At cutover (90-day soak), this becomes the canonical dashboard and v2
-// moves to /staff-dashboard-v2.html as the fallback.
-// v3 dashboard HTML route — explicit no-cache headers so iterative CSS/JS
-// changes always reach the browser (2026-05-13: stop the cache fights).
+// No-cache helper used by every staff-dashboard route below so the live
+// dashboard always fetches fresh CSS/JS after a deploy.
 function noCacheHeaders(res) {
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.setHeader('Pragma', 'no-cache');
   res.setHeader('Expires', '0');
 }
+
+// ===== Staff Dashboard hard cutover (2026-05-13) =====
+// Canonical /staff-dashboard.html now serves the v3 dashboard. v2 moves to
+// /staff-dashboard-v2.html as the safety-net URL during the soak period.
+// /staff-dashboard-v3/ kept working for anyone who bookmarked it pre-cutover.
+// /staff-dashboard-legacy.html (v1) still planned to delete ~2026-07-28.
+
+// Canonical URL — now serves v3
+app.get('/staff-dashboard.html', (req, res) => {
+  noCacheHeaders(res);
+  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+});
+
+// v2 safety net — serves the prior canonical staff-dashboard.html file
+app.get('/staff-dashboard-v2.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
+});
+
+// Legacy v1 — kept accessible until 2026-07-28 deletion
+app.get('/staff-dashboard-legacy.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'staff-dashboard-legacy.html'));
+});
+
+// v3 dedicated URL — preserved so any direct /staff-dashboard-v3/ bookmarks
+// still resolve to the same content as the canonical URL.
 app.get('/staff-dashboard-v3/', (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
@@ -796,8 +807,8 @@ app.get('/staff-dashboard-v3/index.html', (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
-// Static assets under /staff-dashboard-v3/ (config.js, announcements-bootstrap.js)
-// Reuse staticOptions so these also send no-cache headers.
+// Static assets under /staff-dashboard-v3/ (config.js, announcements-bootstrap.js,
+// caspio-isolation.js). Reuse staticOptions so these also send no-cache headers.
 app.use('/staff-dashboard-v3', express.static(path.join(__dirname, 'staff-dashboard-v3'), staticOptions));
 
 app.get('/bundle-orders-dashboard.html', (req, res) => {
