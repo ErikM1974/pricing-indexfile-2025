@@ -52,13 +52,43 @@
         return '$' + num.toFixed(2);
     }
 
-    function carrierTrackingUrl(carrier, tracking) {
+    // 2026-05-13: Supacolor API sometimes returns Carrier="" for stamps_com
+    // USPS packages and other auto-imports. We now also infer from
+    // Shipping_Method and (last resort) from the tracking-number format.
+    // Mirrors the same logic in dashboards/js/supacolor-orders.js — keep
+    // them in sync.
+    function inferCarrier(carrier, shippingMethod, tracking) {
+        var src = (String(carrier || '') + ' ' + String(shippingMethod || '')).toLowerCase();
+        if (src.indexOf('fedex') >= 0) return 'fedex';
+        if (src.indexOf('ups') >= 0)   return 'ups';
+        if (src.indexOf('usps') >= 0 || src.indexOf('stamps') >= 0 || src.indexOf('priority mail') >= 0) return 'usps';
+        if (src.indexOf('dhl') >= 0)   return 'dhl';
+        var t = String(tracking || '').replace(/\s+/g, '');
+        if (/^1Z[A-Z0-9]{16}$/i.test(t))      return 'ups';
+        if (/^9\d{19,21}$/.test(t))           return 'usps';
+        if (/^\d{12}$|^\d{15}$/.test(t))      return 'fedex';
+        if (/^\d{10,11}$/.test(t))            return 'dhl';
+        return '';
+    }
+
+    function displayCarrierLabel(carrier, shippingMethod, tracking) {
+        if (carrier) return carrier;
+        var c = inferCarrier(carrier, shippingMethod, tracking);
+        if (c === 'fedex') return 'FedEx';
+        if (c === 'ups')   return 'UPS';
+        if (c === 'usps')  return 'USPS';
+        if (c === 'dhl')   return 'DHL';
+        return '';
+    }
+
+    function carrierTrackingUrl(carrier, tracking, shippingMethod) {
         if (!tracking) return null;
-        var c = (carrier || '').toLowerCase();
-        if (c.indexOf('fedex') !== -1) return 'https://www.fedex.com/fedextrack/?trknbr=' + encodeURIComponent(tracking);
-        if (c.indexOf('ups') !== -1)   return 'https://www.ups.com/track?tracknum=' + encodeURIComponent(tracking);
-        if (c.indexOf('usps') !== -1)  return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + encodeURIComponent(tracking);
-        if (c.indexOf('dhl') !== -1)   return 'https://www.dhl.com/us-en/home/tracking/tracking-express.html?submit=1&tracking-id=' + encodeURIComponent(tracking);
+        var c = inferCarrier(carrier, shippingMethod, tracking);
+        var t = encodeURIComponent(tracking);
+        if (c === 'fedex') return 'https://www.fedex.com/fedextrack/?trknbr=' + t;
+        if (c === 'ups')   return 'https://www.ups.com/track?tracknum=' + t;
+        if (c === 'usps')  return 'https://tools.usps.com/go/TrackConfirmAction?tLabels=' + t;
+        if (c === 'dhl')   return 'https://www.dhl.com/us-en/home/tracking/tracking-express.html?submit=1&tracking-id=' + t;
         return null;
     }
 
@@ -390,12 +420,14 @@
         if (j.Tracking_Number) {
             $('sjd-tracking-section').style.display = '';
             $('sjd-tracking-number').textContent = j.Tracking_Number;
-            var trackingUrl = carrierTrackingUrl(j.Carrier, j.Tracking_Number);
+            // Pass Shipping_Method so empty-Carrier stamps_com / etc. still
+            // resolves to the right carrier link + label.
+            var trackingUrl = carrierTrackingUrl(j.Carrier, j.Tracking_Number, j.Shipping_Method);
             $('sjd-tracking-link').href = trackingUrl || '#';
             if (!trackingUrl) {
                 $('sjd-tracking-link').removeAttribute('target');
             }
-            $('sjd-carrier-line').textContent = j.Carrier || '';
+            $('sjd-carrier-line').textContent = displayCarrierLabel(j.Carrier, j.Shipping_Method, j.Tracking_Number);
         } else {
             $('sjd-tracking-section').style.display = 'none';
         }
