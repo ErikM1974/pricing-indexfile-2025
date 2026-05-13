@@ -138,11 +138,74 @@ body {
     margin-top: 0.25rem;
 }
 
+/* Tab Navigation Helper — 2026-05-13 IA cleanup.
+   One-line decision helper above the tab bar so reps see the question
+   ("Who supplied the garment?") before they hunt for the right tab. */
+.tab-navigation-helper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: var(--radius-md);
+    color: #3730a3;
+    font-size: 0.9rem;
+}
+.tab-navigation-helper i {
+    font-size: 1.1rem;
+    color: #4338ca;
+}
+.tab-navigation-helper strong { color: #1e1b4b; }
+
 /* Tab Navigation */
 .tab-navigation {
     display: flex;
+    align-items: stretch;
     gap: 8px;
     margin-bottom: 24px;
+}
+
+/* Vertical divider between the 3 price-tier tabs and the stitch-surcharge
+   modifier tab — visual cue that the 4th tab is a modifier, not a tier. */
+.tab-divider {
+    width: 2px;
+    background: #d1d5db;
+    margin: 8px 4px;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+/* Modifier-style tab — subtly distinct so reps see it's not in the
+   "pick exactly one" group. Same hover/active treatment, different
+   resting state. */
+.tab-btn--modifier {
+    background: #fffbeb;
+    border-color: #fcd34d;
+    color: #92400e;
+}
+.tab-btn--modifier:hover {
+    border-color: #d97706;
+    color: #b45309;
+}
+.tab-btn--modifier.active {
+    background: #fef3c7;
+    border-color: #d97706;
+    border-bottom: 3px solid #d97706;
+    color: #92400e;
+}
+.tab-btn--modifier.active .tab-subtitle {
+    color: #92400e;
+}
+
+@media (max-width: 720px) {
+    /* Drop the vertical divider on narrow screens — tabs wrap to 2 rows
+       anyway and the divider eats space. The modifier-tab color still
+       carries the visual distinction. */
+    .tab-divider { display: none; }
+    .tab-navigation-helper { font-size: 0.85rem; padding: 8px 12px; }
 }
 
 .tab-btn {
@@ -216,22 +279,31 @@ body {
     margin-top: 2px;
 }
 
-/* LTM Banner */
+/* LTM Banner — 2026-05-13: shrunk to a compact pill instead of a
+   full-width amber strip. Erik flagged the previous size as "too much
+   information" repeated on every tab. Different tiers genuinely use
+   different LTM thresholds (1-7 for retail, 1-23 for some Contract
+   pricing), so we can't collapse into one global banner — but we can
+   reduce its visual weight on each tab. */
 .ltm-banner {
     background: var(--ltm-bg);
     border: 1px solid var(--ltm-border);
-    border-radius: var(--radius-md);
-    padding: 10px 16px;
-    display: flex;
+    border-radius: 999px;
+    padding: 4px 12px;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 24px;
+    gap: 6px;
+    margin-bottom: 18px;
     color: var(--warning-text);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: fit-content;
+    max-width: 100%;
 }
 
 .ltm-banner i {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
 }
 
 /* Matrix Grid */

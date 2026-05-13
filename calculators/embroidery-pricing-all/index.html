@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Page-specific styles -->
-    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css">
+    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=20260513-iacleanup">
 </head>
 <body>
     <!-- Error Banner (hidden by default) -->
@@ -31,32 +31,45 @@
                     <span>Embroidery Pricing</span>
                 </div>
                 <h1><i class="fas fa-tshirt"></i> Embroidery Pricing 2026</h1>
-                <p class="subtitle">Contract-Ruthie | Add Logo (NWCA garments) | Additional Stitch Charges | Customer-Supplied (their items)</p>
+                <p class="subtitle">Three price tiers (by who supplies the garment) + a stitch-surcharge modifier</p>
                 <p class="version-info">Updated February 2026</p>
             </div>
         </header>
 
+        <!-- 2026-05-13 IA cleanup: tabs regrouped so reps see the decision tree
+             at a glance — first 3 tabs are mutually-exclusive price tiers (pick
+             one based on who supplied the garment), the 4th is a modifier that
+             adds to any tier when stitch count >10K. Stitch-charges moved from
+             3rd to 4th position; a small divider + helper line make the split
+             obvious. Tab data-tab keys are UNCHANGED so existing bookmarks
+             keep working. -->
+
         <!-- Tab Navigation -->
+        <div class="tab-navigation-helper">
+            <i class="fas fa-circle-question" aria-hidden="true"></i>
+            <span><strong>Who supplied the garment?</strong> Pick the matching tier below. Add Stitch Surcharges if logo &gt; 10K stitches.</span>
+        </div>
         <div class="tab-navigation">
             <button class="tab-btn active" data-tab="contract" onclick="switchTab('contract')">
                 <i class="fas fa-industry"></i>
-                Contract-Ruthie
-                <span class="tab-subtitle">Production/Partners</span>
+                Wholesale Partners
+                <span class="tab-subtitle">Ruthie / ASI · they bring blanks</span>
             </button>
             <button class="tab-btn" data-tab="al-retail" onclick="switchTab('al-retail')">
                 <i class="fas fa-tag"></i>
                 Add Logo
-                <span class="tab-subtitle">NWCA Garments</span>
-            </button>
-            <button class="tab-btn" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
-                <i class="fas fa-layer-group"></i>
-                Additional Stitch Charges
-                <span class="tab-subtitle">Surcharges &gt; 10K Stitches</span>
+                <span class="tab-subtitle">We supply garment</span>
             </button>
             <button class="tab-btn" data-tab="decg-retail" onclick="switchTab('decg-retail')">
                 <i class="fas fa-box-open"></i>
-                Customer-Supplied
-                <span class="tab-subtitle">Customer's Own Items</span>
+                Customer Supplied
+                <span class="tab-subtitle">Retail · they bring blanks</span>
+            </button>
+            <span class="tab-divider" aria-hidden="true"></span>
+            <button class="tab-btn tab-btn--modifier" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
+                <i class="fas fa-layer-group"></i>
+                Stitch Surcharges
+                <span class="tab-subtitle">+ adds to any tier · &gt; 10K stitches</span>
             </button>
         </div>
 
