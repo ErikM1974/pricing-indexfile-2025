@@ -273,7 +273,7 @@ app.use(session({
 // =============================================================================
 // Role permissions configuration - Erik has full access, others restricted to their dashboards
 const CRM_PERMISSIONS = {
-  'Erik': ['taneisha', 'nika', 'house'],  // Full admin access
+  'Erik': ['taneisha', 'nika', 'house', 'policies-admin'],  // Full admin access + policies CMS
   'Taneisha': ['taneisha'],                // Own dashboard only
   'Nika': ['nika']                         // Own dashboard only
 };
@@ -517,8 +517,10 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 });
 
 // Parse JSON and URL-encoded bodies
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// Body parser limit bumped to 5mb to accommodate TipTap policy bodies (Policies Hub).
+// Default 100kb silently 413s on policies with embedded image references.
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
 // Serve static files from specific directories
 const staticOptions = {
@@ -645,6 +647,28 @@ app.post('/api/crm-session', express.json(), (req, res) => {
   });
 });
 
+// GET current CRM session — used by Policies Hub admin gate and any
+// frontend that needs to render role-conditional UI without a full login flow.
+// Returns 200 with user info when authenticated, 200 with anonymous shape when not.
+app.get('/api/crm-session/me', (req, res) => {
+  if (!req.session?.crmUser) {
+    return res.json({
+      authenticated: false,
+      permissions: [],
+      firstName: '',
+      email: ''
+    });
+  }
+  const u = req.session.crmUser;
+  res.json({
+    authenticated: true,
+    name: u.name,
+    firstName: u.firstName,
+    email: u.email || '',
+    permissions: u.permissions || []
+  });
+});
+
 // Logout endpoint - clears CRM session
 app.get('/crm-logout', (req, res) => {
   if (req.session) {
@@ -723,6 +747,11 @@ app.all('/api/crm-proxy/house-accounts*', ...createCrmProxy('house-accounts', ['
 
 // Sales Reps 2026 proxy - requires 'house' role (admin can view/edit all reps)
 app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', ['house']));
+
+// Policies Hub admin proxy - requires 'policies-admin' role (currently Erik only).
+// Public reads do NOT go through here — frontend hits /api/policies-public on the
+// caspio-pricing-proxy directly (unprotected, Published+Active only).
+app.all('/api/crm-proxy/policies*', ...createCrmProxy('policies', ['policies-admin']));
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 

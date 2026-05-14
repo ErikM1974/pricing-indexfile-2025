@@ -1,0 +1,402 @@
+/**
+ * Policies Hub — main page controller
+ *
+ * Renders:
+ *   - Left tree sidebar (Category → Policy → Sub-procedure, 3 levels max)
+ *   - Main card grid + list-view toggle
+ *   - Debounced search box (hits /api/policies-public/search)
+ *   - Category filter chips
+ *   - Recently Updated rail
+ *   - Admin-only "+ New Policy" button (rendered after admin gate resolves)
+ *
+ * Depends on: PoliciesAPI, PoliciesAdminGate (loaded as separate <script>s).
+ */
+(function () {
+    'use strict';
+
+    const state = {
+        tree: [],              // [{category, policies: [{..., children: [...]}]}]
+        flatById: new Map(),   // policy_id -> record
+        viewMode: localStorage.getItem('policies_view') || 'grid',
+        categoryFilter: 'all',
+        searchQuery: '',
+        searchResults: null,   // null = not searching; array = active search
+        statusFilter: 'Published' // admin can switch to 'Draft' or 'All'
+    };
+
+    // ----------------------------- helpers -----------------------------
+    function escapeHtml(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatDate(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return iso;
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    function categoryIcon(cat) {
+        const map = {
+            'Financial': 'fa-dollar-sign',
+            'Operations': 'fa-cogs',
+            'Customer Service': 'fa-headset',
+            'HR': 'fa-users',
+            'Training': 'fa-graduation-cap'
+        };
+        return map[cat] || 'fa-folder';
+    }
+
+    function debounce(fn, ms) {
+        let t = null;
+        return function (...args) {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), ms);
+        };
+    }
+
+    // ----------------------------- data load -----------------------------
+    async function loadTree() {
+        try {
+            const useAdmin = window.IS_POLICIES_ADMIN;
+            const result = useAdmin
+                ? await PoliciesAPI.adminGetTree()
+                : await PoliciesAPI.getTree();
+
+            state.tree = (result && result.tree) || [];
+
+            // Build flat index for quick lookup
+            state.flatById.clear();
+            const walk = (node) => {
+                state.flatById.set(node.Policy_ID, node);
+                (node.children || []).forEach(walk);
+            };
+            state.tree.forEach(cat => cat.policies.forEach(walk));
+
+            render();
+        } catch (e) {
+            console.error('[policies-hub] loadTree error:', e);
+            renderError('Could not load policies. Please refresh.');
+        }
+    }
+
+    // ----------------------------- rendering -----------------------------
+    function render() {
+        renderTreeSidebar();
+        renderCategoryChips();
+        renderCards();
+        renderRecentlyUpdated();
+        renderAdminAffordances();
+    }
+
+    function renderError(msg) {
+        const grid = document.getElementById('policiesGrid');
+        if (grid) {
+            grid.innerHTML = `<div class="hub-error"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(msg)}</div>`;
+        }
+    }
+
+    function renderTreeSidebar() {
+        const el = document.getElementById('treeSidebar');
+        if (!el) return;
+
+        if (state.tree.length === 0) {
+            el.innerHTML = '<div class="tree-empty">No policies yet.</div>';
+            return;
+        }
+
+        const rowsHtml = state.tree.map(cat => {
+            const policiesHtml = cat.policies.map(p => renderTreeNode(p, 1)).join('');
+            return `
+                <details class="tree-cat" open>
+                    <summary>
+                        <i class="fas ${categoryIcon(cat.category)}"></i>
+                        <span>${escapeHtml(cat.category)}</span>
+                        <span class="tree-count">${cat.policies.length}</span>
+                    </summary>
+                    <ul class="tree-list">${policiesHtml}</ul>
+                </details>
+            `;
+        }).join('');
+
+        el.innerHTML = rowsHtml;
+    }
+
+    function renderTreeNode(node, depth) {
+        const hasChildren = node.children && node.children.length > 0;
+        const isExternal = !!node.External_URL;
+        const isDraft = node.Status === 'Draft';
+        const href = `/pages/policy-detail.html?id=${encodeURIComponent(node.Policy_ID)}`;
+
+        const linkClass = ['tree-link'];
+        if (isDraft) linkClass.push('is-draft');
+        if (isExternal) linkClass.push('is-external');
+
+        const externalBadge = isExternal ? '<i class="fas fa-external-link-alt tree-external-icon" aria-label="External"></i>' : '';
+        const draftBadge = isDraft ? '<span class="tree-badge tree-badge-draft">Draft</span>' : '';
+
+        if (hasChildren && depth < 3) {
+            const childrenHtml = node.children.map(c => renderTreeNode(c, depth + 1)).join('');
+            return `
+                <li class="tree-item tree-item-parent">
+                    <details>
+                        <summary>
+                            <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}</a>
+                        </summary>
+                        <ul class="tree-list tree-list-nested">${childrenHtml}</ul>
+                    </details>
+                </li>
+            `;
+        }
+
+        return `
+            <li class="tree-item">
+                <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}</a>
+            </li>
+        `;
+    }
+
+    function renderCategoryChips() {
+        const el = document.getElementById('categoryChips');
+        if (!el) return;
+
+        const counts = { all: 0 };
+        state.tree.forEach(cat => {
+            counts[cat.category] = cat.policies.length;
+            counts.all += cat.policies.length;
+        });
+
+        const allCats = ['Financial', 'Operations', 'Customer Service', 'HR', 'Training'];
+        const chips = [
+            { key: 'all', label: 'All Policies', icon: 'fa-layer-group' },
+            ...allCats.map(c => ({ key: c, label: c, icon: categoryIcon(c) }))
+        ];
+
+        el.innerHTML = chips.map(c => `
+            <button class="category-chip ${state.categoryFilter === c.key ? 'active' : ''}" data-category="${escapeHtml(c.key)}">
+                <i class="fas ${c.icon}"></i>
+                ${escapeHtml(c.label)}
+                <span class="count">${counts[c.key] || 0}</span>
+            </button>
+        `).join('');
+
+        el.querySelectorAll('.category-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                state.categoryFilter = chip.dataset.category;
+                state.searchResults = null;
+                const searchInput = document.getElementById('hubSearch');
+                if (searchInput) searchInput.value = '';
+                state.searchQuery = '';
+                render();
+            });
+        });
+    }
+
+    function renderCards() {
+        const grid = document.getElementById('policiesGrid');
+        const list = document.getElementById('policiesList');
+        if (!grid || !list) return;
+
+        // Determine the policies to render
+        let policies;
+        if (state.searchResults !== null) {
+            policies = state.searchResults;
+        } else {
+            // Collect top-level policies from tree (sub-procedures shown inside detail page)
+            policies = [];
+            state.tree.forEach(cat => {
+                if (state.categoryFilter === 'all' || state.categoryFilter === cat.category) {
+                    cat.policies.forEach(p => policies.push(p));
+                }
+            });
+        }
+
+        if (policies.length === 0) {
+            const msg = state.searchResults !== null
+                ? `No policies match "${escapeHtml(state.searchQuery)}".`
+                : 'No policies in this category yet.';
+            grid.innerHTML = `<div class="hub-empty"><i class="far fa-folder-open"></i> ${msg}</div>`;
+            list.innerHTML = '';
+            return;
+        }
+
+        // Grid view
+        grid.innerHTML = policies.map(renderCard).join('');
+
+        // List view
+        list.innerHTML = `
+            <div class="policy-list-header">
+                <span>Policy</span>
+                <span>Category</span>
+                <span>Updated</span>
+                <span>Owner</span>
+            </div>
+            ${policies.map(renderListItem).join('')}
+        `;
+
+        // Apply current view mode
+        applyViewMode();
+    }
+
+    function renderCard(p) {
+        const isExternal = !!p.External_URL;
+        const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
+        const isDraft = p.Status === 'Draft';
+        const isNew = p.Created_At && (Date.now() - new Date(p.Created_At).getTime()) < 30 * 24 * 60 * 60 * 1000;
+
+        return `
+            <a href="${href}" class="policy-card ${isDraft ? 'is-draft' : ''}" data-category="${escapeHtml(p.Category)}">
+                ${isNew && !isDraft ? '<span class="policy-flag flag-new">NEW</span>' : ''}
+                ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
+                ${isExternal ? '<span class="policy-flag flag-external"><i class="fas fa-external-link-alt"></i> External</span>' : ''}
+                <span class="policy-category-tag">
+                    <i class="fas ${categoryIcon(p.Category)}"></i> ${escapeHtml(p.Category)}
+                </span>
+                <h3 class="policy-title">${escapeHtml(p.Title)}</h3>
+                <p class="policy-description">${escapeHtml(p.Summary || '')}</p>
+                <div class="policy-meta">
+                    <span class="policy-updated">
+                        <i class="far fa-calendar"></i> ${formatDate(p.Updated_At || p.Created_At)}
+                    </span>
+                    <span class="policy-owner">
+                        <i class="far fa-user"></i> ${escapeHtml(p.Owner_Name || '—')}
+                    </span>
+                </div>
+            </a>
+        `;
+    }
+
+    function renderListItem(p) {
+        const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
+        const isDraft = p.Status === 'Draft';
+        return `
+            <a href="${href}" class="policy-list-item" data-category="${escapeHtml(p.Category)}">
+                <span class="policy-list-title">
+                    ${escapeHtml(p.Title)}
+                    ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
+                </span>
+                <span class="policy-list-category">${escapeHtml(p.Category)}</span>
+                <span class="policy-list-date">${formatDate(p.Updated_At || p.Created_At)}</span>
+                <span class="policy-list-owner">${escapeHtml(p.Owner_Name || '—')}</span>
+            </a>
+        `;
+    }
+
+    function renderRecentlyUpdated() {
+        const el = document.getElementById('recentItems');
+        if (!el) return;
+
+        const flat = [];
+        state.flatById.forEach(p => flat.push(p));
+        const sorted = flat
+            .filter(p => p.Status !== 'Archived')
+            .sort((a, b) => new Date(b.Updated_At || b.Created_At) - new Date(a.Updated_At || a.Created_At))
+            .slice(0, 4);
+
+        if (sorted.length === 0) {
+            el.innerHTML = '<div class="recent-empty">Nothing updated yet.</div>';
+            return;
+        }
+
+        el.innerHTML = sorted.map(p => {
+            const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
+            const isNew = p.Created_At && (Date.now() - new Date(p.Created_At).getTime()) < 14 * 24 * 60 * 60 * 1000;
+            return `
+                <a href="${href}" class="recent-item">
+                    ${isNew ? '<span class="new-badge">NEW</span>' : ''}
+                    <span class="recent-item-title">${escapeHtml(p.Title)}</span>
+                    <span class="recent-item-date">${formatDate(p.Updated_At || p.Created_At)}</span>
+                </a>
+            `;
+        }).join('');
+    }
+
+    function renderAdminAffordances() {
+        const btn = document.getElementById('newPolicyBtn');
+        const draftToggle = document.getElementById('draftToggle');
+        if (btn) btn.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
+        if (draftToggle) draftToggle.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
+    }
+
+    // ----------------------------- view modes -----------------------------
+    function applyViewMode() {
+        const grid = document.getElementById('policiesGrid');
+        const list = document.getElementById('policiesList');
+        const buttons = document.querySelectorAll('.view-toggle-btn');
+        if (!grid || !list) return;
+
+        if (state.viewMode === 'list') {
+            grid.classList.add('hidden');
+            list.classList.add('active');
+        } else {
+            grid.classList.remove('hidden');
+            list.classList.remove('active');
+        }
+        buttons.forEach(b => b.classList.toggle('active', b.dataset.view === state.viewMode));
+    }
+
+    // ----------------------------- events -----------------------------
+    function wireEvents() {
+        // Search (debounced 300ms)
+        const searchInput = document.getElementById('hubSearch');
+        if (searchInput) {
+            const onSearch = debounce(async () => {
+                const q = searchInput.value.trim();
+                state.searchQuery = q;
+                if (!q) {
+                    state.searchResults = null;
+                    render();
+                    return;
+                }
+                try {
+                    const result = await PoliciesAPI.searchPolicies(q);
+                    state.searchResults = result.policies || [];
+                    render();
+                } catch (e) {
+                    console.error('[policies-hub] search error:', e);
+                }
+            }, 300);
+            searchInput.addEventListener('input', onSearch);
+        }
+
+        // View toggle (grid / list)
+        document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                state.viewMode = btn.dataset.view;
+                localStorage.setItem('policies_view', state.viewMode);
+                applyViewMode();
+            });
+        });
+
+        // New Policy button
+        const newBtn = document.getElementById('newPolicyBtn');
+        if (newBtn) {
+            newBtn.addEventListener('click', () => {
+                window.location.href = '/pages/policy-detail.html?id=new&edit=1';
+            });
+        }
+    }
+
+    // ----------------------------- init -----------------------------
+    function init() {
+        wireEvents();
+        loadTree();
+    }
+
+    document.addEventListener('policies:admin-resolved', () => {
+        renderAdminAffordances();
+        // Reload tree in case admin sees drafts the public view doesn't
+        if (window.IS_POLICIES_ADMIN) loadTree();
+    });
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
