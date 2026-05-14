@@ -937,9 +937,14 @@
             // this is the pragmatic workaround.
             if (aiState.quoteID) {
                 try {
+                    // Phase 10.1 (2026-05-14): use the server's clean
+                    // /quote/<ID> path route (handled by server.js:4086).
+                    // The old /pages/quote-view.html?quoteId=... format
+                    // didn't match getQuoteIdFromUrl()'s path regex →
+                    // "Quote Not Found" error.
                     var viewUrl = window.location.origin
-                        + '/pages/quote-view.html?quoteId=' + encodeURIComponent(aiState.quoteID)
-                        + '&autoPdf=1';
+                        + '/quote/' + encodeURIComponent(aiState.quoteID)
+                        + '?autoPdf=1';
                     var w = window.open(viewUrl, '_blank');
                     if (!w) {
                         // Popup blocked — surface a fallback message

@@ -112,7 +112,16 @@ class QuoteViewPage {
         const path = window.location.pathname;
         // Match multiple formats: DTF0112-1 or DTF-1768263686415
         const match = path.match(/\/quote\/([A-Z]{2,5}[-\d]+)/);
-        return match ? match[1] : null;
+        if (match) return match[1];
+        // Phase 10.1 (2026-05-14): defense-in-depth fallback for
+        // /pages/quote-view.html?quoteId=<ID> URLs (any old email
+        // links from before the /quote/<ID> path was canonical).
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const qid = params.get('quoteId');
+            if (qid && /^[A-Z]{2,5}[-\d]+-?\d*$/.test(qid)) return qid;
+        } catch (e) { /* ignore */ }
+        return null;
     }
 
     async loadQuote() {
