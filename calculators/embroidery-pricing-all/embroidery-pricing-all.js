@@ -48,7 +48,16 @@ const TIER_ORDER = ['1-7', '8-23', '24-47', '48-71', '72+'];
 const FB_STITCH_EXAMPLES = [25000, 30000, 35000, 50000];
 
 // Stitch counts for full back pricing (25K minimum, higher range)
-const FB_STITCH_COUNTS = [25000, 30000, 35000, 40000, 45000, 50000];
+// Round 9b (2026-05-14): expanded from 5K to 1K increments to match the
+// contract Full Back precision. Most full-back / jacket-back designs are
+// 25K-35K with occasional outliers — 26 rows give reps 1K resolution.
+const FB_STITCH_COUNTS = [
+    25000, 26000, 27000, 28000, 29000, 30000,
+    31000, 32000, 33000, 34000, 35000,
+    36000, 37000, 38000, 39000, 40000,
+    41000, 42000, 43000, 44000, 45000,
+    46000, 47000, 48000, 49000, 50000
+];
 
 // Stitch counts for contract pricing matrices (5K to 25K)
 const CONTRACT_STITCH_COUNTS = [

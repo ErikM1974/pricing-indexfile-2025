@@ -45,7 +45,17 @@
     // logos. Round 9 (2026-05-14) — was [8K,10K,12K,14K,16K,18K,20K,25K] in 2K
     // steps; tighter precision matches reality (logos rarely land on 2K boundaries).
     var CONTRACT_STITCH_COUNTS = [8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000];
-    var FB_STITCH_COUNTS = [25000, 30000, 35000, 40000, 45000, 50000];
+    // Round 9b (2026-05-14): expanded to 1K increments to match the new
+    // contract garment table precision. Most jacket-back / full-back designs
+    // are 25K-35K with the occasional outlier — 26 rows give reps 1K
+    // resolution across the entire range without forcing them to interpolate.
+    var FB_STITCH_COUNTS = [
+        25000, 26000, 27000, 28000, 29000, 30000,
+        31000, 32000, 33000, 34000, 35000,
+        36000, 37000, 38000, 39000, 40000,
+        41000, 42000, 43000, 44000, 45000,
+        46000, 47000, 48000, 49000, 50000
+    ];
 
     var PRODUCT_META = {
         garment:  {
