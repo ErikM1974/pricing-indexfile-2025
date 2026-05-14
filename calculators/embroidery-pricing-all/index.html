@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Page-specific styles -->
-    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=20260513-iacleanup">
+    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=20260513-fullback">
 </head>
 <body>
     <!-- Error Banner (hidden by default) -->
@@ -70,6 +70,11 @@
                 <i class="fas fa-layer-group"></i>
                 Additional Stitches
                 <span class="tab-subtitle">+ adds to any tier · &gt; 10K stitches</span>
+            </button>
+            <button class="tab-btn tab-btn--modifier" data-tab="fullback" onclick="switchTab('fullback')">
+                <i class="fas fa-expand"></i>
+                Full Back Embroidery
+                <span class="tab-subtitle">Jacket-back &amp; 25K+ designs</span>
             </button>
         </div>
 
@@ -191,28 +196,13 @@
                 </div>
             </div>
 
-            <!-- Contract Full Back Matrix -->
-            <div class="matrix-card full-width">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Contract Full Back (25K+ Stitches) <span class="part-number-badge">DECG-FB</span></h3>
-                    <div class="matrix-meta">Priced per 1,000 stitches &bull; 25K minimum &bull; Min $20.00</div>
-                    <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
-                </div>
-                <table id="contractFullBackMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th class="ltm-tier">1-7</th>
-                            <th class="ltm-tier">8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            <!-- Full Back cross-reference (Round 4, 2026-05-13) — table
+                 moved to its own canonical tab to eliminate duplication. -->
+            <div class="fullback-crossref">
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                    <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate applies to contract jobs — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
+                </a>
             </div>
 
             <!-- Additional Fees -->
@@ -401,29 +391,13 @@
                 </div>
             </div>
 
-            <!-- AL Retail Full Back Matrix -->
-            <div class="matrix-card full-width">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Full Back Additional Logo (25K+ Stitches)
-                        <span class="part-number-badge">DECG-FB</span>
-                    </h3>
-                    <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
-                </div>
-                <table id="alRetailFullBackMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th class="ltm-tier">1-7</th>
-                            <th class="ltm-tier">8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            <!-- Full Back cross-reference (Round 4, 2026-05-13) — table
+                 moved to its own canonical tab to eliminate duplication. -->
+            <div class="fullback-crossref">
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                    <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate when we supply the garment — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
+                </a>
             </div>
 
             <!-- Sales Script Example -->
@@ -483,47 +457,15 @@
                     </div>
                 </div>
 
-                <!-- Full Back Toggle -->
-                <div class="es-fullback" onclick="document.getElementById('esFbPanel').classList.toggle('open'); this.classList.toggle('open')">
-                    <div class="es-fullback-left">
-                        <div><span class="es-fullback-text"><strong>25,000+ stitches</strong> — Full back embroidery pricing table</span></div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div class="es-fullback-tag">DECG-FB</div>
-                        <div class="es-fullback-arrow">&#9662;</div>
-                    </div>
-                </div>
-
-                <!-- DECG-FB Collapsible Panel -->
-                <div class="es-fb-panel" id="esFbPanel">
-                    <div class="es-fb-inner">
-                        <div class="es-fb-header">
-                            <div class="es-fb-title">Full Back Embroidery — DECG-FB</div>
-                            <div class="es-fb-meta">
-                                <span>Priced per <strong>1,000 stitches</strong></span>
-                                <span>Min <strong>25K stitches</strong></span>
-                                <span>Min charge <strong>$20.00</strong></span>
-                            </div>
-                        </div>
-                        <table class="es-fb-table">
-                            <thead>
-                                <tr>
-                                    <th>Stitches</th>
-                                    <th>1-7</th>
-                                    <th>8-23</th>
-                                    <th>24-47</th>
-                                    <th>48-71</th>
-                                    <th>72+</th>
-                                </tr>
-                            </thead>
-                            <tbody id="esFbTableBody">
-                                <!-- Populated by JS from CONTRACT_PRICING -->
-                            </tbody>
-                        </table>
-                        <div class="es-fb-ltm">
-                            <strong>LTM Fee: $100.00</strong> — applies to full back orders of 1–23 pieces
-                        </div>
-                    </div>
+                <!-- Full Back cross-reference (Round 4, 2026-05-13) —
+                     The full Full Back price table moved to its own tab
+                     (?tab=fullback) so reps can deep-link to it from the
+                     dashboard. This is just a pointer. -->
+                <div class="fullback-crossref">
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                    <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                        <strong>Looking for Full Back Embroidery (25K+)?</strong> See the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
+                    </a>
                 </div>
 
                 <!-- Affected Customers Section -->
@@ -699,31 +641,69 @@
                 <p>Add <strong>$10.00/piece</strong> for heavyweight items: Carhartt jackets, bags, canvas, leather</p>
             </div>
 
-            <!-- DECG Retail Full Back Matrix -->
-            <div class="matrix-card full-width">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-expand"></i> Full Back (25K+ Stitches)
-                        <span class="part-number-badge">DECG-FB</span>
-                    </h3>
-                    <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
-                </div>
-                <table id="decgRetailFullBackMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th class="ltm-tier">1-7</th>
-                            <th class="ltm-tier">8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
+            <!-- Full Back cross-reference (Round 4, 2026-05-13) — table
+                 moved to its own canonical tab to eliminate duplication. -->
+            <div class="fullback-crossref">
+                <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                    <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate when the customer supplies the garment — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
+                </a>
             </div>
 
+        </div>
+
+        <!-- Tab Content: FULL BACK EMBROIDERY (Round 4, 2026-05-13) —
+             Extracted from the Stitch Charges tab where it lived as a
+             collapsible panel. Now a first-class tab so reps can deep-link
+             to it from the dashboard with one click. Pricing is universal
+             (same DECG-FB rate for Contract / Add Logo / Customer Supplied),
+             so this is the SINGLE canonical Full Back price table. The
+             other tabs (Contract / AL-Retail / DECG-Retail / Stitch Charges)
+             now show a cross-reference link instead of a duplicate matrix.
+             Same #esFbTableBody ID kept so the existing
+             buildStitchChargesFullBackTable() JS function (which runs on
+             init) populates this table without any JS change. -->
+        <div id="tab-fullback" class="tab-content">
+            <div class="use-case-banner">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Full Back Embroidery (DECG-FB):</strong> Priced per 1,000 stitches for designs 25K and up — typically jacket-back logos, school-spirit backs, full-coverage embroidery. Same rate applies whether the garment is wholesale (Contract), NWCA-supplied (Add Logo), or customer-supplied.
+                </div>
+                <button class="share-link-btn" onclick="copyShareableLink()">
+                    <i class="fas fa-link"></i> Copy Link
+                </button>
+            </div>
+
+            <div class="es-fb-panel open" id="esFbPanelPrimary">
+                <div class="es-fb-inner">
+                    <div class="es-fb-header">
+                        <div class="es-fb-title">Full Back Embroidery — DECG-FB</div>
+                        <div class="es-fb-meta">
+                            <span>Priced per <strong>1,000 stitches</strong></span>
+                            <span>Min <strong>25K stitches</strong></span>
+                            <span>Min charge <strong>$20.00</strong></span>
+                        </div>
+                    </div>
+                    <table class="es-fb-table">
+                        <thead>
+                            <tr>
+                                <th>Stitches</th>
+                                <th>1-7</th>
+                                <th>8-23</th>
+                                <th>24-47</th>
+                                <th>48-71</th>
+                                <th>72+</th>
+                            </tr>
+                        </thead>
+                        <tbody id="esFbTableBody">
+                            <!-- Populated by buildStitchChargesFullBackTable() on init -->
+                        </tbody>
+                    </table>
+                    <div class="es-fb-ltm">
+                        <strong>LTM Fee: $100.00</strong> — applies to full back orders of 1–23 pieces
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>

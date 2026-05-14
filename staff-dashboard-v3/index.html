@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3600-cusupplied">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3600-cusupplied">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3600-cusupplied">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3700-fullback">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3700-fullback">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3600-cusupplied">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3700-fullback">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3600-cusupplied"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3700-fullback"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>
@@ -392,11 +392,12 @@
                                     <i class="fas fa-tshirt" aria-hidden="true"></i>
                                 </div>
                                 <span class="tool-category-title">Corporate Embroidery</span>
-                                <span class="tool-category-count">2</span>
+                                <span class="tool-category-count">3</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-tag" aria-hidden="true"></i> Additional Logo</a>
                                 <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Additional Stitches</a>
+                                <a href="/calculators/embroidery-pricing-all/?tab=fullback" class="tool-btn"><i class="fas fa-expand" aria-hidden="true"></i> Full Back Embroidery</a>
                             </div>
                         </div>
 

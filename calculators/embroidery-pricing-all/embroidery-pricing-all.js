@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Auto-select tab from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam && ['contract', 'al-retail', 'stitch-charges', 'decg-retail'].includes(tabParam)) {
+    if (tabParam && ['contract', 'al-retail', 'stitch-charges', 'decg-retail', 'fullback'].includes(tabParam)) {
         switchTab(tabParam);
     }
 });
