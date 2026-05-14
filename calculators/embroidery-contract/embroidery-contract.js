@@ -125,6 +125,34 @@
         return { unit: unit, rate: rate, kStitches: kStitches, tierIdx: idx, tier: tier, minChargeApplied: minChargeApplied };
     }
 
+    /**
+     * Calculate unit price with LTM fee built into the per-piece price.
+     * Matches the convention in embroidery-pricing-all.js calculateUnitPriceWithLTM
+     * (and every other NWCA pricing surface) — for orders at/below the LTM
+     * threshold, divide the flat LTM fee across the pieces and add to per-piece.
+     * Reps see ONE all-in unit price; ShopWorks gets one line item instead of
+     * a separate "LTM" line.
+     */
+    function calculateUnitPriceWithLTM(baseUnitPrice, quantity, ltmThreshold, ltmFee) {
+        if (quantity > 0 && quantity <= ltmThreshold) {
+            var ltmPerPiece = ltmFee / quantity;
+            return {
+                finalUnitPrice: baseUnitPrice + ltmPerPiece,
+                baseUnitPrice: baseUnitPrice,
+                ltmPerPiece: ltmPerPiece,
+                ltmFee: ltmFee,
+                hasLtm: true
+            };
+        }
+        return {
+            finalUnitPrice: baseUnitPrice,
+            baseUnitPrice: baseUnitPrice,
+            ltmPerPiece: 0,
+            ltmFee: 0,
+            hasLtm: false
+        };
+    }
+
     /* ---------------------- Data fetch ---------------------- */
 
     function fetchContractPricing() {
@@ -154,13 +182,29 @@
         var p = PRODUCT_META[state.product];
         var calc = computeUnit(state.product, state.qty, state.stitches);
 
-        // Result panel — header + hero price
+        // Round 8 (2026-05-14): roll LTM into the per-piece price the same way
+        // every other NWCA calculator does. Reps see ONE all-in unit price —
+        // no separate "LTM fee" line in the totals, no extra ShopWorks invoice
+        // row. The pricing tables still show base rates; the LTM warning
+        // chip under the qty input bridges the gap.
+        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
+        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+        var baseUnit = calc ? calc.unit : 0;
+        var ltmCalc = calculateUnitPriceWithLTM(baseUnit, state.qty, ltmThreshold, ltmFeeBase);
+        var orderTotal = ltmCalc.finalUnitPrice * state.qty;
+
+        // Result panel — header + hero price (now all-in)
         document.getElementById('resProductLabel').textContent = p.label;
         if (calc) {
             document.getElementById('resTier').textContent = 'Tier ' + TIER_LABELS[calc.tierIdx];
-            document.getElementById('unitPrice').textContent = fmtMoney(calc.unit);
+            document.getElementById('unitPrice').textContent = fmtMoney(ltmCalc.finalUnitPrice);
+            // Sub-line — show the rate breakdown, plus LTM math when it applies
             var subText = (state.stitches / 1000).toFixed(0) + 'K × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
             if (calc.minChargeApplied) subText += ' · min charge applied';
+            if (ltmCalc.hasLtm) {
+                subText += ' · incl. $' + fmtMoney(ltmCalc.ltmFee) + ' LTM ÷ ' + state.qty +
+                    ' = <b>+$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>';
+            }
             document.getElementById('unitSub').innerHTML = subText;
         } else {
             document.getElementById('resTier').textContent = '—';
@@ -168,35 +212,19 @@
             document.getElementById('unitSub').innerHTML = 'Pricing unavailable';
         }
 
-        // Totals
-        var ltmApplies = state.qty <= (pricing ? pricing.ltmThreshold : 23);
-        var ltmFee = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
-        var unit = calc ? calc.unit : 0;
-        var subtotal = unit * state.qty;
-        var ltm = ltmApplies ? ltmFee : 0;
-        var total = subtotal + ltm;
-        var perPieceAllIn = state.qty > 0 ? (total / state.qty) : 0;
-
-        document.getElementById('subtotal').textContent = '$' + fmtMoney(subtotal);
-        document.getElementById('subtotalNote').textContent = fmtInt(state.qty) + ' × $' + fmtMoney(unit);
-        var ltmCard = document.getElementById('ltmCard');
-        if (ltm) {
-            ltmCard.classList.add('alert');
-            document.getElementById('ltmValue').textContent = '+ $' + fmtMoney(ltm);
-            document.getElementById('ltmNote').textContent = 'Orders 1–' + (pricing ? pricing.ltmThreshold : 23);
-        } else {
-            ltmCard.classList.remove('alert');
-            document.getElementById('ltmValue').textContent = '—';
-            document.getElementById('ltmNote').textContent = 'Not applicable';
+        // Single Order Total card (replaces Subtotal + LTM cards)
+        document.getElementById('orderTotal').textContent = '$' + fmtMoney(orderTotal);
+        var orderTotalNote = document.getElementById('orderTotalNote');
+        if (orderTotalNote) {
+            orderTotalNote.textContent = fmtInt(state.qty) + ' × $' + fmtMoney(ltmCalc.finalUnitPrice);
         }
-        document.getElementById('orderTotal').textContent = '$' + fmtMoney(total);
-        document.getElementById('perPieceAllIn').textContent = fmtMoney(perPieceAllIn);
 
-        // LTM helper line under the quantity field
+        // LTM helper line under the quantity field (kept — bridges the gap
+        // between table base rates and the calculator's all-in unit)
         var ltmHelp = document.getElementById('ltmHelp');
-        if (ltmApplies && state.qty > 0) {
+        if (ltmCalc.hasLtm) {
             ltmHelp.hidden = false;
-            document.getElementById('ltmHelpAmount').textContent = '$' + ltmFee;
+            document.getElementById('ltmHelpAmount').textContent = '$' + ltmFeeBase;
         } else {
             ltmHelp.hidden = true;
         }
@@ -379,17 +407,19 @@
         var p = PRODUCT_META[state.product];
         var calc = computeUnit(state.product, state.qty, state.stitches);
         if (!calc) return;
-        var ltmApplies = state.qty <= (pricing ? pricing.ltmThreshold : 23);
-        var ltmFee = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
-        var subtotal = calc.unit * state.qty;
-        var ltm = ltmApplies ? ltmFee : 0;
-        var total = subtotal + ltm;
+        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
+        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+        var ltmCalc = calculateUnitPriceWithLTM(calc.unit, state.qty, ltmThreshold, ltmFeeBase);
+        var total = ltmCalc.finalUnitPrice * state.qty;
+        // Customer-friendly format — single per-piece price (LTM built in), no
+        // separate "LTM fee" jargon that the customer would need to decode.
+        var ltmNote = ltmCalc.hasLtm
+            ? ' (incl. $' + fmtMoney(ltmCalc.ltmPerPiece) + ' LTM/pc)'
+            : '';
         var text =
             p.label + ' · ' + fmtInt(state.qty) + ' pcs · ' + (state.stitches / 1000).toFixed(0) + 'K stitches\n' +
-            'Unit: $' + fmtMoney(calc.unit) +
-            '  Subtotal: $' + fmtMoney(subtotal) +
-            (ltm ? '  LTM: $' + fmtMoney(ltm) : '') +
-            '  Total: $' + fmtMoney(total);
+            'Unit: $' + fmtMoney(ltmCalc.finalUnitPrice) + ' / piece' + ltmNote +
+            '  •  Total: $' + fmtMoney(total);
         copyToClipboard(text)
             .then(function () { showToast('Quote text copied'); })
             .catch(function () { showToast('Couldn\'t copy — try again'); });

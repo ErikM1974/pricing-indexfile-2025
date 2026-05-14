@@ -510,8 +510,25 @@ h1.page-title em {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    gap: 16px;
 }
 .tot.tot--total .v { font-size: 28px; }
+
+/* Round 8 (2026-05-14): single-card totals layout. LTM is rolled into the
+   per-piece price so there's no separate Subtotal/LTM/Total split — just one
+   big Order Total card. Make it more prominent than the 3-card version was. */
+.totals--single .tot.tot--total {
+    padding: 16px 18px;
+}
+.totals--single .tot.tot--total .v {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--pink-700);
+}
+.totals--single .tot.tot--total .k {
+    font-size: 12px;
+    color: var(--pink-700);
+}
 .calc-actions {
     margin-top: auto;
     padding-top: 18px;

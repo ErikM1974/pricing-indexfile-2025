@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-editorial">
+    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-ltm-builtin">
 </head>
 <body>
 
@@ -164,22 +164,16 @@
 
                 <div class="divider"></div>
 
-                <div class="totals">
-                    <div class="tot">
-                        <div class="k">Subtotal</div>
-                        <div class="v" id="subtotal">$172.80</div>
-                        <div class="note" id="subtotalNote">24 × $7.20</div>
-                    </div>
-                    <div class="tot" id="ltmCard">
-                        <div class="k">LTM fee</div>
-                        <div class="v" id="ltmValue">—</div>
-                        <div class="note" id="ltmNote">Not applicable</div>
-                    </div>
+                <!-- Round 8 (2026-05-14): LTM is rolled into the per-piece price
+                     (matches every other NWCA calculator). Subtotal + LTM cards
+                     dropped — they'd be redundant. Just the Order Total now,
+                     promoted to a full-width hero card. -->
+                <div class="totals totals--single">
                     <div class="tot tot--total">
                         <div class="row">
                             <div>
                                 <div class="k">Order total</div>
-                                <div class="note">≈ $<span id="perPieceAllIn">7.20</span> all-in / piece</div>
+                                <div class="note"><span id="orderTotalNote">24 × $7.20</span></div>
                             </div>
                             <div class="v" id="orderTotal">$172.80</div>
                         </div>
@@ -382,6 +376,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="embroidery-contract.js?v=20260514-editorial"></script>
+    <script src="embroidery-contract.js?v=20260514-ltm-builtin"></script>
 </body>
 </html>
