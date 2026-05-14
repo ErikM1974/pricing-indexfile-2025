@@ -247,11 +247,9 @@
         const isExternal = !!p.External_URL;
         const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
         const isDraft = p.Status === 'Draft';
-        const isNew = p.Created_At && (Date.now() - new Date(p.Created_At).getTime()) < 30 * 24 * 60 * 60 * 1000;
 
         return `
             <a href="${href}" class="policy-card ${isDraft ? 'is-draft' : ''}" data-category="${escapeHtml(p.Category)}">
-                ${isNew && !isDraft ? '<span class="policy-flag flag-new">NEW</span>' : ''}
                 ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
                 ${isExternal ? '<span class="policy-flag flag-external"><i class="fas fa-external-link-alt"></i> External</span>' : ''}
                 <span class="policy-category-tag">
@@ -305,10 +303,8 @@
 
         el.innerHTML = sorted.map(p => {
             const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
-            const isNew = p.Created_At && (Date.now() - new Date(p.Created_At).getTime()) < 14 * 24 * 60 * 60 * 1000;
             return `
                 <a href="${href}" class="recent-item">
-                    ${isNew ? '<span class="new-badge">NEW</span>' : ''}
                     <span class="recent-item-title">${escapeHtml(p.Title)}</span>
                     <span class="recent-item-date">${formatDate(p.Updated_At || p.Created_At)}</span>
                 </a>

@@ -11,10 +11,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-1">
-    <link rel="stylesheet" href="/pages/css/policy-detail.css?v=20260514-1">
+    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-2">
+    <link rel="stylesheet" href="/pages/css/policy-detail.css?v=20260514-2">
 </head>
 <body class="policy-detail-body">
+
+    <!-- Hidden Caspio auth embed — used by policies-admin-gate.js to
+         auto-bootstrap the Express CRM session if the viewer is already
+         signed in to Caspio. Without this, edit affordances stay hidden. -->
+    <div class="caspio-auth" hidden>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
 
     <header class="detail-topbar">
         <a href="/pages/policies-hub.html" class="back-link">
@@ -59,9 +70,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-1"></script>
-    <script src="/shared_components/js/policies/policies-api.js?v=20260514-1"></script>
-    <script src="/shared_components/js/policies/policy-editor-tiptap.js?v=20260514-1"></script>
-    <script src="/shared_components/js/policies/policy-detail.js?v=20260514-1"></script>
+    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-2"></script>
+    <script src="/shared_components/js/policies/policies-api.js?v=20260514-2"></script>
+    <script src="/shared_components/js/policies/policy-editor-tiptap.js?v=20260514-2"></script>
+    <script src="/shared_components/js/policies/policy-detail.js?v=20260514-2"></script>
 </body>
 </html>

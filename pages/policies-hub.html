@@ -11,9 +11,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-1">
+    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-2">
 </head>
 <body class="policies-hub-body">
+
+    <!-- Hidden Caspio auth embed — provides First_Name/Last_Name/Email/Role
+         that policies-admin-gate.js uses to auto-bootstrap the Express CRM
+         session for admins on this page. -->
+    <div class="caspio-auth" hidden>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
 
     <!-- Top bar -->
     <header class="hub-topbar">
@@ -83,8 +94,8 @@
     </div>
 
     <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-1"></script>
-    <script src="/shared_components/js/policies/policies-api.js?v=20260514-1"></script>
-    <script src="/shared_components/js/policies/policies-hub.js?v=20260514-1"></script>
+    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-2"></script>
+    <script src="/shared_components/js/policies/policies-api.js?v=20260514-2"></script>
+    <script src="/shared_components/js/policies/policies-hub.js?v=20260514-2"></script>
 </body>
 </html>
