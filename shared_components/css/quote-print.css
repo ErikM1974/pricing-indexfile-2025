@@ -26,9 +26,16 @@
    Mirrors the email closing — "Pricing is based on customer-supplied
    blanks. This quote is valid for 30 days. Reply to confirm or send
    a PO when you're ready." Hidden on the live quote view; shows only
-   on print (Save as PDF). */
-.print-only-terms {
-    display: none;
+   on print (Save as PDF).
+   Phase 11.2 (2026-05-14): scope the hide rule explicitly to
+   `@media screen` so it pairs symmetrically with the `@media print`
+   show rule below. Guards against edge cases where the browser
+   evaluates `@media print` outside an actual print context (e.g.,
+   DevTools print-emulation, headless screenshot tools). */
+@media screen {
+    .print-only-terms {
+        display: none !important;
+    }
 }
 
 @media print {
