@@ -116,7 +116,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Auto-select tab from URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
-    if (tabParam && ['contract', 'al-retail', 'stitch-charges', 'decg-retail', 'fullback'].includes(tabParam)) {
+    // Note: 'contract' removed from whitelist Round 6 (2026-05-13) — the
+    // Contract tab moved to its own page at /calculators/embroidery-contract/.
+    // Old ?tab=contract URLs are redirected by the inline script in
+    // index.html <head> before this code runs, so 'contract' shouldn't
+    // reach here, but it's defensively excluded.
+    if (tabParam && ['al-retail', 'stitch-charges', 'decg-retail', 'fullback'].includes(tabParam)) {
         switchTab(tabParam);
     }
 });

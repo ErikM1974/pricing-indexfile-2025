@@ -1,0 +1,239 @@
+/* =====================================================
+   CONTRACT PRICING THEME — Shared CSS for Contract DTG
+   and Contract Embroidery pages.
+   ----------------------------------------------------------
+   Why pink? NWCA puts pink box labels on contract jobs in
+   the factory. The page chrome echoes that operational
+   color code so reps see the same pink on screen as on the
+   physical floor — reinforces the mental model "this is
+   a CONTRACT page, not a Corporate page."
+
+   Accent strategy: WHITE page, pink ACCENTS only. Page
+   title bar, calculator card top border, table header,
+   primary buttons, share-link button. Body stays
+   high-contrast and readable. Pink = signal, not chrome.
+   Matches the pattern Stripe / Linear use for brand
+   accents — never overwhelming.
+
+   This file LAYERS ON TOP of calculator-base.css. Loads
+   AFTER it so pink wins the cascade for the overridden
+   tokens. Both Contract pages link these two files in
+   this exact order:
+     1. calculator-base.css   (shared baseline)
+     2. contract-pricing-theme.css   (pink overlay)
+   ===================================================== */
+
+:root {
+    /* === Pink palette (Tailwind rose-* / pink-*) === */
+    --contract-pink:        #db2777;   /* rose-600  · primary action color */
+    --contract-pink-dark:   #be185d;   /* rose-700  · hover / active */
+    --contract-pink-soft:   #fce7f3;   /* rose-100  · subtle tints (table row, hero band) */
+    --contract-pink-border: #fbcfe8;   /* rose-200  · borders */
+    --contract-pink-text:   #831843;   /* pink-900  · readable on white */
+    --contract-pink-glow:   rgba(219, 39, 119, 0.18);
+}
+
+/* === Token overrides === */
+/* calculator-base.css uses --primary-green/--primary-color/--primary-dark
+   throughout. Rebind them so the existing CSS reuses pink without me
+   rewriting every rule. */
+body.contract-pricing,
+.contract-pricing {
+    --primary-green:  var(--contract-pink);
+    --primary-color:  var(--contract-pink);
+    --primary-dark:   var(--contract-pink-dark);
+    --focus-shadow:   0 0 0 0.25rem var(--contract-pink-glow);
+}
+
+/* === Page header — pink accent bar above the title === */
+body.contract-pricing .page-title {
+    color: var(--contract-pink-text);
+    border-top: 4px solid var(--contract-pink);
+    padding-top: 1.25rem;
+    margin-top: 0;
+    position: relative;
+}
+body.contract-pricing .page-title::before {
+    content: "Contract · Wholesale Partner Pricing";
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--contract-pink);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+body.contract-pricing .page-subtitle {
+    color: #6b7280;
+}
+
+/* === Hero "info banner" — pink-tinted info card === */
+body.contract-pricing .contract-info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    margin: 1.5rem 0;
+    background: var(--contract-pink-soft);
+    border: 1px solid var(--contract-pink-border);
+    border-left: 4px solid var(--contract-pink);
+    border-radius: 8px;
+    color: var(--contract-pink-text);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+body.contract-pricing .contract-info-banner i.fa-info-circle,
+body.contract-pricing .contract-info-banner i.fa-handshake {
+    color: var(--contract-pink);
+    font-size: 1.2rem;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+body.contract-pricing .contract-info-banner strong { color: var(--contract-pink-text); }
+
+/* === Calculator card — pink top border === */
+body.contract-pricing .calculator-card,
+body.contract-pricing .input-section,
+body.contract-pricing .results-card {
+    border-top: 3px solid var(--contract-pink);
+}
+body.contract-pricing .section-title i,
+body.contract-pricing .calculator-card h3 i {
+    color: var(--contract-pink) !important;
+}
+
+/* === Buttons === */
+body.contract-pricing .btn-primary {
+    background: var(--contract-pink);
+    border-color: var(--contract-pink);
+    color: white;
+}
+body.contract-pricing .btn-primary:hover {
+    background: var(--contract-pink-dark);
+    border-color: var(--contract-pink-dark);
+}
+
+/* === Copy Quote Link button — prominent pink, sits inline with the
+   calculator result so Ruthie can copy → paste in one motion. === */
+.contract-share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--contract-pink);
+    color: white;
+    border: 1px solid var(--contract-pink-dark);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+    box-shadow: 0 1px 2px rgba(219, 39, 119, 0.12);
+}
+.contract-share-btn:hover {
+    background: var(--contract-pink-dark);
+    box-shadow: 0 4px 12px var(--contract-pink-glow);
+    transform: translateY(-1px);
+}
+.contract-share-btn:active { transform: translateY(0); }
+.contract-share-btn i { font-size: 0.95rem; }
+
+.contract-share-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 20px;
+    background: var(--contract-pink-text);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 9999;
+}
+.contract-share-toast.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.contract-share-toast i { margin-right: 8px; color: #fbcfe8; }
+
+/* === Pricing matrix — pink header row === */
+body.contract-pricing .pricing-matrix thead th,
+body.contract-pricing table thead th {
+    background: var(--contract-pink-soft);
+    color: var(--contract-pink-text);
+    border-bottom: 2px solid var(--contract-pink);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+body.contract-pricing .pricing-matrix tbody tr:nth-child(even) td {
+    background: rgba(252, 231, 243, 0.4);   /* extra-soft pink zebra stripes */
+}
+body.contract-pricing .pricing-matrix tbody td.best-tier,
+body.contract-pricing .pricing-matrix tbody td.best-col {
+    background: rgba(251, 207, 232, 0.4);
+    font-weight: 600;
+}
+
+/* === Part-number badges (CTR-Garmt, CTR-Cap, DECG-FB) === */
+body.contract-pricing .part-number-badge {
+    background: var(--contract-pink-soft);
+    color: var(--contract-pink-text);
+    border: 1px solid var(--contract-pink-border);
+}
+
+/* === Tier progress bar (DTG page) === */
+body.contract-pricing .tier-bar {
+    background: var(--contract-pink) !important;
+}
+
+/* === LTM / warning banner — keep amber (universal warning color) but
+   add a pink left-border so it still feels part of the contract page === */
+body.contract-pricing .ltm-banner {
+    border-left: 4px solid var(--contract-pink);
+}
+
+/* === Form inputs focus state === */
+body.contract-pricing .form-input:focus,
+body.contract-pricing input[type="number"]:focus,
+body.contract-pricing select:focus {
+    border-color: var(--contract-pink) !important;
+    box-shadow: var(--focus-shadow);
+}
+
+/* === Final price display === */
+body.contract-pricing .final-price,
+body.contract-pricing .result-row.final .final-price,
+body.contract-pricing #contractFinalUnitPrice {
+    color: var(--contract-pink) !important;
+}
+
+/* === Breadcrumb link color === */
+body.contract-pricing .breadcrumb a {
+    color: var(--contract-pink);
+}
+body.contract-pricing .breadcrumb a:hover {
+    color: var(--contract-pink-dark);
+}
+
+/* === Logo / brand area — keep the NWCA green logo (don't hue-shift the
+   brand mark itself); only the page chrome turns pink. === */
+
+/* === Print: keep matrices crisp, drop pink fills for paper === */
+@media print {
+    body.contract-pricing .pricing-matrix thead th {
+        background: #f3f4f6;
+        color: #1f2937;
+        border-bottom: 2px solid #6b7280;
+    }
+    body.contract-pricing .pricing-matrix tbody tr:nth-child(even) td {
+        background: #fafafa;
+    }
+    .contract-share-btn,
+    .contract-share-toast { display: none !important; }
+}

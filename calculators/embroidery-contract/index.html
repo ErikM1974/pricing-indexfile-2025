@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Contract Embroidery Pricing — Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <!-- Shared base styles (provides .header, .breadcrumb, .calculator-card,
+         .pricing-matrix, .form-input, .btn-primary, etc.) -->
+    <link href="../../shared_components/css/calculator-base.css?v=20260513-contract" rel="stylesheet">
+
+    <!-- Contract Pricing Pink Theme — overlay on top of calculator-base.
+         Rebinds green tokens to pink and adds .contract-share-btn /
+         .contract-info-banner / .contract-share-toast components. -->
+    <link href="../../shared_components/css/contract-pricing-theme.css?v=20260513-contract" rel="stylesheet">
+</head>
+<body class="contract-pricing">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel"
+                     class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">
+                        <i class="fas fa-arrow-left"></i> Dashboard
+                    </a>
+                    <span>/</span>
+                    <span>Contract Embroidery</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <h1 class="page-title">Contract Embroidery Pricing 2026</h1>
+        <p class="page-subtitle">Wholesale embroidery pricing for production accounts (Ruthie / ASI distributors who supply their own blanks)</p>
+
+        <!-- Contract Info Banner -->
+        <div class="contract-info-banner">
+            <i class="fas fa-handshake" aria-hidden="true"></i>
+            <div>
+                <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks). Single price tier — no segment tabs. Same Full Back rate as Corporate.
+            </div>
+        </div>
+
+        <!-- LTM Banner -->
+        <div class="ltm-banner">
+            <i class="fas fa-exclamation-circle"></i>
+            <span><strong>LTM Fee:</strong> Orders of 1-23 pieces incur a $50 Less Than Minimum fee</span>
+        </div>
+
+        <!-- Quick Price Calculator -->
+        <div class="calculator-card compact">
+            <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+            <div class="calc-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ecItemType">Item Type</label>
+                        <select id="ecItemType" class="form-input">
+                            <option value="garment">Garment</option>
+                            <option value="cap">Cap</option>
+                            <option value="laser-patch">Laser Patch</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ecQuantity">Quantity</label>
+                        <input type="number" id="ecQuantity" class="form-input" value="24" min="1" max="9999">
+                    </div>
+                    <div class="form-group">
+                        <label for="ecStitches">Stitch Count</label>
+                        <input type="number" id="ecStitches" class="form-input" value="8000" min="1000" max="100000" step="1000">
+                    </div>
+                </div>
+                <div class="calc-results">
+                    <div class="result-row breakdown" id="ecBreakdownRow">
+                        <span id="ecBreakdownLabel">8K × $0.90/1K:</span>
+                        <span id="ecBreakdownValue">$7.20</span>
+                    </div>
+                    <div class="result-row breakdown hidden" id="ecLtmBreakdownRow">
+                        <span id="ecLtmBreakdownLabel">+ LTM ($50 ÷ 3):</span>
+                        <span id="ecLtmBreakdownValue">+$16.67</span>
+                    </div>
+                    <div class="result-row final">
+                        <span>Unit Price:</span>
+                        <span id="ecFinalUnitPrice" class="final-price">$7.20</span>
+                    </div>
+                </div>
+
+                <!-- Share row: prominent Copy Link button for the "calculate → share" flow -->
+                <div class="share-row" style="margin-top: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; color: #6b7280;">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                        Share this exact quote with a customer — they'll see the calculator pre-filled.
+                    </span>
+                    <button type="button" class="contract-share-btn" id="ecShareBtn">
+                        <i class="fas fa-link" aria-hidden="true"></i> Copy Quote Link
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ShopWorks Part Numbers Reference Card -->
+        <div class="shopworks-ref-card">
+            <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+            <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
+            <span class="ref-item"><span class="ref-code">CTR-Garmt</span> Garments</span>
+            <span class="ref-item"><span class="ref-code">CTR-Cap</span> Caps</span>
+            <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
+        </div>
+
+        <!-- Pricing Matrices Grid -->
+        <div class="matrices-grid">
+            <!-- Contract Garments Matrix -->
+            <div class="matrix-card">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-tshirt"></i> Contract Garments <span class="part-number-badge">CTR-Garmt</span></h3>
+                </div>
+                <table id="ecGarmentsMatrix" class="pricing-matrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-tier">1-7</th>
+                            <th class="ltm-tier">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-tier">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Contract Caps Matrix -->
+            <div class="matrix-card">
+                <div class="matrix-header">
+                    <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts <span class="part-number-badge">CTR-Cap</span></h3>
+                </div>
+                <table id="ecCapsMatrix" class="pricing-matrix">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th class="ltm-tier">1-7</th>
+                            <th class="ltm-tier">8-23</th>
+                            <th>24-47</th>
+                            <th>48-71</th>
+                            <th class="best-tier">72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Full Back Embroidery — universal rate (same DECG-FB matrix as corporate) -->
+        <div class="matrix-card full-width" style="margin-top: 1.5rem;">
+            <div class="matrix-header">
+                <h3><i class="fas fa-expand"></i> Full Back Embroidery (25K+ Stitches) <span class="part-number-badge">DECG-FB</span></h3>
+                <div class="matrix-meta">Priced per 1,000 stitches &bull; 25K minimum &bull; Min charge $20.00</div>
+                <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
+            </div>
+            <table id="ecFullBackMatrix" class="pricing-matrix">
+                <thead>
+                    <tr>
+                        <th>Stitches</th>
+                        <th class="ltm-tier">1-7</th>
+                        <th class="ltm-tier">8-23</th>
+                        <th>24-47</th>
+                        <th>48-71</th>
+                        <th class="best-tier">72+</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Populated by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="contact-card" style="margin-top: 2rem;">
+            <div class="contact-header">
+                <i class="fas fa-phone-alt"></i>
+                <div>
+                    <div class="contact-title">Contract Embroidery Specialist</div>
+                    <div class="contact-subtitle">Direct line for wholesale partner inquiries</div>
+                </div>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h3>Ruthie Nhoung</h3>
+                    <div class="contact-detail">
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:253-922-5793">253-922-5793 ext. 119</a>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:ruth@nwcustomapparel.com">ruth@nwcustomapparel.com</a>
+                    </div>
+                    <div class="contact-detail">
+                        <i class="fas fa-clock"></i>
+                        <span>Mon-Fri: 9AM - 5PM PST</span>
+                    </div>
+                </div>
+                <div class="quote-requirements">
+                    <h4>What You'll Need for Your Quote:</h4>
+                    <ul class="requirements-list">
+                        <li>Vector artwork (AI, EPS, or PDF)</li>
+                        <li>Stitch count for each logo location</li>
+                        <li>Final quantity needed</li>
+                        <li>Desired delivery date</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="important-note">
+                <i class="fas fa-info-circle"></i>
+                <div class="important-note-text">
+                    <strong>Note:</strong> This calculator provides estimated pricing based on standard contract rates. Final quotes may vary based on artwork complexity and current production schedule. Contact Ruthie for an official contract quote.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast for share-link copied confirmation -->
+    <div class="contract-share-toast" id="ecShareToast">
+        <i class="fas fa-check-circle"></i><span>Quote link copied — paste into your email or chat</span>
+    </div>
+
+    <!-- Calculator + URL params + share-link logic -->
+    <script src="embroidery-contract.js?v=20260513-contract"></script>
+</body>
+</html>

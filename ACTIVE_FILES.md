@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-04-29
+**Last Updated:** 2026-05-14
 **Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
@@ -69,7 +69,21 @@
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/policies-hub.html` | Policy documentation hub | dashboard-styles.css | ✅ Active |
+| `/pages/policies-hub.html` | Policy documentation hub (legacy v1, hardcoded cards) | dashboard-styles.css | 🗄️ Legacy (kept during dogfood; sidebar link will switch to policies-hub-v2.html) |
+| `/pages/policies-hub-v2.html` | **NEW** Caspio-backed Policies Hub (tree sidebar, search, category chips, admin-gated CRUD) | policies-admin-gate.js, policies-api.js, policies-hub.js, policies-hub-v2.css | ✅ Active |
+| `/pages/policy-detail.html` | **NEW** Individual policy read/edit page (TipTap rich-text editor, breadcrumb, outline, sub-procedures) | policies-admin-gate.js, policies-api.js, policy-editor-tiptap.js, policy-detail.js, policies-hub-v2.css, policy-detail.css | ✅ Active |
+| `/pages/css/policies-hub-v2.css` | **NEW** Stylesheet for policies hub v2 (tree sidebar, cards, category chips, NW-green theme) | — | ✅ Active |
+| `/pages/css/policy-detail.css` | **NEW** Stylesheet for policy-detail.html (prose body, TipTap chrome, outline sidebar, edit form) | — | ✅ Active |
+| `/shared_components/js/policies/policies-api.js` | **NEW** Policies Hub fetch wrapper (public reads + admin CRUD, 401 redirect, 409 concurrency) | /api/policies-public/*, /api/crm-proxy/policies/* | ✅ Active |
+| `/shared_components/js/policies/policies-admin-gate.js` | **NEW** Resolves `window.IS_POLICIES_ADMIN` from `/api/crm-session/me` permissions; emits `policies:admin-resolved` event | /api/crm-session/me | ✅ Active |
+| `/shared_components/js/policies/policies-hub.js` | **NEW** Hub page controller (tree render, search debounce, category filter, grid/list toggle, recently-updated) | PoliciesAPI, PoliciesAdminGate | ✅ Active |
+| `/shared_components/js/policies/policy-detail.js` | **NEW** Detail page controller (read/edit/new modes, save flow, autosave drafts, sub-procedure listing) | PoliciesAPI, PoliciesAdminGate, PolicyEditor, DOMPurify (CDN) | ✅ Active |
+| `/shared_components/js/policies/policy-editor-tiptap.js` | **NEW** TipTap 2.10.4 rich-text editor wrapper loaded from esm.sh (StarterKit + Image + Link + Table + Placeholder + Typography) | esm.sh @tiptap/* @2.10.4 | ✅ Active |
+| `/scripts/seed-policies.js` | **NEW** Stub seed script — inserts via /api/policies once the proxy is deployed (superseded by `seed-policies-direct.js` for initial migration) | Node `https`, CRM_API_SECRET env var | 🔧 Deferred (proxy-based) |
+| `/scripts/extract-legacy-policies.js` | **NEW** Extracts/cleans the 9 legacy policy HTML files → writes `scripts/legacy-policies.json` | Node `fs`/`path` | 🔧 One-time (ran 2026-05-14) |
+| `/scripts/seed-policies-direct.js` | **NEW** Direct Caspio inserter — reads `legacy-policies.json` and POSTs to Caspio REST API using credentials from `caspio-pricing-proxy/.env`. Used for initial migration before proxy deploy. | Node `https`, Caspio OAuth | 🔧 One-time (ran 2026-05-14, seeded 9 rows) |
+| `/scripts/verify-policies.js` | **NEW** Reads back the `Policies` table from Caspio and prints a per-row summary — confirms a seed/migration landed | Node `https`, Caspio OAuth | 🔧 Diagnostic |
+| `/scripts/legacy-policies.json` | **NEW** Generated artifact from `extract-legacy-policies.js` — 9 cleaned policy records ready for Caspio insert | (generated) | 🔧 Generated |
 | `/pages/pricing-negotiation-policy.html` | Pricing strategy & negotiation guide | Bootstrap, Font Awesome | ✅ Active |
 | `/pages/inventory-details.html` | Inventory details page | Various | ✅ Active |
 | `/pages/resources.html` | Resources page | Various | ✅ Active |
@@ -273,9 +287,11 @@
 ### Embroidery System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/embroidery-pricing-all/index.html` | **UNIFIED** Embroidery pricing page (Contract + DECG tabs) | embroidery-pricing-all.js | ✅ Active |
-| `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Combined Contract/DECG pricing logic (linear $/1K model) | /api/contract-pricing, /api/decg-pricing | ✅ Active |
+| `/calculators/embroidery-pricing-all/index.html` | **CORPORATE-ONLY** Embroidery pricing page — Additional Logo · Customer Supplied Garments · Additional Stitches · Full Back Embroidery tabs. Contract Embroidery split off into its own standalone page (`/calculators/embroidery-contract/`) Round 6 / 2026-05-13. Old `?tab=contract` URLs redirect via JS. | embroidery-pricing-all.js | ✅ Active |
+| `/calculators/embroidery-pricing-all/embroidery-pricing-all.js` | Corporate embroidery pricing logic (AL retail + DECG retail + stitch surcharges + Full Back) | /api/al-pricing, /api/decg-pricing, /api/pricing-bundle?method=EMB | ✅ Active |
 | `/calculators/embroidery-pricing-all/embroidery-pricing-all.css` | Tabbed interface styles | - | ✅ Active |
+| `/calculators/embroidery-contract/index.html` | **NEW (2026-05-13 Round 6)** Standalone Contract Embroidery pricing page for Ruthie / ASI distributors who supply their own blanks. Mirrors the Contract DTG page architecture — single-tier wholesale pricing, no segment tabs. Includes Quick Price Calculator + CTR-Garmt / CTR-Cap matrices + universal DECG-FB Full Back matrix + Copy Quote Link share button. Pink theme (factory color-code) via contract-pricing-theme.css. | embroidery-contract.js, calculator-base.css, contract-pricing-theme.css | ✅ Active |
+| `/calculators/embroidery-contract/embroidery-contract.js` | **NEW (2026-05-13 Round 6)** Standalone calculator JS for the Contract Embroidery page. Fetches `/api/pricing-bundle?method=EMB`, builds 3 pricing matrices, runs the Quick Calc, supports URL-param share-links (`?type=&qty=&stitches=`) — Ruthie types inputs, copies a share-URL, customer clicks the URL and sees the calculator pre-filled with the same quote. No ES-module deps; pure browser JS. | /api/pricing-bundle?method=EMB | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
 | `/shared_components/js/embroidery-quote-pricing.js` | Embroidery pricing engine (tiers, LTM, stitch surcharges, FB) | Caspio API | ✅ Active |
 | `/shared_components/js/embroidery-quote-service.js` | Embroidery quote save/update/email service | Caspio API, EmailJS | ✅ Active |
@@ -727,6 +743,7 @@
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
 | `/shared_components/css/calculator-base.css` | Calculator base styles (foundation for all calc pages) | All calculators | ✅ Active |
+| `/shared_components/css/contract-pricing-theme.css` | **NEW (2026-05-13)** Pink-accent theme overlay for Contract pricing pages — operational color-code matching the pink box labels NWCA puts on contract jobs in the factory. Layers on top of calculator-base.css; rebinds `--primary-green`/`--primary-color`/`--primary-dark` to rose-600/700 so existing calculator CSS reuses pink without rewrite. Adds `.contract-share-btn` + `.contract-share-toast` + `.contract-info-banner` components for the "calculate → copy link → share with customer" workflow. Activated via `<body class="contract-pricing">`. | calculators/dtg-contract/index.html, calculators/embroidery-contract/index.html | ✅ Active |
 | `/shared_components/css/calculator-modern-enhancements.css` | Modern calculator enhancements (2026 refresh) | All calculators | ✅ Active |
 | `/shared_components/css/shared-pricing-styles.css` | Shared pricing display styles | All pricing pages | ✅ Active |
 | `/shared_components/css/screenprint-pricing-clean.css` | Clean screen print pricing styles | Screen print calculator | ✅ Active |

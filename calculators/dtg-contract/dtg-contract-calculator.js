@@ -10,6 +10,88 @@ class DTGContractCalculator {
         this.bindEvents();
         this.currentCalculation = null;
         this.quoteService = new DTGQuoteService();
+
+        // Round 6 (2026-05-13): URL-param share-link support. Pre-fill the
+        // calculator from ?qty=&locs=&hw= so a customer clicking Ruthie's
+        // shared link sees the exact same quote. Read params, set inputs,
+        // trigger first calculation. See: contract-pricing-theme.css for
+        // the .contract-share-btn / .contract-share-toast components.
+        this.applyUrlParams();
+        this.bindShareLink();
+        // Trigger a calculation if URL params provided enough info, so the
+        // page loads with the price already showing for the customer.
+        if (this.elements.quantity.value && parseInt(this.elements.quantity.value, 10) > 0) {
+            this.calculate();
+        }
+    }
+
+    applyUrlParams() {
+        var params = new URLSearchParams(window.location.search);
+        var qty = params.get('qty');
+        var locs = params.get('locs');     // comma-separated location codes: "LC,FF,FB"
+        var hw = params.get('hw');         // "1" if heavyweight
+        if (qty && !isNaN(parseInt(qty, 10))) {
+            this.elements.quantity.value = parseInt(qty, 10);
+        }
+        if (locs) {
+            var codes = locs.split(',').map(function (c) { return c.trim().toUpperCase(); });
+            this.elements.locationCheckboxes.forEach(function (cb) {
+                if (codes.indexOf(cb.dataset.location) !== -1) {
+                    cb.checked = true;
+                    var card = cb.closest('.location-card');
+                    if (card) card.classList.add('selected');
+                }
+            });
+        }
+        if (hw === '1' && this.elements.isHeavyweight) {
+            this.elements.isHeavyweight.checked = true;
+        }
+    }
+
+    buildShareUrl() {
+        var locs = Array.from(this.elements.locationCheckboxes)
+            .filter(function (cb) { return cb.checked; })
+            .map(function (cb) { return cb.dataset.location; })
+            .join(',');
+        var url = new URL(window.location.href);
+        url.search = '';
+        url.searchParams.set('qty', this.elements.quantity.value || '');
+        if (locs) url.searchParams.set('locs', locs);
+        if (this.elements.isHeavyweight && this.elements.isHeavyweight.checked) {
+            url.searchParams.set('hw', '1');
+        }
+        return url.toString();
+    }
+
+    showShareToast() {
+        var toast = document.getElementById('dtgShareToast');
+        if (!toast) return;
+        toast.classList.add('is-visible');
+        setTimeout(function () { toast.classList.remove('is-visible'); }, 2400);
+    }
+
+    async copyShareLink() {
+        var url = this.buildShareUrl();
+        try {
+            await navigator.clipboard.writeText(url);
+            this.showShareToast();
+        } catch (err) {
+            var ta = document.createElement('textarea');
+            ta.value = url;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); this.showShareToast(); } catch (e) { /* swallow */ }
+            document.body.removeChild(ta);
+        }
+    }
+
+    bindShareLink() {
+        var btn = document.getElementById('dtgShareBtn');
+        if (!btn) return;
+        var self = this;
+        btn.addEventListener('click', function () { self.copyShareLink(); });
     }
 
     initializeEmailJS() {

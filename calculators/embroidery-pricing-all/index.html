@@ -12,7 +12,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Page-specific styles -->
-    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=20260513-fullback">
+    <link rel="stylesheet" href="/calculators/embroidery-pricing-all/embroidery-pricing-all.css?v=20260513-corporate">
+
+    <!-- Round 6 (2026-05-13): Contract Embroidery split off to its own
+         standalone page. Redirect old ?tab=contract bookmarks BEFORE the
+         page paints so reps with saved links land on the new page.
+         Inline + synchronous = no flash of the old corporate page. -->
+    <script>
+    (function () {
+        var p = new URLSearchParams(window.location.search);
+        if (p.get('tab') === 'contract') {
+            window.location.replace('/calculators/embroidery-contract/');
+        }
+    })();
+    </script>
 </head>
 <body>
     <!-- Error Banner (hidden by default) -->
@@ -31,7 +44,7 @@
                     <span>Embroidery Pricing</span>
                 </div>
                 <h1><i class="fas fa-tshirt"></i> Embroidery Pricing 2026</h1>
-                <p class="subtitle">Contract Embroidery (wholesale) + Additional Logo / Customer Supplied Garments (corporate) + Additional Stitches modifier</p>
+                <p class="subtitle">Corporate embroidery — Additional Logo / Customer Supplied Garments + Additional Stitches + Full Back Embroidery. <a href="/calculators/embroidery-contract/" style="color: #db2777; font-weight: 600;">Looking for Contract Embroidery? →</a></p>
                 <p class="version-info">Updated February 2026</p>
             </div>
         </header>
@@ -44,18 +57,18 @@
              obvious. Tab data-tab keys are UNCHANGED so existing bookmarks
              keep working. -->
 
-        <!-- Tab Navigation -->
+        <!-- Tab Navigation —
+             2026-05-13 Round 6: Contract Embroidery split off into its own
+             standalone page at /calculators/embroidery-contract/ (mirrors the
+             Contract DTG page architecture). This page is now CORPORATE-ONLY
+             with 2 tier tabs + 2 modifier tabs. Anyone hitting ?tab=contract
+             gets JS-redirected to the new page so bookmarks survive. -->
         <div class="tab-navigation-helper">
             <i class="fas fa-circle-question" aria-hidden="true"></i>
             <span><strong>Who supplied the garment?</strong> Pick the matching tier below. Add the Additional Stitches modifier if logo &gt; 10K stitches.</span>
         </div>
         <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="contract" onclick="switchTab('contract')">
-                <i class="fas fa-industry"></i>
-                Contract Embroidery
-                <span class="tab-subtitle">Ruthie / ASI · they bring blanks</span>
-            </button>
-            <button class="tab-btn" data-tab="al-retail" onclick="switchTab('al-retail')">
+            <button class="tab-btn active" data-tab="al-retail" onclick="switchTab('al-retail')">
                 <i class="fas fa-tag"></i>
                 Additional Logo
                 <span class="tab-subtitle">We supply garment</span>
@@ -78,158 +91,15 @@
             </button>
         </div>
 
-        <!-- Tab Content: CONTRACT (Production/Ruthie) -->
-        <div id="tab-contract" class="tab-content active">
-            <div class="use-case-banner">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks).
-                </div>
-                <button class="share-link-btn" onclick="copyShareableLink()">
-                    <i class="fas fa-link"></i> Copy Link
-                </button>
-            </div>
+        <!-- Tab Content: CONTRACT — REMOVED in Round 6 (2026-05-13).
+             Contract Embroidery now has its own standalone page at
+             /calculators/embroidery-contract/ to mirror the Contract DTG
+             pattern. Bookmarks pointing at ?tab=contract are redirected by
+             the inline script at the bottom of this file. -->
 
-            <!-- LTM Banner -->
-            <div class="ltm-banner">
-                <i class="fas fa-exclamation-circle"></i>
-                <span><strong>LTM Fee:</strong> Orders of 1-23 pieces incur a $50 Less Than Minimum fee</span>
-            </div>
-
-            <!-- Quick Calculator (moved to top) -->
-            <div class="calculator-card compact">
-                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
-                <div class="calc-form">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contractItemType">Item Type</label>
-                            <select id="contractItemType">
-                                <option value="garment">Garment</option>
-                                <option value="cap">Cap</option>
-                                <option value="laser-patch">Laser Patch</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="contractQuantity">Quantity</label>
-                            <input type="number" id="contractQuantity" value="24" min="1" max="9999">
-                        </div>
-                        <div class="form-group">
-                            <label for="contractStitches">Stitch Count</label>
-                            <input type="number" id="contractStitches" value="8000" min="1000" max="100000" step="1000">
-                        </div>
-                    </div>
-                    <div class="calc-results">
-                        <div class="result-row breakdown" id="contractBreakdownRow">
-                            <span id="contractBreakdownLabel">8K × $0.625/1K:</span>
-                            <span id="contractBreakdownValue">$5.00</span>
-                        </div>
-                        <div class="result-row breakdown hidden" id="contractLtmBreakdownRow">
-                            <span id="contractLtmBreakdownLabel">+ LTM ($50 ÷ 3):</span>
-                            <span id="contractLtmBreakdownValue">+$16.67</span>
-                        </div>
-                        <div class="result-row final">
-                            <span>Unit Price:</span>
-                            <span id="contractFinalUnitPrice" class="final-price">$5.00</span>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-            <!-- ShopWorks Part Numbers Reference Card -->
-            <div class="shopworks-ref-card">
-                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
-                <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
-                <span class="ref-item"><span class="ref-code">CTR-Garmt</span> Garments</span>
-                <span class="ref-item"><span class="ref-code">CTR-Cap</span> Caps</span>
-                <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
-                <span class="ref-divider">|</span>
-                <span class="ref-upgrades" id="contractCapUpgrades">
-                    <span class="loading-text">Loading...</span>
-                </span>
-            </div>
-
-            <!-- Pricing Matrices Grid -->
-            <div class="matrices-grid">
-                <!-- Contract Garments Matrix -->
-                <div class="matrix-card">
-                    <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Contract Garments <span class="part-number-badge">CTR-Garmt</span></h3>
-                    </div>
-                    <table id="contractGarmentsMatrix" class="pricing-matrix">
-                        <thead>
-                            <tr>
-                                <th>Stitches</th>
-                                <th class="ltm-tier">1-7</th>
-                                <th class="ltm-tier">8-23</th>
-                                <th>24-47</th>
-                                <th>48-71</th>
-                                <th class="best-tier">72+</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Contract Caps Matrix -->
-                <div class="matrix-card">
-                    <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts <span class="part-number-badge">CTR-Cap</span></h3>
-                    </div>
-                    <table id="contractCapsMatrix" class="pricing-matrix">
-                        <thead>
-                            <tr>
-                                <th>Stitches</th>
-                                <th class="ltm-tier">1-7</th>
-                                <th class="ltm-tier">8-23</th>
-                                <th>24-47</th>
-                                <th>48-71</th>
-                                <th class="best-tier">72+</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Full Back cross-reference (Round 4, 2026-05-13) — table
-                 moved to its own canonical tab to eliminate duplication. -->
-            <div class="fullback-crossref">
-                <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
-                    <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate applies to contract jobs — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
-                </a>
-            </div>
-
-            <!-- Additional Fees -->
-            <div class="fees-card">
-                <h3><i class="fas fa-plus-circle"></i> Additional Fees</h3>
-                <div class="fees-grid">
-                    <div class="fee-item">
-                        <span class="fee-label">LTM (Less Than Minimum)</span>
-                        <span class="fee-value">$50.00</span>
-                        <span class="fee-note">Orders of 1-23 pieces</span>
-                    </div>
-                    <div class="fee-item">
-                        <span class="fee-label">Extra Thread Colors</span>
-                        <span class="fee-value">$1.00/color/piece</span>
-                        <span class="fee-note">More than 4 colors</span>
-                    </div>
-                    <div class="fee-item">
-                        <span class="fee-label">Digitizing</span>
-                        <span class="fee-value">$100.00</span>
-                        <span class="fee-note">New logo setup</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tab Content: AL RETAIL (Additional Logo) -->
-        <div id="tab-al-retail" class="tab-content">
+        <!-- Tab Content: AL RETAIL (Additional Logo) — now the default
+             tab since Contract is gone. -->
+        <div id="tab-al-retail" class="tab-content active">
             <!-- Collapsible: Pricing Decision Guide -->
             <details class="info-disclosure">
                 <summary>

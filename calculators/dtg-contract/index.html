@@ -13,25 +13,31 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Shared Calculator Styles -->
-    <link href="../../shared_components/css/calculator-base.css" rel="stylesheet">
-    
-    <!-- DTG-Specific Styles -->
-    <link href="dtg-contract-styles.css" rel="stylesheet">
-    
-    <!-- DTG Contract Fix CSS - Professional styling with NWCA green theme -->
-    <link href="dtg-contract-fix.css" rel="stylesheet">
-    
+    <link href="../../shared_components/css/calculator-base.css?v=20260513-contract" rel="stylesheet">
+
+    <!-- DTG-Specific Styles (keep for layout — grid, modal, location cards) -->
+    <link href="dtg-contract-styles.css?v=20260513-contract" rel="stylesheet">
+
+    <!-- DTG Contract Fix CSS (kept; relies on tokens overridden below) -->
+    <link href="dtg-contract-fix.css?v=20260513-contract" rel="stylesheet">
+
+    <!-- Contract Pricing Pink Theme (2026-05-13 Round 6) — loaded LAST so
+         pink wins the cascade for primary-color tokens. Same file the
+         Contract Embroidery page uses, giving both Contract pages an
+         identical visual language. -->
+    <link href="../../shared_components/css/contract-pricing-theme.css?v=20260513-contract" rel="stylesheet">
+
     <!-- Base Quote Service -->
     <script src="../../shared_components/js/base-quote-service.js"></script>
     <!-- Calculator Utilities -->
     <script src="../../shared_components/js/calculator-utilities.js"></script>
     <!-- DTG Quote Service -->
     <script src="dtg-quote-service.js"></script>
-    
+
     <!-- DTG Calculator Class -->
-    <script src="dtg-contract-calculator.js"></script>
+    <script src="dtg-contract-calculator.js?v=20260513-contract"></script>
 </head>
-<body>
+<body class="contract-pricing">
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -40,11 +46,11 @@
                      alt="Northwest Custom Apparel" 
                      class="logo">
                 <nav class="breadcrumb">
-                    <a href="../../staff-dashboard.html">
+                    <a href="/staff-dashboard.html">
                         <i class="fas fa-arrow-left"></i> Dashboard
                     </a>
                     <span>/</span>
-                    <span>Contract DTG Calculator</span>
+                    <span>Contract DTG</span>
                 </nav>
             </div>
             <div class="user-welcome" id="userWelcome">
@@ -55,43 +61,18 @@
 
     <!-- Main Content -->
     <main class="main-container">
-        <h1 class="page-title">Contract DTG Pricing Calculator</h1>
-        <p class="page-subtitle">Calculate pricing for Direct-to-Garment printing on customer-supplied items</p>
+        <h1 class="page-title">Contract DTG Pricing 2026</h1>
+        <p class="page-subtitle">Wholesale DTG printing for production accounts (partners who supply their own blanks)</p>
 
-        <!-- Product Showcase Section -->
-        <div class="product-showcase">
-            <div class="product-showcase-inner">
-                <div class="product-showcase-image">
-                    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094646" 
-                         alt="DTG Printed Apparel" 
-                         title="Professional Direct-to-Garment Printing">
-                </div>
-                <div class="product-showcase-content">
-                    <h3><i class="fas fa-star"></i> Premium DTG Contract Printing</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                        Experience the highest quality Direct-to-Garment printing with our state-of-the-art technology. 
-                        Perfect for detailed designs, photorealistic images, and unlimited colors on your custom apparel. 
-                        Our contract services deliver professional results with fast turnaround times.
-                    </p>
-                    <div class="product-features">
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Photorealistic prints</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Unlimited colors</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Soft hand feel</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Fast production</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Contract Info Banner (replaces the old Ruth-image Product Showcase
+             section per Round 6 cleanup — Erik wants the page focused on
+             "calculate + share", not a marketing hero. The pink banner echoes
+             the factory pink box label so reps see the contract context
+             immediately. -->
+        <div class="contract-info-banner">
+            <i class="fas fa-handshake" aria-hidden="true"></i>
+            <div>
+                <strong>Contract Pricing:</strong> Wholesale DTG printing for production accounts and ad-specialty distributors who supply their own blanks. Configure locations + quantity below, then copy a share-link to send the exact quote to your customer.
             </div>
         </div>
 
@@ -207,9 +188,14 @@
 
             <!-- Results Section -->
             <div class="results-card">
-                <div class="results-header">
-                    <h2 class="results-title">Your Quote</h2>
-                    <div id="tierBadge"></div>
+                <div class="results-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                        <h2 class="results-title" style="margin: 0;">Your Quote</h2>
+                        <div id="tierBadge"></div>
+                    </div>
+                    <button type="button" class="contract-share-btn" id="dtgShareBtn" title="Copy a link that auto-fills this quote for your customer">
+                        <i class="fas fa-link" aria-hidden="true"></i> Copy Quote Link
+                    </button>
                 </div>
 
                 <div id="resultsContent">
@@ -336,6 +322,11 @@
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- Toast for share-link copied confirmation -->
+    <div class="contract-share-toast" id="dtgShareToast">
+        <i class="fas fa-check-circle"></i><span>Quote link copied — paste into your email or chat</span>
     </div>
 
     <!-- JavaScript -->
