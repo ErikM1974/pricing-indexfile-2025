@@ -189,7 +189,14 @@
 
         if (state.isEditing) {
             titleEl.innerHTML = `<input type="text" id="editTitle" class="title-input" value="${escapeHtml(state.policy.Title)}" placeholder="Policy title">`;
-            summaryEl.innerHTML = `<input type="text" id="editSummary" class="summary-input" value="${escapeHtml(state.policy.Summary || '')}" placeholder="Short one-line summary (shows on card)">`;
+            summaryEl.innerHTML = `
+                <div class="input-with-ai">
+                    <input type="text" id="editSummary" class="summary-input" value="${escapeHtml(state.policy.Summary || '')}" placeholder="Short one-line summary (shows on card)">
+                    <button type="button" class="ai-suggest-btn" id="aiSuggestSummary" title="Let Claude write the summary from the policy body">
+                        <i class="fas fa-sparkles"></i> Suggest
+                    </button>
+                </div>
+            `;
             metaEl.innerHTML = `
                 <div class="edit-meta-row">
                     <label>
@@ -215,10 +222,18 @@
                     </label>
                     <label>
                         <span>Tags (comma-separated)</span>
-                        <input type="text" id="editTags" value="${escapeHtml(state.policy.Tags || '')}" placeholder="e.g. embroidery, LTM, pickup">
+                        <div class="input-with-ai">
+                            <input type="text" id="editTags" value="${escapeHtml(state.policy.Tags || '')}" placeholder="e.g. embroidery, LTM, pickup">
+                            <button type="button" class="ai-suggest-btn ai-suggest-btn-sm" id="aiSuggestTags" title="Let Claude propose tags from the policy body">
+                                <i class="fas fa-sparkles"></i>
+                            </button>
+                        </div>
                     </label>
                 </div>
             `;
+
+            // Wire the AI suggest buttons after the DOM is in place
+            wireAISuggestButtons();
         } else {
             titleEl.innerHTML = escapeHtml(state.policy.Title);
             summaryEl.innerHTML = state.policy.Summary ? escapeHtml(state.policy.Summary) : '';
@@ -339,6 +354,119 @@
 
         const share = $('shareBtn');
         if (share) share.addEventListener('click', onShare);
+    }
+
+    // ----- AI suggest buttons (Summary + Tags) -----
+    //
+    // Both call /api/policies/ai-assist (the same streaming endpoint the
+    // editor uses), but collect the streamed deltas into a single string
+    // and stuff it into the target input field. Non-modal — feels like
+    // the field "just fills itself in."
+    function wireAISuggestButtons() {
+        const summaryBtn = $('aiSuggestSummary');
+        if (summaryBtn) {
+            summaryBtn.addEventListener('click', async () => {
+                const input = $('editSummary');
+                const editor = state.editor;
+                const bodyHtml = editor ? editor.getHTML() : (state.policy.Body_HTML || '');
+                if (!bodyHtml || bodyHtml.replace(/<[^>]+>/g, '').trim().length < 20) {
+                    showToast('<i class="fas fa-circle-info"></i> Write some body content first, then I can summarize it.');
+                    return;
+                }
+                await runAISuggest(summaryBtn, input, 'auto-summarize', { surroundingContext: bodyHtml });
+            });
+        }
+        const tagsBtn = $('aiSuggestTags');
+        if (tagsBtn) {
+            tagsBtn.addEventListener('click', async () => {
+                const input = $('editTags');
+                const editor = state.editor;
+                const bodyHtml = editor ? editor.getHTML() : (state.policy.Body_HTML || '');
+                if (!bodyHtml || bodyHtml.replace(/<[^>]+>/g, '').trim().length < 20) {
+                    showToast('<i class="fas fa-circle-info"></i> Write some body content first, then I can suggest tags.');
+                    return;
+                }
+                await runAISuggest(tagsBtn, input, 'suggest-tags', { surroundingContext: bodyHtml });
+            });
+        }
+    }
+
+    async function runAISuggest(btn, inputEl, action, extra) {
+        const titleEl = $('editTitle');
+        const categoryEl = $('editCategory');
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+
+        try {
+            const payload = {
+                action,
+                title: titleEl ? titleEl.value : (state.policy.Title || ''),
+                category: categoryEl ? categoryEl.value : (state.policy.Category || ''),
+                ...extra
+            };
+            const res = await fetch('/api/policies/ai-assist', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'text/event-stream' },
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                let detail = res.statusText;
+                try { detail = (await res.json()).error || detail; } catch (e) { /* noop */ }
+                throw new Error(`${res.status}: ${detail}`);
+            }
+
+            // Consume SSE deltas into a single string
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buf = '';
+            let output = '';
+            let finished = false;
+            while (!finished) {
+                const { value, done } = await reader.read();
+                if (done) break;
+                buf += decoder.decode(value, { stream: true });
+                let idx;
+                while ((idx = buf.indexOf('\n\n')) >= 0) {
+                    const block = buf.slice(0, idx);
+                    buf = buf.slice(idx + 2);
+                    let type = 'message', dataStr = '';
+                    for (const line of block.split('\n')) {
+                        if (line.startsWith('event: ')) type = line.slice(7).trim();
+                        else if (line.startsWith('data: ')) dataStr += line.slice(6);
+                    }
+                    if (!dataStr) continue;
+                    let data; try { data = JSON.parse(dataStr); } catch { data = null; }
+                    if (!data) continue;
+                    if (type === 'delta' && typeof data.text === 'string') output += data.text;
+                    else if (type === 'done') { finished = true; break; }
+                    else if (type === 'error') throw new Error(data.message || 'AI error');
+                }
+            }
+
+            // Strip surrounding whitespace, surrounding quotes, and any
+            // accidental leading "Summary:" / "Tags:" preamble.
+            output = output.trim()
+                .replace(/^["'`]+|["'`]+$/g, '')
+                .replace(/^(Summary|Tags|Tag|TLDR):\s*/i, '')
+                .trim();
+
+            if (!output) {
+                showToast('<i class="fas fa-circle-info"></i> Claude returned nothing — try again.');
+                return;
+            }
+
+            inputEl.value = output;
+            inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+            showToast('<i class="fas fa-check-circle"></i> Filled — review and tweak before saving');
+        } catch (e) {
+            console.error('[ai-suggest] error:', e);
+            showToast(`<i class="fas fa-triangle-exclamation"></i> ${e.message}`);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
     }
 
     // Copy the canonical share URL to clipboard + toast confirmation.

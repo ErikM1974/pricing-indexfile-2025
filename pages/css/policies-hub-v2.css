@@ -135,6 +135,19 @@ body.policies-hub-body {
 }
 .btn-danger:hover { background: #991b1b; }
 
+/* AI button — sparkly purple gradient, distinct from primary/secondary */
+.btn-ai {
+    background: linear-gradient(135deg, #6e3edb 0%, #9b3edb 60%, #c93edb 100%);
+    color: white;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: filter 0.15s, transform 0.05s;
+}
+.btn-ai:hover { filter: brightness(1.08); color: white; }
+.btn-ai .ai-search-btn-label { font-weight: 600; }
+
 /* =====================================================
    MAIN LAYOUT
    ===================================================== */
@@ -612,6 +625,139 @@ body.policies-hub-body {
    ===================================================== */
 .admin-only { display: none; }
 html.is-policies-admin .admin-only { display: inline-flex; }
+
+/* =====================================================
+   AI SEMANTIC SEARCH MODAL
+   ===================================================== */
+.ai-search-modal { max-width: 640px; }
+
+.ai-search-help {
+    font-size: 0.88rem;
+    color: var(--ph-text-secondary);
+    margin-bottom: 0.6rem;
+}
+.ai-search-examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+.ai-search-example {
+    background: #faf5ff;
+    border: 1px solid #e9d5ff;
+    border-radius: 999px;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.82rem;
+    color: #6e3edb;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.ai-search-example:hover {
+    background: #9b3edb;
+    color: white;
+    border-color: #9b3edb;
+}
+
+.ai-search-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.ai-search-input {
+    flex: 1;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--ph-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    background: white;
+    transition: border 0.15s, box-shadow 0.15s;
+}
+.ai-search-input:focus {
+    border-color: #9b3edb;
+    box-shadow: 0 0 0 3px rgba(155, 62, 219, 0.12);
+}
+
+.ai-search-status {
+    font-size: 0.85rem;
+    color: var(--ph-text-muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.ai-search-status i { color: #16a34a; }
+.ai-search-status.error { color: var(--ph-danger); }
+.ai-search-status.error i { color: var(--ph-danger); }
+
+.ai-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+.ai-search-result {
+    display: block;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--ph-border);
+    border-radius: 9px;
+    text-decoration: none;
+    color: var(--ph-text);
+    background: white;
+    transition: border 0.15s, transform 0.05s, box-shadow 0.15s;
+    position: relative;
+}
+.ai-search-result:hover {
+    border-color: #9b3edb;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transform: translateY(-1px);
+}
+.ai-search-result-conf {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ph-text-muted);
+    margin-bottom: 0.3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.ai-search-conf-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #94a3b8;
+    display: inline-block;
+}
+.ai-search-result-high .ai-search-conf-dot { background: #16a34a; }
+.ai-search-result-medium .ai-search-conf-dot { background: #d97706; }
+.ai-search-result-low .ai-search-conf-dot { background: #94a3b8; }
+.ai-search-result-high .ai-search-result-conf { color: #16a34a; }
+.ai-search-result-medium .ai-search-result-conf { color: #d97706; }
+
+.ai-search-result-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--ph-text);
+    margin-bottom: 0.2rem;
+}
+.ai-search-result-category {
+    font-size: 0.78rem;
+    color: var(--ph-text-muted);
+    margin-bottom: 0.4rem;
+}
+.ai-search-result-category i { margin-right: 0.25rem; }
+.ai-search-result-why {
+    font-size: 0.85rem;
+    color: var(--ph-text-secondary);
+    font-style: italic;
+    line-height: 1.4;
+}
+.ai-search-result-why i {
+    color: var(--ph-text-muted);
+    margin-right: 0.3rem;
+    font-size: 0.75rem;
+}
 
 /* =====================================================
    MOBILE RESPONSIVENESS — staff read on phones in the shop

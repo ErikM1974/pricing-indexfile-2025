@@ -65,6 +65,14 @@
             description: 'Natural, professional Mexican Spanish for shop-floor staff.',
             needsPrompt: false,
             needsSelection: true
+        },
+        {
+            key: 'explain-like-im-new',
+            label: 'Explain like I\'m new',
+            icon: 'fa-graduation-cap',
+            description: 'Rewrite at 6th-grade reading level for new hires. Defines jargon inline, adds concrete examples.',
+            needsPrompt: false,
+            needsSelection: false
         }
     ];
 

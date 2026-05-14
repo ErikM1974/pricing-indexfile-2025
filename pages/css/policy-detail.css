@@ -127,6 +127,36 @@ body.policy-detail-body {
 }
 .summary-input:focus { border-color: var(--pd-accent); background: var(--pd-surface); }
 
+/* Input + "AI Suggest" button pairing */
+.input-with-ai {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+    margin-bottom: 1rem;
+}
+.input-with-ai > input { flex: 1; margin-bottom: 0; }
+
+.ai-suggest-btn {
+    background: linear-gradient(135deg, #6e3edb 0%, #9b3edb 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0 0.85rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: filter 0.15s;
+    white-space: nowrap;
+    font-family: inherit;
+}
+.ai-suggest-btn:hover { filter: brightness(1.08); }
+.ai-suggest-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+.ai-suggest-btn-sm { padding: 0 0.7rem; }
+.ai-suggest-btn i.fa-sparkles { font-size: 0.85rem; }
+
 .policy-meta-row {
     display: flex;
     flex-wrap: wrap;

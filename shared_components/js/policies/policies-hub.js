@@ -377,6 +377,18 @@
             });
         }
 
+        // AI Search button — opens the Claude-powered semantic search modal
+        const aiBtn = document.getElementById('aiSearchBtn');
+        if (aiBtn) {
+            aiBtn.addEventListener('click', () => {
+                if (window.PolicyAISearch && typeof window.PolicyAISearch.open === 'function') {
+                    window.PolicyAISearch.open();
+                } else {
+                    alert('AI search not ready yet. Refresh and try again.');
+                }
+            });
+        }
+
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             const meta = e.metaKey || e.ctrlKey;
