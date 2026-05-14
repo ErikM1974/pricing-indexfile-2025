@@ -52,13 +52,34 @@
         };
         return map[cat] || 'fa-folder';
     }
+    // DOMPurify config — allows embedded videos from a tight allowlist of
+    // trusted hosts (YouTube, Loom, Vimeo). Generic iframes from anywhere
+    // are still stripped, so a malicious paste can't slip in third-party
+    // content. The `data-video-embed` wrapper is preserved so our CSS
+    // 16:9 styling kicks in.
+    const SAFE_IFRAME_HOSTS = /^https:\/\/(?:www\.)?(youtube\.com|youtube-nocookie\.com|loom\.com|player\.vimeo\.com)\//;
+
     function sanitizeHtml(html) {
-        if (!window.DOMPurify) return html; // graceful fallback if DOMPurify failed to load
-        return window.DOMPurify.sanitize(html, {
-            ADD_ATTR: ['target', 'rel'],
-            FORBID_TAGS: ['style', 'script'],
-            FORBID_ATTR: ['onerror', 'onload', 'onclick']
+        if (!window.DOMPurify) return html;
+        const clean = window.DOMPurify.sanitize(html, {
+            ADD_TAGS: ['iframe'],
+            ADD_ATTR: ['target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'loading', 'data-video-embed', 'data-src', 'data-kind'],
+            FORBID_TAGS: ['style', 'script', 'object', 'embed', 'form', 'input'],
+            FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
         });
+        // After sanitize, drop iframes whose src isn't on the allowlist.
+        // Defense-in-depth in case a future TipTap upgrade adds new iframe sources.
+        try {
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = clean;
+            wrapper.querySelectorAll('iframe').forEach(f => {
+                const src = f.getAttribute('src') || '';
+                if (!SAFE_IFRAME_HOSTS.test(src)) f.remove();
+            });
+            return wrapper.innerHTML;
+        } catch (e) {
+            return clean;
+        }
     }
 
     // -------------------- data load --------------------
