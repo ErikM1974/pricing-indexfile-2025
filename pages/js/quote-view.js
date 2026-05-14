@@ -91,6 +91,21 @@ class QuoteViewPage {
         if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
             this.setupPushButton();
         }
+
+        // Phase 10 (2026-05-14): if ?autoPdf=1 is in the URL, trigger
+        // the PDF download automatically after a short delay (lets the
+        // DOM finish painting + product images settle). The
+        // contract-embroidery AI chat panel opens this tab when Ruthie
+        // clicks "Open in Outlook" so the PDF is ready to drag-attach.
+        if (urlParams.get('autoPdf') === '1' && this.quoteData) {
+            setTimeout(() => {
+                try {
+                    this.downloadPdf();
+                } catch (err) {
+                    console.warn('[quote-view] autoPdf download failed:', err);
+                }
+            }, 800);
+        }
     }
 
     getQuoteIdFromUrl() {
@@ -2236,124 +2251,137 @@ class QuoteViewPage {
         // Reset text color
         pdf.setTextColor(51, 51, 51);
 
-        // Customer Info
-        pdf.setFontSize(10);
+        // Phase 10 (2026-05-14): 3-column invoice layout —
+        // Bill To, Ship To, Quote Details side-by-side. Saves ~50mm
+        // vertical vs the stacked left-column / right-column approach,
+        // making single-page fit reliable for typical CEMB quotes.
+        const isCEMB_pdf = (this.quoteId || '').startsWith('CEMB');
+        const colBillX = margin;            // 20mm
+        const colShipX = margin + 65;       // 85mm
+        const colDetX  = margin + 130;      // 150mm
+        const lineGap = 4.5;
+        let yBill = yPos;
+        let yShip = yPos;
+        let yDet  = yPos;
+
+        // --- BILL TO (left column) ---
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('PREPARED FOR', margin, yPos);
-        yPos += 6;
-
+        pdf.setTextColor(76, 179, 84);
+        pdf.text('BILL TO', colBillX, yBill);
+        pdf.setTextColor(51, 51, 51);
+        yBill += lineGap + 1.5;
         pdf.setFont('helvetica', 'normal');
-        pdf.text(this.quoteData.CustomerName || 'N/A', margin, yPos);
-        yPos += 5;
-        if (this.quoteData.CompanyName) {
-            pdf.text(this.quoteData.CompanyName, margin, yPos);
-            yPos += 5;
-        }
-        if (this.quoteData.CustomerEmail) {
-            pdf.text(this.quoteData.CustomerEmail, margin, yPos);
-            yPos += 5;
-        }
-        if (this.quoteData.Phone) {
-            pdf.text(this.formatPhone(this.quoteData.Phone), margin, yPos);
-            yPos += 5;
+        pdf.setFontSize(8);
+        if (this.quoteData.CustomerName) { pdf.text(this.quoteData.CustomerName, colBillX, yBill); yBill += lineGap; }
+        if (this.quoteData.CompanyName)  { pdf.text(this.quoteData.CompanyName,  colBillX, yBill); yBill += lineGap; }
+        if (this.quoteData.CustomerEmail){ pdf.text(this.quoteData.CustomerEmail, colBillX, yBill); yBill += lineGap; }
+        if (this.quoteData.Phone)        { pdf.text(this.formatPhone(this.quoteData.Phone), colBillX, yBill); yBill += lineGap; }
+        // Billing address — for CEMB, ShipTo* fields carry the billing
+        // (Phase 5/6/8 convention). For non-CEMB, no separate billing.
+        if (isCEMB_pdf) {
+            const billAddr = this.quoteData.ShipToAddress || '';
+            if (billAddr) {
+                yBill += 1.5;
+                pdf.text(billAddr, colBillX, yBill); yBill += lineGap;
+                const billCity = this.quoteData.ShipToCity || '';
+                const billSt   = this.quoteData.ShipToState || '';
+                const billZ    = this.quoteData.ShipToZip || '';
+                const billLine = [billCity, billSt].filter(Boolean).join(', ') + (billZ ? ' ' + billZ : '');
+                if (billLine.trim()) { pdf.text(billLine, colBillX, yBill); yBill += lineGap; }
+            }
         }
 
-        // Ship To block (below Prepared For, if address, ship method, or tracking present)
-        const pdfShipAddr = this.quoteData.ShipToAddress || '';
-        const pdfShipCity = this.quoteData.ShipToCity || '';
-        if (pdfShipAddr || pdfShipCity || this.quoteData.ShipMethod || this.quoteData.Carrier || this.quoteData.TrackingNumber) {
-            yPos += 3;
+        // --- SHIP TO (middle column) ---
+        // CEMB: read Shipping* (actual shipping address from pre-flight)
+        // Non-CEMB: read ShipTo* (legacy single-address)
+        const shipAddrSrc  = isCEMB_pdf ? 'ShippingAddress' : 'ShipToAddress';
+        const shipCitySrc  = isCEMB_pdf ? 'ShippingCity'    : 'ShipToCity';
+        const shipStateSrc = isCEMB_pdf ? 'ShippingState'   : 'ShipToState';
+        const shipZipSrc   = isCEMB_pdf ? 'ShippingZip'     : 'ShipToZip';
+        const pdfShipAddr  = this.quoteData[shipAddrSrc]  || '';
+        const pdfShipCity  = this.quoteData[shipCitySrc]  || '';
+        const pdfShipState = this.quoteData[shipStateSrc] || '';
+        const pdfShipZip   = this.quoteData[shipZipSrc]   || '';
+        const pdfShipMethod = this.quoteData.ShipMethod || '';
+        const isPickup = pdfShipMethod === 'Customer Pickup';
+        const isSameAsBilling = isCEMB_pdf && !pdfShipAddr && !pdfShipCity && pdfShipMethod && !isPickup;
+        const hasShipInfo = pdfShipAddr || pdfShipCity || pdfShipMethod
+            || this.quoteData.Carrier || this.quoteData.TrackingNumber || isSameAsBilling || isPickup;
+
+        if (hasShipInfo) {
+            pdf.setFontSize(9);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('SHIP TO', margin, yPos);
-            yPos += 6;
-            pdf.setFont('helvetica', 'normal');
-            if (pdfShipAddr) {
-                pdf.text(pdfShipAddr, margin, yPos);
-                yPos += 5;
-            }
-            const pdfCityLine = [pdfShipCity, this.quoteData.ShipToState].filter(Boolean).join(', ') +
-                (this.quoteData.ShipToZip ? ' ' + this.quoteData.ShipToZip : '');
-            if (pdfCityLine.trim()) {
-                pdf.text(pdfCityLine, margin, yPos);
-                yPos += 5;
-            }
-            if (this.quoteData.ShipMethod) {
+            pdf.setTextColor(76, 179, 84);
+            pdf.text('SHIP TO', colShipX, yShip);
+            pdf.setTextColor(51, 51, 51);
+            yShip += lineGap + 1.5;
+            pdf.setFontSize(8);
+            if (isPickup) {
                 pdf.setFont('helvetica', 'italic');
-                pdf.text('Via: ' + this.quoteData.ShipMethod, margin, yPos);
+                pdf.text('Customer Pickup', colShipX, yShip);
                 pdf.setFont('helvetica', 'normal');
-                yPos += 5;
+                yShip += lineGap;
+            } else if (isSameAsBilling) {
+                pdf.setFont('helvetica', 'italic');
+                pdf.text('Same as billing', colShipX, yShip);
+                pdf.setFont('helvetica', 'normal');
+                yShip += lineGap;
+                if (pdfShipMethod) { pdf.text('Via: ' + pdfShipMethod, colShipX, yShip); yShip += lineGap; }
+            } else {
+                pdf.setFont('helvetica', 'normal');
+                if (pdfShipAddr) { pdf.text(pdfShipAddr, colShipX, yShip); yShip += lineGap; }
+                const shipLine = [pdfShipCity, pdfShipState].filter(Boolean).join(', ') + (pdfShipZip ? ' ' + pdfShipZip : '');
+                if (shipLine.trim()) { pdf.text(shipLine, colShipX, yShip); yShip += lineGap; }
+                if (pdfShipMethod) {
+                    pdf.setFont('helvetica', 'italic');
+                    pdf.text('Via: ' + pdfShipMethod, colShipX, yShip);
+                    pdf.setFont('helvetica', 'normal');
+                    yShip += lineGap;
+                }
             }
+            // Tracking under address (kept compact)
             if (this.quoteData.Carrier || this.quoteData.TrackingNumber) {
                 const pdfCarriers = (this.quoteData.Carrier || '').split(',').map(s => s.trim());
                 const pdfTrackNums = (this.quoteData.TrackingNumber || '').split(',').map(s => s.trim());
                 pdfTrackNums.forEach((tn, i) => {
                     if (!tn) return;
                     const c = pdfCarriers[i] || pdfCarriers[0] || '';
-                    const trackText = c ? `Tracking: ${tn} (${c})` : `Tracking: ${tn}`;
-                    pdf.text(trackText, margin, yPos);
-                    yPos += 5;
+                    const trackText = c ? `Trk: ${tn} (${c})` : `Trk: ${tn}`;
+                    pdf.text(trackText, colShipX, yShip);
+                    yShip += lineGap;
                 });
             }
         }
 
-        // Quote Details (right side)
-        const rightCol = pageWidth - margin - 50;
+        // --- QUOTE DETAILS (right column) ---
+        pdf.setFontSize(9);
         pdf.setFont('helvetica', 'bold');
-        pdf.text('QUOTE DETAILS', rightCol, 50);
-
+        pdf.setTextColor(76, 179, 84);
+        pdf.text('QUOTE DETAILS', colDetX, yDet);
+        pdf.setTextColor(51, 51, 51);
+        yDet += lineGap + 1.5;
         pdf.setFont('helvetica', 'normal');
-        let detailY = 56;
-        pdf.text(`Type: ${this.getQuoteType()}`, rightCol, detailY);
-        detailY += 6;
-        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt_Quote)}`, rightCol, detailY);
-        detailY += 6;
-        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, rightCol, detailY);
-        detailY += 6;
-
-        // Add Sales Rep if available
+        pdf.setFontSize(8);
+        pdf.text(`Type: ${this.getQuoteType()}`, colDetX, yDet); yDet += lineGap;
+        pdf.text(`Created: ${this.formatDate(this.quoteData.CreatedAt_Quote)}`, colDetX, yDet); yDet += lineGap;
+        pdf.text(`Valid Until: ${this.formatDate(this.quoteData.ExpiresAt)}`, colDetX, yDet); yDet += lineGap;
         const salesRep = this.quoteData.SalesRepName || this.quoteData.SalesRep || '';
-        if (salesRep) {
-            pdf.text(`Sales Rep: ${salesRep}`, rightCol, detailY);
-            detailY += 6;
-        }
+        if (salesRep) { pdf.text(`Sales Rep: ${salesRep}`, colDetX, yDet); yDet += lineGap; }
+        if (this.quoteData.CustomerNumber) { pdf.text(`Customer #: ${this.quoteData.CustomerNumber}`, colDetX, yDet); yDet += lineGap; }
+        if (this.quoteData.PaymentTerms)   { pdf.text(`Terms: ${this.quoteData.PaymentTerms}`, colDetX, yDet); yDet += lineGap; }
+        if (this.quoteData.OrderNumber)    { pdf.text(`Order #: ${this.quoteData.OrderNumber}`, colDetX, yDet); yDet += lineGap; }
+        if (this.quoteData.ReqShipDate)    { pdf.text(`Req Ship: ${this.formatDate(this.quoteData.ReqShipDate)}`, colDetX, yDet); yDet += lineGap; }
+        if (this.quoteData.DropDeadDate)   { pdf.text(`Drop Dead: ${this.formatDate(this.quoteData.DropDeadDate)}`, colDetX, yDet); yDet += lineGap; }
 
-        // Customer Number if available
-        if (this.quoteData.CustomerNumber) {
-            pdf.text(`Customer #: ${this.quoteData.CustomerNumber}`, rightCol, detailY);
-            detailY += 6;
-        }
+        // Advance yPos past the tallest column
+        yPos = Math.max(yBill, yShip, yDet) + 4;
 
-        // Payment Terms if available
-        if (this.quoteData.PaymentTerms) {
-            pdf.text(`Terms: ${this.quoteData.PaymentTerms}`, rightCol, detailY);
-            detailY += 6;
-        }
-
-        // Order Number if available
-        if (this.quoteData.OrderNumber) {
-            pdf.text(`Order #: ${this.quoteData.OrderNumber}`, rightCol, detailY);
-            detailY += 6;
-        }
-
-        // Req Ship Date if available
-        if (this.quoteData.ReqShipDate) {
-            pdf.text(`Req Ship Date: ${this.formatDate(this.quoteData.ReqShipDate)}`, rightCol, detailY);
-            detailY += 6;
-        }
-
-        // Drop Dead Date if available
-        if (this.quoteData.DropDeadDate) {
-            pdf.text(`Drop Dead: ${this.formatDate(this.quoteData.DropDeadDate)}`, rightCol, detailY);
-            detailY += 6;
-        }
-
-        yPos = Math.max(yPos, detailY + 6);
-
-        // Divider
+        // Divider (thin line — invoice convention)
         pdf.setDrawColor(76, 179, 84);
         pdf.setLineWidth(0.5);
         pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 6;
+        yPos += 5;
 
         // Embroidery Details Section (for embroidery and laser-patch quotes)
         const quoteType = this.getQuoteType();
@@ -2804,13 +2832,13 @@ class QuoteViewPage {
             yPos += noteLines.length * 4 + 4;
         }
 
-        // Footer
+        // Footer (Phase 10 — Phase 9 wording on closing line)
         const footerY = 265;
         pdf.setFontSize(8);
         pdf.setTextColor(102, 102, 102);
         pdf.setFont('helvetica', 'normal');
-        pdf.text('This quote is valid for 30 days. 50% deposit required to begin production.', margin, footerY);
-        pdf.text('Thank you for your business!', margin, footerY + 4);
+        pdf.text('Pricing is based on customer-supplied blanks. This quote is valid for 30 days.', margin, footerY);
+        pdf.text('Reply to confirm or send a PO when you’re ready. Thank you for your business!', margin, footerY + 4);
 
         pdf.setTextColor(76, 179, 84);
         pdf.text(`Northwest Custom Apparel | (253) 922-5793 | nwcustomapparel.com`, pageWidth / 2, footerY + 10, { align: 'center' });

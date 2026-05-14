@@ -929,6 +929,29 @@
             // Also copy the body to clipboard as a safety net in case the
             // mailto: truncated long bodies — Ruthie can paste-replace.
             copyToClipboard(draft.body).catch(function () { /* non-fatal */ });
+
+            // Phase 10 (2026-05-14): open the saved quote view in a new
+            // tab with ?autoPdf=1 so the PDF auto-downloads while Outlook
+            // is opening. Ruthie can then drag the PDF into the Outlook
+            // compose to attach. mailto: URLs can't carry attachments —
+            // this is the pragmatic workaround.
+            if (aiState.quoteID) {
+                try {
+                    var viewUrl = window.location.origin
+                        + '/pages/quote-view.html?quoteId=' + encodeURIComponent(aiState.quoteID)
+                        + '&autoPdf=1';
+                    var w = window.open(viewUrl, '_blank');
+                    if (!w) {
+                        // Popup blocked — surface a fallback message
+                        showToast('Popup blocked — open the quote view manually to download the PDF.');
+                    } else {
+                        showToast('PDF downloading in a new tab — drag it into Outlook to attach.');
+                    }
+                } catch (err) {
+                    console.warn('[ai-chat] auto-PDF tab open failed:', err);
+                }
+            }
+
             var url = buildMailto(draft);
             window.location.href = url;
             if (btn) {
