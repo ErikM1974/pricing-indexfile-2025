@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-11">
+    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-12">
 </head>
 <body class="policies-hub-body">
 
@@ -42,6 +42,11 @@
         <button id="aiSearchBtn" class="btn btn-ai" title="Ask Claude to find a policy in plain English">
             <i class="fas fa-sparkles"></i> <span class="ai-search-btn-label">Ask Claude</span>
         </button>
+        <a id="questionsBadge" href="/pages/policy-questions.html" class="btn-questions-badge" style="display:none" title="View open questions across all policies">
+            <i class="fas fa-comments-question"></i>
+            <span class="badge-label">Questions</span>
+            <span class="badge-count" id="questionsBadgeCount">0</span>
+        </a>
         <button id="newPolicyBtn" class="btn btn-primary" style="display:none">
             <i class="fas fa-plus"></i> New Policy
         </button>
@@ -97,9 +102,9 @@
     </div>
 
     <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-11"></script>
-    <script src="/shared_components/js/policies/policies-api.js?v=20260514-11"></script>
-    <script src="/shared_components/js/policies/policy-ai-search.js?v=20260514-11"></script>
-    <script src="/shared_components/js/policies/policies-hub.js?v=20260514-11"></script>
+    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policies-api.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policy-ai-search.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policies-hub.js?v=20260514-12"></script>
 </body>
 </html>

@@ -120,6 +120,31 @@
 
         await loadComments(state);
         wireForm(state);
+        handleHashDeepLink(state);
+    }
+
+    // If the URL has a #comment-<Comment_ID> hash, scroll that comment into
+    // view + briefly highlight it + auto-set the reply target. Called once
+    // after initial render and again on hashchange.
+    function handleHashDeepLink(state) {
+        const tryScroll = () => {
+            const hash = (window.location.hash || '').replace(/^#/, '');
+            if (!hash.startsWith('comment-')) return;
+            const commentId = hash.slice('comment-'.length);
+            const target = document.getElementById(`comment-${commentId}`);
+            if (!target) return;
+            // Scroll smoothly + flash a highlight ring for visibility
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('comment-flash');
+            setTimeout(() => target.classList.remove('comment-flash'), 2200);
+            // Pre-set reply if the comment isn't the user's own
+            const c = state.comments.find(x => x.Comment_ID === commentId);
+            if (c && state.authorName && c.Author_Name !== state.authorName) {
+                setReplyTarget(state, commentId, c.Author_Name);
+            }
+        };
+        tryScroll();
+        window.addEventListener('hashchange', tryScroll);
     }
 
     async function loadComments(state) {
@@ -189,7 +214,7 @@
         const bodyHtml = escapeHtml(c.Body || '').split(/\n\n+/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 
         return `
-            <div class="comment ${isReply ? 'comment-reply' : ''} ${isResolved ? 'comment-resolved' : ''}" data-comment-id="${escapeHtml(c.Comment_ID)}">
+            <div class="comment ${isReply ? 'comment-reply' : ''} ${isResolved ? 'comment-resolved' : ''}" id="comment-${escapeHtml(c.Comment_ID)}" data-comment-id="${escapeHtml(c.Comment_ID)}">
                 <div class="comment-avatar" style="background:${authorColor(c.Author_Name)}">${escapeHtml(authorInitials(c.Author_Name))}</div>
                 <div class="comment-body">
                     <div class="comment-meta">

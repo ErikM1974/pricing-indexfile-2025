@@ -315,8 +315,30 @@
     function renderAdminAffordances() {
         const btn = document.getElementById('newPolicyBtn');
         const draftToggle = document.getElementById('draftToggle');
+        const badge = document.getElementById('questionsBadge');
         if (btn) btn.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
         if (draftToggle) draftToggle.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
+        if (badge) badge.style.display = window.IS_POLICIES_ADMIN ? 'inline-flex' : 'none';
+        if (window.IS_POLICIES_ADMIN) loadQuestionsBadge();
+    }
+
+    // Fetch the open-questions count from the admin inbox endpoint and
+    // update the topbar badge. Silent on failure — the badge stays hidden.
+    async function loadQuestionsBadge() {
+        const badge = document.getElementById('questionsBadge');
+        const countEl = document.getElementById('questionsBadgeCount');
+        if (!badge || !countEl) return;
+        try {
+            const res = await fetch('/api/crm-proxy/policy-comments/inbox/count', { credentials: 'same-origin' });
+            if (!res.ok) return;
+            const data = await res.json();
+            const n = data.count || 0;
+            countEl.textContent = n;
+            badge.classList.toggle('has-questions', n > 0);
+            badge.title = n === 0
+                ? 'No open questions — inbox zero'
+                : `${n} open question${n === 1 ? '' : 's'} waiting`;
+        } catch (e) { /* silent — badge stays hidden */ }
     }
 
     // ----------------------------- view modes -----------------------------

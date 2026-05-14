@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Open Questions — Policies Hub</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=20260514-12">
+</head>
+<body class="policies-hub-body">
+
+    <!-- Hidden Caspio auth embed — same pattern as hub for admin gate auto-bootstrap -->
+    <div class="caspio-auth" hidden>
+        <div id="auth-firstname">[@authfield:First_Name]</div>
+        <div id="auth-lastname">[@authfield:Last_Name]</div>
+        <div id="auth-email">[@authfield:Email]</div>
+        <div id="auth-role">[@authfield:Role]</div>
+        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+    </div>
+
+    <!-- Top bar -->
+    <header class="hub-topbar">
+        <a href="/pages/policies-hub.html" class="hub-topbar-back" aria-label="Back to Policies Hub">
+            <i class="fas fa-arrow-left"></i> Hub
+        </a>
+        <div class="hub-topbar-title">
+            <i class="fas fa-comments-question"></i>
+            Open Questions
+            <span class="question-count-chip" id="inboxCount"></span>
+        </div>
+        <div style="flex:1"></div>
+    </header>
+
+    <div class="hub-layout questions-layout">
+        <main class="hub-content">
+
+            <div class="hub-page-header">
+                <h1>Open questions across all policies</h1>
+                <p>Every question staff have asked that's still waiting on an answer. Oldest first.</p>
+            </div>
+
+            <!-- Filter / sort toolbar -->
+            <div class="questions-toolbar" id="questionsToolbar"></div>
+
+            <!-- Questions list / empty state -->
+            <section id="questionsList" class="questions-list">
+                <div class="questions-loading"><i class="fas fa-circle-notch fa-spin"></i> Loading inbox…</div>
+            </section>
+
+            <!-- Non-admin block -->
+            <div id="questionsLockedNote" class="hub-empty" style="display:none">
+                <i class="fas fa-lock"></i>
+                The Open Questions inbox is admin-only. If you have a question, post it on the relevant policy page.
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policy-questions-inbox.js?v=20260514-12"></script>
+</body>
+</html>

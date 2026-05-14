@@ -1219,6 +1219,15 @@ body.policy-detail-body {
     opacity: 0.75;
     background: linear-gradient(180deg, #f0fdf4, white 35%);
 }
+/* Briefly ring a comment when arriving via deep-link hash */
+.comment.comment-flash {
+    box-shadow: 0 0 0 3px var(--pd-accent), 0 4px 14px rgba(46, 91, 62, 0.2);
+    animation: comment-flash 2.2s ease-out;
+}
+@keyframes comment-flash {
+    0%, 30%   { box-shadow: 0 0 0 3px var(--pd-accent), 0 4px 14px rgba(46, 91, 62, 0.3); }
+    100%      { box-shadow: 0 0 0 0 transparent; }
+}
 
 .comment-avatar {
     width: 36px;
