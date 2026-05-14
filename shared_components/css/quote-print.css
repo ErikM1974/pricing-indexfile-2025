@@ -1,464 +1,734 @@
 /**
- * Quote Print Stylesheet
- * Professional print formatting for NWCA quotes
- * Hides UI elements and formats for clean PDF/print output
+ * Quote Print Stylesheet — QuickBooks-style Invoice
+ * ============================================================
+ * Phase 11 (2026-05-14): complete rewrite. Replaces the old 463-LOC
+ * stylesheet that targeted classes that no longer exist on quote-view.html.
+ *
+ * Design goals:
+ *   • Single 8.5×11" letter page for typical quotes (1 line item).
+ *   • Vector text (selectable, searchable in the saved PDF).
+ *   • Two-column Bill To / Ship To header below the logo + Quote #.
+ *   • Quote Details strip below, 2-column compact rows.
+ *   • Items table with green header, subtle gridlines, no
+ *     unused size columns (S/M/L/XL/2XL/3XL hidden for CEMB).
+ *   • Right-aligned totals hierarchy (Subtotal / Tax / TOTAL).
+ *   • Compact yellow Special Notes block.
+ *   • Single-line green footer with terms + contact.
+ *
+ * Triggered by window.print() (downloadPdf() wraps it). User picks
+ * "Save as PDF" in Chrome's print dialog. Produces sub-100KB PDFs.
+ *
+ * Targets the ACTUAL classes used in pages/quote-view.html (.quote-meta,
+ * .meta-card, .product-table, .totals-card, .quote-footer, etc.).
  */
 
 @media print {
-    /* ============================================
+
+    /* ============================================================
        PAGE SETUP
-       ============================================ */
-    
+       ============================================================ */
+
     @page {
         size: letter;
-        margin: 0.5in;
+        margin: 0.4in;
     }
-    
-    /* Reset all elements */
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+
+    html, body {
+        background: #fff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        color: #1a202c !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif !important;
+        font-size: 10pt;
+        line-height: 1.35;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
     }
-    
-    /* ============================================
-       HIDE NON-PRINT ELEMENTS
-       ============================================ */
-    
-    /* Hide all elements by default */
-    body * {
-        visibility: hidden;
+
+    /* Preserve all colored backgrounds */
+    *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
     }
-    
-    /* Show only quote container and its contents */
-    .quote-container,
-    .quote-container * {
-        visibility: visible;
-    }
-    
-    .quote-container {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-    
-    /* Explicitly hide UI elements */
-    .btn,
-    .button,
-    button,
+
+    /* ============================================================
+       HIDE NON-INVOICE CHROME
+       ============================================================ */
+
+    .quote-actions,
+    #download-pdf-btn,
+    #accept-quote-btn,
+    #push-shopworks-btn,
     .modal,
     .modal-backdrop,
-    .navigation,
-    .nav,
-    .navbar,
-    .header-nav,
-    .footer,
-    .sidebar,
-    .no-print,
-    .form-section,
-    .product-search,
-    .add-product,
-    .remove-btn,
-    .edit-btn,
-    .delete-btn,
-    .action-buttons,
-    .toast-container,
-    .loading-overlay,
-    .unsaved-indicator,
-    .progress-steps,
-    .breadcrumb,
+    #accept-modal,
+    #success-modal,
+    #product-modal,
+    .product-modal,
+    .product-modal-backdrop,
+    #loading,
+    #error-state,
     .skip-to-content,
-    input[type="submit"],
-    input[type="button"],
-    select,
-    textarea,
-    .form-control,
-    .form-check,
-    .alert,
-    .badge {
+    /* Hide global site chrome if present */
+    nav,
+    .navbar,
+    .site-header,
+    .site-footer:not(.quote-footer) {
         display: none !important;
     }
-    
-    /* ============================================
-       BASIC STYLES
-       ============================================ */
-    
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-        font-size: 12pt;
-        line-height: 1.6;
-        color: #000;
-        background: white;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
+
+    /* ============================================================
+       PAGE CONTAINER
+       ============================================================ */
+
+    .quote-page,
+    #quote-content,
+    .quote-container {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: #fff !important;
     }
-    
-    /* ============================================
-       HEADER STYLES
-       ============================================ */
-    
+
+    /* ============================================================
+       HEADER — NWCA logo + Quote # + Status
+       ============================================================ */
+
     .quote-header {
         display: flex !important;
         justify-content: space-between;
         align-items: flex-start;
-        border-bottom: 3px solid #003f7f !important;
-        padding-bottom: 15pt;
-        margin-bottom: 20pt;
+        gap: 14pt;
+        padding: 0 0 10pt 0 !important;
+        margin: 0 0 14pt 0 !important;
+        background: none !important;
+        border: none !important;
+        border-bottom: 2pt solid #4cb354 !important;
+        border-radius: 0 !important;
+        color: #1a202c !important;
     }
-    
+
+    .quote-header .header-left,
+    .quote-header .header-right {
+        flex: 1;
+    }
+
+    .quote-header .header-left {
+        max-width: 60%;
+    }
+
+    .logo-container {
+        display: block !important;
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+
     .company-logo {
-        max-width: 180pt;
-        height: auto;
+        max-height: 56pt;
+        width: auto;
         display: block !important;
     }
-    
-    .company-info {
+
+    .quote-header .header-right {
         text-align: right;
-        flex: 1;
-        margin-left: 20pt;
     }
-    
-    .company-info h1 {
-        color: #003f7f !important;
-        font-size: 24pt;
-        margin: 0 0 5pt 0;
-        font-weight: bold;
+
+    #quote-id-header,
+    .quote-header h1 {
+        font-size: 22pt !important;
+        font-weight: 700 !important;
+        letter-spacing: -0.01em;
+        color: #1a202c !important;
+        margin: 0 0 4pt 0 !important;
+        line-height: 1.1;
+        background: none !important;
+        text-shadow: none !important;
     }
-    
-    .company-info p {
-        margin: 2pt 0;
-        font-size: 11pt;
-        color: #333 !important;
+
+    .quote-status {
+        font-size: 9pt;
     }
-    
-    .company-info .tagline {
-        font-style: italic;
-        color: #666 !important;
+
+    .status-badge {
+        display: inline-block !important;
+        padding: 2pt 8pt !important;
+        border-radius: 999pt !important;
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.06em !important;
+        text-transform: uppercase !important;
+        background: #fef3c7 !important;
+        color: #92400e !important;
+        border: 1pt solid #fcd34d !important;
     }
-    
-    /* ============================================
-       QUOTE META INFORMATION
-       ============================================ */
-    
+
+    .status-badge.status-accepted {
+        background: #dcfce7 !important;
+        color: #166534 !important;
+        border-color: #86efac !important;
+    }
+
+    .status-badge.status-expired,
+    .status-badge.status-rejected {
+        background: #fee2e2 !important;
+        color: #991b1b !important;
+        border-color: #fca5a5 !important;
+    }
+
+    /* PO number row (when present) */
+    #po-number-row {
+        margin: 0 0 8pt 0 !important;
+        text-align: right !important;
+        font-size: 9pt;
+        color: #475569;
+    }
+
+    /* ============================================================
+       META CARDS — Bill To / Ship To / Quote Details
+       ============================================================ */
+
+    /* Force the meta-card grid into a 3-column invoice header.
+       Web view stacks vertically on narrow widths; print MUST be
+       3 columns. The wrapper class on the section is .quote-meta. */
     .quote-meta {
+        display: grid !important;
+        grid-template-columns: 1.2fr 1fr 1.1fr !important;
+        gap: 10pt !important;
+        margin: 0 0 12pt 0 !important;
+        padding: 0 !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .meta-card {
+        background: #f9fafb !important;
+        border: 1pt solid #e2e8f0 !important;
+        border-radius: 4pt !important;
+        padding: 8pt 10pt !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    .meta-card h3 {
+        font-size: 7.5pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
+        color: #4cb354 !important;
+        margin: 0 0 5pt 0 !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    .meta-card p {
+        margin: 0 0 2pt 0 !important;
+        padding: 0 !important;
+        font-size: 9pt !important;
+        color: #1a202c !important;
+        line-height: 1.4;
+    }
+
+    /* Customer card specifics */
+    .customer-name {
+        font-weight: 700 !important;
+        font-size: 10pt !important;
+        color: #1a202c !important;
+    }
+
+    .company-name {
+        font-weight: 500 !important;
+        color: #1a202c !important;
+    }
+
+    .customer-email,
+    .customer-phone {
+        color: #475569 !important;
+        font-size: 8.5pt !important;
+        word-break: break-all;
+    }
+
+    /* Phase 8 billing-block (inside Prepared For card) */
+    .billing-block {
+        display: block !important;
+        margin-top: 6pt !important;
+        padding-top: 5pt !important;
+        border-top: 1pt dashed #cbd5e0 !important;
+        background: none !important;
+    }
+
+    .billing-block p:first-child {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em !important;
+        text-transform: uppercase !important;
+        color: #4cb354 !important;
+        margin: 0 0 3pt 0 !important;
+    }
+
+    .billing-address,
+    .billing-city-state {
+        font-size: 9pt !important;
+        font-weight: 400 !important;
+        color: #1a202c !important;
+    }
+
+    /* Ship-to card */
+    .ship-to-card #ship-to-address,
+    .ship-to-card #ship-to-city-state {
+        font-size: 9pt !important;
+        color: #1a202c !important;
+    }
+
+    #ship-to-method {
+        font-style: italic !important;
+        color: #475569 !important;
+        font-size: 8.5pt !important;
+        margin-top: 3pt !important;
+    }
+
+    #ship-to-tracking {
+        font-size: 8pt !important;
+        color: #475569 !important;
+    }
+
+    /* Dates card — compact 2-column key/value rows */
+    .dates-card .date-row {
+        display: grid !important;
+        grid-template-columns: auto 1fr !important;
+        gap: 6pt !important;
+        font-size: 9pt !important;
+        margin: 0 0 2pt 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: none !important;
+    }
+
+    .dates-card .date-row .label {
+        color: #475569 !important;
+        font-weight: 500 !important;
+        white-space: nowrap;
+    }
+
+    .dates-card .date-row .value {
+        color: #1a202c !important;
+        font-weight: 600 !important;
+        text-align: right;
+    }
+
+    /* ============================================================
+       STATUS BANNERS (expired / accepted)
+       ============================================================ */
+
+    .expired-banner,
+    .accepted-banner {
+        padding: 6pt 10pt !important;
+        border-radius: 4pt !important;
+        margin: 0 0 8pt 0 !important;
+        font-size: 9pt !important;
+        page-break-inside: avoid;
+        background: #f0fdf4 !important;
+        border: 1pt solid #86efac !important;
+        color: #166534 !important;
         display: flex !important;
-        justify-content: space-between;
-        margin-bottom: 20pt;
-        gap: 20pt;
+        align-items: center;
+        gap: 8pt;
     }
-    
-    .quote-number {
-        flex: 1;
+
+    .expired-banner {
+        background: #fef2f2 !important;
+        border-color: #fca5a5 !important;
+        color: #991b1b !important;
     }
-    
-    .quote-number h2 {
-        color: #003f7f !important;
-        font-size: 18pt;
-        margin: 0 0 8pt 0;
-        font-weight: bold;
+
+    .accepted-banner strong,
+    .expired-banner strong {
+        font-size: 10pt;
+        font-weight: 700;
     }
-    
-    .quote-number p {
-        font-size: 11pt;
-        color: #333 !important;
-        margin: 3pt 0;
+
+    /* ============================================================
+       EMBROIDERY INFO ROW (Location / Stitches)
+       ============================================================ */
+
+    .quote-items > h2,
+    #quote-content > .quote-items > h2 {
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        color: #1a202c !important;
+        margin: 12pt 0 6pt 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        background: none !important;
     }
-    
-    .customer-info {
-        flex: 1;
-        background: #f8f9fa !important;
-        padding: 12pt;
-        border: 1px solid #dee2e6;
-        border-radius: 4pt;
-    }
-    
-    .customer-info h3 {
-        color: #003f7f !important;
-        font-size: 12pt;
-        margin: 0 0 8pt 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5pt;
-        font-weight: bold;
-    }
-    
-    .customer-info p {
-        font-size: 11pt;
-        margin: 4pt 0;
-        color: #000 !important;
-    }
-    
-    .customer-info strong {
-        font-weight: bold;
-    }
-    
-    /* ============================================
-       QUOTE ITEMS TABLE
-       ============================================ */
-    
-    .quote-items {
-        margin: 20pt 0;
-    }
-    
-    .quote-items h3 {
-        color: #003f7f !important;
-        font-size: 14pt;
-        margin: 0 0 10pt 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5pt;
-        font-weight: bold;
-    }
-    
-    .items-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 15pt 0;
+
+    .embroidery-info {
+        background: #f0fdf4 !important;
+        border: 1pt solid #bbf7d0 !important;
+        border-radius: 4pt !important;
+        padding: 6pt 10pt !important;
+        margin: 0 0 8pt 0 !important;
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 14pt;
+        font-size: 9pt !important;
         page-break-inside: avoid;
     }
-    
-    .items-table thead {
+
+    .emb-detail {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .emb-label {
+        font-weight: 600 !important;
+        color: #166534 !important;
+        margin-right: 3pt;
+    }
+
+    .emb-value {
+        color: #1a202c !important;
+        font-weight: 500 !important;
+    }
+
+    /* ============================================================
+       ITEMS TABLE — QuickBooks-style grid
+       ============================================================ */
+
+    .items-container {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .product-table-wrapper {
+        overflow: visible !important;
+        margin: 0 !important;
+    }
+
+    .product-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 9pt !important;
+        margin: 0 0 8pt 0 !important;
+        page-break-inside: avoid;
+    }
+
+    .product-table thead {
         display: table-header-group;
     }
-    
-    .items-table th {
-        background: #003f7f !important;
-        color: white !important;
-        padding: 8pt;
-        text-align: left;
-        font-size: 11pt;
-        font-weight: bold;
-        border: 1px solid #003f7f;
+
+    .product-table thead th {
+        background: #4cb354 !important;
+        color: #fff !important;
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.05em !important;
+        text-transform: uppercase !important;
+        padding: 5pt 6pt !important;
+        text-align: left !important;
+        border: none !important;
     }
-    
-    .items-table th:last-child,
-    .items-table td:last-child {
-        text-align: right;
+
+    .product-table thead th.qty-col,
+    .product-table thead th.price-col,
+    .product-table thead th.total-col {
+        text-align: right !important;
     }
-    
-    .items-table td {
-        padding: 8pt;
-        border: 1px solid #dee2e6;
-        font-size: 10pt;
-        color: #000 !important;
-        vertical-align: top;
+
+    .product-table tbody td {
+        border-bottom: 0.5pt solid #e2e8f0 !important;
+        padding: 6pt !important;
+        font-size: 9pt !important;
+        color: #1a202c !important;
+        vertical-align: top !important;
+        background: #fff !important;
     }
-    
-    .items-table tbody tr {
+
+    .product-table tbody tr {
         page-break-inside: avoid;
     }
-    
-    .items-table tbody tr:nth-child(even) {
-        background: #f8f9fa !important;
+
+    /* Hide the empty size columns — CEMB quotes are per-piece, not per-size */
+    .product-table thead th.size-col,
+    .product-table tbody td.size-col {
+        display: none !important;
     }
-    
-    /* Item details styling */
-    .item-details strong {
-        display: block;
-        font-weight: bold;
-        margin-bottom: 2pt;
-        color: #000 !important;
+
+    /* Numeric columns right-aligned */
+    .product-table .qty-col,
+    .product-table .price-col,
+    .product-table .total-col {
+        text-align: right !important;
+        font-variant-numeric: tabular-nums;
     }
-    
-    .item-details small {
-        display: block;
-        font-size: 9pt;
-        color: #666 !important;
-        margin: 1pt 0;
+
+    .product-table .total-col {
+        font-weight: 700 !important;
     }
-    
-    /* ============================================
-       TOTALS SECTION
-       ============================================ */
-    
-    .items-table tfoot {
-        display: table-footer-group;
+
+    /* Customer-supplied row style (CEMB items) */
+    .customer-supplied-row td {
+        background: #fffdf5 !important;
     }
-    
-    .items-table tfoot td {
-        font-weight: bold;
-        padding: 8pt;
-        border: 1px solid #003f7f;
-        background: white;
+
+    /* Style col: SKU subtitle styling */
+    .product-table .style-col > div:first-child {
+        font-weight: 700 !important;
+        color: #1a202c !important;
+        font-size: 9.5pt;
     }
-    
-    .subtotal-row td {
-        padding-top: 12pt !important;
-        border-top: 2px solid #003f7f !important;
+
+    .product-table .style-col > div:last-child {
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace !important;
+        font-size: 7.5pt !important;
+        color: #94a3b8 !important;
+        font-weight: 500 !important;
+        margin-top: 2pt !important;
+        letter-spacing: 0.04em !important;
     }
-    
-    .grand-total td {
-        font-size: 14pt !important;
-        color: #003f7f !important;
-        padding: 10pt !important;
-        background: #f8f9fa !important;
-        border: 2px solid #003f7f !important;
-        font-weight: bold;
-    }
-    
-    /* ============================================
-       FOOTER SECTION
-       ============================================ */
-    
-    .quote-footer {
-        margin-top: 30pt;
-        padding-top: 15pt;
-        border-top: 1px solid #dee2e6;
+
+    /* ============================================================
+       SPECIAL NOTES — compact yellow callout
+       ============================================================ */
+
+    #special-notes-section,
+    .special-notes-section {
+        margin: 8pt 0 !important;
+        padding: 0 !important;
         page-break-inside: avoid;
     }
-    
-    .footer-grid {
+
+    .special-notes-card {
+        background: #fefce8 !important;
+        border: 1pt solid #fde68a !important;
+        border-radius: 4pt !important;
+        padding: 6pt 10pt !important;
+    }
+
+    .special-notes-card h3 {
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        color: #92400e !important;
+        margin: 0 0 4pt 0 !important;
+    }
+
+    .special-notes-content,
+    #special-notes-content {
+        font-family: inherit !important;
+        font-size: 8.5pt !important;
+        color: #78350f !important;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        line-height: 1.4;
+        margin: 0 !important;
+    }
+
+    /* Hide the FontAwesome icon on print (we have the heading text) */
+    .special-notes-card h3 .fas {
+        display: none !important;
+    }
+
+    /* ============================================================
+       TOTALS — right-aligned hierarchy
+       ============================================================ */
+
+    .quote-totals {
+        margin: 8pt 0 !important;
+        padding: 0 !important;
+        display: flex !important;
+        justify-content: flex-end;
+        page-break-inside: avoid;
+    }
+
+    .totals-card {
+        width: 40% !important;
+        min-width: 220pt;
+        padding: 6pt 10pt !important;
+        background: #f9fafb !important;
+        border: 1pt solid #e2e8f0 !important;
+        border-radius: 4pt !important;
+        box-shadow: none !important;
+    }
+
+    .totals-card .total-row {
         display: flex !important;
         justify-content: space-between;
-        margin-bottom: 15pt;
-        gap: 15pt;
+        align-items: baseline;
+        padding: 3pt 0 !important;
+        font-size: 9.5pt !important;
+        border: none !important;
     }
-    
+
+    .totals-card .total-row .label {
+        color: #475569 !important;
+        font-weight: 500 !important;
+    }
+
+    .totals-card .total-row .value {
+        color: #1a202c !important;
+        font-weight: 600 !important;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .totals-card .total-row.grand-total {
+        margin-top: 4pt !important;
+        padding-top: 6pt !important;
+        border-top: 1pt solid #4cb354 !important;
+    }
+
+    .totals-card .total-row.grand-total .label,
+    .totals-card .total-row.grand-total .value {
+        color: #4cb354 !important;
+        font-weight: 700 !important;
+        font-size: 12pt !important;
+    }
+
+    .totals-card .total-quantity {
+        text-align: right !important;
+        font-size: 7.5pt !important;
+        color: #94a3b8 !important;
+        margin: 4pt 0 0 0 !important;
+        padding: 0 !important;
+        font-style: italic;
+    }
+
+    /* ============================================================
+       FOOTER — terms + contact, single block
+       ============================================================ */
+
+    .quote-footer {
+        margin: 14pt 0 0 0 !important;
+        padding: 8pt 0 0 0 !important;
+        border-top: 1pt solid #e2e8f0 !important;
+        background: none !important;
+        color: #475569 !important;
+        font-size: 8pt !important;
+        page-break-inside: avoid;
+    }
+
+    .footer-content {
+        display: flex !important;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16pt;
+        margin: 0 0 6pt 0 !important;
+        background: none !important;
+    }
+
     .footer-section {
         flex: 1;
+        background: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
-    
+
     .footer-section h4 {
-        color: #003f7f !important;
-        font-size: 11pt;
-        margin: 0 0 6pt 0;
-        text-transform: uppercase;
-        font-weight: bold;
+        font-size: 7.5pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        color: #4cb354 !important;
+        margin: 0 0 3pt 0 !important;
+        padding: 0 !important;
     }
-    
-    .footer-section p {
-        font-size: 10pt;
-        color: #333 !important;
-        margin: 2pt 0;
+
+    .footer-section p,
+    .footer-section ul {
+        font-size: 8pt !important;
+        color: #475569 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: 1.4;
     }
-    
-    /* Terms box */
-    .terms {
-        background: #fff3cd !important;
-        border: 1px solid #ffc107 !important;
-        padding: 10pt;
-        border-radius: 4pt;
-        margin: 15pt 0;
-        page-break-inside: avoid;
+
+    .footer-section ul {
+        list-style: none !important;
     }
-    
-    .terms h4 {
-        color: #856404 !important;
-        font-size: 11pt;
-        margin: 0 0 6pt 0;
-        font-weight: bold;
+
+    .footer-section li {
+        font-size: 8pt !important;
+        color: #475569 !important;
+        margin: 0 !important;
+        padding-left: 8pt !important;
+        position: relative;
     }
-    
-    .terms p,
-    .terms li {
-        font-size: 9pt;
-        color: #856404 !important;
-        margin: 3pt 0;
+
+    .footer-section li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #4cb354;
+        font-weight: 700;
     }
-    
-    .terms ul {
-        margin: 0;
-        padding-left: 15pt;
-    }
-    
-    /* Thank you message */
-    .thank-you {
+
+    .footer-bottom,
+    .footer-section + p {
         text-align: center;
-        font-size: 14pt;
-        font-weight: bold;
-        color: #003f7f !important;
-        margin: 20pt 0 10pt;
+        font-size: 7.5pt !important;
+        color: #94a3b8 !important;
+        padding-top: 4pt !important;
+        margin: 0 !important;
+        border-top: 0.5pt solid #e2e8f0 !important;
     }
-    
-    /* Footer copyright */
-    .footer-logo {
-        text-align: center;
-        margin-top: 15pt;
-        padding-top: 10pt;
-        border-top: 1px solid #dee2e6;
-    }
-    
-    .footer-logo small {
-        font-size: 9pt;
-        color: #666 !important;
-    }
-    
-    /* ============================================
-       PAGE BREAK CONTROL
-       ============================================ */
-    
-    /* Avoid breaking inside these elements */
-    .customer-info,
-    .quote-meta,
-    .items-table,
-    .quote-footer,
-    .terms {
-        page-break-inside: avoid;
-    }
-    
-    /* Force page break before footer if needed */
-    .quote-footer {
-        page-break-before: auto;
-    }
-    
-    /* Keep table rows together */
-    tr {
-        page-break-inside: avoid;
-        page-break-after: auto;
-    }
-    
-    /* Keep headers with content */
-    h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid;
-    }
-    
-    /* ============================================
-       SPECIAL PRINT ADJUSTMENTS
-       ============================================ */
-    
-    /* Ensure backgrounds print */
-    * {
-        print-color-adjust: exact !important;
-        -webkit-print-color-adjust: exact !important;
-    }
-    
-    /* Links as plain text */
+
+    /* ============================================================
+       LINK STYLING
+       ============================================================ */
+
     a {
+        color: #1a202c !important;
         text-decoration: none !important;
-        color: inherit !important;
     }
-    
-    /* Remove link URLs */
-    a[href]:after {
-        content: none !important;
+
+    /* Strip URL after links — invoice convention */
+    a[href]::after {
+        content: '' !important;
     }
-    
-    /* Ensure images print */
-    img {
-        max-width: 100% !important;
-        page-break-inside: avoid;
+
+    /* ============================================================
+       PAGE-BREAK PROTECTION
+       ============================================================ */
+
+    .quote-meta,
+    .quote-items,
+    .items-container,
+    .product-table,
+    .embroidery-info,
+    .special-notes-card,
+    .quote-totals,
+    .totals-card,
+    .quote-footer {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
-    
-    /* Print only classes */
-    .print-only {
-        display: block !important;
-        visibility: visible !important;
+
+    h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
     }
-    
-    /* High quality text */
-    body {
-        text-rendering: optimizeLegibility;
-        -webkit-font-smoothing: antialiased;
+
+    /* Orphans/widows — prevent dangling lines */
+    p {
+        orphans: 3;
+        widows: 3;
     }
-    
-    /* ============================================
-       FALLBACK FOR BROWSERS
-       ============================================ */
-    
-    /* For browsers that don't support print-color-adjust */
-    .quote-header,
-    .items-table th,
-    .grand-total td {
-        -webkit-print-color-adjust: exact;
-        color-adjust: exact;
+
+    /* ============================================================
+       MISC — hide error/loading states if visible on render
+       ============================================================ */
+
+    .loading-overlay,
+    .toast-container,
+    .alert {
+        display: none !important;
     }
 }
