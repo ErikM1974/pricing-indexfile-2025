@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-4100-pinkcontract">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-4100-pinkcontract">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-4100-pinkcontract">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-4100-pinkcontract">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-editorial">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260514-editorial">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260514-editorial">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-editorial">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-4100-pinkcontract">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260514-editorial">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-4100-pinkcontract">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260514-editorial">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-4100-pinkcontract"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260514-editorial"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>

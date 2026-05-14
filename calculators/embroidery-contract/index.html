@@ -1,241 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Contract Embroidery Pricing — Northwest Custom Apparel</title>
+    <title>Contract Embroidery Pricing 2026 — Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-    <!-- Shared base styles (provides .header, .breadcrumb, .calculator-card,
-         .pricing-matrix, .form-input, .btn-primary, etc.) -->
-    <link href="../../shared_components/css/calculator-base.css?v=20260513-contract" rel="stylesheet">
+    <!-- Editorial typography: Fraunces serif display, Geist sans body, Geist Mono numbers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
-    <!-- Contract Pricing Pink Theme — overlay on top of calculator-base.
-         Rebinds green tokens to pink and adds .contract-share-btn /
-         .contract-info-banner / .contract-share-toast components. -->
-    <link href="../../shared_components/css/contract-pricing-theme.css?v=20260513-contract" rel="stylesheet">
+    <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
+    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-editorial">
 </head>
-<body class="contract-pricing">
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel"
-                     class="logo">
-                <nav class="breadcrumb">
-                    <a href="/staff-dashboard.html">
-                        <i class="fas fa-arrow-left"></i> Dashboard
-                    </a>
-                    <span>/</span>
-                    <span>Contract Embroidery</span>
-                </nav>
-            </div>
+<body>
+
+    <!-- ========== Top bar ========== -->
+    <header class="topbar">
+        <div class="logo">
+            <span class="logo-mark">NW</span>
+            <span>Northwest Custom Apparel</span>
         </div>
+        <nav class="crumbs">
+            <a href="/staff-dashboard.html">
+                <!-- back chevron (rotated forward chevron) -->
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                Dashboard
+            </a>
+            <span class="sep">/</span>
+            <span class="here">Contract Embroidery</span>
+        </nav>
+        <div class="spacer"></div>
+        <span class="theme-chip"><span class="dot"></span> Contract · Wholesale Partner</span>
     </header>
 
-    <!-- Main Content -->
-    <main class="main-container">
-        <h1 class="page-title">Contract Embroidery Pricing 2026</h1>
-        <p class="page-subtitle">Wholesale embroidery pricing for production accounts (Ruthie / ASI distributors who supply their own blanks)</p>
+    <main class="page">
 
-        <!-- Contract Info Banner -->
-        <div class="contract-info-banner">
-            <i class="fas fa-handshake" aria-hidden="true"></i>
+        <!-- ========== Hero ========== -->
+        <section class="hero">
             <div>
-                <strong>Contract Pricing:</strong> For established wholesale partners and production accounts (e.g., ad-specialty distributors who supply their own blanks). Single price tier — no segment tabs. Same Full Back rate as Corporate.
+                <div class="eyebrow">Contract · Wholesale partner pricing</div>
+                <h1 class="page-title">Contract Embroidery <em>2026.</em></h1>
+                <p class="lede">
+                    Wholesale embroidery pricing for production accounts &mdash; Ruthie's desk &amp;
+                    ASI distributors who supply their own blanks. Single price tier, no segment tabs,
+                    same full-back rate as Corporate.
+                </p>
             </div>
-        </div>
-
-        <!-- LTM Banner -->
-        <div class="ltm-banner">
-            <i class="fas fa-exclamation-circle"></i>
-            <span><strong>LTM Fee:</strong> Orders of 1-23 pieces incur a $50 Less Than Minimum fee</span>
-        </div>
-
-        <!-- Quick Price Calculator -->
-        <div class="calculator-card compact">
-            <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
-            <div class="calc-form">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="ecItemType">Item Type</label>
-                        <select id="ecItemType" class="form-input">
-                            <option value="garment">Garment</option>
-                            <option value="cap">Cap</option>
-                            <option value="laser-patch">Laser Patch</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="ecQuantity">Quantity</label>
-                        <input type="number" id="ecQuantity" class="form-input" value="24" min="1" max="9999">
-                    </div>
-                    <div class="form-group">
-                        <label for="ecStitches">Stitch Count</label>
-                        <input type="number" id="ecStitches" class="form-input" value="8000" min="1000" max="100000" step="1000">
-                    </div>
+            <aside class="hero-aside">
+                <div class="fact">
+                    <span class="k">Pricing</span>
+                    <span class="v">5 quantity tiers · 1 → 72+ pcs</span>
                 </div>
-                <div class="calc-results">
-                    <div class="result-row breakdown" id="ecBreakdownRow">
-                        <span id="ecBreakdownLabel">8K × $0.90/1K:</span>
-                        <span id="ecBreakdownValue">$7.20</span>
-                    </div>
-                    <div class="result-row breakdown hidden" id="ecLtmBreakdownRow">
-                        <span id="ecLtmBreakdownLabel">+ LTM ($50 ÷ 3):</span>
-                        <span id="ecLtmBreakdownValue">+$16.67</span>
-                    </div>
-                    <div class="result-row final">
-                        <span>Unit Price:</span>
-                        <span id="ecFinalUnitPrice" class="final-price">$7.20</span>
-                    </div>
-                </div>
-
-                <!-- Share row: prominent Copy Link button for the "calculate → share" flow -->
-                <div class="share-row" style="margin-top: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
-                    <span style="font-size: 0.85rem; color: #6b7280;">
-                        <i class="fas fa-info-circle" aria-hidden="true"></i>
-                        Share this exact quote with a customer — they'll see the calculator pre-filled.
+                <div class="fact">
+                    <span class="k">LTM Fee</span>
+                    <span class="v">
+                        <strong>$50</strong> on orders 1–23 pcs
+                        <span class="pill">CTR-Garmt / CTR-Cap</span>
                     </span>
-                    <button type="button" class="contract-share-btn" id="ecShareBtn">
-                        <i class="fas fa-link" aria-hidden="true"></i> Copy Quote Link
+                </div>
+                <div class="fact">
+                    <span class="k">Full Back LTM</span>
+                    <span class="v">
+                        <strong>$100</strong> on orders 1–23 pcs
+                        <span class="pill">DECG-FB</span>
+                    </span>
+                </div>
+            </aside>
+        </section>
+
+        <!-- Pricing-unavailable banner (hidden by default; shown by JS on API failure) -->
+        <div id="pricingError" class="pricing-error" hidden>
+            <strong>Unable to load contract pricing.</strong> Refresh the page or contact Ruthie directly if this persists.
+        </div>
+
+        <!-- ========== Quick Price Calculator ========== -->
+        <section class="calc" aria-label="Quick price calculator">
+            <div>
+                <div class="calc-head">
+                    <h2>Quick price calculator</h2>
+                    <span class="meta">Live · No login</span>
+                </div>
+                <div class="calc-form">
+
+                    <!-- Item Type — segmented picker -->
+                    <div class="field">
+                        <label>Item type</label>
+                        <div class="seg" role="tablist" id="segItemType">
+                            <button type="button" data-product="garment" class="active">
+                                <span class="label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l3-2 3 1 3-1 3 2 3 4-3 2-1-1v12H7V9L6 10 3 8z"/></svg>
+                                    Garment
+                                </span>
+                                <span class="code">CTR-Garmt</span>
+                            </button>
+                            <button type="button" data-product="cap">
+                                <span class="label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>
+                                    Cap Front
+                                </span>
+                                <span class="code">CTR-Cap</span>
+                            </button>
+                            <button type="button" data-product="fullback">
+                                <span class="label">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+                                    Full Back
+                                </span>
+                                <span class="code">DECG-FB</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Quantity -->
+                        <div class="field">
+                            <label for="qty">Quantity</label>
+                            <input id="qty" class="input num" type="number" min="1" step="1" value="24">
+                            <div class="range-shortcuts" id="qtyPresets">
+                                <button type="button" data-q="12">12</button>
+                                <button type="button" data-q="24" class="active">24</button>
+                                <button type="button" data-q="48">48</button>
+                                <button type="button" data-q="72">72</button>
+                                <button type="button" data-q="144">144</button>
+                                <button type="button" data-q="288">288</button>
+                            </div>
+                            <div class="help warn" id="ltmHelp" hidden>
+                                <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>
+                                LTM fee of <strong id="ltmHelpAmount">$50</strong> applies (orders 1–23)
+                            </div>
+                        </div>
+
+                        <!-- Stitch Count -->
+                        <div class="field">
+                            <label for="stitch">Stitch count</label>
+                            <input id="stitch" class="input num" type="number" min="1000" step="500" value="8000">
+                            <div class="range-shortcuts" id="stitchPresets">
+                                <!-- Populated by JS based on product selection -->
+                            </div>
+                            <div class="help" id="stitchHelp">
+                                Minimum: <strong>8K</strong> stitches
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result panel (right half) -->
+            <div class="calc-result">
+                <div class="res-eyebrow">
+                    <span>Unit price · <span id="resProductLabel">Garment</span></span>
+                    <span class="res-tier" id="resTier">Tier 24–47</span>
+                </div>
+                <div class="unit-price">
+                    <span class="currency">$</span>
+                    <span id="unitPrice">7.20</span>
+                    <span class="per">/ piece</span>
+                </div>
+                <div class="unit-sub">
+                    <span id="unitSub">8K × <b>$0.90/1K</b></span>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="totals">
+                    <div class="tot">
+                        <div class="k">Subtotal</div>
+                        <div class="v" id="subtotal">$172.80</div>
+                        <div class="note" id="subtotalNote">24 × $7.20</div>
+                    </div>
+                    <div class="tot" id="ltmCard">
+                        <div class="k">LTM fee</div>
+                        <div class="v" id="ltmValue">—</div>
+                        <div class="note" id="ltmNote">Not applicable</div>
+                    </div>
+                    <div class="tot tot--total">
+                        <div class="row">
+                            <div>
+                                <div class="k">Order total</div>
+                                <div class="note">≈ $<span id="perPieceAllIn">7.20</span> all-in / piece</div>
+                            </div>
+                            <div class="v" id="orderTotal">$172.80</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="calc-actions">
+                    <button type="button" class="btn primary" id="copyLinkBtn">
+                        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 1 0 5.66 5.66l1-1"/></svg>
+                        <span>Copy quote link</span>
+                    </button>
+                    <button type="button" class="btn ghost" id="copyTextBtn">
+                        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+                        <span>Copy quote text</span>
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- ShopWorks Part Numbers Reference Card -->
-        <div class="shopworks-ref-card">
-            <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
-            <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
-            <span class="ref-item"><span class="ref-code">CTR-Garmt</span> Garments</span>
-            <span class="ref-item"><span class="ref-code">CTR-Cap</span> Caps</span>
-            <span class="ref-item"><span class="ref-code">DECG-FB</span> Full Back</span>
-        </div>
-
-        <!-- Pricing Matrices Grid -->
-        <div class="matrices-grid">
-            <!-- Contract Garments Matrix -->
-            <div class="matrix-card">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-tshirt"></i> Contract Garments <span class="part-number-badge">CTR-Garmt</span></h3>
-                </div>
-                <table id="ecGarmentsMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th class="ltm-tier">1-7</th>
-                            <th class="ltm-tier">8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Contract Caps Matrix -->
-            <div class="matrix-card">
-                <div class="matrix-header">
-                    <h3><i class="fas fa-hat-cowboy"></i> Contract Cap Fronts <span class="part-number-badge">CTR-Cap</span></h3>
-                </div>
-                <table id="ecCapsMatrix" class="pricing-matrix">
-                    <thead>
-                        <tr>
-                            <th>Stitches</th>
-                            <th class="ltm-tier">1-7</th>
-                            <th class="ltm-tier">8-23</th>
-                            <th>24-47</th>
-                            <th>48-71</th>
-                            <th class="best-tier">72+</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Full Back Embroidery — universal rate (same DECG-FB matrix as corporate) -->
-        <div class="matrix-card full-width" style="margin-top: 1.5rem;">
-            <div class="matrix-header">
-                <h3><i class="fas fa-expand"></i> Full Back Embroidery (25K+ Stitches) <span class="part-number-badge">DECG-FB</span></h3>
-                <div class="matrix-meta">Priced per 1,000 stitches &bull; 25K minimum &bull; Min charge $20.00</div>
-                <div class="fb-ltm-notice"><strong>Full Back LTM Fee: $100.00</strong> (orders of 1-23 pieces)</div>
-            </div>
-            <table id="ecFullBackMatrix" class="pricing-matrix">
-                <thead>
-                    <tr>
-                        <th>Stitches</th>
-                        <th class="ltm-tier">1-7</th>
-                        <th class="ltm-tier">8-23</th>
-                        <th>24-47</th>
-                        <th>48-71</th>
-                        <th class="best-tier">72+</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Populated by JS -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Contact Section -->
-        <div class="contact-card" style="margin-top: 2rem;">
-            <div class="contact-header">
-                <i class="fas fa-phone-alt"></i>
+        <!-- ========== Callouts (insight cards) ========== -->
+        <div class="callouts">
+            <div class="callout">
+                <span class="ico">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v0M12 11v6"/></svg>
+                </span>
                 <div>
-                    <div class="contact-title">Contract Embroidery Specialist</div>
-                    <div class="contact-subtitle">Direct line for wholesale partner inquiries</div>
+                    <h4>Same-day quotes</h4>
+                    <p>Ruthie returns contract quotes within one business day. Send artwork + stitch count to skip the back-and-forth.</p>
                 </div>
             </div>
-            <div class="contact-grid">
-                <div class="contact-info">
-                    <h3>Ruthie Nhoung</h3>
-                    <div class="contact-detail">
-                        <i class="fas fa-phone"></i>
-                        <a href="tel:253-922-5793">253-922-5793 ext. 119</a>
-                    </div>
-                    <div class="contact-detail">
-                        <i class="fas fa-envelope"></i>
-                        <a href="mailto:ruth@nwcustomapparel.com">ruth@nwcustomapparel.com</a>
-                    </div>
-                    <div class="contact-detail">
-                        <i class="fas fa-clock"></i>
-                        <span>Mon-Fri: 9AM - 5PM PST</span>
-                    </div>
-                </div>
-                <div class="quote-requirements">
-                    <h4>What You'll Need for Your Quote:</h4>
-                    <ul class="requirements-list">
-                        <li>Vector artwork (AI, EPS, or PDF)</li>
-                        <li>Stitch count for each logo location</li>
-                        <li>Final quantity needed</li>
-                        <li>Desired delivery date</li>
-                    </ul>
+            <div class="callout">
+                <span class="ico">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M16 7H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H8"/></svg>
+                </span>
+                <div>
+                    <h4>Volume breaks at 24, 48, 72</h4>
+                    <p>Every tier jump drops the per-1K rate. Hitting <b>72+</b> shaves up to <b>27%</b> off the 1–7 rate.</p>
                 </div>
             </div>
-            <div class="important-note">
-                <i class="fas fa-info-circle"></i>
-                <div class="important-note-text">
-                    <strong>Note:</strong> This calculator provides estimated pricing based on standard contract rates. Final quotes may vary based on artwork complexity and current production schedule. Contact Ruthie for an official contract quote.
+            <div class="callout">
+                <span class="ico">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>
+                </span>
+                <div>
+                    <h4>Mind the LTM threshold</h4>
+                    <p>Bumping from 23 → 24 pieces removes the $50 fee. For full back, the fee is $100 — worth a heads-up to your customer.</p>
                 </div>
             </div>
+        </div>
+
+        <!-- ========== Pricing tables (tabbed) ========== -->
+        <section class="section">
+            <div class="section-head">
+                <div>
+                    <h2>Pricing tables</h2>
+                    <p>Highlighted row + cell reflect your current calculator inputs.</p>
+                </div>
+                <div class="tabs" id="tableTabs">
+                    <button type="button" data-product="garment" class="active">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l3-2 3 1 3-1 3 2 3 4-3 2-1-1v12H7V9L6 10 3 8z"/></svg>
+                        Garments <span class="code">CTR-Garmt</span>
+                    </button>
+                    <button type="button" data-product="cap">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>
+                        Cap Fronts <span class="code">CTR-Cap</span>
+                    </button>
+                    <button type="button" data-product="fullback">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+                        Full Back <span class="code">DECG-FB</span>
+                    </button>
+                </div>
+            </div>
+
+            <article class="price-card" id="priceCard">
+                <header class="price-head">
+                    <div class="title">
+                        <span class="icon-bubble" id="cardIcon">
+                            <!-- swapped by JS -->
+                        </span>
+                        <div>
+                            <h3 id="cardTitle">Contract Garments</h3>
+                            <div class="sub" id="cardSubtitle">Flat embroidery on shirts, jackets, bags &amp; soft goods</div>
+                        </div>
+                    </div>
+                    <span class="code-chip" id="cardCode">CTR-Garmt</span>
+                </header>
+                <table class="price" id="priceTable">
+                    <thead>
+                        <tr>
+                            <th>Stitches</th>
+                            <th>1–7</th>
+                            <th>8–23</th>
+                            <th>24–47</th>
+                            <th>48–71</th>
+                            <th>72+</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Populated by JS -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>$ / 1,000 stitches</td>
+                            <td></td><td></td><td></td><td></td><td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                <div class="price-foot">
+                    <div class="legend">
+                        <span class="legend-item"><span class="sw"></span> Your tier &amp; stitch count</span>
+                        <span class="legend-item"><span class="sw bg"></span> Active quantity column</span>
+                    </div>
+                    <div id="cardMins">
+                        <span>Min stitches <b id="cardMinStitches">8K</b></span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- ========== ShopWorks parts row ========== -->
+        <div class="parts-row">
+            <span class="lbl">ShopWorks parts</span>
+            <span class="part"><span class="pc">LTM</span> Less Than Minimum Fee</span>
+            <span class="part"><span class="pc">CTR-Garmt</span> Garments</span>
+            <span class="part"><span class="pc">CTR-Cap</span> Caps</span>
+            <span class="part"><span class="pc">DECG-FB</span> Full Back</span>
+        </div>
+
+        <!-- ========== Contact card ========== -->
+        <section class="contact">
+            <div class="contact-left">
+                <div class="eyebrow">Contract embroidery specialist</div>
+                <h3>Ruthie Nhoung</h3>
+                <div class="role">Direct line for wholesale partner inquiries</div>
+                <div class="contact-links">
+                    <a href="tel:+12539225793,119">
+                        <span class="ico">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+                        </span>
+                        <span class="k">Direct</span>
+                        <span>253-922-5793 ext. 119</span>
+                    </a>
+                    <a href="mailto:ruth@nwcustomapparel.com">
+                        <span class="ico">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+                        </span>
+                        <span class="k">Email</span>
+                        <span>ruth@nwcustomapparel.com</span>
+                    </a>
+                </div>
+                <div class="hours">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    MON–FRI · 9 AM – 5 PM PST
+                </div>
+            </div>
+            <div class="contact-right">
+                <h4>What Ruthie needs for an official quote</h4>
+                <ol class="checklist">
+                    <li>
+                        <span class="num">01</span>
+                        <div>
+                            <div class="what">Vector artwork</div>
+                            <div class="why">AI, EPS, or PDF — needed to confirm stitch count</div>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="num">02</span>
+                        <div>
+                            <div class="what">Stitch count per logo location</div>
+                            <div class="why">Drives the row in the pricing table</div>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="num">03</span>
+                        <div>
+                            <div class="what">Final quantity</div>
+                            <div class="why">Tier determines the column — and whether LTM applies</div>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="num">04</span>
+                        <div>
+                            <div class="what">Desired delivery date</div>
+                            <div class="why">Production schedule may affect availability</div>
+                        </div>
+                    </li>
+                </ol>
+            </div>
+        </section>
+
+        <div class="footnote">
+            Estimates based on standard contract rates. Final quotes may vary by artwork complexity &amp; production schedule.<br>
+            For an official contract quote, contact Ruthie directly. · Northwest Custom Apparel · 2026 rates
         </div>
     </main>
 
-    <!-- Toast for share-link copied confirmation -->
-    <div class="contract-share-toast" id="ecShareToast">
-        <i class="fas fa-check-circle"></i><span>Quote link copied — paste into your email or chat</span>
+    <!-- Share-link copy confirmation -->
+    <div class="share-toast" id="shareToast">
+        <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
+        <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <!-- Calculator + URL params + share-link logic -->
-    <script src="embroidery-contract.js?v=20260513-contract"></script>
+    <script src="embroidery-contract.js?v=20260514-editorial"></script>
 </body>
 </html>
