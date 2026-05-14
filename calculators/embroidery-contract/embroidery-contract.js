@@ -578,7 +578,224 @@
         opened: false,
         messages: [],          // [{role: 'user'|'assistant', content: string}, ...]
         isStreaming: false,
+        // Phase 3 (2026-05-14): track lookup_customer single-match result so
+        // we can stamp CompanyName / ContactName / Email onto the saved
+        // quote_session row when Ruthie clicks Copy or Open in Outlook.
+        lastLookup: null,      // {company, contact_name, email, rep} or null
+        // Phase 3: most recently rendered email-draft block. Parsed once on
+        // stream-complete; reused by both action buttons + the save call.
+        currentDraft: null,    // {to, subject, body, customer: {...}}
     };
+
+    /* ---------- Phase 3 helpers ---------- */
+
+    // Parse the EMAIL DRAFT block emitted by Claude. Returns {to, subject,
+    // body} for downstream use (mailto, copy-to-clipboard, save-to-quote).
+    function parseEmailDraft(blockText) {
+        // blockText is the content between START / END markers (already
+        // stripped by the caller).
+        var toMatch = blockText.match(/^To:\s*(.*)$/m);
+        var subjMatch = blockText.match(/^Subject:\s*(.*)$/m);
+        // Strip the To: + Subject: administrative lines from the body
+        var body = blockText
+            .replace(/^To:\s*.*$/m, '')
+            .replace(/^Subject:\s*.*$/m, '')
+            .replace(/^\n+/, '');
+        return {
+            to: (toMatch && toMatch[1] || '').trim(),
+            subject: (subjMatch && subjMatch[1] || '').trim(),
+            body: body.trim(),
+        };
+    }
+
+    // Extract first-name from "Hi <name>," greeting in the body, used as a
+    // fallback for the customer record when lookup wasn't called.
+    function extractGreetingName(body) {
+        var m = body.match(/^Hi\s+([^,\n]+),/m);
+        return m ? m[1].trim() : '';
+    }
+
+    // Build a mailto: URL. URL-encodes subject + body per RFC. Caps body at
+    // 1,800 chars defensively — some Windows mail handlers truncate URLs
+    // around the 2KB mark, which would silently drop the end of the email.
+    function buildMailto(draft) {
+        var BODY_CAP = 1800;
+        var body = draft.body || '';
+        var truncated = false;
+        if (body.length > BODY_CAP) {
+            body = body.slice(0, BODY_CAP);
+            truncated = true;
+            console.warn('[ai-chat] mailto body capped at ' + BODY_CAP + ' chars (full body still available in clipboard if you Copy).');
+        }
+        var params = [];
+        if (draft.subject) params.push('subject=' + encodeURIComponent(draft.subject));
+        if (body) params.push('body=' + encodeURIComponent(body));
+        var qs = params.length ? '?' + params.join('&') : '';
+        var to = (draft.to || '').trim();
+        // encodeURIComponent over the email is RFC-safe and tolerates '+' and other delims.
+        return 'mailto:' + encodeURIComponent(to) + qs;
+    }
+
+    // POST the AI-drafted quote to /api/quote_sessions + /api/quote_items.
+    // Fire-and-forget pattern: caller doesn't await — see handleCommitDraft.
+    async function saveContractEmbroideryQuote(opts) {
+        var calcContext = opts.calcContext;
+        var customer = opts.customer || {};
+        if (!calcContext) throw new Error('calcContext required');
+
+        var proxyBase = API_BASE_URL;
+
+        // 1. Atomic sequence — auto-creates the CEMB counter on first call.
+        var seqRes = await fetch(proxyBase + '/api/quote-sequence/CEMB');
+        if (!seqRes.ok) throw new Error('quote-sequence returned ' + seqRes.status);
+        var seqData = await seqRes.json();
+        var quoteID = seqData.prefix + '-' + seqData.year + '-' + String(seqData.sequence).padStart(3, '0');
+
+        var nowISO = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+        var expiresISO = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().replace(/\.\d{3}Z$/, '');
+
+        var productLabel = (PRODUCT_META[calcContext.product] && PRODUCT_META[calcContext.product].label) || calcContext.product;
+        var stitchK = Math.round(calcContext.stitches / 1000);
+        var skuBase = calcContext.product === 'cap' ? 'CTR-Cap'
+            : calcContext.product === 'fullback' ? 'CTR-FB'
+            : 'CTR-Garmt';
+
+        // 2. Session row — uses the same fields embroidery-quote-service maps to.
+        var session = {
+            QuoteID: quoteID,
+            SessionID: 'cemb_ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11),
+            CustomerEmail: customer.email || '',
+            CustomerName: customer.name || 'AI Draft',
+            CompanyName: customer.company || '',
+            SalesRepEmail: 'ruth@nwcustomapparel.com',
+            SalesRepName: 'Ruthie Nhoung',
+            TotalQuantity: calcContext.qty,
+            SubtotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
+            LTMFeeTotal: parseFloat((calcContext.ltmFee || 0).toFixed(2)),
+            TotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
+            Status: 'Open',
+            CreatedAt_Quote: nowISO,
+            ExpiresAt: expiresISO,
+            Notes: 'AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches',
+            StitchCount: calcContext.stitches,
+            PrintLocation: calcContext.product === 'cap' ? 'Cap'
+                : calcContext.product === 'fullback' ? 'Full Back'
+                : 'Left Chest',
+        };
+        var sessRes = await fetch(proxyBase + '/api/quote_sessions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(session),
+        });
+        if (!sessRes.ok) {
+            var t = await sessRes.text();
+            throw new Error('quote_sessions POST returned ' + sessRes.status + ': ' + t.slice(0, 120));
+        }
+
+        // 3. Line item row
+        var item = {
+            QuoteID: quoteID,
+            LineNumber: 1,
+            StyleNumber: skuBase,
+            ProductName: 'Contract ' + productLabel + ' embroidery · ' + stitchK + 'K stitches',
+            Quantity: calcContext.qty,
+            FinalUnitPrice: parseFloat(calcContext.finalUnit.toFixed(2)),
+            LineTotal: parseFloat(calcContext.orderTotal.toFixed(2)),
+            SizeBreakdown: '',
+            AddedAt: nowISO,
+        };
+        var itemRes = await fetch(proxyBase + '/api/quote_items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item),
+        });
+        if (!itemRes.ok) {
+            var t2 = await itemRes.text();
+            // Session was saved but line item failed — log and surface to caller.
+            console.warn('[ai-chat] quote_items POST failed: ' + itemRes.status + ' ' + t2.slice(0, 120) +
+                ' — session ' + quoteID + ' was saved but has no line items.');
+            throw new Error('quote_items POST returned ' + itemRes.status);
+        }
+
+        return quoteID;
+    }
+
+    // Action handler shared by Copy + Open in Outlook. Takes the action
+    // immediately, then fires the quote save in the background. Receives
+    // the draft as a closed-over arg so each rendered email-card is bound
+    // to ITS specific draft — clicking an older card's button still pulls
+    // the correct text even if a newer draft has been rendered since.
+    function handleCommitDraft(action, btn, draft) {
+        if (!draft) draft = aiState.currentDraft;
+        if (!draft) return;
+
+        // Take the immediate action
+        if (action === 'copy') {
+            copyToClipboard(draft.body).then(function () {
+                if (btn) {
+                    btn.classList.add('copied');
+                    var span = btn.querySelector('span');
+                    if (span) {
+                        var orig = span.textContent;
+                        span.textContent = 'Copied!';
+                        setTimeout(function () {
+                            btn.classList.remove('copied');
+                            span.textContent = orig;
+                        }, 2200);
+                    }
+                }
+            });
+        } else if (action === 'outlook') {
+            // Also copy the body to clipboard as a safety net in case the
+            // mailto: truncated long bodies — Ruthie can paste-replace.
+            copyToClipboard(draft.body).catch(function () { /* non-fatal */ });
+            var url = buildMailto(draft);
+            window.location.href = url;
+            if (btn) {
+                btn.classList.add('opened');
+                var span2 = btn.querySelector('span');
+                if (span2) {
+                    var orig2 = span2.textContent;
+                    span2.textContent = 'Opening Outlook…';
+                    setTimeout(function () {
+                        btn.classList.remove('opened');
+                        span2.textContent = orig2;
+                    }, 2200);
+                }
+            }
+        }
+
+        // Fire-and-forget quote save. Don't block the click.
+        var calcCtx = buildCalcContext();
+        if (!calcCtx) {
+            console.warn('[ai-chat] no calcContext at save time — skipping quote save');
+            return;
+        }
+        // Prefer the snapshot taken at draft-render time (closed over by the
+        // card's buttons) over the live aiState.lastLookup — clicks happen
+        // potentially much later than the render, and lastLookup may have
+        // moved on. Fall back to live aiState only if no snapshot is attached.
+        var lookup = draft.lookupSnapshot || aiState.lastLookup;
+        // Only trust the lookup when its email matches the draft's recipient
+        // — defensive against the rare case where the AI emits a To: line that
+        // doesn't correspond to the captured tool result.
+        var draftEmail = (draft.to || '').toLowerCase();
+        var lookupEmail = (lookup && lookup.email || '').toLowerCase();
+        var lookupTrusted = !!lookup && draftEmail && draftEmail === lookupEmail;
+        var customer = {
+            email: draft.to || (lookupTrusted ? lookup.email : '') || '',
+            name: (lookupTrusted ? lookup.contact_name : '') || extractGreetingName(draft.body) || '',
+            company: (lookupTrusted ? lookup.company : '') || '',
+        };
+        saveContractEmbroideryQuote({ calcContext: calcCtx, customer: customer })
+            .then(function (quoteID) {
+                showToast('Saved as ' + quoteID);
+            })
+            .catch(function (err) {
+                console.warn('[ai-chat] quote save failed:', err);
+                showToast('Email ready. (Couldn\'t save quote — see console.)');
+            });
+    }
 
     function buildCalcContext() {
         var calc = computeUnit(state.product, state.qty, state.stitches);
@@ -651,7 +868,11 @@
      * reply. If found, split the reply into the conversational part
      * (before the marker) + the email draft (between markers). Render
      * the conversational part in a normal bubble; render the email in
-     * an email-draft-card with a Copy button.
+     * an email-draft-card with Copy + Open in Outlook buttons.
+     *
+     * Phase 3 (2026-05-14): also parses To/Subject out of the draft and
+     * stashes the structured draft on aiState.currentDraft so the action
+     * buttons can build a mailto: URL and save the quote.
      */
     function renderAssistantReply(bubbleEl, fullText) {
         var startMarker = 'EMAIL DRAFT START';
@@ -664,7 +885,24 @@
         }
         var preamble = fullText.slice(0, startIdx).trim();
         var emailEnd = endIdx === -1 ? fullText.length : endIdx;
-        var emailBody = fullText.slice(startIdx + startMarker.length, emailEnd).trim();
+        var blockText = fullText.slice(startIdx + startMarker.length, emailEnd).trim();
+
+        // Parse the To: / Subject: lines into structured fields. We bind
+        // each card's buttons to THIS draft via closure (see below) so
+        // older cards keep working even after newer drafts arrive — but
+        // we also stash the latest on aiState for any caller that wants
+        // "the most recent" (e.g. external integrations).
+        var parsed = parseEmailDraft(blockText);
+        var cardDraft = {
+            to: parsed.to,
+            subject: parsed.subject,
+            body: parsed.body,
+            // Snapshot of the lookup at the moment this draft was generated.
+            // Prevents staleness when Ruthie iterates on multiple customers
+            // in a single session — each card's save uses its own snapshot.
+            lookupSnapshot: aiState.lastLookup ? Object.assign({}, aiState.lastLookup) : null,
+        };
+        aiState.currentDraft = cardDraft;
 
         // Render the preamble (conversational text) in the existing bubble
         bubbleEl.textContent = preamble || '(Email drafted — see below.)';
@@ -678,26 +916,66 @@
         label.textContent = 'Email draft';
         var body = document.createElement('div');
         body.className = 'draft-body';
-        body.textContent = emailBody;
+        body.textContent = parsed.body;
+
+        // Meta row: To / Subject for visibility (only renders if populated)
+        if (parsed.to || parsed.subject) {
+            var meta = document.createElement('div');
+            meta.className = 'draft-meta';
+            if (parsed.to) {
+                var toRow = document.createElement('div');
+                toRow.className = 'draft-meta-row';
+                toRow.innerHTML = '<span class="draft-meta-label">To</span><span class="draft-meta-val">' +
+                    String(parsed.to).replace(/[<>&]/g, function (m) { return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[m]; }) +
+                    '</span>';
+                meta.appendChild(toRow);
+            }
+            if (parsed.subject) {
+                var subjRow = document.createElement('div');
+                subjRow.className = 'draft-meta-row';
+                subjRow.innerHTML = '<span class="draft-meta-label">Subject</span><span class="draft-meta-val">' +
+                    String(parsed.subject).replace(/[<>&]/g, function (m) { return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[m]; }) +
+                    '</span>';
+                meta.appendChild(subjRow);
+            }
+            card.appendChild(label);
+            card.appendChild(meta);
+        } else {
+            card.appendChild(label);
+        }
+        card.appendChild(body);
+
         var actions = document.createElement('div');
         actions.className = 'email-draft-actions';
+
+        // Open in Outlook (primary action — pre-fills To/Subject/Body)
+        var outlookBtn = document.createElement('button');
+        outlookBtn.type = 'button';
+        outlookBtn.className = 'btn-outlook';
+        outlookBtn.innerHTML =
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>' +
+            '<polyline points="22,6 12,13 2,6"/>' +
+            '</svg><span>Open in Outlook</span>';
+        outlookBtn.addEventListener('click', function () {
+            handleCommitDraft('outlook', outlookBtn, cardDraft);
+        });
+        actions.appendChild(outlookBtn);
+
+        // Copy email (secondary action)
         var copyBtn = document.createElement('button');
         copyBtn.type = 'button';
         copyBtn.className = 'btn-copy-email';
-        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copy email</span>';
+        copyBtn.innerHTML =
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+            '<rect x="9" y="9" width="11" height="11" rx="2"/>' +
+            '<path d="M5 15V5a2 2 0 0 1 2-2h10"/>' +
+            '</svg><span>Copy email</span>';
         copyBtn.addEventListener('click', function () {
-            copyToClipboard(emailBody).then(function () {
-                copyBtn.classList.add('copied');
-                copyBtn.querySelector('span').textContent = 'Copied!';
-                setTimeout(function () {
-                    copyBtn.classList.remove('copied');
-                    copyBtn.querySelector('span').textContent = 'Copy email';
-                }, 2200);
-            });
+            handleCommitDraft('copy', copyBtn, cardDraft);
         });
         actions.appendChild(copyBtn);
-        card.appendChild(label);
-        card.appendChild(body);
+
         card.appendChild(actions);
         msgEl.appendChild(card);
         document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
@@ -764,6 +1042,20 @@
                         accumulated += data.text;
                         bubble.textContent = accumulated;
                         document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
+                    } else if (eventType === 'tool_result' && data.tool === 'lookup_customer') {
+                        // Phase 3: capture the single-match (or first match) so
+                        // the quote save knows the company + contact + email.
+                        // Multi-match results bypass auto-capture — Claude will
+                        // ask Ruthie which one, and a follow-up lookup with the
+                        // narrowed query will give us a single match.
+                        var matches = (data.result && data.result.matches) || [];
+                        if (matches.length === 1) {
+                            aiState.lastLookup = matches[0];
+                        } else if (matches.length > 1 && !aiState.lastLookup) {
+                            // No prior match — stash first as a best-effort fallback.
+                            // Will be overwritten when Ruthie narrows down.
+                            aiState.lastLookup = matches[0];
+                        }
                     } else if (eventType === 'error') {
                         throw new Error(data.message || 'AI stream error');
                     }

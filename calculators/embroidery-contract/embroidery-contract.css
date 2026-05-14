@@ -1341,6 +1341,77 @@ a.logo:hover { opacity: 0.85; }
 .btn-copy-email:hover { background: var(--pink-700); }
 .btn-copy-email.copied { background: var(--ok); border-color: var(--ok); }
 
+/* Open-in-Outlook — primary action. Outlook-blue accent so it visually
+   reads as "the button". Copy email demotes to outlined secondary. */
+.btn-outlook {
+    background: #0078D4;
+    color: #fff;
+    border: 1px solid #106EBE;
+    border-radius: 6px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 140ms;
+    cursor: pointer;
+}
+.btn-outlook:hover { background: #106EBE; }
+.btn-outlook.opened { background: var(--ok); border-color: var(--ok); }
+.btn-outlook svg { flex-shrink: 0; }
+
+/* Phase 3 demotes Copy email to secondary visual weight — it's still a
+   first-class action but Outlook is the recommended path. */
+.email-draft-actions .btn-copy-email {
+    background: #FFFFFF;
+    color: var(--pink-700);
+    border: 1px solid var(--pink-300, #F5B5C8);
+}
+.email-draft-actions .btn-copy-email:hover {
+    background: var(--pink-50);
+    color: var(--pink-700);
+}
+.email-draft-actions .btn-copy-email.copied {
+    background: var(--ok);
+    color: #fff;
+    border-color: var(--ok);
+}
+
+/* Meta row inside the draft card — shows the parsed To: + Subject: so
+   Ruthie can verify before clicking Open in Outlook. */
+.email-draft-card .draft-meta {
+    margin-bottom: 8px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+.email-draft-card .draft-meta-row {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+}
+.email-draft-card .draft-meta-row + .draft-meta-row {
+    margin-top: 4px;
+}
+.email-draft-card .draft-meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-soft, #6B7280);
+    flex: 0 0 52px;
+}
+.email-draft-card .draft-meta-val {
+    flex: 1;
+    color: var(--ink);
+    word-break: break-word;
+}
+
 /* Input form at bottom of panel */
 .ai-chat-input {
     border-top: 1px solid var(--line);
