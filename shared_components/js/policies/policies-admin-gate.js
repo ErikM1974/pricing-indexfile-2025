@@ -5,17 +5,21 @@
  *   window.IS_POLICIES_ADMIN = true | false
  *   window.POLICIES_USER     = { firstName, email } | null
  *
- * Two-step flow:
- *   1. GET /api/crm-session/me — if Express CRM session already exists and
- *      includes 'policies-admin' in permissions, we're done.
- *   2. If session not established but the page has the Caspio auth embed
- *      (#auth-firstname etc.) populated, POST /api/crm-session to bootstrap
- *      the session, then re-fetch /me. This lets logged-in Caspio users
- *      (like Erik) get admin affordances on the Policies Hub without first
- *      visiting one of the legacy CRM dashboards.
+ * Three-step resolution (fastest first):
+ *   1. GET /api/crm-session/me — if Express CRM session already has
+ *      'policies-admin' in permissions, done.
+ *   2. sessionStorage check — staff-dashboard.html stamps `nwca_user_name`
+ *      and `nwca_user_email` when the user logs in. If present, POST
+ *      /api/crm-session immediately to bootstrap. This is the normal path
+ *      for anyone who got here via the staff dashboard.
+ *   3. Caspio embed wait — if no sessionStorage, wait up to 3s for the
+ *      Caspio [@authfield] placeholders to populate, then bootstrap. This
+ *      is the cold-start path (visit policies-hub.html directly without
+ *      logging in to staff dashboard first).
  *
- * Fires a 'policies:admin-resolved' event on document so other modules can
- * react without a polling race.
+ * Fires 'policies:admin-resolved' event on document so other modules can
+ * react without polling. Verbose console logs (`[admin-gate]`) make
+ * production debugging straightforward.
  */
 (function () {
     'use strict';
@@ -23,13 +27,27 @@
     window.IS_POLICIES_ADMIN = false;
     window.POLICIES_USER = null;
 
+    const log = (...args) => console.log('[admin-gate]', ...args);
+
+    function readSessionStorage() {
+        const name = sessionStorage.getItem('nwca_user_name') || '';
+        const email = sessionStorage.getItem('nwca_user_email') || '';
+        if (!name && !email) return null;
+        const parts = name.split(/\s+/);
+        return {
+            firstName: parts[0] || '',
+            lastName: parts.slice(1).join(' '),
+            email
+        };
+    }
+
     function readCaspioAuth() {
         const fn = document.getElementById('auth-firstname')?.textContent?.trim() || '';
         const ln = document.getElementById('auth-lastname')?.textContent?.trim() || '';
         const em = document.getElementById('auth-email')?.textContent?.trim() || '';
 
-        // Caspio renders `[@authfield:First_Name]` literal if the user is NOT
-        // signed in (or the embed hasn't loaded yet). Treat those as empty.
+        // Caspio renders literal `[@authfield:First_Name]` when not signed in
+        // OR when the embed script hasn't replaced placeholders yet.
         const isReal = v => v && !v.includes('@authfield') && !v.includes('[@auth');
 
         if (!isReal(fn)) return null;
@@ -50,24 +68,29 @@
         }
     }
 
-    async function bootstrapSession(caspioUser) {
+    async function bootstrapSession(user) {
         try {
-            const fullName = caspioUser.firstName + (caspioUser.lastName ? ' ' + caspioUser.lastName : '');
+            const fullName = user.firstName + (user.lastName ? ' ' + user.lastName : '');
+            log('bootstrap → POST /api/crm-session', { name: fullName, email: user.email });
             const res = await fetch('/api/crm-session', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: fullName, email: caspioUser.email })
+                body: JSON.stringify({ name: fullName, email: user.email })
             });
-            if (!res.ok) return false;
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) {
+                log('bootstrap failed', res.status, data);
+                return false;
+            }
+            log('bootstrap ok', data);
             return true;
         } catch (e) {
+            log('bootstrap error', e);
             return false;
         }
     }
 
-    // Caspio's embed script populates the auth fields asynchronously. Poll
-    // for up to ~3s before giving up — the embed usually lands in <500ms.
     function waitForCaspio(timeoutMs = 3000) {
         return new Promise(resolve => {
             const start = Date.now();
@@ -82,16 +105,32 @@
     }
 
     async function resolve() {
-        // 1) Check existing Express session
+        // 1) Existing Express session?
         let me = await fetchMe();
+        log('initial /me', me);
 
-        // 2) If not authenticated and the page embeds Caspio auth,
-        //    try to bootstrap an Express session from it.
-        if (!me?.authenticated && document.getElementById('auth-firstname')) {
-            const caspioUser = await waitForCaspio();
-            if (caspioUser) {
-                const ok = await bootstrapSession(caspioUser);
+        // 2) Not authenticated → try sessionStorage (fast path, staff-dashboard set it)
+        if (!me?.authenticated) {
+            const ssUser = readSessionStorage();
+            if (ssUser?.firstName) {
+                log('sessionStorage user found', ssUser);
+                const ok = await bootstrapSession(ssUser);
                 if (ok) me = await fetchMe();
+                log('after sessionStorage bootstrap /me', me);
+            }
+        }
+
+        // 3) Still not authenticated → wait for Caspio embed (cold start)
+        if (!me?.authenticated && document.getElementById('auth-firstname')) {
+            log('waiting for Caspio embed…');
+            const cu = await waitForCaspio();
+            if (cu) {
+                log('Caspio embed user found', cu);
+                const ok = await bootstrapSession(cu);
+                if (ok) me = await fetchMe();
+                log('after Caspio bootstrap /me', me);
+            } else {
+                log('Caspio embed timeout — no auth available');
             }
         }
 
@@ -102,6 +141,8 @@
             lastName: me.lastName || '',
             email: me.email || ''
         } : null;
+
+        log('resolved', { isAdmin: window.IS_POLICIES_ADMIN, user: window.POLICIES_USER });
 
         document.documentElement.classList.toggle('is-policies-admin', window.IS_POLICIES_ADMIN);
         document.dispatchEvent(new CustomEvent('policies:admin-resolved', {
