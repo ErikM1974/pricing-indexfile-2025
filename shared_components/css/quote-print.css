@@ -22,6 +22,15 @@
  * .meta-card, .product-table, .totals-card, .quote-footer, etc.).
  */
 
+/* Phase 11.1 (2026-05-14): print-only terms paragraph.
+   Mirrors the email closing — "Pricing is based on customer-supplied
+   blanks. This quote is valid for 30 days. Reply to confirm or send
+   a PO when you're ready." Hidden on the live quote view; shows only
+   on print (Save as PDF). */
+.print-only-terms {
+    display: none;
+}
+
 @media print {
 
     /* ============================================================
@@ -30,7 +39,7 @@
 
     @page {
         size: letter;
-        margin: 0.4in;
+        margin: 0.35in;  /* Phase 11.1: tightened from 0.4in for 1-page fit */
     }
 
     html, body {
@@ -200,8 +209,8 @@
     .quote-meta {
         display: grid !important;
         grid-template-columns: 1.2fr 1fr 1.1fr !important;
-        gap: 10pt !important;
-        margin: 0 0 12pt 0 !important;
+        gap: 8pt !important;             /* Phase 11.1: 10pt → 8pt */
+        margin: 0 0 10pt 0 !important;   /* Phase 11.1: 12pt → 10pt */
         padding: 0 !important;
         page-break-inside: avoid;
         break-inside: avoid;
@@ -299,10 +308,15 @@
         color: #475569 !important;
     }
 
-    /* Dates card — compact 2-column key/value rows */
+    /* Dates card — key/value rows.
+       Phase 11.1 (2026-05-14): NO `display:` rule. Web view sets
+       display:flex for visible rows; hidden rows have inline
+       `style="display: none;"`. The Phase 11 `display: grid !important`
+       forced empty rows (Order #, Req Ship Date, etc.) to render as
+       "---". Removing the display override lets inline hide win. */
     .dates-card .date-row {
-        display: grid !important;
-        grid-template-columns: auto 1fr !important;
+        justify-content: space-between;
+        align-items: baseline;
         gap: 6pt !important;
         font-size: 9pt !important;
         margin: 0 0 2pt 0 !important;
@@ -327,6 +341,11 @@
        STATUS BANNERS (expired / accepted)
        ============================================================ */
 
+    /* Phase 11.1 (2026-05-14): NO `display:` rule here — these banners
+       default to inline `style="display: none;"` in the HTML and only
+       flip to display:flex when the renderer JS detects an expired or
+       accepted quote. Using `display: flex !important` (the Phase 11
+       bug) overrode the inline hide → empty banners always showed. */
     .expired-banner,
     .accepted-banner {
         padding: 6pt 10pt !important;
@@ -337,7 +356,6 @@
         background: #f0fdf4 !important;
         border: 1pt solid #86efac !important;
         color: #166534 !important;
-        display: flex !important;
         align-items: center;
         gap: 8pt;
     }
@@ -444,7 +462,7 @@
 
     .product-table tbody td {
         border-bottom: 0.5pt solid #e2e8f0 !important;
-        padding: 6pt !important;
+        padding: 5pt 6pt !important;     /* Phase 11.1: 6pt → 5pt vertical */
         font-size: 9pt !important;
         color: #1a202c !important;
         vertical-align: top !important;
@@ -602,12 +620,29 @@
     }
 
     /* ============================================================
+       PRINT-ONLY TERMS PARAGRAPH
+       Phase 11.1 (2026-05-14): mirrors the email closing, shown only
+       on print. Sits between the totals card and the footer.
+       ============================================================ */
+
+    .print-only-terms {
+        display: block !important;
+        margin: 8pt 0 6pt 0 !important;
+        padding: 0 !important;
+        font-size: 9pt !important;
+        color: #475569 !important;
+        line-height: 1.5 !important;
+        font-style: italic;
+        page-break-inside: avoid;
+    }
+
+    /* ============================================================
        FOOTER — terms + contact, single block
        ============================================================ */
 
     .quote-footer {
-        margin: 14pt 0 0 0 !important;
-        padding: 8pt 0 0 0 !important;
+        margin: 10pt 0 0 0 !important;   /* Phase 11.1: 14pt → 10pt */
+        padding: 6pt 0 0 0 !important;   /* Phase 11.1: 8pt → 6pt */
         border-top: 1pt solid #e2e8f0 !important;
         background: none !important;
         color: #475569 !important;
