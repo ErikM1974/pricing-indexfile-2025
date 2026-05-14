@@ -20,6 +20,7 @@ class QuoteViewPage {
             'DTF': 'Direct-to-Film',
             'EMB': 'Embroidery',
             'EMBC': 'Customer Supplied Embroidery',
+            'CEMB': 'Contract Embroidery', // Phase 6: fallback when CEMB quote has no items
             'SPC': 'Screen Print',
             'SP': 'Screen Print',
             'RICH': 'Richardson Caps',
@@ -193,6 +194,14 @@ class QuoteViewPage {
         if (shipToAddress || shipToCity || shipMethod || hasTracking) {
             const shipCard = document.getElementById('ship-to-card');
             if (shipCard) {
+                // Phase 6 (2026-05-14): CEMB quotes use the second meta-card
+                // for the customer's BILLING address (CRM stores a mailing
+                // address — often a PO Box — not a shipping destination).
+                // Other quote types keep the default "Ship To" heading.
+                if ((this.quoteId || '').startsWith('CEMB')) {
+                    const h3 = shipCard.querySelector('h3');
+                    if (h3) h3.textContent = 'Billing Address';
+                }
                 if (shipToAddress) {
                     document.getElementById('ship-to-address').textContent = shipToAddress;
                 }
@@ -869,21 +878,23 @@ class QuoteViewPage {
             return '';
         }
 
-        // Style → display label map. Phase 5 (2026-05-14) extended from the
-        // old binary {DECC: Caps, else: Garments} to include:
-        //   - DECG-FB → "Customer Full Back" (was rendering as "Customer Garments")
-        //   - CTR-Cap / CTR-Garmt / CTR-FB → AI-drafted contract embroidery
-        //     (wholesale partner brings their own blanks). Same business
-        //     model as DECG/DECC, just a different price tier.
-        // Color tints stay 2-way (blue for cap-family, amber for garment-family)
-        // so the table reads as visually consistent.
+        // Style → display label + SKU map.
+        //
+        // Phase 5 (2026-05-14): extended from old binary {DECC: Caps, else:
+        // Garments} to include DECG-FB + CTR-Cap/CTR-Garmt/CTR-FB.
+        //
+        // Phase 6 (2026-05-14): added explicit `sku` field — the style col
+        // now renders as a 2-line stack matching the calculator's segmented
+        // picker design (friendly label on top, part number subtitle below).
+        // CEMB labels simplified from "Contract X" to just "X" since the
+        // SKU subtitle (CTR-*) carries the wholesale-vs-retail distinction.
         const STYLE_LABEL_MAP = {
-            'DECC':      { label: 'Customer Caps',      isCap: true  },
-            'DECG':      { label: 'Customer Garments',  isCap: false },
-            'DECG-FB':   { label: 'Customer Full Back', isCap: false },
-            'CTR-Cap':   { label: 'Contract Cap',       isCap: true  },
-            'CTR-Garmt': { label: 'Contract Garment',   isCap: false },
-            'CTR-FB':    { label: 'Contract Full Back', isCap: false },
+            'DECC':      { label: 'Customer Caps',      sku: 'DECC',      isCap: true  },
+            'DECG':      { label: 'Customer Garments',  sku: 'DECG',      isCap: false },
+            'DECG-FB':   { label: 'Full Back',          sku: 'DECG-FB',   isCap: false },
+            'CTR-Cap':   { label: 'Cap',                sku: 'CTR-Cap',   isCap: true  },
+            'CTR-Garmt': { label: 'Garment',            sku: 'CTR-Garmt', isCap: false },
+            'CTR-FB':    { label: 'Full Back',          sku: 'CTR-FB',    isCap: false }, // legacy back-compat
         };
 
         let html = '';
@@ -893,14 +904,20 @@ class QuoteViewPage {
             const qty = parseInt(item.Quantity) || 0;
             const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
             const lineTotal = item.LineTotal || (qty * unitPrice);
-            const styleMeta = STYLE_LABEL_MAP[styleNumber] || { label: 'Customer-Supplied Item', isCap: false };
+            const styleMeta = STYLE_LABEL_MAP[styleNumber] || { label: 'Customer-Supplied Item', sku: styleNumber, isCap: false };
             const displayLabel = styleMeta.label;
+            const displaySku = styleMeta.sku;
             const isCap = styleMeta.isCap;
+            // Tints: blue family for caps, amber for garments/back
+            const bg     = isCap ? '#eff6ff' : '#fffbeb';
+            const ink    = isCap ? '#1e40af' : '#92400e';
+            const subInk = isCap ? '#3b82f6' : '#b45309';
 
             html += `
-                <tr class="customer-supplied-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
-                    <td class="style-col" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">
-                        ${this.escapeHtml(displayLabel)}
+                <tr class="customer-supplied-row" style="background: ${bg};">
+                    <td class="style-col" style="font-weight: 600; color: ${ink};">
+                        <div>${this.escapeHtml(displayLabel)}</div>
+                        <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; font-weight: 500; color: ${subInk}; opacity: 0.75; margin-top: 2px; letter-spacing: 0.03em;">${this.escapeHtml(displaySku)}</div>
                     </td>
                     <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>
                     <td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
@@ -3030,6 +3047,20 @@ class QuoteViewPage {
         // Check for laser-patch cap orders (EMB prefix with laser-patch embellishment type)
         if (prefix === 'EMB' && this.quoteData?.CapEmbellishmentType === 'laser-patch') {
             return 'Laser Patch';
+        }
+
+        // Phase 6 (2026-05-14): CEMB quotes — Type reflects the actual
+        // embellishment based on the line item's StyleNumber so reps see
+        // "Cap Embroidery" / "Garment Embroidery" / "Full Back Embroidery"
+        // instead of generic "Custom Quote". this.items[] is already
+        // populated by the time renderQuote() / getQuoteType() runs
+        // (loadQuote sets it at line ~117 before render at ~158).
+        if (prefix === 'CEMB' && this.items && this.items.length > 0) {
+            const style = this.items[0].StyleNumber || '';
+            if (style === 'CTR-Cap')                       return 'Cap Embroidery';
+            if (style === 'CTR-Garmt')                     return 'Garment Embroidery';
+            if (style === 'DECG-FB' || style === 'CTR-FB') return 'Full Back Embroidery';
+            return 'Contract Embroidery';
         }
 
         return this.quoteTypes[prefix] || 'Custom Quote';

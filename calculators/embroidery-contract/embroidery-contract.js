@@ -702,8 +702,11 @@
 
         var productLabel = (PRODUCT_META[calcContext.product] && PRODUCT_META[calcContext.product].label) || calcContext.product;
         var stitchK = Math.round(calcContext.stitches / 1000);
+        // Phase 6: fullback uses DECG-FB to match the calculator's
+        // segmented-picker label + the corporate embroidery pricing page +
+        // ShopWorks. CTR-FB was a Phase 3 mistake; renderer accepts both.
         var skuBase = calcContext.product === 'cap' ? 'CTR-Cap'
-            : calcContext.product === 'fullback' ? 'CTR-FB'
+            : calcContext.product === 'fullback' ? 'DECG-FB'
             : 'CTR-Garmt';
         var locationLabel = calcContext.product === 'cap' ? 'Cap'
             : calcContext.product === 'fullback' ? 'Full Back'
