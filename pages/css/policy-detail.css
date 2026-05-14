@@ -950,6 +950,305 @@ body.policy-detail-body {
 .detail-topbar-title i { color: var(--pd-accent); }
 
 /* =====================================================
+   MERMAID DIAGRAMS
+   ===================================================== */
+
+/* Rendered diagram on read view */
+.policy-body .policy-mermaid,
+.tt-content .policy-mermaid {
+    margin: 1.5em 0;
+    padding: 1.5em;
+    background: white;
+    border: 1px solid var(--pd-border);
+    border-radius: 10px;
+    text-align: center;
+    overflow-x: auto;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+.policy-body .policy-mermaid svg,
+.tt-content .policy-mermaid svg {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Fallback when render fails — show source as code */
+.policy-body pre.mermaid.mermaid-error,
+.tt-content pre.mermaid.mermaid-error {
+    background: var(--pd-bg);
+    border-left: 3px solid var(--pd-warning);
+    padding: 1em;
+    border-radius: 0 6px 6px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85em;
+    overflow-x: auto;
+}
+.mermaid-error-banner {
+    background: var(--pd-warning-soft);
+    color: var(--pd-warning);
+    padding: 0.55em 0.8em;
+    border-radius: 6px;
+    font-size: 0.85em;
+    margin: 1em 0 0.5em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+/* In edit mode — TipTap NodeView placeholder block */
+.tt-mermaid-block {
+    margin: 1em 0;
+    padding: 1em 1.2em;
+    background: linear-gradient(135deg, #faf5ff 0%, #f3eaff 100%);
+    border: 1.5px dashed #9b3edb;
+    border-radius: 10px;
+    user-select: none;
+}
+.tt-mermaid-block.ProseMirror-selectednode {
+    outline: 3px solid #9b3edb;
+    outline-offset: 2px;
+}
+.tt-mermaid-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6e3edb;
+    margin-bottom: 0.6em;
+}
+.tt-mermaid-label i { margin-right: 0.3em; }
+.tt-mermaid-source {
+    background: white;
+    border: 1px solid #e9d5ff;
+    border-radius: 6px;
+    padding: 0.7em 1em;
+    margin: 0 0 0.7em;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--pd-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.tt-mermaid-edit-btn {
+    background: white;
+    border: 1px solid #9b3edb;
+    color: #6e3edb;
+    padding: 0.35em 0.75em;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.tt-mermaid-edit-btn:hover {
+    background: #9b3edb;
+    color: white;
+}
+
+/* =====================================================
+   MERMAID INSERT MODAL
+   ===================================================== */
+.mermaid-tabs {
+    display: flex;
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--pd-border);
+}
+.mermaid-tab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.55rem 0.85rem;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--pd-text-secondary);
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: color 0.15s, border-color 0.15s;
+}
+.mermaid-tab:hover { color: var(--pd-text); }
+.mermaid-tab.active {
+    color: #6e3edb;
+    border-bottom-color: #9b3edb;
+}
+
+.mermaid-pane { display: none; }
+.mermaid-pane.active { display: block; }
+
+.mermaid-code {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--pd-border);
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    resize: vertical;
+    background: var(--pd-bg);
+    color: var(--pd-text);
+    outline: none;
+}
+.mermaid-code:focus {
+    border-color: #9b3edb;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(155, 62, 219, 0.12);
+}
+.mermaid-help {
+    font-size: 0.78rem;
+    color: var(--pd-text-muted);
+    margin-top: 0.4rem;
+}
+.mermaid-help a { color: #9b3edb; }
+
+.mermaid-preview-wrap {
+    border: 1px solid var(--pd-border);
+    border-radius: 9px;
+    overflow: hidden;
+    background: white;
+    margin-top: 1rem;
+}
+.mermaid-preview {
+    padding: 1.25rem;
+    text-align: center;
+    overflow-x: auto;
+    min-height: 80px;
+}
+.mermaid-preview svg { max-width: 100%; height: auto; }
+.mermaid-preview-loading,
+.mermaid-preview-error {
+    color: var(--pd-text-muted);
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-align: center;
+}
+.mermaid-preview-error {
+    color: var(--pd-warning);
+    background: var(--pd-warning-soft);
+    border-radius: 6px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+}
+
+/* =====================================================
+   IMAGE LIGHTBOX
+   ===================================================== */
+.pd-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+    cursor: zoom-out;
+}
+.pd-lightbox-overlay.show { opacity: 1; }
+
+.pd-lightbox-stage {
+    max-width: 95vw;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: default;
+}
+.pd-lightbox-img {
+    max-width: 95vw;
+    max-height: 88vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+    background: #1a1a1a;
+}
+.pd-lightbox-caption {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.95rem;
+    margin-top: 1rem;
+    text-align: center;
+    max-width: 80vw;
+    line-height: 1.4;
+}
+.pd-lightbox-counter {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-lightbox-close,
+.pd-lightbox-prev,
+.pd-lightbox-next {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.05s;
+    backdrop-filter: blur(8px);
+}
+.pd-lightbox-close:hover,
+.pd-lightbox-prev:hover,
+.pd-lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+.pd-lightbox-close:active,
+.pd-lightbox-prev:active,
+.pd-lightbox-next:active { transform: scale(0.95); }
+
+.pd-lightbox-close {
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-lightbox-prev,
+.pd-lightbox-next {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pd-lightbox-prev { left: 1.5rem; }
+.pd-lightbox-next { right: 1.5rem; }
+.pd-lightbox-prev:active,
+.pd-lightbox-next:active { transform: translateY(-50%) scale(0.95); }
+
+@media (max-width: 600px) {
+    .pd-lightbox-close { top: 1rem; right: 1rem; width: 40px; height: 40px; }
+    .pd-lightbox-prev, .pd-lightbox-next {
+        bottom: 1rem;
+        top: auto;
+        transform: none;
+        width: 44px;
+        height: 44px;
+    }
+    .pd-lightbox-prev { left: 1rem; }
+    .pd-lightbox-next { right: 1rem; }
+    .pd-lightbox-prev:active,
+    .pd-lightbox-next:active { transform: scale(0.95); }
+}
+
+/* =====================================================
    TOAST (copy-link confirmation, etc.)
    ===================================================== */
 .pd-toast {

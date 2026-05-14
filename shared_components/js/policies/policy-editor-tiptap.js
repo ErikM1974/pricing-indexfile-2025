@@ -143,6 +143,68 @@
         });
     }
 
+    // -------------------- Custom Mermaid Diagram node --------------------
+    // Stored in HTML as <pre class="mermaid">source code</pre> — exactly the
+    // shape Mermaid expects for client-side rendering. In edit mode, TipTap
+    // shows the raw source in a styled <pre>; on the read view, the
+    // PolicyMermaid module replaces it with the rendered SVG.
+    function createMermaidNode(mods) {
+        return mods.Node.create({
+            name: 'mermaidDiagram',
+            group: 'block',
+            content: '',
+            atom: true,
+            draggable: true,
+            selectable: true,
+
+            addAttributes() {
+                return {
+                    source: {
+                        default: '',
+                        parseHTML: el => el.textContent || '',
+                        renderHTML: () => ({})  // we render source as the child text, not an attribute
+                    }
+                };
+            },
+
+            parseHTML() {
+                return [{
+                    tag: 'pre.mermaid',
+                    getAttrs: el => ({ source: el.textContent || '' })
+                }];
+            },
+
+            renderHTML({ node }) {
+                return [
+                    'pre',
+                    mods.mergeAttributes({ class: 'mermaid' }),
+                    node.attrs.source || ''
+                ];
+            },
+
+            addNodeView() {
+                return ({ node, getPos, editor }) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'tt-mermaid-block';
+                    wrap.innerHTML = `
+                        <div class="tt-mermaid-label"><i class="fas fa-diagram-project"></i> Mermaid diagram</div>
+                        <pre class="tt-mermaid-source">${node.attrs.source.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</pre>
+                        <button type="button" class="tt-mermaid-edit-btn">Edit diagram</button>
+                    `;
+                    wrap.querySelector('.tt-mermaid-edit-btn').addEventListener('click', () => {
+                        if (window.PolicyMermaid && typeof window.PolicyMermaid.openInsertModal === 'function') {
+                            // Pop the modal with current source as the starting point.
+                            // For now we just delete + re-insert via the modal — author can copy/paste old source.
+                            // Phase 2: pass starting source to modal.
+                            window.PolicyMermaid.openInsertModal(editor);
+                        }
+                    });
+                    return { dom: wrap, contentDOM: null };
+                };
+            }
+        });
+    }
+
     // -------------------- Custom VideoEmbed node --------------------
     // Renders as a responsive container with an iframe inside. Stored in HTML as:
     //   <div data-video-embed data-src="EMBED_URL" data-kind="youtube"></div>
@@ -278,6 +340,7 @@
                 <button type="button" data-cmd="link" title="Add link"><i class="fas fa-link"></i></button>
                 <button type="button" data-cmd="imageUpload" title="Upload image"><i class="fas fa-image"></i></button>
                 <button type="button" data-cmd="videoEmbed" title="Embed YouTube / Loom / Vimeo video"><i class="fas fa-video"></i></button>
+                <button type="button" data-cmd="mermaidDiagram" title="Insert a flowchart / diagram (Mermaid)"><i class="fas fa-diagram-project"></i></button>
                 <span class="tt-dropdown" data-dropdown="callout">
                     <button type="button" class="tt-dropdown-trigger" title="Insert callout box (Tip / Warning / Important / Note)">
                         <i class="fas fa-comment-dots"></i> <i class="fas fa-caret-down tt-dropdown-caret"></i>
@@ -381,6 +444,14 @@
                         chain.toggleCallout(kind).run();
                         break;
                     }
+                    case 'mermaidDiagram': {
+                        if (!window.PolicyMermaid || typeof window.PolicyMermaid.openInsertModal !== 'function') {
+                            alert('Mermaid not loaded yet. Refresh and try again.');
+                            break;
+                        }
+                        window.PolicyMermaid.openInsertModal(editor);
+                        break;
+                    }
                 }
                 updateToolbarState(toolbarEl, editor);
             });
@@ -475,6 +546,7 @@
         const mods = await loadTipTap();
         const VideoEmbed = createVideoEmbedNode(mods);
         const Callout = createCalloutNode(mods);
+        const MermaidDiagram = createMermaidNode(mods);
 
         container.classList.add('tt-host');
         container.innerHTML = `
@@ -497,7 +569,8 @@
                 mods.Placeholder.configure({ placeholder }),
                 mods.Typography,
                 VideoEmbed,
-                Callout
+                Callout,
+                MermaidDiagram
             ],
             content: initialHtml || '<p></p>',
             editorProps: {
