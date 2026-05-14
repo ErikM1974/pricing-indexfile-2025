@@ -551,9 +551,321 @@
             renderPriceTable();
         });
 
-        // Copy buttons
-        document.getElementById('copyLinkBtn').addEventListener('click', copyShareLink);
-        document.getElementById('copyTextBtn').addEventListener('click', copyQuoteText);
+        // Round 11 (2026-05-14): replaced the Copy buttons with the AI
+        // assistant button. Legacy copyShareLink + copyQuoteText functions
+        // remain in this file for back-compat and as fallback (a future
+        // round may revive them in the AI panel).
+        var aiBtn = document.getElementById('aiDraftBtn');
+        if (aiBtn) aiBtn.addEventListener('click', openAiChatPanel);
+
+        bindAiChat();
+    }
+
+    /* =====================================================
+       AI Quote Assistant — chat panel + SSE streaming
+       Round 11 (2026-05-14, Phase 1)
+
+       Opens a right-side panel with a chat UI. Sends the page's current
+       calculator state (state.product / qty / stitches + computed prices)
+       to /api/contract-embroidery-ai/chat on every turn. Streams Claude's
+       response token-by-token via SSE. When Claude outputs the email
+       between "EMAIL DRAFT START" and "EMAIL DRAFT END" markers, we
+       render an email-draft-card with a Copy button.
+       ===================================================== */
+
+    var AI_ENDPOINT = API_BASE_URL + '/api/contract-embroidery-ai/chat';
+    var aiState = {
+        opened: false,
+        messages: [],          // [{role: 'user'|'assistant', content: string}, ...]
+        isStreaming: false,
+    };
+
+    function buildCalcContext() {
+        var calc = computeUnit(state.product, state.qty, state.stitches);
+        if (!calc) return null;
+        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
+        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+        var ltmCalc = calculateUnitPriceWithLTM(calc.unit, state.qty, ltmThreshold, ltmFeeBase);
+        return {
+            product: state.product,
+            qty: state.qty,
+            stitches: state.stitches,
+            baseUnit: Number(calc.unit.toFixed(2)),
+            finalUnit: Number(ltmCalc.finalUnitPrice.toFixed(2)),
+            ltmFee: ltmCalc.hasLtm ? ltmFeeBase : 0,
+            ltmPerPiece: Number(ltmCalc.ltmPerPiece.toFixed(2)),
+            orderTotal: Number((ltmCalc.finalUnitPrice * state.qty).toFixed(2)),
+        };
+    }
+
+    function updateContextPill() {
+        var pill = document.getElementById('aiChatContextPill');
+        if (!pill) return;
+        var ctx = buildCalcContext();
+        if (!ctx) {
+            pill.innerHTML = '<i>Pricing unavailable — close and refresh.</i>';
+            return;
+        }
+        var label = PRODUCT_META[ctx.product]?.label || ctx.product;
+        pill.innerHTML =
+            '<b>' + fmtInt(ctx.qty) + ' ' + label.toLowerCase() + (ctx.qty === 1 ? '' : 's') + '</b>' +
+            ' · ' + (ctx.stitches / 1000) + 'K stitches' +
+            ' · <b>$' + fmtMoney(ctx.finalUnit) + '/pc</b>' +
+            ' · Total <b>$' + fmtMoney(ctx.orderTotal) + '</b>' +
+            (ctx.ltmFee > 0 ? ' · incl. $' + ctx.ltmFee + ' LTM' : '');
+    }
+
+    function appendChatBubble(role, text, opts) {
+        opts = opts || {};
+        var container = document.getElementById('aiChatMessages');
+        var msg = document.createElement('div');
+        msg.className = 'chat-message ' + role + (opts.error ? ' error' : '');
+        var bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        bubble.textContent = text;
+        msg.appendChild(bubble);
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+        return bubble;
+    }
+
+    function appendTypingIndicator() {
+        var container = document.getElementById('aiChatMessages');
+        var msg = document.createElement('div');
+        msg.className = 'chat-message assistant typing-wrap';
+        var typing = document.createElement('div');
+        typing.className = 'chat-typing';
+        typing.innerHTML = '<span></span><span></span><span></span>';
+        msg.appendChild(typing);
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
+        return msg;
+    }
+
+    function removeTypingIndicator(typingEl) {
+        if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+    }
+
+    /**
+     * Look for the EMAIL DRAFT START / END markers in the assistant's
+     * reply. If found, split the reply into the conversational part
+     * (before the marker) + the email draft (between markers). Render
+     * the conversational part in a normal bubble; render the email in
+     * an email-draft-card with a Copy button.
+     */
+    function renderAssistantReply(bubbleEl, fullText) {
+        var startMarker = 'EMAIL DRAFT START';
+        var endMarker = 'EMAIL DRAFT END';
+        var startIdx = fullText.indexOf(startMarker);
+        var endIdx = fullText.indexOf(endMarker);
+        if (startIdx === -1) {
+            bubbleEl.textContent = fullText;
+            return;
+        }
+        var preamble = fullText.slice(0, startIdx).trim();
+        var emailEnd = endIdx === -1 ? fullText.length : endIdx;
+        var emailBody = fullText.slice(startIdx + startMarker.length, emailEnd).trim();
+
+        // Render the preamble (conversational text) in the existing bubble
+        bubbleEl.textContent = preamble || '(Email drafted — see below.)';
+
+        // Build the email-draft-card AFTER the conversational bubble
+        var msgEl = bubbleEl.closest('.chat-message');
+        var card = document.createElement('div');
+        card.className = 'email-draft-card';
+        var label = document.createElement('div');
+        label.className = 'draft-label';
+        label.textContent = 'Email draft';
+        var body = document.createElement('div');
+        body.className = 'draft-body';
+        body.textContent = emailBody;
+        var actions = document.createElement('div');
+        actions.className = 'email-draft-actions';
+        var copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'btn-copy-email';
+        copyBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>Copy email</span>';
+        copyBtn.addEventListener('click', function () {
+            copyToClipboard(emailBody).then(function () {
+                copyBtn.classList.add('copied');
+                copyBtn.querySelector('span').textContent = 'Copied!';
+                setTimeout(function () {
+                    copyBtn.classList.remove('copied');
+                    copyBtn.querySelector('span').textContent = 'Copy email';
+                }, 2200);
+            });
+        });
+        actions.appendChild(copyBtn);
+        card.appendChild(label);
+        card.appendChild(body);
+        card.appendChild(actions);
+        msgEl.appendChild(card);
+        document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
+    }
+
+    /**
+     * Send the current messages array + calcContext to the SSE endpoint.
+     * Stream the response into a new assistant bubble. When done, parse
+     * for an EMAIL DRAFT block and render the card if present.
+     */
+    async function sendChatMessage() {
+        if (aiState.isStreaming) return;
+        aiState.isStreaming = true;
+        var sendBtn = document.getElementById('aiChatSend');
+        if (sendBtn) sendBtn.disabled = true;
+
+        var typingEl = appendTypingIndicator();
+
+        try {
+            var response = await fetch(AI_ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: aiState.messages,
+                    calcContext: buildCalcContext(),
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('AI server returned ' + response.status);
+            }
+
+            // Replace typing indicator with the actual assistant bubble
+            removeTypingIndicator(typingEl);
+            var bubble = appendChatBubble('assistant', '');
+
+            var reader = response.body.getReader();
+            var decoder = new TextDecoder();
+            var accumulated = '';
+            var sseBuffer = '';
+
+            while (true) {
+                var chunk = await reader.read();
+                if (chunk.done) break;
+                sseBuffer += decoder.decode(chunk.value, { stream: true });
+
+                // Parse SSE events from the buffer. Each event is delimited
+                // by a blank line (\n\n) and consists of "event: TYPE" +
+                // "data: JSON" lines.
+                var events = sseBuffer.split('\n\n');
+                sseBuffer = events.pop(); // Last (possibly incomplete) chunk
+
+                for (var i = 0; i < events.length; i++) {
+                    var lines = events[i].split('\n');
+                    var eventType = null, dataJson = null;
+                    for (var j = 0; j < lines.length; j++) {
+                        if (lines[j].startsWith('event: ')) eventType = lines[j].slice(7).trim();
+                        if (lines[j].startsWith('data: ')) dataJson = lines[j].slice(6).trim();
+                    }
+                    if (!eventType || !dataJson) continue;
+                    var data;
+                    try { data = JSON.parse(dataJson); } catch (e) { continue; }
+                    if (eventType === 'delta' && data.text) {
+                        accumulated += data.text;
+                        bubble.textContent = accumulated;
+                        document.getElementById('aiChatMessages').scrollTop = document.getElementById('aiChatMessages').scrollHeight;
+                    } else if (eventType === 'error') {
+                        throw new Error(data.message || 'AI stream error');
+                    }
+                    // 'done' event — we let the stream-end handle finalization
+                }
+            }
+
+            // Stream complete — store in history + render any EMAIL DRAFT block
+            aiState.messages.push({ role: 'assistant', content: accumulated });
+            renderAssistantReply(bubble, accumulated);
+        } catch (err) {
+            console.error('[ai-chat] error:', err);
+            removeTypingIndicator(typingEl);
+            appendChatBubble(
+                'assistant',
+                "Hmm, I couldn't reach the AI right now. Please try again in a moment, or copy the quote details from the calculator manually.",
+                { error: true }
+            );
+        } finally {
+            aiState.isStreaming = false;
+            if (sendBtn) sendBtn.disabled = false;
+            var ta = document.getElementById('aiChatTextarea');
+            if (ta) ta.focus();
+        }
+    }
+
+    function openAiChatPanel() {
+        var panel = document.getElementById('aiChatPanel');
+        if (!panel) return;
+        panel.classList.add('is-open');
+        panel.setAttribute('aria-hidden', 'false');
+        aiState.opened = true;
+        updateContextPill();
+
+        // First-open greeting — send an empty user message so Claude
+        // greets Ruthie with the calc context.
+        if (aiState.messages.length === 0) {
+            aiState.messages.push({
+                role: 'user',
+                content: '(Open the chat — greet Ruthie and ask for the customer details.)',
+            });
+            sendChatMessage();
+        }
+
+        setTimeout(function () {
+            var ta = document.getElementById('aiChatTextarea');
+            if (ta) ta.focus();
+        }, 360);
+    }
+
+    function closeAiChatPanel() {
+        var panel = document.getElementById('aiChatPanel');
+        if (!panel) return;
+        panel.classList.remove('is-open');
+        panel.setAttribute('aria-hidden', 'true');
+        aiState.opened = false;
+    }
+
+    function bindAiChat() {
+        var closeBtn = document.getElementById('aiChatClose');
+        if (closeBtn) closeBtn.addEventListener('click', closeAiChatPanel);
+
+        var form = document.getElementById('aiChatForm');
+        var ta = document.getElementById('aiChatTextarea');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                var text = (ta.value || '').trim();
+                if (!text || aiState.isStreaming) return;
+                aiState.messages.push({ role: 'user', content: text });
+                appendChatBubble('user', text);
+                ta.value = '';
+                ta.style.height = 'auto';
+                updateContextPill();
+                sendChatMessage();
+            });
+        }
+        if (ta) {
+            ta.addEventListener('keydown', function (e) {
+                // Enter sends; Shift+Enter newline
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (form) form.dispatchEvent(new Event('submit'));
+                }
+            });
+            // Auto-grow textarea
+            ta.addEventListener('input', function () {
+                ta.style.height = 'auto';
+                ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+            });
+        }
+        // Refresh the context pill whenever the calculator inputs change
+        ['ecQuantity', 'ecStitches', 'qty', 'stitch'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.addEventListener('input', function () {
+                if (aiState.opened) updateContextPill();
+            });
+        });
+        // Escape closes the panel
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && aiState.opened) closeAiChatPanel();
+        });
     }
 
     /* ---------------------- Init ---------------------- */

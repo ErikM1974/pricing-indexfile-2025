@@ -13,16 +13,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-cap-rename">
+    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-ai-phase1">
 </head>
 <body>
 
     <!-- ========== Top bar ========== -->
     <header class="topbar">
-        <div class="logo">
-            <span class="logo-mark">NW</span>
-            <span>Northwest Custom Apparel</span>
-        </div>
+        <a href="/staff-dashboard.html" class="logo" title="Back to Staff Dashboard">
+            <img class="logo-img" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+        </a>
         <nav class="crumbs">
             <a href="/staff-dashboard.html">
                 <!-- back chevron (rotated forward chevron) -->
@@ -167,13 +166,13 @@
                 </div>
 
                 <div class="calc-actions">
-                    <button type="button" class="btn primary" id="copyLinkBtn">
-                        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 1 0 5.66 5.66l1-1"/></svg>
-                        <span>Copy quote link</span>
-                    </button>
-                    <button type="button" class="btn ghost" id="copyTextBtn">
-                        <svg class="ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-                        <span>Copy quote text</span>
+                    <!-- Round 11 (2026-05-14): replaced the two Copy buttons with
+                         a single AI assistant button. Click → opens the AI chat
+                         panel on the right; Claude reads the current calculator
+                         state and drafts a polished email quote for Ruthie. -->
+                    <button type="button" class="btn primary btn--ai" id="aiDraftBtn">
+                        <span class="ai-sparkle" aria-hidden="true">✨</span>
+                        <span>Draft Email Quote with AI</span>
                     </button>
                 </div>
             </div>
@@ -331,12 +330,48 @@
         </div>
     </main>
 
+    <!-- ========== AI Quote Chat Panel ==========
+         Slides in from the right edge when the rep clicks "Draft Email
+         Quote with AI". Streaming chat with Claude (via the proxy's
+         /api/contract-embroidery-ai/chat endpoint). The panel reads the
+         page's current state.* values on open, so Claude sees the same
+         quote inputs the calculator hero shows.
+
+         The chat appends bubbles to .chat-messages. When Claude emits a
+         block between "EMAIL DRAFT START" and "EMAIL DRAFT END" markers,
+         the JS extracts it and renders an .email-draft-card with a Copy
+         button so Ruthie can paste straight into Outlook. -->
+    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
+        <header class="ai-chat-head">
+            <div class="ai-chat-title">
+                <span class="ai-sparkle" aria-hidden="true">✨</span>
+                <span>AI Quote Assistant</span>
+            </div>
+            <button type="button" class="ai-chat-close" id="aiChatClose" aria-label="Close AI assistant">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </header>
+        <div class="ai-chat-context-pill" id="aiChatContextPill">
+            <!-- Filled by JS with current quote summary, e.g.:
+                 "12 caps · 8K stitches · $11.37/pc · $136.44 total" -->
+        </div>
+        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite">
+            <!-- Bubbles appended by JS -->
+        </div>
+        <form class="ai-chat-input" id="aiChatForm">
+            <textarea id="aiChatTextarea" rows="1" placeholder="Type your reply…" autocomplete="off"></textarea>
+            <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </button>
+        </form>
+    </aside>
+
     <!-- Share-link copy confirmation -->
     <div class="share-toast" id="shareToast">
         <svg class="ico" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="embroidery-contract.js?v=20260514-cap-rename"></script>
+    <script src="embroidery-contract.js?v=20260514-ai-phase1"></script>
 </body>
 </html>
