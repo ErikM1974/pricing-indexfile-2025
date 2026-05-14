@@ -60,6 +60,14 @@
                     <p class="company-name" id="company-name"></p>
                     <p class="customer-email" id="customer-email">---</p>
                     <p class="customer-phone" id="customer-phone">---</p>
+                    <!-- Phase 8 (2026-05-14): CEMB billing-block — renders under
+                         the customer info when the saved quote has a billing
+                         address (CEMB-only; legacy quotes don't populate this). -->
+                    <div class="billing-block" id="customer-billing-block" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--quote-card-border, #e2e8f0);">
+                        <p style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--quote-green, #4caf50); margin: 0 0 4px;">Billing Address</p>
+                        <p class="billing-address" id="customer-billing-address" style="margin: 0; font-size: 14px;"></p>
+                        <p class="billing-city-state" id="customer-billing-city-state" style="margin: 2px 0 0; font-size: 14px;"></p>
+                    </div>
                 </div>
                 <div class="meta-card ship-to-card" id="ship-to-card" style="display: none;">
                     <h3>Ship To</h3>
@@ -269,6 +277,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=20260514-cemb-3"></script>
+    <script src="/pages/js/quote-view.js?v=20260514-cemb-4"></script>
 </body>
 </html>

@@ -184,33 +184,80 @@ class QuoteViewPage {
             document.getElementById('po-number-row').style.display = 'block';
         }
 
-        // Ship To card (show if address OR ship method present)
-        const shipToAddress = this.quoteData.ShipToAddress || '';
-        const shipToCity = this.quoteData.ShipToCity || '';
-        const shipToState = this.quoteData.ShipToState || '';
-        const shipToZip = this.quoteData.ShipToZip || '';
+        // Phase 8 (2026-05-14): CEMB quotes get a layout swap —
+        //   - Billing address renders UNDER the customer info in the
+        //     Prepared For (left) card via the billing-block div.
+        //   - The middle card becomes "Ship To" again (Phase 6 relabel
+        //     reverted) and reads from ShippingAddress/* (not ShipTo*).
+        // For non-CEMB quotes, behavior is unchanged: middle card shows
+        // ShipTo* with the default "Ship To" heading.
+        const isCEMB_phase8 = (this.quoteId || '').startsWith('CEMB');
+
+        if (isCEMB_phase8) {
+            // Render billing-block inside Prepared For card
+            const billAddr = this.quoteData.ShipToAddress || '';
+            const billCity = this.quoteData.ShipToCity || '';
+            const billState = this.quoteData.ShipToState || '';
+            const billZip = this.quoteData.ShipToZip || '';
+            if (billAddr || billCity) {
+                const billBlock = document.getElementById('customer-billing-block');
+                if (billBlock) {
+                    document.getElementById('customer-billing-address').textContent = billAddr;
+                    const billCityLine = [billCity, billState].filter(Boolean).join(', ') + (billZip ? ' ' + billZip : '');
+                    document.getElementById('customer-billing-city-state').textContent = billCityLine;
+                    billBlock.style.display = 'block';
+                }
+            }
+        }
+
+        // Middle "Ship To" card data source:
+        //   - CEMB: ShippingAddress/* (the actual shipping destination
+        //     captured during the pre-flight). May be empty when "same
+        //     as billing" or "customer pickup" — handle below.
+        //   - Non-CEMB: ShipToAddress/* (legacy behavior).
+        const shipAddrField  = isCEMB_phase8 ? 'ShippingAddress' : 'ShipToAddress';
+        const shipCityField  = isCEMB_phase8 ? 'ShippingCity'    : 'ShipToCity';
+        const shipStateField = isCEMB_phase8 ? 'ShippingState'   : 'ShipToState';
+        const shipZipField   = isCEMB_phase8 ? 'ShippingZip'     : 'ShipToZip';
+        const shipToAddress = this.quoteData[shipAddrField] || '';
+        const shipToCity    = this.quoteData[shipCityField]  || '';
+        const shipToState   = this.quoteData[shipStateField] || '';
+        const shipToZip     = this.quoteData[shipZipField]   || '';
         const shipMethod = this.quoteData.ShipMethod || '';
         const hasTracking = this.quoteData.Carrier || this.quoteData.TrackingNumber;
-        if (shipToAddress || shipToCity || shipMethod || hasTracking) {
+
+        // CEMB pickup / same-as-billing edge cases (Phase 8):
+        //   - ShipMethod === 'Customer Pickup' → show "Customer Pickup"
+        //   - No shipping address but ShipMethod set → "Same as billing"
+        const isCEMBPickup        = isCEMB_phase8 && shipMethod === 'Customer Pickup';
+        const isCEMBSameAsBilling = isCEMB_phase8 && !shipToAddress && !shipToCity
+            && shipMethod && shipMethod !== 'Customer Pickup';
+
+        if (shipToAddress || shipToCity || shipMethod || hasTracking || isCEMBPickup || isCEMBSameAsBilling) {
             const shipCard = document.getElementById('ship-to-card');
             if (shipCard) {
-                // Phase 6 (2026-05-14): CEMB quotes use the second meta-card
-                // for the customer's BILLING address (CRM stores a mailing
-                // address — often a PO Box — not a shipping destination).
-                // Other quote types keep the default "Ship To" heading.
-                if ((this.quoteId || '').startsWith('CEMB')) {
-                    const h3 = shipCard.querySelector('h3');
-                    if (h3) h3.textContent = 'Billing Address';
-                }
-                if (shipToAddress) {
-                    document.getElementById('ship-to-address').textContent = shipToAddress;
-                }
-                const cityLine = [shipToCity, shipToState].filter(Boolean).join(', ') + (shipToZip ? ' ' + shipToZip : '');
-                if (cityLine.trim()) {
-                    document.getElementById('ship-to-city-state').textContent = cityLine;
-                }
-                if (shipMethod) {
+                if (isCEMBPickup) {
+                    // Show only "Customer Pickup" italic — no address, no Via row
+                    document.getElementById('ship-to-address').innerHTML =
+                        '<em style="color: #64748b;">Customer Pickup</em>';
+                    document.getElementById('ship-to-city-state').textContent = '';
+                    // Method row stays empty (the "Customer Pickup" line already conveys it)
+                } else if (isCEMBSameAsBilling) {
+                    document.getElementById('ship-to-address').innerHTML =
+                        '<em style="color: #64748b;">Same as billing</em>';
+                    document.getElementById('ship-to-city-state').textContent = '';
                     document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
+                } else {
+                    if (shipToAddress) {
+                        document.getElementById('ship-to-address').textContent = shipToAddress;
+                    }
+                    const cityLine = [shipToCity, shipToState].filter(Boolean).join(', ') + (shipToZip ? ' ' + shipToZip : '');
+                    if (cityLine.trim()) {
+                        document.getElementById('ship-to-city-state').textContent = cityLine;
+                    }
+                    if (shipMethod) {
+                        document.getElementById('ship-to-method').textContent = 'Via: ' + shipMethod;
+                    }
                 }
 
                 // Tracking info (supports comma-separated multiple tracking numbers)

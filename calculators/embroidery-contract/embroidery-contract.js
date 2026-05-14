@@ -760,9 +760,10 @@
             : calcContext.product === 'fullback' ? 'Full Back'
             : 'Left Chest';
 
-        // Phase 7: assemble shipping + tax + reseller permit data from
-        // the cfBundle (pre-flight checklist result). Defaults when no
-        // pre-flight ran: shipping=same as billing, tax=taxable, no permit.
+        // Phase 7 (+ Phase 8 ship method): assemble shipping + tax + reseller
+        // permit data from the cfBundle (pre-flight checklist result).
+        // Defaults when no pre-flight ran: shipping=same as billing,
+        // tax=taxable, no permit.
         var shippingAddr = '';
         var shippingCity = '';
         var shippingState = '';
@@ -777,32 +778,28 @@
             if (s.pickup) {
                 shipMethod = 'Customer Pickup';
             } else if (s.same_as_billing) {
-                // Leave Shipping* empty; renderer + ShopWorks infer "ship to billing"
-                shipMethod = '';
+                // Leave Shipping* empty; method tells the renderer to display
+                // "Same as billing" + Via: <method>. Default UPS Ground if
+                // AI omitted (per Phase 8 prompt requirement).
+                shipMethod = s.method || 'UPS Ground';
             } else if (s.address || s.city) {
                 shippingAddr = s.address || '';
                 shippingCity = s.city || '';
                 shippingState = s.state || '';
                 shippingZip = s.zip || '';
-                shipMethod = 'Ship to customer';
+                shipMethod = s.method || 'UPS Ground';
             }
         }
 
-        // Phase 7: extra context lines into Notes so the quote view's
-        // Special Notes box surfaces tax-exempt / reseller / shipping
-        // info without needing schema changes.
+        // Phase 7 (+ Phase 8): Notes lines. Phase 8 drops the "Shipping to:"
+        // line — that info now renders on the middle "Ship To" card directly.
+        // Keeps the tax-exempt / reseller permit line since no dedicated home.
         var notesLines = ['AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
         if (cfBundle) {
             if (!taxable) {
                 notesLines.push(resellerPermit
                     ? 'Tax-exempt · Reseller permit: ' + resellerPermit
                     : 'Tax-exempt · No reseller permit # on file');
-            }
-            if (shippingAddr || shippingCity) {
-                var shipLine = [shippingAddr, [shippingCity, shippingState].filter(Boolean).join(', ') + (shippingZip ? ' ' + shippingZip : '')].filter(Boolean).join(' · ');
-                notesLines.push('Shipping to: ' + shipLine);
-            } else if (cfBundle.shipping && cfBundle.shipping.pickup) {
-                notesLines.push('Shipping: Customer pickup');
             }
         }
 
