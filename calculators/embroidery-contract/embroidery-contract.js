@@ -623,11 +623,31 @@
 
     /* ---------- Phase 3 helpers ---------- */
 
+    // Phase 7.1 (2026-05-14): defensive Markdown-code-fence stripper.
+    // The prompt explicitly tells Claude not to wrap structured output
+    // in ```fences```, but Claude has a strong habit of wrapping JSON
+    // and "formatted output" in fences anyway. This helper strips:
+    //   - Leading "```json\n" / "```text\n" / bare "```\n"
+    //   - Trailing "\n```"
+    //   - Any orphan fence lines mid-text
+    // Idempotent on plain text — safe to call unconditionally.
+    function stripCodeFences(text) {
+        if (!text) return text;
+        var out = String(text);
+        out = out.replace(/^\s*```[a-zA-Z]*\s*\n/, '');   // leading fence with optional lang
+        out = out.replace(/\n\s*```\s*$/, '');             // trailing fence
+        out = out.replace(/^```[a-zA-Z]*\s*$/gm, '');      // orphan fence lines
+        out = out.replace(/^```\s*$/gm, '');
+        return out.trim();
+    }
+
     // Parse the EMAIL DRAFT block emitted by Claude. Returns {to, subject,
     // body} for downstream use (mailto, copy-to-clipboard, save-to-quote).
     function parseEmailDraft(blockText) {
         // blockText is the content between START / END markers (already
-        // stripped by the caller).
+        // stripped by the caller). Phase 7.1: strip any Markdown fences
+        // the AI may have wrapped the content in.
+        blockText = stripCodeFences(blockText);
         var toMatch = blockText.match(/^To:\s*(.*)$/m);
         var subjMatch = blockText.match(/^Subject:\s*(.*)$/m);
         // Strip the To: + Subject: administrative lines from the body
@@ -660,6 +680,10 @@
         var endIdx = fullText.indexOf(endMarker);
         if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
         var jsonText = fullText.slice(startIdx + startMarker.length, endIdx).trim();
+        // Phase 7.1: strip any Markdown code fences Claude wrapped the JSON
+        // in. Without this, JSON.parse fails and we fall back to defaults,
+        // which silently undoes the rep's pre-flight answers (tax/shipping).
+        jsonText = stripCodeFences(jsonText);
         try {
             var parsed = JSON.parse(jsonText);
             // Minimal sanity check
