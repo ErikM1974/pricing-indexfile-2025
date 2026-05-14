@@ -41,7 +41,10 @@
     var STITCH_PRESETS_GARMENT = [4000, 6000, 8000, 10000, 12000, 15000];
     var STITCH_PRESETS_FULLBACK = [25000, 30000, 40000, 50000];
 
-    var CONTRACT_STITCH_COUNTS = [8000, 10000, 12000, 14000, 16000, 18000, 20000, 25000];
+    // 1K increments from 8K-20K covers the realistic range for most contract
+    // logos. Round 9 (2026-05-14) — was [8K,10K,12K,14K,16K,18K,20K,25K] in 2K
+    // steps; tighter precision matches reality (logos rarely land on 2K boundaries).
+    var CONTRACT_STITCH_COUNTS = [8000, 9000, 10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000];
     var FB_STITCH_COUNTS = [25000, 30000, 35000, 40000, 45000, 50000];
 
     var PRODUCT_META = {
@@ -219,15 +222,12 @@
             orderTotalNote.textContent = fmtInt(state.qty) + ' × $' + fmtMoney(ltmCalc.finalUnitPrice);
         }
 
-        // LTM helper line under the quantity field (kept — bridges the gap
-        // between table base rates and the calculator's all-in unit)
+        // LTM helper chip — REMOVED in Round 9 (2026-05-14). The table's
+        // intersection cell now shows the all-in price, matching the hero —
+        // no gap to explain, no warning needed. Defensive null-check kept
+        // in case the markup ever returns.
         var ltmHelp = document.getElementById('ltmHelp');
-        if (ltmCalc.hasLtm) {
-            ltmHelp.hidden = false;
-            document.getElementById('ltmHelpAmount').textContent = '$' + ltmFeeBase;
-        } else {
-            ltmHelp.hidden = true;
-        }
+        if (ltmHelp) ltmHelp.hidden = !ltmCalc.hasLtm;
     }
 
     /* ---------------------- Segmented picker + presets ---------------------- */
@@ -256,19 +256,30 @@
     }
 
     function renderStitchPresets() {
+        // Round 9 (2026-05-14): preset chips + helper text removed from the
+        // markup. This function is mostly a no-op now but kept so the call
+        // sites don't have to be conditional. We still update the input's
+        // `min` attribute so the rep can't type a value below the product's
+        // minimum (browser-level enforcement).
         var p = PRODUCT_META[state.product];
+        var stitchInput = document.getElementById('stitch');
+        if (stitchInput) stitchInput.setAttribute('min', p.minStitches);
+        // If the legacy preset container is still in the DOM, populate it.
         var container = document.getElementById('stitchPresets');
-        var html = '';
-        p.stitchPresets.forEach(function (s) {
-            html += '<button type="button" data-s="' + s + '">' + (s / 1000) + 'K</button>';
-        });
-        container.innerHTML = html;
-        // Help text under input
-        var helpText = 'Minimum: <strong>' + (p.minStitches / 1000) + 'K</strong> stitches';
-        if (p.minCharge) helpText += ' · Min charge <strong>$' + p.minCharge.toFixed(2) + '</strong>';
-        document.getElementById('stitchHelp').innerHTML = helpText;
-        // Stitch input min attribute
-        document.getElementById('stitch').setAttribute('min', p.minStitches);
+        if (container) {
+            var html = '';
+            p.stitchPresets.forEach(function (s) {
+                html += '<button type="button" data-s="' + s + '">' + (s / 1000) + 'K</button>';
+            });
+            container.innerHTML = html;
+        }
+        // Legacy helper text — only update if the element is still present.
+        var stitchHelp = document.getElementById('stitchHelp');
+        if (stitchHelp) {
+            var helpText = 'Minimum: <strong>' + (p.minStitches / 1000) + 'K</strong> stitches';
+            if (p.minCharge) helpText += ' · Min charge <strong>$' + p.minCharge.toFixed(2) + '</strong>';
+            stitchHelp.innerHTML = helpText;
+        }
     }
 
     /* ---------------------- Pricing tables ---------------------- */
@@ -304,6 +315,14 @@
             theadCells[i].classList.toggle('qty-col', (i - 1) === activeTierIdx);
         }
 
+        // Round 9 (2026-05-14): the active INTERSECTION cell (row matching the
+        // current stitch count × column matching the current tier) shows the
+        // ALL-IN price (base + LTM÷qty), not the base. Matches the hero exactly
+        // — that cell IS the rep's quote. Other cells stay base as the rate
+        // card. Pre-compute LTM details once so we don't redo the math per cell.
+        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
+        var ltmFeeBase = state.tableProduct === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+
         // Build body rows
         var rowsHtml = '';
         var stitchCounts = p.stitchCounts;
@@ -317,6 +336,12 @@
                 if (state.tableProduct === 'fullback') {
                     var minPrice = (pricing.fullBack && pricing.fullBack.minPrice) || 20;
                     if (price < minPrice) price = minPrice;
+                }
+                // If this is the highlighted intersection cell AND the active
+                // qty is in the LTM tier, swap to all-in price.
+                if (isHi && ci === activeTierIdx && highlightActive) {
+                    var ltmCalc = calculateUnitPriceWithLTM(price, state.qty, ltmThreshold, ltmFeeBase);
+                    price = ltmCalc.finalUnitPrice;
                 }
                 var classes = [];
                 if (ci === activeTierIdx) classes.push('qty-col');
@@ -455,16 +480,21 @@
             renderPriceTable();
         });
 
-        // Quantity preset chips
-        document.getElementById('qtyPresets').addEventListener('click', function (e) {
-            var btn = e.target.closest('button[data-q]');
-            if (!btn) return;
-            state.qty = parseInt(btn.getAttribute('data-q'), 10);
-            qtyInput.value = state.qty;
-            renderSegmentedActiveStates();
-            renderCalculator();
-            renderPriceTable();
-        });
+        // Qty preset chips — REMOVED in Round 9 (2026-05-14). Reps type the
+        // exact quantity directly. Defensive: if the markup ever returns,
+        // wire the handler.
+        var qtyPresets = document.getElementById('qtyPresets');
+        if (qtyPresets) {
+            qtyPresets.addEventListener('click', function (e) {
+                var btn = e.target.closest('button[data-q]');
+                if (!btn) return;
+                state.qty = parseInt(btn.getAttribute('data-q'), 10);
+                qtyInput.value = state.qty;
+                renderSegmentedActiveStates();
+                renderCalculator();
+                renderPriceTable();
+            });
+        }
 
         // Stitch count input
         var stitchInput = document.getElementById('stitch');
@@ -476,16 +506,19 @@
             renderPriceTable();
         });
 
-        // Stitch preset chips (delegated — re-rendered when product changes)
-        document.getElementById('stitchPresets').addEventListener('click', function (e) {
-            var btn = e.target.closest('button[data-s]');
-            if (!btn) return;
-            state.stitches = parseInt(btn.getAttribute('data-s'), 10);
-            stitchInput.value = state.stitches;
-            renderSegmentedActiveStates();
-            renderCalculator();
-            renderPriceTable();
-        });
+        // Stitch preset chips — REMOVED in Round 9 (2026-05-14).
+        var stitchPresets = document.getElementById('stitchPresets');
+        if (stitchPresets) {
+            stitchPresets.addEventListener('click', function (e) {
+                var btn = e.target.closest('button[data-s]');
+                if (!btn) return;
+                state.stitches = parseInt(btn.getAttribute('data-s'), 10);
+                stitchInput.value = state.stitches;
+                renderSegmentedActiveStates();
+                renderCalculator();
+                renderPriceTable();
+            });
+        }
 
         // Pricing table tabs (independent from calculator product — reps can browse
         // any table without changing their calculator inputs)

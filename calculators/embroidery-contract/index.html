@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-ltm-builtin">
+    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-stripped">
 </head>
 <body>
 
@@ -114,34 +114,20 @@
                     </div>
 
                     <div class="row">
-                        <!-- Quantity -->
+                        <!-- Quantity (Round 9: preset chips + LTM warning chip removed
+                             — the table's intersection cell now shows the all-in price
+                             which matches the hero, so no warning is needed) -->
                         <div class="field">
                             <label for="qty">Quantity</label>
                             <input id="qty" class="input num" type="number" min="1" step="1" value="24">
-                            <div class="range-shortcuts" id="qtyPresets">
-                                <button type="button" data-q="12">12</button>
-                                <button type="button" data-q="24" class="active">24</button>
-                                <button type="button" data-q="48">48</button>
-                                <button type="button" data-q="72">72</button>
-                                <button type="button" data-q="144">144</button>
-                                <button type="button" data-q="288">288</button>
-                            </div>
-                            <div class="help warn" id="ltmHelp" hidden>
-                                <svg class="ico" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>
-                                LTM fee of <strong id="ltmHelpAmount">$50</strong> applies (orders 1–23)
-                            </div>
                         </div>
 
-                        <!-- Stitch Count -->
+                        <!-- Stitch Count (Round 9: preset chips + minimum-helper removed
+                             — rep types the exact stitch count, calculator hero shows
+                             the precise all-in price live) -->
                         <div class="field">
                             <label for="stitch">Stitch count</label>
                             <input id="stitch" class="input num" type="number" min="1000" step="500" value="8000">
-                            <div class="range-shortcuts" id="stitchPresets">
-                                <!-- Populated by JS based on product selection -->
-                            </div>
-                            <div class="help" id="stitchHelp">
-                                Minimum: <strong>8K</strong> stitches
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -376,6 +362,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="embroidery-contract.js?v=20260514-ltm-builtin"></script>
+    <script src="embroidery-contract.js?v=20260514-stripped"></script>
 </body>
 </html>
