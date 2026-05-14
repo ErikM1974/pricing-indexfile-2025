@@ -919,10 +919,289 @@ body.policy-detail-body {
 }
 .detail-topbar-title i { color: var(--pd-accent); }
 
-/* Print styles — Phase 2 will harden these */
+/* =====================================================
+   READ TIME PILL
+   ===================================================== */
+.meta-readtime {
+    color: var(--pd-text-muted);
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+.meta-readtime i { color: var(--pd-text-muted); }
+
+/* =====================================================
+   CALLOUT BOXES (Tip / Warning / Important / Note)
+   ===================================================== */
+.policy-body .callout,
+.tt-content .callout {
+    --callout-accent: #2563eb;
+    --callout-bg: #eff6ff;
+    --callout-icon: '\f05a';  /* fa-circle-info */
+    --callout-label: 'Note';
+    background: var(--callout-bg);
+    border-left: 4px solid var(--callout-accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1em 1.2em 1em 3em;
+    margin: 1.25em 0;
+    position: relative;
+    color: var(--pd-text);
+}
+.policy-body .callout::before,
+.tt-content .callout::before {
+    content: var(--callout-icon);
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    left: 1em;
+    top: 1.05em;
+    color: var(--callout-accent);
+    font-size: 1.1em;
+}
+.policy-body .callout::after,
+.tt-content .callout::after {
+    content: var(--callout-label);
+    position: absolute;
+    left: 3em;
+    top: -0.65em;
+    background: var(--callout-accent);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.15em 0.6em;
+    border-radius: 99px;
+}
+.policy-body .callout > *:first-child,
+.tt-content .callout > *:first-child { margin-top: 0; }
+.policy-body .callout > *:last-child,
+.tt-content .callout > *:last-child { margin-bottom: 0; }
+
+.policy-body .callout[data-kind="tip"],
+.tt-content .callout[data-kind="tip"] {
+    --callout-accent: #16a34a;
+    --callout-bg: #f0fdf4;
+    --callout-icon: '\f0eb';  /* fa-lightbulb */
+    --callout-label: 'Tip';
+}
+.policy-body .callout[data-kind="warning"],
+.tt-content .callout[data-kind="warning"] {
+    --callout-accent: #d97706;
+    --callout-bg: #fffbeb;
+    --callout-icon: '\f071';  /* fa-triangle-exclamation */
+    --callout-label: 'Warning';
+}
+.policy-body .callout[data-kind="important"],
+.tt-content .callout[data-kind="important"] {
+    --callout-accent: #dc2626;
+    --callout-bg: #fef2f2;
+    --callout-icon: '\f0a1';  /* fa-bullhorn */
+    --callout-label: 'Important';
+}
+.policy-body .callout[data-kind="info"],
+.tt-content .callout[data-kind="info"] {
+    --callout-accent: #2563eb;
+    --callout-bg: #eff6ff;
+    --callout-icon: '\f05a';  /* fa-circle-info */
+    --callout-label: 'Note';
+}
+
+/* =====================================================
+   TOOLBAR DROPDOWN (used by Callout button)
+   ===================================================== */
+.tt-toolbar .tt-dropdown {
+    position: relative;
+    display: inline-block;
+}
+.tt-toolbar .tt-dropdown-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+.tt-toolbar .tt-dropdown-caret {
+    font-size: 0.65rem;
+    opacity: 0.7;
+}
+.tt-toolbar .tt-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: white;
+    border: 1px solid var(--pd-border);
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    padding: 0.25rem;
+    min-width: 160px;
+    z-index: 10;
+}
+.tt-toolbar .tt-dropdown.open .tt-dropdown-menu {
+    display: block;
+}
+.tt-toolbar .tt-dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.45rem 0.7rem;
+    border: none;
+    background: transparent;
+    color: var(--pd-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: left;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+    font-family: inherit;
+    min-width: 0;
+}
+.tt-toolbar .tt-dropdown-menu button:hover {
+    background: var(--pd-bg);
+}
+.tt-toolbar .tt-dropdown-menu button i { width: 1.1em; text-align: center; }
+
+/* =====================================================
+   PRINT STYLES — clean, paper-friendly output for staff packets
+   ===================================================== */
 @media print {
-    .detail-topbar, .outline-sidebar, .policy-actions, .breadcrumb { display: none; }
-    .detail-main { box-shadow: none; border: none; padding: 0; }
-    .detail-layout { display: block; padding: 0; }
-    body { background: white; }
+    /* Hide everything that doesn't belong on paper */
+    .detail-topbar,
+    .outline-sidebar,
+    .policy-actions,
+    .breadcrumb,
+    .sub-procedure-card .sub-arrow,
+    .tt-toolbar,
+    .ai-modal-overlay,
+    .meta-tags {
+        display: none !important;
+    }
+
+    /* Reset paper background and layout */
+    body, .policy-detail-body {
+        background: white !important;
+        color: black !important;
+        font-size: 11pt;
+        line-height: 1.5;
+    }
+    .detail-layout {
+        display: block !important;
+        max-width: 100%;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .detail-main {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        max-width: 100%;
+    }
+
+    /* Title and meta */
+    .policy-title {
+        font-size: 22pt;
+        page-break-after: avoid;
+        margin-top: 0;
+    }
+    .policy-summary {
+        font-style: italic;
+        color: #444 !important;
+        page-break-after: avoid;
+    }
+    .policy-meta-row {
+        border-bottom: 1px solid #ccc;
+        font-size: 10pt;
+        color: #555 !important;
+        page-break-after: avoid;
+    }
+    .meta-pill, .meta-readtime, .meta-owner, .meta-updated {
+        color: #444 !important;
+        background: transparent !important;
+    }
+
+    /* Body typography */
+    .policy-body h1, .policy-body h2, .policy-body h3 {
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        color: black !important;
+    }
+    .policy-body h2 { font-size: 16pt; margin-top: 1.5em; }
+    .policy-body h3 { font-size: 13pt; margin-top: 1.2em; }
+    .policy-body p, .policy-body li {
+        orphans: 3;
+        widows: 3;
+    }
+    .policy-body blockquote {
+        border-left: 3px solid #333 !important;
+        background: #f4f4f4 !important;
+        page-break-inside: avoid;
+    }
+
+    /* Callouts print as muted bordered boxes — keep the prefix label */
+    .policy-body .callout {
+        background: #f8f8f8 !important;
+        border-left: 3px solid #333 !important;
+        page-break-inside: avoid;
+        margin: 0.9em 0;
+        padding: 0.6em 0.8em 0.6em 2.2em;
+    }
+    .policy-body .callout::before {
+        color: #333 !important;
+    }
+    .policy-body .callout::after {
+        background: #333 !important;
+        color: white !important;
+    }
+
+    /* Lists and tables */
+    .policy-body ul, .policy-body ol {
+        page-break-inside: avoid;
+    }
+    .policy-body table {
+        page-break-inside: avoid;
+        border-collapse: collapse;
+    }
+    .policy-body table th, .policy-body table td {
+        border: 1px solid #999 !important;
+    }
+
+    /* Images and embeds */
+    .policy-body img {
+        max-width: 100% !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    /* Hide videos in print — they're useless on paper */
+    .policy-body .video-embed {
+        display: none !important;
+    }
+
+    /* Sub-procedures section: indent visually */
+    .sub-procedures {
+        border-top: 1px solid #999;
+        margin-top: 2em;
+        padding-top: 1em;
+    }
+    .sub-procedure-card {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+    }
+
+    /* Links: show URL in parens after, like academic papers */
+    .policy-body a[href^="http"]::after {
+        content: " (" attr(href) ")";
+        font-size: 9pt;
+        color: #666;
+    }
+
+    /* Page setup */
+    @page {
+        margin: 0.75in;
+    }
+    @page :first {
+        margin-top: 0.5in;
+    }
 }

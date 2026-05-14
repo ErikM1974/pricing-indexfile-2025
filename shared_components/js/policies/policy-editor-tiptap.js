@@ -84,6 +84,65 @@
         return null;
     }
 
+    // -------------------- Custom Callout node --------------------
+    // Renders as a styled box with a leading icon and label. Stored in HTML as:
+    //   <div data-callout data-kind="tip">…content…</div>
+    // Four kinds: tip / warning / important / info. The kind drives the icon,
+    // color, and prefix label via CSS.
+    const CALLOUT_KINDS = [
+        { key: 'tip', label: 'Tip', icon: 'fa-lightbulb' },
+        { key: 'warning', label: 'Warning', icon: 'fa-triangle-exclamation' },
+        { key: 'important', label: 'Important', icon: 'fa-bullhorn' },
+        { key: 'info', label: 'Note', icon: 'fa-circle-info' }
+    ];
+
+    function createCalloutNode(mods) {
+        return mods.Node.create({
+            name: 'callout',
+            group: 'block',
+            content: 'block+',
+            defining: true,
+
+            addAttributes() {
+                return {
+                    kind: {
+                        default: 'tip',
+                        parseHTML: el => el.getAttribute('data-kind') || 'tip',
+                        renderHTML: attrs => ({ 'data-kind': attrs.kind })
+                    }
+                };
+            },
+
+            parseHTML() {
+                return [{ tag: 'div[data-callout]' }];
+            },
+
+            renderHTML({ node, HTMLAttributes }) {
+                const kind = node.attrs.kind || 'tip';
+                return [
+                    'div',
+                    mods.mergeAttributes(HTMLAttributes, {
+                        'data-callout': '',
+                        'data-kind': kind,
+                        class: `callout callout-${kind}`
+                    }),
+                    0  // content goes here
+                ];
+            },
+
+            addCommands() {
+                return {
+                    setCallout: (kind = 'tip') => ({ commands }) =>
+                        commands.wrapIn(this.name, { kind }),
+                    toggleCallout: (kind = 'tip') => ({ commands }) =>
+                        commands.toggleWrap(this.name, { kind }),
+                    unsetCallout: () => ({ commands }) =>
+                        commands.lift(this.name)
+                };
+            }
+        });
+    }
+
     // -------------------- Custom VideoEmbed node --------------------
     // Renders as a responsive container with an iframe inside. Stored in HTML as:
     //   <div data-video-embed data-src="EMBED_URL" data-kind="youtube"></div>
@@ -219,6 +278,17 @@
                 <button type="button" data-cmd="link" title="Add link"><i class="fas fa-link"></i></button>
                 <button type="button" data-cmd="imageUpload" title="Upload image"><i class="fas fa-image"></i></button>
                 <button type="button" data-cmd="videoEmbed" title="Embed YouTube / Loom / Vimeo video"><i class="fas fa-video"></i></button>
+                <span class="tt-dropdown" data-dropdown="callout">
+                    <button type="button" class="tt-dropdown-trigger" title="Insert callout box (Tip / Warning / Important / Note)">
+                        <i class="fas fa-comment-dots"></i> <i class="fas fa-caret-down tt-dropdown-caret"></i>
+                    </button>
+                    <div class="tt-dropdown-menu" role="menu">
+                        <button type="button" data-cmd="callout-tip"><i class="fas fa-lightbulb"></i> Tip</button>
+                        <button type="button" data-cmd="callout-warning"><i class="fas fa-triangle-exclamation"></i> Warning</button>
+                        <button type="button" data-cmd="callout-important"><i class="fas fa-bullhorn"></i> Important</button>
+                        <button type="button" data-cmd="callout-info"><i class="fas fa-circle-info"></i> Note</button>
+                    </div>
+                </span>
                 <button type="button" data-cmd="table" title="Insert table"><i class="fas fa-table"></i></button>
                 <span class="tt-sep"></span>
                 <button type="button" data-cmd="hr" title="Horizontal rule"><i class="fas fa-minus"></i></button>
@@ -303,6 +373,14 @@
                         window.PolicyAIAssist.open(editor, { title: ctx.Title, category: ctx.Category });
                         break;
                     }
+                    case 'callout-tip':
+                    case 'callout-warning':
+                    case 'callout-important':
+                    case 'callout-info': {
+                        const kind = cmd.split('-')[1];
+                        chain.toggleCallout(kind).run();
+                        break;
+                    }
                 }
                 updateToolbarState(toolbarEl, editor);
             });
@@ -366,9 +444,37 @@
         });
     }
 
+    // -------------------- Dropdown helper --------------------
+    function wireDropdowns(toolbarEl) {
+        const triggers = toolbarEl.querySelectorAll('.tt-dropdown-trigger');
+        triggers.forEach(trigger => {
+            const wrap = trigger.closest('.tt-dropdown');
+            const menu = wrap.querySelector('.tt-dropdown-menu');
+            trigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const wasOpen = wrap.classList.contains('open');
+                // Close all dropdowns first
+                toolbarEl.querySelectorAll('.tt-dropdown.open').forEach(d => d.classList.remove('open'));
+                if (!wasOpen) wrap.classList.add('open');
+            });
+            // Close menu when a child button is clicked
+            menu.addEventListener('click', () => {
+                wrap.classList.remove('open');
+            });
+        });
+        // Click outside closes
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.tt-dropdown')) {
+                toolbarEl.querySelectorAll('.tt-dropdown.open').forEach(d => d.classList.remove('open'));
+            }
+        });
+    }
+
     async function mount(container, { initialHtml = '', placeholder = 'Start writing your policy…' } = {}) {
         const mods = await loadTipTap();
         const VideoEmbed = createVideoEmbedNode(mods);
+        const Callout = createCalloutNode(mods);
 
         container.classList.add('tt-host');
         container.innerHTML = `
@@ -390,7 +496,8 @@
                 mods.TableCell,
                 mods.Placeholder.configure({ placeholder }),
                 mods.Typography,
-                VideoEmbed
+                VideoEmbed,
+                Callout
             ],
             content: initialHtml || '<p></p>',
             editorProps: {
@@ -399,6 +506,7 @@
         });
 
         wireToolbar(toolbarEl, editor);
+        wireDropdowns(toolbarEl);
         wireFileDropAndPaste(editorEl, editor);
         updateToolbarState(toolbarEl, editor);
 

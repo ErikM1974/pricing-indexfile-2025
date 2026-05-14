@@ -52,6 +52,17 @@
         };
         return map[cat] || 'fa-folder';
     }
+
+    // Estimated read time — uses a 230 wpm baseline (standard for English
+    // business prose; verified against Medium's 265 wpm benchmark but tuned
+    // down because internal SOPs have more lists and procedural detail).
+    // Rounds up; minimum 1 min.
+    function estimateReadTime(html) {
+        if (!html) return 0;
+        const plain = String(html).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const words = plain ? plain.split(/\s+/).length : 0;
+        return Math.max(1, Math.ceil(words / 230));
+    }
     // DOMPurify config — allows embedded videos from a tight allowlist of
     // trusted hosts (YouTube, Loom, Vimeo). Generic iframes from anywhere
     // are still stripped, so a malicious paste can't slip in third-party
@@ -216,6 +227,8 @@
                 .split(',').map(t => t.trim()).filter(Boolean)
                 .map(t => `<span class="meta-tag">${escapeHtml(t)}</span>`).join('');
 
+            const readMinutes = estimateReadTime(state.policy.Body_HTML);
+
             metaEl.innerHTML = `
                 <span class="meta-pill meta-category">
                     <i class="fas ${categoryIcon(state.policy.Category)}"></i> ${escapeHtml(state.policy.Category)}
@@ -223,11 +236,14 @@
                 ${state.policy.Status !== 'Published'
                     ? `<span class="meta-pill meta-status meta-${state.policy.Status.toLowerCase()}">${escapeHtml(state.policy.Status)}</span>`
                     : ''}
+                ${readMinutes > 0
+                    ? `<span class="meta-readtime"><i class="far fa-clock"></i> ${readMinutes} min read</span>`
+                    : ''}
                 <span class="meta-owner">
                     <i class="far fa-user"></i> ${escapeHtml(state.policy.Owner_Name || '—')}
                 </span>
                 <span class="meta-updated">
-                    <i class="far fa-clock"></i> Last updated ${formatDate(state.policy.Updated_At)}
+                    <i class="far fa-calendar"></i> Updated ${formatDate(state.policy.Updated_At)}
                     ${state.policy.Updated_By ? ` by ${escapeHtml(state.policy.Updated_By)}` : ''}
                 </span>
                 ${tagsHtml ? `<div class="meta-tags">${tagsHtml}</div>` : ''}
