@@ -313,11 +313,15 @@
             return;
         }
 
-        // Active tier (only highlight if the calculator's product matches the table's product
-        // — otherwise the highlight is misleading)
-        var highlightActive = state.product === state.tableProduct;
-        var activeTierIdx = highlightActive ? tierIndexForQty(state.qty) : -1;
-        var activeStitches = highlightActive ? state.stitches : -1;
+        // Round 9c (2026-05-14): column + row highlighting ALWAYS apply
+        // (qty + stitch are method-agnostic — they help reps locate the
+        // comparable cell on any tab). Only the intersection-cell ALL-IN
+        // swap is gated on product match — rolling LTM into a different
+        // method's price would be misleading, so non-matching intersection
+        // cells stay at base rate.
+        var productMatches = state.product === state.tableProduct;
+        var activeTierIdx = tierIndexForQty(state.qty);
+        var activeStitches = state.stitches;
 
         // Update thead with active column
         var theadCells = document.querySelectorAll('#priceTable thead th');
@@ -347,9 +351,11 @@
                     var minPrice = (pricing.fullBack && pricing.fullBack.minPrice) || 20;
                     if (price < minPrice) price = minPrice;
                 }
-                // If this is the highlighted intersection cell AND the active
-                // qty is in the LTM tier, swap to all-in price.
-                if (isHi && ci === activeTierIdx && highlightActive) {
+                // Intersection cell ALL-IN swap — only when the rep is
+                // actually quoting this product. Reps browsing OTHER tabs see
+                // base rates in the intersection cell (LTM rollin would be
+                // misleading since they're not quoting that method).
+                if (isHi && ci === activeTierIdx && productMatches) {
                     var ltmCalc = calculateUnitPriceWithLTM(price, state.qty, ltmThreshold, ltmFeeBase);
                     price = ltmCalc.finalUnitPrice;
                 }
