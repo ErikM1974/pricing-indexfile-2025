@@ -753,6 +753,11 @@ app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', 
 // caspio-pricing-proxy directly (unprotected, Published+Active only).
 app.all('/api/crm-proxy/policies*', ...createCrmProxy('policies', ['policies-admin']));
 
+// Policies Hub comments admin proxy - moderation actions (resolve / hide / edit)
+// require 'policies-admin'. Public reads + posts hit
+// /api/policy-comments-public on the proxy directly, no role gate.
+app.all('/api/crm-proxy/policy-comments*', ...createCrmProxy('policy-comments', ['policies-admin']));
+
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
 // The actual Claude API call lives on the proxy (where ANTHROPIC_API_KEY is

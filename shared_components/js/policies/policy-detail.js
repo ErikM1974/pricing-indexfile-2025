@@ -676,6 +676,18 @@
         await renderBody();
         renderActions();
         await renderSubProcedures();
+        renderComments();
+    }
+
+    // Mount the threaded discussion thread under the policy body.
+    // Skip in new-policy mode (no Policy_ID yet) and in edit mode (avoid
+    // pulling focus away from the editor).
+    function renderComments() {
+        if (state.isNew || state.isEditing) return;
+        if (!state.policy || !state.policy.Policy_ID) return;
+        if (window.PolicyComments && typeof window.PolicyComments.mount === 'function') {
+            window.PolicyComments.mount(state.policy.Policy_ID);
+        }
     }
 
     // -------------------- init --------------------
