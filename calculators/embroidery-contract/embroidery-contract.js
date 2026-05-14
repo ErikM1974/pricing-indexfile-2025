@@ -791,16 +791,14 @@
             }
         }
 
-        // Phase 7 (+ Phase 8): Notes lines. Phase 8 drops the "Shipping to:"
-        // line — that info now renders on the middle "Ship To" card directly.
-        // Keeps the tax-exempt / reseller permit line since no dedicated home.
+        // Phase 7 (+ Phase 8): Notes lines. Phase 8 dropped the "Shipping to:"
+        // line — info now renders on the middle "Ship To" card directly.
+        // Phase 9 (2026-05-14): hardcoded the tax-exempt line to a reminder
+        // for the rep ("verify WA Reseller Permit on file") instead of a
+        // typed-in permit number — Ruthie no longer enters one in the chat.
         var notesLines = ['AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
-        if (cfBundle) {
-            if (!taxable) {
-                notesLines.push(resellerPermit
-                    ? 'Tax-exempt · Reseller permit: ' + resellerPermit
-                    : 'Tax-exempt · No reseller permit # on file');
-            }
+        if (cfBundle && !taxable) {
+            notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
         }
 
         // 2. Session row.
