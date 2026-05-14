@@ -236,7 +236,7 @@ EmailJS Public Key: 4qSbDO-SQs19TbP80
 EmailJS Service ID: service_jgrave3
 Company Phone: 253-922-5793
 
-Quote Prefixes: DTG, RICH, EMB, EMBC, LT, PATCH, SPC, SSC, WEB
+Quote Prefixes: DTG, RICH, EMB, EMBC, CEMB, LT, PATCH, SPC, SSC, WEB
 ```
 
 ## Critical Patterns to Remember
