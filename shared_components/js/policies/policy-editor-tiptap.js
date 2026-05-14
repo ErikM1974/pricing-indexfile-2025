@@ -224,6 +224,10 @@
                 <button type="button" data-cmd="hr" title="Horizontal rule"><i class="fas fa-minus"></i></button>
                 <button type="button" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
                 <button type="button" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fas fa-redo"></i></button>
+                <span class="tt-sep"></span>
+                <button type="button" data-cmd="aiAssist" class="tt-ai-btn" title="AI Assist — let Claude help you write or polish">
+                    <i class="fas fa-sparkles"></i> <span class="tt-ai-label">AI</span>
+                </button>
                 <input type="file" accept="image/*" class="tt-file-input" hidden>
             </div>
         `;
@@ -287,6 +291,16 @@
                     }
                     case 'table': {
                         chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+                        break;
+                    }
+                    case 'aiAssist': {
+                        if (!window.PolicyAIAssist) {
+                            alert('AI Assist not loaded yet. Refresh the page and try again.');
+                            break;
+                        }
+                        // The detail page exposes the policy meta on window.POLICIES_CURRENT
+                        const ctx = window.POLICIES_CURRENT || {};
+                        window.PolicyAIAssist.open(editor, { title: ctx.Title, category: ctx.Category });
                         break;
                     }
                 }

@@ -26,6 +26,7 @@
     "node": "18.x"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
     "body-parser": "^1.20.2",
     "compression": "^1.8.0",
     "csv-parse": "^6.1.0",

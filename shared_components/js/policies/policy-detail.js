@@ -116,6 +116,8 @@
                 : await PoliciesAPI.getPolicy(id);
             state.policy = result.policy;
             state.originalUpdatedAt = state.policy.Updated_At || '';
+            // Expose policy meta for AI Assist context (read by policy-ai-assist.js)
+            window.POLICIES_CURRENT = state.policy;
 
             // External stub → redirect
             if (state.policy.External_URL && !state.isEditing) {
