@@ -345,19 +345,25 @@
        default to inline `style="display: none;"` in the HTML and only
        flip to display:flex when the renderer JS detects an expired or
        accepted quote. Using `display: flex !important` (the Phase 11
-       bug) overrode the inline hide → empty banners always showed. */
+       bug) overrode the inline hide → empty banners always showed.
+
+       Phase 11.2 (2026-05-14): tightened padding/margin/font + collapsed
+       the title + detail children into a single inline horizontal strip.
+       Was ~40pt tall (2 stacked lines + padding) → now ~14pt tall.
+       Saves ~30pt of vertical space on accepted quotes, restoring the
+       1-page fit that was lost when the Accepted banner showed. */
     .expired-banner,
     .accepted-banner {
-        padding: 6pt 10pt !important;
-        border-radius: 4pt !important;
-        margin: 0 0 8pt 0 !important;
-        font-size: 9pt !important;
+        padding: 4pt 10pt !important;     /* Phase 11.2: 6pt → 4pt */
+        border-radius: 3pt !important;    /* Phase 11.2: 4pt → 3pt */
+        margin: 0 0 6pt 0 !important;     /* Phase 11.2: 8pt → 6pt */
+        font-size: 8pt !important;        /* Phase 11.2: 9pt → 8pt */
         page-break-inside: avoid;
         background: #f0fdf4 !important;
-        border: 1pt solid #86efac !important;
+        border: 0.5pt solid #86efac !important;  /* Phase 11.2: 1pt → 0.5pt */
         color: #166534 !important;
         align-items: center;
-        gap: 8pt;
+        gap: 6pt;
     }
 
     .expired-banner {
@@ -366,10 +372,30 @@
         color: #991b1b !important;
     }
 
+    /* Phase 11.2: collapse the title + detail children into a single
+       inline horizontal line. The renderer emits two stacked elements
+       (h3/title + p/detail) by default for screen view; in print we
+       lay them out inline so the banner reads as one strip. */
+    .expired-banner h3, .expired-banner .banner-title,
+    .accepted-banner h3, .accepted-banner .banner-title,
     .accepted-banner strong,
     .expired-banner strong {
-        font-size: 10pt;
-        font-weight: 700;
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+        margin: 0 !important;
+        display: inline !important;
+    }
+    .expired-banner p, .expired-banner .banner-detail,
+    .accepted-banner p, .accepted-banner .banner-detail {
+        font-size: 8pt !important;
+        font-weight: 400 !important;
+        margin: 0 0 0 8pt !important;
+        display: inline !important;
+    }
+    /* Hide the warning/check icon SVG — wordmark alone conveys the state */
+    .expired-banner svg,
+    .accepted-banner svg {
+        display: none !important;
     }
 
     /* ============================================================
