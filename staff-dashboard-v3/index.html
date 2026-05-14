@@ -24,24 +24,24 @@
         Cascade order is enforced by @layer, not source order.
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3700-fullback">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3700-fullback">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3700-fullback">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260513-3900-beta">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260513-3900-beta">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260513-3900-beta">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260513-3900-beta">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=20260513-3900-beta">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3700-fullback">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260513-3900-beta">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
          injects into <head> at runtime (semantic.css, responsive576.css, etc).
          Without this, Caspio's CSS overrides our dashboard colors ~500ms after
          page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3700-fullback"></script>
+    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260513-3900-beta"></script>
     <!-- Config bootstrap (must load BEFORE the module) -->
     <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
 </head>
@@ -481,18 +481,21 @@
                                 <span class="tool-category-title">Production</span>
                                 <span class="tool-category-count">7</span>
                             </div>
+                            <!-- Production: production-ready tools first, BETA tools last.
+                                 Maturity gradient is implicit via order + chip color. -->
                             <div class="tool-buttons">
                                 <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck" aria-hidden="true"></i> Bradley's Transfer Queue</a>
                                 <a href="/dashboards/supacolor-orders.html" class="tool-btn"><i class="fas fa-link" aria-hidden="true"></i> Supacolor API Orders</a>
                                 <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font" aria-hidden="true"></i> Monogram Dashboard</a>
                                 <a href="/dashboards/names-numbers-dashboard.html" class="tool-btn"><i class="fas fa-users" aria-hidden="true"></i> Names &amp; Numbers</a>
-                                <a href="/pages/box-labels.html" class="tool-btn"><i class="fas fa-box" aria-hidden="true"></i> Box Labels</a>
                                 <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Purchasing</a>
                                 <a href="/pages/order-form.html" class="tool-btn"><i class="fas fa-file-invoice" aria-hidden="true"></i> Order Form</a>
+                                <a href="/pages/box-labels.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-box" aria-hidden="true"></i> Box Labels</a>
                             </div>
                         </div>
 
-                        <!-- Art & Design -->
+                        <!-- Art & Design: production-ready tools first, BETA tools last.
+                             Maturity gradient is implicit via order + chip color. -->
                         <div class="tool-category">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
@@ -505,11 +508,11 @@
                                 <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush" aria-hidden="true"></i> Steve's Queue</a>
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass" aria-hidden="true"></i> Ruth's Queue</a>
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
-                                <a href="/pages/dst-viewer.html" class="tool-btn"><i class="fas fa-microscope" aria-hidden="true"></i> DST Stitch Viewer</a>
-                                <a href="/pages/mockup-generator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> Mockup Generator</a>
                                 <a href="/pages/jds-mockup-creator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> JDS Tumbler Mockup</a>
-                                <a href="/pages/design-gallery.html" class="tool-btn"><i class="fas fa-images" aria-hidden="true"></i> Design Gallery</a>
-                                <a href="/dashboards/digitized-designs.html" class="tool-btn"><i class="fas fa-th-list" aria-hidden="true"></i> Digitized Designs</a>
+                                <a href="/pages/mockup-generator.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-magic" aria-hidden="true"></i> Mockup Generator</a>
+                                <a href="/pages/design-gallery.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-images" aria-hidden="true"></i> Design Gallery</a>
+                                <a href="/dashboards/digitized-designs.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-th-list" aria-hidden="true"></i> Digitized Designs</a>
+                                <a href="/pages/dst-viewer.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-microscope" aria-hidden="true"></i> DST Stitch Viewer</a>
                             </div>
                         </div>
 

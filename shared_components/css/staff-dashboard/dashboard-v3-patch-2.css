@@ -378,35 +378,139 @@
   100% { background-position: -100% 0; }
 }
 
-/* ── 13. Tool button "coming soon" state (2026-05-13 Round 3) ──────────
+/* ── 13. Tool button "coming soon" state (2026-05-13 Round 4 — redesigned)
    Reserves dashboard slots for calculators that aren't built yet (e.g.
    Customer Supplied DTF, Customer Supplied DTG). Renders as a <span>
-   (not an <a>) so it's not navigable. Visually greyed out + a small
-   amber "Coming soon" pill anchored top-right, so reps see the roadmap
-   without clicking into a broken page. When the calculator ships, swap
-   <span class="tool-btn tool-btn--soon"> → <a class="tool-btn"> and
-   drop the class — no other markup change needed. */
+   (not an <a>) so it's not navigable.
+
+   Design notes (the Meta/Google senior-engineer pass):
+   • Badge sits INSIDE the button, right-aligned, vertically centered —
+     not floating off the corner with negative offsets (the prior version
+     used right:-8px/top:-8px which clipped on dark surfaces and read as a
+     misaligned afterthought). Now it's a peer of the label inside one
+     flex layout.
+   • Right-padding on the button reserves a fixed-width slot for the
+     badge so the label never overlaps it as text grows.
+   • Dim ONLY the label + icon, NOT the parent (badge keeps full
+     legibility). Prior version's opacity:0.55 muted the badge too.
+   • Dark-mode amber palette (amber-400 text + 14% bg alpha + 35% border
+     alpha) — translucent so it inherits the dashboard surface rather
+     than punching a beige hole on dark. amber-300 on amber-500/14
+     hits WCAG AA 4.5:1 on #1f252b.
+   • border-radius 6px (not 999px) — modern engineered look, matches the
+     tab-btn--modifier amber styling already in use elsewhere on the v3
+     theme. Pills read as friendly/childish; squared-off reads as status.
+   • Hover/focus suppressed via :is() override — the parent .tool-btn:hover
+     was translating the button 2px, which made the badge jitter on
+     mouseover even with pointer-events:none.
+
+   When the calculator ships, swap <span class="tool-btn tool-btn--soon">
+   → <a class="tool-btn" href="...">. No other markup change. */
 .tool-btn--soon {
   position: relative;
-  opacity: 0.55;
+  padding-right: 102px !important;          /* reserve room for the badge */
+  color: var(--ink-lo);                     /* dim label, badge stays bright */
   cursor: not-allowed;
-  pointer-events: none;        /* belt + suspenders alongside no href */
+  /* Block parent .tool-btn:hover translate/border-color so the button
+     doesn't jitter when the cursor crosses it. */
+  pointer-events: auto;
 }
+.tool-btn--soon i {
+  color: var(--ink-lo) !important;          /* dim icon too — was nw-green */
+  opacity: 0.55;
+}
+.tool-btn--soon:hover,
+.tool-btn--soon:focus {
+  background: var(--surface-card-2) !important;
+  color: var(--ink-lo) !important;
+  border-color: var(--surface-border) !important;
+  transform: none !important;
+}
+
 .tool-btn--soon::after {
   content: "Coming soon";
   position: absolute;
-  top: -8px;
-  right: -8px;
-  padding: 2px 8px;
-  font-size: 9px;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  line-height: 1;
+
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: #fef3c7;          /* matches the modifier-tab amber palette */
-  color: #92400e;
-  border: 1px solid #fcd34d;
-  border-radius: 999px;
+
+  /* Dark-mode amber: translucent so it sits ON the surface rather than
+     punching a beige rectangle into it. amber-400 (#fbbf24) reads ~5:1
+     contrast against the card bg → WCAG AA pass. */
+  background: rgba(251, 191, 36, 0.14);
+  color: #fcd34d;                            /* amber-300 */
+  border: 1px solid rgba(251, 191, 36, 0.38);
+  border-radius: 6px;
   white-space: nowrap;
-  /* Prevent the pill from being clipped by the button's own overflow */
-  z-index: 1;
+  pointer-events: none;                      /* tooltip text shouldn't be hoverable */
+}
+
+/* ── 14. Tool button "BETA" state (2026-05-13 Round 5) ──────────────────
+   For tools that EXIST and CAN be used but aren't 100% polished — Erik is
+   still iterating. Industry-standard label (every AE recognizes "Beta"
+   without explanation: GitHub, Linear, Vercel, Microsoft, Google all use
+   the same word for "works but caveat emptor").
+
+   Three-tier maturity gradient now visible on the dashboard:
+     · default green-icon button = production / stable
+     · indigo BETA chip          = works, rough edges, give Erik feedback
+     · amber Coming soon chip    = doesn't exist yet, can't click
+
+   Critical UX difference vs --soon: BETA buttons stay FULLY CLICKABLE.
+   No pointer-events:none, no dimmed label. The chip is purely an
+   advisory label — the underlying tool is real and useful. We only
+   *hint* at the status without gating the user out.
+
+   Indigo (not amber) keeps the visual semantics clean: amber = blocked
+   roadmap, indigo = in-development. Matches GitHub's Beta badge color
+   and Linear's "In progress" workflow state, which AEs may already
+   recognize from those products. */
+.tool-btn--beta {
+  position: relative;
+  padding-right: 60px !important;            /* reserve room for the BETA chip */
+}
+.tool-btn--beta::after {
+  content: "BETA";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  line-height: 1;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  /* Dark-mode indigo: translucent so it sits on the surface. indigo-300
+     (#a5b4fc) on indigo-500/14 hits WCAG AA on the card surface. */
+  background: rgba(129, 140, 248, 0.16);     /* indigo-400 @ 16% */
+  color: #c7d2fe;                            /* indigo-200 — readable on dark */
+  border: 1px solid rgba(129, 140, 248, 0.42);
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;                      /* chip is advisory only */
+}
+/* On hover: keep the chip steady; only the button reacts. The parent's
+   transform: translateX(2px) already shows the affordance. */
+.tool-btn--beta:hover::after {
+  /* Slight brightening on hover so the chip doesn't feel "ignored" when
+     the rest of the button lights up. */
+  background: rgba(129, 140, 248, 0.22);
+  color: #e0e7ff;                            /* indigo-100 */
+  border-color: rgba(129, 140, 248, 0.55);
 }
