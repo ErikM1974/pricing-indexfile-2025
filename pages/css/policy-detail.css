@@ -1,6 +1,6 @@
 /* =====================================================
    POLICY DETAIL — read / edit view
-   Pulls variables from policies-hub-v2.css if loaded.
+   Pulls variables from policies-hub-v2.css (loaded by policies-hub.html).
    ===================================================== */
 
 :root {

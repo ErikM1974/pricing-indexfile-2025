@@ -69,8 +69,8 @@
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/policies-hub.html` | Policy documentation hub (legacy v1, hardcoded cards) | dashboard-styles.css | 🗄️ Legacy (kept during dogfood; sidebar link will switch to policies-hub-v2.html) |
-| `/pages/policies-hub-v2.html` | **NEW** Caspio-backed Policies Hub (tree sidebar, search, category chips, admin-gated CRUD) | policies-admin-gate.js, policies-api.js, policies-hub.js, policies-hub-v2.css | ✅ Active |
+| `/pages/policies-hub.html` | **CANONICAL** Caspio-backed Policies Hub (tree sidebar, search, category chips, admin-gated CRUD) — renamed 2026-05-14 from policies-hub-v2.html as the production cutover | policies-admin-gate.js, policies-api.js, policies-hub.js, policies-hub-v2.css | ✅ Active |
+| `/pages/policies-hub-legacy.html` | Pre-Caspio hardcoded hub (9 cards, no editing) — archived 2026-05-14 for safety; safe to delete after ~30 days if no fallback events | dashboard-styles.css, policies-hub.css | 🗄️ Legacy |
 | `/pages/policy-detail.html` | **NEW** Individual policy read/edit page (TipTap rich-text editor, breadcrumb, outline, sub-procedures) | policies-admin-gate.js, policies-api.js, policy-editor-tiptap.js, policy-detail.js, policies-hub-v2.css, policy-detail.css | ✅ Active |
 | `/pages/css/policies-hub-v2.css` | **NEW** Stylesheet for policies hub v2 (tree sidebar, cards, category chips, NW-green theme) | — | ✅ Active |
 | `/pages/css/policy-detail.css` | **NEW** Stylesheet for policy-detail.html (prose body, TipTap chrome, outline sidebar, edit form) | — | ✅ Active |

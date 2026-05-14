@@ -126,7 +126,7 @@
                 <div class="detail-error">
                     <i class="fas fa-exclamation-triangle"></i>
                     <h2>${escapeHtml(msg)}</h2>
-                    <a href="/pages/policies-hub-v2.html" class="btn btn-secondary">
+                    <a href="/pages/policies-hub.html" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Hub
                     </a>
                 </div>
@@ -138,10 +138,10 @@
         const el = $('breadcrumb');
         if (!el || !state.policy) return;
         const parts = [
-            `<a href="/pages/policies-hub-v2.html">Policies Hub</a>`
+            `<a href="/pages/policies-hub.html">Policies Hub</a>`
         ];
         if (state.policy.Category) {
-            parts.push(`<a href="/pages/policies-hub-v2.html?category=${encodeURIComponent(state.policy.Category)}">${escapeHtml(state.policy.Category)}</a>`);
+            parts.push(`<a href="/pages/policies-hub.html?category=${encodeURIComponent(state.policy.Category)}">${escapeHtml(state.policy.Category)}</a>`);
         }
         parts.push(`<span class="crumb-current">${escapeHtml(state.policy.Title || 'New policy')}</span>`);
         el.innerHTML = parts.join('<i class="fas fa-chevron-right crumb-sep"></i>');
@@ -407,7 +407,7 @@
         }
         clearAutosaveDraft(state.isNew ? 'new' : state.policy.Policy_ID);
         if (state.isNew) {
-            window.location.href = '/pages/policies-hub-v2.html';
+            window.location.href = '/pages/policies-hub.html';
         } else {
             const url = new URL(window.location.href);
             url.searchParams.delete('edit');
@@ -419,7 +419,7 @@
         if (!window.confirm(`Archive "${state.policy.Title}"? It will be hidden from staff but recoverable.`)) return;
         try {
             await PoliciesAPI.archivePolicy(state.policy.Policy_ID);
-            window.location.href = '/pages/policies-hub-v2.html';
+            window.location.href = '/pages/policies-hub.html';
         } catch (e) {
             setSaveStatus(`Archive failed: ${e.message}`, 'error');
         }
