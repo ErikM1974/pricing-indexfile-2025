@@ -581,11 +581,45 @@
         // Phase 3 (2026-05-14): track lookup_customer single-match result so
         // we can stamp CompanyName / ContactName / Email onto the saved
         // quote_session row when Ruthie clicks Copy or Open in Outlook.
-        lastLookup: null,      // {company, contact_name, email, rep} or null
+        // Phase 4 extended the shape to include customer_number, contact_first,
+        // contact_last, phone, address, address2, city, state, zip.
+        lastLookup: null,
         // Phase 3: most recently rendered email-draft block. Parsed once on
         // stream-complete; reused by both action buttons + the save call.
-        currentDraft: null,    // {to, subject, body, customer: {...}}
+        currentDraft: null,    // {to, subject, body, lookupSnapshot}
+        // Phase 4 (2026-05-14): pre-generated CEMB quote ID for this panel
+        // session. Generated lazily on the first AI message (so opening +
+        // closing the panel without sending doesn't burn an ID). Reused
+        // across iterations + on save (so we don't fetch a fresh sequence
+        // at click time). quoteIDPromise serializes concurrent fetches.
+        quoteID: null,
+        quoteIDPromise: null,
     };
+
+    /* ---------- Phase 4 — quote ID pre-generation ---------- */
+
+    // Lazy + idempotent. First call fires a single fetch; subsequent calls
+    // (within the same panel session) return the cached string. Failure is
+    // soft: returns null so the AI just skips the quote-# reference; the
+    // save call later falls back to fetching a fresh sequence.
+    function ensureQuoteID() {
+        if (aiState.quoteID) return Promise.resolve(aiState.quoteID);
+        if (aiState.quoteIDPromise) return aiState.quoteIDPromise;
+        aiState.quoteIDPromise = (async function () {
+            try {
+                var r = await fetch(API_BASE_URL + '/api/quote-sequence/CEMB');
+                if (!r.ok) throw new Error('quote-sequence returned ' + r.status);
+                var d = await r.json();
+                aiState.quoteID = d.prefix + '-' + d.year + '-' + String(d.sequence).padStart(3, '0');
+                return aiState.quoteID;
+            } catch (err) {
+                console.warn('[ai-chat] ensureQuoteID failed — proceeding without pre-assigned ID:', err);
+                aiState.quoteIDPromise = null;
+                return null;
+            }
+        })();
+        return aiState.quoteIDPromise;
+    }
 
     /* ---------- Phase 3 helpers ---------- */
 
@@ -638,6 +672,14 @@
 
     // POST the AI-drafted quote to /api/quote_sessions + /api/quote_items.
     // Fire-and-forget pattern: caller doesn't await — see handleCommitDraft.
+    //
+    // Phase 4 (2026-05-14):
+    //   - Accepts opts.quoteID (pre-generated). Falls back to fetching a
+    //     fresh sequence only if no ID was provided (legacy / failure path).
+    //   - Accepts an extended customer shape: {email, name, company,
+    //     customer_number, phone, address, address2, city, state, zip}.
+    //     Maps onto quote_sessions fields the schema already had reserved
+    //     but Phase 3 left blank.
     async function saveContractEmbroideryQuote(opts) {
         var calcContext = opts.calcContext;
         var customer = opts.customer || {};
@@ -645,11 +687,15 @@
 
         var proxyBase = API_BASE_URL;
 
-        // 1. Atomic sequence — auto-creates the CEMB counter on first call.
-        var seqRes = await fetch(proxyBase + '/api/quote-sequence/CEMB');
-        if (!seqRes.ok) throw new Error('quote-sequence returned ' + seqRes.status);
-        var seqData = await seqRes.json();
-        var quoteID = seqData.prefix + '-' + seqData.year + '-' + String(seqData.sequence).padStart(3, '0');
+        // 1. Reuse the pre-generated CEMB ID when available; otherwise burn
+        // a fresh one (legacy save path / panel where ensureQuoteID failed).
+        var quoteID = opts.quoteID;
+        if (!quoteID) {
+            var seqRes = await fetch(proxyBase + '/api/quote-sequence/CEMB');
+            if (!seqRes.ok) throw new Error('quote-sequence returned ' + seqRes.status);
+            var seqData = await seqRes.json();
+            quoteID = seqData.prefix + '-' + seqData.year + '-' + String(seqData.sequence).padStart(3, '0');
+        }
 
         var nowISO = new Date().toISOString().replace(/\.\d{3}Z$/, '');
         var expiresISO = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().replace(/\.\d{3}Z$/, '');
@@ -661,12 +707,20 @@
             : 'CTR-Garmt';
 
         // 2. Session row — uses the same fields embroidery-quote-service maps to.
+        // Phase 4: also stamp CustomerNumber + Phone + ShipTo address from
+        // the lookup snapshot when available (graceful empties otherwise).
         var session = {
             QuoteID: quoteID,
             SessionID: 'cemb_ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11),
             CustomerEmail: customer.email || '',
             CustomerName: customer.name || 'AI Draft',
             CompanyName: customer.company || '',
+            CustomerNumber: customer.customer_number || '',
+            Phone: customer.phone || '',
+            ShipToAddress: customer.address || '',
+            ShipToCity: customer.city || '',
+            ShipToState: customer.state || '',
+            ShipToZip: customer.zip || '',
             SalesRepEmail: 'ruth@nwcustomapparel.com',
             SalesRepName: 'Ruthie Nhoung',
             TotalQuantity: calcContext.qty,
@@ -782,12 +836,28 @@
         var draftEmail = (draft.to || '').toLowerCase();
         var lookupEmail = (lookup && lookup.email || '').toLowerCase();
         var lookupTrusted = !!lookup && draftEmail && draftEmail === lookupEmail;
+        // Phase 4: extended customer shape with phone, address, customer_number
+        // — all sourced from the lookup snapshot when trusted, empty otherwise.
         var customer = {
             email: draft.to || (lookupTrusted ? lookup.email : '') || '',
             name: (lookupTrusted ? lookup.contact_name : '') || extractGreetingName(draft.body) || '',
             company: (lookupTrusted ? lookup.company : '') || '',
+            customer_number: (lookupTrusted ? lookup.customer_number : '') || '',
+            phone: (lookupTrusted ? lookup.phone : '') || '',
+            address: (lookupTrusted ? lookup.address : '') || '',
+            address2: (lookupTrusted ? lookup.address2 : '') || '',
+            city: (lookupTrusted ? lookup.city : '') || '',
+            state: (lookupTrusted ? lookup.state : '') || '',
+            zip: (lookupTrusted ? lookup.zip : '') || '',
         };
-        saveContractEmbroideryQuote({ calcContext: calcCtx, customer: customer })
+        // Phase 4: pass the pre-generated quote ID through so we don't burn
+        // a fresh sequence at click-time (the AI's email already references
+        // this ID, so they must match).
+        saveContractEmbroideryQuote({
+            calcContext: calcCtx,
+            customer: customer,
+            quoteID: aiState.quoteID || null,
+        })
             .then(function (quoteID) {
                 showToast('Saved as ' + quoteID);
             })
@@ -810,6 +880,11 @@
             baseUnit: Number(calc.unit.toFixed(2)),
             finalUnit: Number(ltmCalc.finalUnitPrice.toFixed(2)),
             ltmFee: ltmCalc.hasLtm ? ltmFeeBase : 0,
+            // Phase 4: include the pre-generated CEMB quote ID so the AI can
+            // reference it in the subject + intro. May be null if first
+            // message hasn't fired yet OR ensureQuoteID() failed — the AI
+            // gracefully omits it in that case.
+            quoteID: aiState.quoteID || null,
             ltmPerPiece: Number(ltmCalc.ltmPerPiece.toFixed(2)),
             orderTotal: Number((ltmCalc.finalUnitPrice * state.qty).toFixed(2)),
         };
@@ -995,6 +1070,11 @@
         var typingEl = appendTypingIndicator();
 
         try {
+            // Phase 4: pre-fetch the CEMB quote ID before the AI runs, so the
+            // first emitted draft can already reference it in subject + intro.
+            // Failure is soft — ensureQuoteID returns null and the AI omits.
+            await ensureQuoteID();
+
             var response = await fetch(AI_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
