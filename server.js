@@ -754,152 +754,56 @@ app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', 
 app.all('/api/crm-proxy/policies*', ...createCrmProxy('policies', ['policies-admin']));
 
 // =============================================================================
-// POLICIES HUB AI ASSIST — proxies the TipTap editor's "AI Assist" panel to
-// the Claude API. Streams Server-Sent Events back to the browser so the editor
-// can render generated text token-by-token. Role-gated to policies-admin.
-// System prompt is cached via cache_control: ephemeral — only Erik writes
-// policies right now, so cache reads should dominate during a writing session.
+// POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
+// The actual Claude API call lives on the proxy (where ANTHROPIC_API_KEY is
+// configured). This handler role-gates via Express session, then pipes the
+// SSE response body straight through to the browser. Same client-facing
+// contract as before: POST /api/policies/ai-assist returns text/event-stream.
 // =============================================================================
-const { Anthropic, APIError } = require('@anthropic-ai/sdk');
-const { POLICY_AI_SYSTEM_PROMPT } = require('./shared_components/lib/policy-ai-prompt');
-
-let anthropicClient = null;
-function getAnthropicClient() {
-  if (!anthropicClient) {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      throw new Error('ANTHROPIC_API_KEY env var is not set. Set it on Heroku via `heroku config:set ANTHROPIC_API_KEY=sk-ant-...`.');
-    }
-    anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-  }
-  return anthropicClient;
-}
-
-const VALID_AI_ACTIONS = new Set([
-  'generate-from-prompt',
-  'polish-draft',
-  'expand-section',
-  'summarize-section',
-  'add-faq',
-  'translate-to-spanish'
-]);
-
-// Build a focused user message from the action + context the editor sent.
-// Keeps the system prompt (cached) frozen and varies only the user turn.
-function buildUserMessage({ action, prompt, selectedText, surroundingContext, title, category }) {
-  const lines = [`ACTION: ${action}`];
-  if (title) lines.push(`POLICY TITLE: ${title}`);
-  if (category) lines.push(`CATEGORY: ${category}`);
-
-  if (action === 'generate-from-prompt') {
-    lines.push('', 'USER PROMPT:', prompt || '(no prompt provided — generate based on title and category)');
-  } else if (action === 'add-faq') {
-    lines.push('', 'POLICY CONTENT (use this to derive realistic questions):',
-      surroundingContext || selectedText || '(no content provided)');
-  } else if (action === 'translate-to-spanish') {
-    lines.push('', 'CONTENT TO TRANSLATE:', selectedText || surroundingContext || '(no content provided)');
-  } else {
-    // polish-draft / expand-section / summarize-section
-    if (selectedText) lines.push('', 'SELECTED TEXT (the part to operate on):', selectedText);
-    if (surroundingContext && surroundingContext !== selectedText) {
-      lines.push('', 'SURROUNDING CONTEXT (for reference — do NOT include in your output):', surroundingContext);
-    }
-    if (prompt) lines.push('', 'ADDITIONAL INSTRUCTIONS FROM AUTHOR:', prompt);
-  }
-
-  return lines.join('\n');
-}
-
 app.post(
   '/api/policies/ai-assist',
   requireCrmRole(['policies-admin']),
   express.json({ limit: '1mb' }),
   async (req, res) => {
-    const { action, prompt, selectedText, surroundingContext, title, category } = req.body || {};
-
-    if (!action || !VALID_AI_ACTIONS.has(action)) {
-      return res.status(400).json({
-        error: 'Invalid action',
-        valid: Array.from(VALID_AI_ACTIONS)
-      });
-    }
-
-    let client;
+    const target = `${CRM_API_BASE}/api/policies-ai-assist`;
     try {
-      client = getAnthropicClient();
-    } catch (e) {
-      return res.status(500).json({ error: e.message });
-    }
-
-    // SSE handshake
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
-      'X-Accel-Buffering': 'no'
-    });
-    const sendEvent = (type, data) => {
-      res.write(`event: ${type}\n`);
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
-    };
-
-    try {
-      const userMessage = buildUserMessage({ action, prompt, selectedText, surroundingContext, title, category });
-
-      const stream = client.messages.stream({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
-        // Adaptive thinking: Sonnet 4.6 supports it; lets the model decide when to think.
-        // Skipping for now — adds latency, and policy edits are fast-feedback.
-        // thinking: { type: 'adaptive' },
-        system: [
-          {
-            type: 'text',
-            text: POLICY_AI_SYSTEM_PROMPT,
-            cache_control: { type: 'ephemeral' }
-          }
-        ],
-        messages: [{ role: 'user', content: userMessage }]
+      const upstream = await fetch(target, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+          'X-CRM-API-Secret': CRM_API_SECRET
+        },
+        body: JSON.stringify(req.body || {})
       });
 
-      stream.on('text', (delta) => {
-        sendEvent('delta', { text: delta });
-      });
+      // Forward upstream status + the SSE headers
+      res.status(upstream.status);
+      res.setHeader('Content-Type', upstream.headers.get('content-type') || 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
 
-      stream.on('error', (err) => {
-        console.error('[ai-assist] stream error:', err.message);
-        sendEvent('error', { message: err.message });
+      if (!upstream.body) {
         res.end();
-      });
-
-      const finalMessage = await stream.finalMessage();
-      const usage = finalMessage.usage || {};
-      sendEvent('done', {
-        stop_reason: finalMessage.stop_reason,
-        usage: {
-          input_tokens: usage.input_tokens || 0,
-          output_tokens: usage.output_tokens || 0,
-          cache_read_input_tokens: usage.cache_read_input_tokens || 0,
-          cache_creation_input_tokens: usage.cache_creation_input_tokens || 0
-        }
-      });
-      res.end();
-
-      // Log cache effectiveness for ongoing tuning
-      const cacheRead = usage.cache_read_input_tokens || 0;
-      const cacheWrite = usage.cache_creation_input_tokens || 0;
-      console.log(`[ai-assist] ${action} done — in=${usage.input_tokens || 0} out=${usage.output_tokens || 0} cache_read=${cacheRead} cache_write=${cacheWrite}`);
-    } catch (e) {
-      console.error('[ai-assist] error:', e.message);
-      if (e instanceof APIError) {
-        sendEvent('error', { message: `Claude API error ${e.status}: ${e.message}` });
-      } else {
-        sendEvent('error', { message: e.message });
+        return;
+      }
+      // Pipe the SSE chunks straight through — no buffering, no re-parsing
+      for await (const chunk of upstream.body) {
+        res.write(chunk);
       }
       res.end();
+    } catch (e) {
+      console.error('[ai-assist proxy] error:', e.message);
+      if (!res.headersSent) {
+        res.status(502).json({ error: 'Upstream AI service unavailable', detail: e.message });
+      } else {
+        res.end();
+      }
     }
   }
 );
-console.log('✓ Policies AI Assist endpoint loaded (Claude Sonnet 4.6 + prompt caching)');
+console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-proxy/api/policies-ai-assist)');
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
