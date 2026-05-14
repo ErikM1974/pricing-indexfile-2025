@@ -745,7 +745,9 @@ class QuoteViewPage {
     renderEmbroideryInfo() {
         // Determine quote type from prefix
         const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
-        const isEmbroideryQuote = ['EMB', 'EMBC', 'RICH', 'CAP'].includes(prefix);
+        // CEMB (Contract Embroidery, AI-drafted) added 2026-05-14 (Phase 5)
+        // so the Location + Stitches detail row renders on CEMB quote views.
+        const isEmbroideryQuote = ['EMB', 'EMBC', 'CEMB', 'RICH', 'CAP'].includes(prefix);
 
         // Check if this is a laser-patch order
         const capEmbellishmentType = this.quoteData?.CapEmbellishmentType || 'embroidery';
@@ -867,6 +869,23 @@ class QuoteViewPage {
             return '';
         }
 
+        // Style → display label map. Phase 5 (2026-05-14) extended from the
+        // old binary {DECC: Caps, else: Garments} to include:
+        //   - DECG-FB → "Customer Full Back" (was rendering as "Customer Garments")
+        //   - CTR-Cap / CTR-Garmt / CTR-FB → AI-drafted contract embroidery
+        //     (wholesale partner brings their own blanks). Same business
+        //     model as DECG/DECC, just a different price tier.
+        // Color tints stay 2-way (blue for cap-family, amber for garment-family)
+        // so the table reads as visually consistent.
+        const STYLE_LABEL_MAP = {
+            'DECC':      { label: 'Customer Caps',      isCap: true  },
+            'DECG':      { label: 'Customer Garments',  isCap: false },
+            'DECG-FB':   { label: 'Customer Full Back', isCap: false },
+            'CTR-Cap':   { label: 'Contract Cap',       isCap: true  },
+            'CTR-Garmt': { label: 'Contract Garment',   isCap: false },
+            'CTR-FB':    { label: 'Contract Full Back', isCap: false },
+        };
+
         let html = '';
         this.customerSuppliedItems.forEach(item => {
             const styleNumber = item.StyleNumber || 'DECG';
@@ -874,12 +893,13 @@ class QuoteViewPage {
             const qty = parseInt(item.Quantity) || 0;
             const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
             const lineTotal = item.LineTotal || (qty * unitPrice);
-            const isDECC = styleNumber === 'DECC';
-            const displayLabel = isDECC ? 'Customer Caps' : 'Customer Garments';
+            const styleMeta = STYLE_LABEL_MAP[styleNumber] || { label: 'Customer-Supplied Item', isCap: false };
+            const displayLabel = styleMeta.label;
+            const isCap = styleMeta.isCap;
 
             html += `
-                <tr class="customer-supplied-row" style="background: ${isDECC ? '#eff6ff' : '#fffbeb'};">
-                    <td class="style-col" style="font-weight: 600; color: ${isDECC ? '#1e40af' : '#92400e'};">
+                <tr class="customer-supplied-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
+                    <td class="style-col" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">
                         ${this.escapeHtml(displayLabel)}
                     </td>
                     <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>

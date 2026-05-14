@@ -705,10 +705,16 @@
         var skuBase = calcContext.product === 'cap' ? 'CTR-Cap'
             : calcContext.product === 'fullback' ? 'CTR-FB'
             : 'CTR-Garmt';
+        var locationLabel = calcContext.product === 'cap' ? 'Cap'
+            : calcContext.product === 'fullback' ? 'Full Back'
+            : 'Left Chest';
 
         // 2. Session row — uses the same fields embroidery-quote-service maps to.
-        // Phase 4: also stamp CustomerNumber + Phone + ShipTo address from
-        // the lookup snapshot when available (graceful empties otherwise).
+        // Phase 4: stamp CustomerNumber + Phone + ShipTo address from the
+        // lookup snapshot when available (graceful empties otherwise).
+        // Phase 5: also stamp Account_Owner / Email_Salesrep (reflects the
+        // customer's actual assigned rep instead of always Ruthie) and
+        // Payment_Terms (e.g. "Net 10" — shown in Quote Details card).
         var session = {
             QuoteID: quoteID,
             SessionID: 'cemb_ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11),
@@ -721,8 +727,15 @@
             ShipToCity: customer.city || '',
             ShipToState: customer.state || '',
             ShipToZip: customer.zip || '',
-            SalesRepEmail: 'ruth@nwcustomapparel.com',
-            SalesRepName: 'Ruthie Nhoung',
+            // Phase 5: rep identity reflects the CRM's account-owner record.
+            // Email is still SIGNED by Ruthie in the body (system-prompt
+            // locked to Ruthie). Saved record captures the real owner for
+            // routing/reporting. Falls back to Ruthie when CRM missing.
+            SalesRepEmail: customer.email_salesrep || 'ruth@nwcustomapparel.com',
+            SalesRepName: customer.account_owner || 'Ruthie Nhoung',
+            // Phase 5: payment terms surface as "Terms: Net 10" in Quote
+            // Details card. Empty by default — only set when CRM has one.
+            PaymentTerms: customer.payment_terms || '',
             TotalQuantity: calcContext.qty,
             SubtotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
             LTMFeeTotal: parseFloat((calcContext.ltmFee || 0).toFixed(2)),
@@ -732,9 +745,7 @@
             ExpiresAt: expiresISO,
             Notes: 'AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches',
             StitchCount: calcContext.stitches,
-            PrintLocation: calcContext.product === 'cap' ? 'Cap'
-                : calcContext.product === 'fullback' ? 'Full Back'
-                : 'Left Chest',
+            PrintLocation: locationLabel,
         };
         var sessRes = await fetch(proxyBase + '/api/quote_sessions', {
             method: 'POST',
@@ -747,6 +758,13 @@
         }
 
         // 3. Line item row
+        // Phase 5: EmbellishmentType: 'customer-supplied' routes the item
+        // through quote-view.js's renderCustomerSuppliedRows() path, which
+        // doesn't require a SizeBreakdown (contract embroidery is per-piece,
+        // not per-size). Without this flag, the line item falls into the
+        // standard product-rows path where parseSizeBreakdown('') returns {}
+        // and NO row gets rendered — table headers without a body.
+        // (locationLabel hoisted above for re-use on the session row.)
         var item = {
             QuoteID: quoteID,
             LineNumber: 1,
@@ -756,6 +774,9 @@
             FinalUnitPrice: parseFloat(calcContext.finalUnit.toFixed(2)),
             LineTotal: parseFloat(calcContext.orderTotal.toFixed(2)),
             SizeBreakdown: '',
+            EmbellishmentType: 'customer-supplied',
+            PrintLocation: locationLabel,
+            PrintLocationName: locationLabel,
             AddedAt: nowISO,
         };
         var itemRes = await fetch(proxyBase + '/api/quote_items', {
@@ -830,17 +851,31 @@
         // potentially much later than the render, and lastLookup may have
         // moved on. Fall back to live aiState only if no snapshot is attached.
         var lookup = draft.lookupSnapshot || aiState.lastLookup;
-        // Only trust the lookup when its email matches the draft's recipient
-        // — defensive against the rare case where the AI emits a To: line that
-        // doesn't correspond to the captured tool result.
+        // Strict trust check — defensive against stale lookups across turns.
+        // Used for company/phone/customer_number/address/payment_terms/rep
+        // (anything where stale data could be misleading or wrong).
         var draftEmail = (draft.to || '').toLowerCase();
         var lookupEmail = (lookup && lookup.email || '').toLowerCase();
         var lookupTrusted = !!lookup && draftEmail && draftEmail === lookupEmail;
-        // Phase 4: extended customer shape with phone, address, customer_number
-        // — all sourced from the lookup snapshot when trusted, empty otherwise.
+
+        // Phase 5: relaxed-trust check for the contact's full NAME only.
+        // The AI just used this name in "Hi <first>," — if the lookup's
+        // contact_name starts with the same first name, it's almost
+        // certainly the right person even if the email-trust check failed
+        // (case differences, alt email fields, etc.). Identity-low-risk.
+        var greetingFirst = (extractGreetingName(draft.body) || '').toLowerCase();
+        var lookupName = (lookup && lookup.contact_name || '');
+        var lookupFirst = (lookup && lookup.contact_first || lookupName.split(/\s+/)[0] || '').toLowerCase();
+        var nameTrusted = !!lookupName && (
+            lookupTrusted ||
+            (greetingFirst && lookupFirst && lookupFirst === greetingFirst)
+        );
+
+        // Phase 4 + 5: extended customer shape — name uses relaxed trust;
+        // everything else uses strict email-match trust.
         var customer = {
             email: draft.to || (lookupTrusted ? lookup.email : '') || '',
-            name: (lookupTrusted ? lookup.contact_name : '') || extractGreetingName(draft.body) || '',
+            name: (nameTrusted ? lookupName : '') || extractGreetingName(draft.body) || '',
             company: (lookupTrusted ? lookup.company : '') || '',
             customer_number: (lookupTrusted ? lookup.customer_number : '') || '',
             phone: (lookupTrusted ? lookup.phone : '') || '',
@@ -849,6 +884,10 @@
             city: (lookupTrusted ? lookup.city : '') || '',
             state: (lookupTrusted ? lookup.state : '') || '',
             zip: (lookupTrusted ? lookup.zip : '') || '',
+            // Phase 5: rep + terms — all strict-trust-gated.
+            account_owner: (lookupTrusted ? lookup.account_owner : '') || '',
+            email_salesrep: (lookupTrusted ? lookup.email_salesrep : '') || '',
+            payment_terms: (lookupTrusted ? lookup.payment_terms : '') || '',
         };
         // Phase 4: pass the pre-generated quote ID through so we don't burn
         // a fresh sequence at click-time (the AI's email already references
