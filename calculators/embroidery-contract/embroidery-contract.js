@@ -649,6 +649,29 @@
         return m ? m[1].trim() : '';
     }
 
+    // Phase 7 (2026-05-14): parse the CUSTOMER_FINAL JSON block emitted
+    // by the AI after the pre-flight checklist completes. Returns the
+    // parsed object OR null if the block is missing/invalid. Source of
+    // truth for the saved quote_sessions row when present.
+    function parseCustomerFinal(fullText) {
+        var startMarker = 'CUSTOMER_FINAL START';
+        var endMarker = 'CUSTOMER_FINAL END';
+        var startIdx = fullText.indexOf(startMarker);
+        var endIdx = fullText.indexOf(endMarker);
+        if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) return null;
+        var jsonText = fullText.slice(startIdx + startMarker.length, endIdx).trim();
+        try {
+            var parsed = JSON.parse(jsonText);
+            // Minimal sanity check
+            if (!parsed || typeof parsed !== 'object') return null;
+            return parsed;
+        } catch (err) {
+            console.warn('[ai-chat] CUSTOMER_FINAL JSON parse failed:', err.message,
+                '\nRaw text:', jsonText.slice(0, 200));
+            return null;
+        }
+    }
+
     // Build a mailto: URL. URL-encodes subject + body per RFC. Caps body at
     // 1,800 chars defensively — some Windows mail handlers truncate URLs
     // around the 2KB mark, which would silently drop the end of the email.
@@ -683,6 +706,7 @@
     async function saveContractEmbroideryQuote(opts) {
         var calcContext = opts.calcContext;
         var customer = opts.customer || {};
+        var cfBundle = opts.cfBundle || null;  // Phase 7: shipping + tax info
         if (!calcContext) throw new Error('calcContext required');
 
         var proxyBase = API_BASE_URL;
@@ -712,12 +736,61 @@
             : calcContext.product === 'fullback' ? 'Full Back'
             : 'Left Chest';
 
-        // 2. Session row — uses the same fields embroidery-quote-service maps to.
+        // Phase 7: assemble shipping + tax + reseller permit data from
+        // the cfBundle (pre-flight checklist result). Defaults when no
+        // pre-flight ran: shipping=same as billing, tax=taxable, no permit.
+        var shippingAddr = '';
+        var shippingCity = '';
+        var shippingState = '';
+        var shippingZip = '';
+        var shipMethod = '';
+        var taxable = true;
+        var resellerPermit = null;
+        if (cfBundle) {
+            taxable = cfBundle.taxable !== false;
+            resellerPermit = cfBundle.reseller_permit || null;
+            var s = cfBundle.shipping || {};
+            if (s.pickup) {
+                shipMethod = 'Customer Pickup';
+            } else if (s.same_as_billing) {
+                // Leave Shipping* empty; renderer + ShopWorks infer "ship to billing"
+                shipMethod = '';
+            } else if (s.address || s.city) {
+                shippingAddr = s.address || '';
+                shippingCity = s.city || '';
+                shippingState = s.state || '';
+                shippingZip = s.zip || '';
+                shipMethod = 'Ship to customer';
+            }
+        }
+
+        // Phase 7: extra context lines into Notes so the quote view's
+        // Special Notes box surfaces tax-exempt / reseller / shipping
+        // info without needing schema changes.
+        var notesLines = ['AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
+        if (cfBundle) {
+            if (!taxable) {
+                notesLines.push(resellerPermit
+                    ? 'Tax-exempt · Reseller permit: ' + resellerPermit
+                    : 'Tax-exempt · No reseller permit # on file');
+            }
+            if (shippingAddr || shippingCity) {
+                var shipLine = [shippingAddr, [shippingCity, shippingState].filter(Boolean).join(', ') + (shippingZip ? ' ' + shippingZip : '')].filter(Boolean).join(' · ');
+                notesLines.push('Shipping to: ' + shipLine);
+            } else if (cfBundle.shipping && cfBundle.shipping.pickup) {
+                notesLines.push('Shipping: Customer pickup');
+            }
+        }
+
+        // 2. Session row.
         // Phase 4: stamp CustomerNumber + Phone + ShipTo address from the
         // lookup snapshot when available (graceful empties otherwise).
         // Phase 5: also stamp Account_Owner / Email_Salesrep (reflects the
         // customer's actual assigned rep instead of always Ruthie) and
         // Payment_Terms (e.g. "Net 10" — shown in Quote Details card).
+        // Phase 7: TaxRate flips to 0 when tax-exempt; Shipping* fields hold
+        // the destination address (separate from billing on ShipTo*); Notes
+        // gets reseller permit + shipping info packed in for the renderer.
         var session = {
             QuoteID: quoteID,
             SessionID: 'cemb_ai_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11),
@@ -726,10 +799,17 @@
             CompanyName: customer.company || '',
             CustomerNumber: customer.customer_number || '',
             Phone: customer.phone || '',
+            // ShipTo* = BILLING address (Phase 6 renderer relabel)
             ShipToAddress: customer.address || '',
             ShipToCity: customer.city || '',
             ShipToState: customer.state || '',
             ShipToZip: customer.zip || '',
+            // Shipping* = actual shipping address when different from billing
+            ShippingAddress: shippingAddr,
+            ShippingCity: shippingCity,
+            ShippingState: shippingState,
+            ShippingZip: shippingZip,
+            ShipMethod: shipMethod,
             // Phase 5: rep identity reflects the CRM's account-owner record.
             // Email is still SIGNED by Ruthie in the body (system-prompt
             // locked to Ruthie). Saved record captures the real owner for
@@ -739,6 +819,9 @@
             // Phase 5: payment terms surface as "Terms: Net 10" in Quote
             // Details card. Empty by default — only set when CRM has one.
             PaymentTerms: customer.payment_terms || '',
+            // Phase 7: tax rate — 0 for tax-exempt, 0.101 for taxable.
+            // Renderer reads this and shows "Tax-exempt" vs "WA Sales Tax".
+            TaxRate: taxable ? 0.101 : 0,
             TotalQuantity: calcContext.qty,
             SubtotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
             LTMFeeTotal: parseFloat((calcContext.ltmFee || 0).toFixed(2)),
@@ -746,7 +829,7 @@
             Status: 'Open',
             CreatedAt_Quote: nowISO,
             ExpiresAt: expiresISO,
-            Notes: 'AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches',
+            Notes: notesLines.join('\n'),
             StitchCount: calcContext.stitches,
             PrintLocation: locationLabel,
         };
@@ -849,49 +932,66 @@
             console.warn('[ai-chat] no calcContext at save time — skipping quote save');
             return;
         }
-        // Prefer the snapshot taken at draft-render time (closed over by the
-        // card's buttons) over the live aiState.lastLookup — clicks happen
-        // potentially much later than the render, and lastLookup may have
-        // moved on. Fall back to live aiState only if no snapshot is attached.
-        var lookup = draft.lookupSnapshot || aiState.lastLookup;
-        // Strict trust check — defensive against stale lookups across turns.
-        // Used for company/phone/customer_number/address/payment_terms/rep
-        // (anything where stale data could be misleading or wrong).
-        var draftEmail = (draft.to || '').toLowerCase();
-        var lookupEmail = (lookup && lookup.email || '').toLowerCase();
-        var lookupTrusted = !!lookup && draftEmail && draftEmail === lookupEmail;
-
-        // Phase 5: relaxed-trust check for the contact's full NAME only.
-        // The AI just used this name in "Hi <first>," — if the lookup's
-        // contact_name starts with the same first name, it's almost
-        // certainly the right person even if the email-trust check failed
-        // (case differences, alt email fields, etc.). Identity-low-risk.
-        var greetingFirst = (extractGreetingName(draft.body) || '').toLowerCase();
-        var lookupName = (lookup && lookup.contact_name || '');
-        var lookupFirst = (lookup && lookup.contact_first || lookupName.split(/\s+/)[0] || '').toLowerCase();
-        var nameTrusted = !!lookupName && (
-            lookupTrusted ||
-            (greetingFirst && lookupFirst && lookupFirst === greetingFirst)
-        );
-
-        // Phase 4 + 5: extended customer shape — name uses relaxed trust;
-        // everything else uses strict email-match trust.
-        var customer = {
-            email: draft.to || (lookupTrusted ? lookup.email : '') || '',
-            name: (nameTrusted ? lookupName : '') || extractGreetingName(draft.body) || '',
-            company: (lookupTrusted ? lookup.company : '') || '',
-            customer_number: (lookupTrusted ? lookup.customer_number : '') || '',
-            phone: (lookupTrusted ? lookup.phone : '') || '',
-            address: (lookupTrusted ? lookup.address : '') || '',
-            address2: (lookupTrusted ? lookup.address2 : '') || '',
-            city: (lookupTrusted ? lookup.city : '') || '',
-            state: (lookupTrusted ? lookup.state : '') || '',
-            zip: (lookupTrusted ? lookup.zip : '') || '',
-            // Phase 5: rep + terms — all strict-trust-gated.
-            account_owner: (lookupTrusted ? lookup.account_owner : '') || '',
-            email_salesrep: (lookupTrusted ? lookup.email_salesrep : '') || '',
-            payment_terms: (lookupTrusted ? lookup.payment_terms : '') || '',
-        };
+        // Phase 7: if the AI emitted a CUSTOMER_FINAL block (post-pre-flight),
+        // use it as the source of truth. Skips all trust-check gymnastics
+        // since Ruthie literally just confirmed/edited every field in chat.
+        var customer;
+        var cfBundle = null;
+        if (draft.confirmedCustomer && typeof draft.confirmedCustomer === 'object') {
+            var cf = draft.confirmedCustomer;
+            var billing = cf.billing || {};
+            var shipping = cf.shipping || {};
+            customer = {
+                email: cf.email || draft.to || '',
+                name: cf.name || extractGreetingName(draft.body) || '',
+                company: cf.company || '',
+                customer_number: cf.customer_number || '',
+                phone: cf.phone || '',
+                // Billing address → ShipTo* columns (Phase 6 relabels as "Billing")
+                address: billing.address || '',
+                city: billing.city || '',
+                state: billing.state || '',
+                zip: billing.zip || '',
+                account_owner: cf.account_owner || '',
+                email_salesrep: cf.email_salesrep || '',
+                payment_terms: cf.payment_terms || '',
+            };
+            // Phase 7 extras — packed onto a separate bundle for the save call
+            cfBundle = {
+                shipping: shipping,
+                taxable: cf.taxable !== false,         // default true if missing/null
+                reseller_permit: cf.reseller_permit || null,
+            };
+        } else {
+            // Pre-flight skipped or AI didn't emit CUSTOMER_FINAL — fall
+            // back to the Phase 4/5 lookupSnapshot logic with trust checks.
+            var lookup = draft.lookupSnapshot || aiState.lastLookup;
+            var draftEmail = (draft.to || '').toLowerCase();
+            var lookupEmail = (lookup && lookup.email || '').toLowerCase();
+            var lookupTrusted = !!lookup && draftEmail && draftEmail === lookupEmail;
+            var greetingFirst = (extractGreetingName(draft.body) || '').toLowerCase();
+            var lookupName = (lookup && lookup.contact_name || '');
+            var lookupFirst = (lookup && lookup.contact_first || lookupName.split(/\s+/)[0] || '').toLowerCase();
+            var nameTrusted = !!lookupName && (
+                lookupTrusted ||
+                (greetingFirst && lookupFirst && lookupFirst === greetingFirst)
+            );
+            customer = {
+                email: draft.to || (lookupTrusted ? lookup.email : '') || '',
+                name: (nameTrusted ? lookupName : '') || extractGreetingName(draft.body) || '',
+                company: (lookupTrusted ? lookup.company : '') || '',
+                customer_number: (lookupTrusted ? lookup.customer_number : '') || '',
+                phone: (lookupTrusted ? lookup.phone : '') || '',
+                address: (lookupTrusted ? lookup.address : '') || '',
+                address2: (lookupTrusted ? lookup.address2 : '') || '',
+                city: (lookupTrusted ? lookup.city : '') || '',
+                state: (lookupTrusted ? lookup.state : '') || '',
+                zip: (lookupTrusted ? lookup.zip : '') || '',
+                account_owner: (lookupTrusted ? lookup.account_owner : '') || '',
+                email_salesrep: (lookupTrusted ? lookup.email_salesrep : '') || '',
+                payment_terms: (lookupTrusted ? lookup.payment_terms : '') || '',
+            };
+        }
         // Phase 4: pass the pre-generated quote ID through so we don't burn
         // a fresh sequence at click-time (the AI's email already references
         // this ID, so they must match).
@@ -899,6 +999,7 @@
             calcContext: calcCtx,
             customer: customer,
             quoteID: aiState.quoteID || null,
+            cfBundle: cfBundle,  // Phase 7: shipping + tax info
         })
             .then(function (quoteID) {
                 showToast('Saved as ' + quoteID);
@@ -1000,7 +1101,17 @@
             bubbleEl.textContent = fullText;
             return;
         }
-        var preamble = fullText.slice(0, startIdx).trim();
+        // Phase 7: also capture the CUSTOMER_FINAL JSON block (output
+        // before EMAIL DRAFT). The preamble is everything before the
+        // FIRST of either marker — we want to strip both administrative
+        // blocks from the conversational text.
+        var customerFinal = parseCustomerFinal(fullText);
+        var preambleEnd = startIdx;
+        var customerFinalStartIdx = fullText.indexOf('CUSTOMER_FINAL START');
+        if (customerFinalStartIdx !== -1 && customerFinalStartIdx < preambleEnd) {
+            preambleEnd = customerFinalStartIdx;
+        }
+        var preamble = fullText.slice(0, preambleEnd).trim();
         var emailEnd = endIdx === -1 ? fullText.length : endIdx;
         var blockText = fullText.slice(startIdx + startMarker.length, emailEnd).trim();
 
@@ -1018,6 +1129,11 @@
             // Prevents staleness when Ruthie iterates on multiple customers
             // in a single session — each card's save uses its own snapshot.
             lookupSnapshot: aiState.lastLookup ? Object.assign({}, aiState.lastLookup) : null,
+            // Phase 7: structured customer data from the pre-flight checklist.
+            // When present, this is the source of truth for the saved quote
+            // (overrides lookupSnapshot). Captured per-draft so each card
+            // saves its own checklist state.
+            confirmedCustomer: customerFinal,
         };
         aiState.currentDraft = cardDraft;
 

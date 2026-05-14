@@ -1925,9 +1925,14 @@ class QuoteViewPage {
                 </div>
             `;
         } else {
+            // Phase 7: CEMB quotes that confirmed tax-exempt in the pre-flight
+            // show "Tax-exempt" instead of "Out of State Sales" (which is
+            // the existing default for other quote types with TaxRate=0).
+            const isCEMB = (this.quoteId || '').startsWith('CEMB');
+            const zeroTaxLabel = isCEMB ? 'Tax-exempt' : 'Out of State Sales';
             totalsHtml += `
                 <div class="total-row tax-row">
-                    <span class="label">Out of State Sales:</span>
+                    <span class="label">${zeroTaxLabel}:</span>
                     <span class="value">$0.00</span>
                 </div>
             `;
