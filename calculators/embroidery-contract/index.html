@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-crosstab">
+    <link rel="stylesheet" href="embroidery-contract.css?v=20260514-cap-rename">
 </head>
 <body>
 
@@ -99,7 +99,7 @@
                             <button type="button" data-product="cap">
                                 <span class="label">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>
-                                    Cap Front
+                                    Cap
                                 </span>
                                 <span class="code">CTR-Cap</span>
                             </button>
@@ -179,36 +179,11 @@
             </div>
         </section>
 
-        <!-- ========== Callouts (insight cards) ========== -->
-        <div class="callouts">
-            <div class="callout">
-                <span class="ico">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v0M12 11v6"/></svg>
-                </span>
-                <div>
-                    <h4>Same-day quotes</h4>
-                    <p>Ruthie returns contract quotes within one business day. Send artwork + stitch count to skip the back-and-forth.</p>
-                </div>
-            </div>
-            <div class="callout">
-                <span class="ico">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M16 7H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H8"/></svg>
-                </span>
-                <div>
-                    <h4>Volume breaks at 24, 48, 72</h4>
-                    <p>Every tier jump drops the per-1K rate. Hitting <b>72+</b> shaves up to <b>27%</b> off the 1–7 rate.</p>
-                </div>
-            </div>
-            <div class="callout">
-                <span class="ico">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16v.5"/></svg>
-                </span>
-                <div>
-                    <h4>Mind the LTM threshold</h4>
-                    <p>Bumping from 23 → 24 pieces removes the $50 fee. For full back, the fee is $100 — worth a heads-up to your customer.</p>
-                </div>
-            </div>
-        </div>
+        <!-- Callouts row REMOVED in Round 10 (2026-05-14) — the 3 insight
+             cards (Same-day quotes / Volume breaks / Mind the LTM threshold)
+             were editorial flourishes from the Designer mockup. In production
+             reps don't read them and they pushed the pricing tables further
+             down the page. Removed to tighten the calculator → tables flow. -->
 
         <!-- ========== Pricing tables (tabbed) ========== -->
         <section class="section">
@@ -224,7 +199,7 @@
                     </button>
                     <button type="button" data-product="cap">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>
-                        Cap Fronts <span class="code">CTR-Cap</span>
+                        Caps <span class="code">CTR-Cap</span>
                     </button>
                     <button type="button" data-product="fullback">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
@@ -362,6 +337,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="embroidery-contract.js?v=20260514-crosstab"></script>
+    <script src="embroidery-contract.js?v=20260514-cap-rename"></script>
 </body>
 </html>

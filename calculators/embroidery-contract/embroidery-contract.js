@@ -68,9 +68,14 @@
             minStitches: 8000,
         },
         cap:      {
-            label: 'Cap Front',   code: 'CTR-Cap',
-            title: 'Contract Cap Fronts',
-            subtitle: 'Front-panel embroidery on caps & headwear',
+            // Round 10 (2026-05-14): renamed from "Cap Front" to "Cap" — the
+            // CTR-Cap part covers ANY single panel on a cap (front, back,
+            // or side). Same per-1K rate regardless of panel. Subtitle makes
+            // the scope explicit so reps don't think one charge covers a
+            // multi-panel cap (it doesn't — pricing is per panel).
+            label: 'Cap',   code: 'CTR-Cap',
+            title: 'Contract Caps',
+            subtitle: 'Embroidery on any cap panel — front, back, or side',
             iconSvg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>',
             stitchCounts: CONTRACT_STITCH_COUNTS,
             stitchPresets: STITCH_PRESETS_GARMENT,
