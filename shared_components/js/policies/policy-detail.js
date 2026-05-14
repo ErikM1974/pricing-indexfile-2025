@@ -302,6 +302,11 @@
         const el = $('policyActions');
         if (!el) return;
 
+        // Share button — visible in both read and edit mode (when there's a real policy)
+        const shareBtn = state.policy && !state.isNew
+            ? `<button id="shareBtn" class="btn btn-secondary" type="button" title="Copy a link to this policy"><i class="fas fa-link"></i> Copy link</button>`
+            : '';
+
         if (state.isEditing) {
             el.innerHTML = `
                 <button id="saveBtn" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
@@ -309,6 +314,7 @@
                 ${!state.isNew && window.IS_POLICIES_ADMIN
                     ? '<button id="archiveBtn" class="btn btn-danger" type="button"><i class="fas fa-archive"></i> Archive</button>'
                     : ''}
+                ${shareBtn}
                 <span id="saveStatus" class="save-status"></span>
             `;
             $('saveBtn').addEventListener('click', onSave);
@@ -318,15 +324,53 @@
         } else if (window.IS_POLICIES_ADMIN && state.policy && !state.policy.External_URL) {
             el.innerHTML = `
                 <button id="editBtn" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
+                ${shareBtn}
             `;
             $('editBtn').addEventListener('click', () => {
                 const url = new URL(window.location.href);
                 url.searchParams.set('edit', '1');
                 window.location.href = url.toString();
             });
+        } else if (shareBtn) {
+            el.innerHTML = shareBtn;
         } else {
             el.innerHTML = '';
         }
+
+        const share = $('shareBtn');
+        if (share) share.addEventListener('click', onShare);
+    }
+
+    // Copy the canonical share URL to clipboard + toast confirmation.
+    async function onShare() {
+        if (!state.policy) return;
+        // Build a clean URL: no `edit=1`, no other params
+        const u = new URL(window.location.href);
+        u.search = `?id=${encodeURIComponent(state.policy.Policy_ID)}`;
+        const shareUrl = u.toString();
+
+        try {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast(`<i class="fas fa-check-circle"></i> Link copied — paste anywhere`);
+        } catch (e) {
+            // Older browser / no clipboard permission — fallback to prompt
+            window.prompt('Copy this link:', shareUrl);
+        }
+    }
+
+    // Lightweight toast — auto-dismisses. No dependency on a toast library.
+    function showToast(html) {
+        let host = document.querySelector('.pd-toast');
+        if (host) host.remove();
+        host = document.createElement('div');
+        host.className = 'pd-toast';
+        host.innerHTML = html;
+        document.body.appendChild(host);
+        requestAnimationFrame(() => host.classList.add('show'));
+        setTimeout(() => {
+            host.classList.remove('show');
+            setTimeout(() => host.remove(), 300);
+        }, 2500);
     }
 
     async function renderSubProcedures() {
@@ -535,6 +579,56 @@
         if (state.isEditing) await loadParentOptions();
         await loadPolicy();
         if (state.policy) render();
+        wireKeyboardShortcuts();
+    }
+
+    // Cmd/Ctrl + S → save (in edit mode); Cmd/Ctrl + E → enter edit mode (read mode);
+    // Cmd/Ctrl + Shift + C → copy share link; Esc → cancel edit / back to read.
+    function wireKeyboardShortcuts() {
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in a non-policy input or the TipTap editor
+            // is handling its own shortcuts (TipTap captures Cmd+B/I/etc).
+            const meta = e.metaKey || e.ctrlKey;
+
+            // Cmd/Ctrl+S → save
+            if (meta && !e.shiftKey && e.key.toLowerCase() === 's') {
+                if (state.isEditing) {
+                    e.preventDefault();
+                    const saveBtn = document.getElementById('saveBtn');
+                    if (saveBtn && !saveBtn.disabled) saveBtn.click();
+                }
+                return;
+            }
+
+            // Cmd/Ctrl+E → enter edit mode (read mode, admin only)
+            if (meta && !e.shiftKey && e.key.toLowerCase() === 'e') {
+                if (!state.isEditing && window.IS_POLICIES_ADMIN && state.policy && !state.policy.External_URL) {
+                    e.preventDefault();
+                    const editBtn = document.getElementById('editBtn');
+                    if (editBtn) editBtn.click();
+                }
+                return;
+            }
+
+            // Cmd/Ctrl+Shift+C → copy share link
+            if (meta && e.shiftKey && e.key.toLowerCase() === 'c') {
+                if (state.policy && !state.isNew) {
+                    e.preventDefault();
+                    onShare();
+                }
+                return;
+            }
+
+            // Escape → exit edit (with confirmation if dirty) or close any open AI modal
+            if (e.key === 'Escape') {
+                const aiOverlay = document.getElementById('aiModalOverlay');
+                if (aiOverlay) return; // AI modal handles its own Esc
+                if (state.isEditing && !state.isNew) {
+                    const cancelBtn = document.getElementById('cancelBtn');
+                    if (cancelBtn) cancelBtn.click();
+                }
+            }
+        });
     }
 
     if (document.readyState === 'loading') {

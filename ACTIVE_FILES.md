@@ -84,6 +84,8 @@
 | `/scripts/extract-legacy-policies.js` | **NEW** Extracts/cleans the 9 legacy policy HTML files → writes `scripts/legacy-policies.json` | Node `fs`/`path` | 🔧 One-time (ran 2026-05-14) |
 | `/scripts/seed-policies-direct.js` | **NEW** Direct Caspio inserter — reads `legacy-policies.json` and POSTs to Caspio REST API using credentials from `caspio-pricing-proxy/.env`. Used for initial migration before proxy deploy. | Node `https`, Caspio OAuth | 🔧 One-time (ran 2026-05-14, seeded 9 rows) |
 | `/scripts/verify-policies.js` | **NEW** Reads back the `Policies` table from Caspio and prints a per-row summary — confirms a seed/migration landed | Node `https`, Caspio OAuth | 🔧 Diagnostic |
+| `/scripts/backfill-body-plain.js` | **NEW** One-shot: scans every `Policies` row where Body_HTML is set but Body_Plain is empty, derives plain text locally, and PUTs it back via Caspio REST. Used 2026-05-14 to fix the 9 legacy-migrated rows whose bulk insert bypassed the server-side strip. | Node `https`, Caspio OAuth | 🔧 One-time (ran 2026-05-14) |
+| `/scripts/reparent-policy.js` | **NEW** Direct Caspio PUT to set `Parent_Policy_ID` on a given policy — used to demo the 3-level hierarchy. Started with `ltm-order-decision-algorithm` → child of `ltm-fee-policy`. Add more `RE_PARENT_PAIRS` and re-run. | Node `https`, Caspio OAuth | 🔧 Reusable |
 | `/scripts/legacy-policies.json` | **NEW** Generated artifact from `extract-legacy-policies.js` — 9 cleaned policy records ready for Caspio insert | (generated) | 🔧 Generated |
 | `/pages/pricing-negotiation-policy.html` | Pricing strategy & negotiation guide | Bootstrap, Font Awesome | ✅ Active |
 | `/pages/inventory-details.html` | Inventory details page | Various | ✅ Active |

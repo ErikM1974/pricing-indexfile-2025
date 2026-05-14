@@ -376,6 +376,46 @@
                 window.location.href = '/pages/policy-detail.html?id=new&edit=1';
             });
         }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            const meta = e.metaKey || e.ctrlKey;
+
+            // Cmd/Ctrl+K → focus search input (universal "open quick-find" shortcut)
+            if (meta && !e.shiftKey && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                const s = document.getElementById('hubSearch');
+                if (s) { s.focus(); s.select(); }
+                return;
+            }
+
+            // "/" → also focuses search (when not already in a text field)
+            if (e.key === '/' && !meta && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                const s = document.getElementById('hubSearch');
+                if (s) s.focus();
+                return;
+            }
+
+            // Cmd/Ctrl+N → new policy (admin only)
+            if (meta && !e.shiftKey && e.key.toLowerCase() === 'n') {
+                if (window.IS_POLICIES_ADMIN) {
+                    e.preventDefault();
+                    window.location.href = '/pages/policy-detail.html?id=new&edit=1';
+                }
+                return;
+            }
+
+            // Escape → clear search if focused
+            if (e.key === 'Escape') {
+                const s = document.getElementById('hubSearch');
+                if (s && document.activeElement === s) {
+                    s.value = '';
+                    s.dispatchEvent(new Event('input'));
+                    s.blur();
+                }
+            }
+        });
     }
 
     // ----------------------------- init -----------------------------

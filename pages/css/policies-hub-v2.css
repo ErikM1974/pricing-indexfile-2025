@@ -612,3 +612,70 @@ body.policies-hub-body {
    ===================================================== */
 .admin-only { display: none; }
 html.is-policies-admin .admin-only { display: inline-flex; }
+
+/* =====================================================
+   MOBILE RESPONSIVENESS — staff read on phones in the shop
+   ===================================================== */
+
+/* Tablet and below — stack the layout */
+@media (max-width: 900px) {
+    .hub-topbar {
+        flex-wrap: wrap;
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+    }
+    .hub-topbar-back { font-size: 0.85rem; }
+    .hub-topbar-title { font-size: 1rem; flex: 1 1 auto; }
+    .hub-search-wrap { flex: 1 1 100%; order: 3; }
+    .hub-search-wrap input { font-size: 16px; /* prevents iOS zoom on focus */ }
+
+    .hub-layout {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .hub-sidebar {
+        position: static;
+        max-height: none;
+        padding: 0.5rem 0.75rem;
+    }
+    .tree-cat > summary { padding: 0.55rem 0.5rem; }
+    .tree-link { padding: 0.55rem 0.6rem; font-size: 0.92rem; }
+}
+
+/* Phone — touch-friendly, single column */
+@media (max-width: 600px) {
+    .hub-page-header h1 { font-size: 1.35rem; }
+    .hub-page-header p { font-size: 0.88rem; }
+
+    /* Category chips wrap nicely; bigger tap targets */
+    .category-chips { gap: 0.4rem; }
+    .category-chip { padding: 0.55rem 0.85rem; font-size: 0.88rem; }
+    .category-chip .count { font-size: 0.7rem; }
+
+    /* Cards stack to one column; bigger touch targets */
+    .policies-grid {
+        grid-template-columns: 1fr;
+    }
+    .policy-card {
+        padding: 1rem 1rem 0.85rem;
+    }
+    .policy-title { font-size: 1rem; }
+    .policy-description { font-size: 0.83rem; }
+
+    /* Recently-updated rail collapses to single column */
+    .recent-items { grid-template-columns: 1fr; }
+
+    /* List view: drop category + owner columns on phones, keep title + date */
+    .policy-list-header,
+    .policy-list-item {
+        grid-template-columns: 2fr 1fr;
+    }
+    .policy-list-header > :nth-child(2),
+    .policy-list-header > :nth-child(4),
+    .policy-list-item > :nth-child(2),
+    .policy-list-item > :nth-child(4) { display: none; }
+
+    /* Hide the view toggle on phones — grid is best for small screens */
+    .view-toggle { display: none; }
+}

@@ -920,6 +920,35 @@ body.policy-detail-body {
 .detail-topbar-title i { color: var(--pd-accent); }
 
 /* =====================================================
+   TOAST (copy-link confirmation, etc.)
+   ===================================================== */
+.pd-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #111827;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.18s, transform 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+.pd-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+.pd-toast i { color: #10b981; }
+
+/* =====================================================
    READ TIME PILL
    ===================================================== */
 .meta-readtime {
@@ -1204,4 +1233,86 @@ body.policy-detail-body {
     @page :first {
         margin-top: 0.5in;
     }
+}
+
+/* =====================================================
+   MOBILE RESPONSIVENESS
+   ===================================================== */
+@media (max-width: 900px) {
+    .detail-topbar {
+        padding: 0.75rem 1rem;
+        gap: 0.5rem;
+    }
+    .detail-topbar a.back-link { font-size: 0.85rem; padding: 0.3rem 0.5rem; }
+    .detail-topbar-title { font-size: 0.95rem; }
+
+    .detail-layout {
+        gap: 1rem;
+        padding: 1rem;
+    }
+    .detail-main { padding: 1.25rem 1.25rem; }
+
+    /* Outline sidebar drops below main content on tablets */
+    .outline-sidebar {
+        position: static;
+        max-height: none;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .detail-main { padding: 1rem; }
+
+    /* Smaller title on phones — preserves hierarchy */
+    .policy-title { font-size: 1.5rem; }
+    .policy-summary { font-size: 0.95rem; }
+
+    /* Meta pills wrap; smaller text */
+    .policy-meta-row { font-size: 0.78rem; gap: 0.4rem 0.6rem; }
+    .meta-pill { font-size: 0.72rem; padding: 0.2rem 0.55rem; }
+
+    /* Body typography — slightly tighter line height, comfortable read size */
+    .policy-body { font-size: 0.95rem; line-height: 1.65; }
+    .policy-body h1 { font-size: 1.4rem; }
+    .policy-body h2 { font-size: 1.15rem; }
+    .policy-body h3 { font-size: 1rem; }
+
+    /* Edit form fields stack to one column */
+    .edit-meta-row { grid-template-columns: 1fr; gap: 0.65rem; }
+
+    /* TipTap editor: keep toolbar usable on small screens, allow it to scroll */
+    .tt-toolbar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 0.3rem 0.4rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .tt-toolbar button { font-size: 0.82rem; padding: 0.3rem 0.45rem; min-width: 1.9rem; }
+    .tt-editor { padding: 1rem; }
+    .tt-content { font-size: 16px; /* prevents iOS zoom on focus */ }
+
+    /* Actions row wraps cleanly */
+    .policy-actions { gap: 0.5rem; }
+    .policy-actions .btn { padding: 0.55rem 0.85rem; font-size: 0.88rem; }
+    .save-status { font-size: 0.78rem; margin-left: 0; flex-basis: 100%; }
+
+    /* Sub-procedures cards single column */
+    .sub-procedures-list { grid-template-columns: 1fr; }
+
+    /* AI Assist modal — full-screen on phones */
+    .ai-modal {
+        max-width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    .ai-modal-overlay { padding: 0; }
+    .ai-modal-header { padding: 0.85rem 1rem; }
+    .ai-modal-header h2 { font-size: 1rem; }
+    .ai-modal-body { padding: 1rem; }
+    .ai-action-grid { grid-template-columns: 1fr; }
+    .ai-modal-footer {
+        flex-direction: column-reverse;
+        padding: 0.75rem 1rem;
+    }
+    .ai-modal-footer .btn { width: 100%; justify-content: center; }
 }
