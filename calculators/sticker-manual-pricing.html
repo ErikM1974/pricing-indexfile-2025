@@ -8,7 +8,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260515-4">
+    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260515-redesign-2">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -40,6 +40,11 @@
                 </button>
                 <div class="page-hero-hint" id="autoOpenHint">Chat opens automatically…</div>
             </div>
+            <img class="page-hero-art"
+                 src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531"
+                 alt="Sample die-cut sticker and vinyl banner from Northwest Custom Apparel"
+                 loading="lazy"
+                 decoding="async">
         </section>
 
         <!-- ========== Quick-facts strip (replaces 3 info boxes) ========== -->
@@ -56,26 +61,18 @@
             <strong>Unable to load sticker pricing.</strong> Refresh the page, or contact Erik if this persists.
         </div>
 
-        <!-- ========== Pricing reference (closed accordion by default) ========== -->
-        <details class="pricing-accordion" id="pricingAccordion">
+        <!-- ========== Banner pricing — short, fast lookup, sits above sticker tables ========== -->
+        <details class="pricing-accordion" id="bannerAccordion">
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
-                    <i class="fas fa-table"></i>
-                    Show pricing reference
+                    <i class="fas fa-flag"></i>
+                    Vinyl banner pricing
                 </span>
-                <span class="toggle-meta">50 sticker SKUs + banner rate card</span>
+                <span class="toggle-meta">$10/sqft · $40 minimum · 13oz vinyl</span>
                 <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
             </summary>
 
             <div class="pricing-accordion-body">
-                <!-- Sticker pricing tables (rendered by JS) -->
-                <section class="pricing-grid" id="pricingGrid" aria-label="Sticker pricing tables">
-                    <div class="pricing-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading pricing…
-                    </div>
-                </section>
-
-                <!-- Banner rate card -->
                 <section class="banner-section" id="bannerSection">
                     <div class="banner-section-header">
                         <h2><i class="fas fa-flag"></i> Vinyl Banners</h2>
@@ -88,6 +85,26 @@
                         <strong>Formula:</strong> (Width&nbsp;×&nbsp;Height ÷&nbsp;144) × $10/sqft × Qty &nbsp;·&nbsp;
                         <strong>Minimum:</strong> $40 per banner &nbsp;·&nbsp;
                         <strong>Included:</strong> Sewn hems + #2 brass grommets every 24"
+                    </div>
+                </section>
+            </div>
+        </details>
+
+        <!-- ========== Sticker pricing reference (closed by default) ========== -->
+        <details class="pricing-accordion" id="pricingAccordion">
+            <summary class="pricing-accordion-toggle">
+                <span class="toggle-label">
+                    <i class="fas fa-table"></i>
+                    Sticker pricing reference
+                </span>
+                <span class="toggle-meta">50 SKUs · sizes 2×2 → 6×6</span>
+                <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
+            </summary>
+
+            <div class="pricing-accordion-body">
+                <section class="pricing-grid" id="pricingGrid" aria-label="Sticker pricing tables">
+                    <div class="pricing-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading pricing…
                     </div>
                 </section>
             </div>
