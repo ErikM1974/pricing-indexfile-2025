@@ -202,6 +202,23 @@
             html += '</tr>';
         }
         tbody.innerHTML = html;
+
+        // Live LTM footer note — when the current qty hits the LTM tier,
+        // swap the generic "$50 ÷ qty per piece" text for the actual
+        // computation so the customer sees the per-piece impact for THEIR
+        // order. Outside the LTM tier, keep the generic explainer.
+        var ltmNoteEl = document.getElementById('tableLtmNote');
+        if (ltmNoteEl) {
+            if (state.qty <= LTM_THRESHOLD && state.qty > 0) {
+                var ltmPerPc = LTM_FEE / state.qty;
+                ltmNoteEl.innerHTML =
+                    'LTM fee <b>$' + LTM_FEE.toFixed(2) + '</b> ÷ <b>' + state.qty + ' pcs</b>' +
+                    ' = adds <b>+$' + fmtMoney(ltmPerPc) + '/pc</b> on this order';
+            } else {
+                ltmNoteEl.innerHTML =
+                    'LTM fee <b>$50</b> on orders 1–23 pcs · adds <b>$50 ÷ qty</b> per piece';
+            }
+        }
     }
 
     /* ---------------------- URL params ---------------------- */
