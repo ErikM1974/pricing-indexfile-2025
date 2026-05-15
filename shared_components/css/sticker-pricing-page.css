@@ -804,13 +804,14 @@ body {
     resize: none;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 0.6rem 0.85rem;
+    padding: 0.7rem 0.9rem;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     line-height: 1.5;
     color: var(--text-primary);
     outline: none;
-    max-height: 120px;
+    min-height: 72px;        /* ~3 lines visible by default */
+    max-height: 220px;       /* grows up to ~10 lines as you type */
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 .ai-chat-input textarea:focus {

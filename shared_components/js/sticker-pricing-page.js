@@ -268,6 +268,8 @@
             });
         }
 
+        const outlookBtn = document.getElementById('aiOutlookBtn');
+        if (outlookBtn) outlookBtn.addEventListener('click', handleOpenOutlook);
         if (copyBtn) copyBtn.addEventListener('click', handleCopyEmail);
         if (saveBtn) saveBtn.addEventListener('click', handleSaveQuote);
 
@@ -279,7 +281,7 @@
 
     function autoResizeTextarea(ta) {
         ta.style.height = 'auto';
-        ta.style.height = Math.min(120, ta.scrollHeight) + 'px';
+        ta.style.height = Math.min(220, Math.max(72, ta.scrollHeight)) + 'px';
     }
 
     function openChatPanel() {
@@ -575,16 +577,18 @@
 
     function updateActionsAvailability() {
         const actions = document.getElementById('aiChatActions');
+        const outlookBtn = document.getElementById('aiOutlookBtn');
         const copyBtn = document.getElementById('aiCopyEmailBtn');
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
         if (!actions) return;
         const hasDraft = !!aiState.currentEmailDraft;
         const hasQuote = !!aiState.currentPriceQuote;
         actions.hidden = !(hasDraft || hasQuote);
+        if (outlookBtn) outlookBtn.disabled = !hasDraft;
         if (copyBtn) copyBtn.disabled = !hasDraft;
         if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && aiState.currentCustomerFinal);
         if (aiState.savedQuoteID && saveBtn) {
-            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link (${aiState.savedQuoteID})`;
+            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
             saveBtn.disabled = false;
         }
     }
@@ -724,8 +728,47 @@
     }
 
     // -----------------------------------------------------------------
-    // Copy email / Save quote actions
+    // Open in Outlook / Copy email / Save quote actions
     // -----------------------------------------------------------------
+
+    /**
+     * Build a mailto: URL from the parsed email draft. Body capped at 1,800
+     * chars defensively — some Windows mail handlers truncate URLs around
+     * the 2KB mark, which would silently drop the end of the email. If the
+     * customer saved the quote first, append the share link to the body so
+     * the customer can review the full quote in-browser.
+     */
+    function buildMailto(draft) {
+        const BODY_CAP = 1800;
+        let body = draft.body || '';
+        if (aiState.savedQuoteID) {
+            const shareUrl = `${location.origin}/quote/${encodeURIComponent(aiState.savedQuoteID)}`;
+            body += `\n\nView quote online: ${shareUrl}`;
+        }
+        if (body.length > BODY_CAP) {
+            body = body.slice(0, BODY_CAP);
+            console.warn('[sticker-ai] mailto body capped at ' + BODY_CAP + ' chars.');
+        }
+        const params = [];
+        if (draft.subject) params.push('subject=' + encodeURIComponent(draft.subject));
+        if (body) params.push('body=' + encodeURIComponent(body));
+        const qs = params.length ? '?' + params.join('&') : '';
+        const to = (draft.to || '').trim();
+        return 'mailto:' + encodeURIComponent(to) + qs;
+    }
+
+    function handleOpenOutlook() {
+        const draft = aiState.currentEmailDraft;
+        if (!draft) return;
+        try {
+            window.location.href = buildMailto(draft);
+            showToast('Opening Outlook…');
+        } catch (err) {
+            console.error('[sticker-ai] mailto open failed:', err);
+            showToast('Failed to open Outlook — try Copy email instead');
+        }
+    }
+
     function handleCopyEmail() {
         const draft = aiState.currentEmailDraft;
         if (!draft) return;
@@ -741,7 +784,10 @@
     async function handleSaveQuote() {
         // Second click after save → copy the share link.
         if (aiState.savedQuoteID) {
-            const url = `${location.origin}/quote-view.html?id=${encodeURIComponent(aiState.savedQuoteID)}`;
+            // Use the server's clean /quote/<ID> route (server.js:2798) — the same
+            // path CEMB uses. /quote-view.html?id=... doesn't match the path-regex
+            // and renders as "Quote Not Found".
+            const url = `${location.origin}/quote/${encodeURIComponent(aiState.savedQuoteID)}`;
             try {
                 await navigator.clipboard.writeText(url);
                 showToast(`Share link copied — ${aiState.savedQuoteID}`);

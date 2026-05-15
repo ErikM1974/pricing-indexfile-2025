@@ -26,7 +26,8 @@ class QuoteViewPage {
             'RICH': 'Richardson Caps',
             'CAP': 'Cap Embroidery',
             'LT': 'Laser Tumblers',
-            'PATCH': 'Embroidered Emblems'
+            'PATCH': 'Embroidered Emblems',
+            'STK': 'Die-Cut Stickers & Vinyl Banners'
         };
 
         // DTF Location configuration
