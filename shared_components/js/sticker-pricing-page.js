@@ -53,7 +53,17 @@
 
     async function init() {
         wireChatPanel();
+        // Show the floating "Quote" button by default — hidden by the
+        // openChatPanel call once the chat opens.
+        showFloatingButton();
         await Promise.all([loadAndRenderPricing(), loadAndRenderBannerRates()]);
+        // Auto-open the chat 600ms after pricing loads. Gives the page a
+        // beat to render, then chat slides in and bot starts greeting.
+        // The hint text in the hero ("Chat opens automatically…") sets
+        // expectation so the panel doesn't feel intrusive.
+        setTimeout(() => {
+            if (!aiState.opened) openChatPanel();
+        }, 600);
     }
 
     function escapeHtml(s) {
@@ -241,10 +251,14 @@
         const ta = document.getElementById('aiChatTextarea');
         const copyBtn = document.getElementById('aiCopyEmailBtn');
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
+        const floatingBtn = document.getElementById('floatingQuoteBtn');
+        const resetBtn = document.getElementById('aiChatResetBtn');
 
         if (openBtn) openBtn.addEventListener('click', openChatPanel);
         if (closeBtn) closeBtn.addEventListener('click', closeChatPanel);
         if (backdrop) backdrop.addEventListener('click', closeChatPanel);
+        if (floatingBtn) floatingBtn.addEventListener('click', openChatPanel);
+        if (resetBtn) resetBtn.addEventListener('click', resetChat);
 
         if (form) {
             form.addEventListener('submit', function (e) {
@@ -286,7 +300,8 @@
 
     function openChatPanel() {
         if (!pricingData) {
-            window.alert('Pricing is still loading — give it a moment.');
+            // Pricing still loading — silent no-op (will auto-retry).
+            // Avoids a noisy alert when the user clicks fast.
             return;
         }
         const panel = document.getElementById('aiChatPanel');
@@ -297,9 +312,13 @@
         backdrop.classList.add('open');
         backdrop.setAttribute('aria-hidden', 'false');
         aiState.opened = true;
+        hideFloatingButton();
+        // The hint text in the hero is no longer relevant once chat opens.
+        const hint = document.getElementById('autoOpenHint');
+        if (hint) hint.style.opacity = '0';
 
         if (aiState.messages.length === 0) {
-            // Kick off the conversation — bot greets and asks for size
+            // Kick off the conversation — bot greets and asks for product type.
             aiState.messages.push({
                 role: 'user',
                 content: '(Open the chat — greet the rep briefly and ask whether they\'re quoting stickers or a banner.)',
@@ -323,6 +342,61 @@
         backdrop.classList.remove('open');
         backdrop.setAttribute('aria-hidden', 'true');
         aiState.opened = false;
+        showFloatingButton();
+    }
+
+    function showFloatingButton() {
+        const btn = document.getElementById('floatingQuoteBtn');
+        if (btn) btn.hidden = false;
+    }
+    function hideFloatingButton() {
+        const btn = document.getElementById('floatingQuoteBtn');
+        if (btn) btn.hidden = true;
+    }
+
+    /**
+     * Reset chat state for a fresh quote (without reloading the page).
+     * Use case: rep finishes a quote for customer A and immediately
+     * starts another for customer B without losing their place on the page.
+     */
+    function resetChat() {
+        if (aiState.isStreaming) {
+            // Don't reset mid-stream — would orphan an in-flight SSE call.
+            showToast('Wait for the current reply to finish first');
+            return;
+        }
+        // Clear UI state
+        const messagesEl = document.getElementById('aiChatMessages');
+        if (messagesEl) messagesEl.innerHTML = '';
+        const actionsEl = document.getElementById('aiChatActions');
+        if (actionsEl) actionsEl.hidden = true;
+
+        // Clear any pricing-table highlights from the previous quote
+        document.querySelectorAll('tr.ai-highlighted').forEach(tr => {
+            tr.classList.remove('ai-highlighted');
+            tr.querySelectorAll('.ai-quoted-badge').forEach(b => b.remove());
+        });
+        document.querySelectorAll('.banner-rate-card.highlighted').forEach(c => c.classList.remove('highlighted'));
+
+        // Reset state but keep the panel open
+        aiState.messages = [];
+        aiState.currentPriceQuote = null;
+        aiState.currentCustomerFinal = null;
+        aiState.currentEmailDraft = null;
+        aiState.lastLookup = null;
+        aiState.quoteID = null;
+        aiState.quoteIDPromise = null;
+        aiState.savedQuoteID = null;
+        aiState.isStreaming = false;
+
+        // Re-greet the rep with a fresh conversation
+        aiState.messages.push({
+            role: 'user',
+            content: '(Open the chat — greet the rep briefly and ask whether they\'re quoting stickers or a banner.)',
+        });
+        updateContextPill('Drafting quote… ready when you are.');
+        sendChatMessage();
+        showToast('New quote started');
     }
 
     function updateContextPill(text) {

@@ -1,12 +1,13 @@
 /* =============================================================================
    sticker-pricing-page.css
    Page-specific styles for /calculators/sticker-manual-pricing.html — the
-   Die-Cut Sticker pricing page + AI quote chat panel.
+   Die-Cut Sticker + Vinyl Banner AI quote page.
 
-   Extracted from inline <style> on 2026-05-15 (Rule #3: no inline CSS/JS).
+   v20260515-4: Chat-first redesign. Hero shrunk, info-boxes removed,
+   pricing tables behind accordion, floating quote button when chat closed,
+   reset-chat button, print-friendly @media print rules.
    ============================================================================= */
 
-/* ---------- NWCA Green Theme Variables ---------- */
 :root {
     --primary-color: #4cb354;
     --primary-dark: #409a47;
@@ -23,7 +24,7 @@
     --warning-text: #92400e;
     --best-value-bg: #fef3c7;
     --best-value-border: #f59e0b;
-    --highlight-bg: #fff7ed;        /* AI-quote row highlight */
+    --highlight-bg: #fff7ed;
     --highlight-border: #f59e0b;
     --highlight-pulse: rgba(245, 158, 11, 0.4);
     --chat-bg: #f9fafb;
@@ -49,7 +50,7 @@ body {
 .header {
     background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
-    padding: 1rem 0;
+    padding: 0.85rem 0;
     box-shadow: var(--shadow-sm);
     position: sticky;
     top: 0;
@@ -65,7 +66,7 @@ body {
     gap: 2rem;
 }
 .header-left { display: flex; align-items: center; gap: 2rem; }
-.logo { height: 40px; width: auto; }
+.logo { height: 36px; width: auto; }
 .breadcrumb {
     display: flex;
     align-items: center;
@@ -82,182 +83,206 @@ body {
 
 /* ---------- Main container ---------- */
 .main-container {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 2rem;
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    padding: 0 1.5rem;
 }
 
-/* ---------- Page header + AI button ---------- */
-.page-header {
+/* =============================================================================
+   SLIM HERO (no animation, big single CTA)
+   ============================================================================= */
+.page-hero {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
-    padding: 3rem 2rem;
-    border-radius: 12px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.25);
+    padding: 2.25rem 1.5rem;
+    border-radius: 14px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 16px rgba(76, 179, 84, 0.22);
     text-align: center;
-    position: relative;
-    overflow: hidden;
 }
-.page-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: rotate 20s linear infinite;
-}
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-.page-header-content { position: relative; z-index: 1; }
+.page-hero-content { max-width: 640px; margin: 0 auto; }
 .page-eyebrow {
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     font-size: 0.75rem;
-    font-weight: 600;
-    opacity: 0.85;
-    margin-bottom: 0.5rem;
+    font-weight: 700;
+    opacity: 0.92;
+    margin-bottom: 0.6rem;
 }
-.page-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-.page-header p { font-size: 1.15rem; opacity: 0.95; max-width: 640px; margin: 0 auto; }
+.page-hero h1 {
+    font-size: 1.65rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    line-height: 1.3;
+}
 
+/* The dominant CTA — large, contrasting, clearly the primary action */
 .ai-open-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-top: 1.5rem;
-    padding: 0.9rem 2rem;
+    gap: 0.7rem;
+    padding: 1.1rem 2.5rem;
     background: white;
     color: var(--primary-dark);
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.15rem;
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
     transition: transform 0.15s, box-shadow 0.15s;
+    letter-spacing: 0.01em;
 }
 .ai-open-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.20);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.25);
 }
+.ai-open-btn:active { transform: translateY(0); }
 .ai-open-btn .ai-sparkle {
-    font-size: 1.2rem;
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6));
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 6px rgba(254, 240, 138, 0.7));
 }
-.effective-date {
-    margin-top: 1rem;
-    font-size: 0.85rem;
-    opacity: 0.85;
+.page-hero-hint {
+    margin-top: 0.85rem;
+    font-size: 0.8rem;
+    opacity: 0.78;
+    font-style: italic;
 }
 
-/* ---------- Pricing-unavailable banner ---------- */
+/* =============================================================================
+   QUICK-FACTS STRIP (replaces 3 info-boxes)
+   ============================================================================= */
+.quick-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    justify-content: center;
+    align-items: center;
+    padding: 0.9rem 1.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    font-size: 0.85rem;
+}
+.quick-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    white-space: nowrap;
+}
+.quick-fact i {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+/* =============================================================================
+   PRICING ERROR BANNER
+   ============================================================================= */
 .pricing-error {
     background: #fee2e2;
     border-left: 4px solid #dc2626;
     color: #991b1b;
     padding: 1rem 1.5rem;
     border-radius: 8px;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
 }
 
-/* ---------- Info-box variants ---------- */
-.info-box {
-    background: var(--success-bg);
-    border-left: 4px solid var(--primary-color);
-    padding: 1.5rem;
-    border-radius: 8px;
-    margin: 2rem 0;
-}
-.info-box h3 {
-    color: var(--success-text);
+/* =============================================================================
+   PRICING REFERENCE ACCORDION (closed by default)
+   ============================================================================= */
+.pricing-accordion {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
     margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+.pricing-accordion-toggle {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    list-style: none;
+    transition: background 0.15s;
 }
-.info-box ul {
-    margin-left: 1.5rem;
-    color: var(--success-text);
+.pricing-accordion-toggle::-webkit-details-marker { display: none; }
+.pricing-accordion-toggle:hover { background: var(--hover-bg); }
+.pricing-accordion-toggle .toggle-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
 }
-.info-box li { margin-bottom: 0.5rem; }
-
-.info-box.setup-fee {
-    background: #fef3c7;
-    border-left-color: #f59e0b;
-}
-.info-box.setup-fee h3 { color: #92400e; }
-.info-box.setup-fee ul { color: #78350f; }
-.info-box.setup-fee .setup-fee-amount {
-    font-size: 1.6rem;
-    font-weight: 700;
-    color: #d97706;
-    margin: 0.75rem 0 1rem;
-}
-.info-box.setup-fee .part-number {
-    font-size: 1rem;
+.pricing-accordion-toggle .toggle-label i { color: var(--primary-color); }
+.pricing-accordion-toggle .toggle-meta {
     font-weight: 500;
-    color: #92400e;
-    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    color: var(--text-secondary);
+    font-size: 0.825rem;
+    margin-left: auto;
+    margin-right: 0.75rem;
 }
-.info-box.setup-fee .setup-fee-footer {
-    margin-top: 1rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid #fde68a;
-    color: #92400e;
+.pricing-accordion-toggle .toggle-chevron {
+    transition: transform 0.2s ease;
+    color: var(--text-secondary);
 }
-.info-box.setup-fee .setup-fee-footer i { color: #f59e0b; margin-right: 0.4rem; }
-.info-box.rules-box {
-    background: #ecfeff;
-    border-left-color: #0891b2;
+.pricing-accordion[open] .pricing-accordion-toggle .toggle-chevron {
+    transform: rotate(180deg);
 }
-.info-box.rules-box h3 { color: #155e75; }
-.info-box.rules-box ul { color: #164e63; }
+.pricing-accordion[open] .pricing-accordion-toggle {
+    border-bottom: 1px solid var(--border-color);
+}
 
-/* ---------- Pricing grid ---------- */
+.pricing-accordion-body {
+    padding: 1.25rem 1.5rem 1.5rem;
+}
+
+/* Pricing grid (sticker tables) */
 .pricing-grid {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
 }
 .pricing-loading {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 3rem;
+    padding: 2rem;
     text-align: center;
     color: var(--text-secondary);
-    font-size: 1rem;
-    box-shadow: var(--shadow-sm);
+    font-size: 0.95rem;
 }
 .pricing-loading i { margin-right: 0.5rem; color: var(--primary-color); }
 
 .pricing-section {
-    background: var(--card-bg);
-    border-radius: 12px;
-    padding: 1.5rem 2rem 2rem;
-    box-shadow: var(--shadow-sm);
+    background: #fafbfc;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem 1.5rem;
 }
 .size-title {
-    font-size: 1.4rem;
+    font-size: 1.15rem;
     color: var(--primary-color);
-    margin-bottom: 1rem;
+    margin-bottom: 0.85rem;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding-bottom: 0.75rem;
+    gap: 0.5rem;
+    padding-bottom: 0.6rem;
     border-bottom: 2px solid var(--primary-color);
 }
 .size-title .pn-prefix {
     font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     background: var(--hover-bg);
     color: var(--text-secondary);
-    padding: 0.25rem 0.5rem;
+    padding: 0.2rem 0.5rem;
     border-radius: 4px;
     font-weight: 500;
     margin-left: auto;
@@ -269,19 +294,20 @@ body {
 }
 .pricing-table thead { background: var(--hover-bg); }
 .pricing-table th {
-    padding: 0.85rem 1rem;
+    padding: 0.7rem 0.85rem;
     text-align: left;
     font-weight: 600;
     color: var(--text-primary);
     border-bottom: 2px solid var(--border-color);
-    font-size: 0.875rem;
+    font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 .pricing-table td {
-    padding: 0.85rem 1rem;
+    padding: 0.7rem 0.85rem;
     border-bottom: 1px solid var(--border-color);
     vertical-align: middle;
+    font-size: 0.9rem;
 }
 .pricing-table tbody tr {
     transition: background-color 0.18s, box-shadow 0.18s;
@@ -296,9 +322,9 @@ body {
     display: inline-block;
     background: var(--best-value-border);
     color: white;
-    padding: 0.2rem 0.55rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 12px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     margin-left: 0.4rem;
@@ -306,15 +332,15 @@ body {
 .price-highlight {
     color: var(--primary-color);
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 .partnumber-cell {
     font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
     color: var(--text-secondary);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
-/* ---------- Row highlight (AI-quoted row) ---------- */
+/* Row highlight (AI-quoted) */
 .pricing-table tbody tr.ai-highlighted {
     background: var(--highlight-bg) !important;
     box-shadow: inset 4px 0 0 var(--highlight-border);
@@ -340,63 +366,15 @@ body {
     letter-spacing: 0.05em;
 }
 
-/* ---------- CTA + footer ---------- */
-.cta-section {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    color: white;
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    margin: 2rem 0;
-}
-.cta-section h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
-.cta-section p { opacity: 0.95; margin-bottom: 1rem; }
-.cta-buttons {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-.cta-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.85rem 1.75rem;
-    background: white;
-    color: var(--primary-dark);
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: transform 0.15s, box-shadow 0.15s;
-}
-.cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.pricing-footer {
-    text-align: center;
-    padding: 1.5rem 0;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    line-height: 1.6;
-}
-.pricing-footer code {
-    background: var(--hover-bg);
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
-    font-size: 0.85em;
-}
-
 /* =============================================================================
-   BANNER SECTION (rate card + live-quote card)
+   BANNER SECTION (inside accordion now)
    ============================================================================= */
 .banner-section {
     background: linear-gradient(135deg, #0c4a6e, #075985);
     color: white;
     border-radius: 12px;
-    padding: 2rem;
-    margin: 2rem 0;
+    padding: 1.5rem;
+    margin-top: 1rem;
     box-shadow: var(--shadow-md);
 }
 .banner-section-header {
@@ -405,48 +383,47 @@ body {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 1.1rem;
+    padding-bottom: 0.6rem;
     border-bottom: 1px solid rgba(255,255,255,0.2);
 }
 .banner-section-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
 }
 .banner-section-header h2 i { color: #fbbf24; }
 .banner-section-eyebrow {
-    font-size: 0.825rem;
+    font-size: 0.8rem;
     opacity: 0.85;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     font-weight: 500;
 }
-
 .banner-rate-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 0.85rem;
 }
 .banner-rate-card {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 8px;
-    padding: 1rem 1.25rem;
+    padding: 0.85rem 1rem;
     transition: background 0.15s;
 }
 .banner-rate-card.included { border-color: #34d399; }
 .banner-rate-card .pn {
     font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #bae6fd;
     margin-bottom: 0.25rem;
     letter-spacing: 0.05em;
 }
 .banner-rate-card .rate {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     margin-bottom: 0.25rem;
 }
@@ -457,7 +434,7 @@ body {
     margin-left: 0.25rem;
 }
 .banner-rate-card .desc {
-    font-size: 0.825rem;
+    font-size: 0.78rem;
     opacity: 0.85;
     line-height: 1.4;
 }
@@ -465,12 +442,12 @@ body {
     display: inline-block;
     background: #10b981;
     color: white;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    padding: 0.15rem 0.5rem;
-    border-radius: 8px;
+    padding: 0.12rem 0.45rem;
+    border-radius: 6px;
     margin-bottom: 0.3rem;
 }
 .banner-rate-card.highlighted {
@@ -485,17 +462,15 @@ body {
     100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3); }
 }
 .banner-formula {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     opacity: 0.9;
-    padding: 0.85rem 1rem;
+    padding: 0.75rem 0.9rem;
     background: rgba(0,0,0,0.18);
     border-radius: 8px;
-    line-height: 1.55;
+    line-height: 1.5;
 }
 
-/* Live-quote card rendered in the chat when the AI returns a banner quote.
-   Sits inline in the chat messages — different visual treatment than the
-   inline sticker row highlights since banners don't have a "row" to glow. */
+/* Live banner-quote card (rendered in chat) */
 .banner-quote-card {
     background: linear-gradient(135deg, #0c4a6e, #075985);
     color: white;
@@ -546,6 +521,90 @@ body {
 }
 
 /* =============================================================================
+   COMPACT CTA + FOOTER (replaces old gradient CTA block)
+   ============================================================================= */
+.cta-compact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 0.85rem;
+    box-shadow: var(--shadow-sm);
+    font-size: 0.9rem;
+}
+.cta-compact .cta-text { color: var(--text-secondary); }
+.cta-compact .cta-links {
+    display: inline-flex;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+}
+.cta-compact .cta-links a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.cta-compact .cta-links a:hover { color: var(--primary-dark); }
+
+.pricing-footer {
+    text-align: center;
+    padding: 1rem 0 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.6;
+}
+
+/* =============================================================================
+   FLOATING "✨ QUOTE" BUTTON (shown when chat is closed)
+   ============================================================================= */
+.floating-quote-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 80;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.95rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(64, 154, 71, 0.45);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.25s;
+    opacity: 0;
+    pointer-events: none;
+}
+.floating-quote-btn:not([hidden]) {
+    opacity: 1;
+    pointer-events: auto;
+    animation: floating-in 0.3s ease;
+}
+.floating-quote-btn[hidden] { display: none; }
+.floating-quote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(64, 154, 71, 0.55);
+}
+.floating-quote-btn .ai-sparkle {
+    font-size: 1.15rem;
+    filter: drop-shadow(0 0 4px rgba(254, 240, 138, 0.7));
+}
+@keyframes floating-in {
+    from { transform: translateY(20px) scale(0.9); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* =============================================================================
    AI CHAT PANEL (right-side drawer)
    ============================================================================= */
 .ai-chat-backdrop {
@@ -569,7 +628,7 @@ body {
     top: 0;
     right: 0;
     bottom: 0;
-    width: 420px;
+    width: 440px;
     max-width: 100vw;
     background: var(--card-bg);
     box-shadow: -8px 0 24px rgba(0,0,0,0.12);
@@ -579,15 +638,13 @@ body {
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 100;
 }
-.ai-chat-panel.open {
-    transform: translateX(0);
-}
+.ai-chat-panel.open { transform: translateX(0); }
 
 .ai-chat-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 1rem 1.25rem;
+    padding: 0.9rem 1.25rem;
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
     color: white;
     flex-shrink: 0;
@@ -597,13 +654,17 @@ body {
     align-items: center;
     gap: 0.5rem;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 .ai-chat-title .ai-sparkle {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     filter: drop-shadow(0 0 4px rgba(254, 240, 138, 0.7));
 }
-.ai-chat-close {
+.ai-chat-head-actions {
+    display: inline-flex;
+    gap: 0.4rem;
+}
+.ai-chat-icon-btn, .ai-chat-close {
     background: rgba(255,255,255,0.15);
     color: white;
     border: none;
@@ -615,16 +676,17 @@ body {
     align-items: center;
     justify-content: center;
     transition: background 0.15s;
+    font-size: 0.9rem;
 }
-.ai-chat-close:hover { background: rgba(255,255,255,0.25); }
+.ai-chat-icon-btn:hover, .ai-chat-close:hover { background: rgba(255,255,255,0.25); }
 
 .ai-chat-context-pill {
-    margin: 0.75rem 1.25rem;
-    padding: 0.6rem 0.85rem;
+    margin: 0.7rem 1.25rem;
+    padding: 0.55rem 0.85rem;
     background: var(--success-bg);
     border-radius: 8px;
     color: var(--success-text);
-    font-size: 0.825rem;
+    font-size: 0.82rem;
     font-weight: 500;
     flex-shrink: 0;
 }
@@ -678,7 +740,6 @@ body {
     padding: 0 0.5rem;
 }
 
-/* Tool result chip (in-bubble micro-status, e.g. "Looking up Acme Fuel…") */
 .tool-chip {
     display: inline-flex;
     align-items: center;
@@ -693,7 +754,6 @@ body {
 }
 .tool-chip i { font-size: 0.7rem; }
 
-/* Typing indicator */
 .chat-typing {
     display: inline-flex;
     align-items: center;
@@ -718,7 +778,6 @@ body {
     30% { transform: translateY(-6px); opacity: 1; }
 }
 
-/* Email-draft card (inline rendered when AI emits EMAIL DRAFT block) */
 .email-draft-card {
     background: white;
     border: 1px solid var(--border-color);
@@ -745,7 +804,7 @@ body {
     margin: 0;
 }
 
-/* Footer actions (Copy email / Save quote) */
+/* Footer actions */
 .ai-chat-actions {
     display: flex;
     gap: 0.5rem;
@@ -775,10 +834,7 @@ body {
     border-color: var(--primary-color);
 }
 .ai-action-btn:active:not(:disabled) { transform: translateY(1px); }
-.ai-action-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+.ai-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .ai-action-btn.primary {
     background: var(--primary-color);
     color: white;
@@ -789,7 +845,6 @@ body {
     border-color: var(--primary-dark);
 }
 
-/* Input form */
 .ai-chat-input {
     display: flex;
     gap: 0.5rem;
@@ -810,8 +865,8 @@ body {
     line-height: 1.5;
     color: var(--text-primary);
     outline: none;
-    min-height: 72px;        /* ~3 lines visible by default */
-    max-height: 220px;       /* grows up to ~10 lines as you type */
+    min-height: 72px;
+    max-height: 220px;
     transition: border-color 0.15s, box-shadow 0.15s;
 }
 .ai-chat-input textarea:focus {
@@ -835,7 +890,9 @@ body {
 .ai-chat-send:hover { background: var(--primary-dark); }
 .ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; background: var(--text-secondary); }
 
-/* ---------- Share toast ---------- */
+/* =============================================================================
+   SHARE TOAST
+   ============================================================================= */
 .share-toast {
     position: fixed;
     bottom: 1.5rem;
@@ -858,18 +915,63 @@ body {
 .share-toast i { color: #4ade80; }
 
 /* =============================================================================
-   Mobile
+   MOBILE
    ============================================================================= */
 @media (max-width: 768px) {
-    .page-header h1 { font-size: 1.75rem; }
-    .page-header p { font-size: 1rem; }
-    .pricing-section { padding: 1.25rem 1rem 1.5rem; }
-    .pricing-table { font-size: 0.85rem; }
-    .pricing-table th,
-    .pricing-table td { padding: 0.65rem 0.5rem; }
-    .partnumber-cell { font-size: 0.7rem; }
-    .cta-buttons { flex-direction: column; }
+    .header-container { padding: 0 1rem; }
+    .main-container { padding: 0 1rem; margin: 1rem auto; }
+    .page-hero { padding: 1.75rem 1rem; }
+    .page-hero h1 { font-size: 1.3rem; }
+    .ai-open-btn { padding: 0.9rem 1.75rem; font-size: 1rem; }
+    .quick-facts { gap: 0.4rem 0.85rem; padding: 0.75rem 0.85rem; font-size: 0.78rem; }
+    .quick-fact { white-space: normal; }
+    .pricing-accordion-toggle { padding: 0.85rem 1rem; flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+    .pricing-accordion-toggle .toggle-meta { margin-left: 0; margin-right: 0; }
+    .pricing-accordion-body { padding: 1rem; }
+    .pricing-section { padding: 1rem; }
+    .pricing-table { font-size: 0.82rem; }
+    .pricing-table th, .pricing-table td { padding: 0.55rem 0.5rem; }
+    .partnumber-cell { font-size: 0.68rem; }
+    .cta-compact { flex-direction: column; align-items: flex-start; padding: 0.85rem 1rem; }
 
-    /* Chat panel goes fullscreen on phones */
+    /* Chat panel fullscreen on phones */
     .ai-chat-panel { width: 100vw; }
+
+    /* Floating button — slightly smaller on mobile */
+    .floating-quote-btn { bottom: 18px; right: 18px; padding: 0.85rem 1.25rem; font-size: 0.95rem; }
+}
+
+/* =============================================================================
+   PRINT — hide chat, show reference only
+   ============================================================================= */
+@media print {
+    .header, .page-hero, .quick-facts, .cta-compact,
+    .ai-chat-panel, .ai-chat-backdrop, .floating-quote-btn,
+    .share-toast, .pricing-accordion-toggle {
+        display: none !important;
+    }
+    .pricing-accordion {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    /* Force accordion contents visible regardless of [open] state */
+    .pricing-accordion-body {
+        display: block !important;
+    }
+    .pricing-section {
+        page-break-inside: avoid;
+        border: 1px solid #ccc;
+    }
+    .banner-section {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+    .banner-rate-card, .banner-formula {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+    }
+    body { background: white; }
 }

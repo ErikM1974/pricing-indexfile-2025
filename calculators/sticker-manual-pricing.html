@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Die-Cut Sticker &amp; Vinyl Banner Quote — Northwest Custom Apparel</title>
+    <title>Die Cut Sticker &amp; Vinyl Banner Quote — Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260515-3">
+    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260515-4">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -29,18 +29,26 @@
     <!-- ========== Main ========== -->
     <main class="main-container">
 
-        <!-- ========== Page header + AI launch button ========== -->
-        <section class="page-header">
-            <div class="page-header-content">
-                <div class="page-eyebrow">Sticker &amp; Banner · Internal staff tool</div>
-                <h1>Die-Cut Stickers &amp; Vinyl Banners</h1>
-                <p>5 standard sticker sizes (2×2 – 6×6, qty 50–10,000) plus custom-size vinyl banners at $10/sqft. AI bot handles both.</p>
+        <!-- ========== Slim hero — single CTA dominates ========== -->
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <div class="page-eyebrow">✨ AI Sticker &amp; Banner Quote</div>
+                <h1>Pricing handled by AI — start a quote in 30 seconds</h1>
                 <button type="button" class="ai-open-btn" id="aiOpenBtn">
                     <span class="ai-sparkle" aria-hidden="true">✨</span>
-                    Draft a Quote with AI
+                    Start a Quote with AI
                 </button>
-                <div class="effective-date">Pricing updated May 2026 · 50 sticker SKUs + banner rate card · Caspio-backed</div>
+                <div class="page-hero-hint" id="autoOpenHint">Chat opens automatically…</div>
             </div>
+        </section>
+
+        <!-- ========== Quick-facts strip (replaces 3 info boxes) ========== -->
+        <section class="quick-facts" aria-label="Pricing facts at a glance">
+            <div class="quick-fact"><i class="fas fa-robot"></i> <span>Pricing via AI chat</span></div>
+            <div class="quick-fact"><i class="fas fa-flag"></i> <span>$40 banner minimum</span></div>
+            <div class="quick-fact"><i class="fas fa-bolt"></i> <span>+25% rush &lt;5 days</span></div>
+            <div class="quick-fact"><i class="fas fa-palette"></i> <span>$50 setup if new art</span></div>
+            <div class="quick-fact"><i class="fas fa-clock"></i> <span>10–12 day standard</span></div>
         </section>
 
         <!-- Loading-error banner (shown by JS when API fails) -->
@@ -48,97 +56,82 @@
             <strong>Unable to load sticker pricing.</strong> Refresh the page, or contact Erik if this persists.
         </div>
 
-        <!-- ========== Art Setup Fee callout ========== -->
-        <section class="info-box setup-fee">
-            <h3><i class="fas fa-palette"></i> Art Setup Fee</h3>
-            <div class="setup-fee-amount">$50.00 <span class="part-number">(GRT-50)</span></div>
-            <p><strong>One-time fee for new artwork — covers:</strong></p>
-            <ul>
-                <li>Custom sticker design mockup</li>
-                <li>Print-readiness check for die-cut specifications</li>
-                <li>Up to 2 rounds of revisions</li>
-            </ul>
-            <div class="setup-fee-footer">
-                <span><i class="fas fa-check-circle"></i> Waived if customer has an approved design on file</span>
-            </div>
-        </section>
+        <!-- ========== Pricing reference (closed accordion by default) ========== -->
+        <details class="pricing-accordion" id="pricingAccordion">
+            <summary class="pricing-accordion-toggle">
+                <span class="toggle-label">
+                    <i class="fas fa-table"></i>
+                    Show pricing reference
+                </span>
+                <span class="toggle-meta">50 sticker SKUs + banner rate card</span>
+                <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
+            </summary>
 
-        <!-- ========== Pricing tables (rendered by JS from /api/sticker-pricing) ========== -->
-        <section class="pricing-grid" id="pricingGrid" aria-label="Sticker pricing tables">
-            <div class="pricing-loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading pricing…
-            </div>
-        </section>
+            <div class="pricing-accordion-body">
+                <!-- Sticker pricing tables (rendered by JS) -->
+                <section class="pricing-grid" id="pricingGrid" aria-label="Sticker pricing tables">
+                    <div class="pricing-loading">
+                        <i class="fas fa-spinner fa-spin"></i> Loading pricing…
+                    </div>
+                </section>
 
-        <!-- ========== Pricing rules info ========== -->
-        <section class="info-box rules-box">
-            <h3><i class="fas fa-info-circle"></i> How the AI quotes custom sizes &amp; quantities</h3>
-            <ul>
-                <li><strong>Bounding box:</strong> non-square sizes (2×3, 4×5, etc.) price at the smallest standard tier that fits. E.g. 2×3 → 3×3 price.</li>
-                <li><strong>Quantity round-up:</strong> non-standard qty rounds UP to the next tier. E.g. 750 → 1,000 tier price.</li>
-                <li><strong>Off-grid:</strong> sizes &gt; 6×6 or qty &gt; 10,000 → escalate to a custom quote (Erik fills in pricing within 1 business day).</li>
-            </ul>
-        </section>
-
-        <!-- ========== Volume Discounts callout ========== -->
-        <section class="info-box volume-box">
-            <h3><i class="fas fa-chart-line"></i> Volume Discounts (Stickers)</h3>
-            <p>The more stickers you order, the more you save. Per-unit costs drop significantly at higher quantities. <strong>Contact us for quotes on quantities over 10,000 or custom sizes.</strong></p>
-        </section>
-
-        <!-- ========== Banner Rate Card ========== -->
-        <section class="banner-section" id="bannerSection">
-            <div class="banner-section-header">
-                <h2><i class="fas fa-flag"></i> Vinyl Banners</h2>
-                <span class="banner-section-eyebrow">13oz vinyl · Custom size · $10/sqft</span>
+                <!-- Banner rate card -->
+                <section class="banner-section" id="bannerSection">
+                    <div class="banner-section-header">
+                        <h2><i class="fas fa-flag"></i> Vinyl Banners</h2>
+                        <span class="banner-section-eyebrow">13oz vinyl · Custom size · $10/sqft</span>
+                    </div>
+                    <div class="banner-rate-grid" id="bannerRateGrid">
+                        <div class="pricing-loading"><i class="fas fa-spinner fa-spin"></i> Loading banner rates…</div>
+                    </div>
+                    <div class="banner-formula">
+                        <strong>Formula:</strong> (Width&nbsp;×&nbsp;Height ÷&nbsp;144) × $10/sqft × Qty &nbsp;·&nbsp;
+                        <strong>Minimum:</strong> $40 per banner &nbsp;·&nbsp;
+                        <strong>Included:</strong> Sewn hems + #2 brass grommets every 24"
+                    </div>
+                </section>
             </div>
-            <div class="banner-rate-grid" id="bannerRateGrid">
-                <!-- Rendered by JS from /api/banner-pricing -->
-                <div class="pricing-loading"><i class="fas fa-spinner fa-spin"></i> Loading banner rates…</div>
-            </div>
-            <div class="banner-formula">
-                <strong>Formula:</strong> (Width&nbsp;×&nbsp;Height ÷&nbsp;144) × $10/sqft × Qty &nbsp;·&nbsp;
-                <strong>Minimum:</strong> $40 per banner &nbsp;·&nbsp;
-                <strong>Included:</strong> Hemmed edges + 4 corner grommets
-            </div>
-        </section>
+        </details>
 
-        <!-- ========== CTA ========== -->
-        <section class="cta-section">
-            <h2>Questions on a custom job?</h2>
-            <p>Reach out — we'll help with custom sizes, rush orders, or odd-shape die-cuts.</p>
-            <div class="cta-buttons">
-                <a href="tel:253-922-5793" class="cta-btn"><i class="fas fa-phone"></i> (253) 922-5793</a>
-                <a href="mailto:sales@nwcustomapparel.com" class="cta-btn"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+        <!-- ========== Compact CTA ========== -->
+        <section class="cta-compact">
+            <div class="cta-text">Need a custom quote, rush order, or help with art?</div>
+            <div class="cta-links">
+                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> (253) 922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
             </div>
         </section>
 
         <!-- ========== Footer ========== -->
         <footer class="pricing-footer">
-            <strong>Northwest Custom Apparel</strong> · Pricing maintained in Caspio table <code>Sticker_Pricing</code> · 50 SKUs (2×2 through 6×6, qty 50–10,000)
+            <strong>Northwest Custom Apparel</strong> · Pricing maintained in Caspio · 50 sticker SKUs (2×2 – 6×6) + banner rate card
         </footer>
     </main>
 
-    <!-- ========== AI Quote Chat Panel ==========
-         Slides in from the right when "Draft a Quote with AI" is clicked.
-         Streaming chat with Claude via /api/contract-sticker-ai/chat. Reads
-         /api/quote-sequence/STK at open to pre-assign a quote ID. -->
+    <!-- ========== Floating "Quote" button (shown when chat is closed) ========== -->
+    <button type="button" class="floating-quote-btn" id="floatingQuoteBtn" aria-label="Open AI quote chat" hidden>
+        <span class="ai-sparkle" aria-hidden="true">✨</span>
+        <span class="floating-quote-label">Quote</span>
+    </button>
+
+    <!-- ========== AI Quote Chat Panel ========== -->
     <aside class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
         <header class="ai-chat-head">
             <div class="ai-chat-title">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
-                <span>AI Sticker Quote Assistant</span>
+                <span>AI Sticker &amp; Banner Assistant</span>
             </div>
-            <button type="button" class="ai-chat-close" id="aiChatClose" aria-label="Close AI assistant">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
+            <div class="ai-chat-head-actions">
+                <button type="button" class="ai-chat-icon-btn" id="aiChatResetBtn" title="Start a new quote" aria-label="Reset chat">
+                    <i class="fas fa-rotate-right" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="ai-chat-close" id="aiChatClose" aria-label="Close AI assistant">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
         </header>
-        <div class="ai-chat-context-pill" id="aiChatContextPill">
-            <!-- Filled by JS: "Quote STK1115-1 · ready to draft" -->
-        </div>
-        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite">
-            <!-- Bubbles appended by JS -->
-        </div>
+        <div class="ai-chat-context-pill" id="aiChatContextPill"></div>
+        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
                 <i class="fas fa-envelope-open-text"></i> Open in Outlook
@@ -168,7 +161,7 @@
     </div>
 
     <!-- ========== Scripts ========== -->
-    <script src="/shared_components/js/sticker-pricing-service.js?v=20260515-3"></script>
-    <script src="/shared_components/js/sticker-pricing-page.js?v=20260515-3"></script>
+    <script src="/shared_components/js/sticker-pricing-service.js?v=20260515-4"></script>
+    <script src="/shared_components/js/sticker-pricing-page.js?v=20260515-4"></script>
 </body>
 </html>
