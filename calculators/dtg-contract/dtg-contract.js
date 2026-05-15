@@ -280,13 +280,7 @@
 
     function renderPriceTable() {
         var tbody = document.querySelector('#priceTable tbody');
-        var tfoot = document.querySelector('#priceTable tfoot');
         if (!tbody) return;
-
-        // Tfoot once carried a single rate per tier (back when all locations
-        // shared a flat rate). Rates now vary per location, so a footer
-        // "summary row" is misleading — hide it.
-        if (tfoot) tfoot.style.display = 'none';
 
         // Pricing not loaded yet — show placeholder rows so the table
         // doesn't collapse to empty.
@@ -298,6 +292,7 @@
                     '<td>—</td><td>—</td><td>—</td><td>—</td></tr>';
             });
             tbody.innerHTML = loadingHtml;
+            renderEffectiveRateRow();
             return;
         }
 
@@ -349,6 +344,75 @@
                     'LTM fee <b>$50</b> on orders 1–23 pcs · adds <b>$50 ÷ qty</b> per piece';
             }
         }
+
+        renderEffectiveRateRow();
+    }
+
+    // "Your effective rate" row in <tfoot> — shows the all-in $/pc per
+    // tier column for the customer's CURRENT selections (locations +
+    // heavyweight + qty). HW and LTM are per-piece (not per-location),
+    // so they're folded in ONCE per column, never multiplied by location
+    // count. LTM appears only in the 1-23 column and only when state.qty
+    // is in the LTM bracket — never as a hypothetical at other tiers.
+    function renderEffectiveRateRow() {
+        var row = document.getElementById('effectiveRow');
+        if (!row) return;
+        var cells = row.querySelectorAll('.effective-cell');
+        var sublabelEl = document.getElementById('effectiveSublabel');
+
+        // Empty state: no locations OR pricing not loaded → hide.
+        if (!pricing || !state.locs.length) {
+            row.hidden = true;
+            return;
+        }
+
+        // Sum selected-location rates at each tier. If ANY rate is missing
+        // (Caspio table gap), hide rather than render bogus numbers.
+        var subtotals = [0, 0, 0, 0];
+        for (var t = 0; t < TIER_ORDER.length; t++) {
+            for (var i = 0; i < state.locs.length; i++) {
+                var r = rateFor(state.locs[i], TIER_ORDER[t]);
+                if (r == null) {
+                    row.hidden = true;
+                    return;
+                }
+                subtotals[t] += r;
+            }
+        }
+
+        var activeTierIdx = tierIndexForQty(state.qty);
+        var hwAmt = state.heavyweight ? HEAVYWEIGHT_UPCHARGE : 0;
+        var ltmActive = (state.qty > 0 && state.qty <= LTM_THRESHOLD);
+        var ltmPerPiece = ltmActive ? (LTM_FEE / state.qty) : 0;
+
+        for (var ci = 0; ci < cells.length; ci++) {
+            var cell = cells[ci];
+            // LTM only ever applies in the 1-23 column AND only when the
+            // user's qty is actually in the LTM bracket. We don't fabricate
+            // hypothetical LTM for off-bracket scenarios.
+            var ltmHere = (ci === 0 && ltmActive) ? ltmPerPiece : 0;
+            var effective = subtotals[ci] + hwAmt + ltmHere;
+
+            cell.innerHTML =
+                '<span class="eff-amt">$' + fmtMoney(effective) + '</span>' +
+                '<span class="eff-unit">/pc</span>';
+
+            // Reuse the body's bull's-eye highlight on the active column.
+            cell.classList.toggle('cell-hi', ci === activeTierIdx);
+            cell.classList.toggle('qty-col', ci === activeTierIdx);
+        }
+
+        // Sublabel reflects what's folded into the ACTIVE column.
+        if (sublabelEl) {
+            var bits = [];
+            if (hwAmt > 0) bits.push('HW');
+            if (activeTierIdx === 0 && ltmActive) bits.push('LTM');
+            sublabelEl.textContent = bits.length
+                ? 'per piece · incl. ' + bits.join(' + ')
+                : 'per piece';
+        }
+
+        row.hidden = false;
     }
 
     /* ---------------------- URL params ---------------------- */

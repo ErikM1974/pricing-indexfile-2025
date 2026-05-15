@@ -839,6 +839,91 @@ table.price tfoot td.qty-col {
     color: var(--pink-800);
 }
 
+/* "Your effective rate" row — shows the all-in per-piece price for
+   the customer's current selections, per tier column. Overrides the
+   inherited uppercase/mono tfoot styling so the dollar amounts read
+   like prices instead of footer labels. */
+table.price tfoot tr.effective-row td {
+    padding: 16px;
+    background: var(--paper-2);
+    border-top: 2px solid var(--pink-200);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 16px;
+}
+table.price tfoot tr.effective-row td.effective-label-cell {
+    text-align: left;
+    background: var(--pink-50);
+    color: var(--pink-800);
+    border-right: 1px solid var(--pink-200);
+    display: table-cell;
+    vertical-align: middle;
+    line-height: 1.3;
+}
+.effective-label {
+    display: block;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pink-800);
+}
+.effective-sublabel {
+    display: block;
+    margin-top: 2px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--slate);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.effective-cell .eff-amt {
+    display: inline;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+}
+.effective-cell .eff-unit {
+    display: inline;
+    margin-left: 3px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--slate);
+    text-transform: lowercase;
+    letter-spacing: 0;
+}
+table.price tfoot tr.effective-row td.cell-hi {
+    background: var(--pink-600);
+    color: #fff;
+    position: relative;
+}
+table.price tfoot tr.effective-row td.cell-hi .eff-amt,
+table.price tfoot tr.effective-row td.cell-hi .eff-unit {
+    color: #fff;
+}
+table.price tfoot tr.effective-row td.cell-hi::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--pink-700);
+    border-radius: 4px;
+    pointer-events: none;
+}
+/* When a body row above the effective row is "row-hi" (its location
+   is selected), the per-tier qty-col cell in that row already paints
+   pink. Make sure the effective row's qty-col reuses our pink-600
+   highlight rather than the lighter pink-100/200 gradient inherited
+   from the generic tfoot.qty-col rule. */
+table.price tfoot tr.effective-row td.qty-col:not(.cell-hi) {
+    background: var(--pink-100);
+    color: var(--pink-800);
+}
+
 .price-foot {
     display: flex;
     justify-content: space-between;
@@ -1086,6 +1171,11 @@ table.price tfoot td.qty-col {
     .page { padding: 20px 16px 60px; }
     .topbar { padding: 12px 16px; }
     table.price thead th, table.price tbody td { padding: 10px 8px; font-size: 13px; }
+    table.price tfoot tr.effective-row td { padding: 12px 8px; font-size: 13px; }
+    .effective-label { font-size: 13px; }
+    .effective-sublabel { font-size: 10px; }
+    .effective-cell .eff-amt { font-size: 15px; }
+    .effective-cell .eff-unit { font-size: 10px; }
     .unit-price { font-size: 56px; }
     .unit-price .currency { font-size: 26px; }
     .loc-grid { grid-template-columns: 1fr; }

@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, mirrors Contract Embroidery -->
-    <link rel="stylesheet" href="dtg-contract.css?v=20260516-caspio">
+    <link rel="stylesheet" href="dtg-contract.css?v=20260516-eff">
 </head>
 <body>
 
@@ -242,8 +242,20 @@
                         <!-- Populated by JS (one row per location code) -->
                     </tbody>
                     <tfoot>
-                        <!-- Tfoot hidden by JS — rates differ per location now,
-                             so a single "summary rate per tier" row was misleading. -->
+                        <!-- Effective per-piece rate for the customer's CURRENT
+                             selections (locations + heavyweight + qty), computed
+                             per tier column so the customer can see the
+                             volume ladder. Hidden when zero locations selected. -->
+                        <tr class="effective-row" id="effectiveRow" hidden>
+                            <td class="effective-label-cell">
+                                <span class="effective-label">Your effective rate</span>
+                                <span class="effective-sublabel" id="effectiveSublabel">per piece</span>
+                            </td>
+                            <td class="effective-cell" data-tier-idx="0">—</td>
+                            <td class="effective-cell" data-tier-idx="1">—</td>
+                            <td class="effective-cell" data-tier-idx="2">—</td>
+                            <td class="effective-cell" data-tier-idx="3">—</td>
+                        </tr>
                     </tfoot>
                 </table>
                 <div class="price-foot">
@@ -373,6 +385,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="dtg-contract.js?v=20260516-caspio"></script>
+    <script src="dtg-contract.js?v=20260516-eff"></script>
 </body>
 </html>
