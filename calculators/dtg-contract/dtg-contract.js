@@ -120,6 +120,8 @@
         var base = computeBaseUnit();
         var ltmCalc = calculateUnitPriceWithLTM(base.baseUnit, state.qty, LTM_THRESHOLD, LTM_FEE);
         var orderTotal = ltmCalc.finalUnitPrice * state.qty;
+        var breakdownEl = document.getElementById('ppBreakdown');
+        var breakdownList = document.getElementById('ppBreakdownList');
 
         // Header summary
         document.getElementById('resLocSummary').textContent = locsLabel(state.locs);
@@ -133,21 +135,57 @@
             document.getElementById('unitSub').innerHTML = 'Pick at least one location to see pricing';
             document.getElementById('orderTotal').textContent = '$—';
             document.getElementById('orderTotalNote').textContent = '—';
+            if (breakdownEl) breakdownEl.hidden = true;
             renderPriceTable();
             return;
         }
 
         document.getElementById('unitPrice').textContent = fmtMoney(ltmCalc.finalUnitPrice);
 
-        // Sub-line shows the breakdown: N loc × $X.XX [+$1 HW] [incl. LTM]
-        var subBits = [base.locCount + (base.locCount === 1 ? ' loc × ' : ' locs × ') +
-            '<b>$' + base.perLocRate.toFixed(2) + '</b>'];
-        if (state.heavyweight) subBits.push('+ <b>$1.00</b> HW');
+        // Short sub-line — kept as a compact one-liner for at-a-glance reading.
+        // The itemized breakdown card below carries the full per-line detail.
+        var subBits = [base.locCount + (base.locCount === 1 ? ' location' : ' locations') +
+            ' @ <b>$' + base.perLocRate.toFixed(2) + '/pc</b>'];
+        if (state.heavyweight) subBits.push('+ HW <b>$1.00</b>');
         if (ltmCalc.hasLtm) {
-            subBits.push('incl. $' + fmtMoney(ltmCalc.ltmFee) + ' LTM ÷ ' + state.qty +
-                ' = <b>+$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>');
+            subBits.push('+ LTM <b>$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>');
         }
         document.getElementById('unitSub').innerHTML = subBits.join(' · ');
+
+        // Itemized per-piece breakdown — one row per location + HW + LTM,
+        // summing to the unit price. Customer can see exactly what each
+        // dollar buys without doing the math from the rate table.
+        if (breakdownEl && breakdownList) {
+            var rows = '';
+            state.locs.forEach(function (code) {
+                var name = LOC_META[code] ? LOC_META[code].name : code;
+                rows += '<li>' +
+                    '<span class="pp-label">' + name + '</span>' +
+                    '<span class="pp-val">$' + base.perLocRate.toFixed(2) + '</span>' +
+                    '</li>';
+            });
+            if (state.heavyweight) {
+                rows += '<li>' +
+                    '<span class="pp-label">Heavyweight upcharge' +
+                    '<span class="pp-sublabel">hoodies, fleece, etc.</span></span>' +
+                    '<span class="pp-val">$1.00</span>' +
+                    '</li>';
+            }
+            if (ltmCalc.hasLtm) {
+                rows += '<li>' +
+                    '<span class="pp-label">Less-Than-Minimum fee' +
+                    '<span class="pp-sublabel">$' + fmtMoney(ltmCalc.ltmFee) +
+                    ' ÷ ' + state.qty + ' pcs</span></span>' +
+                    '<span class="pp-val">$' + fmtMoney(ltmCalc.ltmPerPiece) + '</span>' +
+                    '</li>';
+            }
+            rows += '<li class="pp-sum">' +
+                '<span class="pp-label">Per-piece total</span>' +
+                '<span class="pp-val">$' + fmtMoney(ltmCalc.finalUnitPrice) + '</span>' +
+                '</li>';
+            breakdownList.innerHTML = rows;
+            breakdownEl.hidden = false;
+        }
 
         document.getElementById('orderTotal').textContent = '$' + fmtMoney(orderTotal);
         document.getElementById('orderTotalNote').textContent =
@@ -239,15 +277,6 @@
         if (hw === '1' || hw === 'true') state.heavyweight = true;
     }
 
-    function buildShareUrl() {
-        var url = new URL(window.location.href);
-        url.search = '';
-        url.searchParams.set('qty', String(state.qty));
-        if (state.locs.length) url.searchParams.set('locs', state.locs.join(','));
-        if (state.heavyweight) url.searchParams.set('hw', '1');
-        return url.toString();
-    }
-
     function showToast(message) {
         var toast = document.getElementById('shareToast');
         if (!toast) return;
@@ -271,12 +300,6 @@
             catch (e) { reject(e); }
             finally { document.body.removeChild(ta); }
         });
-    }
-
-    function copyShareLink() {
-        copyToClipboard(buildShareUrl())
-            .then(function () { showToast('Quote link copied — paste into your email or chat'); })
-            .catch(function () { showToast("Couldn't copy — please copy from the address bar"); });
     }
 
     /* ---------------------- Event wiring ---------------------- */
@@ -329,10 +352,6 @@
             renderCalculator();
             if (aiState.opened) updateContextPill();
         });
-
-        // Share link
-        var shareBtn = document.getElementById('shareBtn');
-        if (shareBtn) shareBtn.addEventListener('click', copyShareLink);
 
         // AI assistant
         var aiBtn = document.getElementById('aiDraftBtn');

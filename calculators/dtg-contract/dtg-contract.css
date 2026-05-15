@@ -502,6 +502,73 @@ h1.page-title em {
     margin: 18px 0;
     opacity: 0.6;
 }
+
+/* Per-piece breakdown card — itemizes every component of the unit price
+   (each location, heavyweight, LTM-per-piece) so the customer can see
+   exactly what $X.XX/pc is buying. Sits between the unit-sub line and
+   the Order Total card. Soft-translucent white over the pink gradient. */
+.pp-breakdown {
+    margin: 18px 0;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(185, 28, 92, 0.18);
+    border-radius: var(--r);
+    padding: 12px 14px;
+}
+.pp-breakdown-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--pink-700);
+    margin-bottom: 8px;
+}
+.pp-breakdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+.pp-breakdown-list li {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--ink-2);
+}
+.pp-breakdown-list li .pp-label {
+    flex: 1;
+    min-width: 0;
+}
+.pp-breakdown-list li .pp-sublabel {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--slate-2);
+    margin-top: 1px;
+    letter-spacing: 0.02em;
+}
+.pp-breakdown-list li .pp-val {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--ink);
+    flex-shrink: 0;
+}
+.pp-breakdown-list li.pp-sum {
+    border-top: 1px solid rgba(185, 28, 92, 0.20);
+    padding-top: 8px;
+    margin-top: 2px;
+}
+.pp-breakdown-list li.pp-sum .pp-label {
+    font-weight: 600;
+    color: var(--ink);
+}
+.pp-breakdown-list li.pp-sum .pp-val {
+    color: var(--pink-700);
+}
 .totals {
     display: grid;
     grid-template-columns: 1fr 1fr;

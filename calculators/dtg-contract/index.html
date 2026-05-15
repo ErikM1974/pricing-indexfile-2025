@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, mirrors Contract Embroidery -->
-    <link rel="stylesheet" href="dtg-contract.css?v=20260515-ltm-clarity">
+    <link rel="stylesheet" href="dtg-contract.css?v=20260515-breakdown">
 </head>
 <body>
 
@@ -176,7 +176,14 @@
                     <span id="unitSub">Pick at least one location to see pricing</span>
                 </div>
 
-                <div class="divider"></div>
+                <!-- Per-piece breakdown — itemized list of every per-piece
+                     component (each location, heavyweight upcharge, LTM
+                     per-piece) so the customer sees exactly what the unit
+                     price covers. Hidden when no locations are selected. -->
+                <div class="pp-breakdown" id="ppBreakdown" hidden>
+                    <div class="pp-breakdown-head">Per-piece breakdown</div>
+                    <ul class="pp-breakdown-list" id="ppBreakdownList"></ul>
+                </div>
 
                 <div class="totals totals--single">
                     <div class="tot tot--total">
@@ -194,10 +201,6 @@
                     <button type="button" class="btn primary btn--ai" id="aiDraftBtn">
                         <span class="ai-sparkle" aria-hidden="true">✨</span>
                         <span>Draft Email Quote with AI</span>
-                    </button>
-                    <button type="button" class="btn ghost" id="shareBtn" title="Copy a link that auto-fills this quote for your customer">
-                        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        <span>Copy share link</span>
                     </button>
                 </div>
             </div>
@@ -375,6 +378,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="dtg-contract.js?v=20260515-ltm-clarity"></script>
+    <script src="dtg-contract.js?v=20260515-breakdown"></script>
 </body>
 </html>
