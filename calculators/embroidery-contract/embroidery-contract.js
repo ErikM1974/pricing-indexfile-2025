@@ -796,7 +796,7 @@
         // Phase 9 (2026-05-14): hardcoded the tax-exempt line to a reminder
         // for the rep ("verify WA Reseller Permit on file") instead of a
         // typed-in permit number — Ruthie no longer enters one in the chat.
-        var notesLines = ['AI-drafted contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
+        var notesLines = ['Contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
         if (cfBundle && !taxable) {
             notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
         }

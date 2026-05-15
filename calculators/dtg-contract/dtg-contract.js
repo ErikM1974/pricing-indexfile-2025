@@ -464,7 +464,7 @@
             }
         }
 
-        var notesLines = ['AI-drafted contract DTG quote · ' + locationLabel +
+        var notesLines = ['Contract DTG quote · ' + locationLabel +
             (calcContext.heavyweight ? ' · Heavyweight (+$1/pc)' : '')];
         if (cfBundle && !taxable) {
             notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
