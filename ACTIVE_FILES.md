@@ -373,11 +373,9 @@
 ### DTG Contract Pricing (Customer-facing)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/dtg-contract/index.html` | DTG contract pricing calculator | dtg-contract-calculator.js | ✅ Active |
-| `/calculators/dtg-contract/dtg-contract-calculator.js` | DTG contract calculator logic | dtg-pricing-service.js | ✅ Active |
-| `/calculators/dtg-contract/dtg-quote-service.js` | DTG contract quote save service | base-quote-service.js | ✅ Active |
-| `/calculators/dtg-contract/dtg-contract-styles.css` | DTG contract page styles | — | ✅ Active |
-| `/calculators/dtg-contract/dtg-contract-fix.css` | DTG contract style fixes | — | ✅ Active |
+| `/calculators/dtg-contract/index.html` | **REWRITTEN (2026-05-15)** Contract DTG editorial page — matches Contract Embroidery layout (Fraunces serif + pink accents + AI quote assistant). Replaces the old calculator-base.css layout. | dtg-contract.css, dtg-contract.js | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract.css` | **NEW (2026-05-15)** Editorial stylesheet for Contract DTG — port of embroidery-contract.css with location-checkbox grid + heavyweight toggle instead of segmented stitch-count input. Self-contained (no calculator-base.css). | — | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract.js` | **NEW (2026-05-15)** Contract DTG calc + AI assistant. Hardcoded 4-tier pricing ($7.50/$6.75/$6.00/$5.25 per location), $50 LTM at qty≤23, +$1 heavyweight. AI panel calls `/api/contract-dtg-ai/chat`, saves quotes with `CDTG` prefix. | — | ✅ Active |
 
 ### Screen Print Customer Pricing (Customer-facing)
 | File | Purpose | Dependencies | Status |
