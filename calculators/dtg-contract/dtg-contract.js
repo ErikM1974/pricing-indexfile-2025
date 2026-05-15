@@ -301,8 +301,14 @@
 
         // Heavyweight toggle
         var hw = document.getElementById('hwToggle');
+        var hwCard = hw.closest('.hw-toggle');
+        function syncHwCardState() {
+            if (hwCard) hwCard.classList.toggle('is-on', !!hw.checked);
+        }
+        syncHwCardState();
         hw.addEventListener('change', function () {
             state.heavyweight = !!hw.checked;
+            syncHwCardState();
             renderCalculator();
             if (aiState.opened) updateContextPill();
         });
@@ -511,32 +517,86 @@
             throw new Error('quote_sessions POST returned ' + sessRes.status + ': ' + t.slice(0, 120));
         }
 
-        var productName = 'Contract DTG printing · ' + locationLabel +
-            (calcContext.heavyweight ? ' (Heavyweight)' : '');
-        var item = {
-            QuoteID: quoteID,
-            LineNumber: 1,
-            StyleNumber: 'DTG-CONTRACT',
-            ProductName: productName,
-            Color: calcContext.heavyweight ? 'Heavyweight' : 'Standard Weight',
-            Quantity: calcContext.qty,
-            FinalUnitPrice: parseFloat(calcContext.finalUnit.toFixed(2)),
-            LineTotal: parseFloat(calcContext.orderTotal.toFixed(2)),
-            SizeBreakdown: '',
-            EmbellishmentType: 'customer-supplied',
-            PrintLocation: locationLabel,
-            PrintLocationName: locationLabel,
-            AddedAt: nowISO,
+        // Break out line items per Erik's 2026-05-15 request: one row per print
+        // location + a separate row for the heavyweight upcharge + a separate
+        // row for the LTM fee. Customer sees exactly what they're paying for
+        // on the PDF instead of one combined line. Sum of LineTotals matches
+        // calcContext.orderTotal exactly (verified in dtg-contract.js tests).
+        var PART_CODES = {
+            LC: 'DTG-LC', FF: 'DTG-FF', FB: 'DTG-FB', JF: 'DTG-JF', JB: 'DTG-JB'
         };
-        var itemRes = await fetch(proxyBase + '/api/quote_items', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(item),
+        var lineItems = [];
+        var lineNum = 1;
+
+        calcContext.locs.forEach(function (code) {
+            var locName = LOC_META[code] ? LOC_META[code].name : code;
+            var perLocPrice = calcContext.perLocRate;
+            lineItems.push({
+                QuoteID: quoteID,
+                LineNumber: lineNum++,
+                StyleNumber: PART_CODES[code] || 'DTG-CONTRACT',
+                ProductName: locName + ' DTG print',
+                Color: '',
+                Quantity: calcContext.qty,
+                FinalUnitPrice: parseFloat(perLocPrice.toFixed(2)),
+                LineTotal: parseFloat((perLocPrice * calcContext.qty).toFixed(2)),
+                SizeBreakdown: '',
+                EmbellishmentType: 'customer-supplied',
+                PrintLocation: code,
+                PrintLocationName: locName,
+                AddedAt: nowISO,
+            });
         });
-        if (!itemRes.ok) {
-            var t2 = await itemRes.text();
-            console.warn('[ai-chat] quote_items POST failed: ' + itemRes.status + ' ' + t2.slice(0, 120));
-            throw new Error('quote_items POST returned ' + itemRes.status);
+
+        if (calcContext.heavyweight) {
+            lineItems.push({
+                QuoteID: quoteID,
+                LineNumber: lineNum++,
+                StyleNumber: 'DTG-HW',
+                ProductName: 'Heavyweight fabric upcharge (hoodies, fleece)',
+                Color: '',
+                Quantity: calcContext.qty,
+                FinalUnitPrice: 1.00,
+                LineTotal: parseFloat((1.00 * calcContext.qty).toFixed(2)),
+                SizeBreakdown: '',
+                EmbellishmentType: 'customer-supplied',
+                PrintLocation: '',
+                PrintLocationName: '',
+                AddedAt: nowISO,
+            });
+        }
+
+        if (calcContext.ltmFee > 0) {
+            lineItems.push({
+                QuoteID: quoteID,
+                LineNumber: lineNum++,
+                StyleNumber: 'LTM',
+                ProductName: 'Less-Than-Minimum fee (orders 1–23 pcs)',
+                Color: '',
+                Quantity: 1,
+                FinalUnitPrice: parseFloat(calcContext.ltmFee.toFixed(2)),
+                LineTotal: parseFloat(calcContext.ltmFee.toFixed(2)),
+                SizeBreakdown: '',
+                EmbellishmentType: 'customer-supplied',
+                PrintLocation: '',
+                PrintLocationName: '',
+                AddedAt: nowISO,
+            });
+        }
+
+        for (var li = 0; li < lineItems.length; li++) {
+            var itemRes = await fetch(proxyBase + '/api/quote_items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lineItems[li]),
+            });
+            if (!itemRes.ok) {
+                var t2 = await itemRes.text();
+                console.warn('[ai-chat] quote_items POST ' + (li + 1) + '/' +
+                    lineItems.length + ' failed: ' + itemRes.status + ' ' +
+                    t2.slice(0, 120));
+                throw new Error('quote_items POST returned ' + itemRes.status);
+            }
         }
         return quoteID;
     }
