@@ -302,7 +302,7 @@
             // Kick off the conversation — bot greets and asks for size
             aiState.messages.push({
                 role: 'user',
-                content: '(Open the chat — greet the rep briefly and ask what size sticker they need.)',
+                content: '(Open the chat — greet the rep briefly and ask whether they\'re quoting stickers or a banner.)',
             });
             updateContextPill('Drafting quote… ready when you are.');
             sendChatMessage();
