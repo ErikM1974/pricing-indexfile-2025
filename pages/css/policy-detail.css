@@ -1974,3 +1974,752 @@ body.policy-detail-body {
     }
     .ai-modal-footer .btn { width: 100%; justify-content: center; }
 }
+
+/* =====================================================
+   SOURCE MODE — raw HTML editor (used for .nwca-doc rich policies)
+   Toggled via the Source button on the toolbar. Editor swaps for a
+   monospace textarea; getHTML() returns textarea value verbatim so
+   custom classes / semantic tags survive save.
+   ===================================================== */
+.tt-toolbar .tt-source-btn {
+    background: transparent;
+    color: var(--pd-text-secondary);
+    border: 1px solid var(--pd-border);
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.tt-toolbar .tt-source-btn .tt-source-label {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 0.78rem;
+}
+.tt-toolbar .tt-source-btn:hover {
+    background: var(--pd-surface);
+    color: var(--pd-text);
+    border-color: var(--pd-text-muted);
+}
+.tt-toolbar .tt-source-btn.is-active {
+    background: var(--pd-accent);
+    color: white;
+    border-color: var(--pd-accent);
+}
+
+.tt-source-host {
+    background: #f8fafc;
+    border-top: 1px solid var(--pd-border);
+}
+.tt-source-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+    background: #f0f4ed;
+    border-bottom: 1px solid #d4ddc9;
+    color: #1f3d2a;
+    font-size: 0.83rem;
+    line-height: 1.5;
+}
+.tt-source-banner i { color: var(--pd-accent); margin-top: 0.15rem; flex-shrink: 0; }
+.tt-source-banner code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 0.78rem;
+    background: rgba(46, 91, 62, 0.08);
+    border: 1px solid rgba(46, 91, 62, 0.18);
+    padding: 0.05rem 0.3rem;
+    border-radius: 3px;
+}
+.tt-source {
+    display: block;
+    width: 100%;
+    min-height: 480px;
+    padding: 1.1rem 1.25rem;
+    border: none;
+    outline: none;
+    background: #fbfaf6;
+    color: #1a1a1a;
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    resize: vertical;
+    box-sizing: border-box;
+    tab-size: 2;
+}
+.tt-source:focus {
+    background: #ffffff;
+    box-shadow: inset 3px 0 0 var(--pd-accent);
+}
+
+/* =====================================================
+   .nwca-doc — Editorial spec-sheet class library
+   For rich policy docs pasted via Source mode. Scoped under .nwca-doc
+   so simple policies (without the wrapper) are unaffected. Styles cover:
+   masthead, eyebrow, doc title/subtitle, meta grid, numbered sections,
+   step tags, rich callouts, hotline cards, quick-ref table, escalation
+   grid, footer. NWCA brand-tokenized (uses --pd-accent for green).
+
+   Cheatsheet for Erik (also reproduced in the source-mode banner):
+     <div class="nwca-doc">
+       <header class="masthead">
+         <div class="eyebrow"><span>NWCA-OPS-XXX-001 · Operations</span></div>
+         <h1 class="doc-title">Title <span class="accent-word">accent</span></h1>
+         <p class="doc-subtitle">One-line description</p>
+         <div class="meta">
+           <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value">Name</div></div>
+           ...
+         </div>
+       </header>
+       <main class="body">
+         <section><h2><span class="section-num">01</span> Heading</h2>...</section>
+         <h3><span class="step-tag">STEP 1</span> Sub-heading</h3>
+         <div class="callout callout-error"><div class="callout-tag">⚠ Tag</div><p class="error-msg">"Quote"</p></div>
+         <div class="callout callout-info"><div class="callout-tag">Heads-up</div><p>Body</p></div>
+         <div class="hotline">
+           <div class="hotline-label">📞 Tag</div>
+           <div class="hotline-name">Name</div>
+           <a class="hotline-number" href="tel:5551234">555-1234</a>
+           <div class="hotline-detail"><strong>Hours:</strong> ...</div>
+           <div class="hotline-script">"Script"</div>
+         </div>
+         <div class="escalation-grid">
+           <div class="esc-card"><div class="esc-role">Primary</div><div class="esc-name">Name</div><div class="esc-desc">Role</div></div>
+         </div>
+         <table class="quick-ref"><thead>...</thead><tbody><tr><td><span class="step-circle">1</span></td>...</tbody></table>
+       </main>
+       <footer class="footer">
+         <div class="footer-brand"><strong>Northwest Custom Apparel</strong> · <em>Since 1977</em></div>
+         <div class="footer-stamp">Rev 1.0 · MM.DD.YYYY</div>
+       </footer>
+     </div>
+
+   Read-view scope: .policy-body .nwca-doc
+   Edit-view scope (WYSIWYG preview, before/after source toggle): .tt-content .nwca-doc
+   ===================================================== */
+
+.policy-body .nwca-doc,
+.tt-content .nwca-doc {
+    /* Inherit fonts from policy-detail (Inter loaded globally), but use Fraunces
+       for display + JetBrains Mono for spec labels. Both loaded by policy-detail.html. */
+    --nwca-ink: #1a1a1a;
+    --nwca-ink-soft: #4a4a4a;
+    --nwca-paper: #ffffff;
+    --nwca-paper-warm: #f5f5f3;
+    --nwca-rule: #d4d4d0;
+    --nwca-accent: var(--pd-accent);             /* NWCA deep green */
+    --nwca-accent-deep: var(--pd-accent-dark);
+    --nwca-accent-bright: #4cb04f;               /* brand-mid green for accent words */
+    --nwca-accent-tint: var(--pd-accent-soft);
+    --nwca-black: #1a1a1a;
+    --nwca-black-soft: #2d2d2d;
+    --nwca-gray-mid: #8a8a8a;
+    --nwca-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+    --nwca-shadow-deep: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+    background: var(--nwca-paper);
+    color: var(--nwca-ink);
+    line-height: 1.65;
+    font-size: 16px;
+    box-shadow: var(--nwca-shadow-deep);
+    position: relative;
+    overflow: hidden;
+    margin: 1.5rem 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Masthead — black hero with brand-stripe + radial accent */
+.policy-body .nwca-doc .masthead,
+.tt-content .nwca-doc .masthead {
+    background: var(--nwca-black);
+    color: var(--nwca-paper);
+    padding: 48px 56px 56px;
+    position: relative;
+    overflow: hidden;
+}
+.policy-body .nwca-doc .masthead::before,
+.tt-content .nwca-doc .masthead::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg,
+        var(--nwca-accent-bright) 0%,
+        var(--nwca-accent-bright) 50%,
+        var(--nwca-paper) 50%,
+        var(--nwca-paper) 75%,
+        var(--nwca-gray-mid) 75%);
+}
+.policy-body .nwca-doc .masthead::after,
+.tt-content .nwca-doc .masthead::after {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(76, 176, 79, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.policy-body .nwca-doc .eyebrow,
+.tt-content .nwca-doc .eyebrow {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--nwca-accent-bright);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: none;
+    padding: 0;
+}
+.policy-body .nwca-doc .eyebrow::after,
+.tt-content .nwca-doc .eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(76, 176, 79, 0.3);
+}
+
+.policy-body .nwca-doc .doc-title,
+.tt-content .nwca-doc .doc-title {
+    font-family: 'Fraunces', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+    font-variation-settings: 'opsz' 144;
+    color: var(--nwca-paper);
+    border: none;
+    padding: 0;
+}
+.policy-body .nwca-doc .doc-title .accent-word,
+.tt-content .nwca-doc .doc-title .accent-word {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--nwca-accent-bright);
+}
+
+.policy-body .nwca-doc .doc-subtitle,
+.tt-content .nwca-doc .doc-subtitle {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 32px;
+    max-width: 560px;
+}
+
+/* Meta grid — owner / effective / applies-to */
+.policy-body .nwca-doc .meta,
+.tt-content .nwca-doc .meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 24px;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+.policy-body .nwca-doc .meta-item,
+.tt-content .nwca-doc .meta-item {
+    padding-right: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+.policy-body .nwca-doc .meta-item:last-child,
+.tt-content .nwca-doc .meta-item:last-child { border-right: none; }
+.policy-body .nwca-doc .meta-label,
+.tt-content .nwca-doc .meta-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 6px;
+}
+.policy-body .nwca-doc .meta-value,
+.tt-content .nwca-doc .meta-value {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--nwca-paper);
+}
+
+/* Body */
+.policy-body .nwca-doc .body,
+.tt-content .nwca-doc .body {
+    padding: 48px 56px 56px;
+}
+.policy-body .nwca-doc section + section,
+.tt-content .nwca-doc section + section {
+    margin-top: 40px;
+}
+
+/* Numbered section h2 — section-num pill + bottom rule */
+.policy-body .nwca-doc h2,
+.tt-content .nwca-doc h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 26px;
+    color: var(--nwca-black);
+    margin-bottom: 18px;
+    margin-top: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    letter-spacing: -0.01em;
+    border-bottom: 2px solid var(--nwca-rule);
+    padding-bottom: 10px;
+    flex-wrap: wrap;
+}
+.policy-body .nwca-doc .section-num,
+.tt-content .nwca-doc .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--nwca-accent);
+    letter-spacing: 0.1em;
+    background: var(--nwca-accent-tint);
+    padding: 4px 10px;
+    border-radius: 2px;
+    align-self: center;
+}
+
+.policy-body .nwca-doc h3,
+.tt-content .nwca-doc h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--nwca-black-soft);
+    margin-top: 28px;
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+}
+.policy-body .nwca-doc h3 .step-tag,
+.tt-content .nwca-doc h3 .step-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--nwca-black);
+    color: var(--nwca-paper);
+    padding: 3px 9px;
+    border-radius: 2px;
+    margin-right: 10px;
+    letter-spacing: 0.08em;
+    vertical-align: middle;
+    position: relative;
+    top: -2px;
+}
+
+.policy-body .nwca-doc p,
+.tt-content .nwca-doc p {
+    margin-bottom: 12px;
+    color: var(--nwca-ink-soft);
+}
+.policy-body .nwca-doc p strong,
+.policy-body .nwca-doc li strong,
+.tt-content .nwca-doc p strong,
+.tt-content .nwca-doc li strong {
+    color: var(--nwca-ink);
+    font-weight: 600;
+}
+
+/* Custom-styled lists — numbered circles, dash bullets */
+.policy-body .nwca-doc ol,
+.policy-body .nwca-doc ul,
+.tt-content .nwca-doc ol,
+.tt-content .nwca-doc ul {
+    padding-left: 0;
+    list-style: none;
+    margin-bottom: 14px;
+}
+.policy-body .nwca-doc ol > li,
+.policy-body .nwca-doc ul > li,
+.tt-content .nwca-doc ol > li,
+.tt-content .nwca-doc ul > li {
+    position: relative;
+    padding-left: 32px;
+    margin-bottom: 9px;
+    color: var(--nwca-ink-soft);
+}
+.policy-body .nwca-doc ol,
+.tt-content .nwca-doc ol { counter-reset: nwca-step; }
+.policy-body .nwca-doc ol > li,
+.tt-content .nwca-doc ol > li { counter-increment: nwca-step; }
+.policy-body .nwca-doc ol > li::before,
+.tt-content .nwca-doc ol > li::before {
+    content: counter(nwca-step);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 22px;
+    height: 22px;
+    background: var(--nwca-black);
+    color: var(--nwca-paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    line-height: 1;
+}
+.policy-body .nwca-doc ul > li::before,
+.tt-content .nwca-doc ul > li::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 11px;
+    width: 8px;
+    height: 1px;
+    background: var(--nwca-accent);
+}
+.policy-body .nwca-doc li ul,
+.policy-body .nwca-doc li ol,
+.tt-content .nwca-doc li ul,
+.tt-content .nwca-doc li ol {
+    margin-top: 6px;
+    margin-bottom: 4px;
+}
+
+/* kbd / inline code */
+.policy-body .nwca-doc kbd,
+.policy-body .nwca-doc code,
+.tt-content .nwca-doc kbd,
+.tt-content .nwca-doc code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--nwca-paper-warm);
+    border: 1px solid var(--nwca-rule);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--nwca-black);
+    font-weight: 500;
+}
+
+/* Callouts (different namespace from .callout[data-kind] — both can coexist) */
+.policy-body .nwca-doc .callout,
+.tt-content .nwca-doc .callout {
+    margin: 18px 0;
+    padding: 22px 26px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    background: transparent;          /* override the page-level .callout default */
+    border-left: none;                /* override the page-level .callout default */
+}
+.policy-body .nwca-doc .callout::before,
+.tt-content .nwca-doc .callout::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--nwca-black);
+    margin: 0;
+    /* override font-awesome icon from base .callout */
+    font-family: inherit;
+    color: transparent;
+}
+.policy-body .nwca-doc .callout::after,
+.tt-content .nwca-doc .callout::after {
+    /* hide the auto-generated label from base .callout */
+    content: none;
+}
+.policy-body .nwca-doc .callout-error,
+.tt-content .nwca-doc .callout-error {
+    background: #f5f5f3;
+    border: 1px solid var(--nwca-rule);
+}
+.policy-body .nwca-doc .callout-error::before,
+.tt-content .nwca-doc .callout-error::before { background: var(--nwca-black); }
+.policy-body .nwca-doc .callout-info,
+.tt-content .nwca-doc .callout-info {
+    background: var(--nwca-accent-tint);
+    border: 1px solid rgba(46, 91, 62, 0.25);
+}
+.policy-body .nwca-doc .callout-info::before,
+.tt-content .nwca-doc .callout-info::before { background: var(--nwca-accent); }
+.policy-body .nwca-doc .callout-tag,
+.tt-content .nwca-doc .callout-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.policy-body .nwca-doc .callout-error .callout-tag,
+.tt-content .nwca-doc .callout-error .callout-tag { color: var(--nwca-black); }
+.policy-body .nwca-doc .callout-info .callout-tag,
+.tt-content .nwca-doc .callout-info .callout-tag { color: var(--nwca-accent-deep); }
+.policy-body .nwca-doc .callout p,
+.tt-content .nwca-doc .callout p { margin-bottom: 8px; color: var(--nwca-ink); }
+.policy-body .nwca-doc .callout p:last-child,
+.tt-content .nwca-doc .callout p:last-child { margin-bottom: 0; }
+.policy-body .nwca-doc .callout-error .error-msg,
+.tt-content .nwca-doc .callout-error .error-msg {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--nwca-black);
+    line-height: 1.5;
+    border-left: 2px solid var(--nwca-accent);
+    padding-left: 14px;
+    margin: 12px 0;
+}
+
+/* Hotline box */
+.policy-body .nwca-doc .hotline,
+.tt-content .nwca-doc .hotline {
+    background: var(--nwca-black);
+    color: var(--nwca-paper);
+    padding: 28px 30px;
+    margin: 22px 0;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+.policy-body .nwca-doc .hotline::after,
+.tt-content .nwca-doc .hotline::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(76, 176, 79, 0.2) 0%, transparent 60%);
+    pointer-events: none;
+}
+.policy-body .nwca-doc .hotline-label,
+.tt-content .nwca-doc .hotline-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--nwca-accent-bright);
+    margin-bottom: 8px;
+    position: relative;
+    z-index: 1;
+}
+.policy-body .nwca-doc .hotline-name,
+.tt-content .nwca-doc .hotline-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    color: var(--nwca-paper);
+    position: relative;
+    z-index: 1;
+}
+.policy-body .nwca-doc .hotline-number,
+.tt-content .nwca-doc .hotline-number {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--nwca-accent-bright);
+    margin-bottom: 14px;
+    line-height: 1;
+    display: block;
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+}
+.policy-body .nwca-doc .hotline-number:hover,
+.tt-content .nwca-doc .hotline-number:hover {
+    color: #5cc060;
+    text-decoration: underline;
+}
+.policy-body .nwca-doc .hotline-detail,
+.tt-content .nwca-doc .hotline-detail {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+}
+.policy-body .nwca-doc .hotline-detail strong,
+.tt-content .nwca-doc .hotline-detail strong { color: var(--nwca-paper); font-weight: 600; }
+.policy-body .nwca-doc .hotline-script,
+.tt-content .nwca-doc .hotline-script {
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border-left: 2px solid var(--nwca-accent-bright);
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+    position: relative;
+    z-index: 1;
+}
+
+/* Quick reference table */
+.policy-body .nwca-doc .quick-ref,
+.tt-content .nwca-doc .quick-ref {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    background: var(--nwca-paper);
+    box-shadow: var(--nwca-shadow-soft);
+}
+.policy-body .nwca-doc .quick-ref thead,
+.tt-content .nwca-doc .quick-ref thead {
+    background: var(--nwca-black);
+    color: var(--nwca-paper);
+}
+.policy-body .nwca-doc .quick-ref th,
+.tt-content .nwca-doc .quick-ref th {
+    padding: 13px 18px;
+    text-align: left;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--nwca-paper);
+}
+.policy-body .nwca-doc .quick-ref th:first-child,
+.tt-content .nwca-doc .quick-ref th:first-child { width: 80px; text-align: center; }
+.policy-body .nwca-doc .quick-ref td,
+.tt-content .nwca-doc .quick-ref td {
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--nwca-rule);
+    color: var(--nwca-ink-soft);
+    font-size: 14.5px;
+}
+.policy-body .nwca-doc .quick-ref tbody tr:last-child td,
+.tt-content .nwca-doc .quick-ref tbody tr:last-child td { border-bottom: none; }
+.policy-body .nwca-doc .quick-ref tbody tr:nth-child(even),
+.tt-content .nwca-doc .quick-ref tbody tr:nth-child(even) { background: var(--nwca-paper-warm); }
+.policy-body .nwca-doc .quick-ref .step-circle,
+.tt-content .nwca-doc .quick-ref .step-circle {
+    display: inline-flex;
+    width: 32px; height: 32px;
+    align-items: center;
+    justify-content: center;
+    background: var(--nwca-accent);
+    color: var(--nwca-paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    border-radius: 50%;
+    font-size: 14px;
+}
+.policy-body .nwca-doc .quick-ref td:first-child,
+.tt-content .nwca-doc .quick-ref td:first-child { text-align: center; }
+
+/* Escalation grid (2-up cards) */
+.policy-body .nwca-doc .escalation-grid,
+.tt-content .nwca-doc .escalation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+}
+.policy-body .nwca-doc .esc-card,
+.tt-content .nwca-doc .esc-card {
+    background: var(--nwca-paper-warm);
+    border: 1px solid var(--nwca-rule);
+    padding: 18px 20px;
+    border-radius: 4px;
+}
+.policy-body .nwca-doc .esc-card .esc-role,
+.tt-content .nwca-doc .esc-card .esc-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--nwca-accent);
+    margin-bottom: 6px;
+}
+.policy-body .nwca-doc .esc-card .esc-name,
+.tt-content .nwca-doc .esc-card .esc-name {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 21px;
+    font-weight: 600;
+    color: var(--nwca-black);
+    margin-bottom: 4px;
+}
+.policy-body .nwca-doc .esc-card .esc-desc,
+.tt-content .nwca-doc .esc-card .esc-desc {
+    font-size: 14px;
+    color: var(--nwca-ink-soft);
+}
+
+/* Footer */
+.policy-body .nwca-doc .footer,
+.tt-content .nwca-doc .footer {
+    background: var(--nwca-paper-warm);
+    padding: 28px 56px;
+    border-top: 1px solid var(--nwca-rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 0;
+}
+.policy-body .nwca-doc .footer-brand,
+.tt-content .nwca-doc .footer-brand {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    color: var(--nwca-ink-soft);
+    font-size: 15px;
+}
+.policy-body .nwca-doc .footer-brand strong,
+.tt-content .nwca-doc .footer-brand strong {
+    font-style: normal;
+    color: var(--nwca-black);
+    font-weight: 600;
+}
+.policy-body .nwca-doc .footer-stamp,
+.tt-content .nwca-doc .footer-stamp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--nwca-ink-soft);
+    padding: 6px 12px;
+    border: 1px solid var(--nwca-rule);
+    border-radius: 2px;
+}
+
+/* Mobile — port the worldship @media (max-width: 720px) block */
+@media (max-width: 720px) {
+    .policy-body .nwca-doc .masthead,
+    .tt-content .nwca-doc .masthead { padding: 28px 22px 36px; }
+    .policy-body .nwca-doc .body,
+    .tt-content .nwca-doc .body { padding: 28px 22px; }
+    .policy-body .nwca-doc .footer,
+    .tt-content .nwca-doc .footer { padding: 22px; }
+    .policy-body .nwca-doc .doc-title,
+    .tt-content .nwca-doc .doc-title { font-size: 30px; }
+    .policy-body .nwca-doc .meta,
+    .tt-content .nwca-doc .meta { grid-template-columns: 1fr; gap: 14px; }
+    .policy-body .nwca-doc .meta-item,
+    .tt-content .nwca-doc .meta-item {
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 12px;
+        padding-right: 0;
+    }
+    .policy-body .nwca-doc .meta-item:last-child,
+    .tt-content .nwca-doc .meta-item:last-child { border-bottom: none; }
+    .policy-body .nwca-doc h2,
+    .tt-content .nwca-doc h2 { font-size: 21px; }
+    .policy-body .nwca-doc .hotline-number,
+    .tt-content .nwca-doc .hotline-number { font-size: 30px; }
+    .policy-body .nwca-doc .escalation-grid,
+    .tt-content .nwca-doc .escalation-grid { grid-template-columns: 1fr; }
+    .tt-source { min-height: 360px; font-size: 12px; }
+}

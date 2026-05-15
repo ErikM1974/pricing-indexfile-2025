@@ -358,6 +358,10 @@
                 <button type="button" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
                 <button type="button" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fas fa-redo"></i></button>
                 <span class="tt-sep"></span>
+                <button type="button" data-cmd="source" class="tt-source-btn" title="View / edit raw HTML source — needed when pasting NWCA-styled docs (.nwca-doc) so custom classes survive">
+                    <i class="fas fa-code"></i> <span class="tt-source-label">Source</span>
+                </button>
+                <span class="tt-sep"></span>
                 <button type="button" data-cmd="aiAssist" class="tt-ai-btn" title="AI Assist — let Claude help you write or polish">
                     <i class="fas fa-sparkles"></i> <span class="tt-ai-label">AI</span>
                 </button>
@@ -424,6 +428,10 @@
                     }
                     case 'table': {
                         chain.insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+                        break;
+                    }
+                    case 'source': {
+                        toggleSourceMode(editor);
                         break;
                     }
                     case 'aiAssist': {
@@ -542,6 +550,118 @@
         });
     }
 
+    // -------------------- Source-mode (raw HTML) helpers --------------------
+    // The TipTap WYSIWYG schema strips unknown classes / semantic tags on parse.
+    // For policies that need rich custom HTML (e.g. .nwca-doc spec sheets with
+    // .masthead, .hotline, .quick-ref, etc.), an admin can flip to source mode:
+    // a textarea takes over, edits/saves bypass TipTap entirely. The marker
+    // <!-- nwca-rich --> is auto-stamped on first source-mode save and triggers
+    // auto-source-mode on subsequent opens so classes survive round-trips.
+    const NWCA_RICH_MARKER = '<!-- nwca-rich -->';
+
+    function isRichDoc(html) {
+        if (!html) return false;
+        return html.indexOf(NWCA_RICH_MARKER) !== -1 || /class\s*=\s*["'][^"']*\bnwca-doc\b/.test(html);
+    }
+
+    function stampRichMarker(html) {
+        if (!html) return html;
+        if (html.indexOf(NWCA_RICH_MARKER) !== -1) return html;
+        // Stamp at the very top so it survives even if the body is wrapped later
+        return NWCA_RICH_MARKER + '\n' + html;
+    }
+
+    function enterSourceMode(editor) {
+        if (editor._policyMode === 'source') return;
+        const host = editor._sourceHost;
+        const ta = editor._sourceTextarea;
+        const editorEl = editor._editorEl;
+        if (!host || !ta || !editorEl) return;
+
+        // Pull content into the textarea. Special-case the FIRST entry after
+        // mount: if the original initialHtml was a rich doc, use it verbatim
+        // (TipTap will have stripped the marker comment and .nwca-doc classes
+        // during its initial parse — we want the un-stripped original).
+        let html;
+        if (!editor._sourceModeEnteredOnce && editor._originalInitialHtml && isRichDoc(editor._originalInitialHtml)) {
+            html = editor._originalInitialHtml;
+        } else {
+            html = editor._originalGetHTML();
+        }
+        if (isRichDoc(html)) html = stampRichMarker(html);
+        ta.value = html;
+        editor._sourceModeEnteredOnce = true;
+
+        // Show source, hide WYSIWYG
+        editorEl.style.display = 'none';
+        host.style.display = '';
+        editor._policyMode = 'source';
+
+        // Toggle button state
+        markSourceButtonActive(editor._toolbarEl, true);
+        // Disable formatting buttons that don't apply in source mode
+        setFormattingDisabled(editor._toolbarEl, true);
+
+        // Focus textarea
+        try { ta.focus(); } catch (e) { /* ignore */ }
+    }
+
+    function exitSourceMode(editor, opts = {}) {
+        if (editor._policyMode !== 'source') return;
+        const host = editor._sourceHost;
+        const ta = editor._sourceTextarea;
+        const editorEl = editor._editorEl;
+        if (!host || !ta || !editorEl) return;
+
+        const html = ta.value;
+        // Warn if the doc looks rich (has .nwca-doc / masthead / hotline / etc.) —
+        // TipTap will strip those classes when it parses, and the user will lose work.
+        if (!opts.skipWarn && isRichDoc(html)) {
+            const ok = window.confirm(
+                "Switching back to WYSIWYG will normalize this doc through TipTap's schema and " +
+                "strip custom classes like .nwca-doc / .masthead / .hotline. Your styled layout " +
+                "will be lost on the next save.\n\nKeep editing in Source mode (recommended)?\n\n" +
+                "OK = stay in Source · Cancel = switch to WYSIWYG anyway"
+            );
+            if (ok) return;  // stay in source
+        }
+
+        // Push textarea content back into the editor (will normalize through schema)
+        editor.commands.setContent(html || '<p></p>', /* emitUpdate */ true);
+
+        host.style.display = 'none';
+        editorEl.style.display = '';
+        editor._policyMode = 'wysiwyg';
+
+        markSourceButtonActive(editor._toolbarEl, false);
+        setFormattingDisabled(editor._toolbarEl, false);
+    }
+
+    function toggleSourceMode(editor) {
+        if (editor._policyMode === 'source') {
+            exitSourceMode(editor);
+        } else {
+            enterSourceMode(editor);
+        }
+    }
+
+    function markSourceButtonActive(toolbarEl, active) {
+        if (!toolbarEl) return;
+        const btn = toolbarEl.querySelector('button[data-cmd="source"]');
+        if (btn) btn.classList.toggle('is-active', !!active);
+    }
+
+    function setFormattingDisabled(toolbarEl, disabled) {
+        if (!toolbarEl) return;
+        // Disable everything except the source button + AI button (AI can still run on raw HTML)
+        toolbarEl.querySelectorAll('button[data-cmd]').forEach(btn => {
+            const cmd = btn.dataset.cmd;
+            if (cmd === 'source' || cmd === 'aiAssist') return;
+            btn.disabled = !!disabled;
+            btn.style.opacity = disabled ? '0.4' : '';
+        });
+    }
+
     async function mount(container, { initialHtml = '', placeholder = 'Start writing your policy…' } = {}) {
         const mods = await loadTipTap();
         const VideoEmbed = createVideoEmbedNode(mods);
@@ -552,9 +672,18 @@
         container.innerHTML = `
             ${buildToolbarHtml()}
             <div class="tt-editor"></div>
+            <div class="tt-source-host" style="display:none;">
+                <div class="tt-source-banner">
+                    <i class="fas fa-code"></i>
+                    <span><strong>Source mode</strong> — raw HTML. Custom classes (e.g. <code>.nwca-doc</code>) and semantic tags survive save in this mode. Click <strong>Source</strong> again to return to WYSIWYG (will strip custom classes).</span>
+                </div>
+                <textarea class="tt-source" spellcheck="false" autocomplete="off" placeholder="<div class='nwca-doc'>&#10;  <header class='masthead'>...</header>&#10;  ...&#10;</div>"></textarea>
+            </div>
         `;
         const toolbarEl = container.querySelector('.tt-toolbar');
         const editorEl = container.querySelector('.tt-editor');
+        const sourceHost = container.querySelector('.tt-source-host');
+        const sourceTextarea = container.querySelector('.tt-source');
 
         const editor = new mods.Editor({
             element: editorEl,
@@ -578,13 +707,51 @@
             }
         });
 
+        // Stash references the source-mode helpers need
+        editor._toolbarEl = toolbarEl;
+        editor._editorEl = editorEl;
+        editor._sourceHost = sourceHost;
+        editor._sourceTextarea = sourceTextarea;
+        editor._policyMode = 'wysiwyg';
+        // Stash the un-touched initialHtml so the first source-mode entry can
+        // restore it verbatim (TipTap will have stripped HTML comments and
+        // unknown classes during its own parse step).
+        editor._originalInitialHtml = initialHtml;
+        editor._sourceModeEnteredOnce = false;
+
+        // Monkey-patch getHTML so the existing save flow (collectEditPayload,
+        // autosave, cancel-diff) automatically gets the right value depending
+        // on mode — no changes needed in policy-detail.js.
+        editor._originalGetHTML = editor.getHTML.bind(editor);
+        editor.getHTML = function () {
+            if (editor._policyMode === 'source' && editor._sourceTextarea) {
+                let html = editor._sourceTextarea.value || '';
+                // Auto-stamp the rich-doc marker if the body uses .nwca-doc but
+                // the marker isn't there yet — so the next open auto-flips back
+                // to source mode.
+                if (isRichDoc(html) && html.indexOf(NWCA_RICH_MARKER) === -1) {
+                    html = stampRichMarker(html);
+                    editor._sourceTextarea.value = html;
+                }
+                return html;
+            }
+            return editor._originalGetHTML();
+        };
+
         wireToolbar(toolbarEl, editor);
         wireDropdowns(toolbarEl);
         wireFileDropAndPaste(editorEl, editor);
         updateToolbarState(toolbarEl, editor);
 
+        // Auto-flip to source mode if the initial HTML carries the rich marker
+        // or a .nwca-doc wrapper — preserves classes on round-trip edits.
+        if (isRichDoc(initialHtml)) {
+            // Defer one tick so TipTap finishes initial mount
+            setTimeout(() => enterSourceMode(editor), 0);
+        }
+
         return editor;
     }
 
-    window.PolicyEditor = { mount, loadTipTap, detectVideoEmbed };
+    window.PolicyEditor = { mount, loadTipTap, detectVideoEmbed, NWCA_RICH_MARKER };
 })();
