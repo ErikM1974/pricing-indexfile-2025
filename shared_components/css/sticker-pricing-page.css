@@ -1,0 +1,874 @@
+/* =============================================================================
+   sticker-pricing-page.css
+   Page-specific styles for /calculators/sticker-manual-pricing.html — the
+   Die-Cut Sticker pricing page + AI quote chat panel.
+
+   Extracted from inline <style> on 2026-05-15 (Rule #3: no inline CSS/JS).
+   ============================================================================= */
+
+/* ---------- NWCA Green Theme Variables ---------- */
+:root {
+    --primary-color: #4cb354;
+    --primary-dark: #409a47;
+    --primary-light: #5bc85f;
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --hover-bg: #f3f4f6;
+    --success-bg: #d1fae5;
+    --success-text: #065f46;
+    --warning-bg: #fef3c7;
+    --warning-text: #92400e;
+    --best-value-bg: #fef3c7;
+    --best-value-border: #f59e0b;
+    --highlight-bg: #fff7ed;        /* AI-quote row highlight */
+    --highlight-border: #f59e0b;
+    --highlight-pulse: rgba(245, 158, 11, 0.4);
+    --chat-bg: #f9fafb;
+    --chat-bubble-user: #4cb354;
+    --chat-bubble-user-text: #ffffff;
+    --chat-bubble-assistant: #ffffff;
+    --chat-bubble-assistant-text: #1f2937;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 25px rgba(0,0,0,0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* ---------- Header ---------- */
+.header {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+.header-left { display: flex; align-items: center; gap: 2rem; }
+.logo { height: 40px; width: auto; }
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+.breadcrumb a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+.breadcrumb a:hover { color: var(--primary-dark); }
+
+/* ---------- Main container ---------- */
+.main-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+}
+
+/* ---------- Page header + AI button ---------- */
+.page-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 3rem 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.25);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.page-header-content { position: relative; z-index: 1; }
+.page-eyebrow {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.85;
+    margin-bottom: 0.5rem;
+}
+.page-header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.page-header p { font-size: 1.15rem; opacity: 0.95; max-width: 640px; margin: 0 auto; }
+
+.ai-open-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0.9rem 2rem;
+    background: white;
+    color: var(--primary-dark);
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.ai-open-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.20);
+}
+.ai-open-btn .ai-sparkle {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.6));
+}
+.effective-date {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+/* ---------- Pricing-unavailable banner ---------- */
+.pricing-error {
+    background: #fee2e2;
+    border-left: 4px solid #dc2626;
+    color: #991b1b;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+/* ---------- Info-box variants ---------- */
+.info-box {
+    background: var(--success-bg);
+    border-left: 4px solid var(--primary-color);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+.info-box h3 {
+    color: var(--success-text);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.info-box ul {
+    margin-left: 1.5rem;
+    color: var(--success-text);
+}
+.info-box li { margin-bottom: 0.5rem; }
+
+.info-box.setup-fee {
+    background: #fef3c7;
+    border-left-color: #f59e0b;
+}
+.info-box.setup-fee h3 { color: #92400e; }
+.info-box.setup-fee ul { color: #78350f; }
+.info-box.setup-fee .setup-fee-amount {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #d97706;
+    margin: 0.75rem 0 1rem;
+}
+.info-box.setup-fee .part-number {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #92400e;
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+}
+.info-box.setup-fee .setup-fee-footer {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #fde68a;
+    color: #92400e;
+}
+.info-box.setup-fee .setup-fee-footer i { color: #f59e0b; margin-right: 0.4rem; }
+.info-box.rules-box {
+    background: #ecfeff;
+    border-left-color: #0891b2;
+}
+.info-box.rules-box h3 { color: #155e75; }
+.info-box.rules-box ul { color: #164e63; }
+
+/* ---------- Pricing grid ---------- */
+.pricing-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+.pricing-loading {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 3rem;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+.pricing-loading i { margin-right: 0.5rem; color: var(--primary-color); }
+
+.pricing-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem 2rem 2rem;
+    box-shadow: var(--shadow-sm);
+}
+.size-title {
+    font-size: 1.4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-color);
+}
+.size-title .pn-prefix {
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    background: var(--hover-bg);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    margin-left: auto;
+}
+
+.pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.pricing-table thead { background: var(--hover-bg); }
+.pricing-table th {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.pricing-table td {
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+.pricing-table tbody tr {
+    transition: background-color 0.18s, box-shadow 0.18s;
+}
+.pricing-table tbody tr:hover { background: var(--hover-bg); }
+.pricing-table tbody tr.best-value {
+    background: var(--best-value-bg);
+    border-left: 4px solid var(--best-value-border);
+}
+.pricing-table tbody tr.best-value td { font-weight: 600; }
+.best-value-badge {
+    display: inline-block;
+    background: var(--best-value-border);
+    color: white;
+    padding: 0.2rem 0.55rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 0.4rem;
+}
+.price-highlight {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+.partnumber-cell {
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* ---------- Row highlight (AI-quoted row) ---------- */
+.pricing-table tbody tr.ai-highlighted {
+    background: var(--highlight-bg) !important;
+    box-shadow: inset 4px 0 0 var(--highlight-border);
+    animation: pulse-glow 1.6s ease-out 2;
+}
+@keyframes pulse-glow {
+    0%   { box-shadow: inset 4px 0 0 var(--highlight-border), 0 0 0 0 var(--highlight-pulse); }
+    50%  { box-shadow: inset 4px 0 0 var(--highlight-border), 0 0 0 8px transparent; }
+    100% { box-shadow: inset 4px 0 0 var(--highlight-border), 0 0 0 0 transparent; }
+}
+.pricing-table tbody tr.ai-highlighted td { font-weight: 600; color: #78350f; }
+.pricing-table tbody tr.ai-highlighted .price-highlight { color: #d97706; }
+.ai-quoted-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.15rem 0.5rem;
+    background: var(--highlight-border);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ---------- CTA + footer ---------- */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    margin: 2rem 0;
+}
+.cta-section h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+.cta-section p { opacity: 0.95; margin-bottom: 1rem; }
+.cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.75rem;
+    background: white;
+    color: var(--primary-dark);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.pricing-footer {
+    text-align: center;
+    padding: 1.5rem 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+}
+.pricing-footer code {
+    background: var(--hover-bg);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    font-size: 0.85em;
+}
+
+/* =============================================================================
+   BANNER SECTION (rate card + live-quote card)
+   ============================================================================= */
+.banner-section {
+    background: linear-gradient(135deg, #0c4a6e, #075985);
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-md);
+}
+.banner-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+.banner-section-header h2 {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.banner-section-header h2 i { color: #fbbf24; }
+.banner-section-eyebrow {
+    font-size: 0.825rem;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+}
+
+.banner-rate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.banner-rate-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    transition: background 0.15s;
+}
+.banner-rate-card.included { border-color: #34d399; }
+.banner-rate-card .pn {
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    font-size: 0.7rem;
+    color: #bae6fd;
+    margin-bottom: 0.25rem;
+    letter-spacing: 0.05em;
+}
+.banner-rate-card .rate {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+.banner-rate-card .rate .unit {
+    font-size: 0.7em;
+    opacity: 0.75;
+    font-weight: 500;
+    margin-left: 0.25rem;
+}
+.banner-rate-card .desc {
+    font-size: 0.825rem;
+    opacity: 0.85;
+    line-height: 1.4;
+}
+.banner-rate-card .included-badge {
+    display: inline-block;
+    background: #10b981;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.15rem 0.5rem;
+    border-radius: 8px;
+    margin-bottom: 0.3rem;
+}
+.banner-rate-card.highlighted {
+    background: rgba(251, 191, 36, 0.18);
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3);
+    animation: banner-pulse 1.6s ease-out 2;
+}
+@keyframes banner-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.6); }
+    50%  { box-shadow: 0 0 0 10px transparent; }
+    100% { box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.3); }
+}
+.banner-formula {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    padding: 0.85rem 1rem;
+    background: rgba(0,0,0,0.18);
+    border-radius: 8px;
+    line-height: 1.55;
+}
+
+/* Live-quote card rendered in the chat when the AI returns a banner quote.
+   Sits inline in the chat messages — different visual treatment than the
+   inline sticker row highlights since banners don't have a "row" to glow. */
+.banner-quote-card {
+    background: linear-gradient(135deg, #0c4a6e, #075985);
+    color: white;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow-md);
+}
+.banner-quote-card .bqc-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #fbbf24;
+    margin-bottom: 0.6rem;
+}
+.banner-quote-card .bqc-pn {
+    font-family: 'Geist Mono', 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    color: #bae6fd;
+    margin-bottom: 0.4rem;
+}
+.banner-quote-card .bqc-size {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+}
+.banner-quote-card .bqc-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.3rem 0;
+    font-size: 0.875rem;
+}
+.banner-quote-card .bqc-line.total {
+    border-top: 1px solid rgba(255,255,255,0.25);
+    margin-top: 0.4rem;
+    padding-top: 0.6rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+.banner-quote-card .bqc-line .v { font-family: 'Geist Mono', 'SF Mono', Monaco, monospace; }
+.banner-quote-card .bqc-note {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 0.4rem;
+    font-style: italic;
+}
+
+/* =============================================================================
+   AI CHAT PANEL (right-side drawer)
+   ============================================================================= */
+.ai-chat-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+    z-index: 90;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s, visibility 0s linear 0.25s;
+}
+.ai-chat-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.25s, visibility 0s;
+}
+
+.ai-chat-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 420px;
+    max-width: 100vw;
+    background: var(--card-bg);
+    box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+}
+.ai-chat-panel.open {
+    transform: translateX(0);
+}
+
+.ai-chat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    flex-shrink: 0;
+}
+.ai-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1rem;
+}
+.ai-chat-title .ai-sparkle {
+    font-size: 1.1rem;
+    filter: drop-shadow(0 0 4px rgba(254, 240, 138, 0.7));
+}
+.ai-chat-close {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+}
+.ai-chat-close:hover { background: rgba(255,255,255,0.25); }
+
+.ai-chat-context-pill {
+    margin: 0.75rem 1.25rem;
+    padding: 0.6rem 0.85rem;
+    background: var(--success-bg);
+    border-radius: 8px;
+    color: var(--success-text);
+    font-size: 0.825rem;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.ai-chat-context-pill:empty { display: none; }
+
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 1.25rem 1rem;
+    background: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    max-width: 88%;
+}
+.chat-message.user { align-self: flex-end; align-items: flex-end; }
+.chat-message.assistant { align-self: flex-start; align-items: flex-start; }
+.chat-bubble {
+    padding: 0.65rem 0.9rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+.chat-message.user .chat-bubble {
+    background: var(--chat-bubble-user);
+    color: var(--chat-bubble-user-text);
+    border-bottom-right-radius: 4px;
+}
+.chat-message.assistant .chat-bubble {
+    background: var(--chat-bubble-assistant);
+    color: var(--chat-bubble-assistant-text);
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow-sm);
+}
+.chat-message.error .chat-bubble {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+.chat-message .meta {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+    padding: 0 0.5rem;
+}
+
+/* Tool result chip (in-bubble micro-status, e.g. "Looking up Acme Fuel…") */
+.tool-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.2rem 0.6rem;
+    background: #eff6ff;
+    color: #1e40af;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin: 0.2rem 0;
+}
+.tool-chip i { font-size: 0.7rem; }
+
+/* Typing indicator */
+.chat-typing {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.75rem 1rem;
+    background: var(--chat-bubble-assistant);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+    box-shadow: var(--shadow-sm);
+}
+.chat-typing .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-secondary);
+    animation: typing-bounce 1.2s ease-in-out infinite;
+}
+.chat-typing .dot:nth-child(2) { animation-delay: 0.15s; }
+.chat-typing .dot:nth-child(3) { animation-delay: 0.30s; }
+@keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Email-draft card (inline rendered when AI emits EMAIL DRAFT block) */
+.email-draft-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    box-shadow: var(--shadow-sm);
+}
+.email-draft-card .label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+.email-draft-card pre {
+    font-family: inherit;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Footer actions (Copy email / Save quote) */
+.ai-chat-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    background: white;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+.ai-action-btn {
+    flex: 1;
+    padding: 0.6rem 0.85rem;
+    background: white;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+.ai-action-btn:hover:not(:disabled) {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+}
+.ai-action-btn:active:not(:disabled) { transform: translateY(1px); }
+.ai-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.ai-action-btn.primary {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+.ai-action-btn.primary:hover:not(:disabled) {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* Input form */
+.ai-chat-input {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.85rem 1.25rem 1rem;
+    background: white;
+    border-top: 1px solid var(--border-color);
+    align-items: flex-end;
+    flex-shrink: 0;
+}
+.ai-chat-input textarea {
+    flex: 1;
+    resize: none;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+    outline: none;
+    max-height: 120px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ai-chat-input textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+}
+.ai-chat-send {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s;
+}
+.ai-chat-send:hover { background: var(--primary-dark); }
+.ai-chat-send:disabled { opacity: 0.5; cursor: not-allowed; background: var(--text-secondary); }
+
+/* ---------- Share toast ---------- */
+.share-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(120%);
+    background: var(--text-primary);
+    color: white;
+    padding: 0.85rem 1.5rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 200;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.share-toast.show { transform: translateX(-50%) translateY(0); }
+.share-toast i { color: #4ade80; }
+
+/* =============================================================================
+   Mobile
+   ============================================================================= */
+@media (max-width: 768px) {
+    .page-header h1 { font-size: 1.75rem; }
+    .page-header p { font-size: 1rem; }
+    .pricing-section { padding: 1.25rem 1rem 1.5rem; }
+    .pricing-table { font-size: 0.85rem; }
+    .pricing-table th,
+    .pricing-table td { padding: 0.65rem 0.5rem; }
+    .partnumber-cell { font-size: 0.7rem; }
+    .cta-buttons { flex-direction: column; }
+
+    /* Chat panel goes fullscreen on phones */
+    .ai-chat-panel { width: 100vw; }
+}
