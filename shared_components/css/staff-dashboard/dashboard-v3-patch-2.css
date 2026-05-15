@@ -475,6 +475,44 @@
    roadmap, indigo = in-development. Matches GitHub's Beta badge color
    and Linear's "In progress" workflow state, which AEs may already
    recognize from those products. */
+/* AI chip — flags buttons that drop into an AI-assisted flow.
+   Real markup (not ::after) because we want both icon + text inside. */
+.tool-btn--ai {
+  position: relative;
+  padding-right: 64px !important;            /* reserve room for the chip */
+}
+.tool-btn-ai-chip {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  line-height: 1;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  background: rgba(129, 140, 248, 0.16);
+  color: #c7d2fe;
+  border: 1px solid rgba(129, 140, 248, 0.42);
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.tool-btn-ai-chip i {
+  font-size: 10px;
+  color: #c7d2fe !important;                 /* override .tool-btn i color rule */
+}
+.tool-btn--ai:hover .tool-btn-ai-chip {
+  background: rgba(129, 140, 248, 0.22);
+}
+
 .tool-btn--beta {
   position: relative;
   padding-right: 60px !important;            /* reserve room for the BETA chip */

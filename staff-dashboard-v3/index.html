@@ -34,7 +34,7 @@
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260515-ai-chip">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
@@ -466,7 +466,10 @@
                             <div class="tool-buttons">
                                 <a href="/calculators/embroidered-emblem/" class="tool-btn"><i class="fas fa-certificate" aria-hidden="true"></i> Emblems</a>
                                 <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn"><i class="fas fa-mug-hot" aria-hidden="true"></i> Laser Tumbler</a>
-                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn"><i class="fas fa-sticky-note" aria-hidden="true"></i> Stickers</a>
+                                <a href="/calculators/sticker-manual-pricing.html" class="tool-btn tool-btn--ai">
+                                    <i class="fas fa-sticky-note" aria-hidden="true"></i> Stickers/Banners
+                                    <span class="tool-btn-ai-chip" aria-label="AI-assisted quote"><i class="fas fa-robot" aria-hidden="true"></i> AI</span>
+                                </a>
                                 <a href="/calculators/webstores.html" class="tool-btn"><i class="fas fa-store" aria-hidden="true"></i> Webstore</a>
                                 <a href="/calculators/richardson-2025.html" class="tool-btn"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Richardson Non-Sanmar</a>
                             </div>
