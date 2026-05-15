@@ -958,6 +958,12 @@ class QuoteViewPage {
         // picker design (friendly label on top, part number subtitle below).
         // CEMB labels simplified from "Contract X" to just "X" since the
         // SKU subtitle (CTR-*) carries the wholesale-vs-retail distinction.
+        // Phase 7 (2026-05-15): Contract DTG SKUs added so each saved
+        // line item (one per print location + heavyweight + LTM) reads
+        // with its own clear label instead of the generic
+        // "Customer-Supplied Item" fallback. DTG-HW and LTM carry
+        // isFee:true so the renderer tints them slate instead of amber,
+        // signaling "this is a fee, not a print location" at a glance.
         const STYLE_LABEL_MAP = {
             'DECC':      { label: 'Customer Caps',      sku: 'DECC',      isCap: true  },
             'DECG':      { label: 'Customer Garments',  sku: 'DECG',      isCap: false },
@@ -965,12 +971,25 @@ class QuoteViewPage {
             'CTR-Cap':   { label: 'Cap',                sku: 'CTR-Cap',   isCap: true  },
             'CTR-Garmt': { label: 'Garment',            sku: 'CTR-Garmt', isCap: false },
             'CTR-FB':    { label: 'Full Back',          sku: 'CTR-FB',    isCap: false }, // legacy back-compat
+            'DTG-LC':    { label: 'Left Chest',         sku: 'DTG-LC',    isCap: false },
+            'DTG-FF':    { label: 'Full Front',         sku: 'DTG-FF',    isCap: false },
+            'DTG-FB':    { label: 'Full Back',          sku: 'DTG-FB',    isCap: false },
+            'DTG-JF':    { label: 'Jumbo Front',        sku: 'DTG-JF',    isCap: false },
+            'DTG-JB':    { label: 'Jumbo Back',         sku: 'DTG-JB',    isCap: false },
+            'DTG-HW':    { label: 'Heavyweight Upcharge', sku: 'DTG-HW', isCap: false, isFee: true },
+            'LTM':       { label: 'Less-Than-Minimum Fee', sku: 'LTM',   isCap: false, isFee: true },
         };
+
+        // Set of SKUs that represent a DTG print location — used to swap
+        // the size-col placeholder text from "Customer-supplied" to
+        // "DTG print", and to strip the redundant location prefix from
+        // the ProductName when it matches the label.
+        const DTG_LOCATION_SKUS = new Set(['DTG-LC', 'DTG-FF', 'DTG-FB', 'DTG-JF', 'DTG-JB']);
 
         let html = '';
         this.customerSuppliedItems.forEach(item => {
             const styleNumber = item.StyleNumber || 'DECG';
-            const description = item.ProductName || 'Customer-Supplied Item';
+            let description = item.ProductName || 'Customer-Supplied Item';
             const qty = parseInt(item.Quantity) || 0;
             const unitPrice = item.FinalUnitPrice || item.BaseUnitPrice || 0;
             const lineTotal = item.LineTotal || (qty * unitPrice);
@@ -978,10 +997,25 @@ class QuoteViewPage {
             const displayLabel = styleMeta.label;
             const displaySku = styleMeta.sku;
             const isCap = styleMeta.isCap;
-            // Tints: blue family for caps, amber for garments/back
-            const bg     = isCap ? '#eff6ff' : '#fffbeb';
-            const ink    = isCap ? '#1e40af' : '#92400e';
-            const subInk = isCap ? '#3b82f6' : '#b45309';
+            const isFee = !!styleMeta.isFee;
+            // Tints: slate for fees (HW, LTM), blue for caps, amber for garments/back
+            const bg     = isFee ? '#f1f5f9' : (isCap ? '#eff6ff' : '#fffbeb');
+            const ink    = isFee ? '#334155' : (isCap ? '#1e40af' : '#92400e');
+            const subInk = isFee ? '#64748b' : (isCap ? '#3b82f6' : '#b45309');
+
+            // Trim redundant location prefix on DTG location rows:
+            // "Left Chest DTG print" → "DTG print" once the label column
+            // already shows "Left Chest".
+            if (DTG_LOCATION_SKUS.has(styleNumber) && description.startsWith(displayLabel + ' ')) {
+                description = description.slice(displayLabel.length + 1);
+            }
+
+            // Size-col placeholder text varies by category so HW/LTM
+            // don't read as "customer-supplied items" (which they aren't).
+            let sizeColPlaceholder = 'Customer-supplied';
+            if (styleNumber === 'DTG-HW') sizeColPlaceholder = 'Per-piece upcharge';
+            else if (styleNumber === 'LTM') sizeColPlaceholder = 'Order-level fee';
+            else if (DTG_LOCATION_SKUS.has(styleNumber)) sizeColPlaceholder = 'DTG print';
 
             html += `
                 <tr class="customer-supplied-row" style="background: ${bg};">
@@ -991,7 +1025,7 @@ class QuoteViewPage {
                     </td>
                     <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>
                     <td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
-                        Customer-supplied
+                        ${this.escapeHtml(sizeColPlaceholder)}
                     </td>
                     <td class="qty-col">${qty}</td>
                     <td class="price-col">${this.formatCurrency(unitPrice)}</td>
