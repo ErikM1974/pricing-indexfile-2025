@@ -13,7 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
     <!-- Page stylesheet — editorial design, mirrors Contract Embroidery -->
-    <link rel="stylesheet" href="dtg-contract.css?v=20260515-breakdown">
+    <link rel="stylesheet" href="dtg-contract.css?v=20260516-caspio">
 </head>
 <body>
 
@@ -231,7 +231,7 @@
                 <table class="price" id="priceTable">
                     <thead>
                         <tr>
-                            <th>Locations</th>
+                            <th>Location</th>
                             <th>1–23</th>
                             <th>24–47</th>
                             <th>48–71</th>
@@ -239,21 +239,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Populated by JS -->
+                        <!-- Populated by JS (one row per location code) -->
                     </tbody>
                     <tfoot>
-                        <tr>
-                            <td>$ / piece / location</td>
-                            <td>$7.50</td>
-                            <td>$6.75</td>
-                            <td>$6.00</td>
-                            <td>$5.25</td>
-                        </tr>
+                        <!-- Tfoot hidden by JS — rates differ per location now,
+                             so a single "summary rate per tier" row was misleading. -->
                     </tfoot>
                 </table>
                 <div class="price-foot">
                     <div class="legend">
-                        <span class="legend-item"><span class="sw"></span> Your location count &amp; tier</span>
+                        <span class="legend-item"><span class="sw"></span> Your selected locations &amp; tier</span>
                         <span class="legend-item"><span class="sw bg"></span> Active quantity column</span>
                     </div>
                     <div class="mins">
@@ -378,6 +373,6 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="dtg-contract.js?v=20260515-breakdown"></script>
+    <script src="dtg-contract.js?v=20260516-caspio"></script>
 </body>
 </html>

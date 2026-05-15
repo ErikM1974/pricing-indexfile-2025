@@ -25,18 +25,14 @@
 
     /* ---------------------- Constants ---------------------- */
 
-    // Hardcoded — no /api/contract-dtg-pricing endpoint exists. If we ever add
-    // one, swap to fetchContractDtgPricing() like the embroidery side.
     var TIER_ORDER  = ['1-23', '24-47', '48-71', '72+'];
     var TIER_LABELS = ['1–23', '24–47', '48–71', '72+'];
-    var TIER_RATES  = {
-        '1-23':  7.50,
-        '24-47': 6.75,
-        '48-71': 6.00,
-        '72+':   5.25,
-    };
+
+    // LTM + heavyweight policy values — DEFAULTS. The init() flow overwrites
+    // these from the /api/contract-dtg/print-costs response so policy
+    // changes can ship without a code deploy.
     var LTM_FEE = 50;
-    var LTM_THRESHOLD = 23;          // qty <= 23 triggers LTM
+    var LTM_THRESHOLD = 23;
     var HEAVYWEIGHT_UPCHARGE = 1.00;
 
     var LOC_META = {
@@ -49,6 +45,14 @@
     var LOC_CODES_ORDER = ['LC', 'FF', 'FB', 'JF', 'JB'];
 
     /* ---------------------- State ---------------------- */
+
+    // Live print-cost data from /api/contract-dtg/print-costs.
+    // Shape: { tiers, locations, costs[{PrintLocationCode,TierLabel,PrintCost}],
+    //          ltm:{fee,threshold}, heavyweight:{upcharge} }
+    // Null until the fetch resolves — guards in computeBaseUnit / render
+    // functions return early when this is null (CLAUDE.md Rule #4: no
+    // silent fallbacks, show pricingError banner instead).
+    var pricing = null;
 
     var state = {
         qty: 24,
@@ -91,18 +95,63 @@
         };
     }
 
+    // Look up the PrintCost for a single location code at a given tier.
+    // Returns null if pricing hasn't loaded yet OR the (code, tier) pair
+    // is missing from the Caspio table — caller treats null as "can't
+    // compute yet, show placeholder", which keeps CLAUDE.md Rule #4 honest.
+    function rateFor(locCode, tier) {
+        if (!pricing || !pricing.costs) return null;
+        for (var i = 0; i < pricing.costs.length; i++) {
+            var c = pricing.costs[i];
+            if (c.PrintLocationCode === locCode && c.TierLabel === tier) {
+                return Number(c.PrintCost);
+            }
+        }
+        return null;
+    }
+
+    function fetchContractDtgPricing() {
+        return fetch(API_BASE_URL + '/api/contract-dtg/print-costs')
+            .then(function (r) {
+                if (!r.ok) throw new Error('Contract DTG pricing API error: ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                return {
+                    tiers: (data.tiers && data.tiers.length) ? data.tiers : TIER_ORDER,
+                    locations: data.locations || [],
+                    costs: data.costs || [],
+                    ltm: data.ltm || { fee: 50, threshold: 23 },
+                    heavyweight: data.heavyweight || { upcharge: 1.00 },
+                };
+            });
+    }
+
     function computeBaseUnit() {
         var tierIdx = tierIndexForQty(state.qty);
         var tier = TIER_ORDER[tierIdx];
-        var perLocRate = TIER_RATES[tier];
-        var locCount = state.locs.length;
-        var locSubtotal = perLocRate * locCount;
+        // Per-location rates differ now — sum each selected location's
+        // rate at this tier instead of multiplying a flat rate by count.
+        var locRates = [];
+        var locSubtotal = 0;
+        for (var i = 0; i < state.locs.length; i++) {
+            var code = state.locs[i];
+            var rate = rateFor(code, tier);
+            if (rate == null) return null;   // pricing missing → bail
+            var meta = LOC_META[code];
+            locRates.push({
+                code: code,
+                name: meta ? meta.name : code,
+                rate: rate,
+            });
+            locSubtotal += rate;
+        }
         var hwCharge = state.heavyweight ? HEAVYWEIGHT_UPCHARGE : 0;
         return {
             tierIdx: tierIdx,
             tier: tier,
-            perLocRate: perLocRate,
-            locCount: locCount,
+            locRates: locRates,
+            locCount: state.locs.length,
             locSubtotal: locSubtotal,
             heavyweightCharge: hwCharge,
             baseUnit: locSubtotal + hwCharge,
@@ -117,51 +166,84 @@
     /* ---------------------- Calculator render ---------------------- */
 
     function renderCalculator() {
-        var base = computeBaseUnit();
-        var ltmCalc = calculateUnitPriceWithLTM(base.baseUnit, state.qty, LTM_THRESHOLD, LTM_FEE);
-        var orderTotal = ltmCalc.finalUnitPrice * state.qty;
         var breakdownEl = document.getElementById('ppBreakdown');
         var breakdownList = document.getElementById('ppBreakdownList');
+        var resTierEl = document.getElementById('resTier');
+        var resLocSummaryEl = document.getElementById('resLocSummary');
+        var unitPriceEl = document.getElementById('unitPrice');
+        var unitSubEl = document.getElementById('unitSub');
+        var orderTotalEl = document.getElementById('orderTotal');
+        var orderTotalNoteEl = document.getElementById('orderTotalNote');
 
-        // Header summary
-        document.getElementById('resLocSummary').textContent = locsLabel(state.locs);
-        document.getElementById('resTier').textContent = state.locs.length
-            ? 'Tier ' + TIER_LABELS[base.tierIdx]
-            : '—';
-
+        // Empty state — no locations selected. Shown both before pricing
+        // loads (locs default to []) AND any time the rep clears all picks.
         if (!state.locs.length) {
-            // Empty state — show placeholder
-            document.getElementById('unitPrice').textContent = '—';
-            document.getElementById('unitSub').innerHTML = 'Pick at least one location to see pricing';
-            document.getElementById('orderTotal').textContent = '$—';
-            document.getElementById('orderTotalNote').textContent = '—';
+            resLocSummaryEl.textContent = locsLabel(state.locs);
+            resTierEl.textContent = '—';
+            unitPriceEl.textContent = '—';
+            unitSubEl.innerHTML = pricing
+                ? 'Pick at least one location to see pricing'
+                : 'Loading pricing…';
+            orderTotalEl.textContent = '$—';
+            orderTotalNoteEl.textContent = '—';
             if (breakdownEl) breakdownEl.hidden = true;
             renderPriceTable();
             return;
         }
 
-        document.getElementById('unitPrice').textContent = fmtMoney(ltmCalc.finalUnitPrice);
+        var base = computeBaseUnit();
 
-        // Short sub-line — kept as a compact one-liner for at-a-glance reading.
-        // The itemized breakdown card below carries the full per-line detail.
-        var subBits = [base.locCount + (base.locCount === 1 ? ' location' : ' locations') +
-            ' @ <b>$' + base.perLocRate.toFixed(2) + '/pc</b>'];
+        // Pricing hasn't loaded yet, or one of the selected locations
+        // isn't in the Caspio table. Either way: show "loading" state
+        // and DON'T render bogus numbers (Rule #4).
+        if (!base) {
+            resLocSummaryEl.textContent = locsLabel(state.locs);
+            resTierEl.textContent = '—';
+            unitPriceEl.textContent = '—';
+            unitSubEl.innerHTML = pricing
+                ? 'Pricing missing for one of these locations — refresh the page'
+                : 'Loading pricing…';
+            orderTotalEl.textContent = '$—';
+            orderTotalNoteEl.textContent = '—';
+            if (breakdownEl) breakdownEl.hidden = true;
+            renderPriceTable();
+            return;
+        }
+
+        var ltmCalc = calculateUnitPriceWithLTM(base.baseUnit, state.qty, LTM_THRESHOLD, LTM_FEE);
+        var orderTotal = ltmCalc.finalUnitPrice * state.qty;
+
+        // Header summary
+        resLocSummaryEl.textContent = locsLabel(state.locs);
+        resTierEl.textContent = 'Tier ' + TIER_LABELS[base.tierIdx];
+        unitPriceEl.textContent = fmtMoney(ltmCalc.finalUnitPrice);
+
+        // Compact one-liner. Per-location rates differ now, so instead of
+        // "N locations @ $X/pc" we show the prints subtotal (sum of all
+        // location rates) — the itemized breakdown card below names each.
+        var subBits = [];
+        if (base.locRates.length === 1) {
+            subBits.push(base.locRates[0].name +
+                ' @ <b>$' + base.locRates[0].rate.toFixed(2) + '/pc</b>');
+        } else {
+            subBits.push(base.locRates.length + ' locations · base ' +
+                '<b>$' + fmtMoney(base.locSubtotal) + '/pc</b>');
+        }
         if (state.heavyweight) subBits.push('+ HW <b>$1.00</b>');
         if (ltmCalc.hasLtm) {
             subBits.push('+ LTM <b>$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>');
         }
-        document.getElementById('unitSub').innerHTML = subBits.join(' · ');
+        unitSubEl.innerHTML = subBits.join(' · ');
 
         // Itemized per-piece breakdown — one row per location + HW + LTM,
         // summing to the unit price. Customer can see exactly what each
         // dollar buys without doing the math from the rate table.
         if (breakdownEl && breakdownList) {
             var rows = '';
-            state.locs.forEach(function (code) {
-                var name = LOC_META[code] ? LOC_META[code].name : code;
+            base.locRates.forEach(function (lr) {
                 rows += '<li>' +
-                    '<span class="pp-label">' + name + '</span>' +
-                    '<span class="pp-val">$' + base.perLocRate.toFixed(2) + '</span>' +
+                    '<span class="pp-label">' + lr.name + '</span>' +
+                    '<span class="pp-val">$' + lr.rate.toFixed(2) + '</span>' +
                     '</li>';
             });
             if (state.heavyweight) {
@@ -187,8 +269,8 @@
             breakdownEl.hidden = false;
         }
 
-        document.getElementById('orderTotal').textContent = '$' + fmtMoney(orderTotal);
-        document.getElementById('orderTotalNote').textContent =
+        orderTotalEl.textContent = '$' + fmtMoney(orderTotal);
+        orderTotalNoteEl.textContent =
             fmtInt(state.qty) + ' × $' + fmtMoney(ltmCalc.finalUnitPrice);
 
         renderPriceTable();
@@ -198,47 +280,57 @@
 
     function renderPriceTable() {
         var tbody = document.querySelector('#priceTable tbody');
+        var tfoot = document.querySelector('#priceTable tfoot');
         if (!tbody) return;
 
-        var activeTierIdx = tierIndexForQty(state.qty);
-        var activeLocCount = state.locs.length;
-        var base = computeBaseUnit();
-        var ltmCalcAtActive = calculateUnitPriceWithLTM(base.baseUnit, state.qty, LTM_THRESHOLD, LTM_FEE);
+        // Tfoot once carried a single rate per tier (back when all locations
+        // shared a flat rate). Rates now vary per location, so a footer
+        // "summary row" is misleading — hide it.
+        if (tfoot) tfoot.style.display = 'none';
 
-        // Update thead with active column
+        // Pricing not loaded yet — show placeholder rows so the table
+        // doesn't collapse to empty.
+        if (!pricing) {
+            var loadingHtml = '';
+            LOC_CODES_ORDER.forEach(function (code) {
+                var meta = LOC_META[code];
+                loadingHtml += '<tr><td>' + (meta ? meta.name : code) + '</td>' +
+                    '<td>—</td><td>—</td><td>—</td><td>—</td></tr>';
+            });
+            tbody.innerHTML = loadingHtml;
+            return;
+        }
+
+        var activeTierIdx = tierIndexForQty(state.qty);
+
+        // Highlight thead column matching the current quantity tier.
         var theadCells = document.querySelectorAll('#priceTable thead th');
         for (var i = 0; i < theadCells.length; i++) {
             theadCells[i].classList.toggle('qty-col', (i - 1) === activeTierIdx);
         }
-        // Tfoot rate row mirrors column highlight
-        var tfootCells = document.querySelectorAll('#priceTable tfoot td');
-        for (var f = 0; f < tfootCells.length; f++) {
-            tfootCells[f].classList.toggle('qty-col', (f - 1) === activeTierIdx);
-        }
 
-        // Body rows: 1 through 5 locations
+        // Body rows: one row per location code, in the same order as the
+        // location-checkbox grid. Selected locations get .row-hi; the
+        // intersection cell (selected location × current qty tier) gets
+        // .cell-hi for the bull's-eye highlight.
         var html = '';
-        for (var n = 1; n <= 5; n++) {
-            var isHi = (n === activeLocCount);
-            html += '<tr' + (isHi ? ' class="row-hi"' : '') + '>';
-            html += '<td>' + n + ' location' + (n === 1 ? '' : 's') + '</td>';
+        LOC_CODES_ORDER.forEach(function (code) {
+            var meta = LOC_META[code];
+            var displayName = meta ? meta.name : code;
+            var isLocSelected = state.locs.indexOf(code) !== -1;
+            html += '<tr' + (isLocSelected ? ' class="row-hi"' : '') + '>';
+            html += '<td>' + displayName + '</td>';
             TIER_ORDER.forEach(function (tier, ci) {
-                var perLoc = TIER_RATES[tier];
-                var price = perLoc * n;
-                if (state.heavyweight) price += HEAVYWEIGHT_UPCHARGE;
-                // Intersection cell shows ALL-IN price (with LTM rolled in)
-                var showIntersection = isHi && ci === activeTierIdx;
-                if (showIntersection) {
-                    price = ltmCalcAtActive.finalUnitPrice;
-                }
+                var rate = rateFor(code, tier);
                 var classes = [];
                 if (ci === activeTierIdx) classes.push('qty-col');
-                if (showIntersection) classes.push('cell-hi');
+                if (isLocSelected && ci === activeTierIdx) classes.push('cell-hi');
+                var cellText = (rate == null) ? '—' : '$' + fmtMoney(rate);
                 html += '<td' + (classes.length ? ' class="' + classes.join(' ') + '"' : '') +
-                    '>$' + fmtMoney(price) + '</td>';
+                    '>' + cellText + '</td>';
             });
             html += '</tr>';
-        }
+        });
         tbody.innerHTML = html;
 
         // Live LTM footer note — when the current qty hits the LTM tier,
@@ -564,22 +656,24 @@
         var lineItems = [];
         var lineNum = 1;
 
-        calcContext.locs.forEach(function (code) {
-            var locName = LOC_META[code] ? LOC_META[code].name : code;
-            var perLocPrice = calcContext.perLocRate;
+        // Each location's per-piece rate comes from calcContext.locRates
+        // (built in buildCalcContext from the Caspio API). Different
+        // locations have different rates now, so LineTotal is computed
+        // per-location instead of using one shared perLocPrice.
+        (calcContext.locRates || []).forEach(function (lr) {
             lineItems.push({
                 QuoteID: quoteID,
                 LineNumber: lineNum++,
-                StyleNumber: PART_CODES[code] || 'DTG-CONTRACT',
-                ProductName: locName + ' DTG print',
+                StyleNumber: PART_CODES[lr.code] || 'DTG-CONTRACT',
+                ProductName: lr.name + ' DTG print',
                 Color: '',
                 Quantity: calcContext.qty,
-                FinalUnitPrice: parseFloat(perLocPrice.toFixed(2)),
-                LineTotal: parseFloat((perLocPrice * calcContext.qty).toFixed(2)),
+                FinalUnitPrice: parseFloat(lr.rate.toFixed(2)),
+                LineTotal: parseFloat((lr.rate * calcContext.qty).toFixed(2)),
                 SizeBreakdown: '',
                 EmbellishmentType: 'customer-supplied',
-                PrintLocation: code,
-                PrintLocationName: locName,
+                PrintLocation: lr.code,
+                PrintLocationName: lr.name,
                 AddedAt: nowISO,
             });
         });
@@ -764,14 +858,26 @@
     function buildCalcContext() {
         if (!state.locs.length) return null;
         var base = computeBaseUnit();
+        if (!base) return null;   // pricing not loaded yet
         var ltmCalc = calculateUnitPriceWithLTM(base.baseUnit, state.qty, LTM_THRESHOLD, LTM_FEE);
+        // Each location gets its own rate + line total. AI prompt
+        // (contract-dtg-ai-prompt.js) iterates this array to emit one
+        // bullet per location with the correct per-location rate.
+        var locRates = base.locRates.map(function (lr) {
+            return {
+                code: lr.code,
+                name: lr.name,
+                rate: Number(lr.rate.toFixed(2)),
+                lineTotal: Number((lr.rate * state.qty).toFixed(2)),
+            };
+        });
         return {
             qty: state.qty,
             locs: state.locs.slice(),
             locationNames: state.locs.map(function (c) { return LOC_META[c] ? LOC_META[c].name : c; }),
+            locRates: locRates,
             heavyweight: state.heavyweight,
             tier: base.tier,
-            perLocRate: Number(base.perLocRate.toFixed(2)),
             heavyweightCharge: Number(base.heavyweightCharge.toFixed(2)),
             baseUnit: Number(base.baseUnit.toFixed(2)),
             finalUnit: Number(ltmCalc.finalUnitPrice.toFixed(2)),
@@ -787,7 +893,9 @@
         if (!pill) return;
         var ctx = buildCalcContext();
         if (!ctx) {
-            pill.innerHTML = '<i>Pick at least one location, then I can draft the quote.</i>';
+            pill.innerHTML = pricing
+                ? '<i>Pick at least one location, then I can draft the quote.</i>'
+                : '<i>Loading pricing…</i>';
             return;
         }
         var locStr = ctx.locationNames.join(' + ');
@@ -1101,15 +1209,41 @@
 
         // Reflect state into DOM
         document.getElementById('qty').value = state.qty;
-        document.getElementById('hwToggle').checked = state.heavyweight;
+        var hwToggle = document.getElementById('hwToggle');
+        hwToggle.checked = state.heavyweight;
+        var hwCard = hwToggle.closest('.hw-toggle');
+        if (hwCard) hwCard.classList.toggle('is-on', state.heavyweight);
         state.locs.forEach(function (code) {
             var cb = document.querySelector('.loc input[data-loc="' + code + '"]');
             if (cb) cb.checked = true;
         });
         syncLocCardStates();
 
-        renderCalculator();
         bindEvents();
+        renderCalculator();    // initial "Loading pricing…" state
+
+        // Pull live Caspio rates. Until this resolves the calculator
+        // shows "Loading pricing…" instead of any number — CLAUDE.md
+        // Rule #4: never silently fall back to stale/bogus prices.
+        fetchContractDtgPricing()
+            .then(function (data) {
+                pricing = data;
+                // Sync LTM + heavyweight policy from API so a Caspio-only
+                // edit (or a future endpoint extension) flips the math.
+                LTM_FEE = data.ltm.fee;
+                LTM_THRESHOLD = data.ltm.threshold;
+                HEAVYWEIGHT_UPCHARGE = data.heavyweight.upcharge;
+                var errBanner = document.getElementById('pricingError');
+                if (errBanner) errBanner.hidden = true;
+                renderCalculator();
+            })
+            .catch(function (err) {
+                console.error('[contract-dtg] Failed to load pricing:', err);
+                var errBanner = document.getElementById('pricingError');
+                if (errBanner) errBanner.hidden = false;
+                document.getElementById('unitPrice').textContent = '—';
+                document.getElementById('unitSub').textContent = 'Pricing unavailable — refresh or contact Ruth';
+            });
     }
 
     if (document.readyState === 'loading') {
