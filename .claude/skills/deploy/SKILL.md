@@ -1,354 +1,510 @@
 ---
 name: Deploy to Production
-description: Deploy current develop branch to production. Use when user says /deploy, "deploy to production", "push to heroku", "release to production", "deploy changes", "ship it", or "release changes". Commits changes, pushes develop, merges to main, creates version tag, pushes to GitHub and Heroku, then returns to develop branch.
+description: Deploy current develop branch to production. Use when user says /deploy, "deploy to production", "push to heroku", "release to production", "deploy changes", "ship it", or "release changes". Pre-flight gates (auth, freshness, tests, memory), single-version cache-bust, --no-ff release merge with changelog, real release-status verification, auto-restart on stale slug, Slack notification.
 ---
 
 # Deploy to Production Skill
 
-This skill automates the full deployment workflow for Northwest Custom Apparel's Pricing Index project.
+Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → Heroku with strict safety gates, traceable release artifacts, and self-healing for stale slugs.
 
 ## What This Skill Does
 
-Executes a complete deployment pipeline:
-1. Commits any uncommitted changes (auto-generated message)
-2. Pushes develop branch to GitHub
-3. Merges develop into main
-4. Creates a version tag (e.g., v2025.12.23.1)
-5. Pushes main to GitHub and Heroku
-6. Returns to develop branch
+1. **Pre-flight gates** (Step 0.1–0.6) refuse to deploy bad state
+2. **Single-version cache-bust** — one `$DEPLOY_VERSION` applied to all `?v=` query strings
+3. **Precise staging** — `git add -u` + explicit HTML files, never `-A`
+4. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
+5. **Auto-generated CHANGELOG.md** from `git log` between previous tag and HEAD
+6. **Real Heroku release verification** via `heroku releases --json`, not blind sleep
+7. **Dynamic stale-slug detection** with `ps:restart` → `ps:scale` escalation
+8. **Slack deploy notification** (silent skip if webhook unset)
+9. **Copy-pasteable rollback** procedure at end of skill
 
-## When to Use This Skill
+## Triggers
 
-Use this skill when the user says:
-- "/deploy"
-- "deploy to production"
-- "push to heroku"
-- "release to production"
-- "deploy changes"
-- "ship it"
-- "release changes"
+`/deploy` · "deploy to production" · "push to heroku" · "release to production" · "deploy changes" · "ship it" · "release changes"
+
+Flags: `--skip-tests` (emergency bypass for Step 0.6)
 
 ## Implementation
 
-Execute these steps in order. **Stop immediately if any step fails.**
+Execute these steps in order. **Stop immediately if any pre-flight gate fails — nothing has been modified yet.**
 
-### Step 1: Check Current Branch and Status
+---
+
+### Step 0.1 — Fetch latest remote state
 
 ```bash
-# Verify we're on develop branch
+git fetch origin --prune --tags
+```
+
+If this fails (network down, auth issue), abort.
+
+### Step 0.2 — Verify on develop branch
+
+```bash
 git branch --show-current
 ```
 
-If not on develop, inform the user and stop.
+If not on `develop`, report and abort.
+
+### Step 0.3 — Verify develop not behind origin
 
 ```bash
-# Check for uncommitted changes
-git status --porcelain
+git rev-list --count HEAD..origin/develop
 ```
 
-### Step 1.5: Auto-Bump Cache-Bust Versions
+If non-zero, abort with:
+> Local develop is N commits behind origin. Run `git pull --ff-only origin develop` first.
 
-**REQUIRED before committing.** For each modified `.js` or `.css` file detected in Step 1:
+This prevents the silent "deployed stale local" disaster when work was pushed from another machine.
 
-1. Get the list of changed JS/CSS files:
-```bash
-git diff --name-only HEAD | grep -E '\.(js|css)$'
-```
-Also check unstaged/untracked:
-```bash
-git status --porcelain | grep -E '\.(js|css)$' | awk '{print $2}'
-```
-
-2. For each changed file, extract the filename and find all HTML files referencing it with `?v=`:
-```bash
-# Example for mockup-detail.js:
-grep -rn "mockup-detail\.js?v=" --include="*.html" .
-```
-
-3. Bump the version number in each matching HTML file:
-   - **Simple number** (e.g., `?v=12`): increment by 1 → `?v=13`
-   - **Date-based** (e.g., `?v=20260317`): replace with today's date in YYYYMMDD format
-   - Use `sed -i` for the replacement. Example:
-```bash
-sed -i "s/mockup-detail\.js?v=[0-9]*/mockup-detail.js?v=13/g" pages/mockup-detail.html
-```
-
-4. Stage the modified HTML files so they're included in the deploy commit.
-
-5. Report what was bumped:
-```
-Cache-bust: mockup-detail.js v12→v13 (1 file), mockup-detail.css v11→v12 (1 file)
-```
-
-**If no JS/CSS files were changed, skip this step.**
-
-### Step 2: Commit Changes (if any)
-
-Only run if there are uncommitted changes from Step 1:
+### Step 0.4 — Heroku auth + remote check
 
 ```bash
-# Stage all changes
-git add -A
-
-# Get list of changed files for commit message
-git diff --cached --name-only
+heroku auth:whoami
+git remote get-url heroku
 ```
 
-Generate commit message based on changed files:
-- Format: `Deploy: updated X files (file1.js, file2.css, ...)`
-- If more than 3 files, show first 3 with "... and X more"
+If `auth:whoami` fails → abort: "Run `heroku login` first."
+If `git remote get-url heroku` fails → abort: "No heroku remote — run `heroku git:remote -a sanmar-inventory-app`."
+
+Refusing to start a deploy that would fail at Step 12 keeps `main` and Heroku in sync.
+
+### Step 0.5 — MEMORY.md size gate
 
 ```bash
-# Create commit with auto-generated message
-git commit -m "Deploy: updated X files (file1, file2, ...)"
+MEMFILE="$HOME/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md"
+LINES=$(wc -l < "$MEMFILE")
+echo "MEMORY.md: $LINES lines"
 ```
 
-### Step 3: Push Develop to GitHub
+- `> 180` lines → **HARD STOP.** Condense MEMORY.md (move detail to topic files) before deploying.
+- `> 150` lines → warning only, proceed.
+- `≤ 150` lines → proceed silently.
+
+Runs *before* deploy so a failure here doesn't strand state half-changed.
+
+### Step 0.6 — Smoke tests (skippable)
+
+If `--skip-tests` was NOT specified:
+
+```bash
+if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:parser']?0:1)" 2>/dev/null; then
+  npm run test:parser
+fi
+```
+
+If tests fail → abort. Tell user: "Tests failed. Fix or re-run with `/deploy --skip-tests` for emergencies."
+
+### Step 1 — Compute single deploy version
+
+```bash
+SHORT_SHA=$(git rev-parse --short HEAD)
+TODAY=$(date +%Y.%m.%d)
+N=$(( $(git tag -l "v${TODAY}.*" | wc -l) + 1 ))
+DEPLOY_TAG="v${TODAY}.${N}"
+DEPLOY_VERSION="${TODAY}.${N}"
+echo "Deploy tag: $DEPLOY_TAG"
+```
+
+ONE version per deploy applied uniformly. No per-file divergence.
+
+### Step 2 — Cache-bust auto-bump
+
+1. Identify changed JS/CSS (both committed-vs-remote and working-tree dirty):
+
+```bash
+CHANGED_ASSETS=$( (git diff --name-only origin/develop HEAD -- '*.js' '*.css'; \
+                   git status --porcelain | awk '/\.(js|css)$/ {print $2}') | sort -u )
+```
+
+2. For each changed asset, find HTML refs and replace with `perl -i` (cross-platform — works in Windows git-bash, macOS, Linux; GNU `sed -i` does not):
+
+```bash
+BUMPED_HTML=""
+for ASSET in $CHANGED_ASSETS; do
+  BASENAME=$(basename "$ASSET")
+  for HTML in $(grep -rl --include="*.html" "${BASENAME}?v=" .); do
+    perl -i -pe "s|(\Q${BASENAME}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
+    BUMPED_HTML="$BUMPED_HTML $HTML"
+    echo "  bumped $BASENAME in $HTML → ?v=${DEPLOY_VERSION}"
+  done
+done
+```
+
+The regex `[^"' >]+` matches alphanumeric and any suffix format — `20260424b`, `v15`, `1.2.3-rc1` all replaced cleanly. No more half-replacements.
+
+If no JS/CSS files changed, skip this step.
+
+### Step 3 — Stage changes precisely
+
+```bash
+git add -u                          # tracked-file modifications only — never -A
+for HTML in $BUMPED_HTML; do
+  git add "$HTML"                   # bumped HTMLs from Step 2 (may already be tracked)
+done
+```
+
+**Never `git add -A`** — would catch `.env`, log files, downloaded CSVs, anything stray in the working tree.
+
+### Step 4 — Commit
+
+```bash
+N_FILES=$(git diff --cached --name-only | wc -l)
+TOP3=$(git diff --cached --name-only | head -3 | xargs -n1 basename | tr '\n' ', ' | sed 's/, $//')
+git commit -m "Deploy ${DEPLOY_TAG}: ${N_FILES} files (${TOP3}...)"
+```
+
+### Step 5 — Push develop to GitHub
 
 ```bash
 git push origin develop
 ```
 
-### Step 4: ASK FOR CONFIRMATION (REQUIRED)
+### Step 6 — 🛑 CONFIRMATION GATE (REQUIRED)
 
-**CRITICAL: You MUST ask the user for confirmation before proceeding to production.**
+Use `AskUserQuestion`. Show:
 
-Display a summary and ask:
 ```
 READY TO DEPLOY TO PRODUCTION?
 
-Summary so far:
-- Branch: develop
-- Committed: X files
-- Pushed to: GitHub (develop branch)
+  Branch:        develop
+  Deploy tag:    ${DEPLOY_TAG}
+  Committed:     ${N_FILES} files (${TOP3})
+  New commits since last release:
+${git log $(git describe --tags --abbrev=0)..HEAD --oneline}
 
 Next steps will:
-- Merge develop → main
-- Create version tag
-- Push to GitHub (main) and Heroku (PRODUCTION)
+  - Merge develop → main with --no-ff
+  - Generate CHANGELOG.md entry
+  - Create annotated tag with commit log
+  - Push to GitHub + Heroku (PRODUCTION)
+  - Verify live site, auto-restart if stale
 
-Are you ready to proceed?
+Proceed?
 ```
 
-Use the AskUserQuestion tool to get explicit confirmation. **DO NOT proceed without user approval.**
+If user says no → `git checkout develop` (already there) and stop. Develop is already pushed; nothing destructive happened.
 
-If user says no or wants to stop, return to develop branch and stop.
-
-### Step 5: Switch to Main Branch
+### Step 7 — Switch to main, hard pull
 
 ```bash
 git checkout main
+git pull --ff-only origin main
 ```
 
-### Step 6: Pull Latest Main (Safety Check)
+If `--ff-only` fails (main diverged), abort:
+1. `git checkout develop`
+2. Tell user: "main has diverged from origin. Investigate — somebody pushed a hotfix directly?"
+
+### Step 8 — Merge develop with `--no-ff`
 
 ```bash
-git pull origin main
+git merge --no-ff develop -m "Release ${DEPLOY_TAG}"
 ```
 
-### Step 7: Merge Develop into Main
+Creates an explicit release-marker commit on main. After: `git log main --first-parent --oneline` is your clean release history.
 
-```bash
-git merge develop --no-edit
-```
-
-**CRITICAL: If merge fails due to conflict:**
-1. Run `git merge --abort`
-2. Run `git checkout develop`
-3. Display error message to user:
+**Conflict handling (unchanged from old skill):**
+1. `git merge --abort`
+2. `git checkout develop`
+3. Tell user:
    ```
-   DEPLOY ABORTED: Merge conflict detected!
+   DEPLOY ABORTED: Merge conflict on main.
 
-   Please resolve conflicts manually:
-   1. git checkout main
-   2. git merge develop
-   3. Resolve conflicts in your editor
-   4. git add . && git commit
-   5. Run /deploy again
+   Resolve manually:
+     git checkout main
+     git merge develop
+     [resolve in editor]
+     git add . && git commit
+     /deploy
 
    You are back on develop branch.
    ```
-4. **STOP** - do not continue with remaining steps
+4. STOP.
 
-### Step 8: Create Version Tag
-
-Generate tag in format: `vYYYY.MM.DD.N` where N is sequence number for the day.
+### Step 9 — Generate CHANGELOG entry
 
 ```bash
-# Get today's date
-date +%Y.%m.%d
+LAST_TAG=$(git describe --tags --abbrev=0 HEAD^)
+{
+  echo "## ${DEPLOY_TAG} (${TODAY})"
+  echo ""
+  git log "${LAST_TAG}..HEAD" --first-parent --pretty="- %s" --reverse
+  echo ""
+  [ -f CHANGELOG.md ] && cat CHANGELOG.md
+} > CHANGELOG.md.new && mv CHANGELOG.md.new CHANGELOG.md
 
-# Check for existing tags today to determine sequence number
-git tag -l "v$(date +%Y.%m.%d).*"
+git add CHANGELOG.md
+git commit -m "Changelog ${DEPLOY_TAG}"
 ```
 
-If no tags exist for today, use `.1`. Otherwise increment the last sequence number.
+`CHANGELOG.md` is now the auto-maintained release log — no manual editing required, ever.
+
+### Step 10 — Create annotated tag with real message
 
 ```bash
-# Create annotated tag
-git tag -a v2025.12.23.1 -m "Production deploy"
+git tag -a "${DEPLOY_TAG}" -m "Release ${DEPLOY_TAG}
+
+$(git log "${LAST_TAG}..HEAD" --first-parent --pretty='- %s' --reverse)"
 ```
 
-### Step 9: Push Main to GitHub (with tags)
+`git tag -ln20` now shows useful summaries instead of identical "Production deploy" lines.
+
+### Step 11 — Push main + specific tag (NOT `--tags`)
 
 ```bash
-git push origin main --tags
+git push origin main
+git push origin "${DEPLOY_TAG}"
 ```
 
-### Step 10: Push Main to Heroku
+Pushing the specific tag avoids leaking local-only/experimental tags to remote.
+
+### Step 12 — Push to Heroku
 
 ```bash
 git push heroku main
 ```
 
-### Step 10.5: Verify Heroku Serves Fresh Content (Auto-Restart if Stale)
+### Step 13 — Wait for Heroku release `status=succeeded`
 
-**Why this exists**: We've observed repeatedly (2026-04-23 and 2026-04-24) that Heroku reports `Released vNNN` and the git push completes successfully, yet the live dyno keeps serving the **previous slug** — sometimes for several minutes, sometimes indefinitely until a manual `heroku ps:restart`. Root cause appears to be session affinity on a single-dyno setup (see the `heroku-session-affinity` cookie in every response). Without this step, the `/deploy` success message is misleading — the user refreshes, sees old code, and wastes time debugging what's actually a stale-slug issue.
-
-**Skip condition**: If Step 1.5 reported no JS/CSS cache-bumps (i.e., no frontend changes), there's nothing to verify — skip to Step 11.
-
-**Procedure**:
-
-1. Pick ONE representative cache-bumped JS file from Step 1.5. First choice: `pages/js/art-request-detail.js` if it was bumped (most common). Otherwise the first file in the bumped list.
-
-2. Extract the NEW version value from the local HTML that hosts it. Example:
 ```bash
-# If art-request-detail.js was bumped
-NEW_VERSION=$(grep -oP 'art-request-detail\.js\?v=\K[^"]+' pages/art-request-detail.html | head -1)
-echo "Expected live version: $NEW_VERSION"
+for i in $(seq 1 60); do
+  STATUS=$(heroku releases --json --app sanmar-inventory-app | head -c 4096 | python -c "import sys,json; print(json.load(sys.stdin)[0]['status'])" 2>/dev/null)
+  case "$STATUS" in
+    succeeded) echo "  Release succeeded"; break ;;
+    failed)    echo "  Heroku release FAILED — check 'heroku releases:output'"; exit 1 ;;
+    *)         sleep 2 ;;
+  esac
+done
 ```
 
-3. Initial pause for natural slug propagation (~5s), then curl-check the live URL that serves that HTML. Use a unique cache-bust query param:
+Real release-status polling, not blind `sleep 5`. (Use `python` instead of `jq` since `jq` isn't always on Windows git-bash. If `jq` is available, substitute `jq -r '.[0].status'`.)
+
+### Step 14 — Live-version verification
+
+**Skip condition:** if Step 2 reported no bumped HTML files AND no `/api/version` endpoint is available, skip to Step 15.
+
+**14a. Backend SHA check** (preferred — works for ALL deploys):
+
 ```bash
+LIVE_SHA=$(curl -s -m 10 "https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/api/version?_=$(date +%s)" | python -c "import sys,json; print(json.load(sys.stdin).get('sha','unknown'))" 2>/dev/null)
+
+if [ "$LIVE_SHA" = "$SHORT_SHA" ]; then
+  echo "  ✓ Backend SHA verified ($LIVE_SHA)"
+  VERIFIED=1
+fi
+```
+
+If `/api/version` doesn't exist yet (404 or `unknown`), fall through to 14b.
+
+**14b. Frontend `?v=` check** (when assets were bumped):
+
+```bash
+# Pick the first bumped HTML and derive its live URL
+FIRST_HTML=$(echo "$BUMPED_HTML" | tr ' ' '\n' | grep -v '^$' | head -1)
+ROUTE=$(echo "$FIRST_HTML" | sed -e 's|^pages/||' -e 's|^|/|' -e 's|\.html$||' -e 's|^/index$|/|')
+LIVE_URL="https://sanmar-inventory-app-4cd7b252508d.herokuapp.com${ROUTE}"
+
+# Expected version is whatever Step 2 just wrote
+EXPECTED="$DEPLOY_VERSION"
+
 sleep 5
-LIVE_URL="https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/art-request/52833"
-LIVE_VERSION=$(curl -s "${LIVE_URL}?_=$(date +%s)" | grep -oP 'art-request-detail\.js\?v=\K[^"]+' | head -1)
+LIVE_VERSION=$(curl -s -m 10 "${LIVE_URL}?_=$(date +%s)" | grep -oP '\?v=\K[^"]+' | head -1)
+
+if [ "$LIVE_VERSION" = "$EXPECTED" ]; then
+  echo "  ✓ Live version matches ($EXPECTED)"
+  VERIFIED=1
+fi
 ```
 
-4. Compare. If `LIVE_VERSION` equals `NEW_VERSION` → live site is fresh, proceed to Step 11.
+**14c. Stale-slug recovery** (if neither 14a nor 14b verified):
 
-5. If mismatch, poll once every 5 seconds for up to 20 seconds total (using Monitor with an until-loop or run_in_background). If it catches up naturally within that window → proceed.
-
-6. **If still stale after 25 seconds**: Heroku isn't propagating on its own. Auto-restart the dyno:
 ```bash
-heroku ps:restart --app sanmar-inventory-app
+# Poll up to 25s for natural propagation
+for i in $(seq 1 5); do
+  sleep 5
+  # repeat 14a/14b check
+  [ "$VERIFIED" = "1" ] && break
+done
+
+# Still stale? Auto-restart
+if [ "$VERIFIED" != "1" ]; then
+  echo "  ⚠ Heroku served stale slug after release — auto-restarting dyno"
+  heroku ps:restart --app sanmar-inventory-app
+  for i in $(seq 1 18); do
+    sleep 5
+    # repeat check
+    [ "$VERIFIED" = "1" ] && { echo "  ✓ Dyno restarted; live serving ${EXPECTED}"; break; }
+  done
+fi
+
+# Still stale after restart? Scale cycle
+if [ "$VERIFIED" != "1" ]; then
+  echo "  ⚠ Restart didn't help — cycling dyno scale"
+  heroku ps:scale web=0 --app sanmar-inventory-app
+  sleep 5
+  heroku ps:scale web=1 --app sanmar-inventory-app
+  for i in $(seq 1 12); do
+    sleep 5
+    [ "$VERIFIED" = "1" ] && break
+  done
+fi
+
+# Manual escalation if still failing
+if [ "$VERIFIED" != "1" ]; then
+  echo "  ⚠ Live site STILL stuck. Investigate — possibly bad release or platform issue."
+  echo "  Check: heroku logs --tail --app sanmar-inventory-app"
+fi
 ```
-Report to user: `⚠ Heroku served stale slug after release — auto-restarting dyno.`
 
-7. After `ps:restart`, poll again (every 5s for up to 90s) until `LIVE_VERSION == NEW_VERSION`. Once matched, report `✓ Dyno restarted; live site now serving $NEW_VERSION` and proceed to Step 11.
+### Step 15 — Slack deploy notification (silent fallback)
 
-8. **Escalation path** (rare): if after the restart the site is still stale for 90+ seconds, try a scale cycle:
 ```bash
-heroku ps:scale web=0 --app sanmar-inventory-app
-sleep 5
-heroku ps:scale web=1 --app sanmar-inventory-app
+if [ -n "$SLACK_DEPLOY_WEBHOOK_URL" ]; then
+  curl -s -X POST "$SLACK_DEPLOY_WEBHOOK_URL" \
+    -H 'Content-Type: application/json' \
+    -d "{\"text\":\"🚀 Deployed ${DEPLOY_TAG} — ${N_FILES} files: ${TOP3}\"}" \
+    > /dev/null
+fi
 ```
-Then poll for up to 60 more seconds. If still stale after that, stop and tell the user: `⚠ Live site is stuck serving $LIVE_VERSION. Investigate manually — possibly a bad release or platform issue.`
 
-**Important**: Never skip this step on frontend deploys. The stale-slug issue is silent to Heroku's build logs but visible to end users.
+If env var unset, skip silently — no error, no warning.
 
-### Step 11: Return to Develop Branch
+### Step 16 — Return to develop, keep in sync
 
 ```bash
 git checkout develop
+git merge --ff-only main
+git push origin develop
 ```
 
-### Step 12: Display Success Message
+`--ff-only` here is safe because main just got a release commit develop doesn't have yet. Keeps develop's tip at the release-merge.
+
+### Step 17 — Success message
 
 ```
-DEPLOY SUCCESSFUL!
+✅ DEPLOY SUCCESSFUL — ${DEPLOY_TAG}
 
-Summary:
-- Committed: X files
-- Version tag: v2025.12.23.1
-- Pushed to: GitHub (develop + main) and Heroku
+  Files:        ${N_FILES} (${TOP3}...)
+  Tag:          ${DEPLOY_TAG}
+  Live:         https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/
+  SHA verified: ${LIVE_SHA:-via ?v=}
 
-Main branch is now live at:
-https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/
+  Rollback if needed (see Rollback Procedure below):
+    Fast:  heroku releases:rollback --app sanmar-inventory-app
+    Full:  git checkout main && git revert -m 1 HEAD && git push origin main && git push heroku main
 ```
 
-### Step 13: Memory Audit (REQUIRED)
+### Step 18 — Session documentation (non-blocking)
 
-Before asking about session documentation, check MEMORY.md health:
-
-```bash
-MEMFILE="$HOME/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/MEMORY.md"
-wc -l < "$MEMFILE"
-```
-
-- If **over 180 lines**: STOP and condense MEMORY.md before continuing. Move detailed content to topic files.
-- If **under 180 lines**: Report the count (e.g., "MEMORY.md: 94/200 lines") and continue.
-
-### Step 14: Session Documentation (REQUIRED)
-
-Ask the user what type of work was done this session:
-
-Use AskUserQuestion with options:
-- "Bug fix" → Collect Problem/Root Cause/Solution/Prevention, add to `/memory/LESSONS_LEARNED.md`. If the fix changes documented behavior, also update MEMORY.md.
-- "New feature or integration" → Add a concise entry to MEMORY.md (key facts, sync rules, gotchas only). If details exceed 10 lines, create/update a topic file instead.
-- "Nothing notable" → Skip documentation, deploy is complete.
+Use `AskUserQuestion`:
+- **Bug fix** → Collect Problem/Root Cause/Solution/Prevention, append to `/memory/LESSONS_LEARNED.md`. If the fix changes documented behavior, update MEMORY.md too.
+- **New feature / integration** → Add a concise entry to MEMORY.md (key facts, sync rules, gotchas only). Details >10 lines → topic file.
+- **Nothing notable** → Skip.
 
 **Rules for MEMORY.md updates:**
-- Only add sync rules, gotchas, key architectural decisions, and essential API facts
-- Detailed implementation notes go in topic files (emb-builder-details.md, design-lookup-details.md, etc.)
-- One-time script results, batch stats, historical counts → do NOT add anywhere
-- After any update, re-check line count. If over 180, condense immediately.
+- Sync rules, gotchas, architecture decisions, essential API facts only
+- Detail goes in topic files (`emb-builder-details.md`, etc.), not MEMORY.md
+- One-time script results, batch stats → nowhere
+- After updating, re-check line count. If over 150, condense before next deploy
 
-## Error Handling
+This step does NOT block deploy success. Deploy is already done by here.
 
-| Error | Action |
-|-------|--------|
-| Not on develop branch | Stop, inform user |
-| Merge conflict | Abort merge, return to develop, show manual resolution steps |
-| Push fails | Show error, suggest `git pull` first |
-| Heroku push fails | Show error, suggest checking Heroku login status |
-| Heroku released but live dyno serves stale slug | Step 10.5 auto-runs `heroku ps:restart`; if that fails too, auto-escalates to `ps:scale web=0` + `web=1` cycle |
+---
 
-## Example Output
+## Rollback Procedure
 
-```
-Starting deployment...
+Two playbooks. Pick based on whether the bug is in the **slug** (env vars, Heroku platform) or the **code** (logic bug, regression).
 
-[1/12] Checking branch... develop
-[2/12] Committing changes... 3 files staged
-       Commit: "Deploy: updated 3 files (calculator.js, styles.css, index.html)"
-[3/12] Pushing develop to GitHub... done
+### Fast — Heroku slug rollback (code unchanged)
 
-[4/12] CONFIRMATION REQUIRED...
+Use when: bad config var, Heroku platform glitch, dyno crash, or you need to revert NOW and investigate later.
 
-       READY TO DEPLOY TO PRODUCTION?
+```bash
+# See recent releases
+heroku releases --app sanmar-inventory-app
 
-       Summary so far:
-       - Branch: develop
-       - Committed: 3 files
-       - Pushed to: GitHub (develop branch)
+# Roll back to a specific known-good release
+heroku releases:rollback v<NNN> --app sanmar-inventory-app
 
-       Next steps will:
-       - Merge develop → main
-       - Create version tag
-       - Push to GitHub (main) and Heroku (PRODUCTION)
-
-       [User confirms: Yes, proceed]
-
-[5/13]  Switching to main... done
-[6/13]  Pulling latest main... already up to date
-[7/13]  Merging develop into main... done
-[8/13]  Creating version tag... v2025.12.23.1
-[9/13]  Pushing main to GitHub... done
-[10/13] Pushing to Heroku... done
-[10.5/13] Verifying live content freshness...
-         Expected: art-request-detail.js?v=20260424c
-         Live:     art-request-detail.js?v=20260424b (stale)
-         ⚠ Stale slug detected — running heroku ps:restart...
-         ✓ Dyno restarted; live site now serving 20260424c
-[11/13] Returning to develop... done
-
-DEPLOY SUCCESSFUL! Version v2025.12.23.1 is now live.
+# Or just roll back one release
+heroku releases:rollback --app sanmar-inventory-app
 ```
 
-## Important Notes
+Git history is untouched. Re-deploying without further changes will redeploy the broken slug — so this is a stopgap, not a fix.
 
-- Always verify you're on develop branch before starting
-- Never force push - if push fails, investigate why
-- Version tags provide rollback points: `git checkout v2025.12.23.1`
-- If Heroku fails but GitHub succeeds, you can manually run `git push heroku main`
+### Full — Git revert + redeploy
+
+Use when: the bug is in the actual code. Creates a clean revert commit and a new release.
+
+```bash
+git checkout main
+git pull --ff-only origin main
+
+# Revert the release merge commit (-m 1 = keep main's history, drop develop's changes)
+git revert -m 1 HEAD --no-edit
+
+# Push the revert
+git push origin main
+git push heroku main
+
+# Bring develop back to a sane state
+git checkout develop
+git revert -m 1 <release-merge-sha> --no-edit
+git push origin develop
+```
+
+After: develop and main are both back to pre-release state. Investigate the bug, fix on develop, `/deploy` again.
+
+---
+
+## Error Handling Quick Reference
+
+| Failure | Auto-action | Manual step needed |
+|---|---|---|
+| Not on develop | Abort | `git checkout develop` |
+| develop behind origin | Abort | `git pull --ff-only origin develop` |
+| Not heroku-authed | Abort | `heroku login` |
+| MEMORY.md > 180 lines | Abort | Condense to topic files |
+| Tests fail | Abort | Fix tests, or `--skip-tests` for emergency |
+| Merge conflict on main | Auto `merge --abort`, return to develop | Resolve manually, re-run |
+| `--ff-only` pull fails | Abort | Investigate divergent main |
+| Heroku release `failed` | Abort | `heroku releases:output` to see why |
+| Stale slug after release | Auto `ps:restart` → `ps:scale` cycle | Manual `heroku logs --tail` only if both fail |
+| Push to Heroku hangs | None | `Ctrl-C`, check `heroku status`, retry |
+
+---
+
+## Environment Variables
+
+| Var | Required? | Purpose |
+|---|---|---|
+| `SLACK_DEPLOY_WEBHOOK_URL` | Optional | Posts deploy summary to a Slack channel. Skill skips silently if unset. Use same pattern as existing `SLACK_SUPACOLOR_HEALTH_WEBHOOK_URL`. |
+
+## Follow-up tasks (not part of this skill)
+
+1. **Add `/api/version` endpoint to caspio-pricing-proxy** — returns `{sha: process.env.HEROKU_SLUG_COMMIT}`. Heroku auto-sets `HEROKU_SLUG_COMMIT` if the `runtime-dyno-metadata` lab is enabled (`heroku labs:enable runtime-dyno-metadata`). Until this lands, Step 14a falls through to 14b (frontend `?v=` check), which still works.
+2. **Wire `SLACK_DEPLOY_WEBHOOK_URL`** — create a `#deploys` channel webhook, add the URL to `.env` (and Heroku config vars if you want the running app to share the channel).
+
+---
+
+## What Changed From The Previous Version
+
+This is a full rewrite addressing 18 issues identified in 2026-05-16 review. Highlights:
+
+| Old behavior | New behavior |
+|---|---|
+| `git add -A` | `git add -u` + explicit HTML files (no .env risk) |
+| No remote freshness check | Step 0.3 refuses if local develop is behind origin |
+| Per-file independent version bumps | Single `$DEPLOY_VERSION` applied uniformly |
+| `sed -i` (GNU-only, half-replaces suffixed versions) | `perl -i` with robust regex |
+| `--no-edit` fast-forward merge | `--no-ff` with release-marker commit |
+| Tag message: "Production deploy" | Tag message: actual commit list from `git log` |
+| `git push origin main --tags` | `git push origin main && git push origin <tag>` |
+| Blind `sleep 5` then check live URL | Polls `heroku releases --json` until `succeeded` |
+| Hardcoded `art-request-detail.js` sample | Dynamic — picks first bumped file, derives route |
+| MEMORY.md audit happens post-deploy | Pre-flight gate (Step 0.5) — can't strand mid-deploy |
+| No CHANGELOG | Auto-generated from `git log` each release |
+| No rollback docs | Two-playbook Rollback Procedure section |
+| No deploy notification | Slack webhook (optional, silent skip if unset) |
