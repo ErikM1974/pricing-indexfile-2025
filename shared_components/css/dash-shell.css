@@ -1,0 +1,280 @@
+/* ==========================================================================
+   dash-shell.css — Canonical shell for staff-dashboard child pages
+
+   Used by every page scaffolded with the /dash-page skill. Provides a
+   consistent header, back-link, content container, error banner, and
+   stat-card grid so new pages drop straight into the design system.
+
+   Relies on the 2026 design tokens declared in art-hub.css :root
+   (--surface-*, --gray-*, --shadow-*, --radius-*, --state-*, --space-*).
+   art-hub.css MUST be loaded before this file. No new tokens declared here.
+
+   Per-page theme override (set BEFORE this stylesheet runs, in :root):
+     --dash-theme        Primary accent (default NW green #009900)
+     --dash-theme-dark   Hover/active variant
+     --dash-theme-bg     Light tinted background
+   ========================================================================== */
+
+:root {
+    --dash-theme:       #009900;
+    --dash-theme-dark:  #006600;
+    --dash-theme-bg:    #f0f9f0;
+}
+
+/* ---------- Shell ---------- */
+.dash-shell {
+    min-height: 100vh;
+    background: var(--surface-page);
+    display: flex;
+    flex-direction: column;
+}
+
+/* ---------- Header ---------- */
+.dash-header {
+    background: var(--dash-theme);
+    color: #fff;
+    padding: var(--space-3) var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+}
+
+.dash-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.dash-header-logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.dash-header-title {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
+}
+
+.dash-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+/* ---------- Back link ---------- */
+.dash-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.5);
+    border-radius: var(--radius-md);
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+
+.dash-back-link:hover {
+    background: #fff;
+    color: var(--dash-theme);
+}
+
+/* ---------- Content container ---------- */
+.dash-content {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-6);
+    flex: 1;
+    box-sizing: border-box;
+}
+
+/* ---------- Error banner ---------- */
+.dash-error-banner {
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    background: var(--state-danger-bg);
+    color: var(--state-danger);
+    border: 1px solid var(--state-danger);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+}
+
+.dash-error-banner.show {
+    display: flex;
+}
+
+.dash-error-banner-message {
+    flex: 1;
+}
+
+.dash-error-banner-close {
+    background: transparent;
+    border: 0;
+    color: var(--state-danger);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.dash-error-banner-close:hover {
+    opacity: 0.7;
+}
+
+/* ---------- Stat grid ---------- */
+.dash-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.dash-stat-card {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.dash-stat-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
+}
+
+.dash-stat-card--accent {
+    border-top: 3px solid var(--dash-theme);
+}
+
+.dash-stat-value {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.dash-stat-label {
+    margin-top: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ---------- Generic card panel ---------- */
+.dash-card {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-4);
+}
+
+.dash-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.dash-card-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* ---------- Buttons ---------- */
+.dash-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-300);
+    background: var(--surface-card);
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+    text-decoration: none;
+}
+
+.dash-btn:hover {
+    background: var(--gray-100);
+    border-color: var(--gray-400);
+}
+
+.dash-btn--primary {
+    background: var(--dash-theme);
+    color: #fff;
+    border-color: var(--dash-theme);
+}
+
+.dash-btn--primary:hover {
+    background: var(--dash-theme-dark);
+    border-color: var(--dash-theme-dark);
+    color: #fff;
+}
+
+/* ---------- Loading indicator ---------- */
+.dash-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    color: var(--gray-500);
+    font-size: 0.9375rem;
+}
+
+.dash-loading::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--gray-300);
+    border-top-color: var(--dash-theme);
+    border-radius: 50%;
+    animation: dash-spin 0.7s linear infinite;
+}
+
+@keyframes dash-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+    .dash-header {
+        padding: var(--space-3);
+    }
+    .dash-header-title {
+        font-size: 1.0625rem;
+    }
+    .dash-content {
+        padding: var(--space-4);
+    }
+}

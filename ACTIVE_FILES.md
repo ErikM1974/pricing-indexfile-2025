@@ -472,6 +472,7 @@
 | `/shared_components/js/quote-builder-base.js` | Base functionality | All quote builders | ✅ Active |
 | `/shared_components/js/quote-builder-utils.js` | **NEW** Shared utilities: escapeHtml, formatPrice, showToast, etc. (2026-01-30 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/fetch-timeout.js` | Global fetch() wrapper adding 15s AbortController timeout to all requests | All embroidery pages | ✅ Active |
+| `/shared_components/js/dash-page-helpers.js` | **NEW (2026-05-16)** Canonical helpers for staff-dashboard child pages — `window.DashPage.showError/hideError/apiUrl/fetchJson`. Enforces CLAUDE.md API-error rule (no silent fallback). Loaded by every page scaffolded via the `/dash-page` skill. | APP_CONFIG, fetch-timeout.js | ✅ Active |
 | `/shared_components/js/quote-formatter.js` | Format quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-persistence.js` | Save/load quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |
@@ -788,6 +789,7 @@
 | `/shared_components/css/dashboard-styles.css` | Shared dashboard styles | All dashboards | ✅ Active |
 | `/shared_components/css/kanban.css` | Kanban board shared styles (4 boards: art-hub, transfers, supacolor, etc.) | All kanban dashboards | ✅ Active |
 | `/shared_components/css/art-hub.css` | Art Hub design tokens + shared styles (2026 design system) | art-hub-steve, art-hub-ruth, ae-dashboard, bradley-transfers | ✅ Active |
+| `/shared_components/css/dash-shell.css` | **NEW (2026-05-16)** Canonical shell classes (`.dash-header`, `.dash-back-link`, `.dash-content`, `.dash-error-banner`, `.dash-stat-card`, `.dash-card`, `.dash-btn`) for staff-dashboard child pages. Reuses art-hub.css tokens — defines NO new tokens. Emitted by every page scaffolded via the `/dash-page` skill. | art-hub.css, all `/dash-page new`-scaffolded pages | ✅ Active |
 | `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
 | `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
