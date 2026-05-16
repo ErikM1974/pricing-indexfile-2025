@@ -1,376 +1,162 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working in this repository.
 
-## 🔴 TOP 8 NEVER-BREAK RULES (Read First!)
+## 🔴 Top 8 Never-Break Rules
 
-These rules prevent disasters. **Violating any of these caused 71+ orphaned files requiring massive cleanup.**
-
-1. **NO Version Suffix Files** - Never create `-backup`, `-FINAL`, `-FIXED`, `-old` files. Use Git branches.
-2. **NO Test Files in Root** - ALL test files go in `/tests/` folder. No exceptions.
-3. **NO Inline Code** - Zero `<style>` or `<script>` tags with content in HTML files.
-4. **NO Silent API Failures** - ALWAYS show errors when API fails. Never use fallback data silently.
-5. **ALWAYS Update ACTIVE_FILES.md** - Every file create/delete/move must update documentation immediately.
-6. **NO Memory File Bloat** - No dev logs (DAY-*.md), no duplicate docs. Keep INDEX.md under 200 lines.
-7. **USE CONFIG FOR API URLs** - Don't hardcode `caspio-pricing-proxy` URL. Use `APP_CONFIG.API.BASE_URL` or config object.
-8. **SYNC CALCULATOR & QUOTE BUILDER PRICES** - If both exist for a method, test identical inputs. Prices must match.
-
-## 🚨 CRITICAL: 3-Day Tees Order Submission
-
-**IMPORTANT:** 3-Day Tees order submission uses `server.js:749` NOT a service class!
-
-- ✅ Edit `server.js` lines 749-1050 for order payload changes
-- ❌ `ThreeDayTeesOrderService` was deleted (unused dead code)
-
-**Full details:** See `/memory/3-day-tees/SHOPWORKS-INTEGRATION.md`
+1. **NO version-suffix files** — Never create `-backup`, `-FINAL`, `-FIXED`, `-old`, `-v2`. Use Git branches.
+2. **NO test files in root** — ALL tests go in `/tests/` (ui/api/unit subdirectories). No exceptions.
+3. **NO inline code** — Zero `<style>` or `<script>` tags with content in HTML files.
+4. **NO silent API failures** — Always show errors when an API fails. Never fall back to cached/stale data silently. Wrong pricing is worse than an error.
+5. **ALWAYS update ACTIVE_FILES.md** — Every file create/delete/move updates documentation immediately.
+6. **USE CONFIG for API URLs** — Don't hardcode `caspio-pricing-proxy` URL. Use `APP_CONFIG.API.BASE_URL`.
+7. **SYNC calculator + quote builder prices** — If both exist for a method, test identical inputs match.
+8. **SYNC all 4 quote builders** — A change to one (DTG/DTF/EMB/SCP) usually applies to all four. Always check.
 
 ## Pre-Flight Checklist
 
-**Before creating ANY new file:**
-- Is this a test file? → MUST go in /tests/ (no exceptions)
-- Check ACTIVE_FILES.md → Does similar functionality exist?
-- Follow directory guide → Correct subdirectory placement
-- Use kebab-case naming → No spaces, no CAPS
-- External JS/CSS only → No inline code
-- Update ACTIVE_FILES.md → Required immediately
+**Before creating a file:**
+- Test file? → `/tests/`. Calculator? → `/calculators/`. Quote builder? → `/quote-builders/`. Dashboard? → `/dashboards/`. Page? → `/pages/`.
+- Shared JS/CSS? → `/shared_components/{js,css}/`. Page-specific? → same folder as the HTML.
+- Root HTML allowed ONLY for `index.html`, `cart.html`, `product.html`. Everything else → subdirectory.
+- Use kebab-case. External JS/CSS only (no inline).
+- Check ACTIVE_FILES.md for existing functionality first.
 
 **Before committing:**
-- Remove all console.logs
-- Update ACTIVE_FILES.md
-- No hardcoded URLs (use config)
-- **Quote builder change?** → Check if same change needed in other 3 builders
-- **Pricing logic change?** → Verify `printQuote()` and `saveAndGetLink()` use same inputs as `recalculatePricing()`
-- **Run `npm run validate-docs`** if you created/moved memory files
-- **Document any ManageOrders discoveries** (see [ManageOrders Documentation Updates](#manageorders-documentation-updates))
-- Descriptive commit message
-- Tested in browser
+- Remove `console.log` debug statements.
+- Update ACTIVE_FILES.md (and `shared_components/js/GUIDE.md` for new shared JS).
+- No hardcoded API URLs.
+- Pricing change? Verify `printQuote()` and `saveAndGetLink()` use the same inputs as `recalculatePricing()`.
+- Quote builder change? Check if it applies to the other 3 (see Quote Builder Sync below).
+- ManageOrders discovery? Document per [ManageOrders Documentation Routing](#manageorders-documentation-routing).
 
-**After fixing a bug or learning something new:**
-- Add entry to [LESSONS_LEARNED.md](/memory/LESSONS_LEARNED.md) with Problem/Root Cause/Solution/Prevention
-- Update relevant memory file if it's about: ManageOrders, Caspio API, Stripe, ShopWorks
-- **LESSONS_LEARNED.md size limit: 300 lines max, 28-30 entries max**
-  - Before adding: run `wc -l` — if over 250 lines, archive the oldest resolved entry first
-  - Archive destination: `/memory/LESSONS_LEARNED_ARCHIVE.md` (no line limit)
-  - Keep only: recurring bugs, active architecture rules, gotchas likely to bite again
-  - Archive: one-time fixes, historical migrations, resolved bugs unlikely to recur
+**After fixing a bug:**
+- Append entry to [LESSONS_LEARNED.md](/memory/LESSONS_LEARNED.md): Problem / Root Cause / Solution / Prevention.
+- LESSONS_LEARNED hard limit: 300 lines. If over 250 lines before adding, archive oldest resolved entry to `/memory/LESSONS_LEARNED_ARCHIVE.md` (no limit).
+- Keep only: recurring bugs, active architecture rules, gotchas likely to recur. Archive: one-time fixes, historical migrations.
 
-## Codebase Health (Auto-Enforced)
+## Auto-Update Memory (Don't Ask, Just Do)
 
-**Claude enforces these rules automatically on EVERY task — no manual cleanup sessions needed.**
+Memory updates are part of completing the task — not a separate ask-permission step.
 
-### On every file create:
-- Add entry to ACTIVE_FILES.md immediately (Rule #5)
-- Add entry to `shared_components/js/GUIDE.md` if it's a new JS file in that directory
-- Verify the file follows directory structure rules (tests→`/tests/`, shared JS→`/shared_components/js/`, etc.)
+- **Bug fixes** → append to LESSONS_LEARNED.md; update MEMORY.md only if the fix changes documented behavior.
+- **API / integration changes** (ManageOrders, Caspio, Stripe, ShopWorks) → update the relevant section/topic file.
+- **New features** → one-liner in MEMORY.md or full detail in topic file (>2 lines → topic file).
+- Notify Erik in one sentence: "Updated LESSONS_LEARNED.md and MEMORY.md."
+- Memory rules in detail: `~/.claude/projects/.../memory/MEMORY.md` (auto-loaded each session).
 
-### On every file delete:
-- Remove from ACTIVE_FILES.md immediately
-- Remove from GUIDE.md if applicable
-- Check for orphaned references (`grep` for filename in HTML/JS files)
+## File-Lifecycle Automation
 
-### On every file move/rename:
-- Update ACTIVE_FILES.md with new path
-- Update GUIDE.md if applicable
-- Update all `<script src>` and `import` references
+On every create/delete/move/rename:
+- Update ACTIVE_FILES.md (path, addition, removal — match action to event).
+- Update `shared_components/js/GUIDE.md` if it's in that directory.
+- On delete/rename: `grep` for the filename in HTML/JS, fix orphaned references.
+- On server.js route change: update the route TOC comment block at the top of server.js.
 
-### On every server.js route change:
-- Update the Route TOC comment block at the top of server.js (line numbers)
-
-### Dead code detection (check during related work):
-- If you notice a JS file with zero HTML `<script>` references, flag it to Erik
-- If you find version-suffixed files (-v2, -v3, -backup), flag for removal
-- If a file hasn't been modified in 6+ months and has no references, flag it
-
-### Monthly health check (on first /deploy of each month):
-- Quick scan for `*.bak`, `*.backup`, `*-FINAL` files
-- Verify ACTIVE_FILES.md file count matches reality (±5 tolerance)
-- Check GUIDE.md covers all files in `shared_components/js/`
-
-## Documentation Triggers (Auto-Update)
-
-**CRITICAL: Claude MUST auto-update memory files as part of the fix/feature workflow — no asking, just do it and notify.**
-
-The workflow for any bug fix, feature, or integration change is:
-1. Write code → 2. Commit → 3. Deploy → **4. Update memory files** → 5. Notify Erik what was updated
-
-### Bug Fixes (any non-trivial fix)
-**Auto-update** LESSONS_LEARNED.md (Problem/Root Cause/Solution/Prevention) + update MEMORY.md if the fix changes documented behavior. Notify:
-> "Updated LESSONS_LEARNED.md and MEMORY.md with the fix details."
-
-### API/Integration Changes
-**Auto-update** MEMORY.md section for the affected integration (ManageOrders, Caspio, Stripe, ShopWorks). Notify:
-> "Updated MEMORY.md with the integration changes."
-
-### Pricing Changes
-**Auto-update** relevant pricing docs. Notify:
-> "Updated pricing documentation with the changes."
-
-### New Feature Complete
-**Auto-update** MEMORY.md with feature details. Notify:
-> "Documented new feature in MEMORY.md."
-
-### Rule: Don't Ask, Just Do
-Memory updates are part of completing the task — not a separate step that needs permission. If Erik says "skip" for a specific update, don't update that one.
-
-## Memory Maintenance Protocol
-
-**Auto-memory dir**: `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025/memory/`
-
-### What Goes Where (Decision Tree)
-| Content type | Destination |
-|---|---|
-| Sync rules, "NOT X" corrections, cross-system deps | MEMORY.md (1-liners only) |
-| Detailed implementation notes (>2 lines on a topic) | Topic file |
-| Database table schemas, field lists | `caspio-schema.md` |
-| Bug fixes with root cause | `/memory/LESSONS_LEARNED.md` (git-tracked) |
-| One-time script results, batch stats | **Nowhere** — ephemeral |
-
-### Size Discipline
-- **Target**: 80–130 lines. **Hard limit**: 200 lines (only first 200 load into context).
-- **Warning threshold**: 150 lines — stop and condense before adding more.
-- **Rule of thumb**: If you're writing more than 2 lines about something, it belongs in a topic file.
-- Before adding to MEMORY.md: run `wc -l` to check current count. If over 130, condense first.
-
-### Topic Files (no line limit, loaded on demand)
-| File | Content |
-|---|---|
-| `backend-overview.md` | Backend route inventory (44 files), architecture, patterns, env vars |
-| `caspio-schema.md` | All Caspio table schemas, fields, gotchas |
-| `emb-builder-details.md` | Embroidery builder architecture deep-dive |
-| `design-lookup-details.md` | Design_Lookup_2026 normalization, enrichment |
-| `art-hub-details.md` | Art Hub full architecture, UI, workflows |
-| `common-gotchas.md` | All gotchas organized by category with code examples |
-| `python-inksoft-details.md` | Python Inksoft transform pipeline, OnSite payload, store configs |
-
-### Topic File Rules
-- Located in the auto-memory directory (see path above).
-- Always linked from MEMORY.md header row.
-- Each file should be self-contained with a `> Linked from MEMORY.md` header.
-- Create new topic files freely — they have no line limit.
-- When a MEMORY.md section grows past 10 lines, extract to topic file immediately.
-
-### Memory Efficiency Enforcement
-**On every MEMORY.md edit, Claude MUST:**
-1. Check line count with `wc -l` before AND after editing
-2. If adding new content would push past 130 lines, condense an existing section first
-3. Never duplicate info that's already in a topic file — just link to it
-4. Prefer updating existing topic files over adding lines to MEMORY.md
-5. When completing a feature that added 5+ lines, review if any can be condensed
-
-## File Organization
-
-```
-Creating a new file? Start here:
-├─ Test file? → `/tests/` (ui/api/unit subdirectories)
-├─ Calculator? → `/calculators/`
-├─ Quote builder? → `/quote-builders/`
-├─ Dashboard? → `/dashboards/`
-├─ General page? → `/pages/`
-├─ JavaScript file?
-│  ├─ Shared/reusable? → `/shared_components/js/`
-│  └─ Page-specific? → Same folder as HTML
-├─ CSS file?
-│  ├─ Shared styles? → `/shared_components/css/`
-│  └─ Page-specific? → Same folder as HTML
-└─ Is it index.html, cart.html, or product.html? → Root (ONLY THESE!)
-   └─ Everything else → MUST go in a subdirectory!
-```
+**Dead code detection** (flag, don't auto-delete): JS files with zero `<script>` references; files unchanged 6+ months with no references; any `*.bak`, `*.backup`, `-FINAL` files found.
 
 ## API Error Handling (Erik's #1 Rule)
 
 ```javascript
-// NEVER - Silent fallback
+// NEVER — silent fallback
 try {
   const data = await fetchAPI();
 } catch (error) {
-  const data = getCachedData(); // NO! Will cause wrong pricing
+  const data = getCachedData(); // NO! Customer sees wrong price.
 }
 
-// ALWAYS - Visible failure
+// ALWAYS — visible failure
 try {
   const data = await fetchAPI();
 } catch (error) {
   showErrorBanner('Unable to load pricing. Please refresh.');
   console.error('API failed:', error);
-  throw error; // Stop execution
+  throw error;
 }
 ```
 
-**Remember:** Wrong pricing data is WORSE than showing an error!
+## Related Projects (Sibling Repos)
 
-## Project Overview
+| Project | Location | URL / Port |
+|---|---|---|
+| **Pricing Index** (this repo) | `.` | port 3000 local / Heroku `sanmar-inventory-app` |
+| **caspio-pricing-proxy** (backend API) | `../caspio-pricing-proxy` | `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com` · port 3002 local |
+| **Python Inksoft** (InkSoft → ShopWorks) | `../Python Inksoft` | `https://inksoft-transform-8a3dc4e38097.herokuapp.com` · Flask · deploy `git subtree push --prefix web heroku main` |
 
-### Related Projects
+**Cross-project sync**: When modifying ManageOrders push logic, check if the same change applies in Python Inksoft (`web/`). Shared patterns: size suffixes (`_2X`, `_3XL`), OnSite payload, `TaxTotal=0`, gift certs as line items.
 
-**This project (Pricing Index File 2025)** - Frontend
-- Quote builders, calculators, pricing pages
-- Uses API endpoints from backend
-- Port 3000 (local), Heroku (production)
+## Critical Patterns
 
-**Backend (caspio-pricing-proxy)** - API Server
-- Location: `../caspio-pricing-proxy` (sibling directory)
-- Port 3002 (local), Heroku (production)
-- Base URL: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+### Two Color-Field System (inventory-critical)
 
-**Python Inksoft** - Order Transformation
-- Location: `../Python Inksoft` (sibling directory)
-- URL: `https://inksoft-transform-8a3dc4e38097.herokuapp.com`
-- Transforms InkSoft e-commerce orders → ShopWorks OnSite format
-- Flask app (Python 3.11), deployed via `git subtree push --prefix web heroku main`
-- Uses caspio-pricing-proxy for ShopWorks API + design lookups + gift certificates
-- **Shared patterns**: Size suffix logic (`_2X`, `_3XL`), OnSite push format, tax handling
-- When modifying ManageOrders push logic, check if same change applies here
+| Field | Use for | Example |
+|---|---|---|
+| **COLOR_NAME** | UI display, customer quotes | "Brilliant Orange" |
+| **CATALOG_COLOR** | API queries, ShopWorks PO, inventory | "BrillOrng" |
 
-### Key System Components
+```javascript
+catalogColor: product.CATALOG_COLOR   // ✅ Inventory works
+catalogColor: product.COLOR_NAME      // ❌ "Unable to verify"
+```
 
-1. **Adapters** (`/shared_components/js/*-adapter.js`) - Handle pricing data from Caspio
-2. **Quote System** - Two tables: `quote_sessions` + `quote_items`, ID: `[PREFIX][MMDD]-seq`
-3. **API Proxy** - `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
-4. **Cart Management** - Session-based, single embellishment type per cart
+### Multi-SKU Products (PC54 example)
+
+PC54 has SKUs `PC54`, `PC54_2X`, `PC54_3X` mapped to `Size01–Size06`. **`PC54_2X` uses `Size05`, NOT `Size06`.** Mis-mapping silently breaks ShopWorks line items.
+
+### Embroidery Tier Structure
+
+- Tiers: 1-7 / 8-23 / 24-47 / 48-71 / 72+
+- **LTM threshold: `qty <= 7`** (NOT `< 24` like DTG/DTF — common mistake)
+- Caps and garments tier separately — never combine qty for a tier discount.
+- 5-tier structure + `MarginDenominator 0.57` + `LTM_Fee $50`. Detail: [emb-builder-details.md](memory/emb-builder-details.md).
+
+### Quote Builder Sync (all 4 builders)
+
+Files: `quote-builders/{dtg,dtf,embroidery,screenprint}-quote-builder.html` + matching `shared_components/js/*-quote-builder.js`. Shared utils: `quote-builder-utils.js`. Shared CSS: `quote-builder-common.css`.
+
+**Sync these across all 4**: CSS/layout/spacing · table structure · fee/charges panel · customer info panel · modal styling · utility functions in `quote-builder-utils.js`.
+
+**Do NOT sync** (method-specific): pricing logic · location selection UI · logo/artwork config · `*-pricing-service.js` / `*-quote-service.js` · `updateDiscountType()` / `updateAdditionalCharges()` / `updateFeeTableRows()`.
+
+After any builder change, ask: "Does this apply to the other 3? Should this move to `quote-builder-utils.js`? Does it affect `printQuote()` or `saveAndGetLink()`?"
 
 ## Quick Reference
 
-```
-API Proxy: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com
-EmailJS Public Key: 4qSbDO-SQs19TbP80
-EmailJS Service ID: service_jgrave3
-Company Phone: 253-922-5793
-
-Quote Prefixes: DTG, RICH, EMB, EMBC, CEMB, LT, PATCH, SPC, SSC, WEB
-```
-
-## Critical Patterns to Remember
-
-### Two Color Field System (CRITICAL for Inventory)
-
-| Field | Purpose | Example | Used For |
-|-------|---------|---------|----------|
-| **COLOR_NAME** | Display to users | "Brilliant Orange" | UI, customer quotes |
-| **CATALOG_COLOR** | API queries | "BrillOrng" | Inventory API, ShopWorks |
-
-```javascript
-// WRONG - Cart saves but inventory shows "Unable to Verify"
-catalogColor: product.COLOR_NAME  // Should be CATALOG_COLOR
-
-// CORRECT
-catalogColor: product.CATALOG_COLOR
-```
-
-### Multi-SKU Product Pattern (PC54 Example)
-
-| Product | ShopWorks SKUs | Size Fields |
-|---------|----------------|-------------|
-| PC54 | PC54, PC54_2X, PC54_3X | Size01-Size06 |
-
-**Critical:** PC54_2X uses **Size05** (NOT Size06!)
-
-### Sample Cart Pricing Formula
-- **Formula**: `(baseCost / 0.57) + sizeUpcharge` (2026 margin: 43%)
-- **Rounding**: Half-dollar ceiling (`Math.ceil(price * 2) / 2`)
-
-### Quote Builder Sync Rule (CRITICAL)
-
-**Shared Utilities (2026-01-30 consolidation):**
-Common utility functions are now in `/shared_components/js/quote-builder-utils.js`:
-- `escapeHtml()` - XSS protection for HTML output
-- `formatPrice()` - Price display formatting
-- `showToast()` - Toast notifications (fixed in DTF - was broken)
-- `copyShareableUrl()` - Share modal URL copy
-- `handleCellKeydown()` - Table keyboard navigation
-- `getDiscountValues()` - Discount calculation helpers
-
-**When modifying ANY quote builder, check if the change applies to all 4:**
-- `quote-builders/dtg-quote-builder.html`
-- `quote-builders/dtf-quote-builder.html`
-- `quote-builders/embroidery-quote-builder.html`
-- `quote-builders/screenprint-quote-builder.html`
-
-**Changes that MUST be synced across all builders:**
-- CSS styling (colors, spacing, layout, input padding)
-- Table structure changes (columns, child rows, thumbnails)
-- Fee/charges panel updates
-- Customer info panel changes
-- Modal styling
-- If modifying a function in `quote-builder-utils.js`, it affects ALL builders automatically
-
-**Method-specific (do NOT sync):**
-- Pricing logic (each method has unique pricing formula)
-- Location selection UI (DTG: dropdown, DTF: radio grid, Screenprint: checkboxes)
-- Logo/artwork configuration (Embroidery has digitizing, etc.)
-- Method-specific services (`*-pricing-service.js`, `*-quote-service.js`)
-- `updateDiscountType()`, `updateAdditionalCharges()`, `updateFeeTableRows()` - these call builder-specific functions
-
-**After making quote builder changes, always ask:**
-> "Does this change apply to the other 3 quote builders?"
-> "Should this be moved to quote-builder-utils.js?"
-> "Does this affect `printQuote()` or `saveAndGetLink()`? Verify PDF and URL quote output match the UI."
-
-### Embroidery Tier Structure (Feb 2026)
-
-**IMPORTANT:** Embroidery uses a 5-tier structure with LTM only for tiny orders:
-- Tiers: 1-7, 8-23, 24-47, 48-71, 72+
-- LTM threshold: `qty <= 7` (NOT `< 24` like DTG/DTF)
-- See `/memory/EMBROIDERY_PRICING_2026.md` for details
-
-## Development Commands
-
-```bash
-npm start          # Start Express server (port 3000) - That's it!
-```
-
-## Debug Commands
-
-```javascript
-// Check pricing data loaded
-console.log('Pricing:', window.pricingData);
-
-// Test API connection
-fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/health')
-    .then(r => r.json()).then(d => console.log('API:', d));
-
-// Clear all caches
-localStorage.clear(); sessionStorage.clear(); location.reload(true);
-```
+- **API Proxy**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
+- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF`
+- **Dev**: `npm start` (port 3000)
 
 ## Security Checklist
 
-When adding new API endpoints or rendering user data:
-- **SQL Injection**: Use `sanitizeFilterInput()` for Caspio filter parameters
-- **XSS**: Use `escapeHTML()` when rendering external/user data via innerHTML
-- **CORS**: Update `ALLOWED_ORIGINS` in server.js if adding new domains
-- **Rate Limits**: Sensitive endpoints should use `strictLimiter`
+When adding endpoints or rendering user data:
+- **SQL injection**: use `sanitizeFilterInput()` for Caspio filter params.
+- **XSS**: use `escapeHTML()` when rendering external/user data via `innerHTML`.
+- **CORS**: update `ALLOWED_ORIGINS` in server.js for new domains.
+- **Rate limit**: sensitive endpoints use `strictLimiter`.
 
-See `/memory/SECURITY_AUDIT_2026-01.md` for full audit report.
+## ManageOrders Documentation Routing
 
-## Documentation Lookup
+| Discovery type | Destination |
+|---|---|
+| New fields, endpoints, implementations | `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` |
+| Bugs, gotchas, workarounds | `/memory/LESSONS_LEARNED.md` (Order Processing & ShopWorks) |
+| CRM / Order Entry capabilities | `/memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md` |
+| 3-Day Tees Stripe→ShopWorks flow | `/memory/3-day-tees/ORDER_PUSH_FLOW.md` |
 
-**All detailed documentation is in `/memory/` directory.**
+These files are the single source of truth across all 3 NWCA projects.
 
-When you need detailed docs, use the Task tool with `subagent_type='Explore'` or read specific files:
-- `/memory/CROSS_PROJECT_HUB.md` - **START HERE** - Entry point for all 3 NWCA projects
-- `/memory/LESSONS_LEARNED.md` - Past bugs and solutions (check first when debugging!)
-- `/memory/INDEX.md` - Master navigation for all documentation
-- `/memory/GLOSSARY.md` - Shared terminology across all projects
-- `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md` - **MASTER** ShopWorks ManageOrders API (PULL + PUSH)
-- `/memory/3-day-tees/` - 3-Day Tees implementation
-- `/memory/LASER_PATCH_IMPLEMENTATION.md` - Laser leatherette patch feature (caps, GRT-50 setup fee)
+## Documentation Entry Points
 
-**Keep this list short** - add new docs to `/memory/INDEX.md` and topic-specific sections below.
+- [/memory/CROSS_PROJECT_HUB.md](memory/CROSS_PROJECT_HUB.md) — start here for cross-project work
+- [/memory/LESSONS_LEARNED.md](memory/LESSONS_LEARNED.md) — check first when debugging
+- [/memory/INDEX.md](memory/INDEX.md) — master navigation
+- [/memory/GLOSSARY.md](memory/GLOSSARY.md) — shared terminology
 
-## ManageOrders Documentation Updates
-
-When discovering new ManageOrders patterns or issues:
-
-1. **New fields, endpoints, or implementations** → Add to `/memory/MANAGEORDERS_COMPLETE_REFERENCE.md`
-2. **Bugs, gotchas, and workarounds** → Add to `/memory/LESSONS_LEARNED.md` under "Order Processing & ShopWorks"
-3. **CRM/Order Entry capabilities** → See `/memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md`
-4. **3-Day Tees Stripe→ShopWorks flow** → See `/memory/3-day-tees/ORDER_PUSH_FLOW.md`
-
-**These files are the single source of truth** - all three projects (Pricing Index, caspio-proxy, Python Inksoft) reference them.
+For deep research, use the Task tool with `subagent_type='Explore'`.
 
 ---
 
 **When in doubt:**
-1. Check the Top 8 Never-Break Rules
-2. Check ACTIVE_FILES.md for existing functionality
-3. Use Task tool with Explore agent to look up detailed docs
+1. Check the Top 8 Never-Break Rules above.
+2. Check ACTIVE_FILES.md before creating anything new.
+3. Use the Explore agent to look up detailed docs.
