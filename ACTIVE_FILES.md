@@ -790,6 +790,7 @@
 | `/shared_components/css/kanban.css` | Kanban board shared styles (4 boards: art-hub, transfers, supacolor, etc.) | All kanban dashboards | ✅ Active |
 | `/shared_components/css/art-hub.css` | Art Hub design tokens + shared styles (2026 design system) | art-hub-steve, art-hub-ruth, ae-dashboard, bradley-transfers | ✅ Active |
 | `/shared_components/css/dash-shell.css` | **NEW (2026-05-16)** Canonical shell classes (`.dash-header`, `.dash-back-link`, `.dash-content`, `.dash-error-banner`, `.dash-stat-card`, `.dash-card`, `.dash-btn`) for staff-dashboard child pages. Reuses art-hub.css tokens — defines NO new tokens. Emitted by every page scaffolded via the `/dash-page` skill. | art-hub.css, all `/dash-page new`-scaffolded pages | ✅ Active |
+| `/dashboards/css/digitized-designs.css` | **NEW (2026-05-16)** Page-specific styles for digitized-designs.html. Extracted from inline `<style>` block on 2026-05-16 by `/dash-page lift` — pure extraction (no token swap, no class rename) so behavior matches pre-lift exactly. | digitized-designs.html | ✅ Active |
 | `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
 | `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
