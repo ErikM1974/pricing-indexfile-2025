@@ -1,0 +1,274 @@
+/* =============================================================================
+   webstore-pricing-page.css — overrides for /calculators/webstores.html
+
+   Loads ON TOP of sticker-pricing-page.css. The chat panel, page hero,
+   floating button, action footer, share toast, accordion shell — all
+   come from sticker. This file adds:
+     - .webstore-quote-card  → store-setup live quote (cream/navy)
+     - .fundraiser-quote-card → per-item sell-price card (purple/gold)
+     - .web-search-chip      → distinct treatment for web_search tool calls
+     - quick-fact accent for the $2K minimum / $300 setup callout
+
+   By design, when sticker visuals get tweaked, webstore follows.
+   ========================================================================== */
+
+/* -- Quick-fact accent (mirrors emblem's amber LTM treatment, slightly
+      navier — webstore is a B2B service vs emblem's product order) ------- */
+.quick-fact.quick-fact--accent {
+    background: linear-gradient(135deg, #e8f1fb 0%, #d1e5f7 100%);
+    border: 1px solid #94bbe0;
+    box-shadow: 0 1px 0 0 rgba(30, 90, 160, 0.10) inset,
+                0 2px 8px -2px rgba(30, 90, 160, 0.18);
+    color: #0e3a66;
+    font-weight: 500;
+}
+.quick-fact.quick-fact--accent i { color: #1e5aa0; }
+.quick-fact.quick-fact--accent strong {
+    color: #0e3a66;
+    font-weight: 700;
+}
+
+/* -- WEBSTORE-SETUP live quote card (cream + navy editorial look) -------- */
+.webstore-quote-card {
+    margin-top: 12px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #fdfbf3 0%, #f6efde 100%);
+    color: #1a2a3f;
+    border: 1px solid #d6c896;
+    border-radius: var(--radius-2, 12px);
+    box-shadow: 0 4px 14px rgba(20, 40, 60, 0.10);
+    position: relative;
+    overflow: hidden;
+}
+.webstore-quote-card::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, rgba(30, 60, 100, 0.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+.webstore-quote-card .wsq-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #82704a;
+    margin-bottom: 4px;
+}
+.webstore-quote-card .wsq-pn {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a2a3f;
+}
+.webstore-quote-card .wsq-store-type {
+    display: inline-block;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    padding: 3px 10px;
+    background: #1e5aa0;
+    color: #fff;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.webstore-quote-card .wsq-store-type.open-close {
+    background: #0e7c46;
+}
+.webstore-quote-card .wsq-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    padding: 5px 0;
+    border-top: 1px solid rgba(20, 40, 60, 0.08);
+}
+.webstore-quote-card .wsq-line:first-of-type { border-top: none; }
+.webstore-quote-card .wsq-line.total {
+    border-top: 1px solid rgba(20, 40, 60, 0.25);
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+    font-size: 15px;
+}
+.webstore-quote-card .wsq-line .v {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+}
+.webstore-quote-card .wsq-meta {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(20, 40, 60, 0.16);
+    font-size: 12px;
+    color: #4a5870;
+    line-height: 1.45;
+}
+.webstore-quote-card .wsq-meta strong { color: #1a2a3f; }
+.webstore-quote-card .wsq-warn {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fef3c7;
+    border-left: 3px solid #d97706;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+/* -- FUNDRAISER live sell-price card (deep purple, donation-vibe) -------- */
+.fundraiser-quote-card {
+    margin-top: 12px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #2d1b5f 0%, #4a2d8f 100%);
+    color: #fff;
+    border-radius: var(--radius-2, 12px);
+    box-shadow: 0 6px 18px rgba(45, 27, 95, 0.30);
+    position: relative;
+    overflow: hidden;
+}
+.fundraiser-quote-card::before {
+    content: "";
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(255, 220, 100, 0.16) 0%, transparent 70%);
+    pointer-events: none;
+}
+.fundraiser-quote-card .fqc-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #ffe8a0;
+    margin-bottom: 6px;
+}
+.fundraiser-quote-card .fqc-price {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 36px;
+    font-weight: 700;
+    color: #fff8e0;
+    line-height: 1.1;
+    margin: 4px 0;
+}
+.fundraiser-quote-card .fqc-spec {
+    font-size: 12px;
+    opacity: 0.85;
+    margin: 2px 0 12px;
+}
+.fundraiser-quote-card .fqc-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    padding: 3px 0;
+    color: rgba(255, 255, 255, 0.85);
+}
+.fundraiser-quote-card .fqc-line.total {
+    border-top: 1px solid rgba(255, 232, 160, 0.30);
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+}
+.fundraiser-quote-card .fqc-line .v {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+}
+.fundraiser-quote-card .fqc-donation-banner {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 232, 160, 0.18);
+    border: 1px solid rgba(255, 232, 160, 0.35);
+    border-radius: 8px;
+    font-size: 13px;
+    color: #fff8e0;
+    text-align: center;
+    font-weight: 600;
+}
+.fundraiser-quote-card .fqc-tax-warn {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(220, 38, 38, 0.18);
+    border: 1px solid rgba(252, 165, 165, 0.50);
+    border-radius: 6px;
+    font-size: 11px;
+    color: #fef2f2;
+    line-height: 1.4;
+}
+.fundraiser-quote-card .fqc-tax-warn strong { color: #fffaf0; }
+
+/* -- WEB SEARCH chip — distinct from price/tool chips ------------------- */
+.tool-chip.web-search-chip {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #f8fafc;
+    border-color: #475569;
+}
+.tool-chip.web-search-chip i { color: #38bdf8; }
+
+/* When a web-search produces multi-result inline display, render below
+   the chip as a small list of cards */
+.web-search-results {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--paper-2, #f6f1e6);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 10px;
+    font-size: 12px;
+}
+.web-search-results .wsr-query {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3, #6b7280);
+    margin-bottom: 8px;
+}
+.web-search-results .wsr-answer {
+    padding: 6px 10px;
+    background: #e0f2fe;
+    border-left: 3px solid #0284c7;
+    border-radius: 4px;
+    color: #0c4a6e;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+.web-search-results .wsr-result {
+    padding: 6px 0;
+    border-top: 1px solid var(--rule-soft, rgba(0,0,0,0.05));
+    line-height: 1.4;
+}
+.web-search-results .wsr-result:first-of-type { border-top: none; }
+.web-search-results .wsr-result a {
+    color: #1e40af;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+}
+.web-search-results .wsr-result a:hover { text-decoration: underline; }
+.web-search-results .wsr-result .wsr-snip {
+    color: var(--ink-2, #4b4538);
+    font-size: 11px;
+    margin-top: 2px;
+}
+.web-search-results .wsr-result .wsr-domain {
+    color: var(--ink-3, #6b7280);
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+/* -- Mobile tweaks ------------------------------------------------------- */
+@media (max-width: 640px) {
+    .webstore-quote-card,
+    .fundraiser-quote-card {
+        padding: 14px 14px;
+    }
+    .fundraiser-quote-card .fqc-price {
+        font-size: 30px;
+    }
+}
