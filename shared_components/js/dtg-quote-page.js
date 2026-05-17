@@ -427,10 +427,14 @@
                     ${escapeHtml(c.name)}${c.units ? ` (${escapeHtml(c.units)})` : ''}
                 </span>`).join('');
             const warnings = (p.warnings || []).map(w => `<div class="ts-warning">⚠ ${escapeHtml(w)}</div>`).join('');
+            const thumbHtml = p.mainImageUrl
+                ? `<div class="ts-thumb"><img src="${escapeHtml(p.mainImageUrl)}" alt="${escapeHtml(p.styleNumber)}" loading="lazy" onerror="this.parentElement.style.display='none';"></div>`
+                : '';
             html += `
-                <div class="top-seller-card">
+                <div class="top-seller-card${thumbHtml ? ' has-thumb' : ''}">
                     <div class="ts-rank-badge ${rankClass}">#${rank}</div>
-                    <div>
+                    ${thumbHtml}
+                    <div class="ts-body">
                         <div><span class="ts-style">${escapeHtml(p.styleNumber)}</span> · <span class="ts-name">${escapeHtml(p.name)}</span></div>
                         <div class="ts-brand">${escapeHtml(p.brand || '')} · ${escapeHtml(p.fabric || '')}</div>
                         <div class="ts-sales">${escapeHtml(p.salesData || '')}</div>
