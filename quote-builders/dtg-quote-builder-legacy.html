@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 DTG Quote Builder | Northwest Custom Apparel</title>
+
+    <!-- NWCA Favicon -->
+    <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <!-- App Configuration (centralized API URLs, settings) -->
+    <script src="/config/app.config.js"></script>
+
+    <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=20260323d">
+
+    <!-- DTG Quote Builder Styles (overrides common) -->
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder-extracted.css?v=20260323">
+
+    <!-- Shared Color Picker Component -->
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
+
+    <!-- Shared Quote Share Modal (2026 consolidation) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+
+    <!-- Customer Lookup Autocomplete -->
+    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=20260129">
+
+    <!-- Extended Sizes Shared Module (2026-03-21 consolidation) -->
+    <script src="/shared_components/js/extended-sizes-config.js?v=20260321"></script>
+    <script src="/shared_components/js/quote-extended-sizes.js?v=20260321"></script>
+
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Compact Header -->
+    <header class="power-header">
+        <a href="/staff-dashboard.html">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel"
+                 class="logo">
+        </a>
+        <div class="power-header-center">
+            <div class="power-header-title">
+                2026 DTG Quote Builder
+            </div>
+            <div class="power-header-subtitle">Direct-to-Garment Printing</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+                <i class="fas fa-plus"></i> New Quote
+            </button>
+            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="power-main">
+        <!-- Left: Content Area -->
+        <div class="power-content">
+            <!-- Print Location Configuration Section -->
+            <div class="logo-section print-location-section">
+                <div class="primary-logo-config">
+                    <span class="logo-section-label"><i class="fas fa-print"></i> Print Location</span>
+                    <div class="print-location-controls" style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+                        <!-- Front Location Selection -->
+                        <div class="location-group">
+                            <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px;">FRONT (pick one)</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label class="location-radio">
+                                    <input type="radio" name="front-location" value="LC" checked onchange="updatePrintLocation()">
+                                    <span>Left Chest <span style="color: #666; font-size: 11px;">(4" x 4")</span></span>
+                                </label>
+                                <label class="location-radio">
+                                    <input type="radio" name="front-location" value="FF" onchange="updatePrintLocation()">
+                                    <span>Full Front <span style="color: #666; font-size: 11px;">(12" x 16")</span></span>
+                                </label>
+                                <label class="location-radio">
+                                    <input type="radio" name="front-location" value="JF" onchange="updatePrintLocation()">
+                                    <span>Jumbo Front <span style="color: #666; font-size: 11px;">(16" x 20")</span></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Back Location Selection (Optional) -->
+                        <div class="location-group">
+                            <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 8px;">BACK (add if needed)</div>
+                            <div style="display: flex; flex-direction: column; gap: 6px;">
+                                <label class="location-radio">
+                                    <input type="radio" name="back-location" value="" checked onchange="updatePrintLocation()">
+                                    <span>None</span>
+                                </label>
+                                <label class="location-radio">
+                                    <input type="radio" name="back-location" value="FB" onchange="updatePrintLocation()">
+                                    <span>Full Back <span style="color: #666; font-size: 11px;">(12" x 16")</span></span>
+                                </label>
+                                <label class="location-radio">
+                                    <input type="radio" name="back-location" value="JB" onchange="updatePrintLocation()">
+                                    <span>Jumbo Back <span style="color: #666; font-size: 11px;">(16" x 20")</span></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Current Selection Display -->
+                        <div class="location-summary" style="background: #f0f7ff; padding: 12px 16px; border-radius: 8px; min-width: 150px;">
+                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">SELECTED</div>
+                            <div id="location-display" style="font-size: 14px; font-weight: 600; color: #2563eb;">Left Chest</div>
+                            <div id="location-code" style="font-size: 11px; color: #666; margin-top: 2px;">Code: LC</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Grid Section -->
+            <div class="product-grid-section">
+                <!-- Search Row -->
+                <div class="search-row">
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text"
+                               id="product-search"
+                               class="search-input"
+                               placeholder="Search by style # (e.g., PC54, G500) or product name"
+                               autocomplete="off">
+                        <div id="search-suggestions" class="search-suggestions"></div>
+                    </div>
+                </div>
+
+                <!-- Minimum Order Warning Banner -->
+                <div id="min-order-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Minimum Order: 24 pieces</strong> -
+                    Orders under 24 pieces require Less Than Minimum Fee.
+                </div>
+
+                <!-- Excel-Style Product Table -->
+                <div class="product-table-wrapper">
+                    <table class="product-table" id="product-table">
+                        <thead>
+                            <tr>
+                                <th class="style-col">Style</th>
+                                <th class="thumbnail-col"></th>
+                                <th class="desc-col">Description</th>
+                                <th class="color-col">Color</th>
+                                <th class="size-col">S</th>
+                                <th class="size-col">M</th>
+                                <th class="size-col">L</th>
+                                <th class="size-col">XL</th>
+                                <th class="size-col">2XL</th>
+                                <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
+                                <th class="qty-col">Qty</th>
+                                <th class="price-col">Unit $</th>
+                                <th class="total-col">Total</th>
+                                <th class="actions-col"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-tbody">
+                            <!-- Empty State Message - shown until products added -->
+                            <tr id="empty-state-row">
+                                <td colspan="13" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
+                                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
+                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                </td>
+                            </tr>
+                            <!-- Product rows will be added here -->
+                        </tbody>
+                        <!-- Fee Summary Section (auto-populated by JS) -->
+                        <tbody id="fees-tbody" class="fee-summary-section">
+                            <tr id="ltm-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="ltm-row-unit">$50.00</td>
+                                <td class="cell-total" id="ltm-row-total">$50.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="art-charge-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-palette"></i> Art Charge (Logo Mockup & Review)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="art-charge-unit">$0.00</td>
+                                <td class="cell-total" id="art-charge-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="graphic-design-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="graphic-design-unit">$0.00</td>
+                                <td class="cell-total" id="graphic-design-total-row">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="rush-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-bolt"></i> Rush Fee
+                                </td>
+                                <td class="cell-qty">1</td>
+                                <td class="cell-price" id="rush-fee-unit">$0.00</td>
+                                <td class="cell-total" id="rush-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <!-- Discount row removed 2026-03-23 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Add Row Button -->
+                <button class="add-row-btn" onclick="addNewRow()">
+                    <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
+                </button>
+
+                <!-- Keyboard Hints -->
+                <div class="keyboard-hint">
+                    <kbd>Tab</kbd> Next cell &nbsp;|&nbsp;
+                    <kbd>Enter</kbd> Next row &nbsp;|&nbsp;
+                    <kbd>Ctrl+S</kbd> Save &nbsp;|&nbsp;
+                    <kbd>Ctrl+P</kbd> Print PDF
+                </div>
+
+                <!-- Extended Size Picker Backdrop -->
+                <div id="size-popup-backdrop" class="size-popup-backdrop hidden" onclick="closeExtendedSizePopup()"></div>
+
+                <!-- Extended Size Picker Popup (for Size06/Other sizes) -->
+                <div id="extended-size-popup" class="size-popup hidden">
+                    <div class="size-popup-header">
+                        <h4><i class="fas fa-ruler"></i> Extended Sizes (Size06)</h4>
+                        <button class="size-popup-close" onclick="closeExtendedSizePopup()">&times;</button>
+                    </div>
+                    <p class="size-popup-hint">Enter quantities for extended sizes. These create separate line items.</p>
+                    <div class="size-popup-grid" id="size-popup-grid">
+                        <!-- Size inputs generated dynamically -->
+                    </div>
+                    <div class="size-popup-actions">
+                        <button class="size-popup-cancel" onclick="closeExtendedSizePopup()">Cancel</button>
+                        <button class="size-popup-apply" onclick="applyExtendedSizes()">
+                            <i class="fas fa-check"></i> Apply Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Pricing Sidebar -->
+        <div class="power-sidebar" id="power-sidebar">
+            <!-- Resize handle for dragging sidebar width -->
+            <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
+
+            <!-- Scrollable Content Container -->
+            <div class="sidebar-scroll-container">
+                <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
+                <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
+                    <div class="customer-panel-header" onclick="document.getElementById('dtg-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;">
+                        <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #4cb354;"></i> Customer</h4>
+                        <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
+                    </div>
+                    <div id="dtg-customer-fields">
+                        <div class="customer-field customer-lookup-container" style="margin-bottom: 8px;">
+                            <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
+                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+                        </div>
+                        <div class="customer-lookup-divider" style="text-align: center; font-size: 11px; color: #999; margin: 8px 0;">OR ENTER MANUALLY</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="customer-field">
+                                <label class="quote-label">NAME *</label>
+                                <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
+                            </div>
+                            <div class="customer-field">
+                                <label class="quote-label">EMAIL *</label>
+                                <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input">
+                            </div>
+                            <div class="customer-field">
+                                <label class="quote-label">COMPANY</label>
+                                <input type="text" id="company-name" placeholder="Company name" class="quote-input">
+                            </div>
+                            <div class="customer-field">
+                                <label class="quote-label">SALES REP</label>
+                                <select id="sales-rep" class="quote-input">
+                                    <option value="sales@nwcustomapparel.com">General Sales</option>
+                                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
+                                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
+                                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
+                                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
+                                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
+                                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
+                                    <option value="art@nwcustomapparel.com">Steve Deland</option>
+                                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
+                                </select>
+                            </div>
+                            <div class="customer-field">
+                                <label class="quote-label">CUSTOMER #</label>
+                                <input type="text" id="customer-number" placeholder="ShopWorks ID" class="quote-input">
+                            </div>
+                            <div class="customer-field">
+                                <label class="quote-label">PHONE</label>
+                                <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
+                            </div>
+                            <div class="customer-field" style="grid-column: 1 / -1;">
+                                <label class="quote-label">PROJECT NAME</label>
+                                <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Panel -->
+                <div class="pricing-panel">
+                    <div class="pricing-title">
+                        <i class="fas fa-calculator"></i> Quote Summary
+                    </div>
+
+                    <div class="pricing-row">
+                        <span class="label">Print Location:</span>
+                        <span class="value" id="sidebar-location">Left Chest</span>
+                    </div>
+
+                    <div class="pricing-row">
+                        <span class="label">Total Pieces:</span>
+                        <span class="value" id="total-qty">0</span>
+                    </div>
+
+                    <div class="pricing-row">
+                        <span class="label">Pricing Tier:</span>
+                        <span class="tier-badge" id="pricing-tier">12-23</span>
+                    </div>
+                    <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
+
+                    <div class="pricing-row">
+                        <span class="label">Products Subtotal:</span>
+                        <span class="value" id="subtotal">$0.00</span>
+                    </div>
+                    <div class="pricing-row" id="per-unit-price-row" style="display: none; font-size: 12px; color: #6b7280; border-bottom: none; padding: 2px 0;">
+                        <span class="label" style="font-style: italic;">Per Piece:</span>
+                        <span class="value" id="per-unit-price" style="font-style: italic; font-weight: 500;">-</span>
+                    </div>
+
+                    <!-- Tax Section -->
+                    <div class="pricing-totals-section">
+                        <div class="pricing-row">
+                            <span class="label" style="font-weight: 600;">Subtotal:</span>
+                            <span class="value" id="pre-tax-subtotal">$0.00</span>
+                        </div>
+                        <div class="pricing-row" id="tax-toggle-row">
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
+                                <span style="font-size: 12px;">Include Tax</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-1">
+                                <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                                       style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                                       onchange="updateTaxCalculation()" title="Tax rate %">
+                                <span style="font-size: 11px; color: #64748b;">%</span>
+                            </div>
+                        </div>
+                        <div class="pricing-row" id="tax-row">
+                            <span class="label text-muted">Sales Tax:</span>
+                            <span class="value" id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="pricing-row grand-total-row">
+                            <span class="label">TOTAL:</span>
+                            <span class="value" id="grand-total-with-tax">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fees & Charges Panel (merged artwork + additional charges) -->
+                <div class="additional-charges-panel">
+                    <div class="charges-header" onclick="toggleFeesCharges()">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Fees & Charges</span>
+                            <span id="charges-badge" class="charges-badge hidden">$0.00</span>
+                        </div>
+                        <i id="charges-chevron" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="fees-charges-content" class="charges-content hidden">
+                        <!-- Art / Design subsection -->
+                        <div class="charge-subsection-label">Art & Design</div>
+                        <div class="charge-field">
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()">
+                                <span>Logo Mockup & Review</span>
+                            </label>
+                            <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
+                                <span class="prefix">$</span>
+                                <input type="number" id="art-charge" class="quote-input"
+                                       min="0" step="0.01" value="0" disabled
+                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                            </div>
+                        </div>
+                        <div class="charge-field">
+                            <label class="quote-label">Graphic Design ($75/hr)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
+                                       min="0" step="0.5" placeholder="0"
+                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                                <span class="text-muted">hrs</span>
+                                <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
+                            </div>
+                        </div>
+                        <!-- Rush / Discount subsection -->
+                        <div class="charge-subsection-label" style="margin-top: 10px;">Additional</div>
+                        <div class="charge-field">
+                            <label class="quote-label">Rush Fee</label>
+                            <div class="input-with-prefix">
+                                <span class="prefix">$</span>
+                                <input type="number" id="rush-fee" class="quote-input"
+                                       min="0" step="0.01" placeholder="0.00"
+                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
+                            </div>
+                        </div>
+                        <!-- Discount controls removed 2026-03-23 -->
+                    </div>
+                </div>
+
+                <!-- LTM Control Panel (shown only when qty < 24) -->
+                <div id="dtg-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+                    <div id="dtg-ltm-panel"></div>
+                </div>
+
+                <!-- Order & Shipping (top-level panel, not nested in Save) -->
+                <div id="dtg-order-fields" style="margin-bottom: 12px;"></div>
+
+                <!-- Save & Share Section (Collapsible) -->
+                <div class="save-quote-panel-collapsible">
+                    <div class="save-quote-header" onclick="toggleSaveShare()">
+                        <div class="save-quote-title">
+                            <i class="fas fa-share-alt"></i> Save & Share
+                        </div>
+                        <i id="save-share-chevron" class="fas fa-chevron-down"></i>
+                    </div>
+                    <div id="save-share-content" class="hidden" style="margin-top: 12px;">
+                        <!-- Customer fields moved to top of sidebar (2026-03-23) -->
+                        <button class="btn-save-quote" onclick="saveAndGetLink()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-link"></i> Save & Get Shareable Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons (Outside scroll container - always visible) -->
+            <div class="action-panel">
+                <button class="btn-action btn-primary-action" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                    <i class="fas fa-print"></i> Print Quote
+                </button>
+                <button class="btn-action btn-secondary-action" onclick="dtgEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                    <i class="fas fa-envelope"></i> Email Quote
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Logo Modal -->
+    <div id="logo-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-palette"></i> Custom Logo Setup</h3>
+                <button class="modal-close" onclick="closeLogoModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Position</label>
+                    <select id="logo-position">
+                        <option value="Left Chest">Left Chest</option>
+                        <option value="Right Chest">Right Chest</option>
+                        <option value="Center Chest">Center Chest</option>
+                        <option value="Full Front">Full Front</option>
+                        <option value="Full Back">Full Back</option>
+                        <option value="Upper Back">Upper Back</option>
+                        <option value="Left Sleeve">Left Sleeve</option>
+                        <option value="Right Sleeve">Right Sleeve</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Stitch Count</label>
+                    <input type="number" id="logo-stitches" value="8000" min="1000" step="1000">
+                    <small style="color: #666;">Min: 1,000 | Increment: 1,000</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-secondary-action" onclick="closeLogoModal()" style="background: #6c757d;">Cancel</button>
+                <button class="btn-action btn-primary-action" onclick="applyCustomLogo()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Core Dependencies -->
+    <script src="/shared_components/js/product-category-filter.js"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=20260323d"></script>
+    <script src="/shared_components/js/dtg-pricing-service.js"></script>
+    <script src="/shared_components/js/dtg-quote-service.js"></script>
+    <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
+    <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=20260323b"></script>
+
+    <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
+    <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-session.js?v=20260113"></script>
+
+    <!-- Staff Authentication Helper (auto-select sales rep) -->
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+
+    <!-- Customer Lookup Autocomplete -->
+    <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
+
+    <!-- Sidebar Resize (2026 UX improvement) -->
+    <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
+
+    <!-- Product Thumbnail Modal (click to enlarge) -->
+    <script src="/shared_components/js/product-thumbnail-modal.js?v=20260424"></script>
+
+    <!-- Power Quote Controller (extracted to external JS) -->
+    <script src="/shared_components/js/dtg-quote-builder.js?v=20260323"></script>
+    <!-- INLINE SCRIPT REMOVED — All DTG functions now in dtg-quote-builder.js -->
+
+</body>
+</html>

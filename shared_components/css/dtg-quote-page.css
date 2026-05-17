@@ -1,0 +1,412 @@
+/* =============================================================================
+   dtg-quote-page.css — overrides for /quote-builders/dtg-quote-builder.html
+
+   Loads ON TOP of sticker-pricing-page.css. Adds:
+     - .dtg-quote-card      → live DTG price card (NWCA green)
+     - .top-seller-card     → recommendation cards rendered inline in chat
+     - .web-search-chip     → reuse pattern from webstore (already defined
+                               in webstore-pricing-page.css? no, only in
+                               webstore — we duplicate for DTG)
+     - .submit-shopworks-btn → 4th action button in chat footer
+     - .quick-fact--accent  → green-tinted callout (LTM threshold reminder)
+     - Legacy form re-theme → replaces the blue header/Bootstrap chrome
+                               on the existing form inside the accordion
+
+   By design, when sticker visuals get tweaked, DTG follows.
+   ========================================================================== */
+
+/* -- Quick-fact accent (NWCA green tint) -------------------------------- */
+.quick-fact.quick-fact--accent {
+    background: linear-gradient(135deg, #ebf6e8 0%, #d4ecd0 100%);
+    border: 1px solid #7ab86a;
+    box-shadow: 0 1px 0 0 rgba(46, 88, 39, 0.10) inset,
+                0 2px 8px -2px rgba(46, 88, 39, 0.20);
+    color: #1f3a1f;
+    font-weight: 500;
+}
+.quick-fact.quick-fact--accent i { color: #2e5827; }
+.quick-fact.quick-fact--accent strong {
+    color: #1f3a1f;
+    font-weight: 700;
+}
+
+/* -- DTG live quote card (NWCA green editorial look) -------------------- */
+.dtg-quote-card {
+    margin-top: 12px;
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #1f3a1f 0%, #2e5827 100%);
+    color: #fff;
+    border-radius: var(--radius-2, 12px);
+    box-shadow: 0 6px 18px rgba(31, 58, 31, 0.30);
+    position: relative;
+    overflow: hidden;
+}
+.dtg-quote-card::before {
+    content: "";
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 90px;
+    height: 90px;
+    background: radial-gradient(circle, rgba(255, 248, 200, 0.10) 0%, transparent 70%);
+    pointer-events: none;
+}
+.dtg-quote-card .dtg-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: #ffe8a0;
+    margin-bottom: 4px;
+}
+.dtg-quote-card .dtg-pn {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff8e0;
+    word-break: break-all;
+}
+.dtg-quote-card .dtg-product-line {
+    font-size: 13px;
+    margin: 4px 0 12px;
+    opacity: 0.92;
+}
+.dtg-quote-card .dtg-location-pill {
+    display: inline-block;
+    margin: 4px 8px 12px 0;
+    padding: 3px 10px;
+    background: rgba(255, 232, 160, 0.20);
+    border: 1px solid rgba(255, 232, 160, 0.40);
+    color: #fff8e0;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+.dtg-quote-card .dtg-tier-pill {
+    display: inline-block;
+    margin: 4px 8px 12px 0;
+    padding: 3px 10px;
+    background: #fff8e0;
+    color: #2e5827;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.dtg-quote-card .dtg-tier-pill.ltm {
+    background: #fef3c7;
+    color: #78350f;
+}
+.dtg-quote-card .dtg-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    font-size: 12px;
+    margin-bottom: 10px;
+    color: rgba(255, 255, 255, 0.85);
+}
+.dtg-quote-card .dtg-sizes span {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+}
+.dtg-quote-card .dtg-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    padding: 5px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.10);
+    color: rgba(255, 255, 255, 0.92);
+}
+.dtg-quote-card .dtg-line:first-of-type { border-top: none; }
+.dtg-quote-card .dtg-line.total {
+    border-top: 1px solid rgba(255, 232, 160, 0.40);
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #fff;
+}
+.dtg-quote-card .dtg-line .v {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+}
+.dtg-quote-card .dtg-rule-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(255, 232, 160, 0.18);
+    border-left: 3px solid #ffe8a0;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #fff8e0;
+    line-height: 1.45;
+}
+.dtg-quote-card .dtg-rule-note strong { color: #fffaf0; }
+
+/* -- Top-seller recommendation cards (rendered in chat) ----------------- */
+.top-seller-recommendations {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--paper-2, #f6f1e6);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 10px;
+}
+.top-seller-recommendations .tsr-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3, #6b7280);
+    margin-bottom: 10px;
+}
+.top-seller-card {
+    padding: 10px 12px;
+    background: var(--paper-1, #fff);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    transition: box-shadow var(--dur-base, 200ms) var(--ease-out, ease);
+}
+.top-seller-card:hover {
+    box-shadow: 0 2px 8px rgba(20, 40, 60, 0.10);
+}
+.top-seller-card .ts-rank-badge {
+    width: 32px;
+    height: 32px;
+    background: #2e5827;
+    color: #fff8e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: var(--mono, ui-monospace, monospace);
+    flex-shrink: 0;
+}
+.top-seller-card .ts-rank-badge.gold { background: #d97706; color: #fff8e0; }
+.top-seller-card .ts-rank-badge.silver { background: #6b7280; }
+.top-seller-card .ts-rank-badge.bronze { background: #a16207; }
+.top-seller-card .ts-style {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-1, #1f3a1f);
+}
+.top-seller-card .ts-name {
+    font-size: 13px;
+    color: var(--ink-2, #4b5563);
+}
+.top-seller-card .ts-brand {
+    font-size: 11px;
+    color: var(--ink-3, #6b7280);
+    font-style: italic;
+}
+.top-seller-card .ts-sales {
+    font-size: 11px;
+    color: #2e5827;
+    font-weight: 600;
+    margin-top: 2px;
+}
+.top-seller-card .ts-best-for {
+    font-size: 11px;
+    color: var(--ink-2, #4b5563);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+.top-seller-card .ts-colors {
+    display: flex;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+.top-seller-card .ts-color-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px 2px 4px;
+    background: var(--paper-2, #f6f1e6);
+    border-radius: 4px;
+    font-size: 10px;
+    color: var(--ink-2, #4b5563);
+}
+.top-seller-card .ts-color-chip .swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    border: 1px solid rgba(0,0,0,0.10);
+}
+.top-seller-card .ts-warning {
+    margin-top: 6px;
+    padding: 4px 8px;
+    background: #fef3c7;
+    border-left: 3px solid #d97706;
+    border-radius: 3px;
+    font-size: 11px;
+    color: #78350f;
+}
+
+/* -- Web search chip + results (reuse webstore pattern) ----------------- */
+.tool-chip.web-search-chip {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    color: #f8fafc;
+    border-color: #475569;
+}
+.tool-chip.web-search-chip i { color: #38bdf8; }
+.web-search-results {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: var(--paper-2, #f6f1e6);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 10px;
+    font-size: 12px;
+}
+.web-search-results .wsr-query {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3, #6b7280);
+    margin-bottom: 8px;
+}
+.web-search-results .wsr-answer {
+    padding: 6px 10px;
+    background: #e0f2fe;
+    border-left: 3px solid #0284c7;
+    border-radius: 4px;
+    color: #0c4a6e;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-bottom: 8px;
+}
+.web-search-results .wsr-result {
+    padding: 6px 0;
+    border-top: 1px solid var(--rule-soft, rgba(0,0,0,0.05));
+    line-height: 1.4;
+}
+.web-search-results .wsr-result:first-of-type { border-top: none; }
+.web-search-results .wsr-result a {
+    color: #1e40af;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+}
+.web-search-results .wsr-result a:hover { text-decoration: underline; }
+.web-search-results .wsr-result .wsr-snip {
+    color: var(--ink-2, #4b4538);
+    font-size: 11px;
+    margin-top: 2px;
+}
+.web-search-results .wsr-result .wsr-domain {
+    color: var(--ink-3, #6b7280);
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+/* -- "Submit to ShopWorks" action button + status ------------------------ */
+.ai-action-btn.submit-shopworks-btn {
+    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%);
+    color: #fff;
+    border: 1px solid #2e5827;
+    font-weight: 600;
+}
+.ai-action-btn.submit-shopworks-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1f3a1f 0%, #0f2010 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(31, 58, 31, 0.30);
+}
+.ai-action-btn.submit-shopworks-btn:disabled {
+    background: var(--paper-3, #e5e7eb);
+    color: var(--ink-3, #9ca3af);
+    border-color: var(--rule, #d1d5db);
+}
+.shopworks-success-card {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #065f46;
+    border: 1px solid #34d399;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+.shopworks-success-card .sws-label {
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #065f46;
+    margin-bottom: 4px;
+}
+.shopworks-success-card .sws-order-id {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 15px;
+    font-weight: 700;
+    color: #064e3b;
+}
+.shopworks-error-card {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: #fef2f2;
+    color: #991b1b;
+    border-left: 3px solid #dc2626;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* -- Legacy form re-theme (green replaces blue) ------------------------- */
+/* The existing 12 DTG JS files load their own classes (.power-header,
+   .power-main, .power-content, etc.) inside the "Manual quote builder"
+   accordion. We re-theme the blue header bar to NWCA green and tweak the
+   typography to match the rest of the page. */
+.power-header {
+    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%) !important;
+    color: #fff !important;
+    border-bottom: 1px solid #1f3a1f;
+}
+.power-header .logo { filter: brightness(0) invert(1); }
+.power-header-title { color: #fff !important; }
+.power-header-subtitle { color: rgba(255, 255, 255, 0.85) !important; }
+.power-header .btn-header {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.30);
+    color: #fff;
+}
+.power-header .btn-header:hover {
+    background: rgba(255, 255, 255, 0.20);
+}
+.power-header .btn-new-quote {
+    background: #fff8e0;
+    color: #2e5827;
+    border-color: #fff8e0;
+    font-weight: 700;
+}
+.power-header .btn-new-quote:hover {
+    background: #fff;
+    color: #1f3a1f;
+}
+
+/* Re-theme legacy radio buttons + form controls to green */
+.location-radio input[type="radio"]:checked {
+    accent-color: #2e5827;
+}
+.btn-primary, .quote-btn, .calc-btn {
+    background: #2e5827 !important;
+    border-color: #2e5827 !important;
+}
+.btn-primary:hover, .quote-btn:hover, .calc-btn:hover {
+    background: #1f3a1f !important;
+    border-color: #1f3a1f !important;
+}
+
+/* -- Mobile tweaks ------------------------------------------------------- */
+@media (max-width: 640px) {
+    .dtg-quote-card { padding: 14px 14px; }
+    .dtg-quote-card .dtg-pn { font-size: 13px; }
+    .top-seller-card {
+        grid-template-columns: auto 1fr;
+        gap: 8px;
+    }
+}
