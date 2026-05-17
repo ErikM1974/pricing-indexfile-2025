@@ -1,3 +1,7 @@
+## v2026.05.17.3 (2026.05.17)
+
+- Deploy v2026.05.17.3: 3 files (dtg-quote-builder.html, dtg-quote-page.css, dtg-quote-page.js...)
+
 ## v2026.05.17.2 (2026.05.17)
 
 - Deploy v2026.05.17.2: 3 files (dtg-quote-builder.html, dtg-quote-page.css, dtg-quote-page.js...)
