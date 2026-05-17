@@ -280,14 +280,31 @@
             return false;
         };
 
-        let html = `
+        // Pick a default hero image — first color with a mainImageUrl wins.
+        const defaultHero = colors.find(c => c.mainImageUrl) || null;
+
+        let html = '';
+        if (defaultHero) {
+            html += `
+                <div class="pd-hero">
+                    <img class="pd-hero-img"
+                         src="${escapeHtml(defaultHero.mainImageUrl)}"
+                         alt="${escapeHtml(data.styleNumber)} in ${escapeHtml(defaultHero.name)}"
+                         data-default-src="${escapeHtml(defaultHero.mainImageUrl)}"
+                         data-default-color="${escapeHtml(defaultHero.name)}"
+                         onerror="this.style.display='none';">
+                    <div class="pd-hero-caption" data-default-color="${escapeHtml(defaultHero.name)}">${escapeHtml(defaultHero.name)}</div>
+                </div>`;
+        }
+
+        html += `
             <div class="pd-label">Catalog details</div>
             <div class="pd-title"><span class="pd-style">${escapeHtml(data.styleNumber)}</span> · ${escapeHtml(data.title || '')}</div>
             <div class="pd-meta">${fmtInt(data.colorCount || 0)} colors available · ${fmtInt(data.sizeCount || 0)} sizes${data.hasUpcharges ? ' · 2XL+ upcharges apply' : ''}</div>
         `;
 
         if (colors.length > 0) {
-            html += `<div class="pd-section-label">Click a color to pick it</div>`;
+            html += `<div class="pd-section-label">Hover to preview · click to pick</div>`;
             html += `<div class="color-swatch-grid">`;
             for (const c of colors) {
                 const warn = avoidColorMatch(c.name);
@@ -298,6 +315,7 @@
                     <button type="button" class="color-swatch${warn ? ' warning' : ''}"
                             data-color-name="${escapeHtml(c.name)}"
                             data-catalog-color="${escapeHtml(c.catalogColor || '')}"
+                            data-main-image="${escapeHtml(c.mainImageUrl || '')}"
                             title="${escapeHtml(c.name)}${warn ? ' — ⚠ avoid for DTG' : ''}">
                         ${imgHtml}
                         <span class="cs-name">${escapeHtml(c.name)}</span>
@@ -323,12 +341,48 @@
 
         wrap.innerHTML = html;
 
-        // Wire click handlers on swatches → send "use [color]" to the bot
+        const heroImg = wrap.querySelector('.pd-hero-img');
+        const heroCap = wrap.querySelector('.pd-hero-caption');
+
+        // Hover a swatch → preview that color in the hero. Click → pick + lock.
         wrap.querySelectorAll('.color-swatch').forEach((btn) => {
+            const mainImg = btn.getAttribute('data-main-image') || '';
+            const colorName = btn.getAttribute('data-color-name') || '';
+
+            if (heroImg && mainImg) {
+                btn.addEventListener('mouseenter', () => {
+                    if (wrap.dataset.locked === 'true') return;
+                    heroImg.style.display = '';
+                    heroImg.src = mainImg;
+                    if (heroCap) heroCap.textContent = colorName;
+                });
+                btn.addEventListener('mouseleave', () => {
+                    if (wrap.dataset.locked === 'true') return;
+                    const defSrc = heroImg.getAttribute('data-default-src') || '';
+                    const defCol = heroImg.getAttribute('data-default-color') || '';
+                    if (defSrc) {
+                        heroImg.style.display = '';
+                        heroImg.src = defSrc;
+                    }
+                    if (heroCap && defCol) heroCap.textContent = defCol;
+                });
+            }
+
             btn.addEventListener('click', () => {
                 if (aiState.isStreaming) return;
-                const colorName = btn.getAttribute('data-color-name');
                 if (!colorName) return;
+                // Lock hero on the picked color so it persists after the click.
+                if (heroImg && mainImg) {
+                    heroImg.style.display = '';
+                    heroImg.src = mainImg;
+                    heroImg.setAttribute('data-default-src', mainImg);
+                    heroImg.setAttribute('data-default-color', colorName);
+                    if (heroCap) {
+                        heroCap.textContent = colorName;
+                        heroCap.setAttribute('data-default-color', colorName);
+                    }
+                    wrap.dataset.locked = 'true';
+                }
                 const ta = document.getElementById('aiChatTextarea');
                 const form = document.getElementById('aiChatForm');
                 if (!ta || !form) return;

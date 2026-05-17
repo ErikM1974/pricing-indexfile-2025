@@ -258,6 +258,33 @@
     border: 1px solid var(--rule, rgba(0,0,0,0.08));
     border-radius: 10px;
 }
+.product-details-card .pd-hero {
+    margin: -2px -4px 12px;
+    background: #fff;
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+}
+.product-details-card .pd-hero-img {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    height: 220px;
+    object-fit: contain;
+    margin: 0 auto;
+    background: #fafafa;
+    transition: opacity 0.18s ease;
+}
+.product-details-card .pd-hero-caption {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2, #374151);
+    padding: 6px 10px 8px;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(246,241,230,0.6) 100%);
+    border-top: 1px solid var(--rule, rgba(0,0,0,0.06));
+}
 .product-details-card .pd-label {
     font-size: 11px;
     font-weight: 700;
