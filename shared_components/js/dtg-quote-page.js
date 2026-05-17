@@ -249,12 +249,95 @@
         else if (toolName === 'web_search') iconClass = 'fa-globe';
         else if (toolName === 'quote_dtg_pricing') iconClass = 'fa-print';
         else if (toolName === 'recommend_top_sellers') iconClass = 'fa-star';
+        else if (toolName === 'lookup_product_details') iconClass = 'fa-palette';
         chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         if (opts.searchResults) msg.appendChild(buildWebSearchResultsEl(opts.searchResults));
         if (opts.topSellers) msg.appendChild(buildTopSellersEl(opts.topSellers));
+        if (opts.productDetails) msg.appendChild(buildProductDetailsEl(opts.productDetails));
         container.appendChild(msg);
         scrollChatBottom();
+    }
+
+    /**
+     * Render product-details (lookup_product_details tool result) — title, then
+     * a grid of clickable color swatches (from SanMar's COLOR_SQUARE_IMAGE),
+     * then a list of size chips with upcharges proactively shown. Clicking a
+     * swatch sends "Let's go with [Color Name]" back to the bot.
+     */
+    function buildProductDetailsEl(data) {
+        const wrap = document.createElement('div');
+        wrap.className = 'product-details-card';
+        const colors = Array.isArray(data.colors) ? data.colors : [];
+        const sizes = Array.isArray(data.sizes) ? data.sizes : [];
+        const warnings = Array.isArray(data.avoidWarnings) ? data.avoidWarnings : [];
+
+        // Detect avoid-list colors (for warning badge on PC61 Red, PC78H White)
+        const avoidColorMatch = (name) => {
+            const n = String(name).toLowerCase();
+            if (data.styleNumber === 'PC61' && n.includes('red')) return true;
+            if (data.styleNumber === 'PC78H' && n === 'white') return true;
+            return false;
+        };
+
+        let html = `
+            <div class="pd-label">Catalog details</div>
+            <div class="pd-title"><span class="pd-style">${escapeHtml(data.styleNumber)}</span> · ${escapeHtml(data.title || '')}</div>
+            <div class="pd-meta">${fmtInt(data.colorCount || 0)} colors available · ${fmtInt(data.sizeCount || 0)} sizes${data.hasUpcharges ? ' · 2XL+ upcharges apply' : ''}</div>
+        `;
+
+        if (colors.length > 0) {
+            html += `<div class="pd-section-label">Click a color to pick it</div>`;
+            html += `<div class="color-swatch-grid">`;
+            for (const c of colors) {
+                const warn = avoidColorMatch(c.name);
+                const imgHtml = c.swatchImageUrl
+                    ? `<img class="cs-img" src="${escapeHtml(c.swatchImageUrl)}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.classList.add('placeholder');this.removeAttribute('src');">`
+                    : `<div class="cs-img placeholder"></div>`;
+                html += `
+                    <button type="button" class="color-swatch${warn ? ' warning' : ''}"
+                            data-color-name="${escapeHtml(c.name)}"
+                            data-catalog-color="${escapeHtml(c.catalogColor || '')}"
+                            title="${escapeHtml(c.name)}${warn ? ' — ⚠ avoid for DTG' : ''}">
+                        ${imgHtml}
+                        <span class="cs-name">${escapeHtml(c.name)}</span>
+                    </button>`;
+            }
+            html += `</div>`;
+        }
+
+        for (const w of warnings) {
+            html += `<div class="pd-color-warning">${escapeHtml(w)}</div>`;
+        }
+
+        if (sizes.length > 0) {
+            html += `<div class="pd-section-label">Sizes${data.upchargeSummary ? ' (upcharges shown)' : ''}</div>`;
+            html += `<div class="pd-size-list">`;
+            for (const s of sizes) {
+                const cls = s.hasUpcharge ? 'pd-size-chip has-upcharge' : 'pd-size-chip';
+                const up = s.hasUpcharge ? `<span class="upcharge">+$${fmtMoney(s.upcharge)}</span>` : '';
+                html += `<span class="${cls}">${escapeHtml(s.size)}${up}</span>`;
+            }
+            html += `</div>`;
+        }
+
+        wrap.innerHTML = html;
+
+        // Wire click handlers on swatches → send "use [color]" to the bot
+        wrap.querySelectorAll('.color-swatch').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (aiState.isStreaming) return;
+                const colorName = btn.getAttribute('data-color-name');
+                if (!colorName) return;
+                const ta = document.getElementById('aiChatTextarea');
+                const form = document.getElementById('aiChatForm');
+                if (!ta || !form) return;
+                ta.value = `Let's go with ${colorName}.`;
+                form.dispatchEvent(new Event('submit', { cancelable: true }));
+            });
+        });
+
+        return wrap;
     }
 
     function buildWebSearchResultsEl(data) {
@@ -570,6 +653,14 @@
             } else {
                 const n = Array.isArray(result.results) ? result.results.length : 0;
                 appendToolChip(tool, `Searched the web — ${n} result${n === 1 ? '' : 's'}`, { searchResults: result });
+            }
+        } else if (tool === 'lookup_product_details') {
+            if (result.error) {
+                appendToolChip(tool, `Lookup failed: ${result.message || result.error}`);
+            } else {
+                const cc = result.colorCount ?? (Array.isArray(result.colors) ? result.colors.length : 0);
+                const sc = result.sizeCount ?? (Array.isArray(result.sizes) ? result.sizes.length : 0);
+                appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}`, { productDetails: result });
             }
         }
     }
