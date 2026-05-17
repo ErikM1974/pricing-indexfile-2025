@@ -247,6 +247,146 @@
     color: #78350f;
 }
 
+/* -- Product details (catalog colors + sizes) -------------------------- */
+/* Rendered when bot calls lookup_product_details. Lists ALL the colors
+   the style comes in (from SanMar catalog), each as a clickable swatch
+   so the rep can pick visually. Size list shows upcharges proactively. */
+.product-details-card {
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--paper-2, #f6f1e6);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 10px;
+}
+.product-details-card .pd-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-3, #6b7280);
+    margin-bottom: 4px;
+}
+.product-details-card .pd-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-1, #1f3a1f);
+    line-height: 1.3;
+}
+.product-details-card .pd-style {
+    font-family: var(--mono, ui-monospace, monospace);
+    color: #2e5827;
+}
+.product-details-card .pd-meta {
+    font-size: 11px;
+    color: var(--ink-3, #6b7280);
+    margin: 4px 0 10px;
+}
+
+.product-details-card .pd-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-2, #4b5563);
+    margin: 12px 0 6px;
+}
+
+/* Color swatch grid */
+.color-swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+    gap: 6px;
+}
+.color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px;
+    background: var(--paper-1, #fff);
+    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform var(--dur-fast, 120ms) ease,
+                box-shadow var(--dur-fast, 120ms) ease,
+                border-color var(--dur-fast, 120ms) ease;
+    font: inherit;
+    text-align: center;
+}
+.color-swatch:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(46, 88, 39, 0.18);
+    border-color: #2e5827;
+}
+.color-swatch:focus-visible {
+    outline: 2px solid #2e5827;
+    outline-offset: 2px;
+}
+.color-swatch .cs-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 4px;
+    background: #f5f5f5;
+    object-fit: cover;
+    display: block;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+.color-swatch .cs-img.placeholder {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+}
+.color-swatch .cs-name {
+    font-size: 10px;
+    line-height: 1.25;
+    color: var(--ink-2, #4b5563);
+    font-weight: 500;
+    word-break: break-word;
+}
+.color-swatch.warning {
+    border-color: #d97706;
+    background: #fef3c7;
+}
+.color-swatch.warning .cs-img::after {
+    content: "⚠";
+}
+
+.product-details-card .pd-color-warning {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #fef3c7;
+    border-left: 3px solid #d97706;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+/* Size list */
+.pd-size-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 11px;
+}
+.pd-size-chip {
+    padding: 3px 8px;
+    background: var(--paper-1, #fff);
+    border: 1px solid var(--rule, rgba(0,0,0,0.10));
+    border-radius: 4px;
+    font-family: var(--mono, ui-monospace, monospace);
+    color: var(--ink-2, #4b5563);
+}
+.pd-size-chip.has-upcharge {
+    background: #fef9e7;
+    border-color: #f4d77a;
+    color: #6b4a05;
+    font-weight: 600;
+}
+.pd-size-chip .upcharge {
+    color: #b8420a;
+    font-weight: 700;
+    margin-left: 3px;
+}
+
 /* -- Web search chip + results (reuse webstore pattern) ----------------- */
 .tool-chip.web-search-chip {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
