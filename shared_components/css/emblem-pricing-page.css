@@ -1,0 +1,220 @@
+/* =============================================================================
+   emblem-pricing-page.css — overrides for /calculators/embroidered-emblem/
+
+   Loads ON TOP of sticker-pricing-page.css. The chat panel, page hero,
+   floating button, action footer, share toast, accordion shell — all come
+   from sticker. This file ONLY adds the emblem-specific pricing-grid
+   table styling (16 sizes × 10 qty tiers) and a few small tweaks.
+
+   By design, when sticker visuals get tweaked, emblem follows.
+   ========================================================================== */
+
+/* -- Emblem 16×10 pricing grid -------------------------------------------- */
+
+.emblem-grid-wrap {
+    width: 100%;
+    overflow-x: auto;          /* horizontal scroll on small screens */
+    border-radius: var(--radius-2, 12px);
+    background: var(--paper-1, #fff);
+    box-shadow: var(--shadow-1);
+}
+
+.emblem-pricing-table {
+    width: 100%;
+    min-width: 720px;          /* keep readable; force scroll below */
+    border-collapse: collapse;
+    font-size: 13px;
+    font-feature-settings: 'tnum';
+}
+
+.emblem-pricing-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--paper-2, #f6f1e6);
+    color: var(--ink-2, #4b4538);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--rule, rgba(0,0,0,0.08));
+    text-align: center;
+}
+
+.emblem-pricing-table thead th.size-col-head {
+    text-align: left;
+    padding-left: 16px;
+}
+
+.emblem-pricing-table tbody td {
+    padding: 9px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--rule-soft, rgba(0,0,0,0.04));
+    color: var(--ink-2, #4b4538);
+    transition: background var(--dur-fast, 120ms) ease,
+                color var(--dur-fast, 120ms) ease;
+}
+
+.emblem-pricing-table tbody td.size-label {
+    text-align: left;
+    padding-left: 16px;
+    font-weight: 600;
+    color: var(--ink-1, #2a2419);
+    background: var(--paper-2, #f6f1e6);
+    white-space: nowrap;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+}
+
+.emblem-pricing-table tbody td.qty-cell {
+    cursor: default;
+}
+
+/* Hover highlight on each cell to make scanning the grid easier */
+.emblem-pricing-table tbody tr:hover td:not(.size-label) {
+    background: var(--paper-2, #f6f1e6);
+}
+
+/* AI-quoted cell highlight (mirrors sticker's row highlight) */
+.emblem-pricing-table tbody td.ai-highlighted {
+    background: var(--accent-soft, #fde7d4);
+    color: var(--accent-deep, #b8420a);
+    font-weight: 700;
+    position: relative;
+    animation: pulse-cell 1.4s ease-in-out 2;
+}
+
+@keyframes pulse-cell {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft, #fde7d4); }
+    50%      { box-shadow: 0 0 0 6px var(--accent-soft, #fde7d4); }
+}
+
+.emblem-pricing-table tbody td.ai-highlighted::after {
+    content: "AI quoted";
+    position: absolute;
+    top: -8px;
+    right: -2px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: var(--accent-deep, #b8420a);
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+/* -- Tiny tweaks vs sticker --------------------------------------------- */
+
+/* Emblem hero — slightly different headline emphasis */
+.page-hero h1 .em-mono {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 0.85em;
+    color: var(--accent-deep, #b8420a);
+    letter-spacing: -0.01em;
+}
+
+/* Tool-chip alternate icon for emblem tool */
+.tool-chip.emblem-tool i { color: var(--accent-deep, #b8420a); }
+
+/* Live emblem-quote card — mirrors banner-quote-card structure. Renders
+   inline in the chat when AI emits PRICE_QUOTE so the rep sees the order
+   total without scrolling back to the grid. */
+.emblem-quote-card {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #1f3a1f 0%, #2d5a2d 100%);
+    color: #fff;
+    border-radius: var(--radius-2, 12px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+}
+.emblem-quote-card::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+.emblem-quote-card .eqc-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 4px;
+}
+.emblem-quote-card .eqc-pn {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff8e7;
+}
+.emblem-quote-card .eqc-spec {
+    font-size: 12px;
+    opacity: 0.85;
+    margin: 2px 0 12px;
+}
+.emblem-quote-card .eqc-line {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    padding: 4px 0;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+.emblem-quote-card .eqc-line:first-of-type { border-top: none; }
+.emblem-quote-card .eqc-line.total {
+    border-top: 1px solid rgba(255,255,255,0.25);
+    margin-top: 6px;
+    padding-top: 8px;
+    font-weight: 700;
+    font-size: 15px;
+}
+.emblem-quote-card .eqc-line .v {
+    font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
+}
+.emblem-quote-card .eqc-note {
+    font-size: 11px;
+    opacity: 0.75;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* -- Backing-type swatch helper (small visual in pricing-facts strip) ---- */
+.backing-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+.backing-swatch.iron-on { background: #c9a36e; }
+.backing-swatch.sewn-on { background: #6b7280; }
+.backing-swatch.velcro  { background: #1e3a8a; }
+
+/* -- Responsive: stack the grid into vertical cards on small screens ---- */
+@media (max-width: 640px) {
+    .emblem-pricing-table { min-width: 0; }
+    .emblem-pricing-table thead { display: none; }
+    .emblem-pricing-table tbody td:not(.size-label) { display: none; }
+    .emblem-pricing-table tbody td.size-label {
+        display: block;
+        position: static;
+        background: var(--paper-1, #fff);
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--rule-soft, rgba(0,0,0,0.06));
+    }
+    .emblem-pricing-table tbody td.size-label::after {
+        content: " — open chat for a quote at your qty";
+        font-weight: 400;
+        color: var(--ink-3, #6b7280);
+        font-size: 12px;
+    }
+}

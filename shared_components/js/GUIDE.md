@@ -134,6 +134,7 @@
 | `sticker-pricing-service.js` | Sticker pricing fetcher (`/api/sticker-pricing`) — 50 SKUs (5 sizes × 10 qty tiers) with PartNumber. Used by order-form sticker method + sticker page. |
 | `sticker-pricing-page.js` | Sticker + Banner quote page logic — renders 5 sticker tables (`/api/sticker-pricing`) AND banner rate-card grid (`/api/banner-pricing`); drives AI chat (SSE to `/api/contract-sticker-ai/chat`, handles BOTH product lines); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights sticker rows OR banner rate cards based on `productType`; renders inline banner-quote card; saves to `quote_sessions` with STK prefix. |
 | `emblem-pricing-service.js` | Embroidered emblem pricing fetcher (`/api/emblem-pricing`). |
+| `emblem-pricing-page.js` | Embroidered emblem patch quote page logic — renders 16×10 pricing grid (`/api/emblem-pricing`); drives AI chat (SSE to `/api/contract-emblem-ai/chat`); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights pricing-grid cells on AI quote; renders inline emblem-quote card with order total + LTM note; saves to `quote_sessions` with PATCH prefix. Mirrors sticker-pricing-page.js exactly — single product line, single quote tool. |
 
 ## Staff Dashboard
 
