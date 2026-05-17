@@ -1,3 +1,7 @@
+## v2026.05.16.7 (2026-05-16)
+
+- Deploy v2026.05.16.7: 7 files (ACTIVE_FILES.md,index.html,webstores.html,...)
+
 ## v2026.05.16.6 (2026-05-16)
 
 - Deploy v2026.05.16.6: 1 files (index.html,...)
