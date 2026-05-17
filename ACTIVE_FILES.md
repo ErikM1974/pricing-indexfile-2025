@@ -346,11 +346,11 @@
 ### Webstore System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/webstores.html` | Webstore quote + fundraiser calculator | webstores-calculator.js, webstores-fundraiser.js, webstores-styles.css | ✅ Active |
-| `/calculators/webstores-calculator.js` | Webstore setup quote logic + email | webstores-quote-service.js, EmailJS | ✅ Active |
-| `/calculators/webstores-fundraiser.js` | **NEW** Fundraiser/donation pricing calculator | — | ✅ Active |
-| `/calculators/webstores-quote-service.js` | Webstore quote save service | base-quote-service.js | ✅ Active |
-| `/calculators/webstores-styles.css` | Webstore + fundraiser styles | calculator-base.css | ✅ Active |
+| `/calculators/webstores.html` | **REWRITTEN (2026-05-16)** Custom webstore quote + fundraiser pricing page — AI-first redesign mirroring sticker/emblem layout. Bot handles BOTH store-setup quotes AND per-item fundraiser math via 4 tools (lookup_customer + 2 pricing + web_search). External CSS/JS only. | sticker-pricing-page.css, webstore-pricing-page.css, webstore-pricing-page.js | ✅ Active |
+| `/calculators/webstores-calculator.js` | 🗄️ Pre-AI store-setup logic. Save flow + math now handled inline in webstore-pricing-page.js (same WEB prefix). Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
+| `/calculators/webstores-fundraiser.js` | 🗄️ Pre-AI fundraiser pricing calculator. Math now in `quote_fundraiser_pricing` tool on the proxy. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
+| `/calculators/webstores-quote-service.js` | 🗄️ Pre-AI quote save service. Save flow now in webstore-pricing-page.js (same Caspio endpoints, same WEB prefix). Delete after soak. | base-quote-service.js | 🗄️ Legacy (delete ~2026-06-16) |
+| `/calculators/webstores-styles.css` | 🗄️ Pre-AI page styles. New page uses sticker-pricing-page.css + webstore-pricing-page.css. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
 
 ### Special Calculators
 | File | Purpose | Dependencies | Status |
@@ -474,6 +474,7 @@
 | `/shared_components/js/fetch-timeout.js` | Global fetch() wrapper adding 15s AbortController timeout to all requests | All embroidery pages | ✅ Active |
 | `/shared_components/js/dash-page-helpers.js` | **NEW (2026-05-16)** Canonical helpers for staff-dashboard child pages — `window.DashPage.showError/hideError/apiUrl/fetchJson`. Enforces CLAUDE.md API-error rule (no silent fallback). Loaded by every page scaffolded via the `/dash-page` skill. | APP_CONFIG, fetch-timeout.js | ✅ Active |
 | `/shared_components/js/emblem-pricing-page.js` | **NEW (2026-05-16)** Embroidered emblem patch page controller — fetches `/api/emblem-pricing` grid, renders 16×10 table, drives AI chat panel via SSE to `/api/contract-emblem-ai/chat`, parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks, highlights pricing-grid cell on quote, saves to `quote_sessions` with PATCH prefix. Mirrors sticker-pricing-page.js pattern. | /api/emblem-pricing, /api/contract-emblem-ai/chat, /api/quote-sequence/PATCH, /api/quote_sessions, /api/quote_items | ✅ Active |
+| `/shared_components/js/webstore-pricing-page.js` | **NEW (2026-05-16)** Custom-webstore page controller — drives AI chat via SSE to `/api/contract-webstore-ai/chat`. **Dual-mode**: parses PRICE_QUOTE blocks with `productType: "webstore-setup"` (renders cream/navy store-quote card with store-type pill + per-item surcharge meta) OR `"fundraiser-item"` (renders deep-purple sell-price card with breakdown + 1099-NEC warning). Renders web_search results inline as a search-results list with linked sources. Saves to `quote_sessions` with WEB prefix. | /api/contract-webstore-ai/chat, /api/quote-sequence/WEB, /api/quote_sessions, /api/quote_items | ✅ Active |
 | `/shared_components/js/quote-formatter.js` | Format quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-persistence.js` | Save/load quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |
@@ -793,6 +794,7 @@
 | `/shared_components/css/dash-shell.css` | **NEW (2026-05-16)** Canonical shell classes (`.dash-header`, `.dash-back-link`, `.dash-content`, `.dash-error-banner`, `.dash-stat-card`, `.dash-card`, `.dash-btn`) for staff-dashboard child pages. Reuses art-hub.css tokens — defines NO new tokens. Emitted by every page scaffolded via the `/dash-page` skill. | art-hub.css, all `/dash-page new`-scaffolded pages | ✅ Active |
 | `/dashboards/css/digitized-designs.css` | **NEW (2026-05-16)** Page-specific styles for digitized-designs.html. Extracted from inline `<style>` block on 2026-05-16 by `/dash-page lift` — pure extraction (no token swap, no class rename) so behavior matches pre-lift exactly. | digitized-designs.html | ✅ Active |
 | `/shared_components/css/emblem-pricing-page.css` | **NEW (2026-05-16)** Emblem patch page overrides — loads ON TOP of sticker-pricing-page.css. Adds the 16×10 pricing-grid table styling, AI-quoted cell highlight, live emblem-quote card, mobile collapse. Sticker provides the chat panel + hero + accordion shell; this file only adds emblem-unique bits. | sticker-pricing-page.css, /calculators/embroidered-emblem/index.html | ✅ Active |
+| `/shared_components/css/webstore-pricing-page.css` | **NEW (2026-05-16)** Custom-webstore page overrides — loads ON TOP of sticker-pricing-page.css. Adds: cream/navy `.webstore-quote-card` for store-setup quotes, deep-purple/gold `.fundraiser-quote-card` for fundraiser sell-price math, distinct `.web-search-chip` styling + `.web-search-results` inline list for Tavily search results. | sticker-pricing-page.css, /calculators/webstores.html | ✅ Active |
 | `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
 | `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |

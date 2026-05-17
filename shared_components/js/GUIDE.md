@@ -135,6 +135,7 @@
 | `sticker-pricing-page.js` | Sticker + Banner quote page logic — renders 5 sticker tables (`/api/sticker-pricing`) AND banner rate-card grid (`/api/banner-pricing`); drives AI chat (SSE to `/api/contract-sticker-ai/chat`, handles BOTH product lines); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights sticker rows OR banner rate cards based on `productType`; renders inline banner-quote card; saves to `quote_sessions` with STK prefix. |
 | `emblem-pricing-service.js` | Embroidered emblem pricing fetcher (`/api/emblem-pricing`). |
 | `emblem-pricing-page.js` | Embroidered emblem patch quote page logic — renders 16×10 pricing grid (`/api/emblem-pricing`); drives AI chat (SSE to `/api/contract-emblem-ai/chat`); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights pricing-grid cells on AI quote; renders inline emblem-quote card with order total + LTM note; saves to `quote_sessions` with PATCH prefix. Mirrors sticker-pricing-page.js exactly — single product line, single quote tool. |
+| `webstore-pricing-page.js` | Custom-webstore page logic — drives AI chat (SSE to `/api/contract-webstore-ai/chat`). **DUAL-MODE**: parses PRICE_QUOTE with `productType: "webstore-setup"` (renders cream/navy store-quote card) OR `"fundraiser-item"` (renders deep-purple sell-price card with breakdown + 1099-NEC warning). Renders `web_search` tool results inline as a list of linked sources (Tavily-backed). Saves to `quote_sessions` with WEB prefix. Mirrors sticker pattern (2 product lines / 1 chat). |
 
 ## Staff Dashboard
 

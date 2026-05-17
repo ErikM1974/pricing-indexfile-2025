@@ -107,6 +107,28 @@
     pointer-events: none;
 }
 
+/* ----------------------------------------------------------------------
+   Accent fact — used for the LTM-threshold callout in the quick-facts
+   strip. Draws the eye to the single most actionable piece of pricing
+   info (order 200+ to skip the $50 fee). Warm amber tone signals
+   "money / savings opportunity" without being alarm-red.
+   ---------------------------------------------------------------------- */
+.quick-fact.quick-fact--accent {
+    background: linear-gradient(135deg, #fff8e7 0%, #ffeec9 100%);
+    border: 1px solid #f4d77a;
+    box-shadow: 0 1px 0 0 rgba(232, 175, 30, 0.18) inset,
+                0 2px 8px -2px rgba(180, 130, 20, 0.18);
+    color: #6b4a05;
+    font-weight: 500;
+}
+.quick-fact.quick-fact--accent i {
+    color: #b8420a;
+}
+.quick-fact.quick-fact--accent strong {
+    color: #6b4a05;
+    font-weight: 700;
+}
+
 /* -- Tiny tweaks vs sticker --------------------------------------------- */
 
 /* Emblem hero — slightly different headline emphasis */
@@ -115,6 +137,55 @@
     font-size: 0.85em;
     color: var(--accent-deep, #b8420a);
     letter-spacing: -0.01em;
+}
+
+/* ----------------------------------------------------------------------
+   Emblem hero collage override
+   ----------------------------------------------------------------------
+   Sticker uses `object-fit: cover` because its hero is a single product
+   shot — cropping is fine. Emblem hero is a COLLAGE of multiple patches;
+   `cover` chops half the patches off. We override to `contain` so every
+   patch in the collage stays visible, soften the left-edge mask so the
+   collage doesn't feel cut off, and give the patches a subtle drop
+   shadow so they pop against the cream background.
+   ---------------------------------------------------------------------- */
+.page-hero-art.emblem-hero-art {
+    /* Show the whole collage; never crop */
+    object-fit: contain;
+    object-position: center right;
+
+    /* Give the collage more room to breathe — patches are smaller individually,
+       so we widen the clamp and reduce the over-height that sticker uses */
+    height: 100%;
+    width: clamp(320px, 52%, 600px);
+    padding: var(--space-3, 16px) var(--space-4, 20px) var(--space-3, 16px) 0;
+    box-sizing: border-box;
+
+    /* Replace sticker's sharp horizontal mask with a softer fade that
+       starts much further left and ends at full opacity earlier — so the
+       collage stays mostly visible while still blending into the
+       headline area on the far left */
+    -webkit-mask-image: linear-gradient(95deg, transparent 0%, rgba(0,0,0,0.4) 12%, #000 32%, #000 100%);
+            mask-image: linear-gradient(95deg, transparent 0%, rgba(0,0,0,0.4) 12%, #000 32%, #000 100%);
+
+    /* Subtle shadow lifts the patches off the cream hero background */
+    filter: drop-shadow(0 6px 18px rgba(20, 18, 12, 0.16));
+}
+
+/* Tablet — slightly less width, still contained */
+@media (max-width: 960px) {
+    .page-hero-art.emblem-hero-art {
+        width: clamp(280px, 45%, 460px);
+        padding: var(--space-2, 12px) var(--space-3, 16px) var(--space-2, 12px) 0;
+    }
+}
+
+/* Mobile — hide the hero art entirely; the headline + CTA need the full
+   width and the collage would compete with the AI CTA for attention */
+@media (max-width: 640px) {
+    .page-hero-art.emblem-hero-art {
+        display: none;
+    }
 }
 
 /* Tool-chip alternate icon for emblem tool */
