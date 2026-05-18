@@ -176,13 +176,11 @@
 }
 
 /* Body: line-items table FIRST (full width), customer panel BELOW (full
-   width, horizontal flex-wrap). The 2-col grid (table + sidebar) was
-   smushing the 9 size columns at <1500px viewports. Stacking gives the
-   table breathing room while the customer panel uses horizontal space
-   efficiently as a flex-wrap row.
-
-   Very-wide-monitor opt-in: at >=1500px we restore the side-by-side
-   layout for reps who prefer the glance-and-go view. */
+   width, horizontal flex-wrap). ALWAYS stacked — no side-by-side mode.
+   Erik's feedback v14: the 2-col grid was smushing size columns even
+   at wide viewports, and the dropdown floated awkwardly between the
+   table and the panel. Stacking is the simplest, most-reliable layout
+   for a form with 9-10 size columns. */
 .dtg-form-body {
     display: flex;
     flex-direction: column;
@@ -193,26 +191,6 @@
     padding: 12px 16px;
     border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
     min-width: 0;
-}
-
-/* Side-by-side opt-in for wide monitors only (>=1500px). Customer panel
-   reclaims 280px on the right; line-items table still fits 9 size cols
-   because the host viewport is now wide enough. */
-@media (min-width: 1500px) {
-    .dtg-form-body {
-        display: grid;
-        grid-template-columns: 1fr 280px;
-    }
-    .dtg-rows-pane {
-        border-right: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
-        border-bottom: none;
-    }
-    .dtg-customer-pane.dcp-horizontal {
-        display: block; /* falls back to vertical at wide-mode */
-    }
-    .dtg-customer-pane.dcp-horizontal .dcp-flex-row {
-        display: block; /* each input stacks again like the original layout */
-    }
 }
 
 /* Line items table — designed to fit S..6XL (9 size cols) without
