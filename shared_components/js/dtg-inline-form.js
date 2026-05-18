@@ -947,6 +947,92 @@
     }
 
     // ----- Submit ------------------------------------------------------------
+    // Walk every row's sizes against its row.inventory and collect any
+    // size+qty combos that exceed available stock. Returns [] when stock
+    // is OK or unknown (no false alarms). Matches the order form's
+    // submit-time stock check pattern.
+    function collectStockIssues() {
+        const issues = [];
+        for (const row of state.rows) {
+            if (!row.style || !row.color) continue;
+            const inv = row.inventory || { bySize: {}, status: 'unknown' };
+            if (inv.status !== 'ok') continue; // no data → don't false-alarm
+            for (const [size, qtyRaw] of Object.entries(row.sizes || {})) {
+                const qty = Number(qtyRaw) || 0;
+                if (qty <= 0) continue;
+                const available = Number(inv.bySize[size]);
+                if (!Number.isFinite(available)) continue; // missing data for this size
+                if (qty > available) {
+                    issues.push({
+                        style: row.style,
+                        color: row.color,
+                        size,
+                        qty,
+                        available,
+                    });
+                }
+            }
+        }
+        return issues;
+    }
+
+    // Show the stock-confirm modal. Returns a Promise that resolves to true
+    // (proceed) or false (cancel). Backdrop click / Escape / Cancel = false.
+    function confirmStockOverflow(issues) {
+        return new Promise((resolve) => {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'dtg-stock-confirm-backdrop';
+            backdrop.setAttribute('role', 'dialog');
+            backdrop.setAttribute('aria-modal', 'true');
+
+            const itemsHtml = issues.map((it) => `
+                <li class="dscm-item">
+                    <span class="dscm-style">${escapeHtml(it.style)}</span>
+                    <span class="dscm-color">${escapeHtml(it.color || '(no color)')}</span>
+                    <span class="dscm-size">${escapeHtml(it.size)} × ${it.qty}</span>
+                    <span class="dscm-stock">${it.available.toLocaleString()} in stock</span>
+                </li>
+            `).join('');
+
+            backdrop.innerHTML = `
+                <div class="dtg-stock-confirm-modal" role="document">
+                    <div class="dscm-head">
+                        <span class="dscm-head-icon" aria-hidden="true">⚠</span>
+                        <h3 class="dscm-title">Stock check</h3>
+                    </div>
+                    <p class="dscm-body">
+                        ${issues.length === 1 ? '1 size exceeds' : `${issues.length} sizes exceed`}
+                        SanMar's current stock. May need backorder, drop-ship, or
+                        extended lead time. Push to ShopWorks anyway?
+                    </p>
+                    <ul class="dscm-list">${itemsHtml}</ul>
+                    <div class="dscm-actions">
+                        <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">Cancel</button>
+                        <button type="button" class="dscm-btn dscm-btn-proceed" data-action="confirm">Proceed anyway</button>
+                    </div>
+                </div>
+            `;
+
+            function cleanup(result) {
+                document.removeEventListener('keydown', onKey);
+                backdrop.remove();
+                resolve(result);
+            }
+            function onKey(e) { if (e.key === 'Escape') cleanup(false); }
+
+            backdrop.addEventListener('click', (e) => {
+                if (e.target === backdrop) cleanup(false);
+            });
+            backdrop.querySelector('[data-action="cancel"]').addEventListener('click', () => cleanup(false));
+            backdrop.querySelector('[data-action="confirm"]').addEventListener('click', () => cleanup(true));
+            document.addEventListener('keydown', onKey);
+
+            document.body.appendChild(backdrop);
+            // Focus the "Cancel" button by default — safer than auto-confirming.
+            backdrop.querySelector('[data-action="cancel"]').focus();
+        });
+    }
+
     async function submitToShopWorks() {
         const statusEl = document.getElementById('dtgSubmitStatus');
         const setStatus = (cls, msg) => {
@@ -968,6 +1054,18 @@
         if (!state.customer.email || !state.customer.designNumber) {
             setStatus('error', 'Need customer email and design number before pushing.');
             return;
+        }
+
+        // Stock check — if any cell exceeds SanMar inventory, ask the rep
+        // to confirm before pushing. Rep may know about backorder, drop-ship,
+        // or extended lead time so we don't hard-block.
+        const stockIssues = collectStockIssues();
+        if (stockIssues.length > 0) {
+            const proceed = await confirmStockOverflow(stockIssues);
+            if (!proceed) {
+                setStatus('error', 'Push cancelled — adjust quantities and try again.');
+                return;
+            }
         }
 
         state.submitting = true;

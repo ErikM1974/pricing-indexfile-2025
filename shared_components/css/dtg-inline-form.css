@@ -674,6 +674,131 @@
     border-radius: 3px;
 }
 
+/* Stock-confirm modal — shown at Submit time when one or more sizes
+   exceed SanMar's current inventory. Rep can proceed (backorder /
+   drop-ship known) or cancel (adjust qty and retry). Mirrors the
+   order form's StockConfirmModal aesthetic. */
+.dtg-stock-confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 24px;
+    animation: dscm-fade 0.18s ease;
+}
+@keyframes dscm-fade { from { opacity: 0; } to { opacity: 1; } }
+.dtg-stock-confirm-modal {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    width: 100%;
+    max-width: 520px;
+    max-height: 80vh;
+    overflow: auto;
+    padding: 22px 24px 18px;
+    animation: dscm-pop 0.2s ease;
+}
+@keyframes dscm-pop {
+    from { transform: scale(0.96); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+.dtg-stock-confirm-modal .dscm-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.dtg-stock-confirm-modal .dscm-head-icon {
+    font-size: 22px;
+    color: #b45309;
+}
+.dtg-stock-confirm-modal .dscm-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f3a1f;
+}
+.dtg-stock-confirm-modal .dscm-body {
+    margin: 6px 0 14px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: #4b5563;
+}
+.dtg-stock-confirm-modal .dscm-list {
+    list-style: none;
+    margin: 0 0 16px;
+    padding: 0;
+    border: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+    border-radius: 8px;
+    overflow: hidden;
+}
+.dtg-stock-confirm-modal .dscm-item {
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    gap: 10px;
+    align-items: baseline;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.05));
+}
+.dtg-stock-confirm-modal .dscm-item:last-child { border-bottom: none; }
+.dtg-stock-confirm-modal .dscm-item:nth-child(even) { background: #fafaf6; }
+.dtg-stock-confirm-modal .dscm-style {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-weight: 700;
+    color: #1f3a1f;
+}
+.dtg-stock-confirm-modal .dscm-color {
+    color: #4b5563;
+}
+.dtg-stock-confirm-modal .dscm-size {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-weight: 600;
+    color: #1f3a1f;
+    text-align: right;
+}
+.dtg-stock-confirm-modal .dscm-stock {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 11px;
+    color: #b91c1c;
+    font-weight: 700;
+}
+.dtg-stock-confirm-modal .dscm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+.dtg-stock-confirm-modal .dscm-btn {
+    padding: 9px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+}
+.dtg-stock-confirm-modal .dscm-btn-cancel {
+    background: #fff;
+    border-color: #d6cdb8;
+    color: #4b5563;
+}
+.dtg-stock-confirm-modal .dscm-btn-cancel:hover {
+    background: #f6f1e6;
+    border-color: #2e5827;
+    color: #2e5827;
+}
+.dtg-stock-confirm-modal .dscm-btn-proceed {
+    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
+    color: #fff;
+}
+.dtg-stock-confirm-modal .dscm-btn-proceed:hover {
+    box-shadow: 0 4px 14px rgba(180, 83, 9, 0.35);
+    transform: translateY(-1px);
+}
+
 .dtg-form-foot {
     padding: 10px 20px;
     background: #f6f1e6;
