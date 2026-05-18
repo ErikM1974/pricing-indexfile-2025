@@ -34,6 +34,38 @@
 
     const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
 
+    // Sales reps — mirrors pages/order-form/components/paper-form.jsx:2128-2132.
+    // Tech debt: if a 6th rep joins, edit this list AND the order form's list.
+    // No /api/sales-reps endpoint today.
+    const SALES_REPS = [
+        { code: 'nika',     name: 'Nika Lao',       email: 'nika@nwcustomapparel.com' },
+        { code: 'erik',     name: 'Erik Mickelson', email: 'erik@nwcustomapparel.com' },
+        { code: 'ruth',     name: 'Ruthie Nhoung',  email: 'ruth@nwcustomapparel.com' },
+        { code: 'taneisha', name: 'Taneisha Clark', email: 'taneisha@nwcustomapparel.com' },
+        { code: 'jim',      name: 'Jim Mickelson',  email: 'jim@nwcustomapparel.com' },
+    ];
+    function repByCode(code) {
+        return SALES_REPS.find(r => r.code === code) || SALES_REPS[1]; // default Erik
+    }
+
+    // Shipping methods — match the order form (paper-form.jsx:2371).
+    const SHIP_METHODS = [
+        { code: 'ups',      label: 'UPS Ground' },
+        { code: 'pickup',   label: 'Customer Pickup' },
+        { code: 'willcall', label: 'Will Call' },
+        { code: 'other',    label: 'Other' },
+    ];
+    function shipLabel(code) {
+        const m = SHIP_METHODS.find(x => x.code === code);
+        return m ? m.label : 'UPS Ground';
+    }
+
+    // sessionStorage key prefix + state-shape version (bump if state shape
+    // changes incompatibly so old restores don't crash).
+    const STATE_VERSION = 1;
+    const STATE_KEY = 'dtg.formState.v' + STATE_VERSION;
+    const QUOTEID_KEY = 'dtg.quoteID.v' + STATE_VERSION;
+
     const LOCATION_LABELS = {
         LC: 'Left Chest',
         FF: 'Full Front',
@@ -58,7 +90,15 @@
     const _bundleCache = new Map();      // style → bundle (for live preview math)
 
     // ----- State -------------------------------------------------------------
+    // Restore last-used sales rep from localStorage (per-rep preference,
+    // not per-quote — survives page refresh AND across quotes).
+    const lastRepCode = (function () {
+        try { return localStorage.getItem('dtg.lastSalesRep') || ''; }
+        catch { return ''; }
+    })();
+
     const state = {
+        formVersion: STATE_VERSION,
         front: 'LC',
         back: '',
         rows: [],
@@ -73,8 +113,20 @@
             designNumber: '',
             terms: 'Prepaid',
             contacts: [],   // populated when a company is picked
+            salesRepCode: lastRepCode || 'erik', // A1
+        },
+        shipping: {
+            method: 'ups', // A2 — UPS Ground default; pickup / willcall / other
         },
         submitting: false,
+        // C9 dirty-tracking: set to true when the rep touches any form field
+        // AFTER the chat last filled it. Cleared when chat re-fills (with
+        // confirmation) or when rep resets. Used to gate fillFromQuote()
+        // overwrites.
+        dirtyAfterChatFill: false,
+        // B5 retry: cached payload for the last submit attempt + its pricing
+        // result so Retry doesn't re-fetch /api/dtg/quote-pricing.
+        lastSubmit: null, // { body, pricing }
     };
 
     function newBlankRow() {
@@ -94,6 +146,130 @@
             // sz-inv-badge classes (good/low/over/oos/unknown) work the same.
             inventory: { bySize: {}, status: 'unknown', grandTotal: 0 },
         };
+    }
+
+    // ----- C9 dirty tracking ------------------------------------------------
+    // Mark the form as having rep-edits since the last chat fill. Used to
+    // guard against silent overwrite when the chat emits a new PRICE_QUOTE
+    // while the rep is editing.
+    function markDirty() { state.dirtyAfterChatFill = true; }
+    function clearDirty() { state.dirtyAfterChatFill = false; }
+
+    // ----- C8 bulk size paste -----------------------------------------------
+    // Parses "S:2 M:4 L:6 2XL:1" (and variants with /, -, =, comma, semicolon
+    // separators) into { S: 2, M: 4, L: 6, '2XL': 1 }. Returns empty object if
+    // the text doesn't look like a size list (so plain paste falls through).
+    function parseBulkSizes(text) {
+        const result = {};
+        // Tokens: SIZE [:/=\-\s] QTY  separated by [,;\s]
+        // Size names: XS, S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL (case insensitive)
+        const re = /\b(XS|S|M|L|XL|2XL|3XL|4XL|5XL|6XL|XXL)\s*[:\/\-=]\s*(\d{1,4})\b/gi;
+        let m;
+        while ((m = re.exec(text)) !== null) {
+            let key = m[1].toUpperCase();
+            if (key === 'XXL') key = '2XL'; // standardize
+            const q = parseInt(m[2], 10);
+            if (Number.isFinite(q) && q >= 0) result[key] = q;
+        }
+        return result;
+    }
+
+    function showToastSafe(text) {
+        const toast = document.getElementById('shareToast');
+        const txt = document.getElementById('shareToastText');
+        if (!toast || !txt) {
+            // Fallback — log
+            console.info('[dtg-inline-form]', text);
+            return;
+        }
+        txt.textContent = text;
+        toast.classList.add('show');
+        clearTimeout(showToastSafe._t);
+        showToastSafe._t = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // ----- B4 sessionStorage persistence -----------------------------------
+    // Save a slim snapshot of the form state every 500ms (debounced). Rep
+    // refreshes the browser → next page load offers to restore. Stops the
+    // "I closed my tab and lost 10 minutes of work" disaster.
+    let _saveTimer = null;
+    function scheduleStateSave() {
+        clearTimeout(_saveTimer);
+        _saveTimer = setTimeout(() => {
+            try {
+                sessionStorage.setItem(STATE_KEY, JSON.stringify({
+                    v: STATE_VERSION,
+                    savedAt: Date.now(),
+                    front: state.front,
+                    back: state.back,
+                    rows: state.rows.map(r => ({
+                        // Strip transient + heavy fields (inventory, colorsAvailable
+                        // are re-hydrated on restore; _perPiece/_lineTotal are
+                        // recomputed by updateLivePrices).
+                        style: r.style,
+                        color: r.color,
+                        catalogColor: r.catalogColor,
+                        colorSwatch: r.colorSwatch,
+                        desc: r.desc,
+                        sizes: r.sizes,
+                        availableSizes: r.availableSizes,
+                    })),
+                    customer: state.customer,
+                    shipping: state.shipping,
+                }));
+            } catch (e) { /* quota or disabled storage — ignore */ }
+        }, 500);
+    }
+
+    // Attempt to restore form state from sessionStorage. Returns true if
+    // something was restored (so the caller can show the "Resumed" banner).
+    function restoreStateFromSession() {
+        try {
+            const raw = sessionStorage.getItem(STATE_KEY);
+            if (!raw) return false;
+            const snap = JSON.parse(raw);
+            if (!snap || snap.v !== STATE_VERSION) {
+                sessionStorage.removeItem(STATE_KEY);
+                return false;
+            }
+            if (Array.isArray(snap.rows) && snap.rows.length > 0) {
+                state.rows = snap.rows.map(r => {
+                    const fresh = newBlankRow();
+                    return { ...fresh, ...r };
+                });
+                state.front = snap.front || 'LC';
+                state.back = snap.back || '';
+                if (snap.customer) state.customer = { ...state.customer, ...snap.customer };
+                if (snap.shipping) state.shipping = { ...state.shipping, ...snap.shipping };
+                return true;
+            }
+        } catch (e) {
+            // Corrupt JSON / quota error — nuke it and start fresh.
+            try { sessionStorage.removeItem(STATE_KEY); } catch {}
+        }
+        return false;
+    }
+
+    function clearSessionState() {
+        try {
+            sessionStorage.removeItem(STATE_KEY);
+            sessionStorage.removeItem(QUOTEID_KEY);
+        } catch {}
+        try { delete window.__dtgQuoteID; } catch {}
+    }
+
+    // Read the AI quoteID. Prefers window scope (set by the chat controller
+    // when a PRICE_QUOTE block arrives), falls back to sessionStorage so it
+    // survives page refresh.
+    function getQuoteID() {
+        if (window.__dtgQuoteID) return window.__dtgQuoteID;
+        try { return sessionStorage.getItem(QUOTEID_KEY) || ''; }
+        catch { return ''; }
+    }
+    function setQuoteID(qid) {
+        if (!qid) return;
+        window.__dtgQuoteID = qid;
+        try { sessionStorage.setItem(QUOTEID_KEY, qid); } catch {}
     }
 
     // Fetch SanMar inventory for a row's style+catalogColor combo via the
@@ -297,8 +473,8 @@
                         </div>
                         <div class="dcp-row">
                             <div>
-                                <div class="dcp-field-label">Design #</div>
-                                <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="e.g. 12345">
+                                <div class="dcp-field-label">Design # <span class="dcp-optional">(optional)</span></div>
+                                <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="add later if TBD">
                             </div>
                             <div>
                                 <div class="dcp-field-label">Payment terms</div>
@@ -311,7 +487,24 @@
                             </div>
                         </div>
 
-                        <button type="button" class="dtg-submit-btn" id="dtgSubmitBtn" disabled>
+                        <div class="dcp-row">
+                            <div>
+                                <div class="dcp-field-label">Sales rep</div>
+                                <select id="dtgSalesRep">
+                                    ${SALES_REPS.map(r => `<option value="${escapeHtml(r.code)}"${state.customer.salesRepCode === r.code ? ' selected' : ''}>${escapeHtml(r.name)}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div>
+                                <div class="dcp-field-label">Ship method</div>
+                                <select id="dtgShipMethod">
+                                    ${SHIP_METHODS.map(m => `<option value="${escapeHtml(m.code)}"${state.shipping.method === m.code ? ' selected' : ''}>${escapeHtml(m.label)}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="dtgValidationBanner" class="dtg-validation-banner" hidden></div>
+
+                        <button type="button" class="dtg-submit-btn" id="dtgSubmitBtn">
                             <i class="fas fa-truck"></i> Submit to ShopWorks
                         </button>
                         <div id="dtgSubmitStatus" class="dtg-submit-status" hidden></div>
@@ -362,6 +555,8 @@
         frontEl.querySelectorAll('.dtg-location-pill').forEach((btn) => {
             btn.addEventListener('click', () => {
                 state.front = btn.getAttribute('data-loc-code') || 'LC';
+                markDirty();
+                scheduleStateSave();
                 renderLocationPills();
                 schedulePriceUpdate();
             });
@@ -369,6 +564,8 @@
         backEl.querySelectorAll('.dtg-location-pill').forEach((btn) => {
             btn.addEventListener('click', () => {
                 state.back = btn.getAttribute('data-loc-code') || '';
+                markDirty();
+                scheduleStateSave();
                 renderLocationPills();
                 schedulePriceUpdate();
             });
@@ -502,12 +699,26 @@
         const subtotal = state.rows.reduce((s, r) => s + (Number(r._lineTotal) || 0), 0);
         const tierDisplay = isLtm ? `${tier} (LTM)` : tier;
 
+        // C7 — tax estimate. WA Tacoma rate fallback 10.1% per MEMORY.md.
+        // For pickup orders, no shipping in the tax base. For UPS Ground we
+        // don't capture a shipping $ amount on the form today, so tax base
+        // is still just subtotal (rep can override in ShopWorks if needed).
+        const TAX_RATE = 0.101;
+        const taxEstimate = Math.round(subtotal * TAX_RATE * 100) / 100;
+        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
+        const isPickup = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+
         el.innerHTML = `
-            <div class="dps-label">Live DTG quote · ${effectiveLocationLabel()}</div>
+            <div class="dps-label">Live DTG quote · ${effectiveLocationLabel()} · ${escapeHtml(shipLabel(state.shipping.method))}</div>
             <div class="dps-grid">
                 <div><span class="dps-tier-pill${isLtm ? ' ltm' : ''}">${escapeHtml(tierDisplay)}</span></div>
                 <div>${cq} combined pieces${isLtm ? ` · LTM +$${ltmPP.toFixed(2)}/pc` : ''}</div>
-                <div class="dps-total">$${fmtMoney(subtotal)}</div>
+                <div class="dps-total">$${fmtMoney(grandTotal)}</div>
+            </div>
+            <div class="dps-totals-rows">
+                <div class="dps-totals-row"><span>Subtotal</span><span class="dps-mono">$${fmtMoney(subtotal)}</span></div>
+                <div class="dps-totals-row dps-tax-row"><span>Tax (est, WA 10.1%${isPickup ? ' · pickup' : ''})</span><span class="dps-mono">$${fmtMoney(taxEstimate)}</span></div>
+                <div class="dps-totals-row dps-grand-row"><span>Order total</span><span class="dps-mono">$${fmtMoney(grandTotal)}</span></div>
             </div>
             ${isLtm ? `<div class="dps-note">Bump combined qty above this tier and the $${ltmFee} LTM fee disappears.</div>` : ''}
         `;
@@ -533,16 +744,45 @@
         ) || null;
     }
 
+    // B6 — Inline validation banner. Lists the SPECIFIC currently-missing
+    // required fields above the Submit button, updating live as the rep
+    // fills things in. Design # is intentionally NOT a hard requirement —
+    // A3 handles it as a soft warning at click time.
     function updateSubmitEnabled() {
         const btn = document.getElementById('dtgSubmitBtn');
+        const banner = document.getElementById('dtgValidationBanner');
         if (!btn) return;
         const cq = combinedQty();
         const hasLines = state.rows.some((r) => r.style && r.color && Object.values(r.sizes || {}).some((v) => Number(v) > 0));
-        const hasCustomer = !!(state.customer.email || state.customer.companyId);
-        btn.disabled = state.submitting || !hasLines || cq < 1 || !hasCustomer || !state.customer.designNumber;
-        btn.title = btn.disabled
-            ? 'Need: location + at least one row + customer email/ID + design #'
-            : 'Push this quote to ShopWorks';
+        const hasCustomerEmail = !!(state.customer.email && state.customer.email.includes('@'));
+        const hasCompanyOrName = !!(state.customer.company || (state.customer.firstName && state.customer.lastName) || state.customer.companyId);
+        const hasShipMethod = !!state.shipping.method;
+        const hasSalesRep = !!state.customer.salesRepCode;
+
+        const missing = [];
+        if (cq < 1)            missing.push('Add a line with sizes');
+        if (!hasLines)         missing.push('Pick a style + color');
+        if (!hasCustomerEmail) missing.push('Customer email');
+        if (!hasCompanyOrName) missing.push('Company or contact name');
+        if (!hasShipMethod)    missing.push('Ship method');
+        if (!hasSalesRep)      missing.push('Sales rep');
+
+        const ready = missing.length === 0;
+        btn.disabled = state.submitting || !ready;
+
+        if (banner) {
+            if (ready || state.submitting) {
+                banner.hidden = true;
+                banner.innerHTML = '';
+            } else {
+                banner.hidden = false;
+                banner.innerHTML = `<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Need: ${missing.map(m => `<span class="dvb-item">${escapeHtml(m)}</span>`).join(' · ')}`;
+            }
+        }
+
+        btn.title = ready
+            ? (state.customer.designNumber ? 'Push this quote to ShopWorks' : 'Push to ShopWorks — design # is optional, can be added in ShopWorks after')
+            : '';
     }
 
     // ----- Row + combobox handlers ------------------------------------------
@@ -561,7 +801,35 @@
                 if (!row.sizes) row.sizes = {};
                 if (q > 0) row.sizes[sz] = q;
                 else delete row.sizes[sz];
+                markDirty();
+                scheduleStateSave();
                 schedulePriceUpdate();
+            });
+            // C8 — bulk size paste. Accept formats like:
+            //   "S:2 M:4 L:6 2XL:1"   "S/4, M/6, L/6"   "S-2 M-4 L-6"
+            // Distribute parsed values across this row's size cells.
+            input.addEventListener('paste', (e) => {
+                const text = (e.clipboardData || window.clipboardData)?.getData('text');
+                if (!text) return; // fall through to default paste
+                const parsed = parseBulkSizes(text);
+                const sizesParsed = Object.keys(parsed);
+                if (sizesParsed.length < 2) return; // single value → keep default behavior
+                e.preventDefault();
+                const rid = input.getAttribute('data-row-id');
+                const row = state.rows.find((r) => r.id === rid);
+                if (!row) return;
+                let totalAdded = 0;
+                for (const [sz, qty] of Object.entries(parsed)) {
+                    if (!row.sizes) row.sizes = {};
+                    if (qty > 0) row.sizes[sz] = qty;
+                    else delete row.sizes[sz];
+                    totalAdded += qty;
+                }
+                markDirty();
+                scheduleStateSave();
+                renderTable();
+                schedulePriceUpdate();
+                showToastSafe(`Distributed ${totalAdded} pieces across ${sizesParsed.length} sizes`);
             });
         });
 
@@ -570,6 +838,8 @@
             btn.addEventListener('click', () => {
                 const rid = btn.getAttribute('data-remove-row');
                 state.rows = state.rows.filter((r) => r.id !== rid);
+                markDirty();
+                scheduleStateSave();
                 renderTable();
                 schedulePriceUpdate();
             });
@@ -649,6 +919,8 @@
             row.colorSwatch = '';
             row.colorsAvailable = [];
             row.availableSizes = [];
+            markDirty();
+            scheduleStateSave();
             close();
             renderTable();
             // Asynchronously: fetch colors, fetch bundle (for live price + available sizes)
@@ -739,6 +1011,8 @@
             row.color = c.COLOR_NAME || c.colorName || '';
             row.catalogColor = c.CATALOG_COLOR || c.catalogColor || '';
             row.colorSwatch = c.COLOR_SQUARE_IMAGE || c.colorSwatchUrl || '';
+            markDirty();
+            scheduleStateSave();
             close();
             renderTable();
             schedulePriceUpdate();
@@ -763,6 +1037,8 @@
         const addBtn = document.getElementById('dtgAddRowBtn');
         if (addBtn) addBtn.addEventListener('click', () => {
             state.rows.push(newBlankRow());
+            markDirty();
+            scheduleStateSave();
             renderTable();
         });
 
@@ -789,7 +1065,28 @@
         const termsSel = document.getElementById('dtgTerms');
         if (termsSel) termsSel.addEventListener('change', () => {
             state.customer.terms = termsSel.value;
+            markDirty();
+            scheduleStateSave();
             updateSubmitEnabled();
+        });
+        // A1 sales rep — remember last pick in localStorage so the next quote
+        // starts on the same rep.
+        const repSel = document.getElementById('dtgSalesRep');
+        if (repSel) repSel.addEventListener('change', () => {
+            state.customer.salesRepCode = repSel.value;
+            try { localStorage.setItem('dtg.lastSalesRep', repSel.value); } catch {}
+            markDirty();
+            scheduleStateSave();
+            updateSubmitEnabled();
+        });
+        // A2 shipping method
+        const shipSel = document.getElementById('dtgShipMethod');
+        if (shipSel) shipSel.addEventListener('change', () => {
+            state.shipping.method = shipSel.value;
+            markDirty();
+            scheduleStateSave();
+            updateSubmitEnabled();
+            renderSummary(); // tax recompute (C7)
         });
     }
     function bindInputToState(elId, stateKey) {
@@ -797,6 +1094,8 @@
         if (!el) return;
         el.addEventListener('input', () => {
             state.customer[stateKey] = el.value.trim();
+            markDirty();
+            scheduleStateSave();
             updateSubmitEnabled();
         });
     }
@@ -856,6 +1155,8 @@
             // Reflect in companyId field if it's blank
             const cidInput = document.getElementById('dtgCompanyId');
             if (cidInput && !cidInput.value) cidInput.value = state.customer.companyId;
+            markDirty();
+            scheduleStateSave();
             close();
             updateSubmitEnabled();
         }
@@ -976,6 +1277,44 @@
         return issues;
     }
 
+    // Generic confirm-modal helper used by both A3 (design # soft warning)
+    // and C9 (chat-form overwrite warning). Promise resolves true on proceed,
+    // false on cancel/Esc/backdrop-click. Buttons take string labels;
+    // proceedClass controls the proceed-button color (default amber/warn).
+    function genericConfirm({ icon, title, body, cancelLabel, proceedLabel, proceedClass }) {
+        return new Promise((resolve) => {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'dtg-stock-confirm-backdrop';
+            backdrop.setAttribute('role', 'dialog');
+            backdrop.setAttribute('aria-modal', 'true');
+            backdrop.innerHTML = `
+                <div class="dtg-stock-confirm-modal" role="document">
+                    <div class="dscm-head">
+                        <span class="dscm-head-icon" aria-hidden="true">${escapeHtml(icon || '⚠')}</span>
+                        <h3 class="dscm-title">${escapeHtml(title)}</h3>
+                    </div>
+                    <p class="dscm-body">${body /* trusted — caller controls */}</p>
+                    <div class="dscm-actions">
+                        <button type="button" class="dscm-btn dscm-btn-cancel" data-action="cancel">${escapeHtml(cancelLabel || 'Cancel')}</button>
+                        <button type="button" class="dscm-btn ${proceedClass || 'dscm-btn-proceed'}" data-action="confirm">${escapeHtml(proceedLabel || 'Proceed')}</button>
+                    </div>
+                </div>
+            `;
+            function cleanup(result) {
+                document.removeEventListener('keydown', onKey);
+                backdrop.remove();
+                resolve(result);
+            }
+            function onKey(e) { if (e.key === 'Escape') cleanup(false); }
+            backdrop.addEventListener('click', (e) => { if (e.target === backdrop) cleanup(false); });
+            backdrop.querySelector('[data-action="cancel"]').addEventListener('click', () => cleanup(false));
+            backdrop.querySelector('[data-action="confirm"]').addEventListener('click', () => cleanup(true));
+            document.addEventListener('keydown', onKey);
+            document.body.appendChild(backdrop);
+            backdrop.querySelector('[data-action="cancel"]').focus();
+        });
+    }
+
     // Show the stock-confirm modal. Returns a Promise that resolves to true
     // (proceed) or false (cancel). Backdrop click / Escape / Cancel = false.
     function confirmStockOverflow(issues) {
@@ -1051,14 +1390,32 @@
             setStatus('error', 'Need a location + at least one filled row.');
             return;
         }
-        if (!state.customer.email || !state.customer.designNumber) {
-            setStatus('error', 'Need customer email and design number before pushing.');
+        if (!state.customer.email) {
+            setStatus('error', 'Need customer email before pushing.');
             return;
         }
 
+        // A3 — Design # soft warning. Submit is no longer hard-blocked when the
+        // design # is empty. Instead we confirm with the rep, then push with
+        // designNumber: null. Rep adds the design # directly in ShopWorks
+        // after the art team assigns one.
+        if (!state.customer.designNumber) {
+            const proceedNoDesign = await genericConfirm({
+                icon: '🎨',
+                title: 'No design # entered',
+                body: 'The art team can assign one in ShopWorks after you push. The order will be created with no Design ID and the rep can add it manually. Push anyway?',
+                cancelLabel: 'Cancel',
+                proceedLabel: 'Push without design #',
+                proceedClass: 'dscm-btn-proceed',
+            });
+            if (!proceedNoDesign) {
+                setStatus('error', 'Push cancelled — add a design # and try again, or push without one when ready.');
+                return;
+            }
+        }
+
         // Stock check — if any cell exceeds SanMar inventory, ask the rep
-        // to confirm before pushing. Rep may know about backorder, drop-ship,
-        // or extended lead time so we don't hard-block.
+        // to confirm before pushing.
         const stockIssues = collectStockIssues();
         if (stockIssues.length > 0) {
             const proceed = await confirmStockOverflow(stockIssues);
@@ -1068,11 +1425,16 @@
             }
         }
 
+        // Resolve sales rep from the state.customer.salesRepCode
+        const rep = repByCode(state.customer.salesRepCode);
+        const shipMethodLabel = shipLabel(state.shipping.method);
+        const isPickup = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+
         state.submitting = true;
         updateSubmitEnabled();
         setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pricing + pushing…');
 
-        // 1) Authoritative price via canonical endpoint (= what the chat would quote)
+        // 1) Authoritative price via canonical endpoint
         let pricing;
         try {
             const r = await fetch(`${API_BASE}/api/dtg/quote-pricing`, {
@@ -1092,7 +1454,7 @@
             return;
         }
 
-        // 2) Build the order-form-shaped payload (mirrors pages/order-form/shopworks.js buildBody)
+        // 2) Build the order-form-shaped payload
         const items = Array.isArray(pricing.lineItems) ? pricing.lineItems : [];
         const totals = pricing.totals || {};
         const subtotal = Number(pricing.subtotal) || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
@@ -1124,6 +1486,12 @@
             };
         });
 
+        // C7 — tax estimate. Use what the canonical endpoint returned if
+        // available; otherwise fallback to subtotal × 10.1% (WA Tacoma rate
+        // per MEMORY.md). For pickup orders, shipping = 0 so tax = subtotal × rate.
+        const taxEstimate = Number(totals.taxEstimate) || Math.round(subtotal * 0.101 * 100) / 100;
+        const grandTotal = Number(totals.grandTotal) || Math.round((subtotal + taxEstimate) * 100) / 100;
+
         const body = {
             info: {
                 company: state.customer.company || '',
@@ -1135,17 +1503,22 @@
                 companyName: state.customer.company || '',
                 companyId: state.customer.companyId || '',
                 phone: state.customer.phone || '',
-                designNumber: state.customer.designNumber || '',
-                salesRep: 'Erik Mickelson',
-                salesRepEmail: 'erik@nwcustomapparel.com',
+                designNumber: state.customer.designNumber || null, // A3 — nullable
+                salesRep: rep.name,
+                salesRepEmail: rep.email,
                 terms: state.customer.terms || 'Prepaid',
                 paymentTerms: state.customer.terms || 'Prepaid',
                 taxable: true,
-                quoteId: window.__dtgQuoteID || '',
+                quoteId: getQuoteID() || '',
             },
             rows,
-            ship: { method: 'ups', sameAsBilling: true },
-            orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}`,
+            ship: {
+                method: state.shipping.method, // A2 — real value (ups / pickup / willcall / other)
+                methodLabel: shipMethodLabel,
+                sameAsBilling: true,
+                isPickup,
+            },
+            orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}${isPickup ? ' · CUSTOMER PICKUP' : ''}`,
             files: [],
             decoConfig: { method: 'dtg' },
             breakdown: {
@@ -1155,18 +1528,38 @@
                 tier: pricing.tier,
                 subtotal: Math.round(subtotal * 100) / 100,
                 ltmTotal: Math.round(ltmTotal * 100) / 100,
-                taxEstimate: Number(totals.taxEstimate) || 0,
+                taxEstimate,
                 depositDue: 0,
-                grandTotal: Number(totals.grandTotal) || Math.round(subtotal * 100) / 100,
+                grandTotal,
                 fees: [],
                 errors: [],
             },
-            methodNotesBlock: `DTG · ${effectiveLocationLabel()} · Tier ${pricing.tier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pieces`,
+            methodNotesBlock: `DTG · ${effectiveLocationLabel()} · Tier ${pricing.tier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pieces · Ship: ${shipMethodLabel}`,
             designNumbers: state.customer.designNumber ? [state.customer.designNumber] : [],
             addOns: [],
         };
 
-        // 3) POST to /api/submit-order-form
+        // B5 — cache for retry. If the push fails, the retry button reuses
+        // this exact body so we don't double-fetch pricing.
+        state.lastSubmit = { body, pricing, subtotal };
+
+        await postPayloadToShopWorks(body, { subtotal, items });
+        state.submitting = false;
+        updateSubmitEnabled();
+    }
+
+    // B5 — extracted POST handler so the Retry button can re-call without
+    // recomputing the payload. Shows a structured error card with
+    // [Retry] [Copy payload] on failure.
+    async function postPayloadToShopWorks(body, ctx) {
+        const statusEl = document.getElementById('dtgSubmitStatus');
+        const setStatus = (cls, msg) => {
+            if (!statusEl) return;
+            statusEl.className = `dtg-submit-status ${cls}`;
+            statusEl.innerHTML = msg;
+            statusEl.hidden = false;
+        };
+        setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pushing to ShopWorks…');
         try {
             const r = await fetch(SUBMIT_URL, {
                 method: 'POST',
@@ -1177,20 +1570,76 @@
             if (r.ok && data.success) {
                 const id = data.shopWorksId || data.extOrderId;
                 setStatus('success',
-                    `<strong>Pushed to ShopWorks.</strong> Order: <code>${escapeHtml(id || 'submitted')}</code> · ${items.length} line${items.length === 1 ? '' : 's'} · $${fmtMoney(subtotal)}`
+                    `<strong>Pushed to ShopWorks.</strong> Order: <code>${escapeHtml(id || 'submitted')}</code> · ${ctx.items.length} line${ctx.items.length === 1 ? '' : 's'} · $${fmtMoney(ctx.subtotal)}`
                 );
+                // Clear sessionStorage on success — the rep is done with
+                // this quote, next page load starts fresh.
+                clearSessionState();
             } else {
-                setStatus('error', `Push failed: ${escapeHtml(data.error || 'HTTP ' + r.status)}${data.detail ? ` (${escapeHtml(data.detail)})` : ''}`);
+                renderRetryCard(setStatus, `HTTP ${r.status}: ${data.error || 'unknown error'}${data.detail ? ' — ' + data.detail : ''}`);
             }
         } catch (err) {
-            setStatus('error', `Push failed: ${escapeHtml(err.message)}`);
+            renderRetryCard(setStatus, `Network error: ${err.message}`);
         }
-        state.submitting = false;
-        updateSubmitEnabled();
+    }
+
+    function renderRetryCard(setStatus, errorMsg) {
+        setStatus('error', `
+            <div class="dts-error-head"><strong>Push failed.</strong> ${escapeHtml(errorMsg)}</div>
+            <div class="dts-error-actions">
+                <button type="button" class="dts-retry-btn" data-action="retry"><i class="fas fa-rotate-right"></i> Retry</button>
+                <button type="button" class="dts-copy-btn" data-action="copy-payload"><i class="fas fa-copy"></i> Copy payload</button>
+            </div>
+        `);
+        const statusEl = document.getElementById('dtgSubmitStatus');
+        if (!statusEl) return;
+        statusEl.querySelector('[data-action="retry"]')?.addEventListener('click', async () => {
+            if (!state.lastSubmit) {
+                setStatus('error', 'No cached payload to retry — please re-click Submit.');
+                return;
+            }
+            state.submitting = true;
+            updateSubmitEnabled();
+            await postPayloadToShopWorks(state.lastSubmit.body, {
+                subtotal: state.lastSubmit.subtotal,
+                items: state.lastSubmit.pricing.lineItems || [],
+            });
+            state.submitting = false;
+            updateSubmitEnabled();
+        });
+        statusEl.querySelector('[data-action="copy-payload"]')?.addEventListener('click', () => {
+            if (!state.lastSubmit) return;
+            try {
+                navigator.clipboard.writeText(JSON.stringify(state.lastSubmit.body, null, 2));
+                showToastSafe('Payload copied — paste to support or stash for retry');
+            } catch (e) {
+                showToastSafe('Clipboard failed — payload in console');
+                console.log('[dtg-inline-form] retry payload:', state.lastSubmit.body);
+            }
+        });
     }
 
     // ----- Public API for chat bridge ---------------------------------------
     async function fillFromQuote(priceQuote, customerFinal) {
+        // C9 — race guard. If the rep has touched the form since the last
+        // chat fill, ask before overwriting. Only triggers when there are
+        // actual user edits AND the chat is delivering a new PRICE_QUOTE
+        // (customer-only fills bypass — those don't clobber rows).
+        if (priceQuote && state.dirtyAfterChatFill) {
+            const proceed = await genericConfirm({
+                icon: '✏️',
+                title: 'AI updated the quote',
+                body: 'You have edits on the form. The AI just sent a new quote. Apply it (overwrites your edits) or keep your edits (ignore the new quote)?',
+                cancelLabel: 'Keep my edits',
+                proceedLabel: 'Apply new quote',
+                proceedClass: 'dscm-btn-proceed',
+            });
+            if (!proceed) {
+                // Rep kept their edits — bail without overwriting.
+                return;
+            }
+        }
+
         if (priceQuote) {
             // Set location
             const code = priceQuote.locationCode || (priceQuote.lineItems && priceQuote.lineItems[0] && priceQuote.lineItems[0].locationCode) || 'LC';
@@ -1216,10 +1665,9 @@
             });
             state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
 
-            // Cache the AI quoteID for the eventual ShopWorks push notes
-            if (window.__dtgQuoteID == null && priceQuote.quoteID) {
-                window.__dtgQuoteID = priceQuote.quoteID;
-            }
+            // Cache the AI quoteID + persist to sessionStorage so it survives
+            // a page refresh.
+            if (priceQuote.quoteID) setQuoteID(priceQuote.quoteID);
 
             // IMMEDIATE render so the rep sees the rows right away. Hydration
             // (catalog colors, available sizes, swatch URLs) happens in the
@@ -1303,6 +1751,12 @@
             schedulePriceUpdate();
         }
 
+        // C9 — clear dirty flag now that the form reflects the chat. Save
+        // the current state to sessionStorage so refresh recovery works.
+        clearDirty();
+        scheduleStateSave();
+        updateSubmitEnabled();
+
         // Scroll the form into view so the rep sees the fill happen.
         const wrap = document.querySelector('.dtg-form-wrap');
         if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1349,9 +1803,65 @@
 
     // ----- Init --------------------------------------------------------------
     function init() {
-        // Start with one blank row
+        // B4 — try to restore from sessionStorage first. If we restored, show
+        // a small banner offering to start fresh.
+        const restored = restoreStateFromSession();
         if (state.rows.length === 0) state.rows.push(newBlankRow());
         render();
+        if (restored) {
+            showResumeBanner();
+            // Hydrate the restored rows' inventory + bundle data in the
+            // background so the size cells + badges fill in.
+            for (const row of state.rows) {
+                if (row.style && row.color) {
+                    kickInventoryFetch(row);
+                }
+                if (row.style) {
+                    // refresh available sizes from bundle (cached if hot)
+                    fetchBundle(row.style).then(b => {
+                        if (b && Array.isArray(b.sizes)) {
+                            row.availableSizes = b.sizes.filter(s => Number(s.price) > 0).map(s => String(s.size).toUpperCase());
+                            renderTable();
+                            schedulePriceUpdate();
+                        }
+                    }).catch(() => {});
+                }
+            }
+        }
+    }
+
+    // B4 — "Resumed from your last session" banner shown after a successful
+    // restoreStateFromSession(). Inserted OUTSIDE `.dtg-form-wrap` (into the
+    // wrap's parent) so subsequent render() calls don't wipe it. Auto-
+    // dismissed after 10 seconds; rep can also "Start fresh" to clear.
+    function showResumeBanner() {
+        // Remove any pre-existing banner so we don't stack duplicates if
+        // init() somehow runs twice.
+        document.querySelectorAll('.dtg-resume-banner').forEach((b) => b.remove());
+
+        try {
+            const banner = document.createElement('div');
+            banner.className = 'dtg-resume-banner';
+            banner.innerHTML = `
+                <span class="drb-msg"><i class="fas fa-clock-rotate-left"></i> Resumed your last session</span>
+                <button type="button" class="drb-dismiss" data-action="dismiss">Start fresh</button>
+                <button type="button" class="drb-close" data-action="close" aria-label="Close">×</button>
+            `;
+            const dismissBtn = banner.querySelector('[data-action="dismiss"]');
+            const closeBtn = banner.querySelector('[data-action="close"]');
+            if (dismissBtn) dismissBtn.addEventListener('click', () => {
+                clearSessionState();
+                resetForm();
+                banner.remove();
+            });
+            if (closeBtn) closeBtn.addEventListener('click', () => banner.remove());
+            // Attach to <body> as a fixed-position toast. Free of any
+            // in-form re-render churn.
+            document.body.appendChild(banner);
+            setTimeout(() => { try { banner.remove(); } catch {} }, 10000);
+        } catch (err) {
+            console.warn('[dtg-inline-form] showResumeBanner skipped:', err && err.message);
+        }
     }
 
     if (document.readyState === 'loading') {
@@ -1366,5 +1876,9 @@
         getState,
         resetForm,
         submitToShopWorks,
+        // C9 — chat controller calls this before fillFromQuote() to decide
+        // whether to warn about overwriting user edits.
+        isDirty: () => state.dirtyAfterChatFill,
+        clearDirty,
     };
 })();

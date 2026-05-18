@@ -166,6 +166,13 @@
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
         aiState.isStreaming = false;
+        // Clear the persistent quoteID + form state so next page load
+        // doesn't try to resume a quote the rep just discarded.
+        try {
+            sessionStorage.removeItem('dtg.quoteID.v1');
+            sessionStorage.removeItem('dtg.formState.v1');
+        } catch {}
+        try { delete window.__dtgQuoteID; } catch {}
         if (window.DTGInlineForm && typeof window.DTGInlineForm.resetForm === 'function') {
             try { window.DTGInlineForm.resetForm(); } catch (e) { /* non-fatal */ }
         }
@@ -190,6 +197,16 @@
 
     async function ensureQuoteID() {
         if (aiState.quoteID) return aiState.quoteID;
+        // B4 — try restoring from sessionStorage first so a page refresh
+        // doesn't burn a new quote sequence number.
+        try {
+            const stashed = sessionStorage.getItem('dtg.quoteID.v1');
+            if (stashed) {
+                aiState.quoteID = stashed;
+                updateContextPill('drafting…');
+                return aiState.quoteID;
+            }
+        } catch {}
         if (aiState.quoteIDPromise) return aiState.quoteIDPromise;
         aiState.quoteIDPromise = (async () => {
             try {
@@ -197,6 +214,7 @@
                 if (!r.ok) throw new Error('quote-sequence ' + r.status);
                 const d = await r.json();
                 aiState.quoteID = `${d.prefix}-${d.year}-${String(d.sequence).padStart(3, '0')}`;
+                try { sessionStorage.setItem('dtg.quoteID.v1', aiState.quoteID); } catch {}
                 updateContextPill('drafting…');
                 return aiState.quoteID;
             } catch (err) {
