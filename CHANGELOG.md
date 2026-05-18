@@ -1,3 +1,7 @@
+## v2026.05.18.2 (2026.05.18)
+
+- Deploy v2026.05.18.2: 6 files (dtg-quote-builder.html, dtg-inline-form.css, dtg-inline-form.js...)
+
 ## v2026.05.18.1 (2026.05.18)
 
 - Deploy v2026.05.18.1: 3 files (dtg-quote-builder.html, dtg-quote-page.css, dtg-quote-page.js...)
