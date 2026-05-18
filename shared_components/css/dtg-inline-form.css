@@ -311,6 +311,19 @@
 .dtg-row-color-swatch--blank { background-color: #e5e7eb; }
 .dtg-row-color input[data-has-swatch="true"] { padding-left: 26px; }
 
+/* AI-touched row indicator — applied for ~2s after the chat's
+   lookup_product_details or lookup_customer tool result writes into the
+   row. Gives the rep a visible "the form caught the chat" cue so they
+   know the AI just updated the line. */
+@keyframes dtgRowAiPulse {
+    0%   { background: rgba(46, 88, 39, 0.18); box-shadow: inset 3px 0 0 #2e5827; }
+    60%  { background: rgba(46, 88, 39, 0.08); box-shadow: inset 3px 0 0 #2e5827; }
+    100% { background: transparent;            box-shadow: inset 3px 0 0 transparent; }
+}
+.dtg-rows-table tbody tr.dtg-row-ai-touched {
+    animation: dtgRowAiPulse 2s ease-out forwards;
+}
+
 /* Narrow viewport — hide the (already truncated) description column.
    The style + color columns retain the data identity. Hovering the Style
    cell still reveals the description via the `title` attribute. */

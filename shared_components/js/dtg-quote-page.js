@@ -271,7 +271,7 @@
         msg.appendChild(chip);
         if (opts.searchResults) msg.appendChild(buildWebSearchResultsEl(opts.searchResults));
         if (opts.topSellers) msg.appendChild(buildTopSellersEl(opts.topSellers));
-        if (opts.productDetails) msg.appendChild(buildProductDetailsEl(opts.productDetails));
+        if (opts.productDetails) msg.appendChild(buildProductDetailsEl(opts.productDetails, { preselectedColor: opts.preselectedColor || null }));
         container.appendChild(msg);
         scrollChatBottom();
     }
@@ -282,12 +282,72 @@
      * then a list of size chips with upcharges proactively shown. Clicking a
      * swatch sends "Let's go with [Color Name]" back to the bot.
      */
-    function buildProductDetailsEl(data) {
+    /**
+     * Detect a "preselected" color for a product-details card by inspecting:
+     *   (a) form rows — if a row already exists with this style + a non-empty
+     *       color (set by previewStyle/fillFromQuote), use it.
+     *   (b) the latest user chat message — if it mentions a token (3+ chars)
+     *       that appears as a whole word in exactly one canonical COLOR_NAME,
+     *       use it. Multiple matches → prefer shortest (the "plain" one).
+     *
+     * Returns the canonical color name (string) or null.
+     */
+    function detectPreselectedColor(result) {
+        const colors = Array.isArray(result.colors) ? result.colors : [];
+        if (!colors.length) return null;
+
+        // (a) form row inspection
+        try {
+            if (window.DTGInlineForm && typeof window.DTGInlineForm.getRows === 'function') {
+                const rows = window.DTGInlineForm.getRows() || [];
+                const style = String(result.styleNumber || '').toUpperCase();
+                const matched = rows.find((r) => String(r.style || '').toUpperCase() === style && r.color);
+                if (matched) {
+                    const exact = colors.find((c) => String(c.name || '').toLowerCase() === String(matched.color).toLowerCase());
+                    if (exact) return exact.name;
+                    const fuzzy = colors.find((c) => String(c.name || '').toLowerCase().includes(String(matched.color).toLowerCase()));
+                    if (fuzzy) return fuzzy.name;
+                }
+            }
+        } catch (e) { /* ignore */ }
+
+        // (b) latest user message scan
+        try {
+            const userMsgs = (aiState.messages || []).filter((m) => m.role === 'user');
+            if (!userMsgs.length) return null;
+            const txt = String(userMsgs[userMsgs.length - 1].content || '').toLowerCase();
+            if (!txt) return null;
+            const hits = [];
+            for (const c of colors) {
+                const cn = String(c.name || '').toLowerCase();
+                if (!cn) continue;
+                const words = cn.match(/[a-z]+/g) || [];
+                for (const w of words) {
+                    if (w.length < 3) continue;
+                    const re = new RegExp('\\b' + w + '\\b');
+                    if (re.test(txt)) { hits.push(c); break; }
+                }
+            }
+            if (hits.length === 1) return hits[0].name;
+            if (hits.length > 1) {
+                hits.sort((a, b) => String(a.name).length - String(b.name).length);
+                return hits[0].name;
+            }
+        } catch (e) { /* ignore */ }
+
+        return null;
+    }
+
+    function buildProductDetailsEl(data, opts = {}) {
         const wrap = document.createElement('div');
         wrap.className = 'product-details-card';
         const colors = Array.isArray(data.colors) ? data.colors : [];
         const sizes = Array.isArray(data.sizes) ? data.sizes : [];
         const warnings = Array.isArray(data.avoidWarnings) ? data.avoidWarnings : [];
+        const preselectedColor = opts.preselectedColor || null;
+        const preselectedColorObj = preselectedColor
+            ? colors.find((c) => String(c.name || '').toLowerCase() === String(preselectedColor).toLowerCase())
+            : null;
 
         // Detect avoid-list colors (for warning badge on PC61 Red, PC78H White)
         const avoidColorMatch = (name) => {
@@ -297,20 +357,23 @@
             return false;
         };
 
-        // Pick a default hero image — first color with a mainImageUrl wins.
-        const defaultHero = colors.find(c => c.mainImageUrl) || null;
+        // Pick the hero image — preselected wins if set, else first w/ image.
+        const hero = preselectedColorObj && preselectedColorObj.mainImageUrl
+            ? preselectedColorObj
+            : (colors.find((c) => c.mainImageUrl) || null);
+        const isConfirmed = !!preselectedColorObj;
 
         let html = '';
-        if (defaultHero) {
+        if (hero) {
             html += `
-                <div class="pd-hero">
+                <div class="pd-hero${isConfirmed ? ' confirmed' : ''}">
                     <img class="pd-hero-img"
-                         src="${escapeHtml(defaultHero.mainImageUrl)}"
-                         alt="${escapeHtml(data.styleNumber)} in ${escapeHtml(defaultHero.name)}"
-                         data-default-src="${escapeHtml(defaultHero.mainImageUrl)}"
-                         data-default-color="${escapeHtml(defaultHero.name)}"
+                         src="${escapeHtml(hero.mainImageUrl)}"
+                         alt="${escapeHtml(data.styleNumber)} in ${escapeHtml(hero.name)}"
+                         data-default-src="${escapeHtml(hero.mainImageUrl)}"
+                         data-default-color="${escapeHtml(hero.name)}"
                          onerror="this.style.display='none';">
-                    <div class="pd-hero-caption" data-default-color="${escapeHtml(defaultHero.name)}">${escapeHtml(defaultHero.name)}</div>
+                    <div class="pd-hero-caption" data-default-color="${escapeHtml(hero.name)}">${isConfirmed ? '<i class="fas fa-check"></i> ' : ''}${escapeHtml(hero.name)}</div>
                 </div>`;
         }
 
@@ -321,15 +384,23 @@
         `;
 
         if (colors.length > 0) {
-            html += `<div class="pd-section-label">Hover to preview · click to pick</div>`;
-            html += `<div class="color-swatch-grid">`;
+            if (isConfirmed) {
+                // Color already known — collapse swatches behind an expander so
+                // the card reads as a confirmation, not an interrogation.
+                html += `<button type="button" class="pd-swatch-expander" aria-expanded="false">Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down"></i></button>`;
+                html += `<div class="color-swatch-grid pd-collapsed" hidden>`;
+            } else {
+                html += `<div class="pd-section-label">Hover to preview · click to pick</div>`;
+                html += `<div class="color-swatch-grid">`;
+            }
             for (const c of colors) {
                 const warn = avoidColorMatch(c.name);
+                const isHero = isConfirmed && preselectedColorObj && c.name === preselectedColorObj.name;
                 const imgHtml = c.swatchImageUrl
                     ? `<img class="cs-img" src="${escapeHtml(c.swatchImageUrl)}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.classList.add('placeholder');this.removeAttribute('src');">`
                     : `<div class="cs-img placeholder"></div>`;
                 html += `
-                    <button type="button" class="color-swatch${warn ? ' warning' : ''}"
+                    <button type="button" class="color-swatch${warn ? ' warning' : ''}${isHero ? ' picked' : ''}"
                             data-color-name="${escapeHtml(c.name)}"
                             data-catalog-color="${escapeHtml(c.catalogColor || '')}"
                             data-main-image="${escapeHtml(c.mainImageUrl || '')}"
@@ -360,6 +431,35 @@
 
         const heroImg = wrap.querySelector('.pd-hero-img');
         const heroCap = wrap.querySelector('.pd-hero-caption');
+
+        // If we rendered in "confirmed" mode (preselected color), lock the
+        // hero on that color so swatch hovers don't replace it until the
+        // rep explicitly clicks one.
+        if (isConfirmed) wrap.dataset.locked = 'true';
+
+        // Wire up the swatch-grid expander (only present in confirmed mode)
+        const expander = wrap.querySelector('.pd-swatch-expander');
+        const grid = wrap.querySelector('.color-swatch-grid');
+        if (expander && grid) {
+            expander.addEventListener('click', () => {
+                const isHidden = grid.hasAttribute('hidden');
+                if (isHidden) {
+                    grid.removeAttribute('hidden');
+                    expander.setAttribute('aria-expanded', 'true');
+                    expander.innerHTML = `Hide colors <i class="fas fa-chevron-up"></i>`;
+                    // Unlock the hero so hovering a swatch previews the new
+                    // color. The first click commits + re-locks via the
+                    // standard swatch click handler below.
+                    wrap.dataset.locked = 'false';
+                } else {
+                    grid.setAttribute('hidden', '');
+                    expander.setAttribute('aria-expanded', 'false');
+                    expander.innerHTML = `Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down"></i>`;
+                    // Restore the original confirmed-color lock
+                    wrap.dataset.locked = 'true';
+                }
+            });
+        }
 
         // Hover a swatch → preview that color in the hero. Click → pick + lock.
         wrap.querySelectorAll('.color-swatch').forEach((btn) => {
@@ -754,6 +854,11 @@
                     ? `Found ${matches[0].company || matches[0].contact_name || 'match'}`
                     : `${matches.length} matches — narrowing…`);
             appendToolChip(tool, status);
+            // Real-time preview: if exactly one confident match, pre-fill the
+            // form's customer pane immediately so the rep sees confirmation.
+            if (matches.length === 1 && window.DTGInlineForm && typeof window.DTGInlineForm.previewCustomer === 'function') {
+                try { window.DTGInlineForm.previewCustomer(matches[0]); } catch (e) { /* non-fatal */ }
+            }
         } else if (tool === 'quote_dtg_pricing') {
             if (result.error) {
                 appendToolChip(tool, `Error: ${result.message || result.error}`);
@@ -785,7 +890,21 @@
             } else {
                 const cc = result.colorCount ?? (Array.isArray(result.colors) ? result.colors.length : 0);
                 const sc = result.sizeCount ?? (Array.isArray(result.sizes) ? result.sizes.length : 0);
-                appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}`, { productDetails: result });
+                const preselectedColor = detectPreselectedColor(result);
+                appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}${preselectedColor ? ` · ✓ ${preselectedColor}` : ''}`, { productDetails: result, preselectedColor });
+                // Real-time preview: pre-fill the first empty row's style +
+                // description + available colors/sizes so the rep sees the
+                // form catching up with the conversation.
+                if (window.DTGInlineForm && typeof window.DTGInlineForm.previewStyle === 'function') {
+                    try {
+                        window.DTGInlineForm.previewStyle({
+                            style: result.styleNumber,
+                            desc: result.title || '',
+                            colorsAvailable: result.colors || [],
+                            availableSizes: (result.sizes || []).map((s) => String(s.size).toUpperCase()),
+                        });
+                    } catch (e) { /* non-fatal */ }
+                }
             }
         }
     }
