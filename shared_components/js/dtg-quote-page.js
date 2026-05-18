@@ -19,8 +19,6 @@
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     const AI_ENDPOINT = API_BASE_URL + '/api/dtg-quote-ai/chat';
     const QUOTE_PREFIX = 'DTG';
-    const SUBMIT_ORDER_FORM_URL = '/api/submit-order-form'; // relative — same-origin (sanmar-inventory-app)
-
     const aiState = {
         opened: false,
         messages: [],
@@ -32,7 +30,6 @@
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,
-        shopWorksOrderId: null, // set after successful Submit to ShopWorks
     };
 
     document.addEventListener('DOMContentLoaded', init);
@@ -68,7 +65,6 @@
         const ta = document.getElementById('aiChatTextarea');
         const copyBtn = document.getElementById('aiCopyEmailBtn');
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
-        const submitBtn = document.getElementById('aiSubmitShopWorksBtn');
         const floatingBtn = document.getElementById('floatingQuoteBtn');
         const resetBtn = document.getElementById('aiChatResetBtn');
 
@@ -104,7 +100,6 @@
         if (outlookBtn) outlookBtn.addEventListener('click', handleOpenOutlook);
         if (copyBtn) copyBtn.addEventListener('click', handleCopyEmail);
         if (saveBtn) saveBtn.addEventListener('click', handleSaveQuote);
-        if (submitBtn) submitBtn.addEventListener('click', handleSubmitToShopWorks);
 
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && aiState.opened) closeChatPanel();
@@ -168,8 +163,10 @@
         aiState.quoteID = null;
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
-        aiState.shopWorksOrderId = null;
         aiState.isStreaming = false;
+        if (window.DTGInlineForm && typeof window.DTGInlineForm.resetForm === 'function') {
+            try { window.DTGInlineForm.resetForm(); } catch (e) { /* non-fatal */ }
+        }
         aiState.messages.push({
             role: 'user',
             content: "(Open the chat — greet the rep briefly and ask what DTG quote they're drafting.)",
@@ -506,6 +503,9 @@
 
         if (priceQuote) {
             aiState.currentPriceQuote = priceQuote;
+            // Preserve the AI quoteID alongside the priceQuote so the form can
+            // include it in the ShopWorks "Notes On Order".
+            if (aiState.quoteID && !priceQuote.quoteID) priceQuote.quoteID = aiState.quoteID;
             renderDtgQuoteCard(bubbleEl, priceQuote);
         }
         if (customerFinal) aiState.currentCustomerFinal = customerFinal;
@@ -514,6 +514,16 @@
             renderEmailDraftCard(bubbleEl, emailDraft);
         }
         updateActionsAvailability();
+
+        // Bridge: if we have a quote, fill the inline form below. Rep reviews + clicks
+        // the form's Submit button. No more chat-side ShopWorks push.
+        if ((priceQuote || customerFinal) && window.DTGInlineForm && typeof window.DTGInlineForm.fillFromQuote === 'function') {
+            try {
+                window.DTGInlineForm.fillFromQuote(priceQuote, customerFinal);
+            } catch (err) {
+                console.error('[dtg-ai] failed to fill inline form:', err);
+            }
+        }
     }
 
     function renderDtgQuoteCard(bubbleEl, priceQuote) {
@@ -604,28 +614,15 @@
         const outlookBtn = document.getElementById('aiOutlookBtn');
         const copyBtn = document.getElementById('aiCopyEmailBtn');
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
-        const submitBtn = document.getElementById('aiSubmitShopWorksBtn');
         if (!actions) return;
         const hasDraft = !!aiState.currentEmailDraft;
         const hasQuote = !!aiState.currentPriceQuote;
         const hasCustomer = !!aiState.currentCustomerFinal;
-        const hasDesign = hasCustomer && !!aiState.currentCustomerFinal.designNumber;
         actions.hidden = !(hasDraft || hasQuote);
         if (outlookBtn) outlookBtn.disabled = !hasDraft;
         if (copyBtn) copyBtn.disabled = !hasDraft;
         if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && hasCustomer);
-        // Submit to ShopWorks: needs full quote + customer + designNumber
-        if (submitBtn) {
-            submitBtn.disabled = !(hasQuote && hasCustomer && hasDesign) || !!aiState.shopWorksOrderId;
-            if (aiState.shopWorksOrderId) {
-                submitBtn.innerHTML = `<i class="fas fa-check"></i> Pushed ${escapeHtml(aiState.shopWorksOrderId)}`;
-            } else if (!hasDesign && hasCustomer) {
-                submitBtn.title = 'Bot needs a designNumber from the rep before push is allowed';
-            } else {
-                submitBtn.title = '';
-            }
-        }
-        if (aiState.savedQuoteID && saveBtn && !aiState.shopWorksOrderId) {
+        if (aiState.savedQuoteID && saveBtn) {
             saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
             saveBtn.disabled = false;
         }
@@ -888,168 +885,6 @@
             const btn = document.getElementById('aiSaveQuoteBtn');
             if (btn) btn.disabled = false;
         }
-    }
-
-    /**
-     * Submit to ShopWorks: build the same payload the order form sends
-     * (per pages/order-form/shopworks.js:buildBody) and POST it to
-     * /api/submit-order-form on this domain. The backend forwards to the
-     * proxy's /api/manageorders/orders/create — we don't touch ManageOrders
-     * credentials directly.
-     */
-    async function handleSubmitToShopWorks() {
-        if (aiState.shopWorksOrderId) {
-            showToast(`Already pushed — ${aiState.shopWorksOrderId}`);
-            return;
-        }
-        const priceQuote = aiState.currentPriceQuote;
-        const customer = aiState.currentCustomerFinal || {};
-        if (!priceQuote || !customer.designNumber) {
-            showToast('Need a complete quote with designNumber before push');
-            return;
-        }
-
-        const btn = document.getElementById('aiSubmitShopWorksBtn');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin"></i> Pushing…`;
-        }
-
-        try {
-            const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
-            if (items.length === 0) {
-                showToast('No line items to push');
-                if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fas fa-truck"></i> Submit to ShopWorks`; }
-                return;
-            }
-            const totals = priceQuote.totals || {};
-            const sharedLocationCode = priceQuote.locationCode || items[0].locationCode || '';
-            const sharedLocationLabel = priceQuote.locationLabel || items[0].locationLabel || sharedLocationCode;
-            const sharedTier = priceQuote.tier || items[0].tier || '';
-            const combinedQty = Number(priceQuote.combinedQuantity)
-                || items.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0);
-            const subtotal = Number(priceQuote.subtotal)
-                || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
-            const ltmTotal = items.reduce(
-                (s, it) => s + (Number(it.ltmPerUnit) || 0) * (Number(it.totalQuantity) || 0),
-                0,
-            );
-
-            const rows = items.map((it, i) => ({
-                id: `dtg-row-${i + 1}`,
-                style: it.style || it.styleNumber || '',
-                desc: it.description || `${it.style || it.styleNumber || ''} ${it.color || ''}`.trim(),
-                color: it.color || '',
-                sizes: it.sizes || {},
-                deco: 'dtg',
-                rowDecoConfig: { method: 'dtg', locationCode: it.locationCode || sharedLocationCode },
-                price: Number(it.finalUnitPrice) || 0,
-                manualMode: false,
-            }));
-
-            const byRow = {};
-            items.forEach((it, i) => {
-                byRow[`dtg-row-${i + 1}`] = {
-                    unitPriceBySize: (it.lineSizes || []).reduce((m, s) => {
-                        m[s.size] = s.finalUnit;
-                        return m;
-                    }, {}),
-                    rowSubtotal: Number(it.lineTotal) || 0,
-                    tier: it.tier || sharedTier,
-                };
-            });
-
-            // Build the order-form-shaped payload. The backend's
-            // /api/submit-order-form handler maps this to a ManageOrders
-            // payload via the same machinery the order form uses.
-            const body = {
-                info: {
-                    buyer: customer.name || '',
-                    buyerEmail: customer.email || '',
-                    companyName: customer.company || '',
-                    companyId: customer.customer_number || '',
-                    phone: customer.phone || '',
-                    designNumber: customer.designNumber || '',
-                    salesRep: customer.account_owner || 'Erik Mickelson',
-                    salesRepEmail: customer.email_salesrep || 'sales@nwcustomapparel.com',
-                    paymentTerms: customer.payment_terms || 'Net 10',
-                    taxable: customer.taxable !== false,
-                    quoteId: aiState.quoteID || '',
-                },
-                rows,
-                ship: customer.shipping?.same_as_billing
-                    ? { sameAsBilling: true, method: customer.shipping?.method || 'UPS Ground' }
-                    : (customer.shipping || { method: 'UPS Ground' }),
-                orderNotes: `DTG quote ${aiState.quoteID || ''} — pushed by AI bot (${items.length} line${items.length === 1 ? '' : 's'})`,
-                decoConfig: { method: 'dtg' },
-                breakdown: {
-                    supported: true,
-                    totalQty: combinedQty,
-                    tier: sharedTier,
-                    subtotal: Math.round(subtotal * 100) / 100,
-                    ltmTotal: Math.round(ltmTotal * 100) / 100,
-                    taxEstimate: Number(totals.taxEstimate) || 0,
-                    grandTotal: Number(totals.grandTotal) || Math.round(subtotal * 100) / 100,
-                    fees: [],
-                    errors: [],
-                    byRow,
-                },
-                methodNotesBlock: `DTG · ${sharedLocationLabel} · Tier ${sharedTier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${combinedQty} combined pieces`,
-                designNumbers: customer.designNumber ? [customer.designNumber] : [],
-                addOns: [],
-            };
-
-            const r = await fetch(SUBMIT_ORDER_FORM_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-            const json = await r.json().catch(() => ({}));
-            if (!r.ok || !json.success) {
-                throw new Error(json.error || json.detail || `HTTP ${r.status}`);
-            }
-            const orderId = json.shopWorksId || json.extOrderId || 'pushed';
-            aiState.shopWorksOrderId = orderId;
-            renderShopWorksSuccess(orderId, json.mode);
-            updateActionsAvailability();
-            showToast(`Pushed to ShopWorks — order ${orderId}`);
-        } catch (err) {
-            console.error('[dtg-ai] ShopWorks push failed:', err);
-            renderShopWorksError(err.message || String(err));
-            const btn = document.getElementById('aiSubmitShopWorksBtn');
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="fas fa-truck-fast"></i> Submit to ShopWorks`;
-            }
-        }
-    }
-
-    function renderShopWorksSuccess(orderId, mode) {
-        const container = document.getElementById('aiChatMessages');
-        const msg = document.createElement('div');
-        msg.className = 'chat-message assistant';
-        const card = document.createElement('div');
-        card.className = 'shopworks-success-card';
-        card.innerHTML = `
-            <div class="sws-label">✓ Pushed to ShopWorks</div>
-            <div class="sws-order-id">${escapeHtml(orderId)}</div>
-            ${mode === 'mock' ? '<div style="font-size:11px;margin-top:4px;color:#78350f;">(Mock mode — backend unreachable, payload stashed in localStorage)</div>' : ''}
-        `;
-        msg.appendChild(card);
-        container.appendChild(msg);
-        scrollChatBottom();
-    }
-
-    function renderShopWorksError(message) {
-        const container = document.getElementById('aiChatMessages');
-        const msg = document.createElement('div');
-        msg.className = 'chat-message assistant';
-        const card = document.createElement('div');
-        card.className = 'shopworks-error-card';
-        card.innerHTML = `<strong>ShopWorks push failed:</strong> ${escapeHtml(message)}`;
-        msg.appendChild(card);
-        container.appendChild(msg);
-        scrollChatBottom();
     }
 
     let toastTimer = null;

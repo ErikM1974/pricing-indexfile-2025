@@ -11,7 +11,8 @@
 
     <!-- Shared chat/page CSS (sticker is canonical) + DTG overrides -->
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
-    <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.18.1">
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.18.2">
+    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.18.2">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -119,28 +120,11 @@
             </div>
         </details>
 
-        <!-- ========== Manual quote builder accordion (iframes the legacy form) ========== -->
-        <details class="pricing-accordion">
-            <summary class="pricing-accordion-toggle">
-                <span class="toggle-label">
-                    <i class="fas fa-sliders"></i>
-                    Manual quote builder (power user)
-                </span>
-                <span class="toggle-meta">Old form — same as before, NWCA green theme</span>
-                <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
-            </summary>
-            <div class="pricing-accordion-body" style="padding:0;">
-                <iframe
-                    src="/quote-builders/dtg-quote-builder-legacy.html"
-                    title="DTG manual quote builder"
-                    style="width:100%; min-height:1200px; border:0; display:block;"
-                    loading="lazy">
-                </iframe>
-                <div class="banner-formula" style="margin:12px 16px;">
-                    <strong>Power-user mode:</strong> the manual quote builder is the same one you've used before — just embedded here. Use it when you need fine-grained control (multiple products in one quote, custom add-ons, etc.). For most quotes, the AI chat is faster.
-                </div>
-            </div>
-        </details>
+        <!-- ========== Inline DTG order form (chat fills, rep edits, one Submit) ========== -->
+        <section aria-labelledby="dtgFormHead">
+            <h2 id="dtgFormHead" class="visually-hidden">DTG Order Form</h2>
+            <div id="dtgInlineFormMount"></div>
+        </section>
 
         <!-- ========== Compact CTA ========== -->
         <section class="cta-compact">
@@ -191,9 +175,6 @@
             <button type="button" class="ai-action-btn" id="aiSaveQuoteBtn" disabled>
                 <i class="fas fa-link"></i> Save &amp; share link
             </button>
-            <button type="button" class="ai-action-btn submit-shopworks-btn" id="aiSubmitShopWorksBtn" disabled>
-                <i class="fas fa-truck-fast"></i> Submit to ShopWorks
-            </button>
         </div>
         <form class="ai-chat-input" id="aiChatForm">
             <textarea id="aiChatTextarea" rows="3" placeholder="Type your reply… (e.g. 'PC54 navy, Left Chest, 36 pieces' or 'Recommend a t-shirt for 24 pieces')" autocomplete="off"></textarea>
@@ -214,6 +195,11 @@
 
     <!-- ========== Scripts ========== -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.18.1"></script>
+    <!-- DTGPricingService — used by the inline form's live price preview AND /pricing/dtg (single source of truth on the frontend) -->
+    <script src="/shared_components/js/dtg-pricing-service.js?v=2026.05.18.2"></script>
+    <!-- Inline DTG order form — bot fills it via window.DTGInlineForm.fillFromQuote() -->
+    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.18.2"></script>
+    <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
+    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.18.2"></script>
 </body>
 </html>
