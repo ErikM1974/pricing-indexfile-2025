@@ -1,3 +1,8 @@
+## v2026.05.18.7 (2026.05.18)
+
+- LESSONS_LEARNED: document DTG LTM Caspio-driven refactor
+- Deploy v2026.05.18.7: DTG line items - N/A cells + inventory badges + description tooltip
+
 ## v2026.05.18.6 (2026.05.18)
 
 - Deploy v2026.05.18.6: DTG LTM Caspio-driven (4 frontend files)
