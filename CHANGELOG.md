@@ -1,3 +1,7 @@
+## v2026.05.18.8 (2026.05.18)
+
+- Deploy v2026.05.18.8: stock-confirm modal at Submit time
+
 ## v2026.05.18.7 (2026.05.18)
 
 - LESSONS_LEARNED: document DTG LTM Caspio-driven refactor
