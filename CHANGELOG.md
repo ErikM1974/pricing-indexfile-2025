@@ -1,3 +1,7 @@
+## v2026.05.18.11 (2026.05.18)
+
+- Deploy v2026.05.18.11: DTG chat — fuzzy color match + adaptive swatch card + AI-touched indicator
+
 ## v2026.05.18.10 (2026.05.18)
 
 - Deploy v2026.05.18.10: resetForm preserves rep, resets dirty + shipping
