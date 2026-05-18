@@ -347,14 +347,16 @@ class DTGPricingService {
         
         console.log('[DTGPricingService] Using tier:', tier.TierLabel);
         
-        // Calculate prices for each location
+        // Calculate prices for each location (passing all tiers so the LTM
+        // print-cost fallback can find the lowest non-LTM tier label).
         this.locations.forEach(location => {
             allLocationPrices[location.code] = this.calculateLocationPrices(
                 location.code,
                 tier,
                 costs,
                 sizes,
-                upcharges
+                upcharges,
+                tiers
             );
         });
         
@@ -365,18 +367,34 @@ class DTGPricingService {
      * Calculate prices for a specific location
      * @private
      */
-    calculateLocationPrices(locationCode, tier, costs, sizes, upcharges) {
+    calculateLocationPrices(locationCode, tier, costs, sizes, upcharges, allTiers) {
         const prices = {};
-        
+
         // Handle combined locations (e.g., 'LC_FB')
         const locationCodes = locationCode.split('_');
-        
+
+        // Resolve which TierLabel to look up in DTG_Costs. Default: the
+        // tier's own label. If the LTM tier (LTM_Fee>0) has no DTG_Costs
+        // rows, fall back to the lowest non-LTM tier's costs (preserves
+        // the historical "LTM uses 24-47 print cost" pattern).
+        let costsTierLabel = tier.TierLabel;
+        const isLTMTier = parseFloat(tier.LTM_Fee || 0) > 0;
+        if (isLTMTier && Array.isArray(allTiers)) {
+            const hasCostsForTier = costs.some(c => c.TierLabel === tier.TierLabel);
+            if (!hasCostsForTier) {
+                const nonLtm = allTiers
+                    .filter(t => parseFloat(t.LTM_Fee || 0) === 0)
+                    .sort((a, b) => Number(a.MinQuantity) - Number(b.MinQuantity));
+                if (nonLtm.length) costsTierLabel = nonLtm[0].TierLabel;
+            }
+        }
+
         // Get print cost for this location and tier
         let totalPrintCost = 0;
         locationCodes.forEach(code => {
-            const costEntry = costs.find(c => 
-                c.PrintLocationCode === code && 
-                c.TierLabel === tier.TierLabel
+            const costEntry = costs.find(c =>
+                c.PrintLocationCode === code &&
+                c.TierLabel === costsTierLabel
             );
             if (costEntry) {
                 totalPrintCost += parseFloat(costEntry.PrintCost);
@@ -430,11 +448,19 @@ class DTGPricingService {
     /**
      * Calculate per-tier, per-size base prices for a given print location.
      * Handles combined locations (e.g. "LC_FB" → splits by "_" and sums costs).
-     * Does NOT include LTM distribution — consumers add (50 / userSelectedQty) themselves.
+     * Does NOT include LTM distribution — consumers add `Math.floor(tier.LTM_Fee / qty * 100) / 100` themselves.
+     *
+     * Tiers come straight from Caspio's Pricing_Tiers table (filtered by
+     * DecorationMethod='DTG'). The LTM tier (1-23) is a real row in Caspio
+     * with LTM_Fee > 0; this method no longer synthesizes it client-side.
+     *
+     * If DTG_Costs has no print-cost rows for the LTM tier (current production
+     * reality), we fall back to the lowest non-LTM tier's print costs —
+     * preserves the historical "LTM uses 24-47 print cost + LTM fee" pattern.
      *
      * @param {Object} data - From fetchPricingData(): { tiers, costs, sizes, upcharges }
      * @param {string} locationCode - e.g. 'LC', 'FF', 'LC_FB'
-     * @returns {Array<{ label, isLTM, basePrices: {size: price} }>}
+     * @returns {Array<{ label, isLTM, ltmFee, basePrices: {size: price} }>}
      */
     calculateAllTierPricesForLocation(data, locationCode) {
         const { tiers, costs, sizes, upcharges } = data;
@@ -442,16 +468,25 @@ class DTGPricingService {
         const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
         const locationCodes = (locationCode || 'LC').split('_');
 
-        // Build synthetic '1-23' LTM tier from '24-47' data
-        const tier2447 = tiers.find(t => t.TierLabel === '24-47');
-        const allTiers = [];
-        if (tier2447) {
-            allTiers.push({ ...tier2447, TierLabel: '1-23', displayLabel: '1-23', isLTM: true });
-        }
-        tiers.forEach(t => allTiers.push({ ...t, displayLabel: t.TierLabel, isLTM: false }));
+        // Sort tiers by MinQuantity so the LTM tier (1-23) comes first.
+        const sortedTiers = [...tiers].sort(
+            (a, b) => parseInt(a.MinQuantity, 10) - parseInt(b.MinQuantity, 10)
+        );
 
-        return allTiers.map(tier => {
-            const lookupTier = tier.isLTM ? '24-47' : tier.TierLabel;
+        // Lowest non-LTM tier label — used as print-cost fallback for LTM rows
+        // that DTG_Costs doesn't have entries for.
+        const lowestNonLtmTierLabel = (sortedTiers.find(t => parseFloat(t.LTM_Fee || 0) === 0) || sortedTiers[0] || {}).TierLabel;
+
+        return sortedTiers.map(tier => {
+            const isLTM = parseFloat(tier.LTM_Fee || 0) > 0;
+            // Resolve which TierLabel to look up in DTG_Costs. If the LTM tier
+            // has its own print-cost rows, use them; otherwise fall back to the
+            // lowest non-LTM tier (preserves the historical pattern).
+            let lookupTier = tier.TierLabel;
+            if (isLTM) {
+                const hasCosts = costs.some(c => c.TierLabel === tier.TierLabel);
+                if (!hasCosts) lookupTier = lowestNonLtmTierLabel;
+            }
             let totalPrintCost = 0;
             locationCodes.forEach(code => {
                 const costEntry = costs.find(c =>
@@ -466,71 +501,39 @@ class DTGPricingService {
             sizeLabels.forEach(size => {
                 basePrices[size] = roundedBase + parseFloat(upcharges[size] || 0);
             });
-            return { label: tier.displayLabel, isLTM: tier.isLTM, basePrices };
+            return {
+                label: tier.TierLabel,
+                isLTM,
+                ltmFee: parseFloat(tier.LTM_Fee || 0),
+                basePrices
+            };
         });
     }
 
     /**
-     * Get the appropriate tier for a quantity
+     * Get the appropriate tier for a quantity.
+     * Caspio's Pricing_Tiers table is the source of truth — including the
+     * 1-23 LTM tier. Just `find()` by range, no special-case branches.
      * @private
      */
     getTierForQuantity(tiers, quantity) {
         // Defensive null checking - prevent crash if tiers is undefined
         if (!tiers || !Array.isArray(tiers) || tiers.length === 0) {
             console.error('[DTGPricingService] ERROR: Invalid tiers parameter:', tiers);
-            // Return a safe fallback tier
+            // Return a safe fallback tier (no LTM)
             return {
                 TierLabel: '24-47',
                 MinQuantity: 1,
                 MaxQuantity: 47,
                 MarginDenominator: 0.57, // 2026 margin (43%)
+                LTM_Fee: 0,
                 Note: 'Fallback tier - tiers parameter was invalid'
             };
         }
 
-        // Debug logging for specific problematic cases
-        if ((quantity === 166 || quantity < 24) && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] Finding tier for quantity ' + quantity + ':', {
-                quantity: quantity,
-                availableTiers: tiers.map(t => ({
-                    label: t.TierLabel,
-                    min: t.MinQuantity,
-                    max: t.MaxQuantity
-                }))
-            });
-        }
-
-        // For quantities under 24, use the 24-47 tier (with LTM fee applied elsewhere)
-        if (quantity < 24) {
-            const tier2447 = tiers.find(t => t.TierLabel === '24-47');
-            if (tier2447) {
-                // Return a modified tier that includes the lower quantities
-                return {
-                    ...tier2447,
-                    MinQuantity: 1,  // Allow quantities from 1
-                    TierLabel: '24-47',
-                    Note: 'Using 24-47 tier for quantities under 24 with LTM fee'
-                };
-            }
-            // Fallback if somehow 24-47 tier doesn't exist
-            return {
-                TierLabel: '24-47',
-                MinQuantity: 1,
-                MaxQuantity: 47,
-                MarginDenominator: 0.57, // 2026 margin (43%)
-                Note: 'Fallback tier for quantities under 24'
-            };
-        }
-        
-        const tier = tiers.find(t => 
-            quantity >= t.MinQuantity && quantity <= t.MaxQuantity
+        return tiers.find(t =>
+            quantity >= parseInt(t.MinQuantity, 10) && quantity <= parseInt(t.MaxQuantity, 10)
         );
-        
-        if (quantity === 166 && window.DTG_PERFORMANCE?.debug) {
-            console.log('[DTGPricingService DEBUG] Selected tier for 166:', tier?.TierLabel);
-        }
-        
-        return tier;
     }
 
 

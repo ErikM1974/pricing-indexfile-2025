@@ -2577,17 +2577,25 @@
             }
         }
 
+        // Read the LTM fee from the Caspio Pricing_Tiers row for the LTM tier.
+        // Falls back to 50 only if the bundle didn't load yet (defensive).
+        function getLTMFeeFromBundle() {
+            const tiers = (pricingData && pricingData.pricing && pricingData.pricing.tiers) || [];
+            const ltmTier = tiers.find(t => Number(t.LTM_Fee || 0) > 0);
+            return ltmTier ? Number(ltmTier.LTM_Fee) : 50.00;
+        }
+
         // Update the LTM fee calculation display
         function updateLTMFeeDisplay(quantity) {
             const feeCalc = document.getElementById('dtg-ltm-fee-calc');
             if (!feeCalc) return;
 
-            const ltmFee = 50.00;
-            const feePerShirt = ltmFee / quantity;
+            const ltmFee = getLTMFeeFromBundle();
+            const feePerShirt = Math.floor((ltmFee / quantity) * 100) / 100;
 
             feeCalc.innerHTML = `$${ltmFee.toFixed(2)} ÷ ${quantity} = <span style="color: #4cb354;">$${feePerShirt.toFixed(2)}/shirt</span>`;
 
-            console.log(`💰 LTM fee updated: $${feePerShirt.toFixed(2)}/shirt for ${quantity} pieces`);
+            console.log(`💰 LTM fee updated: $${feePerShirt.toFixed(2)}/shirt for ${quantity} pieces (Caspio LTM_Fee = $${ltmFee})`);
         }
 
         // Handle LTM quantity input changes (real-time)
@@ -2667,20 +2675,21 @@
                     priceDetailElement.textContent = `${loc1Name} + ${loc2Name} • ${displayTier} pieces`;
                 }
 
-                // Add LTM fee to price if tier is under 24 pieces
+                // Add LTM fee to price if tier is under 24 pieces.
+                // LTM fee value comes from Caspio's Pricing_Tiers row for
+                // the LTM tier (today: 1-23 row, LTM_Fee = 50). No hardcoding.
                 if (toggleState.selectedTier === '1-23') {
-                    // Get the quantity from the input field
                     const ltmQuantityInput = document.getElementById('dtg-ltm-quantity-input');
                     const quantity = ltmQuantityInput ? parseInt(ltmQuantityInput.value) || 12 : 12;
 
-                    // Calculate LTM fee per shirt
-                    const ltmFee = 50.00;
-                    const ltmFeePerShirt = ltmFee / quantity;
+                    const ltmFee = getLTMFeeFromBundle();
+                    // Math.floor((fee/qty)*100)/100 — DTG LTM convention,
+                    // floor (not round) to prevent overcharge per MEMORY.md.
+                    const ltmFeePerShirt = Math.floor((ltmFee / quantity) * 100) / 100;
 
-                    // Add LTM fee to the final price
                     finalPrice += ltmFeePerShirt;
 
-                    console.log(`💰 LTM fee per shirt: $${ltmFeePerShirt.toFixed(2)} (${quantity} pieces)`);
+                    console.log(`💰 LTM fee per shirt: $${ltmFeePerShirt.toFixed(2)} (${quantity} pieces, Caspio LTM_Fee = $${ltmFee})`);
                 }
 
                 // Update price display

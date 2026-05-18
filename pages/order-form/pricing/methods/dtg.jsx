@@ -120,14 +120,32 @@
     return codes.length > 0 ? codes.join('_') : null;
   }
 
-  // DTG tiers: 24-47, 48-71, 72+. Anything under 24 is LTM territory and
-  // distributes the $50 fee per piece via floor((50/qty)*100)/100.
+  // DTG tier label (1-23 / 24-47 / 48-71 / 72+) for display in add-on picker
+  // and similar UI surfaces. This is a thin label-only helper — the actual
+  // tier ROW (including LTM_Fee, MarginDenominator) is resolved from the
+  // bundle via findTierRow() below, which reads Caspio's Pricing_Tiers.
   function tierForQty(qty) {
     if (qty <= 0) return null;
     if (qty < 24) return '1-23';
     if (qty <= 47) return '24-47';
     if (qty <= 71) return '48-71';
     return '72+';
+  }
+
+  // DTG tiers come from Caspio's Pricing_Tiers table (including the 1-23
+  // LTM row with LTM_Fee=50). Find the row whose [MinQuantity, MaxQuantity]
+  // range contains the given qty. Returns the full tier row (incl. LTM_Fee).
+  function findTierRow(tiers, qty) {
+    if (!Array.isArray(tiers) || tiers.length === 0 || qty <= 0) return null;
+    const match = tiers.find(t =>
+      qty >= Number(t.MinQuantity) && qty <= Number(t.MaxQuantity)
+    );
+    if (match) return match;
+    // Above the highest range — cap at the largest tier.
+    const sorted = [...tiers].sort(
+      (a, b) => Number(b.MaxQuantity) - Number(a.MaxQuantity)
+    );
+    return sorted[0] || null;
   }
 
   async function fetchBundleForRow(row, formCtx) {
@@ -143,28 +161,41 @@
     return await window.OrderFormPricing.getBundle('dtg', bundleKey, fetcher);
   }
 
-  // Resolve a single combo's per-tier per-size price by walking the bundle's
-  // costs[] (PrintLocationCode -> per-tier PrintCost) and the sizes[] array.
-  // For combos like 'LC_FB', sum print costs across the codes.
-  function priceForLocationCombo(bundle, combo, tier, totalQty) {
+  // Resolve a single combo's per-size price by walking the bundle's costs[]
+  // and sizes[] arrays. For combos like 'LC_FB', sum print costs across codes.
+  // Tier (including LTM_Fee) is resolved from the bundle's Caspio Pricing_Tiers
+  // rows. If the LTM tier has no DTG_Costs entries, print cost falls back to
+  // the lowest non-LTM tier's costs (historical pattern, no data change needed).
+  function priceForLocationCombo(bundle, combo, totalQty) {
     if (!bundle || !combo) return null;
     const codes = String(combo).split('_');
-    const tiers   = bundle.tiers || [];
-    const tierRow = tiers.find(t => {
-      const min = Number(t.MinQuantity) || 0;
-      const max = Number(t.MaxQuantity) || Infinity;
-      // For LTM (qty<24), use the lowest paid tier (24-47) as the basis.
-      const effectiveQty = totalQty < 24 ? Math.max(totalQty, min) : totalQty;
-      return effectiveQty >= min && effectiveQty <= max;
-    }) || tiers[0];
+    const tiers = bundle.tiers || [];
+    const tierRow = findTierRow(tiers, totalQty);
     if (!tierRow) return null;
+
     const marginDenom = Number(tierRow.MarginDenominator) || 0.6;
-    const tierLabel = tierRow.TierLabel;
+    const ltmFee = Number(tierRow.LTM_Fee || 0);
+    const isLTM = ltmFee > 0;
+
+    // Resolve the TierLabel we'll use to look up DTG_Costs rows. Default:
+    // the tier's own label. If LTM tier has no rows in DTG_Costs, fall back
+    // to the lowest non-LTM tier (preserves the historical "LTM uses 24-47
+    // print cost + LTM fee" pattern).
+    let costsTierLabel = tierRow.TierLabel;
+    if (isLTM) {
+      const hasCosts = (bundle.costs || []).some(c => c.TierLabel === tierRow.TierLabel);
+      if (!hasCosts) {
+        const nonLtm = tiers
+          .filter(t => Number(t.LTM_Fee || 0) === 0)
+          .sort((a, b) => Number(a.MinQuantity) - Number(b.MinQuantity));
+        if (nonLtm.length) costsTierLabel = nonLtm[0].TierLabel;
+      }
+    }
 
     // Print cost: sum across all codes in the combo
     let totalPrintCost = 0;
     codes.forEach(code => {
-      const costEntry = (bundle.costs || []).find(c => c.PrintLocationCode === code && c.TierLabel === tierLabel);
+      const costEntry = (bundle.costs || []).find(c => c.PrintLocationCode === code && c.TierLabel === costsTierLabel);
       if (costEntry) totalPrintCost += Number(costEntry.PrintCost) || 0;
     });
 
@@ -184,7 +215,7 @@
       const up = Number(upcharges[s.size]) || 0;
       out[s.size] = baseRounded + up;
     });
-    return { unitPriceBySize: out, tierLabel };
+    return { unitPriceBySize: out, tierLabel: tierRow.TierLabel, ltmFee };
   }
 
   function priceRow({ row, formCtx, bundle, locationCombo }) {
@@ -202,12 +233,15 @@
       out.error = 'Drag a DTG location from the rail (LC / FF / JF / FB / JB)';
       return out;
     }
-    const tier = tierForQty(totalQty);
-    const priced = priceForLocationCombo(bundle, combo, tier, totalQty);
+    const priced = priceForLocationCombo(bundle, combo, totalQty);
     if (!priced) { out.error = `No DTG pricing for combo ${combo}`; return out; }
+    const tier = priced.tierLabel;
 
-    // LTM distribution — DTG convention: floor((50/qty)*100)/100 (prevents overcharging)
-    const ltmPP = (totalQty < 24 && totalQty > 0) ? Math.floor((50 / totalQty) * 100) / 100 : 0;
+    // LTM distribution — driven by Caspio's Pricing_Tiers.LTM_Fee column.
+    // Currently the 1-23 tier has LTM_Fee=50; all other tiers have 0.
+    // Math.floor((fee/qty)*100)/100 prevents overcharging per MEMORY.md.
+    const ltmFee = Number(priced.ltmFee || 0);
+    const ltmPP = (ltmFee > 0 && totalQty > 0) ? Math.floor((ltmFee / totalQty) * 100) / 100 : 0;
 
     Object.keys(row.sizes || {}).forEach(sizeKey => {
       const qty = Number(row.sizes[sizeKey]) || 0;
@@ -258,7 +292,6 @@
     const out = S.emptyOrderBreakdown();
     out.totalQty = S.totalQtyAcrossRows(rows);
     if (!out.totalQty) return out;
-    out.tier = tierForQty(out.totalQty);
 
     // Phase 5d — combo resolved from CONFIGURATOR addOns once per aggregate
     // run, then passed to priceRow. Falls back to legacy decoConfig when no
@@ -280,6 +313,18 @@
       catch (err) { return { row: r, error: err?.message || String(err) }; }
     }));
 
+    // Resolve the aggregate tier + LTM fee from the FIRST successfully-fetched
+    // bundle's Pricing_Tiers (tier definitions are shared across DTG styles).
+    let resolvedTierRow = null;
+    for (const f of fetched) {
+      if (f.bundle && Array.isArray(f.bundle.tiers) && f.bundle.tiers.length) {
+        resolvedTierRow = findTierRow(f.bundle.tiers, out.totalQty);
+        if (resolvedTierRow) break;
+      }
+    }
+    out.tier = resolvedTierRow?.TierLabel || null;
+    const aggregateLtmFee = Number(resolvedTierRow?.LTM_Fee || 0);
+
     fetched.forEach(({ row, bundle, error }) => {
       if (error || !bundle) {
         out.errors.push({ rowId: row.id, message: error || 'No bundle' });
@@ -291,7 +336,10 @@
       out.subtotal += rb.rowSubtotal;
     });
 
-    if (out.tier === '1-23') out.ltmTotal = 50;
+    // LTM total = the fee from the resolved tier row (typically $50 from the
+    // 1-23 row; $0 from other tiers). Distributed into per-piece pricing —
+    // this field is reported separately for the breakdown display.
+    if (aggregateLtmFee > 0) out.ltmTotal = aggregateLtmFee;
     out.grandTotal = out.subtotal;
     return out;
   }
@@ -309,10 +357,11 @@
     }
     const label = COMBOS.find(c => c.value === combo)?.label
       || combo.split('_').map(c => COMBOS.find(x => x.value === c)?.label || c).join(' + ');
+    const ltmFee = Number(breakdown?.ltmTotal || 0);
     return [
       `DTG · Location: ${combo} (${label})`,
       `Tier ${breakdown?.tier || '?'} · ${breakdown?.totalQty || 0} pcs`,
-      breakdown?.tier === '1-23' ? `LTM: $50 distributed at $${(50/breakdown.totalQty).toFixed(2)}/pc (built into per-piece pricing)` : '',
+      ltmFee > 0 ? `LTM: $${ltmFee} distributed at $${(ltmFee/breakdown.totalQty).toFixed(2)}/pc (built into per-piece pricing)` : '',
     ].filter(Boolean).join('\n');
   }
 

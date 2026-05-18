@@ -18,9 +18,9 @@
  *     submitToShopWorks(),                       // also called by the visible button
  *   };
  *
- * Pricing math is the single canonical formula:
- *   garmentCost / marginDenom + sum(printCosts) → Math.ceil(*2)/2 → + size upcharges
- *   LTM (combined qty < 24): floor((50/qty)*100)/100 per piece.
+ * Pricing math is the single canonical formula (driven by Caspio Pricing_Tiers):
+ *   garmentCost / tier.MarginDenominator + sum(printCosts) → Math.ceil(*2)/2 → + size upcharges
+ *   LTM (resolved tier has LTM_Fee > 0): floor((tier.LTM_Fee / qty) * 100) / 100 per piece.
  * Backed by window.DTGPricingService for the live preview, and by
  * POST /api/dtg/quote-pricing on submit so the wire-side price matches.
  */
@@ -434,28 +434,49 @@
             updateSubmitEnabled();
             return;
         }
-        const tier = tierForQty(cq);
-        const isLtm = cq < 24;
-        const ltmPP = isLtm ? Math.floor((50 / cq) * 100) / 100 : 0;
+        // Resolve tier from the FIRST row's cached bundle so we get the
+        // Caspio Pricing_Tiers row (incl. real LTM_Fee). Falls back to the
+        // standard label buckets if no bundle is cached yet.
+        const firstRowWithBundle = state.rows.find((r) => r.style && _bundleCache.has(r.style.toUpperCase()));
+        const tierRow = firstRowWithBundle
+            ? findTierRowInBundle(_bundleCache.get(firstRowWithBundle.style.toUpperCase()), cq)
+            : null;
+        const tier = tierRow ? tierRow.TierLabel : tierLabelFromQty(cq);
+        const ltmFee = Number(tierRow && tierRow.LTM_Fee) || 0;
+        const isLtm = ltmFee > 0;
+        const ltmPP = isLtm ? Math.floor((ltmFee / cq) * 100) / 100 : 0;
         const subtotal = state.rows.reduce((s, r) => s + (Number(r._lineTotal) || 0), 0);
+        const tierDisplay = isLtm ? `${tier} (LTM)` : tier;
 
         el.innerHTML = `
             <div class="dps-label">Live DTG quote · ${effectiveLocationLabel()}</div>
             <div class="dps-grid">
-                <div><span class="dps-tier-pill${isLtm ? ' ltm' : ''}">${escapeHtml(tier)}</span></div>
+                <div><span class="dps-tier-pill${isLtm ? ' ltm' : ''}">${escapeHtml(tierDisplay)}</span></div>
                 <div>${cq} combined pieces${isLtm ? ` · LTM +$${ltmPP.toFixed(2)}/pc` : ''}</div>
                 <div class="dps-total">$${fmtMoney(subtotal)}</div>
             </div>
-            ${isLtm ? `<div class="dps-note">Bump combined qty to 24 and the $50 LTM fee disappears.</div>` : ''}
+            ${isLtm ? `<div class="dps-note">Bump combined qty above this tier and the $${ltmFee} LTM fee disappears.</div>` : ''}
         `;
         updateSubmitEnabled();
     }
 
-    function tierForQty(qty) {
-        if (qty < 24) return '1-23 (LTM)';
+    // Display-only tier-label buckets — used when no bundle has been cached
+    // yet (initial render before the first style search resolves). Matches
+    // the Caspio Pricing_Tiers row labels (1-23, 24-47, 48-71, 72+).
+    function tierLabelFromQty(qty) {
+        if (qty < 24) return '1-23';
         if (qty <= 47) return '24-47';
         if (qty <= 71) return '48-71';
         return '72+';
+    }
+
+    // Find the tier ROW in a bundle's Caspio-driven tiers list.
+    function findTierRowInBundle(bundle, qty) {
+        const tiers = (bundle && bundle.tiers) || [];
+        if (!tiers.length || qty <= 0) return null;
+        return tiers.find((t) =>
+            qty >= Number(t.MinQuantity) && qty <= Number(t.MaxQuantity)
+        ) || null;
     }
 
     function updateSubmitEnabled() {
@@ -827,19 +848,23 @@
             return;
         }
         const svc = new window.DTGPricingService();
-        const isLtm = cq < 24;
-        const ltmPP = isLtm ? Math.floor((50 / cq) * 100) / 100 : 0;
 
         for (const row of state.rows) {
             if (!row.style || !row.color) { row._perPiece = null; row._lineTotal = 0; continue; }
             try {
                 const bundle = await fetchBundle(row.style);
                 if (!bundle) { row._perPiece = null; row._lineTotal = 0; continue; }
+                // Resolve the tier ROW from Caspio (incl. LTM_Fee). The
+                // row's LTM_Fee column drives per-piece LTM dynamically —
+                // no more hardcoded $50.
+                const tier = svc.getTierForQuantity(bundle.tiers, cq);
+                if (!tier) { row._perPiece = null; row._lineTotal = 0; continue; }
+                const ltmFee = Number(tier.LTM_Fee) || 0;
+                const ltmPP = ltmFee > 0 ? Math.floor((ltmFee / cq) * 100) / 100 : 0;
+
                 const allPrices = svc.calculateAllLocationPrices(bundle, cq);
                 if (!allPrices || !allPrices[code]) { row._perPiece = null; row._lineTotal = 0; continue; }
                 const locPrices = allPrices[code];
-                // pick a tier label for lookup
-                const tier = svc.getTierForQuantity(bundle.tiers, cq);
                 let lineTotal = 0;
                 let count = 0;
                 let aggregate = 0;
