@@ -335,6 +335,60 @@
         }
     }
 
+    /**
+     * Find the best matching color in a SanMar color list for a free-form query.
+     *
+     * The bot frequently emits rep-shorthand like "black" / "navy" / "athl heather"
+     * but SanMar's canonical COLOR_NAME is "Jet Black" / "True Navy" / "Athletic
+     * Heather". An exact-match lookup leaves `catalogColor` empty, which breaks
+     * the ShopWorks push (and the inventory badge, and the swatch image).
+     *
+     * Strategy (first hit wins):
+     *   1. Exact case-insensitive match.
+     *   2. Whole-word match (\bblack\b) → prefer shortest canonical (the "plain" one).
+     *   3. Substring contains (q in name) → prefer shortest.
+     *   4. Reverse contains (name in q) → prefer longest (most specific).
+     *   5. null — leave it, the rep can click a swatch.
+     */
+    function fuzzyMatchColor(colorsList, query) {
+        if (!Array.isArray(colorsList) || !colorsList.length) return null;
+        const q = String(query || '').trim().toLowerCase();
+        if (!q) return null;
+        const norm = (c) => String(c.COLOR_NAME || c.colorName || '').trim();
+
+        // 1. exact match (case-insensitive)
+        const exact = colorsList.find((c) => norm(c).toLowerCase() === q);
+        if (exact) return exact;
+
+        // 2. whole-word match — "black" finds "Jet Black" but not "Blackish Heather"
+        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const wordRe = new RegExp('\\b' + escaped + '\\b', 'i');
+        const wordHits = colorsList.filter((c) => wordRe.test(norm(c)));
+        if (wordHits.length) {
+            wordHits.sort((a, b) => norm(a).length - norm(b).length);
+            return wordHits[0];
+        }
+
+        // 3. substring contains — "athl heather" finds "Athletic Heather"
+        const containsHits = colorsList.filter((c) => norm(c).toLowerCase().includes(q));
+        if (containsHits.length) {
+            containsHits.sort((a, b) => norm(a).length - norm(b).length);
+            return containsHits[0];
+        }
+
+        // 4. reverse contains — "navy blue" finds "Navy"
+        const reverseHits = colorsList.filter((c) => {
+            const n = norm(c).toLowerCase();
+            return n && q.includes(n);
+        });
+        if (reverseHits.length) {
+            reverseHits.sort((a, b) => norm(b).length - norm(a).length);
+            return reverseHits[0];
+        }
+
+        return null;
+    }
+
     async function fetchProductColors(style) {
         const sn = String(style || '').trim().toUpperCase();
         if (!sn) return { colors: [], productTitle: '' };
@@ -634,8 +688,12 @@
             const styleTitle = row.desc
                 ? `${row.style || ''} — ${row.desc}`
                 : (row.style || '');
+            // _aiTouched: timestamp set when previewStyle filled the row from a
+            // chat tool. Render a small "AI is filling…" pulse for 2s then fade.
+            const aiTouchedAgeMs = row._aiTouched ? Date.now() - row._aiTouched : 999999;
+            const aiTouchClass = aiTouchedAgeMs < 2000 ? ' dtg-row-ai-touched' : '';
             return `
-                <tr data-row-id="${escapeHtml(row.id)}">
+                <tr data-row-id="${escapeHtml(row.id)}" class="${aiTouchClass.trim()}">
                     <td class="dtg-row-style" title="${escapeHtml(styleTitle)}">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="style">
                             <input type="text" value="${escapeHtml(row.style)}" placeholder="PC54" autocomplete="off">
@@ -1688,12 +1746,17 @@
                         ]);
                         row.colorsAvailable = info.colors || [];
                         if (!row.desc && info.productTitle) row.desc = info.productTitle;
-                        const matchColor = (info.colors || []).find((c) =>
-                            (c.COLOR_NAME || c.colorName || '').toLowerCase() === (row.color || '').toLowerCase()
-                        );
+                        // Fuzzy match — bot often emits rep shorthand ("black") but
+                        // canonical is "Jet Black". Exact-match would leave catalogColor
+                        // empty → broken inventory check + bad ShopWorks push.
+                        const matchColor = fuzzyMatchColor(info.colors || [], row.color);
                         if (matchColor) {
                             row.catalogColor = matchColor.CATALOG_COLOR || matchColor.catalogColor || '';
                             row.colorSwatch = matchColor.COLOR_SQUARE_IMAGE || '';
+                            // Promote canonical name so the row displays "Jet Black"
+                            // even if the bot sent "black".
+                            const canonical = matchColor.COLOR_NAME || matchColor.colorName || '';
+                            if (canonical) row.color = canonical;
                         }
                         if (bundle && Array.isArray(bundle.sizes)) {
                             row.availableSizes = bundle.sizes
@@ -1878,6 +1941,59 @@
         init();
     }
 
+    // ----- Real-time preview helpers (chat-driven, silent) ----------------
+    // These let the chat controller fill the form INCREMENTALLY as the bot
+    // does its work — before the final PRICE_QUOTE block arrives. They do
+    // NOT mark dirty (so the C9 race guard doesn't fire) and do NOT save
+    // to sessionStorage (preview state isn't yet authoritative).
+    //
+    // The "AI is filling…" indicator class `.dtg-row-ai-touched` is added
+    // to the touched row and faded out after the next renderTable() call.
+
+    // Find the row to preview into. Returns the first empty row (no style),
+    // or null if every row already has a style (rep is mid-edit; don't
+    // clobber). Used by previewStyle.
+    function findPreviewableRow() {
+        return state.rows.find((r) => !r.style) || null;
+    }
+
+    function previewStyle({ style, desc, colorsAvailable, availableSizes }) {
+        if (!style) return;
+        const row = findPreviewableRow();
+        if (!row) return; // every row already has a style — don't clobber
+        row.style = String(style).toUpperCase();
+        row.styleUpper = row.style;
+        if (desc) row.desc = desc;
+        if (Array.isArray(colorsAvailable)) row.colorsAvailable = colorsAvailable;
+        if (Array.isArray(availableSizes)) row.availableSizes = availableSizes;
+        row._aiTouched = Date.now(); // for the visual indicator
+        // Re-render WITHOUT marking dirty / saving to sessionStorage —
+        // this is a transient preview, not a rep edit.
+        renderTable();
+    }
+
+    function previewCustomer(match) {
+        if (!match) return;
+        // Only fill if the rep hasn't already typed customer info.
+        if (state.customer.email || state.customer.company || state.customer.companyId) return;
+        const nameParts = String(match.contact_name || '').split(/\s+/);
+        state.customer.company = match.company || state.customer.company;
+        state.customer.companyId = match.customer_number || state.customer.companyId;
+        state.customer.firstName = match.contact_first || nameParts[0] || state.customer.firstName;
+        state.customer.lastName  = match.contact_last  || nameParts.slice(1).join(' ') || state.customer.lastName;
+        state.customer.email = match.email || state.customer.email;
+        state.customer.phone = match.phone || state.customer.phone;
+        // Reflect into DOM
+        const set = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+        set('dtgCompanyInput', state.customer.company);
+        set('dtgCompanyId', state.customer.companyId);
+        set('dtgFirstName', state.customer.firstName);
+        set('dtgLastName', state.customer.lastName);
+        set('dtgEmail', state.customer.email);
+        set('dtgPhone', state.customer.phone);
+        updateSubmitEnabled();
+    }
+
     // Expose API
     window.DTGInlineForm = {
         fillFromQuote,
@@ -1888,5 +2004,13 @@
         // whether to warn about overwriting user edits.
         isDirty: () => state.dirtyAfterChatFill,
         clearDirty,
+        // Real-time chat-driven preview hooks (silent, no dirty marking).
+        previewStyle,
+        previewCustomer,
+        // Read-only row inspector — used by the chat's product-details card
+        // to detect a preselected color so it can collapse the swatch grid.
+        getRows: () => state.rows.map((r) => ({
+            style: r.style, color: r.color, catalogColor: r.catalogColor,
+        })),
     };
 })();
