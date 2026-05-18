@@ -15,6 +15,21 @@
    By design, when sticker visuals get tweaked, DTG follows.
    ========================================================================== */
 
+/* DTG-specific override: the chat panel does NOT dim/blur the rest of the
+   page. Reps need to watch the form fill in real time while typing in
+   the chat — a blurred form defeats the purpose. The backdrop stays
+   click-to-close, just transparent. */
+.ai-chat-backdrop {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    /* Pointer events on the backdrop are kept so click-outside still closes,
+       but the form behind it needs clicks too. Workaround: pointer-events:
+       none on the backdrop itself; close handled by the panel's own close
+       button + Escape key (both already wired in dtg-quote-page.js). */
+    pointer-events: none;
+}
+
 /* -- Quick-fact accent (NWCA green tint) -------------------------------- */
 .quick-fact.quick-fact--accent {
     background: linear-gradient(135deg, #ebf6e8 0%, #d4ecd0 100%);
