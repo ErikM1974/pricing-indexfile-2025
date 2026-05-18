@@ -62,6 +62,55 @@
     }
 
     /**
+     * Detect an explicit print location code in the rep's chat message and
+     * auto-update the form's location pill. The rep typed it — they shouldn't
+     * also have to click the pill manually. Mirrors the customer-pick and
+     * matrix-submit pattern: chat is allowed to write to the form when the
+     * rep was explicit.
+     *
+     * Supports:
+     *   - Single front codes: LC, FF, JF
+     *   - Front + back combos as a single token: LC_FB, FF_FB, JF_JB, LC_JB
+     *   - Front + back as two tokens with "and"/"+"/"&" between:
+     *     "LC and FB", "JF + JB", "LC&FB"
+     *
+     * The detection is whole-word + case-insensitive. "FFmpeg" doesn't match
+     * "FF". "LC" only matches if it's a standalone token.
+     */
+    function tryAutoSetLocation(text) {
+        if (!window.DTGInlineForm || typeof window.DTGInlineForm.setLocation !== 'function') return null;
+        const t = String(text || '');
+        // 1. Combo as a single token (e.g. "LC_FB")
+        const COMBO_RE = /\b(LC|FF|JF)_(FB|JB)\b/i;
+        let m = COMBO_RE.exec(t);
+        if (m) {
+            return window.DTGInlineForm.setLocation(m[1].toUpperCase(), m[2].toUpperCase());
+        }
+        // 2. Two tokens with separator: "LC and FB" / "JF + JB" / "LC&FB"
+        const TWO_TOKEN_RE = /\b(LC|FF|JF)\s*(?:and|\+|&|,)\s*(FB|JB)\b/i;
+        m = TWO_TOKEN_RE.exec(t);
+        if (m) {
+            return window.DTGInlineForm.setLocation(m[1].toUpperCase(), m[2].toUpperCase());
+        }
+        // 3. Single front code
+        const FRONT_RE = /\b(LC|FF|JF)\b/i;
+        m = FRONT_RE.exec(t);
+        if (m) {
+            return window.DTGInlineForm.setLocation(m[1].toUpperCase(), '');
+        }
+        // 4. Back-only as a hint — rep typed "FB" alone meaning add full back
+        //    to whatever front is current. Keep current front, add back.
+        const BACK_RE = /\b(FB|JB)\b/i;
+        m = BACK_RE.exec(t);
+        if (m) {
+            const snap = window.DTGInlineForm.getFormSnapshot?.();
+            const currentFront = snap?.front || 'LC';
+            return window.DTGInlineForm.setLocation(currentFront, m[1].toUpperCase());
+        }
+        return null;
+    }
+
+    /**
      * A3 — When the bot has shown an A/B/C menu of customer matches and the
      * rep replies with just a single letter, fill the form's customer pane
      * with the corresponding match immediately. Saves a round-trip and gives
@@ -115,10 +164,11 @@
                 autoResizeTextarea(ta);
                 aiState.messages.push({ role: 'user', content: text });
                 appendChatBubble('user', text);
-                // A3 — menu-letter customer pick: if the rep replied with
-                // a single letter (a/b/c/d/e) and the last lookup_customer
-                // tool stashed a list of matches, fill the form's customer
-                // pane immediately — don't wait for the bot's confirmation.
+                // Auto-update form from explicit rep input — chat writes to form
+                // for things the rep was explicit about, so they don't have to
+                // ALSO click. The form's snapshot then flows to the bot on the
+                // next request via getFormSnapshot().
+                tryAutoSetLocation(text);
                 tryMenuLetterCustomerPick(text);
                 sendChatMessage();
             });
