@@ -1,3 +1,7 @@
+## v2026.05.18.14 (2026.05.18)
+
+- Deploy v2026.05.18.14: portal color dropdown + inline size matrix + fuzzy-match fix
+
 ## v2026.05.18.13 (2026.05.18)
 
 - Deploy v2026.05.18.13: DTG chat backdrop transparent — see form behind chat
