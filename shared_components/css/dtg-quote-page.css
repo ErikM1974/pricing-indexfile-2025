@@ -140,6 +140,56 @@
     line-height: 1.45;
 }
 .dtg-quote-card .dtg-rule-note strong { color: #fffaf0; }
+.dtg-quote-card .dtg-rule-note.dtg-rule-info {
+    background: rgba(255, 255, 255, 0.10);
+    border-left-color: rgba(255, 255, 255, 0.40);
+}
+.dtg-quote-card .dtg-shared-header {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+}
+.dtg-quote-card .dtg-shared-header .dtg-combined-qty {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.90);
+    font-weight: 600;
+    margin-left: auto;
+}
+.dtg-quote-card .dtg-line-item {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
+}
+.dtg-quote-card .dtg-line-item:last-of-type {
+    border-bottom: none;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
+.dtg-quote-card .dtg-line-item .dtg-pn {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+.dtg-quote-card .dtg-line-item .dtg-product-line {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.86);
+    margin-bottom: 4px;
+}
+.dtg-quote-card .dtg-line-item .dtg-sizes {
+    margin-bottom: 4px;
+}
+.dtg-quote-card .dtg-line-item .dtg-line {
+    border-top: none;
+    padding: 2px 0;
+    font-size: 13px;
+}
+.dtg-quote-card .dtg-line.subtotal {
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+}
 
 /* -- Top-seller recommendation cards (rendered in chat) ----------------- */
 .top-seller-recommendations {

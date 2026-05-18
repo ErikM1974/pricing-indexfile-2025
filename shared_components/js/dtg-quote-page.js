@@ -520,39 +520,65 @@
         const msgEl = bubbleEl.closest('.chat-message');
         if (!msgEl) return;
         const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
-        const item = items[0] || {};
+        if (items.length === 0) return;
         const rules = priceQuote.appliedRules || {};
         const totals = priceQuote.totals || {};
+
+        // Shared imprint + tier come from the top of the PRICE_QUOTE block when
+        // multi-line, or from the first line for backward-compat.
+        const sharedLocLabel = priceQuote.locationLabel
+            || items[0].locationLabel || items[0].locationCode || '';
+        const sharedTier = priceQuote.tier || items[0].tier || '';
+        const tierIsLtm = /LTM/i.test(String(sharedTier));
+        const combinedQty = Number(priceQuote.combinedQuantity)
+            || items.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0);
+        const subtotal = Number(priceQuote.subtotal)
+            || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
 
         const card = document.createElement('div');
         card.className = 'dtg-quote-card';
 
-        const tierIsLtm = /LTM/i.test(String(item.tier || ''));
-        const sizesHtml = item.sizes
-            ? Object.entries(item.sizes).map(([s, q]) => `<span>${escapeHtml(s)}: ${fmtInt(q)}</span>`).join('')
-            : '';
+        const isMulti = items.length > 1;
+
+        let linesHtml = '';
+        items.forEach((it) => {
+            const sizesHtml = it.sizes
+                ? Object.entries(it.sizes).map(([s, q]) => `<span>${escapeHtml(s)}: ${fmtInt(q)}</span>`).join('')
+                : '';
+            linesHtml += `
+                <div class="dtg-line-item">
+                    <div class="dtg-pn">${escapeHtml(it.partNumber || 'DTG-CUSTOM')}</div>
+                    <div class="dtg-product-line">${escapeHtml(it.description || ((it.style || it.styleNumber || '') + ' — ' + (it.color || '')))}</div>
+                    <div class="dtg-sizes">${sizesHtml}</div>
+                    <div class="dtg-line"><span>${fmtInt(Number(it.totalQuantity) || 0)} pieces @ $${fmtMoney(Number(it.finalUnitPrice) || 0)}/pc</span><span class="v">$${fmtMoney(Number(it.lineTotal) || 0)}</span></div>
+                </div>`;
+        });
 
         const upchargeNote = rules.sizeUpcharge ? `<div class="dtg-rule-note"><strong>Size upcharge:</strong> ${escapeHtml(rules.sizeUpcharge)}</div>` : '';
         const ltmNote = rules.ltm ? `<div class="dtg-rule-note"><strong>LTM:</strong> ${escapeHtml(rules.ltm)}</div>` : '';
         const tierNote = rules.tier ? `<div class="dtg-rule-note"><strong>Tier:</strong> ${escapeHtml(rules.tier)}</div>` : '';
+        const tierByImprintNote = rules.tierIsByImprint
+            ? `<div class="dtg-rule-note dtg-rule-info"><strong>Pricing model:</strong> ${escapeHtml(rules.tierIsByImprint)}</div>`
+            : '';
 
         card.innerHTML = `
-            <div class="dtg-label">Live DTG quote</div>
-            <div class="dtg-pn">${escapeHtml(item.partNumber || 'DTG-CUSTOM')}</div>
-            <div class="dtg-product-line">${escapeHtml(item.description || (item.style + ' — ' + (item.color || '')))}</div>
-            <div>
-                <span class="dtg-location-pill">${escapeHtml(item.locationLabel || item.locationCode || '')}</span>
-                <span class="dtg-tier-pill${tierIsLtm ? ' ltm' : ''}">${escapeHtml(item.tier || '')}</span>
+            <div class="dtg-label">Live DTG quote${isMulti ? ` · ${items.length} lines` : ''}</div>
+            <div class="dtg-shared-header">
+                <span class="dtg-location-pill">${escapeHtml(sharedLocLabel)}</span>
+                <span class="dtg-tier-pill${tierIsLtm ? ' ltm' : ''}">${escapeHtml(sharedTier)}</span>
+                <span class="dtg-combined-qty">${fmtInt(combinedQty)} combined pieces</span>
             </div>
-            <div class="dtg-sizes">${sizesHtml}</div>
 
-            <div class="dtg-line"><span>${fmtInt(Number(item.totalQuantity) || 0)} pieces @ avg $${fmtMoney(Number(item.finalUnitPrice) || 0)}</span><span class="v">$${fmtMoney(Number(item.lineTotal) || 0)}</span></div>
+            ${linesHtml}
+
+            <div class="dtg-line subtotal"><span>Subtotal</span><span class="v">$${fmtMoney(subtotal)}</span></div>
             ${Number(totals.taxEstimate) ? `<div class="dtg-line"><span>Tax (est)</span><span class="v">$${fmtMoney(Number(totals.taxEstimate))}</span></div>` : ''}
-            <div class="dtg-line total"><span>Order total</span><span class="v">$${fmtMoney(Number(totals.grandTotal) || Number(item.lineTotal) || 0)}</span></div>
+            <div class="dtg-line total"><span>Order total</span><span class="v">$${fmtMoney(Number(totals.grandTotal) || subtotal)}</span></div>
 
             ${tierNote}
             ${ltmNote}
             ${upchargeNote}
+            ${tierByImprintNote}
         `;
         msgEl.appendChild(card);
         scrollChatBottom();
@@ -697,6 +723,13 @@
         } else if (tool === 'quote_dtg_pricing') {
             if (result.error) {
                 appendToolChip(tool, `Error: ${result.message || result.error}`);
+            } else if (Array.isArray(result.lineItems) && result.lineItems.length > 1) {
+                const qty = result.combinedQuantity || result.totalQuantity || 0;
+                const sub = result.subtotal || result.lineItems.reduce((s, l) => s + (Number(l.lineTotal) || 0), 0);
+                const ltm = result.isLtmTier ? ` · LTM +$${fmtMoney(result.ltmPerUnit)}/pc` : '';
+                appendToolChip(tool,
+                    `${result.lineItems.length} lines @ ${result.locationLabel || result.locationCode} · ${fmtInt(qty)} combined pieces · tier ${result.tier}${ltm} · subtotal $${fmtMoney(sub)}`
+                );
             } else {
                 appendToolChip(tool,
                     `${result.partNumber}: $${fmtMoney(result.lineTotal)} (${fmtInt(result.totalQuantity)} @ avg $${fmtMoney(result.finalUnitPrice)})`
@@ -883,8 +916,48 @@
         }
 
         try {
-            const item = (priceQuote.lineItems && priceQuote.lineItems[0]) || {};
+            const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
+            if (items.length === 0) {
+                showToast('No line items to push');
+                if (btn) { btn.disabled = false; btn.innerHTML = `<i class="fas fa-truck"></i> Submit to ShopWorks`; }
+                return;
+            }
             const totals = priceQuote.totals || {};
+            const sharedLocationCode = priceQuote.locationCode || items[0].locationCode || '';
+            const sharedLocationLabel = priceQuote.locationLabel || items[0].locationLabel || sharedLocationCode;
+            const sharedTier = priceQuote.tier || items[0].tier || '';
+            const combinedQty = Number(priceQuote.combinedQuantity)
+                || items.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0);
+            const subtotal = Number(priceQuote.subtotal)
+                || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
+            const ltmTotal = items.reduce(
+                (s, it) => s + (Number(it.ltmPerUnit) || 0) * (Number(it.totalQuantity) || 0),
+                0,
+            );
+
+            const rows = items.map((it, i) => ({
+                id: `dtg-row-${i + 1}`,
+                style: it.style || it.styleNumber || '',
+                desc: it.description || `${it.style || it.styleNumber || ''} ${it.color || ''}`.trim(),
+                color: it.color || '',
+                sizes: it.sizes || {},
+                deco: 'dtg',
+                rowDecoConfig: { method: 'dtg', locationCode: it.locationCode || sharedLocationCode },
+                price: Number(it.finalUnitPrice) || 0,
+                manualMode: false,
+            }));
+
+            const byRow = {};
+            items.forEach((it, i) => {
+                byRow[`dtg-row-${i + 1}`] = {
+                    unitPriceBySize: (it.lineSizes || []).reduce((m, s) => {
+                        m[s.size] = s.finalUnit;
+                        return m;
+                    }, {}),
+                    rowSubtotal: Number(it.lineTotal) || 0,
+                    tier: it.tier || sharedTier,
+                };
+            });
 
             // Build the order-form-shaped payload. The backend's
             // /api/submit-order-form handler maps this to a ManageOrders
@@ -901,50 +974,27 @@
                     salesRepEmail: customer.email_salesrep || 'sales@nwcustomapparel.com',
                     paymentTerms: customer.payment_terms || 'Net 10',
                     taxable: customer.taxable !== false,
-                    // Reference: the original quote ID from the chat
                     quoteId: aiState.quoteID || '',
                 },
-                rows: [{
-                    id: 'dtg-row-1',
-                    style: item.style || '',
-                    desc: item.description || `${item.style || ''} ${item.color || ''}`.trim(),
-                    color: item.color || '',
-                    sizes: item.sizes || {},
-                    deco: 'dtg',
-                    rowDecoConfig: {
-                        method: 'dtg',
-                        locationCode: item.locationCode || '',
-                    },
-                    price: item.finalUnitPrice || 0,
-                    manualMode: false,
-                }],
+                rows,
                 ship: customer.shipping?.same_as_billing
                     ? { sameAsBilling: true, method: customer.shipping?.method || 'UPS Ground' }
                     : (customer.shipping || { method: 'UPS Ground' }),
-                orderNotes: `DTG quote ${aiState.quoteID || ''} — pushed by AI bot`,
+                orderNotes: `DTG quote ${aiState.quoteID || ''} — pushed by AI bot (${items.length} line${items.length === 1 ? '' : 's'})`,
                 decoConfig: { method: 'dtg' },
                 breakdown: {
                     supported: true,
-                    totalQty: Number(item.totalQuantity) || 0,
-                    tier: item.tier || null,
-                    subtotal: Number(item.lineTotal) || 0,
-                    ltmTotal: Number(item.ltmPerUnit) * Number(item.totalQuantity) || 0,
+                    totalQty: combinedQty,
+                    tier: sharedTier,
+                    subtotal: Math.round(subtotal * 100) / 100,
+                    ltmTotal: Math.round(ltmTotal * 100) / 100,
                     taxEstimate: Number(totals.taxEstimate) || 0,
-                    grandTotal: Number(totals.grandTotal) || Number(item.lineTotal) || 0,
+                    grandTotal: Number(totals.grandTotal) || Math.round(subtotal * 100) / 100,
                     fees: [],
                     errors: [],
-                    byRow: {
-                        'dtg-row-1': {
-                            unitPriceBySize: (item.lineSizes || []).reduce((m, s) => {
-                                m[s.size] = s.finalUnit;
-                                return m;
-                            }, {}),
-                            rowSubtotal: Number(item.lineTotal) || 0,
-                            tier: item.tier,
-                        },
-                    },
+                    byRow,
                 },
-                methodNotesBlock: `DTG · ${item.locationLabel || item.locationCode || ''} · Tier ${item.tier || ''}`,
+                methodNotesBlock: `DTG · ${sharedLocationLabel} · Tier ${sharedTier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${combinedQty} combined pieces`,
                 designNumbers: customer.designNumber ? [customer.designNumber] : [],
                 addOns: [],
             };
