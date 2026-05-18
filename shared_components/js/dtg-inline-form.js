@@ -365,9 +365,29 @@
         const exact = colorsList.find((c) => norm(c).toLowerCase() === q);
         if (exact) return exact;
 
-        // 2. whole-word match — "black" finds "Jet Black" but not "Blackish Heather"
-        const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const wordRe = new RegExp('\\b' + escaped + '\\b', 'i');
+        // 2. multi-word query: score canonical colors by how many of the query's
+        //    words match. "athletic heather" against ["Athletic Heather",
+        //    "Black Heather", "Dark Heather Grey"] → AH=2, BH=1, DHG=1, AH wins.
+        //    Fixes a bug where rep typed "athletic heather" but the matcher
+        //    picked "Black Heather" because shortest-length sort came first.
+        const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const queryWords = (q.match(/[a-z]+/g) || []).filter((w) => w.length >= 3);
+        if (queryWords.length > 1) {
+            const scored = colorsList.map((c) => {
+                const name = norm(c).toLowerCase();
+                let hits = 0;
+                for (const w of queryWords) {
+                    if (new RegExp('\\b' + escapeRe(w) + '\\b').test(name)) hits++;
+                }
+                return { c, hits, len: name.length };
+            }).filter((s) => s.hits > 0);
+            if (scored.length) {
+                scored.sort((a, b) => (b.hits - a.hits) || (a.len - b.len));
+                return scored[0].c;
+            }
+        }
+        // Single-word query: original whole-word match, shortest wins.
+        const wordRe = new RegExp('\\b' + escapeRe(q) + '\\b', 'i');
         const wordHits = colorsList.filter((c) => wordRe.test(norm(c)));
         if (wordHits.length) {
             wordHits.sort((a, b) => norm(a).length - norm(b).length);
@@ -852,6 +872,41 @@
             : '';
     }
 
+    /**
+     * Position a combobox menu as a fixed-position portal that floats above
+     * all stacking contexts. Used by the style + color comboboxes so the
+     * dropdown is fully visible regardless of nearby chrome (chat panel,
+     * customer pane below the table, live pricing card, etc.).
+     *
+     * Reads the input's current rect each call so the menu stays pinned
+     * during scroll.
+     */
+    function positionPortaledMenu(menu, input) {
+        const rect = input.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const spaceBelow = vh - rect.bottom;
+        const spaceAbove = rect.top;
+        const maxMenuHeight = 280;
+        // Flip to open ABOVE the input when there's more room above than
+        // below AND below would be cramped (< 180px).
+        const openUp = spaceBelow < 180 && spaceAbove > spaceBelow;
+        menu.style.position = 'fixed';
+        if (openUp) {
+            menu.style.top = '';
+            menu.style.bottom = (vh - rect.top + 2) + 'px';
+            menu.style.maxHeight = Math.min(maxMenuHeight, spaceAbove - 16) + 'px';
+        } else {
+            menu.style.bottom = '';
+            menu.style.top = (rect.bottom + 2) + 'px';
+            menu.style.maxHeight = Math.min(maxMenuHeight, spaceBelow - 16) + 'px';
+        }
+        menu.style.left = rect.left + 'px';
+        // Color names like "Athletic Heather" need ~220px to read cleanly;
+        // the cell itself is only ~110px wide.
+        menu.style.minWidth = Math.max(rect.width, 240) + 'px';
+        menu.style.maxWidth = '340px';
+    }
+
     // ----- Row + combobox handlers ------------------------------------------
     function wireRowHandlers() {
         const table = document.getElementById('dtgRowsTable');
@@ -931,21 +986,33 @@
         let timer = null;
         let lastMatches = [];
         let activeIndex = 0;
+        const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
         function close() {
-            if (menu) { menu.remove(); menu = null; }
+            if (menu) {
+                menu.remove();
+                menu = null;
+                window.removeEventListener('scroll', reposition, true);
+                window.removeEventListener('resize', reposition);
+            }
         }
         function open() {
             if (!menu) {
                 menu = document.createElement('div');
                 menu.className = 'dtg-combobox-menu';
-                wrap.appendChild(menu);
+                // Portal to body so the dropdown floats above the chat
+                // panel, customer pane, live pricing card, etc.
+                document.body.appendChild(menu);
+                positionPortaledMenu(menu, input);
+                window.addEventListener('scroll', reposition, true);
+                window.addEventListener('resize', reposition);
             }
         }
         function paint() {
             if (!menu) return;
             if (lastMatches.length === 0) {
                 menu.innerHTML = `<div class="dtg-combobox-empty">${input.value ? `No matches for "${escapeHtml(input.value)}"` : 'Type 2+ characters'}</div>`;
+                positionPortaledMenu(menu, input);
                 return;
             }
             menu.innerHTML = lastMatches.slice(0, 10).map((m, i) => `
@@ -964,6 +1031,7 @@
                     pick(lastMatches[parseInt(item.getAttribute('data-idx'), 10)]);
                 });
             });
+            positionPortaledMenu(menu, input);
         }
         async function search(q) {
             if (q.length < 2) { lastMatches = []; paint(); return; }
@@ -1018,7 +1086,10 @@
             else if (e.key === 'Enter') { if (lastMatches[activeIndex]) { e.preventDefault(); pick(lastMatches[activeIndex]); } }
             else if (e.key === 'Escape') { close(); }
         });
-        document.addEventListener('mousedown', (e) => { if (menu && !wrap.contains(e.target)) close(); });
+        document.addEventListener('mousedown', (e) => {
+            // Menu is portaled to body, so wrap.contains() doesn't include it.
+            if (menu && !wrap.contains(e.target) && !menu.contains(e.target)) close();
+        });
     }
 
     function attachColorCombobox(wrap, input, rid) {
@@ -1027,13 +1098,24 @@
         let menu = null;
         let activeIndex = 0;
         let matches = row.colorsAvailable || [];
+        const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
-        function close() { if (menu) { menu.remove(); menu = null; } }
+        function close() {
+            if (menu) {
+                menu.remove();
+                menu = null;
+                window.removeEventListener('scroll', reposition, true);
+                window.removeEventListener('resize', reposition);
+            }
+        }
         function open() {
             if (!menu) {
                 menu = document.createElement('div');
                 menu.className = 'dtg-combobox-menu';
-                wrap.appendChild(menu);
+                document.body.appendChild(menu);
+                positionPortaledMenu(menu, input);
+                window.addEventListener('scroll', reposition, true);
+                window.addEventListener('resize', reposition);
             }
         }
         function filter(q) {
@@ -1072,6 +1154,7 @@
                 item.addEventListener('mouseenter', () => { activeIndex = parseInt(item.getAttribute('data-idx'), 10) || 0; paint(); });
                 item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
             });
+            positionPortaledMenu(menu, input);
         }
         function pick(c) {
             if (!c) return;
@@ -1095,7 +1178,9 @@
             else if (e.key === 'Enter') { if (matches[activeIndex]) { e.preventDefault(); pick(matches[activeIndex]); } }
             else if (e.key === 'Escape') { close(); }
         });
-        document.addEventListener('mousedown', (e) => { if (menu && !wrap.contains(e.target)) close(); });
+        document.addEventListener('mousedown', (e) => {
+            if (menu && !wrap.contains(e.target) && !menu.contains(e.target)) close();
+        });
     }
 
     // ----- Customer combobox + manual fields --------------------------------

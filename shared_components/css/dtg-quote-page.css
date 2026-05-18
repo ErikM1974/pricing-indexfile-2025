@@ -530,6 +530,148 @@
     font-weight: 700;
 }
 
+/* Inline size-entry matrix — appears in the product-details card after a
+   color is confirmed. Rep fills sizes inline and clicks "Add to quote"
+   instead of typing "S:4 M:8 L:6" in the chat textarea. */
+.product-details-card .pd-size-matrix {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: var(--paper-1, #fff);
+    border: 1px solid var(--rule, rgba(0,0,0,0.10));
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(46, 88, 39, 0.06);
+}
+.product-details-card .pd-size-matrix .pd-section-label {
+    margin: 0 0 8px;
+    color: #2e5827;
+    font-size: 11px;
+}
+.product-details-card .pd-size-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(64px, 1fr));
+    gap: 6px;
+}
+.product-details-card .pd-sm-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding: 5px 6px;
+    background: #fafaf6;
+    border: 1px solid #e8e4d4;
+    border-radius: 5px;
+    cursor: text;
+    transition: border-color var(--dur-fast, 120ms) ease,
+                background var(--dur-fast, 120ms) ease;
+}
+.product-details-card .pd-sm-cell:hover {
+    border-color: #2e5827;
+}
+.product-details-card .pd-sm-cell:focus-within {
+    border-color: #2e5827;
+    background: #fff;
+    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.12);
+}
+.product-details-card .pd-sm-cell.has-upcharge {
+    background: #fef3c7;
+    border-color: rgba(217, 119, 6, 0.35);
+}
+.product-details-card .pd-sm-cell.has-upcharge:focus-within {
+    background: #fffbeb;
+    border-color: #d97706;
+    box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.18);
+}
+.product-details-card .pd-sm-label {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+.product-details-card .pd-sm-cell.has-upcharge .pd-sm-label { color: #78350f; }
+.product-details-card .pd-sm-up {
+    font-size: 9px;
+    font-weight: 600;
+    color: #d97706;
+    text-transform: none;
+    letter-spacing: 0;
+}
+.product-details-card .pd-sm-cell input {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid transparent;
+    background: #ffffff;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f3a1f;
+    text-align: center;
+    font-family: var(--mono, ui-monospace, monospace);
+    box-sizing: border-box;
+    /* hide native spinner */
+    -moz-appearance: textfield;
+}
+.product-details-card .pd-sm-cell input::-webkit-outer-spin-button,
+.product-details-card .pd-sm-cell input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.product-details-card .pd-sm-cell input:focus {
+    outline: none;
+    border-color: #2e5827;
+}
+.product-details-card .pd-size-matrix-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule, rgba(0,0,0,0.06));
+}
+.product-details-card .pd-sm-total {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2e5827;
+    font-variant-numeric: tabular-nums;
+}
+.product-details-card .pd-sm-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%);
+    color: #fff8e0;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform var(--dur-fast, 120ms) ease,
+                box-shadow var(--dur-fast, 120ms) ease,
+                opacity var(--dur-fast, 120ms) ease;
+}
+.product-details-card .pd-sm-add:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(46, 88, 39, 0.25);
+}
+.product-details-card .pd-sm-add:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.product-details-card .pd-size-matrix-sent {
+    opacity: 0.65;
+    pointer-events: none;
+}
+.product-details-card .pd-size-matrix-sent .pd-sm-add {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    opacity: 1;
+}
+
 .product-details-card .pd-color-warning {
     margin-top: 8px;
     padding: 8px 10px;

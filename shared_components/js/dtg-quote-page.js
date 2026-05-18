@@ -352,22 +352,29 @@
             if (!userMsgs.length) return null;
             const txt = String(userMsgs[userMsgs.length - 1].content || '').toLowerCase();
             if (!txt) return null;
-            const hits = [];
+            // For each canonical color, count how many of its words (3+ chars)
+            // appear in the user text. Higher word-match wins, ties broken by
+            // shorter canonical name (the "plain" variant). This fixes the
+            // case where rep says "athletic heather" and the matcher picks
+            // "Black Heather" because it's shorter — wrong. "Athletic Heather"
+            // has 2 word-matches vs Black Heather's 1, so it wins.
+            const scored = [];
             for (const c of colors) {
                 const cn = String(c.name || '').toLowerCase();
                 if (!cn) continue;
-                const words = cn.match(/[a-z]+/g) || [];
+                const words = (cn.match(/[a-z]+/g) || []).filter((w) => w.length >= 3);
+                if (!words.length) continue;
+                let matchCount = 0;
                 for (const w of words) {
-                    if (w.length < 3) continue;
                     const re = new RegExp('\\b' + w + '\\b');
-                    if (re.test(txt)) { hits.push(c); break; }
+                    if (re.test(txt)) matchCount++;
                 }
+                if (matchCount > 0) scored.push({ c, matchCount, len: cn.length });
             }
-            if (hits.length === 1) return hits[0].name;
-            if (hits.length > 1) {
-                hits.sort((a, b) => String(a.name).length - String(b.name).length);
-                return hits[0].name;
-            }
+            if (!scored.length) return null;
+            // Sort by matchCount desc, then by length asc.
+            scored.sort((a, b) => (b.matchCount - a.matchCount) || (a.len - b.len));
+            return scored[0].c.name;
         } catch (e) { /* ignore */ }
 
         return null;
@@ -451,7 +458,39 @@
             html += `<div class="pd-color-warning">${escapeHtml(w)}</div>`;
         }
 
-        if (sizes.length > 0) {
+        // Inline size-entry matrix — only when a color is locked (confirmed
+        // mode). Lets the rep tab through size inputs and click "Add to
+        // quote" instead of typing "S:4 M:8 L:6" in the chat textarea.
+        // Submits a structured message back to the bot which then prices
+        // via quote_dtg_pricing as part of its normal intake.
+        if (isConfirmed && sizes.length > 0) {
+            const matrixId = 'pd-matrix-' + Math.random().toString(36).slice(2, 9);
+            html += `<div class="pd-size-matrix" id="${matrixId}" data-style="${escapeHtml(data.styleNumber)}" data-color="${escapeHtml(preselectedColorObj.name)}">`;
+            html += `<div class="pd-section-label">Quick sizes — fill what you need, then Add to quote</div>`;
+            html += `<div class="pd-size-matrix-grid">`;
+            for (const s of sizes) {
+                const up = s.hasUpcharge ? `<span class="pd-sm-up">+$${fmtMoney(s.upcharge)}</span>` : '';
+                const upchargeClass = s.hasUpcharge ? ' has-upcharge' : '';
+                html += `
+                    <label class="pd-sm-cell${upchargeClass}">
+                        <span class="pd-sm-label">${escapeHtml(s.size)}${up}</span>
+                        <input type="number" min="0" step="1" inputmode="numeric"
+                               data-size="${escapeHtml(s.size)}"
+                               placeholder="0">
+                    </label>`;
+            }
+            html += `</div>`;
+            html += `
+                <div class="pd-size-matrix-actions">
+                    <span class="pd-sm-total">0 pcs</span>
+                    <button type="button" class="pd-sm-add" disabled>
+                        Add to quote <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>`;
+            html += `</div>`;
+        } else if (sizes.length > 0) {
+            // Non-confirmed mode (no color yet) — show the original read-only
+            // size chips with upcharges so the rep sees the available range.
             html += `<div class="pd-section-label">Sizes${data.upchargeSummary ? ' (upcharges shown)' : ''}</div>`;
             html += `<div class="pd-size-list">`;
             for (const s of sizes) {
@@ -471,6 +510,64 @@
         // hero on that color so swatch hovers don't replace it until the
         // rep explicitly clicks one.
         if (isConfirmed) wrap.dataset.locked = 'true';
+
+        // Wire up the inline size matrix (only present in confirmed mode)
+        const matrix = wrap.querySelector('.pd-size-matrix');
+        if (matrix) {
+            const inputs = matrix.querySelectorAll('input[data-size]');
+            const totalEl = matrix.querySelector('.pd-sm-total');
+            const addBtn = matrix.querySelector('.pd-sm-add');
+
+            function recalcMatrix() {
+                let total = 0;
+                inputs.forEach((inp) => {
+                    const v = parseInt(inp.value, 10);
+                    if (Number.isFinite(v) && v > 0) total += v;
+                });
+                totalEl.textContent = total === 1 ? '1 pc' : `${total} pcs`;
+                addBtn.disabled = total === 0 || aiState.isStreaming;
+            }
+
+            inputs.forEach((inp) => {
+                inp.addEventListener('input', recalcMatrix);
+                // Enter on any cell submits if total > 0
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !addBtn.disabled) {
+                        e.preventDefault();
+                        addBtn.click();
+                    }
+                });
+            });
+
+            addBtn.addEventListener('click', () => {
+                if (aiState.isStreaming) return;
+                const parts = [];
+                inputs.forEach((inp) => {
+                    const v = parseInt(inp.value, 10);
+                    if (Number.isFinite(v) && v > 0) {
+                        parts.push(`${inp.getAttribute('data-size')}:${v}`);
+                    }
+                });
+                if (!parts.length) return;
+                const style = matrix.getAttribute('data-style') || '';
+                const color = matrix.getAttribute('data-color') || '';
+                const msg = `Sizes for ${style} ${color}: ${parts.join(' ')}`;
+                const ta = document.getElementById('aiChatTextarea');
+                const form = document.getElementById('aiChatForm');
+                if (!ta || !form) return;
+                ta.value = msg;
+                form.dispatchEvent(new Event('submit', { cancelable: true }));
+                // Disable the matrix after submit so the rep can't double-submit
+                inputs.forEach((inp) => { inp.disabled = true; });
+                addBtn.disabled = true;
+                addBtn.innerHTML = '<i class="fas fa-check"></i> Sent';
+                matrix.classList.add('pd-size-matrix-sent');
+            });
+
+            // Auto-focus the first non-upcharge size cell (usually S or M)
+            const firstReg = matrix.querySelector('.pd-sm-cell:not(.has-upcharge) input');
+            if (firstReg) setTimeout(() => firstReg.focus(), 100);
+        }
 
         // Wire up the swatch-grid expander (only present in confirmed mode)
         const expander = wrap.querySelector('.pd-swatch-expander');
