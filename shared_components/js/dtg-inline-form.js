@@ -354,7 +354,12 @@
         if (!Array.isArray(colorsList) || !colorsList.length) return null;
         const q = String(query || '').trim().toLowerCase();
         if (!q) return null;
-        const norm = (c) => String(c.COLOR_NAME || c.colorName || '').trim();
+        // Handle BOTH shapes: SanMar's /api/product-colors returns
+        // { COLOR_NAME, CATALOG_COLOR, COLOR_SQUARE_IMAGE } whereas the bot's
+        // lookup_product_details tool returns { name, catalogColor,
+        // swatchImageUrl, mainImageUrl }. fillFromQuote uses the first
+        // shape; previewStyle uses the second.
+        const norm = (c) => String(c.COLOR_NAME || c.colorName || c.name || '').trim();
 
         // 1. exact match (case-insensitive)
         const exact = colorsList.find((c) => norm(c).toLowerCase() === q);
@@ -494,7 +499,7 @@
                         <div id="dtgPriceSummary" class="dtg-price-summary"></div>
                     </div>
 
-                    <aside class="dtg-customer-pane">
+                    <aside class="dtg-customer-pane dcp-horizontal">
                         <div class="dcp-label"><i class="fas fa-building"></i> Customer + push</div>
                         <div class="dcp-search-label">Search customer</div>
                         <div class="dtg-combobox" id="dtgCompanyCombo">
@@ -503,56 +508,60 @@
 
                         <div class="dcp-divider">Or fill manually</div>
 
-                        <div class="dcp-row">
-                            <div>
-                                <div class="dcp-field-label">First name</div>
-                                <input type="text" id="dtgFirstName" autocomplete="off">
+                        <div class="dcp-manual">
+                            <div class="dcp-row">
+                                <div>
+                                    <div class="dcp-field-label">First name</div>
+                                    <input type="text" id="dtgFirstName" autocomplete="off">
+                                </div>
+                                <div>
+                                    <div class="dcp-field-label">Last name</div>
+                                    <input type="text" id="dtgLastName" autocomplete="off">
+                                </div>
                             </div>
-                            <div>
-                                <div class="dcp-field-label">Last name</div>
-                                <input type="text" id="dtgLastName" autocomplete="off">
+                            <div class="dcp-field-wrap dcp-field-email">
+                                <div class="dcp-field-label">Email</div>
+                                <input type="email" id="dtgEmail" autocomplete="off">
                             </div>
-                        </div>
-                        <div class="dcp-field-label">Email</div>
-                        <input type="email" id="dtgEmail" autocomplete="off">
-                        <div class="dcp-row">
-                            <div>
-                                <div class="dcp-field-label">Phone</div>
-                                <input type="tel" id="dtgPhone" autocomplete="off">
+                            <div class="dcp-row">
+                                <div>
+                                    <div class="dcp-field-label">Phone</div>
+                                    <input type="tel" id="dtgPhone" autocomplete="off">
+                                </div>
+                                <div>
+                                    <div class="dcp-field-label">Company ID (optional)</div>
+                                    <input type="text" id="dtgCompanyId" autocomplete="off" placeholder="ShopWorks ID">
+                                </div>
                             </div>
-                            <div>
-                                <div class="dcp-field-label">Company ID (optional)</div>
-                                <input type="text" id="dtgCompanyId" autocomplete="off" placeholder="ShopWorks ID">
+                            <div class="dcp-row">
+                                <div>
+                                    <div class="dcp-field-label">Design # <span class="dcp-optional">(optional)</span></div>
+                                    <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="add later if TBD">
+                                </div>
+                                <div>
+                                    <div class="dcp-field-label">Payment terms</div>
+                                    <select id="dtgTerms">
+                                        <option value="Prepaid">Prepaid</option>
+                                        <option value="Net 10">Net 10</option>
+                                        <option value="Net 30">Net 30</option>
+                                        <option value="Pay On Pickup">Pay On Pickup</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div class="dcp-row">
-                            <div>
-                                <div class="dcp-field-label">Design # <span class="dcp-optional">(optional)</span></div>
-                                <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="add later if TBD">
-                            </div>
-                            <div>
-                                <div class="dcp-field-label">Payment terms</div>
-                                <select id="dtgTerms">
-                                    <option value="Prepaid">Prepaid</option>
-                                    <option value="Net 10">Net 10</option>
-                                    <option value="Net 30">Net 30</option>
-                                    <option value="Pay On Pickup">Pay On Pickup</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <div class="dcp-row">
-                            <div>
-                                <div class="dcp-field-label">Sales rep</div>
-                                <select id="dtgSalesRep">
-                                    ${SALES_REPS.map(r => `<option value="${escapeHtml(r.code)}"${state.customer.salesRepCode === r.code ? ' selected' : ''}>${escapeHtml(r.name)}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div>
-                                <div class="dcp-field-label">Ship method</div>
-                                <select id="dtgShipMethod">
-                                    ${SHIP_METHODS.map(m => `<option value="${escapeHtml(m.code)}"${state.shipping.method === m.code ? ' selected' : ''}>${escapeHtml(m.label)}</option>`).join('')}
-                                </select>
+                            <div class="dcp-row">
+                                <div>
+                                    <div class="dcp-field-label">Sales rep</div>
+                                    <select id="dtgSalesRep">
+                                        ${SALES_REPS.map(r => `<option value="${escapeHtml(r.code)}"${state.customer.salesRepCode === r.code ? ' selected' : ''}>${escapeHtml(r.name)}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <div class="dcp-field-label">Ship method</div>
+                                    <select id="dtgShipMethod">
+                                        ${SHIP_METHODS.map(m => `<option value="${escapeHtml(m.code)}"${state.shipping.method === m.code ? ' selected' : ''}>${escapeHtml(m.label)}</option>`).join('')}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -1957,7 +1966,7 @@
         return state.rows.find((r) => !r.style) || null;
     }
 
-    function previewStyle({ style, desc, colorsAvailable, availableSizes }) {
+    function previewStyle({ style, desc, color, colorsAvailable, availableSizes }) {
         if (!style) return;
         const row = findPreviewableRow();
         if (!row) return; // every row already has a style — don't clobber
@@ -1966,10 +1975,107 @@
         if (desc) row.desc = desc;
         if (Array.isArray(colorsAvailable)) row.colorsAvailable = colorsAvailable;
         if (Array.isArray(availableSizes)) row.availableSizes = availableSizes;
+
+        // If the chat detected a color (from rep's message OR existing rows),
+        // push it through fuzzyMatchColor to resolve canonical + catalogColor
+        // + swatch image. Saves a 2nd round-trip via quote_dtg_pricing for
+        // the color cell to fill.
+        if (color && !row.color) {
+            const matched = fuzzyMatchColor(row.colorsAvailable || [], color);
+            if (matched) {
+                row.color = matched.COLOR_NAME || matched.colorName || matched.name || color;
+                row.catalogColor = matched.CATALOG_COLOR || matched.catalogColor || '';
+                row.colorSwatch = matched.COLOR_SQUARE_IMAGE || matched.swatchImageUrl || '';
+                if (row.catalogColor) kickInventoryFetch(row);
+            } else {
+                // No match in the catalog — store the rep's text and let the
+                // hydrate path (in fillFromQuote) try again with a longer list.
+                row.color = String(color);
+            }
+        }
+
         row._aiTouched = Date.now(); // for the visual indicator
         // Re-render WITHOUT marking dirty / saving to sessionStorage —
         // this is a transient preview, not a rep edit.
         renderTable();
+    }
+
+    /**
+     * Fill the form's rows from a `quote_dtg_pricing` tool result. Each lineItem
+     * has the shape returned by `caspio-pricing-proxy/lib/dtg-canonical-pricing.js`:
+     *   { styleNumber, color, sizes: {S: 2, ...}, totalQuantity, ... }
+     *
+     * Strategy per line:
+     *   1. Find a row matching (style, color) case-insensitive.
+     *   2. Else use the first empty row (no style).
+     *   3. Else append a new row at the end.
+     *
+     * For each filled row:
+     *   - row.style + row.color (via fuzzyMatchColor when colorsAvailable is hydrated)
+     *   - row.sizes merged into existing — only fill cells the rep hasn't typed
+     *   - row.catalogColor + row.colorSwatch (when colorsAvailable hits)
+     *   - row._aiTouched timestamp for the pulse indicator
+     *   - kickInventoryFetch() once catalogColor is resolved
+     */
+    function previewLineItems(lineItems) {
+        if (!Array.isArray(lineItems) || !lineItems.length) return;
+        let mutated = false;
+        for (const item of lineItems) {
+            const style = String(item.styleNumber || item.style || '').toUpperCase();
+            const color = String(item.color || '').trim();
+            if (!style) continue;
+
+            // Find an existing row by (style, color) — case-insensitive.
+            let row = state.rows.find((r) =>
+                String(r.style || '').toUpperCase() === style &&
+                String(r.color || '').toLowerCase() === color.toLowerCase()
+            );
+            // Fall back to first empty-style row.
+            if (!row) row = state.rows.find((r) => !r.style) || null;
+            // Fall back to creating a new row.
+            if (!row) {
+                row = newBlankRow();
+                state.rows.push(row);
+            }
+
+            row.style = style;
+            row.styleUpper = style;
+
+            // Color resolution: use fuzzyMatchColor when we have hydrated
+            // colorsAvailable (set by previewStyle or fillFromQuote earlier).
+            // Otherwise store the raw color text and let the next hydrate
+            // pass resolve it.
+            if (color && !row.color) {
+                const matched = fuzzyMatchColor(row.colorsAvailable || [], color);
+                if (matched) {
+                    row.color = matched.COLOR_NAME || matched.colorName || matched.name || color;
+                    row.catalogColor = matched.CATALOG_COLOR || matched.catalogColor || '';
+                    row.colorSwatch = matched.COLOR_SQUARE_IMAGE || matched.swatchImageUrl || '';
+                    if (row.catalogColor) kickInventoryFetch(row);
+                } else {
+                    row.color = color;
+                }
+            }
+
+            // Size merge — per-cell, only fill cells the rep hasn't typed.
+            // row.sizes[size] === undefined → fill. === 0 → fill (rep didn't
+            // type 0 explicitly; that's the "empty" state). > 0 → keep rep's
+            // value (they typed it, we don't clobber).
+            const sizes = (item.sizes && typeof item.sizes === 'object') ? item.sizes : {};
+            for (const [size, qty] of Object.entries(sizes)) {
+                const n = Number(qty);
+                if (!Number.isFinite(n) || n < 0) continue;
+                const existing = Number(row.sizes[size]) || 0;
+                if (existing === 0) row.sizes[size] = n;
+            }
+
+            row._aiTouched = Date.now();
+            mutated = true;
+        }
+        if (mutated) {
+            renderTable();
+            schedulePriceUpdate();
+        }
     }
 
     function previewCustomer(match) {
@@ -2007,6 +2113,7 @@
         // Real-time chat-driven preview hooks (silent, no dirty marking).
         previewStyle,
         previewCustomer,
+        previewLineItems,
         // Read-only row inspector — used by the chat's product-details card
         // to detect a preselected color so it can collapse the swatch grid.
         getRows: () => state.rows.map((r) => ({
