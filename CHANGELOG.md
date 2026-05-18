@@ -1,3 +1,7 @@
+## v2026.05.18.9 (2026.05.18)
+
+- Deploy v2026.05.18.9: DTG UX hardening — 9 fixes
+
 ## v2026.05.18.8 (2026.05.18)
 
 - Deploy v2026.05.18.8: stock-confirm modal at Submit time
