@@ -1,3 +1,7 @@
+## v2026.05.18.5 (2026.05.18)
+
+- Deploy v2026.05.18.5: row color swatches + editability hint
+
 ## v2026.05.18.4 (2026.05.18)
 
 - Deploy v2026.05.18.4: chat avg-price fix + Copy Chat + form tightening + immediate row render
