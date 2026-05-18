@@ -9,6 +9,52 @@
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+}
+
+/* B4 — Resume banner shown when sessionStorage had a prior in-progress
+   form state. Toast-style, fixed-positioned at the top-right of the
+   viewport so it's not affected by any in-form re-renders. */
+.dtg-resume-banner {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    max-width: 380px;
+    background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid rgba(217, 119, 6, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    color: #78350f;
+    animation: drb-slide 0.25s ease;
+}
+@keyframes drb-slide { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.dtg-resume-banner .drb-msg { flex: 1; font-weight: 600; }
+.dtg-resume-banner .drb-msg i { margin-right: 6px; color: #b45309; }
+.dtg-resume-banner .drb-dismiss {
+    background: #ffffff;
+    border: 1px solid #d97706;
+    color: #92400e;
+    padding: 4px 12px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.dtg-resume-banner .drb-dismiss:hover { background: #fef3c7; }
+.dtg-resume-banner .drb-close {
+    background: transparent;
+    border: none;
+    color: #92400e;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 4px;
 }
 
 .dtg-form-header {
@@ -827,3 +873,111 @@
     cursor: pointer;
 }
 .dtg-form-foot .dff-reset-btn:hover { background: #fff; border-color: #2e5827; color: #2e5827; }
+
+/* B6 — Inline validation banner above Submit. Names the specific missing
+   field(s) live so reps stop guessing what's blocking them. */
+.dtg-validation-banner {
+    margin: 12px 0 6px;
+    padding: 8px 12px;
+    background: #fef3c7;
+    border-left: 3px solid #d97706;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #78350f;
+    line-height: 1.45;
+}
+.dtg-validation-banner i { margin-right: 6px; color: #b45309; }
+.dtg-validation-banner .dvb-item {
+    display: inline-block;
+    font-weight: 600;
+}
+
+/* A3 — "Optional" label tag next to the Design # field-label, hinting
+   the rep doesn't need to fill it before submit. */
+.dcp-field-label .dcp-optional {
+    font-size: 9px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: lowercase;
+    letter-spacing: 0.02em;
+    margin-left: 4px;
+    font-style: italic;
+}
+
+/* C7 — Totals rows inside the live price card. Subtotal / Tax (est) /
+   Order total on three lines below the existing tier+combinedQty pill. */
+.dtg-price-summary .dps-totals-rows {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.dtg-price-summary .dps-totals-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.86);
+}
+.dtg-price-summary .dps-tax-row { font-style: italic; }
+.dtg-price-summary .dps-grand-row {
+    margin-top: 2px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+}
+.dtg-price-summary .dps-mono {
+    font-family: var(--mono, ui-monospace, monospace);
+    font-variant-numeric: tabular-nums;
+}
+
+/* B5 — Submit-failure retry card. Sits inside .dtg-submit-status with
+   .error class. Two buttons stacked horizontally: Retry + Copy payload. */
+.dtg-submit-status .dts-error-head {
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+.dtg-submit-status .dts-error-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+}
+.dtg-submit-status .dts-retry-btn,
+.dtg-submit-status .dts-copy-btn {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.18s ease;
+}
+.dtg-submit-status .dts-retry-btn {
+    background: #2e5827;
+    color: #fff;
+    border-color: #2e5827;
+}
+.dtg-submit-status .dts-retry-btn:hover {
+    background: #1f3a1f;
+    box-shadow: 0 2px 6px rgba(46, 88, 39, 0.35);
+}
+.dtg-submit-status .dts-copy-btn {
+    background: #ffffff;
+    color: #4b5563;
+    border-color: #d6cdb8;
+}
+.dtg-submit-status .dts-copy-btn:hover {
+    background: #f6f1e6;
+    border-color: #6b7280;
+    color: #1f3a1f;
+}
