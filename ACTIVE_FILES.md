@@ -590,6 +590,7 @@
 ### DTG Extended Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/shared_components/js/dtg-catalog.js` | NWCA-Approved DTG Catalog browser on `/quote-builders/dtg-quote-builder.html` — fetches `/api/dtg/top-sellers/{categories,styles,?style=X}`, renders style grid + detail modal with colors/sizes, drops picks onto the inline form via `window.DTGInlineForm.previewStyle()` | `/api/dtg/top-sellers/*` proxy endpoint, dtg-inline-form.js, dtg-catalog.css | ✅ Active |
 | `/shared_components/js/dtg-config.js` | DTG location/print settings configuration | — | ✅ Active |
 | `/shared_components/js/dtg-integration.js` | DTG calculator/adapter coordinator | dtg-pricing-service.js | ✅ Active |
 | `/shared_components/js/dtg-page-setup.js` | DTG pricing page initialization | — | ✅ Active |
@@ -800,6 +801,7 @@
 | `/shared_components/css/webstore-pricing-page.css` | **NEW (2026-05-16)** Custom-webstore page overrides — loads ON TOP of sticker-pricing-page.css. Adds: cream/navy `.webstore-quote-card` for store-setup quotes, deep-purple/gold `.fundraiser-quote-card` for fundraiser sell-price math, distinct `.web-search-chip` styling + `.web-search-results` inline list for Tavily search results. | sticker-pricing-page.css, /calculators/webstores.html | ✅ Active |
 | `/shared_components/css/dtg-quote-page.css` | **NEW (2026-05-17)** DTG quote-builder overrides — loads ON TOP of sticker-pricing-page.css. Adds: deep-green `.dtg-quote-card` for the live price card, `.top-seller-card` recommendation cards (rendered inline in chat by the recommend_top_sellers tool), `.shopworks-success-card`, `.shopworks-error-card`. | sticker-pricing-page.css, /quote-builders/dtg-quote-builder.html | ✅ Active |
 | `/shared_components/css/dtg-inline-form.css` | **NEW (2026-05-18)** Inline DTG order form styles — NWCA-green, replaces the iframed legacy Bootstrap form. Adds `.dtg-form-wrap` (paper card), `.dtg-location-pill` (front/back imprint chooser), `.dtg-rows-table` (multi-row table with style/color combobox + size grid), `.dtg-price-summary` (live tier + LTM card), `.dtg-customer-pane` (right-side customer panel mirroring the order form). | /quote-builders/dtg-quote-builder.html, dtg-inline-form.js | ✅ Active |
+| `/shared_components/css/dtg-catalog.css` | **NEW (2026-05-18)** NWCA-Approved DTG Catalog browser styles — category-tabbed style grid (`.dtg-catalog-grid` + `.dtg-catalog-card`) with rank badges, plus full-screen detail modal (`.dtg-catalog-modal`) with per-color "Add to quote" cards. Loaded on dtg-quote-builder.html. | /quote-builders/dtg-quote-builder.html, dtg-catalog.js | ✅ Active |
 | `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
 | `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
