@@ -1,3 +1,7 @@
+## v2026.05.18.10 (2026.05.18)
+
+- Deploy v2026.05.18.10: resetForm preserves rep, resets dirty + shipping
+
 ## v2026.05.18.9 (2026.05.18)
 
 - Deploy v2026.05.18.9: DTG UX hardening — 9 fixes
