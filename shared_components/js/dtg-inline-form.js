@@ -355,8 +355,8 @@
                 <th>Description</th>
                 <th>Color</th>
                 ${sizesShown.map((s) => `<th class="size-col">${escapeHtml(s)}</th>`).join('')}
-                <th class="size-col">Total</th>
-                <th>$/pc</th>
+                <th class="total-col">Total</th>
+                <th class="price-col">$/pc</th>
                 <th></th>
             </tr>
         `;
@@ -395,8 +395,8 @@
                         </div>
                     </td>
                     ${sizeCells}
-                    <td class="size-col"><strong>${total}</strong></td>
-                    <td>${perPiece != null ? '$' + perPiece.toFixed(2) : '—'}</td>
+                    <td class="total-col"><strong>${total}</strong></td>
+                    <td class="price-col">${perPiece != null ? '$' + perPiece.toFixed(2) : '—'}</td>
                     <td><button type="button" class="dtg-row-remove" data-remove-row="${escapeHtml(row.id)}" title="Remove row">×</button></td>
                 </tr>
             `;
@@ -1037,28 +1037,44 @@
                 window.__dtgQuoteID = priceQuote.quoteID;
             }
 
-            // Hydrate per-row catalog (CATALOG_COLOR + available sizes + swatch)
-            for (const row of state.rows) {
-                if (!row.style) continue;
-                try {
-                    const [info, bundle] = await Promise.all([
-                        fetchProductColors(row.style),
-                        fetchBundle(row.style),
-                    ]);
-                    row.colorsAvailable = info.colors || [];
-                    if (!row.desc && info.productTitle) row.desc = info.productTitle;
-                    const matchColor = (info.colors || []).find((c) =>
-                        (c.COLOR_NAME || c.colorName || '').toLowerCase() === (row.color || '').toLowerCase()
-                    );
-                    if (matchColor) {
-                        row.catalogColor = matchColor.CATALOG_COLOR || matchColor.catalogColor || '';
-                        row.colorSwatch = matchColor.COLOR_SQUARE_IMAGE || '';
+            // IMMEDIATE render so the rep sees the rows right away. Hydration
+            // (catalog colors, available sizes, swatch URLs) happens in the
+            // background in parallel — when each row's hydrate completes we
+            // re-render so the description / catalog color fill in. Without
+            // this the form looks empty until ALL hydrates finish (8+ seconds
+            // for a 4-line quote with cold caches).
+            renderLocationPills();
+            renderTable();
+
+            const hydrates = state.rows
+                .filter((row) => row.style)
+                .map(async (row) => {
+                    try {
+                        const [info, bundle] = await Promise.all([
+                            fetchProductColors(row.style),
+                            fetchBundle(row.style),
+                        ]);
+                        row.colorsAvailable = info.colors || [];
+                        if (!row.desc && info.productTitle) row.desc = info.productTitle;
+                        const matchColor = (info.colors || []).find((c) =>
+                            (c.COLOR_NAME || c.colorName || '').toLowerCase() === (row.color || '').toLowerCase()
+                        );
+                        if (matchColor) {
+                            row.catalogColor = matchColor.CATALOG_COLOR || matchColor.catalogColor || '';
+                            row.colorSwatch = matchColor.COLOR_SQUARE_IMAGE || '';
+                        }
+                        if (bundle && Array.isArray(bundle.sizes)) {
+                            row.availableSizes = bundle.sizes
+                                .filter((s) => Number(s.price) > 0)
+                                .map((s) => String(s.size).toUpperCase());
+                        }
+                    } catch (e) {
+                        console.warn('[dtg-inline-form] hydrate failed for', row.style, e);
                     }
-                    if (bundle && Array.isArray(bundle.sizes)) {
-                        row.availableSizes = bundle.sizes.filter((s) => Number(s.price) > 0).map((s) => String(s.size).toUpperCase());
-                    }
-                } catch (e) { console.warn('[dtg-inline-form] hydrate failed for', row.style, e); }
-            }
+                });
+            // Re-render once all parallel hydrates complete (description column
+            // and catalog colors fill in). Doesn't block fillFromQuote returning.
+            Promise.all(hydrates).then(() => { renderTable(); schedulePriceUpdate(); });
         }
 
         if (customerFinal) {
@@ -1092,9 +1108,13 @@
             if (termsSel && state.customer.terms) termsSel.value = state.customer.terms;
         }
 
-        renderLocationPills();
-        renderTable();
-        schedulePriceUpdate();
+        // Re-render once more in case only customer fields were touched (no
+        // priceQuote rebuild). Cheap; safe.
+        if (!priceQuote) {
+            renderLocationPills();
+            renderTable();
+            schedulePriceUpdate();
+        }
 
         // Scroll the form into view so the rep sees the fill happen.
         const wrap = document.querySelector('.dtg-form-wrap');

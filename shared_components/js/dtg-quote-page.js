@@ -67,12 +67,14 @@
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
         const floatingBtn = document.getElementById('floatingQuoteBtn');
         const resetBtn = document.getElementById('aiChatResetBtn');
+        const chatCopyBtn = document.getElementById('aiChatCopyBtn');
 
         if (openBtn) openBtn.addEventListener('click', openChatPanel);
         if (closeBtn) closeBtn.addEventListener('click', closeChatPanel);
         if (backdrop) backdrop.addEventListener('click', closeChatPanel);
         if (floatingBtn) floatingBtn.addEventListener('click', openChatPanel);
         if (resetBtn) resetBtn.addEventListener('click', resetChat);
+        if (chatCopyBtn) chatCopyBtn.addEventListener('click', handleCopyChat);
 
         if (form) {
             form.addEventListener('submit', function (e) {
@@ -531,6 +533,18 @@
         }
     }
 
+    // Weighted avg per-piece: lineTotal / qty. We compute this on the frontend
+    // (rather than trust the bot's `finalUnitPrice` field) because the bot
+    // sometimes emits the S-XL base unit instead of the actual weighted avg
+    // when sizes include 2XL+ upcharges. The lineTotal IS reliable (math is
+    // done by the canonical pricing module), so dividing by qty always wins.
+    function avgPerPiece(it) {
+        const qty = Number(it.totalQuantity) || 0;
+        const total = Number(it.lineTotal) || 0;
+        if (qty > 0 && total > 0) return Math.round((total / qty) * 100) / 100;
+        return Number(it.finalUnitPrice) || 0;
+    }
+
     function renderDtgQuoteCard(bubbleEl, priceQuote) {
         const msgEl = bubbleEl.closest('.chat-message');
         if (!msgEl) return;
@@ -565,7 +579,7 @@
                     <div class="dtg-pn">${escapeHtml(it.partNumber || 'DTG-CUSTOM')}</div>
                     <div class="dtg-product-line">${escapeHtml(it.description || ((it.style || it.styleNumber || '') + ' — ' + (it.color || '')))}</div>
                     <div class="dtg-sizes">${sizesHtml}</div>
-                    <div class="dtg-line"><span>${fmtInt(Number(it.totalQuantity) || 0)} pieces @ $${fmtMoney(Number(it.finalUnitPrice) || 0)}/pc</span><span class="v">$${fmtMoney(Number(it.lineTotal) || 0)}</span></div>
+                    <div class="dtg-line"><span>${fmtInt(Number(it.totalQuantity) || 0)} pieces @ $${fmtMoney(avgPerPiece(it))}/pc</span><span class="v">$${fmtMoney(Number(it.lineTotal) || 0)}</span></div>
                 </div>`;
         });
 
@@ -793,6 +807,34 @@
             showToast('Email copied — paste into Outlook');
         }).catch(err => {
             console.warn('[dtg-ai] clipboard failed:', err);
+            showToast('Copy failed — check console');
+        });
+    }
+
+    // Copy Chat — dump the full conversation to clipboard as plain text.
+    // Used when the rep wants to paste the chat into a bug report, share it
+    // with another rep, or send it to the AI feedback loop.
+    function handleCopyChat() {
+        const container = document.getElementById('aiChatMessages');
+        if (!container) { showToast('No chat to copy'); return; }
+        const lines = [];
+        if (aiState.quoteID) lines.push(`Quote: ${aiState.quoteID}`);
+        lines.push(`Copied: ${new Date().toLocaleString()}`);
+        lines.push('---');
+        container.querySelectorAll('.chat-message').forEach((msg) => {
+            const role = msg.classList.contains('user') ? 'REP' : 'BOT';
+            // innerText drops <script> + collapses whitespace nicely
+            const txt = (msg.innerText || '').trim();
+            if (!txt) return;
+            lines.push(`${role}: ${txt}`);
+            lines.push('');
+        });
+        const text = lines.join('\n').trim();
+        if (!text) { showToast('Nothing to copy yet'); return; }
+        navigator.clipboard.writeText(text).then(() => {
+            showToast(`Chat copied — ${container.querySelectorAll('.chat-message').length} messages`);
+        }).catch((err) => {
+            console.warn('[dtg-ai] copy-chat failed:', err);
             showToast('Copy failed — check console');
         });
     }
