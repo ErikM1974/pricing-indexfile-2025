@@ -12,7 +12,7 @@
     <!-- Shared chat/page CSS (sticker is canonical) + DTG overrides -->
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.18.2">
-    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.18.2">
+    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.18.4">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -155,6 +155,9 @@
                 <span>AI DTG Assistant</span>
             </div>
             <div class="ai-chat-head-actions">
+                <button type="button" class="ai-chat-icon-btn" id="aiChatCopyBtn" title="Copy whole conversation" aria-label="Copy chat">
+                    <i class="fas fa-copy" aria-hidden="true"></i>
+                </button>
                 <button type="button" class="ai-chat-icon-btn" id="aiChatResetBtn" title="Start a new quote" aria-label="Reset chat">
                     <i class="fas fa-rotate-right" aria-hidden="true"></i>
                 </button>
@@ -198,8 +201,8 @@
     <!-- DTGPricingService — used by the inline form's live price preview AND /pricing/dtg (single source of truth on the frontend) -->
     <script src="/shared_components/js/dtg-pricing-service.js?v=2026.05.18.2"></script>
     <!-- Inline DTG order form — bot fills it via window.DTGInlineForm.fillFromQuote() -->
-    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.18.2"></script>
+    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.18.4"></script>
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
-    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.18.3"></script>
+    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.18.4"></script>
 </body>
 </html>

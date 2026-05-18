@@ -132,7 +132,7 @@
 /* Two-column body: line items + customer panel */
 .dtg-form-body {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 300px;
     gap: 0;
 }
 @media (max-width: 1100px) {
@@ -140,18 +140,22 @@
 }
 
 .dtg-rows-pane {
-    padding: 16px 20px;
+    padding: 12px 16px;
     border-right: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
+    min-width: 0; /* prevent the table from pushing the grid wider */
 }
 @media (max-width: 1100px) {
     .dtg-rows-pane { border-right: none; border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.06)); }
 }
 
-/* Line items table */
+/* Line items table — designed to fit S..6XL (9 size cols) without
+   horizontal scroll on a typical 1100px+ viewport. On narrow viewports
+   the description column is hidden and the table scrolls horizontally. */
 .dtg-rows-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: 12px;
+    table-layout: auto;
 }
 .dtg-rows-table thead th {
     text-align: left;
@@ -159,17 +163,25 @@
     font-weight: 700;
     color: #6b7280;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 6px 4px;
+    letter-spacing: 0.04em;
+    padding: 4px 3px;
     border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.10));
     white-space: nowrap;
 }
 .dtg-rows-table thead th.size-col {
     text-align: center;
+    width: 38px;
+    min-width: 38px;
+}
+.dtg-rows-table thead th.total-col,
+.dtg-rows-table thead th.price-col {
+    text-align: right;
     width: 46px;
+    min-width: 46px;
+    padding-right: 6px;
 }
 .dtg-rows-table tbody td {
-    padding: 6px 4px;
+    padding: 3px 3px;
     border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.04));
     vertical-align: middle;
 }
@@ -179,13 +191,14 @@
 .dtg-rows-table input[type="number"],
 .dtg-rows-table select {
     width: 100%;
-    padding: 5px 6px;
+    padding: 4px 5px;
     border: 1px solid #d6cdb8;
     border-radius: 4px;
-    font-size: 13px;
+    font-size: 12px;
     font-family: inherit;
     background: #ffffff;
     color: #1f3a1f;
+    box-sizing: border-box;
 }
 .dtg-rows-table input:focus,
 .dtg-rows-table select:focus {
@@ -196,16 +209,48 @@
 .dtg-rows-table input[type="number"] {
     text-align: center;
     -moz-appearance: textfield;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 .dtg-rows-table input[type="number"]::-webkit-outer-spin-button,
 .dtg-rows-table input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+.dtg-rows-table td.size-col,
+.dtg-rows-table td.total-col,
+.dtg-rows-table td.price-col {
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.dtg-rows-table td.total-col,
+.dtg-rows-table td.price-col {
+    text-align: right;
+    padding-right: 6px;
+}
 
-.dtg-row-style { min-width: 90px; }
-.dtg-row-desc { min-width: 160px; color: #6b7280; font-size: 12px; }
-.dtg-row-color { min-width: 110px; }
+.dtg-row-style { width: 78px; min-width: 78px; }
+.dtg-row-desc {
+    min-width: 0;
+    color: #6b7280;
+    font-size: 11px;
+    line-height: 1.3;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.dtg-row-color { width: 96px; min-width: 96px; }
+
+/* Narrow viewport — hide the (already truncated) description column.
+   The style + color columns retain the data identity. */
+@media (max-width: 900px) {
+    .dtg-rows-table .dtg-row-desc,
+    .dtg-rows-table thead th:nth-child(2) {
+        display: none;
+    }
+}
 .dtg-row-remove {
     background: none;
     border: none;
@@ -394,7 +439,7 @@
 
 /* Customer panel */
 .dtg-customer-pane {
-    padding: 16px 20px;
+    padding: 12px 16px;
     background: #fafaf6;
 }
 .dtg-customer-pane .dcp-label {
@@ -426,14 +471,15 @@
 .dtg-customer-pane input[type="tel"],
 .dtg-customer-pane select {
     width: 100%;
-    padding: 8px 10px;
+    padding: 6px 8px;
     border: 1px solid #d6cdb8;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12.5px;
     background: #ffffff;
     color: #1f3a1f;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-family: inherit;
+    box-sizing: border-box;
 }
 .dtg-customer-pane input:focus,
 .dtg-customer-pane select:focus {
