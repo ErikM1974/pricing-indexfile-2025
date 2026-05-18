@@ -241,7 +241,29 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.dtg-row-color { width: 96px; min-width: 96px; }
+.dtg-row-color { width: 110px; min-width: 110px; }
+/* Inline color swatch chip in the color cell — sits inside the combobox
+   to the left of the color-name input. Driven by row.colorSwatch (from
+   /api/product-colors COLOR_SQUARE_IMAGE) so the rep can see at a
+   glance which color is on each line. */
+.dtg-row-color .dtg-combobox { position: relative; }
+.dtg-row-color-swatch {
+    position: absolute;
+    left: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 1;
+}
+.dtg-row-color-swatch--blank { background-color: #e5e7eb; }
+.dtg-row-color input[data-has-swatch="true"] { padding-left: 26px; }
 
 /* Narrow viewport — hide the (already truncated) description column.
    The style + color columns retain the data identity. */

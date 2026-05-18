@@ -201,7 +201,9 @@
             <div class="dtg-form-wrap">
                 <header class="dtg-form-header">
                     <div class="dfh-title"><i class="fas fa-clipboard-list"></i> DTG order form</div>
-                    <div class="dfh-sub">Same canonical pricing as <a href="/pricing/dtg" class="dff-pricing-link">/pricing/dtg</a> and the order form. Chat fills it; rep reviews; one Submit.</div>
+                    <div class="dfh-sub">
+                        <strong>Every field is editable.</strong> After the AI fills it, you can swap colors, change sizes, add or remove rows, switch print location, or edit the customer/design # — then click Submit. Same canonical pricing as <a href="/pricing/dtg" class="dff-pricing-link">/pricing/dtg</a> and the order form.
+                    </div>
                 </header>
 
                 <section class="dtg-form-section">
@@ -391,7 +393,10 @@
                     <td class="dtg-row-desc">${escapeHtml(row.desc || '—')}</td>
                     <td class="dtg-row-color">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
-                            <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'}>
+                            ${row.colorSwatch
+                                ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
+                                : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
+                            <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
                         </div>
                     </td>
                     ${sizeCells}
