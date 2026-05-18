@@ -1,3 +1,7 @@
+## v2026.05.18.13 (2026.05.18)
+
+- Deploy v2026.05.18.13: DTG chat backdrop transparent — see form behind chat
+
 ## v2026.05.18.12 (2026.05.18)
 
 - Deploy v2026.05.18.12: DTG live form mirror + layout unsmush + REP MODE
