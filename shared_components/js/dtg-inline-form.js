@@ -2205,6 +2205,32 @@
             style: r.style, color: r.color, catalogColor: r.catalogColor,
         })),
         /**
+         * Write the print location to the form from the chat side.
+         * Used when the rep types an explicit location code in chat
+         * ("pc61 jet black FF s:2 m:13" → setLocation('FF', '')) so
+         * the form pill switches automatically without making the rep
+         * click. Returns the new effective location code (e.g. "LC_FB").
+         *
+         * front: one of 'LC', 'FF', 'JF' (front-only options)
+         * back:  one of '', 'FB', 'JB' (optional back)
+         */
+        setLocation: (front, back) => {
+            const VALID_FRONT = ['LC', 'FF', 'JF'];
+            const VALID_BACK = ['', 'FB', 'JB'];
+            const f = String(front || '').toUpperCase();
+            const b = String(back || '').toUpperCase();
+            if (!VALID_FRONT.includes(f)) return null;
+            if (!VALID_BACK.includes(b)) return null;
+            const changed = (state.front !== f) || (state.back !== b);
+            if (!changed) return effectiveLocationCode();
+            state.front = f;
+            state.back = b;
+            scheduleStateSave();
+            renderLocationPills();
+            schedulePriceUpdate();
+            return effectiveLocationCode();
+        },
+        /**
          * Snapshot of form state for the chat backend. Sent on every chat
          * request as `calcContext.formState` so the bot knows what's
          * already on the form and doesn't re-ask. The bot uses this
