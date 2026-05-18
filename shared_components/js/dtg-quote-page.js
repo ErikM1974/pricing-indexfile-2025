@@ -27,6 +27,10 @@
         currentCustomerFinal: null,
         currentEmailDraft: null,
         lastLookup: null,
+        // A3 — list of contacts/companies from the most recent
+        // lookup_customer tool result. Used to fill the form's customer
+        // pane when the rep replies with a single A/B/C menu letter.
+        lastMatches: [],
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,
@@ -57,6 +61,32 @@
         catch { return ''; }
     }
 
+    /**
+     * A3 — When the bot has shown an A/B/C menu of customer matches and the
+     * rep replies with just a single letter, fill the form's customer pane
+     * with the corresponding match immediately. Saves a round-trip and gives
+     * the rep instant feedback.
+     *
+     * Strict regex: the trimmed message must be a single letter (a-z) with
+     * an optional trailing dot or paren. "Add 2 more" doesn't match.
+     * "d" → index 3. "D." → index 3. "d)" → index 3.
+     */
+    function tryMenuLetterCustomerPick(text) {
+        const m = /^([a-zA-Z])[.)]?$/.exec(String(text || '').trim());
+        if (!m) return;
+        if (!Array.isArray(aiState.lastMatches) || !aiState.lastMatches.length) return;
+        const idx = m[1].toLowerCase().charCodeAt(0) - 97; // a=0
+        if (idx < 0 || idx >= aiState.lastMatches.length) return;
+        const match = aiState.lastMatches[idx];
+        if (!match) return;
+        if (window.DTGInlineForm && typeof window.DTGInlineForm.previewCustomer === 'function') {
+            try { window.DTGInlineForm.previewCustomer(match); } catch (e) { /* non-fatal */ }
+        }
+        // Refine lastLookup to the picked one so subsequent fillFromQuote
+        // calls have the right anchor.
+        aiState.lastLookup = match;
+    }
+
     function wireChatPanel() {
         const openBtn = document.getElementById('aiOpenBtn');
         const closeBtn = document.getElementById('aiChatClose');
@@ -85,6 +115,11 @@
                 autoResizeTextarea(ta);
                 aiState.messages.push({ role: 'user', content: text });
                 appendChatBubble('user', text);
+                // A3 — menu-letter customer pick: if the rep replied with
+                // a single letter (a/b/c/d/e) and the last lookup_customer
+                // tool stashed a list of matches, fill the form's customer
+                // pane immediately — don't wait for the bot's confirmation.
+                tryMenuLetterCustomerPick(text);
                 sendChatMessage();
             });
         }
@@ -848,6 +883,10 @@
             const matches = result.matches || [];
             if (matches.length === 1) aiState.lastLookup = matches[0];
             else if (matches.length > 1 && !aiState.lastLookup) aiState.lastLookup = matches[0];
+            // A3 — stash the full match list so a subsequent "d" reply
+            // from the rep can fill the customer pane via letter-index
+            // without waiting for the bot's follow-up reply.
+            aiState.lastMatches = matches.slice(0, 26); // up to A-Z
             const status = matches.length === 0
                 ? 'No customer match — drafting generic'
                 : (matches.length === 1
@@ -862,17 +901,29 @@
         } else if (tool === 'quote_dtg_pricing') {
             if (result.error) {
                 appendToolChip(tool, `Error: ${result.message || result.error}`);
-            } else if (Array.isArray(result.lineItems) && result.lineItems.length > 1) {
-                const qty = result.combinedQuantity || result.totalQuantity || 0;
-                const sub = result.subtotal || result.lineItems.reduce((s, l) => s + (Number(l.lineTotal) || 0), 0);
-                const ltm = result.isLtmTier ? ` · LTM +$${fmtMoney(result.ltmPerUnit)}/pc` : '';
-                appendToolChip(tool,
-                    `${result.lineItems.length} lines @ ${result.locationLabel || result.locationCode} · ${fmtInt(qty)} combined pieces · tier ${result.tier}${ltm} · subtotal $${fmtMoney(sub)}`
-                );
             } else {
-                appendToolChip(tool,
-                    `${result.partNumber}: $${fmtMoney(result.lineTotal)} (${fmtInt(result.totalQuantity)} @ avg $${fmtMoney(result.finalUnitPrice)})`
-                );
+                // Real-time preview: fill the form's sizes + color + style for
+                // every line in the result. This is the BIG real-time-fill hook —
+                // by the time the bot's tool chip renders, the form's row should
+                // already show all the sizes the bot just priced.
+                const lineItems = Array.isArray(result.lineItems) && result.lineItems.length
+                    ? result.lineItems
+                    : (result.styleNumber ? [result] : []);
+                if (lineItems.length && window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
+                    try { window.DTGInlineForm.previewLineItems(lineItems); } catch (e) { /* non-fatal */ }
+                }
+                if (Array.isArray(result.lineItems) && result.lineItems.length > 1) {
+                    const qty = result.combinedQuantity || result.totalQuantity || 0;
+                    const sub = result.subtotal || result.lineItems.reduce((s, l) => s + (Number(l.lineTotal) || 0), 0);
+                    const ltm = result.isLtmTier ? ` · LTM +$${fmtMoney(result.ltmPerUnit)}/pc` : '';
+                    appendToolChip(tool,
+                        `${result.lineItems.length} lines @ ${result.locationLabel || result.locationCode} · ${fmtInt(qty)} combined pieces · tier ${result.tier}${ltm} · subtotal $${fmtMoney(sub)}`
+                    );
+                } else {
+                    appendToolChip(tool,
+                        `${result.partNumber}: $${fmtMoney(result.lineTotal)} (${fmtInt(result.totalQuantity)} @ avg $${fmtMoney(result.finalUnitPrice)})`
+                    );
+                }
             }
         } else if (tool === 'recommend_top_sellers') {
             const n = result.count || (result.products?.length) || 0;
@@ -900,6 +951,10 @@
                         window.DTGInlineForm.previewStyle({
                             style: result.styleNumber,
                             desc: result.title || '',
+                            // Pass the preselected color through — previewStyle
+                            // resolves it via fuzzyMatchColor so the row fills
+                            // color+catalogColor+swatch in one shot.
+                            color: preselectedColor || null,
                             colorsAvailable: result.colors || [],
                             availableSizes: (result.sizes || []).map((s) => String(s.size).toUpperCase()),
                         });
