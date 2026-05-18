@@ -2204,5 +2204,35 @@
         getRows: () => state.rows.map((r) => ({
             style: r.style, color: r.color, catalogColor: r.catalogColor,
         })),
+        /**
+         * Snapshot of form state for the chat backend. Sent on every chat
+         * request as `calcContext.formState` so the bot knows what's
+         * already on the form and doesn't re-ask. The bot uses this
+         * to skip questions for fields the rep has already filled.
+         */
+        getFormSnapshot: () => ({
+            locationCode: effectiveLocationCode() || 'LC',
+            locationLabel: effectiveLocationLabel(),
+            front: state.front || 'LC',
+            back: state.back || '',
+            rows: state.rows
+                .filter((r) => r.style || Object.values(r.sizes || {}).some((q) => Number(q) > 0))
+                .map((r) => ({
+                    style: r.style || '',
+                    color: r.color || '',
+                    sizes: r.sizes || {},
+                    totalQty: Object.values(r.sizes || {}).reduce((s, q) => s + (Number(q) || 0), 0),
+                })),
+            customer: {
+                company: state.customer.company || '',
+                companyId: state.customer.companyId || '',
+                firstName: state.customer.firstName || '',
+                lastName: state.customer.lastName || '',
+                email: state.customer.email || '',
+                phone: state.customer.phone || '',
+                designNumber: state.customer.designNumber || '',
+            },
+            shipping: { method: state.shipping.method || 'ups' },
+        }),
     };
 })();
