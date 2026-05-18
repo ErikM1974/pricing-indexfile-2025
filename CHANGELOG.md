@@ -1,3 +1,7 @@
+## v2026.05.18.6 (2026.05.18)
+
+- Deploy v2026.05.18.6: DTG LTM Caspio-driven (4 frontend files)
+
 ## v2026.05.18.5 (2026.05.18)
 
 - Deploy v2026.05.18.5: row color swatches + editability hint
