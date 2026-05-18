@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.18.15">
     <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.18.15">
+    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.18.20">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -60,65 +61,50 @@
             <div class="quick-fact"><i class="fas fa-robot"></i> <span>AI-driven intake + Q&amp;A</span></div>
         </section>
 
-        <!-- ========== Top-seller quick-picks accordion ========== -->
-        <details class="pricing-accordion">
+        <!-- ========== NWCA-Approved DTG Catalog (interactive browser) ========== -->
+        <details class="pricing-accordion" id="dtgCatalogAccordion">
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
                     <i class="fas fa-star"></i>
-                    Top-seller quick-picks
+                    NWCA-Approved DTG Catalog
                 </span>
-                <span class="toggle-meta">6 hand-curated DTG-friendly garments</span>
+                <span class="toggle-meta">20 top-selling, DTG-tested garments — click any card to view colors and add to quote</span>
                 <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
             </summary>
             <div class="pricing-accordion-body">
-                <section class="banner-section">
-                    <div class="banner-section-header">
-                        <h2><i class="fas fa-tshirt"></i> Recommended t-shirts (in sales rank order)</h2>
-                        <span class="banner-section-eyebrow">Tested + proven on our Brother GTX600 DTG printers</span>
-                    </div>
-                    <div class="banner-rate-grid">
-                        <div class="banner-rate-card included">
-                            <div class="pn">PC54 · #1</div>
-                            <div class="included-badge">Top seller</div>
-                            <div class="rate">Port &amp; Company<span class="unit"> Core Cotton Tee</span></div>
-                            <div class="desc"><strong>18,753+ units sold.</strong> 100% cotton. Reliable workhorse — best default pick. Best colors: Jet Black, Dk Hthr Grey, Navy, White.</div>
+                <section class="dtg-catalog-section">
+                    <div class="dtg-catalog-head">
+                        <div class="dtg-catalog-eyebrow">
+                            <i class="fas fa-shield-check"></i> Tested on our Brother GTX600 · Sales-proven · SanMar-stocked
                         </div>
-                        <div class="banner-rate-card included">
-                            <div class="pn">PC61 · #2</div>
-                            <div class="included-badge">Top seller</div>
-                            <div class="rate">Port &amp; Company<span class="unit"> Essential Tee</span></div>
-                            <div class="desc"><strong>15,621+ units.</strong> 100% cotton, budget-friendly. <strong>⚠ Avoid Red color</strong> — causes fixation stains.</div>
-                        </div>
-                        <div class="banner-rate-card included">
-                            <div class="pn">PC450 · #3</div>
-                            <div class="included-badge">Top seller</div>
-                            <div class="rate">Port &amp; Company<span class="unit"> Fan Favorite Tee</span></div>
-                            <div class="desc"><strong>10,006+ units.</strong> Softer cotton blend, customer favorite for retail-style feel.</div>
-                        </div>
-                        <div class="banner-rate-card">
-                            <div class="pn">PC55 · #4</div>
-                            <div class="rate">Port &amp; Company<span class="unit"> Core Blend Tee</span></div>
-                            <div class="desc">6,932+ units. Cotton/poly blend, less shrinkage. Best for athletic teams.</div>
-                        </div>
-                        <div class="banner-rate-card">
-                            <div class="pn">BC3001 · #5</div>
-                            <div class="rate">BELLA+CANVAS<span class="unit"> Unisex Jersey</span></div>
-                            <div class="desc">Premium tee — smooth fabric face, sharper print. Step up when budget allows.</div>
-                        </div>
-                        <div class="banner-rate-card">
-                            <div class="pn">DT6000 · #6</div>
-                            <div class="rate">District<span class="unit"> Very Important Tee</span></div>
-                            <div class="desc">1,770+ units. Lightweight cotton, holds print well. Best for hot-climate orders.</div>
+                        <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
+                            <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
+                            <!-- categories injected dynamically -->
                         </div>
                     </div>
-                    <div class="banner-formula">
-                        <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying needed).
-                        &nbsp;·&nbsp;
-                        <strong>Best for hoodies:</strong> DT1101 Perfect Weight Fleece · PC850H Fan Favorite Fleece.
+                    <div class="dtg-catalog-grid" id="dtgCatalogGrid">
+                        <!-- Cards injected by dtg-catalog.js -->
+                        <div class="dtg-catalog-loading">
+                            <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
+                        </div>
+                    </div>
+                    <div class="dtg-catalog-foot">
+                        <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying).
                     </div>
                 </section>
             </div>
         </details>
+
+        <!-- ========== Catalog detail modal (style + all colors + size mix) ========== -->
+        <div class="dtg-catalog-modal-backdrop" id="dtgCatalogModalBackdrop" hidden></div>
+        <div class="dtg-catalog-modal" id="dtgCatalogModal" hidden role="dialog" aria-modal="true" aria-labelledby="dtgCatalogModalTitle">
+            <button type="button" class="dtg-catalog-modal-close" id="dtgCatalogModalClose" aria-label="Close catalog modal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="dtg-catalog-modal-body" id="dtgCatalogModalBody">
+                <!-- injected by dtg-catalog.js -->
+            </div>
+        </div>
 
         <!-- ========== Inline DTG order form (chat fills, rep edits, one Submit) ========== -->
         <section aria-labelledby="dtgFormHead">
@@ -206,5 +192,7 @@
     <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.18.18"></script>
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
     <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.18.19"></script>
+    <!-- NWCA-Approved DTG Catalog browser — backed by /api/dtg/top-sellers -->
+    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.18.20"></script>
 </body>
 </html>
