@@ -542,15 +542,35 @@
             addBtn.addEventListener('click', () => {
                 if (aiState.isStreaming) return;
                 const parts = [];
+                const sizesObj = {};
                 inputs.forEach((inp) => {
                     const v = parseInt(inp.value, 10);
                     if (Number.isFinite(v) && v > 0) {
-                        parts.push(`${inp.getAttribute('data-size')}:${v}`);
+                        const sz = inp.getAttribute('data-size');
+                        parts.push(`${sz}:${v}`);
+                        sizesObj[sz] = v;
                     }
                 });
                 if (!parts.length) return;
                 const style = matrix.getAttribute('data-style') || '';
                 const color = matrix.getAttribute('data-color') || '';
+
+                // 🔴 KEY FIX — push to the form IMMEDIATELY. Don't wait for
+                // quote_dtg_pricing (which only fires after the bot has
+                // location + customer). The matrix has everything the form
+                // needs: style + color + sizes. Form is source of truth.
+                if (window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
+                    try {
+                        window.DTGInlineForm.previewLineItems([{
+                            styleNumber: style,
+                            color: color,
+                            sizes: sizesObj,
+                        }]);
+                    } catch (e) { /* non-fatal */ }
+                }
+
+                // Still send the chat message so the bot tracks the line
+                // and can call quote_dtg_pricing when it has the location.
                 const msg = `Sizes for ${style} ${color}: ${parts.join(' ')}`;
                 const ta = document.getElementById('aiChatTextarea');
                 const form = document.getElementById('aiChatForm');
@@ -937,12 +957,23 @@
 
         try {
             await ensureQuoteID();
+            // Send a live snapshot of the form so the bot knows what's
+            // already set (location, rows, customer) and skips re-asking.
+            // The form is the source of truth — the bot reads from it.
+            const formState = (window.DTGInlineForm && typeof window.DTGInlineForm.getFormSnapshot === 'function')
+                ? (function () {
+                    try { return window.DTGInlineForm.getFormSnapshot(); } catch { return null; }
+                })()
+                : null;
             const response = await fetch(AI_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     messages: aiState.messages,
-                    calcContext: { quoteID: aiState.quoteID },
+                    calcContext: {
+                        quoteID: aiState.quoteID,
+                        formState,
+                    },
                 }),
             });
             if (!response.ok) throw new Error('AI server returned ' + response.status);
