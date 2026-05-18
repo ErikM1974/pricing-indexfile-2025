@@ -266,12 +266,81 @@
 .dtg-row-color input[data-has-swatch="true"] { padding-left: 26px; }
 
 /* Narrow viewport — hide the (already truncated) description column.
-   The style + color columns retain the data identity. */
+   The style + color columns retain the data identity. Hovering the Style
+   cell still reveals the description via the `title` attribute. */
 @media (max-width: 900px) {
     .dtg-rows-table .dtg-row-desc,
     .dtg-rows-table thead th:nth-child(2) {
         display: none;
     }
+}
+
+/* Unavailable-size cells (e.g. PC90H doesn't carry 5XL/6XL). Striped
+   non-interactive cell with a small "N/A" label. Mirrors the order-form
+   pattern (styles.css:.sz-unavail / .sz-na) so reps see the same UI on
+   both pages. */
+.dtg-rows-table td.sz-unavail {
+    background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(0, 0, 0, 0.06) 4px 5px);
+    cursor: not-allowed;
+    text-align: center;
+    vertical-align: middle;
+}
+.dtg-rows-table .sz-na {
+    display: block;
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #9ca3af;
+    text-align: center;
+    line-height: 1.6;
+    user-select: none;
+}
+
+/* Inventory badges under each size cell — green/amber/red based on
+   requested-vs-available. Same classes the order form's styles.css
+   defines, so the visual language matches across both pages. */
+.dtg-rows-table td .sz-inv-badge {
+    display: block;
+    font-family: var(--mono, ui-monospace, monospace);
+    font-size: 9px;
+    letter-spacing: 0.02em;
+    text-align: center;
+    margin-top: 2px;
+    line-height: 1.2;
+    user-select: none;
+    color: #6b7280;
+    transition: opacity 0.15s ease;
+}
+.dtg-rows-table td .sz-inv-good     { color: #15803d; }     /* green — plenty */
+.dtg-rows-table td .sz-inv-low      { color: #b45309; }     /* amber — qty close to available */
+.dtg-rows-table td .sz-inv-over     { color: #b91c1c; font-weight: 700; }  /* red — qty > available */
+.dtg-rows-table td .sz-inv-oos      { color: #b91c1c; font-weight: 700; }  /* red — out of stock */
+.dtg-rows-table td .sz-inv-unknown  { color: #9ca3af; font-style: italic; }
+.dtg-rows-table td .sz-inv-not-local { color: #475569; font-style: italic; font-size: 8px; }
+/* Sz-overflow: red-tinted background when qty > available. */
+.dtg-rows-table td.sz-overflow {
+    background: color-mix(in oklab, #fee2e2 50%, transparent);
+}
+/* Collapse the green "good" badge to a tiny dot in the resting state so
+   the table doesn't get cluttered with numbers — hover or focus reveals
+   the actual digits. Mirrors the order-form's paper.css pattern. */
+.dtg-rows-table td:not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-good {
+    color: transparent;
+    text-indent: -9999px;
+    overflow: hidden;
+}
+.dtg-rows-table td:not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-good::before {
+    content: '●';
+    display: block;
+    text-indent: 0;
+    font-size: 6px;
+    line-height: 1;
+    color: #15803d;
+}
+.dtg-rows-table td:not(:focus-within):not(:hover) .sz-inv-unknown {
+    opacity: 0.55;
 }
 .dtg-row-remove {
     background: none;

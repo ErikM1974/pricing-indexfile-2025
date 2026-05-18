@@ -6,6 +6,16 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+## Pricing
+
+### DTG LTM fee/threshold lived in 4 different files (2026-05-18)
+**Problem:** Erik wanted to bump or remove the $50 DTG LTM fee. That single number was hardcoded in 4 places: backend `lib/dtg-canonical-pricing.js`, frontend `dtg-pricing-service.js`, `pages/order-form/pricing/methods/dtg.jsx`, `calculators/dtg-pricing.html`. The `qty < 24` threshold was also hardcoded across all 4. Changing the fee would have been a 4-PR + 4-deploy nightmare.
+**Root Cause:** Caspio's `Pricing_Tiers` table already had an `LTM_Fee` column (queried by `/api/dtg/product-bundle`), but the value was `0` for all 3 DTG rows and no code read it — every consumer reimplemented "qty<24 → $50/qty floored" inline.
+**Solution:** Added a 4th DTG row to `Pricing_Tiers`: `TierLabel='1-23' MinQty=1 MaxQty=23 MarginDenominator=0.57 LTM_Fee=50 DecorationMethod='DTG'`. Refactored all 4 files to (a) find the tier row by qty range (no special `<24` branch), (b) read `LTM_Fee` off the resolved row. The canonical module also got a "smart print-cost fallback": when the LTM tier has no `DTG_Costs` rows, it uses the lowest non-LTM tier's costs (preserves the historical "LTM uses 24-47 print cost + LTM fee" pattern).
+**Prevention:** Any pricing constant that has a corresponding Caspio column MUST be read from the column, not duplicated in code. When adding a new pricing method, audit for hardcoded `$50` / `<24` / `<7` before shipping. The 19 jest scenarios in `caspio-pricing-proxy/tests/jest/dtg-canonical-pricing.test.js` pin the Caspio-driven contract — they include a `LTM_Fee=75` test that proves accounting can change the value with no code change.
+
+---
+
 ## Dashboard / UI
 
 ### Caspio Embed Script Overrides Host Page CSS (2026-05-13)
