@@ -1777,6 +1777,10 @@
     }
 
     function resetForm() {
+        // Preserve the rep's last-picked sales rep across resets — they
+        // typically do many quotes in a row as themselves.
+        const preservedRepCode = state.customer.salesRepCode
+            || (function () { try { return localStorage.getItem('dtg.lastSalesRep') || 'erik'; } catch { return 'erik'; } })();
         state.front = 'LC';
         state.back = '';
         state.rows = [newBlankRow()];
@@ -1784,7 +1788,11 @@
             company: '', companyId: '', contactId: '',
             firstName: '', lastName: '', email: '', phone: '',
             designNumber: '', terms: 'Prepaid', contacts: [],
+            salesRepCode: preservedRepCode,
         };
+        state.shipping = { method: 'ups' };
+        state.dirtyAfterChatFill = false;
+        state.lastSubmit = null;
         const statusEl = document.getElementById('dtgSubmitStatus');
         if (statusEl) statusEl.hidden = true;
         render();
