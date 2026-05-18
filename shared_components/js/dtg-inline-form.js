@@ -89,7 +89,36 @@
             colorsAvailable: [],
             sizes: {},         // { S: 4, M: 8, ... }
             availableSizes: [],
+            // Inventory state populated by kickInventoryFetch() after a style+
+            // color pick. Mirrors the order form's row.inventory shape so the
+            // sz-inv-badge classes (good/low/over/oos/unknown) work the same.
+            inventory: { bySize: {}, status: 'unknown', grandTotal: 0 },
         };
+    }
+
+    // Fetch SanMar inventory for a row's style+catalogColor combo via the
+    // shared window.OrderFormInventory module. Idempotent; results are cached
+    // 5 min in the inventory module itself, so calling on every input event
+    // is cheap. Re-renders the table when the data lands.
+    async function kickInventoryFetch(row) {
+        if (!row || !row.style || !row.catalogColor) return;
+        if (!window.OrderFormInventory || typeof window.OrderFormInventory.getInventoryForRow !== 'function') {
+            return; // graceful — script not loaded
+        }
+        try {
+            const result = await window.OrderFormInventory.getInventoryForRow(
+                row.style, row.catalogColor
+            );
+            // Only update if this row is still in state (rep didn't remove it
+            // while the fetch was in flight).
+            const current = state.rows.find(r => r.id === row.id);
+            if (current) {
+                current.inventory = result || { bySize: {}, status: 'unknown' };
+                renderTable();
+            }
+        } catch (err) {
+            console.warn('[dtg-inline-form] inventory fetch failed', err);
+        }
     }
 
     function effectiveLocationCode() {
@@ -374,23 +403,48 @@
         tbody.innerHTML = state.rows.map((row) => {
             const total = Object.values(row.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
             const perPiece = row._perPiece;
+            const inv = row.inventory || { bySize: {}, status: 'unknown' };
+            const invKnown = inv.status === 'ok';
+            const classify = (window.OrderFormInventory && window.OrderFormInventory.classifyInventory)
+                || ((q, a) => Number.isFinite(Number(a)) ? (Number(a) === 0 ? 'oos' : (q > a ? 'over' : (q > a * 0.8 ? 'low' : 'good'))) : 'unknown');
+
             const sizeCells = sizesShown.map((sz) => {
                 const qty = Number((row.sizes || {})[sz]) || 0;
                 const avail = row.availableSizes && row.availableSizes.length > 0
                     ? row.availableSizes.includes(sz)
                     : true;
-                return `<td class="size-col">
-                    <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}" ${avail ? '' : 'disabled placeholder="—"'}>
+                if (!avail && row.style) {
+                    // Product doesn't carry this size — render an N/A cell
+                    // (matches the order form's .sz-unavail pattern).
+                    return `<td class="size-col sz-unavail" title="${escapeHtml(row.style)} doesn't come in ${escapeHtml(sz)}"><span class="sz-na">N/A</span></td>`;
+                }
+                // Render input + inventory badge underneath if we have stock data.
+                const invAvailable = inv.bySize ? inv.bySize[sz] : null;
+                const showBadge = invKnown && Number.isFinite(Number(invAvailable));
+                const klass = showBadge ? classify(qty, Number(invAvailable)) : 'unknown';
+                const overflow = klass === 'over';
+                const badge = showBadge
+                    ? `<span class="sz-inv-badge sz-inv-${klass}" title="SanMar stock: ${Number(invAvailable).toLocaleString()} ${escapeHtml(sz)}${overflow ? ' — exceeds available' : ''}">${Number(invAvailable).toLocaleString()}</span>`
+                    : '';
+                return `<td class="size-col${overflow ? ' sz-overflow' : ''}">
+                    <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}">
+                    ${badge}
                 </td>`;
             }).join('');
+
+            // Description tooltip for narrow viewports — hover the style cell
+            // to see the product title even when the Description column is hidden.
+            const styleTitle = row.desc
+                ? `${row.style || ''} — ${row.desc}`
+                : (row.style || '');
             return `
                 <tr data-row-id="${escapeHtml(row.id)}">
-                    <td class="dtg-row-style">
+                    <td class="dtg-row-style" title="${escapeHtml(styleTitle)}">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="style">
                             <input type="text" value="${escapeHtml(row.style)}" placeholder="PC54" autocomplete="off">
                         </div>
                     </td>
-                    <td class="dtg-row-desc">${escapeHtml(row.desc || '—')}</td>
+                    <td class="dtg-row-desc" title="${escapeHtml(row.desc || '')}">${escapeHtml(row.desc || '—')}</td>
                     <td class="dtg-row-color">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
                             ${row.colorSwatch
@@ -688,6 +742,8 @@
             close();
             renderTable();
             schedulePriceUpdate();
+            // Kick off SanMar inventory fetch — badges appear once data lands.
+            kickInventoryFetch(row);
         }
         input.addEventListener('input', () => { open(); filter(input.value); });
         input.addEventListener('focus', () => { open(); filter(input.value); });
@@ -1098,6 +1154,9 @@
                                 .filter((s) => Number(s.price) > 0)
                                 .map((s) => String(s.size).toUpperCase());
                         }
+                        // Once we know the catalogColor, kick off the inventory
+                        // fetch. The fetch resolves async + re-renders independently.
+                        kickInventoryFetch(row);
                     } catch (e) {
                         console.warn('[dtg-inline-form] hydrate failed for', row.style, e);
                     }
