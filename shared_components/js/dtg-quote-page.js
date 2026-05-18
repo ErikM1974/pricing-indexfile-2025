@@ -383,7 +383,12 @@
                 const ta = document.getElementById('aiChatTextarea');
                 const form = document.getElementById('aiChatForm');
                 if (!ta || !form) return;
-                ta.value = `Let's go with ${colorName}.`;
+                // Include the style number so the bot doesn't have to ask
+                // "which style?" when multiple product-detail cards are on screen.
+                const styleNumber = data && data.styleNumber ? data.styleNumber : '';
+                ta.value = styleNumber
+                    ? `For ${styleNumber}, let's go with ${colorName}.`
+                    : `Let's go with ${colorName}.`;
                 form.dispatchEvent(new Event('submit', { cancelable: true }));
             });
         });
