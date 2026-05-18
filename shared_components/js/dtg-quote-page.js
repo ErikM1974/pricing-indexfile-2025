@@ -562,6 +562,36 @@
                 addBtn.disabled = true;
                 addBtn.innerHTML = '<i class="fas fa-check"></i> Sent';
                 matrix.classList.add('pd-size-matrix-sent');
+
+                // After submit, show explicit follow-up actions so the rep
+                // doesn't have to guess "what next?". Two clear paths:
+                //   (1) Add another color of THIS style — clicks the existing
+                //       swatch expander, scrolls the grid into view.
+                //   (2) Different style or done — just type/use chat.
+                if (!matrix.parentElement.querySelector('.pd-size-matrix-followup')) {
+                    const followup = document.createElement('div');
+                    followup.className = 'pd-size-matrix-followup';
+                    followup.innerHTML = `
+                        <button type="button" class="pd-sm-add-color">
+                            <i class="fas fa-plus"></i> Another color of ${escapeHtml(style)}
+                        </button>
+                        <span class="pd-sm-divider">— or type a new style in chat below</span>
+                    `;
+                    matrix.parentElement.insertBefore(followup, matrix.nextSibling);
+
+                    followup.querySelector('.pd-sm-add-color').addEventListener('click', () => {
+                        const expander = wrap.querySelector('.pd-swatch-expander');
+                        const grid = wrap.querySelector('.color-swatch-grid');
+                        // Open the swatch grid if it's collapsed (confirmed mode)
+                        if (expander && expander.getAttribute('aria-expanded') === 'false') {
+                            expander.click();
+                        }
+                        // Scroll to it so the rep can pick
+                        if (grid) {
+                            setTimeout(() => grid.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+                        }
+                    });
+                }
             });
 
             // Auto-focus the first non-upcharge size cell (usually S or M)
