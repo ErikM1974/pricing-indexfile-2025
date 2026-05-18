@@ -381,50 +381,65 @@
         const colors = Array.isArray(result.colors) ? result.colors : [];
         if (!colors.length) return null;
 
-        // (a) form row inspection
+        // 🔴 PRIORITY: Latest user message wins over existing form rows.
+        //
+        // Why: if the rep already added PC61 Jet Black and now types
+        // "pc61 in yellow", they're adding a NEW color. The user's CURRENT
+        // intent (yellow) trumps the existing row (jet black). Looking at
+        // the form row first would pick Jet Black and render the wrong
+        // matrix.
+        //
+        // (a) Latest user message scan — explicit color win.
         try {
-            if (window.DTGInlineForm && typeof window.DTGInlineForm.getRows === 'function') {
-                const rows = window.DTGInlineForm.getRows() || [];
-                const style = String(result.styleNumber || '').toUpperCase();
-                const matched = rows.find((r) => String(r.style || '').toUpperCase() === style && r.color);
-                if (matched) {
-                    const exact = colors.find((c) => String(c.name || '').toLowerCase() === String(matched.color).toLowerCase());
-                    if (exact) return exact.name;
-                    const fuzzy = colors.find((c) => String(c.name || '').toLowerCase().includes(String(matched.color).toLowerCase()));
-                    if (fuzzy) return fuzzy.name;
+            const userMsgs = (aiState.messages || []).filter((m) => m.role === 'user');
+            if (userMsgs.length) {
+                const txt = String(userMsgs[userMsgs.length - 1].content || '').toLowerCase();
+                if (txt) {
+                    // For each canonical color, count how many of its words
+                    // (3+ chars) appear in the user text. Higher word-match
+                    // wins; ties broken by shorter canonical name. So
+                    // "athletic heather" picks "Athletic Heather" not
+                    // "Black Heather".
+                    const scored = [];
+                    for (const c of colors) {
+                        const cn = String(c.name || '').toLowerCase();
+                        if (!cn) continue;
+                        const words = (cn.match(/[a-z]+/g) || []).filter((w) => w.length >= 3);
+                        if (!words.length) continue;
+                        let matchCount = 0;
+                        for (const w of words) {
+                            const re = new RegExp('\\b' + w + '\\b');
+                            if (re.test(txt)) matchCount++;
+                        }
+                        if (matchCount > 0) scored.push({ c, matchCount, len: cn.length });
+                    }
+                    if (scored.length) {
+                        scored.sort((a, b) => (b.matchCount - a.matchCount) || (a.len - b.len));
+                        return scored[0].c.name;
+                    }
                 }
             }
         } catch (e) { /* ignore */ }
 
-        // (b) latest user message scan
+        // (b) Form row fallback — only if the user message had no color
+        //     mention. Used for repeated lookups where the rep clicked
+        //     "+ Another color of PC61" without typing a new color.
         try {
-            const userMsgs = (aiState.messages || []).filter((m) => m.role === 'user');
-            if (!userMsgs.length) return null;
-            const txt = String(userMsgs[userMsgs.length - 1].content || '').toLowerCase();
-            if (!txt) return null;
-            // For each canonical color, count how many of its words (3+ chars)
-            // appear in the user text. Higher word-match wins, ties broken by
-            // shorter canonical name (the "plain" variant). This fixes the
-            // case where rep says "athletic heather" and the matcher picks
-            // "Black Heather" because it's shorter — wrong. "Athletic Heather"
-            // has 2 word-matches vs Black Heather's 1, so it wins.
-            const scored = [];
-            for (const c of colors) {
-                const cn = String(c.name || '').toLowerCase();
-                if (!cn) continue;
-                const words = (cn.match(/[a-z]+/g) || []).filter((w) => w.length >= 3);
-                if (!words.length) continue;
-                let matchCount = 0;
-                for (const w of words) {
-                    const re = new RegExp('\\b' + w + '\\b');
-                    if (re.test(txt)) matchCount++;
+            if (window.DTGInlineForm && typeof window.DTGInlineForm.getRows === 'function') {
+                const rows = window.DTGInlineForm.getRows() || [];
+                const style = String(result.styleNumber || '').toUpperCase();
+                // Match on style only IF there's exactly one row for this style.
+                // If multiple rows (e.g. two PC61 colors), don't guess —
+                // let the rep pick from the swatch grid.
+                const matched = rows.filter((r) => String(r.style || '').toUpperCase() === style && r.color);
+                if (matched.length === 1) {
+                    const row = matched[0];
+                    const exact = colors.find((c) => String(c.name || '').toLowerCase() === String(row.color).toLowerCase());
+                    if (exact) return exact.name;
+                    const fuzzy = colors.find((c) => String(c.name || '').toLowerCase().includes(String(row.color).toLowerCase()));
+                    if (fuzzy) return fuzzy.name;
                 }
-                if (matchCount > 0) scored.push({ c, matchCount, len: cn.length });
             }
-            if (!scored.length) return null;
-            // Sort by matchCount desc, then by length asc.
-            scored.sort((a, b) => (b.matchCount - a.matchCount) || (a.len - b.len));
-            return scored[0].c.name;
         } catch (e) { /* ignore */ }
 
         return null;
