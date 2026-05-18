@@ -1,3 +1,7 @@
+## v2026.05.18.4 (2026.05.18)
+
+- Deploy v2026.05.18.4: chat avg-price fix + Copy Chat + form tightening + immediate row render
+
 ## v2026.05.18.3 (2026.05.18)
 
 - Deploy v2026.05.18.3: swatch click includes style number
