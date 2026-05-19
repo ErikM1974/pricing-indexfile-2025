@@ -1,3 +1,7 @@
+## v2026.05.19.12 (2026.05.19)
+
+- Deploy v2026.05.19.12: pre-flight readiness panel + tier-break optimization hints
+
 ## v2026.05.19.11 (2026.05.19)
 
 - Deploy v2026.05.19.11: line-item card — per-size price + clone + OOS warn + dropdown chevron
