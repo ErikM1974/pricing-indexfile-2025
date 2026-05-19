@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.19.1">
     <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.19.1">
-    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.2">
+    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.3">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -77,9 +77,16 @@
                         <div class="dtg-catalog-eyebrow">
                             <i class="fas fa-shield-check"></i> Tested on our Brother GTX600 · Sales-proven · SanMar-stocked
                         </div>
-                        <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
-                            <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
-                            <!-- categories injected dynamically -->
+                        <div class="dtg-catalog-toolbar">
+                            <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
+                                <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
+                                <!-- categories injected dynamically -->
+                            </div>
+                            <div class="dtg-catalog-search-wrap">
+                                <i class="fas fa-search dtg-catalog-search-icon"></i>
+                                <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch"
+                                    placeholder="Quick find — type PC54, BELLA, navy, hoodie…" autocomplete="off">
+                            </div>
                         </div>
                     </div>
                     <div class="dtg-catalog-grid" id="dtgCatalogGrid">
@@ -193,6 +200,6 @@
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
     <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.1"></script>
     <!-- NWCA-Approved DTG Catalog browser — backed by /api/dtg/top-sellers -->
-    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.18.20"></script>
+    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.3"></script>
 </body>
 </html>
