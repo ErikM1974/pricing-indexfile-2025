@@ -1,3 +1,7 @@
+## v2026.05.19.4 (2026.05.19)
+
+- Deploy v2026.05.19.4: DTG catalog — fix Phase 2 swatch click + grid breakpoint + exact-style search
+
 ## v2026.05.18.16 (2026.05.18)
 
 - Deploy v2026.05.18.16: FORM IS SOURCE OF TRUTH architecture
