@@ -1,3 +1,7 @@
+## v2026.05.19.13 (2026.05.19)
+
+- Deploy v2026.05.19.13: Design # picker — customer-aware DTG design dropdown with thumbnails
+
 ## v2026.05.19.12 (2026.05.19)
 
 - Deploy v2026.05.19.12: pre-flight readiness panel + tier-break optimization hints
