@@ -519,6 +519,93 @@
     display: none;
 }
 
+/* "★ NWCA top picks" row injected into the product-details card. Sits
+   ABOVE the full SanMar color grid. Surfaces the 4-6 colors NWCA actually
+   sells most of for this style (from DTG_Top_Sellers_2026), so reps don't
+   have to scan 60+ swatches to find the popular ones. */
+.product-details-card .pd-top-picks {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
+    border: 1px solid rgba(217, 119, 6, 0.30);
+    border-radius: 8px;
+    animation: pd-top-picks-fade 220ms ease-out;
+}
+@keyframes pd-top-picks-fade {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.product-details-card .pd-top-picks-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #78350f;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+.product-details-card .pd-top-picks-label i {
+    color: #d97706;
+    font-size: 12px;
+}
+.product-details-card .pd-top-picks-hint {
+    text-transform: none;
+    font-weight: 500;
+    color: #92400e;
+    letter-spacing: 0;
+}
+.product-details-card .pd-top-picks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 6px;
+}
+.product-details-card .pd-top-pick {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px;
+    background: #fff;
+    border: 1px solid rgba(217, 119, 6, 0.25);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 120ms ease,
+                box-shadow 120ms ease,
+                border-color 120ms ease;
+    font: inherit;
+    text-align: center;
+}
+.product-details-card .pd-top-pick:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.22);
+    border-color: #d97706;
+}
+.product-details-card .pd-top-pick:focus-visible {
+    outline: 2px solid #d97706;
+    outline-offset: 2px;
+}
+.product-details-card .pd-top-pick-swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    background: #f5f5f5;
+    object-fit: cover;
+    display: block;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+.product-details-card .pd-top-pick-swatch.placeholder {
+    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+}
+.product-details-card .pd-top-pick-name {
+    font-size: 10px;
+    line-height: 1.2;
+    color: #78350f;
+    font-weight: 600;
+    word-break: break-word;
+}
+
 /* Highlight the currently-picked swatch within the expanded grid */
 .color-swatch.picked {
     border-color: #2e5827;
