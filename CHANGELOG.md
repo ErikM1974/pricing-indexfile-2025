@@ -1,3 +1,7 @@
+## v2026.05.19.6 (2026.05.19)
+
+- Deploy v2026.05.19.6: DTG catalog — second-add fix + hero image swap per color
+
 ## v2026.05.19.5 (2026.05.19)
 
 - Deploy v2026.05.19.5: DTG catalog — Shopify-style swatch select + Kornit Storm Hexa rename
