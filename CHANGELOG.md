@@ -1,3 +1,7 @@
+## v2026.05.19.11 (2026.05.19)
+
+- Deploy v2026.05.19.11: line-item card — per-size price + clone + OOS warn + dropdown chevron
+
 ## v2026.05.19.10 (2026.05.19)
 
 - Deploy v2026.05.19.10: DTG two-column layout + card-per-line-item form
