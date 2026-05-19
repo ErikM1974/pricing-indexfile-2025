@@ -489,6 +489,9 @@
                         <strong>Every field is editable.</strong> After the AI fills it, you can swap colors, change sizes, add or remove rows, switch print location, or edit the customer/design # — then click Submit. Same canonical pricing as <a href="/pricing/dtg" class="dff-pricing-link">/pricing/dtg</a> and the order form.
                     </div>
                 </header>
+                <!-- Inline resume banner — only shown when restoreStateFromSession()
+                     restored a saved state. Empty placeholder otherwise. -->
+                <div id="dtgResumeBannerMount"></div>
 
                 <section class="dtg-form-section">
                     <div class="dfs-label"><i class="fas fa-print"></i> Print location (shared across all rows)</div>
@@ -1996,21 +1999,43 @@
     }
 
     // B4 — "Resumed from your last session" banner shown after a successful
-    // restoreStateFromSession(). Inserted OUTSIDE `.dtg-form-wrap` (into the
-    // wrap's parent) so subsequent render() calls don't wipe it. Auto-
-    // dismissed after 10 seconds; rep can also "Start fresh" to clear.
+    // restoreStateFromSession(). Renders INLINE at the top of the form (into
+    // #dtgResumeBannerMount) so it can't get visually clipped by the chat
+    // panel overlay or be misplaced at any viewport size.
+    //
+    // The mount point is a permanent div inside .dtg-form-wrap. We append a
+    // child instead of writing to innerHTML so subsequent render() calls
+    // that touch the form don't wipe the banner.
     function showResumeBanner() {
-        // Remove any pre-existing banner so we don't stack duplicates if
-        // init() somehow runs twice.
-        document.querySelectorAll('.dtg-resume-banner').forEach((b) => b.remove());
-
         try {
+            const mount = document.getElementById('dtgResumeBannerMount');
+            if (!mount) return;
+            // Clear any prior banner content
+            mount.innerHTML = '';
+
+            // Build a contextual message with row count + quote ID
+            const rowCount = state.rows.filter(r => r.style || Object.values(r.sizes || {}).some(q => Number(q) > 0)).length;
+            const totalPcs = state.rows.reduce((s, r) => s + Object.values(r.sizes || {}).reduce((a, b) => a + (Number(b) || 0), 0), 0);
+            const quoteID = getQuoteID();
+
+            const parts = [];
+            if (rowCount > 0) parts.push(`${rowCount} row${rowCount === 1 ? '' : 's'}`);
+            if (totalPcs > 0) parts.push(`${totalPcs} piece${totalPcs === 1 ? '' : 's'}`);
+            if (state.customer && state.customer.company) parts.push(state.customer.company);
+            const summary = parts.length ? ` — ${parts.join(' · ')}` : '';
+            const qidLabel = (quoteID && typeof quoteID === 'string') ? ` <strong>${escapeHtml(quoteID)}</strong>` : '';
+
             const banner = document.createElement('div');
-            banner.className = 'dtg-resume-banner';
+            banner.className = 'dtg-resume-banner-inline';
             banner.innerHTML = `
-                <span class="drb-msg"><i class="fas fa-clock-rotate-left"></i> Resumed your last session</span>
-                <button type="button" class="drb-dismiss" data-action="dismiss">Start fresh</button>
-                <button type="button" class="drb-close" data-action="close" aria-label="Close">×</button>
+                <span class="drbi-icon"><i class="fas fa-clock-rotate-left"></i></span>
+                <span class="drbi-msg">Resumed your last quote${qidLabel}${escapeHtml(summary)}. Continue editing below, or start over.</span>
+                <button type="button" class="drbi-dismiss" data-action="dismiss">
+                    <i class="fas fa-trash-can"></i> Start fresh
+                </button>
+                <button type="button" class="drbi-close" data-action="close" aria-label="Dismiss this notice">
+                    <i class="fas fa-times"></i>
+                </button>
             `;
             const dismissBtn = banner.querySelector('[data-action="dismiss"]');
             const closeBtn = banner.querySelector('[data-action="close"]');
@@ -2020,10 +2045,10 @@
                 banner.remove();
             });
             if (closeBtn) closeBtn.addEventListener('click', () => banner.remove());
-            // Attach to <body> as a fixed-position toast. Free of any
-            // in-form re-render churn.
-            document.body.appendChild(banner);
-            setTimeout(() => { try { banner.remove(); } catch {} }, 10000);
+            mount.appendChild(banner);
+            // No auto-dismiss — banner persists until the rep clicks
+            // "Start fresh" or ×. Inline placement means it's not
+            // visually intrusive, and reps can take their time deciding.
         } catch (err) {
             console.warn('[dtg-inline-form] showResumeBanner skipped:', err && err.message);
         }

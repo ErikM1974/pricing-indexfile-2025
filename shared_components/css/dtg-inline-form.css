@@ -12,49 +12,75 @@
     position: relative;
 }
 
-/* B4 — Resume banner shown when sessionStorage had a prior in-progress
-   form state. Toast-style, fixed-positioned at the top-right of the
-   viewport so it's not affected by any in-form re-renders. */
-.dtg-resume-banner {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    z-index: 9999;
-    max-width: 380px;
-    background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
-    border: 1px solid rgba(217, 119, 6, 0.5);
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+/* B4 — Inline resume banner. Lives inside the form (mounted at
+   #dtgResumeBannerMount) so it can't get clipped by the chat panel
+   overlay or floated awkwardly at the viewport edge. Full-width
+   alert-style bar above the print-location row. */
+.dtg-resume-banner-inline {
+    margin: 12px 20px 0;
     padding: 10px 14px;
+    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
+    border: 1px solid rgba(217, 119, 6, 0.4);
+    border-left: 4px solid #d97706;
+    border-radius: 6px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     font-size: 12.5px;
     color: #78350f;
-    animation: drb-slide 0.25s ease;
+    line-height: 1.4;
+    animation: drbi-slide 0.25s ease;
 }
-@keyframes drb-slide { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.dtg-resume-banner .drb-msg { flex: 1; font-weight: 600; }
-.dtg-resume-banner .drb-msg i { margin-right: 6px; color: #b45309; }
-.dtg-resume-banner .drb-dismiss {
+@keyframes drbi-slide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.dtg-resume-banner-inline .drbi-icon {
+    flex: 0 0 auto;
+    color: #b45309;
+    font-size: 14px;
+}
+.dtg-resume-banner-inline .drbi-msg {
+    flex: 1 1 auto;
+    font-weight: 500;
+    color: #78350f;
+}
+.dtg-resume-banner-inline .drbi-msg strong { color: #92400e; font-weight: 700; }
+.dtg-resume-banner-inline .drbi-dismiss {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 auto;
     background: #ffffff;
     border: 1px solid #d97706;
     color: #92400e;
-    padding: 4px 12px;
+    padding: 5px 12px;
     border-radius: 5px;
+    font: inherit;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
+    transition: background 120ms ease;
 }
-.dtg-resume-banner .drb-dismiss:hover { background: #fef3c7; }
-.dtg-resume-banner .drb-close {
+.dtg-resume-banner-inline .drbi-dismiss:hover { background: #fef3c7; }
+.dtg-resume-banner-inline .drbi-dismiss i { font-size: 10px; }
+.dtg-resume-banner-inline .drbi-close {
+    flex: 0 0 auto;
     background: transparent;
     border: none;
     color: #92400e;
-    font-size: 18px;
+    font-size: 14px;
     line-height: 1;
     cursor: pointer;
-    padding: 0 4px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: background 120ms ease;
+}
+.dtg-resume-banner-inline .drbi-close:hover { background: rgba(217, 119, 6, 0.10); }
+
+@media (max-width: 700px) {
+    .dtg-resume-banner-inline {
+        margin: 12px 12px 0;
+        flex-wrap: wrap;
+    }
+    .dtg-resume-banner-inline .drbi-msg { flex-basis: 100%; }
 }
 
 .dtg-form-header {
