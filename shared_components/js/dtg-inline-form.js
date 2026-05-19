@@ -618,7 +618,13 @@
                             </div>
                         </div>
 
-                        <div id="dtgValidationBanner" class="dtg-validation-banner" hidden></div>
+                        <!-- Pre-flight readiness panel (2026-05-19). Replaces
+                             the old single-line validation banner with a richer
+                             checklist showing every item's state (✓ ready,
+                             ⚠ warning, ✗ blocker) plus tier-break optimization
+                             hints. Click any ⚠ or ✗ item to scroll to / focus
+                             the field that needs attention. -->
+                        <div id="dtgPreflightPanel" class="dtg-preflight-panel"></div>
 
                         <button type="button" class="dtg-submit-btn" id="dtgSubmitBtn">
                             <i class="fas fa-truck"></i> Submit to ShopWorks
@@ -899,45 +905,211 @@
     // required fields above the Submit button, updating live as the rep
     // fills things in. Design # is intentionally NOT a hard requirement —
     // A3 handles it as a soft warning at click time.
-    function updateSubmitEnabled() {
-        const btn = document.getElementById('dtgSubmitBtn');
-        const banner = document.getElementById('dtgValidationBanner');
-        if (!btn) return;
+    // Compute the pre-flight readiness state for the current form. Returns an
+    // array of items + the overall ready flag. Each item describes ONE piece
+    // of the order with a state ('ok' / 'warn' / 'block' / 'tip'), a label,
+    // a value (or remediation message), and optionally a `jumpId` — the DOM
+    // id of the field the rep should click to fix the issue.
+    function computeReadiness() {
+        const items = [];
         const cq = combinedQty();
-        const hasLines = state.rows.some((r) => r.style && r.color && Object.values(r.sizes || {}).some((v) => Number(v) > 0));
+
+        // 1. Print location — has a sensible default (LC), so always ok
+        const locCode = effectiveLocationCode();
+        const locLabel = effectiveLocationLabel() || locCode;
+        if (locCode) {
+            items.push({ state: 'ok', label: 'Print location', value: locLabel + (state.back ? ` (${locCode})` : '') });
+        } else {
+            items.push({ state: 'block', label: 'Print location', value: 'Pick a front location', jumpId: 'dtgFrontOptions' });
+        }
+
+        // 2. Line items
+        const validLines = state.rows.filter((r) =>
+            r.style && r.color && !isRowColorInvalid(r) &&
+            Object.values(r.sizes || {}).some((v) => Number(v) > 0)
+        );
+        const invalidColorRows = state.rows.map((r, i) => ({ r, i })).filter(({ r }) => isRowColorInvalid(r));
+
+        if (state.rows.length === 0) {
+            items.push({ state: 'block', label: 'Line items', value: 'No lines yet — pick a style from the catalog or click Add row', jumpId: 'dtgAddRowBtn' });
+        } else if (validLines.length === 0) {
+            items.push({ state: 'block', label: 'Line items', value: `${state.rows.length} row${state.rows.length === 1 ? '' : 's'} pending — finish style + color + sizes`, jumpId: 'dtgRowsCards' });
+        } else {
+            const tierLabel = _lastTier ? _lastTier.TierLabel : '?';
+            const ltmFee = _lastTier ? Number(_lastTier.LTM_Fee) || 0 : 0;
+            const tierNote = ltmFee > 0 ? ` (LTM +$${(Math.floor((ltmFee / cq) * 100) / 100).toFixed(2)}/pc)` : '';
+            items.push({
+                state: 'ok',
+                label: 'Line items',
+                value: `${validLines.length} line${validLines.length === 1 ? '' : 's'} · ${cq} combined pcs · tier ${tierLabel}${tierNote}`,
+            });
+        }
+
+        // 3. Invalid colors — separate items per row so it's clear which fix
+        for (const { r, i } of invalidColorRows) {
+            items.push({ state: 'block', label: `Row ${i + 1} color`, value: `"${r.color}" not in ${r.style || 'catalog'} — pick from the dropdown`, jumpId: 'dtgRowsCards' });
+        }
+
+        // 4. Customer (company or name + email)
         const hasCustomerEmail = !!(state.customer.email && state.customer.email.includes('@'));
         const hasCompanyOrName = !!(state.customer.company || (state.customer.firstName && state.customer.lastName) || state.customer.companyId);
-        const hasShipMethod = !!state.shipping.method;
-        const hasSalesRep = !!state.customer.salesRepCode;
-        const invalidColorRows = state.rows
-            .map((r, i) => ({ r, i }))
-            .filter(({ r }) => isRowColorInvalid(r));
+        const custDisplay = state.customer.company
+            || `${state.customer.firstName || ''} ${state.customer.lastName || ''}`.trim()
+            || state.customer.companyId;
+        if (!hasCompanyOrName) {
+            items.push({ state: 'block', label: 'Customer', value: 'Search for a company or fill name manually', jumpId: 'dtgCompanyInput' });
+        } else if (!hasCustomerEmail) {
+            items.push({ state: 'block', label: 'Customer', value: `${custDisplay} — missing email`, jumpId: 'dtgEmail' });
+        } else {
+            items.push({ state: 'ok', label: 'Customer', value: `${custDisplay} · ${state.customer.email}` });
+        }
 
-        const missing = [];
-        if (cq < 1)            missing.push('Add a line with sizes');
-        if (!hasLines)         missing.push('Pick a style + color');
-        if (invalidColorRows.length) {
-            // Use a single human-readable item — e.g. "Row 2: 'Pink' not in PC90H catalog"
-            for (const { r, i } of invalidColorRows) {
-                missing.push(`Row ${i + 1}: "${r.color}" not in ${r.style || 'catalog'} — pick from dropdown`);
+        // 5. Sales rep
+        const repCode = state.customer.salesRepCode;
+        if (!repCode) {
+            items.push({ state: 'block', label: 'Sales rep', value: 'Pick a sales rep', jumpId: 'dtgSalesRep' });
+        } else {
+            const repName = (SALES_REPS.find((r) => r.code === repCode) || {}).name || repCode;
+            items.push({ state: 'ok', label: 'Sales rep', value: repName });
+        }
+
+        // 6. Ship method
+        if (!state.shipping.method) {
+            items.push({ state: 'block', label: 'Ship method', value: 'Pick a ship method', jumpId: 'dtgShipMethod' });
+        } else {
+            const shipLabel = (SHIP_METHODS.find((m) => m.code === state.shipping.method) || {}).label || state.shipping.method;
+            items.push({ state: 'ok', label: 'Ship method', value: shipLabel });
+        }
+
+        // 7. Design # — soft warning (TBD is ok per the bot's workflow)
+        if (!state.customer.designNumber) {
+            items.push({ state: 'warn', label: 'Design #', value: 'Blank — TBD ok, or fill if you have it', jumpId: 'dtgDesignNumber' });
+        } else {
+            items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
+        }
+
+        // 8. OOS-with-qty warnings (any size typed where SanMar shows 0 stock)
+        let oosTypedCount = 0;
+        for (const row of state.rows) {
+            const inv = row.inventory;
+            if (!inv || inv.status !== 'ok') continue;
+            for (const [sz, qty] of Object.entries(row.sizes || {})) {
+                if (Number(qty) > 0 && inv.bySize && Number(inv.bySize[sz]) === 0) oosTypedCount++;
             }
         }
-        if (!hasCustomerEmail) missing.push('Customer email');
-        if (!hasCompanyOrName) missing.push('Company or contact name');
-        if (!hasShipMethod)    missing.push('Ship method');
-        if (!hasSalesRep)      missing.push('Sales rep');
+        if (oosTypedCount > 0) {
+            items.push({
+                state: 'warn',
+                label: 'Stock',
+                value: `${oosTypedCount} size${oosTypedCount === 1 ? '' : 's'} typed at qty > 0 are showing OOS at SanMar — verify before promising`,
+            });
+        }
 
-        const ready = missing.length === 0;
+        // 9. Tier-break optimization (free money)
+        if (_lastTier && _allTiers && cq > 0) {
+            const nextTier = findNextTier(_allTiers, _lastTier, cq);
+            if (nextTier) {
+                const piecesNeeded = nextTier.MinQty - cq;
+                if (piecesNeeded > 0 && piecesNeeded <= 5) {
+                    const currentLtmFee = Number(_lastTier.LTM_Fee) || 0;
+                    const hint = currentLtmFee > 0
+                        ? `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} and skip the $${currentLtmFee} LTM fee`
+                        : `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} — cheaper per-piece pricing`;
+                    items.push({ state: 'tip', label: 'Tier tip', value: hint });
+                }
+            }
+        }
+
+        // Overall readiness — any blocker means submit is gated
+        const blockers = items.filter((i) => i.state === 'block').length;
+        const warnings = items.filter((i) => i.state === 'warn').length;
+        const ready = blockers === 0;
+        return { items, blockers, warnings, ready };
+    }
+
+    // Return the next tier above the current one in MinQuantity order, or
+    // null if currentTier is already the top tier or tiers list is missing.
+    function findNextTier(tiers, currentTier, currentQty) {
+        if (!Array.isArray(tiers) || !currentTier) return null;
+        const sorted = tiers.slice().sort((a, b) => Number(a.MinQuantity) - Number(b.MinQuantity));
+        const idx = sorted.findIndex((t) => t.TierLabel === currentTier.TierLabel);
+        if (idx < 0 || idx === sorted.length - 1) return null;
+        const next = sorted[idx + 1];
+        return {
+            TierLabel: next.TierLabel,
+            MinQty: Number(next.MinQuantity),
+            MaxQty: Number(next.MaxQuantity),
+            LTM_Fee: Number(next.LTM_Fee) || 0,
+        };
+    }
+
+    // Render the pre-flight panel and gate the Submit button accordingly.
+    // Called whenever state changes (sizes, customer fields, location, etc).
+    // Replaced the old single-line validation banner on 2026-05-19 with this
+    // richer always-visible checklist.
+    function updateSubmitEnabled() {
+        const btn = document.getElementById('dtgSubmitBtn');
+        const panel = document.getElementById('dtgPreflightPanel');
+        if (!btn) return;
+
+        const { items, blockers, warnings, ready } = computeReadiness();
         btn.disabled = state.submitting || !ready;
 
-        if (banner) {
-            if (ready || state.submitting) {
-                banner.hidden = true;
-                banner.innerHTML = '';
-            } else {
-                banner.hidden = false;
-                banner.innerHTML = `<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Need: ${missing.map(m => `<span class="dvb-item">${escapeHtml(m)}</span>`).join(' · ')}`;
-            }
+        if (panel) {
+            const quoteID = getQuoteID();
+            const qidLabel = quoteID ? `<span class="dpp-qid">${escapeHtml(quoteID)}</span>` : '';
+            const headerClass = ready ? 'dpp-header dpp-header--ready' : 'dpp-header dpp-header--blocked';
+            const headerIcon = ready ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+            const headerText = ready
+                ? (warnings > 0
+                    ? `Ready to push — ${warnings} thing${warnings === 1 ? '' : 's'} worth a glance`
+                    : 'Ready to push to ShopWorks')
+                : `${blockers} thing${blockers === 1 ? '' : 's'} need${blockers === 1 ? 's' : ''} attention before push`;
+
+            const itemHtml = items.map((it) => {
+                const iconClass = it.state === 'ok'   ? 'fa-check-circle dpp-i--ok'
+                                : it.state === 'warn' ? 'fa-exclamation-triangle dpp-i--warn'
+                                : it.state === 'block'? 'fa-circle-xmark dpp-i--block'
+                                : 'fa-lightbulb dpp-i--tip';
+                const cursor = it.jumpId ? 'dpp-item--clickable' : '';
+                const jumpAttr = it.jumpId ? `data-jump-id="${escapeHtml(it.jumpId)}"` : '';
+                return `
+                    <div class="dpp-item ${cursor}" ${jumpAttr}>
+                        <i class="fas ${iconClass}" aria-hidden="true"></i>
+                        <span class="dpp-label">${escapeHtml(it.label)}:</span>
+                        <span class="dpp-value">${escapeHtml(it.value)}</span>
+                    </div>
+                `;
+            }).join('');
+
+            panel.innerHTML = `
+                <div class="${headerClass}">
+                    ${headerIcon}
+                    <span class="dpp-header-text">${escapeHtml(headerText)}</span>
+                    ${qidLabel}
+                </div>
+                <div class="dpp-items">${itemHtml}</div>
+            `;
+            panel.hidden = false;
+
+            // Wire jump-to-field clicks (delegated would be cleaner, but the
+            // panel re-renders on every state change, so per-render attach is fine)
+            panel.querySelectorAll('.dpp-item--clickable').forEach((el) => {
+                el.addEventListener('click', () => {
+                    const id = el.getAttribute('data-jump-id');
+                    const target = document.getElementById(id);
+                    if (!target) return;
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Focus the underlying input/select if reachable
+                    if (target.tagName === 'INPUT' || target.tagName === 'SELECT' || target.tagName === 'TEXTAREA') {
+                        setTimeout(() => target.focus(), 300);
+                    } else {
+                        // For container ids, find first input inside
+                        const firstInput = target.querySelector('input, select, textarea, button');
+                        if (firstInput) setTimeout(() => firstInput.focus(), 300);
+                    }
+                });
+            });
         }
 
         btn.title = ready
@@ -1465,6 +1637,14 @@
     }
 
     // ----- Live pricing (via window.DTGPricingService) -----------------------
+    //
+    // Tier info cache — populated by updateLivePrices() after a successful
+    // run, read by the pre-flight panel for tier-break optimization hints.
+    // Module-scoped so we don't have to re-fetch the bundle just to render
+    // the readiness panel. Cleared on style change / row removal.
+    let _lastTier = null;       // current tier object (TierLabel, MinQty, MaxQty, LTM_Fee)
+    let _allTiers = null;       // full tiers list (used to find the next tier)
+    let _lastPerPiece = null;   // weighted avg per-piece price at current tier (for savings math)
     let _priceTimer = null;
     function schedulePriceUpdate() {
         clearTimeout(_priceTimer);
@@ -1476,11 +1656,13 @@
         const cq = combinedQty();
         if (!code || cq === 0 || !window.DTGPricingService) {
             for (const r of state.rows) { r._perPiece = null; r._lineTotal = 0; }
+            _lastTier = null; _allTiers = null; _lastPerPiece = null;
             renderTable();
             renderSummary();
             return;
         }
         const svc = new window.DTGPricingService();
+        _lastPerPiece = null; // reset; first priced row sets it
 
         for (const row of state.rows) {
             if (!row.style || !row.color) { row._perPiece = null; row._lineTotal = 0; continue; }
@@ -1497,6 +1679,9 @@
                 // no more hardcoded $50.
                 const tier = svc.getTierForQuantity(bundle.tiers, cq);
                 if (!tier) { row._perPiece = null; row._lineTotal = 0; continue; }
+                // Cache for the pre-flight panel's tier-break hint.
+                _lastTier = tier;
+                _allTiers = bundle.tiers;
                 const ltmFee = Number(tier.LTM_Fee) || 0;
                 const ltmPP = ltmFee > 0 ? Math.floor((ltmFee / cq) * 100) / 100 : 0;
 
@@ -1535,6 +1720,7 @@
                 }
                 row._perPiece = count > 0 ? Math.round((aggregate / count) * 100) / 100 : null;
                 row._lineTotal = Math.round(lineTotal * 100) / 100;
+                if (row._perPiece && _lastPerPiece == null) _lastPerPiece = row._perPiece;
             } catch (err) {
                 console.error('[dtg-inline-form] row price update failed:', row.style, err);
                 row._perPiece = null;
