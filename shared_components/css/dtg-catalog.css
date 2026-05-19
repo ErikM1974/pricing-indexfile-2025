@@ -292,13 +292,14 @@
     padding: 0 14px 8px;
 }
 .dtg-cc-color-swatch {
+    position: relative; /* anchor the .dtg-cc-swatch-check dot */
     width: 28px;
     height: 28px;
     padding: 0;
     background: #fff;
     border: 1.5px solid rgba(0, 0, 0, 0.12);
     border-radius: 5px;
-    overflow: hidden;
+    overflow: visible; /* let the check dot poke out the corner */
     cursor: pointer;
     transition: transform 100ms ease,
                 border-color 100ms ease,
@@ -309,29 +310,81 @@
     border-color: #2e5827;
     box-shadow: 0 2px 6px rgba(46, 88, 39, 0.30);
     z-index: 2;
-    position: relative;
 }
 .dtg-cc-color-swatch:focus-visible {
     outline: 2px solid #2e5827;
     outline-offset: 1px;
+}
+/* Selected state — ring + checkmark badge so the rep can SEE which color
+   the green CTA below is about to add. Matches the Shopify pattern. */
+.dtg-cc-color-swatch--selected {
+    border-color: #2e5827;
+    box-shadow: 0 0 0 2px #2e5827, 0 2px 6px rgba(46, 88, 39, 0.35);
+    z-index: 2;
 }
 .dtg-cc-color-swatch img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 3px; /* round corners inside parent's border */
 }
 .dtg-cc-swatch-placeholder {
     display: block;
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    border-radius: 3px;
 }
+/* Tiny check badge in the swatch corner — only visible on --selected */
+.dtg-cc-swatch-check {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 14px;
+    height: 14px;
+    background: #2e5827;
+    color: #fff;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 7px;
+    line-height: 1;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.dtg-cc-color-swatch--selected .dtg-cc-swatch-check {
+    display: flex;
+}
+/* "+N" overflow badge — now a real button that opens the All-colors modal */
 .dtg-cc-more {
-    font-size: 10.5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+    height: 28px;
+    padding: 0 6px;
+    background: transparent;
+    border: 1.5px dashed #d6cdb8;
+    border-radius: 5px;
     color: #6b7280;
-    font-weight: 600;
-    padding: 0 4px;
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 100ms ease,
+                border-color 100ms ease,
+                color 100ms ease;
+}
+.dtg-cc-more:hover {
+    background: #f6f1e6;
+    border-color: #2e5827;
+    color: #2e5827;
+}
+.dtg-cc-selected-color-label {
+    /* Label inside the CTA that flips as the rep picks different swatches */
+    font-weight: 700;
 }
 
 /* Action buttons */
