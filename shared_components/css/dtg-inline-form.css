@@ -336,6 +336,27 @@
 .dtg-row-color-swatch--blank { background-color: #e5e7eb; }
 .dtg-row-color input[data-has-swatch="true"] { padding-left: 26px; }
 
+/* Invalid color state — rep typed a color SanMar doesn't carry for this
+   style. The row's price + Submit are blocked until they pick from the
+   dropdown. Hard red border + inline ⚠ message below the cell make the
+   error impossible to miss. */
+.dtg-row-color.dtg-row-color-invalid .dtg-combobox input {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+.dtg-row-color.dtg-row-color-invalid .dtg-combobox input:focus {
+    border-color: #b91c1c;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+}
+.dtg-row-color-warn {
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #b91c1c;
+    line-height: 1.3;
+    cursor: help;
+}
+
 /* AI-touched row indicator — applied for ~2s after the chat's
    lookup_product_details or lookup_customer tool result writes into the
    row. Gives the rep a visible "the form caught the chat" cue so they

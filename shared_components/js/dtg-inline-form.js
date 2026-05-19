@@ -313,9 +313,39 @@
     }
 
     function combinedQty() {
+        // Exclude invalid-color rows from the tier / piece count. They're
+        // not real orders until the rep picks a valid catalog color.
         return state.rows.reduce((sum, r) => {
+            if (isRowColorInvalid(r)) return sum;
             return sum + Object.values(r.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
         }, 0);
+    }
+
+    /**
+     * Is this row's color valid?
+     *
+     * A row is INVALID when the rep typed a color the catalog doesn't have:
+     *   row.color === "Pink" + row.catalogColor === ""  → invalid
+     * vs VALID when the rep picked from the dropdown (which sets both):
+     *   row.color === "Jet Black" + row.catalogColor === "Jet Black"
+     * OR when the row is partially filled (no style/color yet, mid-typing):
+     *   row.color === ""  → not invalid (just incomplete)
+     *
+     * Used by:
+     *   - updateLivePrices() to skip invalid rows in the dollar total
+     *   - updateSubmitEnabled() to disable Submit when any row is invalid
+     *   - renderTable() to render a red ⚠ warning next to the bad cell
+     */
+    function isRowColorInvalid(row) {
+        if (!row) return false;
+        // Empty color is not invalid — just incomplete
+        if (!row.color || String(row.color).trim().length === 0) return false;
+        // Style not yet picked — color hasn't had a chance to validate
+        if (!row.style) return false;
+        // colorsAvailable not hydrated yet (still fetching) — defer judgment
+        if (!Array.isArray(row.colorsAvailable) || row.colorsAvailable.length === 0) return false;
+        // Color is set but no catalogColor → no dropdown match → invalid
+        return !row.catalogColor || String(row.catalogColor).trim().length === 0;
     }
 
     // ----- Fetchers ----------------------------------------------------------
@@ -732,13 +762,16 @@
                         </div>
                     </td>
                     <td class="dtg-row-desc" title="${escapeHtml(row.desc || '')}">${escapeHtml(row.desc || '—')}</td>
-                    <td class="dtg-row-color">
+                    <td class="dtg-row-color${isRowColorInvalid(row) ? ' dtg-row-color-invalid' : ''}">
                         <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
                             ${row.colorSwatch
                                 ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
                                 : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
                             <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
                         </div>
+                        ${isRowColorInvalid(row)
+                            ? `<div class="dtg-row-color-warn" title="Pick a valid color from the dropdown">⚠ Not in catalog</div>`
+                            : ''}
                     </td>
                     ${sizeCells}
                     <td class="total-col"><strong>${total}</strong></td>
@@ -848,10 +881,19 @@
         const hasCompanyOrName = !!(state.customer.company || (state.customer.firstName && state.customer.lastName) || state.customer.companyId);
         const hasShipMethod = !!state.shipping.method;
         const hasSalesRep = !!state.customer.salesRepCode;
+        const invalidColorRows = state.rows
+            .map((r, i) => ({ r, i }))
+            .filter(({ r }) => isRowColorInvalid(r));
 
         const missing = [];
         if (cq < 1)            missing.push('Add a line with sizes');
         if (!hasLines)         missing.push('Pick a style + color');
+        if (invalidColorRows.length) {
+            // Use a single human-readable item — e.g. "Row 2: 'Pink' not in PC90H catalog"
+            for (const { r, i } of invalidColorRows) {
+                missing.push(`Row ${i + 1}: "${r.color}" not in ${r.style || 'catalog'} — pick from dropdown`);
+            }
+        }
         if (!hasCustomerEmail) missing.push('Customer email');
         if (!hasCompanyOrName) missing.push('Company or contact name');
         if (!hasShipMethod)    missing.push('Ship method');
@@ -1363,6 +1405,11 @@
 
         for (const row of state.rows) {
             if (!row.style || !row.color) { row._perPiece = null; row._lineTotal = 0; continue; }
+            // Block pricing on rows where the rep typed a color the catalog
+            // doesn't have (no catalogColor → no SanMar match → invalid).
+            // Without this guard, the live total includes phantom dollars
+            // for orders that would fail in ShopWorks.
+            if (isRowColorInvalid(row)) { row._perPiece = null; row._lineTotal = 0; continue; }
             try {
                 const bundle = await fetchBundle(row.style);
                 if (!bundle) { row._perPiece = null; row._lineTotal = 0; continue; }

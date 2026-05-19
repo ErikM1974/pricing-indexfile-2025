@@ -356,7 +356,21 @@
         msg.appendChild(chip);
         if (opts.searchResults) msg.appendChild(buildWebSearchResultsEl(opts.searchResults));
         if (opts.topSellers) msg.appendChild(buildTopSellersEl(opts.topSellers));
-        if (opts.productDetails) msg.appendChild(buildProductDetailsEl(opts.productDetails, { preselectedColor: opts.preselectedColor || null }));
+        if (opts.productDetails) {
+            const card = buildProductDetailsEl(opts.productDetails, {
+                preselectedColor: opts.preselectedColor || null,
+            });
+            msg.appendChild(card);
+            // If a curated-colors promise was started, wait for it then
+            // inject the top-picks row into the rendered card.
+            if (opts.curatedColorsPromise) {
+                opts.curatedColorsPromise.then((curatedColors) => {
+                    if (Array.isArray(curatedColors) && curatedColors.length) {
+                        injectTopPicksRow(card, curatedColors, opts.productDetails);
+                    }
+                }).catch(() => { /* non-fatal */ });
+            }
+        }
         container.appendChild(msg);
         scrollChatBottom();
     }
@@ -367,6 +381,99 @@
      * then a list of size chips with upcharges proactively shown. Clicking a
      * swatch sends "Let's go with [Color Name]" back to the bot.
      */
+    /**
+     * Fetch the curated top colors for a style from the DTG_Top_Sellers_2026
+     * Caspio table. Returns an array of { name, catalogColor, swatchUrl, units }
+     * or [] if the style isn't in the curated list.
+     */
+    const _curatedColorsCache = new Map();
+    async function fetchCuratedColorsForStyle(styleNumber) {
+        const sn = String(styleNumber || '').trim().toUpperCase();
+        if (!sn) return [];
+        if (_curatedColorsCache.has(sn)) return _curatedColorsCache.get(sn);
+        try {
+            const r = await fetch(`${API_BASE_URL}/api/dtg/top-sellers?style=${encodeURIComponent(sn)}`);
+            if (!r.ok) { _curatedColorsCache.set(sn, []); return []; }
+            const data = await r.json();
+            const list = Array.isArray(data && data.records) ? data.records.map((r) => ({
+                name: r.color_name || '',
+                catalogColor: r.catalog_color || '',
+                swatchUrl: r.swatch_image_url || '',
+                units: Number(r.color_units_sold || 0),
+                rank: Number(r.color_rank || 0),
+            })) : [];
+            _curatedColorsCache.set(sn, list);
+            return list;
+        } catch {
+            _curatedColorsCache.set(sn, []);
+            return [];
+        }
+    }
+
+    /**
+     * Inject a "★ NWCA top picks" row above the existing color grid in
+     * a product-details card. Renders 4-6 mini swatches with click handlers
+     * that fire the same chat-message dispatch as a regular swatch pick.
+     */
+    function injectTopPicksRow(cardEl, curatedColors, productData) {
+        if (!cardEl || !Array.isArray(curatedColors) || !curatedColors.length) return;
+        // Find the existing color-swatch-grid in the card so we can insert before it
+        const grid = cardEl.querySelector('.color-swatch-grid');
+        if (!grid) return;
+        // Already injected? (don't double-render if fetch resolved twice)
+        if (cardEl.querySelector('.pd-top-picks')) return;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'pd-top-picks';
+        const styleNumber = productData?.styleNumber || '';
+        const limit = Math.min(6, curatedColors.length);
+        const picks = curatedColors.slice(0, limit);
+
+        wrap.innerHTML = `
+            <div class="pd-top-picks-label">
+                <i class="fas fa-star"></i>
+                NWCA top picks for ${escapeHtml(styleNumber)}
+                <span class="pd-top-picks-hint">— our best-selling colors</span>
+            </div>
+            <div class="pd-top-picks-grid">
+                ${picks.map((c) => `
+                    <button type="button" class="pd-top-pick"
+                            data-color-name="${escapeHtml(c.name)}"
+                            data-catalog-color="${escapeHtml(c.catalogColor)}"
+                            title="${escapeHtml(c.name)} — ${c.units.toLocaleString()} units sold">
+                        ${c.swatchUrl
+                            ? `<img class="pd-top-pick-swatch" src="${escapeHtml(c.swatchUrl)}" alt="" loading="lazy" onerror="this.classList.add('placeholder');this.removeAttribute('src');">`
+                            : `<div class="pd-top-pick-swatch placeholder"></div>`}
+                        <span class="pd-top-pick-name">${escapeHtml(c.name)}</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+        // Click handler — same payload as the full-grid swatches
+        wrap.querySelectorAll('.pd-top-pick').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                if (aiState.isStreaming) return;
+                const colorName = btn.getAttribute('data-color-name') || '';
+                if (!colorName) return;
+                const ta = document.getElementById('aiChatTextarea');
+                const form = document.getElementById('aiChatForm');
+                if (!ta || !form) return;
+                ta.value = styleNumber
+                    ? `For ${styleNumber}, let's go with ${colorName}.`
+                    : `Let's go with ${colorName}.`;
+                form.dispatchEvent(new Event('submit', { cancelable: true }));
+            });
+        });
+
+        // Insert BEFORE the swatch-grid section label (or grid itself)
+        const sectionLabel = grid.previousElementSibling;
+        if (sectionLabel && sectionLabel.classList.contains('pd-section-label')) {
+            cardEl.insertBefore(wrap, sectionLabel);
+        } else {
+            cardEl.insertBefore(wrap, grid);
+        }
+    }
+
     /**
      * Detect a "preselected" color for a product-details card by inspecting:
      *   (a) form rows — if a row already exists with this style + a non-empty
@@ -1165,7 +1272,21 @@
                 const cc = result.colorCount ?? (Array.isArray(result.colors) ? result.colors.length : 0);
                 const sc = result.sizeCount ?? (Array.isArray(result.sizes) ? result.sizes.length : 0);
                 const preselectedColor = detectPreselectedColor(result);
-                appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}${preselectedColor ? ` · ✓ ${preselectedColor}` : ''}`, { productDetails: result, preselectedColor });
+
+                // Fire a parallel fetch for the curated top colors for this
+                // style (from DTG_Top_Sellers_2026). When it lands, slot the
+                // top-picks row into the rendered product card. Non-blocking:
+                // the card renders immediately with just the full grid; the
+                // top-picks row appears 100-300ms later.
+                let curatedColorsPromise = null;
+                if (cc >= 10) {
+                    // Only worth showing for styles with many colors. For
+                    // smaller catalogs (PC150 has 16 colors, just a few)
+                    // the full grid is already manageable.
+                    curatedColorsPromise = fetchCuratedColorsForStyle(result.styleNumber);
+                }
+
+                appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}${preselectedColor ? ` · ✓ ${preselectedColor}` : ''}`, { productDetails: result, preselectedColor, curatedColorsPromise });
                 // Real-time preview: pre-fill the first empty row's style +
                 // description + available colors/sizes so the rep sees the
                 // form catching up with the conversation.
