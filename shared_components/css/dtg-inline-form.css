@@ -262,12 +262,17 @@
     100% { box-shadow: 0 1px 3px rgba(46, 88, 39, 0.08); border-color: rgba(0, 0, 0, 0.08); }
 }
 
-/* Top row: style combobox + color combobox + remove button */
+/* Top row: style combobox + color combobox + actions (clone, remove) */
 .dtg-line-head {
     display: grid;
-    grid-template-columns: 110px 1fr 28px;
+    grid-template-columns: 110px 1fr 60px;
     gap: 8px;
     align-items: center;
+}
+.dtg-line-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 .dtg-line-style .dtg-combobox,
 .dtg-line-color .dtg-combobox {
@@ -320,7 +325,8 @@
     border-color: #dc2626;
     background: rgba(220, 38, 38, 0.04);
 }
-.dtg-line-remove {
+.dtg-line-remove,
+.dtg-line-clone {
     width: 28px;
     height: 32px;
     padding: 0;
@@ -328,16 +334,52 @@
     border: 1px solid transparent;
     border-radius: 5px;
     color: #9ca3af;
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 13px;
     line-height: 1;
     cursor: pointer;
-    transition: color 120ms ease, background 120ms ease, border-color 120ms ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 120ms ease, background 120ms ease, border-color 120ms ease, transform 80ms ease;
+}
+.dtg-line-remove {
+    font-size: 20px;
+    font-weight: 700;
 }
 .dtg-line-remove:hover {
     color: #dc2626;
     background: rgba(220, 38, 38, 0.06);
     border-color: rgba(220, 38, 38, 0.25);
+}
+.dtg-line-clone:hover {
+    color: #2e5827;
+    background: rgba(46, 88, 39, 0.07);
+    border-color: rgba(46, 88, 39, 0.3);
+}
+.dtg-line-clone:active {
+    transform: scale(0.94);
+}
+
+/* Combobox chevron — visual cue that the color field is a dropdown.
+   Without this, reps don't realize they can click to see all colors. */
+.dtg-combobox-chevron {
+    position: absolute;
+    right: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 11px;
+    pointer-events: none;
+    transition: color 120ms ease;
+}
+.dtg-line-color .dtg-combobox {
+    position: relative;
+}
+.dtg-line-color input {
+    padding-right: 24px; /* leave room for the chevron */
+}
+.dtg-line-color .dtg-combobox:focus-within .dtg-combobox-chevron {
+    color: #2e5827;
 }
 
 /* Description line (between head and sizes) */
@@ -423,20 +465,60 @@
     align-items: center;
     justify-content: center;
 }
-.dtg-size-stock {
+/* Per-size price (replaced raw inventory count on 2026-05-19). Reps see
+   the tier-adjusted + LTM-amortized price for each size at a glance,
+   so they can quote upcharges without mental math. */
+.dtg-size-price {
     text-align: center;
-    font-size: 9px;
-    color: #6b7280;
+    font-size: 10.5px;
+    color: #4b5563;
     line-height: 1.2;
-    min-height: 11px;
+    min-height: 13px;
     font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
 }
-.dtg-size-stock--good  { color: #15803d; }
-.dtg-size-stock--low   { color: #b45309; }
-.dtg-size-stock--oos   { color: #dc2626; font-weight: 700; }
-.dtg-size-stock--over  { color: #dc2626; font-weight: 700; }
-.dtg-size-stock--unknown { color: transparent; }
-.dtg-size-cell--overflow input {
+.dtg-size-price--oos {
+    color: #dc2626;
+}
+.dtg-size-oos-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #dc2626;
+    border-radius: 50%;
+    flex: 0 0 auto;
+}
+/* OOS cell — red border on the input as a visual warning. Does not block
+   typing (rep may know stock is incoming); the typed-OOS warning below
+   the cell catches the case where they actually fill an OOS size.
+   Note: the attribute selector [type="number"] is required to outrank
+   the base rule's specificity (same selector pattern). */
+.dtg-size-cell--oos input[type="number"] {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.03);
+}
+.dtg-size-cell--oos input[type="number"]:focus {
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
+    border-color: #dc2626;
+    outline: none;
+}
+.dtg-size-warn {
+    margin-top: 2px;
+    padding: 2px 4px;
+    background: rgba(220, 38, 38, 0.1);
+    color: #991b1b;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+}
+/* The "typed more than in stock" case still gets a red border too. */
+.dtg-size-cell--overflow input[type="number"] {
     border-color: #dc2626;
     background: rgba(220, 38, 38, 0.04);
 }

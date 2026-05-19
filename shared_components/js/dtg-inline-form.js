@@ -730,17 +730,40 @@
                         <div class="dtg-size-na">N/A</div>
                     </div>`;
                 }
+                // Per-size price (tier-adjusted with LTM amortized in). Replaces
+                // the raw inventory count Erik removed in v11 — reps see the
+                // upcharge for extended sizes at a glance, no mental math.
+                const priceForSize = row._priceBySize ? row._priceBySize[sz] : null;
+                const priceLabel = (typeof priceForSize === 'number')
+                    ? `$${priceForSize.toFixed(2)}`
+                    : '';
+
+                // OOS warning — red dot + red border. Does NOT block typing
+                // (rep may know stock is incoming); the warning is loud
+                // enough to make them verify before promising.
                 const invAvailable = inv.bySize ? inv.bySize[sz] : null;
-                const showBadge = invKnown && Number.isFinite(Number(invAvailable));
-                const klass = showBadge ? classify(qty, Number(invAvailable)) : 'unknown';
-                const overflow = klass === 'over';
-                const badge = showBadge
-                    ? `<div class="dtg-size-stock dtg-size-stock--${klass}" title="SanMar stock: ${Number(invAvailable).toLocaleString()} ${escapeHtml(sz)}${overflow ? ' — exceeds available' : ''}">${Number(invAvailable).toLocaleString()}</div>`
-                    : '<div class="dtg-size-stock dtg-size-stock--unknown"></div>';
-                return `<div class="dtg-size-cell${overflow ? ' dtg-size-cell--overflow' : ''}">
+                const stockKnown = invKnown && Number.isFinite(Number(invAvailable));
+                const isOOS = stockKnown && Number(invAvailable) === 0;
+                const oosDot = isOOS
+                    ? `<span class="dtg-size-oos-dot" title="Out of stock at SanMar (${escapeHtml(sz)}) — verify before promising"></span>`
+                    : '';
+
+                // Inline warning when a rep types qty into an OOS cell.
+                const typedOOS = isOOS && qty > 0;
+                const oosWarn = typedOOS
+                    ? `<div class="dtg-size-warn" title="Out of stock at SanMar — verify before promising">⚠ OOS</div>`
+                    : '';
+
+                // Keep the "over inventory" classification for the typed-too-much
+                // case (rep typed 50 but only 12 in stock).
+                const klass = stockKnown ? classify(qty, Number(invAvailable)) : 'unknown';
+                const overflow = klass === 'over' && !isOOS;
+
+                return `<div class="dtg-size-cell${overflow ? ' dtg-size-cell--overflow' : ''}${isOOS ? ' dtg-size-cell--oos' : ''}">
                     <div class="dtg-size-label">${escapeHtml(sz)}</div>
                     <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}">
-                    ${badge}
+                    <div class="dtg-size-price${isOOS ? ' dtg-size-price--oos' : ''}">${oosDot}${priceLabel}</div>
+                    ${oosWarn}
                 </div>`;
             }).join('');
 
@@ -762,9 +785,15 @@
                                     ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
                                     : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
                                 <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
+                                <i class="fas fa-caret-down dtg-combobox-chevron" aria-hidden="true"></i>
                             </div>
                         </div>
-                        <button type="button" class="dtg-line-remove dtg-row-remove" data-remove-row="${escapeHtml(row.id)}" title="Remove line">×</button>
+                        <div class="dtg-line-actions">
+                            <button type="button" class="dtg-line-clone" data-clone-row="${escapeHtml(row.id)}" title="Clone this line (same style + sizes, change color)">
+                                <i class="fas fa-clone" aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="dtg-line-remove dtg-row-remove" data-remove-row="${escapeHtml(row.id)}" title="Remove line">×</button>
+                        </div>
                     </div>
                     ${row.desc ? `<div class="dtg-line-desc" title="${escapeHtml(row.desc)}">${escapeHtml(row.desc)}</div>` : ''}
                     ${colorInvalid ? `<div class="dtg-row-color-warn" title="Pick a valid color from the dropdown">⚠ "${escapeHtml(row.color)}" not in ${escapeHtml(row.style)} catalog — pick from the dropdown above</div>` : ''}
@@ -1014,6 +1043,39 @@
                 renderTable();
                 schedulePriceUpdate();
                 showToastSafe(`Distributed ${totalAdded} pieces across ${sizesParsed.length} sizes`);
+            });
+        });
+
+        // Clone row — duplicate the line (style + color + sizes + availableSizes)
+        // into a new row right below it. The common workflow: customer wants
+        // the same garment in 2+ colors with the same size mix. Faster than
+        // re-adding via catalog + re-typing sizes.
+        table.querySelectorAll('[data-clone-row]').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const rid = btn.getAttribute('data-clone-row');
+                const idx = state.rows.findIndex((r) => r.id === rid);
+                if (idx < 0) return;
+                const src = state.rows[idx];
+                const clone = newBlankRow();
+                clone.style = src.style;
+                clone.styleUpper = src.styleUpper;
+                clone.desc = src.desc;
+                clone.color = src.color;
+                clone.catalogColor = src.catalogColor;
+                clone.colorSwatch = src.colorSwatch;
+                clone.colorsAvailable = src.colorsAvailable;
+                clone.availableSizes = Array.isArray(src.availableSizes) ? [...src.availableSizes] : [];
+                clone.sizes = Object.assign({}, src.sizes || {});
+                clone._aiTouched = Date.now(); // pulse animation on the new card
+                state.rows.splice(idx + 1, 0, clone); // insert right below source
+                markDirty();
+                scheduleStateSave();
+                renderTable();
+                schedulePriceUpdate();
+                // Kick an inventory fetch if catalogColor is set — same as a
+                // fresh row from the catalog would get.
+                if (clone.catalogColor) kickInventoryFetch(clone);
+                showToastSafe(`Cloned ${src.style || 'line'} — change the color to differentiate`);
             });
         });
 
@@ -1441,6 +1503,23 @@
                 const allPrices = svc.calculateAllLocationPrices(bundle, cq);
                 if (!allPrices || !allPrices[code]) { row._perPiece = null; row._lineTotal = 0; continue; }
                 const locPrices = allPrices[code];
+
+                // Build a per-size price map for the card to render under
+                // each cell. Reps see "$30.99" under S and "$33.99" under
+                // 2XL at a glance — no mental math for upcharges.
+                row._priceBySize = {};
+                const sizesToPrice = Array.isArray(row.availableSizes) && row.availableSizes.length
+                    ? row.availableSizes
+                    : Object.keys(locPrices);
+                for (const sz of sizesToPrice) {
+                    const priceObj = locPrices[String(sz).toUpperCase()] || locPrices[sz];
+                    const base = priceObj && priceObj[tier.TierLabel];
+                    if (typeof base === 'number') {
+                        row._priceBySize[String(sz).toUpperCase()] = Math.round((base + ltmPP) * 100) / 100;
+                    }
+                }
+
+                // Sum line total + weighted-average per-piece across typed sizes.
                 let lineTotal = 0;
                 let count = 0;
                 let aggregate = 0;
