@@ -1658,13 +1658,27 @@
         let menu = null;
         let designs = [];
         let activeIndex = 0;
+        const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
-        function close() { if (menu) { menu.remove(); menu = null; } }
+        function close() {
+            if (menu) {
+                menu.remove();
+                menu = null;
+                window.removeEventListener('scroll', reposition, true);
+                window.removeEventListener('resize', reposition);
+            }
+        }
         function open() {
             if (!menu) {
                 menu = document.createElement('div');
                 menu.className = 'dtg-combobox-menu dtg-design-menu';
-                wrap.appendChild(menu);
+                // Portal to body so the menu floats ABOVE the sticky form
+                // column's scroll context (matches style/color combobox pattern).
+                // Without this the menu gets clipped by the form's overflow:auto.
+                document.body.appendChild(menu);
+                positionPortaledMenu(menu, input);
+                window.addEventListener('scroll', reposition, true);
+                window.addEventListener('resize', reposition);
             }
         }
         function filterByQuery(q) {
@@ -1716,6 +1730,8 @@
                     pick(filtered[i]);
                 });
             });
+            // Re-position after content change — menu height varies with row count.
+            positionPortaledMenu(menu, input);
         }
         function pick(d) {
             if (!d) return;
@@ -1801,13 +1817,29 @@
         let timer = null;
         let matches = [];
         let activeIndex = 0;
+        const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
-        function close() { if (menu) { menu.remove(); menu = null; } }
+        function close() {
+            if (menu) {
+                menu.remove();
+                menu = null;
+                window.removeEventListener('scroll', reposition, true);
+                window.removeEventListener('resize', reposition);
+            }
+        }
         function open() {
             if (!menu) {
                 menu = document.createElement('div');
                 menu.className = 'dtg-combobox-menu';
-                wrap.appendChild(menu);
+                // Portal to body — was previously appended to `wrap`, which
+                // got clipped by the sticky form column's overflow:auto and
+                // landed in the wrong place on screen. Matches the style/color
+                // combobox pattern. Fixes the 2026-05-19 bug where the
+                // customer dropdown appeared below the form panel.
+                document.body.appendChild(menu);
+                positionPortaledMenu(menu, input);
+                window.addEventListener('scroll', reposition, true);
+                window.addEventListener('resize', reposition);
             }
         }
         function paint() {
@@ -1830,6 +1862,8 @@
                 item.addEventListener('mouseenter', () => { activeIndex = parseInt(item.getAttribute('data-idx'), 10) || 0; paint(); });
                 item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
             });
+            // Re-position after content change — menu height can shrink/grow.
+            positionPortaledMenu(menu, input);
         }
         async function search(q) {
             if (q.length < 2) { matches = []; paint(); return; }
