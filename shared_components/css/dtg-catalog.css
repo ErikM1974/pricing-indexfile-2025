@@ -226,6 +226,18 @@
 
 /* ----- Modal -------------------------------------------------------------- */
 
+/* The HTML5 `hidden` attribute sets display:none in the user agent stylesheet,
+   but the more specific `.dtg-catalog-modal { display: flex }` and
+   `.dtg-catalog-modal-backdrop { position: fixed; inset: 0 }` rules below
+   override it — so the modal renders visibly on page load even when the HTML
+   says hidden. Explicit `[hidden]` override here, with !important to win
+   regardless of source order. (Same bug class as .color-swatch-grid[hidden]
+   in dtg-quote-page.css.) */
+.dtg-catalog-modal[hidden],
+.dtg-catalog-modal-backdrop[hidden] {
+    display: none !important;
+}
+
 .dtg-catalog-modal-backdrop {
     position: fixed;
     inset: 0;
