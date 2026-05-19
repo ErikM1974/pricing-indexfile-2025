@@ -589,7 +589,15 @@
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">Design # <span class="dcp-optional">(optional)</span></div>
-                                    <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="add later if TBD">
+                                    <div class="dtg-design-row">
+                                        <div class="dtg-combobox" id="dtgDesignCombo" data-combo-kind="design">
+                                            <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="Pick a customer first to see their DTG designs">
+                                            <i class="fas fa-caret-down dtg-combobox-chevron" aria-hidden="true"></i>
+                                        </div>
+                                        <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" target="_blank" rel="noopener" hidden>
+                                            <img id="dtgDesignThumbImg" alt="" loading="lazy">
+                                        </a>
+                                    </div>
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">Payment terms</div>
@@ -981,11 +989,25 @@
             items.push({ state: 'ok', label: 'Ship method', value: shipLabel });
         }
 
-        // 7. Design # — soft warning (TBD is ok per the bot's workflow)
+        // 7. Design # — soft warning when blank; show the matched design's
+        // name (from the design picker cache) when the # links to a real
+        // DTG design on file. If the rep typed something that doesn't match
+        // any of the customer's designs, surface that as a soft warning too.
         if (!state.customer.designNumber) {
             items.push({ state: 'warn', label: 'Design #', value: 'Blank — TBD ok, or fill if you have it', jumpId: 'dtgDesignNumber' });
         } else {
-            items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
+            const cachedDesigns = _designComboboxCustomerId
+                ? (_designsCacheByCustomer.get(String(_designComboboxCustomerId)) || [])
+                : [];
+            const matched = cachedDesigns.find((d) => d.idDesign === String(state.customer.designNumber).trim());
+            if (matched) {
+                items.push({ state: 'ok', label: 'Design #', value: `${matched.idDesign} — ${matched.designName || '(no name)'}` });
+            } else if (_designComboboxCustomerId && cachedDesigns.length > 0) {
+                // Customer has designs loaded, but the typed # isn't one of them.
+                items.push({ state: 'warn', label: 'Design #', value: `${state.customer.designNumber} — not on file for this customer (manual entry ok)`, jumpId: 'dtgDesignNumber' });
+            } else {
+                items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
+            }
         }
 
         // 8. OOS-with-qty warnings (any size typed where SanMar shows 0 stock)
@@ -1503,13 +1525,34 @@
         const input = document.getElementById('dtgCompanyInput');
         if (wrap && input) attachCompanyCombobox(wrap, input);
 
+        // Design # combobox (DTG designs for the current customer)
+        const designWrap = document.getElementById('dtgDesignCombo');
+        const designInput = document.getElementById('dtgDesignNumber');
+        if (designWrap && designInput) {
+            attachDesignCombobox(designWrap, designInput);
+            // On initial mount, if a customer is already loaded (e.g. session
+            // restored from a previous quote), kick off the design fetch.
+            refreshDesignComboboxForNewCustomer();
+        }
+
         // Manual customer fields
         bindInputToState('dtgFirstName', 'firstName');
         bindInputToState('dtgLastName', 'lastName');
         bindInputToState('dtgEmail', 'email');
         bindInputToState('dtgPhone', 'phone');
+        // When the rep types a Company ID manually (rather than picking from
+        // the search combobox), also refresh the design picker against that ID.
         bindInputToState('dtgCompanyId', 'companyId');
-        bindInputToState('dtgDesignNumber', 'designNumber');
+        const cidInput = document.getElementById('dtgCompanyId');
+        if (cidInput) {
+            let cidTimer = null;
+            cidInput.addEventListener('input', () => {
+                clearTimeout(cidTimer);
+                cidTimer = setTimeout(() => refreshDesignComboboxForNewCustomer(), 300);
+            });
+        }
+        // dtgDesignNumber is bound to state separately so the combobox's own
+        // input handler doesn't conflict. Skip bindInputToState here.
         const termsSel = document.getElementById('dtgTerms');
         if (termsSel) termsSel.addEventListener('change', () => {
             state.customer.terms = termsSel.value;
@@ -1546,6 +1589,211 @@
             scheduleStateSave();
             updateSubmitEnabled();
         });
+    }
+
+    // ----- DTG Design picker --------------------------------------------------
+    //
+    // Per-customer cache of designs fetched from /api/dtg-designs/by-customer.
+    // Keyed by customerId so switching customers triggers a fresh fetch but
+    // re-picking the same customer is instant. Cleared on resetForm().
+    const _designsCacheByCustomer = new Map();
+    let _designComboboxCustomerId = null;
+
+    async function fetchDesignsForCustomer(customerId) {
+        if (!customerId) return [];
+        const key = String(customerId);
+        if (_designsCacheByCustomer.has(key)) return _designsCacheByCustomer.get(key);
+        try {
+            const url = `${API_BASE}/api/dtg-designs/by-customer/${encodeURIComponent(key)}?limit=200`;
+            const r = await fetch(url);
+            if (!r.ok) {
+                console.warn('[dtg-inline-form] DTG designs fetch failed:', r.status);
+                _designsCacheByCustomer.set(key, []);
+                return [];
+            }
+            const j = await r.json();
+            const designs = Array.isArray(j.designs) ? j.designs : [];
+            _designsCacheByCustomer.set(key, designs);
+            return designs;
+        } catch (err) {
+            console.warn('[dtg-inline-form] DTG designs fetch error:', err.message);
+            _designsCacheByCustomer.set(key, []);
+            return [];
+        }
+    }
+
+    // Update the inline thumbnail anchor next to the Design # input. Called
+    // whenever a design is picked, the design # is typed, or the customer
+    // changes. Hidden when no matching design is loaded.
+    function syncDesignThumbnail() {
+        const anchor = document.getElementById('dtgDesignThumbAnchor');
+        const img = document.getElementById('dtgDesignThumbImg');
+        if (!anchor || !img) return;
+
+        const designNum = String(state.customer.designNumber || '').trim();
+        if (!designNum || !_designComboboxCustomerId) {
+            anchor.hidden = true;
+            img.removeAttribute('src');
+            return;
+        }
+        const designs = _designsCacheByCustomer.get(String(_designComboboxCustomerId)) || [];
+        const match = designs.find((d) => d.idDesign === designNum);
+        if (match && match.thumbnailUrl) {
+            img.src = match.thumbnailUrl;
+            img.alt = match.designName || `Design ${designNum}`;
+            anchor.href = match.thumbnailUrl;
+            anchor.title = `${match.designName || 'Design ' + designNum} — click to enlarge`;
+            anchor.hidden = false;
+        } else {
+            anchor.hidden = true;
+            img.removeAttribute('src');
+        }
+    }
+
+    // Combobox machinery for the Design # field. Opens a dropdown of the
+    // current customer's DTG designs (DesignType=45) on focus; clicking a
+    // row fills the input + shows the thumbnail inline. Mirrors the
+    // attachCompanyCombobox pattern below.
+    function attachDesignCombobox(wrap, input) {
+        let menu = null;
+        let designs = [];
+        let activeIndex = 0;
+
+        function close() { if (menu) { menu.remove(); menu = null; } }
+        function open() {
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.className = 'dtg-combobox-menu dtg-design-menu';
+                wrap.appendChild(menu);
+            }
+        }
+        function filterByQuery(q) {
+            const qq = q.toLowerCase().trim();
+            if (!qq) return designs;
+            return designs.filter((d) =>
+                String(d.idDesign).toLowerCase().includes(qq) ||
+                String(d.designName || '').toLowerCase().includes(qq)
+            );
+        }
+        function paint(q) {
+            if (!menu) return;
+            if (!_designComboboxCustomerId) {
+                menu.innerHTML = `<div class="dtg-combobox-empty">Pick a customer first to load DTG designs</div>`;
+                return;
+            }
+            const filtered = filterByQuery(q || '');
+            if (filtered.length === 0) {
+                if (designs.length === 0) {
+                    menu.innerHTML = `<div class="dtg-combobox-empty">No DTG designs on file for this customer — type a # manually or mark TBD</div>`;
+                } else {
+                    menu.innerHTML = `<div class="dtg-combobox-empty">No designs match "${escapeHtml(q)}"</div>`;
+                }
+                return;
+            }
+            menu.innerHTML = filtered.slice(0, 30).map((d, i) => {
+                const thumb = d.thumbnailUrl
+                    ? `<img class="dtg-design-row-thumb" src="${escapeHtml(d.thumbnailUrl)}" alt="" loading="lazy">`
+                    : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image"></i></div>`;
+                const meta = [];
+                if (d.locationCount > 1) meta.push(`${d.locationCount} locations`);
+                if (d.isVariation) meta.push('variation');
+                if (!d.designComplete) meta.push('in progress');
+                return `
+                    <div class="dtg-combobox-item dtg-design-row${i === activeIndex ? ' active' : ''}" data-idx="${i}">
+                        ${thumb}
+                        <div class="dtg-design-row-text">
+                            <div class="ci-primary"><strong>${escapeHtml(d.idDesign)}</strong> — ${escapeHtml(d.designName || '(no name)')}</div>
+                            <div class="ci-secondary">${meta.length ? meta.join(' · ') : (d.dateCreated || '')}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            menu.querySelectorAll('.dtg-combobox-item').forEach((item, idx) => {
+                item.addEventListener('mouseenter', () => { activeIndex = idx; });
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    const i = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                    pick(filtered[i]);
+                });
+            });
+        }
+        function pick(d) {
+            if (!d) return;
+            input.value = d.idDesign;
+            state.customer.designNumber = d.idDesign;
+            markDirty();
+            scheduleStateSave();
+            close();
+            syncDesignThumbnail();
+            updateSubmitEnabled();
+        }
+        async function refresh() {
+            if (!_designComboboxCustomerId) {
+                designs = [];
+                if (menu) paint('');
+                return;
+            }
+            designs = await fetchDesignsForCustomer(_designComboboxCustomerId);
+            // Update placeholder based on what we found
+            if (designs.length === 0) {
+                input.placeholder = 'No DTG designs on file — type a # manually or mark TBD';
+            } else {
+                input.placeholder = `Pick from ${designs.length} DTG design${designs.length === 1 ? '' : 's'} or type a # manually`;
+            }
+            if (menu) paint(input.value);
+            syncDesignThumbnail();
+        }
+
+        // Wire events
+        input.addEventListener('focus', async () => {
+            open();
+            paint(input.value);
+            // If we haven't loaded yet for this customer, kick a load
+            if (_designComboboxCustomerId && designs.length === 0 && !_designsCacheByCustomer.has(String(_designComboboxCustomerId))) {
+                await refresh();
+            }
+        });
+        input.addEventListener('input', () => {
+            // The rep is typing — could be filtering or entering a custom #
+            state.customer.designNumber = input.value;
+            markDirty();
+            scheduleStateSave();
+            if (menu) paint(input.value);
+            syncDesignThumbnail();
+            updateSubmitEnabled();
+        });
+        input.addEventListener('blur', () => {
+            // Defer close so mousedown on a menu item still fires pick()
+            setTimeout(close, 150);
+        });
+        input.addEventListener('keydown', (e) => {
+            const filtered = filterByQuery(input.value);
+            if (e.key === 'ArrowDown') { e.preventDefault(); activeIndex = Math.min(activeIndex + 1, filtered.length - 1); paint(input.value); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); activeIndex = Math.max(activeIndex - 1, 0); paint(input.value); }
+            else if (e.key === 'Enter') {
+                if (filtered[activeIndex]) { e.preventDefault(); pick(filtered[activeIndex]); }
+            } else if (e.key === 'Escape') { close(); }
+        });
+
+        // Expose a refresh hook so the company picker can trigger reload
+        // when a new customer is chosen.
+        wrap.__refreshDesigns = refresh;
+    }
+
+    // Called by attachCompanyCombobox.pick() whenever a customer is selected
+    // (or by previewCustomer() when a chat tool fills the customer pane).
+    // Re-points the design picker at the new customer and clears the input
+    // if the previously-typed design # doesn't belong to the new customer.
+    async function refreshDesignComboboxForNewCustomer() {
+        const cid = state.customer.companyId || state.customer.id;
+        const newId = (cid != null && String(cid).trim() !== '') ? String(cid).trim() : null;
+        if (newId === _designComboboxCustomerId) return; // no change
+        _designComboboxCustomerId = newId;
+        const wrap = document.getElementById('dtgDesignCombo');
+        if (wrap && typeof wrap.__refreshDesigns === 'function') {
+            await wrap.__refreshDesigns();
+        }
+        syncDesignThumbnail();
     }
 
     function attachCompanyCombobox(wrap, input) {
@@ -1606,6 +1854,8 @@
             markDirty();
             scheduleStateSave();
             close();
+            // Re-point the Design # picker at the new customer.
+            refreshDesignComboboxForNewCustomer();
             updateSubmitEnabled();
         }
         input.addEventListener('input', () => {
@@ -2270,6 +2520,10 @@
         // typically do many quotes in a row as themselves.
         const preservedRepCode = state.customer.salesRepCode
             || (function () { try { return localStorage.getItem('dtg.lastSalesRep') || 'erik'; } catch { return 'erik'; } })();
+        // Clear the design picker cache so a fresh quote doesn't show the
+        // previous customer's designs in the picker.
+        _designsCacheByCustomer.clear();
+        _designComboboxCustomerId = null;
         state.front = 'LC';
         state.back = '';
         state.rows = [newBlankRow()];
@@ -2567,6 +2821,9 @@
         set('dtgLastName', state.customer.lastName);
         set('dtgEmail', state.customer.email);
         set('dtgPhone', state.customer.phone);
+        // New customer ID → refresh the Design # picker so its dropdown
+        // shows THIS customer's DTG designs.
+        refreshDesignComboboxForNewCustomer();
         updateSubmitEnabled();
     }
 
