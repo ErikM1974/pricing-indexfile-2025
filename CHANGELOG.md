@@ -1,3 +1,7 @@
+## v2026.05.19.8 (2026.05.19)
+
+- Deploy v2026.05.19.8: DTG catalog — per-color units stat + rotated hero color across cards
+
 ## v2026.05.19.7 (2026.05.19)
 
 - Deploy v2026.05.19.7: DTG form — auto-hydrate availableSizes when previewStyle has none
