@@ -219,6 +219,249 @@
     min-width: 0;
 }
 
+/* ============================================================================
+   Card-per-line-item layout (2026-05-19). Replaced the old line-items table
+   with self-contained cards that fit comfortably in the new sticky right
+   column (~520px wide). Each card stacks vertically: style+color row at top,
+   size grid (2 rows × 5 cells = XS through 6XL) in the middle, totals at the
+   bottom. Per-row size availability is rendered as N/A inside the card.
+   ============================================================================ */
+
+.dtg-rows-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.dtg-rows-empty {
+    padding: 18px;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+    border: 1.5px dashed rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.015);
+}
+.dtg-line-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px 12px;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.dtg-line-card:hover {
+    border-color: rgba(46, 88, 39, 0.2);
+    box-shadow: 0 1px 3px rgba(46, 88, 39, 0.08);
+}
+.dtg-line-card--ai-touched {
+    animation: dtg-line-pulse 1.6s ease-out;
+}
+@keyframes dtg-line-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(46, 88, 39, 0.55); border-color: #2e5827; }
+    60%  { box-shadow: 0 0 0 10px rgba(46, 88, 39, 0); }
+    100% { box-shadow: 0 1px 3px rgba(46, 88, 39, 0.08); border-color: rgba(0, 0, 0, 0.08); }
+}
+
+/* Top row: style combobox + color combobox + remove button */
+.dtg-line-head {
+    display: grid;
+    grid-template-columns: 110px 1fr 28px;
+    gap: 8px;
+    align-items: center;
+}
+.dtg-line-style .dtg-combobox,
+.dtg-line-color .dtg-combobox {
+    width: 100%;
+}
+.dtg-line-style input,
+.dtg-line-color input {
+    width: 100%;
+    height: 32px;
+    padding: 4px 8px;
+    font-size: 13px;
+    font-family: inherit;
+    border: 1px solid #d6cdb8;
+    border-radius: 5px;
+    background: #fff;
+}
+.dtg-line-style input {
+    font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
+    font-weight: 700;
+    color: #2e5827;
+    text-transform: uppercase;
+}
+.dtg-line-style input:focus,
+.dtg-line-color input:focus {
+    outline: none;
+    border-color: #2e5827;
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+}
+.dtg-line-color {
+    position: relative;
+}
+.dtg-line-color .dtg-row-color-swatch {
+    position: absolute;
+    left: 7px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    z-index: 1;
+}
+.dtg-line-color input[data-has-swatch="true"] {
+    padding-left: 32px;
+}
+.dtg-line-color.dtg-row-color-invalid input {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.04);
+}
+.dtg-line-remove {
+    width: 28px;
+    height: 32px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: #9ca3af;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 120ms ease, background 120ms ease, border-color 120ms ease;
+}
+.dtg-line-remove:hover {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.06);
+    border-color: rgba(220, 38, 38, 0.25);
+}
+
+/* Description line (between head and sizes) */
+.dtg-line-desc {
+    margin: 6px 0 8px;
+    font-size: 11.5px;
+    color: #6b7280;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Inline color-invalid warning (in card form, lives below the head) */
+.dtg-line-card .dtg-row-color-warn {
+    margin: 4px 0 8px;
+    padding: 6px 8px;
+    background: rgba(220, 38, 38, 0.06);
+    border: 1px solid rgba(220, 38, 38, 0.2);
+    border-radius: 4px;
+    font-size: 11px;
+    color: #991b1b;
+}
+
+/* Size grid — fixed 5-column layout that wraps to 2 rows for the 10 sizes */
+.dtg-line-sizes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px 6px;
+    margin: 2px 0 8px;
+}
+.dtg-size-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    min-width: 0;
+}
+.dtg-size-label {
+    text-align: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    padding-bottom: 1px;
+}
+.dtg-size-cell input[type="number"] {
+    width: 100%;
+    height: 30px;
+    padding: 2px 4px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1px solid #d6cdb8;
+    border-radius: 4px;
+    background: #fff;
+    -moz-appearance: textfield;
+}
+.dtg-size-cell input[type="number"]::-webkit-outer-spin-button,
+.dtg-size-cell input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.dtg-size-cell input[type="number"]:focus {
+    outline: none;
+    border-color: #2e5827;
+    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.15);
+}
+.dtg-size-cell--na {
+    opacity: 0.5;
+}
+.dtg-size-na {
+    height: 30px;
+    border: 1px dashed #d1d5db;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.025);
+    color: #9ca3af;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dtg-size-stock {
+    text-align: center;
+    font-size: 9px;
+    color: #6b7280;
+    line-height: 1.2;
+    min-height: 11px;
+    font-variant-numeric: tabular-nums;
+}
+.dtg-size-stock--good  { color: #15803d; }
+.dtg-size-stock--low   { color: #b45309; }
+.dtg-size-stock--oos   { color: #dc2626; font-weight: 700; }
+.dtg-size-stock--over  { color: #dc2626; font-weight: 700; }
+.dtg-size-stock--unknown { color: transparent; }
+.dtg-size-cell--overflow input {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.04);
+}
+
+/* Footer row: qty · $/pc · total */
+.dtg-line-foot {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(0, 0, 0, 0.06);
+    font-size: 12px;
+    color: #6b7280;
+}
+.dtg-line-qty { flex: 0 0 auto; }
+.dtg-line-qty strong { color: #1f3a1f; font-size: 14px; font-variant-numeric: tabular-nums; }
+.dtg-line-perpiece { flex: 1 1 auto; }
+.dtg-line-total {
+    flex: 0 0 auto;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f3a1f;
+    font-variant-numeric: tabular-nums;
+}
+
 /* Line items table — designed to fit S..6XL (9 size cols) without
    horizontal scroll on a typical 1100px+ viewport. On narrow viewports
    the description column is hidden and the table scrolls horizontally. */
