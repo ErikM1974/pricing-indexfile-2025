@@ -168,42 +168,32 @@
             if (titleArea) titleArea.addEventListener('click', () => openModal(style));
             const heroArea = card.querySelector('.dtg-cc-hero');
             if (heroArea) heroArea.addEventListener('click', () => openModal(style));
-            // Click an inline swatch → fill form directly with that color, no modal
+            // Click an inline swatch → SELECT that color (Shopify pattern).
+            // Adds happen only on the CTA, so reps don't accidentally drop
+            // a $$$ order line just by clicking a swatch to preview.
             card.querySelectorAll('.dtg-cc-color-swatch').forEach((sw) => {
                 sw.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const colorName = sw.getAttribute('data-color-name');
-                    const catalogColor = sw.getAttribute('data-catalog-color');
-                    const swatchUrl = sw.getAttribute('data-swatch-url');
-                    quickAddToQuote(style, colorName, catalogColor, swatchUrl, row.product_title);
-                });
-                // Hover swatch → swap hero image to show that color
-                sw.addEventListener('mouseenter', () => {
-                    const heroImg = card.querySelector('.dtg-cc-hero-img');
-                    const variantSrc = sw.getAttribute('data-hover-src') || '';
-                    if (heroImg && variantSrc) heroImg.src = variantSrc;
-                });
-                sw.addEventListener('mouseleave', () => {
-                    const heroImg = card.querySelector('.dtg-cc-hero-img');
-                    const defaultSrc = heroImg?.getAttribute('data-default-src') || '';
-                    if (heroImg && defaultSrc) heroImg.src = defaultSrc;
+                    selectColorOnCard(card, sw);
                 });
             });
-            // Add-default CTA
+            // Add-default CTA — adds the CURRENTLY SELECTED color (not always
+            // the top color). card.dataset.selected* is initialized to top
+            // color when the card renders, and updated by selectColorOnCard().
             const addBtn = card.querySelector('.dtg-cc-add-default');
             if (addBtn) {
                 addBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     quickAddToQuote(
                         style,
-                        row.top_color,
-                        row.top_color_catalog,
-                        row.top_color_swatch,
+                        card.dataset.selectedColor,
+                        card.dataset.selectedCatalogColor,
+                        card.dataset.selectedSwatchUrl,
                         row.product_title
                     );
                 });
             }
-            // "View all colors" button → modal
+            // "View all colors" button → modal (size data per color)
             const viewAllBtn = card.querySelector('.dtg-cc-view-all');
             if (viewAllBtn) {
                 viewAllBtn.addEventListener('click', (e) => {
@@ -211,7 +201,36 @@
                     openModal(style);
                 });
             }
+            // "+N" badge — also opens the modal so reps can reach tail colors
+            const moreBtn = card.querySelector('.dtg-cc-more');
+            if (moreBtn) {
+                moreBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(style);
+                });
+            }
         });
+    }
+
+    // Mark a swatch as selected on its card. Updates the swatch ring +
+    // checkmark, the CTA label ("Add Pink"), and the card-level dataset
+    // that the CTA click reads from. Reused by tests + future bot wiring.
+    function selectColorOnCard(card, sw) {
+        const colorName = sw.getAttribute('data-color-name') || '';
+        const catalogColor = sw.getAttribute('data-catalog-color') || '';
+        const swatchUrl = sw.getAttribute('data-swatch-url') || '';
+        // Visually flip the selected state on this card's swatch row
+        card.querySelectorAll('.dtg-cc-color-swatch').forEach((s) => {
+            s.classList.remove('dtg-cc-color-swatch--selected');
+        });
+        sw.classList.add('dtg-cc-color-swatch--selected');
+        // Persist selection in card dataset for the CTA to pick up
+        card.dataset.selectedColor = colorName;
+        card.dataset.selectedCatalogColor = catalogColor;
+        card.dataset.selectedSwatchUrl = swatchUrl;
+        // Update the green CTA label so it says "+ Add Pink" (not "Add Jet Black")
+        const label = card.querySelector('.dtg-cc-selected-color-label');
+        if (label) label.textContent = colorName;
     }
 
     function renderCard(s) {
@@ -229,28 +248,39 @@
                     onerror="this.style.display='none';this.parentElement.classList.add('dtg-cc-hero-missing');">`
             : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt"></i></div>';
 
-        // Inline color swatches (top 4-6 from server)
+        // Inline color swatches (top 4-6 from server). First swatch (top
+        // color) starts selected. Click another → swap the selected state.
+        // Each swatch carries a small check overlay revealed by --selected.
         const topColors = Array.isArray(s.top_colors) ? s.top_colors : [];
         const swatchesHtml = topColors.length
-            ? `<div class="dtg-cc-swatches">${topColors.slice(0, 6).map((c) => `
-                <button type="button" class="dtg-cc-color-swatch"
+            ? `<div class="dtg-cc-swatches">${topColors.slice(0, 6).map((c, i) => `
+                <button type="button"
+                        class="dtg-cc-color-swatch${i === 0 ? ' dtg-cc-color-swatch--selected' : ''}"
                         data-color-name="${escapeHtml(c.color_name)}"
                         data-catalog-color="${escapeHtml(c.catalog_color)}"
                         data-swatch-url="${escapeHtml(c.swatch_image_url || '')}"
-                        title="${escapeHtml(c.color_name)} — click to add ${escapeHtml(s.style)} ${escapeHtml(c.color_name)} to quote">
+                        title="${escapeHtml(c.color_name)} — click to select, then '+ Add' below">
                     ${c.swatch_image_url
                         ? `<img src="${escapeHtml(c.swatch_image_url)}" alt="" loading="lazy">`
                         : `<span class="dtg-cc-swatch-placeholder"></span>`}
+                    <span class="dtg-cc-swatch-check" aria-hidden="true"><i class="fas fa-check"></i></span>
                 </button>`).join('')}
-                ${s.color_count > 6 ? `<span class="dtg-cc-more">+${s.color_count - 6}</span>` : ''}
+                ${s.color_count > 6 ? `<button type="button" class="dtg-cc-more" title="See all ${s.color_count} colors with size data">+${s.color_count - 6}</button>` : ''}
               </div>`
             : '';
 
         // Fabric guess from brand (matches what the bot prompt knows)
         const brand = extractBrand(s.product_title);
 
+        // The article carries the current selection in data-selected-*; the
+        // CTA reads from it. Initialized to the top-seller color, updated by
+        // selectColorOnCard() when the rep clicks a different swatch.
         return `
-            <article class="dtg-catalog-card" data-style="${escapeHtml(s.style)}">
+            <article class="dtg-catalog-card"
+                     data-style="${escapeHtml(s.style)}"
+                     data-selected-color="${escapeHtml(s.top_color || '')}"
+                     data-selected-catalog-color="${escapeHtml(s.top_color_catalog || '')}"
+                     data-selected-swatch-url="${escapeHtml(s.top_color_swatch || '')}">
                 <div class="dtg-cc-hero">
                     ${heroImg}
                     <div class="dtg-cc-hero-badges">
@@ -270,8 +300,8 @@
                 </div>
                 ${swatchesHtml}
                 <div class="dtg-cc-actions">
-                    <button type="button" class="dtg-cc-add-default" title="Add ${escapeHtml(s.top_color)} to quote">
-                        <i class="fas fa-plus"></i> Add ${escapeHtml(s.top_color || s.style)}
+                    <button type="button" class="dtg-cc-add-default" title="Add the selected color to your quote">
+                        <i class="fas fa-plus"></i> Add <span class="dtg-cc-selected-color-label">${escapeHtml(s.top_color || s.style)}</span>
                     </button>
                     <button type="button" class="dtg-cc-view-all" title="See all ${s.color_count} colors with size data">
                         <i class="fas fa-eye"></i> All ${fmtInt(s.color_count)}
