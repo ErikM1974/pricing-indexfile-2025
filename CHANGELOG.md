@@ -1,3 +1,7 @@
+## v2026.05.19.9 (2026.05.19)
+
+- Deploy v2026.05.19.9: DTG page re-engineered — catalog-first, chatbot as research assistant
+
 ## v2026.05.19.8 (2026.05.19)
 
 - Deploy v2026.05.19.8: DTG catalog — per-color units stat + rotated hero color across cards
