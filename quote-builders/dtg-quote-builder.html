@@ -12,8 +12,8 @@
     <!-- Shared chat/page CSS (sticker is canonical) + DTG overrides -->
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.19.1">
-    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.19.1">
-    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.9">
+    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.19.10">
+    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.10">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -43,39 +43,53 @@
             </div>
         </section>
 
-        <!-- ========== NWCA-Approved DTG Catalog — always-expanded, primary ========== -->
-        <section class="dtg-catalog-section dtg-catalog-section--standalone" aria-label="NWCA-Approved DTG Catalog">
-            <div class="dtg-catalog-head">
-                <div class="dtg-catalog-section-title">
-                    <i class="fas fa-star"></i>
-                    NWCA-Approved DTG Catalog
-                    <span class="dtg-catalog-section-meta">20 top-selling, DTG-tested garments — click any card to add to the order form below</span>
-                </div>
-                <div class="dtg-catalog-eyebrow">
-                    <i class="fas fa-shield-check"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
-                </div>
-                <div class="dtg-catalog-toolbar">
-                    <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
-                        <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
-                        <!-- categories injected dynamically -->
+        <!-- ========== Two-column workspace: catalog (left) + sticky form (right) ========== -->
+        <!-- Industry-standard pattern (Faire / NuOrder / Shopify B2B). On      -->
+        <!-- 1280px+ viewports the form stays in view as the rep browses the    -->
+        <!-- catalog — no more up/down scrolling between picking and entering.  -->
+        <!-- Below 1280px the grid collapses to single-column stacked.          -->
+        <div class="dtg-layout">
+
+            <!-- ========== Left column: NWCA-Approved DTG Catalog ========== -->
+            <section class="dtg-catalog-section dtg-catalog-section--standalone" aria-label="NWCA-Approved DTG Catalog">
+                <div class="dtg-catalog-head">
+                    <div class="dtg-catalog-section-title">
+                        <i class="fas fa-star"></i>
+                        NWCA-Approved DTG Catalog
+                        <span class="dtg-catalog-section-meta">20 top-selling, DTG-tested garments — click any card to drop it into the order on the right</span>
                     </div>
-                    <div class="dtg-catalog-search-wrap">
-                        <i class="fas fa-search dtg-catalog-search-icon"></i>
-                        <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch"
-                            placeholder="Quick find — type PC54, BELLA, navy, hoodie…" autocomplete="off">
+                    <div class="dtg-catalog-eyebrow">
+                        <i class="fas fa-shield-check"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
+                    </div>
+                    <div class="dtg-catalog-toolbar">
+                        <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
+                            <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
+                            <!-- categories injected dynamically -->
+                        </div>
+                        <div class="dtg-catalog-search-wrap">
+                            <i class="fas fa-search dtg-catalog-search-icon"></i>
+                            <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch"
+                                placeholder="Quick find — type PC54, BELLA, navy, hoodie…" autocomplete="off">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="dtg-catalog-grid" id="dtgCatalogGrid">
-                <!-- Cards injected by dtg-catalog.js -->
-                <div class="dtg-catalog-loading">
-                    <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
+                <div class="dtg-catalog-grid" id="dtgCatalogGrid">
+                    <!-- Cards injected by dtg-catalog.js -->
+                    <div class="dtg-catalog-loading">
+                        <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
+                    </div>
                 </div>
-            </div>
-            <div class="dtg-catalog-foot">
-                <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying).
-            </div>
-        </section>
+                <div class="dtg-catalog-foot">
+                    <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying).
+                </div>
+            </section>
+
+            <!-- ========== Right column: sticky order form ========== -->
+            <aside class="dtg-form-column" aria-labelledby="dtgFormHead">
+                <h2 id="dtgFormHead" class="visually-hidden">DTG Order Form</h2>
+                <div id="dtgInlineFormMount"></div>
+            </aside>
+        </div>
 
         <!-- ========== Catalog detail modal (style + all colors + size mix) ========== -->
         <div class="dtg-catalog-modal-backdrop" id="dtgCatalogModalBackdrop" hidden></div>
@@ -87,12 +101,6 @@
                 <!-- injected by dtg-catalog.js -->
             </div>
         </div>
-
-        <!-- ========== Inline DTG order form (rep builds manually from the catalog above) ========== -->
-        <section aria-labelledby="dtgFormHead">
-            <h2 id="dtgFormHead" class="visually-hidden">DTG Order Form</h2>
-            <div id="dtgInlineFormMount"></div>
-        </section>
 
         <!-- ========== Compact CTA ========== -->
         <section class="cta-compact">
@@ -171,10 +179,10 @@
     <!-- OrderFormInventory — SanMar stock check by style + catalog color. Reused from /order-form.html. -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.18.7"></script>
     <!-- Inline DTG order form — bot fills it via window.DTGInlineForm.fillFromQuote() -->
-    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.19.7"></script>
+    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.19.10"></script>
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
-    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.9"></script>
+    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.10"></script>
     <!-- NWCA-Approved DTG Catalog browser — backed by /api/dtg/top-sellers -->
-    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.9"></script>
+    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.10"></script>
 </body>
 </html>

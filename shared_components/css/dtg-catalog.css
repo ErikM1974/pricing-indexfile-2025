@@ -12,6 +12,73 @@
    card-with-hover-lift pattern same as the rest of the page.
    ========================================================================== */
 
+/* ============================================================================
+   Two-column layout (2026-05-19) — catalog on the left, sticky order form
+   on the right. Industry-standard pattern for catalog-to-order workflows.
+   Eliminates the up/down scroll fatigue of the previous stacked layout.
+
+   Breakpoint: at 1280px+ the layout is two columns. Below 1280px it
+   collapses to single-column stacked (the form sits below the catalog
+   as it did pre-restructure). Laptops + small monitors still work.
+
+   The right column is `position: sticky` so it stays in view as the rep
+   scrolls the catalog. It has its own scroll for when the form is taller
+   than the viewport (5+ line items, fully filled customer pane, etc.).
+   ============================================================================ */
+
+.dtg-layout {
+    display: grid;
+    /* Catalog: stretches to fill remaining space (minmax 0 prevents grid
+       blow-out from the catalog content). Form: 440-520px — wide enough
+       for the line-item card layout (commit 2) but narrow enough to leave
+       the catalog room for 2-3 cards across at common viewport widths. */
+    grid-template-columns: minmax(0, 1fr) minmax(440px, 520px);
+    gap: 20px;
+    align-items: start;
+    margin-bottom: 18px;
+}
+.dtg-layout > .dtg-catalog-section--standalone {
+    /* Left column — catalog. Sticky behavior is on the RIGHT column, not
+       this one. Catalog scrolls with the page so the rep can see all 20
+       cards without horizontal-scroll on a single-row layout. */
+    min-width: 0; /* allow the grid cell to shrink without overflow */
+}
+.dtg-form-column {
+    /* Right column — order form. Sticky so it stays in view as the rep
+       scrolls through the catalog. Has its own scroll for tall forms. */
+    position: sticky;
+    top: 14px;
+    max-height: calc(100vh - 28px);
+    overflow-y: auto;
+    /* Hide horizontal scrollbar (vertical only) */
+    overflow-x: hidden;
+    /* Smooth out browser-default scrollbar on Webkit + Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: #d6cdb8 transparent;
+}
+.dtg-form-column::-webkit-scrollbar { width: 8px; }
+.dtg-form-column::-webkit-scrollbar-thumb {
+    background: #d6cdb8;
+    border-radius: 4px;
+}
+.dtg-form-column::-webkit-scrollbar-thumb:hover {
+    background: #bdb097;
+}
+
+/* Below 1280px (laptops, smaller monitors): single-column stacked. The
+   form sits below the catalog as it did pre-restructure. No sticky, no
+   side-by-side. Catches all the reps on smaller displays. */
+@media (max-width: 1279px) {
+    .dtg-layout {
+        grid-template-columns: 1fr;
+    }
+    .dtg-form-column {
+        position: static;
+        max-height: none;
+        overflow: visible;
+    }
+}
+
 /* ----- Page title strip (replaced the old big hero on 2026-05-19) -------- */
 
 .page-titlebar {
@@ -59,10 +126,12 @@
     padding: 16px 4px 8px;
 }
 /* Standalone modifier — the catalog no longer lives inside an accordion
-   (2026-05-19). It's a top-level section with its own card-style frame. */
+   (2026-05-19). It's a top-level section with its own card-style frame.
+   Internal padding is tight (16px) because the catalog sits in the
+   narrower left column of the two-column layout. */
 .dtg-catalog-section--standalone {
-    padding: 20px 22px 22px;
-    margin: 0 0 18px;
+    padding: 18px 16px 18px;
+    margin: 0;
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 10px;
@@ -189,13 +258,13 @@
 /* ----- Grid ---------------------------------------------------------------- */
 
 .dtg-catalog-grid {
-    /* 3-column dense grid at desktop. Each card ~320-400px wide. Big enough
-       for a meaningful product image + inline color swatches + dual CTA.
-       320px minmax (was 340) lets a 1280px laptop viewport reliably fit 3
-       cards once container + accordion padding is accounted for. */
+    /* 2-3 column dense grid inside the two-column layout's left column.
+       220px minmax fits 2 cards at narrowest viewport (1280px → ~470px
+       catalog grid space after section padding), 3 cards at 1440px+,
+       4 at 1920px+. Cards stretch to fill row width. */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
     margin-top: 14px;
 }
 @media (max-width: 900px) {

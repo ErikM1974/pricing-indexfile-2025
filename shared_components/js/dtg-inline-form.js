@@ -541,12 +541,12 @@
                 <div class="dtg-form-body">
                     <div class="dtg-rows-pane">
                         <div class="dfs-label" style="margin-bottom:8px;"><i class="fas fa-list"></i> Line items</div>
-                        <div style="overflow-x:auto;">
-                            <table class="dtg-rows-table" id="dtgRowsTable">
-                                <thead></thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
+                        <!-- 2026-05-19: switched from <table> to card-per-line-item
+                             so the form fits cleanly in the new sticky right column
+                             of the two-column layout. Each card is self-contained:
+                             style + color row at top, size grid wrapping below,
+                             totals at the bottom. -->
+                        <div class="dtg-rows-cards" id="dtgRowsCards"></div>
                         <button type="button" class="dtg-add-row-btn" id="dtgAddRowBtn"><i class="fas fa-plus"></i> Add row</button>
 
                         <div id="dtgPriceSummary" class="dtg-price-summary"></div>
@@ -688,96 +688,95 @@
         });
     }
 
+    // Renders state.rows as a stack of self-contained line-item cards.
+    // Replaced the old <table> on 2026-05-19 so the form fits cleanly in the
+    // narrow (~520px) sticky right column of the two-column layout. Each
+    // card has: style+color row at top, size grid (XS-6XL in 2 rows of 5)
+    // in the middle, and totals at the bottom. Per-row size availability
+    // (N/A vs editable) replaces the old table-wide column-show logic.
     function renderTable() {
-        const table = document.getElementById('dtgRowsTable');
-        if (!table) return;
-        // Determine which sizes any row has so we can show those columns.
-        const sizesShown = collectSizesShown();
-        const head = `
-            <tr>
-                <th>Style</th>
-                <th>Description</th>
-                <th>Color</th>
-                ${sizesShown.map((s) => `<th class="size-col">${escapeHtml(s)}</th>`).join('')}
-                <th class="total-col">Total</th>
-                <th class="price-col">$/pc</th>
-                <th></th>
-            </tr>
-        `;
-        table.querySelector('thead').innerHTML = head;
+        const container = document.getElementById('dtgRowsCards');
+        if (!container) return;
 
-        const tbody = table.querySelector('tbody');
         if (state.rows.length === 0) {
-            tbody.innerHTML = `
-                <tr><td colspan="${sizesShown.length + 5}" style="text-align:center;color:#9ca3af;font-style:italic;padding:18px;">Add a row to start — or open the AI chat (right) to draft a quote</td></tr>
-            `;
+            container.innerHTML = `<div class="dtg-rows-empty">No line items yet — pick a style from the catalog or click <strong>Add row</strong> to start.</div>`;
             return;
         }
-        tbody.innerHTML = state.rows.map((row) => {
+
+        // Fixed size template — always render all 10 size slots per card.
+        // Per-row availability hides individual cells as N/A. The card layout
+        // doesn't need the table-wide collectSizesShown() compression anymore.
+        const SIZE_GRID = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
+
+        const classify = (window.OrderFormInventory && window.OrderFormInventory.classifyInventory)
+            || ((q, a) => Number.isFinite(Number(a)) ? (Number(a) === 0 ? 'oos' : (q > a ? 'over' : (q > a * 0.8 ? 'low' : 'good'))) : 'unknown');
+
+        container.innerHTML = state.rows.map((row) => {
             const total = Object.values(row.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
             const perPiece = row._perPiece;
+            const lineTotal = (perPiece != null && total > 0) ? (perPiece * total) : null;
             const inv = row.inventory || { bySize: {}, status: 'unknown' };
             const invKnown = inv.status === 'ok';
-            const classify = (window.OrderFormInventory && window.OrderFormInventory.classifyInventory)
-                || ((q, a) => Number.isFinite(Number(a)) ? (Number(a) === 0 ? 'oos' : (q > a ? 'over' : (q > a * 0.8 ? 'low' : 'good'))) : 'unknown');
 
-            const sizeCells = sizesShown.map((sz) => {
+            const sizeCells = SIZE_GRID.map((sz) => {
                 const qty = Number((row.sizes || {})[sz]) || 0;
                 const avail = row.availableSizes && row.availableSizes.length > 0
                     ? row.availableSizes.includes(sz)
                     : true;
                 if (!avail && row.style) {
-                    // Product doesn't carry this size — render an N/A cell
-                    // (matches the order form's .sz-unavail pattern).
-                    return `<td class="size-col sz-unavail" title="${escapeHtml(row.style)} doesn't come in ${escapeHtml(sz)}"><span class="sz-na">N/A</span></td>`;
+                    // Style doesn't carry this size — render a dimmed N/A cell.
+                    return `<div class="dtg-size-cell dtg-size-cell--na" title="${escapeHtml(row.style)} doesn't come in ${escapeHtml(sz)}">
+                        <div class="dtg-size-label">${escapeHtml(sz)}</div>
+                        <div class="dtg-size-na">N/A</div>
+                    </div>`;
                 }
-                // Render input + inventory badge underneath if we have stock data.
                 const invAvailable = inv.bySize ? inv.bySize[sz] : null;
                 const showBadge = invKnown && Number.isFinite(Number(invAvailable));
                 const klass = showBadge ? classify(qty, Number(invAvailable)) : 'unknown';
                 const overflow = klass === 'over';
                 const badge = showBadge
-                    ? `<span class="sz-inv-badge sz-inv-${klass}" title="SanMar stock: ${Number(invAvailable).toLocaleString()} ${escapeHtml(sz)}${overflow ? ' — exceeds available' : ''}">${Number(invAvailable).toLocaleString()}</span>`
-                    : '';
-                return `<td class="size-col${overflow ? ' sz-overflow' : ''}">
+                    ? `<div class="dtg-size-stock dtg-size-stock--${klass}" title="SanMar stock: ${Number(invAvailable).toLocaleString()} ${escapeHtml(sz)}${overflow ? ' — exceeds available' : ''}">${Number(invAvailable).toLocaleString()}</div>`
+                    : '<div class="dtg-size-stock dtg-size-stock--unknown"></div>';
+                return `<div class="dtg-size-cell${overflow ? ' dtg-size-cell--overflow' : ''}">
+                    <div class="dtg-size-label">${escapeHtml(sz)}</div>
                     <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}">
                     ${badge}
-                </td>`;
+                </div>`;
             }).join('');
 
-            // Description tooltip for narrow viewports — hover the style cell
-            // to see the product title even when the Description column is hidden.
-            const styleTitle = row.desc
-                ? `${row.style || ''} — ${row.desc}`
-                : (row.style || '');
-            // _aiTouched: timestamp set when previewStyle filled the row from a
-            // chat tool. Render a small "AI is filling…" pulse for 2s then fade.
             const aiTouchedAgeMs = row._aiTouched ? Date.now() - row._aiTouched : 999999;
-            const aiTouchClass = aiTouchedAgeMs < 2000 ? ' dtg-row-ai-touched' : '';
+            const aiTouchClass = aiTouchedAgeMs < 2000 ? ' dtg-line-card--ai-touched' : '';
+            const colorInvalid = isRowColorInvalid(row);
+
             return `
-                <tr data-row-id="${escapeHtml(row.id)}" class="${aiTouchClass.trim()}">
-                    <td class="dtg-row-style" title="${escapeHtml(styleTitle)}">
-                        <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="style">
-                            <input type="text" value="${escapeHtml(row.style)}" placeholder="PC54" autocomplete="off">
+                <div class="dtg-line-card${aiTouchClass}" data-row-id="${escapeHtml(row.id)}">
+                    <div class="dtg-line-head">
+                        <div class="dtg-line-style dtg-row-style">
+                            <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="style">
+                                <input type="text" value="${escapeHtml(row.style)}" placeholder="Style (e.g. PC54)" autocomplete="off">
+                            </div>
                         </div>
-                    </td>
-                    <td class="dtg-row-desc" title="${escapeHtml(row.desc || '')}">${escapeHtml(row.desc || '—')}</td>
-                    <td class="dtg-row-color${isRowColorInvalid(row) ? ' dtg-row-color-invalid' : ''}">
-                        <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
-                            ${row.colorSwatch
-                                ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
-                                : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
-                            <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
+                        <div class="dtg-line-color dtg-row-color${colorInvalid ? ' dtg-row-color-invalid' : ''}">
+                            <div class="dtg-combobox" data-row-id="${escapeHtml(row.id)}" data-combo-kind="color">
+                                ${row.colorSwatch
+                                    ? `<span class="dtg-row-color-swatch" style="background-image:url('${escapeHtml(row.colorSwatch)}');" aria-hidden="true"></span>`
+                                    : (row.color ? `<span class="dtg-row-color-swatch dtg-row-color-swatch--blank" aria-hidden="true"></span>` : '')}
+                                <input type="text" value="${escapeHtml(row.color)}" placeholder="${row.style ? 'Pick color' : 'Pick style first'}" autocomplete="off" ${row.style ? '' : 'disabled'} ${row.colorSwatch || row.color ? 'data-has-swatch="true"' : ''}>
+                            </div>
                         </div>
-                        ${isRowColorInvalid(row)
-                            ? `<div class="dtg-row-color-warn" title="Pick a valid color from the dropdown">⚠ Not in catalog</div>`
-                            : ''}
-                    </td>
-                    ${sizeCells}
-                    <td class="total-col"><strong>${total}</strong></td>
-                    <td class="price-col">${perPiece != null ? '$' + perPiece.toFixed(2) : '—'}</td>
-                    <td><button type="button" class="dtg-row-remove" data-remove-row="${escapeHtml(row.id)}" title="Remove row">×</button></td>
-                </tr>
+                        <button type="button" class="dtg-line-remove dtg-row-remove" data-remove-row="${escapeHtml(row.id)}" title="Remove line">×</button>
+                    </div>
+                    ${row.desc ? `<div class="dtg-line-desc" title="${escapeHtml(row.desc)}">${escapeHtml(row.desc)}</div>` : ''}
+                    ${colorInvalid ? `<div class="dtg-row-color-warn" title="Pick a valid color from the dropdown">⚠ "${escapeHtml(row.color)}" not in ${escapeHtml(row.style)} catalog — pick from the dropdown above</div>` : ''}
+                    <div class="dtg-line-sizes">
+                        ${sizeCells}
+                    </div>
+                    <div class="dtg-line-foot">
+                        <span class="dtg-line-qty"><strong>${total}</strong> pc${total === 1 ? '' : 's'}</span>
+                        <span class="dtg-line-perpiece">${perPiece != null ? '$' + perPiece.toFixed(2) + '/pc' : '— /pc'}</span>
+                        <span class="dtg-line-total">${lineTotal != null ? '$' + lineTotal.toFixed(2) : '$0.00'}</span>
+                    </div>
+                </div>
             `;
         }).join('');
 
@@ -954,7 +953,11 @@
 
     // ----- Row + combobox handlers ------------------------------------------
     function wireRowHandlers() {
-        const table = document.getElementById('dtgRowsTable');
+        // 2026-05-19 — container switched from <table id="dtgRowsTable"> to
+        // <div id="dtgRowsCards"> for the new card-per-line-item layout.
+        // Same data attributes inside, so all the per-input wiring works
+        // unchanged — only the container query changed.
+        const table = document.getElementById('dtgRowsCards');
         if (!table) return;
 
         // Size qty inputs
@@ -970,6 +973,20 @@
                 else delete row.sizes[sz];
                 markDirty();
                 scheduleStateSave();
+                // 2026-05-19 — update the card's qty footer IMMEDIATELY (no
+                // debounce, no DOM destruction) so the rep sees the new total
+                // the same frame they type. Per-piece price + line total
+                // settle ~200ms later via schedulePriceUpdate's re-render.
+                const card = input.closest('.dtg-line-card');
+                const qtyEl = card?.querySelector('.dtg-line-qty strong');
+                if (qtyEl) {
+                    const total = Object.values(row.sizes || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+                    qtyEl.textContent = String(total);
+                    const labelEl = qtyEl.nextSibling;
+                    if (labelEl && labelEl.nodeType === Node.TEXT_NODE) {
+                        labelEl.textContent = total === 1 ? ' pc' : ' pcs';
+                    }
+                }
                 schedulePriceUpdate();
             });
             // C8 — bulk size paste. Accept formats like:
