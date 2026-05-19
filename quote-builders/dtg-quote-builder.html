@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
     <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.19.1">
     <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.19.1">
-    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.8">
+    <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.19.9">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -34,73 +34,48 @@
     <!-- ========== Main ========== -->
     <main class="main-container">
 
-        <!-- ========== Hero ========== -->
-        <section class="page-hero">
-            <div class="page-hero-content">
-                <div class="page-eyebrow">✨ DTG Order Entry Assistant</div>
-                <h1>Direct-to-garment quotes — drafted in 30 seconds, ready to push to ShopWorks</h1>
-                <button type="button" class="ai-open-btn" id="aiOpenBtn">
-                    <span class="ai-sparkle" aria-hidden="true">✨</span>
-                    Start a Quote with AI
-                </button>
-                <div class="page-hero-hint" id="autoOpenHint">Chat opens automatically…</div>
-            </div>
-        </section>
-
-        <!-- ========== Quick-facts strip ========== -->
-        <section class="quick-facts" aria-label="DTG facts at a glance">
-            <div class="quick-fact quick-fact--accent" title="Orders below 24 use the 24-47 tier base price + a $50 LTM fee distributed per piece. Order 24+ and the fee disappears entirely.">
+        <!-- ========== Page title strip — minimal hero ========== -->
+        <section class="page-titlebar" aria-label="Page title">
+            <h1 class="page-titlebar-title">DTG Quote Builder</h1>
+            <div class="page-titlebar-fact" title="Orders below 24 use the 24-47 tier base price + a $50 LTM fee distributed per piece. Order 24+ and the fee disappears entirely.">
                 <i class="fas fa-cube"></i>
                 <span>Order <strong>24+</strong> to skip the <strong>$50 LTM fee</strong></span>
             </div>
-            <div class="quick-fact"><i class="fas fa-layer-group"></i> <span>Tiers: <strong>1–23</strong> · <strong>24–47</strong> · <strong>48–71</strong> · <strong>72+</strong></span></div>
-            <div class="quick-fact"><i class="fas fa-print"></i> <span>5 print locations + 4 combos</span></div>
-            <div class="quick-fact"><i class="fas fa-star"></i> <span>Top-seller recommendations</span></div>
-            <div class="quick-fact"><i class="fas fa-truck-fast"></i> <span>Push to ShopWorks from chat</span></div>
-            <div class="quick-fact"><i class="fas fa-clock"></i> <span>5–7 day turnaround</span></div>
-            <div class="quick-fact"><i class="fas fa-robot"></i> <span>AI-driven intake + Q&amp;A</span></div>
         </section>
 
-        <!-- ========== NWCA-Approved DTG Catalog (interactive browser) ========== -->
-        <details class="pricing-accordion" id="dtgCatalogAccordion">
-            <summary class="pricing-accordion-toggle">
-                <span class="toggle-label">
+        <!-- ========== NWCA-Approved DTG Catalog — always-expanded, primary ========== -->
+        <section class="dtg-catalog-section dtg-catalog-section--standalone" aria-label="NWCA-Approved DTG Catalog">
+            <div class="dtg-catalog-head">
+                <div class="dtg-catalog-section-title">
                     <i class="fas fa-star"></i>
                     NWCA-Approved DTG Catalog
-                </span>
-                <span class="toggle-meta">20 top-selling, DTG-tested garments — click any card to view colors and add to quote</span>
-                <i class="fas fa-chevron-down toggle-chevron" aria-hidden="true"></i>
-            </summary>
-            <div class="pricing-accordion-body">
-                <section class="dtg-catalog-section">
-                    <div class="dtg-catalog-head">
-                        <div class="dtg-catalog-eyebrow">
-                            <i class="fas fa-shield-check"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
-                        </div>
-                        <div class="dtg-catalog-toolbar">
-                            <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
-                                <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
-                                <!-- categories injected dynamically -->
-                            </div>
-                            <div class="dtg-catalog-search-wrap">
-                                <i class="fas fa-search dtg-catalog-search-icon"></i>
-                                <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch"
-                                    placeholder="Quick find — type PC54, BELLA, navy, hoodie…" autocomplete="off">
-                            </div>
-                        </div>
+                    <span class="dtg-catalog-section-meta">20 top-selling, DTG-tested garments — click any card to add to the order form below</span>
+                </div>
+                <div class="dtg-catalog-eyebrow">
+                    <i class="fas fa-shield-check"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
+                </div>
+                <div class="dtg-catalog-toolbar">
+                    <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
+                        <button type="button" class="dtg-cat-tab active" data-category="">All <span class="dtg-cat-count"></span></button>
+                        <!-- categories injected dynamically -->
                     </div>
-                    <div class="dtg-catalog-grid" id="dtgCatalogGrid">
-                        <!-- Cards injected by dtg-catalog.js -->
-                        <div class="dtg-catalog-loading">
-                            <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
-                        </div>
+                    <div class="dtg-catalog-search-wrap">
+                        <i class="fas fa-search dtg-catalog-search-icon"></i>
+                        <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch"
+                            placeholder="Quick find — type PC54, BELLA, navy, hoodie…" autocomplete="off">
                     </div>
-                    <div class="dtg-catalog-foot">
-                        <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying).
-                    </div>
-                </section>
+                </div>
             </div>
-        </details>
+            <div class="dtg-catalog-grid" id="dtgCatalogGrid">
+                <!-- Cards injected by dtg-catalog.js -->
+                <div class="dtg-catalog-loading">
+                    <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
+                </div>
+            </div>
+            <div class="dtg-catalog-foot">
+                <strong>⚠ Avoid for DTG:</strong> Gildan products (special coating dulls prints) · PC78H White (washes out) · PC61 Red (24hr drying).
+            </div>
+        </section>
 
         <!-- ========== Catalog detail modal (style + all colors + size mix) ========== -->
         <div class="dtg-catalog-modal-backdrop" id="dtgCatalogModalBackdrop" hidden></div>
@@ -113,7 +88,7 @@
             </div>
         </div>
 
-        <!-- ========== Inline DTG order form (chat fills, rep edits, one Submit) ========== -->
+        <!-- ========== Inline DTG order form (rep builds manually from the catalog above) ========== -->
         <section aria-labelledby="dtgFormHead">
             <h2 id="dtgFormHead" class="visually-hidden">DTG Order Form</h2>
             <div id="dtgInlineFormMount"></div>
@@ -121,7 +96,7 @@
 
         <!-- ========== Compact CTA ========== -->
         <section class="cta-compact">
-            <div class="cta-text">Questions about a specific quote or product? Open the chat — the AI knows our pricing inside out.</div>
+            <div class="cta-text">Need to look up a price, customer, or color before placing an order? Open the floating chat — the research assistant knows our pricing inside out.</div>
             <div class="cta-links">
                 <a href="tel:253-922-5793"><i class="fas fa-phone"></i> (253) 922-5793</a>
                 <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
@@ -135,17 +110,17 @@
     </main>
 
     <!-- ========== Floating "Quote" button ========== -->
-    <button type="button" class="floating-quote-btn" id="floatingQuoteBtn" aria-label="Open order entry assistant" hidden>
+    <button type="button" class="floating-quote-btn" id="floatingQuoteBtn" aria-label="Open research assistant" hidden>
         <span class="ai-sparkle" aria-hidden="true">✨</span>
-        <span class="floating-quote-label">Quote</span>
+        <span class="floating-quote-label">Ask</span>
     </button>
 
     <!-- ========== DTG Order Entry Assistant Chat Panel ========== -->
-    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="DTG Order Entry Assistant" aria-hidden="true">
+    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="DTG Research Assistant" aria-hidden="true">
         <header class="ai-chat-head">
             <div class="ai-chat-title">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
-                <span>DTG Order Entry Assistant</span>
+                <span>DTG Research Assistant</span>
             </div>
             <div class="ai-chat-head-actions">
                 <button type="button" class="ai-chat-icon-btn" id="aiChatCopyBtn" title="Copy whole conversation" aria-label="Copy chat">
@@ -173,7 +148,7 @@
             </button>
         </div>
         <form class="ai-chat-input" id="aiChatForm">
-            <textarea id="aiChatTextarea" rows="3" placeholder="Type your reply… (e.g. 'PC54 navy, Left Chest, 36 pieces' or 'Recommend a t-shirt for 24 pieces')" autocomplete="off"></textarea>
+            <textarea id="aiChatTextarea" rows="3" placeholder="Ask me anything — pricing, customer lookup, color availability, top-seller recommendations. (You build the order manually using the catalog above.)" autocomplete="off"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
             </button>
@@ -198,8 +173,8 @@
     <!-- Inline DTG order form — bot fills it via window.DTGInlineForm.fillFromQuote() -->
     <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.19.7"></script>
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
-    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.1"></script>
+    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.9"></script>
     <!-- NWCA-Approved DTG Catalog browser — backed by /api/dtg/top-sellers -->
-    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.8"></script>
+    <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.9"></script>
 </body>
 </html>

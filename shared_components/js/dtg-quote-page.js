@@ -36,11 +36,20 @@
         savedQuoteID: null,
     };
 
+    // Master switch (2026-05-19): the chat panel is now a research assistant.
+    // When false, tool results render in chat for the rep to READ, but never
+    // write to the order form. Erik flipped this off because manual entry via
+    // the catalog is faster than waiting on tool-call cycles. Set true to
+    // re-enable chat-driven order intake — none of the listeners were removed,
+    // just gated.
+    const ENABLE_BOT_FORM_FILL = false;
+
     document.addEventListener('DOMContentLoaded', init);
     function init() {
         wireChatPanel();
         showFloatingButton();
-        setTimeout(() => { if (!aiState.opened) openChatPanel(); }, 600);
+        // 2026-05-19: chat no longer auto-opens. Rep clicks the floating
+        // ✨ button when they want to research / ask a question.
     }
 
     function escapeHtml(s) {
@@ -78,6 +87,7 @@
      * "FF". "LC" only matches if it's a standalone token.
      */
     function tryAutoSetLocation(text) {
+        if (!ENABLE_BOT_FORM_FILL) return null;
         if (!window.DTGInlineForm || typeof window.DTGInlineForm.setLocation !== 'function') return null;
         const t = String(text || '');
         // 1. Combo as a single token (e.g. "LC_FB")
@@ -121,6 +131,7 @@
      * "d" → index 3. "D." → index 3. "d)" → index 3.
      */
     function tryMenuLetterCustomerPick(text) {
+        if (!ENABLE_BOT_FORM_FILL) return;
         const m = /^([a-zA-Z])[.)]?$/.exec(String(text || '').trim());
         if (!m) return;
         if (!Array.isArray(aiState.lastMatches) || !aiState.lastMatches.length) return;
@@ -258,7 +269,10 @@
             sessionStorage.removeItem('dtg.formState.v1');
         } catch {}
         try { delete window.__dtgQuoteID; } catch {}
-        if (window.DTGInlineForm && typeof window.DTGInlineForm.resetForm === 'function') {
+        // 2026-05-19 — chat reset no longer wipes the form. The rep's manual
+        // line-item work is their canonical state; chat is a side panel that
+        // can be reset independently.
+        if (ENABLE_BOT_FORM_FILL && window.DTGInlineForm && typeof window.DTGInlineForm.resetForm === 'function') {
             try { window.DTGInlineForm.resetForm(); } catch (e) { /* non-fatal */ }
         }
         aiState.messages.push({
@@ -727,11 +741,10 @@
                 const style = matrix.getAttribute('data-style') || '';
                 const color = matrix.getAttribute('data-color') || '';
 
-                // 🔴 KEY FIX — push to the form IMMEDIATELY. Don't wait for
-                // quote_dtg_pricing (which only fires after the bot has
-                // location + customer). The matrix has everything the form
-                // needs: style + color + sizes. Form is source of truth.
-                if (window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
+                // 2026-05-19 — chat is now research-only. The matrix still
+                // sends sizes to the bot so it can quote, but no longer writes
+                // to the order form. Rep manually adds the style via the catalog.
+                if (ENABLE_BOT_FORM_FILL && window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
                     try {
                         window.DTGInlineForm.previewLineItems([{
                             styleNumber: style,
@@ -994,9 +1007,10 @@
         }
         updateActionsAvailability();
 
-        // Bridge: if we have a quote, fill the inline form below. Rep reviews + clicks
-        // the form's Submit button. No more chat-side ShopWorks push.
-        if ((priceQuote || customerFinal) && window.DTGInlineForm && typeof window.DTGInlineForm.fillFromQuote === 'function') {
+        // 2026-05-19 — bot is research-only now. Quote info renders in the
+        // chat for the rep to read; they manually build the order via the
+        // catalog. Flag flip restores the auto-fill behavior.
+        if (ENABLE_BOT_FORM_FILL && (priceQuote || customerFinal) && window.DTGInlineForm && typeof window.DTGInlineForm.fillFromQuote === 'function') {
             try {
                 window.DTGInlineForm.fillFromQuote(priceQuote, customerFinal);
             } catch (err) {
@@ -1223,23 +1237,24 @@
                     ? `Found ${matches[0].company || matches[0].contact_name || 'match'}`
                     : `${matches.length} matches — narrowing…`);
             appendToolChip(tool, status);
-            // Real-time preview: if exactly one confident match, pre-fill the
-            // form's customer pane immediately so the rep sees confirmation.
-            if (matches.length === 1 && window.DTGInlineForm && typeof window.DTGInlineForm.previewCustomer === 'function') {
+            // 2026-05-19 — chat is research-only. Customer info renders in
+            // the chat chip above for the rep to copy; we no longer push it
+            // to the form's customer pane.
+            if (ENABLE_BOT_FORM_FILL && matches.length === 1 && window.DTGInlineForm && typeof window.DTGInlineForm.previewCustomer === 'function') {
                 try { window.DTGInlineForm.previewCustomer(matches[0]); } catch (e) { /* non-fatal */ }
             }
         } else if (tool === 'quote_dtg_pricing') {
             if (result.error) {
                 appendToolChip(tool, `Error: ${result.message || result.error}`);
             } else {
-                // Real-time preview: fill the form's sizes + color + style for
-                // every line in the result. This is the BIG real-time-fill hook —
-                // by the time the bot's tool chip renders, the form's row should
-                // already show all the sizes the bot just priced.
+                // 2026-05-19 — chat is research-only. The bot quotes the
+                // price into the chat chip; rep manually mirrors the order
+                // via the catalog. Pricing math still runs server-side so
+                // the rep can quote over the phone before building.
                 const lineItems = Array.isArray(result.lineItems) && result.lineItems.length
                     ? result.lineItems
                     : (result.styleNumber ? [result] : []);
-                if (lineItems.length && window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
+                if (ENABLE_BOT_FORM_FILL && lineItems.length && window.DTGInlineForm && typeof window.DTGInlineForm.previewLineItems === 'function') {
                     try { window.DTGInlineForm.previewLineItems(lineItems); } catch (e) { /* non-fatal */ }
                 }
                 if (Array.isArray(result.lineItems) && result.lineItems.length > 1) {
@@ -1287,17 +1302,15 @@
                 }
 
                 appendToolChip(tool, `${result.styleNumber}: ${cc} color${cc === 1 ? '' : 's'} · ${sc} size${sc === 1 ? '' : 's'}${preselectedColor ? ` · ✓ ${preselectedColor}` : ''}`, { productDetails: result, preselectedColor, curatedColorsPromise });
-                // Real-time preview: pre-fill the first empty row's style +
-                // description + available colors/sizes so the rep sees the
-                // form catching up with the conversation.
-                if (window.DTGInlineForm && typeof window.DTGInlineForm.previewStyle === 'function') {
+                // 2026-05-19 — chat is research-only. The product card with
+                // color swatches renders in the chat for the rep to browse;
+                // they pick the style + color from the catalog above to build
+                // the actual order.
+                if (ENABLE_BOT_FORM_FILL && window.DTGInlineForm && typeof window.DTGInlineForm.previewStyle === 'function') {
                     try {
                         window.DTGInlineForm.previewStyle({
                             style: result.styleNumber,
                             desc: result.title || '',
-                            // Pass the preselected color through — previewStyle
-                            // resolves it via fuzzyMatchColor so the row fills
-                            // color+catalogColor+swatch in one shot.
                             color: preselectedColor || null,
                             colorsAvailable: result.colors || [],
                             availableSizes: (result.sizes || []).map((s) => String(s.size).toUpperCase()),
