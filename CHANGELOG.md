@@ -1,3 +1,7 @@
+## v2026.05.19.7 (2026.05.19)
+
+- Deploy v2026.05.19.7: DTG form — auto-hydrate availableSizes when previewStyle has none
+
 ## v2026.05.19.6 (2026.05.19)
 
 - Deploy v2026.05.19.6: DTG catalog — second-add fix + hero image swap per color
