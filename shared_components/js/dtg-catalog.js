@@ -25,6 +25,7 @@
     // Cache the styles list — we fetch it once
     let stylesCache = null;
     let currentCategory = ''; // '' = All
+    let currentSearch = '';   // free-text quick-find filter
 
     function escapeHtml(s) {
         return String(s == null ? '' : s)
@@ -59,6 +60,19 @@
                 closeModal();
             }
         });
+
+        // Phase 3 — quick-find search input
+        const searchInput = document.getElementById('dtgCatalogSearch');
+        if (searchInput) {
+            let searchTimer = null;
+            searchInput.addEventListener('input', () => {
+                clearTimeout(searchTimer);
+                searchTimer = setTimeout(() => {
+                    currentSearch = searchInput.value.trim();
+                    renderGrid();
+                }, 120);
+            });
+        }
 
         // Lazy-load when accordion is first opened
         let loaded = false;
@@ -119,44 +133,181 @@
     function renderGrid() {
         const grid = document.getElementById('dtgCatalogGrid');
         if (!grid || !stylesCache) return;
-        const filtered = currentCategory
-            ? stylesCache.filter((s) => s.category === currentCategory)
-            : stylesCache;
+        // Apply text filter (Phase 3) + category filter
+        const filtered = stylesCache.filter((s) => {
+            if (currentCategory && s.category !== currentCategory) return false;
+            if (currentSearch) {
+                const q = currentSearch.toLowerCase();
+                const hay = `${s.style} ${s.product_title} ${s.category} ${s.top_color}`.toLowerCase();
+                if (!hay.includes(q)) return false;
+            }
+            return true;
+        });
         if (!filtered.length) {
-            grid.innerHTML = `<div class="dtg-catalog-empty">No styles in this category.</div>`;
+            grid.innerHTML = `<div class="dtg-catalog-empty">No styles match${currentSearch ? ` "${escapeHtml(currentSearch)}"` : ''}.</div>`;
             return;
         }
-        grid.innerHTML = filtered.map((s) => {
-            const rankBadge = s.style_rank <= 3
-                ? `<span class="dtg-cc-rank dtg-cc-rank-${s.style_rank}">#${s.style_rank}</span>`
-                : `<span class="dtg-cc-rank">#${s.style_rank}</span>`;
-            // Use the top color's swatch as a visual cue
-            const swatchHtml = s.top_color_swatch
-                ? `<img class="dtg-cc-swatch" src="${escapeHtml(s.top_color_swatch)}" alt="" loading="lazy">`
-                : '';
-            return `
-                <button type="button" class="dtg-catalog-card" data-style="${escapeHtml(s.style)}">
-                    <div class="dtg-cc-head">
-                        <span class="dtg-cc-style">${escapeHtml(s.style)}</span>
+        grid.innerHTML = filtered.map((s) => renderCard(s)).join('');
+        // Wire interactions
+        grid.querySelectorAll('.dtg-catalog-card').forEach((card) => {
+            const style = card.getAttribute('data-style');
+            // Whole-card click → modal (deep dive: all colors + size mix)
+            const titleArea = card.querySelector('.dtg-cc-titleblock');
+            if (titleArea) titleArea.addEventListener('click', () => openModal(style));
+            const heroArea = card.querySelector('.dtg-cc-hero');
+            if (heroArea) heroArea.addEventListener('click', () => openModal(style));
+            // Click an inline swatch → fill form directly with that color, no modal
+            card.querySelectorAll('.dtg-cc-color-swatch').forEach((sw) => {
+                sw.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const colorName = sw.getAttribute('data-color-name');
+                    const catalogColor = sw.getAttribute('data-catalog-color');
+                    const swatchUrl = sw.getAttribute('data-swatch-url');
+                    quickAddToQuote(style, colorName, catalogColor, swatchUrl, s.product_title);
+                });
+                // Hover swatch → swap hero image to show that color
+                sw.addEventListener('mouseenter', () => {
+                    const heroImg = card.querySelector('.dtg-cc-hero-img');
+                    const defaultSrc = heroImg?.getAttribute('data-default-src') || '';
+                    const variantSrc = sw.getAttribute('data-hover-src') || '';
+                    if (heroImg && variantSrc) heroImg.src = variantSrc;
+                });
+                sw.addEventListener('mouseleave', () => {
+                    const heroImg = card.querySelector('.dtg-cc-hero-img');
+                    const defaultSrc = heroImg?.getAttribute('data-default-src') || '';
+                    if (heroImg && defaultSrc) heroImg.src = defaultSrc;
+                });
+            });
+            // Add-default CTA
+            const addBtn = card.querySelector('.dtg-cc-add-default');
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    quickAddToQuote(
+                        style,
+                        s.top_color,
+                        s.top_color_catalog,
+                        s.top_color_swatch,
+                        s.product_title
+                    );
+                });
+            }
+            // "View all colors" button → modal
+            const viewAllBtn = card.querySelector('.dtg-cc-view-all');
+            if (viewAllBtn) {
+                viewAllBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openModal(style);
+                });
+            }
+        });
+    }
+
+    function renderCard(s) {
+        const rankBadge = s.style_rank <= 3
+            ? `<span class="dtg-cc-rank dtg-cc-rank-${s.style_rank}">#${s.style_rank}</span>`
+            : `<span class="dtg-cc-rank">#${s.style_rank}</span>`;
+
+        // Hero product image — SanMar's MAIN_IMAGE_URL via /api/dtg/top-sellers/styles
+        const heroImg = s.main_image_url
+            ? `<img class="dtg-cc-hero-img"
+                    src="${escapeHtml(s.main_image_url)}"
+                    alt="${escapeHtml(s.style)} ${escapeHtml(s.top_color || '')}"
+                    data-default-src="${escapeHtml(s.main_image_url)}"
+                    loading="lazy"
+                    onerror="this.style.display='none';this.parentElement.classList.add('dtg-cc-hero-missing');">`
+            : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt"></i></div>';
+
+        // Inline color swatches (top 4-6 from server)
+        const topColors = Array.isArray(s.top_colors) ? s.top_colors : [];
+        const swatchesHtml = topColors.length
+            ? `<div class="dtg-cc-swatches">${topColors.slice(0, 6).map((c) => `
+                <button type="button" class="dtg-cc-color-swatch"
+                        data-color-name="${escapeHtml(c.color_name)}"
+                        data-catalog-color="${escapeHtml(c.catalog_color)}"
+                        data-swatch-url="${escapeHtml(c.swatch_image_url || '')}"
+                        title="${escapeHtml(c.color_name)} — click to add ${escapeHtml(s.style)} ${escapeHtml(c.color_name)} to quote">
+                    ${c.swatch_image_url
+                        ? `<img src="${escapeHtml(c.swatch_image_url)}" alt="" loading="lazy">`
+                        : `<span class="dtg-cc-swatch-placeholder"></span>`}
+                </button>`).join('')}
+                ${s.color_count > 6 ? `<span class="dtg-cc-more">+${s.color_count - 6}</span>` : ''}
+              </div>`
+            : '';
+
+        // Fabric guess from brand (matches what the bot prompt knows)
+        const brand = extractBrand(s.product_title);
+
+        return `
+            <article class="dtg-catalog-card" data-style="${escapeHtml(s.style)}">
+                <div class="dtg-cc-hero">
+                    ${heroImg}
+                    <div class="dtg-cc-hero-badges">
                         ${rankBadge}
+                    </div>
+                </div>
+                <div class="dtg-cc-titleblock">
+                    <div class="dtg-cc-style-row">
+                        <span class="dtg-cc-style">${escapeHtml(s.style)}</span>
+                        <span class="dtg-cc-category">${escapeHtml(s.category)}</span>
                     </div>
                     <div class="dtg-cc-title">${escapeHtml(stripStyleSuffix(s.product_title))}</div>
                     <div class="dtg-cc-meta">
-                        ${fmtInt(s.total_units_sold)} units · ${fmtInt(s.color_count)} colors
+                        ${brand ? `<span>${escapeHtml(brand)}</span> · ` : ''}
+                        <span>${fmtInt(s.total_units_sold)} units sold</span>
                     </div>
-                    <div class="dtg-cc-swatch-row">
-                        ${swatchHtml}
-                        <span class="dtg-cc-top-color">Top: ${escapeHtml(s.top_color || '—')}</span>
-                    </div>
-                    <div class="dtg-cc-cta">
-                        <i class="fas fa-eye"></i> View colors
-                    </div>
-                </button>
-            `;
-        }).join('');
-        grid.querySelectorAll('.dtg-catalog-card').forEach((card) => {
-            card.addEventListener('click', () => openModal(card.getAttribute('data-style')));
-        });
+                </div>
+                ${swatchesHtml}
+                <div class="dtg-cc-actions">
+                    <button type="button" class="dtg-cc-add-default" title="Add ${escapeHtml(s.top_color)} to quote">
+                        <i class="fas fa-plus"></i> Add ${escapeHtml(s.top_color || s.style)}
+                    </button>
+                    <button type="button" class="dtg-cc-view-all" title="See all ${s.color_count} colors with size data">
+                        <i class="fas fa-eye"></i> All ${fmtInt(s.color_count)}
+                    </button>
+                </div>
+            </article>
+        `;
+    }
+
+    function extractBrand(title) {
+        const t = String(title || '').trim();
+        if (/^Port\s*&\s*Co/i.test(t)) return 'Port & Co';
+        if (/^BELLA\+CANVAS/i.test(t)) return 'BELLA+CANVAS';
+        if (/^District/i.test(t)) return 'District';
+        if (/^Sport-Tek/i.test(t)) return 'Sport-Tek';
+        if (/^Next Level/i.test(t)) return 'Next Level';
+        return '';
+    }
+
+    // Phase 2 — quick-add a (style, color) to the form without opening the modal
+    function quickAddToQuote(style, colorName, catalogColor, swatchUrl, productTitle) {
+        if (!window.DTGInlineForm) return;
+        try {
+            if (typeof window.DTGInlineForm.previewStyle === 'function') {
+                window.DTGInlineForm.previewStyle({
+                    style,
+                    desc: stripStyleSuffix(productTitle || ''),
+                    color: colorName,
+                    colorsAvailable: [{
+                        COLOR_NAME: colorName,
+                        CATALOG_COLOR: catalogColor,
+                        COLOR_SQUARE_IMAGE: swatchUrl,
+                    }],
+                });
+            }
+            // Visual confirmation on the card
+            const card = document.querySelector(`.dtg-catalog-card[data-style="${style}"]`);
+            if (card) {
+                card.classList.add('dtg-cc-just-added');
+                setTimeout(() => card.classList.remove('dtg-cc-just-added'), 1200);
+            }
+            // Scroll the form into view
+            const formMount = document.getElementById('dtgInlineFormMount');
+            if (formMount) formMount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (err) {
+            console.error('[dtg-catalog] quickAddToQuote failed:', err);
+        }
     }
 
     // Trim the trailing ". STYLENUMBER" from SanMar product titles for a
