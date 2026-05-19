@@ -2167,6 +2167,25 @@
         // Re-render WITHOUT marking dirty / saving to sessionStorage —
         // this is a transient preview, not a rep edit.
         renderTable();
+
+        // If the caller didn't pass availableSizes (catalog path), hydrate
+        // them from the pricing bundle in the background so PC61's 4XL/5XL/6XL
+        // columns actually appear instead of being silently truncated to 3XL.
+        // The style-combobox path already does this — this matches it.
+        if (!Array.isArray(availableSizes) || !availableSizes.length) {
+            fetchBundle(row.style).then((bundle) => {
+                if (!bundle || !Array.isArray(bundle.sizes)) return;
+                const sizes = bundle.sizes
+                    .filter((s) => Number(s.price) > 0)
+                    .map((s) => String(s.size).toUpperCase());
+                if (sizes.length) {
+                    row.availableSizes = sizes;
+                    renderTable();
+                }
+            }).catch((err) => {
+                console.warn('[dtg-inline-form] previewStyle: bundle hydration failed', err);
+            });
+        }
     }
 
     /**
