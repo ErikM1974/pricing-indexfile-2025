@@ -214,13 +214,15 @@
 
     // Mark a swatch as selected on its card. Updates the swatch ring +
     // checkmark, the CTA label ("Add Pink"), the hero image (so the model
-    // is wearing the color the rep just picked), and the card-level dataset
-    // that the CTA click reads from.
+    // is wearing the color the rep just picked), the per-color stat line
+    // ("Pink · 412 units sold"), and the card-level dataset that the CTA
+    // click reads from.
     function selectColorOnCard(card, sw) {
         const colorName = sw.getAttribute('data-color-name') || '';
         const catalogColor = sw.getAttribute('data-catalog-color') || '';
         const swatchUrl = sw.getAttribute('data-swatch-url') || '';
         const frontSrc = sw.getAttribute('data-front-src') || '';
+        const colorUnits = Number(sw.getAttribute('data-color-units') || 0);
         // Visually flip the selected state on this card's swatch row
         card.querySelectorAll('.dtg-cc-color-swatch').forEach((s) => {
             s.classList.remove('dtg-cc-color-swatch--selected');
@@ -233,9 +235,14 @@
         // Update the green CTA label so it says "+ Add Pink" (not "Add Jet Black")
         const label = card.querySelector('.dtg-cc-selected-color-label');
         if (label) label.textContent = colorName;
+        // Update the per-color stat line right above the action buttons
+        const statName = card.querySelector('.dtg-cc-color-stat-name');
+        if (statName) statName.textContent = colorName;
+        const statUnits = card.querySelector('.dtg-cc-color-stat-units');
+        if (statUnits) statUnits.textContent = fmtInt(colorUnits);
         // Swap the hero image to the model wearing this color. Falls back
-        // to data-default-src (the top-color hero) if this color has no
-        // per-color image hydrated by the proxy.
+        // to data-default-src (the rotated default hero) if this color has
+        // no per-color image hydrated by the proxy.
         const heroImg = card.querySelector('.dtg-cc-hero-img');
         if (heroImg) {
             const defaultSrc = heroImg.getAttribute('data-default-src') || '';
@@ -248,29 +255,43 @@
             ? `<span class="dtg-cc-rank dtg-cc-rank-${s.style_rank}">#${s.style_rank}</span>`
             : `<span class="dtg-cc-rank">#${s.style_rank}</span>`;
 
-        // Hero product image — SanMar's MAIN_IMAGE_URL via /api/dtg/top-sellers/styles
-        const heroImg = s.main_image_url
+        // Pick which color the card opens with. Rotates through the first
+        // three top colors (rank-1 → 0, rank-2 → 1, rank-3 → 2, rank-4 → 0…)
+        // so the grid stops being a wall of black tees. Falls back gracefully
+        // when a style has fewer than 3 top colors.
+        const topColors = Array.isArray(s.top_colors) ? s.top_colors : [];
+        const variantPool = Math.max(1, Math.min(3, topColors.length || 1));
+        const defaultIdx = topColors.length
+            ? ((Number(s.style_rank) || 1) - 1) % variantPool
+            : 0;
+        const defaultColor = topColors[defaultIdx] || null;
+
+        // Hero image — use the rotated color's front image if available,
+        // otherwise fall back to the style's main image.
+        const heroSrc = (defaultColor && defaultColor.front_image_url) || s.main_image_url || '';
+        const heroImg = heroSrc
             ? `<img class="dtg-cc-hero-img"
-                    src="${escapeHtml(s.main_image_url)}"
-                    alt="${escapeHtml(s.style)} ${escapeHtml(s.top_color || '')}"
-                    data-default-src="${escapeHtml(s.main_image_url)}"
+                    src="${escapeHtml(heroSrc)}"
+                    alt="${escapeHtml(s.style)} ${escapeHtml(defaultColor ? defaultColor.color_name : (s.top_color || ''))}"
+                    data-default-src="${escapeHtml(heroSrc)}"
                     loading="lazy"
                     onerror="this.style.display='none';this.parentElement.classList.add('dtg-cc-hero-missing');">`
             : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt"></i></div>';
 
-        // Inline color swatches (top 4-6 from server). First swatch (top
-        // color) starts selected. Click another → swap the selected state.
-        // Each swatch carries a small check overlay revealed by --selected.
-        const topColors = Array.isArray(s.top_colors) ? s.top_colors : [];
+        // Inline color swatches (top 4-6 from server). The defaultIdx-th
+        // swatch starts selected. Click another → swap the selected state.
+        // Each swatch carries data-color-units so the per-color stat line
+        // below can update on selection without a second lookup.
         const swatchesHtml = topColors.length
             ? `<div class="dtg-cc-swatches">${topColors.slice(0, 6).map((c, i) => `
                 <button type="button"
-                        class="dtg-cc-color-swatch${i === 0 ? ' dtg-cc-color-swatch--selected' : ''}"
+                        class="dtg-cc-color-swatch${i === defaultIdx ? ' dtg-cc-color-swatch--selected' : ''}"
                         data-color-name="${escapeHtml(c.color_name)}"
                         data-catalog-color="${escapeHtml(c.catalog_color)}"
                         data-swatch-url="${escapeHtml(c.swatch_image_url || '')}"
                         data-front-src="${escapeHtml(c.front_image_url || '')}"
-                        title="${escapeHtml(c.color_name)} — click to select, then '+ Add' below">
+                        data-color-units="${Number(c.color_units_sold || 0)}"
+                        title="${escapeHtml(c.color_name)} — ${fmtInt(c.color_units_sold || 0)} units sold. Click to select.">
                     ${c.swatch_image_url
                         ? `<img src="${escapeHtml(c.swatch_image_url)}" alt="" loading="lazy">`
                         : `<span class="dtg-cc-swatch-placeholder"></span>`}
@@ -280,18 +301,30 @@
               </div>`
             : '';
 
+        // Selected-color stat line. Lives between the swatches and the
+        // action buttons; updates inside selectColorOnCard() on every click.
+        const selectedColorStatHtml = defaultColor
+            ? `<div class="dtg-cc-color-stat">
+                <span class="dtg-cc-color-stat-name">${escapeHtml(defaultColor.color_name)}</span>
+                <span class="dtg-cc-color-stat-dot">·</span>
+                <span class="dtg-cc-color-stat-units">${fmtInt(defaultColor.color_units_sold || 0)}</span>
+                <span class="dtg-cc-color-stat-label">units sold</span>
+              </div>`
+            : '';
+
         // Fabric guess from brand (matches what the bot prompt knows)
         const brand = extractBrand(s.product_title);
 
         // The article carries the current selection in data-selected-*; the
-        // CTA reads from it. Initialized to the top-seller color, updated by
-        // selectColorOnCard() when the rep clicks a different swatch.
+        // CTA reads from it. Initialized to the rotated default color,
+        // updated by selectColorOnCard() when the rep clicks a swatch.
+        const ctaColorName = defaultColor ? defaultColor.color_name : (s.top_color || s.style);
         return `
             <article class="dtg-catalog-card"
                      data-style="${escapeHtml(s.style)}"
-                     data-selected-color="${escapeHtml(s.top_color || '')}"
-                     data-selected-catalog-color="${escapeHtml(s.top_color_catalog || '')}"
-                     data-selected-swatch-url="${escapeHtml(s.top_color_swatch || '')}">
+                     data-selected-color="${escapeHtml(defaultColor ? defaultColor.color_name : (s.top_color || ''))}"
+                     data-selected-catalog-color="${escapeHtml(defaultColor ? defaultColor.catalog_color : (s.top_color_catalog || ''))}"
+                     data-selected-swatch-url="${escapeHtml(defaultColor ? (defaultColor.swatch_image_url || '') : (s.top_color_swatch || ''))}">
                 <div class="dtg-cc-hero">
                     ${heroImg}
                     <div class="dtg-cc-hero-badges">
@@ -306,13 +339,14 @@
                     <div class="dtg-cc-title">${escapeHtml(stripStyleSuffix(s.product_title))}</div>
                     <div class="dtg-cc-meta">
                         ${brand ? `<span>${escapeHtml(brand)}</span> · ` : ''}
-                        <span>${fmtInt(s.total_units_sold)} units sold</span>
+                        <span>${fmtInt(s.total_units_sold)} units sold total</span>
                     </div>
                 </div>
                 ${swatchesHtml}
+                ${selectedColorStatHtml}
                 <div class="dtg-cc-actions">
                     <button type="button" class="dtg-cc-add-default" title="Add the selected color to your quote">
-                        <i class="fas fa-plus"></i> Add <span class="dtg-cc-selected-color-label">${escapeHtml(s.top_color || s.style)}</span>
+                        <i class="fas fa-plus"></i> Add <span class="dtg-cc-selected-color-label">${escapeHtml(ctaColorName)}</span>
                     </button>
                     <button type="button" class="dtg-cc-view-all" title="See all ${s.color_count} colors with size data">
                         <i class="fas fa-eye"></i> All ${fmtInt(s.color_count)}

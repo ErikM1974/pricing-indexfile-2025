@@ -387,6 +387,35 @@
     font-weight: 700;
 }
 
+/* Per-color stat line ("Pink · 412 units sold") — updates on swatch click.
+   Sits between the swatch row and the action buttons so the rep can see
+   instant feedback on the popularity of the color they just selected. */
+.dtg-cc-color-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    padding: 0 14px 6px;
+    font-size: 11.5px;
+    color: #4b5563;
+    line-height: 1.3;
+}
+.dtg-cc-color-stat-name {
+    font-weight: 700;
+    color: #1f3a1f;
+}
+.dtg-cc-color-stat-dot {
+    color: #9ca3af;
+}
+.dtg-cc-color-stat-units {
+    font-weight: 700;
+    color: #2e5827;
+    font-variant-numeric: tabular-nums;
+}
+.dtg-cc-color-stat-label {
+    color: #6b7280;
+    font-size: 10.5px;
+}
+
 /* Action buttons */
 .dtg-cc-actions {
     display: grid;
