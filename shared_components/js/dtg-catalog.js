@@ -213,12 +213,14 @@
     }
 
     // Mark a swatch as selected on its card. Updates the swatch ring +
-    // checkmark, the CTA label ("Add Pink"), and the card-level dataset
-    // that the CTA click reads from. Reused by tests + future bot wiring.
+    // checkmark, the CTA label ("Add Pink"), the hero image (so the model
+    // is wearing the color the rep just picked), and the card-level dataset
+    // that the CTA click reads from.
     function selectColorOnCard(card, sw) {
         const colorName = sw.getAttribute('data-color-name') || '';
         const catalogColor = sw.getAttribute('data-catalog-color') || '';
         const swatchUrl = sw.getAttribute('data-swatch-url') || '';
+        const frontSrc = sw.getAttribute('data-front-src') || '';
         // Visually flip the selected state on this card's swatch row
         card.querySelectorAll('.dtg-cc-color-swatch').forEach((s) => {
             s.classList.remove('dtg-cc-color-swatch--selected');
@@ -231,6 +233,14 @@
         // Update the green CTA label so it says "+ Add Pink" (not "Add Jet Black")
         const label = card.querySelector('.dtg-cc-selected-color-label');
         if (label) label.textContent = colorName;
+        // Swap the hero image to the model wearing this color. Falls back
+        // to data-default-src (the top-color hero) if this color has no
+        // per-color image hydrated by the proxy.
+        const heroImg = card.querySelector('.dtg-cc-hero-img');
+        if (heroImg) {
+            const defaultSrc = heroImg.getAttribute('data-default-src') || '';
+            heroImg.src = frontSrc || defaultSrc;
+        }
     }
 
     function renderCard(s) {
@@ -259,6 +269,7 @@
                         data-color-name="${escapeHtml(c.color_name)}"
                         data-catalog-color="${escapeHtml(c.catalog_color)}"
                         data-swatch-url="${escapeHtml(c.swatch_image_url || '')}"
+                        data-front-src="${escapeHtml(c.front_image_url || '')}"
                         title="${escapeHtml(c.color_name)} — click to select, then '+ Add' below">
                     ${c.swatch_image_url
                         ? `<img src="${escapeHtml(c.swatch_image_url)}" alt="" loading="lazy">`

@@ -2125,8 +2125,20 @@
 
     function previewStyle({ style, desc, color, colorsAvailable, availableSizes }) {
         if (!style) return;
-        const row = findPreviewableRow();
-        if (!row) return; // every row already has a style — don't clobber
+        // Resolve a target row in this order:
+        //   1. The first row with no style yet (catalog open, empty form)
+        //   2. Otherwise, append a brand-new row (rep already has lines and
+        //      is adding a second style/color from the catalog).
+        //
+        // Until 2026-05-19 this returned silently when every row already had
+        // a style, which made the "Add Pink" CTA on a second catalog card
+        // appear to do nothing — exactly the bug Erik reported. Mirrors the
+        // same pattern previewLineItems() already uses.
+        let row = findPreviewableRow();
+        if (!row) {
+            row = newBlankRow();
+            state.rows.push(row);
+        }
         row.style = String(style).toUpperCase();
         row.styleUpper = row.style;
         if (desc) row.desc = desc;
