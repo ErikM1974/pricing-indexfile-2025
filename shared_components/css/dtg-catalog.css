@@ -117,10 +117,12 @@
 /* ----- Grid ---------------------------------------------------------------- */
 
 .dtg-catalog-grid {
-    /* 3-column dense grid at desktop. Each card ~360-400px wide. Big enough
-       for a meaningful product image + inline color swatches + dual CTA. */
+    /* 3-column dense grid at desktop. Each card ~320-400px wide. Big enough
+       for a meaningful product image + inline color swatches + dual CTA.
+       320px minmax (was 340) lets a 1280px laptop viewport reliably fit 3
+       cards once container + accordion padding is accounted for. */
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 16px;
     margin-top: 14px;
 }
