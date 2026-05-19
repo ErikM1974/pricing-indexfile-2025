@@ -1,3 +1,7 @@
+## v2026.05.19.10 (2026.05.19)
+
+- Deploy v2026.05.19.10: DTG two-column layout + card-per-line-item form
+
 ## v2026.05.19.9 (2026.05.19)
 
 - Deploy v2026.05.19.9: DTG page re-engineered — catalog-first, chatbot as research assistant
