@@ -1,3 +1,7 @@
+## v2026.05.19.14 (2026.05.19)
+
+- Deploy v2026.05.19.14: customer + design comboboxes — fix dropdown position bug
+
 ## v2026.05.19.13 (2026.05.19)
 
 - Deploy v2026.05.19.13: Design # picker — customer-aware DTG design dropdown with thumbnails
