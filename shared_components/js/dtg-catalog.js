@@ -134,12 +134,20 @@
         const grid = document.getElementById('dtgCatalogGrid');
         if (!grid || !stylesCache) return;
         // Apply text filter (Phase 3) + category filter
+        // If the query is an EXACT style code that exists in the catalog
+        // (e.g. "PC61"), narrow strictly to that style — otherwise the
+        // substring match would also surface PC61LS, PC61T, etc.
+        const q = currentSearch.toLowerCase();
+        const exactStyleHit = q ? stylesCache.find((s) => s.style.toLowerCase() === q) : null;
         const filtered = stylesCache.filter((s) => {
             if (currentCategory && s.category !== currentCategory) return false;
-            if (currentSearch) {
-                const q = currentSearch.toLowerCase();
-                const hay = `${s.style} ${s.product_title} ${s.category} ${s.top_color}`.toLowerCase();
-                if (!hay.includes(q)) return false;
+            if (q) {
+                if (exactStyleHit) {
+                    if (s.style.toLowerCase() !== q) return false;
+                } else {
+                    const hay = `${s.style} ${s.product_title} ${s.category} ${s.top_color}`.toLowerCase();
+                    if (!hay.includes(q)) return false;
+                }
             }
             return true;
         });
@@ -148,9 +156,13 @@
             return;
         }
         grid.innerHTML = filtered.map((s) => renderCard(s)).join('');
+        // Build a style → row lookup so per-card click handlers can resolve
+        // their row data without a linear scan through stylesCache every time.
+        const byStyle = new Map(filtered.map((s) => [s.style, s]));
         // Wire interactions
         grid.querySelectorAll('.dtg-catalog-card').forEach((card) => {
             const style = card.getAttribute('data-style');
+            const row = byStyle.get(style) || {};
             // Whole-card click → modal (deep dive: all colors + size mix)
             const titleArea = card.querySelector('.dtg-cc-titleblock');
             if (titleArea) titleArea.addEventListener('click', () => openModal(style));
@@ -163,12 +175,11 @@
                     const colorName = sw.getAttribute('data-color-name');
                     const catalogColor = sw.getAttribute('data-catalog-color');
                     const swatchUrl = sw.getAttribute('data-swatch-url');
-                    quickAddToQuote(style, colorName, catalogColor, swatchUrl, s.product_title);
+                    quickAddToQuote(style, colorName, catalogColor, swatchUrl, row.product_title);
                 });
                 // Hover swatch → swap hero image to show that color
                 sw.addEventListener('mouseenter', () => {
                     const heroImg = card.querySelector('.dtg-cc-hero-img');
-                    const defaultSrc = heroImg?.getAttribute('data-default-src') || '';
                     const variantSrc = sw.getAttribute('data-hover-src') || '';
                     if (heroImg && variantSrc) heroImg.src = variantSrc;
                 });
@@ -185,10 +196,10 @@
                     e.stopPropagation();
                     quickAddToQuote(
                         style,
-                        s.top_color,
-                        s.top_color_catalog,
-                        s.top_color_swatch,
-                        s.product_title
+                        row.top_color,
+                        row.top_color_catalog,
+                        row.top_color_swatch,
+                        row.product_title
                     );
                 });
             }
