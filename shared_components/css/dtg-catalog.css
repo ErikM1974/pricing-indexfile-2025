@@ -12,10 +12,82 @@
    card-with-hover-lift pattern same as the rest of the page.
    ========================================================================== */
 
+/* ----- Page title strip (replaced the old big hero on 2026-05-19) -------- */
+
+.page-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    margin: 14px 0 14px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-left: 4px solid #2e5827;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.page-titlebar-title {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f3a1f;
+    letter-spacing: -0.01em;
+}
+.page-titlebar-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: #edf3ea;
+    color: #1f3a1f;
+    border: 1px solid rgba(46, 88, 39, 0.25);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+}
+.page-titlebar-fact i { color: #2e5827; }
+.page-titlebar-fact strong { font-weight: 700; }
+@media (max-width: 700px) {
+    .page-titlebar { flex-direction: column; align-items: flex-start; }
+    .page-titlebar-title { font-size: 18px; }
+}
+
 /* ----- Section + header ---------------------------------------------------- */
 
 .dtg-catalog-section {
     padding: 16px 4px 8px;
+}
+/* Standalone modifier — the catalog no longer lives inside an accordion
+   (2026-05-19). It's a top-level section with its own card-style frame. */
+.dtg-catalog-section--standalone {
+    padding: 20px 22px 22px;
+    margin: 0 0 18px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+.dtg-catalog-section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f3a1f;
+    margin-bottom: 10px;
+}
+.dtg-catalog-section-title > i {
+    color: #2e5827;
+    font-size: 14px;
+}
+.dtg-catalog-section-meta {
+    font-size: 12px;
+    font-weight: 400;
+    color: #6b7280;
+    letter-spacing: 0;
+    text-transform: none;
 }
 .dtg-catalog-head {
     margin-bottom: 14px;

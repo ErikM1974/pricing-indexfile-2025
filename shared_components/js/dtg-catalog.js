@@ -47,8 +47,10 @@
     document.addEventListener('DOMContentLoaded', init);
 
     async function init() {
-        const accordion = document.getElementById('dtgCatalogAccordion');
-        if (!accordion) return; // page doesn't have the catalog section
+        // 2026-05-19 — catalog is now always-expanded (no accordion shell).
+        // We anchor on the grid element instead of the old <details>.
+        const grid = document.getElementById('dtgCatalogGrid');
+        if (!grid) return; // page doesn't have the catalog section
 
         // Hook up modal close on backdrop click + X button + Escape
         const backdrop = document.getElementById('dtgCatalogModalBackdrop');
@@ -74,24 +76,15 @@
             });
         }
 
-        // Lazy-load when accordion is first opened
-        let loaded = false;
-        const loadIfNeeded = async () => {
-            if (loaded) return;
-            loaded = true;
-            try {
-                await Promise.all([loadCategories(), loadStyles()]);
-            } catch (err) {
-                console.error('[dtg-catalog] init failed:', err);
-                const grid = document.getElementById('dtgCatalogGrid');
-                if (grid) grid.innerHTML = `<div class="dtg-catalog-error">Couldn't load catalog. <button type="button" onclick="location.reload()">Retry</button></div>`;
-            }
-        };
-        accordion.addEventListener('toggle', () => {
-            if (accordion.open) loadIfNeeded();
-        });
-        // Preload anyway after 800ms so it's snappy when first opened
-        setTimeout(loadIfNeeded, 800);
+        // Load immediately — catalog is the primary interaction surface now,
+        // not a hidden accordion. Reps see the 20 cards within ~500ms of page
+        // load instead of having to click to expand first.
+        try {
+            await Promise.all([loadCategories(), loadStyles()]);
+        } catch (err) {
+            console.error('[dtg-catalog] init failed:', err);
+            grid.innerHTML = `<div class="dtg-catalog-error">Couldn't load catalog. <button type="button" onclick="location.reload()">Retry</button></div>`;
+        }
     }
 
     // ----- Category tabs ------------------------------------------------
