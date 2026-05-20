@@ -1,3 +1,7 @@
+## v2026.05.20.19 (2026.05.20)
+
+- Deploy v2026.05.20.19: new-artwork upload UI + submit wiring + readiness gates (Phase 2+3)
+
 ## v2026.05.20.18 (2026.05.20)
 
 - Deploy v2026.05.20.18: new-artwork upload path Phase 1 — open Designs[] gate when files present
