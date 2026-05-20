@@ -1,3 +1,8 @@
+## v2026.05.20.12 (2026.05.20)
+
+- Correct MO retention docs: ~2 years, not 60 days
+- Deploy v2026.05.20.12: 1 files (server.js,...)
+
 ## v2026.05.20.11 (2026.05.20)
 
 - Deploy v2026.05.20.11: 4 files (dtg-quote-builder.html,server.js,dtg-inline-form.css,...)
