@@ -559,6 +559,21 @@
                             <input type="text" id="dtgCompanyInput" autocomplete="off" placeholder="Company name or contact…">
                         </div>
 
+                        <!-- Contact picker — appears after a customer is picked, showing
+                             every contact on file at that company so the rep can switch
+                             between them (e.g. Aaberg's has Craig Edward, Accounting,
+                             and Alexx Bacon). Hidden when no contacts exist. -->
+                        <div class="dcp-contact-row" id="dtgContactRow" hidden>
+                            <div class="dcp-field-label">
+                                <i class="fas fa-user"></i>
+                                Contact at this company
+                                <span class="dcp-contact-count" id="dtgContactCount"></span>
+                            </div>
+                            <select id="dtgContactPicker" class="dcp-contact-select">
+                                <option value="">— pick a contact —</option>
+                            </select>
+                        </div>
+
                         <div class="dcp-divider">Or fill manually</div>
 
                         <div class="dcp-manual">
@@ -1525,6 +1540,23 @@
         const input = document.getElementById('dtgCompanyInput');
         if (wrap && input) attachCompanyCombobox(wrap, input);
 
+        // Contact picker — switches between this company's contacts.
+        // When the rep selects a different contact, re-apply that contact's
+        // first/last/email/phone to the form. State.customer.contacts must
+        // already be populated by attachCompanyCombobox.pick() or previewCustomer().
+        const contactPicker = document.getElementById('dtgContactPicker');
+        if (contactPicker) contactPicker.addEventListener('change', () => {
+            const id = contactPicker.value;
+            if (!id) return;
+            const ct = (state.customer.contacts || []).find((c) =>
+                String(c.ID_Contact || '') === id);
+            if (ct) {
+                applyContact(ct);
+                markDirty();
+                scheduleStateSave();
+            }
+        });
+
         // Design # combobox (DTG designs for the current customer)
         const designWrap = document.getElementById('dtgDesignCombo');
         const designInput = document.getElementById('dtgDesignNumber');
@@ -1877,11 +1909,15 @@
             state.customer.companyId = c.id_Customer != null ? String(c.id_Customer) : '';
             state.customer.contacts = c.contacts || [];
             input.value = c.Company_Name || '';
-            // If only one emailable contact, auto-pick them
+            // Auto-pick first emailable contact (rep can switch via the picker)
             const firstContact = (c.contacts || []).find((ct) => ct.Email || ct.ContactNumbersEmail);
             if (firstContact) {
                 applyContact(firstContact);
             }
+            // Populate the contact dropdown so the rep can switch to a different
+            // contact at this company (e.g. Aaberg's has Craig Edward / Accounting /
+            // Alexx Bacon; auto-pick lands on Craig, but rep can switch to Alexx).
+            populateContactPicker(c.contacts || []);
             // Reflect in companyId field if it's blank
             const cidInput = document.getElementById('dtgCompanyId');
             if (cidInput && !cidInput.value) cidInput.value = state.customer.companyId;
@@ -1920,11 +1956,50 @@
         state.customer.lastName = ct.NameLast || '';
         state.customer.email = ct.Email || ct.ContactNumbersEmail || '';
         state.customer.phone = ct.Phone || ct.Company_Phone || '';
+        state.customer.contactId = ct.ID_Contact != null ? String(ct.ID_Contact) : '';
         const fn = document.getElementById('dtgFirstName'); if (fn) fn.value = state.customer.firstName;
         const ln = document.getElementById('dtgLastName'); if (ln) ln.value = state.customer.lastName;
         const em = document.getElementById('dtgEmail'); if (em) em.value = state.customer.email;
         const ph = document.getElementById('dtgPhone'); if (ph) ph.value = state.customer.phone;
+        // Keep the contact picker in sync (highlights which contact is active)
+        const picker = document.getElementById('dtgContactPicker');
+        if (picker && state.customer.contactId) picker.value = state.customer.contactId;
         updateSubmitEnabled();
+    }
+
+    // Populate the contact dropdown with the picked company's contacts so the
+    // rep can switch between them. Called from pick() in attachCompanyCombobox
+    // (when a company is picked from search) and from previewCustomer() (when
+    // the chat fills the customer). Hidden when no contacts on file.
+    function populateContactPicker(contacts) {
+        const row = document.getElementById('dtgContactRow');
+        const picker = document.getElementById('dtgContactPicker');
+        const counter = document.getElementById('dtgContactCount');
+        if (!row || !picker) return;
+        const list = Array.isArray(contacts) ? contacts : [];
+        if (!list.length) {
+            row.hidden = true;
+            picker.innerHTML = '<option value="">— pick a contact —</option>';
+            return;
+        }
+        row.hidden = false;
+        if (counter) counter.textContent = `(${list.length} on file)`;
+        // Sort: contacts with email first (emailable = useful), then alphabetically
+        const sorted = list.slice().sort((a, b) => {
+            const ea = !!(a.Email || a.ContactNumbersEmail);
+            const eb = !!(b.Email || b.ContactNumbersEmail);
+            if (ea !== eb) return ea ? -1 : 1; // emailable first
+            return String(a.ct_NameFull || `${a.NameFirst || ''} ${a.NameLast || ''}`).localeCompare(
+                String(b.ct_NameFull || `${b.NameFirst || ''} ${b.NameLast || ''}`));
+        });
+        picker.innerHTML = sorted.map((ct) => {
+            const name = ct.ct_NameFull || `${ct.NameFirst || ''} ${ct.NameLast || ''}`.trim() || '(unnamed)';
+            const email = ct.Email || ct.ContactNumbersEmail || '';
+            const tag = email ? ` — ${email}` : ' (no email)';
+            const id = ct.ID_Contact != null ? String(ct.ID_Contact) : '';
+            const selected = id === state.customer.contactId ? ' selected' : '';
+            return `<option value="${escapeHtml(id)}"${selected}>${escapeHtml(name)}${escapeHtml(tag)}</option>`;
+        }).join('');
     }
 
     // ----- Live pricing (via window.DTGPricingService) -----------------------
@@ -2862,6 +2937,10 @@
         set('dtgLastName', state.customer.lastName);
         set('dtgEmail', state.customer.email);
         set('dtgPhone', state.customer.phone);
+        // Surface the customer's contacts in the picker dropdown.
+        if (Array.isArray(state.customer.contacts) && state.customer.contacts.length) {
+            populateContactPicker(state.customer.contacts);
+        }
         // New customer ID → refresh the Design # picker so its dropdown
         // shows THIS customer's DTG designs.
         refreshDesignComboboxForNewCustomer();
