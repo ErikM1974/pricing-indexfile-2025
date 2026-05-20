@@ -828,6 +828,24 @@
     font-size: 12px;
     font-style: italic;
 }
+/* "Did you mean" hint at the top of the dropdown — appears when the
+   typed query had no exact hits but a shorter prefix found matches. */
+.dtg-combobox-hint {
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
+    border-bottom: 1px solid rgba(217, 119, 6, 0.25);
+    color: #78350f;
+    font-size: 11.5px;
+    line-height: 1.4;
+}
+.dtg-combobox-hint strong {
+    color: #1f3a1f;
+    font-weight: 700;
+}
+.dtg-combobox-hint em {
+    color: #6b7280;
+    font-style: italic;
+}
 .dtg-combobox-item .ci-swatches {
     display: flex;
     gap: 3px;
