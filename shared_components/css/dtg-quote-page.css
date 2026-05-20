@@ -4,16 +4,79 @@
    Loads ON TOP of sticker-pricing-page.css. Adds:
      - .dtg-quote-card      → live DTG price card (NWCA green)
      - .top-seller-card     → recommendation cards rendered inline in chat
-     - .web-search-chip     → reuse pattern from webstore (already defined
-                               in webstore-pricing-page.css? no, only in
-                               webstore — we duplicate for DTG)
+     - .web-search-chip     → reuse pattern from webstore
      - .submit-shopworks-btn → 4th action button in chat footer
      - .quick-fact--accent  → green-tinted callout (LTM threshold reminder)
      - Legacy form re-theme → replaces the blue header/Bootstrap chrome
-                               on the existing form inside the accordion
+
+   2026-05-20 — PNW THEME REFACTOR (Erik request):
+     - Extracted all hardcoded brand colors into :root tokens below
+     - Pacific Northwest palette: deeper forest greens, warm cedar/birch
+       accents, mountain-mist neutrals
+     - Subtle SVG topographic background applied to body — looks like
+       elevation lines of a Cascades hike at ~4% opacity
+     - Two parallel green systems consolidated: hardcoded #2e5827 (102 refs
+       across 3 DTG files) → var(--pnw-forest)
 
    By design, when sticker visuals get tweaked, DTG follows.
    ========================================================================== */
+
+/* ============================================================================
+   PNW DESIGN TOKENS — single source of truth for DTG-app brand colors
+   ============================================================================
+   These override / extend the base tokens from sticker-pricing-page.css.
+   When you need to tune the brand, edit ONLY these lines.
+*/
+:root {
+    /* --- Forest greens (replaces hardcoded #2e5827 across all DTG CSS) --- */
+    --pnw-forest-deep: #1f4922;  /* Deepest forest — borders, strong accents */
+    --pnw-forest:      #2e5827;  /* Primary brand green — CTA buttons, icons */
+    --pnw-forest-mid:  #3d6d35;  /* Mid-tone for gradient stops + hover states */
+    --pnw-pine:        #1a3517;  /* Headings + strong text (was #1f3a1f) */
+    --pnw-moss:        #6b8e60;  /* Soft accent — secondary text, hints */
+    --pnw-sage:        #a8c39e;  /* Pale lichen — subtle borders, tints */
+
+    /* --- Warm woods (replaces hardcoded #f6f1e6 + new cedar accent) --- */
+    --pnw-birch:       #f7f2e3;  /* Soft cream paper (~1 step warmer than old) */
+    --pnw-birch-deep:  #ede5cf;  /* Slightly more saturated cream — surfaces */
+    --pnw-cedar:       #8b6f4e;  /* Optional wood tone — borders, accents */
+    --pnw-bark-shadow: #3a2e1f;  /* Deep brown — sparingly, e.g. select text */
+
+    /* --- Neutrals (mountain mist) --- */
+    --pnw-mist:        #e8eee7;  /* Mountain-mist for soft backgrounds */
+    --pnw-fog:         #f4f6f3;  /* Even paler mist for hover states */
+    --pnw-stone:       #6b7280;  /* Neutral text gray */
+    --pnw-stone-soft:  #9ca3af;  /* Muted gray */
+
+    /* --- Surface scale (whites + neutrals) --- */
+    --pnw-paper:       #ffffff;  /* Pure white cards */
+    --pnw-rule:        rgba(31, 73, 34, 0.10);  /* Forest-tinted border lines */
+    --pnw-rule-strong: rgba(31, 73, 34, 0.22);
+
+    /* --- Shadows (subtle elevation, forest-tinted not pure black) --- */
+    --pnw-shadow-sm:   0 1px 2px rgba(31, 73, 34, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --pnw-shadow-md:   0 2px 6px rgba(31, 73, 34, 0.10), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --pnw-shadow-lg:   0 6px 16px rgba(31, 73, 34, 0.14), 0 12px 28px rgba(0, 0, 0, 0.08);
+    --pnw-glow-focus:  0 0 0 3px rgba(46, 88, 39, 0.20);
+}
+
+/* ============================================================================
+   PNW BACKGROUND — subtle topographic contour pattern
+   ============================================================================
+   An SVG data-URI of soft contour lines (think USGS topo map) at very low
+   opacity. Adds quiet PNW character without competing with form content.
+   The pattern is encoded inline (no extra HTTP request).
+*/
+body {
+    background-color: var(--pnw-birch);
+    background-image:
+        linear-gradient(180deg, rgba(232, 238, 231, 0.5) 0%, rgba(247, 242, 227, 0.3) 800px),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'><g fill='none' stroke='%231f4922' stroke-width='0.5' opacity='0.045'><path d='M0,400 Q200,350 400,400 T800,400'/><path d='M0,420 Q200,370 400,420 T800,420'/><path d='M0,380 Q200,330 400,380 T800,380'/><path d='M0,360 Q200,310 400,360 T800,360'/><path d='M0,440 Q200,390 400,440 T800,440'/><path d='M0,300 Q200,250 400,300 T800,300'/><path d='M0,500 Q200,450 400,500 T800,500'/><path d='M0,200 Q200,150 400,200 T800,200'/><path d='M0,600 Q200,550 400,600 T800,600'/><path d='M0,100 Q200,50 400,100 T800,100'/><path d='M0,700 Q200,650 400,700 T800,700'/></g></svg>");
+    background-attachment: fixed;
+    background-position: center top;
+    background-size: 100% auto, 800px 800px;
+    background-repeat: no-repeat, repeat;
+}
 
 /* DTG-specific override: the chat panel does NOT dim/blur the rest of the
    page. Reps need to watch the form fill in real time while typing in
@@ -36,12 +99,12 @@
     border: 1px solid #7ab86a;
     box-shadow: 0 1px 0 0 rgba(46, 88, 39, 0.10) inset,
                 0 2px 8px -2px rgba(46, 88, 39, 0.20);
-    color: #1f3a1f;
+    color: var(--pnw-pine);
     font-weight: 500;
 }
-.quick-fact.quick-fact--accent i { color: #2e5827; }
+.quick-fact.quick-fact--accent i { color: var(--pnw-forest); }
 .quick-fact.quick-fact--accent strong {
-    color: #1f3a1f;
+    color: var(--pnw-pine);
     font-weight: 700;
 }
 
@@ -49,7 +112,7 @@
 .dtg-quote-card {
     margin-top: 12px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #1f3a1f 0%, #2e5827 100%);
+    background: linear-gradient(135deg, var(--pnw-pine) 0%, var(--pnw-forest) 100%);
     color: #fff;
     border-radius: var(--radius-2, 12px);
     box-shadow: 0 6px 18px rgba(31, 58, 31, 0.30);
@@ -103,7 +166,7 @@
     margin: 4px 8px 12px 0;
     padding: 3px 10px;
     background: #fff8e0;
-    color: #2e5827;
+    color: var(--pnw-forest);
     border-radius: 999px;
     font-size: 11px;
     font-weight: 700;
@@ -210,7 +273,7 @@
 .top-seller-recommendations {
     margin-top: 10px;
     padding: 12px 14px;
-    background: var(--paper-2, #f6f1e6);
+    background: var(--paper-2, var(--pnw-birch));
     border: 1px solid var(--rule, rgba(0,0,0,0.08));
     border-radius: 10px;
 }
@@ -263,7 +326,7 @@
 .top-seller-card .ts-rank-badge {
     width: 32px;
     height: 32px;
-    background: #2e5827;
+    background: var(--pnw-forest);
     color: #fff8e0;
     border-radius: 50%;
     display: flex;
@@ -281,7 +344,7 @@
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 13px;
     font-weight: 700;
-    color: var(--ink-1, #1f3a1f);
+    color: var(--ink-1, var(--pnw-pine));
 }
 .top-seller-card .ts-name {
     font-size: 13px;
@@ -294,7 +357,7 @@
 }
 .top-seller-card .ts-sales {
     font-size: 11px;
-    color: #2e5827;
+    color: var(--pnw-forest);
     font-weight: 600;
     margin-top: 2px;
 }
@@ -315,7 +378,7 @@
     align-items: center;
     gap: 4px;
     padding: 2px 6px 2px 4px;
-    background: var(--paper-2, #f6f1e6);
+    background: var(--paper-2, var(--pnw-birch));
     border-radius: 4px;
     font-size: 10px;
     color: var(--ink-2, #4b5563);
@@ -343,7 +406,7 @@
 .product-details-card {
     margin-top: 10px;
     padding: 12px 14px;
-    background: var(--paper-2, #f6f1e6);
+    background: var(--paper-2, var(--pnw-birch));
     border: 1px solid var(--rule, rgba(0,0,0,0.08));
     border-radius: 10px;
 }
@@ -385,12 +448,12 @@
 .product-details-card .pd-title {
     font-size: 14px;
     font-weight: 700;
-    color: var(--ink-1, #1f3a1f);
+    color: var(--ink-1, var(--pnw-pine));
     line-height: 1.3;
 }
 .product-details-card .pd-style {
     font-family: var(--mono, ui-monospace, monospace);
-    color: #2e5827;
+    color: var(--pnw-forest);
 }
 .product-details-card .pd-meta {
     font-size: 11px;
@@ -432,10 +495,10 @@
 .color-swatch:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(46, 88, 39, 0.18);
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
 }
 .color-swatch:focus-visible {
-    outline: 2px solid #2e5827;
+    outline: 2px solid var(--pnw-forest);
     outline-offset: 2px;
 }
 .color-swatch .cs-img {
@@ -470,12 +533,12 @@
    caption gets a check icon, and the full swatch grid is hidden behind an
    expander button. The rep can still expand to switch colors if needed. */
 .product-details-card .pd-hero.confirmed {
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
     box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.18);
 }
 .product-details-card .pd-hero.confirmed .pd-hero-caption {
     background: linear-gradient(180deg, rgba(46, 88, 39, 0.05) 0%, rgba(46, 88, 39, 0.12) 100%);
-    color: #2e5827;
+    color: var(--pnw-forest);
     font-weight: 700;
 }
 .product-details-card .pd-hero.confirmed .pd-hero-caption .fa-check {
@@ -502,12 +565,12 @@
 }
 .product-details-card .pd-swatch-expander:hover {
     background: #f3f7f1;
-    border-color: #2e5827;
-    color: #2e5827;
+    border-color: var(--pnw-forest);
+    color: var(--pnw-forest);
 }
 .product-details-card .pd-swatch-expander[aria-expanded="true"] {
     background: #f3f7f1;
-    color: #2e5827;
+    color: var(--pnw-forest);
 }
 .product-details-card .color-swatch-grid.pd-collapsed {
     margin-top: 8px;
@@ -608,12 +671,12 @@
 
 /* Highlight the currently-picked swatch within the expanded grid */
 .color-swatch.picked {
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
     background: #f3f7f1;
-    box-shadow: inset 0 0 0 2px #2e5827;
+    box-shadow: inset 0 0 0 2px var(--pnw-forest);
 }
 .color-swatch.picked .cs-name {
-    color: #2e5827;
+    color: var(--pnw-forest);
     font-weight: 700;
 }
 
@@ -630,7 +693,7 @@
 }
 .product-details-card .pd-size-matrix .pd-section-label {
     margin: 0 0 8px;
-    color: #2e5827;
+    color: var(--pnw-forest);
     font-size: 11px;
 }
 .product-details-card .pd-size-matrix-grid {
@@ -652,10 +715,10 @@
                 background var(--dur-fast, 120ms) ease;
 }
 .product-details-card .pd-sm-cell:hover {
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
 }
 .product-details-card .pd-sm-cell:focus-within {
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
     background: #fff;
     box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.12);
 }
@@ -695,7 +758,7 @@
     border-radius: 4px;
     font-size: 14px;
     font-weight: 700;
-    color: #1f3a1f;
+    color: var(--pnw-pine);
     text-align: center;
     font-family: var(--mono, ui-monospace, monospace);
     box-sizing: border-box;
@@ -709,7 +772,7 @@
 }
 .product-details-card .pd-sm-cell input:focus {
     outline: none;
-    border-color: #2e5827;
+    border-color: var(--pnw-forest);
 }
 .product-details-card .pd-size-matrix-actions {
     display: flex;
@@ -723,7 +786,7 @@
 .product-details-card .pd-sm-total {
     font-size: 12px;
     font-weight: 700;
-    color: #2e5827;
+    color: var(--pnw-forest);
     font-variant-numeric: tabular-nums;
 }
 .product-details-card .pd-sm-add {
@@ -731,7 +794,7 @@
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%);
+    background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
     color: #fff8e0;
     border: none;
     border-radius: 6px;
@@ -779,8 +842,8 @@
     gap: 6px;
     padding: 6px 14px;
     background: #fff;
-    border: 1.5px solid #2e5827;
-    color: #2e5827;
+    border: 1.5px solid var(--pnw-forest);
+    color: var(--pnw-forest);
     border-radius: 999px;
     font: inherit;
     font-size: 11px;
@@ -850,7 +913,7 @@
 .web-search-results {
     margin-top: 8px;
     padding: 10px 12px;
-    background: var(--paper-2, #f6f1e6);
+    background: var(--paper-2, var(--pnw-birch));
     border: 1px solid var(--rule, rgba(0,0,0,0.08));
     border-radius: 10px;
     font-size: 12px;
@@ -899,13 +962,13 @@
 
 /* -- "Submit to ShopWorks" action button + status ------------------------ */
 .ai-action-btn.submit-shopworks-btn {
-    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%);
+    background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
     color: #fff;
-    border: 1px solid #2e5827;
+    border: 1px solid var(--pnw-forest);
     font-weight: 600;
 }
 .ai-action-btn.submit-shopworks-btn:hover:not(:disabled) {
-    background: linear-gradient(135deg, #1f3a1f 0%, #0f2010 100%);
+    background: linear-gradient(135deg, var(--pnw-pine) 0%, #0f2010 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(31, 58, 31, 0.30);
 }
@@ -955,9 +1018,9 @@
    accordion. We re-theme the blue header bar to NWCA green and tweak the
    typography to match the rest of the page. */
 .power-header {
-    background: linear-gradient(135deg, #2e5827 0%, #1f3a1f 100%) !important;
+    background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%) !important;
     color: #fff !important;
-    border-bottom: 1px solid #1f3a1f;
+    border-bottom: 1px solid var(--pnw-pine);
 }
 .power-header .logo { filter: brightness(0) invert(1); }
 .power-header-title { color: #fff !important; }
@@ -972,26 +1035,26 @@
 }
 .power-header .btn-new-quote {
     background: #fff8e0;
-    color: #2e5827;
+    color: var(--pnw-forest);
     border-color: #fff8e0;
     font-weight: 700;
 }
 .power-header .btn-new-quote:hover {
     background: #fff;
-    color: #1f3a1f;
+    color: var(--pnw-pine);
 }
 
 /* Re-theme legacy radio buttons + form controls to green */
 .location-radio input[type="radio"]:checked {
-    accent-color: #2e5827;
+    accent-color: var(--pnw-forest);
 }
 .btn-primary, .quote-btn, .calc-btn {
-    background: #2e5827 !important;
-    border-color: #2e5827 !important;
+    background: var(--pnw-forest) !important;
+    border-color: var(--pnw-forest) !important;
 }
 .btn-primary:hover, .quote-btn:hover, .calc-btn:hover {
-    background: #1f3a1f !important;
-    border-color: #1f3a1f !important;
+    background: var(--pnw-pine) !important;
+    border-color: var(--pnw-pine) !important;
 }
 
 /* -- Mobile tweaks ------------------------------------------------------- */
@@ -1002,4 +1065,128 @@
         grid-template-columns: auto 1fr;
         gap: 8px;
     }
+}
+
+/* ============================================================================
+   PNW THEME — additional visual touches (2026-05-20)
+   ============================================================================
+   These rules layer on top of all the per-component styling above to give the
+   DTG quote builder a quiet Pacific Northwest character — deeper greens,
+   warm cedar accents, subtle elevation. Each rule is additive; remove the
+   whole block to revert to flat styling.
+*/
+
+/* Header (logo bar) gets a thin forest-gradient underline for PNW signature */
+body > .header,
+.header {
+    position: relative;
+    border-bottom-color: var(--pnw-rule) !important;
+}
+body > .header::after,
+.header::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--pnw-forest-deep) 0%,
+        var(--pnw-forest) 35%,
+        var(--pnw-moss) 65%,
+        transparent 100%
+    );
+    pointer-events: none;
+}
+
+/* Tree icon for the NWCA-Approved badge gets PNW forest green */
+.dtg-catalog-section-title .fa-tree {
+    color: var(--pnw-forest-deep);
+    margin-right: 4px;
+    text-shadow: 0 1px 2px rgba(31, 73, 34, 0.12);
+}
+
+/* Catalog section card — slightly warmer paper, forest-tinted border */
+.dtg-catalog-section--standalone {
+    background: var(--pnw-paper);
+    border: 1px solid var(--pnw-rule);
+    box-shadow: var(--pnw-shadow-sm);
+}
+
+/* Form column (sticky right panel) — same paper treatment for symmetry */
+.dtg-form-column .dtg-form-wrap {
+    border-color: var(--pnw-rule);
+    box-shadow: var(--pnw-shadow-md);
+}
+
+/* Form header band uses a soft mist-to-paper gradient — feels like
+   morning fog lifting off the bay */
+.dtg-form-header {
+    background: linear-gradient(180deg, var(--pnw-mist) 0%, var(--pnw-paper) 100%) !important;
+    border-bottom: 1px solid var(--pnw-rule) !important;
+}
+
+/* Catalog cards lift gently on hover — feels like leaves rustling */
+.dtg-cc-card {
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+.dtg-cc-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--pnw-shadow-md);
+    border-color: var(--pnw-sage);
+}
+
+/* Add-row button uses the PNW gradient too — matches submit-btn */
+.dtg-add-row-btn {
+    background: linear-gradient(180deg, var(--pnw-mist) 0%, var(--pnw-fog) 100%) !important;
+    border-color: var(--pnw-rule-strong) !important;
+    transition: all 180ms ease;
+}
+.dtg-add-row-btn:hover {
+    background: linear-gradient(180deg, var(--pnw-sage) 0%, var(--pnw-mist) 100%) !important;
+    border-color: var(--pnw-forest) !important;
+    color: var(--pnw-forest-deep) !important;
+}
+
+/* Pickup toggle row — softer mist-tinted background */
+.dcp-pickup-toggle {
+    background: var(--pnw-fog) !important;
+    border-color: var(--pnw-rule) !important;
+}
+.dcp-pickup-toggle:has(input:checked) {
+    background: var(--pnw-mist) !important;
+    border-color: var(--pnw-sage) !important;
+}
+
+/* CTA: "Ask" floating button (research assistant) gets the PNW gradient */
+.floating-quote-btn {
+    background: linear-gradient(180deg, var(--pnw-forest-mid) 0%, var(--pnw-forest) 50%, var(--pnw-forest-deep) 100%) !important;
+    box-shadow: var(--pnw-shadow-md), 0 1px 0 0 rgba(255, 255, 255, 0.18) inset !important;
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+.floating-quote-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--pnw-shadow-lg), 0 1px 0 0 rgba(255, 255, 255, 0.25) inset !important;
+    filter: brightness(1.05);
+}
+
+/* Footer gets a soft mist tint instead of pure white */
+.pricing-footer {
+    background: var(--pnw-mist);
+    border-top: 1px solid var(--pnw-rule);
+    color: var(--pnw-stone);
+}
+
+/* Catalog tabs (All / T-Shirt / etc.) — selected state uses forest-deep */
+.dtg-cat-tab.active {
+    background: var(--pnw-forest-deep) !important;
+    border-color: var(--pnw-forest-deep) !important;
+    box-shadow: 0 1px 4px rgba(31, 73, 34, 0.30) !important;
+}
+.dtg-cat-tab {
+    transition: all 160ms ease;
+}
+.dtg-cat-tab:hover:not(.active) {
+    border-color: var(--pnw-forest) !important;
+    color: var(--pnw-forest-deep) !important;
 }
