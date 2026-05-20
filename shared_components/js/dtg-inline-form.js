@@ -70,6 +70,41 @@
         return method === 'Customer Pickup' || method === 'pickup' || method === 'willcall';
     }
 
+    // --- Date helpers (Erik 2026-05-20) -------------------------------------
+    // ISO date "YYYY-MM-DD" matches HTML <input type="date"> serialization
+    // AND ManageOrders push (proxy reformats to MM/DD/YYYY on its side).
+    function isoDate(d) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${dd}`;
+    }
+    // Add N business days (Mon-Fri only). NOTE: doesn't account for US holidays —
+    // rep is expected to bump the date manually for holiday weeks (Thanksgiving,
+    // Xmas). Worth adding a holiday-aware version if reps complain.
+    function addBusinessDays(start, days) {
+        const d = new Date(start);
+        let added = 0;
+        while (added < days) {
+            d.setDate(d.getDate() + 1);
+            const dow = d.getDay();
+            if (dow !== 0 && dow !== 6) added++;
+        }
+        return d;
+    }
+    // Erik's rule: ≤ 24 pcs → 5 business days; > 24 pcs → 10 business days.
+    function computeAutoDueDate(combinedQty) {
+        const bizDays = combinedQty > 24 ? 10 : 5;
+        return isoDate(addBusinessDays(new Date(), bizDays));
+    }
+    // Human-readable label for the auto-due hint shown next to the field.
+    function dueDateAutoLabel(combinedQty) {
+        if (combinedQty <= 0) return '5 business days (auto)';
+        return combinedQty > 24
+            ? `10 business days (auto · 25+ pcs)`
+            : `5 business days (auto · ${combinedQty} pcs)`;
+    }
+
     // sessionStorage key prefix + state-shape version (bump if state shape
     // changes incompatibly so old restores don't crash).
     // v2 (2026-05-20): SHIP_METHODS now uses ShopWorks-canonical names
@@ -131,6 +166,17 @@
             terms: 'Prepaid',
             contacts: [],   // populated when a company is picked
             salesRepCode: lastRepCode || 'erik', // A1
+        },
+        // Schedule — production due date + customer event ("drop dead") date.
+        // Erik's rule (2026-05-20): qty ≤ 24 → 5 business days; qty > 24 → 10
+        // business days. Drop dead is optional and only used when the customer
+        // has a hard deadline (event, photo shoot, etc.).
+        // dueDate / dropDeadDate are ISO strings "YYYY-MM-DD" (matches HTML
+        // <input type="date"> format). Backend converts to MM/DD/YYYY for OnSite.
+        scheduling: {
+            dueDate: '',         // production due date — auto unless rep edits
+            dropDeadDate: '',    // optional customer event date
+            autoDueDate: true,   // true = recompute on qty change; false = rep manually overrode
         },
         shipping: {
             // Default 'Customer Pickup' since ~95% of NWCA orders are local
@@ -748,6 +794,33 @@
                                 </div>
                             </div>
 
+                            <!-- Schedule section (2026-05-20).
+                                 Due date auto-calculates from combined qty:
+                                   ≤24 pcs → 5 business days
+                                   >24 pcs → 10 business days
+                                 Rep can override either date. Drop dead optional. -->
+                            <div class="dcp-dates">
+                                <div class="dcp-section-head">
+                                    <i class="fas fa-calendar-alt"></i> Schedule
+                                </div>
+                                <div class="dcp-row">
+                                    <div>
+                                        <div class="dcp-field-label">
+                                            Due date <span class="dcp-field-sub">production ready</span>
+                                        </div>
+                                        <input type="date" id="dtgDueDate" value="${escapeHtml(state.scheduling.dueDate || '')}">
+                                        <div class="dcp-date-hint" id="dtgDueDateHint">${escapeHtml(state.scheduling.autoDueDate ? dueDateAutoLabel(combinedQty()) : 'Manual override')}</div>
+                                    </div>
+                                    <div>
+                                        <div class="dcp-field-label">
+                                            Drop dead <span class="dcp-optional">(optional — customer event)</span>
+                                        </div>
+                                        <input type="date" id="dtgDropDeadDate" value="${escapeHtml(state.scheduling.dropDeadDate || '')}">
+                                        <div class="dcp-date-hint">Customer's hard deadline</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Customer Pickup toggle (2026-05-20).
                                  ON  → hides ship-to fields, sets ShipMethod = Customer Pickup,
                                        tax = 10.1% (Milton, WA flat).
@@ -1014,10 +1087,30 @@
         return STANDARD_SIZES.filter((s) => setSizes.has(s));
     }
 
+    // Recompute the due date based on current combined qty. Only fires when
+    // the rep hasn't manually overridden the date. Updates both state AND
+    // the visible input + hint. Called from renderSummary() so any qty
+    // change (add row, edit cell, etc.) triggers it.
+    function syncDueDateFromQty() {
+        if (!state.scheduling.autoDueDate) return;
+        const cq = combinedQty();
+        const newDate = computeAutoDueDate(cq);
+        if (newDate !== state.scheduling.dueDate) {
+            state.scheduling.dueDate = newDate;
+            const f = document.getElementById('dtgDueDate');
+            if (f) f.value = newDate;
+            scheduleStateSave();
+        }
+        const hint = document.getElementById('dtgDueDateHint');
+        if (hint) hint.textContent = dueDateAutoLabel(cq);
+    }
+
     function renderSummary() {
         const el = document.getElementById('dtgPriceSummary');
         if (!el) return;
         const cq = combinedQty();
+        // Recompute due date based on current qty (auto-mode only).
+        syncDueDateFromQty();
         if (cq === 0) {
             el.innerHTML = `<div class="dps-empty">Add at least one row with sizes to see live pricing.</div>`;
             updateSubmitEnabled();
@@ -1773,6 +1866,35 @@
             // On initial mount, if a customer is already loaded (e.g. session
             // restored from a previous quote), kick off the design fetch.
             refreshDesignComboboxForNewCustomer();
+        }
+
+        // --- Schedule section: due date + drop dead date (Erik 2026-05-20) ---
+        // Initialize due date on mount if it's still blank (qty=0 case picks
+        // the 5-BD branch — when first row's qty pushes past 24, recompute
+        // fires via syncDueDateFromQty()).
+        if (!state.scheduling.dueDate && state.scheduling.autoDueDate) {
+            state.scheduling.dueDate = computeAutoDueDate(combinedQty());
+            const f = document.getElementById('dtgDueDate');
+            if (f) f.value = state.scheduling.dueDate;
+        }
+        const dueDateEl = document.getElementById('dtgDueDate');
+        if (dueDateEl) {
+            dueDateEl.addEventListener('input', () => {
+                state.scheduling.dueDate = dueDateEl.value;
+                state.scheduling.autoDueDate = false; // rep took control
+                const hint = document.getElementById('dtgDueDateHint');
+                if (hint) hint.textContent = 'Manual override';
+                markDirty();
+                scheduleStateSave();
+            });
+        }
+        const dropDeadEl = document.getElementById('dtgDropDeadDate');
+        if (dropDeadEl) {
+            dropDeadEl.addEventListener('input', () => {
+                state.scheduling.dropDeadDate = dropDeadEl.value;
+                markDirty();
+                scheduleStateSave();
+            });
         }
 
         // Design thumbnail click → open lightbox (Erik 2026-05-20).
@@ -2839,6 +2961,15 @@
                 // CustomerPurchaseOrder field in ShopWorks. Falls back to the
                 // OF-NNNN extOrderId on the backend when not provided.
                 po: state.customer.po || '',
+                // Order schedule. dateIn = today (order placed). dateDue =
+                // production-ready date (auto from qty unless rep overrode).
+                // dropDeadDate = customer's hard event deadline (optional).
+                // Backend maps dateDue → requestedShipDate, dropDeadDate →
+                // dropDeadDate. ISO strings YYYY-MM-DD; proxy reformats to
+                // MM/DD/YYYY for OnSite.
+                dateIn: isoDate(new Date()),
+                dateDue: state.scheduling.dueDate || '',
+                dropDeadDate: state.scheduling.dropDeadDate || '',
                 // Billing state — flows from the picked contact's
                 // company_contacts_2026.State so the OF push endpoint can
                 // branch tax logic on it (out-of-state customers get 0 tax
@@ -3166,6 +3297,13 @@
             address1: '', address2: '', city: '', state: '', zip: '',
             taxRate: 0.101, taxRateSource: 'pickup-flat',
             taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
+        };
+        // Schedule resets: re-auto-calc due date from qty (will land on 5 BDs
+        // since qty starts at 0 → ≤24 branch).
+        state.scheduling = {
+            dueDate: computeAutoDueDate(0),
+            dropDeadDate: '',
+            autoDueDate: true,
         };
         state.dirtyAfterChatFill = false;
         state.lastSubmit = null;

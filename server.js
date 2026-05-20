@@ -2770,9 +2770,20 @@ app.post('/api/submit-order-form', async (req, res) => {
       // Payment terms — one of: "Prepaid" (default) | "Pay On Pickup"
       terms: info.terms || 'Prepaid',
       // Proxy expects camelCase names matching manageorders-push-client: orderDate, requestedShipDate, dropDeadDate
+      // Dates (2026-05-20 — Erik split dueDate from dropDeadDate).
+      //   orderDate          = today (rep can override via info.dateIn)
+      //   requestedShipDate  = production due date — auto-calc from qty in
+      //                         frontend (≤24 pcs → 5 BDs, >24 → 10 BDs) OR
+      //                         rep-overridden value. Maps to ShopWorks's
+      //                         "Req. Ship Date" field.
+      //   dropDeadDate       = customer's hard deadline (event/photoshoot).
+      //                         Optional — empty when customer has no event.
+      //                         Maps to ShopWorks's "Drop Dead Date" field.
+      //   Previously both fields shared info.dateDue, which incorrectly
+      //   shoved "today" into ShopWorks's Drop Dead column on every order.
       orderDate: info.dateIn || new Date().toISOString().slice(0, 10),
       requestedShipDate: info.dateDue || info.dateIn || new Date().toISOString().slice(0, 10),
-      dropDeadDate: info.dateDue || '',
+      dropDeadDate: info.dropDeadDate || '',
       // Customer routing — when the rep picked a known company from
       // autocomplete, info.companyId carries the real ShopWorks id_Customer
       // (e.g. 1276 for Aaberg's Rentals). Falls back to 2791 (catch-all
