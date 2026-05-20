@@ -1,3 +1,7 @@
+## v2026.05.20.2 (2026.05.20)
+
+- Deploy v2026.05.20.2: contact picker — switch between a company's contacts after pick
+
 ## v2026.05.20.1 (2026.05.20)
 
 - Deploy v2026.05.20.1: fix customer combobox selection — missing menu.contains guard
