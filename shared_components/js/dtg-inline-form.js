@@ -178,6 +178,19 @@
             dropDeadDate: '',    // optional customer event date
             autoDueDate: true,   // true = recompute on qty change; false = rep manually overrode
         },
+        // New-artwork upload (Erik 2026-05-20).
+        // Used when the rep has NEW artwork (not in Design_Lookup_2026 / no
+        // ShopWorks id_Design yet). Frontend uploads file(s) to Caspio via
+        // /api/files/upload; the hosted URLs flow through the submit body as
+        // body.files[] → server.js Designs[] gate (now open) → ShopWorks
+        // creates a new design with metadata + ImageURL.
+        //
+        // Mutually exclusive with state.customer.designNumber (the existing-
+        // design picker). Readiness panel blocks submit if both are set.
+        newArtwork: {
+            designName: '',  // required (rep types) — flows to info.newDesignName → base.name in server.js
+            files: [],       // [{ fileName, uniqueFileName, hostedUrl, externalKey, fileSize, fileType, placement }]
+        },
         shipping: {
             // Default 'Customer Pickup' since ~95% of NWCA orders are local
             // Tacoma-area pickups (Erik 2026-05-20). Reps switch to UPS Ground
@@ -797,6 +810,45 @@
                                 </div>
                             </div>
 
+                            <!-- ============================================================
+                                 New-artwork upload block (Erik 2026-05-20).
+                                 Visible whenever no existing Design # is picked. Rep uploads
+                                 artwork → file is hosted in Caspio's artwork folder → URL flows
+                                 to ManageOrders Designs[0].Locations[0].ImageURL → ShopWorks
+                                 creates a new design record on import. Multiple files allowed
+                                 (one per print placement).
+                                 ============================================================ -->
+                            <div class="dcp-newart" id="dtgNewArtworkBlock">
+                                <div class="dcp-section-head">
+                                    <i class="fas fa-paint-brush"></i> Or upload new artwork
+                                    <span class="dcp-newart-sub">No design # yet? Upload the file here.</span>
+                                </div>
+                                <div class="dcp-field-wrap">
+                                    <div class="dcp-field-label">
+                                        Design name
+                                        <span class="dcp-required">required</span>
+                                    </div>
+                                    <input type="text" id="dtgNewArtworkName"
+                                        autocomplete="off"
+                                        placeholder="e.g. Star Sportswear front logo 2026"
+                                        value="${escapeHtml(state.newArtwork.designName || '')}">
+                                    <div class="dcp-field-hint">Used to find this design later in ShopWorks's art library.</div>
+                                </div>
+                                <div class="dcp-newart-dropzone" id="dtgNewArtworkDropzone" tabindex="0" role="button" aria-label="Upload artwork file">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <div class="dcp-newart-dropzone-msg">
+                                        <strong>Drop file here</strong> or <span class="dcp-newart-browse">click to browse</span>
+                                    </div>
+                                    <div class="dcp-newart-dropzone-sub">AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max</div>
+                                </div>
+                                <input type="file" id="dtgNewArtworkInput" class="dcp-newart-input"
+                                    accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd,.svg,.webp"
+                                    multiple
+                                    hidden>
+                                <div class="dcp-newart-list" id="dtgNewArtworkList"></div>
+                                <div class="dcp-newart-status" id="dtgNewArtworkStatus"></div>
+                            </div>
+
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">Sales rep</div>
@@ -1307,13 +1359,50 @@
             }
         }
 
-        // 7. Design # — soft warning when blank; show the matched design's
-        // name (from the design picker cache) when the # links to a real
-        // DTG design on file. If the rep typed something that doesn't match
-        // any of the customer's designs, surface that as a soft warning too.
-        if (!state.customer.designNumber) {
-            items.push({ state: 'warn', label: 'Design #', value: 'Blank — TBD ok, or fill if you have it', jumpId: 'dtgDesignNumber' });
+        // 7. Design — either existing Design # OR new artwork upload (mutually
+        // exclusive). Erik 2026-05-20:
+        //   (a) No design # AND no files → BLOCK (rep must pick one path)
+        //   (b) Files uploaded but no design name → BLOCK
+        //   (c) Both design # AND files → BLOCK (conflict — pick one)
+        //   (d) Otherwise: ok / warn states like before
+        const hasExistingDesign = !!(state.customer.designNumber && String(state.customer.designNumber).trim());
+        const newArtworkFiles = state.newArtwork?.files || [];
+        const newArtworkName = (state.newArtwork?.designName || '').trim();
+        const hasUploadedArtwork = newArtworkFiles.length > 0;
+
+        if (hasExistingDesign && hasUploadedArtwork) {
+            // Conflict: rep has both — block until they pick one
+            items.push({
+                state: 'block',
+                label: 'Design',
+                value: `Conflict — existing design #${state.customer.designNumber} picked AND ${newArtworkFiles.length} file(s) uploaded. Pick one or the other.`,
+                jumpId: 'dtgDesignNumber',
+            });
+        } else if (!hasExistingDesign && !hasUploadedArtwork) {
+            // Neither — block
+            items.push({
+                state: 'block',
+                label: 'Design',
+                value: 'Pick an existing design # OR upload new artwork',
+                jumpId: 'dtgDesignNumber',
+            });
+        } else if (hasUploadedArtwork && !newArtworkName) {
+            // Files uploaded but no name — block
+            items.push({
+                state: 'block',
+                label: 'Design',
+                value: `${newArtworkFiles.length} file(s) uploaded — type a Design name to continue`,
+                jumpId: 'dtgNewArtworkName',
+            });
+        } else if (hasUploadedArtwork) {
+            // New artwork ready
+            items.push({
+                state: 'ok',
+                label: 'Design',
+                value: `New: "${newArtworkName}" — ${newArtworkFiles.length} file(s) will create a new ShopWorks design`,
+            });
         } else {
+            // Existing design # — show the matched design's name when available
             const cachedDesigns = _designComboboxCustomerId
                 ? (_designsCacheByCustomer.get(String(_designComboboxCustomerId)) || [])
                 : [];
@@ -1321,7 +1410,6 @@
             if (matched) {
                 items.push({ state: 'ok', label: 'Design #', value: `${matched.idDesign} — ${matched.designName || '(no name)'}` });
             } else if (_designComboboxCustomerId && cachedDesigns.length > 0) {
-                // Customer has designs loaded, but the typed # isn't one of them.
                 items.push({ state: 'warn', label: 'Design #', value: `${state.customer.designNumber} — not on file for this customer (manual entry ok)`, jumpId: 'dtgDesignNumber' });
             } else {
                 items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
@@ -1863,6 +1951,11 @@
         // Pill is populated asynchronously after customer is picked (see pick()).
         wireHistoryPillHandlers();
 
+        // New-artwork upload zone (Erik 2026-05-20) — drag-drop + click-to-browse
+        // for uploading customer artwork that doesn't have an existing
+        // ShopWorks design # yet.
+        attachNewArtworkUpload();
+
         // Contact picker — switches between this company's contacts.
         // When the rep selects a different contact, re-apply that contact's
         // first/last/email/phone to the form. State.customer.contacts must
@@ -2346,6 +2439,9 @@
             scheduleStateSave();
             close();
             syncDesignThumbnail();
+            // Hide/show the new-artwork upload block based on whether an
+            // existing design # is now set (Erik 2026-05-20).
+            if (typeof updateNewArtworkVisibility === 'function') updateNewArtworkVisibility();
             updateSubmitEnabled();
         }
         async function refresh() {
@@ -2381,6 +2477,8 @@
             scheduleStateSave();
             if (menu) paint(input.value);
             syncDesignThumbnail();
+            // Hide/show upload block on design # change (Erik 2026-05-20).
+            if (typeof updateNewArtworkVisibility === 'function') updateNewArtworkVisibility();
             updateSubmitEnabled();
         });
         input.addEventListener('blur', () => {
@@ -2586,6 +2684,271 @@
             // Matches the existing guard pattern in attachStyleCombobox + attachColorCombobox.
             if (menu && !wrap.contains(e.target) && !menu.contains(e.target)) close();
         });
+    }
+
+    // ====== NEW-ARTWORK UPLOAD (Erik 2026-05-20) ===========================
+    // Rep can upload artwork files for orders that don't have an existing
+    // ShopWorks Design # yet. Files are uploaded to Caspio's artwork folder
+    // (POST /api/files/upload) → hosted URL flows through submit body into
+    // ManageOrders → ShopWorks auto-creates new design with metadata + image.
+    //
+    // Adapted from the proven 3-Day Tees pattern (pages/js/3-day-tees.js:773).
+    // ========================================================================
+
+    const NEW_ARTWORK_MAX_BYTES = 20 * 1024 * 1024;           // 20 MB hard limit
+    const NEW_ARTWORK_ACCEPT = /\.(ai|eps|pdf|png|jpe?g|tiff?|psd|svg|webp)$/i;
+    const NEW_ARTWORK_PLACEMENTS = [
+        { code: 'Left Chest',  label: 'Left Chest' },
+        { code: 'Full Front',  label: 'Full Front' },
+        { code: 'Full Back',   label: 'Full Back' },
+        { code: 'Jumbo Front', label: 'Jumbo Front' },
+        { code: 'Jumbo Back',  label: 'Jumbo Back' },
+    ];
+
+    function validateArtworkFile(file) {
+        if (!file) return 'No file';
+        if (file.size > NEW_ARTWORK_MAX_BYTES) {
+            return `Too large (${(file.size / 1024 / 1024).toFixed(1)} MB · max 20 MB)`;
+        }
+        if (!NEW_ARTWORK_ACCEPT.test(file.name)) {
+            return `File type not allowed (${file.name.split('.').pop()}). Use AI / EPS / PSD / PDF / PNG / JPG / TIFF / SVG / WebP.`;
+        }
+        return null;
+    }
+
+    // Upload a single file to Caspio via /api/files/upload — XHR-based for
+    // progress events. Returns { externalKey, hostedUrl, fileName, ... } on
+    // success, throws on failure.
+    function uploadArtworkFileToCaspio(file, onProgress) {
+        const formData = new FormData();
+        formData.append('file', file);
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', (e) => {
+                if (!e.lengthComputable || !onProgress) return;
+                onProgress(Math.round((e.loaded / e.total) * 100));
+            });
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const result = JSON.parse(xhr.responseText);
+                        const hostedUrl = `${API_BASE}/api/files/${result.externalKey}`;
+                        resolve({
+                            externalKey: result.externalKey,
+                            hostedUrl,
+                            fileName: result.fileName || file.name,
+                            originalName: result.originalName || file.name,
+                            size: result.size || file.size,
+                            mimeType: result.mimeType || file.type,
+                        });
+                    } catch (e) {
+                        reject(new Error(`Upload OK but parse failed: ${e.message}`));
+                    }
+                } else {
+                    reject(new Error(`Upload failed (HTTP ${xhr.status}): ${xhr.responseText.substring(0, 200)}`));
+                }
+            });
+            xhr.addEventListener('error', () => reject(new Error('Network error during upload')));
+            xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
+            xhr.open('POST', `${API_BASE}/api/files/upload`);
+            xhr.send(formData);
+        });
+    }
+
+    // Pick an icon for the uploaded file based on extension. Real images
+    // (PNG/JPG/WebP/SVG/GIF) get the proxy thumbnail; design files (AI/EPS/
+    // PSD/PDF) get a Font Awesome icon since browsers can't preview them.
+    function artworkFileThumbHtml(file) {
+        const ext = (file.fileName || '').split('.').pop().toLowerCase();
+        const isImage = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext);
+        if (isImage && file.hostedUrl) {
+            return `<img class="dcp-newart-thumb-img" src="${escapeHtml(file.hostedUrl)}" alt="${escapeHtml(file.fileName)}">`;
+        }
+        // Design file — icon by type
+        const iconMap = {
+            ai: 'fa-bezier-curve', eps: 'fa-bezier-curve', pdf: 'fa-file-pdf',
+            psd: 'fa-layer-group', tiff: 'fa-image', tif: 'fa-image',
+        };
+        const icon = iconMap[ext] || 'fa-file';
+        return `<div class="dcp-newart-thumb-icon"><i class="fas ${icon}"></i><div class="dcp-newart-thumb-ext">${escapeHtml(ext.toUpperCase())}</div></div>`;
+    }
+
+    function renderNewArtworkList() {
+        const list = document.getElementById('dtgNewArtworkList');
+        if (!list) return;
+        const files = state.newArtwork.files || [];
+        if (files.length === 0) {
+            list.innerHTML = '';
+            return;
+        }
+        list.innerHTML = files.map((f, idx) => `
+            <div class="dcp-newart-card" data-file-idx="${idx}">
+                <div class="dcp-newart-thumb">${artworkFileThumbHtml(f)}</div>
+                <div class="dcp-newart-card-body">
+                    <div class="dcp-newart-card-name" title="${escapeHtml(f.fileName)}">${escapeHtml(f.fileName)}</div>
+                    <div class="dcp-newart-card-meta">${(f.fileSize / 1024).toFixed(0)} KB · ${escapeHtml(f.fileType || 'unknown')}</div>
+                    <div class="dcp-newart-card-placement">
+                        <label>Placement:
+                            <select class="dcp-newart-placement-select" data-file-idx="${idx}">
+                                ${NEW_ARTWORK_PLACEMENTS.map(p => `<option value="${escapeHtml(p.code)}"${f.placement === p.code ? ' selected' : ''}>${escapeHtml(p.label)}</option>`).join('')}
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <button type="button" class="dcp-newart-remove" data-file-idx="${idx}" aria-label="Remove ${escapeHtml(f.fileName)}">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `).join('');
+
+        // Wire per-card handlers (event delegation would also work)
+        list.querySelectorAll('.dcp-newart-remove').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = Number(btn.dataset.fileIdx);
+                state.newArtwork.files.splice(idx, 1);
+                renderNewArtworkList();
+                updateNewArtworkVisibility();
+                markDirty();
+                scheduleStateSave();
+                updateSubmitEnabled();
+            });
+        });
+        list.querySelectorAll('.dcp-newart-placement-select').forEach(sel => {
+            sel.addEventListener('change', () => {
+                const idx = Number(sel.dataset.fileIdx);
+                if (state.newArtwork.files[idx]) {
+                    state.newArtwork.files[idx].placement = sel.value;
+                    markDirty();
+                    scheduleStateSave();
+                }
+            });
+        });
+    }
+
+    function setNewArtworkStatus(text, cls) {
+        const el = document.getElementById('dtgNewArtworkStatus');
+        if (!el) return;
+        el.textContent = text || '';
+        el.className = 'dcp-newart-status' + (cls ? ' dcp-newart-status--' + cls : '');
+    }
+
+    async function handleArtworkFiles(fileList) {
+        if (!fileList || fileList.length === 0) return;
+        const filesToUpload = Array.from(fileList);
+        for (const file of filesToUpload) {
+            const err = validateArtworkFile(file);
+            if (err) {
+                setNewArtworkStatus(`✗ ${file.name}: ${err}`, 'error');
+                continue;
+            }
+            setNewArtworkStatus(`Uploading ${file.name}…`, 'loading');
+            try {
+                const result = await uploadArtworkFileToCaspio(file, (pct) => {
+                    setNewArtworkStatus(`Uploading ${file.name}… ${pct}%`, 'loading');
+                });
+                state.newArtwork.files.push({
+                    fileName: result.fileName,
+                    uniqueFileName: result.originalName,
+                    hostedUrl: result.hostedUrl,
+                    externalKey: result.externalKey,
+                    fileSize: result.size,
+                    fileType: result.mimeType,
+                    // Default placement to the form's currently-selected front
+                    // location label (Left Chest / Full Front / Jumbo Front)
+                    placement: (LOCATION_LABELS[state.front] || 'Left Chest'),
+                });
+                setNewArtworkStatus(`✓ Uploaded ${file.name}`, 'success');
+                markDirty();
+                scheduleStateSave();
+                updateSubmitEnabled();
+            } catch (e) {
+                setNewArtworkStatus(`✗ ${file.name}: ${e.message}`, 'error');
+            }
+        }
+        renderNewArtworkList();
+        updateNewArtworkVisibility();
+        // Clear the "loading" status after a beat so success/error stays briefly
+        setTimeout(() => {
+            const el = document.getElementById('dtgNewArtworkStatus');
+            if (el && el.classList.contains('dcp-newart-status--success')) {
+                el.textContent = '';
+                el.className = 'dcp-newart-status';
+            }
+        }, 2500);
+    }
+
+    // Show/hide the new-artwork block based on whether an existing Design # is
+    // picked. When rep has an existing design, hide the upload UI to enforce
+    // the "one or the other" rule (also enforced as a blocker in the readiness panel).
+    function updateNewArtworkVisibility() {
+        const block = document.getElementById('dtgNewArtworkBlock');
+        if (!block) return;
+        const hasExistingDesign = !!(state.customer.designNumber && String(state.customer.designNumber).trim());
+        const hasUploads = (state.newArtwork.files || []).length > 0;
+        // Visible by default. Becomes "hidden" only when existing design is set
+        // AND no uploads exist (avoids stranding rep with uploaded files they
+        // can't see). When BOTH exist, show the block + the readiness panel
+        // will warn about the conflict.
+        if (hasExistingDesign && !hasUploads) {
+            block.classList.add('dcp-newart-collapsed');
+        } else {
+            block.classList.remove('dcp-newart-collapsed');
+        }
+    }
+
+    function attachNewArtworkUpload() {
+        const dropzone = document.getElementById('dtgNewArtworkDropzone');
+        const input = document.getElementById('dtgNewArtworkInput');
+        const nameInput = document.getElementById('dtgNewArtworkName');
+        if (!dropzone || !input || !nameInput) return;
+
+        // Design name input — bind to state
+        nameInput.addEventListener('input', () => {
+            state.newArtwork.designName = nameInput.value;
+            markDirty();
+            scheduleStateSave();
+            updateSubmitEnabled();
+        });
+
+        // Click-to-browse
+        dropzone.addEventListener('click', () => input.click());
+        dropzone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                input.click();
+            }
+        });
+
+        // File input change
+        input.addEventListener('change', (e) => {
+            handleArtworkFiles(e.target.files);
+            input.value = ''; // Reset so same file can be re-uploaded after removal
+        });
+
+        // Drag-drop
+        ['dragover', 'dragenter'].forEach(evt => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('dcp-newart-dropzone--over');
+            });
+        });
+        ['dragleave', 'dragend'].forEach(evt => {
+            dropzone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dcp-newart-dropzone--over');
+            });
+        });
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dcp-newart-dropzone--over');
+            handleArtworkFiles(e.dataTransfer.files);
+        });
+
+        renderNewArtworkList();
+        updateNewArtworkVisibility();
     }
 
     // ---- Customer History Pill (Phase 1: info-only) -----------------------
@@ -3096,7 +3459,12 @@
         // design # is empty. Instead we confirm with the rep, then push with
         // designNumber: null. Rep adds the design # directly in ShopWorks
         // after the art team assigns one.
-        if (!state.customer.designNumber) {
+        //
+        // SKIP the warning when rep has uploaded new artwork (Erik 2026-05-20)
+        // — that path INTENTIONALLY pushes without an existing design # because
+        // ShopWorks will create the new design from the upload metadata.
+        const hasUploadedArt = (state.newArtwork?.files || []).length > 0;
+        if (!state.customer.designNumber && !hasUploadedArt) {
             const proceedNoDesign = await genericConfirm({
                 icon: '🎨',
                 title: 'No design # entered',
@@ -3224,6 +3592,11 @@
                 state: state.customer.state || '',
                 city: state.customer.city || '',
                 designNumber: state.customer.designNumber || null, // A3 — nullable
+                // New-artwork design name (Erik 2026-05-20). Required when
+                // files are uploaded; server.js uses it to set Designs[0].name
+                // (which becomes ShopWorks's DesignName for the new design).
+                // Empty/undefined when rep picked an existing Design # instead.
+                newDesignName: (state.newArtwork.designName || '').trim(),
                 salesRep: rep.name,
                 salesRepEmail: rep.email,
                 terms: state.customer.terms || 'Prepaid',
@@ -3253,7 +3626,19 @@
                 taxAccountName: state.shipping.taxAccountName || '',
             },
             orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}${isPickup ? ' · CUSTOMER PICKUP' : ''}`,
-            files: [],
+            // New-artwork files (Erik 2026-05-20). When rep uploaded artwork
+            // for a brand-new design, each file becomes one entry here. The
+            // server.js Designs[] builder reads files[].hostedUrl + .placements
+            // and emits a Designs[] entry without id_Design → ShopWorks
+            // creates a new design from the metadata. Empty array when rep
+            // picked an existing Design # instead.
+            files: (state.newArtwork.files || []).map(f => ({
+                hostedUrl: f.hostedUrl,
+                placements: [f.placement || (LOCATION_LABELS[state.front] || 'Left Chest')],
+                colors: '',                // DTG = full-color CMYK, no ink-color tracking
+                designNo: '',              // not a real design # — this IS the new design
+                name: f.fileName,
+            })),
             decoConfig: { method: 'dtg' },
             breakdown: {
                 supported: true,
@@ -3551,6 +3936,11 @@
             dueDate: computeAutoDueDate(0),
             dropDeadDate: '',
             autoDueDate: true,
+        };
+        // New-artwork upload state: clear all uploaded files + design name.
+        state.newArtwork = {
+            designName: '',
+            files: [],
         };
         state.dirtyAfterChatFill = false;
         state.lastSubmit = null;
