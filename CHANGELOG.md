@@ -1,3 +1,7 @@
+## v2026.05.20.18 (2026.05.20)
+
+- Deploy v2026.05.20.18: new-artwork upload path Phase 1 — open Designs[] gate when files present
+
 ## v2026.05.20.17 (2026.05.20)
 
 - Deploy v2026.05.20.17: remove awkward pine-needle stripes from titlebar
