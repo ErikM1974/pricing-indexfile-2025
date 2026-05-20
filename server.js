@@ -1818,9 +1818,29 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 //   - Pickup at NWCA Milton, WA      → 10.1% flat (Milton rate)
 //   - Shipping out of WA state        → 0.0% (no nexus)
 //   - Shipping IN WA state            → destination city rate (DOR lookup)
+//
+// These three rules ARE Washington's "destination-based sourcing" law, in
+// effect since 2008. Authority:
+//   - WAC 458-20-145  Sourcing — sale at seller's location vs. destination
+//   - WAC 458-20-193  Interstate sales of tangible personal property
+//                     (the basis for the "out-of-state ship = no WA tax" rule)
+//   - WAC 458-20-110  Delivery charges
+//                     ⚠ Shipping CHARGES are taxable too. The legally correct
+//                     tax base is (subtotal + shipping) × rate. We currently
+//                     send cur_Shipping: 0 from the DTG form (UPS cost is COGS,
+//                     not billed to the customer), so subtotal × rate is right
+//                     for today. WHEN we add a billed-shipping line to the
+//                     form, this formula MUST change.
+//   - DOR rate API:   webgis.dor.wa.gov/webapi/AddressRates.aspx
+//                     (called from /api/tax-rates/lookup in this server)
+//   - Live tool:      https://webgis.dor.wa.gov/taxratelookup/SalesTax.aspx
+//
 // The frontend looks up the in-state destination rate via /api/tax-rates/lookup
 // and passes the computed taxTotal in the submit payload. The backend re-derives
 // the GL account here so AR's books stay clean even if the frontend is wrong.
+//
+// Motor-vehicle / boat / aircraft sales are an EXCEPTION (taxed at seller's
+// location even when delivered) — N/A for NWCA since we sell apparel.
 function getTaxAccount(state, isCustomerPickup) {
   if (isCustomerPickup) return { code: '2200.101', label: 'Customer Pickup — Milton, WA 10.1%', rate: 0.101 };
   if (state && state.toUpperCase() !== 'WA') return { code: '2202', label: 'Out of State Sales — No Tax', rate: 0 };

@@ -1849,12 +1849,19 @@
         if (block) block.hidden = isPickup;
     }
 
-    // Re-derive state.shipping.taxRate per Erik's 3 rules:
-    //   - pickup            → 10.1% (Milton flat)
-    //   - out of WA state   → 0%
+    // Re-derive state.shipping.taxRate per WA's destination-based sourcing law
+    // (WAC 458-20-145 + 458-20-193). Three rules:
+    //   - pickup            → 10.1% (Milton flat — WAC 458-20-145, seller's location)
+    //   - out of WA state   → 0%    (WAC 458-20-193 — no nexus on out-of-state sales)
     //   - in WA state       → /api/tax-rates/lookup destination city rate
+    //                          (backend hits webgis.dor.wa.gov AddressRates API)
     // Writes status text into #dtgTaxStatus + updates state.shipping.taxRate.
     // Caller is responsible for renderSummary() afterwards.
+    //
+    // Note: shipping CHARGES are taxable in WA (WAC 458-20-110) — currently
+    // not in our tax base because DTG form sends cur_Shipping: 0. If we ever
+    // bill the customer for shipping, the tax base must become
+    // (subtotal + shipping) × rate. Same comment in server.js getTaxAccount().
     async function recomputeTaxRate() {
         const status = document.getElementById('dtgTaxStatus');
         const setStatus = (text, cls) => {
