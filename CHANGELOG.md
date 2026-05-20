@@ -1,3 +1,7 @@
+## v2026.05.20.14 (2026.05.20)
+
+- Deploy v2026.05.20.14: clear stale pill content on hide
+
 ## v2026.05.20.13 (2026.05.20)
 
 - Deploy v2026.05.20.13: 3 files (dtg-quote-builder.html,dtg-inline-form.css,dtg-inline-form.js,...)
