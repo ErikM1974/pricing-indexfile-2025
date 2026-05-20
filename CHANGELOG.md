@@ -1,3 +1,8 @@
+## v2026.05.20.6 (2026.05.20)
+
+- Add WAC citations + WA tax rules doc
+- Deploy v2026.05.20.6: 5 files (LESSONS_LEARNED.md,wa-sales-tax-rules.md,dtg-quote-builder.html,...)
+
 ## v2026.05.20.5 (2026.05.20)
 
 - Deploy v2026.05.20.5: 5 files (LESSONS_LEARNED.md,dtg-quote-builder.html,server.js,...)
