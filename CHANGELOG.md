@@ -1,3 +1,7 @@
+## v2026.05.20.4 (2026.05.20)
+
+- Deploy v2026.05.20.4: stop regenerating combobox menu DOM on hover
+
 ## v2026.05.20.3 (2026.05.20)
 
 - Deploy v2026.05.20.3: customer search did-you-mean fallback
