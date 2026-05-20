@@ -2540,16 +2540,26 @@ app.post('/api/submit-order-form', async (req, res) => {
       .map(n => Number(String(n || '').trim()))
       .filter(n => Number.isInteger(n) && n > 0 && n < 1000000);
 
-    // Designs[]: ONLY emit when at least one design# resolved to a real
-    // ShopWorks id_Design. Otherwise return [] so ShopWorks doesn't create
-    // a new orphan design from DesignName/ExtDesignID — the sales rep links
-    // the design manually in ShopWorks's UI when they review the order.
-    // Erik's preference (2026-05-02 after OF-0027/0028 reviewed):
-    //   "if there isn't a design we shouldn't create a new one, just leave
-    //    it blank and the sales rep can select the design inside shopworks".
-    // This prevents the orphan-design accumulation we observed on every
-    // order push since the form launched.
-    const designs = linkedIdDesigns.length === 0 ? [] : methodsUsed.map((method) => {
+    // Designs[]: emit when EITHER (a) at least one design# resolved to a real
+    // ShopWorks id_Design (existing-design path) OR (b) the rep uploaded at
+    // least one artwork file (new-design path — ShopWorks creates a new
+    // design record from the metadata + ImageURL). Otherwise return [] so
+    // ShopWorks doesn't create an orphan design from DesignName alone.
+    //
+    // Erik's evolved preference (2026-05-02 → 2026-05-20):
+    //   2026-05-02: "if there isn't a design we shouldn't create a new one,
+    //                just leave it blank and the sales rep can select the
+    //                design inside shopworks"
+    //   2026-05-20: "if rep uploads new artwork, create the design with full
+    //                metadata + image so the art team doesn't have to chase
+    //                emailed attachments separately"
+    //
+    // The frontend gates the new-design path so it only fires when (a) at
+    // least one file IS uploaded AND (b) the rep typed a Design Name AND
+    // (c) NO existing Design # was picked (conflict prevention). See
+    // memory/MO_NEW_DESIGN_FLOW.md (to be added).
+    const hostedAnyFiles = (files || []).some(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
+    const designs = (linkedIdDesigns.length === 0 && !hostedAnyFiles) ? [] : methodsUsed.map((method) => {
       const hostedFiles = files.filter(f => f && (f.hostedUrl || (f.preview && /^https?:/i.test(f.preview))));
       // Primary location entries (from uploaded artwork files OR placeholder).
       const primaryLocations = (hostedFiles.length ? hostedFiles : [{ name: 'placeholder' }]).map((f, i) => ({
@@ -2618,6 +2628,15 @@ app.post('/api/submit-order-form', async (req, res) => {
       if (linkedIdDesigns.length && (method === 'embroidery' || method === 'screenprint' || method === 'dtf' || method === 'dtg')) {
         base.linkedDesigns = linkedIdDesigns.map(id => ({ id_Design: id }));
         if (linkedIdDesigns.length === 1) base.idDesign = linkedIdDesigns[0];
+      }
+      // NEW-DESIGN PATH (Erik 2026-05-20): when no existing design# was picked
+      // but rep uploaded artwork + typed a Design Name, override the auto-
+      // generated "${company} — ${method}" name with the rep's chosen name.
+      // This makes the new design searchable in ShopWorks's art library by
+      // a meaningful identifier (e.g. "Star Sportswear front logo 2026")
+      // rather than a generic auto-name.
+      if (!linkedIdDesigns.length && info.newDesignName && String(info.newDesignName).trim()) {
+        base.name = String(info.newDesignName).trim();
       }
       return base;
     });
