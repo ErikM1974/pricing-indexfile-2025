@@ -1864,7 +1864,14 @@ function getTaxAccount(state, isCustomerPickup) {
 //   3. Out-of-state shipping                    → DO NOT APPLY
 //   4. No tax info available (defensive)        → FLAG: needs rep review
 function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId }) {
-  const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
+  // Pickup detection: frontend canonical is 'Customer Pickup' (matches
+  // ShopWorks ship-method list exactly). Legacy codes 'pickup' / 'willcall'
+  // accepted for backward-compat with pre-v2026.05.20.7 share-link drafts.
+  const isPickup = ship && (
+    ship.method === 'Customer Pickup' ||
+    ship.method === 'pickup' ||
+    ship.method === 'willcall'
+  );
   const shState = (ship && ship.state || info && info.state || '').toUpperCase();
   const isOutOfState = !isPickup && shState && shState !== 'WA';
 
@@ -2673,7 +2680,14 @@ app.post('/api/submit-order-form', async (req, res) => {
         state: ship.state || info.state || '',
         zip: ship.zip || info.zip || '',
         country: 'USA',
-        method: (ship.method === 'pickup' || ship.method === 'willcall') ? 'Customer Pickup' : (ship.method === 'other' ? 'Other' : 'UPS Ground')
+        // ShipMethod: frontend now sends ShopWorks-canonical names directly
+        // ('Customer Pickup' / 'UPS Ground' / 'Priority Mail'). Translate
+        // legacy codes for backward-compat; pass through anything else verbatim.
+        method: (ship.method === 'pickup' || ship.method === 'willcall')
+          ? 'Customer Pickup'
+          : (ship.method === 'ups' ? 'UPS Ground'
+            : (ship.method === 'other' ? 'Other'
+              : (ship.method || 'Customer Pickup')))
       },
       billing: {
         company: info.company || '',

@@ -48,21 +48,35 @@
         return SALES_REPS.find(r => r.code === code) || SALES_REPS[1]; // default Erik
     }
 
-    // Shipping methods — match the order form (paper-form.jsx:2371).
+    // Shipping methods — values match ShopWorks's ship method list EXACTLY
+    // (no client→server translation needed at submit time, value passes
+    // through verbatim into payload.ship.method). Erik's curated list
+    // (2026-05-20): just the 3 we actually use. Order matches dropdown UI
+    // order. First entry = default.
     const SHIP_METHODS = [
-        { code: 'ups',      label: 'UPS Ground' },
-        { code: 'pickup',   label: 'Customer Pickup' },
-        { code: 'willcall', label: 'Will Call' },
-        { code: 'other',    label: 'Other' },
+        { code: 'Customer Pickup', label: 'Customer Pickup' },
+        { code: 'UPS Ground',      label: 'UPS Ground' },
+        { code: 'Priority Mail',   label: 'Priority Mail' },
     ];
     function shipLabel(code) {
         const m = SHIP_METHODS.find(x => x.code === code);
-        return m ? m.label : 'UPS Ground';
+        return m ? m.label : 'Customer Pickup';
+    }
+    function isPickupMethod(method) {
+        // Centralized check — covers ShopWorks-canonical "Customer Pickup"
+        // PLUS the legacy 'pickup' / 'willcall' codes used in share-link
+        // drafts before v2026.05.20.7. Once those drafts age out, can
+        // collapse to just the first equality.
+        return method === 'Customer Pickup' || method === 'pickup' || method === 'willcall';
     }
 
     // sessionStorage key prefix + state-shape version (bump if state shape
     // changes incompatibly so old restores don't crash).
-    const STATE_VERSION = 1;
+    // v2 (2026-05-20): SHIP_METHODS now uses ShopWorks-canonical names
+    // ("Customer Pickup" instead of "pickup"); old v1 sessions with
+    // method='ups'/'pickup' would no longer match the new dropdown values
+    // and would crash the select. Bumping invalidates old sessions cleanly.
+    const STATE_VERSION = 2;
     const STATE_KEY = 'dtg.formState.v' + STATE_VERSION;
     const QUOTEID_KEY = 'dtg.quoteID.v' + STATE_VERSION;
 
@@ -118,9 +132,14 @@
             salesRepCode: lastRepCode || 'erik', // A1
         },
         shipping: {
-            method: 'ups',  // A2 — UPS Ground default; pickup / willcall / other
-            // Ship-to address (used when method !== 'pickup'). Pre-filled from
-            // the picked contact's company address; overridable for drop-ships.
+            // Default 'Customer Pickup' since ~95% of NWCA orders are local
+            // Tacoma-area pickups (Erik 2026-05-20). Reps switch to UPS Ground
+            // / Priority Mail only when shipping. Toggling the pickup
+            // checkbox flips between this and the prior non-pickup method.
+            method: 'Customer Pickup',
+            // Ship-to address (only relevant when method !== 'Customer Pickup').
+            // Pre-filled from the picked contact's company address; overridable
+            // for drop-ships.
             address1: '',
             address2: '',
             city: '',
@@ -688,7 +707,6 @@
                                     <select id="dtgTerms">
                                         <option value="Prepaid">Prepaid</option>
                                         <option value="Net 10">Net 10</option>
-                                        <option value="Net 30">Net 30</option>
                                         <option value="Pay On Pickup">Pay On Pickup</option>
                                     </select>
                                 </div>
@@ -713,14 +731,15 @@
                                  ON  → hides ship-to fields, sets ShipMethod = Customer Pickup,
                                        tax = 10.1% (Milton, WA flat).
                                  OFF → shows ship-to fields, tax = destination lookup if WA
-                                       or 0% if out-of-state. -->
+                                       or 0% if out-of-state.
+                                 Default: ON (matches state.shipping.method = 'Customer Pickup'). -->
                             <div class="dcp-pickup-toggle">
                                 <label class="dcp-toggle-label">
-                                    <input type="checkbox" id="dtgPickupToggle"${state.shipping.method === 'pickup' ? ' checked' : ''}>
+                                    <input type="checkbox" id="dtgPickupToggle"${isPickupMethod(state.shipping.method) ? ' checked' : ''}>
                                     <span class="dcp-toggle-track"><span class="dcp-toggle-thumb"></span></span>
                                     <span class="dcp-toggle-text">
                                         <strong>Customer Pickup</strong>
-                                        <span class="dcp-toggle-sub">Kathy comes to NWCA Milton — no shipping address, tax 10.1% flat</span>
+                                        <span class="dcp-toggle-sub">Pickup at NWCA Milton — no shipping address, tax 10.1% flat</span>
                                     </span>
                                 </label>
                             </div>
@@ -728,7 +747,7 @@
                             <!-- Ship-to address block (hidden when pickup is ON).
                                  Pre-fills from contact's company address. Override
                                  allowed for drop-ships. -->
-                            <div class="dcp-shipto" id="dtgShipToBlock"${state.shipping.method === 'pickup' ? ' hidden' : ''}>
+                            <div class="dcp-shipto" id="dtgShipToBlock"${isPickupMethod(state.shipping.method) ? ' hidden' : ''}>
                                 <div class="dcp-shipto-head">
                                     <i class="fas fa-truck"></i> Ship to
                                     <span class="dcp-shipto-sub">Destination drives the tax rate</span>
@@ -1002,7 +1021,7 @@
         // recomputeTaxRate() any time the rep toggles pickup OR types a
         // ship-to address. Pickup = 0.101, out-of-state = 0, in-WA = DOR
         // destination city rate.
-        const isPickup = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+        const isPickup = isPickupMethod(state.shipping.method);
         const shState = (state.shipping.state || '').toUpperCase();
         const taxRate = Number(state.shipping.taxRate);
         const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
@@ -1125,7 +1144,7 @@
         }
 
         // 6. Ship method + ship-to address
-        const isPickupReady = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+        const isPickupReady = isPickupMethod(state.shipping.method);
         if (!state.shipping.method) {
             items.push({ state: 'block', label: 'Ship method', value: 'Pick a ship method or toggle Customer Pickup', jumpId: 'dtgPickupToggle' });
         } else if (isPickupReady) {
@@ -1792,20 +1811,20 @@
         const pickupTgl = document.getElementById('dtgPickupToggle');
         if (pickupTgl) pickupTgl.addEventListener('change', () => {
             if (pickupTgl.checked) {
-                // Remember the prior method so toggling OFF can restore it.
-                if (state.shipping.method !== 'pickup' && state.shipping.method !== 'willcall') {
+                // Remember the prior non-pickup method so toggling OFF can restore it.
+                if (!isPickupMethod(state.shipping.method)) {
                     state.shipping._prePickupMethod = state.shipping.method;
                 }
-                state.shipping.method = 'pickup';
+                state.shipping.method = 'Customer Pickup';
             } else {
-                state.shipping.method = state.shipping._prePickupMethod || 'ups';
+                state.shipping.method = state.shipping._prePickupMethod || 'UPS Ground';
                 delete state.shipping._prePickupMethod;
             }
             // Sync the dropdown + show/hide ship-to block.
             const sel = document.getElementById('dtgShipMethod');
             if (sel) sel.value = state.shipping.method;
             const block = document.getElementById('dtgShipToBlock');
-            if (block) block.hidden = (state.shipping.method === 'pickup');
+            if (block) block.hidden = isPickupMethod(state.shipping.method);
             recomputeTaxRate();
             markDirty();
             scheduleStateSave();
@@ -1845,12 +1864,12 @@
     }
 
     // Sync the pickup toggle UI to whatever state.shipping.method currently is.
-    // Called from the ship-method dropdown handler so legacy "Customer Pickup"
-    // picks also flip the toggle.
+    // Called from the ship-method dropdown handler so dropdown-picked
+    // "Customer Pickup" also flips the toggle.
     function syncPickupToggleFromShipMethod() {
         const tgl = document.getElementById('dtgPickupToggle');
         const block = document.getElementById('dtgShipToBlock');
-        const isPickup = (state.shipping.method === 'pickup' || state.shipping.method === 'willcall');
+        const isPickup = isPickupMethod(state.shipping.method);
         if (tgl) tgl.checked = isPickup;
         if (block) block.hidden = isPickup;
     }
@@ -1876,7 +1895,7 @@
             status.className = 'dcp-tax-status' + (cls ? ' dcp-tax-status--' + cls : '');
         };
 
-        const isPickup = (state.shipping.method === 'pickup' || state.shipping.method === 'willcall');
+        const isPickup = isPickupMethod(state.shipping.method);
         if (isPickup) {
             state.shipping.taxRate = 0.101;
             state.shipping.taxRateSource = 'pickup-flat';
@@ -2662,7 +2681,7 @@
         // Resolve sales rep from the state.customer.salesRepCode
         const rep = repByCode(state.customer.salesRepCode);
         const shipMethodLabel = shipLabel(state.shipping.method);
-        const isPickup = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+        const isPickup = isPickupMethod(state.shipping.method);
 
         state.submitting = true;
         updateSubmitEnabled();
@@ -3059,9 +3078,9 @@
             salesRepCode: preservedRepCode,
         };
         state.shipping = {
-            method: 'ups',
+            method: 'Customer Pickup',  // matches the default in state init (top of file)
             address1: '', address2: '', city: '', state: '', zip: '',
-            taxRate: 0.101, taxRateSource: 'default-pre-lookup',
+            taxRate: 0.101, taxRateSource: 'pickup-flat',
             taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
         };
         state.dirtyAfterChatFill = false;
