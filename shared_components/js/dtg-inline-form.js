@@ -126,6 +126,7 @@
             phone: '',
             state: '',      // billing state — flows from company_contacts_2026.State
             city: '',       // billing city  — same source, used as default ship-to city
+            po: '',         // customer's purchase order # — passed as info.po → ShopWorks CustomerPurchaseOrder
             designNumber: '',
             terms: 'Prepaid',
             contacts: [],   // populated when a company is picked
@@ -600,6 +601,19 @@
             return;
         }
         host.innerHTML = `
+            <!-- Design thumbnail lightbox (2026-05-20). Click any design thumbnail
+                 in the form → opens full-size image here. Backdrop / Escape / X
+                 button close it. Mounted at the top so z-index stacks cleanly. -->
+            <div class="dtg-thumb-lightbox" id="dtgThumbLightbox" hidden role="dialog" aria-modal="true" aria-labelledby="dtgThumbLightboxTitle">
+                <div class="dtg-thumb-lightbox-backdrop" data-action="close"></div>
+                <div class="dtg-thumb-lightbox-panel">
+                    <button type="button" class="dtg-thumb-lightbox-close" data-action="close" aria-label="Close design preview">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <div class="dtg-thumb-lightbox-title" id="dtgThumbLightboxTitle"></div>
+                    <img id="dtgThumbLightboxImg" alt="" loading="lazy">
+                </div>
+            </div>
             <div class="dtg-form-wrap">
                 <header class="dtg-form-header">
                     <div class="dfh-title"><i class="fas fa-clipboard-list"></i> DTG order form</div>
@@ -689,6 +703,10 @@
                                     <input type="text" id="dtgCompanyId" autocomplete="off" placeholder="ShopWorks ID">
                                 </div>
                             </div>
+                            <div class="dcp-field-wrap">
+                                <div class="dcp-field-label">Customer PO # <span class="dcp-optional">(optional)</span></div>
+                                <input type="text" id="dtgPoNumber" autocomplete="off" placeholder="Customer's purchase order #">
+                            </div>
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">Design # <span class="dcp-optional">(optional)</span></div>
@@ -697,8 +715,11 @@
                                             <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="Pick a customer first to see their DTG designs">
                                             <i class="fas fa-caret-down dtg-combobox-chevron" aria-hidden="true"></i>
                                         </div>
-                                        <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" target="_blank" rel="noopener" hidden>
+                                        <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" href="#" hidden>
                                             <img id="dtgDesignThumbImg" alt="" loading="lazy">
+                                            <span class="dtg-design-thumb-zoom" aria-hidden="true">
+                                                <i class="fas fa-search-plus"></i>
+                                            </span>
                                         </a>
                                     </div>
                                 </div>
@@ -1754,11 +1775,41 @@
             refreshDesignComboboxForNewCustomer();
         }
 
+        // Design thumbnail click → open lightbox (Erik 2026-05-20).
+        // Intercepts the anchor's default href navigation; shows the image
+        // full-size in a modal so the rep can verify the artwork before submit.
+        const thumbAnchor = document.getElementById('dtgDesignThumbAnchor');
+        if (thumbAnchor) {
+            thumbAnchor.addEventListener('click', (e) => {
+                e.preventDefault();
+                const img = document.getElementById('dtgDesignThumbImg');
+                if (!img || !img.src) return;
+                openDesignLightbox(img.src, img.alt || '');
+            });
+        }
+
+        // Lightbox close handlers — backdrop click, X button, Escape key
+        const lightbox = document.getElementById('dtgThumbLightbox');
+        if (lightbox) {
+            lightbox.addEventListener('click', (e) => {
+                if (e.target.dataset?.action === 'close') closeDesignLightbox();
+            });
+        }
+        // Escape key — global listener (rebound on each render is harmless,
+        // browsers dedupe identical listeners)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const lb = document.getElementById('dtgThumbLightbox');
+                if (lb && !lb.hidden) closeDesignLightbox();
+            }
+        });
+
         // Manual customer fields
         bindInputToState('dtgFirstName', 'firstName');
         bindInputToState('dtgLastName', 'lastName');
         bindInputToState('dtgEmail', 'email');
         bindInputToState('dtgPhone', 'phone');
+        bindInputToState('dtgPoNumber', 'po');
         // When the rep types a Company ID manually (rather than picking from
         // the search combobox), also refresh the design picker against that ID.
         bindInputToState('dtgCompanyId', 'companyId');
@@ -2006,6 +2057,30 @@
             _designsCacheByCustomer.set(key, []);
             return [];
         }
+    }
+
+    // Open the design lightbox with a given image URL + caption.
+    // The lightbox is mounted at form-render time (see render()) and lives
+    // outside the .dtg-form-wrap so its position:fixed z-index isn't trapped
+    // by any sticky parent. Body scroll lock prevents background scrolling.
+    function openDesignLightbox(src, caption) {
+        const lb = document.getElementById('dtgThumbLightbox');
+        const img = document.getElementById('dtgThumbLightboxImg');
+        const title = document.getElementById('dtgThumbLightboxTitle');
+        if (!lb || !img) return;
+        img.src = src;
+        img.alt = caption || 'Design preview';
+        if (title) title.textContent = caption || '';
+        lb.hidden = false;
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDesignLightbox() {
+        const lb = document.getElementById('dtgThumbLightbox');
+        const img = document.getElementById('dtgThumbLightboxImg');
+        if (!lb) return;
+        lb.hidden = true;
+        if (img) img.removeAttribute('src');
+        document.body.style.overflow = '';
     }
 
     // Update the inline thumbnail anchor next to the Design # input. Called
@@ -2760,6 +2835,10 @@
                 companyName: state.customer.company || '',
                 companyId: state.customer.companyId || '',
                 phone: state.customer.phone || '',
+                // Customer's purchase order # — passes through as the order's
+                // CustomerPurchaseOrder field in ShopWorks. Falls back to the
+                // OF-NNNN extOrderId on the backend when not provided.
+                po: state.customer.po || '',
                 // Billing state — flows from the picked contact's
                 // company_contacts_2026.State so the OF push endpoint can
                 // branch tax logic on it (out-of-state customers get 0 tax
@@ -3078,7 +3157,7 @@
         state.customer = {
             company: '', companyId: '', contactId: '',
             firstName: '', lastName: '', email: '', phone: '',
-            state: '', city: '',
+            state: '', city: '', po: '',
             designNumber: '', terms: 'Prepaid', contacts: [],
             salesRepCode: preservedRepCode,
         };
