@@ -707,6 +707,24 @@
                             <input type="text" id="dtgCompanyInput" autocomplete="off" placeholder="Company name or contact…">
                         </div>
 
+                        <!-- Customer history pill (2026-05-20 — Phase 1: info-only).
+                             Appears after a customer is picked. Shows aggregated 90-day
+                             order patterns from ManageOrders: order count, last order
+                             date, usual ship method + terms, last design used, and any
+                             backfill suggestions for missing contact data. Does NOT
+                             auto-fill any field values — rep clicks "Use this" buttons
+                             to apply suggestions explicitly. -->
+                        <div class="dcp-history-pill" id="dtgHistoryPill" hidden>
+                            <div class="dhp-head" id="dtgHistoryPillHead">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span class="dhp-summary" id="dtgHistoryPillSummary">Loading customer history…</span>
+                                <button type="button" class="dhp-toggle" id="dtgHistoryPillToggle" aria-label="Expand history" aria-expanded="false">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+                            <div class="dhp-body" id="dtgHistoryPillBody" hidden></div>
+                        </div>
+
                         <!-- Contact picker — appears after a customer is picked, showing
                              every contact on file at that company so the rep can switch
                              between them (e.g. Aaberg's has Craig Edward, Accounting,
@@ -1841,6 +1859,10 @@
         const input = document.getElementById('dtgCompanyInput');
         if (wrap && input) attachCompanyCombobox(wrap, input);
 
+        // Customer history pill — expand/collapse + "Use this" button handlers.
+        // Pill is populated asynchronously after customer is picked (see pick()).
+        wireHistoryPillHandlers();
+
         // Contact picker — switches between this company's contacts.
         // When the rep selects a different contact, re-apply that contact's
         // first/last/email/phone to the form. State.customer.contacts must
@@ -2510,6 +2532,25 @@
             // Re-derive tax (out-of-state customer → 0% even before rep
             // touches ship-to fields).
             if (billingStateChanged) recomputeTaxRate();
+
+            // Fire-and-forget customer history fetch (Phase 1 info-only pill).
+            // Renders in the background ~400ms later — doesn't block any
+            // contact-info auto-fill above. Failure → pill stays hidden.
+            if (state.customer.companyId) {
+                // Show "loading" state immediately so rep knows it's coming
+                const pill = document.getElementById('dtgHistoryPill');
+                const summary = document.getElementById('dtgHistoryPillSummary');
+                if (pill && summary) {
+                    pill.hidden = false;
+                    summary.textContent = 'Looking up past orders…';
+                }
+                fetchCustomerHistory(state.customer.companyId)
+                    .then(profile => renderCustomerHistoryPill(profile))
+                    .catch(() => {
+                        // Defensive — hide pill if anything goes wrong
+                        if (pill) pill.hidden = true;
+                    });
+            }
             // Populate the contact dropdown so the rep can switch to a different
             // contact at this company (e.g. Aaberg's has Craig Edward / Accounting /
             // Alexx Bacon; auto-pick lands on Craig, but rep can switch to Alexx).
@@ -2544,6 +2585,208 @@
             // visible symptom: dropdown closes but nothing gets selected.
             // Matches the existing guard pattern in attachStyleCombobox + attachColorCombobox.
             if (menu && !wrap.contains(e.target) && !menu.contains(e.target)) close();
+        });
+    }
+
+    // ---- Customer History Pill (Phase 1: info-only) -----------------------
+    // Fetches aggregated 90-day order profile from /api/customer-history/:id
+    // and renders a compact pill near the customer panel. Phase 1 is READ-ONLY
+    // — no auto-fills. Rep clicks "Use this" buttons to apply suggestions
+    // explicitly (e.g. fill a missing ship-to address from past orders).
+    // After 2 weeks of real usage we'll add surgical auto-fills for fields
+    // where signal is high and reps want it.
+    // ----------------------------------------------------------------------
+
+    // Per-session cache so re-picking the same customer is instant.
+    const _historyCacheByCustomer = new Map(); // idCustomer → profile
+
+    async function fetchCustomerHistory(idCustomer) {
+        if (!idCustomer) return null;
+        const idNum = Number(idCustomer);
+        if (!Number.isInteger(idNum) || idNum <= 0) return null;
+        if (_historyCacheByCustomer.has(idNum)) return _historyCacheByCustomer.get(idNum);
+        try {
+            const r = await fetch(`${API_BASE}/api/customer-history/${idNum}`);
+            if (!r.ok) return null;
+            const data = await r.json();
+            _historyCacheByCustomer.set(idNum, data);
+            return data;
+        } catch (e) {
+            console.warn('[dtg-inline-form] customer-history fetch failed:', e.message);
+            return null;
+        }
+    }
+
+    function renderCustomerHistoryPill(profile) {
+        const pill = document.getElementById('dtgHistoryPill');
+        const summary = document.getElementById('dtgHistoryPillSummary');
+        const body = document.getElementById('dtgHistoryPillBody');
+        if (!pill || !summary || !body) return;
+
+        if (!profile || !profile.hasHistory) {
+            pill.hidden = true;
+            return;
+        }
+
+        // --- Summary line ---
+        const orderCount = profile.orderCount || 0;
+        const daysAgo = profile.lastOrderDaysAgo;
+        const daysAgoLabel = daysAgo === 0 ? 'today'
+            : daysAgo === 1 ? 'yesterday'
+            : daysAgo < 30 ? `${daysAgo} days ago`
+            : daysAgo < 365 ? `${Math.round(daysAgo / 30)} months ago`
+            : `${(daysAgo / 365).toFixed(1)} years ago`;
+        summary.textContent = `${orderCount} order${orderCount === 1 ? '' : 's'} on file · last ${daysAgoLabel}`;
+        pill.hidden = false;
+
+        // --- Expanded body ---
+        const rows = [];
+
+        // Behavior summary
+        const usually = [];
+        if (profile.topShipMethod) usually.push(profile.topShipMethod);
+        if (profile.topTerms) usually.push(profile.topTerms);
+        if (usually.length) {
+            rows.push(`
+                <div class="dhp-row">
+                    <span class="dhp-label">Usually:</span>
+                    <span class="dhp-value">${escapeHtml(usually.join(' · '))}</span>
+                </div>
+            `);
+        }
+
+        // Last design
+        if (profile.lastDesignId) {
+            const designLabel = profile.lastDesignName
+                ? `#${profile.lastDesignId} — ${profile.lastDesignName}`
+                : `#${profile.lastDesignId}`;
+            const isAlreadyPicked = String(state.customer.designNumber || '') === String(profile.lastDesignId);
+            rows.push(`
+                <div class="dhp-row">
+                    <span class="dhp-label">Last design:</span>
+                    <span class="dhp-value">${escapeHtml(designLabel)}</span>
+                    ${isAlreadyPicked ? '<span class="dhp-applied">✓ selected</span>' : `<button type="button" class="dhp-apply" data-apply="design" data-design="${escapeHtml(profile.lastDesignId)}">Use this</button>`}
+                </div>
+            `);
+        }
+
+        // Top items (read-only — Phase 2 might add quick-add buttons)
+        if (profile.topItems && profile.topItems.length) {
+            const itemsList = profile.topItems.map(t => `${escapeHtml(t.partNumber)} ${escapeHtml(t.color)} (${t.count}×)`).join(' · ');
+            rows.push(`
+                <div class="dhp-row">
+                    <span class="dhp-label">Top items:</span>
+                    <span class="dhp-value">${itemsList}</span>
+                </div>
+            `);
+        }
+
+        // Phone backfill suggestion — only show when current state has a default/blank phone
+        // AND history found a non-default phone in past orders
+        const currentPhone = state.customer.phone || '';
+        const phoneLooksDefault = !currentPhone || /^253-(922-5793|229-9214)$/.test(currentPhone);
+        if (phoneLooksDefault && profile.contactBackfill?.phone) {
+            rows.push(`
+                <div class="dhp-row dhp-suggest">
+                    <span class="dhp-label">💡 Phone:</span>
+                    <span class="dhp-value">${escapeHtml(profile.contactBackfill.phone)}
+                        <span class="dhp-meta">from order ${escapeHtml(profile.contactBackfill.phoneFromOrderDate || '')}</span>
+                    </span>
+                    <button type="button" class="dhp-apply" data-apply="phone" data-phone="${escapeHtml(profile.contactBackfill.phone)}">Use this</button>
+                </div>
+            `);
+        } else if (phoneLooksDefault && !profile.contactBackfill?.phone) {
+            rows.push(`
+                <div class="dhp-row dhp-warn">
+                    <span class="dhp-label">⚠ Phone:</span>
+                    <span class="dhp-value">No real phone in ${orderCount} past order${orderCount === 1 ? '' : 's'} — Caspio shows "${escapeHtml(currentPhone || 'blank')}". Ask customer.</span>
+                </div>
+            `);
+        }
+
+        // Last ship-to suggestion — only show when not pickup AND ship-to currently blank
+        const currentShipMethod = state.shipping?.method || '';
+        const isPickupNow = isPickupMethod(currentShipMethod);
+        const shipToBlank = !state.shipping?.address1 && !state.shipping?.city;
+        if (profile.lastShipTo && shipToBlank && !isPickupNow) {
+            const addr = `${profile.lastShipTo.address1}, ${profile.lastShipTo.city}, ${profile.lastShipTo.state} ${profile.lastShipTo.zip}`.trim();
+            const dataAttrs = ['address1', 'city', 'state', 'zip']
+                .map(k => `data-${k}="${escapeHtml(profile.lastShipTo[k] || '')}"`).join(' ');
+            rows.push(`
+                <div class="dhp-row dhp-suggest">
+                    <span class="dhp-label">💡 Last ship-to:</span>
+                    <span class="dhp-value">${escapeHtml(addr)}
+                        <span class="dhp-meta">from order ${escapeHtml(profile.lastShipTo.fromOrderDate || '')}</span>
+                    </span>
+                    <button type="button" class="dhp-apply" data-apply="shipto" ${dataAttrs}>Use this</button>
+                </div>
+            `);
+        }
+
+        // Source indicator (for debugging — small + subtle)
+        if (profile._source === 'cache') {
+            rows.push(`<div class="dhp-row dhp-source"><span class="dhp-meta">(from cache · refreshes every 6 hours)</span></div>`);
+        }
+
+        body.innerHTML = rows.join('');
+    }
+
+    function wireHistoryPillHandlers() {
+        const head = document.getElementById('dtgHistoryPillHead');
+        const body = document.getElementById('dtgHistoryPillBody');
+        const toggle = document.getElementById('dtgHistoryPillToggle');
+        if (!head || !body || !toggle) return;
+
+        // Toggle expand/collapse
+        const toggleBody = () => {
+            const isHidden = body.hidden;
+            body.hidden = !isHidden;
+            toggle.setAttribute('aria-expanded', String(isHidden));
+            toggle.querySelector('i').className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+        };
+        head.addEventListener('click', (e) => {
+            if (e.target.closest('button.dhp-apply')) return; // don't toggle when clicking apply buttons
+            toggleBody();
+        });
+
+        // "Use this" buttons inside the expanded body — event delegation
+        body.addEventListener('click', (e) => {
+            const btn = e.target.closest('button.dhp-apply');
+            if (!btn) return;
+            const action = btn.dataset.apply;
+            if (action === 'phone') {
+                const newPhone = btn.dataset.phone;
+                state.customer.phone = newPhone;
+                const f = document.getElementById('dtgPhone');
+                if (f) f.value = newPhone;
+                btn.replaceWith(Object.assign(document.createElement('span'), { className: 'dhp-applied', textContent: '✓ applied' }));
+                markDirty();
+                scheduleStateSave();
+            } else if (action === 'design') {
+                const newDesign = btn.dataset.design;
+                state.customer.designNumber = newDesign;
+                const f = document.getElementById('dtgDesignNumber');
+                if (f) f.value = newDesign;
+                if (typeof syncDesignThumbnail === 'function') syncDesignThumbnail();
+                btn.replaceWith(Object.assign(document.createElement('span'), { className: 'dhp-applied', textContent: '✓ applied' }));
+                markDirty();
+                scheduleStateSave();
+                updateSubmitEnabled();
+            } else if (action === 'shipto') {
+                state.shipping.address1 = btn.dataset.address1 || '';
+                state.shipping.city = btn.dataset.city || '';
+                state.shipping.state = btn.dataset.state || '';
+                state.shipping.zip = btn.dataset.zip || '';
+                const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+                setVal('dtgShipAddress1', state.shipping.address1);
+                setVal('dtgShipCity', state.shipping.city);
+                setVal('dtgShipState', state.shipping.state);
+                setVal('dtgShipZip', state.shipping.zip);
+                btn.replaceWith(Object.assign(document.createElement('span'), { className: 'dhp-applied', textContent: '✓ applied' }));
+                markDirty();
+                scheduleStateSave();
+                if (typeof recomputeTaxRate === 'function') recomputeTaxRate();
+            }
         });
     }
 

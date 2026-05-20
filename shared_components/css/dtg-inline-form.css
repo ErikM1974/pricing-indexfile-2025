@@ -1810,6 +1810,149 @@
 }
 
 /* ============================================================================
+   Customer History Pill (2026-05-20 — Phase 1 info-only)
+   ============================================================================
+   Compact pill that appears below the customer search when a customer is
+   picked. Collapsed by default — clicking expands to show patterns +
+   backfill suggestions. NO auto-fill in Phase 1 — rep clicks "Use this"
+   on individual suggestions to apply.
+*/
+.dcp-history-pill {
+    margin: 8px 0 10px;
+    padding: 8px 12px;
+    background: linear-gradient(180deg, #ecf6e7 0%, #f4fbef 100%);
+    border: 1px solid #98c98a;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #1f3a1f;
+    animation: dhp-slide-in 200ms ease-out;
+}
+@keyframes dhp-slide-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.dcp-history-pill[hidden] { display: none !important; }
+
+.dhp-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+}
+.dhp-head:hover {
+    color: #2e5827;
+}
+.dhp-head .fa-clipboard-list {
+    color: #2e5827;
+    font-size: 13px;
+}
+.dhp-summary {
+    flex: 1 1 auto;
+    font-weight: 500;
+}
+.dhp-toggle {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    color: #2e5827;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 100ms ease;
+}
+.dhp-toggle:hover {
+    background: rgba(46, 88, 39, 0.10);
+}
+
+.dhp-body {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(46, 88, 39, 0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.dhp-body[hidden] { display: none !important; }
+
+.dhp-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.dhp-label {
+    flex: 0 0 auto;
+    font-weight: 600;
+    color: #4b5563;
+    min-width: 80px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.dhp-value {
+    flex: 1 1 auto;
+    color: #1f3a1f;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.dhp-meta {
+    font-size: 11px;
+    color: #6b7280;
+    font-style: italic;
+    margin-left: 4px;
+}
+
+/* Suggestion rows have a subtle accent so they stand out from informational rows */
+.dhp-row.dhp-suggest .dhp-label {
+    color: #b45309;
+}
+.dhp-row.dhp-warn .dhp-label {
+    color: #b91c1c;
+}
+.dhp-row.dhp-warn .dhp-value {
+    color: #7f1d1d;
+}
+
+.dhp-apply {
+    flex: 0 0 auto;
+    padding: 3px 10px;
+    background: #ffffff;
+    border: 1px solid #2e5827;
+    color: #2e5827;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 100ms ease;
+}
+.dhp-apply:hover {
+    background: #2e5827;
+    color: #ffffff;
+}
+
+.dhp-applied {
+    flex: 0 0 auto;
+    padding: 3px 8px;
+    background: #d1fae5;
+    color: #065f46;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.dhp-source .dhp-meta {
+    font-size: 10px;
+    color: #9ca3af;
+    margin-left: 0;
+}
+
+/* ============================================================================
    Schedule section — Due Date + Drop Dead Date (2026-05-20)
    ============================================================================
 */
