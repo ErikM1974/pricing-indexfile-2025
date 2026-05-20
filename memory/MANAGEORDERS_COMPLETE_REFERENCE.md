@@ -433,13 +433,17 @@ Download orders that were previously pushed via the API.
 |-----------|------|----------|-------------|
 | `date_from` | string | Yes | Upload date range start (YYYY-MM-DD) |
 | `date_to` | string | Yes | Upload date range end (YYYY-MM-DD) |
-| `time_from` | string | No | Time range start (HH-MM-SS) |
+| `time_from` | string | No | Time range start (HH-MM-SS — note the DASHES, not colons) |
 | `time_to` | string | No | Time range end (HH-MM-SS) |
-| `api_source` | string | No | Filter: `"all"`, `"none"`, or specific source name |
+| `api_source` | string | No | Filter: `"all"`, `"none"`, or specific source name (e.g. `"OrderForm"`) |
 
-**Response:** Array of OrderJson objects (orders you previously submitted)
+**Response:** `{ result: [order1, order2, ...] }`
 
-**Use Case:** Verify orders were received, retrieve order data for reconciliation.
+**⚠ RESPONSE SHAPE WARNING (verified 2026-05-20):** The official Swagger spec shows `result: [{ order_json: {} }]` (objects wrapped in `order_json` key). The ACTUAL API returns the order fields directly at the top level of each result entry: `result: [{ ExtOrderID, ExtSource, ContactNameFirst, date_OrderPlaced, ... }]`. The proxy's `verifyOrder()` function in `lib/manageorders-push-client.js` reads `order.order_json.ExtOrderID` which always returns undefined — bug to fix.
+
+**Verified retention (2026-05-20):** Pulled 469-day-old orders (placed 02/05/2025) successfully. Retention is **at least 15.6 months and likely 2 years** per ManageOrders's documented API guide — NOT the 60 days previously claimed. See `caspio-pricing-proxy/scripts/test-mo-retention.js` for the probe script. The 60-day claim originated from an early misreading + has lived in our docs since 2025; corrected here.
+
+**Use Case:** Verify orders were received, retrieve order data for reconciliation, historical lookups for the YTD/archive system.
 
 ---
 
@@ -1409,11 +1413,16 @@ The Staff Dashboard (`/staff-dashboard.html`) uses ManageOrders PULL API extensi
 | `PartNumber` | Product matching | Used for Garment Tracker |
 | `Size01-Size06` | Quantity extraction | **Must parseInt() - returns strings!** |
 
-### 60-Day Data Limit Workaround
+### Daily Sales Archive Pattern (formerly "60-Day Limit Workaround")
 
-**Problem:** ManageOrders only retains ~60 days of data via the PULL API.
+**⚠ RETENTION CORRECTION (2026-05-20):** The "60-day retention" claim historically documented in our memory was WRONG. We empirically verified via `caspio-pricing-proxy/scripts/test-mo-retention.js` that ManageOrders `/order-pull` retrieves orders as old as **02/05/2025 (469 days / 15.6 months)** still today — and likely 2 years per the official ManageOrders API guide. NWCA's customer-autocomplete 60-day window is a chosen design constraint for performance + freshness, not an MO API limit.
 
-**Solution:** Archive daily sales to Caspio for YTD tracking.
+**Why the archive pattern still makes sense:**
+- Pulling 2 years of orders on every Staff Dashboard load = slow + heavy
+- Caspio archive gives sub-second YTD totals
+- Long-term reliability — if MO ever goes offline or rate-limits aggressively, our YTD numbers survive
+
+**Solution:** Archive daily sales to Caspio for YTD tracking. The Caspio archive is the source of truth for older periods; ManageOrders is queried for the rolling 60-day window for freshness.
 
 ```javascript
 // Staff Dashboard pattern
