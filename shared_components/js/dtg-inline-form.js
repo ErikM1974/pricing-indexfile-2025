@@ -2812,6 +2812,11 @@
                 errors: [],
             },
             methodNotesBlock: `DTG · ${effectiveLocationLabel()} · Tier ${pricing.tier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pieces · Ship: ${shipMethodLabel}`,
+            // Surface the print location(s) as a dedicated field so the
+            // server's buildOrderNote() can include a "Print Locations:" line
+            // at the top of Notes On Order — Erik scans this in ShopWorks
+            // before opening the order details.
+            printLocations: effectiveLocationLabel(),
             designNumbers: state.customer.designNumber ? [state.customer.designNumber] : [],
             addOns: [],
         };
