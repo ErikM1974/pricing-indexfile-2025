@@ -1,3 +1,7 @@
+## v2026.05.20.3 (2026.05.20)
+
+- Deploy v2026.05.20.3: customer search did-you-mean fallback
+
 ## v2026.05.20.2 (2026.05.20)
 
 - Deploy v2026.05.20.2: contact picker — switch between a company's contacts after pick
