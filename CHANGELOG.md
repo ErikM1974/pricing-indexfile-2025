@@ -1,3 +1,7 @@
+## v2026.05.20.8 (2026.05.20)
+
+- Deploy v2026.05.20.8: 3 files (dtg-quote-builder.html,server.js,dtg-inline-form.js,...)
+
 ## v2026.05.20.7 (2026.05.20)
 
 - Deploy v2026.05.20.7: 3 files (dtg-quote-builder.html,server.js,dtg-inline-form.js,...)
