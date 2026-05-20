@@ -2128,3 +2128,251 @@
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
 }
+
+/* ============================================================================
+   New-Artwork Upload (2026-05-20)
+   ============================================================================
+   Drop zone + design name + per-file placement dropdown + thumbnail preview.
+   Block appears below the Design # row when no existing design # is picked.
+   When existing design IS picked, block collapses (.dcp-newart-collapsed).
+*/
+.dcp-newart {
+    margin: 12px 0 8px;
+    padding: 10px 12px;
+    background: var(--pnw-fog);
+    border: 1px solid var(--pnw-rule);
+    border-radius: 8px;
+    transition: opacity 180ms ease, max-height 220ms ease, padding 180ms ease;
+}
+.dcp-newart.dcp-newart-collapsed {
+    /* Hide the upload block when an existing design # is picked. Animate to
+       avoid a jarring snap. */
+    opacity: 0.55;
+    max-height: 60px;
+    overflow: hidden;
+    padding-bottom: 0;
+}
+.dcp-newart.dcp-newart-collapsed .dcp-newart-dropzone,
+.dcp-newart.dcp-newart-collapsed .dcp-newart-list,
+.dcp-newart.dcp-newart-collapsed .dcp-field-wrap {
+    display: none;
+}
+
+.dcp-newart .dcp-section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pnw-pine);
+}
+.dcp-newart .dcp-section-head .fas {
+    color: var(--pnw-forest);
+}
+.dcp-newart-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--pnw-stone);
+    margin-left: auto;
+}
+
+.dcp-required {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    background: rgba(180, 83, 9, 0.12);
+    color: #b45309;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.dcp-field-hint {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--pnw-stone);
+    line-height: 1.3;
+}
+
+/* --- Dropzone --- */
+.dcp-newart-dropzone {
+    margin-top: 10px;
+    padding: 18px 14px;
+    background: var(--pnw-paper);
+    border: 2px dashed var(--pnw-sage);
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    user-select: none;
+}
+.dcp-newart-dropzone:hover,
+.dcp-newart-dropzone:focus-visible {
+    background: var(--pnw-mist);
+    border-color: var(--pnw-forest);
+    outline: none;
+}
+.dcp-newart-dropzone--over {
+    background: var(--pnw-mist);
+    border-color: var(--pnw-forest-deep);
+    transform: scale(1.01);
+    box-shadow: var(--pnw-shadow-sm);
+}
+.dcp-newart-dropzone .fas {
+    font-size: 28px;
+    color: var(--pnw-forest);
+    margin-bottom: 6px;
+    display: block;
+}
+.dcp-newart-dropzone-msg {
+    font-size: 13px;
+    color: var(--pnw-pine);
+    margin-bottom: 2px;
+}
+.dcp-newart-dropzone-msg strong {
+    font-weight: 700;
+}
+.dcp-newart-browse {
+    color: var(--pnw-forest);
+    text-decoration: underline;
+    font-weight: 500;
+}
+.dcp-newart-dropzone-sub {
+    font-size: 11px;
+    color: var(--pnw-stone);
+}
+
+/* --- Status line (upload progress, errors, success) --- */
+.dcp-newart-status {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--pnw-stone);
+    min-height: 1.4em;
+}
+.dcp-newart-status--success { color: #16a34a; font-weight: 500; }
+.dcp-newart-status--error   { color: #dc2626; font-weight: 500; }
+.dcp-newart-status--loading { color: var(--pnw-forest); font-style: italic; }
+
+/* --- File list (uploaded cards) --- */
+.dcp-newart-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+}
+.dcp-newart-card {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 8px 10px;
+    background: var(--pnw-paper);
+    border: 1px solid var(--pnw-rule);
+    border-radius: 8px;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.dcp-newart-card:hover {
+    border-color: var(--pnw-sage);
+    box-shadow: var(--pnw-shadow-sm);
+}
+
+.dcp-newart-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    background: var(--pnw-mist);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.dcp-newart-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.dcp-newart-thumb-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--pnw-forest);
+}
+.dcp-newart-thumb-icon .fas {
+    font-size: 22px;
+    margin-bottom: 2px;
+}
+.dcp-newart-thumb-ext {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--pnw-stone);
+    letter-spacing: 0.05em;
+}
+
+.dcp-newart-card-body {
+    min-width: 0;  /* allow text truncation in name */
+}
+.dcp-newart-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pnw-pine);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dcp-newart-card-meta {
+    font-size: 11px;
+    color: var(--pnw-stone);
+    margin-top: 2px;
+}
+.dcp-newart-card-placement {
+    margin-top: 6px;
+    font-size: 11px;
+}
+.dcp-newart-card-placement label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--pnw-stone);
+    font-weight: 500;
+}
+.dcp-newart-placement-select {
+    padding: 3px 6px;
+    border: 1px solid var(--pnw-rule-strong);
+    border-radius: 4px;
+    background: var(--pnw-paper);
+    font: inherit;
+    font-size: 11px;
+    color: var(--pnw-pine);
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.dcp-newart-placement-select:focus-visible {
+    outline: 2px solid var(--pnw-forest);
+    outline-offset: -1px;
+    border-color: var(--pnw-forest);
+}
+
+.dcp-newart-remove {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: transparent;
+    border: 1px solid var(--pnw-rule);
+    border-radius: 50%;
+    color: var(--pnw-stone);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 120ms ease;
+}
+.dcp-newart-remove:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+    color: #dc2626;
+}
