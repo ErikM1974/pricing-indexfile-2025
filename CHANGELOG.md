@@ -1,3 +1,7 @@
+## v2026.05.20.1 (2026.05.20)
+
+- Deploy v2026.05.20.1: fix customer combobox selection — missing menu.contains guard
+
 ## v2026.05.19.14 (2026.05.19)
 
 - Deploy v2026.05.19.14: customer + design comboboxes — fix dropdown position bug
