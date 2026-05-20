@@ -70,9 +70,42 @@ For completeness — none of these affect apparel decoration:
 
 Single source of truth for "what GL account" is `getTaxAccount(state, isCustomerPickup)` in `pricing-index/server.js` (search for `WAC 458-20-145`). The three branches map 1:1 to the 3 rules above.
 
-Single source of truth for "what RATE" is `recomputeTaxRate()` in `shared_components/js/dtg-inline-form.js`. Other quote builders (EMB, DTF, etc.) each have their own analog — they all call `/api/tax-rates/lookup` so the rate itself is consistent.
+Single source of truth for "what RATE" is `recomputeTaxRate()` in `shared_components/js/dtg-inline-form.js`. Other quote builders (EMB, DTF, etc.) each have their own analog — they all call `/api/tax-rates/lookup` so the rate itself is consistent. The lookup endpoint returns BOTH the rate AND the matched Caspio `sales_tax_accounts_2026` row (`account` + `accountName`); the frontend captures both into `state.shipping.taxAccount` / `taxAccountName`.
 
-Order Form submit path (`/api/submit-order-form`) pushes `taxTotal` + `taxPartNumber` + `taxPartDescription` to ManageOrders/ShopWorks. ShopWorks may swap our generic `TAX` part for its own configured `Tax_10.1` part — that's a feature, not a bug, and it routes to the right GL account regardless.
+## ShopWorks push: TaxTotal = 0, tax applied manually (Erik's workflow, 2026-05-20)
+
+**Order Form submit path (`/api/submit-order-form`) sends `taxTotal: 0` to ManageOrders.** This is intentional, not a bug.
+
+The reason: the ShopWorks ManageOrders integration is configured with hardcoded `Tax Line Item = "Tax_10.1"` and `Tax Account = "2200.101"`. Those defaults are stamped on EVERY order pulled by the integration — there's no per-order override mechanism. If we pushed `TaxTotal: $X` for a Seattle 10.35% order, ShopWorks would auto-create a line labeled `Tax_10.1 — City of Milton Sales Tax 10.1%` with the correct dollar amount but the wrong GL account and wrong description.
+
+**Erik's chosen workflow:**
+1. Form computes the correct destination-based tax for the customer-facing quote
+2. Submit sends `TaxTotal: 0` (no auto-tax-line created in ShopWorks)
+3. Notes On Order carries a structured tax block (rate, Caspio account, dollar amount) — see `buildOrderNote()` in `server.js`
+4. Erik reviews the order, manually adds the correct tax line in ShopWorks using the Notes block as a cheat sheet
+5. Invoices the customer
+
+This puts a human in the loop for every order, which Erik wants for AR accuracy.
+
+**Notes On Order tax block format** (4 variants):
+
+```
+TAX — APPLY MANUALLY IN SHOPWORKS       ← pickup OR in-WA shipping
+Rate:    10.35%  (Seattle — DOR lookup)
+Account: 2200.103 — 10.30%
+Amount:  $25.88 on $250.00 subtotal
+
+TAX — DO NOT APPLY (out of state)       ← out-of-state shipping
+State:   OR
+Account: 2202 — Out of State Sales
+Reason:  WAC 458-20-193 (no nexus on out-of-state delivery)
+
+TAX — NEEDS REVIEW                      ← defensive: rep didn't fill destination
+Subtotal: $150.00
+Rep: confirm destination + apply correct WA rate before invoicing
+```
+
+**Future option:** If the manual-application step becomes a bottleneck, ask Bradley if ManageOrders supports per-order tax part override. If supported, we can send the matched Caspio account directly and remove the human-in-loop step. Until then, the manual workflow is the right answer.
 
 ---
 

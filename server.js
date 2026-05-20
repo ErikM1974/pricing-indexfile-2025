@@ -1850,60 +1850,66 @@ function getTaxAccount(state, isCustomerPickup) {
   return { code: '2200.101', label: 'WA Sales Tax — Destination City', rate: null };
 }
 
+// Notes On Order is the SINGLE most-glanced field in ShopWorks for the rep
+// reviewing an order. Per Erik (2026-05-20): strip everything that's already
+// in a structured ShopWorks field — Order ID is the External ID field,
+// timestamp is Date Order Placed, company is the Customer header — and keep
+// ONLY the tax-application instructions, which Erik applies manually after
+// each order arrives (because the integration's hardcoded Tax_10.1 default
+// would mis-label non-Milton-pickup orders).
+//
+// 4 possible blocks:
+//   1. Pickup (always Milton, 10.1%)            → APPLY: 2200.101
+//   2. In-WA shipping (DOR destination lookup)  → APPLY: matched Caspio account
+//   3. Out-of-state shipping                    → DO NOT APPLY
+//   4. No tax info available (defensive)        → FLAG: needs rep review
 function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId }) {
-  // Note content is intentionally LEAN — anything that ManageOrders has a
-  // structured field for is omitted (customer name → Contact*; PO →
-  // CustomerPurchaseOrder; sales rep → CustomerServiceRep; due date →
-  // date_OrderDropDead; ship method → ShippingAddresses[].ShipMethod;
-  // billing/shipping addresses → Customer/ShippingAddresses). Only items
-  // that aren't in structured fields land here:
-  //   - Order ID + submit timestamp (audit trail)
-  //   - CRM Customer ID (NWCA's company ID — helps AE jump from order to
-  //     customer record without searching by name)
-  //   - Order Notes (free-form rep input)
-  //   - Tax Account / Expected Tax (AR can't get this from MO directly)
-  const submittedAt = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  // Pickup detection: frontend sends 'pickup' (canonical) but historic share-
-  // link drafts may still carry 'willcall'. Accept both.
   const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
-  const taxState = (ship && ship.state) || (info && info.state) || '';
-  const taxAccount = getTaxAccount(taxState, isPickup);
-  // Expected tax line — prefer the frontend's computed amount (already
-  // includes the destination-city rate or pickup flat 10.1%); fall back to
-  // subtotal × 10.1% only if the frontend didn't pass one through.
-  const computedTax = Number(breakdown?.taxEstimate);
-  const expectedTax = Number.isFinite(computedTax) && computedTax > 0
-    ? `\nExpected Tax: $${computedTax.toFixed(2)}`
-    : (breakdown?.supported && Number(breakdown.subtotal) > 0 && (isPickup || (taxState && taxState.toUpperCase() === 'WA'))
-        ? `\nExpected Tax: $${(Number(breakdown.subtotal) * 0.101).toFixed(2)}`
-        : '');
-  const lines = [
-    `ONLINE ORDER FORM`,
-    `Order: ${extOrderId || 'pending'}  ·  Submitted: ${submittedAt}`,
-  ];
-  if (draftId) lines.push(`Draft/Share Link: ${draftId}`);
-  lines.push('');
-  // Company + CRM Company ID — quick reference so AE can jump from this
-  // order to the company's CRM record without searching by name.
-  // Erik asked for this labeled as "Company ID" (matches the form's term).
-  if (info.company || info.companyId) {
-    const idPart = info.companyId ? `  ·  Company ID: ${info.companyId}` : '';
-    lines.push(`Company: ${info.company || 'N/A'}${idPart}`);
-    lines.push('');
-  }
-  lines.push(`Order Notes: ${orderNotes || 'None'}`);
-  lines.push('');
-  // ASCII divider — Unicode em-dash renders as '????' in OnSite's legacy
-  // notes display.
-  lines.push(`----------------------`);
-  if (isPickup) {
-    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})${expectedTax}`);
-  } else if (taxState && taxState.toUpperCase() === 'WA') {
-    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})${expectedTax}`);
+  const shState = (ship && ship.state || info && info.state || '').toUpperCase();
+  const isOutOfState = !isPickup && shState && shState !== 'WA';
+
+  const subtotal = Number(breakdown?.subtotal) || 0;
+  const taxAmount = Number(breakdown?.taxEstimate) || 0;
+  const taxRate = Number(ship?.taxRate);
+  const taxRatePct = Number.isFinite(taxRate) && taxRate > 0
+    ? (taxRate * 100).toFixed(2)
+    : null;
+
+  // Caspio sales_tax_accounts_2026 row — frontend captures from /api/tax-rates/lookup
+  // and passes through. Fall back to safe defaults if missing.
+  const taxAccount = ship?.taxAccount
+    || (isPickup ? '2200.101' : isOutOfState ? '2202' : '2200');
+  const taxAccountName = ship?.taxAccountName
+    || (isPickup ? 'Wash:10.1%' : isOutOfState ? 'Out of State Sales' : 'WA Sales Tax');
+
+  const lines = [];
+
+  if (isOutOfState) {
+    // BLOCK 3 — Out-of-state shipping: do not apply tax (WAC 458-20-193)
+    lines.push('TAX — DO NOT APPLY (out of state)');
+    lines.push(`State:   ${shState}`);
+    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
+    lines.push(`Reason:  WAC 458-20-193 (no nexus on out-of-state delivery)`);
+  } else if (isPickup) {
+    // BLOCK 1 — Customer pickup at Milton: flat 10.1%
+    lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
+    lines.push(`Rate:    ${taxRatePct || '10.10'}%  (Milton pickup — flat)`);
+    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
+    lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
+  } else if (shState === 'WA' && taxRatePct) {
+    // BLOCK 2 — In-WA shipping: destination city rate (DOR lookup)
+    const city = ship?.city || '';
+    lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
+    lines.push(`Rate:    ${taxRatePct}%  (${city || 'WA destination'} — DOR lookup)`);
+    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
+    lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
   } else {
-    lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})`);
-    lines.push(`No tax due (out of state)`);
+    // BLOCK 4 — Defensive fallback: no rate available, flag for rep review
+    lines.push('TAX — NEEDS REVIEW');
+    lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    lines.push(`Rep: confirm destination + apply correct WA rate before invoicing`);
   }
+
   return lines.join('\n');
 }
 
@@ -2680,45 +2686,24 @@ app.post('/api/submit-order-form', async (req, res) => {
       },
       notes: notesBlocks,
       rushOrder: false,
-      // Tax: push the frontend's authoritative tax amount.
+      // Tax: ALWAYS send 0. (2026-05-20 — see memory/wa-sales-tax-rules.md)
       //
-      // Erik's rules (2026-05-20):
-      //   - Pickup at NWCA Milton, WA → 10.1% flat
-      //   - Shipping out of WA state   → 0% (no nexus)
-      //   - Shipping in WA state       → destination city rate (DOR lookup)
+      // Background: the ShopWorks ManageOrders integration is configured with
+      // hardcoded Tax Line Item = "Tax_10.1" and Tax Account = "2200.101".
+      // Those defaults stamp ALL orders pulled by the integration regardless
+      // of payload — there's no per-order override. Sending TaxTotal: $X
+      // would auto-create a tax line with the right dollar amount but the
+      // WRONG label and GL account for non-Milton destinations (e.g. a Seattle
+      // 10.35% order would show as "City of Milton Sales Tax 10.1%" in
+      // ShopWorks's books).
       //
-      // The frontend computes the right number using /api/tax-rates/lookup and
-      // passes it via breakdown.taxEstimate. We re-derive isPickup and the GL
-      // account here so AR's books match the rules above even if the frontend
-      // sent something stale. The tax LINE on ShopWorks is auto-created from
-      // (TaxTotal + TaxPartNumber + TaxPartDescription).
-      //
-      // taxTotal > 0 ONLY when:
-      //   - the frontend computed > 0 (sanity check), AND
-      //   - the order isn't out-of-state shipping (rule 2)
-      // Everything else falls through to 0 (ShopWorks just doesn't add a tax line).
-      taxTotal: (() => {
-        const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
-        const shipState = (ship && ship.state) || (info && info.state) || '';
-        // Out-of-state ship → no tax, regardless of what frontend sent
-        if (!isPickup && shipState && shipState.toUpperCase() !== 'WA') return 0;
-        const frontendTax = Number(breakdown?.taxEstimate);
-        if (Number.isFinite(frontendTax) && frontendTax > 0) {
-          return Math.round(frontendTax * 100) / 100;
-        }
-        return 0;
-      })(),
-      taxPartNumber: 'TAX',
-      taxPartDescription: (() => {
-        const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
-        const shipState = (ship && ship.state) || (info && info.state) || '';
-        if (isPickup) return 'WA Sales Tax (Pickup — Milton 10.1%)';
-        if (shipState && shipState.toUpperCase() === 'WA') {
-          const city = (ship && ship.city) || (info && info.city) || '';
-          return city ? `WA Sales Tax (${city})` : 'WA Sales Tax (Destination)';
-        }
-        return ''; // not used when taxTotal=0
-      })(),
+      // Erik's chosen workflow: send TaxTotal: 0, no auto-tax-line gets
+      // created, Erik manually applies the correct tax line in ShopWorks
+      // using the structured Notes On Order block (see buildOrderNote above)
+      // which carries the Caspio account number + rate + dollar amount the
+      // rep saw at quote time. The customer-facing quote (in the form preview)
+      // still shows the correct tax — only the ShopWorks push omits it.
+      taxTotal: 0,
       cur_Shipping: 0,
       totals: {
         subtotal: 0, rushFee: 0, salesTax: 0, shipping: 0, grandTotal: 0
