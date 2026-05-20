@@ -1926,16 +1926,26 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     lines.push(`Rep: confirm destination + apply correct WA rate before invoicing`);
   }
 
-  return lines.join('\n');
+  // Return as ARRAY — each element becomes a separate row in ShopWorks's
+  // Notes On Order tab (Erik 2026-05-20). Caller flattens with one
+  // notesBlocks.push({type, note}) per element.
+  return lines;
 }
 
+// Returns ARRAY of strings; each becomes its own row in ShopWorks's Notes To
+// Production tab (Erik 2026-05-20).
 function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
-  const headerLines = [];
+  const lines = [];
   const block = String(methodNotesBlock || '').trim();
-  if (block) headerLines.push(block);
-  // Garment breakdown: one line per row, listing each size×qty pair using
-  // the stored row.sizes keys (so ladies XXL appears as 'XXL', not '2XL').
-  const rowLines = [];
+  if (block) {
+    // The method block is itself a "·"-separated metadata string like
+    //   "DTG · Left Chest + Full Back · Tier 1-23 (LTM) · 1 line · 17 combined pieces · Ship: Customer Pickup"
+    // Split on " · " so production sees each fact as its own note row.
+    for (const piece of block.split(' · ').map(s => s.trim()).filter(Boolean)) {
+      lines.push(piece);
+    }
+  }
+  // Garment breakdown: one row per (style, color) listing all sizes
   (rows || []).forEach(r => {
     if (!r || !r.style) return;
     const sizes = r.sizes || {};
@@ -1945,16 +1955,9 @@ function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
     if (pairs.length === 0) return;
     const totalQty = pairs.reduce((s, p) => s + Number(p.split('×')[1] || 0), 0);
     const colorPart = r.colorName ? ` ${r.colorName}` : '';
-    rowLines.push(`• ${r.style}${colorPart}: ${pairs.join(', ')} (${totalQty} pcs)`);
+    lines.push(`${r.style}${colorPart}: ${pairs.join(', ')} (${totalQty} pcs)`);
   });
-  const parts = [];
-  if (headerLines.length) parts.push(headerLines.join('\n'));
-  if (rowLines.length) {
-    if (parts.length) parts.push(''); // blank line between header and breakdown
-    parts.push('Garment breakdown:');
-    parts.push(...rowLines);
-  }
-  return parts.join('\n');
+  return lines;
 }
 
 // NOTE: buildShippingNote() was removed (2026-05-01). All shipping data is
@@ -1970,8 +1973,11 @@ function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
 // weighted-average per-row price shown vs. the authoritative per-size
 // price in LinesOE confused purchasing. The LinesOE block carries the
 // true per-size prices; this note is for what to BUY, not what to charge.
+// Returns ARRAY of strings; each becomes its own row in ShopWorks's Notes To
+// Purchasing tab. ONE row per (style, color, size) so sourcing can scan/check
+// off each line as they pull from SanMar (Erik 2026-05-20).
 function buildPurchasingNote({ rows }) {
-  const lines = ['Line Items:'];
+  const lines = [];
   (rows || []).forEach(r => {
     if (!r || !r.style) return;
     const sizes = r.sizes || {};
@@ -1982,7 +1988,7 @@ function buildPurchasingNote({ rows }) {
       lines.push(`${r.style}${colorPart} - ${sz} × ${q}`);
     });
   });
-  return lines.length > 1 ? lines.join('\n') : '';
+  return lines;
 }
 
 function buildArtNote({ info, files }) {
@@ -2636,17 +2642,28 @@ app.post('/api/submit-order-form', async (req, res) => {
     // NOT sent (intentional — already in MO structured fields):
     //   - Shipping (ShippingAddresses[], date_OrderRequestedToShip, date_OrderDropDead)
     //   - Contact info (Contact*, CustomerPurchaseOrder, CustomerServiceRep)
+    // Notes builders now return ARRAYS of strings — push each as a separate
+    // notesBlocks entry so ShopWorks displays them as distinct rows in the
+    // corresponding Notes tab. Erik (2026-05-20): "the notes need to come in
+    // as separate line items in the notes section". One note row per fact
+    // beats one row crammed with multi-line text.
     const notesBlocks = [];
-    const orderNote = buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations });
-    if (orderNote) notesBlocks.push({ type: 'Notes On Order', note: orderNote });
+    const pushArray = (type, arr) => {
+      for (const note of (Array.isArray(arr) ? arr : [arr])) {
+        if (note && String(note).trim()) {
+          notesBlocks.push({ type, note: String(note).trim() });
+        }
+      }
+    };
 
-    const productionNote = buildProductionNote({ rows, breakdown, methodNotesBlock });
-    if (productionNote) notesBlocks.push({ type: 'Notes To Production', note: productionNote });
-
-    const purchasingNote = buildPurchasingNote({ rows });
-    if (purchasingNote) notesBlocks.push({ type: 'Notes To Purchasing', note: purchasingNote });
+    pushArray('Notes On Order',     buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }));
+    pushArray('Notes To Production', buildProductionNote({ rows, breakdown, methodNotesBlock }));
+    pushArray('Notes To Purchasing', buildPurchasingNote({ rows }));
 
     if (info.artNotes || (Array.isArray(files) && files.length)) {
+      // Art note remains a single multi-line entry for now (file links + colors
+      // belong together for the art team's review). Refactor to array if Erik
+      // asks later.
       const artNote = buildArtNote({ info, files });
       if (artNote) notesBlocks.push({ type: 'Notes To Art', note: artNote });
     }
