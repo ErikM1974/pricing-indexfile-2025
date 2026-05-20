@@ -1,3 +1,7 @@
+## v2026.05.20.5 (2026.05.20)
+
+- Deploy v2026.05.20.5: 5 files (LESSONS_LEARNED.md,dtg-quote-builder.html,server.js,...)
+
 ## v2026.05.20.4 (2026.05.20)
 
 - Deploy v2026.05.20.4: stop regenerating combobox menu DOM on hover
