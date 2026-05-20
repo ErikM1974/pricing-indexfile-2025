@@ -2706,35 +2706,50 @@ app.post('/api/submit-order-form', async (req, res) => {
       lineItems,
       designs,
       attachments,
-      // Shipping block: OMIT entirely for Customer Pickup orders (Erik
-      // 2026-05-20). The proxy's manageorders-push-client only adds
-      // ShippingAddresses[] when this key is truthy, AND only links
-      // LinesOE[].ExtShipID when ShippingAddresses is set. For pickup
-      // orders the customer doesn't have a ship-to address — sending the
-      // company's billing city as a "shipping address" (as we did before)
-      // was misleading. Ship method "Customer Pickup" is preserved in
-      // Notes To Production so the warehouse team still sees the flag.
-      ...((ship.method === 'pickup' || ship.method === 'willcall' || ship.method === 'Customer Pickup')
-        ? {}
+      // Shipping block. Two cases (Erik 2026-05-20, refined later same day):
+      //
+      // (1) Customer Pickup: send the block with NWCA Milton as the address,
+      //     ShipAddress01 = "Customer Pickup" as a marker. Earlier we tried
+      //     omitting the block entirely for pickup orders, but that left
+      //     ShopWorks's order header with no Ship Method — production +
+      //     AR reports lost track of these orders. The "Customer Pickup"
+      //     marker in ShipAddress01 makes it unambiguous to anyone reading
+      //     the order that this isn't a real ship-to. The city/state/zip
+      //     are NWCA's actual location so the order has a valid address
+      //     for filtering/reporting.
+      //
+      // (2) Shipping (UPS Ground / Priority Mail / Other): send the real
+      //     ship-to address the rep typed in the ship-to block.
+      shipping: (ship.method === 'pickup' || ship.method === 'willcall' || ship.method === 'Customer Pickup')
+        ? {
+          company: 'Northwest Custom Apparel',
+          firstName: '',
+          lastName: '',
+          address1: 'Customer Pickup',
+          address2: '',
+          city: 'Milton',
+          state: 'WA',
+          zip: '98354',
+          country: 'USA',
+          method: 'Customer Pickup'
+        }
         : {
-          shipping: {
-            company: info.company || '',
-            firstName: info.buyerFirst || '',
-            lastName: info.buyerLast || '',
-            address1: ship.address || info.address || '',
-            address2: '',
-            city: ship.city || info.city || '',
-            state: ship.state || info.state || '',
-            zip: ship.zip || info.zip || '',
-            country: 'USA',
-            // ShipMethod: frontend now sends ShopWorks-canonical names directly
-            // ('UPS Ground' / 'Priority Mail'). Translate legacy codes for
-            // backward-compat; pass through anything else verbatim.
-            method: (ship.method === 'ups' ? 'UPS Ground'
-              : (ship.method === 'other' ? 'Other'
-                : (ship.method || 'UPS Ground')))
-          }
-        }),
+          company: info.company || '',
+          firstName: info.buyerFirst || '',
+          lastName: info.buyerLast || '',
+          address1: ship.address || info.address || '',
+          address2: '',
+          city: ship.city || info.city || '',
+          state: ship.state || info.state || '',
+          zip: ship.zip || info.zip || '',
+          country: 'USA',
+          // ShipMethod: frontend now sends ShopWorks-canonical names directly
+          // ('UPS Ground' / 'Priority Mail'). Translate legacy codes for
+          // backward-compat; pass through anything else verbatim.
+          method: (ship.method === 'ups' ? 'UPS Ground'
+            : (ship.method === 'other' ? 'Other'
+              : (ship.method || 'UPS Ground')))
+        },
       billing: {
         company: info.company || '',
         address1: info.address || '',
