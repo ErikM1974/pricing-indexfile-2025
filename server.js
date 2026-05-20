@@ -1863,7 +1863,7 @@ function getTaxAccount(state, isCustomerPickup) {
 //   2. In-WA shipping (DOR destination lookup)  → APPLY: matched Caspio account
 //   3. Out-of-state shipping                    → DO NOT APPLY
 //   4. No tax info available (defensive)        → FLAG: needs rep review
-function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId }) {
+function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }) {
   // Pickup detection: frontend canonical is 'Customer Pickup' (matches
   // ShopWorks ship-method list exactly). Legacy codes 'pickup' / 'willcall'
   // accepted for backward-compat with pre-v2026.05.20.7 share-link drafts.
@@ -1890,6 +1890,15 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     || (isPickup ? 'Wash:10.1%' : isOutOfState ? 'Out of State Sales' : 'WA Sales Tax');
 
   const lines = [];
+
+  // Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
+  // Prefix block so it's the first line CSR/AR sees when they open Notes On
+  // Order. Frontend sends e.g. "Left Chest", "Full Back", "Left Chest + Full Back".
+  const locsClean = String(printLocations || '').trim();
+  if (locsClean) {
+    lines.push(`Print Locations: ${locsClean}`);
+    lines.push('');
+  }
 
   if (isOutOfState) {
     // BLOCK 3 — Out-of-state shipping: do not apply tax (WAC 458-20-193)
@@ -2204,6 +2213,7 @@ app.post('/api/submit-order-form', async (req, res) => {
       decoConfig = {},         // form-wide method config from the order form
       breakdown = null,        // computed pricing breakdown { byRow: { rowId: {unitPriceBySize, ...} }, subtotal, ... }
       methodNotesBlock = '',   // method-specific context (frontend-built)
+      printLocations = '',     // human-readable print location label (e.g. "Left Chest + Full Back")
       designNumbers = [],      // array of design # strings to look up in ShopWorks
       addOns = []              // Phase 2a fee/service add-ons → push as ShopWorks LinesOE entries
     } = req.body || {};
@@ -2627,7 +2637,7 @@ app.post('/api/submit-order-form', async (req, res) => {
     //   - Shipping (ShippingAddresses[], date_OrderRequestedToShip, date_OrderDropDead)
     //   - Contact info (Contact*, CustomerPurchaseOrder, CustomerServiceRep)
     const notesBlocks = [];
-    const orderNote = buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId });
+    const orderNote = buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations });
     if (orderNote) notesBlocks.push({ type: 'Notes On Order', note: orderNote });
 
     const productionNote = buildProductionNote({ rows, breakdown, methodNotesBlock });
