@@ -2378,7 +2378,16 @@ app.post('/api/submit-order-form', async (req, res) => {
           catalogColor: catalogColor,
           size: sz,
           quantity: qty,
-          price: price
+          price: price,
+          // WorkOrderNotes = print location(s) for this line (Erik 2026-05-20).
+          // Surfaces in ShopWorks's line-level work-order printout so the
+          // production-floor operator sees the print location next to the
+          // garment SKU/size/qty without flipping to Notes To Production.
+          // Frontend sends printLocations as the human-readable label
+          // ("Left Chest", "Full Back", "Left Chest + Full Back"). Empty
+          // string when not set — proxy strips empty workOrderNotes so no
+          // blank field lands in ShopWorks.
+          workOrderNotes: printLocations || ''
         });
       });
     });
