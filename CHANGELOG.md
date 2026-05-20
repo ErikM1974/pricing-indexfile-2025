@@ -1,3 +1,7 @@
+## v2026.05.20.15 (2026.05.20)
+
+- Deploy v2026.05.20.15: pickup ShippingAddresses with Customer Pickup marker
+
 ## v2026.05.20.14 (2026.05.20)
 
 - Deploy v2026.05.20.14: clear stale pill content on hide
