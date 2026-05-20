@@ -469,14 +469,60 @@
         }
     }
 
+    // Search companies with progressive fallback.
+    //
+    // The backend treats the whole query as one literal substring (LIKE
+    // '%full query%'), so "Archterra Landscape Company" returns 0 matches
+    // for "Archterra Landscape Service" because of the last word. To fix
+    // this client-side without a backend redeploy, we retry with shorter
+    // prefixes when the full search returns nothing:
+    //
+    //   "Archterra Landscape Company"  →  0 matches  →  retry...
+    //   "Archterra Landscape"          →  1 match    →  use this
+    //
+    // Results carry a `_searchedFor` field so the dropdown can show a
+    // "did you mean" hint when the rep typed something longer than what
+    // actually matched.
     async function fetchCompanies(q) {
         const key = q.toLowerCase();
         if (_companySearchCache.has(key)) return _companySearchCache.get(key);
-        try {
-            const r = await fetch(`${API_BASE}/api/company-contacts-2026/search?q=${encodeURIComponent(q)}&limit=10`);
+
+        const hitApi = async (query) => {
+            const r = await fetch(`${API_BASE}/api/company-contacts-2026/search?q=${encodeURIComponent(query)}&limit=10`);
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const data = await r.json();
-            const results = Array.isArray(data && data.companies) ? data.companies : [];
+            return Array.isArray(data && data.companies) ? data.companies : [];
+        };
+
+        try {
+            // First attempt: exact query
+            let results = await hitApi(q);
+            let searchedFor = q;
+
+            // Fallback chain: progressively drop trailing tokens until we
+            // find matches OR run out of tokens.
+            if (results.length === 0) {
+                const tokens = q.trim().split(/\s+/).filter(Boolean);
+                for (let n = tokens.length - 1; n >= 1; n--) {
+                    const tryQuery = tokens.slice(0, n).join(' ');
+                    // Don't retry queries that are too short — backend rejects
+                    // very short queries via sanitizeSearchQuery anyway.
+                    if (tryQuery.length < 2) break;
+                    const tryResults = await hitApi(tryQuery);
+                    if (tryResults.length > 0) {
+                        results = tryResults;
+                        searchedFor = tryQuery;
+                        break;
+                    }
+                }
+            }
+
+            // Tag the results so paint() can show a hint if we fell back
+            if (searchedFor !== q && results.length > 0) {
+                results._fallbackFrom = q;
+                results._fallbackTo = searchedFor;
+            }
+
             _companySearchCache.set(key, results);
             return results;
         } catch (err) {
@@ -1878,9 +1924,19 @@
             if (!menu) return;
             if (matches.length === 0) {
                 menu.innerHTML = `<div class="dtg-combobox-empty">${input.value.length >= 2 ? `No matches for "${escapeHtml(input.value)}"` : 'Type 2+ characters'}</div>`;
+                positionPortaledMenu(menu, input);
                 return;
             }
-            menu.innerHTML = matches.slice(0, 10).map((c, i) => {
+            // "Did you mean" hint — appears when the rep typed something
+            // longer than what actually matched (e.g. typed "Archterra
+            // Landscape Company" but only "Archterra Landscape" found hits).
+            const fallbackHint = (matches._fallbackFrom && matches._fallbackTo)
+                ? `<div class="dtg-combobox-hint">
+                       Showing matches for <strong>"${escapeHtml(matches._fallbackTo)}"</strong>
+                       — your search <em>"${escapeHtml(matches._fallbackFrom)}"</em> had no exact hits
+                   </div>`
+                : '';
+            menu.innerHTML = fallbackHint + matches.slice(0, 10).map((c, i) => {
                 const loc = [c.City, c.State].filter(Boolean).join(', ');
                 const contactCount = (c.contacts || []).length;
                 return `
