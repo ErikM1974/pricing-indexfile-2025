@@ -1401,9 +1401,16 @@
                 </div>
             `).join('');
             menu.querySelectorAll('.dtg-combobox-item').forEach((item) => {
+                // Update active class in-place on hover (no DOM regeneration)
+                // so real mouse clicks reliably hit their target. See note in
+                // attachCompanyCombobox.
                 item.addEventListener('mouseenter', () => {
-                    activeIndex = parseInt(item.getAttribute('data-idx'), 10) || 0;
-                    paint();
+                    const newIdx = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                    if (newIdx === activeIndex) return;
+                    activeIndex = newIdx;
+                    menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
+                        it.classList.toggle('active', i === activeIndex);
+                    });
                 });
                 item.addEventListener('mousedown', (e) => {
                     e.preventDefault();
@@ -1530,7 +1537,16 @@
                 `;
             }).join('');
             menu.querySelectorAll('.dtg-combobox-item').forEach((item) => {
-                item.addEventListener('mouseenter', () => { activeIndex = parseInt(item.getAttribute('data-idx'), 10) || 0; paint(); });
+                // Update active class in-place on hover (no DOM regeneration).
+                // See note in attachCompanyCombobox.
+                item.addEventListener('mouseenter', () => {
+                    const newIdx = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                    if (newIdx === activeIndex) return;
+                    activeIndex = newIdx;
+                    menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
+                        it.classList.toggle('active', i === activeIndex);
+                    });
+                });
                 item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
             });
             positionPortaledMenu(menu, input);
@@ -1947,7 +1963,18 @@
                 `;
             }).join('');
             menu.querySelectorAll('.dtg-combobox-item').forEach((item) => {
-                item.addEventListener('mouseenter', () => { activeIndex = parseInt(item.getAttribute('data-idx'), 10) || 0; paint(); });
+                // Hover: update active class IN PLACE, don't re-render the menu.
+                // (Re-rendering on every mouseenter destroys the DOM under the
+                // user's cursor and intermittently kills the click — Erik's
+                // real-mouse-click selection bug, 2026-05-20.)
+                item.addEventListener('mouseenter', () => {
+                    const newIdx = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                    if (newIdx === activeIndex) return;
+                    activeIndex = newIdx;
+                    menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
+                        it.classList.toggle('active', i === activeIndex);
+                    });
+                });
                 item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
             });
             // Re-position after content change — menu height can shrink/grow.
