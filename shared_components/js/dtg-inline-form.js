@@ -2624,7 +2624,11 @@
         if (!pill || !summary || !body) return;
 
         if (!profile || !profile.hasHistory) {
+            // Clear stale content from any prior customer's render so the next
+            // time this pill is shown there's no flash of old data.
             pill.hidden = true;
+            summary.textContent = '';
+            body.innerHTML = '';
             return;
         }
 
