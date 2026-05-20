@@ -134,6 +134,12 @@
             // rate replaces this as soon as recomputeTaxRate() runs.
             taxRate: 0.101,
             taxRateSource: 'default-pre-lookup',
+            // Caspio sales_tax_accounts_2026 row matched to this rate. The DOR
+            // lookup endpoint returns these so we can surface the right GL
+            // account in the ShopWorks Notes On Order block (Erik applies tax
+            // manually post-import — see memory/wa-sales-tax-rules.md).
+            taxAccount: '2200.101',
+            taxAccountName: 'Wash:10.1%',
         },
         submitting: false,
         // C9 dirty-tracking: set to true when the rep touches any form field
@@ -1849,12 +1855,19 @@
         if (block) block.hidden = isPickup;
     }
 
-    // Re-derive state.shipping.taxRate per Erik's 3 rules:
-    //   - pickup            → 10.1% (Milton flat)
-    //   - out of WA state   → 0%
+    // Re-derive state.shipping.taxRate per WA's destination-based sourcing law
+    // (WAC 458-20-145 + 458-20-193). Three rules:
+    //   - pickup            → 10.1% (Milton flat — WAC 458-20-145, seller's location)
+    //   - out of WA state   → 0%    (WAC 458-20-193 — no nexus on out-of-state sales)
     //   - in WA state       → /api/tax-rates/lookup destination city rate
+    //                          (backend hits webgis.dor.wa.gov AddressRates API)
     // Writes status text into #dtgTaxStatus + updates state.shipping.taxRate.
     // Caller is responsible for renderSummary() afterwards.
+    //
+    // Note: shipping CHARGES are taxable in WA (WAC 458-20-110) — currently
+    // not in our tax base because DTG form sends cur_Shipping: 0. If we ever
+    // bill the customer for shipping, the tax base must become
+    // (subtotal + shipping) × rate. Same comment in server.js getTaxAccount().
     async function recomputeTaxRate() {
         const status = document.getElementById('dtgTaxStatus');
         const setStatus = (text, cls) => {
@@ -1867,6 +1880,10 @@
         if (isPickup) {
             state.shipping.taxRate = 0.101;
             state.shipping.taxRateSource = 'pickup-flat';
+            // Milton pickup → Caspio account 2200.101 (Wash:10.1%). Hardcoded
+            // since pickup destination doesn't change.
+            state.shipping.taxAccount = '2200.101';
+            state.shipping.taxAccountName = 'Wash:10.1%';
             setStatus('Pickup at Milton, WA — 10.1% flat', 'success');
             renderSummary();
             return;
@@ -1875,6 +1892,9 @@
         if (shState && shState !== 'WA') {
             state.shipping.taxRate = 0;
             state.shipping.taxRateSource = 'out-of-state';
+            // Out-of-state → Caspio account 2202 (Out of State Sales, 0%).
+            state.shipping.taxAccount = '2202';
+            state.shipping.taxAccountName = 'Out of State Sales';
             setStatus('Out of state — no tax', 'info');
             renderSummary();
             return;
@@ -1910,6 +1930,11 @@
             }
             state.shipping.taxRate = ratePct / 100;
             state.shipping.taxRateSource = j.fallback ? 'dor-fallback' : 'dor-lookup';
+            // The lookup endpoint matched the DOR rate to a Caspio
+            // sales_tax_accounts_2026 row — capture both for the
+            // ShopWorks Notes block.
+            state.shipping.taxAccount = j.account || '2200';
+            state.shipping.taxAccountName = j.accountName || 'WA Sales Tax';
             const loc = state.shipping.city || j.locationCode || 'WA';
             setStatus(
                 j.fallback
@@ -2743,9 +2768,13 @@
                 state: isPickup ? '' : (state.shipping.state || ''),
                 zip: isPickup ? '' : (state.shipping.zip || ''),
                 // Tax rate the rep saw at submit time (for audit trail in
-                // notes — the actual TaxTotal is in breakdown.taxEstimate).
+                // notes — the actual TaxTotal is sent as 0; Erik applies the
+                // tax line manually in ShopWorks per the Notes On Order
+                // block).
                 taxRate: Number.isFinite(taxRate) ? taxRate : 0,
                 taxRateSource: state.shipping.taxRateSource || '',
+                taxAccount: state.shipping.taxAccount || '',
+                taxAccountName: state.shipping.taxAccountName || '',
             },
             orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}${isPickup ? ' · CUSTOMER PICKUP' : ''}`,
             files: [],
@@ -3033,6 +3062,7 @@
             method: 'ups',
             address1: '', address2: '', city: '', state: '', zip: '',
             taxRate: 0.101, taxRateSource: 'default-pre-lookup',
+            taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
         };
         state.dirtyAfterChatFill = false;
         state.lastSubmit = null;
