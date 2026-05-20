@@ -1905,7 +1905,14 @@
             else if (e.key === 'Enter') { if (matches[activeIndex]) { e.preventDefault(); pick(matches[activeIndex]); } }
             else if (e.key === 'Escape') { close(); }
         });
-        document.addEventListener('mousedown', (e) => { if (menu && !wrap.contains(e.target)) close(); });
+        document.addEventListener('mousedown', (e) => {
+            // Menu is portaled to <body>, so wrap.contains() doesn't include it.
+            // Without the !menu.contains() guard, clicking a result row triggers
+            // close() before the row's own mousedown handler fires pick() —
+            // visible symptom: dropdown closes but nothing gets selected.
+            // Matches the existing guard pattern in attachStyleCombobox + attachColorCombobox.
+            if (menu && !wrap.contains(e.target) && !menu.contains(e.target)) close();
+        });
     }
 
     function applyContact(ct) {
