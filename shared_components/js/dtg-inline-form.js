@@ -110,13 +110,30 @@
             lastName: '',
             email: '',
             phone: '',
+            state: '',      // billing state — flows from company_contacts_2026.State
+            city: '',       // billing city  — same source, used as default ship-to city
             designNumber: '',
             terms: 'Prepaid',
             contacts: [],   // populated when a company is picked
             salesRepCode: lastRepCode || 'erik', // A1
         },
         shipping: {
-            method: 'ups', // A2 — UPS Ground default; pickup / willcall / other
+            method: 'ups',  // A2 — UPS Ground default; pickup / willcall / other
+            // Ship-to address (used when method !== 'pickup'). Pre-filled from
+            // the picked contact's company address; overridable for drop-ships.
+            address1: '',
+            address2: '',
+            city: '',
+            state: '',
+            zip: '',
+            // Computed tax — populated by the DOR /api/tax-rates/lookup call
+            // (in-WA shipping) OR hardcoded to 0.101 (pickup) / 0 (out-of-state).
+            // Floats 0..1 (NOT a percentage). Read by recalc + submit. Starts at
+            // 10.1% so the first preview render shows a plausible Tacoma-ish
+            // estimate even before the rep types a ship-to address; the real
+            // rate replaces this as soon as recomputeTaxRate() runs.
+            taxRate: 0.101,
+            taxRateSource: 'default-pre-lookup',
         },
         submitting: false,
         // C9 dirty-tracking: set to true when the rep touches any form field
@@ -685,6 +702,55 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <!-- Customer Pickup toggle (2026-05-20).
+                                 ON  → hides ship-to fields, sets ShipMethod = Customer Pickup,
+                                       tax = 10.1% (Milton, WA flat).
+                                 OFF → shows ship-to fields, tax = destination lookup if WA
+                                       or 0% if out-of-state. -->
+                            <div class="dcp-pickup-toggle">
+                                <label class="dcp-toggle-label">
+                                    <input type="checkbox" id="dtgPickupToggle"${state.shipping.method === 'pickup' ? ' checked' : ''}>
+                                    <span class="dcp-toggle-track"><span class="dcp-toggle-thumb"></span></span>
+                                    <span class="dcp-toggle-text">
+                                        <strong>Customer Pickup</strong>
+                                        <span class="dcp-toggle-sub">Kathy comes to NWCA Milton — no shipping address, tax 10.1% flat</span>
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Ship-to address block (hidden when pickup is ON).
+                                 Pre-fills from contact's company address. Override
+                                 allowed for drop-ships. -->
+                            <div class="dcp-shipto" id="dtgShipToBlock"${state.shipping.method === 'pickup' ? ' hidden' : ''}>
+                                <div class="dcp-shipto-head">
+                                    <i class="fas fa-truck"></i> Ship to
+                                    <span class="dcp-shipto-sub">Destination drives the tax rate</span>
+                                </div>
+                                <div class="dcp-field-wrap">
+                                    <div class="dcp-field-label">Address line 1</div>
+                                    <input type="text" id="dtgShipAddress1" autocomplete="off" value="${escapeHtml(state.shipping.address1 || '')}">
+                                </div>
+                                <div class="dcp-field-wrap">
+                                    <div class="dcp-field-label">Address line 2 <span class="dcp-optional">(optional)</span></div>
+                                    <input type="text" id="dtgShipAddress2" autocomplete="off" value="${escapeHtml(state.shipping.address2 || '')}">
+                                </div>
+                                <div class="dcp-row dcp-row-3">
+                                    <div>
+                                        <div class="dcp-field-label">City</div>
+                                        <input type="text" id="dtgShipCity" autocomplete="off" value="${escapeHtml(state.shipping.city || '')}">
+                                    </div>
+                                    <div>
+                                        <div class="dcp-field-label">State</div>
+                                        <input type="text" id="dtgShipState" autocomplete="off" maxlength="2" placeholder="WA" value="${escapeHtml(state.shipping.state || '')}">
+                                    </div>
+                                    <div>
+                                        <div class="dcp-field-label">ZIP</div>
+                                        <input type="text" id="dtgShipZip" autocomplete="off" maxlength="10" value="${escapeHtml(state.shipping.zip || '')}">
+                                    </div>
+                                </div>
+                                <div class="dcp-tax-status" id="dtgTaxStatus"></div>
+                            </div>
                         </div>
 
                         <!-- Pre-flight readiness panel (2026-05-19). Replaces
@@ -925,14 +991,24 @@
         const subtotal = state.rows.reduce((s, r) => s + (Number(r._lineTotal) || 0), 0);
         const tierDisplay = isLtm ? `${tier} (LTM)` : tier;
 
-        // C7 — tax estimate. WA Tacoma rate fallback 10.1% per MEMORY.md.
-        // For pickup orders, no shipping in the tax base. For UPS Ground we
-        // don't capture a shipping $ amount on the form today, so tax base
-        // is still just subtotal (rep can override in ShopWorks if needed).
-        const TAX_RATE = 0.101;
-        const taxEstimate = Math.round(subtotal * TAX_RATE * 100) / 100;
-        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
+        // Tax estimate per Erik's 3 rules (2026-05-20). The taxRate on
+        // state.shipping is the authoritative source — populated by
+        // recomputeTaxRate() any time the rep toggles pickup OR types a
+        // ship-to address. Pickup = 0.101, out-of-state = 0, in-WA = DOR
+        // destination city rate.
         const isPickup = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
+        const shState = (state.shipping.state || '').toUpperCase();
+        const taxRate = Number(state.shipping.taxRate);
+        const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
+        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
+        const taxPct = (taxRate * 100).toFixed(taxRate * 100 < 10 ? 1 : 2);
+        const taxLabel = isPickup
+            ? `Tax (pickup, Milton WA ${taxPct}%)`
+            : (!shState || shState === 'WA')
+                ? (state.shipping.taxRateSource === 'dor-lookup' || state.shipping.taxRateSource === 'dor-fallback'
+                    ? `Tax (${escapeHtml(state.shipping.city || 'WA destination')} ${taxPct}%)`
+                    : `Tax (WA destination — enter city + ZIP)`)
+                : `Tax (out of state — 0%)`;
 
         el.innerHTML = `
             <div class="dps-label">Live DTG quote · ${effectiveLocationLabel()} · ${escapeHtml(shipLabel(state.shipping.method))}</div>
@@ -943,7 +1019,7 @@
             </div>
             <div class="dps-totals-rows">
                 <div class="dps-totals-row"><span>Subtotal</span><span class="dps-mono">$${fmtMoney(subtotal)}</span></div>
-                <div class="dps-totals-row dps-tax-row"><span>Tax (est, WA 10.1%${isPickup ? ' · pickup' : ''})</span><span class="dps-mono">$${fmtMoney(taxEstimate)}</span></div>
+                <div class="dps-totals-row dps-tax-row"><span>${taxLabel}</span><span class="dps-mono">$${fmtMoney(taxEstimate)}</span></div>
                 <div class="dps-totals-row dps-grand-row"><span>Order total</span><span class="dps-mono">$${fmtMoney(grandTotal)}</span></div>
             </div>
             ${isLtm ? `<div class="dps-note">Bump combined qty above this tier and the $${ltmFee} LTM fee disappears.</div>` : ''}
@@ -1042,12 +1118,36 @@
             items.push({ state: 'ok', label: 'Sales rep', value: repName });
         }
 
-        // 6. Ship method
+        // 6. Ship method + ship-to address
+        const isPickupReady = state.shipping.method === 'pickup' || state.shipping.method === 'willcall';
         if (!state.shipping.method) {
-            items.push({ state: 'block', label: 'Ship method', value: 'Pick a ship method', jumpId: 'dtgShipMethod' });
+            items.push({ state: 'block', label: 'Ship method', value: 'Pick a ship method or toggle Customer Pickup', jumpId: 'dtgPickupToggle' });
+        } else if (isPickupReady) {
+            items.push({ state: 'ok', label: 'Ship method', value: 'Customer Pickup — Milton, WA (tax 10.1%)' });
         } else {
             const shipLabel = (SHIP_METHODS.find((m) => m.code === state.shipping.method) || {}).label || state.shipping.method;
-            items.push({ state: 'ok', label: 'Ship method', value: shipLabel });
+            // For non-pickup, check the ship-to address completeness
+            const haveCity = !!state.shipping.city;
+            const haveStateField = !!state.shipping.state;
+            const haveZip = (state.shipping.zip || '').length >= 5;
+            if (!haveCity || !haveStateField || !haveZip) {
+                items.push({
+                    state: 'warn',
+                    label: 'Ship to',
+                    value: `${shipLabel} — fill city + state + ZIP for accurate tax`,
+                    jumpId: 'dtgShipCity',
+                });
+            } else {
+                const taxPct = ((Number(state.shipping.taxRate) || 0) * 100).toFixed(2);
+                const taxBit = (state.shipping.state || '').toUpperCase() === 'WA'
+                    ? ` · ${taxPct}% tax`
+                    : ' · 0% tax (out of state)';
+                items.push({
+                    state: 'ok',
+                    label: 'Ship to',
+                    value: `${state.shipping.city}, ${state.shipping.state} ${state.shipping.zip}${taxBit}`,
+                });
+            }
         }
 
         // 7. Design # — soft warning when blank; show the matched design's
@@ -1668,11 +1768,159 @@
         const shipSel = document.getElementById('dtgShipMethod');
         if (shipSel) shipSel.addEventListener('change', () => {
             state.shipping.method = shipSel.value;
+            // Keep the pickup toggle in sync with the dropdown (a rep picking
+            // "Customer Pickup" from the legacy dropdown should also flip the
+            // toggle so the ship-to block hides + tax recomputes).
+            syncPickupToggleFromShipMethod();
+            recomputeTaxRate();
             markDirty();
             scheduleStateSave();
             updateSubmitEnabled();
-            renderSummary(); // tax recompute (C7)
+            renderSummary();
         });
+
+        // Customer Pickup toggle (2026-05-20). When ON we override ship.method
+        // to 'pickup' (canonical, accepted by the OF push endpoint at server.js
+        // line ~1838 + ~2627) and hide the ship-to block. When OFF we restore
+        // the previous non-pickup method (default 'ups') and show the block.
+        const pickupTgl = document.getElementById('dtgPickupToggle');
+        if (pickupTgl) pickupTgl.addEventListener('change', () => {
+            if (pickupTgl.checked) {
+                // Remember the prior method so toggling OFF can restore it.
+                if (state.shipping.method !== 'pickup' && state.shipping.method !== 'willcall') {
+                    state.shipping._prePickupMethod = state.shipping.method;
+                }
+                state.shipping.method = 'pickup';
+            } else {
+                state.shipping.method = state.shipping._prePickupMethod || 'ups';
+                delete state.shipping._prePickupMethod;
+            }
+            // Sync the dropdown + show/hide ship-to block.
+            const sel = document.getElementById('dtgShipMethod');
+            if (sel) sel.value = state.shipping.method;
+            const block = document.getElementById('dtgShipToBlock');
+            if (block) block.hidden = (state.shipping.method === 'pickup');
+            recomputeTaxRate();
+            markDirty();
+            scheduleStateSave();
+            updateSubmitEnabled();
+            renderSummary();
+        });
+
+        // Ship-to address fields. Each bound to state.shipping with a debounced
+        // tax-rate lookup so the rep sees "Seattle — 10.25%" appear as soon as
+        // they finish typing city + state + ZIP.
+        const SHIP_FIELDS = [
+            ['dtgShipAddress1', 'address1'],
+            ['dtgShipAddress2', 'address2'],
+            ['dtgShipCity',     'city'],
+            ['dtgShipState',    'state'],
+            ['dtgShipZip',      'zip'],
+        ];
+        let taxLookupTimer = null;
+        SHIP_FIELDS.forEach(([elId, key]) => {
+            const el = document.getElementById(elId);
+            if (!el) return;
+            el.addEventListener('input', () => {
+                state.shipping[key] = el.value.trim();
+                if (key === 'state') {
+                    // Normalize to uppercase 2-letter code on the fly.
+                    state.shipping.state = state.shipping.state.toUpperCase().slice(0, 2);
+                    el.value = state.shipping.state;
+                }
+                markDirty();
+                scheduleStateSave();
+                // Debounced tax lookup — fires 600ms after the rep stops
+                // typing. Only when city + state + ZIP are all present.
+                clearTimeout(taxLookupTimer);
+                taxLookupTimer = setTimeout(recomputeTaxRate, 600);
+            });
+        });
+    }
+
+    // Sync the pickup toggle UI to whatever state.shipping.method currently is.
+    // Called from the ship-method dropdown handler so legacy "Customer Pickup"
+    // picks also flip the toggle.
+    function syncPickupToggleFromShipMethod() {
+        const tgl = document.getElementById('dtgPickupToggle');
+        const block = document.getElementById('dtgShipToBlock');
+        const isPickup = (state.shipping.method === 'pickup' || state.shipping.method === 'willcall');
+        if (tgl) tgl.checked = isPickup;
+        if (block) block.hidden = isPickup;
+    }
+
+    // Re-derive state.shipping.taxRate per Erik's 3 rules:
+    //   - pickup            → 10.1% (Milton flat)
+    //   - out of WA state   → 0%
+    //   - in WA state       → /api/tax-rates/lookup destination city rate
+    // Writes status text into #dtgTaxStatus + updates state.shipping.taxRate.
+    // Caller is responsible for renderSummary() afterwards.
+    async function recomputeTaxRate() {
+        const status = document.getElementById('dtgTaxStatus');
+        const setStatus = (text, cls) => {
+            if (!status) return;
+            status.textContent = text;
+            status.className = 'dcp-tax-status' + (cls ? ' dcp-tax-status--' + cls : '');
+        };
+
+        const isPickup = (state.shipping.method === 'pickup' || state.shipping.method === 'willcall');
+        if (isPickup) {
+            state.shipping.taxRate = 0.101;
+            state.shipping.taxRateSource = 'pickup-flat';
+            setStatus('Pickup at Milton, WA — 10.1% flat', 'success');
+            renderSummary();
+            return;
+        }
+        const shState = (state.shipping.state || '').toUpperCase();
+        if (shState && shState !== 'WA') {
+            state.shipping.taxRate = 0;
+            state.shipping.taxRateSource = 'out-of-state';
+            setStatus('Out of state — no tax', 'info');
+            renderSummary();
+            return;
+        }
+        if (!shState || !state.shipping.city || !state.shipping.zip || state.shipping.zip.length < 5) {
+            // Not enough info yet; keep last known rate but show prompt.
+            setStatus('Enter ship-to city + WA + ZIP to look up tax rate', 'info');
+            return;
+        }
+        // In-WA shipping → DOR lookup.
+        try {
+            setStatus('Looking up destination tax rate…', 'loading');
+            const r = await fetch(`${API_BASE}/api/tax-rates/lookup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    address: state.shipping.address1 || '',
+                    city: state.shipping.city,
+                    state: shState,
+                    zip: state.shipping.zip,
+                }),
+            });
+            const j = await r.json();
+            if (!r.ok || !j.success) {
+                setStatus(j.error || `Lookup failed (HTTP ${r.status})`, 'error');
+                return;
+            }
+            // API returns taxRate as a percentage (e.g. 10.25). Convert to float.
+            const ratePct = Number(j.taxRate);
+            if (!Number.isFinite(ratePct)) {
+                setStatus('Lookup returned no rate', 'error');
+                return;
+            }
+            state.shipping.taxRate = ratePct / 100;
+            state.shipping.taxRateSource = j.fallback ? 'dor-fallback' : 'dor-lookup';
+            const loc = state.shipping.city || j.locationCode || 'WA';
+            setStatus(
+                j.fallback
+                    ? `Default rate ${ratePct.toFixed(2)}% (DOR unavailable)`
+                    : `${loc} — ${ratePct.toFixed(2)}%`,
+                j.fallback ? 'warning' : 'success'
+            );
+            renderSummary();
+        } catch (err) {
+            setStatus('Lookup failed — keeping last known rate', 'error');
+        }
     }
     function bindInputToState(elId, stateKey) {
         const el = document.getElementById(elId);
@@ -1991,12 +2239,36 @@
             state.customer.company = c.Company_Name || '';
             state.customer.companyId = c.id_Customer != null ? String(c.id_Customer) : '';
             state.customer.contacts = c.contacts || [];
+            // Capture company-level address fields BEFORE applyContact runs —
+            // the per-contact records from the search endpoint don't carry
+            // address data, only the company bucket does. These drive both
+            // billing state (info.state on push) AND the ship-to pre-fill.
+            const newBillingState = (c.State || '').toString().toUpperCase().slice(0, 2);
+            const billingStateChanged = newBillingState !== state.customer.state;
+            state.customer.state = newBillingState;
+            state.customer.city = (c.City || '').toString();
+            // Pre-fill ship-to from company address ONLY if rep hasn't started
+            // typing one in (don't clobber an in-progress drop-ship address).
+            if (!state.shipping.address1) {
+                state.shipping.address1 = (c.Address || '').toString();
+                state.shipping.city = (c.City || '').toString();
+                state.shipping.state = newBillingState;
+                state.shipping.zip = (c.Zip || '').toString();
+                const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+                setVal('dtgShipAddress1', state.shipping.address1);
+                setVal('dtgShipCity', state.shipping.city);
+                setVal('dtgShipState', state.shipping.state);
+                setVal('dtgShipZip', state.shipping.zip);
+            }
             input.value = c.Company_Name || '';
             // Auto-pick first emailable contact (rep can switch via the picker)
             const firstContact = (c.contacts || []).find((ct) => ct.Email || ct.ContactNumbersEmail);
             if (firstContact) {
                 applyContact(firstContact);
             }
+            // Re-derive tax (out-of-state customer → 0% even before rep
+            // touches ship-to fields).
+            if (billingStateChanged) recomputeTaxRate();
             // Populate the contact dropdown so the rep can switch to a different
             // contact at this company (e.g. Aaberg's has Craig Edward / Accounting /
             // Alexx Bacon; auto-pick lands on Craig, but rep can switch to Alexx).
@@ -2040,6 +2312,10 @@
         state.customer.email = ct.Email || ct.ContactNumbersEmail || '';
         state.customer.phone = ct.Phone || ct.Company_Phone || '';
         state.customer.contactId = ct.ID_Contact != null ? String(ct.ID_Contact) : '';
+        // NOTE: Company-level address (state, city, ship-to pre-fill) is
+        // captured in pick() at company-pick time. The per-contact records
+        // returned by /api/company-contacts-2026/search don't carry address
+        // fields, so applyContact only handles per-contact data.
         const fn = document.getElementById('dtgFirstName'); if (fn) fn.value = state.customer.firstName;
         const ln = document.getElementById('dtgLastName'); if (ln) ln.value = state.customer.lastName;
         const em = document.getElementById('dtgEmail'); if (em) em.value = state.customer.email;
@@ -2419,11 +2695,15 @@
             };
         });
 
-        // C7 — tax estimate. Use what the canonical endpoint returned if
-        // available; otherwise fallback to subtotal × 10.1% (WA Tacoma rate
-        // per MEMORY.md). For pickup orders, shipping = 0 so tax = subtotal × rate.
-        const taxEstimate = Number(totals.taxEstimate) || Math.round(subtotal * 0.101 * 100) / 100;
-        const grandTotal = Number(totals.grandTotal) || Math.round((subtotal + taxEstimate) * 100) / 100;
+        // Tax — derive from state.shipping.taxRate (set by recomputeTaxRate()).
+        // Pickup = 0.101, out-of-state = 0, in-WA = DOR destination city rate.
+        // This MUST match the rate the rep saw in the live preview at submit time.
+        const shStateUC = (state.shipping.state || '').toUpperCase();
+        const taxRate = Number(state.shipping.taxRate);
+        const taxEstimate = (!isPickup && shStateUC && shStateUC !== 'WA')
+            ? 0
+            : Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
+        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
 
         const body = {
             info: {
@@ -2436,6 +2716,12 @@
                 companyName: state.customer.company || '',
                 companyId: state.customer.companyId || '',
                 phone: state.customer.phone || '',
+                // Billing state — flows from the picked contact's
+                // company_contacts_2026.State so the OF push endpoint can
+                // branch tax logic on it (out-of-state customers get 0 tax
+                // even if a ship-to wasn't filled in).
+                state: state.customer.state || '',
+                city: state.customer.city || '',
                 designNumber: state.customer.designNumber || null, // A3 — nullable
                 salesRep: rep.name,
                 salesRepEmail: rep.email,
@@ -2446,10 +2732,20 @@
             },
             rows,
             ship: {
-                method: state.shipping.method, // A2 — real value (ups / pickup / willcall / other)
+                method: state.shipping.method, // canonical: ups / pickup / willcall / other
                 methodLabel: shipMethodLabel,
-                sameAsBilling: true,
+                sameAsBilling: !!isPickup, // pickup uses billing as the "ship-to"
                 isPickup,
+                // Ship-to address (only populated when method !== 'pickup').
+                address: isPickup ? '' : (state.shipping.address1 || ''),
+                address2: isPickup ? '' : (state.shipping.address2 || ''),
+                city: isPickup ? '' : (state.shipping.city || ''),
+                state: isPickup ? '' : (state.shipping.state || ''),
+                zip: isPickup ? '' : (state.shipping.zip || ''),
+                // Tax rate the rep saw at submit time (for audit trail in
+                // notes — the actual TaxTotal is in breakdown.taxEstimate).
+                taxRate: Number.isFinite(taxRate) ? taxRate : 0,
+                taxRateSource: state.shipping.taxRateSource || '',
             },
             orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}${isPickup ? ' · CUSTOMER PICKUP' : ''}`,
             files: [],
@@ -2729,10 +3025,15 @@
         state.customer = {
             company: '', companyId: '', contactId: '',
             firstName: '', lastName: '', email: '', phone: '',
+            state: '', city: '',
             designNumber: '', terms: 'Prepaid', contacts: [],
             salesRepCode: preservedRepCode,
         };
-        state.shipping = { method: 'ups' };
+        state.shipping = {
+            method: 'ups',
+            address1: '', address2: '', city: '', state: '', zip: '',
+            taxRate: 0.101, taxRateSource: 'default-pre-lookup',
+        };
         state.dirtyAfterChatFill = false;
         state.lastSubmit = null;
         const statusEl = document.getElementById('dtgSubmitStatus');

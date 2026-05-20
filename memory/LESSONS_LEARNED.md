@@ -6,6 +6,26 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+## Order Processing & ShopWorks
+
+### OF push hardcoded `TaxTotal: 0` + wrong `isPickup` check + missing DTG in id_Design whitelist (2026-05-20)
+**Problem:** Erik submitted OF-0040 (Edgemont Jr. High) and ShopWorks received `TaxTotal: 0` even though the live form preview showed correct tax. Customer was under-billed $19.08. Three separate bugs piled up: (1) `server.js:1838 const isPickup = ship && ship.method === 'willcall'` — frontend sends `'pickup'`, not `'willcall'`, so pickup-tax branch never fired; (2) the OF payload hardcoded `taxTotal: 0` instead of pushing the form's computed amount; (3) the id_Design push at `server.js:~2537` whitelisted `embroidery / screenprint / dtf` but NOT `dtg` — so every DTG order created an orphan placeholder design in ShopWorks even when the rep picked an existing design # from the customer-aware picker.
+**Root Cause:** Three separate copy-paste-era artifacts compounded. The `'willcall'` hardcode dates from before the form added `'pickup'` as the canonical pickup code (the dropdown shows both — `willcall` for back-compat). The `taxTotal: 0` was a "let OnSite calculate" assumption that turned out to be wrong (ShopWorks does NOT auto-calc tax — it just shows whatever's pushed). The DTG omission from the design whitelist happened because DTG didn't have a customer-aware design picker until v14, so prior reps couldn't pick a design # for DTG, so the bug was invisible.
+**Solution:** (a) Accept both `'pickup'` AND `'willcall'` in every isPickup check (server.js + frontend). (b) Compute tax in the frontend via `state.shipping.taxRate` (set by `recomputeTaxRate()` which calls `/api/tax-rates/lookup` for in-WA destinations OR hardcodes `0.101` for pickup OR `0` for out-of-state). Push `taxTotal` + `taxPartNumber` + `taxPartDescription` in the submit payload — server.js re-derives isPickup as defense-in-depth and zeros out tax for out-of-state-shipping regardless of what frontend sent. (c) Add `'dtg'` to the design-link whitelist in `server.js`'s `linkedIdDesigns` block.
+**Prevention:** When a field accepts multiple coded values (pickup/willcall), every check site needs to accept ALL of them — make it a helper function (`isPickupShip(ship)`) not an inline comparison. Any "let downstream calculate X" assumption needs an end-to-end test on the actual downstream — ShopWorks tax in our case. When adding a new method (DTG had no design picker until v14), audit every existing method-specific code path (`if (method === 'embroidery' || ...)`) and add the new method explicitly.
+
+---
+
+## UI Patterns
+
+### Don't regenerate combobox menu DOM on hover (2026-05-20)
+**Problem:** Customer search dropdown — Erik hovered a row, then mouse-clicked, but the click never selected. Keyboard ArrowDown+Enter worked fine. Took 4 deploys to find the real root cause.
+**Root Cause:** On `mouseenter`, the handler called `paint()` which set `menu.innerHTML = ...` — destroying every DOM node and recreating them with the active class on the hovered one. Real mouse motion between mousedown and click had enough latency for the destroy-and-recreate to lose the click target intermittently. Synthetic `dispatchEvent(new MouseEvent('mousedown'))` smoke tests gave false positives because they're synchronous (no DOM churn between event dispatch and listener execution).
+**Solution:** On hover, toggle the `.active` class via `classList.toggle()` on existing items — don't regenerate the HTML. Same fix applied to all 3 free-typing comboboxes in `shared_components/js/dtg-inline-form.js` (style, color, customer) that had the pattern.
+**Prevention:** Never regenerate DOM nodes during user interactions (hover, mid-click). Update CSS classes / text content in-place. Smoke tests for interactive selection should use the full `mousedown + mouseup + click` sequence with proper `button: 0, buttons: 1` props — bare `dispatchEvent('mousedown')` is a false-positive trap.
+
+---
+
 ## Pricing
 
 ### DTG LTM fee/threshold lived in 4 different files (2026-05-18)

@@ -1814,12 +1814,20 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 // Pattern adopted from Python Inksoft/web/transform.py:build_notes_array().
 // ============================================================================
 
-// NWCA's tax account lookup. The order form ships at one rate (10.1% Milton, WA);
-// out-of-state and pickup orders go to their own GL accounts per AR's setup.
+// NWCA's tax account lookup. Per Erik's rules (2026-05-20):
+//   - Pickup at NWCA Milton, WA      → 10.1% flat (Milton rate)
+//   - Shipping out of WA state        → 0.0% (no nexus)
+//   - Shipping IN WA state            → destination city rate (DOR lookup)
+// The frontend looks up the in-state destination rate via /api/tax-rates/lookup
+// and passes the computed taxTotal in the submit payload. The backend re-derives
+// the GL account here so AR's books stay clean even if the frontend is wrong.
 function getTaxAccount(state, isCustomerPickup) {
-  if (isCustomerPickup) return { code: '2200',     label: 'Customer Pickup — Milton, WA 10.1%' };
-  if (state && state.toUpperCase() !== 'WA') return { code: '2202', label: 'Out of State Sales' };
-  return { code: '2200.101', label: 'WA Sales Tax 10.1%' };
+  if (isCustomerPickup) return { code: '2200.101', label: 'Customer Pickup — Milton, WA 10.1%', rate: 0.101 };
+  if (state && state.toUpperCase() !== 'WA') return { code: '2202', label: 'Out of State Sales — No Tax', rate: 0 };
+  // In-WA shipping: rate is destination-specific (city of ship-to). The
+  // frontend's DOR lookup returns the authoritative rate; we report the GL
+  // account here and trust the rate it computed.
+  return { code: '2200.101', label: 'WA Sales Tax — Destination City', rate: null };
 }
 
 function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId }) {
@@ -1835,12 +1843,20 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   //   - Order Notes (free-form rep input)
   //   - Tax Account / Expected Tax (AR can't get this from MO directly)
   const submittedAt = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-  const isPickup = ship && ship.method === 'willcall';
+  // Pickup detection: frontend sends 'pickup' (canonical) but historic share-
+  // link drafts may still carry 'willcall'. Accept both.
+  const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
   const taxState = (ship && ship.state) || (info && info.state) || '';
   const taxAccount = getTaxAccount(taxState, isPickup);
-  const expectedTax = breakdown?.supported && Number(breakdown.subtotal) > 0
-    ? `\nExpected Tax: $${(Number(breakdown.subtotal) * 0.101).toFixed(2)}`
-    : '';
+  // Expected tax line — prefer the frontend's computed amount (already
+  // includes the destination-city rate or pickup flat 10.1%); fall back to
+  // subtotal × 10.1% only if the frontend didn't pass one through.
+  const computedTax = Number(breakdown?.taxEstimate);
+  const expectedTax = Number.isFinite(computedTax) && computedTax > 0
+    ? `\nExpected Tax: $${computedTax.toFixed(2)}`
+    : (breakdown?.supported && Number(breakdown.subtotal) > 0 && (isPickup || (taxState && taxState.toUpperCase() === 'WA'))
+        ? `\nExpected Tax: $${(Number(breakdown.subtotal) * 0.101).toFixed(2)}`
+        : '');
   const lines = [
     `ONLINE ORDER FORM`,
     `Order: ${extOrderId || 'pending'}  ·  Submitted: ${submittedAt}`,
@@ -1857,7 +1873,9 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   }
   lines.push(`Order Notes: ${orderNotes || 'None'}`);
   lines.push('');
-  lines.push(`──────────────────────`);
+  // ASCII divider — Unicode em-dash renders as '????' in OnSite's legacy
+  // notes display.
+  lines.push(`----------------------`);
   if (isPickup) {
     lines.push(`Tax Account: ${taxAccount.code} (${taxAccount.label})${expectedTax}`);
   } else if (taxState && taxState.toUpperCase() === 'WA') {
@@ -1905,9 +1923,11 @@ function buildProductionNote({ rows, breakdown, methodNotesBlock }) {
 // Duplicating in a note created exactly the redundancy Erik flagged.
 
 // Notes To Purchasing — line-by-line list for the sourcing team to pull
-// from SanMar. One line per (style, color, size) at the qty + price the
-// rep priced. Mirrors Python Inksoft's pattern (transform.py:840-855)
-// so production teams have the same shape across both order paths.
+// from SanMar. One line per (style, color, size) at the qty the rep
+// priced. Prices are intentionally OMITTED here (Erik 2026-05-20) — the
+// weighted-average per-row price shown vs. the authoritative per-size
+// price in LinesOE confused purchasing. The LinesOE block carries the
+// true per-size prices; this note is for what to BUY, not what to charge.
 function buildPurchasingNote({ rows }) {
   const lines = ['Line Items:'];
   (rows || []).forEach(r => {
@@ -1917,8 +1937,7 @@ function buildPurchasingNote({ rows }) {
       const q = Number(sizes[sz]) || 0;
       if (!q) return;
       const colorPart = r.colorName ? ` - ${r.colorName}` : '';
-      const pricePart = r.price ? ` @ $${Number(r.price).toFixed(2)}` : '';
-      lines.push(`${r.style}${colorPart} - ${sz} × ${q}${pricePart}`);
+      lines.push(`${r.style}${colorPart} - ${sz} × ${q}`);
     });
   });
   return lines.length > 1 ? lines.join('\n') : '';
@@ -2534,7 +2553,11 @@ app.post('/api/submit-order-form', async (req, res) => {
       // is currently a no-op until multi-design# support lands. Without this
       // singular alias, even a successful design# lookup silently dropped to
       // id_Design:0 in the ShopWorks payload (orphan).
-      if (linkedIdDesigns.length && (method === 'embroidery' || method === 'screenprint' || method === 'dtf')) {
+      // DTG added 2026-05-20 — the new DTG Quote Builder has a customer-aware
+      // Design # picker that hands back the existing ShopWorks id_Design.
+      // Without DTG in this whitelist, the picked design was silently dropped
+      // and ShopWorks created an orphan placeholder design on every DTG push.
+      if (linkedIdDesigns.length && (method === 'embroidery' || method === 'screenprint' || method === 'dtf' || method === 'dtg')) {
         base.linkedDesigns = linkedIdDesigns.map(id => ({ id_Design: id }));
         if (linkedIdDesigns.length === 1) base.idDesign = linkedIdDesigns[0];
       }
@@ -2624,7 +2647,7 @@ app.post('/api/submit-order-form', async (req, res) => {
         state: ship.state || info.state || '',
         zip: ship.zip || info.zip || '',
         country: 'USA',
-        method: ship.method === 'willcall' ? 'Customer Pickup' : (ship.method === 'other' ? 'Other' : 'UPS Ground')
+        method: (ship.method === 'pickup' || ship.method === 'willcall') ? 'Customer Pickup' : (ship.method === 'other' ? 'Other' : 'UPS Ground')
       },
       billing: {
         company: info.company || '',
@@ -2637,8 +2660,45 @@ app.post('/api/submit-order-form', async (req, res) => {
       },
       notes: notesBlocks,
       rushOrder: false,
-      // Tax: let OnSite calculate per-location rate. Flags (sts_EnableTax01-04=1) are set by the proxy.
-      taxTotal: 0,
+      // Tax: push the frontend's authoritative tax amount.
+      //
+      // Erik's rules (2026-05-20):
+      //   - Pickup at NWCA Milton, WA → 10.1% flat
+      //   - Shipping out of WA state   → 0% (no nexus)
+      //   - Shipping in WA state       → destination city rate (DOR lookup)
+      //
+      // The frontend computes the right number using /api/tax-rates/lookup and
+      // passes it via breakdown.taxEstimate. We re-derive isPickup and the GL
+      // account here so AR's books match the rules above even if the frontend
+      // sent something stale. The tax LINE on ShopWorks is auto-created from
+      // (TaxTotal + TaxPartNumber + TaxPartDescription).
+      //
+      // taxTotal > 0 ONLY when:
+      //   - the frontend computed > 0 (sanity check), AND
+      //   - the order isn't out-of-state shipping (rule 2)
+      // Everything else falls through to 0 (ShopWorks just doesn't add a tax line).
+      taxTotal: (() => {
+        const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
+        const shipState = (ship && ship.state) || (info && info.state) || '';
+        // Out-of-state ship → no tax, regardless of what frontend sent
+        if (!isPickup && shipState && shipState.toUpperCase() !== 'WA') return 0;
+        const frontendTax = Number(breakdown?.taxEstimate);
+        if (Number.isFinite(frontendTax) && frontendTax > 0) {
+          return Math.round(frontendTax * 100) / 100;
+        }
+        return 0;
+      })(),
+      taxPartNumber: 'TAX',
+      taxPartDescription: (() => {
+        const isPickup = ship && (ship.method === 'pickup' || ship.method === 'willcall');
+        const shipState = (ship && ship.state) || (info && info.state) || '';
+        if (isPickup) return 'WA Sales Tax (Pickup — Milton 10.1%)';
+        if (shipState && shipState.toUpperCase() === 'WA') {
+          const city = (ship && ship.city) || (info && info.city) || '';
+          return city ? `WA Sales Tax (${city})` : 'WA Sales Tax (Destination)';
+        }
+        return ''; // not used when taxTotal=0
+      })(),
       cur_Shipping: 0,
       totals: {
         subtotal: 0, rushFee: 0, salesTax: 0, shipping: 0, grandTotal: 0

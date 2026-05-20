@@ -1682,3 +1682,129 @@
     border-color: #6b7280;
     color: #1f3a1f;
 }
+
+/* ============================================================================
+   Customer Pickup toggle + Ship-to block (2026-05-20)
+   ============================================================================
+   Toggle lives at the bottom of the customer panel. ON state highlights the
+   row + sets the toggle thumb to NWCA green. OFF state shows the ship-to
+   address block below it.
+*/
+
+.dcp-pickup-toggle {
+    margin: 12px 0 4px;
+    padding: 10px 12px;
+    background: #f6f1e6;
+    border: 1px solid #d6cdb8;
+    border-radius: 8px;
+}
+.dcp-pickup-toggle:has(input:checked) {
+    background: #ecf6e7;
+    border-color: #98c98a;
+}
+.dcp-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+.dcp-toggle-label input[type="checkbox"] {
+    /* Visually hidden but keeps semantics + keyboard focus */
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0; height: 0;
+}
+.dcp-toggle-track {
+    flex: 0 0 auto;
+    width: 38px;
+    height: 22px;
+    background: #c8b08a;
+    border-radius: 999px;
+    position: relative;
+    transition: background 120ms ease;
+}
+.dcp-toggle-label input:checked + .dcp-toggle-track {
+    background: #2e5827;
+}
+.dcp-toggle-label input:focus-visible + .dcp-toggle-track {
+    outline: 2px solid #2e5827;
+    outline-offset: 2px;
+}
+.dcp-toggle-thumb {
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 18px; height: 18px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: transform 120ms ease;
+}
+.dcp-toggle-label input:checked + .dcp-toggle-track .dcp-toggle-thumb {
+    transform: translateX(16px);
+}
+.dcp-toggle-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+.dcp-toggle-text strong {
+    font-size: 14px;
+    color: #1f3a1f;
+    font-weight: 600;
+}
+.dcp-toggle-sub {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* --- Ship-to block (visible when pickup is OFF) --- */
+.dcp-shipto {
+    margin-top: 8px;
+    padding: 10px 12px;
+    background: #ffffff;
+    border: 1px solid #e7dfca;
+    border-radius: 8px;
+}
+.dcp-shipto[hidden] { display: none !important; }
+.dcp-shipto-head {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1f3a1f;
+}
+.dcp-shipto-head .fas { color: #2e5827; }
+.dcp-shipto-sub {
+    font-size: 11px;
+    font-weight: 400;
+    color: #6b7280;
+    margin-left: auto;
+}
+
+/* 3-column row: City | State | ZIP */
+.dcp-row.dcp-row-3 {
+    display: grid;
+    grid-template-columns: 2fr 0.7fr 1fr;
+    gap: 8px;
+}
+
+/* Tax-status pill under the ship-to address */
+.dcp-tax-status {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    color: #64748b;
+    min-height: 1.4em;
+}
+.dcp-tax-status--success { color: #16a34a; font-weight: 500; }
+.dcp-tax-status--info    { color: #64748b; }
+.dcp-tax-status--warning { color: #d97706; }
+.dcp-tax-status--error   { color: #dc2626; }
+.dcp-tax-status--loading { color: #6b7280; font-style: italic; }
+.dcp-tax-status--loading::before {
+    content: "⏳ ";
+}
