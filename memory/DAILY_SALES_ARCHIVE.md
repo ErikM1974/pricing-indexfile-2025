@@ -23,7 +23,9 @@ Three separate archive systems exist for different purposes:
 
 ### Purpose
 
-Track Year-to-Date (YTD) sales for the $3M sales goal banner on the Staff Dashboard. Overcomes ManageOrders' 60-day data retention limit by archiving daily sales to Caspio.
+Track Year-to-Date (YTD) sales for the $3M sales goal banner on the Staff Dashboard.
+
+> **⚠ Historical note (corrected 2026-05-20):** This system was originally built around the belief that ManageOrders only retained 60 days of data. **That was WRONG.** We empirically verified MO retention is **at least 15.6 months (469 days)** and probably 2 years — pulled orders placed 02/05/2025 successfully via `/order-pull` on 05/20/2026. See `caspio-pricing-proxy/scripts/test-mo-retention.js`. The archive system is still valuable for: (a) sub-second dashboard performance vs. 2-year MO queries, (b) reliability if MO goes offline, (c) data permanence. References to "60 days" throughout this doc are a NWCA-chosen rolling-window design constraint, NOT an MO API limit.
 
 ## Architecture
 
