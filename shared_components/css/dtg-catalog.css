@@ -96,23 +96,6 @@
     border-radius: 10px;
     box-shadow: var(--pnw-shadow-sm);
     position: relative;
-    overflow: hidden;
-}
-.page-titlebar::after {
-    /* Subtle pine-needle accent — three tiny vertical strokes at the top-right
-       that hint at a forest treeline. Pure CSS, no extra DOM. */
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 100%;
-    background:
-        linear-gradient(180deg, var(--pnw-forest-deep) 0%, transparent 100%) 8px 0/2px 100% no-repeat,
-        linear-gradient(180deg, var(--pnw-forest) 0%, transparent 100%) 20px 0/2px 100% no-repeat,
-        linear-gradient(180deg, var(--pnw-moss) 0%, transparent 100%) 32px 0/2px 100% no-repeat;
-    opacity: 0.45;
-    pointer-events: none;
 }
 .page-titlebar-title {
     margin: 0;
