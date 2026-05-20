@@ -1,3 +1,7 @@
+## v2026.05.20.17 (2026.05.20)
+
+- Deploy v2026.05.20.17: remove awkward pine-needle stripes from titlebar
+
 ## v2026.05.20.16 (2026.05.20)
 
 - Deploy v2026.05.20.16: PNW theme + CSS tokens (4 files)
