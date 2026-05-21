@@ -157,6 +157,57 @@ function isValidIdentifier(input) {
   return /^[a-zA-Z0-9\-_.\s]+$/.test(input);
 }
 
+/**
+ * Parse a Caspio timestamp as Pacific wall-clock time.
+ *
+ * Caspio's REST API returns timestamps WITHOUT a timezone marker. They're
+ * naive Pacific (America/Los_Angeles) wall-clock strings. Default JS
+ * `Date.parse()` on a UTC server (Heroku) interprets them as UTC, shifting
+ * by 7–8 hours depending on DST. That breaks every date-math comparison
+ * (purge retention, sync staleness, etc.).
+ *
+ * This is the SERVER-SIDE twin of shared_components/js/caspio-date-utils.js
+ * (which exposes window.CaspioDate.parse for the browser).
+ *
+ * @returns {number} milliseconds since epoch, or NaN on bad input.
+ */
+function parseCaspioPacificMs(s) {
+  if (!s) return NaN;
+  if (s instanceof Date) return s.getTime();
+  if (typeof s !== 'string') {
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? NaN : d.getTime();
+  }
+  const trimmed = s.trim();
+  if (!trimmed) return NaN;
+  // Already has explicit timezone (Z or ±HH:MM) — parse as-is.
+  if (/(Z|[+-]\d{2}:?\d{2})$/.test(trimmed)) {
+    const t = Date.parse(trimmed);
+    return Number.isFinite(t) ? t : NaN;
+  }
+  // Naive Caspio = Pacific wall-clock. Resolve via Intl.DateTimeFormat,
+  // which knows the DST rules for America/Los_Angeles at any instant.
+  const probe = Date.parse(trimmed + 'Z');
+  if (!Number.isFinite(probe)) return NaN;
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      timeZoneName: 'longOffset',
+    }).formatToParts(new Date(probe));
+    const tz = parts.find(p => p.type === 'timeZoneName');
+    const m = tz && tz.value.match(/GMT([+-])(\d{1,2})(?::(\d{2}))?/);
+    if (!m) return probe;
+    const sign = m[1];
+    const hh = m[2].length === 1 ? '0' + m[2] : m[2];
+    const mm = (m[3] || '00');
+    const resolved = Date.parse(trimmed + sign + hh + ':' + mm);
+    return Number.isFinite(resolved) ? resolved : probe;
+  } catch (_) {
+    // Intl unsupported — better to return the probe than nothing.
+    return probe;
+  }
+}
+
 // Safety monitoring system (optional - for development only)
 let monitor = null;
 let autoRecovery = null;
@@ -4775,12 +4826,15 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
       return t >= sinceMs;
     });
 
-    // Filter to ones that are stale (Last_Synced > olderThanMin OR never synced)
+    // Filter to ones that are stale (Last_Synced > olderThanMin OR never synced).
+    // Use parseCaspioPacificMs because Caspio returns naive Pacific timestamps —
+    // raw Date.parse on a UTC server (Heroku) shifts ~7-8 h and would incorrectly
+    // mark fresh syncs as stale (or vice versa).
     const staleThresholdMs = olderThanMin * 60 * 1000;
     const now = Date.now();
     const candidates = inWindow.filter(s => {
       if (!s.ShopWorks_Last_Synced) return true;
-      const lastSynced = Date.parse(s.ShopWorks_Last_Synced);
+      const lastSynced = parseCaspioPacificMs(s.ShopWorks_Last_Synced);
       if (!Number.isFinite(lastSynced)) return true;
       return (now - lastSynced) > staleThresholdMs;
     });
@@ -4840,7 +4894,10 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
         if (Array.isArray(cancelled) && cancelled.length > 0) {
           const purgeBeforeMs = Date.now() - PURGE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
           const purgeList = cancelled.filter(s => {
-            const ts = s.ShopWorks_Last_Synced ? Date.parse(s.ShopWorks_Last_Synced) : 0;
+            // parseCaspioPacificMs — Caspio returns naive Pacific timestamps;
+            // raw Date.parse would resolve them as UTC on Heroku, purging
+            // ~7-8 h late (or early near DST transitions).
+            const ts = s.ShopWorks_Last_Synced ? parseCaspioPacificMs(s.ShopWorks_Last_Synced) : 0;
             return Number.isFinite(ts) && ts > 0 && ts < purgeBeforeMs;
           });
           for (const s of purgeList) {

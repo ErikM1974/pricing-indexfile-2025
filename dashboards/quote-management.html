@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.20">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.21">
 </head>
 <body>
     <!-- Header -->
@@ -38,6 +38,8 @@
                 <select id="filter-status">
                     <option value="">All Statuses</option>
                     <option value="Open">Open</option>
+                    <option value="Processed">Processed (in ShopWorks)</option>
+                    <option value="Processed - ShopWorks Failed">Push Failed</option>
                     <option value="Accepted">Accepted</option>
                     <option value="Lost">Lost</option>
                     <option value="Expired">Expired</option>
@@ -98,6 +100,10 @@
             <div class="stat-card cancelled">
                 <div class="stat-value" id="stat-cancelled">-</div>
                 <div class="stat-label">Cancelled</div>
+            </div>
+            <div class="stat-card failed" id="stat-card-failed">
+                <div class="stat-value" id="stat-failed">-</div>
+                <div class="stat-label">Push Failed</div>
             </div>
             <div class="stat-card total">
                 <div class="stat-value" id="stat-total">$0</div>
@@ -174,6 +180,10 @@
 
     <!-- Staff Authentication Helper -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+    <!-- CaspioDate helper — parses naive Pacific timestamps correctly
+         (Caspio returns no TZ marker; default JS parse misinterprets as UTC,
+         which shifts dashboard countdowns 7–8 h off). Use CaspioDate.parse(). -->
+    <script src="/shared_components/js/caspio-date-utils.js?v=2026.05.21.21"></script>
 
     <script>
         // ============================================================
@@ -326,24 +336,36 @@
             const now = new Date();
             const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-            let openCount = 0;
+            // "Active" rolls up: Open (draft) + Processed (pushed to ShopWorks
+            // successfully + currently in production). Both represent live
+            // money in the pipeline. Failed pushes are tracked separately so
+            // staff can spot them and intervene.
+            let activeCount = 0;
             let acceptedCount = 0;
             let expiringCount = 0;
             let cancelledCount = 0;
+            let failedCount = 0;
             let totalValue = 0;
 
             filteredQuotes.forEach(quote => {
                 if (quote.Status === 'Cancelled_in_ShopWorks') {
-                    // Cancelled orders are counted separately and EXCLUDED
-                    // from Total Value (the dollar didn't materialize).
+                    // Cancelled — counted separately and EXCLUDED from totals.
                     cancelledCount++;
                     return;
                 }
+                if (quote.Status === 'Processed - ShopWorks Failed') {
+                    // Push failed — needs rep attention. Count, but include
+                    // in Total Value because the dollar is still in flight.
+                    failedCount++;
+                    totalValue += parseFloat(quote.TotalAmount) || 0;
+                    return;
+                }
 
-                if (quote.Status === 'Open' || quote.Status === 'Active') {
-                    openCount++;
-                    // Check if expiring within 7 days
-                    if (quote.ExpiresAt) {
+                if (quote.Status === 'Open' || quote.Status === 'Active' || quote.Status === 'Processed') {
+                    activeCount++;
+                    // Check if expiring within 7 days (Open only — Processed
+                    // orders don't expire, they're already submitted).
+                    if (quote.Status === 'Open' && quote.ExpiresAt) {
                         const expiresDate = new Date(quote.ExpiresAt);
                         if (expiresDate <= sevenDaysFromNow) {
                             expiringCount++;
@@ -356,11 +378,13 @@
                 totalValue += parseFloat(quote.TotalAmount) || 0;
             });
 
-            document.getElementById('stat-active').textContent = openCount;
+            document.getElementById('stat-active').textContent = activeCount;
             document.getElementById('stat-accepted').textContent = acceptedCount;
             document.getElementById('stat-expiring').textContent = expiringCount;
             const cancelledEl = document.getElementById('stat-cancelled');
             if (cancelledEl) cancelledEl.textContent = cancelledCount;
+            const failedEl = document.getElementById('stat-failed');
+            if (failedEl) failedEl.textContent = failedCount;
             document.getElementById('stat-total').textContent = formatCurrency(totalValue);
         }
 
@@ -395,33 +419,55 @@
                 const statusClass = getStatusClass(quote);
                 const expiresInfo = getExpiresInfo(quote);
                 const isCancelled = quote.Status === 'Cancelled_in_ShopWorks';
+                const isProcessed = quote.Status === 'Processed';
+                const isFailed = quote.Status === 'Processed - ShopWorks Failed';
 
-                // For cancelled rows: red badge replaces the editable
-                // dropdown (you can't "un-cancel" — the order is gone in SW)
-                // + retention countdown ("Purges in 28 days") in the Created
-                // column so AR can see how much time is left on the audit window.
-                const statusCellHtml = isCancelled
-                    ? `<span class="status-badge status-cancelled" title="Order was deleted in ShopWorks. Will be permanently purged after 30 days.">
-                         <i class="fas fa-ban"></i> Cancelled (SW)
-                       </span>`
-                    : `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
-                                data-pk-id="${quote.PK_ID}"
-                                data-quote-id="${quote.QuoteID}"
-                                onclick="event.stopPropagation();"
-                                onchange="updateQuoteStatus(this)">
-                            <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
-                            <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled>Accepted</option>
-                            <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
-                            <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled>Expired</option>
-                        </select>`;
+                // Status cell branches:
+                //   • Cancelled — red badge (no dropdown; order is gone in SW)
+                //   • Processed — green "In ShopWorks" badge (system-managed
+                //     state — flips automatically post-submit, no manual edit)
+                //   • Push Failed — amber warning badge (needs rep attention)
+                //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)
+                let statusCellHtml;
+                if (isCancelled) {
+                    statusCellHtml = `<span class="status-badge status-cancelled" title="Order was deleted in ShopWorks. Will be permanently purged after 30 days.">
+                                          <i class="fas fa-ban"></i> Cancelled (SW)
+                                       </span>`;
+                } else if (isProcessed) {
+                    const woNum = quote.ShopWorks_Order_Number ? ` #${quote.ShopWorks_Order_Number}` : '';
+                    statusCellHtml = `<span class="status-badge status-processed" title="Order successfully pushed to ShopWorks${woNum ? ` (WO${woNum})` : ''}. System-managed state — syncs hourly.">
+                                          <i class="fas fa-check-circle"></i> In ShopWorks${woNum}
+                                       </span>`;
+                } else if (isFailed) {
+                    statusCellHtml = `<span class="status-badge status-failed" title="Push to ShopWorks failed. Open the quote and click Refresh to retry, or contact dev to inspect the proxy logs.">
+                                          <i class="fas fa-exclamation-triangle"></i> Push Failed
+                                       </span>`;
+                } else {
+                    statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
+                                              data-pk-id="${quote.PK_ID}"
+                                              data-quote-id="${quote.QuoteID}"
+                                              onclick="event.stopPropagation();"
+                                              onchange="updateQuoteStatus(this)">
+                                          <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
+                                          <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled>Accepted</option>
+                                          <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
+                                          <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled>Expired</option>
+                                       </select>`;
+                }
 
                 // Retention countdown — ShopWorks_Last_Synced is the
-                // cancelled-at timestamp. Purge happens at +30 days.
+                // cancelled-at timestamp. Purge happens at +30 days. Use
+                // CaspioDate.parse to correctly resolve the naive Pacific
+                // timestamp; raw Date.parse would shift by ~7-8 h depending
+                // on DST → countdown off by 1 day (the "Purges in 31 days"
+                // bug from the previous deploy).
                 const retentionInfo = isCancelled && quote.ShopWorks_Last_Synced
                     ? (() => {
-                        const cancelledMs = Date.parse(quote.ShopWorks_Last_Synced);
-                        if (!Number.isFinite(cancelledMs)) return '';
-                        const purgeMs = cancelledMs + 30 * 24 * 60 * 60 * 1000;
+                        const cancelledDate = (window.CaspioDate && window.CaspioDate.parse)
+                            ? window.CaspioDate.parse(quote.ShopWorks_Last_Synced)
+                            : new Date(quote.ShopWorks_Last_Synced);
+                        if (!cancelledDate || isNaN(cancelledDate.getTime())) return '';
+                        const purgeMs = cancelledDate.getTime() + 30 * 24 * 60 * 60 * 1000;
                         const daysLeft = Math.max(0, Math.ceil((purgeMs - Date.now()) / 86400000));
                         return `<div class="date-relative" style="color:#b91c1c">Purges in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</div>`;
                       })()
