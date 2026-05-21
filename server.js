@@ -218,6 +218,13 @@ const NWCA_LOCATIONS = {
   },
 };
 
+// Soft-delete retention — how many days a Cancelled_in_ShopWorks quote
+// stays around before the bulk-sync cron hard-purges it. Audit fix L1
+// centralizes this so the dashboard countdown + bulk-sync purge + UI
+// banners all agree on a single number. Override via env if AR policy
+// changes (e.g., extend to 60d for litigation hold).
+const SOFT_DELETE_RETENTION_DAYS = Number(process.env.SOFT_DELETE_RETENTION_DAYS) || 30;
+
 /**
  * Parse a Caspio timestamp as Pacific wall-clock time.
  *
@@ -4445,6 +4452,16 @@ app.get('/art-request/:designId', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'art-request-detail.html'));
 });
 
+// /api/config — exposes runtime configuration constants the frontend needs
+// (currently just SOFT_DELETE_RETENTION_DAYS so the dashboard countdown +
+// quote-view banner show the same number as the server-side cron purges).
+// Add new keys here as the frontend needs them.
+app.get('/api/config', (req, res) => {
+  res.json({
+    softDeleteRetentionDays: SOFT_DELETE_RETENTION_DAYS,
+  });
+});
+
 // Public quote page route - serves the HTML
 app.get('/quote/:quoteId', (req, res) => {
   // Validate quote ID format - accept multiple formats:
@@ -4856,6 +4873,19 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
               phoneBest:   chosen.Phone_Best || null,
               email:       chosen.Company_Email || null,
               contactName: chosen.ct_NameFull || [chosen.NameFirst, chosen.NameLast].filter(Boolean).join(' ') || null,
+              // Audit fix H1 (2026-05-21): expose curated customer-record fields
+              // so the form + invoice + quote-view can react.
+              // - isTaxExempt: invoice shows "Tax Exempt (Cert #...)" instead of tax line
+              // - customerWarning: form shows a yellow banner before submit
+              // - paymentTerms: pre-populates the Payment Terms dropdown
+              //                  (CustTerms is the historical pref; Payment_Terms
+              //                   is the newer normalized value)
+              // - accountTier: lets the form badge VIP customers
+              isTaxExempt:     chosen.Is_Tax_Exempt === true || chosen.Is_Tax_Exempt === 1 || chosen.Is_Tax_Exempt === '1',
+              taxExemptNumber: chosen.Tax_Exempt_Number || null,
+              customerWarning: chosen.Customer_Warning || null,
+              paymentTerms:    chosen.Preferred_Terms_FromOrders || chosen.Payment_Terms || chosen.CustTerms || null,
+              accountTier:     chosen.Account_Tier || null,
               source:      'company-contacts-2026',
               idCustomer,
             };
@@ -4987,7 +5017,7 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // Hard-purges quote_sessions rows where Status='Cancelled_in_ShopWorks'
     // AND ShopWorks_Last_Synced > 30 days ago. Audit-trail retention is
     // 30 days from the deletion-detection timestamp. (Erik 2026-05-21)
-    const PURGE_RETENTION_DAYS = 30;
+    const PURGE_RETENTION_DAYS = SOFT_DELETE_RETENTION_DAYS;
     const purgeStats = { purged: 0, purgeErrors: 0 };
     if (!dryRun) {
       try {

@@ -2031,6 +2031,38 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         </div>
       </div>
 
+      {/* Customer Warning banner — surfaces when the picked customer record
+          has a Customer_Warning set (credit hold, payment issues, etc.).
+          Yellow / amber so it draws attention but doesn't block submit. */}
+      {info.customerWarning ? (
+        <div className="customer-warning-banner" style={{
+          display: 'flex', alignItems: 'flex-start', gap: 10,
+          background: '#fef3c7', border: '1px solid #fde68a', borderLeft: '4px solid #d97706',
+          borderRadius: 4, padding: '10px 14px', margin: '8px 0 16px',
+          color: '#78350f', fontSize: 13, lineHeight: 1.45,
+        }}>
+          <span style={{ fontSize: 18, lineHeight: 1, color: '#d97706' }}>⚠️</span>
+          <div>
+            <div style={{ fontWeight: 700, color: '#92400e', textTransform: 'uppercase', letterSpacing: '.04em', fontSize: 11 }}>Customer Warning</div>
+            <div>{info.customerWarning}</div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Tax-Exempt chip — visible inline next to the company name when set.
+          Reminds the rep this customer doesn't pay tax. */}
+      {info.isTaxExempt ? (
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          background: '#dcfce7', border: '1px solid #bbf7d0',
+          color: '#166534', padding: '4px 10px', borderRadius: 4,
+          fontSize: 12, fontWeight: 600, marginBottom: 12,
+        }}>
+          <span>🏛️</span>
+          <span>TAX EXEMPT{info.taxExemptNumber ? ` · Cert # ${info.taxExemptNumber}` : ''}</span>
+        </div>
+      ) : null}
+
       {/* Info grid */}
       <div className="p-info">
         <div className="p-cell">
@@ -2050,6 +2082,17 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
             onPick={(c) => {
               const cs = Array.isArray(c.contacts) ? c.contacts : [];
               const top = cs[0] || null;
+              // Audit fix H1: surface customer-record curated fields.
+              const isExempt = c.Is_Tax_Exempt === true || c.Is_Tax_Exempt === 1 || c.Is_Tax_Exempt === '1';
+              const warning = c.Customer_Warning || '';
+              // Payment terms preference order: Preferred_Terms_FromOrders (rolled-up
+              // from order history) → Payment_Terms → CustTerms. Falls back to
+              // existing form value (no overwrite if customer record is empty).
+              const termsPref =
+                c.Preferred_Terms_FromOrders ||
+                c.Payment_Terms ||
+                c.CustTerms ||
+                info.terms || '';
               setInfo({
                 ...info,
                 company:    c.Company_Name || '',
@@ -2073,6 +2116,13 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 buyerFirst: top ? (top.NameFirst || '') : '',
                 buyerLast:  top ? (top.NameLast || '')  : '',
                 email:      top ? (top.Email || '')     : '',
+                // H1 plumbing — these surface in the form UI (warning banner +
+                // tax-exempt chip) and flow through to the submit body so the
+                // server can suppress tax computation when exempt.
+                isTaxExempt:     isExempt,
+                taxExemptNumber: c.Tax_Exempt_Number || '',
+                customerWarning: warning,
+                terms:           termsPref,
               });
             }}
           />
