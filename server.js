@@ -5118,10 +5118,58 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     //    garment+color combo in ShipStation's order view.
     const items = await buildShipStationItems(lineItems, originalSubmission);
 
-    // 8. Compose the payload
+    // 8. Compose the payload.
+    //
+    // orderNumber vs orderKey (Erik 2026-05-21):
+    //   orderNumber = displayed in ShipStation UI as "Order #" → use WO#
+    //                 when known so warehouse cross-references with ShopWorks
+    //                 ("pull WO 141899") instead of our internal quote ID.
+    //                 Falls back to quote ID until WO# is synced.
+    //   orderKey = internal idempotency key → ALWAYS the quote ID so re-sends
+    //              dedup correctly. Salted by retry-on-404 logic above when
+    //              ShipStation ghosts a deleted-order key.
+    const shopworksWoNum = session.ShopWorks_Order_Number || order?.id_Order;
+    const displayOrderNumber = shopworksWoNum ? `WO ${shopworksWoNum}` : safeQuoteId;
+
+    // Weight estimate — per-garment weights based on typical NWCA inventory.
+    // Warehouse can override at label-buy time, but having a sensible default
+    // means "buy label" is one click for most orders instead of "weigh first."
+    const GARMENT_WEIGHTS_OZ = {
+      // Hoodies / sweatshirts (heavy)
+      'PC90': 24, 'PC78': 22, 'PC850': 22, 'F260': 26, 'F261': 26,
+      '18000': 16, '8054': 30, 'ST253': 22, 'ST254': 22,
+      // Long sleeves
+      'PC54LS': 8, 'PC61LS': 8, 'PC55LS': 9, 'ST350LS': 9,
+      // Standard adult tees
+      'PC54': 5.5, 'PC61': 6, 'PC55': 6.5, '5000': 6, '3001': 5,
+      'ST350': 5, 'ST450': 6, 'DT6000': 5,
+      // Youth tees
+      'PC54Y': 4, 'PC61Y': 4, 'PC55Y': 4, '5000B': 4,
+      // Polos
+      'K500': 8, 'K420': 9, 'K100': 8, 'K110': 8,
+      // Caps
+      'CP80': 3, 'C112': 4, 'STC10': 4, 'C932': 4,
+      // Bags (varies wildly — coarse default)
+      'BG': 8,
+    };
+    const estimateWeightOz = (it) => {
+      const sku = String(it.sku || '');
+      // Longest-prefix match (PC90H_3XL → PC90; PC54LS → PC54LS, not PC54)
+      let oz = 6; // default per-item
+      let bestLen = 0;
+      for (const prefix of Object.keys(GARMENT_WEIGHTS_OZ)) {
+        if (sku.startsWith(prefix) && prefix.length > bestLen) {
+          oz = GARMENT_WEIGHTS_OZ[prefix];
+          bestLen = prefix.length;
+        }
+      }
+      return oz * (Number(it.quantity) || 0);
+    };
+    const totalWeightOz = items.reduce((s, it) => s + estimateWeightOz(it), 0);
+
     const payload = {
-      orderNumber: safeQuoteId,
-      orderKey:    safeQuoteId,           // idempotency
+      orderNumber: displayOrderNumber,    // "WO 141899" or fallback "OF-0048"
+      orderKey:    safeQuoteId,           // idempotency — always quote ID
       orderDate:   (originalSubmission?.info?.dateIn || new Date().toISOString().split('T')[0]) + 'T00:00:00.000Z',
       orderStatus: 'awaiting_shipment',
       customerEmail:    order?.ContactEmail || originalSubmission?.info?.email || session.CustomerEmail || '',
@@ -5202,6 +5250,33 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       // even though they'll pick at rate time.
       ...(useMapped ? { carrierCode: mapped.carrier, serviceCode: mapped.service } : {}),
       requestedShippingService: method || undefined,
+
+      // Estimated total weight in ounces — saves the warehouse from
+      // weighing before rate-shopping. Approximate per-garment weights;
+      // warehouse can override in ShipStation UI at label-buy time.
+      ...(totalWeightOz > 0 ? { weight: { value: Math.round(totalWeightOz), units: 'ounces' } } : {}),
+
+      // Custom fields — surface in ShipStation's order detail under "Notes".
+      // Warehouse picker uses these to know what they're packing/shipping.
+      advancedOptions: {
+        customField1: (function () {
+          // Decoration method + locations (extract first line from methodNotesBlock).
+          // For OF-0048 this looks like: "DTG · Left Chest + Full Back · Tier 24-47..."
+          const methodNote = originalSubmission?.info?.methodNotesBlock
+            || originalSubmission?.methodNotesBlock
+            || '';
+          const firstFew = String(methodNote).split(' · ').slice(0, 2).join(' · ');
+          return firstFew || 'Custom Decoration';
+        })(),
+        customField2: (function () {
+          // Design # — from ShopWorks order if synced, else from originalSubmission.designNumbers
+          const designId = order?.id_Design ||
+            (Array.isArray(originalSubmission?.designNumbers) && originalSubmission.designNumbers[0]) ||
+            '';
+          return designId ? `Design # ${designId}` : '';
+        })(),
+        customField3: originalSubmission?.info?.isRush ? '🚨 RUSH' : '',
+      },
     };
 
     // 9. POST to proxy
