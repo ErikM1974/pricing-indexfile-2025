@@ -1781,3 +1781,213 @@ body {
 @media print {
     .meta-card.sw-mirrored::after { display: none; }  /* don't print the ShopWorks badge */
 }
+
+/* ============================================================================
+   Phase 4c — Order Status grid + Notes panel + Shipping panel
+   ============================================================================ */
+
+/* Order Status grid — 10-tile responsive grid */
+.sw-status-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-status-section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 12px;
+}
+.sw-status-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.sw-status-cell:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.sw-status-cell-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    text-align: center;
+}
+.sw-status-cell-value {
+    display: inline-block;
+    min-width: 50px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.3;
+    border: 1.5px solid transparent;
+}
+.sw-status-cell-value--yes {
+    background: #dcfce7;
+    color: #14532d;
+    border-color: #86efac;
+}
+.sw-status-cell-value--no {
+    background: #fee2e2;
+    color: #7f1d1d;
+    border-color: #fca5a5;
+}
+
+/* Notes To Production — numbered list mirroring the ShopWorks PDF */
+.sw-notes-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-notes-section h2 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-notes-list {
+    margin: 0;
+    padding-left: 28px;
+    list-style-type: decimal;
+    list-style-position: outside;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #334155;
+}
+.sw-notes-list li {
+    padding: 4px 0;
+    border-bottom: 1px dashed #f1f5f9;
+}
+.sw-notes-list li:last-child {
+    border-bottom: none;
+}
+.sw-notes-list li::marker {
+    color: #94a3b8;
+    font-weight: 600;
+}
+.sw-notes-footer {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #fef9e7;
+    border: 1px solid #f9d97a;
+    border-radius: 6px;
+    font-size: 11.5px;
+    color: #78350f;
+    line-height: 1.4;
+}
+
+/* Shipping panel */
+.sw-shipping-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-shipping-section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-shipping-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.sw-shipping-meta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 110px;
+}
+.sw-shipping-meta-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+}
+.sw-shipping-meta-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+.sw-shipping-address-block {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #334155;
+}
+.sw-shipping-recipient {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+.sw-shipping-method {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+    font-weight: 600;
+    color: var(--quote-green, #4caf50);
+}
+.sw-shipping-mode {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+.sw-shipping-mode-pill {
+    padding: 4px 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.sw-shipping-mode-pill::before {
+    content: "○";
+    margin-right: 4px;
+    font-size: 14px;
+    line-height: 1;
+}
+.sw-shipping-mode-pill--active {
+    background: var(--quote-green-light, #c8e6c9);
+    border-color: var(--quote-green, #4caf50);
+    color: var(--quote-green-dark, #2e7d32);
+}
+.sw-shipping-mode-pill--active::before {
+    content: "●";
+}

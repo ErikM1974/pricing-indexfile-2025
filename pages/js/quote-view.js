@@ -2351,6 +2351,11 @@ class QuoteViewPage {
 
         // Render the new Designs panel
         this._renderDesignsPanel(order, lineItems);
+
+        // Phase 4c — Status grid, Notes, Shipping panels
+        this._renderStatusGrid(order);
+        this._renderNotesPanel();
+        this._renderShippingPanel(order);
     }
 
     _overrideField(elementId, value) {
@@ -2434,6 +2439,237 @@ class QuoteViewPage {
             45: 'DTG',
         };
         return TYPE_NAMES[Number(idDesignType)] || (idDesignType ? `Type ${idDesignType}` : 'Unknown');
+    }
+
+    // ====================================================================
+    // Phase 4c — Status grid, Notes, Shipping panels
+    // ====================================================================
+
+    _renderStatusGrid(order) {
+        const section = document.getElementById('sw-status-section');
+        const grid = document.getElementById('sw-status-grid');
+        if (!section || !grid) return;
+
+        // Map of ShopWorks /orders status fields to user-friendly labels +
+        // semantics. The ShopWorks UI shows 10 columns of Yes/No flags;
+        // we mirror that grid here. Some fields return numbers (0/1),
+        // others strings ('Yes'/'No') — handle both.
+        //
+        // Mapping deduced from the ShopWorks UI screenshot Erik shared.
+        // sts_SizingType isn't a Yes/No (it's a numeric mode), so we skip
+        // it; "Approved" isn't in the /orders read schema either — derive
+        // from id_SalesStatus or hide if not present.
+        const STATUS_FIELDS = [
+            { label: 'Approved',  field: '_approved_inferred',  always: true }, // hardcoded for OF orders that successfully imported
+            { label: 'Art',       field: 'sts_ArtDone' },
+            { label: 'Purchase',  field: 'sts_Purchased' },
+            { label: 'Sub Pur',   field: 'sts_PurchasedSub' },
+            { label: 'Rec',       field: 'sts_Received' },
+            { label: 'Pre',       field: 'sts_PrePay' }, // best-guess: prepayment status
+            { label: 'Prod',      field: 'sts_Produced' },
+            { label: 'Ship',      field: 'sts_Shipped' },
+            { label: 'Inv',       field: 'sts_Invoiced' },
+            { label: 'Paid',      field: 'sts_Paid' },
+        ];
+
+        const cells = STATUS_FIELDS.map(({ label, field, always }) => {
+            const raw = always ? 'Yes' : order?.[field];
+            const yes = this._isStatusYes(raw);
+            const tone = yes ? 'yes' : 'no';
+            const display = yes ? 'Yes' : 'No';
+            return `
+                <div class="sw-status-cell">
+                    <div class="sw-status-cell-label">${this.escapeHtml(label)}</div>
+                    <div class="sw-status-cell-value sw-status-cell-value--${tone}">${display}</div>
+                </div>
+            `;
+        }).join('');
+
+        grid.innerHTML = cells;
+        section.style.display = 'block';
+    }
+
+    _isStatusYes(raw) {
+        if (raw == null || raw === '') return false;
+        const s = String(raw).trim().toLowerCase();
+        if (s === 'yes' || s === 'y' || s === 'true' || s === '1') return true;
+        // Numeric: 0 = No, non-zero = Yes (ShopWorks convention)
+        const n = Number(raw);
+        if (!Number.isNaN(n)) return n > 0;
+        return false;
+    }
+
+    _renderNotesPanel() {
+        const section = document.getElementById('sw-notes-section');
+        const list = document.getElementById('sw-notes-list');
+        const footer = document.getElementById('sw-notes-footer');
+        if (!section || !list) return;
+
+        // The MO /v1 /orders endpoint doesn't expose ShopWorks-side notes,
+        // and the original submission's Notes JSON doesn't store the
+        // assembled "Notes To Production" block (that's built server-side
+        // in buildProductionNote()). So we reconstruct the same lines
+        // client-side from the structured data we DO have. Result mirrors
+        // the ShopWorks PDF's Notes To Production block (1 line per fact).
+        const original = this.fullData?.originalSubmission;
+        if (!original) {
+            section.style.display = 'none';
+            return;
+        }
+
+        const lines = [];
+
+        // 1. Decoration method (DTG / Embroidery / Screen Print / etc.)
+        const method = original.decoConfig?.method || '';
+        if (method) {
+            const METHOD_LABELS = { dtg: 'DTG', embroidery: 'Embroidery', screenprint: 'Screen Print', dtf: 'DTF Transfer', sticker: 'Sticker', emblem: 'Emblem' };
+            lines.push(METHOD_LABELS[method] || method);
+        }
+
+        // 2. Print locations (Left Chest + Full Back / Jumbo Front / etc.)
+        const printLocs = original.printLocations || '';
+        if (printLocs) lines.push(printLocs);
+
+        // 3. Tier (24-47 / 48-71 / 72+)
+        const tier = original.breakdown?.tier;
+        if (tier) lines.push(`Tier ${tier}`);
+
+        // 4. Line count + total qty
+        const rows = Array.isArray(original.rows) ? original.rows : [];
+        const validRows = rows.filter(r => r && r.style && r.sizes && Object.values(r.sizes).some(v => Number(v) > 0));
+        if (validRows.length > 0) {
+            lines.push(`${validRows.length} line${validRows.length === 1 ? '' : 's'}`);
+        }
+        const totalQty = original.breakdown?.totalQty;
+        if (totalQty) lines.push(`${totalQty} combined pieces`);
+
+        // 5. Ship method
+        const shipMethod = original.ship?.methodLabel || original.ship?.method;
+        if (shipMethod) lines.push(`Ship: ${shipMethod}`);
+
+        // 6. Per-row size breakdown (mirrors the ShopWorks PDF's per-line entries)
+        for (const r of validRows) {
+            const sizePairs = Object.entries(r.sizes || {})
+                .filter(([, q]) => Number(q) > 0)
+                .map(([sz, q]) => `${sz}×${Number(q)}`);
+            if (sizePairs.length === 0) continue;
+            const totalPcs = sizePairs.reduce((s, p) => s + Number(p.split('×')[1] || 0), 0);
+            const color = r.colorName || r.color || '';
+            lines.push(`${r.style}${color ? ' ' + color : ''}: ${sizePairs.join(', ')} (${totalPcs} pcs)`);
+        }
+
+        if (lines.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        list.innerHTML = lines.map(line => `<li>${this.escapeHtml(line)}</li>`).join('');
+
+        if (footer) {
+            footer.style.display = 'block';
+            footer.textContent = 'Notes as submitted. ShopWorks operators may have added more notes — open the order in ShopWorks to see the current full list.';
+        }
+
+        section.style.display = 'block';
+    }
+
+    _renderShippingPanel(order) {
+        const section = document.getElementById('sw-shipping-section');
+        if (!section) return;
+
+        // Source priority: original submission's ship.* fields (the MO /v1
+        // /orders endpoint doesn't expose ShippingAddresses, so we use what
+        // we pushed). When `order.date_Shippied` (yes, typo in MO API) is
+        // populated, surface that as Date Shipped + show shipped-state.
+        const original = this.fullData?.originalSubmission;
+        const ship = original?.ship || {};
+        const info = original?.info || {};
+
+        // Detect pickup orders — render differently
+        const method = (ship.method || ship.methodLabel || '').toString();
+        const isPickup = method === 'Customer Pickup' || ship.isPickup === true ||
+                         method.toLowerCase().includes('pickup') || method.toLowerCase().includes('willcall');
+
+        // Date Shipped — from snapshot (the only ShopWorks-side shipping
+        // signal we currently have in /orders). Note: 'Shippied' is the
+        // actual field name (typo in the API).
+        const dateShipped = order?.date_Shippied || order?.date_Shipped;
+        const setMeta = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value || '—';
+        };
+        setMeta('sw-shipping-date', dateShipped ? this.formatDate(dateShipped) : '');
+
+        // # of Boxes — count of tracking numbers (rough proxy) when available
+        // from the original Carrier/TrackingNumber fields on the quote row.
+        const trackingNum = this.quoteData?.TrackingNumber || '';
+        const boxCount = trackingNum ? trackingNum.split(',').filter(s => s.trim()).length : 0;
+        setMeta('sw-shipping-boxes', boxCount > 0 ? String(boxCount) : '');
+
+        // Shipped By: not currently exposed; leave empty for now
+        setMeta('sw-shipping-by', '');
+
+        // Build the address block — mirrors the ShopWorks PDF layout:
+        //   Star Sportswear              ← Company (info.company)
+        //   Wendy Mickelson              ← Recipient name (ship.address often
+        //                                   contains this — reps put recipient
+        //                                   name in line 1, street in line 2)
+        //   14805 75th St. Ct. East      ← Street address (ship.address2)
+        //   Sumner, WA 98390             ← city/state/zip
+        //   USA                          ← country
+        //   UPS Ground                   ← method
+        const recipient = isPickup
+            ? 'Customer Pickup at NWCA Milton'
+            : (info.company || this.quoteData?.CompanyName || '—');
+        document.getElementById('sw-shipping-recipient').textContent = recipient;
+
+        let addr1, addr2, city, state, zip, country;
+        if (isPickup) {
+            addr1 = '2025 Freeman Road East';
+            addr2 = '';
+            city  = 'Milton';
+            state = 'WA';
+            zip   = '98354';
+            country = 'USA';
+        } else {
+            // Both address fields rendered verbatim — convention is line 1 =
+            // recipient name, line 2 = street, but we don't enforce that
+            // (reps may use them either way).
+            addr1 = ship.address || ship.address1 || '';
+            addr2 = ship.address2 || '';
+            city  = ship.city || '';
+            state = ship.state || '';
+            zip   = ship.zip || '';
+            country = ship.country || 'USA';
+        }
+
+        document.getElementById('sw-shipping-line1').textContent = addr1;
+        document.getElementById('sw-shipping-line1').style.display = addr1 ? 'block' : 'none';
+        document.getElementById('sw-shipping-line2').textContent = addr2;
+        document.getElementById('sw-shipping-line2').style.display = addr2 ? 'block' : 'none';
+        const cityLine = [city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '');
+        document.getElementById('sw-shipping-citystate').textContent = cityLine.trim();
+        document.getElementById('sw-shipping-citystate').style.display = cityLine.trim() ? 'block' : 'none';
+        document.getElementById('sw-shipping-country').textContent = country;
+
+        // Method label (UPS Ground / Customer Pickup / Priority Mail / etc.)
+        const methodLabel = ship.methodLabel || method || 'Not specified';
+        document.getElementById('sw-shipping-method').textContent = methodLabel;
+
+        // Mode pill — Single Address / Multiple Addresses / No Shipping
+        const mode = isPickup ? 'none' : 'single';  // multi-address support deferred
+        document.querySelectorAll('.sw-shipping-mode-pill').forEach(pill => {
+            const pillMode = pill.dataset.mode;
+            pill.classList.toggle('sw-shipping-mode-pill--active', pillMode === mode);
+        });
+
+        // If absolutely nothing useful to show (no submission data either),
+        // hide the section.
+        if (!recipient || recipient === '—') {
+            section.style.display = 'none';
+        } else {
+            section.style.display = 'block';
+        }
     }
 
     // Event Listeners
