@@ -1,3 +1,7 @@
+## v2026.05.21.20 (2026.05.21)
+
+- Deploy v2026.05.21.20: 2 files — quote-management dashboard handles Cancelled_in_ShopWorks: red badge, filter option, stat card, retention countdown, row tint, exclude from Total Value
+
 ## v2026.05.21.19 (2026.05.21)
 
 - Deploy v2026.05.21.19: 11 files — soft-delete (Status=Cancelled_in_ShopWorks) with 30-day audit retention + bulk-sync cron purge; CANCELLED banner on invoice + quote-view
