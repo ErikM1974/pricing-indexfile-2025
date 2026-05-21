@@ -5030,9 +5030,18 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       return res.json({ skipped: true, reason: 'pickup', message: 'Customer Pickup orders do not need ShipStation labels' });
     }
 
-    // 5. Look up the carrier+service for our ship method (best-effort —
-    // ShipStation accepts the order even if these are blank; warehouse
-    // picks at rate time)
+    // 5. Look up the carrier+service for our ship method.
+    //
+    // CRITICAL: ShipStation rejects createorder with HTTP 400 (empty body)
+    // when carrierCode/serviceCode reference a carrier NOT configured in the
+    // account. NWCA currently has only Stamps.com (USPS) connected; UPS and
+    // FedEx require a separate "Add Carrier" step in ShipStation Settings.
+    //
+    // Strategy: only include carrierCode+serviceCode when the carrier is in
+    // CONFIGURED_CARRIERS. Otherwise omit those fields entirely (order still
+    // creates fine; warehouse picks at label-buy time) and use the freetext
+    // `requestedShippingService` hint so the rep's preference still shows
+    // in the ShipStation UI.
     const SHIP_METHOD_MAP = {
       'UPS Ground':       { carrier: 'ups',        service: 'ups_ground' },
       'UPS 2nd Day':      { carrier: 'ups',        service: 'ups_2nd_day_air' },
@@ -5043,7 +5052,11 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       'USPS Ground':      { carrier: 'stamps_com', service: 'usps_ground_advantage' },
       'FedEx Ground':     { carrier: 'fedex',      service: 'fedex_ground' },
     };
+    // TODO: replace with dynamic carrier list from ShipStation /carriers
+    //       endpoint (cached 24h). For now, hardcoded to what NWCA has set up.
+    const CONFIGURED_CARRIERS = new Set(['stamps_com']);
     const mapped = SHIP_METHOD_MAP[method] || { carrier: null, service: null };
+    const useMapped = mapped.carrier && CONFIGURED_CARRIERS.has(mapped.carrier);
 
     // 6. Build the bill-to (CompanyContactsMerge2026 → originalSubmission fallback)
     //    Reuse the billingContact lookup pattern from /full — fetch one-shot here.
@@ -5144,8 +5157,12 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
         `Quote: ${safeQuoteId}`,
       ].filter(Boolean).join(' · '),
 
-      carrierCode:   mapped.carrier,
-      serviceCode:   mapped.service,
+      // Carrier preset: only when the carrier is actually configured in
+      // ShipStation. Otherwise just record the rep's preference as a hint
+      // so warehouse staff see "UPS Ground" in the requested-service field
+      // even though they'll pick at rate time.
+      ...(useMapped ? { carrierCode: mapped.carrier, serviceCode: mapped.service } : {}),
+      requestedShippingService: method || undefined,
     };
 
     // 9. POST to proxy
