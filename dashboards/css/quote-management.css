@@ -243,6 +243,26 @@ body {
 }
 .status-badge.status-failed i { font-size: 11px; }
 
+/* Awaiting-Payment badge — soft yellow, informational rather than
+   alarming. Stripe checkout in flight; status auto-advances when the
+   webhook fires, so no rep action required (but visible if it stalls). */
+.status-badge.status-pending-payment {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: #b45309;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    cursor: help;
+    white-space: nowrap;
+}
+.status-badge.status-pending-payment i { font-size: 11px; }
+
 /* Row tint for cancelled quotes — subtle so it doesn't drown out
    active quotes when mixed in. */
 .quote-row--cancelled {

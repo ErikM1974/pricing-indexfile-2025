@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.21">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.22">
 </head>
 <body>
     <!-- Header -->
@@ -38,6 +38,7 @@
                 <select id="filter-status">
                     <option value="">All Statuses</option>
                     <option value="Open">Open</option>
+                    <option value="Pending Payment">Awaiting Payment (Stripe)</option>
                     <option value="Processed">Processed (in ShopWorks)</option>
                     <option value="Processed - ShopWorks Failed">Push Failed</option>
                     <option value="Accepted">Accepted</option>
@@ -361,7 +362,10 @@
                     return;
                 }
 
-                if (quote.Status === 'Open' || quote.Status === 'Active' || quote.Status === 'Processed') {
+                if (quote.Status === 'Open' || quote.Status === 'Active' || quote.Status === 'Processed' || quote.Status === 'Pending Payment') {
+                    // Pending Payment = 3-Day Tees Stripe checkout started but
+                    // webhook hasn't confirmed payment yet. Order is in-flight
+                    // money, so rolled into Active alongside Open/Processed.
                     activeCount++;
                     // Check if expiring within 7 days (Open only — Processed
                     // orders don't expire, they're already submitted).
@@ -421,12 +425,16 @@
                 const isCancelled = quote.Status === 'Cancelled_in_ShopWorks';
                 const isProcessed = quote.Status === 'Processed';
                 const isFailed = quote.Status === 'Processed - ShopWorks Failed';
+                const isPendingPayment = quote.Status === 'Pending Payment';
 
                 // Status cell branches:
                 //   • Cancelled — red badge (no dropdown; order is gone in SW)
                 //   • Processed — green "In ShopWorks" badge (system-managed
                 //     state — flips automatically post-submit, no manual edit)
                 //   • Push Failed — amber warning badge (needs rep attention)
+                //   • Pending Payment — amber "Awaiting Payment" badge (3-Day
+                //     Tees Stripe checkout in progress; webhook flips it to
+                //     Payment Confirmed → Processed when capture succeeds)
                 //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)
                 let statusCellHtml;
                 if (isCancelled) {
@@ -441,6 +449,10 @@
                 } else if (isFailed) {
                     statusCellHtml = `<span class="status-badge status-failed" title="Push to ShopWorks failed. Open the quote and click Refresh to retry, or contact dev to inspect the proxy logs.">
                                           <i class="fas fa-exclamation-triangle"></i> Push Failed
+                                       </span>`;
+                } else if (isPendingPayment) {
+                    statusCellHtml = `<span class="status-badge status-pending-payment" title="3-Day Tees order — customer started Stripe checkout but payment hasn't been confirmed yet. Status flips to Payment Confirmed / Processed automatically when the Stripe webhook fires.">
+                                          <i class="fas fa-credit-card"></i> Awaiting Payment
                                        </span>`;
                 } else {
                     statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
