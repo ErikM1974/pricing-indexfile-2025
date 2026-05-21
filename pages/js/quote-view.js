@@ -2350,6 +2350,9 @@ class QuoteViewPage {
 
     applyShopWorksOverlay(snapshot) {
         if (!snapshot || !snapshot.order) return;
+        // Stash the full snapshot so sub-renders (designs panel, shipping)
+        // can access pushed data (Designs.Locations, Attachments, ShippingAddresses).
+        this._currentSnapshot = snapshot;
         const order = snapshot.order;
         const lineItems = snapshot.lineItems || [];
 
@@ -2408,6 +2411,9 @@ class QuoteViewPage {
         // looking at (subtle tint, no extra DOM).
         this._markFieldsAsShopWorksSource();
 
+        // Phase 4d: Billing address sub-block under "Prepared For"
+        this._renderBillingBlock(order);
+
         // Render the new Designs panel
         this._renderDesignsPanel(order, lineItems);
 
@@ -2415,6 +2421,73 @@ class QuoteViewPage {
         this._renderStatusGrid(order);
         this._renderNotesPanel();
         this._renderShippingPanel(order);
+
+        // Phase 4d — Financial Summary panel
+        this._renderFinancialPanel(order);
+    }
+
+    _renderFinancialPanel(order) {
+        const section = document.getElementById('sw-financial-section');
+        if (!section) return;
+        // Bail if the order header has no financial data at all.
+        const subtotal = Number(order.cur_SubTotal);
+        if (!Number.isFinite(subtotal)) {
+            section.style.display = 'none';
+            return;
+        }
+
+        const fmt = (n) => {
+            const v = Number(n);
+            if (!Number.isFinite(v)) return '—';
+            return '$' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        };
+        const setVal = (id, n) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = fmt(n);
+        };
+
+        setVal('sw-fin-subtotal', order.cur_SubTotal);
+        setVal('sw-fin-tax',      order.cur_SalesTaxTotal);
+        setVal('sw-fin-shipping', order.cur_Shipping);
+        setVal('sw-fin-total',    order.cur_TotalInvoice);
+        setVal('sw-fin-payments', order.cur_Payments);
+        setVal('sw-fin-balance',  order.cur_Balance);
+        const termsEl = document.getElementById('sw-fin-terms');
+        if (termsEl) termsEl.textContent = order.TermsName || '—';
+
+        section.style.display = 'block';
+    }
+
+    _renderBillingBlock(order) {
+        // Render the customer's billing address. ShopWorks's /v1/orders
+        // doesn't expose billing fields directly — they're on the Customer
+        // record. We have two reliable sources:
+        //   1. originalSubmission.info — the form's captured address (best
+        //      for our staff-direct OF orders since rep typed it at submit)
+        //   2. CompanyContactsMerge2026 via /api/company-contacts-2026 — would
+        //      require a separate fetch by id_Customer
+        // For now, use #1 (free, no extra API call) and skip silently if not
+        // populated. Future iteration can add #2 as a fallback.
+        const info = this.fullData?.originalSubmission?.info;
+        if (!info) return;
+        const addr = info.address || info.address1 || '';
+        const city = info.city || '';
+        const state = info.state || '';
+        const zip = info.zip || '';
+
+        // Need at least an address OR a city+state to render.
+        if (!addr && !city) return;
+
+        const block = document.getElementById('customer-billing-block');
+        if (!block) return;
+        const addrEl = document.getElementById('customer-billing-address');
+        const cityStateEl = document.getElementById('customer-billing-city-state');
+        if (addrEl) addrEl.textContent = addr;
+        if (cityStateEl) {
+            const line = [city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '');
+            cityStateEl.textContent = line.trim();
+        }
+        block.style.display = 'block';
     }
 
     _overrideField(elementId, value) {
@@ -2449,18 +2522,25 @@ class QuoteViewPage {
 
         // Counters at the top: Product Qty + Total Imprints.
         const productQty = Number(order.TotalProductQuantity) || lineItems.reduce((s, li) => s + (Number(li.LineQuantity) || 0), 0);
-        // Total imprints = sum of line item quantities × number of print locations.
-        // The /lineitems endpoint doesn't directly expose location count, so
-        // approximate as productQty × locationsCount when known, else fall back
-        // to "—". For DTG 2-location orders (LC + FB), this is qty × 2.
         const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType);
-        // Locations count — guess from the design pattern. ShopWorks doesn't
-        // expose this directly on the order; we can derive from the original
-        // submission's `printLocations` field if present.
-        const submittedPrintLocs = this.fullData?.originalSubmission?.printLocations || '';
-        const locationsCount = submittedPrintLocs
-            ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
-            : 1;
+
+        // Locations count — PREFER the pushed data's Designs[].Locations[]
+        // (which has accurate per-design locations from when we pushed).
+        // Fall back to the original submission's printLocations only if the
+        // pushed data is unavailable (e.g. legacy quotes).
+        const pushedDesign = (this._currentSnapshot?.pushed?.Designs || [])[0] || null;
+        const pushedLocations = pushedDesign?.Locations || [];
+        let locationsCount, locationsNames;
+        if (pushedLocations.length > 0) {
+            locationsCount = pushedLocations.length;
+            locationsNames = pushedLocations.map(L => L.Location).filter(Boolean).join(' + ');
+        } else {
+            const submittedPrintLocs = this.fullData?.originalSubmission?.printLocations || '';
+            locationsCount = submittedPrintLocs
+                ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
+                : 1;
+            locationsNames = submittedPrintLocs || 'Left Chest';
+        }
         const totalImprints = productQty * locationsCount;
 
         const productQtyEl = document.getElementById('sw-designs-product-qty');
@@ -2468,7 +2548,8 @@ class QuoteViewPage {
         const imprintsEl = document.getElementById('sw-designs-imprints');
         if (imprintsEl) imprintsEl.textContent = totalImprints || '—';
 
-        // Render the design row in the table.
+        // Render the design row in the table — now shows the location names
+        // (e.g. "Left Chest + Full Back") instead of just the count.
         const tbody = document.getElementById('sw-designs-tbody');
         if (tbody) {
             tbody.innerHTML = `
@@ -2476,13 +2557,67 @@ class QuoteViewPage {
                     <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
                     <td class="sw-designs-name">${this.escapeHtml(order.DesignName || '(no name)')}</td>
                     <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
-                    <td class="sw-designs-locations">${this.escapeHtml(String(locationsCount))}</td>
+                    <td class="sw-designs-locations" title="${this.escapeHtml(locationsNames || '')}">
+                        ${this.escapeHtml(String(locationsCount))}<span class="sw-designs-locations-names">${locationsNames ? ' (' + this.escapeHtml(locationsNames) + ')' : ''}</span>
+                    </td>
                     <td class="sw-designs-imprints">${this.escapeHtml(String(totalImprints || ''))}</td>
                 </tr>
             `;
         }
 
+        // Phase 4d: render per-location artwork thumbnails below the table.
+        // /order-pull's Designs[].Locations[] gives us the actual ImageURLs.
+        this._renderArtworkThumbnails(pushedLocations);
+
         section.style.display = 'block';
+    }
+
+    _renderArtworkThumbnails(locations) {
+        // Mount/replace an artwork-strip below the Designs table. Hidden if
+        // no locations have images.
+        const section = document.getElementById('sw-designs-section');
+        if (!section) return;
+        const existing = document.getElementById('sw-designs-artwork');
+        const hasArt = (locations || []).some(L => L && L.ImageURL);
+        if (!hasArt) {
+            if (existing) existing.remove();
+            return;
+        }
+
+        const html = `
+            <div class="sw-designs-artwork-head">Artwork files (${locations.length})</div>
+            <div class="sw-designs-artwork-grid">
+                ${(locations || []).map(L => {
+                    const url = L?.ImageURL || '';
+                    const filename = (L?.Notes || '').split('Uploaded: ').pop() || (url.split('/').pop() || 'artwork');
+                    const isImg = /\.(png|jpe?g|gif|webp|svg)$/i.test(url);
+                    const code = L?.DesignCode || '';
+                    return `
+                        <a class="sw-designs-artwork-card" href="${this.escapeHtml(url)}" target="_blank" rel="noopener">
+                            <div class="sw-designs-artwork-thumb">
+                                ${isImg
+                                    ? `<img src="${this.escapeHtml(url)}" alt="${this.escapeHtml(L.Location || '')}" loading="lazy">`
+                                    : `<div class="sw-designs-artwork-thumb-icon"><i class="fas fa-file"></i></div>`}
+                            </div>
+                            <div class="sw-designs-artwork-meta">
+                                <div class="sw-designs-artwork-location">${this.escapeHtml(L.Location || code)}</div>
+                                <div class="sw-designs-artwork-filename">${this.escapeHtml(filename)}</div>
+                            </div>
+                        </a>
+                    `;
+                }).join('')}
+            </div>
+        `;
+
+        if (existing) {
+            existing.innerHTML = html;
+        } else {
+            const div = document.createElement('div');
+            div.id = 'sw-designs-artwork';
+            div.className = 'sw-designs-artwork';
+            div.innerHTML = html;
+            section.appendChild(div);
+        }
     }
 
     _resolveDesignTypeName(idDesignType) {
@@ -2636,13 +2771,30 @@ class QuoteViewPage {
         const section = document.getElementById('sw-shipping-section');
         if (!section) return;
 
-        // Source priority: original submission's ship.* fields (the MO /v1
-        // /orders endpoint doesn't expose ShippingAddresses, so we use what
-        // we pushed). When `order.date_Shippied` (yes, typo in MO API) is
-        // populated, surface that as Date Shipped + show shipped-state.
+        // Source priority:
+        //   1. snapshot.pushed.ShippingAddresses[0] — what's in MO right now
+        //      (matches what ShopWorks operators see; reflects our push)
+        //   2. originalSubmission.ship — the form's submission data (fallback)
+        // The MO /v1/orders endpoint doesn't expose ShippingAddresses, so
+        // pushed is the only source that aligns with ShopWorks-side data.
+        const pushedShip = (this._currentSnapshot?.pushed?.ShippingAddresses || [])[0];
         const original = this.fullData?.originalSubmission;
-        const ship = original?.ship || {};
         const info = original?.info || {};
+        // Normalize pushed ShipAddress fields to ship.* shape used below
+        const ship = pushedShip
+            ? {
+                methodLabel: pushedShip.ShipMethod || '',
+                method: pushedShip.ShipMethod || '',
+                address: pushedShip.ShipAddress01 || '',
+                address2: pushedShip.ShipAddress02 || '',
+                city: pushedShip.ShipCity || '',
+                state: pushedShip.ShipState || '',
+                zip: pushedShip.ShipZip || '',
+                country: pushedShip.ShipCountry || 'USA',
+                shipName: pushedShip.ShipName || '',
+                shipCompany: pushedShip.ShipCompany || '',
+            }
+            : (original?.ship || {});
 
         // Detect pickup orders — render differently
         const method = (ship.method || ship.methodLabel || '').toString();

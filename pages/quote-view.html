@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.5">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.6">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -282,6 +282,45 @@
             </section>
 
             <!-- ============================================================
+                 ShopWorks Financial Summary (Erik 2026-05-21 — Phase 4d).
+                 Sourced from /v1/orders cur_* fields (post-import, reflects
+                 ShopWorks-side adjustments). Hidden until snapshot synced.
+                 ============================================================ -->
+            <section id="sw-financial-section" class="sw-financial-section" style="display: none;">
+                <h2>Financial Summary</h2>
+                <div class="sw-financial-grid">
+                    <div class="sw-financial-row">
+                        <span class="sw-financial-label">Subtotal</span>
+                        <span class="sw-financial-value" id="sw-fin-subtotal">—</span>
+                    </div>
+                    <div class="sw-financial-row">
+                        <span class="sw-financial-label">Sales Tax</span>
+                        <span class="sw-financial-value" id="sw-fin-tax">—</span>
+                    </div>
+                    <div class="sw-financial-row">
+                        <span class="sw-financial-label">Shipping</span>
+                        <span class="sw-financial-value" id="sw-fin-shipping">—</span>
+                    </div>
+                    <div class="sw-financial-row sw-financial-row--total">
+                        <span class="sw-financial-label">Total Invoice</span>
+                        <span class="sw-financial-value" id="sw-fin-total">—</span>
+                    </div>
+                    <div class="sw-financial-row">
+                        <span class="sw-financial-label">Payments Received</span>
+                        <span class="sw-financial-value" id="sw-fin-payments">—</span>
+                    </div>
+                    <div class="sw-financial-row sw-financial-row--balance">
+                        <span class="sw-financial-label">Balance Due</span>
+                        <span class="sw-financial-value" id="sw-fin-balance">—</span>
+                    </div>
+                    <div class="sw-financial-row sw-financial-row--terms">
+                        <span class="sw-financial-label">Terms</span>
+                        <span class="sw-financial-value" id="sw-fin-terms">—</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================
                  Shipping panel (Erik 2026-05-21 — Phase 4c).
                  Mirrors the ShopWorks PDF's Shipping block: Date Shipped,
                  Shipped By, # Of Boxes (when populated post-shipment), then
@@ -444,6 +483,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.5"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.6"></script>
 </body>
 </html>
