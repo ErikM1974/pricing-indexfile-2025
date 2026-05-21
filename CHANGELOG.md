@@ -1,3 +1,7 @@
+## v2026.05.21.18 (2026.05.21)
+
+- Deploy v2026.05.21.18: 1 files — fix OF push: link line items to design via ExtDesignIDBlock (auto-toggles Apply Designs in SW) + send street in ShipAddress02 (was hardcoded empty)
+
 ## v2026.05.21.17 (2026.05.21)
 
 - Deploy v2026.05.21.17: 8 files — wire Phone_Best from CompanyContactsMerge2026 into OF form picker + invoice billingContact fallback
