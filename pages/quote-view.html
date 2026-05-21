@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=20260515-phase11-3">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.2">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -48,6 +48,33 @@
                     </div>
                 </div>
             </header>
+
+            <!-- ============================================================
+                 ShopWorks sync strip (Erik 2026-05-21).
+                 Three states by sync status:
+                   • Pending  — gray pill "Pending import" + Refresh button
+                   • Imported — green pill "ShopWorks #141899 ✓" + last-synced
+                                 + Refresh button
+                   • (no sync info yet on a brand-new draft) — strip hidden
+                 Hidden when no ShopWorks info is available (e.g. legacy quotes).
+                 ============================================================ -->
+            <div id="sw-sync-strip" class="sw-sync-strip" style="display: none;">
+                <div class="sw-sync-left">
+                    <span class="sw-sync-pill" id="sw-sync-pill">
+                        <span class="sw-sync-pill-icon" id="sw-sync-pill-icon">⏳</span>
+                        <span class="sw-sync-pill-text" id="sw-sync-pill-text">Pending import…</span>
+                    </span>
+                    <span class="sw-sync-extorder" id="sw-sync-extorder"></span>
+                </div>
+                <div class="sw-sync-right">
+                    <span class="sw-sync-timestamp" id="sw-sync-timestamp"></span>
+                    <button type="button" class="sw-sync-refresh-btn" id="sw-sync-refresh-btn"
+                            aria-label="Refresh from ShopWorks">
+                        <span class="sw-sync-refresh-icon" aria-hidden="true">🔄</span>
+                        <span class="sw-sync-refresh-label">Refresh</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- PO Number (inline with header, shown if present) -->
             <div id="po-number-row" style="display: none; text-align: right; margin: -8px 0 8px; padding-right: 4px;">
@@ -287,6 +314,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=20260515-stk"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.2"></script>
 </body>
 </html>
