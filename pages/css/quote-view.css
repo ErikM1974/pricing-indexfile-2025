@@ -1991,3 +1991,78 @@ body {
 .sw-shipping-mode-pill--active::before {
     content: "●";
 }
+
+/* ============================================================================
+   Manual ShopWorks WO# entry strip (Erik 2026-05-21)
+   ============================================================================
+   Workaround for the MO /v1/getorderno gap. Reps type the WO# they see in
+   ShopWorks UI; we store it and use it for all future syncs on this quote.
+*/
+.sw-manual-wo-strip {
+    margin: 8px 0 18px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
+    border: 1px solid #f9d97a;
+    border-left: 4px solid #d97706;
+    border-radius: 8px;
+}
+.sw-manual-wo-left {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+.sw-manual-wo-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+.sw-manual-wo-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #78350f;
+}
+.sw-manual-wo-input {
+    padding: 6px 10px;
+    border: 1.5px solid #d97706;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    width: 110px;
+    text-align: center;
+    background: #ffffff;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+.sw-manual-wo-input:focus {
+    outline: 2px solid #b45309;
+    outline-offset: 1px;
+}
+.sw-manual-wo-btn {
+    padding: 6px 14px;
+    background: #d97706;
+    border: 1.5px solid #b45309;
+    border-radius: 6px;
+    color: #ffffff;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+.sw-manual-wo-btn:hover:not(:disabled) {
+    background: #b45309;
+}
+.sw-manual-wo-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.sw-manual-wo-help {
+    margin-top: 8px;
+    font-size: 11.5px;
+    color: #92400e;
+    line-height: 1.4;
+}
+@media print {
+    .sw-manual-wo-strip { display: none !important; }
+}

@@ -2129,6 +2129,9 @@ class QuoteViewPage {
             btn.addEventListener('click', () => this.syncFromShopWorks({ manual: true }));
         }
 
+        // Manual ShopWorks Order # entry (workaround for /v1/getorderno gap)
+        this._setupManualWoStrip();
+
         // Auto-sync in the background if data is stale (> 30 min since last
         // pull) AND the quote has been processed (in MO somewhere).
         const sw = this.fullData?.shopWorks;
@@ -2143,7 +2146,7 @@ class QuoteViewPage {
         }
     }
 
-    async syncFromShopWorks({ manual = false } = {}) {
+    async syncFromShopWorks({ manual = false, shopWorksOrderNumber = null } = {}) {
         const btn = document.getElementById('sw-sync-refresh-btn');
         const pillText = document.getElementById('sw-sync-pill-text');
         const pillIcon = document.getElementById('sw-sync-pill-icon');
@@ -2158,7 +2161,11 @@ class QuoteViewPage {
         }
 
         try {
-            const r = await fetch(`/api/quote-sessions/${this.quoteId}/sync-from-shopworks`, { method: 'POST' });
+            const opts = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
+            if (shopWorksOrderNumber) {
+                opts.body = JSON.stringify({ shopWorksOrderNumber });
+            }
+            const r = await fetch(`/api/quote-sessions/${this.quoteId}/sync-from-shopworks`, opts);
             if (!r.ok) {
                 throw new Error(`HTTP ${r.status}`);
             }
@@ -2185,12 +2192,18 @@ class QuoteViewPage {
                 },
             };
             this.renderSyncStrip(this.fullData);
+            this._toggleManualWoStrip();
 
             // Phase 4b: when snapshot is present, override existing fields
             // (email, phone, PO, dates, etc.) with ShopWorks-side values and
             // render the new Designs panel.
             if (result.snapshot) {
                 this.applyShopWorksOverlay(result.snapshot);
+            } else if (result.note) {
+                // Manual WO# was stored but /v1 doesn't have the order yet.
+                // Surface that friendly message via the pill.
+                if (pillText) pillText.textContent = `WO# saved — live data in ~24h`;
+                if (pillIcon) pillIcon.textContent = '⏳';
             }
         } catch (e) {
             console.warn('[QuoteView/sync] sync failed:', e.message);
@@ -2260,6 +2273,52 @@ class QuoteViewPage {
                 tsEl.textContent = 'Never synced';
             }
         }
+    }
+
+    _setupManualWoStrip() {
+        const btn = document.getElementById('sw-manual-wo-btn');
+        const input = document.getElementById('sw-manual-wo-input');
+        if (!btn || !input) return;
+
+        // Decide whether to show the strip based on initial state.
+        this._toggleManualWoStrip();
+
+        const submit = async () => {
+            const raw = (input.value || '').trim();
+            const n = Number(raw);
+            if (!Number.isInteger(n) || n <= 0 || n > 9999999) {
+                alert('Please enter a valid ShopWorks Order # (numeric, e.g. 141899)');
+                input.focus();
+                return;
+            }
+            btn.disabled = true;
+            btn.textContent = 'Syncing…';
+            try {
+                await this.syncFromShopWorks({ manual: true, shopWorksOrderNumber: n });
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Set & Sync';
+            }
+        };
+        btn.addEventListener('click', submit);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); submit(); }
+        });
+    }
+
+    _toggleManualWoStrip() {
+        // Show the manual-entry strip when:
+        //   - The quote was Processed (pushed to MO)
+        //   - The auto-mapping (/v1/getorderno) didn't resolve a WO#
+        //   - No WO# is yet stored on the row
+        // Hide it once a WO# is set (auto or manual).
+        const strip = document.getElementById('sw-manual-wo-strip');
+        if (!strip) return;
+        const sw = this.fullData?.shopWorks;
+        const status = this.fullData?.status || '';
+        const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
+        const hasWoNumber = !!(sw?.orderNumber);
+        strip.style.display = (isProcessed && !hasWoNumber) ? 'block' : 'none';
     }
 
     _formatRelativeTime(isoOrDate) {
