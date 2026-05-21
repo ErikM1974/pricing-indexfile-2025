@@ -5207,12 +5207,27 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     // 9. POST to proxy
     const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
       || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    const proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
+    let proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const result = await proxyResp.json().catch(() => ({}));
+    let result = await proxyResp.json().catch(() => ({}));
+
+    // Retry-on-404: ShipStation returns 404 if the orderKey was previously
+    // associated with a deleted order (they reserve the key forever).
+    // Salt the orderKey with a millisecond timestamp and retry once.
+    if (proxyResp.status === 404 && !payload._retried) {
+      console.warn(`[send-to-shipstation] 404 on orderKey '${payload.orderKey}' — likely deleted-order ghost. Retrying with salted orderKey.`);
+      payload.orderKey = `${payload.orderKey}-r${Date.now()}`;
+      payload._retried = true;
+      proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      result = await proxyResp.json().catch(() => ({}));
+    }
 
     if (!proxyResp.ok || !result.success) {
       console.error(`[send-to-shipstation] proxy returned ${proxyResp.status}:`, result);
