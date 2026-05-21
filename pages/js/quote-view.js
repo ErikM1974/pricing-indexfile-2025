@@ -2117,6 +2117,12 @@ class QuoteViewPage {
         // Render the strip from initial data.
         this.renderSyncStrip(this.fullData);
 
+        // Apply ShopWorks-side data overlay on top of the original render
+        // (if we already have a snapshot from a previous sync).
+        if (this.fullData?.shopWorks?.snapshot) {
+            this.applyShopWorksOverlay(this.fullData.shopWorks.snapshot);
+        }
+
         // Wire the manual Refresh button.
         const btn = document.getElementById('sw-sync-refresh-btn');
         if (btn) {
@@ -2180,9 +2186,12 @@ class QuoteViewPage {
             };
             this.renderSyncStrip(this.fullData);
 
-            // TODO Phase 4b+: when snapshot is present, re-render the
-            // production-side sections (Order Info, Dates, Designs, Line
-            // Items, Status, Notes, Shipping, Financial) from snapshot.
+            // Phase 4b: when snapshot is present, override existing fields
+            // (email, phone, PO, dates, etc.) with ShopWorks-side values and
+            // render the new Designs panel.
+            if (result.snapshot) {
+                this.applyShopWorksOverlay(result.snapshot);
+            }
         } catch (e) {
             console.warn('[QuoteView/sync] sync failed:', e.message);
             if (manual && pillText) {
@@ -2266,6 +2275,165 @@ class QuoteViewPage {
             const days = Math.floor(hours / 24);
             return `${days}d ago`;
         } catch { return 'recently'; }
+    }
+
+    // ====================================================================
+    // Phase 4b — ShopWorks overlay (Erik 2026-05-21)
+    // ====================================================================
+    // When a fresh snapshot is available, override existing displayed
+    // fields with ShopWorks-side values (which reflect any operator edits
+    // made after the original submission). Also renders the new Designs
+    // panel that mirrors the ShopWorks production PDF.
+    //
+    // Snapshot shape (from /api/quote-sessions/:id/full):
+    //   { order: {...all /orders fields...}, lineItems: [...], fetchedAt }
+    // ====================================================================
+
+    applyShopWorksOverlay(snapshot) {
+        if (!snapshot || !snapshot.order) return;
+        const order = snapshot.order;
+        const lineItems = snapshot.lineItems || [];
+
+        this._overrideField('customer-name', order.CustomerName);
+        // Composite contact name from first/last (ShopWorks splits them)
+        const contactName = [order.ContactFirstName, order.ContactLastName].filter(Boolean).join(' ').trim();
+        // Email + phone — these are the fields Erik most often edits in ShopWorks
+        this._overrideField('customer-email', order.ContactEmail);
+        if (order.ContactPhone) {
+            this._overrideField('customer-phone', this.formatPhone(order.ContactPhone));
+        }
+
+        // PO Number — reveal the inline PO row even if it was hidden before
+        if (order.CustomerPurchaseOrder) {
+            this._overrideField('po-number-display', order.CustomerPurchaseOrder);
+            const poRow = document.getElementById('po-number-row');
+            if (poRow) poRow.style.display = 'block';
+        }
+
+        // Order # (ShopWorks WO#) — reveal the conditional row
+        if (order.id_Order) {
+            this._overrideField('order-number', String(order.id_Order));
+            const row = document.getElementById('order-number-row');
+            if (row) row.style.display = 'flex';
+        }
+
+        // Sales rep — ShopWorks CustomerServiceRep
+        if (order.CustomerServiceRep) {
+            this._overrideField('sales-rep', order.CustomerServiceRep);
+            const row = document.getElementById('sales-rep-row');
+            if (row) row.style.display = 'flex';
+        }
+
+        // Date fields (ShopWorks uses ISO dates or "MM/DD/YYYY" format)
+        if (order.date_RequestedToShip) {
+            this._overrideField('req-ship-date', this.formatDate(order.date_RequestedToShip));
+            const row = document.getElementById('req-ship-date-row');
+            if (row) row.style.display = 'flex';
+        }
+        // Drop Dead Date — ShopWorks field name varies; try several
+        const dropDead = order.date_DropDead || order.date_OrderDropDead || order.DropDeadDate;
+        if (dropDead) {
+            this._overrideField('drop-dead-date', this.formatDate(dropDead));
+            const row = document.getElementById('drop-dead-date-row');
+            if (row) row.style.display = 'flex';
+        }
+
+        // Customer Number — id_Customer from ShopWorks
+        if (order.id_Customer) {
+            this._overrideField('customer-number-display', String(order.id_Customer));
+            const row = document.getElementById('customer-number-row');
+            if (row) row.style.display = 'flex';
+        }
+
+        // Mark fields visually as "from ShopWorks" so reps know what they're
+        // looking at (subtle tint, no extra DOM).
+        this._markFieldsAsShopWorksSource();
+
+        // Render the new Designs panel
+        this._renderDesignsPanel(order, lineItems);
+    }
+
+    _overrideField(elementId, value) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        const v = value == null ? '' : String(value);
+        if (v.trim() && el.textContent !== v) {
+            el.textContent = v;
+        }
+    }
+
+    _markFieldsAsShopWorksSource() {
+        // Subtle visual indicator on the field group's containing card
+        // (a small ShopWorks badge in the corner of each meta card).
+        const cards = document.querySelectorAll('.meta-card');
+        cards.forEach(card => card.classList.add('sw-mirrored'));
+    }
+
+    _renderDesignsPanel(order, lineItems) {
+        const section = document.getElementById('sw-designs-section');
+        if (!section) return;
+
+        // ShopWorks tracks ONE primary id_Design per order (multi-design
+        // orders use Designs[] but the order header just shows the main).
+        // If id_Design is 0 or missing, hide the panel (some orders have
+        // no design — fee-only orders, transfers, etc.).
+        const idDesign = Number(order.id_Design) || 0;
+        if (!idDesign && !order.DesignName) {
+            section.style.display = 'none';
+            return;
+        }
+
+        // Counters at the top: Product Qty + Total Imprints.
+        const productQty = Number(order.TotalProductQuantity) || lineItems.reduce((s, li) => s + (Number(li.LineQuantity) || 0), 0);
+        // Total imprints = sum of line item quantities × number of print locations.
+        // The /lineitems endpoint doesn't directly expose location count, so
+        // approximate as productQty × locationsCount when known, else fall back
+        // to "—". For DTG 2-location orders (LC + FB), this is qty × 2.
+        const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType);
+        // Locations count — guess from the design pattern. ShopWorks doesn't
+        // expose this directly on the order; we can derive from the original
+        // submission's `printLocations` field if present.
+        const submittedPrintLocs = this.fullData?.originalSubmission?.printLocations || '';
+        const locationsCount = submittedPrintLocs
+            ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
+            : 1;
+        const totalImprints = productQty * locationsCount;
+
+        const productQtyEl = document.getElementById('sw-designs-product-qty');
+        if (productQtyEl) productQtyEl.textContent = productQty || '—';
+        const imprintsEl = document.getElementById('sw-designs-imprints');
+        if (imprintsEl) imprintsEl.textContent = totalImprints || '—';
+
+        // Render the design row in the table.
+        const tbody = document.getElementById('sw-designs-tbody');
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
+                    <td class="sw-designs-name">${this.escapeHtml(order.DesignName || '(no name)')}</td>
+                    <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
+                    <td class="sw-designs-locations">${this.escapeHtml(String(locationsCount))}</td>
+                    <td class="sw-designs-imprints">${this.escapeHtml(String(totalImprints || ''))}</td>
+                </tr>
+            `;
+        }
+
+        section.style.display = 'block';
+    }
+
+    _resolveDesignTypeName(idDesignType) {
+        // ShopWorks design type IDs per Erik's "design type translation.csv":
+        //   1 = Screenprint, 2 = Embroidery, 4 = Sticker, 5 = Emblem,
+        //   8 = DTF Transfer, 45 = DTG
+        const TYPE_NAMES = {
+            1: 'Screenprint',
+            2: 'Embroidery',
+            4: 'Sticker',
+            5: 'Emblem',
+            8: 'DTF Transfer',
+            45: 'DTG',
+        };
+        return TYPE_NAMES[Number(idDesignType)] || (idDesignType ? `Type ${idDesignType}` : 'Unknown');
     }
 
     // Event Listeners
