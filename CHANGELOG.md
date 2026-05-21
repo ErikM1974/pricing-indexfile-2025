@@ -1,3 +1,7 @@
+## v2026.05.21.21 (2026.05.21)
+
+- Deploy v2026.05.21.21: 3 files — Phase A audit fixes: C1 dashboard handles Processed+Failed statuses, C3 Pacific TZ parse helper (server-side + client-side via caspio-date-utils)
+
 ## v2026.05.21.20 (2026.05.21)
 
 - Deploy v2026.05.21.20: 2 files — quote-management dashboard handles Cancelled_in_ShopWorks: red badge, filter option, stat card, retention countdown, row tint, exclude from Total Value
