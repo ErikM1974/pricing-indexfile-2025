@@ -158,6 +158,67 @@ function isValidIdentifier(input) {
 }
 
 /**
+ * Idempotency cache for /api/submit-order-form.
+ *
+ * Maps a client-supplied submissionId (UUID generated per submit attempt)
+ * to the response we returned. If a client retries with the SAME submissionId
+ * within the TTL window, we return the cached response instead of allocating
+ * a new OF-NNNN and pushing again. Protects against:
+ *  - Network hiccup mid-response (client retries)
+ *  - Browser double-submit despite frontend's `submitting` guard
+ *  - Heroku router 503 → client auto-retry
+ *
+ * Single-process Map — fine for one Heroku dyno. If we ever scale to
+ * multiple web dynos, this needs to move to Redis or a Caspio dedup column.
+ */
+const SUBMIT_IDEMPOTENCY_TTL_MS = 10 * 60 * 1000; // 10 min
+const submitIdempotencyCache = new Map(); // submissionId → { response, expiresAt }
+
+function getCachedSubmitResponse(submissionId) {
+  if (!submissionId) return null;
+  const cached = submitIdempotencyCache.get(submissionId);
+  if (!cached) return null;
+  if (Date.now() > cached.expiresAt) {
+    submitIdempotencyCache.delete(submissionId);
+    return null;
+  }
+  return cached.response;
+}
+function cacheSubmitResponse(submissionId, response) {
+  if (!submissionId) return;
+  submitIdempotencyCache.set(submissionId, {
+    response,
+    expiresAt: Date.now() + SUBMIT_IDEMPOTENCY_TTL_MS,
+  });
+  // Best-effort eviction of expired entries (keep Map from growing forever).
+  if (submitIdempotencyCache.size > 1000) {
+    const now = Date.now();
+    for (const [k, v] of submitIdempotencyCache) {
+      if (now > v.expiresAt) submitIdempotencyCache.delete(k);
+    }
+  }
+}
+
+/**
+ * Northwest Custom Apparel physical locations. Used for:
+ *  - Customer Pickup shipping addresses (pickup orders ship to here)
+ *  - Tax-zip lookups for pickup orders (Milton WA = 10.1%)
+ *  - Remit-to addresses on invoices
+ * Centralizing here so a future move/relocation only updates one place.
+ */
+const NWCA_LOCATIONS = {
+  milton: {
+    company: 'Northwest Custom Apparel',
+    address1: '2025 Freeman Road East',
+    address2: '',
+    city: 'Milton',
+    state: 'WA',
+    zip: '98354',
+    country: 'USA',
+  },
+};
+
+/**
  * Parse a Caspio timestamp as Pacific wall-clock time.
  *
  * Caspio's REST API returns timestamps WITHOUT a timezone marker. They're
@@ -2278,8 +2339,22 @@ app.post('/api/submit-order-form', async (req, res) => {
       methodNotesBlock = '',   // method-specific context (frontend-built)
       printLocations = '',     // human-readable print location label (e.g. "Left Chest + Full Back")
       designNumbers = [],      // array of design # strings to look up in ShopWorks
-      addOns = []              // Phase 2a fee/service add-ons → push as ShopWorks LinesOE entries
+      addOns = [],             // Phase 2a fee/service add-ons → push as ShopWorks LinesOE entries
+      submissionId            // optional client-generated UUID for idempotent retries (audit fix H5)
     } = req.body || {};
+
+    // Idempotency check (audit fix H5): if the client retried with the same
+    // submissionId within the TTL window, return the cached response instead
+    // of allocating a new OF-NNNN + re-pushing. Protects against double-submit
+    // on network hiccups despite the frontend's `submitting` guard.
+    const idemId = submissionId || req.headers['x-submission-id'] || null;
+    if (idemId) {
+      const cached = getCachedSubmitResponse(idemId);
+      if (cached) {
+        console.log('[Order Form Submit] ↻ idempotent retry for submissionId', idemId, '→ returning cached response');
+        return res.status(cached.statusCode || 200).json({ ...cached.body, idempotentReplay: true });
+      }
+    }
 
     if (!info.email && !info.company) {
       return res.status(400).json({ success: false, error: 'Missing contact info (email or company required)' });
@@ -2585,6 +2660,22 @@ app.post('/api/submit-order-form', async (req, res) => {
     const ORDER_TYPE_DEFAULT = 6;  // Online Store — fallback when no method picked
     const methodsUsed = [...new Set(rows.map(r => r && r.deco).filter(Boolean))];
 
+    // Audit fix M3 (2026-05-21): ShopWorks doesn't allow mixed-method orders
+    // — each order routes to a single production queue (id_OrderType). If the
+    // rep accidentally mixes DTG + EMB rows, the push would silently land on
+    // whichever method wins the methodsUsed[0] race, and the other method's
+    // lines arrive at the wrong production queue. Block at submit time with
+    // a clear message; rep should split into separate orders.
+    if (methodsUsed.length > 1) {
+      console.warn('[Order Form Submit] Mixed-method blocked:', methodsUsed.join(', '), 'for', extOrderId);
+      return res.status(400).json({
+        success: false,
+        error: 'Mixed-method orders not supported',
+        details: `This order has rows with ${methodsUsed.length} different decoration methods (${methodsUsed.join(', ')}). ShopWorks orders can only have ONE decoration method. Please split this into separate orders — one per method.`,
+        methodsUsed,
+      });
+    }
+
     // Design # → id_Design resolution.
     //
     // CASPIO TABLE INSIGHT (Erik confirmed 2026-05-02): the
@@ -2827,15 +2918,19 @@ app.post('/api/submit-order-form', async (req, res) => {
       //     ship-to address the rep typed in the ship-to block.
       shipping: (ship.method === 'pickup' || ship.method === 'willcall' || ship.method === 'Customer Pickup')
         ? {
-          company: 'Northwest Custom Apparel',
+          // Customer Pickup — ships to NWCA Milton location.
+          // Uses NWCA_LOCATIONS.milton so the address lives in one place.
+          // ShipAddress01 is overridden to "Customer Pickup" as a visible
+          // marker on ShopWorks / packing slips.
+          company: NWCA_LOCATIONS.milton.company,
           firstName: '',
           lastName: '',
           address1: 'Customer Pickup',
           address2: '',
-          city: 'Milton',
-          state: 'WA',
-          zip: '98354',
-          country: 'USA',
+          city: NWCA_LOCATIONS.milton.city,
+          state: NWCA_LOCATIONS.milton.state,
+          zip: NWCA_LOCATIONS.milton.zip,
+          country: NWCA_LOCATIONS.milton.country,
           method: 'Customer Pickup'
         }
         : {
@@ -3076,10 +3171,16 @@ app.post('/api/submit-order-form', async (req, res) => {
         console.warn('[Order Form Submit] Customer_Service_History upsert failed (non-fatal):', e.message);
       }
 
-      return res.json({ success: true, extOrderId, shopWorksId, mode: 'live', skippedLines });
+      const successBody = { success: true, extOrderId, shopWorksId, mode: 'live', skippedLines };
+      cacheSubmitResponse(idemId, { statusCode: 200, body: successBody });
+      return res.json(successBody);
     } else {
       console.error('[Order Form Submit] Push failed:', result);
-      return res.status(502).json({ success: false, extOrderId, error: result.error || 'ShopWorks submission failed', detail: result });
+      const failBody = { success: false, extOrderId, error: result.error || 'ShopWorks submission failed', detail: result };
+      // Cache failures too — a client retry after a 502 should get the same
+      // result back instead of starting a fresh push (idempotent error path).
+      cacheSubmitResponse(idemId, { statusCode: 502, body: failBody });
+      return res.status(502).json(failBody);
     }
   } catch (err) {
     console.error('[Order Form Submit] Error:', err);

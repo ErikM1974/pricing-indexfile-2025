@@ -118,14 +118,28 @@ window.nwOrderAPI = (function () {
     };
   }
 
+  // Generate a UUID-ish submissionId per submit attempt for the server's
+  // idempotency cache (audit fix H5). The same submissionId on a retry
+  // returns the original response instead of re-allocating an OF-NNNN.
+  // crypto.randomUUID is supported in all modern browsers; fallback for old.
+  function newSubmissionId() {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    // Fallback — not RFC-4122 but unique enough for our 10-min idem cache.
+    return 'sub-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+  }
+
   async function submitOrder(order) {
     const draftId = order.draftId || null;
-    const body = buildBody(order, draftId ? { draftId } : {});
+    const submissionId = order.submissionId || newSubmissionId();
+    const body = buildBody(order, draftId ? { draftId, submissionId } : { submissionId });
 
     try {
       const r = await fetch(SUBMIT_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Submission-Id': submissionId,
+        },
         body: JSON.stringify(body)
       });
       const json = await r.json().catch(() => ({}));
