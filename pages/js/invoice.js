@@ -257,29 +257,77 @@
     }
 
     renderBillTo(data, order, orig) {
-      // Customer / company
+      const billing = data.billingContact || null;
+
+      // Customer / company — three-tier priority
       const customer =
         order?.CustomerName ||
+        billing?.companyName ||
         orig?.info?.company ||
         data.sessionRaw?.CompanyName ||
         data.sessionRaw?.CustomerName ||
         '—';
       $('bill-customer-name').textContent = customer;
 
-      // Contact (prefer ShopWorks live data; fall back to original)
+      // Contact (prefer ShopWorks live, then billing-contact record, then quote)
       const first = order?.ContactFirstName || '';
       const last  = order?.ContactLastName  || '';
       const swContact = [first, last].filter(Boolean).join(' ').trim();
-      const contact = swContact || orig?.info?.name || data.sessionRaw?.CustomerName || '';
+      const contact =
+        swContact ||
+        billing?.contactName ||
+        orig?.info?.name ||
+        data.sessionRaw?.CustomerName ||
+        '';
       if (contact && contact !== customer) {
         $('bill-contact-name').textContent = contact;
       }
 
-      // Email / phone
-      const email = order?.ContactEmail || orig?.info?.email || data.sessionRaw?.CustomerEmail || '';
+      // Billing street address — pull from CompanyContactsMerge2026 first
+      // (authoritative), then fall back to whatever the rep typed at submit.
+      const billAddr1 =
+        billing?.address1 ||
+        orig?.info?.address ||
+        orig?.info?.address1 ||
+        orig?.info?.billingAddress ||
+        '';
+      const billAddr2 =
+        billing?.address2 ||
+        orig?.info?.address2 ||
+        '';
+      const billCity  = billing?.city  || orig?.info?.city  || '';
+      const billState = billing?.state || orig?.info?.state || '';
+      const billZip   = billing?.zip   || orig?.info?.zip   || '';
+      const billCityState =
+        [billCity, billState].filter(Boolean).join(', ') +
+        (billZip ? ' ' + billZip : '');
+
+      if (billAddr1) $('bill-address-line1').textContent = billAddr1;
+      else $('bill-address-line1').style.display = 'none';
+
+      if (billAddr2) $('bill-address-line2').textContent = billAddr2;
+      else $('bill-address-line2').style.display = 'none';
+
+      if (billCityState.trim()) $('bill-address-citystate').textContent = billCityState.trim();
+      else $('bill-address-citystate').style.display = 'none';
+
+      // Email / phone — quote-specific contact info takes priority over
+      // the company-record values (rep may have keyed a different contact).
+      const email =
+        order?.ContactEmail ||
+        orig?.info?.email ||
+        data.sessionRaw?.CustomerEmail ||
+        billing?.email ||
+        '';
       if (email) $('bill-email').textContent = email;
 
-      const phone = fmtPhone(order?.ContactPhone || orig?.info?.phone || data.sessionRaw?.Phone || '');
+      const phone = fmtPhone(
+        order?.ContactPhone ||
+        orig?.info?.phone ||
+        data.sessionRaw?.Phone ||
+        billing?.phone ||
+        ''
+      );
       if (phone) $('bill-phone').textContent = phone;
     }
 

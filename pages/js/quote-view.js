@@ -2785,21 +2785,21 @@ class QuoteViewPage {
     _renderBillingBlock(order) {
         // Render the customer's billing address. ShopWorks's /v1/orders
         // doesn't expose billing fields directly — they're on the Customer
-        // record. We have two reliable sources:
-        //   1. originalSubmission.info — the form's captured address (best
-        //      for our staff-direct OF orders since rep typed it at submit)
-        //   2. CompanyContactsMerge2026 via /api/company-contacts-2026 — would
-        //      require a separate fetch by id_Customer
-        // For now, use #1 (free, no extra API call) and skip silently if not
-        // populated. Future iteration can add #2 as a fallback.
-        const info = this.fullData?.originalSubmission?.info;
-        if (!info) return;
-        const addr = info.address || info.address1 || '';
-        const city = info.city || '';
-        const state = info.state || '';
-        const zip = info.zip || '';
+        // record. Source priority:
+        //   1. fullData.billingContact — CompanyContactsMerge2026 record
+        //      (server-side fetched in /api/quote-sessions/:quoteId/full).
+        //      Most authoritative; has the full street address.
+        //   2. originalSubmission.info — whatever the rep typed at submit
+        //      (often partial: city/state only). Fallback only.
+        const billing = this.fullData?.billingContact;
+        const info = this.fullData?.originalSubmission?.info || {};
 
-        // Need at least an address OR a city+state to render.
+        const addr  = billing?.address1 || info.address || info.address1 || '';
+        const city  = billing?.city || info.city || '';
+        const state = billing?.state || info.state || '';
+        const zip   = billing?.zip || info.zip || '';
+
+        // Need at least a street address OR a city+state to render.
         if (!addr && !city) return;
 
         const block = document.getElementById('customer-billing-block');

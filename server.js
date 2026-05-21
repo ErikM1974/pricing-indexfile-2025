@@ -4624,6 +4624,57 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       items = [];
     }
 
+    // Billing contact — pull the customer's billing address from the
+    // CompanyContactsMerge2026 table so the invoice / quote-view can display
+    // a complete Bill-To block. The original submission only captures whatever
+    // the rep typed at submit time (often partial: city/state only).
+    //
+    // Source priority for id_Customer:
+    //   1. ShopWorks snapshot's order.id_Customer (most authoritative)
+    //   2. originalSubmission.info.companyId (form-captured)
+    let billingContact = null;
+    const idCustomer =
+      shopWorks?.snapshot?.order?.id_Customer ||
+      originalSubmission?.info?.companyId ||
+      null;
+    if (idCustomer) {
+      try {
+        const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
+          || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(
+          `${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`,
+          { method: 'GET' }
+        );
+        if (resp.ok) {
+          const data = await resp.json();
+          const contacts = Array.isArray(data?.contacts) ? data.contacts : [];
+          // Prefer contacts with a complete address; fall back to the most-recent.
+          const complete = contacts.find(c => c.Has_Complete_Address && c.Address);
+          const fallback = contacts.find(c => c.Address) || contacts[0];
+          const chosen = complete || fallback;
+          if (chosen) {
+            billingContact = {
+              companyName: chosen.Company_Name || chosen.CustomerCompanyName || null,
+              address1:    chosen.Address || null,
+              address2:    chosen.Address2 || null,
+              city:        chosen.City || null,
+              state:       chosen.State || null,
+              zip:         chosen.Zip || null,
+              phone:       chosen.Company_Phone || null,
+              email:       chosen.Company_Email || null,
+              contactName: chosen.ct_NameFull || [chosen.NameFirst, chosen.NameLast].filter(Boolean).join(' ') || null,
+              source:      'company-contacts-2026',
+              idCustomer,
+            };
+          }
+        }
+      } catch (e) {
+        // Best-effort fetch — don't fail the whole /full response if proxy is
+        // momentarily unreachable. Front end will fall back to originalSubmission.
+        console.warn(`[quote/full] billing-contact fetch failed for customer ${idCustomer}:`, e.message);
+      }
+    }
+
     res.json({
       quoteId: session.QuoteID,
       status: session.Status,
@@ -4631,6 +4682,7 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       originalSubmission,                     // parsed Notes JSON
       quoteItems: items,                      // pre-import line items
       shopWorks,                              // current ShopWorks-side state (when synced)
+      billingContact,                         // Bill-To address from CompanyContactsMerge2026
     });
   } catch (error) {
     console.error('[quote/full] error:', error);
