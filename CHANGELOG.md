@@ -1,3 +1,7 @@
+## v2026.05.21.2 (2026.05.21)
+
+- Deploy v2026.05.21.2: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4a: ShopWorks sync strip (Pending/Imported pill + Refresh button)
+
 ## v2026.05.21.1 (2026.05.21)
 
 - Deploy v2026.05.21.1: 1 files (server.js,...) — add quote-sessions ShopWorks sync endpoints (POST /sync-from-shopworks, GET /full)
