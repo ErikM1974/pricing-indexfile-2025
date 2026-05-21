@@ -1,3 +1,7 @@
+## v2026.05.21.5 (2026.05.21)
+
+- Deploy v2026.05.21.5: 4 files (quote-view.css,quote-view.js,quote-view.html,) — Manual ShopWorks WO# entry (workaround for /v1/getorderno gap)
+
 ## v2026.05.21.4 (2026.05.21)
 
 - Deploy v2026.05.21.4: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4c: Order Status grid + Notes + Shipping panels
