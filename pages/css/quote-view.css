@@ -1542,6 +1542,39 @@ body {
      - Imported → forest-green pill with checkmark + WO#
      - Failed   → amber pill with warning sign (transient — only on refresh)
    ============================================================================ */
+/* CANCELLED-IN-SHOPWORKS banner — full-width red strip above the sync
+   strip when the ShopWorks operator deleted the order. The quote row
+   stays in Caspio for 30 days for audit; bulk-sync cron purges later. */
+.sw-cancelled-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #fef2f2;
+    border: 2px solid #b91c1c;
+    border-radius: 6px;
+    margin: 12px 0 18px;
+    color: #7f1d1d;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.sw-cancelled-icon {
+    font-size: 22px;
+    line-height: 1;
+    color: #b91c1c;
+}
+.sw-cancelled-text strong {
+    display: inline-block;
+    font-weight: 800;
+    color: #b91c1c;
+    letter-spacing: 0.04em;
+    margin-right: 6px;
+}
+.sw-cancelled-detail {
+    color: #7f1d1d;
+    font-weight: 500;
+}
+
 .sw-sync-strip {
     display: flex;
     flex-wrap: wrap;

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.9">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.19">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,6 +58,17 @@
                    • (no sync info yet on a brand-new draft) — strip hidden
                  Hidden when no ShopWorks info is available (e.g. legacy quotes).
                  ============================================================ -->
+            <!-- CANCELLED-IN-SHOPWORKS banner (sits above the sync strip).
+                 Shows when ShopWorks operator deleted the order. Soft-delete
+                 keeps the row 30 days for audit, then bulk-sync cron purges. -->
+            <div id="sw-cancelled-banner" class="sw-cancelled-banner" style="display: none;">
+                <span class="sw-cancelled-icon" aria-hidden="true">⊘</span>
+                <div class="sw-cancelled-text">
+                    <strong>CANCELLED IN SHOPWORKS</strong>
+                    <span id="sw-cancelled-detail" class="sw-cancelled-detail"></span>
+                </div>
+            </div>
+
             <div id="sw-sync-strip" class="sw-sync-strip" style="display: none;">
                 <div class="sw-sync-left">
                     <span class="sw-sync-pill" id="sw-sync-pill">
@@ -533,6 +544,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.16"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.19"></script>
 </body>
 </html>
