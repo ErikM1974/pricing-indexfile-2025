@@ -508,7 +508,21 @@
         return;
       }
 
-      rows.forEach(row => tbody.appendChild(this.buildLineRow(row)));
+      // Audit fix H3: group size-suffixed SKUs back into one logical product.
+      // PC90H + PC90H_2X + PC90H_3XL + PC90H_4XL → one PC90H header row
+      // with per-size sub-rows underneath. Customer reads 1 product (correct)
+      // instead of 4 separate line items.
+      const grouped = this.groupLineItemsByBaseSku(rows);
+      grouped.forEach(group => {
+        if (group.children && group.children.length > 0) {
+          tbody.appendChild(this.buildLineRow(group.parent, { isGroupParent: true }));
+          group.children.forEach(child => {
+            tbody.appendChild(this.buildLineRow(child, { isGroupChild: true }));
+          });
+        } else {
+          tbody.appendChild(this.buildLineRow(group.parent));
+        }
+      });
     }
 
     // Map ShopWorks /v1/lineitems[] to display rows.
@@ -632,9 +646,14 @@
       });
     }
 
-    buildLineRow(row) {
+    buildLineRow(row, opts) {
+      opts = opts || {};
       const tr = el('tr');
-      // Item / Style
+      // Apply grouping classes — CSS dims/indents children for visual hierarchy.
+      if (opts.isGroupParent) tr.classList.add('invoice-item-row--group-parent');
+      if (opts.isGroupChild)  tr.classList.add('invoice-item-row--group-child');
+
+      // Item / Style — children show the size suffix only (parent shows base PN).
       tr.appendChild(el('td', { class: 'col-style', text: row.style || '—' }));
       // Color
       tr.appendChild(el('td', { class: 'col-color', text: row.color || '' }));
@@ -650,11 +669,90 @@
       tr.appendChild(descCell);
       // Qty
       tr.appendChild(el('td', { class: 'col-qty', text: row.qty ? String(row.qty) : '—' }));
-      // Unit
-      tr.appendChild(el('td', { class: 'col-unit', text: row.unit ? fmtMoney(row.unit) : '—' }));
+      // Unit (parent of a group shows blank since per-size unit prices vary)
+      tr.appendChild(el('td', { class: 'col-unit', text: row.unit ? fmtMoney(row.unit) : (opts.isGroupParent ? 'varies' : '—') }));
       // Total
       tr.appendChild(el('td', { class: 'col-total', text: row.total ? fmtMoney(row.total) : '—' }));
       return tr;
+    }
+
+    /**
+     * Audit fix H3: collapse size-suffixed SKUs back into one logical product.
+     *
+     * Input:  [{style:'PC90H',...}, {style:'PC90H_2X',...}, {style:'PC90H_3XL',...}, {style:'PC54Y',...}]
+     * Output: [
+     *   { parent: {style:'PC90H', qty:10, total:468, desc:base+'Sizes: S-4XL'}, children: [child1, child2, child3, child4] },
+     *   { parent: {style:'PC54Y', ...}, children: [] }   // single-SKU products stay flat
+     * ]
+     *
+     * Base SKU = PartNumber with any size suffix stripped. Suffix detection
+     * regex matches: _XS, _XXS, _2X..._6X, _2XL..._6XL, _YXS/YS/YM/YL/YXL.
+     * Same patterns as collectSizesFromLineItem so size labels align.
+     *
+     * Single-SKU groups (no siblings) collapse back to flat rows so a single-
+     * size order doesn't get unnecessary visual nesting.
+     */
+    groupLineItemsByBaseSku(rows) {
+      if (!Array.isArray(rows) || rows.length === 0) return [];
+      const SUFFIX_RE = /_([0-9]+XL?|XS|XXS|YXS|YS|YM|YL|YXL)$/i;
+      const byBase = new Map();          // base PN → array of row indices
+      const insertOrder = [];            // preserves original order
+
+      rows.forEach((row, i) => {
+        const style = String(row.style || '').trim();
+        const m = style.match(SUFFIX_RE);
+        const baseKey = (m ? style.slice(0, m.index) : style) + '|' + (row.color || '');
+        if (!byBase.has(baseKey)) {
+          byBase.set(baseKey, []);
+          insertOrder.push(baseKey);
+        }
+        byBase.get(baseKey).push(i);
+      });
+
+      const result = [];
+      for (const key of insertOrder) {
+        const indices = byBase.get(key);
+        // Single-SKU groups → flat row (no grouping)
+        if (indices.length === 1) {
+          result.push({ parent: rows[indices[0]], children: [] });
+          continue;
+        }
+        // Multi-SKU group → roll up qty + total + locations into parent.
+        const groupRows = indices.map(i => rows[i]);
+        // Pick the row WITHOUT a size suffix as the "base" — its PartDescription
+        // is the canonical product name. Fall back to first row if all suffixed.
+        const baseRow = groupRows.find(r => !SUFFIX_RE.test(String(r.style || ''))) || groupRows[0];
+        const baseStyle = String(baseRow.style || '').replace(SUFFIX_RE, '');
+        const baseDesc = (baseRow.desc || '').split(' — ')[0].split(',')[0]; // strip size detail
+        const totalQty   = groupRows.reduce((s, r) => s + (Number(r.qty) || 0), 0);
+        const totalDollars = groupRows.reduce((s, r) => s + (Number(r.total) || 0), 0);
+
+        const parent = {
+          style: baseStyle,
+          color: baseRow.color,
+          desc:  baseDesc || baseRow.desc,
+          locations: baseRow.locations || '',
+          qty:   totalQty,
+          unit:  0,            // varies — buildLineRow shows "varies" placeholder
+          total: totalDollars,
+        };
+        // Children = each per-size line, with style trimmed to just the suffix
+        // (e.g. "_3XL" → "3XL") for cleaner display under the parent row.
+        const children = groupRows.map(r => {
+          const sStyle = String(r.style || '');
+          const sm = sStyle.match(SUFFIX_RE);
+          const sizeLabel = sm ? sm[1].toUpperCase().replace(/^([2-6]X)$/, '$1L') : (sStyle.replace(baseStyle, '').replace(/^_/, '') || '—');
+          return {
+            ...r,
+            style: '↳ ' + sizeLabel,    // arrow indent + size label
+            desc:  r.desc,
+            color: '',                  // color inherits from parent; blank to avoid dup
+            locations: '',              // locations only on parent
+          };
+        });
+        result.push({ parent, children });
+      }
+      return result;
     }
 
     // ---------- totals ----------
@@ -680,12 +778,23 @@
       // Hide shipping row if zero
       if (!shipping) $('shipping-row').style.display = 'none';
 
-      // Compute tax rate (when both subtotal and tax > 0). Use parenthetical
-      // inline format "(9.50%)" — cleaner than the old "@ 9.50%" pill.
+      // Compute tax rate (when both subtotal and tax > 0). Three-state
+      // display per audit fix M5:
+      //   • "(X%)" — tax was charged
+      //   • "(Tax Exempt)" — customer is tax-exempt per CompanyContactsMerge2026
+      //   • "(0% — Out of State)" — non-WA customer, tax=0 by default
+      //   • blank — no taxable base
       const taxBase = subtotal + shipping;
       const rateEl = $('total-tax-rate');
+      const isExempt = !!(data.billingContact && data.billingContact.isTaxExempt);
       if (tax > 0 && taxBase > 0) {
         rateEl.textContent = `(${((tax / taxBase) * 100).toFixed(2)}%)`;
+      } else if (isExempt && subtotal > 0) {
+        const cert = data.billingContact?.taxExemptNumber;
+        rateEl.textContent = cert ? `(Tax Exempt · Cert # ${cert})` : '(Tax Exempt)';
+        rateEl.style.color = '#166534';  // forest green to match exempt status
+      } else if (subtotal > 0 && tax === 0) {
+        rateEl.textContent = '(0% — Out of State)';
       } else {
         rateEl.textContent = '';
       }

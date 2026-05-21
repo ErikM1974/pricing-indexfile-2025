@@ -38,7 +38,7 @@
                 <select id="filter-status">
                     <option value="">All Statuses</option>
                     <option value="Open">Open</option>
-                    <option value="Pending Payment">Awaiting Payment (Stripe)</option>
+                    <option value="Pending Payment">Awaiting Payment</option>
                     <option value="Processed">Processed (in ShopWorks)</option>
                     <option value="Processed - ShopWorks Failed">Push Failed</option>
                     <option value="Accepted">Accepted</option>
@@ -451,7 +451,7 @@
                                           <i class="fas fa-exclamation-triangle"></i> Push Failed
                                        </span>`;
                 } else if (isPendingPayment) {
-                    statusCellHtml = `<span class="status-badge status-pending-payment" title="3-Day Tees order — customer started Stripe checkout but payment hasn't been confirmed yet. Status flips to Payment Confirmed / Processed automatically when the Stripe webhook fires.">
+                    statusCellHtml = `<span class="status-badge status-pending-payment" title="3-Day Tees order — credit card is processed in ShopWorks. Status updates once the order is completed there.">
                                           <i class="fas fa-credit-card"></i> Awaiting Payment
                                        </span>`;
                 } else {
