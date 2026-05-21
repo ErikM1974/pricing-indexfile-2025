@@ -1,3 +1,7 @@
+## v2026.05.21.17 (2026.05.21)
+
+- Deploy v2026.05.21.17: 8 files — wire Phone_Best from CompanyContactsMerge2026 into OF form picker + invoice billingContact fallback
+
 ## v2026.05.21.16 (2026.05.21)
 
 - Deploy v2026.05.21.16: 9 files — add billing address to invoice + quote-view (server-side fetch from CompanyContactsMerge2026 by id_Customer)
