@@ -1,3 +1,7 @@
+## v2026.05.21.9 (2026.05.21)
+
+- Deploy v2026.05.21.9: multi-design, payments, tracking, action buttons, print styles + bulk-sync endpoint
+
 ## v2026.05.21.8 (2026.05.21)
 
 - Deploy v2026.05.21.8: Phase 4e - View Original Submission audit panel with diff highlighting + stale-sync warning
