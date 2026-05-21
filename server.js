@@ -4661,6 +4661,10 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
               state:       chosen.State || null,
               zip:         chosen.Zip || null,
               phone:       chosen.Company_Phone || null,
+              // Phone_Best — curated "best phone for this contact" maintained
+              // in CompanyContactsMerge2026. Preferred when populated; reps
+              // hand-pick the right number per contact in the Caspio admin.
+              phoneBest:   chosen.Phone_Best || null,
               email:       chosen.Company_Email || null,
               contactName: chosen.ct_NameFull || [chosen.NameFirst, chosen.NameLast].filter(Boolean).join(' ') || null,
               source:      'company-contacts-2026',

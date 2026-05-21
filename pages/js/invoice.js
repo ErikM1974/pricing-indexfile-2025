@@ -321,10 +321,19 @@
         '';
       if (email) $('bill-email').textContent = email;
 
+      // Phone priority:
+      //   1. ShopWorks order.ContactPhone — set at order placement, most
+      //      specific to THIS order
+      //   2. originalSubmission.info.phone — what the rep typed at submit
+      //   3. sessionRaw.Phone — quote_sessions column
+      //   4. billing.phoneBest — curated "best phone" from CompanyContactsMerge2026
+      //      (preferred over Company_Phone — Erik hand-picks it per contact)
+      //   5. billing.phone — Company_Phone (legacy ShopWorks-imported)
       const phone = fmtPhone(
         order?.ContactPhone ||
         orig?.info?.phone ||
         data.sessionRaw?.Phone ||
+        billing?.phoneBest ||
         billing?.phone ||
         ''
       );

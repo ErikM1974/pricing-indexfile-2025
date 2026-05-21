@@ -2058,7 +2058,11 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 // it as ExtCustomerID for proper ShopWorks customer matching
                 // across repeat orders.
                 companyId:  c.id_Customer ? String(c.id_Customer) : '',
-                phone:      c.Company_Phone || '',
+                // Phone priority: Phone_Best (curated by Erik in CompanyContactsMerge2026)
+                // → top contact's Phone_Best → Company_Phone → top contact's Company_Phone.
+                // Phone_Best is the field reps should treat as authoritative when
+                // present; Company_Phone is the legacy ShopWorks-imported value.
+                phone:      top?.Phone_Best || c.Phone_Best || top?.Company_Phone || c.Company_Phone || '',
                 address:    c.Address || '',
                 city:       c.City || '',
                 state:      c.State || '',
