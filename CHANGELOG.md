@@ -1,3 +1,7 @@
+## v2026.05.21.26 (2026.05.21)
+
+- fix(quote-management): correct SalesRep -> SalesRepEmail field + archive resolved LESSONS_LEARNED entries
+
 ## v2026.05.21.25 (2026.05.21)
 
 - Deploy v2026.05.21.25: 2 files (quote-management.css,quote-management.html,...)
