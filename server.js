@@ -5103,8 +5103,10 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
 
     // 7. Build the items[] — collapse size-suffixed SKUs into grouped lines.
     //    For each base style+color, one ShipStation item with summarized
-    //    size breakdown in options[].
-    const items = buildShipStationItems(lineItems, originalSubmission);
+    //    size breakdown in options[]. After building, enrich each item
+    //    with a product image URL so warehouse pickers see the actual
+    //    garment+color combo in ShipStation's order view.
+    const items = await buildShipStationItems(lineItems, originalSubmission);
 
     // 8. Compose the payload
     const payload = {
@@ -5233,17 +5235,63 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
 });
 
 /**
+ * Look up a product's color-specific image URL from the SanMar bulk catalog.
+ * Used to enrich ShipStation line items with images so warehouse pickers see
+ * the actual garment color combo.
+ *
+ * Returns null when lookup fails — caller proceeds without an image.
+ *
+ * Module-level cache (TTL 24h) keeps repeat lookups for the same style+color
+ * fast and reduces proxy load. NWCA has ~200 active SKUs; cache stays small.
+ */
+const PRODUCT_IMAGE_CACHE = new Map();
+const PRODUCT_IMAGE_TTL_MS = 24 * 60 * 60 * 1000;
+
+async function lookupProductImage(styleNumber, color) {
+  if (!styleNumber) return null;
+  const key = `${styleNumber}|${color || ''}`.toLowerCase();
+  const cached = PRODUCT_IMAGE_CACHE.get(key);
+  if (cached && Date.now() < cached.expiresAt) return cached.url;
+
+  try {
+    const PROXY = process.env.CASPIO_PROXY_BASE_URL
+      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const url = `${PROXY}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`;
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      PRODUCT_IMAGE_CACHE.set(key, { url: null, expiresAt: Date.now() + 60_000 }); // brief negative cache
+      return null;
+    }
+    const data = await resp.json();
+    const first = Array.isArray(data) && data.length > 0 ? data[0] : null;
+    if (!first) {
+      PRODUCT_IMAGE_CACHE.set(key, { url: null, expiresAt: Date.now() + 60_000 });
+      return null;
+    }
+    // Prefer color-specific model shot for visual confirmation
+    const imageUrl = first.COLOR_PRODUCT_IMAGE || first.PRODUCT_IMAGE || first.THUMBNAIL_IMAGE || null;
+    PRODUCT_IMAGE_CACHE.set(key, { url: imageUrl, expiresAt: Date.now() + PRODUCT_IMAGE_TTL_MS });
+    return imageUrl;
+  } catch (e) {
+    console.warn(`[lookupProductImage] failed for ${styleNumber}/${color}:`, e.message);
+    return null;
+  }
+}
+
+/**
  * Build the ShipStation items[] array from snapshot.lineItems[] (post-import)
  * or originalSubmission.rows[] (pre-import).
  *
  * Collapses size-suffixed SKUs back into one product per (PartNumber+Color),
- * with a "Sizes: S:1, M:1, L:1, XL:1, 2XL:2..." string in options[].
+ * with a "Sizes: S:1, M:1, L:1, XL:1, 2XL:2..." string in options[]. Also
+ * enriches each item with imageUrl (color-specific garment shot) so the
+ * warehouse picker visually verifies the right product.
  *
  * This is the server-side mirror of the client-side groupLineItemsByBaseSku
  * in pages/js/invoice.js — keeps the ShipStation order looking like 3 logical
  * products instead of 8 size-suffix line items.
  */
-function buildShipStationItems(lineItems, originalSubmission) {
+async function buildShipStationItems(lineItems, originalSubmission) {
   const out = [];
   const SUFFIX_RE = /_([0-9]+XL?|XS|XXS|YXS|YS|YM|YL|YXL)$/i;
 
@@ -5296,29 +5344,45 @@ function buildShipStationItems(lineItems, originalSubmission) {
           v.color  ? { name: 'Color', value: v.color } : null,
           v.sizeChunks.length ? { name: 'Sizes', value: v.sizeChunks.join(', ') } : null,
         ].filter(Boolean),
+        _colorForImage: v.color,    // internal — stripped after image lookup
       });
     }
-    return out;
+  } else {
+    // Fallback — originalSubmission rows (pre-import orders).
+    const rows = originalSubmission?.rows || [];
+    rows.forEach(r => {
+      const sizes = r.sizes || {};
+      const totalQty = Object.values(sizes).reduce((s, n) => s + (Number(n) || 0), 0) || Number(r.qty) || 0;
+      if (!totalQty) return;
+      const sizeChunks = Object.keys(sizes).filter(k => Number(sizes[k]) > 0).map(k => `${k.toUpperCase()}:${sizes[k]}`);
+      const color = r.color || r.colorName || '';
+      // For image lookup we want CATALOG_COLOR (e.g. "BrillOrng") when set,
+      // since that's what the inventory endpoint expects. Fall back to
+      // display color name if catalogColor isn't on the row.
+      const catalogColor = r.catalogColor || color;
+      out.push({
+        sku:       r.style || r.styleNumber || 'MISC',
+        name:      r.desc || r.description || (r.style || 'Custom item'),
+        quantity:  totalQty,
+        unitPrice: Number(r.unitPrice) || Number(r.price) || 0,
+        options: [
+          color ? { name: 'Color', value: color } : null,
+          sizeChunks.length ? { name: 'Sizes', value: sizeChunks.join(', ') } : null,
+        ].filter(Boolean),
+        _colorForImage: catalogColor,
+      });
+    });
   }
 
-  // Fallback — originalSubmission rows (pre-import orders).
-  const rows = originalSubmission?.rows || [];
-  rows.forEach(r => {
-    const sizes = r.sizes || {};
-    const totalQty = Object.values(sizes).reduce((s, n) => s + (Number(n) || 0), 0) || Number(r.qty) || 0;
-    if (!totalQty) return;
-    const sizeChunks = Object.keys(sizes).filter(k => Number(sizes[k]) > 0).map(k => `${k.toUpperCase()}:${sizes[k]}`);
-    out.push({
-      sku:       r.style || r.styleNumber || 'MISC',
-      name:      r.desc || r.description || (r.style || 'Custom item'),
-      quantity:  totalQty,
-      unitPrice: Number(r.unitPrice) || Number(r.price) || 0,
-      options: [
-        (r.color || r.colorName) ? { name: 'Color', value: r.color || r.colorName } : null,
-        sizeChunks.length ? { name: 'Sizes', value: sizeChunks.join(', ') } : null,
-      ].filter(Boolean),
-    });
-  });
+  // Enrich every item with a product image URL (in parallel). Warehouse
+  // pickers see the actual garment color+style in ShipStation's order view.
+  // Best-effort — missing images don't block the push.
+  await Promise.all(out.map(async (item) => {
+    const imageUrl = await lookupProductImage(item.sku, item._colorForImage);
+    if (imageUrl) item.imageUrl = imageUrl;
+    delete item._colorForImage;
+  }));
+
   return out;
 }
 
