@@ -90,7 +90,28 @@
     return `${day}d ago`;
   }
 
-  function decorationLabel(idDesignType, fallback) {
+  // Map a decoration "method" code (from originalSubmission) to a display label.
+  // These codes come from our quote-builder UI and are reliable.
+  const METHOD_LABELS = {
+    'dtg':           'DTG Digital Printing',
+    'dtf':           'DTF Transfer',
+    'emb':           'Embroidery',
+    'embroidery':    'Embroidery',
+    'cap-emb':       'Cap Embroidery',
+    'sp':            'Screen Printing',
+    'screen-print':  'Screen Printing',
+    'screenprint':   'Screen Printing',
+    'sticker':       'Sticker',
+    'emblem':        'Emblem / Patch',
+    'patch':         'Emblem / Patch',
+    'laser':         'Laser Engraving',
+    'jds':           'Laser Engraving',
+  };
+
+  // Map a ShopWorks DESIGN type id to a label. Used as a last-resort fallback —
+  // ShopWorks's ORDER type ID lookup is a different table that we don't ship
+  // client-side, so we DON'T treat id_OrderType as a design-type id here.
+  function designTypeLabel(idDesignType, fallback) {
     const TYPE_NAMES = {
       1: 'Screen Printing', 2: 'Embroidery', 4: 'Sticker',
       5: 'Emblem', 8: 'DTF Transfer', 45: 'DTG Digital Printing',
@@ -326,8 +347,25 @@
         '';
       $('detail-terms').textContent = terms || '—';
 
-      // Decoration / order type
-      const decoType = decorationLabel(order?.id_OrderType, this.inferDecorationFromQuoteId());
+      // Decoration / order type. Source priority:
+      //   1. originalSubmission.decoConfig.method — what the rep chose at submit
+      //      time (most reliable; 'dtg', 'emb', 'screen-print', etc.)
+      //   2. originalSubmission.rows[0].deco — per-row method
+      //   3. originalSubmission.info.method — older shape
+      //   4. The order's primary DesignType id (from pushed.Designs[0])
+      //   5. Quote-ID prefix inference (last-resort)
+      //
+      // We do NOT use order.id_OrderType — that's a separate ShopWorks lookup
+      // table and the IDs don't match the design-type table.
+      const pushedFirstDesign = (this.fullData?.shopWorks?.snapshot?.pushed?.Designs || [])[0];
+      const method =
+        orig?.decoConfig?.method ||
+        orig?.rows?.[0]?.deco ||
+        orig?.info?.method;
+      let decoType =
+        (method && METHOD_LABELS[String(method).toLowerCase()]) ||
+        designTypeLabel(pushedFirstDesign?.id_DesignType, null) ||
+        this.inferDecorationFromQuoteId();
       $('detail-method').textContent = decoType;
     }
 
@@ -380,11 +418,19 @@
       // Each line in ShopWorks may have multiple sizes (Size01..Size06).
       // For an invoice we surface qty/unit/total at the LINE level
       // (subtotal of all sizes), and put the size breakdown in the description.
+      //
+      // ShopWorks /v1/lineitems field names:
+      //   LineQuantity   — total qty for this style/color line
+      //   LineUnitPrice  — per-piece price
+      //   PartNumber / PartColor / PartDescription
+      //   Size01..Size06 — per-size qty (string-typed in MO)
       const out = [];
       lineItems.forEach(li => {
         const sizes = this.collectSizesFromLineItem(li);
-        const qty   = sizes.reduce((s, x) => s + x.qty, 0) || Number(li.TotalQuantity) || 0;
-        const unit  = Number(li.cur_UnitPrice) || Number(li.UnitPrice) || 0;
+        const qty   = Number(li.LineQuantity) ||
+                      sizes.reduce((s, x) => s + x.qty, 0) ||
+                      Number(li.TotalQuantity) || 0;
+        const unit  = Number(li.LineUnitPrice) || Number(li.cur_UnitPrice) || Number(li.UnitPrice) || 0;
         const total = Number(li.cur_TotalPrice) || (unit * qty);
 
         const sizeStr = sizes.length
