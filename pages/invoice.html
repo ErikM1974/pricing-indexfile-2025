@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice — Northwest Custom Apparel</title>
+    <link rel="stylesheet" href="/pages/css/invoice.css?v=2026.05.21.12">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="invoice-page">
+        <!-- Loading -->
+        <div id="loading" class="invoice-loading">
+            <p>Loading invoice…</p>
+        </div>
+
+        <!-- Error -->
+        <div id="error" class="invoice-error" style="display: none;">
+            <h2>Invoice Not Found</h2>
+            <p id="error-message">The invoice you're looking for could not be loaded.</p>
+            <p class="error-help">Contact us at <a href="tel:2539225793">(253) 922-5793</a> or
+                <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+        </div>
+
+        <!-- Toolbar (hidden in print) -->
+        <div id="toolbar" class="invoice-toolbar" style="display: none;">
+            <button type="button" id="btn-print" class="toolbar-btn toolbar-btn--primary">
+                🖨 Print / Save as PDF
+            </button>
+            <button type="button" id="btn-refresh" class="toolbar-btn">
+                🔄 Refresh from ShopWorks
+            </button>
+            <a id="btn-back-to-quote" class="toolbar-btn toolbar-btn--ghost" href="#">
+                ← Back to full quote view
+            </a>
+            <span id="sync-status" class="toolbar-sync-status"></span>
+        </div>
+
+        <!-- Invoice content -->
+        <div id="invoice" class="invoice" style="display: none;">
+
+            <!-- Header strip: logo + invoice meta -->
+            <header class="invoice-header">
+                <div class="invoice-header-left">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="invoice-logo">
+                    <div class="invoice-company-meta">
+                        <div class="invoice-company-name">Northwest Custom Apparel</div>
+                        <div class="invoice-company-line">2025 Freeman Road East · Milton, WA 98354</div>
+                        <div class="invoice-company-line">(253) 922-5793 · sales@nwcustomapparel.com</div>
+                    </div>
+                </div>
+                <div class="invoice-header-right">
+                    <div class="invoice-title" id="invoice-title">INVOICE</div>
+                    <div class="invoice-meta-row">
+                        <span class="invoice-meta-label">Order #</span>
+                        <span class="invoice-meta-value" id="invoice-order-number">—</span>
+                    </div>
+                    <div class="invoice-meta-row">
+                        <span class="invoice-meta-label">Quote #</span>
+                        <span class="invoice-meta-value" id="invoice-quote-id">—</span>
+                    </div>
+                    <div class="invoice-meta-row">
+                        <span class="invoice-meta-label">Date</span>
+                        <span class="invoice-meta-value" id="invoice-date">—</span>
+                    </div>
+                    <div class="invoice-meta-row" id="rush-row" style="display: none;">
+                        <span class="invoice-rush-badge">RUSH</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Bill To + Ship To -->
+            <section class="invoice-addresses">
+                <div class="invoice-address-block">
+                    <div class="invoice-address-label">Bill To</div>
+                    <div class="invoice-address-name" id="bill-customer-name">—</div>
+                    <div class="invoice-address-line" id="bill-contact-name"></div>
+                    <div class="invoice-address-line" id="bill-email"></div>
+                    <div class="invoice-address-line" id="bill-phone"></div>
+                </div>
+                <div class="invoice-address-block">
+                    <div class="invoice-address-label">Ship To</div>
+                    <div class="invoice-address-name" id="ship-recipient">—</div>
+                    <div class="invoice-address-line" id="ship-line1"></div>
+                    <div class="invoice-address-line" id="ship-line2"></div>
+                    <div class="invoice-address-line" id="ship-citystate"></div>
+                    <div class="invoice-address-line invoice-ship-method" id="ship-method"></div>
+                </div>
+            </section>
+
+            <!-- Order details strip -->
+            <section class="invoice-details">
+                <div class="invoice-detail-cell">
+                    <div class="invoice-detail-label">PO Number</div>
+                    <div class="invoice-detail-value" id="detail-po">—</div>
+                </div>
+                <div class="invoice-detail-cell">
+                    <div class="invoice-detail-label">Sales Rep</div>
+                    <div class="invoice-detail-value" id="detail-rep">—</div>
+                </div>
+                <div class="invoice-detail-cell">
+                    <div class="invoice-detail-label">Req Ship Date</div>
+                    <div class="invoice-detail-value" id="detail-ship-date">—</div>
+                </div>
+                <div class="invoice-detail-cell">
+                    <div class="invoice-detail-label">Terms</div>
+                    <div class="invoice-detail-value" id="detail-terms">—</div>
+                </div>
+                <div class="invoice-detail-cell invoice-detail-cell--method">
+                    <div class="invoice-detail-label">Decoration</div>
+                    <div class="invoice-detail-value" id="detail-method">—</div>
+                </div>
+            </section>
+
+            <!-- Line items table -->
+            <section class="invoice-items">
+                <table class="invoice-items-table">
+                    <thead>
+                        <tr>
+                            <th class="col-style">Item</th>
+                            <th class="col-color">Color</th>
+                            <th class="col-desc">Description</th>
+                            <th class="col-qty">Qty</th>
+                            <th class="col-unit">Unit</th>
+                            <th class="col-total">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody id="items-tbody">
+                        <!-- populated by JS -->
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Totals (right-aligned at bottom) -->
+            <section class="invoice-totals">
+                <div class="invoice-totals-inner">
+                    <div class="invoice-totals-row">
+                        <span class="invoice-totals-label">Subtotal</span>
+                        <span class="invoice-totals-value" id="total-subtotal">$0.00</span>
+                    </div>
+                    <div class="invoice-totals-row">
+                        <span class="invoice-totals-label">
+                            Sales Tax <span class="invoice-totals-rate" id="total-tax-rate"></span>
+                        </span>
+                        <span class="invoice-totals-value" id="total-tax">$0.00</span>
+                    </div>
+                    <div class="invoice-totals-row" id="shipping-row">
+                        <span class="invoice-totals-label">Shipping</span>
+                        <span class="invoice-totals-value" id="total-shipping">$0.00</span>
+                    </div>
+                    <div class="invoice-totals-row invoice-totals-row--grand">
+                        <span class="invoice-totals-label">TOTAL</span>
+                        <span class="invoice-totals-value" id="total-grand">$0.00</span>
+                    </div>
+                    <div class="invoice-totals-row" id="paid-row" style="display: none;">
+                        <span class="invoice-totals-label">Payments Received</span>
+                        <span class="invoice-totals-value" id="total-paid">$0.00</span>
+                    </div>
+                    <div class="invoice-totals-row invoice-totals-row--balance" id="balance-row" style="display: none;">
+                        <span class="invoice-totals-label">Balance Due</span>
+                        <span class="invoice-totals-value" id="total-balance">$0.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer (NWCA contact + sync timestamp) -->
+            <footer class="invoice-footer">
+                <div class="invoice-footer-left">
+                    Thank you for your business · <strong>Northwest Custom Apparel</strong> ·
+                    <a href="https://nwcustomapparel.com">nwcustomapparel.com</a>
+                </div>
+                <div class="invoice-footer-right" id="footer-sync-info"></div>
+            </footer>
+        </div>
+    </div>
+
+    <script src="/pages/js/invoice.js?v=2026.05.21.12"></script>
+</body>
+</html>

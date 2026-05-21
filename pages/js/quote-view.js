@@ -88,6 +88,12 @@ class QuoteViewPage {
         // Setup event listeners
         this.setupEventListeners();
 
+        // Wire the "Open as Invoice" link to the matching /invoice/:quoteId URL.
+        const invLink = document.getElementById('open-invoice-link');
+        if (invLink && this.quoteId) {
+            invLink.href = `/invoice/${encodeURIComponent(this.quoteId)}`;
+        }
+
         // ShopWorks sync strip (Erik 2026-05-21).
         // Renders the "Pending import" / "ShopWorks #N" pill + Refresh button.
         // Auto-syncs in the background if data is > 30 min stale.
