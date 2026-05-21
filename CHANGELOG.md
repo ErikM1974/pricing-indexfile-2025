@@ -1,3 +1,7 @@
+## v2026.05.21.19 (2026.05.21)
+
+- Deploy v2026.05.21.19: 11 files — soft-delete (Status=Cancelled_in_ShopWorks) with 30-day audit retention + bulk-sync cron purge; CANCELLED banner on invoice + quote-view
+
 ## v2026.05.21.18 (2026.05.21)
 
 - Deploy v2026.05.21.18: 1 files — fix OF push: link line items to design via ExtDesignIDBlock (auto-toggles Apply Designs in SW) + send street in ShipAddress02 (was hardcoded empty)
