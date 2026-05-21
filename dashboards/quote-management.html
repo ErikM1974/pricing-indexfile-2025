@@ -290,10 +290,10 @@
 
                 // Sales rep filter
                 if (salesRepFilter === 'mine') {
-                    if (quote.SalesRep !== currentUserEmail) {
+                    if (quote.SalesRepEmail !== currentUserEmail) {
                         return false;
                     }
-                } else if (salesRepFilter && quote.SalesRep !== salesRepFilter) {
+                } else if (salesRepFilter && quote.SalesRepEmail !== salesRepFilter) {
                     return false;
                 }
 
@@ -520,7 +520,7 @@
                             <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
                             <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>
                         </td>
-                        <td>${getSalesRepName(quote.SalesRep)}</td>
+                        <td>${getSalesRepName(quote.SalesRepEmail)}</td>
                         <td>${quote.TotalQuantity || 0}</td>
                         <td class="quote-amount">${formatCurrency(quote.TotalAmount)}</td>
                         <td>${statusCellHtml}</td>
