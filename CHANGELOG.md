@@ -1,3 +1,7 @@
+## v2026.05.21.6 (2026.05.21)
+
+- Deploy v2026.05.21.6: 4 files — Phase 4d: Financial summary + Art thumbnails + Billing block + accurate location count from /order-pull
+
 ## v2026.05.21.5 (2026.05.21)
 
 - Deploy v2026.05.21.5: 4 files (quote-view.css,quote-view.js,quote-view.html,) — Manual ShopWorks WO# entry (workaround for /v1/getorderno gap)
