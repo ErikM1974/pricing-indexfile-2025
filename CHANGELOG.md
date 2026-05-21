@@ -1,3 +1,7 @@
+## v2026.05.21.15 (2026.05.21)
+
+- Deploy v2026.05.21.15: 7 files — QuickBooks invoice polish (RUSH banner, AMOUNT DUE, payment info, size labels, label cleanup)
+
 ## v2026.05.21.14 (2026.05.21)
 
 - Deploy v2026.05.21.14: 2 files (invoice.css) — comprehensive print stylesheet rewrite for 1-page PDF fidelity
