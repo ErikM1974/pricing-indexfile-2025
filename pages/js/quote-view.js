@@ -2424,6 +2424,150 @@ class QuoteViewPage {
 
         // Phase 4d — Financial Summary panel
         this._renderFinancialPanel(order);
+
+        // Phase 4e — View Original Submission audit panel
+        this._renderOriginalSubmissionPanel(order);
+
+        // Phase 4d+ — Stale-data warning if last sync > 24 hrs ago
+        this._renderStaleSyncWarning();
+    }
+
+    _renderOriginalSubmissionPanel(order) {
+        // Show a collapsible audit panel comparing the original push data
+        // (from quote_sessions.Notes JSON) against the current ShopWorks state.
+        // Visual diff: changed fields get a side-by-side "before → after" row.
+        const section = document.getElementById('sw-original-section');
+        const body = document.getElementById('sw-original-body');
+        const meta = document.getElementById('sw-original-summary-meta');
+        if (!section || !body) return;
+
+        const original = this.fullData?.originalSubmission;
+        if (!original) {
+            section.style.display = 'none';
+            return;
+        }
+
+        // Identify diffs between original push and current ShopWorks state.
+        // Each entry: { label, original, current, isDiff }
+        const info = original.info || {};
+        const ship = original.ship || {};
+        const breakdown = original.breakdown || {};
+        const rows = Array.isArray(original.rows) ? original.rows : [];
+
+        // Helper to make a diff row
+        const norm = (v) => (v == null || v === '') ? '—' : String(v).trim();
+        const mkRow = (label, originalVal, currentVal) => {
+            const o = norm(originalVal);
+            const c = norm(currentVal);
+            const isDiff = o !== c && o !== '—' && c !== '—';
+            return { label, original: o, current: c, isDiff };
+        };
+
+        const diffRows = [
+            mkRow('Customer email', info.email || info.buyerEmail, order.ContactEmail),
+            mkRow('Customer phone', info.phone, order.ContactPhone),
+            mkRow('PO Number', info.po, order.CustomerPurchaseOrder),
+            mkRow('Sales rep', info.salesRep, order.CustomerServiceRep),
+            mkRow('Terms', info.terms || info.paymentTerms, order.TermsName),
+            mkRow('Subtotal',
+                  breakdown.subtotal != null ? '$' + Number(breakdown.subtotal).toFixed(2) : '',
+                  order.cur_SubTotal != null ? '$' + Number(order.cur_SubTotal).toFixed(2) : ''),
+            mkRow('Tax',
+                  breakdown.taxEstimate != null ? '$' + Number(breakdown.taxEstimate).toFixed(2) : '',
+                  order.cur_SalesTaxTotal != null ? '$' + Number(order.cur_SalesTaxTotal).toFixed(2) : ''),
+            mkRow('Ship method',
+                  ship.methodLabel || ship.method,
+                  this._currentSnapshot?.pushed?.ShippingAddresses?.[0]?.ShipMethod),
+        ];
+
+        const diffsCount = diffRows.filter(r => r.isDiff).length;
+        if (meta) {
+            meta.textContent = diffsCount > 0
+                ? `${diffsCount} field${diffsCount === 1 ? '' : 's'} changed in ShopWorks`
+                : 'No changes detected since submit';
+            meta.className = 'sw-original-summary-meta' + (diffsCount > 0 ? ' sw-original-summary-meta--changed' : '');
+        }
+
+        // Build the body content
+        const diffTable = `
+            <table class="sw-original-table">
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Original submission</th>
+                        <th>Current ShopWorks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${diffRows.map(r => `
+                        <tr class="${r.isDiff ? 'sw-original-row--diff' : ''}">
+                            <td class="sw-original-label">${this.escapeHtml(r.label)}</td>
+                            <td class="sw-original-value sw-original-value--original">${this.escapeHtml(r.original)}</td>
+                            <td class="sw-original-value sw-original-value--current">
+                                ${r.isDiff ? '<span class="sw-original-arrow">→</span> ' : ''}${this.escapeHtml(r.current)}
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+
+        // Original line items snapshot
+        const lineItemsHtml = rows.length === 0 ? '' : `
+            <div class="sw-original-subsection">
+                <h4 class="sw-original-subheader">Original line items (${rows.length})</h4>
+                <ul class="sw-original-rows-list">
+                    ${rows.map(r => {
+                        const sizes = r.sizes || {};
+                        const pairs = Object.entries(sizes)
+                            .filter(([, q]) => Number(q) > 0)
+                            .map(([sz, q]) => `${sz}×${Number(q)}`).join(', ');
+                        const totalPcs = Object.values(sizes).reduce((s, q) => s + (Number(q) || 0), 0);
+                        return `<li><strong>${this.escapeHtml(r.style || '?')}</strong>${r.colorName ? ' · ' + this.escapeHtml(r.colorName) : ''} — ${this.escapeHtml(pairs || '0 pcs')} (${totalPcs} pcs)</li>`;
+                    }).join('')}
+                </ul>
+            </div>
+        `;
+
+        // Original artwork / design # snapshot
+        const originalDesign = info.designNumber || '';
+        const originalArt = original.files && original.files.length > 0
+            ? `${original.files.length} file(s) uploaded at submit`
+            : (originalDesign ? `Design # ${originalDesign}` : 'No design info captured');
+
+        body.innerHTML = `
+            <div class="sw-original-intro">
+                What we pushed to ManageOrders on submit, vs. what ShopWorks currently has.
+                Differences are <strong>highlighted</strong>.
+            </div>
+            ${diffTable}
+            <div class="sw-original-design-snapshot">
+                <strong>Original art:</strong> ${this.escapeHtml(originalArt)}
+            </div>
+            ${lineItemsHtml}
+        `;
+
+        section.style.display = 'block';
+    }
+
+    _renderStaleSyncWarning() {
+        // Surface a small inline warning at the top of the sync strip
+        // when the last sync is > 24 hours old. Reps may forget about
+        // long-quiet orders; this nudges them to click Refresh.
+        const pillText = document.getElementById('sw-sync-pill-text');
+        if (!pillText) return;
+        const sw = this.fullData?.shopWorks;
+        if (!sw?.lastSynced || sw.status !== 'Imported') return;
+        const minutesStale = (Date.now() - new Date(sw.lastSynced).getTime()) / 60000;
+        if (minutesStale > 24 * 60) {
+            // Don't overwrite the WO# pill — append a subtle indicator
+            const ts = document.getElementById('sw-sync-timestamp');
+            if (ts) {
+                ts.style.color = '#b45309';
+                ts.style.fontWeight = '600';
+                ts.title = 'Data is more than 24 hours old. Click Refresh for the latest from ShopWorks.';
+            }
+        }
     }
 
     _renderFinancialPanel(order) {
