@@ -4647,9 +4647,12 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // cleanly support date-range comparisons via this proxy path, so we
     // pull all Processed rows + filter by date client-side. There are
     // typically <500 Processed quotes total at any time.
+    // Caspio proxy GET /quote_sessions accepts q.where for filtering.
+    // (The `filter=` param ONLY works for QuoteID lookups; for arbitrary
+    // field filters use Caspio's native q.where syntax.)
     let sessions;
     try {
-      sessions = await makeApiRequest(`/quote_sessions?filter=${encodeURIComponent("Status='Processed'")}&pageSize=500`);
+      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Processed'")}&q.pageSize=1000`);
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }
