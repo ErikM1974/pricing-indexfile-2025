@@ -105,6 +105,7 @@ dotenv.config();
 //   L2798 GET  /quote/:quoteId (→ quote-view.html)
 //   L2810 GET  /api/public/quote/:quoteId
 //   L2852 POST /api/public/quote/:quoteId/accept
+//   L4272 GET  /invoice/:quoteId (→ invoice.html)  — clean PDF-style one-pager, auto-syncs from ShopWorks
 //
 // SHOPWORKS SYNC (2026-05-21) — quote-view mirrors live ShopWorks state
 //   L4308 POST /api/quote-sessions/:quoteId/sync-from-shopworks   — pulls fresh state from MO + writes Caspio (hard-deletes on missing)
@@ -4267,6 +4268,19 @@ app.get('/quote/:quoteId', (req, res) => {
     return res.status(400).send('Invalid quote ID format');
   }
   res.sendFile(path.join(__dirname, 'pages', 'quote-view.html'));
+});
+
+// Single-page invoice route — same data, condensed PDF-style layout
+// Auto-syncs from ShopWorks when the cached snapshot is older than 30 minutes
+// (see pages/js/invoice.js). Useful for printing / emailing customers a clean
+// one-pager. Shares the /api/quote-sessions/:quoteId/full endpoint with the
+// quote-view page, so any ShopWorks edits flow through here too.
+app.get('/invoice/:quoteId', (req, res) => {
+  const quoteId = req.params.quoteId;
+  if (!quoteId || !/^[A-Z]{2,5}[-\d]+-?\d*$/.test(quoteId)) {
+    return res.status(400).send('Invalid quote ID format');
+  }
+  res.sendFile(path.join(__dirname, 'pages', 'invoice.html'));
 });
 
 // Public API - Get quote data with view tracking
