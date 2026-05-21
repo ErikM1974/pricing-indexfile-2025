@@ -244,8 +244,7 @@ body {
 .status-badge.status-failed i { font-size: 11px; }
 
 /* Awaiting-Payment badge — soft yellow, informational rather than
-   alarming. Stripe checkout in flight; status auto-advances when the
-   webhook fires, so no rep action required (but visible if it stalls). */
+   alarming. 3-Day Tees order; card is processed in ShopWorks. */
 .status-badge.status-pending-payment {
     display: inline-flex;
     align-items: center;
@@ -262,6 +261,48 @@ body {
     white-space: nowrap;
 }
 .status-badge.status-pending-payment i { font-size: 11px; }
+
+/* Payment-Received badge — teal, transient good state. Payment is in
+   but the ShopWorks order hasn't been created yet; should advance to
+   In ShopWorks shortly. Distinct from the green "Processed" badge so
+   reps can tell it's not fully done. */
+.status-badge.status-payment-confirmed {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: #ccfbf1;
+    border: 1px solid #99f6e4;
+    color: #115e59;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    cursor: help;
+    white-space: nowrap;
+}
+.status-badge.status-payment-confirmed i { font-size: 11px; }
+
+/* Charged-No-SW-Order badge — RED URGENT. Customer was charged but the
+   order didn't land in ShopWorks. Distinct from amber "Push Failed"
+   because there's money in but no record on our side; needs immediate
+   manual entry. Same red as Cancelled (SW) since both are alarming. */
+.status-badge.status-charged-no-sw {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    cursor: help;
+    white-space: nowrap;
+}
+.status-badge.status-charged-no-sw i { font-size: 11px; }
 
 /* Row tint for cancelled quotes — subtle so it doesn't drown out
    active quotes when mixed in. */
