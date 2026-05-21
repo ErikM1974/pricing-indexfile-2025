@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.4">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.5">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,6 +73,32 @@
                         <span class="sw-sync-refresh-icon" aria-hidden="true">🔄</span>
                         <span class="sw-sync-refresh-label">Refresh</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 Set ShopWorks Order # — manual entry workaround (Erik 2026-05-21).
+                 The MO /v1/getorderno mapping endpoint returns empty for our
+                 NWCA-* ExtOrderIDs (MO config gap). Until that's fixed
+                 upstream, reps enter the WO# they see in ShopWorks UI here
+                 and the system stores it. Subsequent syncs use the stored
+                 WO# to fetch /v1/orders/{N} directly. Shown only when:
+                   - Status is Processed/Pending (i.e., pushed but not yet
+                     mapped to a ShopWorks order)
+                   - ShopWorks_Order_Number is not yet set
+                 Hidden after the rep enters the number or once auto-mapping
+                 succeeds.
+                 ============================================================ -->
+            <div id="sw-manual-wo-strip" class="sw-manual-wo-strip" style="display: none;">
+                <div class="sw-manual-wo-left">
+                    <span class="sw-manual-wo-icon">🔗</span>
+                    <span class="sw-manual-wo-label">Link to ShopWorks Order #:</span>
+                    <input type="text" id="sw-manual-wo-input" class="sw-manual-wo-input"
+                           inputmode="numeric" pattern="[0-9]*" maxlength="7" placeholder="e.g. 141899">
+                    <button type="button" class="sw-manual-wo-btn" id="sw-manual-wo-btn">Set &amp; Sync</button>
+                </div>
+                <div class="sw-manual-wo-help">
+                    Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever.
                 </div>
             </div>
 
@@ -418,6 +444,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.4"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.5"></script>
 </body>
 </html>

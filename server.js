@@ -4379,18 +4379,78 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
     const pkId = session.PK_ID;
     const previousStatus = session.ShopWorks_Status || '';
 
-    // 2. ExtOrderID we sent to ManageOrders was `NWCA-{QuoteID}` (see 3-Day Tees +
-    //    Order Form push paths). Mirror that here.
+    // 2. Determine how to find the ShopWorks order:
+    //    (a) Body sends `shopWorksOrderNumber` (rep typed the WO# into the
+    //        "Set ShopWorks Order #" input on /quote/:quoteId) — store it
+    //        and use it directly to fetch /v1/orders/{N}, bypassing the
+    //        broken /v1/getorderno mapping.
+    //    (b) Else, if the row already has ShopWorks_Order_Number stored,
+    //        use that.
+    //    (c) Else fall through to the snapshot endpoint which tries
+    //        /v1/getorderno (currently empty for our orders — known MO
+    //        config gap; will work eventually).
+    let manualOrderNumber = null;
+    if (req.body && req.body.shopWorksOrderNumber) {
+      const n = Number(req.body.shopWorksOrderNumber);
+      if (Number.isInteger(n) && n > 0 && n < 10000000) {
+        manualOrderNumber = n;
+      } else {
+        return res.status(400).json({ success: false, error: 'Invalid shopWorksOrderNumber' });
+      }
+    } else if (Number.isFinite(Number(session.ShopWorks_Order_Number)) && Number(session.ShopWorks_Order_Number) > 0) {
+      manualOrderNumber = Number(session.ShopWorks_Order_Number);
+    }
+
     const extOrderId = `NWCA-${safeQuoteId}`;
 
-    // 3. Pull current state from MO via the new proxy snapshot endpoint.
+    // 3. Fetch snapshot via one of two paths:
     let snapshot;
     try {
-      const r = await fetch(`${SYNC_PROXY_BASE}/api/manageorders/order/${encodeURIComponent(extOrderId)}/snapshot`);
-      if (!r.ok) {
-        return res.status(502).json({ success: false, error: `MO snapshot fetch failed: HTTP ${r.status}` });
+      if (manualOrderNumber) {
+        // Direct fetch by id_Order — bypass /v1/getorderno (which doesn't
+        // surface our orders yet). Pulls /v1/orders/{N} + /v1/lineitems/{N}
+        // in parallel.
+        const [orderResp, linesResp] = await Promise.all([
+          fetch(`${SYNC_PROXY_BASE}/api/manageorders/orders/${manualOrderNumber}?refresh=true`),
+          fetch(`${SYNC_PROXY_BASE}/api/manageorders/lineitems/${manualOrderNumber}?refresh=true`),
+        ]);
+        const orderJson = await orderResp.json().catch(() => ({}));
+        const linesJson = await linesResp.json().catch(() => ({}));
+        const orderArr = orderJson?.result || [];
+        if (orderArr.length === 0) {
+          // Order # was provided but /v1 doesn't have it yet. Persist the
+          // WO# so future syncs can try again, but mark as Pending for now.
+          if (req.body?.shopWorksOrderNumber) {
+            await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
+              ShopWorks_Order_Number: manualOrderNumber,
+              ShopWorks_Status: 'Pending',
+              ShopWorks_Last_Synced: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+            }).catch(() => {});
+          }
+          return res.json({
+            success: true, synced: true, deleted: false, status: 'Pending',
+            shopWorksOrderNumber: manualOrderNumber,
+            lastSynced: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+            reason: 'shopworks_order_not_in_mo_v1_yet',
+            note: 'Order # saved. ManageOrders /v1 sync from OnSite has up to ~24h lag for new orders. Refresh tomorrow for live data.',
+          });
+        }
+        snapshot = {
+          found: true,
+          id_Order: manualOrderNumber,
+          extOrderId,
+          order: orderArr[0],
+          lineItems: linesJson?.result || [],
+          fetchedAt: new Date().toISOString(),
+        };
+      } else {
+        // Standard path — try the auto-mapping snapshot endpoint
+        const r = await fetch(`${SYNC_PROXY_BASE}/api/manageorders/order/${encodeURIComponent(extOrderId)}/snapshot`);
+        if (!r.ok) {
+          return res.status(502).json({ success: false, error: `MO snapshot fetch failed: HTTP ${r.status}` });
+        }
+        snapshot = await r.json();
       }
-      snapshot = await r.json();
     } catch (e) {
       return res.status(502).json({ success: false, error: `MO snapshot fetch error: ${e.message}` });
     }
