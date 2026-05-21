@@ -1532,3 +1532,134 @@ body {
     box-shadow: 0 4px 24px rgba(0,0,0,0.3);
     background: #fff;
 }
+
+/* ============================================================================
+   ShopWorks Sync Strip (Erik 2026-05-21)
+   ============================================================================
+   Status pill + Refresh button banner that lives between the quote header
+   and the customer-meta panels. Three visual states:
+     - Pending  → gray pill with hourglass
+     - Imported → forest-green pill with checkmark + WO#
+     - Failed   → amber pill with warning sign (transient — only on refresh)
+   ============================================================================ */
+.sw-sync-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 18px;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 13px;
+}
+.sw-sync-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.sw-sync-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sw-sync-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+    transition: background-color 180ms ease, color 180ms ease;
+}
+.sw-sync-pill-icon {
+    font-size: 12px;
+    line-height: 1;
+}
+.sw-sync-pill--pending {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+.sw-sync-pill--imported {
+    background: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
+}
+.sw-sync-pill--unknown {
+    background: #fef3c7;
+    color: #78350f;
+    border: 1px solid #fcd34d;
+}
+
+.sw-sync-extorder {
+    font-size: 11px;
+    font-weight: 500;
+    color: #64748b;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    letter-spacing: 0.02em;
+}
+
+.sw-sync-timestamp {
+    font-size: 11px;
+    color: #64748b;
+}
+
+.sw-sync-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.sw-sync-refresh-btn:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+.sw-sync-refresh-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.sw-sync-refresh-btn--loading .sw-sync-refresh-icon {
+    animation: sw-sync-spin 0.9s linear infinite;
+}
+@keyframes sw-sync-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+.sw-sync-refresh-icon {
+    font-size: 13px;
+    line-height: 1;
+    display: inline-block;
+}
+
+@media (max-width: 600px) {
+    .sw-sync-strip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .sw-sync-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+@media print {
+    .sw-sync-strip { display: none !important; }
+}

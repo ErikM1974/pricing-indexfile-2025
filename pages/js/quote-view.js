@@ -88,6 +88,11 @@ class QuoteViewPage {
         // Setup event listeners
         this.setupEventListeners();
 
+        // ShopWorks sync strip (Erik 2026-05-21).
+        // Renders the "Pending import" / "ShopWorks #N" pill + Refresh button.
+        // Auto-syncs in the background if data is > 30 min stale.
+        this.setupShopWorksSyncStrip();
+
         // Setup push-to-ShopWorks button (staff only, EMB quotes only)
         if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
             this.setupPushButton();
@@ -2079,6 +2084,188 @@ class QuoteViewPage {
 
         // Hide accept button
         document.getElementById('accept-quote-btn').style.display = 'none';
+    }
+
+    // ====================================================================
+    // ShopWorks sync strip (Erik 2026-05-21)
+    // ====================================================================
+    // Renders a status pill ("Pending import" / "ShopWorks #N") + Refresh
+    // button under the quote header. Auto-syncs in background if local
+    // data is > 30 min stale. Manual Refresh button forces an immediate
+    // pull. Both call POST /api/quote-sessions/:quoteId/sync-from-shopworks
+    // which writes 4 ShopWorks_* columns in quote_sessions and (when
+    // ShopWorks has deleted the order) hard-deletes the row.
+    // ====================================================================
+
+    async setupShopWorksSyncStrip() {
+        // Fetch the merged /full endpoint which includes the parsed
+        // ShopWorks_Snapshot. Used for the sync pill + (Phase 4b+) all
+        // the ShopWorks-mirrored sections.
+        try {
+            const r = await fetch(`/api/quote-sessions/${this.quoteId}/full`);
+            if (!r.ok) {
+                // 404 or 500 — the page already rendered from /api/public/quote
+                // so this is non-fatal. Hide the strip and move on.
+                return;
+            }
+            this.fullData = await r.json();
+        } catch (e) {
+            console.warn('[QuoteView/sync] /full fetch failed:', e.message);
+            return;
+        }
+
+        // Render the strip from initial data.
+        this.renderSyncStrip(this.fullData);
+
+        // Wire the manual Refresh button.
+        const btn = document.getElementById('sw-sync-refresh-btn');
+        if (btn) {
+            btn.addEventListener('click', () => this.syncFromShopWorks({ manual: true }));
+        }
+
+        // Auto-sync in the background if data is stale (> 30 min since last
+        // pull) AND the quote has been processed (in MO somewhere).
+        const sw = this.fullData?.shopWorks;
+        const status = this.fullData?.status || '';
+        if ((status === 'Processed' || status === 'Processed - ShopWorks Failed')) {
+            const lastSynced = sw?.lastSynced ? new Date(sw.lastSynced) : null;
+            const minutesStale = lastSynced ? (Date.now() - lastSynced.getTime()) / 60000 : Infinity;
+            if (minutesStale > 30) {
+                // Fire-and-forget; UI updates when it resolves
+                this.syncFromShopWorks({ manual: false }).catch(() => {});
+            }
+        }
+    }
+
+    async syncFromShopWorks({ manual = false } = {}) {
+        const btn = document.getElementById('sw-sync-refresh-btn');
+        const pillText = document.getElementById('sw-sync-pill-text');
+        const pillIcon = document.getElementById('sw-sync-pill-icon');
+
+        // Loading state
+        if (manual && btn) {
+            btn.disabled = true;
+            btn.classList.add('sw-sync-refresh-btn--loading');
+        }
+        if (manual && pillText) {
+            pillText.textContent = 'Syncing from ShopWorks…';
+        }
+
+        try {
+            const r = await fetch(`/api/quote-sessions/${this.quoteId}/sync-from-shopworks`, { method: 'POST' });
+            if (!r.ok) {
+                throw new Error(`HTTP ${r.status}`);
+            }
+            const result = await r.json();
+
+            // Hard delete redirect — order was removed from ShopWorks
+            if (result.deleted) {
+                if (manual) {
+                    // Inform user explicitly when they clicked Refresh
+                    alert(`Order ${this.quoteId} was deleted in ShopWorks. Removing this quote from the system.`);
+                }
+                window.location.replace(`/staff-dashboard.html?quote_deleted=${encodeURIComponent(this.quoteId)}`);
+                return;
+            }
+
+            // Merge fresh ShopWorks state into our local view + re-render
+            this.fullData = {
+                ...this.fullData,
+                shopWorks: {
+                    orderNumber: result.shopWorksOrderNumber,
+                    status: result.status,
+                    lastSynced: result.lastSynced,
+                    snapshot: result.snapshot || null,
+                },
+            };
+            this.renderSyncStrip(this.fullData);
+
+            // TODO Phase 4b+: when snapshot is present, re-render the
+            // production-side sections (Order Info, Dates, Designs, Line
+            // Items, Status, Notes, Shipping, Financial) from snapshot.
+        } catch (e) {
+            console.warn('[QuoteView/sync] sync failed:', e.message);
+            if (manual && pillText) {
+                pillText.textContent = 'Sync failed — try again';
+                if (pillIcon) pillIcon.textContent = '⚠';
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.classList.remove('sw-sync-refresh-btn--loading');
+            }
+        }
+    }
+
+    renderSyncStrip(data) {
+        const strip = document.getElementById('sw-sync-strip');
+        if (!strip) return;
+
+        const sw = data?.shopWorks;
+        const status = data?.status || '';
+        const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
+
+        // Hide the strip on legacy quotes (never pushed, no sync info available).
+        if (!isProcessed && !sw) {
+            strip.style.display = 'none';
+            return;
+        }
+        strip.style.display = 'flex';
+
+        const pill = document.getElementById('sw-sync-pill');
+        const pillText = document.getElementById('sw-sync-pill-text');
+        const pillIcon = document.getElementById('sw-sync-pill-icon');
+        const extOrderEl = document.getElementById('sw-sync-extorder');
+        const tsEl = document.getElementById('sw-sync-timestamp');
+
+        // Compose the external-order reference (always show — useful audit).
+        if (extOrderEl) {
+            extOrderEl.textContent = `Ref: NWCA-${this.quoteId}`;
+        }
+
+        // Determine pill variant + content.
+        const swStatus = sw?.status || (isProcessed ? 'Pending' : '');
+        let variant = 'pending';
+        if (swStatus === 'Imported' && sw?.orderNumber) {
+            variant = 'imported';
+            pillText.textContent = `ShopWorks #${sw.orderNumber}`;
+            pillIcon.textContent = '✓';
+        } else if (swStatus === 'Pending') {
+            variant = 'pending';
+            pillText.textContent = 'Pending import';
+            pillIcon.textContent = '⏳';
+        } else {
+            variant = 'unknown';
+            pillText.textContent = 'Not yet synced';
+            pillIcon.textContent = '?';
+        }
+        if (pill) {
+            pill.className = `sw-sync-pill sw-sync-pill--${variant}`;
+        }
+
+        // Last-synced timestamp ("Last synced 14m ago").
+        if (tsEl) {
+            if (sw?.lastSynced) {
+                tsEl.textContent = `Last synced ${this._formatRelativeTime(sw.lastSynced)}`;
+            } else {
+                tsEl.textContent = 'Never synced';
+            }
+        }
+    }
+
+    _formatRelativeTime(isoOrDate) {
+        try {
+            const d = isoOrDate instanceof Date ? isoOrDate : new Date(isoOrDate);
+            const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+            if (seconds < 30) return 'just now';
+            if (seconds < 60) return `${seconds}s ago`;
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        } catch { return 'recently'; }
     }
 
     // Event Listeners
