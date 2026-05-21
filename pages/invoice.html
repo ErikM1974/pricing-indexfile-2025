@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice — Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/invoice.css?v=2026.05.21.14">
+    <link rel="stylesheet" href="/pages/css/invoice.css?v=2026.05.21.15">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -36,6 +36,9 @@
                 ← Back to full quote view
             </a>
             <span id="sync-status" class="toolbar-sync-status"></span>
+            <span class="toolbar-print-tip" title="Chrome print dialog → More Settings → uncheck &quot;Headers and footers&quot; for the cleanest PDF (one-time setting)">
+                💡 Print tip
+            </span>
         </div>
 
         <!-- Invoice content -->
@@ -63,14 +66,21 @@
                         <span class="invoice-meta-value" id="invoice-quote-id">—</span>
                     </div>
                     <div class="invoice-meta-row">
-                        <span class="invoice-meta-label">Date</span>
+                        <span class="invoice-meta-label">Invoice Date</span>
                         <span class="invoice-meta-value" id="invoice-date">—</span>
-                    </div>
-                    <div class="invoice-meta-row" id="rush-row" style="display: none;">
-                        <span class="invoice-rush-badge">RUSH</span>
                     </div>
                 </div>
             </header>
+
+            <!-- Status banner (RUSH / expedite / etc.) — hidden by default,
+                 shown only when the order qualifies as RUSH. Placed above the
+                 line items per QuickBooks convention for "high-priority"
+                 callouts: full-width, accent border, can't be missed. -->
+            <div id="status-banner" class="invoice-status-banner" style="display: none;">
+                <span class="invoice-status-icon">⚡</span>
+                <span class="invoice-status-text">RUSH ORDER</span>
+                <span class="invoice-status-detail" id="status-banner-detail"></span>
+            </div>
 
             <!-- Bill To + Ship To -->
             <section class="invoice-addresses">
@@ -124,7 +134,7 @@
                             <th class="col-color">Color</th>
                             <th class="col-desc">Description</th>
                             <th class="col-qty">Qty</th>
-                            <th class="col-unit">Unit</th>
+                            <th class="col-unit">Unit Price</th>
                             <th class="col-total">Total</th>
                         </tr>
                     </thead>
@@ -152,16 +162,33 @@
                         <span class="invoice-totals-value" id="total-shipping">$0.00</span>
                     </div>
                     <div class="invoice-totals-row invoice-totals-row--grand">
-                        <span class="invoice-totals-label">TOTAL</span>
+                        <span class="invoice-totals-label">Total</span>
                         <span class="invoice-totals-value" id="total-grand">$0.00</span>
                     </div>
                     <div class="invoice-totals-row" id="paid-row" style="display: none;">
                         <span class="invoice-totals-label">Payments Received</span>
                         <span class="invoice-totals-value" id="total-paid">$0.00</span>
                     </div>
-                    <div class="invoice-totals-row invoice-totals-row--balance" id="balance-row" style="display: none;">
-                        <span class="invoice-totals-label">Balance Due</span>
-                        <span class="invoice-totals-value" id="total-balance">$0.00</span>
+                    <div class="invoice-totals-row invoice-totals-row--amount-due">
+                        <span class="invoice-totals-label">AMOUNT DUE</span>
+                        <span class="invoice-totals-value" id="total-amount-due">$0.00</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment instructions — QuickBooks-style "how to pay" block.
+                 Always visible; terms text is wired from order/quote data. -->
+            <section class="invoice-payment-info">
+                <div class="invoice-payment-block">
+                    <div class="invoice-payment-heading">Payment Information</div>
+                    <div class="invoice-payment-body">
+                        Payment due
+                        <strong id="invoice-payment-terms-text">on receipt</strong>
+                        from invoice date.
+                        Pay by check (Northwest Custom Apparel, 2025 Freeman Road East, Milton WA 98354)
+                        or ACH/credit card — contact
+                        <a href="mailto:ar@nwcustomapparel.com">ar@nwcustomapparel.com</a>
+                        for routing. Past-due balances accrue 1.5% monthly finance charge.
                     </div>
                 </div>
             </section>
@@ -177,6 +204,6 @@
         </div>
     </div>
 
-    <script src="/pages/js/invoice.js?v=2026.05.21.13"></script>
+    <script src="/pages/js/invoice.js?v=2026.05.21.15"></script>
 </body>
 </html>
