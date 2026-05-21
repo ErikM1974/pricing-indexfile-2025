@@ -4917,6 +4917,26 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       }
     }
 
+    // ShipStation state block — derived from the new Caspio columns added
+    // for the ShipStation integration. Front-end uses this to decide:
+    //   • show "Send to ShipStation" button (when shipStation === null)
+    //   • show "✓ In ShipStation #N" badge (when status==='awaiting_shipment')
+    //   • show "📦 Shipped — tracking #X" (when status==='shipped')
+    //   • hide entirely (when ship.method === 'Customer Pickup')
+    let shipStation = null;
+    if (session.ShipStation_Order_ID || session.ShipStation_Status || session.TrackingNumber) {
+      shipStation = {
+        orderId:      session.ShipStation_Order_ID || null,
+        status:       session.ShipStation_Status || null,
+        lastSynced:   session.ShipStation_Last_Synced || null,
+        trackingNumber: session.TrackingNumber || null,
+        trackingCarrier: session.TrackingCarrier || null,
+        trackingURL:    session.TrackingURL || null,
+        shippedAt:    session.ShippedAt || null,
+        labelCost:    session.LabelCost != null ? Number(session.LabelCost) : null,
+      };
+    }
+
     res.json({
       quoteId: session.QuoteID,
       status: session.Status,
@@ -4925,6 +4945,7 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       quoteItems: items,                      // pre-import line items
       shopWorks,                              // current ShopWorks-side state (when synced)
       billingContact,                         // Bill-To address from CompanyContactsMerge2026
+      shipStation,                            // ShipStation state (when sent / shipped)
     });
   } catch (error) {
     console.error('[quote/full] error:', error);
@@ -4944,6 +4965,346 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
  *   - olderThanMin: default 30 (skip rows synced more recently than N min)
  *   - dryRun:      if true, returns the list of candidates without syncing
  */
+/**
+ * POST /api/quote-sessions/:quoteId/send-to-shipstation
+ *
+ * Push the quote's customer + line items to ShipStation. Idempotent — if the
+ * order already exists (orderKey = quoteId), ShipStation updates instead of
+ * duplicating.
+ *
+ * Response shapes:
+ *   { success: true, shipstationOrderId: 12345, status: 'awaiting_shipment' }
+ *   { success: true, alreadySent: true, shipstationOrderId: ... }
+ *   { skipped: true, reason: 'pickup' }              // Customer Pickup orders
+ *   { success: false, error: '...' }                 // 4xx/5xx pass-through
+ */
+app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+
+    // 1. Fetch the quote
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return res.status(404).json({ success: false, error: 'Quote not found' });
+    }
+    const session = sessions[0];
+    const pkId = session.PK_ID;
+
+    // 2. Already-sent check — idempotency at the Caspio layer
+    if (session.ShipStation_Order_ID) {
+      return res.json({
+        success: true,
+        alreadySent: true,
+        shipstationOrderId: session.ShipStation_Order_ID,
+        status: session.ShipStation_Status || 'awaiting_shipment',
+        lastSynced: session.ShipStation_Last_Synced,
+      });
+    }
+
+    // 3. Parse the snapshot + original submission (same logic as /full).
+    let originalSubmission = null;
+    if (session.Notes) {
+      try { originalSubmission = JSON.parse(session.Notes); } catch (_) { /* legacy plain-text */ }
+    }
+    let snapshot = null;
+    if (session.ShopWorks_Snapshot) {
+      try { snapshot = JSON.parse(session.ShopWorks_Snapshot); } catch (_) { /* ignore */ }
+    }
+    const order = snapshot?.order || null;
+    const lineItems = snapshot?.lineItems || [];
+    const pushedShip = (snapshot?.pushed?.ShippingAddresses || [])[0];
+    const ship = pushedShip ? {
+      method:    pushedShip.ShipMethod || '',
+      address1:  pushedShip.ShipAddress01 || '',
+      address2:  pushedShip.ShipAddress02 || '',
+      city:      pushedShip.ShipCity || '',
+      state:     pushedShip.ShipState || '',
+      zip:       pushedShip.ShipZip || '',
+      company:   pushedShip.ShipCompany || '',
+      name:      pushedShip.ShipName || '',
+    } : (originalSubmission?.ship || {});
+
+    // 4. Customer Pickup orders never go to ShipStation
+    const method = (ship.method || ship.methodLabel || '').toString();
+    if (method === 'Customer Pickup' || method.toLowerCase().includes('pickup')) {
+      return res.json({ skipped: true, reason: 'pickup', message: 'Customer Pickup orders do not need ShipStation labels' });
+    }
+
+    // 5. Look up the carrier+service for our ship method (best-effort —
+    // ShipStation accepts the order even if these are blank; warehouse
+    // picks at rate time)
+    const SHIP_METHOD_MAP = {
+      'UPS Ground':       { carrier: 'ups',        service: 'ups_ground' },
+      'UPS 2nd Day':      { carrier: 'ups',        service: 'ups_2nd_day_air' },
+      'UPS Next Day':     { carrier: 'ups',        service: 'ups_next_day_air' },
+      'Priority Mail':    { carrier: 'stamps_com', service: 'usps_priority_mail' },
+      'USPS Priority':    { carrier: 'stamps_com', service: 'usps_priority_mail' },
+      'USPS First Class': { carrier: 'stamps_com', service: 'usps_first_class_mail' },
+      'USPS Ground':      { carrier: 'stamps_com', service: 'usps_ground_advantage' },
+      'FedEx Ground':     { carrier: 'fedex',      service: 'fedex_ground' },
+    };
+    const mapped = SHIP_METHOD_MAP[method] || { carrier: null, service: null };
+
+    // 6. Build the bill-to (CompanyContactsMerge2026 → originalSubmission fallback)
+    //    Reuse the billingContact lookup pattern from /full — fetch one-shot here.
+    let billingContact = null;
+    const idCustomer = order?.id_Customer || originalSubmission?.info?.companyId || null;
+    if (idCustomer) {
+      try {
+        const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
+          || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`);
+        if (resp.ok) {
+          const data = await resp.json();
+          const contacts = Array.isArray(data?.contacts) ? data.contacts : [];
+          const complete = contacts.find(c => c.Has_Complete_Address && c.Address);
+          billingContact = complete || contacts.find(c => c.Address) || contacts[0] || null;
+        }
+      } catch (e) {
+        console.warn(`[send-to-shipstation] billing-contact fetch failed:`, e.message);
+      }
+    }
+
+    // 7. Build the items[] — collapse size-suffixed SKUs into grouped lines.
+    //    For each base style+color, one ShipStation item with summarized
+    //    size breakdown in options[].
+    const items = buildShipStationItems(lineItems, originalSubmission);
+
+    // 8. Compose the payload
+    const payload = {
+      orderNumber: safeQuoteId,
+      orderKey:    safeQuoteId,           // idempotency
+      orderDate:   (originalSubmission?.info?.dateIn || new Date().toISOString().split('T')[0]) + 'T00:00:00.000Z',
+      orderStatus: 'awaiting_shipment',
+      customerEmail:    order?.ContactEmail || originalSubmission?.info?.email || session.CustomerEmail || '',
+      customerUsername: order?.CustomerName || session.CompanyName || originalSubmission?.info?.company || '',
+
+      billTo: {
+        name:       billingContact?.ct_NameFull || [billingContact?.NameFirst, billingContact?.NameLast].filter(Boolean).join(' ') || originalSubmission?.info?.name || session.CustomerName || '',
+        company:    billingContact?.Company_Name || originalSubmission?.info?.company || session.CompanyName || '',
+        street1:    billingContact?.Address || originalSubmission?.info?.address || '',
+        street2:    billingContact?.Address2 || '',
+        city:       billingContact?.City || originalSubmission?.info?.city || '',
+        state:      billingContact?.State || originalSubmission?.info?.state || '',
+        postalCode: billingContact?.Zip || originalSubmission?.info?.zip || '',
+        country:    'US',
+        phone:      billingContact?.Phone_Best || billingContact?.Company_Phone || session.Phone || '',
+      },
+
+      shipTo: {
+        // NWCA ship convention: ShipAddress01 = recipient name, ShipAddress02 = street
+        name:       ship.name || ship.address1 || originalSubmission?.info?.name || '',
+        company:    ship.company || originalSubmission?.info?.company || session.CompanyName || '',
+        street1:    ship.address2 || ship.address1 || '',
+        street2:    '',
+        city:       ship.city || '',
+        state:      ship.state || '',
+        postalCode: ship.zip || '',
+        country:    'US',
+        phone:      session.Phone || billingContact?.Phone_Best || '',
+        residential: false,
+      },
+
+      items,
+
+      amountPaid:    Number(order?.cur_TotalInvoice) || Number(session.TotalAmount) || 0,
+      taxAmount:     Number(order?.cur_SalesTaxTotal) || 0,
+      shippingAmount: 0,  // warehouse sets actual at label-purchase time
+
+      customerNotes: originalSubmission?.info?.orderNotes || '',
+      internalNotes: [
+        session.ShopWorks_Order_Number ? `WO ${session.ShopWorks_Order_Number}` : '',
+        `Sales rep: ${order?.CustomerServiceRep || session.SalesRepName || 'unknown'}`,
+        `Quote: ${safeQuoteId}`,
+      ].filter(Boolean).join(' · '),
+
+      carrierCode:   mapped.carrier,
+      serviceCode:   mapped.service,
+    };
+
+    // 9. POST to proxy
+    const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
+      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await proxyResp.json().catch(() => ({}));
+
+    if (!proxyResp.ok || !result.success) {
+      console.error(`[send-to-shipstation] proxy returned ${proxyResp.status}:`, result);
+      return res.status(proxyResp.status || 502).json({
+        success: false,
+        error: result.error || 'ShipStation push failed',
+        details: result.details || null,
+      });
+    }
+
+    // 10. Write back to Caspio
+    const nowIso = new Date().toISOString();
+    try {
+      await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
+        ShipStation_Order_ID:     result.shipstationOrderId,
+        ShipStation_Status:       result.orderStatus || 'awaiting_shipment',
+        ShipStation_Last_Synced:  nowIso,
+      });
+    } catch (e) {
+      console.warn(`[send-to-shipstation] Caspio PUT failed (order is in ShipStation, but Caspio out of sync):`, e.message);
+    }
+
+    return res.json({
+      success: true,
+      shipstationOrderId: result.shipstationOrderId,
+      status: result.orderStatus || 'awaiting_shipment',
+      lastSynced: nowIso,
+    });
+
+  } catch (error) {
+    console.error('[send-to-shipstation] unexpected error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
+ * Build the ShipStation items[] array from snapshot.lineItems[] (post-import)
+ * or originalSubmission.rows[] (pre-import).
+ *
+ * Collapses size-suffixed SKUs back into one product per (PartNumber+Color),
+ * with a "Sizes: S:1, M:1, L:1, XL:1, 2XL:2..." string in options[].
+ *
+ * This is the server-side mirror of the client-side groupLineItemsByBaseSku
+ * in pages/js/invoice.js — keeps the ShipStation order looking like 3 logical
+ * products instead of 8 size-suffix line items.
+ */
+function buildShipStationItems(lineItems, originalSubmission) {
+  const out = [];
+  const SUFFIX_RE = /_([0-9]+XL?|XS|XXS|YXS|YS|YM|YL|YXL)$/i;
+
+  // Prefer ShopWorks lineItems if present (post-import). They're authoritative.
+  if (Array.isArray(lineItems) && lineItems.length > 0) {
+    const byBase = new Map();   // baseStyle|color → { name, qty, sizes:[], unitPrice, base }
+    lineItems.forEach(li => {
+      const style = String(li.PartNumber || '').trim();
+      const m = style.match(SUFFIX_RE);
+      const baseStyle = m ? style.slice(0, m.index) : style;
+      const color = String(li.PartColor || '').trim();
+      const key = baseStyle + '|' + color;
+
+      const qty = Number(li.LineQuantity) || 0;
+      const unitPrice = Number(li.LineUnitPrice) || 0;
+      const sizeLabel = m
+        ? m[1].toUpperCase().replace(/^([2-6]X)$/, '$1L')
+        : (function () {
+            // Base SKU — read Size01-06 columns
+            const labels = ['S','M','L','XL','2XL','3XL'];
+            const sizes = [];
+            for (let i = 1; i <= 6; i++) {
+              const q = Number(li['Size0' + i]);
+              if (q > 0) sizes.push(`${labels[i-1]}:${q}`);
+            }
+            return sizes.join(', ') || 'OSFA';
+          })();
+
+      if (!byBase.has(key)) {
+        byBase.set(key, {
+          sku:      baseStyle,
+          name:     li.PartDescription || baseStyle,
+          color,
+          qty:      0,
+          unitPrice,        // first-seen price; weighted-average could be computed but blended is fine for SS
+          sizeChunks: [],
+        });
+      }
+      const bucket = byBase.get(key);
+      bucket.qty += qty;
+      bucket.sizeChunks.push(sizeLabel + (m ? `:${qty}` : ''));
+    });
+    for (const v of byBase.values()) {
+      out.push({
+        sku:       v.sku,
+        name:      v.name,
+        quantity:  v.qty,
+        unitPrice: v.unitPrice,
+        options: [
+          v.color  ? { name: 'Color', value: v.color } : null,
+          v.sizeChunks.length ? { name: 'Sizes', value: v.sizeChunks.join(', ') } : null,
+        ].filter(Boolean),
+      });
+    }
+    return out;
+  }
+
+  // Fallback — originalSubmission rows (pre-import orders).
+  const rows = originalSubmission?.rows || [];
+  rows.forEach(r => {
+    const sizes = r.sizes || {};
+    const totalQty = Object.values(sizes).reduce((s, n) => s + (Number(n) || 0), 0) || Number(r.qty) || 0;
+    if (!totalQty) return;
+    const sizeChunks = Object.keys(sizes).filter(k => Number(sizes[k]) > 0).map(k => `${k.toUpperCase()}:${sizes[k]}`);
+    out.push({
+      sku:       r.style || r.styleNumber || 'MISC',
+      name:      r.desc || r.description || (r.style || 'Custom item'),
+      quantity:  totalQty,
+      unitPrice: Number(r.unitPrice) || Number(r.price) || 0,
+      options: [
+        (r.color || r.colorName) ? { name: 'Color', value: r.color || r.colorName } : null,
+        sizeChunks.length ? { name: 'Sizes', value: sizeChunks.join(', ') } : null,
+      ].filter(Boolean),
+    });
+  });
+  return out;
+}
+
+/**
+ * POST /api/quote-sessions/:quoteId/shipstation-tracking
+ *
+ * Called BY the proxy webhook handler when ShipStation reports a label was
+ * bought. Writes tracking fields to Caspio quote_sessions by QuoteID.
+ *
+ * Body: { quoteId, trackingNumber, trackingCarrier, trackingUrl, shippedAt,
+ *         labelCost, shipstationOrderId, shipstationStatus }
+ *
+ * No auth required currently — proxy is the only caller. Future hardening:
+ * add a shared secret or restrict by source IP.
+ */
+app.post('/api/quote-sessions/:quoteId/shipstation-tracking', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+    const payload = req.body || {};
+
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      console.warn(`[shipstation-tracking] no quote found for ${safeQuoteId}`);
+      return res.status(404).json({ success: false, error: 'Quote not found' });
+    }
+    const pkId = sessions[0].PK_ID;
+
+    const updates = {
+      TrackingNumber:     payload.trackingNumber || null,
+      TrackingCarrier:    payload.trackingCarrier || null,
+      TrackingURL:        payload.trackingUrl || null,
+      ShippedAt:          payload.shippedAt || new Date().toISOString(),
+      LabelCost:          Number(payload.labelCost) || null,
+      ShipStation_Status: payload.shipstationStatus || 'shipped',
+      ShipStation_Last_Synced: new Date().toISOString(),
+    };
+
+    // Strip nulls so we don't blow away existing values with empty writes.
+    for (const k of Object.keys(updates)) {
+      if (updates[k] == null || updates[k] === '') delete updates[k];
+    }
+
+    await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', updates);
+    console.log(`[shipstation-tracking] ✓ ${safeQuoteId} → tracking ${payload.trackingNumber} (${payload.trackingCarrier})`);
+
+    return res.json({ success: true, updated: Object.keys(updates) });
+  } catch (error) {
+    console.error('[shipstation-tracking] error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
   const startedAt = Date.now();
   try {
