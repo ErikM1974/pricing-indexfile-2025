@@ -1498,3 +1498,141 @@ Comprehensive pattern for building quote view pages and PDFs. Applies to all quo
 **Root Cause:** The regex `/_\d?[xXsSmMlL]+$/i` only handled `_2X`/`_3XL` style suffixes. `NE1020_S/M`, `BG517_OSFA` stayed un-normalized, never matching SanMar's base style `NE1020`/`BG517`.
 **Solution:** Added `replace(/_(OSFA|S\/M|L\/XL|ONE SIZE)$/i, '')` before the existing regex. Also: backfill missing SanMar items via poSearch, paginate all Caspio queries, add live ManageOrders API fallback for orders missing from Caspio cache.
 **Prevention:** When adding new size suffix patterns to ShopWorks, update the normalization regex in `sanmar-orders.js` (3 instances — search `baseStyle =`).
+
+---
+
+### Mixed Quote Tier Separation (Caps vs Garments) (archived 2026-05-21)
+**Problem:** Caps and garments need SEPARATE tier calculations — cannot combine for quantity discounts.
+**Root Cause:** Different methods, stitch counts, stitch rates, and industry standard.
+**Solution:** `garmentTier = getTier(garmentQty)`, `capTier = getTier(capQty)` — never combine.
+**Prevention:** Each type under threshold gets separate $50 LTM fee. (Rule encoded in MEMORY.md "LTM Sync" + CLAUDE.md.)
+
+---
+
+### Inventory Showing "Unable to Verify" (COLOR_NAME vs CATALOG_COLOR) (archived 2026-05-21)
+**Problem:** Cart saves but inventory check shows "Unable to Verify."
+**Root Cause:** Using `COLOR_NAME` ("Brilliant Orange") instead of `CATALOG_COLOR` ("BrillOrng") for API queries.
+**Prevention:** `CATALOG_COLOR` for API calls, `COLOR_NAME` for display only. See CLAUDE.md Two Color Field System.
+
+---
+
+### Shipping Not Taxed in Quote View (WA State Requires It) (archived 2026-05-21)
+**Problem:** Quote view/PDF taxed subtotal only. WA state requires tax on shipping too.
+**Solution:** All 6 tax sites changed to `taxableAmount = subtotal + shipping`.
+**Prevention:** WA state taxes shipping. All tax calculation sites must include shipping in taxable base. (Rule in CLAUDE.md "Top Critical Gotchas".)
+
+---
+
+### Beanies Priced as Caps (ProductCategoryFilter Is Truth) (archived 2026-05-21)
+**Problem:** CP90 beanie: different prices on calculator vs quote builder.
+**Root Cause:** Quote builder's `isCapProduct()` caught beanies via SanMar CATEGORY_NAME without flat headwear exclusion.
+**Solution:** Added `ProductCategoryFilter.isFlatHeadwear()` check in all quote builders.
+**Prevention:** Use `ProductCategoryFilter` as single source of truth. Never duplicate keyword lists. (Rule in MEMORY.md "Beanie = flat, NOT cap".)
+
+---
+
+### PC54 2XL Size Mapping Wrong (Size05 Not Size06) (archived 2026-05-21)
+**Problem:** 2XL orders going to wrong ShopWorks SKU.
+**Root Cause:** PC54_2X uses Size05, not Size06 as expected.
+**Prevention:** PC54: base (Size01-06), PC54_2X uses **Size05** (NOT Size06!). Always verify with ShopWorks. (Rule in CLAUDE.md Multi-SKU Products.)
+
+---
+
+### Size Modifiers Not Applying Correctly (_2X Not _2XL) (archived 2026-05-21)
+**Problem:** 2XL and 3XL items going to wrong SKUs.
+**Root Cause:** ShopWorks uses `_2X`/`_3X`, NOT `_2XL`/`_3XL`. SanMar API also rejects `_2XL`.
+**Prevention:** Always check SIZE_MODIFIERS dict. `_2XL` → `_2X` fix applied across all 12 files (2026-02-21). (Rule in MEMORY.md "SanMar-ShopWorks Size Mapping".)
+
+---
+
+### OnSite Size Translation Table Appends Suffixes — Send BASE PN (archived 2026-05-21, originally CORRECTED 2026-05-01)
+**Problem:** Order Form's first real ShopWorks import showed double-suffixed PNs: `PC61Y_XS_XS`, `112_OSFA_OSFA`, `NE1000_S_M_S/M`. This entry previously said "Size Translation Table only assigns columns" — that was wrong.
+**Root Cause:** OnSite's Size Translation Table has an "OnSite Part Number Modifier" column that **does append** the configured suffix (`_XS`, `_2X`, `_3XL`, …) to the incoming PN, in addition to mapping the size to Size01-06. Pre-suffixing on the client causes a double-stamp.
+**Solution:** Push the BASE PN + plain size string (`PC61Y` + `XS`); OnSite produces `PC61Y_XS`. Fix landed in `server.js` `/api/submit-order-form` line-items builder.
+**Prevention:**
+  - For **MO push payloads**: send base PN, plain size — never pre-suffix.
+  - For **frontend display + SanMar inventory API**: the suffixed PN is still correct (SanMar's catalog lists each extended size as its own SKU). `orderFormSizeSuffix()` is the right helper for those paths.
+  - For other integrations using `getPartNumber()`: verify whether your push target's translation table also appends modifiers before pre-suffixing in code.
+  (Rule in MEMORY.md "ManageOrders API → Size Translation".)
+
+---
+
+### OnSite Integrations All Share /onsite URL (archived 2026-05-21)
+**Problem:** Embroidery PUSH health check returned 403 from `/embroidery/signin`.
+**Root Cause:** All OnSite integrations share `/onsite`. Distinguished by `ExtSource`/`id_Customer`, not URL paths.
+**Prevention:** Verify URL from ShopWorks admin. Don't infer paths from integration names. (Rule in MEMORY.md "Embroidery Push to ShopWorks".)
+
+---
+
+### TaxTotal > 0 Creates Unwanted Tax Line Item (archived 2026-05-21, superseded by 2026-05-20 entry)
+**Problem:** Pushed orders had phantom tax line item auto-generated from `TaxTotal`.
+**Solution:** Always send `TaxTotal: 0`. OnSite calculates tax from `sts_EnableTax` flags per line item.
+**Prevention:** For ManageOrders integration type, ALWAYS `TaxTotal: 0`. Only InkSoft type supports `TaxTotal > 0`. (Superseded by 2026-05-20 "ShopWorks ManageOrders integration ignores per-order TaxPartNumber" entry which expands on this.)
+
+---
+
+### Push API Does NOT Support Tax Fields (archived 2026-05-21)
+**Problem:** Tax fields (`Tax[]`, `coa_AccountSalesTax01`, `sts_EnableTax`) all stripped by OnSite.
+**Root Cause:** ManageOrders Push API schema doesn't include these — they're InkSoft-specific.
+**Solution:** Removed unsupported fields. Use Notes On Order for tax info.
+**Prevention:** Only rely on fields in official Swagger spec. Non-Swagger fields silently stripped. (Related to TaxTotal=0 rule.)
+
+---
+
+### Simple Design Linking via {id_Design: N} (archived 2026-05-21)
+**Problem:** Full design blocks caused ShopWorks to create duplicate designs.
+**Solution:** Known design → `{id_Design: parseInt(number)}`. Unknown → `Designs: []` (empty, let humans handle).
+**Prevention:** Always link by ID. Don't auto-create placeholder records. (Rule in MEMORY.md "Embroidery Push to ShopWorks → Design linking".)
+
+---
+
+### REST API AlterReadOnlyData (Formula Fields + Emojis) (archived 2026-05-21)
+**Problem:** PUT returned 500 `AlterReadOnlyData`.
+**Root Cause 1:** Caspio REST API rejects 4-byte UTF-8 (emojis) with misleading "read-only" error.
+**Root Cause 2:** Formula fields (e.g., `Amount_Art_Billed`) are read-only — only source fields are writable.
+**Prevention:** Never write to formula fields. Never include emojis in API payloads. Strip non-ASCII as defense. (Rule in MEMORY.md "Art Hub → Amount_Art_Billed is formula".)
+
+---
+
+### Dropdown Fields Return Objects, Not Strings (archived 2026-05-21)
+**Problem:** Art Request showed `[object Object]` for Order Type.
+**Root Cause:** Caspio dropdown fields return objects like `{'6': 'Transfer'}` via REST API.
+**Solution:** `typeof === 'object'` → `Object.values(field).join(', ')`.
+**Prevention:** Dropdowns → object, text → string, files → may be base CDN URL when empty. (Rule in MEMORY.md "Caspio ListFields: Return objects".)
+
+---
+
+### Triggered Actions Don't Fire on REST API Updates (archived 2026-05-21)
+**Problem:** Expected Caspio triggered actions for email notifications on REST API updates.
+**Root Cause:** Triggered actions ONLY fire on DataPage form submissions, NOT REST API updates.
+**Solution:** Use EmailJS (client-side) or server-side notifications instead.
+**Prevention:** REST API updates = no Caspio automation. Plan for external notifications. (Rule in MEMORY.md "Art Hub → Caspio triggered actions DON'T fire on REST API updates".)
+
+---
+
+### getSizeSuffix() Falsy-Zero Bug (|| vs undefined) (archived 2026-05-21)
+**Problem:** `getSizeSuffix('XLR')` returned `'_XLR'` instead of `''`. Normalization worked but empty string `''` is falsy.
+**Root Cause:** `SIZE_TO_SUFFIX[normalized] || SIZE_TO_SUFFIX[size]` — `''` treated as miss by `||`.
+**Solution:** Explicit `if (normalizedSuffix !== undefined) return normalizedSuffix;`.
+**Prevention:** Same class as taxRate bug. Use `??` or explicit `!== undefined` check. (Subsumed by the general Falsy-Zero rule above.)
+
+---
+
+### Art Hub Email Recipient Priority — Sales_Rep Before User_Email (archived 2026-05-21)
+**Problem:** Steve reported mockups were being sent to him instead of the sales rep. AEs got wrong recipient on revision requests.
+**Root Cause:** 7 locations in `art-request-detail.js` and 4 in `art-actions-shared.js` used `User_Email || Sales_Rep` — `User_Email` is often the artist's email, not the rep.
+**Solution:** Swapped to `Sales_Rep || User_Email` everywhere. `Sales_Rep` is the correct field for routing emails to reps.
+**Prevention:** Always use `Sales_Rep` as primary recipient for rep-facing emails. `User_Email` is a fallback only. (Rule in MEMORY.md "Art Hub → Email recipient order".)
+
+---
+
+### Box image-loading legacy fixes — now subsumed by box-url-rules.md (archived 2026-05-21, originally 2026-05-07)
+Two pre-`resolveToProxyUrl` bugs: (1) Box `download_url` shared/static URLs returned 404 → fixed with `/api/box/shared-image` proxy fallback in `renderFilledThumb()` onerror across 6 files; (2) Reference File images rendered as `COM/API/BOX/THUMBNAIL/...` badge because `getFileExtension()` treated proxy paths as extensions, plus mixed-content blocks because backend stored HTTP URLs → fixed via guard (`/` or len > 10) + `normalizeBoxProxyUrl()`. **Both rules superseded** by the centralized box-url-rules.md discipline (always proxy-form URLs in Caspio, `checkUrlReachable()` over plain HEAD, slot-aware recovery, nightly auto-recover cron). Don't write code that retries Box CDN URLs directly — use the proxy.
+
+---
+
+### Box Mockup Files Deleted From Box UI — Defense in Depth (archived 2026-05-21, originally 2026-04-20 → 2026-04-22)
+**Problem (recurring):** Mockup images break in art request gallery + customer approval view. Box returns 404 for fileIds still referenced by Caspio. Steve previously had to manually re-link 21 designs. Thumbnails show generic IMG badge; download alerts "This mockup file no longer exists in Box". **Secondary issue (same day):** the post-upload HEAD verify rejected legitimate uploads when Box's eventual-consistency window (0.5–3s) exceeded the retry ceiling — staff saw "Uploaded file could not be verified in Box. Please try again." on files that actually uploaded fine.
+**Root Cause:** Upload flow is correct (stores proxy URL `/api/box/thumbnail/{fileId}` from Box's authoritative response). Files get deleted **after** upload via Box web UI cleanup — `BOX_ART_FOLDER_ID` ("Steve Art Box 2020") is a shared-access folder. Secondary path: `DELETE /api/box/file/:fileId` had no reference guard. Secondary verify-too-strict: single-attempt (later 3-attempt `[0,500,1500]`) HEAD didn't cover Box's index propagation tail.
+**Solution (defense in depth, 2026-04-22):** (1) Frontend 404 detection — `handleImageError()` HEADs proxy URL on image error; flips slot to "File missing — Re-upload" card (customer view → soft "Mockup is being updated — contact your rep"). (2) Backend upload verify — `verifyBoxFileAccessible()` HEADs fileId with retry `[0,1000,3000,5000]` (~9s); **advisory only, returns boolean** — callers log `[BOX_VERIFY_SOFT_FAIL]` and save to Caspio regardless. (3) DELETE endpoint guard — `findBoxFileReferences()` scans ArtRequests (5 fields) + Digitizing_Mockups (7 fields); returns 409 `FILE_IN_USE` unless `?force=true`. (4) `/api/box/download/:fileId` 404 returns `code: 'BOX_FILE_NOT_FOUND'`. (5) Fixed `sharedUrl` → `proxyUrl` at box-upload.js:1383.
+**Prevention:** Caspio-referenced Box files CAN still be deleted out-of-band. Defense in depth: detect broken files early (HEAD on img error), surface clearly, make repair one-click. **When adding belt-and-suspenders validation, pick ONE layer to own hard failures — duplicating blocks across upload-time AND display-time just multiplies user-facing false positives.** Display-time won (catches deletes too, not just phantoms). Long-term: Box retention policy on `BOX_ART_FOLDER_ID`. (Rules encoded in box-url-rules.md.)
