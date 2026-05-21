@@ -448,54 +448,225 @@ body {
   font-style: italic;
 }
 
-/* === Print =============================================== */
+/* === Print ===============================================
+ * Goal: Single 8.5x11" letter page, looks like a real invoice
+ * (QuickBooks-style). Print rules must EXPLICITLY restore the
+ * desktop 2-column layout — otherwise the @media (max-width:700)
+ * mobile rules below cascade through when printing from a narrow
+ * browser viewport.
+ */
 
 @media print {
   @page {
     size: letter;
-    margin: 0.4in;
+    margin: 0.35in;
   }
-  body {
+
+  /* Force all colors/backgrounds to render in print (critical for
+     header rule, address backgrounds, tax-rate pill, location chip
+     and the green accents). */
+  html, body, *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  html, body {
     background: #fff !important;
-    font-size: 11.5px;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 10pt;
+    line-height: 1.35;
+    color: #1f2937 !important;
   }
+
   .invoice-page {
-    max-width: none;
-    padding: 0;
-    margin: 0;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
+
+  /* Hide all on-screen chrome */
   .invoice-toolbar,
   .invoice-loading,
-  .invoice-error {
+  .invoice-error,
+  .toolbar-sync-status {
     display: none !important;
   }
+
   .invoice {
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    min-height: auto;
-  }
-  .invoice-header { padding-bottom: 12px; margin-bottom: 14px; }
-  .invoice-title { font-size: 22px; }
-  .invoice-logo { width: 110px; }
-  .invoice-addresses { margin-bottom: 12px; }
-  .invoice-details { margin-bottom: 12px; padding: 8px 10px; }
-  .invoice-items-table thead th { padding: 6px 4px; }
-  .invoice-items-table tbody td { padding: 5px 4px; }
-  /* Prevent zebra stripes from looking dirty on print */
-  .invoice-items-table tbody tr:nth-child(even) td {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: auto !important;
     background: #fff !important;
-    border-bottom: 1px solid var(--inv-line-soft);
+  }
+
+  /* Header — explicit 2-column even if printing from mobile */
+  .invoice-header {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 12px !important;
+    border-bottom: 2.5px solid #14532d !important;
+  }
+  .invoice-header-left {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .invoice-logo { width: 100px !important; height: auto !important; }
+  .invoice-company-meta { font-size: 8.5pt !important; line-height: 1.4 !important; }
+  .invoice-company-name { font-size: 9.5pt !important; }
+  .invoice-header-right {
+    text-align: right !important;
+    min-width: 200px !important;
+  }
+  .invoice-title {
+    font-size: 22pt !important;
+    color: #14532d !important;
+    margin-bottom: 6px !important;
+    letter-spacing: 0.04em !important;
+  }
+  .invoice-meta-row {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    font-size: 9pt !important;
+  }
+  .invoice-meta-label { text-align: right !important; min-width: 52px !important; }
+
+  /* Bill To + Ship To — explicit 2-column */
+  .invoice-addresses {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px !important;
+    margin-bottom: 10px !important;
+  }
+  .invoice-address-block {
+    background: #f9fafb !important;
+    border: 1px solid #d1d5db !important;
+    padding: 8px 10px !important;
+    border-radius: 3px !important;
+  }
+  .invoice-address-label {
+    font-size: 7.5pt !important;
+    letter-spacing: 0.1em !important;
+    color: #6b7280 !important;
+  }
+  .invoice-address-name { font-size: 10pt !important; }
+  .invoice-address-line { font-size: 9pt !important; }
+  .invoice-ship-method { color: #14532d !important; font-weight: 600 !important; }
+
+  /* Details strip — 5 columns horizontal */
+  .invoice-details {
+    display: grid !important;
+    grid-template-columns: repeat(5, 1fr) !important;
+    gap: 8px !important;
+    background: #f3f4f6 !important;
+    padding: 7px 9px !important;
+    margin-bottom: 10px !important;
+    border-radius: 3px !important;
+  }
+  .invoice-detail-label {
+    font-size: 7.5pt !important;
+    letter-spacing: 0.08em !important;
+    color: #6b7280 !important;
+  }
+  .invoice-detail-value { font-size: 9pt !important; }
+  .invoice-detail-cell--method .invoice-detail-value {
+    color: #14532d !important;
+  }
+
+  /* Line items table */
+  .invoice-items {
+    margin-bottom: 12px !important;
+  }
+  .invoice-items-table thead {
+    display: table-header-group !important;  /* repeat header on page 2 if needed */
+  }
+  .invoice-items-table thead th {
+    padding: 5px 4px !important;
+    font-size: 8pt !important;
+    color: #4b5563 !important;
+    background: #f3f4f6 !important;
+    border-bottom: 1.5px solid #374151 !important;
   }
   .invoice-items-table tbody td {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    padding: 4px 4px !important;
+    font-size: 9pt !important;
+    border-bottom: 1px solid #e5e7eb !important;
   }
-  /* Avoid orphan headers */
-  .invoice-items-table thead { display: table-header-group; }
-  /* Keep totals + footer with the last item if at all possible */
-  .invoice-totals { break-inside: avoid; }
-  .invoice-footer { break-inside: avoid; }
+  .invoice-items-table tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  /* Disable zebra in print (looks cleaner on paper) */
+  .invoice-items-table tbody tr:nth-child(even) td {
+    background: #fff !important;
+  }
+  .invoice-items-table .col-style    { width: 14% !important; }
+  .invoice-items-table .col-color    { width: 13% !important; }
+  .invoice-items-table .col-desc     { width: 39% !important; }
+  .invoice-items-table .col-qty      { width: 7%  !important; }
+  .invoice-items-table .col-unit     { width: 12% !important; }
+  .invoice-items-table .col-total    { width: 15% !important; }
+  .invoice-item-locations {
+    background: #dcfce7 !important;
+    color: #166534 !important;
+    border: 1px solid #bbf7d0 !important;
+    font-size: 7.5pt !important;
+  }
+
+  /* Totals — keep together on one page */
+  .invoice-totals {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 12px !important;
+  }
+  .invoice-totals-inner { width: 260px !important; font-size: 9.5pt !important; }
+  .invoice-totals-row { padding: 3px 0 !important; }
+  .invoice-totals-rate {
+    background: #f3f4f6 !important;
+    color: #6b7280 !important;
+    font-size: 7.5pt !important;
+  }
+  .invoice-totals-row--grand {
+    border-top: 2px solid #1f2937 !important;
+    margin-top: 4px !important;
+    padding-top: 6px !important;
+    font-size: 12pt !important;
+  }
+  .invoice-totals-row--grand .invoice-totals-label,
+  .invoice-totals-row--grand .invoice-totals-value {
+    color: #1f2937 !important;
+    font-weight: 700 !important;
+  }
+  .invoice-totals-row--balance {
+    border-top: 1px dashed #d1d5db !important;
+    margin-top: 3px !important;
+    padding-top: 5px !important;
+  }
+  .invoice-totals-row--balance .invoice-totals-label,
+  .invoice-totals-row--balance .invoice-totals-value {
+    color: #b45309 !important;
+    font-weight: 700 !important;
+  }
+
+  /* Footer */
+  .invoice-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border-top: 1px solid #d1d5db !important;
+    padding-top: 8px !important;
+    margin-top: 10px !important;
+    font-size: 8pt !important;
+    color: #6b7280 !important;
+  }
+  .invoice-footer a { color: #14532d !important; }
 }
 
 /* === Small-screen graceful degradation =================== */
