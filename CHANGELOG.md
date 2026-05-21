@@ -1,3 +1,7 @@
+## v2026.05.21.14 (2026.05.21)
+
+- Deploy v2026.05.21.14: 2 files (invoice.css) — comprehensive print stylesheet rewrite for 1-page PDF fidelity
+
 ## v2026.05.21.13 (2026.05.21)
 
 - Deploy v2026.05.21.13: 6 files (invoice.html,invoice.js,dtf-quote-builder.html,...) — fix invoice line prices + decoration label
