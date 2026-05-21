@@ -5131,11 +5131,12 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     const shopworksWoNum = session.ShopWorks_Order_Number || order?.id_Order;
     const displayOrderNumber = shopworksWoNum ? `WO ${shopworksWoNum}` : safeQuoteId;
 
-    // Weight estimate — per-garment weights based on typical NWCA inventory.
-    // Warehouse can override at label-buy time, but having a sensible default
-    // means "buy label" is one click for most orders instead of "weigh first."
-    const GARMENT_WEIGHTS_OZ = {
-      // Hoodies / sweatshirts (heavy)
+    // Weight per item — REAL SanMar PIECE_WEIGHT when buildShipStationItems
+    // attached it (via /api/inventory lookup), with a hardcoded prefix-based
+    // fallback for SKUs SanMar doesn't recognize or where the lookup failed.
+    // Sum × quantity = total order weight in oz for the ShipStation payload.
+    const GARMENT_WEIGHTS_OZ_FALLBACK = {
+      // Hoodies / sweatshirts
       'PC90': 24, 'PC78': 22, 'PC850': 22, 'F260': 26, 'F261': 26,
       '18000': 16, '8054': 30, 'ST253': 22, 'ST254': 22,
       // Long sleeves
@@ -5145,27 +5146,36 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       'ST350': 5, 'ST450': 6, 'DT6000': 5,
       // Youth tees
       'PC54Y': 4, 'PC61Y': 4, 'PC55Y': 4, '5000B': 4,
-      // Polos
+      // Polos / Caps / Bags
       'K500': 8, 'K420': 9, 'K100': 8, 'K110': 8,
-      // Caps
       'CP80': 3, 'C112': 4, 'STC10': 4, 'C932': 4,
-      // Bags (varies wildly — coarse default)
       'BG': 8,
     };
     const estimateWeightOz = (it) => {
+      const qty = Number(it.quantity) || 0;
+      // Prefer real SanMar weight (PIECE_WEIGHT) attached during the
+      // /api/inventory lookup in buildShipStationItems
+      if (Number.isFinite(it._weightPerPieceOz) && it._weightPerPieceOz > 0) {
+        return it._weightPerPieceOz * qty;
+      }
+      // Fallback — hardcoded prefix lookup. Longest-prefix wins so
+      // "PC54LS" matches before "PC54". Default 6 oz per piece.
       const sku = String(it.sku || '');
-      // Longest-prefix match (PC90H_3XL → PC90; PC54LS → PC54LS, not PC54)
-      let oz = 6; // default per-item
+      let oz = 6;
       let bestLen = 0;
-      for (const prefix of Object.keys(GARMENT_WEIGHTS_OZ)) {
+      for (const prefix of Object.keys(GARMENT_WEIGHTS_OZ_FALLBACK)) {
         if (sku.startsWith(prefix) && prefix.length > bestLen) {
-          oz = GARMENT_WEIGHTS_OZ[prefix];
+          oz = GARMENT_WEIGHTS_OZ_FALLBACK[prefix];
           bestLen = prefix.length;
         }
       }
-      return oz * (Number(it.quantity) || 0);
+      return oz * qty;
     };
     const totalWeightOz = items.reduce((s, it) => s + estimateWeightOz(it), 0);
+    // Strip the internal _weightPerPieceOz tracker so it doesn't leak to
+    // ShipStation's item payload (which would silently ignore unknown keys
+    // but we keep it clean for log readability).
+    items.forEach(it => { delete it._weightPerPieceOz; });
 
     const payload = {
       orderNumber: displayOrderNumber,    // "WO 141899" or fallback "OF-0048"
@@ -5339,23 +5349,28 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
 });
 
 /**
- * Look up a product's color-specific image URL from the SanMar bulk catalog.
- * Used to enrich ShipStation line items with images so warehouse pickers see
- * the actual garment color combo.
+ * Look up product metadata from SanMar bulk catalog — image URL + per-piece
+ * weight in ounces. Used by the ShipStation push to enrich line items.
  *
- * Returns null when lookup fails — caller proceeds without an image.
+ * SanMar's PIECE_WEIGHT field is in POUNDS per piece (e.g. 1.48 for PC90H
+ * hoodie). We convert to ounces here so the consumer just multiplies by qty.
+ *
+ * Returns { imageUrl, weightOz } — either may be null if the lookup fails
+ * or the field isn't populated. Caller falls back to defaults.
  *
  * Module-level cache (TTL 24h) keeps repeat lookups for the same style+color
  * fast and reduces proxy load. NWCA has ~200 active SKUs; cache stays small.
  */
-const PRODUCT_IMAGE_CACHE = new Map();
-const PRODUCT_IMAGE_TTL_MS = 24 * 60 * 60 * 1000;
+const PRODUCT_META_CACHE = new Map();
+const PRODUCT_META_TTL_MS = 24 * 60 * 60 * 1000;
 
-async function lookupProductImage(styleNumber, color) {
-  if (!styleNumber) return null;
+async function lookupProductMeta(styleNumber, color) {
+  if (!styleNumber) return { imageUrl: null, weightOz: null };
   const key = `${styleNumber}|${color || ''}`.toLowerCase();
-  const cached = PRODUCT_IMAGE_CACHE.get(key);
-  if (cached && Date.now() < cached.expiresAt) return cached.url;
+  const cached = PRODUCT_META_CACHE.get(key);
+  if (cached && Date.now() < cached.expiresAt) {
+    return { imageUrl: cached.imageUrl, weightOz: cached.weightOz };
+  }
 
   try {
     const PROXY = process.env.CASPIO_PROXY_BASE_URL
@@ -5363,22 +5378,28 @@ async function lookupProductImage(styleNumber, color) {
     const url = `${PROXY}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`;
     const resp = await fetch(url);
     if (!resp.ok) {
-      PRODUCT_IMAGE_CACHE.set(key, { url: null, expiresAt: Date.now() + 60_000 }); // brief negative cache
-      return null;
+      PRODUCT_META_CACHE.set(key, { imageUrl: null, weightOz: null, expiresAt: Date.now() + 60_000 });
+      return { imageUrl: null, weightOz: null };
     }
     const data = await resp.json();
     const first = Array.isArray(data) && data.length > 0 ? data[0] : null;
     if (!first) {
-      PRODUCT_IMAGE_CACHE.set(key, { url: null, expiresAt: Date.now() + 60_000 });
-      return null;
+      PRODUCT_META_CACHE.set(key, { imageUrl: null, weightOz: null, expiresAt: Date.now() + 60_000 });
+      return { imageUrl: null, weightOz: null };
     }
-    // Prefer color-specific model shot for visual confirmation
+    // Image: prefer color-specific model shot for visual confirmation
     const imageUrl = first.COLOR_PRODUCT_IMAGE || first.PRODUCT_IMAGE || first.THUMBNAIL_IMAGE || null;
-    PRODUCT_IMAGE_CACHE.set(key, { url: imageUrl, expiresAt: Date.now() + PRODUCT_IMAGE_TTL_MS });
-    return imageUrl;
+    // Weight: PIECE_WEIGHT is SanMar's pounds-per-piece field. Convert to oz.
+    // Sanity: bound between 0 and 200 oz (12.5 lbs — heaviest garment we'd ship)
+    // to catch bad data without crashing.
+    const lbs = Number(first.PIECE_WEIGHT);
+    const weightOz = (Number.isFinite(lbs) && lbs > 0 && lbs < 12.5) ? lbs * 16 : null;
+
+    PRODUCT_META_CACHE.set(key, { imageUrl, weightOz, expiresAt: Date.now() + PRODUCT_META_TTL_MS });
+    return { imageUrl, weightOz };
   } catch (e) {
-    console.warn(`[lookupProductImage] failed for ${styleNumber}/${color}:`, e.message);
-    return null;
+    console.warn(`[lookupProductMeta] failed for ${styleNumber}/${color}:`, e.message);
+    return { imageUrl: null, weightOz: null };
   }
 }
 
@@ -5478,12 +5499,16 @@ async function buildShipStationItems(lineItems, originalSubmission) {
     });
   }
 
-  // Enrich every item with a product image URL (in parallel). Warehouse
-  // pickers see the actual garment color+style in ShipStation's order view.
-  // Best-effort — missing images don't block the push.
+  // Enrich every item with product metadata (image URL + per-piece weight)
+  // from SanMar bulk catalog. Done in parallel. Warehouse pickers see the
+  // actual garment in ShipStation's order view; payload includes accurate
+  // weight from SanMar's authoritative PIECE_WEIGHT field. Best-effort —
+  // missing fields don't block the push (the caller has a fallback weight
+  // table for SKUs SanMar doesn't recognize).
   await Promise.all(out.map(async (item) => {
-    const imageUrl = await lookupProductImage(item.sku, item._colorForImage);
-    if (imageUrl) item.imageUrl = imageUrl;
+    const meta = await lookupProductMeta(item.sku, item._colorForImage);
+    if (meta.imageUrl) item.imageUrl = meta.imageUrl;
+    if (meta.weightOz) item._weightPerPieceOz = meta.weightOz;  // consumed by caller, stripped before send
     delete item._colorForImage;
   }));
 
