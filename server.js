@@ -5018,8 +5018,16 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     //   - UPS (most orders) → WorldShip (desktop app, separate workflow)
     //   - Customer Pickup → no label needed
     //   - FedEx / Other → assume manual / WorldShip until configured
-    const method = (ship.method || ship.methodLabel || '').toString();
+    //
+    // BUT — the rep can override at send time by passing body.overrideShipMethod.
+    // Example: customer picked "UPS Ground" but it's only 3 shirts — rep clicks
+    // Send to ShipStation, modal opens, rep picks "Priority Mail", body has
+    // overrideShipMethod="Priority Mail" → we use that instead and push.
+    const origMethod = (ship.method || ship.methodLabel || '').toString();
+    const overrideMethod = (req.body?.overrideShipMethod || '').toString().trim();
+    const method = overrideMethod || origMethod;
     const methodLower = method.toLowerCase();
+    const wasOverridden = !!overrideMethod && overrideMethod !== origMethod;
 
     if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
       return res.json({ skipped: true, reason: 'pickup', message: 'Customer Pickup — no shipping label needed.' });
@@ -5028,14 +5036,16 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       return res.json({
         skipped: true,
         reason: 'ups-uses-worldship',
-        message: 'UPS orders ship via WorldShip (desktop app), not ShipStation. Open WorldShip to print this label.',
+        message: 'UPS orders ship via WorldShip (desktop app), not ShipStation. To use ShipStation, override the method to a USPS service.',
+        originalMethod: origMethod,
       });
     }
     if (methodLower.startsWith('fedex')) {
       return res.json({
         skipped: true,
         reason: 'fedex-not-configured',
-        message: 'FedEx is not connected to ShipStation. Use the carrier\'s own shipping tool until FedEx is added in ShipStation Settings.',
+        message: 'FedEx is not connected to ShipStation. Use the carrier\'s own shipping tool, or override to a USPS service.',
+        originalMethod: origMethod,
       });
     }
     // Only continue for USPS / Priority Mail / unconfigured-but-supported methods
@@ -5180,6 +5190,10 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
         session.ShopWorks_Order_Number ? `WO ${session.ShopWorks_Order_Number}` : '',
         `Sales rep: ${order?.CustomerServiceRep || session.SalesRepName || 'unknown'}`,
         `Quote: ${safeQuoteId}`,
+        // Surface the override so warehouse picker sees the rep intentionally
+        // re-routed (e.g., "customer originally chose UPS Ground but rep
+        // selected Priority Mail for this small package").
+        wasOverridden ? `Ship method overridden: ${origMethod} → ${method}` : '',
       ].filter(Boolean).join(' · '),
 
       // Carrier preset: only when the carrier is actually configured in

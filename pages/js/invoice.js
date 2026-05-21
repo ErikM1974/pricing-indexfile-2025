@@ -893,24 +893,24 @@
         return;
       }
 
-      // UPS orders ship via WorldShip (NWCA's separate desktop tool), not ShipStation.
-      // Show a non-clickable hint so the rep knows where to go.
+      // UPS orders normally use WorldShip, but reps can override to USPS at
+      // send time (small packages, 2-3 shirts). Keep button clickable — modal
+      // handles the override picker.
       if (methodLower.startsWith('ups')) {
         btn.style.display = 'inline-flex';
-        btn.disabled = true;
-        btn.innerHTML = '📦 Ship via WorldShip';
-        btn.title = 'UPS orders use WorldShip (desktop app), not ShipStation. Open WorldShip to print this label.';
+        btn.disabled = false;
+        btn.innerHTML = '🚢 Override → USPS via ShipStation';
+        btn.title = `Order is currently ${method}. Click to override to a USPS service and route via ShipStation (otherwise use WorldShip for UPS).`;
         btn.style.background = '#fef3c7';
         btn.style.color = '#92400e';
         btn.style.borderColor = '#fde68a';
         return;
       }
-      // FedEx / other non-configured carriers — same pattern
       if (methodLower.startsWith('fedex')) {
         btn.style.display = 'inline-flex';
-        btn.disabled = true;
-        btn.innerHTML = '📦 FedEx label — use carrier tool';
-        btn.title = 'FedEx is not connected to ShipStation. Use FedEx Ship Manager or print manually.';
+        btn.disabled = false;
+        btn.innerHTML = '🚢 Override → USPS via ShipStation';
+        btn.title = `Order is currently ${method}. Click to override to a USPS service and route via ShipStation.`;
         btn.style.background = '#fef3c7';
         btn.style.color = '#92400e';
         btn.style.borderColor = '#fde68a';
@@ -952,11 +952,28 @@
 
     async sendToShipStation() {
       const btn = $('btn-shipstation');
-      if (!confirm(
-        `Send order ${this.quoteId} to ShipStation?\n\n` +
-        'The warehouse will rate + buy the shipping label in ShipStation. ' +
-        'Tracking will appear back on this invoice automatically once a label is bought.'
-      )) return;
+      const data = this.fullData || {};
+      const pushedShip = (data.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
+      const currentMethod = (pushedShip?.ShipMethod || data.originalSubmission?.ship?.method || '').toString();
+      const currentLower = currentMethod.toLowerCase();
+      const isNonUSPS =
+        currentLower.startsWith('ups') ||
+        currentLower.startsWith('fedex') ||
+        (currentMethod && !currentLower.includes('usps') && !currentLower.includes('priority') && !currentLower.includes('mail'));
+
+      // For UPS / FedEx / unknown methods, open a method-override modal.
+      // For USPS-flavored methods, no override needed — go straight to send.
+      let overrideMethod = null;
+      if (isNonUSPS) {
+        overrideMethod = await this.openShipStationOverrideModal(currentMethod);
+        if (overrideMethod === null) return; // user cancelled
+      } else {
+        if (!confirm(
+          `Send order ${this.quoteId} to ShipStation?\n\n` +
+          'Warehouse will rate + buy the label in ShipStation. ' +
+          'Tracking will appear back on this invoice automatically.'
+        )) return;
+      }
 
       btn.disabled = true;
       btn.innerHTML = 'Sending…';
@@ -964,7 +981,11 @@
       try {
         const resp = await fetch(
           `/api/quote-sessions/${encodeURIComponent(this.quoteId)}/send-to-shipstation`,
-          { method: 'POST' }
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(overrideMethod ? { overrideShipMethod: overrideMethod } : {}),
+          }
         );
         const result = await resp.json();
 
@@ -994,6 +1015,105 @@
         alert('Failed to send to ShipStation:\n\n' + err.message);
         this.updateShipStationButton();
       }
+    }
+
+    /**
+     * Open a modal asking the rep how to route a non-USPS order.
+     * Returns the chosen overrideShipMethod string, or null on cancel.
+     *
+     * Usage: when customer picked UPS but it's a small package the rep wants
+     * to ship via USPS via ShipStation instead.
+     */
+    openShipStationOverrideModal(currentMethod) {
+      return new Promise((resolve) => {
+        // Remove any prior instance
+        const prev = document.getElementById('shipstation-override-modal');
+        if (prev) prev.remove();
+
+        const modal = el('div', { id: 'shipstation-override-modal' }, null);
+        Object.assign(modal.style, {
+          position: 'fixed', inset: '0', background: 'rgba(15, 23, 42, 0.55)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: '9999', padding: '20px',
+        });
+
+        const card = el('div', null, null);
+        Object.assign(card.style, {
+          background: '#fff', borderRadius: '8px', padding: '24px 28px',
+          maxWidth: '480px', width: '100%', boxShadow: '0 20px 50px rgba(0,0,0,.25)',
+          fontFamily: 'Inter, -apple-system, sans-serif',
+        });
+
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <span style="font-size:22px">🚢</span>
+            <h2 style="margin:0; font-size:18px; color:#1f2937">Send to ShipStation</h2>
+          </div>
+          <p style="margin:0 0 16px; color:#4b5563; font-size:13.5px; line-height:1.5">
+            This order was created with shipping method
+            <strong style="color:#b45309">${escapeHTML(currentMethod || '(none)')}</strong>.
+            ShipStation in NWCA's setup only supports USPS — to route this order
+            there, choose a USPS service below.
+            Otherwise, ${currentMethod && currentMethod.toLowerCase().startsWith('ups') ? 'use WorldShip' : 'use the carrier\'s own tool'}
+            instead.
+          </p>
+          <div style="margin-bottom:18px">
+            <div style="font-size:12px; font-weight:600; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px">
+              Override to USPS service:
+            </div>
+            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
+              <input type="radio" name="ss-override" value="Priority Mail" checked style="margin-top:3px">
+              <div>
+                <div style="font-weight:600; color:#1f2937">Priority Mail</div>
+                <div style="font-size:12px; color:#6b7280">2–3 business days · Recommended for 2-3 shirts</div>
+              </div>
+            </label>
+            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
+              <input type="radio" name="ss-override" value="USPS First Class" style="margin-top:3px">
+              <div>
+                <div style="font-weight:600; color:#1f2937">USPS First Class</div>
+                <div style="font-size:12px; color:#6b7280">3–5 days · Lightest packages (under 1 lb)</div>
+              </div>
+            </label>
+            <label class="ss-override-opt" style="display:flex; align-items:flex-start; gap:8px; padding:10px 12px; border:1px solid #d1d5db; border-radius:4px; margin-bottom:6px; cursor:pointer">
+              <input type="radio" name="ss-override" value="USPS Ground" style="margin-top:3px">
+              <div>
+                <div style="font-weight:600; color:#1f2937">USPS Ground Advantage</div>
+                <div style="font-size:12px; color:#6b7280">2–5 days · Cheaper than Priority for heavier boxes</div>
+              </div>
+            </label>
+          </div>
+          <div style="display:flex; gap:10px; justify-content:flex-end">
+            <button type="button" id="ss-modal-cancel" style="padding:8px 16px; border:1px solid #d1d5db; background:#fff; color:#4b5563; border-radius:4px; font-weight:500; cursor:pointer">
+              Cancel
+            </button>
+            <button type="button" id="ss-modal-confirm" style="padding:8px 18px; border:none; background:#14532d; color:#fff; border-radius:4px; font-weight:600; cursor:pointer">
+              Override & Send to ShipStation
+            </button>
+          </div>
+        `;
+        modal.appendChild(card);
+        document.body.appendChild(modal);
+
+        const cleanup = (val) => {
+          modal.remove();
+          resolve(val);
+        };
+
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) cleanup(null); // backdrop click cancels
+        });
+        card.querySelector('#ss-modal-cancel').addEventListener('click', () => cleanup(null));
+        card.querySelector('#ss-modal-confirm').addEventListener('click', () => {
+          const picked = card.querySelector('input[name="ss-override"]:checked')?.value || 'Priority Mail';
+          cleanup(picked);
+        });
+        // Esc cancels
+        const keyHandler = (e) => {
+          if (e.key === 'Escape') { document.removeEventListener('keydown', keyHandler); cleanup(null); }
+        };
+        document.addEventListener('keydown', keyHandler);
+      });
     }
 
     async maybeAutoSync() {
