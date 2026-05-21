@@ -5024,11 +5024,32 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       name:      pushedShip.ShipName || '',
     } : (originalSubmission?.ship || {});
 
-    // 4. Customer Pickup orders never go to ShipStation
+    // 4. Skip ShipStation entirely for non-USPS orders. NWCA's workflow:
+    //   - USPS (small packages, 2-3 shirts) → ShipStation
+    //   - UPS (most orders) → WorldShip (desktop app, separate workflow)
+    //   - Customer Pickup → no label needed
+    //   - FedEx / Other → assume manual / WorldShip until configured
     const method = (ship.method || ship.methodLabel || '').toString();
-    if (method === 'Customer Pickup' || method.toLowerCase().includes('pickup')) {
-      return res.json({ skipped: true, reason: 'pickup', message: 'Customer Pickup orders do not need ShipStation labels' });
+    const methodLower = method.toLowerCase();
+
+    if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
+      return res.json({ skipped: true, reason: 'pickup', message: 'Customer Pickup — no shipping label needed.' });
     }
+    if (methodLower.startsWith('ups')) {
+      return res.json({
+        skipped: true,
+        reason: 'ups-uses-worldship',
+        message: 'UPS orders ship via WorldShip (desktop app), not ShipStation. Open WorldShip to print this label.',
+      });
+    }
+    if (methodLower.startsWith('fedex')) {
+      return res.json({
+        skipped: true,
+        reason: 'fedex-not-configured',
+        message: 'FedEx is not connected to ShipStation. Use the carrier\'s own shipping tool until FedEx is added in ShipStation Settings.',
+      });
+    }
+    // Only continue for USPS / Priority Mail / unconfigured-but-supported methods
 
     // 5. Look up the carrier+service for our ship method.
     //

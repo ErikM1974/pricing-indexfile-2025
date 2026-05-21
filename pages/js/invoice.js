@@ -879,9 +879,10 @@
       const order = data.shopWorks?.snapshot?.order;
       const pushedShip = (data.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
       const method = (pushedShip?.ShipMethod || data.originalSubmission?.ship?.method || '').toString();
+      const methodLower = method.toLowerCase();
 
-      // Hide for pickup orders entirely
-      if (method === 'Customer Pickup' || method.toLowerCase().includes('pickup')) {
+      // Hide for pickup orders entirely (no label needed)
+      if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
         btn.style.display = 'none';
         return;
       }
@@ -889,6 +890,30 @@
       // Hide until we have a ShopWorks snapshot (pre-import — no items to push yet)
       if (!order && !data.originalSubmission) {
         btn.style.display = 'none';
+        return;
+      }
+
+      // UPS orders ship via WorldShip (NWCA's separate desktop tool), not ShipStation.
+      // Show a non-clickable hint so the rep knows where to go.
+      if (methodLower.startsWith('ups')) {
+        btn.style.display = 'inline-flex';
+        btn.disabled = true;
+        btn.innerHTML = '📦 Ship via WorldShip';
+        btn.title = 'UPS orders use WorldShip (desktop app), not ShipStation. Open WorldShip to print this label.';
+        btn.style.background = '#fef3c7';
+        btn.style.color = '#92400e';
+        btn.style.borderColor = '#fde68a';
+        return;
+      }
+      // FedEx / other non-configured carriers — same pattern
+      if (methodLower.startsWith('fedex')) {
+        btn.style.display = 'inline-flex';
+        btn.disabled = true;
+        btn.innerHTML = '📦 FedEx label — use carrier tool';
+        btn.title = 'FedEx is not connected to ShipStation. Use FedEx Ship Manager or print manually.';
+        btn.style.background = '#fef3c7';
+        btn.style.color = '#92400e';
+        btn.style.borderColor = '#fde68a';
         return;
       }
 
