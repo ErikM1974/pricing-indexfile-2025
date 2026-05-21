@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.7">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.8">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -324,6 +324,26 @@
             </section>
 
             <!-- ============================================================
+                 View Original Submission — collapsible audit panel
+                 (Erik 2026-05-21 — Phase 4e). Shows what the original
+                 push contained, side-by-side with current ShopWorks state.
+                 Helps reps + AR answer "what changed since submit?".
+                 Hidden until snapshot synced.
+                 ============================================================ -->
+            <section id="sw-original-section" class="sw-original-section" style="display: none;">
+                <details class="sw-original-details">
+                    <summary class="sw-original-summary">
+                        <span class="sw-original-summary-icon">▸</span>
+                        <span class="sw-original-summary-title">View original submission</span>
+                        <span class="sw-original-summary-meta" id="sw-original-summary-meta"></span>
+                    </summary>
+                    <div class="sw-original-body" id="sw-original-body">
+                        <!-- populated by JS -->
+                    </div>
+                </details>
+            </section>
+
+            <!-- ============================================================
                  Shipping panel (Erik 2026-05-21 — Phase 4c).
                  Mirrors the ShopWorks PDF's Shipping block: Date Shipped,
                  Shipped By, # Of Boxes (when populated post-shipment), then
@@ -486,6 +506,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.7"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.8"></script>
 </body>
 </html>
