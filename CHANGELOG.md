@@ -1,3 +1,7 @@
+## v2026.05.21.1 (2026.05.21)
+
+- Deploy v2026.05.21.1: 1 files (server.js,...) — add quote-sessions ShopWorks sync endpoints (POST /sync-from-shopworks, GET /full)
+
 ## v2026.05.20.19 (2026.05.20)
 
 - Deploy v2026.05.20.19: new-artwork upload UI + submit wiring + readiness gates (Phase 2+3)
