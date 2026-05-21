@@ -4990,17 +4990,6 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     const session = sessions[0];
     const pkId = session.PK_ID;
 
-    // 2. Already-sent check — idempotency at the Caspio layer
-    if (session.ShipStation_Order_ID) {
-      return res.json({
-        success: true,
-        alreadySent: true,
-        shipstationOrderId: session.ShipStation_Order_ID,
-        status: session.ShipStation_Status || 'awaiting_shipment',
-        lastSynced: session.ShipStation_Last_Synced,
-      });
-    }
-
     // 3. Parse the snapshot + original submission (same logic as /full).
     let originalSubmission = null;
     if (session.Notes) {
@@ -5050,6 +5039,19 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       });
     }
     // Only continue for USPS / Priority Mail / unconfigured-but-supported methods
+
+    // 4b. Already-sent check — idempotency at the Caspio layer. Runs AFTER
+    // the routing skips so a stale ShipStation_Order_ID on a UPS order
+    // (e.g., from before today's USPS-only routing) doesn't block the skip.
+    if (session.ShipStation_Order_ID) {
+      return res.json({
+        success: true,
+        alreadySent: true,
+        shipstationOrderId: session.ShipStation_Order_ID,
+        status: session.ShipStation_Status || 'awaiting_shipment',
+        lastSynced: session.ShipStation_Last_Synced,
+      });
+    }
 
     // 5. Look up the carrier+service for our ship method.
     //
