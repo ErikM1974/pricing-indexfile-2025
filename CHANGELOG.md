@@ -1,3 +1,7 @@
+## v2026.05.21.7 (2026.05.21)
+
+- Deploy v2026.05.21.7: show computed tax rate next to Sales Tax (9.50%, 10.10%, etc.) on financial summary
+
 ## v2026.05.21.6 (2026.05.21)
 
 - Deploy v2026.05.21.6: 4 files — Phase 4d: Financial summary + Art thumbnails + Billing block + accurate location count from /order-pull
