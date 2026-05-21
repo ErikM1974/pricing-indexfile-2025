@@ -200,6 +200,9 @@
       this.renderFooter(data, sw);
       this.renderSyncStatus(sw);
       this.renderStatusBanner(data, order);
+      // Refresh the ShipStation button state — guarded with optional chaining
+      // in case the toolbar isn't yet in the DOM during early renders.
+      if (typeof this.updateShipStationButton === 'function') this.updateShipStationButton();
     }
 
     renderHeader(data, order) {
@@ -851,6 +854,121 @@
       $('btn-refresh').addEventListener('click', () => this.syncNow(true));
       const back = $('btn-back-to-quote');
       if (back) back.setAttribute('href', `/quote/${encodeURIComponent(this.quoteId)}`);
+      // Wire the ShipStation button — initial visibility decided by
+      // updateShipStationButton() which runs after each render.
+      const ssBtn = $('btn-shipstation');
+      if (ssBtn) ssBtn.addEventListener('click', () => this.sendToShipStation());
+      this.updateShipStationButton();
+    }
+
+    /**
+     * Show / hide / relabel the Send-to-ShipStation button based on current
+     * data state. Called from wireToolbar (init) + after every render.
+     *
+     * States:
+     *   • Hidden — when shipping = Customer Pickup OR no ShopWorks snapshot yet
+     *   • "🚢 Send to ShipStation" — order is ready to ship, not yet sent
+     *   • "✓ In ShipStation #N" (disabled) — already sent, awaiting label
+     *   • "📦 Shipped — UPS 1Z..." (disabled, link) — label bought + tracking
+     */
+    updateShipStationButton() {
+      const btn = $('btn-shipstation');
+      if (!btn) return;
+      const data = this.fullData || {};
+      const ss = data.shipStation;
+      const order = data.shopWorks?.snapshot?.order;
+      const pushedShip = (data.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
+      const method = (pushedShip?.ShipMethod || data.originalSubmission?.ship?.method || '').toString();
+
+      // Hide for pickup orders entirely
+      if (method === 'Customer Pickup' || method.toLowerCase().includes('pickup')) {
+        btn.style.display = 'none';
+        return;
+      }
+
+      // Hide until we have a ShopWorks snapshot (pre-import — no items to push yet)
+      if (!order && !data.originalSubmission) {
+        btn.style.display = 'none';
+        return;
+      }
+
+      btn.style.display = 'inline-flex';
+
+      // Already shipped — show tracking with carrier
+      if (ss && ss.status === 'shipped' && ss.trackingNumber) {
+        btn.disabled = false;
+        btn.innerHTML = `📦 Shipped · <a href="${escapeHTML(ss.trackingURL || '#')}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">${escapeHTML(ss.trackingNumber)}</a>`;
+        btn.title = `Carrier: ${ss.trackingCarrier || 'unknown'} · Click tracking# to track`;
+        btn.style.background = '#dcfce7';
+        btn.style.color = '#166534';
+        btn.style.borderColor = '#bbf7d0';
+        return;
+      }
+
+      // Already sent to ShipStation — awaiting label
+      if (ss && ss.orderId) {
+        btn.disabled = true;
+        btn.innerHTML = `✓ In ShipStation #${escapeHTML(String(ss.orderId))}`;
+        btn.title = 'Already pushed. Warehouse buys the label in ShipStation UI; tracking will appear here once shipped.';
+        btn.style.background = '#f3f4f6';
+        btn.style.color = '#4b5563';
+        btn.style.borderColor = '#d1d5db';
+        return;
+      }
+
+      // Default state — ready to send
+      btn.disabled = false;
+      btn.innerHTML = '🚢 Send to ShipStation';
+      btn.title = 'Push this order to ShipStation. Warehouse will rate + buy the label there.';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+
+    async sendToShipStation() {
+      const btn = $('btn-shipstation');
+      if (!confirm(
+        `Send order ${this.quoteId} to ShipStation?\n\n` +
+        'The warehouse will rate + buy the shipping label in ShipStation. ' +
+        'Tracking will appear back on this invoice automatically once a label is bought.'
+      )) return;
+
+      btn.disabled = true;
+      btn.innerHTML = 'Sending…';
+
+      try {
+        const resp = await fetch(
+          `/api/quote-sessions/${encodeURIComponent(this.quoteId)}/send-to-shipstation`,
+          { method: 'POST' }
+        );
+        const result = await resp.json();
+
+        if (result.skipped) {
+          alert(`Skipped: ${result.message || result.reason}`);
+          this.updateShipStationButton();
+          return;
+        }
+        if (!resp.ok || !result.success) {
+          throw new Error(result.error || `HTTP ${resp.status}`);
+        }
+
+        // Optimistic local update so the button flips state immediately
+        if (!this.fullData.shipStation) this.fullData.shipStation = {};
+        this.fullData.shipStation.orderId = result.shipstationOrderId;
+        this.fullData.shipStation.status = result.status || 'awaiting_shipment';
+        this.fullData.shipStation.lastSynced = result.lastSynced;
+        this.updateShipStationButton();
+
+        if (result.alreadySent) {
+          alert(`Already in ShipStation as #${result.shipstationOrderId}. No duplicate created.`);
+        } else {
+          alert(`✓ Sent to ShipStation as #${result.shipstationOrderId}. The warehouse can now buy a label.`);
+        }
+      } catch (err) {
+        console.error('[invoice] sendToShipStation failed:', err);
+        alert('Failed to send to ShipStation:\n\n' + err.message);
+        this.updateShipStationButton();
+      }
     }
 
     async maybeAutoSync() {
