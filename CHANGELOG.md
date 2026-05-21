@@ -1,3 +1,7 @@
+## v2026.05.21.4 (2026.05.21)
+
+- Deploy v2026.05.21.4: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4c: Order Status grid + Notes + Shipping panels
+
 ## v2026.05.21.3 (2026.05.21)
 
 - Deploy v2026.05.21.3: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4b: ShopWorks overlay (override email/phone/PO/dates) + new Designs panel
