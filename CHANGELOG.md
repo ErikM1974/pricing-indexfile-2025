@@ -1,3 +1,7 @@
+## v2026.05.21.25 (2026.05.21)
+
+- Deploy v2026.05.21.25: 2 files (quote-management.css,quote-management.html,...)
+
 ## v2026.05.21.24 (2026.05.21)
 
 - Deploy v2026.05.21.24: Phase E audit fixes — M1 split tax-application block into Notes To Accounting (keeps Notes On Order clean for CSR), L4 explicit RUSH checkbox in OF form (replaces fragile Notes-regex detection)
