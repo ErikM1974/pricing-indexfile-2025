@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
 
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.22">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.21.25">
 </head>
 <body>
     <!-- Header -->
@@ -39,6 +39,8 @@
                     <option value="">All Statuses</option>
                     <option value="Open">Open</option>
                     <option value="Pending Payment">Awaiting Payment</option>
+                    <option value="Payment Confirmed">Payment Received</option>
+                    <option value="Payment Confirmed - ShopWorks Failed">Charged · No SW Order</option>
                     <option value="Processed">Processed (in ShopWorks)</option>
                     <option value="Processed - ShopWorks Failed">Push Failed</option>
                     <option value="Accepted">Accepted</option>
@@ -354,18 +356,24 @@
                     cancelledCount++;
                     return;
                 }
-                if (quote.Status === 'Processed - ShopWorks Failed') {
+                if (quote.Status === 'Processed - ShopWorks Failed' ||
+                    quote.Status === 'Payment Confirmed - ShopWorks Failed') {
                     // Push failed — needs rep attention. Count, but include
                     // in Total Value because the dollar is still in flight.
+                    // 'Payment Confirmed - ShopWorks Failed' is the URGENT
+                    // variant: customer was already charged but the order
+                    // never landed in ShopWorks → manual entry required.
                     failedCount++;
                     totalValue += parseFloat(quote.TotalAmount) || 0;
                     return;
                 }
 
-                if (quote.Status === 'Open' || quote.Status === 'Active' || quote.Status === 'Processed' || quote.Status === 'Pending Payment') {
-                    // Pending Payment = 3-Day Tees Stripe checkout started but
-                    // webhook hasn't confirmed payment yet. Order is in-flight
-                    // money, so rolled into Active alongside Open/Processed.
+                if (quote.Status === 'Open' || quote.Status === 'Active' || quote.Status === 'Processed' || quote.Status === 'Pending Payment' || quote.Status === 'Payment Confirmed') {
+                    // In-flight money — rolled into Active:
+                    //   • Pending Payment — 3-Day Tees order awaiting card
+                    //     processing in ShopWorks.
+                    //   • Payment Confirmed — payment received, ShopWorks
+                    //     order hasn't been created yet (transient).
                     activeCount++;
                     // Check if expiring within 7 days (Open only — Processed
                     // orders don't expire, they're already submitted).
@@ -426,15 +434,20 @@
                 const isProcessed = quote.Status === 'Processed';
                 const isFailed = quote.Status === 'Processed - ShopWorks Failed';
                 const isPendingPayment = quote.Status === 'Pending Payment';
+                const isPaymentConfirmed = quote.Status === 'Payment Confirmed';
+                const isChargedNoSWOrder = quote.Status === 'Payment Confirmed - ShopWorks Failed';
 
                 // Status cell branches:
                 //   • Cancelled — red badge (no dropdown; order is gone in SW)
                 //   • Processed — green "In ShopWorks" badge (system-managed
                 //     state — flips automatically post-submit, no manual edit)
                 //   • Push Failed — amber warning badge (needs rep attention)
+                //   • Charged · No SW Order — red URGENT badge (money in, no
+                //     ShopWorks order — manual entry required)
                 //   • Pending Payment — amber "Awaiting Payment" badge (3-Day
-                //     Tees Stripe checkout in progress; webhook flips it to
-                //     Payment Confirmed → Processed when capture succeeds)
+                //     Tees order, card processed in ShopWorks)
+                //   • Payment Confirmed — teal "Payment Received" badge
+                //     (payment in, ShopWorks order not yet created)
                 //   • Otherwise — editable dropdown (Open/Lost/Accepted/Expired)
                 let statusCellHtml;
                 if (isCancelled) {
@@ -446,6 +459,10 @@
                     statusCellHtml = `<span class="status-badge status-processed" title="Order successfully pushed to ShopWorks${woNum ? ` (WO${woNum})` : ''}. System-managed state — syncs hourly.">
                                           <i class="fas fa-check-circle"></i> In ShopWorks${woNum}
                                        </span>`;
+                } else if (isChargedNoSWOrder) {
+                    statusCellHtml = `<span class="status-badge status-charged-no-sw" title="URGENT — payment was processed but the order didn't land in ShopWorks. Customer has been charged. Manually enter the order in ShopWorks, then mark this quote as Processed.">
+                                          <i class="fas fa-exclamation-triangle"></i> Charged · No SW Order
+                                       </span>`;
                 } else if (isFailed) {
                     statusCellHtml = `<span class="status-badge status-failed" title="Push to ShopWorks failed. Open the quote and click Refresh to retry, or contact dev to inspect the proxy logs.">
                                           <i class="fas fa-exclamation-triangle"></i> Push Failed
@@ -453,6 +470,10 @@
                 } else if (isPendingPayment) {
                     statusCellHtml = `<span class="status-badge status-pending-payment" title="3-Day Tees order — credit card is processed in ShopWorks. Status updates once the order is completed there.">
                                           <i class="fas fa-credit-card"></i> Awaiting Payment
+                                       </span>`;
+                } else if (isPaymentConfirmed) {
+                    statusCellHtml = `<span class="status-badge status-payment-confirmed" title="3-Day Tees order — payment received, ShopWorks order hasn't been created yet. Should advance to In ShopWorks shortly.">
+                                          <i class="fas fa-check-circle"></i> Payment Received
                                        </span>`;
                 } else {
                     statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
