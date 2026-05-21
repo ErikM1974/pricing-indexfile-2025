@@ -93,6 +93,9 @@ class QuoteViewPage {
         // Auto-syncs in the background if data is > 30 min stale.
         this.setupShopWorksSyncStrip();
 
+        // Quick action buttons (Print / Copy link / Email customer)
+        this._setupQuickActions();
+
         // Setup push-to-ShopWorks button (staff only, EMB quotes only)
         if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
             this.setupPushButton();
@@ -2422,14 +2425,114 @@ class QuoteViewPage {
         this._renderNotesPanel();
         this._renderShippingPanel(order);
 
-        // Phase 4d — Financial Summary panel
+        // Phase 4d — Financial Summary panel + payments list (NEW)
         this._renderFinancialPanel(order);
+        this._renderPaymentsList(snapshot.payments || []);
+
+        // Phase 4d+ — Tracking section on shipping panel (NEW)
+        this._renderTrackingInShippingPanel(snapshot.tracking || [], order);
 
         // Phase 4e — View Original Submission audit panel
         this._renderOriginalSubmissionPanel(order);
 
         // Phase 4d+ — Stale-data warning if last sync > 24 hrs ago
         this._renderStaleSyncWarning();
+    }
+
+    _renderPaymentsList(payments) {
+        // Show payment history below the Financial Summary panel.
+        // /v1/payments returns: id_SubPayment, FirstName, LastName, BillingCompnay,
+        // BillingAddress, BillingCity, BillingState, BillingZip, CreditCardCompany,
+        // PaymentDate, PaymentMethod (probably), Amount fields.
+        const finSection = document.getElementById('sw-financial-section');
+        if (!finSection) return;
+        const existing = document.getElementById('sw-payments-list');
+        if (existing) existing.remove();
+
+        if (!payments || payments.length === 0) return;
+
+        const list = document.createElement('div');
+        list.id = 'sw-payments-list';
+        list.className = 'sw-payments-list';
+        list.innerHTML = `
+            <h3 class="sw-payments-list-head">Payment History (${payments.length})</h3>
+            <table class="sw-payments-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th class="sw-payments-amount-col">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${payments.map(p => {
+                        const date = p.PaymentDate || p.date_Payment || p.date_PaymentApplied || '';
+                        // Method: prefer explicit, else infer from CreditCardCompany
+                        const method = p.PaymentMethod || p.CreditCardCompany || p.PaymentType || 'Payment';
+                        // Reference: card last 4, check #, etc.
+                        const ref = p.LastFour || p.CheckNumber || p.TransactionID || p.PaymentReference || '';
+                        const amt = Number(p.Amount || p.PaymentAmount || p.cur_Payment || 0);
+                        const amtStr = '$' + amt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                        return `
+                            <tr>
+                                <td>${this.escapeHtml(date ? this.formatDate(date) : '—')}</td>
+                                <td>${this.escapeHtml(method)}</td>
+                                <td class="sw-payments-ref">${this.escapeHtml(ref || '—')}</td>
+                                <td class="sw-payments-amount">${amtStr}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+        finSection.appendChild(list);
+    }
+
+    _renderTrackingInShippingPanel(tracking, order) {
+        // Append a tracking section to the shipping panel.
+        // /v1/tracking returns: TrackingNumber, ShippingCarrier (or similar),
+        // date_Shipped, BoxNumber, BoxCount, etc.
+        const shipSection = document.getElementById('sw-shipping-section');
+        if (!shipSection) return;
+        const existing = document.getElementById('sw-tracking-block');
+        if (existing) existing.remove();
+
+        // Also update Date Shipped + # Of Boxes meta from tracking data when present.
+        if (tracking && tracking.length > 0) {
+            const first = tracking[0];
+            const dateShipped = first.date_Shipped || first.PaymentDate || order?.date_Shippied;
+            const boxCount = tracking.length;
+            const dateEl = document.getElementById('sw-shipping-date');
+            const boxEl = document.getElementById('sw-shipping-boxes');
+            if (dateEl && dateShipped) dateEl.textContent = this.formatDate(dateShipped);
+            if (boxEl) boxEl.textContent = String(boxCount);
+
+            // Build the tracking block.
+            const block = document.createElement('div');
+            block.id = 'sw-tracking-block';
+            block.className = 'sw-tracking-block';
+            block.innerHTML = `
+                <h3 class="sw-tracking-head">Tracking (${tracking.length} ${tracking.length === 1 ? 'package' : 'packages'})</h3>
+                <ul class="sw-tracking-list">
+                    ${tracking.map(t => {
+                        const trkNum = t.TrackingNumber || t.tracking_number || '';
+                        const carrier = t.ShippingCarrier || t.Carrier || t.ship_carrier || 'Carrier';
+                        const link = this.getTrackingLink ? this.getTrackingLink(carrier, trkNum) : '';
+                        const linkHtml = link
+                            ? `<a href="${this.escapeHtml(link)}" target="_blank" rel="noopener">${this.escapeHtml(trkNum)}</a>`
+                            : this.escapeHtml(trkNum || '—');
+                        const date = t.date_Shipped || '';
+                        return `<li>
+                            <span class="sw-tracking-carrier">${this.escapeHtml(carrier)}</span>
+                            <span class="sw-tracking-num">${linkHtml}</span>
+                            ${date ? `<span class="sw-tracking-date">${this.escapeHtml(this.formatDate(date))}</span>` : ''}
+                        </li>`;
+                    }).join('')}
+                </ul>
+            `;
+            shipSection.appendChild(block);
+        }
     }
 
     _renderOriginalSubmissionPanel(order) {
@@ -2548,6 +2651,56 @@ class QuoteViewPage {
         `;
 
         section.style.display = 'block';
+    }
+
+    _setupQuickActions() {
+        const printBtn = document.getElementById('sw-action-print');
+        const copyBtn = document.getElementById('sw-action-copy-link');
+        const emailBtn = document.getElementById('sw-action-email');
+
+        if (printBtn) {
+            printBtn.addEventListener('click', () => window.print());
+        }
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(window.location.href);
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<span class="sw-action-icon">✓</span> Copied!';
+                    copyBtn.classList.add('sw-action-btn--success');
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.classList.remove('sw-action-btn--success');
+                    }, 1800);
+                } catch (e) {
+                    alert('Copy failed — your browser blocked clipboard access. URL: ' + window.location.href);
+                }
+            });
+        }
+
+        if (emailBtn) {
+            emailBtn.addEventListener('click', () => {
+                const email = this.quoteData?.CustomerEmail
+                    || this._currentSnapshot?.order?.ContactEmail
+                    || '';
+                const customerName = this.quoteData?.CustomerName || 'Customer';
+                const subject = `Your Quote ${this.quoteId} from Northwest Custom Apparel`;
+                const body = [
+                    `Hi ${customerName.split(' ')[0]},`,
+                    '',
+                    `Here's the link to your quote:`,
+                    window.location.href,
+                    '',
+                    'Let me know if you have any questions!',
+                    '',
+                    '— Northwest Custom Apparel',
+                    '(253) 922-5793',
+                ].join('\n');
+                const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailto;
+            });
+        }
     }
 
     _renderStaleSyncWarning() {
@@ -2675,64 +2828,83 @@ class QuoteViewPage {
         const section = document.getElementById('sw-designs-section');
         if (!section) return;
 
-        // ShopWorks tracks ONE primary id_Design per order (multi-design
-        // orders use Designs[] but the order header just shows the main).
-        // If id_Design is 0 or missing, hide the panel (some orders have
-        // no design — fee-only orders, transfers, etc.).
+        // Multi-design support (Erik 2026-05-21): iterate ALL Designs in the
+        // pushed array. ShopWorks's /v1/orders only exposes ONE id_Design
+        // (the primary), but pushed/order-pull preserves the full array.
+        // Each Design has its own Locations[] with art URLs.
+        const allPushedDesigns = (this._currentSnapshot?.pushed?.Designs || []);
         const idDesign = Number(order.id_Design) || 0;
-        if (!idDesign && !order.DesignName) {
+
+        // If no design at all (no pushed, no primary id_Design, no name) → hide.
+        if (allPushedDesigns.length === 0 && !idDesign && !order.DesignName) {
             section.style.display = 'none';
             return;
         }
 
-        // Counters at the top: Product Qty + Total Imprints.
+        // Counters at the top.
         const productQty = Number(order.TotalProductQuantity) || lineItems.reduce((s, li) => s + (Number(li.LineQuantity) || 0), 0);
-        const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType);
-
-        // Locations count — PREFER the pushed data's Designs[].Locations[]
-        // (which has accurate per-design locations from when we pushed).
-        // Fall back to the original submission's printLocations only if the
-        // pushed data is unavailable (e.g. legacy quotes).
-        const pushedDesign = (this._currentSnapshot?.pushed?.Designs || [])[0] || null;
-        const pushedLocations = pushedDesign?.Locations || [];
-        let locationsCount, locationsNames;
-        if (pushedLocations.length > 0) {
-            locationsCount = pushedLocations.length;
-            locationsNames = pushedLocations.map(L => L.Location).filter(Boolean).join(' + ');
-        } else {
-            const submittedPrintLocs = this.fullData?.originalSubmission?.printLocations || '';
-            locationsCount = submittedPrintLocs
-                ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
-                : 1;
-            locationsNames = submittedPrintLocs || 'Left Chest';
-        }
-        const totalImprints = productQty * locationsCount;
+        // Total locations across ALL designs (e.g. 2 designs × 2 locations each = 4)
+        const totalLocations = allPushedDesigns.reduce((s, d) => s + ((d?.Locations || []).length), 0)
+            || 1;
+        const totalImprints = productQty * totalLocations;
 
         const productQtyEl = document.getElementById('sw-designs-product-qty');
         if (productQtyEl) productQtyEl.textContent = productQty || '—';
         const imprintsEl = document.getElementById('sw-designs-imprints');
         if (imprintsEl) imprintsEl.textContent = totalImprints || '—';
 
-        // Render the design row in the table — now shows the location names
-        // (e.g. "Left Chest + Full Back") instead of just the count.
+        // Render ONE row per design. When pushed data is unavailable
+        // (legacy quote or sync hasn't happened), render a single row from
+        // the /v1/order header.
         const tbody = document.getElementById('sw-designs-tbody');
         if (tbody) {
-            tbody.innerHTML = `
-                <tr>
-                    <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
-                    <td class="sw-designs-name">${this.escapeHtml(order.DesignName || '(no name)')}</td>
-                    <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
-                    <td class="sw-designs-locations" title="${this.escapeHtml(locationsNames || '')}">
-                        ${this.escapeHtml(String(locationsCount))}<span class="sw-designs-locations-names">${locationsNames ? ' (' + this.escapeHtml(locationsNames) + ')' : ''}</span>
-                    </td>
-                    <td class="sw-designs-imprints">${this.escapeHtml(String(totalImprints || ''))}</td>
-                </tr>
-            `;
+            if (allPushedDesigns.length === 0) {
+                // Fallback: just one row from the order header
+                const submittedPrintLocs = this.fullData?.originalSubmission?.printLocations || '';
+                const locationsCount = submittedPrintLocs
+                    ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
+                    : 1;
+                const locationsNames = submittedPrintLocs || 'Left Chest';
+                const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType);
+                tbody.innerHTML = `
+                    <tr>
+                        <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
+                        <td class="sw-designs-name">${this.escapeHtml(order.DesignName || '(no name)')}</td>
+                        <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
+                        <td class="sw-designs-locations" title="${this.escapeHtml(locationsNames)}">
+                            ${this.escapeHtml(String(locationsCount))}<span class="sw-designs-locations-names"> (${this.escapeHtml(locationsNames)})</span>
+                        </td>
+                        <td class="sw-designs-imprints">${this.escapeHtml(String(productQty * locationsCount || ''))}</td>
+                    </tr>
+                `;
+            } else {
+                // Multi-design: one row per pushed design
+                tbody.innerHTML = allPushedDesigns.map((d, i) => {
+                    const locs = d?.Locations || [];
+                    const locationsCount = locs.length || 1;
+                    const locationsNames = locs.map(L => L.Location).filter(Boolean).join(' + ') || '(unspecified)';
+                    const designTypeLabel = this._resolveDesignTypeName(d?.id_DesignType || order.id_DesignType);
+                    // First design uses the order's id_Design; additional ones use ExtDesignID or "—"
+                    const dispId = (i === 0 && idDesign) ? idDesign : (d?.id_Design || d?.ExtDesignID || '—');
+                    const dispName = d?.DesignName || order.DesignName || '(no name)';
+                    return `
+                        <tr>
+                            <td class="sw-designs-id">${this.escapeHtml(String(dispId))}</td>
+                            <td class="sw-designs-name">${this.escapeHtml(dispName)}</td>
+                            <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
+                            <td class="sw-designs-locations" title="${this.escapeHtml(locationsNames)}">
+                                ${this.escapeHtml(String(locationsCount))}<span class="sw-designs-locations-names"> (${this.escapeHtml(locationsNames)})</span>
+                            </td>
+                            <td class="sw-designs-imprints">${this.escapeHtml(String(productQty * locationsCount || ''))}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
         }
 
-        // Phase 4d: render per-location artwork thumbnails below the table.
-        // /order-pull's Designs[].Locations[] gives us the actual ImageURLs.
-        this._renderArtworkThumbnails(pushedLocations);
+        // Artwork thumbnails — collect ALL locations across ALL designs.
+        const allLocations = allPushedDesigns.flatMap(d => d?.Locations || []);
+        this._renderArtworkThumbnails(allLocations);
 
         section.style.display = 'block';
     }

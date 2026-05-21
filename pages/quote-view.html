@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.8">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.9">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -100,6 +100,23 @@
                 <div class="sw-manual-wo-help">
                     Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever.
                 </div>
+            </div>
+
+            <!-- ============================================================
+                 Quick Actions row (Erik 2026-05-21).
+                 Common per-order actions consolidated at the top. Always
+                 visible for staff. Hidden in print mode.
+                 ============================================================ -->
+            <div class="sw-actions-row" id="sw-actions-row">
+                <button type="button" class="sw-action-btn" id="sw-action-print" title="Print or save as PDF">
+                    <span class="sw-action-icon">🖨</span> Print / PDF
+                </button>
+                <button type="button" class="sw-action-btn" id="sw-action-copy-link" title="Copy this quote's URL to clipboard">
+                    <span class="sw-action-icon">📋</span> Copy link
+                </button>
+                <button type="button" class="sw-action-btn" id="sw-action-email" title="Email this quote to the customer">
+                    <span class="sw-action-icon">📧</span> Email customer
+                </button>
             </div>
 
             <!-- PO Number (inline with header, shown if present) -->
@@ -506,6 +523,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.8"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.9"></script>
 </body>
 </html>

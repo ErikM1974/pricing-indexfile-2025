@@ -2435,3 +2435,218 @@ body {
 @media print {
     .sw-original-section { display: none !important; }
 }
+
+/* ============================================================================
+   Quick Actions row (Erik 2026-05-21)
+   ============================================================================ */
+.sw-actions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed #e2e8f0;
+}
+.sw-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 120ms ease;
+}
+.sw-action-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #0f172a;
+    transform: translateY(-1px);
+}
+.sw-action-btn--success {
+    background: #dcfce7;
+    border-color: #86efac;
+    color: #14532d;
+}
+.sw-action-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+/* ============================================================================
+   Payments list (below Financial Summary)
+   ============================================================================ */
+.sw-payments-list {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #f1f5f9;
+}
+.sw-payments-list-head {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin: 0 0 10px;
+}
+.sw-payments-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.sw-payments-table thead th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+}
+.sw-payments-amount-col {
+    text-align: right;
+}
+.sw-payments-table tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+.sw-payments-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.sw-payments-ref {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 12px;
+    color: #64748b;
+}
+.sw-payments-amount {
+    text-align: right;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-weight: 700;
+    color: #16a34a;
+}
+
+/* ============================================================================
+   Tracking block (inside Shipping panel)
+   ============================================================================ */
+.sw-tracking-block {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+.sw-tracking-head {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--quote-green, #4caf50);
+    margin: 0 0 10px;
+}
+.sw-tracking-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.sw-tracking-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 6px;
+    font-size: 13px;
+}
+.sw-tracking-carrier {
+    font-weight: 700;
+    color: #075985;
+    min-width: 80px;
+}
+.sw-tracking-num {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    flex: 1;
+}
+.sw-tracking-num a {
+    color: #0369a1;
+    text-decoration: underline;
+}
+.sw-tracking-date {
+    font-size: 11.5px;
+    color: #64748b;
+}
+
+/* ============================================================================
+   PRINT — print-mode rules for all the new ShopWorks-mirror sections
+   ============================================================================ */
+@media print {
+    /* Hide interactive UI that's irrelevant on paper */
+    .sw-sync-strip,
+    .sw-manual-wo-strip,
+    .sw-actions-row,
+    .sw-original-section,
+    .sw-sync-refresh-btn {
+        display: none !important;
+    }
+    /* Make panel headings consistent with the printed invoice tone */
+    .sw-designs-section h2,
+    .sw-status-section h2,
+    .sw-notes-section h2,
+    .sw-shipping-section h2,
+    .sw-financial-section h2 {
+        font-size: 13pt;
+        color: #1a1a1a !important;
+        border-bottom: 1.5pt solid #4caf50 !important;
+        padding-bottom: 4pt;
+        page-break-after: avoid;
+    }
+    .sw-designs-section,
+    .sw-status-section,
+    .sw-notes-section,
+    .sw-shipping-section,
+    .sw-financial-section {
+        margin: 12pt 0;
+        padding: 8pt 10pt;
+        background: #ffffff;
+        border: 0.5pt solid #cccccc;
+        page-break-inside: avoid;
+    }
+    .sw-status-cell {
+        background: #ffffff;
+        padding: 4pt 6pt;
+    }
+    .sw-status-cell-value--yes {
+        background: #e8f5e9;
+    }
+    .sw-status-cell-value--no {
+        background: #ffebee;
+    }
+    /* Hide the "ShopWorks ✓" badge on cards when printing */
+    .meta-card.sw-mirrored::after {
+        display: none !important;
+    }
+    /* Tracking + payments rows should print cleanly */
+    .sw-tracking-list li {
+        background: #ffffff !important;
+        border: 0.5pt solid #cccccc !important;
+    }
+    /* Artwork thumbnails — print at smaller size */
+    .sw-designs-artwork-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8pt;
+    }
+    .sw-designs-artwork-thumb {
+        max-height: 80pt;
+    }
+}
