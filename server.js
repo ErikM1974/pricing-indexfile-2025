@@ -1989,9 +1989,32 @@ function getTaxAccount(state, isCustomerPickup) {
 //   3. Out-of-state shipping                    → DO NOT APPLY
 //   4. No tax info available (defensive)        → FLAG: needs rep review
 function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }) {
-  // Pickup detection: frontend canonical is 'Customer Pickup' (matches
-  // ShopWorks ship-method list exactly). Legacy codes 'pickup' / 'willcall'
-  // accepted for backward-compat with pre-v2026.05.20.7 share-link drafts.
+  // Audit fix M1 (2026-05-21): Notes On Order now contains ONLY operational
+  // audit info that CSR/Production reads (print locations, order ID refs).
+  // The tax-application instructions moved to Notes To Accounting via the
+  // companion buildAccountingNote() — AR is the audience for those.
+  const lines = [];
+
+  // Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
+  // Frontend sends e.g. "Left Chest", "Full Back", "Left Chest + Full Back".
+  const locsClean = String(printLocations || '').trim();
+  if (locsClean) {
+    lines.push(`Print Locations: ${locsClean}`);
+  }
+
+  // Return as ARRAY — each element becomes a separate row in ShopWorks's
+  // Notes On Order tab. Caller flattens with one notesBlocks.push({type,note})
+  // per element.
+  return lines;
+}
+
+/**
+ * Build the tax-application block as Notes To Accounting (M1 refactor).
+ * AR reads this tab to apply sales tax manually in ShopWorks. Splitting
+ * from Notes On Order means CSR doesn't see tax instructions they'd
+ * dismiss as already-handled.
+ */
+function buildAccountingNote({ info, breakdown, ship }) {
   const isPickup = ship && (
     ship.method === 'Customer Pickup' ||
     ship.method === 'pickup' ||
@@ -2000,60 +2023,51 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   const shState = (ship && ship.state || info && info.state || '').toUpperCase();
   const isOutOfState = !isPickup && shState && shState !== 'WA';
 
+  // Tax-exempt customers — server may have surfaced this through info.isTaxExempt
+  // (Phase C plumbing). If exempt, emit a single concise note and skip the
+  // standard tax-rate block.
+  if (info && info.isTaxExempt) {
+    const cert = info.taxExemptNumber || '(no cert # on file)';
+    return [
+      'TAX EXEMPT — DO NOT APPLY',
+      `Cert #:  ${cert}`,
+      'Reason:  Customer record marked Tax Exempt in CompanyContactsMerge2026',
+    ];
+  }
+
   const subtotal = Number(breakdown?.subtotal) || 0;
   const taxAmount = Number(breakdown?.taxEstimate) || 0;
   const taxRate = Number(ship?.taxRate);
   const taxRatePct = Number.isFinite(taxRate) && taxRate > 0
     ? (taxRate * 100).toFixed(2)
     : null;
-
-  // Caspio sales_tax_accounts_2026 row — frontend captures from /api/tax-rates/lookup
-  // and passes through. Fall back to safe defaults if missing.
   const taxAccount = ship?.taxAccount
     || (isPickup ? '2200.101' : isOutOfState ? '2202' : '2200');
   const taxAccountName = ship?.taxAccountName
     || (isPickup ? 'Wash:10.1%' : isOutOfState ? 'Out of State Sales' : 'WA Sales Tax');
 
   const lines = [];
-
-  // Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
-  // Prefix block so it's the first line CSR/AR sees when they open Notes On
-  // Order. Frontend sends e.g. "Left Chest", "Full Back", "Left Chest + Full Back".
-  const locsClean = String(printLocations || '').trim();
-  if (locsClean) {
-    lines.push(`Print Locations: ${locsClean}`);
-    lines.push('');
-  }
-
   if (isOutOfState) {
-    // BLOCK 3 — Out-of-state shipping: do not apply tax (WAC 458-20-193)
     lines.push('TAX — DO NOT APPLY (out of state)');
     lines.push(`State:   ${shState}`);
     lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
     lines.push(`Reason:  WAC 458-20-193 (no nexus on out-of-state delivery)`);
   } else if (isPickup) {
-    // BLOCK 1 — Customer pickup at Milton: flat 10.1%
     lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
     lines.push(`Rate:    ${taxRatePct || '10.10'}%  (Milton pickup — flat)`);
     lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
     lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
   } else if (shState === 'WA' && taxRatePct) {
-    // BLOCK 2 — In-WA shipping: destination city rate (DOR lookup)
     const city = ship?.city || '';
     lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
     lines.push(`Rate:    ${taxRatePct}%  (${city || 'WA destination'} — DOR lookup)`);
     lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
     lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
   } else {
-    // BLOCK 4 — Defensive fallback: no rate available, flag for rep review
     lines.push('TAX — NEEDS REVIEW');
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
     lines.push(`Rep: confirm destination + apply correct WA rate before invoicing`);
   }
-
-  // Return as ARRAY — each element becomes a separate row in ShopWorks's
-  // Notes On Order tab (Erik 2026-05-20). Caller flattens with one
-  // notesBlocks.push({type, note}) per element.
   return lines;
 }
 
@@ -2844,6 +2858,11 @@ app.post('/api/submit-order-form', async (req, res) => {
     };
 
     pushArray('Notes On Order',     buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }));
+    // Audit fix M1 (2026-05-21): tax-application block now lives on
+    // Notes To Accounting tab instead of Notes On Order — keeps the two
+    // audiences (CSR/Production reading "Notes On Order" vs AR reading
+    // "Notes To Accounting") looking at the right content.
+    pushArray('Notes To Accounting', buildAccountingNote({ info, breakdown, ship }));
     pushArray('Notes To Production', buildProductionNote({ rows, breakdown, methodNotesBlock }));
     pushArray('Notes To Purchasing', buildPurchasingNote({ rows }));
 

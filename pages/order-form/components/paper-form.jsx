@@ -2171,6 +2171,28 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
           <input className="p-in" type="date" value={info.dateDue} onChange={e => update('dateDue', e.target.value)} />
         </div>
 
+        {/* Audit fix L4: explicit isRush checkbox. Replaces the fragile
+            "Notes contains 'rush'" string-match. Flows to originalSubmission.info.isRush
+            → invoice/quote-view banner detection becomes deterministic. */}
+        <div className="p-cell" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <input
+            type="checkbox"
+            id="of-isRush"
+            checked={!!info.isRush}
+            onChange={e => update('isRush', e.target.checked)}
+            style={{ width: 18, height: 18, accentColor: '#b91c1c', cursor: 'pointer' }}
+          />
+          <label htmlFor="of-isRush" style={{
+            cursor: 'pointer',
+            fontSize: 12,
+            fontWeight: info.isRush ? 700 : 500,
+            color: info.isRush ? '#b91c1c' : 'var(--ink-2, #475569)',
+            userSelect: 'none',
+          }}>
+            ⚡ RUSH order
+          </label>
+        </div>
+
         <div className="p-cell">
           <div className="lbl">PO #{lockPO && <span style={{fontSize:9,color:'var(--ink-3)',marginLeft:6}}>(set by staff)</span>}</div>
           <input className="p-in" value={info.po} onChange={e => update('po', e.target.value)} readOnly={lockPO} />
