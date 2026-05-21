@@ -2237,3 +2237,21 @@ body {
         max-width: 100%;
     }
 }
+
+/* Tax-rate sublabel under the Sales Tax row */
+.sw-financial-sublabel {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 8px;
+    background: #e0f2fe;
+    color: #075985;
+    border: 1px solid #7dd3fc;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    vertical-align: middle;
+}
+.sw-financial-sublabel:empty {
+    display: none;
+}

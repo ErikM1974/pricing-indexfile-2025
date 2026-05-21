@@ -2455,6 +2455,27 @@ class QuoteViewPage {
         const termsEl = document.getElementById('sw-fin-terms');
         if (termsEl) termsEl.textContent = order.TermsName || '—';
 
+        // Tax rate — computed from amount ÷ (subtotal + shipping). MO doesn't
+        // expose the rate directly; this back-calculates it. Useful for AR
+        // to verify the destination rate is correct (10.1% Milton pickup,
+        // 9.5% Sumner, 10.35% Seattle, etc.). When taxable base is 0 or tax
+        // is 0, leave blank (no rate to show).
+        const taxRateEl = document.getElementById('sw-fin-tax-rate');
+        if (taxRateEl) {
+            const subtotalNum = Number(order.cur_SubTotal) || 0;
+            const shippingNum = Number(order.cur_Shipping) || 0;
+            const taxNum = Number(order.cur_SalesTaxTotal) || 0;
+            const taxableBase = subtotalNum + shippingNum;
+            if (taxNum > 0 && taxableBase > 0) {
+                const ratePct = (taxNum / taxableBase) * 100;
+                taxRateEl.textContent = `${ratePct.toFixed(2)}%`;
+            } else if (subtotalNum > 0 && taxNum === 0) {
+                taxRateEl.textContent = '0% — out of state';
+            } else {
+                taxRateEl.textContent = '';
+            }
+        }
+
         section.style.display = 'block';
     }
 
