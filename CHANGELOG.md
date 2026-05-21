@@ -1,3 +1,7 @@
+## v2026.05.21.3 (2026.05.21)
+
+- Deploy v2026.05.21.3: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4b: ShopWorks overlay (override email/phone/PO/dates) + new Designs panel
+
 ## v2026.05.21.2 (2026.05.21)
 
 - Deploy v2026.05.21.2: 3 files (quote-view.css,quote-view.js,quote-view.html,) — Phase 4a: ShopWorks sync strip (Pending/Imported pill + Refresh button)
