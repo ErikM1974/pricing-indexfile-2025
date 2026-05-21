@@ -2066,3 +2066,174 @@ body {
 @media print {
     .sw-manual-wo-strip { display: none !important; }
 }
+
+/* ============================================================================
+   Phase 4d — Artwork thumbnails grid (under Designs panel)
+   ============================================================================ */
+.sw-designs-locations-names {
+    color: #64748b;
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+.sw-designs-artwork {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+}
+.sw-designs-artwork-head {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+.sw-designs-artwork-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+.sw-designs-artwork-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.sw-designs-artwork-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: var(--quote-green, #4caf50);
+}
+.sw-designs-artwork-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sw-designs-artwork-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.sw-designs-artwork-thumb-icon {
+    font-size: 36px;
+    color: #94a3b8;
+}
+.sw-designs-artwork-meta {
+    text-align: center;
+}
+.sw-designs-artwork-location {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+.sw-designs-artwork-filename {
+    font-size: 10.5px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media print {
+    .sw-designs-artwork-card { break-inside: avoid; }
+}
+
+/* ============================================================================
+   Phase 4d — Financial Summary panel
+   ============================================================================ */
+.sw-financial-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-financial-section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-financial-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 480px;
+    margin-left: auto;
+}
+.sw-financial-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.sw-financial-label {
+    font-weight: 500;
+    color: #475569;
+}
+.sw-financial-value {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-weight: 600;
+    color: #0f172a;
+}
+.sw-financial-row--total {
+    background: #ecfdf5;
+    border: 1px solid #86efac;
+    margin-top: 6px;
+}
+.sw-financial-row--total .sw-financial-label {
+    color: #14532d;
+    font-weight: 700;
+}
+.sw-financial-row--total .sw-financial-value {
+    color: var(--quote-green-dark, #2e7d32);
+    font-size: 16px;
+}
+.sw-financial-row--balance {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+}
+.sw-financial-row--balance .sw-financial-label {
+    color: #7f1d1d;
+    font-weight: 700;
+}
+.sw-financial-row--balance .sw-financial-value {
+    color: #b91c1c;
+    font-size: 16px;
+    font-weight: 700;
+}
+.sw-financial-row--terms {
+    background: transparent;
+    border-top: 1px dashed #e2e8f0;
+    margin-top: 4px;
+    padding-top: 12px;
+}
+.sw-financial-row--terms .sw-financial-value {
+    font-family: inherit;
+    font-weight: 600;
+    color: #475569;
+}
+@media (max-width: 600px) {
+    .sw-financial-grid {
+        max-width: 100%;
+    }
+}
