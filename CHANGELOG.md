@@ -1,3 +1,7 @@
+## v2026.05.21.16 (2026.05.21)
+
+- Deploy v2026.05.21.16: 9 files — add billing address to invoice + quote-view (server-side fetch from CompanyContactsMerge2026 by id_Customer)
+
 ## v2026.05.21.15 (2026.05.21)
 
 - Deploy v2026.05.21.15: 7 files — QuickBooks invoice polish (RUSH banner, AMOUNT DUE, payment info, size labels, label cleanup)
