@@ -2393,7 +2393,11 @@ app.post('/api/submit-order-form', async (req, res) => {
           // ("Left Chest", "Full Back", "Left Chest + Full Back"). Empty
           // string when not set — proxy strips empty workOrderNotes so no
           // blank field lands in ShopWorks.
-          workOrderNotes: printLocations || ''
+          workOrderNotes: printLocations || '',
+          // Internal — used below to link this line to the matching design's
+          // ExtDesignID after the designs[] array is built. Removed before
+          // the payload is sent to the proxy.
+          _method: r.deco || decoConfig?.method || ''
         });
       });
     });
@@ -2702,6 +2706,31 @@ app.post('/api/submit-order-form', async (req, res) => {
       if (artNote) notesBlocks.push({ type: 'Notes To Art', note: artNote });
     }
 
+    // --- Link line items to their design via ExtDesignIDBlock --------
+    // Without this, ShopWorks imports each line with the "Apply Designs"
+    // toggle OFF — the rep then has to manually flip it on every line
+    // before production can see the artwork. By setting ExtDesignIDBlock
+    // = the design's ExtDesignID, the OnSite import auto-links the line
+    // to the design and toggles Apply Designs ON. (Erik confirmed 2026-05-21
+    // by inspecting WO 141899 line item PC90H_3XL.)
+    //
+    // designsByMethod maps "DTG"/"EMB"/etc. → "OF-0048-DTG" (the externalId
+    // we sent in the Designs[] array). Lines whose row method has no design
+    // (e.g., manual-only fee rows) leave extDesignIdBlock empty — same as
+    // pre-fix behavior, no regression.
+    const designsByMethod = new Map();
+    (designs || []).forEach(d => {
+      const m = (d?.externalId || '').match(/-([A-Z0-9]+)$/);
+      if (m && m[1]) designsByMethod.set(m[1], d.externalId);
+    });
+    lineItems.forEach(line => {
+      const lineMethod = (line._method || '').toUpperCase();
+      if (lineMethod && designsByMethod.has(lineMethod)) {
+        line.extDesignIdBlock = designsByMethod.get(lineMethod);
+      }
+      delete line._method;
+    });
+
     // Build the order Description field — populates ShopWorks's
     // Order Information > Description (visible in order list views).
     // Format: "EMBROIDERY · Left Chest · 8,000 stitches" — gives ShopWorks
@@ -2762,8 +2791,14 @@ app.post('/api/submit-order-form', async (req, res) => {
           company: info.company || '',
           firstName: info.buyerFirst || '',
           lastName: info.buyerLast || '',
+          // NWCA shipping convention (from the OF ship-to block):
+          //   line 1 = recipient name ("Wendy Mickelson")
+          //   line 2 = street address ("14805 75th Street Ct East")
+          // Bug history: address2 was previously hard-coded to '' so the
+          // actual street never reached ShopWorks (WO 141899 landed with
+          // only the recipient name in ShipAddress01). Erik 2026-05-21.
           address1: ship.address || info.address || '',
-          address2: '',
+          address2: ship.address2 || info.address2 || '',
           city: ship.city || info.city || '',
           state: ship.state || info.state || '',
           zip: ship.zip || info.zip || '',
