@@ -1,3 +1,7 @@
+## v2026.05.21.8 (2026.05.21)
+
+- Deploy v2026.05.21.8: Phase 4e - View Original Submission audit panel with diff highlighting + stale-sync warning
+
 ## v2026.05.21.7 (2026.05.21)
 
 - Deploy v2026.05.21.7: show computed tax rate next to Sales Tax (9.50%, 10.10%, etc.) on financial summary
