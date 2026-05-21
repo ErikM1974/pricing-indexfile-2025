@@ -4643,24 +4643,32 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     const olderThanMin = Math.max(Number(req.body?.olderThanMin) || 30, 5);
     const dryRun = req.body?.dryRun === true || req.query?.dryRun === '1';
 
-    // Pull processed quote_sessions rows from the last N days.
-    // We can't use "since X" filters cleanly on Caspio Notes timestamps,
-    // so we use CreatedAt_Quote which is indexed.
-    const since = new Date(Date.now() - daysBack * 24 * 60 * 60 * 1000);
-    const sinceIso = since.toISOString().slice(0, 19);
-    const filter = `Status='Processed' AND CreatedAt_Quote>='${sinceIso}'`;
+    // Pull processed quote_sessions rows. Caspio's filter syntax doesn't
+    // cleanly support date-range comparisons via this proxy path, so we
+    // pull all Processed rows + filter by date client-side. There are
+    // typically <500 Processed quotes total at any time.
     let sessions;
     try {
-      sessions = await makeApiRequest(`/quote_sessions?filter=${encodeURIComponent(filter)}&pageSize=500`);
+      sessions = await makeApiRequest(`/quote_sessions?filter=${encodeURIComponent("Status='Processed'")}&pageSize=500`);
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }
     if (!Array.isArray(sessions)) sessions = [];
 
+    // Filter to last N days (by CreatedAt_Quote OR fall back to no-date)
+    const sinceMs = Date.now() - daysBack * 24 * 60 * 60 * 1000;
+    const inWindow = sessions.filter(s => {
+      const created = s.CreatedAt_Quote || s.CreatedAt;
+      if (!created) return true; // include rows without a created date
+      const t = Date.parse(created);
+      if (!Number.isFinite(t)) return true;
+      return t >= sinceMs;
+    });
+
     // Filter to ones that are stale (Last_Synced > olderThanMin OR never synced)
     const staleThresholdMs = olderThanMin * 60 * 1000;
     const now = Date.now();
-    const candidates = sessions.filter(s => {
+    const candidates = inWindow.filter(s => {
       if (!s.ShopWorks_Last_Synced) return true;
       const lastSynced = Date.parse(s.ShopWorks_Last_Synced);
       if (!Number.isFinite(lastSynced)) return true;
@@ -4672,7 +4680,8 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
         success: true,
         dryRun: true,
         candidateCount: candidates.length,
-        totalProcessedInWindow: sessions.length,
+        totalProcessedInWindow: inWindow.length,
+        totalProcessedAllTime: sessions.length,
         candidates: candidates.slice(0, 20).map(s => ({
           quoteId: s.QuoteID,
           customer: s.CustomerName,
@@ -4711,7 +4720,7 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
 
     const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
     console.log(`[bulk-sync] ${stats.synced} synced (${stats.imported} imported, ${stats.deleted} deleted, ${stats.pending} pending, ${stats.errors} errors) in ${elapsedSec}s`);
-    res.json({ success: true, ...stats, elapsedSec, candidateCount: candidates.length, totalProcessedInWindow: sessions.length });
+    res.json({ success: true, ...stats, elapsedSec, candidateCount: candidates.length, totalProcessedInWindow: inWindow.length });
   } catch (error) {
     console.error('[bulk-sync] unexpected error:', error);
     res.status(500).json({ success: false, error: 'Bulk sync failed', details: error.message });
