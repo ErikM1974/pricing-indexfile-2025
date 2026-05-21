@@ -5091,19 +5091,45 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
         phone:      billingContact?.Phone_Best || billingContact?.Company_Phone || session.Phone || '',
       },
 
-      shipTo: {
-        // NWCA ship convention: ShipAddress01 = recipient name, ShipAddress02 = street
-        name:       ship.name || ship.address1 || originalSubmission?.info?.name || '',
-        company:    ship.company || originalSubmission?.info?.company || session.CompanyName || '',
-        street1:    ship.address2 || ship.address1 || '',
-        street2:    '',
-        city:       ship.city || '',
-        state:      ship.state || '',
-        postalCode: ship.zip || '',
-        country:    'US',
-        phone:      session.Phone || billingContact?.Phone_Best || '',
-        residential: false,
-      },
+      shipTo: (function buildShipTo() {
+        // NWCA ship convention: ShipAddress01 = recipient name, ShipAddress02 = street.
+        // ShipStation V1 REQUIRES shipTo.name AND shipTo.street1 — both must
+        // be non-empty or POST /orders/createorder returns 400.
+        const a1 = ship.address1 || '';
+        const a2 = ship.address2 || '';
+        // Heuristic: when only ONE field is set we don't know if it's a name or
+        // a street. Use a digit-count rule — addresses usually start with a number.
+        const a1HasDigits = /\d/.test(a1);
+        const a2HasDigits = /\d/.test(a2);
+        const recipient =
+          ship.name ||
+          (a1 && !a1HasDigits ? a1 : '') ||    // a1 looks like a name (no digits)
+          (a2 && !a2HasDigits ? a2 : '') ||    // a2 looks like a name
+          originalSubmission?.info?.name ||
+          [originalSubmission?.info?.buyerFirst, originalSubmission?.info?.buyerLast].filter(Boolean).join(' ') ||
+          ship.company ||
+          session.CompanyName ||
+          'Receiving';                          // last-resort non-empty
+        const street =
+          (a2 && a2HasDigits ? a2 : '') ||      // prefer the field that has digits
+          (a1 && a1HasDigits ? a1 : '') ||
+          originalSubmission?.info?.shipAddress ||
+          a1 || a2 ||                            // fall through to whatever's set
+          'Address on file';                     // last-resort non-empty
+        const recipientCompany = ship.company || originalSubmission?.info?.company || session.CompanyName || '';
+        return {
+          name:       recipient,
+          company:    recipientCompany,
+          street1:    street,
+          street2:    '',
+          city:       ship.city || originalSubmission?.info?.shipCity || '',
+          state:      ship.state || originalSubmission?.info?.shipState || '',
+          postalCode: ship.zip || originalSubmission?.info?.shipZip || '',
+          country:    'US',
+          phone:      session.Phone || billingContact?.Phone_Best || '',
+          residential: false,
+        };
+      })(),
 
       items,
 
