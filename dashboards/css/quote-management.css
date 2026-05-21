@@ -165,8 +165,51 @@ body {
     border-left: 4px solid #ffc107;
 }
 
+.stat-card.cancelled {
+    border-left: 4px solid #b91c1c;
+}
+.stat-card.cancelled .stat-value {
+    color: #b91c1c;
+}
+
 .stat-card.total {
     border-left: 4px solid #17a2b8;
+}
+
+/* Cancelled-in-ShopWorks badge — replaces the status dropdown on
+   cancelled rows. Read-only, red, can't be un-cancelled from the UI. */
+.status-badge.status-cancelled {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    cursor: help;
+    white-space: nowrap;
+}
+.status-badge.status-cancelled i {
+    font-size: 11px;
+}
+
+/* Row tint for cancelled quotes — subtle so it doesn't drown out
+   active quotes when mixed in. */
+.quote-row--cancelled {
+    background: #fef9f9 !important;
+    opacity: 0.85;
+}
+.quote-row--cancelled:hover {
+    background: #fef2f2 !important;
+    opacity: 1;
+}
+.quote-row--cancelled .quote-id,
+.quote-row--cancelled .customer-name {
+    color: #6b7280;
 }
 
 .stat-value {
