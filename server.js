@@ -108,7 +108,7 @@ dotenv.config();
 //   L4272 GET  /invoice/:quoteId (→ invoice.html)  — clean PDF-style one-pager, auto-syncs from ShopWorks
 //
 // SHOPWORKS SYNC (2026-05-21) — quote-view mirrors live ShopWorks state
-//   L4308 POST /api/quote-sessions/:quoteId/sync-from-shopworks   — pulls fresh state from MO + writes Caspio (hard-deletes on missing)
+//   L4308 POST /api/quote-sessions/:quoteId/sync-from-shopworks   — pulls fresh state from MO + writes Caspio (soft-deletes on missing → 30d retention → bulk-sync cron purges)
 //   L4445 GET  /api/quote-sessions/:quoteId/full                  — quote_sessions row + parsed ShopWorks_Snapshot for the UI
 //   L4520 POST /api/quote-sessions/bulk-sync-from-shopworks       — staff dashboard + hourly cron entry point (sync all stale Processed quotes from last 30d)
 //
@@ -4532,38 +4532,40 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
     }
 
     // 4b. NOT FOUND in ShopWorks. Two sub-cases:
-    //     - Previously Imported → ShopWorks operator deleted → HARD DELETE our row
+    //     - Previously Imported → ShopWorks operator deleted → SOFT DELETE
+    //       (Status → 'Cancelled_in_ShopWorks', preserve row for 30-day audit
+    //        retention; bulk-sync cron purges later)
     //     - Otherwise (Pending or never synced) → just bump Last_Synced
     if (previousStatus === 'Imported') {
-      // HARD DELETE. Order existed in SW and now doesn't — operator removed it.
+      // SOFT DELETE. Order existed in SW and now doesn't — operator removed it.
+      // Erik 2026-05-21: soft delete over hard delete chosen for audit trail.
+      // The row stays visible (with a "Cancelled" banner) so AR/CSR can still
+      // see the order if a customer calls back. After 30 days the row is
+      // hard-purged by the bulk-sync cron.
       try {
-        // Delete associated quote_items first (best-effort) so we don't leave orphans.
-        const items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
-        if (Array.isArray(items)) {
-          for (const it of items) {
-            if (it.PK_ID) {
-              await makeApiRequest(`/quote_items/${it.PK_ID}`, 'DELETE').catch(e => {
-                console.warn(`[sync-from-shopworks] quote_items DELETE failed PK=${it.PK_ID}:`, e.message);
-              });
-            }
-          }
-        }
-        // Now delete the quote_sessions row itself.
-        await makeApiRequest(`/quote_sessions/${pkId}`, 'DELETE');
-        console.log(`[sync-from-shopworks] 🗑️ HARD DELETED ${safeQuoteId} (was SW#${session.ShopWorks_Order_Number || '?'})`);
+        await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
+          Status: 'Cancelled_in_ShopWorks',
+          ShopWorks_Status: 'Deleted',
+          // ShopWorks_Last_Synced doubles as cancelled_at timestamp — it's
+          // when we DETECTED the deletion (close enough to actual delete time
+          // since the cron runs hourly).
+          ShopWorks_Last_Synced: nowIso,
+        });
+        console.log(`[sync-from-shopworks] ⊘ SOFT DELETED ${safeQuoteId} (was SW#${session.ShopWorks_Order_Number || '?'}) — 30d retention`);
         notifyQuoteDeleted(safeQuoteId, session.ShopWorks_Order_Number, session.CustomerName);
 
         return res.json({
           success: true,
           synced: true,
-          deleted: true,
-          status: 'Deleted',
+          deleted: true,        // semantically "cancelled" — front-end uses this to redirect
+          softDeleted: true,    // distinguishes from hard-delete for callers that care
+          status: 'Cancelled_in_ShopWorks',
           shopWorksOrderNumber: session.ShopWorks_Order_Number,
           lastSynced: nowIso,
         });
       } catch (e) {
-        console.error(`[sync-from-shopworks] Hard-delete failed for ${safeQuoteId}:`, e.message);
-        return res.status(500).json({ success: false, error: 'Hard-delete failed', details: e.message });
+        console.error(`[sync-from-shopworks] Soft-delete failed for ${safeQuoteId}:`, e.message);
+        return res.status(500).json({ success: false, error: 'Soft-delete failed', details: e.message });
       }
     }
 
@@ -4826,9 +4828,49 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
       await new Promise(r => setTimeout(r, 1000));
     }
 
+    // --- 30-day purge pass for soft-deleted rows -------------------------
+    // Hard-purges quote_sessions rows where Status='Cancelled_in_ShopWorks'
+    // AND ShopWorks_Last_Synced > 30 days ago. Audit-trail retention is
+    // 30 days from the deletion-detection timestamp. (Erik 2026-05-21)
+    const PURGE_RETENTION_DAYS = 30;
+    const purgeStats = { purged: 0, purgeErrors: 0 };
+    if (!dryRun) {
+      try {
+        const cancelled = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Cancelled_in_ShopWorks'")}&q.pageSize=1000`);
+        if (Array.isArray(cancelled) && cancelled.length > 0) {
+          const purgeBeforeMs = Date.now() - PURGE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+          const purgeList = cancelled.filter(s => {
+            const ts = s.ShopWorks_Last_Synced ? Date.parse(s.ShopWorks_Last_Synced) : 0;
+            return Number.isFinite(ts) && ts > 0 && ts < purgeBeforeMs;
+          });
+          for (const s of purgeList) {
+            try {
+              // Delete child quote_items first (best-effort).
+              const items = await makeApiRequest(`/quote_items?filter=QuoteID='${s.QuoteID}'`);
+              if (Array.isArray(items)) {
+                for (const it of items) {
+                  if (it.PK_ID) {
+                    await makeApiRequest(`/quote_items/${it.PK_ID}`, 'DELETE').catch(() => {});
+                  }
+                }
+              }
+              await makeApiRequest(`/quote_sessions/${s.PK_ID}`, 'DELETE');
+              console.log(`[bulk-sync] 🗑️ PURGED ${s.QuoteID} (cancelled ${PURGE_RETENTION_DAYS}+ days ago)`);
+              purgeStats.purged++;
+            } catch (e) {
+              console.warn(`[bulk-sync] purge failed for ${s.QuoteID}:`, e.message);
+              purgeStats.purgeErrors++;
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[bulk-sync] purge pass skipped (fetch failed):', e.message);
+      }
+    }
+
     const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
-    console.log(`[bulk-sync] ${stats.synced} synced (${stats.imported} imported, ${stats.deleted} deleted, ${stats.pending} pending, ${stats.errors} errors) in ${elapsedSec}s`);
-    res.json({ success: true, ...stats, elapsedSec, candidateCount: candidates.length, totalProcessedInWindow: inWindow.length });
+    console.log(`[bulk-sync] ${stats.synced} synced (${stats.imported} imported, ${stats.deleted} soft-deleted, ${stats.pending} pending, ${stats.errors} errors, ${purgeStats.purged} purged) in ${elapsedSec}s`);
+    res.json({ success: true, ...stats, ...purgeStats, elapsedSec, candidateCount: candidates.length, totalProcessedInWindow: inWindow.length });
   } catch (error) {
     console.error('[bulk-sync] unexpected error:', error);
     res.status(500).json({ success: false, error: 'Bulk sync failed', details: error.message });

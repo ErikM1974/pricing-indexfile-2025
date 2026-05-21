@@ -275,6 +275,21 @@ body {
   font-weight: 500;
 }
 
+/* Cancelled variant — visually distinct from RUSH (darker red,
+   no left-border accent, strikes a "voided" tone). */
+.invoice-status-banner--cancelled {
+  background: #fef2f2;
+  border: 2px solid #b91c1c;
+  border-left: 2px solid #b91c1c;
+  color: #7f1d1d;
+}
+.invoice-status-banner--cancelled .invoice-status-text {
+  color: #7f1d1d;
+}
+.invoice-status-banner--cancelled .invoice-status-detail {
+  color: #991b1b;
+}
+
 /* === Bill To + Ship To =================================== */
 
 .invoice-addresses {
@@ -771,6 +786,15 @@ body {
   }
   .invoice-status-text { color: #b91c1c !important; }
   .invoice-status-detail { color: #7c2d12 !important; }
+
+  /* Cancelled variant for print — heavier border, voided look */
+  .invoice-status-banner--cancelled {
+    background: #fef2f2 !important;
+    border: 2px solid #b91c1c !important;
+    color: #7f1d1d !important;
+  }
+  .invoice-status-banner--cancelled .invoice-status-text { color: #7f1d1d !important; }
+  .invoice-status-banner--cancelled .invoice-status-detail { color: #991b1b !important; }
 
   /* Payment instructions block — keep with totals on same page */
   .invoice-payment-info {

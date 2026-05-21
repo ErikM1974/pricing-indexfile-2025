@@ -222,7 +222,30 @@
     }
 
     renderStatusBanner(data, order) {
-      // Show full-width RUSH banner above line items when ANY of:
+      const banner = $('status-banner');
+      const text   = banner ? banner.querySelector('.invoice-status-text') : null;
+      const icon   = banner ? banner.querySelector('.invoice-status-icon') : null;
+      const detail = $('status-banner-detail');
+      if (!banner) return;
+
+      // CANCELLED state takes priority over RUSH. When ShopWorks operator
+      // deleted the order, the cron flips Status='Cancelled_in_ShopWorks'
+      // and the row is kept for 30 days before purge.
+      if (data.status === 'Cancelled_in_ShopWorks') {
+        banner.classList.add('invoice-status-banner--cancelled');
+        if (icon) icon.textContent = '⊘';
+        if (text) text.textContent = 'CANCELLED IN SHOPWORKS';
+        if (detail) {
+          const ts = data.sessionRaw?.ShopWorks_Last_Synced;
+          detail.textContent = ts
+            ? '— Order deleted in ShopWorks on ' + fmtDate(ts) + '. This record will be purged after 30 days.'
+            : '— Order was deleted in ShopWorks. This record will be purged after 30 days.';
+        }
+        banner.style.display = 'flex';
+        return;
+      }
+
+      // Default RUSH state. Show banner when ANY of:
       //  - originalSubmission.info.isRush / .rush
       //  - order has a Drop Dead date within 5 days
       //  - Notes mention "RUSH" (case-insensitive)
@@ -237,16 +260,15 @@
         (Array.isArray(order?.Notes) &&
           order.Notes.some(n => /rush/i.test(n?.Note || n?.Notes || '')));
 
-      const banner = $('status-banner');
-      if (!banner) return;
       if (!rushFlag) {
         banner.style.display = 'none';
         return;
       }
+      banner.classList.remove('invoice-status-banner--cancelled');
+      if (icon) icon.textContent = '⚡';
+      if (text) text.textContent = 'RUSH ORDER';
       banner.style.display = 'flex';
 
-      // Add context detail when we know WHY it's rush.
-      const detail = $('status-banner-detail');
       if (detail) {
         if (dropDead) {
           detail.textContent = '— Required by ' + fmtDate(dropDead);
@@ -749,12 +771,10 @@
         );
         if (!resp.ok) throw new Error(`Sync failed (${resp.status})`);
         const result = await resp.json();
-        if (result.deleted) {
-          // ShopWorks side removed this order → bounce back to staff queue.
-          window.location.href = `/staff/quotes?deleted=${encodeURIComponent(this.quoteId)}`;
-          return;
-        }
-        // Reload fresh data and re-render
+        // Soft-delete: the row was flipped to Status='Cancelled_in_ShopWorks'.
+        // Reload fresh data so the CANCELLED banner appears in place — no
+        // redirect (the page is still a useful audit record for 30 days
+        // before the bulk-sync cron purges it).
         await this.loadFullData();
         this.render();
       } catch (err) {

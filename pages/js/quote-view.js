@@ -2180,13 +2180,16 @@ class QuoteViewPage {
             }
             const result = await r.json();
 
-            // Hard delete redirect — order was removed from ShopWorks
+            // SOFT delete — order was removed from ShopWorks. We keep the
+            // quote_sessions row for 30 days (audit retention) and flip
+            // Status to 'Cancelled_in_ShopWorks'. The cron's purge pass will
+            // hard-delete after 30d. Don't redirect — just reload the page
+            // so the new "CANCELLED IN SHOPWORKS" banner renders in place.
             if (result.deleted) {
                 if (manual) {
-                    // Inform user explicitly when they clicked Refresh
-                    alert(`Order ${this.quoteId} was deleted in ShopWorks. Removing this quote from the system.`);
+                    alert(`Order ${this.quoteId} was deleted in ShopWorks. This quote is now marked Cancelled and will be retained for 30 days.`);
                 }
-                window.location.replace(`/staff-dashboard.html?quote_deleted=${encodeURIComponent(this.quoteId)}`);
+                window.location.reload();
                 return;
             }
 
@@ -2235,6 +2238,23 @@ class QuoteViewPage {
         const sw = data?.shopWorks;
         const status = data?.status || '';
         const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
+        const isCancelled = status === 'Cancelled_in_ShopWorks';
+
+        // CANCELLED state — show the dedicated banner instead of the sync strip.
+        const cancelledBanner = document.getElementById('sw-cancelled-banner');
+        if (isCancelled && cancelledBanner) {
+            const ts = data?.sessionRaw?.ShopWorks_Last_Synced;
+            const detail = document.getElementById('sw-cancelled-detail');
+            if (detail) {
+                detail.textContent = ts
+                    ? ' — Order deleted in ShopWorks on ' + this.formatDate(ts) + '. This record will be purged after 30 days.'
+                    : ' — Order was deleted in ShopWorks. This record will be purged after 30 days.';
+            }
+            cancelledBanner.style.display = 'flex';
+            strip.style.display = 'none';
+            return;
+        }
+        if (cancelledBanner) cancelledBanner.style.display = 'none';
 
         // Hide the strip on legacy quotes (never pushed, no sync info available).
         if (!isProcessed && !sw) {
