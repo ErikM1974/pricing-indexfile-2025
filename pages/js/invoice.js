@@ -199,7 +199,7 @@
       this.renderTotals(data, order, orig);
       this.renderFooter(data, sw);
       this.renderSyncStatus(sw);
-      this.renderRushBadge(data, order);
+      this.renderStatusBanner(data, order);
     }
 
     renderHeader(data, order) {
@@ -221,20 +221,39 @@
       $('invoice-date').textContent = fmtDate(new Date().toISOString());
     }
 
-    renderRushBadge(data, order) {
-      // Show RUSH when:
-      //  - originalSubmission.info.isRush, OR
-      //  - order has a Drop Dead date within 5 days, OR
-      //  - Notes mention "RUSH"
+    renderStatusBanner(data, order) {
+      // Show full-width RUSH banner above line items when ANY of:
+      //  - originalSubmission.info.isRush / .rush
+      //  - order has a Drop Dead date within 5 days
+      //  - Notes mention "RUSH" (case-insensitive)
       const info = data.originalSubmission?.info || {};
+      const dropDead = order?.date_DropDead;
+      const dropDeadSoon = dropDead &&
+        (new Date(dropDead).getTime() - Date.now() < 5 * 86400000);
       const rushFlag =
         info.isRush === true ||
         info.rush === true ||
-        (order?.date_DropDead &&
-          new Date(order.date_DropDead).getTime() - Date.now() < 5 * 86400000) ||
+        dropDeadSoon ||
         (Array.isArray(order?.Notes) &&
           order.Notes.some(n => /rush/i.test(n?.Note || n?.Notes || '')));
-      if (rushFlag) $('rush-row').style.display = 'flex';
+
+      const banner = $('status-banner');
+      if (!banner) return;
+      if (!rushFlag) {
+        banner.style.display = 'none';
+        return;
+      }
+      banner.style.display = 'flex';
+
+      // Add context detail when we know WHY it's rush.
+      const detail = $('status-banner-detail');
+      if (detail) {
+        if (dropDead) {
+          detail.textContent = '— Required by ' + fmtDate(dropDead);
+        } else {
+          detail.textContent = '— Expedited production';
+        }
+      }
     }
 
     renderBillTo(data, order, orig) {
@@ -450,8 +469,29 @@
     }
 
     collectSizesFromLineItem(li) {
-      // Per memory: S/M/L/XL → Size01-04; 2XL → Size05 (with _2X suffix);
-      // extended → Size06.
+      // Two cases:
+      //
+      // 1) Size-suffixed SKU (PC90H_2X, PC90H_3XL, PC90H_4XL, PC54Y_XS, etc.)
+      //    These represent a SINGLE extended size; ShopWorks stores the qty in
+      //    Size01 (or wherever) but the slot index is meaningless because the
+      //    SKU's suffix itself IS the size. Always use the suffix as the label.
+      //
+      // 2) Base SKU (PC90H with no suffix) — sizes S–3XL map to Size01–06 in
+      //    SanMar order; use the canonical labels.
+      const partNum = li.PartNumber || '';
+      const suffixMatch = partNum.match(/_([0-9]+XL?|XS|XXS|YXS|YS|YM|YL|YXL)$/i);
+      if (suffixMatch) {
+        let label = suffixMatch[1].toUpperCase();
+        // Normalize bare "2X"/"3X"/"4X" mainframe codes to "2XL"/"3XL"/"4XL"
+        if (/^[2-6]X$/.test(label)) label += 'L';
+        // Total qty for the line lives in LineQuantity (preferred) — Size01..06
+        // are the sub-buckets but for a size-suffixed SKU there's effectively
+        // only one size, so use the line total.
+        const totalQty = Number(li.LineQuantity) || 0;
+        if (totalQty > 0) return [{ size: label, qty: totalQty }];
+      }
+
+      // Base SKU — map Size01–06 to S, M, L, XL, 2XL, 3XL (SanMar standard).
       const labels = ['S','M','L','XL','2XL','3XL'];
       const out = [];
       for (let i = 1; i <= 6; i++) {
@@ -549,34 +589,42 @@
       const grand     = fromOrder ? Number(order.cur_TotalInvoice)     : Number(orig?.totals?.total    || data.sessionRaw?.TotalAmount || 0);
       const payments  = fromOrder ? Number(order.cur_Payments)         : 0;
       const balance   = fromOrder ? Number(order.cur_Balance)          : grand;
+      // AMOUNT DUE = ShopWorks balance when known, otherwise grand - payments.
+      const amountDue = fromOrder ? balance : (grand - payments);
 
       $('total-subtotal').textContent = fmtMoney(subtotal);
       $('total-tax').textContent      = fmtMoney(tax);
       $('total-shipping').textContent = fmtMoney(shipping);
       $('total-grand').textContent    = fmtMoney(grand);
+      $('total-amount-due').textContent = fmtMoney(amountDue);
 
       // Hide shipping row if zero
       if (!shipping) $('shipping-row').style.display = 'none';
 
-      // Compute tax rate (when both subtotal and tax > 0)
+      // Compute tax rate (when both subtotal and tax > 0). Use parenthetical
+      // inline format "(9.50%)" — cleaner than the old "@ 9.50%" pill.
       const taxBase = subtotal + shipping;
       const rateEl = $('total-tax-rate');
       if (tax > 0 && taxBase > 0) {
-        rateEl.textContent = `@ ${((tax / taxBase) * 100).toFixed(2)}%`;
+        rateEl.textContent = `(${((tax / taxBase) * 100).toFixed(2)}%)`;
       } else {
         rateEl.textContent = '';
       }
 
-      // Payments + balance — only show when meaningful (i.e. ShopWorks data
-      // shows payments received or balance ≠ grand total)
+      // Payments — only show when > 0 (most invoices: zero payments).
       if (payments > 0) {
         $('paid-row').style.display = 'flex';
         $('total-paid').textContent = '-' + fmtMoney(payments);
       }
-      if (fromOrder && (payments > 0 || Math.abs(balance - grand) > 0.005)) {
-        $('balance-row').style.display = 'flex';
-        $('total-balance').textContent = fmtMoney(balance);
-      }
+
+      // Wire payment terms into the footer payment block.
+      const termsText =
+        order?.TermsName ||
+        orig?.info?.paymentTerms ||
+        data.sessionRaw?.PaymentTerms ||
+        'on receipt';
+      const termsEl = document.getElementById('invoice-payment-terms-text');
+      if (termsEl) termsEl.textContent = termsText;
     }
 
     // ---------- footer / sync state ----------
