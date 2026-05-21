@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.6">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.7">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -294,7 +294,10 @@
                         <span class="sw-financial-value" id="sw-fin-subtotal">—</span>
                     </div>
                     <div class="sw-financial-row">
-                        <span class="sw-financial-label">Sales Tax</span>
+                        <span class="sw-financial-label">
+                            Sales Tax
+                            <span class="sw-financial-sublabel" id="sw-fin-tax-rate"></span>
+                        </span>
                         <span class="sw-financial-value" id="sw-fin-tax">—</span>
                     </div>
                     <div class="sw-financial-row">
@@ -483,6 +486,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.6"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.7"></script>
 </body>
 </html>
