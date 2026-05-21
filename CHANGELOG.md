@@ -1,3 +1,7 @@
+## v2026.05.21.27 (2026.05.21)
+
+- Deploy v2026.05.21.27: ShipStation Phase 3 — pricing-index /send-to-shipstation endpoint + /shipstation-tracking webhook callback, 🚢 button on invoice toolbar with shipped/awaiting/default states + tracking# link
+
 ## v2026.05.21.26 (2026.05.21)
 
 - fix(quote-management): correct SalesRep -> SalesRepEmail field + archive resolved LESSONS_LEARNED entries
