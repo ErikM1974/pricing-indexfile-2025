@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.3">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.4">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -211,6 +211,18 @@
                 </div>
             </section>
 
+            <!-- ============================================================
+                 ShopWorks Order Status grid (Erik 2026-05-21 — Phase 4c).
+                 10-tile grid of Yes/No flags mirroring the ShopWorks UI's
+                 right-side Order Status panel. Hidden until snapshot synced.
+                 ============================================================ -->
+            <section id="sw-status-section" class="sw-status-section" style="display: none;">
+                <h2>Order Status</h2>
+                <div class="sw-status-grid" id="sw-status-grid">
+                    <!-- 10 cells populated by JS — each cell: label + Yes/No pill -->
+                </div>
+            </section>
+
             <!-- Quote Items -->
             <section class="quote-items">
                 <h2>Quote Details</h2>
@@ -224,6 +236,63 @@
                 <div class="special-notes-card">
                     <h3><i class="fas fa-sticky-note" style="color: #f9a825; margin-right: 6px;"></i>Special Notes</h3>
                     <pre id="special-notes-content" class="special-notes-content"></pre>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 Notes To Production (Erik 2026-05-21 — Phase 4c).
+                 Numbered timestamped entries from the original submission
+                 (the structured Notes To Production block we pushed). If
+                 ShopWorks operators have added more notes in OnSite, those
+                 aren't surfaced by the MO /v1 read API — we show what we
+                 submitted plus a note explaining the limitation.
+                 ============================================================ -->
+            <section id="sw-notes-section" class="sw-notes-section" style="display: none;">
+                <h2>Notes To Production</h2>
+                <ol class="sw-notes-list" id="sw-notes-list">
+                    <!-- populated by JS — each <li> is a single Production note -->
+                </ol>
+                <div class="sw-notes-footer" id="sw-notes-footer" style="display: none;"></div>
+            </section>
+
+            <!-- ============================================================
+                 Shipping panel (Erik 2026-05-21 — Phase 4c).
+                 Mirrors the ShopWorks PDF's Shipping block: Date Shipped,
+                 Shipped By, # Of Boxes (when populated post-shipment), then
+                 the recipient address + method + Single/Multiple/No-Shipping
+                 indicator. Data sourced from the original submission's
+                 ship.* fields (the MO /v1 /orders endpoint doesn't expose
+                 ShippingAddresses — defer to a separate fetch later).
+                 ============================================================ -->
+            <section id="sw-shipping-section" class="sw-shipping-section" style="display: none;">
+                <h2>Shipping</h2>
+                <div class="sw-shipping-meta">
+                    <div class="sw-shipping-meta-row">
+                        <span class="sw-shipping-meta-label">Date Shipped</span>
+                        <span class="sw-shipping-meta-value" id="sw-shipping-date">—</span>
+                    </div>
+                    <div class="sw-shipping-meta-row">
+                        <span class="sw-shipping-meta-label">Shipped By</span>
+                        <span class="sw-shipping-meta-value" id="sw-shipping-by">—</span>
+                    </div>
+                    <div class="sw-shipping-meta-row">
+                        <span class="sw-shipping-meta-label"># Of Boxes</span>
+                        <span class="sw-shipping-meta-value" id="sw-shipping-boxes">—</span>
+                    </div>
+                </div>
+                <div class="sw-shipping-address-block" id="sw-shipping-address-block">
+                    <div class="sw-shipping-recipient" id="sw-shipping-recipient">—</div>
+                    <div class="sw-shipping-line1" id="sw-shipping-line1"></div>
+                    <div class="sw-shipping-line2" id="sw-shipping-line2"></div>
+                    <div class="sw-shipping-citystate" id="sw-shipping-citystate"></div>
+                    <div class="sw-shipping-country" id="sw-shipping-country"></div>
+                    <div class="sw-shipping-method" id="sw-shipping-method"></div>
+                </div>
+                <div class="sw-shipping-mode" id="sw-shipping-mode">
+                    <!-- Three radio-style indicators: Single Address / Multiple / No Shipping -->
+                    <span class="sw-shipping-mode-pill" data-mode="single">Single Address</span>
+                    <span class="sw-shipping-mode-pill" data-mode="multiple">Multiple Addresses</span>
+                    <span class="sw-shipping-mode-pill" data-mode="none">No Shipping</span>
                 </div>
             </section>
 
@@ -349,6 +418,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.3"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.4"></script>
 </body>
 </html>
