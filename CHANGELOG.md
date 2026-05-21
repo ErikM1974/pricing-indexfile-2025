@@ -1,3 +1,7 @@
+## v2026.05.21.22 (2026.05.21)
+
+- Deploy v2026.05.21.22: Phase B audit fixes — H5 submissionId idempotency guard, M3 block multi-method orders at submit, M4 NWCA_LOCATIONS constant for pickup branch
+
 ## v2026.05.21.21 (2026.05.21)
 
 - Deploy v2026.05.21.21: 3 files — Phase A audit fixes: C1 dashboard handles Processed+Failed statuses, C3 Pacific TZ parse helper (server-side + client-side via caspio-date-utils)
