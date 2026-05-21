@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.2">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.05.21.3">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260515-phase11-3" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -176,6 +176,41 @@
                 </div>
             </section>
 
+            <!-- ============================================================
+                 ShopWorks Designs panel (Erik 2026-05-21).
+                 Mirrors the Designs block on the ShopWorks production PDF.
+                 Hidden until a ShopWorks snapshot has been synced.
+                 ============================================================ -->
+            <section id="sw-designs-section" class="sw-designs-section" style="display: none;">
+                <h2>Designs</h2>
+                <div class="sw-designs-meta">
+                    <div class="sw-designs-counter">
+                        <span class="sw-designs-counter-label">Product Qty</span>
+                        <span class="sw-designs-counter-value" id="sw-designs-product-qty">—</span>
+                    </div>
+                    <div class="sw-designs-counter">
+                        <span class="sw-designs-counter-label">Total Imprints</span>
+                        <span class="sw-designs-counter-value" id="sw-designs-imprints">—</span>
+                    </div>
+                </div>
+                <div class="sw-designs-table-wrap">
+                    <table class="sw-designs-table" id="sw-designs-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Locations</th>
+                                <th>Imprints</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sw-designs-tbody">
+                            <!-- populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- Quote Items -->
             <section class="quote-items">
                 <h2>Quote Details</h2>
@@ -314,6 +349,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.21.2"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.21.3"></script>
 </body>
 </html>

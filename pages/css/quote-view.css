@@ -1663,3 +1663,121 @@ body {
 @media print {
     .sw-sync-strip { display: none !important; }
 }
+
+/* ============================================================================
+   Phase 4b — ShopWorks Designs panel + mirrored-fields indicator
+   ============================================================================ */
+
+/* Subtle indicator on meta cards showing they reflect live ShopWorks data */
+.meta-card.sw-mirrored {
+    position: relative;
+}
+.meta-card.sw-mirrored::after {
+    content: "ShopWorks ✓";
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    padding: 2px 8px;
+    background: #dcfce7;
+    color: #14532d;
+    border: 1px solid #86efac;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+/* Designs panel — mirrors the ShopWorks PDF "Designs" block */
+.sw-designs-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-designs-section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-designs-meta {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.sw-designs-counter {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.sw-designs-counter-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+}
+.sw-designs-counter-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.1;
+}
+.sw-designs-table-wrap {
+    overflow-x: auto;
+}
+.sw-designs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.sw-designs-table thead th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #475569;
+}
+.sw-designs-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+}
+.sw-designs-table tbody tr:last-child td {
+    border-bottom: none;
+}
+.sw-designs-id {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-weight: 600;
+    color: #0f172a;
+    width: 80px;
+}
+.sw-designs-name {
+    font-weight: 600;
+    color: #0f172a;
+}
+.sw-designs-type {
+    color: #475569;
+    width: 100px;
+}
+.sw-designs-locations,
+.sw-designs-imprints {
+    text-align: center;
+    width: 90px;
+    color: #475569;
+}
+
+@media print {
+    .meta-card.sw-mirrored::after { display: none; }  /* don't print the ShopWorks badge */
+}
