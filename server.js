@@ -106,6 +106,10 @@ dotenv.config();
 //   L2810 GET  /api/public/quote/:quoteId
 //   L2852 POST /api/public/quote/:quoteId/accept
 //
+// SHOPWORKS SYNC (2026-05-21) — quote-view mirrors live ShopWorks state
+//   L4308 POST /api/quote-sessions/:quoteId/sync-from-shopworks   — pulls fresh state from MO + writes Caspio (hard-deletes on missing)
+//   L4445 GET  /api/quote-sessions/:quoteId/full                  — quote_sessions row + parsed ShopWorks_Snapshot for the UI
+//
 // FRIENDLY URL ROUTES
 //   L1623 /calculators/embroidery-pricing-all → index.html
 //   L1628 /pricing/embroidery → embroidery-pricing-all
@@ -4302,6 +4306,274 @@ app.get('/api/public/quote/:quoteId', async (req, res) => {
 
   } catch (error) {
     console.error('Error fetching public quote:', error);
+    res.status(500).json({ error: 'Failed to fetch quote' });
+  }
+});
+
+// ============================================================================
+// QUOTE ↔ SHOPWORKS SYNC ENDPOINTS (Erik 2026-05-21)
+// ============================================================================
+//
+// After an OF-NNNN order is pushed to ManageOrders and ShopWorks pulls it (~2-3 hours
+// later), ShopWorks becomes the source of truth — operators may edit the email,
+// ship address, line items, status flags, etc. The quote-view page mirrors
+// ShopWorks's current state by syncing these edits back into quote_sessions.
+//
+//   POST /api/quote-sessions/:quoteId/sync-from-shopworks
+//     Pulls fresh state from MO snapshot endpoint + writes to Caspio.
+//     If ShopWorks has deleted the order, HARD DELETES the quote_sessions row.
+//     Used by the page's auto-sync (on stale) + manual Refresh button + the
+//     hourly cron job.
+//
+//   GET /api/quote-sessions/:quoteId/full
+//     Returns the quote_sessions row WITH the parsed ShopWorks_Snapshot embedded.
+//     This is the page's primary data source — UI prefers ShopWorks_Snapshot
+//     when present, falls back to the original submission (Notes JSON) when
+//     not (pre-import).
+//
+// Sync is ONE-WAY only: ShopWorks → quote_sessions. We never write back to
+// ManageOrders after the initial /create push.
+// ============================================================================
+
+const SYNC_PROXY_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const SYNC_SLACK_DELETE_WEBHOOK = process.env.SLACK_QUOTE_DELETE_WEBHOOK_URL || '';
+
+/**
+ * Notify Slack (best-effort, fire-and-forget) when a quote_sessions row is
+ * hard-deleted because ShopWorks no longer has the order. Lets AR/sales
+ * notice if a real customer order disappears (vs. a test-order cleanup).
+ */
+function notifyQuoteDeleted(quoteId, shopWorksOrderNumber, customerName) {
+  if (!SYNC_SLACK_DELETE_WEBHOOK) return;
+  const payload = {
+    text: `🗑️ Quote ${quoteId} hard-deleted — ShopWorks no longer has Order #${shopWorksOrderNumber || '?'} (${customerName || 'no customer'})`
+  };
+  fetch(SYNC_SLACK_DELETE_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch(() => {/* silent */});
+}
+
+/**
+ * POST /api/quote-sessions/:quoteId/sync-from-shopworks
+ *
+ * Triggers a fresh pull from ManageOrders for the given quote.
+ * - If ShopWorks returns the order → updates the 4 ShopWorks_* columns
+ * - If ShopWorks returns "not found" and we previously had status=Imported → HARD DELETE
+ * - If ShopWorks returns "not found" and status was Pending → just updates Last_Synced
+ *
+ * Returns: { success, synced, deleted, status, shopWorksOrderNumber, snapshot }
+ */
+app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) => {
+  const startedAt = Date.now();
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+
+    // 1. Look up the quote_sessions row by QuoteID (need PK_ID for PUT/DELETE).
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return res.status(404).json({ success: false, error: 'Quote not found' });
+    }
+    const session = sessions[0];
+    const pkId = session.PK_ID;
+    const previousStatus = session.ShopWorks_Status || '';
+
+    // 2. ExtOrderID we sent to ManageOrders was `NWCA-{QuoteID}` (see 3-Day Tees +
+    //    Order Form push paths). Mirror that here.
+    const extOrderId = `NWCA-${safeQuoteId}`;
+
+    // 3. Pull current state from MO via the new proxy snapshot endpoint.
+    let snapshot;
+    try {
+      const r = await fetch(`${SYNC_PROXY_BASE}/api/manageorders/order/${encodeURIComponent(extOrderId)}/snapshot`);
+      if (!r.ok) {
+        return res.status(502).json({ success: false, error: `MO snapshot fetch failed: HTTP ${r.status}` });
+      }
+      snapshot = await r.json();
+    } catch (e) {
+      return res.status(502).json({ success: false, error: `MO snapshot fetch error: ${e.message}` });
+    }
+
+    const nowIso = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+
+    // 4. Branch: order found in ShopWorks vs. not.
+    if (snapshot.found) {
+      // 4a. UPDATE path — write the new ShopWorks-side state.
+      const update = {
+        ShopWorks_Order_Number: snapshot.id_Order,
+        ShopWorks_Status: 'Imported',
+        ShopWorks_Last_Synced: nowIso,
+        ShopWorks_Snapshot: JSON.stringify({
+          // Trim the snapshot we store — the raw MO payload can be large, and
+          // we only need the order header + line items for the UI.
+          order: snapshot.order,
+          lineItems: snapshot.lineItems,
+          fetchedAt: snapshot.fetchedAt,
+        }),
+      };
+      try {
+        await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', update);
+      } catch (e) {
+        console.warn(`[sync-from-shopworks] Caspio PUT failed for ${safeQuoteId}:`, e.message);
+        return res.status(500).json({ success: false, error: 'Caspio update failed', details: e.message });
+      }
+
+      const elapsed = Date.now() - startedAt;
+      console.log(`[sync-from-shopworks] ✓ ${safeQuoteId} → SW#${snapshot.id_Order} (${elapsed}ms)`);
+      return res.json({
+        success: true,
+        synced: true,
+        deleted: false,
+        status: 'Imported',
+        shopWorksOrderNumber: snapshot.id_Order,
+        lastSynced: nowIso,
+        snapshot: {
+          order: snapshot.order,
+          lineItems: snapshot.lineItems,
+          fetchedAt: snapshot.fetchedAt,
+        },
+      });
+    }
+
+    // 4b. NOT FOUND in ShopWorks. Two sub-cases:
+    //     - Previously Imported → ShopWorks operator deleted → HARD DELETE our row
+    //     - Otherwise (Pending or never synced) → just bump Last_Synced
+    if (previousStatus === 'Imported') {
+      // HARD DELETE. Order existed in SW and now doesn't — operator removed it.
+      try {
+        // Delete associated quote_items first (best-effort) so we don't leave orphans.
+        const items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
+        if (Array.isArray(items)) {
+          for (const it of items) {
+            if (it.PK_ID) {
+              await makeApiRequest(`/quote_items/${it.PK_ID}`, 'DELETE').catch(e => {
+                console.warn(`[sync-from-shopworks] quote_items DELETE failed PK=${it.PK_ID}:`, e.message);
+              });
+            }
+          }
+        }
+        // Now delete the quote_sessions row itself.
+        await makeApiRequest(`/quote_sessions/${pkId}`, 'DELETE');
+        console.log(`[sync-from-shopworks] 🗑️ HARD DELETED ${safeQuoteId} (was SW#${session.ShopWorks_Order_Number || '?'})`);
+        notifyQuoteDeleted(safeQuoteId, session.ShopWorks_Order_Number, session.CustomerName);
+
+        return res.json({
+          success: true,
+          synced: true,
+          deleted: true,
+          status: 'Deleted',
+          shopWorksOrderNumber: session.ShopWorks_Order_Number,
+          lastSynced: nowIso,
+        });
+      } catch (e) {
+        console.error(`[sync-from-shopworks] Hard-delete failed for ${safeQuoteId}:`, e.message);
+        return res.status(500).json({ success: false, error: 'Hard-delete failed', details: e.message });
+      }
+    }
+
+    // 4c. Still pending — just bump the timestamp so we don't re-poll constantly.
+    try {
+      await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
+        ShopWorks_Status: previousStatus || 'Pending',
+        ShopWorks_Last_Synced: nowIso,
+      });
+    } catch (e) {
+      console.warn(`[sync-from-shopworks] pending-timestamp PUT failed for ${safeQuoteId}:`, e.message);
+    }
+    return res.json({
+      success: true,
+      synced: true,
+      deleted: false,
+      status: previousStatus || 'Pending',
+      shopWorksOrderNumber: null,
+      lastSynced: nowIso,
+      reason: snapshot.reason || 'not_imported_yet',
+    });
+
+  } catch (error) {
+    console.error('[sync-from-shopworks] unexpected error:', error);
+    res.status(500).json({ success: false, error: 'Sync failed', details: error.message });
+  }
+});
+
+/**
+ * GET /api/quote-sessions/:quoteId/full
+ *
+ * Returns the quote_sessions row with the ShopWorks_Snapshot parsed and
+ * embedded. This is the primary data source for the quote-view page.
+ *
+ * Response shape (compact):
+ *   {
+ *     quoteId, status, ...flat columns,
+ *     originalSubmission: { info, rows, ship, ... } | null,  // parsed Notes JSON
+ *     shopWorks: {
+ *       orderNumber, status, lastSynced,
+ *       snapshot: { order, lineItems, fetchedAt }
+ *     } | null
+ *   }
+ */
+app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+    const session = sessions[0];
+
+    // Parse the original submission from Notes JSON (best-effort).
+    let originalSubmission = null;
+    if (session.Notes) {
+      try { originalSubmission = JSON.parse(session.Notes); }
+      catch { /* Notes may be plain text on legacy quotes — leave as null */ }
+    }
+
+    // Parse the ShopWorks snapshot if we have one.
+    let shopWorks = null;
+    if (session.ShopWorks_Snapshot) {
+      try {
+        const snapshot = JSON.parse(session.ShopWorks_Snapshot);
+        shopWorks = {
+          orderNumber: session.ShopWorks_Order_Number,
+          status: session.ShopWorks_Status,
+          lastSynced: session.ShopWorks_Last_Synced,
+          snapshot, // { order, lineItems, fetchedAt }
+        };
+      } catch (e) {
+        console.warn(`[quote/full] ShopWorks_Snapshot parse failed for ${safeQuoteId}:`, e.message);
+      }
+    } else if (session.ShopWorks_Status || session.ShopWorks_Order_Number || session.ShopWorks_Last_Synced) {
+      // No snapshot but other ShopWorks fields are populated (e.g. just
+      // marked Pending without a successful sync yet).
+      shopWorks = {
+        orderNumber: session.ShopWorks_Order_Number || null,
+        status: session.ShopWorks_Status || 'Pending',
+        lastSynced: session.ShopWorks_Last_Synced || null,
+        snapshot: null,
+      };
+    }
+
+    // Also fetch quote_items so the UI can render the original line items
+    // even when ShopWorks hasn't imported yet.
+    let items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
+    if (Array.isArray(items)) {
+      items = items.filter(it => it.QuoteID === safeQuoteId);
+    } else {
+      items = [];
+    }
+
+    res.json({
+      quoteId: session.QuoteID,
+      status: session.Status,
+      sessionRaw: session,                    // every flat column for power users
+      originalSubmission,                     // parsed Notes JSON
+      quoteItems: items,                      // pre-import line items
+      shopWorks,                              // current ShopWorks-side state (when synced)
+    });
+  } catch (error) {
+    console.error('[quote/full] error:', error);
     res.status(500).json({ error: 'Failed to fetch quote' });
   }
 });
