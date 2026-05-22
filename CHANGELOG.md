@@ -1,3 +1,7 @@
+## v2026.05.22.6 (2026.05.22)
+
+- Deploy v2026.05.22.6: M1 revert + tax-account auto-resolve
+
 ## v2026.05.22.5 (2026.05.22)
 
 - Deploy v2026.05.22.5: 1 files (server.js,...)
