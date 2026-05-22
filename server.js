@@ -4749,6 +4749,187 @@ function notifyQuoteDeleted(quoteId, shopWorksOrderNumber, customerName) {
   }).catch(() => {/* silent */});
 }
 
+// ============================================================================
+// Quote_Change_Log helpers (Erik 2026-05-22 — Phase 1 of SW edit audit trail)
+// ----------------------------------------------------------------------------
+// When sync-from-shopworks detects a delta between the old and new snapshot,
+// it writes one row per changed field to Quote_Change_Log (via proxy). Phase 2
+// (banner on quote-view) and Phase 3 (dashboard activity feed) read from this
+// table to surface "what changed in SW since last view".
+// ============================================================================
+
+// Format "now" as a Pacific naive-wall-clock timestamp matching Caspio's
+// expectation (no Z, no offset). Mirrors parseCaspioPacificMs's understanding.
+function nowPacificNaiveIso() {
+  try {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/Los_Angeles',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: false,
+    }).formatToParts(new Date());
+    const get = (t) => parts.find(p => p.type === t).value;
+    return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}:${get('second')}`;
+  } catch (_) {
+    return new Date().toISOString().replace(/\.\d{3}Z$/, '');
+  }
+}
+
+// Order-header fields we watch for changes. Skip timestamps that churn freely
+// (like date_LastModified). Field name → { changeType, severity }.
+const WATCHED_ORDER_FIELDS = {
+  cur_SubTotal:       { type: 'financial', severity: 'info' },
+  cur_SalesTaxTotal:  { type: 'financial', severity: 'info' },
+  cur_Shipping:       { type: 'financial', severity: 'info' },
+  cur_TotalInvoice:   { type: 'financial', severity: 'warning' },
+  cur_Payments:       { type: 'financial', severity: 'info' },
+  cur_Balance:        { type: 'financial', severity: 'info' },
+  sts_ArtDone:        { type: 'status',    severity: 'info' },
+  sts_Purchased:      { type: 'status',    severity: 'info' },
+  sts_Received:       { type: 'status',    severity: 'info' },
+  sts_Produced:       { type: 'status',    severity: 'info' },
+  sts_Shipped:        { type: 'status',    severity: 'info' },
+  sts_Invoiced:       { type: 'status',    severity: 'info' },
+  sts_Paid:           { type: 'status',    severity: 'info' },
+  date_RequestedToShip:{type: 'shipping',  severity: 'warning' },
+  date_DropDead:      { type: 'shipping',  severity: 'warning' },
+  CustomerServiceRep: { type: 'customer',  severity: 'info' },
+  id_DesignType:      { type: 'design',    severity: 'info' },
+  id_Design:          { type: 'design',    severity: 'info' },
+  DesignName:         { type: 'design',    severity: 'info' },
+};
+
+// Normalize a value for comparison — null/undefined/'' all become null.
+// Numeric strings → numbers. Other values pass through.
+function normalizeForDiff(v) {
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'string') {
+    const trimmed = v.trim();
+    if (!trimmed) return null;
+    // Try numeric coercion for things like "0", "67.50"
+    const n = Number(trimmed);
+    if (Number.isFinite(n) && String(n) === trimmed) return n;
+    return trimmed;
+  }
+  return v;
+}
+
+/**
+ * Diff two snapshots and return an array of change records.
+ * @param {Object|null} oldSnap  Previous snapshot (from quote_sessions.ShopWorks_Snapshot)
+ * @param {Object} newSnap       Fresh snapshot from MO
+ * @returns {Array<{field, oldValue, newValue, type, severity}>}
+ */
+function diffSnapshots(oldSnap, newSnap) {
+  const changes = [];
+  if (!oldSnap || !newSnap) return changes;
+  const oldOrder = oldSnap.order || {};
+  const newOrder = newSnap.order || {};
+
+  // 1. Order-header field diffs
+  for (const [field, meta] of Object.entries(WATCHED_ORDER_FIELDS)) {
+    const o = normalizeForDiff(oldOrder[field]);
+    const n = normalizeForDiff(newOrder[field]);
+    if (o !== n) {
+      changes.push({
+        field,
+        oldValue: o,
+        newValue: n,
+        type: meta.type,
+        severity: meta.severity,
+      });
+    }
+  }
+
+  // 2. Line item diffs — match by PartNumber+PartColor.
+  // For each NEW line, find matching OLD line and compare LineUnitPrice/LineQuantity.
+  // Unmatched OLD lines → "removed". Unmatched NEW lines → "added".
+  const oldLines = Array.isArray(oldSnap.lineItems) ? oldSnap.lineItems : [];
+  const newLines = Array.isArray(newSnap.lineItems) ? newSnap.lineItems : [];
+  const keyOf = (li) => `${(li.PartNumber || '').trim()}|${(li.PartColor || '').trim()}`;
+  const oldByKey = new Map(oldLines.map(li => [keyOf(li), li]));
+  const newByKey = new Map(newLines.map(li => [keyOf(li), li]));
+
+  for (const [key, nLine] of newByKey) {
+    const oLine = oldByKey.get(key);
+    if (!oLine) {
+      // Added
+      changes.push({
+        field: `LineItem[${key}]`,
+        oldValue: null,
+        newValue: `${nLine.PartNumber} ${nLine.PartColor} qty=${nLine.LineQuantity} @ $${nLine.LineUnitPrice}`,
+        type: 'line_item',
+        severity: 'warning',
+      });
+    } else {
+      // Compare unit price + quantity
+      const oPrice = normalizeForDiff(oLine.LineUnitPrice);
+      const nPrice = normalizeForDiff(nLine.LineUnitPrice);
+      if (oPrice !== nPrice) {
+        changes.push({
+          field: `LineUnitPrice[${key}]`,
+          oldValue: oPrice,
+          newValue: nPrice,
+          type: 'line_item',
+          severity: 'warning',
+        });
+      }
+      const oQty = normalizeForDiff(oLine.LineQuantity);
+      const nQty = normalizeForDiff(nLine.LineQuantity);
+      if (oQty !== nQty) {
+        changes.push({
+          field: `LineQuantity[${key}]`,
+          oldValue: oQty,
+          newValue: nQty,
+          type: 'line_item',
+          severity: 'warning',
+        });
+      }
+    }
+  }
+  for (const [key, oLine] of oldByKey) {
+    if (!newByKey.has(key)) {
+      changes.push({
+        field: `LineItem[${key}]`,
+        oldValue: `${oLine.PartNumber} ${oLine.PartColor} qty=${oLine.LineQuantity} @ $${oLine.LineUnitPrice}`,
+        newValue: null,
+        type: 'line_item',
+        severity: 'critical',
+      });
+    }
+  }
+
+  return changes;
+}
+
+/**
+ * Write change records to Quote_Change_Log via the proxy. Fire-and-forget —
+ * a logging failure must not block the snapshot write.
+ */
+async function logQuoteChanges(quoteId, changes, detectedBy, salesRepEmail, shopWorksOrderNumber) {
+  if (!Array.isArray(changes) || changes.length === 0) return;
+  const ts = nowPacificNaiveIso();
+  const rows = changes.map(c => ({
+    QuoteID: quoteId,
+    ShopWorksOrderNumber: shopWorksOrderNumber || null,
+    SalesRepEmail: salesRepEmail || null,
+    ChangedAt: ts,
+    ChangeType: c.type || 'other',
+    FieldName: String(c.field || '').slice(0, 250),
+    OldValue: c.oldValue == null ? '' : String(c.oldValue).slice(0, 64000),
+    NewValue: c.newValue == null ? '' : String(c.newValue).slice(0, 64000),
+    Severity: c.severity || 'info',
+    DetectedBy: detectedBy || 'cron',
+    Notes: c.notes || '',
+  }));
+  try {
+    await makeApiRequest('/quote_change_log', 'POST', rows);
+    console.log(`[change-log] wrote ${rows.length} change record(s) for ${quoteId}`);
+  } catch (e) {
+    console.warn(`[change-log] write failed for ${quoteId} (non-fatal):`, e.message);
+  }
+}
+
 /**
  * POST /api/quote-sessions/:quoteId/sync-from-shopworks
  *
@@ -4839,17 +5020,42 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
     // 4. Branch: order found in ShopWorks vs. not.
     if (snapshot.found) {
       // 4a. UPDATE path — write the new ShopWorks-side state.
+
+      // Phase 1 change-log diff (Erik 2026-05-22): compare new snapshot
+      // against the previous one BEFORE overwrite. Each diff becomes one
+      // row in Quote_Change_Log. Fire-and-forget — log write must not block
+      // the snapshot update. Detected-by reflects how the sync was invoked:
+      //   - body has shopWorksOrderNumber → manual entry by rep
+      //   - else → page-load auto-sync OR hourly cron (we can't tell apart
+      //     at this layer; cron caller can pass ?detectedBy=cron in future)
+      let oldSnap = null;
+      if (session.ShopWorks_Snapshot) {
+        try { oldSnap = JSON.parse(session.ShopWorks_Snapshot); }
+        catch (_) { /* malformed; treat as no prior snapshot */ }
+      }
+      const newSnap = {
+        order: snapshot.order,
+        lineItems: snapshot.lineItems,
+        fetchedAt: snapshot.fetchedAt,
+      };
+      const changes = diffSnapshots(oldSnap, newSnap);
+      if (changes.length > 0) {
+        const detectedBy = req.body?.shopWorksOrderNumber ? 'manual-refresh'
+          : (req.query?.detectedBy || 'page-load-sync');
+        logQuoteChanges(
+          safeQuoteId,
+          changes,
+          detectedBy,
+          session.SalesRepEmail || null,
+          snapshot.id_Order || null,
+        ).catch(() => {});
+      }
+
       const update = {
         ShopWorks_Order_Number: snapshot.id_Order,
         ShopWorks_Status: 'Imported',
         ShopWorks_Last_Synced: nowIso,
-        ShopWorks_Snapshot: JSON.stringify({
-          // Trim the snapshot we store — the raw MO payload can be large, and
-          // we only need the order header + line items for the UI.
-          order: snapshot.order,
-          lineItems: snapshot.lineItems,
-          fetchedAt: snapshot.fetchedAt,
-        }),
+        ShopWorks_Snapshot: JSON.stringify(newSnap),
       };
       try {
         await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', update);
@@ -4897,6 +5103,16 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
         });
         console.log(`[sync-from-shopworks] ⊘ SOFT DELETED ${safeQuoteId} (was SW#${session.ShopWorks_Order_Number || '?'}) — 30d retention`);
         notifyQuoteDeleted(safeQuoteId, session.ShopWorks_Order_Number, session.CustomerName);
+
+        // Log to Quote_Change_Log (critical severity — order is GONE in SW)
+        logQuoteChanges(safeQuoteId, [{
+          field: 'Status',
+          oldValue: 'Imported',
+          newValue: 'Cancelled_in_ShopWorks',
+          type: 'deleted',
+          severity: 'critical',
+          notes: 'Order removed from SW — soft-deleted with 30d audit retention',
+        }], 'cron', session.SalesRepEmail || null, session.ShopWorks_Order_Number || null).catch(() => {});
 
         // SW → SS cascade (Erik 2026-05-22): when SW operator deletes the
         // order, also delete the matching ShipStation order so warehouse
@@ -6037,6 +6253,82 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
   } catch (error) {
     console.error('[bulk-sync-ss-tracking] unexpected error:', error);
     res.status(500).json({ success: false, error: 'Bulk SS tracking sync failed', details: error.message });
+  }
+});
+
+/**
+ * GET /api/quote-change-log/:quoteId
+ * Returns up to N most-recent changes for a single quote (newest first).
+ * Used by the "what changed" banner on /quote/:id (Phase 2).
+ */
+app.get('/api/quote-change-log/:quoteId', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 500);
+    const sinceHours = Number(req.query.sinceHours);
+    const qs = new URLSearchParams({
+      quoteID: safeQuoteId,
+      limit: String(limit),
+    });
+    if (Number.isFinite(sinceHours) && sinceHours > 0) {
+      qs.set('hoursAgo', String(sinceHours));
+    }
+    const data = await makeApiRequest(`/quote_change_log?${qs.toString()}`);
+    // Proxy returns { success, count, records } — pass through
+    res.json(data);
+  } catch (error) {
+    console.error(`[change-log/${req.params.quoteId}] error:`, error.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch change log', details: error.message });
+  }
+});
+
+/**
+ * GET /api/quote-change-log/recent?hours=24&salesRepEmail=...
+ * Activity feed across ALL quotes for the dashboard (Phase 3).
+ * Filterable by hoursAgo, salesRepEmail, severity, unacknowledged.
+ */
+app.get('/api/quote-change-log-recent', async (req, res) => {
+  try {
+    const hours = Math.min(Math.max(Number(req.query.hours) || 24, 1), 720);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 500);
+    const qs = new URLSearchParams({
+      hoursAgo: String(hours),
+      limit: String(limit),
+    });
+    if (req.query.salesRepEmail) qs.set('salesRepEmail', String(req.query.salesRepEmail));
+    if (req.query.severity)      qs.set('severity', String(req.query.severity));
+    if (req.query.unacknowledged === 'true') qs.set('unacknowledged', 'true');
+    const data = await makeApiRequest(`/quote_change_log?${qs.toString()}`);
+    res.json(data);
+  } catch (error) {
+    console.error('[change-log-recent] error:', error.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch activity feed', details: error.message });
+  }
+});
+
+/**
+ * PUT /api/quote-change-log/:id/acknowledge
+ * Mark a single change record as seen by a user. Used by the change banner's
+ * "mark as seen" button (Phase 2) and dashboard activity feed (Phase 3).
+ */
+app.put('/api/quote-change-log/:id/acknowledge', async (req, res) => {
+  try {
+    const pkId = parseInt(req.params.id, 10);
+    if (!Number.isInteger(pkId) || pkId <= 0) {
+      return res.status(400).json({ success: false, error: 'Invalid PK_ID' });
+    }
+    const acknowledgedBy = String(req.body?.acknowledgedBy || '').slice(0, 250);
+    if (!acknowledgedBy) {
+      return res.status(400).json({ success: false, error: 'acknowledgedBy required in body' });
+    }
+    await makeApiRequest(`/quote_change_log/${pkId}`, 'PUT', {
+      Acknowledged_By: acknowledgedBy,
+      Acknowledged_At: nowPacificNaiveIso(),
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(`[change-log/${req.params.id}/acknowledge] error:`, error.message);
+    res.status(500).json({ success: false, error: 'Failed to acknowledge', details: error.message });
   }
 });
 
