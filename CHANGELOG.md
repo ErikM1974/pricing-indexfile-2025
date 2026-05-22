@@ -1,3 +1,16 @@
+## v2026.05.22.1 (2026.05.22)
+
+- ShipStation: robust shipTo.name+street1 fallback (digit-count heuristic to detect name-vs-street when ShipAddress01/02 ambiguous)
+- ShipStation: only send carrierCode+serviceCode when carrier is configured in account (NWCA has stamps_com only); use requestedShippingService freetext for unconfigured carriers (UPS/FedEx) so warehouse picks at rate-buy time
+- Deploy v2026.05.21.28: ShipStation — route ONLY USPS orders to ShipStation (UPS uses WorldShip, FedEx uses carrier tool, pickup needs no label). Invoice button shows 'Ship via WorldShip' hint for UPS orders instead of misrouting to ShipStation.
+- ShipStation: route-skip checks (pickup/UPS/FedEx) run BEFORE alreadySent dedup, so a stale ShipStation_Order_ID on a UPS order doesn't block the skip-to-WorldShip response
+- ShipStation: enrich items[] with product image URLs from SanMar bulk catalog (COLOR_PRODUCT_IMAGE), cached 24h. Warehouse pickers see actual garment+color in ShipStation order view.
+- Deploy v2026.05.21.28: ShipStation — ship-method override modal (UPS/FedEx orders show 'Override → USPS' button → modal lets rep pick Priority Mail / First Class / Ground Advantage on-the-fly; image enrichment via SanMar catalog)
+- ShipStation: retry on 404 with salted orderKey (ShipStation reserves keys of deleted orders permanently → 404 on createorder with same orderKey unless we salt it)
+- ShipStation: use WO# as orderNumber (warehouse cross-refs with ShopWorks), add weight estimate by garment type, add customField1 (decoration), customField2 (design#), customField3 (RUSH flag)
+- ShipStation: use real SanMar PIECE_WEIGHT (lbs→oz) co-fetched with image URL via /api/inventory; hardcoded prefix table is fallback only
+- Deploy v2026.05.22.1: 4 files (quote-management.html,quote-view.js,quote-view.html,...)
+
 ## v2026.05.21.27 (2026.05.21)
 
 - Deploy v2026.05.21.27: ShipStation Phase 3 — pricing-index /send-to-shipstation endpoint + /shipstation-tracking webhook callback, 🚢 button on invoice toolbar with shipped/awaiting/default states + tracking# link
