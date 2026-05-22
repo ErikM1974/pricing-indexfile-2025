@@ -128,6 +128,13 @@
                 <button type="button" class="sw-action-btn" id="sw-action-email" title="Email this quote to the customer">
                     <span class="sw-action-icon">📧</span> Email customer
                 </button>
+                <!-- ShipStation button (Erik 2026-05-22 — B). Hidden by default.
+                     Visibility + label managed by _updateShipStationButton()
+                     (mirrors invoice.js logic: production-complete gate, pickup
+                     skip, UPS/FedEx override, already-sent state, tracking#). -->
+                <button type="button" class="sw-action-btn" id="sw-action-shipstation" style="display: none;" title="Push this order to ShipStation. Warehouse will rate + buy the label there.">
+                    <span class="sw-action-icon">🚢</span> Send to ShipStation
+                </button>
             </div>
 
             <!-- PO Number (inline with header, shown if present) -->
@@ -544,6 +551,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.05.22.1"></script>
+    <script src="/pages/js/quote-view.js?v=2026.05.22.3"></script>
 </body>
 </html>
