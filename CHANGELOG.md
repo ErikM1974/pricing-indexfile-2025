@@ -1,3 +1,7 @@
+## v2026.05.22.8 (2026.05.22)
+
+- Deploy v2026.05.22.8: Phase 2 change banner on quote-view
+
 ## v2026.05.22.7 (2026.05.22)
 
 - Deploy v2026.05.22.7: Quote_Change_Log Phase 1 — diff + write + read endpoints
