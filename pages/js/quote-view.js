@@ -2154,6 +2154,194 @@ class QuoteViewPage {
                 this.syncFromShopWorks({ manual: false }).catch(() => {});
             }
         }
+
+        // Phase 2 change banner (Erik 2026-05-22) — show "edited in SW" notice
+        // when Quote_Change_Log has unacknowledged changes for this quote.
+        // Staff-only — customers viewing share links never see internal edits.
+        this._loadChangeLog().catch(() => {});
+    }
+
+    // ====================================================================
+    // Phase 2 — Change banner (Erik 2026-05-22)
+    // ====================================================================
+    // Fetches unacknowledged changes from Quote_Change_Log for this quote
+    // and renders a colored banner under the SW sync strip. Banner color =
+    // highest severity present (critical > warning > info). Reps click
+    // "Mark all as seen" to acknowledge → next page load won't show.
+    // ====================================================================
+
+    async _loadChangeLog() {
+        if (!this.isStaff) return;
+        try {
+            const r = await fetch(`/api/quote-change-log/${encodeURIComponent(this.quoteId)}?sinceHours=168`);
+            if (!r.ok) return;
+            const data = await r.json();
+            const records = (data.records || []).filter(rec => !rec.Acknowledged_At);
+            if (records.length === 0) return;
+            this._renderChangeBanner(records);
+        } catch (e) {
+            console.warn('[change-log] load failed:', e.message);
+        }
+    }
+
+    _renderChangeBanner(records) {
+        // Clean up any existing banner (e.g. on re-sync)
+        document.getElementById('sw-change-banner')?.remove();
+
+        // Sort newest first
+        records.sort((a, b) => {
+            const ta = (window.CaspioDate && window.CaspioDate.parse)
+                ? window.CaspioDate.parse(a.ChangedAt) : new Date(a.ChangedAt);
+            const tb = (window.CaspioDate && window.CaspioDate.parse)
+                ? window.CaspioDate.parse(b.ChangedAt) : new Date(b.ChangedAt);
+            return (tb?.getTime() || 0) - (ta?.getTime() || 0);
+        });
+
+        // Determine max severity
+        const rank = { info: 0, warning: 1, critical: 2 };
+        let maxSev = 'info';
+        for (const r of records) {
+            if ((rank[r.Severity] ?? 0) > (rank[maxSev] ?? 0)) maxSev = r.Severity || 'info';
+        }
+
+        const palette = {
+            info:     { bg: '#eff6ff', border: '#3b82f6', color: '#1e40af', icon: '✏', headline: 'This order was edited in ShopWorks' },
+            warning:  { bg: '#fffbeb', border: '#f59e0b', color: '#92400e', icon: '⚠', headline: 'This order has changes that need review' },
+            critical: { bg: '#fef2f2', border: '#dc2626', color: '#991b1b', icon: '🚨', headline: 'CRITICAL — ShopWorks made changes' },
+        }[maxSev];
+
+        const top3 = records.slice(0, 3);
+        const hasMore = records.length > 3;
+        const newestAgo = this._formatRelativeTime(records[0].ChangedAt);
+
+        const banner = document.createElement('div');
+        banner.id = 'sw-change-banner';
+        banner.className = 'sw-change-banner';
+        banner.style.cssText =
+            `margin:8px 0;padding:12px 16px;border:1px solid ${palette.border};` +
+            `background:${palette.bg};color:${palette.color};border-radius:6px;font-size:14px;line-height:1.5;`;
+
+        const ids = records.map(r => r.PK_ID).filter(Boolean);
+        const summaryRows = top3.map(r => `<li>${this.escapeHtml(this._humanizeChange(r))}</li>`).join('');
+        const detailsRows = hasMore
+            ? records.map(r => `<li style="margin-bottom:4px;"><span style="opacity:0.7;font-size:12px;">${this._formatRelativeTime(r.ChangedAt)}</span> &middot; ${this.escapeHtml(this._humanizeChange(r))}</li>`).join('')
+            : '';
+
+        banner.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <strong style="font-size:15px;">${palette.icon} ${palette.headline} &middot; ${records.length} change${records.length === 1 ? '' : 's'} (most recent ${this.escapeHtml(newestAgo)})</strong>
+                <div>
+                    <button type="button" id="sw-change-banner-ack" data-change-ids="${ids.join(',')}"
+                            style="background:${palette.color};color:#fff;border:0;padding:6px 12px;border-radius:4px;font-size:13px;cursor:pointer;font-weight:600;">
+                        Mark all as seen
+                    </button>
+                </div>
+            </div>
+            <ul style="margin:8px 0 0 0;padding-left:20px;">${summaryRows}</ul>
+            ${hasMore ? `
+                <details style="margin-top:8px;">
+                    <summary style="cursor:pointer;font-size:13px;font-weight:600;opacity:0.85;">View full history (${records.length})</summary>
+                    <ul style="margin:8px 0 0 0;padding-left:20px;">${detailsRows}</ul>
+                </details>
+            ` : ''}
+        `;
+
+        // Insert directly after the sync strip
+        const syncStrip = document.getElementById('sw-sync-strip');
+        if (syncStrip && syncStrip.parentNode) {
+            syncStrip.parentNode.insertBefore(banner, syncStrip.nextSibling);
+        }
+
+        // Wire the acknowledge button
+        document.getElementById('sw-change-banner-ack')?.addEventListener('click', () => this._acknowledgeChanges(ids));
+    }
+
+    async _acknowledgeChanges(pkIds) {
+        if (!Array.isArray(pkIds) || pkIds.length === 0) return;
+        const ackBy = sessionStorage.getItem('nwca_user_email')
+            || sessionStorage.getItem('nwca_user_name')
+            || 'unknown';
+        const btn = document.getElementById('sw-change-banner-ack');
+        if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+        try {
+            await Promise.all(pkIds.map(id =>
+                fetch(`/api/quote-change-log/${id}/acknowledge`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acknowledgedBy: ackBy }),
+                })
+            ));
+            // Fade out the banner
+            const banner = document.getElementById('sw-change-banner');
+            if (banner) {
+                banner.style.transition = 'opacity 0.3s';
+                banner.style.opacity = '0';
+                setTimeout(() => banner.remove(), 320);
+            }
+        } catch (e) {
+            console.error('[change-log] acknowledge failed:', e);
+            if (btn) { btn.disabled = false; btn.textContent = 'Mark all as seen'; }
+            alert('Failed to acknowledge changes: ' + e.message);
+        }
+    }
+
+    // Map raw Caspio FieldName + values to human-readable text.
+    _humanizeChange(rec) {
+        const LABELS = {
+            cur_SubTotal: 'Subtotal',
+            cur_TotalInvoice: 'Total',
+            cur_SalesTaxTotal: 'Sales Tax',
+            cur_Shipping: 'Shipping',
+            cur_Payments: 'Payments Received',
+            cur_Balance: 'Balance Due',
+            sts_ArtDone: 'Art status',
+            sts_Purchased: 'Purchasing status',
+            sts_Received: 'Receiving status',
+            sts_Produced: 'Production status',
+            sts_Shipped: 'Shipped status',
+            sts_Invoiced: 'Invoiced status',
+            sts_Paid: 'Payment status',
+            date_RequestedToShip: 'Ship date',
+            date_DropDead: 'Drop dead date',
+            CustomerServiceRep: 'CSR',
+            id_DesignType: 'Design type',
+            id_Design: 'Design link',
+            DesignName: 'Design name',
+            Status: 'Order status',
+        };
+        const field = String(rec.FieldName || '');
+
+        // Line item fields: LineUnitPrice[PC600|Athletic Hthr] → "PC600 (Athletic Hthr) unit price"
+        let label;
+        const lineMatch = field.match(/^(LineUnitPrice|LineQuantity|LineItem)\[(.+)\]$/);
+        if (lineMatch) {
+            const what = lineMatch[1] === 'LineUnitPrice' ? 'unit price'
+                : lineMatch[1] === 'LineQuantity' ? 'qty' : '';
+            const [pn, color] = lineMatch[2].split('|');
+            const garmentLabel = color ? `${pn} (${color})` : pn;
+            label = `${garmentLabel}${what ? ' ' + what : ''}`;
+        } else {
+            label = LABELS[field] || field;
+        }
+
+        let oldVal = (rec.OldValue == null || rec.OldValue === '') ? '(empty)' : String(rec.OldValue);
+        let newVal = (rec.NewValue == null || rec.NewValue === '') ? '(empty)' : String(rec.NewValue);
+
+        // Money formatting
+        if (field.startsWith('cur_') || field.startsWith('LineUnitPrice')) {
+            const fmt = v => Number.isFinite(Number(v)) ? '$' + Number(v).toFixed(2) : v;
+            oldVal = fmt(oldVal);
+            newVal = fmt(newVal);
+        }
+        // 0/1 status flips
+        if (field.startsWith('sts_') && field !== 'sts_Paid' && field !== 'sts_Purchased') {
+            if (oldVal === '0') oldVal = 'incomplete';
+            else if (oldVal === '1') oldVal = 'complete ✓';
+            if (newVal === '0') newVal = 'incomplete';
+            else if (newVal === '1') newVal = 'complete ✓';
+        }
+
+        return `${label}: ${oldVal} → ${newVal}`;
     }
 
     async syncFromShopWorks({ manual = false, shopWorksOrderNumber = null } = {}) {
