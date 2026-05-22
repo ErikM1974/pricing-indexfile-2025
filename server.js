@@ -1975,6 +1975,76 @@ function getTaxAccount(state, isCustomerPickup) {
   return { code: '2200.101', label: 'WA Sales Tax — Destination City', rate: null };
 }
 
+// ============================================================================
+// Sales tax accounts cache (Erik 2026-05-22)
+// ----------------------------------------------------------------------------
+// Caches the 33-row sales_tax_accounts_2026 Caspio table so the note builder
+// can look up the rate-specific GL account (2200.101, 2200.102, …) without
+// hitting the proxy on every submit. The frontend's /api/tax-rates/lookup
+// returns this same data + the rate at once, but if it ever fails to populate
+// ship.taxAccount, this server-side fallback prevents the order from landing
+// in ShopWorks's generic "2200" parent account (which AR doesn't reconcile).
+//
+// TTL: 1 hour. The Caspio table changes ~never (WA DOR adjusts rates quarterly).
+// ============================================================================
+let _taxAccountsCache = null;
+let _taxAccountsCacheAt = 0;
+let _taxAccountsInFlight = null;
+const TAX_ACCOUNTS_TTL_MS = 60 * 60 * 1000;
+
+async function ensureTaxAccountsCache() {
+  const fresh = _taxAccountsCache && (Date.now() - _taxAccountsCacheAt) < TAX_ACCOUNTS_TTL_MS;
+  if (fresh) return _taxAccountsCache;
+  if (_taxAccountsInFlight) return _taxAccountsInFlight;
+  _taxAccountsInFlight = (async () => {
+    try {
+      const r = await fetch(`${SYNC_PROXY_BASE}/api/tax-rates`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const json = await r.json();
+      const data = Array.isArray(json?.data) ? json.data : [];
+      _taxAccountsCache = data.filter(a => a.Active === 'Yes' && Number.isFinite(Number(a.Tax_Rate)));
+      _taxAccountsCacheAt = Date.now();
+      console.log(`[tax-accounts] cache refreshed: ${_taxAccountsCache.length} active accounts`);
+      return _taxAccountsCache;
+    } catch (e) {
+      console.warn('[tax-accounts] cache refresh failed (will serve stale or empty):', e.message);
+      return _taxAccountsCache || [];
+    } finally {
+      _taxAccountsInFlight = null;
+    }
+  })();
+  return _taxAccountsInFlight;
+}
+
+/**
+ * Look up the rate-specific GL account from the cached sales_tax_accounts_2026
+ * table. Matches `Tax_Rate` (decimal, e.g. 0.102 = 10.2%) with 0.0001 tolerance
+ * to absorb float-rounding. Returns null when no match within ±0.5%.
+ */
+function findTaxAccountByRate(rateDecimal) {
+  if (!Number.isFinite(rateDecimal) || rateDecimal <= 0) return null;
+  const accounts = _taxAccountsCache || [];
+  if (accounts.length === 0) return null;
+  const exact = accounts.find(a => Math.abs(Number(a.Tax_Rate) - rateDecimal) < 0.0001);
+  if (exact) {
+    return { account: String(exact.Account_Number), accountName: exact.Account_Name };
+  }
+  // No exact match — find closest within 0.5% tolerance (handles DOR rates
+  // that aren't on the standard 0.1% grid, e.g. 10.05%).
+  let closest = null;
+  for (const a of accounts) {
+    const diff = Math.abs(Number(a.Tax_Rate) - rateDecimal);
+    if (diff < 0.005 && (!closest || diff < closest.diff)) {
+      closest = { a, diff };
+    }
+  }
+  if (closest) {
+    console.warn(`[tax-accounts] no exact match for rate=${rateDecimal} — closest ${closest.a.Tax_Rate} (acct ${closest.a.Account_Number})`);
+    return { account: String(closest.a.Account_Number), accountName: closest.a.Account_Name };
+  }
+  return null;
+}
+
 // Notes On Order is the SINGLE most-glanced field in ShopWorks for the rep
 // reviewing an order. Per Erik (2026-05-20): strip everything that's already
 // in a structured ShopWorks field — Order ID is the External ID field,
@@ -1989,87 +2059,100 @@ function getTaxAccount(state, isCustomerPickup) {
 //   3. Out-of-state shipping                    → DO NOT APPLY
 //   4. No tax info available (defensive)        → FLAG: needs rep review
 function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }) {
-  // Audit fix M1 (2026-05-21): Notes On Order now contains ONLY operational
-  // audit info that CSR/Production reads (print locations, order ID refs).
-  // The tax-application instructions moved to Notes To Accounting via the
-  // companion buildAccountingNote() — AR is the audience for those.
+  // M1 reverted 2026-05-22: Notes On Order is the primary tab CSR/AR/Production
+  // all scan. Keep operational + financial in one place, one fact per line.
+  // Tax block lives here (was briefly on Notes To Accounting under M1).
   const lines = [];
 
-  // Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
-  // Frontend sends e.g. "Left Chest", "Full Back", "Left Chest + Full Back".
+  // 1. Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
   const locsClean = String(printLocations || '').trim();
   if (locsClean) {
     lines.push(`Print Locations: ${locsClean}`);
   }
 
-  // Return as ARRAY — each element becomes a separate row in ShopWorks's
-  // Notes On Order tab. Caller flattens with one notesBlocks.push({type,note})
-  // per element.
-  return lines;
-}
+  // 2. Tax block — subtotal / rate / amount / total / account, one per line.
+  const subtotal = Number(breakdown?.subtotal) || 0;
+  const taxAmount = Number(breakdown?.taxEstimate) || 0;
+  const taxRate = Number(ship?.taxRate) || 0;
+  const total = subtotal + taxAmount;
 
-/**
- * Build the tax-application block as Notes To Accounting (M1 refactor).
- * AR reads this tab to apply sales tax manually in ShopWorks. Splitting
- * from Notes On Order means CSR doesn't see tax instructions they'd
- * dismiss as already-handled.
- */
-function buildAccountingNote({ info, breakdown, ship }) {
   const isPickup = ship && (
     ship.method === 'Customer Pickup' ||
     ship.method === 'pickup' ||
     ship.method === 'willcall'
   );
-  const shState = (ship && ship.state || info && info.state || '').toUpperCase();
+  const shState = String(ship?.state || info?.state || '').toUpperCase();
   const isOutOfState = !isPickup && shState && shState !== 'WA';
 
-  // Tax-exempt customers — server may have surfaced this through info.isTaxExempt
-  // (Phase C plumbing). If exempt, emit a single concise note and skip the
-  // standard tax-rate block.
-  if (info && info.isTaxExempt) {
+  // Tax-exempt customer (cert on file) → short-circuit
+  if (info?.isTaxExempt) {
     const cert = info.taxExemptNumber || '(no cert # on file)';
-    return [
-      'TAX EXEMPT — DO NOT APPLY',
-      `Cert #:  ${cert}`,
-      'Reason:  Customer record marked Tax Exempt in CompanyContactsMerge2026',
-    ];
-  }
-
-  const subtotal = Number(breakdown?.subtotal) || 0;
-  const taxAmount = Number(breakdown?.taxEstimate) || 0;
-  const taxRate = Number(ship?.taxRate);
-  const taxRatePct = Number.isFinite(taxRate) && taxRate > 0
-    ? (taxRate * 100).toFixed(2)
-    : null;
-  const taxAccount = ship?.taxAccount
-    || (isPickup ? '2200.101' : isOutOfState ? '2202' : '2200');
-  const taxAccountName = ship?.taxAccountName
-    || (isPickup ? 'Wash:10.1%' : isOutOfState ? 'Out of State Sales' : 'WA Sales Tax');
-
-  const lines = [];
-  if (isOutOfState) {
-    lines.push('TAX — DO NOT APPLY (out of state)');
-    lines.push(`State:   ${shState}`);
-    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
-    lines.push(`Reason:  WAC 458-20-193 (no nexus on out-of-state delivery)`);
-  } else if (isPickup) {
-    lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
-    lines.push(`Rate:    ${taxRatePct || '10.10'}%  (Milton pickup — flat)`);
-    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
-    lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
-  } else if (shState === 'WA' && taxRatePct) {
-    const city = ship?.city || '';
-    lines.push('TAX — APPLY MANUALLY IN SHOPWORKS');
-    lines.push(`Rate:    ${taxRatePct}%  (${city || 'WA destination'} — DOR lookup)`);
-    lines.push(`Account: ${taxAccount} — ${taxAccountName}`);
-    lines.push(`Amount:  $${taxAmount.toFixed(2)} on $${subtotal.toFixed(2)} subtotal`);
-  } else {
-    lines.push('TAX — NEEDS REVIEW');
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
-    lines.push(`Rep: confirm destination + apply correct WA rate before invoicing`);
+    lines.push(`Tax: EXEMPT — DO NOT APPLY`);
+    lines.push(`Cert #: ${cert}`);
+    lines.push(`Reason: Customer marked Tax Exempt in CompanyContactsMerge2026`);
+    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    return lines;
   }
+
+  // Out-of-state shipping → no tax (WAC 458-20-193)
+  if (isOutOfState) {
+    lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    lines.push(`Tax: DO NOT APPLY (out of state)`);
+    lines.push(`State: ${shState}`);
+    lines.push(`Tax Account: 2202 — Out of State Sales`);
+    lines.push(`Reason: WAC 458-20-193 (no nexus on out-of-state delivery)`);
+    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    return lines;
+  }
+
+  // Pickup or in-WA shipping → apply tax. Resolve the rate-specific GL account.
+  // Source priority:
+  //   1. ship.taxAccount — frontend's /api/tax-rates/lookup result (authoritative)
+  //   2. findTaxAccountByRate(taxRate) — server-side lookup from cached
+  //      sales_tax_accounts_2026 table (fallback if frontend dropped it)
+  //   3. Hardcoded '2200.101' for pickup (Milton, always 10.10%)
+  // We DON'T fall through to generic '2200' parent — that would land orders in
+  // an unreconciled GL account and confuse AR.
+  let taxAccount = ship?.taxAccount;
+  let taxAccountName = ship?.taxAccountName;
+  if (!taxAccount && taxRate > 0) {
+    const lookup = findTaxAccountByRate(taxRate);
+    if (lookup) {
+      taxAccount = lookup.account;
+      taxAccountName = lookup.accountName;
+    }
+  }
+  if (!taxAccount && isPickup) {
+    taxAccount = '2200.101';
+    taxAccountName = '10.10%';
+  }
+
+  const ratePct = taxRate > 0 ? (taxRate * 100).toFixed(2) : null;
+
+  if (ratePct && taxAccount) {
+    const locationLabel = isPickup
+      ? 'Milton pickup — flat'
+      : `${ship?.city || 'WA destination'} — DOR lookup`;
+    lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    lines.push(`Tax Rate: ${ratePct}% (${locationLabel})`);
+    lines.push(`Tax Amount: $${taxAmount.toFixed(2)}`);
+    lines.push(`Total with Tax: $${total.toFixed(2)}`);
+    lines.push(`Tax Account: ${taxAccount} — ${taxAccountName || ratePct + '%'}`);
+    lines.push(`Apply Tax: Manually in ShopWorks`);
+  } else {
+    // No rate / no account resolved — flag for rep review.
+    lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    lines.push(`Tax: NEEDS REVIEW`);
+    lines.push(`Rep: Confirm destination + apply correct WA rate before invoicing`);
+  }
+
+  // Each line becomes one row in ShopWorks's Notes On Order tab.
   return lines;
 }
+
+// (buildAccountingNote removed 2026-05-22 — M1 reverted. Tax block now
+// lives inline in buildOrderNote above, where CSR/AR/Production all look.)
 
 // Returns ARRAY of strings; each becomes its own row in ShopWorks's Notes To
 // Production tab (Erik 2026-05-20).
@@ -2913,12 +2996,29 @@ app.post('/api/submit-order-form', async (req, res) => {
       }
     };
 
+    // Pre-warm the sales_tax_accounts_2026 cache so buildOrderNote can do
+    // server-side rate→account resolution if the frontend dropped ship.taxAccount.
+    // Fire-and-forget — note builder handles cache-miss gracefully (falls back
+    // to hardcodes for pickup/OOS, NEEDS REVIEW otherwise).
+    await ensureTaxAccountsCache().catch(() => {});
+
+    // Server-side authoritative resolution: if frontend didn't capture the
+    // GL account (DOR API hiccup, frontend bug), look it up from Caspio by
+    // rate so we never push generic '2200' parent account by mistake.
+    if (!ship.taxAccount && Number(ship.taxRate) > 0) {
+      const lookup = findTaxAccountByRate(Number(ship.taxRate));
+      if (lookup) {
+        ship.taxAccount = lookup.account;
+        ship.taxAccountName = lookup.accountName;
+        console.log(`[submit] tax account auto-resolved by rate ${ship.taxRate} → ${ship.taxAccount}`);
+      }
+    }
+
+    // Notes On Order — primary tab CSR/AR/Production all read. Includes
+    // print locations + full tax block (subtotal/rate/amount/total/account/apply).
+    // M1 (2026-05-21) briefly split tax into Notes To Accounting; reverted
+    // 2026-05-22 because most users scan Notes On Order first.
     pushArray('Notes On Order',     buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId, printLocations }));
-    // Audit fix M1 (2026-05-21): tax-application block now lives on
-    // Notes To Accounting tab instead of Notes On Order — keeps the two
-    // audiences (CSR/Production reading "Notes On Order" vs AR reading
-    // "Notes To Accounting") looking at the right content.
-    pushArray('Notes To Accounting', buildAccountingNote({ info, breakdown, ship }));
     pushArray('Notes To Production', buildProductionNote({ rows, breakdown, methodNotesBlock }));
     pushArray('Notes To Purchasing', buildPurchasingNote({ rows }));
 
