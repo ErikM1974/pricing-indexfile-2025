@@ -1,3 +1,7 @@
+## v2026.05.22.2 (2026.05.22)
+
+- Deploy v2026.05.22.2: 1 files (quote-management.html,...)
+
 ## v2026.05.22.1 (2026.05.22)
 
 - ShipStation: robust shipTo.name+street1 fallback (digit-count heuristic to detect name-vs-street when ShipAddress01/02 ambiguous)
