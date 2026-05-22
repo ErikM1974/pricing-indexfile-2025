@@ -455,7 +455,21 @@
                                           <i class="fas fa-ban"></i> Cancelled (SW)
                                        </span>`;
                 } else if (isProcessed) {
-                    const woNum = quote.ShopWorks_Order_Number ? ` #${quote.ShopWorks_Order_Number}` : '';
+                    // A2 (2026-05-22): the indexed column is the primary source,
+                    // but some rows have a synced snapshot WITHOUT the column
+                    // backfilled (legacy gap — /v1/getorderno never resolved
+                    // their WO# so sync-from-shopworks couldn't write the
+                    // column). Parse the snapshot as a fallback so those rows
+                    // still show "#NNNNN". /full now backfills opportunistically,
+                    // so this branch becomes mostly dormant over time.
+                    let woId = quote.ShopWorks_Order_Number || 0;
+                    if (!woId && quote.ShopWorks_Snapshot) {
+                        try {
+                            const snap = JSON.parse(quote.ShopWorks_Snapshot);
+                            woId = Number(snap?.order?.id_Order) || 0;
+                        } catch (_) { /* malformed snapshot — leave woId at 0 */ }
+                    }
+                    const woNum = woId ? ` #${woId}` : '';
                     statusCellHtml = `<span class="status-badge status-processed" title="Order successfully pushed to ShopWorks${woNum ? ` (WO${woNum})` : ''}. System-managed state — syncs hourly.">
                                           <i class="fas fa-check-circle"></i> In ShopWorks${woNum}
                                        </span>`;

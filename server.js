@@ -2475,6 +2475,13 @@ app.post('/api/submit-order-form', async (req, res) => {
     // Pre-suffixing here would double-stamp it (PC61Y_XS_XS).
     const lineItems = [];
     const skippedLines = [];   // sizes with qty>0 the engine couldn't price — returned to caller
+    // B1 ($0 line guard, Erik 2026-05-22): manual-mode rows with rep-typed
+    // $0 used to push through to MO at price=0, landing in ShopWorks as a
+    // $0 line + $0 subtotal (e.g. WO 141918 / OF-0050). Block at submit
+    // time instead. Fee/service add-ons are built in a separate loop below
+    // and can legitimately be $0 (e.g. included service) — those are
+    // unaffected.
+    const zeroPriceLines = [];
     rows.forEach(r => {
       if (!r || (!r.style && !r.desc && !r.sizes)) return;
       const partBase = (r.style || 'MISC').trim();
@@ -2518,6 +2525,19 @@ app.post('/api/submit-order-form', async (req, res) => {
           console.warn('[Order Form Submit] Skipping unpriced line:', partBase, sz, 'qty=' + qty);
           return;
         }
+        // B1: hard-block garment lines that ended up at $0 after price
+        // resolution (manual override with empty/0 price, or unsupported
+        // pricing method with no fallback). Pushing $0 produces invisible
+        // garbage in ShopWorks — rep should fix the row, not paper over it.
+        if (!(price > 0)) {
+          zeroPriceLines.push({
+            style: partBase,
+            color: color,
+            size: sz,
+            quantity: qty,
+          });
+          return;
+        }
         // Send the BASE part number + plain size. ShopWorks's Size Translation
         // Table appends the per-size modifier (`_XS`, `_2X`, `_3XL`, etc.) on
         // ingest. Pre-suffixing here would double-stamp it (PC61Y_XS_XS).
@@ -2548,6 +2568,22 @@ app.post('/api/submit-order-form', async (req, res) => {
         });
       });
     });
+
+    // B1 reject: any garment line that collapsed to $0 above blocks the
+    // whole submit. Rep sees the offending row(s) and fixes the price.
+    if (zeroPriceLines.length > 0) {
+      const summary = zeroPriceLines
+        .map(z => `${z.style}${z.color ? ` (${z.color})` : ''} ${z.size} × ${z.quantity}`)
+        .join('; ');
+      const plural = zeroPriceLines.length === 1;
+      console.warn('[Order Form Submit] Rejecting submit — $0 line(s):', summary);
+      return res.status(400).json({
+        success: false,
+        error: '$0 line item',
+        details: `${plural ? 'Line' : 'Lines'} ${summary} ${plural ? 'has' : 'have'} no price. Set a price on the row before submitting.`,
+        zeroPriceLines,
+      });
+    }
 
     // --- Add-on fees (Phase 2a 2026-05-03) ---
     // Server-side companion to window.OrderFormServiceCodes (frontend client).
@@ -2697,6 +2733,23 @@ app.post('/api/submit-order-form', async (req, res) => {
       });
     }
 
+    // C2 (Erik 2026-05-22): the prior `designTypeId: DESIGN_TYPE_ID[method] || 3`
+    // silently fell to design type 3 ("standard" — doesn't exist in ShopWorks's
+    // design taxonomy) when method was missing or unrecognized. Result: orders
+    // landed in SW with a bogus type and the quote-view rendered "Type: Unknown"
+    // on the Designs panel (e.g. OF-0050). Reject at submit time so reps fix
+    // the row's method before the order ships off to MO.
+    const primaryMethod = methodsUsed[0] || decoConfig?.method || '';
+    if (primaryMethod && !DESIGN_TYPE_ID[primaryMethod]) {
+      console.warn('[Order Form Submit] Unmapped method blocked:', primaryMethod, 'for', extOrderId);
+      return res.status(400).json({
+        success: false,
+        error: 'Unsupported decoration method',
+        details: `Method "${primaryMethod}" isn't recognized. Pick one of: ${Object.keys(DESIGN_TYPE_ID).join(', ')}.`,
+        method: primaryMethod,
+      });
+    }
+
     // Design # → id_Design resolution.
     //
     // CASPIO TABLE INSIGHT (Erik confirmed 2026-05-02): the
@@ -2782,7 +2835,10 @@ app.post('/api/submit-order-form', async (req, res) => {
             .map(r => r.catalogColor || r.colorName || r.color)
             .filter(Boolean)
         )].join(', '),
-        designTypeId: DESIGN_TYPE_ID[method] || 3,
+        // C2 (2026-05-22): no `|| 3` fallback — methodsUsed has been validated
+        // against DESIGN_TYPE_ID at the guard above, so this lookup always
+        // resolves to a real ShopWorks design type ID.
+        designTypeId: DESIGN_TYPE_ID[method],
         locations: [...primaryLocations, ...addonLocations],
       };
       // Attach known id_Design references per CLAUDE.md MANAGEORDERS pattern.
@@ -4820,8 +4876,22 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
     if (session.ShopWorks_Snapshot) {
       try {
         const snapshot = JSON.parse(session.ShopWorks_Snapshot);
+        // A1 backfill (Erik 2026-05-22): if the snapshot knows the WO# but
+        // the indexed column is empty, persist it so the dashboard list view
+        // (which only reads `ShopWorks_Order_Number`, not the snapshot JSON)
+        // shows the # suffix on the "IN SHOPWORKS" badge. /v1/getorderno is
+        // broken upstream → some quotes had the snapshot synced (via manual
+        // WO# entry on /quote/:id) but the column was never written back. This
+        // closes the gap opportunistically — next dashboard load catches up.
+        const snapshotWo = Number(snapshot?.order?.id_Order) || 0;
+        const columnWo   = Number(session.ShopWorks_Order_Number) || 0;
+        if (snapshotWo > 0 && columnWo === 0) {
+          makeApiRequest(`/quote_sessions/${session.PK_ID}`, 'PUT', {
+            ShopWorks_Order_Number: snapshotWo,
+          }).catch(e => console.warn(`[quote/full] WO# backfill failed for ${safeQuoteId}:`, e.message));
+        }
         shopWorks = {
-          orderNumber: session.ShopWorks_Order_Number,
+          orderNumber: session.ShopWorks_Order_Number || snapshotWo || null,
           status: session.ShopWorks_Status,
           lastSynced: session.ShopWorks_Last_Synced,
           snapshot, // { order, lineItems, fetchedAt }

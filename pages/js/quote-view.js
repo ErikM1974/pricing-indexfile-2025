@@ -27,7 +27,8 @@ class QuoteViewPage {
             'CAP': 'Cap Embroidery',
             'LT': 'Laser Tumblers',
             'PATCH': 'Embroidered Emblems',
-            'STK': 'Die-Cut Stickers & Vinyl Banners'
+            'STK': 'Die-Cut Stickers & Vinyl Banners',
+            'OF':  'Order Form'  // A4 (2026-05-22): OF-NNNN was falling through to "Custom Quote"
         };
 
         // DTF Location configuration
@@ -2406,6 +2407,15 @@ class QuoteViewPage {
             this._overrideField('order-number', String(order.id_Order));
             const row = document.getElementById('order-number-row');
             if (row) row.style.display = 'flex';
+
+            // A3 (2026-05-22): also append the WO# inline to the hero header
+            // so the first thing on the page reads "Quote #OF-0050 · WO #141918".
+            // The WO# is already shown in the sync pill and the Quote Details
+            // row below, but reps glance at the hero first.
+            const heroEl = document.getElementById('quote-id-header');
+            if (heroEl && !heroEl.textContent.includes('WO #')) {
+                heroEl.textContent = `${heroEl.textContent} · WO #${order.id_Order}`;
+            }
         }
 
         // Sales rep — ShopWorks CustomerServiceRep
@@ -2463,6 +2473,162 @@ class QuoteViewPage {
 
         // Phase 4d+ — Stale-data warning if last sync > 24 hrs ago
         this._renderStaleSyncWarning();
+
+        // B2 (2026-05-22) — flag $0 line items in the SW snapshot so reps
+        // catch billing-blocker pushes (e.g. WO 141918 / OF-0050) before AR
+        // tries to invoice an empty order.
+        this._renderZeroPriceWarning(lineItems);
+
+        // D1 (Erik 2026-05-22): once a SW snapshot is present, overlay the
+        // prominent quote-view top totals + per-line Unit/Total cells so
+        // they mirror ShopWorks (matches the invoice page's behavior at
+        // pages/js/invoice.js:765 — `fromOrder` fallback chain). Aligns
+        // with the "SW is source of truth post-import" principle.
+        this._overlayQuoteFromShopWorks(order, lineItems);
+    }
+
+    _overlayQuoteFromShopWorks(order, lineItems) {
+        if (!order) return;
+        const fmt = (n) => {
+            const v = Number(n);
+            if (!Number.isFinite(v)) return '$0.00';
+            return '$' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        };
+
+        // 1. Overlay the totals card. Only swap a row when the
+        // corresponding cur_* field is a finite number (null/undefined
+        // means SW didn't populate it — leave the quote-driven value).
+        const totalsCard = document.querySelector('.totals-card');
+        if (totalsCard) {
+            const fieldByLabel = {
+                subtotal: order.cur_SubTotal,
+                shipping: order.cur_Shipping,
+                tax:      order.cur_SalesTaxTotal,
+                total:    order.cur_TotalInvoice,
+            };
+            totalsCard.querySelectorAll('.total-row').forEach(row => {
+                const label = row.querySelector('.label')?.textContent?.toLowerCase() || '';
+                const valEl = row.querySelector('.value');
+                if (!valEl) return;
+                let swVal = null;
+                if (row.classList.contains('grand-total')) {
+                    swVal = fieldByLabel.total;
+                } else if (label.includes('subtotal')) {
+                    swVal = fieldByLabel.subtotal;
+                } else if (label.includes('shipping')) {
+                    swVal = fieldByLabel.shipping;
+                } else if (label.includes('tax')) {
+                    swVal = fieldByLabel.tax;
+                }
+                if (Number.isFinite(Number(swVal))) {
+                    valEl.textContent = fmt(swVal);
+                    valEl.classList.add('sw-mirrored');
+                }
+            });
+        }
+
+        // 2. Overlay per-line Unit + Total cells in the product table.
+        // Match SW lineItems to rendered rows by PartNumber + PartColor.
+        // Color matching: exact first, then case-insensitive, then by
+        // PartNumber alone when only one SW line exists for that style.
+        if (!Array.isArray(lineItems) || lineItems.length === 0) return;
+        const normalize = (s) => String(s || '').trim().toLowerCase().replace(/[\s\-_/]/g, '');
+        const linesByStyle = new Map();
+        lineItems.forEach(li => {
+            const pn = String(li.PartNumber || '').trim().toUpperCase();
+            if (!pn) return;
+            if (!linesByStyle.has(pn)) linesByStyle.set(pn, []);
+            linesByStyle.get(pn).push(li);
+        });
+
+        document.querySelectorAll('tr.first-row').forEach(tr => {
+            const styleText = tr.querySelector('.style-col')?.textContent?.trim() || '';
+            const colorText = tr.querySelector('.color-col')?.textContent?.trim() || '';
+            const styleMatch = styleText.match(/^([A-Z0-9_-]+)/i);
+            if (!styleMatch) return;
+            const style = styleMatch[1].toUpperCase();
+            const candidates = linesByStyle.get(style);
+            if (!candidates || candidates.length === 0) return;
+
+            // Pick matching SW lines for this row's color.
+            let matches = candidates.filter(li => normalize(li.PartColor) === normalize(colorText));
+            if (matches.length === 0 && candidates.length === 1) {
+                // Single SW line for this style — accept it even with color mismatch
+                // (CATALOG_COLOR like "Athletic Hthr" vs display "Athletic Heather").
+                matches = candidates;
+            }
+            if (matches.length === 0) return;
+
+            // Aggregate: sum qty × price across matching SW lines, then
+            // compute a weighted-avg unit price. For OF-0050 (single line)
+            // this collapses to just LineUnitPrice and LineQuantity.
+            let totalQty = 0;
+            let totalValue = 0;
+            matches.forEach(li => {
+                const q = Number(li.LineQuantity) || 0;
+                const p = Number(li.LineUnitPrice) || 0;
+                totalQty += q;
+                totalValue += q * p;
+            });
+            const avgUnit = totalQty > 0 ? (totalValue / totalQty) : 0;
+            const priceEl = tr.querySelector('.price-col');
+            const totalEl = tr.querySelector('.total-col');
+            if (priceEl) { priceEl.textContent = fmt(avgUnit); priceEl.classList.add('sw-mirrored'); }
+            if (totalEl) { totalEl.textContent = fmt(totalValue); totalEl.classList.add('sw-mirrored'); }
+        });
+    }
+
+    _renderZeroPriceWarning(lineItems) {
+        // Mount a yellow banner under the ShopWorks sync strip when one or
+        // more non-fee lines have LineUnitPrice=0 + LineQuantity>0 in the
+        // snapshot. Fees / services / discounts can legitimately be $0 —
+        // heuristic: skip lines whose PartNumber is in a known fee/service set.
+        //
+        // MO field names (not what you'd expect):
+        //   • LineUnitPrice — the per-unit price (null when $0)
+        //   • LineQuantity  — total line quantity (sum of Size01..Size06)
+        const FEE_CODES = new Set([
+            'DD', 'GRT-50', '3D-EMB', 'AL', 'AL-CAP', 'DECG-FB',
+            'CTR-Garmt', 'CTR-Cap', 'RUSH', 'TAX', 'SHIP', 'DISCOUNT',
+            'ART', 'PATCH', 'CDP', 'FREIGHT', 'PALLET',
+        ]);
+        const existing = document.getElementById('sw-zero-price-warning');
+        if (existing) existing.remove();
+
+        const zeroLines = (lineItems || []).filter(li => {
+            const price = Number(li?.LineUnitPrice);
+            const qty   = Number(li?.LineQuantity);
+            if (!(qty > 0)) return false;
+            if (price > 0) return false;
+            const pn = String(li?.PartNumber || '').trim().toUpperCase();
+            if (!pn || FEE_CODES.has(pn)) return false;
+            return true;
+        });
+        if (zeroLines.length === 0) return;
+
+        const items = zeroLines.map(li => {
+            const pn = li?.PartNumber || '?';
+            const color = li?.PartColor || li?.Color || '';
+            const qty = Number(li?.LineQuantity) || 0;
+            return `${pn}${color ? ` (${color})` : ''} × ${qty}`;
+        }).join(' · ');
+
+        const banner = document.createElement('div');
+        banner.id = 'sw-zero-price-warning';
+        banner.className = 'sw-zero-price-warning';
+        banner.style.cssText = 'margin:8px 0;padding:10px 14px;border:1px solid #f59e0b;background:#fffbeb;color:#92400e;border-radius:6px;font-size:14px;line-height:1.4;';
+        banner.innerHTML = `
+            <strong>⚠ ShopWorks shows $0 on ${zeroLines.length} line${zeroLines.length === 1 ? '' : 's'}</strong> —
+            verify before invoicing.<br>
+            <span style="font-size:13px;opacity:0.85;">${this.escapeHtml(items)}</span>
+        `;
+
+        // Insert directly after the sync strip so it sits in the same
+        // "ShopWorks-state cluster" near the top of the quote.
+        const syncStrip = document.getElementById('sw-sync-strip');
+        if (syncStrip && syncStrip.parentNode) {
+            syncStrip.parentNode.insertBefore(banner, syncStrip.nextSibling);
+        }
     }
 
     _renderPaymentsList(payments) {
@@ -2891,7 +3057,8 @@ class QuoteViewPage {
                     ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
                     : 1;
                 const locationsNames = submittedPrintLocs || 'Left Chest';
-                const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType);
+                const methodFallback = this.fullData?.originalSubmission?.decoConfig?.method;
+                const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType, methodFallback);
                 tbody.innerHTML = `
                     <tr>
                         <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
@@ -2909,7 +3076,10 @@ class QuoteViewPage {
                     const locs = d?.Locations || [];
                     const locationsCount = locs.length || 1;
                     const locationsNames = locs.map(L => L.Location).filter(Boolean).join(' + ') || '(unspecified)';
-                    const designTypeLabel = this._resolveDesignTypeName(d?.id_DesignType || order.id_DesignType);
+                    const designTypeLabel = this._resolveDesignTypeName(
+                        d?.id_DesignType || order.id_DesignType,
+                        this.fullData?.originalSubmission?.decoConfig?.method
+                    );
                     // First design uses the order's id_Design; additional ones use ExtDesignID or "—"
                     const dispId = (i === 0 && idDesign) ? idDesign : (d?.id_Design || d?.ExtDesignID || '—');
                     const dispName = d?.DesignName || order.DesignName || '(no name)';
@@ -2983,7 +3153,7 @@ class QuoteViewPage {
         }
     }
 
-    _resolveDesignTypeName(idDesignType) {
+    _resolveDesignTypeName(idDesignType, methodFallback = null) {
         // ShopWorks design type IDs per Erik's "design type translation.csv":
         //   1 = Screenprint, 2 = Embroidery, 4 = Sticker, 5 = Emblem,
         //   8 = DTF Transfer, 45 = DTG
@@ -2995,7 +3165,25 @@ class QuoteViewPage {
             8: 'DTF Transfer',
             45: 'DTG',
         };
-        return TYPE_NAMES[Number(idDesignType)] || (idDesignType ? `Type ${idDesignType}` : 'Unknown');
+        const direct = TYPE_NAMES[Number(idDesignType)];
+        if (direct) return direct;
+
+        // C1 (2026-05-22): when SW snapshot doesn't carry id_DesignType (rare —
+        // happens for OF-* quotes where MO didn't surface the field on either
+        // the design or the order header), fall back to the originalSubmission's
+        // decoConfig.method. Mirrors the DESIGN_TYPE_ID map in server.js:2697.
+        const METHOD_TO_NAME = {
+            embroidery: 'Embroidery',
+            screenprint: 'Screenprint',
+            dtg: 'DTG',
+            dtf: 'DTF Transfer',
+            sticker: 'Sticker',
+            emblem: 'Emblem',
+        };
+        const m = String(methodFallback || '').toLowerCase();
+        if (METHOD_TO_NAME[m]) return METHOD_TO_NAME[m];
+
+        return idDesignType ? `Type ${idDesignType}` : 'Unknown';
     }
 
     // ====================================================================
