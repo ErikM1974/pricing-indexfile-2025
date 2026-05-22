@@ -4798,6 +4798,38 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
         console.log(`[sync-from-shopworks] ⊘ SOFT DELETED ${safeQuoteId} (was SW#${session.ShopWorks_Order_Number || '?'}) — 30d retention`);
         notifyQuoteDeleted(safeQuoteId, session.ShopWorks_Order_Number, session.CustomerName);
 
+        // SW → SS cascade (Erik 2026-05-22): when SW operator deletes the
+        // order, also delete the matching ShipStation order so warehouse
+        // doesn't pick/label a phantom shipment. SKIP if already shipped —
+        // label is bought + paid, can't undo without explicit void action.
+        // Fire-and-forget — cascade failure shouldn't block the SW-side
+        // soft-delete (the quote_sessions row is already cancelled; a
+        // stranded SS order is a smaller problem than a stuck cascade).
+        if (session.ShipStation_Order_ID && session.ShipStation_Status !== 'shipped') {
+          (async () => {
+            try {
+              const delUrl = `${SYNC_PROXY_BASE}/api/shipstation/orders/${encodeURIComponent(session.ShipStation_Order_ID)}?reason=${encodeURIComponent('SW order deleted (cascade)')}`;
+              const r = await fetch(delUrl, { method: 'DELETE' });
+              if (r.ok) {
+                console.log(`[sync-from-shopworks] ⊘ SS-cascade: deleted ShipStation #${session.ShipStation_Order_ID} for ${safeQuoteId}`);
+                // Also clear our local ShipStation columns so the dashboard
+                // doesn't keep showing "In ShipStation #N" on a deleted order.
+                await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
+                  ShipStation_Status: 'cancelled',
+                  ShipStation_Last_Synced: nowIso,
+                }).catch(() => { /* non-fatal — row already in audit-retention state */ });
+              } else {
+                console.warn(`[sync-from-shopworks] SS-cascade DELETE failed: HTTP ${r.status}`);
+              }
+            } catch (e) {
+              console.warn(`[sync-from-shopworks] SS-cascade error (non-fatal):`, e.message);
+            }
+          })();
+        } else if (session.ShipStation_Order_ID && session.ShipStation_Status === 'shipped') {
+          // Already shipped — can't undo. Just log so it shows up in oncall review.
+          console.warn(`[sync-from-shopworks] ⚠ SW deleted ${safeQuoteId} but SS already shipped (#${session.ShipStation_Order_ID}, tracking=${session.TrackingNumber || '?'}). Manual customer contact needed.`);
+        }
+
         return res.json({
           success: true,
           synced: true,
@@ -5771,6 +5803,140 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
   } catch (error) {
     console.error('[bulk-sync] unexpected error:', error);
     res.status(500).json({ success: false, error: 'Bulk sync failed', details: error.message });
+  }
+});
+
+/**
+ * POST /api/quote-sessions/bulk-sync-shipstation-tracking
+ *
+ * Fallback safety net — called hourly by the proxy's
+ * sync-shipstation-tracking.js cron. The primary tracking-write path is the
+ * SHIP_NOTIFY webhook (proxy → /api/quote-sessions/:id/shipstation-tracking).
+ * This catches the case where the webhook failed to deliver.
+ *
+ * Algorithm:
+ *   1. Pull quote_sessions WHERE ShipStation_Order_ID IS NOT NULL AND
+ *      ShipStation_Status != 'shipped' (in SS, not yet labeled per our state)
+ *   2. For each: GET proxy /api/shipstation/shipments?orderId={ssId}
+ *   3. If a non-voided shipment exists with tracking# → write to Caspio via
+ *      the same /shipstation-tracking endpoint the webhook uses
+ *   4. Throttle 1s between requests (ShipStation rate-limits at ~40/min)
+ *   5. Returns aggregate stats
+ *
+ * Body: { daysBack?, dryRun? }
+ */
+app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) => {
+  const startedAt = Date.now();
+  try {
+    const daysBack = Math.min(Math.max(Number(req.body?.daysBack) || 30, 1), 90);
+    const dryRun = req.body?.dryRun === true || req.query?.dryRun === '1';
+
+    // 1. Pull candidates from Caspio. Filter syntax: ShipStation_Order_ID
+    // is a Number column, so > 0 ensures it's set (NOT NULL would also work
+    // but Caspio's WHERE accepts > 0).
+    let sessions;
+    try {
+      sessions = await makeApiRequest(
+        `/quote_sessions?q.where=${encodeURIComponent("ShipStation_Order_ID > 0 AND (ShipStation_Status IS NULL OR ShipStation_Status <> 'shipped')")}&q.pageSize=500`
+      );
+    } catch (e) {
+      return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
+    }
+    if (!Array.isArray(sessions)) sessions = [];
+
+    // Filter to last N days (don't poll ancient orders forever).
+    // Also defensive client-side check on ShipStation_Order_ID and status —
+    // Caspio's WHERE with `> 0 AND ... <> 'shipped'` doesn't always exclude
+    // null cleanly via the proxy path. Belt-and-suspenders here.
+    const sinceMs = Date.now() - daysBack * 24 * 60 * 60 * 1000;
+    const candidates = sessions.filter(s => {
+      if (!(Number(s.ShipStation_Order_ID) > 0)) return false;
+      if (s.ShipStation_Status === 'shipped') return false;
+      const created = s.CreatedAt_Quote || s.CreatedAt;
+      if (!created) return true;
+      const t = Date.parse(created);
+      return !Number.isFinite(t) || t >= sinceMs;
+    });
+
+    if (dryRun) {
+      return res.json({
+        success: true,
+        dryRun: true,
+        candidateCount: candidates.length,
+        candidates: candidates.slice(0, 20).map(s => ({
+          quoteId: s.QuoteID,
+          shipstationOrderId: s.ShipStation_Order_ID,
+          customer: s.CustomerName,
+          status: s.ShipStation_Status,
+        })),
+      });
+    }
+
+    // 2-3. For each candidate, ask proxy for shipments. If shipped, write.
+    const SYNC_PROXY_BASE_LOCAL = process.env.CASPIO_PROXY_BASE_URL
+      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const stats = { checked: 0, newlyShipped: 0, stillPending: 0, voided: 0, errors: 0, errorDetails: [] };
+
+    for (const s of candidates) {
+      stats.checked++;
+      try {
+        const shipmentsUrl = `${SYNC_PROXY_BASE_LOCAL}/api/shipstation/shipments?orderId=${encodeURIComponent(s.ShipStation_Order_ID)}`;
+        const r = await fetch(shipmentsUrl);
+        if (!r.ok) throw new Error(`proxy returned ${r.status}`);
+        const data = await r.json();
+        const shipments = (data?.shipments || []).filter(ship => !ship.voided);
+        const voidedAll = (data?.shipments || []).length > 0 && shipments.length === 0;
+        if (voidedAll) {
+          stats.voided++;
+          continue;
+        }
+        const ship = shipments[0];
+        if (!ship || !ship.trackingNumber) {
+          stats.stillPending++;
+          continue;
+        }
+        // Reuse the webhook's write path so the field-mapping logic is in one place.
+        const writeUrl = `http://localhost:${process.env.PORT || 3000}/api/quote-sessions/${encodeURIComponent(s.QuoteID)}/shipstation-tracking`;
+        const trackingUrl = (function () {
+          // Mirror the proxy's buildTrackingUrl — keep them in sync if you add carriers.
+          const map = {
+            ups:        `https://www.ups.com/track?tracknum=${encodeURIComponent(ship.trackingNumber)}`,
+            stamps_com: `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(ship.trackingNumber)}`,
+            usps:       `https://tools.usps.com/go/TrackConfirmAction?tLabels=${encodeURIComponent(ship.trackingNumber)}`,
+            fedex:      `https://www.fedex.com/fedextrack/?trknbr=${encodeURIComponent(ship.trackingNumber)}`,
+          };
+          return map[String(ship.carrierCode || '').toLowerCase()] || '';
+        })();
+        const wr = await fetch(writeUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            trackingNumber:   ship.trackingNumber,
+            trackingCarrier:  ship.carrierCode,
+            trackingUrl,
+            shippedAt:        ship.shipDate || new Date().toISOString(),
+            labelCost:        ship.shipmentCost,
+            shipstationOrderId: s.ShipStation_Order_ID,
+            shipstationStatus: 'shipped',
+          }),
+        });
+        if (!wr.ok) throw new Error(`tracking write returned ${wr.status}`);
+        stats.newlyShipped++;
+        console.log(`[bulk-sync-ss-tracking] ${s.QuoteID} SS#${s.ShipStation_Order_ID} → ${ship.trackingNumber} (${ship.carrierCode}) — webhook had missed`);
+      } catch (e) {
+        stats.errors++;
+        stats.errorDetails.push({ quoteId: s.QuoteID, error: e.message });
+      }
+      // Throttle — ShipStation rate-limits at ~40 req/min for /shipments.
+      await new Promise(r => setTimeout(r, 1000));
+    }
+
+    const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
+    console.log(`[bulk-sync-ss-tracking] checked=${stats.checked} newlyShipped=${stats.newlyShipped} still=${stats.stillPending} voided=${stats.voided} errors=${stats.errors} (${elapsedSec}s)`);
+    res.json({ success: true, ...stats, elapsedSec, candidateCount: candidates.length });
+  } catch (error) {
+    console.error('[bulk-sync-ss-tracking] unexpected error:', error);
+    res.status(500).json({ success: false, error: 'Bulk SS tracking sync failed', details: error.message });
   }
 });
 
