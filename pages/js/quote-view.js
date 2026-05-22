@@ -2485,6 +2485,92 @@ class QuoteViewPage {
         // pages/js/invoice.js:765 — `fromOrder` fallback chain). Aligns
         // with the "SW is source of truth post-import" principle.
         this._overlayQuoteFromShopWorks(order, lineItems);
+
+        // B (2026-05-22): refresh the ShipStation button now that we know
+        // the order's production state + ship method from the snapshot.
+        this._updateShipStationButton(order, snapshot);
+    }
+
+    _updateShipStationButton(order, snapshot) {
+        const btn = document.getElementById('sw-action-shipstation');
+        if (!btn) return;
+
+        // Staff-only — customers viewing share links don't see this internal
+        // ops button (same staff-check pattern as the rest of the page).
+        if (!this.isStaff) { btn.style.display = 'none'; return; }
+
+        const ss = this.fullData?.shipStation;
+        const pushedShip = (this.fullData?.shopWorks?.snapshot?.pushed?.ShippingAddresses || [])[0];
+        const method = (pushedShip?.ShipMethod || this.fullData?.originalSubmission?.ship?.method || '').toString();
+        const methodLower = method.toLowerCase();
+
+        // Hide for pickup — no label needed
+        if (methodLower.includes('pickup') || methodLower.includes('willcall')) {
+            btn.style.display = 'none';
+            return;
+        }
+        if (!order) { btn.style.display = 'none'; return; }
+
+        const isShipped = ss && ss.status === 'shipped' && ss.trackingNumber;
+        const isInShipStation = ss && ss.orderId;
+        const swProduced = Number(order?.sts_Produced);
+
+        // Production-complete gate — see invoice.js for the rationale.
+        if (!isShipped && !isInShipStation && swProduced !== 1) {
+            btn.style.display = 'inline-flex';
+            btn.disabled = true;
+            btn.innerHTML = '<span class="sw-action-icon">🕐</span> Waiting for production';
+            btn.title = `Order isn't decorated yet (sts_Produced=${order?.sts_Produced ?? 'unknown'}). Enables when production marks complete.`;
+            return;
+        }
+        btn.style.display = 'inline-flex';
+        if (isShipped) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="sw-action-icon">📦</span> Shipped · ${this.escapeHtml(ss.trackingNumber)}`;
+            btn.title = `Carrier: ${ss.trackingCarrier || 'unknown'}`;
+            return;
+        }
+        if (isInShipStation) {
+            btn.disabled = true;
+            btn.innerHTML = `<span class="sw-action-icon">✓</span> In ShipStation #${this.escapeHtml(String(ss.orderId))}`;
+            btn.title = 'Already pushed. Warehouse buys the label in ShipStation UI.';
+            return;
+        }
+        // Default: production done, not yet sent → enable
+        btn.disabled = false;
+        btn.innerHTML = '<span class="sw-action-icon">🚢</span> Send to ShipStation';
+        btn.title = 'Push this order to ShipStation. Warehouse will rate + buy the label there.';
+    }
+
+    async _sendToShipStation() {
+        const btn = document.getElementById('sw-action-shipstation');
+        if (!btn || btn.disabled) return;
+        if (!confirm('Send this order to ShipStation? Warehouse will rate + buy the label there.')) return;
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="sw-action-icon">⏳</span> Sending…';
+        try {
+            const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/send-to-shipstation`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+            const result = await resp.json().catch(() => ({}));
+            if (!resp.ok || !result.success) {
+                throw new Error(result.error || `HTTP ${resp.status}`);
+            }
+            // Refresh /full so the new ShipStation_Order_ID + status are reflected
+            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/full`);
+            if (r.ok) this.fullData = await r.json();
+            this._updateShipStationButton(
+                this.fullData?.shopWorks?.snapshot?.order,
+                this.fullData?.shopWorks?.snapshot
+            );
+        } catch (err) {
+            console.error('[quote-view] sendToShipStation failed:', err);
+            alert(`Failed to send to ShipStation: ${err.message}`);
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
     }
 
     _overlayQuoteFromShopWorks(order, lineItems) {
@@ -2849,6 +2935,14 @@ class QuoteViewPage {
         const printBtn = document.getElementById('sw-action-print');
         const copyBtn = document.getElementById('sw-action-copy-link');
         const emailBtn = document.getElementById('sw-action-email');
+        const ssBtn = document.getElementById('sw-action-shipstation');
+
+        // B (2026-05-22): wire ShipStation button. Visibility decided by
+        // _updateShipStationButton() — runs from applyShopWorksOverlay once
+        // snapshot lands. Staff-only (gated on this.isStaff).
+        if (ssBtn) {
+            ssBtn.addEventListener('click', () => this._sendToShipStation());
+        }
 
         if (printBtn) {
             printBtn.addEventListener('click', () => window.print());

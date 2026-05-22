@@ -142,7 +142,17 @@
         this.render();
         this.wireToolbar();
         $('loading').style.display = 'none';
-        $('toolbar').style.display = 'flex';
+        // Staff gate (Erik 2026-05-22): the toolbar holds internal-ops buttons
+        // (Refresh from ShopWorks, Send to ShipStation). Customers landing on
+        // /invoice/X via a share link should see a clean invoice only — they
+        // can still Ctrl+P natively. Staff identified by ?staff=true URL flag
+        // OR nwca_user_email sessionStorage (set by staff-dashboard login).
+        const isStaff = new URLSearchParams(window.location.search).get('staff') === 'true'
+          || !!sessionStorage.getItem('nwca_user_email')
+          || !!sessionStorage.getItem('nwca_user_name');
+        if (isStaff) {
+          $('toolbar').style.display = 'flex';
+        }
         $('invoice').style.display = 'block';
         document.title = `Invoice ${this.headerOrderNumber()} - Northwest Custom Apparel`;
         // Auto-sync if stale (and we have a Processed quote)
@@ -890,6 +900,25 @@
       // Hide until we have a ShopWorks snapshot (pre-import — no items to push yet)
       if (!order && !data.originalSubmission) {
         btn.style.display = 'none';
+        return;
+      }
+
+      // Production-complete gate (Erik 2026-05-22): SW sts_Produced=1 means
+      // the order has been decorated. Before that, shipping is premature —
+      // blanks may not even be at NWCA (sts_Received=0). Skip when terminal
+      // state (already shipped or already in ShipStation) so those displays
+      // still work — once you're past the gate, you're past it.
+      const isShipped = ss && ss.status === 'shipped' && ss.trackingNumber;
+      const isInShipStation = ss && ss.orderId;
+      const swProduced = Number(order?.sts_Produced);
+      if (!isShipped && !isInShipStation && swProduced !== 1) {
+        btn.style.display = 'inline-flex';
+        btn.disabled = true;
+        btn.innerHTML = '🕐 Waiting for production';
+        btn.title = `Order isn't decorated yet in ShopWorks (sts_Produced=${order?.sts_Produced ?? 'unknown'}). This button enables once production marks the order complete.`;
+        btn.style.background = '#f3f4f6';
+        btn.style.color = '#9ca3af';
+        btn.style.borderColor = '#e5e7eb';
         return;
       }
 
