@@ -352,6 +352,118 @@
             return parseFloat(quote.TotalAmount) || 0;
         }
 
+        // D (Erik 2026-05-22): per-row ShipStation state for the dashboard
+        // queue view. Returns one of: 'hidden', 'waiting', 'ready', 'sent',
+        // 'shipped'. Production coordinator scans the dashboard, sees at a
+        // glance which orders are ready to ship and clicks the 🚢 button
+        // (or sees tracking# if already shipped).
+        //
+        // States:
+        //   'hidden'  — not Processed, no snapshot, OR pickup (no label needed)
+        //   'waiting' — Processed + snapshot exists, but sts_Produced != 1
+        //   'ready'   — sts_Produced == 1, no ShipStation_Order_ID yet
+        //   'sent'    — ShipStation_Order_ID is set (awaiting label buy)
+        //   'shipped' — TrackingNumber is set (label bought)
+        function getShipStationState(quote) {
+            if (quote.Status !== 'Processed') return { state: 'hidden' };
+            if (!quote.ShopWorks_Snapshot)     return { state: 'hidden' };
+            let snap;
+            try { snap = JSON.parse(quote.ShopWorks_Snapshot); }
+            catch (_) { return { state: 'hidden' }; }
+            const order = snap?.order || {};
+
+            // Detect pickup. Source priority:
+            //   1. quote.ShipMethod column (when populated — newer submits)
+            //   2. snapshot.pushed.ShippingAddresses[0].ShipMethod (post-MO sync)
+            //   3. originalSubmission.ship.method (from Notes JSON — always present)
+            const pushedShip = (snap?.pushed?.ShippingAddresses || [])[0];
+            let method = String(quote.ShipMethod || pushedShip?.ShipMethod || '').toLowerCase();
+            if (!method && quote.Notes) {
+                try {
+                    const notes = JSON.parse(quote.Notes);
+                    method = String(notes?.ship?.method || '').toLowerCase();
+                } catch (_) { /* ignore malformed Notes */ }
+            }
+            if (method.includes('pickup') || method.includes('willcall')) {
+                return { state: 'hidden' };
+            }
+            if (quote.TrackingNumber) {
+                return {
+                    state: 'shipped',
+                    trackingNumber: quote.TrackingNumber,
+                    trackingUrl: quote.TrackingURL,
+                    carrier: quote.TrackingCarrier,
+                };
+            }
+            if (quote.ShipStation_Order_ID) {
+                return { state: 'sent', shipstationId: quote.ShipStation_Order_ID };
+            }
+            const swProduced = Number(order?.sts_Produced);
+            if (swProduced !== 1) {
+                return { state: 'waiting', stsProduced: order?.sts_Produced };
+            }
+            return { state: 'ready' };
+        }
+
+        function renderShipStationButton(quote) {
+            const s = getShipStationState(quote);
+            if (s.state === 'hidden') return '';
+            if (s.state === 'waiting') {
+                return `<button class="action-btn" disabled
+                                onclick="event.stopPropagation();"
+                                style="opacity:0.4;cursor:not-allowed;"
+                                title="Waiting for production (sts_Produced=${s.stsProduced ?? 'unknown'}). Enables once SW marks decoration complete.">
+                            <span style="font-size:14px;">🕐</span>
+                        </button>`;
+            }
+            if (s.state === 'sent') {
+                return `<button class="action-btn" disabled
+                                onclick="event.stopPropagation();"
+                                style="opacity:0.6;cursor:not-allowed;background:#f3f4f6;"
+                                title="In ShipStation #${s.shipstationId}. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.">
+                            <span style="font-size:14px;">✓</span>
+                        </button>`;
+            }
+            if (s.state === 'shipped') {
+                const url = s.trackingUrl || '#';
+                return `<a class="action-btn" href="${url}" target="_blank" rel="noopener"
+                           onclick="event.stopPropagation();"
+                           style="text-decoration:none;color:#166534;background:#dcfce7;"
+                           title="Shipped via ${s.carrier || 'carrier'} · Tracking: ${s.trackingNumber}">
+                            <span style="font-size:14px;">📦</span>
+                        </a>`;
+            }
+            // ready
+            return `<button class="action-btn"
+                            onclick="event.stopPropagation(); sendToShipStation('${quote.QuoteID}', ${quote.PK_ID})"
+                            style="color:#0369a1;"
+                            title="Send to ShipStation. Warehouse will rate + buy the label there.">
+                        <span style="font-size:14px;">🚢</span>
+                    </button>`;
+        }
+
+        // Click handler — POST to send-to-shipstation, then refresh
+        async function sendToShipStation(quoteId, pkId) {
+            if (!confirm(`Send ${quoteId} to ShipStation? Warehouse will rate + buy the label there.`)) return;
+            try {
+                const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/send-to-shipstation`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                const result = await resp.json().catch(() => ({}));
+                if (!resp.ok || !result.success) {
+                    throw new Error(result.error || `HTTP ${resp.status}`);
+                }
+                showToast(`✓ ${quoteId} sent to ShipStation #${result.shipstationOrderId || '?'}`);
+                // Refresh just this row's data — reload all quotes so the snapshot
+                // + ShipStation_Order_ID are current.
+                await loadQuotes();
+            } catch (err) {
+                console.error('[QuoteManagement] sendToShipStation failed:', err);
+                alert(`Failed to send ${quoteId} to ShipStation:\n${err.message}`);
+            }
+        }
+
         function updateStats() {
             const now = new Date();
             const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -572,6 +684,7 @@
                             <button class="action-btn action-audit" onclick="event.stopPropagation(); viewAudit('${quote.QuoteID}')" title="Pricing Audit">
                                 <i class="fas fa-chart-bar"></i>
                             </button>
+                            ${renderShipStationButton(quote)}
                             <button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
                                 <i class="fas fa-trash"></i>
                             </button>
