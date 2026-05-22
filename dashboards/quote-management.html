@@ -335,6 +335,23 @@
             renderTable();
         }
 
+        // Get the "effective" amount for a quote: SW cur_TotalInvoice when
+        // the snapshot has it, else fall back to the quote-contract TotalAmount.
+        // Used in both row render and stats sum so dashboard amounts mirror
+        // ShopWorks just like the quote-view and invoice pages do. (Erik
+        // 2026-05-22 — full SW-as-source-of-truth consistency.)
+        function getEffectiveAmount(quote) {
+            // Only overlay for Processed quotes with a synced snapshot.
+            if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {
+                try {
+                    const snap = JSON.parse(quote.ShopWorks_Snapshot);
+                    const swTotal = Number(snap?.order?.cur_TotalInvoice);
+                    if (Number.isFinite(swTotal)) return swTotal;
+                } catch (_) { /* fall through to quote total */ }
+            }
+            return parseFloat(quote.TotalAmount) || 0;
+        }
+
         function updateStats() {
             const now = new Date();
             const sevenDaysFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -364,7 +381,7 @@
                     // variant: customer was already charged but the order
                     // never landed in ShopWorks → manual entry required.
                     failedCount++;
-                    totalValue += parseFloat(quote.TotalAmount) || 0;
+                    totalValue += getEffectiveAmount(quote);
                     return;
                 }
 
@@ -387,7 +404,7 @@
                     acceptedCount++;
                 }
 
-                totalValue += parseFloat(quote.TotalAmount) || 0;
+                totalValue += getEffectiveAmount(quote);
             });
 
             document.getElementById('stat-active').textContent = activeCount;
@@ -536,7 +553,7 @@
                         </td>
                         <td>${getSalesRepName(quote.SalesRepEmail)}</td>
                         <td>${quote.TotalQuantity || 0}</td>
-                        <td class="quote-amount">${formatCurrency(quote.TotalAmount)}</td>
+                        <td class="quote-amount">${formatCurrency(getEffectiveAmount(quote))}</td>
                         <td>${statusCellHtml}</td>
                         <td>
                             <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
