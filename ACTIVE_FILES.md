@@ -495,6 +495,7 @@
 | `/shared_components/js/pricing-sidebar-component.js` | **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-lookup-service.js` | **NEW** Customer autocomplete search (2026-01-29) | All quote builders | ✅ Active |
+| `/shared_components/js/customer-context-banners.js` | **NEW** Customer Warning banner + Tax Exempt chip + Account Tier badge + Payment Terms autofill with legacy-CRM mapping (2026-05-23). Exposes `window.surfaceCustomerContext(contact, config)` + `window.mapToOfferedTerms()` | EMB, DTF, SCP quote builders + customer-lookup-service.js | ✅ Active |
 | `/shared_components/js/product-thumbnail-modal.js` | **NEW** Product image thumbnail + click-to-enlarge modal (2026-01-29) | DTG, Screen Print, Embroidery builders | ✅ Active |
 | `/shared_components/js/shopworks-import-parser.js` | **NEW** ShopWorks order text parser (2026-01-31) | Embroidery quote builder | ✅ Active |
 | `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |

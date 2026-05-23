@@ -534,6 +534,16 @@
                         <!-- Customer Lookup -->
                         <div class="customer-field customer-lookup-container">
                             <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+
+                            <!-- Customer context banners (Erik 2026-05-23) — populated by
+                                 window.surfaceCustomerContext() after a customer is picked.
+                                 Hidden until then. Customer Warning (amber) + Tax Exempt
+                                 chip (green) + Account Tier badge (indigo). -->
+                            <div id="customer-warning-banner" hidden></div>
+                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;">
+                                <span id="customer-tax-chip" hidden></span>
+                                <span id="customer-tier-badge" hidden></span>
+                            </div>
                         </div>
                         <div class="customer-lookup-divider">or enter manually</div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
@@ -858,7 +868,10 @@
                                     <input type="text" id="drop-dead-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                                 </div>
                                 <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Terms</label>
+                                    <label style="font-size: 11px; color: #64748b; display: block;">
+                                        Terms
+                                        <span id="customer-terms-note" hidden></span>
+                                    </label>
                                     <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                                 </div>
                             </div>
@@ -1373,6 +1386,8 @@ Company:Absher Construction Company
 
     <!-- Customer Lookup Autocomplete -->
     <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
+    <!-- Customer Context Banners (Erik 2026-05-23) — Warning/Tax/Tier/Terms autofill -->
+    <script src="/shared_components/js/customer-context-banners.js?v=2026.05.23.1"></script>
 
     <!-- Product Thumbnail Modal (click to enlarge) -->
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260424"></script>
@@ -1385,7 +1400,7 @@ Company:Absher Construction Company
 
     <!-- Power Quote Controller (extracted to external JS) -->
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.05.21.28"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=20260323b"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.05.23.1"></script>
 
 </body>
 </html>
