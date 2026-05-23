@@ -1,3 +1,7 @@
+## v2026.05.23.5 (2026.05.23)
+
+- Deploy v2026.05.23.5: EMB/DTF/SCP — shared customer-context-banners helper
+
 ## v2026.05.23.4 (2026.05.23)
 
 - Deploy v2026.05.23.4: Order Form — same CRM-term mapping as DTG
