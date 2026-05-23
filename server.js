@@ -2064,6 +2064,16 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   // Tax block lives here (was briefly on Notes To Accounting under M1).
   const lines = [];
 
+  // 0. Customer Warning (Erik 2026-05-23): if the customer record in
+  // CompanyContactsMerge2026 has a Customer_Warning flag (e.g. "DO NOT
+  // EXTEND CREDIT", "REQUIRES PREPAY"), surface it as the FIRST line so
+  // AR sees it before doing anything else. Frontend pulls this via the
+  // /api/order-form-drafts/companies/:id picker and passes through info.
+  const cw = String(info?.customerWarning || '').trim();
+  if (cw) {
+    lines.push(`CUSTOMER WARNING: ${cw}`);
+  }
+
   // 1. Print Locations — Erik's #1 thing he scans for in ShopWorks (2026-05-20).
   const locsClean = String(printLocations || '').trim();
   if (locsClean) {
@@ -2145,6 +2155,14 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
     lines.push(`Tax: NEEDS REVIEW`);
     lines.push(`Rep: Confirm destination + apply correct WA rate before invoicing`);
+  }
+
+  // 3. Live Quote URL (Erik 2026-05-23) — gives the SW operator a one-click
+  // jump back to the customer-facing quote-view (which has the live SW state
+  // overlay, the original submission audit panel, all the design info). Saves
+  // them looking up the OF# in our system every time they need full context.
+  if (extOrderId) {
+    lines.push(`Live Quote: https://teamnwca.com/quote/${extOrderId}`);
   }
 
   // Each line becomes one row in ShopWorks's Notes On Order tab.
@@ -3148,7 +3166,10 @@ app.post('/api/submit-order-form', async (req, res) => {
         country: 'USA'
       },
       notes: notesBlocks,
-      rushOrder: false,
+      // Rush flag (Erik 2026-05-23): was hardcoded false. info.isRush comes
+      // from the explicit RUSH checkbox in the order form (audit fix L4
+      // 2026-05-21). Used by SW to prioritize in the production queue.
+      rushOrder: !!info.isRush,
       // Tax: ALWAYS send 0. (2026-05-20 — see memory/wa-sales-tax-rules.md)
       //
       // Background: the ShopWorks ManageOrders integration is configured with
