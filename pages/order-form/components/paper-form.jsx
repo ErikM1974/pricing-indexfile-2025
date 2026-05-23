@@ -17,6 +17,34 @@ const ALL_DECOS = [
 //   "5/6T"  → "5/6T"    (left as-is, already readable)
 //   "S/M"   → "S/M"     (left as-is)
 // Anything else passes through unchanged.
+// Map a customer's CRM payment term to one of the terms the Order Form
+// OFFERS today. NWCA's OF dropdown has TWO options: Prepaid / Pay On Pickup
+// (different from DTG which also offers Net 10). Customer table preserves
+// historical terms (Net 30, Net 60, COD, Credit Card on File, etc.) that
+// need conversion. Unknown / unsupported terms default to Prepaid — the
+// most conservative choice (don't accidentally extend credit). Reps can
+// manually switch in the dropdown if they want to honor a legacy agreement.
+//
+// Returns { term, mappedFrom } where mappedFrom is non-null only when
+// conversion happened (so the UI can show a "⚠ mapped" note).
+//   mapToOfferedOrderFormTerms('Prepaid')              → { term: 'Prepaid', mappedFrom: null }
+//   mapToOfferedOrderFormTerms('Net 30')               → { term: 'Prepaid', mappedFrom: 'Net 30' }
+//   mapToOfferedOrderFormTerms('Credit Card on File')  → { term: 'Prepaid', mappedFrom: 'Credit Card on File' }
+function mapToOfferedOrderFormTerms(crmTerm) {
+  if (!crmTerm) return { term: '', mappedFrom: null };
+  const original = String(crmTerm).trim();
+  const t = original.toLowerCase().replace(/\s+/g, ' ');
+  // Exact matches to OF's offered set
+  if (t === 'prepaid' || t === 'pre-paid' || t === 'pre paid' || t === 'pp') {
+    return { term: 'Prepaid', mappedFrom: null };
+  }
+  if (t === 'pay on pickup' || t === 'pay-on-pickup' || t === 'on pickup' || t === 'pop') {
+    return { term: 'Pay On Pickup', mappedFrom: null };
+  }
+  // Anything else (Net X / COD / Credit Card / Cash / Check / unknown) → Prepaid
+  return { term: 'Prepaid', mappedFrom: original };
+}
+
 function prettyPrintSize(s) {
   const raw = String(s || '').trim();
   if (!raw) return raw;
@@ -2088,11 +2116,17 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
               // Payment terms preference order: Preferred_Terms_FromOrders (rolled-up
               // from order history) → Payment_Terms → CustTerms. Falls back to
               // existing form value (no overwrite if customer record is empty).
-              const termsPref =
+              // Then RUN THROUGH mapToOfferedOrderFormTerms so legacy CRM values
+              // (Net 30, Credit Card on File, etc.) safely convert to one of
+              // the 2 terms OF actually offers. Track the original via
+              // termsMappedFrom so the UI can flag the conversion.
+              const rawTermsPref =
                 c.Preferred_Terms_FromOrders ||
                 c.Payment_Terms ||
                 c.CustTerms ||
                 info.terms || '';
+              const { term: termsPref, mappedFrom: termsMappedFrom } =
+                mapToOfferedOrderFormTerms(rawTermsPref);
               setInfo({
                 ...info,
                 company:    c.Company_Name || '',
@@ -2123,6 +2157,10 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
                 taxExemptNumber: c.Tax_Exempt_Number || '',
                 customerWarning: warning,
                 terms:           termsPref,
+                // Surfaces the ⚠ "CRM had 'X' — mapped to Y" note next to
+                // the Terms dropdown when conversion happened. Null when
+                // the CRM term already matched an OF-offered value.
+                termsMappedFrom: termsMappedFrom,
               });
             }}
           />
@@ -2428,7 +2466,16 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
         <div className="p-cell">
           <div style={{display:'flex',gap:12,alignItems:'flex-end',marginBottom:6}}>
             <div style={{flex:'0 0 140px'}}>
-              <div className="lbl">Terms</div>
+              <div className="lbl">
+                Terms
+                {info.termsMappedFrom ? (
+                  <span style={{
+                    fontSize: 11, color: '#92400e', fontWeight: 600, marginLeft: 6,
+                  }} title={`Customer's CRM term was "${info.termsMappedFrom}" but OF only offers Prepaid / Pay On Pickup. Defaulted to Prepaid — switch if you want to override.`}>
+                    ⚠ from "{info.termsMappedFrom}"
+                  </span>
+                ) : null}
+              </div>
               <select className="p-in" value={info.terms || 'Prepaid'} onChange={e => update('terms', e.target.value)}>
                 <option value="Prepaid">Prepaid</option>
                 <option value="Pay On Pickup">Pay On Pickup</option>
