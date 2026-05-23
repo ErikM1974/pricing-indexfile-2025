@@ -1,3 +1,7 @@
+## v2026.05.23.2 (2026.05.23)
+
+- Deploy v2026.05.23.2: DTG quote builder — Customer Warning + Tax Exempt + Payment Terms + Phone_Best
+
 ## v2026.05.23.1 (2026.05.23)
 
 - Deploy v2026.05.23.1: 3 audit fixes (rushOrder, customer warning, quote URL)
