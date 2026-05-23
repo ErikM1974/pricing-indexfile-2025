@@ -1,3 +1,7 @@
+## v2026.05.23.1 (2026.05.23)
+
+- Deploy v2026.05.23.1: 3 audit fixes (rushOrder, customer warning, quote URL)
+
 ## v2026.05.22.8 (2026.05.22)
 
 - Deploy v2026.05.22.8: Phase 2 change banner on quote-view
