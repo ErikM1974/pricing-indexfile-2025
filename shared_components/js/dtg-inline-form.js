@@ -824,16 +824,16 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="dcp-field-label">Payment terms</div>
+                                    <div class="dcp-field-label">
+                                        Payment terms
+                                        <span id="dtgTermsMapNote" hidden
+                                              style="font-size:11px;color:#92400e;font-weight:600;margin-left:6px;"
+                                              title="Customer's CRM term mapped to a term NWCA currently offers"></span>
+                                    </div>
                                     <select id="dtgTerms">
                                         <option value="Prepaid">Prepaid</option>
-                                        <option value="Pay On Pickup">Pay On Pickup</option>
                                         <option value="Net 10">Net 10</option>
-                                        <option value="Net 15">Net 15</option>
-                                        <option value="Net 30">Net 30</option>
-                                        <option value="Net 45">Net 45</option>
-                                        <option value="Net 60">Net 60</option>
-                                        <option value="COD">COD</option>
+                                        <option value="Pay On Pickup">Pay On Pickup</option>
                                     </select>
                                 </div>
                             </div>
@@ -3269,29 +3269,60 @@
             }
         }
 
-        // Auto-select payment terms in dropdown. Match case-insensitively;
-        // if customer's term isn't in our dropdown (rare edge case — new
-        // term not yet added), inject it as a new option so reps don't lose
-        // the data. Also updates state.customer.terms so the submit payload
-        // carries the right value.
+        // Auto-select payment terms in dropdown. NWCA only OFFERS three terms
+        // today: Prepaid / Net 10 / Pay On Pickup (Erik 2026-05-23). The CRM
+        // may carry historical terms NWCA no longer extends (NET 30, NET 60,
+        // COD, etc.) — those get MAPPED to a currently-offered term via
+        // mapToOfferedTerms(), with a small ⚠ note next to the dropdown
+        // surfacing the conversion so reps know to verify.
         const termsSelect = document.getElementById('dtgTerms');
+        const mapNote = document.getElementById('dtgTermsMapNote');
         if (termsSelect && state.customer.paymentTerms) {
-            const pref = state.customer.paymentTerms;
-            const match = Array.from(termsSelect.options).find((o) =>
-                o.value.toLowerCase() === pref.toLowerCase());
-            if (match) {
-                termsSelect.value = match.value;
-                state.customer.terms = match.value;
-            } else {
-                // CRM has a term not in our dropdown — add it dynamically
-                const opt = document.createElement('option');
-                opt.value = pref;
-                opt.textContent = pref;
-                termsSelect.appendChild(opt);
-                termsSelect.value = pref;
-                state.customer.terms = pref;
+            const original = state.customer.paymentTerms;
+            const mapped = mapToOfferedTerms(original) || 'Prepaid';
+            termsSelect.value = mapped;
+            state.customer.terms = mapped;
+            if (mapNote) {
+                if (mapped.toLowerCase() !== original.toLowerCase()) {
+                    // Mapping happened — flag it so the rep notices
+                    mapNote.textContent = `⚠ CRM had "${original}" — mapped to ${mapped}`;
+                    mapNote.hidden = false;
+                } else {
+                    mapNote.hidden = true;
+                    mapNote.textContent = '';
+                }
             }
+        } else if (mapNote) {
+            mapNote.hidden = true;
+            mapNote.textContent = '';
         }
+    }
+
+    // Map a customer's CRM payment term (which may be a legacy / no-longer-offered
+    // value like NET 30 / NET 60 / COD) to one of the three terms NWCA currently
+    // OFFERS: Prepaid / Net 10 / Pay On Pickup. Returns null when no match.
+    //
+    // Rationale per Erik (2026-05-23): customer table preserves historical
+    // payment-term agreements from past years. NWCA no longer extends NET 30+
+    // credit to all customers — only Net 10 max. Unknown net-X terms default
+    // to Prepaid (safest — most conservative). Rep can manually switch via
+    // the dropdown if they want to honor a legacy agreement.
+    function mapToOfferedTerms(crmTerm) {
+        if (!crmTerm) return null;
+        const t = String(crmTerm).trim().toLowerCase().replace(/\s+/g, ' ');
+        // Exact matches to NWCA's offered set
+        if (t === 'prepaid' || t === 'pre-paid' || t === 'pre paid' || t === 'pp') return 'Prepaid';
+        if (t === 'pay on pickup' || t === 'pay-on-pickup' || t === 'on pickup' || t === 'pop') return 'Pay On Pickup';
+        if (t === 'net 10' || t === 'net10' || t === 'n10' || t === 'net-10') return 'Net 10';
+        // Legacy/unsupported terms NWCA no longer offers — default conservatively
+        // to Prepaid (don't accidentally extend credit). Includes any other Net X.
+        if (/^net[\s\-]*\d+$/.test(t)) return 'Prepaid';
+        if (t === 'cod' || t === 'c.o.d.' || t === 'cash on delivery') return 'Prepaid';
+        if (t === 'cash' || t === 'check') return 'Prepaid';
+        // Credit card variants — all imply prepaid (we charge upfront / on file)
+        if (t.includes('credit card')) return 'Prepaid';
+        // Unknown — return null so caller can decide (we default to Prepaid)
+        return null;
     }
 
     // Populate the contact dropdown with the picked company's contacts so the
