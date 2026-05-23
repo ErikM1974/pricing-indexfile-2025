@@ -289,6 +289,13 @@
                     <div class="customer-field customer-lookup-container" style="margin-bottom: 8px;">
                         <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
                         <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+
+                        <!-- Customer context banners (Erik 2026-05-23) -->
+                        <div id="customer-warning-banner" hidden></div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;">
+                            <span id="customer-tax-chip" hidden></span>
+                            <span id="customer-tier-badge" hidden></span>
+                        </div>
                     </div>
                     <div class="customer-lookup-divider" style="text-align: center; font-size: 11px; color: #999; margin: 8px 0;">OR ENTER MANUALLY</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
@@ -634,6 +641,8 @@
 
     <!-- Customer Lookup Autocomplete -->
     <script src="/shared_components/js/customer-lookup-service.js?v=20260129"></script>
+    <!-- Customer Context Banners (Erik 2026-05-23) — Warning/Tax/Tier autofill -->
+    <script src="/shared_components/js/customer-context-banners.js?v=2026.05.23.1"></script>
 
     <!-- Sidebar Resize (2026 UX improvement) -->
     <script src="/shared_components/js/sidebar-resize.js?v=20260127"></script>
@@ -647,7 +656,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260127"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=20260323c"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.23.1"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">

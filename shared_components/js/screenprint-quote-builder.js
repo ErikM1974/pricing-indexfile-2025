@@ -825,6 +825,18 @@ document.addEventListener('DOMContentLoaded', async function() {
                     document.getElementById('customer-name').value = contact.ct_NameFull || '';
                     document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                     document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+
+                    // Surface CRM context (Erik 2026-05-23) — Warning banner +
+                    // Tax Exempt chip + Account Tier badge + Phone_Best autofill.
+                    if (typeof window.surfaceCustomerContext === 'function') {
+                        window.surfaceCustomerContext(contact, {
+                            warningContainerId: 'customer-warning-banner',
+                            taxChipContainerId: 'customer-tax-chip',
+                            tierBadgeContainerId: 'customer-tier-badge',
+                            phoneInputId: 'customer-phone',
+                        });
+                    }
+
                     showToast('Customer info loaded', 'success');
                 },
                 onClear: () => {

@@ -1370,6 +1370,23 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (addrInput) addrInput.value = contact.Address;
                 }
                 _customerDesignGallery = null; // Invalidate gallery cache on customer change
+
+                // Surface CRM context (Erik 2026-05-23) — Customer Warning banner +
+                // Tax Exempt chip + Account Tier badge + payment terms auto-fill
+                // with legacy-CRM mapping. Defensive — only fires if the shared
+                // helper loaded (script tag may not be present on older builds).
+                if (typeof window.surfaceCustomerContext === 'function') {
+                    window.surfaceCustomerContext(contact, {
+                        warningContainerId: 'customer-warning-banner',
+                        taxChipContainerId: 'customer-tax-chip',
+                        tierBadgeContainerId: 'customer-tier-badge',
+                        phoneInputId: 'customer-phone',
+                        termsSelectId: 'payment-terms',
+                        termsNoteId: 'customer-terms-note',
+                        offeredTerms: ['Prepaid', 'Net 10', 'Pay On Pickup'],
+                    });
+                }
+
                 showToast('Customer info loaded', 'success');
             },
             onClear: () => {
