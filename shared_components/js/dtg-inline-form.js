@@ -166,6 +166,16 @@
             terms: 'Prepaid',
             contacts: [],   // populated when a company is picked
             salesRepCode: lastRepCode || 'erik', // A1
+            // Curated CRM context (Erik 2026-05-23) — populated by pick()
+            // from CompanyContactsMerge2026 fields the proxy now returns.
+            // Surfaces in the DTG form as a warning banner, tax chip, and
+            // auto-fills the payment terms dropdown. Flows through info.*
+            // on submit so the server can suppress tax for exempt customers.
+            customerWarning: '',
+            isTaxExempt:     false,
+            taxExemptNumber: '',
+            paymentTerms:    '',     // CRM-preferred terms (e.g., "Net 30") — auto-selects in dropdown
+            accountTier:     '',     // VIP / GOLD / House — info-only badge
         },
         // Schedule — production due date + customer event ("drop dead") date.
         // Erik's rule (2026-05-20): qty ≤ 24 → 5 business days; qty > 24 → 10
@@ -720,6 +730,19 @@
                             <input type="text" id="dtgCompanyInput" autocomplete="off" placeholder="Company name or contact…">
                         </div>
 
+                        <!-- Curated CRM context banners (Erik 2026-05-23).
+                             Populated by renderCustomerContextBadges() after a
+                             customer is picked. Hidden when the customer has no
+                             warning / no tax exempt / no account tier. -->
+                        <div id="dtgCustomerWarning" class="dtg-customer-warning" hidden
+                             style="display:flex;align-items:flex-start;gap:10px;background:#fef3c7;border:1px solid #fde68a;border-left:4px solid #d97706;border-radius:4px;padding:10px 14px;margin:8px 0;color:#78350f;font-size:13px;line-height:1.45;"></div>
+                        <div class="dcp-chip-row" style="display:flex;flex-wrap:wrap;gap:6px;margin:6px 0;">
+                            <span id="dtgTaxExemptChip" hidden
+                                  style="display:inline-flex;align-items:center;gap:6px;background:#dcfce7;border:1px solid #bbf7d0;color:#166534;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;"></span>
+                            <span id="dtgAccountTierBadge" hidden
+                                  style="display:inline-flex;align-items:center;gap:6px;background:#e0e7ff;border:1px solid #c7d2fe;color:#3730a3;padding:4px 10px;border-radius:4px;font-size:12px;font-weight:600;"></span>
+                        </div>
+
                         <!-- Customer history pill (2026-05-20 — Phase 1: info-only).
                              Appears after a customer is picked. Shows aggregated 90-day
                              order patterns from ManageOrders: order count, last order
@@ -804,8 +827,13 @@
                                     <div class="dcp-field-label">Payment terms</div>
                                     <select id="dtgTerms">
                                         <option value="Prepaid">Prepaid</option>
-                                        <option value="Net 10">Net 10</option>
                                         <option value="Pay On Pickup">Pay On Pickup</option>
+                                        <option value="Net 10">Net 10</option>
+                                        <option value="Net 15">Net 15</option>
+                                        <option value="Net 30">Net 30</option>
+                                        <option value="Net 45">Net 45</option>
+                                        <option value="Net 60">Net 60</option>
+                                        <option value="COD">COD</option>
                                     </select>
                                 </div>
                             </div>
@@ -2600,6 +2628,16 @@
             state.customer.company = c.Company_Name || '';
             state.customer.companyId = c.id_Customer != null ? String(c.id_Customer) : '';
             state.customer.contacts = c.contacts || [];
+            // Curated CRM context (Erik 2026-05-23) — fields the proxy now
+            // returns on /api/company-contacts-2026/search response.
+            state.customer.customerWarning = String(c.Customer_Warning || '').trim();
+            state.customer.isTaxExempt = c.Is_Tax_Exempt === true || c.Is_Tax_Exempt === 1 || c.Is_Tax_Exempt === '1';
+            state.customer.taxExemptNumber = String(c.Tax_Exempt_Number || '').trim();
+            state.customer.paymentTerms = String(
+                c.Preferred_Terms_FromOrders || c.Payment_Terms || c.CustTerms || ''
+            ).trim();
+            state.customer.accountTier = String(c.Account_Tier || '').trim();
+            renderCustomerContextBadges();
             // Capture company-level address fields BEFORE applyContact runs —
             // the per-contact records from the search endpoint don't carry
             // address data, only the company bucket does. These drive both
@@ -3161,7 +3199,11 @@
         state.customer.firstName = ct.NameFirst || '';
         state.customer.lastName = ct.NameLast || '';
         state.customer.email = ct.Email || ct.ContactNumbersEmail || '';
-        state.customer.phone = ct.Phone || ct.Company_Phone || '';
+        // Phone priority (Erik 2026-05-23): Phone_Best (curated "best phone
+        // for this contact" in CompanyContactsMerge2026) → Phone → Company_Phone.
+        // Phone_Best is the field reps should treat as authoritative when
+        // present; the others are legacy/imported values.
+        state.customer.phone = ct.Phone_Best || ct.Phone || ct.Company_Phone || '';
         state.customer.contactId = ct.ID_Contact != null ? String(ct.ID_Contact) : '';
         // NOTE: Company-level address (state, city, ship-to pre-fill) is
         // captured in pick() at company-pick time. The per-contact records
@@ -3175,6 +3217,81 @@
         const picker = document.getElementById('dtgContactPicker');
         if (picker && state.customer.contactId) picker.value = state.customer.contactId;
         updateSubmitEnabled();
+    }
+
+    // Surface curated CRM context (Erik 2026-05-23): Customer Warning banner,
+    // Tax Exempt chip, Account Tier badge, auto-select Payment Terms dropdown.
+    // Called from pick() when a customer is selected; also from session
+    // restore when state.customer is rehydrated from a saved draft.
+    function renderCustomerContextBadges() {
+        // Warning banner — amber, prominent, draws AR/CSR attention immediately
+        const warn = document.getElementById('dtgCustomerWarning');
+        if (warn) {
+            const cw = state.customer.customerWarning;
+            if (cw) {
+                warn.innerHTML =
+                    `<span style="font-size:18px;line-height:1;color:#d97706;">⚠️</span>` +
+                    `<div>` +
+                    `<div style="font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.04em;font-size:11px;">Customer Warning</div>` +
+                    `<div>${escapeHtml(cw)}</div>` +
+                    `</div>`;
+                warn.hidden = false;
+            } else {
+                warn.hidden = true;
+                warn.innerHTML = '';
+            }
+        }
+
+        // Tax exempt chip — green pill, shows cert# when on file
+        const taxChip = document.getElementById('dtgTaxExemptChip');
+        if (taxChip) {
+            if (state.customer.isTaxExempt) {
+                const cert = state.customer.taxExemptNumber
+                    ? ` · Cert # ${escapeHtml(state.customer.taxExemptNumber)}` : '';
+                taxChip.innerHTML = `<span>🏛️</span><span>TAX EXEMPT${cert}</span>`;
+                taxChip.hidden = false;
+            } else {
+                taxChip.hidden = true;
+                taxChip.innerHTML = '';
+            }
+        }
+
+        // Account tier badge — VIP / GOLD / House etc. (info-only)
+        const tier = document.getElementById('dtgAccountTierBadge');
+        if (tier) {
+            const at = state.customer.accountTier;
+            if (at) {
+                tier.innerHTML = `<span>⭐</span><span>${escapeHtml(at)}</span>`;
+                tier.hidden = false;
+            } else {
+                tier.hidden = true;
+                tier.innerHTML = '';
+            }
+        }
+
+        // Auto-select payment terms in dropdown. Match case-insensitively;
+        // if customer's term isn't in our dropdown (rare edge case — new
+        // term not yet added), inject it as a new option so reps don't lose
+        // the data. Also updates state.customer.terms so the submit payload
+        // carries the right value.
+        const termsSelect = document.getElementById('dtgTerms');
+        if (termsSelect && state.customer.paymentTerms) {
+            const pref = state.customer.paymentTerms;
+            const match = Array.from(termsSelect.options).find((o) =>
+                o.value.toLowerCase() === pref.toLowerCase());
+            if (match) {
+                termsSelect.value = match.value;
+                state.customer.terms = match.value;
+            } else {
+                // CRM has a term not in our dropdown — add it dynamically
+                const opt = document.createElement('option');
+                opt.value = pref;
+                opt.textContent = pref;
+                termsSelect.appendChild(opt);
+                termsSelect.value = pref;
+                state.customer.terms = pref;
+            }
+        }
     }
 
     // Populate the contact dropdown with the picked company's contacts so the
