@@ -1,3 +1,7 @@
+## v2026.05.23.4 (2026.05.23)
+
+- Deploy v2026.05.23.4: Order Form — same CRM-term mapping as DTG
+
 ## v2026.05.23.3 (2026.05.23)
 
 - Deploy v2026.05.23.3: DTG terms dropdown — revert to NWCA's 3 offered terms + CRM mapping
