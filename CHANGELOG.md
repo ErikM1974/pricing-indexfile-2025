@@ -1,3 +1,7 @@
+## v2026.05.23.3 (2026.05.23)
+
+- Deploy v2026.05.23.3: DTG terms dropdown — revert to NWCA's 3 offered terms + CRM mapping
+
 ## v2026.05.23.2 (2026.05.23)
 
 - Deploy v2026.05.23.2: DTG quote builder — Customer Warning + Tax Exempt + Payment Terms + Phone_Best
