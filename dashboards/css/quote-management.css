@@ -17,7 +17,7 @@ body {
 
 /* Header */
 .dashboard-header {
-    background: linear-gradient(135deg, #2e4a62 0%, #1a2f42 100%);
+    background: linear-gradient(135deg, var(--pnw-forest, #2e4a62) 0%, var(--pnw-forest-deep, #1a2f42) 100%);
     padding: 12px 24px;
     display: flex;
     justify-content: space-between;
@@ -116,12 +116,12 @@ body {
 .filter-group select:focus,
 .filter-group input:focus {
     outline: none;
-    border-color: #2e4a62;
+    border-color: var(--pnw-forest, #2e4a62);
     box-shadow: 0 0 0 2px rgba(46,74,98,0.1);
 }
 
 .btn-search {
-    background: #2e4a62;
+    background: var(--pnw-forest, #2e4a62);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -134,7 +134,7 @@ body {
 }
 
 .btn-search:hover {
-    background: #1a2f42;
+    background: var(--pnw-forest-deep, #1a2f42);
 }
 
 /* Stats Cards */
@@ -158,7 +158,7 @@ body {
 }
 
 .stat-card.accepted {
-    border-left: 4px solid #2e4a62;
+    border-left: 4px solid var(--pnw-forest, #2e4a62);
 }
 
 .stat-card.expiring {
@@ -395,7 +395,7 @@ body {
 
 .quote-id {
     font-weight: 600;
-    color: #2e4a62;
+    color: var(--pnw-forest, #2e4a62);
 }
 
 .customer-name {
@@ -489,7 +489,7 @@ body {
     width: 40px;
     height: 40px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #2e4a62;
+    border-top: 3px solid var(--pnw-forest, #2e4a62);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -503,7 +503,7 @@ body {
 .action-btn {
     background: none;
     border: none;
-    color: #2e4a62;
+    color: var(--pnw-forest, #2e4a62);
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
@@ -537,7 +537,7 @@ body {
 
 .pagination button:hover:not(:disabled) {
     background: #f8f9fa;
-    border-color: #2e4a62;
+    border-color: var(--pnw-forest, #2e4a62);
 }
 
 .pagination button:disabled {
