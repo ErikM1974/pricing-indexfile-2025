@@ -8,6 +8,29 @@ Supersedes `QUOTE_BUILDER_UNIFICATION_PLAN.md` (kept for historical context).
 
 ---
 
+## 🎯 The North Star
+
+**Every quote builder pushes orders into ShopWorks like DTG does today.**
+
+A rep finishes a quote → clicks one button → the order lives in ShopWorks
+OnSite with the right Work Order #, customer linked, design linked, line
+items pushed, notes routed correctly. No double-entry. No paper handoff.
+No "I'll type it into SW after lunch."
+
+| Builder | Pricing math | Visual identity | **ShopWorks push** | Quote-view ↔ SW sync |
+|---|:---:|:---:|:---:|:---:|
+| **DTG** | ✅ | ✅ | ✅ **GOLD STANDARD** | ✅ |
+| **Order Form** | ✅ | ✅ | ✅ | ✅ |
+| **EMB** | ✅ | ✅ | ✅ (`pushToShopWorks()` wired) | ✅ |
+| **DTF** | ✅ | ✅ | ❌ **Phase 8 (NEXT BIG)** | n/a until pushed |
+| **SCP** | ✅ | ✅ | ❌ **Phase 8** | n/a until pushed |
+| **Cap** | ✅ | partial | ❌ **Phase 8** | n/a until pushed |
+
+**That's the endgame.** Everything else in this roadmap (visual unification,
+code health, inline-form refactor) is *supporting infrastructure* for this.
+
+---
+
 ## ✅ Shipped today (2026-05-23) — already in production
 
 ### Phase 0 — Pricing baseline coverage (DONE)
@@ -128,6 +151,76 @@ Supersedes `QUOTE_BUILDER_UNIFICATION_PLAN.md` (kept for historical context).
 
 ### Priority 3 — Big bet (multi-week)
 
+#### ⭐ Phase 8 — ShopWorks push for DTF / SCP / Cap (the North Star)
+**Why**: This is the actual goal. Reps finish a quote → one button →
+order lives in ShopWorks. EMB + DTG + Order Form already do this. The
+remaining 3 builders are the gap.
+
+**What "done" looks like per builder** (mirror what DTG + EMB do today):
+1. **Backend endpoint** `POST /api/submit-{method}-order` in `server.js`
+   - Accepts the quote payload (customer, products, services, totals)
+   - Translates to ManageOrders LineItems + LineDecors + Notes
+   - Posts to `https://manageordersapi.com/onsite` with the right `ExtSource`
+   - Returns the SW `id_Order` (WO#)
+   - Writes `ShopWorks_Order_Number` back to `quote_sessions` row
+   - Idempotency cache + `PushedToShopWorks` flag prevents duplicate pushes
+2. **Frontend push button** in the builder (mirrors EMB's `pushToShopWorks()`)
+   - Validates required fields (customer, design, line items > 0, no $0 lines)
+   - Spinner + success/error toast
+   - Disabled state after successful push (or `force=true` override)
+3. **Quote-view integration** — once pushed, the quote-view page shows the
+   SW snapshot overlay (already built for DTG/EMB — works for any builder
+   that pushes)
+4. **Design linking** — known design # → `{id_Design: N}` in payload;
+   unknown → `Designs: []` (per memory rule)
+5. **Fee routing** — known fee PNs → `LinesOE`; unknown → `Notes On Order`;
+   `TAX`/`SHIP`/`DISCOUNT` → order-level (per memory rule)
+6. **Method-specific specifics**:
+   - **DTF**: location + transfer size mapping; PressingLaborCost as
+     separate line; freight cost rolled into per-piece
+   - **SCP**: color count drives screen charges; 2 LTM tiers ($75/$50);
+     ink color list as Notes
+   - **Cap**: cap-style PN mapping; cap-specific embroidery service codes
+     (CB/CS/3D-EMB/AS-CAP/AL-CAP); flat-headwear distinction
+     (`ProductCategoryFilter.isFlatHeadwear()` for beanies)
+
+**Reference patterns to copy**:
+- DTG submit flow — `shared_components/js/dtg-inline-form.js` + server.js
+- Order Form submit — `server.js:2448` (`/api/submit-order-form`)
+- EMB push — `shared_components/js/embroidery-quote-builder.js:6719`
+  (`pushToShopWorks()`)
+- 3-Day Tees submit — `server.js:1625` (`/api/submit-3day-order`)
+  (most complete reference — payload mapping is the cleanest)
+
+**Critical sync points** (from `MEMORY.md` — DO NOT REGRESS):
+- `Color` field MUST be `CATALOG_COLOR`, NOT `COLOR_NAME` (proxy v606 fix)
+- Size translation: push BASE PN + plain size; OnSite appends modifiers
+- Tax: `TaxTotal: 0` (NWCA always sets to zero in MO push)
+- 2XL → `_2X` suffix, `Size05` (NOT `_2XL`, NOT `Size06`)
+- Notes — only 4 valid types: `Notes On Order` / `To Production` /
+  `To Purchasing` / `To Art`. One bad type aborts push.
+- New quote ID prefix per method (or reuse existing — DTF=SPC, SCP=SSC,
+  Cap=EMBC per `MEMORY.md` quote prefix list)
+
+**Effort estimate**:
+- DTF: ~5 days (medium complexity — location config but well-shaped data)
+- SCP: ~5 days (color count + screen charges + 2-LTM tier math)
+- Cap: ~3 days (smaller scope; mostly EMB pattern with cap PN mapping)
+
+**Total: ~2-3 weeks calendar with the safety net of CI gate catching
+pricing drift + `?legacy=1` flag for rep rollback.**
+
+**Dependency**: Phase 3 (inline-form refactor) is NOT a prerequisite —
+push can ship on top of current builder forms. But the refactor would
+make the submit code much cleaner per builder. Order is flexible:
+- **Path A (push first)**: ship Phase 8 on current builders → reps get
+  the value immediately → refactor in Phase 3 with confidence
+- **Path B (refactor first)**: ship Phase 3 inline-form refactor → then
+  push in Phase 8 uses the clean shell. Slower to value but cleaner code.
+
+**My recommendation: Path A.** Ship the business value (push to SW)
+first, refactor for code quality after. Reps will thank you faster.
+
 #### Phase 3 — Inline-form widget refactor (DTG pattern → EMB/DTF/SCP)
 **Why**: Biggest payoff. Currently EMB has an 11,209-line builder.js, DTF 3,267, SCP 3,966. DTG's clean state→render pattern in `dtg-inline-form.js` is the gold standard.
 
@@ -165,27 +258,39 @@ Once shell is unified, add missing DTG features to EMB/DTF/SCP:
 
 ---
 
-## 🗺 Recommended sequencing
+## 🗺 Recommended sequencing — North Star first
 
 ```
-Week 1 (next session candidates):
+Week 1 (next session candidates — quick wins):
   Day 1: Phase 0b.1.5 EMB runner (1-2hr) + Dashboard polish remaining (2hr)
-  Day 2: Phase 6 pricing model proposals (research + Erik decision)
-  Day 3-5: Phase 1 code health audit
+  Day 2: Phase 6 pricing margin lift proposals (research + Erik decision)
+  Day 3-5: Phase 1 code health audit (parallelizable)
 
-Week 2-5:
-  Phase 3 inline-form refactor — SCP first as proof, then DTF, then EMB
+⭐ Weeks 2-4: PHASE 8 — ShopWorks push for DTF / SCP / Cap (the real goal)
+  Week 2: DTF push (mirror EMB pattern — backend + frontend + quote-view)
+  Week 3: SCP push (color count + screen charge + 2-LTM tier math)
+  Week 4: Cap push (PN mapping + cap-specific service codes)
 
-Week 6-7:
-  Phase 4 feature parity rollout
+Week 5-7: Phase 3 inline-form refactor (cleanup AFTER push ships)
+  SCP first → DTF → EMB. Each behind ?legacy=1 for safe rollback.
 
 Week 8:
+  Phase 4 feature parity rollout (tier hints, AI chat, catalog, inventory)
   Phase 5 dashboard polish + docs
 
-Throughout: Phase 7 pricing UX changes whenever Erik approves them
+Throughout: Phase 7 pricing UX changes (LTM reframe, nudge prompts)
+whenever Erik approves them
 ```
 
-**Honest take**: Phases 3-5 are the original 8-week plan. We did Phase 0+2 in 1 day, so we're ahead. Phase 3 is the only multi-week piece.
+**Honest take**:
+- Phase 8 IS the actual business goal. Should be Priority 1A after the
+  quick wins.
+- The original 8-week unification plan didn't fully scope Phase 8
+  (it focused on visual + structural unification). Now that the
+  visual+CI infrastructure is in place, Phase 8 is the next-most-valuable
+  thing on the board.
+- We did Phase 0+2 in 1 day. At that pace, Phase 8 (3 builders) is
+  realistically 2-3 weeks of focused work.
 
 ---
 
@@ -288,6 +393,14 @@ If continuing fresh, start a new conversation with one of these:
 > per-method proposal, get my approval, then update Caspio Pricing_Tiers.
 > See ROADMAP_2026_05.md for current proposed values."
 
+**⭐ THE BIG ONE — ShopWorks push (Priority 3)**:
+> "Phase 8 — wire DTF push to ShopWorks. Mirror EMB's pushToShopWorks()
+> pattern (shared_components/js/embroidery-quote-builder.js:6719) +
+> backend route like POST /api/submit-order-form. Use ManageOrders push
+> URL https://manageordersapi.com/onsite with ExtSource: 'NWCA-DTF'.
+> Idempotency cache + PushedToShopWorks flag. CI gate is safety net.
+> See ROADMAP_2026_05.md for full spec + critical sync points."
+
 **Big refactor (Priority 3)**:
 > "Phase 3 inline-form refactor — start with SCP. Extract DTG's state→render
 > pattern from dtg-inline-form.js into a shared quote-builder-inline-shell.js,
@@ -296,4 +409,9 @@ If continuing fresh, start a new conversation with one of these:
 
 ---
 
-**Last words**: We're in a great spot. Visual + CI infrastructure done. Pricing model proven malleable (SCP lift). 22 baselines locked. Future Claude has everything needed to pick up and keep shipping.
+**Last words**: We're in a great spot. Visual + CI infrastructure done.
+Pricing model proven malleable (SCP lift). 22 baselines locked. **The
+North Star is Phase 8 — every quote builder pushing to ShopWorks like
+DTG does today.** EMB is already there. DTF / SCP / Cap are the gap.
+~2-3 weeks of focused work to close it. Future Claude has everything
+needed to pick up and keep shipping.
