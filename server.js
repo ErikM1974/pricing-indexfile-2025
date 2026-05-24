@@ -6017,9 +6017,19 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // Caspio proxy GET /quote_sessions accepts q.where for filtering.
     // (The `filter=` param ONLY works for QuoteID lookups; for arbitrary
     // field filters use Caspio's native q.where syntax.)
+    //
+    // Cron pickup criteria (2026-05-23): we sync rows that are EITHER
+    //   • Status='Processed' (DTG OF flow) OR
+    //   • PushedToShopWorks IS NOT NULL (EMB/SCP/DTF push-handler flow)
+    // The two builders use different dedup conventions — DTG OF flips Status
+    // to 'Processed' after push; EMB/DTF/SCP push handlers in the proxy set
+    // a PushedToShopWorks timestamp but leave Status='Open'. Without this
+    // OR clause, EMB/SCP/DTF orders never get their ShopWorks snapshot
+    // synced back, which means /invoice/EMB-XXXX shows pre-import data only
+    // and Send-to-ShipStation has incomplete info.
     let sessions;
     try {
-      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Processed'")}&q.pageSize=1000`);
+      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Processed' OR PushedToShopWorks IS NOT NULL")}&q.pageSize=1000`);
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }
