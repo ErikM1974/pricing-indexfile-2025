@@ -2295,6 +2295,9 @@ class DTFQuoteBuilder {
             ? window._dtfArtwork.getFiles()
             : [];
 
+        // Phase 11.1 — include design # if rep picked one from the combobox
+        const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+
         const quoteData = {
             quoteId: quoteId,
             customerName,
@@ -2303,6 +2306,7 @@ class DTFQuoteBuilder {
             salesRep,
             notes: '',
             referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
+            designNumber,     // → quote-service writes to quote_sessions.Notes.designNumber
             selectedLocations: this.selectedLocations,
             locationDetails: this.selectedLocations.map(loc => ({
                 code: loc,
@@ -3272,6 +3276,38 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[DTF] Artwork upload widget mounted');
         } catch (e) {
             console.error('[DTF] Artwork widget mount failed:', e);
+        }
+    }
+
+    // Phase 11.1 (2026-05-24) — customer-aware design lookup.
+    // Wraps #design-number input with autocomplete fetching from
+    // proxy /api/designs/by-customer?method=dtf.
+    if (typeof CustomerDesignCombobox !== 'undefined') {
+        try {
+            const designInput = document.getElementById('design-number');
+            if (designInput) {
+                window._dtfDesignCombobox = CustomerDesignCombobox.attach(designInput, {
+                    method: 'dtf',
+                    getCustomerId: () => {
+                        const v = document.getElementById('customer-number')?.value?.trim();
+                        const n = parseInt(v, 10);
+                        return Number.isFinite(n) && n > 0 ? n : null;
+                    },
+                    onPick: (design) => {
+                        console.log('[DTF] Design picked:', design.idDesign, design.designName);
+                    },
+                });
+                // Refresh combobox when customer number changes
+                const custInput = document.getElementById('customer-number');
+                if (custInput) {
+                    custInput.addEventListener('change', () => {
+                        if (window._dtfDesignCombobox) window._dtfDesignCombobox.refresh();
+                    });
+                }
+                console.log('[DTF] Design combobox mounted');
+            }
+        } catch (e) {
+            console.error('[DTF] Design combobox mount failed:', e);
         }
     }
 });

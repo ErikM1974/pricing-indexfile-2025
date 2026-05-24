@@ -340,6 +340,13 @@
                             <label class="quote-label">PROJECT NAME</label>
                             <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
+                        <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
+                        <div class="customer-field" style="grid-column: 1 / -1;">
+                            <label class="quote-label" for="design-number">
+                                DESIGN # <span style="color:#9ca3af;font-weight:400;">(pick from this customer's DTF designs)</span>
+                            </label>
+                            <input type="text" id="design-number" placeholder="Type design # or name…" class="quote-input">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -671,7 +678,9 @@
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.23.9"></script>
+    <!-- Phase 11.1: customer-aware design lookup -->
+    <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.24.1"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">

@@ -785,6 +785,37 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
+    // Phase 11.1 (2026-05-24) — customer-aware design lookup.
+    // Wraps #design-number input with autocomplete fetching from
+    // proxy /api/designs/by-customer?method=scp (DesignType=1).
+    if (typeof CustomerDesignCombobox !== 'undefined') {
+        try {
+            const designInput = document.getElementById('design-number');
+            if (designInput) {
+                window._scpDesignCombobox = CustomerDesignCombobox.attach(designInput, {
+                    method: 'scp',
+                    getCustomerId: () => {
+                        const v = document.getElementById('customer-number')?.value?.trim();
+                        const n = parseInt(v, 10);
+                        return Number.isFinite(n) && n > 0 ? n : null;
+                    },
+                    onPick: (design) => {
+                        console.log('[SCP] Design picked:', design.idDesign, design.designName);
+                    },
+                });
+                const custInput = document.getElementById('customer-number');
+                if (custInput) {
+                    custInput.addEventListener('change', () => {
+                        if (window._scpDesignCombobox) window._scpDesignCombobox.refresh();
+                    });
+                }
+                console.log('[SCP] Design combobox mounted');
+            }
+        } catch (e) {
+            console.error('[SCP] Design combobox mount failed:', e);
+        }
+    }
+
     showLoading(true);
 
     try {
@@ -3793,6 +3824,9 @@ async function saveAndGetLink() {
             ? window._scpArtwork.getFiles()
             : [];
 
+        // Phase 11.1 — include design # if rep picked one from the combobox
+        const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+
         // Collect quote data
         const quoteData = {
             customerName: customerName,
@@ -3800,6 +3834,7 @@ async function saveAndGetLink() {
             companyName: document.getElementById('company-name')?.value?.trim() || '',
             salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
             referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
+            designNumber,     // → SCP quote-service writes to quote_sessions.Notes.designNumber
             items: items,
             totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
             subtotal: pricing.subtotal || 0,
