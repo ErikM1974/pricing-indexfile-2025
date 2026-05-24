@@ -16,6 +16,16 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+## Quote Builders
+
+### Phase 11.3 — rich-mode artwork upload across EMB/DTF/SCP (2026-05-24)
+**Problem:** Quote builders for EMB/DTF/SCP let reps upload reference artwork (Phase 9), but the metadata stopped at "files only" — no design name, no per-file placement, no link to the ShopWorks Designs[] payload. DTG's order form inline section had the rich pattern; the three quote builders did not. Erik's unified-UX directive ("same features across all 4 builders") required closing the gap.
+**Root Cause:** `shared_components/js/artwork-upload.js` was intentionally minimal at first (Phase 9 charter: "reference art the rep saw, no SW auto-creation"). DTG's pattern in `dtg-inline-form.js:2727+` had the richer fields. Builders that wanted rich UX needed to either (a) copy DTG's pattern locally (anti-pattern — violates unified-UX rule) or (b) the shared widget needed an opt-in rich mode.
+**Solution:** Extended `artwork-upload.js` with backwards-compatible `opts.designName` + `opts.placements`. New API: `getDesignName()`, `setDesignName()`, `isValidForPush()`. Each builder passes its own placement list (DTF: 9, SCP: 7, EMB: 9). Push transformers in proxy now follow a 3-branch chain: existing id_Design # → new design with art (Designs[{name, Locations[]}]) → empty. EMB-specific twist: persistence schema decision was deferred — chose to repurpose `ImportNotes` column from `[]` to `{importNotes:[], referenceArtwork:[], newDesignName:''}`; proxy reader handles BOTH shapes for backwards compat with pre-Phase 11.3 quotes.
+**Prevention:** When you find a feature where DTG has the gold standard and others have a stub, FIRST upgrade the shared module with opt-in args (don't fork). When you need to persist new fields in EMB's plain-text Notes column, the next-best slot is `ImportNotes` (existing JSON column with limited consumers) — but always extend the proxy parser to handle the legacy shape first to avoid breaking pre-migration quotes. Pattern shipped in commits 8056aeaa (DTF), 20c96945 (SCP), 488cb086 (EMB) + matching proxy commits 28fc1e6, e4db006, ba2b06a.
+
+---
+
 ## Order Processing & ShopWorks
 
 ### ShopWorks ManageOrders integration ignores per-order TaxPartNumber (2026-05-20)
