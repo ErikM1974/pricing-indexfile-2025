@@ -4269,6 +4269,22 @@
 
     // ----- Init --------------------------------------------------------------
     function init() {
+        // Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
+        // If URL has ?edit=DTG-NNN, fetch the saved quote, populate the form,
+        // and enable revision-on-save. Mirrors EMB/DTF/SCP loadQuoteForEditing.
+        // Takes priority over the session-restore flow: if rep arrived via
+        // an explicit edit URL, that wins over auto-restore.
+        const editParam = (new URLSearchParams(window.location.search)).get('edit');
+        if (editParam && /^DTG-/.test(editParam)) {
+            if (state.rows.length === 0) state.rows.push(newBlankRow());
+            render();
+            // Kick load in background; render shows immediately, fills in async.
+            loadSavedDtgQuoteForEdit(editParam).catch(err => {
+                console.error('[DTG Edit] Load failed:', err);
+            });
+            return;
+        }
+
         // B4 — try to restore from sessionStorage first. If we restored, show
         // a small banner offering to start fresh.
         const restored = restoreStateFromSession();
@@ -4293,6 +4309,154 @@
                     }).catch(() => {});
                 }
             }
+        }
+    }
+
+    // ========================================================================
+    // Phase 11.6 (2026-05-24) — DTG Edit-Reopen
+    //
+    // Fetches a saved DTG quote from Caspio, populates the form, and primes
+    // the save path for "revision" mode (PUT existing session + replace items
+    // instead of creating a fresh DTG-NNN). Mirrors EMB/DTF/SCP's
+    // loadQuoteForEditing() pattern but adapted to DTG's chat-panel-driven
+    // save flow (the actual revision-save lives in dtg-quote-page.js — this
+    // function just hands it the editing context via window globals).
+    //
+    // SAFETY: assertQuoteEditable() runs first. If the quote is in ShopWorks
+    // (Status=Processed/Pending Payment/etc.), it alerts the rep and
+    // redirects to the read-only /quote/:id view — never populates the form.
+    // This enforces Erik's one-way-sync rule at the load boundary.
+    // ========================================================================
+    async function loadSavedDtgQuoteForEdit(quoteId) {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        let res, data;
+        try {
+            res = await fetch(`${apiBase}/api/quote-sessions/${encodeURIComponent(quoteId)}/full`);
+            data = await res.json();
+        } catch (e) {
+            alert(`Failed to load ${quoteId}: ${e.message}`);
+            return;
+        }
+        if (!res.ok || !data || !data.sessionRaw) {
+            alert(`${quoteId} not found.`);
+            return;
+        }
+
+        const session = data.sessionRaw;
+        const items = Array.isArray(data.quoteItems) ? data.quoteItems : [];
+
+        // Lock guard — bail if quote is in ShopWorks.
+        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+            return;
+        }
+
+        // Parse the Notes JSON to recover customer + designNumber + locationCode.
+        let notes = {};
+        try { notes = typeof session.Notes === 'string' ? JSON.parse(session.Notes || '{}') : (session.Notes || {}); }
+        catch (_) { notes = {}; }
+
+        // Populate customer state from session header + Notes.customer
+        const c = notes.customer || {};
+        state.customer.company    = session.CompanyName || c.company || '';
+        state.customer.companyId  = c.companyId || c.customerNumber || '';
+        state.customer.email      = session.CustomerEmail || c.email || '';
+        state.customer.phone      = session.Phone || c.phone || '';
+        const nameParts = String(session.CustomerName || c.name || '').split(/\s+/);
+        state.customer.firstName  = c.firstName || nameParts[0] || '';
+        state.customer.lastName   = c.lastName  || nameParts.slice(1).join(' ') || '';
+        state.customer.designNumber = notes.designNumber || '';
+
+        // Print location — the saved items all share the same printLocation
+        // (DTG: location is global, not per-line). Use the first item's
+        // PrintLocation as the canonical value.
+        const firstLoc = items.find(it => it && it.PrintLocation);
+        if (firstLoc && firstLoc.PrintLocation) {
+            const code = String(firstLoc.PrintLocation).toUpperCase();
+            if (code.includes('_')) {
+                const [front, back] = code.split('_');
+                state.front = front;
+                state.back  = back || '';
+            } else {
+                state.front = code;
+                state.back = '';
+            }
+        }
+
+        // Rebuild rows from quote_items. Each item carries Style/Color/SizeBreakdown.
+        const newRows = items
+            .filter(it => it && it.EmbellishmentType === 'dtg' && it.StyleNumber)
+            .map(it => {
+                const row = newBlankRow();
+                row.style      = String(it.StyleNumber || '').toUpperCase();
+                row.styleUpper = row.style;
+                row.color      = it.Color || '';
+                row.desc       = it.ProductName || '';
+                try {
+                    row.sizes = it.SizeBreakdown ? JSON.parse(it.SizeBreakdown) : {};
+                } catch (_) {
+                    row.sizes = {};
+                }
+                return row;
+            });
+
+        state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
+
+        // Stash editing context on window so dtg-quote-page.js's save path
+        // can branch into the PUT/revision flow.
+        window._dtgEditingQuoteId = quoteId;
+        window._dtgEditingPK_ID = session.PK_ID;
+        window._dtgEditingRevision = Number(session.RevisionNumber) || 1;
+        // Also make the quoteID visible to the existing getQuoteID() helper.
+        setQuoteID(quoteId);
+        // Mark aiState as already saved so the email button (Phase 11.5) works
+        // out of the box without requiring a fresh "Save & share link" click.
+        if (window.aiState) window.aiState.savedQuoteID = quoteId;
+
+        // Render the populated form + kick inventory hydration so size cells
+        // light up.
+        renderLocationPills();
+        renderTable();
+        renderSummary();
+        for (const row of state.rows) {
+            if (row.style && row.color) kickInventoryFetch(row);
+            if (row.style) {
+                fetchBundle(row.style).then(b => {
+                    if (b && Array.isArray(b.sizes)) {
+                        row.availableSizes = b.sizes.filter(s => Number(s.price) > 0).map(s => String(s.size).toUpperCase());
+                        renderTable();
+                        schedulePriceUpdate();
+                    }
+                }).catch(() => {});
+            }
+        }
+        schedulePriceUpdate();
+
+        // Show edit-mode banner — explains current rev + that next save is a revision.
+        showEditModeBanner(quoteId, window._dtgEditingRevision);
+    }
+
+    function showEditModeBanner(quoteId, revision) {
+        try {
+            const mount = document.getElementById('dtgResumeBannerMount');
+            if (!mount) return;
+            mount.innerHTML = '';
+            const banner = document.createElement('div');
+            banner.className = 'dtg-edit-mode-banner';
+            banner.style.cssText =
+                'display:flex;align-items:center;gap:8px;padding:10px 14px;' +
+                'background:#fef3c7;border:1px solid #fbbf24;border-left:4px solid #d97706;' +
+                'border-radius:6px;color:#92400e;font-size:13px;line-height:1.4;margin-bottom:10px;';
+            banner.innerHTML = `
+                <i class="fas fa-pencil-alt"></i>
+                <div>
+                    <strong>Editing ${escapeHtml(String(quoteId))}</strong> · Rev ${escapeHtml(String(revision))}
+                    <span style="opacity:0.85;"> — Saving will create Rev ${escapeHtml(String(revision + 1))} (same quote ID).</span>
+                </div>
+            `;
+            mount.appendChild(banner);
+        } catch (err) {
+            console.warn('[dtg-inline-form] showEditModeBanner skipped:', err && err.message);
         }
     }
 

@@ -1415,8 +1415,18 @@
             const subtotal = lineItems.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
             const total = Number(totals.grandTotal) || subtotal;
 
+            // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
+            // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
+            // dtg-inline-form set window._dtgEditingQuoteId + _dtgEditingPK_ID
+            // + _dtgEditingRevision. In that mode the save becomes a REVISION
+            // (PUT to existing session + replace items, same QuoteID, bumped
+            // RevisionNumber) instead of CREATE (POST a fresh session).
+            const isEditMode = !!(window._dtgEditingQuoteId && window._dtgEditingPK_ID);
+            const effectiveQuoteID = isEditMode ? window._dtgEditingQuoteId : quoteID;
+            const newRevision = isEditMode ? (Number(window._dtgEditingRevision) || 1) + 1 : 1;
+
             const sessionPayload = {
-                QuoteID: quoteID,
+                QuoteID: effectiveQuoteID,
                 SessionID: `dtg_${Date.now()}`,
                 Status: 'Open',
                 CustomerEmail: customer.email || '',
@@ -1434,18 +1444,65 @@
                     customer,
                     emailSubject: draft.subject || '',
                 }),
+                ...(isEditMode ? { RevisionNumber: newRevision } : {}),
             };
-            const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionPayload),
-            });
-            if (!sessionRes.ok) {
-                const t = await sessionRes.text();
-                throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+
+            if (isEditMode) {
+                // PUT existing session by PK_ID (Caspio update)
+                const putRes = await fetch(`${API_BASE_URL}/api/quote_sessions/${window._dtgEditingPK_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!putRes.ok) {
+                    const t = await putRes.text();
+                    throw new Error('quote_sessions PUT ' + putRes.status + ': ' + t.slice(0, 200));
+                }
+                // Replace items: fetch existing rows then DELETE each by PK_ID.
+                // Caspio's proxy doesn't support bulk-delete by QuoteID filter,
+                // so we walk the list. If any individual delete fails we keep
+                // going and log — the new items still post (might briefly show
+                // dupes in quote-view but the latest revision wins on amount).
+                try {
+                    const existingRes = await fetch(
+                        `${API_BASE_URL}/api/quote_items?QuoteID=${encodeURIComponent(effectiveQuoteID)}`
+                    );
+                    if (existingRes.ok) {
+                        const existing = await existingRes.json();
+                        const oldItems = Array.isArray(existing) ? existing : [];
+                        for (const oi of oldItems) {
+                            if (!oi || !oi.PK_ID) continue;
+                            try {
+                                const delRes = await fetch(
+                                    `${API_BASE_URL}/api/quote_items/${oi.PK_ID}`,
+                                    { method: 'DELETE' }
+                                );
+                                if (!delRes.ok) {
+                                    console.warn('[dtg-ai] delete item', oi.PK_ID, 'returned', delRes.status);
+                                }
+                            } catch (innerErr) {
+                                console.warn('[dtg-ai] delete item', oi.PK_ID, 'failed:', innerErr.message);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[dtg-ai] item-cleanup pass failed (continuing):', e.message);
+                }
+            } else {
+                // CREATE — original flow
+                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!sessionRes.ok) {
+                    const t = await sessionRes.text();
+                    throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+                }
             }
+
             const items = lineItems.map((it, idx) => ({
-                QuoteID: quoteID,
+                QuoteID: effectiveQuoteID,
                 LineNumber: idx + 1,
                 StyleNumber: it.style || it.partNumber,
                 ProductName: it.description || `${it.style} ${it.color || ''}`.trim(),
@@ -1471,10 +1528,15 @@
                 });
                 if (!r.ok) console.warn('[dtg-ai] quote_items POST failed:', r.status);
             }
-            aiState.savedQuoteID = quoteID;
-            updateContextPill('saved ✓');
+            aiState.savedQuoteID = effectiveQuoteID;
+            // Bump in-memory edit revision so consecutive saves keep
+            // incrementing (Rev 2 → 3 → 4) without page reload.
+            if (isEditMode) window._dtgEditingRevision = newRevision;
+            updateContextPill(isEditMode ? `saved Rev ${newRevision} ✓` : 'saved ✓');
             updateActionsAvailability();
-            showToast(`Saved ${quoteID} — click again for share link`);
+            showToast(isEditMode
+                ? `Saved ${effectiveQuoteID} as Rev ${newRevision}`
+                : `Saved ${effectiveQuoteID} — click again for share link`);
         } catch (err) {
             console.error('[dtg-ai] save failed:', err);
             showToast('Save failed — check console');
