@@ -2291,9 +2291,15 @@ class DTFQuoteBuilder {
 
         // Build quote data
         // Phase 9 — include uploaded reference artwork file refs (if any)
+        // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
+        // from the rich-mode widget, so the proxy can emit Designs[{name, Locations[]}]
+        // for new-artwork pushes (creates a fresh design record in ShopWorks).
         const referenceArtwork = (window._dtfArtwork && typeof window._dtfArtwork.getFiles === 'function')
             ? window._dtfArtwork.getFiles()
             : [];
+        const newDesignName = (window._dtfArtwork && typeof window._dtfArtwork.getDesignName === 'function')
+            ? (window._dtfArtwork.getDesignName() || '').trim()
+            : '';
 
         // Phase 11.1 — include design # if rep picked one from the combobox
         const designNumber = document.getElementById('design-number')?.value?.trim() || '';
@@ -2306,6 +2312,7 @@ class DTFQuoteBuilder {
             salesRep,
             notes: '',
             referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
+            newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
             designNumber,     // → quote-service writes to quote_sessions.Notes.designNumber
             selectedLocations: this.selectedLocations,
             locationDetails: this.selectedLocations.map(loc => ({
@@ -3267,13 +3274,34 @@ document.addEventListener('DOMContentLoaded', () => {
     dtfQuoteBuilder = new DTFQuoteBuilder();
     window.dtfQuoteBuilder = dtfQuoteBuilder;
 
-    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
-    // Files uploaded here are read in saveAndGetLink() and stored to
-    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
+    // Adds design name input + per-file placement dropdown so the push payload
+    // can carry Designs[{name, Locations[{Location, ImageURL}]}] when the rep
+    // is creating a brand-new design (no existing #). Mirrors DTG's pattern
+    // in dtg-inline-form.js:2814-2864.
     if (typeof ArtworkUpload !== 'undefined') {
         try {
-            window._dtfArtwork = ArtworkUpload.attach({ mountSelector: '#dtf-artwork-mount' });
-            console.log('[DTF] Artwork upload widget mounted');
+            window._dtfArtwork = ArtworkUpload.attach({
+                mountSelector: '#dtf-artwork-mount',
+                designName: {
+                    enabled: true,
+                    label: 'Design name (required when uploading new artwork)',
+                    placeholder: 'e.g. Acme Corp Logo',
+                },
+                placements: [
+                    { code: 'Left Chest',   label: 'Left Chest' },
+                    { code: 'Right Chest',  label: 'Right Chest' },
+                    { code: 'Full Front',   label: 'Full Front' },
+                    { code: 'Full Back',    label: 'Full Back' },
+                    { code: 'Center Front', label: 'Center Front' },
+                    { code: 'Center Back',  label: 'Center Back' },
+                    { code: 'Back of Neck', label: 'Back of Neck' },
+                    { code: 'Left Sleeve',  label: 'Left Sleeve' },
+                    { code: 'Right Sleeve', label: 'Right Sleeve' },
+                ],
+                defaultPlacement: 'Left Chest',
+            });
+            console.log('[DTF] Artwork upload widget mounted (rich mode)');
         } catch (e) {
             console.error('[DTF] Artwork widget mount failed:', e);
         }
