@@ -1219,6 +1219,51 @@
     border-radius: 3px;
 }
 
+/* Phase 11.4/11.5 (2026-05-24): Print + Email buttons next to Submit.
+   Secondary actions — visually quieter than the primary "Submit to ShopWorks"
+   button above them. Match EMB/DTF/SCP's secondary-action aesthetic but kept
+   within DTG's existing palette. */
+.dtg-secondary-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+.dtg-secondary-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.dtg-secondary-btn:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+.dtg-secondary-btn:active {
+    background: #e2e8f0;
+}
+.dtg-secondary-btn i { font-size: 13px; }
+#dtgEmailBtn {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+#dtgEmailBtn:hover {
+    background: #dbeafe;
+    border-color: #60a5fa;
+    color: #1e40af;
+}
+
 /* Stock-confirm modal — shown at Submit time when one or more sizes
    exceed SanMar's current inventory. Rep can proceed (backorder /
    drop-ship known) or cancel (adjust qty and retry). Mirrors the

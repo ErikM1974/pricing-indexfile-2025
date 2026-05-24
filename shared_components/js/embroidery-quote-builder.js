@@ -801,6 +801,13 @@ async function loadQuoteForEditing(quoteId) {
         const session = result.session;
         const items = result.items;
 
+        // Phase 11.3.5 (Erik 2026-05-24): one-way SW sync — bail if the quote
+        // is already in ShopWorks. assertQuoteEditable() alerts the rep and
+        // redirects to read-only quote-view.
+        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+            return;
+        }
+
         // Store edit mode state
         editingQuoteId = quoteId;
         editingRevision = session.RevisionNumber || 1;
@@ -1321,23 +1328,39 @@ function populateAdditionalCharges(session) {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
-    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
-    // Files uploaded here are read in saveAndGetLink() and stored to
-    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
+    // Adds design name input + per-file placement dropdown so the push payload
+    // can carry Designs[{name, Locations[{Location, ImageURL}]}] for new-design
+    // pushes. Mirrors DTF/SCP wiring (commit 8056aeaa, 20c96945).
+    //
+    // Phase 9.1 RESOLVED (2026-05-24, Phase 11.3d): EMB persistence chose
+    // option (c) — repurpose ImportNotes from array → object so referenceArtwork
+    // and newDesignName ride alongside the existing import-notes array. Proxy's
+    // embroidery-push-transformer.js handles both shapes (legacy array kept
+    // working). Quote-service writes the object form in customerData.
     if (typeof ArtworkUpload !== 'undefined') {
         try {
-            window._embArtwork = ArtworkUpload.attach({ mountSelector: '#emb-artwork-mount' });
-            console.log('[EMB] Artwork upload widget mounted');
-            // 🚧 TODO Phase 9.1: persist window._embArtwork.getFiles() into the
-            // quote save payload. EMB's Notes column is plain text (not JSON
-            // like DTF/SCP), so persistence needs a schema decision:
-            //   (a) Add referenceArtwork column to Quote_Sessions
-            //   (b) Convert Notes to JSON (would break older quotes' parsers)
-            //   (c) Repurpose existing JSON column (ImportNotes? — semantic mismatch)
-            // For now: widget WORKS for upload (files land in Caspio Artwork
-            // folder, rep sees them mid-session) but URLs are NOT persisted
-            // when quote is saved/edited. Files exist on server, just not
-            // linked back to this quote.
+            window._embArtwork = ArtworkUpload.attach({
+                mountSelector: '#emb-artwork-mount',
+                designName: {
+                    enabled: true,
+                    label: 'Design name (required when uploading new artwork)',
+                    placeholder: 'e.g. Acme Corp Logo',
+                },
+                placements: [
+                    { code: 'Left Chest',   label: 'Left Chest' },
+                    { code: 'Right Chest',  label: 'Right Chest' },
+                    { code: 'Full Back',    label: 'Full Back' },
+                    { code: 'Left Sleeve',  label: 'Left Sleeve' },
+                    { code: 'Right Sleeve', label: 'Right Sleeve' },
+                    { code: 'Cap Front',    label: 'Cap Front' },
+                    { code: 'Cap Side',     label: 'Cap Side' },
+                    { code: 'Cap Back',     label: 'Cap Back' },
+                    { code: 'Beanie Front', label: 'Beanie Front' },
+                ],
+                defaultPlacement: 'Left Chest',
+            });
+            console.log('[EMB] Artwork upload widget mounted (rich mode)');
         } catch (e) {
             console.error('[EMB] Artwork widget mount failed:', e);
         }
@@ -6538,6 +6561,17 @@ async function saveAndGetLink() {
             importNotes: lastImportMetadata
                 ? [...(lastImportMetadata.warnings || []), ...(lastImportMetadata.unmatchedLines || []), ...(lastImportMetadata.reviewItems || [])]
                 : [],
+            // Phase 11.3 (2026-05-24) — rich-mode artwork data.
+            // Persisted by quote-service.js into the ImportNotes JSON column
+            // (extended from flat-array to object shape so this data rides
+            // along without a Caspio schema change). Proxy's EMB transformer
+            // reads them to emit Designs[{name, Locations[]}] on push.
+            referenceArtwork: (window._embArtwork && typeof window._embArtwork.getFiles === 'function')
+                ? window._embArtwork.getFiles()
+                : [],
+            newDesignName: (window._embArtwork && typeof window._embArtwork.getDesignName === 'function')
+                ? (window._embArtwork.getDesignName() || '').trim()
+                : '',
             paidToDate: lastImportMetadata?.paidToDate ?? 0,
             balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
             orderNotes: lastImportMetadata?.orderNotes ?? '',

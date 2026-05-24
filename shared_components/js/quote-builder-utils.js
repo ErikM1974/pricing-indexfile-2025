@@ -794,6 +794,48 @@ function checkForEditMode() {
 }
 
 /**
+ * Phase 11.3.5 (Erik 2026-05-24): one-way ShopWorks sync — once a quote is
+ * pushed to SW, ALL revisions happen there and flow back via the snapshot
+ * sync. Editing in our app would silently diverge from SW.
+ *
+ * Call this from each builder's loadQuoteForEditing() RIGHT AFTER fetching
+ * the session. Returns false when the quote is locked (caller should abort
+ * load + bail). Default behavior on lock: alert the rep + redirect to the
+ * read-only quote-view page. Pass { silent: true } to skip the alert/redirect
+ * and just get the boolean (useful for tests or programmatic flows).
+ *
+ * @param {Object} session — quote_sessions row (must have .QuoteID + .Status)
+ * @param {Object} [opts]
+ * @param {boolean} [opts.silent=false] — skip alert + redirect on lock
+ * @returns {boolean} true → safe to edit; false → locked, abort
+ */
+function assertQuoteEditable(session, opts = {}) {
+    const lockedStatuses = new Set([
+        'Processed',
+        'Cancelled_in_ShopWorks',
+        'Payment Confirmed',
+        'Payment Confirmed - ShopWorks Failed',
+        'Pending Payment',
+    ]);
+    const status = session && session.Status;
+    if (!lockedStatuses.has(status)) return true;
+
+    if (opts.silent) return false;
+
+    const quoteId = (session && session.QuoteID) || '(unknown)';
+    alert(
+        `${quoteId} is in ShopWorks (status: ${status}).\n\n` +
+        `Per the one-way sync rule, edits must happen in ShopWorks. ` +
+        `Changes in this app would not sync back to the SW order.\n\n` +
+        `Opening read-only quote view instead.`
+    );
+    try {
+        window.location.href = `/quote/${encodeURIComponent(quoteId)}`;
+    } catch (_) { /* navigation failed — swallow */ }
+    return false;
+}
+
+/**
  * Update UI to show edit mode (header subtitle + save button text).
  * @param {string} quoteId
  * @param {number} revision

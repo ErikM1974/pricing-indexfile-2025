@@ -1012,37 +1012,69 @@ body {
     line-height: 1.5;
 }
 
-/* -- Legacy form re-theme (green replaces blue) ------------------------- */
-/* The existing 12 DTG JS files load their own classes (.power-header,
-   .power-main, .power-content, etc.) inside the "Manual quote builder"
-   accordion. We re-theme the blue header bar to NWCA green and tweak the
-   typography to match the rest of the page. */
+/* -- Phase 11.7 (2026-05-24): power-header chrome for DTG --------------- */
+/* Erik's "unified UX" rule — make DTG's top chrome match EMB/DTF/SCP so a
+   rep switching between builders sees the same banner + buttons. Catalog
+   browser + AI chat stay (they're DTG's killer features), only the header
+   harmonizes. Base layout rules cloned from quote-builder-common.css so we
+   don't have to load that whole file. */
 .power-header {
-    background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%) !important;
+    background: linear-gradient(135deg, var(--pnw-forest, #2e5827) 0%, var(--pnw-pine, #1f4922) 100%) !important;
     color: #fff !important;
-    border-bottom: 1px solid var(--pnw-pine);
+    border-bottom: 1px solid var(--pnw-pine, #1f4922);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-.power-header .logo { filter: brightness(0) invert(1); }
-.power-header-title { color: #fff !important; }
-.power-header-subtitle { color: rgba(255, 255, 255, 0.85) !important; }
+.power-header .logo { height: 40px; }
+.power-header .header-actions {
+    display: flex;
+    gap: 10px;
+}
 .power-header .btn-header {
     background: rgba(255, 255, 255, 0.10);
     border: 1px solid rgba(255, 255, 255, 0.30);
     color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
 }
 .power-header .btn-header:hover {
     background: rgba(255, 255, 255, 0.20);
 }
 .power-header .btn-new-quote {
     background: #fff8e0;
-    color: var(--pnw-forest);
+    color: var(--pnw-forest, #2e5827) !important;
     border-color: #fff8e0;
     font-weight: 700;
 }
 .power-header .btn-new-quote:hover {
     background: #fff;
-    color: var(--pnw-pine);
+    color: var(--pnw-pine, #1f4922) !important;
 }
+.power-header-center {
+    text-align: center;
+    flex: 1;
+}
+.power-header-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #fff !important;
+}
+.power-header-subtitle {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85) !important;
+    margin-top: 2px;
+}
+/* (Power-header rules consolidated above in Phase 11.7 block) */
 
 /* Re-theme legacy radio buttons + form controls to green */
 .location-radio input[type="radio"]:checked {

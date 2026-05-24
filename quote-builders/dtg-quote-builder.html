@@ -11,32 +11,42 @@
 
     <!-- Shared chat/page CSS (sticker is canonical) + DTG overrides -->
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
-    <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.20.16">
-    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.20.19">
+    <link rel="stylesheet" href="/shared_components/css/dtg-quote-page.css?v=2026.05.24.5">
+    <link rel="stylesheet" href="/shared_components/css/dtg-inline-form.css?v=2026.05.24.4">
     <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.05.20.17">
 </head>
 <body>
-    <!-- ========== Header ========== -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
-                    <a href="/staff-dashboard.html">Dashboard</a>
-                    <span>/</span>
-                    <span>DTG Quote Builder</span>
-                </nav>
-            </div>
+    <!-- ========== Header (Phase 11.7 — unified chrome matching EMB/DTF/SCP) ========== -->
+    <!-- Erik 2026-05-24: replaced DTG's custom breadcrumb header with the same
+         power-header structure the other 3 builders use. Reps switching
+         between builders now see consistent top-bar buttons + branding.
+         Catalog browser + AI chat stay below — they're DTG's killer features
+         and aren't affected by this swap. -->
+    <header class="power-header">
+        <a href="/staff-dashboard.html">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel"
+                 class="logo">
+        </a>
+        <div class="power-header-center">
+            <div class="power-header-title">2026 DTG Quote Builder</div>
+            <div class="power-header-subtitle">Direct-to-Garment Printing · Kornit Storm Hexa</div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-header btn-new-quote" onclick="dtgConfirmNewQuote()">
+                <i class="fas fa-plus"></i> New Quote
+            </button>
+            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </button>
         </div>
     </header>
 
     <!-- ========== Main ========== -->
     <main class="main-container">
 
-        <!-- ========== Page title strip — minimal hero ========== -->
-        <section class="page-titlebar" aria-label="Page title">
-            <h1 class="page-titlebar-title">DTG Quote Builder</h1>
+        <!-- ========== LTM fee tip strip (Phase 11.7: title moved to power-header above) ========== -->
+        <section class="page-titlebar" aria-label="Pricing tip">
             <div class="page-titlebar-fact" title="Orders below 24 use the 24-47 tier base price + a $50 LTM fee distributed per piece. Order 24+ and the fee disappears entirely.">
                 <i class="fas fa-cube"></i>
                 <span>Order <strong>24+</strong> to skip the <strong>$50 LTM fee</strong></span>
@@ -181,9 +191,16 @@
     <!-- Inline DTG order form — bot fills it via window.DTGInlineForm.fillFromQuote() -->
     <!-- Phase 10 (2026-05-23): shared customer-context-banners helper. DTG migrated to use it for consistency with EMB/DTF/SCP. -->
     <script src="/shared_components/js/customer-context-banners.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.23.4"></script>
+    <!-- Phase 11.4/11.5 (2026-05-24): print/email helpers for parity with EMB/DTF/SCP -->
+    <!-- EmailJS for Email Quote button -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Shared utilities: emailQuote, assertQuoteEditable, showToast (DTG inline form also uses its own toast — both coexist) -->
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.05.24.3"></script>
+    <!-- Invoice generator for Print Quote (PDF-quality invoice from current quote state) -->
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.05.24.4"></script>
+    <script src="/shared_components/js/dtg-inline-form.js?v=2026.05.24.4"></script>
     <!-- Chat controller — listens for PRICE_QUOTE blocks and fills the form -->
-    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.19.10"></script>
+    <script src="/shared_components/js/dtg-quote-page.js?v=2026.05.24.5"></script>
     <!-- NWCA-Approved DTG Catalog browser — backed by /api/dtg/top-sellers -->
     <script src="/shared_components/js/dtg-catalog.js?v=2026.05.19.10"></script>
 </body>

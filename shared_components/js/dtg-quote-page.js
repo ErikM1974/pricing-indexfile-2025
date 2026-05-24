@@ -1415,8 +1415,18 @@
             const subtotal = lineItems.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
             const total = Number(totals.grandTotal) || subtotal;
 
+            // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
+            // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
+            // dtg-inline-form set window._dtgEditingQuoteId + _dtgEditingPK_ID
+            // + _dtgEditingRevision. In that mode the save becomes a REVISION
+            // (PUT to existing session + replace items, same QuoteID, bumped
+            // RevisionNumber) instead of CREATE (POST a fresh session).
+            const isEditMode = !!(window._dtgEditingQuoteId && window._dtgEditingPK_ID);
+            const effectiveQuoteID = isEditMode ? window._dtgEditingQuoteId : quoteID;
+            const newRevision = isEditMode ? (Number(window._dtgEditingRevision) || 1) + 1 : 1;
+
             const sessionPayload = {
-                QuoteID: quoteID,
+                QuoteID: effectiveQuoteID,
                 SessionID: `dtg_${Date.now()}`,
                 Status: 'Open',
                 CustomerEmail: customer.email || '',
@@ -1434,18 +1444,65 @@
                     customer,
                     emailSubject: draft.subject || '',
                 }),
+                ...(isEditMode ? { RevisionNumber: newRevision } : {}),
             };
-            const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionPayload),
-            });
-            if (!sessionRes.ok) {
-                const t = await sessionRes.text();
-                throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+
+            if (isEditMode) {
+                // PUT existing session by PK_ID (Caspio update)
+                const putRes = await fetch(`${API_BASE_URL}/api/quote_sessions/${window._dtgEditingPK_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!putRes.ok) {
+                    const t = await putRes.text();
+                    throw new Error('quote_sessions PUT ' + putRes.status + ': ' + t.slice(0, 200));
+                }
+                // Replace items: fetch existing rows then DELETE each by PK_ID.
+                // Caspio's proxy doesn't support bulk-delete by QuoteID filter,
+                // so we walk the list. If any individual delete fails we keep
+                // going and log — the new items still post (might briefly show
+                // dupes in quote-view but the latest revision wins on amount).
+                try {
+                    const existingRes = await fetch(
+                        `${API_BASE_URL}/api/quote_items?QuoteID=${encodeURIComponent(effectiveQuoteID)}`
+                    );
+                    if (existingRes.ok) {
+                        const existing = await existingRes.json();
+                        const oldItems = Array.isArray(existing) ? existing : [];
+                        for (const oi of oldItems) {
+                            if (!oi || !oi.PK_ID) continue;
+                            try {
+                                const delRes = await fetch(
+                                    `${API_BASE_URL}/api/quote_items/${oi.PK_ID}`,
+                                    { method: 'DELETE' }
+                                );
+                                if (!delRes.ok) {
+                                    console.warn('[dtg-ai] delete item', oi.PK_ID, 'returned', delRes.status);
+                                }
+                            } catch (innerErr) {
+                                console.warn('[dtg-ai] delete item', oi.PK_ID, 'failed:', innerErr.message);
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[dtg-ai] item-cleanup pass failed (continuing):', e.message);
+                }
+            } else {
+                // CREATE — original flow
+                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!sessionRes.ok) {
+                    const t = await sessionRes.text();
+                    throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+                }
             }
+
             const items = lineItems.map((it, idx) => ({
-                QuoteID: quoteID,
+                QuoteID: effectiveQuoteID,
                 LineNumber: idx + 1,
                 StyleNumber: it.style || it.partNumber,
                 ProductName: it.description || `${it.style} ${it.color || ''}`.trim(),
@@ -1471,10 +1528,15 @@
                 });
                 if (!r.ok) console.warn('[dtg-ai] quote_items POST failed:', r.status);
             }
-            aiState.savedQuoteID = quoteID;
-            updateContextPill('saved ✓');
+            aiState.savedQuoteID = effectiveQuoteID;
+            // Bump in-memory edit revision so consecutive saves keep
+            // incrementing (Rev 2 → 3 → 4) without page reload.
+            if (isEditMode) window._dtgEditingRevision = newRevision;
+            updateContextPill(isEditMode ? `saved Rev ${newRevision} ✓` : 'saved ✓');
             updateActionsAvailability();
-            showToast(`Saved ${quoteID} — click again for share link`);
+            showToast(isEditMode
+                ? `Saved ${effectiveQuoteID} as Rev ${newRevision}`
+                : `Saved ${effectiveQuoteID} — click again for share link`);
         } catch (err) {
             console.error('[dtg-ai] save failed:', err);
             showToast('Save failed — check console');
@@ -1493,4 +1555,49 @@
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
     }
+
+    // ========================================================================
+    // Phase 11.7 (Erik 2026-05-24) — power-header "+ New Quote" button handler
+    //
+    // Wired from the unified power-header in dtg-quote-builder.html. Confirms
+    // unsaved work via the inline form's dirty flag, then resets the form +
+    // clears edit-mode + saved-quote-ID context so the next save creates a
+    // fresh DTG-NNN (not a revision of whatever was just open).
+    //
+    // Exposed on window so the inline `onclick` attribute in the HTML can
+    // reach it (file uses an IIFE so other helpers stay private).
+    // ========================================================================
+    window.dtgConfirmNewQuote = function dtgConfirmNewQuote() {
+        try {
+            const form = window.DTGInlineForm;
+            const dirty = form && typeof form.isDirty === 'function' && form.isDirty();
+            if (dirty) {
+                if (!confirm('You have unsaved changes. Start a new quote? (Resets the form.)')) {
+                    return;
+                }
+            }
+            if (form && typeof form.resetForm === 'function') {
+                form.resetForm();
+                // Clear edit-mode context so next save creates a new quote ID
+                // (not a revision of whatever we just reset away from).
+                try {
+                    delete window._dtgEditingQuoteId;
+                    delete window._dtgEditingPK_ID;
+                    delete window._dtgEditingRevision;
+                } catch (_) { /* swallow */ }
+                // Also drop the saved quote ID from chat-panel state so the
+                // Email Quote button correctly requires a fresh save first.
+                if (window.aiState) window.aiState.savedQuoteID = null;
+                showToast('New quote — form cleared');
+            } else {
+                // Last-resort fallback if inline form hasn't loaded yet
+                location.reload();
+            }
+        } catch (e) {
+            console.error('[DTG] New Quote handler failed:', e);
+            if (confirm('Reset failed. Reload the page to start fresh?')) {
+                location.reload();
+            }
+        }
+    };
 })();

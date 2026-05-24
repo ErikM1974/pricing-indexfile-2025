@@ -515,6 +515,17 @@ body {
     background: #e8f0f6;
 }
 
+/* Phase 11.3.5 (Erik 2026-05-24): locked-edit button — quote is in ShopWorks
+   and one-way sync rule says edits happen there, not here. Visually clear
+   that the button is dormant; tooltip explains why. */
+.action-btn.action-btn--locked,
+.action-btn.action-btn--locked:hover {
+    color: var(--qb-text-muted, #9ca3af);
+    background: transparent;
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
 /* Pagination */
 .pagination {
     display: flex;
