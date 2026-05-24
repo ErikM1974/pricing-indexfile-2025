@@ -3223,78 +3223,41 @@
     // Tax Exempt chip, Account Tier badge, auto-select Payment Terms dropdown.
     // Called from pick() when a customer is selected; also from session
     // restore when state.customer is rehydrated from a saved draft.
+    //
+    // Phase 10 (2026-05-23): MIGRATED to shared customer-context-banners.js
+    // helper for sync hygiene with EMB/DTF/SCP. Single code path; one fix
+    // updates all 4 builders. Behavior preserved — DTG's dtg* DOM IDs still
+    // used via the helper's config object.
     function renderCustomerContextBadges() {
-        // Warning banner — amber, prominent, draws AR/CSR attention immediately
-        const warn = document.getElementById('dtgCustomerWarning');
-        if (warn) {
-            const cw = state.customer.customerWarning;
-            if (cw) {
-                warn.innerHTML =
-                    `<span style="font-size:18px;line-height:1;color:#d97706;">⚠️</span>` +
-                    `<div>` +
-                    `<div style="font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:.04em;font-size:11px;">Customer Warning</div>` +
-                    `<div>${escapeHtml(cw)}</div>` +
-                    `</div>`;
-                warn.hidden = false;
-            } else {
-                warn.hidden = true;
-                warn.innerHTML = '';
-            }
+        if (typeof window.surfaceCustomerContext !== 'function') {
+            console.warn('[DTG] customer-context-banners.js not loaded — context badges may not render');
+            return;
         }
-
-        // Tax exempt chip — green pill, shows cert# when on file
-        const taxChip = document.getElementById('dtgTaxExemptChip');
-        if (taxChip) {
-            if (state.customer.isTaxExempt) {
-                const cert = state.customer.taxExemptNumber
-                    ? ` · Cert # ${escapeHtml(state.customer.taxExemptNumber)}` : '';
-                taxChip.innerHTML = `<span>🏛️</span><span>TAX EXEMPT${cert}</span>`;
-                taxChip.hidden = false;
-            } else {
-                taxChip.hidden = true;
-                taxChip.innerHTML = '';
-            }
-        }
-
-        // Account tier badge — VIP / GOLD / House etc. (info-only)
-        const tier = document.getElementById('dtgAccountTierBadge');
-        if (tier) {
-            const at = state.customer.accountTier;
-            if (at) {
-                tier.innerHTML = `<span>⭐</span><span>${escapeHtml(at)}</span>`;
-                tier.hidden = false;
-            } else {
-                tier.hidden = true;
-                tier.innerHTML = '';
-            }
-        }
-
-        // Auto-select payment terms in dropdown. NWCA only OFFERS three terms
-        // today: Prepaid / Net 10 / Pay On Pickup (Erik 2026-05-23). The CRM
-        // may carry historical terms NWCA no longer extends (NET 30, NET 60,
-        // COD, etc.) — those get MAPPED to a currently-offered term via
-        // mapToOfferedTerms(), with a small ⚠ note next to the dropdown
-        // surfacing the conversion so reps know to verify.
+        // Map DTG's camelCase state back to the raw CRM field shape the
+        // shared helper expects (Customer_Warning, Is_Tax_Exempt, etc.)
+        window.surfaceCustomerContext({
+            Customer_Warning: state.customer.customerWarning,
+            Is_Tax_Exempt: state.customer.isTaxExempt,
+            Tax_Exempt_Number: state.customer.taxExemptNumber,
+            Account_Tier: state.customer.accountTier,
+            Payment_Terms: state.customer.paymentTerms,
+        }, {
+            warningContainerId: 'dtgCustomerWarning',
+            taxChipContainerId: 'dtgTaxExemptChip',
+            tierBadgeContainerId: 'dtgAccountTierBadge',
+            termsSelectId: 'dtgTerms',
+            termsNoteId: 'dtgTermsMapNote',
+            // NWCA only OFFERS three terms today: Prepaid / Net 10 / Pay On Pickup
+            // (Erik 2026-05-23). Legacy CRM terms like NET 30/60 get mapped to
+            // Prepaid by the shared helper (most conservative — don't extend
+            // credit accidentally) with a ⚠ note surfacing the conversion.
+            offeredTerms: ['Prepaid', 'Net 10', 'Pay On Pickup'],
+        });
+        // The shared helper sets the dropdown value; mirror it to state.customer.terms
+        // so downstream save logic picks up the same value.
         const termsSelect = document.getElementById('dtgTerms');
-        const mapNote = document.getElementById('dtgTermsMapNote');
-        if (termsSelect && state.customer.paymentTerms) {
-            const original = state.customer.paymentTerms;
-            const mapped = mapToOfferedTerms(original) || 'Prepaid';
-            termsSelect.value = mapped;
-            state.customer.terms = mapped;
-            if (mapNote) {
-                if (mapped.toLowerCase() !== original.toLowerCase()) {
-                    // Mapping happened — flag it so the rep notices
-                    mapNote.textContent = `⚠ CRM had "${original}" — mapped to ${mapped}`;
-                    mapNote.hidden = false;
-                } else {
-                    mapNote.hidden = true;
-                    mapNote.textContent = '';
-                }
-            }
-        } else if (mapNote) {
-            mapNote.hidden = true;
-            mapNote.textContent = '';
+        if (termsSelect && termsSelect.value) {
+            state.customer.terms = termsSelect.value;
         }
     }
 
