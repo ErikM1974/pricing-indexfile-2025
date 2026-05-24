@@ -3828,6 +3828,13 @@ async function saveAndGetLink() {
                 spPersistence.clearDraft();
             }
 
+            // Phase 8 (2026-05-23): reveal Push-to-ShopWorks button after save.
+            // Gated behind ?enableScpPush=1 query param until Erik confirms
+            // OnSite integration IDs in proxy config/manageorders-scp-config.js.
+            if (typeof showScpPushButton === 'function') {
+                showScpPushButton(result.quoteID);
+            }
+
             // Show success modal with shareable link
             if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
                 QuoteShareModal.show(result.quoteID, editingQuoteId ? `Updated to Rev ${editingRevision}` : null);
@@ -3964,3 +3971,123 @@ function generateQuoteText(products, pricing) {
 // ============================================================
 
 // showLoading(), showToast() → provided by quote-builder-utils.js
+
+
+// =====================================================
+// Push to ShopWorks (Phase 8 — 2026-05-23)
+// =====================================================
+// Mirrors the EMB/DTF pushToShopWorks() pattern.
+// Gated behind ?enableScpPush=1 query param until Erik confirms the
+// OnSite integration IDs (id_Customer, id_OrderType, ExtSource) in
+// caspio-pricing-proxy/config/manageorders-scp-config.js.
+//
+// To enable for testing:
+//   /quote-builders/screenprint-quote-builder.html?enableScpPush=1
+//
+// When ready for production, remove the flag check from showScpPushButton().
+
+let _scpPushQuoteId = null;
+
+function _scpPushEnabled() {
+    try {
+        return new URLSearchParams(window.location.search).has('enableScpPush');
+    } catch {
+        return false;
+    }
+}
+
+function showScpPushButton(quoteId) {
+    _scpPushQuoteId = quoteId;
+
+    // 🚧 Phase 8 gate — remove this when ShopWorks integration is verified
+    if (!_scpPushEnabled()) {
+        console.log('[SCP Push] Button hidden (add ?enableScpPush=1 to URL to test push)');
+        return;
+    }
+
+    const btn = document.getElementById('scp-push-shopworks-btn');
+    if (btn) {
+        btn.style.display = '';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        const label = document.getElementById('scp-push-shopworks-label');
+        if (label) label.textContent = 'Push to ShopWorks';
+    }
+}
+
+async function scpPushToShopWorks() {
+    const btn = document.getElementById('scp-push-shopworks-btn');
+    const label = document.getElementById('scp-push-shopworks-label');
+    if (!btn || btn.disabled || !_scpPushQuoteId) return;
+
+    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+    const companyName = document.getElementById('company-name')?.value?.trim() || '';
+    const displayName = companyName || customerName || 'N/A';
+
+    const confirmed = confirm(
+        `Push to ShopWorks?\n\n` +
+        `Quote: ${_scpPushQuoteId}\n` +
+        `Customer: ${displayName}\n\n` +
+        `This will create a new screen print order in ShopWorks OnSite.\n` +
+        `(Phase 8 testing mode — orders land under the EMB integration ` +
+        `customer until SCP gets its own.)`
+    );
+    if (!confirmed) return;
+
+    // Loading state
+    const originalText = label?.textContent || 'Push to ShopWorks';
+    if (label) label.textContent = 'Pushing...';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        const response = await fetch(`${apiBase}/api/scp-push/push-quote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                quoteId: _scpPushQuoteId,
+                isTest: false,
+                force: false,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 409) {
+                if (label) label.textContent = 'Already Pushed';
+                btn.style.background = '#28a745';
+                if (typeof showToast === 'function') {
+                    showToast('Already pushed to ShopWorks', 'info');
+                }
+                return;
+            }
+            throw new Error(data.error || data.details || `HTTP ${response.status}`);
+        }
+
+        // Success
+        if (label) label.textContent = `Pushed ✓ (${data.extOrderId})`;
+        btn.style.background = '#28a745';
+        if (typeof showToast === 'function') {
+            showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+        }
+        console.log('[SCP Push] Success:', data);
+
+    } catch (error) {
+        console.error('[SCP Push] Push error:', error);
+        if (label) label.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        if (typeof showToast === 'function') {
+            showToast(`Push failed: ${error.message}`, 'error');
+        }
+    }
+}
+
+// Expose for HTML onclick + cross-file callers
+window.scpPushToShopWorks = scpPushToShopWorks;
+window.showScpPushButton = showScpPushButton;
