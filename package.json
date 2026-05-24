@@ -20,7 +20,11 @@
     "test:emb-pricing-verbose": "node tests/validation/validate-2025-embroidery-pricing.js --verbose",
     "test:order": "node tests/run-order.js",
     "test:batch": "node tests/e2e-batch-runner.js",
-    "test:emb-ltm": "node tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis"
+    "test:emb-ltm": "node tests/validation/validate-2025-embroidery-pricing.js --ltm-analysis",
+    "capture:pricing": "node scripts/capture-pricing-baselines.js",
+    "capture:pricing:headed": "node scripts/capture-pricing-baselines.js --headed",
+    "capture:pricing:ci": "node scripts/capture-pricing-baselines.js --start-server",
+    "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose"
   },
   "engines": {
     "node": "18.x"

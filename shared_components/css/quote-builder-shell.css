@@ -1,0 +1,360 @@
+/* =============================================================================
+   quote-builder-shell.css — canonical visual language for ALL quote builders
+
+   Goal: bring EMB / DTF / SCP up to DTG's visual quality bar (Pacific Northwest
+   palette, forest-tinted shadows, card-based layout, Inter typography).
+
+   Load order (MUST be in this sequence — shell tokens override common's legacy tokens):
+     1. shared_components/css/quote-builder-common.css      (legacy shared utilities — load FIRST)
+     2. shared_components/css/quote-builder-shell.css       (THIS file — PNW tokens override common's via cascade)
+     3. shared_components/css/<builder>-quote-builder*.css  (per-builder overrides — load LAST)
+
+   Phase 2a (2026-05-23): tokens + base primitives. Builder reskin (Phase 2b) wires the
+   .qb-* primitives into the actual HTML. CI gate (tests/integration/pricing-baselines)
+   guarantees no pricing regression during the reskin.
+
+   IMPORTANT: This file maps legacy --builder-primary / --nwca-* tokens to PNW
+   greens, so any existing CSS that uses var(--builder-primary) automatically
+   inherits the new palette. No mass find-replace needed.
+   ========================================================================== */
+
+/* ============================================================================
+   PACIFIC NORTHWEST DESIGN TOKENS
+   ============================================================================
+   Lifted from dtg-quote-page.css (the DTG gold-standard already uses these).
+   This is the single source of truth — when you tune the brand, edit ONLY here.
+*/
+:root {
+    /* --- Forest greens (primary brand) --- */
+    --pnw-forest-deep: #1f4922;  /* Deepest forest — borders, strong accents */
+    --pnw-forest:      #2e5827;  /* Primary brand green — CTAs, icons */
+    --pnw-forest-mid:  #3d6d35;  /* Mid-tone for gradients + hover states */
+    --pnw-pine:        #1a3517;  /* Headings + emphatic text */
+    --pnw-moss:        #6b8e60;  /* Soft accent — secondary text, hints */
+    --pnw-sage:        #a8c39e;  /* Pale lichen — subtle borders, tints */
+
+    /* --- Warm woods (paper / surfaces) --- */
+    --pnw-birch:       #f7f2e3;  /* Soft cream paper — page background */
+    --pnw-birch-deep:  #ede5cf;  /* Slightly saturated cream — card backs */
+    --pnw-cedar:       #8b6f4e;  /* Optional wood tone — accents */
+    --pnw-bark-shadow: #3a2e1f;  /* Deep brown — sparingly, e.g. select text */
+
+    /* --- Neutrals (mountain mist) --- */
+    --pnw-mist:        #e8eee7;  /* Mist for soft backgrounds */
+    --pnw-fog:         #f4f6f3;  /* Even paler mist — hover states */
+    --pnw-stone:       #6b7280;  /* Neutral text gray */
+    --pnw-stone-soft:  #9ca3af;  /* Muted gray */
+
+    /* --- Surface scale --- */
+    --pnw-paper:       #ffffff;  /* Pure white cards */
+    --pnw-rule:        rgba(31, 73, 34, 0.10);   /* Forest-tinted borders */
+    --pnw-rule-strong: rgba(31, 73, 34, 0.22);
+
+    /* --- Forest-tinted shadows (NOT pure black) --- */
+    --pnw-shadow-sm:   0 1px 2px rgba(31, 73, 34, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+    --pnw-shadow-md:   0 2px 6px rgba(31, 73, 34, 0.10), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --pnw-shadow-lg:   0 6px 16px rgba(31, 73, 34, 0.14), 0 12px 28px rgba(0, 0, 0, 0.08);
+    --pnw-glow-focus:  0 0 0 3px rgba(46, 88, 39, 0.20);
+
+    /* --- Semantic states (consistent with art-hub.css) --- */
+    --qb-state-warn:    #f59e0b;
+    --qb-state-warn-bg: #fef3c7;
+    --qb-state-error:   #dc2626;
+    --qb-state-error-bg:#fef2f2;
+    --qb-state-info:    #3b82f6;
+    --qb-state-info-bg: #eff6ff;
+    --qb-state-success: var(--pnw-forest);
+    --qb-state-success-bg: var(--pnw-mist);
+
+    /* --- Radii / spacing / motion (canonical 2026 scale, matches art-hub.css) --- */
+    --qb-radius-sm:   4px;
+    --qb-radius-md:   8px;
+    --qb-radius-lg:   12px;
+    --qb-radius-xl:   16px;
+    --qb-radius-pill: 999px;
+
+    --qb-space-1: 4px;
+    --qb-space-2: 8px;
+    --qb-space-3: 12px;
+    --qb-space-4: 16px;
+    --qb-space-5: 20px;
+    --qb-space-6: 24px;
+    --qb-space-8: 32px;
+
+    --qb-ease-out:  cubic-bezier(.2, .8, .2, 1);
+    --qb-dur-fast:  120ms;
+    --qb-dur-base:  200ms;
+    --qb-dur-slow:  320ms;
+
+    /* --- Typography --- */
+    --qb-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --qb-font-features: "cv11" 1, "ss01" 1, "tnum" 1;
+
+    /* ========================================================================
+       LEGACY TOKEN ALIASES — back-compat for existing CSS without find-replace
+       ========================================================================
+       Any CSS that says var(--builder-primary) / var(--nwca-blue) / var(--builder-header-bg)
+       will now resolve to PNW forest greens instead of the lime + navy palette.
+       This is the "instant uplift" — no per-builder rewriting needed.
+    */
+    --builder-primary:        var(--pnw-forest);
+    --builder-primary-dark:   var(--pnw-forest-deep);
+    --builder-primary-light:  var(--pnw-moss);
+    --builder-header-bg:      var(--pnw-forest-deep);
+
+    --nwca-blue:              var(--pnw-forest-deep);   /* legacy "navy header" → forest */
+    --nwca-green:             var(--pnw-forest);
+    --nwca-red:               var(--qb-state-error);
+
+    --builder-text-dark:      var(--pnw-pine);
+    --builder-text-muted:     var(--pnw-stone);
+    --builder-text-light:     var(--pnw-stone-soft);
+
+    --builder-border:         var(--pnw-rule);
+    --builder-border-dark:    var(--pnw-rule-strong);
+    --border-color:           var(--pnw-rule);
+    --color-border:           var(--pnw-rule);
+    --color-border-light:     var(--pnw-rule);
+
+    --color-bg-light:         var(--pnw-fog);
+    --color-bg-lighter:       var(--pnw-mist);
+    --bg-light:               var(--pnw-fog);
+    --bg-sidebar:             var(--pnw-mist);
+
+    --builder-error:          var(--qb-state-error);
+    --builder-success:        var(--qb-state-success);
+    --builder-warning:        var(--qb-state-warn);
+    --builder-info:           var(--qb-state-info);
+
+    /* Table header colors — replaces the slate-blue defaults in common.css */
+    --color-header-dark:      var(--pnw-forest-deep);
+    --color-header-qty:       var(--pnw-forest);
+    --color-header-price:     var(--pnw-forest-deep);
+    --color-header-actions:   var(--pnw-stone);
+}
+
+/* ============================================================================
+   GLOBAL TYPOGRAPHY + BACKGROUND
+   ============================================================================
+   Opt-in: only applies when <body class="qb-shell-body"> is present.
+   Builders that haven't been re-skinned yet are unaffected.
+*/
+body.qb-shell-body {
+    font-family: var(--qb-font-family);
+    font-feature-settings: var(--qb-font-features);
+    color: var(--pnw-pine);
+    background-color: var(--pnw-birch);
+    background-image:
+        linear-gradient(180deg, rgba(232, 238, 231, 0.5) 0%, rgba(247, 242, 227, 0.3) 800px),
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800'><g fill='none' stroke='%231f4922' stroke-width='0.5' opacity='0.045'><path d='M0,400 Q200,350 400,400 T800,400'/><path d='M0,420 Q200,370 400,420 T800,420'/><path d='M0,380 Q200,330 400,380 T800,380'/><path d='M0,360 Q200,310 400,360 T800,360'/><path d='M0,440 Q200,390 400,440 T800,440'/><path d='M0,300 Q200,250 400,300 T800,300'/><path d='M0,500 Q200,450 400,500 T800,500'/><path d='M0,200 Q200,150 400,200 T800,200'/><path d='M0,600 Q200,550 400,600 T800,600'/><path d='M0,100 Q200,50 400,100 T800,100'/><path d='M0,700 Q200,650 400,700 T800,700'/></g></svg>");
+    background-attachment: fixed;
+    background-position: center top;
+    background-size: 100% auto, 800px 800px;
+    background-repeat: no-repeat, repeat;
+}
+
+/* ============================================================================
+   CARD PRIMITIVES — the building blocks of the new look
+   ============================================================================
+   Use these in NEW markup. Existing markup picks up the legacy aliases above
+   (so it gets the green palette without changing classes).
+*/
+.qb-card {
+    background: var(--pnw-paper);
+    border: 1px solid var(--pnw-rule);
+    border-radius: var(--qb-radius-lg);
+    box-shadow: var(--pnw-shadow-md);
+    overflow: hidden;
+    transition: box-shadow var(--qb-dur-base) var(--qb-ease-out);
+}
+
+.qb-card:hover {
+    box-shadow: var(--pnw-shadow-lg);
+}
+
+.qb-card-head {
+    padding: var(--qb-space-4) var(--qb-space-5);
+    border-bottom: 1px solid var(--pnw-rule);
+    background: linear-gradient(180deg, var(--pnw-paper) 0%, var(--pnw-fog) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--qb-space-3);
+}
+
+.qb-card-head h2,
+.qb-card-head h3,
+.qb-card-head .qb-card-title {
+    margin: 0;
+    color: var(--pnw-pine);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+}
+
+.qb-card-body {
+    padding: var(--qb-space-5);
+}
+
+.qb-card-section {
+    padding: var(--qb-space-4) var(--qb-space-5);
+    border-top: 1px solid var(--pnw-rule);
+}
+
+.qb-card-section:first-child {
+    border-top: none;
+}
+
+/* ============================================================================
+   BUTTON PRIMITIVES
+   ============================================================================ */
+.qb-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--qb-space-2);
+    padding: 10px 18px;
+    font-family: var(--qb-font-family);
+    font-size: 14px;
+    font-weight: 600;
+    border: 1px solid var(--pnw-rule);
+    border-radius: var(--qb-radius-md);
+    background: var(--pnw-paper);
+    color: var(--pnw-pine);
+    cursor: pointer;
+    transition: all var(--qb-dur-fast) var(--qb-ease-out);
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+.qb-button:hover {
+    border-color: var(--pnw-forest);
+    background: var(--pnw-fog);
+    transform: translateY(-1px);
+    box-shadow: var(--pnw-shadow-sm);
+}
+
+.qb-button:focus-visible {
+    outline: none;
+    box-shadow: var(--pnw-glow-focus);
+}
+
+.qb-button--primary {
+    background: var(--pnw-forest);
+    border-color: var(--pnw-forest-deep);
+    color: var(--pnw-paper);
+}
+
+.qb-button--primary:hover {
+    background: var(--pnw-forest-deep);
+    border-color: var(--pnw-pine);
+    color: var(--pnw-paper);
+}
+
+.qb-button--ghost {
+    background: transparent;
+    border-color: var(--pnw-rule);
+    color: var(--pnw-stone);
+}
+
+.qb-button--ghost:hover {
+    background: var(--pnw-fog);
+    color: var(--pnw-pine);
+}
+
+.qb-button--danger {
+    background: var(--pnw-paper);
+    border-color: var(--qb-state-error);
+    color: var(--qb-state-error);
+}
+
+.qb-button--danger:hover {
+    background: var(--qb-state-error-bg);
+}
+
+/* ============================================================================
+   TITLEBAR PRIMITIVE — minimal hero, replaces blue "power-header" chrome
+   ============================================================================ */
+.qb-titlebar {
+    padding: var(--qb-space-6) var(--qb-space-8) var(--qb-space-4);
+    background: transparent;
+    border-bottom: 1px solid var(--pnw-rule);
+    margin-bottom: var(--qb-space-6);
+}
+
+.qb-titlebar-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--pnw-pine);
+    letter-spacing: -0.015em;
+}
+
+.qb-titlebar-subtitle {
+    margin: var(--qb-space-1) 0 0;
+    font-size: 14px;
+    color: var(--pnw-stone);
+}
+
+.qb-titlebar-fact {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--qb-space-2);
+    margin-top: var(--qb-space-3);
+    padding: 6px 12px;
+    background: var(--pnw-mist);
+    border: 1px solid var(--pnw-rule);
+    border-radius: var(--qb-radius-pill);
+    font-size: 13px;
+    color: var(--pnw-forest-deep);
+    font-weight: 500;
+}
+
+/* ============================================================================
+   INPUT PRIMITIVE — applies to native inputs inside .qb-card
+   ============================================================================ */
+.qb-card input[type="text"],
+.qb-card input[type="number"],
+.qb-card input[type="email"],
+.qb-card input[type="tel"],
+.qb-card select,
+.qb-card textarea {
+    font-family: var(--qb-font-family);
+    font-size: 14px;
+    color: var(--pnw-pine);
+    padding: 8px 12px;
+    border: 1px solid var(--pnw-rule);
+    border-radius: var(--qb-radius-md);
+    background: var(--pnw-paper);
+    transition: all var(--qb-dur-fast) var(--qb-ease-out);
+}
+
+.qb-card input:focus,
+.qb-card select:focus,
+.qb-card textarea:focus {
+    outline: none;
+    border-color: var(--pnw-forest);
+    box-shadow: var(--pnw-glow-focus);
+}
+
+/* ============================================================================
+   BADGE / CHIP PRIMITIVES — for tier labels, status, etc.
+   ============================================================================ */
+.qb-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: var(--qb-radius-pill);
+    background: var(--pnw-mist);
+    border: 1px solid var(--pnw-rule);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--pnw-forest-deep);
+    line-height: 1.4;
+}
+
+.qb-chip--warn   { background: var(--qb-state-warn-bg);    color: #92400e; border-color: var(--qb-state-warn); }
+.qb-chip--error  { background: var(--qb-state-error-bg);   color: var(--qb-state-error); border-color: var(--qb-state-error); }
+.qb-chip--info   { background: var(--qb-state-info-bg);    color: var(--qb-state-info); border-color: var(--qb-state-info); }
+.qb-chip--success{ background: var(--pnw-mist);            color: var(--pnw-forest-deep); border-color: var(--pnw-forest); }

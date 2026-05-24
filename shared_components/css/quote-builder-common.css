@@ -830,7 +830,7 @@ body {
    ============================================ */
 .action-panel {
     padding: 15px 20px;
-    background: #2c3e50;
+    background: var(--color-header-dark, #2c3e50);
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1340,7 +1340,7 @@ body {
     height: 50px;
     margin: 0 auto 20px;
     border: 5px solid rgba(255, 255, 255, 0.3);
-    border-top: 5px solid #003f7f;
+    border-top: 5px solid var(--nwca-blue, #003f7f);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -1634,11 +1634,11 @@ label.required::after {
 }
 
 .progress-step.active {
-    color: #003f7f;
+    color: var(--nwca-blue, #003f7f);
 }
 
 .progress-step.active::before {
-    background: #003f7f;
+    background: var(--nwca-blue, #003f7f);
     color: white;
 }
 
@@ -1690,7 +1690,7 @@ label.required::after {
     position: absolute;
     top: -40px;
     left: 0;
-    background: #003f7f;
+    background: var(--nwca-blue, #003f7f);
     color: white;
     padding: 8px 16px;
     text-decoration: none;
@@ -2179,14 +2179,14 @@ textarea:disabled {
 }
 
 /* Colors */
-.text-primary { color: #003f7f !important; }
+.text-primary { color: var(--nwca-blue, #003f7f) !important; }
 .text-success { color: #28a745 !important; }
 .text-danger { color: #dc3545 !important; }
 .text-warning { color: #ffc107 !important; }
 .text-info { color: #17a2b8 !important; }
 .text-muted { color: #6c757d !important; }
 
-.bg-primary { background-color: #003f7f !important; }
+.bg-primary { background-color: var(--nwca-blue, #003f7f) !important; }
 .bg-success { background-color: #28a745 !important; }
 .bg-danger { background-color: #dc3545 !important; }
 .bg-warning { background-color: #ffc107 !important; }
@@ -2199,7 +2199,7 @@ textarea:disabled {
 .border-0 { border: 0 !important; }
 .border-top { border-top: 1px solid #dee2e6 !important; }
 .border-bottom { border-bottom: 1px solid #dee2e6 !important; }
-.border-primary { border-color: #003f7f !important; }
+.border-primary { border-color: var(--nwca-blue, #003f7f) !important; }
 .border-success { border-color: #28a745 !important; }
 .border-danger { border-color: #dc3545 !important; }
 

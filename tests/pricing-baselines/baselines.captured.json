@@ -1,0 +1,950 @@
+{
+  "_meta": {
+    "capturedAt": "2026-05-24T00:32:22.600Z",
+    "capturedBy": "scripts/capture-pricing-baselines.js",
+    "scenarios": 22,
+    "successful": 22,
+    "stubs": 0,
+    "errors": 0,
+    "errorList": []
+  },
+  "DTG-01": {
+    "builder": "DTG",
+    "description": "Small order LC only",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 12,
+      "location": "LC",
+      "sizes": {
+        "M": 4,
+        "L": 4,
+        "XL": 4
+      }
+    },
+    "expected": {
+      "tier": "1-23",
+      "ltmFee": 50,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 4,
+          "perPiece": 13,
+          "sizeTotal": 52
+        },
+        "L": {
+          "qty": 4,
+          "perPiece": 13,
+          "sizeTotal": 52
+        },
+        "XL": {
+          "qty": 4,
+          "perPiece": 13,
+          "sizeTotal": 52
+        }
+      },
+      "lineSubtotal": 156,
+      "grandTotalBeforeTax": 206
+    }
+  },
+  "DTG-02": {
+    "builder": "DTG",
+    "description": "LTM threshold (24 = no fee)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 24,
+      "location": "LC",
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 13,
+          "sizeTotal": 104
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 13,
+          "sizeTotal": 104
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 13,
+          "sizeTotal": 104
+        }
+      },
+      "lineSubtotal": 312,
+      "grandTotalBeforeTax": 312
+    }
+  },
+  "DTG-03": {
+    "builder": "DTG",
+    "description": "Multi-location (LC + FB)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 48,
+      "location": "LC_FB",
+      "sizes": {
+        "M": 12,
+        "L": 16,
+        "XL": 20
+      }
+    },
+    "expected": {
+      "tier": "48-71",
+      "ltmFee": 0,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 12,
+          "perPiece": 19.5,
+          "sizeTotal": 234
+        },
+        "L": {
+          "qty": 16,
+          "perPiece": 19.5,
+          "sizeTotal": 312
+        },
+        "XL": {
+          "qty": 20,
+          "perPiece": 19.5,
+          "sizeTotal": 390
+        }
+      },
+      "lineSubtotal": 936,
+      "grandTotalBeforeTax": 936
+    }
+  },
+  "DTG-04": {
+    "builder": "DTG",
+    "description": "Hoodie larger order",
+    "inputs": {
+      "style": "F260",
+      "color": "Charcoal Heather",
+      "qty": 72,
+      "location": "LC",
+      "sizes": {
+        "M": 24,
+        "L": 24,
+        "XL": 24
+      }
+    },
+    "expected": {
+      "tier": "72+",
+      "ltmFee": 0,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 24,
+          "perPiece": 28.5,
+          "sizeTotal": 684
+        },
+        "L": {
+          "qty": 24,
+          "perPiece": 28.5,
+          "sizeTotal": 684
+        },
+        "XL": {
+          "qty": 24,
+          "perPiece": 28.5,
+          "sizeTotal": 684
+        }
+      },
+      "lineSubtotal": 2052,
+      "grandTotalBeforeTax": 2052
+    }
+  },
+  "DTG-05": {
+    "builder": "DTG",
+    "description": "Extended size mix (upcharges)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 12,
+      "location": "LC",
+      "sizes": {
+        "M": 1,
+        "L": 1,
+        "XL": 1,
+        "2XL": 3,
+        "3XL": 3,
+        "4XL": 3
+      }
+    },
+    "expected": {
+      "tier": "1-23",
+      "ltmFee": 50,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 1,
+          "perPiece": 13,
+          "sizeTotal": 13
+        },
+        "L": {
+          "qty": 1,
+          "perPiece": 13,
+          "sizeTotal": 13
+        },
+        "XL": {
+          "qty": 1,
+          "perPiece": 13,
+          "sizeTotal": 13
+        },
+        "2XL": {
+          "qty": 3,
+          "perPiece": 15,
+          "sizeTotal": 45
+        },
+        "3XL": {
+          "qty": 3,
+          "perPiece": 16,
+          "sizeTotal": 48
+        },
+        "4XL": {
+          "qty": 3,
+          "perPiece": 17,
+          "sizeTotal": 51
+        }
+      },
+      "lineSubtotal": 183,
+      "grandTotalBeforeTax": 233
+    }
+  },
+  "EMB-01": {
+    "builder": "EMB",
+    "description": "Small standard garment 8K LC",
+    "inputs": {
+      "style": "PC54",
+      "color": "Navy",
+      "qty": 24,
+      "location": "Left Chest",
+      "stitches": 8000,
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 20,
+          "sizeTotal": 160
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 20,
+          "sizeTotal": 160
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 20,
+          "sizeTotal": 160
+        }
+      },
+      "lineSubtotal": 480,
+      "grandTotalBeforeTax": 480,
+      "_path": "PRIMARY"
+    }
+  },
+  "EMB-02": {
+    "builder": "EMB",
+    "description": "LTM edge (qty<=7)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 7,
+      "location": "Left Chest",
+      "stitches": 8000,
+      "sizes": {
+        "M": 3,
+        "L": 2,
+        "XL": 2
+      }
+    },
+    "expected": {
+      "tier": "1-7",
+      "ltmFee": 50,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 3,
+          "perPiece": 24,
+          "sizeTotal": 72
+        },
+        "L": {
+          "qty": 2,
+          "perPiece": 24,
+          "sizeTotal": 48
+        },
+        "XL": {
+          "qty": 2,
+          "perPiece": 24,
+          "sizeTotal": 48
+        }
+      },
+      "lineSubtotal": 168,
+      "grandTotalBeforeTax": 218,
+      "_path": "PRIMARY"
+    }
+  },
+  "EMB-03": {
+    "builder": "EMB",
+    "description": "Primary 8K LC + AL 5K right sleeve",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 48,
+      "locations": [
+        {
+          "name": "Left Chest",
+          "stitches": 8000
+        },
+        {
+          "name": "Right Sleeve",
+          "stitches": 5000,
+          "isAL": true
+        }
+      ],
+      "sizes": {
+        "M": 16,
+        "L": 16,
+        "XL": 16
+      }
+    },
+    "expected": {
+      "tier": "48-71",
+      "ltmFee": 0,
+      "primaryPerPiece": 19,
+      "alPerPiece": 7.5,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 16,
+          "perPiece": 26.5,
+          "sizeTotal": 424
+        },
+        "L": {
+          "qty": 16,
+          "perPiece": 26.5,
+          "sizeTotal": 424
+        },
+        "XL": {
+          "qty": 16,
+          "perPiece": 26.5,
+          "sizeTotal": 424
+        }
+      },
+      "lineSubtotal": 1272,
+      "grandTotalBeforeTax": 1272,
+      "_path": "PRIMARY+AL"
+    }
+  },
+  "EMB-04": {
+    "builder": "EMB",
+    "description": "Full Back 15K (DECG path)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 24,
+      "location": "Full Back",
+      "stitches": 15000,
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "stitchCount": 15000,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 32.75,
+          "sizeTotal": 262
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 32.75,
+          "sizeTotal": 262
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 32.75,
+          "sizeTotal": 262
+        }
+      },
+      "lineSubtotal": 786,
+      "grandTotalBeforeTax": 786,
+      "_path": "DECG-garment"
+    }
+  },
+  "EMB-05": {
+    "builder": "EMB",
+    "description": "Cap C112 8K front",
+    "inputs": {
+      "style": "C112",
+      "color": "Navy",
+      "qty": 24,
+      "location": "Cap Front",
+      "stitches": 8000,
+      "sizes": {
+        "OSFA": 24
+      },
+      "isCap": true
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "stitchCount": 8000,
+      "perSizeBreakdown": {
+        "OSFA": {
+          "qty": 24,
+          "perPiece": 19,
+          "sizeTotal": 456
+        }
+      },
+      "lineSubtotal": 456,
+      "grandTotalBeforeTax": 456,
+      "_path": "DECG-cap"
+    }
+  },
+  "EMB-06": {
+    "builder": "EMB",
+    "description": "Beanie CP90 5K (flat headwear)",
+    "inputs": {
+      "style": "CP90",
+      "color": "Black",
+      "qty": 24,
+      "location": "Beanie Front",
+      "stitches": 5000,
+      "sizes": {
+        "OSFA": 24
+      },
+      "isFlatHeadwear": true
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "stitchCount": 5000,
+      "perSizeBreakdown": {
+        "OSFA": {
+          "qty": 24,
+          "perPiece": 24,
+          "sizeTotal": 576
+        }
+      },
+      "lineSubtotal": 576,
+      "grandTotalBeforeTax": 576,
+      "_path": "DECG-flat-headwear"
+    }
+  },
+  "EMB-07": {
+    "builder": "EMB",
+    "description": "Extended sizes 2XL/3XL upcharge",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 24,
+      "location": "Left Chest",
+      "stitches": 8000,
+      "sizes": {
+        "M": 8,
+        "XL": 8,
+        "2XL": 4,
+        "3XL": 4
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 20,
+          "sizeTotal": 160
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 20,
+          "sizeTotal": 160
+        },
+        "2XL": {
+          "qty": 4,
+          "perPiece": 22,
+          "sizeTotal": 88
+        },
+        "3XL": {
+          "qty": 4,
+          "perPiece": 23,
+          "sizeTotal": 92
+        }
+      },
+      "lineSubtotal": 500,
+      "grandTotalBeforeTax": 500,
+      "_path": "PRIMARY"
+    }
+  },
+  "DTF-01": {
+    "builder": "DTF",
+    "description": "Small qty 1 location (LTM tier 10-23)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Navy",
+      "qty": 10,
+      "locations": [
+        {
+          "code": "LC",
+          "size": "small"
+        }
+      ],
+      "sizes": {
+        "M": 4,
+        "L": 3,
+        "XL": 3
+      }
+    },
+    "expected": {
+      "tier": "10-23",
+      "ltmFee": 0,
+      "ltmDistributedPerPiece": 5,
+      "garmentBaseCost": 3,
+      "garmentSellPerPiece": 5.26,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 4,
+          "perPiece": 20,
+          "sizeTotal": 80
+        },
+        "L": {
+          "qty": 3,
+          "perPiece": 20,
+          "sizeTotal": 60
+        },
+        "XL": {
+          "qty": 3,
+          "perPiece": 20,
+          "sizeTotal": 60
+        }
+      },
+      "lineSubtotal": 200,
+      "grandTotalBeforeTax": 200
+    }
+  },
+  "DTF-02": {
+    "builder": "DTF",
+    "description": "LTM edge same color black",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 10,
+      "locations": [
+        {
+          "code": "LC",
+          "size": "small"
+        }
+      ],
+      "sizes": {
+        "M": 4,
+        "L": 3,
+        "XL": 3
+      }
+    },
+    "expected": {
+      "tier": "10-23",
+      "ltmFee": 0,
+      "ltmDistributedPerPiece": 5,
+      "garmentBaseCost": 3,
+      "garmentSellPerPiece": 5.26,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 4,
+          "perPiece": 20,
+          "sizeTotal": 80
+        },
+        "L": {
+          "qty": 3,
+          "perPiece": 20,
+          "sizeTotal": 60
+        },
+        "XL": {
+          "qty": 3,
+          "perPiece": 20,
+          "sizeTotal": 60
+        }
+      },
+      "lineSubtotal": 200,
+      "grandTotalBeforeTax": 200
+    }
+  },
+  "DTF-03": {
+    "builder": "DTF",
+    "description": "Two locations (LC small + FB large)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 24,
+      "locations": [
+        {
+          "code": "LC",
+          "size": "small"
+        },
+        {
+          "code": "FB",
+          "size": "large"
+        }
+      ],
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "ltmDistributedPerPiece": 0,
+      "garmentBaseCost": 3,
+      "garmentSellPerPiece": 5.26,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 30.5,
+          "sizeTotal": 244
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 30.5,
+          "sizeTotal": 244
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 30.5,
+          "sizeTotal": 244
+        }
+      },
+      "lineSubtotal": 732,
+      "grandTotalBeforeTax": 732
+    }
+  },
+  "DTF-04": {
+    "builder": "DTF",
+    "description": "Three locations max (LC + FB + LS)",
+    "inputs": {
+      "style": "PC54",
+      "color": "White",
+      "qty": 48,
+      "locations": [
+        {
+          "code": "LC",
+          "size": "small"
+        },
+        {
+          "code": "FB",
+          "size": "large"
+        },
+        {
+          "code": "LS",
+          "size": "small"
+        }
+      ],
+      "sizes": {
+        "M": 16,
+        "L": 16,
+        "XL": 16
+      }
+    },
+    "expected": {
+      "tier": "48-71",
+      "ltmFee": 0,
+      "ltmDistributedPerPiece": 0,
+      "garmentBaseCost": 3,
+      "garmentSellPerPiece": 5.26,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 16,
+          "perPiece": 34,
+          "sizeTotal": 544
+        },
+        "L": {
+          "qty": 16,
+          "perPiece": 34,
+          "sizeTotal": 544
+        },
+        "XL": {
+          "qty": 16,
+          "perPiece": 34,
+          "sizeTotal": 544
+        }
+      },
+      "lineSubtotal": 1632,
+      "grandTotalBeforeTax": 1632
+    }
+  },
+  "DTF-05": {
+    "builder": "DTF",
+    "description": "Large size combo (LC small + FB medium)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 24,
+      "locations": [
+        {
+          "code": "LC",
+          "size": "small"
+        },
+        {
+          "code": "FB",
+          "size": "medium"
+        }
+      ],
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "ltmDistributedPerPiece": 0,
+      "garmentBaseCost": 3,
+      "garmentSellPerPiece": 5.26,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 26,
+          "sizeTotal": 208
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 26,
+          "sizeTotal": 208
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 26,
+          "sizeTotal": 208
+        }
+      },
+      "lineSubtotal": 624,
+      "grandTotalBeforeTax": 624
+    }
+  },
+  "SCP-01": {
+    "builder": "SCP",
+    "description": "Simplest — 1 color 1 location",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 24,
+      "primaryColors": 1,
+      "additionalLocations": [],
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "13-36",
+      "ltmFee": 75,
+      "screenSetupFee": 30,
+      "totalColors": 1,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 13.5,
+          "sizeTotal": 108
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 13.5,
+          "sizeTotal": 108
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 13.5,
+          "sizeTotal": 108
+        }
+      },
+      "lineSubtotal": 324,
+      "grandTotalBeforeTax": 429
+    }
+  },
+  "SCP-02": {
+    "builder": "SCP",
+    "description": "Multi-color (4) 1 location",
+    "inputs": {
+      "style": "PC54",
+      "color": "Navy",
+      "qty": 48,
+      "primaryColors": 4,
+      "additionalLocations": [],
+      "sizes": {
+        "M": 16,
+        "L": 16,
+        "XL": 16
+      }
+    },
+    "expected": {
+      "tier": "37-71",
+      "ltmFee": 50,
+      "screenSetupFee": 120,
+      "totalColors": 4,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 16,
+          "perPiece": 17,
+          "sizeTotal": 272
+        },
+        "L": {
+          "qty": 16,
+          "perPiece": 17,
+          "sizeTotal": 272
+        },
+        "XL": {
+          "qty": 16,
+          "perPiece": 17,
+          "sizeTotal": 272
+        }
+      },
+      "lineSubtotal": 816,
+      "grandTotalBeforeTax": 986
+    }
+  },
+  "SCP-03": {
+    "builder": "SCP",
+    "description": "1c LC + 1c FB",
+    "inputs": {
+      "style": "PC54",
+      "color": "Athletic Heather",
+      "qty": 24,
+      "primaryColors": 1,
+      "additionalLocations": [
+        1
+      ],
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "13-36",
+      "ltmFee": 75,
+      "screenSetupFee": 60,
+      "totalColors": 2,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 19.5,
+          "sizeTotal": 156
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 19.5,
+          "sizeTotal": 156
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 19.5,
+          "sizeTotal": 156
+        }
+      },
+      "lineSubtotal": 468,
+      "grandTotalBeforeTax": 603
+    }
+  },
+  "SCP-04": {
+    "builder": "SCP",
+    "description": "Max colors (6) 1 location",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 48,
+      "primaryColors": 6,
+      "additionalLocations": [],
+      "sizes": {
+        "M": 16,
+        "L": 16,
+        "XL": 16
+      }
+    },
+    "expected": {
+      "tier": "37-71",
+      "ltmFee": 50,
+      "screenSetupFee": 180,
+      "totalColors": 6,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 16,
+          "perPiece": 20,
+          "sizeTotal": 320
+        },
+        "L": {
+          "qty": 16,
+          "perPiece": 20,
+          "sizeTotal": 320
+        },
+        "XL": {
+          "qty": 16,
+          "perPiece": 20,
+          "sizeTotal": 320
+        }
+      },
+      "lineSubtotal": 960,
+      "grandTotalBeforeTax": 1190
+    }
+  },
+  "SCP-05": {
+    "builder": "SCP",
+    "description": "Tier break edge — qty 73",
+    "inputs": {
+      "style": "PC54",
+      "color": "White",
+      "qty": 73,
+      "primaryColors": 2,
+      "additionalLocations": [],
+      "sizes": {
+        "M": 25,
+        "L": 24,
+        "XL": 24
+      }
+    },
+    "expected": {
+      "tier": "72-144",
+      "ltmFee": 0,
+      "screenSetupFee": 60,
+      "totalColors": 2,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 25,
+          "perPiece": 12.5,
+          "sizeTotal": 312.5
+        },
+        "L": {
+          "qty": 24,
+          "perPiece": 12.5,
+          "sizeTotal": 300
+        },
+        "XL": {
+          "qty": 24,
+          "perPiece": 12.5,
+          "sizeTotal": 300
+        }
+      },
+      "lineSubtotal": 912.5,
+      "grandTotalBeforeTax": 972.5
+    }
+  }
+}
