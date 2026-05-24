@@ -3998,13 +3998,10 @@ function _scpPushEnabled() {
 
 function showScpPushButton(quoteId) {
     _scpPushQuoteId = quoteId;
-
-    // 🚧 Phase 8 gate — remove this when ShopWorks integration is verified
-    if (!_scpPushEnabled()) {
-        console.log('[SCP Push] Button hidden (add ?enableScpPush=1 to URL to test push)');
-        return;
-    }
-
+    // Phase 8 gate LIFTED 2026-05-23 — SCP push live to all reps.
+    // Orders currently land under EMB integration customer (id=3739) in
+    // OnSite until Erik creates a dedicated SCP integration. Defaults in
+    // caspio-pricing-proxy/config/manageorders-scp-config.js.
     const btn = document.getElementById('scp-push-shopworks-btn');
     if (btn) {
         btn.style.display = '';

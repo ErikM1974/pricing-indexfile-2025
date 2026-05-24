@@ -3301,13 +3301,10 @@ function _dtfPushEnabled() {
 
 function showDtfPushButton(quoteId) {
     _dtfPushQuoteId = quoteId;
-
-    // 🚧 Phase 8 gate — remove this when ShopWorks integration is verified
-    if (!_dtfPushEnabled()) {
-        console.log('[DTF Push] Button hidden (add ?enableDtfPush=1 to URL to test push)');
-        return;
-    }
-
+    // Phase 8 gate LIFTED 2026-05-23 — DTF push live to all reps.
+    // Orders currently land under EMB integration customer (id=3739) in
+    // OnSite until Erik creates a dedicated DTF integration. Defaults in
+    // caspio-pricing-proxy/config/manageorders-dtf-config.js.
     const btn = document.getElementById('dtf-push-shopworks-btn');
     if (btn) {
         btn.style.display = '';
