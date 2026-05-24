@@ -94,11 +94,27 @@ pricing regression.
 |---|---|---|---|
 | 1 | `4186bc61` (pricing-index) | Lift DTF/SCP push gates | ✅ |
 | 2 | `42f89397` (pricing-index) | Artwork upload widget (DTF/SCP full, EMB partial) | ✅ |
-| 3 | (proxy) `ea4fc72` was already shipped earlier | SCP push backend | ✅ |
-| 4 | (proxy) `442a0ab` was already shipped earlier | DTF push backend | ✅ |
-| 5 | Plus the 12 earlier today commits (CI gate, PNW visual, SCP margin) | — | ✅ |
+| 3 | `797b2fdc` (pricing-index) | Roadmap + overnight status report | ✅ |
+| 4 | `a9e500ef` (pricing-index) | **Phase 10.7 — DTG customer-context migrated to shared helper** | ✅ |
+| 5 | (proxy) `ea4fc72` from earlier | SCP push backend | ✅ |
+| 6 | (proxy) `442a0ab` from earlier | DTF push backend | ✅ |
 
-**Total deployed today: 14 commits across 2 repos.**
+**Total deployed today: 16 commits across 2 repos.**
+
+### What `a9e500ef` did
+
+Per audit finding #7 (split-brain): DTG had its own
+`renderCustomerContextBadges()` reading Customer_Warning / Is_Tax_Exempt /
+Account_Tier / Payment_Terms. EMB/DTF/SCP used shared
+`customer-context-banners.js`. Two code paths for the same job.
+
+Consolidated to one: DTG now calls `surfaceCustomerContext()` from the
+shared helper, passing its `dtg*` DOM IDs via the config object. Behavior
+preserved (verified live in Chrome — helper loaded, all elements present).
+
+**Why it matters**: from now on, any fix to customer context surfacing
+(new warning field, new badge color, new payment term mapping) updates
+ALL 4 builders in one place. Sync hygiene.
 
 ---
 
@@ -128,6 +144,14 @@ I had your full autonomy grant but deliberately did NOT do these:
 - **Why**: DTG's new chat-first UI deliberately dropped these. Bringing
   them back needs design input — should they be in the new chat flow, in
   the sidebar, on a separate page? Not something to guess.
+- **Specifically Print**: I considered porting from legacy
+  `dtg-quote-builder.js:3369` (printQuote uses EmbroideryInvoiceGenerator
+  + `collectProductsFromTable()`). But the legacy printQuote was written
+  for the OLD table-based DTG UI. The new UI uses `state.rows[]` from
+  `dtg-inline-form.js`. Building an adapter from new-state → invoice
+  format involves shape mapping I couldn't validate without you watching.
+  Risk of generating broken HTML / wrong totals / missed line items in
+  customer-facing print. Better to wait.
 
 ---
 
