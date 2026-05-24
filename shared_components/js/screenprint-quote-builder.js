@@ -773,13 +773,31 @@ function resetQuote() {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
-    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
-    // Files uploaded here are read in saveAndGetLink() and stored to
-    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
+    // Adds design name input + per-file placement dropdown so the push payload
+    // can carry Designs[{name, Locations[{Location, ImageURL}]}] when the rep
+    // is creating a brand-new design (no existing #).
     if (typeof ArtworkUpload !== 'undefined') {
         try {
-            window._scpArtwork = ArtworkUpload.attach({ mountSelector: '#scp-artwork-mount' });
-            console.log('[SCP] Artwork upload widget mounted');
+            window._scpArtwork = ArtworkUpload.attach({
+                mountSelector: '#scp-artwork-mount',
+                designName: {
+                    enabled: true,
+                    label: 'Design name (required when uploading new artwork)',
+                    placeholder: 'e.g. Acme Corp Logo',
+                },
+                placements: [
+                    { code: 'Front',        label: 'Front' },
+                    { code: 'Back',         label: 'Back' },
+                    { code: 'Left Chest',   label: 'Left Chest' },
+                    { code: 'Right Chest',  label: 'Right Chest' },
+                    { code: 'Left Sleeve',  label: 'Left Sleeve' },
+                    { code: 'Right Sleeve', label: 'Right Sleeve' },
+                    { code: 'Back of Neck', label: 'Back of Neck' },
+                ],
+                defaultPlacement: 'Front',
+            });
+            console.log('[SCP] Artwork upload widget mounted (rich mode)');
         } catch (e) {
             console.error('[SCP] Artwork widget mount failed:', e);
         }
@@ -3820,9 +3838,15 @@ async function saveAndGetLink() {
         const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
         // Phase 9 — include uploaded reference artwork file refs (if any)
+        // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
+        // from the rich-mode widget, so the proxy can emit Designs[{name, Locations[]}]
+        // for new-artwork pushes (creates a fresh design record in ShopWorks).
         const referenceArtwork = (window._scpArtwork && typeof window._scpArtwork.getFiles === 'function')
             ? window._scpArtwork.getFiles()
             : [];
+        const newDesignName = (window._scpArtwork && typeof window._scpArtwork.getDesignName === 'function')
+            ? (window._scpArtwork.getDesignName() || '').trim()
+            : '';
 
         // Phase 11.1 — include design # if rep picked one from the combobox
         const designNumber = document.getElementById('design-number')?.value?.trim() || '';
@@ -3834,6 +3858,7 @@ async function saveAndGetLink() {
             companyName: document.getElementById('company-name')?.value?.trim() || '',
             salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
             referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
+            newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
             designNumber,     // → SCP quote-service writes to quote_sessions.Notes.designNumber
             items: items,
             totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
