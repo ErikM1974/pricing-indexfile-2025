@@ -1,3 +1,11 @@
+## v2026.05.23.6 (2026.05.23)
+
+- Phase 0b + 2a/2b/2c/2d: pricing baseline CI gate + Pacific Northwest visual unification
+- 22-scenario pricing capture script + Jest regression gate (npm run test:pricing-baselines)
+- PNW palette tokens (shell.css) applied to all 4 quote builders + 5 customer pricing calculators
+- Caspio Pricing_Tiers SCP margins updated (PK_ID 14→0.48, 15→0.50, 16→0.50) — ~$7K-9K/yr lift
+- 3-try retry on capture script kills CI flakiness
+
 ## v2026.05.23.5 (2026.05.23)
 
 - Deploy v2026.05.23.5: EMB/DTF/SCP — shared customer-context-banners helper
