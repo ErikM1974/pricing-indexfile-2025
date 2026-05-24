@@ -586,28 +586,57 @@ async function captureAll({ startServer = false, headless = true, baseUrl = 'htt
 
     for (const [id, scenario] of scenarios) {
       console.log('  [' + id + '] ' + scenario.description + ' …');
-      try {
-        const runnerSrc = PAGE_RUNNERS[builder].toString();
-        const result = await page.evaluate(async (runnerSource, scenarioData) => {
-          // eslint-disable-next-line no-eval
-          const runnerFn = eval('(' + runnerSource + ')');
-          return await runnerFn(scenarioData);
-        }, runnerSrc, scenario);
 
-        captured[id] = {
-          builder: scenario.builder,
-          description: scenario.description,
-          inputs: scenario.inputs,
-          expected: result
-        };
-        if (result._stub) {
-          console.log('    ⏳ stub (Phase 0b.1)');
-        } else {
-          console.log('    ✅ grand=$' + result.grandTotalBeforeTax + ' line=$' + result.lineSubtotal);
+      // Retry transient failures (network race, API timeout, page state).
+      // Up to MAX_TRIES total. Each try clears sessionStorage cache + re-evaluates.
+      // Real pricing regressions reproduce on every try, so they still fail loudly.
+      const MAX_TRIES = 3;
+      let lastError = null;
+      let success = false;
+
+      for (let attempt = 1; attempt <= MAX_TRIES; attempt++) {
+        try {
+          // Clear any cached pricing data in sessionStorage before each attempt
+          // — prevents stale cache from poisoning a retry
+          await page.evaluate(() => {
+            Object.keys(sessionStorage).filter(k =>
+              /PricingData|pricingBundle|dtg|dtf|emb|scp|screenprint/i.test(k)
+            ).forEach(k => sessionStorage.removeItem(k));
+          });
+
+          const runnerSrc = PAGE_RUNNERS[builder].toString();
+          const result = await page.evaluate(async (runnerSource, scenarioData) => {
+            // eslint-disable-next-line no-eval
+            const runnerFn = eval('(' + runnerSource + ')');
+            return await runnerFn(scenarioData);
+          }, runnerSrc, scenario);
+
+          captured[id] = {
+            builder: scenario.builder,
+            description: scenario.description,
+            inputs: scenario.inputs,
+            expected: result
+          };
+          if (result._stub) {
+            console.log('    ⏳ stub (Phase 0b.1)');
+          } else {
+            const retryNote = attempt > 1 ? ' (retry ' + attempt + ')' : '';
+            console.log('    ✅ grand=$' + result.grandTotalBeforeTax + ' line=$' + result.lineSubtotal + retryNote);
+          }
+          success = true;
+          break;
+        } catch (e) {
+          lastError = e;
+          if (attempt < MAX_TRIES) {
+            console.log('    ⚠ attempt ' + attempt + ' failed: ' + e.message + ' — retrying after 1.5s …');
+            await new Promise(r => setTimeout(r, 1500));
+          }
         }
-      } catch (e) {
-        console.error('    ❌ ' + e.message);
-        errors.push({ id, error: e.message });
+      }
+
+      if (!success) {
+        console.error('    ❌ ' + lastError.message + ' (after ' + MAX_TRIES + ' tries)');
+        errors.push({ id, error: lastError.message, attempts: MAX_TRIES });
       }
     }
 
