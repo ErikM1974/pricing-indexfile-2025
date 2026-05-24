@@ -2499,6 +2499,13 @@ class DTFQuoteBuilder {
                     this.persistence.clearDraft();
                 }
 
+                // Phase 8 (2026-05-23): reveal Push-to-ShopWorks button after save.
+                // Gated behind ?enableDtfPush=1 query param until Erik confirms
+                // OnSite integration IDs (id_Customer, id_OrderType, ExtSource).
+                if (typeof showDtfPushButton === 'function') {
+                    showDtfPushButton(finalQuoteId);
+                }
+
                 // Show success modal with shareable link
                 // Prefer shared QuoteShareModal module (2026 consolidation)
                 if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
@@ -3265,3 +3272,133 @@ function printQuote() {
         dtfQuoteBuilder.printQuote();
     }
 }
+
+// =====================================================
+// Push to ShopWorks (Phase 8 — 2026-05-23)
+// =====================================================
+// Mirrors the EMB pushToShopWorks() pattern at
+// shared_components/js/embroidery-quote-builder.js:6719.
+//
+// Gated behind ?enableDtfPush=1 query param so reps can't accidentally
+// trigger pushes until Erik confirms the OnSite integration IDs
+// (id_Customer, id_OrderType, ExtSource) in
+// caspio-pricing-proxy/config/manageorders-dtf-config.js.
+//
+// To enable for testing:
+//   /quote-builders/dtf-quote-builder.html?enableDtfPush=1
+//
+// When ready for production, remove the flag check from showDtfPushButton().
+
+let _dtfPushQuoteId = null;
+
+function _dtfPushEnabled() {
+    try {
+        return new URLSearchParams(window.location.search).has('enableDtfPush');
+    } catch {
+        return false;
+    }
+}
+
+function showDtfPushButton(quoteId) {
+    _dtfPushQuoteId = quoteId;
+
+    // 🚧 Phase 8 gate — remove this when ShopWorks integration is verified
+    if (!_dtfPushEnabled()) {
+        console.log('[DTF Push] Button hidden (add ?enableDtfPush=1 to URL to test push)');
+        return;
+    }
+
+    const btn = document.getElementById('dtf-push-shopworks-btn');
+    if (btn) {
+        btn.style.display = '';
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        const label = document.getElementById('dtf-push-shopworks-label');
+        if (label) label.textContent = 'Push to ShopWorks';
+    }
+}
+
+async function dtfPushToShopWorks() {
+    const btn = document.getElementById('dtf-push-shopworks-btn');
+    const label = document.getElementById('dtf-push-shopworks-label');
+    if (!btn || btn.disabled || !_dtfPushQuoteId) return;
+
+    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+    const companyName = document.getElementById('company-name')?.value?.trim() || '';
+    const displayName = companyName || customerName || 'N/A';
+
+    const confirmed = confirm(
+        `Push to ShopWorks?\n\n` +
+        `Quote: ${_dtfPushQuoteId}\n` +
+        `Customer: ${displayName}\n\n` +
+        `This will create a new DTF order in ShopWorks OnSite.\n` +
+        `(Phase 8 testing mode — orders land under the EMB integration ` +
+        `customer until DTF gets its own.)`
+    );
+    if (!confirmed) return;
+
+    // Loading state
+    const originalText = label?.textContent || 'Push to ShopWorks';
+    if (label) label.textContent = 'Pushing...';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+
+    try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+        const response = await fetch(`${apiBase}/api/dtf-push/push-quote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                quoteId: _dtfPushQuoteId,
+                isTest: false,
+                force: false,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 409) {
+                if (label) label.textContent = 'Already Pushed';
+                btn.style.background = '#28a745';
+                if (typeof showToast === 'function') {
+                    showToast('Already pushed to ShopWorks', 'info');
+                } else if (dtfQuoteBuilder?.showToast) {
+                    dtfQuoteBuilder.showToast('Already pushed to ShopWorks', 'info');
+                }
+                return;
+            }
+            throw new Error(data.error || data.details || `HTTP ${response.status}`);
+        }
+
+        // Success
+        if (label) label.textContent = `Pushed ✓ (${data.extOrderId})`;
+        btn.style.background = '#28a745';
+        const successMsg = `Pushed to ShopWorks as ${data.extOrderId}`;
+        if (typeof showToast === 'function') {
+            showToast(successMsg, 'success');
+        } else if (dtfQuoteBuilder?.showToast) {
+            dtfQuoteBuilder.showToast(successMsg, 'success');
+        }
+        console.log('[DTF Push] Success:', data);
+
+    } catch (error) {
+        console.error('[DTF Push] Push error:', error);
+        if (label) label.textContent = originalText;
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        const errorMsg = `Push failed: ${error.message}`;
+        if (typeof showToast === 'function') {
+            showToast(errorMsg, 'error');
+        } else if (dtfQuoteBuilder?.showToast) {
+            dtfQuoteBuilder.showToast(errorMsg, 'error');
+        }
+    }
+}
+
+// Expose for HTML onclick + cross-file callers
+window.dtfPushToShopWorks = dtfPushToShopWorks;
+window.showDtfPushButton = showDtfPushButton;

@@ -580,6 +580,10 @@
                     <button class="btn-save-quote" onclick="dtfQuoteBuilder.saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
+                    <!-- Phase 8 (2026-05-23): Push to ShopWorks. Hidden until quote saved AND ?enableDtfPush=1 in URL (gated until Erik confirms OnSite integration IDs) -->
+                    <button id="dtf-push-shopworks-btn" onclick="dtfPushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                        <i class="fas fa-upload"></i> <span id="dtf-push-shopworks-label">Push to ShopWorks</span>
+                    </button>
                     <!-- Email button moved to action panel below -->
                 </div>
             </div>
@@ -659,7 +663,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=20260127"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=20260106r"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.23.1"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.23.6"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
