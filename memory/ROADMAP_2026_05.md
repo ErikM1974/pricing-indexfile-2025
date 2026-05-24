@@ -415,3 +415,105 @@ North Star is Phase 8 — every quote builder pushing to ShopWorks like
 DTG does today.** EMB is already there. DTF / SCP / Cap are the gap.
 ~2-3 weeks of focused work to close it. Future Claude has everything
 needed to pick up and keep shipping.
+
+---
+
+# 📋 Phase 9+ — Overnight 2026-05-23 work (autonomous session)
+
+Erik granted full autonomy + went to bed. Following deltas SHIPPED + DEPLOYED:
+
+### ✅ Phase 8 finalization (DEPLOYED)
+- **DTF + SCP push gates LIFTED** (commit `4186bc61`) — push buttons now
+  visible to all reps after Save & Get Shareable Link. Orders land in EMB
+  customer 3739 until Erik creates dedicated DTF/SCP integrations.
+- **Cap push** confirmed shipped via EMB pipeline (no separate work needed
+  — EMB's pushToShopWorks already routes cap items via EmbellishmentType)
+
+### ✅ Phase 9: Artwork upload (DEPLOYED, partial persistence)
+- New shared `shared_components/js/artwork-upload.js` — drag-drop + multi-
+  file widget. Posts to `/api/files/upload` (Caspio Artwork folder).
+- Wired into DTF / SCP / EMB quote builders (commit `42f89397`).
+- **DTF + SCP**: full persistence — file refs saved to
+  `quote_sessions.Notes` JSON as `referenceArtwork[]`.
+- **EMB**: 🚧 widget mounts and UPLOAD works (files land in Caspio), but
+  URL refs are NOT persisted to the quote because EMB's Notes column is
+  plain text (not JSON like DTF/SCP). **Phase 9.1 schema decision needed**:
+  (a) add `ReferenceArtwork` JSON column to Quote_Sessions
+  (b) convert EMB Notes to JSON (back-compat risk for existing quotes)
+  (c) repurpose existing JSON column (no good candidate)
+
+### ✅ ShipStation investigation (DOCUMENTED, no change needed)
+- ShipStation is **post-fulfillment** in current architecture (post-SW
+  import). Quote builders correctly do NOT push to ShipStation.
+- Workflow: builder → SW push → SW sync (15-min cron) → rep clicks "Send
+  to ShipStation" on quote-view OR quote-management when ready to ship.
+- Button gated by `swProduced==1`. ALREADY WORKS as designed.
+
+---
+
+# 📋 Phase 10 — DTG feature parity audit findings (still PENDING)
+
+Comprehensive 15-feature audit complete. Key deltas requiring Erik input or
+multi-hour focused work — NOT shipped autonomously overnight.
+
+### EMB/DTF/SCP are MISSING (DTG has these)
+| # | Feature | Effort | Pickup notes |
+|---|---|---|---|
+| 1 | **Inventory check per row** | ~3hr/builder × 3 | Port from DTG's `OrderFormInventory` integration (`dtg-inline-form.js:256-259, 387-389`). Include `pages/order-form/inventory/inventory-check.js` + call `kickInventoryFetch()` per added product row. SanMar stock badges. |
+| 2 | **Customer history pill (90-day)** | ~3hr/builder × 3 | Port from `dtg-inline-form.js:746-756` + fetch at `:2672`. Should extract to `quote-builder-utils.js` so DTG migrates too. |
+| 3 | **AI chat panel** (Research Assistant) | ~2 weeks/builder | DTG uses `/api/dtg-quote-ai/chat` endpoint with method-specific tools. New endpoint per method (`/api/emb-quote-ai/chat`, etc.) + system prompt tuning per method. Multi-week effort, NOT autonomous candidate. |
+
+### DTG is MISSING (EMB/DTF/SCP have these)
+| # | Feature | Effort | Pickup notes |
+|---|---|---|---|
+| 4 | **Print Quote button + PDF** | ~3hr | DTG's new chat-first UI dropped Print Quote. Add `invoiceGenerator.generateInvoiceHTML()` call to DTG (legacy version exists at `dtg-quote-builder.js:3369` not wired into new UI). |
+| 5 | **Email Quote button** | ~1hr | DTG missing. Wire shared `emailQuote()` from `quote-builder-utils.js`. |
+| 6 | **Edit / revision (reopen existing quote)** | ~4hr | DTG missing. Add `checkForEditMode()` from `quote-builder-utils.js:791` + `loadQuoteForEditing()` pattern. State hydration is non-trivial. |
+
+### Split-brain (consolidate)
+| # | Issue | Effort | Pickup notes |
+|---|---|---|---|
+| 7 | **Customer context surfacing — DTG uses own implementation** | ~1hr | DTG has `renderCustomerContextBadges()` at `dtg-inline-form.js:3226` reading `Customer_Warning`/`Is_Tax_Exempt`/`Account_Tier`. EMB/DTF/SCP use shared `customer-context-banners.js`. Migrate DTG to shared helper for sync hygiene. |
+
+### Quick wins (still NOT shipped)
+| # | Feature | Effort | Pickup notes |
+|---|---|---|---|
+| 8 | **DTF Email Quote** confirm + wire | 1hr | Audit found NO `emailQuote` calls in DTF builder. Probably missing. Wire shared `emailQuote()` from `quote-builder-utils.js`. |
+| 9 | **Phase 9.1 EMB persistence** | 1hr after schema decision | Decide schema (add column? convert Notes?), then wire EMB save to write `referenceArtwork[]`. |
+
+### Items NOT changing
+- **ShipStation integration in builders** — correctly post-fulfillment, no change needed.
+- **DTG catalog browser** — method-specific (curated DTG-friendly garments). Should NOT be ported to other methods.
+
+---
+
+## 🧠 Updated pickup prompts (PRIORITIZED)
+
+**Quick win (most valuable for ~1 day of work)**:
+> "Phase 10.7 — migrate DTG customer-context-badges to the shared
+> customer-context-banners.js helper. DTG's own implementation at
+> shared_components/js/dtg-inline-form.js:3226 (renderCustomerContextBadges)
+> reads the same Caspio fields. Goal: single code path for all 4 builders.
+> ~1hr."
+
+**Next phase, medium effort (~1 week)**:
+> "Phase 10.1 — port DTG's inventory check pattern to EMB/DTF/SCP.
+> See OrderFormInventory integration at dtg-inline-form.js:256-259, 387-389
+> + pages/order-form/inventory/inventory-check.js. Per-row SanMar stock
+> badges. ~3hr/builder × 3 builders."
+
+**Then**:
+> "Phase 10.2 — port DTG's customer history pill (90-day) to EMB/DTF/SCP.
+> See dtg-inline-form.js:746-756 + fetch at :2672. Extract to
+> quote-builder-utils.js so DTG migrates to shared code too."
+
+**DTG gap fixes**:
+> "Phase 10.4-6 — DTG is missing Print Quote, Email Quote, and Edit-reopen
+> that EMB/DTF/SCP have. Add via quote-builder-utils.js wiring +
+> EmbroideryInvoiceGenerator call for Print. See ROADMAP Phase 10 table."
+
+**Strategic (multi-week)**:
+> "Phase 10.3 — AI chat panel for EMB/DTF/SCP. DTG-only today, uses
+> /api/dtg-quote-ai/chat endpoint with method-specific tools. New endpoint
+> per method + system prompt tuning. ~2 weeks per builder. Erik input
+> needed on method-specific tool design."
