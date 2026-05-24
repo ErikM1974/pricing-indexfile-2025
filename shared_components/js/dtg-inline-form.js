@@ -982,6 +982,18 @@
                             <i class="fas fa-truck"></i> Submit to ShopWorks
                         </button>
                         <div id="dtgSubmitStatus" class="dtg-submit-status" hidden></div>
+
+                        <!-- Phase 11.4/11.5 (2026-05-24): Print + Email parity with EMB/DTF/SCP.
+                             Print works from current state at any time. Email requires a
+                             saved quote ID (sets after "Save & share link" in chat panel). -->
+                        <div class="dtg-secondary-actions">
+                            <button type="button" class="dtg-secondary-btn" id="dtgPrintBtn" title="Open printable PDF-quality invoice of this quote">
+                                <i class="fas fa-print"></i> Print Quote
+                            </button>
+                            <button type="button" class="dtg-secondary-btn" id="dtgEmailBtn" title="Email this quote link to the customer (save quote first)">
+                                <i class="fas fa-envelope"></i> Email Quote
+                            </button>
+                        </div>
                     </aside>
                 </div>
 
@@ -1969,6 +1981,19 @@
         // Submit
         const submit = document.getElementById('dtgSubmitBtn');
         if (submit) submit.addEventListener('click', () => submitToShopWorks());
+
+        // Phase 11.4 (2026-05-24): Print Quote — opens a PDF-quality invoice
+        // in a new window for the rep to print/save. Works from current form
+        // state, no saved quote required.
+        const printBtn = document.getElementById('dtgPrintBtn');
+        if (printBtn) printBtn.addEventListener('click', () => dtgPrintQuote());
+
+        // Phase 11.5 (2026-05-24): Email Quote — sends the customer a link to
+        // the saved quote via EmailJS. Requires the quote to have been saved
+        // first (sets aiState.savedQuoteID from the chat panel's "Save & share
+        // link" button).
+        const emailBtn = document.getElementById('dtgEmailBtn');
+        if (emailBtn) emailBtn.addEventListener('click', () => dtgEmailQuote());
 
         // Customer combobox
         const wrap = document.getElementById('dtgCompanyCombo');
@@ -3540,6 +3565,177 @@
             document.body.appendChild(backdrop);
             // Focus the "Cancel" button by default — safer than auto-confirming.
             backdrop.querySelector('[data-action="cancel"]').focus();
+        });
+    }
+
+    // ========================================================================
+    // Phase 11.4 (2026-05-24) — DTG Print Quote
+    // Opens a PDF-quality invoice from the current form state in a new
+    // window for the rep to print/save. Mirrors EMB/DTF/SCP printQuote()
+    // pattern using the shared EmbroideryInvoiceGenerator class.
+    // No saved quote required — works from current in-memory state.
+    // ========================================================================
+    async function dtgPrintQuote() {
+        try {
+            if (typeof EmbroideryInvoiceGenerator === 'undefined') {
+                alert('Print is unavailable — invoice generator not loaded. Please refresh and try again.');
+                return;
+            }
+
+            // Collect line items from current state
+            const cleanLines = state.rows.filter(r => r.style && r.color && Object.keys(r.sizes || {}).length > 0);
+            if (cleanLines.length === 0) {
+                alert('Add at least one product with a size before printing.');
+                return;
+            }
+
+            // Trigger a fresh price calculation so the invoice reads current numbers
+            const priceQuote = computePriceQuoteFromState();
+            if (!priceQuote || !Array.isArray(priceQuote.lineItems) || priceQuote.lineItems.length === 0) {
+                alert('Could not compute pricing. Make sure all rows have a style + color + at least one filled size.');
+                return;
+            }
+
+            // Build invoice data structure (matches what EmbroideryInvoiceGenerator expects).
+            // DTG doesn't use per-logo locations; the print location is shared across rows.
+            const locationLabel = LOCATION_LABELS[effectiveLocationCode()] || effectiveLocationCode() || 'Left Chest';
+            const invoiceProducts = priceQuote.lineItems.map(li => {
+                const sizeQtys = li.sizes || {};
+                const totalQty = Object.values(sizeQtys).reduce((s, q) => s + (Number(q) || 0), 0);
+                return {
+                    style: li.style || li.partNumber || '',
+                    color: li.color || '',
+                    description: li.description || `${li.style} ${li.color}`.trim(),
+                    quantity: totalQty,
+                    unitPrice: Number(li.finalUnitPrice) || 0,
+                    lineTotal: Number(li.lineTotal) || 0,
+                    sizeBreakdown: sizeQtys,
+                    printLocation: locationLabel,
+                    logoSpecs: { logos: [{ pos: locationLabel, stitch: '' }] },
+                };
+            });
+
+            const pricingData = {
+                quoteId: getQuoteID() || `DTG-PREVIEW-${Date.now()}`,
+                method: 'DTG',
+                pricingTier: priceQuote.tier || 'Standard',
+                combinedQuantity: priceQuote.combinedQuantity || 0,
+                products: invoiceProducts,
+                subtotal: Number(priceQuote.subtotal) || 0,
+                ltmFee: Number(priceQuote.totalLtmFee) || 0,
+                ltmDistributed: false, // DTG bakes LTM into per-unit; show as separate line for transparency
+                grandTotal: Number(priceQuote.grandTotal) || 0,
+                taxRate: Number(state.shipping?.taxRate) || 0,
+                taxAmount: 0,                       // computed by invoice generator
+                shippingFee: 0,
+            };
+
+            const customerData = {
+                name: [state.customer?.firstName, state.customer?.lastName].filter(Boolean).join(' ') || 'Customer',
+                company: state.customer?.company || '',
+                email: state.customer?.email || '',
+                phone: state.customer?.phone || '',
+                salesRepEmail: state.customer?.salesRepEmail || 'sales@nwcustomapparel.com',
+            };
+
+            const generator = new EmbroideryInvoiceGenerator();
+            const invoiceHTML = generator.generateInvoiceHTML(pricingData, customerData);
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('Pop-up blocker stopped the print window. Allow pop-ups for this page and try again.');
+                return;
+            }
+            printWindow.document.write(invoiceHTML);
+            printWindow.document.close();
+
+            // Wait for fonts/images to settle before triggering the print dialog.
+            setTimeout(() => {
+                try { printWindow.print(); } catch (_) { /* user can press Ctrl+P manually */ }
+            }, 400);
+        } catch (e) {
+            console.error('[DTG Print] Error:', e);
+            alert('Print failed: ' + (e.message || 'unknown error'));
+        }
+    }
+
+    // Lightweight pricing snapshot the invoice generator can consume. Reads
+    // from in-memory `state` + the existing live preview helper rather than
+    // running the full async submit flow. Returns null when state is empty.
+    function computePriceQuoteFromState() {
+        // Prefer the chat-controller's latest snapshot (already computed for
+        // the live price preview). Fall back to recomputing from rows.
+        if (window.aiState && window.aiState.lastPriceQuote) {
+            return window.aiState.lastPriceQuote;
+        }
+        // Best-effort fallback: walk state.rows and approximate totals from
+        // the displayed DOM (preview cells). Returns minimal structure.
+        const code = effectiveLocationCode();
+        const lineItems = state.rows
+            .filter(r => r.style && r.color && Object.keys(r.sizes || {}).length > 0)
+            .map(r => {
+                const totalQty = Object.values(r.sizes).reduce((s, q) => s + (Number(q) || 0), 0);
+                const unitPrice = Number(r.previewUnit) || 0;
+                return {
+                    style: r.style,
+                    color: r.color,
+                    description: r.description || `${r.style} ${r.color}`,
+                    sizes: r.sizes,
+                    totalQuantity: totalQty,
+                    finalUnitPrice: unitPrice,
+                    lineTotal: unitPrice * totalQty,
+                };
+            });
+        const subtotal = lineItems.reduce((s, li) => s + (li.lineTotal || 0), 0);
+        const combinedQuantity = lineItems.reduce((s, li) => s + (li.totalQuantity || 0), 0);
+        return {
+            lineItems,
+            combinedQuantity,
+            subtotal,
+            grandTotal: subtotal,
+            totalLtmFee: 0,
+            tier: 'Standard',
+        };
+    }
+
+    // ========================================================================
+    // Phase 11.5 (2026-05-24) — DTG Email Quote
+    // Sends customer a link to the saved quote via the shared emailQuote()
+    // helper (EmailJS service_jgrave3 / template_quote_email). Requires a
+    // saved quote (aiState.savedQuoteID populated by chat panel's "Save &
+    // share link" button). Surfaces a clear "save first" message if not.
+    // ========================================================================
+    async function dtgEmailQuote() {
+        const savedId = (window.aiState && window.aiState.savedQuoteID) || null;
+        if (!savedId) {
+            alert(
+                'Save the quote first before emailing.\n\n' +
+                'Open the chat panel (✨ Ask button) and click "Save & share link" — that gives the quote an ID. ' +
+                'Then come back here and click Email Quote.'
+            );
+            return;
+        }
+
+        const customerEmail = (state.customer?.email || '').trim();
+        if (!customerEmail) {
+            alert('Customer email is required. Fill in the email field in the customer panel and try again.');
+            return;
+        }
+
+        if (typeof emailQuote !== 'function') {
+            alert('Email helper not loaded. Please refresh and try again.');
+            return;
+        }
+
+        const customerName =
+            [state.customer?.firstName, state.customer?.lastName].filter(Boolean).join(' ').trim() ||
+            state.customer?.company ||
+            'Customer';
+
+        await emailQuote({
+            quoteId: savedId,
+            customerEmail,
+            customerName,
+            salesRepEmail: state.customer?.salesRepEmail || 'sales@nwcustomapparel.com',
         });
     }
 
