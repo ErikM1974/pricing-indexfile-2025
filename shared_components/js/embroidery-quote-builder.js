@@ -4400,6 +4400,18 @@ function selectColor(rowId, optionEl, skipDuplicateCheck) {
     // This runs async but doesn't block - will update UI when API returns
     detectAndAdjustSizeUI(rowId);
 
+    // Phase 10.1 (2026-05-23) — fire SanMar inventory check + render badges
+    // next to each size input. Uses shared InventoryBadges wrapper.
+    // Graceful: silently no-ops if scripts missing or non-SanMar product.
+    if (window.InventoryBadges && typeof window.InventoryBadges.attach === 'function'
+        && catalogColor && row.dataset.nonSanmar !== 'true') {
+        window.InventoryBadges.attach(row, {
+            style: style,
+            catalogColor: catalogColor,
+            sizeCellSelector: 'input.size-input',
+        });
+    }
+
     // Focus first size input (may be overridden by detectAndAdjustSizeUI for special products)
     const firstSize = row.querySelector('.size-input');
     if (firstSize) firstSize.focus();

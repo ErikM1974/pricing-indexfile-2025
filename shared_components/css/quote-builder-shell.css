@@ -540,3 +540,48 @@ body.qb-shell-body {
 .artwork-status-info    { color: var(--qb-state-info, #3b82f6); }
 .artwork-status-success { color: var(--pnw-forest, #2e5827); }
 .artwork-status-error   { color: var(--qb-state-error, #dc2626); }
+
+/* ============================================================================
+   INVENTORY BADGES (Phase 10.1 — 2026-05-23)
+   ============================================================================
+   Used by shared_components/js/inventory-badges.js — injected next to each
+   size input on a product row to show SanMar stock level at-a-glance.
+*/
+.inv-badge {
+    display: inline-block;
+    margin-top: 2px;
+    padding: 1px 4px;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: var(--qb-radius-sm, 4px);
+    text-align: center;
+    min-width: 22px;
+    cursor: help;
+    border: 1px solid transparent;
+    user-select: none;
+}
+
+.inv-badge--good {
+    background: var(--pnw-mist, #dcfce7);
+    color: var(--pnw-forest-deep, #166534);
+    border-color: var(--pnw-forest, #22c55e);
+}
+
+.inv-badge--low {
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: #92400e;
+    border-color: var(--qb-state-warn, #f59e0b);
+}
+
+.inv-badge--oos {
+    background: var(--qb-state-error-bg, #fef2f2);
+    color: var(--qb-state-error, #dc2626);
+    border-color: var(--qb-state-error, #dc2626);
+}
+
+.inv-badge--unknown {
+    background: #f3f4f6;
+    color: var(--pnw-stone-soft, #9ca3af);
+    border-color: #d1d5db;
+}

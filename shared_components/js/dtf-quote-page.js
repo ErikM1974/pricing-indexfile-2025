@@ -786,6 +786,17 @@ function selectColor(rowId, optionEl) {
     // Enable size inputs
     row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
 
+    // Phase 10.1 (2026-05-23) — fire SanMar inventory check + render badges
+    // next to each size input. Uses shared InventoryBadges wrapper around
+    // OrderFormInventory module. Graceful: silently no-ops if scripts missing.
+    if (window.InventoryBadges && typeof window.InventoryBadges.attach === 'function') {
+        window.InventoryBadges.attach(row, {
+            style: style,
+            catalogColor: catalogColor,
+            sizeCellSelector: 'input.size-input',
+        });
+    }
+
     // Focus first size
     const firstSize = row.querySelector('.size-input:not(.xxxl-picker-btn)');
     if (firstSize) firstSize.focus();
