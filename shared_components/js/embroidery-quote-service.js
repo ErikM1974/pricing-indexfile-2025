@@ -329,7 +329,15 @@ class EmbroideryQuoteService {
                 DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
-                ImportNotes: JSON.stringify(customerData.importNotes || []),
+                // Phase 11.3 (2026-05-24): ImportNotes extended from a flat array
+                // to an object so referenceArtwork[] + newDesignName ride along
+                // without a Caspio schema change. Proxy embroidery transformer
+                // handles BOTH the legacy array form AND the new object form.
+                ImportNotes: JSON.stringify({
+                    importNotes: customerData.importNotes || [],
+                    referenceArtwork: Array.isArray(customerData.referenceArtwork) ? customerData.referenceArtwork : [],
+                    newDesignName: customerData.newDesignName || ''
+                }),
                 PaidToDate: customerData.paidToDate ?? 0,
                 BalanceAmount: customerData.balanceAmount ?? 0,
                 OrderNotes: customerData.orderNotes || '',
@@ -1415,7 +1423,15 @@ class EmbroideryQuoteService {
                 DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
-                ImportNotes: JSON.stringify(customerData.importNotes || []),
+                // Phase 11.3 (2026-05-24): ImportNotes extended from a flat array
+                // to an object so referenceArtwork[] + newDesignName ride along
+                // without a Caspio schema change. Proxy embroidery transformer
+                // handles BOTH the legacy array form AND the new object form.
+                ImportNotes: JSON.stringify({
+                    importNotes: customerData.importNotes || [],
+                    referenceArtwork: Array.isArray(customerData.referenceArtwork) ? customerData.referenceArtwork : [],
+                    newDesignName: customerData.newDesignName || ''
+                }),
                 PaidToDate: customerData.paidToDate ?? 0,
                 BalanceAmount: customerData.balanceAmount ?? 0,
                 OrderNotes: customerData.orderNotes || '',
