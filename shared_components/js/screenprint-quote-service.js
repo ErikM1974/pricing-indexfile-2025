@@ -104,7 +104,12 @@ class ScreenPrintQuoteService {
                 TotalAmount: totalAmount,
                 Status: 'Open',
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify({ ...printSetup, userNotes: quoteData.notes || '' }),
+                Notes: JSON.stringify({
+                    ...printSetup,
+                    userNotes: quoteData.notes || '',
+                    // Phase 9 (2026-05-23) — reference artwork file refs
+                    referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : []
+                }),
                 // Sales rep (2026-03-23)
                 SalesRepEmail: quoteData.salesRep || '',
                 // Additional charges (2026 fee refactor)
@@ -366,7 +371,12 @@ class ScreenPrintQuoteService {
                 LTMFeeTotal: parseFloat(ltmFeeTotal.toFixed(2)),
                 TotalAmount: parseFloat(totalAmount.toFixed(2)),
                 ExpiresAt: expiresAt,
-                Notes: JSON.stringify({ ...printSetup, userNotes: quoteData.notes || '' }),
+                Notes: JSON.stringify({
+                    ...printSetup,
+                    userNotes: quoteData.notes || '',
+                    // Phase 9 (2026-05-23) — reference artwork file refs
+                    referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : []
+                }),
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 RevisedBy: quoteData.salesRep || 'sales@nwcustomapparel.com',

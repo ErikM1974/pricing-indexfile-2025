@@ -358,3 +358,185 @@ body.qb-shell-body {
 .qb-chip--error  { background: var(--qb-state-error-bg);   color: var(--qb-state-error); border-color: var(--qb-state-error); }
 .qb-chip--info   { background: var(--qb-state-info-bg);    color: var(--qb-state-info); border-color: var(--qb-state-info); }
 .qb-chip--success{ background: var(--pnw-mist);            color: var(--pnw-forest-deep); border-color: var(--pnw-forest); }
+
+/* ============================================================================
+   ARTWORK UPLOAD WIDGET (Phase 9 — 2026-05-23)
+   ============================================================================
+   Used by shared_components/js/artwork-upload.js — mounted into EMB/DTF/SCP
+   quote builders to give reps drag-drop artwork upload for the current quote.
+*/
+.artwork-upload-widget {
+    background: var(--pnw-paper, #fff);
+    border: 1px solid var(--pnw-rule, rgba(31, 73, 34, 0.10));
+    border-radius: var(--qb-radius-md, 8px);
+    padding: 12px 16px;
+    margin: 12px 0;
+}
+
+.artwork-upload-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--pnw-pine, #1a3517);
+    margin-bottom: 4px;
+}
+
+.artwork-upload-head i {
+    color: var(--pnw-forest, #2e5827);
+}
+
+.artwork-upload-sub {
+    font-size: 12px;
+    color: var(--pnw-stone, #6b7280);
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+
+.artwork-dropzone {
+    border: 2px dashed var(--pnw-rule-strong, rgba(31, 73, 34, 0.22));
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--pnw-fog, #f4f6f3);
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 150ms cubic-bezier(.2,.8,.2,1);
+    color: var(--pnw-stone, #6b7280);
+}
+
+.artwork-dropzone:hover,
+.artwork-dropzone:focus-visible,
+.artwork-dropzone-active {
+    border-color: var(--pnw-forest, #2e5827);
+    background: var(--pnw-mist, #e8eee7);
+    color: var(--pnw-forest-deep, #1f4922);
+    outline: none;
+}
+
+.artwork-dropzone i {
+    font-size: 28px;
+    color: var(--pnw-forest, #2e5827);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.artwork-dropzone-msg {
+    font-size: 14px;
+    color: var(--pnw-pine, #1a3517);
+    margin-bottom: 4px;
+}
+
+.artwork-dropzone-msg strong { color: var(--pnw-forest-deep, #1f4922); }
+.artwork-dropzone-browse { text-decoration: underline; color: var(--pnw-forest, #2e5827); }
+
+.artwork-dropzone-sub {
+    font-size: 11px;
+    color: var(--pnw-stone-soft, #9ca3af);
+}
+
+.artwork-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.artwork-list:empty { display: none; }
+
+.artwork-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: var(--pnw-fog, #f4f6f3);
+    border: 1px solid var(--pnw-rule, rgba(31, 73, 34, 0.10));
+    border-radius: var(--qb-radius-sm, 4px);
+}
+
+.artwork-file-thumb {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    border-radius: var(--qb-radius-sm, 4px);
+    overflow: hidden;
+    background: var(--pnw-paper, #fff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.artwork-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.artwork-thumb-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: var(--pnw-stone, #6b7280);
+    font-size: 18px;
+}
+
+.artwork-thumb-ext {
+    font-size: 9px;
+    font-weight: 600;
+    margin-top: 2px;
+    color: var(--pnw-stone-soft, #9ca3af);
+}
+
+.artwork-file-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.artwork-file-name {
+    display: block;
+    font-size: 13px;
+    color: var(--pnw-pine, #1a3517);
+    text-decoration: none;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.artwork-file-name:hover { text-decoration: underline; color: var(--pnw-forest, #2e5827); }
+
+.artwork-file-size {
+    font-size: 11px;
+    color: var(--pnw-stone, #6b7280);
+}
+
+.artwork-file-remove {
+    background: transparent;
+    border: none;
+    color: var(--pnw-stone, #6b7280);
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: var(--qb-radius-sm, 4px);
+    transition: all 120ms;
+}
+
+.artwork-file-remove:hover {
+    background: var(--qb-state-error-bg, #fef2f2);
+    color: var(--qb-state-error, #dc2626);
+}
+
+.artwork-status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--pnw-stone, #6b7280);
+    min-height: 18px;
+}
+
+.artwork-status:empty { display: none; }
+
+.artwork-status-info    { color: var(--qb-state-info, #3b82f6); }
+.artwork-status-success { color: var(--pnw-forest, #2e5827); }
+.artwork-status-error   { color: var(--qb-state-error, #dc2626); }

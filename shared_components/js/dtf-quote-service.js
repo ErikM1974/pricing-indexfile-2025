@@ -159,7 +159,9 @@ class DTFQuoteService {
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
                     marginDenominator: quoteData.marginDenominator,
                     laborPerLocation: quoteData.laborCostPerLocation,
-                    freightPerLocation: quoteData.freightPerTransfer
+                    freightPerLocation: quoteData.freightPerTransfer,
+                    // Phase 9 (2026-05-23) — reference artwork file refs
+                    referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : []
                 }),
                 // Additional charges (2026 fee refactor)
                 ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
@@ -634,7 +636,9 @@ class DTFQuoteService {
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
                     marginDenominator: quoteData.marginDenominator,
                     laborPerLocation: quoteData.laborCostPerLocation,
-                    freightPerLocation: quoteData.freightPerTransfer
+                    freightPerLocation: quoteData.freightPerTransfer,
+                    // Phase 9 (2026-05-23) — reference artwork file refs
+                    referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : []
                 }),
                 RevisionNumber: newRevision,
                 RevisedAt: this.formatDateForCaspio(new Date()),

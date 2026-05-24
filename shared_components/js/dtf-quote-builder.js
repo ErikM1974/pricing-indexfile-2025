@@ -2290,6 +2290,11 @@ class DTFQuoteBuilder {
         const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '')) || subtotal;
 
         // Build quote data
+        // Phase 9 — include uploaded reference artwork file refs (if any)
+        const referenceArtwork = (window._dtfArtwork && typeof window._dtfArtwork.getFiles === 'function')
+            ? window._dtfArtwork.getFiles()
+            : [];
+
         const quoteData = {
             quoteId: quoteId,
             customerName,
@@ -2297,6 +2302,7 @@ class DTFQuoteBuilder {
             companyName,
             salesRep,
             notes: '',
+            referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
             selectedLocations: this.selectedLocations,
             locationDetails: this.selectedLocations.map(loc => ({
                 code: loc,
@@ -3256,6 +3262,18 @@ let dtfQuoteBuilder;
 document.addEventListener('DOMContentLoaded', () => {
     dtfQuoteBuilder = new DTFQuoteBuilder();
     window.dtfQuoteBuilder = dtfQuoteBuilder;
+
+    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
+    // Files uploaded here are read in saveAndGetLink() and stored to
+    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    if (typeof ArtworkUpload !== 'undefined') {
+        try {
+            window._dtfArtwork = ArtworkUpload.attach({ mountSelector: '#dtf-artwork-mount' });
+            console.log('[DTF] Artwork upload widget mounted');
+        } catch (e) {
+            console.error('[DTF] Artwork widget mount failed:', e);
+        }
+    }
 });
 
 // Global function wrappers for HTML onclick handlers

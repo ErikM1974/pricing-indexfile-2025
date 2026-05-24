@@ -1321,6 +1321,28 @@ function populateAdditionalCharges(session) {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
+    // Files uploaded here are read in saveAndGetLink() and stored to
+    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    if (typeof ArtworkUpload !== 'undefined') {
+        try {
+            window._embArtwork = ArtworkUpload.attach({ mountSelector: '#emb-artwork-mount' });
+            console.log('[EMB] Artwork upload widget mounted');
+            // 🚧 TODO Phase 9.1: persist window._embArtwork.getFiles() into the
+            // quote save payload. EMB's Notes column is plain text (not JSON
+            // like DTF/SCP), so persistence needs a schema decision:
+            //   (a) Add referenceArtwork column to Quote_Sessions
+            //   (b) Convert Notes to JSON (would break older quotes' parsers)
+            //   (c) Repurpose existing JSON column (ImportNotes? — semantic mismatch)
+            // For now: widget WORKS for upload (files land in Caspio Artwork
+            // folder, rep sees them mid-session) but URLs are NOT persisted
+            // when quote is saved/edited. Files exist on server, just not
+            // linked back to this quote.
+        } catch (e) {
+            console.error('[EMB] Artwork widget mount failed:', e);
+        }
+    }
+
     showLoading(true);
 
     // ALWAYS set up search first - independent of pricing calculator

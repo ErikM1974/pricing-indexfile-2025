@@ -773,6 +773,18 @@ function resetQuote() {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // Phase 9 (2026-05-23) — reference artwork upload (shared widget).
+    // Files uploaded here are read in saveAndGetLink() and stored to
+    // quote_sessions.Notes JSON as referenceArtwork[]. No schema change.
+    if (typeof ArtworkUpload !== 'undefined') {
+        try {
+            window._scpArtwork = ArtworkUpload.attach({ mountSelector: '#scp-artwork-mount' });
+            console.log('[SCP] Artwork upload widget mounted');
+        } catch (e) {
+            console.error('[SCP] Artwork widget mount failed:', e);
+        }
+    }
+
     showLoading(true);
 
     try {
@@ -3765,12 +3777,18 @@ async function saveAndGetLink() {
         const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
         const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
+        // Phase 9 — include uploaded reference artwork file refs (if any)
+        const referenceArtwork = (window._scpArtwork && typeof window._scpArtwork.getFiles === 'function')
+            ? window._scpArtwork.getFiles()
+            : [];
+
         // Collect quote data
         const quoteData = {
             customerName: customerName,
             customerEmail: customerEmail,
             companyName: document.getElementById('company-name')?.value?.trim() || '',
             salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
             items: items,
             totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
             subtotal: pricing.subtotal || 0,
