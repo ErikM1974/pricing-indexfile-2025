@@ -132,7 +132,7 @@
 /* Focus indicator for accessibility (WCAG 2.4.7) */
 .location-radio input[type="radio"]:focus-visible,
 .location-radio input[type="checkbox"]:focus-visible {
-    outline: 2px solid var(--nwca-green, #2563eb);
+    outline: 2px solid var(--nwca-green, var(--pnw-forest, #2563eb));
     outline-offset: 2px;
 }
 
@@ -171,19 +171,19 @@
 }
 
 .ink-btn:hover span {
-    border-color: #2563eb;
-    color: #2563eb;
+    border-color: var(--pnw-forest, #2563eb);
+    color: var(--pnw-forest, #2563eb);
 }
 
 .ink-btn input[type="radio"]:checked + span {
-    background: #2563eb;
-    border-color: #2563eb;
+    background: var(--pnw-forest, #2563eb);
+    border-color: var(--pnw-forest, #2563eb);
     color: white;
 }
 
 /* Focus indicator for accessibility (WCAG 2.4.7) */
 .ink-btn input[type="radio"]:focus-visible + span {
-    outline: 2px solid #2563eb;
+    outline: 2px solid var(--pnw-forest, #2563eb);
     outline-offset: 2px;
 }
 
@@ -366,33 +366,33 @@
     gap: 4px;
     padding: 2px 8px;
     background: #f0fdf4;
-    border: 1px solid #22c55e;
+    border: 1px solid var(--pnw-forest, #22c55e);
     border-radius: 12px;
     font-size: 11px;
-    color: #16a34a;
+    color: var(--pnw-forest-deep, #16a34a);
     cursor: pointer;
     margin-top: 4px;
     transition: all 0.15s ease;
 }
 
 .al-btn:hover {
-    background: #22c55e;
+    background: var(--pnw-forest, #22c55e);
     color: white;
 }
 
 .al-btn.has-al {
-    background: #eff6ff;
-    border-color: #3b82f6;
-    color: #2563eb;
+    background: var(--pnw-mist, #eff6ff);
+    border-color: var(--pnw-moss, #3b82f6);
+    color: var(--pnw-forest, #2563eb);
 }
 
 .al-btn.has-al:hover {
-    background: #3b82f6;
+    background: var(--pnw-moss, #3b82f6);
     color: white;
 }
 
 .al-btn .al-badge {
-    background: #3b82f6;
+    background: var(--pnw-moss, #3b82f6);
     color: white;
     border-radius: 10px;
     padding: 0 6px;
@@ -494,10 +494,10 @@
     gap: 4px;
     padding: 4px 12px;
     background: #f0fdf4;
-    border: 1px dashed #22c55e;
+    border: 1px dashed var(--pnw-forest, #22c55e);
     border-radius: 4px;
     font-size: 11px;
-    color: #16a34a;
+    color: var(--pnw-forest-deep, #16a34a);
     cursor: pointer;
 }
 

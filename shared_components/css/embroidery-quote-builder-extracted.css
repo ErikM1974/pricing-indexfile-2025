@@ -48,7 +48,7 @@
 .pricing-total-sticky {
     background: #fff;
     padding: 12px 16px;
-    border-top: 2px solid #22c55e;
+    border-top: 2px solid var(--pnw-forest, #22c55e);
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -290,8 +290,8 @@
 }
 
 .digitizing-checkbox.checked {
-    background: #22c55e;
-    border-color: #22c55e;
+    background: var(--pnw-forest, #22c55e);
+    border-color: var(--pnw-forest, #22c55e);
 }
 
 .digitizing-checkbox.checked .digitizing-checkbox-label {
@@ -309,7 +309,7 @@
 .digitizing-checkbox-indicator {
     width: 20px;
     height: 20px;
-    border: 2px solid #22c55e;
+    border: 2px solid var(--pnw-forest, #22c55e);
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -325,7 +325,7 @@
 
 .digitizing-checkbox-indicator i {
     font-size: 12px;
-    color: #22c55e;
+    color: var(--pnw-forest, #22c55e);
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -342,7 +342,7 @@
 
 .digitizing-checkbox-price {
     font-size: 12px;
-    color: #16a34a;
+    color: var(--pnw-forest-deep, #16a34a);
     margin-left: auto;
 }
 
@@ -434,7 +434,7 @@
 }
 
 .toggle-switch.active {
-    background: #22c55e;
+    background: var(--pnw-forest, #22c55e);
 }
 
 .toggle-switch-handle {
@@ -619,7 +619,7 @@
 }
 
 .artwork-toggle input:checked + .artwork-toggle-indicator {
-    background: #22c55e;
+    background: var(--pnw-forest, #22c55e);
 }
 
 .artwork-toggle input:checked + .artwork-toggle-indicator::after {
@@ -994,17 +994,17 @@
     gap: 4px;
     padding: 2px 8px;
     background: #f0fdf4;
-    border: 1px solid #22c55e;
+    border: 1px solid var(--pnw-forest, #22c55e);
     border-radius: 12px;
     font-size: 11px;
-    color: #16a34a;
+    color: var(--pnw-forest-deep, #16a34a);
     cursor: pointer;
     margin-top: 4px;
     transition: all 0.15s ease;
 }
 
 .al-btn:hover {
-    background: #22c55e;
+    background: var(--pnw-forest, #22c55e);
     color: white;
 }
 
@@ -1122,10 +1122,10 @@
     gap: 4px;
     padding: 4px 12px;
     background: #f0fdf4;
-    border: 1px dashed #22c55e;
+    border: 1px dashed var(--pnw-forest, #22c55e);
     border-radius: 4px;
     font-size: 11px;
-    color: #16a34a;
+    color: var(--pnw-forest-deep, #16a34a);
     cursor: pointer;
 }
 
@@ -2664,7 +2664,7 @@ td.size-disabled input {
 .import-summary-banner .banner-detail { color: #475569; font-size: 12px; }
 .import-summary-banner .banner-ns-item { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
 .import-summary-banner .banner-ns-item:hover { text-decoration: underline; }
-.import-summary-banner .banner-ns-item .ns-price-ok { color: #16a34a; }
+.import-summary-banner .banner-ns-item .ns-price-ok { color: var(--pnw-forest-deep, #16a34a); }
 .import-summary-banner .banner-ns-item .ns-price-warn { color: #dc2626; }
 .import-summary-banner .btn-dismiss-banner {
     position: absolute; top: 8px; right: 12px; background: none;

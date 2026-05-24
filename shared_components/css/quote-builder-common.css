@@ -177,12 +177,20 @@ body {
 
 /* New Quote Button - Green accent */
 .power-header .btn-new-quote {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-    border: none;
+    /* Light cream button on the deep-forest header — high contrast for the
+       primary "New Quote" CTA, on-palette with PNW birch + sage tones. */
+    background: var(--pnw-birch, #f7f2e3);
+    color: var(--pnw-forest-deep, #15803d) !important;
+    border: 1px solid var(--pnw-sage, transparent);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-weight: 600;
 }
 
 .power-header .btn-new-quote:hover {
-    background: linear-gradient(135deg, #16a34a, #15803d);
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-pine, #15803d) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.20);
+    transform: translateY(-1px);
 }
 
 /* Unsaved Changes Badge (in header) */

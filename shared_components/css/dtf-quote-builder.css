@@ -1654,22 +1654,23 @@
     transform: translateY(-1px);
 }
 
-/* Column header accent colors */
+/* Column header accent colors — PNW palette (forest / moss / cedar trio)
+   keeps zone differentiation but on-brand */
 .location-column:nth-child(1) .column-header {
-    color: #166534;
-    border-bottom: 2px solid #4cb354;
+    color: var(--pnw-forest-deep, #166534);
+    border-bottom: 2px solid var(--pnw-forest, #4cb354);
     padding-bottom: 8px;
 }
 
 .location-column:nth-child(2) .column-header {
-    color: #1e40af;
-    border-bottom: 2px solid #3b82f6;
+    color: var(--pnw-moss, #1e40af);
+    border-bottom: 2px solid var(--pnw-moss, #3b82f6);
     padding-bottom: 8px;
 }
 
 .location-column:nth-child(3) .column-header {
-    color: #9a3412;
-    border-bottom: 2px solid #f59e0b;
+    color: var(--pnw-cedar, #9a3412);
+    border-bottom: 2px solid var(--pnw-cedar, #f59e0b);
     padding-bottom: 8px;
 }
 
