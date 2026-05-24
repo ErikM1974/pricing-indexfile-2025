@@ -16,9 +16,11 @@
    CSS VARIABLES
    ========================================== */
 :root {
-    --primary-color: #4cb354;  /* NWCA Green */
-    --primary-dark: #409a47;   /* Dark Green */
-    --primary-light: #e8f5e9;  /* Light Green */
+    /* Phase 2d (2026-05-23): use PNW palette when shell.css is loaded
+       (customer calculators), fall back to lime NWCA green otherwise */
+    --primary-color: var(--pnw-forest, #4cb354);       /* NWCA Green / PNW Forest */
+    --primary-dark:  var(--pnw-forest-deep, #409a47);  /* Dark Green / PNW Deep Forest */
+    --primary-light: var(--pnw-mist, #e8f5e9);         /* Light Green / PNW Mist */
     --text-primary: #333333;
     --text-secondary: #666666;
     --border-color: #e5e7eb;

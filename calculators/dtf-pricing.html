@@ -12,7 +12,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Universal Pricing CSS - Load FIRST for proper theming -->
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css">
+    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=20260523b">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20260523a">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-layout.css">
     <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css">
     <link rel="stylesheet" href="/shared_components/css/universal-pricing-components.css">
@@ -52,11 +54,12 @@
     <style>
         /* CRITICAL: Override blue theme with green - MUST be inline to override JS */
         :root {
-            --primary-color: #4cb354 !important;  /* Updated to match DTG green */
-            --primary: #4cb354 !important;
-            --primary-dark: #409a47 !important;  /* Updated to match DTG dark green */
-            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
-            --nwca-primary: #4cb354 !important;
+            /* Phase 2d (2026-05-23): var() ref so PNW palette resolves via shell.css */
+            --primary-color: var(--pnw-forest, #4cb354) !important;  /* PNW forest */
+            --primary: var(--pnw-forest, #4cb354) !important;
+            --primary-dark: var(--pnw-forest-deep, #409a47) !important;
+            --primary-light: var(--pnw-mist, #e8f5e9) !important;
+            --nwca-primary: var(--pnw-forest, #4cb354) !important;
         }
         
         /* Enhanced Header Styles for DTF */

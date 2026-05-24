@@ -12,13 +12,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- UNIVERSAL PRICING HEADER (New Unified Design) -->
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20250110">
-    
+    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=20260523b">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20260523a">
+
     <style>
         :root {
-            --primary-color: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #e8f5e9;
+            /* Phase 2d (2026-05-23): var() ref so PNW palette resolves via shell.css */
+            --primary-color: var(--pnw-forest, #4cb354);
+            --primary-dark: var(--pnw-forest-deep, #409a47);
+            --primary-light: var(--pnw-mist, #e8f5e9);
             --bg-color: #f9f9f9;
             --card-bg: #ffffff;
             --border-color: #e5e7eb;

@@ -26,7 +26,9 @@
     <link rel="icon" type="image/png" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1">
 
     <!-- UNIVERSAL PRICING HEADER (New Unified Design) -->
-    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20250110">
+    <!-- Phase 2d (2026-05-23): PNW palette tokens — must load BEFORE universal-pricing-header.css to uplift --primary-* tokens -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=20260523b">
+    <link rel="stylesheet" href="/shared_components/css/universal-pricing-header.css?v=20260523a">
 
     <!-- Universal Toggle Pricing CSS for consistency across all calculators -->
     <link rel="stylesheet" href="/shared_components/css/universal-toggle-pricing.css?v=20251008">
@@ -65,12 +67,13 @@
 
     <!-- Screen Print V2 Styles -->
     <style>
-        /* CRITICAL: Force green theme colors - Updated to match DTG/DTF */
+        /* Phase 2d (2026-05-23): use var() refs so PNW palette can resolve via
+           quote-builder-shell.css. Fallback hex matches old behavior. */
         :root {
-            --primary-color: #4cb354 !important;  /* Updated to match DTG/DTF green */
-            --primary: #4cb354 !important;
-            --primary-dark: #409a47 !important;  /* Updated to match DTG/DTF dark green */
-            --primary-light: #e8f5e9 !important; /* Added light green for backgrounds */
+            --primary-color: var(--pnw-forest, #4cb354) !important;
+            --primary: var(--pnw-forest, #4cb354) !important;
+            --primary-dark: var(--pnw-forest-deep, #409a47) !important;
+            --primary-light: var(--pnw-mist, #e8f5e9) !important;
         }
 
         /* Screen reader only utility class for accessibility */
