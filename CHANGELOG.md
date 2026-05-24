@@ -1,3 +1,29 @@
+## v2026.05.24.1 (2026.05.24)
+
+- Phase 0b + Phase 2: pricing baseline CI gate + PNW visual unification
+- Phase 2c: kill remaining hardcoded colors — PNW palette across all 3 builders
+- Phase 0b.2: retry logic for capture script — kill CI flakiness
+- Phase 2d: extend PNW palette to customer-facing pricing calculators
+- Changelog v2026.05.23.6
+- Phase 2f: PNW palette to Quote Management dashboard header
+- Add ROADMAP_2026_05.md — master plan post-Phase 2 deployment
+- Add Phase 8 (ShopWorks push) as North Star to roadmap
+- Phase 8: DTF push button + handler (frontend side)
+- Phase 8: SCP push button + handler (frontend side)
+- Phase 8: lift DTF + SCP push gates — production ready
+- Phase 9: artwork upload widget — EMB/DTF/SCP
+- Phase 10: roadmap update + overnight status report
+- Phase 10.7: migrate DTG customer-context-badges to shared helper
+- Update OVERNIGHT status doc with DTG customer-context migration commit
+- Verify EMB/Cap/Patch builder live + add verification table to status doc
+- Phase 10.1: SanMar inventory badges on EMB/DTF/SCP rows
+- Update OVERNIGHT status doc — Phase 10.1 (inventory badges) shipped, 10.2 deferred
+- Phase 11.1: customer-aware design combobox on DTF + SCP
+- Strategic plan: NWCA Quote Builder Unified UX Master Plan
+- Phase 11.3 (DTF first): rich-mode artwork upload — design name + per-file placement
+- Phase 11.3 (SCP): wire rich-mode artwork upload — design name + per-file placement
+- Deploy v2026.05.24.1: extend bulk-sync + invoice auto-sync to cover EMB/SCP/DTF orders (PushedToShopWorks timestamp OR Status=Processed). Lets all 4 builders' ShipStation buttons work via shared infra without touching parallel session's push handlers.
+
 ## v2026.05.23.6 (2026.05.23)
 
 - Phase 0b + 2a/2b/2c/2d: pricing baseline CI gate + Pacific Northwest visual unification
