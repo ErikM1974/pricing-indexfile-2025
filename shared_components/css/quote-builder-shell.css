@@ -542,6 +542,81 @@ body.qb-shell-body {
 .artwork-status-error   { color: var(--qb-state-error, #dc2626); }
 
 /* ============================================================================
+   ARTWORK UPLOAD — RICH MODE (Phase 11.3 · 2026-05-24)
+   Adds: design-name input above dropzone + per-file placement dropdown.
+   Both opt-in via attach() opts.designName / opts.placements.
+============================================================================ */
+.artwork-upload-widget--rich {
+    /* Slightly more vertical breathing room when rich-mode fields are visible */
+    padding-bottom: var(--qb-space-3, 12px);
+}
+
+.artwork-upload-designname-row {
+    margin: var(--qb-space-3, 12px) 0;
+    padding: var(--qb-space-3, 12px);
+    background: var(--pnw-mist, #f5f9f4);
+    border: 1px solid var(--pnw-mist-deep, #c8d9c4);
+    border-radius: var(--qb-radius-md, 6px);
+}
+
+.artwork-upload-designname-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pnw-forest-deep, #1f4922);
+    margin-bottom: 4px;
+}
+
+.artwork-upload-designname-input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid var(--pnw-birch-deep, #d4cdb8);
+    border-radius: var(--qb-radius-sm, 4px);
+    background: var(--qb-surface-1, #ffffff);
+    box-sizing: border-box;
+}
+.artwork-upload-designname-input:focus {
+    outline: none;
+    border-color: var(--pnw-forest, #2e5827);
+    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.18);
+}
+
+.artwork-upload-designname-hint {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--qb-text-muted, #6b7280);
+}
+
+/* Per-file placement select — sits under the filename in each file card */
+.artwork-file-placement {
+    margin-top: 4px;
+}
+.artwork-file-placement label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--qb-text-muted, #6b7280);
+}
+.artwork-file-placement-label {
+    font-weight: 500;
+}
+.artwork-file-placement-select {
+    font-size: 12px;
+    padding: 2px 6px;
+    border: 1px solid var(--pnw-birch-deep, #d4cdb8);
+    border-radius: var(--qb-radius-sm, 4px);
+    background: var(--qb-surface-1, #ffffff);
+    color: var(--qb-text, #1f2937);
+    cursor: pointer;
+}
+.artwork-file-placement-select:focus {
+    outline: none;
+    border-color: var(--pnw-forest, #2e5827);
+}
+
+/* ============================================================================
    INVENTORY BADGES (Phase 10.1 — 2026-05-23)
    ============================================================================
    Used by shared_components/js/inventory-badges.js — injected next to each

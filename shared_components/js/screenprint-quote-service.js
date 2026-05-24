@@ -108,9 +108,13 @@ class ScreenPrintQuoteService {
                     ...printSetup,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
+                    // Phase 11.3 (2026-05-24) — files carry .placement per file when
+                    // rich-mode widget was used; proxy reads them to emit Locations[].
                     referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : [],
                     // Phase 11.1 (2026-05-24) — picked design # (for SW push to populate Designs[])
-                    designNumber: quoteData.designNumber || ''
+                    designNumber: quoteData.designNumber || '',
+                    // Phase 11.3 (2026-05-24) — design name for NEW-artwork push.
+                    newDesignName: quoteData.newDesignName || ''
                 }),
                 // Sales rep (2026-03-23)
                 SalesRepEmail: quoteData.salesRep || '',
@@ -377,9 +381,13 @@ class ScreenPrintQuoteService {
                     ...printSetup,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
+                    // Phase 11.3 (2026-05-24) — files carry .placement per file when
+                    // rich-mode widget was used.
                     referenceArtwork: Array.isArray(quoteData.referenceArtwork) ? quoteData.referenceArtwork : [],
                     // Phase 11.1 (2026-05-24) — picked design # (for SW push to populate Designs[])
-                    designNumber: quoteData.designNumber || ''
+                    designNumber: quoteData.designNumber || '',
+                    // Phase 11.3 (2026-05-24) — design name for NEW-artwork push.
+                    newDesignName: quoteData.newDesignName || ''
                 }),
                 RevisionNumber: newRevision,
                 RevisedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),

@@ -9,14 +9,18 @@
  * are stored as `referenceArtwork` inside the quote_sessions.Notes JSON
  * (no schema change needed).
  *
- * DTG has its own inline implementation at dtg-inline-form.js:2727-2989
- * with extra features (design name, placements, links into the ShopWorks
- * Designs[] payload to auto-create a design record). This shared module
- * is intentionally simpler — "reference art the rep saw" for the quote,
- * no SW design auto-creation. EMB/DTF/SCP already use GarmentDesignNumber
- * for the SW design link.
+ * Two modes (backwards-compatible):
  *
- * Usage:
+ *   1. SIMPLE (default) — files only. Used by quote drafts where rep just
+ *      wants to keep a paper trail of "art the customer sent us."
+ *
+ *   2. RICH (opt-in via opts.designName + opts.placements) — adds a design
+ *      name input + per-file placement dropdown. The data round-trips
+ *      through the push payload so ShopWorks creates a new design record
+ *      with the right Locations[] (matches dtg-inline-form.js:2727-2989).
+ *      Phase 11.3 (2026-05-24) — Erik's "unified UX across all 4 builders."
+ *
+ * Usage (simple):
  *   <div id="my-builder-artwork-mount"></div>
  *
  *   const widget = ArtworkUpload.attach({
@@ -33,7 +37,27 @@
  *   // Pre-populate (e.g. editing existing quote):
  *   widget.setFiles(existingArtworkArray);
  *
+ * Usage (rich — design name + per-file placement):
+ *   const widget = ArtworkUpload.attach({
+ *     mountSelector: '#dtf-artwork-mount',
+ *     designName: {
+ *       enabled: true,
+ *       label: 'Design name (required for new designs)',
+ *       placeholder: 'e.g. Acme Corp Logo',
+ *     },
+ *     placements: [
+ *       { code: 'Left Chest', label: 'Left Chest' },
+ *       { code: 'Full Front', label: 'Full Front' },
+ *       { code: 'Full Back',  label: 'Full Back' },
+ *     ],
+ *     defaultPlacement: 'Left Chest',
+ *   });
+ *
+ *   const name  = widget.getDesignName();         // string
+ *   const files = widget.getFiles();              // each file has .placement
+ *
  * Created 2026-05-23 — Phase 9 (DTG feature parity for EMB/DTF/SCP).
+ * Extended 2026-05-24 — Phase 11.3 (rich mode).
  */
 
 (function (global) {
@@ -145,7 +169,19 @@
             title: 'Reference Artwork',
             subtitle: 'Optional — attach customer-supplied artwork to this quote (AI/EPS/PSD/PDF/PNG/JPG/TIFF · 20 MB max each)',
             onChange: null,
+            // Rich-mode opts (Phase 11.3, 2026-05-24). All optional.
+            //   designName: { enabled: true, label: '...', placeholder: '...' }
+            //   placements: [{ code: 'Left Chest', label: 'Left Chest' }, ...]
+            //   defaultPlacement: 'Left Chest'   — applied to newly-uploaded files
+            designName: null,
+            placements: null,
+            defaultPlacement: '',
         }, opts || {});
+
+        const richDesignName = !!(opts2.designName && opts2.designName.enabled);
+        const richPlacements = Array.isArray(opts2.placements) && opts2.placements.length > 0;
+        const defaultPlacement = opts2.defaultPlacement
+            || (richPlacements ? opts2.placements[0].code : '');
 
         const mount = typeof opts2.mountSelector === 'string'
             ? document.querySelector(opts2.mountSelector)
@@ -162,15 +198,35 @@
         const inputId = `${uid}-input`;
         const listId = `${uid}-list`;
         const statusId = `${uid}-status`;
+        const designNameInputId = `${uid}-design-name`;
+
+        // Rich-mode HTML — design name input above the dropzone
+        const designNameHtml = richDesignName ? `
+            <div class="artwork-upload-designname-row">
+                <label for="${designNameInputId}" class="artwork-upload-designname-label">
+                    ${escapeHtml(opts2.designName.label || 'Design name')}
+                </label>
+                <input type="text"
+                       id="${designNameInputId}"
+                       class="artwork-upload-designname-input"
+                       placeholder="${escapeHtml(opts2.designName.placeholder || '')}"
+                       maxlength="100"
+                       autocomplete="off">
+                <div class="artwork-upload-designname-hint">
+                    Required when uploading new artwork — becomes the ShopWorks design name.
+                </div>
+            </div>
+        ` : '';
 
         // Render the widget HTML
         mount.innerHTML = `
-            <div class="artwork-upload-widget">
+            <div class="artwork-upload-widget${richDesignName || richPlacements ? ' artwork-upload-widget--rich' : ''}">
                 <div class="artwork-upload-head">
                     <i class="fas fa-paint-brush"></i>
                     <span class="artwork-upload-title">${escapeHtml(opts2.title)}</span>
                 </div>
                 <div class="artwork-upload-sub">${escapeHtml(opts2.subtitle)}</div>
+                ${designNameHtml}
                 <div class="artwork-dropzone" id="${dropzoneId}" tabindex="0" role="button" aria-label="Upload artwork file">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <div class="artwork-dropzone-msg">
@@ -188,11 +244,13 @@
         const input = document.getElementById(inputId);
         const listEl = document.getElementById(listId);
         const statusEl = document.getElementById(statusId);
+        const designNameInput = richDesignName ? document.getElementById(designNameInputId) : null;
 
         // State — owned by this widget instance
         const state = {
-            files: [],     // [{externalKey, hostedUrl, fileName, ...}]
-            uploading: 0,  // count of in-flight uploads
+            files: [],         // [{externalKey, hostedUrl, fileName, ..., placement?}]
+            uploading: 0,      // count of in-flight uploads
+            designName: '',    // rich mode — set via input or setDesignName()
         };
 
         function fireChange() {
@@ -203,6 +261,21 @@
                     console.error('[ArtworkUpload] onChange handler threw:', e);
                 }
             }
+        }
+
+        function renderPlacementSelect(idx, currentPlacement) {
+            if (!richPlacements) return '';
+            const opts = opts2.placements.map(p =>
+                `<option value="${escapeHtml(p.code)}"${currentPlacement === p.code ? ' selected' : ''}>${escapeHtml(p.label)}</option>`
+            ).join('');
+            return `
+                <div class="artwork-file-placement">
+                    <label>
+                        <span class="artwork-file-placement-label">Placement:</span>
+                        <select class="artwork-file-placement-select" data-idx="${idx}">${opts}</select>
+                    </label>
+                </div>
+            `;
         }
 
         function renderList() {
@@ -218,6 +291,7 @@
                             ${escapeHtml(f.fileName)}
                         </a>
                         <div class="artwork-file-size">${(f.size / 1024).toFixed(0)} KB</div>
+                        ${renderPlacementSelect(idx, f.placement || defaultPlacement)}
                     </div>
                     <button type="button" class="artwork-file-remove" data-idx="${idx}" title="Remove" aria-label="Remove ${escapeHtml(f.fileName)}">
                         <i class="fas fa-times"></i>
@@ -237,6 +311,19 @@
                     }
                 });
             });
+
+            // Wire placement selects (rich mode only)
+            if (richPlacements) {
+                listEl.querySelectorAll('.artwork-file-placement-select').forEach((sel) => {
+                    sel.addEventListener('change', () => {
+                        const idx = parseInt(sel.dataset.idx, 10);
+                        if (!isNaN(idx) && state.files[idx]) {
+                            state.files[idx].placement = sel.value;
+                            fireChange();
+                        }
+                    });
+                });
+            }
         }
 
         async function handleFiles(fileList) {
@@ -257,6 +344,12 @@
                     const result = await uploadOne(file, (pct) => {
                         statusEl.textContent = `Uploading ${file.name} … ${pct}%`;
                     });
+                    // Rich mode: stamp the default placement on the new file so
+                    // the per-file dropdown isn't blank on first render. Rep can
+                    // change it inline. Simple mode: .placement is undefined.
+                    if (richPlacements) {
+                        result.placement = defaultPlacement;
+                    }
                     state.files.push(result);
                     renderList();
                     fireChange();
@@ -299,16 +392,34 @@
             input.value = '';
         });
 
+        // Rich mode: bind design name input
+        if (designNameInput) {
+            designNameInput.addEventListener('input', () => {
+                state.designName = designNameInput.value;
+                fireChange();
+            });
+        }
+
         // Public API
         return {
             getFiles: () => state.files.slice(),
             setFiles: (arr) => {
-                state.files = Array.isArray(arr) ? arr.slice() : [];
+                // Backfill .placement with the default for any file missing it
+                // (so reloaded quotes show a sane initial value in the dropdown
+                // rather than the first option silently winning).
+                state.files = (Array.isArray(arr) ? arr : []).map(f => {
+                    if (richPlacements && !f.placement) {
+                        return Object.assign({}, f, { placement: defaultPlacement });
+                    }
+                    return Object.assign({}, f);
+                });
                 renderList();
                 fireChange();
             },
             clear: () => {
                 state.files = [];
+                state.designName = '';
+                if (designNameInput) designNameInput.value = '';
                 renderList();
                 statusEl.textContent = '';
                 statusEl.className = 'artwork-status';
@@ -316,6 +427,20 @@
             },
             isUploading: () => state.uploading > 0,
             count: () => state.files.length,
+            // Rich-mode API (no-op in simple mode but always safe to call)
+            getDesignName: () => state.designName,
+            setDesignName: (s) => {
+                state.designName = String(s || '');
+                if (designNameInput) designNameInput.value = state.designName;
+            },
+            // True if rich-mode fields are valid for a "new design" push.
+            // Simple mode: always true (files-only is fine).
+            isValidForPush: () => {
+                if (richDesignName && state.files.length > 0) {
+                    return state.designName.trim().length > 0;
+                }
+                return true;
+            },
         };
     }
 

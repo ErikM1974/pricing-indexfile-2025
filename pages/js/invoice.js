@@ -1148,9 +1148,14 @@
     async maybeAutoSync() {
       const sw = this.fullData?.shopWorks;
       const status = this.fullData?.status;
-      // Only auto-sync Processed quotes (i.e. already submitted to ShopWorks)
-      // and only when the snapshot is missing or older than 30 minutes.
-      if (status !== 'Processed') return;
+      const pushedToShopWorks = this.fullData?.sessionRaw?.PushedToShopWorks;
+      // Only auto-sync quotes that have actually been pushed to ShopWorks.
+      // Two dedup conventions across builders (2026-05-23):
+      //   • DTG OF flow → Status flips to 'Processed' after push
+      //   • EMB/SCP/DTF flow → Status stays 'Open', PushedToShopWorks timestamp set
+      // Accept either signal so all 4 builders auto-sync.
+      const wasPushed = status === 'Processed' || (pushedToShopWorks && pushedToShopWorks !== '');
+      if (!wasPushed) return;
       const last = sw?.lastSynced ? new Date(sw.lastSynced).getTime() : 0;
       const ageMin = last ? (Date.now() - last) / 60000 : Infinity;
       if (ageMin > 30) {
