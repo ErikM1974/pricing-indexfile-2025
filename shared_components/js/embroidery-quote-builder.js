@@ -801,6 +801,13 @@ async function loadQuoteForEditing(quoteId) {
         const session = result.session;
         const items = result.items;
 
+        // Phase 11.3.5 (Erik 2026-05-24): one-way SW sync — bail if the quote
+        // is already in ShopWorks. assertQuoteEditable() alerts the rep and
+        // redirects to read-only quote-view.
+        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+            return;
+        }
+
         // Store edit mode state
         editingQuoteId = quoteId;
         editingRevision = session.RevisionNumber || 1;

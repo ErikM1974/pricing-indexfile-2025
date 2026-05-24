@@ -674,9 +674,32 @@
                             ${retentionInfo || (expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : '')}
                         </td>
                         <td>
-                            <button class="action-btn" onclick="event.stopPropagation(); editQuote('${quote.QuoteID}')" title="Edit Quote">
-                                <i class="fas fa-edit"></i>
-                            </button>
+                            ${(() => {
+                                // Phase 11.3.5 (Erik 2026-05-24): one-way sync rule —
+                                // once a quote is in ShopWorks, ALL revisions happen
+                                // there and flow back via snapshot. Editing here
+                                // would diverge from SW silently. Lock the Edit
+                                // button for any state where the order is live in
+                                // (or has been touched by) SW.
+                                const lockedStatuses = new Set([
+                                    'Processed',
+                                    'Cancelled_in_ShopWorks',
+                                    'Payment Confirmed',
+                                    'Payment Confirmed - ShopWorks Failed',
+                                    'Pending Payment',
+                                ]);
+                                const isEditLocked = lockedStatuses.has(quote.Status);
+                                if (isEditLocked) {
+                                    return `<button class="action-btn action-btn--locked"
+                                                    disabled
+                                                    title="In ShopWorks — edit there. Changes here would not sync back.">
+                                                <i class="fas fa-lock"></i>
+                                            </button>`;
+                                }
+                                return `<button class="action-btn" onclick="event.stopPropagation(); editQuote('${quote.QuoteID}')" title="Edit Quote">
+                                            <i class="fas fa-edit"></i>
+                                        </button>`;
+                            })()}
                             <button class="action-btn" onclick="event.stopPropagation(); viewQuote('${quote.QuoteID}')" title="View Quote">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -820,6 +843,29 @@
         }
 
         function editQuote(quoteId) {
+            // Phase 11.3.5 (Erik 2026-05-24): defense-in-depth guard against
+            // editing a quote that's been pushed to ShopWorks. The Edit button
+            // in renderTable() is already disabled for these statuses, but
+            // belt-and-braces in case someone calls editQuote() programmatically.
+            const lockedStatuses = new Set([
+                'Processed',
+                'Cancelled_in_ShopWorks',
+                'Payment Confirmed',
+                'Payment Confirmed - ShopWorks Failed',
+                'Pending Payment',
+            ]);
+            const quote = (allQuotes || []).find(q => q.QuoteID === quoteId);
+            if (quote && lockedStatuses.has(quote.Status)) {
+                alert(
+                    `${quoteId} is in ShopWorks (status: ${quote.Status}).\n\n` +
+                    `Per the one-way sync rule, edits must happen in ShopWorks. ` +
+                    `Changes in this app would not sync back.\n\n` +
+                    `Opening read-only quote view instead.`
+                );
+                viewQuote(quoteId);
+                return;
+            }
+
             // Determine quote type from QuoteID prefix
             const prefix = quoteId.split('-')[0];
             let builderUrl = '/quote-builders/embroidery-quote-builder.html';
