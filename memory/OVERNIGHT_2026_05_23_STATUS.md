@@ -96,10 +96,43 @@ pricing regression.
 | 2 | `42f89397` (pricing-index) | Artwork upload widget (DTF/SCP full, EMB partial) | ✅ |
 | 3 | `797b2fdc` (pricing-index) | Roadmap + overnight status report | ✅ |
 | 4 | `a9e500ef` (pricing-index) | **Phase 10.7 — DTG customer-context migrated to shared helper** | ✅ |
-| 5 | (proxy) `ea4fc72` from earlier | SCP push backend | ✅ |
-| 6 | (proxy) `442a0ab` from earlier | DTF push backend | ✅ |
+| 5 | `d6434d1c` (pricing-index) | EMB/Cap/Patch verification doc | ✅ |
+| 6 | `87f3373c` (pricing-index) | **Phase 10.1 — SanMar inventory badges on EMB/DTF/SCP** | ✅ |
+| 7 | (proxy) `ea4fc72` from earlier | SCP push backend | ✅ |
+| 8 | (proxy) `442a0ab` from earlier | DTF push backend | ✅ |
 
-**Total deployed today: 16 commits across 2 repos.**
+**Total deployed today: 18 commits across 2 repos.**
+
+### Phase 10.1 — SanMar inventory badges on EMB/DTF/SCP (commit `87f3373c`)
+
+Per audit finding #1: DTG shows per-size SanMar stock badges; EMB/DTF/SCP
+didn't. Now all 4 builders show them.
+
+**Live tested on DTF**: typed PC54, picked Navy → green badges appeared
+showing real stock: S/M/L 27k each, XL 26,883, 2XL 20,061, 3XL 18,670.
+Tooltips show exact qty. Color-coded: green (≥100), amber (1-99 low),
+red (OOS), gray (unknown). 5-min API cache.
+
+**Modules verified loading on SCP + EMB** (live page eval). Inventory
+fetch fires automatically when rep selects a color on any row.
+
+New file: `shared_components/js/inventory-badges.js` — wrapper around
+existing `OrderFormInventory` that's compatible with table-based
+builders (DTG uses React-style render, so kept its own integration).
+
+CSS: `.inv-badge` styling added to `quote-builder-shell.css`.
+
+### Phase 10.2 — Customer history pill — DEFERRED
+
+DTG's pill (90-day order summary + suggested phone/ship-to backfill +
+"Use this" apply buttons) is too complex to port autonomously. Each
+"Use this" button mutates the picked builder's state shape — DTG uses
+`state.customer.*`, EMB uses DOM inputs with different IDs, DTF/SCP
+similar. Building it wrong = broken state writes = wrong data on saved
+quotes. ~6hr per builder of careful work. Better with you watching.
+
+Roadmap (Phase 10.2) has full pickup notes + DTG file:line citations
+for the next session.
 
 ### EMB/Cap/Patch builder verified working end-to-end (2026-05-23 22:50)
 
