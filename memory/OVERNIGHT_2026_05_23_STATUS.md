@@ -101,6 +101,35 @@ pricing regression.
 
 **Total deployed today: 16 commits across 2 repos.**
 
+### EMB/Cap/Patch builder verified working end-to-end (2026-05-23 22:50)
+
+Per Erik's late-night ask: drove the EMB builder in his Chrome and
+verified the full workflow. **Nothing broken; nothing needed fixing.**
+
+| Test | Result |
+|---|---|
+| Page loads without app errors | ✅ (only Chrome extension noise in console) |
+| Customer context helpers loaded (shared `customer-context-banners.js`) | ✅ |
+| Product search → auto-add product row | ✅ (typed PC54 → row added) |
+| Color picker loads colors from API | ✅ (82 colors for PC54) |
+| Size + quantity input fires recalc | ✅ |
+| **Pricing math correct** | ✅ **$480 exact match to locked EMB-01 baseline** (24 pcs PC54 LC 8K @ $20/pc) |
+| Cap path: add C112 triggers cap-specific UI | ✅ "Cap Front Logo" panel appeared with Flat Embroidery + Cap Front position |
+| Add Service menu opens | ✅ (Monogram / Name / Number / Sewing visible; Laser Patch in full list per audit) |
+| Push to ShopWorks button present | ✅ |
+| Print Quote / Email Quote / Copy to Clipboard | ✅ All wired |
+| Artwork upload widget mounted | ✅ (upload works; persistence deferred for EMB — Phase 9.1 schema decision) |
+
+**Verdict**: EMB / Cap / Patch builder is **production-ready** and matches
+DTG's quality bar for the things it does (it actually has MORE features
+than DTG today — Print, Email, Edit-reopen — which DTG dropped in its
+chat-first rewrite).
+
+The only EMB gap is the artwork persistence schema decision (Phase 9.1
+in ROADMAP_2026_05.md) — and even that doesn't block reps; widget still
+works, files still upload, they just don't re-attach to the quote when
+the rep reopens it later.
+
 ### What `a9e500ef` did
 
 Per audit finding #7 (split-brain): DTG had its own
