@@ -1555,4 +1555,49 @@
         if (toastTimer) clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
     }
+
+    // ========================================================================
+    // Phase 11.7 (Erik 2026-05-24) — power-header "+ New Quote" button handler
+    //
+    // Wired from the unified power-header in dtg-quote-builder.html. Confirms
+    // unsaved work via the inline form's dirty flag, then resets the form +
+    // clears edit-mode + saved-quote-ID context so the next save creates a
+    // fresh DTG-NNN (not a revision of whatever was just open).
+    //
+    // Exposed on window so the inline `onclick` attribute in the HTML can
+    // reach it (file uses an IIFE so other helpers stay private).
+    // ========================================================================
+    window.dtgConfirmNewQuote = function dtgConfirmNewQuote() {
+        try {
+            const form = window.DTGInlineForm;
+            const dirty = form && typeof form.isDirty === 'function' && form.isDirty();
+            if (dirty) {
+                if (!confirm('You have unsaved changes. Start a new quote? (Resets the form.)')) {
+                    return;
+                }
+            }
+            if (form && typeof form.resetForm === 'function') {
+                form.resetForm();
+                // Clear edit-mode context so next save creates a new quote ID
+                // (not a revision of whatever we just reset away from).
+                try {
+                    delete window._dtgEditingQuoteId;
+                    delete window._dtgEditingPK_ID;
+                    delete window._dtgEditingRevision;
+                } catch (_) { /* swallow */ }
+                // Also drop the saved quote ID from chat-panel state so the
+                // Email Quote button correctly requires a fresh save first.
+                if (window.aiState) window.aiState.savedQuoteID = null;
+                showToast('New quote — form cleared');
+            } else {
+                // Last-resort fallback if inline form hasn't loaded yet
+                location.reload();
+            }
+        } catch (e) {
+            console.error('[DTG] New Quote handler failed:', e);
+            if (confirm('Reset failed. Reload the page to start fresh?')) {
+                location.reload();
+            }
+        }
+    };
 })();
