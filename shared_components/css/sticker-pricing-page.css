@@ -991,7 +991,7 @@ body {
     pointer-events: auto;
     animation: floating-in var(--motion-slow) var(--ease-spring);
 }
-.floating-quote-btn[hidden] { display: none; }
+.floating-quote-btn[hidden] { display: none !important; } /* FOUC v2 — !important for race-condition safety */
 .floating-quote-btn:hover {
     background: var(--brand-darker);
     transform: translateY(-2px);
@@ -1054,6 +1054,17 @@ body {
     border-left: 1px solid var(--rule);
 }
 .ai-chat-panel.open { transform: translateX(0); }
+/* FOUC fix v2 (2026-05-25): the .ai-chat-panel class rule above sets
+   display:flex, which OVERRIDES the UA [hidden]{display:none} stylesheet
+   due to selector specificity (0,1,0 beats 0,0,1). Without this override,
+   the panel briefly renders during page load — the transform pushes most
+   of it off-screen but the box-shadow + edge can leak as a white flash
+   near the Ask button. !important ensures the hidden HTML attribute
+   reliably hides the panel from first paint. JS removes the attribute
+   when opening (see embroidery-chat.js openChatPanel). Same trick
+   applied to .ai-chat-backdrop + .floating-quote-btn below. */
+.ai-chat-panel[hidden] { display: none !important; }
+.ai-chat-backdrop[hidden] { display: none !important; }
 
 /* Header — spec-sheet treatment with sparkle, title, serial-style identifier */
 .ai-chat-head {
