@@ -92,6 +92,11 @@
         const panel    = document.getElementById('aiChatPanel');
         const backdrop = document.getElementById('aiChatBackdrop');
         if (!panel) return;
+        // The aside has the HTML `hidden` attribute on initial load to prevent
+        // a FOUC flash (unstyled white block over the Ask button before CSS
+        // catches up). Removing it here lets the slide-in transform animate.
+        panel.removeAttribute('hidden');
+        if (backdrop) backdrop.removeAttribute('hidden');
         panel.classList.add('open');
         panel.setAttribute('aria-hidden', 'false');
         if (backdrop) {
