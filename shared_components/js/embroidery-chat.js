@@ -43,6 +43,165 @@
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
+    // === F1: Safe markdown → HTML rendering for bot replies (2026-05-25) ===
+    // The bot streams beautifully-formatted markdown (tables, **bold**, links,
+    // headings, lists) but the chat panel was rendering it as plain textContent.
+    // This function converts a focused subset of markdown to safe HTML.
+    //
+    // Security: input is HTML-escaped FIRST, then markdown patterns are applied.
+    // URLs are validated against a protocol allowlist (http/https/mailto only).
+    // DOMPurify lazy-loaded as defense-in-depth (sanitizes the final HTML).
+    //
+    // Supports:
+    //   **bold**, *italic*, `inline code`
+    //   [link text](https://url) and raw https:// URLs (auto-linkified)
+    //   ### Heading 3, ## Heading 2 (no h1 — kept as plain text — bot shouldn't use it)
+    //   - list item / * list item, 1. numbered
+    //   | col | col | + | --- | --- | table rows
+    //   blank line = paragraph break, single \n = <br>
+    function isSafeUrl(u) {
+        try {
+            const parsed = new URL(u, window.location.href);
+            return parsed.protocol === 'http:' || parsed.protocol === 'https:'
+                || parsed.protocol === 'mailto:' || parsed.protocol === 'tel:';
+        } catch { return false; }
+    }
+    function markdownToHtml(text) {
+        if (!text) return '';
+        // 1. Escape HTML so any < > & in bot output stays inert
+        let s = escapeHtml(text);
+
+        // 2. Code blocks (preserve content verbatim — process FIRST)
+        const codeBlocks = [];
+        s = s.replace(/```([\s\S]*?)```/g, (_, code) => {
+            codeBlocks.push(code);
+            return `\x00CODEBLOCK${codeBlocks.length - 1}\x00`;
+        });
+
+        // 3. Inline code
+        const inlineCodes = [];
+        s = s.replace(/`([^`\n]+)`/g, (_, code) => {
+            inlineCodes.push(code);
+            return `\x00INLINECODE${inlineCodes.length - 1}\x00`;
+        });
+
+        // 4. Tables (pipe-separated rows with header divider)
+        const tableLines = [];
+        const rawLines = s.split('\n');
+        const lines = [];
+        let i = 0;
+        while (i < rawLines.length) {
+            const line = rawLines[i];
+            // Detect table: current row has pipes AND next row is divider
+            if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < rawLines.length && /^\s*\|[\s|:-]+\|\s*$/.test(rawLines[i+1])) {
+                // Collect all consecutive table rows
+                const rows = [line];
+                let j = i + 1;
+                while (j < rawLines.length && /^\s*\|.*\|\s*$/.test(rawLines[j])) {
+                    rows.push(rawLines[j]);
+                    j++;
+                }
+                // rows[1] is the divider, skip it
+                const parseRow = (r) => r.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+                const header = parseRow(rows[0]);
+                const bodyRows = rows.slice(2).map(parseRow);
+                let html = '<table><thead><tr>';
+                for (const h of header) html += `<th>${h}</th>`;
+                html += '</tr></thead><tbody>';
+                for (const r of bodyRows) {
+                    html += '<tr>';
+                    for (const c of r) html += `<td>${c}</td>`;
+                    html += '</tr>';
+                }
+                html += '</tbody></table>';
+                lines.push(html);
+                i = j;
+                continue;
+            }
+            lines.push(line);
+            i++;
+        }
+        s = lines.join('\n');
+
+        // 5. Headings
+        s = s.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        s = s.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+
+        // 6. Lists (simple — group consecutive list items)
+        s = s.replace(/(^|\n)((?:[\-*] .+(?:\n|$))+)/g, (m, lead, block) => {
+            const items = block.trim().split('\n').map(l => l.replace(/^[\-*] /, ''));
+            return lead + '<ul>' + items.map(it => `<li>${it}</li>`).join('') + '</ul>';
+        });
+        s = s.replace(/(^|\n)((?:\d+\. .+(?:\n|$))+)/g, (m, lead, block) => {
+            const items = block.trim().split('\n').map(l => l.replace(/^\d+\. /, ''));
+            return lead + '<ol>' + items.map(it => `<li>${it}</li>`).join('') + '</ol>';
+        });
+
+        // 7. Bold + italic (bold first, so ** doesn't get caught by *)
+        s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+        s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+
+        // 8. Markdown links [text](url) — validate URL
+        s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, text, url) => {
+            if (!isSafeUrl(url)) return m; // leave as plain text if URL is unsafe
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        });
+
+        // 9. Auto-link raw URLs (must NOT re-link URLs already in <a> tags)
+        // Match http(s)://... up to whitespace, ), or end of string, NOT preceded by =" or '> (markers of an existing href)
+        s = s.replace(/(^|[\s(])(https?:\/\/[^\s<>"')]+)/g, (m, lead, url) => {
+            if (!isSafeUrl(url)) return m;
+            return `${lead}<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+
+        // 10. Restore code blocks + inline code
+        s = s.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, idx) => `<pre><code>${codeBlocks[+idx]}</code></pre>`);
+        s = s.replace(/\x00INLINECODE(\d+)\x00/g, (_, idx) => `<code>${inlineCodes[+idx]}</code>`);
+
+        // 11. Convert remaining newlines to <br> (skip lines that are already block elements)
+        s = s.replace(/\n\n+/g, '\n\n'); // collapse multi-blank
+        s = s.split('\n').map(line => {
+            // Don't add <br> after block-level elements
+            if (/^\s*(<\/?(h[123]|ul|ol|li|table|thead|tbody|tr|th|td|pre|p)\b|<\/(h[123]|ul|ol|table|pre|p)>\s*$)/.test(line)) return line;
+            return line;
+        }).join('\n');
+        s = s.replace(/\n/g, '<br>');
+        // Clean up <br>s adjacent to block elements
+        s = s.replace(/<br>\s*(<(h[123]|ul|ol|table|pre|p)\b)/g, '$1');
+        s = s.replace(/(<\/(h[123]|ul|ol|table|pre|p)>)\s*<br>/g, '$1');
+
+        // 12. DOMPurify if available — defense-in-depth sanitization
+        if (window.DOMPurify) {
+            return window.DOMPurify.sanitize(s, {
+                ALLOWED_TAGS: ['strong', 'em', 'code', 'pre', 'a', 'br',
+                               'h2', 'h3', 'ul', 'ol', 'li',
+                               'table', 'thead', 'tbody', 'tr', 'th', 'td'],
+                ALLOWED_ATTR: ['href', 'target', 'rel'],
+                ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+            });
+        }
+        return s;
+    }
+
+    // Lazy-load DOMPurify from CDN once (mirror of pattern in policy-detail.js)
+    let _dompurifyPromise = null;
+    function ensureDOMPurify() {
+        if (window.DOMPurify) return Promise.resolve();
+        if (_dompurifyPromise) return _dompurifyPromise;
+        _dompurifyPromise = new Promise((resolve) => {
+            const s = document.createElement('script');
+            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
+            s.async = true;
+            s.onload = () => resolve();
+            s.onerror = () => resolve(); // proceed without sanitizer if CDN fails — escape+regex still applies
+            document.head.appendChild(s);
+        });
+        return _dompurifyPromise;
+    }
+    // Fire-and-forget on script load so it's ready by the time the user sends
+    // their first message.
+    ensureDOMPurify();
+
     function wireChatPanel() {
         const closeBtn   = document.getElementById('aiChatClose');
         const backdrop   = document.getElementById('aiChatBackdrop');
@@ -170,7 +329,14 @@
         msg.className = 'chat-message ' + role + (opts.error ? ' error' : '');
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble';
-        bubble.textContent = text;
+        // F1 (2026-05-25): assistant replies render as safe markdown HTML
+        // (clickable links, tables, **bold**, lists). User messages + error
+        // strings stay as plain text — safer and they don't have markdown anyway.
+        if (role === 'assistant' && !opts.error) {
+            bubble.innerHTML = markdownToHtml(text);
+        } else {
+            bubble.textContent = text;
+        }
         msg.appendChild(bubble);
         container.appendChild(msg);
         scrollChatBottom();
@@ -273,7 +439,12 @@
                             bubble = appendBubble('assistant', '');
                         }
                         assistantText += data.text || '';
-                        bubble.textContent = assistantText;
+                        // F1 (2026-05-25): re-render markdown each delta so the
+                        // user sees formatted output stream in (tables, bold,
+                        // clickable links). Re-parsing the full text per delta
+                        // is fine — text is short (sub-2K chars typical) and
+                        // markdownToHtml is sub-millisecond.
+                        bubble.innerHTML = markdownToHtml(assistantText);
                         scrollChatBottom();
                     } else if (eventType === 'tool_result') {
                         // Tool fired — show a chip describing it. Bot's next
