@@ -35,6 +35,12 @@
     <!-- ShopWorks Import Modal -->
     <link rel="stylesheet" href="/shared_components/css/shopworks-import.css?v=20260131">
 
+    <!-- AI Chat Panel CSS (shared with DTG — chat-panel + floating-quote-btn classes
+         live in sticker-pricing-page.css). MUST load in <head> to avoid FOUC on the
+         chat panel — without this, the panel briefly renders as an unstyled white
+         block over the Ask button before the CSS catches up. Bug fix 2026-05-25. -->
+    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -1415,9 +1421,8 @@ Company:Absher Construction Company
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
          /api/emb-quote-ai/chat. Reuses the chat-panel CSS classes from
-         sticker-pricing-page.css (same pattern DTG uses). -->
-    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
-    <script src="/shared_components/js/embroidery-chat.js?v=2026.05.24.6"></script>
+         sticker-pricing-page.css (loaded in <head> to prevent FOUC). -->
+    <script src="/shared_components/js/embroidery-chat.js?v=2026.05.25.1"></script>
 
     <!-- ========== Floating "Ask" button ========== -->
     <button type="button" class="floating-quote-btn" id="floatingQuoteBtn" aria-label="Open EMB research assistant" hidden>
@@ -1426,7 +1431,9 @@ Company:Absher Construction Company
     </button>
 
     <!-- ========== EMB Research Assistant Chat Panel ========== -->
-    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="EMB Research Assistant" aria-hidden="true">
+    <!-- `hidden` attribute keeps the panel from rendering as an unstyled white block
+         on initial load (before CSS or JS run). JS toggles it off when opening. -->
+    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="EMB Research Assistant" aria-hidden="true" hidden>
         <header class="ai-chat-head">
             <div class="ai-chat-title">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
@@ -1458,8 +1465,8 @@ Company:Absher Construction Company
         </form>
     </aside>
 
-    <!-- Backdrop dimmer -->
-    <div class="ai-chat-backdrop" id="aiChatBackdrop" aria-hidden="true"></div>
+    <!-- Backdrop dimmer (`hidden` paired with the aside above — JS removes both on open) -->
+    <div class="ai-chat-backdrop" id="aiChatBackdrop" aria-hidden="true" hidden></div>
 
 </body>
 </html>
