@@ -1210,6 +1210,81 @@ body {
     color: var(--err);
     border: 1px solid #e8b5b1;
 }
+
+/* F1 (2026-05-25): markdown-rendered HTML inside assistant chat bubbles.
+   Bot streams markdown that gets converted to HTML — we style the result
+   so tables, lists, links, code, headings look polished inline. */
+.chat-message.assistant .chat-bubble {
+    white-space: normal; /* override pre-wrap so block elements render cleanly */
+}
+.chat-message.assistant .chat-bubble a {
+    color: var(--brand-deep);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    transition: opacity 120ms ease;
+}
+.chat-message.assistant .chat-bubble a:hover { opacity: 0.75; }
+.chat-message.assistant .chat-bubble strong { font-weight: 600; }
+.chat-message.assistant .chat-bubble em { font-style: italic; }
+.chat-message.assistant .chat-bubble h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0.7rem 0 0.35rem;
+    color: var(--ink-1);
+    letter-spacing: -0.01em;
+}
+.chat-message.assistant .chat-bubble h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0.55rem 0 0.25rem;
+    color: var(--ink-1);
+}
+.chat-message.assistant .chat-bubble ul,
+.chat-message.assistant .chat-bubble ol {
+    margin: 0.35rem 0;
+    padding-left: 1.35rem;
+}
+.chat-message.assistant .chat-bubble li { margin: 0.15rem 0; }
+.chat-message.assistant .chat-bubble code {
+    background: rgba(0,0,0,0.05);
+    border-radius: 4px;
+    padding: 0.05rem 0.32rem;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.875em;
+}
+.chat-message.assistant .chat-bubble pre {
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    padding: 0.55rem 0.75rem;
+    overflow-x: auto;
+    margin: 0.45rem 0;
+}
+.chat-message.assistant .chat-bubble pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.85rem;
+}
+.chat-message.assistant .chat-bubble table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.45rem 0;
+    font-size: 0.875rem;
+}
+.chat-message.assistant .chat-bubble th,
+.chat-message.assistant .chat-bubble td {
+    border: 1px solid var(--rule);
+    padding: 0.32rem 0.55rem;
+    text-align: left;
+    vertical-align: top;
+}
+.chat-message.assistant .chat-bubble th {
+    background: rgba(0,0,0,0.03);
+    font-weight: 600;
+    color: var(--ink-1);
+}
+.chat-message.assistant .chat-bubble br + br { display: none; }
+
 .chat-message .meta {
     font-size: var(--type-micro);
     color: var(--ink-4);
