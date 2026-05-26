@@ -1,5 +1,5 @@
 # Active Files Registry
-**Last Updated:** 2026-05-14
+**Last Updated:** 2026-05-26
 **Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
@@ -980,6 +980,10 @@ cap-embroidery-fix.css
 | `/dashboards/art-hub-ruth.html` | Art hub — Ruth's personalized view | — | ✅ Active |
 | `/dashboards/art-hub-steve.html` | Art hub — Steve's personalized view | art-hub.css, art-hub-steve.js | ✅ Active |
 | `/dashboards/bradley-transfers.html` | **NEW** Bradley's Supacolor transfer queue (heat-transfer orders to subcontractor) | bradley-transfers.js, bradley-transfers.css, art-hub.css, caspio-pricing-proxy /api/transfer-orders | ✅ Active |
+| `/dashboards/production-shifts.html` | **NEW** Production team daily shift schedule + WA labor rules (clock-in/out, breaks, lunch) | production-shifts/{styles.css, app.jsx, data.js}, React 18 + Babel CDN | ✅ Active |
+| `/dashboards/production-shifts/styles.css` | **NEW** Production Shifts page styles (Geist font, timeline, table, work-rules cards) | — | ✅ Active |
+| `/dashboards/production-shifts/app.jsx` | **NEW** Production Shifts React app (Header, DaySummary, MasterTable, Timeline, WorkRules, LaborRules) | data.js (window.NWCA_SCHEDULE + NWCA_HELPERS) | ✅ Active |
+| `/dashboards/production-shifts/data.js` | **NEW** Production Shifts employee data + time helpers (window.NWCA_SCHEDULE, NWCA_HELPERS) | — | ✅ Active |
 | `/dashboards/js/bradley-transfers.js` | **NEW** Transfer queue controller — poll API, filter/sort, create transfer modal | /api/transfer-orders, /api/transfer-orders/stats | ✅ Active |
 | `/dashboards/css/bradley-transfers.css` | **NEW** Transfer queue styles (navy theme, rush pulse, status chips, modal) | — | ✅ Active |
 | `/pages/transfer-detail.html` | **NEW** Single-transfer detail page with status transition buttons (Mark Ordered / Add PO / Ship / Receive / Cancel / Rush) + activity timeline | transfer-detail.js, transfer-detail.css, bradley-transfers.css, /api/transfer-orders/:id | ✅ Active |
