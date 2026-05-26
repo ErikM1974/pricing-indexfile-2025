@@ -229,7 +229,9 @@ body {
 }
 
 .power-sidebar {
-    width: 300px;
+    /* Erik 2026-05-26: self-adjusting width — wider on big monitors, never below 360.
+       Drag-resize (sidebar-resize.js) still overrides via inline style. */
+    width: clamp(360px, 26vw, 500px);
     background: var(--bg-sidebar);
     border-left: 1px solid var(--border-color);
     display: flex;

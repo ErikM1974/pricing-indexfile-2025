@@ -222,29 +222,39 @@ class DTFQuoteBuilder {
         // Initialize customer lookup autocomplete
         if (typeof CustomerLookupService !== 'undefined') {
             const customerLookup = new CustomerLookupService();
+
+            const applyContact = (contact) => {
+                document.getElementById('customer-name').value = contact.ct_NameFull || '';
+                document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+                document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+
+                if (typeof window.surfaceCustomerContext === 'function') {
+                    window.surfaceCustomerContext(contact, {
+                        warningContainerId: 'customer-warning-banner',
+                        taxChipContainerId: 'customer-tax-chip',
+                        tierBadgeContainerId: 'customer-tier-badge',
+                        phoneInputId: 'customer-phone',
+                    });
+                }
+
+                this.showToast('Customer info loaded', 'success');
+            };
+
             customerLookup.bindToInput('customer-lookup', {
-                onSelect: (contact) => {
-                    document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                    document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                    document.getElementById('company-name').value = contact.CustomerCompanyName || '';
-
-                    // Surface CRM context (Erik 2026-05-23) — Warning banner +
-                    // Tax Exempt chip + Account Tier badge + Phone_Best autofill.
-                    if (typeof window.surfaceCustomerContext === 'function') {
-                        window.surfaceCustomerContext(contact, {
-                            warningContainerId: 'customer-warning-banner',
-                            taxChipContainerId: 'customer-tax-chip',
-                            tierBadgeContainerId: 'customer-tier-badge',
-                            phoneInputId: 'customer-phone',
-                        });
-                    }
-
-                    this.showToast('Customer info loaded', 'success');
-                },
+                onSelect: applyContact,
                 onClear: () => {
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
+                }
+            });
+
+            // Erik 2026-05-26: COMPANY field also triggers autocomplete (DTG parity).
+            customerLookup.bindToInput('company-name', {
+                onSelect: (contact) => {
+                    const lookupInput = document.getElementById('customer-lookup');
+                    if (lookupInput) lookupInput.value = contact.CustomerCompanyName || '';
+                    applyContact(contact);
                 }
             });
         }

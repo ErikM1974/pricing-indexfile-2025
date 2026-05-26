@@ -258,3 +258,15 @@
         color: #ccc;
     }
 }
+
+/* Erik 2026-05-26: when CustomerLookupService is bound to #company-name
+   (the manual-entry field inside the 2-col grid, ~130-180px wide), the
+   default dropdown (left:0; right:0 of its parent) is too narrow to show
+   company names. Break out of the narrow grid cell, anchored to the
+   input's left edge, extending right. */
+#company-name-dropdown {
+    right: auto;
+    min-width: 280px;
+    width: max-content;
+    max-width: 360px;
+}
