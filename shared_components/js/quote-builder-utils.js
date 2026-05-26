@@ -61,7 +61,11 @@ function showToast(message, type = 'info', duration = 3000) {
     }
 
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
+    // CSS rules are named .toast-success / .toast-error / etc — must prefix with "toast-".
+    // Bug before 2026-05-25: was `toast ${type}` which created class "toast success" with
+    // no matching CSS, so the toast rendered as an unstyled translucent box (white text on
+    // no background) that briefly overlapped the floating AI chat button on page load.
+    toast.className = `toast toast-${type}`;
 
     // Select icon based on type
     const icons = {
