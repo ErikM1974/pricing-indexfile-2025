@@ -9,6 +9,9 @@ const pct = (m) => Math.max(0, Math.min(100, ((m - TL_START) / TL_RANGE) * 100))
 
 const DEPTS = ["All", "Embroidery", "DTG", "Ruthie/Mikalah"];
 
+// Update this date whenever you change schedule data in data.js
+const SCHEDULE_EFFECTIVE_DATE = "5/26/2026";
+
 // stable hue from name → avatar tint
 function hue(str) {
   let h = 0;
@@ -31,6 +34,22 @@ function Avatar({ name, size = 32 }) {
   );
 }
 
+// ---------------- Breadcrumb ----------------
+function Breadcrumb() {
+  return (
+    <nav className="ps-breadcrumb" aria-label="Breadcrumb">
+      <a href="/staff-dashboard.html">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Staff Dashboard
+      </a>
+      <span className="ps-breadcrumb-sep" aria-hidden="true">›</span>
+      <span className="ps-breadcrumb-current">Production Shifts</span>
+    </nav>
+  );
+}
+
 // ---------------- Header ----------------
 function Header() {
   return (
@@ -46,6 +65,7 @@ function Header() {
         <div>
           <div className="brand-line">NW Custom Apparel</div>
           <h1 className="page-title">Production Shifts</h1>
+          <div className="effective-date">Schedule effective {SCHEDULE_EFFECTIVE_DATE}</div>
         </div>
       </div>
       <div className="topbar-right">
@@ -694,6 +714,7 @@ function App() {
 
   return (
     <div className="app">
+      <Breadcrumb />
       <Header />
 
       {/* Print-only header — visible only when printing */}
@@ -783,7 +804,7 @@ function App() {
           <div className="waiver-body">
             <div className="waiver-label">Need to skip a lunch?</div>
             <div className="waiver-title">Voluntary Meal Period Waiver</div>
-            <div className="waiver-sub">Download, fill out, and return the signed form to Bradley Wright.</div>
+            <div className="waiver-sub">Download, fill out, sign with a witness, and return the form to Bradley in his office.</div>
           </div>
           <span className="waiver-cta">
             Download PDF
@@ -792,6 +813,18 @@ function App() {
             </svg>
           </span>
         </a>
+
+        <div className="waiver-note" role="note">
+          <span className="waiver-note-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4M12 16h.01"/>
+            </svg>
+          </span>
+          <div>
+            <strong>Please note:</strong> Working through lunch is a privilege we may extend on a case-by-case basis — it's not guaranteed. Any waiver must be reviewed and approved by management before it takes effect. Until then, every employee is required to take a full 30-minute lunch.
+          </div>
+        </div>
 
         <DaySummary employees={all} />
         <DeptChips dept={dept} setDept={setDept} employees={all} />
