@@ -1,3 +1,7 @@
+## v2026.05.26.5 (2026-05-26)
+
+- Deploy v2026.05.26.5: 1 file (Customer-Supplied-Garments-Acknowledgment.pdf)
+
 ## v2026.05.26.4 (2026-05-26)
 
 - Deploy v2026.05.26.4: 3 files (production-shifts.html,app.jsx,styles.css...)
