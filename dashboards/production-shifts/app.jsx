@@ -63,13 +63,6 @@ function Header() {
           </svg>
           WA labor rules
         </a>
-        <button className="btn-primary" onClick={() => window.print()}>
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8" rx="1"/>
-          </svg>
-          Print
-        </button>
       </div>
     </header>
   );
@@ -121,10 +114,19 @@ function MasterTable({ employees, onSelect, selectedId }) {
           <h2>Master schedule</h2>
           <p>Every shift, break, and lunch at a glance. Click a row for details.</p>
         </div>
-        <div className="legend">
-          <span className="legend-item"><span className="legend-sw legend-clock" />Clock in / out</span>
-          <span className="legend-item"><span className="legend-sw legend-break" />Rest break (paid, no punch)</span>
-          <span className="legend-item"><span className="legend-sw legend-lunch" />Lunch (unpaid, punch out &amp; in)</span>
+        <div className="master-head-right">
+          <div className="legend">
+            <span className="legend-item"><span className="legend-sw legend-clock" />Clock in / out</span>
+            <span className="legend-item"><span className="legend-sw legend-break" />Rest break (paid, no punch)</span>
+            <span className="legend-item"><span className="legend-sw legend-lunch" />Lunch (unpaid, punch out &amp; in)</span>
+          </div>
+          <button className="btn-primary master-print" onClick={() => window.print()}>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+              <rect x="6" y="14" width="12" height="8" rx="1"/>
+            </svg>
+            Print Shift Schedule
+          </button>
         </div>
       </div>
       <div className="master-scroll">
@@ -423,7 +425,7 @@ function WorkRules() {
         "When you punch out for lunch, leave your workstation. No exceptions.",
         "You may not perform any work during an unpaid lunch. Even \"just finishing one thing\" creates a wage claim against the company. If something has to get done, don't punch out.",
         "Lunch is the full 30 minutes. Returning at 12:25 instead of 12:30 doesn't satisfy state law and undermines the policy for everyone.",
-        "No verbal waivers. To skip a lunch, you must sign a written waiver with Erik or Ruthie. A supervisor saying \"you can skip it\" is not legally valid in Washington.",
+        "No verbal waivers. To skip a lunch, you must sign a written waiver and return it to Bradley Wright. A supervisor saying \"you can skip it\" is not legally valid in Washington.",
       ],
     },
     {
@@ -493,7 +495,7 @@ function WorkRules() {
     },
     {
       claim: "\"Brian or Ruthie said I could skip lunch today.\"",
-      reality: "Supervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — and only Erik or Ruthie can process one."
+      reality: "Supervisors cannot grant verbal waivers. The only valid way to skip a lunch is a signed, written waiver kept on file — submit it to Bradley Wright."
     },
   ];
 
@@ -769,6 +771,27 @@ function App() {
             </div>
           </div>
         </div>
+
+        <a className="waiver-card" href="/forms/NWCA-Meal-Period-Waiver.pdf" download="NWCA Meal Period Waiver.pdf" target="_blank" rel="noopener">
+          <span className="waiver-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 2v6h6"/>
+              <path d="M12 18v-6M9 15l3 3 3-3"/>
+            </svg>
+          </span>
+          <div className="waiver-body">
+            <div className="waiver-label">Need to skip a lunch?</div>
+            <div className="waiver-title">Voluntary Meal Period Waiver</div>
+            <div className="waiver-sub">Download, fill out, and return the signed form to Bradley Wright.</div>
+          </div>
+          <span className="waiver-cta">
+            Download PDF
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </span>
+        </a>
 
         <DaySummary employees={all} />
         <DeptChips dept={dept} setDept={setDept} employees={all} />
