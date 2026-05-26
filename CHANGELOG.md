@@ -1,3 +1,19 @@
+## v2026.05.26.1 (2026.05.26)
+
+- Phase 11.3 (EMB): rich-mode artwork upload + persistence via ImportNotes object
+- LESSONS_LEARNED: add Quote Builders section + Phase 11.3 entry
+- Phase 11.3.5: lock edits after push — enforce one-way ShopWorks sync
+- Phase 11.4 + 11.5: DTG Print Quote + Email Quote buttons (parity with EMB/DTF/SCP)
+- Phase 11.6: DTG edit-reopen for pre-push revisions
+- LESSONS_LEARNED: add Phase 11.3.5/11.4/11.5/11.6 milestone entry
+- Phase 11.7: DTG chrome harmonization — power-header parity with EMB/DTF/SCP
+- EMB Chat C: research-only AI chat panel on the Embroidery Quote Builder
+- EMB chat FOUC fix — white box no longer flashes over Ask button on load
+- LESSONS_LEARNED: EMB chat FOUC fix (CSS in head + hidden attr)
+- EMB Smart F1: bot chat panel now renders markdown — tables, links, bold
+- FOUC fix v2: !important on [hidden] for ai-chat-panel + backdrop + button
+- Deploy v2026.05.26.1: 13 files (LESSONS_LEARNED.md,dtf-quote-builder.html,dtg-quote-builder-legacy.html...)
+
 ## v2026.05.24.1 (2026.05.24)
 
 - Phase 0b + Phase 2: pricing baseline CI gate + PNW visual unification
