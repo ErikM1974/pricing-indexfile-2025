@@ -49,9 +49,10 @@
     display: none;
 }
 
-/* DTF-SPECIFIC: Sidebar overrides (wider, auto-scroll) */
+/* DTF-SPECIFIC: Sidebar overrides (auto-scroll). Erik 2026-05-26: dropped
+   the 320px fixed-width override so DTF inherits the shared clamp(360,26vw,500)
+   baseline. The drag-resize handle still lets reps fine-tune. */
 .power-sidebar {
-    width: 320px;
     overflow-y: auto;
 }
 

@@ -11,8 +11,11 @@ class SidebarResizer {
         this.sidebar = document.querySelector(sidebarSelector);
         this.handle = document.querySelector(handleSelector);
         this.isResizing = false;
-        this.minWidth = 260;
-        this.maxWidth = 700;
+        // Erik 2026-05-26: bumped floor 260→360 + ceiling 700→600 to match
+        // new shared .power-sidebar baseline (clamp(360px,26vw,500px)) +
+        // EMB override (max-width:600px).
+        this.minWidth = 360;
+        this.maxWidth = 600;
         this.storageKey = 'sidebarWidth';
 
         if (this.sidebar && this.handle) {
@@ -99,8 +102,9 @@ class SidebarResizer {
     }
 
     resetWidth() {
-        // Reset to default width (300px)
-        this.sidebar.style.width = '300px';
+        // Erik 2026-05-26: clear inline width so the CSS clamp() baseline
+        // takes over again — no stale 300px fallback.
+        this.sidebar.style.width = '';
         localStorage.removeItem(this.storageKey);
     }
 }

@@ -1384,56 +1384,59 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (typeof CustomerLookupService !== 'undefined') {
         const customerLookup = new CustomerLookupService();
         window.customerLookupInstance = customerLookup;  // Store for ShopWorks import
+
+        const applyContact = (contact) => {
+            document.getElementById('customer-name').value = contact.ct_NameFull || '';
+            document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
+            document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+            // Fill customer number (ShopWorks ID)
+            document.getElementById('customer-number').value = contact.id_Customer || '';
+            // Phone — API may not return phone, clear if empty
+            const phoneInput = document.getElementById('customer-phone');
+            if (phoneInput) phoneInput.value = contact.Phone || '';
+            // Auto-fill Ship To from contact address
+            if (contact.State) {
+                const stateInput = document.getElementById('ship-state');
+                if (stateInput) stateInput.value = contact.State;
+            }
+            if (contact.City) {
+                const cityInput = document.getElementById('ship-city');
+                if (cityInput) cityInput.value = contact.City;
+            }
+            if (contact.Zip) {
+                const zipInput = document.getElementById('ship-zip');
+                if (zipInput) {
+                    zipInput.value = contact.Zip;
+                    lookupTaxRate(); // Auto-trigger tax lookup
+                }
+            }
+            if (contact.Address) {
+                const addrInput = document.getElementById('ship-address');
+                if (addrInput) addrInput.value = contact.Address;
+            }
+            _customerDesignGallery = null; // Invalidate gallery cache on customer change
+
+            // Surface CRM context (Erik 2026-05-23) — Customer Warning banner +
+            // Tax Exempt chip + Account Tier badge + payment terms auto-fill
+            // with legacy-CRM mapping. Defensive — only fires if the shared
+            // helper loaded (script tag may not be present on older builds).
+            if (typeof window.surfaceCustomerContext === 'function') {
+                window.surfaceCustomerContext(contact, {
+                    warningContainerId: 'customer-warning-banner',
+                    taxChipContainerId: 'customer-tax-chip',
+                    tierBadgeContainerId: 'customer-tier-badge',
+                    phoneInputId: 'customer-phone',
+                    termsSelectId: 'payment-terms',
+                    termsNoteId: 'customer-terms-note',
+                    offeredTerms: ['Prepaid', 'Net 10', 'Pay On Pickup'],
+                });
+            }
+
+            showToast('Customer info loaded', 'success');
+        };
+
         customerLookup.bindToInput('customer-lookup', {
-            onSelect: (contact) => {
-                document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                document.getElementById('company-name').value = contact.CustomerCompanyName || '';
-                // Fill customer number (ShopWorks ID)
-                document.getElementById('customer-number').value = contact.id_Customer || '';
-                // Phone — API may not return phone, clear if empty
-                const phoneInput = document.getElementById('customer-phone');
-                if (phoneInput) phoneInput.value = contact.Phone || '';
-                // Auto-fill Ship To from contact address
-                if (contact.State) {
-                    const stateInput = document.getElementById('ship-state');
-                    if (stateInput) stateInput.value = contact.State;
-                }
-                if (contact.City) {
-                    const cityInput = document.getElementById('ship-city');
-                    if (cityInput) cityInput.value = contact.City;
-                }
-                if (contact.Zip) {
-                    const zipInput = document.getElementById('ship-zip');
-                    if (zipInput) {
-                        zipInput.value = contact.Zip;
-                        lookupTaxRate(); // Auto-trigger tax lookup
-                    }
-                }
-                if (contact.Address) {
-                    const addrInput = document.getElementById('ship-address');
-                    if (addrInput) addrInput.value = contact.Address;
-                }
-                _customerDesignGallery = null; // Invalidate gallery cache on customer change
-
-                // Surface CRM context (Erik 2026-05-23) — Customer Warning banner +
-                // Tax Exempt chip + Account Tier badge + payment terms auto-fill
-                // with legacy-CRM mapping. Defensive — only fires if the shared
-                // helper loaded (script tag may not be present on older builds).
-                if (typeof window.surfaceCustomerContext === 'function') {
-                    window.surfaceCustomerContext(contact, {
-                        warningContainerId: 'customer-warning-banner',
-                        taxChipContainerId: 'customer-tax-chip',
-                        tierBadgeContainerId: 'customer-tier-badge',
-                        phoneInputId: 'customer-phone',
-                        termsSelectId: 'payment-terms',
-                        termsNoteId: 'customer-terms-note',
-                        offeredTerms: ['Prepaid', 'Net 10', 'Pay On Pickup'],
-                    });
-                }
-
-                showToast('Customer info loaded', 'success');
-            },
+            onSelect: applyContact,
             onClear: () => {
                 document.getElementById('customer-name').value = '';
                 document.getElementById('customer-email').value = '';
@@ -1442,6 +1445,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const phoneInput = document.getElementById('customer-phone');
                 if (phoneInput) phoneInput.value = '';
                 _customerDesignGallery = null; // Invalidate gallery cache on customer clear
+            }
+        });
+
+        // Erik 2026-05-26: COMPANY field also triggers autocomplete (DTG parity).
+        customerLookup.bindToInput('company-name', {
+            onSelect: (contact) => {
+                const lookupInput = document.getElementById('customer-lookup');
+                if (lookupInput) lookupInput.value = contact.CustomerCompanyName || '';
+                applyContact(contact);
             }
         });
     }
