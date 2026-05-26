@@ -1,3 +1,7 @@
+## v2026.05.26.2 (2026-05-26)
+
+- Deploy v2026.05.26.2: 7 files (ACTIVE_FILES.md,production-shifts.html,app.jsx...)
+
 ## v2026.05.26.1 (2026.05.26)
 
 - Phase 11.3 (EMB): rich-mode artwork upload + persistence via ImportNotes object
