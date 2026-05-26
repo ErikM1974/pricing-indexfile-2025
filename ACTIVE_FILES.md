@@ -984,6 +984,7 @@ cap-embroidery-fix.css
 | `/dashboards/production-shifts/styles.css` | **NEW** Production Shifts page styles (Geist font, timeline, table, work-rules cards) | — | ✅ Active |
 | `/dashboards/production-shifts/app.jsx` | **NEW** Production Shifts React app (Header, DaySummary, MasterTable, Timeline, WorkRules, LaborRules) | data.js (window.NWCA_SCHEDULE + NWCA_HELPERS) | ✅ Active |
 | `/dashboards/production-shifts/data.js` | **NEW** Production Shifts employee data + time helpers (window.NWCA_SCHEDULE, NWCA_HELPERS) | — | ✅ Active |
+| `/forms/NWCA-Meal-Period-Waiver.pdf` | **NEW** Voluntary Meal Period Waiver — employees download, fill out, return to Bradley Wright | served via `/forms` static route, linked from production-shifts dashboard | ✅ Active |
 | `/dashboards/js/bradley-transfers.js` | **NEW** Transfer queue controller — poll API, filter/sort, create transfer modal | /api/transfer-orders, /api/transfer-orders/stats | ✅ Active |
 | `/dashboards/css/bradley-transfers.css` | **NEW** Transfer queue styles (navy theme, rush pulse, status chips, modal) | — | ✅ Active |
 | `/pages/transfer-detail.html` | **NEW** Single-transfer detail page with status transition buttons (Mark Ordered / Add PO / Ship / Receive / Cancel / Rush) + activity timeline | transfer-detail.js, transfer-detail.css, bradley-transfers.css, /api/transfer-orders/:id | ✅ Active |
