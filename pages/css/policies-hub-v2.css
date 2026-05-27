@@ -326,6 +326,106 @@ body.policies-hub-body {
 }
 
 /* Category chips */
+/* =====================================================
+   EMPLOYEE HANDBOOK HERO TILE
+   ===================================================== */
+.handbook-hero-tile {
+    background: linear-gradient(135deg, #175C28 0%, #23843A 100%);
+    border-radius: var(--ph-radius);
+    padding: 1.4rem 1.6rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.25rem;
+    align-items: center;
+    box-shadow: 0 4px 18px rgba(23,92,40,0.18);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.handbook-hero-tile-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #ffffff;
+}
+.handbook-hero-tile-body { min-width: 0; }
+.handbook-hero-tile-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #cfead4;
+    margin-bottom: 0.2rem;
+}
+.handbook-hero-tile-title {
+    font-size: 1.4rem;
+    margin: 0 0 0.3rem 0;
+    color: #ffffff;
+    font-weight: 700;
+    line-height: 1.2;
+}
+.handbook-hero-tile-desc {
+    margin: 0;
+    color: #e3f0e6;
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+.handbook-hero-tile-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+.btn-handbook-primary,
+.btn-handbook-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background 0.15s, transform 0.1s, border-color 0.15s;
+    white-space: nowrap;
+}
+.btn-handbook-primary {
+    background: #ffffff;
+    color: var(--ph-accent-dark, #1f3d2a);
+}
+.btn-handbook-primary:hover { background: #f6f7f9; transform: translateY(-1px); }
+.btn-handbook-secondary {
+    background: transparent;
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.4);
+}
+.btn-handbook-secondary:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); }
+
+@media (max-width: 700px) {
+    .handbook-hero-tile {
+        grid-template-columns: 1fr;
+        text-align: left;
+        padding: 1.25rem;
+    }
+    .handbook-hero-tile-icon {
+        display: none;
+    }
+    .handbook-hero-tile-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    .btn-handbook-primary,
+    .btn-handbook-secondary {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
 .category-chips {
     display: flex;
     flex-wrap: wrap;
