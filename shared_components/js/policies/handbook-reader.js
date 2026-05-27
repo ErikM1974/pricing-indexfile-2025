@@ -140,14 +140,18 @@
     }
 
     function renderIntro(parent) {
-        // Render parent body, but strip the explicit "Download PDF" link
-        // since the topbar already has one (avoid duplication).
+        // Render parent body, but strip the duplicate download/read links
+        // (the topbar already has both buttons) and the embedded TOC
+        // (we render our own sticky TOC sidebar).
         let body = parent.Body_HTML || '';
+        // Match both the legacy "Download a printable copy" heading and the
+        // current "Read or download the handbook" heading. Each is followed
+        // by 1-3 short paragraphs that we also strip.
         body = body.replace(
-            /<h2>\s*Download a printable copy\s*<\/h2>\s*<p>[\s\S]*?<\/p>\s*(?:<p>[\s\S]*?<\/p>)?/i,
+            /<h2>\s*(?:Download a printable copy|Read or download the handbook)\s*<\/h2>(?:\s*<p>[\s\S]*?<\/p>){1,3}/gi,
             ''
         );
-        // Also strip the embedded Table of Contents (we render our own sticky TOC).
+        // Strip the embedded Table of Contents (we render our own sticky TOC).
         body = body.replace(/<h2>\s*Table of Contents\s*<\/h2>\s*<ol>[\s\S]*?<\/ol>/i, '');
         body = stripChapterFooter(body);
         return `
