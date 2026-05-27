@@ -1,3 +1,7 @@
+## v2026.05.27.1 (2026.05.27)
+
+- Deploy v2026.05.27.1: 3 files (Employee-Handbook-2026-Updates.pdf,Employee-Handbook-Latest.pdf,build-handbook-pdf.py,...)
+
 ## v2026.05.26.5 (2026-05-26)
 
 - Deploy v2026.05.26.5: 1 file (Customer-Supplied-Garments-Acknowledgment.pdf)
