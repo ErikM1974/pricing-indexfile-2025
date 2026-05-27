@@ -1,3 +1,7 @@
+## v2026.05.27.4 (2026.05.27)
+
+- Deploy v2026.05.27.4: Fix handbook page header — self-contained topbar styles, strip duplicate intro links
+
 ## v2026.05.27.3 (2026.05.27)
 
 - Deploy v2026.05.27.3: Update Ch 2 Expanding Horizons — add laser engraving + Roland, drop Safety Shirts
