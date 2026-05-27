@@ -1,3 +1,7 @@
+## v2026.05.27.3 (2026.05.27)
+
+- Deploy v2026.05.27.3: Update Ch 2 Expanding Horizons — add laser engraving + Roland, drop Safety Shirts
+
 ## v2026.05.27.2 (2026.05.27)
 
 - Deploy v2026.05.27.2: Employee Handbook online reader + hub hero tile
