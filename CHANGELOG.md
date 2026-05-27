@@ -1,3 +1,7 @@
+## v2026.05.27.2 (2026.05.27)
+
+- Deploy v2026.05.27.2: Employee Handbook online reader + hub hero tile
+
 ## v2026.05.27.1 (2026.05.27)
 
 - Deploy v2026.05.27.1: 3 files (Employee-Handbook-2026-Updates.pdf,Employee-Handbook-Latest.pdf,build-handbook-pdf.py,...)
