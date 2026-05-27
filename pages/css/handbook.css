@@ -14,40 +14,89 @@ body.handbook-body {
     min-height: 100vh;
 }
 
-/* Top bar overrides — extends .detail-topbar from policies-hub-v2.css */
+/* =====================================================
+   TOP BAR — self-contained; doesn't depend on policy-detail.css
+   ===================================================== */
 .handbook-topbar {
+    background: var(--ph-surface, #ffffff);
+    border-bottom: 1px solid var(--ph-border, #e5e7eb);
+    padding: 0.7rem 1.5rem;
+    display: flex;
+    align-items: center;
     gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: var(--ph-shadow-sm, 0 1px 2px rgba(0,0,0,0.04));
+}
+.handbook-topbar .back-link {
+    color: var(--ph-text-secondary, #4b5563);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+    transition: background 0.15s, color 0.15s;
+}
+.handbook-topbar .back-link:hover {
+    background: var(--ph-bg, #f6f7f9);
+    color: var(--ph-accent, #2e5b3e);
+}
+.handbook-topbar-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ph-text, #111827);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex: 1;
+}
+.handbook-topbar-title i {
+    color: var(--ph-accent, #2e5b3e);
+    font-size: 1.1rem;
 }
 .handbook-topbar-actions {
     display: inline-flex;
-    gap: 0.6rem;
+    gap: 0.5rem;
     margin-left: auto;
+    align-items: center;
 }
 .handbook-pdf-btn,
 .handbook-print-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 0.45rem;
     text-decoration: none;
-    padding: 0.55rem 1rem;
+    padding: 0.5rem 0.95rem;
     border-radius: 8px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 600;
     cursor: pointer;
-    border: none;
-    transition: background 0.15s, transform 0.1s;
+    border: 1px solid transparent;
+    font-family: inherit;
+    transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+    white-space: nowrap;
 }
 .handbook-pdf-btn {
     background: var(--ph-accent, #2e5b3e);
     color: #ffffff;
 }
-.handbook-pdf-btn:hover { background: var(--ph-accent-dark, #1f3d2a); }
+.handbook-pdf-btn:hover {
+    background: var(--ph-accent-dark, #1f3d2a);
+    color: #ffffff;
+}
 .handbook-print-btn {
     background: var(--ph-surface, #ffffff);
     color: var(--ph-text-secondary, #4b5563);
-    border: 1px solid var(--ph-border, #e5e7eb);
+    border-color: var(--ph-border, #e5e7eb);
 }
-.handbook-print-btn:hover { background: var(--ph-bg, #f6f7f9); }
+.handbook-print-btn:hover {
+    background: var(--ph-bg, #f6f7f9);
+    color: var(--ph-text, #111827);
+    border-color: var(--ph-text-muted, #6b7280);
+}
 
 /* =====================================================
    LAYOUT — sticky TOC sidebar + scrolling main
@@ -375,14 +424,25 @@ body.handbook-body {
     .handbook-hero h1 { font-size: 1.9rem; }
     .handbook-chapter { padding: 1.5rem 1.25rem; }
     .handbook-chapter-title { font-size: 1.45rem; }
-    .handbook-topbar-actions .btn { font-size: 0.8rem; padding: 0.45rem 0.65rem; }
+    .handbook-topbar { padding: 0.55rem 0.85rem; gap: 0.5rem; }
+    .handbook-topbar-title { font-size: 0.92rem; }
+    .handbook-topbar-title i { font-size: 1rem; }
+    .handbook-topbar-actions { gap: 0.35rem; }
+    .handbook-pdf-btn,
+    .handbook-print-btn { font-size: 0.78rem; padding: 0.4rem 0.6rem; }
+    /* On very narrow screens, hide button text — keep just the icon */
+    @media (max-width: 540px) {
+        .handbook-topbar .back-link span,
+        .handbook-pdf-btn span,
+        .handbook-print-btn span { display: none; }
+    }
 }
 
 /* =====================================================
    PRINT — clean print without sidebar/topbar
    ===================================================== */
 @media print {
-    .detail-topbar,
+    .handbook-topbar,
     .handbook-toc-sidebar,
     .handbook-back-top {
         display: none !important;
