@@ -8,6 +8,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Dashboards
 
+### Quote-management Amount column showed $0.00 for orders with null cur_TotalInvoice (2026-05-28)
+**Problem:** Quote Management dashboard showed `$0.00` in the Amount column for some Processed orders that had non-zero `TotalAmount` in `quote_sessions`. The user reported "order 141919 should reflect the ShopWorks amount" but the dashboard was returning 0.
+**Root Cause:** `getEffectiveAmount()` did `const swTotal = Number(snap?.order?.cur_TotalInvoice); if (Number.isFinite(swTotal)) return swTotal;` — but `Number(null) === 0` and `Number.isFinite(0) === true`, so a null `cur_TotalInvoice` returned 0 instead of falling through to the `quote.TotalAmount` fallback. Classic falsy-zero with extra steps: not the `||` form, but a `Number()` coercion that swallows null into a valid-looking 0.
+**Fix:** Explicit `raw != null && raw !== ''` check BEFORE `Number()` coercion. Null/empty → fall through to TotalAmount; real `0` → trust ShopWorks and display $0.00. Added `getAmountTooltip()` hover so staff can see whether the displayed amount came from SW or the original quote — quick way to spot stale syncs.
+**Prevention:** Whenever wrapping a possibly-null API value in `Number()`, gate with `!= null` first. `Number.isFinite()` is NOT a null check — only useful AFTER you've confirmed the input was a real number/string. Pattern applies anywhere we read optional numerics from snapshots (cur_*, TotalAmount, LineUnitPrice, etc.). Shipped: `v2026.05.28.3` (Heroku v1191).
+
 ### Quote-management dashboard fell through to editable dropdown for unrecognized statuses (2026-05-21)
 **Problem:** quote-management dashboard fell through to editable status dropdown when row had a status the renderer didn't recognize (Pending Payment, Payment Confirmed, Payment Confirmed - ShopWorks Failed), making the row appear as "Open" and letting a rep accidentally change it.
 **Root Cause:** `renderTable()` only branched on Cancelled/Processed/Push Failed; all other statuses fell to the dropdown default. New statuses added to server.js (Stripe-flow statuses written at server.js:497, 561, 617) had no corresponding dashboard handler.
