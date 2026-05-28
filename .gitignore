@@ -5,6 +5,10 @@ node_modules/
 .vscode/
 npm-debug.log
 
+# Python
+__pycache__/
+*.pyc
+
 # Backup/version files (CLAUDE.md Rule #1)
 *.bak
 *.backup
