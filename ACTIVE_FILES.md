@@ -36,8 +36,7 @@
 | `/cart.html` | Shopping cart | See "Main Pages" section | ✅ Active |
 | `/product.html` | Product display page | See "Main Pages" section | ✅ Active |
 | `/brands.html` | Brands listing page | brands.js, brands.css, brands-flyout.js | ✅ Active |
-| `/staff-dashboard.html` | Staff dashboard v2 (canonical) | See "Dashboard & Admin" section | ✅ Active |
-| `/staff-dashboard-legacy.html` | Pre-cut-over staff dashboard (90-day soak) | 🗄️ Legacy (delete ~2026-07-28) | 🗄️ Legacy |
+| `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
 | `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
 | `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
 | `/jest.config.js` | Jest test runner config (used by `tests/jest/`) | Jest | ⚙️ Tooling |
@@ -948,8 +947,7 @@ cap-embroidery-fix.css
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/staff-dashboard.html` | **NEW (2026-04-28 cut-over)** Main staff dashboard — v2 design (oklch palette, NW green accent, Inter + JetBrains Mono, Tweaks drawer). All existing back-links from index.html, admin/, calculators/, training/ pages resolve here. | staff-dashboard-v2-tokens.css, staff-dashboard-v2.css, staff-dashboard-v2-tweaks.js, staff-dashboard-v2-extras.js + legacy staff-dashboard-*.js services | ✅ Active |
-| `/staff-dashboard-legacy.html` | Pre-cut-over staff dashboard, kept as 90-day safety net. `/staff-dashboard-v2.html` 301-redirects to canonical. | Legacy CSS + staff-dashboard-*.js | 🗄️ Legacy (delete ~2026-07-28) |
+| `/staff-dashboard-v3/index.html` | **CANONICAL (V3 sole survivor, 2026-05-28)** Main staff dashboard served at `/staff-dashboard.html`. Uses @layer CSS (tokens → base → components → utilities → overrides) + unlayered theme. v2 and v1 files deleted; their URLs 301-redirect to canonical. Recovery: `git show v2026.05.27.5:staff-dashboard.html`. | staff-dashboard/{tokens,base,components,utilities,dashboard-v3-theme,dashboard-v3-patch-2}.css, staff-dashboard-v3/{config,caspio-isolation}.js + modular controllers under shared_components/js/staff-dashboard/ | ✅ Active |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
