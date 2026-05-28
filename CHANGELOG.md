@@ -1,3 +1,7 @@
+## v2026.05.28.3 (2026.05.28)
+
+- Deploy v2026.05.28.3: 4 files (quote-management.css,quote-management.html,quote-view.js,...)
+
 ## v2026.05.28.2 (2026.05.28)
 
 - Deploy v2026.05.28.2: Replace pricing banner with Option D (minimal two-column)
