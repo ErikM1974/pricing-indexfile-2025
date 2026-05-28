@@ -304,6 +304,42 @@ body {
 }
 .status-badge.status-charged-no-sw i { font-size: 11px; }
 
+/* Progress column — 5 milestone pills per row (Purchase Received,
+   Produced, Shipped, Invoiced, Paid). Green when ShopWorks marks the
+   milestone done, neutral gray when pending. Hover for full label. */
+.milestone-pills {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+.milestone-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    font-size: 11px;
+    cursor: help;
+    border: 1.5px solid transparent;
+    transition: transform 100ms ease;
+}
+.milestone-pill:hover { transform: scale(1.1); }
+.milestone-pill--done {
+    background: #dcfce7;
+    color: #14532d;
+    border-color: #86efac;
+}
+.milestone-pill--pending {
+    background: #f1f5f9;
+    color: #94a3b8;
+    border-color: #e2e8f0;
+}
+.milestone-na {
+    color: #94a3b8;
+    font-style: italic;
+}
+
 /* Row tint for cancelled quotes — subtle so it doesn't drown out
    active quotes when mixed in. */
 .quote-row--cancelled {
