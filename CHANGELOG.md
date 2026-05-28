@@ -1,3 +1,7 @@
+## v2026.05.27.5 (2026.05.27)
+
+- Deploy v2026.05.27.5: 2 files (dashboard-v3-theme.css,index.html,...)
+
 ## v2026.05.27.4 (2026.05.27)
 
 - Deploy v2026.05.27.4: Fix handbook page header — self-contained topbar styles, strip duplicate intro links
