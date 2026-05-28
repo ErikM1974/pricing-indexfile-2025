@@ -1,3 +1,7 @@
+## v2026.05.28.5 (2026.05.28)
+
+- Deploy v2026.05.28.5: 5 files (policies-hub-v2.css,handbook.html,policies-hub.html...)
+
 ## v2026.05.28.4 (2026.05.28)
 
 - Deploy v2026.05.28.4: 9 files (ACTIVE_FILES.md,LESSONS_LEARNED.md,staff-dashboard-dark.css,...)
