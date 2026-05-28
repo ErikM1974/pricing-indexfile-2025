@@ -3477,31 +3477,30 @@ class QuoteViewPage {
         const grid = document.getElementById('sw-status-grid');
         if (!section || !grid) return;
 
-        // Map of ShopWorks /orders status fields to user-friendly labels +
-        // semantics. The ShopWorks UI shows 10 columns of Yes/No flags;
-        // we mirror that grid here. Some fields return numbers (0/1),
-        // others strings ('Yes'/'No') — handle both.
-        //
-        // Mapping deduced from the ShopWorks UI screenshot Erik shared.
-        // sts_SizingType isn't a Yes/No (it's a numeric mode), so we skip
-        // it; "Approved" isn't in the /orders read schema either — derive
-        // from id_SalesStatus or hide if not present.
+        // 5-tile workflow snapshot (Erik 2026-05-28). Trimmed from the prior
+        // 10-tile mirror of the ShopWorks UI — staff don't need Approved/
+        // Art/Sub Pur/Pre at-a-glance; what they want is "where is the order
+        // in the pipeline?" Each tile is a milestone:
+        //   Purchase Received — goods purchased AND physically received
+        //   Produced          — decoration complete
+        //   Shipped           — out the door
+        //   Invoiced          — invoice generated
+        //   Paid              — customer paid
+        // "Purchase Received" is a composite Yes only when both sts_Purchased
+        // and sts_Received are Yes (received implies purchased, but ANDing
+        // guards against data inconsistency).
         const STATUS_FIELDS = [
-            { label: 'Approved',  field: '_approved_inferred',  always: true }, // hardcoded for OF orders that successfully imported
-            { label: 'Art',       field: 'sts_ArtDone' },
-            { label: 'Purchase',  field: 'sts_Purchased' },
-            { label: 'Sub Pur',   field: 'sts_PurchasedSub' },
-            { label: 'Rec',       field: 'sts_Received' },
-            { label: 'Pre',       field: 'sts_PrePay' }, // best-guess: prepayment status
-            { label: 'Prod',      field: 'sts_Produced' },
-            { label: 'Ship',      field: 'sts_Shipped' },
-            { label: 'Inv',       field: 'sts_Invoiced' },
-            { label: 'Paid',      field: 'sts_Paid' },
+            { label: 'Purchase Received', composite: ['sts_Purchased', 'sts_Received'] },
+            { label: 'Produced',          field: 'sts_Produced' },
+            { label: 'Shipped',           field: 'sts_Shipped' },
+            { label: 'Invoiced',          field: 'sts_Invoiced' },
+            { label: 'Paid',              field: 'sts_Paid' },
         ];
 
-        const cells = STATUS_FIELDS.map(({ label, field, always }) => {
-            const raw = always ? 'Yes' : order?.[field];
-            const yes = this._isStatusYes(raw);
+        const cells = STATUS_FIELDS.map(({ label, field, composite }) => {
+            const yes = composite
+                ? composite.every(f => this._isStatusYes(order?.[f]))
+                : this._isStatusYes(order?.[field]);
             const tone = yes ? 'yes' : 'no';
             const display = yes ? 'Yes' : 'No';
             return `

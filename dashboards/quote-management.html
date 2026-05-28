@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=20260523b">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=20260523f">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.28.3">
 </head>
 <body>
     <!-- Header -->
@@ -49,22 +49,6 @@
                     <option value="Lost">Lost</option>
                     <option value="Expired">Expired</option>
                     <option value="Cancelled_in_ShopWorks">Cancelled (ShopWorks)</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label>Sales Rep</label>
-                <select id="filter-sales-rep">
-                    <option value="">All Quotes</option>
-                    <option value="mine">My Quotes</option>
-                    <option value="adriyella@nwcustomapparel.com">Adriyella</option>
-                    <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
-                    <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
-                    <option value="jim@nwcustomapparel.com">Jim Mickelson</option>
-                    <option value="nika@nwcustomapparel.com">Nika Lao</option>
-                    <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
-                    <option value="art@nwcustomapparel.com">Steve Deland</option>
-                    <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                 </select>
             </div>
 
@@ -146,10 +130,10 @@
                         </th>
                         <th>Quote ID</th>
                         <th>Customer</th>
-                        <th>Sales Rep</th>
                         <th>Items</th>
                         <th style="text-align: right;">Amount</th>
                         <th>Status</th>
+                        <th>Progress</th>
                         <th>Created</th>
                         <th>Actions</th>
                     </tr>
@@ -272,7 +256,6 @@
         function applyFilters() {
             // Get filter values
             const statusFilter = document.getElementById('filter-status').value;
-            const salesRepFilter = document.getElementById('filter-sales-rep').value;
             const dateFilter = document.getElementById('filter-date').value;
             const searchFilter = document.getElementById('filter-search').value.toLowerCase().trim();
 
@@ -287,15 +270,6 @@
             filteredQuotes = allQuotes.filter(quote => {
                 // Status filter
                 if (statusFilter && quote.Status !== statusFilter) {
-                    return false;
-                }
-
-                // Sales rep filter
-                if (salesRepFilter === 'mine') {
-                    if (quote.SalesRepEmail !== currentUserEmail) {
-                        return false;
-                    }
-                } else if (salesRepFilter && quote.SalesRepEmail !== salesRepFilter) {
                     return false;
                 }
 
@@ -342,16 +316,81 @@
         // Used in both row render and stats sum so dashboard amounts mirror
         // ShopWorks just like the quote-view and invoice pages do. (Erik
         // 2026-05-22 — full SW-as-source-of-truth consistency.)
+        //
+        // 2026-05-28: explicit null/undefined check before Number() — without
+        // it, Number(null) === 0 made unsynced rows render as $0.00 instead
+        // of falling back to the original quote total.
         function getEffectiveAmount(quote) {
             // Only overlay for Processed quotes with a synced snapshot.
             if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {
                 try {
                     const snap = JSON.parse(quote.ShopWorks_Snapshot);
-                    const swTotal = Number(snap?.order?.cur_TotalInvoice);
-                    if (Number.isFinite(swTotal)) return swTotal;
+                    const raw = snap?.order?.cur_TotalInvoice;
+                    if (raw != null && raw !== '') {
+                        const swTotal = Number(raw);
+                        if (Number.isFinite(swTotal)) return swTotal;
+                    }
                 } catch (_) { /* fall through to quote total */ }
             }
             return parseFloat(quote.TotalAmount) || 0;
+        }
+
+        // 5-milestone workflow progress for the Progress column (Erik
+        // 2026-05-28). Mirrors the same milestones shown on the quote
+        // detail page so staff can scan the dashboard and see where
+        // each order is. Data comes from the SW snapshot order.sts_*
+        // fields; rows without a snapshot show a single em-dash placeholder.
+        // "Purchase Received" is a composite AND of sts_Purchased and
+        // sts_Received (received implies purchased, but AND-ing guards
+        // against ShopWorks data inconsistency).
+        const MILESTONE_ICONS = [
+            { label: 'Purchase Received', icon: 'fa-box',           fields: ['sts_Purchased', 'sts_Received'] },
+            { label: 'Produced',          icon: 'fa-cog',           fields: ['sts_Produced'] },
+            { label: 'Shipped',           icon: 'fa-truck',         fields: ['sts_Shipped'] },
+            { label: 'Invoiced',          icon: 'fa-file-invoice',  fields: ['sts_Invoiced'] },
+            { label: 'Paid',              icon: 'fa-dollar-sign',   fields: ['sts_Paid'] },
+        ];
+
+        function isStatusYes(raw) {
+            if (raw == null || raw === '') return false;
+            const s = String(raw).trim().toLowerCase();
+            if (s === 'yes' || s === 'y' || s === 'true' || s === '1') return true;
+            const n = Number(raw);
+            return !Number.isNaN(n) && n > 0;
+        }
+
+        function renderMilestonePills(quote) {
+            if (!quote.ShopWorks_Snapshot) {
+                return `<span class="milestone-na" title="ShopWorks not yet synced">—</span>`;
+            }
+            let order;
+            try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
+            catch (_) { return `<span class="milestone-na" title="Snapshot parse error">—</span>`; }
+
+            const pills = MILESTONE_ICONS.map(({ label, icon, fields }) => {
+                const done = fields.every(f => isStatusYes(order[f]));
+                const tone = done ? 'done' : 'pending';
+                return `<span class="milestone-pill milestone-pill--${tone}" title="${label}: ${done ? 'Yes' : 'No'}">
+                            <i class="fas ${icon}"></i>
+                        </span>`;
+            }).join('');
+            return `<div class="milestone-pills">${pills}</div>`;
+        }
+
+        // Tooltip explaining where the displayed amount came from. Hover on
+        // the Amount cell shows "From ShopWorks: $X" for synced Processed
+        // rows, "From quote: $X" otherwise — so staff can spot stale syncs.
+        function getAmountTooltip(quote) {
+            if (quote.Status === 'Processed' && quote.ShopWorks_Snapshot) {
+                try {
+                    const snap = JSON.parse(quote.ShopWorks_Snapshot);
+                    const raw = snap?.order?.cur_TotalInvoice;
+                    if (raw != null && raw !== '' && Number.isFinite(Number(raw))) {
+                        return `From ShopWorks invoice total (WO #${quote.ShopWorks_Order_Number || '?'})`;
+                    }
+                } catch (_) { /* fall through */ }
+            }
+            return 'From quote total (ShopWorks not yet synced)';
         }
 
         // D (Erik 2026-05-22): per-row ShipStation state for the dashboard
@@ -665,10 +704,10 @@
                             <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
                             <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>
                         </td>
-                        <td>${getSalesRepName(quote.SalesRepEmail)}</td>
                         <td>${quote.TotalQuantity || 0}</td>
-                        <td class="quote-amount">${formatCurrency(getEffectiveAmount(quote))}</td>
+                        <td class="quote-amount" title="${getAmountTooltip(quote)}">${formatCurrency(getEffectiveAmount(quote))}</td>
                         <td>${statusCellHtml}</td>
+                        <td>${renderMilestonePills(quote)}</td>
                         <td>
                             <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
                             ${retentionInfo || (expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : '')}
@@ -801,21 +840,6 @@
             if (daysUntil === 1) return 'Expires tomorrow';
             if (daysUntil <= 7) return `Expires in ${daysUntil} days`;
             return null;
-        }
-
-        function getSalesRepName(email) {
-            const names = {
-                'sales@nwcustomapparel.com': 'General Sales',
-                'adriyella@nwcustomapparel.com': 'Adriyella',
-                'bradley@nwcustomapparel.com': 'Bradley',
-                'erik@nwcustomapparel.com': 'Erik',
-                'jim@nwcustomapparel.com': 'Jim',
-                'nika@nwcustomapparel.com': 'Nika',
-                'ruth@nwcustomapparel.com': 'Ruth',
-                'art@nwcustomapparel.com': 'Steve',
-                'taneisha@nwcustomapparel.com': 'Taneisha'
-            };
-            return names[email] || email || '-';
         }
 
         // Navigation
