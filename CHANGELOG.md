@@ -1,3 +1,7 @@
+## v2026.05.28.2 (2026.05.28)
+
+- Deploy v2026.05.28.2: Replace pricing banner with Option D (minimal two-column)
+
 ## v2026.05.28.1 (2026.05.28)
 
 - Deploy v2026.05.28.1: 4 files (ACTIVE_FILES.md,server.js,staff-dashboard-legacy.html,...)
