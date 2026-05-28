@@ -47,10 +47,10 @@ dotenv.config();
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
-// STAFF DASHBOARD ROUTING (hard cutover 2026-05-13)
+// STAFF DASHBOARD ROUTING (v3 sole survivor — 2026-05-28 cleanup)
 //   L770  /staff-dashboard.html         → v3 canonical (serves staff-dashboard-v3/index.html)
-//   L775  /staff-dashboard-v2.html      → v2 safety net (serves staff-dashboard.html)
-//   L780  /staff-dashboard-legacy.html  → v1 (delete ~2026-07-28)
+//   L775  /staff-dashboard-v2.html      → 301 redirect → /staff-dashboard.html
+//   L780  /staff-dashboard-legacy.html  → 301 redirect → /staff-dashboard.html
 //   L786  /staff-dashboard-v3/          → v3 dedicated URL (kept for old bookmarks)
 //
 // LEGACY REDIRECTS
@@ -983,26 +983,27 @@ function noCacheHeaders(res) {
   res.setHeader('Expires', '0');
 }
 
-// ===== Staff Dashboard hard cutover (2026-05-13) =====
-// Canonical /staff-dashboard.html now serves the v3 dashboard. v2 moves to
-// /staff-dashboard-v2.html as the safety-net URL during the soak period.
-// /staff-dashboard-v3/ kept working for anyone who bookmarked it pre-cutover.
-// /staff-dashboard-legacy.html (v1) still planned to delete ~2026-07-28.
+// ===== Staff Dashboard (v3 sole survivor, cleanup 2026-05-28) =====
+// 2026-05-13: v3 became canonical, v2/v1 kept as safety nets.
+// 2026-05-28: v2 + v1 files deleted (no rollback ever needed in soak).
+//   The /staff-dashboard-v2.html and /staff-dashboard-legacy.html URLs
+//   now 301-redirect to canonical so old bookmarks still land on V3.
+//   Recovery: `git show v2026.05.27.5:staff-dashboard.html` (or :staff-dashboard-legacy.html).
 
-// Canonical URL — now serves v3
+// Canonical URL — serves v3
 app.get('/staff-dashboard.html', (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
 
-// v2 safety net — serves the prior canonical staff-dashboard.html file
+// Old v2 URL → redirect to canonical (file deleted 2026-05-28)
 app.get('/staff-dashboard-v2.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard.html'));
+  res.redirect(301, '/staff-dashboard.html');
 });
 
-// Legacy v1 — kept accessible until 2026-07-28 deletion
+// Old v1 URL → redirect to canonical (file deleted 2026-05-28)
 app.get('/staff-dashboard-legacy.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'staff-dashboard-legacy.html'));
+  res.redirect(301, '/staff-dashboard.html');
 });
 
 // v3 dedicated URL — preserved so any direct /staff-dashboard-v3/ bookmarks
