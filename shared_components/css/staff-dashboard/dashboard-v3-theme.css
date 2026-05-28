@@ -1003,3 +1003,183 @@ a{ color: inherit; }
   gap: 6px;
 }
 
+/* =====================================================
+   PRICING UPDATE BANNER (added 2026-05-27)
+   Temporary heads-up that sits directly above the sales-goal
+   banner. Amber accent (#fbbf24 / #f59e0b) keeps it visually
+   distinct from the green goal hero. Same 960px container so
+   the two banners stack as a single column on the page.
+   Remove this whole block + the matching <section> in
+   staff-dashboard-v3/index.html once the May 28 notice is stale.
+   ===================================================== */
+.pricing-update-banner {
+  max-width: 960px;
+  margin: 0 auto 14px;
+  padding: 16px 22px 18px 26px;
+  background:
+    radial-gradient(circle at 8% 50%, rgba(245, 158, 11, .12) 0%, transparent 42%),
+    radial-gradient(circle at 92% 50%, rgba(245, 158, 11, .06) 0%, transparent 44%),
+    var(--surface-card);
+  border: 1px solid rgba(245, 158, 11, .28);
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(245, 158, 11, .12),
+    0 8px 32px -10px rgba(245, 158, 11, .25),
+    var(--shadow-card);
+}
+.pricing-update-banner::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #fbbf24, #f59e0b, #fbbf24);
+  box-shadow: 0 0 14px rgba(251, 191, 36, .55);
+}
+
+.pricing-update-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-areas:
+    "head    script"
+    "facts   script";
+  gap: 10px 22px;
+  align-items: stretch;
+}
+.pricing-update-head   { grid-area: head; }
+.pricing-update-facts  { grid-area: facts; }
+.pricing-update-script { grid-area: script; }
+
+.pricing-update-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+.pricing-update-pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #fbbf24;
+  box-shadow: 0 0 0 0 rgba(251, 191, 36, .55);
+  animation: pricingUpdatePulse 1.6s ease-in-out infinite;
+}
+@keyframes pricingUpdatePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, .55); }
+  50%      { box-shadow: 0 0 0 8px rgba(251, 191, 36, 0);   }
+}
+.pricing-update-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #fbbf24;
+}
+.pricing-update-effective {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, .12);
+  border: 1px solid rgba(245, 158, 11, .28);
+  color: #fcd34d;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.pricing-update-lead {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink-hi);
+  letter-spacing: -.005em;
+}
+
+.pricing-update-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.pricing-update-fact {
+  padding: 8px 11px;
+  border-radius: 10px;
+  background: var(--surface-card-2);
+  border: 1px solid var(--surface-border);
+  min-width: 0;
+}
+.pricing-update-fact-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fcd34d;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.pricing-update-fact-value i {
+  font-size: 11px;
+  opacity: .85;
+}
+.pricing-update-fact-label {
+  font-size: 11px;
+  color: var(--ink-md);
+  margin-top: 3px;
+  line-height: 1.35;
+}
+
+.pricing-update-script {
+  margin: 0;
+  padding: 11px 14px 11px 15px;
+  border-left: 3px solid #fbbf24;
+  background: rgba(245, 158, 11, .06);
+  border-radius: 0 10px 10px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.pricing-update-script-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--ink-lo);
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.pricing-update-script p {
+  margin: 0;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--ink-hi);
+}
+
+@media (max-width: 900px) {
+  .pricing-update-content {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "head"
+      "facts"
+      "script";
+    gap: 12px;
+  }
+}
+@media (max-width: 560px) {
+  .pricing-update-banner {
+    padding: 14px 16px 16px 22px;
+  }
+  .pricing-update-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .pricing-update-effective { font-size: 10px; }
+}
+
