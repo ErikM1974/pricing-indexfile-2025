@@ -833,11 +833,6 @@
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
 | `/shared_components/css/force-green-theme.css` | Force NWCA green theme override | Multiple pages | ✅ Active |
 | `/shared_components/css/modern-enhancements.css` | Modern UI enhancement overlays | Multiple pages | ✅ Active |
-| `/shared_components/css/staff-dashboard-layout.css` | Staff dashboard layout (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
-| `/shared_components/css/staff-dashboard-widgets.css` | Staff dashboard widgets (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
-| `/shared_components/css/staff-dashboard-dark.css` | Staff dashboard dark theme (legacy v1) | staff-dashboard-legacy.html | 🗄️ Legacy |
-| `/shared_components/css/staff-dashboard-v2.css` | Staff dashboard v2 styles | staff-dashboard.html | ✅ Active |
-| `/shared_components/css/staff-dashboard-v2-tokens.css` | Staff dashboard v2 design tokens | staff-dashboard.html | ✅ Active |
 | `/shared_components/css/names-numbers.css` | Names & Numbers roster manager styles | names-numbers.html + dashboard | ✅ Active |
 | `/shared_components/css/monogram-form.css` | Monogram form styles | monogram-form.html | ✅ Active |
 | `/shared_components/css/old-designs.css` | Old designs archive styles | old-designs.html | ✅ Active |
@@ -1011,21 +1006,14 @@ cap-embroidery-fix.css
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
 
-### Staff Dashboard V2 Files (2025-12-31 Redesign)
+### Staff Dashboard Legacy JS (still loaded by V3 as bridge globals)
 | File | Purpose | Status |
 |------|---------|--------|
-| `/shared_components/css/staff-dashboard-layout.css` | 4-zone grid layout, responsive | ✅ Active |
-| `/shared_components/css/staff-dashboard-widgets.css` | Metrics cards, team performance, skeletons | ✅ Active |
-| `/shared_components/css/staff-dashboard-dark.css` | **NEW** Dark mode theme (matches House Accounts) | ✅ Active |
-| `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration | ✅ Active |
+| `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration; V3 garment-tracker controller bridges to its `window.StaffDashboardService.*` globals | ✅ Active |
 | `/shared_components/js/staff-dashboard-announcements.js` | Priority announcements with dismiss | ✅ Active |
 | `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |
 | `/shared_components/js/production-schedule-stats.js` | Precomputed turnaround stats from 819 records | ✅ Active |
 | `/shared_components/js/production-schedule-predictor.js` | Prediction engine for turnaround times | ✅ Active |
-| `/shared_components/css/staff-dashboard-v2-tokens.css` | **NEW (2026-04-28)** Design tokens for v2 dashboard (oklch palette, NW green, dark/light themes, density). Remaps legacy `--bg-dark`/`--card-*`/`--accent-blue`/etc. so existing CSS picks up new colors. | 🧪 Testing |
-| `/shared_components/css/staff-dashboard-v2.css` | **NEW (2026-04-28)** v2 visual overrides — typography (Inter + JetBrains Mono), refined cards/buttons/sidebar, NW green accent throughout, Tweaks drawer styles. Layered after legacy CSS. | 🧪 Testing |
-| `/shared_components/js/staff-dashboard-v2-tweaks.js` | **NEW (2026-04-28)** Floating Tweaks drawer (accent/density — Light theme stripped per Erik). Persists to `localStorage['nwca-staff-dash-v2-tweaks']`. Exposes `window.StaffDashboardV2Tweaks.{get,set,reset}`. Applied early to avoid theme flicker. | 🧪 Testing |
-| `/shared_components/js/staff-dashboard-v2-extras.js` | **NEW (2026-04-28)** v2 extras: populates `#revenueStats` (orders + AOV) from `StaffDashboardService.getMetrics()` cache; makes Specialty & Quick Links / Forms, Shipping & Reference tool categories collapsible by default with localStorage persistence. | 🧪 Testing |
 
 ### Staff Dashboard V3 Refactor (in development on `refactor/staff-dashboard-v3` branch — 2026-05-12)
 Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.md`. Built in parallel at `/staff-dashboard-v3/`; cuts over once 90-day soak passes. v2 will move to `/staff-dashboard-v2.html` at cutover.
