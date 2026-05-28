@@ -1,3 +1,7 @@
+## v2026.05.28.4 (2026.05.28)
+
+- Deploy v2026.05.28.4: 9 files (ACTIVE_FILES.md,LESSONS_LEARNED.md,staff-dashboard-dark.css,...)
+
 ## v2026.05.28.3 (2026.05.28)
 
 - Deploy v2026.05.28.3: 4 files (quote-management.css,quote-management.html,quote-view.js,...)
