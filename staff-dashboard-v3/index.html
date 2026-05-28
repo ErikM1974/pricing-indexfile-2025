@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.05.27.5">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.05.28.2">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -272,44 +272,27 @@
             <div id="partialDataWarning" class="partial-data-warning is-hidden"></div>
 
             <!-- ===================================================
-                 PRICING UPDATE BANNER (added 2026-05-27)
-                 Temporary heads-up for the May 28 price change. Sits
-                 above the sales-goal banner so staff see it first.
-                 Remove this <section> + the .pricing-update-* rules in
+                 PRICING UPDATE BANNER (Option D, 2026-05-28)
+                 Minimal two-column heads-up for the May 28 price change.
+                 Lead + sub line on the left, "If a customer asks" quote
+                 on the right. Sits above the sales-goal banner so staff
+                 see it first.
+                 Remove this <aside> + the .pricing-banner-d rules in
                  dashboard-v3-theme.css once the notice is no longer fresh.
                  =================================================== -->
-            <section class="pricing-update-banner" role="status" aria-label="Pricing update notice">
-                <div class="pricing-update-content">
-                    <div class="pricing-update-head">
-                        <div class="pricing-update-eyebrow">
-                            <span class="pricing-update-pulse" aria-hidden="true"></span>
-                            <span class="pricing-update-kicker">Pricing Update</span>
-                            <span class="pricing-update-effective"><i class="fas fa-calendar-check" aria-hidden="true"></i> Effective May 28, 2026</span>
-                        </div>
-                        <p class="pricing-update-lead">New quotes automatically use the updated pricing.</p>
+            <aside class="pricing-banner-d" role="note" aria-label="Pricing update">
+                <div class="pricing-banner-d__main">
+                    <div>
+                        <div class="pricing-banner-d__lead">Pricing update is live for new quotes.</div>
+                        <div class="pricing-banner-d__sub">~4% increase on new orders &middot; existing quotes honored &middot; effective May 28, 2026</div>
                     </div>
-
-                    <div class="pricing-update-facts">
-                        <div class="pricing-update-fact">
-                            <div class="pricing-update-fact-value"><i class="fas fa-arrow-trend-up" aria-hidden="true"></i> ~4%</div>
-                            <div class="pricing-update-fact-label">Increase on all new orders</div>
-                        </div>
-                        <div class="pricing-update-fact">
-                            <div class="pricing-update-fact-value"><i class="fas fa-shield-halved" aria-hidden="true"></i> Honored</div>
-                            <div class="pricing-update-fact-label">Already-issued quotes at previous pricing</div>
-                        </div>
-                        <div class="pricing-update-fact">
-                            <div class="pricing-update-fact-value"><i class="fas fa-user-check" aria-hidden="true"></i> See Erik</div>
-                            <div class="pricing-update-fact-label">For questions or pushback</div>
-                        </div>
-                    </div>
-
-                    <blockquote class="pricing-update-script">
-                        <div class="pricing-update-script-label"><i class="fas fa-comment-dots" aria-hidden="true"></i> If a customer asks</div>
-                        <p>&ldquo;We periodically adjust pricing to reflect current garment costs and the quality and turnaround we deliver.&rdquo;</p>
-                    </blockquote>
                 </div>
-            </section>
+
+                <div class="pricing-banner-d__aside">
+                    <div class="pricing-banner-d__aside-head">&#x21B3; IF A CUSTOMER ASKS</div>
+                    <span class="pricing-banner-d__quote">&ldquo;We periodically adjust pricing to reflect current garment costs and the quality and turnaround we deliver.&rdquo;</span>
+                </div>
+            </aside>
 
             <!-- ===================================================
                  SALES GOAL BANNER (simplified 2026-05-13 per Erik's request)
