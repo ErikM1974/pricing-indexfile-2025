@@ -1,3 +1,8 @@
+## v2026.05.29.3 (2026.05.29)
+
+- Add missing shared contract-pricing-2026.css (was untracked → broke prod)
+- Deploy v2026.05.29.3: 8 files (index.html,index.html,richardson-2025.html,...)
+
 ## v2026.05.29.2 (2026.05.29)
 
 - Fix DTF Quote Builder -> ShopWorks push: real customer, fees, ship-to, typed notes
