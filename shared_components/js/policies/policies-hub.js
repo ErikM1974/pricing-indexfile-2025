@@ -21,7 +21,8 @@
         categoryFilter: 'all',
         searchQuery: '',
         searchResults: null,   // null = not searching; array = active search
-        statusFilter: 'Published' // admin can switch to 'Draft' or 'All'
+        statusFilter: 'Published', // (legacy, unused)
+        showArchived: false    // admin toggle — archived policies hidden by default
     };
 
     // ----------------------------- helpers -----------------------------
@@ -58,6 +59,10 @@
             clearTimeout(t);
             t = setTimeout(() => fn.apply(this, args), ms);
         };
+    }
+
+    function isArchived(p) {
+        return !!p && (p.Status === 'Archived' || p.Is_Active === false || p.Is_Active === 'false' || p.Is_Active === 0);
     }
 
     // ----------------------------- data load -----------------------------
@@ -111,13 +116,15 @@
         }
 
         const rowsHtml = state.tree.map(cat => {
-            const policiesHtml = cat.policies.map(p => renderTreeNode(p, 1)).join('');
+            const vis = cat.policies.filter(p => state.showArchived || !isArchived(p));
+            if (vis.length === 0) return '';
+            const policiesHtml = vis.map(p => renderTreeNode(p, 1)).join('');
             return `
                 <details class="tree-cat" open>
                     <summary>
                         <i class="fas ${categoryIcon(cat.category)}"></i>
                         <span>${escapeHtml(cat.category)}</span>
-                        <span class="tree-count">${cat.policies.length}</span>
+                        <span class="tree-count">${vis.length}</span>
                     </summary>
                     <ul class="tree-list">${policiesHtml}</ul>
                 </details>
@@ -128,25 +135,29 @@
     }
 
     function renderTreeNode(node, depth) {
-        const hasChildren = node.children && node.children.length > 0;
+        const visChildren = (node.children || []).filter(c => state.showArchived || !isArchived(c));
+        const hasChildren = visChildren.length > 0;
         const isExternal = !!node.External_URL;
         const isDraft = node.Status === 'Draft';
+        const archived = isArchived(node);
         const href = `/pages/policy-detail.html?id=${encodeURIComponent(node.Policy_ID)}`;
 
         const linkClass = ['tree-link'];
         if (isDraft) linkClass.push('is-draft');
+        if (archived) linkClass.push('is-archived');
         if (isExternal) linkClass.push('is-external');
 
         const externalBadge = isExternal ? '<i class="fas fa-external-link-alt tree-external-icon" aria-label="External"></i>' : '';
         const draftBadge = isDraft ? '<span class="tree-badge tree-badge-draft">Draft</span>' : '';
+        const archivedBadge = archived ? '<span class="tree-badge tree-badge-archived">Archived</span>' : '';
 
         if (hasChildren && depth < 3) {
-            const childrenHtml = node.children.map(c => renderTreeNode(c, depth + 1)).join('');
+            const childrenHtml = visChildren.map(c => renderTreeNode(c, depth + 1)).join('');
             return `
                 <li class="tree-item tree-item-parent">
                     <details>
                         <summary>
-                            <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}</a>
+                            <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}${archivedBadge}</a>
                         </summary>
                         <ul class="tree-list tree-list-nested">${childrenHtml}</ul>
                     </details>
@@ -156,7 +167,7 @@
 
         return `
             <li class="tree-item">
-                <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}</a>
+                <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}${archivedBadge}</a>
             </li>
         `;
     }
@@ -167,8 +178,9 @@
 
         const counts = { all: 0 };
         state.tree.forEach(cat => {
-            counts[cat.category] = cat.policies.length;
-            counts.all += cat.policies.length;
+            const n = cat.policies.filter(p => state.showArchived || !isArchived(p)).length;
+            counts[cat.category] = n;
+            counts.all += n;
         });
 
         const allCats = ['Financial', 'Operations', 'Customer Service', 'HR', 'Training'];
@@ -211,7 +223,7 @@
             policies = [];
             state.tree.forEach(cat => {
                 if (state.categoryFilter === 'all' || state.categoryFilter === cat.category) {
-                    cat.policies.forEach(p => policies.push(p));
+                    cat.policies.forEach(p => { if (state.showArchived || !isArchived(p)) policies.push(p); });
                 }
             });
         }
@@ -247,9 +259,11 @@
         const isExternal = !!p.External_URL;
         const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
         const isDraft = p.Status === 'Draft';
+        const archived = isArchived(p);
 
         return `
-            <a href="${href}" class="policy-card ${isDraft ? 'is-draft' : ''}" data-category="${escapeHtml(p.Category)}">
+            <a href="${href}" class="policy-card ${isDraft ? 'is-draft' : ''} ${archived ? 'is-archived' : ''}" data-category="${escapeHtml(p.Category)}">
+                ${archived ? '<span class="policy-flag flag-archived">ARCHIVED</span>' : ''}
                 ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
                 ${isExternal ? '<span class="policy-flag flag-external"><i class="fas fa-external-link-alt"></i> External</span>' : ''}
                 <span class="policy-category-tag">
@@ -272,11 +286,13 @@
     function renderListItem(p) {
         const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
         const isDraft = p.Status === 'Draft';
+        const archived = isArchived(p);
         return `
-            <a href="${href}" class="policy-list-item" data-category="${escapeHtml(p.Category)}">
+            <a href="${href}" class="policy-list-item ${archived ? 'is-archived' : ''}" data-category="${escapeHtml(p.Category)}">
                 <span class="policy-list-title">
                     ${escapeHtml(p.Title)}
                     ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
+                    ${archived ? '<span class="policy-flag flag-archived">ARCHIVED</span>' : ''}
                 </span>
                 <span class="policy-list-category">${escapeHtml(p.Category)}</span>
                 <span class="policy-list-date">${formatDate(p.Updated_At || p.Created_At)}</span>
@@ -315,9 +331,11 @@
     function renderAdminAffordances() {
         const btn = document.getElementById('newPolicyBtn');
         const draftToggle = document.getElementById('draftToggle');
+        const archivedToggleWrap = document.getElementById('archivedToggleWrap');
         const badge = document.getElementById('questionsBadge');
         if (btn) btn.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
         if (draftToggle) draftToggle.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
+        if (archivedToggleWrap) archivedToggleWrap.style.display = window.IS_POLICIES_ADMIN ? 'inline-flex' : 'none';
         if (badge) badge.style.display = window.IS_POLICIES_ADMIN ? 'inline-flex' : 'none';
         if (window.IS_POLICIES_ADMIN) loadQuestionsBadge();
     }
@@ -390,6 +408,15 @@
                 applyViewMode();
             });
         });
+
+        // Show-archived toggle (admin)
+        const archChk = document.getElementById('archivedToggle');
+        if (archChk) {
+            archChk.addEventListener('change', () => {
+                state.showArchived = archChk.checked;
+                render();
+            });
+        }
 
         // New Policy button
         const newBtn = document.getElementById('newPolicyBtn');
