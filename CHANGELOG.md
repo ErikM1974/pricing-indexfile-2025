@@ -1,3 +1,8 @@
+## v2026.05.29.4 (2026.05.29)
+
+- Harden /deploy: guard untracked HTML-referenced assets + fail loudly on dirty checkout
+- Deploy v2026.05.29.4: Richardson cap pricing parity — 3D Puff option + new-design setup (00 digitizing / 0 GRT-50)
+
 ## v2026.05.29.3 (2026.05.29)
 
 - Add missing shared contract-pricing-2026.css (was untracked → broke prod)
