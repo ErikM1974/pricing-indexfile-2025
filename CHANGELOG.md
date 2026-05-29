@@ -1,3 +1,8 @@
+## v2026.05.29.6 (2026.05.29)
+
+- Add archived-policy filter + Show-archived toggle to Policies Hub
+- Deploy v2026.05.29.6: archived-filter cache-bust
+
 ## v2026.05.29.5 (2026.05.29)
 
 - Deploy v2026.05.29.5: sticker save-path parity — pre-tax total, retry-safe partial-save block, $0-setup-fee fix
