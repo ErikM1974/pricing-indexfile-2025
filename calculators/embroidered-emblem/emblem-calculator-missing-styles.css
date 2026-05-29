@@ -1,0 +1,848 @@
+/**
+ * Emblem Calculator Missing Styles
+ * Restores all CSS classes that were missing after the refactoring
+ * Uses NWCA green theme (#4cb354) consistently
+ * Updated to include pricing table and input field styles
+ */
+
+/* ============================================
+   PRICING TABLE STYLES (Reference Grid)
+   ============================================ */
+.pricing-container {
+    margin: 2rem 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.pricing-header {
+    background: #f7f7f7;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.pricing-header:hover {
+    background: #f0f0f0;
+}
+
+.pricing-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: #1f2937;
+}
+
+.pricing-content {
+    display: none;
+    padding: 1.5rem;
+    overflow-x: auto;
+}
+
+.pricing-content.show {
+    display: block;
+}
+
+.pricing-content table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.pricing-content th,
+.pricing-content td {
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    border: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+}
+
+.pricing-content thead th {
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.pricing-content tbody tr:nth-child(even) {
+    background: #f9fafb;
+}
+
+.pricing-content tbody tr:hover {
+    background: #f0fdf4;
+}
+
+.pricing-content tbody td {
+    color: #1f2937;
+}
+
+.pricing-content tbody td:first-child {
+    font-weight: 600;
+    text-align: left;
+    background: #f7f7f7;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+}
+
+/* Highlight active price cells */
+.pricing-content td.active-price {
+    background: #d1fae5 !important;
+    font-weight: 700;
+    color: #065f46;
+    border: 2px solid #4cb354;
+}
+
+/* ============================================
+   INPUT FIELD STYLES
+   ============================================ */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #1f2937;
+    background: white;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+}
+
+.form-control:hover {
+    border-color: #d1d5db;
+}
+
+/* Number inputs */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Dimension inputs (Width/Height) */
+.dimension-inputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.dimension-input {
+    position: relative;
+}
+
+.dimension-input input {
+    padding-right: 2.5rem;
+}
+
+.dimension-input::after {
+    content: '"';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    pointer-events: none;
+}
+
+/* Quantity input */
+.quantity-input {
+    max-width: 150px;
+}
+
+/* ============================================
+   OPTIONS SECTION STYLES
+   ============================================ */
+.options-section {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.option-group {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.option-group:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.option-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 0.5rem 0;
+}
+
+.option-label span {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+/* Toggle switch styles */
+.toggle-switch {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.toggle-switch.active {
+    background: #4cb354;
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.active::after {
+    transform: translateX(24px);
+}
+
+/* Extra colors input */
+.extra-colors-input {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.extra-colors-input label {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.extra-colors-input input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    text-align: center;
+}
+
+/* ============================================
+   CALCULATE BUTTON
+   ============================================ */
+.calculate-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+    margin-top: 1.5rem;
+}
+
+.calculate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 179, 84, 0.3);
+}
+
+.calculate-btn:active {
+    transform: translateY(0);
+}
+
+/* ============================================
+   RESULTS SECTION
+   ============================================ */
+.price-display {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 2px solid #4cb354;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.price-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.price-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #4cb354;
+    line-height: 1;
+}
+
+.price-value.prompt {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* ============================================
+   MESSAGE & ALERT STYLES
+   ============================================ */
+.message {
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.message.show {
+    display: flex;
+}
+
+.message-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #86efac;
+}
+
+.message-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.quote-id-display {
+    font-weight: 600;
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================
+   HEADER ACTION STYLES
+   ============================================ */
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.header-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    color: #1f2937;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.header-btn:hover {
+    border-color: #4cb354;
+    color: #4cb354;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.2);
+}
+
+.header-btn.primary {
+    background: #4cb354;
+    color: white;
+    border-color: #4cb354;
+}
+
+.header-btn.primary:hover {
+    background: #409a47;
+    border-color: #409a47;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+.print-header,
+.print-quote-info,
+.print-footer {
+    display: none;
+}
+
+@media print {
+    .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 2rem;
+        border-bottom: 2px solid #4cb354;
+        margin-bottom: 2rem;
+    }
+    
+    .print-company-info {
+        text-align: left;
+    }
+    
+    .print-contact-info {
+        text-align: right;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    .print-quote-info {
+        display: block;
+        margin-bottom: 2rem;
+    }
+    
+    .print-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .print-info-item {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .print-info-label {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .print-footer {
+        display: block;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+        text-align: center;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+    
+    /* Hide non-print elements */
+    .no-print,
+    .header,
+    .header-actions,
+    .shopworks-guide-container,
+    .message,
+    #quoteModal {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   FAQ SECTION STYLES
+   ============================================ */
+.faq-section {
+    background: #f9fafb;
+    padding: 3rem 0;
+    margin-top: 3rem;
+}
+
+.faq-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.faq-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.faq-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.faq-subtitle {
+    color: #6b7280;
+    font-size: 1.125rem;
+}
+
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.faq-item {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s;
+}
+
+.faq-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.faq-question {
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.faq-question::before {
+    content: "Q:";
+    color: #4cb354;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.faq-answer {
+    color: #6b7280;
+    line-height: 1.6;
+    padding-left: 1.5rem;
+}
+
+.faq-cta {
+    text-align: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+    border-radius: 12px;
+    color: white;
+}
+
+.faq-cta h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.faq-cta p {
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+}
+
+/* ============================================
+   ACTION BUTTONS & BACKING OPTIONS
+   ============================================ */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.backing-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.backing-option {
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.backing-option:hover {
+    border-color: #4cb354;
+    background: #f0fdf4;
+}
+
+.backing-option.selected {
+    border-color: #4cb354;
+    background: #d1fae5;
+}
+
+/* ============================================
+   EXAMPLE LIST STYLES
+   ============================================ */
+.example-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.example-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.example-list li::before {
+    content: "•";
+    color: #4cb354;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* ============================================
+   INTERNAL BADGE STYLE
+   ============================================ */
+.internal-badge {
+    background: #ff6b6b;
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    font-weight: normal;
+}
+
+/* ============================================
+   PRICING TOGGLE STYLES
+   ============================================ */
+.pricing-toggle {
+    transition: transform 0.3s;
+    color: #6b7280;
+}
+
+.pricing-toggle.expanded {
+    transform: rotate(180deg);
+}
+
+/* ============================================
+   ORDER SUMMARY STYLES
+   ============================================ */
+.order-summary {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.order-summary h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #1f2937;
+}
+
+/* ============================================
+   MODAL QUOTE PREVIEW STYLES
+   ============================================ */
+#quoteModal {
+    display: none;
+}
+
+#quoteModal.show {
+    display: block;
+}
+
+#quoteModal.active {
+    display: block;
+}
+
+#quotePreview {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+@media (max-width: 768px) {
+    .faq-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .header-btn {
+        justify-content: center;
+    }
+    
+    .backing-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+/* ============================================
+   CALCULATOR GRID LAYOUT
+   ============================================ */
+.section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.section h2 {
+    margin: 0 0 1.5rem 0;
+    color: #1f2937;
+    font-size: 1.75rem;
+    font-weight: 600;
+}
+
+.calculator-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.input-section {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.input-section label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #1f2937;
+    font-size: 0.875rem;
+}
+
+.input-section input[type="number"] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #1f2937;
+    background: white;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+}
+
+.input-section input[type="number"]:focus {
+    outline: none;
+    border-color: #4cb354;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1024px) {
+    .calculator-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 1.5rem;
+    }
+    
+    .input-section {
+        padding: 1rem;
+    }
+    
+    .pricing-content table {
+        font-size: 0.75rem;
+    }
+    
+    .pricing-content th,
+    .pricing-content td {
+        padding: 0.375rem 0.5rem;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+.no-print {
+    /* Already handled in print media query */
+}
+
+.show {
+    display: block !important;
+}
+
+/* ============================================
+   ANIMATION HELPERS
+   ============================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
