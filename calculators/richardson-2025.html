@@ -13,7 +13,7 @@
     <link href="../shared_components/css/calculator-base.css" rel="stylesheet">
     <link href="../shared_components/css/calculator-modern-enhancements.css" rel="stylesheet">
     <!-- Richardson Factory Direct Styles -->
-    <link href="richardson-2025-styles.css" rel="stylesheet">
+    <link href="richardson-2025-styles.css?v=2026.05.29.4" rel="stylesheet">
 
     <!-- Calculator Utilities -->
     <script src="../shared_components/js/calculator-utilities.js"></script>
@@ -115,9 +115,17 @@
                         </label>
                         <label class="radio-option">
                             <input type="radio" name="embellishment" value="leatherette">
-                            <span>Leatherette Patch</span>
+                            <span>Leatherette Patch (+$5/cap)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="embellishment" value="puff">
+                            <span>3D Puff (+$5/cap)</span>
                         </label>
                     </div>
+                    <label class="setup-toggle">
+                        <input type="checkbox" id="newDesign" checked>
+                        <span>New design &mdash; add one-time setup fee</span>
+                    </label>
                 </div>
             </div>
 
@@ -135,7 +143,7 @@
                     </div>
                     <div class="ltm-notice hidden" id="setupNotice">
                         <i class="fas fa-info-circle" aria-hidden="true"></i>
-                        <span>Patch setup: $50.00 one-time (GRT-50)</span>
+                        <span id="setupLabel">Patch setup: $50.00 one-time (GRT-50)</span>
                         <span class="ltm-per-unit" id="setupPerUnit"></span>
                     </div>
                     <div class="price-row price-total">
@@ -199,6 +207,6 @@
     </main>
 
     <!-- Richardson Factory Direct Calculator -->
-    <script src="richardson-factory-direct.js"></script>
+    <script src="richardson-factory-direct.js?v=2026.05.29.4"></script>
 </body>
 </html>

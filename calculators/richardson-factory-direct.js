@@ -185,6 +185,13 @@ let capMarginDenominator = 0.53;
 let patchUpchargePerCap = 5.00;   // method=PATCH, ItemType='Patch'
 let patchSetupFee = 50.00;        // service code GRT-50
 
+// 3D Puff — FALLBACK ONLY; pulled from API (method=CAP-PUFF, ItemType='3D-Puff').
+// Model: cap embroidery base + flat $5/cap upcharge (has stitches) + $100 digitizing if a new design.
+let puffUpchargePerCap = 5.00;
+
+// New-design one-time setup: $100 digitizing for embroidery + 3D puff (mirrors the EMB DigitizingFee).
+const DIGITIZING_FEE = 100.00;
+
 // Small-order (LTM) fee — tier 1-7 only (qty <= 7), matching the embroidery method (NOT < 24).
 const CAP_LTM_FEE = 50.00;
 
@@ -250,6 +257,21 @@ async function initializeRichardsonData() {
             console.error('[Richardson] Patch upcharge load failed (using fallback):', patchError);
         }
 
+        // Fetch 3D Puff upcharge ($5/cap) — method=CAP-PUFF, ItemType='3D-Puff'
+        try {
+            const puffResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=CAP-PUFF`);
+            if (puffResponse.ok) {
+                const puffData = await puffResponse.json();
+                const puffRecord = (puffData.allEmbroideryCostsR || []).find(c => c.ItemType === '3D-Puff');
+                if (puffRecord && puffRecord.EmbroideryCost != null) {
+                    puffUpchargePerCap = parseFloat(puffRecord.EmbroideryCost);
+                    console.log(`[Richardson] 3D Puff upcharge loaded from API: $${puffUpchargePerCap}`);
+                }
+            }
+        } catch (puffError) {
+            console.error('[Richardson] 3D Puff upcharge load failed (using fallback):', puffError);
+        }
+
         // Fetch patch setup fee (GRT-50, $50 one-time) — mirror the Embroidery Quote Builder
         try {
             const codesResponse = await fetch(`${RICHARDSON_API_BASE}/api/service-codes`);
@@ -309,7 +331,9 @@ class RichardsonPricingLookup {
         this.ltmNotice = document.getElementById('ltmNotice');
         this.ltmPerUnit = document.getElementById('ltmPerUnit');
         this.setupNotice = document.getElementById('setupNotice');
+        this.setupLabel = document.getElementById('setupLabel');
         this.setupPerUnit = document.getElementById('setupPerUnit');
+        this.newDesignCheckbox = document.getElementById('newDesign');
         this.pricePerCap = document.getElementById('pricePerCap');
         this.lineTotal = document.getElementById('lineTotal');
 
@@ -340,6 +364,11 @@ class RichardsonPricingLookup {
         this.embellishmentRadios.forEach(radio => {
             radio.addEventListener('change', () => this.updatePricing());
         });
+
+        // New-design toggle - real-time update
+        if (this.newDesignCheckbox) {
+            this.newDesignCheckbox.addEventListener('change', () => this.updatePricing());
+        }
 
         // Cap browser toggle
         if (this.capBrowserToggle) {
@@ -473,25 +502,31 @@ class RichardsonPricingLookup {
         }
 
         const tier = this.getTier(quantity);
-        const isPatch = this.getSelectedEmbellishment() === 'leatherette';
+        const type = this.getSelectedEmbellishment();
+        const isPatch = type === 'leatherette';
+        const isPuff = type === 'puff';
+        const isNewDesign = this.newDesignCheckbox ? this.newDesignCheckbox.checked : true;
 
-        // Decoration base = cap embroidery cost for the tier — SAME base for embroidery and laser patch.
-        // Mirrors the Embroidery Quote Builder: a laser/leatherette patch = embroidery base + $5/cap, no stitches.
+        // Decoration base = cap embroidery cost for the tier — SAME base for embroidery, 3D puff, and laser patch.
+        // Mirrors the Embroidery Quote Builder.
         const embBase = (embroideryCosts['8000'] && embroideryCosts['8000'][tier]) || 13.00;
 
         // Per-cap decorated unit price: garment marked up + embroidery base, rounded up to the dollar (CeilDollar).
         const markedUpGarment = this.selectedCap.price / capMarginDenominator;
         const decoratedRounded = Math.ceil(markedUpGarment + embBase);
 
-        // Laser/leatherette patch: flat +$5/cap upcharge (no stitches).
-        const patchPerCap = isPatch ? patchUpchargePerCap : 0;
+        // Flat +$5/cap upcharge: laser patch (PATCH) or 3D puff (CAP-PUFF). Plain embroidery has none.
+        const upchargePerCap = isPatch ? patchUpchargePerCap : (isPuff ? puffUpchargePerCap : 0);
 
-        // One-time fees: $50 patch setup (GRT-50) for leatherette + $50 LTM at tier 1-7 (qty <= 7).
-        const setupFee = isPatch ? patchSetupFee : 0;
+        // One-time setup — only when it's a new design:
+        //   leatherette -> $50 patch setup (GRT-50);  embroidery / 3D puff -> $100 digitizing.
+        const setupFee = isNewDesign ? (isPatch ? patchSetupFee : DIGITIZING_FEE) : 0;
+
+        // Small-order (LTM) fee — tier 1-7 only (qty <= 7).
         const hasLTM = quantity <= 7;
         const ltmFee = hasLTM ? CAP_LTM_FEE : 0;
 
-        const finalPrice = decoratedRounded + patchPerCap + (setupFee + ltmFee) / quantity;
+        const finalPrice = decoratedRounded + upchargePerCap + (setupFee + ltmFee) / quantity;
         const total = finalPrice * quantity;
 
         // Update display
@@ -506,10 +541,15 @@ class RichardsonPricingLookup {
             this.ltmNotice.classList.add('hidden');
         }
 
-        // Patch setup fee (GRT-50) — leatherette only
+        // One-time setup notice — shown when a new-design setup applies
         if (this.setupNotice) {
-            if (isPatch) {
+            if (setupFee > 0) {
                 this.setupNotice.classList.remove('hidden');
+                if (this.setupLabel) {
+                    this.setupLabel.textContent = isPatch
+                        ? `Patch setup: $${setupFee.toFixed(2)} one-time (GRT-50)`
+                        : `Digitizing: $${setupFee.toFixed(2)} one-time (new design)`;
+                }
                 if (this.setupPerUnit) {
                     this.setupPerUnit.textContent = `(+$${(setupFee / quantity).toFixed(2)}/cap)`;
                 }
