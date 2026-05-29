@@ -1,3 +1,8 @@
+## v2026.05.29.7 (2026.05.29)
+
+- Art notes: hand note notifications to the backend; fix direction + label
+- Deploy v2026.05.29.7: 2 files (art-hub-steve.html,art-request-detail.html,...)
+
 ## v2026.05.29.6 (2026.05.29)
 
 - Add archived-policy filter + Show-archived toggle to Policies Hub
