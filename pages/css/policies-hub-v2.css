@@ -1300,9 +1300,10 @@ html.is-policies-admin .admin-only { display: inline-flex; }
     .hub-page-header h1 { font-size: 1.35rem; }
     .hub-page-header p { font-size: 0.88rem; }
 
-    /* Category chips wrap nicely; bigger tap targets */
-    .category-chips { gap: 0.4rem; }
-    .category-chip { padding: 0.55rem 0.85rem; font-size: 0.88rem; }
+    /* Category chips become a horizontal swipe strip on phones (no ragged wrapping) */
+    .category-chips { gap: 0.4rem; flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+    .category-chips::-webkit-scrollbar { display: none; }
+    .category-chip { padding: 0.55rem 0.85rem; font-size: 0.88rem; flex: 0 0 auto; }
     .category-chip .count { font-size: 0.7rem; }
 
     /* Cards stack to one column; bigger touch targets */

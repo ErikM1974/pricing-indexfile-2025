@@ -47,6 +47,7 @@
             'Financial': 'fa-dollar-sign',
             'Operations': 'fa-cogs',
             'Customer Service': 'fa-headset',
+            'Marketing': 'fa-bullhorn',
             'HR': 'fa-users',
             'Training': 'fa-graduation-cap'
         };
@@ -183,7 +184,7 @@
             counts.all += n;
         });
 
-        const allCats = ['Financial', 'Operations', 'Customer Service', 'HR', 'Training'];
+        const allCats = ['Financial', 'Operations', 'Customer Service', 'Marketing', 'HR', 'Training'];
         const chips = [
             { key: 'all', label: 'All Policies', icon: 'fa-layer-group' },
             ...allCats.map(c => ({ key: c, label: c, icon: categoryIcon(c) }))
