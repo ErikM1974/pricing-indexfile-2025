@@ -1,3 +1,7 @@
+## v2026.05.29.5 (2026.05.29)
+
+- Deploy v2026.05.29.5: sticker save-path parity — pre-tax total, retry-safe partial-save block, $0-setup-fee fix
+
 ## v2026.05.29.4 (2026.05.29)
 
 - Harden /deploy: guard untracked HTML-referenced assets + fail loudly on dirty checkout
