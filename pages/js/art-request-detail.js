@@ -153,8 +153,9 @@
         try { stickyReturn = sessionStorage.getItem('artHubReturnTo') || ''; } catch (e) {}
         // URL view-param wins — AE/customer links opened from email must never
         // be hijacked by Steve's sessionStorage flag.
-        var viewParam = new URLSearchParams(window.location.search).get('view');
-        if (viewParam === 'ae') {
+        var backUrlParams = new URLSearchParams(window.location.search);
+        var viewParam = backUrlParams.get('view');
+        if (viewParam === 'ae' || backUrlParams.has('ae')) {
             backLink.textContent = '← Back to AE Dashboard';
             backLink.href = '/dashboards/ae-dashboard.html';
             return;
@@ -183,7 +184,7 @@
     // Detect view mode at IIFE scope (must be before header setup)
     var iifeUrlParams = new URLSearchParams(window.location.search);
     var isCustomerView = iifeUrlParams.get('view') === 'customer';
-    var isAeView = iifeUrlParams.get('view') === 'ae';
+    var isAeView = iifeUrlParams.get('view') === 'ae' || iifeUrlParams.has('ae'); // '?ae' = =-free email-link flag (see send-art-note-email.js); legacy '?view=ae' still works for in-app links
     var selectedMockupSlot = null;
 
     // Customer view — set up header before data loads

@@ -246,7 +246,7 @@
     }
 
     var urlParams = new URLSearchParams(window.location.search);
-    isAeView = urlParams.get('view') === 'ae';
+    isAeView = urlParams.get('view') === 'ae' || urlParams.has('ae'); // '?ae' = =-free email-link flag (see send-art-note-email.js); legacy '?view=ae' still works for in-app links
     var isCustomerView = urlParams.get('view') === 'customer';
 
     // ── Smart Back Navigation (runs before view-mode branches) ──────────
