@@ -11,7 +11,7 @@
 
     <!-- Shared chat/page CSS (sticker is the canonical pattern) + emblem overrides -->
     <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=20260516">
-    <link rel="stylesheet" href="/shared_components/css/emblem-pricing-page.css?v=2026.05.16.7">
+    <link rel="stylesheet" href="/shared_components/css/emblem-pricing-page.css?v=2026.05.29.3">
 </head>
 <body>
     <!-- ========== Header ========== -->
@@ -44,11 +44,11 @@
                 <div class="page-hero-hint" id="autoOpenHint">Chat opens automatically…</div>
             </div>
             <img class="page-hero-art emblem-hero-art"
+                 id="emblemHeroArt"
                  src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Emblem%20Collage.png?ver=1"
                  alt="Collage of embroidered emblem patches produced by Northwest Custom Apparel — various sizes, shapes, and backings"
                  loading="lazy"
-                 decoding="async"
-                 onerror="this.style.display='none'">
+                 decoding="async">
         </section>
 
         <!-- ========== Quick-facts strip ========== -->
@@ -189,9 +189,9 @@
     </button>
 
     <!-- ========== AI Quote Chat Panel ========== -->
-    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
+    <aside class="ai-chat-panel" id="aiChatPanel" role="dialog" aria-modal="true" aria-labelledby="aiChatTitle" aria-hidden="true">
         <header class="ai-chat-head">
-            <div class="ai-chat-title">
+            <div class="ai-chat-title" id="aiChatTitle">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
                 <span>AI Emblem Patch Assistant</span>
             </div>
@@ -205,7 +205,10 @@
             </div>
         </header>
         <div class="ai-chat-context-pill" id="aiChatContextPill"></div>
-        <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
+        <!-- Dedicated polite status region — announced once per completed turn
+             (not per streamed token) so screen readers aren't flooded. -->
+        <div class="sr-only" id="aiChatStatus" role="status" aria-live="polite"></div>
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
                 <i class="fas fa-envelope-open-text"></i> Open in Outlook
@@ -217,6 +220,7 @@
                 <i class="fas fa-link"></i> Save &amp; share link
             </button>
         </div>
+        <p class="ai-chat-tip" id="aiChatTip">Tip: paste the whole spec at once (size · qty · backing · colors · art status · customer) to skip the back-and-forth.</p>
         <form class="ai-chat-input" id="aiChatForm">
             <textarea id="aiChatTextarea" rows="3" placeholder="Type your reply… (e.g. '200 patches, 3 inch square, sewn-on, 5 colors')" autocomplete="off"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
@@ -235,6 +239,6 @@
     </div>
 
     <!-- ========== Scripts ========== -->
-    <script src="/shared_components/js/emblem-pricing-page.js?v=2026.05.16.5"></script>
+    <script src="/shared_components/js/emblem-pricing-page.js?v=2026.05.29.3"></script>
 </body>
 </html>

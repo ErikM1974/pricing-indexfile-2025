@@ -24,7 +24,9 @@ class EmblemPricingService {
     }
 
     // Inline base-price grid (keyed by size string, then qty-index 0-9).
-    // Source: calculators/embroidered-emblem/emblem-calculator.js:20-37 (verified 2026-01).
+    // Fallback only — the live source is Caspio Emblem_Pricing via
+    // /api/emblem-pricing. Keep in sync with that table and the backend
+    // INLINE_GRID in caspio-pricing-proxy (contract-emblem-ai pricing).
     static INLINE_GRID = {
         '1.00': [2.20, 1.91, 1.41, 1.01, 0.86, 0.74, 0.65, 0.59, 0.54, 0.49],
         '1.50': [2.77, 2.41, 1.78, 1.27, 1.09, 0.93, 0.82, 0.74, 0.68, 0.61],
@@ -83,13 +85,16 @@ class EmblemPricingService {
 
     /**
      * Resolve size tier key from width/height inches.
-     * Matches emblem-calculator.js: avg = (w+h)/2, find smallest tier >= avg.
+     * avg = (w+h)/2, find the smallest tier >= avg (round UP to next size).
      */
     sizeKeyFor(width, height) {
         const avg = (Number(width) + Number(height)) / 2;
         const keys = Object.keys(EmblemPricingService.INLINE_GRID).map(parseFloat).sort((a, b) => a - b);
         const found = keys.find(k => avg <= k);
-        return (found ?? keys[keys.length - 1]).toFixed(2);
+        // No silent clamp: an average above our largest tier (12") is off-grid —
+        // return null so calculateUnit fails closed (matches the AI bot's offGrid
+        // escalation) instead of quoting an oversize patch at the 12" rate.
+        return found != null ? found.toFixed(2) : null;
     }
 
     qtyIndexFor(qty) {
@@ -97,7 +102,7 @@ class EmblemPricingService {
         for (let i = t.length - 1; i >= 0; i--) {
             if (qty >= t[i]) return i;
         }
-        return 0; // below 25 → use the 25-qty price (caller should warn)
+        return -1; // below the 25 minimum → fail closed (caller must handle null)
     }
 
     /**
@@ -107,6 +112,7 @@ class EmblemPricingService {
         if (qty <= 0) return null;
         const sizeKey = this.sizeKeyFor(width, height);
         const qtyIdx = this.qtyIndexFor(qty);
+        if (sizeKey == null || qtyIdx < 0) return null; // off-grid size / below 25 minimum
         const row = grid[sizeKey];
         if (!row || row[qtyIdx] == null) return null;
         const basePrice = Number(row[qtyIdx]);

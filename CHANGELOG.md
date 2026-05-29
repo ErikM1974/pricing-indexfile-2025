@@ -1,3 +1,9 @@
+## v2026.05.29.2 (2026.05.29)
+
+- Fix DTF Quote Builder -> ShopWorks push: real customer, fees, ship-to, typed notes
+- Fix sticker pricing page: once-per-session AI chat, a11y, table corrections
+- Deploy v2026.05.29.2: 31 files (ACTIVE_FILES.md,dtg-contract.css,dtg-contract.js,...)
+
 ## v2026.05.29.1 (2026.05.29)
 
 - Deploy v2026.05.29.1: 6 files (embroidery-pricing-all.css, index.html...)

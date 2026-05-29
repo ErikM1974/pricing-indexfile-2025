@@ -1,392 +1,709 @@
 /* jds-mockup-creator.css — Layout + styling for the JDS Tumbler Mockup Creator.
  *
  * Two-column desktop layout (controls left, canvas right) that stacks vertically
- * on mobile. Brand-aligned with the rest of the AE dashboard (maroon accent,
- * Inter/system font, soft cards with subtle shadows).
+ * on mobile. Adopts the NWCA 2026 design-token system (mirrored from
+ * shared_components/css/art-hub.css) so spacing, color, radius, elevation, and
+ * motion stay consistent with the AE dashboard family. Brand accent is the
+ * NWCA maroon; the download action keeps a positive green.
+ *
+ * No hardcoded one-off hex values in component rules — everything resolves to a
+ * token below. Update a token, not a rule, to re-theme.
  */
+
+/* ── 2026 design tokens (scoped to this page) ───────────────────────── */
+:root {
+    /* Surfaces */
+    --surface-page:     #f7f8fa;
+    --surface-card:     #ffffff;
+    --surface-inset:    #f3f4f6;
+    --surface-hover:    #f9fafb;
+
+    /* Neutral ramp */
+    --gray-50:  #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+
+    /* Brand — NWCA maroon */
+    --brand:        #7f1d1d;
+    --brand-strong: #991b1b;
+    --brand-tint:   #fef2f2;
+    --brand-ring:   rgba(127, 29, 29, 0.22);
+
+    /* Positive action (download) */
+    --success:       #16a34a;
+    --success-hover: #15803d;
+
+    /* Semantic state */
+    --warning:      #d97706;
+    --warning-bg:   #fffbeb;
+    --warning-line: #f59e0b;
+    --warning-ink:  #78350f;
+    --warning-ink-strong: #92400e;
+    --danger:       #b91c1c;
+    --danger-bg:    #fef2f2;
+    --danger-line:  #fecaca;
+
+    /* Elevation */
+    --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
+    --shadow-md: 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06);
+    --shadow-lg: 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08);
+
+    /* Spacing (4-base) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* Radius */
+    --radius-sm:   4px;
+    --radius-md:   8px;
+    --radius-lg:   12px;
+    --radius-pill: 999px;
+
+    /* Motion */
+    --ease-out: cubic-bezier(.2,.8,.2,1);
+    --dur-fast: 120ms;
+    --dur-base: 200ms;
+}
 
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f9fafb;
-    color: #111827;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    background: var(--surface-page);
+    color: var(--gray-900);
     line-height: 1.5;
+}
+
+/* Utility */
+.jmc-hidden { display: none !important; }
+
+/* Shared focus ring — keyboard users get a clear, branded outline */
+:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
 }
 
 /* ── Header ─────────────────────────────────────────────────────────── */
 .jmc-header {
-    background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
     color: #fff;
-    padding: 16px 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: var(--space-4) var(--space-6);
+    box-shadow: var(--shadow-md);
 }
 .jmc-header-inner {
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: var(--space-5);
 }
 .jmc-logo {
     height: 48px;
     width: auto;
     background: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
 }
-.jmc-header-text { flex: 1; }
+.jmc-header-text { flex: 1; min-width: 0; }
 .jmc-header-text h1 {
-    margin: 0 0 4px;
+    margin: 0 0 var(--space-1);
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.01em;
 }
 .jmc-header-text p {
     margin: 0;
     font-size: 13px;
-    opacity: 0.85;
+    opacity: 0.88;
 }
 .jmc-back {
     color: #fff;
     text-decoration: none;
     font-size: 14px;
-    padding: 8px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 6px;
-    transition: background 0.15s;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: var(--radius-md);
+    transition: background var(--dur-fast) var(--ease-out);
 }
-.jmc-back:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
+.jmc-back:hover { background: rgba(255, 255, 255, 0.14); }
 
 /* ── Main grid layout ───────────────────────────────────────────────── */
 .jmc-main {
     max-width: 1400px;
-    margin: 24px auto;
-    padding: 0 24px;
+    margin: var(--space-6) auto;
+    padding: 0 var(--space-6);
     display: grid;
-    grid-template-columns: minmax(320px, 380px) 1fr;
-    gap: 24px;
+    grid-template-columns: minmax(340px, 400px) 1fr;
+    gap: var(--space-6);
     align-items: start;
 }
 @media (max-width: 900px) {
-    .jmc-main {
-        grid-template-columns: 1fr;
-    }
+    .jmc-main { grid-template-columns: 1fr; }
+    /* Canvas first on mobile so the result is what you see when you land */
+    .jmc-preview { order: -1; }
 }
 
 /* ── Controls column ────────────────────────────────────────────────── */
 .jmc-controls {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 .jmc-step {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 18px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
 }
 .jmc-step-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 .jmc-step-num {
     flex: 0 0 28px;
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #7f1d1d;
+    background: var(--brand);
     color: #fff;
     font-weight: 700;
     font-size: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background var(--dur-base) var(--ease-out);
+}
+/* A step the user has satisfied flips to a green check via JS */
+.jmc-step-num--done {
+    background: var(--success);
+    font-size: 16px;
+}
+.jmc-step-num--optional {
+    background: var(--gray-400);
+    font-size: 18px;
+    line-height: 1;
 }
 .jmc-step-header h2 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
-    color: #111827;
+    color: var(--gray-900);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+.jmc-optional-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    background: var(--surface-inset);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-pill);
 }
 
 /* ── Color swatch grid ──────────────────────────────────────────────── */
 .jmc-swatch-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
+    gap: var(--space-2);
 }
 .jmc-swatch-loading {
     grid-column: 1 / -1;
     text-align: center;
-    color: #6b7280;
-    padding: 16px;
+    color: var(--gray-500);
+    padding: var(--space-4);
     font-size: 13px;
 }
 .jmc-swatch {
     aspect-ratio: 1 / 1;
-    border-radius: 8px;
-    border: 2px solid #e5e7eb;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-200);
     cursor: pointer;
     position: relative;
-    transition: transform 0.1s, border-color 0.1s, box-shadow 0.1s;
+    padding: 0;
+    transition: transform var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out),
+                box-shadow var(--dur-fast) var(--ease-out);
     overflow: hidden;
-    background: #f3f4f6;
+    background: var(--gray-100);
 }
 .jmc-swatch:hover {
-    transform: scale(1.05);
-    border-color: #7f1d1d;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.04);
+    border-color: var(--brand);
+    box-shadow: var(--shadow-md);
 }
 .jmc-swatch--active {
-    border-color: #7f1d1d;
+    border-color: var(--brand);
     border-width: 3px;
-    box-shadow: 0 0 0 2px rgba(127, 29, 29, 0.2);
+    box-shadow: 0 0 0 3px var(--brand-ring);
 }
-.jmc-swatch-fill {
+.jmc-swatch--active::after {
+    content: '✓';
     position: absolute;
-    inset: 0;
+    top: 2px;
+    right: 4px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
+.jmc-swatch-fill { position: absolute; inset: 0; }
 .jmc-swatch-label {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0, 0, 0, 0.62);
     color: #fff;
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 500;
     text-align: center;
-    padding: 2px 0;
+    padding: 3px 2px;
     line-height: 1.2;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 .jmc-selected-label {
-    margin-top: 12px;
-    padding: 10px 12px;
-    background: #f3f4f6;
-    border-radius: 6px;
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background: var(--surface-inset);
+    border-radius: var(--radius-md);
     font-size: 13px;
     line-height: 1.4;
 }
 .jmc-selected-sku {
     font-weight: 600;
-    color: #7f1d1d;
-    margin-right: 6px;
+    color: var(--brand);
+    margin-right: var(--space-2);
 }
-.jmc-selected-name {
-    color: #374151;
-}
+.jmc-selected-name { color: var(--gray-700); }
 
 /* ── Drop zone (logo upload) ────────────────────────────────────────── */
 .jmc-drop-zone {
-    border: 2px dashed #d1d5db;
-    border-radius: 10px;
-    padding: 24px 16px;
+    border: 2px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6) var(--space-4);
     text-align: center;
     cursor: pointer;
-    color: #6b7280;
-    transition: border-color 0.15s, background 0.15s, color 0.15s;
+    color: var(--gray-500);
+    transition: border-color var(--dur-fast) var(--ease-out),
+                background var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
 }
 .jmc-drop-zone:hover,
 .jmc-drop-zone--active {
-    border-color: #7f1d1d;
-    background: #fef2f2;
-    color: #7f1d1d;
+    border-color: var(--brand);
+    background: var(--brand-tint);
+    color: var(--brand);
 }
 .jmc-drop-icon {
     width: 44px;
     height: 38px;
-    margin: 0 auto 8px;
+    margin: 0 auto var(--space-2);
     display: block;
-    color: #9ca3af;
+    color: var(--gray-400);
 }
 .jmc-drop-cta {
     font-size: 15px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
+    color: var(--gray-700);
+    margin-bottom: var(--space-1);
 }
-.jmc-drop-sub {
-    font-size: 12px;
-    color: #6b7280;
-}
+.jmc-drop-sub { font-size: 12px; color: var(--gray-500); }
+
 .jmc-logo-info {
-    margin-top: 12px;
-    padding: 8px 12px;
-    background: #f3f4f6;
-    border-radius: 6px;
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-inset);
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--space-3);
     font-size: 13px;
+}
+.jmc-logo-thumb {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background-color: #fff;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 1px solid var(--gray-200);
 }
 .jmc-logo-name {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #374151;
+    color: var(--gray-700);
+    font-weight: 500;
 }
 .jmc-logo-remove {
     flex: 0 0 auto;
     background: transparent;
     border: none;
-    color: #9ca3af;
-    font-size: 18px;
+    color: var(--gray-400);
+    font-size: 20px;
+    line-height: 1;
     cursor: pointer;
-    padding: 0 6px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-sm);
 }
-.jmc-logo-remove:hover { color: #dc2626; }
+.jmc-logo-remove:hover { color: var(--danger); }
 .jmc-logo-tip {
-    margin-top: 10px;
-    padding: 8px 10px;
-    background: #fffbeb;
-    border-left: 3px solid #f59e0b;
-    border-radius: 0 6px 6px 0;
+    margin-top: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    background: var(--warning-bg);
+    border-left: 3px solid var(--warning-line);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
     font-size: 12px;
-    color: #78350f;
-    line-height: 1.4;
+    color: var(--warning-ink);
+    line-height: 1.45;
 }
 
-/* Complexity warning panel — amber/yellow accent (not red error), prominent
-   but not alarming. Shown when detectLogoIssues finds the uploaded logo
-   will likely render poorly. */
+/* ── Complexity warning panel ───────────────────────────────────────── */
 .jmc-warning {
-    background: #fffbeb;
+    background: var(--warning-bg);
     border: 1px solid #fcd34d;
-    border-left: 4px solid #f59e0b;
-    border-radius: 10px;
-    padding: 16px 18px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    border-left: 4px solid var(--warning-line);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    box-shadow: var(--shadow-sm);
 }
 .jmc-warning-title {
     font-size: 15px;
     font-weight: 700;
-    color: #92400e;
-    margin-bottom: 8px;
+    color: var(--warning-ink-strong);
+    margin-bottom: var(--space-2);
     line-height: 1.3;
 }
 .jmc-warning-body {
     font-size: 13px;
-    color: #78350f;
+    color: var(--warning-ink);
     line-height: 1.5;
-    margin-bottom: 14px;
+    margin-bottom: var(--space-4);
 }
-.jmc-warning-body strong {
-    color: #92400e;
-}
+.jmc-warning-body strong { color: var(--warning-ink-strong); }
 .jmc-warning-actions {
     display: flex;
-    gap: 8px;
+    gap: var(--space-2);
     flex-wrap: wrap;
 }
 .jmc-warning-btn {
     flex: 1 1 auto;
     min-width: 120px;
-    padding: 9px 14px;
-    border-radius: 6px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     border: 1px solid transparent;
-    transition: background 0.15s, border-color 0.15s;
+    transition: background var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
 }
 .jmc-warning-btn--primary {
-    background: #92400e;
+    background: var(--warning-ink-strong);
     color: #fff;
-    border-color: #92400e;
+    border-color: var(--warning-ink-strong);
 }
 .jmc-warning-btn--primary:hover {
-    background: #78350f;
-    border-color: #78350f;
+    background: var(--warning-ink);
+    border-color: var(--warning-ink);
 }
 .jmc-warning-btn--secondary {
     background: #fff;
-    color: #78350f;
+    color: var(--warning-ink);
     border-color: #fcd34d;
 }
 .jmc-warning-btn--secondary:hover {
     background: #fef3c7;
-    border-color: #f59e0b;
+    border-color: var(--warning-line);
 }
 
-/* ── Size slider ────────────────────────────────────────────────────── */
+/* ── Size & position controls ───────────────────────────────────────── */
+.jmc-size-row,
+.jmc-position-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+.jmc-size-row { margin-bottom: var(--space-2); }
+.jmc-position-row { margin: var(--space-3) 0 var(--space-2); }
 .jmc-size-label {
-    display: block;
     font-size: 13px;
-    color: #374151;
-    margin-bottom: 8px;
+    color: var(--gray-700);
     font-weight: 500;
 }
+.jmc-size-label span { font-weight: 700; color: var(--brand); }
+
+/* Range slider — themed across engines */
 .jmc-size-slider {
     width: 100%;
-    margin: 4px 0 8px;
+    margin: var(--space-1) 0 var(--space-2);
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-200);
+    cursor: pointer;
 }
-.jmc-size-hint {
+.jmc-size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 3px solid #fff;
+    box-shadow: var(--shadow-md);
+    cursor: grab;
+}
+.jmc-size-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--brand);
+    border: 3px solid #fff;
+    box-shadow: var(--shadow-md);
+    cursor: grab;
+}
+.jmc-size-hint { font-size: 12px; color: var(--gray-500); line-height: 1.4; }
+
+/* Small secondary button (auto-fit, center) */
+.jmc-mini-btn {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    color: var(--gray-700);
     font-size: 12px;
-    color: #6b7280;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
+}
+.jmc-mini-btn:hover { background: var(--surface-inset); border-color: var(--gray-400); }
+
+/* Checkbox label */
+.jmc-check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 13px;
+    color: var(--gray-700);
+    cursor: pointer;
+    user-select: none;
+}
+.jmc-check--block { display: flex; margin-bottom: var(--space-3); line-height: 1.4; }
+.jmc-check input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand);
+    cursor: pointer;
+    flex: 0 0 auto;
 }
 
-/* ── Download button ────────────────────────────────────────────────── */
+/* ── Download & share ───────────────────────────────────────────────── */
+.jmc-action-row {
+    display: flex;
+    gap: var(--space-2);
+}
 .jmc-download-btn {
-    width: 100%;
-    padding: 12px 16px;
-    background: #16a34a;
+    flex: 1 1 auto;
+    padding: var(--space-3) var(--space-4);
+    background: var(--success);
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--radius-md);
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: background 0.15s;
+    gap: var(--space-2);
+    transition: background var(--dur-fast) var(--ease-out);
 }
-.jmc-download-btn:hover {
-    background: #15803d;
+.jmc-download-btn:hover { background: var(--success-hover); }
+.jmc-copy-btn {
+    flex: 0 0 auto;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-card);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: background var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
 }
-.jmc-download-icon {
-    font-size: 16px;
-}
+.jmc-copy-btn:hover { background: var(--surface-inset); border-color: var(--gray-400); }
+.jmc-btn-icon { font-size: 16px; line-height: 1; }
 .jmc-download-hint {
-    margin-top: 8px;
+    margin-top: var(--space-2);
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
     text-align: center;
+    line-height: 1.4;
+}
+
+/* ── Compare colors ─────────────────────────────────────────────────── */
+.jmc-compare-intro {
+    margin: 0 0 var(--space-3);
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.45;
+}
+.jmc-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+.jmc-compare-swatch {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-200);
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    background: var(--gray-100);
+    transition: transform var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
+}
+.jmc-compare-swatch:hover { transform: scale(1.04); border-color: var(--gray-400); }
+.jmc-compare-swatch--selected {
+    border-color: var(--brand);
+    border-width: 3px;
+    box-shadow: 0 0 0 2px var(--brand-ring);
+}
+.jmc-compare-swatch--selected::after {
+    content: '✓';
+    position: absolute;
+    top: 1px;
+    right: 3px;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+}
+.jmc-compare-btn {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transition: background var(--dur-fast) var(--ease-out);
+}
+.jmc-compare-btn:hover:not(:disabled) { background: var(--brand-strong); }
+.jmc-compare-btn:disabled {
+    background: var(--gray-300);
+    color: var(--gray-500);
+    cursor: not-allowed;
 }
 
 /* ── Preview column ─────────────────────────────────────────────────── */
 .jmc-preview {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
+    position: sticky;
+    top: var(--space-6);
+}
+.jmc-preview-toolbar {
+    display: flex;
+    justify-content: flex-end;
+}
+.jmc-segmented {
+    display: inline-flex;
+    background: var(--surface-inset);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    gap: 3px;
+}
+.jmc-seg-btn {
+    border: none;
+    background: transparent;
+    color: var(--gray-600);
+    font-size: 13px;
+    font-weight: 600;
+    padding: var(--space-1) var(--space-4);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out);
+}
+.jmc-seg-btn--active {
+    background: var(--surface-card);
+    color: var(--brand);
+    box-shadow: var(--shadow-sm);
 }
 .jmc-preview-frame {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    box-shadow: var(--shadow-sm);
     position: relative;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    /* Subtle studio backdrop so the tumbler reads as a product shot */
+    background-image: radial-gradient(circle at 50% 38%, #ffffff 0%, var(--surface-page) 78%);
 }
 .jmc-preview-empty {
-    color: #9ca3af;
+    color: var(--gray-400);
     text-align: center;
     font-size: 15px;
+}
+.jmc-empty-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto var(--space-4);
+    display: block;
+    color: var(--gray-300);
 }
 .jmc-canvas {
     max-width: 100%;
@@ -394,67 +711,80 @@ body {
     display: block;
     cursor: grab;
     user-select: none;
+    touch-action: none; /* let pointer-drag reposition the logo instead of scrolling */
+    border-radius: var(--radius-sm);
 }
-.jmc-canvas:active {
-    cursor: grabbing;
-}
+.jmc-canvas:active { cursor: grabbing; }
+.jmc-canvas--locked { cursor: default; } /* frame-preview mode: not draggable */
 .jmc-preview-loading {
     text-align: center;
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 14px;
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.7);
 }
 .jmc-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid #e5e7eb;
-    border-top-color: #7f1d1d;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--brand);
     border-radius: 50%;
     animation: jmc-spin 0.8s linear infinite;
-    margin: 0 auto 12px;
+    margin: 0 auto var(--space-3);
 }
-@keyframes jmc-spin {
-    to { transform: rotate(360deg); }
-}
+@keyframes jmc-spin { to { transform: rotate(360deg); } }
 .jmc-preview-error {
-    color: #b91c1c;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 6px;
-    padding: 12px 16px;
+    color: var(--danger);
+    background: var(--danger-bg);
+    border: 1px solid var(--danger-line);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
     font-size: 13px;
     line-height: 1.5;
 }
 .jmc-preview-caption {
     text-align: center;
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 13px;
-    padding: 0 8px;
+    padding: 0 var(--space-2);
 }
 
 /* ── Toast ──────────────────────────────────────────────────────────── */
 .jmc-toast {
     position: fixed;
-    bottom: 24px;
+    bottom: var(--space-6);
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: #111827;
+    background: var(--gray-900);
     color: #fff;
-    padding: 10px 18px;
-    border-radius: 8px;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
     font-size: 14px;
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.25s, opacity 0.25s;
+    transition: transform var(--dur-base) var(--ease-out),
+                opacity var(--dur-base) var(--ease-out);
     z-index: 1000;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow-lg);
 }
 .jmc-toast--show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
-.jmc-toast--error {
-    background: #b91c1c;
-}
-.jmc-toast--success {
-    background: #16a34a;
+.jmc-toast--error { background: var(--danger); }
+.jmc-toast--success { background: var(--success); }
+
+/* ── Reduced motion ─────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    .jmc-swatch:hover { transform: none; }
 }

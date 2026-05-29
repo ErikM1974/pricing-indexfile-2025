@@ -21,7 +21,11 @@
 (function () {
     'use strict';
 
-    var API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // Rule #6: read the proxy URL from the shared config (config/app.config.js,
+    // loaded just before this script). Literal fallback kept only so the page
+    // still works if that config script ever fails to load.
+    var API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
     /* ---------------------- Constants ---------------------- */
 
@@ -1004,8 +1008,8 @@
     }
 
     function escapeHtml(s) {
-        return String(s).replace(/[<>&]/g, function (m) {
-            return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' })[m];
+        return String(s).replace(/[<>&"]/g, function (m) {
+            return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[m];
         });
     }
 
@@ -1119,6 +1123,13 @@
         try {
             await ensureQuoteID();
 
+            // Abort the request if the stream stalls (no data for AI_IDLE_MS).
+            // Without this, a hung backend leaves isStreaming=true forever and
+            // permanently disables the send button.
+            var aiController = new AbortController();
+            var AI_IDLE_MS = 45000;
+            var aiIdleTimer = setTimeout(function () { aiController.abort(); }, AI_IDLE_MS);
+
             var response = await fetch(AI_ENDPOINT, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1126,6 +1137,7 @@
                     messages: aiState.messages,
                     calcContext: buildCalcContext(),
                 }),
+                signal: aiController.signal,
             });
 
             if (!response.ok) {
@@ -1143,6 +1155,10 @@
             while (true) {
                 var chunk = await reader.read();
                 if (chunk.done) break;
+                // Each received chunk extends the idle deadline — only a truly
+                // stalled stream trips the abort.
+                clearTimeout(aiIdleTimer);
+                aiIdleTimer = setTimeout(function () { aiController.abort(); }, AI_IDLE_MS);
                 sseBuffer += decoder.decode(chunk.value, { stream: true });
 
                 var events = sseBuffer.split('\n\n');
@@ -1180,12 +1196,12 @@
         } catch (err) {
             console.error('[ai-chat] error:', err);
             removeTypingIndicator(typingEl);
-            appendChatBubble(
-                'assistant',
-                "Hmm, I couldn't reach the AI right now. Please try again in a moment, or copy the quote details from the calculator manually.",
-                { error: true }
-            );
+            var errMsg = (err && err.name === 'AbortError')
+                ? "The AI took too long to respond. Please try again, or copy the quote details from the calculator manually."
+                : "Hmm, I couldn't reach the AI right now. Please try again in a moment, or copy the quote details from the calculator manually.";
+            appendChatBubble('assistant', errMsg, { error: true });
         } finally {
+            clearTimeout(aiIdleTimer);
             aiState.isStreaming = false;
             if (sendBtn) sendBtn.disabled = false;
             var ta = document.getElementById('aiChatTextarea');
@@ -1197,6 +1213,13 @@
         var panel = document.getElementById('aiChatPanel');
         if (!panel) return;
 
+        // Guard: don't let the AI draft a quote off missing pricing — without
+        // this, buildCalcContext() returns null and the assistant drafts a
+        // $0 / blank quote. Mirrors the embroidery page's pre-open guard.
+        if (!pricing) {
+            showToast('Pricing is still loading — try again in a moment.');
+            return;
+        }
         // Guard: need at least one location selected before AI can draft
         if (!state.locs.length) {
             showToast('Pick at least one print location first');
@@ -1211,7 +1234,7 @@
         if (aiState.messages.length === 0) {
             aiState.messages.push({
                 role: 'user',
-                content: '(Open the chat — greet Ruth and ask for the customer details.)',
+                content: '(Open the chat — greet Ruthie and ask for the customer details.)',
             });
             sendChatMessage();
         }

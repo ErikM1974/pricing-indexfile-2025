@@ -12,8 +12,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
-    <!-- Page stylesheet — editorial design, replaces dependence on calculator-base.css -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=20260515-note-cleanup">
+    <!-- Shared contract chrome (tokens, top bar, hero, calc shell, result panel,
+         buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
+    <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.05.29.2">
+    <!-- Page-specific styles (segmented item-type picker, table tabs, divider) -->
+    <link rel="stylesheet" href="embroidery-contract.css?v=2026.05.29.3">
 </head>
 <body>
 
@@ -86,23 +89,23 @@
 
                     <!-- Item Type — segmented picker -->
                     <div class="field">
-                        <label>Item type</label>
-                        <div class="seg" role="tablist" id="segItemType">
-                            <button type="button" data-product="garment" class="active">
+                        <label id="segItemTypeLabel">Item type</label>
+                        <div class="seg" role="tablist" id="segItemType" aria-labelledby="segItemTypeLabel">
+                            <button type="button" data-product="garment" class="active" role="tab" aria-selected="true">
                                 <span class="label">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l3-2 3 1 3-1 3 2 3 4-3 2-1-1v12H7V9L6 10 3 8z"/></svg>
                                     Garment
                                 </span>
                                 <span class="code">CTR-Garmt</span>
                             </button>
-                            <button type="button" data-product="cap">
+                            <button type="button" data-product="cap" role="tab" aria-selected="false">
                                 <span class="label">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/><path d="M12 7V4"/></svg>
                                     Cap
                                 </span>
                                 <span class="code">CTR-Cap</span>
                             </button>
-                            <button type="button" data-product="fullback">
+                            <button type="button" data-product="fullback" role="tab" aria-selected="false">
                                 <span class="label">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
                                     Full Back
@@ -359,7 +362,7 @@
             <!-- Bubbles appended by JS -->
         </div>
         <form class="ai-chat-input" id="aiChatForm">
-            <textarea id="aiChatTextarea" rows="1" placeholder="Type your reply…" autocomplete="off"></textarea>
+            <textarea id="aiChatTextarea" rows="1" placeholder="Type your reply…" autocomplete="off" aria-label="Message to the AI quote assistant"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
             </button>
@@ -372,6 +375,8 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="embroidery-contract.js?v=20260515-note-cleanup"></script>
+    <!-- Shared config — exposes APP_CONFIG.API.BASE_URL (Rule #6). Must load first. -->
+    <script src="/config/app.config.js"></script>
+    <script src="embroidery-contract.js?v=2026.05.29.3"></script>
 </body>
 </html>

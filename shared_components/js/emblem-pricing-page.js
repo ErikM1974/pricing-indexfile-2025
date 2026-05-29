@@ -21,6 +21,11 @@
     // -----------------------------------------------------------------
     // Config
     // -----------------------------------------------------------------
+    // NOTE: these standalone calculator pages don't load a shared script that
+    // defines window.APP_CONFIG.API.BASE_URL, so we use the documented hardcoded
+    // fallback (same pattern as sticker-pricing-page.js). True Rule #6 compliance
+    // is a codebase-wide change — define a shared APP_CONFIG and load it on every
+    // calculator page — tracked separately.
     const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     const AI_ENDPOINT = API_BASE_URL + '/api/contract-emblem-ai/chat';
@@ -32,15 +37,18 @@
     let pricingData = null;         // { grid, rules, qtyTiers, source }
     const aiState = {
         opened: false,
+        greeted: false,             // static greeting shown? (gates the no-API greeting)
         messages: [],               // [{role, content}, ...]
         isStreaming: false,
         currentPriceQuote: null,    // last parsed PRICE_QUOTE block
         currentCustomerFinal: null, // last parsed CUSTOMER_FINAL block
         currentEmailDraft: null,    // {to, subject, body}
-        lastLookup: null,           // last single-match from lookup_customer
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,         // populated after save → enables copy-link
+        sessionSaved: false,        // quote_sessions row written? (retry-safe)
+        savedItemLines: [],         // LineNumbers already persisted (retry-safe)
+        lastOpener: null,           // element to return focus to on close (a11y)
     };
 
     // -----------------------------------------------------------------
@@ -50,12 +58,23 @@
 
     async function init() {
         wireChatPanel();
+        wireHeroArt();
         showFloatingButton();
         await loadAndRenderPricing();
-        // Auto-open chat 600ms after grid renders — same UX rhythm as sticker.
+        // Auto-open the panel shortly after load. The greeting is rendered
+        // CLIENT-SIDE (no Claude call) — the first real rep message is what
+        // hits the backend. Pricing-grid load state does NOT gate this: the
+        // chat prices server-side, so it opens even if the grid fetch failed.
         setTimeout(() => {
             if (!aiState.opened) openChatPanel();
         }, 600);
+    }
+
+    function wireHeroArt() {
+        const heroArt = document.getElementById('emblemHeroArt');
+        if (heroArt) {
+            heroArt.addEventListener('error', function () { this.style.display = 'none'; });
+        }
     }
 
     // -----------------------------------------------------------------
@@ -206,32 +225,63 @@
     }
 
     function openChatPanel() {
-        if (!pricingData) return; // silent no-op while pricing still loading
         const panel = document.getElementById('aiChatPanel');
         const backdrop = document.getElementById('aiChatBackdrop');
         if (!panel) return;
+
+        // Remember what to return focus to on close (skip body / auto-open).
+        const active = document.activeElement;
+        aiState.lastOpener = (active && active !== document.body && typeof active.focus === 'function')
+            ? active
+            : document.getElementById('aiOpenBtn');
+
         panel.classList.add('open');
         panel.setAttribute('aria-hidden', 'false');
         backdrop.classList.add('open');
         backdrop.setAttribute('aria-hidden', 'false');
+        setBackgroundInert(true);
         aiState.opened = true;
         hideFloatingButton();
         const hint = document.getElementById('autoOpenHint');
         if (hint) hint.style.opacity = '0';
 
-        if (aiState.messages.length === 0) {
-            aiState.messages.push({
-                role: 'user',
-                content: "(Open the chat — greet the rep briefly and ask what size and quantity of emblem patches they're quoting.)",
-            });
-            updateContextPill('Drafting quote… ready when you are.');
-            sendChatMessage();
+        // First open → static greeting, NO backend call. The first real rep
+        // message is what spends a Claude call (and a PATCH sequence number).
+        if (!aiState.greeted) {
+            renderStaticGreeting();
+            aiState.greeted = true;
         }
 
         setTimeout(() => {
             const ta = document.getElementById('aiChatTextarea');
             if (ta) ta.focus();
         }, 320);
+    }
+
+    function renderStaticGreeting() {
+        appendChatBubble('assistant',
+            'Hi! Ready to draft an emblem patch quote. Tell me the size and quantity to '
+            + 'start — or paste the whole spec at once (size, qty, backing, colors, art '
+            + 'status, customer) and I will quote it in one shot.');
+        updateContextPill('Ready when you are.');
+        announce('Assistant ready. Tell me the emblem size and quantity to start, or paste the full spec.');
+    }
+
+    function announce(text) {
+        const statusEl = document.getElementById('aiChatStatus');
+        if (statusEl) statusEl.textContent = text || '';
+    }
+
+    // Make the page behind the chat drawer non-interactive while it is open,
+    // so keyboard focus stays trapped in the dialog (native `inert` also
+    // implies aria-hidden for assistive tech).
+    function setBackgroundInert(on) {
+        ['.header', '.main-container'].forEach(function (sel) {
+            const el = document.querySelector(sel);
+            if (!el) return;
+            if (on) el.setAttribute('inert', '');
+            else el.removeAttribute('inert');
+        });
     }
 
     function closeChatPanel() {
@@ -242,8 +292,15 @@
         panel.setAttribute('aria-hidden', 'true');
         backdrop.classList.remove('open');
         backdrop.setAttribute('aria-hidden', 'true');
+        setBackgroundInert(false);
         aiState.opened = false;
         showFloatingButton();
+        // Return focus to whatever opened the panel (a11y). Background inert is
+        // cleared above, so the opener is focusable again.
+        const opener = aiState.lastOpener;
+        if (opener && typeof opener.focus === 'function') {
+            try { opener.focus(); } catch (_) { /* element gone */ }
+        }
     }
 
     function showFloatingButton() {
@@ -271,18 +328,17 @@
         aiState.currentPriceQuote = null;
         aiState.currentCustomerFinal = null;
         aiState.currentEmailDraft = null;
-        aiState.lastLookup = null;
         aiState.quoteID = null;
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
+        aiState.sessionSaved = false;
+        aiState.savedItemLines = [];
         aiState.isStreaming = false;
+        aiState.greeted = false;
 
-        aiState.messages.push({
-            role: 'user',
-            content: "(Open the chat — greet the rep briefly and ask what size and quantity of emblem patches they're quoting.)",
-        });
-        updateContextPill('Drafting quote… ready when you are.');
-        sendChatMessage();
+        // Static greeting — no Claude call until the rep types their first message.
+        renderStaticGreeting();
+        aiState.greeted = true;
         showToast('New quote started');
     }
 
@@ -446,6 +502,7 @@
             renderEmailDraftCard(bubbleEl, emailDraft);
         }
         updateActionsAvailability();
+        announce(priceQuote ? 'Quote drafted. ' + (preamble || '') : (preamble || 'Reply ready.'));
     }
 
     function renderEmblemQuoteCard(bubbleEl, priceQuote) {
@@ -532,13 +589,32 @@
         if (!actions) return;
         const hasDraft = !!aiState.currentEmailDraft;
         const hasQuote = !!aiState.currentPriceQuote;
+        const hasCustomer = !!aiState.currentCustomerFinal;
         actions.hidden = !(hasDraft || hasQuote);
-        if (outlookBtn) outlookBtn.disabled = !hasDraft;
-        if (copyBtn) copyBtn.disabled = !hasDraft;
-        if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && aiState.currentCustomerFinal);
-        if (aiState.savedQuoteID && saveBtn) {
-            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
-            saveBtn.disabled = false;
+
+        const draftHint = 'Finish the quote to draft the email first';
+        if (outlookBtn) {
+            outlookBtn.disabled = !hasDraft;
+            outlookBtn.title = hasDraft ? '' : draftHint;
+        }
+        if (copyBtn) {
+            copyBtn.disabled = !hasDraft;
+            copyBtn.title = hasDraft ? '' : draftHint;
+        }
+        if (saveBtn) {
+            if (aiState.savedQuoteID) {
+                saveBtn.innerHTML = '<i class="fas fa-link"></i> Copy share link';
+                saveBtn.disabled = false;
+                saveBtn.title = 'Copy the shareable /quote link';
+            } else {
+                saveBtn.innerHTML = '<i class="fas fa-link"></i> Save &amp; share link';
+                const ready = hasDraft && hasQuote && hasCustomer;
+                saveBtn.disabled = !ready;
+                saveBtn.title = ready ? ''
+                    : !hasQuote ? 'Get a price first'
+                    : !hasCustomer ? 'Confirm the customer details in chat to enable saving'
+                    : 'Draft the email to enable saving';
+            }
         }
     }
 
@@ -614,6 +690,7 @@
                 "Hmm, I couldn't reach the AI right now. Please try again in a moment.",
                 { error: true }
             );
+            announce("Couldn't reach the AI. Please try again.");
         } finally {
             aiState.isStreaming = false;
             const btn = document.getElementById('aiChatSend');
@@ -638,8 +715,6 @@
         const result = data.result || {};
         if (tool === 'lookup_customer') {
             const matches = result.matches || [];
-            if (matches.length === 1) aiState.lastLookup = matches[0];
-            else if (matches.length > 1 && !aiState.lastLookup) aiState.lastLookup = matches[0];
             const status = matches.length === 0
                 ? 'No customer match — drafting generic'
                 : (matches.length === 1
@@ -654,6 +729,9 @@
                     `${result.partNumber}: $${fmtMoney(result.totalPrice)} (${fmtInt(result.quantity)} @ $${fmtMoney(result.pricePerPatch)}/patch)`
                 );
                 highlightCellByPartNumber(result.partNumber);
+                // Rule #4 — if Caspio was unreachable and the backend priced from
+                // its inline fallback grid, the price may be stale. Surface it.
+                if (result.pricingSource === 'inline') showInlinePricingWarning();
             }
         }
     }
@@ -735,10 +813,17 @@
             const lineItems = priceQuote.lineItems;
             const subtotal = lineItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0);
             const includeDig = priceQuote.digitizingFee && priceQuote.digitizingFee.include !== false;
-            const digFee = includeDig ? (Number(priceQuote.digitizingFee.amount) || 100) : 0;
+            // Use the tool's amount as-is (nullish check, NOT ||, so a legitimate
+            // $0 / waived-but-itemized fee isn't silently forced back to $100).
+            const digRaw = priceQuote.digitizingFee ? priceQuote.digitizingFee.amount : null;
+            const digFee = includeDig ? (digRaw != null ? Number(digRaw) : 100) : 0;
             const taxable = customer.taxable === true;
-            const taxAmount = taxable ? Math.round((subtotal + digFee) * 0.101 * 100) / 100 : 0;
-            const total = subtotal + digFee + taxAmount;
+            // Persist the PRE-TAX total the rep saw on the quote card and emailed.
+            // Emblem quote emails show no tax figure; WA sales tax is applied
+            // downstream at invoice time (ManageOrders/ShopWorks push TaxTotal:0 and
+            // OnSite computes tax). We never bake a hardcoded rate into the saved
+            // quote — the taxable flag is persisted for the invoice stage instead.
+            const total = subtotal + digFee;
 
             // LTM total — captured for the LTMFeeTotal field on quote_sessions.
             // The AI tool returns ltm.perPatchAmount per line item; sum across.
@@ -765,21 +850,28 @@
                 TotalAmount: total,
                 Notes: JSON.stringify({
                     digitizing_fee: digFee,
-                    tax: taxAmount,
                     taxable,
+                    tax_note: taxable
+                        ? 'Pre-tax quote — WA sales tax applied at invoice based on ship-to address.'
+                        : 'Tax-exempt — reseller permit on file.',
                     customer,
                     appliedRules: priceQuote.appliedRules || {},
                     emailSubject: draft.subject || '',
                 }),
             };
-            const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionPayload),
-            });
-            if (!sessionRes.ok) {
-                const t = await sessionRes.text();
-                throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+            // Retry-safe: only create the session row once. On a retry after a
+            // partial line-item failure, skip straight to re-posting the items.
+            if (!aiState.sessionSaved) {
+                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!sessionRes.ok) {
+                    const t = await sessionRes.text();
+                    throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+                }
+                aiState.sessionSaved = true;
             }
 
             const items = lineItems.map((it, idx) => {
@@ -830,28 +922,59 @@
                     AddedAt: new Date().toISOString(),
                 });
             }
+            const failures = [];
             for (const it of items) {
-                const r = await fetch(API_BASE_URL + '/api/quote_items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(it),
-                });
-                if (!r.ok) {
-                    const t = await r.text();
-                    console.warn('[emblem-ai] quote_items POST failed:', r.status, t.slice(0, 200));
+                if (aiState.savedItemLines.includes(it.LineNumber)) continue; // already persisted (retry)
+                try {
+                    const r = await fetch(API_BASE_URL + '/api/quote_items', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(it),
+                    });
+                    if (!r.ok) {
+                        const t = await r.text();
+                        failures.push(`line ${it.LineNumber} (${it.StyleNumber}): ${r.status} ${t.slice(0, 120)}`);
+                    } else {
+                        aiState.savedItemLines.push(it.LineNumber);
+                    }
+                } catch (e) {
+                    failures.push(`line ${it.LineNumber} (${it.StyleNumber}): ${e.message}`);
                 }
+            }
+
+            // Rule #4 — never report success on a partial write. The saved
+            // /quote/:id is the customer-facing deliverable; a missing line item
+            // (or the DIG-100 fee) would show a wrong total. Do NOT issue the
+            // share link unless every line item persisted. Failed lines are
+            // retried on the next click (succeeded ones are skipped above).
+            if (failures.length) {
+                console.error('[emblem-ai] quote_items failures:', failures);
+                throw new Error(`${failures.length} of ${items.length} line item(s) failed to save — do NOT send the link. Click Save to retry.`);
             }
 
             aiState.savedQuoteID = quoteID;
             updateContextPill('saved ✓');
             updateActionsAvailability();
+            announce(`Quote ${quoteID} saved. Click again to copy the share link.`);
             showToast(`Saved ${quoteID} — click again for share link`);
         } catch (err) {
             console.error('[emblem-ai] save failed:', err);
-            showToast('Save failed — check console');
+            showToast(err && err.message ? `Save failed — ${err.message}` : 'Save failed — check console');
             const btn = document.getElementById('aiSaveQuoteBtn');
             if (btn) btn.disabled = false;
         }
+    }
+
+    // Visible warning when the backend priced from its inline fallback grid
+    // (Caspio unreachable). Reuses the pricing-error banner so the rep can't
+    // miss it. Wrong/stale pricing is worse than an error (CLAUDE.md Rule 4).
+    function showInlinePricingWarning() {
+        const errorEl = document.getElementById('pricingError');
+        if (errorEl) {
+            errorEl.innerHTML = '<strong>Heads up:</strong> live pricing was unavailable, so this quote used fallback prices. Double-check before sending, and refresh to retry live pricing.';
+            errorEl.hidden = false;
+        }
+        announce('Warning: this quote used fallback pricing. Verify before sending.');
     }
 
     // -----------------------------------------------------------------

@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#7f1d1d">
+    <meta name="description" content="Create quick customer-approval laser-engrave mockups on JDS Polar Camel tumblers — pick a color, drop a logo, download a branded mockup.">
     <title>JDS Tumbler Mockup Creator | NWCA Internal</title>
-    <link rel="stylesheet" href="/pages/css/jds-mockup-creator.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/pages/css/jds-mockup-creator.css?v=2026.05.29.3">
 </head>
 <body>
 
 <header class="jmc-header">
     <div class="jmc-header-inner">
-        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="jmc-logo">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="jmc-logo">
         <div class="jmc-header-text">
             <h1>JDS Tumbler Mockup Creator</h1>
             <p>Quick customer-approval mockups — pick a color, drop a logo, download.</p>
@@ -27,14 +32,14 @@
         <!-- Step 1: Pick tumbler color -->
         <section class="jmc-step">
             <div class="jmc-step-header">
-                <span class="jmc-step-num">1</span>
+                <span class="jmc-step-num" id="jmc-step1-num">1</span>
                 <h2>Pick a tumbler color</h2>
             </div>
             <div class="jmc-swatch-grid" id="jmc-swatch-grid">
                 <!-- Swatches injected by JS after catalog loads -->
-                <div class="jmc-swatch-loading">Loading 17 colors…</div>
+                <div class="jmc-swatch-loading">Loading colors…</div>
             </div>
-            <div class="jmc-selected-label" id="jmc-selected-label" style="display:none;">
+            <div class="jmc-selected-label jmc-hidden" id="jmc-selected-label">
                 <span class="jmc-selected-sku" id="jmc-selected-sku"></span>
                 <span class="jmc-selected-name" id="jmc-selected-name"></span>
             </div>
@@ -43,10 +48,11 @@
         <!-- Step 2: Upload logo -->
         <section class="jmc-step">
             <div class="jmc-step-header">
-                <span class="jmc-step-num">2</span>
+                <span class="jmc-step-num" id="jmc-step2-num">2</span>
                 <h2>Upload your logo</h2>
             </div>
-            <div class="jmc-drop-zone" id="jmc-drop-zone">
+            <div class="jmc-drop-zone" id="jmc-drop-zone" role="button" tabindex="0"
+                 aria-label="Upload a logo: drop a file here or press Enter to browse">
                 <svg class="jmc-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>
                     <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>
@@ -55,12 +61,13 @@
                 <div class="jmc-drop-cta">Drop logo here</div>
                 <div class="jmc-drop-sub">or click to browse — PNG, JPG, SVG</div>
             </div>
-            <input type="file" id="jmc-file-input" accept="image/png,image/jpeg,image/svg+xml,.svg" style="display:none;">
-            <div class="jmc-logo-info" id="jmc-logo-info" style="display:none;">
+            <input type="file" id="jmc-file-input" accept="image/png,image/jpeg,image/svg+xml,.svg" class="jmc-hidden">
+            <div class="jmc-logo-info jmc-hidden" id="jmc-logo-info">
+                <span class="jmc-logo-thumb" id="jmc-logo-thumb" aria-hidden="true"></span>
                 <span class="jmc-logo-name" id="jmc-logo-name"></span>
-                <button type="button" class="jmc-logo-remove" id="jmc-logo-remove" title="Remove">×</button>
+                <button type="button" class="jmc-logo-remove" id="jmc-logo-remove" title="Remove logo" aria-label="Remove logo">×</button>
             </div>
-            <div class="jmc-logo-tip" id="jmc-logo-tip" style="display:none;">
+            <div class="jmc-logo-tip jmc-hidden" id="jmc-logo-tip">
                 <strong>Best results:</strong> single-color <strong>black-on-white</strong> or <strong>black-on-transparent</strong> (SVG, PNG, JPG).<br>
                 Multi-color logos with shadows, white-on-dark logos, and photos may not engrave cleanly.
             </div>
@@ -69,7 +76,7 @@
         <!-- Complexity warning panel — shown when detectLogoIssues() finds the
              uploaded file is likely to render poorly (multi-color, white-on-
              white, or photo-like). Hidden by default; revealed by JS. -->
-        <section class="jmc-warning" id="jmc-logo-warning" style="display:none;">
+        <section class="jmc-warning jmc-hidden" id="jmc-logo-warning">
             <div class="jmc-warning-title" id="jmc-logo-warning-title">⚠ Warning</div>
             <div class="jmc-warning-body" id="jmc-logo-warning-body"></div>
             <div class="jmc-warning-actions">
@@ -78,52 +85,93 @@
             </div>
         </section>
 
-        <!-- Step 3: Adjust size -->
-        <section class="jmc-step" id="jmc-size-step" style="display:none;">
+        <!-- Step 3: Size & position -->
+        <section class="jmc-step jmc-hidden" id="jmc-size-step">
             <div class="jmc-step-header">
-                <span class="jmc-step-num">3</span>
-                <h2>Adjust size</h2>
+                <span class="jmc-step-num" id="jmc-step3-num">3</span>
+                <h2>Size &amp; position</h2>
             </div>
-            <label class="jmc-size-label" for="jmc-size-slider">
-                Logo size: <span id="jmc-size-pct">70</span>%
-            </label>
-            <input type="range" id="jmc-size-slider" min="30" max="110" value="70" step="2" class="jmc-size-slider">
-            <div class="jmc-size-hint">Tip: drag the logo on the preview to reposition.</div>
+            <div class="jmc-size-row">
+                <label class="jmc-size-label" for="jmc-size-slider">
+                    Logo size: <span id="jmc-size-pct">70</span>%
+                </label>
+                <button type="button" class="jmc-mini-btn" id="jmc-fit-btn" title="Reset to a size that fits the imprint area">Auto-fit</button>
+            </div>
+            <input type="range" id="jmc-size-slider" min="30" max="110" value="70" step="2" class="jmc-size-slider" aria-label="Logo size percent">
+            <div class="jmc-position-row">
+                <button type="button" class="jmc-mini-btn" id="jmc-center-btn" title="Re-center the logo">⤢ Center logo</button>
+                <label class="jmc-check">
+                    <input type="checkbox" id="jmc-guide-toggle">
+                    <span>Show imprint area</span>
+                </label>
+            </div>
+            <div class="jmc-size-hint">Drag the logo on the preview to reposition, or click it and nudge with the arrow keys.</div>
         </section>
 
-        <!-- Step 4: Download -->
-        <section class="jmc-step" id="jmc-download-step" style="display:none;">
+        <!-- Step 4: Download & share -->
+        <section class="jmc-step jmc-hidden" id="jmc-download-step">
             <div class="jmc-step-header">
-                <span class="jmc-step-num">4</span>
-                <h2>Download</h2>
+                <span class="jmc-step-num" id="jmc-step4-num">4</span>
+                <h2>Download &amp; share</h2>
             </div>
-            <button type="button" class="jmc-download-btn" id="jmc-download-btn">
-                <span class="jmc-download-icon">⬇</span>
-                <span>Download PNG mockup</span>
+            <label class="jmc-check jmc-check--block">
+                <input type="checkbox" id="jmc-frame-toggle" checked>
+                <span><strong>Add branded frame</strong> — NWCA logo, product name &amp; approval note</span>
+            </label>
+            <div class="jmc-action-row">
+                <button type="button" class="jmc-download-btn" id="jmc-download-btn">
+                    <span class="jmc-btn-icon" aria-hidden="true">⬇</span>
+                    <span>Download PNG</span>
+                </button>
+                <button type="button" class="jmc-copy-btn" id="jmc-copy-btn" title="Copy the mockup image to your clipboard">
+                    <span class="jmc-btn-icon" aria-hidden="true">⧉</span>
+                    <span>Copy</span>
+                </button>
+            </div>
+            <div class="jmc-download-hint">Saves at full 1800&nbsp;px resolution. Paste a copy straight into an email or Slack.</div>
+        </section>
+
+        <!-- Step 5: Compare on more colors (optional) -->
+        <section class="jmc-step jmc-hidden" id="jmc-compare-step">
+            <div class="jmc-step-header">
+                <span class="jmc-step-num jmc-step-num--optional" id="jmc-step5-num">+</span>
+                <h2>Compare colors <span class="jmc-optional-tag">optional</span></h2>
+            </div>
+            <p class="jmc-compare-intro">Pick a few colors to show the customer your logo on each — downloads as one side-by-side sheet.</p>
+            <div class="jmc-compare-grid" id="jmc-compare-grid"></div>
+            <button type="button" class="jmc-compare-btn" id="jmc-compare-btn" disabled>
+                <span class="jmc-btn-icon" aria-hidden="true">▦</span>
+                <span id="jmc-compare-btn-label">Download comparison</span>
             </button>
-            <div class="jmc-download-hint">Saves at full 1800×1800 resolution.</div>
         </section>
 
     </aside>
 
     <!-- RIGHT COLUMN: Live preview canvas -->
     <section class="jmc-preview">
+        <div class="jmc-preview-toolbar jmc-hidden" id="jmc-preview-toolbar">
+            <div class="jmc-segmented" role="group" aria-label="Preview mode">
+                <button type="button" class="jmc-seg-btn jmc-seg-btn--active" id="jmc-mode-edit" aria-pressed="true">Edit</button>
+                <button type="button" class="jmc-seg-btn" id="jmc-mode-frame" aria-pressed="false">Preview frame</button>
+            </div>
+        </div>
         <div class="jmc-preview-frame">
             <div class="jmc-preview-empty" id="jmc-preview-empty">
-                <svg viewBox="0 0 64 64" fill="none" stroke="#d1d5db" stroke-width="2" aria-hidden="true" style="width:64px;height:64px;margin:0 auto 16px;display:block;">
+                <svg class="jmc-empty-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <rect x="18" y="8" width="28" height="48" rx="4"/>
                     <rect x="18" y="14" width="28" height="36"/>
                 </svg>
                 <div>Pick a tumbler color to start.</div>
             </div>
-            <canvas id="jmc-canvas" class="jmc-canvas" style="display:none;"></canvas>
-            <div class="jmc-preview-loading" id="jmc-preview-loading" style="display:none;">
+            <canvas id="jmc-canvas" class="jmc-canvas jmc-hidden" tabindex="0" role="img"
+                    aria-label="Tumbler mockup preview. Drag or use arrow keys to position the logo."></canvas>
+            <div class="jmc-preview-loading jmc-hidden" id="jmc-preview-loading">
                 <div class="jmc-spinner"></div>
                 <div>Loading tumbler image…</div>
             </div>
-            <div class="jmc-preview-error" id="jmc-preview-error" style="display:none;"></div>
+            <div class="jmc-preview-error jmc-hidden" id="jmc-preview-error"></div>
         </div>
-        <div class="jmc-preview-caption" id="jmc-preview-caption" style="display:none;">
+        <div class="jmc-preview-caption jmc-hidden" id="jmc-preview-caption">
             Live preview. Drag the logo to reposition.
         </div>
     </section>
@@ -131,10 +179,10 @@
 </main>
 
 <!-- Toast for status messages -->
-<div class="jmc-toast" id="jmc-toast"></div>
+<div class="jmc-toast" id="jmc-toast" role="status" aria-live="polite"></div>
 
-<script src="/shared_components/js/jds-tumbler-template.js?v=20260512e"></script>
-<script src="/pages/js/jds-mockup-creator.js?v=20260512e"></script>
+<script src="/shared_components/js/jds-tumbler-template.js?v=20260529a"></script>
+<script src="/pages/js/jds-mockup-creator.js?v=2026.05.29.3"></script>
 
 </body>
 </html>

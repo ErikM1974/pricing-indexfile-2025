@@ -12,8 +12,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&display=swap" rel="stylesheet">
 
-    <!-- Page stylesheet — editorial design, mirrors Contract Embroidery -->
-    <link rel="stylesheet" href="dtg-contract.css?v=20260516-eff">
+    <!-- Shared contract chrome (tokens, top bar, hero, calc shell, result panel,
+         buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
+    <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.05.29.2">
+    <!-- Page-specific styles (location grid, heavyweight toggle, per-piece breakdown) -->
+    <link rel="stylesheet" href="dtg-contract.css?v=2026.05.29.3">
 </head>
 <body>
 
@@ -71,7 +74,7 @@
 
         <!-- Pricing-unavailable banner (currently hardcoded, but kept for parity) -->
         <div id="pricingError" class="pricing-error" hidden>
-            <strong>Unable to load contract pricing.</strong> Refresh the page or contact Ruth directly if this persists.
+            <strong>Unable to load contract pricing.</strong> Refresh the page or contact Ruthie directly if this persists.
         </div>
 
         <!-- ========== Quick Price Calculator ========== -->
@@ -285,7 +288,7 @@
         <section class="contact">
             <div class="contact-left">
                 <div class="eyebrow">Contract DTG specialist</div>
-                <h3>Ruth Nhoung</h3>
+                <h3>Ruthie Nhoung</h3>
                 <div class="role">Direct line for wholesale partner inquiries</div>
                 <div class="contact-links">
                     <a href="tel:+12539225793,119">
@@ -309,7 +312,7 @@
                 </div>
             </div>
             <div class="contact-right">
-                <h4>What Ruth needs for an official quote</h4>
+                <h4>What Ruthie needs for an official quote</h4>
                 <ol class="checklist">
                     <li>
                         <span class="num">01</span>
@@ -345,7 +348,7 @@
 
         <div class="footnote">
             Estimates based on standard contract DTG rates. Final quotes may vary by artwork complexity &amp; production schedule.<br>
-            For an official contract quote, contact Ruth directly. · Northwest Custom Apparel · 2026 rates
+            For an official contract quote, contact Ruthie directly. · Northwest Custom Apparel · 2026 rates
         </div>
     </main>
 
@@ -372,7 +375,7 @@
             <!-- Bubbles appended by JS -->
         </div>
         <form class="ai-chat-input" id="aiChatForm">
-            <textarea id="aiChatTextarea" rows="1" placeholder="Type your reply…" autocomplete="off"></textarea>
+            <textarea id="aiChatTextarea" rows="1" placeholder="Type your reply…" autocomplete="off" aria-label="Message to the AI quote assistant"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
             </button>
@@ -385,6 +388,8 @@
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
-    <script src="dtg-contract.js?v=20260516-eff"></script>
+    <!-- Shared config — exposes APP_CONFIG.API.BASE_URL (Rule #6). Must load first. -->
+    <script src="/config/app.config.js"></script>
+    <script src="dtg-contract.js?v=2026.05.29.3"></script>
 </body>
 </html>
