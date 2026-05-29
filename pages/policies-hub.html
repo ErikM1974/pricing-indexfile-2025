@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=2026.05.28.5">
+    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=2026.05.29.6">
 </head>
 <body class="policies-hub-body">
 
@@ -95,7 +95,10 @@
 
             <!-- View toggle / status filter row -->
             <div class="hub-toolbar-row">
-                <div></div>
+                <label class="archived-toggle" id="archivedToggleWrap" title="Show archived policies (admin only)">
+                    <input type="checkbox" id="archivedToggle">
+                    <i class="fas fa-box-archive"></i> Show archived
+                </label>
                 <div class="view-toggle" role="tablist" aria-label="View mode">
                     <button class="view-toggle-btn active" data-view="grid" title="Grid view" aria-label="Grid view">
                         <i class="fas fa-th-large"></i>
@@ -125,6 +128,6 @@
     <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-12"></script>
     <script src="/shared_components/js/policies/policies-api.js?v=20260514-12"></script>
     <script src="/shared_components/js/policies/policy-ai-search.js?v=20260514-12"></script>
-    <script src="/shared_components/js/policies/policies-hub.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policies-hub.js?v=2026.05.29.6"></script>
 </body>
 </html>
