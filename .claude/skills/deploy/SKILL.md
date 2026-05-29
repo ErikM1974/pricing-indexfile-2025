@@ -153,6 +153,30 @@ done
 
 **Never `git add -A`** — would catch `.env`, log files, downloaded CSVs, anything stray in the working tree.
 
+### Step 3.5 — Guard: untracked assets referenced by HTML
+
+`git add -u` stages tracked-file *modifications* but NOT untracked NEW files. If a
+new asset (e.g. a freshly-split shared CSS/JS) is referenced by an HTML page but
+was never `git add`-ed, the deploy ships the HTML that points at it while the asset
+itself 404s in production. This happened on 2026-05-29 — `contract-pricing-2026.css`
+was untracked, so the dedup'd contract calculators shipped without their stylesheet.
+Catch it BEFORE committing:
+
+```bash
+ORPHAN=""
+for ASSET in $(git ls-files --others --exclude-standard -- '*.js' '*.css'); do
+  BN=$(basename "$ASSET")
+  if grep -rqs --include="*.html" "$BN" .; then ORPHAN="$ORPHAN $ASSET"; fi
+done
+if [ -n "$ORPHAN" ]; then
+  echo "✗ DEPLOY ABORTED — untracked asset(s) referenced by HTML (would 404 in prod):"
+  for A in $ORPHAN; do echo "    $A"; done
+  echo "  Fix: 'git add <file>' to ship it (or remove the HTML reference), then re-deploy."
+  git reset -q   # undo Step 3 staging so the tree is left clean
+  exit 1
+fi
+```
+
 ### Step 4 — Commit
 
 ```bash
@@ -170,7 +194,17 @@ git push origin develop
 ### Step 6 — Switch to main, hard pull
 
 ```bash
-git checkout main
+# A dirty working tree (stray edits after Step 4's commit, CRLF churn, or a
+# CONCURRENT session writing to the same checkout) makes `git checkout main` ABORT.
+# If that error is ignored you silently stay on develop and the rest of the deploy
+# runs against the wrong branch — main/Heroku never update, yet it can look like it
+# worked. Fail loudly instead (2026-05-29 incident).
+if ! git checkout main; then
+  echo "✗ DEPLOY ABORTED — could not switch to main (working tree dirty?)."
+  echo "  Run 'git status'; commit or stash the stray changes, then re-deploy."
+  echo "  (develop is already pushed at this point, so nothing is lost.)"
+  exit 1
+fi
 git pull --ff-only origin main
 ```
 
@@ -475,6 +509,8 @@ After: develop and main are both back to pre-release state. Investigate the bug,
 | Not heroku-authed | Abort | `heroku login` |
 | MEMORY.md > 180 lines | Abort | Condense to topic files |
 | Tests fail | Abort | Fix tests, or `--skip-tests` for emergency |
+| Untracked asset referenced by HTML (Step 3.5) | Abort — would 404 in prod | `git add` the new file, re-deploy |
+| Dirty tree blocks `checkout main` (Step 6) | Abort — won't deploy wrong branch | Commit/stash stray changes, re-deploy |
 | Merge conflict on main | Auto `merge --abort`, return to develop | Resolve manually, re-run |
 | `--ff-only` pull fails | Abort | Investigate divergent main |
 | Heroku release `failed` | Abort | `heroku releases:output` to see why |
