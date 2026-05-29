@@ -1,3 +1,8 @@
+## v2026.05.29.8 (2026.05.29)
+
+- Mockup notes: backend-owned notifications + notify checkbox
+- Deploy v2026.05.29.8: 1 files (mockup-detail.html,...)
+
 ## v2026.05.29.7 (2026.05.29)
 
 - Art notes: hand note notifications to the backend; fix direction + label
