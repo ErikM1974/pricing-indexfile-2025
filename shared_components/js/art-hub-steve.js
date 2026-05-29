@@ -262,26 +262,35 @@
                     ID_Design: parseInt(currentNotesDesignId, 10),
                     Note_Type: noteType,
                     Note_Text: noteText,
-                    Note_By: getLoggedInUser().email
+                    Note_By: getLoggedInUser().email,
+                    // Direction-aware backend fan-out (Slack + email + watchers).
+                    // This is the art-dept dashboard — every poster here is the
+                    // art team, so the direction is always 'artist' (notifies the
+                    // rep of record + any watchers). Backend owns notification now.
+                    Posted_By_Role: 'artist',
+                    Posted_By_Email: getLoggedInUser().email,
+                    notify: notify
                 })
             });
 
             if (!resp.ok) throw new Error(`Create note failed: ${resp.status}`);
 
-            // Clear form
+            // Clear form. Reset the notify checkbox back to its default ON
+            // state so the next note still pings the other party + watchers.
             document.getElementById('note-type-select').value = '';
             document.getElementById('note-text').value = '';
-            document.getElementById('note-notify-checkbox').checked = false;
+            document.getElementById('note-notify-checkbox').checked = true;
             submitBtn.textContent = 'Saved!';
             setTimeout(() => { submitBtn.textContent = 'Add Note'; submitBtn.disabled = false; }, 1200);
 
             // Refresh timeline
             fetchNotes(currentNotesDesignId);
 
-            // Send email notification if checkbox checked
-            if (notify) {
-                sendNoteEmail(currentNotesDesignId, noteType, noteText);
-            }
+            // Notification (Slack + direction-aware email + watcher fan-out) is
+            // now handled by the backend POST /api/design-notes handler, gated on
+            // the `notify` flag sent in the body above. The old frontend EmailJS
+            // call (hardwired to the rep-of-record, mislabeled "from Steve") was
+            // removed — the backend owns notification now.
         } catch (err) {
             console.error('Failed to create note:', err);
             submitBtn.textContent = 'Error — try again';
@@ -319,51 +328,11 @@
         }
     }
 
-    function sendNoteEmail(designId, noteType, noteText) {
-        if (typeof emailjs === 'undefined') {
-            console.warn('EmailJS not loaded — skipping note notification');
-            return;
-        }
-
-        // Look up company name from panel header
-        const companyName = document.getElementById('notes-panel-company').textContent || 'Unknown';
-
-        // Look up the sales rep email from the card that opened this panel
-        // We need to find the card with this designId to get the rep email
-        const cards = document.querySelectorAll('.card');
-        let repEmail = 'sales@nwcustomapparel.com';
-        let repName = 'Sales Team';
-        cards.forEach(card => {
-            const idEl = card.querySelector('.id-design');
-            if (idEl && idEl.textContent.replace(/[^0-9]/g, '') === String(designId)) {
-                const repEl = card.querySelector('.rep-name');
-                if (repEl) {
-                    const email = repEl.dataset.email || repEl.textContent;
-                    if (email && email.includes('@')) {
-                        repEmail = email;
-                        repName = getRepDisplayName(email);
-                    }
-                }
-            }
-        });
-
-        const templateParams = {
-            to_email: repEmail,
-            to_name: repName,
-            design_id: designId,
-            company_name: companyName,
-            note_type: noteType,
-            header_emoji: '📝',
-            header_title: noteType,
-            note_text: noteText,
-            from_name: 'Art Department',
-            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae'
-        };
-
-        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', templateParams, EMAILJS_PUBLIC_KEY)
-            .then(() => console.log('Note notification email sent'))
-            .catch(err => console.warn('Note notification email failed (non-blocking):', err));
-    }
+    // sendNoteEmail() removed 2026-05-29 — note notification (Slack +
+    // direction-aware email + watcher fan-out) is now owned by the backend
+    // POST /api/design-notes handler. The old version was hardwired to the
+    // rep-of-record (scraped from the gallery card .rep-name) and mislabeled
+    // every note "from Art Department" regardless of who actually wrote it.
 
     // ── Image Modal (migrated from Caspio Footer) ─────────────────────
     // Upgrade Box thumbnail proxy URLs to their large (1024x1024) variant when
@@ -783,7 +752,8 @@
     // sendNotificationEmail, logArtCharge, createOverlay, removeModals,
     // updateApprovalTotal, resolveRep — all now in window.ArtActions
 
-    // EmailJS constants still needed for sendNoteEmail (notes panel)
+    // EmailJS constants still needed for the 'template_art_in_progress'
+    // status-change email below (note-added email moved to the backend).
     const EMAILJS_SERVICE_ID = 'service_jgrave3';
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const SITE_ORIGIN = 'https://www.teamnwca.com';
