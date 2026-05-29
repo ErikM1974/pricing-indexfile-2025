@@ -550,7 +550,7 @@
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
                     <!-- Phase 8 (2026-05-23): Push to ShopWorks. Hidden until the quote is saved, then revealed by showScpPushButton(). Orders push via /api/scp-push/push-quote; until Erik creates a dedicated SCP OnSite integration they land under the EMB integration (see caspio-pricing-proxy/config/manageorders-scp-config.js). -->
-                    <button id="scp-push-shopworks-btn" onclick="scpPushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <button id="scp-push-shopworks-btn" onclick="openScpPushPreview()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-upload"></i> <span id="scp-push-shopworks-label">Push to ShopWorks</span>
                     </button>
                 </div>
@@ -603,6 +603,26 @@
             <div class="modal-footer">
                 <button class="btn-action btn-secondary-action" onclick="closeLogoModal()" style="background: #6c757d;">Cancel</button>
                 <button class="btn-action btn-primary-action" onclick="applyCustomLogo()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB) -->
+    <div id="scp-push-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 660px; max-width: 94%;">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>
+                <button class="modal-close" onclick="closeScpPushPreview()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="scp-push-status"></div>
+                <div id="scp-push-preview"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-secondary-action" onclick="closeScpPushPreview()" style="background: #6c757d;">Cancel</button>
+                <button id="scp-push-confirm" class="btn-action btn-primary-action" onclick="confirmScpPush()">
+                    <i class="fas fa-upload"></i> Push to ShopWorks
+                </button>
             </div>
         </div>
     </div>

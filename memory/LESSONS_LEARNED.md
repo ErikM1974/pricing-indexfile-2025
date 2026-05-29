@@ -130,6 +130,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Pricing
 
+### Richardson calculator drifted from the Embroidery Quote Builder — leatherette model, margin, tiers (2026-05-29)
+**Problem:** `calculators/richardson-2025.html` priced a leatherette/laser patch with its own `leatherettePricing + leatheretteLabor` table (~$11/cap, no setup), but the Embroidery Quote Builder prices the same patch as **cap embroidery base + $5/cap + $50 GRT-50 setup, no stitches**. Richardson also hardcoded `marginDenominator=0.57` (live API = 0.53) and used a `getTier()` returning `'1-23'` — a label the CAP API doesn't have (it uses `1-7`/`8-23`), so embroidery cost silently fell back to $12 instead of the real $17 at low qty. Net: leatherette under-quoted by ~$6/cap + the missing $50 setup; embroidery under-quoted at small qty.
+**Root Cause:** A standalone calculator reimplemented the cap pricing model instead of mirroring the quote builder, and hardcoded values (margin, tiers, patch cost) that all have Caspio columns. The `'1-23'` tier key was never validated against the API's tier labels, so `embroideryCosts['8000'][tier] || 12` masked the miss as a plausible price.
+**Solution:** Rewrote `richardson-factory-direct.js` to mirror the builder: `getTier()` → `1-7/8-23/24-47/48-71/72+`; margin from `tiersR[0].MarginDenominator`; patch upcharge from `method=PATCH` (ItemType `Patch`); $50 setup from `/api/service-codes` GRT-50; leatherette = embBase + $5/cap + $50 setup; LTM at qty ≤ 7 (not < 24). Deleted the leatherette+labor tables. Verified per-cap + totals match hand-calcs across embroidery/leatherette × small/large qty (e.g. $7.65 blank, leatherette @24 = $35.08/cap, $842 incl. $50 setup).
+**Prevention:** Per Never-Break rule #7, a calculator that duplicates a quote-builder method MUST produce identical math — mirror its formula and pull margin/tiers/upcharges from the SAME Caspio endpoints, never hardcode. ALWAYS validate tier-label strings against the live API (`TierLabel`); a `find()/['key'] || fallback` silently hides a key mismatch as a wrong-but-plausible price.
+
 ### DTG LTM fee/threshold lived in 4 different files (2026-05-18)
 **Problem:** Erik wanted to bump or remove the $50 DTG LTM fee. That single number was hardcoded in 4 places: backend `lib/dtg-canonical-pricing.js`, frontend `dtg-pricing-service.js`, `pages/order-form/pricing/methods/dtg.jsx`, `calculators/dtg-pricing.html`. The `qty < 24` threshold was also hardcoded across all 4. Changing the fee would have been a 4-PR + 4-deploy nightmare.
 **Root Cause:** Caspio's `Pricing_Tiers` table already had an `LTM_Fee` column (queried by `/api/dtg/product-bundle`), but the value was `0` for all 3 DTG rows and no code read it — every consumer reimplemented "qty<24 → $50/qty floored" inline.
@@ -140,12 +146,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Problem:** Hardcoded 3D Puff upcharge ($5/cap) in JavaScript.
 **Solution:** ALL pricing values from Caspio tables, fetched via API. No code deploys for price changes.
 **Prevention:** Single source of truth in Caspio. Sales team adjusts without developer involvement.
-
-### Screen Print Quote Reprices at WORST Tier When Qty Crosses 576 (2026-04-23)
-**Problem:** Nika's quote at 500 pcs showed PC68H=$22.00 / PC55=$14.50. Added 100 long-sleeve (600 total) — prices jumped to PC68H=$30.50 / PC55=$20.50 / PC55LS=$26.50. More qty → higher price.
-**Root Cause:** Caspio `tiersR` for ScreenPrint only caps the top tier at `MaxQuantity=576` (DTG/DTF/EMB use 99999). At 600 pcs, the tier `find()` in `screenprint-quote-builder.js:2858` matched NO tier, then `|| primaryPricing.tiers[0]` fell back to the 13-36 tier (MarginDenom 0.45 — the HIGHEST margin). Same buggy `|| tiers[0]` fallback at line 2874 for additional location.
-**Solution:** Added `findPricingTier(tiers, qty)` helper that clamps qty-above-all-maxes to the TOP tier (not tiers[0]). Applied to both primary and additional lookups. Also: update Caspio Tier 16 MaxQuantity=99999 to match other methods.
-**Prevention:** Never write `find() || arr[0]` for a tier/range lookup — the failure mode is "use cheapest-for-us / worst-for-customer". Always clamp to the appropriate end of the range. Verify tier data (MinQty/MaxQty) across DTG/DTF/EMB/ScreenPrint is internally consistent — the ScreenPrint 576 cap was an isolated data outlier that silently over-charged every 577+ quote.
 
 ---
 

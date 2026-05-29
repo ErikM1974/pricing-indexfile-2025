@@ -170,29 +170,23 @@ let capData = [
 // Store original cap data for reference (before filtering)
 const allRichardsonCaps = [...capData];
 
-// Embroidery pricing by stitch count (fallback values - API preferred)
-// 2026 updated values
+// Cap embroidery pricing by stitch count — FALLBACK ONLY; API (method=CAP) is preferred.
+// Tier labels MUST match the API + getTier(): 1-7 / 8-23 / 24-47 / 48-71 / 72+.
+// (2026 live values from Embroidery_Costs, StitchCount 8000.)
 let embroideryCosts = {
-    '5000': { '1-23': 10.00, '24-47': 9.00, '48-71': 8.00, '72+': 7.00 },
-    '8000': { '1-23': 13.00, '24-47': 12.00, '48-71': 11.00, '72+': 9.50 },
-    '10000': { '1-23': 14.50, '24-47': 13.50, '48-71': 12.50, '72+': 12.00 }
+    '8000': { '1-7': 17.00, '8-23': 17.00, '24-47': 13.00, '48-71': 11.00, '72+': 9.50 }
 };
 
-// Leatherette patch pricing
-const leatherettePricing = {
-    '1-23': 8.40,
-    '24-47': 7.34,
-    '48-71': 7.34,
-    '72+': 6.03
-};
+// Cap margin denominator — FALLBACK ONLY; pulled from API (tiersR[0].MarginDenominator).
+let capMarginDenominator = 0.53;
 
-// Leatherette labor costs
-const leatheretteLabor = {
-    '1-23': 4.00,
-    '24-47': 4.00,
-    '48-71': 3.00,
-    '72+': 2.75
-};
+// Laser/leatherette patch — FALLBACK ONLY; pulled from API to MATCH the Embroidery Quote Builder.
+// Model: cap embroidery base + flat $5/cap upcharge + $50 one-time setup (GRT-50), no stitches.
+let patchUpchargePerCap = 5.00;   // method=PATCH, ItemType='Patch'
+let patchSetupFee = 50.00;        // service code GRT-50
+
+// Small-order (LTM) fee — tier 1-7 only (qty <= 7), matching the embroidery method (NOT < 24).
+const CAP_LTM_FEE = 50.00;
 
 // ============================================================================
 // API Initialization
@@ -217,7 +211,7 @@ async function initializeRichardsonData() {
             console.log(`[Richardson] Filtered caps: ${originalCount} -> ${capData.length}`);
         }
 
-        // Fetch embroidery costs from API
+        // Fetch embroidery costs + cap margin from API
         const embResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=CAP&styleNumber=112`);
         if (embResponse.ok) {
             const embData = await embResponse.json();
@@ -234,6 +228,41 @@ async function initializeRichardsonData() {
                     console.log('[Richardson] Embroidery costs loaded from API');
                 }
             }
+            // Cap margin denominator — mirror the Embroidery Quote Builder (tiersR[0].MarginDenominator)
+            if (embData.tiersR && embData.tiersR[0] && embData.tiersR[0].MarginDenominator) {
+                capMarginDenominator = parseFloat(embData.tiersR[0].MarginDenominator);
+                console.log(`[Richardson] Cap margin denominator loaded from API: ${capMarginDenominator}`);
+            }
+        }
+
+        // Fetch laser/leatherette patch upcharge ($5/cap) — method=PATCH, ItemType='Patch'
+        try {
+            const patchResponse = await fetch(`${RICHARDSON_API_BASE}/api/pricing-bundle?method=PATCH`);
+            if (patchResponse.ok) {
+                const patchData = await patchResponse.json();
+                const patchRecord = (patchData.allPatchCostsR || []).find(c => c.ItemType === 'Patch');
+                if (patchRecord && patchRecord.EmbroideryCost != null) {
+                    patchUpchargePerCap = parseFloat(patchRecord.EmbroideryCost);
+                    console.log(`[Richardson] Patch upcharge loaded from API: $${patchUpchargePerCap}`);
+                }
+            }
+        } catch (patchError) {
+            console.error('[Richardson] Patch upcharge load failed (using fallback):', patchError);
+        }
+
+        // Fetch patch setup fee (GRT-50, $50 one-time) — mirror the Embroidery Quote Builder
+        try {
+            const codesResponse = await fetch(`${RICHARDSON_API_BASE}/api/service-codes`);
+            if (codesResponse.ok) {
+                const codesData = await codesResponse.json();
+                const grt50 = (codesData.data || []).find(c => c.ServiceCode === 'GRT-50');
+                if (grt50 && grt50.SellPrice != null) {
+                    patchSetupFee = parseFloat(grt50.SellPrice);
+                    console.log(`[Richardson] Patch setup fee (GRT-50) loaded from API: $${patchSetupFee}`);
+                }
+            }
+        } catch (codesError) {
+            console.error('[Richardson] GRT-50 setup fee load failed (using fallback):', codesError);
         }
 
         richardsonDataInitialized = true;
@@ -279,6 +308,8 @@ class RichardsonPricingLookup {
         this.priceBreakdown = document.getElementById('priceBreakdown');
         this.ltmNotice = document.getElementById('ltmNotice');
         this.ltmPerUnit = document.getElementById('ltmPerUnit');
+        this.setupNotice = document.getElementById('setupNotice');
+        this.setupPerUnit = document.getElementById('setupPerUnit');
         this.pricePerCap = document.getElementById('pricePerCap');
         this.lineTotal = document.getElementById('lineTotal');
 
@@ -416,9 +447,10 @@ class RichardsonPricingLookup {
     }
 
     getTier(quantity) {
-        if (quantity < 24) return '1-23';
-        if (quantity < 48) return '24-47';
-        if (quantity < 72) return '48-71';
+        if (quantity <= 7) return '1-7';
+        if (quantity <= 23) return '8-23';
+        if (quantity <= 47) return '24-47';
+        if (quantity <= 71) return '48-71';
         return '72+';
     }
 
@@ -426,15 +458,6 @@ class RichardsonPricingLookup {
         const quantity = parseInt(this.quantityInput.value) || 0;
         const tier = this.getTier(quantity);
         this.quantityTier.textContent = `Tier: ${tier}`;
-    }
-
-    getEmbellishmentCost(quantity, type) {
-        const tier = this.getTier(quantity);
-        if (type === 'embroidery') {
-            return embroideryCosts['8000'][tier] || 12.00;
-        } else {
-            return (leatherettePricing[tier] || 7.34) + (leatheretteLabor[tier] || 3.00);
-        }
     }
 
     updatePricing() {
@@ -449,32 +472,50 @@ class RichardsonPricingLookup {
             return;
         }
 
-        // Get pricing values
-        const embellishmentType = this.getSelectedEmbellishment();
-        const embCost = this.getEmbellishmentCost(quantity, embellishmentType);
+        const tier = this.getTier(quantity);
+        const isPatch = this.getSelectedEmbellishment() === 'leatherette';
 
-        // 2026 margin formula
-        const marginDenominator = 0.57;
-        const markedUpGarment = this.selectedCap.price / marginDenominator;
-        const decorated = markedUpGarment + embCost;
-        const decoratedRounded = Math.ceil(decorated);
+        // Decoration base = cap embroidery cost for the tier — SAME base for embroidery and laser patch.
+        // Mirrors the Embroidery Quote Builder: a laser/leatherette patch = embroidery base + $5/cap, no stitches.
+        const embBase = (embroideryCosts['8000'] && embroideryCosts['8000'][tier]) || 13.00;
 
-        // LTM fee for orders under 24
-        const hasLTM = quantity < 24;
-        const ltmFee = hasLTM ? 50.00 : 0;
-        const ltmPerUnitValue = hasLTM ? ltmFee / quantity : 0;
-        const finalPrice = decoratedRounded + ltmPerUnitValue;
+        // Per-cap decorated unit price: garment marked up + embroidery base, rounded up to the dollar (CeilDollar).
+        const markedUpGarment = this.selectedCap.price / capMarginDenominator;
+        const decoratedRounded = Math.ceil(markedUpGarment + embBase);
+
+        // Laser/leatherette patch: flat +$5/cap upcharge (no stitches).
+        const patchPerCap = isPatch ? patchUpchargePerCap : 0;
+
+        // One-time fees: $50 patch setup (GRT-50) for leatherette + $50 LTM at tier 1-7 (qty <= 7).
+        const setupFee = isPatch ? patchSetupFee : 0;
+        const hasLTM = quantity <= 7;
+        const ltmFee = hasLTM ? CAP_LTM_FEE : 0;
+
+        const finalPrice = decoratedRounded + patchPerCap + (setupFee + ltmFee) / quantity;
         const total = finalPrice * quantity;
 
         // Update display
         this.pricePlaceholder.classList.add('hidden');
         this.priceBreakdown.classList.remove('hidden');
 
+        // Small-order (LTM) fee — tier 1-7 only
         if (hasLTM) {
             this.ltmNotice.classList.remove('hidden');
-            this.ltmPerUnit.textContent = `(+$${ltmPerUnitValue.toFixed(2)}/cap)`;
+            this.ltmPerUnit.textContent = `(+$${(ltmFee / quantity).toFixed(2)}/cap)`;
         } else {
             this.ltmNotice.classList.add('hidden');
+        }
+
+        // Patch setup fee (GRT-50) — leatherette only
+        if (this.setupNotice) {
+            if (isPatch) {
+                this.setupNotice.classList.remove('hidden');
+                if (this.setupPerUnit) {
+                    this.setupPerUnit.textContent = `(+$${(setupFee / quantity).toFixed(2)}/cap)`;
+                }
+            } else {
+                this.setupNotice.classList.add('hidden');
+            }
         }
 
         this.pricePerCap.textContent = `$${finalPrice.toFixed(2)}`;

@@ -4141,79 +4141,174 @@ function showScpPushButton(quoteId) {
     }
 }
 
-async function scpPushToShopWorks() {
+// Minimal HTML escaper for preview output (self-contained — no util dependency).
+function _scpEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+
+// Open the preview-and-confirm modal — parity with EMB's openPushPreview().
+// Fetches the exact ExternalOrderJson the backend would push (read-only /preview
+// endpoint) so the rep reviews line items, order type and total before the order
+// is created. If the modal or preview can't load, falls back to a direct
+// confirm()-push so the rep is never blocked.
+async function openScpPushPreview() {
     const btn = document.getElementById('scp-push-shopworks-btn');
-    const label = document.getElementById('scp-push-shopworks-label');
     if (!btn || btn.disabled || !_scpPushQuoteId) return;
 
-    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
-    const companyName = document.getElementById('company-name')?.value?.trim() || '';
-    const displayName = companyName || customerName || 'N/A';
+    const modal = document.getElementById('scp-push-modal');
+    const statusEl = document.getElementById('scp-push-status');
+    const previewEl = document.getElementById('scp-push-preview');
+    const confirmBtn = document.getElementById('scp-push-confirm');
+    if (!modal || !previewEl || !confirmBtn) {
+        return confirmScpPush(true); // modal markup missing → legacy direct push
+    }
 
-    const confirmed = confirm(
-        `Push to ShopWorks?\n\n` +
-        `Quote: ${_scpPushQuoteId}\n` +
-        `Customer: ${displayName}\n\n` +
-        `This will create a new screen print order in ShopWorks OnSite.\n` +
-        `(Phase 8 testing mode — orders land under the EMB integration ` +
-        `customer until SCP gets its own.)`
-    );
-    if (!confirmed) return;
-
-    // Loading state
-    const originalText = label?.textContent || 'Push to ShopWorks';
-    if (label) label.textContent = 'Pushing...';
-    btn.disabled = true;
-    btn.style.opacity = '0.6';
+    if (statusEl) statusEl.innerHTML = '';
+    previewEl.innerHTML = '<div style="padding:24px; text-align:center; color:#64748b;">' +
+        '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.6';
+    confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
+    modal.classList.add('show');
 
     try {
         const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
             ? APP_CONFIG.API.BASE_URL
             : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/scp-push/preview/${encodeURIComponent(_scpPushQuoteId)}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+        renderScpPushPreview(data.orderJson || {});
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+    } catch (err) {
+        console.error('[SCP Push] Preview error:', err);
+        previewEl.innerHTML = '<div style="padding:16px; color:#b91c1c;">' +
+            '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _scpEsc(err.message) +
+            '<br><span style="color:#64748b;">You can still push below.</span></div>';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+    }
+}
 
+// Render the modal body from the /preview orderJson.
+function renderScpPushPreview(o) {
+    const previewEl = document.getElementById('scp-push-preview');
+    if (!previewEl) return;
+    const lines = Array.isArray(o.LinesOE) ? o.LinesOE : [];
+    const designs = Array.isArray(o.Designs) ? o.Designs : [];
+    const shipping = parseFloat(o.cur_Shipping) || 0;
+    const discount = parseFloat(o.TotalDiscounts) || 0;
+    const lineSum = lines.reduce((s, l) => s + (parseFloat(l.Price) || 0) * (parseFloat(l.Qty) || 0), 0);
+    const preTax = lineSum + shipping - discount;
+
+    let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; font-size:13px;">';
+    html += '<div><span style="color:#64748b;">ShopWorks Order:</span> <strong>' + _scpEsc(o.ExtOrderID || '') + '</strong></div>';
+    html += '<div><span style="color:#64748b;">Order type:</span> <strong>' + _scpEsc(String(o.id_OrderType || '')) + '</strong> <span style="color:#64748b;">(13 = Screen Print)</span></div>';
+    html += '<div><span style="color:#64748b;">Customer #:</span> ' + _scpEsc(String(o.id_Customer || '')) + '</div>';
+    html += '<div><span style="color:#64748b;">Designs:</span> ' + designs.length + '</div>';
+    html += '</div>';
+
+    html += '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
+    html += '<thead><tr style="text-align:left; border-bottom:1px solid #e5e7eb; color:#64748b;">' +
+        '<th style="padding:4px;">Part</th><th style="padding:4px;">Description</th>' +
+        '<th style="padding:4px; text-align:center;">Size</th><th style="padding:4px; text-align:right;">Qty</th>' +
+        '<th style="padding:4px; text-align:right;">Price</th></tr></thead><tbody>';
+    if (lines.length === 0) {
+        html += '<tr><td colspan="5" style="padding:8px; color:#b91c1c;">No line items</td></tr>';
+    } else {
+        for (const l of lines) {
+            html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                '<td style="padding:4px; font-weight:600;">' + _scpEsc(l.PartNumber || '') + '</td>' +
+                '<td style="padding:4px;">' + _scpEsc(l.Description || '') + '</td>' +
+                '<td style="padding:4px; text-align:center;">' + _scpEsc(l.Size || '') + '</td>' +
+                '<td style="padding:4px; text-align:right;">' + _scpEsc(String(l.Qty || '')) + '</td>' +
+                '<td style="padding:4px; text-align:right;">$' + (parseFloat(l.Price) || 0).toFixed(2) + '</td></tr>';
+        }
+    }
+    html += '</tbody></table>';
+    html += '<div style="text-align:right; margin-top:10px; font-size:14px; font-weight:700;">' +
+        'Order total (pre-tax): $' + preTax.toFixed(2) + '</div>';
+    if (designs.length === 0) {
+        html += '<div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e;">' +
+            '<i class="fas fa-exclamation-triangle"></i> No design linked — a rep must assign the design + screens in ShopWorks.</div>';
+    }
+    previewEl.innerHTML = html;
+}
+
+// Perform the actual push (POST /push-quote). directFallback=true is the legacy
+// path used when the modal couldn't open.
+async function confirmScpPush(directFallback) {
+    const mainBtn = document.getElementById('scp-push-shopworks-btn');
+    const mainLabel = document.getElementById('scp-push-shopworks-label');
+    const confirmBtn = document.getElementById('scp-push-confirm');
+    const statusEl = document.getElementById('scp-push-status');
+    if (!_scpPushQuoteId) return;
+
+    if (directFallback) {
+        if (!confirm(`Push quote ${_scpPushQuoteId} to ShopWorks?\n\nThis creates a new screen print order in OnSite.`)) return;
+        if (mainBtn) { mainBtn.disabled = true; mainBtn.style.opacity = '0.6'; }
+        if (mainLabel) mainLabel.textContent = 'Pushing...';
+    } else if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.6';
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+    }
+
+    try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         const response = await fetch(`${apiBase}/api/scp-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                quoteId: _scpPushQuoteId,
-                isTest: false,
-                force: false,
-            }),
+            body: JSON.stringify({ quoteId: _scpPushQuoteId, isTest: false, force: false }),
         });
-
         const data = await response.json();
 
         if (!response.ok) {
             if (response.status === 409) {
-                if (label) label.textContent = 'Already Pushed';
-                btn.style.background = '#28a745';
-                if (typeof showToast === 'function') {
-                    showToast('Already pushed to ShopWorks', 'info');
-                }
+                if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px;">Already pushed to ShopWorks.</div>';
+                if (mainLabel) mainLabel.textContent = 'Already Pushed';
+                if (mainBtn) mainBtn.style.background = '#28a745';
+                if (typeof showToast === 'function') showToast('Already pushed to ShopWorks', 'info');
+                closeScpPushPreview();
                 return;
             }
             throw new Error(data.error || data.details || `HTTP ${response.status}`);
         }
 
         // Success
-        if (label) label.textContent = `Pushed ✓ (${data.extOrderId})`;
-        btn.style.background = '#28a745';
-        if (typeof showToast === 'function') {
-            showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
-        }
+        if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
+        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; }
+        if (typeof showToast === 'function') showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[SCP Push] Success:', data);
+        closeScpPushPreview();
 
     } catch (error) {
         console.error('[SCP Push] Push error:', error);
-        if (label) label.textContent = originalText;
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        if (typeof showToast === 'function') {
-            showToast(`Push failed: ${error.message}`, 'error');
-        }
+        if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#b91c1c;">Push failed: ' + _scpEsc(error.message) + '</div>';
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
+        if (mainBtn) { mainBtn.disabled = false; mainBtn.style.opacity = '1'; }
+        if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';
+        if (typeof showToast === 'function') showToast(`Push failed: ${error.message}`, 'error');
     }
 }
 
+function closeScpPushPreview() {
+    const modal = document.getElementById('scp-push-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+// Back-compat alias — the button + older callers reference scpPushToShopWorks.
+function scpPushToShopWorks() { return openScpPushPreview(); }
+
 // Expose for HTML onclick + cross-file callers
+window.openScpPushPreview = openScpPushPreview;
+window.renderScpPushPreview = renderScpPushPreview;
+window.confirmScpPush = confirmScpPush;
+window.closeScpPushPreview = closeScpPushPreview;
 window.scpPushToShopWorks = scpPushToShopWorks;
 window.showScpPushButton = showScpPushButton;
