@@ -477,7 +477,8 @@
                     Author: getLoggedInUser().email,
                     Author_Name: getLoggedInUser().firstName,
                     Note_Text: 'AE updated fields: ' + changedNames.join(', '),
-                    Note_Type: 'status_change'
+                    Note_Type: 'status_change',
+                    notify: false  // audit note: keeps its own mockup_note_notification email below
                 })
             }).catch(function () {});
         }).then(function () {
@@ -1309,7 +1310,8 @@
                             Author: getLoggedInUser().email,
                             Author_Name: getLoggedInUser().firstName,
                             Note_Text: 'Approval reminder sent to ' + getAeDisplayName(aeEmail),
-                            Note_Type: 'artist_note'
+                            Note_Type: 'artist_note',
+                            notify: false  // audit note: reminder email already sent above
                         })
                     }).then(function () {
                         refreshNotes();
@@ -1401,7 +1403,8 @@
                     Author: 'Customer',
                     Author_Name: 'Customer',
                     Note_Text: approvalNote,
-                    Note_Type: 'status_change'
+                    Note_Type: 'status_change',
+                    notify: false  // audit note: sendStatusNotifications handles the emails
                 })
             }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
@@ -1495,7 +1498,8 @@
                         Author: getLoggedInUser().email,
                         Author_Name: getLoggedInUser().firstName,
                         Note_Text: noteText,
-                        Note_Type: 'status_change'
+                        Note_Type: 'status_change',
+                        notify: false  // audit note: sendStatusNotifications handles the emails
                     })
                 });
             }).then(function () {
@@ -1542,7 +1546,8 @@
                     Author: authorName,
                     Author_Name: authorName,
                     Note_Text: noteText,
-                    Note_Type: 'status_change'
+                    Note_Type: 'status_change',
+                    notify: false  // audit note: sendStatusNotifications handles the emails
                 })
             });
         }).then(function () {
@@ -1607,7 +1612,8 @@
                     Author: author,
                     Author_Name: authorName,
                     Note_Text: noteText,
-                    Note_Type: 'status_change'
+                    Note_Type: 'status_change',
+                    notify: false  // audit note: status-change emails fire below
                 })
             }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
@@ -2485,7 +2491,8 @@
                         Author: getLoggedInUser().email,
                         Author_Name: getLoggedInUser().firstName,
                         Note_Text: 'Added file from Box: ' + selectedBoxFile.name,
-                        Note_Type: 'artist_note'
+                        Note_Type: 'artist_note',
+                        notify: false  // audit note: file-add has its own notify flow
                     })
                 }).then(function () {
                     refreshNotes();
@@ -4245,6 +4252,17 @@
             var author = postingAsName;
             var authorName = postingAsName.split(' ')[0];
 
+            // Notification routing is now OWNED BY THE BACKEND (direction-aware
+            // Slack + email + watcher fan-out on POST /api/mockup-notes). We just
+            // tell it who posted, from which view, and whether the user wants the
+            // other party pinged. The old hardwired emailjs.send (rep-of-record
+            // only, no Slack, stand-ins invisible) is gone.
+            //   Posted_By_Role  — 'ae' on the AE view, else 'artist'.
+            //   Posted_By_Email — logged-in staff email ('' if unknown).
+            //   notify          — the notify checkbox (defaults checked).
+            var notifyEl = document.getElementById('pmd-note-notify');
+            var postedByEmail = sessionStorage.getItem('nwca_user_email') || '';
+
             fetch(API_BASE + '/api/mockup-notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -4253,43 +4271,19 @@
                     Author: author,
                     Author_Name: authorName,
                     Note_Text: text,
-                    Note_Type: noteType
+                    Note_Type: noteType,
+                    Posted_By_Role: isAeView ? 'ae' : 'artist',
+                    Posted_By_Email: postedByEmail,
+                    notify: notifyEl ? notifyEl.checked : true
                 })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Failed to save note');
                 input.value = '';
+                // Reset the notify checkbox to its default ON state so the next
+                // note still pings the other party.
+                if (notifyEl) notifyEl.checked = true;
                 refreshNotes();
                 showToast('Note added', 'success');
-
-                // Send email notification to the other party
-                if (typeof emailjs !== 'undefined') {
-                    var designId = currentMockup.Design_Number || mockupId;
-                    var company = currentMockup.Company_Name || 'Unknown';
-                    var toEmail, toName;
-                    if (isAeView) {
-                        // AE added note → notify Ruth
-                        toEmail = 'ruth@nwcustomapparel.com';
-                        toName = 'Ruth';
-                    } else {
-                        // Ruth added note → notify the AE who submitted
-                        toEmail = currentMockup.Submitted_By || 'sales@nwcustomapparel.com';
-                        toName = getAeDisplayName(toEmail);
-                    }
-                    emailjs.init('4qSbDO-SQs19TbP80');
-                    var humanNoteType = noteType.replace(/_/g, ' ');
-                    emailjs.send('service_jgrave3', 'template_art_note_added', {
-                        to_email: toEmail,
-                        to_name: toName,
-                        design_id: designId,
-                        company_name: company,
-                        note_text: text,
-                        note_type: humanNoteType,
-                        header_emoji: '📝',
-                        header_title: humanNoteType,
-                        detail_link: HEROKU_ORIGIN + '/mockup/' + mockupId + (isAeView ? '' : '?view=ae'),
-                        from_name: authorName
-                    }).catch(function () { /* fire-and-forget */ });
-                }
             }).catch(function (err) {
                 showToast('Failed to save note: ' + err.message, 'error');
             }).finally(function () {
@@ -5169,7 +5163,8 @@
                     Author: currentMockup.Submitted_By || 'ae@nwcustomapparel.com',
                     Author_Name: getAeDisplayName(currentMockup.Submitted_By),
                     Note_Text: 'Customer approval email sent to ' + (customerName || 'customer') + ' (' + customerEmail + ')',
-                    Note_Type: 'customer_approval_sent'
+                    Note_Type: 'customer_approval_sent',
+                    notify: false  // audit note: customer approval email already sent above
                 })
             });
         }).then(function () {

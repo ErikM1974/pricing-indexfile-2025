@@ -4,6 +4,14 @@
 
 ---
 
+## JDS + Sticker/Banner intake 500: payload sent `Design_Name` to a column that doesn't exist on ArtRequests (2026-05-08) (archived 2026-05-29)
+**Problem:** Every AE submission via the JDS intake form on the AE dashboard returned `Submission failed: Failed to create art request (500)`. Sticker/Banner intake (same 2026-05-06 deploy) had the same latent bug; just hadn't been exercised.
+**Root Cause:** Both [jds-submit-form.js](shared_components/js/jds-submit-form.js) and [sticker-banner-submit-form.js](shared_components/js/sticker-banner-submit-form.js) POSTed `Design_Name: designName` to `/api/artrequests`. `Design_Name` exists on `Design_Lookup_2026` and `Digitizing_Mockups` — but **not on `ArtRequests`**. Caspio returned `404 FieldNotFound — Cannot perform operation because the following field(s) do not exist: 'Design_Name'`. The proxy's POST handler ([art.js:251-254](../caspio-pricing-proxy/src/routes/art.js#L251)) catches and re-emits as a generic 500, hiding Caspio's actual error from the browser.
+**Solution:** Frontend-only fix — dropped `Design_Name` from both payloads and folded the design-name string into `Item_Specs_Notes` (prefixed `Design Name: …`) so Steve still sees it.
+**Prevention:** (1) **The proxy's `POST /artrequests` handler MUST forward Caspio's `Code`/`Message`/`RequestId` in the 500 response body** (same pattern as `garment-tracker.js` adopted 2026-04-27) — generic "Failed to create art request" gave the frontend nothing actionable. (2) When adding a new intake form that writes to an existing Caspio table, **introspect the live table schema** (`GET /tables/X/fields`) and diff against the payload before the first deploy — Caspio's 95-column tables have plenty of similarly-named fields on neighboring tables that look like they should exist but don't.
+
+---
+
 ## Screen Print Quote Reprices at WORST Tier When Qty Crosses 576 (2026-04-23) (archived 2026-05-29)
 **Problem:** Nika's quote at 500 pcs showed PC68H=$22.00 / PC55=$14.50. Added 100 long-sleeve (600 total) — prices jumped to PC68H=$30.50 / PC55=$20.50 / PC55LS=$26.50. More qty → higher price.
 **Root Cause:** Caspio `tiersR` for ScreenPrint only caps the top tier at `MaxQuantity=576` (DTG/DTF/EMB use 99999). At 600 pcs, the tier `find()` in `screenprint-quote-builder.js:2858` matched NO tier, then `|| primaryPricing.tiers[0]` fell back to the 13-36 tier (MarginDenom 0.45 — the HIGHEST margin). Same buggy `|| tiers[0]` fallback at line 2874 for additional location.

@@ -1066,6 +1066,28 @@ body {
     cursor: not-allowed;
 }
 
+/* Note composer footer — notify toggle + submit on one row (mirrors art panel) */
+.pmd-add-note-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.pmd-add-note-footer .pmd-add-note-btn {
+    margin-top: 0;
+}
+
+.pmd-note-notify-label {
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+}
+
 /* Posting-as indicator */
 .pmd-posting-as {
     display: flex;
