@@ -505,10 +505,10 @@ class RichardsonPricingLookup {
 
         if (isExpanded) {
             this.capBrowserContent.classList.remove('expanded');
-            this.capBrowserToggle.querySelector('.toggle-icon').textContent = '+';
+            this.capBrowserToggle.setAttribute('aria-expanded', 'false');
         } else {
             this.capBrowserContent.classList.add('expanded');
-            this.capBrowserToggle.querySelector('.toggle-icon').textContent = '−';
+            this.capBrowserToggle.setAttribute('aria-expanded', 'true');
 
             if (!this.capBrowserRendered) {
                 this.filterAndRenderCaps();

@@ -549,7 +549,7 @@
                     <button class="btn-save-quote" onclick="saveAndGetLink()" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
-                    <!-- Phase 8 (2026-05-23): Push to ShopWorks. Hidden until quote saved AND ?enableScpPush=1 in URL (gated until Erik confirms OnSite integration IDs) -->
+                    <!-- Phase 8 (2026-05-23): Push to ShopWorks. Hidden until the quote is saved, then revealed by showScpPushButton(). Orders push via /api/scp-push/push-quote; until Erik creates a dedicated SCP OnSite integration they land under the EMB integration (see caspio-pricing-proxy/config/manageorders-scp-config.js). -->
                     <button id="scp-push-shopworks-btn" onclick="scpPushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-upload"></i> <span id="scp-push-shopworks-label">Push to ShopWorks</span>
                     </button>
@@ -616,7 +616,7 @@
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.05.24.2"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.05.29.2"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.05.24.1"></script>
 
@@ -646,7 +646,7 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.05.26.1"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.05.29.2"></script>
 
 </body>
 </html>

@@ -127,7 +127,7 @@
 | `/pages/css/invoice.css` | **NEW** Invoice page styles — print-first letter-paper layout, NWCA forest-green accent, condensed line items, screen-only toolbar, @media print rules | Inter font | ✅ Active |
 | `/pages/embroidery-contract-pricing.html` | **NEW** Shareable contract embroidery pricing page | embroidery-contract-pricing.js, embroidery-contract-pricing.css | ✅ Active |
 | `/pages/data-entry-guide.html` | **NEW** ShopWorks data entry guide with API-driven service prices | data-entry-guide.js, data-entry-guide.css, app-config.js | ✅ Active |
-| `/pages/jds-mockup-creator.html` | **NEW** Standalone JDS Polar Camel tumbler mockup creator — AEs/Steve pick a color, drop a logo, download a customer-approval mockup. Canvas-based compositing, no backend or AI calls. | jds-mockup-creator.js, jds-mockup-creator.css, jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
+| `/pages/jds-mockup-creator.html` | Standalone JDS Polar Camel tumbler mockup creator — AEs/Steve pick a color, drop a logo, then download/copy/compare a customer-approval mockup. Canvas compositing + branded presentation frame + multi-color comparison sheet; no backend or AI calls. | jds-mockup-creator.js, jds-mockup-creator.css, jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
 | `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
 | `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
 | `/pages/design-gallery.html` | **NEW** Standalone design gallery — search 39K+ digitized designs | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ✅ Active |
@@ -323,7 +323,8 @@
 | `/calculators/embroidery-pricing-all/embroidery-pricing-all.css` | Tabbed interface styles | - | ✅ Active |
 | `/calculators/embroidery-contract/index.html` | **Round 7 (2026-05-14)** Editorial Contract Embroidery pricing page. Replaced the Round 6 minimal-pink page with a magazine-style layout extracted from the Claude Designer mockup: top bar with theme chip, editorial hero (serif title with italic year + 3-fact aside), 2-column calculator card with pink-gradient result panel + 72px hero price, 3-card callouts, tabbed pricing tables (Garment / Cap / Full Back) with live active-tier-column + current-stitch-row + intersection-cell highlighting, ShopWorks parts row, dark contact card with numbered checklist, footnote. Single-tier wholesale pricing for Ruthie / ASI distributors who supply their own blanks. | embroidery-contract.js, embroidery-contract.css, Google Fonts (Fraunces, Geist, Geist Mono) | ✅ Active |
 | `/calculators/embroidery-contract/embroidery-contract.js` | **Round 7 (2026-05-14)** Standalone calculator JS for the Contract Embroidery page. Fetches `/api/contract-pricing`, builds 3 pricing matrices, drives the editorial UI (segmented item picker, qty/stitch presets, hero serif price, live table highlighting), supports URL-param share-links (`?type=&qty=&stitches=`) — Ruthie types inputs, copies a share-URL, customer clicks the URL and sees the calculator pre-filled with the same quote. No ES-module deps; pure browser JS. | /api/contract-pricing | ✅ Active |
-| `/calculators/embroidery-contract/embroidery-contract.css` | **NEW (2026-05-14 Round 7)** Editorial stylesheet extracted from the Claude Designer mockup. Replaces dependence on calculator-base.css for this page. Locks the "classic" font pair (Fraunces serif display + Geist sans + Geist Mono numbers), full pink-50→pink-900 palette, warm-neutral inks. Components: topbar with logo mark + theme chip, hero with eyebrow rule line + serif title + 3-fact aside, 2-column calculator card with pink-gradient result panel + 72px hero price, tabbed pricing tables with active-tier-column / active-stitch-row / intersection-cell highlighting, 3-card callouts, dark contact card with radial pink gradient + numbered checklist. ~970 lines. Trimmed of the prototype's tweaks-panel + font-pair-variant rules. | Google Fonts (Fraunces, Geist, Geist Mono) | ✅ Active |
+| `/calculators/embroidery-contract/embroidery-contract.css` | **DEDUP (2026-05-29)** Now page-specific ONLY (~137 lines): segmented item-type picker (`.seg`), pricing-table tabs (`.tabs`), `.divider`, two-column qty/stitch row (`.calc-form .row`), tfoot active-column highlight, + seg/tabs focus rings. All shared chrome (tokens, top bar, hero, calc shell, result panel, buttons, table base, contact, footer, AI chat panel) moved to `/shared_components/css/contract-pricing-2026.css`, loaded BEFORE this file so page rules win the cascade. | contract-pricing-2026.css, Google Fonts | ✅ Active |
+| `/shared_components/css/contract-pricing-2026.css` | **NEW (2026-05-29)** Shared editorial chrome for BOTH contract calculators (`embroidery-contract` + `dtg-contract`): design tokens, top bar, hero, calculator shell, result panel, totals, buttons, pricing-table base, contact card, footnote, toast, pricing-error, and the entire AI chat panel (~1,207 lines). Eliminates the ~1,090 lines that were copy-pasted between the two pages. Loaded BEFORE each page's own CSS so page rules win the cascade. **Bump the `?v=` on BOTH pages when editing this file.** | embroidery-contract.css, dtg-contract.css | ✅ Active |
 | `/quote-builders/embroidery-quote-builder.html` | Embroidery/Cap Combo Quote Builder 2026 (Excel-style) | embroidery-quote-pricing.js | ✅ Active |
 | `/shared_components/js/embroidery-quote-pricing.js` | Embroidery pricing engine (tiers, LTM, stitch surcharges, FB) | Caspio API | ✅ Active |
 | `/shared_components/js/embroidery-quote-service.js` | Embroidery quote save/update/email service | Caspio API, EmailJS | ✅ Active |
@@ -396,7 +397,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/dtg-contract/index.html` | **REWRITTEN (2026-05-15)** Contract DTG editorial page — matches Contract Embroidery layout (Fraunces serif + pink accents + AI quote assistant). Replaces the old calculator-base.css layout. | dtg-contract.css, dtg-contract.js | ✅ Active |
-| `/calculators/dtg-contract/dtg-contract.css` | **NEW (2026-05-15)** Editorial stylesheet for Contract DTG — port of embroidery-contract.css with location-checkbox grid + heavyweight toggle instead of segmented stitch-count input. Self-contained (no calculator-base.css). | — | ✅ Active |
+| `/calculators/dtg-contract/dtg-contract.css` | **DEDUP (2026-05-29)** Now page-specific ONLY (~339 lines): location checkbox grid (`.loc*`), heavyweight toggle (`.hw-toggle*`), per-piece breakdown (`.pp-breakdown*`), per-location pricing-table extras (tfoot qty-col highlight + `.effective-row`), + location/toggle focus-within rings. All shared chrome moved to `/shared_components/css/contract-pricing-2026.css`, loaded BEFORE this file. | contract-pricing-2026.css | ✅ Active |
 | `/calculators/dtg-contract/dtg-contract.js` | **NEW (2026-05-15)** Contract DTG calc + AI assistant. Hardcoded 4-tier pricing ($7.50/$6.75/$6.00/$5.25 per location), $50 LTM at qty≤23, +$1 heavyweight. AI panel calls `/api/contract-dtg-ai/chat`, saves quotes with `CDTG` prefix. | — | ✅ Active |
 
 ### Screen Print Customer Pricing (Customer-facing)
@@ -411,11 +412,9 @@
 ### Embroidered Emblem Calculator
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/embroidered-emblem/index.html` | **REWRITTEN (2026-05-16)** Embroidered emblem patch quote page — AI-first redesign mirroring sticker page layout. External CSS/JS only (no inline). | sticker-pricing-page.css, emblem-pricing-page.css, emblem-pricing-page.js | ✅ Active |
-| `/calculators/embroidered-emblem/emblem-calculator.js` | 🗄️ Pre-AI monolithic calculator (replaced 2026-05-16 by emblem-pricing-page.js). Kept temporarily during soak; delete after AI page proves stable. | — | 🗄️ Legacy (delete ~2026-06-16) |
-| `/calculators/embroidered-emblem/emblem-quote-service.js` | 🗄️ Pre-AI quote save service. Save flow now handled inline in emblem-pricing-page.js (same Caspio endpoints, same PATCH prefix). Delete after soak. | base-quote-service.js | 🗄️ Legacy (delete ~2026-06-16) |
-| `/calculators/embroidered-emblem/embroidered-emblem-styles.css` | 🗄️ Pre-AI page styles. New page uses sticker-pricing-page.css + emblem-pricing-page.css. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
-| `/calculators/embroidered-emblem/emblem-calculator-missing-styles.css` | 🗄️ Pre-AI supplemental styles. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
+| `/calculators/embroidered-emblem/index.html` | **REWRITTEN (2026-05-16; hardened 2026-05-29)** Embroidered emblem patch quote page — AI-first, mirrors sticker layout. External CSS/JS only. Chat auto-opens with a STATIC greeting (no Claude call until the first rep message); accessible dialog (role=dialog/aria-modal/focus-trap/focus-return). | sticker-pricing-page.css, emblem-pricing-page.css, emblem-pricing-page.js | ✅ Active |
+<!-- 4 pre-AI legacy files (emblem-calculator.js, emblem-quote-service.js, embroidered-emblem-styles.css, emblem-calculator-missing-styles.css) DELETED 2026-05-29 — unreferenced by index.html, confirmed via grep. Recover from git history if ever needed. -->
+
 
 ### Laser Tumbler & Sticker Calculators
 | File | Purpose | Dependencies | Status |
@@ -637,7 +636,7 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/screenprint-manual-pricing.js` | Screen print manual pricing service (used by unified manual calculator) | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-quote-builder.js` | Legacy/extracted screen print quote builder controller | ScreenprintQuotePricing class | ✅ Active |
-| `/shared_components/js/screenprint-shopworks-guide-generator.js` | Screen print ShopWorks order guide generator | shopworks-guide-generator.js | ✅ Active |
+| `/shared_components/js/screenprint-shopworks-guide-generator.js` | Screen print ShopWorks manual data-entry guide generator | shopworks-guide-generator.js | ⚠️ Orphan — loaded by no HTML; superseded by the `/api/scp-push/push-quote` API push (2026-05-29). Safe to delete pending Erik's OK. |
 
 ### Universal Components (header, gallery, grid)
 | File | Purpose | Dependencies | Status |
@@ -676,8 +675,8 @@
 | `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
 | `/shared_components/js/sticker-banner-submit-form.js` | **NEW** AE Sticker/Banner art-request intake form (posts to /api/artrequests with Item_Type=Sticker/Banner + structured Item_Specs_Notes block) | /api/artrequests, /api/files/upload, EmailJS | ✅ Active |
 | `/shared_components/js/jds-tumbler-template.js` | **NEW** Algorithm module for JDS Tumbler Mockup Creator — mask coords, color sampling, engrave-color resolver, logo silhouette extractor. Shared by standalone page and (Phase 2) art-request integration. | (none — pure canvas logic) | ✅ Active |
-| `/pages/js/jds-mockup-creator.js` | **NEW** Standalone JDS Mockup Creator page logic — color picker, file upload (PNG/JPG/SVG), live canvas preview, drag-to-reposition, size slider, full-res PNG download. | jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
-| `/pages/css/jds-mockup-creator.css` | **NEW** Standalone JDS Mockup Creator styling — two-column layout, color swatch grid, drop zone, canvas frame, brand maroon accent. | jds-mockup-creator.html | ✅ Active |
+| `/pages/js/jds-mockup-creator.js` | Standalone JDS Mockup Creator page logic — color picker, file upload (PNG/JPG/SVG), live preview with pointer/touch drag + arrow-key nudge, auto-fit, recenter, toggleable imprint guide, branded presentation frame, full-res PNG download, copy-to-clipboard, multi-color comparison sheet, and an Edit/Preview-frame toggle. | jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
+| `/pages/css/jds-mockup-creator.css` | Standalone JDS Mockup Creator styling — 2026 design tokens (scoped :root), Inter, two-column layout, swatch grid, drop zone, segmented Edit/Preview control, compare grid, focus/reduced-motion a11y states, brand maroon accent. | jds-mockup-creator.html | ✅ Active |
 
 ### Sample Order System
 | File | Purpose | Dependencies | Status |

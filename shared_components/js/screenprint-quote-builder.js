@@ -3065,10 +3065,30 @@ async function recalculatePricing() {
             updateRowBreakdownScreenPrint(rowId, product, tierData);
 
             subtotal += productSubtotal;
+            // Persist a fully-priced, save-ready snapshot. saveAndGetLink() reads
+            // these instead of re-scraping the DOM. (The old save map read
+            // product.qty/.sizes/.unitPrice — fields collectProductsFromTable never
+            // returns — so saved quote_items had empty sizes and $0 unit prices,
+            // which the ShopWorks push then under-billed.) unitPrice is the per-
+            // product BLENDED price (productSubtotal / qty) so the saved LineTotal and
+            // the pushed order total exactly equal the quoted subtotal, even when
+            // extended-size upcharges make per-size prices differ within a product.
+            const _pqty = product.totalQty || 0;
             pricedProducts.push({
                 product,
                 prices: tierData.prices,
-                tier: tier
+                tier: tier,
+                // save-ready fields (consumed by saveAndGetLink → ScreenPrintQuoteService)
+                style: product.style,
+                productName: product.productName || product.style,
+                color: product.color,
+                catalogColor: product.catalogColor,
+                sizeBreakdown: product.sizeBreakdown,
+                totalQty: _pqty,
+                unitPrice: _pqty > 0 ? Math.round((productSubtotal / _pqty) * 100) / 100 : 0,
+                lineTotal: Math.round(productSubtotal * 100) / 100,
+                ltmPerUnit: perUnitLTM,
+                imageUrl: product.imageUrl || ''
             });
         }
 
@@ -3824,22 +3844,32 @@ async function saveAndGetLink() {
     }
 
     try {
-        // Get current pricing data
+        // Refresh pricing before saving so the persisted unit prices + line totals
+        // match what the rep sees (and what gets pushed to ShopWorks).
+        // recalculatePricing() repopulates window.currentPricingData.products with
+        // fully-priced, save-ready rows (sizeBreakdown + blended unitPrice).
+        await recalculatePricing();
         const pricing = window.currentPricingData || {};
+        const pricedRows = Array.isArray(pricing.products) ? pricing.products : [];
 
-        // Format items for quote service
-        const items = products.map(product => ({
-            styleNumber: product.style,
-            productName: product.description || product.style,
-            color: product.color,
-            colorCode: product.catalogColor || product.color,
-            quantity: product.qty,
-            sizeBreakdown: product.sizes || {},
-            basePrice: product.basePrice || 0,
-            unitPrice: product.unitPrice || 0,
-            ltmPerUnit: product.ltmPerUnit || 0,
-            lineTotal: product.lineTotal || (product.qty * (product.unitPrice || 0)),
-            imageUrl: product.imageUrl || ''
+        if (pricedRows.length === 0) {
+            throw new Error('No priced products to save — please re-check the product table.');
+        }
+
+        // Format items for quote service from the priced snapshot (NOT a DOM
+        // re-scrape). Each row carries sizeBreakdown + the blended unit price.
+        const items = pricedRows.map(row => ({
+            styleNumber: row.style,
+            productName: row.productName || row.style,
+            color: row.color,
+            colorCode: row.catalogColor || row.color,
+            quantity: row.totalQty,
+            sizeBreakdown: row.sizeBreakdown || {},
+            basePrice: row.unitPrice || 0,
+            unitPrice: row.unitPrice || 0,
+            ltmPerUnit: row.ltmPerUnit || 0,
+            lineTotal: row.lineTotal || ((row.totalQty || 0) * (row.unitPrice || 0)),
+            imageUrl: row.imageUrl || ''
         }));
 
         // Get additional charges for saving (2026 fee refactor)
@@ -4082,27 +4112,18 @@ function generateQuoteText(products, pricing) {
 
 
 // =====================================================
-// Push to ShopWorks (Phase 8 — 2026-05-23)
+// Push to ShopWorks (Phase 8 — 2026-05-23; gate lifted same day)
 // =====================================================
-// Mirrors the EMB/DTF pushToShopWorks() pattern.
-// Gated behind ?enableScpPush=1 query param until Erik confirms the
-// OnSite integration IDs (id_Customer, id_OrderType, ExtSource) in
-// caspio-pricing-proxy/config/manageorders-scp-config.js.
+// Mirrors the EMB/DTF pushToShopWorks() pattern: save the quote, then POST the
+// quoteId to /api/scp-push/push-quote (the proxy reads it back, transforms it,
+// and pushes to ShopWorks OnSite). The button is revealed after a successful save.
 //
-// To enable for testing:
-//   /quote-builders/screenprint-quote-builder.html?enableScpPush=1
-//
-// When ready for production, remove the flag check from showScpPushButton().
+// NOTE: until Erik creates a dedicated SCP OnSite integration, pushed orders land
+// under the EMB integration customer (id=3739) / order type 21 — see
+// caspio-pricing-proxy/config/manageorders-scp-config.js. ExtSource 'NWCA-SCP'
+// already tags them as screen print.
 
 let _scpPushQuoteId = null;
-
-function _scpPushEnabled() {
-    try {
-        return new URLSearchParams(window.location.search).has('enableScpPush');
-    } catch {
-        return false;
-    }
-}
 
 function showScpPushButton(quoteId) {
     _scpPushQuoteId = quoteId;

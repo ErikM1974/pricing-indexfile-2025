@@ -106,6 +106,10 @@ class ScreenPrintQuoteService {
                 ExpiresAt: expiresAt,
                 Notes: JSON.stringify({
                     ...printSetup,
+                    // ShopWorks push reads setupFeeTotal to itemize the SPSU
+                    // screen-setup line (screens = setupFeeTotal / $30). Authoritative
+                    // $ amount the customer was quoted — avoids re-deriving from colors.
+                    setupFeeTotal: setupFees,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files carry .placement per file when
@@ -379,6 +383,10 @@ class ScreenPrintQuoteService {
                 ExpiresAt: expiresAt,
                 Notes: JSON.stringify({
                     ...printSetup,
+                    // ShopWorks push reads setupFeeTotal to itemize the SPSU
+                    // screen-setup line (screens = setupFeeTotal / $30). Authoritative
+                    // $ amount the customer was quoted — avoids re-deriving from colors.
+                    setupFeeTotal: setupFees,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files carry .placement per file when

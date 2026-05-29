@@ -46,7 +46,7 @@
         <!-- SanMar Notice -->
         <div class="sanmar-notice" id="sanmarNotice">
             <div class="notice-header">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <div class="notice-text">
                     <strong>Order these 23 Richardson Styles from SanMar</strong>
                 </div>
@@ -80,7 +80,7 @@
         <!-- Price Lookup Card -->
         <div class="pricing-card">
             <h2 class="section-title">
-                <i class="fas fa-calculator"></i>
+                <i class="fas fa-calculator" aria-hidden="true"></i>
                 Quick Price Lookup
             </h2>
 
@@ -122,23 +122,23 @@
             </div>
 
             <!-- Real-Time Price Display -->
-            <div class="price-display" id="priceDisplay">
+            <div class="price-result" id="priceDisplay">
                 <div class="price-placeholder" id="pricePlaceholder">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" aria-hidden="true"></i>
                     <span>Select a cap style to see pricing</span>
                 </div>
                 <div class="price-breakdown hidden" id="priceBreakdown">
                     <div class="ltm-notice hidden" id="ltmNotice">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>LTM Fee: $50.00 for orders under 24 pieces</span>
                         <span class="ltm-per-unit" id="ltmPerUnit"></span>
                     </div>
                     <div class="price-row price-total">
-                        <span class="price-label">Price Per Cap:</span>
+                        <span class="price-label">Price Per Cap</span>
                         <span class="price-value" id="pricePerCap">--</span>
                     </div>
                     <div class="price-row line-total">
-                        <span class="price-label">Line Total:</span>
+                        <span class="price-label">Line Total</span>
                         <span class="price-value" id="lineTotal">--</span>
                     </div>
                 </div>
@@ -147,22 +147,22 @@
 
         <!-- Cap Browser (Collapsible) -->
         <div class="cap-browser-accordion">
-            <button type="button" class="cap-browser-toggle" id="capBrowserToggle">
+            <button type="button" class="cap-browser-toggle" id="capBrowserToggle" aria-expanded="false" aria-controls="capBrowserContent">
                 <div class="toggle-header">
-                    <i class="fas fa-th-large"></i>
+                    <i class="fas fa-th-large" aria-hidden="true"></i>
                     <span>Browse All Factory Direct Caps</span>
                     <span class="cap-count-badge" id="capCountBadge">133 styles</span>
                 </div>
-                <span class="toggle-icon">+</span>
+                <i class="fas fa-chevron-down toggle-icon" aria-hidden="true"></i>
             </button>
             <div class="cap-browser-content" id="capBrowserContent">
                 <div class="cap-browser-inner">
                     <!-- Search Bar -->
                     <div class="cap-search-bar">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-search" aria-hidden="true"></i>
                         <input type="text" id="capSearchInput" placeholder="Search by style number or description..." class="form-input">
-                        <button type="button" id="clearCapSearch" class="clear-search-btn hidden">
-                            <i class="fas fa-times"></i>
+                        <button type="button" id="clearCapSearch" class="clear-search-btn hidden" aria-label="Clear search">
+                            <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
 
@@ -185,7 +185,7 @@
 
                     <!-- No Results Message -->
                     <div class="no-caps-found hidden" id="noResultsMessage">
-                        <i class="fas fa-search"></i>
+                        <i class="fas fa-search" aria-hidden="true"></i>
                         <p>No caps found matching your search</p>
                     </div>
                 </div>

@@ -954,10 +954,6 @@
                     <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
-                    <!-- Push to ShopWorks (shown after save) -->
-                    <button id="emb-push-shopworks-btn" onclick="pushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: #1a5276; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
-                    </button>
                 </div>
             </div>
 
@@ -973,6 +969,12 @@
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="embEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
                     <i class="fas fa-envelope"></i> Email Quote
+                </button>
+                <!-- Push to ShopWorks: always visible, gated (enabled once the quote is saved AND has a Customer #). -->
+                <button class="btn-action" id="emb-push-shopworks-btn" onclick="openPushPreview()" disabled
+                    title="Save the quote first (Save &amp; Get Shareable Link), then push to ShopWorks"
+                    style="background: #1a5276; color: white; opacity: 0.5; cursor: not-allowed;">
+                    <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
                 </button>
             </div>
 
@@ -1016,6 +1018,32 @@
             <div class="modal-footer">
                 <button class="btn-action btn-secondary-action" onclick="closeLogoModal()" style="background: #6c757d;">Cancel</button>
                 <button class="btn-action btn-primary-action" onclick="applyCustomLogo()">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Push to ShopWorks: preview + confirm modal -->
+    <div class="shopworks-import-modal" id="emb-sw-push-modal">
+        <div class="shopworks-import-content" style="max-width: 760px;">
+            <div class="shopworks-import-header">
+                <h3><i class="fas fa-upload"></i> Push to ShopWorks</h3>
+                <button class="shopworks-import-close" onclick="closePushPreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="shopworks-import-body">
+                <p class="shopworks-import-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Review exactly what will be created in ShopWorks OnSite, then confirm.
+                </p>
+                <div id="emb-sw-push-status"></div>
+                <div id="emb-sw-push-preview"></div>
+            </div>
+            <div class="shopworks-import-footer">
+                <button class="btn-cancel-import" onclick="closePushPreview()">Cancel</button>
+                <button class="btn-parse-import" id="emb-sw-push-confirm" onclick="confirmPushToShopWorks()" disabled>
+                    <i class="fas fa-upload"></i> Push to ShopWorks
+                </button>
             </div>
         </div>
     </div>
@@ -1416,7 +1444,7 @@ Company:Absher Construction Company
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.05.26.1"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.05.29.2"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

@@ -861,20 +861,11 @@ async function loadQuoteForEditing(quoteId) {
 
         showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
-        // Show push button for existing quotes
-        showPushButton(quoteId);
-
-        // Check if already pushed
-        if (session.PushedToShopWorks) {
-            const pushBtn = document.getElementById('emb-push-shopworks-btn');
-            const pushLabel = document.getElementById('emb-push-shopworks-label');
-            if (pushBtn && pushLabel) {
-                pushLabel.textContent = 'Already Pushed';
-                pushBtn.disabled = true;
-                pushBtn.style.opacity = '0.6';
-                pushBtn.style.background = '#28a745';
-            }
-        }
+        // Enable the action-bar push button for this saved quote (gated on
+        // Customer #). Reflect already-pushed state if applicable.
+        _pushQuoteId = quoteId;
+        _pushAlreadyDone = !!session.PushedToShopWorks;
+        updatePushButtonState();
 
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
@@ -1374,6 +1365,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupKeyboardShortcuts();
     setupPrimaryLogoHandlers();
     setupCapPrimaryLogoHandlers();  // Cap logo handlers
+
+    // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
+    // and set its initial (disabled) state for a fresh quote.
+    const _custNumEl = document.getElementById('customer-number');
+    if (_custNumEl) _custNumEl.addEventListener('input', updatePushButtonState);
+    updatePushButtonState();
 
     // Auto-select sales rep based on logged-in staff (2026 consolidation)
     if (typeof StaffAuthHelper !== 'undefined') {
@@ -6781,87 +6778,224 @@ async function saveQuote() {
 // Push to ShopWorks
 // =====================================================
 
+// _pushQuoteId: set once the quote is saved (or when editing a saved quote).
+// _pushAlreadyDone: true when this quote has already been pushed to ShopWorks.
 let _pushQuoteId = null;
+let _pushAlreadyDone = false;
 
-function showPushButton(quoteId) {
-    _pushQuoteId = quoteId;
-    const btn = document.getElementById('emb-push-shopworks-btn');
-    if (btn) {
-        btn.style.display = '';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.style.background = '#1a5276';
-        const label = document.getElementById('emb-push-shopworks-label');
-        if (label) label.textContent = 'Push to ShopWorks';
-    }
-}
-
-async function pushToShopWorks() {
+// Single source of truth for the action-bar "Push to ShopWorks" button state.
+// Gated: enabled only when the quote is saved AND a ShopWorks Customer # is set
+// (a blank Customer # would silently route the order to the catch-all customer).
+function updatePushButtonState() {
     const btn = document.getElementById('emb-push-shopworks-btn');
     const label = document.getElementById('emb-push-shopworks-label');
+    if (!btn || !label) return;
+
+    if (_pushAlreadyDone) {
+        label.textContent = 'Pushed to ShopWorks ✓';
+        btn.disabled = true;
+        btn.style.opacity = '1';
+        btn.style.cursor = 'default';
+        btn.style.background = '#28a745';
+        btn.title = 'This quote has already been pushed to ShopWorks';
+        return;
+    }
+
+    const hasQuote = !!_pushQuoteId;
+    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
+    const enabled = hasQuote && hasCustomer;
+
+    label.textContent = 'Push to ShopWorks';
+    btn.style.background = '#1a5276';
+    btn.disabled = !enabled;
+    btn.style.opacity = enabled ? '1' : '0.5';
+    btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+    btn.title = enabled
+        ? 'Create this quote as an order in ShopWorks OnSite'
+        : (!hasQuote
+            ? 'Save the quote first (Save & Get Shareable Link), then push'
+            : 'Enter the ShopWorks Customer # (top of form) to enable push');
+}
+
+// Called after a successful save and when loading a saved quote for editing.
+function showPushButton(quoteId) {
+    _pushQuoteId = quoteId;
+    _pushAlreadyDone = false;
+    updatePushButtonState();
+}
+
+// Open the preview-and-confirm modal. Fetches the exact ExternalOrderJson the
+// backend would send (read-only /preview endpoint) so the rep reviews line
+// items, designs and notes before the order is created.
+async function openPushPreview() {
+    const btn = document.getElementById('emb-push-shopworks-btn');
     if (!btn || btn.disabled || !_pushQuoteId) return;
 
-    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
-    const companyName = document.getElementById('company-name')?.value?.trim() || '';
-    const displayName = companyName || customerName || 'N/A';
+    const modal = document.getElementById('emb-sw-push-modal');
+    const statusEl = document.getElementById('emb-sw-push-status');
+    const previewEl = document.getElementById('emb-sw-push-preview');
+    const confirmBtn = document.getElementById('emb-sw-push-confirm');
+    if (!modal || !previewEl || !confirmBtn) return;
 
-    const confirmed = confirm(
-        `Push to ShopWorks?\n\n` +
-        `Quote: ${_pushQuoteId}\n` +
-        `Customer: ${displayName}\n` +
-        `ExtOrderID: NWCA-EMB-${_pushQuoteId}\n\n` +
-        `This will create a new order in ShopWorks OnSite.`
-    );
-
-    if (!confirmed) return;
-
-    // Loading state
-    const originalText = label.textContent;
-    label.textContent = 'Pushing...';
-    btn.disabled = true;
-    btn.style.opacity = '0.6';
+    if (statusEl) statusEl.innerHTML = '';
+    previewEl.innerHTML = '<div style="padding:24px; text-align:center; color:#64748b;">' +
+        '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
+    confirmBtn.disabled = true;
+    confirmBtn.style.display = '';
+    confirmBtn.dataset.force = 'false';
+    confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
+    modal.classList.add('active');
 
     try {
         const apiBase = typeof APP_CONFIG !== 'undefined'
             ? APP_CONFIG.API.BASE_URL
             : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/embroidery-push/preview/${encodeURIComponent(_pushQuoteId)}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+        renderPushPreview(data);
+        if (data.alreadyPushed) {
+            confirmBtn.dataset.force = 'true';
+            confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Push Again (creates duplicate)';
+        }
+        confirmBtn.disabled = false;
+    } catch (err) {
+        console.error('[Embroidery] Preview error:', err);
+        previewEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+            'Could not load preview</h5><ul><li>' + escapeHtml(err.message) + '</li></ul></div>';
+    }
+}
 
+// Render the preview modal body from the /preview response.
+function renderPushPreview(data) {
+    const previewEl = document.getElementById('emb-sw-push-preview');
+    const statusEl = document.getElementById('emb-sw-push-status');
+    if (!previewEl) return;
+    const o = data.orderJson || {};
+    const lines = Array.isArray(o.LinesOE) ? o.LinesOE : [];
+
+    if (data.alreadyPushed && statusEl) {
+        statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+            'Already pushed to ShopWorks</h5><ul><li>This quote was pushed' +
+            (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
+            '. Pushing again will create a DUPLICATE order.</li></ul></div>';
+    }
+
+    let html = '<div class="preview-grid">';
+    html += '<div class="preview-item"><div class="preview-item-label">ShopWorks ExtOrderID</div>' +
+        '<div class="preview-item-value">' + escapeHtml(data.extOrderId || '') + '</div></div>';
+    html += '<div class="preview-item"><div class="preview-item-label">Customer #</div>' +
+        '<div class="preview-item-value">' + escapeHtml(String(o.id_Customer || '')) +
+        (o.ExtCustomerID ? ' <span style="color:#94a3b8;">(ext ' + escapeHtml(String(o.ExtCustomerID)) + ')</span>' : '') +
+        '</div></div>';
+    html += '<div class="preview-item"><div class="preview-item-label">Contact</div>' +
+        '<div class="preview-item-value">' +
+        (escapeHtml(((o.ContactNameFirst || '') + ' ' + (o.ContactNameLast || '')).trim()) || '—') + '</div></div>';
+    html += '<div class="preview-item"><div class="preview-item-label">Line items / Designs</div>' +
+        '<div class="preview-item-value">' + lines.length + ' lines · ' + (data.designCount || 0) + ' design(s)</div></div>';
+    html += '</div>';
+
+    html += '<div class="preview-products"><h5>Line items (' + lines.length + ')</h5>';
+    html += '<div class="preview-products-list">';
+    if (lines.length === 0) {
+        html += '<div class="preview-product-item"><span class="preview-product-desc">No line items</span></div>';
+    } else {
+        for (const ln of lines) {
+            const meta = [escapeHtml(ln.Color || ''), escapeHtml(ln.Size || '')].filter(Boolean).join(' · ');
+            html += '<div class="preview-product-item">' +
+                '<span class="preview-product-style">' + escapeHtml(ln.PartNumber || '') + '</span>' +
+                '<span class="preview-product-desc">' + escapeHtml(ln.Description || '') + (meta ? ' — ' + meta : '') + '</span>' +
+                '<span class="preview-product-qty">×' + escapeHtml(String(ln.Qty || '')) + ' @ $' + escapeHtml(String(ln.Price || '')) + '</span>' +
+                '</div>';
+        }
+    }
+    html += '</div></div>';
+
+    const warnings = [];
+    if ((data.designCount || 0) === 0) {
+        warnings.push('No design linked — a sales rep must assign the design manually in ShopWorks.');
+    }
+    if (warnings.length > 0) {
+        html += '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> Heads up</h5><ul>';
+        for (const w of warnings) html += '<li>' + escapeHtml(w) + '</li>';
+        html += '</ul></div>';
+    }
+
+    previewEl.innerHTML = html;
+}
+
+// Perform the actual push (POST /push-quote). force=true re-pushes an
+// already-pushed quote (creates a duplicate) — only set after the rep confirms.
+async function confirmPushToShopWorks() {
+    const confirmBtn = document.getElementById('emb-sw-push-confirm');
+    const statusEl = document.getElementById('emb-sw-push-status');
+    if (!_pushQuoteId || !confirmBtn) return;
+    const force = confirmBtn.dataset.force === 'true';
+
+    const origHtml = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+
+    try {
+        const apiBase = typeof APP_CONFIG !== 'undefined'
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                quoteId: _pushQuoteId,
-                isTest: false,
-                force: false,
-            }),
+            body: JSON.stringify({ quoteId: _pushQuoteId, isTest: false, force }),
         });
-
         const data = await response.json();
 
         if (!response.ok) {
             if (response.status === 409) {
-                // Already pushed
-                label.textContent = 'Already Pushed';
-                btn.style.background = '#28a745';
-                showToast('Already pushed to ShopWorks', 'info');
+                // Caspio says already pushed — offer a guarded force re-push.
+                if (statusEl) {
+                    statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+                        'Already pushed</h5><ul><li>This quote was already pushed' +
+                        (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
+                        '. Click again to push a DUPLICATE.</li></ul></div>';
+                }
+                confirmBtn.dataset.force = 'true';
+                confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Push Again (creates duplicate)';
+                confirmBtn.disabled = false;
                 return;
             }
             throw new Error(data.error || data.details || `HTTP ${response.status}`);
         }
 
         // Success
-        label.textContent = 'Pushed ✓';
-        btn.style.background = '#28a745';
+        _pushAlreadyDone = true;
+        updatePushButtonState();
+        if (statusEl) {
+            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#f0fdf4; border-color:#bbf7d0;">' +
+                '<h4><i class="fas fa-check-circle"></i> Pushed to ShopWorks</h4>' +
+                '<div class="preview-item-value">Created as <strong>' + escapeHtml(data.extOrderId || '') + '</strong> · ' +
+                escapeHtml(String(data.lineItemCount || 0)) + ' line items · ' +
+                escapeHtml(String(data.designCount || 0)) + ' design(s).</div></div>';
+        }
+        confirmBtn.style.display = 'none';
         showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
 
     } catch (error) {
         console.error('[Embroidery] Push error:', error);
-        label.textContent = originalText;
-        btn.disabled = false;
-        btn.style.opacity = '1';
+        if (statusEl) {
+            statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+                'Push failed</h5><ul><li>' + escapeHtml(error.message) + '</li></ul></div>';
+        }
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = origHtml;
         showToast(`Push failed: ${error.message}`, 'error');
     }
 }
+
+function closePushPreview() {
+    const modal = document.getElementById('emb-sw-push-modal');
+    if (modal) modal.classList.remove('active');
+}
+
+// Back-compat alias (older entry points referenced pushToShopWorks directly).
+function pushToShopWorks() { return openPushPreview(); }
 
 async function embEmailQuote() {
     const quoteId = editingQuoteId;
