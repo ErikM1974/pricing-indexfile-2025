@@ -44,6 +44,8 @@
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,         // populated after save → enables copy-link
+        sessionSaved: false,        // quote_sessions row written? (retry-safe)
+        savedItemLines: [],         // LineNumbers already persisted (retry-safe)
         greeted: false,             // static greeting shown (no AI call burned on open)
     };
 
@@ -438,6 +440,8 @@
         aiState.quoteID = null;
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
+        aiState.sessionSaved = false;
+        aiState.savedItemLines = [];
         aiState.isStreaming = false;
         aiState.greeted = false;
 
@@ -937,10 +941,14 @@
             const lineItems = priceQuote.lineItems;
             const subtotal = lineItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0);
             const includeSetup = priceQuote.setupFee && priceQuote.setupFee.include !== false;
-            const setupFee = includeSetup ? (Number(priceQuote.setupFee.amount) || 50) : 0;
+            // Null-check (NOT ||) so a legitimate $0 / waived setup fee isn't forced to $50.
+            const setupRaw = priceQuote.setupFee ? priceQuote.setupFee.amount : null;
+            const setupFee = includeSetup ? (setupRaw != null ? Number(setupRaw) : 50) : 0;
             const taxable = customer.taxable === true;
-            const taxAmount = taxable ? Math.round((subtotal + setupFee) * 0.101 * 100) / 100 : 0;
-            const total = subtotal + setupFee + taxAmount;
+            // Persist the PRE-TAX total the rep saw + emailed (the email shows no tax
+            // figure for taxable customers); WA sales tax is applied downstream at
+            // invoice (ManageOrders/ShopWorks). No hardcoded rate baked into the quote.
+            const total = subtotal + setupFee;
 
             // Build session payload
             const sessionPayload = {
@@ -957,21 +965,28 @@
                 TotalAmount: total,
                 Notes: JSON.stringify({
                     setup_fee: setupFee,
-                    tax: taxAmount,
                     taxable,
+                    tax_note: taxable
+                        ? 'Pre-tax quote — WA sales tax applied at invoice based on ship-to address.'
+                        : 'Tax-exempt — reseller permit on file.',
                     customer,
                     appliedRules: priceQuote.appliedRules || {},
                     emailSubject: draft.subject || '',
                 }),
             };
-            const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionPayload),
-            });
-            if (!sessionRes.ok) {
-                const t = await sessionRes.text();
-                throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+            // Retry-safe: only create the session row once. On a retry after a
+            // partial line-item failure, skip straight to re-posting the items.
+            if (!aiState.sessionSaved) {
+                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(sessionPayload),
+                });
+                if (!sessionRes.ok) {
+                    const t = await sessionRes.text();
+                    throw new Error('quote_sessions POST ' + sessionRes.status + ': ' + t.slice(0, 200));
+                }
+                aiState.sessionSaved = true;
             }
 
             const isBanner = priceQuote.productType === 'banner';
@@ -1019,16 +1034,33 @@
                     AddedAt: new Date().toISOString(),
                 });
             }
+            const failures = [];
             for (const it of items) {
-                const r = await fetch(API_BASE_URL + '/api/quote_items', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(it),
-                });
-                if (!r.ok) {
-                    const t = await r.text();
-                    console.warn('[sticker-ai] quote_items POST failed:', r.status, t.slice(0, 200));
+                if (aiState.savedItemLines.includes(it.LineNumber)) continue; // already persisted (retry)
+                try {
+                    const r = await fetch(API_BASE_URL + '/api/quote_items', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(it),
+                    });
+                    if (!r.ok) {
+                        const t = await r.text();
+                        failures.push(`line ${it.LineNumber} (${it.StyleNumber}): ${r.status} ${t.slice(0, 120)}`);
+                    } else {
+                        aiState.savedItemLines.push(it.LineNumber);
+                    }
+                } catch (e) {
+                    failures.push(`line ${it.LineNumber} (${it.StyleNumber}): ${e.message}`);
                 }
+            }
+
+            // Rule #4 — never report success on a partial write. The saved /quote/:id
+            // is the customer-facing deliverable; a missing line item (or the setup
+            // fee) would show a wrong total. Do NOT issue the share link unless every
+            // item persisted. Failed lines retry on the next click (succeeded ones skip).
+            if (failures.length) {
+                console.error('[sticker-ai] quote_items failures:', failures);
+                throw new Error(`${failures.length} of ${items.length} line item(s) failed to save — do NOT send the link. Click Save to retry.`);
             }
 
             aiState.savedQuoteID = quoteID;
@@ -1037,7 +1069,7 @@
             showToast(`Saved ${quoteID} — click again for share link`);
         } catch (err) {
             console.error('[sticker-ai] save failed:', err);
-            showToast('Save failed — check console');
+            showToast(err && err.message ? `Save failed — ${err.message}` : 'Save failed — check console');
             const btn = document.getElementById('aiSaveQuoteBtn');
             if (btn) btn.disabled = false;
         }
