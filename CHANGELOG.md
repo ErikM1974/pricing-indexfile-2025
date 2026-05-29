@@ -1,3 +1,7 @@
+## v2026.05.29.1 (2026.05.29)
+
+- Deploy v2026.05.29.1: 6 files (embroidery-pricing-all.css, index.html...)
+
 ## v2026.05.28.6 (2026.05.28)
 
 - Deploy v2026.05.28.6: 13 files (.gitignore,ACTIVE_FILES.md,Employee-Handbook-Latest.pdf,...)
