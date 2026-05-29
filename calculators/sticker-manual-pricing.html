@@ -38,7 +38,7 @@
                     <span class="ai-sparkle" aria-hidden="true">✨</span>
                     Start a Quote with AI
                 </button>
-                <div class="page-hero-hint" id="autoOpenHint">Chat opens automatically…</div>
+                <div class="page-hero-hint" id="autoOpenHint">Click to start — most quotes take about 30 seconds.</div>
             </div>
             <img class="page-hero-art"
                  src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094531"
@@ -90,8 +90,8 @@
             </div>
         </details>
 
-        <!-- ========== Sticker pricing reference (closed by default) ========== -->
-        <details class="pricing-accordion" id="pricingAccordion">
+        <!-- ========== Sticker pricing reference (open by default — it's the page's namesake) ========== -->
+        <details class="pricing-accordion" id="pricingAccordion" open>
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
                     <i class="fas fa-table"></i>
@@ -132,7 +132,7 @@
     </button>
 
     <!-- ========== AI Quote Chat Panel ========== -->
-    <aside class="ai-chat-panel" id="aiChatPanel" aria-label="AI Quote Assistant" aria-hidden="true">
+    <aside class="ai-chat-panel" id="aiChatPanel" role="dialog" aria-modal="true" aria-label="AI Quote Assistant" aria-hidden="true">
         <header class="ai-chat-head">
             <div class="ai-chat-title">
                 <span class="ai-sparkle" aria-hidden="true">✨</span>
@@ -178,7 +178,11 @@
     </div>
 
     <!-- ========== Scripts ========== -->
-    <script src="/shared_components/js/sticker-pricing-service.js?v=20260515-4"></script>
-    <script src="/shared_components/js/sticker-pricing-page.js?v=20260515-4"></script>
+    <!-- Note: no shared script defines window.APP_CONFIG.API.BASE_URL on these
+         calculator pages, so sticker-pricing-page.js uses its documented hardcoded
+         fallback (same pattern as the other calculators). True Rule #6 compliance
+         would need a shared config file defining APP_CONFIG.API.BASE_URL — a
+         codebase-wide change, out of scope here. -->
+    <script src="/shared_components/js/sticker-pricing-page.js?v=20260529-1"></script>
 </body>
 </html>

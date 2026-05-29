@@ -34,7 +34,7 @@ class StickerPricingService {
         { PartNumber: 'STK-2X2-3000',  Size: '2x2', Quantity: 3000,  TotalPrice: 874.00,   PricePerSticker: 0.29 },
         { PartNumber: 'STK-2X2-5000',  Size: '2x2', Quantity: 5000,  TotalPrice: 1275.00,  PricePerSticker: 0.26 },
         { PartNumber: 'STK-2X2-10000', Size: '2x2', Quantity: 10000, TotalPrice: 2158.00,  PricePerSticker: 0.22 },
-        { PartNumber: 'STK-3X3-50',    Size: '3x3', Quantity: 50,    TotalPrice: 128.00,   PricePerSticker: 2.56 },
+        { PartNumber: 'STK-3X3-50',    Size: '3x3', Quantity: 50,    TotalPrice: 98.00,    PricePerSticker: 1.96 },  // 2026-05-29: was 128.00/2.56 (cost more than 100-qty)
         { PartNumber: 'STK-3X3-100',   Size: '3x3', Quantity: 100,   TotalPrice: 124.00,   PricePerSticker: 1.24 },
         { PartNumber: 'STK-3X3-200',   Size: '3x3', Quantity: 200,   TotalPrice: 234.00,   PricePerSticker: 1.17, IsBestValue: true },
         { PartNumber: 'STK-3X3-300',   Size: '3x3', Quantity: 300,   TotalPrice: 296.00,   PricePerSticker: 0.99 },
@@ -65,7 +65,7 @@ class StickerPricingService {
         { PartNumber: 'STK-5X5-5000',  Size: '5x5', Quantity: 5000,  TotalPrice: 4694.00,  PricePerSticker: 0.94 },
         { PartNumber: 'STK-5X5-10000', Size: '5x5', Quantity: 10000, TotalPrice: 8892.00,  PricePerSticker: 0.89 },
         { PartNumber: 'STK-6X6-50',    Size: '6x6', Quantity: 50,    TotalPrice: 218.00,   PricePerSticker: 4.36 },
-        { PartNumber: 'STK-6X6-100',   Size: '6x6', Quantity: 100,   TotalPrice: 286.00,   PricePerSticker: 2.86 },
+        { PartNumber: 'STK-6X6-100',   Size: '6x6', Quantity: 100,   TotalPrice: 383.00,   PricePerSticker: 3.83 },  // 2026-05-29: was 286.00/2.86 (under-extrapolated; made 200-qty cost less/pc)
         { PartNumber: 'STK-6X6-200',   Size: '6x6', Quantity: 200,   TotalPrice: 588.00,   PricePerSticker: 2.94, IsBestValue: true },
         { PartNumber: 'STK-6X6-300',   Size: '6x6', Quantity: 300,   TotalPrice: 774.00,   PricePerSticker: 2.58 },
         { PartNumber: 'STK-6X6-500',   Size: '6x6', Quantity: 500,   TotalPrice: 1125.00,  PricePerSticker: 2.25 },

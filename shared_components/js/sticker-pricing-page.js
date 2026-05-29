@@ -44,6 +44,7 @@
         quoteID: null,
         quoteIDPromise: null,
         savedQuoteID: null,         // populated after save → enables copy-link
+        greeted: false,             // static greeting shown (no AI call burned on open)
     };
 
     // -----------------------------------------------------------------
@@ -57,13 +58,22 @@
         // openChatPanel call once the chat opens.
         showFloatingButton();
         await Promise.all([loadAndRenderPricing(), loadAndRenderBannerRates()]);
-        // Auto-open the chat 600ms after pricing loads. Gives the page a
-        // beat to render, then chat slides in and bot starts greeting.
-        // The hint text in the hero ("Chat opens automatically…") sets
-        // expectation so the panel doesn't feel intrusive.
-        setTimeout(() => {
-            if (!aiState.opened) openChatPanel();
-        }, 600);
+        // Auto-open ONCE per browser session — greet the rep the first time
+        // they land, but don't slam the drawer open on every refresh or
+        // navigation. The greeting renders statically (see renderStaticGreeting),
+        // so first paint costs no AI call and reserves no STK quote number until
+        // the rep actually responds. Pass {auto:true} so we don't yank focus
+        // into the textarea on an unprompted open.
+        try {
+            if (!sessionStorage.getItem('stk_chat_autoopened')) {
+                sessionStorage.setItem('stk_chat_autoopened', '1');
+                setTimeout(() => {
+                    if (!aiState.opened) openChatPanel({ auto: true });
+                }, 600);
+            }
+        } catch (_) {
+            // sessionStorage unavailable (private mode / blocked) — skip auto-open.
+        }
     }
 
     function escapeHtml(s) {
@@ -254,10 +264,10 @@
         const floatingBtn = document.getElementById('floatingQuoteBtn');
         const resetBtn = document.getElementById('aiChatResetBtn');
 
-        if (openBtn) openBtn.addEventListener('click', openChatPanel);
+        if (openBtn) openBtn.addEventListener('click', () => openChatPanel());
         if (closeBtn) closeBtn.addEventListener('click', closeChatPanel);
         if (backdrop) backdrop.addEventListener('click', closeChatPanel);
-        if (floatingBtn) floatingBtn.addEventListener('click', openChatPanel);
+        if (floatingBtn) floatingBtn.addEventListener('click', () => openChatPanel());
         if (resetBtn) resetBtn.addEventListener('click', resetChat);
 
         if (form) {
@@ -291,6 +301,29 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && aiState.opened) closeChatPanel();
         });
+        // Keep Tab focus inside the drawer while it's open. It's a modal dialog
+        // (the backdrop dims the page behind it), so focus shouldn't escape to
+        // controls the user can't see.
+        document.addEventListener('keydown', trapFocus);
+    }
+
+    function trapFocus(e) {
+        if (e.key !== 'Tab' || !aiState.opened) return;
+        const panel = document.getElementById('aiChatPanel');
+        if (!panel) return;
+        const focusables = panel.querySelectorAll(
+            'button:not([disabled]), textarea, a[href], input, select, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
     }
 
     function autoResizeTextarea(ta) {
@@ -298,12 +331,14 @@
         ta.style.height = Math.min(220, Math.max(72, ta.scrollHeight)) + 'px';
     }
 
-    function openChatPanel() {
-        if (!pricingData) {
-            // Pricing still loading — silent no-op (will auto-retry).
-            // Avoids a noisy alert when the user clicks fast.
-            return;
-        }
+    function openChatPanel(opts) {
+        opts = opts || {};
+        // NOTE: intentionally NOT gated on pricingData. The bot prices via the
+        // server-side quote_sticker_price / quote_banner_price tools (the source
+        // of truth), so it works even when the on-page pricing table failed to
+        // load. pricingData is only used for row-highlighting, which no-ops
+        // safely when the table isn't there. (Per Rule #4 we still surface the
+        // table's load error visibly — we just don't let it lock out the chat.)
         const panel = document.getElementById('aiChatPanel');
         const backdrop = document.getElementById('aiChatBackdrop');
         if (!panel) return;
@@ -317,20 +352,36 @@
         const hint = document.getElementById('autoOpenHint');
         if (hint) hint.style.opacity = '0';
 
-        if (aiState.messages.length === 0) {
-            // Kick off the conversation — bot greets and asks for product type.
-            aiState.messages.push({
-                role: 'user',
-                content: '(Open the chat — greet the rep briefly and ask whether they\'re quoting stickers or a banner.)',
-            });
-            updateContextPill('Drafting quote… ready when you are.');
-            sendChatMessage();
+        if (aiState.messages.length === 0 && !aiState.greeted) {
+            // Render the opening line client-side — no AI call, no STK number
+            // reserved, until the rep actually sends something.
+            renderStaticGreeting();
         }
 
-        setTimeout(() => {
-            const ta = document.getElementById('aiChatTextarea');
-            if (ta) ta.focus();
-        }, 320);
+        // Only pull focus into the textarea on an explicit user open. Stealing
+        // focus on an automatic first-load open is disorienting and a WCAG flag.
+        if (!opts.auto) {
+            setTimeout(() => {
+                const ta = document.getElementById('aiChatTextarea');
+                if (ta) ta.focus();
+            }, 320);
+        }
+    }
+
+    /**
+     * Render the bot's opening line as a static bubble — no network call. The
+     * real conversation (and the STK quote-ID reservation) starts only when the
+     * rep sends their first message. Used on both first-open and reset.
+     */
+    function renderStaticGreeting() {
+        aiState.greeted = true;
+        appendChatBubble(
+            'assistant',
+            'Hi! I can price die-cut stickers or vinyl banners. Tell me what you '
+            + 'need — e.g. “200 of 3×3 stickers” or “5 banners '
+            + '4×8 ft” — and I’ll work up a quote.'
+        );
+        updateContextPill('Ready when you are.');
     }
 
     function closeChatPanel() {
@@ -388,14 +439,11 @@
         aiState.quoteIDPromise = null;
         aiState.savedQuoteID = null;
         aiState.isStreaming = false;
+        aiState.greeted = false;
 
-        // Re-greet the rep with a fresh conversation
-        aiState.messages.push({
-            role: 'user',
-            content: '(Open the chat — greet the rep briefly and ask whether they\'re quoting stickers or a banner.)',
-        });
-        updateContextPill('Drafting quote… ready when you are.');
-        sendChatMessage();
+        // Re-greet with a fresh static opening line — no AI call until the rep
+        // types the next quote.
+        renderStaticGreeting();
         showToast('New quote started');
     }
 
