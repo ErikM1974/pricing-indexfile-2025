@@ -1,3 +1,8 @@
+## v2026.05.29.10 (2026.05.29)
+
+- Note emails: =-free '?ae' rep-link flag (fixes corrupted ?view=ae)
+- Deploy v2026.05.29.10: 2 files (art-request-detail.html,mockup-detail.html,...)
+
 ## v2026.05.29.8 (2026.05.29)
 
 - Mockup notes: backend-owned notifications + notify checkbox
