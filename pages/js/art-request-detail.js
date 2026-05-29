@@ -4474,6 +4474,21 @@
                 if (postingAsSelect) { postingAsSelect.style.borderColor = '#dc3545'; return; }
             }
 
+            // Notification routing is now OWNED BY THE BACKEND (direction-aware
+            // Slack + email + watcher fan-out). We just tell it who posted, from
+            // which view, and whether the user wants the other party pinged.
+            //   Posted_By_Role  — 'ae' on the AE detail view, else 'artist'.
+            //   Posted_By_Email — logged-in staff email ('' if unknown).
+            //   notify          — the notify checkbox (defaults checked).
+            var notifyEl = document.getElementById('ard-note-notify');
+            var postedByEmail = getLoggedInUser().email;
+            if (!postedByEmail || postedByEmail === 'art@nwcustomapparel.com') {
+                // getLoggedInUser() substitutes the art alias when sessionStorage
+                // has no email — send '' so the backend doesn't treat the alias
+                // as the poster and wrongly drop Steve from the watcher list.
+                postedByEmail = sessionStorage.getItem('nwca_user_email') || '';
+            }
+
             fetch(API_BASE + '/api/design-notes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -4481,36 +4496,19 @@
                     ID_Design: parseInt(designId, 10),
                     Note_Type: noteType,
                     Note_Text: noteText,
-                    Note_By: postingAsName
+                    Note_By: postingAsName,
+                    Posted_By_Role: isAeView ? 'ae' : 'artist',
+                    Posted_By_Email: postedByEmail,
+                    notify: notifyEl ? notifyEl.checked : true
                 })
             }).then(function (resp) {
                 if (!resp.ok) throw new Error('Save failed: ' + resp.status);
 
-                // Notify sales rep if checked
-                var notifyEl = document.getElementById('ard-note-notify');
-                if (notifyEl && notifyEl.checked && currentRequest) {
-                    var repEmail = currentRequest.Sales_Rep || currentRequest.User_Email || '';
-                    var repName = resolveRepName(repEmail);
-                    if (repEmail && typeof emailjs !== 'undefined') {
-                        emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
-                            to_email: repEmail,
-                            to_name: repName,
-                            design_id: designId,
-                            company_name: currentRequest.CompanyName || '',
-                            note_type: noteType,
-                            header_emoji: '📝',
-                            header_title: noteType,
-                            note_text: noteText,
-                            detail_link: SITE_ORIGIN + '/art-request/' + designId + '?view=ae',
-                            from_name: 'Steve (Art Dept)'
-                        }, EMAILJS_PUBLIC_KEY).catch(function () { /* best effort */ });
-                    }
-                }
-
-                // Clear form and collapse
+                // Clear form and collapse. Reset the notify checkbox back to its
+                // default ON state so the next note still pings the other party.
                 typeEl.value = '';
                 textEl.value = '';
-                if (notifyEl) notifyEl.checked = false;
+                if (notifyEl) notifyEl.checked = true;
                 form.classList.remove('open');
                 toggle.textContent = '+ Add Note';
                 submitBtn.disabled = false;
