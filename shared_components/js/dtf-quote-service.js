@@ -111,6 +111,30 @@ class DTFQuoteService {
     }
 
     /**
+     * Order-entry, ship-to, and customer-identity fields shared by saveQuote()
+     * and updateQuote(). Field names mirror embroidery-quote-service.js so the
+     * DTF push transformer (caspio-pricing-proxy/lib/dtf-push-transformer.js)
+     * can build a complete ShopWorks order: real id_Customer, ship-to address,
+     * PO #, and requested/drop-dead ship dates. All columns already exist in
+     * Quote_Sessions (EMB writes them).
+     */
+    _orderEntryFields(quoteData) {
+        return {
+            CustomerNumber: quoteData.customerNumber || '',
+            Phone: quoteData.customerPhone || '',
+            OrderNumber: quoteData.orderNumber || '',
+            PurchaseOrderNumber: quoteData.poNumber || '',
+            ShipToAddress: quoteData.shipAddress || '',
+            ShipToCity: quoteData.shipCity || '',
+            ShipToState: quoteData.shipState || '',
+            ShipToZip: quoteData.shipZip || '',
+            ShipMethod: quoteData.shipMethod || '',
+            ReqShipDate: quoteData.reqShipDate || '',
+            DropDeadDate: quoteData.dropDeadDate || ''
+        };
+    }
+
+    /**
      * Save complete quote to database
      */
     async saveQuote(quoteData) {
@@ -155,7 +179,7 @@ class DTFQuoteService {
                     productCount: quoteData.products.length,
                     tier: quoteData.tierLabel,
                     projectName: quoteData.projectName || '',
-                    specialNotes: quoteData.specialNotes || '',
+                    specialNotes: quoteData.notes || quoteData.specialNotes || '',
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
                     marginDenominator: quoteData.marginDenominator,
                     laborPerLocation: quoteData.laborCostPerLocation,
@@ -187,8 +211,11 @@ class DTFQuoteService {
                 // Sales rep + tax rate (2026-03-23)
                 SalesRepEmail: quoteData.salesRep || '',
                 TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                TaxAmount: salesTax,
                 // Shipping fee + notes (2026-03-22)
-                ShippingFee: parseFloat(quoteData.shippingFee) || 0
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0,
+                // Order-entry + ship-to fields for ShopWorks push (mirror EMB)
+                ...this._orderEntryFields(quoteData)
             };
 
             // Save session
@@ -642,7 +669,7 @@ class DTFQuoteService {
                     productCount: quoteData.products.length,
                     tier: quoteData.tierLabel,
                     projectName: quoteData.projectName || '',
-                    specialNotes: quoteData.specialNotes || '',
+                    specialNotes: quoteData.notes || quoteData.specialNotes || '',
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
                     marginDenominator: quoteData.marginDenominator,
                     laborPerLocation: quoteData.laborCostPerLocation,
@@ -664,8 +691,19 @@ class DTFQuoteService {
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
                 TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                TaxAmount: salesTax,
                 // Shipping fee (2026-03-22)
-                ShippingFee: parseFloat(quoteData.shippingFee) || 0
+                ShippingFee: parseFloat(quoteData.shippingFee) || 0,
+                // Additional charges — must persist on revision too (for ShopWorks push + invoice)
+                ArtCharge: parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0,
+                GraphicDesignHours: parseFloat(quoteData.graphicDesignHours) || 0,
+                GraphicDesignCharge: parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0,
+                RushFee: parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0,
+                Discount: parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0,
+                DiscountPercent: parseFloat(quoteData.discountPercent) || 0,
+                DiscountReason: quoteData.discountReason || '',
+                // Order-entry + ship-to fields for ShopWorks push (mirror EMB)
+                ...this._orderEntryFields(quoteData)
             };
 
             // Update session via PUT

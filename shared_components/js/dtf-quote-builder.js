@@ -324,8 +324,8 @@ class DTFQuoteBuilder {
             'customer-name': session.CustomerName,
             'customer-email': session.CustomerEmail,
             'company-name': session.CompanyName,
-            'customer-phone': session.CustomerPhone,
-            'project-name': session.ProjectName
+            'customer-phone': session.Phone,
+            'customer-number': session.CustomerNumber
         };
 
         for (const [id, value] of Object.entries(fields)) {
@@ -347,13 +347,13 @@ class DTFQuoteBuilder {
         // Populate order & shipping fields (2026.03 overhaul)
         const orderFields = {
             'order-number': session.OrderNumber,
-            'po-number': session.PONumber,
+            'po-number': session.PurchaseOrderNumber,
             'req-ship-date': session.ReqShipDate,
             'drop-dead-date': session.DropDeadDate,
             'ship-to-name': session.ShipToName,
-            'ship-address': session.ShipAddress,
-            'ship-city': session.ShipCity,
-            'ship-zip': session.ShipZip,
+            'ship-address': session.ShipToAddress,
+            'ship-city': session.ShipToCity,
+            'ship-zip': session.ShipToZip,
             'ship-method': session.ShipMethod
         };
 
@@ -368,8 +368,8 @@ class DTFQuoteBuilder {
 
         // Set state dropdown
         const stateSelect = document.getElementById('ship-state');
-        if (stateSelect && session.ShipState) {
-            stateSelect.value = session.ShipState;
+        if (stateSelect && session.ShipToState) {
+            stateSelect.value = session.ShipToState;
         }
 
         // Set tax rate from saved quote
@@ -385,6 +385,15 @@ class DTFQuoteBuilder {
             if (content) content.classList.remove('hidden');
             if (chevron) chevron.style.transform = 'rotate(0)';
         }
+
+        // Restore project name + special instructions from the Notes JSON blob
+        try {
+            const blob = JSON.parse(session.Notes || '{}');
+            const projEl = document.getElementById('project-name');
+            if (projEl && blob.projectName) projEl.value = blob.projectName;
+            const notesEl = document.getElementById('dtf-notes');
+            if (notesEl && blob.specialNotes) notesEl.value = blob.specialNotes;
+        } catch (_) { /* Notes not JSON — skip */ }
     }
 
     /**
@@ -434,6 +443,12 @@ class DTFQuoteBuilder {
             if (discountReasonInput && session.DiscountReason) {
                 discountReasonInput.value = session.DiscountReason;
             }
+        }
+
+        // Shipping fee
+        const shippingFeeInput = document.getElementById('dtf-shipping-fee');
+        if (shippingFeeInput && session.ShippingFee > 0) {
+            shippingFeeInput.value = session.ShippingFee;
         }
 
         // Update UI displays
@@ -619,6 +634,13 @@ class DTFQuoteBuilder {
 
             // Recalculate pricing to update totals
             this.updatePricing();
+
+            // Reveal Push-to-ShopWorks for this loaded (still-editable) quote so
+            // the rep can push without re-saving. Already-pushed quotes never
+            // reach here — assertQuoteEditable() sends them to read-only view.
+            if (typeof showDtfPushButton === 'function') {
+                showDtfPushButton(quoteId);
+            }
 
             if (typeof showToast === 'function') {
                 showToast(`Editing ${quoteId} (Rev ${this.editingRevision})`, 'success');
@@ -2327,6 +2349,8 @@ class DTFQuoteBuilder {
             customerEmail,
             companyName,
             salesRep,
+            // ShopWorks customer ID (#customer-number) — used as id_Customer on push
+            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
             notes: '',
             referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
             newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
@@ -3375,35 +3399,18 @@ function printQuote() {
 // =====================================================
 // Push to ShopWorks (Phase 8 — 2026-05-23)
 // =====================================================
-// Mirrors the EMB pushToShopWorks() pattern at
-// shared_components/js/embroidery-quote-builder.js:6719.
+// Mirrors the EMB pushToShopWorks() pattern. The saved quote is transformed
+// server-side (caspio-pricing-proxy/lib/dtf-push-transformer.js) into a
+// ManageOrders order: garment lines + ship-to + shipping/discount/rush/art
+// charges, linked to the real ShopWorks customer (from the quote's customer #).
 //
-// Gated behind ?enableDtfPush=1 query param so reps can't accidentally
-// trigger pushes until Erik confirms the OnSite integration IDs
-// (id_Customer, id_OrderType, ExtSource) in
+// OnSite integration IDs (id_OrderType / id_DesignType) live in
 // caspio-pricing-proxy/config/manageorders-dtf-config.js.
-//
-// To enable for testing:
-//   /quote-builders/dtf-quote-builder.html?enableDtfPush=1
-//
-// When ready for production, remove the flag check from showDtfPushButton().
 
 let _dtfPushQuoteId = null;
 
-function _dtfPushEnabled() {
-    try {
-        return new URLSearchParams(window.location.search).has('enableDtfPush');
-    } catch {
-        return false;
-    }
-}
-
 function showDtfPushButton(quoteId) {
     _dtfPushQuoteId = quoteId;
-    // Phase 8 gate LIFTED 2026-05-23 — DTF push live to all reps.
-    // Orders currently land under EMB integration customer (id=3739) in
-    // OnSite until Erik creates a dedicated DTF integration. Defaults in
-    // caspio-pricing-proxy/config/manageorders-dtf-config.js.
     const btn = document.getElementById('dtf-push-shopworks-btn');
     if (btn) {
         btn.style.display = '';
@@ -3427,9 +3434,8 @@ async function dtfPushToShopWorks() {
         `Push to ShopWorks?\n\n` +
         `Quote: ${_dtfPushQuoteId}\n` +
         `Customer: ${displayName}\n\n` +
-        `This will create a new DTF order in ShopWorks OnSite.\n` +
-        `(Phase 8 testing mode — orders land under the EMB integration ` +
-        `customer until DTF gets its own.)`
+        `This creates a new DTF order in ShopWorks OnSite with the products, ` +
+        `sizes, charges, and ship-to from this quote.`
     );
     if (!confirmed) return;
 
