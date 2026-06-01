@@ -591,7 +591,7 @@
                         <i class="fas fa-link"></i> Save & Get Shareable Link
                     </button>
                     <!-- Push to ShopWorks - hidden until the quote is saved, then transforms the saved quote into a ShopWorks OnSite order -->
-                    <button id="dtf-push-shopworks-btn" onclick="dtfPushToShopWorks()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                    <button id="dtf-push-shopworks-btn" onclick="openDtfPushPreview()" style="display: none; margin-top: 8px; width: 100%; padding: 10px; background: var(--pnw-forest-deep, #1a5276); color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
                         <i class="fas fa-upload"></i> <span id="dtf-push-shopworks-label">Push to ShopWorks</span>
                     </button>
                     <!-- Email button moved to action panel below -->
@@ -680,7 +680,7 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.05.29.2"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.06.01.1"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
@@ -705,6 +705,26 @@
                 </button>
                 <button class="btn-close-modal" onclick="closeSaveModal()" aria-label="Close save confirmation">
                     Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB/SCP) -->
+    <div id="dtf-push-modal" class="modal-overlay">
+        <div class="modal-content" style="width: 660px; max-width: 94%;">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>
+                <button class="modal-close" onclick="closeDtfPushPreview()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="dtf-push-status"></div>
+                <div id="dtf-push-preview"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-action btn-secondary-action" onclick="closeDtfPushPreview()" style="background: #6c757d;">Cancel</button>
+                <button id="dtf-push-confirm" class="btn-action btn-primary-action" onclick="confirmDtfPush()">
+                    <i class="fas fa-upload"></i> Push to ShopWorks
                 </button>
             </div>
         </div>

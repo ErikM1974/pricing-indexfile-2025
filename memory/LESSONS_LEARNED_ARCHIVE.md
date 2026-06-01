@@ -4,6 +4,14 @@
 
 ---
 
+## `resolveItemType` helper drift across 3 files — JDS records rendered as Garment on detail page (2026-05-08) (archived 2026-06-01)
+**Problem:** New `Item_Type='JDS'` records correctly displayed JDS badge + SKU on Steve's gallery and the AE list, but the Art Request Detail page rendered them as Garment — Item Type badge hidden, JDS Specs card hidden, all the structured info packed into `Item_Specs_Notes` was invisible.
+**Root Cause:** Three separate copies of `resolveItemType()` exist: [art-hub-steve-gallery.js:135](shared_components/js/art-hub-steve-gallery.js), [art-ae.js:26](shared_components/js/art-ae.js), and [pages/js/art-request-detail.js:4406](pages/js/art-request-detail.js). When JDS shipped, the first two were updated; the detail-page copy was missed. Steve gallery's comment claimed it was the "single source of truth … same fallback used in art-ae.js + mockup-detail" — but `art-request-detail.js` was never updated.
+**Solution:** Updated all 3 to recognize `'JDS'`. Added a code comment in each file cross-referencing the others.
+**Prevention:** When extending the item-type taxonomy (or any other shared enum/helper), grep for the helper name and update every copy. Better long-term: factor `resolveItemType` into a shared module — but that touches load order across multiple HTML host pages, so it's a separate cleanup task.
+
+---
+
 ## JDS + Sticker/Banner intake 500: payload sent `Design_Name` to a column that doesn't exist on ArtRequests (2026-05-08) (archived 2026-05-29)
 **Problem:** Every AE submission via the JDS intake form on the AE dashboard returned `Submission failed: Failed to create art request (500)`. Sticker/Banner intake (same 2026-05-06 deploy) had the same latent bug; just hadn't been exercised.
 **Root Cause:** Both [jds-submit-form.js](shared_components/js/jds-submit-form.js) and [sticker-banner-submit-form.js](shared_components/js/sticker-banner-submit-form.js) POSTed `Design_Name: designName` to `/api/artrequests`. `Design_Name` exists on `Design_Lookup_2026` and `Digitizing_Mockups` — but **not on `ArtRequests`**. Caspio returned `404 FieldNotFound — Cannot perform operation because the following field(s) do not exist: 'Design_Name'`. The proxy's POST handler ([art.js:251-254](../caspio-pricing-proxy/src/routes/art.js#L251)) catches and re-emits as a generic 500, hiding Caspio's actual error from the browser.
