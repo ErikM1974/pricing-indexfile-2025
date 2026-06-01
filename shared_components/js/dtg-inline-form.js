@@ -4281,7 +4281,10 @@
         // Takes priority over the session-restore flow: if rep arrived via
         // an explicit edit URL, that wins over auto-restore.
         const editParam = (new URLSearchParams(window.location.search)).get('edit');
-        if (editParam && /^DTG-/.test(editParam)) {
+        // DTG QuoteIDs are date-packed with NO hyphen after the prefix
+        // (e.g. DTG0311-1), so the old /^DTG-/ guard NEVER matched a real quote
+        // and edit-load silently never fired. Match the prefix only. (2026-06-01)
+        if (editParam && /^DTG/i.test(editParam)) {
             if (state.rows.length === 0) state.rows.push(newBlankRow());
             render();
             // Kick load in background; render shows immediately, fills in async.
