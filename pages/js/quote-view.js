@@ -457,6 +457,11 @@ class QuoteViewPage {
             return;
         }
 
+        // Header is shared with the Screen Print path — set it explicitly so it's
+        // always correct regardless of render order. (2026-06-01)
+        const specsTitle = specsSection.querySelector('h2');
+        if (specsTitle) specsTitle.textContent = 'Transfer Specifications';
+
         // Show the section and populate it (with fallback for missing location data)
         specsSection.style.display = 'block';
         if (!locationCodes && !locationNames) {
@@ -557,6 +562,12 @@ class QuoteViewPage {
             if (hasSafety) html += '• Safety stripes included';
             html += '</div>';
         }
+
+        // Method-aware header — this element is shared with the DTF specs
+        // section (hardcoded "Transfer Specifications" in the HTML). Relabel it
+        // for Screen Print so the report isn't mislabeled. (2026-06-01)
+        const specsTitle = specsSection.querySelector('h2');
+        if (specsTitle) specsTitle.textContent = 'Screen Print Specifications';
 
         // Show the section with fallback message if no location data
         specsSection.style.display = 'block';

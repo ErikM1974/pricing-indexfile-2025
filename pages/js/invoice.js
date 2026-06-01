@@ -473,9 +473,17 @@
         orig?.decoConfig?.method ||
         orig?.rows?.[0]?.deco ||
         orig?.info?.method;
+      // designTypeLabel() always returns at least '—' (truthy), which would
+      // short-circuit this || chain BEFORE the quote-ID inference — leaving
+      // DECORATION blank on every quote without a pushed design. Only use it
+      // when it yields a REAL label, else fall through to the prefix inference
+      // (which is never blank). (2026-06-01)
+      const dtLabel = pushedFirstDesign?.id_DesignType
+        ? designTypeLabel(pushedFirstDesign.id_DesignType, null)
+        : null;
       let decoType =
         (method && METHOD_LABELS[String(method).toLowerCase()]) ||
-        designTypeLabel(pushedFirstDesign?.id_DesignType, null) ||
+        (dtLabel && dtLabel !== '—' ? dtLabel : null) ||
         this.inferDecorationFromQuoteId();
       $('detail-method').textContent = decoType;
     }
