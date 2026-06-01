@@ -54,8 +54,18 @@ class EmbroideryInvoiceGenerator {
             taxRate = n > 1 ? n / 100 : n;
         }
         const includeTax = pricingData.includeTax !== false;
-        const taxAmount = includeTax ? pricingData.grandTotal * taxRate : 0;
-        const totalWithTax = pricingData.grandTotal + taxAmount;
+        // Tax base = the ADJUSTED pre-tax subtotal (products + art/graphic-design/
+        // rush/sample/shipping − discount), which is what the rep sees on screen.
+        // The builders pass it as preTaxSubtotal. Historically the generator taxed
+        // the bare grandTotal (products+setup+LTM only) and rendered the fee/discount
+        // rows as DISPLAY-ONLY, so the printed GRAND TOTAL silently ignored every
+        // fee and discount (and DTF fed a tax-INCLUSIVE total → double-tax). Fall
+        // back to grandTotal when preTaxSubtotal isn't supplied. (2026-06-01)
+        const rawPre = pricingData.preTaxSubtotal;
+        const hasPre = rawPre != null && rawPre !== '' && !isNaN(parseFloat(rawPre));
+        const baseForTax = hasPre ? parseFloat(rawPre) : (Number(pricingData.grandTotal) || 0);
+        const taxAmount = includeTax ? baseForTax * taxRate : 0;
+        const totalWithTax = baseForTax + taxAmount;
         
         return `
             <!DOCTYPE html>
@@ -73,7 +83,7 @@ class EmbroideryInvoiceGenerator {
                     ${this.generateCustomerSection(customerData, salesRepName)}
                     ${this.generateEmbroiderySpecs(pricingData)}
                     ${this.generateProductsTable(pricingData)}
-                    ${this.generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate)}
+                    ${this.generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate, baseForTax)}
                     ${this.generateFooter(customerData)}
                 </div>
             </body>
@@ -1412,8 +1422,11 @@ class EmbroideryInvoiceGenerator {
     /**
      * Generate totals section
      */
-    generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate) {
+    generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate, baseForTax) {
         const taxPct = +(((taxRate != null ? taxRate : this.taxRate) * 100).toFixed(2));
+        // The closing "Subtotal" (after the itemized fee/discount rows) must equal
+        // the tax base so the rows reconcile to GRAND TOTAL. Falls back to grandTotal.
+        const adjustedSubtotal = (baseForTax != null && !isNaN(baseForTax)) ? baseForTax : pricingData.grandTotal;
         return `
             <div class="totals-section">
                 <div class="total-row subtotal-row">
@@ -1468,7 +1481,7 @@ class EmbroideryInvoiceGenerator {
                 ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || (((pricingData.garmentLtmFee || 0) > 0 || (pricingData.capLtmFee || 0) > 0) && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
-                    <span>$${pricingData.grandTotal.toFixed(2)}</span>
+                    <span>$${adjustedSubtotal.toFixed(2)}</span>
                 </div>` : ''}
                 ${taxAmount > 0 ? `<div class="total-row tax-row">
                     <span>WA Sales Tax (${taxPct}%):</span>

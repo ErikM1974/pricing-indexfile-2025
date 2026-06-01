@@ -72,10 +72,25 @@ class ScreenPrintQuoteService {
             // Use LTM fee from quoteData (already calculated correctly by quote builder)
             const ltmFeeTotal = quoteData.ltmFee || 0;
             const setupFees = this.calculateSetupFees(quoteData);
-            const preTexTotal = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
-            // Calculate tax
-            const salesTax = parseFloat((preTexTotal * this.taxRate).toFixed(2));
-            const totalAmount = parseFloat((preTexTotal + salesTax).toFixed(2));
+            const baseTotal = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+            // Additional charges (also persisted as separate columns below)
+            const artCharge = parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0;
+            const graphicDesignCharge = parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0;
+            const rushFee = parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0;
+            const discount = parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0;
+            // TotalAmount MUST be the PRE-TAX, fee-inclusive subtotal the report expects
+            // (quote-view adds shipping + tax on top). The old code stored base*(1+tax)
+            // — tax baked in AND art/design/rush/discount dropped — so the report
+            // double-taxed it and the saved total was wrong on every SCP quote that
+            // used a fee. Mirror EMB (embroidery-quote-service.js). (2026-06-01)
+            const preTaxTotal = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee - discount).toFixed(2));
+            const totalAmount = preTaxTotal;
+            // TaxAmount is informational (the ShopWorks push note prints it; TaxTotal
+            // stays 0). Use the quote's ACTUAL rate (normalized percent→decimal), not
+            // the hardcoded service default, so out-of-state rates are honored.
+            const rawSaveRate = parseFloat(quoteData.taxRate);
+            const taxRateDecimal = !isNaN(rawSaveRate) ? (rawSaveRate > 1 ? rawSaveRate / 100 : rawSaveRate) : this.taxRate;
+            const salesTax = parseFloat((preTaxTotal * taxRateDecimal).toFixed(2));
             
             // Prepare print setup details for Notes field
             // Include full location details (frontLocation, backLocation, colors) for quote-view.js display
@@ -136,6 +151,9 @@ class ScreenPrintQuoteService {
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
                 TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                // Tax amount — informational, drives the ShopWorks push tax note
+                // (was never persisted → note always read "$0.00"). (2026-06-01)
+                TaxAmount: salesTax,
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',
@@ -355,11 +373,23 @@ class ScreenPrintQuoteService {
                 .toISOString()
                 .replace(/\.\d{3}Z$/, '');
 
-            // Calculate totals
+            // Calculate totals — MUST match saveQuote so editing a quote does not
+            // silently change its total. TotalAmount = PRE-TAX, fee-inclusive subtotal
+            // (the report adds shipping + tax on top). The old code stored base-only
+            // (no fees) while saveQuote stored base+tax → the same quote's total shifted
+            // by the tax amount after a no-op revision. (2026-06-01)
             const subtotal = quoteData.subtotal || quoteData.items.reduce((sum, item) => sum + item.total, 0);
             const ltmFeeTotal = quoteData.ltmFee || 0;
             const setupFees = this.calculateSetupFees(quoteData);
-            const totalAmount = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+            const baseTotal = quoteData.grandTotal || (subtotal + ltmFeeTotal + setupFees);
+            const artCharge = parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0;
+            const graphicDesignCharge = parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0;
+            const rushFee = parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0;
+            const discount = parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0;
+            const totalAmount = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee - discount).toFixed(2));
+            const rawUpdRate = parseFloat(quoteData.taxRate);
+            const updTaxRateDecimal = !isNaN(rawUpdRate) ? (rawUpdRate > 1 ? rawUpdRate / 100 : rawUpdRate) : this.taxRate;
+            const salesTax = parseFloat((totalAmount * updTaxRateDecimal).toFixed(2));
 
             // Prepare print setup details for Notes field
             const printSetup = {
@@ -418,6 +448,9 @@ class ScreenPrintQuoteService {
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
                 TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                // Tax amount — informational, drives the ShopWorks push tax note
+                // (was never persisted → note always read "$0.00"). (2026-06-01)
+                TaxAmount: salesTax,
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',

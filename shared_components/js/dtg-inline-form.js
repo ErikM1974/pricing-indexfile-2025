@@ -658,7 +658,11 @@
             return b;
         } catch (err) {
             console.error('[dtg-inline-form] bundle fetch failed:', err);
-            return null;
+            // Return an ERROR SENTINEL (not null) so updateLivePrices surfaces a VISIBLE
+            // failure instead of silently pricing the row at $0 — a too-low total a rep
+            // could quote. Erik's #1 rule: an API failure must be shown, never a silent
+            // fallback to zero. (Not cached → retried on the next recompute.) (2026-06-01)
+            return { __pricingError: true, style: sn, message: (err && err.message) || 'pricing unavailable' };
         }
     }
 
@@ -3367,14 +3371,17 @@
         const code = effectiveLocationCode();
         const cq = combinedQty();
         if (!code || cq === 0 || !window.DTGPricingService) {
-            for (const r of state.rows) { r._perPiece = null; r._lineTotal = 0; }
+            for (const r of state.rows) { r._perPiece = null; r._lineTotal = 0; r._priceError = null; }
             _lastTier = null; _allTiers = null; _lastPerPiece = null;
+            renderPriceErrorBanner(null);
             renderTable();
             renderSummary();
             return;
         }
         const svc = new window.DTGPricingService();
         _lastPerPiece = null; // reset; first priced row sets it
+        let _anyPriceError = false;
+        const _erroredStyles = new Set();
 
         for (const row of state.rows) {
             if (!row.style || !row.color) { row._perPiece = null; row._lineTotal = 0; continue; }
@@ -3385,6 +3392,14 @@
             if (isRowColorInvalid(row)) { row._perPiece = null; row._lineTotal = 0; continue; }
             try {
                 const bundle = await fetchBundle(row.style);
+                if (bundle && bundle.__pricingError) {
+                    // Pricing API failed for this style — surface it; do NOT let the row
+                    // sit at $0 in the rep-facing total. (2026-06-01)
+                    row._perPiece = null; row._lineTotal = 0; row._priceError = bundle.message;
+                    _anyPriceError = true; _erroredStyles.add(row.style);
+                    continue;
+                }
+                row._priceError = null;
                 if (!bundle) { row._perPiece = null; row._lineTotal = 0; continue; }
                 // Resolve the tier ROW from Caspio (incl. LTM_Fee). The
                 // row's LTM_Fee column drives per-piece LTM dynamically —
@@ -3437,10 +3452,32 @@
                 console.error('[dtg-inline-form] row price update failed:', row.style, err);
                 row._perPiece = null;
                 row._lineTotal = 0;
+                row._priceError = (err && err.message) || 'pricing error';
+                _anyPriceError = true; _erroredStyles.add(row.style);
             }
         }
+        // Surface any pricing failure so the rep never quotes an incomplete total
+        // that silently dropped a $0 row. (2026-06-01)
+        renderPriceErrorBanner(_anyPriceError ? Array.from(_erroredStyles) : null);
         renderTable();
         renderSummary();
+    }
+
+    // Persistent red banner shown when one or more rows failed to price due to a
+    // pricing-API error. Pass null/empty to clear it. Erik's #1 rule: a failed
+    // pricing call must be visible, never silently zeroed into the total.
+    function renderPriceErrorBanner(styles) {
+        let banner = document.getElementById('dtg-price-error-banner');
+        if (!styles || styles.length === 0) { if (banner) banner.remove(); return; }
+        if (!banner) {
+            banner = document.createElement('div');
+            banner.id = 'dtg-price-error-banner';
+            banner.setAttribute('role', 'alert');
+            banner.style.cssText = 'margin:10px 0;padding:10px 14px;background:#fef2f2;border:1px solid #ef4444;border-left:4px solid #b91c1c;border-radius:6px;color:#991b1b;font-size:13px;font-weight:600;line-height:1.4;';
+            const mount = document.getElementById('dtgResumeBannerMount') || document.getElementById('dtgInlineFormMount');
+            if (mount) mount.insertBefore(banner, mount.firstChild); else return;
+        }
+        banner.textContent = `⚠ Live pricing failed for ${styles.join(', ')} — the total below is INCOMPLETE. Refresh and try again before quoting this customer.`;
     }
 
     // ----- Submit ------------------------------------------------------------
@@ -3598,39 +3635,62 @@
 
             // Build invoice data structure (matches what EmbroideryInvoiceGenerator expects).
             // DTG doesn't use per-logo locations; the print location is shared across rows.
-            const locationLabel = LOCATION_LABELS[effectiveLocationCode()] || effectiveLocationCode() || 'Left Chest';
+            // Build products in the CANONICAL shape the shared generator's size
+            // matrix requires: { product:{style,title,color}, lineItems:[{description,
+            // quantity, unitPrice, total}] }. The old flat shape (no lineItems[]) threw
+            // a TypeError at generateSizeMatrixTable (pp.lineItems.length) so Print
+            // produced no PDF at all. Group each row's sizes by unit price so base
+            // sizes share a line and upcharged extended sizes (2XL+) get their own. (2026-06-01)
             const invoiceProducts = priceQuote.lineItems.map(li => {
-                const sizeQtys = li.sizes || {};
-                const totalQty = Object.values(sizeQtys).reduce((s, q) => s + (Number(q) || 0), 0);
+                const sizes = li.sizes || {};
+                const pbs = li.priceBySize || {};
+                const groups = {};
+                for (const [szRaw, qRaw] of Object.entries(sizes)) {
+                    const q = Number(qRaw) || 0; if (q <= 0) continue;
+                    const sz = String(szRaw).toUpperCase();
+                    const up = Number(pbs[sz]);
+                    const price = !isNaN(up) ? up : (Number(li.finalUnitPrice) || 0);
+                    const key = price.toFixed(2);
+                    (groups[key] = groups[key] || { price, parts: [], qty: 0 });
+                    groups[key].parts.push(`${sz}(${q})`);
+                    groups[key].qty += q;
+                }
+                let lineItems = Object.keys(groups)
+                    .sort((a, b) => parseFloat(a) - parseFloat(b))
+                    .map(k => {
+                        const g = groups[k];
+                        return { description: g.parts.join(' '), quantity: g.qty, unitPrice: g.price, total: Math.round(g.price * g.qty * 100) / 100 };
+                    });
+                if (lineItems.length === 0) {
+                    const totalQty = Object.values(sizes).reduce((s, q) => s + (Number(q) || 0), 0);
+                    lineItems = [{ description: Object.entries(sizes).map(([s, q]) => `${s}(${q})`).join(' '), quantity: totalQty, unitPrice: Number(li.finalUnitPrice) || 0, total: Number(li.lineTotal) || 0 }];
+                }
                 return {
-                    style: li.style || li.partNumber || '',
-                    color: li.color || '',
-                    description: li.description || `${li.style} ${li.color}`.trim(),
-                    quantity: totalQty,
-                    unitPrice: Number(li.finalUnitPrice) || 0,
-                    lineTotal: Number(li.lineTotal) || 0,
-                    sizeBreakdown: sizeQtys,
-                    printLocation: locationLabel,
-                    logoSpecs: { logos: [{ pos: locationLabel, stitch: '' }] },
+                    product: { style: li.style || '', title: li.description || `${li.style} ${li.color}`.trim(), color: li.color || '' },
+                    lineItems,
                 };
             });
+            // Recompute the subtotal from the rendered line items so the printed
+            // lines reconcile exactly to the printed total.
+            const invoiceSubtotal = Math.round(invoiceProducts.reduce((s, p) =>
+                s + p.lineItems.reduce((ss, li) => ss + (Number(li.total) || 0), 0), 0) * 100) / 100;
 
             const pricingData = {
                 quoteId: getQuoteID() || `DTG-PREVIEW-${Date.now()}`,
-                method: 'DTG',
-                // The generator's getQuoteTypeInfo() keys off `isDTG`, NOT `method` —
-                // without this the printed PDF was titled "EMBROIDERY QUOTE" and showed
-                // embroidery specs instead of DTG. printLocation feeds generateDTGSpecs.
-                // (2026-06-01)
+                // The generator's getQuoteTypeInfo() keys off `isDTG`. printLocation
+                // feeds generateDTGSpecs. (2026-06-01)
                 isDTG: true,
                 printLocation: { front: effectiveLocationCode() },
                 pricingTier: priceQuote.tier || 'Standard',
                 combinedQuantity: priceQuote.combinedQuantity || 0,
                 products: invoiceProducts,
-                subtotal: Number(priceQuote.subtotal) || 0,
-                ltmFee: Number(priceQuote.totalLtmFee) || 0,
-                ltmDistributed: false, // DTG bakes LTM into per-unit; show as separate line for transparency
-                grandTotal: Number(priceQuote.grandTotal) || 0,
+                subtotal: invoiceSubtotal,
+                // DTG amortizes LTM INTO the per-piece price (_priceBySize), so it is
+                // already in every line total — don't add a separate LTM line/double-count.
+                ltmFee: 0,
+                ltmDistributed: true,
+                grandTotal: invoiceSubtotal,
+                preTaxSubtotal: invoiceSubtotal,
                 taxRate: Number(state.shipping?.taxRate) || 0,
                 taxAmount: 0,                       // computed by invoice generator
                 shippingFee: 0,
@@ -3668,27 +3728,26 @@
     // from in-memory `state` + the existing live preview helper rather than
     // running the full async submit flow. Returns null when state is empty.
     function computePriceQuoteFromState() {
-        // Prefer the chat-controller's latest snapshot (already computed for
-        // the live price preview). Fall back to recomputing from rows.
-        if (window.aiState && window.aiState.lastPriceQuote) {
-            return window.aiState.lastPriceQuote;
-        }
-        // Best-effort fallback: walk state.rows and approximate totals from
-        // the displayed DOM (preview cells). Returns minimal structure.
-        const code = effectiveLocationCode();
+        // Build from the AUTHORITATIVE live-price fields updateLivePrices() writes:
+        // row._perPiece (LTM-amortized unit), row._lineTotal, row._priceBySize.
+        // The old code read window.aiState.lastPriceQuote (never assigned anywhere)
+        // and r.previewUnit (never written) → every printed line priced at $0 while
+        // the on-screen live table showed correct dollars. (2026-06-01)
         const lineItems = state.rows
             .filter(r => r.style && r.color && Object.keys(r.sizes || {}).length > 0)
             .map(r => {
                 const totalQty = Object.values(r.sizes).reduce((s, q) => s + (Number(q) || 0), 0);
-                const unitPrice = Number(r.previewUnit) || 0;
+                const unitPrice = Number(r._perPiece) || 0;
+                const lineTotal = Number(r._lineTotal) || (unitPrice * totalQty);
                 return {
                     style: r.style,
                     color: r.color,
                     description: r.description || `${r.style} ${r.color}`,
                     sizes: r.sizes,
+                    priceBySize: r._priceBySize || {},
                     totalQuantity: totalQty,
                     finalUnitPrice: unitPrice,
-                    lineTotal: unitPrice * totalQty,
+                    lineTotal: lineTotal,
                 };
             });
         const subtotal = lineItems.reduce((s, li) => s + (li.lineTotal || 0), 0);
@@ -3699,7 +3758,7 @@
             subtotal,
             grandTotal: subtotal,
             totalLtmFee: 0,
-            tier: 'Standard',
+            tier: (_lastTier && (_lastTier.TierLabel || _lastTier.tierLabel)) || 'Standard',
         };
     }
 
@@ -4380,18 +4439,32 @@
         state.customer.designNumber = notes.designNumber || '';
 
         // Print location — the saved items all share the same printLocation
-        // (DTG: location is global, not per-line). Use the first item's
-        // PrintLocation as the canonical value.
+        // (DTG: location is global, not per-line). PrintLocation is saved as a
+        // STRUCTURED value {front, back, combined} (an object, or a JSON string),
+        // NOT a flat "FRONT_BACK" code. The old String(...).split('_') parse
+        // stuffed the whole JSON into state.front, so effectiveLocationCode()
+        // returned a code absent from the price map and EVERY row priced to $0
+        // on reopen (a saved $392 quote showed $0). Parse the structure; fall
+        // back to the legacy flat-string handling for older data. (2026-06-01)
         const firstLoc = items.find(it => it && it.PrintLocation);
         if (firstLoc && firstLoc.PrintLocation) {
-            const code = String(firstLoc.PrintLocation).toUpperCase();
-            if (code.includes('_')) {
-                const [front, back] = code.split('_');
-                state.front = front;
-                state.back  = back || '';
+            let pl = firstLoc.PrintLocation;
+            if (typeof pl === 'string' && pl.trim().startsWith('{')) {
+                try { pl = JSON.parse(pl); } catch (_) { /* fall through to flat-string parse */ }
+            }
+            if (pl && typeof pl === 'object') {
+                state.front = String(pl.front || 'LC').toUpperCase();
+                state.back  = String(pl.back || '').toUpperCase();
             } else {
-                state.front = code;
-                state.back = '';
+                const code = String(pl).toUpperCase();
+                if (code.includes('_')) {
+                    const [front, back] = code.split('_');
+                    state.front = front;
+                    state.back  = back || '';
+                } else {
+                    state.front = code;
+                    state.back = '';
+                }
             }
         }
 
