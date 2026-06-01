@@ -4338,7 +4338,10 @@
             || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         let res, data;
         try {
-            res = await fetch(`${apiBase}/api/quote-sessions/${encodeURIComponent(quoteId)}/full`);
+            // /api/quote-sessions/:id/full is a FRONTEND route (server.js), NOT on the
+            // proxy — fetch it same-origin (relative). Using APP_CONFIG's proxy BASE_URL
+            // here 404'd, which broke DTG edit-load entirely. (2026-06-01)
+            res = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/full`);
             data = await res.json();
         } catch (e) {
             alert(`Failed to load ${quoteId}: ${e.message}`);
