@@ -2823,6 +2823,9 @@ class DTFQuoteBuilder {
             artCharge: artCharge,
             graphicDesignFee: graphicDesignFee,
             graphicDesignHours: designHours,
+            // Shipping — itemized on the PDF so the rows foot to the total (already inside
+            // preTaxSubtotal / the grand total). (2026-06-01)
+            shippingFee: parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0,
             // Rush and discount
             rushFee: rushFee,
             discount: discount,

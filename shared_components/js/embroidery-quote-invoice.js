@@ -1473,12 +1473,17 @@ class EmbroideryInvoiceGenerator {
                     <span>Rush Fee:</span>
                     <span>$${pricingData.rushFee.toFixed(2)}</span>
                 </div>` : ''}
+                ${(pricingData.shippingFee || 0) > 0 ? `
+                <div class="total-row">
+                    <span>Shipping:</span>
+                    <span>$${pricingData.shippingFee.toFixed(2)}</span>
+                </div>` : ''}
                 ${(pricingData.discount || 0) > 0 ? `
                 <div class="total-row discount-row">
                     <span>Discount${pricingData.discountReason ? ` (${pricingData.discountReason})` : ''}:</span>
                     <span>-$${pricingData.discount.toFixed(2)}</span>
                 </div>` : ''}
-                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || (((pricingData.garmentLtmFee || 0) > 0 || (pricingData.capLtmFee || 0) > 0) && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
+                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || (((pricingData.garmentLtmFee || 0) > 0 || (pricingData.capLtmFee || 0) > 0) && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
                     <span>$${adjustedSubtotal.toFixed(2)}</span>

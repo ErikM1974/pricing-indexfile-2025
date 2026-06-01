@@ -826,7 +826,8 @@ async function loadQuoteForEditing(quoteId) {
         // 3739 with no ship-to address. Restore them from the saved session. (2026-06-01)
         (function restoreEmbOrderShipping() {
             const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
-            const isoToInput = (v) => { const m = v && String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : (v || ''); };
+            // EMB date inputs are type=text labeled MM/DD/YYYY; the column is stored ISO.
+            const isoToInput = (v) => { const m = v && String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[2]}/${m[3]}/${m[1]}` : (v || ''); };
             setVal('customer-number', session.CustomerNumber);
             setVal('customer-phone', session.Phone);
             setVal('order-number', session.OrderNumber);
@@ -835,11 +836,38 @@ async function loadQuoteForEditing(quoteId) {
             setVal('ship-city', session.ShipToCity);
             setVal('ship-state', session.ShipToState);
             setVal('ship-zip', session.ShipToZip);
-            setVal('ship-method', session.ShipMethod);
             setVal('payment-terms', session.PaymentTerms);
             setVal('date-order-placed', isoToInput(session.DateOrderPlaced));
             setVal('req-ship-date', isoToInput(session.ReqShipDate));
             setVal('drop-dead-date', isoToInput(session.DropDeadDate));
+            // Ship method: the SAVE collapses an "Other" selection into the custom text,
+            // so a stored value not in the <select> options IS an "Other" method. A bare
+            // setVal would set selectedIndex=-1 (value '') -> the custom method displays
+            // blank and gets WIPED on the next Save Revision. Detect + restore properly.
+            const smEl = document.getElementById('ship-method');
+            const sm = session.ShipMethod || '';
+            if (smEl) {
+                const known = Array.from(smEl.options).map(o => o.value);
+                if (sm && known.indexOf(sm) === -1) {
+                    smEl.value = 'Other';
+                    const other = document.getElementById('ship-method-other');
+                    if (other) other.value = sm;
+                } else if (sm) {
+                    smEl.value = sm;
+                }
+                // A programmatic .value change doesn't fire onchange — call the handler so
+                // the conditional UI (pickup notice / Other text / address visibility)
+                // matches the restored method.
+                if (typeof onShipMethodChange === 'function') { try { onShipMethodChange(); } catch (_) {} }
+            }
+            // Expand the (default-collapsed) Order Details panel so the restored data is
+            // visible — a collapsed header reads as "no data" and risks re-entry/blanking.
+            if (session.CustomerNumber || session.PurchaseOrderNumber || session.OrderNumber || sm || session.ShipToAddress || session.ReqShipDate) {
+                const c = document.getElementById('order-details-content');
+                if (c) c.style.display = 'block';
+                const ch = document.getElementById('order-details-chevron');
+                if (ch) ch.style.transform = 'rotate(180deg)';
+            }
             if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
         })();
 
@@ -11295,6 +11323,9 @@ function buildEmbroideryPricingData(allItems) {
         graphicDesignHours: charges.graphicDesignHours || 0,
         graphicDesignCharge: charges.graphicDesignCharge || 0,
         rushFee: charges.rushFee || 0,
+        // Shipping — itemized on the PDF so the rows foot to the total (already inside
+        // preTaxSubtotal). (2026-06-01)
+        shippingFee: parseFloat(document.getElementById('shipping-fee')?.value) || 0,
         discount: charges.discount || 0,
         discountReason: charges.discountReason || '',
         // DECG/DECC

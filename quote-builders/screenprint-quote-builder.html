@@ -371,10 +371,12 @@
                                 <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                             </select>
                         </div>
-                        <div class="customer-field">
-                            <label class="quote-label">CUSTOMER #</label>
-                            <input type="text" id="customer-number" placeholder="ShopWorks ID" class="quote-input">
-                        </div>
+                        <!-- (2026-06-01) Removed a duplicate customer-number input here
+                             ("CUSTOMER #"). Two elements shared that id, so a rep typing in
+                             this box had it silently ignored on save (getElementById returns
+                             the FIRST one above) -> the order pushed to fallback customer 3739.
+                             The "SHOPWORKS CUST #" field above (auto-fills from the lookup) is
+                             the single source. -->
                         <div class="customer-field">
                             <label class="quote-label">PHONE</label>
                             <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
@@ -642,7 +644,7 @@
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.01.9"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.01.9"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.01.11"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -670,7 +672,7 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.01.10"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.01.11"></script>
 
 </body>
 </html>

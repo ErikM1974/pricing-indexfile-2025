@@ -61,6 +61,16 @@ describe('EmbroideryInvoiceGenerator total math (2026-06-01 PDF regression)', ()
     expect(tax).toBe(0);
     expect(grand).toBeCloseTo(1100.00, 2);
   });
+  test('renders a Shipping row and folds it into the total (rows foot to GRAND TOTAL)', () => {
+    // base 200 + art 50 + shipping 30 = 280 pre-tax; x1.101 = 308.28
+    const html = new Generator().generateInvoiceHTML({
+      quoteId: 'T6', grandTotal: 200, preTaxSubtotal: 280, artCharge: 50, shippingFee: 30,
+      taxRate: 0.101, products: [],
+    }, CUST);
+    expect(html).toMatch(/Shipping:<\/span>\s*<span>\$30\.00<\/span>/);
+    const { grand } = parseTotals(html);
+    expect(grand).toBeCloseTo(308.28, 2);
+  });
   test('GRAND TOTAL always equals (preTaxSubtotal || grandTotal) x (1 + normalizedRate)', () => {
     const cases = [
       { grandTotal: 1000, preTaxSubtotal: 1234.56, taxRate: 0.101 },

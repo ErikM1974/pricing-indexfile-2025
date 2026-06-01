@@ -3649,7 +3649,12 @@
                     const q = Number(qRaw) || 0; if (q <= 0) continue;
                     const sz = String(szRaw).toUpperCase();
                     const up = Number(pbs[sz]);
-                    const price = !isNaN(up) ? up : (Number(li.finalUnitPrice) || 0);
+                    // A size with no per-size price (absent from _priceBySize) was EXCLUDED
+                    // from the on-screen total (updateLivePrices skips it). Skip it here too
+                    // so the printed PDF total matches the screen — don't price an
+                    // unavailable size at the weighted-average fallback. (2026-06-01)
+                    if (isNaN(up)) continue;
+                    const price = up;
                     const key = price.toFixed(2);
                     (groups[key] = groups[key] || { price, parts: [], qty: 0 });
                     groups[key].parts.push(`${sz}(${q})`);

@@ -2981,6 +2981,7 @@ async function recalculatePricing() {
 
     let subtotal = 0;
     const pricedProducts = [];
+    const droppedProducts = []; // products that couldn't be priced (surfaced after the loop)
     let firstPricing = null;  // Capture first product's pricing for nudge savings calc
     let firstTierData = null;
 
@@ -2994,6 +2995,7 @@ async function recalculatePricing() {
 
             if (!pricingData) {
                 console.warn(`No pricing data for ${style}`);
+                droppedProducts.push({ style, reason: 'no pricing data returned' });
                 continue;
             }
 
@@ -3003,12 +3005,13 @@ async function recalculatePricing() {
 
             if (!primaryPricing || !primaryPricing.tiers) {
                 console.warn(`No primary pricing for ${frontColors} colors`);
+                droppedProducts.push({ style, reason: `no pricing for ${frontColors}-color front` });
                 continue;
             }
 
             // Find the tier data for this quantity
             const tierData = findPricingTier(primaryPricing.tiers, totalQty);
-            if (!tierData) continue;
+            if (!tierData) { droppedProducts.push({ style, reason: `no price tier for qty ${totalQty}` }); continue; }
 
             // Capture first product's pricing for nudge savings calculation
             if (!firstPricing) {
@@ -3122,6 +3125,14 @@ async function recalculatePricing() {
                 ltmPerUnit: perUnitLTM,
                 imageUrl: product.imageUrl || ''
             });
+        }
+
+        // Surface any product that couldn't be priced. It was EXCLUDED from the
+        // subtotal/saved/pushed quote with only a console.warn before, so a rep could
+        // quote and push a total that silently dropped a line. Erik's #1 rule. (2026-06-01)
+        if (droppedProducts.length > 0) {
+            const styles = [...new Set(droppedProducts.map(d => d.style))].join(', ');
+            showToast(`Could not price ${styles} for the selected colors/quantity — NOT included in the total. Adjust colors/qty or remove before saving.`, 'error');
         }
 
         // Calculate grand total — in builtin mode LTM is already in subtotal via inflated unit prices
@@ -3818,6 +3829,9 @@ function buildScreenprintPricingData(products) {
         // tax bare grandTotal and drop every fee/discount from the printed total). (2026-06-01)
         preTaxSubtotal: (() => { const t = document.getElementById('pre-tax-subtotal')?.textContent || ''; const v = parseFloat(t.replace(/[$,]/g, '')); return isNaN(v) ? undefined : v; })(),
         includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+        // Shipping — itemized on the PDF so the rows foot to the total (already inside
+        // preTaxSubtotal). (2026-06-01)
+        shippingFee: parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0,
         setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
