@@ -727,7 +727,10 @@
                                     'Payment Confirmed - ShopWorks Failed',
                                     'Pending Payment',
                                 ]);
-                                const isEditLocked = lockedStatuses.has(quote.Status);
+                                // Also lock once pushed to ShopWorks even if Status
+                                // hasn't flipped — EMB/SCP/DTF set PushedToShopWorks
+                                // but can leave Status='Open'. (2026-06-01)
+                                const isEditLocked = lockedStatuses.has(quote.Status) || !!quote.PushedToShopWorks;
                                 if (isEditLocked) {
                                     return `<button class="action-btn action-btn--locked"
                                                     disabled
@@ -879,7 +882,7 @@
                 'Pending Payment',
             ]);
             const quote = (allQuotes || []).find(q => q.QuoteID === quoteId);
-            if (quote && lockedStatuses.has(quote.Status)) {
+            if (quote && (lockedStatuses.has(quote.Status) || quote.PushedToShopWorks)) {
                 alert(
                     `${quoteId} is in ShopWorks (status: ${quote.Status}).\n\n` +
                     `Per the one-way sync rule, edits must happen in ShopWorks. ` +
@@ -890,19 +893,23 @@
                 return;
             }
 
-            // Determine quote type from QuoteID prefix
-            const prefix = quoteId.split('-')[0];
+            // Determine quote type from QuoteID prefix = LEADING LETTERS ONLY.
+            // QuoteID formats differ by method: EMB-2026-001 (hyphen after prefix)
+            // vs DTG0311-1 / DTF0601-1 / SP0601-9001 (date-packed, NO hyphen).
+            // The old split('-')[0] returned "DTG0311" for DTG, so every non-EMB
+            // quote wrongly fell through to the EMB builder. Match the alpha
+            // prefix instead, and use the real builder filenames. (2026-06-01)
+            const prefix = (String(quoteId).match(/^[A-Za-z]+/) || [''])[0].toUpperCase();
             let builderUrl = '/quote-builders/embroidery-quote-builder.html';
 
-            // Map prefix to quote builder (can be extended for other types)
-            if (prefix === 'EMB' || prefix === 'EMBC') {
-                builderUrl = '/quote-builders/embroidery-quote-builder.html';
-            } else if (prefix === 'DTG') {
+            if (prefix === 'DTG') {
                 builderUrl = '/quote-builders/dtg-quote-builder.html';
-            } else if (prefix === 'SPC' || prefix === 'SSC') {
-                builderUrl = '/quote-builders/screen-print-quote-builder.html';
+            } else if (prefix === 'DTF') {
+                builderUrl = '/quote-builders/dtf-quote-builder.html';
+            } else if (prefix === 'SP' || prefix === 'SPC' || prefix === 'SSC') {
+                builderUrl = '/quote-builders/screenprint-quote-builder.html';
             }
-            // Add more quote types as they're implemented
+            // EMB / EMBC / CEMB and anything else → embroidery builder (default)
 
             // Open quote builder in edit mode
             window.open(`${builderUrl}?edit=${quoteId}`, '_blank');
