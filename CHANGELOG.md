@@ -1,3 +1,8 @@
+## v2026.06.01.3 (2026.06.01)
+
+- Quote reports: method-aware specs header + fix blank invoice DECORATION
+- Deploy v2026.06.01.3: 7 files (invoice.html,quote-view.html,dtf-quote-builder.html)
+
 ## v2026.06.01.2 (2026.06.01)
 
 - SCP: capture + persist ShopWorks customer # (was missing -> orders fell back to cust 3739)
