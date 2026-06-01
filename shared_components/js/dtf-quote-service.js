@@ -597,7 +597,9 @@ class DTFQuoteService {
                 throw new Error('Quote not found');
             }
 
-            const session = sessions[0];
+            // Defensive: pick the MATCHING quote, not blindly sessions[0] (which
+            // loaded the wrong quote before the 2026-06-01 proxy QuoteID-filter fix).
+            const session = sessions.find(s => s && s.QuoteID === quoteID) || sessions[0];
 
             // Load items
             const itemsResponse = await fetch(`${this.baseURL}/quote_items?QuoteID=${quoteID}`);

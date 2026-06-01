@@ -825,13 +825,20 @@ function assertQuoteEditable(session, opts = {}) {
         'Pending Payment',
     ]);
     const status = session && session.Status;
-    if (!lockedStatuses.has(status)) return true;
+    // Lock if a locked status OR already pushed to ShopWorks. Once pushed,
+    // ShopWorks is the source of truth, so edits here would diverge from the SW
+    // order. The hourly sync flips Status to 'Processed' only AFTER ShopWorks
+    // imports, so a freshly-pushed quote can still read 'Open' — PushedToShopWorks
+    // catches that window. (2026-06-01)
+    const isPushed = !!(session && session.PushedToShopWorks);
+    if (!lockedStatuses.has(status) && !isPushed) return true;
 
     if (opts.silent) return false;
 
     const quoteId = (session && session.QuoteID) || '(unknown)';
+    const reason = lockedStatuses.has(status) ? `status: ${status}` : 'already pushed to ShopWorks';
     alert(
-        `${quoteId} is in ShopWorks (status: ${status}).\n\n` +
+        `${quoteId} is in ShopWorks (${reason}).\n\n` +
         `Per the one-way sync rule, edits must happen in ShopWorks. ` +
         `Changes in this app would not sync back to the SW order.\n\n` +
         `Opening read-only quote view instead.`
