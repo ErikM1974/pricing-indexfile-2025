@@ -308,7 +308,10 @@ class ScreenPrintQuoteService {
                 throw new Error('Quote not found');
             }
 
-            const session = sessions[0];
+            // Defensive: the proxy now filters by QuoteID, but if it ever returns
+            // extra rows, pick the MATCHING quote — not blindly sessions[0], which
+            // loaded the wrong customer/products before the 2026-06-01 proxy fix.
+            const session = sessions.find(s => s && s.QuoteID === quoteID) || sessions[0];
 
             // Get items
             const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?QuoteID=${quoteID}`);
