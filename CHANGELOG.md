@@ -1,3 +1,7 @@
+## v2026.06.01.8 (2026.06.01)
+
+- Deploy v2026.06.01.8: 5 files (quote-management.html,LESSONS_LEARNED.md,LESSONS_LEARNED_ARCHIVE.md,...)
+
 ## v2026.06.01.6 (2026.06.01)
 
 - Quote edit-load: lock pushed quotes + defensive matching-quote pick
