@@ -1,3 +1,8 @@
+## v2026.06.01.6 (2026.06.01)
+
+- Quote edit-load: lock pushed quotes + defensive matching-quote pick
+- Deploy v2026.06.01.6: 5 files (cache-bust)
+
 ## v2026.06.01.5 (2026.06.01)
 
 - Print/PDF: fix EMB tax-rate pass + DTG flagship title/specs flag
