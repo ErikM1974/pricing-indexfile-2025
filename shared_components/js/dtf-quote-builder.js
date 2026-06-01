@@ -2557,9 +2557,11 @@ class DTFQuoteBuilder {
                     this.persistence.clearDraft();
                 }
 
-                // Phase 8 (2026-05-23): reveal Push-to-ShopWorks button after save.
-                // Gated behind ?enableDtfPush=1 query param until Erik confirms
-                // OnSite integration IDs (id_Customer, id_OrderType, ExtSource).
+                // Reveal the Push-to-ShopWorks button after a successful save.
+                // Clicking it opens openDtfPushPreview() — a review-before-push
+                // modal (parity with EMB/SCP) that shows the exact ShopWorks
+                // payload before the rep confirms. (Order/design type IDs live in
+                // caspio-pricing-proxy/config/manageorders-dtf-config.js: 18/8.)
                 if (typeof showDtfPushButton === 'function') {
                     showDtfPushButton(finalQuoteId);
                 }
@@ -3421,86 +3423,185 @@ function showDtfPushButton(quoteId) {
     }
 }
 
-async function dtfPushToShopWorks() {
+// Minimal HTML escaper for preview output (self-contained — no util dependency).
+function _dtfEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+}
+
+// Open the preview-and-confirm modal — parity with EMB/SCP's openScpPushPreview().
+// Fetches the exact ExternalOrderJson the backend would push (read-only /preview
+// endpoint) so the rep reviews line items, order type and total before the order
+// is created. If the modal or preview can't load, falls back to a direct
+// confirm()-push so the rep is never blocked.
+async function openDtfPushPreview() {
     const btn = document.getElementById('dtf-push-shopworks-btn');
-    const label = document.getElementById('dtf-push-shopworks-label');
     if (!btn || btn.disabled || !_dtfPushQuoteId) return;
 
-    const customerName = document.getElementById('customer-name')?.value?.trim() || '';
-    const companyName = document.getElementById('company-name')?.value?.trim() || '';
-    const displayName = companyName || customerName || 'N/A';
+    const modal = document.getElementById('dtf-push-modal');
+    const statusEl = document.getElementById('dtf-push-status');
+    const previewEl = document.getElementById('dtf-push-preview');
+    const confirmBtn = document.getElementById('dtf-push-confirm');
+    if (!modal || !previewEl || !confirmBtn) {
+        return confirmDtfPush(true); // modal markup missing → legacy direct push
+    }
 
-    const confirmed = confirm(
-        `Push to ShopWorks?\n\n` +
-        `Quote: ${_dtfPushQuoteId}\n` +
-        `Customer: ${displayName}\n\n` +
-        `This creates a new DTF order in ShopWorks OnSite with the products, ` +
-        `sizes, charges, and ship-to from this quote.`
-    );
-    if (!confirmed) return;
-
-    // Loading state
-    const originalText = label?.textContent || 'Push to ShopWorks';
-    if (label) label.textContent = 'Pushing...';
-    btn.disabled = true;
-    btn.style.opacity = '0.6';
+    if (statusEl) statusEl.innerHTML = '';
+    previewEl.innerHTML = '<div style="padding:24px; text-align:center; color:#64748b;">' +
+        '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.6';
+    confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
+    modal.classList.add('show');
 
     try {
         const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
             ? APP_CONFIG.API.BASE_URL
             : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/dtf-push/preview/${encodeURIComponent(_dtfPushQuoteId)}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+        renderDtfPushPreview(data.orderJson || {});
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+    } catch (err) {
+        console.error('[DTF Push] Preview error:', err);
+        previewEl.innerHTML = '<div style="padding:16px; color:#b91c1c;">' +
+            '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _dtfEsc(err.message) +
+            '<br><span style="color:#64748b;">You can still push below.</span></div>';
+        confirmBtn.disabled = false;
+        confirmBtn.style.opacity = '1';
+    }
+}
 
+// Render the modal body from the /preview orderJson.
+function renderDtfPushPreview(o) {
+    const previewEl = document.getElementById('dtf-push-preview');
+    if (!previewEl) return;
+    const lines = Array.isArray(o.LinesOE) ? o.LinesOE : [];
+    const designs = Array.isArray(o.Designs) ? o.Designs : [];
+    const shipping = parseFloat(o.cur_Shipping) || 0;
+    const discount = parseFloat(o.TotalDiscounts) || 0;
+    const lineSum = lines.reduce((s, l) => s + (parseFloat(l.Price) || 0) * (parseFloat(l.Qty) || 0), 0);
+    const preTax = lineSum + shipping - discount;
+
+    let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; font-size:13px;">';
+    html += '<div><span style="color:#64748b;">ShopWorks Order:</span> <strong>' + _dtfEsc(o.ExtOrderID || '') + '</strong></div>';
+    html += '<div><span style="color:#64748b;">Order type:</span> <strong>' + _dtfEsc(String(o.id_OrderType || '')) + '</strong> <span style="color:#64748b;">(18 = Transfers)</span></div>';
+    html += '<div><span style="color:#64748b;">Customer #:</span> ' + _dtfEsc(String(o.id_Customer || '')) + '</div>';
+    html += '<div><span style="color:#64748b;">Designs:</span> ' + designs.length + '</div>';
+    html += '</div>';
+
+    html += '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
+    html += '<thead><tr style="text-align:left; border-bottom:1px solid #e5e7eb; color:#64748b;">' +
+        '<th style="padding:4px;">Part</th><th style="padding:4px;">Description</th>' +
+        '<th style="padding:4px; text-align:center;">Size</th><th style="padding:4px; text-align:right;">Qty</th>' +
+        '<th style="padding:4px; text-align:right;">Price</th></tr></thead><tbody>';
+    if (lines.length === 0) {
+        html += '<tr><td colspan="5" style="padding:8px; color:#b91c1c;">No line items</td></tr>';
+    } else {
+        for (const l of lines) {
+            html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
+                '<td style="padding:4px; font-weight:600;">' + _dtfEsc(l.PartNumber || '') + '</td>' +
+                '<td style="padding:4px;">' + _dtfEsc(l.Description || '') + '</td>' +
+                '<td style="padding:4px; text-align:center;">' + _dtfEsc(l.Size || '') + '</td>' +
+                '<td style="padding:4px; text-align:right;">' + _dtfEsc(String(l.Qty || '')) + '</td>' +
+                '<td style="padding:4px; text-align:right;">$' + (parseFloat(l.Price) || 0).toFixed(2) + '</td></tr>';
+        }
+    }
+    html += '</tbody></table>';
+    html += '<div style="text-align:right; margin-top:10px; font-size:14px; font-weight:700;">' +
+        'Order total (pre-tax): $' + preTax.toFixed(2) + '</div>';
+    if (designs.length === 0) {
+        html += '<div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e;">' +
+            '<i class="fas fa-exclamation-triangle"></i> No design linked — a rep must assign the design in ShopWorks.</div>';
+    }
+    previewEl.innerHTML = html;
+}
+
+// Perform the actual push (POST /push-quote). directFallback=true is the legacy
+// path used when the modal couldn't open.
+async function confirmDtfPush(directFallback) {
+    const mainBtn = document.getElementById('dtf-push-shopworks-btn');
+    const mainLabel = document.getElementById('dtf-push-shopworks-label');
+    const confirmBtn = document.getElementById('dtf-push-confirm');
+    const statusEl = document.getElementById('dtf-push-status');
+    if (!_dtfPushQuoteId) return;
+
+    if (directFallback) {
+        const customerName = document.getElementById('customer-name')?.value?.trim() || '';
+        const companyName = document.getElementById('company-name')?.value?.trim() || '';
+        const displayName = companyName || customerName || 'N/A';
+        if (!confirm(
+            `Push to ShopWorks?\n\nQuote: ${_dtfPushQuoteId}\nCustomer: ${displayName}\n\n` +
+            `This creates a new DTF order in ShopWorks OnSite with the products, sizes, charges, and ship-to from this quote.`
+        )) return;
+        if (mainBtn) { mainBtn.disabled = true; mainBtn.style.opacity = '0.6'; }
+        if (mainLabel) mainLabel.textContent = 'Pushing...';
+    } else if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.style.opacity = '0.6';
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+    }
+
+    const notifyToast = (msg, type) => {
+        if (typeof showToast === 'function') showToast(msg, type);
+        else if (dtfQuoteBuilder?.showToast) dtfQuoteBuilder.showToast(msg, type);
+    };
+
+    try {
+        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         const response = await fetch(`${apiBase}/api/dtf-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                quoteId: _dtfPushQuoteId,
-                isTest: false,
-                force: false,
-            }),
+            body: JSON.stringify({ quoteId: _dtfPushQuoteId, isTest: false, force: false }),
         });
-
         const data = await response.json();
 
         if (!response.ok) {
             if (response.status === 409) {
-                if (label) label.textContent = 'Already Pushed';
-                btn.style.background = '#28a745';
-                if (typeof showToast === 'function') {
-                    showToast('Already pushed to ShopWorks', 'info');
-                } else if (dtfQuoteBuilder?.showToast) {
-                    dtfQuoteBuilder.showToast('Already pushed to ShopWorks', 'info');
-                }
+                if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px;">Already pushed to ShopWorks.</div>';
+                if (mainLabel) mainLabel.textContent = 'Already Pushed';
+                if (mainBtn) mainBtn.style.background = '#28a745';
+                notifyToast('Already pushed to ShopWorks', 'info');
+                closeDtfPushPreview();
                 return;
             }
             throw new Error(data.error || data.details || `HTTP ${response.status}`);
         }
 
         // Success
-        if (label) label.textContent = `Pushed ✓ (${data.extOrderId})`;
-        btn.style.background = '#28a745';
-        const successMsg = `Pushed to ShopWorks as ${data.extOrderId}`;
-        if (typeof showToast === 'function') {
-            showToast(successMsg, 'success');
-        } else if (dtfQuoteBuilder?.showToast) {
-            dtfQuoteBuilder.showToast(successMsg, 'success');
-        }
+        if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
+        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; }
+        notifyToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[DTF Push] Success:', data);
+        closeDtfPushPreview();
 
     } catch (error) {
         console.error('[DTF Push] Push error:', error);
-        if (label) label.textContent = originalText;
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        const errorMsg = `Push failed: ${error.message}`;
-        if (typeof showToast === 'function') {
-            showToast(errorMsg, 'error');
-        } else if (dtfQuoteBuilder?.showToast) {
-            dtfQuoteBuilder.showToast(errorMsg, 'error');
-        }
+        if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#b91c1c;">Push failed: ' + _dtfEsc(error.message) + '</div>';
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
+        if (mainBtn) { mainBtn.disabled = false; mainBtn.style.opacity = '1'; }
+        if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';
+        notifyToast(`Push failed: ${error.message}`, 'error');
     }
 }
 
+function closeDtfPushPreview() {
+    const modal = document.getElementById('dtf-push-modal');
+    if (modal) modal.classList.remove('show');
+}
+
+// Back-compat alias — older callers reference dtfPushToShopWorks.
+function dtfPushToShopWorks() { return openDtfPushPreview(); }
+
 // Expose for HTML onclick + cross-file callers
+window.openDtfPushPreview = openDtfPushPreview;
+window.renderDtfPushPreview = renderDtfPushPreview;
+window.confirmDtfPush = confirmDtfPush;
+window.closeDtfPushPreview = closeDtfPushPreview;
 window.dtfPushToShopWorks = dtfPushToShopWorks;
 window.showDtfPushButton = showDtfPushButton;
