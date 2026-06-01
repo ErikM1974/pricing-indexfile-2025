@@ -1,3 +1,8 @@
+## v2026.06.01.1 (2026.06.01)
+
+- DTF quote builder: add review-before-push preview modal (parity with EMB/SCP)
+- Deploy v2026.06.01.1: 1 files (dtf-quote-builder.html)
+
 ## v2026.05.29.10 (2026.05.29)
 
 - Note emails: =-free '?ae' rep-link flag (fixes corrupted ?view=ae)
