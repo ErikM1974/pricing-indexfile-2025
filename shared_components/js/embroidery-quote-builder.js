@@ -11273,6 +11273,7 @@ function buildEmbroideryPricingData(allItems) {
         subtotal: subtotal,
         grandTotal: grandTotal,
         preTaxSubtotal: isNaN(preTaxSubtotalVal) ? undefined : preTaxSubtotalVal,
+        includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
         totalQuantity: totalQty,
         setupFees: setupFees + capPatchSetupFee,
         setupFeesCount: digitizingCount,

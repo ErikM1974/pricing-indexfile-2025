@@ -3817,6 +3817,7 @@ function buildScreenprintPricingData(products) {
         // total matches the on-screen #grand-total-with-tax (the generator used to
         // tax bare grandTotal and drop every fee/discount from the printed total). (2026-06-01)
         preTaxSubtotal: (() => { const t = document.getElementById('pre-tax-subtotal')?.textContent || ''; const v = parseFloat(t.replace(/[$,]/g, '')); return isNaN(v) ? undefined : v; })(),
+        includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
         setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
