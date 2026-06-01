@@ -3618,6 +3618,12 @@
             const pricingData = {
                 quoteId: getQuoteID() || `DTG-PREVIEW-${Date.now()}`,
                 method: 'DTG',
+                // The generator's getQuoteTypeInfo() keys off `isDTG`, NOT `method` —
+                // without this the printed PDF was titled "EMBROIDERY QUOTE" and showed
+                // embroidery specs instead of DTG. printLocation feeds generateDTGSpecs.
+                // (2026-06-01)
+                isDTG: true,
+                printLocation: { front: effectiveLocationCode() },
                 pricingTier: priceQuote.tier || 'Standard',
                 combinedQuantity: priceQuote.combinedQuantity || 0,
                 products: invoiceProducts,

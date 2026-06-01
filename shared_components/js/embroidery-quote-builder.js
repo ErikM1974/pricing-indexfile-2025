@@ -11379,6 +11379,10 @@ async function printQuote() {
     try {
         const pricingData = buildEmbroideryPricingData(allItems);
 
+        // Pass the quote's actual tax rate (percent) so the printed PDF matches the
+        // on-screen total instead of hardcoding 10.1%. (2026-06-01)
+        pricingData.taxRate = parseFloat(document.getElementById('tax-rate-input')?.value);
+
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
         const customerData = {
             name: document.getElementById('customer-name')?.value || 'Customer',
