@@ -3636,6 +3636,10 @@ async function printQuote() {
         const ltmState = getLtmControlState('spc-ltm-panel');
         pricingData.ltmDistributed = (ltmState.displayMode === 'builtin');
 
+        // Pass the quote's actual tax rate (percent) so the printed PDF matches the
+        // on-screen total instead of hardcoding 10.1%. (2026-06-01)
+        pricingData.taxRate = parseFloat(document.getElementById('tax-rate-input')?.value);
+
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
         const printWindow = window.open('', '_blank');
         printWindow.document.write(invoiceHTML);

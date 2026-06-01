@@ -43,9 +43,18 @@ class EmbroideryInvoiceGenerator {
         // Get sales rep name
         const salesRepName = this.salesRepMap[customerData.salesRepEmail] || 'Sales Team';
         
-        // Calculate tax (respect user's include-tax toggle)
+        // Calculate tax. Use the quote's ACTUAL rate when provided (accepts a
+        // decimal 0.101 or a percent 10.1) instead of a hardcoded 10.1% — out-of-
+        // state / non-standard-rate customers were over-taxed on the printed PDF
+        // vs the on-screen total. Falls back to this.taxRate if not passed. (2026-06-01)
+        let taxRate = this.taxRate;
+        const rawRate = pricingData.taxRate;
+        if (rawRate != null && rawRate !== '' && !isNaN(parseFloat(rawRate))) {
+            const n = parseFloat(rawRate);
+            taxRate = n > 1 ? n / 100 : n;
+        }
         const includeTax = pricingData.includeTax !== false;
-        const taxAmount = includeTax ? pricingData.grandTotal * this.taxRate : 0;
+        const taxAmount = includeTax ? pricingData.grandTotal * taxRate : 0;
         const totalWithTax = pricingData.grandTotal + taxAmount;
         
         return `
@@ -64,7 +73,7 @@ class EmbroideryInvoiceGenerator {
                     ${this.generateCustomerSection(customerData, salesRepName)}
                     ${this.generateEmbroiderySpecs(pricingData)}
                     ${this.generateProductsTable(pricingData)}
-                    ${this.generateTotalsSection(pricingData, taxAmount, totalWithTax)}
+                    ${this.generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate)}
                     ${this.generateFooter(customerData)}
                 </div>
             </body>
@@ -1403,7 +1412,8 @@ class EmbroideryInvoiceGenerator {
     /**
      * Generate totals section
      */
-    generateTotalsSection(pricingData, taxAmount, totalWithTax) {
+    generateTotalsSection(pricingData, taxAmount, totalWithTax, taxRate) {
+        const taxPct = +(((taxRate != null ? taxRate : this.taxRate) * 100).toFixed(2));
         return `
             <div class="totals-section">
                 <div class="total-row subtotal-row">
@@ -1461,7 +1471,7 @@ class EmbroideryInvoiceGenerator {
                     <span>$${pricingData.grandTotal.toFixed(2)}</span>
                 </div>` : ''}
                 ${taxAmount > 0 ? `<div class="total-row tax-row">
-                    <span>WA Sales Tax (10.1%):</span>
+                    <span>WA Sales Tax (${taxPct}%):</span>
                     <span>$${taxAmount.toFixed(2)}</span>
                 </div>` : ''}
                 <div class="total-row grand-total">
