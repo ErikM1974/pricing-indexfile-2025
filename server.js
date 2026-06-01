@@ -4962,6 +4962,30 @@ async function logQuoteChanges(quoteId, changes, detectedBy, salesRepEmail, shop
  *
  * Returns: { success, synced, deleted, status, shopWorksOrderNumber, snapshot }
  */
+// Derive the ManageOrders ExtOrderID the way the PUSH created it, so the sync
+// looks up the correct order. EMB/SCP/DTF builder pushes use a method-prefixed,
+// year-safe ID built by caspio-pricing-proxy/config/manageorders-emb-config.js
+// `buildExtOrderID` (EMB-2026-177 / SCP-2026-MMDD-seq / DTF-2026-MMDD-seq). The
+// Order Form / DTG / legacy flow uses NWCA-{QuoteID}. The old code hardcoded
+// NWCA-{QuoteID} for EVERY quote, so builder orders were looked up under an ID
+// that never existed and never synced back from ShopWorks. Mirror the proxy's
+// buildExtOrderID + getQuoteYear for the three builder prefixes; fall back to
+// NWCA-{QuoteID} for everything else. KEEP IN SYNC with the proxy. (2026-06-01)
+function deriveExtOrderIdForSync(quoteId, session) {
+  const q = String(quoteId || '').trim();
+  const lead = (q.match(/^[A-Za-z]+/) || [''])[0].toUpperCase();
+  const PREFIX_MAP = { EMB: 'EMB', EMBC: 'EMB', CEMB: 'EMB', SP: 'SCP', SPC: 'SCP', SSC: 'SCP', DTF: 'DTF' };
+  const outPrefix = PREFIX_MAP[lead];
+  if (!outPrefix) return `NWCA-${q}`; // Order Form / DTG / legacy — unchanged
+  let tail = q.replace(/^[A-Za-z]+-?/, '') || '0';
+  if (!/^20\d\d(\D|$)/.test(tail)) {
+    const raw = (session && (session.DateOrderPlaced || session.CreatedAt_Quote || session.CreatedAt)) || '';
+    const ym = String(raw).match(/(20\d\d)/);
+    tail = `${ym ? ym[1] : new Date().getFullYear()}-${tail}`;
+  }
+  return `${outPrefix}-${tail}`;
+}
+
 app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) => {
   const startedAt = Date.now();
   try {
@@ -4998,7 +5022,7 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
       manualOrderNumber = Number(session.ShopWorks_Order_Number);
     }
 
-    const extOrderId = `NWCA-${safeQuoteId}`;
+    const extOrderId = deriveExtOrderIdForSync(safeQuoteId, session);
 
     // 3. Fetch snapshot via one of two paths:
     let snapshot;
