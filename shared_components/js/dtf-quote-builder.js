@@ -1875,12 +1875,13 @@ class DTFQuoteBuilder {
                     productTotal += roundedPrice * qty;
 
                     if (baseDisplayPrice === 0 && ['S', 'M', 'L'].includes(size)) {
-                        if (ltmPerUnit === 0) {
-                            baseDisplayPrice = roundedPrice;
-                        } else {
-                            const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
-                            baseDisplayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
-                        }
+                        // Persist the LTM-INCLUSIVE rounded price. This is the SAVE/PRINT
+                        // path: the stored FinalUnitPrice is what the ShopWorks push bills
+                        // and must reconcile with the LTM-in SubtotalAmount. Stripping LTM
+                        // here (priceNoLTM) under-priced every qty<24 DTF order pushed to
+                        // ShopWorks by the full LTM fee. (LTM's separate-line presentation
+                        // is an on-screen-only concern handled by updatePricing.) (2026-06-01)
+                        baseDisplayPrice = roundedPrice;
                     }
                 }
             });
@@ -1888,12 +1889,8 @@ class DTFQuoteBuilder {
             if (baseDisplayPrice === 0 && totalQty > 0) {
                 const garmentCost = product.baseCost / marginDenom;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
-                if (ltmPerUnit === 0) {
-                    baseDisplayPrice = this.pricingCalculator.applyRounding(unitPrice);
-                } else {
-                    const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
-                    baseDisplayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
-                }
+                // LTM-inclusive (see standard-size note above) — persisted price bills the full amount.
+                baseDisplayPrice = this.pricingCalculator.applyRounding(unitPrice);
             }
 
             productTotals.set(product.id, { standardTotal: productTotal, standardUnitPrice: baseDisplayPrice });
@@ -1915,13 +1912,8 @@ class DTFQuoteBuilder {
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
-                let displayPrice;
-                if (ltmPerUnit === 0) {
-                    displayPrice = roundedPrice;
-                } else {
-                    const priceNoLTM = garmentCost + transferCost + laborCost + freightCost;
-                    displayPrice = this.pricingCalculator.applyRounding(priceNoLTM);
-                }
+                // LTM-inclusive (see standard-size note) — persisted child unit price bills the full amount.
+                const displayPrice = roundedPrice;
 
                 const childTotal = roundedPrice * qty;
                 childTotals.set(childRow.id || childRow.dataset.rowId, { total: childTotal, unitPrice: displayPrice });
@@ -2664,7 +2656,12 @@ class DTFQuoteBuilder {
         const totalQty = this.getTotalQuantity();
         // Use calculated state for reliable totals
         const stateCalc = this.calculateFromState();
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0') || stateCalc.subtotal;
+        // PRE-TAX adjusted subtotal (products + art/graphic-design/rush − discount +
+        // shipping) — this is what the on-screen #grand-total-with-tax taxes. We used
+        // to read the tax-INCLUSIVE #grand-total-with-tax here and hand it to the
+        // generator as grandTotal, which then taxed it AGAIN → the printed PDF
+        // double-taxed the customer. Feed the generator the pre-tax base instead. (2026-06-01)
+        const preTaxSubtotalDom = parseFloat(document.getElementById('pre-tax-subtotal')?.textContent?.replace(/[$,]/g, ''));
         const quoteId = document.getElementById('quote-id')?.textContent || this.editingQuoteId || `DTF-${Date.now()}`;
 
         // Build products array with line items
@@ -2799,7 +2796,13 @@ class DTFQuoteBuilder {
             tier: tier,
             products: products,
             subtotal: subtotal,
-            grandTotal: grandTotal,
+            grandTotal: subtotal,
+            // Authoritative pre-tax adjusted subtotal drives the PDF tax + GRAND TOTAL
+            // so the printed total matches the on-screen #grand-total-with-tax. (2026-06-01)
+            preTaxSubtotal: !isNaN(preTaxSubtotalDom) ? preTaxSubtotalDom
+                : (subtotal + artCharge + graphicDesignFee + rushFee
+                   + (parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0) - discount),
+            includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
             setupFees: 0,
             additionalServicesTotal: 0,
             // Empty logos means embroidery specs section will be skipped
@@ -3246,12 +3249,18 @@ class DTFQuoteBuilder {
         });
         this.updateLocationSummary();
 
-        // Reset customer form fields
+        // Reset customer form fields. customer-number + design-number were OMITTED,
+        // so a "New Quote" kept the PREVIOUS customer's ShopWorks # and design link —
+        // the next pushed order silently attached to the wrong customer/design. (2026-06-01)
         ['customer-name', 'customer-email', 'company-name', 'customer-lookup',
-         'customer-phone', 'project-name'].forEach(id => {
+         'customer-phone', 'project-name', 'customer-number', 'design-number'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = '';
         });
+        // Clear the uploaded-artwork widget + design autocomplete so the prior quote's
+        // hosted logo + new-design name don't ride along on the next push. (2026-06-01)
+        try { if (window._dtfArtwork && typeof window._dtfArtwork.clear === 'function') window._dtfArtwork.clear(); } catch (_) {}
+        try { if (window._dtfDesignCombobox && typeof window._dtfDesignCombobox.refresh === 'function') window._dtfDesignCombobox.refresh(); } catch (_) {}
 
         // Reset order & shipping fields
         ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
@@ -3289,6 +3298,14 @@ class DTFQuoteBuilder {
         // Reset graphic design total display
         const designTotal = document.getElementById('graphic-design-total');
         if (designTotal) designTotal.textContent = '0.00';
+
+        // Reset shipping fee + discount type — the shipping fee bled into the next
+        // quote's taxable total after "New Quote" (inflating the price); discount-type
+        // kept a prior 'percent' mode. (2026-06-01)
+        const shipFeeInput = document.getElementById('dtf-shipping-fee');
+        if (shipFeeInput) shipFeeInput.value = '0';
+        const discTypeSel = document.getElementById('discount-type');
+        if (discTypeSel) discTypeSel.value = 'fixed';
 
         // Clear draft storage
         if (this.persistence) {
@@ -3441,6 +3458,13 @@ function _dtfEsc(s) {
 async function openDtfPushPreview() {
     const btn = document.getElementById('dtf-push-shopworks-btn');
     if (!btn || btn.disabled || !_dtfPushQuoteId) return;
+    // Warn before pushing with no ShopWorks Customer # — the order would silently
+    // attach to placeholder customer 3739 instead of the real customer. EMB gates its
+    // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
+    const _dtfCust = document.getElementById('customer-number')?.value?.trim();
+    if (!_dtfCust && !confirm('No ShopWorks Customer # is set.\n\nThis order will attach to the placeholder customer (3739) instead of the real customer. Continue anyway?')) {
+        return;
+    }
 
     const modal = document.getElementById('dtf-push-modal');
     const statusEl = document.getElementById('dtf-push-status');

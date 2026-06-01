@@ -818,6 +818,31 @@ async function loadQuoteForEditing(quoteId) {
         // Populate customer information
         populateCustomerInfo(session);
 
+        // Restore the ORDER / SHIPPING / CUSTOMER-# block. populateCustomerInfo only
+        // restores name/email/company/sales-rep/notes — so on edit-reopen the customer #,
+        // PO #, full ship-to address, ship method, phone, order #, and dates all loaded
+        // BLANK and were then WIPED on Save Revision (updateQuote writes '' for them),
+        // and a subsequent Push to ShopWorks attached the order to fallback customer
+        // 3739 with no ship-to address. Restore them from the saved session. (2026-06-01)
+        (function restoreEmbOrderShipping() {
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+            const isoToInput = (v) => { const m = v && String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[1]}-${m[2]}-${m[3]}` : (v || ''); };
+            setVal('customer-number', session.CustomerNumber);
+            setVal('customer-phone', session.Phone);
+            setVal('order-number', session.OrderNumber);
+            setVal('po-number', session.PurchaseOrderNumber);
+            setVal('ship-address', session.ShipToAddress);
+            setVal('ship-city', session.ShipToCity);
+            setVal('ship-state', session.ShipToState);
+            setVal('ship-zip', session.ShipToZip);
+            setVal('ship-method', session.ShipMethod);
+            setVal('payment-terms', session.PaymentTerms);
+            setVal('date-order-placed', isoToInput(session.DateOrderPlaced));
+            setVal('req-ship-date', isoToInput(session.ReqShipDate));
+            setVal('drop-dead-date', isoToInput(session.DropDeadDate));
+            if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+        })();
+
         // Populate logo configuration
         populateLogoConfig(session, items);
 
@@ -11194,6 +11219,14 @@ function buildEmbroideryPricingData(allItems) {
     const grandTotalText = document.getElementById('grand-total')?.textContent || '$0.00';
     const grandTotal = parseFloat(grandTotalText.replace(/[$,]/g, '')) || 0;
 
+    // Authoritative pre-tax adjusted subtotal (= base + art/graphic-design/rush/
+    // sample/shipping − discount) — this is what the on-screen #grand-total-with-tax
+    // taxes. Passing it makes the printed PDF GRAND TOTAL match the on-screen total;
+    // without it the generator taxed bare grandTotal and the printed total ignored
+    // every additional charge and discount. (2026-06-01)
+    const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '';
+    const preTaxSubtotalVal = parseFloat(preTaxText.replace(/[$,]/g, ''));
+
     // Read total quantity from DOM
     const totalQty = parseInt(document.getElementById('total-qty')?.textContent) || 0;
 
@@ -11239,6 +11272,7 @@ function buildEmbroideryPricingData(allItems) {
         products: invoiceProducts,
         subtotal: subtotal,
         grandTotal: grandTotal,
+        preTaxSubtotal: isNaN(preTaxSubtotalVal) ? undefined : preTaxSubtotalVal,
         totalQuantity: totalQty,
         setupFees: setupFees + capPatchSetupFee,
         setupFeesCount: digitizingCount,

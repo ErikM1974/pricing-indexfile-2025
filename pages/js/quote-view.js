@@ -160,8 +160,12 @@ class QuoteViewPage {
             console.log('[QuoteView] Loaded items:', this.items);
 
             // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.1%
+            // Normalize percent-vs-decimal: EMB stores TaxRate as a DECIMAL (0.101) but
+            // SCP/DTF store it as a PERCENT (10.1). Without this, an SCP/DTF quote rendered
+            // tax at ~1010% on the report/invoice. (2026-06-01)
             if (this.quoteData.TaxRate != null && this.quoteData.TaxRate !== '') {
-                this.taxRate = parseFloat(this.quoteData.TaxRate) || 0;
+                const rawTaxRate = parseFloat(this.quoteData.TaxRate) || 0;
+                this.taxRate = rawTaxRate > 1 ? rawTaxRate / 100 : rawTaxRate;
                 this.includeTax = this.taxRate > 0;
             } else {
                 const taxFeeItem = this.items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');

@@ -643,6 +643,16 @@ async function loadQuoteForEditing(quoteId) {
 
         // Restore order & shipping fields from saved session
         setOrderShippingData('spc-order-fields', session);
+        // setOrderShippingData reads data.notes||data.Notes into .os-notes, but the SCP
+        // session has NO flat `notes` — only the structured `Notes` JSON blob
+        // (locations/colors/userNotes). So the raw JSON dumped into the notes textarea
+        // and the rep's real note was lost (then re-nested into userNotes on re-save).
+        // Extract just the human note. (2026-06-01)
+        try {
+            const _scpNotes = JSON.parse(session.Notes || '{}');
+            const _noteEl = document.querySelector('#spc-order-fields .os-notes');
+            if (_noteEl) _noteEl.value = _scpNotes.userNotes || '';
+        } catch (_) { /* Notes wasn't JSON — leave whatever setOrderShippingData set */ }
 
         // Recalculate pricing to update totals
         recalculatePricing();
@@ -707,13 +717,20 @@ function resetQuote() {
     const ltmWrapperReset = document.getElementById('spc-ltm-wrapper');
     if (ltmWrapperReset) ltmWrapperReset.style.display = 'none';
 
-    // Reset UI controls
-    document.querySelector('input[name="front-location"][value="LC"]').checked = true;
+    // Reset UI controls. NOTE: front-colors/back-colors are radio NAMES (no element
+    // has id="front-colors"), so the old getElementById('front-colors').value threw a
+    // TypeError that ABORTED the whole reset — leaving the prior customer, fees, and
+    // tax rate in the next "New Quote" (wrong-customer/price risk). Select radios by
+    // name, and use the real toggle ids (…-toggle). (2026-06-01)
+    const frontLocLC = document.querySelector('input[name="front-location"][value="LC"]');
+    if (frontLocLC) frontLocLC.checked = true;
     document.querySelectorAll('input[name="back-location"]').forEach(r => r.checked = false);
-    document.getElementById('front-colors').value = '1';
-    document.getElementById('back-colors').value = '1';
-    const darkGarmentToggle = document.getElementById('dark-garment');
-    const safetyToggle = document.getElementById('safety-stripes');
+    const frontColors1 = document.querySelector('input[name="front-colors"][value="1"]');
+    if (frontColors1) frontColors1.checked = true;
+    const backColors1 = document.querySelector('input[name="back-colors"][value="1"]');
+    if (backColors1) backColors1.checked = true;
+    const darkGarmentToggle = document.getElementById('dark-garment-toggle');
+    const safetyToggle = document.getElementById('safety-stripes-toggle');
     if (darkGarmentToggle) darkGarmentToggle.checked = false;
     if (safetyToggle) safetyToggle.checked = false;
 
@@ -724,6 +741,12 @@ function resetQuote() {
     const _cnReset = document.getElementById('customer-number');
     if (_cnReset) _cnReset.value = '';
     document.getElementById('customer-lookup').value = '';
+    // Clear design # + uploaded-artwork widget so the prior quote's design link +
+    // hosted logo/new-design name don't bleed into the next push. (2026-06-01)
+    const _dnReset = document.getElementById('design-number');
+    if (_dnReset) _dnReset.value = '';
+    try { if (window._scpArtwork && typeof window._scpArtwork.clear === 'function') window._scpArtwork.clear(); } catch (_) {}
+    try { if (window._scpDesignCombobox && typeof window._scpDesignCombobox.refresh === 'function') window._scpDesignCombobox.refresh(); } catch (_) {}
 
     // Reset order & shipping fields
     setOrderShippingData('spc-order-fields', {});
@@ -763,9 +786,12 @@ function resetQuote() {
     // Mark as saved (no unsaved changes)
     markAsSaved();
 
-    // Update totals display
-    updateGrandTotal();
-    updateScreenConfig();
+    // Refresh print config + sidebar totals for the now-empty quote. The original
+    // code called updateGrandTotal() and updateScreenConfig() here — NEITHER function
+    // exists, so both threw ReferenceError (previously masked by the front-colors
+    // throw above). The real entry points are updatePrintConfig() + recalculatePricing(). (2026-06-01)
+    updatePrintConfig();
+    try { const _r = recalculatePricing(); if (_r && typeof _r.catch === 'function') _r.catch(() => {}); } catch (_) {}
 
     // Focus search bar for immediate typing
     const searchInput = document.getElementById('product-search');
@@ -3786,6 +3812,11 @@ function buildScreenprintPricingData(products) {
         products: invoiceProducts,
         subtotal: subtotal,
         grandTotal: currentPricing.grandTotal || subtotal,
+        // Authoritative pre-tax adjusted subtotal (base + art/graphic-design/rush
+        // + shipping − discount) drives the PDF tax + GRAND TOTAL so the printed
+        // total matches the on-screen #grand-total-with-tax (the generator used to
+        // tax bare grandTotal and drop every fee/discount from the printed total). (2026-06-01)
+        preTaxSubtotal: (() => { const t = document.getElementById('pre-tax-subtotal')?.textContent || ''; const v = parseFloat(t.replace(/[$,]/g, '')); return isNaN(v) ? undefined : v; })(),
         setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
@@ -4169,6 +4200,13 @@ function _scpEsc(s) {
 async function openScpPushPreview() {
     const btn = document.getElementById('scp-push-shopworks-btn');
     if (!btn || btn.disabled || !_scpPushQuoteId) return;
+    // Warn before pushing with no ShopWorks Customer # — the order would silently
+    // attach to placeholder customer 3739 instead of the real customer. EMB gates its
+    // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
+    const _scpCust = document.getElementById('customer-number')?.value?.trim();
+    if (!_scpCust && !confirm('No ShopWorks Customer # is set.\n\nThis order will attach to the placeholder customer (3739) instead of the real customer. Continue anyway?')) {
+        return;
+    }
 
     const modal = document.getElementById('scp-push-modal');
     const statusEl = document.getElementById('scp-push-status');
