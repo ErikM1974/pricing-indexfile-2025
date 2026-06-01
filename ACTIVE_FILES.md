@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-05-26
-**Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-06-01
+**Total Active Files:** 689 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -520,6 +520,9 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/shared_components/js/customer-lookup-service.js` | Customer autocomplete from Caspio Company_Contacts_Merge_ODBC | caspio-proxy API | ✅ Active |
+| `/shared_components/js/company-contact-picker.js` | Hybrid grouped Company + Contact autocomplete for AE intake forms — groups by company to eliminate duplicate-contact noise | `/api/company-contacts-2026/search` | ✅ Active |
+| `/shared_components/js/design-name-picker.js` | Customer-scoped design autocomplete for AE intake forms — queries Design_Lookup_2026 (ShopWorks sync'd daily) | `/api/digitized-designs/search-all` | ✅ Active |
+| `/shared_components/js/work-order-picker.js` | Browse-on-focus Work Order # picker for AE intake forms — queries ManageOrders, mirrors DesignNamePicker UX | ManageOrders proxy | ✅ Active |
 | `/shared_components/css/customer-lookup.css` | Autocomplete dropdown styling | - | ✅ Active |
 
 **Backend (caspio-pricing-proxy):**
@@ -706,6 +709,7 @@
 | `/shared_components/js/toast-notifications.js` | Toast notification system (success/error/info) | — | ✅ Active |
 | `/shared_components/js/elapsed-time-utils.js` | Elapsed-time badges with urgency tiers (Fresh / Waiting / Overdue) — used by all art/mockup dashboards | caspio-date-utils.js | ✅ Active |
 | `/shared_components/js/caspio-date-utils.js` | Single source of truth for parsing Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). Use `window.CaspioDate.parse/formatDateTime/formatDate/formatAge` instead of any `+ 'Z'` append idiom. | — | ✅ Active |
+| `/shared_components/js/nwca-date-utils.js` | Generic date helpers (not Caspio-specific) — for Caspio timestamp parsing see caspio-date-utils.js | — | ✅ Active |
 | `/shared_components/js/enhanced-loading-animations.js` | Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |
 | `/shared_components/js/manual-mode-indicator.js` | Visual banner shown when pricing pages are in manual cost override mode | — | ✅ Active |
 | `/shared_components/js/header-button-functions.js` | Header button helper functions (shareQuote, etc.) | — | ✅ Active |
@@ -714,6 +718,7 @@
 | `/shared_components/js/quote-indicator-manager.js` | Persistent quote-indicator widget (collapsible, real-time updates) | — | ✅ Active |
 | `/shared_components/js/design-thumbnail-service.js` | Fetch design thumbnails from `Shopworks_Thumbnail_Report` (cached) | /api/thumbnails | ✅ Active |
 | `/shared_components/js/jds-api-service.js` | JDS Industries API service (laser tumblers, 1hr cache) | /api/jds | ✅ Active |
+| `/shared_components/js/jds-catalog-service.js` | Frontend wrapper for `/api/jds-catalog` — returns NWCA-side JDS product metadata (curated list) for AE intake pickers | `/api/jds-catalog`, `/api/jds/products/:sku` | ✅ Active |
 | `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
 | `/shared_components/js/dp5-helper.js` | Embroidery pricing UI helper — bridges hidden Caspio matrix to custom UI | Caspio datapage | ✅ Active |
 
@@ -826,6 +831,7 @@
 | `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
 | `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | AE submit form styles | ae-submit-art.html | ✅ Active |
+| `/shared_components/css/jds-submit-form.css` | JDS vendor-product intake form styles (`.jds-*` class prefix) — Submit Artwork to Steve tab on AE dashboard | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
 | `/shared_components/css/sticker-banner-submit-form.css` | **NEW** Sticker/Banner intake form + Item-Type pill bar styles (ae-dashboard Submit Artwork tab) | ae-dashboard.html | ✅ Active |
@@ -953,7 +959,7 @@ cap-embroidery-fix.css
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
 | `/dashboards/js/rep-crm.js` | **SHARED** CRM service/controller (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
-| `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
+| `/dashboards/js/rep-calendar.js` | ~~DELETED~~ Shared calendar logic (config-driven) — file no longer on disk | APP_CONFIG, REP_CONFIG | ❌ Deleted |
 | `/dashboards/house-accounts.html` | **NEW** House Account assignment dashboard | house-accounts.js, house-accounts.css | ✅ Active |
 | `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
@@ -1003,10 +1009,11 @@ cap-embroidery-fix.css
 | `/shared_components/js/art-ae.js` | AE Steve Mockups tab — API-driven art request gallery (replaces Caspio DataPage) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | **NEW** AE submit art form styles (extracted from Caspio PageHeader) | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
+| `/shared_components/js/jds-submit-form.js` | AE JDS vendor product art request submit form controller — laser tumblers, mugs, awards, plaques, pens, leather patches | jds-catalog-service.js, company-contact-picker.js, jds-submit-form.css | ✅ Active |
 | `/shared_components/js/screenshot-fill.js` | ShopWorks screenshot paste → AI vision → auto-fill art request form | ae-dashboard.html | ✅ Active |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |
-| `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
-| `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
+| `/dashboards/css/taneisha-crm.css` | ~~DELETED~~ ~~DEPRECATED - use rep-crm.css~~ — file removed (2026-06-01 audit) | - | ❌ Deleted |
+| `/dashboards/js/taneisha-crm.js` | ~~DELETED~~ ~~DEPRECATED - use rep-crm.js~~ — file removed (2026-06-01 audit) | - | ❌ Deleted |
 
 ### Staff Dashboard Legacy JS (still loaded by V3 as bridge globals)
 | File | Purpose | Status |
@@ -1042,6 +1049,8 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 | `/shared_components/js/staff-dashboard/core/dashboard-app.js` | **NEW (v3)** Single ES module entry point. Loaded as `<script type="module">` from `/staff-dashboard-v3/index.html`. Bootstraps tweaks → auth → sidebar → announcements → sales-goal → celebrations → metrics, then sets a 5-min refresh interval. | All controllers + tweaks-fab + dashboard-modal | 🚧 In dev |
 | `/shared_components/css/staff-dashboard/components.css` | **NEW (v3)** All reusable components — sales-goal pill (Phase 4.1), announcements, tool categories + buttons, metrics cards (revenue + rep cards + sparkline), Team widget dropdown (Phase 4.5), staff modal (uses `<dashboard-modal>`), production predictor, garment tracker, error banners, skeleton loaders, tweaks FAB + panel. Wrapped in `@layer components`. Uses CSS nesting + container queries. | tokens.css, base.css | 🚧 In dev |
 | `/shared_components/css/staff-dashboard/utilities.css` | **NEW (v3)** Single-purpose helpers — `.stack`, `.cluster`, `.text-*`, `.surface-*`, `.visually-hidden`, `.is-hidden`, `.hide-mobile`/`.show-mobile-only`, focus + spacing + width utilities. Wrapped in `@layer utilities` so direct usage beats component defaults. | tokens.css | 🚧 In dev |
+| `/shared_components/css/staff-dashboard/dashboard-v3-theme.css` | Staff Dashboard v3 theme CSS (unlayered variant) — same theme rules as the `@layer overrides` block but without layer wrapper, for cascade compatibility with existing unlayered CSS | staff-dashboard-v3/index.html | ✅ Active |
+| `/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css` | Staff Dashboard v3 Patch 2 — additional style overrides appended to the theme file (bottom of cascade) | staff-dashboard-v3/index.html | ✅ Active |
 | `/staff-dashboard-v3/index.html` | **NEW (v3)** Parallel-build entry point at `/staff-dashboard-v3/`. Will live alongside `/staff-dashboard.html` (v2) for 90-day soak. At cutover, v2 moves to `/staff-dashboard-v2.html` and the canonical route serves v3. **Coming next.** | All v3 CSS + dashboard-app.js | 🚧 In dev |
 | `/staff-dashboard-v3/config.js` | **NEW (v3)** Tiny bootstrap that sets `window.APP_CONFIG.API.BASE_URL` to the caspio-pricing-proxy URL. Loaded as a regular `<script>` BEFORE the module entry point so dashboard-endpoints.js can read it. Keeps Rule #3 (no inline JS in HTML) clean. | — | 🚧 In dev |
 | `/staff-dashboard-v3/announcements-bootstrap.js` | **NEW (v3)** Reads the `<script type="application/json" id="staffAnnouncementsData">` block from index.html and assigns it to `window.staffAnnouncementsData`. Lifts inline data out of a real `<script>` block per Rule #3 — JSON island is data, not logic. | — | 🚧 In dev |
@@ -1118,22 +1127,22 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 
 ## 📊 Statistics
 
-**As of 2026-04-29 audit (filesystem totals — see header for scope):**
-- Active code files: **575** (296 HTML, 269 JS, 195 CSS — `tests/` excluded)
+**As of 2026-06-01 audit (filesystem totals — see header for scope):**
+- Active code files: **689** (203 HTML, 336 JS, 150 CSS — `tests/` excluded)
 - Per directory:
-  - `shared_components/js/`: 146 files (largest single dir)
-  - `calculators/` (incl. archive): 84 files
-  - `pages/` (incl. js/, css/, order-form/, services/, utils/): 76 files
-  - `shared_components/css/`: 61 files
-  - `dashboards/` (incl. js/, css/, reports/): 39 files
+  - `shared_components/js/`: 203 files (largest single dir)
+  - `pages/` (incl. js/, css/, order-form/, services/, utils/): 103 files
+  - `calculators/` (incl. archive): 81 files
+  - `shared_components/css/`: 77 files
+  - `dashboards/` (incl. js/, css/, reports/): 46 files
   - `training/`: 38 files
-  - Root (HTML/JS/CSS only): 34 files
+  - Root (HTML/JS/CSS only): 32 files
+  - `scripts/` (incl. safety-tools/): 34 files
   - `product/` (incl. components/, services/, styles/, js/): 20 files
-  - `scripts/` (incl. safety-tools/): 20 files
   - `mockups/`: 11 files
   - `policies/`: 8 files
   - `email-templates/`: 7 files
-  - `quote-builders/`: 6 files
+  - `quote-builders/`: 7 files
   - `tools/`, `templates/`: 5 each
   - `admin/`, `art-tools/`, `vendor-portals/`: 3-4 each
   - `employee-bundles/`, `richardson-caps/`: 2 each
@@ -1176,12 +1185,12 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/adriyella-bonus-report.html` | Adriyella bonus report | ✅ Active |
 | `/training/adriyella-daily-report.html` | Adriyella daily report | ✅ Active |
 | `/training/adriyella-daily-tasks.html` | Adriyella daily tasks (v1) | ✅ Active |
-| `/training/adriyella-daily-tasks-v2.html` | Adriyella daily tasks (v2 — current) | ✅ Active |
+| `/training/adriyella-daily-tasks-v2.html` | ~~DELETED~~ ~~Adriyella daily tasks (v2 — current)~~ — file not found on disk (2026-06-01 audit) | ❌ Deleted |
 | `/training/adriyella-task-history.html` | Adriyella task history view | ✅ Active |
 | `/training/adriyella-test-guide.html` | Adriyella test guide | ✅ Active |
 | `/training/adriyella-performance-utils.js` | Adriyella performance utility functions | ✅ Active |
 | `/training/adriyella-task-service.js` | Adriyella task service (Caspio CRUD) | ✅ Active |
-| `/training/api-test-runner.html` | API test runner harness | ✅ Active |
+| `/training/api-test-runner.html` | ~~DELETED~~ ~~API test runner harness~~ — file not found on disk (2026-06-01 audit) | ❌ Deleted |
 | `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
 | `/training/bonus-policy.html` | Bonus policy reference | ✅ Active |
 | `/training/cap-training.html` | Cap embroidery training | ✅ Active |
@@ -1209,8 +1218,8 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/thank-you-card-guide.html` | Thank-you card guide | ✅ Active |
 | `/training/training-engine-base.js` | Training engine base class | ✅ Active |
 | `/training/training-games-hub.html` | Training games hub | ✅ Active |
-| `/training/server.js` | Local training server (dev only) | ⚙️ Tooling |
-| `/training/simple-server.js` | Simple training server (dev only) | ⚙️ Tooling |
+| `/training/server.js` | ~~DELETED~~ ~~Local training server (dev only)~~ — file not found on disk (2026-06-01 audit) | ❌ Deleted |
+| `/training/simple-server.js` | ~~DELETED~~ ~~Simple training server (dev only)~~ — file not found on disk (2026-06-01 audit) | ❌ Deleted |
 
 ### Mockups & Prototypes (`/mockups/` — 11 files)
 
@@ -1242,7 +1251,7 @@ These directories contain code but aren't enumerated at file level — list grow
 | `/employee-bundles/` | 2 HTML | streich-bros-bundle, wcttr-bundle |
 | `/policies/` (root-level) | 8 HTML | Bundle kitting xmas, customer notification SOP, DTG artwork checklist, LTM fee policy, LTM order decision algorithm, payment terms, retail-vs-wholesale policy, sales office procedures |
 | `/richardson-caps/` | 1 HTML + 1 JS | view-combination-caps.html, scripts/richardson-combination-caps-manual.js |
-| `/scripts/` | 14 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, etc. |
+| `/scripts/` | 20 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, caspio-add-isnew-field, match-marketing-pos, quarterly-cleanup, update-new-products-flags, verify-all-60-products, etc. |
 | `/scripts/safety-tools/` | 7 JS | auto-recovery, comprehensive-test-suite, dependency-mapper, error-monitor, file-access-monitor, safe-delete, validate-critical-paths |
 | `/templates/` | 4 HTML + 1 JS | Calculator template, email template, emblem email template, laser tumbler EmailJS template, quote service template |
 | `/tools/` | 5 HTML | Cap layout mockup, CSS diagnostic, decoration selector mockup, diagnose-css-override, diagnose-search-issue |
