@@ -1,3 +1,8 @@
+## v2026.06.01.5 (2026.06.01)
+
+- Print/PDF: fix EMB tax-rate pass + DTG flagship title/specs flag
+- Deploy v2026.06.01.5: 2 files (cache-bust)
+
 ## v2026.06.01.4 (2026.06.01)
 
 - Print/PDF: use the quote's actual tax rate (was hardcoded 10.1% in all 4 builders)
