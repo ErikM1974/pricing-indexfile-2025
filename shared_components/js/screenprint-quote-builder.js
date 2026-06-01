@@ -721,6 +721,8 @@ function resetQuote() {
     document.getElementById('customer-name').value = '';
     document.getElementById('customer-email').value = '';
     document.getElementById('company-name').value = '';
+    const _cnReset = document.getElementById('customer-number');
+    if (_cnReset) _cnReset.value = '';
     document.getElementById('customer-lookup').value = '';
 
     // Reset order & shipping fields
@@ -894,6 +896,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                 document.getElementById('customer-name').value = contact.ct_NameFull || '';
                 document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                 document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                // ShopWorks customer # — so the pushed order attaches to the real
+                // customer instead of the no-customer fallback (2026-06-01).
+                const _custNumEl = document.getElementById('customer-number');
+                if (_custNumEl && contact.id_Customer != null) _custNumEl.value = String(contact.id_Customer);
 
                 if (typeof window.surfaceCustomerContext === 'function') {
                     window.surfaceCustomerContext(contact, {
@@ -3905,6 +3911,9 @@ async function saveAndGetLink() {
             customerName: customerName,
             customerEmail: customerEmail,
             companyName: document.getElementById('company-name')?.value?.trim() || '',
+            // ShopWorks customer # — attaches the pushed order to the real customer
+            // (else the proxy falls back to the no-customer catch-all 3739).
+            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
             salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
             referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
             newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
