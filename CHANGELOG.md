@@ -1,3 +1,8 @@
+## v2026.06.01.4 (2026.06.01)
+
+- Print/PDF: use the quote's actual tax rate (was hardcoded 10.1% in all 4 builders)
+- Deploy v2026.06.01.4: 5 files (cache-bust)
+
 ## v2026.06.01.3 (2026.06.01)
 
 - Quote reports: method-aware specs header + fix blank invoice DECORATION
