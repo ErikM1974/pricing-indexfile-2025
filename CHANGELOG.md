@@ -1,3 +1,8 @@
+## v2026.06.01.2 (2026.06.01)
+
+- SCP: capture + persist ShopWorks customer # (was missing -> orders fell back to cust 3739)
+- Deploy v2026.06.01.2: 5 files (dtf-quote-builder.html,dtg-quote-builder-legacy.html,dtg-quote-builder.html)
+
 ## v2026.06.01.1 (2026.06.01)
 
 - DTF quote builder: add review-before-push preview modal (parity with EMB/SCP)
