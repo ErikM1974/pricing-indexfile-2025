@@ -771,7 +771,10 @@ function populateCustomerInfo(session) {
     const fields = {
         'customer-name': session.CustomerName,
         'customer-email': session.CustomerEmail,
-        'company-name': session.CompanyName
+        'company-name': session.CompanyName,
+        // Restore ShopWorks customer # for builders that have the field (SCP/EMB);
+        // skipped harmlessly when the element is absent (loop checks `el`).
+        'customer-number': session.CustomerNumber
     };
     for (const [id, value] of Object.entries(fields)) {
         const el = document.getElementById(id);
