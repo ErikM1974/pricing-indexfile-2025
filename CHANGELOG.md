@@ -1,3 +1,12 @@
+## v2026.06.02.2 (2026.06.02)
+
+- Fix DTG/order-form routing: apiSource OrderForm -> ManageOrders
+- Order form: send blank APISource (uniform with all push paths → catch-all)
+- Doc: ManageOrders integration APISource routing + consolidation (2026-06-02)
+- Docs: quote-builder shared-vs-per-builder manifest + change-routing (2026-06-02)
+- docs(phase3): add Order Form as 5th surface + Phase 3.1 kickoff
+- Add Roland printer supplies page + dashboard button
+
 ## v2026.06.02.1 (2026.06.02)
 
 - Docs: record self-review round 2 findings + OneDrive silent-revert gotcha/workaround
