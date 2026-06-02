@@ -294,10 +294,11 @@ describe('LTM matrix (Phase 3.1 verification)', () => {
 });
 
 /**
- * Validator severity. The contract throws on dev hosts (localhost/herokuapp)
- * to surface bugs immediately, and warns elsewhere so a live customer print
- * is never blocked. Node has no `location` global → falls back to prod behavior;
- * we simulate localhost by re-loading the module with a stub.
+ * Validator severity. The contract throws only on local dev (localhost / 127.0.0.1)
+ * to surface bugs immediately, and warns everywhere else — including production
+ * heroku (sanmar-inventory-app.herokuapp.com) — so a live customer print is never
+ * blocked. Node has no `location` global → falls back to prod behavior; we
+ * simulate localhost by re-loading the module with a stub.
  */
 describe('Validator severity (Phase 3.1)', () => {
   function loadContractWithHost(hostname) {
@@ -314,9 +315,18 @@ describe('Validator severity (Phase 3.1)', () => {
     // Bypass buildPricingData defaults — call validator on a hand-broken object.
     expect(() => Dev.validatePricingData({ method: 'EMB', quoteId: 'X' })).toThrow(/missing:/);
   });
-  test('throws on *.herokuapp.com (staging) too', () => {
+  test('warns (does NOT throw) on *.herokuapp.com — production heroku must never break a print', () => {
     const Stage = loadContractWithHost('sanmar-inventory-app.herokuapp.com');
-    expect(() => Stage.validatePricingData({ method: 'EMB', quoteId: 'X' })).toThrow(/missing:/);
+    const origWarn = console.warn;
+    const warnings = [];
+    console.warn = (m) => warnings.push(m);
+    try {
+      expect(() => Stage.validatePricingData({ method: 'EMB', quoteId: 'X' })).not.toThrow();
+      expect(warnings.length).toBe(1);
+      expect(warnings[0]).toMatch(/missing:/);
+    } finally {
+      console.warn = origWarn;
+    }
   });
   test('warns (does NOT throw) on a production host', () => {
     const Prod = loadContractWithHost('www.nwcustomapparel.com');

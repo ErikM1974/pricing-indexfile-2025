@@ -74,7 +74,8 @@
     function isDevHost() {
         if (typeof location === 'undefined') return false;
         const h = (location.hostname || '').toLowerCase();
-        return h === 'localhost' || h === '127.0.0.1' || h.endsWith('.herokuapp.com');
+        // Throw only on local dev. Production heroku must warn (never break a live print).
+        return h === 'localhost' || h === '127.0.0.1';
     }
 
     function validatePricingData(pd) {
