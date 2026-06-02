@@ -11295,8 +11295,10 @@ function buildEmbroideryPricingData(allItems) {
         : 0;
 
     // Tax rate read here (was post-overridden in printQuote pre-3.1.0; contract
-    // normalizes percent → decimal at the boundary).
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value;
+    // normalizes percent → decimal at the boundary). The '10.1' fallback preserves
+    // the pre-3.1 behavior: an empty input previously fell through to the
+    // generator's hardcoded WA standard rate.
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.1';
 
     return window.QuotePricingData.buildPricingData({
         method: 'EMB',

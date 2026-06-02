@@ -182,3 +182,162 @@ describe('QuotePricingData contract (Phase 3.1)', () => {
     expect(html).not.toMatch(/Less Than Minimum Fee - Caps/);
   });
 });
+
+/**
+ * Phase 3.1 — Tax matrix × method matrix. Exercises the PR's stated test plan:
+ * 3 rates (0%, 10.1%, 8.8%) × 4 methods × 2 input forms (decimal/percent) → 24
+ * scenarios run through the contract + generator. Asserts the printed Sales
+ * Tax line is what the rep expects from the rate they typed in.
+ */
+describe('Tax matrix per method (Phase 3.1 verification)', () => {
+  const RATES = [
+    { label: 'out-of-state 0%', decimal: 0, percent: 0, pctText: '0' },
+    { label: 'WA standard 10.1%', decimal: 0.101, percent: 10.1, pctText: '10.1' },
+    { label: 'custom 8.8%', decimal: 0.088, percent: 8.8, pctText: '8.8' },
+  ];
+  const METHODS = ['DTG', 'EMB', 'SCP', 'DTF'];
+
+  METHODS.forEach(method => {
+    RATES.forEach(rate => {
+      test(`${method} @ ${rate.label} — decimal and percent inputs render identical totals`, () => {
+        const baseInput = { method, quoteId: 'TX', tier: '24-47', totalQuantity: 30,
+                            products: [], subtotal: 800, preTaxSubtotal: 880,
+                            grandTotal: 880, includeTax: true, artCharge: 80 };
+        const pdDecimal = Contract.buildPricingData({ ...baseInput, taxRate: rate.decimal });
+        const pdPercent = Contract.buildPricingData({ ...baseInput, taxRate: rate.percent });
+        const htmlD = new Generator().generateInvoiceHTML(pdDecimal, CUST);
+        const htmlP = new Generator().generateInvoiceHTML(pdPercent, CUST);
+        const totalsD = parseTotals(htmlD);
+        const totalsP = parseTotals(htmlP);
+        const expectedTax = +(880 * rate.decimal).toFixed(2);
+        const expectedGrand = +(880 + expectedTax).toFixed(2);
+
+        expect(totalsD.tax).toBeCloseTo(expectedTax, 2);
+        expect(totalsP.tax).toBeCloseTo(expectedTax, 2);
+        expect(totalsD.grand).toBeCloseTo(expectedGrand, 2);
+        expect(totalsP.grand).toBeCloseTo(expectedGrand, 2);
+
+        if (rate.decimal > 0) {
+          // Sales Tax row displays the rate as the generator's `+toFixed(2)` form,
+          // which strips trailing zeros (0.101 → "10.1", 0.088 → "8.8").
+          const ratePct = +((rate.decimal * 100).toFixed(2));
+          expect(htmlD).toMatch(new RegExp(`Sales Tax \\(${ratePct}%\\)`));
+        }
+      });
+    });
+  });
+
+  test('includeTax=false suppresses tax regardless of method', () => {
+    METHODS.forEach(method => {
+      const pd = Contract.buildPricingData({
+        method, quoteId: 'NTX', tier: '24-47', totalQuantity: 30, products: [],
+        subtotal: 500, preTaxSubtotal: 500, grandTotal: 500, taxRate: 10.1,
+        includeTax: false,
+      });
+      const { tax, grand } = parseTotals(new Generator().generateInvoiceHTML(pd, CUST));
+      expect(tax).toBe(0);
+      expect(grand).toBeCloseTo(500, 2);
+    });
+  });
+});
+
+/**
+ * LTM matrix. EMB is the only method whose specs renderer fires the LTM notice
+ * (generator line 798 lives inside generateEmbroiderySpecs). For SCP/DTF/DTG
+ * the LTM "distributed vs separate" decision is consumed elsewhere — what
+ * matters here is that the contract carries the right ltmDistributed boolean
+ * and the EMB visual notice appears iff ltmFee > 0 && !ltmDistributed.
+ */
+describe('LTM matrix (Phase 3.1 verification)', () => {
+  const ltmCases = [
+    { name: 'baked-in', ltmFee: 0, ltmDistributed: true, showsNotice: false },
+    { name: 'separate', ltmFee: 50, ltmDistributed: false, showsNotice: true },
+  ];
+
+  ltmCases.forEach(c => {
+    test(`EMB ltm=${c.name} — small-batch notice ${c.showsNotice ? 'shown' : 'hidden'}`, () => {
+      const pd = Contract.buildPricingData({
+        method: 'EMB', quoteId: 'L', tier: '1-7', totalQuantity: 5, products: [],
+        subtotal: 200, preTaxSubtotal: 200, grandTotal: 200, taxRate: 0.101,
+        ltmFee: c.ltmFee, ltmDistributed: c.ltmDistributed,
+        logos: [{ name: 'Front', stitchCount: 8000 }], // forces specs section to render
+      });
+      const html = new Generator().generateInvoiceHTML(pd, CUST);
+      if (c.showsNotice) {
+        expect(html).toMatch(/Small Batch Fee:/);
+      } else {
+        expect(html).not.toMatch(/Small Batch Fee:/);
+      }
+    });
+  });
+
+  test('SCP/DTF/DTG carry ltmDistributed through the contract', () => {
+    ['SCP', 'DTF', 'DTG'].forEach(method => {
+      const pd = Contract.buildPricingData({
+        method, quoteId: 'L', tier: '24-47', totalQuantity: 10, products: [],
+        subtotal: 200, preTaxSubtotal: 200, grandTotal: 200, taxRate: 0.101,
+        ltmFee: 50, ltmDistributed: false,
+      });
+      expect(pd.ltmFee).toBe(50);
+      expect(pd.ltmDistributed).toBe(false);
+    });
+  });
+
+  test('ltmDistributed defaults to true when ltmFee=0 (DTG-style sparse input)', () => {
+    const pd = Contract.buildPricingData({
+      method: 'DTG', quoteId: 'L', tier: 'Standard', totalQuantity: 12, products: [],
+      subtotal: 120, preTaxSubtotal: 120, grandTotal: 120, taxRate: 0,
+    });
+    expect(pd.ltmFee).toBe(0);
+    expect(pd.ltmDistributed).toBe(true);
+  });
+});
+
+/**
+ * Validator severity. The contract throws on dev hosts (localhost/herokuapp)
+ * to surface bugs immediately, and warns elsewhere so a live customer print
+ * is never blocked. Node has no `location` global → falls back to prod behavior;
+ * we simulate localhost by re-loading the module with a stub.
+ */
+describe('Validator severity (Phase 3.1)', () => {
+  function loadContractWithHost(hostname) {
+    const code = fs.readFileSync(path.join(__dirname, '../../shared_components/js/quote-pricing-data.js'), 'utf8');
+    const win = {};
+    // Wrap loader so the inner IIFE sees a `location` global.
+    const wrapped = 'var location = { hostname: ' + JSON.stringify(hostname) + ' };\n' + code;
+    new Function('window', wrapped).call(null, win);
+    return win.QuotePricingData;
+  }
+
+  test('throws on localhost when required fields are missing', () => {
+    const Dev = loadContractWithHost('localhost');
+    // Bypass buildPricingData defaults — call validator on a hand-broken object.
+    expect(() => Dev.validatePricingData({ method: 'EMB', quoteId: 'X' })).toThrow(/missing:/);
+  });
+  test('throws on *.herokuapp.com (staging) too', () => {
+    const Stage = loadContractWithHost('sanmar-inventory-app.herokuapp.com');
+    expect(() => Stage.validatePricingData({ method: 'EMB', quoteId: 'X' })).toThrow(/missing:/);
+  });
+  test('warns (does NOT throw) on a production host', () => {
+    const Prod = loadContractWithHost('www.nwcustomapparel.com');
+    const origWarn = console.warn;
+    const warnings = [];
+    console.warn = (m) => warnings.push(m);
+    try {
+      expect(() => Prod.validatePricingData({ method: 'EMB', quoteId: 'X' })).not.toThrow();
+      expect(warnings.length).toBe(1);
+      expect(warnings[0]).toMatch(/missing:/);
+    } finally {
+      console.warn = origWarn;
+    }
+  });
+  test('throws on dev for non-decimal taxRate (catches a builder forgetting to normalize)', () => {
+    const Dev = loadContractWithHost('localhost');
+    expect(() => Dev.validatePricingData({
+      method: 'EMB', quoteId: 'X', tier: 't', totalQuantity: 1, products: [],
+      subtotal: 0, preTaxSubtotal: 0, grandTotal: 0,
+      taxRate: 10.1, // percent, not decimal — contract user bypassed buildPricingData
+      includeTax: true,
+    })).toThrow(/taxRate must be a decimal/);
+  });
+});

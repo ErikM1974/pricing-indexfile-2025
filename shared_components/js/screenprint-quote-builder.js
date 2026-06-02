@@ -3810,7 +3810,9 @@ function buildScreenprintPricingData(products) {
     }
 
     // Read tax + LTM state here (was post-overridden in printQuote pre-3.1.0).
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value;
+    // '10.1' fallback preserves pre-3.1 behavior: an empty input previously fell
+    // through to the generator's hardcoded WA standard rate.
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.1';
     const ltmState = getLtmControlState('spc-ltm-panel');
     const ltmDistributed = (ltmState.displayMode === 'builtin');
 
