@@ -1,0 +1,93 @@
+/* ==========================================================================
+   roland-printer-supplies.css — page-specific styles for
+   dashboards/roland-printer-supplies.html
+
+   Shell classes (.dash-header, .dash-card, .dash-btn, etc.) come from
+   shared_components/css/dash-shell.css. Design tokens (--surface-*, --gray-*,
+   --shadow-*, --radius-*, --state-*, --space-*, --dash-theme-*) come from
+   shared_components/css/art-hub.css + dash-shell.css.
+
+   Only page-specific styles live here. NEVER redefine tokens. NEVER hardcode
+   colors/shadows/radii — use var(--token-name) so the page inherits the
+   2026 design system.
+   ========================================================================== */
+
+.rps-title-icon {
+    color: var(--dash-theme);
+    margin-right: 8px;
+}
+
+.rps-intro {
+    margin: 0 0 var(--space-5);
+    color: var(--gray-700);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.rps-intro strong {
+    color: var(--gray-900);
+}
+
+/* ---------- Printable PDF callout ---------- */
+.rps-pdf-callout {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-4) var(--space-5);
+    background: var(--dash-theme-bg);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+}
+
+.rps-pdf-callout-text {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.rps-pdf-icon {
+    font-size: 2rem;
+    color: var(--state-danger);
+    flex-shrink: 0;
+}
+
+.rps-pdf-title {
+    font-weight: 600;
+    color: var(--gray-900);
+    font-size: 0.95rem;
+}
+
+.rps-pdf-sub {
+    margin-top: 2px;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+}
+
+.rps-pdf-btn {
+    white-space: nowrap;
+}
+
+/* ---------- JotForm embed wrapper ---------- */
+/* min-height reserves space so the page doesn't jump while the form loads.
+   The JotForm jsform embed injects a self-resizing iframe at this location. */
+.rps-form-wrap {
+    min-height: 600px;
+}
+
+.rps-form-wrap iframe {
+    max-width: 100%;
+    border: 0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 560px) {
+    .rps-pdf-callout {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .rps-pdf-btn {
+        justify-content: center;
+    }
+}
