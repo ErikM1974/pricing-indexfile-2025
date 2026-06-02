@@ -1,3 +1,12 @@
+## v2026.06.02.3 (2026.06.02)
+
+- Phase 3.1: shared pricingData contract for 4 quote builders
+- Phase 3.1 verification: tax/LTM/severity matrices + empty-input regression fix
+- Phase 3.1 fix: validator warns (not throws) on production heroku
+- Merge pull request #5 from ErikM1974/claude/refine-local-plan-p6aDc
+- Invoice: unified LTM totals row for SCP/DTF/DTG (Finding #2 follow-up)
+- Deploy v2026.06.02.3: 5 files (dtf-quote-builder.html,dtg-quote-builder-legacy.html,dtg-quote-builder.html,...)
+
 ## v2026.06.02.2 (2026.06.02)
 
 - Fix DTG/order-form routing: apiSource OrderForm -> ManageOrders
