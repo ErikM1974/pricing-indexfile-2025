@@ -1,3 +1,8 @@
+## v2026.06.02.4 (2026.06.02)
+
+- chore: expand Claude Code permissions for deploy workflow
+- Quote-view PDF Phase 11.4: fix one-page fit for full-size-run quotes
+
 ## v2026.06.02.3 (2026.06.02)
 
 - Phase 3.1: shared pricingData contract for 4 quote builders
