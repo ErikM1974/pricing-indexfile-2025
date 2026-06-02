@@ -2629,9 +2629,6 @@ class DTFQuoteBuilder {
 
             // Generate and open print window
             const invoiceGenerator = new EmbroideryInvoiceGenerator();
-            // Pass the quote's actual tax rate (percent) so the printed PDF matches
-            // the on-screen total instead of hardcoding 10.1%. (2026-06-01)
-            pricingData.taxRate = parseFloat(document.getElementById('tax-rate-input')?.value);
             const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
 
             const printWindow = window.open('', '_blank');
@@ -2775,7 +2772,7 @@ class DTFQuoteBuilder {
 
         // Get graphic design fee
         const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-        const graphicDesignFee = designHours * 75;
+        const graphicDesignCharge = designHours * 75;
 
         // Get rush fee
         const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
@@ -2791,24 +2788,26 @@ class DTFQuoteBuilder {
             discount = discountAmount;
         }
 
-        return {
+        const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
+
+        return window.QuotePricingData.buildPricingData({
+            method: 'DTF',
             quoteId: quoteId,
             tier: tier,
             products: products,
             subtotal: subtotal,
             grandTotal: subtotal,
             // Authoritative pre-tax adjusted subtotal drives the PDF tax + GRAND TOTAL
-            // so the printed total matches the on-screen #grand-total-with-tax. (2026-06-01)
+            // so the printed total matches the on-screen #grand-total-with-tax.
             preTaxSubtotal: !isNaN(preTaxSubtotalDom) ? preTaxSubtotalDom
-                : (subtotal + artCharge + graphicDesignFee + rushFee
-                   + (parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0) - discount),
+                : (subtotal + artCharge + graphicDesignCharge + rushFee + shippingFee - discount),
             includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+            taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
             setupFees: 0,
             additionalServicesTotal: 0,
             // Empty logos means embroidery specs section will be skipped
             logos: [],
             // DTF-specific info
-            isDTF: true,
             selectedLocations: this.selectedLocations,
             locationDetails: this.selectedLocations.map(loc => ({
                 code: loc,
@@ -2817,21 +2816,19 @@ class DTFQuoteBuilder {
             })),
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
             ltmDistributed: (this.currentPricingData?.ltmDisplayMode || 'builtin') === 'builtin',
-            projectName: document.getElementById('project-name')?.value || '',
-            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
+            totalQuantity: totalQty,
             // Artwork services
             artCharge: artCharge,
-            graphicDesignFee: graphicDesignFee,
+            graphicDesignCharge: graphicDesignCharge,
             graphicDesignHours: designHours,
-            // Shipping — itemized on the PDF so the rows foot to the total (already inside
-            // preTaxSubtotal / the grand total). (2026-06-01)
-            shippingFee: parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0,
+            // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
+            shippingFee: shippingFee,
             // Rush and discount
             rushFee: rushFee,
             discount: discount,
             discountType: discountType,
             discountReason: discountReason
-        };
+        });
     }
 
     /**

@@ -1459,16 +1459,6 @@ class EmbroideryInvoiceGenerator {
                     <span>Safety Stripes Surcharge:</span>
                     <span>$${pricingData.safetyStripesTotal.toFixed(2)}</span>
                 </div>` : ''}
-                ${(pricingData.garmentLtmFee || 0) > 0 && !pricingData.ltmDistributed ? `
-                <div class="total-row">
-                    <span>Less Than Minimum Fee - Garments:</span>
-                    <span>$${pricingData.garmentLtmFee.toFixed(2)}</span>
-                </div>` : ''}
-                ${(pricingData.capLtmFee || 0) > 0 && !pricingData.ltmDistributed ? `
-                <div class="total-row">
-                    <span>Less Than Minimum Fee - Caps:</span>
-                    <span>$${pricingData.capLtmFee.toFixed(2)}</span>
-                </div>` : ''}
                 ${(pricingData.artCharge || 0) > 0 ? `
                 <div class="total-row">
                     <span>Logo Mockup & Review:</span>
@@ -1494,7 +1484,7 @@ class EmbroideryInvoiceGenerator {
                     <span>Discount${pricingData.discountReason ? ` (${pricingData.discountReason})` : ''}:</span>
                     <span>-$${pricingData.discount.toFixed(2)}</span>
                 </div>` : ''}
-                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || (((pricingData.garmentLtmFee || 0) > 0 || (pricingData.capLtmFee || 0) > 0) && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
+                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
                     <span>$${adjustedSubtotal.toFixed(2)}</span>
