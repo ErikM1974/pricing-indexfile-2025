@@ -117,7 +117,7 @@ class EmbroideryInvoiceGenerator {
             
             @page {
                 size: letter portrait;
-                margin: 0.3in;
+                margin: 0.25in;
             }
             
             @media print {
@@ -357,6 +357,7 @@ class EmbroideryInvoiceGenerator {
             @media print {
                 body {
                     margin: 0;
+                    line-height: 1.3;
                 }
                 .invoice-container {
                     padding: 0;
@@ -367,6 +368,16 @@ class EmbroideryInvoiceGenerator {
                 .no-print {
                     display: none;
                 }
+                /* Single-page fit: the on-screen invoice fits one page, but the
+                   PDF overflowed to a 2nd page once the method specs/locations
+                   box was added. Compact the print spacing (screen view unchanged).
+                   Erik 2026-06-02. */
+                .invoice-header { margin-bottom: 6px; }
+                .method-specs { margin: 5px 0 !important; padding: 6px 8px !important; }
+                .totals-section { margin-top: 8px; }
+                .invoice-footer { margin-top: 12px; padding-top: 8px; page-break-inside: avoid; }
+                .footer-section { margin-bottom: 5px; }
+                .tagline { margin-top: 8px; }
             }
 
             /* Size Matrix Table */
@@ -556,7 +567,7 @@ class EmbroideryInvoiceGenerator {
         };
 
         let specsHTML = `
-            <div style="margin: 10px 0; padding: 10px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 5px;">
+            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">
                     <i class="fas fa-tshirt" style="margin-right: 5px;"></i>DTG PRINT LOCATIONS:
                 </div>
@@ -594,7 +605,7 @@ class EmbroideryInvoiceGenerator {
         if (!printConfig) return '';
 
         let specsHTML = `
-            <div style="margin: 10px 0; padding: 10px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 5px;">
+            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #e65100; margin-bottom: 8px;">
                     <i class="fas fa-palette" style="margin-right: 5px;"></i>SCREEN PRINT CONFIGURATION:
                 </div>
@@ -670,7 +681,7 @@ class EmbroideryInvoiceGenerator {
         };
 
         let specsHTML = `
-            <div style="margin: 10px 0; padding: 10px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 5px;">
+            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #7b1fa2; margin-bottom: 8px;">
                     <i class="fas fa-layer-group" style="margin-right: 5px;"></i>DTF TRANSFER LOCATIONS:
                 </div>
@@ -705,7 +716,7 @@ class EmbroideryInvoiceGenerator {
         }
 
         let specsHTML = `
-            <div style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
+            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
         `;
 
         // Determine AL base rate from tier
