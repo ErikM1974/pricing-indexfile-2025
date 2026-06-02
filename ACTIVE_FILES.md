@@ -939,6 +939,9 @@ cap-embroidery-fix.css
 | `/dashboards/supacolor-orders.html` | Supacolor orders dashboard — local mirror of Supacolor jobs | supacolor-orders.js, supacolor-orders.css, kanban.css | ✅ Active |
 | `/dashboards/js/supacolor-orders.js` | Supacolor orders controller — sync trigger, kanban view, filters | /api/supacolor-jobs | ✅ Active |
 | `/dashboards/css/supacolor-orders.css` | Supacolor orders dashboard styles | kanban.css | ✅ Active |
+| `/dashboards/roland-printer-supplies.html` | Roland Printer Supplies — JotForm supply-order embed (ink/parts/consumables) for Steve & Brian + printable PDF download (added 2026-06-02, dash-shell canonical) | dash-shell.css, art-hub.css, roland-printer-supplies.css, JotForm 261515595979071 | ✅ Active |
+| `/dashboards/css/roland-printer-supplies.css` | Roland Printer Supplies page-specific styles | dash-shell.css, art-hub.css | ✅ Active |
+| `/forms/NWCA_LG540_Order_Form_1page.pdf` | Roland printer printable supply-order form (1-page; downloaded from roland-printer-supplies.html) | — | ✅ Active |
 
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
