@@ -5,13 +5,20 @@
 > element once* and have it apply to all four; only touch per-builder files for
 > method-specific logic. Last verified 2026-06-02.
 
-## The four builders
-| Builder | Pattern | Core JS |
+## The five order surfaces (all push to ManageOrders)
+| Surface | Pattern | Core JS |
 |---|---|---|
 | **DTG** (flagship) | **inline-form** (DIFFERENT from the other 3) | `dtg-inline-form.js`, `dtg-quote-page.js`, `dtg-catalog.js`, `dtg-pricing-service.js` |
 | **EMB** | "quote-builder" | `embroidery-quote-builder.js`, `embroidery-pricing-service.js`, `embroidery-quote-service.js`, `embroidery-quote-pricing.js` |
 | **SCP** | "quote-builder" | `screenprint-quote-builder.js`, `screenprint-pricing-service.js`, `screenprint-quote-service.js` |
 | **DTF** | "quote-builder" | `dtf-quote-builder.js`, `dtf-pricing-service.js`, `dtf-quote-service.js`, `dtf-quote-pricing.js`, `dtf-quote-page.js`, `dtf-quote-products.js` |
+| **Order Form** (WIP, multi-method) | single-page order entry | `pages/order-form.html` + `order-form-*.js`; pushes via `server.js /api/submit-order-form` → `NWCA-OrderForm` |
+
+### Order Form — the 5th surface (added 2026-06-02)
+One staff-facing page that handles **all 6 methods at once** (EMB/SCP/DTG/DTF/Stickers/Emblems) via a drag-services panel + a single size matrix. It is **already partly unified**:
+- **SHARES (today):** all 7 method pricing services (`{embroidery,cap-embroidery,screenprint,dtg,dtf,emblem,sticker}-pricing-service.js`), `manageorders-inventory-service.js`, `product-category-filter.js`. → *Proof the pricing engines are UI-agnostic; this is the model for the whole unification.*
+- **Push:** `/api/submit-order-form` (server.js) → ManageOrders `NWCA-OrderForm` (apiSource now blank like the rest). The 2026-06-02 push fixes (base PN size-suffix, tax block 2200.101/2202, Notes To Production, per-size breakout) already apply here.
+- **Does NOT yet share:** the PDF/invoice generator (`embroidery-quote-invoice.js`), the shared size config (`extended-sizes-config.js` — it has its own `order-form-size-suffix.js`), `quote-builder-utils.js`. → these are its Phase-3 items.
 
 ## TIER 1 — SHARED: change ONE file → applies everywhere
 
@@ -57,8 +64,12 @@ DTG uses the inline-form architecture and does NOT share the trio's common UI/CS
 PDF/invoice layout · totals + tax block · size handling · customer-info panel · fee/charges panel · modal styling.
 Today: **PDF/totals/tax = already single-source ✓**; size config = shared (DTG gap); panels = shared CSS for the trio, separate for DTG.
 
-## Roadmap to FULL uniformity (so nothing is edited 4×)
+## Roadmap to FULL uniformity (so nothing is edited 5×) — covers DTG/EMB/SCP/DTF **+ Order Form**
+Already shared across all 5: the **7 pricing services** (Order Form proves they're UI-agnostic) + the ManageOrders push path. Phase 3 extends that to the other main elements.
 1. **(done) Manifest** — this file. Routes every change.
-2. **Enforce**: all invoice/PDF/totals/size/tax logic stays in the shared files above. Never duplicate them into a builder.
-3. **Promote common UI to shared renderers** — extract the duplicated HTML panels (size matrix, fee panel, customer panel, modals) into shared JS partials so all 4 render from one source (medium effort).
-4. **Refactor DTG to the shared pattern** (ROADMAP Phase 3) so it's a true peer — then a panel change reaches all 4 automatically.
+2. **Enforce**: all invoice/PDF/totals/size/tax logic stays in the shared files above. Never duplicate them into a surface.
+3. **Phase 3.1 — shared `pricingData` contract** (the shape the invoice consumes) + validator + jest lock. Low risk, foundation. **START HERE.**
+4. **Phase 3.2 — unify size + per-size pricing** (DTG already has `_priceBySize`; trio + Order Form get the same model → fixes the 2XL upcharge gap).
+5. **Phase 3.3 — shared save/load base** (promote `quote-builder-base.js`).
+6. **Phase 3.4 — promote common UI panels** (size matrix, fee/customer panels, modals) to shared renderers so all 5 render from one source.
+7. **Phase 3.5 — fold DTG (and the Order Form's invoice/size gaps) onto the shared base** → a main-element change then reaches all 5 automatically.
