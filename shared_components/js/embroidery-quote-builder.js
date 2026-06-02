@@ -6484,71 +6484,47 @@ function updateTaxCalculation() {
 
     if (!taxRow || !taxAmountEl || !grandTotalWithTax) return;
 
-    // Update pre-tax subtotal display to show adjusted amount
+    // #pre-tax-subtotal is the CANONICAL full pre-tax amount (products + services
+    // + shipping − discount). The save path reads it, so keep it accurate. It is
+    // a hidden carrier now; the visible "Subtotal" line below excludes shipping.
     if (preTaxSubtotal) {
         preTaxSubtotal.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
 
-    // Update tax label dynamically
-    const taxLabel = document.getElementById('tax-label');
-    if (taxLabel) {
-        const pct = (taxRate * 100).toFixed(1);
-        taxLabel.textContent = pct === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pct}%):`;
+    // Shipping line under the invoice: "Customer Pickup" when picking up,
+    // otherwise the shipping charge. (2026-06-02 — totals moved under line items)
+    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+    const isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+    const shipAmtEl = document.getElementById('it-shipping-amt');
+    if (shipAmtEl) {
+        if (isPickup) {
+            shipAmtEl.textContent = 'Customer Pickup';
+            shipAmtEl.classList.add('is-pickup');
+        } else {
+            shipAmtEl.textContent = '$' + shippingFee.toFixed(2);
+            shipAmtEl.classList.remove('is-pickup');
+        }
     }
+
+    // Visible "Subtotal" line = everything pre-tax EXCEPT shipping (shipping is
+    // its own line). Subtotal + Shipping = the taxable base (adjustedSubtotal).
+    const subtotalDisplay = document.getElementById('invoice-subtotal-display');
+    if (subtotalDisplay) subtotalDisplay.textContent = '$' + (adjustedSubtotal - shippingFee).toFixed(2);
+
+    // Keep the Sales Tax label simple — the editable % is shown right beside it.
+    const taxLabel = document.getElementById('tax-label');
+    if (taxLabel) taxLabel.textContent = 'Sales Tax';
 
     if (includeTax) {
         const tax = adjustedSubtotal * taxRate;
-        taxRow.style.display = 'flex';
         taxAmountEl.textContent = '$' + tax.toFixed(2);
         grandTotalWithTax.textContent = '$' + (adjustedSubtotal + tax).toFixed(2);
     } else {
-        taxRow.style.display = 'none';
+        // Keep the tax row visible (it holds the re-enable checkbox); zero the amount.
+        taxAmountEl.textContent = '$0.00';
         grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
-
-    // Mirror the itemized lines into the on-screen Invoice Summary (2026-06-02)
-    renderInvoiceSummary();
 }
-
-/**
- * Render the on-screen Invoice Summary line items (2026-06-02 order-flow
- * redesign). Mirrors the printed PDF: Products + each active fee + discount.
- * These lines sum to #pre-tax-subtotal, which updateTaxCalculation keeps in
- * sync, so the screen always reconciles to GRAND TOTAL (and to the print).
- */
-function renderInvoiceSummary() {
-    const container = document.getElementById('invoice-line-items');
-    if (!container) return;
-    const money = (n) => '$' + (Number(n) || 0).toFixed(2);
-
-    const baseSubtotal = parseFloat((document.getElementById('grand-total')?.textContent || '$0').replace(/[$,]/g, '')) || 0;
-    const artOn = document.getElementById('art-charge-toggle')?.checked;
-    const artCharge = artOn ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
-    const designFee = designHours * 75;
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
-    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
-    const { discount } = (typeof calculateDiscountableSubtotal === 'function')
-        ? calculateDiscountableSubtotal() : { discount: 0 };
-
-    const rows = [];
-    rows.push(`<div class="invoice-line"><span>Products</span><span class="amt">${money(baseSubtotal)}</span></div>`);
-    if (artCharge > 0) rows.push(`<div class="invoice-line"><span>Logo Mockup &amp; Review</span><span class="amt">${money(artCharge)}</span></div>`);
-    if (designFee > 0) rows.push(`<div class="invoice-line"><span>Graphic Design (${designHours} hr${designHours === 1 ? '' : 's'} × $75)</span><span class="amt">${money(designFee)}</span></div>`);
-    if (rushFee > 0) rows.push(`<div class="invoice-line"><span>Rush Fee</span><span class="amt">${money(rushFee)}</span></div>`);
-    if (shippingFee > 0) rows.push(`<div class="invoice-line"><span>Shipping</span><span class="amt">${money(shippingFee)}</span></div>`);
-    if (discount > 0) rows.push(`<div class="invoice-line discount"><span>Discount</span><span class="amt">-${money(discount)}</span></div>`);
-    container.innerHTML = rows.join('');
-
-    // Tier / pieces tag in the summary header (e.g. "24-47 tier · 30 pcs")
-    const tierTag = document.getElementById('invoice-tier-tag');
-    if (tierTag) {
-        const tier = (document.getElementById('pricing-tier')?.textContent || '').trim();
-        const qty = (document.getElementById('total-qty')?.textContent || '0').trim();
-        tierTag.textContent = (Number(qty) > 0 && tier) ? `${tier} tier · ${qty} pcs` : '';
-    }
-}
-window.renderInvoiceSummary = renderInvoiceSummary;
 
 // ============================================================
 // ACTIONS (Save, Print, Email, Copy)
@@ -6937,12 +6913,14 @@ function updatePushButtonState() {
     if (!btn || !label) return;
 
     if (_pushAlreadyDone) {
-        label.textContent = 'Pushed to ShopWorks ✓';
+        // "Sent" — not "Pushed/Imported". The order reached ManageOrders; OnSite
+        // import is confirmed separately (Verify in ShopWorks in the push modal).
+        label.textContent = 'Sent to ShopWorks ✓';
         btn.disabled = true;
         btn.style.opacity = '1';
         btn.style.cursor = 'default';
         btn.style.background = '#28a745';
-        btn.title = 'This quote has already been pushed to ShopWorks';
+        btn.title = 'This quote was sent to ManageOrders. Use “Verify in ShopWorks” to confirm OnSite imported it.';
         return;
     }
 
@@ -7109,18 +7087,37 @@ async function confirmPushToShopWorks() {
             throw new Error(data.error || data.details || `HTTP ${response.status}`);
         }
 
-        // Success
+        // The push endpoint only confirms the order reached ManageOrders STAGING
+        // (MO returns "...has been uploaded"). ShopWorks OnSite imports asynchronously
+        // on its own download cycle, and that conversion can fail SILENTLY — an unmapped
+        // size, an invalid customer/design #, etc. — leaving an order MO accepted but
+        // OnSite never created. So we no longer claim "Pushed to ShopWorks" off the ack;
+        // we report "Sent to ManageOrders" and verify the REAL OnSite import via
+        // getorderno. (EMB-2026-269 false-success — MO said uploaded, OnSite never
+        // imported it — 2026-06-02.)
         _pushAlreadyDone = true;
         updatePushButtonState();
+        const extId = data.extOrderId || _pushQuoteId;
         if (statusEl) {
-            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#f0fdf4; border-color:#bbf7d0;">' +
-                '<h4><i class="fas fa-check-circle"></i> Pushed to ShopWorks</h4>' +
-                '<div class="preview-item-value">Created as <strong>' + escapeHtml(data.extOrderId || '') + '</strong> · ' +
+            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#eff6ff; border-color:#bfdbfe;">' +
+                '<h4><i class="fas fa-paper-plane"></i> Sent to ManageOrders</h4>' +
+                '<div class="preview-item-value">Uploaded as <strong>' + escapeHtml(extId) + '</strong> · ' +
                 escapeHtml(String(data.lineItemCount || 0)) + ' line items · ' +
-                escapeHtml(String(data.designCount || 0)) + ' design(s).</div></div>';
+                escapeHtml(String(data.designCount || 0)) + ' design(s).</div>' +
+                '<div style="margin-top:10px; color:#475569;">ShopWorks imports new orders on its own download cycle — ' +
+                'confirm it actually landed in OnSite:</div>' +
+                '<div id="emb-sw-import-result" style="margin-top:8px; font-size:0.92em;"></div>' +
+                '<button type="button" id="emb-sw-verify-btn" style="margin-top:8px; padding:6px 12px; background:#1a5276; ' +
+                'color:#fff; border:none; border-radius:6px; cursor:pointer;">' +
+                '<i class="fas fa-magnifying-glass"></i> Verify in ShopWorks</button></div>';
+            const vbtn = document.getElementById('emb-sw-verify-btn');
+            if (vbtn) vbtn.addEventListener('click', () => verifyShopWorksImport(extId));
+            // Initial check — usually still "pending" right after a push, which is the
+            // honest state to show instead of a premature green check.
+            verifyShopWorksImport(extId);
         }
         confirmBtn.style.display = 'none';
-        showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+        showToast(`Sent to ManageOrders as ${extId} — verify ShopWorks import`, 'success');
 
     } catch (error) {
         console.error('[Embroidery] Push error:', error);
@@ -7131,6 +7128,43 @@ async function confirmPushToShopWorks() {
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = origHtml;
         showToast(`Push failed: ${error.message}`, 'error');
+    }
+}
+
+// Verify an order ACTUALLY imported into ShopWorks OnSite — not just that
+// ManageOrders accepted the upload. getorderno queries OnSite's real orders by
+// ExtOrderID: a non-empty result means OnSite created the order. Empty means
+// it's either still pending OnSite's import cycle OR the MO→OnSite conversion
+// failed (unmapped size, invalid customer/design #). This is the check that was
+// missing when EMB-2026-269 reported success but never reached ShopWorks
+// (2026-06-02). Uses APP_CONFIG.API.BASE_URL per the no-hardcoded-URL rule.
+async function verifyShopWorksImport(extOrderId) {
+    const out = document.getElementById('emb-sw-import-result');
+    if (!extOrderId || !out) return;
+    out.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking ShopWorks…';
+    try {
+        const apiBase = typeof APP_CONFIG !== 'undefined'
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/manageorders/getorderno/${encodeURIComponent(extOrderId)}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+        const row = Array.isArray(data.result) && data.result.length ? data.result[0] : null;
+        const orderNo = row ? (row.id_Order || row.ID_Order || row) : null;
+        if (orderNo) {
+            out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle"></i> ' +
+                'Confirmed in ShopWorks — order #' + escapeHtml(String(orderNo)) + '</span>';
+        } else {
+            out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+                '<strong>Not in ShopWorks yet.</strong> ManageOrders accepted the upload, but OnSite has not ' +
+                'imported it. OnSite pulls new orders periodically — wait a few minutes and click ' +
+                '“Verify in ShopWorks” again. If it never appears, the MO→OnSite conversion failed ' +
+                '(commonly an unmapped size or an invalid customer/design #) — check the ManageOrders ' +
+                'conversion log for this order.</span>';
+        }
+    } catch (err) {
+        out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+            'Could not verify ShopWorks import: ' + escapeHtml(err.message) + '. Try again shortly.</span>';
     }
 }
 
