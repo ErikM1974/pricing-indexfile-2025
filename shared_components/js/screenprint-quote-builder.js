@@ -3669,14 +3669,6 @@ async function printQuote() {
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
         };
 
-        // LTM display mode: builtin = baked into prices, separate = shown as line item
-        const ltmState = getLtmControlState('spc-ltm-panel');
-        pricingData.ltmDistributed = (ltmState.displayMode === 'builtin');
-
-        // Pass the quote's actual tax rate (percent) so the printed PDF matches the
-        // on-screen total instead of hardcoding 10.1%. (2026-06-01)
-        pricingData.taxRate = parseFloat(document.getElementById('tax-rate-input')?.value);
-
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
         const printWindow = window.open('', '_blank');
         printWindow.document.write(invoiceHTML);
@@ -3817,7 +3809,18 @@ function buildScreenprintPricingData(products) {
         discount = subtotal * (discountAmount / 100);
     }
 
-    return {
+    // Read tax + LTM state here (was post-overridden in printQuote pre-3.1.0).
+    // '10.1' fallback preserves pre-3.1 behavior: an empty input previously fell
+    // through to the generator's hardcoded WA standard rate.
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.1';
+    const ltmState = getLtmControlState('spc-ltm-panel');
+    const ltmDistributed = (ltmState.displayMode === 'builtin');
+
+    const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '';
+    const preTaxVal = parseFloat(preTaxText.replace(/[$,]/g, ''));
+
+    return window.QuotePricingData.buildPricingData({
+        method: 'SCP',
         quoteId: quoteId,
         tier: currentPricing.tier || '24-36',
         products: invoiceProducts,
@@ -3825,19 +3828,17 @@ function buildScreenprintPricingData(products) {
         grandTotal: currentPricing.grandTotal || subtotal,
         // Authoritative pre-tax adjusted subtotal (base + art/graphic-design/rush
         // + shipping − discount) drives the PDF tax + GRAND TOTAL so the printed
-        // total matches the on-screen #grand-total-with-tax (the generator used to
-        // tax bare grandTotal and drop every fee/discount from the printed total). (2026-06-01)
-        preTaxSubtotal: (() => { const t = document.getElementById('pre-tax-subtotal')?.textContent || ''; const v = parseFloat(t.replace(/[$,]/g, '')); return isNaN(v) ? undefined : v; })(),
+        // total matches the on-screen #grand-total-with-tax.
+        preTaxSubtotal: isNaN(preTaxVal) ? undefined : preTaxVal,
         includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
-        // Shipping — itemized on the PDF so the rows foot to the total (already inside
-        // preTaxSubtotal). (2026-06-01)
+        taxRate: taxRateRaw,
+        // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
         shippingFee: parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0,
         setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
         logos: [],
         // Screenprint-specific
-        isScreenprint: true,
         printConfig: {
             front: frontDesc,
             back: backDesc,
@@ -3846,16 +3847,16 @@ function buildScreenprintPricingData(products) {
             totalScreens: printConfig.totalScreens || 1
         },
         ltmFee: currentPricing.ltmFee || 0,
+        ltmDistributed: ltmDistributed,
         safetyStripesTotal: safetyStripesTotal,
         totalQuantity: currentPricing.totalQuantity || 0,
-        // New fee fields
         artCharge: artCharge,
         graphicDesignHours: graphicDesignHours,
         graphicDesignCharge: graphicDesignCharge,
         rushFee: rushFee,
         discount: discount,
         discountReason: discountReason
-    };
+    });
 }
 
 function getLocationName(code) {

@@ -329,6 +329,7 @@
 | `/shared_components/js/embroidery-quote-pricing.js` | Embroidery pricing engine (tiers, LTM, stitch surcharges, FB) | Caspio API | ✅ Active |
 | `/shared_components/js/embroidery-quote-service.js` | Embroidery quote save/update/email service | Caspio API, EmailJS | ✅ Active |
 | `/shared_components/js/embroidery-quote-invoice.js` | Embroidery invoice generation (ShopWorks format) | — | ✅ Active |
+| `/shared_components/js/quote-pricing-data.js` | Shared `pricingData` contract (Phase 3.1) — builds + validates the shape all 4 quote builders pass to `embroidery-quote-invoice.js`. Normalizes method→flags, percent tax→decimal, zero-fills fee fields. | — | ✅ Active |
 | `/shared_components/js/embroidery-quote-products.js` | Embroidery product row management | SanMar API | ✅ Active |
 | `/shared_components/js/embroidery-quote-logos.js` | Logo card management (positions, stitch tiers, AL) | — | ✅ Active |
 | `/shared_components/js/embroidery-quote-adapter.js` | Embroidery data adapter (Caspio → pricing engine) | Caspio API | ✅ Active |
