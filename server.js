@@ -3233,13 +3233,14 @@ app.post('/api/submit-order-form', async (req, res) => {
       // multi-method order through, the first method wins (better than
       // misrouting everything to a generic default).
       idOrderType: ORDER_TYPE_ID[methodsUsed[0]] || ORDER_TYPE_DEFAULT,
-      // APISource: routes orders to the new "Order Form" ShopWorks
-      // ManageOrders integration (set its APISource = "OrderForm" too).
-      // Existing "Northwest Embroidery-Store" integration with blank
-      // APISource keeps pulling per current behavior — see plan note about
-      // potential temporary duplicate ingestion until that integration
-      // also gets a tag.
-      apiSource: 'OrderForm'
+      // APISource: routes the order to the consolidated "Manage Orders"
+      // ShopWorks integration (its APISource = "ManageOrders"). The separate
+      // "Order Form" integration this used to target was DELETED 2026-06-02 when
+      // Erik merged the three integrations into one — pointing here keeps
+      // DTG/order-form orders importing (they otherwise had no integration to
+      // pull them). EMB/SCP/DTF pushes send blank APISource and also land on
+      // "Manage Orders".
+      apiSource: 'ManageOrders'
     };
 
     console.log('[Order Form Submit] Pushing', extOrderId, 'lines:', lineItems.length, 'designs:', designs.length);
