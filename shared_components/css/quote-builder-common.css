@@ -3208,3 +3208,130 @@ input[type="radio"] {
     width: 40px;
     background: var(--color-header-actions);
 }
+
+/* ============================================================
+   ORDER-FLOW REDESIGN (2026-06-02) — shared by EMB / SCP / DTF
+   Numbered, always-visible steps so the order flow reads
+   top-to-bottom (Customer → Artwork → Shipping → Services →
+   Order Details → Invoice) instead of hiding the order fields
+   in collapsed accordions. Self-contained (no dependency on a
+   per-builder extracted stylesheet).
+   ============================================================ */
+.flow-step {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+.flow-step-head {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+.flow-step-head i { font-size: 14px; color: #6366f1; }
+.flow-step-num {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #6366f1;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.flow-step-body { padding: 12px 14px; }
+.flow-step-body label { font-size: 11px; color: #64748b; display: block; margin-bottom: 2px; }
+
+/* Pickup vs Ship segmented toggle */
+.ship-mode-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+.ship-mode-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all .15s;
+}
+.ship-mode-btn:hover { border-color: #94a3b8; }
+.ship-mode-btn.active {
+    border-color: #16a34a;
+    background: #f0fdf4;
+    color: #166534;
+    box-shadow: 0 0 0 1px #16a34a inset;
+}
+.ship-mode-btn i { font-size: 14px; }
+
+/* Muted "filled after import" hint (ShopWorks Order #) */
+.field-hint-muted { font-size: 10px; color: #94a3b8; font-weight: 400; }
+
+/* Invoice-style summary (mirrors the printed PDF) */
+.invoice-summary {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+.invoice-summary-head {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e2e8f0;
+}
+.invoice-summary-head .tier-tag { font-size: 11px; font-weight: 600; color: #6366f1; }
+.invoice-summary-body { padding: 12px 14px; }
+.invoice-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: #475569;
+    padding: 4px 0;
+}
+.invoice-line .amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.invoice-line.muted { color: #94a3b8; font-size: 12px; }
+.invoice-line.discount { color: #dc2626; }
+.invoice-subtotal {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    padding: 7px 0;
+    margin-top: 4px;
+    border-top: 1px solid #e2e8f0;
+}
+.invoice-grand {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px -14px -12px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-top: 2px solid #22c55e;
+}
+.invoice-grand .lbl { font-weight: 700; font-size: 15px; color: #166534; }
+.invoice-grand .amt { font-weight: 700; font-size: 18px; color: #166534; font-variant-numeric: tabular-nums; }

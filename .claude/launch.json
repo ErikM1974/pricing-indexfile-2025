@@ -15,6 +15,14 @@
       "runtimeArgs": ["src/index.js"],
       "port": 3002,
       "cwd": "../caspio-pricing-proxy"
+    },
+    {
+      "name": "pricing-index-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "port": 3010,
+      "autoPort": true,
+      "cwd": "."
     }
   ]
 }

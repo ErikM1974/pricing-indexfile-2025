@@ -231,6 +231,30 @@ function updateAdditionalCharges() {
 // ============================================
 
 /**
+ * Default the order dates for a NEW quote (2026-06-02, shared by EMB/SCP/DTF).
+ * Date Placed → today; Req Ship Date → today + 14 days (2 weeks).
+ * Only fills BLANK fields, so it never clobbers a loaded or typed-in value.
+ * Element IDs: date-order-placed, req-ship-date (consistent across builders).
+ */
+function setQuoteDateDefaults() {
+    const fmt = (d) => {
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${mm}/${dd}/${d.getFullYear()}`;
+    };
+    const today = new Date();
+    const placed = document.getElementById('date-order-placed');
+    if (placed && !placed.value.trim()) placed.value = fmt(today);
+    const reqShip = document.getElementById('req-ship-date');
+    if (reqShip && !reqShip.value.trim()) {
+        const d = new Date(today.getTime());
+        d.setDate(d.getDate() + 14);
+        reqShip.value = fmt(d);
+    }
+}
+if (typeof window !== 'undefined') window.setQuoteDateDefaults = setQuoteDateDefaults;
+
+/**
  * Toggle Additional Charges panel expand/collapse
  * Element IDs: charges-content, charges-chevron (consistent across all builders)
  */

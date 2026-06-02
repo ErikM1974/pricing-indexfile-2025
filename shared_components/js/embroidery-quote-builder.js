@@ -1444,25 +1444,25 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Phone — API may not return phone, clear if empty
             const phoneInput = document.getElementById('customer-phone');
             if (phoneInput) phoneInput.value = contact.Phone || '';
-            // Auto-fill Ship To from contact address
-            if (contact.State) {
-                const stateInput = document.getElementById('ship-state');
-                if (stateInput) stateInput.value = contact.State;
-            }
-            if (contact.City) {
-                const cityInput = document.getElementById('ship-city');
-                if (cityInput) cityInput.value = contact.City;
-            }
-            if (contact.Zip) {
-                const zipInput = document.getElementById('ship-zip');
-                if (zipInput) {
-                    zipInput.value = contact.Zip;
-                    lookupTaxRate(); // Auto-trigger tax lookup
+            // Auto-fill Ship To from contact address. STASH it always so that if
+            // the rep later flips Pickup → Ship it, setShipMode() restores it.
+            // When Pickup is active (the default), do NOT overwrite the Milton shop
+            // address / tax — a pickup order is taxed locally. (2026-06-02)
+            window._lastCustomerShipTo = {
+                address: contact.Address || '',
+                city: contact.City || '',
+                state: contact.State || '',
+                zip: contact.Zip || ''
+            };
+            const _isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+            if (!_isPickup) {
+                if (contact.State) { const el = document.getElementById('ship-state'); if (el) el.value = contact.State; }
+                if (contact.City) { const el = document.getElementById('ship-city'); if (el) el.value = contact.City; }
+                if (contact.Address) { const el = document.getElementById('ship-address'); if (el) el.value = contact.Address; }
+                if (contact.Zip) {
+                    const zipInput = document.getElementById('ship-zip');
+                    if (zipInput) { zipInput.value = contact.Zip; lookupTaxRate(); }
                 }
-            }
-            if (contact.Address) {
-                const addrInput = document.getElementById('ship-address');
-                if (addrInput) addrInput.value = contact.Address;
             }
             _customerDesignGallery = null; // Invalidate gallery cache on customer change
 
@@ -1535,6 +1535,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initEmbroideryPersistence();
 
+            // New-quote date defaults (2026-06-02): Date Placed = today,
+            // Req Ship Date = today + 2 weeks. Fills blanks only, so a draft
+            // restored from the recovery dialog still overrides these.
+            if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
+
             // Check for draft recovery
             if (embSession && embSession.shouldShowRecovery()) {
                 embSession.showRecoveryDialog(
@@ -1552,6 +1557,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Initialize additional charges display (for default $50 art charge)
         updateAdditionalCharges();
+
+        // Paint the Shipping step's Pickup/Ship toggle + pickup-vs-address UI to
+        // match the current ship method (Pickup by default on a new quote; the
+        // loaded value when editing). Idempotent. (2026-06-02 order-flow redesign)
+        onShipMethodChange();
 
     } catch (error) {
         console.error('Failed to initialize pricing:', error);
@@ -6390,13 +6400,20 @@ function onShipZipBlur() {
  */
 function onShipMethodChange() {
     const method = document.getElementById('ship-method').value;
-    const addressFields = document.getElementById('ship-address-fields');
+    const isPickup = method === 'Customer Pickup';
+    const carrierWrap = document.getElementById('ship-carrier-wrap');
     const pickupNotice = document.getElementById('pickup-notice');
     const otherInput = document.getElementById('ship-method-other');
+    const pickupBtn = document.getElementById('ship-mode-pickup');
+    const shipBtn = document.getElementById('ship-mode-ship');
 
-    if (method === 'Customer Pickup') {
-        // Hide address fields, show pickup notice
-        if (addressFields) addressFields.style.display = 'none';
+    // Keep the Pickup / Ship-it segmented toggle in sync with the method value
+    // (so a programmatic change — load, import, draft restore — repaints it too).
+    if (pickupBtn) pickupBtn.classList.toggle('active', isPickup);
+    if (shipBtn) shipBtn.classList.toggle('active', !isPickup);
+    if (carrierWrap) carrierWrap.style.display = isPickup ? 'none' : '';
+
+    if (isPickup) {
         if (pickupNotice) pickupNotice.style.display = 'block';
         if (otherInput) otherInput.style.display = 'none';
         // Auto-set Milton, WA 98354 for tax lookup (NW Custom Apparel shop location)
@@ -6406,15 +6423,47 @@ function onShipMethodChange() {
         document.getElementById('ship-zip').value = '98354';
         lookupTaxRate();
     } else {
-        // Show address fields, hide pickup notice
-        if (addressFields) addressFields.style.display = '';
         if (pickupNotice) pickupNotice.style.display = 'none';
-        // Show/hide Other text input
+        // Show/hide the "Other" free-text method input
         if (otherInput) {
             otherInput.style.display = (method === 'Other') ? 'block' : 'none';
         }
     }
 }
+
+/**
+ * Pickup / Ship-it segmented toggle (2026-06-02 order-flow redesign).
+ * Sets the underlying #ship-method value, then lets onShipMethodChange()
+ * render the conditional UI. Switching to Ship restores the last looked-up
+ * customer ship-to (stashed in applyContact) so the rep doesn't retype it.
+ */
+function setShipMode(mode) {
+    const select = document.getElementById('ship-method');
+    if (!select) return;
+    if (mode === 'pickup') {
+        select.value = 'Customer Pickup';
+    } else {
+        // Leaving pickup → default to UPS Ground (most common carrier)
+        if (select.value === 'Customer Pickup') select.value = 'UPS Ground';
+        // Pre-fill the address from the last selected customer, if we have it
+        const stash = window._lastCustomerShipTo;
+        const zipEl = document.getElementById('ship-zip');
+        if (stash && zipEl && !zipEl.value.trim()) {
+            const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+            set('ship-address', stash.address);
+            set('ship-city', stash.city);
+            if (stash.state) { const st = document.getElementById('ship-state'); if (st) st.value = stash.state; }
+            set('ship-zip', stash.zip);
+        }
+    }
+    onShipMethodChange();
+    // In ship mode, refresh the tax rate for the shown address (if any)
+    if (mode === 'ship') {
+        const zip = document.getElementById('ship-zip')?.value?.trim();
+        if (zip && zip.length >= 5) lookupTaxRate();
+    }
+}
+window.setShipMode = setShipMode;
 
 /**
  * Update tax calculation based on toggle state
@@ -6456,7 +6505,50 @@ function updateTaxCalculation() {
         taxRow.style.display = 'none';
         grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
+
+    // Mirror the itemized lines into the on-screen Invoice Summary (2026-06-02)
+    renderInvoiceSummary();
 }
+
+/**
+ * Render the on-screen Invoice Summary line items (2026-06-02 order-flow
+ * redesign). Mirrors the printed PDF: Products + each active fee + discount.
+ * These lines sum to #pre-tax-subtotal, which updateTaxCalculation keeps in
+ * sync, so the screen always reconciles to GRAND TOTAL (and to the print).
+ */
+function renderInvoiceSummary() {
+    const container = document.getElementById('invoice-line-items');
+    if (!container) return;
+    const money = (n) => '$' + (Number(n) || 0).toFixed(2);
+
+    const baseSubtotal = parseFloat((document.getElementById('grand-total')?.textContent || '$0').replace(/[$,]/g, '')) || 0;
+    const artOn = document.getElementById('art-charge-toggle')?.checked;
+    const artCharge = artOn ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+    const designFee = designHours * 75;
+    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+    const { discount } = (typeof calculateDiscountableSubtotal === 'function')
+        ? calculateDiscountableSubtotal() : { discount: 0 };
+
+    const rows = [];
+    rows.push(`<div class="invoice-line"><span>Products</span><span class="amt">${money(baseSubtotal)}</span></div>`);
+    if (artCharge > 0) rows.push(`<div class="invoice-line"><span>Logo Mockup &amp; Review</span><span class="amt">${money(artCharge)}</span></div>`);
+    if (designFee > 0) rows.push(`<div class="invoice-line"><span>Graphic Design (${designHours} hr${designHours === 1 ? '' : 's'} × $75)</span><span class="amt">${money(designFee)}</span></div>`);
+    if (rushFee > 0) rows.push(`<div class="invoice-line"><span>Rush Fee</span><span class="amt">${money(rushFee)}</span></div>`);
+    if (shippingFee > 0) rows.push(`<div class="invoice-line"><span>Shipping</span><span class="amt">${money(shippingFee)}</span></div>`);
+    if (discount > 0) rows.push(`<div class="invoice-line discount"><span>Discount</span><span class="amt">-${money(discount)}</span></div>`);
+    container.innerHTML = rows.join('');
+
+    // Tier / pieces tag in the summary header (e.g. "24-47 tier · 30 pcs")
+    const tierTag = document.getElementById('invoice-tier-tag');
+    if (tierTag) {
+        const tier = (document.getElementById('pricing-tier')?.textContent || '').trim();
+        const qty = (document.getElementById('total-qty')?.textContent || '0').trim();
+        tierTag.textContent = (Number(qty) > 0 && tier) ? `${tier} tier · ${qty} pcs` : '';
+    }
+}
+window.renderInvoiceSummary = renderInvoiceSummary;
 
 // ============================================================
 // ACTIONS (Save, Print, Email, Copy)
@@ -7334,17 +7426,20 @@ function resetQuote() {
     document.getElementById('po-number').value = '';
     document.getElementById('order-number').value = '';
     document.getElementById('customer-number').value = '';
-    document.getElementById('ship-method').value = 'UPS Ground';
+    document.getElementById('ship-method').value = 'Customer Pickup';
     document.getElementById('ship-method-other').value = '';
+    window._lastCustomerShipTo = null;
     onShipMethodChange();
     document.getElementById('date-order-placed').value = '';
     document.getElementById('req-ship-date').value = '';
     document.getElementById('drop-dead-date').value = '';
     document.getElementById('payment-terms').value = '';
+    // New-quote date defaults (today / +2 weeks) — refills the just-cleared blanks
+    if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
     const odContent = document.getElementById('order-details-content');
     const odChevron = document.getElementById('order-details-chevron');
     const odBadge = document.getElementById('order-details-badge');
-    if (odContent) odContent.style.display = 'none';
+    if (odContent) odContent.style.display = '';   // always-visible flow-step body now
     if (odChevron) odChevron.style.transform = '';
     if (odBadge) odBadge.style.display = 'none';
     document.getElementById('discount-amount').value = '';
