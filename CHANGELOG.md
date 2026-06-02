@@ -1,3 +1,12 @@
+## v2026.06.02.1 (2026.06.02)
+
+- Docs: record self-review round 2 findings + OneDrive silent-revert gotcha/workaround
+- Fix ShopWorks sync-back: look up builder orders by their REAL ExtOrderID
+- Doc: double size-suffix push bug + fix + design-type confirmation (2026-06-02)
+- Doc: design ExtDesignID collision bug + fix (2026-06-02)
+- PDF: compact print layout so quotes fit one page when locations are shown
+- Deploy v2026.06.02.1: PDF single-page layout (embroidery-quote-invoice.js + builder cache-bust)
+
 ## v2026.06.01.9 (2026.06.01)
 
 - Deploy v2026.06.01.9: quote-builder deep-review fixes (28 findings)
