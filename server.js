@@ -3233,14 +3233,14 @@ app.post('/api/submit-order-form', async (req, res) => {
       // multi-method order through, the first method wins (better than
       // misrouting everything to a generic default).
       idOrderType: ORDER_TYPE_ID[methodsUsed[0]] || ORDER_TYPE_DEFAULT,
-      // APISource: routes the order to the consolidated "Manage Orders"
-      // ShopWorks integration (its APISource = "ManageOrders"). The separate
-      // "Order Form" integration this used to target was DELETED 2026-06-02 when
-      // Erik merged the three integrations into one — pointing here keeps
-      // DTG/order-form orders importing (they otherwise had no integration to
-      // pull them). EMB/SCP/DTF pushes send blank APISource and also land on
-      // "Manage Orders".
-      apiSource: 'ManageOrders'
+      // APISource: left BLANK so the single consolidated "Manage Orders"
+      // ShopWorks integration (whose APISource filter Erik cleared on 2026-06-02)
+      // pulls this order as a catch-all — uniform with the quote-builder /
+      // 3-Day-Tees / Inksoft pushes, which all send blank. The 3 integrations
+      // were merged into one; a blank-APISource integration pulls EVERY order
+      // regardless of tag, so nothing falls through. (A specific tag here would
+      // only matter again if multiple integrations are ever reintroduced.)
+      apiSource: ''
     };
 
     console.log('[Order Form Submit] Pushing', extOrderId, 'lines:', lineItems.length, 'designs:', designs.length);
