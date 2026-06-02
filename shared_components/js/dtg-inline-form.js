@@ -3680,14 +3680,15 @@
             const invoiceSubtotal = Math.round(invoiceProducts.reduce((s, p) =>
                 s + p.lineItems.reduce((ss, li) => ss + (Number(li.total) || 0), 0), 0) * 100) / 100;
 
-            const pricingData = {
+            // Contract derives isDTG from method, normalizes tax, and zero-fills
+            // any fee fields not set here (artCharge, rushFee, discount, etc.).
+            const pricingData = window.QuotePricingData.buildPricingData({
+                method: 'DTG',
                 quoteId: getQuoteID() || `DTG-PREVIEW-${Date.now()}`,
-                // The generator's getQuoteTypeInfo() keys off `isDTG`. printLocation
-                // feeds generateDTGSpecs. (2026-06-01)
-                isDTG: true,
+                // printLocation feeds generateDTGSpecs.
                 printLocation: { front: effectiveLocationCode() },
-                pricingTier: priceQuote.tier || 'Standard',
-                combinedQuantity: priceQuote.combinedQuantity || 0,
+                tier: priceQuote.tier || 'Standard',
+                totalQuantity: priceQuote.combinedQuantity || 0,
                 products: invoiceProducts,
                 subtotal: invoiceSubtotal,
                 // DTG amortizes LTM INTO the per-piece price (_priceBySize), so it is
@@ -3697,9 +3698,8 @@
                 grandTotal: invoiceSubtotal,
                 preTaxSubtotal: invoiceSubtotal,
                 taxRate: Number(state.shipping?.taxRate) || 0,
-                taxAmount: 0,                       // computed by invoice generator
-                shippingFee: 0,
-            };
+                shippingFee: 0
+            });
 
             const customerData = {
                 name: [state.customer?.firstName, state.customer?.lastName].filter(Boolean).join(' ') || 'Customer',

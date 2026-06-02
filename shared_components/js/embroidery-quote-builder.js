@@ -11294,7 +11294,12 @@ function buildEmbroideryPricingData(allItems) {
         ? (pricingCalculator.getEmbellishmentUpcharges?.()?.['3d-puff'] || 0)
         : 0;
 
-    return {
+    // Tax rate read here (was post-overridden in printQuote pre-3.1.0; contract
+    // normalizes percent → decimal at the boundary).
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value;
+
+    return window.QuotePricingData.buildPricingData({
+        method: 'EMB',
         quoteId: quoteId,
         tier: tierText,
         products: invoiceProducts,
@@ -11302,6 +11307,7 @@ function buildEmbroideryPricingData(allItems) {
         grandTotal: grandTotal,
         preTaxSubtotal: isNaN(preTaxSubtotalVal) ? undefined : preTaxSubtotalVal,
         includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+        taxRate: taxRateRaw,
         totalQuantity: totalQty,
         setupFees: setupFees + capPatchSetupFee,
         setupFeesCount: digitizingCount,
@@ -11315,16 +11321,15 @@ function buildEmbroideryPricingData(allItems) {
         capEmbellishmentType: capEmbType,
         capPatchSetupFee: capPatchSetupFee,
         puffUpchargePerCap: puffUpchargePerCap,
-        // LTM
-        ltmFee: 0, // Already baked into grandTotal
+        // LTM — already baked into grandTotal
+        ltmFee: 0,
         ltmDistributed: ltmDistributed,
         // Fees
         artCharge: charges.artCharge || 0,
         graphicDesignHours: charges.graphicDesignHours || 0,
         graphicDesignCharge: charges.graphicDesignCharge || 0,
         rushFee: charges.rushFee || 0,
-        // Shipping — itemized on the PDF so the rows foot to the total (already inside
-        // preTaxSubtotal). (2026-06-01)
+        // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
         shippingFee: parseFloat(document.getElementById('shipping-fee')?.value) || 0,
         discount: charges.discount || 0,
         discountReason: charges.discountReason || '',
@@ -11335,7 +11340,7 @@ function buildEmbroideryPricingData(allItems) {
         deccQty: charges.deccQty || 0,
         deccUnit: charges.deccUnit || 0,
         deccTotal: charges.deccTotal || 0
-    };
+    });
 }
 
 /**
@@ -11444,10 +11449,6 @@ async function printQuote() {
 
     try {
         const pricingData = buildEmbroideryPricingData(allItems);
-
-        // Pass the quote's actual tax rate (percent) so the printed PDF matches the
-        // on-screen total instead of hardcoding 10.1%. (2026-06-01)
-        pricingData.taxRate = parseFloat(document.getElementById('tax-rate-input')?.value);
 
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
         const customerData = {

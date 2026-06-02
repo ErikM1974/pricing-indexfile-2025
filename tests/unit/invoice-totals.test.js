@@ -87,3 +87,98 @@ describe('EmbroideryInvoiceGenerator total math (2026-06-01 PDF regression)', ()
     }
   });
 });
+
+/**
+ * Phase 3.1 — QuotePricingData contract. Locks the shape every builder must emit.
+ * The generator is unchanged; the contract normalizes inputs (method→flags,
+ * percent tax→decimal, zero-fills) so the same on-screen quote renders to the
+ * same printed PDF regardless of which builder produced it.
+ */
+function loadContract() {
+  const code = fs.readFileSync(path.join(__dirname, '../../shared_components/js/quote-pricing-data.js'), 'utf8');
+  const win = {};
+  // No `location` global in node — validator's isDevHost() falls back to false (prod = warn).
+  new Function('window', code).call(null, win);
+  return win.QuotePricingData;
+}
+const Contract = loadContract();
+
+// Common quote fields so each test only states what it's varying.
+const BASE = { quoteId: 'T', tier: '24-47', totalQuantity: 30, products: [],
+               subtotal: 900, preTaxSubtotal: 900, grandTotal: 900, taxRate: 0 };
+
+describe('QuotePricingData contract (Phase 3.1)', () => {
+  test('loads from the source file', () => {
+    expect(Contract.CONTRACT_VERSION).toBe('3.1.0');
+    expect(typeof Contract.buildPricingData).toBe('function');
+  });
+  test('rejects unknown method', () => {
+    expect(() => Contract.buildPricingData({ ...BASE, method: 'XYZ' })).toThrow();
+    expect(() => Contract.buildPricingData({ ...BASE })).toThrow(); // missing method
+  });
+  test('derives isDTG/isScreenprint/isDTF from method', () => {
+    expect(Contract.buildPricingData({ ...BASE, method: 'DTG' })).toMatchObject({ isDTG: true, isScreenprint: false, isDTF: false });
+    expect(Contract.buildPricingData({ ...BASE, method: 'EMB' })).toMatchObject({ isDTG: false, isScreenprint: false, isDTF: false });
+    expect(Contract.buildPricingData({ ...BASE, method: 'SCP' })).toMatchObject({ isDTG: false, isScreenprint: true, isDTF: false });
+    expect(Contract.buildPricingData({ ...BASE, method: 'DTF' })).toMatchObject({ isDTG: false, isScreenprint: false, isDTF: true });
+  });
+  test('normalizes percent tax → decimal (10.1 → 0.101)', () => {
+    expect(Contract.buildPricingData({ ...BASE, method: 'SCP', taxRate: 10.1 }).taxRate).toBeCloseTo(0.101, 4);
+    expect(Contract.buildPricingData({ ...BASE, method: 'EMB', taxRate: '10.1' }).taxRate).toBeCloseTo(0.101, 4);
+    expect(Contract.buildPricingData({ ...BASE, method: 'DTG', taxRate: 0.088 }).taxRate).toBeCloseTo(0.088, 4);
+    expect(Contract.buildPricingData({ ...BASE, method: 'DTF', taxRate: '' }).taxRate).toBe(0);
+  });
+  test('zero-fills missing fee fields (DTG inline-form ships sparse)', () => {
+    const pd = Contract.buildPricingData({ ...BASE, method: 'DTG' });
+    ['artCharge', 'graphicDesignCharge', 'rushFee', 'discount', 'setupFees',
+     'shippingFee', 'safetyStripesTotal', 'ltmFee'].forEach(k => expect(pd[k]).toBe(0));
+  });
+  test('grandTotal defaults to preTaxSubtotal when missing', () => {
+    const pd = Contract.buildPricingData({ ...BASE, method: 'EMB', grandTotal: undefined, preTaxSubtotal: 777 });
+    expect(pd.grandTotal).toBe(777);
+  });
+  test('includeTax defaults to true; explicit false honored', () => {
+    expect(Contract.buildPricingData({ ...BASE, method: 'EMB' }).includeTax).toBe(true);
+    expect(Contract.buildPricingData({ ...BASE, method: 'EMB', includeTax: false }).includeTax).toBe(false);
+  });
+  test('warns (prod) on missing required fields, does not throw', () => {
+    const origWarn = console.warn;
+    const warnings = [];
+    console.warn = (m) => warnings.push(m);
+    try {
+      // No `location` in node → validator treats as prod → warn-only.
+      const pd = Object.assign({}, BASE); delete pd.tier; pd.method = 'EMB';
+      // Bypass buildPricingData (it would set defaults) — call validator directly.
+      Contract.validatePricingData(pd);
+      expect(warnings.length).toBe(1);
+      expect(warnings[0]).toMatch(/missing: tier/);
+    } finally {
+      console.warn = origWarn;
+    }
+  });
+  test('contract output renders to the same GRAND TOTAL as a hand-built pricingData (EMB, percent tax)', () => {
+    const handBuilt = { ...BASE, quoteId: 'EMB1', tier: '24-47', totalQuantity: 30, subtotal: 900,
+                        grandTotal: 1000, preTaxSubtotal: 1075, includeTax: true, taxRate: 10.1,
+                        artCharge: 75, setupFees: 100, ltmFee: 0, ltmDistributed: true };
+    const contracted = Contract.buildPricingData({ method: 'EMB', ...handBuilt });
+    expect(render(handBuilt).grand).toBeCloseTo(render(contracted).grand, 2);
+  });
+  test('contract output renders to the same GRAND TOTAL as a hand-built pricingData (DTG, decimal tax)', () => {
+    const handBuilt = { quoteId: 'DTG1', isDTG: true, tier: 'Standard', totalQuantity: 12,
+                        products: [], subtotal: 240, grandTotal: 240, preTaxSubtotal: 240,
+                        taxRate: 0.101, ltmDistributed: true, ltmFee: 0, shippingFee: 0 };
+    const contracted = Contract.buildPricingData({ method: 'DTG', quoteId: 'DTG1', tier: 'Standard',
+                        totalQuantity: 12, products: [], subtotal: 240, grandTotal: 240,
+                        preTaxSubtotal: 240, taxRate: 0.101, ltmDistributed: true, ltmFee: 0 });
+    expect(render(handBuilt).grand).toBeCloseTo(render(contracted).grand, 2);
+  });
+  test('dead garmentLtmFee/capLtmFee are no longer rendered (3.1 cleanup)', () => {
+    // Even if a stale caller still passes them, the generator must not render them.
+    const html = new Generator().generateInvoiceHTML({
+      quoteId: 'T', products: [], grandTotal: 500, preTaxSubtotal: 500, taxRate: 0.101,
+      garmentLtmFee: 99.99, capLtmFee: 88.88, ltmDistributed: false,
+    }, CUST);
+    expect(html).not.toMatch(/Less Than Minimum Fee - Garments/);
+    expect(html).not.toMatch(/Less Than Minimum Fee - Caps/);
+  });
+});
