@@ -1,3 +1,9 @@
+## v2026.06.03.3 (2026.06.03)
+
+- EMB: move Digitizing to the Services bar (Artwork ▾ → DD $100 line item)
+- docs(memory): update EMB pickup — Services bar deployed (v2026.06.03.2), Digitizing on bar; AL build is next
+- Deploy v2026.06.03.3: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.06.03.2 (2026.06.03)
 
 - EMB: persistent catalog-driven Services bar — click a service = line item
