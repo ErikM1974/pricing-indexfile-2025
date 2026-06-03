@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.02.6">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.02.7">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.05.24.2">
@@ -540,7 +540,8 @@
                         </div>
                         <div class="it-row it-shipping" id="it-shipping-row">
                             <span class="it-label">Shipping</span>
-                            <span class="it-amt is-pickup" id="it-shipping-amt">Customer Pickup</span>
+                            <button type="button" class="it-amt it-shipping-edit is-pickup" id="it-shipping-amt"
+                                    onclick="openShippingModal()" title="Change shipping method / address">Customer Pickup</button>
                         </div>
                         <div class="it-row it-tax-row" id="tax-row">
                             <label class="it-tax-label">
@@ -762,87 +763,14 @@
                     <i class="fas fa-truck"></i> Shipping
                 </div>
                 <div class="flow-step-body">
-                    <!-- Pickup vs Ship segmented toggle — drives the #ship-method value -->
-                    <div class="ship-mode-toggle">
-                        <button type="button" class="ship-mode-btn active" id="ship-mode-pickup" onclick="setShipMode('pickup')">
-                            <i class="fas fa-store"></i> Pickup
+                    <!-- Compact summary; the full editor (Pickup/Ship + address) lives in
+                         the shipping modal, opened from here OR the invoice totals line. -->
+                    <div class="shipping-summary-row">
+                        <div id="shipping-summary" class="shipping-summary">Customer Pickup — Milton, WA 98354</div>
+                        <button type="button" class="shipping-change-btn" onclick="openShippingModal()">
+                            <i class="fas fa-pen"></i> Change
                         </button>
-                        <button type="button" class="ship-mode-btn" id="ship-mode-ship" onclick="setShipMode('ship')">
-                            <i class="fas fa-truck"></i> Ship it
-                        </button>
                     </div>
-
-                    <!-- Pickup notice (shown when Pickup selected) -->
-                    <div id="pickup-notice" style="padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e;">
-                        <i class="fas fa-store" style="margin-right: 4px;"></i>
-                        Customer Pickup — NW Custom Apparel, Milton, WA 98354
-                    </div>
-
-                    <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
-                    <div id="ship-carrier-wrap" style="display: none;">
-                        <label>Carrier / Method</label>
-                        <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; background: white; margin-bottom: 8px;">
-                            <option value="Customer Pickup" selected>Customer Pickup</option>
-                            <option value="UPS Ground">UPS Ground</option>
-                            <option value="USPS Priority Mail">USPS Priority Mail</option>
-                            <option value="UPS 2nd Day">UPS 2nd Day</option>
-                            <option value="Sales Rep Deliver">Sales Rep Deliver</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 8px;">
-
-                        <label>Ship To Address</label>
-                        <div id="ship-address-fields">
-                            <input type="text" id="ship-address" placeholder="Street address"
-                                   style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;">
-                            <div style="display: flex; gap: 6px;">
-                                <input type="text" id="ship-city" placeholder="City"
-                                       style="flex: 2; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                <select id="ship-state" onchange="onShipStateChange()"
-                                        style="width: 58px; padding: 6px 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white;">
-                                    <option value="WA" selected>WA</option>
-                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-                                    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-                                    <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
-                                    <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
-                                    <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
-                                    <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
-                                    <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
-                                    <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
-                                    <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
-                                    <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
-                                    <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
-                                    <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
-                                    <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
-                                    <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
-                                    <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-                                    <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
-                                    <option value="WI">WI</option><option value="WY">WY</option>
-                                </select>
-                                <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
-                                       onblur="onShipZipBlur()"
-                                       style="width: 72px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
-                                        style="padding: 6px 10px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Shipping charge (only relevant when shipping) -->
-                        <div id="shipping-fee-field" style="margin-top: 8px;">
-                            <label>Shipping charge</label>
-                            <div style="position: relative;">
-                                <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                                <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
-                                       onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
-                                       style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tax-rate status (visible in both modes — pickup shows the Milton rate) -->
-                    <div id="tax-lookup-status" style="font-size: 11px; margin-top: 6px; color: #64748b; min-height: 16px;"></div>
                 </div>
             </div>
 
@@ -1430,6 +1358,110 @@ Company:Absher Construction Company
 
     <!-- Non-SanMar modal styles moved to embroidery-quote-builder-extracted.css (2026-03-23) -->
 
+    <!-- ============================================================
+         SHIPPING EDITOR MODAL (2026-06-02) — the single home of the
+         shipping controls. Opened from the invoice totals "Shipping"
+         line AND from Step 3's "Change" button. Holds the canonical
+         #ship-method / #ship-address / etc., so there are no duplicate
+         IDs; the rest of the app reads/writes them as before.
+         ============================================================ -->
+    <div class="ship-modal-overlay" id="shipping-modal" onclick="if(event.target===this)closeShippingModal()">
+        <div class="ship-modal">
+            <div class="ship-modal-head">
+                <span><i class="fas fa-truck" style="margin-right:8px;"></i>Shipping</span>
+                <button type="button" class="ship-modal-close" onclick="closeShippingModal()" aria-label="Close">&times;</button>
+            </div>
+            <div class="ship-modal-body">
+                <!-- Pickup vs Ship segmented toggle — drives the #ship-method value -->
+                <div class="ship-mode-toggle">
+                    <button type="button" class="ship-mode-btn active" id="ship-mode-pickup" onclick="setShipMode('pickup')">
+                        <i class="fas fa-store"></i> Pickup
+                    </button>
+                    <button type="button" class="ship-mode-btn" id="ship-mode-ship" onclick="setShipMode('ship')">
+                        <i class="fas fa-truck"></i> Ship it
+                    </button>
+                </div>
+
+                <!-- Pickup notice (shown when Pickup selected) -->
+                <div id="pickup-notice" style="padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e;">
+                    <i class="fas fa-store" style="margin-right: 4px;"></i>
+                    Customer Pickup — NW Custom Apparel, Milton, WA 98354
+                </div>
+
+                <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
+                <div id="ship-carrier-wrap" style="display: none;">
+                    <label>Carrier / Method</label>
+                    <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; background: white; margin-bottom: 10px;">
+                        <option value="Customer Pickup" selected>Customer Pickup</option>
+                        <option value="UPS Ground">UPS Ground</option>
+                        <option value="USPS Priority Mail">USPS Priority Mail</option>
+                        <option value="UPS 2nd Day">UPS 2nd Day</option>
+                        <option value="Sales Rep Deliver">Sales Rep Deliver</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
+
+                    <label>Ship To Address</label>
+                    <div id="ship-address-fields">
+                        <input type="text" id="ship-address" placeholder="Street address"
+                               style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 6px;">
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="ship-city" placeholder="City"
+                                   style="flex: 2; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <select id="ship-state" onchange="onShipStateChange()"
+                                    style="width: 64px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
+                                <option value="WA" selected>WA</option>
+                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                                <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                                <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
+                                <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
+                                <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
+                                <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
+                                <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                                <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
+                                <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
+                                <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
+                                <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                                <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+                                <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
+                                <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
+                                <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                                <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
+                                <option value="WI">WI</option><option value="WY">WY</option>
+                            </select>
+                            <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
+                                   onblur="onShipZipBlur()"
+                                   style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
+                                    style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; white-space: nowrap;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Shipping charge (only relevant when shipping) -->
+                    <div id="shipping-fee-field" style="margin-top: 10px;">
+                        <label>Shipping charge</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
+                            <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
+                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax-rate status (pickup shows the Milton rate; ship shows the looked-up rate) -->
+                <div id="tax-lookup-status" style="font-size: 12px; margin-top: 10px; color: #64748b; min-height: 18px;"></div>
+            </div>
+            <div class="ship-modal-foot">
+                <button type="button" class="ship-modal-done" onclick="closeShippingModal()">
+                    <i class="fas fa-check"></i> Done
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
@@ -1476,7 +1508,7 @@ Company:Absher Construction Company
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.02.6"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.02.7"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

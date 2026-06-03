@@ -6429,6 +6429,7 @@ function onShipMethodChange() {
             otherInput.style.display = (method === 'Other') ? 'block' : 'none';
         }
     }
+    updateShippingSummary();
 }
 
 /**
@@ -6464,6 +6465,48 @@ function setShipMode(mode) {
     }
 }
 window.setShipMode = setShipMode;
+
+/**
+ * Update the Step-3 shipping summary line from the current shipping state.
+ * (2026-06-02 — the shipping editor moved into #shipping-modal; Step 3 and the
+ * invoice "Shipping" totals line both open it and show this summary.)
+ */
+function updateShippingSummary() {
+    const el = document.getElementById('shipping-summary');
+    if (!el) return;
+    const method = document.getElementById('ship-method')?.value || '';
+    const isPickup = method === 'Customer Pickup';
+    const rate = (document.getElementById('tax-rate-input')?.value || '').trim();
+    const ratePart = rate ? ` · ${rate}% tax` : '';
+    if (isPickup) {
+        el.textContent = `Customer Pickup — Milton, WA${ratePart}`;
+    } else {
+        const city = (document.getElementById('ship-city')?.value || '').trim();
+        const state = document.getElementById('ship-state')?.value || '';
+        const zip = (document.getElementById('ship-zip')?.value || '').trim();
+        const loc = [[city, state].filter(Boolean).join(', '), zip].filter(Boolean).join(' ');
+        const m = (method === 'Other')
+            ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+            : method;
+        el.textContent = `${m}${loc ? ' — ' + loc : ' — (enter address)'}${ratePart}`;
+    }
+}
+window.updateShippingSummary = updateShippingSummary;
+
+/** Open the shipping editor modal (from the totals line or Step 3). (2026-06-02) */
+function openShippingModal() {
+    const m = document.getElementById('shipping-modal');
+    if (m) m.classList.add('open');
+}
+/** Close the shipping modal and refresh the summary + totals. */
+function closeShippingModal() {
+    const m = document.getElementById('shipping-modal');
+    if (m) m.classList.remove('open');
+    updateShippingSummary();
+    updateTaxCalculation();
+}
+window.openShippingModal = openShippingModal;
+window.closeShippingModal = closeShippingModal;
 
 /**
  * Update tax calculation based on toggle state
@@ -6524,6 +6567,9 @@ function updateTaxCalculation() {
         taxAmountEl.textContent = '$0.00';
         grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
+
+    // Keep the Step-3 shipping summary's tax-rate in sync after a rate lookup.
+    if (typeof updateShippingSummary === 'function') updateShippingSummary();
 }
 
 // ============================================================
