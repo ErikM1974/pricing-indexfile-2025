@@ -1419,6 +1419,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupPrimaryLogoHandlers();
     setupCapPrimaryLogoHandlers();  // Cap logo handlers
 
+    // Services bar (2026-06-03): a persistent, catalog-driven "Add to order" strip.
+    // Click a chip → addManualServiceRow(code) inserts an editable LINE ITEM. Same
+    // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
+    if (window.QuoteServicesBar) {
+        // Part numbers + descriptions match the real ShopWorks line items (Erik's
+        // test order 142021). Codes are registered in the proxy KNOWN_FEE_PNS so
+        // they push as LinesOE line items. Not here (auto from the top config): AL,
+        // AL-CAP, DECG-FB (Full Back), 3D-EMB, Laser Patch, LTM, DD (Digitizing).
+        const EMB_SERVICE_CATALOG = [
+            { group: 'Artwork', icon: 'fa-palette', items: [
+                { code: 'GRT-50', label: 'Logo Mockup & Review', price: 50, unit: 'flat', icon: 'fa-palette' },
+                { code: 'GRT-75', label: 'Graphic Design',       price: 75, unit: 'hr',   icon: 'fa-pencil-ruler' }
+            ]},
+            { group: 'Add-Ons', icon: 'fa-stamp', items: [
+                { code: 'Monogram', label: 'Monogram', price: 12.50, unit: 'ea', icon: 'fa-font' },
+                { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+            ]}
+        ];
+        window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
+            (code, opts) => addManualServiceRow(code, opts && opts.price));
+    }
+
     // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
     // and set its initial (disabled) state for a fresh quote.
     const _custNumEl = document.getElementById('customer-number');
@@ -2906,7 +2928,7 @@ function createServiceProductRow(serviceType, data) {
         'DECG-FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
         'CB': { description: 'Cap Back Embroidery', icon: 'fa-hat-cowboy', isCap: true },
         'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
-        'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+        'Monogram': { description: 'Dir. Embroider Names on Garments', icon: 'fa-font', isCap: false },
         'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
         'Name/Number': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false },
         'NAME': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false }, // Legacy
@@ -2920,7 +2942,10 @@ function createServiceProductRow(serviceType, data) {
         'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
         'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
         '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
-        'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true }
+        'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true },
+        'GRT-50': { description: 'Logo Mockup & Print Review', icon: 'fa-palette', isCap: false },
+        'GRT-75': { description: 'Graphic Design Services', icon: 'fa-pencil-ruler', isCap: false },
+        'RUSH': { description: 'Rush Charge', icon: 'fa-bolt', isCap: false }
     };
 
     const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
@@ -2936,7 +2961,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'RUSH') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3028,10 +3053,16 @@ function toggleServiceDropdown() {
  * Add a manual service row (Monogram, Name/Number, WEIGHT)
  * Called from the "Add Service" dropdown
  */
-function addManualServiceRow(serviceType) {
+function addManualServiceRow(serviceType, priceOverride) {
     // Close dropdown
     const menu = document.getElementById('service-dropdown-menu');
     if (menu) menu.style.display = 'none';
+
+    // Rush is a single, computed 25%-of-subtotal fee — never add a duplicate
+    if (serviceType === 'RUSH' && document.querySelector('#product-tbody tr.service-product-row[data-service-type="rush"]')) {
+        showToast('Rush Fee is already on the order', 'info');
+        return;
+    }
 
     // Default prices per service type
     const SERVICE_DEFAULTS = {
@@ -3041,30 +3072,44 @@ function addManualServiceRow(serviceType) {
         'SEG': { unitPrice: 10.00, quantity: 1 },
         'DT': { unitPrice: 50.00, quantity: 1 },
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
-        'CTR-CAP': { unitPrice: 0, quantity: 1 }
+        'CTR-CAP': { unitPrice: 0, quantity: 1 },
+        'GRT-50': { unitPrice: 50, quantity: 1 },
+        'GRT-75': { unitPrice: 75, quantity: 1 },
+        'RUSH': { unitPrice: 0, quantity: 1 }
     };
 
     const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
+    // Amount entered in the Services bar for variable-price items (Logo Mockup, Rush)
+    const unitPrice = (priceOverride != null && !isNaN(priceOverride)) ? Number(priceOverride) : defaults.unitPrice;
 
     const row = createServiceProductRow(serviceType, {
         quantity: defaults.quantity,
-        unitPrice: defaults.unitPrice,
-        total: defaults.quantity * defaults.unitPrice,
+        unitPrice: unitPrice,
+        total: defaults.quantity * unitPrice,
         isCap: false
     });
 
     if (row) {
-        // Focus the quantity input so user can immediately set count
-        const qtyInput = row.querySelector('.service-qty');
-        if (qtyInput) {
-            setTimeout(() => {
-                qtyInput.focus();
-                qtyInput.select();
-            }, 50);
+        if (serviceType === 'RUSH') {
+            // Rush qty is fixed at 1; its price = 25% of subtotal (set live in syncRushRow)
+            const q = row.querySelector('.service-qty');
+            if (q) { q.value = '1'; q.readOnly = true; }
+            markAsUnsaved();
+            recalculatePricing();
+            showToast('Rush Fee added — 25% of subtotal', 'success');
+        } else {
+            // Focus the quantity input so user can immediately set count
+            const qtyInput = row.querySelector('.service-qty');
+            if (qtyInput) {
+                setTimeout(() => {
+                    qtyInput.focus();
+                    qtyInput.select();
+                }, 50);
+            }
+            markAsUnsaved();
+            recalculatePricing();
+            showToast(`${serviceType} service row added`, 'success');
         }
-        markAsUnsaved();
-        recalculatePricing();
-        showToast(`${serviceType} service row added`, 'success');
     }
 }
 
@@ -3076,7 +3121,7 @@ function onServiceQtyChange(rowId) {
     if (!row || row.dataset.productType !== 'service') return;
 
     const qtyInput = row.querySelector('.service-qty');
-    const quantity = parseInt(qtyInput?.value) || 0;
+    const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → Graphic Design hours can be fractional (e.g. 0.75)
     // Use sell price override if set, otherwise use original unit price
     const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
     const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
@@ -5414,6 +5459,36 @@ function buildLogoConfiguration() {
 
 const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
 
+/**
+ * Rush Fee = 25% of the merchandise subtotal, as a live LINE ITEM (part RUSH /
+ * "Rush Charge"), mirroring ShopWorks. Added from the Services bar (Charges ▸ Rush
+ * Fee). Recomputed at the END of every recalculatePricing pass: base = #grand-total
+ * minus this row's OWN current value (so it never counts itself), rush = 25% × base.
+ * Saves + pushes as a normal RUSH service line item (qty 1 → Size01 on import).
+ * (2026-06-03)
+ */
+const RUSH_FEE_PCT = 0.25;
+function syncRushRow() {
+    const rushRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-service-type="rush"]');
+    if (!rushRows.length) return;
+    const grandEl = document.getElementById('grand-total');
+    let grand = parseFloat((grandEl?.textContent || '$0').replace(/[$,]/g, '')) || 0;
+    rushRows.forEach((row) => {
+        const rid = row.dataset.rowId;
+        const totalCell = document.getElementById(`row-total-${rid}`);
+        const priceCell = document.getElementById(`row-price-${rid}`);
+        const oldTotal = parseFloat((totalCell?.textContent || '$0').replace(/[$,]/g, '')) || 0;
+        const base = grand - oldTotal;                 // everything except this rush row
+        const rush = +(base * RUSH_FEE_PCT).toFixed(2);
+        row.dataset.unitPrice = String(rush);
+        if (priceCell) priceCell.textContent = '$' + rush.toFixed(2);
+        if (totalCell) totalCell.textContent = '$' + rush.toFixed(2);
+        grand = base + rush;                           // adjust running grand total
+    });
+    if (grandEl) grandEl.textContent = '$' + grand.toFixed(2);
+}
+window.syncRushRow = syncRushRow;
+
 async function recalculatePricing() {
     // Collect products from table (parent rows only)
     const allItems = collectProductsFromTable();
@@ -5745,7 +5820,7 @@ function collectProductsFromTable() {
         // Handle SERVICE product rows (DECG, DECC, AL, MONOGRAM, etc.)
         if (row.dataset.productType === 'service') {
             const qtyInput = row.querySelector('.service-qty');
-            const quantity = parseInt(qtyInput?.value) || 0;
+            const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → fractional service qty (GRT-75 hours)
 
             if (quantity > 0) {
                 const serviceType = row.dataset.serviceType;
@@ -6215,6 +6290,8 @@ function updatePricingDisplay(pricing) {
         if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
     }
 
+    // Rush Fee = 25% of the merchandise subtotal — recompute its line item before tax
+    syncRushRow();
     // Update tax calculation at the end of pricing display
     updateTaxCalculation();
 }

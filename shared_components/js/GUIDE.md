@@ -10,6 +10,7 @@
 | `quote-builder-base.js` | Base quote builder functionality |
 | `quote-builder-core.js` | Core quote builder shared logic (2026 consolidation) |
 | `quote-builder-utils.js` | Shared utilities: escapeHtml, formatPrice, showToast, copyShareableUrl |
+| `quote-services-bar.js` | Persistent catalog-driven services bar; `render(mountId, catalog, onAdd)` → one-click chips that add services as line items (EMB/SCP/DTG/DTF, each with its own catalog) |
 | `quote-builder-step2-modern.js` | Modern Step 2 UI (embroidery/cap builders) |
 | `quote-formatter.js` | Quote formatting for display/print |
 | `quote-persistence.js` | Save/load quote drafts |
