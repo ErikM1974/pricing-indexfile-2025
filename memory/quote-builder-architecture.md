@@ -5,6 +5,40 @@
 > element once* and have it apply to all four; only touch per-builder files for
 > method-specific logic. Last verified 2026-06-02.
 
+## Flagship model & change propagation (set 2026-06-03, Erik's question)
+**What we're trying to achieve:** one family of quote builders that LOOK and FLOW like
+siblings without being clones — uniform chassis, method-correct cargo.
+
+**EMB is the FLAGSHIP.** It's the richest surface (garments + caps + the most services),
+so patterns proven there generalize DOWN to the simpler builders. Design + prove a change
+on EMB first, then propagate.
+
+**Every change is STRUCTURE or CONTENT — sort it first:**
+- **Structure / pattern (SHARED):** *where/how* — totals-under-line-items layout, sales-tax
+  placement, the shipping modal, the `.flow-step` order-flow shell, the Services-bar mechanism,
+  date defaults. Lives in shared files (`quote-builder-common.css`, `embroidery-quote-invoice.js`,
+  `quote-services-bar.js`, `quote-builder-utils.js`). Change once → all trio builders get it.
+- **Content / data (PER-METHOD):** *what* — the service catalog (EMB: Logo Mockup/Graphic
+  Design/stitch counts; SCP: screens/ink colors; DTF: transfer sizes/gang sheets), the pricing
+  engine (`{method}-pricing-service.js`), the design/logo config. Stays per-builder.
+
+**The "it won't 100% map" resolution:** most things that feel un-mappable are CONTENT, not
+structure. "Where sales tax sits" = structure (maps perfectly). "Stitch count" = content (never
+leaves EMB). Sort each change into structure-vs-content and the mapping problem dissolves.
+
+**Propagation rule — ADOPT, don't COPY.** Never copy EMB's HTML into SCP/DTF (drags EMB-only
+fields along + drifts immediately). Extract the structural part to a shared module/CSS; the other
+builder ADOPTS it and supplies its own config. EMB-only pieces can't follow because they aren't in
+the shared part. *The Services bar is the proof: one shared `quote-services-bar.js` + a different
+`*_SERVICE_CATALOG` per builder.*
+
+**Operating procedure (every future change):**
+1. Build/prove on EMB (flagship). 2. Structure or content? Structure → promote to the shared layer;
+content → stays EMB. 3. SCP/DTF adopt the shared piece + wire their own config. 4. **DTG = LEAVE IT**
+(inline-form architecture; it already shares only the universal bits — PDF generator, utils. Do NOT
+force its UI to match; a full fold-in is a separate, much-later project). 5. Record shared-vs-per-method
+below so the next change routes itself.
+
 ## The five order surfaces (all push to ManageOrders)
 | Surface | Pattern | Core JS |
 |---|---|---|
