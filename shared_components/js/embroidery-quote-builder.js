@@ -6544,8 +6544,16 @@ function updateTaxCalculation() {
             shipAmtEl.textContent = 'Customer Pickup';
             shipAmtEl.classList.add('is-pickup');
         } else {
-            shipAmtEl.textContent = '$' + shippingFee.toFixed(2);
             shipAmtEl.classList.remove('is-pickup');
+            if (shippingFee > 0) {
+                shipAmtEl.textContent = '$' + shippingFee.toFixed(2);
+            } else {
+                // No charge entered yet — show the carrier so it doesn't read as "$0.00"
+                const m = document.getElementById('ship-method')?.value || '';
+                shipAmtEl.textContent = (m === 'Other')
+                    ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+                    : (m || 'Ship');
+            }
         }
     }
 
