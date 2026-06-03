@@ -1,3 +1,14 @@
+## v2026.06.03.2 (2026.06.03)
+
+- EMB: persistent catalog-driven Services bar — click a service = line item
+- docs: register quote-services-bar.js in ACTIVE_FILES.md + shared JS GUIDE.md
+- docs(memory): EMB redesign session pickup note (resume point for next session)
+- docs(architecture): flagship model + change-propagation strategy (EMB flagship; structure-vs-content; adopt-don't-copy; DTG separate)
+- EMB Services bar v2: category dropdowns + Rush Fee as a line item w/ amount entry
+- EMB Rush Fee: computed 25%-of-subtotal line item (part RUSH), mirrors ShopWorks
+- EMB Services bar: match real ShopWorks parts/descriptions (test order 142021)
+- Deploy v2026.06.03.2: 4 files (dtf-quote-builder.html,dtg-quote-builder-legacy.html,embroidery-quote-builder.html,...)
+
 ## v2026.06.03.1 (2026.06.03)
 
 - EMB builder: linear order-flow sidebar redesign (pickup-first, invoice-style totals)
