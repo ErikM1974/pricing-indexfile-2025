@@ -1430,7 +1430,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         const EMB_SERVICE_CATALOG = [
             { group: 'Artwork', icon: 'fa-palette', items: [
                 { code: 'GRT-50', label: 'Logo Mockup & Review', price: 50, unit: 'flat', icon: 'fa-palette' },
-                { code: 'GRT-75', label: 'Graphic Design',       price: 75, unit: 'hr',   icon: 'fa-pencil-ruler' }
+                { code: 'GRT-75', label: 'Graphic Design',       price: 75, unit: 'hr',   icon: 'fa-pencil-ruler' },
+                { code: 'DD',     label: 'Digitizing',           price: 100, unit: 'flat', icon: 'fa-cog' }
             ]},
             { group: 'Add-Ons', icon: 'fa-stamp', items: [
                 { code: 'Monogram', label: 'Monogram', price: 12.50, unit: 'ea', icon: 'fa-font' },
@@ -2945,6 +2946,7 @@ function createServiceProductRow(serviceType, data) {
         'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true },
         'GRT-50': { description: 'Logo Mockup & Print Review', icon: 'fa-palette', isCap: false },
         'GRT-75': { description: 'Graphic Design Services', icon: 'fa-pencil-ruler', isCap: false },
+        'DD': { description: 'Digitizing Setup', icon: 'fa-cog', isCap: false },
         'RUSH': { description: 'Rush Charge', icon: 'fa-bolt', isCap: false }
     };
 
@@ -2961,7 +2963,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'RUSH') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'DD' && serviceType !== 'RUSH') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3075,6 +3077,7 @@ function addManualServiceRow(serviceType, priceOverride) {
         'CTR-CAP': { unitPrice: 0, quantity: 1 },
         'GRT-50': { unitPrice: 50, quantity: 1 },
         'GRT-75': { unitPrice: 75, quantity: 1 },
+        'DD': { unitPrice: 100, quantity: 1 },
         'RUSH': { unitPrice: 0, quantity: 1 }
     };
 
