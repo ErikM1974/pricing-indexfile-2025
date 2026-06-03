@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.05.26.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.03.1">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.05.24.2">
@@ -523,6 +523,44 @@
                         </button>
                     </div>
                 </div>
+
+                <!-- ============================================================
+                     INVOICE TOTALS (2026-06-02, per Erik) — sits directly under
+                     the line items like an invoice footer: Subtotal / Shipping /
+                     Sales Tax (checkbox + editable %) / TOTAL. Uses the same
+                     element IDs the tax math + save path already rely on
+                     (#pre-tax-subtotal is kept as a hidden carrier of the full
+                     pre-tax amount incl. shipping, for the save path).
+                     ============================================================ -->
+                <div class="invoice-totals-wrap">
+                    <div class="invoice-totals-box" id="invoice-totals-box">
+                        <div class="it-row">
+                            <span class="it-label">Subtotal</span>
+                            <span class="it-amt" id="invoice-subtotal-display">$0.00</span>
+                        </div>
+                        <div class="it-row it-shipping" id="it-shipping-row">
+                            <span class="it-label">Shipping</span>
+                            <button type="button" class="it-amt it-shipping-edit is-pickup" id="it-shipping-amt"
+                                    onclick="openShippingModal()" title="Change shipping method / address">Customer Pickup</button>
+                        </div>
+                        <div class="it-row it-tax-row" id="tax-row">
+                            <label class="it-tax-label">
+                                <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
+                                <span id="tax-label">Sales Tax</span>
+                                <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1"
+                                       class="it-tax-rate" onchange="updateTaxCalculation()" onclick="event.stopPropagation()">
+                                <span>%</span>
+                            </label>
+                            <span class="it-amt" id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="it-row it-total-row">
+                            <span class="it-label">TOTAL</span>
+                            <span class="it-amt" id="grand-total-with-tax">$0.00</span>
+                        </div>
+                        <!-- Hidden carrier of the full pre-tax subtotal (incl. shipping) for the save path -->
+                        <span id="pre-tax-subtotal" style="display:none;">$0.00</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -537,6 +575,7 @@
                 <!-- Customer Info Section (always visible, top of sidebar) -->
                 <div class="customer-info-section" id="customer-info-section">
                     <div class="section-header-compact">
+                        <span class="flow-step-num">1</span>
                         <i class="fas fa-user"></i> Customer
                     </div>
                     <div class="customer-info-body">
@@ -601,7 +640,8 @@
                 <!-- Design Configuration Section (always visible) -->
                 <div class="design-config-section" id="design-config-section">
                     <div class="section-header-compact">
-                        <i class="fas fa-palette"></i> Design
+                        <span class="flow-step-num">2</span>
+                        <i class="fas fa-palette"></i> Artwork
                     </div>
                     <div class="design-config-body">
                         <!-- Garment Design -->
@@ -711,22 +751,45 @@
 
             </div>
 
-            <!-- Artwork Services Panel -->
-            <div class="additional-charges-panel" style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #86efac;">
-                <div class="charges-header" onclick="toggleArtworkServices()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                    <div style="font-size: 14px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-palette"></i>
-                        <span>Artwork Services</span>
-                        <span id="artwork-badge" class="charges-badge hidden" style="background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">$0.00</span>
-                    </div>
-                    <i id="artwork-chevron" class="fas fa-chevron-down" style="color: #666; transition: transform 0.2s;"></i>
+            <!-- ============================================================
+                 Step 3 · SHIPPING (2026-06-02 order-flow redesign)
+                 Pulled OUT of the buried "Additional Charges" accordion.
+                 Pickup is the default (most orders are pickup); the address
+                 + carrier only appear when the rep chooses "Ship it".
+                 ============================================================ -->
+            <div class="flow-step" id="shipping-step">
+                <div class="flow-step-head">
+                    <span class="flow-step-num">3</span>
+                    <i class="fas fa-truck"></i> Shipping
                 </div>
-                <div id="artwork-content" class="charges-content hidden" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
+                <div class="flow-step-body">
+                    <!-- Compact summary; the full editor (Pickup/Ship + address) lives in
+                         the shipping modal, opened from here OR the invoice totals line. -->
+                    <div class="shipping-summary-row">
+                        <div id="shipping-summary" class="shipping-summary">Customer Pickup — Milton, WA 98354</div>
+                        <button type="button" class="shipping-change-btn" onclick="openShippingModal()">
+                            <i class="fas fa-pen"></i> Change
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 Step 4 · ARTWORK SERVICES (2026-06-02 — always visible)
+                 Was a collapsed green accordion; now a labelled step.
+                 ============================================================ -->
+            <div class="flow-step" id="artwork-services-step">
+                <div class="flow-step-head">
+                    <span class="flow-step-num">4</span>
+                    <i class="fas fa-palette"></i> Artwork Services
+                    <span id="artwork-badge" class="hidden" style="margin-left:auto; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">$0.00</span>
+                </div>
+                <div class="flow-step-body" id="artwork-content">
                     <!-- Logo Mockup & Review -->
                     <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333; margin-bottom: 0;">
                             <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()" style="width: 16px; height: 16px; cursor: pointer;">
-                            <span>Logo Mockup & Review</span>
+                            <span>Logo Mockup &amp; Review</span>
                         </label>
                         <div id="art-charge-wrapper" style="position: relative; opacity: 0.4; margin-top: 6px;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
@@ -749,22 +812,59 @@
                 </div>
             </div>
 
-            <!-- Additional Charges Panel - MOVED ABOVE TOTALS per UX best practices -->
-            <div class="additional-charges-panel" style="background: #f0fdf4; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #86efac;">
-                <div class="charges-header" onclick="toggleAdditionalCharges()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                    <div style="font-size: 14px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-plus-circle"></i> Additional Charges
-                        <span style="font-size: 12px; font-weight: 400; color: #666;">(Optional)</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="charges-badge" style="display: none; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">+$0.00</span>
-                        <i id="charges-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s; transform: rotate(180deg);"></i>
+            <!-- ============================================================
+                 Step 5 · ORDER DETAILS (2026-06-02 — always visible)
+                 Was double-nested + collapsed. ShopWorks Order # is demoted
+                 (you only know it AFTER importing into ShopWorks). Date Placed
+                 + Req Ship Date are auto-defaulted in JS (today / +2 weeks).
+                 ============================================================ -->
+            <div class="flow-step" id="order-details-step">
+                <div class="flow-step-head">
+                    <span class="flow-step-num">5</span>
+                    <i class="fas fa-file-invoice"></i> Order Details
+                    <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 6px;">!</span>
+                    <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;"></i>
+                </div>
+                <div class="flow-step-body" id="order-details-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div>
+                            <label>PO #</label>
+                            <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label>Date Placed</label>
+                            <input type="text" id="date-order-placed" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label>Req Ship Date</label>
+                            <input type="text" id="req-ship-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div>
+                            <label>Drop Dead Date</label>
+                            <input type="text" id="drop-dead-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <label>Terms <span id="customer-terms-note" hidden></span></label>
+                            <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                        </div>
+                        <!-- ShopWorks Order # — demoted; you only have it AFTER importing -->
+                        <div style="grid-column: 1 / -1; margin-top: 2px;">
+                            <label>ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
+                            <input type="text" id="order-number" placeholder="(after import)" style="width: 100%; padding: 5px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 12px; box-sizing: border-box; background:#f8fafc;">
+                        </div>
                     </div>
                 </div>
-                <div id="charges-content" style="display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #86efac;">
-                    <!-- NOTE: Logo Mockup & Graphic Design now in Artwork Services panel above -->
-                    <!-- Rush Fee -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
+            </div>
+
+            <!-- Optional charges (Rush, etc.) — kept slim, below the core flow -->
+            <div class="flow-step" id="optional-charges-step">
+                <div class="flow-step-head">
+                    <i class="fas fa-plus-circle"></i> Optional Charges
+                    <span id="charges-badge" style="display: none; margin-left:auto; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">+$0.00</span>
+                    <i id="charges-chevron" class="fas fa-chevron-up" style="display:none;"></i>
+                </div>
+                <div class="flow-step-body" id="charges-content">
+                    <div class="charge-field">
                         <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
@@ -773,121 +873,6 @@
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
                     </div>
-                    <!-- Shipping Fee -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Shipping</label>
-                        <div style="position: relative;">
-                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
-                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
-                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                        </div>
-                    </div>
-                    <!-- Ship To Address (for WA DOR tax rate lookup) -->
-                    <div id="ship-to-panel" style="margin-bottom: 10px; padding: 10px 12px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px;">
-                        <label style="font-size: 12px; color: #0369a1; margin-bottom: 6px; display: block; font-weight: 600;">
-                            <i class="fas fa-map-marker-alt" style="margin-right: 4px;"></i>Ship To
-                        </label>
-                        <!-- Pickup notice (hidden by default, shown when Customer Pickup selected) -->
-                        <div id="pickup-notice" style="display: none; padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e; margin-bottom: 6px;">
-                            <i class="fas fa-store" style="margin-right: 4px;"></i>
-                            Customer Pickup — NW Custom Apparel, Milton, WA 98354
-                        </div>
-                        <!-- Address fields (hidden when Customer Pickup) -->
-                        <div id="ship-address-fields">
-                            <input type="text" id="ship-address" placeholder="Street address"
-                                   style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-bottom: 6px;">
-                            <div style="display: flex; gap: 6px;">
-                                <input type="text" id="ship-city" placeholder="City"
-                                       style="flex: 2; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                <select id="ship-state" onchange="onShipStateChange()"
-                                        style="width: 58px; padding: 6px 2px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white;">
-                                    <option value="WA" selected>WA</option>
-                                    <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-                                    <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-                                    <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
-                                    <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
-                                    <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
-                                    <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
-                                    <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
-                                    <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
-                                    <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
-                                    <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
-                                    <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
-                                    <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
-                                    <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
-                                    <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
-                                    <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-                                    <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
-                                    <option value="WI">WI</option><option value="WY">WY</option>
-                                </select>
-                                <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
-                                       onblur="onShipZipBlur()"
-                                       style="width: 72px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
-                                        style="padding: 6px 10px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; white-space: nowrap;">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="tax-lookup-status" style="font-size: 11px; margin-top: 4px; color: #64748b; min-height: 16px;"></div>
-                    </div>
-                    <!-- Order Details (collapsible) -->
-                    <div id="order-details-panel" style="margin-bottom: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
-                        <div onclick="toggleOrderDetails()" style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;">
-                            <label style="font-size: 12px; color: #475569; margin: 0; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-file-invoice" style="margin-right: 4px;"></i>Order Details
-                                <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 4px;">!</span>
-                            </label>
-                            <i id="order-details-chevron" class="fas fa-chevron-down" style="font-size: 10px; color: #94a3b8; transition: transform 0.2s;"></i>
-                        </div>
-                        <div id="order-details-content" style="display: none; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e2e8f0;">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">PO #</label>
-                                    <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Order #</label>
-                                    <input type="text" id="order-number" placeholder="ShopWorks Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Ship Method</label>
-                                    <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; background: white;">
-                                        <option value="">-- Select --</option>
-                                        <option value="UPS Ground" selected>UPS Ground</option>
-                                        <option value="Customer Pickup">Customer Pickup</option>
-                                        <option value="USPS Priority Mail">USPS Priority Mail</option>
-                                        <option value="UPS 2nd Day">UPS 2nd Day</option>
-                                        <option value="Sales Rep Deliver">Sales Rep Deliver</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box; margin-top: 4px;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Date Placed</label>
-                                    <input type="text" id="date-order-placed" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Req Ship Date</label>
-                                    <input type="text" id="req-ship-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">Drop Dead Date</label>
-                                    <input type="text" id="drop-dead-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                                <div>
-                                    <label style="font-size: 11px; color: #64748b; display: block;">
-                                        Terms
-                                        <span id="customer-terms-note" hidden></span>
-                                    </label>
-                                    <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- NOTE: Sample Fee removed per user request (2026-01-14) -->
-                    <!-- Discount controls removed 2026-03-23 -->
                 </div>
             </div>
 
@@ -896,36 +881,10 @@
                 <div id="emb-ltm-panel"></div>
             </div>
 
-            <!-- Totals Section with Tax -->
-            <div class="pricing-panel" style="background: white; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <!-- Totals Section with Tax -->
-                <div class="pricing-totals-section" style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #e2e8f0;">
-                    <div class="pricing-row subtotal-row">
-                        <span class="label" style="font-weight: 600;">Subtotal:</span>
-                        <span class="value" id="pre-tax-subtotal" style="font-weight: 600;">$0.00</span>
-                    </div>
-                    <div class="pricing-row tax-toggle-row" style="margin: 10px 0;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; color: #475569;">
-                            <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()"
-                                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #22c55e;">
-                            <span>Sales Tax</span>
-                            <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1"
-                                   onchange="updateTaxCalculation()" onclick="event.stopPropagation()"
-                                   style="width: 60px; padding: 2px 4px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 13px; text-align: right;">
-                            <span>%</span>
-                        </label>
-                    </div>
-                    <div class="pricing-row tax-amount-row" id="tax-row">
-                        <span class="label" id="tax-label" style="color: #64748b;">Sales Tax:</span>
-                        <span class="value" id="tax-amount" style="color: #64748b;">$0.00</span>
-                    </div>
-                    <div class="pricing-row grand-total-row" style="margin-top: 10px; padding-top: 10px; border-top: 2px solid #22c55e; background: linear-gradient(135deg, #f0fdf4, #dcfce7); margin: 10px -16px -16px; padding: 12px 16px; border-radius: 0 0 8px 8px;">
-                        <span class="label" style="font-weight: 700; font-size: 16px; color: #166534;">TOTAL:</span>
-                        <span class="value" id="grand-total-with-tax" style="font-weight: 700; font-size: 18px; color: #166534;">$0.00</span>
-                    </div>
-                </div>
-
-            </div>
+            <!-- Invoice totals moved OUT of the sidebar to UNDER the line items
+                 (2026-06-02, per Erik) so the quote reads like an invoice. The
+                 totals block + tax controls now live in #invoice-totals-box in
+                 the product-grid section (left). -->
 
             <!-- Save & Share Section (Collapsible) -->
             <div class="save-quote-panel" style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
@@ -1399,13 +1358,117 @@ Company:Absher Construction Company
 
     <!-- Non-SanMar modal styles moved to embroidery-quote-builder-extracted.css (2026-03-23) -->
 
+    <!-- ============================================================
+         SHIPPING EDITOR MODAL (2026-06-02) — the single home of the
+         shipping controls. Opened from the invoice totals "Shipping"
+         line AND from Step 3's "Change" button. Holds the canonical
+         #ship-method / #ship-address / etc., so there are no duplicate
+         IDs; the rest of the app reads/writes them as before.
+         ============================================================ -->
+    <div class="ship-modal-overlay" id="shipping-modal" onclick="if(event.target===this)closeShippingModal()">
+        <div class="ship-modal">
+            <div class="ship-modal-head">
+                <span><i class="fas fa-truck" style="margin-right:8px;"></i>Shipping</span>
+                <button type="button" class="ship-modal-close" onclick="closeShippingModal()" aria-label="Close">&times;</button>
+            </div>
+            <div class="ship-modal-body">
+                <!-- Pickup vs Ship segmented toggle — drives the #ship-method value -->
+                <div class="ship-mode-toggle">
+                    <button type="button" class="ship-mode-btn active" id="ship-mode-pickup" onclick="setShipMode('pickup')">
+                        <i class="fas fa-store"></i> Pickup
+                    </button>
+                    <button type="button" class="ship-mode-btn" id="ship-mode-ship" onclick="setShipMode('ship')">
+                        <i class="fas fa-truck"></i> Ship it
+                    </button>
+                </div>
+
+                <!-- Pickup notice (shown when Pickup selected) -->
+                <div id="pickup-notice" style="padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e;">
+                    <i class="fas fa-store" style="margin-right: 4px;"></i>
+                    Customer Pickup — NW Custom Apparel, Milton, WA 98354
+                </div>
+
+                <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
+                <div id="ship-carrier-wrap" style="display: none;">
+                    <label>Carrier / Method</label>
+                    <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; background: white; margin-bottom: 10px;">
+                        <option value="Customer Pickup" selected>Customer Pickup</option>
+                        <option value="UPS Ground">UPS Ground</option>
+                        <option value="USPS Priority Mail">USPS Priority Mail</option>
+                        <option value="UPS 2nd Day">UPS 2nd Day</option>
+                        <option value="Sales Rep Deliver">Sales Rep Deliver</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
+
+                    <label>Ship To Address</label>
+                    <div id="ship-address-fields">
+                        <input type="text" id="ship-address" placeholder="Street address"
+                               style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 6px;">
+                        <div style="display: flex; gap: 6px;">
+                            <input type="text" id="ship-city" placeholder="City"
+                                   style="flex: 2; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <select id="ship-state" onchange="onShipStateChange()"
+                                    style="width: 64px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
+                                <option value="WA" selected>WA</option>
+                                <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                                <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                                <option value="CT">CT</option><option value="DE">DE</option><option value="DC">DC</option>
+                                <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
+                                <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option>
+                                <option value="IA">IA</option><option value="KS">KS</option><option value="KY">KY</option>
+                                <option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
+                                <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
+                                <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option>
+                                <option value="NE">NE</option><option value="NV">NV</option><option value="NH">NH</option>
+                                <option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
+                                <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+                                <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option>
+                                <option value="RI">RI</option><option value="SC">SC</option><option value="SD">SD</option>
+                                <option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
+                                <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
+                                <option value="WI">WI</option><option value="WY">WY</option>
+                            </select>
+                            <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
+                                   onblur="onShipZipBlur()"
+                                   style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
+                                    style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; white-space: nowrap;">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Shipping charge (only relevant when shipping) -->
+                    <div id="shipping-fee-field" style="margin-top: 10px;">
+                        <label>Shipping charge</label>
+                        <div style="position: relative;">
+                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
+                            <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
+                                   onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
+                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax-rate status (pickup shows the Milton rate; ship shows the looked-up rate) -->
+                <div id="tax-lookup-status" style="font-size: 12px; margin-top: 10px; color: #64748b; min-height: 18px;"></div>
+            </div>
+            <div class="ship-modal-foot">
+                <button type="button" class="ship-modal-done" onclick="closeShippingModal()">
+                    <i class="fas fa-check"></i> Done
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Container -->
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.06.01.6"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.06.03.1"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
@@ -1439,13 +1502,13 @@ Company:Absher Construction Company
 
     <!-- Power Quote Controller (extracted to external JS) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.02.3"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.02.3"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.03.1"></script>
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
     <script src="/shared_components/js/artwork-upload.js?v=2026.05.24.2"></script>
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.02.3"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.03.1"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

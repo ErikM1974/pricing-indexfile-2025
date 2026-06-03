@@ -26,6 +26,7 @@
     let stylesCache = null;
     let currentCategory = ''; // '' = All
     let currentSearch = '';   // free-text quick-find filter
+    let lastFullCatalogResults = []; // full SanMar catalog stylesearch hits (fallback flow)
 
     function escapeHtml(s) {
         return String(s == null ? '' : s)
@@ -145,7 +146,26 @@
             return true;
         });
         if (!filtered.length) {
-            grid.innerHTML = `<div class="dtg-catalog-empty">No styles match${currentSearch ? ` "${escapeHtml(currentSearch)}"` : ''}.</div>`;
+            const fcQuery = currentSearch.trim();
+            // Curated 20 has no match. If the rep typed something style-like
+            // (3+ chars), offer a one-click jump to the FULL SanMar catalog
+            // instead of a dead "no results" message. Curated stays primary;
+            // the full catalog is opt-in, on demand.
+            if (fcQuery.length >= 3) {
+                grid.innerHTML = `
+                    <div class="dtg-catalog-empty dtg-fullcat-prompt">
+                        <div class="dtg-fullcat-prompt-line">Not one of our 20 DTG-tested styles — no match for "${escapeHtml(fcQuery)}".</div>
+                        <button type="button" class="dtg-fullcat-trigger" id="dtgFullCatTrigger">
+                            <i class="fas fa-magnifying-glass-plus"></i>
+                            Search the full SanMar catalog for "${escapeHtml(fcQuery)}"
+                        </button>
+                        <div class="dtg-fullcat-prompt-hint">Any SanMar style can be priced for DTG — these just aren't on our proven-print list.</div>
+                    </div>`;
+                const trigger = document.getElementById('dtgFullCatTrigger');
+                if (trigger) trigger.addEventListener('click', () => runFullCatalogSearch(fcQuery));
+            } else {
+                grid.innerHTML = `<div class="dtg-catalog-empty">No styles match${currentSearch ? ` "${escapeHtml(currentSearch)}"` : ''}.</div>`;
+            }
             return;
         }
         grid.innerHTML = filtered.map((s) => renderCard(s)).join('');
@@ -203,6 +223,20 @@
                 });
             }
         });
+
+        // Even when the curated 20 DID return hits, offer a quiet path to the
+        // full catalog while a search is active — covers the case where the
+        // query collides with a curated style (e.g. "5000" surfaces DT5000)
+        // but the rep actually wanted a different SanMar style (Gildan 5000).
+        const fcQ = currentSearch.trim();
+        if (fcQ.length >= 3) {
+            const footer = document.createElement('div');
+            footer.className = 'dtg-fullcat-footer';
+            footer.innerHTML = `Not seeing it? <button type="button" class="dtg-fullcat-footer-link" id="dtgFullCatFooter">Search the full SanMar catalog for "${escapeHtml(fcQ)}" →</button>`;
+            grid.appendChild(footer);
+            const link = document.getElementById('dtgFullCatFooter');
+            if (link) link.addEventListener('click', () => runFullCatalogSearch(fcQ));
+        }
     }
 
     // Mark a swatch as selected on its card. Updates the swatch ring +
@@ -394,6 +428,153 @@
     // & Co Core Cotton Tee".
     function stripStyleSuffix(title) {
         return String(title || '').replace(/\.?\s*[A-Z0-9]+\s*$/, '').trim();
+    }
+
+    // ===================================================================
+    // Full SanMar catalog fallback (2026-06-03)
+    // -------------------------------------------------------------------
+    // The curated grid above is our 20 DTG-tested top-sellers. When a rep
+    // searches for a style we HAVEN'T vetted (e.g. "DT6000"), the curated
+    // filter returns nothing — so we offer a one-click jump to the full
+    // SanMar catalog via /api/stylesearch. Picking a result drops it into
+    // the order form through the SAME window.DTGInlineForm.previewStyle()
+    // path the curated cards use, so colors/sizes/pricing hydrate
+    // identically (backend prices ANY style — verified). Full-catalog
+    // garments are badged "not DTG-tested" and flagged when the fabric is
+    // a known DTG risk. This never blocks a quote — it informs.
+    // ===================================================================
+
+    // Known-risky DTG substrates. The curated catalog exists precisely
+    // because "we know how it prints"; outside it, warn (never block) on the
+    // fabrics that print poorly on the Kornit. Mirrors the catalog footer.
+    function dtgSuitabilityWarning(styleAndLabel) {
+        const t = String(styleAndLabel || '').toLowerCase();
+        if (/\bgildan\b/.test(t)) {
+            return "Gildan's fabric coating can dull DTG prints — sample before committing.";
+        }
+        if (/dri-?fit|posicharge|sport-?wick|performance|polyester|\bpoly\b|moisture[- ]?wick/.test(t)) {
+            return 'Performance / polyester fabric — DTG ink bonds best to cotton; colors may look faded.';
+        }
+        return null;
+    }
+
+    async function runFullCatalogSearch(q) {
+        const grid = document.getElementById('dtgCatalogGrid');
+        if (!grid) return;
+        grid.innerHTML = `<div class="dtg-catalog-loading"><i class="fas fa-circle-notch fa-spin"></i> Searching the full SanMar catalog for "${escapeHtml(q)}"…</div>`;
+        let results = [];
+        try {
+            const data = await fetchJSON(`${API_BASE}/api/stylesearch?term=${encodeURIComponent(q)}`);
+            results = Array.isArray(data) ? data : (data.results || []);
+        } catch (err) {
+            console.error('[dtg-catalog] full-catalog search failed:', err);
+            grid.innerHTML = `<div class="dtg-catalog-error"><i class="fas fa-triangle-exclamation"></i> Couldn't reach the SanMar catalog. <button type="button" id="dtgFullCatRetry">Retry</button></div>`;
+            const retry = document.getElementById('dtgFullCatRetry');
+            if (retry) retry.addEventListener('click', () => runFullCatalogSearch(q));
+            return;
+        }
+        renderFullCatalogResults(q, results);
+    }
+
+    function renderFullCatalogResults(q, results) {
+        const grid = document.getElementById('dtgCatalogGrid');
+        if (!grid) return;
+        lastFullCatalogResults = Array.isArray(results) ? results : [];
+        const header = `
+            <div class="dtg-fullcat-head">
+                <button type="button" class="dtg-fullcat-back" id="dtgFullCatBack">
+                    <i class="fas fa-arrow-left"></i> Back to DTG-tested catalog
+                </button>
+                <div class="dtg-fullcat-head-text">
+                    <strong>Full SanMar catalog</strong> · ${lastFullCatalogResults.length} match${lastFullCatalogResults.length === 1 ? '' : 'es'} for "${escapeHtml(q)}"
+                    <span class="dtg-fullcat-head-warn"><i class="fas fa-flask"></i> Outside our 20 DTG-tested styles — confirm the garment prints well before quoting.</span>
+                </div>
+            </div>`;
+        if (!lastFullCatalogResults.length) {
+            grid.innerHTML = header + `<div class="dtg-catalog-empty">No SanMar styles match "${escapeHtml(q)}". Try the exact style number (e.g. DT6000).</div>`;
+            wireFullCatBack();
+            return;
+        }
+        const cards = lastFullCatalogResults.slice(0, 60).map((m, i) => {
+            const style = String(m.value || m.style || m.styleNumber || '').toUpperCase();
+            const label = String(m.label || m.PRODUCT_TITLE || style);
+            // Strip the leading "STYLE - " and trailing ". STYLE" SanMar wraps
+            // its labels in, leaving just the product name.
+            const leadRe = new RegExp('^' + style.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[-–]\\s*', 'i');
+            const title = stripStyleSuffix(label.replace(leadRe, '')) || label;
+            const warn = dtgSuitabilityWarning(label);
+            return `
+                <article class="dtg-fullcat-card${warn ? ' dtg-fullcat-card--warn' : ''}" data-idx="${i}" data-style="${escapeHtml(style)}">
+                    <div class="dtg-fullcat-card-main">
+                        <div class="dtg-fullcat-card-style">${escapeHtml(style)}</div>
+                        <div class="dtg-fullcat-card-title">${escapeHtml(title)}</div>
+                        ${warn ? `<div class="dtg-fullcat-card-warn"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(warn)}</div>` : ''}
+                    </div>
+                    <button type="button" class="dtg-fullcat-add" data-idx="${i}">
+                        <i class="fas fa-plus"></i> Add to quote
+                    </button>
+                </article>`;
+        }).join('');
+        grid.innerHTML = header + `<div class="dtg-fullcat-results">${cards}</div>`;
+        wireFullCatBack();
+        grid.querySelectorAll('.dtg-fullcat-add').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'), 10);
+                const m = lastFullCatalogResults[idx];
+                if (m) addFullCatalogStyle(btn, m);
+            });
+        });
+    }
+
+    function wireFullCatBack() {
+        const back = document.getElementById('dtgFullCatBack');
+        if (!back) return;
+        back.addEventListener('click', () => {
+            const input = document.getElementById('dtgCatalogSearch');
+            if (input) input.value = '';
+            currentSearch = '';
+            renderGrid();
+        });
+    }
+
+    // Drop a full-catalog style onto the order form. Fetches the real color
+    // list first so the row's color picker is populated; pricing + sizes
+    // hydrate inside previewStyle() via the bundle, identical to the curated
+    // quickAddToQuote() path.
+    async function addFullCatalogStyle(btn, m) {
+        if (!window.DTGInlineForm || typeof window.DTGInlineForm.previewStyle !== 'function') {
+            console.warn('[dtg-catalog] DTGInlineForm.previewStyle unavailable');
+            return;
+        }
+        const style = String(m.value || m.style || m.styleNumber || '').toUpperCase();
+        if (!style) return;
+        const label = String(m.label || '');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Adding…'; }
+        let colors = [];
+        let productTitle = '';
+        try {
+            const data = await fetchJSON(`${API_BASE}/api/product-colors?styleNumber=${encodeURIComponent(style)}`);
+            colors = (data && data.colors) || [];
+            productTitle = (data && data.productTitle) || '';
+        } catch (err) {
+            // Non-fatal — drop the style in anyway; the row's own color combobox
+            // retries the color lookup when the rep opens it.
+            console.warn('[dtg-catalog] product-colors failed for', style, err);
+        }
+        try {
+            window.DTGInlineForm.previewStyle({
+                style,
+                desc: stripStyleSuffix(productTitle || label.replace(new RegExp('^' + style + '\\s*[-–]\\s*', 'i'), '')),
+                colorsAvailable: colors,
+            });
+            const formMount = document.getElementById('dtgInlineFormMount');
+            if (formMount) formMount.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (btn) { btn.innerHTML = '<i class="fas fa-check"></i> Added'; btn.classList.add('dtg-fullcat-add--done'); }
+        } catch (err) {
+            console.error('[dtg-catalog] addFullCatalogStyle failed:', err);
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Add to quote'; }
+        }
     }
 
     // ----- Modal --------------------------------------------------------

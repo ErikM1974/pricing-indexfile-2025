@@ -507,15 +507,29 @@ class EmbroideryInvoiceGenerator {
      * Generate customer section
      */
     generateCustomerSection(customerData, salesRepName) {
+        // Billing address lines (2026-06-02 — Erik: invoice needs the billing address).
+        const billLines = this.addressLines(customerData.billing);
+        // Optional SHIP TO block — shown only when the order ships (not pickup).
+        const ship = customerData.shipping || null;
+        const shipLines = ship ? this.addressLines(ship) : '';
+        const showShip = !!shipLines;
         return `
             <div class="customer-section">
                 <div class="customer-info">
                     <div class="section-title">BILL TO:</div>
                     <div class="info-line"><strong>${customerData.name || 'Customer'}</strong></div>
                     ${customerData.company ? `<div class="info-line">${customerData.company}</div>` : ''}
-                    <div class="info-line">${customerData.email}</div>
+                    ${billLines}
+                    ${customerData.email ? `<div class="info-line">${customerData.email}</div>` : ''}
                     ${customerData.phone ? `<div class="info-line">${customerData.phone}</div>` : ''}
                 </div>
+                ${showShip ? `
+                <div class="customer-info">
+                    <div class="section-title">SHIP TO:</div>
+                    <div class="info-line"><strong>${customerData.name || ''}</strong></div>
+                    ${customerData.company ? `<div class="info-line">${customerData.company}</div>` : ''}
+                    ${shipLines}
+                </div>` : ''}
                 <div class="sales-rep-info">
                     <div class="section-title">SALES REPRESENTATIVE:</div>
                     <div class="info-line"><strong>${salesRepName}</strong></div>
@@ -524,6 +538,23 @@ class EmbroideryInvoiceGenerator {
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Render street + city/state/zip address lines from an address object.
+     * Returns '' when no address is present (so the block degrades cleanly).
+     */
+    addressLines(a) {
+        if (!a) return '';
+        const street = (a.address || a.street || '').trim();
+        const city = (a.city || '').trim();
+        const state = (a.state || '').trim();
+        const zip = (a.zip || '').trim();
+        const cityStateZip = [city, [state, zip].filter(Boolean).join(' ')].filter(Boolean).join(', ');
+        let out = '';
+        if (street) out += `<div class="info-line">${street}</div>`;
+        if (cityStateZip) out += `<div class="info-line">${cityStateZip}</div>`;
+        return out;
     }
     
     /**

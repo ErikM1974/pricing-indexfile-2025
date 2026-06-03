@@ -1444,25 +1444,25 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Phone — API may not return phone, clear if empty
             const phoneInput = document.getElementById('customer-phone');
             if (phoneInput) phoneInput.value = contact.Phone || '';
-            // Auto-fill Ship To from contact address
-            if (contact.State) {
-                const stateInput = document.getElementById('ship-state');
-                if (stateInput) stateInput.value = contact.State;
-            }
-            if (contact.City) {
-                const cityInput = document.getElementById('ship-city');
-                if (cityInput) cityInput.value = contact.City;
-            }
-            if (contact.Zip) {
-                const zipInput = document.getElementById('ship-zip');
-                if (zipInput) {
-                    zipInput.value = contact.Zip;
-                    lookupTaxRate(); // Auto-trigger tax lookup
+            // Auto-fill Ship To from contact address. STASH it always so that if
+            // the rep later flips Pickup → Ship it, setShipMode() restores it.
+            // When Pickup is active (the default), do NOT overwrite the Milton shop
+            // address / tax — a pickup order is taxed locally. (2026-06-02)
+            window._lastCustomerShipTo = {
+                address: contact.Address || '',
+                city: contact.City || '',
+                state: contact.State || '',
+                zip: contact.Zip || ''
+            };
+            const _isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+            if (!_isPickup) {
+                if (contact.State) { const el = document.getElementById('ship-state'); if (el) el.value = contact.State; }
+                if (contact.City) { const el = document.getElementById('ship-city'); if (el) el.value = contact.City; }
+                if (contact.Address) { const el = document.getElementById('ship-address'); if (el) el.value = contact.Address; }
+                if (contact.Zip) {
+                    const zipInput = document.getElementById('ship-zip');
+                    if (zipInput) { zipInput.value = contact.Zip; lookupTaxRate(); }
                 }
-            }
-            if (contact.Address) {
-                const addrInput = document.getElementById('ship-address');
-                if (addrInput) addrInput.value = contact.Address;
             }
             _customerDesignGallery = null; // Invalidate gallery cache on customer change
 
@@ -1535,6 +1535,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initEmbroideryPersistence();
 
+            // New-quote date defaults (2026-06-02): Date Placed = today,
+            // Req Ship Date = today + 2 weeks. Fills blanks only, so a draft
+            // restored from the recovery dialog still overrides these.
+            if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
+
             // Check for draft recovery
             if (embSession && embSession.shouldShowRecovery()) {
                 embSession.showRecoveryDialog(
@@ -1552,6 +1557,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Initialize additional charges display (for default $50 art charge)
         updateAdditionalCharges();
+
+        // Paint the Shipping step's Pickup/Ship toggle + pickup-vs-address UI to
+        // match the current ship method (Pickup by default on a new quote; the
+        // loaded value when editing). Idempotent. (2026-06-02 order-flow redesign)
+        onShipMethodChange();
 
     } catch (error) {
         console.error('Failed to initialize pricing:', error);
@@ -6390,13 +6400,20 @@ function onShipZipBlur() {
  */
 function onShipMethodChange() {
     const method = document.getElementById('ship-method').value;
-    const addressFields = document.getElementById('ship-address-fields');
+    const isPickup = method === 'Customer Pickup';
+    const carrierWrap = document.getElementById('ship-carrier-wrap');
     const pickupNotice = document.getElementById('pickup-notice');
     const otherInput = document.getElementById('ship-method-other');
+    const pickupBtn = document.getElementById('ship-mode-pickup');
+    const shipBtn = document.getElementById('ship-mode-ship');
 
-    if (method === 'Customer Pickup') {
-        // Hide address fields, show pickup notice
-        if (addressFields) addressFields.style.display = 'none';
+    // Keep the Pickup / Ship-it segmented toggle in sync with the method value
+    // (so a programmatic change — load, import, draft restore — repaints it too).
+    if (pickupBtn) pickupBtn.classList.toggle('active', isPickup);
+    if (shipBtn) shipBtn.classList.toggle('active', !isPickup);
+    if (carrierWrap) carrierWrap.style.display = isPickup ? 'none' : '';
+
+    if (isPickup) {
         if (pickupNotice) pickupNotice.style.display = 'block';
         if (otherInput) otherInput.style.display = 'none';
         // Auto-set Milton, WA 98354 for tax lookup (NW Custom Apparel shop location)
@@ -6406,15 +6423,90 @@ function onShipMethodChange() {
         document.getElementById('ship-zip').value = '98354';
         lookupTaxRate();
     } else {
-        // Show address fields, hide pickup notice
-        if (addressFields) addressFields.style.display = '';
         if (pickupNotice) pickupNotice.style.display = 'none';
-        // Show/hide Other text input
+        // Show/hide the "Other" free-text method input
         if (otherInput) {
             otherInput.style.display = (method === 'Other') ? 'block' : 'none';
         }
     }
+    updateShippingSummary();
 }
+
+/**
+ * Pickup / Ship-it segmented toggle (2026-06-02 order-flow redesign).
+ * Sets the underlying #ship-method value, then lets onShipMethodChange()
+ * render the conditional UI. Switching to Ship restores the last looked-up
+ * customer ship-to (stashed in applyContact) so the rep doesn't retype it.
+ */
+function setShipMode(mode) {
+    const select = document.getElementById('ship-method');
+    if (!select) return;
+    if (mode === 'pickup') {
+        select.value = 'Customer Pickup';
+    } else {
+        // Leaving pickup → default to UPS Ground (most common carrier)
+        if (select.value === 'Customer Pickup') select.value = 'UPS Ground';
+        // Pre-fill the address from the last selected customer, if we have it
+        const stash = window._lastCustomerShipTo;
+        const zipEl = document.getElementById('ship-zip');
+        if (stash && zipEl && !zipEl.value.trim()) {
+            const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+            set('ship-address', stash.address);
+            set('ship-city', stash.city);
+            if (stash.state) { const st = document.getElementById('ship-state'); if (st) st.value = stash.state; }
+            set('ship-zip', stash.zip);
+        }
+    }
+    onShipMethodChange();
+    // In ship mode, refresh the tax rate for the shown address (if any)
+    if (mode === 'ship') {
+        const zip = document.getElementById('ship-zip')?.value?.trim();
+        if (zip && zip.length >= 5) lookupTaxRate();
+    }
+}
+window.setShipMode = setShipMode;
+
+/**
+ * Update the Step-3 shipping summary line from the current shipping state.
+ * (2026-06-02 — the shipping editor moved into #shipping-modal; Step 3 and the
+ * invoice "Shipping" totals line both open it and show this summary.)
+ */
+function updateShippingSummary() {
+    const el = document.getElementById('shipping-summary');
+    if (!el) return;
+    const method = document.getElementById('ship-method')?.value || '';
+    const isPickup = method === 'Customer Pickup';
+    const rate = (document.getElementById('tax-rate-input')?.value || '').trim();
+    const ratePart = rate ? ` · ${rate}% tax` : '';
+    if (isPickup) {
+        el.textContent = `Customer Pickup — Milton, WA${ratePart}`;
+    } else {
+        const city = (document.getElementById('ship-city')?.value || '').trim();
+        const state = document.getElementById('ship-state')?.value || '';
+        const zip = (document.getElementById('ship-zip')?.value || '').trim();
+        const loc = [[city, state].filter(Boolean).join(', '), zip].filter(Boolean).join(' ');
+        const m = (method === 'Other')
+            ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+            : method;
+        el.textContent = `${m}${loc ? ' — ' + loc : ' — (enter address)'}${ratePart}`;
+    }
+}
+window.updateShippingSummary = updateShippingSummary;
+
+/** Open the shipping editor modal (from the totals line or Step 3). (2026-06-02) */
+function openShippingModal() {
+    const m = document.getElementById('shipping-modal');
+    if (m) m.classList.add('open');
+}
+/** Close the shipping modal and refresh the summary + totals. */
+function closeShippingModal() {
+    const m = document.getElementById('shipping-modal');
+    if (m) m.classList.remove('open');
+    updateShippingSummary();
+    updateTaxCalculation();
+}
+window.openShippingModal = openShippingModal;
+window.closeShippingModal = closeShippingModal;
 
 /**
  * Update tax calculation based on toggle state
@@ -6435,27 +6527,57 @@ function updateTaxCalculation() {
 
     if (!taxRow || !taxAmountEl || !grandTotalWithTax) return;
 
-    // Update pre-tax subtotal display to show adjusted amount
+    // #pre-tax-subtotal is the CANONICAL full pre-tax amount (products + services
+    // + shipping − discount). The save path reads it, so keep it accurate. It is
+    // a hidden carrier now; the visible "Subtotal" line below excludes shipping.
     if (preTaxSubtotal) {
         preTaxSubtotal.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
 
-    // Update tax label dynamically
-    const taxLabel = document.getElementById('tax-label');
-    if (taxLabel) {
-        const pct = (taxRate * 100).toFixed(1);
-        taxLabel.textContent = pct === '10.1' ? 'WA Sales Tax (10.1%):' : `Sales Tax (${pct}%):`;
+    // Shipping line under the invoice: "Customer Pickup" when picking up,
+    // otherwise the shipping charge. (2026-06-02 — totals moved under line items)
+    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+    const isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+    const shipAmtEl = document.getElementById('it-shipping-amt');
+    if (shipAmtEl) {
+        if (isPickup) {
+            shipAmtEl.textContent = 'Customer Pickup';
+            shipAmtEl.classList.add('is-pickup');
+        } else {
+            shipAmtEl.classList.remove('is-pickup');
+            if (shippingFee > 0) {
+                shipAmtEl.textContent = '$' + shippingFee.toFixed(2);
+            } else {
+                // No charge entered yet — show the carrier so it doesn't read as "$0.00"
+                const m = document.getElementById('ship-method')?.value || '';
+                shipAmtEl.textContent = (m === 'Other')
+                    ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+                    : (m || 'Ship');
+            }
+        }
     }
+
+    // Visible "Subtotal" line = everything pre-tax EXCEPT shipping (shipping is
+    // its own line). Subtotal + Shipping = the taxable base (adjustedSubtotal).
+    const subtotalDisplay = document.getElementById('invoice-subtotal-display');
+    if (subtotalDisplay) subtotalDisplay.textContent = '$' + (adjustedSubtotal - shippingFee).toFixed(2);
+
+    // Keep the Sales Tax label simple — the editable % is shown right beside it.
+    const taxLabel = document.getElementById('tax-label');
+    if (taxLabel) taxLabel.textContent = 'Sales Tax';
 
     if (includeTax) {
         const tax = adjustedSubtotal * taxRate;
-        taxRow.style.display = 'flex';
         taxAmountEl.textContent = '$' + tax.toFixed(2);
         grandTotalWithTax.textContent = '$' + (adjustedSubtotal + tax).toFixed(2);
     } else {
-        taxRow.style.display = 'none';
+        // Keep the tax row visible (it holds the re-enable checkbox); zero the amount.
+        taxAmountEl.textContent = '$0.00';
         grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
     }
+
+    // Keep the Step-3 shipping summary's tax-rate in sync after a rate lookup.
+    if (typeof updateShippingSummary === 'function') updateShippingSummary();
 }
 
 // ============================================================
@@ -6845,12 +6967,14 @@ function updatePushButtonState() {
     if (!btn || !label) return;
 
     if (_pushAlreadyDone) {
-        label.textContent = 'Pushed to ShopWorks ✓';
+        // "Sent" — not "Pushed/Imported". The order reached ManageOrders; OnSite
+        // import is confirmed separately (Verify in ShopWorks in the push modal).
+        label.textContent = 'Sent to ShopWorks ✓';
         btn.disabled = true;
         btn.style.opacity = '1';
         btn.style.cursor = 'default';
         btn.style.background = '#28a745';
-        btn.title = 'This quote has already been pushed to ShopWorks';
+        btn.title = 'This quote was sent to ManageOrders. Use “Verify in ShopWorks” to confirm OnSite imported it.';
         return;
     }
 
@@ -7017,18 +7141,37 @@ async function confirmPushToShopWorks() {
             throw new Error(data.error || data.details || `HTTP ${response.status}`);
         }
 
-        // Success
+        // The push endpoint only confirms the order reached ManageOrders STAGING
+        // (MO returns "...has been uploaded"). ShopWorks OnSite imports asynchronously
+        // on its own download cycle, and that conversion can fail SILENTLY — an unmapped
+        // size, an invalid customer/design #, etc. — leaving an order MO accepted but
+        // OnSite never created. So we no longer claim "Pushed to ShopWorks" off the ack;
+        // we report "Sent to ManageOrders" and verify the REAL OnSite import via
+        // getorderno. (EMB-2026-269 false-success — MO said uploaded, OnSite never
+        // imported it — 2026-06-02.)
         _pushAlreadyDone = true;
         updatePushButtonState();
+        const extId = data.extOrderId || _pushQuoteId;
         if (statusEl) {
-            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#f0fdf4; border-color:#bbf7d0;">' +
-                '<h4><i class="fas fa-check-circle"></i> Pushed to ShopWorks</h4>' +
-                '<div class="preview-item-value">Created as <strong>' + escapeHtml(data.extOrderId || '') + '</strong> · ' +
+            statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#eff6ff; border-color:#bfdbfe;">' +
+                '<h4><i class="fas fa-paper-plane"></i> Sent to ManageOrders</h4>' +
+                '<div class="preview-item-value">Uploaded as <strong>' + escapeHtml(extId) + '</strong> · ' +
                 escapeHtml(String(data.lineItemCount || 0)) + ' line items · ' +
-                escapeHtml(String(data.designCount || 0)) + ' design(s).</div></div>';
+                escapeHtml(String(data.designCount || 0)) + ' design(s).</div>' +
+                '<div style="margin-top:10px; color:#475569;">ShopWorks imports new orders on its own download cycle — ' +
+                'confirm it actually landed in OnSite:</div>' +
+                '<div id="emb-sw-import-result" style="margin-top:8px; font-size:0.92em;"></div>' +
+                '<button type="button" id="emb-sw-verify-btn" style="margin-top:8px; padding:6px 12px; background:#1a5276; ' +
+                'color:#fff; border:none; border-radius:6px; cursor:pointer;">' +
+                '<i class="fas fa-magnifying-glass"></i> Verify in ShopWorks</button></div>';
+            const vbtn = document.getElementById('emb-sw-verify-btn');
+            if (vbtn) vbtn.addEventListener('click', () => verifyShopWorksImport(extId));
+            // Initial check — usually still "pending" right after a push, which is the
+            // honest state to show instead of a premature green check.
+            verifyShopWorksImport(extId);
         }
         confirmBtn.style.display = 'none';
-        showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
+        showToast(`Sent to ManageOrders as ${extId} — verify ShopWorks import`, 'success');
 
     } catch (error) {
         console.error('[Embroidery] Push error:', error);
@@ -7039,6 +7182,43 @@ async function confirmPushToShopWorks() {
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = origHtml;
         showToast(`Push failed: ${error.message}`, 'error');
+    }
+}
+
+// Verify an order ACTUALLY imported into ShopWorks OnSite — not just that
+// ManageOrders accepted the upload. getorderno queries OnSite's real orders by
+// ExtOrderID: a non-empty result means OnSite created the order. Empty means
+// it's either still pending OnSite's import cycle OR the MO→OnSite conversion
+// failed (unmapped size, invalid customer/design #). This is the check that was
+// missing when EMB-2026-269 reported success but never reached ShopWorks
+// (2026-06-02). Uses APP_CONFIG.API.BASE_URL per the no-hardcoded-URL rule.
+async function verifyShopWorksImport(extOrderId) {
+    const out = document.getElementById('emb-sw-import-result');
+    if (!extOrderId || !out) return;
+    out.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking ShopWorks…';
+    try {
+        const apiBase = typeof APP_CONFIG !== 'undefined'
+            ? APP_CONFIG.API.BASE_URL
+            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const resp = await fetch(`${apiBase}/api/manageorders/getorderno/${encodeURIComponent(extOrderId)}`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
+        const row = Array.isArray(data.result) && data.result.length ? data.result[0] : null;
+        const orderNo = row ? (row.id_Order || row.ID_Order || row) : null;
+        if (orderNo) {
+            out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle"></i> ' +
+                'Confirmed in ShopWorks — order #' + escapeHtml(String(orderNo)) + '</span>';
+        } else {
+            out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+                '<strong>Not in ShopWorks yet.</strong> ManageOrders accepted the upload, but OnSite has not ' +
+                'imported it. OnSite pulls new orders periodically — wait a few minutes and click ' +
+                '“Verify in ShopWorks” again. If it never appears, the MO→OnSite conversion failed ' +
+                '(commonly an unmapped size or an invalid customer/design #) — check the ManageOrders ' +
+                'conversion log for this order.</span>';
+        }
+    } catch (err) {
+        out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+            'Could not verify ShopWorks import: ' + escapeHtml(err.message) + '. Try again shortly.</span>';
     }
 }
 
@@ -7334,17 +7514,20 @@ function resetQuote() {
     document.getElementById('po-number').value = '';
     document.getElementById('order-number').value = '';
     document.getElementById('customer-number').value = '';
-    document.getElementById('ship-method').value = 'UPS Ground';
+    document.getElementById('ship-method').value = 'Customer Pickup';
     document.getElementById('ship-method-other').value = '';
+    window._lastCustomerShipTo = null;
     onShipMethodChange();
     document.getElementById('date-order-placed').value = '';
     document.getElementById('req-ship-date').value = '';
     document.getElementById('drop-dead-date').value = '';
     document.getElementById('payment-terms').value = '';
+    // New-quote date defaults (today / +2 weeks) — refills the just-cleared blanks
+    if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
     const odContent = document.getElementById('order-details-content');
     const odChevron = document.getElementById('order-details-chevron');
     const odBadge = document.getElementById('order-details-badge');
-    if (odContent) odContent.style.display = 'none';
+    if (odContent) odContent.style.display = '';   // always-visible flow-step body now
     if (odChevron) odChevron.style.transform = '';
     if (odBadge) odBadge.style.display = 'none';
     document.getElementById('discount-amount').value = '';
@@ -11453,11 +11636,33 @@ async function printQuote() {
         const pricingData = buildEmbroideryPricingData(allItems);
 
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
+
+        // Billing + shipping addresses for the invoice (2026-06-02, Erik).
+        // Billing = the customer's address: prefer the looked-up customer-record
+        // address (stashed on customer select); else the ship-to fields when the
+        // order actually ships; else none. Pickup ship-to is the Milton SHOP, so
+        // it is never used as the billing address. SHIP TO prints only when shipping.
+        const shipMethod = document.getElementById('ship-method')?.value || '';
+        const isPickup = shipMethod === 'Customer Pickup';
+        const shipFields = {
+            address: document.getElementById('ship-address')?.value || '',
+            city: document.getElementById('ship-city')?.value || '',
+            state: document.getElementById('ship-state')?.value || '',
+            zip: document.getElementById('ship-zip')?.value || ''
+        };
+        const stash = window._lastCustomerShipTo;
+        const stashHasAddr = stash && (stash.address || stash.zip);
+        const billing = stashHasAddr
+            ? { address: stash.address, city: stash.city, state: stash.state, zip: stash.zip }
+            : (!isPickup ? shipFields : {});
         const customerData = {
             name: document.getElementById('customer-name')?.value || 'Customer',
             company: document.getElementById('company-name')?.value || '',
             email: document.getElementById('customer-email')?.value || '',
-            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+            phone: document.getElementById('customer-phone')?.value || '',
+            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            billing,
+            shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };
 
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
