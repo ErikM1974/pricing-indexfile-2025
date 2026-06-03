@@ -1423,19 +1423,18 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Click a chip → addManualServiceRow(code) inserts an editable LINE ITEM. Same
     // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
     if (window.QuoteServicesBar) {
+        // Part numbers + descriptions match the real ShopWorks line items (Erik's
+        // test order 142021). Codes are registered in the proxy KNOWN_FEE_PNS so
+        // they push as LinesOE line items. Not here (auto from the top config): AL,
+        // AL-CAP, DECG-FB (Full Back), 3D-EMB, Laser Patch, LTM, DD (Digitizing).
         const EMB_SERVICE_CATALOG = [
             { group: 'Artwork', icon: 'fa-palette', items: [
-                { code: 'Logo Mockup',    label: 'Logo Mockup & Review', prompt: true, icon: 'fa-palette' },
-                { code: 'Graphic Design', label: 'Graphic Design',       price: 75, unit: 'hr', icon: 'fa-pencil-ruler' }
+                { code: 'GRT-50', label: 'Logo Mockup & Review', price: 50, unit: 'flat', icon: 'fa-palette' },
+                { code: 'GRT-75', label: 'Graphic Design',       price: 75, unit: 'hr',   icon: 'fa-pencil-ruler' }
             ]},
             { group: 'Add-Ons', icon: 'fa-stamp', items: [
-                { code: 'Monogram',    label: 'Monogram / Name', price: 12.50, unit: 'ea', icon: 'fa-font' },
-                { code: 'Name/Number', label: 'Name / Number',   price: 15.00, unit: 'ea', icon: 'fa-id-badge' },
-                { code: 'SEG',         label: 'Sewing',          price: 10.00, unit: 'ea', icon: 'fa-scissors' },
-                { code: 'DT',          label: 'Design Transfer', price: 50.00,             icon: 'fa-exchange-alt' }
-            ]},
-            { group: 'Charges', icon: 'fa-plus-circle', items: [
-                { code: 'RUSH', label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+                { code: 'Monogram', label: 'Monogram', price: 12.50, unit: 'ea', icon: 'fa-font' },
+                { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
             ]}
         ];
         window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
@@ -2929,7 +2928,7 @@ function createServiceProductRow(serviceType, data) {
         'DECG-FB': { description: 'Full Back Embroidery', icon: 'fa-expand', isCap: false },
         'CB': { description: 'Cap Back Embroidery', icon: 'fa-hat-cowboy', isCap: true },
         'CS': { description: 'Cap Side Embroidery', icon: 'fa-hat-cowboy', isCap: true },
-        'Monogram': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
+        'Monogram': { description: 'Dir. Embroider Names on Garments', icon: 'fa-font', isCap: false },
         'MONOGRAM': { description: 'Names/Monograms', icon: 'fa-font', isCap: false },
         'Name/Number': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false },
         'NAME': { description: 'Name & Number', icon: 'fa-id-badge', isCap: false }, // Legacy
@@ -2944,8 +2943,8 @@ function createServiceProductRow(serviceType, data) {
         'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
         '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
         'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true },
-        'Logo Mockup': { description: 'Logo Mockup & Review', icon: 'fa-palette', isCap: false },
-        'Graphic Design': { description: 'Graphic Design ($75/hr)', icon: 'fa-pencil-ruler', isCap: false },
+        'GRT-50': { description: 'Logo Mockup & Print Review', icon: 'fa-palette', isCap: false },
+        'GRT-75': { description: 'Graphic Design Services', icon: 'fa-pencil-ruler', isCap: false },
         'RUSH': { description: 'Rush Charge', icon: 'fa-bolt', isCap: false }
     };
 
@@ -2962,7 +2961,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'Logo Mockup' && serviceType !== 'Graphic Design' && serviceType !== 'RUSH') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'RUSH') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3074,8 +3073,8 @@ function addManualServiceRow(serviceType, priceOverride) {
         'DT': { unitPrice: 50.00, quantity: 1 },
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
         'CTR-CAP': { unitPrice: 0, quantity: 1 },
-        'Logo Mockup': { unitPrice: 0, quantity: 1 },
-        'Graphic Design': { unitPrice: 75, quantity: 1 },
+        'GRT-50': { unitPrice: 50, quantity: 1 },
+        'GRT-75': { unitPrice: 75, quantity: 1 },
         'RUSH': { unitPrice: 0, quantity: 1 }
     };
 
@@ -3122,7 +3121,7 @@ function onServiceQtyChange(rowId) {
     if (!row || row.dataset.productType !== 'service') return;
 
     const qtyInput = row.querySelector('.service-qty');
-    const quantity = parseInt(qtyInput?.value) || 0;
+    const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → Graphic Design hours can be fractional (e.g. 0.75)
     // Use sell price override if set, otherwise use original unit price
     const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
     const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
@@ -5821,7 +5820,7 @@ function collectProductsFromTable() {
         // Handle SERVICE product rows (DECG, DECC, AL, MONOGRAM, etc.)
         if (row.dataset.productType === 'service') {
             const qtyInput = row.querySelector('.service-qty');
-            const quantity = parseInt(qtyInput?.value) || 0;
+            const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → fractional service qty (GRT-75 hours)
 
             if (quantity > 0) {
                 const serviceType = row.dataset.serviceType;
