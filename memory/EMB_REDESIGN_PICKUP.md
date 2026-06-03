@@ -10,6 +10,25 @@
 - Verify in-browser with the Preview MCP (`preview_start` name `pricing-index-preview`, autoPort, port 3010) — **restart the preview server if it serves stale HTML** (it cached an old copy mid-session once).
 - Branch: **develop** (frontend) and **develop** (proxy). Deploy frontend = `/deploy` skill; proxy = `git push heroku develop:main`.
 
+## UPDATE 2026-06-03 PM — Services bar SHIPPED; AL is the open piece
+- **DEPLOYED v2026.06.03.2** (frontend): the whole Services-bar arc is LIVE — categorized bar
+  (Artwork / Add-Ons), `GRT-50` Logo Mockup ($50), `GRT-75` Graphic Design ($75/hr, fractional
+  hrs), `Monogram` ($12.50), `RUSH` (live 25%-of-subtotal line). Parts/descriptions match Erik's
+  ShopWorks test order 142021; all in proxy `KNOWN_FEE_PNS` → push as LinesOE (qty → Size01).
+- **On develop, committed, NOT yet deployed:** Digitizing moved to the bar (Artwork ▾ → `DD` $100
+  line, multiples) + top Digitizing checkboxes hidden (commit 425353ff).
+- **Flagship strategy locked** (Erik's call): EMB is flagship; structure=shared, content=per-method;
+  adopt-don't-copy; DTG stays separate. See quote-builder-architecture.md "Flagship model".
+- **NEXT — Additional Logo onto the bar (the big one):** Artwork ▾ → "Additional Logo" → mini-picker
+  (Garment/Cap + stitch: Standard/Mid/Large/Full Back) → adds `AL`/`AL-CAP` line; type qty → unit
+  price LIVE from the API (`embroidery-pricing-service.calculateALPrice(qty, stitch, itemType)`,
+  fetch once + cache, recompute on qty change like syncRushRow — it's tier-aware). Multiple ALs,
+  each independent. Then RETIRE the top AL toggle (`toggleGlobalALNew`/`globalAL`, the `garment-al-inline`
+  /`cap-al-inline` controls) + its recalc AL-fee-row path. Verify API price matches the old toggle
+  ($9/pc Standard @ 12pc). Erik confirmed: move it + REMOVE the top controls (logo card keeps
+  Position + Design Size only). Also still pending: push-verify live test (GRT/Monogram/RUSH/DD →
+  Size01), Design # into logo cards, roll to SCP/DTF.
+
 ## DONE + SHIPPED to production (Release v2026.06.03.1, frontend)
 A `/deploy` ran mid-session, so these EMB changes are LIVE in prod (not just localhost):
 1. **Linear numbered order-flow sidebar** — Customer(1) → Artwork(2) → Shipping(3) → Order Details(4). Pickup is the DEFAULT ship mode; Date Placed defaults to today, Req Ship = +2 weeks (`setQuoteDateDefaults` in `quote-builder-utils.js`). ShopWorks Order # demoted ("filled after import").
