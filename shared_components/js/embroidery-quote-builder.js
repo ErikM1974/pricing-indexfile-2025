@@ -11636,11 +11636,33 @@ async function printQuote() {
         const pricingData = buildEmbroideryPricingData(allItems);
 
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
+
+        // Billing + shipping addresses for the invoice (2026-06-02, Erik).
+        // Billing = the customer's address: prefer the looked-up customer-record
+        // address (stashed on customer select); else the ship-to fields when the
+        // order actually ships; else none. Pickup ship-to is the Milton SHOP, so
+        // it is never used as the billing address. SHIP TO prints only when shipping.
+        const shipMethod = document.getElementById('ship-method')?.value || '';
+        const isPickup = shipMethod === 'Customer Pickup';
+        const shipFields = {
+            address: document.getElementById('ship-address')?.value || '',
+            city: document.getElementById('ship-city')?.value || '',
+            state: document.getElementById('ship-state')?.value || '',
+            zip: document.getElementById('ship-zip')?.value || ''
+        };
+        const stash = window._lastCustomerShipTo;
+        const stashHasAddr = stash && (stash.address || stash.zip);
+        const billing = stashHasAddr
+            ? { address: stash.address, city: stash.city, state: stash.state, zip: stash.zip }
+            : (!isPickup ? shipFields : {});
         const customerData = {
             name: document.getElementById('customer-name')?.value || 'Customer',
             company: document.getElementById('company-name')?.value || '',
             email: document.getElementById('customer-email')?.value || '',
-            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+            phone: document.getElementById('customer-phone')?.value || '',
+            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            billing,
+            shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };
 
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
