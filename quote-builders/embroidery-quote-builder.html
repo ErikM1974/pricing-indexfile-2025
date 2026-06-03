@@ -125,7 +125,7 @@
                                            min="25000" max="100000" step="1000"
                                            oninput="onFullBackStitchCountChange()">
                                 </div>
-                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')">
+                                <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')">
                                     <input type="checkbox" id="primary-digitizing">
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
@@ -194,7 +194,7 @@
                                             <option value="18000">Large +$10/pc (15-25K)</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
+                                    <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
                                         <input type="checkbox" id="cap-primary-digitizing">
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
@@ -1496,7 +1496,7 @@ Company:Absher Construction Company
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.03.2"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.03.6"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
