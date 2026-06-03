@@ -1419,6 +1419,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     setupPrimaryLogoHandlers();
     setupCapPrimaryLogoHandlers();  // Cap logo handlers
 
+    // Services bar (2026-06-03): a persistent, catalog-driven "Add to order" strip.
+    // Click a chip → addManualServiceRow(code) inserts an editable LINE ITEM. Same
+    // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
+    if (window.QuoteServicesBar) {
+        const EMB_SERVICE_CATALOG = [
+            { code: 'Logo Mockup',    label: 'Logo Mockup & Review', price: 0,     unit: 'flat', icon: 'fa-palette' },
+            { code: 'Graphic Design', label: 'Graphic Design',       price: 75,    unit: 'hr',   icon: 'fa-pencil-ruler' },
+            { code: 'Monogram',       label: 'Monogram / Name',      price: 12.50, unit: 'ea',   icon: 'fa-font' },
+            { code: 'Name/Number',    label: 'Name / Number',        price: 15.00, unit: 'ea',   icon: 'fa-id-badge' },
+            { code: 'SEG',            label: 'Sewing',               price: 10.00, unit: 'ea',   icon: 'fa-scissors' },
+            { code: 'DT',             label: 'Design Transfer',      price: 50.00, unit: 'flat', icon: 'fa-exchange-alt' }
+        ];
+        window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG, addManualServiceRow);
+    }
+
     // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
     // and set its initial (disabled) state for a fresh quote.
     const _custNumEl = document.getElementById('customer-number');
@@ -2920,7 +2935,9 @@ function createServiceProductRow(serviceType, data) {
         'AS-GARM': { description: 'Additional Stitches (Garment)', icon: 'fa-layer-group', isCap: false },
         'AS-CAP': { description: 'Additional Stitches (Cap)', icon: 'fa-layer-group', isCap: true },
         '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
-        'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true }
+        'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true },
+        'Logo Mockup': { description: 'Logo Mockup & Review', icon: 'fa-palette', isCap: false },
+        'Graphic Design': { description: 'Graphic Design ($75/hr)', icon: 'fa-pencil-ruler', isCap: false }
     };
 
     const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
@@ -2936,7 +2953,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'Logo Mockup' && serviceType !== 'Graphic Design') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3041,7 +3058,9 @@ function addManualServiceRow(serviceType) {
         'SEG': { unitPrice: 10.00, quantity: 1 },
         'DT': { unitPrice: 50.00, quantity: 1 },
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
-        'CTR-CAP': { unitPrice: 0, quantity: 1 }
+        'CTR-CAP': { unitPrice: 0, quantity: 1 },
+        'Logo Mockup': { unitPrice: 0, quantity: 1 },
+        'Graphic Design': { unitPrice: 75, quantity: 1 }
     };
 
     const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };

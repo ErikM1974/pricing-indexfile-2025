@@ -3469,3 +3469,56 @@ input[type="radio"] {
 .ship-modal-close { background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: #64748b; }
 .ship-modal-done { background: #16a34a; color: #fff; border: none; border-radius: 6px; padding: 9px 20px; font-weight: 600; cursor: pointer; }
 .ship-modal-done:hover { background: #15803d; }
+
+/* Persistent, catalog-driven Services bar (2026-06-03) — click a chip to add a
+   service as a line item. Shared by EMB / SCP / DTG / DTF (rendered by
+   quote-services-bar.js from each builder's catalog). */
+.service-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 4px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+.service-bar-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-right: 2px;
+    white-space: nowrap;
+}
+.service-bar-label i { color: #6366f1; margin-right: 4px; }
+.service-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    font-size: 13px;
+    color: #334155;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.service-chip:hover {
+    border-color: #6366f1;
+    background: #eef2ff;
+    color: #3730a3;
+    box-shadow: 0 1px 4px rgba(99, 102, 241, 0.18);
+}
+.service-chip i { color: #6366f1; font-size: 13px; }
+.service-chip:hover i { color: #4f46e5; }
+.service-chip-name { font-weight: 600; }
+.service-chip-price {
+    font-size: 11px;
+    color: #16a34a;
+    background: #f0fdf4;
+    border-radius: 6px;
+    padding: 1px 6px;
+}
