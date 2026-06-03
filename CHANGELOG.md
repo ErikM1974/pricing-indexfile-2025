@@ -1,3 +1,10 @@
+## v2026.06.03.4 (2026.06.03)
+
+- EMB: source Services-bar fee prices from Caspio Service_Codes (/api/service-codes)
+- docs(memory): record Service_Codes price-wiring + AL pricing source for next session
+- docs(CLAUDE): add rule — all quote-builder pricing/charges run off the API, never hardcoded
+- Deploy v2026.06.03.4: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.06.03.3 (2026.06.03)
 
 - EMB: move Digitizing to the Services bar (Artwork ▾ → DD $100 line item)
