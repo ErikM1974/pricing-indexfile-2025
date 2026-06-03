@@ -1467,7 +1467,21 @@ document.addEventListener('DOMContentLoaded', async function() {
                 { group: 'Artwork', icon: 'fa-palette', items: [
                     { code: 'GRT-50', label: 'Logo Mockup & Review', price: sp('GRT-50', 50),  unit: 'flat', icon: 'fa-palette' },
                     { code: 'GRT-75', label: 'Graphic Design',       price: sp('GRT-75', 75),  unit: 'hr',   icon: 'fa-pencil-ruler' },
-                    { code: 'DD',     label: 'Digitizing',           price: sp('DD', 100),     unit: 'flat', icon: 'fa-cog' }
+                    { code: 'DD',     label: 'Digitizing',           price: sp('DD', 100),     unit: 'flat', icon: 'fa-cog' },
+                    // Additional Logo — live-priced per-piece from the API (calculateALPrice,
+                    // tier-aware + per-1K stitch upcharge). Pick Garment/Cap + size, then enter qty.
+                    { code: 'AL', label: 'Additional Logo', icon: 'fa-clone', addLabel: 'Add Logo', fields: [
+                        { name: 'itemType', label: 'For', options: [
+                            { value: 'garment', label: 'Garment' },
+                            { value: 'cap',     label: 'Cap' }
+                        ]},
+                        { name: 'stitch', label: 'Size', options: [
+                            { value: 'standard', label: 'Standard' },
+                            { value: 'mid',      label: 'Mid' },
+                            { value: 'large',    label: 'Large' },
+                            { value: 'fb',       label: 'Full Back' }
+                        ]}
+                    ]}
                 ]},
                 { group: 'Add-Ons', icon: 'fa-stamp', items: [
                     { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
@@ -1475,7 +1489,13 @@ document.addEventListener('DOMContentLoaded', async function() {
                 ]}
             ];
             window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
-                (code, opts) => addManualServiceRow(code, opts && opts.price));
+                (code, opts) => {
+                    if (code === 'AL' && opts && opts.fields) {
+                        addALLineItem(opts.fields.itemType, opts.fields.stitch);
+                    } else {
+                        addManualServiceRow(code, opts && opts.price);
+                    }
+                });
         });
     }
 
@@ -3151,6 +3171,60 @@ function addManualServiceRow(serviceType, priceOverride) {
             showToast(`${serviceType} service row added`, 'success');
         }
     }
+}
+
+/**
+ * Add an Additional Logo line item from the Services bar.
+ *   itemType  : 'garment' | 'cap' (from the picker)
+ *   stitchVal : '8000' | '13000' | '20000' (stitch count) | 'FB' (Full Back)
+ * The per-piece price is LIVE from the API (EmbroideryPricingService.calculateALPrice —
+ * tier-aware + per-1K stitch upcharge). syncALRows() computes/refreshes it on every
+ * recalc, so the price tracks the quantity the rep types into the line. Multiples are
+ * independent (each row carries its own stitch count + item type).
+ */
+function addALLineItem(itemType, sizeBucket) {
+    // Map the size bucket → a representative stitch count PER item type. "Standard" = each
+    // type's base-stitch (no upcharge): garment 8000, cap 5000. Mid/Large add stitches above
+    // base; the API (calculateALPrice) applies the per-1K upcharge. Full Back is its own path.
+    const STITCH_BY_TYPE = {
+        garment: { standard: 8000, mid: 13000, large: 20000 },
+        cap:     { standard: 5000, mid: 8000,  large: 11000 }
+    };
+    let serviceType, priceItemType, stitchCount, isCap;
+    if (sizeBucket === 'fb') {
+        // Full Back is a garment back placement, priced via the API 'fullback' path
+        serviceType = 'DECG-FB';
+        priceItemType = 'fullback';
+        stitchCount = 25000;            // = fullBack.minStitches (API enforces the floor)
+        isCap = false;
+    } else {
+        isCap = (itemType === 'cap');
+        priceItemType = isCap ? 'cap' : 'garment';
+        serviceType = isCap ? 'AL-CAP' : 'AL';
+        const map = STITCH_BY_TYPE[priceItemType] || STITCH_BY_TYPE.garment;
+        stitchCount = map[sizeBucket] || map.standard;
+    }
+
+    const row = createServiceProductRow(serviceType, {
+        quantity: 1,
+        unitPrice: 0,      // placeholder — set live by syncALRows()
+        total: 0,
+        isCap: isCap,
+        stitchCount: stitchCount
+    });
+    if (!row) return;
+
+    // Mark the row for live AL pricing; carry the pricing item type (garment/cap/fullback)
+    row.dataset.alPriced = 'true';
+    row.dataset.alItemType = priceItemType;
+
+    // Focus the qty input so the rep can set the count immediately
+    const qtyInput = row.querySelector('.service-qty');
+    if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+
+    markAsUnsaved();
+    recalculatePricing();   // → syncALRows() prices the new row
+    showToast('Additional Logo added — set the quantity', 'success');
 }
 
 /**
@@ -5507,6 +5581,63 @@ const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
  * Saves + pushes as a normal RUSH service line item (qty 1 → Size01 on import).
  * (2026-06-03)
  */
+/**
+ * Additional Logo (AL) live pricing — bar-driven line items.
+ * Each AL row (data-al-priced) carries a stitch count + item type (garment/cap/fullback).
+ * Price is pulled LIVE from the API via EmbroideryPricingService.calculateALPrice (tier-aware
+ * + per-1K stitch upcharge), cached once per session. syncALRows() recomputes every AL row at
+ * the END of each recalc pass — BEFORE syncRushRow() so the rush base includes the AL totals —
+ * adjusting #grand-total the same self-referential way syncRushRow does. NEVER falls back to a
+ * guessed price: if the API is unreachable, it shows a visible error and leaves the row at $0
+ * (Erik's #1 rule — wrong pricing is worse than an error). (2026-06-03)
+ */
+async function loadALPricing() {
+    if (window._alPricingCache) return window._alPricingCache;
+    if (!window.EmbroideryPricingService) { console.error('[AL] EmbroideryPricingService unavailable'); return null; }
+    try {
+        window._alPricingSvc = window._alPricingSvc || new window.EmbroideryPricingService();
+        window._alPricingCache = await window._alPricingSvc.fetchALPricing();
+        return window._alPricingCache;
+    } catch (e) {
+        console.error('[AL] fetchALPricing failed', e);
+        showToast("Couldn't load Additional Logo pricing from the server — refresh and try again.", 'error');
+        return null;
+    }
+}
+
+async function syncALRows() {
+    const alRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-al-priced="true"]');
+    if (!alRows.length) return;
+    const cache = await loadALPricing();
+    if (!cache) return;                              // error already surfaced; don't guess a price
+    const svc = window._alPricingSvc;
+    const grandEl = document.getElementById('grand-total');
+    let grand = parseFloat((grandEl?.textContent || '$0').replace(/[$,]/g, '')) || 0;
+    for (const row of alRows) {
+        const rid = row.dataset.rowId;
+        const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
+        const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
+        const itemType = row.dataset.alItemType || 'garment';
+        const totalCell = document.getElementById(`row-total-${rid}`);
+        const priceCell = document.getElementById(`row-price-${rid}`);
+        const oldTotal = parseFloat((totalCell?.textContent || '$0').replace(/[$,]/g, '')) || 0;
+        let unit = 0;
+        try {
+            const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
+            unit = res.unitPrice || 0;
+        } catch (e) {
+            console.error('[AL] calculateALPrice failed', e);
+        }
+        const newTotal = +(unit * qty).toFixed(2);
+        row.dataset.unitPrice = String(unit);
+        if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
+        if (totalCell) totalCell.textContent = '$' + newTotal.toFixed(2);
+        grand = grand - oldTotal + newTotal;         // self-referential adjust (like syncRushRow)
+    }
+    if (grandEl) grandEl.textContent = '$' + grand.toFixed(2);
+}
+window.syncALRows = syncALRows;
+
 const RUSH_FEE_PCT = 0.25;
 function syncRushRow() {
     const rushRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-service-type="rush"]');
@@ -6330,6 +6461,9 @@ function updatePricingDisplay(pricing) {
         if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
     }
 
+    // Additional Logo line items — pull live per-piece price from the API (before Rush,
+    // so Rush's 25% base includes them). Awaited: calculateALPrice is async (cached).
+    await syncALRows();
     // Rush Fee = 25% of the merchandise subtotal — recompute its line item before tax
     syncRushRow();
     // Update tax calculation at the end of pricing display

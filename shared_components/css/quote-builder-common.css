@@ -3580,3 +3580,11 @@ button.service-cat-item:hover { background: #eef2ff; }
 .sci-amt { width: 72px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 12px; text-align: right; }
 .sci-add { padding: 4px 12px; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .sci-add:hover { background: #15803d; }
+/* Picker (fields) item — e.g. Additional Logo: Garment/Cap + stitch size */
+.service-cat-menu:has(.sci-config) { min-width: 290px; }
+.sci-config { flex-direction: column; align-items: stretch; gap: 7px; cursor: default; }
+.sci-config .sci-name { font-weight: 600; }
+.sci-config-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.sci-field-lbl { font-size: 11px; color: #64748b; display: inline-flex; align-items: center; gap: 4px; }
+.sci-field { padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 12px; background: #fff; cursor: pointer; max-width: 160px; }
+.sci-config .sci-add { margin-left: auto; }
