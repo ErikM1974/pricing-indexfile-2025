@@ -5,6 +5,36 @@
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
 const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+/**
+ * Service-fee prices = the Caspio **Service_Codes** table (single source of truth),
+ * via the proxy `GET /api/service-codes`. Fetched once at startup, cached on
+ * window._serviceCodes. `getServicePrice(code, fallback)` returns the live SellPrice,
+ * or the documented fallback WITH a visible warning if the API was unreachable —
+ * never a silent wrong price (Erik's #1 rule). (2026-06-03)
+ */
+async function loadServiceCodePrices() {
+    try {
+        const resp = await fetch(`${API_BASE}/api/service-codes`);
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const json = await resp.json();
+        const map = {};
+        (json.data || []).forEach(sc => { if (sc.ServiceCode) map[String(sc.ServiceCode).toUpperCase()] = sc; });
+        window._serviceCodes = map;
+        return map;
+    } catch (e) {
+        console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
+        if (typeof showToast === 'function') showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
+        return null;
+    }
+}
+function getServicePrice(code, fallback) {
+    const sc = window._serviceCodes && window._serviceCodes[String(code).toUpperCase()];
+    if (!sc) return fallback;
+    const sell = parseFloat(sc.SellPrice);
+    return isNaN(sell) ? fallback : sell;
+}
+window.getServicePrice = getServicePrice;
+
 // API response caches (prevent 429 rate limit errors)
 const sizeDetectionCache = new Map();   // key: "style-color" → size detection result
 const productColorsCache = new Map();   // key: "style" → colors array
@@ -1427,19 +1457,26 @@ document.addEventListener('DOMContentLoaded', async function() {
         // test order 142021). Codes are registered in the proxy KNOWN_FEE_PNS so
         // they push as LinesOE line items. Not here (auto from the top config): AL,
         // AL-CAP, DECG-FB (Full Back), 3D-EMB, Laser Patch, LTM, DD (Digitizing).
-        const EMB_SERVICE_CATALOG = [
-            { group: 'Artwork', icon: 'fa-palette', items: [
-                { code: 'GRT-50', label: 'Logo Mockup & Review', price: 50, unit: 'flat', icon: 'fa-palette' },
-                { code: 'GRT-75', label: 'Graphic Design',       price: 75, unit: 'hr',   icon: 'fa-pencil-ruler' },
-                { code: 'DD',     label: 'Digitizing',           price: 100, unit: 'flat', icon: 'fa-cog' }
-            ]},
-            { group: 'Add-Ons', icon: 'fa-stamp', items: [
-                { code: 'Monogram', label: 'Monogram', price: 12.50, unit: 'ea', icon: 'fa-font' },
-                { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
-            ]}
-        ];
-        window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
-            (code, opts) => addManualServiceRow(code, opts && opts.price));
+        // Prices pulled from Caspio Service_Codes via /api/service-codes (single source
+        // of truth). Non-blocking: render once prices load (or fall back to defaults +
+        // a visible warning if the API is unreachable). Change a price in Caspio → the
+        // bar reflects it on next load, no deploy needed.
+        loadServiceCodePrices().finally(() => {
+            const sp = (code, fb) => getServicePrice(code, fb);
+            const EMB_SERVICE_CATALOG = [
+                { group: 'Artwork', icon: 'fa-palette', items: [
+                    { code: 'GRT-50', label: 'Logo Mockup & Review', price: sp('GRT-50', 50),  unit: 'flat', icon: 'fa-palette' },
+                    { code: 'GRT-75', label: 'Graphic Design',       price: sp('GRT-75', 75),  unit: 'hr',   icon: 'fa-pencil-ruler' },
+                    { code: 'DD',     label: 'Digitizing',           price: sp('DD', 100),     unit: 'flat', icon: 'fa-cog' }
+                ]},
+                { group: 'Add-Ons', icon: 'fa-stamp', items: [
+                    { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
+                    { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+                ]}
+            ];
+            window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
+                (code, opts) => addManualServiceRow(code, opts && opts.price));
+        });
     }
 
     // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
@@ -3068,16 +3105,16 @@ function addManualServiceRow(serviceType, priceOverride) {
 
     // Default prices per service type
     const SERVICE_DEFAULTS = {
-        'Monogram': { unitPrice: 12.50, quantity: 1 },
+        'Monogram': { unitPrice: getServicePrice('Monogram', 12.50), quantity: 1 },
         'Name/Number': { unitPrice: 15.00, quantity: 1 },
         'WEIGHT': { unitPrice: 6.25, quantity: 1 },
         'SEG': { unitPrice: 10.00, quantity: 1 },
         'DT': { unitPrice: 50.00, quantity: 1 },
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
         'CTR-CAP': { unitPrice: 0, quantity: 1 },
-        'GRT-50': { unitPrice: 50, quantity: 1 },
-        'GRT-75': { unitPrice: 75, quantity: 1 },
-        'DD': { unitPrice: 100, quantity: 1 },
+        'GRT-50': { unitPrice: getServicePrice('GRT-50', 50), quantity: 1 },
+        'GRT-75': { unitPrice: getServicePrice('GRT-75', 75), quantity: 1 },
+        'DD': { unitPrice: getServicePrice('DD', 100), quantity: 1 },
         'RUSH': { unitPrice: 0, quantity: 1 }
     };
 

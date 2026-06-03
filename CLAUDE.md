@@ -87,6 +87,24 @@ try {
 
 ## Critical Patterns
 
+### 💵 Pricing = API, never hardcoded (Erik's rule, 2026-06-03) — ALL quote builders
+
+**Every price, fee, charge, upcharge, percentage, and config value in EVERY quote builder
+(EMB/SCP/DTF/DTG + Order Form) MUST come from the backend API — never a hardcoded number in
+the front end.** Caspio is the single source of truth so Erik changes a price in Caspio and
+every builder reflects it with **no deploy**.
+
+- **Service fees / setup / digitizing / monogram / rush %, etc.** → Caspio **`Service_Codes`**
+  table via proxy **`GET /api/service-codes`** (`src/routes/service-codes.js`; supports
+  `?code=`, `/tier/:code/:qty`, full CRUD). Frontend pattern: `loadServiceCodePrices()` +
+  `getServicePrice(code, fallback)` (see `embroidery-quote-builder.js`).
+- **Decoration / garment / cap / AL / full-back pricing** → `/api/pricing-bundle` +
+  `{method}-pricing-service.js` (`calculateALPrice`, etc.).
+- A hardcoded number is allowed ONLY as a **fallback** when the API is unreachable, and it
+  MUST surface a **visible warning** (Erik's #1 rule: never a silent wrong price).
+- When you add ANY new charge to a builder, wire it to the API FIRST. Audit target: Rush 25%,
+  LTM, 3D-puff/laser upcharges, and all SCP/DTF/DTG fees are still being migrated to this.
+
 ### Two Color-Field System (inventory-critical)
 
 | Field | Use for | Example |
