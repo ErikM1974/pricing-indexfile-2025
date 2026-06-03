@@ -3182,7 +3182,7 @@ function addManualServiceRow(serviceType, priceOverride) {
  * recalc, so the price tracks the quantity the rep types into the line. Multiples are
  * independent (each row carries its own stitch count + item type).
  */
-function addALLineItem(itemType, sizeBucket) {
+async function addALLineItem(itemType, sizeBucket) {
     // Map the size bucket → a representative stitch count PER item type. "Standard" = each
     // type's base-stitch (no upcharge): garment 8000, cap 5000. Mid/Large add stitches above
     // base; the API (calculateALPrice) applies the per-1K upcharge. Full Back is its own path.
@@ -3223,7 +3223,8 @@ function addALLineItem(itemType, sizeBucket) {
     if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
 
     markAsUnsaved();
-    recalculatePricing();   // → syncALRows() prices the new row
+    await syncALRows();     // pull the live per-piece price from the API (cached) for this row
+    recalculatePricing();   // sum it into the totals
     showToast('Additional Logo added — set the quantity', 'success');
 }
 
@@ -3233,6 +3234,14 @@ function addALLineItem(itemType, sizeBucket) {
 function onServiceQtyChange(rowId) {
     const row = document.getElementById(`row-${rowId}`);
     if (!row || row.dataset.productType !== 'service') return;
+
+    // Additional Logo: per-piece price is tier-based (changes with this row's quantity),
+    // so re-price from the API first, then recalc. syncALRows updates this row's cells.
+    if (row.dataset.alPriced === 'true') {
+        syncALRows().then(() => recalculatePricing());
+        markAsUnsaved();
+        return;
+    }
 
     const qtyInput = row.querySelector('.service-qty');
     const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → Graphic Design hours can be fractional (e.g. 0.75)
@@ -5611,16 +5620,11 @@ async function syncALRows() {
     const cache = await loadALPricing();
     if (!cache) return;                              // error already surfaced; don't guess a price
     const svc = window._alPricingSvc;
-    const grandEl = document.getElementById('grand-total');
-    let grand = parseFloat((grandEl?.textContent || '$0').replace(/[$,]/g, '')) || 0;
     for (const row of alRows) {
         const rid = row.dataset.rowId;
         const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
         const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
         const itemType = row.dataset.alItemType || 'garment';
-        const totalCell = document.getElementById(`row-total-${rid}`);
-        const priceCell = document.getElementById(`row-price-${rid}`);
-        const oldTotal = parseFloat((totalCell?.textContent || '$0').replace(/[$,]/g, '')) || 0;
         let unit = 0;
         try {
             const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
@@ -5628,13 +5632,13 @@ async function syncALRows() {
         } catch (e) {
             console.error('[AL] calculateALPrice failed', e);
         }
-        const newTotal = +(unit * qty).toFixed(2);
+        // Store the live price on the row; the next recalc sums it like any service row.
         row.dataset.unitPrice = String(unit);
+        const priceCell = document.getElementById(`row-price-${rid}`);
+        const totalCell = document.getElementById(`row-total-${rid}`);
         if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
-        if (totalCell) totalCell.textContent = '$' + newTotal.toFixed(2);
-        grand = grand - oldTotal + newTotal;         // self-referential adjust (like syncRushRow)
+        if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
     }
-    if (grandEl) grandEl.textContent = '$' + grand.toFixed(2);
 }
 window.syncALRows = syncALRows;
 
@@ -6461,9 +6465,8 @@ function updatePricingDisplay(pricing) {
         if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
     }
 
-    // Additional Logo line items — pull live per-piece price from the API (before Rush,
-    // so Rush's 25% base includes them). Awaited: calculateALPrice is async (cached).
-    await syncALRows();
+    // (Additional Logo rows are re-priced from the API on add / qty-change — their
+    // dataset.unitPrice is already current here, so they sum in like any service row.)
     // Rush Fee = 25% of the merchandise subtotal — recompute its line item before tax
     syncRushRow();
     // Update tax calculation at the end of pricing display
