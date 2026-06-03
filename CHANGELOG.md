@@ -1,3 +1,13 @@
+## v2026.06.03.1 (2026.06.03)
+
+- EMB builder: linear order-flow sidebar redesign (pickup-first, invoice-style totals)
+- EMB invoice: move totals (Subtotal/Shipping/Sales Tax/Total) under the line items
+- EMB invoice: edit shipping from the totals line via a popup; fix cut-off tax %
+- EMB invoice: show carrier name (not $0.00) on the Shipping line when no charge
+- Invoice: add billing address to BILL TO + a SHIP TO block when shipping
+- docs(lessons): log WA DOR tax-rate ResultCode-2 wrong-tax bug; archive oldest dashboard entry
+- Deploy v2026.06.03.1: 8 files (ACTIVE_FILES.md,dtf-quote-builder.html,dtg-quote-builder-legacy.html,...)
+
 ## v2026.06.02.4 (2026.06.02)
 
 - chore: expand Claude Code permissions for deploy workflow
