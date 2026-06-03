@@ -3522,3 +3522,61 @@ input[type="radio"] {
     border-radius: 6px;
     padding: 1px 6px;
 }
+
+/* Categorized Services bar (v2, 2026-06-03) — category buttons → dropdowns */
+.service-cat { position: relative; }
+.service-cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 12px;
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.service-cat-btn:hover { border-color: #6366f1; background: #eef2ff; color: #3730a3; box-shadow: 0 1px 4px rgba(99,102,241,0.18); }
+.service-cat-btn > i:first-child { color: #6366f1; }
+.service-cat-caret { font-size: 11px; opacity: 0.7; }
+.service-cat-menu {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 0;
+    z-index: 200;
+    min-width: 250px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    padding: 5px;
+}
+.service-cat-menu[hidden] { display: none; }
+.service-cat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 12px;
+    padding: 8px 10px;
+    border: none;
+    background: none;
+    border-radius: 7px;
+    font-size: 13px;
+    color: #334155;
+    text-align: left;
+    cursor: pointer;
+}
+button.service-cat-item:hover { background: #eef2ff; }
+.service-cat-item .sci-name { display: inline-flex; align-items: center; gap: 8px; }
+.service-cat-item .sci-name i { color: #6366f1; width: 15px; text-align: center; }
+.sci-hint { font-size: 11px; color: #16a34a; background: #f0fdf4; border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+.sci-prompt { cursor: default; }
+.sci-amt-wrap { display: inline-flex; align-items: center; gap: 4px; color: #64748b; }
+.sci-amt { width: 72px; padding: 4px 6px; border: 1px solid #cbd5e1; border-radius: 5px; font-size: 12px; text-align: right; }
+.sci-add { padding: 4px 12px; background: #16a34a; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.sci-add:hover { background: #15803d; }

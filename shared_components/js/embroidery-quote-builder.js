@@ -1424,14 +1424,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
     if (window.QuoteServicesBar) {
         const EMB_SERVICE_CATALOG = [
-            { code: 'Logo Mockup',    label: 'Logo Mockup & Review', price: 0,     unit: 'flat', icon: 'fa-palette' },
-            { code: 'Graphic Design', label: 'Graphic Design',       price: 75,    unit: 'hr',   icon: 'fa-pencil-ruler' },
-            { code: 'Monogram',       label: 'Monogram / Name',      price: 12.50, unit: 'ea',   icon: 'fa-font' },
-            { code: 'Name/Number',    label: 'Name / Number',        price: 15.00, unit: 'ea',   icon: 'fa-id-badge' },
-            { code: 'SEG',            label: 'Sewing',               price: 10.00, unit: 'ea',   icon: 'fa-scissors' },
-            { code: 'DT',             label: 'Design Transfer',      price: 50.00, unit: 'flat', icon: 'fa-exchange-alt' }
+            { group: 'Artwork', icon: 'fa-palette', items: [
+                { code: 'Logo Mockup',    label: 'Logo Mockup & Review', prompt: true, icon: 'fa-palette' },
+                { code: 'Graphic Design', label: 'Graphic Design',       price: 75, unit: 'hr', icon: 'fa-pencil-ruler' }
+            ]},
+            { group: 'Add-Ons', icon: 'fa-stamp', items: [
+                { code: 'Monogram',    label: 'Monogram / Name', price: 12.50, unit: 'ea', icon: 'fa-font' },
+                { code: 'Name/Number', label: 'Name / Number',   price: 15.00, unit: 'ea', icon: 'fa-id-badge' },
+                { code: 'SEG',         label: 'Sewing',          price: 10.00, unit: 'ea', icon: 'fa-scissors' },
+                { code: 'DT',          label: 'Design Transfer', price: 50.00,             icon: 'fa-exchange-alt' }
+            ]},
+            { group: 'Charges', icon: 'fa-plus-circle', items: [
+                { code: 'Rush', label: 'Rush Fee', prompt: true, icon: 'fa-bolt' }
+            ]}
         ];
-        window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG, addManualServiceRow);
+        window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
+            (code, opts) => addManualServiceRow(code, opts && opts.price));
     }
 
     // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
@@ -2937,7 +2945,8 @@ function createServiceProductRow(serviceType, data) {
         '3D-EMB': { description: '3D Puff Embroidery', icon: 'fa-cube', isCap: true },
         'Laser Patch': { description: 'Laser Leatherette Patch', icon: 'fa-certificate', isCap: true },
         'Logo Mockup': { description: 'Logo Mockup & Review', icon: 'fa-palette', isCap: false },
-        'Graphic Design': { description: 'Graphic Design ($75/hr)', icon: 'fa-pencil-ruler', isCap: false }
+        'Graphic Design': { description: 'Graphic Design ($75/hr)', icon: 'fa-pencil-ruler', isCap: false },
+        'Rush': { description: 'Rush Fee', icon: 'fa-bolt', isCap: false }
     };
 
     const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
@@ -2953,7 +2962,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'Logo Mockup' && serviceType !== 'Graphic Design') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'Logo Mockup' && serviceType !== 'Graphic Design' && serviceType !== 'Rush') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3045,7 +3054,7 @@ function toggleServiceDropdown() {
  * Add a manual service row (Monogram, Name/Number, WEIGHT)
  * Called from the "Add Service" dropdown
  */
-function addManualServiceRow(serviceType) {
+function addManualServiceRow(serviceType, priceOverride) {
     // Close dropdown
     const menu = document.getElementById('service-dropdown-menu');
     if (menu) menu.style.display = 'none';
@@ -3060,15 +3069,18 @@ function addManualServiceRow(serviceType) {
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
         'CTR-CAP': { unitPrice: 0, quantity: 1 },
         'Logo Mockup': { unitPrice: 0, quantity: 1 },
-        'Graphic Design': { unitPrice: 75, quantity: 1 }
+        'Graphic Design': { unitPrice: 75, quantity: 1 },
+        'Rush': { unitPrice: 0, quantity: 1 }
     };
 
     const defaults = SERVICE_DEFAULTS[serviceType] || { unitPrice: 0, quantity: 1 };
+    // Amount entered in the Services bar for variable-price items (Logo Mockup, Rush)
+    const unitPrice = (priceOverride != null && !isNaN(priceOverride)) ? Number(priceOverride) : defaults.unitPrice;
 
     const row = createServiceProductRow(serviceType, {
         quantity: defaults.quantity,
-        unitPrice: defaults.unitPrice,
-        total: defaults.quantity * defaults.unitPrice,
+        unitPrice: unitPrice,
+        total: defaults.quantity * unitPrice,
         isCap: false
     });
 
