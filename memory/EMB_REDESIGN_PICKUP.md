@@ -15,8 +15,16 @@
   (Artwork / Add-Ons), `GRT-50` Logo Mockup ($50), `GRT-75` Graphic Design ($75/hr, fractional
   hrs), `Monogram` ($12.50), `RUSH` (live 25%-of-subtotal line). Parts/descriptions match Erik's
   ShopWorks test order 142021; all in proxy `KNOWN_FEE_PNS` → push as LinesOE (qty → Size01).
-- **On develop, committed, NOT yet deployed:** Digitizing moved to the bar (Artwork ▾ → `DD` $100
-  line, multiples) + top Digitizing checkboxes hidden (commit 425353ff).
+- **On develop, committed, NOT yet deployed:** (1) Digitizing moved to the bar (Artwork ▾ → `DD` $100
+  line, multiples) + top Digitizing checkboxes hidden (commit 425353ff). (2) **Bar fee prices now
+  SOURCED from Caspio `Service_Codes`** via proxy `GET /api/service-codes` (commit 516a5d77) —
+  `loadServiceCodePrices()`+`getServicePrice(code,fallback)` in embroidery-quote-builder.js; catalog +
+  SERVICE_DEFAULTS read live SellPrice (GRT-50/GRT-75/DD/Monogram), hardcoded #s are fallback-only
+  (visible toast on API fail, never silent-wrong). Change a price in Caspio → bar updates, no deploy.
+  Backend route already existed: `caspio-pricing-proxy/src/routes/service-codes.js` (GET all/filter,
+  `/tier/:code/:qty`, full CRUD, /seed). **AL pricing source = pricing-bundle `calculateALPrice` (NOT
+  Service_Codes — its AL row is a sell-0 placeholder).** ShopWorks descriptions kept on the line item
+  (Caspio DisplayName differs, e.g. GRT-50 "Setup Fee (Standard)" vs SW "Logo Mockup & Print Review").
 - **Flagship strategy locked** (Erik's call): EMB is flagship; structure=shared, content=per-method;
   adopt-don't-copy; DTG stays separate. See quote-builder-architecture.md "Flagship model".
 - **NEXT — Additional Logo onto the bar (the big one):** Artwork ▾ → "Additional Logo" → mini-picker
