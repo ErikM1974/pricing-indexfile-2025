@@ -1,3 +1,9 @@
+## v2026.06.04.4 (2026.06.04)
+
+- feat(emb): 'Estimate UPS Ground' shipping button (prepay estimate)
+- fix(emb): shipping estimate boxes per-product (4 jackets = 1 box, not 2)
+- Deploy v2026.06.04.4: shipping estimator + EMB audit fixes
+
 ## v2026.06.04.3 (2026.06.04)
 
 - fix(emb): edge-case hardening from adversarial audit (4 real bugs)
