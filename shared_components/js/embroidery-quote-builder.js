@@ -1086,6 +1086,24 @@ function populateLogoConfig(session, items) {
         capPrimaryLogo.needsDigitizing = true;
     }
 
+    // Cap embellishment type (flat embroidery / 3D puff / laser patch). RESTORING THIS IS
+    // REQUIRED — it drives the fee engine's puff/patch upcharge recompute AND the cap-card UI.
+    // Without it, a saved 3D-puff / laser-patch cap reloads as flat embroidery: the type is
+    // lost AND a Save Revision DROPS the upcharge fee item (the save is gated on this type).
+    // Set the dropdown + run the change handler (it must come AFTER the cap stitch/digitizing
+    // restore above, which it reads). The matching 3D-EMB / Laser Patch fee items are then
+    // skipped in populateProducts so the recomputed fee isn't double-counted. (cert audit 2026-06-04)
+    if (session.CapEmbellishmentType && session.CapEmbellishmentType !== 'embroidery') {
+        const capEmbSel = document.getElementById('cap-embellishment-type');
+        if (capEmbSel) {
+            capEmbSel.value = session.CapEmbellishmentType;
+            capPrimaryLogo.embellishmentType = session.CapEmbellishmentType;
+            if (typeof handleCapEmbellishmentChange === 'function') {
+                try { handleCapEmbellishmentChange(); } catch (_) {}
+            }
+        }
+    }
+
     // Design number assignments (2026-02-19)
     if (session.GarmentDesignNumber) {
         primaryLogo.designNumber = session.GarmentDesignNumber;
@@ -1185,16 +1203,18 @@ async function populateProducts(items) {
         await addProductFromQuote(product);
     }
 
-    // Primary-logo stitch surcharges (AS-Garm/AS-CAP) are AUTO-recomputed by the fee table
-    // from the restored primary logo's stitch count — they are NOT standalone rows on a fresh
-    // order. Restoring them ALSO as service rows DOUBLE-COUNTS them on edit-reload (saved $132
-    // row + recomputed fee). The fee engine re-derives them from the logo, so skip the
-    // standalone restore. (cert audit 2026-06-04)
-    const AUTO_RECOMPUTED_PRIMARY_FEES = ['AS-Garm', 'AS-CAP', 'AS-GARM'];
+    // Fees the price engine AUTO-recomputes from restored logo/cap config — they are NOT
+    // standalone rows on a fresh order, so restoring them ALSO as service rows DOUBLE-COUNTS
+    // them on edit-reload (e.g. saved AS-Garm $132 row + recomputed $132 fee). Skip the
+    // standalone restore; the fee table re-derives each from the restored config:
+    //   • AS-Garm / AS-CAP  -> primary garment/cap logo stitch overage
+    //   • 3D-EMB / Laser Patch -> cap embellishment type (restored in populateLogoConfig above)
+    // (cert audit 2026-06-04)
+    const AUTO_RECOMPUTED_FEES = ['AS-Garm', 'AS-CAP', 'AS-GARM', '3D-EMB', 'Laser Patch'];
 
     // Add service items as service product rows (2026-02 refactor)
     for (const serviceItem of serviceItems) {
-        if (AUTO_RECOMPUTED_PRIMARY_FEES.includes(serviceItem.StyleNumber)) continue;
+        if (AUTO_RECOMPUTED_FEES.includes(serviceItem.StyleNumber)) continue;
         const serviceType = serviceItem.StyleNumber;
         const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP' || serviceType === 'AL-CAP' || serviceType === '3D-EMB' || serviceType === 'Laser Patch';
 
