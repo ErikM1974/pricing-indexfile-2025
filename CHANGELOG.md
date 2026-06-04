@@ -1,3 +1,13 @@
+## v2026.06.04.1 (2026.06.04)
+
+- feat(emb): Additional Logo as a bar line item, live-priced from the API
+- feat(emb): retire the top Additional Logo toggle (AL now on the Services bar)
+- fix(emb): AL re-prices on add/qty-change (not in sync updatePricingDisplay)
+- docs(memory): AL build done+verified; lesson on await-in-sync-fn (EMB recalc/display split)
+- feat(emb): move Design # lookup into the logo cards; drop the Artwork sidebar step
+- docs(memory): Design # lookup moved into logo cards — done+verified
+- Deploy v2026.06.04.1: 4 files (dtf-quote-builder.html,dtg-quote-builder-legacy.html,embroidery-quote-builder.html,...)
+
 ## v2026.06.03.4 (2026.06.03)
 
 - EMB: source Services-bar fee prices from Caspio Service_Codes (/api/service-codes)
