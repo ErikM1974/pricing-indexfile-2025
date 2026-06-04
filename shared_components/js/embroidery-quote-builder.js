@@ -7025,7 +7025,13 @@ async function saveAndGetLink() {
 
     const allItems = collectProductsFromTable();
     const products = allItems.filter(p => !p.isService);
-    const manualServiceItems = allItems.filter(p => p.isService);
+    // DECG/DECC (customer-supplied garment/cap) rows are persisted by the decgItems loop below
+    // as EmbellishmentType 'customer-supplied'. They MUST be excluded here, else the
+    // manualServiceItems save loop ALSO writes them as a 'fee' item → the DB gets TWO DECG
+    // rows ($480 for a $240 order) and /invoice + ShopWorks push over-charge 2x, while the
+    // on-screen total (which reads the table once) still shows the correct amount so the rep
+    // never notices. (cert audit 2026-06-04)
+    const manualServiceItems = allItems.filter(p => p.isService && !['decg', 'decc'].includes((p.serviceType || '').toLowerCase()));
     const decgItems = collectDECGItems();
     if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length === 0) {
         showToast('Add products before saving', 'error');
