@@ -910,6 +910,31 @@ async function loadQuoteForEditing(quoteId) {
         // Populate additional charges
         populateAdditionalCharges(session);
 
+        // Restore Services-bar fees (GRT-50 / GRT-75 / DD / RUSH) that were added as standalone
+        // LINE ITEMS. They save as 'fee' quote_items but are NOT in SERVICE_STYLE_NUMBERS, so
+        // populateProducts drops them → silent UNDER-CHARGE on reload (and Save Revision then
+        // permanently deletes them). Restore ONLY the BAR-origin ones: the SIDEBAR inputs
+        // (art-charge→GRT-50, graphic-design-hours→GRT-75, digitizing checkbox→DD, rush-fee→RUSH)
+        // recompute from their saved SESSION field, so a non-zero session field means
+        // "sidebar origin — already handled, don't add a duplicate row". RUSH self-prices (25% of
+        // subtotal in syncRushRow); the others take their saved unit price. (cert audit 2026-06-04)
+        (function restoreBarFees() {
+            if (typeof addManualServiceRow !== 'function') return;
+            const sidebarField = {
+                'GRT-50': parseFloat(session.ArtCharge) || 0,
+                'GRT-75': parseFloat(session.GraphicDesignHours) || 0,
+                'DD': (parseFloat(session.DigitizingFee) || 0) + (parseFloat(session.CapDigitizingFee) || 0),
+                'RUSH': parseFloat(session.RushFee) || 0
+            };
+            (items || []).forEach(it => {
+                if (it.EmbellishmentType !== 'fee') return;
+                const sn = it.StyleNumber;
+                if (!(sn in sidebarField)) return;        // not a bar-fee code
+                if (sidebarField[sn] > 0) return;         // sidebar origin → recomputed elsewhere
+                addManualServiceRow(sn, sn === 'RUSH' ? undefined : (it.BaseUnitPrice || it.FinalUnitPrice || 0));
+            });
+        })();
+
         // Restore tax rate and shipping from fee items
         const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
         if (taxFeeItem) {
