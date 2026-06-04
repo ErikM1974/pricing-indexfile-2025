@@ -6,12 +6,13 @@
 > tell Erik **with 100% confidence the app is bullet-proof** — every surface correct for any order.
 > **Read this first, then [EMB_REDESIGN_PICKUP.md](EMB_REDESIGN_PICKUP.md) for the redesign history.**
 
-## 🟢 CERT RUN — 2026-06-04 EVENING (4 NEW BUGS FIXED · on `develop` · NOT yet deployed)
-Ran the certification matrix (archetypes × surfaces). Found + fixed **4 real bugs**, all in the
-**edit-reload / save-restore** path, each verified END-TO-END (reload → Save Revision → re-fetch
-`quote_items` reconciles to the original subtotal) + regression-checked + **970/970 unit tests green**.
-On **`develop`** (commits `e6edad76`, `57c861e5`, `6bd130c6`, `d0b67597`); frontend asset `?v=` bumped
-to `.9` — **NOT deployed; prod still `.6`.** Deploy is a clean one-shot (frontend only, no proxy change).
+## 🟢 CERT RUN — 2026-06-04 EVENING (6 NEW BUGS FIXED · on `develop` · NOT yet deployed)
+Ran the certification matrix (archetypes × surfaces) + a parallel save↔restore code audit (subagent).
+Found + fixed **6 real bugs**, all in the **edit-reload / save-restore** path, each verified END-TO-END
+(reload → Save Revision → re-fetch `quote_items` reconciles) + regression-checked + **970/970 unit tests
+green**. On **`develop`** (commits `e6edad76`, `57c861e5`, `6bd130c6`, `d0b67597`, `db32318c`, `467702fc`
++ memory); frontend asset `?v=` bumped to `.11` — **NOT deployed; prod still `.6`.** Frontend-only, no
+proxy change. Bugs #5–6 are the highest-impact (one over-charges /invoice + push, not just reload):
 1. **2XL extended-size line DROPPED on edit-reload** (under-charge $88): `addProductFromQuote` put 2XL in a
    child row, then the end-of-fn `onSizeChange` read the empty PARENT 2XL input as qty 0 and DELETED the
    child (the 2XL double-count guard backfiring on programmatic restore; 3XL/4XL unaffected). Fix: set the
@@ -26,14 +27,30 @@ to `.9` — **NOT deployed; prod still `.6`.** Deploy is a clean one-shot (front
    PrintLocation/StitchCount/DigitizingFee + LogoSpecs.logos saved the default Left Chest/8000 with no
    garment. Fix: gate all on `garmentQuantity>0` (both save paths) + filter the phantom primary out of
    LogoSpecs.logos. (EMB-2026-278 Art + Production notes now cap-only)
+5. **Services-bar fees (GRT-50/GRT-75/DD/RUSH) LOST on reload** (under-charge): added via the bar they save
+   as `fee` items but aren't in `SERVICE_STYLE_NUMBERS` → dropped on reload, then Save Revision deletes them
+   permanently. RUSH (common 25% rush) verified: EMB-2026-284 reloaded $875→$730 (−$145). Fix: restore
+   bar-origin fee items via `addManualServiceRow` in loadQuoteForEditing, gated on the matching SIDEBAR
+   session field being 0 (art-charge→GRT-50, gd-hours→GRT-75, digitizing-checkbox→DD, rush-fee→RUSH recompute
+   from those fields — non-zero ⇒ sidebar origin, don't add a duplicate row).
+6. **DECG/DECC double-SAVE** (2× over-charge on /invoice + push, NOT just reload): a customer-supplied
+   garment/cap row is collected by BOTH collectProductsFromTable (→manualServiceItems→saved as `fee`) AND
+   collectDECGItems (→saved as `customer-supplied`). DB held 2 DECG ($480) for a $240 order; on-screen total
+   read the table once ($240) so the rep never saw it. EMB-2026-286 reproduced. Fix: exclude DECG/DECC from
+   `manualServiceItems` in saveAndGetLink. EMB-2026-287 verified: 1 item, /invoice $240, push 1 LinesOE.
 **Archetypes certified** (pricing foots · save→reload round-trip · push PNs+notes · /invoice): garment +
-extended-sizes + AL + Full-Back + stitch-surcharge (276) · cap + 3D-puff specialty (278) · combined
-garment-72 + cap-24 separate-tiers (280). **Tax engine certified**: out-of-state NY→0% (account 2202),
-WA 98101→10.5% live DOR; /invoice foots at 0% and 10.1%. LESSONS_LEARNED updated (edit-reload restore class).
-**NEXT:** `/deploy` frontend (tag `v2026.06.04.7`, no proxy change) — **Erik to confirm/run** (unattended
-prod pricing deploy held for sign-off). Optional remaining archetypes: tier-72+ volume reconcile, tax-exempt
-(include-tax OFF) round-trip, laser-patch cap, calculator-vs-builder parity (Top-8 #7). **Delete test orders
-271/272/274/275/276/278/279/280** (all cust 3739 / TEST-prefix).
+extended-sizes + AL + Full-Back + stitch-surcharge (276) · cap + 3D-puff (278) · combined garment-72 + cap-24
+separate-tiers (280). **Also round-trip-verified:** AS-CAP cap-stitch surcharge (281, recomputed once not
+lost), laser-patch cap + GRT-50 setup (282), LTM qty≤7 $50 distributed (283), sidebar DD+graphic-design (284),
+Monogram (288). **API-failure = Erik's #1 rule UPHELD**: init fail→warning toast (builder:1732), calculateQuote
+throw→error toast + NO silent $0 (builder:6155), AL fail→error toast+$0 (builder:5693). **Tax engine**:
+out-of-state NY→0%, WA 98101→10.5% live DOR; /invoice foots at 0% and 10.1%. LESSONS_LEARNED updated.
+**NOT yet verified (why not 100%):** fixes are NOT deployed (prod has all 6 bugs); only push PREVIEW tested,
+not live MO→ShopWorks conversion of the new fixes; PDF spot-checked not exhaustive; multi-garment-style only
+via the cap+garment combo. **Discount has NO input controls in the EMB builder** (populateAdditionalCharges
+discount-restore lines reference non-existent `discount-type/amount/preset` = harmless dead code).
+**NEXT:** `/deploy` frontend (tag `v2026.06.04.7`, no proxy change) — **Erik to confirm/run** → then live-push
+ONE order to confirm the MO→SW conversion. **Delete test orders 271–288** (all cust 3739 / TEST-prefix).
 
 ## ✅ RESUME STATUS — 2026-06-04 PM (everything below is now DEPLOYED + LIVE)
 **Frontend prod = v2026.06.04.4; proxy prod = `ab41aa7`.** The "develop NOT deployed" warnings further down are STALE — all of it shipped. What's DONE + LIVE + verified:
