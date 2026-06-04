@@ -40,10 +40,19 @@
   garment Std $9.00@12 (== old toggle + direct API), $7.50@48 (tier-aware), cap Mid $8.50, FB $31.25; 3
   independent rows; grand $837 foots; toggles hidden; globalAL off; no legacy fee row. NEW shared-bar
   capability: `quote-services-bar.js` now supports a `fields` picker item (inline selects + Add) — reusable.
-- **NEXT:** (1) Erik reviews AL live on localhost:3000 (hard-refresh; `?v=2026.06.03.6`) → `/deploy` when happy.
-  (2) Push-verify a live TEST order — AL/GRT/Monogram/RUSH/DD land as LinesOE (qty → Size01); confirm `AL-CAP`
-  + `DECG-FB` are in proxy `KNOWN_FEE_PNS`. (3) Design # into the logo cards. (4) Roll bar + invoice layout to
-  SCP/DTF.
+- **DONE 2026-06-04 — Design # lookup moved INTO the logo cards (verified; develop, NOT deployed):** garment
+  Design # now at the top of the Primary Logo card, cap Design # at the top of the Cap Front Logo card (label
+  "Design #"). Standalone sidebar "Artwork" step (`#design-config-section`) REMOVED; flow renumbered
+  Customer(1) → Shipping(2) → Order Details(3) (hidden Artwork-Services panel left as 4). Inner IDs unchanged
+  (`garment-design-number`/`-info`/`-clear`, cap equiv) so `lookupDesignNumber`/`openDesignSearchModal`/
+  `clearDesignNumber`/thumbnails stay wired by ID — zero JS change. Re-scoped sidebar sizing to
+  `.logo-card-design-row` + separator border (`embroidery-quote-builder-extracted.css?v=2026.06.04.1`). Commit
+  ed7ed481. Note: design inputs are visible only once that product type is in the order (cards show on add) —
+  intended. Verified (Preview): inputs in cards, no dup IDs, section gone, steps 1/2/3, styled, no errors.
+- **NEXT:** (1) Erik reviews AL + Design# live on localhost:3000 (hard-refresh; EMB js `?v=2026.06.03.6`, css
+  `?v=2026.06.04.1`) → `/deploy` when happy (ships BOTH). (2) Push-verify a live TEST order — AL/GRT/Monogram/
+  RUSH/DD land as LinesOE (qty → Size01); confirm `AL-CAP` + `DECG-FB` are in proxy `KNOWN_FEE_PNS`. (3) Roll
+  bar + invoice layout to SCP/DTF.
 
 ## DONE + SHIPPED to production (Release v2026.06.03.1, frontend)
 A `/deploy` ran mid-session, so these EMB changes are LIVE in prod (not just localhost):
