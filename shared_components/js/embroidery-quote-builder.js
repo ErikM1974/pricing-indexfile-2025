@@ -11881,7 +11881,14 @@ async function diagnoseQuote() {
 function buildEmbroideryPricingData(allItems) {
     const productList = allItems.filter(p => !p.isService);
     const serviceItems = allItems.filter(p => p.isService);
-    const quoteId = document.getElementById('quote-id')?.textContent || `EMB-${Date.now()}`;
+    // Use the REAL saved quote ID — edit mode = editingQuoteId; after a save = _pushQuoteId.
+    // The legacy #quote-id element was removed in a refactor, so this ALWAYS fell back to a
+    // Date.now() temp ID: every printed PDF showed a garbage quote # (e.g. EMB-1780608435889)
+    // instead of EMB-2026-276. Only a brand-new, never-saved quote keeps the temp. (2026-06-04 audit)
+    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId)
+        || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId)
+        || document.getElementById('quote-id')?.textContent?.trim()
+        || `EMB-${Date.now()}`;
 
     // Build products array with line items for invoice
     const invoiceProducts = [];
