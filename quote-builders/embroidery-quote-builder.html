@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.05.24.2">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.05.26.1">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.04.1">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
@@ -99,6 +99,28 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
+                            <!-- Design # lookup (moved from the sidebar Artwork step 2026-06-04) -->
+                            <div class="design-lookup-row logo-card-design-row" id="top-garment-design-row">
+                                <label class="design-row-label"><i class="fas fa-hashtag"></i> Design #</label>
+                                <div class="design-number-input-group">
+                                    <input type="text" id="garment-design-number" class="design-number-input"
+                                           placeholder="Design #" maxlength="10"
+                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
+                                        <i class="fas fa-database"></i>
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
+                                <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                    <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            </div>
                             <div class="logo-form-row">
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
@@ -166,6 +188,28 @@
                             <i class="fas fa-chevron-down logo-card-collapse-icon"></i>
                         </div>
                         <div class="logo-card-body">
+                            <!-- Design # lookup (moved from the sidebar Artwork step 2026-06-04) -->
+                            <div class="design-lookup-row logo-card-design-row" id="top-cap-design-row">
+                                <label class="design-row-label"><i class="fas fa-hashtag"></i> Design #</label>
+                                <div class="design-number-input-group">
+                                    <input type="text" id="cap-design-number" class="design-number-input"
+                                           placeholder="Design #" maxlength="10"
+                                           onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
+                                        <i class="fas fa-database"></i>
+                                    </button>
+                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
+                                <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                    <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
+                                </div>
+                            </div>
                             <!-- Embellishment Type Selection -->
                             <div class="logo-form-row cap-embellishment-row">
                                 <div class="logo-form-field">
@@ -618,59 +662,10 @@
                     </div>
                 </div>
 
-                <!-- Design Configuration Section (always visible) -->
-                <div class="design-config-section" id="design-config-section">
-                    <div class="section-header-compact">
-                        <span class="flow-step-num">2</span>
-                        <i class="fas fa-palette"></i> Artwork
-                    </div>
-                    <div class="design-config-body">
-                        <!-- Garment Design -->
-                        <div class="design-lookup-row" id="top-garment-design-row">
-                            <label class="design-row-label"><i class="fas fa-tshirt"></i> Garment</label>
-                            <div class="design-number-input-group">
-                                <input type="text" id="garment-design-number" class="design-number-input"
-                                       placeholder="Design #" maxlength="10"
-                                       onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
-                                <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
-                                    <i class="fas fa-database"></i>
-                                </button>
-                                <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
-                            <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
-                                <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        </div>
-                        <!-- Cap Design -->
-                        <div class="design-lookup-row" id="top-cap-design-row">
-                            <label class="design-row-label"><i class="fas fa-hat-cowboy"></i> Cap</label>
-                            <div class="design-number-input-group">
-                                <input type="text" id="cap-design-number" class="design-number-input"
-                                       placeholder="Design #" maxlength="10"
-                                       onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
-                                <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                                <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
-                                    <i class="fas fa-database"></i>
-                                </button>
-                                <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
-                            <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
-                                <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Artwork step (Design # lookup) REMOVED 2026-06-04 — the garment + cap Design #
+                     lookups now live INSIDE the logo cards above (garment → Primary Logo card,
+                     cap → Cap Front Logo card). Shown only when that product type is in the order. -->
+
 
                 <!-- Pricing Panel -->
                 <div class="pricing-panel">
@@ -740,7 +735,7 @@
                  ============================================================ -->
             <div class="flow-step" id="shipping-step">
                 <div class="flow-step-head">
-                    <span class="flow-step-num">3</span>
+                    <span class="flow-step-num">2</span>
                     <i class="fas fa-truck"></i> Shipping
                 </div>
                 <div class="flow-step-body">
@@ -805,7 +800,7 @@
                  ============================================================ -->
             <div class="flow-step" id="order-details-step">
                 <div class="flow-step-head">
-                    <span class="flow-step-num">4</span>
+                    <span class="flow-step-num">3</span>
                     <i class="fas fa-file-invoice"></i> Order Details
                     <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 6px;">!</span>
                     <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;"></i>
