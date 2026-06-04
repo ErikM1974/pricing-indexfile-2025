@@ -1,3 +1,9 @@
+## v2026.06.04.2 (2026.06.04)
+
+- feat(emb): Additional Logo picker — placement + EXACT stitch count (API-priced)
+- docs(memory): AL picker redesign (placement + exact stitches) + J790 stress-test
+- Deploy v2026.06.04.2: cache-bust AL picker assets
+
 ## v2026.06.04.1 (2026.06.04)
 
 - feat(emb): Additional Logo as a bar line item, live-priced from the API
