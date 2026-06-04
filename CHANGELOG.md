@@ -1,3 +1,9 @@
+## v2026.06.04.5 (2026.06.04)
+
+- docs(memory): audit pickup — surfaces + shipping estimator DEPLOYED; cert remaining
+- feat(emb): data-backed box density for shipping estimate (real SanMar cartons)
+- Deploy v2026.06.04.5: data-backed box density
+
 ## v2026.06.04.4 (2026.06.04)
 
 - feat(emb): 'Estimate UPS Ground' shipping button (prepay estimate)
