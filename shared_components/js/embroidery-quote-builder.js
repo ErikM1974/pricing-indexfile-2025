@@ -1471,15 +1471,28 @@ document.addEventListener('DOMContentLoaded', async function() {
                     // Additional Logo — live-priced per-piece from the API (calculateALPrice,
                     // tier-aware + per-1K stitch upcharge). Pick Garment/Cap + size, then enter qty.
                     { code: 'AL', label: 'Additional Logo', icon: 'fa-clone', addLabel: 'Add Logo', fields: [
-                        { name: 'itemType', label: 'For', options: [
-                            { value: 'garment', label: 'Garment' },
-                            { value: 'cap',     label: 'Cap' }
+                        // Placement drives BOTH where it prints AND the pricing path
+                        // (Full Back → full-back rate, Cap* → cap rate, else garment rate).
+                        { name: 'placement', label: 'Where', options: [
+                            { group: 'Garment', options: [
+                                { value: 'Left Chest',   label: 'Left Chest' },
+                                { value: 'Right Chest',  label: 'Right Chest' },
+                                { value: 'Left Sleeve',  label: 'Left Sleeve' },
+                                { value: 'Right Sleeve', label: 'Right Sleeve' },
+                                { value: 'Back/Nape',    label: 'Back / Nape' },
+                                { value: 'Full Back',    label: 'Full Back' }
+                            ]},
+                            { group: 'Cap', options: [
+                                { value: 'Cap Front', label: 'Cap Front' },
+                                { value: 'Cap Back',  label: 'Cap Back' },
+                                { value: 'Cap Side',  label: 'Cap Side' }
+                            ]}
                         ]},
-                        { name: 'stitch', label: 'Size', options: [
-                            { value: 'standard', label: 'Standard' },
-                            { value: 'mid',      label: 'Mid' },
-                            { value: 'large',    label: 'Large' },
-                            { value: 'fb',       label: 'Full Back' }
+                        // Simple by default (Std/Mid/Large chips) — exact when it matters (type the count).
+                        { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                            { label: 'Std',   value: 8000 },
+                            { label: 'Mid',   value: 13000 },
+                            { label: 'Large', value: 20000 }
                         ]}
                     ]}
                 ]},
@@ -1491,7 +1504,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
                 (code, opts) => {
                     if (code === 'AL' && opts && opts.fields) {
-                        addALLineItem(opts.fields.itemType, opts.fields.stitch);
+                        addALLineItem(opts.fields.placement, opts.fields.stitches);
                     } else {
                         addManualServiceRow(code, opts && opts.price);
                     }
@@ -3175,34 +3188,30 @@ function addManualServiceRow(serviceType, priceOverride) {
 
 /**
  * Add an Additional Logo line item from the Services bar.
- *   itemType  : 'garment' | 'cap' (from the picker)
- *   stitchVal : '8000' | '13000' | '20000' (stitch count) | 'FB' (Full Back)
+ *   placement : 'Left Chest' | 'Right Sleeve' | 'Full Back' | 'Cap Front' | … (drives pricing path + prints on the line)
+ *   stitches  : exact stitch count, e.g. 8000 / 11000 / 55000 (typed or from a Std/Mid/Large chip)
  * The per-piece price is LIVE from the API (EmbroideryPricingService.calculateALPrice —
  * tier-aware + per-1K stitch upcharge). syncALRows() computes/refreshes it on every
  * recalc, so the price tracks the quantity the rep types into the line. Multiples are
- * independent (each row carries its own stitch count + item type).
+ * independent (each row carries its own stitch count + placement/pricing path).
  */
-async function addALLineItem(itemType, sizeBucket) {
-    // Map the size bucket → a representative stitch count PER item type. "Standard" = each
-    // type's base-stitch (no upcharge): garment 8000, cap 5000. Mid/Large add stitches above
-    // base; the API (calculateALPrice) applies the per-1K upcharge. Full Back is its own path.
-    const STITCH_BY_TYPE = {
-        garment: { standard: 8000, mid: 13000, large: 20000 },
-        cap:     { standard: 5000, mid: 8000,  large: 11000 }
-    };
-    let serviceType, priceItemType, stitchCount, isCap;
-    if (sizeBucket === 'fb') {
-        // Full Back is a garment back placement, priced via the API 'fullback' path
-        serviceType = 'DECG-FB';
-        priceItemType = 'fullback';
-        stitchCount = 25000;            // = fullBack.minStitches (API enforces the floor)
-        isCap = false;
+async function addALLineItem(placement, stitches) {
+    // Placement drives the pricing path: Full Back → flat per-1K full-back rate; any Cap
+    // placement → cap AL rate; everything else → garment AL rate. The EXACT stitch count
+    // (typed or preset chip) feeds calculateALPrice, so any value (11K, 55K, …) prices
+    // correctly from the API — no coarse buckets.
+    const CAP_PLACEMENTS = ['Cap Front', 'Cap Back', 'Cap Side'];
+    let serviceType, priceItemType, isCap;
+    if (placement === 'Full Back') {
+        serviceType = 'DECG-FB'; priceItemType = 'fullback'; isCap = false;
+    } else if (CAP_PLACEMENTS.includes(placement)) {
+        serviceType = 'AL-CAP'; priceItemType = 'cap'; isCap = true;
     } else {
-        isCap = (itemType === 'cap');
-        priceItemType = isCap ? 'cap' : 'garment';
-        serviceType = isCap ? 'AL-CAP' : 'AL';
-        const map = STITCH_BY_TYPE[priceItemType] || STITCH_BY_TYPE.garment;
-        stitchCount = map[sizeBucket] || map.standard;
+        serviceType = 'AL'; priceItemType = 'garment'; isCap = false;
+    }
+    let stitchCount = parseInt(stitches, 10);
+    if (!stitchCount || stitchCount < 1) {
+        stitchCount = priceItemType === 'cap' ? 5000 : (priceItemType === 'fullback' ? 25000 : 8000);
     }
 
     const row = createServiceProductRow(serviceType, {
@@ -3210,7 +3219,8 @@ async function addALLineItem(itemType, sizeBucket) {
         unitPrice: 0,      // placeholder — set live by syncALRows()
         total: 0,
         isCap: isCap,
-        stitchCount: stitchCount
+        stitchCount: stitchCount,
+        position: placement   // prints on the line + carries to ShopWorks
     });
     if (!row) return;
 
@@ -3225,7 +3235,7 @@ async function addALLineItem(itemType, sizeBucket) {
     markAsUnsaved();
     await syncALRows();     // pull the live per-piece price from the API (cached) for this row
     recalculatePricing();   // sum it into the totals
-    showToast('Additional Logo added — set the quantity', 'success');
+    showToast(`Additional Logo (${placement}) added — set the quantity`, 'success');
 }
 
 /**

@@ -37,20 +37,41 @@
     return fmt(it.price) + suffix;
   }
 
+  // Render <option>s — flat [{value,label}] OR grouped [{group, options:[...]}] (→ <optgroup>).
+  function optionsHtml(options) {
+    if (options[0] && options[0].options) {
+      return options.map((g) =>
+        `<optgroup label="${g.group}">` +
+        g.options.map((o) => `<option value="${o.value}">${o.label}</option>`).join('') +
+        `</optgroup>`).join('');
+    }
+    return options.map((o) => `<option value="${o.value}">${o.label}</option>`).join('');
+  }
+
+  // One picker field: a <select> (default) OR a number input with optional quick-preset
+  // chips (type 'number'/'stitches'). All field values read back generically via .sci-field.
+  function fieldHtml(f) {
+    const lbl = f.label ? `<span class="sci-fl">${f.label}</span>` : '';
+    if (f.type === 'number' || f.type === 'stitches') {
+      const presets = (f.presets || []).map((p) =>
+        `<button type="button" class="sci-preset" data-field="${f.name}" data-val="${p.value}">${p.label}</button>`).join('');
+      return `<label class="sci-field-lbl">${lbl}` +
+        `<input type="number" class="sci-field sci-num" data-field="${f.name}" value="${f.default != null ? f.default : ''}" ` +
+        `min="${f.min != null ? f.min : 0}" step="${f.step != null ? f.step : 1000}" placeholder="${f.placeholder || ''}"></label>` +
+        (presets ? `<span class="sci-presets">${presets}</span>` : '');
+    }
+    return `<label class="sci-field-lbl">${lbl}<select class="sci-field" data-field="${f.name}">${optionsHtml(f.options)}</select></label>`;
+  }
+
   function itemHtml(it) {
     const icon = `<i class="fas ${it.icon || 'fa-plus'}"></i>`;
-    // Picker item: inline selects (e.g. Garment/Cap + stitch size) → Add → onAdd(code, {fields})
+    // Picker item: inline fields (selects / number+presets) → Add → onAdd(code, {fields})
     if (Array.isArray(it.fields) && it.fields.length) {
-      const selects = it.fields.map((f) =>
-        `<label class="sci-field-lbl">${f.label ? f.label + ' ' : ''}` +
-        `<select class="sci-field" data-field="${f.name}">` +
-        f.options.map((o) => `<option value="${o.value}">${o.label}</option>`).join('') +
-        `</select></label>`
-      ).join('');
+      const fieldsHtml = it.fields.map(fieldHtml).join('');
       return `
         <div class="service-cat-item sci-prompt sci-config" data-code="${it.code}">
           <span class="sci-name">${icon} ${it.label}</span>
-          <span class="sci-config-wrap">${selects}<button type="button" class="sci-add sci-add-config" data-code="${it.code}">${it.addLabel || 'Add'}</button></span>
+          <span class="sci-config-wrap">${fieldsHtml}<button type="button" class="sci-add sci-add-config" data-code="${it.code}">${it.addLabel || 'Add'}</button></span>
         </div>`;
     }
     if (it.prompt) {
@@ -125,6 +146,15 @@
           return;
         }
         submitAmt(btn.previousElementSibling);
+      });
+    });
+    // Quick-preset chips fill their sibling number field (e.g. Std/Mid/Large stitch counts)
+    mount.querySelectorAll('.sci-preset').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const wrap = btn.closest('.sci-config');
+        const inp = wrap && wrap.querySelector(`.sci-field[data-field="${btn.dataset.field}"]`);
+        if (inp) inp.value = btn.dataset.val;
       });
     });
     mount.querySelectorAll('.sci-amt').forEach((inp) => {
