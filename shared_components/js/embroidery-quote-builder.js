@@ -1185,8 +1185,16 @@ async function populateProducts(items) {
         await addProductFromQuote(product);
     }
 
+    // Primary-logo stitch surcharges (AS-Garm/AS-CAP) are AUTO-recomputed by the fee table
+    // from the restored primary logo's stitch count — they are NOT standalone rows on a fresh
+    // order. Restoring them ALSO as service rows DOUBLE-COUNTS them on edit-reload (saved $132
+    // row + recomputed fee). The fee engine re-derives them from the logo, so skip the
+    // standalone restore. (cert audit 2026-06-04)
+    const AUTO_RECOMPUTED_PRIMARY_FEES = ['AS-Garm', 'AS-CAP', 'AS-GARM'];
+
     // Add service items as service product rows (2026-02 refactor)
     for (const serviceItem of serviceItems) {
+        if (AUTO_RECOMPUTED_PRIMARY_FEES.includes(serviceItem.StyleNumber)) continue;
         const serviceType = serviceItem.StyleNumber;
         const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP' || serviceType === 'AL-CAP' || serviceType === '3D-EMB' || serviceType === 'Laser Patch';
 
@@ -1276,9 +1284,18 @@ async function addProductFromQuote(product) {
         if (isExtendedSize) {
             // Create child row for extended size (same pattern as ShopWorks import)
             createChildRow(rowIdNum, size, qty);
-        } else if (size === '2XL') {
-            // 2XL goes in Size05 column but still needs a child row
-            createChildRow(rowIdNum, '2XL', qty);
+        } else if (size === '2XL' || size === 'XXL') {
+            // 2XL/XXL lives in the parent's Size05 column. Set the parent input and let the
+            // onSizeChange(rowIdNum) call at the END of this function create + sync the child
+            // row. Calling createChildRow directly here is CLOBBERED: onSizeChange reads the
+            // (still-empty) parent 2XL input as qty 0 and DELETES the freshly-created child
+            // row -> 2XL silently dropped on edit-reload (under-charged). (cert audit 2026-06-04)
+            const xxl = row.querySelector(`input[data-size="${size}"]`);
+            if (xxl && !xxl.disabled) {
+                xxl.value = qty;
+            } else {
+                createChildRow(rowIdNum, size, qty);
+            }
         } else {
             // Standard size - find existing input
             const sizeInput = row.querySelector(`input[data-size="${size}"]`);
