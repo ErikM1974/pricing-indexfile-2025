@@ -5721,14 +5721,20 @@ async function estimateShipping() {
                 } catch (e) { window._shipWtCache[style] = {}; }
             }
             const bySize = window._shipWtCache[style];
+            let prodQty = 0; const casePacks = [];
             for (const [size, qty] of Object.entries(sizes)) {
                 const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
                 const wt = (meta && meta.wt) || 0.5;       // fallback ~0.5 lb/pc
-                const cp = (meta && meta.casePack) || 72;  // fallback 72/box
                 if (!meta) usedFallback = true;
-                totalWeightLb += wt * (parseInt(qty) || 0);
-                totalBoxes += Math.ceil((parseInt(qty) || 0) / cp);
+                const q = parseInt(qty) || 0;
+                totalWeightLb += wt * q;
+                prodQty += q;
+                if (meta && meta.casePack) casePacks.push(meta.casePack);
             }
+            // Box count per PRODUCT (sizes share a box). Smallest case pack = conservative,
+            // bias-high for prepay. Fallback 72/box.
+            const cp = casePacks.length ? Math.min(...casePacks) : 72;
+            totalBoxes += Math.ceil(prodQty / cp);
         }
         totalBoxes = Math.max(1, totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
