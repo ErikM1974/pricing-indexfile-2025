@@ -79,7 +79,7 @@ class EmbroideryInvoiceGenerator {
             </head>
             <body>
                 <div class="invoice-container">
-                    ${this.generateHeader(pricingData, today, expiryDate)}
+                    ${this.generateHeader(pricingData, today, expiryDate, customerData)}
                     ${this.generateCustomerSection(customerData, salesRepName)}
                     ${this.generateEmbroiderySpecs(pricingData)}
                     ${this.generateProductsTable(pricingData)}
@@ -475,9 +475,10 @@ class EmbroideryInvoiceGenerator {
     /**
      * Generate invoice header
      */
-    generateHeader(pricingData, today, expiryDate) {
+    generateHeader(pricingData, today, expiryDate, customerData = {}) {
         const quoteTypeInfo = this.getQuoteTypeInfo(pricingData);
         const quoteId = pricingData.quoteId;
+        const fmtD = (s) => { if (!s) return ''; const d = new Date(String(s).length <= 10 ? s + 'T00:00:00' : s); return isNaN(d) ? s : d.toLocaleDateString(); };
 
         return `
             <div class="invoice-header">
@@ -495,7 +496,9 @@ class EmbroideryInvoiceGenerator {
                     <div class="quote-title">${quoteTypeInfo.title}</div>
                     <div class="quote-details">
                         <strong>Quote #:</strong> ${quoteId || 'DRAFT'}<br>
+                        ${customerData.poNumber ? `<strong>PO #:</strong> ${customerData.poNumber}<br>` : ''}
                         <strong>Date:</strong> ${today.toLocaleDateString()}<br>
+                        ${customerData.reqShipDate ? `<strong>Requested Ship:</strong> ${fmtD(customerData.reqShipDate)}<br>` : ''}
                         <strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}
                     </div>
                 </div>
@@ -870,7 +873,7 @@ class EmbroideryInvoiceGenerator {
             // Primary logo (base 8K included)
             html += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches) -
+                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${primaryLogo.designNumber ? ` &middot; Design #${primaryLogo.designNumber}` : ''} -
                     <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
                 </div>
             `;
@@ -918,7 +921,7 @@ class EmbroideryInvoiceGenerator {
 
                 html += `
                     <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote} -
+                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote}${logo.designNumber ? ` &middot; Design #${logo.designNumber}` : ''} -
                         <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
                         <span style="color: #666; font-size: 10px;">${digitizingText}</span>
                     </div>
@@ -1258,7 +1261,7 @@ class EmbroideryInvoiceGenerator {
                 tableHTML += `
                     <tr class="product-row service-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
                         <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${serviceType}</td>
-                        <td class="desc-cell" colspan="2">${description}${position ? ' - ' + position : ''}</td>
+                        <td class="desc-cell" colspan="2">${description}${position && !String(description).includes(position) ? ' - ' + position : ''}</td>
                         <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 8px; font-style: italic;">
                             Service item
                         </td>

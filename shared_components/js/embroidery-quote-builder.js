@@ -1206,6 +1206,15 @@ async function populateProducts(items) {
             isCap: isCap
         });
 
+        // Re-flag bar Additional-Logo rows so they stay LIVE API-priced on revisions.
+        // Placement + stitch are restored above (now persisted on save); without this flag
+        // the row froze and lost its tier when the rep edited the qty. (2026-06-04 audit)
+        if (serviceRow && ['AL', 'AL-CAP', 'DECG-FB'].includes(serviceType)) {
+            serviceRow.dataset.alPriced = 'true';
+            serviceRow.dataset.alItemType = serviceType === 'DECG-FB' ? 'fullback'
+                : (serviceType === 'AL-CAP' ? 'cap' : 'garment');
+        }
+
         // Restore price override for DECG/DECC if saved
         if (serviceRow && serviceItem.LogoSpecs) {
             try {
@@ -6853,12 +6862,22 @@ function updateTaxCalculation() {
  * Uses EmbroideryQuoteService and QuoteShareModal
  */
 async function saveAndGetLink() {
+    // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
+    // so a stale value here would be persisted to the quote. (2026-06-04 audit hardening)
+    try { await syncALRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
+
     const allItems = collectProductsFromTable();
     const products = allItems.filter(p => !p.isService);
     const manualServiceItems = allItems.filter(p => p.isService);
     const decgItems = collectDECGItems();
     if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length === 0) {
         showToast('Add products before saving', 'error');
+        return;
+    }
+    // Guard: logos/services with NO garment or cap to go on (e.g. an AL-CAP row but the cap
+    // product never got added — the EMB-273 incident). Almost always a mistake. (2026-06-04 audit)
+    if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length > 0) {
+        showToast('This order has only logos/services — add the garment or cap they go on first.', 'error', 6000);
         return;
     }
 
@@ -7794,18 +7813,20 @@ function resetQuote() {
     if (odContent) odContent.style.display = '';   // always-visible flow-step body now
     if (odChevron) odChevron.style.transform = '';
     if (odBadge) odBadge.style.display = 'none';
-    document.getElementById('discount-amount').value = '';
-    document.getElementById('discount-reason').value = '';
+    // NOTE: discount-amount / discount-reason / art-charge were removed when the
+    // discount + artwork-services panels were replaced. Bare getElementById().value
+    // here threw and ABORTED resetQuote → the builder stayed in edit mode and the next
+    // save silently overwrote the previous quote. Guard every access. (2026-06-04)
+    const discAmt = document.getElementById('discount-amount'); if (discAmt) discAmt.value = '';
     const reasonPreset = document.getElementById('discount-reason-preset');
     if (reasonPreset) reasonPreset.value = '';
     const reasonInput = document.getElementById('discount-reason');
-    if (reasonInput) reasonInput.style.display = 'none';
-    document.getElementById('art-charge').value = 0;
-    document.getElementById('art-charge').disabled = true;
-    document.getElementById('art-charge-toggle').checked = false;
+    if (reasonInput) { reasonInput.value = ''; reasonInput.style.display = 'none'; }
+    const artCharge = document.getElementById('art-charge'); if (artCharge) { artCharge.value = 0; artCharge.disabled = true; }
+    const artToggle = document.getElementById('art-charge-toggle'); if (artToggle) artToggle.checked = false;
     const artChargeWrapper = document.getElementById('art-charge-wrapper');
     if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
-    document.getElementById('graphic-design-hours').value = '';
+    const gdh = document.getElementById('graphic-design-hours'); if (gdh) gdh.value = '';
     // Reset artwork badge
     const artworkBadge = document.getElementById('artwork-badge');
     if (artworkBadge) {
@@ -11925,6 +11946,10 @@ async function printQuote() {
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
+            poNumber: document.getElementById('po-number')?.value?.trim() || '',
+            dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
+            reqShipDate: document.getElementById('req-ship-date')?.value || '',
             billing,
             shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };

@@ -10,6 +10,30 @@
 - Verify in-browser with the Preview MCP (`preview_start` name `pricing-index-preview`, autoPort, port 3010) — **restart the preview server if it serves stale HTML** (it cached an old copy mid-session once).
 - Branch: **develop** (frontend) and **develop** (proxy). Deploy frontend = `/deploy` skill; proxy = `git push heroku develop:main`.
 
+## UPDATE 2026-06-04 (PM) — ShopWorks push test + edge-case hardening
+- **Push test:** 4 EMB test orders pushed to ShopWorks (cust 3739, `TEST-` prefix) covering garment/AL/full-back/
+  cap/services — EMB-TEST-2026-271/272/274 (273 = incomplete cap, superseded). The new AL picker pushes correctly:
+  placement+stitch ride in the line **Description** (`ProductName`→Description). **Caps go in the 3XL/last column**
+  (Richardson style **112**, NOT C112) — Erik's convention; `createOrUpdateExtendedChildRow(rowId,'3XL',qty)`. MO→SW
+  conversion is on a cron (~15-60 min); verify via `/api/manageorders/getorderno/:ext`.
+- **Adversarial edge-case audit (2 agents) → 4 real bugs FIXED (frontend fc832404, proxy ef344e5, develop, NOT
+  deployed):** (1) **resetQuote() CRASH** — `discount-amount`/`discount-reason`/`art-charge` were deleted from the
+  DOM; bare `getElementById().value` threw, ABORTING reset → builder stayed in EDIT MODE → next save silently
+  overwrote the prior customer's quote. Guarded all accesses (EQB ~7797). (2) **Logo-only order block** — save
+  passed with services but no garment/cap (the EMB-273 incident); now blocked. (3) **AL edit-reload data-loss** —
+  manual-service save hardcoded `PrintLocationName:''` + stitch-less SizeBreakdown → reopening dropped placement,
+  reset stitch→8K, froze tier pricing. Now persists position→`PrintLocationName` + stitch/position in SizeBreakdown
+  (BOTH save paths, EQS) + restore re-flags AL/AL-CAP/DECG-FB rows `alPriced` (EQB ~1207). (4) **Server blank-customer
+  guard** — non-test push with blank Customer# 400s (was silently routing to catch-all 3739); proxy
+  `embroidery-push.js`. Verified live: resetQuote no-throw, logo-only blocked, AL save persists Right Sleeve/11000 +
+  Full Back/55000. #4 needs PROXY deploy to take effect. cache-bust `?v=2026.06.04.3`.
+- **Audit CLEARED (not bugs):** subset AL (qty<garment) prices fine; $0/blank AL row safely dropped; Rush 25% could
+  NOT be reproduced wrong (the live $76 was a test-harness artifact; save now awaits recalc to be deterministic).
+- **Edge cases NOT yet built (Erik's "cover all bases" backlog):** per-logo artwork upload (all-new-logos → one
+  `newDesignName` today), shipping-cost ESTIMATE (manual `shipping-fee` only, no rate calc), per-piece names
+  (Monogram = qty only), 3D-puff on additional logos, cap-column hint, "some pieces blank" path, multi-new-design
+  naming. **NEXT: `/deploy` frontend + proxy (resetQuote crash is live), then tackle the backlog.**
+
 ## UPDATE 2026-06-04 — AL picker redesigned (placement + EXACT stitches); J790 stress-test
 - **DEPLOYED v2026.06.04.1**: AL-as-bar-line-item + Design#-into-logo-cards (see below).
 - **THEN (develop, VERIFIED, NOT deployed — commit f319ac6c, `?v=2026.06.04.2`):** Erik stress-tested a

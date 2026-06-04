@@ -1220,18 +1220,33 @@ class QuoteViewPage {
             html += this.renderFeeRow('DISCOUNT', discountDesc, 1, -discount, -discount, true);
         }
 
-        // 11. Catch-all: render any remaining fee items not already handled above
-        // Covers: Monogram, Name/Number, WEIGHT, SEG, SECC, DT, CTR-GARMT, CTR-CAP, etc.
-        const handledFeeStyleNumbers = new Set([
-            'AS-GARM', 'AS-Garm', 'AS-CAP', 'AL-GARM', 'AL', 'AL-CAP', 'CB', 'CS',
-            'DD', 'DD-CAP', 'GRT-50', 'GRT-75', 'RUSH', 'SAMPLE',
-            'LTM', 'LTM-CAP', 'DISCOUNT', '3D-EMB', 'Laser Patch',
-            'TAX', 'SHIP'
-        ]);
+        // 11. Catch-all: render every fee LINE ITEM that wasn't already rendered from a
+        //     Quote_Sessions column above. The redesigned builder saves bar services (AL,
+        //     AL-CAP, DECG-FB, DD, GRT-50, GRT-75, Monogram, RUSH, …) as fee line items with
+        //     the session columns left at 0 — so the OLD static "handled" block SILENTLY
+        //     DROPPED them and the invoice didn't foot (Erik's #1 rule). Now a code is
+        //     suppressed ONLY when its session-column emitter actually fired (legacy quotes),
+        //     so each charge renders exactly once whether it came from a column or a line
+        //     item. 3D-EMB/Laser Patch render from items via their own emitters above;
+        //     TAX/SHIP are order-level (totals). (2026-06-04 audit)
+        const handledFeeStyleNumbers = new Set(['3D-EMB', 'Laser Patch', 'TAX', 'SHIP', 'SHIPPING']);
+        const suppressIf = (cond, ...codes) => { if (cond) codes.forEach(c => handledFeeStyleNumbers.add(c)); };
+        suppressIf(garmentStitchCharge > 0, 'AS-GARM', 'AS-Garm');
+        suppressIf(capStitchCharge > 0, 'AS-CAP');
+        suppressIf(alGarmentCharge > 0 && garmentQty > 0, 'AL', 'AL-GARM');
+        suppressIf(alCapCharge > 0 && capQty > 0, 'AL-CAP', 'CB');
+        suppressIf(garmentDigitizing > 0, 'DD');
+        suppressIf(capDigitizing > 0, 'DD-CAP', 'GRT-50');
+        suppressIf(artCharge > 0, 'GRT-50');
+        suppressIf(graphicDesignCharge > 0, 'GRT-75');
+        suppressIf(rushFee > 0, 'RUSH');
+        suppressIf(ltmGarment > 0, 'LTM');
+        suppressIf(ltmCap > 0, 'LTM-CAP');
+        suppressIf(discount > 0, 'DISCOUNT');
         const unhandledFees = (this.items || []).filter(i =>
             i.EmbellishmentType === 'fee' &&
             !handledFeeStyleNumbers.has(i.StyleNumber) &&
-            i.LineTotal !== 0
+            Number(i.LineTotal) !== 0
         );
         for (const fee of unhandledFees) {
             const desc = fee.ProductName || fee.StyleNumber || 'Service Fee';
