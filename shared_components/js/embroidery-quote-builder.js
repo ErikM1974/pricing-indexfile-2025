@@ -904,6 +904,21 @@ async function loadQuoteForEditing(quoteId) {
         // Populate logo configuration
         populateLogoConfig(session, items);
 
+        // Restore the rich-mode ARTWORK upload (files + design name) from ImportNotes. Without
+        // this, reopening a quote shows an EMPTY widget, and the next Save Revision overwrites
+        // ImportNotes with empty referenceArtwork/newDesignName → the uploaded art + design name
+        // are PERMANENTLY wiped and a later push emits "NO DESIGN LINKED" for a job that had art.
+        // (2026-06-04 audit B5)
+        (function restoreEmbArtwork() {
+            if (!window._embArtwork || !session.ImportNotes) return;
+            try {
+                const parsed = JSON.parse(session.ImportNotes);
+                const art = Array.isArray(parsed.referenceArtwork) ? parsed.referenceArtwork : [];
+                if (art.length && typeof window._embArtwork.setFiles === 'function') window._embArtwork.setFiles(art);
+                if (parsed.newDesignName && typeof window._embArtwork.setDesignName === 'function') window._embArtwork.setDesignName(parsed.newDesignName);
+            } catch (_) { /* legacy flat-array ImportNotes → no artwork object to restore */ }
+        })();
+
         // Populate products from line items
         await populateProducts(items);
 
@@ -7180,6 +7195,18 @@ async function saveAndGetLink() {
         return;
     }
 
+    // Artwork uploaded but the design left UNNAMED → the ShopWorks push silently DROPS the art
+    // (the transformer gates Designs[] on a non-empty design name) and production gets "NO DESIGN
+    // LINKED" for a job that has a logo. isValidForPush() is false only in exactly that case
+    // (files present + name blank). Require the name so the uploaded logo reaches the floor.
+    // (2026-06-04 audit B6)
+    if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
+        showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
+        const dn = document.querySelector('.artwork-design-name, #emb-artwork-design-name, [data-artwork-design-name]');
+        if (dn && typeof dn.focus === 'function') dn.focus();
+        return;
+    }
+
     // Validate non-SanMar products have pricing set
     const zeroPriceRows = products.filter(p => {
         const row = document.getElementById(`row-${p.rowId}`);
@@ -7957,7 +7984,11 @@ function resetQuote() {
     const capCard = document.getElementById('cap-logo-card');
     if (garmentCard) garmentCard.style.display = 'none';
     if (capCard) capCard.style.display = 'none';
-    // Note: Artwork services panel is now in sidebar (always visible, no reset needed)
+    // Clear the artwork UPLOAD widget (files + design name). Without this, a logo uploaded on
+    // the previous quote BLEEDS into the next quote and gets saved + pushed to ShopWorks — the
+    // wrong logo embroidered on a real order. (The old comment here confused the removed charge
+    // panel with this widget.) DTF does the same via _dtfArtwork.clear(). (2026-06-04 audit B1)
+    try { window._embArtwork?.clear?.(); } catch (_) {}
 
     // Reset logo configurations to defaults
     primaryLogo.position = 'Left Chest';
@@ -11944,24 +11975,28 @@ function buildEmbroideryPricingData(allItems) {
                 });
             }
 
-            // Extended sizes — read from child row price cells
-            const extendedSizes = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
-            extendedSizes.forEach(size => {
-                const qty = product.sizeBreakdown[size] || 0;
-                if (qty > 0) {
-                    const childRowId = childRowMap[rowId]?.[size];
-                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                    const childPriceText = childPriceCell?.textContent || '$0.00';
-                    const unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
-
-                    lineItems.push({
-                        description: `${size}(${qty})`,
-                        quantity: qty,
-                        unitPrice: unitPrice,
-                        total: qty * unitPrice,
-                        hasUpcharge: true
-                    });
-                }
+            // Extended / non-standard sizes — read from child row price cells. Iterate ALL
+            // sizeBreakdown keys (NOT a hardcoded list) so tall (LT/XLT…), fitted-cap combos
+            // (S/M, M/L, L/XL), youth (YS/YM/YL), toddler (2T–6T), big (LB/XLB…) and 7XL+ are
+            // NOT dropped from the PDF — they were silently vanishing from the table while their
+            // $ stayed in the total, so the products table under-footed. (2026-06-04 audit B3)
+            Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+                if (!(qty > 0)) return;
+                if (size === 'SVC') return;                       // service pseudo-size
+                if (baseSizes.includes(size)) return;             // already in the grouped base line
+                if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
+                const childRowId = childRowMap[rowId]?.[size];
+                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                const childPriceText = childPriceCell?.textContent || '';
+                let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+                if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row found → base price
+                lineItems.push({
+                    description: `${size}(${qty})`,
+                    quantity: qty,
+                    unitPrice: unitPrice,
+                    total: qty * unitPrice,
+                    hasUpcharge: true
+                });
             });
         }
 
@@ -11997,6 +12032,28 @@ function buildEmbroideryPricingData(allItems) {
                 unitPrice: si.unitPrice,
                 total: si.unitPrice * si.totalQuantity
             }]
+        });
+    });
+
+    // Stitch surcharge (AS-Garm / AS-CAP) — a flat per-piece charge for a primary logo over 8K
+    // stitches. It's in the on-screen fee table AND the grand total, but was NEVER emitted as a
+    // PDF line item, so the products table under-footed (e.g. $3341.50 table vs $3473.50 subtotal
+    // on EMB-2026-276 — a $132 gap with nothing explaining it). Read the live fee-row values and
+    // add a real line so the PDF foots. (2026-06-04 audit B2)
+    [
+        { rowId: 'garment-stitch-fee-row', totalId: 'garment-stitch-fee-total', unitId: 'garment-stitch-fee-unit', qtyId: 'garment-stitch-fee-qty', style: 'AS-Garm', label: 'Additional Stitches (Garment)', isCap: false },
+        { rowId: 'cap-stitch-fee-row', totalId: 'cap-stitch-fee-total', unitId: 'cap-stitch-fee-unit', qtyId: 'cap-stitch-fee-qty', style: 'AS-CAP', label: 'Additional Stitches (Cap)', isCap: true }
+    ].forEach(s => {
+        const row = document.getElementById(s.rowId);
+        if (!row || row.style.display === 'none') return;   // surcharge not active
+        const total = parseFloat((document.getElementById(s.totalId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+        if (!(total > 0)) return;
+        const qty = parseInt(document.getElementById(s.qtyId)?.textContent) || 0;
+        const unit = parseFloat((document.getElementById(s.unitId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+        invoiceProducts.push({
+            product: { style: s.style, title: s.label, color: '', isService: true, isCap: s.isCap },
+            isService: true,
+            lineItems: [{ description: s.label, quantity: qty || 1, unitPrice: unit, total: total }]
         });
     });
 
