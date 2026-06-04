@@ -1268,6 +1268,13 @@ async function populateProducts(items) {
                 : (serviceType === 'AL-CAP' ? 'cap' : 'garment');
         }
 
+        // Re-flag bar Customer-Supplied (DECG/DECC) rows so they stay LIVE API-priced on revisions
+        // (same as AL above) — without this the row freezes and loses its tier if the rep edits qty.
+        if (serviceRow && ['DECG', 'DECC'].includes(serviceType)) {
+            serviceRow.dataset.decgPriced = 'true';
+            serviceRow.dataset.decgItemType = serviceType === 'DECC' ? 'cap' : 'garment';
+        }
+
         // Restore price override for DECG/DECC if saved
         if (serviceRow && serviceItem.LogoSpecs) {
             try {
@@ -1570,12 +1577,30 @@ document.addEventListener('DOMContentLoaded', async function() {
                 { group: 'Add-Ons', icon: 'fa-stamp', items: [
                     { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
                     { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+                ]},
+                // Customer-Supplied: the customer brings their OWN blanks (corporate Costco jackets,
+                // etc.) — we charge embroidery ONLY, no garment, at higher DECG tiers (no garment
+                // margin). Live-priced per-piece from /api/decg-pricing (Embroidery_Costs DECG-Garmt /
+                // DECG-Cap), garment vs cap by chip. Pick stitches, then set the qty on the line.
+                { group: 'Customer-Supplied', icon: 'fa-box-open', items: [
+                    { code: 'DECG', label: 'Customer Garment', icon: 'fa-tshirt', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                        { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                            { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                        ]}
+                    ]},
+                    { code: 'DECC', label: 'Customer Cap', icon: 'fa-hat-cowboy', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                        { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                            { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                        ]}
+                    ]}
                 ]}
             ];
             window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
                 (code, opts) => {
                     if (code === 'AL' && opts && opts.fields) {
                         addALLineItem(opts.fields.placement, opts.fields.stitches);
+                    } else if ((code === 'DECG' || code === 'DECC') && opts && opts.fields) {
+                        addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches);
                     } else {
                         addManualServiceRow(code, opts && opts.price);
                     }
@@ -3310,6 +3335,46 @@ async function addALLineItem(placement, stitches) {
 }
 
 /**
+ * Add a Customer-Supplied (DECG / DECC) line item from the Services bar.
+ *   itemType : 'garment' (part # DECG) | 'cap' (part # DECC)
+ *   stitches : exact stitch count (typed or from a Std/Mid/Large chip)
+ * The customer brings their OWN blanks (e.g. corporate buys jackets at Costco), so we charge
+ * embroidery ONLY — no garment — at a MUCH higher per-piece rate because there is no garment
+ * margin to absorb it. Price is LIVE from the API: EmbroideryPricingService.calculateDECGPrice
+ * pulls the qty-tier base + per-1K stitch upcharge from /api/decg-pricing (Caspio Embroidery_Costs
+ * DECG-Garmt / DECG-Cap tiers — garment vs cap chosen by itemType). syncDECGRows() refreshes the
+ * price whenever the rep changes the quantity. NEVER guesses: API down → visible toast + $0
+ * (Erik's #1 rule). The price cell stays double-click-overridable. (2026-06-04)
+ */
+async function addDECGLineItem(itemType, stitches) {
+    const serviceType = itemType === 'cap' ? 'DECC' : 'DECG';
+    let stitchCount = parseInt(stitches, 10);
+    if (!stitchCount || stitchCount < 1) stitchCount = 8000;
+
+    const row = createServiceProductRow(serviceType, {
+        quantity: 1,
+        unitPrice: 0,      // placeholder — set live by syncDECGRows()
+        total: 0,
+        isCap: itemType === 'cap',
+        stitchCount: stitchCount
+    });
+    if (!row) return;
+
+    // Mark the row for live DECG pricing; carry the item type (garment/cap → tier table).
+    row.dataset.decgPriced = 'true';
+    row.dataset.decgItemType = itemType === 'cap' ? 'cap' : 'garment';
+
+    const qtyInput = row.querySelector('.service-qty');
+    if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+
+    markAsUnsaved();
+    await syncDECGRows();    // pull the live per-piece price from the API (cached) for this row
+    recalculatePricing();    // sum it into the totals
+    showToast(`Customer-Supplied ${itemType === 'cap' ? 'Cap (DECC)' : 'Garment (DECG)'} added — set the quantity`, 'success');
+}
+window.addDECGLineItem = addDECGLineItem;
+
+/**
  * Handle quantity change for service product rows
  */
 function onServiceQtyChange(rowId) {
@@ -3320,6 +3385,14 @@ function onServiceQtyChange(rowId) {
     // so re-price from the API first, then recalc. syncALRows updates this row's cells.
     if (row.dataset.alPriced === 'true') {
         syncALRows().then(() => recalculatePricing());
+        markAsUnsaved();
+        return;
+    }
+
+    // Customer-Supplied (DECG/DECC): per-piece price is tier-based (changes with this row's
+    // quantity), so re-price from the API first, then recalc. syncDECGRows updates the cells.
+    if (row.dataset.decgPriced === 'true') {
+        syncDECGRows().then(() => recalculatePricing());
         markAsUnsaved();
         return;
     }
@@ -5723,6 +5796,58 @@ async function syncALRows() {
 }
 window.syncALRows = syncALRows;
 
+/**
+ * Customer-Supplied (DECG/DECC) live pricing — bar-driven line items, a mirror of the AL path.
+ * Each DECG/DECC row (data-decg-priced) carries a stitch count + item type (garment/cap). The
+ * per-piece price is LIVE from the API (EmbroideryPricingService.calculateDECGPrice — qty-tier
+ * base + per-1K stitch upcharge from the Embroidery_Costs DECG tiers, garment vs cap by itemType),
+ * cached once per session. syncDECGRows() recomputes every DECG row whenever the quantity changes.
+ * NEVER falls back to a guessed price: if the API is unreachable it shows a visible error and
+ * leaves the row at $0 (Erik's #1 rule). Manually-overridden rows are left untouched. (2026-06-04)
+ */
+async function loadDECGPricing() {
+    if (window._decgPricingCache) return window._decgPricingCache;
+    if (!window.EmbroideryPricingService) { console.error('[DECG] EmbroideryPricingService unavailable'); return null; }
+    try {
+        window._alPricingSvc = window._alPricingSvc || new window.EmbroideryPricingService();
+        window._decgPricingCache = await window._alPricingSvc.fetchDECGPricing();
+        return window._decgPricingCache;
+    } catch (e) {
+        console.error('[DECG] fetchDECGPricing failed', e);
+        showToast("Couldn't load Customer-Supplied (DECG) pricing from the server — refresh and try again.", 'error');
+        return null;
+    }
+}
+
+async function syncDECGRows() {
+    const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
+    if (!rows.length) return;
+    const cache = await loadDECGPricing();
+    if (!cache) return;                              // error already surfaced; don't guess a price
+    const svc = window._alPricingSvc;
+    for (const row of rows) {
+        if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
+        const rid = row.dataset.rowId;
+        const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
+        const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
+        const itemType = row.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        let unit = 0;
+        try {
+            const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache);
+            unit = res.unitPrice || 0;
+        } catch (e) {
+            console.error('[DECG] calculateDECGPrice failed', e);
+        }
+        // Store the live price on the row; the next recalc sums it like any service row.
+        row.dataset.unitPrice = String(unit);
+        const priceCell = document.getElementById(`row-price-${rid}`);
+        const totalCell = document.getElementById(`row-total-${rid}`);
+        if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
+        if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
+    }
+}
+window.syncDECGRows = syncDECGRows;
+
 const RUSH_FEE_PCT = 0.25;
 function syncRushRow() {
     const rushRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-service-type="rush"]');
@@ -7021,7 +7146,7 @@ function updateTaxCalculation() {
 async function saveAndGetLink() {
     // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
     // so a stale value here would be persisted to the quote. (2026-06-04 audit hardening)
-    try { await syncALRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
+    try { await syncALRows(); await syncDECGRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
 
     const allItems = collectProductsFromTable();
     const products = allItems.filter(p => !p.isService);
