@@ -1,3 +1,9 @@
+## v2026.06.04.6 (2026.06.04)
+
+- docs(memory): box-density data findings (real SanMar cartons; no weight in feed)
+- feat(emb): estimator reads tunable box density; suppress spurious cap note
+- Deploy v2026.06.04.6: tunable box density + cap-note fix
+
 ## v2026.06.04.5 (2026.06.04)
 
 - docs(memory): audit pickup — surfaces + shipping estimator DEPLOYED; cert remaining
