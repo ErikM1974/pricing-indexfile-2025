@@ -904,11 +904,51 @@ async function loadQuoteForEditing(quoteId) {
         // Populate logo configuration
         populateLogoConfig(session, items);
 
+        // Restore the rich-mode ARTWORK upload (files + design name) from ImportNotes. Without
+        // this, reopening a quote shows an EMPTY widget, and the next Save Revision overwrites
+        // ImportNotes with empty referenceArtwork/newDesignName → the uploaded art + design name
+        // are PERMANENTLY wiped and a later push emits "NO DESIGN LINKED" for a job that had art.
+        // (2026-06-04 audit B5)
+        (function restoreEmbArtwork() {
+            if (!window._embArtwork || !session.ImportNotes) return;
+            try {
+                const parsed = JSON.parse(session.ImportNotes);
+                const art = Array.isArray(parsed.referenceArtwork) ? parsed.referenceArtwork : [];
+                if (art.length && typeof window._embArtwork.setFiles === 'function') window._embArtwork.setFiles(art);
+                if (parsed.newDesignName && typeof window._embArtwork.setDesignName === 'function') window._embArtwork.setDesignName(parsed.newDesignName);
+            } catch (_) { /* legacy flat-array ImportNotes → no artwork object to restore */ }
+        })();
+
         // Populate products from line items
         await populateProducts(items);
 
         // Populate additional charges
         populateAdditionalCharges(session);
+
+        // Restore Services-bar fees (GRT-50 / GRT-75 / DD / RUSH) that were added as standalone
+        // LINE ITEMS. They save as 'fee' quote_items but are NOT in SERVICE_STYLE_NUMBERS, so
+        // populateProducts drops them → silent UNDER-CHARGE on reload (and Save Revision then
+        // permanently deletes them). Restore ONLY the BAR-origin ones: the SIDEBAR inputs
+        // (art-charge→GRT-50, graphic-design-hours→GRT-75, digitizing checkbox→DD, rush-fee→RUSH)
+        // recompute from their saved SESSION field, so a non-zero session field means
+        // "sidebar origin — already handled, don't add a duplicate row". RUSH self-prices (25% of
+        // subtotal in syncRushRow); the others take their saved unit price. (cert audit 2026-06-04)
+        (function restoreBarFees() {
+            if (typeof addManualServiceRow !== 'function') return;
+            const sidebarField = {
+                'GRT-50': parseFloat(session.ArtCharge) || 0,
+                'GRT-75': parseFloat(session.GraphicDesignHours) || 0,
+                'DD': (parseFloat(session.DigitizingFee) || 0) + (parseFloat(session.CapDigitizingFee) || 0),
+                'RUSH': parseFloat(session.RushFee) || 0
+            };
+            (items || []).forEach(it => {
+                if (it.EmbellishmentType !== 'fee') return;
+                const sn = it.StyleNumber;
+                if (!(sn in sidebarField)) return;        // not a bar-fee code
+                if (sidebarField[sn] > 0) return;         // sidebar origin → recomputed elsewhere
+                addManualServiceRow(sn, sn === 'RUSH' ? undefined : (it.BaseUnitPrice || it.FinalUnitPrice || 0));
+            });
+        })();
 
         // Restore tax rate and shipping from fee items
         const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
@@ -1086,6 +1126,24 @@ function populateLogoConfig(session, items) {
         capPrimaryLogo.needsDigitizing = true;
     }
 
+    // Cap embellishment type (flat embroidery / 3D puff / laser patch). RESTORING THIS IS
+    // REQUIRED — it drives the fee engine's puff/patch upcharge recompute AND the cap-card UI.
+    // Without it, a saved 3D-puff / laser-patch cap reloads as flat embroidery: the type is
+    // lost AND a Save Revision DROPS the upcharge fee item (the save is gated on this type).
+    // Set the dropdown + run the change handler (it must come AFTER the cap stitch/digitizing
+    // restore above, which it reads). The matching 3D-EMB / Laser Patch fee items are then
+    // skipped in populateProducts so the recomputed fee isn't double-counted. (cert audit 2026-06-04)
+    if (session.CapEmbellishmentType && session.CapEmbellishmentType !== 'embroidery') {
+        const capEmbSel = document.getElementById('cap-embellishment-type');
+        if (capEmbSel) {
+            capEmbSel.value = session.CapEmbellishmentType;
+            capPrimaryLogo.embellishmentType = session.CapEmbellishmentType;
+            if (typeof handleCapEmbellishmentChange === 'function') {
+                try { handleCapEmbellishmentChange(); } catch (_) {}
+            }
+        }
+    }
+
     // Design number assignments (2026-02-19)
     if (session.GarmentDesignNumber) {
         primaryLogo.designNumber = session.GarmentDesignNumber;
@@ -1185,8 +1243,18 @@ async function populateProducts(items) {
         await addProductFromQuote(product);
     }
 
+    // Fees the price engine AUTO-recomputes from restored logo/cap config — they are NOT
+    // standalone rows on a fresh order, so restoring them ALSO as service rows DOUBLE-COUNTS
+    // them on edit-reload (e.g. saved AS-Garm $132 row + recomputed $132 fee). Skip the
+    // standalone restore; the fee table re-derives each from the restored config:
+    //   • AS-Garm / AS-CAP  -> primary garment/cap logo stitch overage
+    //   • 3D-EMB / Laser Patch -> cap embellishment type (restored in populateLogoConfig above)
+    // (cert audit 2026-06-04)
+    const AUTO_RECOMPUTED_FEES = ['AS-Garm', 'AS-CAP', 'AS-GARM', '3D-EMB', 'Laser Patch'];
+
     // Add service items as service product rows (2026-02 refactor)
     for (const serviceItem of serviceItems) {
+        if (AUTO_RECOMPUTED_FEES.includes(serviceItem.StyleNumber)) continue;
         const serviceType = serviceItem.StyleNumber;
         const isCap = serviceType === 'DECC' || serviceType === 'CB' || serviceType === 'CS' || serviceType === 'AS-CAP' || serviceType === 'AL-CAP' || serviceType === '3D-EMB' || serviceType === 'Laser Patch';
 
@@ -1213,6 +1281,13 @@ async function populateProducts(items) {
             serviceRow.dataset.alPriced = 'true';
             serviceRow.dataset.alItemType = serviceType === 'DECG-FB' ? 'fullback'
                 : (serviceType === 'AL-CAP' ? 'cap' : 'garment');
+        }
+
+        // Re-flag bar Customer-Supplied (DECG/DECC) rows so they stay LIVE API-priced on revisions
+        // (same as AL above) — without this the row freezes and loses its tier if the rep edits qty.
+        if (serviceRow && ['DECG', 'DECC'].includes(serviceType)) {
+            serviceRow.dataset.decgPriced = 'true';
+            serviceRow.dataset.decgItemType = serviceType === 'DECC' ? 'cap' : 'garment';
         }
 
         // Restore price override for DECG/DECC if saved
@@ -1276,9 +1351,18 @@ async function addProductFromQuote(product) {
         if (isExtendedSize) {
             // Create child row for extended size (same pattern as ShopWorks import)
             createChildRow(rowIdNum, size, qty);
-        } else if (size === '2XL') {
-            // 2XL goes in Size05 column but still needs a child row
-            createChildRow(rowIdNum, '2XL', qty);
+        } else if (size === '2XL' || size === 'XXL') {
+            // 2XL/XXL lives in the parent's Size05 column. Set the parent input and let the
+            // onSizeChange(rowIdNum) call at the END of this function create + sync the child
+            // row. Calling createChildRow directly here is CLOBBERED: onSizeChange reads the
+            // (still-empty) parent 2XL input as qty 0 and DELETES the freshly-created child
+            // row -> 2XL silently dropped on edit-reload (under-charged). (cert audit 2026-06-04)
+            const xxl = row.querySelector(`input[data-size="${size}"]`);
+            if (xxl && !xxl.disabled) {
+                xxl.value = qty;
+            } else {
+                createChildRow(rowIdNum, size, qty);
+            }
         } else {
             // Standard size - find existing input
             const sizeInput = row.querySelector(`input[data-size="${size}"]`);
@@ -1508,12 +1592,30 @@ document.addEventListener('DOMContentLoaded', async function() {
                 { group: 'Add-Ons', icon: 'fa-stamp', items: [
                     { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
                     { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+                ]},
+                // Customer-Supplied: the customer brings their OWN blanks (corporate Costco jackets,
+                // etc.) — we charge embroidery ONLY, no garment, at higher DECG tiers (no garment
+                // margin). Live-priced per-piece from /api/decg-pricing (Embroidery_Costs DECG-Garmt /
+                // DECG-Cap), garment vs cap by chip. Pick stitches, then set the qty on the line.
+                { group: 'Customer-Supplied', icon: 'fa-box-open', items: [
+                    { code: 'DECG', label: 'Customer Garment', icon: 'fa-tshirt', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                        { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                            { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                        ]}
+                    ]},
+                    { code: 'DECC', label: 'Customer Cap', icon: 'fa-hat-cowboy', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                        { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                            { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                        ]}
+                    ]}
                 ]}
             ];
             window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
                 (code, opts) => {
                     if (code === 'AL' && opts && opts.fields) {
                         addALLineItem(opts.fields.placement, opts.fields.stitches);
+                    } else if ((code === 'DECG' || code === 'DECC') && opts && opts.fields) {
+                        addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches);
                     } else {
                         addManualServiceRow(code, opts && opts.price);
                     }
@@ -3248,6 +3350,46 @@ async function addALLineItem(placement, stitches) {
 }
 
 /**
+ * Add a Customer-Supplied (DECG / DECC) line item from the Services bar.
+ *   itemType : 'garment' (part # DECG) | 'cap' (part # DECC)
+ *   stitches : exact stitch count (typed or from a Std/Mid/Large chip)
+ * The customer brings their OWN blanks (e.g. corporate buys jackets at Costco), so we charge
+ * embroidery ONLY — no garment — at a MUCH higher per-piece rate because there is no garment
+ * margin to absorb it. Price is LIVE from the API: EmbroideryPricingService.calculateDECGPrice
+ * pulls the qty-tier base + per-1K stitch upcharge from /api/decg-pricing (Caspio Embroidery_Costs
+ * DECG-Garmt / DECG-Cap tiers — garment vs cap chosen by itemType). syncDECGRows() refreshes the
+ * price whenever the rep changes the quantity. NEVER guesses: API down → visible toast + $0
+ * (Erik's #1 rule). The price cell stays double-click-overridable. (2026-06-04)
+ */
+async function addDECGLineItem(itemType, stitches) {
+    const serviceType = itemType === 'cap' ? 'DECC' : 'DECG';
+    let stitchCount = parseInt(stitches, 10);
+    if (!stitchCount || stitchCount < 1) stitchCount = 8000;
+
+    const row = createServiceProductRow(serviceType, {
+        quantity: 1,
+        unitPrice: 0,      // placeholder — set live by syncDECGRows()
+        total: 0,
+        isCap: itemType === 'cap',
+        stitchCount: stitchCount
+    });
+    if (!row) return;
+
+    // Mark the row for live DECG pricing; carry the item type (garment/cap → tier table).
+    row.dataset.decgPriced = 'true';
+    row.dataset.decgItemType = itemType === 'cap' ? 'cap' : 'garment';
+
+    const qtyInput = row.querySelector('.service-qty');
+    if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+
+    markAsUnsaved();
+    await syncDECGRows();    // pull the live per-piece price from the API (cached) for this row
+    recalculatePricing();    // sum it into the totals
+    showToast(`Customer-Supplied ${itemType === 'cap' ? 'Cap (DECC)' : 'Garment (DECG)'} added — set the quantity`, 'success');
+}
+window.addDECGLineItem = addDECGLineItem;
+
+/**
  * Handle quantity change for service product rows
  */
 function onServiceQtyChange(rowId) {
@@ -3258,6 +3400,14 @@ function onServiceQtyChange(rowId) {
     // so re-price from the API first, then recalc. syncALRows updates this row's cells.
     if (row.dataset.alPriced === 'true') {
         syncALRows().then(() => recalculatePricing());
+        markAsUnsaved();
+        return;
+    }
+
+    // Customer-Supplied (DECG/DECC): per-piece price is tier-based (changes with this row's
+    // quantity), so re-price from the API first, then recalc. syncDECGRows updates the cells.
+    if (row.dataset.decgPriced === 'true') {
+        syncDECGRows().then(() => recalculatePricing());
         markAsUnsaved();
         return;
     }
@@ -5661,6 +5811,58 @@ async function syncALRows() {
 }
 window.syncALRows = syncALRows;
 
+/**
+ * Customer-Supplied (DECG/DECC) live pricing — bar-driven line items, a mirror of the AL path.
+ * Each DECG/DECC row (data-decg-priced) carries a stitch count + item type (garment/cap). The
+ * per-piece price is LIVE from the API (EmbroideryPricingService.calculateDECGPrice — qty-tier
+ * base + per-1K stitch upcharge from the Embroidery_Costs DECG tiers, garment vs cap by itemType),
+ * cached once per session. syncDECGRows() recomputes every DECG row whenever the quantity changes.
+ * NEVER falls back to a guessed price: if the API is unreachable it shows a visible error and
+ * leaves the row at $0 (Erik's #1 rule). Manually-overridden rows are left untouched. (2026-06-04)
+ */
+async function loadDECGPricing() {
+    if (window._decgPricingCache) return window._decgPricingCache;
+    if (!window.EmbroideryPricingService) { console.error('[DECG] EmbroideryPricingService unavailable'); return null; }
+    try {
+        window._alPricingSvc = window._alPricingSvc || new window.EmbroideryPricingService();
+        window._decgPricingCache = await window._alPricingSvc.fetchDECGPricing();
+        return window._decgPricingCache;
+    } catch (e) {
+        console.error('[DECG] fetchDECGPricing failed', e);
+        showToast("Couldn't load Customer-Supplied (DECG) pricing from the server — refresh and try again.", 'error');
+        return null;
+    }
+}
+
+async function syncDECGRows() {
+    const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
+    if (!rows.length) return;
+    const cache = await loadDECGPricing();
+    if (!cache) return;                              // error already surfaced; don't guess a price
+    const svc = window._alPricingSvc;
+    for (const row of rows) {
+        if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
+        const rid = row.dataset.rowId;
+        const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
+        const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
+        const itemType = row.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        let unit = 0;
+        try {
+            const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache);
+            unit = res.unitPrice || 0;
+        } catch (e) {
+            console.error('[DECG] calculateDECGPrice failed', e);
+        }
+        // Store the live price on the row; the next recalc sums it like any service row.
+        row.dataset.unitPrice = String(unit);
+        const priceCell = document.getElementById(`row-price-${rid}`);
+        const totalCell = document.getElementById(`row-total-${rid}`);
+        if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
+        if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
+    }
+}
+window.syncDECGRows = syncDECGRows;
+
 const RUSH_FEE_PCT = 0.25;
 function syncRushRow() {
     const rushRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-service-type="rush"]');
@@ -6959,11 +7161,17 @@ function updateTaxCalculation() {
 async function saveAndGetLink() {
     // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
     // so a stale value here would be persisted to the quote. (2026-06-04 audit hardening)
-    try { await syncALRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
+    try { await syncALRows(); await syncDECGRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
 
     const allItems = collectProductsFromTable();
     const products = allItems.filter(p => !p.isService);
-    const manualServiceItems = allItems.filter(p => p.isService);
+    // DECG/DECC (customer-supplied garment/cap) rows are persisted by the decgItems loop below
+    // as EmbellishmentType 'customer-supplied'. They MUST be excluded here, else the
+    // manualServiceItems save loop ALSO writes them as a 'fee' item → the DB gets TWO DECG
+    // rows ($480 for a $240 order) and /invoice + ShopWorks push over-charge 2x, while the
+    // on-screen total (which reads the table once) still shows the correct amount so the rep
+    // never notices. (cert audit 2026-06-04)
+    const manualServiceItems = allItems.filter(p => p.isService && !['decg', 'decc'].includes((p.serviceType || '').toLowerCase()));
     const decgItems = collectDECGItems();
     if (products.length === 0 && decgItems.length === 0 && manualServiceItems.length === 0) {
         showToast('Add products before saving', 'error');
@@ -6984,6 +7192,18 @@ async function saveAndGetLink() {
         showToast('Please enter customer name and email', 'error');
         if (!customerName) document.getElementById('customer-name')?.focus();
         else if (!customerEmail) document.getElementById('customer-email')?.focus();
+        return;
+    }
+
+    // Artwork uploaded but the design left UNNAMED → the ShopWorks push silently DROPS the art
+    // (the transformer gates Designs[] on a non-empty design name) and production gets "NO DESIGN
+    // LINKED" for a job that has a logo. isValidForPush() is false only in exactly that case
+    // (files present + name blank). Require the name so the uploaded logo reaches the floor.
+    // (2026-06-04 audit B6)
+    if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
+        showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
+        const dn = document.querySelector('.artwork-design-name, #emb-artwork-design-name, [data-artwork-design-name]');
+        if (dn && typeof dn.focus === 'function') dn.focus();
         return;
     }
 
@@ -7764,7 +7984,11 @@ function resetQuote() {
     const capCard = document.getElementById('cap-logo-card');
     if (garmentCard) garmentCard.style.display = 'none';
     if (capCard) capCard.style.display = 'none';
-    // Note: Artwork services panel is now in sidebar (always visible, no reset needed)
+    // Clear the artwork UPLOAD widget (files + design name). Without this, a logo uploaded on
+    // the previous quote BLEEDS into the next quote and gets saved + pushed to ShopWorks — the
+    // wrong logo embroidered on a real order. (The old comment here confused the removed charge
+    // panel with this widget.) DTF does the same via _dtfArtwork.clear(). (2026-06-04 audit B1)
+    try { window._embArtwork?.clear?.(); } catch (_) {}
 
     // Reset logo configurations to defaults
     primaryLogo.position = 'Left Chest';
@@ -11688,7 +11912,14 @@ async function diagnoseQuote() {
 function buildEmbroideryPricingData(allItems) {
     const productList = allItems.filter(p => !p.isService);
     const serviceItems = allItems.filter(p => p.isService);
-    const quoteId = document.getElementById('quote-id')?.textContent || `EMB-${Date.now()}`;
+    // Use the REAL saved quote ID — edit mode = editingQuoteId; after a save = _pushQuoteId.
+    // The legacy #quote-id element was removed in a refactor, so this ALWAYS fell back to a
+    // Date.now() temp ID: every printed PDF showed a garbage quote # (e.g. EMB-1780608435889)
+    // instead of EMB-2026-276. Only a brand-new, never-saved quote keeps the temp. (2026-06-04 audit)
+    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId)
+        || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId)
+        || document.getElementById('quote-id')?.textContent?.trim()
+        || `EMB-${Date.now()}`;
 
     // Build products array with line items for invoice
     const invoiceProducts = [];
@@ -11744,24 +11975,28 @@ function buildEmbroideryPricingData(allItems) {
                 });
             }
 
-            // Extended sizes — read from child row price cells
-            const extendedSizes = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
-            extendedSizes.forEach(size => {
-                const qty = product.sizeBreakdown[size] || 0;
-                if (qty > 0) {
-                    const childRowId = childRowMap[rowId]?.[size];
-                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                    const childPriceText = childPriceCell?.textContent || '$0.00';
-                    const unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
-
-                    lineItems.push({
-                        description: `${size}(${qty})`,
-                        quantity: qty,
-                        unitPrice: unitPrice,
-                        total: qty * unitPrice,
-                        hasUpcharge: true
-                    });
-                }
+            // Extended / non-standard sizes — read from child row price cells. Iterate ALL
+            // sizeBreakdown keys (NOT a hardcoded list) so tall (LT/XLT…), fitted-cap combos
+            // (S/M, M/L, L/XL), youth (YS/YM/YL), toddler (2T–6T), big (LB/XLB…) and 7XL+ are
+            // NOT dropped from the PDF — they were silently vanishing from the table while their
+            // $ stayed in the total, so the products table under-footed. (2026-06-04 audit B3)
+            Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+                if (!(qty > 0)) return;
+                if (size === 'SVC') return;                       // service pseudo-size
+                if (baseSizes.includes(size)) return;             // already in the grouped base line
+                if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
+                const childRowId = childRowMap[rowId]?.[size];
+                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                const childPriceText = childPriceCell?.textContent || '';
+                let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+                if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row found → base price
+                lineItems.push({
+                    description: `${size}(${qty})`,
+                    quantity: qty,
+                    unitPrice: unitPrice,
+                    total: qty * unitPrice,
+                    hasUpcharge: true
+                });
             });
         }
 
@@ -11797,6 +12032,28 @@ function buildEmbroideryPricingData(allItems) {
                 unitPrice: si.unitPrice,
                 total: si.unitPrice * si.totalQuantity
             }]
+        });
+    });
+
+    // Stitch surcharge (AS-Garm / AS-CAP) — a flat per-piece charge for a primary logo over 8K
+    // stitches. It's in the on-screen fee table AND the grand total, but was NEVER emitted as a
+    // PDF line item, so the products table under-footed (e.g. $3341.50 table vs $3473.50 subtotal
+    // on EMB-2026-276 — a $132 gap with nothing explaining it). Read the live fee-row values and
+    // add a real line so the PDF foots. (2026-06-04 audit B2)
+    [
+        { rowId: 'garment-stitch-fee-row', totalId: 'garment-stitch-fee-total', unitId: 'garment-stitch-fee-unit', qtyId: 'garment-stitch-fee-qty', style: 'AS-Garm', label: 'Additional Stitches (Garment)', isCap: false },
+        { rowId: 'cap-stitch-fee-row', totalId: 'cap-stitch-fee-total', unitId: 'cap-stitch-fee-unit', qtyId: 'cap-stitch-fee-qty', style: 'AS-CAP', label: 'Additional Stitches (Cap)', isCap: true }
+    ].forEach(s => {
+        const row = document.getElementById(s.rowId);
+        if (!row || row.style.display === 'none') return;   // surcharge not active
+        const total = parseFloat((document.getElementById(s.totalId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+        if (!(total > 0)) return;
+        const qty = parseInt(document.getElementById(s.qtyId)?.textContent) || 0;
+        const unit = parseFloat((document.getElementById(s.unitId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+        invoiceProducts.push({
+            product: { style: s.style, title: s.label, color: '', isService: true, isCap: s.isCap },
+            isService: true,
+            lineItems: [{ description: s.label, quantity: qty || 1, unitPrice: unit, total: total }]
         });
     });
 

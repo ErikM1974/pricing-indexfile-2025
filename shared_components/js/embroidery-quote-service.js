@@ -252,9 +252,12 @@ class EmbroideryQuoteService {
                 ExpiresAt: expiresAt,
                 Notes: customerData.notes || '',
                 // Embroidery details for easy access by quote view
-                PrintLocation: primaryLogo?.position || 'Left Chest',
-                StitchCount: primaryLogo?.stitchCount || 8000,
-                DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
+                // Garment logo fields only when the order HAS garments — else a cap-only quote
+                // saved the default 'Left Chest'/8000 and production saw a spurious "Garment:"
+                // note (mirror of the cap gate below). (2026-06-04 cert audit)
+                PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
+                StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? 100 : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -386,7 +389,15 @@ class EmbroideryQuoteService {
                     if (isFirstItem) {
                         try {
                             const specs = {
-                                logos: pricingResults.logos.map(l => ({
+                                // Drop the garment/cap primary logo when that side has NO
+                                // product — else a cap-only (or garment-only) order saved the
+                                // phantom default primary into LogoSpecs.logos and the push Art
+                                // note showed e.g. "Left Chest: 8000 stitches" on a cap-only job.
+                                // Mirror of the PrintLocation gate. (2026-06-04 cert audit)
+                                logos: pricingResults.logos.filter(l => {
+                                    const isCapLogo = /cap/i.test(l.id || '') || /^(cf|cap )/i.test(l.position || '');
+                                    return isCapLogo ? (pricingResults.capQuantity > 0) : (pricingResults.garmentQuantity > 0);
+                                }).map(l => ({
                                     pos: l.position,
                                     stitch: l.stitchCount,
                                     digit: l.needsDigitizing ? 1 : 0,
@@ -1365,9 +1376,12 @@ class EmbroideryQuoteService {
                 ).toFixed(2)),
                 Notes: customerData.notes || '',
                 // Embroidery details
-                PrintLocation: primaryLogo?.position || 'Left Chest',
-                StitchCount: primaryLogo?.stitchCount || 8000,
-                DigitizingFee: primaryLogo?.needsDigitizing ? 100 : 0,
+                // Garment logo fields only when the order HAS garments — else a cap-only quote
+                // saved the default 'Left Chest'/8000 and production saw a spurious "Garment:"
+                // note (mirror of the cap gate below). (2026-06-04 cert audit)
+                PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
+                StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? 100 : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -1490,7 +1504,15 @@ class EmbroideryQuoteService {
                     if (isFirstItem) {
                         try {
                             const specs = {
-                                logos: pricingResults.logos.map(l => ({
+                                // Drop the garment/cap primary logo when that side has NO
+                                // product — else a cap-only (or garment-only) order saved the
+                                // phantom default primary into LogoSpecs.logos and the push Art
+                                // note showed e.g. "Left Chest: 8000 stitches" on a cap-only job.
+                                // Mirror of the PrintLocation gate. (2026-06-04 cert audit)
+                                logos: pricingResults.logos.filter(l => {
+                                    const isCapLogo = /cap/i.test(l.id || '') || /^(cf|cap )/i.test(l.position || '');
+                                    return isCapLogo ? (pricingResults.capQuantity > 0) : (pricingResults.garmentQuantity > 0);
+                                }).map(l => ({
                                     pos: l.position,
                                     stitch: l.stitchCount,
                                     digit: l.needsDigitizing ? 1 : 0,

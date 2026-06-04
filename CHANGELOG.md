@@ -1,3 +1,16 @@
+## v2026.06.04.15 (2026.06.04)
+
+- fix(emb): artwork lifecycle + PDF footing — 6 audit bugs (reset-bleed wrong-logo, edit-reload artwork wipe, unnamed-art push drop, missing stitch-surcharge line, dropped non-standard sizes, setup-fee double-display)
+- fix(emb): PDF printed a Date.now() quote # instead of the real saved ID
+- feat(emb): DECG (garment) + DECC (cap) Customer-Supplied chips, live-priced from /api/decg-pricing
+- fix(emb): DECG/DECC double-save — 2x over-charge on invoice + ShopWorks push
+- fix(emb): restore Services-bar fees (RUSH/GRT-50/GRT-75/DD) lost on edit-reload
+- fix(emb): drop phantom garment logo / production note on cap-only orders
+- fix(emb): restore cap embellishment type (3D-puff/laser-patch) on edit-reload
+- fix(emb): edit-reload pricing — dropped 2XL extended size + AS-Garm/AS-CAP double-count
+- docs(memory): cert run, edit-reload restore class, artwork/PDF audit
+- Deploy v2026.06.04.15: EMB bulletproof — 13 bug fixes + DECG/DECC chips (cert + artwork/PDF audit)
+
 ## v2026.06.04.6 (2026.06.04)
 
 - docs(memory): box-density data findings (real SanMar cartons; no weight in feed)

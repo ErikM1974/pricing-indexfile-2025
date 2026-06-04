@@ -878,14 +878,17 @@ class EmbroideryInvoiceGenerator {
                 </div>
             `;
 
-            // Additional stitches line item (when primary > 8K) - GARMENTS ONLY
+            // Additional stitches NOTE (primary > 8K). The dollar charge is its own line item in
+            // the products table (AS-Garm/AS-CAP, a flat tier). Do NOT print a per-piece $ here:
+            // the old figure was a hardcoded extraK × $1.25 (e.g. "+$5.00") — WRONG (the real
+            // charge is the flat $4/$10 tier) and it double-showed the charge. Note the overage
+            // for context; the table line carries the dollars. (2026-06-04 audit B2)
             if (extraStitches > 0 && type === 'garment') {
                 const extraK = extraStitches / 1000;
-                const asCostPerUnit = extraK * 1.25;
                 html += `
                     <div style="font-size: 11px; color: #333; margin: 4px 0; margin-left: 15px;">
-                        + <strong>Additional Stitches</strong> (+${extraK}K) -
-                        <span style="color: #ff6b35;">+$${asCostPerUnit.toFixed(2)} per piece</span>
+                        + <strong>Additional Stitches</strong> (+${extraK}K over base) -
+                        <span style="color: #ff6b35;">charged in the line items below</span>
                     </div>
                 `;
             }
@@ -1476,7 +1479,7 @@ class EmbroideryInvoiceGenerator {
             <div class="totals-section">
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
-                    <span>$${pricingData.grandTotal.toFixed(2)}</span>
+                    <span>$${(pricingData.grandTotal - (pricingData.setupFees || 0)).toFixed(2)}</span>
                 </div>
                 ${pricingData.additionalServicesTotal > 0 ? `
                 <div class="total-row">
