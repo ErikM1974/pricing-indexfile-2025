@@ -11946,6 +11946,10 @@ async function printQuote() {
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
+            poNumber: document.getElementById('po-number')?.value?.trim() || '',
+            dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
+            reqShipDate: document.getElementById('req-ship-date')?.value || '',
             billing,
             shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };

@@ -653,7 +653,12 @@
     }
 
     quoteItemsToInvoiceRows(items) {
-      return items.map(it => {
+      // TAX / SHIP / DISCOUNT are order-level — they belong in the totals block, not as
+      // line items (they were rendering as rows, double-showing tax). (2026-06-04 audit)
+      const ORDER_LEVEL = new Set(['TAX', 'SHIP', 'SHIPPING', 'DISCOUNT']);
+      return items.filter(it =>
+          !(String(it.EmbellishmentType || '').toLowerCase() === 'fee' && ORDER_LEVEL.has(it.StyleNumber))
+      ).map(it => {
         const qty   = Number(it.Quantity) || Number(it.TotalQuantity) || 0;
         const unit  = Number(it.UnitPrice) || Number(it.FinalUnitPrice) || 0;
         const total = Number(it.LineTotal) || Number(it.TotalAmount) || (unit * qty);
@@ -779,14 +784,19 @@
     // ---------- totals ----------
 
     renderTotals(data, order, orig) {
-      // Prefer ShopWorks dollars when present
+      // Prefer ShopWorks dollars when present. Otherwise (pre-import quote) fall back to the
+      // SAVED session amounts so the invoice foots. TotalAmount is the pre-tax total INCLUDING
+      // all service/AL fees (it matches the rendered line items); SubtotalAmount is products-only
+      // and would under-foot. Tax falls back to the saved TaxAmount (was $0 → wrong tax + pre-tax
+      // grand on pre-import WA orders), and the grand is computed = subtotal + tax + shipping.
+      // (2026-06-04 audit)
       const fromOrder = order && Number.isFinite(Number(order.cur_SubTotal));
-      const subtotal  = fromOrder ? Number(order.cur_SubTotal)        : Number(orig?.totals?.subtotal || data.sessionRaw?.SubtotalAmount || 0);
-      const tax       = fromOrder ? Number(order.cur_SalesTaxTotal)    : Number(orig?.totals?.tax      || 0);
-      const shipping  = fromOrder ? Number(order.cur_Shipping)         : Number(orig?.totals?.shipping || 0);
-      const grand     = fromOrder ? Number(order.cur_TotalInvoice)     : Number(orig?.totals?.total    || data.sessionRaw?.TotalAmount || 0);
-      const payments  = fromOrder ? Number(order.cur_Payments)         : 0;
-      const balance   = fromOrder ? Number(order.cur_Balance)          : grand;
+      const subtotal  = fromOrder ? Number(order.cur_SubTotal)     : Number(orig?.totals?.subtotal ?? data.sessionRaw?.TotalAmount ?? data.sessionRaw?.SubtotalAmount ?? 0);
+      const tax       = fromOrder ? Number(order.cur_SalesTaxTotal) : Number(orig?.totals?.tax      ?? data.sessionRaw?.TaxAmount ?? 0);
+      const shipping  = fromOrder ? Number(order.cur_Shipping)      : Number(orig?.totals?.shipping  ?? 0);
+      const grand     = fromOrder ? Number(order.cur_TotalInvoice)  : Number(orig?.totals?.total     ?? (subtotal + tax + shipping));
+      const payments  = fromOrder ? Number(order.cur_Payments)      : 0;
+      const balance   = fromOrder ? Number(order.cur_Balance)       : grand;
       // AMOUNT DUE = ShopWorks balance when known, otherwise grand - payments.
       const amountDue = fromOrder ? balance : (grand - payments);
 
