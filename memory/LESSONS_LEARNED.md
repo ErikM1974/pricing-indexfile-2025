@@ -156,12 +156,6 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Solution:** On hover, toggle the `.active` class via `classList.toggle()` on existing items — don't regenerate the HTML. Same fix applied to all 3 free-typing comboboxes in `shared_components/js/dtg-inline-form.js` (style, color, customer) that had the pattern.
 **Prevention:** Never regenerate DOM nodes during user interactions (hover, mid-click). Update CSS classes / text content in-place. Smoke tests for interactive selection should use the full `mousedown + mouseup + click` sequence with proper `button: 0, buttons: 1` props — bare `dispatchEvent('mousedown')` is a false-positive trap.
 
-### Art Request Download "Failed to fetch" — CDN URLs Can't Be Fetched Cross-Origin (2026-04-23)
-**Problem:** Steve reported lightbox Download button on art-request-detail "Artwork 2" tile alerted `Download failed: Failed to fetch`. Recurring across multiple requests.
-**Root Cause:** `downloadLightboxImage()` in `pages/js/art-request-detail.js` only routed Box URLs through the proxy. The "Artwork 1–4" tiles come from `READ_ONLY_FIELDS` (`CDN_Link`, `CDN_Link_Two/Three/Four`, `File_Upload`) which store **Cloudinary/Caspio CDN URLs**, not Box URLs. Those fell through to raw `fetch(url)` which hit cross-origin CORS → `TypeError: Failed to fetch`. Image `<img src>` rendered fine (CORS doesn't apply to image tags), so the lightbox image looked normal — only Download broke.
-**Solution:** Added a third branch that detects non-Box URLs and uses an anchor-tag open (`<a href download target=_blank>`) instead of `fetch()`. Browsers bypass CORS for plain navigations.
-**Prevention:** When proxying downloads, enumerate ALL URL shapes a field can hold — not just the current-generation one. Legacy fields (`CDN_Link_*`, `File_Upload`) predate the Box-proxy era. For cross-origin resources you can't `fetch()`, fall back to anchor-tag navigation rather than swallowing the error.
-
 ### "Defensive" Cleanup Selector Nuked Static Overlays — Mark Complete Silently Broke (2026-04-23)
 **Problem:** Steve reported "Mark Complete does nothing" on art-request-detail. After an initial fix-deploy, testing live found it *still* broken — page showed "Error Loading" banner and the whole render chain was crashing silently. Two other features (Find Order, Send for Approval, Share with Customer) were also dead.
 **Root Cause:** To mitigate a theorized orphan-overlay scenario I added `document.querySelectorAll('.art-modal-overlay, #quick-action-overlay').forEach(el => el.remove())` on page boot. The selector matched FOUR legitimate static HTML overlays that share class `art-modal-overlay`: `#find-order-overlay`, `#approval-overlay` (×2), `#share-customer-overlay`. Cleanup wiped them. Then `initShareWithCustomer()` called `overlay.addEventListener('click', ...)` on the now-null share overlay → TypeError → outer `.catch` in render() painted the "Error Loading" banner, and `renderSteveActions()` (which wires up Mark Complete) never got to run.
@@ -249,6 +243,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **Root Cause:** `this.taxRate || 0.101` — JS `||` treats `0` as falsy.
 **Solution:** `this.taxRate ?? 0.101` — nullish coalescing only falls through on `null`/`undefined`.
 **Prevention:** Always `??` when `0`, `""`, or `false` are valid values. Reserve `||` for all-falsy defaults.
+
+### `await` in a sync fn that only looks like the async one — EMB recalc vs updatePricingDisplay (2026-06-03)
+**Problem:** Adding the Additional Logo bar line item, I put `await syncALRows()` beside `syncRushRow(); updateTaxCalculation();`, assuming that block ended `async recalculatePricing()`. It is actually the tail of `updatePricingDisplay(pricing)` — a SYNC fn that recalc calls. `SyntaxError: await is only valid in async functions` took the WHOLE `embroidery-quote-builder.js` down -> every global undefined, Services bar blank, console empty.
+**Root Cause:** `recalculatePricing()` (async) delegates rendering to `updatePricingDisplay()` (sync), and `syncRushRow`/`updateTaxCalculation` live at the end of the SYNC one.
+**Solution:** Keep the display fn sync. A tier-priced line only re-prices when its OWN qty/stitch/type change -> reprice in `addALLineItem` (await syncALRows) + `onServiceQtyChange` (`syncALRows().then(recalc)`); the sync recalc just sums the stored `dataset.unitPrice`. No async ripple into the save path, no duplicated math.
+**Prevention:** Run `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded." The block ending in `syncRushRow()`/`updateTaxCalculation()` is `updatePricingDisplay` (sync), NOT `recalculatePricing`.
 
 ---
 

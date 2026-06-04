@@ -27,15 +27,32 @@
   (Caspio DisplayName differs, e.g. GRT-50 "Setup Fee (Standard)" vs SW "Logo Mockup & Print Review").
 - **Flagship strategy locked** (Erik's call): EMB is flagship; structure=shared, content=per-method;
   adopt-don't-copy; DTG stays separate. See quote-builder-architecture.md "Flagship model".
-- **NEXT — Additional Logo onto the bar (the big one):** Artwork ▾ → "Additional Logo" → mini-picker
-  (Garment/Cap + stitch: Standard/Mid/Large/Full Back) → adds `AL`/`AL-CAP` line; type qty → unit
-  price LIVE from the API (`embroidery-pricing-service.calculateALPrice(qty, stitch, itemType)`,
-  fetch once + cache, recompute on qty change like syncRushRow — it's tier-aware). Multiple ALs,
-  each independent. Then RETIRE the top AL toggle (`toggleGlobalALNew`/`globalAL`, the `garment-al-inline`
-  /`cap-al-inline` controls) + its recalc AL-fee-row path. Verify API price matches the old toggle
-  ($9/pc Standard @ 12pc). Erik confirmed: move it + REMOVE the top controls (logo card keeps
-  Position + Design Size only). Also still pending: push-verify live test (GRT/Monogram/RUSH/DD →
-  Size01), Design # into logo cards, roll to SCP/DTF.
+- **DONE 2026-06-03 — Additional Logo on the bar (verified; on develop, NOT yet deployed):** Artwork ▾ →
+  "Additional Logo" picker (Garment/Cap + size Standard/Mid/Large/Full Back) → drops an `AL`/`AL-CAP`/
+  `DECG-FB` line item; rep types qty → per-piece price LIVE from the API (`EmbroideryPricingService.
+  calculateALPrice`, cached via `/api/al-pricing`). Re-prices on add (`addALLineItem` awaits `syncALRows`)
+  + on qty-change (`onServiceQtyChange` → `syncALRows().then(recalc)` for `[data-al-priced]` rows) — NOT in
+  the sync `updatePricingDisplay` (putting `await` there was a SyntaxError that nuked the whole script; see
+  LESSONS 2026-06-03). Top toggle RETIRED: `garment-al-inline`/`cap-al-inline` hidden; `globalAL` defaults
+  false so the legacy fee-row path stays dormant on new quotes (no double-count); engine kept for
+  backward-compat load of old quotes. Size→stitch per type: garment 8000/13000/20000, cap 5000/8000/11000,
+  FB 25000. Commits e84896f7 + ee044c7e + db2c7930; cache-bust `?v=2026.06.03.6`. Live-verified (Preview):
+  garment Std $9.00@12 (== old toggle + direct API), $7.50@48 (tier-aware), cap Mid $8.50, FB $31.25; 3
+  independent rows; grand $837 foots; toggles hidden; globalAL off; no legacy fee row. NEW shared-bar
+  capability: `quote-services-bar.js` now supports a `fields` picker item (inline selects + Add) — reusable.
+- **DONE 2026-06-04 — Design # lookup moved INTO the logo cards (verified; develop, NOT deployed):** garment
+  Design # now at the top of the Primary Logo card, cap Design # at the top of the Cap Front Logo card (label
+  "Design #"). Standalone sidebar "Artwork" step (`#design-config-section`) REMOVED; flow renumbered
+  Customer(1) → Shipping(2) → Order Details(3) (hidden Artwork-Services panel left as 4). Inner IDs unchanged
+  (`garment-design-number`/`-info`/`-clear`, cap equiv) so `lookupDesignNumber`/`openDesignSearchModal`/
+  `clearDesignNumber`/thumbnails stay wired by ID — zero JS change. Re-scoped sidebar sizing to
+  `.logo-card-design-row` + separator border (`embroidery-quote-builder-extracted.css?v=2026.06.04.1`). Commit
+  ed7ed481. Note: design inputs are visible only once that product type is in the order (cards show on add) —
+  intended. Verified (Preview): inputs in cards, no dup IDs, section gone, steps 1/2/3, styled, no errors.
+- **NEXT:** (1) Erik reviews AL + Design# live on localhost:3000 (hard-refresh; EMB js `?v=2026.06.03.6`, css
+  `?v=2026.06.04.1`) → `/deploy` when happy (ships BOTH). (2) Push-verify a live TEST order — AL/GRT/Monogram/
+  RUSH/DD land as LinesOE (qty → Size01); confirm `AL-CAP` + `DECG-FB` are in proxy `KNOWN_FEE_PNS`. (3) Roll
+  bar + invoice layout to SCP/DTF.
 
 ## DONE + SHIPPED to production (Release v2026.06.03.1, frontend)
 A `/deploy` ran mid-session, so these EMB changes are LIVE in prod (not just localhost):

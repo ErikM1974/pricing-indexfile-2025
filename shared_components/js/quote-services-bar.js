@@ -39,6 +39,20 @@
 
   function itemHtml(it) {
     const icon = `<i class="fas ${it.icon || 'fa-plus'}"></i>`;
+    // Picker item: inline selects (e.g. Garment/Cap + stitch size) → Add → onAdd(code, {fields})
+    if (Array.isArray(it.fields) && it.fields.length) {
+      const selects = it.fields.map((f) =>
+        `<label class="sci-field-lbl">${f.label ? f.label + ' ' : ''}` +
+        `<select class="sci-field" data-field="${f.name}">` +
+        f.options.map((o) => `<option value="${o.value}">${o.label}</option>`).join('') +
+        `</select></label>`
+      ).join('');
+      return `
+        <div class="service-cat-item sci-prompt sci-config" data-code="${it.code}">
+          <span class="sci-name">${icon} ${it.label}</span>
+          <span class="sci-config-wrap">${selects}<button type="button" class="sci-add sci-add-config" data-code="${it.code}">${it.addLabel || 'Add'}</button></span>
+        </div>`;
+    }
     if (it.prompt) {
       return `
         <div class="service-cat-item sci-prompt">
@@ -100,7 +114,18 @@
       closeAll();
     };
     mount.querySelectorAll('.sci-add').forEach((btn) => {
-      btn.addEventListener('click', (e) => { e.stopPropagation(); submitAmt(btn.previousElementSibling); });
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (btn.classList.contains('sci-add-config')) {
+          const row = btn.closest('.sci-config');
+          const fields = {};
+          row.querySelectorAll('.sci-field').forEach((s) => { fields[s.dataset.field] = s.value; });
+          add(btn.dataset.code, { fields });
+          closeAll();
+          return;
+        }
+        submitAmt(btn.previousElementSibling);
+      });
     });
     mount.querySelectorAll('.sci-amt').forEach((inp) => {
       inp.addEventListener('click', (e) => e.stopPropagation());

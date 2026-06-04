@@ -154,6 +154,12 @@ When adding endpoints or rendering user data:
 - **CORS**: update `ALLOWED_ORIGINS` in server.js for new domains.
 - **Rate limit**: sensitive endpoints use `strictLimiter`.
 
+## Policies Hub ↔ Employee Handbook sync
+
+**Before publishing any NEW or substantially-changed Policies Hub policy/procedure, do a two-way Employee Handbook check** (the 22-chapter `employee-handbook` policy + its chapter policies, also `Employee-Handbook-Latest.pdf`):
+1. **No contradiction** — scan the handbook; it is the higher authority on HR/employment topics, so reword the policy to defer (never restate or contradict it), or flag the conflict to Erik.
+2. **Keep the handbook current** — if the new/changed policy introduces or alters something the handbook should reflect, propose the matching handbook update so it doesn't drift, and surface it to Erik. Steps: `policies-hub-update-playbook.md` → "Handbook cross-check" + `handbook-sync-workflow.md`.
+
 ## ManageOrders Documentation Routing
 
 | Discovery type | Destination |

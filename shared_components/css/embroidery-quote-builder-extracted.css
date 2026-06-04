@@ -2395,6 +2395,29 @@ td.size-disabled input {
     font-size: 11px;
 }
 
+/* Design # lookup relocated INTO the logo cards (2026-06-04) — re-scope the sidebar
+   sizing so the moved row keeps its compact buttons/input + add a separator from the
+   Position/Design-Size row below. */
+.logo-card-design-row {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eef2f7;
+}
+.logo-card-design-row .design-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+.logo-card-design-row .design-number-input {
+    width: 90px;
+    padding: 4px 8px;
+    font-size: 12px;
+}
+.logo-card-design-row .design-info-badge {
+    margin-top: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
 /* ============================================
    DESIGN THUMBNAILS
    ============================================ */
