@@ -10,6 +10,23 @@
 - Verify in-browser with the Preview MCP (`preview_start` name `pricing-index-preview`, autoPort, port 3010) — **restart the preview server if it serves stale HTML** (it cached an old copy mid-session once).
 - Branch: **develop** (frontend) and **develop** (proxy). Deploy frontend = `/deploy` skill; proxy = `git push heroku develop:main`.
 
+## UPDATE 2026-06-04 — AL picker redesigned (placement + EXACT stitches); J790 stress-test
+- **DEPLOYED v2026.06.04.1**: AL-as-bar-line-item + Design#-into-logo-cards (see below).
+- **THEN (develop, VERIFIED, NOT deployed — commit f319ac6c, `?v=2026.06.04.2`):** Erik stress-tested a
+  real order (J790 Glacier jacket, 3 logos incl. a 55K full back) and surfaced that the AL picker's coarse
+  buckets (Std/Mid/Large + locked-25K Full Back) couldn't represent 11K or 55K → mis-priced. **Redesigned the
+  AL picker:** (1) **Placement** dropdown (grouped Garment/Cap incl Full Back) that DRIVES the pricing path
+  (Full Back→fullback rate, Cap*→cap, else garment) AND prints on the line + carries to ShopWorks (was
+  notes-only). (2) **Exact Stitches** number field + Std/Mid/Large preset chips — simple for common, exact
+  when it matters; feeds `calculateALPrice` directly. `quote-services-bar.js` gained grouped `<optgroup>` +
+  a `number`/`stitches` field type w/ preset chips (reusable). `addALLineItem(placement, stitches)`.
+  Live-verified (17 pcs, tier 8-23): Right Sleeve **11K=$12.75/pc**, Full Back **55K=$68.75/pc** (was locked
+  $31.25 — **gap fixed**), Cap Front 8K=$8.50. **Full J790 order entered live** (Aaberg's/Nika, sizes
+  L1/XL2/2XL3/3XL6/4XL5=17 via `createOrUpdateExtendedChildRow`, Mid primary, sleeve 11K+DD, back 55K, GRT-50,
+  UPS→Sumner): Subtotal **$3,024.50** + WA tax $305.47 = **$3,329.97**. PNs all correct: J790(+_2X/_3X/_4X),
+  AL, DD, DECG-FB, GRT-50. **NEXT: `/deploy` this fix** (prod still has the bucketed picker w/ the full-back
+  gap), then push-verify + roll to SCP/DTF.
+
 ## UPDATE 2026-06-03 PM — Services bar SHIPPED; AL is the open piece
 - **DEPLOYED v2026.06.03.2** (frontend): the whole Services-bar arc is LIVE — categorized bar
   (Artwork / Add-Ons), `GRT-50` Logo Mockup ($50), `GRT-75` Graphic Design ($75/hr, fractional
