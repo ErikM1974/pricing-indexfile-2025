@@ -11,6 +11,15 @@
 - **4 edge-case fixes** (resetQuote crash, logo-only-order block, AL edit-reload persistence, server blank-customer guard) — DEPLOYED. resetQuote no longer crashes/corrupts.
 - **4 output-surface fixes** — DEPLOYED + verified live on EMB-2026-275: **/quote foots** (AL/Full Back render: $480+$282+$1650=$2412); **/invoice tax fixed** (Tax $243.61/10.1%, grand $2655.61 foots, no TAX line item); **production Logo Map** live (Notes To Production lists Garment + Cap primaries + "Additional Logos: Right Sleeve 11000 / Full Back 55000"); **PDF** now prints Design#/PO#/Req-Ship + AL placement dup fixed. Quote-mgmt dashboard = already solid (no fix).
 - **Shipping estimator** — DEPLOYED + verified. Proxy `POST /api/shipping/estimate-ups-ground {toZip,weightLb,boxes}` (rough zone×weight). Frontend "Estimate UPS Ground" button in the shipping modal → `estimateShipping()` sums real SanMar weight+boxes (`/api/inventory` PIECE_WEIGHT/CASE_SIZE per size, boxes per-product via min case pack) → fills shipping fee. Verified: 4 J790 jackets→Seattle = 7lb, 1 box, $17.12.
+- **Box density (v2026.06.04.5):** `perBoxForCategory(avgWt, caseSize)` in embroidery-quote-builder.js uses
+  DATA-BACKED outbound pieces-per-box from a real SanMar inbound-carton sample (2026-06-04, 71 cartons): caps
+  ~60, tees ~58, polos ~36, hoodies/jackets ~16-17 (decorated-shaved, errs high). Category inferred from
+  per-piece weight + case pack (no extra API call). KEY: **SanMar's shipment feed has NO weight/dimensions**
+  (confirmed in the raw XML; the `sanmar-soap.js` weight/dim parser is dead code) → carton weight = per-piece
+  weight × qty. `/api/sanmar-shipments/by-date` has a **7-day hard limit** (can't mine deep history). **NWCA
+  outbound `Box_Contents`/`Box_Shipments` tables DON'T exist** (stale memory pointer in CLAUDE.md →
+  `box-labels-details.md` also missing). To get TRUE measured decorated density later, build an outbound
+  box-contents log, then re-derive. Category lookup if ever needed: `/api/product-details` → `CATEGORY_NAME`.
 - **⚠️ NEEDS ERIK:** the UPS rate model is a ROUGH starter (linear, coarse zones). For accuracy, Erik downloads the **UPS 983 zone chart + Ground rate grid** from ups.com → replace `zoneForZip()` + `ZONE_MODEL` in `caspio-pricing-proxy/src/routes/shipping.js`. Also delete the EMB-TEST-2026-271/272/274/275 test orders from ShopWorks/3739.
 
 ## REMAINING for full "100% bulletproof" certification
