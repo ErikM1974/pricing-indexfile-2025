@@ -5689,10 +5689,13 @@ window.syncRushRow = syncRushRow;
 // errs to MORE boxes (bias high for prepay). Category is inferred from avg per-piece
 // weight + SanMar case pack, so no extra product lookup is needed.
 function perBoxForCategory(avgWtLb, caseSize) {
-    if (caseSize >= 100) return 60;   // caps / headwear (light, high case pack)
-    if (avgWtLb >= 1.0) return 16;    // hoodies / jackets / outerwear (bulky)
-    if (avgWtLb >= 0.5) return 36;    // polos / heavier knits
-    return 58;                        // tees / light tops
+    // window._boxDensity is loaded from /api/shipping/box-density (Caspio Box_Density_Reference
+    // → defaults), so Erik can tune the numbers without a deploy. Hardcoded values = fallback.
+    const m = window._boxDensity || {};
+    if (caseSize >= 100) return m.Cap || 60;          // caps / headwear (light, high case pack)
+    if (avgWtLb >= 1.0) return m.Jacket || m.Sweatshirt || 16;  // hoodies / jackets / outerwear
+    if (avgWtLb >= 0.5) return m.Polo || 36;          // polos / heavier knits
+    return m['T-Shirt'] || 58;                        // tees / light tops
 }
 
 /**
@@ -5712,6 +5715,10 @@ async function estimateShipping() {
 
     if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
     try {
+        // Load the tunable box density (Caspio Box_Density_Reference → defaults) once.
+        if (!window._boxDensity) {
+            try { const dr = await fetch(`${API_BASE}/api/shipping/box-density`); if (dr.ok) window._boxDensity = (await dr.json()).density || {}; } catch (e) { window._boxDensity = {}; }
+        }
         window._shipWtCache = window._shipWtCache || {};
         let totalWeightLb = 0, totalBoxes = 0, usedFallback = false;
         for (const p of products) {
