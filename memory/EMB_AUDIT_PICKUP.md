@@ -6,6 +6,20 @@
 > tell Erik **with 100% confidence the app is bullet-proof** — every surface correct for any order.
 > **Read this first, then [EMB_REDESIGN_PICKUP.md](EMB_REDESIGN_PICKUP.md) for the redesign history.**
 
+## ✅ RESUME STATUS — 2026-06-04 PM (everything below is now DEPLOYED + LIVE)
+**Frontend prod = v2026.06.04.4; proxy prod = `ab41aa7`.** The "develop NOT deployed" warnings further down are STALE — all of it shipped. What's DONE + LIVE + verified:
+- **4 edge-case fixes** (resetQuote crash, logo-only-order block, AL edit-reload persistence, server blank-customer guard) — DEPLOYED. resetQuote no longer crashes/corrupts.
+- **4 output-surface fixes** — DEPLOYED + verified live on EMB-2026-275: **/quote foots** (AL/Full Back render: $480+$282+$1650=$2412); **/invoice tax fixed** (Tax $243.61/10.1%, grand $2655.61 foots, no TAX line item); **production Logo Map** live (Notes To Production lists Garment + Cap primaries + "Additional Logos: Right Sleeve 11000 / Full Back 55000"); **PDF** now prints Design#/PO#/Req-Ship + AL placement dup fixed. Quote-mgmt dashboard = already solid (no fix).
+- **Shipping estimator** — DEPLOYED + verified. Proxy `POST /api/shipping/estimate-ups-ground {toZip,weightLb,boxes}` (rough zone×weight). Frontend "Estimate UPS Ground" button in the shipping modal → `estimateShipping()` sums real SanMar weight+boxes (`/api/inventory` PIECE_WEIGHT/CASE_SIZE per size, boxes per-product via min case pack) → fills shipping fee. Verified: 4 J790 jackets→Seattle = 7lb, 1 box, $17.12.
+- **⚠️ NEEDS ERIK:** the UPS rate model is a ROUGH starter (linear, coarse zones). For accuracy, Erik downloads the **UPS 983 zone chart + Ground rate grid** from ups.com → replace `zoneForZip()` + `ZONE_MODEL` in `caspio-pricing-proxy/src/routes/shipping.js`. Also delete the EMB-TEST-2026-271/272/274/275 test orders from ShopWorks/3739.
+
+## REMAINING for full "100% bulletproof" certification
+1. **Run the exhaustive test matrix** (archetypes × 6 surfaces — see the matrix near the bottom of this file). Individual pieces are verified; a full sweep across garment/cap/mixed/full-back/3D-puff/laser/extended-sizes/all-tiers/services/discount/tax-exempt/out-of-state, each save→reload→push→PDF→/quote→/invoice, is the cert step. Bias adversarial — try to break each.
+2. **Reconcile totals across surfaces** for each: on-screen == PDF == /quote == /invoice == saved TotalAmount == push subtotal.
+3. **Load Erik's real UPS tables** → re-verify estimates.
+4. **Minor polish found:** suppress the spurious "Cap: CF — 8000 stitches" production-note line on garment-ONLY orders (transformer buildNotes — only emit the Cap line when there's actually a cap); the latent GRT double-count if a rep uses sidebar AND bar (builder).
+Only AFTER the matrix passes + totals reconcile → certify to Erik with the evidence table.
+
 ## How to resume / drive the app
 - Local app: `npm start` (port 3000). Preview MCP server `pricing-index-preview` (port 3010) — restart if it 404s ("Server not found" → `preview_start`). Drive via `preview_eval` (screenshot tool hangs on this heavy page; use eval + console-logs).
 - Build an order in Preview: `addProductRow(style)` → wait → `selectColor(rowId, optEl)` → wait → set `.size-input[data-size=X]`; **caps go in the 3XL/last column via `createOrUpdateExtendedChildRow(rowId,'3XL',qty)`** (cap style = Richardson **112**, not C112). Add logos via `addALLineItem(placement, stitches)`; services via `addManualServiceRow(code)`. Save via `saveAndGetLink()` (needs customer name+email); grab QuoteID from the share-modal: `document.body.innerHTML.match(/EMB-2026-(\d+)/)` (take max).

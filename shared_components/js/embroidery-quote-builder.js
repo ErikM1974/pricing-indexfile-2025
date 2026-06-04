@@ -5683,6 +5683,18 @@ function syncRushRow() {
 }
 window.syncRushRow = syncRushRow;
 
+// Data-backed OUTBOUND pieces-per-box by category, from a real SanMar inbound-carton
+// sample (2026-06-04: tee full cartons ~70-78, hoodie ~18-20) with a decorated-bulk
+// shave — decorated/folded goods fit FEWER per box than flat-packed blanks, so this
+// errs to MORE boxes (bias high for prepay). Category is inferred from avg per-piece
+// weight + SanMar case pack, so no extra product lookup is needed.
+function perBoxForCategory(avgWtLb, caseSize) {
+    if (caseSize >= 100) return 60;   // caps / headwear (light, high case pack)
+    if (avgWtLb >= 1.0) return 16;    // hoodies / jackets / outerwear (bulky)
+    if (avgWtLb >= 0.5) return 36;    // polos / heavier knits
+    return 58;                        // tees / light tops
+}
+
 /**
  * Estimate outbound UPS Ground freight for the current order so the rep can put a
  * prepay shipping line on the quote (customer pays it up front — no second card charge).
@@ -5721,7 +5733,7 @@ async function estimateShipping() {
                 } catch (e) { window._shipWtCache[style] = {}; }
             }
             const bySize = window._shipWtCache[style];
-            let prodQty = 0; const casePacks = [];
+            let prodQty = 0, prodWt = 0, maxCase = 0;
             for (const [size, qty] of Object.entries(sizes)) {
                 const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
                 const wt = (meta && meta.wt) || 0.5;       // fallback ~0.5 lb/pc
@@ -5729,12 +5741,14 @@ async function estimateShipping() {
                 const q = parseInt(qty) || 0;
                 totalWeightLb += wt * q;
                 prodQty += q;
-                if (meta && meta.casePack) casePacks.push(meta.casePack);
+                prodWt += wt * q;
+                if (meta && meta.casePack) maxCase = Math.max(maxCase, meta.casePack);
             }
-            // Box count per PRODUCT (sizes share a box). Smallest case pack = conservative,
-            // bias-high for prepay. Fallback 72/box.
-            const cp = casePacks.length ? Math.min(...casePacks) : 72;
-            totalBoxes += Math.ceil(prodQty / cp);
+            // Boxes per PRODUCT from DATA-BACKED outbound density (real SanMar cartons +
+            // decorated shave) — category inferred from avg per-piece weight + case pack.
+            const avgWt = prodQty > 0 ? prodWt / prodQty : 0.5;
+            const ppb = perBoxForCategory(avgWt, maxCase);
+            totalBoxes += Math.ceil(prodQty / ppb);
         }
         totalBoxes = Math.max(1, totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
