@@ -5683,6 +5683,80 @@ function syncRushRow() {
 }
 window.syncRushRow = syncRushRow;
 
+/**
+ * Estimate outbound UPS Ground freight for the current order so the rep can put a
+ * prepay shipping line on the quote (customer pays it up front — no second card charge).
+ * Weight + box count come from REAL SanMar data (/api/inventory → PIECE_WEIGHT + CASE_SIZE
+ * per size); the rate is a rough zone×weight estimate from the proxy. (2026-06-04, Erik)
+ */
+async function estimateShipping() {
+    const btn = document.getElementById('estimate-ship-btn');
+    const resultEl = document.getElementById('estimate-ship-result');
+    const setMsg = (msg, color) => { if (resultEl) { resultEl.innerHTML = msg; resultEl.style.color = color || '#64748b'; } };
+    const zip = document.getElementById('ship-zip')?.value?.trim();
+    if (!zip) return setMsg('Enter the ship-to ZIP first.', '#dc2626');
+    const products = collectProductsFromTable().filter(p => !p.isService);
+    if (products.length === 0) return setMsg('Add products first.', '#dc2626');
+
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
+    try {
+        window._shipWtCache = window._shipWtCache || {};
+        let totalWeightLb = 0, totalBoxes = 0, usedFallback = false;
+        for (const p of products) {
+            const style = p.style;
+            const sizes = p.sizeBreakdown || {};
+            if (!window._shipWtCache[style]) {
+                try {
+                    const r = await fetch(`${API_BASE}/api/inventory?styleNumber=${encodeURIComponent(style)}`);
+                    const data = r.ok ? await r.json() : [];
+                    const rows = Array.isArray(data) ? data : (data.rows || data.Result || data.data || []);
+                    const bySize = {};
+                    rows.forEach(row => {
+                        const sz = row.SIZE || row.size || row.Size;
+                        if (sz && bySize[sz] === undefined) {
+                            bySize[sz] = { wt: parseFloat(row.PIECE_WEIGHT) || 0, casePack: parseInt(row.CASE_SIZE) || 0 };
+                        }
+                    });
+                    window._shipWtCache[style] = bySize;
+                } catch (e) { window._shipWtCache[style] = {}; }
+            }
+            const bySize = window._shipWtCache[style];
+            let prodQty = 0; const casePacks = [];
+            for (const [size, qty] of Object.entries(sizes)) {
+                const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
+                const wt = (meta && meta.wt) || 0.5;       // fallback ~0.5 lb/pc
+                if (!meta) usedFallback = true;
+                const q = parseInt(qty) || 0;
+                totalWeightLb += wt * q;
+                prodQty += q;
+                if (meta && meta.casePack) casePacks.push(meta.casePack);
+            }
+            // Box count per PRODUCT (sizes share a box). Smallest case pack = conservative,
+            // bias-high for prepay. Fallback 72/box.
+            const cp = casePacks.length ? Math.min(...casePacks) : 72;
+            totalBoxes += Math.ceil(prodQty / cp);
+        }
+        totalBoxes = Math.max(1, totalBoxes);
+        const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes })
+        });
+        if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
+        const est = await resp.json();
+        const feeInput = document.getElementById('shipping-fee');
+        if (feeInput) { feeInput.value = Number(est.estimate).toFixed(2); }
+        if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— rough, adjust as needed</span>`, '#166534');
+    } catch (e) {
+        console.error('[estimateShipping]', e);
+        setMsg('Could not estimate shipping — enter it manually.', '#dc2626');
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-truck-fast"></i> Estimate UPS Ground'; }
+    }
+}
+window.estimateShipping = estimateShipping;
+
 async function recalculatePricing() {
     // Collect products from table (parent rows only)
     const allItems = collectProductsFromTable();
