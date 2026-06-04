@@ -1,3 +1,12 @@
+## v2026.06.04.3 (2026.06.04)
+
+- fix(emb): edge-case hardening from adversarial audit (4 real bugs)
+- docs(memory): push test + edge-case audit findings + 4 fixes + backlog
+- fix(emb invoice): /quote renders AL/AL-CAP/DD/GRT fee line items (foots now)
+- docs(memory): EMB deep-audit pickup — bulletproof mission state + resume plan
+- fix(emb): /invoice tax foots + PDF shows Design#/PO#/Req-Ship (output-surface audit)
+- Deploy v2026.06.04.3: cache-bust EMB audit fixes (surfaces + edge-cases)
+
 ## v2026.06.04.2 (2026.06.04)
 
 - feat(emb): Additional Logo picker — placement + EXACT stitch count (API-priced)
