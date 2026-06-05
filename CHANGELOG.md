@@ -1,3 +1,9 @@
+## v2026.06.05.3 (2026.06.05)
+
+- docs(memory): mark 3 order-entry improvements SHIPPED v2026.06.05.2 (pending Erik live verify)
+- fix(lookup): raise customer-contact dropdown limit 10->25 so all of a company's contacts show (Aaberg's has 17); shared service -> all 4 builders
+- Deploy v2026.06.05.3: 4 files (dtf-quote-builder.html,dtg-quote-builder-legacy.html,embroidery-quote-builder.html,...)
+
 ## v2026.06.05.2 (2026.06.05)
 
 - docs(memory): next-session pickup 2026-06-05 — AS-Garm fix shipped + verified; 3 UX/bug items queued
