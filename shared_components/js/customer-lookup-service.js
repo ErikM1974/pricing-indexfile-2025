@@ -7,7 +7,7 @@ class CustomerLookupService {
         this.baseURL = options.baseURL || window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.minSearchLength = options.minSearchLength || 3;
         this.debounceMs = options.debounceMs || 300;
-        this.maxResults = options.maxResults || 10;
+        this.maxResults = options.maxResults || 25;  // 25 = proxy max; shows all contacts for larger accounts (e.g. Aaberg's has 17) (Erik 2026-06-05)
 
         // Debounce timer
         this.debounceTimer = null;
