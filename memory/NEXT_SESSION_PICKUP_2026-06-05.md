@@ -84,7 +84,17 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.3** (Heroku v1238, develop=main synced) · Proxy **v787** · Inksoft **v262**.
+- Frontend **v2026.06.05.3** (Heroku v1238, develop=main synced) · Proxy **v788** · Inksoft **v262**.
+- **PROXY v788 — push session-selection fix (Erik's #1 rule: wrong total to ShopWorks).** EMB-2026-294
+  pushed STALE notes ($2493/qty28/12000st — from old 291) while its LINE ITEMS were fresh ($366/qty5/8000st).
+  ROOT: TWO `Quote_Sessions` rows shared QuoteID 294 (stale PK_ID 1622 from a 06/04 out-of-band test draft +
+  fresh PK_ID 1624 = Erik's order); the push read `sessions[0]` UNORDERED → Caspio returns oldest-first → grabbed
+  the stale row for the Notes. FIX: `embroidery/dtf/scp-push.js` session query now `q.orderBy:'PK_ID DESC'` (newest
+  save first) on BOTH push + preview; EMB warns on >1 row. Verified live: 294 preview now reads $366. Why the dup id:
+  `quote-sequence.js` is a BLIND counter (`quote_counters.NextSequence`, no existence check) — the 06/04 294 draft was
+  inserted out-of-band so it never advanced the counter → 294 reissued ONCE. Counter now at 295 (EMB-2026-295 does NOT
+  exist → no imminent collision). OPEN (Erik's call): delete stale 294 (PK_ID 1622) + wrong ShopWorks 294 (test cust 3739);
+  OPTIONAL harden quote-sequence to skip already-existing ids (defense-in-depth; low priority, counter is clean).
 - **v2026.06.05.3 also shipped** a customer-lookup fix: `customer-lookup-service.js` `maxResults` 10→25 so the
   contact dropdown shows ALL of a company's contacts (Aaberg's has 17; was capped at 10). Shared service → all 4 builders.
   NOTE: proxy `/api/company-contacts/search` caps at 25 — a company with >25 contacts would still truncate (bump proxy if needed).
