@@ -1,3 +1,10 @@
+## v2026.06.05.1 (2026.06.05)
+
+- fix(order-form): stamp APISource="ManageOrders" (was blank) to match the ShopWorks integration filter
+- docs(memory): next-session pickup — AS-Garm subtotal fix + APISource receiving win recap
+- fix(emb): include AS-Garm/AS-CAP stitch fees in saved SubtotalAmount
+- Deploy v2026.06.05.1: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.06.04.15 (2026.06.04)
 
 - fix(emb): artwork lifecycle + PDF footing — 6 audit bugs (reset-bleed wrong-logo, edit-reload artwork wipe, unnamed-art push drop, missing stitch-surcharge line, dropped non-standard sizes, setup-fee double-display)
