@@ -84,4 +84,12 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.2** (Heroku v1237, develop=main synced) · Proxy **v787** · Inksoft **v262**.
+- Frontend **v2026.06.05.3** (Heroku v1238, develop=main synced) · Proxy **v787** · Inksoft **v262**.
+- **v2026.06.05.3 also shipped** a customer-lookup fix: `customer-lookup-service.js` `maxResults` 10→25 so the
+  contact dropdown shows ALL of a company's contacts (Aaberg's has 17; was capped at 10). Shared service → all 4 builders.
+  NOTE: proxy `/api/company-contacts/search` caps at 25 — a company with >25 contacts would still truncate (bump proxy if needed).
+- **Email-not-filling investigation (Maxx Bacon @ Aaberg's):** NOT a code bug — the contact's `Email`/`ContactNumbersEmail`
+  columns are genuinely blank (only the shared `Company_Email` is set; it's identical on all 17 Aaberg's rows so it's NOT a
+  safe fallback — Erik vetoed that). Maxx (ID_Contact 162449) is a no-email DUP of Alexx Bacon (116287, has alexx@aabergsequipment.com).
+  Resolution = data cleanup in ShopWorks (Erik's call), no code change. Lesson: ran proxy locally vs live Caspio to PROVE the
+  `Email` vs `ContactNumbersEmail` columns are identical before deploying a "fix" — caught a wrong theory pre-deploy.
