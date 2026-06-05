@@ -1,3 +1,9 @@
+## v2026.06.05.2 (2026.06.05)
+
+- docs(memory): next-session pickup 2026-06-05 — AS-Garm fix shipped + verified; 3 UX/bug items queued
+- feat(emb): order-entry flow improvements — AL qty auto-tally, logo card auto-collapse, prominent one-click Push
+- Deploy v2026.06.05.2: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.06.05.1 (2026.06.05)
 
 - fix(order-form): stamp APISource="ManageOrders" (was blank) to match the ShopWorks integration filter
