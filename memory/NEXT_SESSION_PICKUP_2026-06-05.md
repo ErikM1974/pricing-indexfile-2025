@@ -1,0 +1,75 @@
+# NEXT SESSION PICKUP — set 2026-06-05 (Erik powering off)
+
+## ✅ DONE THIS SESSION — deployed + verified, DON'T redo
+
+### 1. ShopWorks receiving outage — FIXED + DEPLOYED + VERIFIED
+- **Root cause:** the OnSite "Manage Orders" integration's **`APISource` filter = `ManageOrders`** silently
+  dropped 100% of our blank-APISource pushes.
+- **Fix:** stamp `APISource:"ManageOrders"` on EVERY push path. Deployed: proxy **v787** (EMB/SCP/DTF +
+  order-form/3DT/DTG via `transformOrder`), Inksoft `transform.py` **v262**, frontend `server.js`
+  (shipped in v2026.06.05.1).
+- **Verified:** Erik's rep-built order **`EMB-2026-293` imported into ShopWorks** — `APISource:"ManageOrders"`,
+  `id_Integration:200`, design #9449 linked.
+
+### 2. AS-Garm subtotal fix — FIXED + DEPLOYED (frontend **v2026.06.05.1**) + VERIFIED
+- **Bug:** EMB `SubtotalAmount` was saved as `pricingResults.subtotal + ltmFee`, which EXCLUDED the
+  AS-Garm/AS-CAP stitch surcharges (they live in `grandTotal`, not `subtotal`), while `TaxAmount` + the
+  pushed ShopWorks lines INCLUDED them → quote under-counted vs ShopWorks (291: $2493 vs $2605 lines).
+- **Fix:** `shared_components/js/embroidery-quote-service.js` — BOTH save paths (saveQuote + updateQuote)
+  now compute one shared `const preTaxSubtotal = grandTotal + art/design/rush/sample − discount` and use
+  it for BOTH `SubtotalAmount` AND `TotalAmount` (can't diverge again). 40 jest tests pass.
+- **Verified:** `EMB-2026-293` foots perfectly — Subtotal **$1142 = sum of all 9 lines** (incl the $312
+  Additional-Logo fee); Total $1257.34 = Subtotal + Tax. (293's logo was ≤10K so it had no AS-Garm
+  surcharge specifically — the AL fee folded in correctly; the jest tests cover the AS-Garm delta.)
+- **TODO (carry-over):** add this to `LESSONS_LEARNED.md` (file was ~300 lines — archive an old resolved
+  entry first). Lesson = "saved SubtotalAmount must equal the all-in pre-tax base the tax uses (= sum of
+  pushed lines); never derive it from `pricingResults.subtotal` (products-only, drops stitch fees). Same
+  'output paths must agree' class as the 2026-06-01 invoice bug."
+
+---
+
+## 🔧 NEXT — 3 items from Erik's live order-entry feedback (do in this order)
+
+### #1 (DO FIRST — pricing-safety BUG): Additional-Logo qty defaults to 1, should auto-tally to total pieces
+- When a rep adds an **Additional Logo (AL)** from the Services bar, its qty defaults to **1**. It should
+  default to the **total garment quantity** on the order (e.g. 39) and stay in sync as sizes change.
+- **Risk:** if the rep forgets to change 1→39, the logo is under-billed ($8 vs $312) — Erik's #1 rule.
+- **Where:** `shared_components/js/embroidery-quote-builder.js` — `addALLineItem` / the Services-bar onAdd
+  handler. Set AL qty = sum of garment quantities (the "Total Pieces" value), and re-sync on garment qty
+  change (in `recalculatePricing` or a qty-change hook).
+- Erik's words: "it should default to the total quantity currently on the order… right now it sets the
+  additional logo to one… thinking of a better, easier way to key this in." → answer: auto-tally, no manual count.
+
+### #2 (UX): Logo card crowds the line items / hard to read
+- The Primary Logo card is tall and sits ABOVE the product table, squeezing the line items into a tiny
+  scroll area (worse with multiple logos).
+- **Recommended fix:** auto-collapse the logo card to a one-line summary once a Design # is set (it already
+  has the chevron / `toggleLogoCard`). Keeps it accessible but out of the way.
+- **Where:** `quote-builders/embroidery-quote-builder.html` (logo-card markup) + `embroidery-quote-builder.js`
+  (`toggleLogoCard` / the Design# set handler — `setDesignNumberOnLogo` / `updateLogoCardHeader`).
+
+### #3 (UX — biggest workflow win): "Push to ShopWorks" is buried + Save-vs-Push flow confusing
+- It's the LAST button under Copy/Print/Email/Save&Share. Erik got confused about what to click after
+  entering the line items ("I think you have to click Save and Share… that option is buried").
+- **Recommended fix:** make **Push to ShopWorks the prominent PRIMARY action** (top, full-width, distinct
+  color) and have it **auto-save before pushing** (no separate Save step). One clear path: fill order →
+  Push → review modal → confirm.
+- **Where:** the right-panel action buttons in `quote-builders/embroidery-quote-builder.html` (Save & Share
+  section + Copy/Print/Email/Push) + the push handler (`openPushPreview`/`confirmPushToShopWorks` — ensure
+  it saves first).
+
+---
+
+## ⚠️ Flags + cleanup
+- **`loadQuoteForEditing` froze the page** (90s+, twice) when I called it programmatically on complex
+  quote 291 (DECG + multi-logo). May be my direct invocation (not the dashboard edit flow), OR a real
+  edit-load hang on heavy quotes — worth a look; could bite reps editing big orders.
+- **AUTOMATION NOTE:** the EMB builder is too heavy to drive reliably via Chrome CDP (freezes/races on the
+  product autocomplete + edit-load). For live E2E tests, have ERIK build the order; I verify the pushed JSON.
+- **Test orders to DELETE in ShopWorks/Caspio** (all test): `EMB-2026-293` (cust 1276 Aaberg's, Erik's
+  test), `EMB-TEST-2026-291` (HAND-EDITED this session: SubtotalAmount forced to 2605, re-pushed, left
+  `Status=Open` + `PushedToShopWorks` reset then re-set — re-lock or delete), `EMB-TEST-2026-294`,
+  `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
+
+## Deploy state
+- Frontend **v2026.06.05.1** (Heroku, develop=main synced) · Proxy **v787** · Inksoft **v262**.
