@@ -225,6 +225,23 @@ class EmbroideryQuoteService {
             const additionalLogo = pricingResults.logos?.find(l => l.id?.includes('additional') && !l.id?.includes('cap'));
             const capPrimaryLogo = pricingResults.logos?.find(l => l.id === 'cap-primary');
 
+            // Pre-tax subtotal = the all-in amount the tax is computed on: decoration
+            // grandTotal — which ALREADY includes the AS-Garm/AS-CAP stitch fees + LTM
+            // (see embroidery-quote-builder.js: "Stitch fees ... included in grandTotal")
+            // — plus art/design/rush/sample, minus discount. SubtotalAmount AND TotalAmount
+            // MUST be this SAME value: the ShopWorks push tax-note prints "Total with Tax =
+            // Subtotal + Tax" and SW sums the same line items.
+            // (Fix 2026-06-05: the old `subtotal + ltm` formula DROPPED the stitch fees from
+            //  SubtotalAmount, so the quote under-counted vs what ShopWorks bills.)
+            const preTaxSubtotal = parseFloat((
+                (pricingResults.grandTotal || 0) +
+                (customerData.artCharge || 0) +
+                (customerData.graphicDesignCharge || 0) +
+                (customerData.rushFee || 0) +
+                (customerData.sampleFee || 0) -
+                (customerData.discount || 0)
+            ).toFixed(2));
+
             // Prepare session data
             const sessionData = {
                 QuoteID: quoteID,
@@ -235,18 +252,9 @@ class EmbroideryQuoteService {
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,
-                SubtotalAmount: parseFloat(((pricingResults.subtotal || 0) + (pricingResults.ltmFee || 0)).toFixed(2)),
+                SubtotalAmount: preTaxSubtotal,
                 LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),  // Keep for internal tracking
-                // TotalAmount includes ALL fees: grandTotal + Art + GraphicDesign + Rush + Sample - Discount
-                // (2026-01-14 fix: Art/Rush/Sample/Discount were missing from TotalAmount)
-                TotalAmount: parseFloat((
-                    pricingResults.grandTotal +
-                    (customerData.artCharge || 0) +
-                    (customerData.graphicDesignCharge || 0) +
-                    (customerData.rushFee || 0) +
-                    (customerData.sampleFee || 0) -
-                    (customerData.discount || 0)
-                ).toFixed(2)),
+                TotalAmount: preTaxSubtotal,  // identical all-in pre-tax base — must match SubtotalAmount
                 Status: 'Open',
                 CreatedAt_Quote: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
                 ExpiresAt: expiresAt,
@@ -1356,6 +1364,19 @@ class EmbroideryQuoteService {
             const additionalLogo = pricingResults.logos?.find(l => l.id?.includes('additional') && !l.id?.includes('cap'));
             const capPrimaryLogo = pricingResults.logos?.find(l => l.id === 'cap-primary');
 
+            // Pre-tax subtotal — see the save path above. SubtotalAmount and TotalAmount must
+            // be this SAME all-in pre-tax base (grandTotal incl stitch + LTM, + art/design/rush/
+            // sample − discount) so the push note's "Total with Tax = Subtotal + Tax" reconciles
+            // and matches what ShopWorks sums. (Fix 2026-06-05: stitch fees were being dropped.)
+            const preTaxSubtotal = parseFloat((
+                (pricingResults.grandTotal || 0) +
+                (customerData.artCharge || 0) +
+                (customerData.graphicDesignCharge || 0) +
+                (customerData.rushFee || 0) +
+                (customerData.sampleFee || 0) -
+                (customerData.discount || 0)
+            ).toFixed(2));
+
             // Prepare updated session data
             const sessionData = {
                 CustomerEmail: customerData.email,
@@ -1364,16 +1385,9 @@ class EmbroideryQuoteService {
                 SalesRepEmail: customerData.salesRepEmail || 'sales@nwcustomapparel.com',
                 SalesRepName: customerData.salesRepName || '',
                 TotalQuantity: pricingResults.totalQuantity || 0,
-                SubtotalAmount: parseFloat(((pricingResults.subtotal || 0) + (pricingResults.ltmFee || 0)).toFixed(2)),
+                SubtotalAmount: preTaxSubtotal,
                 LTMFeeTotal: parseFloat((pricingResults.ltmFee || 0).toFixed(2)),  // Keep for internal tracking
-                TotalAmount: parseFloat((
-                    pricingResults.grandTotal +
-                    (customerData.artCharge || 0) +
-                    (customerData.graphicDesignCharge || 0) +
-                    (customerData.rushFee || 0) +
-                    (customerData.sampleFee || 0) -
-                    (customerData.discount || 0)
-                ).toFixed(2)),
+                TotalAmount: preTaxSubtotal,  // identical all-in pre-tax base — must match SubtotalAmount
                 Notes: customerData.notes || '',
                 // Embroidery details
                 // Garment logo fields only when the order HAS garments — else a cap-only quote
