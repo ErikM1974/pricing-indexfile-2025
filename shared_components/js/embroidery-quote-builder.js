@@ -1281,6 +1281,7 @@ async function populateProducts(items) {
             serviceRow.dataset.alPriced = 'true';
             serviceRow.dataset.alItemType = serviceType === 'DECG-FB' ? 'fullback'
                 : (serviceType === 'AL-CAP' ? 'cap' : 'garment');
+            serviceRow.dataset.alQtyAuto = 'false';   // preserve the SAVED qty on reload — don't re-tally
         }
 
         // Re-flag bar Customer-Supplied (DECG/DECC) rows so they stay LIVE API-priced on revisions
@@ -1804,6 +1805,11 @@ function updateLogoCardHeader(type, designNumber) {
             ? `${baseTitle} — Design #${designNumber}`
             : baseTitle;
     }
+    // Auto-collapse once a design # is set so the card stops crowding the line items below;
+    // expand again if it's cleared so the rep can re-enter. The chevron (toggleLogoCard) still
+    // lets them re-open it to tweak position / size / stitches. (Erik 2026-06-05)
+    if (designNumber) card.classList.add('collapsed');
+    else card.classList.remove('collapsed');
 }
 
 // ============================================================
@@ -3325,8 +3331,14 @@ async function addALLineItem(placement, stitches) {
         stitchCount = priceItemType === 'cap' ? 5000 : (priceItemType === 'fullback' ? 25000 : 8000);
     }
 
+    // Auto-tally: a 2nd logo goes on EVERY piece, so default the qty to the order's current
+    // garment (or cap) count instead of 1 — reps no longer hand-count. Stays auto-synced to the
+    // order total until the rep types a different qty. (Erik 2026-06-05)
+    const counts = getOrderPieceCounts();
+    const autoQty = (priceItemType === 'cap') ? counts.cap : counts.garment;
+
     const row = createServiceProductRow(serviceType, {
-        quantity: 1,
+        quantity: autoQty > 0 ? autoQty : 1,
         unitPrice: 0,      // placeholder — set live by syncALRows()
         total: 0,
         isCap: isCap,
@@ -3338,6 +3350,7 @@ async function addALLineItem(placement, stitches) {
     // Mark the row for live AL pricing; carry the pricing item type (garment/cap/fullback)
     row.dataset.alPriced = 'true';
     row.dataset.alItemType = priceItemType;
+    row.dataset.alQtyAuto = 'true';   // qty tracks the order's piece count until the rep edits it
 
     // Focus the qty input so the rep can set the count immediately
     const qtyInput = row.querySelector('.service-qty');
@@ -3346,7 +3359,9 @@ async function addALLineItem(placement, stitches) {
     markAsUnsaved();
     await syncALRows();     // pull the live per-piece price from the API (cached) for this row
     recalculatePricing();   // sum it into the totals
-    showToast(`Additional Logo (${placement}) added — set the quantity`, 'success');
+    showToast(autoQty > 0
+        ? `Additional Logo (${placement}) — qty auto-set to ${autoQty} (all pieces). Adjust if needed.`
+        : `Additional Logo (${placement}) added — set the quantity`, 'success');
 }
 
 /**
@@ -3399,6 +3414,7 @@ function onServiceQtyChange(rowId) {
     // Additional Logo: per-piece price is tier-based (changes with this row's quantity),
     // so re-price from the API first, then recalc. syncALRows updates this row's cells.
     if (row.dataset.alPriced === 'true') {
+        row.dataset.alQtyAuto = 'false';   // rep set the qty by hand — stop auto-tallying to the order total
         syncALRows().then(() => recalculatePricing());
         markAsUnsaved();
         return;
@@ -5783,17 +5799,38 @@ async function loadALPricing() {
     }
 }
 
+/**
+ * Current piece counts on the order, garment vs cap, summed from the product rows. An
+ * Additional Logo is a 2nd decoration that goes on EVERY piece, so its qty should track the
+ * order total (not sit at 1) — used to auto-default + auto-sync AL rows. (Erik 2026-06-05)
+ */
+function getOrderPieceCounts() {
+    const products = collectProductsFromTable().filter(p => !p.isService);
+    return {
+        garment: products.filter(p => !p.isCap).reduce((s, p) => s + (p.totalQuantity || 0), 0),
+        cap: products.filter(p => p.isCap).reduce((s, p) => s + (p.totalQuantity || 0), 0),
+    };
+}
+
 async function syncALRows() {
     const alRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-al-priced="true"]');
     if (!alRows.length) return;
     const cache = await loadALPricing();
     if (!cache) return;                              // error already surfaced; don't guess a price
     const svc = window._alPricingSvc;
+    const counts = getOrderPieceCounts();
     for (const row of alRows) {
         const rid = row.dataset.rowId;
+        const itemType = row.dataset.alItemType || 'garment';
+        // Auto-tally: a 2nd logo goes on every piece — keep the qty synced to the order's
+        // garment/cap count UNLESS the rep overrode it (al-qty-auto === "false"). (Erik 2026-06-05)
+        if (row.dataset.alQtyAuto !== 'false') {
+            const want = (itemType === 'cap') ? counts.cap : counts.garment;
+            const qInput = row.querySelector('.service-qty');
+            if (qInput && want > 0 && String(want) !== qInput.value) qInput.value = String(want);
+        }
         const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
         const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
-        const itemType = row.dataset.alItemType || 'garment';
         let unit = 0;
         try {
             const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
@@ -5981,6 +6018,11 @@ async function estimateShipping() {
 window.estimateShipping = estimateShipping;
 
 async function recalculatePricing() {
+    // Keep Additional-Logo rows tallied to the order's piece count + re-priced for the current
+    // tier BEFORE we read the table — so a garment add/remove/qty change flows into the AL line.
+    // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
+    //  doesn't re-fire onServiceQtyChange → no loop.) (Erik 2026-06-05)
+    try { await syncALRows(); } catch (_) {}
     // Collect products from table (parent rows only)
     const allItems = collectProductsFromTable();
     const productList = allItems.filter(p => !p.isService);
@@ -7158,7 +7200,8 @@ function updateTaxCalculation() {
  * Save quote and get shareable link
  * Uses EmbroideryQuoteService and QuoteShareModal
  */
-async function saveAndGetLink() {
+async function saveAndGetLink(opts = {}) {
+    const skipShareModal = !!(opts && opts.skipShareModal);   // true from pushToShopWorks: auto-save → push, no share modal
     // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
     // so a stale value here would be persisted to the quote. (2026-06-04 audit hardening)
     try { await syncALRows(); await syncDECGRows(); await recalculatePricing(); } catch (e) { console.warn('[Save] pre-save recalc skipped', e); }
@@ -7505,22 +7548,27 @@ async function saveAndGetLink() {
                 updateEditModeUI(result.quoteID, newRevision);
                 showToast(`Revision ${newRevision} saved successfully!`, 'success');
 
-                // Show modal with link (don't pass message as baseUrl!)
-                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                    QuoteShareModal.show(result.quoteID);
-                } else {
-                    const url = `${window.location.origin}/quote/${result.quoteID}`;
-                    navigator.clipboard.writeText(url).catch(() => {});
-                    showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
+                // Show modal with link (don't pass message as baseUrl!) — skipped when auto-saving
+                // to push, where the push preview opens instead.
+                if (!skipShareModal) {
+                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                        QuoteShareModal.show(result.quoteID);
+                    } else {
+                        const url = `${window.location.origin}/quote/${result.quoteID}`;
+                        navigator.clipboard.writeText(url).catch(() => {});
+                        showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
+                    }
                 }
             } else {
-                // New quote: Show success modal with shareable link
-                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                    QuoteShareModal.show(result.quoteID);
-                } else {
-                    const url = `${window.location.origin}/quote/${result.quoteID}`;
-                    navigator.clipboard.writeText(url).catch(() => {});
-                    showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
+                // New quote: success modal with shareable link — skipped when auto-saving to push.
+                if (!skipShareModal) {
+                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                        QuoteShareModal.show(result.quoteID);
+                    } else {
+                        const url = `${window.location.origin}/quote/${result.quoteID}`;
+                        navigator.clipboard.writeText(url).catch(() => {});
+                        showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
+                    }
                 }
             }
 
@@ -7576,9 +7624,8 @@ function updatePushButtonState() {
         return;
     }
 
-    const hasQuote = !!_pushQuoteId;
     const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
-    const enabled = hasQuote && hasCustomer;
+    const enabled = hasCustomer;   // push now auto-saves first, so it no longer requires a prior save
 
     label.textContent = 'Push to ShopWorks';
     btn.style.background = '#1a5276';
@@ -7586,10 +7633,8 @@ function updatePushButtonState() {
     btn.style.opacity = enabled ? '1' : '0.5';
     btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
     btn.title = enabled
-        ? 'Create this quote as an order in ShopWorks OnSite'
-        : (!hasQuote
-            ? 'Save the quote first (Save & Get Shareable Link), then push'
-            : 'Enter the ShopWorks Customer # (top of form) to enable push');
+        ? 'Save + create this quote as an order in ShopWorks OnSite (saves automatically)'
+        : 'Enter the ShopWorks Customer # (top of the form) to enable push';
 }
 
 // Called after a successful save and when loading a saved quote for editing.
@@ -7598,6 +7643,25 @@ function showPushButton(quoteId) {
     _pushAlreadyDone = false;
     updatePushButtonState();
 }
+
+// One-click "Push to ShopWorks": auto-SAVE first (so the rep never has to hunt for a separate
+// "Save & Share" step), then open the review-and-confirm preview. saveAndGetLink() validates +
+// sets _pushQuoteId on success; on failure it already surfaced the error and we bail. (Erik 2026-06-05)
+async function pushToShopWorks() {
+    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
+    if (!hasCustomer) {
+        showToast('Enter the ShopWorks Customer # (top of the form) before pushing.', 'warning');
+        document.getElementById('customer-number')?.focus();
+        return;
+    }
+    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
+    if (!_pushQuoteId || dirty) {
+        await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId
+    }
+    if (!_pushQuoteId) return;            // save failed / validation blocked it — error already shown
+    await openPushPreview();
+}
+window.pushToShopWorks = pushToShopWorks;
 
 // Open the preview-and-confirm modal. Fetches the exact ExternalOrderJson the
 // backend would send (read-only /preview endpoint) so the rep reviews line
@@ -7825,8 +7889,9 @@ function closePushPreview() {
     if (modal) modal.classList.remove('active');
 }
 
-// Back-compat alias (older entry points referenced pushToShopWorks directly).
-function pushToShopWorks() { return openPushPreview(); }
+// NOTE: pushToShopWorks() (defined above) now AUTO-SAVES then opens the push preview. The old
+// back-compat alias that just called openPushPreview() was removed so the auto-save wrapper wins
+// (a later same-name function declaration would otherwise override it). (Erik 2026-06-05)
 
 async function embEmailQuote() {
     const quoteId = editingQuoteId;
