@@ -28,7 +28,19 @@
 
 ---
 
-## 🔧 NEXT — 3 items from Erik's live order-entry feedback (do in this order)
+## ✅ SHIPPED v2026.06.05.2 (Heroku v1237, commit c3123247) — 3 order-entry improvements; PENDING Erik's live-build verify
+
+> **#1 AL qty auto-tally** — `embroidery-quote-builder.js`: new `getOrderPieceCounts()`; `addALLineItem`
+> defaults qty to total garment/cap count (not 1); `syncALRows` auto-syncs it (now called from
+> `recalculatePricing` so a garment-qty change flows in); `onServiceQtyChange` sets `alQtyAuto='false'`
+> on manual edit; edit-reload sets `alQtyAuto='false'` to preserve the saved qty.
+> **#2 logo card auto-collapse** — `updateLogoCardHeader` adds `.collapsed` once a Design # is set (chevron re-opens).
+> **#3 one-click Push** — new `pushToShopWorks()` auto-saves via `saveAndGetLink({skipShareModal:true})` then
+> opens the preview; button is now FIRST + prominent, enabled on Customer # (removed a dup legacy `pushToShopWorks` alias).
+> AL still lands as a ShopWorks **LinesOE line item** (KNOWN_FEE_PNS has AL/AL-CAP/DECG-FB; `manualServiceItems` saves AL).
+> **TO VERIFY (Erik builds an order):** AL qty auto-fills to the total + pushes as a line item with that qty; logo card collapses; one-click Push auto-saves then previews.
+
+### Original feedback detail (now shipped)
 
 ### #1 (DO FIRST — pricing-safety BUG): Additional-Logo qty defaults to 1, should auto-tally to total pieces
 - When a rep adds an **Additional Logo (AL)** from the Services bar, its qty defaults to **1**. It should
@@ -72,4 +84,4 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.1** (Heroku, develop=main synced) · Proxy **v787** · Inksoft **v262**.
+- Frontend **v2026.06.05.2** (Heroku v1237, develop=main synced) · Proxy **v787** · Inksoft **v262**.
