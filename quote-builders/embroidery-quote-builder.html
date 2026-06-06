@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.05.6">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.05.9">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
@@ -879,6 +879,9 @@
 
             <!-- Action Buttons (Outside scroll container - always visible) -->
             <div class="action-panel">
+                <!-- Push-readiness checklist — shows the gates a successful push needs, so the rep isn't
+                     guessing why the button is disabled. Live via renderPushReadiness(). (audit #8 2026-06-05) -->
+                <div class="push-readiness" id="push-readiness"></div>
                 <!-- Push to ShopWorks is the PRIMARY action — first + prominent. It now auto-SAVES the
                      quote first (pushToShopWorks), so the rep no longer has to hunt for "Save & Share".
                      Enabled once a Customer # is set. (Erik 2026-06-05) -->
@@ -1481,7 +1484,7 @@ Company:Absher Construction Company
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.05.8"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.05.9"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
