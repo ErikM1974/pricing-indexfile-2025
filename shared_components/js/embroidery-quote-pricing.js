@@ -398,6 +398,14 @@ class EmbroideryPricingCalculator {
                     this.patchUpchargePerCap = patchUpcharge.SellPrice;
                 }
 
+            } else {
+                // P2-14 (audit 2026-06-06): a 200 {success:false} (or a shape without .data) silently kept the
+                // hardcoded default fees — never silently use a wrong fee (Erik's #1 rule). Warn like the catch.
+                console.warn('[EmbroideryPricingCalculator] Service codes response not usable (success/data missing) — using defaults');
+                if (this.apiStatus && Array.isArray(this.apiStatus.warnings)) this.apiStatus.warnings.push('Service-code fees unavailable — using default fees');
+                if (!this.apiError && typeof this.showAPIWarning === 'function') {
+                    this.showAPIWarning('Could not load current service fees from the server (unexpected response) — using default amounts. Verify these fees before sending the quote.', 'partial');
+                }
             }
         } catch (error) {
             console.warn('[EmbroideryPricingCalculator] Failed to load service codes, using defaults:', error.message);
@@ -1957,11 +1965,16 @@ class EmbroideryPricingCalculator {
         const submitButtons = document.querySelectorAll(
             'button[type="submit"], ' +
             'button[id*="submit"], ' +
-            'button[id*="save"], ' + 
+            'button[id*="save"], ' +
             'button[id*="send"], ' +
             'button[id*="quote"], ' +
             '.btn-primary, ' +
-            '.create-quote-btn'
+            '.create-quote-btn, ' +
+            // P2-13 (audit 2026-06-06): the real EMB Save/Push controls weren't matched above (Save is
+            // .btn-save-quote / onclick=saveAndGetLink, Push is #emb-push-shopworks-btn), so this
+            // AL-pricing-failure backstop was INERT. Add the real selectors.
+            '.btn-save-quote, #emb-push-shopworks-btn, ' +
+            '[onclick*="saveAndGetLink"], [onclick*="pushToShopWorks"]'
         );
         
         submitButtons.forEach(btn => {
