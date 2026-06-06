@@ -84,7 +84,12 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.6** (Heroku v1241, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- Frontend **v2026.06.05.7** (Heroku v1242, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- **v2026.06.05.7 — Order Recap** (Erik's "empty space left of the totals" question): read-only "order at a glance"
+  (Customer / Ship-To / Logos) `#order-recap` filling the bottom-left empty space, pairing with the invoice totals.
+  EMB-SCOPED: `margin-right:auto` on the new div so the SHARED `.invoice-totals-wrap` stays flex-end (DTF/SCP/DTG
+  untouched — verified the wrap CSS is a clean flex row before building). Live via `renderOrderRecap()` hooked into
+  recalc + updateLogoCardHeader + applyContact; CSS `.order-recap:empty{display:none}` hides it until populated.
 - **v2026.06.05.6 — audit #3 right-panel re-skin SHIPPED** (SHARED css → DTF/SCP/DTG affected, verify): Quote Summary
   `.pricing-panel` now bordered white card (14px pad); `.pricing-title i` + `.tier-badge` → indigo #6366f1 (match step
   numbers; green invoice TOTAL stays money accent); Special Notes header off-yellow → neutral gradient; Order Details
