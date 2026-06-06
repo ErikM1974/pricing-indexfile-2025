@@ -1,3 +1,9 @@
+## v2026.06.06.7 (2026.06.06)
+
+- fix(emb): P2 customer/shipping batch — pickup-reload address guard + stale-banner clear + project-name
+- fix(emb): P2 batch — ProjectName persistence + dashboard pushed-order lock + push-button email re-enable
+- Deploy v2026.06.06.7: cache-bust P2 batch
+
 ## v2026.06.06.6 (2026.06.06)
 
 - chore: remove stray inv_sample.json (malformed-path debug artifact)
