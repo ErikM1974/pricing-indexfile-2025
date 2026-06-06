@@ -4,6 +4,12 @@
 
 ---
 
+## Quote-management Amount column showed $0.00 for orders with null cur_TotalInvoice (2026-05-28) (archived 2026-06-06)
+**Problem:** Quote Management dashboard showed `$0.00` in the Amount column for some Processed orders that had non-zero `TotalAmount` in `quote_sessions`.
+**Root Cause:** `getEffectiveAmount()` did `const swTotal = Number(snap?.order?.cur_TotalInvoice); if (Number.isFinite(swTotal)) return swTotal;` — but `Number(null) === 0` and `Number.isFinite(0) === true`, so a null `cur_TotalInvoice` returned 0 instead of falling through to the `quote.TotalAmount` fallback.
+**Fix:** Explicit `raw != null && raw !== ''` check BEFORE `Number()` coercion. Added `getAmountTooltip()` hover. Shipped `v2026.05.28.3`.
+**Prevention:** Whenever wrapping a possibly-null API value in `Number()`, gate with `!= null` first. `Number.isFinite()` is NOT a null check.
+
 ## `resolveItemType` helper drift across 3 files — JDS records rendered as Garment on detail page (2026-05-08) (archived 2026-06-01)
 **Problem:** New `Item_Type='JDS'` records correctly displayed JDS badge + SKU on Steve's gallery and the AE list, but the Art Request Detail page rendered them as Garment — Item Type badge hidden, JDS Specs card hidden, all the structured info packed into `Item_Specs_Notes` was invisible.
 **Root Cause:** Three separate copies of `resolveItemType()` exist: [art-hub-steve-gallery.js:135](shared_components/js/art-hub-steve-gallery.js), [art-ae.js:26](shared_components/js/art-ae.js), and [pages/js/art-request-detail.js:4406](pages/js/art-request-detail.js). When JDS shipped, the first two were updated; the detail-page copy was missed. Steve gallery's comment claimed it was the "single source of truth … same fallback used in art-ae.js + mockup-detail" — but `art-request-detail.js` was never updated.

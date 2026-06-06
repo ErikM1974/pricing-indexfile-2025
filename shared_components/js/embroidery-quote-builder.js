@@ -1694,14 +1694,25 @@ document.addEventListener('DOMContentLoaded', async function() {
                 zip: contact.Zip || ''
             };
             const _isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+            // P1-2 (audit 2026-06-06): a tax-exempt customer must NOT be charged WA sales tax — the CRM
+            // chip is cosmetic. Clear the tax here (uncheck include-tax + zero the rate) and DO NOT run the
+            // DOR lookup (its async result would overwrite the 0 — same race as the P0 pickup bug). #1 rule.
+            const _taxExempt = (contact.Is_Tax_Exempt === true || contact.Is_Tax_Exempt === 1 || contact.Is_Tax_Exempt === '1');
             if (!_isPickup) {
                 if (contact.State) { const el = document.getElementById('ship-state'); if (el) el.value = contact.State; }
                 if (contact.City) { const el = document.getElementById('ship-city'); if (el) el.value = contact.City; }
                 if (contact.Address) { const el = document.getElementById('ship-address'); if (el) el.value = contact.Address; }
                 if (contact.Zip) {
                     const zipInput = document.getElementById('ship-zip');
-                    if (zipInput) { zipInput.value = contact.Zip; lookupTaxRate(); }
+                    if (zipInput) { zipInput.value = contact.Zip; if (!_taxExempt) lookupTaxRate(); }
                 }
+            }
+            if (_taxExempt) {
+                const incTax = document.getElementById('include-tax');
+                if (incTax) incTax.checked = false;
+                const rateInput = document.getElementById('tax-rate-input');
+                if (rateInput) rateInput.value = '0';
+                if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
             }
             _customerDesignGallery = null; // Invalidate gallery cache on customer change
 
@@ -2305,14 +2316,13 @@ async function autoFillCustomerFromCompany(companyName) {
         const exactMatch = contacts.find(c =>
             (c.CustomerCompanyName || '').toLowerCase().trim() === fullNameLower
         );
-        // Also check if first result's company contains our search term
-        const bestMatch = exactMatch || contacts[0];
+        // P1-3 (audit 2026-06-06): ONLY auto-attach on an EXACT company-name match. The old `contacts[0]`
+        // fallback + substring `isCloseMatch` could silently attach the order to the WRONG ShopWorks
+        // customer (a real but different account). No exact match → leave the customer # blank for the rep.
+        const bestMatch = exactMatch;
 
-        // Only auto-fill if company name is a close match
         if (bestMatch && bestMatch.id_Customer) {
-            const matchName = (bestMatch.CustomerCompanyName || '').toLowerCase();
-            const isCloseMatch = exactMatch || matchName.includes(firstWord.toLowerCase());
-            if (isCloseMatch && !customerInput.value.trim()) {
+            if (!customerInput.value.trim()) {
                 customerInput.value = bestMatch.id_Customer;
                 // Also fill other customer fields if empty
                 const companyInput = document.getElementById('company-name');
@@ -5917,9 +5927,15 @@ async function syncALRows() {
         try {
             const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
             unit = res.unitPrice || 0;
+            delete row.dataset.priceError;
         } catch (e) {
+            // P1-4 (audit 2026-06-06): a pricing throw must NOT silently bill $0 (Erik's #1 rule). Flag the
+            // row so the save/push gate blocks it, and tell the rep.
             console.error('[AL] calculateALPrice failed', e);
+            row.dataset.priceError = 'true';
+            showToast('Could not price the Additional Logo row — refresh; it will not be saved at $0.', 'error');
         }
+        if (!(unit > 0)) row.dataset.priceError = 'true';   // an AL is never legitimately $0
         // Store the live price on the row; the next recalc sums it like any service row.
         row.dataset.unitPrice = String(unit);
         const priceCell = document.getElementById(`row-price-${rid}`);
@@ -5970,9 +5986,14 @@ async function syncDECGRows() {
         try {
             const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache, heavyweight);
             unit = res.unitPrice || 0;
+            delete row.dataset.priceError;
         } catch (e) {
+            // P1-4 (audit 2026-06-06): never silently bill a customer-supplied row at $0 (Erik's #1 rule).
             console.error('[DECG] calculateDECGPrice failed', e);
+            row.dataset.priceError = 'true';
+            showToast('Could not price the Customer-Supplied row — refresh; it will not be saved at $0.', 'error');
         }
+        if (!(unit > 0)) row.dataset.priceError = 'true';   // a customer-supplied row is never $0
         // Store the live price on the row; the next recalc sums it like any service row.
         row.dataset.unitPrice = String(unit);
         const priceCell = document.getElementById(`row-price-${rid}`);
@@ -7146,6 +7167,14 @@ function onShipMethodChange() {
         document.getElementById('ship-city').value = 'Milton';
         document.getElementById('ship-state').value = 'WA';
         document.getElementById('ship-zip').value = '98354';
+        // P1-1 (audit 2026-06-06): clear any previously-estimated freight when switching back to Pickup —
+        // otherwise phantom freight is billed + taxed + saved as a SHIP line + pushed to cur_Shipping while
+        // the UI shows "Customer Pickup". Pickup is always free. (mirror the estimator's recalc at ~L6107.)
+        const _pickupShipFee = document.getElementById('shipping-fee');
+        if (_pickupShipFee && parseFloat(_pickupShipFee.value) > 0) {
+            _pickupShipFee.value = '0';
+            if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
+        }
         lookupTaxRate();
     } else {
         if (pickupNotice) pickupNotice.style.display = 'none';
@@ -7379,6 +7408,15 @@ async function saveAndGetLink(opts = {}) {
     if (zeroPriceRows.length > 0) {
         const styleList = zeroPriceRows.map(p => p.style).join(', ');
         showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
+        return;
+    }
+
+    // P1-4 (audit 2026-06-06): block save when any Additional-Logo / Customer-Supplied row failed to price
+    // (its pricing API threw or returned $0). Never save a silent $0 line (Erik's #1 rule).
+    const priceErrRows = Array.from(document.querySelectorAll('#product-tbody tr.service-product-row'))
+        .filter(r => r.dataset.priceError === 'true');
+    if (priceErrRows.length > 0) {
+        showToast('Some Additional-Logo / Customer-Supplied rows could not be priced — refresh and re-check before saving (they will not be saved at $0).', 'error', 7000);
         return;
     }
 

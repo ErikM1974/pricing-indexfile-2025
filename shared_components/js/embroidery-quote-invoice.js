@@ -18,6 +18,22 @@ class EmbroideryInvoiceGenerator {
     }
 
     /**
+     * Escape user/external-controlled text before interpolating into invoice HTML. The generated markup is
+     * written to a print window via document.write, so an unescaped customer name/note/address = stored XSS.
+     * This generator backs ALL four builders (EMB/DTG/DTF/SCP), so the fix protects every printed quote.
+     * Self-contained (no load-order dependency on quote-builder-utils). (audit P0-1 2026-06-06)
+     */
+    esc(str) {
+        if (str == null) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    /**
      * Get quote type info for dynamic title and filename
      * Detects quote type from pricingData flags
      */
@@ -496,7 +512,7 @@ class EmbroideryInvoiceGenerator {
                     <div class="quote-title">${quoteTypeInfo.title}</div>
                     <div class="quote-details">
                         <strong>Quote #:</strong> ${quoteId || 'DRAFT'}<br>
-                        ${customerData.poNumber ? `<strong>PO #:</strong> ${customerData.poNumber}<br>` : ''}
+                        ${customerData.poNumber ? `<strong>PO #:</strong> ${this.esc(customerData.poNumber)}<br>` : ''}
                         <strong>Date:</strong> ${today.toLocaleDateString()}<br>
                         ${customerData.reqShipDate ? `<strong>Requested Ship:</strong> ${fmtD(customerData.reqShipDate)}<br>` : ''}
                         <strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}
@@ -520,23 +536,23 @@ class EmbroideryInvoiceGenerator {
             <div class="customer-section">
                 <div class="customer-info">
                     <div class="section-title">BILL TO:</div>
-                    <div class="info-line"><strong>${customerData.name || 'Customer'}</strong></div>
-                    ${customerData.company ? `<div class="info-line">${customerData.company}</div>` : ''}
+                    <div class="info-line"><strong>${this.esc(customerData.name) || 'Customer'}</strong></div>
+                    ${customerData.company ? `<div class="info-line">${this.esc(customerData.company)}</div>` : ''}
                     ${billLines}
-                    ${customerData.email ? `<div class="info-line">${customerData.email}</div>` : ''}
-                    ${customerData.phone ? `<div class="info-line">${customerData.phone}</div>` : ''}
+                    ${customerData.email ? `<div class="info-line">${this.esc(customerData.email)}</div>` : ''}
+                    ${customerData.phone ? `<div class="info-line">${this.esc(customerData.phone)}</div>` : ''}
                 </div>
                 ${showShip ? `
                 <div class="customer-info">
                     <div class="section-title">SHIP TO:</div>
-                    <div class="info-line"><strong>${customerData.name || ''}</strong></div>
-                    ${customerData.company ? `<div class="info-line">${customerData.company}</div>` : ''}
+                    <div class="info-line"><strong>${this.esc(customerData.name) || ''}</strong></div>
+                    ${customerData.company ? `<div class="info-line">${this.esc(customerData.company)}</div>` : ''}
                     ${shipLines}
                 </div>` : ''}
                 <div class="sales-rep-info">
                     <div class="section-title">SALES REPRESENTATIVE:</div>
-                    <div class="info-line"><strong>${salesRepName}</strong></div>
-                    <div class="info-line">${customerData.salesRepEmail}</div>
+                    <div class="info-line"><strong>${this.esc(salesRepName)}</strong></div>
+                    <div class="info-line">${this.esc(customerData.salesRepEmail)}</div>
                     <div class="info-line">(253) 922-5793</div>
                 </div>
             </div>
@@ -555,8 +571,8 @@ class EmbroideryInvoiceGenerator {
         const zip = (a.zip || '').trim();
         const cityStateZip = [city, [state, zip].filter(Boolean).join(' ')].filter(Boolean).join(', ');
         let out = '';
-        if (street) out += `<div class="info-line">${street}</div>`;
-        if (cityStateZip) out += `<div class="info-line">${cityStateZip}</div>`;
+        if (street) out += `<div class="info-line">${this.esc(street)}</div>`;
+        if (cityStateZip) out += `<div class="info-line">${this.esc(cityStateZip)}</div>`;
         return out;
     }
     
@@ -873,7 +889,7 @@ class EmbroideryInvoiceGenerator {
             // Primary logo (base 8K included)
             html += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${primaryLogo.designNumber ? ` &middot; Design #${primaryLogo.designNumber}` : ''} -
+                    ✓ <strong>${this.esc(position)}</strong> (${stitchCount.toLocaleString()} stitches)${primaryLogo.designNumber ? ` &middot; Design #${this.esc(primaryLogo.designNumber)}` : ''} -
                     <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
                 </div>
             `;
@@ -924,7 +940,7 @@ class EmbroideryInvoiceGenerator {
 
                 html += `
                     <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                        ✓ <strong>${position}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote}${logo.designNumber ? ` &middot; Design #${logo.designNumber}` : ''} -
+                        ✓ <strong>${this.esc(position)}</strong> (${stitchCount.toLocaleString()} stitches)${stitchNote}${logo.designNumber ? ` &middot; Design #${this.esc(logo.designNumber)}` : ''} -
                         <span style="color: #ff6b35;">+$${alUnitPrice.toFixed(2)} per piece</span>
                         <span style="color: #666; font-size: 10px;">${digitizingText}</span>
                     </div>
@@ -1013,9 +1029,9 @@ class EmbroideryInvoiceGenerator {
 
                 tableHTML += `
                     <tr class="${rowClass}">
-                        <td>${item.partNumber}${item.hasUpcharge ? '' : ''}</td>
-                        <td>${isFirstRow ? item.description : ''}</td>
-                        <td>${isFirstRow ? item.displayColor : ''}</td>
+                        <td>${this.esc(item.partNumber)}${item.hasUpcharge ? '' : ''}</td>
+                        <td>${isFirstRow ? this.esc(item.description) : ''}</td>
+                        <td>${isFirstRow ? this.esc(item.displayColor) : ''}</td>
                         <td style="text-align: center;">
                             ${item.size}
                             ${item.hasUpcharge ? '<span style="color:#f59e0b;font-size:9px;"> +$' + item.upchargeAmount.toFixed(0) + '</span>' : ''}
@@ -1033,7 +1049,7 @@ class EmbroideryInvoiceGenerator {
             tableHTML += `
                 <tr class="product-group-subtotal" style="background: #f8f9fa; font-weight: 600;">
                     <td colspan="4" style="text-align: right; font-size: 10px;">
-                        ${items[0].partNumber} ${items[0].displayColor} Subtotal:
+                        ${this.esc(items[0].partNumber)} ${this.esc(items[0].displayColor)} Subtotal:
                     </td>
                     <td style="text-align: center;">${groupQty}</td>
                     <td></td>
@@ -1263,8 +1279,8 @@ class EmbroideryInvoiceGenerator {
                 // Service row - spans size columns with description
                 tableHTML += `
                     <tr class="product-row service-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
-                        <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${serviceType}</td>
-                        <td class="desc-cell" colspan="2">${description}${position && !String(description).includes(position) ? ' - ' + position : ''}</td>
+                        <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${this.esc(serviceType)}</td>
+                        <td class="desc-cell" colspan="2">${this.esc(description)}${position && !String(description).includes(position) ? ' - ' + this.esc(position) : ''}</td>
                         <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 8px; font-style: italic;">
                             Service item
                         </td>
@@ -1345,9 +1361,9 @@ class EmbroideryInvoiceGenerator {
 
                 tableHTML += `
                     <tr class="product-row${!isFirstRow ? ' extended-size-row' : ''}">
-                        <td class="part-cell">${rowStyle}</td>
-                        <td class="desc-cell">${rowDescription}</td>
-                        <td class="color-cell">${rowColor}</td>
+                        <td class="part-cell">${this.esc(rowStyle)}</td>
+                        <td class="desc-cell">${this.esc(rowDescription)}</td>
+                        <td class="color-cell">${this.esc(rowColor)}</td>
                         ${sizeCells}
                         <td class="qty-cell" style="text-align: center;">${item.quantity}</td>
                         <td class="unit-cell" style="text-align: right;">$${item.unitPrice.toFixed(2)}</td>
@@ -1560,7 +1576,7 @@ class EmbroideryInvoiceGenerator {
                 ${customerData.notes ? `
                 <div class="footer-section">
                     <div class="footer-title">SPECIAL NOTES:</div>
-                    <div class="footer-text">${customerData.notes}</div>
+                    <div class="footer-text">${this.esc(customerData.notes)}</div>
                 </div>` : ''}
                 <div class="tagline">Family Owned & Operated Since 1977</div>
             </div>
