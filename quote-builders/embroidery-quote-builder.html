@@ -356,7 +356,7 @@
                                         &nbsp;&bull;&nbsp;
                                         <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#6366f1; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use <strong>+ Add Service</strong> for Monogram, Sewing, etc.
+                                        <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
                                     </div>
                                 </td>
                             </tr>
@@ -582,7 +582,7 @@
                             <label class="it-tax-label">
                                 <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
                                 <span id="tax-label">Sales Tax</span>
-                                <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1"
+                                <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1" aria-label="Sales tax rate (percent)"
                                        class="it-tax-rate" onchange="updateTaxCalculation()" onclick="event.stopPropagation()">
                                 <span>%</span>
                             </label>
