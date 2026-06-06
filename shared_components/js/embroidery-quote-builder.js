@@ -5948,7 +5948,23 @@ async function syncDECGRows() {
 }
 window.syncDECGRows = syncDECGRows;
 
-const RUSH_FEE_PCT = 0.25;
+// Rush surcharge rate — sourced from the Service_Codes API (RUSH.UnitCost = 25 → 25%), NOT hardcoded,
+// so Erik can change it in Caspio with no deploy (CLAUDE.md "Pricing = API" rule). getServicePrice()
+// can't be reused here: it reads SellPrice, which is 0 for RUSH (PricingMethod=CALCULATED) — the rate
+// lives in UnitCost. Falls back to 0.25 with a ONE-TIME visible warning if the API didn't load. (audit #13a 2026-06-05)
+let _rushRateWarned = false;
+function getRushRate() {
+    const sc = window._serviceCodes && window._serviceCodes['RUSH'];
+    const pct = sc ? parseFloat(sc.UnitCost) : NaN;
+    if (!isNaN(pct) && pct > 0) return pct / 100;
+    if (!_rushRateWarned) {
+        _rushRateWarned = true;
+        if (typeof showToast === 'function') showToast('Using default 25% rush — rush rate not loaded from the pricing service', 'warning', 5000);
+        console.warn('[Rush] RUSH service-code UnitCost unavailable; falling back to 25%');
+    }
+    return 0.25;
+}
+window.getRushRate = getRushRate;
 function syncRushRow() {
     const rushRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-service-type="rush"]');
     if (!rushRows.length) return;
@@ -5960,7 +5976,7 @@ function syncRushRow() {
         const priceCell = document.getElementById(`row-price-${rid}`);
         const oldTotal = parseFloat((totalCell?.textContent || '$0').replace(/[$,]/g, '')) || 0;
         const base = grand - oldTotal;                 // everything except this rush row
-        const rush = +(base * RUSH_FEE_PCT).toFixed(2);
+        const rush = +(base * getRushRate()).toFixed(2);
         row.dataset.unitPrice = String(rush);
         if (priceCell) priceCell.textContent = '$' + rush.toFixed(2);
         if (totalCell) totalCell.textContent = '$' + rush.toFixed(2);
@@ -7809,6 +7825,19 @@ function renderPushPreview(data) {
         html += '</ul></div>';
     }
 
+    // Surface the manual tax step (the push intentionally sends TaxTotal:0; the rate + account live in the
+    // Notes On Order) so the rep knows to set tax in ShopWorks after import. (audit #11 2026-06-05)
+    const oNotes = Array.isArray(o.Notes) ? o.Notes : [];
+    // Pull the tax lines the transformer wrote (buildSalesTaxNote): "Tax Rate: X%", "Tax Account: C — D",
+    // "Tax: DO NOT APPLY (out of state)", "Apply Tax: Manually in ShopWorks". Covers in-state, out-of-state,
+    // and needs-review cases.
+    const taxLines = oNotes.map(n => String(n.Note || '')).filter(t => /^(Tax Rate:|Tax Account:|Tax: |Apply Tax:)/i.test(t));
+    if (taxLines.length) {
+        html += '<div class="preview-warnings preview-manual-tax"><h5><i class="fas fa-info-circle"></i> After import — set tax in ShopWorks</h5><ul>' +
+            taxLines.map(t => '<li>' + escapeHtml(t.trim()) + '</li>').join('') +
+            '</ul></div>';
+    }
+
     previewEl.innerHTML = html;
 }
 
@@ -8090,8 +8119,10 @@ function resetQuote() {
         </tr>
     `;
 
-    // Reset row counter
+    // Reset row counter + the child-row map (module-level) — else a previous quote's 2XL/3XL child-row
+    // references leak into the next quote and can mis-map size overrides on save. (audit #13c 2026-06-05)
     rowCounter = 0;
+    childRowMap = {};
 
     // Reset logo cards visibility
     const garmentCard = document.getElementById('garment-logo-card');
@@ -8124,6 +8155,9 @@ function resetQuote() {
         capPrimaryLogo.designNumber = null;
         capPrimaryLogo.designName = null;
         capPrimaryLogo.thumbnailUrl = null;
+        capPrimaryLogo.embellishmentType = 'embroidery';  // else a prior quote's 3D-puff / laser-patch bleeds into the next (audit #13c 2026-06-05)
+        const cEmbSel = document.getElementById('cap-embellishment-type');
+        if (cEmbSel) { cEmbSel.value = 'embroidery'; if (typeof handleCapEmbellishmentChange === 'function') handleCapEmbellishmentChange(); }
         updateLogoCardHeader('cap', null);
         const cDesignInput = document.getElementById('cap-design-number');
         if (cDesignInput) cDesignInput.value = '';
