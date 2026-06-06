@@ -7484,8 +7484,10 @@ async function saveAndGetLink(opts = {}) {
                 const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
                 const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
                 const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
-                const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
-                return Math.round((preTaxSubtotal + shippingFee) * (rateVal / 100) * 100) / 100;
+                // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
+                // adjustedSubtotal that updateTaxCalculation taxes once at L7259). Do NOT add shipping
+                // again — that double-counted shipping in the saved/pushed TaxAmount. (round-2 N1/N6 — pre-existing bug)
+                return Math.round(preTaxSubtotal * (rateVal / 100) * 100) / 100;
             })(),
             importNotes: lastImportMetadata
                 ? [...(lastImportMetadata.warnings || []), ...(lastImportMetadata.unmatchedLines || []), ...(lastImportMetadata.reviewItems || [])]
@@ -7753,7 +7755,15 @@ function updatePushButtonState() {
  */
 function getPushReadiness() {
     let hasProducts = false;
-    try { const c = getOrderPieceCounts(); hasProducts = (c.garment + c.cap) > 0; } catch (_) {}
+    try {
+        const c = getOrderPieceCounts();
+        let pieces = c.garment + c.cap;
+        // Customer-supplied (DECG/DECC) rows ARE the order's items but collect with isService:true, so
+        // getOrderPieceCounts() filters them out. Count them too — else a valid DECG/DECC-only quote
+        // (saveAndGetLink permits products===0 && decg>0) can't reach the Push button. (round-2 regression fix)
+        if (typeof collectDECGItems === 'function') pieces += collectDECGItems().length;
+        hasProducts = pieces > 0;
+    } catch (_) {}
     return {
         hasCustomer: !!(document.getElementById('customer-number')?.value?.trim()),
         hasProducts: hasProducts,
@@ -7776,7 +7786,7 @@ function renderPushReadiness() {
         `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
     el.innerHTML = '<div class="pr-title">Before you push</div>' +
         item(r.hasCustomer, 'ShopWorks Customer #') +
-        item(r.hasProducts, 'At least one product') +
+        item(r.hasProducts, 'At least one item') +
         item(r.hasName, 'Customer name') +
         item(r.hasEmail, 'Customer email');
 }
@@ -7792,6 +7802,7 @@ function showPushButton(quoteId) {
 // One-click "Push to ShopWorks": auto-SAVE first (so the rep never has to hunt for a separate
 // "Save & Share" step), then open the review-and-confirm preview. saveAndGetLink() validates +
 // sets _pushQuoteId on success; on failure it already surfaced the error and we bail. (Erik 2026-06-05)
+let _pushInFlight = false;  // re-entrancy guard — a rapid double-click must not create 2 sessions / 2 SW orders (round-2 fix)
 async function pushToShopWorks() {
     const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
     if (!hasCustomer) {
@@ -7799,12 +7810,21 @@ async function pushToShopWorks() {
         document.getElementById('customer-number')?.focus();
         return;
     }
-    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
-    if (!_pushQuoteId || dirty) {
-        await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId
+    if (_pushInFlight) return;             // already saving/pushing — ignore the double-click
+    _pushInFlight = true;
+    const pushBtn = document.getElementById('emb-push-shopworks-btn');
+    if (pushBtn) pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
+    try {
+        const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
+        if (!_pushQuoteId || dirty) {
+            await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId
+        }
+        if (!_pushQuoteId) return;            // save failed / validation blocked it — error already shown
+        await openPushPreview();
+    } finally {
+        _pushInFlight = false;
+        updatePushButtonState();          // re-enable via the gate (respects blank-cust# / "Sent ✓" states) — NOT disabled=false
     }
-    if (!_pushQuoteId) return;            // save failed / validation blocked it — error already shown
-    await openPushPreview();
 }
 window.pushToShopWorks = pushToShopWorks;
 
