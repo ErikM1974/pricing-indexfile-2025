@@ -1,3 +1,9 @@
+## v2026.06.06.6 (2026.06.06)
+
+- chore: remove stray inv_sample.json (malformed-path debug artifact)
+- fix(emb): P2 errors-dimension — service-code silent-default warning + revive AL-failure backstop
+- Deploy v2026.06.06.6: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.06.06.5 (2026.06.06)
 
 - **security(emb): readiness deep-dive P0** — fixed **stored XSS** in the shared invoice/PDF generator (an unescaped customer name/note/address executed on print; affects all 4 builders), **SQL injection** on the public `GET /api/quote_items` `styleNumber`, and a **destructive `DELETE … OR 1=1`** injection in `/api/emb-designs`. (proxy + frontend)
