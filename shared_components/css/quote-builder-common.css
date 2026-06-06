@@ -666,7 +666,7 @@ body {
 }
 
 .pricing-title i {
-    color: var(--nwca-green);
+    color: #6366f1;  /* indigo — match the step-number system; the green invoice TOTAL stays the sole money accent (audit re-skin 2026-06-05) */
 }
 
 .pricing-row {
@@ -760,7 +760,7 @@ body {
 .tier-badge {
     display: inline-block;
     padding: 4px 10px;
-    background: var(--nwca-blue);
+    background: #6366f1;  /* indigo — match the step system (audit re-skin 2026-06-05) */
     color: white;
     border-radius: 12px;
     font-size: 12px;

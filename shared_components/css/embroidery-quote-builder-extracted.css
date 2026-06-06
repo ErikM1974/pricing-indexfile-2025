@@ -46,6 +46,17 @@
     margin-bottom: 16px;
 }
 
+/* Quote Summary card chrome — give it the same bordered-white-card look as the flow-step cards so
+   the right rail reads as one consistent stack instead of a borderless block; 14px padding aligns
+   its content edge with the flow-steps (was the base 20px). (audit re-skin 2026-06-05) */
+.sidebar-scroll-container .pricing-panel {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 12px;
+}
+
 /* Sticky TOTAL - Always visible at bottom */
 .pricing-total-sticky {
     background: #fff;
@@ -1476,12 +1487,12 @@ td.size-disabled input {
 
 .notes-header {
     padding: 8px 10px;
-    background: #fefce8;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);  /* off the yellow outlier → neutral; sticky-note icon stays the accent (audit re-skin 2026-06-05) */
     cursor: pointer;
 }
 
 .notes-header:hover {
-    background: #fef9c3;
+    background: #eef2f7;
 }
 
 .notes-badge {
