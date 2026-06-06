@@ -1,3 +1,9 @@
+## v2026.06.05.10 (2026.06.05)
+
+- docs(memory): audit continued (v.8 #11/#13a/#13c, v.9 #8); #4a/#12 held as judgment calls
+- fix(emb): review wave 2 — data-integrity + silent-price + push-button bugs
+- Deploy v2026.06.05.10
+
 ## v2026.06.05.9 (2026.06.05)
 
 - feat(emb): push-readiness checklist (audit #8) — show Customer# / products / name gates above Push
