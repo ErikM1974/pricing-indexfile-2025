@@ -1,3 +1,9 @@
+## v2026.06.05.6 (2026.06.05)
+
+- docs(memory): EMB audit (39 agents/13 fixes) — shipped batch v2026.06.05.5 + proxy v789; remaining visual/polish
+- ui(emb): right-panel re-skin (audit #3) — Quote Summary card chrome, indigo headers, de-yellow Special Notes, renumber
+- Deploy v2026.06.05.6: 4 files
+
 ## v2026.06.05.5 (2026.06.05)
 
 - docs(memory): v2026.06.05.4 right-panel UX redesign (artwork->logo card, action stack, drop Save&Share)
