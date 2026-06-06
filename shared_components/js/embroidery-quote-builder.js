@@ -856,6 +856,7 @@ async function loadQuoteForEditing(quoteId) {
             // EMB date inputs are type=text labeled MM/DD/YYYY; the column is stored ISO.
             const isoToInput = (v) => { const m = v && String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[2]}/${m[3]}/${m[1]}` : (v || ''); };
             setVal('customer-number', session.CustomerNumber);
+            setVal('project-name', session.ProjectName);   // P2-5 (audit 2026-06-06): restore Project Name on edit-reload
             setVal('customer-phone', session.Phone);
             setVal('order-number', session.OrderNumber);
             setVal('po-number', session.PurchaseOrderNumber);
@@ -1662,6 +1663,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (_custNumEl) _custNumEl.addEventListener('input', updatePushButtonState);
     const _custNameEl = document.getElementById('customer-name');   // keep the push-readiness "Customer name" check live (audit #8)
     if (_custNameEl) _custNameEl.addEventListener('input', updatePushButtonState);
+    const _custEmailEl = document.getElementById('customer-email');  // P2-15 (audit 2026-06-06): re-enable Push when Email is the last field typed
+    if (_custEmailEl) _custEmailEl.addEventListener('input', updatePushButtonState);
     updatePushButtonState();
 
     // Auto-select sales rep based on logged-in staff (2026 consolidation)
