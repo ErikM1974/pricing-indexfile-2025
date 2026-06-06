@@ -1700,6 +1700,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             }
 
             renderOrderRecap();  // customer set → refresh the bottom Order Recap
+            updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)
             showToast('Customer info loaded', 'success');
         };
 
@@ -2189,6 +2190,11 @@ async function applyDesignToCard(type, designNum, design) {
             await autoFillCustomerFromCompany(company);
         }
     }
+
+    // Design lookup just auto-filled the Customer # (programmatically — no 'input' event fires) → re-enable
+    // the Push button + refresh the readiness checklist and the Order Recap. (review C2 2026-06-05)
+    updatePushButtonState();
+    renderOrderRecap();
 
     showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
 
@@ -6210,6 +6216,13 @@ async function recalculatePricing() {
     try {
         const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
 
+        // Never render $0.00 on a hard API/config failure — calculateQuote returns {success:false} in that
+        // case; surface it instead of silently showing a wrong (zero) price. (review C4 — Erik's #1 rule)
+        if (!pricing || pricing.success === false) {
+            showToast((pricing && pricing.message) || 'Pricing unavailable — cannot price this quote. Refresh and try again.', 'error', 6000);
+            return;
+        }
+
         if (pricing) {
             // Update row prices - match line items to rows by style AND color
             // With different colors per extended size, we now get separate products for each color
@@ -6912,7 +6925,7 @@ function calculateDiscountableSubtotal() {
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked
         ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
-    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * 75;
+    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API, not hardcoded (review C8)
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
     const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
     const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
@@ -7373,6 +7386,25 @@ async function saveAndGetLink(opts = {}) {
             pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
         }
 
+        // Don't SAVE a quote at a silently-wrong (zero) price on a hard pricing failure. `=== false`
+        // (not falsy) so the DECG-only branch above — which builds a pricing object with no `success`
+        // field — is NOT blocked. (review C4 — Erik's #1 rule)
+        if (pricing && pricing.success === false) {
+            if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
+            try { showLoading(false); } catch (_) {}
+            showToast(pricing.message || 'Pricing unavailable — cannot save this quote. Refresh and try again.', 'error', 6000);
+            return;
+        }
+
+        // Don't save an UNDER-total either — if any product's pricing failed it was left out of the
+        // subtotal (review C5). Block the save so a wrong (low) price never reaches Caspio/ShopWorks.
+        if (pricing && Array.isArray(pricing.failedProducts) && pricing.failedProducts.length > 0) {
+            if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
+            try { showLoading(false); } catch (_) {}
+            showToast(`Can't save — pricing failed for ${pricing.failedProducts.length} item(s) (${pricing.failedProducts.map(f => f.style).join(', ')}). Refresh until all prices load.`, 'error', 7000);
+            return;
+        }
+
         // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
         // Only for mixed orders (products + DECG). DECG-only path above already initialized correctly.
         if (decgItems.length > 0 && products.length > 0) {
@@ -7693,8 +7725,12 @@ function updatePushButtonState() {
         return;
     }
 
-    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
-    const enabled = hasCustomer;   // push now auto-saves first, so it no longer requires a prior save
+    // Push auto-saves first, and the save REQUIRES customer #, >=1 product, name AND email — so enable
+    // the button only when all four are met. This keeps it consistent with the readiness checklist
+    // (no more "enabled with zero products") and never invites a click that dies in the save step.
+    // (review C22/C35 2026-06-05)
+    const r = getPushReadiness();
+    const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
 
     label.textContent = 'Push to ShopWorks';
     btn.style.background = '#1a5276';
@@ -7703,7 +7739,23 @@ function updatePushButtonState() {
     btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
     btn.title = enabled
         ? 'Save + create this quote as an order in ShopWorks OnSite (saves automatically)'
-        : 'Enter the ShopWorks Customer # (top of the form) to enable push';
+        : 'Complete the “Before you push” checklist (Customer #, a product, name + email) to enable push';
+}
+
+/**
+ * Single source of truth for "is this quote ready to push to ShopWorks?" — used by BOTH the Push button
+ * gate (updatePushButtonState) and the readiness checklist (renderPushReadiness) so they can never
+ * contradict. Mirrors the saveAndGetLink() validation (name + email required). (review C22/C35 2026-06-05)
+ */
+function getPushReadiness() {
+    let hasProducts = false;
+    try { const c = getOrderPieceCounts(); hasProducts = (c.garment + c.cap) > 0; } catch (_) {}
+    return {
+        hasCustomer: !!(document.getElementById('customer-number')?.value?.trim()),
+        hasProducts: hasProducts,
+        hasName: !!(document.getElementById('customer-name')?.value?.trim()),
+        hasEmail: !!(document.getElementById('customer-email')?.value?.trim()),
+    };
 }
 
 /**
@@ -7715,16 +7767,14 @@ function renderPushReadiness() {
     const el = document.getElementById('push-readiness');
     if (!el) return;
     if (_pushAlreadyDone) { el.innerHTML = ''; return; }   // already sent — nothing to check
-    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
-    const hasName = !!(document.getElementById('customer-name')?.value?.trim());
-    let hasProducts = false;
-    try { const c = getOrderPieceCounts(); hasProducts = (c.garment + c.cap) > 0; } catch (_) {}
+    const r = getPushReadiness();
     const item = (ok, label) =>
         `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
     el.innerHTML = '<div class="pr-title">Before you push</div>' +
-        item(hasCustomer, 'ShopWorks Customer #') +
-        item(hasProducts, 'At least one product') +
-        item(hasName, 'Customer name');
+        item(r.hasCustomer, 'ShopWorks Customer #') +
+        item(r.hasProducts, 'At least one product') +
+        item(r.hasName, 'Customer name') +
+        item(r.hasEmail, 'Customer email');
 }
 window.renderPushReadiness = renderPushReadiness;
 
@@ -8332,6 +8382,14 @@ function resetQuote() {
     editingRevision = null;
     lastImportMetadata = null;
 
+    // Clear ShopWorks push state — else a brand-new quote inherits the PREVIOUS quote's _pushQuoteId
+    // (could preview/push the OLD order from a blank form — wrong order to production) and its
+    // _pushAlreadyDone "Sent ✓" state (stuck disabled button + blank readiness checklist). showPushButton
+    // only resets these on save, which New-Quote-without-save never reaches. (review C3/C7 2026-06-05)
+    _pushAlreadyDone = false;
+    _pushQuoteId = null;
+    if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+
     // Clear draft storage
     if (embPersistence) {
         embPersistence.clearDraft();
@@ -8433,7 +8491,7 @@ function onLtmOverrideChange() {
 function updateAdditionalCharges() {
     const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
     const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
-    const graphicDesignCharge = graphicDesignHours * 75; // $75/hr (GRT-75)
+    const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75); // GRT-75 rate from Service_Codes API (review C8)
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
     const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
@@ -8502,7 +8560,7 @@ function updateFeeTableRows() {
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designTotal = designHours * 75;
+    const designTotal = designHours * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API (review C8)
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
@@ -8573,7 +8631,7 @@ function getAdditionalCharges() {
 
     // Graphic Design Services (GRT-75) @ $75/hr
     const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
-    const graphicDesignCharge = graphicDesignHours * 75;
+    const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API (review C8)
 
     // DECG/DECC data now collected from service product rows (not fee rows)
     // Use collectDECGItems() which reads from product table

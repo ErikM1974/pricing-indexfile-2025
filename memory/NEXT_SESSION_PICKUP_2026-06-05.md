@@ -84,7 +84,15 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.7** (Heroku v1242, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- Frontend **v2026.06.05.9** (Heroku v1243, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- **AUDIT CONTINUED (v2026.06.05.8 + .9):** #11 tax-in-push-preview (surfaces buildSalesTaxNote lines so rep sets
+  ShopWorks tax after import), #13a Rush%→Service_Codes (getRushRate() reads RUSH.UnitCost=25; getServicePrice reads
+  SellPrice=0 so couldn't reuse; one-time fallback warning), #13c resetQuote hygiene (childRowMap + cap
+  embellishmentType), #8 push-readiness checklist (#push-readiness Customer#/products/name gates above Push).
+  REMAINING (held for Erik — judgment calls, not bugs): #4a light action bar (.action-panel #2c3e50 + .btn-secondary-action
+  white-on-translucent are built FOR the dark panel + SHARED with modal Cancel across 4 builders → restyle has blast
+  radius; the dark panel also intentionally anchors the primary CTA); #12 logo card collapse-by-DEFAULT (card already
+  auto-collapses when design# set; default-collapse needs a partial-collapse showing only the design# row — low marginal value).
 - **v2026.06.05.7 — Order Recap** (Erik's "empty space left of the totals" question): read-only "order at a glance"
   (Customer / Ship-To / Logos) `#order-recap` filling the bottom-left empty space, pairing with the invoice totals.
   EMB-SCOPED: `margin-right:auto` on the new div so the SHARED `.invoice-totals-wrap` stays flex-end (DTF/SCP/DTG

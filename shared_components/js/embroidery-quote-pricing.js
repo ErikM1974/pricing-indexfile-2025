@@ -1431,6 +1431,7 @@ class EmbroideryPricingCalculator {
 
         // Calculate each product's pricing
         const productPricing = [];
+        const failedProducts = [];  // products whose size-pricing API call failed → must NOT silently vanish from the total (review C5)
         let subtotal = 0;
         let garmentSubtotal = 0;
         let capSubtotal = 0;
@@ -1445,6 +1446,8 @@ class EmbroideryPricingCalculator {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
                 garmentSubtotal += pricing.subtotal;
+            } else {
+                failedProducts.push({ style: product.style, color: product.color, isCap: false });  // review C5
             }
         }
 
@@ -1460,9 +1463,21 @@ class EmbroideryPricingCalculator {
                 productPricing.push(pricing);
                 subtotal += pricing.subtotal;
                 capSubtotal += pricing.subtotal;
+            } else {
+                failedProducts.push({ style: product.style, color: product.color, isCap: true });  // review C5
             }
         }
-        
+
+        // A product whose pricing failed was just LEFT OUT of the subtotal — never let that pass silently
+        // (the quote would foot to a lower-than-correct total). Surface it loudly + flag the result so the
+        // save path can refuse to persist an under-total. (review C5 — Erik's #1 rule)
+        if (failedProducts.length > 0) {
+            this.showAPIWarning(
+                `Unable to load pricing for ${failedProducts.length} item(s): ${failedProducts.map(f => f.style).join(', ')}. They were left OUT of the total — do not save or quote until pricing loads. Refresh or contact IT.`,
+                'main-pricing'
+            );
+        }
+
         // Apply LTM separately for caps and garments
         // Each product type has its own LTM if qty <= 7 (2026 5-tier restructure)
         // LTM override: skip if user disabled via options.ltmEnabled === false
@@ -1732,6 +1747,7 @@ class EmbroideryPricingCalculator {
 
         return {
             products: productPricing,
+            failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed
             totalQuantity: totalQuantity,
             tier: garmentTier,  // Primary tier for backward compat (garment-based)
             garmentTier: garmentTier,  // NEW: Separate garment tier
