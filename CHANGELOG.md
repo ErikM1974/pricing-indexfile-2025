@@ -1,3 +1,9 @@
+## v2026.06.06.1 (2026.06.06)
+
+- docs(memory): overnight deep-review hardening — 25 fixes shipped (proxy v790 + frontend v.10/.11/.12); remaining + risky catalogued
+- fix(emb): round-2 — fix 3 regressions from the review pass + a pre-existing tax double-count
+- Deploy v2026.06.06.1
+
 ## v2026.06.05.12 (2026.06.05)
 
 - fix(emb): review wave 4 — silent-fallback warnings + save-while-uploading + FB rate + onboarding/a11y
