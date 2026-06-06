@@ -815,6 +815,9 @@ function markEmbroideryDirty() {
  */
 async function loadQuoteForEditing(quoteId) {
     showToast('Loading quote...', 'info');
+    // P0 guard (audit 2026-06-06): a pickup quote's restore re-fires the live Milton tax lookup async;
+    // block lookupTaxRate() for the whole restore so it can't overwrite the saved rate. finally re-enables.
+    window._restoringQuote = true;
 
     try {
         const result = await quoteService.loadQuote(quoteId);
@@ -1000,6 +1003,8 @@ async function loadQuoteForEditing(quoteId) {
         editingQuoteId = null;
         editingRevision = null;
         addNewRow();
+    } finally {
+        window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep
     }
 }
 
@@ -1089,8 +1094,14 @@ function populateLogoConfig(session, items) {
         primaryLogo.needsDigitizing = true;
     }
 
-    // Additional logo on garments
-    if (session.AdditionalLogoLocation) {
+    // Additional logo on garments — LEGACY globalAL path. The current row-based flow saves the AL as an
+    // `embroidery-additional` line item (which restores its OWN row + price) AND sets AdditionalLogoLocation.
+    // Enabling globalAL here when an AL row already exists double-charges (globalAL feeds the engine's
+    // additionalServicesTotal AND the restored row bills again). Only enable for truly-legacy quotes: the
+    // field is set but NO AL row exists to restore. (audit P1 2026-06-06)
+    const hasALRow = items.some(i => i.EmbellishmentType === 'embroidery-additional' ||
+        ['AL', 'AL-CAP', 'DECG-FB'].includes((i.StyleNumber || '').toUpperCase()));
+    if (session.AdditionalLogoLocation && !hasALRow) {
         globalAL.garment.enabled = true;
         globalAL.garment.position = 'AL';
         globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
@@ -1353,6 +1364,20 @@ async function addProductFromQuote(product) {
         // SIZE06_EXTENDED_SIZES is defined at module level and includes tall sizes
         const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size.toUpperCase()) ||
                                SIZE06_EXTENDED_SIZES.includes(size);
+
+        // OSFA-only caps/beanies/bags hold qty on the PARENT (dataset.osfaQty + .osfa-qty-input), not a
+        // child row. OSFA is in SIZE06_EXTENDED_SIZES, so without this special-case it routes to the generic
+        // createChildRow branch and the trailing onSizeChange drops it → silent cap-qty loss on reload.
+        // Mirror the ShopWorks-import OSFA handling (L11844). (audit P1 2026-06-06)
+        if (size.toUpperCase() === 'OSFA' && row.dataset.sizeCategory === 'osfa-only') {
+            row.dataset.osfaQty = qty;
+            row.dataset.isOsfaOnly = 'true';
+            const osfaInput = row.querySelector('.osfa-qty-input');
+            if (osfaInput) osfaInput.value = qty;
+            const qtyDisp = document.getElementById(`row-qty-${rowIdNum}`);
+            if (qtyDisp) qtyDisp.textContent = qty;
+            continue;
+        }
 
         if (size === '2XL' || size === 'XXL') {
             // 2XL AND legacy "XXL" both live in the parent's Size05 column (data-size="2XL"). Check this
@@ -6999,6 +7024,11 @@ function showTaxStatus(message, type) {
  * Called on ZIP blur, state change, and manual button click
  */
 async function lookupTaxRate() {
+    // P0 (audit 2026-06-06, Erik's #1 rule): during an edit-reload the saved tax rate is restored
+    // synchronously, but a pickup quote's onShipMethodChange fires this async lookup, which resolves
+    // LATER and would silently overwrite the frozen rate with today's live Milton DOR rate. No-op while
+    // restoring — the saved rate stands; the load's finally re-enables live lookups for the rep.
+    if (window._restoringQuote) return false;
     const state = document.getElementById('ship-state').value;
     const zip = document.getElementById('ship-zip').value.trim();
     const city = document.getElementById('ship-city').value.trim();
