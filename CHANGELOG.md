@@ -1,3 +1,9 @@
+## v2026.06.05.4 (2026.06.05)
+
+- docs(memory): v2026.06.05.3 lookup-limit fix + Maxx email data-gap finding
+- docs(memory): proxy v788 push session-selection fix + sequence root-cause (dup QuoteID)
+- ui(emb): reorganize right panel — artwork into logo card, unified action stack, drop Save & Share dropdown
+
 ## v2026.06.05.3 (2026.06.05)
 
 - docs(memory): mark 3 order-entry improvements SHIPPED v2026.06.05.2 (pending Erik live verify)
