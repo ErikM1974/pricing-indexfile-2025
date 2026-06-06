@@ -1,3 +1,8 @@
+## v2026.06.05.12 (2026.06.05)
+
+- fix(emb): review wave 4 — silent-fallback warnings + save-while-uploading + FB rate + onboarding/a11y
+- Deploy v2026.06.05.12
+
 ## v2026.06.05.11 (2026.06.05)
 
 - fix(emb): review wave 3 — un-break DTF/SCP/DTG (my indigo regression) + label/security/a11y/cleanup
