@@ -84,7 +84,13 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.5** (Heroku v1240, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- Frontend **v2026.06.05.6** (Heroku v1241, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- **v2026.06.05.6 — audit #3 right-panel re-skin SHIPPED** (SHARED css → DTF/SCP/DTG affected, verify): Quote Summary
+  `.pricing-panel` now bordered white card (14px pad); `.pricing-title i` + `.tier-badge` → indigo #6366f1 (match step
+  numbers; green invoice TOTAL stays money accent); Special Notes header off-yellow → neutral gradient; Order Details
+  renumbered 3→2. STILL REMAINING from audit: #4a light action bar (caveat: shared w/ modal Cancel buttons), #8 push-
+  readiness checklist, #9 full numbered spine, #11 surface tax in push preview, #12 logo card collapse-default, #13
+  Rush%→Service_Codes + resetQuote childRowMap/cap-embellishment hygiene.
 - **EMB BUILDER AUDIT (workflow ww781a8f5 — 39 agents, 53 confirmed findings → 13 fixes).** Full plan in
   `tasks/ww781a8f5.output`. SHIPPED BATCH (proxy v789 + frontend v2026.06.05.5): **artwork-upload HTTP 500**
   (`files-simple.js` streamed Readable.from(buffer)→chunked→Caspio reset; now Buffer append + timeout, mirrors

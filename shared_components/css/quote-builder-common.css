@@ -3352,6 +3352,26 @@ input[type="radio"] {
     padding: 8px 16px 14px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
+/* Order Recap (EMB only) — fills the space LEFT of the totals; margin-right:auto pushes the totals
+   box to the right while the SHARED .invoice-totals-wrap stays flex-end for the other builders. (Erik 2026-06-05) */
+.order-recap {
+    flex: 0 1 460px;
+    min-width: 0;
+    margin-right: auto;
+    align-self: stretch;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    font-size: 12px;
+    color: #475569;
+}
+.order-recap:empty { display: none; }
+.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.order-recap .or-row { display: flex; gap: 8px; padding: 2px 0; line-height: 1.35; }
+.order-recap .or-label { color: #94a3b8; flex: 0 0 56px; }
+.order-recap .or-val { color: #334155; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .it-row {
     display: flex;
     justify-content: space-between;
