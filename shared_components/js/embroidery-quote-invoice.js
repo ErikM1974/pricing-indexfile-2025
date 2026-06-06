@@ -1508,7 +1508,7 @@ class EmbroideryInvoiceGenerator {
                 </div>` : ''}
                 ${(pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 ? `
                 <div class="total-row">
-                    <span>Graphic Design (${pricingData.graphicDesignHours || 0} hrs × $75):</span>
+                    <span>Graphic Design (${pricingData.graphicDesignHours || 0} hrs${(pricingData.graphicDesignHours || 0) > 0 ? ` × $${((pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) / pricingData.graphicDesignHours).toFixed(2)}/hr` : ''}):</span>
                     <span>$${(pricingData.graphicDesignFee || pricingData.graphicDesignCharge).toFixed(2)}</span>
                 </div>` : ''}
                 ${(pricingData.rushFee || 0) > 0 ? `
