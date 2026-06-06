@@ -1638,6 +1638,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     // and set its initial (disabled) state for a fresh quote.
     const _custNumEl = document.getElementById('customer-number');
     if (_custNumEl) _custNumEl.addEventListener('input', updatePushButtonState);
+    const _custNameEl = document.getElementById('customer-name');   // keep the push-readiness "Customer name" check live (audit #8)
+    if (_custNameEl) _custNameEl.addEventListener('input', updatePushButtonState);
     updatePushButtonState();
 
     // Auto-select sales rep based on logged-in staff (2026 consolidation)
@@ -6088,6 +6090,7 @@ async function recalculatePricing() {
     //  doesn't re-fire onServiceQtyChange → no loop.) (Erik 2026-06-05)
     try { await syncALRows(); } catch (_) {}
     renderOrderRecap();  // keep the bottom Order Recap (customer / ship / logos) current on any recalc
+    renderPushReadiness();  // keep the "At least one product" push-readiness check current (audit #8)
     // Collect products from table (parent rows only)
     const allItems = collectProductsFromTable();
     const productList = allItems.filter(p => !p.isService);
@@ -7676,6 +7679,7 @@ function updatePushButtonState() {
     const btn = document.getElementById('emb-push-shopworks-btn');
     const label = document.getElementById('emb-push-shopworks-label');
     if (!btn || !label) return;
+    renderPushReadiness();
 
     if (_pushAlreadyDone) {
         // "Sent" — not "Pushed/Imported". The order reached ManageOrders; OnSite
@@ -7701,6 +7705,28 @@ function updatePushButtonState() {
         ? 'Save + create this quote as an order in ShopWorks OnSite (saves automatically)'
         : 'Enter the ShopWorks Customer # (top of the form) to enable push';
 }
+
+/**
+ * Push-readiness checklist (audit #8 2026-06-05) — shows the gates a successful ShopWorks push needs
+ * (Customer #, ≥1 product, customer name) so the rep isn't guessing why the Push button is disabled.
+ * Live-rendered from updatePushButtonState() + recalculatePricing().
+ */
+function renderPushReadiness() {
+    const el = document.getElementById('push-readiness');
+    if (!el) return;
+    if (_pushAlreadyDone) { el.innerHTML = ''; return; }   // already sent — nothing to check
+    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
+    const hasName = !!(document.getElementById('customer-name')?.value?.trim());
+    let hasProducts = false;
+    try { const c = getOrderPieceCounts(); hasProducts = (c.garment + c.cap) > 0; } catch (_) {}
+    const item = (ok, label) =>
+        `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
+    el.innerHTML = '<div class="pr-title">Before you push</div>' +
+        item(hasCustomer, 'ShopWorks Customer #') +
+        item(hasProducts, 'At least one product') +
+        item(hasName, 'Customer name');
+}
+window.renderPushReadiness = renderPushReadiness;
 
 // Called after a successful save and when loading a saved quote for editing.
 function showPushButton(quoteId) {

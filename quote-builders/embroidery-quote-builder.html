@@ -879,6 +879,9 @@
 
             <!-- Action Buttons (Outside scroll container - always visible) -->
             <div class="action-panel">
+                <!-- Push-readiness checklist — shows the gates a successful push needs, so the rep isn't
+                     guessing why the button is disabled. Live via renderPushReadiness(). (audit #8 2026-06-05) -->
+                <div class="push-readiness" id="push-readiness"></div>
                 <!-- Push to ShopWorks is the PRIMARY action — first + prominent. It now auto-SAVES the
                      quote first (pushToShopWorks), so the rep no longer has to hunt for "Save & Share".
                      Enabled once a Customer # is set. (Erik 2026-06-05) -->
