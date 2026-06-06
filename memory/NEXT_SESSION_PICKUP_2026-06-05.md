@@ -84,7 +84,29 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.12** (Heroku v1247, develop=main synced) · Proxy **v790** · Inksoft **v262**.
+- Frontend **v2026.06.06.2** (develop=main synced) · Proxy **v791** · Inksoft **v262**.
+- **ROUND-2 RE-REVIEW (workflow w97g25yst, 25 agents) — caught 3 REGRESSIONS from my own fix pass + 9 new.** Full
+  dump: `C:\Users\erik\AppData\Local\Temp\emb-findings-r2.md`. SHIPPED:
+  · **v2026.06.06.1** — REG1 (my C22/C35 push gate wrongly excluded DECG/DECC-only orders → count collectDECGItems);
+    REG3 (pushToShopWorks had NO double-click guard → dup sessions/orders → added _pushInFlight); N1/N6 (PRE-EXISTING
+    HIGH: saved TaxAmount added shipping to #pre-tax-subtotal which already includes it → shipping taxed TWICE in the
+    SW push note; on-screen+PDF were fine → dropped the extra +shippingFee).
+  · **proxy v791** — N5: rep free-text Notes now reach ShopWorks on push (buildNotes added session.Notes, skips JSON blobs).
+  · **v2026.06.06.2** — N3 (Email worked only when editing; now falls back to _pushQuoteId for a just-saved quote);
+    N7 (PDF "Graphic Design × $75" label now derives the rate from amount/hrs → tracks API GRT-75).
+  **🔴 THREE PRICING DECISIONS WAITING ON ERIK (verified, NOT changed — they alter quoted prices):**
+  · **N2 (HIGH)** EMB MarginDenominator is per-tier in Caspio (0.55 for 1-7, 0.53 for 8+) but the code reads tiersR[0]
+    and applies it to ALL tiers → tiers 8-23/24-47/48-71/72+ are UNDER-priced ~3.8% (uses 0.55, should be 0.53). Fix =
+    per-tier lookup (honors the API). Pricing-engine: embroidery-quote-pricing.js init ~133/425 + use sites 585/1075/
+    1107/1192/2005/2026/2054/2087. **Raises tier-8+ garment+cap prices — needs Erik's go.**
+  · **N4 (MED)** AS-Garm stitch-surcharge tiers parsed by blind [0]/[1] of allEmbroideryCostsR; Caspio has BOTH legacy
+    'ALL' rows (10K/15K) AND canonical 'Mid'/'Large' (15K/25K). Code uses 'ALL' by row-luck; deleting them zeroes the
+    10-15K band. Which threshold scheme is canonical? = Erik's call (embroidery-quote-pricing.js:165-181).
+  · **R1 (MED)** garment Additional-Logo priced 2 ways: services-bar 5K@$1/1K vs legacy 8K@$1.25/1K (hits SW-import +
+    old quotes). Which formula is canonical? = Erik's call.
+  REMAINING LOW (catalogued, low value/judgment): N8 dead email tax base, N9/C17/C30 hardcoded Name#/WEIGHT/SEG/DT
+  defaults, C10 retry-idempotency, C18 proxy legacy-monogram, C23 numbering, C26 dropdown-Esc, C29 vestigial design-id,
+  C31 dup formula, C38 XXL-identity, R2 Ladies-XXL, R3 modal focus-trap, R4 disabled-Push contrast, R5 artwork-shrink-on-DTF/SCP.
 - **OVERNIGHT DEEP-REVIEW HARDENING (Erik: "work overnight until 110% confident… best EVER").** Workflow
   `wlm2x62ua` (57 agents) → 38 confirmed+safe + 5 risky. Full findings dump: `C:\Users\erik\AppData\Local\Temp\emb-findings.md`.
   SHIPPED across proxy v790 + frontend v.10/.11/.12:
