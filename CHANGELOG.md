@@ -1,3 +1,10 @@
+## v2026.06.06.5 (2026.06.06)
+
+- **security(emb): readiness deep-dive P0** — fixed **stored XSS** in the shared invoice/PDF generator (an unescaped customer name/note/address executed on print; affects all 4 builders), **SQL injection** on the public `GET /api/quote_items` `styleNumber`, and a **destructive `DELETE … OR 1=1`** injection in `/api/emb-designs`. (proxy + frontend)
+- fix(emb): P1 wrong-money — phantom freight after switching to Pickup; tax-exempt customers still charged WA tax; design-lookup auto-attaching the WRONG customer on a fuzzy match; AL/DECG pricing errors saving $0; WA DOR tax-rate truncated to 1 decimal; `/invoice` dropping discount (didn't foot) + omitting shipping from the grand total; Design # + artwork pushing a duplicate design.
+- Cache-bust `embroidery-quote-invoice.js` (all 4 builders), `embroidery-quote-builder.js`, `pages/js/invoice.js` → v2026.06.06.5.
+- Deploy v2026.06.06.5
+
 ## v2026.06.06.4 (2026.06.06)
 
 - fix(emb): readiness-audit P0 (Erik's #1 rule) — reopening a Customer-Pickup quote silently overwrote the saved tax rate with today's live Milton rate (the async lookup resolved after the restore). Guarded with `window._restoringQuote`.
