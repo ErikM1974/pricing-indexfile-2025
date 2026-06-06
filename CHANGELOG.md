@@ -1,3 +1,8 @@
+## v2026.06.06.2 (2026.06.06)
+
+- fix(emb): round-2 — Email works on a just-saved quote (N3) + PDF Graphic-Design rate tracks API (N7)
+- Deploy v2026.06.06.2
+
 ## v2026.06.06.1 (2026.06.06)
 
 - docs(memory): overnight deep-review hardening — 25 fixes shipped (proxy v790 + frontend v.10/.11/.12); remaining + risky catalogued
