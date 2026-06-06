@@ -84,7 +84,26 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.9** (Heroku v1243, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- Frontend **v2026.06.05.12** (Heroku v1247, develop=main synced) · Proxy **v790** · Inksoft **v262**.
+- **OVERNIGHT DEEP-REVIEW HARDENING (Erik: "work overnight until 110% confident… best EVER").** Workflow
+  `wlm2x62ua` (57 agents) → 38 confirmed+safe + 5 risky. Full findings dump: `C:\Users\erik\AppData\Local\Temp\emb-findings.md`.
+  SHIPPED across proxy v790 + frontend v.10/.11/.12:
+  · **proxy v790** — C1 GRT-75 fractional-hour under-bill (parseInt→parseFloat in transformer), C6 PK_ID injection
+    (parsePkId guard on all 9 quote :id routes), C13 quote_analytics filter-injection sanitize.
+  · **v.10** — C3/C7 resetQuote clears _pushQuoteId/_pushAlreadyDone (blank New Quote could push the PREVIOUS order!),
+    C4 recalc+save refuse \$0 on {success:false}, C5 failedProducts (a price-failed product no longer silently dropped
+    from the total — warns + blocks save), C2/C9 Push re-enables on programmatic customer set, C22/C35 one
+    getPushReadiness() drives button+checklist (customer#/product/name/EMAIL), C8 GRT-75 fee →API (4 sites).
+  · **v.11** — C33/C34 REVERTED my indigo shared-CSS regression (DTF/SCP/DTG) + re-scoped to body.emb-builder, C21 recap
+    "Ship to"→"Shipping", C36 push-preview shows needs-review tax line, C32 swatch URL/hex sanitize (XSS), C12 toast
+    aria roles, C27/C28 dead console.log + const.
+  · **v.12** — C11 block save while artwork uploading, C14/C15 service-code/3D-puff/laser-patch fallback WARN (#1 rule),
+    C16 FB uses fbStitchRate, C20 empty-state real "Add to order", C25 tax-rate aria-label.
+  REMAINING confirmed (lower value / need care): C10 retry-dup-idempotency, C17/C30 dead SERVICE_DEFAULTS, C18 proxy
+  legacy-monogram-dropped, C19 Email-on-unsaved, C23 numbering, C26 dropdown-Esc, C29 vestigial design-id, C31 dup
+  formula, C38 XXL-identity. RISKY (need Erik): R1 garment-AL stitch-formula divergence (5K@\$1 vs 8K@\$1.25 — PRICING,
+  needs his call), R2 Ladies-XXL≠2XL, R3 modal focus-trap, R4 disabled-Push contrast, R5 artwork-shrink on DTF/SCP.
+  Round-2 re-review in flight to catch regressions + misses.
 - **AUDIT CONTINUED (v2026.06.05.8 + .9):** #11 tax-in-push-preview (surfaces buildSalesTaxNote lines so rep sets
   ShopWorks tax after import), #13a Rush%→Service_Codes (getRushRate() reads RUSH.UnitCost=25; getServicePrice reads
   SellPrice=0 so couldn't reuse; one-time fallback warning), #13c resetQuote hygiene (childRowMap + cap
