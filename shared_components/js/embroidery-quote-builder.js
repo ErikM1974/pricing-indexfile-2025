@@ -1697,6 +1697,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 });
             }
 
+            renderOrderRecap();  // customer set → refresh the bottom Order Recap
             showToast('Customer info loaded', 'success');
         };
 
@@ -1820,7 +1821,41 @@ function updateLogoCardHeader(type, designNumber) {
     // lets them re-open it to tweak position / size / stitches. (Erik 2026-06-05)
     if (designNumber) card.classList.add('collapsed');
     else card.classList.remove('collapsed');
+    renderOrderRecap();  // logo changed → refresh the bottom Order Recap
 }
+
+/**
+ * Order Recap — read-only "order at a glance" (Customer / Ship-To / Logos) shown in the empty space
+ * LEFT of the invoice totals, so the who/what/where isn't buried in the right rail. It only MIRRORS
+ * the real fields (edits still happen there). Re-rendered from recalculatePricing + the customer/logo
+ * handlers. Hidden (CSS .order-recap:empty) until there's something to show. (Erik 2026-06-05)
+ */
+function renderOrderRecap() {
+    const el = document.getElementById('order-recap');
+    if (!el) return;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const company = (document.getElementById('company-name')?.value || '').trim();
+    const name = (document.getElementById('customer-name')?.value || '').trim();
+    const custNum = (document.getElementById('customer-number')?.value || '').trim();
+    const ship = (document.getElementById('it-shipping-amt')?.textContent || '').trim();
+    const logos = [];
+    try {
+        if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.designNumber) {
+            const pos = document.getElementById('primary-position')?.value || '';
+            logos.push(`#${primaryLogo.designNumber}${pos ? ' · ' + pos : ''}`);
+        }
+        if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.designNumber) {
+            logos.push(`Cap #${capPrimaryLogo.designNumber}`);
+        }
+    } catch (_) {}
+    const cust = company || name;
+    const rows = [];
+    if (cust) rows.push(`<div class="or-row"><span class="or-label">Customer</span><span class="or-val">${esc(cust)}${custNum ? ' · #' + esc(custNum) : ''}</span></div>`);
+    if (ship) rows.push(`<div class="or-row"><span class="or-label">Ship&nbsp;to</span><span class="or-val">${esc(ship)}</span></div>`);
+    if (logos.length) rows.push(`<div class="or-row"><span class="or-label">Logo${logos.length > 1 ? 's' : ''}</span><span class="or-val">${esc(logos.join('   ·   '))}</span></div>`);
+    el.innerHTML = rows.length ? `<div class="or-title">Order at a glance</div>${rows.join('')}` : '';
+}
+window.renderOrderRecap = renderOrderRecap;
 
 // ============================================================
 // DESIGN NUMBER LOOKUP / SEARCH
@@ -6036,6 +6071,7 @@ async function recalculatePricing() {
     // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
     //  doesn't re-fire onServiceQtyChange → no loop.) (Erik 2026-06-05)
     try { await syncALRows(); } catch (_) {}
+    renderOrderRecap();  // keep the bottom Order Recap (customer / ship / logos) current on any recalc
     // Collect products from table (parent rows only)
     const allItems = collectProductsFromTable();
     const productList = allItems.filter(p => !p.isService);

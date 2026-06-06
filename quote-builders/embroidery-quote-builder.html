@@ -562,6 +562,12 @@
                      pre-tax amount incl. shipping, for the save path).
                      ============================================================ -->
                 <div class="invoice-totals-wrap">
+                    <!-- Order Recap — fills the empty space LEFT of the totals so the who/what/where isn't
+                         buried on the right; pairs with the totals (how much) into one "order at a glance"
+                         band. EMB-ONLY: other builders have no #order-recap, and .order-recap uses
+                         margin-right:auto so the SHARED .invoice-totals-wrap stays flex-end for them.
+                         Live-rendered by renderOrderRecap(); hidden (:empty) until there's something to show. (Erik 2026-06-05) -->
+                    <div class="order-recap" id="order-recap"></div>
                     <div class="invoice-totals-box" id="invoice-totals-box">
                         <div class="it-row">
                             <span class="it-label">Subtotal</span>
