@@ -143,6 +143,10 @@
 
             xhr.addEventListener('error', () => reject(new Error('Network error during upload')));
             xhr.addEventListener('abort', () => reject(new Error('Upload cancelled')));
+            // Timeout so a hung connection (the old proxy "socket hang up") can't freeze the widget on
+            // "Uploading…%" forever with no recovery. (audit fix 2026-06-05) Pairs with the proxy timeout.
+            xhr.timeout = 90000;
+            xhr.addEventListener('timeout', () => reject(new Error('Upload timed out — please try again.')));
 
             xhr.open('POST', `${apiBase}/api/files/upload`);
             xhr.send(formData);
@@ -167,7 +171,7 @@
         const opts2 = Object.assign({
             mountSelector: null,
             title: 'Reference Artwork',
-            subtitle: 'Optional — attach customer-supplied artwork to this quote (AI/EPS/PSD/PDF/PNG/JPG/TIFF · 20 MB max each)',
+            subtitle: "Optional — attach the customer's art file.",  /* shortened; formats/size shown on the dropzone (audit 2026-06-05) */
             onChange: null,
             // Rich-mode opts (Phase 11.3, 2026-05-24). All optional.
             //   designName: { enabled: true, label: '...', placeholder: '...' }

@@ -956,6 +956,15 @@ async function loadQuoteForEditing(quoteId) {
             const rateInput = document.getElementById('tax-rate-input');
             if (rateInput) rateInput.value = taxFeeItem.BaseUnitPrice || 10.1;
         }
+        // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
+        // HTML, so without restoring it the reload re-applies WA tax to an exempt/out-of-state customer
+        // and a Save Revision bakes the wrong total in. Restore the checkbox from the saved exemption
+        // signal BEFORE recalculatePricing() reads it. (audit fix 2026-06-05 — Erik's #1 rule)
+        const includeTaxEl = document.getElementById('include-tax');
+        if (includeTaxEl) {
+            const taxExempt = !taxFeeItem && !(parseFloat(session.TaxRate) > 0);
+            includeTaxEl.checked = !taxExempt;
+        }
         const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
         if (shipFeeItem && shipFeeItem.LineTotal > 0) {
             document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
@@ -1349,21 +1358,22 @@ async function addProductFromQuote(product) {
         const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size.toUpperCase()) ||
                                SIZE06_EXTENDED_SIZES.includes(size);
 
-        if (isExtendedSize) {
+        if (size === '2XL' || size === 'XXL') {
+            // 2XL AND legacy "XXL" both live in the parent's Size05 column (data-size="2XL"). Check this
+            // BEFORE the isExtendedSize branch: legacy "XXL" is in SIZE06_EXTENDED_SIZES, so it would
+            // route to createChildRow("XXL") — but the parent has no data-size="XXL" input, so the
+            // trailing onSizeChange reads it as qty 0 and DELETES the child → 2XL silently dropped
+            // (under-charged) on reload. Normalize the column to "2XL" + set the parent input; the
+            // onSizeChange at the end of this function creates + syncs the child. (audit fix 2026-06-05)
+            const parent2x = row.querySelector(`input[data-size="2XL"]`);
+            if (parent2x && !parent2x.disabled) {
+                parent2x.value = qty;
+            } else {
+                createChildRow(rowIdNum, '2XL', qty);
+            }
+        } else if (isExtendedSize) {
             // Create child row for extended size (same pattern as ShopWorks import)
             createChildRow(rowIdNum, size, qty);
-        } else if (size === '2XL' || size === 'XXL') {
-            // 2XL/XXL lives in the parent's Size05 column. Set the parent input and let the
-            // onSizeChange(rowIdNum) call at the END of this function create + sync the child
-            // row. Calling createChildRow directly here is CLOBBERED: onSizeChange reads the
-            // (still-empty) parent 2XL input as qty 0 and DELETES the freshly-created child
-            // row -> 2XL silently dropped on edit-reload (under-charged). (cert audit 2026-06-04)
-            const xxl = row.querySelector(`input[data-size="${size}"]`);
-            if (xxl && !xxl.disabled) {
-                xxl.value = qty;
-            } else {
-                createChildRow(rowIdNum, size, qty);
-            }
         } else {
             // Standard size - find existing input
             const sizeInput = row.querySelector(`input[data-size="${size}"]`);
@@ -5827,7 +5837,10 @@ async function syncALRows() {
         if (row.dataset.alQtyAuto !== 'false') {
             const want = (itemType === 'cap') ? counts.cap : counts.garment;
             const qInput = row.querySelector('.service-qty');
-            if (qInput && want > 0 && String(want) !== qInput.value) qInput.value = String(want);
+            // Set the qty to the order count even when it's 0 (rep removed all garments) — otherwise a
+            // stale auto-tallied AL keeps its old qty and bills against zero pieces. Manual rows
+            // (alQtyAuto === 'false') are excluded by the guard above, so a hand-set qty is never zeroed. (audit fix 2026-06-05)
+            if (qInput && String(want) !== qInput.value) qInput.value = String(want);
         }
         const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
         const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
@@ -7245,7 +7258,7 @@ async function saveAndGetLink(opts = {}) {
     // (2026-06-04 audit B6)
     if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
         showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
-        const dn = document.querySelector('.artwork-design-name, #emb-artwork-design-name, [data-artwork-design-name]');
+        const dn = document.querySelector('#emb-artwork-mount .artwork-upload-designname-input');  // widget's real input class (audit fix 2026-06-05)
         if (dn && typeof dn.focus === 'function') dn.focus();
         return;
     }
