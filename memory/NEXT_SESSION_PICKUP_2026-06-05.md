@@ -84,7 +84,18 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.4** (Heroku v1239, develop=main synced) · Proxy **v788** · Inksoft **v262**.
+- Frontend **v2026.06.05.5** (Heroku v1240, develop=main synced) · Proxy **v789** · Inksoft **v262**.
+- **EMB BUILDER AUDIT (workflow ww781a8f5 — 39 agents, 53 confirmed findings → 13 fixes).** Full plan in
+  `tasks/ww781a8f5.output`. SHIPPED BATCH (proxy v789 + frontend v2026.06.05.5): **artwork-upload HTTP 500**
+  (`files-simple.js` streamed Readable.from(buffer)→chunked→Caspio reset; now Buffer append + timeout, mirrors
+  thumbnails.js; +frontend xhr.timeout); **3 pricing bugs** (tax-exempt re-tax on reload → restore #include-tax;
+  stale AL auto-tally bills vs 0 garments → zero it; legacy XXL dropped on reload → normalize to 2XL parent col);
+  **artwork widget shrink** (quote-builder-shell.css dropzone/icon/thumb/design-name — SHARED, affects DTF/SCP);
+  **shipping de-dup** (removed right-rail #shipping-step card; lives in bottom-left invoice block — answers Erik's Q);
+  **design-name focus bug** (selector fixed). REMAINING (visual/polish, pending Erik's eye): #3 right-panel re-skin
+  (Quote Summary card chrome + indigo headers + Special Notes off-yellow + collapse CSS), #4a light action bar,
+  #8 push-readiness checklist, #9 one numbered spine, #11 surface tax in push preview, #12 logo card collapse-default,
+  #13 Rush%→Service_Codes + resetQuote childRowMap/cap-embellishment hygiene.
 - **v2026.06.05.4 — right-panel UX redesign (Erik feedback):** (1) Reference Artwork moved OUT of the retired
   "Save & Share" dropdown INTO the garment logo card under the Design # (`emb-artwork-mount` relocated; collapses
   with the card once a Design # is set). (2) "Save & Get Shareable Link" → renamed "Get Shareable Link", moved into
