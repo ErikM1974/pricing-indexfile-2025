@@ -1658,6 +1658,7 @@ class EmbroideryPricingCalculator {
                                     stitchCount: fbStitchCount,
                                     logoId: logo.id
                                 });
+                                additionalServicesTotal += total;  // BUGFIX 2026-06-06: FB-as-additional total was pushed to the list but never summed (the `continue` skipped the +=total below) → Full Back silently dropped from grandTotal
                                 continue; // Skip normal AL processing
                             }
 
