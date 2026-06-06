@@ -1,3 +1,8 @@
+## v2026.06.05.11 (2026.06.05)
+
+- fix(emb): review wave 3 — un-break DTF/SCP/DTG (my indigo regression) + label/security/a11y/cleanup
+- Deploy v2026.06.05.11
+
 ## v2026.06.05.10 (2026.06.05)
 
 - docs(memory): audit continued (v.8 #11/#13a/#13c, v.9 #8); #4a/#12 held as judgment calls
