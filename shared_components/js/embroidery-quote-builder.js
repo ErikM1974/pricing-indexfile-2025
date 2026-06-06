@@ -1747,6 +1747,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 const phoneInput = document.getElementById('customer-phone');
                 if (phoneInput) phoneInput.value = '';
                 _customerDesignGallery = null; // Invalidate gallery cache on customer clear
+                clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners
             }
         });
 
@@ -7162,18 +7163,22 @@ function onShipMethodChange() {
     if (isPickup) {
         if (pickupNotice) pickupNotice.style.display = 'block';
         if (otherInput) otherInput.style.display = 'none';
-        // Auto-set Milton, WA 98354 for tax lookup (NW Custom Apparel shop location)
-        document.getElementById('ship-address').value = '';
-        document.getElementById('ship-city').value = 'Milton';
-        document.getElementById('ship-state').value = 'WA';
-        document.getElementById('ship-zip').value = '98354';
-        // P1-1 (audit 2026-06-06): clear any previously-estimated freight when switching back to Pickup —
-        // otherwise phantom freight is billed + taxed + saved as a SHIP line + pushed to cur_Shipping while
-        // the UI shows "Customer Pickup". Pickup is always free. (mirror the estimator's recalc at ~L6107.)
-        const _pickupShipFee = document.getElementById('shipping-fee');
-        if (_pickupShipFee && parseFloat(_pickupShipFee.value) > 0) {
-            _pickupShipFee.value = '0';
-            if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
+        // Auto-set Milton, WA 98354 + clear estimated freight — but NOT during an edit-reload.
+        // P2-7 (audit 2026-06-06): a saved Pickup quote may hold a real ship-to (e.g. an imported OOS
+        // address) that restoreEmbOrderShipping just restored; clobbering it to Milton here would wipe it
+        // and a Save Revision would persist Milton. Skip the clobber + freight-clear while restoring.
+        if (!window._restoringQuote) {
+            document.getElementById('ship-address').value = '';
+            document.getElementById('ship-city').value = 'Milton';
+            document.getElementById('ship-state').value = 'WA';
+            document.getElementById('ship-zip').value = '98354';
+            // P1-1 (audit 2026-06-06): clear any previously-estimated freight when switching back to Pickup —
+            // otherwise phantom freight is billed + taxed + saved as a SHIP line + pushed to cur_Shipping.
+            const _pickupShipFee = document.getElementById('shipping-fee');
+            if (_pickupShipFee && parseFloat(_pickupShipFee.value) > 0) {
+                _pickupShipFee.value = '0';
+                if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
+            }
         }
         lookupTaxRate();
     } else {
@@ -7511,6 +7516,7 @@ async function saveAndGetLink(opts = {}) {
             email: customerEmail,
             name: customerName,
             company: document.getElementById('company-name')?.value?.trim() || '',
+            project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
             salesRepEmail: salesRepEmail,
             salesRepName: salesRepName,
             notes: document.getElementById('notes')?.value?.trim() || '',
@@ -8280,7 +8286,18 @@ function setupUnsavedChangesTracking() {
 /**
  * Reset all quote data and start fresh
  */
+// P2-8 (audit 2026-06-06): the CRM context banners (warning / tax-exempt chip / tier badge / terms note)
+// are painted by surfaceCustomerContext on customer select but were never cleared — so they bled onto the
+// next/blank customer after Start-New or a manual re-entry. Clear them on reset + lookup-clear.
+function clearCustomerContextBanners() {
+    ['customer-warning-banner', 'customer-tax-chip', 'customer-tier-badge', 'customer-terms-note'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.innerHTML = ''; el.style.display = 'none'; }
+    });
+}
+
 function resetQuote() {
+    clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote
     // Clear all product rows and re-add empty state
     const tbody = document.getElementById('product-tbody');
     tbody.innerHTML = `
@@ -8401,6 +8418,7 @@ function resetQuote() {
     document.getElementById('company-name').value = '';
     document.getElementById('customer-phone').value = '';
     document.getElementById('customer-lookup').value = '';
+    { const pn = document.getElementById('project-name'); if (pn) pn.value = ''; }  // P2-5 (audit 2026-06-06)
 
     // Reset notes
     const notesEl = document.getElementById('notes');
@@ -12627,6 +12645,7 @@ async function printQuote() {
         const customerData = {
             name: document.getElementById('customer-name')?.value || 'Customer',
             company: document.getElementById('company-name')?.value || '',
+            project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): show on PDF/invoice
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
