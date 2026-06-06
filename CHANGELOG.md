@@ -1,3 +1,12 @@
+## v2026.06.06.4 (2026.06.06)
+
+- fix(emb): readiness-audit P0 (Erik's #1 rule) — reopening a Customer-Pickup quote silently overwrote the saved tax rate with today's live Milton rate (the async lookup resolved after the restore). Guarded with `window._restoringQuote`.
+- fix(emb): readiness-audit P1 — legacy additional-logo quotes double-charged the AL on reload; now gated on no AL row present.
+- fix(emb): readiness-audit P1 — OSFA-only caps/beanies dropped their quantity on reload; now mirrors the ShopWorks-import parent-OSFA path.
+- fix(emb): a Full Back added as an *additional* logo was dropped from the grand total (`additionalServicesTotal`); now summed.
+- test(emb): 298-check combinatorial pricing matrix + edit-reload regression guards (12 tests) + ShopWorks push verification (all 20 line-item types land in LinesOE/order-level).
+- Deploy v2026.06.06.4
+
 ## v2026.06.06.3 (2026.06.06)
 
 - fix(emb): per-tier margin (N2) — 8+ garment tiers were under-charged at 0.55 vs 0.53; builder now matches the live pricing pages (J790 $79 / 112 $26). Cap was already correct.

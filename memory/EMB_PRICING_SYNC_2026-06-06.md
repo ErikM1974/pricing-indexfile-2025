@@ -37,7 +37,7 @@ Customer brings their OWN blank (e.g., 24 J790s from us + 2 of their own jackets
 
 ## Pending
 - **Caspio cleanup:** delete the 8 legacy `ALL` AS rows from `Embroidery_Costs` (PK 235/236/237/238 + the now-redundant duplicates) via the proxy, AFTER the code deploys. Mid/Large rows (241-244) stay.
-- **Deploy:** N2 + band re-source + AL/DECG fallback fixes + 10K wording are staged on `develop`, tested, NOT yet on Heroku.
+- **Deploy: DONE 2026-06-06** — v2026.06.06.3 (Heroku release v1250). Verified live: cache-bust `?v=2026.06.06.3`, deployed pricing JS has `getMarginDenominator`, service has `heavyweightSurcharge`, both pages read "10,000 stitches." GitHub synced (main+develop+tag). Includes N2 + band re-source + AL/DECG fallbacks + DECC 8K-base + heavyweight toggle + 10K wording.
 - **Staff calc nits (`embroidery-pricing-all`):** first-logo note says "$1.25/1K" (should be the flat band); cap AL note says "8,000" (should be 5,000). Non-customer-facing.
 
 ## Files
