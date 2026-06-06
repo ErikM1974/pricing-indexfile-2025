@@ -1,3 +1,8 @@
+## v2026.06.05.9 (2026.06.05)
+
+- feat(emb): push-readiness checklist (audit #8) — show Customer# / products / name gates above Push
+- Deploy v2026.06.05.9
+
 ## v2026.06.05.8 (2026.06.05)
 
 - docs(memory): Order Recap shipped v2026.06.05.7
