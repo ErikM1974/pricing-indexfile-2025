@@ -666,7 +666,7 @@ body {
 }
 
 .pricing-title i {
-    color: #6366f1;  /* indigo — match the step-number system; the green invoice TOTAL stays the sole money accent (audit re-skin 2026-06-05) */
+    color: var(--nwca-green);  /* EMB indigo override moved to .emb-builder scope (review C34) — DTF/SCP/DTG keep PNW-green */
 }
 
 .pricing-row {
@@ -760,7 +760,7 @@ body {
 .tier-badge {
     display: inline-block;
     padding: 4px 10px;
-    background: #6366f1;  /* indigo — match the step system (audit re-skin 2026-06-05) */
+    background: var(--nwca-blue);  /* EMB indigo override moved to .emb-builder scope (review C33) — DTF/SCP/DTG keep their blue */
     color: white;
     border-radius: 12px;
     font-size: 12px;
