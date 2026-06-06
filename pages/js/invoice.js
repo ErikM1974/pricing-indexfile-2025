@@ -791,10 +791,21 @@
       // grand on pre-import WA orders), and the grand is computed = subtotal + tax + shipping.
       // (2026-06-04 audit)
       const fromOrder = order && Number.isFinite(Number(order.cur_SubTotal));
-      const subtotal  = fromOrder ? Number(order.cur_SubTotal)     : Number(orig?.totals?.subtotal ?? data.sessionRaw?.TotalAmount ?? data.sessionRaw?.SubtotalAmount ?? 0);
+      const subtotalNet = fromOrder ? Number(order.cur_SubTotal)   : Number(orig?.totals?.subtotal ?? data.sessionRaw?.TotalAmount ?? data.sessionRaw?.SubtotalAmount ?? 0);
       const tax       = fromOrder ? Number(order.cur_SalesTaxTotal) : Number(orig?.totals?.tax      ?? data.sessionRaw?.TaxAmount ?? 0);
-      const shipping  = fromOrder ? Number(order.cur_Shipping)      : Number(orig?.totals?.shipping  ?? 0);
-      const grand     = fromOrder ? Number(order.cur_TotalInvoice)  : Number(orig?.totals?.total     ?? (subtotal + tax + shipping));
+      // P1-8 (audit 2026-06-06): pre-import, fall back to the saved SHIP fee item so shipping dollars are in
+      // the grand total (they were omitted while still being taxed). Mirrors quote-view's getShippingFee().
+      const _items = data.quoteItems || [];
+      const _feeItem = (sn) => _items.find(i => String(i.EmbellishmentType).toLowerCase() === 'fee' && String(i.StyleNumber).toUpperCase() === sn);
+      const _shipItem = _feeItem('SHIP') || _feeItem('SHIPPING');
+      const shipping  = fromOrder ? Number(order.cur_Shipping)      : Number(orig?.totals?.shipping  ?? (_shipItem ? Number(_shipItem.LineTotal) : 0));
+      // P1-7 (audit 2026-06-06): pre-import, surface the saved DISCOUNT so the invoice FOOTS — TotalAmount is
+      // already net of discount, but the rendered line items are full price. Show a pre-discount subtotal +
+      // a Discount row; the grand stays net + tax + shipping.
+      const _discItem = _feeItem('DISCOUNT');
+      const discount  = fromOrder ? 0 : (_discItem ? Math.abs(Number(_discItem.LineTotal)) : 0);
+      const subtotal  = subtotalNet + discount;   // pre-discount — matches the rendered line items
+      const grand     = fromOrder ? Number(order.cur_TotalInvoice)  : Number(orig?.totals?.total     ?? (subtotalNet + tax + shipping));
       const payments  = fromOrder ? Number(order.cur_Payments)      : 0;
       const balance   = fromOrder ? Number(order.cur_Balance)       : grand;
       // AMOUNT DUE = ShopWorks balance when known, otherwise grand - payments.
@@ -805,6 +816,14 @@
       $('total-shipping').textContent = fmtMoney(shipping);
       $('total-grand').textContent    = fmtMoney(grand);
       $('total-amount-due').textContent = fmtMoney(amountDue);
+
+      // Discount row — only when there's a discount (P1-7)
+      if (discount > 0) {
+          $('total-discount').textContent = '-' + fmtMoney(discount);
+          if ($('discount-row')) $('discount-row').style.display = '';
+      } else if ($('discount-row')) {
+          $('discount-row').style.display = 'none';
+      }
 
       // Hide shipping row if zero
       if (!shipping) $('shipping-row').style.display = 'none';
