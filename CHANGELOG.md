@@ -1,3 +1,9 @@
+## v2026.06.05.8 (2026.06.05)
+
+- docs(memory): Order Recap shipped v2026.06.05.7
+- feat(emb): audit batch — Rush%→API (#13a), resetQuote hygiene (#13c), tax-in-push-preview (#11)
+- Deploy v2026.06.05.8
+
 ## v2026.06.05.7 (2026.06.05)
 
 - docs(memory): audit #3 right-panel re-skin shipped v2026.06.05.6
