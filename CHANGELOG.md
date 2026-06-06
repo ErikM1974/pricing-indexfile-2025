@@ -1,3 +1,9 @@
+## v2026.06.05.5 (2026.06.05)
+
+- docs(memory): v2026.06.05.4 right-panel UX redesign (artwork->logo card, action stack, drop Save&Share)
+- fix(emb): audit batch — 3 pricing bugs + artwork shrink + shipping de-dup + upload timeout + focus
+- Deploy v2026.06.05.5: 9 files (cap-embroidery-pricing-integrated.html,dtf-pricing.html,dtg-pricing.html,...)
+
 ## v2026.06.05.4 (2026.06.05)
 
 - docs(memory): v2026.06.05.3 lookup-limit fix + Maxx email data-gap finding
