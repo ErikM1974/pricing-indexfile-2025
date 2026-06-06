@@ -659,6 +659,13 @@
                     statusCellHtml = `<span class="status-badge status-payment-confirmed" title="3-Day Tees order — payment received, ShopWorks order hasn't been created yet. Should advance to In ShopWorks shortly.">
                                           <i class="fas fa-check-circle"></i> Payment Received
                                        </span>`;
+                } else if (quote.PushedToShopWorks) {
+                    // P2-1 (audit 2026-06-06): a pushed order whose Status hasn't yet flipped to Processed
+                    // (the hourly sync runs AFTER SW imports) would otherwise render the editable dropdown,
+                    // letting a rep mark a LIVE ShopWorks order "Lost". Show a read-only locked badge.
+                    statusCellHtml = `<span class="status-badge status-processed" title="Pushed to ShopWorks — locked. Status syncs from ShopWorks hourly.">
+                                          <i class="fas fa-lock"></i> In ShopWorks
+                                       </span>`;
                 } else {
                     statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
                                               data-pk-id="${quote.PK_ID}"
