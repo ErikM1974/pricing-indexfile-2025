@@ -8072,7 +8072,7 @@ function closePushPreview() {
 // (a later same-name function declaration would otherwise override it). (Erik 2026-06-05)
 
 async function embEmailQuote() {
-    const quoteId = editingQuoteId;
+    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
     if (!quoteId) {
         showToast('Please save the quote first before emailing', 'error');
         return;
@@ -12584,7 +12584,7 @@ async function printQuote() {
  * Email embroidery quote — requires save first, then calls shared emailQuote()
  */
 async function embEmailQuote() {
-    const quoteId = editingQuoteId;
+    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
     if (!quoteId) {
         showToast('Please save the quote first before emailing', 'error');
         return;
