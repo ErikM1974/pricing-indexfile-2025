@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.04.2">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.05.24.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.04.1">
@@ -731,28 +731,10 @@
 
             </div>
 
-            <!-- ============================================================
-                 Step 3 · SHIPPING (2026-06-02 order-flow redesign)
-                 Pulled OUT of the buried "Additional Charges" accordion.
-                 Pickup is the default (most orders are pickup); the address
-                 + carrier only appear when the rep chooses "Ship it".
-                 ============================================================ -->
-            <div class="flow-step" id="shipping-step">
-                <div class="flow-step-head">
-                    <span class="flow-step-num">2</span>
-                    <i class="fas fa-truck"></i> Shipping
-                </div>
-                <div class="flow-step-body">
-                    <!-- Compact summary; the full editor (Pickup/Ship + address) lives in
-                         the shipping modal, opened from here OR the invoice totals line. -->
-                    <div class="shipping-summary-row">
-                        <div id="shipping-summary" class="shipping-summary">Customer Pickup — Milton, WA 98354</div>
-                        <button type="button" class="shipping-change-btn" onclick="openShippingModal()">
-                            <i class="fas fa-pen"></i> Change
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- Shipping right-rail card REMOVED (audit 2026-06-05 — Erik's shipping-placement question):
+                 Shipping is a money line that feeds Tax→TOTAL, so its single home is the bottom-left invoice
+                 totals block, where the clickable "Shipping" line opens the same shipping modal. This deletes
+                 the duplicate. updateShippingSummary() guards on the now-absent #shipping-summary so it no-ops. -->
 
             <!-- ============================================================
                  Step 4 · ARTWORK SERVICES (2026-06-02 — always visible)
@@ -1489,11 +1471,11 @@ Company:Absher Construction Company
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.02.3"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.04.15"></script>
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
-    <script src="/shared_components/js/artwork-upload.js?v=2026.05.24.2"></script>
+    <script src="/shared_components/js/artwork-upload.js?v=2026.06.05.5"></script>
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.05.2"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.05.5"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

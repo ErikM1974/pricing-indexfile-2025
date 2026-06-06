@@ -398,7 +398,7 @@ body.qb-shell-body {
     border: 2px dashed var(--pnw-rule-strong, rgba(31, 73, 34, 0.22));
     border-radius: var(--qb-radius-md, 8px);
     background: var(--pnw-fog, #f4f6f3);
-    padding: 24px 16px;
+    padding: 12px 14px;  /* shrunk — was 24px 16px; widget felt imposing in the logo card (audit 2026-06-05) */
     text-align: center;
     cursor: pointer;
     transition: all 150ms cubic-bezier(.2,.8,.2,1);
@@ -415,14 +415,14 @@ body.qb-shell-body {
 }
 
 .artwork-dropzone i {
-    font-size: 28px;
+    font-size: 18px;  /* was 28px (audit 2026-06-05) */
     color: var(--pnw-forest, #2e5827);
     display: block;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 .artwork-dropzone-msg {
-    font-size: 14px;
+    font-size: 13px;  /* was 14px (audit 2026-06-05) */
     color: var(--pnw-pine, #1a3517);
     margin-bottom: 4px;
 }
@@ -455,8 +455,8 @@ body.qb-shell-body {
 }
 
 .artwork-file-thumb {
-    width: 48px;
-    height: 48px;
+    width: 36px;  /* was 48px (audit 2026-06-05) */
+    height: 36px;
     flex-shrink: 0;
     border-radius: var(--qb-radius-sm, 4px);
     overflow: hidden;
@@ -552,17 +552,20 @@ body.qb-shell-body {
 }
 
 .artwork-upload-designname-row {
-    margin: var(--qb-space-3, 12px) 0;
-    padding: var(--qb-space-3, 12px);
-    background: var(--pnw-mist, #f5f9f4);
-    border: 1px solid var(--pnw-mist-deep, #c8d9c4);
-    border-radius: var(--qb-radius-md, 6px);
+    /* Demoted from a boxed green panel to a plain field (audit 2026-06-05) — the box made the
+       artwork widget look heavy/imposing, especially now that it lives inside the logo card. */
+    margin: 8px 0 0;
+    padding: 0;
+    background: none;
+    border: none;
 }
 
 .artwork-upload-designname-label {
     display: block;
-    font-size: 13px;
+    font-size: 11px;            /* was 13px — match the sibling logo-card field labels (audit 2026-06-05) */
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .04em;
     color: var(--pnw-forest-deep, #1f4922);
     margin-bottom: 4px;
 }

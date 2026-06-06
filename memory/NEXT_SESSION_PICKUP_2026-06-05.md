@@ -84,7 +84,14 @@
   `VERIFY-1/2/3-0604`, `CTRLA/CTRLB-0604`; draft Caspio quotes `EMB-2026-294` / `EMB-2026-295`.
 
 ## Deploy state
-- Frontend **v2026.06.05.3** (Heroku v1238, develop=main synced) · Proxy **v788** · Inksoft **v262**.
+- Frontend **v2026.06.05.4** (Heroku v1239, develop=main synced) · Proxy **v788** · Inksoft **v262**.
+- **v2026.06.05.4 — right-panel UX redesign (Erik feedback):** (1) Reference Artwork moved OUT of the retired
+  "Save & Share" dropdown INTO the garment logo card under the Design # (`emb-artwork-mount` relocated; collapses
+  with the card once a Design # is set). (2) "Save & Get Shareable Link" → renamed "Get Shareable Link", moved into
+  the action stack directly under Push (order now Push ▸ Get Link ▸ Copy ▸ Print ▸ Email). (3) "Save & Share"
+  collapsible dropdown retired. (4) Special Notes now a standalone field. KNOWN EDGE CASE: garment logo card hides for
+  cap-only orders → artwork upload is garment-orders-only (flagged to Erik; add to cap card if he does cap-only art).
+  DEAD CODE: `toggleSaveShare()` in embroidery-quote-builder.js (no longer called; references removed elements) — flag, don't auto-delete.
 - **PROXY v788 — push session-selection fix (Erik's #1 rule: wrong total to ShopWorks).** EMB-2026-294
   pushed STALE notes ($2493/qty28/12000st — from old 291) while its LINE ITEMS were fresh ($366/qty5/8000st).
   ROOT: TWO `Quote_Sessions` rows shared QuoteID 294 (stale PK_ID 1622 from a 06/04 out-of-band test draft +
