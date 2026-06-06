@@ -1726,7 +1726,7 @@ class CatalogSearch {
         return `
             <div class="quick-view-pricing">
                 <h3 class="pricing-header">Cap Embroidery Pricing</h3>
-                <p class="pricing-subtitle">Includes one front logo at 8,000 stitches</p>
+                <p class="pricing-subtitle">Includes one front logo at 10,000 stitches</p>
                 <div class="ltm-notice">
                     <span class="ltm-icon">⚠️</span>
                     Orders under 24 pieces: +$50.00 LTM fee

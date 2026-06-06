@@ -455,7 +455,7 @@ class EmbroideryPricingService {
      * @param {Object} [cachedPricing] - Optional cached DECG pricing data to avoid refetch
      * @returns {Promise<Object>} { unitPrice, ltmFee, tier, stitchCount, breakdown }
      */
-    async calculateDECGPrice(quantity, stitchCount = 8000, itemType = 'garment', cachedPricing = null) {
+    async calculateDECGPrice(quantity, stitchCount = 8000, itemType = 'garment', cachedPricing = null, heavyweight = false) {
         // Fetch DECG pricing from API (or use cached)
         const decgPricing = cachedPricing || await this.fetchDECGPricing();
 
@@ -479,13 +479,17 @@ class EmbroideryPricingService {
             throw new Error(`DECG base price not found for tier: ${tier}`);
         }
 
-        // Calculate extra stitch charge (above 8K base)
-        const baseStitches = 8000;
+        // Extra stitch charge above the DECG base — 8,000 for BOTH garment AND cap (customer-supplied page).
+        // /api/decg-pricing returns null baseStitches, so this 8000 fallback is the operative value (NOT 5K like
+        // the regular additional-logo cap — customer-supplied is a different, higher scheme).
+        const baseStitches = pricingCategory.baseStitches || 8000;
         const extraK = Math.max(0, (stitchCount - baseStitches) / 1000);
         const extraCharge = extraK * upchargeRate;
 
-        // Unit price = base + extra stitches
-        const unitPrice = basePrice + extraCharge;
+        // Heavyweight surcharge (+$/pc for Carhartt/canvas/leather) — API-sourced, only when toggled.
+        const hwSurcharge = (heavyweight && parseFloat(decgPricing.heavyweightSurcharge)) ? parseFloat(decgPricing.heavyweightSurcharge) : 0;
+        // Unit price = base + extra stitches + heavyweight
+        const unitPrice = basePrice + extraCharge + hwSurcharge;
 
         // LTM fee for small orders (≤7 pieces for embroidery)
         const ltmFee = quantity <= ltmThreshold ? ltmFeeAmount : 0;
@@ -501,7 +505,8 @@ class EmbroideryPricingService {
                 basePrice: basePrice,
                 extraStitches: extraK * 1000,
                 upchargeRate: upchargeRate,
-                extraCharge: parseFloat(extraCharge.toFixed(2))
+                extraCharge: parseFloat(extraCharge.toFixed(2)),
+                heavyweightSurcharge: hwSurcharge
             },
             pricingSource: 'decg-api'
         };
@@ -621,8 +626,8 @@ class EmbroideryPricingService {
         }
 
         const basePrice = pricingCategory.basePrices[tier];
-        const upchargeRate = pricingCategory.perThousandUpcharge || 1.00;
-        const baseStitches = pricingCategory.baseStitches || 5000;
+        const upchargeRate = pricingCategory.perThousandUpcharge || (itemType === 'cap' ? 1.00 : 1.25);
+        const baseStitches = pricingCategory.baseStitches || (itemType === 'cap' ? 5000 : 8000);
         const ltmThreshold = pricingCategory.ltmThreshold || 7;
         const ltmFeeAmount = pricingCategory.ltmFee || 50.00;
 

@@ -1292,6 +1292,8 @@ async function populateProducts(items) {
         if (serviceRow && ['DECG', 'DECC'].includes(serviceType)) {
             serviceRow.dataset.decgPriced = 'true';
             serviceRow.dataset.decgItemType = serviceType === 'DECC' ? 'cap' : 'garment';
+            // Restore the Heavyweight (+$10/pc) flag from SizeBreakdown so the live re-price keeps it.
+            try { serviceRow.dataset.decgHeavyweight = JSON.parse(serviceItem.SizeBreakdown || '{}').heavyweight ? 'true' : 'false'; } catch (e) { serviceRow.dataset.decgHeavyweight = 'false'; }
         }
 
         // Restore price override for DECG/DECC if saved
@@ -1605,12 +1607,14 @@ document.addEventListener('DOMContentLoaded', async function() {
                     { code: 'DECG', label: 'Customer Garment', icon: 'fa-tshirt', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
                         { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
                             { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
-                        ]}
+                        ]},
+                        { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
                     ]},
                     { code: 'DECC', label: 'Customer Cap', icon: 'fa-hat-cowboy', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
                         { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
                             { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
-                        ]}
+                        ]},
+                        { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
                     ]}
                 ]}
             ];
@@ -1619,7 +1623,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (code === 'AL' && opts && opts.fields) {
                         addALLineItem(opts.fields.placement, opts.fields.stitches);
                     } else if ((code === 'DECG' || code === 'DECC') && opts && opts.fields) {
-                        addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches);
+                        addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches, opts.fields.heavyweight);
                     } else {
                         addManualServiceRow(code, opts && opts.price);
                     }
@@ -3422,7 +3426,7 @@ async function addALLineItem(placement, stitches) {
  * price whenever the rep changes the quantity. NEVER guesses: API down → visible toast + $0
  * (Erik's #1 rule). The price cell stays double-click-overridable. (2026-06-04)
  */
-async function addDECGLineItem(itemType, stitches) {
+async function addDECGLineItem(itemType, stitches, heavyweight) {
     const serviceType = itemType === 'cap' ? 'DECC' : 'DECG';
     let stitchCount = parseInt(stitches, 10);
     if (!stitchCount || stitchCount < 1) stitchCount = 8000;
@@ -3439,6 +3443,7 @@ async function addDECGLineItem(itemType, stitches) {
     // Mark the row for live DECG pricing; carry the item type (garment/cap → tier table).
     row.dataset.decgPriced = 'true';
     row.dataset.decgItemType = itemType === 'cap' ? 'cap' : 'garment';
+    row.dataset.decgHeavyweight = heavyweight ? 'true' : 'false';   // +$10/pc Carhartt/canvas/leather
 
     const qtyInput = row.querySelector('.service-qty');
     if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
@@ -5935,9 +5940,10 @@ async function syncDECGRows() {
         const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
         const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
         const itemType = row.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        const heavyweight = row.dataset.decgHeavyweight === 'true';
         let unit = 0;
         try {
-            const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache);
+            const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache, heavyweight);
             unit = res.unitPrice || 0;
         } catch (e) {
             console.error('[DECG] calculateDECGPrice failed', e);
@@ -8703,6 +8709,7 @@ function collectDECGItems() {
             const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
             const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
             const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
+            const heavyweight = row.dataset.decgHeavyweight === 'true';
 
             if (qty > 0) {
                 items.push({
@@ -8711,6 +8718,7 @@ function collectDECGItems() {
                     unitPrice: unitPrice,
                     total: qty * unitPrice,
                     stitchCount: stitchCount,
+                    heavyweight: heavyweight,
                     rowId: row.dataset.rowId,
                     hasPriceOverride: overridePrice > 0
                 });
