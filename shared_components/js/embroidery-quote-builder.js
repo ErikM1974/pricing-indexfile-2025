@@ -69,13 +69,7 @@ const SIZE_TO_SLOT = {
     '5XL': 'Size06', '6XL': 'Size06', 'OSFA': 'Size06'
 };
 
-// Display labels matching ShopWorks column headers
-// Note: Internally we use L/2XL/3XL, but display as LG/XXL/XXXL
-const SIZE_DISPLAY_LABELS = {
-    'S': 'S', 'M': 'M', 'L': 'LG', 'XL': 'XL',
-    '2XL': 'XXL', '3XL': 'XXXL',
-    'XS': 'XXXL', '4XL': 'XXXL', '5XL': 'XXXL', '6XL': 'XXXL'
-};
+// (removed dead SIZE_DISPLAY_LABELS — unused, and it had an incorrect 'XS'→'XXXL' mapping; review C28 2026-06-05)
 
 // State
 let pricingCalculator = null;
@@ -1538,7 +1532,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                 ],
                 defaultPlacement: 'Left Chest',
             });
-            console.log('[EMB] Artwork upload widget mounted (rich mode)');
         } catch (e) {
             console.error('[EMB] Artwork widget mount failed:', e);
         }
@@ -1854,7 +1847,7 @@ function renderOrderRecap() {
     const cust = company || name;
     const rows = [];
     if (cust) rows.push(`<div class="or-row"><span class="or-label">Customer</span><span class="or-val">${esc(cust)}${custNum ? ' · #' + esc(custNum) : ''}</span></div>`);
-    if (ship) rows.push(`<div class="or-row"><span class="or-label">Ship&nbsp;to</span><span class="or-val">${esc(ship)}</span></div>`);
+    if (ship) rows.push(`<div class="or-row"><span class="or-label">Shipping</span><span class="or-val">${esc(ship)}</span></div>`);  // #it-shipping-amt is a charge/method, not a destination (review C21)
     if (logos.length) rows.push(`<div class="or-row"><span class="or-label">Logo${logos.length > 1 ? 's' : ''}</span><span class="or-val">${esc(logos.join('   ·   '))}</span></div>`);
     el.innerHTML = rows.length ? `<div class="or-title">Order at a glance</div>${rows.join('')}` : '';
 }
@@ -5309,10 +5302,13 @@ function createChildRow(parentRowId, size, qty) {
         </div>`
     ).join('');
 
-    // Build current color display
-    const currentSwatchStyle = parentSwatchUrl
-        ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${parentHex};`;
+    // Build current color display — sanitize before interpolating into style="" (CSS/attribute
+    // breakout); mirrors the hardened getSwatchStyle(). (review C32)
+    const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
+    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
+    const currentSwatchStyle = /^https?:\/\//i.test(_swUrl)
+        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`
+        : `background-color: ${_swHex};`;
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -7907,7 +7903,7 @@ function renderPushPreview(data) {
     // Pull the tax lines the transformer wrote (buildSalesTaxNote): "Tax Rate: X%", "Tax Account: C — D",
     // "Tax: DO NOT APPLY (out of state)", "Apply Tax: Manually in ShopWorks". Covers in-state, out-of-state,
     // and needs-review cases.
-    const taxLines = oNotes.map(n => String(n.Note || '')).filter(t => /^(Tax Rate:|Tax Account:|Tax: |Apply Tax:)/i.test(t));
+    const taxLines = oNotes.map(n => String(n.Note || '')).filter(t => /^(Tax Rate:|Tax Account:|Tax Amount:|Tax: |Apply Tax:|Rep:|State:)/i.test(t));  // +Rep:/State:/Tax Amount: so needs-review + out-of-state instructions surface (review C36)
     if (taxLines.length) {
         html += '<div class="preview-warnings preview-manual-tax"><h5><i class="fas fa-info-circle"></i> After import — set tax in ShopWorks</h5><ul>' +
             taxLines.map(t => '<li>' + escapeHtml(t.trim()) + '</li>').join('') +

@@ -66,6 +66,9 @@ function showToast(message, type = 'info', duration = 3000) {
     // no matching CSS, so the toast rendered as an unstyled translucent box (white text on
     // no background) that briefly overlapped the floating AI chat button on page load.
     toast.className = `toast toast-${type}`;
+    // Announce to assistive tech: errors interrupt (assertive), others are polite. (review C12)
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    toast.setAttribute('aria-atomic', 'true');
 
     // Select icon based on type
     const icons = {
@@ -630,9 +633,15 @@ function cleanProductTitle(title, styleNumber) {
  */
 function getSwatchStyle(color) {
     if (color.COLOR_SQUARE_IMAGE) {
-        return `background-image: url('${color.COLOR_SQUARE_IMAGE}'); background-size: cover; background-position: center;`;
+        // Strip quotes/parens/backslashes/whitespace + require an http(s) URL so a crafted swatch value
+        // can't break out of the style="" attribute or the url() (CSS/attribute injection). (review C32)
+        const safe = String(color.COLOR_SQUARE_IMAGE).replace(/["'()\\\s]/g, '');
+        if (/^https?:\/\//i.test(safe)) {
+            return `background-image: url('${safe}'); background-size: cover; background-position: center;`;
+        }
     }
-    return `background-color: ${color.HEX_CODE || '#ccc'};`;
+    const hex = (color.HEX_CODE && /^#[0-9a-fA-F]{3,8}$/.test(color.HEX_CODE)) ? color.HEX_CODE : '#ccc';
+    return `background-color: ${hex};`;
 }
 
 // ============================================

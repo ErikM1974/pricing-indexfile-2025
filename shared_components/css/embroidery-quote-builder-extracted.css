@@ -57,6 +57,12 @@
     margin-bottom: 12px;
 }
 
+/* EMB-scoped indigo (review C33/C34 2026-06-05) — keep the embroidery Quote Summary icon + tier badge
+   indigo to match the EMB-only step-number pills, WITHOUT recoloring DTF/SCP/DTG (which share
+   .tier-badge / .pricing-title and have no .emb-builder body class). */
+.emb-builder .pricing-title i { color: #6366f1; }
+.emb-builder .tier-badge { background: #6366f1; }
+
 /* Sticky TOTAL - Always visible at bottom */
 .pricing-total-sticky {
     background: #fff;
