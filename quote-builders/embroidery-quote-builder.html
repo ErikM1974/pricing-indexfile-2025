@@ -121,6 +121,10 @@
                                     <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
                                 </div>
                             </div>
+                            <!-- Reference artwork — moved here from the old "Save & Share" panel (Erik 2026-06-05).
+                                 Home is with the design: use it when there's no Design # yet (uploading + naming
+                                 art creates the ShopWorks design). Hides with the card once a Design # is set. -->
+                            <div id="emb-artwork-mount" style="margin-top: 4px;"></div>
                             <div class="logo-form-row">
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
@@ -868,33 +872,18 @@
                  totals block + tax controls now live in #invoice-totals-box in
                  the product-grid section (left). -->
 
-            <!-- Save & Share Section (Collapsible) -->
-            <div class="save-quote-panel" style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <div class="save-quote-header" onclick="toggleSaveShare()" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                    <div class="save-quote-title" style="font-size: 14px; font-weight: 600; color: #334155; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-share-alt"></i> Save & Share
-                    </div>
-                    <i id="save-share-chevron" class="fas fa-chevron-up" style="color: #666; transition: transform 0.2s; transform: rotate(180deg);"></i>
+            <!-- Special Notes — standalone (the retired "Save & Share" dropdown is gone: artwork moved into the
+                 logo card, the share button moved into the action stack below). Erik 2026-06-05 -->
+            <div class="notes-section collapsed" id="notes-section" style="margin-bottom: 16px;">
+                <div class="notes-header" onclick="toggleNotesSection()">
+                    <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                        <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
+                        <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
+                        <i class="fas fa-chevron-down notes-toggle-icon" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
+                    </label>
                 </div>
-                <div id="save-share-content" style="display: none; margin-top: 12px;">
-                    <!-- Special Notes (collapsible) -->
-                    <div class="notes-section collapsed" id="notes-section">
-                        <div class="notes-header" onclick="toggleNotesSection()">
-                            <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
-                                <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
-                                <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
-                                <i class="fas fa-chevron-down notes-toggle-icon" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
-                            </label>
-                        </div>
-                        <div class="notes-body" style="display: none;">
-                            <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
-                        </div>
-                    </div>
-                    <!-- Phase 9 (2026-05-23): reference artwork upload widget -->
-                    <div id="emb-artwork-mount"></div>
-                    <button class="btn-save-quote" onclick="saveAndGetLink()" style="margin-top: 12px; width: 100%; padding: 12px; background: linear-gradient(135deg, #4cb354, #409a47); color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">
-                        <i class="fas fa-link"></i> Save & Get Shareable Link
-                    </button>
+                <div class="notes-body" style="display: none;">
+                    <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
                 </div>
             </div>
 
@@ -909,6 +898,11 @@
                     title="Enter the ShopWorks Customer # (top of the form) to enable push"
                     style="background: #1a5276; color: white; opacity: 0.5; cursor: not-allowed; font-size: 16px; font-weight: 700; padding: 14px; box-shadow: 0 2px 6px rgba(26,82,118,0.35);">
                     <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
+                </button>
+                <!-- Get Shareable Link — secondary, directly under Push (moved out of the retired "Save & Share"
+                     panel; renamed from "Save & Get Shareable Link" since Push + this both auto-save now). Erik 2026-06-05 -->
+                <button class="btn-action btn-secondary-action" onclick="saveAndGetLink()" style="background: #ecfdf5; color: #059669; border-color: #6ee7b7;">
+                    <i class="fas fa-link"></i> Get Shareable Link
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
