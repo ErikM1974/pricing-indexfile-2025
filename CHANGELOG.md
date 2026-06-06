@@ -1,3 +1,9 @@
+## v2026.06.05.7 (2026.06.05)
+
+- docs(memory): audit #3 right-panel re-skin shipped v2026.06.05.6
+- feat(emb): Order Recap — use the empty space left of the totals for an 'order at a glance' band
+- Deploy v2026.06.05.7: 4 files
+
 ## v2026.06.05.6 (2026.06.05)
 
 - docs(memory): EMB audit (39 agents/13 fixes) — shipped batch v2026.06.05.5 + proxy v789; remaining visual/polish
