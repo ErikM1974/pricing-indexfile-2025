@@ -7327,6 +7327,14 @@ async function saveAndGetLink(opts = {}) {
         return;
     }
 
+    // Artwork still uploading → getFiles() below would snapshot referenceArtwork WITHOUT the in-flight
+    // file (the widget pushes to state.files only AFTER the upload resolves), so the EMB transformer would
+    // omit its Location and production silently loses the art. Block save until uploads finish. (review C11)
+    if (window._embArtwork && typeof window._embArtwork.isUploading === 'function' && window._embArtwork.isUploading()) {
+        showToast('Artwork is still uploading — wait for it to finish before saving.', 'warning', 5000);
+        return;
+    }
+
     // Validate non-SanMar products have pricing set
     const zeroPriceRows = products.filter(p => {
         const row = document.getElementById(`row-${p.rowId}`);

@@ -372,7 +372,12 @@ class EmbroideryPricingCalculator {
             }
         } catch (error) {
             console.warn('[EmbroideryPricingCalculator] Failed to load service codes, using defaults:', error.message);
-            // Non-critical - continue with hardcoded defaults
+            // Erik's #1 rule: a fee falling back to a default must not be SILENT. Surface a non-blocking
+            // warning, but don't overwrite a critical main-pricing banner. (review C14)
+            if (this.apiStatus && Array.isArray(this.apiStatus.warnings)) this.apiStatus.warnings.push('Service-code fees unavailable — using default fees');
+            if (!this.apiError && typeof this.showAPIWarning === 'function') {
+                this.showAPIWarning('Could not load current service fees (digitizing, monogram, Full Back, patch/3D-puff upcharges) from the server — using default amounts. Verify these fees before sending the quote.', 'partial');
+            }
         }
     }
 
@@ -486,7 +491,7 @@ class EmbroideryPricingCalculator {
                 }
             } catch (puffError) {
                 console.error('[EmbroideryPricingCalculator] Failed to load 3D Puff pricing:', puffError);
-                // Keep the hardcoded default as fallback
+                if (typeof this.showAPIWarning === 'function') this.showAPIWarning('3D Puff cap upcharge could not be loaded from the server. Do not quote 3D-puff caps until pricing reloads — refresh the page.', 'partial');  // review C15 — Erik's #1 rule
             }
 
             // Fetch Patch upcharge from PATCH endpoint
@@ -506,7 +511,7 @@ class EmbroideryPricingCalculator {
                 }
             } catch (patchError) {
                 console.error('[EmbroideryPricingCalculator] Failed to load Patch pricing:', patchError);
-                // Keep the hardcoded default as fallback
+                if (typeof this.showAPIWarning === 'function') this.showAPIWarning('Laser-patch cap upcharge could not be loaded from the server. Do not quote laser-patch caps until pricing reloads — refresh the page.', 'partial');  // review C15 — Erik's #1 rule
             }
 
             this.capInitialized = true;
@@ -1420,7 +1425,7 @@ class EmbroideryPricingCalculator {
                         primaryFBUsedTierPricing = true;
                     } else {
                         // Formula-based: $1.25 per 1,000 stitches (min 25K)
-                        primaryFullBackStitchCost += (fbStitchCount / 1000) * this.additionalStitchRate;
+                        primaryFullBackStitchCost += (fbStitchCount / 1000) * (this.fbStitchRate || this.additionalStitchRate);  // FB-specific rate (FB service code), not the garment STITCH-RATE (review C16)
                     }
                 } else {
                     // Other positions: flat tier surcharge (Mid $4, Large $10)
@@ -1586,7 +1591,7 @@ class EmbroideryPricingCalculator {
                                     description = `FB Full Back (${fbStitchCount/1000}K st, tier pricing)`;
                                 } else {
                                     // Formula-based pricing
-                                    const fbStitchRate = this.additionalStitchRate; // $1.25/1K
+                                    const fbStitchRate = this.fbStitchRate || this.additionalStitchRate; // FB rate (FB service code), falls back to garment rate (review C16)
                                     unitPrice = (fbStitchCount / 1000) * fbStitchRate;
                                     description = `FB Full Back (${fbStitchCount/1000}K stitches)`;
                                 }
