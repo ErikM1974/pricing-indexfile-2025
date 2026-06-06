@@ -52,6 +52,9 @@
   // chips (type 'number'/'stitches'). All field values read back generically via .sci-field.
   function fieldHtml(f) {
     const lbl = f.label ? `<span class="sci-fl">${f.label}</span>` : '';
+    if (f.type === 'checkbox') {
+      return `<label class="sci-field-lbl sci-check-lbl"><input type="checkbox" class="sci-field sci-check" data-field="${f.name}"${f.default ? ' checked' : ''}> ${f.label || ''}</label>`;
+    }
     if (f.type === 'number' || f.type === 'stitches') {
       const presets = (f.presets || []).map((p) =>
         `<button type="button" class="sci-preset" data-field="${f.name}" data-val="${p.value}">${p.label}</button>`).join('');
@@ -140,7 +143,7 @@
         if (btn.classList.contains('sci-add-config')) {
           const row = btn.closest('.sci-config');
           const fields = {};
-          row.querySelectorAll('.sci-field').forEach((s) => { fields[s.dataset.field] = s.value; });
+          row.querySelectorAll('.sci-field').forEach((s) => { fields[s.dataset.field] = (s.type === 'checkbox') ? s.checked : s.value; });
           add(btn.dataset.code, { fields });
           closeAll();
           return;

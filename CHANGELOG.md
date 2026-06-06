@@ -1,3 +1,12 @@
+## v2026.06.06.3 (2026.06.06)
+
+- fix(emb): per-tier margin (N2) — 8+ garment tiers were under-charged at 0.55 vs 0.53; builder now matches the live pricing pages (J790 $79 / 112 $26). Cap was already correct.
+- fix(emb): additional-stitch band re-sourced from canonical Embroidery_Costs Mid/Large rows by label (Caspio edits now take effect); 25K cap derived from data, not hardcoded
+- fix(emb): additional-logo + DECG fallbacks now category-correct; DECC customer-supplied cap base corrected to 8,000 (matches the page)
+- feat(emb): DECG/DECC "Heavyweight +$10/pc" toggle (API-sourced) + reusable services-bar checkbox field; also fixes a pre-existing DECG stitch-count-not-persisted bug
+- docs(emb): "10,000 stitches included" wording on the garment + cap pricing pages
+- Deploy v2026.06.06.3
+
 ## v2026.06.06.2 (2026.06.06)
 
 - fix(emb): round-2 — Email works on a just-saved quote (N3) + PDF Graphic-Design rate tracks API (N7)

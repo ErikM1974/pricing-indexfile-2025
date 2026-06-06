@@ -3613,4 +3613,7 @@ button.service-cat-item:hover { background: #eef2ff; }
 input.sci-num { width: 92px; cursor: text; }
 .sci-presets { display: inline-flex; gap: 4px; }
 .sci-preset { padding: 2px 8px; font-size: 11px; background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 5px; cursor: pointer; font-weight: 600; }
+/* checkbox field (e.g. DECG/DECC Heavyweight +$10/pc) — override the .sci-field input styling */
+.sci-check-lbl { cursor: pointer; white-space: nowrap; }
+.sci-check { padding: 0; border: none; max-width: none; width: auto; cursor: pointer; accent-color: #16a34a; }
 .sci-preset:hover { background: #e0e7ff; }

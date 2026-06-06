@@ -133,7 +133,11 @@ class EmbroideryPricingCalculator {
                     data.tiersR.forEach(tier => {
                         this.tiers[tier.TierLabel] = {
                             embCost: 0, // Will be set from allEmbroideryCostsR
-                            hasLTM: tier.LTM_Fee > 0
+                            hasLTM: tier.LTM_Fee > 0,
+                            // Per-tier margin (N2 fix): 1-7 = 0.55 (lower margin, offsets the $50 LTM on small
+                            // orders), 8+ = 0.53. Honor Caspio's per-tier value — NOT tiersR[0] for all tiers
+                            // (that flattened to 0.55 and under-charged every 8+ garment order vs the live page).
+                            marginDenominator: parseFloat(tier.MarginDenominator) || this.marginDenominator
                         };
                         if (tier.LTM_Fee > 0) {
                             this.ltmFee = tier.LTM_Fee;
@@ -162,22 +166,47 @@ class EmbroideryPricingCalculator {
                     // Parse AS-Garm stitch surcharge tiers from API data
                     // These replace the hardcoded $4/$10 flat tier surcharges
                     // AS-Cap uses same tiers as AS-Garm (prices are identical as of Feb 2026)
-                    const asGarmRows = data.allEmbroideryCostsR
-                        .filter(c => c.ItemType === 'AS-Garm')
-                        .sort((a, b) => a.StitchCount - b.StitchCount);
-                    if (asGarmRows.length >= 2) {
+                    // Read the CANONICAL Mid/Large rows by TierLabel (D1 fix). Was positional [0]/[1] over
+                    // duplicate ALL+Mid/Large rows — correct only by luck, and it read the legacy ALL rows so
+                    // editing the Mid/Large price in Caspio did nothing. By-label makes Caspio edits take effect
+                    // and survives deleting the ALL rows. Prices come 100% from Caspio; 10K "included" is the
+                    // confirmed policy boundary (a band definition, not a price).
+                    const asGarm = data.allEmbroideryCostsR.filter(c => c.ItemType === 'AS-Garm');
+                    const asMid = asGarm.find(c => c.TierLabel === 'Mid');
+                    const asLarge = asGarm.find(c => c.TierLabel === 'Large');
+                    const INCLUDED_STITCHES = 10000;
+                    if (asMid && asLarge) {
+                        const midCeil = parseFloat(asMid.StitchCount) || 15000;
+                        const largeCeil = parseFloat(asLarge.StitchCount) || 25000;
                         this.stitchSurchargeTiers = [
-                            { max: asGarmRows[0].StitchCount, fee: 0 },
-                            { max: asGarmRows[1].StitchCount, fee: asGarmRows[0].EmbroideryCost },
-                            { max: 25000, fee: asGarmRows[1].EmbroideryCost }
+                            { max: INCLUDED_STITCHES, fee: 0 },                              // <=10K included
+                            { max: midCeil,   fee: parseFloat(asMid.EmbroideryCost) || 0 },  // 10,001-15,000 (Mid)
+                            { max: largeCeil, fee: parseFloat(asLarge.EmbroideryCost) || 0 } // 15,001-25,000 (Large)
                         ];
-                        // Expose for UI label updates
                         this.stitchSurchargeData = {
-                            midFee: asGarmRows[0].EmbroideryCost,
-                            largeFee: asGarmRows[1].EmbroideryCost,
-                            midThreshold: asGarmRows[0].StitchCount,
-                            largeThreshold: asGarmRows[1].StitchCount
+                            midFee: parseFloat(asMid.EmbroideryCost) || 0,
+                            largeFee: parseFloat(asLarge.EmbroideryCost) || 0,
+                            midThreshold: INCLUDED_STITCHES,
+                            largeThreshold: midCeil
                         };
+                    } else {
+                        // Canonical rows missing — flag loudly and fall back to the legacy positional parse.
+                        console.error('[EMB pricing] AS-Garm Mid/Large rows not found — using legacy fallback; check Caspio Embroidery_Costs.');
+                        if (this.apiStatus) this.apiStatus.stitchBandFallback = true;
+                        const asGarmRows = asGarm.sort((a, b) => a.StitchCount - b.StitchCount);
+                        if (asGarmRows.length >= 2) {
+                            this.stitchSurchargeTiers = [
+                                { max: asGarmRows[0].StitchCount, fee: 0 },
+                                { max: asGarmRows[1].StitchCount, fee: asGarmRows[0].EmbroideryCost },
+                                { max: 25000, fee: asGarmRows[1].EmbroideryCost }
+                            ];
+                            this.stitchSurchargeData = {
+                                midFee: asGarmRows[0].EmbroideryCost,
+                                largeFee: asGarmRows[1].EmbroideryCost,
+                                midThreshold: asGarmRows[0].StitchCount,
+                                largeThreshold: asGarmRows[1].StitchCount
+                            };
+                        }
                     }
 
                     // Mark main pricing as successfully loaded
@@ -418,13 +447,19 @@ class EmbroideryPricingCalculator {
             const data = await response.json();
 
             if (data && data.allEmbroideryCostsR) {
+                // Per-tier cap margins (N2 fix): cap MarginDenominator lives in tiersR (EmbroideryCaps),
+                // keyed by TierLabel. Build a lookup so each cap tier honors its own margin (1-7 vs 8+).
+                const capMarginByTier = {};
+                (data.tiersR || []).forEach(t => { const m = parseFloat(t.MarginDenominator); if (m > 0) capMarginByTier[t.TierLabel] = m; });
+
                 // Build cap tiers from API data
                 this.capTiers = {};
                 data.allEmbroideryCostsR.forEach(cost => {
                     if (cost.StitchCount === 8000) {
                         this.capTiers[cost.TierLabel] = {
                             embCost: cost.EmbroideryCost,
-                            hasLTM: cost.TierLabel === '1-7'
+                            hasLTM: cost.TierLabel === '1-7',
+                            marginDenominator: capMarginByTier[cost.TierLabel] || 0.57  // per-tier (N2); helper falls back to global
                         };
                         // Store cap-specific additional stitch rate (from first Cap record)
                         // Caps use $1.00/1K (NOT Shirt's $1.25/1K)
@@ -556,6 +591,11 @@ class EmbroideryPricingCalculator {
      */
     getCapEmbroideryCost(tier) {
         return this.capTiers[tier]?.embCost || 9.00; // Cap default if not loaded
+    }
+
+    // Per-tier cap margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
+    getCapMarginDenominator(tier) {
+        return this.capTiers[tier]?.marginDenominator || this.capMarginDenominator || 0.57;
     }
 
     /**
@@ -820,7 +860,9 @@ class EmbroideryPricingCalculator {
         for (const tier of this.stitchSurchargeTiers) {
             if (stitchCount <= tier.max) return tier.fee;
         }
-        return 10; // Above 25K in non-FB position — cap at Large tier
+        // Above the top band (>25K) in a non-FB slot — cap at the Large-tier fee from Caspio (not a hardcoded 10).
+        const t = this.stitchSurchargeTiers;
+        return (t && t.length) ? t[t.length - 1].fee : 10;
     }
 
     /**
@@ -840,6 +882,11 @@ class EmbroideryPricingCalculator {
      */
     getEmbroideryCost(tier) {
         return this.tiers[tier]?.embCost || 12.00;
+    }
+
+    // Per-tier garment margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
+    getMarginDenominator(tier) {
+        return this.tiers[tier]?.marginDenominator || this.marginDenominator || 0.57;
     }
     
     /**
@@ -1072,7 +1119,7 @@ class EmbroideryPricingCalculator {
             
             // Calculate decorated price using bottom-up logic
             // Step 1: Calculate and ROUND the base price (garment cost + embroidery for 8k stitches)
-            const garmentCost = standardBasePrice / this.marginDenominator;
+            const garmentCost = standardBasePrice / this.getMarginDenominator(tier);
             const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
             const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
             // Step 2: Add extra stitch fees on top (no more rounding)
@@ -1104,7 +1151,7 @@ class EmbroideryPricingCalculator {
             
             // Calculate decorated price using bottom-up logic with upcharge
             // Step 1: Calculate standard base price FIRST (same as S-XL)
-            const garmentCost = standardBasePrice / this.marginDenominator;
+            const garmentCost = standardBasePrice / this.getMarginDenominator(tier);
             const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
             const standardRoundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
 
@@ -1189,7 +1236,7 @@ class EmbroideryPricingCalculator {
             const relativeUpcharge = apiUpcharge - baseSizeUpcharge;
 
             // Calculate decorated price
-            const garmentCost = standardBasePrice / this.marginDenominator;
+            const garmentCost = standardBasePrice / this.getMarginDenominator(tier);
             const baseDecoratedPrice = garmentCost + embCost;
             const roundedBase = this.roundPrice(baseDecoratedPrice);
             const finalPrice = roundedBase + relativeUpcharge + additionalStitchCost;
@@ -2002,7 +2049,7 @@ class EmbroideryPricingCalculator {
             }
             if (basePrice === 0) return null;
 
-            const marginDenom = this.capMarginDenominator || 0.57;
+            const marginDenom = this.getCapMarginDenominator(tier);
             const embCost = this.getCapEmbroideryCost(tier);
             const garmentCost = basePrice / marginDenom;
             return this.roundCapPrice(garmentCost + embCost);
@@ -2023,7 +2070,7 @@ class EmbroideryPricingCalculator {
             if (basePrice === 0) return null;
 
             const embCost = this.getEmbroideryCost(tier);
-            const garmentCost = basePrice / this.marginDenominator;
+            const garmentCost = basePrice / this.getMarginDenominator(tier);
             return this.roundPrice(garmentCost + embCost);
         }
     }
@@ -2051,7 +2098,7 @@ class EmbroideryPricingCalculator {
         const result = {};
 
         if (isCap) {
-            const marginDenom = this.capMarginDenominator || 0.57;
+            const marginDenom = this.getCapMarginDenominator(tier);
             const embCost = this.getCapEmbroideryCost(tier);
 
             for (const [size, basePrice] of Object.entries(priceData.basePrices)) {
@@ -2084,7 +2131,7 @@ class EmbroideryPricingCalculator {
             if (standardBasePrice === 0) return null;
 
             const baseSizeUpcharge = baseSize ? (priceData.sizeUpcharges[baseSize] || 0) : 0;
-            const garmentCost = standardBasePrice / this.marginDenominator;
+            const garmentCost = standardBasePrice / this.getMarginDenominator(tier);
             const roundedBase = this.roundPrice(garmentCost + embCost);
 
             for (const [size, basePrice] of Object.entries(priceData.basePrices)) {
