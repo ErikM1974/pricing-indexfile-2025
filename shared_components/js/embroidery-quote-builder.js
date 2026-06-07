@@ -8023,7 +8023,14 @@ async function pushToShopWorks() {
     if (_pushInFlight) return;             // already saving/pushing — ignore the double-click
     _pushInFlight = true;
     const pushBtn = document.getElementById('emb-push-shopworks-btn');
-    if (pushBtn) pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
+    let _pushBtnHtml = null;
+    if (pushBtn) {
+        pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
+        // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep
+        // knows it's working (was just greying out with no feedback). Restored in finally.
+        _pushBtnHtml = pushBtn.innerHTML;
+        pushBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+    }
     try {
         const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
         if (!_pushQuoteId || dirty) {
@@ -8033,6 +8040,7 @@ async function pushToShopWorks() {
         await openPushPreview();
     } finally {
         _pushInFlight = false;
+        if (pushBtn && _pushBtnHtml != null) pushBtn.innerHTML = _pushBtnHtml;  // restore label before the gate re-styles it
         updatePushButtonState();          // re-enable via the gate (respects blank-cust# / "Sent ✓" states) — NOT disabled=false
     }
 }
