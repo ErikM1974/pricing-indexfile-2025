@@ -834,7 +834,9 @@
       //   • "(Tax Exempt)" — customer is tax-exempt per CompanyContactsMerge2026
       //   • "(0% — Out of State)" — non-WA customer, tax=0 by default
       //   • blank — no taxable base
-      const taxBase = subtotal + shipping;
+      // [B9] (audit 2026-06-06): tax was computed on the POST-discount base, so the % label must divide by
+      // subtotalNet — dividing by the pre-discount `subtotal` under-reported the rate on discounted quotes.
+      const taxBase = subtotalNet + shipping;
       const rateEl = $('total-tax-rate');
       const isExempt = !!(data.billingContact && data.billingContact.isTaxExempt);
       if (tax > 0 && taxBase > 0) {
