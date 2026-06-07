@@ -8115,6 +8115,16 @@ function renderPushReadiness() {
         item(r.hasProducts, 'At least one item') +
         item(r.hasName, 'Customer name') +
         item(r.hasEmail, 'Customer email');
+    // [2026-06-07] Keep the Push button in LOCK-STEP with this checklist so they can NEVER desync. Direct
+    // renderPushReadiness() callers (e.g. a product change at ~line 6341) updated the checklist green but
+    // never re-gated the button → it stayed stale-disabled even with all checks green (the bug Erik hit).
+    const _pbtn = document.getElementById('emb-push-shopworks-btn');
+    if (_pbtn && !_pushAlreadyDone) {
+        const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
+        _pbtn.disabled = !enabled;
+        _pbtn.style.opacity = enabled ? '1' : '0.5';
+        _pbtn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+    }
 }
 window.renderPushReadiness = renderPushReadiness;
 
