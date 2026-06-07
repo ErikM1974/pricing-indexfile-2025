@@ -337,7 +337,10 @@ body {
    ============================================ */
 .product-table-wrapper {
     flex: 1;
+    min-height: 440px;            /* [2026-06-07] was collapsing too short → constant scrolling. Give it room. */
     overflow: auto;
+    /* room below the last row so an open color/size dropdown isn't clipped against the scroll edge */
+    padding-bottom: 220px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background: white;
