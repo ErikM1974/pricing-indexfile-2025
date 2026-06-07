@@ -3379,6 +3379,16 @@ input[type="radio"] {
 .order-recap .or-thumb { margin: 0; text-align: center; }
 .order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: block; }
 .order-recap .or-thumb figcaption { font-size: 10px; color: #94a3b8; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* [2026-06-07] Ship-To address card — fills the open space between the order recap and the invoice totals (EMB only). */
+.emb-builder .invoice-totals-wrap { justify-content: flex-start; gap: 12px; }
+.emb-builder .order-recap { margin-right: 0; }
+.emb-builder .invoice-totals-box { margin-left: auto; }
+.emb-builder .ship-to-card { flex: 1 1 260px; min-width: 0; align-self: stretch; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; }
+.emb-builder .ship-to-card:empty { display: none; }
+.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
+.ship-to-card .st-co { font-weight: 600; }
+.ship-to-card .st-method { color: #64748b; font-size: 11px; margin-top: 2px; }
 .it-row {
     display: flex;
     justify-content: space-between;
