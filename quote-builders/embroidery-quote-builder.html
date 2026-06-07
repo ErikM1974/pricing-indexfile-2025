@@ -1418,6 +1418,10 @@ Company:Absher Construction Company
                                    onchange="updateAdditionalCharges(); updateTaxCalculation();" oninput="updateAdditionalCharges(); updateTaxCalculation();"
                                    style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                         </div>
+                        <!-- [B12] residential delivery surcharge — check before Estimate to add the UPS residential fee -->
+                        <label style="display:block; margin-top:6px; font-size:12px; color:#475569;">
+                            <input type="checkbox" id="ship-residential"> Residential delivery (+$6.50)
+                        </label>
                         <!-- UPS Ground prepay estimate (real SanMar weights + case packs) -->
                         <button type="button" id="estimate-ship-btn" onclick="estimateShipping()"
                                 style="margin-top: 8px; padding: 7px 12px; background: #6366f1; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer;">

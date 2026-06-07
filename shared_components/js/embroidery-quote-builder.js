@@ -2699,8 +2699,11 @@ function buildDesignSearchCardHtml(d) {
     const dstDisplay = dstText.length > 50 ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more' : dstText;
     const company = d.company || '';
 
-    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(\'' + dn + '\')"'
-        + ' data-design-number="' + dn + '" data-company="' + escapeHtml(company) + '">'
+    // [C11] (audit 2026-06-06): pass the value via the data attribute instead of interpolating dn into a JS
+    // string in the inline onclick (dn's HTML-attr escaping decodes before JS parses → a quoted design # could
+    // break out). Alphanumeric today, but injection-safe now.
+    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(this.dataset.designNumber)"'
+        + ' data-design-number="' + escapeHtml(dn) + '" data-company="' + escapeHtml(company) + '">'
         + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
         + '<div class="design-gallery-info">'
             + '<div class="design-gallery-number">#' + dn + '</div>'
@@ -6162,7 +6165,9 @@ async function estimateShipping() {
         totalBoxes = Math.max(1, totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes })
+            // [B12] (audit 2026-06-06): pass residential so the endpoint adds its $6.50 residential surcharge
+            // (RESIDENTIAL_SURCHARGE in shipping.js) — was omitted → residential freight under-quoted ~$6.50.
+            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, residential: !!document.getElementById('ship-residential')?.checked })
         });
         if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
         const est = await resp.json();
