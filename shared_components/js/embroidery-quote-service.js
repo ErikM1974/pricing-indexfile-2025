@@ -343,6 +343,7 @@ class EmbroideryQuoteService {
                 DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
+                IsWholesale: customerData.isWholesale ? 'Yes' : 'No',  // wholesale/reseller → 0 tax; push routes to account 2203 (2026-06-07)
                 // Phase 11.3 (2026-05-24): ImportNotes extended from a flat array
                 // to an object so referenceArtwork[] + newDesignName ride along
                 // without a Caspio schema change. Proxy embroidery transformer
@@ -1464,6 +1465,7 @@ class EmbroideryQuoteService {
                 DigitizingCodes: (customerData.digitizingCodes || []).join(','),
                 TaxRate: customerData.taxRate ?? 0,
                 TaxAmount: customerData.taxAmount ?? 0,
+                IsWholesale: customerData.isWholesale ? 'Yes' : 'No',  // wholesale/reseller → 0 tax; push routes to account 2203 (2026-06-07)
                 // Phase 11.3 (2026-05-24): ImportNotes extended from a flat array
                 // to an object so referenceArtwork[] + newDesignName ride along
                 // without a Caspio schema change. Proxy embroidery transformer

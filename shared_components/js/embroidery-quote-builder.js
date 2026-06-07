@@ -966,6 +966,10 @@ async function loadQuoteForEditing(quoteId) {
             // reloaded exempt quote doesn't re-apply WA tax (lookupTaxRate reads window._taxExempt). #1 rule.
             window._taxExempt = taxExempt;
         }
+        // [2026-06-07] Restore the wholesale flag + checkbox so a reloaded wholesale order stays 0-tax / acct 2203.
+        window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
+        const _wholesaleEl = document.getElementById('wholesale-checkbox');
+        if (_wholesaleEl) _wholesaleEl.checked = window._isWholesale;
         const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
         if (shipFeeItem && shipFeeItem.LineTotal > 0) {
             document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
@@ -7088,6 +7092,27 @@ function showTaxStatus(message, type) {
     el.innerHTML = (icons[type] || '') + message;
 }
 
+// [2026-06-07] Wholesale / reseller toggle (per-order checkbox by the sales tax). ON → zero the tax, uncheck
+// include-tax, and flag the order so the ShopWorks push routes it to the Wholesale Sales account (2203). OFF →
+// re-enable tax + re-look-up the destination rate. The flag is the ONLY trigger for wholesale — never inferred
+// from a $0 rate (a failed lookup must not silently become wholesale → no tax). Erik's #1 rule.
+function toggleWholesale() {
+    const cb = document.getElementById('wholesale-checkbox');
+    window._isWholesale = !!(cb && cb.checked);
+    const incTax = document.getElementById('include-tax');
+    const rateInput = document.getElementById('tax-rate-input');
+    if (window._isWholesale) {
+        if (incTax) incTax.checked = false;
+        if (rateInput) rateInput.value = '0';
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        if (typeof showTaxStatus === 'function') showTaxStatus('Wholesale / reseller — no tax', 'info');
+    } else {
+        if (incTax) incTax.checked = true;
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        if (typeof lookupTaxRate === 'function') lookupTaxRate(); // re-fetch the real rate for the ship address
+    }
+}
+
 /**
  * Look up WA tax rate via DOR API
  * Called on ZIP blur, state change, and manual button click
@@ -7098,15 +7123,15 @@ async function lookupTaxRate() {
     // LATER and would silently overwrite the frozen rate with today's live Milton DOR rate. No-op while
     // restoring — the saved rate stands; the load's finally re-enables live lookups for the rep.
     if (window._restoringQuote) return false;
-    // [B8] (audit 2026-06-06): a tax-exempt customer must stay 0% even after a Pickup→Ship toggle re-runs
-    // this lookup — otherwise WA tax is silently re-applied to an exempt order. #1 rule.
-    if (window._taxExempt) {
+    // [B8] (audit 2026-06-06): a tax-exempt customer — OR a wholesale/reseller order ([2026-06-07]) — must
+    // stay 0% even after a Pickup→Ship toggle re-runs this lookup, else WA tax is silently re-applied. #1 rule.
+    if (window._taxExempt || window._isWholesale) {
         const rateInput = document.getElementById('tax-rate-input');
         if (rateInput) rateInput.value = '0';
         const incTax = document.getElementById('include-tax');
         if (incTax) incTax.checked = false;
         updateTaxCalculation();
-        showTaxStatus('Tax Exempt customer — no tax', 'info');
+        showTaxStatus(window._isWholesale ? 'Wholesale / reseller — no tax' : 'Tax Exempt customer — no tax', 'info');
         return false;
     }
     const state = document.getElementById('ship-state').value;
@@ -7582,6 +7607,7 @@ async function saveAndGetLink(opts = {}) {
             name: customerName,
             company: document.getElementById('company-name')?.value?.trim() || '',
             project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
+            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07] → IsWholesale; push routes to acct 2203
             salesRepEmail: salesRepEmail,
             salesRepName: salesRepName,
             notes: document.getElementById('notes')?.value?.trim() || '',
@@ -8414,6 +8440,10 @@ function resetQuote() {
     // references leak into the next quote and can mis-map size overrides on save. (audit #13c 2026-06-05)
     rowCounter = 0;
     childRowMap = {};
+    // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
+    window._isWholesale = false;
+    const _wholesaleReset = document.getElementById('wholesale-checkbox');
+    if (_wholesaleReset) _wholesaleReset.checked = false;
 
     // Reset logo cards visibility
     const garmentCard = document.getElementById('garment-logo-card');
@@ -12752,6 +12782,7 @@ async function printQuote() {
             name: document.getElementById('customer-name')?.value || 'Customer',
             company: document.getElementById('company-name')?.value || '',
             project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): show on PDF/invoice
+            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07]
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
