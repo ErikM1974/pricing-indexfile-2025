@@ -337,7 +337,10 @@ body {
    ============================================ */
 .product-table-wrapper {
     flex: 1;
+    min-height: 440px;            /* [2026-06-07] was collapsing too short → constant scrolling. Give it room. */
     overflow: auto;
+    /* room below the last row so an open color/size dropdown isn't clipped against the scroll edge */
+    padding-bottom: 220px;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background: white;
@@ -3372,6 +3375,10 @@ input[type="radio"] {
 .order-recap .or-row { display: flex; gap: 8px; padding: 2px 0; line-height: 1.35; }
 .order-recap .or-label { color: #94a3b8; flex: 0 0 56px; }
 .order-recap .or-val { color: #334155; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.order-recap .or-thumbs { display: flex; gap: 10px; padding: 6px 0 2px; flex-wrap: wrap; }
+.order-recap .or-thumb { margin: 0; text-align: center; }
+.order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: block; }
+.order-recap .or-thumb figcaption { font-size: 10px; color: #94a3b8; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .it-row {
     display: flex;
     justify-content: space-between;
