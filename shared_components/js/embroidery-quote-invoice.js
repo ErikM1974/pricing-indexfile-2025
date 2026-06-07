@@ -513,6 +513,7 @@ class EmbroideryInvoiceGenerator {
                     <div class="quote-details">
                         <strong>Quote #:</strong> ${quoteId || 'DRAFT'}<br>
                         ${customerData.poNumber ? `<strong>PO #:</strong> ${this.esc(customerData.poNumber)}<br>` : ''}
+                        ${customerData.project ? `<strong>Project:</strong> ${this.esc(customerData.project)}<br>` : ''}
                         <strong>Date:</strong> ${today.toLocaleDateString()}<br>
                         ${customerData.reqShipDate ? `<strong>Requested Ship:</strong> ${fmtD(customerData.reqShipDate)}<br>` : ''}
                         <strong>Valid Until:</strong> ${expiryDate.toLocaleDateString()}

@@ -1731,6 +1731,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (zipInput) { zipInput.value = contact.Zip; if (!_taxExempt) lookupTaxRate(); }
                 }
             }
+            // [B8] (audit 2026-06-06): persist exemption so a later Pickup→Ship toggle (which re-runs
+            // lookupTaxRate) doesn't silently re-apply WA tax to an exempt customer. #1 rule.
+            window._taxExempt = _taxExempt;
             if (_taxExempt) {
                 const incTax = document.getElementById('include-tax');
                 if (incTax) incTax.checked = false;
@@ -7084,6 +7087,17 @@ async function lookupTaxRate() {
     // LATER and would silently overwrite the frozen rate with today's live Milton DOR rate. No-op while
     // restoring — the saved rate stands; the load's finally re-enables live lookups for the rep.
     if (window._restoringQuote) return false;
+    // [B8] (audit 2026-06-06): a tax-exempt customer must stay 0% even after a Pickup→Ship toggle re-runs
+    // this lookup — otherwise WA tax is silently re-applied to an exempt order. #1 rule.
+    if (window._taxExempt) {
+        const rateInput = document.getElementById('tax-rate-input');
+        if (rateInput) rateInput.value = '0';
+        const incTax = document.getElementById('include-tax');
+        if (incTax) incTax.checked = false;
+        updateTaxCalculation();
+        showTaxStatus('Tax Exempt customer — no tax', 'info');
+        return false;
+    }
     const state = document.getElementById('ship-state').value;
     const zip = document.getElementById('ship-zip').value.trim();
     const city = document.getElementById('ship-city').value.trim();
@@ -7415,6 +7429,13 @@ async function saveAndGetLink(opts = {}) {
         showToast('Please enter customer name and email', 'error');
         if (!customerName) document.getElementById('customer-name')?.focus();
         else if (!customerEmail) document.getElementById('customer-email')?.focus();
+        return;
+    }
+    // [B11] (P3-15, audit 2026-06-06): email was presence-checked but never format-validated → a typo'd
+    // address saved + emailed silently. Reject an obviously-malformed address.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+        showToast('Enter a valid email address (name@company.com).', 'error');
+        document.getElementById('customer-email')?.focus();
         return;
     }
 
@@ -8049,9 +8070,36 @@ function renderPushPreview(data) {
     }
     html += '</div></div>';
 
+    // [B3] (P2-11, audit 2026-06-06): render the Designs so the rep SEES the artwork/logo before pushing
+    // (catches a wrong/missing/duplicate design). Handles Branch-1 {id_Design} (existing, linked in SW) and
+    // Branch-2 {DesignName, Locations[].ImageURL} (new artwork upload).
+    const designs = Array.isArray(o.Designs) ? o.Designs : [];
+    if (designs.length) {
+        html += '<div class="preview-products"><h5>Designs (' + designs.length + ')</h5><div class="preview-products-list">';
+        for (const d of designs) {
+            if (d.id_Design && !d.DesignName) {
+                html += '<div class="preview-product-item"><span class="preview-product-desc">Existing design #' + escapeHtml(String(d.id_Design)) + ' (linked in ShopWorks)</span></div>';
+                continue;
+            }
+            const locs = Array.isArray(d.Locations) ? d.Locations : [];
+            const thumb = (locs.find(l => l && l.ImageURL) || {}).ImageURL;
+            html += '<div class="preview-product-item">' +
+                (thumb ? '<img src="' + escapeHtml(thumb) + '" alt="" style="width:40px;height:40px;object-fit:contain;border:1px solid #e2e8f0;border-radius:4px;margin-right:8px;">' : '') +
+                '<span class="preview-product-desc">' + escapeHtml(d.DesignName || '(unnamed)') + ' · ' + escapeHtml(String(locs.length)) + ' location(s)</span>' +
+                '</div>';
+        }
+        html += '</div></div>';
+    }
+
     const warnings = [];
     if ((data.designCount || 0) === 0) {
         warnings.push('No design linked — a sales rep must assign the design manually in ShopWorks.');
+    }
+    // [B4] (P2-4, audit 2026-06-06): surface any fee the transformer demoted to an order Note (buildNotes
+    // writes "Order notes: <fees>") instead of a billable line, so the rep catches an under-bill before push.
+    for (const n of (Array.isArray(o.Notes) ? o.Notes : [])) {
+        const t = String(n.Note || '');
+        if (/^Order notes:/i.test(t)) warnings.push('Fee sent as a note (not a billable line): ' + t.replace(/^Order notes:\s*/i, ''));
     }
     if (warnings.length > 0) {
         html += '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> Heads up</h5><ul>';
@@ -8357,6 +8405,9 @@ function clearCustomerContextBanners() {
         const el = document.getElementById(id);
         if (el) { el.innerHTML = ''; el.style.display = 'none'; }
     });
+    // [B8] (audit 2026-06-06): clear the persisted tax-exemption so it can't leak into the next quote and
+    // suppress a legitimate tax lookup.
+    window._taxExempt = false;
 }
 
 function resetQuote() {
