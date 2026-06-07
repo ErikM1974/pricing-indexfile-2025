@@ -735,3 +735,14 @@ td.size-disabled input {
         border: none;
     }
 }
+
+/* ============================================================
+   OPTION C — SCP page-flow layout (2026-06-07, Erik) — mirrors EMB.
+   Long orders scroll as ONE page (no cramped inner-scroll table); column headers + the action sidebar pin.
+   Scoped to `.scp-builder`. Shared header is 60px (.power-main in quote-builder-common.css).
+   ============================================================ */
+.scp-builder .power-main { height: auto; min-height: calc(100vh - 60px); overflow: visible; align-items: flex-start; }
+.scp-builder .power-content { overflow: visible; }
+.scp-builder .product-table-wrapper { overflow: visible; min-height: 0; padding-bottom: 0; }
+.scp-builder .product-table thead th { top: 0; }
+.scp-builder .power-sidebar { position: sticky; top: 8px; align-self: flex-start; max-height: calc(100vh - 16px); }
