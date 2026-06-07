@@ -521,9 +521,9 @@ function getEmbroideryQuoteData() {
         customerNumber: document.getElementById('customer-number')?.value || '',
         shipMethod: document.getElementById('ship-method')?.value || '',
         shipMethodOther: document.getElementById('ship-method-other')?.value || '',
-        dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
-        reqShipDate: document.getElementById('req-ship-date')?.value || '',
-        dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
+        dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
+        reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
+        dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
         paymentTerms: document.getElementById('payment-terms')?.value || '',
         // Cached design data for instant restore (no API call needed)
         garmentDesignData: primaryLogo._designData || null,
@@ -676,9 +676,9 @@ function restoreEmbroideryDraft(draft) {
         }
         onShipMethodChange();
     }
-    if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = draft.dateOrderPlaced;
-    if (draft.reqShipDate) document.getElementById('req-ship-date').value = draft.reqShipDate;
-    if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = draft.dropDeadDate;
+    if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(draft.dateOrderPlaced);
+    if (draft.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(draft.reqShipDate);
+    if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(draft.dropDeadDate);
     if (draft.paymentTerms) document.getElementById('payment-terms').value = draft.paymentTerms;
     // Auto-expand Order Details panel if any field restored
     if (draft.poNumber || draft.orderNumber || draft.shipMethod ||
@@ -853,8 +853,8 @@ async function loadQuoteForEditing(quoteId) {
         // 3739 with no ship-to address. Restore them from the saved session. (2026-06-01)
         (function restoreEmbOrderShipping() {
             const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
-            // EMB date inputs are type=text labeled MM/DD/YYYY; the column is stored ISO.
-            const isoToInput = (v) => { const m = v && String(v).match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? `${m[2]}/${m[3]}/${m[1]}` : (v || ''); };
+            // [2026-06-07] EMB date inputs are now native <input type=date> (YYYY-MM-DD); the column is stored ISO.
+            const isoToInput = (v) => dateToInputValue(v);
             setVal('customer-number', session.CustomerNumber);
             setVal('project-name', session.ProjectName);   // P2-5 (audit 2026-06-06): restore Project Name on edit-reload
             setVal('customer-phone', session.Phone);
@@ -1903,6 +1903,28 @@ function updateLogoCardHeader(type, designNumber) {
  * the real fields (edits still happen there). Re-rendered from recalculatePricing + the customer/logo
  * handlers. Hidden (CSS .order-recap:empty) until there's something to show. (Erik 2026-06-05)
  */
+// [2026-06-07] Native <input type="date"> uses YYYY-MM-DD; the rest of the app + the ShopWorks push use
+// MM/DD/YYYY. Convert ONLY at the input boundary so nothing downstream (save, PDF, push) changes. Pure
+// string ops — NO new Date() — so there is no UTC/timezone day-shift.
+function dateToInputValue(v) {            // any (ISO / YYYY-MM-DD / MM/DD/YYYY) → YYYY-MM-DD for the date input
+    if (!v) return '';
+    const s = String(v).trim();
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+    return '';
+}
+function dateFromInputValue(v) {          // YYYY-MM-DD (or MM/DD/YYYY) → MM/DD/YYYY for storage / push / PDF
+    if (!v) return '';
+    const s = String(v).trim();
+    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[2]}/${m[3]}/${m[1]}`;
+    m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (m) return `${m[1].padStart(2, '0')}/${m[2].padStart(2, '0')}/${m[3]}`;
+    return '';
+}
+
 function renderOrderRecap() {
     const el = document.getElementById('order-recap');
     if (!el) return;
@@ -7649,9 +7671,9 @@ async function saveAndGetLink(opts = {}) {
                 if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
                 return sel;
             })(),
-            dateOrderPlaced: document.getElementById('date-order-placed')?.value?.trim() || '',
-            reqShipDate: document.getElementById('req-ship-date')?.value?.trim() || '',
-            dropDeadDate: document.getElementById('drop-dead-date')?.value?.trim() || '',
+            dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
+            reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
+            dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
             paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
             // Frozen tax & design data for Caspio (2026-02-12)
             designNumbers: lastImportMetadata?.designNumbers || [],
@@ -10989,9 +11011,9 @@ async function confirmShopWorksImport() {
             onShipMethodChange();
         }
         if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
-        if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = data.dateOrderPlaced;
-        if (data.reqShipDate) document.getElementById('req-ship-date').value = data.reqShipDate;
-        if (data.dropDeadDate) document.getElementById('drop-dead-date').value = data.dropDeadDate;
+        if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(data.dateOrderPlaced);
+        if (data.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(data.reqShipDate);
+        if (data.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(data.dropDeadDate);
         if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
 
         // Auto-expand Order Details panel if any field populated
@@ -12802,8 +12824,8 @@ async function printQuote() {
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
             // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
             poNumber: document.getElementById('po-number')?.value?.trim() || '',
-            dateOrderPlaced: document.getElementById('date-order-placed')?.value || '',
-            reqShipDate: document.getElementById('req-ship-date')?.value || '',
+            dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
+            reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
             billing,
             shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };
