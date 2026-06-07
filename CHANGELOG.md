@@ -1,3 +1,10 @@
+## v2026.06.07.2 (2026.06.07)
+
+- docs(memory): log to-100 readiness lessons (adversarial-verify-own-fix, B8 tax-exempt persistence, B1/monogram traps) + final verdict
+- docs(memory): archive 12 oldest resolved one-off lessons (301->225 lines)
+- feat(emb): wholesale / reseller checkbox — 0 tax, routes to ShopWorks account 2203
+- Deploy v2026.06.07.2: cache-bust wholesale checkbox
+
 ## v2026.06.07.1 (2026.06.07)
 
 - fix(emb): readiness C-group a11y + dead-code polish (C2-C7, C10)
