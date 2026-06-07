@@ -1992,6 +1992,11 @@ class EmbroideryPricingCalculator {
                 const alFailed = document.querySelector('#product-tbody tr.service-product-row[data-al-priced="true"][data-price-error="true"]');
                 if (alFailed) {
                     btn.disabled = true;
+                } else if (btn.id === 'emb-push-shopworks-btn' || btn.classList.contains('btn-save-quote')) {
+                    // [C8-fix] (audit 2026-06-06): don't force-ENABLE the Push/Save controls — their owner
+                    // (updatePushButtonState + the _pushAlreadyDone "Sent" lock + the blank-Customer# gate)
+                    // re-asserts the correct state after the loop. Force-enabling here would override the lock.
+                    return;
                 } else {
                     btn.disabled = false; // No failed AL line — allow the quote
                     btn.style.opacity = '1';
@@ -2013,7 +2018,11 @@ class EmbroideryPricingCalculator {
                 }
             }
         });
-        
+
+        // [C8-fix] (audit 2026-06-06): re-assert the Push/Save button state we deliberately skipped above,
+        // so the _pushAlreadyDone lock / blank-Customer# gate win over this backstop (not force-enabled).
+        if (reason === 'al-pricing' && typeof updatePushButtonState === 'function') updatePushButtonState();
+
         // Also disable form submission
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
