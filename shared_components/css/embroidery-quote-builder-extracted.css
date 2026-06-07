@@ -54,6 +54,22 @@
     max-height: calc(100vh - 16px); /* the inner .sidebar-scroll-container handles a tall sidebar */
 }
 
+/* ============================================================
+   PROTOTYPE — Order-footer layout (2026-06-07, Erik). Order Details + Special Notes relocated (via
+   relocateOrderFooter() in embroidery-quote-builder.js) from the sidebar into the bottom band, so the sidebar
+   slims to Customer + Quote Summary + Push. Reversible. EMB-only.
+   ============================================================ */
+.emb-builder .invoice-totals-wrap.order-footer { flex-wrap: wrap; align-items: stretch; }
+.emb-builder .invoice-totals-wrap.order-footer .invoice-totals-box { margin-left: 0; }
+.emb-builder #order-details-step.in-footer {
+    flex: 1 1 300px; min-width: 0; margin: 0;
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+.emb-builder #order-details-step.in-footer .flow-step-header { padding: 0 0 6px; cursor: default; }
+.emb-builder .footer-notes-row { width: 100%; margin: 10px 0 0; }
+.emb-builder #notes-section.in-footer { margin: 0 !important; }
+
 /* ============================================
    SIDEBAR IMPROVEMENTS (2026)
    - Scrollable content area
