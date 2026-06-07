@@ -962,6 +962,9 @@ async function loadQuoteForEditing(quoteId) {
         if (includeTaxEl) {
             const taxExempt = !taxFeeItem && !(parseFloat(session.TaxRate) > 0);
             includeTaxEl.checked = !taxExempt;
+            // [B8-R2] (audit 2026-06-06): also persist the exemption so a later Pickup→Ship toggle on a
+            // reloaded exempt quote doesn't re-apply WA tax (lookupTaxRate reads window._taxExempt). #1 rule.
+            window._taxExempt = taxExempt;
         }
         const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
         if (shipFeeItem && shipFeeItem.LineTotal > 0) {
@@ -1722,6 +1725,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             // chip is cosmetic. Clear the tax here (uncheck include-tax + zero the rate) and DO NOT run the
             // DOR lookup (its async result would overwrite the 0 — same race as the P0 pickup bug). #1 rule.
             const _taxExempt = (contact.Is_Tax_Exempt === true || contact.Is_Tax_Exempt === 1 || contact.Is_Tax_Exempt === '1');
+            // [B8 + B8-R1] (audit 2026-06-06): persist exemption BEFORE the ship-field block below runs
+            // lookupTaxRate — otherwise a NEW non-exempt customer selected right after an exempt one would see
+            // the prior customer's stale window._taxExempt=true and get forced to 0% (under-charge). Also stops
+            // a later Pickup→Ship toggle re-applying WA tax to an exempt customer. #1 rule.
+            window._taxExempt = _taxExempt;
             if (!_isPickup) {
                 if (contact.State) { const el = document.getElementById('ship-state'); if (el) el.value = contact.State; }
                 if (contact.City) { const el = document.getElementById('ship-city'); if (el) el.value = contact.City; }
@@ -1731,9 +1739,6 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (zipInput) { zipInput.value = contact.Zip; if (!_taxExempt) lookupTaxRate(); }
                 }
             }
-            // [B8] (audit 2026-06-06): persist exemption so a later Pickup→Ship toggle (which re-runs
-            // lookupTaxRate) doesn't silently re-apply WA tax to an exempt customer. #1 rule.
-            window._taxExempt = _taxExempt;
             if (_taxExempt) {
                 const incTax = document.getElementById('include-tax');
                 if (incTax) incTax.checked = false;
@@ -2694,8 +2699,11 @@ function buildDesignSearchCardHtml(d) {
     const dstDisplay = dstText.length > 50 ? dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more' : dstText;
     const company = d.company || '';
 
-    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(\'' + dn + '\')"'
-        + ' data-design-number="' + dn + '" data-company="' + escapeHtml(company) + '">'
+    // [C11] (audit 2026-06-06): pass the value via the data attribute instead of interpolating dn into a JS
+    // string in the inline onclick (dn's HTML-attr escaping decodes before JS parses → a quoted design # could
+    // break out). Alphanumeric today, but injection-safe now.
+    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(this.dataset.designNumber)"'
+        + ' data-design-number="' + escapeHtml(dn) + '" data-company="' + escapeHtml(company) + '">'
         + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
         + '<div class="design-gallery-info">'
             + '<div class="design-gallery-number">#' + dn + '</div>'
@@ -6008,9 +6016,10 @@ async function syncDECGRows() {
     const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
     if (!rows.length) return;
     const cache = await loadDECGPricing();
-    // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 DECG price the save gate would accept. Flag
-    // every row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
-    if (!cache) { rows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
+    // [A3 + A3-DECG fix] (audit 2026-06-06): API down → flag rows so saveAndGetLink's priceError gate blocks
+    // (Erik's #1 rule). But a MANUALLY-overridden DECG row (sellPrice>0) is independent of the API → don't
+    // over-block it (fail-closed otherwise). Toast already surfaced.
+    if (!cache) { rows.forEach(r => { if (!(parseFloat(r.dataset.sellPrice) > 0)) r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
     for (const row of rows) {
         if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
@@ -6156,7 +6165,9 @@ async function estimateShipping() {
         totalBoxes = Math.max(1, totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes })
+            // [B12] (audit 2026-06-06): pass residential so the endpoint adds its $6.50 residential surcharge
+            // (RESIDENTIAL_SURCHARGE in shipping.js) — was omitted → residential freight under-quoted ~$6.50.
+            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, residential: !!document.getElementById('ship-residential')?.checked })
         });
         if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
         const est = await resp.json();

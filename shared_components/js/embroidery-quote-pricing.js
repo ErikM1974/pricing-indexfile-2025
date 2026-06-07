@@ -1985,11 +1985,20 @@ class EmbroideryPricingCalculator {
             // Set specific tooltip based on reason
             if (reason === 'al-pricing') {
                 btn.title = 'Cannot create quotes with Additional Logos while AL pricing is unavailable';
-                // Only disable if AL is being used
-                if (window.embQuoteBuilder && window.embQuoteBuilder.hasAdditionalLogos && window.embQuoteBuilder.hasAdditionalLogos()) {
+                // [C8] (audit 2026-06-06): the old guard called window.embQuoteBuilder.hasAdditionalLogos()
+                // which is UNDEFINED → the else always ran → this backstop RE-ENABLED the buttons → inert.
+                // Probe the DOM for an actually-FAILED AL row (data-al-priced + data-price-error, set by
+                // syncALRows on API failure — see [A3]). Only block when a real failed AL line is present.
+                const alFailed = document.querySelector('#product-tbody tr.service-product-row[data-al-priced="true"][data-price-error="true"]');
+                if (alFailed) {
                     btn.disabled = true;
+                } else if (btn.id === 'emb-push-shopworks-btn' || btn.classList.contains('btn-save-quote')) {
+                    // [C8-fix] (audit 2026-06-06): don't force-ENABLE the Push/Save controls — their owner
+                    // (updatePushButtonState + the _pushAlreadyDone "Sent" lock + the blank-Customer# gate)
+                    // re-asserts the correct state after the loop. Force-enabling here would override the lock.
+                    return;
                 } else {
-                    btn.disabled = false; // Allow quotes without AL
+                    btn.disabled = false; // No failed AL line — allow the quote
                     btn.style.opacity = '1';
                     btn.style.cursor = 'pointer';
                     btn.title = '';
@@ -2009,7 +2018,11 @@ class EmbroideryPricingCalculator {
                 }
             }
         });
-        
+
+        // [C8-fix] (audit 2026-06-06): re-assert the Push/Save button state we deliberately skipped above,
+        // so the _pushAlreadyDone lock / blank-Customer# gate win over this backstop (not force-enabled).
+        if (reason === 'al-pricing' && typeof updatePushButtonState === 'function') updatePushButtonState();
+
         // Also disable form submission
         const forms = document.querySelectorAll('form');
         forms.forEach(form => {
