@@ -6206,14 +6206,28 @@ window.syncRushRow = syncRushRow;
 // Data-backed OUTBOUND pieces-per-box by category, from a real SanMar inbound-carton
 // sample (2026-06-04: tee full cartons ~70-78, hoodie ~18-20) with a decorated-bulk
 // shave — decorated/folded goods fit FEWER per box than flat-packed blanks, so this
-// errs to MORE boxes (bias high for prepay). Category is inferred from avg per-piece
-// weight + SanMar case pack, so no extra product lookup is needed.
-function perBoxForCategory(avgWtLb, caseSize) {
+// errs to MORE boxes (bias high for prepay). Uses the product's REAL SanMar category
+// (/api/inventory CATEGORY_NAME) when known, else infers from avg per-piece weight + case.
+function perBoxForCategory(avgWtLb, caseSize, catName) {
     // window._boxDensity is loaded from /api/shipping/box-density (Caspio Box_Density_Reference
     // → defaults), so Erik can tune the numbers without a deploy. Hardcoded values = fallback.
     const m = window._boxDensity || {};
+    const c = String(catName || '').toLowerCase();
+    // Prefer the product's real SanMar category.
+    if (c) {
+        if (c.includes('cap') || c.includes('hat') || c.includes('headwear') || c.includes('beanie')) return m.Cap || 60;
+        if (c.includes('outerwear') || c.includes('jacket') || c.includes('vest')) {
+            // SanMar lumps jackets + heavy outerwear under "Outerwear"; split by weight.
+            return avgWtLb >= 1.7 ? (m.Outerwear || 15) : (m.Jacket || 17);
+        }
+        if (c.includes('sweatshirt') || c.includes('fleece') || c.includes('hood')) return m.Sweatshirt || m.Hoodie || 16;
+        if (c.includes('polo') || c.includes('knit') || c.includes('woven') || c.includes('dress shirt')) return m.Polo || 36;
+        if (c.includes('t-shirt') || c.includes('tee') || c.includes('tank')) return m['T-Shirt'] || 58;
+    }
+    // Fallback: infer from avg per-piece weight + SanMar case pack (blank/unknown category).
     if (caseSize >= 100) return m.Cap || 60;          // caps / headwear (light, high case pack)
-    if (avgWtLb >= 1.0) return m.Jacket || m.Sweatshirt || 16;  // hoodies / jackets / outerwear
+    if (avgWtLb >= 1.7) return m.Outerwear || 15;     // heavy parkas / insulated outerwear
+    if (avgWtLb >= 1.0) return m.Jacket || m.Sweatshirt || 16;  // jackets / hoodies / fleece
     if (avgWtLb >= 0.5) return m.Polo || 36;          // polos / heavier knits
     return m['T-Shirt'] || 58;                        // tees / light tops
 }
@@ -6222,7 +6236,8 @@ function perBoxForCategory(avgWtLb, caseSize) {
  * Estimate outbound UPS Ground freight for the current order so the rep can put a
  * prepay shipping line on the quote (customer pays it up front — no second card charge).
  * Weight + box count come from REAL SanMar data (/api/inventory → PIECE_WEIGHT + CASE_SIZE
- * per size); the rate is a rough zone×weight estimate from the proxy. (2026-06-04, Erik)
+ * per size); the rate uses the real UPS Ground Daily grid + origin-983 zones via the proxy
+ * (/api/shipping/estimate-ups-ground). (2026-06-04; rate model upgraded 2026-06-07, Erik)
  */
 async function estimateShipping() {
     const btn = document.getElementById('estimate-ship-btn');
@@ -6241,6 +6256,7 @@ async function estimateShipping() {
         }
         window._shipWtCache = window._shipWtCache || {};
         let totalWeightLb = 0, totalBoxes = 0, usedFallback = false;
+        const boxWeightsLb = [];   // real per-box weights → endpoint prices each box at its own weight
         for (const p of products) {
             const style = p.style;
             const sizes = p.sizeBreakdown || {};
@@ -6250,16 +6266,18 @@ async function estimateShipping() {
                     const data = r.ok ? await r.json() : [];
                     const rows = Array.isArray(data) ? data : (data.rows || data.Result || data.data || []);
                     const bySize = {};
+                    let category = '';
                     rows.forEach(row => {
                         const sz = row.SIZE || row.size || row.Size;
                         if (sz && bySize[sz] === undefined) {
                             bySize[sz] = { wt: parseFloat(row.PIECE_WEIGHT) || 0, casePack: parseInt(row.CASE_SIZE) || 0 };
                         }
+                        if (!category) category = row.CATEGORY_NAME || row.category || '';
                     });
-                    window._shipWtCache[style] = bySize;
-                } catch (e) { window._shipWtCache[style] = {}; }
+                    window._shipWtCache[style] = { bySize, category };
+                } catch (e) { window._shipWtCache[style] = { bySize: {}, category: '' }; }
             }
-            const bySize = window._shipWtCache[style];
+            const { bySize, category } = window._shipWtCache[style];
             let prodQty = 0, prodWt = 0, maxCase = 0;
             for (const [size, qty] of Object.entries(sizes)) {
                 const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
@@ -6272,17 +6290,25 @@ async function estimateShipping() {
                 if (meta && meta.casePack) maxCase = Math.max(maxCase, meta.casePack);
             }
             // Boxes per PRODUCT from DATA-BACKED outbound density (real SanMar cartons +
-            // decorated shave) — category inferred from avg per-piece weight + case pack.
+            // decorated shave) — uses the product's real SanMar category, else weight/case.
             const avgWt = prodQty > 0 ? prodWt / prodQty : 0.5;
-            const ppb = perBoxForCategory(avgWt, maxCase);
-            totalBoxes += Math.ceil(prodQty / ppb);
+            const ppb = perBoxForCategory(avgWt, maxCase, category);
+            const nBoxesProd = prodQty > 0 ? Math.max(1, Math.ceil(prodQty / ppb)) : 0;
+            totalBoxes += nBoxesProd;
+            // Spread this product's weight across its own boxes so each box is priced at its
+            // real weight (a heavy jacket box vs a light tee box) instead of an even split.
+            if (nBoxesProd > 0) {
+                const perBoxWt = prodWt / nBoxesProd;
+                for (let i = 0; i < nBoxesProd; i++) boxWeightsLb.push(perBoxWt);
+            }
         }
         totalBoxes = Math.max(1, totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
-            // [B12] (audit 2026-06-06): pass residential so the endpoint adds its $6.50 residential surcharge
-            // (RESIDENTIAL_SURCHARGE in shipping.js) — was omitted → residential freight under-quoted ~$6.50.
-            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, residential: !!document.getElementById('ship-residential')?.checked })
+            // [B12] (audit 2026-06-06): pass residential so the endpoint adds its residential surcharge.
+            // [2026-06-07] pass boxWeightsLb so each box is priced at its real weight (heavy jacket box
+            // vs light tee box) against the real UPS Daily grid — weightLb/boxes kept for fallback.
+            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, boxWeightsLb, residential: !!document.getElementById('ship-residential')?.checked })
         });
         if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
         const est = await resp.json();
