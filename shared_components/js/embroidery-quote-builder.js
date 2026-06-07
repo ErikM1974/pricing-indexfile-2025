@@ -1994,6 +1994,8 @@ function relocateOrderFooter() {
             row.appendChild(notes);
             notes.classList.add('in-footer');
         }
+        // [2026-06-07] re-evaluate the Push button after the DOM move (defensive — never leave it stale/disabled)
+        if (typeof updatePushButtonState === 'function') updatePushButtonState();
     } catch (e) { console.error('[relocateOrderFooter]', e); }
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', relocateOrderFooter);
@@ -8040,13 +8042,13 @@ let _pushAlreadyDone = false;
 function updatePushButtonState() {
     const btn = document.getElementById('emb-push-shopworks-btn');
     const label = document.getElementById('emb-push-shopworks-label');
-    if (!btn || !label) return;
+    if (!btn) return;  // [2026-06-07] do NOT bail when the label is transiently missing → still enable/disable the button
     renderPushReadiness();
 
     if (_pushAlreadyDone) {
         // "Sent" — not "Pushed/Imported". The order reached ManageOrders; OnSite
         // import is confirmed separately (Verify in ShopWorks in the push modal).
-        label.textContent = 'Sent to ShopWorks ✓';
+        if (label) label.textContent = 'Sent to ShopWorks ✓';
         btn.disabled = true;
         btn.style.opacity = '1';
         btn.style.cursor = 'default';
@@ -8062,7 +8064,7 @@ function updatePushButtonState() {
     const r = getPushReadiness();
     const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
 
-    label.textContent = 'Push to ShopWorks';
+    if (label) label.textContent = 'Push to ShopWorks';
     btn.style.background = '#1a5276';
     btn.disabled = !enabled;
     btn.style.opacity = enabled ? '1' : '0.5';
@@ -8139,13 +8141,14 @@ async function pushToShopWorks() {
     if (_pushInFlight) return;             // already saving/pushing — ignore the double-click
     _pushInFlight = true;
     const pushBtn = document.getElementById('emb-push-shopworks-btn');
-    let _pushBtnHtml = null;
     if (pushBtn) {
         pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
-        // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep
-        // knows it's working (was just greying out with no feedback). Restored in finally.
-        _pushBtnHtml = pushBtn.innerHTML;
-        pushBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+        // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep knows
+        // it's working. Update the LABEL's content, NOT the button's innerHTML — replacing the button HTML
+        // destroys #emb-push-shopworks-label, which updatePushButtonState needs, and would strand the button
+        // disabled (the greyed-Push regression). updatePushButtonState() in the finally resets the label text.
+        const lbl = document.getElementById('emb-push-shopworks-label');
+        if (lbl) lbl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
     }
     try {
         const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
@@ -8156,8 +8159,7 @@ async function pushToShopWorks() {
         await openPushPreview();
     } finally {
         _pushInFlight = false;
-        if (pushBtn && _pushBtnHtml != null) pushBtn.innerHTML = _pushBtnHtml;  // restore label before the gate re-styles it
-        updatePushButtonState();          // re-enable via the gate (respects blank-cust# / "Sent ✓" states) — NOT disabled=false
+        updatePushButtonState();          // resets the label text + re-enables via the gate (respects blank-cust# / "Sent ✓")
     }
 }
 window.pushToShopWorks = pushToShopWorks;
