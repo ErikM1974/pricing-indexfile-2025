@@ -24,6 +24,36 @@
     position: relative;
 }
 
+/* ============================================================
+   OPTION C — EMB page-flow layout (2026-06-07, Erik)
+   Long orders scroll as ONE page instead of a cramped inner-scroll table, with the column headers and the
+   action sidebar PINNED in place. Scoped to `.emb-builder` (the body class) so DTF/SCP/DTG keep the
+   fixed-viewport shell untouched. The shared header is 60px (see `.power-main` in quote-builder-common.css).
+   ============================================================ */
+.emb-builder .power-main {
+    height: auto;                   /* was calc(100vh - 60px) — grow with the line items */
+    min-height: calc(100vh - 60px);
+    overflow: visible;              /* was hidden — let the PAGE be the scroll container */
+    align-items: flex-start;        /* don't stretch the columns → the sidebar can pin */
+}
+.emb-builder .power-content {
+    overflow: visible;              /* was hidden — the table flows into the page */
+}
+.emb-builder .product-table-wrapper {
+    overflow: visible;              /* was auto — no inner scrollbar; table grows to its content */
+    min-height: 0;
+    padding-bottom: 0;              /* the dropdown-clip hack is unneeded with no scroll container */
+}
+.emb-builder .product-table thead th {
+    top: 0;                         /* the thead is already position:sticky → now pins to the page top */
+}
+.emb-builder .power-sidebar {
+    position: sticky;               /* Quote Summary + Order Details + Push stay in view while scrolling */
+    top: 8px;
+    align-self: flex-start;
+    max-height: calc(100vh - 16px); /* the inner .sidebar-scroll-container handles a tall sidebar */
+}
+
 /* ============================================
    SIDEBAR IMPROVEMENTS (2026)
    - Scrollable content area
