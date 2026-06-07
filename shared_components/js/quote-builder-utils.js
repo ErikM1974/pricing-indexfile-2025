@@ -240,19 +240,22 @@ function updateAdditionalCharges() {
  * Element IDs: date-order-placed, req-ship-date (consistent across builders).
  */
 function setQuoteDateDefaults() {
-    const fmt = (d) => {
+    // [2026-06-07] Format for the input's TYPE: native <input type=date> needs YYYY-MM-DD; legacy type=text
+    // builders use MM/DD/YYYY. Setting MM/DD/YYYY on a type=date input is silently rejected → blank field.
+    const fmt = (d, el) => {
+        const yyyy = d.getFullYear();
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const dd = String(d.getDate()).padStart(2, '0');
-        return `${mm}/${dd}/${d.getFullYear()}`;
+        return (el && el.type === 'date') ? `${yyyy}-${mm}-${dd}` : `${mm}/${dd}/${yyyy}`;
     };
     const today = new Date();
     const placed = document.getElementById('date-order-placed');
-    if (placed && !placed.value.trim()) placed.value = fmt(today);
+    if (placed && !placed.value.trim()) placed.value = fmt(today, placed);
     const reqShip = document.getElementById('req-ship-date');
     if (reqShip && !reqShip.value.trim()) {
         const d = new Date(today.getTime());
         d.setDate(d.getDate() + 14);
-        reqShip.value = fmt(d);
+        reqShip.value = fmt(d, reqShip);
     }
 }
 if (typeof window !== 'undefined') window.setQuoteDateDefaults = setQuoteDateDefaults;
