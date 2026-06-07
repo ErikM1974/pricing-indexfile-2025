@@ -1,3 +1,7 @@
+## v2026.06.07.11 (2026.06.07)
+
+- Deploy v2026.06.07.11: 3 files (LESSONS_LEARNED.md,embroidery-quote-builder.html,embroidery-quote-builder.js,...)
+
 ## v2026.06.07.2 (2026.06.07)
 
 - docs(memory): log to-100 readiness lessons (adversarial-verify-own-fix, B8 tax-exempt persistence, B1/monogram traps) + final verdict
