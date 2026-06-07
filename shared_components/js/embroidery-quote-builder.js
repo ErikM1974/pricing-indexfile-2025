@@ -1925,6 +1925,30 @@ function dateFromInputValue(v) {          // YYYY-MM-DD (or MM/DD/YYYY) → MM/D
     return '';
 }
 
+// [2026-06-07] Ship-To address card in the order-at-a-glance band — shows the entered destination so the rep
+// can verify it at a glance (Erik's idea). Hidden for Customer Pickup or when no address is entered.
+function renderShipToCard() {
+    const el = document.getElementById('ship-to-card');
+    if (!el) return;
+    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const method = (document.getElementById('ship-method')?.value || '').trim();
+    const isPickup = /pickup|will[\s-]?call/i.test(method);
+    const addr = (document.getElementById('ship-address')?.value || '').trim();
+    const city = (document.getElementById('ship-city')?.value || '').trim();
+    const state = (document.getElementById('ship-state')?.value || '').trim();
+    const zip = (document.getElementById('ship-zip')?.value || '').trim();
+    if (isPickup || !(addr || city || zip)) { el.innerHTML = ''; return; }  // hidden for pickup / no address
+    const company = (document.getElementById('company-name')?.value || '').trim();
+    const cityLine = ([city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '')).trim();
+    const lines = [];
+    if (company) lines.push(`<div class="st-line st-co">${esc(company)}</div>`);
+    if (addr) lines.push(`<div class="st-line">${esc(addr)}</div>`);
+    if (cityLine) lines.push(`<div class="st-line">${esc(cityLine)}</div>`);
+    if (method && !isPickup) lines.push(`<div class="st-line st-method">via ${esc(method)}</div>`);
+    el.innerHTML = lines.length ? `<div class="st-title">Ship To</div>${lines.join('')}` : '';
+}
+window.renderShipToCard = renderShipToCard;
+
 function renderOrderRecap() {
     const el = document.getElementById('order-recap');
     if (!el) return;
@@ -1961,6 +1985,7 @@ function renderOrderRecap() {
     if (logos.length) rows.push(`<div class="or-row"><span class="or-label">Logo${logos.length > 1 ? 's' : ''}</span><span class="or-val">${esc(logos.join('   ·   '))}</span></div>`);
     if (thumbs.length) rows.push(`<div class="or-thumbs">${thumbs.map(t => `<figure class="or-thumb"><img src="${esc(t.url)}" alt="${esc(t.label)}" loading="lazy" onerror="this.closest('.or-thumb').style.display='none'"><figcaption>${esc(t.label)}</figcaption></figure>`).join('')}</div>`);
     el.innerHTML = rows.length ? `<div class="or-title">Order at a glance</div>${rows.join('')}` : '';
+    renderShipToCard();  // keep the ship-to card in sync with the glance panel
 }
 window.renderOrderRecap = renderOrderRecap;
 
@@ -7308,6 +7333,7 @@ function onShipMethodChange() {
         }
     }
     updateShippingSummary();
+    renderShipToCard();  // [2026-06-07] refresh the ship-to card on mode/method change
 }
 
 /**
@@ -7323,7 +7349,17 @@ function setShipMode(mode) {
         select.value = 'Customer Pickup';
     } else {
         // Leaving pickup → default to UPS Ground (most common carrier)
-        if (select.value === 'Customer Pickup') select.value = 'UPS Ground';
+        const wasPickup = select.value === 'Customer Pickup';
+        if (wasPickup) select.value = 'UPS Ground';
+        // [2026-06-07] Clear the Milton pickup defaults (onShipMethodChange stamps city=Milton/state=WA/zip=98354
+        // for the pickup tax) so they don't masquerade as the ship-to DESTINATION — bug: Pickup→Ship left "Milton"
+        // in the city. The rep types the real address, or it's restored from the last customer just below. Guard
+        // on _restoringQuote so an edit-reload of a real saved ship-to isn't wiped.
+        if (wasPickup && !window._restoringQuote) {
+            ['ship-address', 'ship-city', 'ship-state', 'ship-zip'].forEach((id) => {
+                const el = document.getElementById(id); if (el) el.value = '';
+            });
+        }
         // Pre-fill the address from the last selected customer, if we have it
         const stash = window._lastCustomerShipTo;
         const zipEl = document.getElementById('ship-zip');
@@ -7382,6 +7418,7 @@ function closeShippingModal() {
     if (m) m.classList.remove('open');
     updateShippingSummary();
     updateTaxCalculation();
+    renderShipToCard();  // [2026-06-07] show the entered ship-to address in the glance band
 }
 window.openShippingModal = openShippingModal;
 window.closeShippingModal = closeShippingModal;

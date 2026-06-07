@@ -569,6 +569,9 @@
                          margin-right:auto so the SHARED .invoice-totals-wrap stays flex-end for them.
                          Live-rendered by renderOrderRecap(); hidden (:empty) until there's something to show. (Erik 2026-06-05) -->
                     <div class="order-recap" id="order-recap"></div>
+                    <!-- Ship-To card — fills the gap between the recap + totals; shows the entered destination so the
+                         rep can eyeball it. renderShipToCard(); hidden (:empty) for Customer Pickup / no address. (Erik 2026-06-07) -->
+                    <div class="ship-to-card" id="ship-to-card"></div>
                     <div class="invoice-totals-box" id="invoice-totals-box">
                         <div class="it-row">
                             <span class="it-label">Subtotal</span>
