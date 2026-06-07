@@ -1944,10 +1944,34 @@ function renderShipToCard() {
     if (company) lines.push(`<div class="st-line st-co">${esc(company)}</div>`);
     if (addr) lines.push(`<div class="st-line">${esc(addr)}</div>`);
     if (cityLine) lines.push(`<div class="st-line">${esc(cityLine)}</div>`);
-    if (method && !isPickup) lines.push(`<div class="st-line st-method">via ${esc(method)}</div>`);
-    el.innerHTML = lines.length ? `<div class="st-title">Ship To</div>${lines.join('')}` : '';
+    // shipping line: method · charge · (boxes/zone — ONLY when the charge IS still the estimate, not a manual override)
+    const fee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+    const est = window._lastShipEstimate;
+    let shipLine = esc(method || 'UPS Ground');
+    if (fee > 0) shipLine += ` &middot; $${fee.toFixed(2)}`;
+    if (est && Math.abs((est.estimate || 0) - fee) < 0.01 && est.boxes) {
+        shipLine += ` &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${esc(String(est.zone))}`;
+    }
+    lines.push(`<div class="st-line st-method">${shipLine}</div>`);
+    const actions = '<div class="st-actions">'
+        + '<button type="button" class="st-btn st-btn-reest" onclick="reestimateShipFromCard()" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>'
+        + '<button type="button" class="st-btn st-btn-edit" onclick="openShippingModal()" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>'
+        + '</div>';
+    el.innerHTML = `<div class="st-title">Ship To</div>${lines.join('')}${actions}`;
 }
 window.renderShipToCard = renderShipToCard;
+
+// [2026-06-07] Re-estimate shipping in place from the Ship-To card (no modal) — handles the "added more items,
+// weight changed" case. estimateShipping() reads the current ship-zip + line items, updates #shipping-fee + the
+// totals; we just give card-button feedback + re-render. MANUAL only — never auto (would clobber a rep's
+// hand-tuned charge, which the estimate explicitly invites). (Erik 2026-06-07)
+async function reestimateShipFromCard() {
+    const card = document.getElementById('ship-to-card');
+    const btn = card ? card.querySelector('.st-btn-reest') : null;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
+    try { await estimateShipping(); } finally { renderShipToCard(); }
+}
+window.reestimateShipFromCard = reestimateShipFromCard;
 
 function renderOrderRecap() {
     const el = document.getElementById('order-recap');
@@ -6240,6 +6264,9 @@ async function estimateShipping() {
         if (feeInput) { feeInput.value = Number(est.estimate).toFixed(2); }
         if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        // [2026-06-07] remember the estimate so the Ship-To card can show boxes/zone + re-render with the new charge
+        window._lastShipEstimate = { estimate: Number(est.estimate) || 0, boxes: est.boxes, zone: est.zone, weight: est.billableWeightLb };
+        if (typeof renderShipToCard === 'function') renderShipToCard();
         setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— rough, adjust as needed</span>`, '#166534');
     } catch (e) {
         console.error('[estimateShipping]', e);
