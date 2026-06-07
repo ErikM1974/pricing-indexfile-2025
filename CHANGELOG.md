@@ -1,3 +1,10 @@
+## v2026.06.06.11 (2026.06.06)
+
+- fix(emb): readiness C8 — revive the inert AL-pricing save backstop
+- fix(emb): readiness true-100 — close 4 verification-caught gaps (B8-R1/R2, A3-DECG, C8)
+- fix(emb): readiness apply-ready tail — design-search onclick (C11) + residential freight (B12)
+- Deploy v2026.06.06.11: cache-bust true-100 batch (B8-R1/R2, A3-DECG, C8, C11, B12)
+
 ## v2026.06.06.10 (2026.06.06)
 
 - fix(emb): readiness B-group batch 1 — push-preview artwork, tax-exempt toggle, PDF/label/email
