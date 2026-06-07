@@ -1156,24 +1156,30 @@ class ShopWorksImportParser {
         }
 
         switch (classification) {
-            case 'digitizing':
+            case 'digitizing': {
                 result.services.digitizing = true;
                 result.services.digitizingCount++;
+                // [A4] (audit 2026-06-06): normalize legacy DGT-001/002/003 → DD/DDE/DDT BEFORE storing, so the
+                // push transformer's KNOWN_FEE_PNS recognizes them and emits a real billable line item (else the
+                // fee was demoted to an order Note → ShopWorks under-billed). The classifier already normalizes
+                // for routing at :1556, but the STORED code was still the raw PN.
+                const _normCode = this.SERVICE_CODE_ALIASES[item.partNumber.toUpperCase()] || item.partNumber.toUpperCase();
                 // Store digitizing code and amount for fee lookup
                 if (!result.services.digitizingCodes) {
                     result.services.digitizingCodes = [];
                 }
-                result.services.digitizingCodes.push(item.partNumber.toUpperCase());
+                result.services.digitizingCodes.push(_normCode);
                 // Track actual fee amounts from DGT items
                 if (!result.services.digitizingFees) {
                     result.services.digitizingFees = [];
                 }
                 result.services.digitizingFees.push({
-                    code: item.partNumber.toUpperCase(),
+                    code: _normCode,
                     amount: item.unitPrice || 0,
                     description: item.description || ''
                 });
                 break;
+            }
 
             case 'patch-setup':
                 result.services.patchSetup = true;

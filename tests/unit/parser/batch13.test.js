@@ -539,7 +539,7 @@ describe('Batch 13 — Order 8 (#136571): Port of Seattle — DGT-002, ONYX, GRT
     test('DGT-002 at $50 with full description', () => {
         expect(result.services.digitizingFees).toHaveLength(1);
         const dgt = result.services.digitizingFees[0];
-        expect(dgt.code).toBe('DGT-002');
+        expect(dgt.code).toBe('DDE');   // [A4] 2026-06-06: DGT-002 normalized to DDE so the push bills a real line
         expect(dgt.amount).toBe(50);
         expect(dgt.description).toContain('revising');
     });

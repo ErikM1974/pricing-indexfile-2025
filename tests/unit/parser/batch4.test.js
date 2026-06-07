@@ -197,13 +197,13 @@ describe('Batch 4 — Order 4 (#135256): DGT-002 fee, AL, empty PN, size merging
     });
 
     test('DGT-002 code stored in digitizingCodes', () => {
-        expect(result.services.digitizingCodes).toContain('DGT-002');
+        expect(result.services.digitizingCodes).toContain('DDE');   // [A4] DGT-002 normalized to DDE
     });
 
     test('DGT-002 fee amount ($50) tracked in digitizingFees', () => {
         expect(result.services.digitizingFees).toHaveLength(1);
         expect(result.services.digitizingFees[0]).toEqual({
-            code: 'DGT-002',
+            code: 'DDE',   // [A4] DGT-002 normalized to DDE
             amount: 50,
             description: 'Fee for revising existing digitized designs to meet new specifications'
         });
@@ -412,7 +412,7 @@ describe('Batch 4 — digitizingFees tracking', () => {
         const result = parser.parse(orders[3]); // Order 4
         expect(result.services.digitizingFees).toBeDefined();
         expect(result.services.digitizingFees).toHaveLength(1);
-        expect(result.services.digitizingFees[0].code).toBe('DGT-002');
+        expect(result.services.digitizingFees[0].code).toBe('DDE');   // [A4] DGT-002 normalized to DDE
         expect(result.services.digitizingFees[0].amount).toBe(50);
     });
 

@@ -627,7 +627,7 @@ describe('Batch 11 — Order 8 (#136449): lululemon — DGT-001, DECG×26', () =
     test('DGT-001 digitizing at $100', () => {
         expect(result.services.digitizingFees).toHaveLength(1);
         const dgt = result.services.digitizingFees[0];
-        expect(dgt.code).toBe('DGT-001');
+        expect(dgt.code).toBe('DD');   // [A4] 2026-06-06: DGT-001 normalized to DD so the push bills a real line
         expect(dgt.amount).toBe(100);
     });
 
