@@ -82,4 +82,12 @@ describe('EmbroideryInvoiceGenerator — no XSS payload survives rendering (P0-1
     expect(html).not.toMatch(/<script/i);
     expect(html).not.toMatch(/<img\s+src=x\s+onerror/i);
   });
+
+  test('malicious discountReason in pricingData is escaped (B6, 2026-06-06)', () => {
+    const html = new Generator().generateInvoiceHTML(
+      { quoteId: 'T', grandTotal: 100, discount: 50, discountReason: XSS, preTaxSubtotal: 100, taxRate: 0.101, products: [] },
+      { name: 'Acme', salesRepEmail: '' }
+    );
+    assertClean(html);
+  });
 });

@@ -1314,7 +1314,12 @@ class EmbroideryQuoteService {
 
             // Defensive: pick the MATCHING quote, not blindly sessions[0] (which
             // loaded the wrong quote before the 2026-06-01 proxy QuoteID-filter fix).
-            const session = sessions.find(s => s && s.QuoteID === quoteId) || sessions[0];
+            // [A2] (audit 2026-06-06): among duplicate-QuoteID rows pick the NEWEST PK_ID — push/preview/sync
+            // all target the max PK_ID, so the edit must bind the same row, else updateQuote's PUT targets a
+            // stale row → split-brain → a duplicate ShopWorks order. Order-agnostic (don't trust API order).
+            const _matches = sessions.filter(s => s && s.QuoteID === quoteId);
+            const session = (_matches.length ? _matches : sessions)
+                .reduce((a, b) => ((Number(b.PK_ID) || 0) > (Number(a.PK_ID) || 0) ? b : a));
 
             // Fetch line items
             const itemsResponse = await fetch(

@@ -4992,11 +4992,15 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
 
     // 1. Look up the quote_sessions row by QuoteID (need PK_ID for PUT/DELETE).
-    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+    const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'&q.orderBy=PK_ID DESC`);
     if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
       return res.status(404).json({ success: false, error: 'Quote not found' });
     }
-    const session = sessions[0];
+    // [A2] (audit 2026-06-06): among duplicate-QuoteID rows prefer the PUSHED row, else the newest (client-
+    // sorted, robust if the filter= route strips q.orderBy) — the sync's PUT must target the same row push
+    // stamped, not an oldest/unpushed duplicate (→ split-brain → a second ShopWorks order).
+    const session = sessions.find(s => s.PushedToShopWorks)
+      || [...sessions].sort((a, b) => (Number(b.PK_ID) || 0) - (Number(a.PK_ID) || 0))[0];
     const pkId = session.PK_ID;
     const previousStatus = session.ShopWorks_Status || '';
 

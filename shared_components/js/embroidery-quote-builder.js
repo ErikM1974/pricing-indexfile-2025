@@ -5914,7 +5914,9 @@ async function syncALRows() {
     const alRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-al-priced="true"]');
     if (!alRows.length) return;
     const cache = await loadALPricing();
-    if (!cache) return;                              // error already surfaced; don't guess a price
+    // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 AL price the save gate would accept. Flag
+    // every AL row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
+    if (!cache) { alRows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
     const counts = getOrderPieceCounts();
     for (const row of alRows) {
@@ -5982,7 +5984,9 @@ async function syncDECGRows() {
     const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
     if (!rows.length) return;
     const cache = await loadDECGPricing();
-    if (!cache) return;                              // error already surfaced; don't guess a price
+    // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 DECG price the save gate would accept. Flag
+    // every row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
+    if (!cache) { rows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
     for (const row of rows) {
         if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
@@ -7766,8 +7770,9 @@ async function saveAndGetLink(opts = {}) {
                 }
             }
 
-            // Show Push to ShopWorks button after successful save
-            showPushButton(result.quoteID);
+            // Show Push to ShopWorks button after successful save. [B5]: only a NEW quote clears the
+            // already-pushed lock; an update preserves it so a re-save can't re-enable a duplicate push.
+            showPushButton(result.quoteID, { resetPushed: !isUpdate });
         } else {
             throw new Error(result?.error || 'Failed to save quote');
         }
@@ -7881,9 +7886,11 @@ function renderPushReadiness() {
 window.renderPushReadiness = renderPushReadiness;
 
 // Called after a successful save and when loading a saved quote for editing.
-function showPushButton(quoteId) {
+function showPushButton(quoteId, opts = {}) {
     _pushQuoteId = quoteId;
-    _pushAlreadyDone = false;
+    // [B5] (audit 2026-06-06): only CLEAR the "already pushed" lock for a genuinely NEW quote. A re-save of
+    // an already-pushed quote must NOT wipe it (else the rep can push again → a duplicate ShopWorks order).
+    if (opts.resetPushed === true) _pushAlreadyDone = false;
     updatePushButtonState();
 }
 
@@ -8054,6 +8061,13 @@ async function confirmPushToShopWorks() {
     const statusEl = document.getElementById('emb-sw-push-status');
     if (!_pushQuoteId || !confirmBtn) return;
     const force = confirmBtn.dataset.force === 'true';
+
+    // [B5] (audit 2026-06-06): defense-in-depth — never silently re-push an already-pushed quote unless the
+    // rep explicitly armed the duplicate button (force). Belt-and-suspenders behind the showPushButton lock.
+    if (_pushAlreadyDone && !force) {
+        showToast('Already sent to ShopWorks this session — use the "Push Again (creates duplicate)" button if you really mean to.', 'warning');
+        return;
+    }
 
     const origHtml = confirmBtn.innerHTML;
     confirmBtn.disabled = true;
