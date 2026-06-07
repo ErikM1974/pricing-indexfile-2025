@@ -1,3 +1,8 @@
+## v2026.06.06.8 (2026.06.06)
+
+- fix(emb): P2 batch — design-not-found push warning + push-modal focus trap
+- Deploy v2026.06.06.8: cache-bust P2-9/P2-16
+
 ## v2026.06.06.7 (2026.06.06)
 
 - fix(emb): P2 customer/shipping batch — pickup-reload address guard + stale-banner clear + project-name
