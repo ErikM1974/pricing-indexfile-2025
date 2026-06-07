@@ -951,11 +951,11 @@
     </div>
 
     <!-- Push to ShopWorks: preview + confirm modal -->
-    <div class="shopworks-import-modal" id="emb-sw-push-modal">
+    <div class="shopworks-import-modal" id="emb-sw-push-modal" role="dialog" aria-modal="true" aria-labelledby="emb-sw-push-title">
         <div class="shopworks-import-content" style="max-width: 760px;">
             <div class="shopworks-import-header">
-                <h3><i class="fas fa-upload"></i> Push to ShopWorks</h3>
-                <button class="shopworks-import-close" onclick="closePushPreview()">
+                <h3 id="emb-sw-push-title"><i class="fas fa-upload"></i> Push to ShopWorks</h3>
+                <button class="shopworks-import-close" onclick="closePushPreview()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1484,7 +1484,7 @@ Company:Absher Construction Company
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
     <script src="/pages/order-form/inventory/inventory-check.js?v=2026.05.23.1"></script>
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.06.7"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.06.8"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
