@@ -2143,9 +2143,14 @@ async function lookupDesignNumber(type) {
             }
             // Truly not found
             infoBadge.className = 'design-info-badge design-info-warning';
+            // P2-9 (audit 2026-06-06): setDesignNumberOnLogo below makes the push treat this typed # as an
+            // EXISTING ShopWorks design (id_Design), NOT a new one — so the old "a new design will be created"
+            // copy was misleading and gave false comfort about a wrong/typo'd number. Tell the rep exactly
+            // what will happen so they verify the # or clear it and upload artwork for a genuinely new design.
             infoBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Design #' + escapeHtml(designNum) +
-                ' not found in database. A new design will be created in ShopWorks.';
-            // Still set the number — user might know it exists in ShopWorks
+                ' not found in our database. It will be pushed as an EXISTING ShopWorks design # — verify it is correct, or clear it and upload artwork to create a NEW design.';
+            // Still set the number — the rep may know it exists in ShopWorks (the warning above makes the
+            // "existing id_Design" behavior explicit).
             setDesignNumberOnLogo(type, designNum);
             clearBtn.style.display = 'inline-flex';
         }
@@ -7933,6 +7938,24 @@ async function openPushPreview() {
     confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
     modal.classList.add('active');
 
+    // P2-16 (audit 2026-06-06): focus management for the load-bearing push-confirm modal — remember the
+    // opener, move focus into the modal, trap Tab inside it, and close on Escape (a11y; stops focus leaking
+    // to the page behind the modal).
+    window._pushModalOpener = document.activeElement;
+    setTimeout(() => { try { const f = modal.querySelector('button:not([disabled])'); if (f) f.focus(); } catch (_) {} }, 0);
+    if (!modal._embKeyBound) {
+        modal._embKeyBound = true;
+        modal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { e.preventDefault(); closePushPreview(); return; }
+            if (e.key !== 'Tab') return;
+            const f = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')).filter((el) => el.offsetParent !== null);
+            if (!f.length) return;
+            const first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+    }
+
     try {
         const apiBase = typeof APP_CONFIG !== 'undefined'
             ? APP_CONFIG.API.BASE_URL
@@ -8148,6 +8171,8 @@ async function verifyShopWorksImport(extOrderId) {
 function closePushPreview() {
     const modal = document.getElementById('emb-sw-push-modal');
     if (modal) modal.classList.remove('active');
+    // P2-16: restore focus to whatever opened the modal (a11y — focus must not vanish to <body>).
+    try { if (window._pushModalOpener && window._pushModalOpener.focus) window._pushModalOpener.focus(); } catch (_) {}
 }
 
 // NOTE: pushToShopWorks() (defined above) now AUTO-SAVES then opens the push preview. The old

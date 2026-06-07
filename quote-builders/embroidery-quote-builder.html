@@ -951,11 +951,11 @@
     </div>
 
     <!-- Push to ShopWorks: preview + confirm modal -->
-    <div class="shopworks-import-modal" id="emb-sw-push-modal">
+    <div class="shopworks-import-modal" id="emb-sw-push-modal" role="dialog" aria-modal="true" aria-labelledby="emb-sw-push-title">
         <div class="shopworks-import-content" style="max-width: 760px;">
             <div class="shopworks-import-header">
-                <h3><i class="fas fa-upload"></i> Push to ShopWorks</h3>
-                <button class="shopworks-import-close" onclick="closePushPreview()">
+                <h3 id="emb-sw-push-title"><i class="fas fa-upload"></i> Push to ShopWorks</h3>
+                <button class="shopworks-import-close" onclick="closePushPreview()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
