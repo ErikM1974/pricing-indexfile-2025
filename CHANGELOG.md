@@ -1,3 +1,8 @@
+## v2026.06.06.10 (2026.06.06)
+
+- fix(emb): readiness B-group batch 1 — push-preview artwork, tax-exempt toggle, PDF/label/email
+- Deploy v2026.06.06.10: cache-bust B-group batch 1
+
 ## v2026.06.06.9 (2026.06.06)
 
 - test(emb): stored-XSS regression test for the shared invoice/PDF generator (P0-1)
