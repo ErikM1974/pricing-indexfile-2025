@@ -1,3 +1,10 @@
+## v2026.06.06.9 (2026.06.06)
+
+- test(emb): stored-XSS regression test for the shared invoice/PDF generator (P0-1)
+- fix(emb): readiness P0/P1 batch 2 — close 5 newly-found audit blockers (A1-A3,B5,B6)
+- fix(emb): readiness P0/P1 batch 3 — finish A-group (A4 import under-bill, A5/A6 wrong-account)
+- Deploy v2026.06.06.9: cache-bust A-group + B5/B6
+
 ## v2026.06.06.8 (2026.06.06)
 
 - fix(emb): P2 batch — design-not-found push warning + push-modal focus trap
