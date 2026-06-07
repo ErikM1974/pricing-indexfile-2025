@@ -1,3 +1,8 @@
+## v2026.06.07.1 (2026.06.07)
+
+- fix(emb): readiness C-group a11y + dead-code polish (C2-C7, C10)
+- Deploy v2026.06.07.1: cache-bust C-group a11y/dead-code
+
 ## v2026.06.06.11 (2026.06.06)
 
 - fix(emb): readiness C8 — revive the inert AL-pricing save backstop
