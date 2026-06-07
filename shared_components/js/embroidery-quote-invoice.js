@@ -629,7 +629,7 @@ class EmbroideryInvoiceGenerator {
             const frontName = LOCATION_NAMES[printLocation.front] || printLocation.front;
             specsHTML += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Front:</strong> ${frontName}
+                    <strong>Front:</strong> ${this.esc(frontName)}
                 </div>
             `;
         }
@@ -639,7 +639,7 @@ class EmbroideryInvoiceGenerator {
             const backName = LOCATION_NAMES[printLocation.back] || printLocation.back;
             specsHTML += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Back:</strong> ${backName}
+                    <strong>Back:</strong> ${this.esc(backName)}
                 </div>
             `;
         }
@@ -666,7 +666,7 @@ class EmbroideryInvoiceGenerator {
         if (printConfig.front) {
             specsHTML += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Front:</strong> ${printConfig.front}
+                    <strong>Front:</strong> ${this.esc(printConfig.front)}
                 </div>
             `;
         }
@@ -675,7 +675,7 @@ class EmbroideryInvoiceGenerator {
         if (printConfig.back) {
             specsHTML += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    <strong>Back:</strong> ${printConfig.back}
+                    <strong>Back:</strong> ${this.esc(printConfig.back)}
                 </div>
             `;
         }
@@ -743,7 +743,7 @@ class EmbroideryInvoiceGenerator {
             const config = locationConfig[loc] || { label: loc, size: '' };
             specsHTML += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
-                    • ${config.label} <span style="color: #666;">(${config.size})</span>
+                    • ${this.esc(config.label)} <span style="color: #666;">(${config.size})</span>
                 </div>
             `;
         });

@@ -54,8 +54,9 @@
 </head>
 <body class="emb-builder"><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
+    <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
         <div class="loading-spinner"></div>
+        <span class="sr-only">Loading…</span>
     </div>
 
     <!-- Compact Header -->
@@ -106,13 +107,13 @@
                                     <input type="text" id="garment-design-number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number" aria-label="Look up design">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #">
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" aria-label="Clear design" style="display:none;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -199,13 +200,13 @@
                                     <input type="text" id="cap-design-number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number">
+                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number" aria-label="Look up design">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #">
+                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" aria-label="Clear design" style="display:none;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -616,6 +617,7 @@
                     <div class="customer-info-body">
                         <!-- Customer Lookup -->
                         <div class="customer-field customer-lookup-container">
+                            <label class="sr-only" for="customer-lookup">Search for a customer by company, name, or email</label>
                             <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
 
                             <!-- Customer context banners (Erik 2026-05-23) — populated by
@@ -631,28 +633,28 @@
                         <div class="customer-lookup-divider">or enter manually</div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                             <div class="customer-field" style="grid-column: span 2;">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Name *</label>
+                                <label for="customer-name" style="font-size: 11px; color: #64748b; display: block;">Name *</label>
                                 <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                             <div class="customer-field" style="grid-column: span 2;">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Email *</label>
+                                <label for="customer-email" style="font-size: 11px; color: #64748b; display: block;">Email *</label>
                                 <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                             <div class="customer-field">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Company</label>
+                                <label for="company-name" style="font-size: 11px; color: #64748b; display: block;">Company</label>
                                 <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                             <div class="customer-field">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
+                                <label for="customer-number" style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
                                 <input type="text" id="customer-number" placeholder="ShopWorks ID" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                                 <span id="customer-number-resolved" hidden></span>
                             </div>
                             <div class="customer-field">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Phone</label>
+                                <label for="customer-phone" style="font-size: 11px; color: #64748b; display: block;">Phone</label>
                                 <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                             <div class="customer-field">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Sales Rep</label>
+                                <label for="sales-rep" style="font-size: 11px; color: #64748b; display: block;">Sales Rep</label>
                                 <select id="sales-rep" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white; box-sizing: border-box;">
                                     <option value="sales@nwcustomapparel.com">General Sales</option>
                                     <option value="adriyella@nwcustomapparel.com">Adriyella</option>
@@ -666,7 +668,7 @@
                                 </select>
                             </div>
                             <div class="customer-field" style="grid-column: 1 / -1;">
-                                <label style="font-size: 11px; color: #64748b; display: block;">Project Name</label>
+                                <label for="project-name" style="font-size: 11px; color: #64748b; display: block;">Project Name</label>
                                 <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                         </div>
@@ -765,6 +767,7 @@
                             <span>Logo Mockup &amp; Review</span>
                         </label>
                         <div id="art-charge-wrapper" style="position: relative; opacity: 0.4; margin-top: 6px;">
+                            <label class="sr-only" for="art-charge">Logo mockup &amp; review charge in dollars</label>
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                             <input type="number" id="art-charge" min="0" max="5000" step="0.01" value="0" disabled
                                    onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
@@ -773,7 +776,7 @@
                     </div>
                     <!-- Graphic Design -->
                     <div class="charge-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design ($75/hr)</label>
+                        <label for="graphic-design-hours" style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design ($75/hr)</label>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <input type="number" id="graphic-design-hours" min="0" max="100" step="0.5" placeholder="0"
                                    onchange="updateArtworkCharges()" oninput="updateArtworkCharges()"
@@ -801,28 +804,28 @@
                 <div class="flow-step-body" id="order-details-content">
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div>
-                            <label>PO #</label>
+                            <label for="po-number">PO #</label>
                             <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                         </div>
                         <div>
-                            <label>Date Placed</label>
+                            <label for="date-order-placed">Date Placed</label>
                             <input type="text" id="date-order-placed" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                         </div>
                         <div>
-                            <label>Req Ship Date</label>
+                            <label for="req-ship-date">Req Ship Date</label>
                             <input type="text" id="req-ship-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                         </div>
                         <div>
-                            <label>Drop Dead Date</label>
+                            <label for="drop-dead-date">Drop Dead Date</label>
                             <input type="text" id="drop-dead-date" placeholder="MM/DD/YYYY" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                         </div>
                         <div style="grid-column: 1 / -1;">
-                            <label>Terms <span id="customer-terms-note" hidden></span></label>
+                            <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
                             <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                         </div>
                         <!-- ShopWorks Order # — demoted; you only have it AFTER importing -->
                         <div style="grid-column: 1 / -1; margin-top: 2px;">
-                            <label>ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
+                            <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
                             <input type="text" id="order-number" placeholder="(after import)" style="width: 100%; padding: 5px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 12px; box-sizing: border-box; background:#f8fafc;">
                         </div>
                     </div>
@@ -840,7 +843,7 @@
                 </div>
                 <div class="flow-step-body" id="charges-content">
                     <div class="charge-field">
-                        <label style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
+                        <label for="rush-fee" style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                             <input type="number" id="rush-fee" min="0" max="10000" step="0.01" placeholder="0.00"
@@ -918,11 +921,11 @@
     </div>
 
     <!-- Custom Logo Modal -->
-    <div id="logo-modal" class="modal-overlay">
+    <div id="logo-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="logo-modal-title">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-palette"></i> Custom Logo Setup</h3>
-                <button class="modal-close" onclick="closeLogoModal()">&times;</button>
+                <h3 id="logo-modal-title"><i class="fas fa-palette"></i> Custom Logo Setup</h3>
+                <button class="modal-close" onclick="closeLogoModal()" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
@@ -990,11 +993,11 @@
     </div>
 
     <!-- ShopWorks Import Modal -->
-    <div class="shopworks-import-modal" id="shopworks-import-modal">
+    <div class="shopworks-import-modal" id="shopworks-import-modal" role="dialog" aria-modal="true" aria-labelledby="shopworks-import-modal-title">
         <div class="shopworks-import-content">
             <div class="shopworks-import-header">
-                <h3><i class="fas fa-file-import"></i> Import from ShopWorks</h3>
-                <button class="shopworks-import-close" onclick="closeShopWorksImportModal()">
+                <h3 id="shopworks-import-modal-title"><i class="fas fa-file-import"></i> Import from ShopWorks</h3>
+                <button class="shopworks-import-close" onclick="closeShopWorksImportModal()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1039,11 +1042,11 @@ Company:Absher Construction Company
     </div>
 
     <!-- DECG Stitch Count Modal (shown after import with customer-supplied items) -->
-    <div class="shopworks-import-modal" id="decg-stitch-modal">
+    <div class="shopworks-import-modal" id="decg-stitch-modal" role="dialog" aria-modal="true" aria-labelledby="decg-stitch-modal-title">
         <div class="shopworks-import-content" style="max-width: 500px;">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                <h3><i class="fas fa-ruler"></i> Confirm Stitch Counts</h3>
-                <button class="shopworks-import-close" onclick="closeDECGStitchModal()">
+                <h3 id="decg-stitch-modal-title"><i class="fas fa-ruler"></i> Confirm Stitch Counts</h3>
+                <button class="shopworks-import-close" onclick="closeDECGStitchModal()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1066,11 +1069,11 @@ Company:Absher Construction Company
     </div>
 
     <!-- Pricing Review Modal (shown during ShopWorks import for products + services) -->
-    <div class="shopworks-import-modal" id="service-pricing-review-modal">
+    <div class="shopworks-import-modal" id="service-pricing-review-modal" role="dialog" aria-modal="true" aria-labelledby="service-pricing-review-modal-title">
         <div class="shopworks-import-content" style="max-width: 800px;">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
-                <h3><i class="fas fa-tags"></i> Review Import Pricing</h3>
-                <button class="shopworks-import-close" onclick="cancelServicePricingReview()">
+                <h3 id="service-pricing-review-modal-title"><i class="fas fa-tags"></i> Review Import Pricing</h3>
+                <button class="shopworks-import-close" onclick="cancelServicePricingReview()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1200,11 +1203,11 @@ Company:Absher Construction Company
     <!-- DECG Stitch Count + Service Pricing Review modal styles moved to embroidery-quote-builder-extracted.css (2026-03-23) -->
 
     <!-- Add Non-SanMar Product Modal -->
-    <div class="shopworks-import-modal" id="add-nonsanmar-modal">
+    <div class="shopworks-import-modal" id="add-nonsanmar-modal" role="dialog" aria-modal="true" aria-labelledby="add-nonsanmar-modal-title">
         <div class="shopworks-import-content" style="max-width: 520px;">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
-                <h3><i class="fas fa-plus-circle"></i> Add Non-SanMar Product</h3>
-                <button class="shopworks-import-close" onclick="closeAddNonSanmarModal()">
+                <h3 id="add-nonsanmar-modal-title"><i class="fas fa-plus-circle"></i> Add Non-SanMar Product</h3>
+                <button class="shopworks-import-close" onclick="closeAddNonSanmarModal()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1270,11 +1273,11 @@ Company:Absher Construction Company
     </div>
 
     <!-- Design Search Modal -->
-    <div class="shopworks-import-modal" id="design-search-modal">
+    <div class="shopworks-import-modal" id="design-search-modal" role="dialog" aria-modal="true" aria-labelledby="design-search-modal-title">
         <div class="shopworks-import-content design-search-content">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
-                <h3><i class="fas fa-database"></i> Find Existing Design</h3>
-                <button class="shopworks-import-close" onclick="closeDesignSearchModal()">
+                <h3 id="design-search-modal-title"><i class="fas fa-database"></i> Find Existing Design</h3>
+                <button class="shopworks-import-close" onclick="closeDesignSearchModal()" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1335,10 +1338,10 @@ Company:Absher Construction Company
          #ship-method / #ship-address / etc., so there are no duplicate
          IDs; the rest of the app reads/writes them as before.
          ============================================================ -->
-    <div class="ship-modal-overlay" id="shipping-modal" onclick="if(event.target===this)closeShippingModal()">
+    <div class="ship-modal-overlay" id="shipping-modal" onclick="if(event.target===this)closeShippingModal()" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
         <div class="ship-modal">
             <div class="ship-modal-head">
-                <span><i class="fas fa-truck" style="margin-right:8px;"></i>Shipping</span>
+                <span id="shipping-modal-title"><i class="fas fa-truck" style="margin-right:8px;"></i>Shipping</span>
                 <button type="button" class="ship-modal-close" onclick="closeShippingModal()" aria-label="Close">&times;</button>
             </div>
             <div class="ship-modal-body">
@@ -1360,7 +1363,7 @@ Company:Absher Construction Company
 
                 <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
                 <div id="ship-carrier-wrap" style="display: none;">
-                    <label>Carrier / Method</label>
+                    <label for="ship-method">Carrier / Method</label>
                     <select id="ship-method" onchange="onShipMethodChange()" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; background: white; margin-bottom: 10px;">
                         <option value="Customer Pickup" selected>Customer Pickup</option>
                         <option value="UPS Ground">UPS Ground</option>
@@ -1371,7 +1374,7 @@ Company:Absher Construction Company
                     </select>
                     <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
 
-                    <label>Ship To Address</label>
+                    <label for="ship-address">Ship To Address</label>
                     <div id="ship-address-fields">
                         <input type="text" id="ship-address" placeholder="Street address"
                                style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 6px;">
@@ -1402,7 +1405,7 @@ Company:Absher Construction Company
                             <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
                                    onblur="onShipZipBlur()"
                                    style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate"
+                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate" aria-label="Look up tax rate"
                                     style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; white-space: nowrap;">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -1411,7 +1414,7 @@ Company:Absher Construction Company
 
                     <!-- Shipping charge (only relevant when shipping) -->
                     <div id="shipping-fee-field" style="margin-top: 10px;">
-                        <label>Shipping charge</label>
+                        <label for="shipping-fee">Shipping charge</label>
                         <div style="position: relative;">
                             <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
                             <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"

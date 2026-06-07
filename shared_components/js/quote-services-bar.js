@@ -105,13 +105,22 @@
       '<span class="service-bar-label"><i class="fas fa-plus-circle"></i> Add to order:</span>' +
       groups.map((g) => `
         <div class="service-cat">
-          <button type="button" class="service-cat-btn">
+          <button type="button" class="service-cat-btn" aria-haspopup="true" aria-expanded="false">
             <i class="fas ${g.icon || 'fa-plus'}"></i> ${g.group} <i class="fas fa-caret-down service-cat-caret"></i>
           </button>
           <div class="service-cat-menu" hidden>${g.items.map(itemHtml).join('')}</div>
         </div>`).join('');
 
-    const closeAll = () => mount.querySelectorAll('.service-cat-menu').forEach((m) => { m.hidden = true; });
+    // Toggle a menu's visibility AND keep its trigger button's aria-expanded in sync.
+    const setMenuOpen = (menu, open) => {
+      if (!menu) return;
+      menu.hidden = !open;
+      const trigger = menu.previousElementSibling;
+      if (trigger && trigger.classList.contains('service-cat-btn')) {
+        trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+      }
+    };
+    const closeAll = () => mount.querySelectorAll('.service-cat-menu').forEach((m) => setMenuOpen(m, false));
     const add = (code, opts) => { try { onAdd(code, opts); } catch (e) { console.error('[ServicesBar] onAdd failed', code, e); } };
 
     // Category button → toggle its dropdown (close the others)
@@ -121,8 +130,18 @@
         const menu = btn.nextElementSibling;
         const wasOpen = !menu.hidden;
         closeAll();
-        menu.hidden = wasOpen;
+        setMenuOpen(menu, !wasOpen);
       });
+    });
+
+    // Escape closes any open menu and returns focus to its trigger
+    mount.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape') return;
+      const openMenu = mount.querySelector('.service-cat-menu:not([hidden])');
+      if (!openMenu) return;
+      const trigger = openMenu.previousElementSibling;
+      closeAll();
+      if (trigger && typeof trigger.focus === 'function') trigger.focus();
     });
 
     // Fixed-price items → add directly
@@ -171,7 +190,13 @@
     if (!window.__svcBarOutsideBound) {
       window.__svcBarOutsideBound = true;
       document.addEventListener('click', () => {
-        document.querySelectorAll('.service-cat-menu').forEach((m) => { m.hidden = true; });
+        document.querySelectorAll('.service-cat-menu').forEach((m) => {
+          m.hidden = true;
+          const trigger = m.previousElementSibling;
+          if (trigger && trigger.classList.contains('service-cat-btn')) {
+            trigger.setAttribute('aria-expanded', 'false');
+          }
+        });
       });
     }
   }
