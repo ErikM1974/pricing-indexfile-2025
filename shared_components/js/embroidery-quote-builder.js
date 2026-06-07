@@ -1921,11 +1921,23 @@ function renderOrderRecap() {
             logos.push(`Cap #${capPrimaryLogo.designNumber}`);
         }
     } catch (_) {}
+    // [2026-06-07] Design thumbnails (already fetched for the logo cards) — surface them in the glance panel
+    // so the rep can visually confirm the artwork before pushing. (Erik)
+    const thumbs = [];
+    try {
+        if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.thumbnailUrl && primaryLogo.designNumber) {
+            thumbs.push({ url: primaryLogo.thumbnailUrl, label: `#${primaryLogo.designNumber}` });
+        }
+        if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.thumbnailUrl && capPrimaryLogo.designNumber) {
+            thumbs.push({ url: capPrimaryLogo.thumbnailUrl, label: `Cap #${capPrimaryLogo.designNumber}` });
+        }
+    } catch (_) {}
     const cust = company || name;
     const rows = [];
     if (cust) rows.push(`<div class="or-row"><span class="or-label">Customer</span><span class="or-val">${esc(cust)}${custNum ? ' · #' + esc(custNum) : ''}</span></div>`);
     if (ship) rows.push(`<div class="or-row"><span class="or-label">Shipping</span><span class="or-val">${esc(ship)}</span></div>`);  // #it-shipping-amt is a charge/method, not a destination (review C21)
     if (logos.length) rows.push(`<div class="or-row"><span class="or-label">Logo${logos.length > 1 ? 's' : ''}</span><span class="or-val">${esc(logos.join('   ·   '))}</span></div>`);
+    if (thumbs.length) rows.push(`<div class="or-thumbs">${thumbs.map(t => `<figure class="or-thumb"><img src="${esc(t.url)}" alt="${esc(t.label)}" loading="lazy" onerror="this.closest('.or-thumb').style.display='none'"><figcaption>${esc(t.label)}</figcaption></figure>`).join('')}</div>`);
     el.innerHTML = rows.length ? `<div class="or-title">Order at a glance</div>${rows.join('')}` : '';
 }
 window.renderOrderRecap = renderOrderRecap;
@@ -2310,6 +2322,8 @@ function showDesignThumbnail(type, imageUrl) {
     } else {
         thumbDiv.style.display = 'none';
     }
+    // [2026-06-07] mirror the design preview into the glance panel for a visual confirm
+    if (typeof renderOrderRecap === 'function') renderOrderRecap();
 }
 
 /**
