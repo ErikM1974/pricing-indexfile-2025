@@ -3389,6 +3389,12 @@ input[type="radio"] {
 .ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
 .ship-to-card .st-co { font-weight: 600; }
 .ship-to-card .st-method { color: #64748b; font-size: 11px; margin-top: 2px; }
+.ship-to-card .st-actions { display: flex; gap: 8px; margin-top: 8px; }
+.ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; cursor: pointer; }
+.ship-to-card .st-btn:hover { background: #eef2f7; }
+.ship-to-card .st-btn:disabled { opacity: .6; cursor: default; }
+.ship-to-card .st-btn-reest { border-color: #16a34a; color: #166534; background: #f0fdf4; }
+.ship-to-card .st-btn-reest:hover { background: #dcfce7; }
 .it-row {
     display: flex;
     justify-content: space-between;
