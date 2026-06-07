@@ -8273,19 +8273,8 @@ function closePushPreview() {
 // back-compat alias that just called openPushPreview() was removed so the auto-save wrapper wins
 // (a later same-name function declaration would otherwise override it). (Erik 2026-06-05)
 
-async function embEmailQuote() {
-    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
-    if (!quoteId) {
-        showToast('Please save the quote first before emailing', 'error');
-        return;
-    }
-    await emailQuote({
-        quoteId,
-        customerEmail: document.getElementById('customer-email')?.value?.trim(),
-        customerName: document.getElementById('customer-name')?.value?.trim(),
-        salesRepEmail: document.getElementById('sales-rep')?.value
-    });
-}
+// embEmailQuote() — single definition lives later in this file (the earlier
+// byte-identical duplicate was removed 2026-06-07; the later one wins via hoisting).
 
 // ============================================
 // Additional Charges Section Functions
@@ -8309,23 +8298,9 @@ function toggleAdditionalCharges() {
     }
 }
 
-/**
- * Toggle Save & Share panel visibility
- * Panel is COLLAPSED by default - user expands when ready to save
- */
-function toggleSaveShare() {
-    const content = document.getElementById('save-share-content');
-    const chevron = document.getElementById('save-share-chevron');
-    if (content.style.display === 'none') {
-        // Expanding - show content, chevron points UP
-        content.style.display = 'block';
-        chevron.style.transform = 'rotate(0deg)';
-    } else {
-        // Collapsing - hide content, chevron points DOWN
-        content.style.display = 'none';
-        chevron.style.transform = 'rotate(180deg)';
-    }
-}
+// toggleSaveShare() — EMB-local copy removed 2026-06-07 (dead: the EMB UI has no
+// #save-share-content panel). The live copy is the shared one in quote-builder-utils.js,
+// which DTF/SCP/legacy-DTG still use.
 
 function toggleOrderDetails() {
     const content = document.getElementById('order-details-content');
