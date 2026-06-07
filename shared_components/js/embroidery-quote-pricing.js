@@ -1985,11 +1985,15 @@ class EmbroideryPricingCalculator {
             // Set specific tooltip based on reason
             if (reason === 'al-pricing') {
                 btn.title = 'Cannot create quotes with Additional Logos while AL pricing is unavailable';
-                // Only disable if AL is being used
-                if (window.embQuoteBuilder && window.embQuoteBuilder.hasAdditionalLogos && window.embQuoteBuilder.hasAdditionalLogos()) {
+                // [C8] (audit 2026-06-06): the old guard called window.embQuoteBuilder.hasAdditionalLogos()
+                // which is UNDEFINED → the else always ran → this backstop RE-ENABLED the buttons → inert.
+                // Probe the DOM for an actually-FAILED AL row (data-al-priced + data-price-error, set by
+                // syncALRows on API failure — see [A3]). Only block when a real failed AL line is present.
+                const alFailed = document.querySelector('#product-tbody tr.service-product-row[data-al-priced="true"][data-price-error="true"]');
+                if (alFailed) {
                     btn.disabled = true;
                 } else {
-                    btn.disabled = false; // Allow quotes without AL
+                    btn.disabled = false; // No failed AL line — allow the quote
                     btn.style.opacity = '1';
                     btn.style.cursor = 'pointer';
                     btn.title = '';
