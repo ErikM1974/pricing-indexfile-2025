@@ -1,3 +1,7 @@
+## v2026.06.07.13 (2026.06.07)
+
+- Deploy v2026.06.07.13: freight estimate shows exact-vs-rough zone wording
+
 ## v2026.06.07.11 (2026.06.07)
 
 - Deploy v2026.06.07.11: 3 files (LESSONS_LEARNED.md,embroidery-quote-builder.html,embroidery-quote-builder.js,...)
