@@ -106,6 +106,27 @@ class CustomerLookupService {
     }
 
     /**
+     * [A5] (audit 2026-06-06): Resolve a typed ShopWorks Customer # (id_Customer) to its CRM company, so a
+     * transposed-but-valid number is caught before the order pushes to a real-but-WRONG account. Uses the
+     * by-customer endpoint (keys id_Customer) — NOT getById (keys ID_Contact, the wrong key here).
+     * @param {string|number} customerId - ShopWorks id_Customer
+     * @returns {Promise<Object|null>} first CRM contact for that customer, or null
+     */
+    async getByCustomerId(customerId) {
+        const id = String(customerId || '').trim();
+        if (!id) return null;
+        try {
+            const resp = await fetch(`${this.baseURL}/api/company-contacts/by-customer/${encodeURIComponent(id)}`);
+            if (!resp.ok) return null;
+            const data = await resp.json();
+            return (data.contacts && data.contacts[0]) || null;
+        } catch (e) {
+            console.error('CustomerLookupService getByCustomerId error:', e);
+            return null;
+        }
+    }
+
+    /**
      * Format contact for display in dropdown
      * @param {Object} contact - Contact object
      * @returns {string} - Formatted display string

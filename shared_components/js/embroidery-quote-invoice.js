@@ -1539,7 +1539,7 @@ class EmbroideryInvoiceGenerator {
                 </div>` : ''}
                 ${(pricingData.discount || 0) > 0 ? `
                 <div class="total-row discount-row">
-                    <span>Discount${pricingData.discountReason ? ` (${pricingData.discountReason})` : ''}:</span>
+                    <span>Discount${pricingData.discountReason ? ` (${this.esc(pricingData.discountReason)})` : ''}:</span>
                     <span>-$${pricingData.discount.toFixed(2)}</span>
                 </div>` : ''}
                 ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || ((pricingData.ltmFee || 0) > 0 && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `

@@ -1661,6 +1661,27 @@ document.addEventListener('DOMContentLoaded', async function() {
     // and set its initial (disabled) state for a fresh quote.
     const _custNumEl = document.getElementById('customer-number');
     if (_custNumEl) _custNumEl.addEventListener('input', updatePushButtonState);
+    // [A5] (audit 2026-06-06): on change, verify the typed Customer # against CRM and show the resolved
+    // company (or warn) — catches a transposed-but-valid # before it silently pushes to a wrong account.
+    if (_custNumEl) _custNumEl.addEventListener('change', async () => {
+        if (window._restoringQuote) return;
+        const id = (_custNumEl.value || '').trim();
+        const noteEl = document.getElementById('customer-number-resolved');
+        if (!noteEl) return;
+        if (!id) { noteEl.textContent = ''; noteEl.hidden = true; return; }
+        if (!window.customerLookupInstance) return;
+        const contact = await window.customerLookupInstance.getByCustomerId(id);
+        if ((_custNumEl.value || '').trim() !== id) return;   // value changed mid-await — ignore stale result
+        if (contact && contact.CustomerCompanyName) {
+            noteEl.textContent = '✓ ' + contact.CustomerCompanyName;
+            noteEl.style.cssText = 'font-size:11px;color:#166534;font-weight:600;display:block;margin-top:2px;';
+            noteEl.hidden = false;
+        } else {
+            noteEl.textContent = '⚠ No CRM customer for #' + id + ' — verify before pushing.';
+            noteEl.style.cssText = 'font-size:11px;color:#92400e;font-weight:600;display:block;margin-top:2px;';
+            noteEl.hidden = false;
+        }
+    });
     const _custNameEl = document.getElementById('customer-name');   // keep the push-readiness "Customer name" check live (audit #8)
     if (_custNameEl) _custNameEl.addEventListener('input', updatePushButtonState);
     const _custEmailEl = document.getElementById('customer-email');  // P2-15 (audit 2026-06-06): re-enable Push when Email is the last field typed
@@ -5914,7 +5935,9 @@ async function syncALRows() {
     const alRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-al-priced="true"]');
     if (!alRows.length) return;
     const cache = await loadALPricing();
-    if (!cache) return;                              // error already surfaced; don't guess a price
+    // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 AL price the save gate would accept. Flag
+    // every AL row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
+    if (!cache) { alRows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
     const counts = getOrderPieceCounts();
     for (const row of alRows) {
@@ -5982,7 +6005,9 @@ async function syncDECGRows() {
     const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
     if (!rows.length) return;
     const cache = await loadDECGPricing();
-    if (!cache) return;                              // error already surfaced; don't guess a price
+    // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 DECG price the save gate would accept. Flag
+    // every row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
+    if (!cache) { rows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
     for (const row of rows) {
         if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
@@ -7766,8 +7791,9 @@ async function saveAndGetLink(opts = {}) {
                 }
             }
 
-            // Show Push to ShopWorks button after successful save
-            showPushButton(result.quoteID);
+            // Show Push to ShopWorks button after successful save. [B5]: only a NEW quote clears the
+            // already-pushed lock; an update preserves it so a re-save can't re-enable a duplicate push.
+            showPushButton(result.quoteID, { resetPushed: !isUpdate });
         } else {
             throw new Error(result?.error || 'Failed to save quote');
         }
@@ -7881,9 +7907,11 @@ function renderPushReadiness() {
 window.renderPushReadiness = renderPushReadiness;
 
 // Called after a successful save and when loading a saved quote for editing.
-function showPushButton(quoteId) {
+function showPushButton(quoteId, opts = {}) {
     _pushQuoteId = quoteId;
-    _pushAlreadyDone = false;
+    // [B5] (audit 2026-06-06): only CLEAR the "already pushed" lock for a genuinely NEW quote. A re-save of
+    // an already-pushed quote must NOT wipe it (else the rep can push again → a duplicate ShopWorks order).
+    if (opts.resetPushed === true) _pushAlreadyDone = false;
     updatePushButtonState();
 }
 
@@ -8054,6 +8082,13 @@ async function confirmPushToShopWorks() {
     const statusEl = document.getElementById('emb-sw-push-status');
     if (!_pushQuoteId || !confirmBtn) return;
     const force = confirmBtn.dataset.force === 'true';
+
+    // [B5] (audit 2026-06-06): defense-in-depth — never silently re-push an already-pushed quote unless the
+    // rep explicitly armed the duplicate button (force). Belt-and-suspenders behind the showPushButton lock.
+    if (_pushAlreadyDone && !force) {
+        showToast('Already sent to ShopWorks this session — use the "Push Again (creates duplicate)" button if you really mean to.', 'warning');
+        return;
+    }
 
     const origHtml = confirmBtn.innerHTML;
     confirmBtn.disabled = true;
@@ -10727,9 +10762,15 @@ async function confirmShopWorksImport() {
                     const results = await window.customerLookupInstance.search(data.customer.email);
 
                     if (results.length > 0) {
-                        // Auto-populate from first CRM match — only fill empty fields
-                        // Parser already populated these during import; CRM supplements, doesn't replace
-                        const contact = results[0];
+                        // [A6] (audit 2026-06-06): search() is FUZZY, so results[0] can be a DIFFERENT customer.
+                        // Only trust a match whose email EXACTLY equals the imported one — otherwise fall back to
+                        // an empty object so the import data is used and id_Customer / company / address are NOT
+                        // filled from a wrong account (which would silently push the order to the wrong customer).
+                        const _wantEmail = (data.customer.email || '').toLowerCase().trim();
+                        const _exact = results.find(c => (c.ContactNumbersEmail || '').toLowerCase().trim() === _wantEmail);
+                        if (!_exact) showToast('No exact CRM email match for the imported customer — using imported values (verify the Customer # before pushing).', 'info');
+                        // Parser already populated these during import; CRM supplements, doesn't replace.
+                        const contact = _exact || {};
                         const nameEl = document.getElementById('customer-name');
                         const emailEl = document.getElementById('customer-email');
                         const companyEl = document.getElementById('company-name');
