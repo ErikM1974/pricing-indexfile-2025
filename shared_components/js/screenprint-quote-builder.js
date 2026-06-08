@@ -819,6 +819,7 @@ function resetQuote() {
 
     // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
     window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: re-check include-tax on New Quote (else next quote after a wholesale/exempt one bills $0 tax)
+    { const _r = document.getElementById('ship-residential'); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
     // [2026-06-08] clear the order-summary band on Reset / New Quote (recalc may short-circuit on the empty quote)
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
