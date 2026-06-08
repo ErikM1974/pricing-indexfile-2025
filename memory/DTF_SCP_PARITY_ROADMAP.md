@@ -1,5 +1,9 @@
 # DTF + SCP → EMB Flagship: Order-Summary Parity Roadmap
 
+## ✅ PROGRESS
+- **Phase 0 — DONE + verified live (2026-06-08, v2026.06.08.1).** Created `shared_components/js/quote-order-summary.js` (Order Recap + Ship-To card + `getShipFields()` accessor; selector-agnostic via `QuoteOrderSummary.configure()`). EMB rewired to configure it; output byte-identical (verified in prod browser — recap + ship-to card render exactly as before). De-scoped `.ship-to-card` shell → shared. Locked by `tests/unit/quote-order-summary.test.js` + the edit-reload harness now injects the module first. 1005 unit tests pass. NOTE: `relocateOrderFooter` was already gone (footer is static HTML) — not part of the extraction.
+- **NEXT → Phase 1** (shared estimator + modal): move `estimateShipping`/`perBoxForCategory`/box-density cache + `openShippingModal` into the module, reading products via a per-builder `collectProducts()` callback + writing the fee via the accessor.
+
 **Derived from live source (2026-06-07).** The 3 audit inputs arrived null, so current-state was reverse-engineered from `embroidery-quote-builder.{js,html}` (flagship), `dtf-quote-builder.{js,html}`, `screenprint-quote-builder.{js,html}`, `quote-builder-utils.js`, and the band CSS. Reference architecture doc: `memory/quote-builder-architecture.md`.
 
 **Core problem:** the EMB order-summary band (recap + ship-to card + estimator + footer) and ALL its supporting JS/CSS live in **EMB-only files** (`embroidery-quote-builder.js`, `embroidery-quote-builder-extracted.css`). DTF and SCP also use **two different ship-to field conventions** — DTF is id-based (`#ship-zip`), SCP is the shared `.os-ship-*` class panel. Any port must therefore be **selector-agnostic** and **promoted to shared files**, not copied.
