@@ -1,3 +1,8 @@
+## v2026.06.08.2 (2026.06.08)
+
+- docs(memory): Phase 0 DTF/SCP parity DONE + verified live; log the shared-extraction gotcha
+- Deploy v2026.06.08.2: consolidate freight boxes across whole order (fix multi-style over-quote)
+
 ## v2026.06.07.13 (2026.06.07)
 
 - Deploy v2026.06.07.13: freight estimate shows exact-vs-rough zone wording
