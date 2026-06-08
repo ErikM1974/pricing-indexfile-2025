@@ -52,6 +52,7 @@ dotenv.config();
 //   L775  /staff-dashboard-v2.html      → 301 redirect → /staff-dashboard.html
 //   L780  /staff-dashboard-legacy.html  → 301 redirect → /staff-dashboard.html
 //   L786  /staff-dashboard-v3/          → v3 dedicated URL (kept for old bookmarks)
+//   /quote-builders/dtg-quote-builder-legacy.html → 301 → dtg-quote-builder.html (legacy deleted 2026-06-08)
 //
 // LEGACY REDIRECTS
 //   L657  /calculators/embroidery-contract* → embroidery-pricing-all
@@ -1004,6 +1005,12 @@ app.get('/staff-dashboard-v2.html', (req, res) => {
 // Old v1 URL → redirect to canonical (file deleted 2026-05-28)
 app.get('/staff-dashboard-legacy.html', (req, res) => {
   res.redirect(301, '/staff-dashboard.html');
+});
+
+// Old DTG legacy builder → redirect to the flagship (legacy files deleted 2026-06-08:
+// dtg-quote-builder-legacy.html + dtg-quote-builder.js + dtg-quote-service.js — superseded by the v14 flagship).
+app.get('/quote-builders/dtg-quote-builder-legacy.html', (req, res) => {
+  res.redirect(301, '/quote-builders/dtg-quote-builder.html');
 });
 
 // v3 dedicated URL — preserved so any direct /staff-dashboard-v3/ bookmarks

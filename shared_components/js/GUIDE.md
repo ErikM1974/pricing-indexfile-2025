@@ -44,10 +44,8 @@
 | `dtg-integration.js` | Coordinates calculator, adapter, events |
 | `dtg-page-setup.js` | DTG calculator page initialization |
 | `dtg-pricing-service.js` | DTG pricing API service |
-| `dtg-quote-builder.js` | DTG quote builder controller |
-| `dtg-quote-pricing.js` | DTG quote pricing engine |
-| `dtg-quote-products.js` | DTG quote product manager |
-| `dtg-quote-service.js` | DTG quote save/email service |
+| `dtg-quote-pricing.js` | DTG quote pricing engine (⚠️ legacy — dead-code candidate) |
+| `dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — dead-code candidate) |
 | `dtg-quote-system.js` | DTG quote system orchestrator |
 | `dtg-product-recommendations.js` | Product recommendations for DTG |
 | `dtg-product-recommendations-modal.js` | Recommendations modal UI |
