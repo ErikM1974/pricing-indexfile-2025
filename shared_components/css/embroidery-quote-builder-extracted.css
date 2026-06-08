@@ -66,7 +66,9 @@
     background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
     padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.emb-builder #order-details-step.in-footer .flow-step-header { padding: 0 0 6px; cursor: default; }
+.emb-builder #order-details-step.in-footer .flow-step-head { padding: 0 0 8px; cursor: default; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; gap: 6px; }
+.emb-builder #order-details-step.in-footer .flow-step-num { display: none; } /* the "2" step badge is a sidebar-flow leftover */
+.emb-builder #order-details-step.in-footer label { font-size: 11px; color: #64748b; }
 .emb-builder .footer-notes-row { width: 100%; margin: 10px 0 0; }
 .emb-builder #notes-section.in-footer { margin: 0 !important; }
 

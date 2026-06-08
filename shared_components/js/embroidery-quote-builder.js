@@ -1977,29 +1977,8 @@ window.reestimateShipFromCard = reestimateShipFromCard;
 // sidebar into the bottom band, so the sidebar slims to Customer + Quote Summary + Push, and the order metadata
 // reviews in one footer alongside glance / ship-to / totals. EMB-only + reversible (delete this block to revert).
 // The moved blocks keep their IDs, so every date/terms/notes JS reference keeps working.
-function relocateOrderFooter() {
-    try {
-        const wrap = document.querySelector('.invoice-totals-wrap');
-        const orderDetails = document.getElementById('order-details-step');
-        const totalsBox = document.getElementById('invoice-totals-box');
-        const notes = document.getElementById('notes-section');
-        if (!wrap || !orderDetails || orderDetails.dataset.footerMoved) return;
-        wrap.classList.add('order-footer');
-        if (totalsBox) wrap.insertBefore(orderDetails, totalsBox); else wrap.appendChild(orderDetails);
-        orderDetails.classList.add('in-footer');
-        orderDetails.dataset.footerMoved = '1';
-        if (notes) {
-            let row = document.getElementById('footer-notes-row');
-            if (!row) { row = document.createElement('div'); row.id = 'footer-notes-row'; row.className = 'footer-notes-row'; wrap.parentNode.insertBefore(row, wrap.nextSibling); }
-            row.appendChild(notes);
-            notes.classList.add('in-footer');
-        }
-        // [2026-06-07] re-evaluate the Push button after the DOM move (defensive — never leave it stale/disabled)
-        if (typeof updatePushButtonState === 'function') updatePushButtonState();
-    } catch (e) { console.error('[relocateOrderFooter]', e); }
-}
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', relocateOrderFooter);
-else relocateOrderFooter();
+// [2026-06-07] Order-footer layout is now STATIC HTML — #order-details-step + #notes-section live directly in
+// `.invoice-totals-wrap.order-footer` (no runtime relocate, no flash). relocateOrderFooter() removed.
 
 function renderOrderRecap() {
     const el = document.getElementById('order-recap');
