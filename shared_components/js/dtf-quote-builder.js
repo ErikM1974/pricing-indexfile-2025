@@ -3363,6 +3363,7 @@ class DTFQuoteBuilder {
         }
 
         window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags, uncheck box, RE-CHECK include-tax on New Quote (else next quote bills $0 tax)
+        { const _r = document.getElementById('ship-residential'); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
         this.showToast('Started new quote', 'success');
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }
