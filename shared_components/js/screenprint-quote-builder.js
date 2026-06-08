@@ -4488,11 +4488,21 @@ if (typeof QuoteOrderSummary !== 'undefined') {
             zip:     '#spc-order-fields .os-ship-zip',
             method:  '#spc-order-fields .os-ship-method',
             fee:     '#spc-order-fields .os-shipping-fee',
+            residential: '#ship-residential',
         },
         recap: {
             company: '#company-name',
             name:    '#customer-name',
             custNum: '#customer-number',
+        },
+        // [2026-06-08] Commit 6: SCP adopts the shared UPS-Ground estimator. configure() auto-points _cfg.estimate
+        // at the module estimator (Re-estimate auto-lights). collectProductsFromTable returns {style, sizeBreakdown};
+        // the module filters p.style && !isService (SCP rows have no isService flag → p.style is the real guard).
+        estimateHooks: {
+            collectProducts: function () { return (typeof collectProductsFromTable === 'function') ? collectProductsFromTable() : []; },
+            onApplied: function () { if (typeof recalculatePricing === 'function') recalculatePricing(); },
+            btn: '#estimate-ship-btn',
+            result: '#estimate-ship-result',
         },
     });
 }

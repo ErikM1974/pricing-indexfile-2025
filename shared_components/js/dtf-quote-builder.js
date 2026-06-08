@@ -3382,11 +3382,28 @@ if (typeof QuoteOrderSummary !== 'undefined') {
             zip: '#ship-zip',
             method: '#ship-method',
             fee: '#dtf-shipping-fee',
+            residential: '#ship-residential',
         },
         recap: {
             company: '#company-name',
             name: '#customer-name',
             custNum: '#customer-number',
+        },
+        // [2026-06-08] Commit 5: DTF adopts the shared UPS-Ground estimator. configure() auto-points _cfg.estimate
+        // at the module estimator when estimateHooks is present, so the ship-to card's Re-estimate button auto-lights.
+        // DTF products are {styleNumber, quantities} → remap to the estimator's {style, sizeBreakdown}.
+        estimateHooks: {
+            collectProducts: function () {
+                return (window.dtfQuoteBuilder && dtfQuoteBuilder.products ? dtfQuoteBuilder.products : [])
+                    .map(function (p) { return { style: p.styleNumber, sizeBreakdown: p.quantities }; })
+                    .filter(function (p) { return p.style && Object.values(p.sizeBreakdown || {}).some(function (q) { return (parseInt(q) || 0) > 0; }); });
+            },
+            onApplied: function () {
+                if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
+                if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+            },
+            btn: '#estimate-ship-btn',
+            result: '#estimate-ship-result',
         },
     });
 }
