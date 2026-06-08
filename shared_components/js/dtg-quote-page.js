@@ -1388,6 +1388,7 @@
         });
     }
 
+    let _dtgSaveInFlight = false;
     async function handleSaveQuote() {
         if (aiState.savedQuoteID) {
             const url = `${location.origin}/quote/${encodeURIComponent(aiState.savedQuoteID)}`;
@@ -1399,12 +1400,30 @@
             }
             return;
         }
+        // [2026-06-08] Phase 1 Chunk C — reentrancy guard. The form's #dtgSaveBtn and the
+        // chat-panel #aiSaveQuoteBtn both call this; a fast double-click during the in-flight
+        // POST would CREATE a second quote_sessions + duplicate quote_items under one QuoteID.
+        if (_dtgSaveInFlight) return;
+        _dtgSaveInFlight = true;
         const saveBtn = document.getElementById('aiSaveQuoteBtn');
         if (saveBtn) saveBtn.disabled = true;
         try {
-            const priceQuote = aiState.currentPriceQuote;
-            const customer = aiState.currentCustomerFinal || {};
+            // [2026-06-08] Phase 1 Chunk C — the MANUAL inline-form is the source of truth
+            // when it has priced rows. aiState.currentPriceQuote is the AI chat's quote and
+            // does NOT reflect manual row/qty/tax edits (it's set ONLY from the PRICE_QUOTE
+            // block at :997). Prefer the live form quote so the saved record == the on-screen
+            // total (Erik's #1 rule) and so tax/wholesale (recomputeTaxRate, the single
+            // authority) persist. Fall back to the AI quote when the form has no priced rows.
+            let priceQuote = aiState.currentPriceQuote;
+            let customer = aiState.currentCustomerFinal || {};
             const draft = aiState.currentEmailDraft || {};
+            const formQuote = (window.DTGInlineForm && typeof window.DTGInlineForm.getSaveQuote === 'function')
+                ? window.DTGInlineForm.getSaveQuote()
+                : null;
+            if (formQuote && formQuote.lineItems && formQuote.lineItems.length) {
+                priceQuote = formQuote;
+                if (formQuote.customer) customer = { ...customer, ...formQuote.customer };
+            }
             if (!priceQuote || !priceQuote.lineItems || !priceQuote.lineItems.length) {
                 throw new Error('No price quote to save');
             }
@@ -1413,7 +1432,19 @@
             const lineItems = priceQuote.lineItems;
             const totals = priceQuote.totals || {};
             const subtotal = lineItems.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
-            const total = Number(totals.grandTotal) || subtotal;
+            // Canonical tax for the saved record. /invoice reconstructs
+            // grand = TotalAmount + TaxAmount (reading TaxAmount VERBATIM), so TotalAmount
+            // MUST be pre-tax — never bake tax in (the SCP/DTF double-tax bug). The form
+            // branch carries taxRate/taxAmount; the AI branch uses totals.taxEstimate.
+            let taxRate = Number(priceQuote.taxRate);
+            if (!Number.isFinite(taxRate)) taxRate = Number(totals.taxRate) || 0;
+            let taxAmount = Number(priceQuote.taxAmount);
+            if (!Number.isFinite(taxAmount)) taxAmount = Number(totals.taxAmount);
+            if (!Number.isFinite(taxAmount)) taxAmount = Number(totals.taxEstimate) || 0;
+            if (!taxRate && subtotal > 0 && taxAmount > 0) {
+                taxRate = Math.round((taxAmount / subtotal) * 10000) / 10000;
+            }
+            const isWholesale = !!priceQuote.isWholesale;
 
             // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
             // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
@@ -1436,13 +1467,34 @@
                 TotalQuantity: lineItems.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0),
                 SubtotalAmount: subtotal,
                 LTMFeeTotal: lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0),
-                TotalAmount: total,
+                // PRE-tax (matches EMB/SCP/DTF). /quote + /invoice add TaxAmount on top.
+                TotalAmount: subtotal,
+                // [2026-06-08] Phase 1 Chunk C — persist tax so saved record + /quote + /invoice
+                // + push agree. TaxRate is a DECIMAL (0.101) like EMB; readers normalize >1?/100.
+                TaxRate: taxRate,
+                TaxAmount: taxAmount,
+                IsWholesale: isWholesale ? 'Yes' : 'No',
                 Notes: JSON.stringify({
                     productType: 'dtg',
                     designNumber: customer.designNumber || null,
                     appliedRules: priceQuote.appliedRules || {},
                     customer,
                     emailSubject: draft.subject || '',
+                    // Chunk E (edit-reload) restores these so a reopened exempt/wholesale/
+                    // out-of-state quote doesn't silently revert to 10.1% Milton pickup.
+                    shipping: priceQuote.shipping || null,
+                    tax: {
+                        isWholesale,
+                        isTaxExempt: !!priceQuote.isTaxExempt,
+                        taxExemptNumber: priceQuote.taxExemptNumber || '',
+                        taxRate,
+                        taxRateSource: (priceQuote.shipping && priceQuote.shipping.taxRateSource) || '',
+                        taxAccount: priceQuote.taxAccount || '',
+                        taxAccountName: priceQuote.taxAccountName || '',
+                        taxRateOverride: (priceQuote.shipping && priceQuote.shipping.taxRateOverride != null)
+                            ? priceQuote.shipping.taxRateOverride : null,
+                        includeTax: priceQuote.shipping ? (priceQuote.shipping.includeTax !== false) : true,
+                    },
                 }),
                 ...(isEditMode ? { RevisionNumber: newRevision } : {}),
             };
@@ -1542,8 +1594,17 @@
             showToast('Save failed — check console');
             const btn = document.getElementById('aiSaveQuoteBtn');
             if (btn) btn.disabled = false;
+        } finally {
+            _dtgSaveInFlight = false;
         }
     }
+
+    // [2026-06-08] Phase 1 Chunk C — expose the save handler so the inline form's
+    // "Save & Get Link" button (dtg-inline-form.js #dtgSaveBtn) can trigger it. The
+    // file is an IIFE, so the form reaches handleSaveQuote only through window.
+    // Manual quotes were previously unsaveable (the chat-panel Save button is hidden
+    // without an AI quote); handleSaveQuote now reads the form via getSaveQuote().
+    window.dtgSaveQuote = handleSaveQuote;
 
     let toastTimer = null;
     function showToast(text) {
