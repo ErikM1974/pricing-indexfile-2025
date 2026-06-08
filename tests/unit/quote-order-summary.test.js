@@ -301,4 +301,14 @@ describe('SCP config (selector-agnostic: scoped .os-ship-* classes, no estimator
     expect(f.zip).toBe('98354');
     expect(f.fee).toBe(40);
   });
+  test('card empties once the ship fields are blanked (reset path — must clear .os-ship-* explicitly)', () => {
+    const w = setupSCP();
+    scpq(w, '.os-ship-address').value = '2025 Freeman Rd E';
+    scpq(w, '.os-ship-method').value = 'Ground';
+    w.QuoteOrderSummary.renderShipToCard();
+    expect(w.document.getElementById('ship-to-card').innerHTML).toContain('2025 Freeman Rd E'); // populated
+    ['.os-ship-address', '.os-ship-city', '.os-ship-zip', '.os-ship-method'].forEach(s => { scpq(w, s).value = ''; });
+    w.QuoteOrderSummary.renderShipToCard();
+    expect(w.document.getElementById('ship-to-card').innerHTML).toBe(''); // empty after blanking → no stale address
+  });
 });

@@ -755,6 +755,17 @@ function resetQuote() {
 
     // Reset order & shipping fields
     setOrderShippingData('spc-order-fields', {});
+    // [2026-06-08] setOrderShippingData({}) is a NO-OP for BLANKING (the shared util's setter guards `if (el && val)`),
+    // so explicitly clear the scoped .os-ship-* fields here — else the always-visible Ship-To card (Phase 3 band) would
+    // re-render the PRIOR quote's address on a new quote. SCP-local; does NOT touch the shared util. (adversarial-review gap)
+    ['.os-ship-address', '.os-ship-city', '.os-ship-zip', '.os-ship-method'].forEach(function (s) {
+        var el = document.querySelector('#spc-order-fields ' + s);
+        if (el) el.value = '';
+    });
+    var _shipStateReset = document.querySelector('#spc-order-fields .os-ship-state');
+    if (_shipStateReset) _shipStateReset.value = 'WA';
+    var _shipFeeReset = document.querySelector('#spc-order-fields .os-shipping-fee');
+    if (_shipFeeReset) _shipFeeReset.value = '0';
     const taxRateReset = document.getElementById('tax-rate-input');
     if (taxRateReset) taxRateReset.value = '10.1';
 
