@@ -238,6 +238,7 @@ class DTFQuoteBuilder {
                 }
 
                 this.showToast('Customer info loaded', 'success');
+                if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
             };
 
             customerLookup.bindToInput('customer-lookup', {
@@ -246,6 +247,7 @@ class DTFQuoteBuilder {
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
+                    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap when the lookup is cleared
                 }
             });
 
@@ -394,6 +396,9 @@ class DTFQuoteBuilder {
             const notesEl = document.getElementById('dtf-notes');
             if (notesEl && blob.specialNotes) notesEl.value = blob.specialNotes;
         } catch (_) { /* Notes not JSON — skip */ }
+        // [2026-06-08] reflect the loaded customer + ship-to in the order-summary band on edit-reload
+        // (belt-and-suspenders vs the recalc hook, which can short-circuit when qty is 0)
+        if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
     }
 
     /**
@@ -3326,7 +3331,32 @@ class DTFQuoteBuilder {
         }
 
         this.showToast('Started new quote', 'success');
+        if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }
+}
+
+// [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 2.
+// DTF selector map: fee is #dtf-shipping-fee (not #shipping-fee); no #ship-residential; no #it-shipping-amt
+// (recap drops the Shipping row); no logo model (logos omitted); no estimator/modal yet → estimate + editOnclick
+// omitted, so the module hides the Re-estimate + Edit buttons. quote-order-summary.js loads before this file.
+if (typeof QuoteOrderSummary !== 'undefined') {
+    QuoteOrderSummary.configure({
+        orderRecap: '#order-recap',
+        shipToCard: '#ship-to-card',
+        ship: {
+            address: '#ship-address',
+            city: '#ship-city',
+            state: '#ship-state',
+            zip: '#ship-zip',
+            method: '#ship-method',
+            fee: '#dtf-shipping-fee',
+        },
+        recap: {
+            company: '#company-name',
+            name: '#customer-name',
+            custNum: '#customer-number',
+        },
+    });
 }
 
 // Global instance

@@ -31,16 +31,20 @@ const FIELDS = `
   <input id="primary-position">
 `;
 
-function setup(logos) {
+function setup(logos, opts) {
+  opts = opts || {};
   const dom = new JSDOM(`<!DOCTYPE html><html><body>${FIELDS}</body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
   const { window } = dom;
   window.eval(SRC);
-  window.QuoteOrderSummary.configure({
+  const cfg = {
     orderRecap: '#order-recap', shipToCard: '#ship-to-card',
     ship: { address: '#ship-address', city: '#ship-city', state: '#ship-state', zip: '#ship-zip', method: '#ship-method', fee: '#shipping-fee', residential: '#ship-residential' },
     recap: { company: '#company-name', name: '#customer-name', custNum: '#customer-number', shippingDisplay: '#it-shipping-amt', logos: () => (logos || []) },
-    estimate: () => null, reestimateOnclick: 'reestimateShipFromCard()', editOnclick: 'openShippingModal()',
-  });
+    reestimateOnclick: 'reestimateShipFromCard()',
+  };
+  if (!opts.noEstimate) cfg.estimate = () => null;            // EMB-like: estimator present -> Re-estimate shows
+  if (!opts.noEdit) cfg.editOnclick = 'openShippingModal()';  // EMB-like: editor present -> Edit shows
+  window.QuoteOrderSummary.configure(cfg);
   return window;
 }
 const setV = (w, id, v) => { w.document.getElementById(id).value = v; };
@@ -101,6 +105,16 @@ describe('Ship-To card', () => {
     expect(h).toContain('&lt;b&gt;');
     expect(h).not.toContain('<b>&x</');
   });
+  test('hides Re-estimate + Edit when the builder supplies no estimator/editor (DTF-like config)', () => {
+    const w = setup(null, { noEstimate: true, noEdit: true });
+    setV(w, 'company-name', 'Acme Co'); setV(w, 'ship-address', '1 A St'); setV(w, 'ship-method', 'UPS Ground');
+    w.QuoteOrderSummary.renderShipToCard();
+    const h = html(w, 'ship-to-card');
+    expect(h).not.toContain('st-actions');
+    expect(h).not.toContain('Re-estimate');
+    expect(h).not.toContain('>Edit<');
+    expect(h).toContain('<div class="st-line st-co">Acme Co</div>');
+  });
 });
 
 describe('Order Recap', () => {
@@ -150,5 +164,66 @@ describe('getShipFields accessor (selector-agnostic linchpin)', () => {
     expect(f.method).toBe('UPS Ground');
     expect(f.fee).toBe(30);
     expect(f.residential).toBe(true);
+  });
+});
+
+// ---- DTF integration: the ACTUAL DTF selector config (fee=#dtf-shipping-fee, no shippingDisplay, no estimator) ----
+const DTF_FIELDS = `
+  <div id="order-recap"></div>
+  <div id="ship-to-card"></div>
+  <input id="company-name">
+  <input id="customer-name">
+  <input id="customer-number">
+  <input id="ship-address">
+  <input id="ship-city">
+  <input id="ship-state">
+  <input id="ship-zip">
+  <input id="ship-method">
+  <input id="dtf-shipping-fee" value="0">
+`;
+function setupDTF() {
+  const dom = new JSDOM(`<!DOCTYPE html><html><body>${DTF_FIELDS}</body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
+  const { window } = dom;
+  window.eval(SRC);
+  window.QuoteOrderSummary.configure({
+    orderRecap: '#order-recap', shipToCard: '#ship-to-card',
+    ship: { address: '#ship-address', city: '#ship-city', state: '#ship-state', zip: '#ship-zip', method: '#ship-method', fee: '#dtf-shipping-fee' },
+    recap: { company: '#company-name', name: '#customer-name', custNum: '#customer-number' },
+    // no shippingDisplay, no logos, no estimate, no editOnclick — DTF Phase 2
+  });
+  return window;
+}
+
+describe('DTF config (selector-agnostic: #dtf-shipping-fee, no shippingDisplay, no estimator)', () => {
+  test('recap shows Customer (+#) but NO Shipping row (shippingDisplay omitted)', () => {
+    const w = setupDTF();
+    w.document.getElementById('company-name').value = 'DTF Co';
+    w.document.getElementById('customer-number').value = '1234';
+    w.QuoteOrderSummary.renderOrderRecap();
+    const h = w.document.getElementById('order-recap').innerHTML;
+    expect(h).toContain('DTF Co');
+    expect(h).toContain('#1234');
+    expect(h).not.toContain('Shipping');
+    expect(h).not.toContain('Logo');
+  });
+  test('ship-to card reads #dtf-shipping-fee + renders NO action buttons', () => {
+    const w = setupDTF();
+    w.document.getElementById('ship-address').value = '1 A St';
+    w.document.getElementById('ship-method').value = 'Ground';
+    w.document.getElementById('dtf-shipping-fee').value = '25';
+    w.QuoteOrderSummary.renderShipToCard();
+    const h = w.document.getElementById('ship-to-card').innerHTML;
+    expect(h).toContain('1 A St');
+    expect(h).toContain('Ground');
+    expect(h).toContain('$25.00');
+    expect(h).not.toContain('st-actions');
+    expect(h).not.toContain('Re-estimate');
+  });
+  test('ship-to card hides on Customer Pickup', () => {
+    const w = setupDTF();
+    w.document.getElementById('ship-address').value = '1 A St';
+    w.document.getElementById('ship-method').value = 'Customer Pickup';
+    w.QuoteOrderSummary.renderShipToCard();
+    expect(w.document.getElementById('ship-to-card').innerHTML).toBe('');
   });
 });

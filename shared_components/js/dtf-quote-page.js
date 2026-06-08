@@ -118,6 +118,8 @@ function updateTaxCalculation() {
         taxRowEl.style.display = 'none';
         grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
+    // [2026-06-08] keep the order-summary band (recap + ship-to card) current on every recalc / tax / fee change
+    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 }
 
 // toggleAdditionalCharges() moved to quote-builder-utils.js
