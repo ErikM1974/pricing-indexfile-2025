@@ -1,3 +1,14 @@
+## v2026.06.08.23 (2026.06.08)
+
+- docs(memory): DTG parity roadmap + status (legacy deleted, exempt fixed, Phase 0 band done; Phases 1-2 planned)
+- docs(memory): DTG Phase 1 status + the save-flow blocker for Chunk C (manual form doesn't write aiState.currentPriceQuote)
+- docs(memory): DTG roadmap START-HERE handoff — resolved save-flow blocker + Phase 1/2 pickup steps + prompt
+- WIP(dtg): Phase 1 Chunks A+B — tax controls + single-authority threading (NOT deployed)
+- feat(dtg): Phase 1 — tax UI + wholesale + save-fidelity (Chunks C/D/E), verified
+- fix(dtg): resetForm must clear Phase 1 tax flags (reset-bleed → 0% tax)
+- docs(memory): DTG Phase 1 — reset-bleed fix + live TEST push results (OF-0055/0056)
+- Deploy v2026.06.08.23: 1 files (dtg-quote-builder.html,...)
+
 ## v2026.06.08.7 (2026.06.08)
 
 - docs(memory): SCP Phase 3 band DONE+reviewed+reset-fix; band parity COMPLETE across EMB/DTF/SCP
