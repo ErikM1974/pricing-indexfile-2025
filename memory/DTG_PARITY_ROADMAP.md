@@ -1,3 +1,35 @@
+# ⭐ NEXT SESSION — START HERE (DTG Phase 1 + 2)
+
+**Goal:** finish bringing the DTG flagship (`quote-builders/dtg-quote-builder.html` → `dtg-inline-form.js` + `dtg-quote-page.js`) to EMB/DTF/SCP parity: sales-tax UI controls + wholesale + the UPS estimator, all money-path-correct (screen = PDF = saved `/quote`+`/invoice` = ShopWorks push must AGREE).
+
+### ✅ Already shipped + safe in production (do NOT redo)
+- Legacy DTG builder DELETED (`dtg-quote-builder-legacy.html` + `dtg-quote-builder.js` + `dtg-quote-service.js`); legacy URL 301-redirects to the flagship (`server.js`). (v2026.06.08.21)
+- **Tax-EXEMPT bug FIXED** — `recomputeTaxRate()` (dtg-inline-form.js ~2239) zeros exempt customers; `pick()` (~2710) always re-derives. (v2026.06.08.20)
+- **PHASE 0 band DONE + verified live** — `quote-order-summary.js` loaded before `dtg-inline-form.js`; `#order-recap`+`#ship-to-card` mounted after `#dtgPriceSummary`; `configure()` in `init()`; `renderBand()` at `renderSummary()` end. (v2026.06.08.22)
+- **DTG's tax is CORRECT + SAFE as-is** (exempt + the existing per-address DOR engine). Phases 1/2 are enhancements, not correctness fixes.
+
+### 📦 Phase 1 Chunks A+B are BUILT but UNDEPLOYED — branch `dtg-phase1-wip` (pushed to origin)
+`git checkout dtg-phase1-wip` to get them. They add: state flags (`includeTax`/`taxRateOverride`/`isWholesale`); `#include-tax`+`#tax-rate-input`+`#wholesale-checkbox` controls in `#dtgShipToBlock` + CSS; handlers → `recomputeTaxRate()`; wholesale(2203)/opt-out/manual early-return branches in `recomputeTaxRate()` (the single tax authority). **Correct for on-screen + submit + PDF** (all read `state.shipping.taxRate`). ⚠️ **Do NOT deploy A+B without Chunk C** — the saved record would drop the tax (the EMB/SCP desync bug class).
+
+### 🔑 RESOLVED ARCHITECTURE (the blocker, untangled — read before Chunk C)
+DTG's manual inline-form **does NOT save sessions itself.** Saving goes through the **CHAT panel's "Save & share link"** button → `handleSaveQuote()` (dtg-quote-page.js ~1391), which reads `aiState.currentPriceQuote` — set ONLY by the AI chat's `parsePriceQuote()` (dtg-quote-page.js:997). The inline-form (`state` in dtg-inline-form.js) **never writes `aiState.currentPriceQuote`** (grep-confirmed). Proof: dtg-inline-form.js:3798 tells the rep *"Open the chat panel (✨ Ask) and click 'Save & share link'"*.
+
+### 🚦 Chunk C — INVESTIGATE THIS FIRST (the real Phase-1 work)
+1. **Does `handleSaveQuote` reflect MANUAL inline-form edits at all?** If `aiState.currentPriceQuote` is the AI's original quote and the rep then manually edits rows/qty in the inline-form, the save may persist STALE data — a bug bigger than tax. Trace whether anything syncs the inline-form `state` → `aiState.currentPriceQuote` on edit. If nothing does, that sync is the foundation Chunk C builds on.
+2. **Tax bridge (once #1 is understood):** expose the inline-form's live tax for the save. Cleanest: in `dtg-inline-form.js`, whenever `recomputeTaxRate()` runs, write `window._dtgTaxBridge = { taxRate: state.shipping.taxRate, taxAmount, isWholesale: state.customer.isWholesale, includeTax: state.shipping.includeTax }`. Then in `handleSaveQuote`'s `sessionPayload` (dtg-quote-page.js ~1428): keep `TotalAmount = subtotal` (pre-tax — already is), and ADD `TaxRate: window._dtgTaxBridge.taxRate` (DECIMAL like EMB, e.g. 0.101 — NOT percent), `TaxAmount: round(subtotal*taxRate)`, `IsWholesale: window._dtgTaxBridge.isWholesale`. Then `/quote`+`/invoice` reconstruct grand = TotalAmount+TaxAmount and the shared `embroidery-quote-invoice.js` reads the real rate. (1f below — the `computePriceQuoteFromState` tax bridge at dtg-inline-form.js:3816 — feeds the PDF; verify the PDF still foots after.)
+3. **VERIFY the full matrix** (below) — screen == PDF == saved == push-preview for each.
+
+### Chunk D (submit wholesale) + E (edit-reload restore) + PHASE 2 (estimator)
+See §1h, §1i, §PHASE 2 in the detailed plan below. Phase 2 (estimator + billable shipping) is HIGH risk — it moves the taxed total; do it LAST, after Phase 1's matrix is green.
+
+### Regression matrix (run for Phase 1, re-run with shipping for Phase 2)
+pickup(10.1%/2200.101) · in-WA(DOR rate/2200) · out-of-state(0%/2202) · exempt(0%/2204) · **wholesale(0%/2203)** · manual-override(entered%) · include-tax-unchecked(0%) — each: on-screen `#dtgPriceSummary` total == printed PDF GRAND TOTAL == saved `TotalAmount+TaxAmount` == ShopWorks push-preview. Then save → reopen `?edit=DTG…` → rate/account/wholesale survive (don't revert to pickup).
+
+### 📋 Copy-paste pickup prompt for the new session
+> Resume DTG parity. Read `memory/DTG_PARITY_ROADMAP.md` (START HERE section). Phase 0 + exempt fix are deployed & safe. Phase 1 Chunks A+B are on branch `dtg-phase1-wip` (tax controls + recomputeTaxRate threading). FIRST: investigate whether `handleSaveQuote` (dtg-quote-page.js) reflects manual inline-form edits (the inline-form never writes `aiState.currentPriceQuote`). Then build Chunk C (save-fidelity: bridge the inline-form's tax to the saved `sessionPayload` via `window._dtgTaxBridge` + add `TaxRate`/`TaxAmount`/`IsWholesale`), then D (submit wholesale + server.js GL-2203 branch), E (edit-reload restore), then Phase 2 (estimator). Run the full regression matrix (screen==PDF==saved==push) before each deploy. Money-path — verify, don't assume.
+
+---
+
 All maps are verified accurate against the live code. The four input maps (TAX/SUMMARY, SHIP/BAND, SAVE/SUBMIT) are correct and internally consistent. I have everything needed to write the plan.
 
 ---
