@@ -173,6 +173,10 @@ class DTFQuoteBuilder {
             this.updatePricing();
         }
 
+        // [2026-06-08] Repaint the order-summary band after a draft recovery — restoreDraft writes #customer-name /
+        // #company-name, but updatePricing() above is gated on products + short-circuits on zero qty, so the recap
+        // could otherwise stay empty until the next field edit. (Adversarial-review gap, DTF Phase 2.)
+        if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
     }
 
     /**
