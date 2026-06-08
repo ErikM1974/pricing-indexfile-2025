@@ -2102,6 +2102,19 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   const shState = String(ship?.state || info?.state || '').toUpperCase();
   const isOutOfState = !isPickup && shState && shState !== 'WA';
 
+  // Wholesale / reseller (WA reseller permit on file) → no tax, GL 2203. HIGHEST
+  // priority — matches recomputeTaxRate's ordering (wholesale wins over exempt /
+  // out-of-state / pickup), so a wholesale customer with an out-of-state ship-to
+  // still books to 2203, not 2202. (2026-06-08 Phase 1 Chunk D — DTG/EMB/SCP/DTF)
+  if (info?.isWholesale) {
+    lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    lines.push(`Tax: DO NOT APPLY (wholesale / reseller)`);
+    lines.push(`Tax Account: 2203 — Wholesale Sales (WA reseller permit)`);
+    lines.push(`Reason: Customer marked Wholesale / reseller — sale for resale, no retail tax`);
+    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    return lines;
+  }
+
   // Tax-exempt customer (cert on file) → short-circuit
   if (info?.isTaxExempt) {
     const cert = info.taxExemptNumber || '(no cert # on file)';

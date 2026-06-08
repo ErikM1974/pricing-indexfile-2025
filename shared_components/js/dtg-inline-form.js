@@ -979,12 +979,16 @@
                                     </div>
                                 </div>
                                 <div class="dcp-tax-status" id="dtgTaxStatus"></div>
-                                <!-- [2026-06-08] Phase 1 tax controls — include-tax toggle + manual rate override + wholesale -->
-                                <div class="dtg-tax-controls" id="dtgTaxControls">
-                                    <label class="dtg-tax-ctl"><input type="checkbox" id="include-tax" ${state.shipping.includeTax !== false ? 'checked' : ''}> Include sales tax</label>
-                                    <label class="dtg-tax-ctl">Rate <input type="number" id="tax-rate-input" step="0.1" min="0" max="20" placeholder="auto" value="${state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : ''}"> %</label>
-                                    <label class="dtg-tax-ctl"><input type="checkbox" id="wholesale-checkbox" ${state.customer.isWholesale ? 'checked' : ''}> Wholesale / reseller — no tax (GL 2203)</label>
-                                </div>
+                            </div>
+                            <!-- [2026-06-08] Phase 1 tax controls — include-tax / manual rate / wholesale.
+                                 MOVED OUT of #dtgShipToBlock (which is hidden when Customer Pickup is ON)
+                                 so they're reachable for pickup orders too — ~95% of DTG volume, and
+                                 wholesale/reseller customers are largely the local-pickup crowd.
+                                 recomputeTaxRate() is the single authority for all three. -->
+                            <div class="dtg-tax-controls" id="dtgTaxControls">
+                                <label class="dtg-tax-ctl"><input type="checkbox" id="include-tax" ${state.shipping.includeTax !== false ? 'checked' : ''}> Include sales tax</label>
+                                <label class="dtg-tax-ctl">Rate <input type="number" id="tax-rate-input" step="0.1" min="0" max="20" placeholder="auto" value="${state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : ''}"> %</label>
+                                <label class="dtg-tax-ctl"><input type="checkbox" id="wholesale-checkbox" ${state.customer.isWholesale ? 'checked' : ''}> Wholesale / reseller — no tax (GL 2203)</label>
                             </div>
                         </div>
 
@@ -1005,6 +1009,14 @@
                              Print works from current state at any time. Email requires a
                              saved quote ID (sets after "Save & share link" in chat panel). -->
                         <div class="dtg-secondary-actions">
+                            <!-- [2026-06-08] Phase 1 Chunk C — Save button on the FORM (manual-first
+                                 parity with EMB/DTF/SCP). Saves the manual quote (with tax/wholesale)
+                                 to quote_sessions via dtg-quote-page's handleSaveQuote; first click
+                                 saves, second copies the share link. Manual quotes were previously
+                                 unsaveable (the chat-panel Save button is hidden without an AI quote). -->
+                            <button type="button" class="dtg-secondary-btn" id="dtgSaveBtn" title="Save this quote &amp; get a shareable link">
+                                <i class="fas fa-floppy-disk"></i> Save &amp; Get Link
+                            </button>
                             <button type="button" class="dtg-secondary-btn" id="dtgPrintBtn" title="Open printable PDF-quality invoice of this quote">
                                 <i class="fas fa-print"></i> Print Quote
                             </button>
@@ -1269,10 +1281,19 @@
         const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
         const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
         const taxPct = (taxRate * 100).toFixed(taxRate * 100 < 10 ? 1 : 2);
-        const taxLabel = isPickup
+        // [2026-06-08] Phase 1 — label the new 0% sources (wholesale/exempt/opt-out/manual)
+        // set by recomputeTaxRate. The DOLLAR amount is already correct (taxRate is 0 for
+        // these); this only makes the row TEXT honest instead of "out of state — 0%".
+        const src = state.shipping.taxRateSource;
+        const taxLabel =
+            src === 'wholesale'   ? 'Tax (wholesale / reseller — 0%)' :
+            src === 'tax-exempt'  ? 'Tax (tax-exempt customer — 0%)' :
+            src === 'tax-opt-out' ? 'Tax (not included)' :
+            src === 'manual'      ? `Tax (manual rate ${taxPct}%)` :
+            isPickup
             ? `Tax (pickup, Milton WA ${taxPct}%)`
             : (!shState || shState === 'WA')
-                ? (state.shipping.taxRateSource === 'dor-lookup' || state.shipping.taxRateSource === 'dor-fallback'
+                ? (src === 'dor-lookup' || src === 'dor-fallback'
                     ? `Tax (${escapeHtml(state.shipping.city || 'WA destination')} ${taxPct}%)`
                     : `Tax (WA destination — enter city + ZIP)`)
                 : `Tax (out of state — 0%)`;
@@ -1541,6 +1562,16 @@
 
         const { items, blockers, warnings, ready } = computeReadiness();
         btn.disabled = state.submitting || !ready;
+
+        // [2026-06-08] Phase 1 Chunk C — enable Save once any row is fully priced
+        // (looser than Submit, which also needs email/design). Lets a rep save a
+        // draft quote + share link before the full push-readiness gate passes.
+        const saveBtn = document.getElementById('dtgSaveBtn');
+        if (saveBtn) {
+            const anyPriced = state.rows.some(r =>
+                r.style && r.color && Object.keys(r.sizes || {}).length > 0 && Number(r._lineTotal) > 0);
+            saveBtn.disabled = !anyPriced;
+        }
 
         if (panel) {
             const quoteID = getQuoteID();
@@ -2000,6 +2031,20 @@
         // Submit
         const submit = document.getElementById('dtgSubmitBtn');
         if (submit) submit.addEventListener('click', () => submitToShopWorks());
+
+        // [2026-06-08] Phase 1 Chunk C: Save & Get Link — saves the MANUAL quote
+        // (with tax/wholesale) to quote_sessions. Delegates to dtg-quote-page's
+        // handleSaveQuote (exposed as window.dtgSaveQuote), which now reads this
+        // form's quote via getSaveQuote() instead of the AI chat's stale quote.
+        // Gated on a fully-priced row so an empty form can't save a blank quote.
+        const saveBtn = document.getElementById('dtgSaveBtn');
+        if (saveBtn) saveBtn.addEventListener('click', () => {
+            if (typeof window.dtgSaveQuote === 'function') {
+                window.dtgSaveQuote();
+            } else {
+                alert('Save is unavailable — please refresh and try again.');
+            }
+        });
 
         // Phase 11.4 (2026-05-24): Print Quote — opens a PDF-quality invoice
         // in a new window for the rep to print/save. Works from current form
@@ -3452,7 +3497,7 @@
         const code = effectiveLocationCode();
         const cq = combinedQty();
         if (!code || cq === 0 || !window.DTGPricingService) {
-            for (const r of state.rows) { r._perPiece = null; r._lineTotal = 0; r._priceError = null; }
+            for (const r of state.rows) { r._perPiece = null; r._lineTotal = 0; r._priceError = null; r._priceBySize = {}; r._ltmPP = 0; r._baseUnit = null; r._tierLabel = null; }
             _lastTier = null; _allTiers = null; _lastPerPiece = null;
             renderPriceErrorBanner(null);
             renderTable();
@@ -3465,6 +3510,12 @@
         const _erroredStyles = new Set();
 
         for (const row of state.rows) {
+            // [2026-06-08] Phase 1 Chunk C fix — clear ALL derived price fields up front so a
+            // row that fails to price (invalid color / API error / no tier) cannot leak STALE
+            // _priceBySize/_ltmPP/_baseUnit/_tierLabel into the PDF (dtgPrintQuote re-derives the
+            // invoice subtotal from _priceBySize) or the saved quote_items. The success path
+            // below repopulates them for priced rows.
+            row._priceBySize = {}; row._ltmPP = 0; row._baseUnit = null; row._tierLabel = null;
             if (!row.style || !row.color) { row._perPiece = null; row._lineTotal = 0; continue; }
             // Block pricing on rows where the rep typed a color the catalog
             // doesn't have (no catalogColor → no SanMar match → invalid).
@@ -3528,11 +3579,20 @@
                 }
                 row._perPiece = count > 0 ? Math.round((aggregate / count) * 100) / 100 : null;
                 row._lineTotal = Math.round(lineTotal * 100) / 100;
+                // [2026-06-08] Phase 1 Chunk C — stash the breakdown the SAVE path needs
+                // (computePriceQuoteFromState → handleSaveQuote item map). _perPiece is the
+                // LTM-amortized weighted unit; ltmPP is added uniformly to every size's final,
+                // so the weighted base = _perPiece − ltmPP. _tierLabel drives PricingTier.
+                row._ltmPP = ltmPP;
+                row._baseUnit = row._perPiece != null ? Math.round((row._perPiece - ltmPP) * 100) / 100 : null;
+                row._tierLabel = tier.TierLabel;
                 if (row._perPiece && _lastPerPiece == null) _lastPerPiece = row._perPiece;
             } catch (err) {
                 console.error('[dtg-inline-form] row price update failed:', row.style, err);
                 row._perPiece = null;
                 row._lineTotal = 0;
+                row._ltmPP = 0;
+                row._baseUnit = null;
                 row._priceError = (err && err.message) || 'pricing error';
                 _anyPriceError = true; _erroredStyles.add(row.style);
             }
@@ -3819,12 +3879,26 @@
         // The old code read window.aiState.lastPriceQuote (never assigned anywhere)
         // and r.previewUnit (never written) → every printed line priced at $0 while
         // the on-screen live table showed correct dollars. (2026-06-01)
+        // DTG's print location is shared across all rows (not per-line).
+        const locCode = effectiveLocationCode();
+        const locLabel = effectiveLocationLabel();
         const lineItems = state.rows
-            .filter(r => r.style && r.color && Object.keys(r.sizes || {}).length > 0)
+            // [2026-06-08] Phase 1 Chunk C fix — exclude invalid-color rows (mirror combinedQty +
+            // updateLivePrices) so the saved record + PDF match the on-screen subtotal, which
+            // already drops them. Without this an invalidated row saves a $0 line + inflates qty.
+            .filter(r => r.style && r.color && !isRowColorInvalid(r) && Object.keys(r.sizes || {}).length > 0)
             .map(r => {
                 const totalQty = Object.values(r.sizes).reduce((s, q) => s + (Number(q) || 0), 0);
                 const unitPrice = Number(r._perPiece) || 0;
                 const lineTotal = Number(r._lineTotal) || (unitPrice * totalQty);
+                // [2026-06-08] Phase 1 Chunk C — emit the FULL item shape handleSaveQuote's item
+                // map reads (baseUnitPrice/ltmPerUnit/tier/location). Omitting these saved
+                // BaseUnitPrice=0/LTMPerUnit=0/HasLTM=No → LTM silently stripped from the record
+                // (the DTF under-pricing bug class). _ltmPP/_baseUnit/_tierLabel come from updateLivePrices.
+                const ltmPerUnit = Number(r._ltmPP) || 0;
+                const baseUnit = (r._baseUnit != null)
+                    ? Number(r._baseUnit)
+                    : Math.round((unitPrice - ltmPerUnit) * 100) / 100;
                 return {
                     style: r.style,
                     color: r.color,
@@ -3832,19 +3906,44 @@
                     sizes: r.sizes,
                     priceBySize: r._priceBySize || {},
                     totalQuantity: totalQty,
+                    baseUnitPrice: baseUnit,
+                    ltmPerUnit: ltmPerUnit,
                     finalUnitPrice: unitPrice,
                     lineTotal: lineTotal,
+                    locationCode: locCode,
+                    locationLabel: locLabel,
+                    tier: r._tierLabel || (_lastTier && (_lastTier.TierLabel || _lastTier.tierLabel)) || 'Standard',
                 };
             });
-        const subtotal = lineItems.reduce((s, li) => s + (li.lineTotal || 0), 0);
+        const subtotal = Math.round(lineItems.reduce((s, li) => s + (li.lineTotal || 0), 0) * 100) / 100;
         const combinedQuantity = lineItems.reduce((s, li) => s + (li.totalQuantity || 0), 0);
+        const totalLtmFee = Math.round(lineItems.reduce((s, li) => s + ((li.ltmPerUnit * li.totalQuantity) || 0), 0) * 100) / 100;
+        // [2026-06-08] Phase 1 Chunk C — tax rides from the SINGLE authority
+        // (recomputeTaxRate → state.shipping.taxRate, a DECIMAL). It is ALREADY 0 for
+        // wholesale / exempt / out-of-state / opt-out, so no re-check is needed here.
+        const taxRate = Number(state.shipping.taxRate) || 0;
+        const taxAmount = Math.round(subtotal * taxRate * 100) / 100;
+        const grandTotal = Math.round((subtotal + taxAmount) * 100) / 100;
         return {
             lineItems,
             combinedQuantity,
             subtotal,
-            grandTotal: subtotal,
-            totalLtmFee: 0,
+            grandTotal,
+            totalLtmFee,
             tier: (_lastTier && (_lastTier.TierLabel || _lastTier.tierLabel)) || 'Standard',
+            locationCode: locCode,
+            locationLabel: locLabel,
+            // Tax block consumed by the SAVE path (dtg-quote-page handleSaveQuote).
+            // taxRate is a DECIMAL (0.101) — matches EMB; quote-view/invoice normalize >1?/100,
+            // so decimal round-trips. DO NOT change to percent or /invoice's verbatim TaxAmount breaks.
+            taxRate,
+            taxAmount,
+            taxAccount: state.shipping.taxAccount || '',
+            taxAccountName: state.shipping.taxAccountName || '',
+            isWholesale: !!(state.customer && state.customer.isWholesale),
+            isTaxExempt: !!(state.customer && state.customer.isTaxExempt),
+            taxExemptNumber: (state.customer && state.customer.taxExemptNumber) || '',
+            totals: { subtotal, taxRate, taxAmount, grandTotal },
         };
     }
 
@@ -4009,14 +4108,15 @@
             };
         });
 
-        // Tax — derive from state.shipping.taxRate (set by recomputeTaxRate()).
-        // Pickup = 0.101, out-of-state = 0, in-WA = DOR destination city rate.
-        // This MUST match the rate the rep saw in the live preview at submit time.
-        const shStateUC = (state.shipping.state || '').toUpperCase();
+        // Tax — derive ONLY from state.shipping.taxRate (recomputeTaxRate is the single
+        // authority: it already zeroes the rate for out-of-state / exempt / wholesale /
+        // opt-out, sets the manual rate, and uses the DOR rate in-WA / 0.101 pickup).
+        // [2026-06-08] Phase 1 Chunk D fix — REMOVED the redundant out-of-state guard that
+        // re-zeroed tax here: it desynced the push from screen/saved/PDF when a rep set a
+        // MANUAL rate on an out-of-state ship-to (manual outranks out-of-state in the authority,
+        // so screen/saved showed the manual rate but the push booked $0). Push now == screen.
         const taxRate = Number(state.shipping.taxRate);
-        const taxEstimate = (!isPickup && shStateUC && shStateUC !== 'WA')
-            ? 0
-            : Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
+        const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
         const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
 
         const body = {
@@ -4060,6 +4160,13 @@
                 terms: state.customer.terms || 'Prepaid',
                 paymentTerms: state.customer.terms || 'Prepaid',
                 taxable: true,
+                // [2026-06-08] Phase 1 Chunk D — flow the tax-status flags so server.js
+                // buildOrderNote renders the right Notes On Order block. Wholesale →
+                // GL 2203 (no tax); exempt → DO NOT APPLY. ship.taxAccount already carries
+                // 2203/2204/2202, but buildOrderNote branches on these info.* flags.
+                isWholesale: !!(state.customer && state.customer.isWholesale),
+                isTaxExempt: !!(state.customer && state.customer.isTaxExempt),
+                taxExemptNumber: (state.customer && state.customer.taxExemptNumber) || '',
                 quoteId: getQuoteID() || '',
             },
             rows,
@@ -4544,6 +4651,64 @@
         state.customer.lastName   = c.lastName  || nameParts.slice(1).join(' ') || '';
         state.customer.designNumber = notes.designNumber || '';
 
+        // [2026-06-08] Phase 1 Chunk E — restore shipping + tax + wholesale/exempt so a
+        // reopened exempt/wholesale/out-of-state/manual quote does NOT silently revert to
+        // 10.1% Milton pickup (the EMB/SCP/DTF edit-reload bug class). Source: Notes.shipping
+        // (full block) + Notes.tax, with the session.TaxRate/IsWholesale columns as fallback
+        // for older records. recomputeTaxRate() (called after render below) then RE-DERIVES
+        // authoritatively from the restored state — these flags drive its early-return branches.
+        const savedShip = notes.shipping || {};
+        const savedTax = notes.tax || {};
+        if (savedShip.method) state.shipping.method = savedShip.method;
+        state.shipping.address1 = savedShip.address1 || '';
+        state.shipping.address2 = savedShip.address2 || '';
+        state.shipping.city     = savedShip.city || '';
+        state.shipping.state    = savedShip.state || '';
+        state.shipping.zip      = savedShip.zip || '';
+        state.shipping.includeTax = (savedTax.includeTax != null) ? !!savedTax.includeTax
+                                   : (savedShip.includeTax != null ? !!savedShip.includeTax : true);
+        state.shipping.taxRateOverride = (savedTax.taxRateOverride != null) ? Number(savedTax.taxRateOverride)
+                                       : (savedShip.taxRateOverride != null ? Number(savedShip.taxRateOverride) : null);
+        state.customer.isWholesale = (savedTax.isWholesale != null)
+            ? !!savedTax.isWholesale
+            : (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
+        if (savedTax.isTaxExempt != null) state.customer.isTaxExempt = !!savedTax.isTaxExempt;
+        if (savedTax.taxExemptNumber != null) state.customer.taxExemptNumber = savedTax.taxExemptNumber;
+        // Seed the rate from the saved column (DTG stores DECIMAL; normalize >1?/100 for
+        // any legacy percent rows) so the first render shows the saved rate before the
+        // async DOR re-lookup completes — not the 10.1% default.
+        const _savedRate = parseFloat(session.TaxRate);
+        if (Number.isFinite(_savedRate)) {
+            state.shipping.taxRate = _savedRate > 1 ? _savedRate / 100 : _savedRate;
+        } else if (savedTax.taxRate != null) {
+            state.shipping.taxRate = Number(savedTax.taxRate);
+        }
+        if (savedShip.taxRateSource) state.shipping.taxRateSource = savedShip.taxRateSource;
+        if (savedTax.taxAccount) state.shipping.taxAccount = savedTax.taxAccount;
+        if (savedTax.taxAccountName) state.shipping.taxAccountName = savedTax.taxAccountName;
+        // Sync the static ship-to + tax controls (rendered ONCE from default state in render(),
+        // BEFORE this runs) to the restored state. CRITICAL: without re-syncing the ship method +
+        // pickup toggle, a reopened SHIPPED quote shows pickup-toggle CHECKED + ship-to hidden;
+        // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.1%,
+        // silently re-taxing an out-of-state (0%) or mis-taxing an in-WA-destination quote.
+        try {
+            const incEl = document.getElementById('include-tax');
+            if (incEl) incEl.checked = state.shipping.includeTax !== false;
+            const rateEl = document.getElementById('tax-rate-input');
+            if (rateEl) rateEl.value = state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : '';
+            const wholeEl = document.getElementById('wholesale-checkbox');
+            if (wholeEl) wholeEl.checked = state.customer.isWholesale;
+            // Ship method + address inputs + pickup toggle / ship-to block visibility.
+            const methodEl = document.getElementById('dtgShipMethod');
+            if (methodEl) methodEl.value = state.shipping.method || 'Customer Pickup';
+            const setShip = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setShip('dtgShipAddress1', state.shipping.address1);
+            setShip('dtgShipCity', state.shipping.city);
+            setShip('dtgShipState', state.shipping.state);
+            setShip('dtgShipZip', state.shipping.zip);
+            if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
+        } catch (_) { /* controls may be absent on older markup */ }
+
         // Print location — the saved items all share the same printLocation
         // (DTG: location is global, not per-line). PrintLocation is saved as a
         // STRUCTURED value {front, back, combined} (an object, or a JSON string),
@@ -4609,6 +4774,10 @@
         renderLocationPills();
         renderTable();
         renderSummary();
+        // [2026-06-08] Phase 1 Chunk E — re-derive tax from the just-restored shipping/
+        // wholesale/exempt/manual state (single authority). Without this a reopened
+        // non-pickup quote would keep the default 10.1% until the rep touched a field.
+        recomputeTaxRate();
         for (const row of state.rows) {
             if (row.style && row.color) kickInventoryFetch(row);
             if (row.style) {
@@ -4907,6 +5076,43 @@
         getState,
         resetForm,
         submitToShopWorks,
+        // [2026-06-08] Phase 1 Chunk C — the SAVE path (dtg-quote-page handleSaveQuote) reads
+        // this so the saved quote_session reflects the MANUAL form (the on-screen total), not
+        // the AI chat's stale currentPriceQuote. Returns the tax-bearing, item-complete quote
+        // plus the customer + shipping/tax blocks the save + edit-reload (Chunk E) need.
+        // null when the form has no priced rows (handleSaveQuote then falls back to the AI quote).
+        getSaveQuote: () => {
+            const pq = computePriceQuoteFromState();
+            if (!pq || !pq.lineItems || !pq.lineItems.length) return null;
+            pq.customer = {
+                name: [state.customer.firstName, state.customer.lastName].filter(Boolean).join(' '),
+                firstName: state.customer.firstName || '',
+                lastName: state.customer.lastName || '',
+                company: state.customer.company || '',
+                companyId: state.customer.companyId || '',
+                email: state.customer.email || '',
+                phone: state.customer.phone || '',
+                designNumber: state.customer.designNumber || '',
+            };
+            pq.shipping = {
+                method: state.shipping.method,
+                address1: state.shipping.address1 || '',
+                address2: state.shipping.address2 || '',
+                city: state.shipping.city || '',
+                state: state.shipping.state || '',
+                zip: state.shipping.zip || '',
+                taxRate: state.shipping.taxRate,
+                taxRateSource: state.shipping.taxRateSource || '',
+                taxAccount: state.shipping.taxAccount || '',
+                taxAccountName: state.shipping.taxAccountName || '',
+                taxRateOverride: state.shipping.taxRateOverride,
+                includeTax: state.shipping.includeTax !== false,
+            };
+            return pq;
+        },
+        // True when at least one row is fully priced — gates the form's Save button.
+        hasCompleteRows: () => state.rows.some(r =>
+            r.style && r.color && Object.keys(r.sizes || {}).length > 0 && Number(r._lineTotal) > 0),
         // C9 — chat controller calls this before fillFromQuote() to decide
         // whether to warn about overwriting user edits.
         isDirty: () => state.dirtyAfterChatFill,
