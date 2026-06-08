@@ -153,9 +153,16 @@ class DTFQuoteService {
             const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
 
             // Calculate tax
+            // [2026-06-08] P0: store PRE-TAX all-in (products + fees − discount + shipping) for BOTH SubtotalAmount
+            // + TotalAmount (mirror EMB). The old code double-taxed quoteData.total (already tax-inclusive) at a
+            // hardcoded 10.1%, corrupting the /quote + /invoice mirror + ignoring the rep's rate + include-tax toggle.
+            // The shared invoice generator applies tax on top from TaxRate.
             const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
-            const salesTax = parseFloat((quoteData.total * this.taxRate).toFixed(2));
-            const totalWithTax = parseFloat((quoteData.total + salesTax).toFixed(2));
+            const preTaxAllIn = parseFloat((quoteData.preTaxSubtotal != null ? quoteData.preTaxSubtotal : quoteData.subtotal).toFixed(2));
+            const _realRatePct = parseFloat(quoteData.taxRate);
+            const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
+            const includeTax = quoteData.includeTax !== false;
+            const salesTax = includeTax ? parseFloat((preTaxAllIn * _realRate).toFixed(2)) : 0;
 
             // Prepare session data
             const sessionData = {
@@ -165,9 +172,9 @@ class DTFQuoteService {
                 CustomerName: quoteData.customerName || 'Guest',
                 CompanyName: quoteData.companyName || '',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: subtotal,
+                SubtotalAmount: preTaxAllIn,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: totalWithTax,
+                TotalAmount: preTaxAllIn,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
@@ -647,9 +654,16 @@ class DTFQuoteService {
             const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
 
             // Calculate tax
+            // [2026-06-08] P0: store PRE-TAX all-in (products + fees − discount + shipping) for BOTH SubtotalAmount
+            // + TotalAmount (mirror EMB). The old code double-taxed quoteData.total (already tax-inclusive) at a
+            // hardcoded 10.1%, corrupting the /quote + /invoice mirror + ignoring the rep's rate + include-tax toggle.
+            // The shared invoice generator applies tax on top from TaxRate.
             const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
-            const salesTax = parseFloat((quoteData.total * this.taxRate).toFixed(2));
-            const totalWithTax = parseFloat((quoteData.total + salesTax).toFixed(2));
+            const preTaxAllIn = parseFloat((quoteData.preTaxSubtotal != null ? quoteData.preTaxSubtotal : quoteData.subtotal).toFixed(2));
+            const _realRatePct = parseFloat(quoteData.taxRate);
+            const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
+            const includeTax = quoteData.includeTax !== false;
+            const salesTax = includeTax ? parseFloat((preTaxAllIn * _realRate).toFixed(2)) : 0;
 
             // Prepare updated session data
             const sessionData = {
@@ -658,9 +672,9 @@ class DTFQuoteService {
                 CompanyName: quoteData.companyName || '',
                 SalesRepEmail: quoteData.salesRep || 'sales@nwcustomapparel.com',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: subtotal,
+                SubtotalAmount: preTaxAllIn,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: totalWithTax,
+                TotalAmount: preTaxAllIn,
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
                     locations: quoteData.selectedLocations,

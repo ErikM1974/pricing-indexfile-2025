@@ -215,6 +215,14 @@ function handleDiscountReasonPresetChange() {
 // ============================================
 
 async function lookupTaxRate() {
+    // [2026-06-08] P0 (#1 rule): a tax-exempt customer or wholesale order stays 0% — do NOT let a ZIP/state change
+    // re-apply WA tax (the async DOR result would silently overwrite the 0). Mirror EMB's guard.
+    if (window._taxExempt || window._isWholesale) {
+        const _ri = document.getElementById('tax-rate-input');
+        if (_ri) _ri.value = '0';
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        return false;
+    }
     const state = document.getElementById('ship-state')?.value || 'WA';
     const zip = document.getElementById('ship-zip')?.value?.trim() || '';
     const city = document.getElementById('ship-city')?.value?.trim() || '';

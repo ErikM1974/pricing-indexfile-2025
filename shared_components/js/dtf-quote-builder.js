@@ -232,6 +232,23 @@ class DTFQuoteBuilder {
                 document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                 document.getElementById('company-name').value = contact.CustomerCompanyName || '';
 
+                // [2026-06-08] P0 (Erik's #1 rule): honor tax-exempt customers — the CRM "TAX EXEMPT" chip was
+                // cosmetic; the quote/PDF/push still billed WA tax. Mirror EMB. Also restore tax for a taxable
+                // customer selected right after an exempt one (else the prior 0% bleeds → under-charge).
+                var _wasExempt = !!window._taxExempt;
+                window._taxExempt = (contact.Is_Tax_Exempt === true || contact.Is_Tax_Exempt === 1 || contact.Is_Tax_Exempt === '1');
+                var _incTax = document.getElementById('include-tax');
+                var _rateEl = document.getElementById('tax-rate-input');
+                if (window._taxExempt) {
+                    if (_incTax) _incTax.checked = false;
+                    if (_rateEl) _rateEl.value = '0';
+                    if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+                } else if (_wasExempt) {
+                    if (_incTax) _incTax.checked = true;
+                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.1';
+                    if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+                }
+
                 if (typeof window.surfaceCustomerContext === 'function') {
                     window.surfaceCustomerContext(contact, {
                         warningContainerId: 'customer-warning-banner',
@@ -251,6 +268,7 @@ class DTFQuoteBuilder {
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
+                    window._taxExempt = false;  // [2026-06-08] P0: customer cleared → no longer exempt
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap when the lookup is cleared
                 }
             });
@@ -2474,6 +2492,10 @@ class DTFQuoteBuilder {
             ltmFee: ltmFee,
             total: grandTotal,
             grandTotal: grandTotal,
+            // [2026-06-08] P0: pre-tax all-in (products + fees − discount + shipping) for the SAVE path — the
+            // service stores SubtotalAmount=TotalAmount=this (mirror EMB) instead of double-taxing `total`.
+            preTaxSubtotal: parseFloat(document.getElementById('pre-tax-subtotal')?.textContent?.replace(/[$,]/g, '')) || subtotal,
+            includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
             pricingMetadata: this.currentPricingData ? {
                 tier: this.currentPricingData.tier,
                 marginDenominator: this.currentPricingData.marginDenom,
@@ -3334,6 +3356,7 @@ class DTFQuoteBuilder {
             searchInput.focus();
         }
 
+        window._taxExempt = false; window._isWholesale = false;  // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
         this.showToast('Started new quote', 'success');
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }
