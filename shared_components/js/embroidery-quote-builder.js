@@ -6233,7 +6233,7 @@ async function estimateShipping() {
         // [2026-06-07] remember the estimate so the Ship-To card can show boxes/zone + re-render with the new charge
         window._lastShipEstimate = { estimate: Number(est.estimate) || 0, boxes: est.boxes, zone: est.zone, weight: est.billableWeightLb };
         if (typeof renderShipToCard === 'function') renderShipToCard();
-        setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— ${est.rough ? 'rough zone' : 'UPS list rate'}, adjust as needed</span>`, '#166534');
+        setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— ${est.basis === 'list' ? 'UPS list rate' : ('est. cost +' + Math.round((est.markupPct || 0) * 100) + '% handling')}${est.rough ? ' · approx zone' : ''}, adjust as needed</span>`, '#166534');
     } catch (e) {
         console.error('[estimateShipping]', e);
         setMsg('Could not estimate shipping — enter it manually.', '#dc2626');
