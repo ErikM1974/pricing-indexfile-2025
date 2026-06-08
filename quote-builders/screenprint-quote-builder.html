@@ -468,6 +468,13 @@
                             <span style="font-size: 11px; color: #64748b;">%</span>
                         </div>
                     </div>
+                    <!-- [2026-06-08] Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
+                    <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
+                        <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
+                            <input type="checkbox" id="wholesale-checkbox" onchange="toggleWholesale()">
+                            <span>Wholesale / Reseller — no tax (WA permit on file)</span>
+                        </label>
+                    </div>
                     <div class="pricing-row" id="tax-row">
                         <span class="label text-muted">Sales Tax:</span>
                         <span class="value" id="tax-amount">$0.00</span>
@@ -647,7 +654,7 @@
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.08.9"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.08.10"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.02.3"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.07.1"></script>
@@ -680,7 +687,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.4"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.08.9"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.08.10"></script>
 
 </body>
 </html>

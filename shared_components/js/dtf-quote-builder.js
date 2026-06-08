@@ -401,6 +401,10 @@ class DTFQuoteBuilder {
         if (taxRateInput && session.TaxRate) {
             taxRateInput.value = session.TaxRate;
         }
+        // [2026-06-08] restore the per-order wholesale flag + checkbox on edit-reload (mirror EMB)
+        window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
+        { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = window._isWholesale; }
+        if (window._isWholesale) { const _it = document.getElementById('include-tax'); if (_it) _it.checked = false; }
 
         // Auto-expand order details panel if data exists
         if (hasOrderData) {
@@ -2496,6 +2500,7 @@ class DTFQuoteBuilder {
             // service stores SubtotalAmount=TotalAmount=this (mirror EMB) instead of double-taxing `total`.
             preTaxSubtotal: parseFloat(document.getElementById('pre-tax-subtotal')?.textContent?.replace(/[$,]/g, '')) || subtotal,
             includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
             pricingMetadata: this.currentPricingData ? {
                 tier: this.currentPricingData.tier,
                 marginDenominator: this.currentPricingData.marginDenom,
@@ -3356,7 +3361,7 @@ class DTFQuoteBuilder {
             searchInput.focus();
         }
 
-        window._taxExempt = false; window._isWholesale = false;  // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
+        window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags + uncheck the box on New Quote
         this.showToast('Started new quote', 'success');
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }

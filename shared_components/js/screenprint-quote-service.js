@@ -154,6 +154,7 @@ class ScreenPrintQuoteService {
                 // Tax amount — informational, drives the ShopWorks push tax note
                 // (was never persisted → note always read "$0.00"). (2026-06-01)
                 TaxAmount: salesTax,
+                IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',
@@ -451,6 +452,7 @@ class ScreenPrintQuoteService {
                 // Tax amount — informational, drives the ShopWorks push tax note
                 // (was never persisted → note always read "$0.00"). (2026-06-01)
                 TaxAmount: salesTax,
+                IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Order & shipping fields (2026-03-22)
                 Phone: quoteData.phone || '',
                 OrderNumber: quoteData.orderNumber || '',
