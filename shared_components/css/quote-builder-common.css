@@ -3383,6 +3383,11 @@ input[type="radio"] {
 .emb-builder .invoice-totals-wrap { justify-content: flex-start; gap: 12px; }
 .emb-builder .order-recap { margin-right: 0; }
 .emb-builder .invoice-totals-box { margin-left: auto; }
+/* [2026-06-08] DTF adopts the band (Phase 2) — #order-recap + #ship-to-card stack full-width in the .pricing-panel
+   sidebar (Option A, under the totals). Card shell + recap inner styles are shared below; here we add top spacing +
+   a divider from the totals. (:empty hides each until populated, so no stray divider/spacing.) */
+.dtf-builder .order-recap { margin: 12px 0 0; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+.dtf-builder .ship-to-card { margin-top: 10px; }
 /* [2026-06-08] Card shell de-scoped from .emb-builder so DTF/SCP inherit it when they adopt the band (Phase 2/3).
    The band POSITIONING (.invoice-totals-wrap flex / .order-recap margin above) stays per-builder. */
 .ship-to-card { flex: 1 1 260px; min-width: 0; align-self: stretch; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; }

@@ -304,7 +304,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
+                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">EMAIL *</label>
@@ -312,7 +312,7 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">COMPANY</label>
-                            <input type="text" id="company-name" placeholder="Company name" class="quote-input">
+                            <input type="text" id="company-name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
@@ -330,7 +330,7 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">CUSTOMER #</label>
-                            <input type="text" id="customer-number" placeholder="ShopWorks ID" class="quote-input">
+                            <input type="text" id="customer-number" placeholder="ShopWorks ID" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">PHONE</label>
@@ -407,6 +407,11 @@
                         <span class="value" id="grand-total-with-tax">$0.00</span>
                     </div>
                 </div>
+                <!-- [2026-06-08] Shared order-summary band (DTF/SCP parity Phase 2) — Order Recap + Ship-To card
+                     stacked under the totals in the Quote Summary sidebar. Filled by renderOrderRecap() in
+                     dtf-quote-builder.js; hidden via :empty until populated. Card + recap CSS are shared. -->
+                <div class="order-recap" id="order-recap"></div>
+                <div class="ship-to-card" id="ship-to-card"></div>
             </div>
 
             <!-- Artwork Services Panel -->
@@ -515,14 +520,14 @@
                                     <input type="text" id="ship-to-name" placeholder="Recipient name" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
                                 </div>
                                 <div class="customer-field">
-                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input" style="font-size: 12px; padding: 6px 8px;" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                 </div>
                                 <div class="d-flex gap-2">
                                     <div class="customer-field" style="flex: 2;">
-                                        <input type="text" id="ship-city" placeholder="City" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                        <input type="text" id="ship-city" placeholder="City" class="quote-input" style="font-size: 12px; padding: 6px 8px;" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 60px;">
-                                        <select id="ship-state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange()">
+                                        <select id="ship-state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange();if(window.renderOrderRecap)renderOrderRecap()">
                                             <option value="WA" selected>WA</option>
                                             <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
                                             <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
@@ -545,7 +550,7 @@
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 80px;">
                                         <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10" class="quote-input"
-                                               onblur="onShipZipBlur()" style="font-size: 12px; padding: 6px 8px;">
+                                               onblur="onShipZipBlur()" oninput="if(window.renderOrderRecap)renderOrderRecap()" style="font-size: 12px; padding: 6px 8px;">
                                     </div>
                                     <button type="button" class="btn-tax-lookup" onclick="lookupTaxRate()" title="Look up tax rate">
                                         <i class="fas fa-search"></i>
@@ -555,7 +560,7 @@
                                 <!-- Shipping Method -->
                                 <div class="customer-field">
                                     <label class="quote-label" style="font-size: 11px;">Shipping Method</label>
-                                    <select id="ship-method" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <select id="ship-method" class="quote-input" style="font-size: 12px; padding: 6px 8px;" onchange="if(window.renderOrderRecap)renderOrderRecap()">
                                         <option value="">Select...</option>
                                         <option value="Ground">Ground</option>
                                         <option value="2-Day">2-Day</option>
@@ -681,6 +686,8 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
+    <!-- [2026-06-08] Shared order-summary band — MUST load before dtf-quote-builder.js (which calls QuoteOrderSummary.configure() at eval) -->
+    <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.1"></script>
     <script src="/shared_components/js/dtf-quote-builder.js?v=2026.06.02.3"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->

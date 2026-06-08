@@ -79,12 +79,17 @@
             shipLine += ' &middot; ' + est.boxes + ' box' + (est.boxes > 1 ? 'es' : '') + ' &middot; zone ' + esc(String(est.zone));
         }
         lines.push('<div class="st-line st-method">' + shipLine + '</div>');
-        var reestOnclick = _cfg.reestimateOnclick || 'reestimateShipFromCard()';
-        var acts = '<button type="button" class="st-btn st-btn-reest" onclick="' + reestOnclick + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>';
+        // Re-estimate renders ONLY when the builder supplied an estimator (EMB has one; DTF/SCP not until Phase 1).
+        // Edit renders only when editOnclick is set. If neither, omit the .st-actions wrapper (no empty bar).
+        var acts = '';
+        if (typeof _cfg.estimate === 'function') {
+            var reestOnclick = _cfg.reestimateOnclick || 'reestimateShipFromCard()';
+            acts += '<button type="button" class="st-btn st-btn-reest" onclick="' + reestOnclick + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>';
+        }
         if (_cfg.editOnclick) {
             acts += '<button type="button" class="st-btn st-btn-edit" onclick="' + _cfg.editOnclick + '" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>';
         }
-        var actions = '<div class="st-actions">' + acts + '</div>';
+        var actions = acts ? '<div class="st-actions">' + acts + '</div>' : '';
         el.innerHTML = '<div class="st-title">Ship To</div>' + lines.join('') + actions;
     }
 
