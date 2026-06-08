@@ -2421,3 +2421,29 @@
     border-color: #dc2626;
     color: #dc2626;
 }
+
+/* [2026-06-08] Order-at-a-glance band (shared module quote-order-summary.js) — DTG Phase 0. Card shell + inner copied
+   from quote-builder-common.css (DTG doesn't load common.css — avoids sticker-layout conflicts). Stacked full-width
+   under #dtgPriceSummary; the trio's flex positioning is replaced by margin-top here. */
+.order-recap { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; color: #475569; margin-top: 12px; }
+.order-recap:empty { display: none; }
+.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.order-recap .or-row { display: flex; gap: 8px; padding: 2px 0; line-height: 1.35; }
+.order-recap .or-label { color: #94a3b8; flex: 0 0 56px; }
+.order-recap .or-val { color: #334155; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.order-recap .or-thumbs { display: flex; gap: 10px; padding: 6px 0 2px; flex-wrap: wrap; }
+.order-recap .or-thumb { margin: 0; text-align: center; }
+.order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: block; }
+.order-recap .or-thumb figcaption { font-size: 10px; color: #94a3b8; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ship-to-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; margin-top: 10px; }
+.ship-to-card:empty { display: none; }
+.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
+.ship-to-card .st-co { font-weight: 600; }
+.ship-to-card .st-method { color: #64748b; font-size: 11px; margin-top: 2px; }
+.ship-to-card .st-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; cursor: pointer; }
+.ship-to-card .st-btn:hover { background: #eef2f7; }
+.ship-to-card .st-btn:disabled { opacity: .6; cursor: default; }
+.ship-to-card .st-btn-reest { border-color: #16a34a; color: #166534; background: #f0fdf4; }
+.ship-to-card .st-btn-reest:hover { background: #dcfce7; }
