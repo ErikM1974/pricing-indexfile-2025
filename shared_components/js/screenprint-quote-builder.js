@@ -648,6 +648,10 @@ async function loadQuoteForEditing(quoteId) {
         // so a reopened exempt/out-of-state quote (saved TaxRate 0) defaulted to 10.1% and re-taxed on Save Revision.
         var _savedRate = parseFloat(session.TaxRate);
         if (Number.isFinite(_savedRate)) { var _rateEl = document.getElementById('tax-rate-input'); if (_rateEl) _rateEl.value = _savedRate; }
+        // [2026-06-08] restore the per-order wholesale flag + checkbox on edit-reload (mirror EMB)
+        window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
+        { var _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = window._isWholesale; }
+        if (window._isWholesale) { var _it = document.getElementById('include-tax'); if (_it) _it.checked = false; }
         // setOrderShippingData reads data.notes||data.Notes into .os-notes, but the SCP
         // session has NO flat `notes` — only the structured `Notes` JSON blob
         // (locations/colors/userNotes). So the raw JSON dumped into the notes textarea
@@ -814,7 +818,7 @@ function resetQuote() {
     try { const _r = recalculatePricing(); if (_r && typeof _r.catch === 'function') _r.catch(() => {}); } catch (_) {}
 
     // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
-    window._taxExempt = false; window._isWholesale = false;
+    window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; }
     // [2026-06-08] clear the order-summary band on Reset / New Quote (recalc may short-circuit on the empty quote)
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
@@ -3512,6 +3516,23 @@ function updateTaxCalculation() {
 
 // toggleAdditionalCharges() moved to quote-builder-utils.js
 
+// [2026-06-08] Wholesale / reseller toggle (mirror EMB). Per-order checkbox by the sales tax → 0 tax + push GL 2203.
+function toggleWholesale() {
+    const cb = document.getElementById('wholesale-checkbox');
+    window._isWholesale = !!(cb && cb.checked);
+    const incTax = document.getElementById('include-tax');
+    const rateInput = document.getElementById('tax-rate-input');
+    if (window._isWholesale) {
+        if (incTax) incTax.checked = false;
+        if (rateInput) rateInput.value = '0';
+    } else {
+        if (incTax) incTax.checked = true;
+        if (rateInput) rateInput.value = '10.1';  // rep re-blurs the ship ZIP for the precise rate
+    }
+    updateTaxCalculation();
+}
+window.toggleWholesale = toggleWholesale;
+
 function updateAdditionalCharges() {
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
@@ -4064,6 +4085,7 @@ async function saveAndGetLink() {
             // LTM display preferences (2026-03-22)
             ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
             ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
+            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
             // Order & shipping fields (2026-03-22)
             ...getOrderShippingData('spc-order-fields')
         };

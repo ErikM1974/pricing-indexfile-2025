@@ -398,6 +398,13 @@
                                onchange="updateTaxCalculation()" title="Tax rate %">
                         <span style="font-size: 11px; color: #64748b;">%</span>
                     </div>
+                    <!-- [2026-06-08] Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
+                    <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
+                        <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
+                            <input type="checkbox" id="wholesale-checkbox" onchange="toggleWholesale()">
+                            <span>Wholesale / Reseller — no tax (WA permit on file)</span>
+                        </label>
+                    </div>
                     <div class="pricing-row" id="tax-row">
                         <span class="label text-muted" id="tax-rate-label">Sales Tax (10.1%)</span>
                         <span class="value" id="tax-amount">$0.00</span>

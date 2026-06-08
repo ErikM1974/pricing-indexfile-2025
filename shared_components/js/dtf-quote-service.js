@@ -219,6 +219,7 @@ class DTFQuoteService {
                 SalesRepEmail: quoteData.salesRep || '',
                 TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
+                IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Shipping fee + notes (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
                 // Order-entry + ship-to fields for ShopWorks push (mirror EMB)
@@ -708,6 +709,7 @@ class DTFQuoteService {
                 // Tax rate (2026-03-23)
                 TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
+                IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Shipping fee (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
                 // Additional charges — must persist on revision too (for ShopWorks push + invoice)

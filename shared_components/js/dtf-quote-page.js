@@ -308,6 +308,25 @@ function onShipStateChange() {
     }
 }
 
+// [2026-06-08] Wholesale / reseller toggle (mirror EMB). Per-order checkbox by the sales tax → 0 tax + push GL 2203.
+function toggleWholesale() {
+    const cb = document.getElementById('wholesale-checkbox');
+    window._isWholesale = !!(cb && cb.checked);
+    const incTax = document.getElementById('include-tax');
+    const rateInput = document.getElementById('tax-rate-input');
+    if (window._isWholesale) {
+        if (incTax) incTax.checked = false;
+        if (rateInput) rateInput.value = '0';
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+    } else {
+        if (incTax) incTax.checked = true;
+        if (rateInput) rateInput.value = '10.1';
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        if (typeof lookupTaxRate === 'function') lookupTaxRate();  // re-fetch the real rate for the ship address
+    }
+}
+window.toggleWholesale = toggleWholesale;
+
 function onShipZipBlur() {
     const state = document.getElementById('ship-state')?.value || 'WA';
     const zip = document.getElementById('ship-zip')?.value?.trim() || '';
