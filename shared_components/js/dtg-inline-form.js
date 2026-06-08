@@ -725,6 +725,9 @@
                         <button type="button" class="dtg-add-row-btn" id="dtgAddRowBtn"><i class="fas fa-plus"></i> Add row</button>
 
                         <div id="dtgPriceSummary" class="dtg-price-summary"></div>
+                        <!-- [2026-06-08] Order-at-a-glance band (Phase 0) — both :empty-hidden until populated by quote-order-summary.js -->
+                        <div class="order-recap" id="order-recap"></div>
+                        <div class="ship-to-card" id="ship-to-card"></div>
                     </div>
 
                     <aside class="dtg-customer-pane dcp-horizontal">
@@ -1278,6 +1281,7 @@
             ${isLtm ? `<div class="dps-note">Bump combined qty above this tier and the $${ltmFee} LTM fee disappears.</div>` : ''}
         `;
         updateSubmitEnabled();
+        renderBand();  // [2026-06-08] Phase 0: keep the order-summary band current on every priced render
     }
 
     // Display-only tier-label buckets — used when no bundle has been cached
@@ -4350,7 +4354,27 @@
     }
 
     // ----- Init --------------------------------------------------------------
+    // [2026-06-08] Phase 0: refresh the shared order-summary band (recap + ship-to card). Guarded — a no-op if the
+    // module didn't load. Called at the end of renderSummary() so it tracks every priced state change (customer pick,
+    // ship-field edits, pickup toggle, recompute, edit-reload all funnel through renderSummary).
+    function renderBand() {
+        if (typeof QuoteOrderSummary === 'undefined') return;
+        try { QuoteOrderSummary.renderOrderRecap(); } catch (_) {}
+        try { QuoteOrderSummary.renderShipToCard(); } catch (_) {}
+    }
+
     function init() {
+        // [2026-06-08] Phase 0: wire the shared order-summary band to DTG's own #dtgShip*/#dtgCompany* fields
+        // (the module is selector-agnostic). No estimate/editOnclick yet → the module hides those buttons.
+        if (typeof QuoteOrderSummary !== 'undefined') {
+            QuoteOrderSummary.configure({
+                orderRecap: '#order-recap',
+                shipToCard: '#ship-to-card',
+                ship: { address: '#dtgShipAddress1', city: '#dtgShipCity', state: '#dtgShipState', zip: '#dtgShipZip', method: '#dtgShipMethod' },
+                recap: { company: '#dtgCompanyInput', custNum: '#dtgCompanyId' },
+                logos: function () { return []; },
+            });
+        }
         // Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
         // If URL has ?edit=DTG-NNN, fetch the saved quote, populate the form,
         // and enable revision-on-save. Mirrors EMB/DTF/SCP loadQuoteForEditing.
