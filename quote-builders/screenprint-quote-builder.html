@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.08.5">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.08.16">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
@@ -551,14 +551,12 @@
             <!-- Order & Shipping (top-level panel, not nested in Save) -->
             <div id="spc-order-fields" style="margin-bottom: 12px;"></div>
             <!-- [2026-06-08] Shared UPS Ground estimator (Commit 6) — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
-            <div class="customer-field" id="spc-estimate-row" style="margin: -4px 0 12px;">
-                <label class="d-flex align-items-center gap-2" style="font-size:11px;color:#475569;cursor:pointer;">
-                    <input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)
-                </label>
-                <button type="button" id="estimate-ship-btn" onclick="QuoteOrderSummary.estimateShipping()" style="margin-top:4px;cursor:pointer;font-size:11px;font-weight:600;padding:5px 10px;background:#f0fdf4;border:1px solid #16a34a;color:#166534;border-radius:6px;">
+            <div class="estimate-ship-row" id="spc-estimate-row" style="margin: -4px 0 12px;">
+                <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
+                <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="QuoteOrderSummary.estimateShipping()">
                     <i class="fas fa-truck-fast"></i> Estimate UPS Ground
                 </button>
-                <div id="estimate-ship-result" style="font-size:11px;min-height:14px;margin-top:3px;"></div>
+                <div id="estimate-ship-result" class="estimate-ship-result"></div>
             </div>
 
             <!-- Save & Share Section (Collapsible) -->
