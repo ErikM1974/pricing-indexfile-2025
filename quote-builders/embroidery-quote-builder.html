@@ -562,7 +562,7 @@
                      (#pre-tax-subtotal is kept as a hidden carrier of the full
                      pre-tax amount incl. shipping, for the save path).
                      ============================================================ -->
-                <div class="invoice-totals-wrap">
+                <div class="invoice-totals-wrap order-footer">
                     <!-- Order Recap — fills the empty space LEFT of the totals so the who/what/where isn't
                          buried on the right; pairs with the totals (how much) into one "order at a glance"
                          band. EMB-ONLY: other builders have no #order-recap, and .order-recap uses
@@ -572,6 +572,44 @@
                     <!-- Ship-To card — fills the gap between the recap + totals; shows the entered destination so the
                          rep can eyeball it. renderShipToCard(); hidden (:empty) for Customer Pickup / no address. (Erik 2026-06-07) -->
                     <div class="ship-to-card" id="ship-to-card"></div>
+                    <!-- Order Details — relocated from the sidebar into the footer band (Erik 2026-06-07): sidebar slims
+                         to Customer + Quote Summary + Push; order metadata reviews here with glance / ship-to / totals. -->
+                    <div class="flow-step in-footer" id="order-details-step">
+                        <div class="flow-step-head">
+                            <span class="flow-step-num">2</span>
+                            <i class="fas fa-file-invoice"></i> Order Details
+                            <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 6px;">!</span>
+                            <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;"></i>
+                        </div>
+                        <div class="flow-step-body" id="order-details-content">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <div>
+                                    <label for="po-number">PO #</label>
+                                    <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="date-order-placed">Date Placed</label>
+                                    <input type="date" id="date-order-placed" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="req-ship-date">Req Ship Date</label>
+                                    <input type="date" id="req-ship-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div>
+                                    <label for="drop-dead-date">Drop Dead Date</label>
+                                    <input type="date" id="drop-dead-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div style="grid-column: 1 / -1;">
+                                    <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
+                                    <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                </div>
+                                <div style="grid-column: 1 / -1; margin-top: 2px;">
+                                    <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
+                                    <input type="text" id="order-number" placeholder="(after import)" style="width: 100%; padding: 5px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 12px; box-sizing: border-box; background:#f8fafc;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="invoice-totals-box" id="invoice-totals-box">
                         <div class="it-row">
                             <span class="it-label">Subtotal</span>
@@ -604,6 +642,21 @@
                         </div>
                         <!-- Hidden carrier of the full pre-tax subtotal (incl. shipping) for the save path -->
                         <span id="pre-tax-subtotal" style="display:none;">$0.00</span>
+                    </div>
+                    <!-- Special Notes — relocated from the sidebar into a full-width row under the footer (Erik 2026-06-07) -->
+                    <div class="footer-notes-row" id="footer-notes-row">
+                        <div class="notes-section collapsed in-footer" id="notes-section" style="margin-bottom: 0;">
+                            <div class="notes-header" onclick="toggleNotesSection()">
+                                <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
+                                    <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
+                                    <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
+                                    <i class="fas fa-chevron-down notes-toggle-icon" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
+                                </label>
+                            </div>
+                            <div class="notes-body" style="display: none;">
+                                <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -803,43 +856,8 @@
                  (you only know it AFTER importing into ShopWorks). Date Placed
                  + Req Ship Date are auto-defaulted in JS (today / +2 weeks).
                  ============================================================ -->
-            <div class="flow-step" id="order-details-step">
-                <div class="flow-step-head">
-                    <span class="flow-step-num">2</span>  <!-- was 3; Shipping (was 2) moved to the invoice block (audit 2026-06-05) -->
-                    <i class="fas fa-file-invoice"></i> Order Details
-                    <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 6px;">!</span>
-                    <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;"></i>
-                </div>
-                <div class="flow-step-body" id="order-details-content">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-                        <div>
-                            <label for="po-number">PO #</label>
-                            <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                        </div>
-                        <div>
-                            <label for="date-order-placed">Date Placed</label>
-                            <input type="date" id="date-order-placed" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                        </div>
-                        <div>
-                            <label for="req-ship-date">Req Ship Date</label>
-                            <input type="date" id="req-ship-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                        </div>
-                        <div>
-                            <label for="drop-dead-date">Drop Dead Date</label>
-                            <input type="date" id="drop-dead-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                        </div>
-                        <div style="grid-column: 1 / -1;">
-                            <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
-                            <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
-                        </div>
-                        <!-- ShopWorks Order # — demoted; you only have it AFTER importing -->
-                        <div style="grid-column: 1 / -1; margin-top: 2px;">
-                            <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
-                            <input type="text" id="order-number" placeholder="(after import)" style="width: 100%; padding: 5px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 12px; box-sizing: border-box; background:#f8fafc;">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Order Details + Special Notes relocated to the bottom footer band (Erik 2026-06-07) — now static HTML
+                 (#order-details-step / #notes-section live in .invoice-totals-wrap.order-footer; no runtime relocate). -->
 
             <!-- Optional Charges panel HIDDEN 2026-06-03 — Rush Fee is now added as a
                  line item from the bottom Services bar (Charges ▸ Rush Fee). Kept in
@@ -873,20 +891,6 @@
                  totals block + tax controls now live in #invoice-totals-box in
                  the product-grid section (left). -->
 
-            <!-- Special Notes — standalone (the retired "Save & Share" dropdown is gone: artwork moved into the
-                 logo card, the share button moved into the action stack below). Erik 2026-06-05 -->
-            <div class="notes-section collapsed" id="notes-section" style="margin-bottom: 16px;">
-                <div class="notes-header" onclick="toggleNotesSection()">
-                    <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
-                        <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
-                        <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
-                        <i class="fas fa-chevron-down notes-toggle-icon" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
-                    </label>
-                </div>
-                <div class="notes-body" style="display: none;">
-                    <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
-                </div>
-            </div>
 
             </div><!-- End sidebar-scroll-container -->
 
