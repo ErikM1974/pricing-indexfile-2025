@@ -644,6 +644,10 @@ async function loadQuoteForEditing(quoteId) {
 
         // Restore order & shipping fields from saved session
         setOrderShippingData('spc-order-fields', session);
+        // [2026-06-08] P0 (#1 rule): restore the saved tax rate — setOrderShippingData does NOT touch #tax-rate-input,
+        // so a reopened exempt/out-of-state quote (saved TaxRate 0) defaulted to 10.1% and re-taxed on Save Revision.
+        var _savedRate = parseFloat(session.TaxRate);
+        if (Number.isFinite(_savedRate)) { var _rateEl = document.getElementById('tax-rate-input'); if (_rateEl) _rateEl.value = _savedRate; }
         // setOrderShippingData reads data.notes||data.Notes into .os-notes, but the SCP
         // session has NO flat `notes` — only the structured `Notes` JSON blob
         // (locations/colors/userNotes). So the raw JSON dumped into the notes textarea
@@ -3488,7 +3492,10 @@ function updateTaxCalculation() {
     }
 
     // Dynamic tax rate from ZIP lookup or manual input
-    const taxRateInput = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+    // [2026-06-08] P0 (#1 rule): Number.isFinite so an exempt/out-of-state rate of 0 STAYS 0% — `parseFloat('0')||10.1`
+    // is the falsy trap that re-taxed exempt orders at 10.1% on screen when include-tax was still checked.
+    const _scpRate = parseFloat(document.getElementById('tax-rate-input')?.value);
+    const taxRateInput = Number.isFinite(_scpRate) ? _scpRate : 10.1;
     const taxRate = taxRateInput / 100;
 
     if (includeTax) {
