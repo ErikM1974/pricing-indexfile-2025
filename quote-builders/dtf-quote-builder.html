@@ -587,14 +587,12 @@
                                     </div>
                                 </div>
                                 <!-- [2026-06-08] Shared UPS Ground estimator (Commit 5) — reads the ship ZIP + SanMar product weights, writes #dtf-shipping-fee -->
-                                <div class="customer-field" style="margin-top: 4px;">
-                                    <label class="d-flex align-items-center gap-2" style="font-size:11px;color:#475569;cursor:pointer;">
-                                        <input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)
-                                    </label>
-                                    <button type="button" id="estimate-ship-btn" onclick="estimateShipping()" style="margin-top:4px;cursor:pointer;font-size:11px;font-weight:600;padding:5px 10px;background:#f0fdf4;border:1px solid #16a34a;color:#166534;border-radius:6px;">
+                                <div class="estimate-ship-row">
+                                    <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
+                                    <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="estimateShipping()">
                                         <i class="fas fa-truck-fast"></i> Estimate UPS Ground
                                     </button>
-                                    <div id="estimate-ship-result" style="font-size:11px;min-height:14px;margin-top:3px;"></div>
+                                    <div id="estimate-ship-result" class="estimate-ship-result"></div>
                                 </div>
                                 <!-- Notes -->
                                 <div class="customer-field" style="margin-top: 4px;">
