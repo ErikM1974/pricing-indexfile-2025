@@ -398,7 +398,7 @@ class DTFQuoteBuilder {
 
         // Set tax rate from saved quote
         const taxRateInput = document.getElementById('tax-rate-input');
-        if (taxRateInput && session.TaxRate) {
+        if (taxRateInput && session.TaxRate != null && session.TaxRate !== '') {  // [2026-06-08] P2: != null so a saved numeric 0 (exempt/wholesale/out-of-state) restores, not the 10.1 HTML default
             taxRateInput.value = session.TaxRate;
         }
         // [2026-06-08] restore the per-order wholesale flag + checkbox on edit-reload (mirror EMB)
@@ -3361,7 +3361,7 @@ class DTFQuoteBuilder {
             searchInput.focus();
         }
 
-        window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags + uncheck the box on New Quote
+        window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags, uncheck box, RE-CHECK include-tax on New Quote (else next quote bills $0 tax)
         this.showToast('Started new quote', 'success');
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }

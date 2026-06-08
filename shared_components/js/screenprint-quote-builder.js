@@ -818,7 +818,7 @@ function resetQuote() {
     try { const _r = recalculatePricing(); if (_r && typeof _r.catch === 'function') _r.catch(() => {}); } catch (_) {}
 
     // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
-    window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; }
+    window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: re-check include-tax on New Quote (else next quote after a wholesale/exempt one bills $0 tax)
     // [2026-06-08] clear the order-summary band on Reset / New Quote (recalc may short-circuit on the empty quote)
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
@@ -4086,6 +4086,10 @@ async function saveAndGetLink() {
             ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
             ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
             isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
+            // [2026-06-08] P0 (review woaaypuz4): the SCP save quoteData NEVER passed taxRate (getOrderShippingData omits it),
+            // so the service fell back to 10.1% → every out-of-state / exempt / non-10.1 SCP quote saved TaxRate=10.1 and the
+            // /quote + /invoice mirror billed full WA tax. Pass it explicitly (mirror DTF). Erik's #1 rule.
+            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
             // Order & shipping fields (2026-03-22)
             ...getOrderShippingData('spc-order-fields')
         };
