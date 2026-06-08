@@ -1825,6 +1825,7 @@ class DTFQuoteBuilder {
         const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
         if (preTaxSubtotal) {
             preTaxSubtotal.textContent = `$${grandTotal.toFixed(2)}`;
+            preTaxSubtotal.dataset.base = grandTotal;  // [2026-06-08] P1: stable base for updateTaxCalculation (must NOT re-read its own fee-inflated textContent → double-count on a 2nd direct call)
         }
 
         // Update tax calculation if the function exists

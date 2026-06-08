@@ -3381,6 +3381,7 @@ function updatePricingDisplay(pricing) {
 
     // Update pre-tax subtotal for tax calculation (grand total before tax)
     document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+    { const _pb = document.getElementById('pre-tax-subtotal'); if (_pb) _pb.dataset.base = (pricing.grandTotal || 0); }  // [2026-06-08] P1: stable base for updateTaxCalculation (no re-read of its own fee-inflated textContent → double-count)
 
     // Update tax calculation
     updateTaxCalculation();
@@ -3459,7 +3460,10 @@ function updateTaxCalculation() {
     const grandTotalEl = document.getElementById('grand-total-with-tax');
 
     // Get base subtotal from pricing
-    let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
+    // [2026-06-08] P1: read the STABLE base (data-base set by updatePricingDisplay), NOT the textContent this fn writes
+    // back — else a 2nd direct call double-adds fees+shipping. Falls back to textContent only before the first recalc.
+    let subtotal = parseFloat(subtotalEl?.dataset?.base);
+    if (!Number.isFinite(subtotal)) subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
 
     // Add art charge if enabled
     const artChargeToggle = document.getElementById('art-charge-toggle');

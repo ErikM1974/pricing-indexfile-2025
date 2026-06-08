@@ -65,7 +65,11 @@ function updateTaxCalculation() {
 
     // Get base subtotal from pricing
     // DTF subtotal always includes LTM (baked in by pricing engine rounding) — no mode branching needed
-    let subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
+    // [2026-06-08] P1: read the STABLE base (data-base set by updatePricing), NOT the textContent this fn writes back
+    // — else a 2nd direct call (tax-rate / include-tax / shipping-fee change) double-adds fees+shipping. Falls back to
+    // textContent only before the first updatePricing.
+    let subtotal = parseFloat(subtotalEl?.dataset?.base);
+    if (!Number.isFinite(subtotal)) subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
 
     // Add art charge if enabled
     const artChargeToggle = document.getElementById('art-charge-toggle');
