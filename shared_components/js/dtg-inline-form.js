@@ -173,6 +173,7 @@
             // on submit so the server can suppress tax for exempt customers.
             customerWarning: '',
             isTaxExempt:     false,
+            isWholesale:     false,  // [2026-06-08] Phase 1: wholesale/reseller → 0 tax + GL 2203
             taxExemptNumber: '',
             paymentTerms:    '',     // CRM-preferred terms (e.g., "Net 30") — auto-selects in dropdown
             accountTier:     '',     // VIP / GOLD / House — info-only badge
@@ -229,6 +230,10 @@
             // manually post-import — see memory/wa-sales-tax-rules.md).
             taxAccount: '2200.101',
             taxAccountName: 'Wash:10.1%',
+            // [2026-06-08] Phase 1 tax-control flags. includeTax: rep can opt the whole quote out of tax.
+            // taxRateOverride: null = auto (DOR/pickup/exempt/etc.); a number (percent) = the manual rate the rep typed.
+            includeTax: true,
+            taxRateOverride: null,
         },
         submitting: false,
         // C9 dirty-tracking: set to true when the rep touches any form field
@@ -974,6 +979,12 @@
                                     </div>
                                 </div>
                                 <div class="dcp-tax-status" id="dtgTaxStatus"></div>
+                                <!-- [2026-06-08] Phase 1 tax controls — include-tax toggle + manual rate override + wholesale -->
+                                <div class="dtg-tax-controls" id="dtgTaxControls">
+                                    <label class="dtg-tax-ctl"><input type="checkbox" id="include-tax" ${state.shipping.includeTax !== false ? 'checked' : ''}> Include sales tax</label>
+                                    <label class="dtg-tax-ctl">Rate <input type="number" id="tax-rate-input" step="0.1" min="0" max="20" placeholder="auto" value="${state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : ''}"> %</label>
+                                    <label class="dtg-tax-ctl"><input type="checkbox" id="wholesale-checkbox" ${state.customer.isWholesale ? 'checked' : ''}> Wholesale / reseller — no tax (GL 2203)</label>
+                                </div>
                             </div>
                         </div>
 
@@ -2210,6 +2221,30 @@
                 taxLookupTimer = setTimeout(recomputeTaxRate, 600);
             });
         });
+
+        // [2026-06-08] Phase 1 tax-control handlers. All route through recomputeTaxRate() (the SINGLE tax authority)
+        // so the on-screen total, the PDF, the saved record, and the ShopWorks push never desync.
+        const incTaxEl = document.getElementById('include-tax');
+        if (incTaxEl) incTaxEl.addEventListener('change', () => {
+            state.shipping.includeTax = incTaxEl.checked;
+            markDirty(); scheduleStateSave(); recomputeTaxRate();
+        });
+        const rateEl = document.getElementById('tax-rate-input');
+        if (rateEl) rateEl.addEventListener('input', () => {
+            const v = rateEl.value.trim();
+            state.shipping.taxRateOverride = (v === '' ? null : Number(v));
+            markDirty(); scheduleStateSave(); recomputeTaxRate();
+        });
+        const wholeEl = document.getElementById('wholesale-checkbox');
+        if (wholeEl) wholeEl.addEventListener('change', () => {
+            state.customer.isWholesale = wholeEl.checked;
+            // UI parity with the trio: wholesale ON → uncheck include-tax; OFF → re-check it. recomputeTaxRate
+            // re-derives the rate (wholesale branch zeros it; exempt/out-of-state still win when applicable).
+            const it = document.getElementById('include-tax');
+            state.shipping.includeTax = !wholeEl.checked;
+            if (it) it.checked = !wholeEl.checked;
+            markDirty(); scheduleStateSave(); recomputeTaxRate();
+        });
     }
 
     // Sync the pickup toggle UI to whatever state.shipping.method currently is.
@@ -2246,12 +2281,42 @@
 
         // [2026-06-08] Tax-exempt customer (CRM Is_Tax_Exempt) → force 0% + skip the pickup/DOR lookup (parity with
         // EMB/DTF/SCP). DTG previously showed an "exempt" chip but STILL taxed them on screen + PDF + the saved total.
+        // [2026-06-08] Phase 1: wholesale/reseller → 0% + GL 2203 (highest priority; backend resolveTaxAccount routes it).
+        if (state.customer && state.customer.isWholesale) {
+            state.shipping.taxRate = 0;
+            state.shipping.taxRateSource = 'wholesale';
+            state.shipping.taxAccount = '2203';
+            state.shipping.taxAccountName = 'Wholesale Sales (WA reseller permit)';
+            setStatus('Wholesale / reseller — no tax (GL 2203)', 'success');
+            renderSummary();
+            return;
+        }
         if (state.customer && state.customer.isTaxExempt) {
             state.shipping.taxRate = 0;
             state.shipping.taxRateSource = 'tax-exempt';
             state.shipping.taxAccount = '2204';
             state.shipping.taxAccountName = 'Tax Exempt';
             setStatus('Tax-exempt customer — no sales tax', 'success');
+            renderSummary();
+            return;
+        }
+        // [2026-06-08] Phase 1: rep opted the quote out of tax (include-tax unchecked) → 0%.
+        if (!state.shipping.includeTax) {
+            state.shipping.taxRate = 0;
+            state.shipping.taxRateSource = 'tax-opt-out';
+            state.shipping.taxAccount = '';
+            state.shipping.taxAccountName = 'No tax (opted out)';
+            setStatus('Tax not included (rep opted out)', 'info');
+            renderSummary();
+            return;
+        }
+        // [2026-06-08] Phase 1: rep typed a manual rate override → use it, skip the DOR lookup.
+        if (state.shipping.taxRateOverride != null && Number.isFinite(Number(state.shipping.taxRateOverride))) {
+            state.shipping.taxRate = Number(state.shipping.taxRateOverride) / 100;
+            state.shipping.taxRateSource = 'manual';
+            state.shipping.taxAccount = '';
+            state.shipping.taxAccountName = 'Manual rate';
+            setStatus('Manual rate ' + Number(state.shipping.taxRateOverride).toFixed(2) + '%', 'info');
             renderSummary();
             return;
         }
