@@ -281,13 +281,10 @@
 | `/calculators/dtg-pricing.html` | DTG pricing calculator | dtg-adapter.js, dtg-pricing-service.js | ✅ Active |
 | `/calculators/dtg-manual-pricing.html` | ~~DELETED~~ Manual DTG pricing — superseded by `/calculators/manual-pricing.html` (unified) | — | ❌ Deleted |
 | `/calculators/archive/manual-pricing-deprecated/dtg-manual-pricing.html` | Archived pre-unification DTG manual calculator | — | 📦 Archived |
-| `/quote-builders/dtg-quote-builder.html` | **REWRITTEN (2026-05-17)** Chat-first DTG quote builder. Sticker-shaped layout (hero + AI CTA + quick-facts + accordions). 4-tool AI bot (lookup_customer, quote_dtg_pricing, recommend_top_sellers, web_search) + frontend "Submit to ShopWorks" button that POSTs to `/api/submit-order-form`. The legacy form is iframed inside an accordion for power users. | sticker-pricing-page.css, dtg-quote-page.css, dtg-quote-page.js, dtg-quote-builder-legacy.html (iframe) | ✅ Active |
-| `/quote-builders/dtg-quote-builder-legacy.html` | **NEW (2026-05-17)** Verbatim copy of the pre-AI DTG quote builder form (542 lines, Bootstrap-based, 15+ JS files). Iframed by the new dtg-quote-builder.html inside the "Manual quote builder (power user)" accordion. Lets reps fall back to the old workflow without breaking anything. Delete only when AI bot is proven fully sufficient. | dtg-quote-builder.js + 14 other DTG JS files (unchanged) | ✅ Active |
-| `/shared_components/js/dtg-quote-builder.js` | DTG quote builder controller | DTGQuotePricing class | ✅ Active |
+| `/quote-builders/dtg-quote-builder.html` | **DTG flagship (v14, 2026-05-19+).** Manual-first inline-form DTG quote builder + DTG AI bot + Submit-to-ShopWorks + sales tax (per-address WA DOR lookup, exempt/pickup/out-of-state) + order-summary band. Legacy iframe REMOVED (legacy builder deleted 2026-06-08; `/quote-builders/dtg-quote-builder-legacy.html` 301-redirects here). This is the sole DTG builder. | dtg-inline-form.js, dtg-quote-page.js, dtg-pricing-service.js, quote-order-summary.js | ✅ Active |
 | `/shared_components/js/dtg-quote-pricing.js` | DTG quote pricing engine | Caspio API | ✅ Active |
-| `/shared_components/js/dtg-quote-products.js` | DTG quote product manager | SanMar API | ✅ Active |
-| `/shared_components/js/dtg-quote-service.js` | DTG quote save/email service | Caspio API, EmailJS | ✅ Active |
-| `/shared_components/js/dtg-quote-system.js` | DTG quote system orchestrator | — | ✅ Active |
+| `/shared_components/js/dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — was loaded by the deleted legacy builder; dead-code candidate) | SanMar API | ⚠️ Orphan? |
+| `/shared_components/js/dtg-quote-system.js` | DTG quote system orchestrator (⚠️ legacy — dead-code candidate) | — | ⚠️ Orphan? |
 
 ### DTF System
 
