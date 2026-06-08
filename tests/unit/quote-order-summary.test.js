@@ -227,3 +227,78 @@ describe('DTF config (selector-agnostic: #dtf-shipping-fee, no shippingDisplay, 
     expect(w.document.getElementById('ship-to-card').innerHTML).toBe('');
   });
 });
+
+// ---- SCP integration: CLASS-based .os-ship-* selectors SCOPED to #spc-order-fields (the real selector-agnostic test) ----
+const SCP_FIELDS = `
+  <div id="order-recap"></div>
+  <div id="ship-to-card"></div>
+  <input id="company-name">
+  <input id="customer-name">
+  <input id="customer-number">
+  <div id="spc-order-fields">
+    <input class="os-ship-address">
+    <input class="os-ship-city">
+    <input class="os-ship-state">
+    <input class="os-ship-zip">
+    <input class="os-ship-method">
+    <input class="os-shipping-fee" value="0">
+  </div>
+`;
+function setupSCP() {
+  const dom = new JSDOM(`<!DOCTYPE html><html><body>${SCP_FIELDS}</body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
+  const { window } = dom;
+  window.eval(SRC);
+  window.QuoteOrderSummary.configure({
+    orderRecap: '#order-recap', shipToCard: '#ship-to-card',
+    ship: { address: '#spc-order-fields .os-ship-address', city: '#spc-order-fields .os-ship-city', state: '#spc-order-fields .os-ship-state', zip: '#spc-order-fields .os-ship-zip', method: '#spc-order-fields .os-ship-method', fee: '#spc-order-fields .os-shipping-fee' },
+    recap: { company: '#company-name', name: '#customer-name', custNum: '#customer-number' },
+  });
+  return window;
+}
+const scpq = (w, sel) => w.document.querySelector('#spc-order-fields ' + sel);
+
+describe('SCP config (selector-agnostic: scoped .os-ship-* classes, no estimator)', () => {
+  test('recap shows Customer (+#) but NO Shipping/Logo rows', () => {
+    const w = setupSCP();
+    w.document.getElementById('company-name').value = 'SCP Co';
+    w.document.getElementById('customer-number').value = '7788';
+    w.QuoteOrderSummary.renderOrderRecap();
+    const h = w.document.getElementById('order-recap').innerHTML;
+    expect(h).toContain('SCP Co');
+    expect(h).toContain('#7788');
+    expect(h).not.toContain('Shipping');
+    expect(h).not.toContain('Logo');
+  });
+  test('ship-to card reads SCOPED .os-ship-* / .os-shipping-fee + NO action buttons', () => {
+    const w = setupSCP();
+    scpq(w, '.os-ship-address').value = '1 A St';
+    scpq(w, '.os-ship-city').value = 'Milton';
+    scpq(w, '.os-ship-state').value = 'WA';
+    scpq(w, '.os-ship-zip').value = '98354';
+    scpq(w, '.os-ship-method').value = 'Ground';
+    scpq(w, '.os-shipping-fee').value = '40';
+    w.QuoteOrderSummary.renderShipToCard();
+    const h = w.document.getElementById('ship-to-card').innerHTML;
+    expect(h).toContain('1 A St');
+    expect(h).toContain('Milton, WA 98354');
+    expect(h).toContain('Ground');
+    expect(h).toContain('$40.00');
+    expect(h).not.toContain('st-actions');
+    expect(h).not.toContain('Re-estimate');
+  });
+  test('ship-to card hides on Customer Pickup', () => {
+    const w = setupSCP();
+    scpq(w, '.os-ship-address').value = '1 A St';
+    scpq(w, '.os-ship-method').value = 'Customer Pickup';
+    w.QuoteOrderSummary.renderShipToCard();
+    expect(w.document.getElementById('ship-to-card').innerHTML).toBe('');
+  });
+  test('getShipFields resolves the SCOPED selectors uniquely', () => {
+    const w = setupSCP();
+    scpq(w, '.os-ship-zip').value = '98354';
+    scpq(w, '.os-shipping-fee').value = '40';
+    const f = w.QuoteOrderSummary.getShipFields();
+    expect(f.zip).toBe('98354');
+    expect(f.fee).toBe(40);
+  });
+});
