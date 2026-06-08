@@ -217,7 +217,7 @@ class DTFQuoteService {
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Sales rep + tax rate (2026-03-23)
                 SalesRepEmail: quoteData.salesRep || '',
-                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
                 // Shipping fee + notes (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
@@ -706,7 +706,7 @@ class DTFQuoteService {
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
-                TaxRate: parseFloat(quoteData.taxRate) || 10.1,
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
                 // Shipping fee (2026-03-22)
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,

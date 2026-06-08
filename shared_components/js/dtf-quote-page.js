@@ -284,6 +284,13 @@ function showTaxStatus(message, type) {
 }
 
 function onShipStateChange() {
+    // [2026-06-08] P0 (#1 rule): exempt/wholesale stays 0% — the WA + short-ZIP branch below writes rate 10.1
+    // directly (bypassing lookupTaxRate's guard), which would re-tax an exempt order. Guard here too.
+    if (window._taxExempt || window._isWholesale) {
+        const _ri = document.getElementById('tax-rate-input'); if (_ri) _ri.value = '0';
+        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
+        return;
+    }
     const state = document.getElementById('ship-state')?.value;
     if (state !== 'WA') {
         document.getElementById('tax-rate-input').value = '0';
