@@ -159,6 +159,11 @@ class DTFQuoteService {
             // The shared invoice generator applies tax on top from TaxRate.
             const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
             const preTaxAllIn = parseFloat((quoteData.preTaxSubtotal != null ? quoteData.preTaxSubtotal : quoteData.subtotal).toFixed(2));
+            // [2026-06-08] polish: TotalAmount/SubtotalAmount now EXCLUDE shipping (matches the rendered line items + a
+            // separate SHIP fee row, like SCP) so /invoice shows a Shipping line + foots. Tax (below) STILL uses
+            // preTaxAllIn so shipping IS taxed. The /invoice + /quote mirror re-adds shipping via the SHIP row → no double-count.
+            const _shipFee = parseFloat(quoteData.shippingFee) || 0;
+            const preTaxNoShip = parseFloat((preTaxAllIn - _shipFee).toFixed(2));
             const _realRatePct = parseFloat(quoteData.taxRate);
             const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
             const includeTax = quoteData.includeTax !== false;
@@ -172,9 +177,9 @@ class DTFQuoteService {
                 CustomerName: quoteData.customerName || 'Guest',
                 CompanyName: quoteData.companyName || '',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: preTaxAllIn,
+                SubtotalAmount: preTaxNoShip,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: preTaxAllIn,
+                TotalAmount: preTaxNoShip,
                 Status: 'Open',
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
@@ -378,6 +383,8 @@ class DTFQuoteService {
                     }
                 }
             }
+
+            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
 
             console.log('[DTFQuoteService] Quote saved:', quoteID,
                 failedItems > 0 ? `(${failedItems} items failed)` : '');
@@ -661,6 +668,11 @@ class DTFQuoteService {
             // The shared invoice generator applies tax on top from TaxRate.
             const subtotal = parseFloat(quoteData.subtotal.toFixed(2));
             const preTaxAllIn = parseFloat((quoteData.preTaxSubtotal != null ? quoteData.preTaxSubtotal : quoteData.subtotal).toFixed(2));
+            // [2026-06-08] polish: TotalAmount/SubtotalAmount now EXCLUDE shipping (matches the rendered line items + a
+            // separate SHIP fee row, like SCP) so /invoice shows a Shipping line + foots. Tax (below) STILL uses
+            // preTaxAllIn so shipping IS taxed. The /invoice + /quote mirror re-adds shipping via the SHIP row → no double-count.
+            const _shipFee = parseFloat(quoteData.shippingFee) || 0;
+            const preTaxNoShip = parseFloat((preTaxAllIn - _shipFee).toFixed(2));
             const _realRatePct = parseFloat(quoteData.taxRate);
             const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
             const includeTax = quoteData.includeTax !== false;
@@ -673,9 +685,9 @@ class DTFQuoteService {
                 CompanyName: quoteData.companyName || '',
                 SalesRepEmail: quoteData.salesRep || 'sales@nwcustomapparel.com',
                 TotalQuantity: parseInt(quoteData.totalQuantity),
-                SubtotalAmount: preTaxAllIn,
+                SubtotalAmount: preTaxNoShip,
                 LTMFeeTotal: parseFloat((quoteData.ltmFee || 0).toFixed(2)),
-                TotalAmount: preTaxAllIn,
+                TotalAmount: preTaxNoShip,
                 ExpiresAt: this.formatDateForCaspio(expiryDate),
                 Notes: JSON.stringify({
                     locations: quoteData.selectedLocations,
@@ -781,6 +793,8 @@ class DTFQuoteService {
                 }
             }
 
+            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
+
             console.log('[DTFQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
 
             return {
@@ -795,6 +809,37 @@ class DTFQuoteService {
                 success: false,
                 error: error.message
             };
+        }
+    }
+
+    /**
+     * [2026-06-08] Write a SHIP fee line item so the saved /quote + /invoice mirror shows + foots shipping.
+     * getShippingFee() reads EmbellishmentType='fee' & StyleNumber='SHIP'. TotalAmount EXCLUDES shipping (above) and
+     * tax is on the shipping-inclusive base, so the mirror's (subtotalNet + SHIP + tax) foots with NO double-count.
+     * Mirror of SCP. Called after the product items in BOTH save paths; updateQuote deletes all items first → no dup.
+     */
+    async _saveShipFeeItem(quoteID, quoteData) {
+        const shipFee = parseFloat(quoteData.shippingFee) || 0;
+        if (shipFee <= 0) return;
+        try {
+            await fetch(`${this.baseURL}/quote_items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    QuoteID: quoteID,
+                    LineNumber: (quoteData.products?.length || 0) + 1,
+                    StyleNumber: 'SHIP',
+                    ProductName: 'Shipping',
+                    EmbellishmentType: 'fee',
+                    Quantity: 1,
+                    BaseUnitPrice: shipFee,
+                    FinalUnitPrice: shipFee,
+                    LineTotal: shipFee,
+                    AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                })
+            });
+        } catch (e) {
+            console.warn('[DTFQuoteService] SHIP fee item save failed:', e);
         }
     }
 
