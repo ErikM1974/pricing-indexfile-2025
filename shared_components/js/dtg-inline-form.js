@@ -2240,6 +2240,17 @@
             status.className = 'dcp-tax-status' + (cls ? ' dcp-tax-status--' + cls : '');
         };
 
+        // [2026-06-08] Tax-exempt customer (CRM Is_Tax_Exempt) → force 0% + skip the pickup/DOR lookup (parity with
+        // EMB/DTF/SCP). DTG previously showed an "exempt" chip but STILL taxed them on screen + PDF + the saved total.
+        if (state.customer && state.customer.isTaxExempt) {
+            state.shipping.taxRate = 0;
+            state.shipping.taxRateSource = 'tax-exempt';
+            state.shipping.taxAccount = '2204';
+            state.shipping.taxAccountName = 'Tax Exempt';
+            setStatus('Tax-exempt customer — no sales tax', 'success');
+            renderSummary();
+            return;
+        }
         const isPickup = isPickupMethod(state.shipping.method);
         if (isPickup) {
             state.shipping.taxRate = 0.101;
@@ -2694,9 +2705,10 @@
             if (firstContact) {
                 applyContact(firstContact);
             }
-            // Re-derive tax (out-of-state customer → 0% even before rep
-            // touches ship-to fields).
-            if (billingStateChanged) recomputeTaxRate();
+            // [2026-06-08] Re-derive tax on EVERY customer pick (not just billing-state changes): catches
+            // tax-exempt customers (→ 0%) the moment they're selected + exempt↔taxable transitions, plus the
+            // original out-of-state-on-pick case. recomputeTaxRate is cheap pre-ship-to (it skips the DOR lookup).
+            recomputeTaxRate();
 
             // Fire-and-forget customer history fetch (Phase 1 info-only pill).
             // Renders in the background ~400ms later — doesn't block any
