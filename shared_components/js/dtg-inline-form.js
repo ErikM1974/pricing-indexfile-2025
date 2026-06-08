@@ -4488,12 +4488,20 @@
             state: '', city: '', po: '',
             designNumber: '', terms: 'Prepaid', contacts: [],
             salesRepCode: preservedRepCode,
+            // [2026-06-08] Phase 1 — MUST reset the tax flags or they bleed into the next
+            // quote (a prior wholesale/exempt would keep zeroing tax on a fresh order).
+            isWholesale: false, isTaxExempt: false, taxExemptNumber: '',
         };
         state.shipping = {
             method: 'Customer Pickup',  // matches the default in state init (top of file)
             address1: '', address2: '', city: '', state: '', zip: '',
             taxRate: 0.101, taxRateSource: 'pickup-flat',
             taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
+            // [2026-06-08] Phase 1 — CRITICAL: re-seed includeTax/taxRateOverride. Omitting
+            // includeTax left it `undefined` after reset → recomputeTaxRate's `!includeTax`
+            // opt-out branch fired → every post-reset quote silently dropped to 0% tax while
+            // the #include-tax checkbox still rendered checked (a money desync).
+            includeTax: true, taxRateOverride: null,
         };
         // Schedule resets: re-auto-calc due date from qty (will land on 5 BDs
         // since qty starts at 0 → ≤24 branch).
