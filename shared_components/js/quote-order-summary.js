@@ -41,7 +41,14 @@
         return String(v).trim();
     }
 
-    function configure(cfg) { _cfg = cfg || null; }
+    function configure(cfg) {
+        _cfg = cfg || null;
+        // Auto-point the ship-to card's Re-estimate button at the module estimator when a builder supplies
+        // estimateHooks (so each builder doesn't re-wire _cfg.estimate). EMB may still set its own.
+        if (_cfg && _cfg.estimateHooks && typeof _cfg.estimate !== 'function') {
+            _cfg.estimate = function () { return estimateShipping(); };
+        }
+    }
 
     // Selector-agnostic ship-field accessor — the linchpin that lets one band serve #ship-* AND .os-ship-*.
     function getShipFields() {
@@ -56,6 +63,129 @@
             fee: parseFloat(_val(s.fee)) || 0,
             residential: !!(resEl && resEl.checked),
         };
+    }
+
+    // ============================================================
+    // Shipping estimator (UPS Ground prepay) — extracted from embroidery-quote-builder.js (2026-06-08, Commit 4).
+    // perBoxForCategory + the box-consolidation loop are LIFTED BYTE-FOR-BYTE — validated against real ShopWorks/UPS
+    // invoices (2026-06-07). DO NOT edit the math; only the I/O boundary (zip/fee/residential via getShipFields,
+    // products via _cfg.estimateHooks.collectProducts, fee write via _cfg.ship.fee, post-apply via onApplied) is
+    // parameterized so EMB/DTF/SCP share ONE estimator.
+    // ============================================================
+    function _apiBase() {
+        return (_cfg && _cfg.apiBase)
+            || (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    }
+    function _hasEstimator() { return !!(_cfg && _cfg.estimateHooks); }
+
+    function perBoxForCategory(avgWtLb, caseSize, catName) {
+        const m = window._boxDensity || {};
+        const c = String(catName || '').toLowerCase();
+        if (c) {
+            if (c.includes('cap') || c.includes('hat') || c.includes('headwear') || c.includes('beanie')) return m.Cap || 60;
+            if (c.includes('outerwear') || c.includes('jacket') || c.includes('vest')) {
+                return avgWtLb >= 1.7 ? (m.Outerwear || 15) : (m.Jacket || 17);
+            }
+            if (c.includes('sweatshirt') || c.includes('fleece') || c.includes('hood')) return m.Sweatshirt || m.Hoodie || 16;
+            if (c.includes('polo') || c.includes('knit') || c.includes('woven') || c.includes('dress shirt')) return m.Polo || 36;
+            if (c.includes('t-shirt') || c.includes('tee') || c.includes('tank')) return m['T-Shirt'] || 58;
+        }
+        if (caseSize >= 100) return m.Cap || 60;
+        if (avgWtLb >= 1.7) return m.Outerwear || 15;
+        if (avgWtLb >= 1.0) return m.Jacket || m.Sweatshirt || 16;
+        if (avgWtLb >= 0.5) return m.Polo || 36;
+        return m['T-Shirt'] || 58;
+    }
+
+    async function estimateShipping() {
+        var hooks = (_cfg && _cfg.estimateHooks) || {};
+        var btn = hooks.btn ? _el(hooks.btn) : null;
+        var resultEl = hooks.result ? _el(hooks.result) : null;
+        var setMsg = function (msg, color) { if (resultEl) { resultEl.innerHTML = msg; resultEl.style.color = color || '#64748b'; } };
+        var f = getShipFields();
+        var zip = f.zip;
+        if (!zip) return setMsg('Enter the ship-to ZIP first.', '#dc2626');
+        var products = (typeof hooks.collectProducts === 'function') ? (hooks.collectProducts() || []) : [];
+        products = products.filter(function (p) { return p && p.style && !p.isService; });  // p.style guards SCP service/fee rows (no isService flag); !isService matches EMB
+        if (products.length === 0) return setMsg('Add products first.', '#dc2626');
+        var API_BASE = _apiBase();
+
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
+        try {
+            if (!window._boxDensity) {
+                try { const dr = await fetch(`${API_BASE}/api/shipping/box-density`); if (dr.ok) window._boxDensity = (await dr.json()).density || {}; } catch (e) { window._boxDensity = {}; }
+            }
+            window._shipWtCache = window._shipWtCache || {};
+            let totalWeightLb = 0, boxEquivalents = 0, usedFallback = false;
+            for (const p of products) {
+                const style = p.style;
+                const sizes = p.sizeBreakdown || {};
+                if (!window._shipWtCache[style]) {
+                    try {
+                        const r = await fetch(`${API_BASE}/api/inventory?styleNumber=${encodeURIComponent(style)}`);
+                        const data = r.ok ? await r.json() : [];
+                        const rows = Array.isArray(data) ? data : (data.rows || data.Result || data.data || []);
+                        const bySize = {};
+                        let category = '';
+                        rows.forEach(row => {
+                            const sz = row.SIZE || row.size || row.Size;
+                            if (sz && bySize[sz] === undefined) {
+                                bySize[sz] = { wt: parseFloat(row.PIECE_WEIGHT) || 0, casePack: parseInt(row.CASE_SIZE) || 0 };
+                            }
+                            if (!category) category = row.CATEGORY_NAME || row.category || '';
+                        });
+                        window._shipWtCache[style] = { bySize, category };
+                    } catch (e) { window._shipWtCache[style] = { bySize: {}, category: '' }; }
+                }
+                const { bySize, category } = window._shipWtCache[style];
+                let prodQty = 0, prodWt = 0, maxCase = 0;
+                for (const [size, qty] of Object.entries(sizes)) {
+                    const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
+                    const wt = (meta && meta.wt) || 0.5;
+                    if (!meta) usedFallback = true;
+                    const q = parseInt(qty) || 0;
+                    totalWeightLb += wt * q;
+                    prodQty += q;
+                    prodWt += wt * q;
+                    if (meta && meta.casePack) maxCase = Math.max(maxCase, meta.casePack);
+                }
+                const avgWt = prodQty > 0 ? prodWt / prodQty : 0.5;
+                const ppb = perBoxForCategory(avgWt, maxCase, category);
+                if (prodQty > 0 && ppb > 0) boxEquivalents += prodQty / ppb;
+            }
+            const totalBoxes = Math.max(1, Math.ceil(boxEquivalents));
+            const boxWeightsLb = Array.from({ length: totalBoxes }, () => totalWeightLb / totalBoxes);
+            const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, boxWeightsLb, residential: !!f.residential })
+            });
+            if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
+            const est = await resp.json();
+            var feeEl = (_cfg && _cfg.ship && _cfg.ship.fee) ? _el(_cfg.ship.fee) : null;
+            if (feeEl) { feeEl.value = Number(est.estimate).toFixed(2); }
+            if (typeof hooks.onApplied === 'function') hooks.onApplied();
+            window._lastShipEstimate = { estimate: Number(est.estimate) || 0, boxes: est.boxes, zone: est.zone, weight: est.billableWeightLb };
+            renderShipToCard();
+            setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— ${est.basis === 'list' ? 'UPS list rate' : ('est. cost +' + Math.round((est.markupPct || 0) * 100) + '% handling')}${est.rough ? ' · approx zone' : ''}, adjust as needed</span>`, '#166534');
+        } catch (e) {
+            console.error('[estimateShipping]', e);
+            setMsg('Could not estimate shipping — enter it manually.', '#dc2626');
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-truck-fast"></i> Estimate UPS Ground'; }
+        }
+    }
+
+    function openShippingModal() {
+        var sel = (_cfg && _cfg.shippingModal) || '#shipping-modal';
+        var m = _el(sel); if (m) m.classList.add('open');
+    }
+    function closeShippingModal() {
+        var sel = (_cfg && _cfg.shippingModal) || '#shipping-modal';
+        var m = _el(sel); if (m) m.classList.remove('open');
+        var hooks = (_cfg && _cfg.estimateHooks) || {};
+        if (typeof hooks.onModalClose === 'function') hooks.onModalClose();
+        renderShipToCard();
     }
 
     function renderShipToCard() {
@@ -147,11 +277,20 @@
         renderOrderRecap: renderOrderRecap,
         renderShipToCard: renderShipToCard,
         reestimateShipFromCard: reestimateShipFromCard,
+        estimateShipping: estimateShipping,
+        openShippingModal: openShippingModal,
+        closeShippingModal: closeShippingModal,
+        _hasEstimator: _hasEstimator,
     };
     // Back-compat globals — existing bare call sites + inline onclick keep working unchanged.
     global.renderOrderRecap = renderOrderRecap;
     global.renderShipToCard = renderShipToCard;
     global.reestimateShipFromCard = reestimateShipFromCard;
+    // estimateShipping / openShippingModal / closeShippingModal are invoked from inline onclick= strings
+    // (EMB modal + Estimate button), so they MUST be globals.
+    global.estimateShipping = estimateShipping;
+    global.openShippingModal = openShippingModal;
+    global.closeShippingModal = closeShippingModal;
 
     // CommonJS export for the jest regression lock (no-op in the browser).
     if (typeof module !== 'undefined' && module.exports) { module.exports = global.QuoteOrderSummary; }

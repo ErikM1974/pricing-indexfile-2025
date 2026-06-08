@@ -312,3 +312,79 @@ describe('SCP config (selector-agnostic: scoped .os-ship-* classes, no estimator
     expect(w.document.getElementById('ship-to-card').innerHTML).toBe(''); // empty after blanking → no stale address
   });
 });
+
+// ---- Shipping estimator (box-math lifted byte-for-byte from EMB — money path; lock the weight/box calc) ----
+function setupEst(products) {
+  const dom = new JSDOM(`<!DOCTYPE html><html><body>
+    <div id="order-recap"></div><div id="ship-to-card"></div>
+    <input id="company-name"><input id="customer-name"><input id="customer-number">
+    <input id="ship-address" value="1 A St"><input id="ship-city" value="Milton">
+    <input id="ship-state" value="WA"><input id="ship-zip" value="98354">
+    <input id="ship-method" value="Ground"><input id="shipping-fee" value="0">
+    <input type="checkbox" id="ship-residential">
+    <button id="est-btn"></button><div id="est-result"></div>
+  </body></html>`, { runScripts: 'outside-only', pretendToBeVisual: true });
+  const { window } = dom;
+  window.eval(SRC);
+  window._boxDensity = undefined; window._shipWtCache = undefined; window._lastShipEstimate = undefined;
+  const calls = [];
+  window.fetch = function (url, opts) {
+    calls.push({ url: String(url), body: opts && opts.body ? JSON.parse(opts.body) : null });
+    const ok = (body) => Promise.resolve({ ok: true, json: () => Promise.resolve(body) });
+    if (String(url).includes('box-density')) return ok({ density: {} });
+    if (String(url).includes('/api/inventory')) return ok([
+      { SIZE: 'S', PIECE_WEIGHT: '0.35', CASE_SIZE: '72', CATEGORY_NAME: 'T-Shirts' },
+      { SIZE: 'M', PIECE_WEIGHT: '0.35', CASE_SIZE: '72', CATEGORY_NAME: 'T-Shirts' },
+      { SIZE: 'XL', PIECE_WEIGHT: '0.40', CASE_SIZE: '72', CATEGORY_NAME: 'T-Shirts' },
+    ]);
+    if (String(url).includes('estimate-ups-ground')) return ok({ estimate: 18.5, boxes: 1, zone: 4, billableWeightLb: 15, basis: 'list' });
+    return ok({});
+  };
+  window.QuoteOrderSummary.configure({
+    orderRecap: '#order-recap', shipToCard: '#ship-to-card',
+    ship: { address: '#ship-address', city: '#ship-city', state: '#ship-state', zip: '#ship-zip', method: '#ship-method', fee: '#shipping-fee', residential: '#ship-residential' },
+    recap: { company: '#company-name', name: '#customer-name', custNum: '#customer-number' },
+    estimateHooks: { collectProducts: () => products, onApplied: () => {}, btn: '#est-btn', result: '#est-result' },
+    apiBase: 'http://proxy.test',
+  });
+  return { window, calls };
+}
+
+describe('Shipping estimator (box-math byte-lock)', () => {
+  test('weight + box count from SanMar data, posts the right body, sets fee + _lastShipEstimate', async () => {
+    const { window, calls } = setupEst([{ style: 'PC54', sizeBreakdown: { S: 12, M: 24, XL: 6 } }]);
+    await window.QuoteOrderSummary.estimateShipping();
+    const est = calls.find(c => c.url.includes('estimate-ups-ground'));
+    expect(est).toBeTruthy();
+    expect(est.body.weightLb).toBeCloseTo(15.0, 5);   // 12*.35 + 24*.35 + 6*.40
+    expect(est.body.boxes).toBe(1);                    // 42 pcs / 58 per-box (T-Shirt) = 0.72 → ceil 1
+    expect(est.body.boxWeightsLb).toHaveLength(1);
+    expect(est.body.boxWeightsLb[0]).toBeCloseTo(15.0, 5);
+    expect(est.body.residential).toBe(false);
+    expect(window.document.getElementById('shipping-fee').value).toBe('18.50');
+    expect(window._lastShipEstimate).toEqual({ estimate: 18.5, boxes: 1, zone: 4, weight: 15 });
+  });
+  test('estimateHooks auto-lights the ship-to card Re-estimate button', () => {
+    const { window } = setupEst([]);
+    window.QuoteOrderSummary.renderShipToCard();
+    expect(window.document.getElementById('ship-to-card').innerHTML).toContain('Re-estimate');
+  });
+  test('residential checkbox flows into the request body', async () => {
+    const { window, calls } = setupEst([{ style: 'PC54', sizeBreakdown: { M: 10 } }]);
+    window.document.getElementById('ship-residential').checked = true;
+    await window.QuoteOrderSummary.estimateShipping();
+    expect(calls.find(c => c.url.includes('estimate-ups-ground')).body.residential).toBe(true);
+  });
+  test('skips service / styleless rows — no /api/inventory?styleNumber=undefined', async () => {
+    const { window, calls } = setupEst([
+      { style: 'PC54', sizeBreakdown: { M: 10 } },
+      { isService: true, sizeBreakdown: { SVC: 1 } },
+      { style: '', sizeBreakdown: { M: 5 } },
+    ]);
+    await window.QuoteOrderSummary.estimateShipping();
+    const inv = calls.filter(c => c.url.includes('/api/inventory'));
+    expect(inv.length).toBe(1);
+    expect(inv[0].url).toContain('styleNumber=PC54');
+    expect(calls.some(c => c.url.includes('styleNumber=undefined'))).toBe(false);
+  });
+});
