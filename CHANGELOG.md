@@ -1,3 +1,8 @@
+## v2026.06.08.7 (2026.06.08)
+
+- docs(memory): SCP Phase 3 band DONE+reviewed+reset-fix; band parity COMPLETE across EMB/DTF/SCP
+- Deploy v2026.06.08.7: freight estimate now cost-based (negotiated + 15% handling) label
+
 ## v2026.06.08.2 (2026.06.08)
 
 - docs(memory): Phase 0 DTF/SCP parity DONE + verified live; log the shared-extraction gotcha
