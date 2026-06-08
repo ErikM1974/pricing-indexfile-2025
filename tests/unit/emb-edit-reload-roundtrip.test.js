@@ -49,6 +49,7 @@ const HTML = read('quote-builders/embroidery-quote-builder.html');
 const UTILS_SRC = read('shared_components/js/quote-builder-utils.js');
 const PCF_SRC = read('shared_components/js/product-category-filter.js');
 const SERVICE_SRC = read('shared_components/js/embroidery-quote-service.js');
+const SUMMARY_SRC = read('shared_components/js/quote-order-summary.js');
 const BUILDER_SRC = read('shared_components/js/embroidery-quote-builder.js');
 
 // Source the builder once for the lightweight source-guard backstop tests at the bottom.
@@ -132,6 +133,7 @@ async function buildBuilder(routes) {
   inject(UTILS_SRC);
   inject(PCF_SRC);
   inject(SERVICE_SRC + '\n;window.EmbroideryQuoteService = EmbroideryQuoteService;');
+  inject(SUMMARY_SRC);  // shared order-summary band — must load before the builder (matches production) so the builder's QuoteOrderSummary.configure() wires #order-recap / #ship-to-card
   inject(BUILDER_SRC + TEST_HOOKS);
 
   // Wire the two module-level deps that init() would normally create, without running init().

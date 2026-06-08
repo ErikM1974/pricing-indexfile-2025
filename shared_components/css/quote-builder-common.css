@@ -3383,8 +3383,10 @@ input[type="radio"] {
 .emb-builder .invoice-totals-wrap { justify-content: flex-start; gap: 12px; }
 .emb-builder .order-recap { margin-right: 0; }
 .emb-builder .invoice-totals-box { margin-left: auto; }
-.emb-builder .ship-to-card { flex: 1 1 260px; min-width: 0; align-self: stretch; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; }
-.emb-builder .ship-to-card:empty { display: none; }
+/* [2026-06-08] Card shell de-scoped from .emb-builder so DTF/SCP inherit it when they adopt the band (Phase 2/3).
+   The band POSITIONING (.invoice-totals-wrap flex / .order-recap margin above) stays per-builder. */
+.ship-to-card { flex: 1 1 260px; min-width: 0; align-self: stretch; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; }
+.ship-to-card:empty { display: none; }
 .ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
 .ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
 .ship-to-card .st-co { font-weight: 600; }
