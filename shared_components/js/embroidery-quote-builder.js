@@ -6173,8 +6173,7 @@ async function estimateShipping() {
             try { const dr = await fetch(`${API_BASE}/api/shipping/box-density`); if (dr.ok) window._boxDensity = (await dr.json()).density || {}; } catch (e) { window._boxDensity = {}; }
         }
         window._shipWtCache = window._shipWtCache || {};
-        let totalWeightLb = 0, totalBoxes = 0, usedFallback = false;
-        const boxWeightsLb = [];   // real per-box weights → endpoint prices each box at its own weight
+        let totalWeightLb = 0, boxEquivalents = 0, usedFallback = false;
         for (const p of products) {
             const style = p.style;
             const sizes = p.sizeBreakdown || {};
@@ -6207,20 +6206,17 @@ async function estimateShipping() {
                 prodWt += wt * q;
                 if (meta && meta.casePack) maxCase = Math.max(maxCase, meta.casePack);
             }
-            // Boxes per PRODUCT from DATA-BACKED outbound density (real SanMar cartons +
-            // decorated shave) — uses the product's real SanMar category, else weight/case.
+            // CONSOLIDATE boxes across the WHOLE order: accumulate fractional "box-equivalents"
+            // (qty ÷ category pieces-per-box) and round up ONCE after the loop. Per-product
+            // counting over-counted multi-style orders 2.7–3.6× (mixed styles actually share a
+            // box) — validated against real ShopWorks/UPS invoices 2026-06-07. (Erik)
             const avgWt = prodQty > 0 ? prodWt / prodQty : 0.5;
             const ppb = perBoxForCategory(avgWt, maxCase, category);
-            const nBoxesProd = prodQty > 0 ? Math.max(1, Math.ceil(prodQty / ppb)) : 0;
-            totalBoxes += nBoxesProd;
-            // Spread this product's weight across its own boxes so each box is priced at its
-            // real weight (a heavy jacket box vs a light tee box) instead of an even split.
-            if (nBoxesProd > 0) {
-                const perBoxWt = prodWt / nBoxesProd;
-                for (let i = 0; i < nBoxesProd; i++) boxWeightsLb.push(perBoxWt);
-            }
+            if (prodQty > 0 && ppb > 0) boxEquivalents += prodQty / ppb;
         }
-        totalBoxes = Math.max(1, totalBoxes);
+        // One ceil for the whole order; even-split total weight across the consolidated boxes.
+        const totalBoxes = Math.max(1, Math.ceil(boxEquivalents));
+        const boxWeightsLb = Array.from({ length: totalBoxes }, () => totalWeightLb / totalBoxes);
         const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             // [B12] (audit 2026-06-06): pass residential so the endpoint adds its residential surcharge.
