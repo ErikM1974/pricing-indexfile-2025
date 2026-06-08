@@ -1951,9 +1951,19 @@ if (typeof QuoteOrderSummary !== 'undefined') {
                 return out;
             }
         },
-        estimate: function () { return (typeof estimateShipping === 'function') ? estimateShipping() : null; },
+        estimate: function () { return QuoteOrderSummary.estimateShipping(); },
         reestimateOnclick: 'reestimateShipFromCard()',
         editOnclick: 'openShippingModal()',
+        apiBase: API_BASE,
+        // [2026-06-08] EMB DRY-rewire: EMB now uses the SHARED estimator (byte-identical copy in quote-order-summary.js);
+        // estimateShipping() below is a thin delegate, perBoxForCategory removed. These hooks give the shared estimator
+        // EMB's product source + post-apply recalc. (EMB keeps its own openShippingModal/closeShippingModal.)
+        estimateHooks: {
+            collectProducts: function () { return collectProductsFromTable(); },
+            onApplied: function () { updateAdditionalCharges(); updateTaxCalculation(); },
+            btn: '#estimate-ship-btn',
+            result: '#estimate-ship-result',
+        },
     });
 }
 
@@ -6121,126 +6131,15 @@ function syncRushRow() {
 }
 window.syncRushRow = syncRushRow;
 
-// Data-backed OUTBOUND pieces-per-box by category, from a real SanMar inbound-carton
-// sample (2026-06-04: tee full cartons ~70-78, hoodie ~18-20) with a decorated-bulk
-// shave — decorated/folded goods fit FEWER per box than flat-packed blanks, so this
-// errs to MORE boxes (bias high for prepay). Uses the product's REAL SanMar category
-// (/api/inventory CATEGORY_NAME) when known, else infers from avg per-piece weight + case.
-function perBoxForCategory(avgWtLb, caseSize, catName) {
-    // window._boxDensity is loaded from /api/shipping/box-density (Caspio Box_Density_Reference
-    // → defaults), so Erik can tune the numbers without a deploy. Hardcoded values = fallback.
-    const m = window._boxDensity || {};
-    const c = String(catName || '').toLowerCase();
-    // Prefer the product's real SanMar category.
-    if (c) {
-        if (c.includes('cap') || c.includes('hat') || c.includes('headwear') || c.includes('beanie')) return m.Cap || 60;
-        if (c.includes('outerwear') || c.includes('jacket') || c.includes('vest')) {
-            // SanMar lumps jackets + heavy outerwear under "Outerwear"; split by weight.
-            return avgWtLb >= 1.7 ? (m.Outerwear || 15) : (m.Jacket || 17);
-        }
-        if (c.includes('sweatshirt') || c.includes('fleece') || c.includes('hood')) return m.Sweatshirt || m.Hoodie || 16;
-        if (c.includes('polo') || c.includes('knit') || c.includes('woven') || c.includes('dress shirt')) return m.Polo || 36;
-        if (c.includes('t-shirt') || c.includes('tee') || c.includes('tank')) return m['T-Shirt'] || 58;
-    }
-    // Fallback: infer from avg per-piece weight + SanMar case pack (blank/unknown category).
-    if (caseSize >= 100) return m.Cap || 60;          // caps / headwear (light, high case pack)
-    if (avgWtLb >= 1.7) return m.Outerwear || 15;     // heavy parkas / insulated outerwear
-    if (avgWtLb >= 1.0) return m.Jacket || m.Sweatshirt || 16;  // jackets / hoodies / fleece
-    if (avgWtLb >= 0.5) return m.Polo || 36;          // polos / heavier knits
-    return m['T-Shirt'] || 58;                        // tees / light tops
-}
+// [2026-06-08] EMB DRY-rewire: perBoxForCategory (box-density math) removed — it now lives ONLY in the shared
+// estimator (quote-order-summary.js), which EMB's estimateShipping delegate calls. Tune box density via Caspio
+// Box_Density_Reference (window._boxDensity) as before — no code change needed.
 
-/**
- * Estimate outbound UPS Ground freight for the current order so the rep can put a
- * prepay shipping line on the quote (customer pays it up front — no second card charge).
- * Weight + box count come from REAL SanMar data (/api/inventory → PIECE_WEIGHT + CASE_SIZE
- * per size); the rate uses the real UPS Ground Daily grid + origin-983 zones via the proxy
- * (/api/shipping/estimate-ups-ground). (2026-06-04; rate model upgraded 2026-06-07, Erik)
- */
-async function estimateShipping() {
-    const btn = document.getElementById('estimate-ship-btn');
-    const resultEl = document.getElementById('estimate-ship-result');
-    const setMsg = (msg, color) => { if (resultEl) { resultEl.innerHTML = msg; resultEl.style.color = color || '#64748b'; } };
-    const zip = document.getElementById('ship-zip')?.value?.trim();
-    if (!zip) return setMsg('Enter the ship-to ZIP first.', '#dc2626');
-    const products = collectProductsFromTable().filter(p => !p.isService);
-    if (products.length === 0) return setMsg('Add products first.', '#dc2626');
-
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
-    try {
-        // Load the tunable box density (Caspio Box_Density_Reference → defaults) once.
-        if (!window._boxDensity) {
-            try { const dr = await fetch(`${API_BASE}/api/shipping/box-density`); if (dr.ok) window._boxDensity = (await dr.json()).density || {}; } catch (e) { window._boxDensity = {}; }
-        }
-        window._shipWtCache = window._shipWtCache || {};
-        let totalWeightLb = 0, boxEquivalents = 0, usedFallback = false;
-        for (const p of products) {
-            const style = p.style;
-            const sizes = p.sizeBreakdown || {};
-            if (!window._shipWtCache[style]) {
-                try {
-                    const r = await fetch(`${API_BASE}/api/inventory?styleNumber=${encodeURIComponent(style)}`);
-                    const data = r.ok ? await r.json() : [];
-                    const rows = Array.isArray(data) ? data : (data.rows || data.Result || data.data || []);
-                    const bySize = {};
-                    let category = '';
-                    rows.forEach(row => {
-                        const sz = row.SIZE || row.size || row.Size;
-                        if (sz && bySize[sz] === undefined) {
-                            bySize[sz] = { wt: parseFloat(row.PIECE_WEIGHT) || 0, casePack: parseInt(row.CASE_SIZE) || 0 };
-                        }
-                        if (!category) category = row.CATEGORY_NAME || row.category || '';
-                    });
-                    window._shipWtCache[style] = { bySize, category };
-                } catch (e) { window._shipWtCache[style] = { bySize: {}, category: '' }; }
-            }
-            const { bySize, category } = window._shipWtCache[style];
-            let prodQty = 0, prodWt = 0, maxCase = 0;
-            for (const [size, qty] of Object.entries(sizes)) {
-                const meta = bySize[size] || bySize[String(size).toUpperCase()] || Object.values(bySize)[0];
-                const wt = (meta && meta.wt) || 0.5;       // fallback ~0.5 lb/pc
-                if (!meta) usedFallback = true;
-                const q = parseInt(qty) || 0;
-                totalWeightLb += wt * q;
-                prodQty += q;
-                prodWt += wt * q;
-                if (meta && meta.casePack) maxCase = Math.max(maxCase, meta.casePack);
-            }
-            // CONSOLIDATE boxes across the WHOLE order: accumulate fractional "box-equivalents"
-            // (qty ÷ category pieces-per-box) and round up ONCE after the loop. Per-product
-            // counting over-counted multi-style orders 2.7–3.6× (mixed styles actually share a
-            // box) — validated against real ShopWorks/UPS invoices 2026-06-07. (Erik)
-            const avgWt = prodQty > 0 ? prodWt / prodQty : 0.5;
-            const ppb = perBoxForCategory(avgWt, maxCase, category);
-            if (prodQty > 0 && ppb > 0) boxEquivalents += prodQty / ppb;
-        }
-        // One ceil for the whole order; even-split total weight across the consolidated boxes.
-        const totalBoxes = Math.max(1, Math.ceil(boxEquivalents));
-        const boxWeightsLb = Array.from({ length: totalBoxes }, () => totalWeightLb / totalBoxes);
-        const resp = await fetch(`${API_BASE}/api/shipping/estimate-ups-ground`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            // [B12] (audit 2026-06-06): pass residential so the endpoint adds its residential surcharge.
-            // [2026-06-07] pass boxWeightsLb so each box is priced at its real weight (heavy jacket box
-            // vs light tee box) against the real UPS Daily grid — weightLb/boxes kept for fallback.
-            body: JSON.stringify({ toZip: zip, weightLb: totalWeightLb, boxes: totalBoxes, boxWeightsLb, residential: !!document.getElementById('ship-residential')?.checked })
-        });
-        if (!resp.ok) throw new Error('estimate endpoint ' + resp.status);
-        const est = await resp.json();
-        const feeInput = document.getElementById('shipping-fee');
-        if (feeInput) { feeInput.value = Number(est.estimate).toFixed(2); }
-        if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
-        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
-        // [2026-06-07] remember the estimate so the Ship-To card can show boxes/zone + re-render with the new charge
-        window._lastShipEstimate = { estimate: Number(est.estimate) || 0, boxes: est.boxes, zone: est.zone, weight: est.billableWeightLb };
-        if (typeof renderShipToCard === 'function') renderShipToCard();
-        setMsg(`&approx; <strong>$${Number(est.estimate).toFixed(2)}</strong> UPS Ground &middot; ${est.billableWeightLb} lb &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${est.zone}${usedFallback ? ' <span style="color:#d97706;">(some weights estimated)</span>' : ''} <span style="color:#94a3b8;">— ${est.basis === 'list' ? 'UPS list rate' : ('est. cost +' + Math.round((est.markupPct || 0) * 100) + '% handling')}${est.rough ? ' · approx zone' : ''}, adjust as needed</span>`, '#166534');
-    } catch (e) {
-        console.error('[estimateShipping]', e);
-        setMsg('Could not estimate shipping — enter it manually.', '#dc2626');
-    } finally {
-        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-truck-fast"></i> Estimate UPS Ground'; }
-    }
-}
+// [2026-06-08] EMB DRY-rewire: thin delegate to the SHARED estimator (quote-order-summary.js). The full UPS-Ground
+// weight/box-math (validated vs real ShopWorks/UPS invoices) now lives ONCE in the module; EMB's estimateHooks (in
+// configure above) feed it EMB's product source (collectProductsFromTable) + #shipping-fee + #ship-residential + the
+// post-apply recalc. Byte-identical to the old inline copy — regression-gated against a fixed order before shipping.
+async function estimateShipping() { return QuoteOrderSummary.estimateShipping(); }
 window.estimateShipping = estimateShipping;
 
 async function recalculatePricing() {
