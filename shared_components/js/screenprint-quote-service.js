@@ -230,6 +230,7 @@ class ScreenPrintQuoteService {
             });
 
             const itemResults = await Promise.all(itemPromises);
+            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] P1: SHIP fee row so the saved mirror shows + taxes shipping
             const failedCount = itemResults.filter(r => !r).length;
 
             console.log('[ScreenPrintQuoteService] Quote saved:', quoteID,
@@ -517,6 +518,7 @@ class ScreenPrintQuoteService {
             });
 
             await Promise.all(itemPromises);
+            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] P1: SHIP fee row so the saved mirror shows + taxes shipping
 
             console.log('[ScreenPrintQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
 
@@ -559,6 +561,38 @@ class ScreenPrintQuoteService {
             console.log('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
         } catch (error) {
             console.warn('[ScreenPrintQuoteService] Error deleting items:', error);
+        }
+    }
+
+    /**
+     * [2026-06-08] P1: write a SHIP fee line item so the saved /quote + /invoice mirror shows + taxes shipping.
+     * getShippingFee() (quote-view.js + invoice.js) resolves shipping ONLY from EmbellishmentType='fee' &
+     * StyleNumber='SHIP'. SCP's TotalAmount stays pre-tax / pre-shipping (the mirror adds shipping on top — see the
+     * preTaxTotal comment), so without this row the saved view dropped shipping + its tax (under-charge). Mirror EMB.
+     * Called after the product items in BOTH saveQuote + updateQuote; updateQuote deletes all items first so no dup.
+     */
+    async _saveShipFeeItem(quoteID, quoteData) {
+        const shipFee = parseFloat(quoteData.shippingFee) || 0;
+        if (shipFee <= 0) return;
+        try {
+            await fetch(`${this.baseURL}/api/quote_items`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    QuoteID: quoteID,
+                    LineNumber: (quoteData.items?.length || 0) + 1,
+                    StyleNumber: 'SHIP',
+                    ProductName: 'Shipping',
+                    EmbellishmentType: 'fee',
+                    Quantity: 1,
+                    BaseUnitPrice: shipFee,
+                    FinalUnitPrice: shipFee,
+                    LineTotal: shipFee,
+                    AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                })
+            });
+        } catch (e) {
+            console.warn('[ScreenPrintQuoteService] SHIP fee item save failed:', e);
         }
     }
 
