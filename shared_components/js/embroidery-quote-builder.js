@@ -1925,100 +1925,37 @@ function dateFromInputValue(v) {          // YYYY-MM-DD (or MM/DD/YYYY) → MM/D
     return '';
 }
 
-// [2026-06-07] Ship-To address card in the order-at-a-glance band — shows the entered destination so the rep
-// can verify it at a glance (Erik's idea). Hidden for Customer Pickup or when no address is entered.
-function renderShipToCard() {
-    const el = document.getElementById('ship-to-card');
-    if (!el) return;
-    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const method = (document.getElementById('ship-method')?.value || '').trim();
-    const isPickup = /pickup|will[\s-]?call/i.test(method);
-    const addr = (document.getElementById('ship-address')?.value || '').trim();
-    const city = (document.getElementById('ship-city')?.value || '').trim();
-    const state = (document.getElementById('ship-state')?.value || '').trim();
-    const zip = (document.getElementById('ship-zip')?.value || '').trim();
-    if (isPickup || !(addr || city || zip)) { el.innerHTML = ''; return; }  // hidden for pickup / no address
-    const company = (document.getElementById('company-name')?.value || '').trim();
-    const cityLine = ([city, state].filter(Boolean).join(', ') + (zip ? ' ' + zip : '')).trim();
-    const lines = [];
-    if (company) lines.push(`<div class="st-line st-co">${esc(company)}</div>`);
-    if (addr) lines.push(`<div class="st-line">${esc(addr)}</div>`);
-    if (cityLine) lines.push(`<div class="st-line">${esc(cityLine)}</div>`);
-    // shipping line: method · charge · (boxes/zone — ONLY when the charge IS still the estimate, not a manual override)
-    const fee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
-    const est = window._lastShipEstimate;
-    let shipLine = esc(method || 'UPS Ground');
-    if (fee > 0) shipLine += ` &middot; $${fee.toFixed(2)}`;
-    if (est && Math.abs((est.estimate || 0) - fee) < 0.01 && est.boxes) {
-        shipLine += ` &middot; ${est.boxes} box${est.boxes > 1 ? 'es' : ''} &middot; zone ${esc(String(est.zone))}`;
-    }
-    lines.push(`<div class="st-line st-method">${shipLine}</div>`);
-    const actions = '<div class="st-actions">'
-        + '<button type="button" class="st-btn st-btn-reest" onclick="reestimateShipFromCard()" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>'
-        + '<button type="button" class="st-btn st-btn-edit" onclick="openShippingModal()" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>'
-        + '</div>';
-    el.innerHTML = `<div class="st-title">Ship To</div>${lines.join('')}${actions}`;
+// [2026-06-08] Order-summary band (Order Recap + Ship-To card) EXTRACTED to the shared, selector-agnostic
+// module shared_components/js/quote-order-summary.js (Phase 0 of the DTF/SCP parity). EMB configures it here;
+// the module renders #order-recap + #ship-to-card byte-identically and aliases window.renderOrderRecap /
+// renderShipToCard / reestimateShipFromCard, so every existing call site keeps working unchanged.
+if (typeof QuoteOrderSummary !== 'undefined') {
+    QuoteOrderSummary.configure({
+        orderRecap: '#order-recap',
+        shipToCard: '#ship-to-card',
+        ship: { address: '#ship-address', city: '#ship-city', state: '#ship-state', zip: '#ship-zip', method: '#ship-method', fee: '#shipping-fee', residential: '#ship-residential' },
+        recap: {
+            company: '#company-name', name: '#customer-name', custNum: '#customer-number', shippingDisplay: '#it-shipping-amt',
+            // EMB-only: primaryLogo / capPrimaryLogo are module-scoped here, so the logos callback lives in EMB.
+            logos: function () {
+                var out = [];
+                try {
+                    if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.designNumber) {
+                        var pos = document.getElementById('primary-position')?.value || '';
+                        out.push({ text: '#' + primaryLogo.designNumber + (pos ? ' · ' + pos : ''), thumbUrl: primaryLogo.thumbnailUrl || '', label: '#' + primaryLogo.designNumber });
+                    }
+                    if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.designNumber) {
+                        out.push({ text: 'Cap #' + capPrimaryLogo.designNumber, thumbUrl: capPrimaryLogo.thumbnailUrl || '', label: 'Cap #' + capPrimaryLogo.designNumber });
+                    }
+                } catch (_) {}
+                return out;
+            }
+        },
+        estimate: function () { return (typeof estimateShipping === 'function') ? estimateShipping() : null; },
+        reestimateOnclick: 'reestimateShipFromCard()',
+        editOnclick: 'openShippingModal()',
+    });
 }
-window.renderShipToCard = renderShipToCard;
-
-// [2026-06-07] Re-estimate shipping in place from the Ship-To card (no modal) — handles the "added more items,
-// weight changed" case. estimateShipping() reads the current ship-zip + line items, updates #shipping-fee + the
-// totals; we just give card-button feedback + re-render. MANUAL only — never auto (would clobber a rep's
-// hand-tuned charge, which the estimate explicitly invites). (Erik 2026-06-07)
-async function reestimateShipFromCard() {
-    const card = document.getElementById('ship-to-card');
-    const btn = card ? card.querySelector('.st-btn-reest') : null;
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
-    try { await estimateShipping(); } finally { renderShipToCard(); }
-}
-window.reestimateShipFromCard = reestimateShipFromCard;
-
-// [2026-06-07 PROTOTYPE] Order-footer layout (Erik): relocate the Order Details + Special Notes blocks from the
-// sidebar into the bottom band, so the sidebar slims to Customer + Quote Summary + Push, and the order metadata
-// reviews in one footer alongside glance / ship-to / totals. EMB-only + reversible (delete this block to revert).
-// The moved blocks keep their IDs, so every date/terms/notes JS reference keeps working.
-// [2026-06-07] Order-footer layout is now STATIC HTML — #order-details-step + #notes-section live directly in
-// `.invoice-totals-wrap.order-footer` (no runtime relocate, no flash). relocateOrderFooter() removed.
-
-function renderOrderRecap() {
-    const el = document.getElementById('order-recap');
-    if (!el) return;
-    const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-    const company = (document.getElementById('company-name')?.value || '').trim();
-    const name = (document.getElementById('customer-name')?.value || '').trim();
-    const custNum = (document.getElementById('customer-number')?.value || '').trim();
-    const ship = (document.getElementById('it-shipping-amt')?.textContent || '').trim();
-    const logos = [];
-    try {
-        if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.designNumber) {
-            const pos = document.getElementById('primary-position')?.value || '';
-            logos.push(`#${primaryLogo.designNumber}${pos ? ' · ' + pos : ''}`);
-        }
-        if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.designNumber) {
-            logos.push(`Cap #${capPrimaryLogo.designNumber}`);
-        }
-    } catch (_) {}
-    // [2026-06-07] Design thumbnails (already fetched for the logo cards) — surface them in the glance panel
-    // so the rep can visually confirm the artwork before pushing. (Erik)
-    const thumbs = [];
-    try {
-        if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.thumbnailUrl && primaryLogo.designNumber) {
-            thumbs.push({ url: primaryLogo.thumbnailUrl, label: `#${primaryLogo.designNumber}` });
-        }
-        if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.thumbnailUrl && capPrimaryLogo.designNumber) {
-            thumbs.push({ url: capPrimaryLogo.thumbnailUrl, label: `Cap #${capPrimaryLogo.designNumber}` });
-        }
-    } catch (_) {}
-    const cust = company || name;
-    const rows = [];
-    if (cust) rows.push(`<div class="or-row"><span class="or-label">Customer</span><span class="or-val">${esc(cust)}${custNum ? ' · #' + esc(custNum) : ''}</span></div>`);
-    if (ship) rows.push(`<div class="or-row"><span class="or-label">Shipping</span><span class="or-val">${esc(ship)}</span></div>`);  // #it-shipping-amt is a charge/method, not a destination (review C21)
-    if (logos.length) rows.push(`<div class="or-row"><span class="or-label">Logo${logos.length > 1 ? 's' : ''}</span><span class="or-val">${esc(logos.join('   ·   '))}</span></div>`);
-    if (thumbs.length) rows.push(`<div class="or-thumbs">${thumbs.map(t => `<figure class="or-thumb"><img src="${esc(t.url)}" alt="${esc(t.label)}" loading="lazy" onerror="this.closest('.or-thumb').style.display='none'"><figcaption>${esc(t.label)}</figcaption></figure>`).join('')}</div>`);
-    el.innerHTML = rows.length ? `<div class="or-title">Order at a glance</div>${rows.join('')}` : '';
-    renderShipToCard();  // keep the ship-to card in sync with the glance panel
-}
-window.renderOrderRecap = renderOrderRecap;
 
 // ============================================================
 // DESIGN NUMBER LOOKUP / SEARCH
