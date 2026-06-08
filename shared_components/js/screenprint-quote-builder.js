@@ -341,6 +341,7 @@ function restoreScreenPrintDraft(draft) {
     }
 
     showToast('Draft restored successfully', 'success');
+    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] draft carries company/name → show them in the band
 }
 
 function markScreenPrintDirty() {
@@ -657,6 +658,10 @@ async function loadQuoteForEditing(quoteId) {
         // Recalculate pricing to update totals
         recalculatePricing();
 
+        // [2026-06-08] reflect the loaded customer + ship-to in the order-summary band (belt-and-suspenders vs the
+        // recalc, which can short-circuit on zero qty)
+        if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
+
         showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
     } catch (error) {
@@ -792,6 +797,9 @@ function resetQuote() {
     // throw above). The real entry points are updatePrintConfig() + recalculatePricing(). (2026-06-01)
     updatePrintConfig();
     try { const _r = recalculatePricing(); if (_r && typeof _r.catch === 'function') _r.catch(() => {}); } catch (_) {}
+
+    // [2026-06-08] clear the order-summary band on Reset / New Quote (recalc may short-circuit on the empty quote)
+    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
     // Focus search bar for immediate typing
     const searchInput = document.getElementById('product-search');
@@ -937,6 +945,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 }
 
                 showToast('Customer info loaded', 'success');
+                if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
             };
 
             customerLookup.bindToInput('customer-lookup', {
@@ -945,6 +954,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
+                    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap on lookup clear
                 }
             });
 
@@ -963,11 +973,22 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Initialize order & shipping fields (shared component)
         renderOrderShippingFields('spc-order-fields');
         initOrderShippingListeners('spc-order-fields', {
-            onShippingFeeChange: () => updateTaxCalculation(),
+            onShippingFeeChange: () => { updateTaxCalculation(); if (window.renderOrderRecap) window.renderOrderRecap(); },  // [2026-06-08] refresh ship-to card on fee change
             onTaxRateChange: (rate) => {
                 const rateInput = document.getElementById('tax-rate-input');
                 if (rateInput) rateInput.value = rate;
                 updateTaxCalculation();
+            }
+        });
+        // [2026-06-08] SCP-local listeners on the shared .os-ship-* panel fields → refresh the order-summary band.
+        // The .os-* panel + its tax listeners are SHARED (quote-builder-utils.js) and must NOT be edited; these
+        // listeners are attached HERE (SCP-only) after the panel renders. The fee is covered by onShippingFeeChange
+        // above. (DTF/SCP parity Phase 3)
+        ['.os-ship-address', '.os-ship-city', '.os-ship-state', '.os-ship-zip', '.os-ship-method'].forEach(function (sel) {
+            var el = document.querySelector('#spc-order-fields ' + sel);
+            if (el) {
+                el.addEventListener('input', function () { if (window.renderOrderRecap) window.renderOrderRecap(); });
+                el.addEventListener('change', function () { if (window.renderOrderRecap) window.renderOrderRecap(); });
             }
         });
 
@@ -3345,6 +3366,9 @@ function updatePricingDisplay(pricing) {
 
     // Update all fee table rows (setup, art, design, rush, discount)
     updateFeeTableRows();
+
+    // [2026-06-08] keep the order-summary band (recap + ship-to card) current on every recompute
+    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 }
 
 // Update sidebar to reflect current print configuration
@@ -4379,3 +4403,30 @@ window.confirmScpPush = confirmScpPush;
 window.closeScpPushPreview = closeScpPushPreview;
 window.scpPushToShopWorks = scpPushToShopWorks;
 window.showScpPushButton = showScpPushButton;
+
+// [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 3.
+// SCP ship fields are CLASS-based (.os-*) inside the single #spc-order-fields panel rendered by the shared
+// renderOrderShippingFields(); selectors are scoped to that container so getShipFields()'s querySelector resolves
+// uniquely. Fee class is .os-shipping-fee. No #it-shipping-amt (recap drops the Shipping row), no logo model, no
+// estimator/modal → estimate + editOnclick omitted (module hides Re-estimate + Edit). The .os-* panel + its tax
+// listeners are SHARED (quote-builder-utils.js) and were NOT touched — the ship-field render hooks are SCP-local
+// listeners attached in init (the .os-ship-* forEach). quote-order-summary.js loads before this file.
+if (typeof QuoteOrderSummary !== 'undefined') {
+    QuoteOrderSummary.configure({
+        orderRecap: '#order-recap',
+        shipToCard: '#ship-to-card',
+        ship: {
+            address: '#spc-order-fields .os-ship-address',
+            city:    '#spc-order-fields .os-ship-city',
+            state:   '#spc-order-fields .os-ship-state',
+            zip:     '#spc-order-fields .os-ship-zip',
+            method:  '#spc-order-fields .os-ship-method',
+            fee:     '#spc-order-fields .os-shipping-fee',
+        },
+        recap: {
+            company: '#company-name',
+            name:    '#customer-name',
+            custNum: '#customer-number',
+        },
+    });
+}

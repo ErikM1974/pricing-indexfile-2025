@@ -343,7 +343,7 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input">
+                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">EMAIL *</label>
@@ -351,11 +351,11 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">COMPANY</label>
-                            <input type="text" id="company-name" placeholder="Company name" class="quote-input">
+                            <input type="text" id="company-name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SHOPWORKS CUST #</label>
-                            <input type="text" id="customer-number" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric">
+                            <input type="text" id="customer-number" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
@@ -477,6 +477,11 @@
                         <span class="value" id="grand-total-with-tax">$0.00</span>
                     </div>
                 </div>
+                <!-- [2026-06-08] Shared order-summary band (DTF/SCP parity Phase 3) — Order Recap + Ship-To card
+                     stacked under the totals in the Quote Summary sidebar. Filled by renderOrderRecap(); hidden
+                     via :empty until populated. Card + recap CSS are shared (quote-builder-common.css). -->
+                <div class="order-recap" id="order-recap"></div>
+                <div class="ship-to-card" id="ship-to-card"></div>
 
             </div>
 
@@ -673,6 +678,8 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
+    <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
+    <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.4"></script>
     <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.02.3"></script>
 
 </body>
