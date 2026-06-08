@@ -3371,8 +3371,8 @@ class DTFQuoteBuilder {
 
 // [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 2.
 // DTF selector map: fee is #dtf-shipping-fee (not #shipping-fee); no #ship-residential; no #it-shipping-amt
-// (recap drops the Shipping row); no logo model (logos omitted); no estimator/modal yet → estimate + editOnclick
-// omitted, so the module hides the Re-estimate + Edit buttons. quote-order-summary.js loads before this file.
+// (recap drops the Shipping row); no logo model (logos omitted). Estimator IS wired (estimateHooks below → the
+// module auto-sets _cfg.estimate → Re-estimate shows); no modal → editOnclick omitted → no Edit button. quote-order-summary.js loads before this file.
 if (typeof QuoteOrderSummary !== 'undefined') {
     QuoteOrderSummary.configure({
         orderRecap: '#order-recap',

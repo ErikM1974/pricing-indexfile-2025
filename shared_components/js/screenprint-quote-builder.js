@@ -3531,8 +3531,22 @@ function toggleWholesale() {
         if (incTax) incTax.checked = false;
         if (rateInput) rateInput.value = '0';
     } else {
-        if (incTax) incTax.checked = true;
-        if (rateInput) rateInput.value = '10.1';  // rep re-blurs the ship ZIP for the precise rate
+        // [2026-06-08] un-toggle wholesale → re-derive the correct rate for the ship address (parity with DTF's
+        // guarded lookupTaxRate) instead of leaving a flat 10.1: exempt stays 0; out-of-state 0; WA re-fetches the DOR rate.
+        if (window._taxExempt) {
+            if (incTax) incTax.checked = false;
+            if (rateInput) rateInput.value = '0';
+        } else {
+            if (incTax) incTax.checked = true;
+            const _st = (document.querySelector('#spc-order-fields .os-ship-state')?.value || 'WA').toUpperCase();
+            const _zip = document.querySelector('#spc-order-fields .os-ship-zip');
+            if (_st === 'WA') {
+                if (rateInput) rateInput.value = '10.1';  // fallback until the async DOR lookup (ZIP blur) returns
+                if (_zip && (_zip.value || '').trim().length >= 5) { _zip.dispatchEvent(new Event('blur')); }
+            } else if (rateInput) {
+                rateInput.value = '0';  // out-of-state — no WA tax
+            }
+        }
     }
     updateTaxCalculation();
 }
@@ -4478,8 +4492,8 @@ window.showScpPushButton = showScpPushButton;
 // [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 3.
 // SCP ship fields are CLASS-based (.os-*) inside the single #spc-order-fields panel rendered by the shared
 // renderOrderShippingFields(); selectors are scoped to that container so getShipFields()'s querySelector resolves
-// uniquely. Fee class is .os-shipping-fee. No #it-shipping-amt (recap drops the Shipping row), no logo model, no
-// estimator/modal → estimate + editOnclick omitted (module hides Re-estimate + Edit). The .os-* panel + its tax
+// uniquely. Fee class is .os-shipping-fee. No #it-shipping-amt (recap drops the Shipping row), no logo model.
+// Estimator IS wired (estimateHooks below → Re-estimate shows); no modal → editOnclick omitted → no Edit. The .os-* panel + its tax
 // listeners are SHARED (quote-builder-utils.js) and were NOT touched — the ship-field render hooks are SCP-local
 // listeners attached in init (the .os-ship-* forEach). quote-order-summary.js loads before this file.
 if (typeof QuoteOrderSummary !== 'undefined') {
