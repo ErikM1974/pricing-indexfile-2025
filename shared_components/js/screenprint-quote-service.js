@@ -90,7 +90,11 @@ class ScreenPrintQuoteService {
             // the hardcoded service default, so out-of-state rates are honored.
             const rawSaveRate = parseFloat(quoteData.taxRate);
             const taxRateDecimal = !isNaN(rawSaveRate) ? (rawSaveRate > 1 ? rawSaveRate / 100 : rawSaveRate) : this.taxRate;
-            const salesTax = parseFloat((preTaxTotal * taxRateDecimal).toFixed(2));
+            // [2026-06-08] P1: WA taxes shipping, and /invoice (invoice.js) TRUSTS this saved TaxAmount verbatim, so the
+            // tax base MUST include shipping (preTaxTotal excludes it by design — the mirror adds shipping on top). Without
+            // this, /invoice under-charged WA tax on the shipping portion of every SCP quote with shipping. Mirror EMB.
+            const _saveShipFee = parseFloat(quoteData.shippingFee) || 0;
+            const salesTax = parseFloat(((preTaxTotal + _saveShipFee) * taxRateDecimal).toFixed(2));
             
             // Prepare print setup details for Notes field
             // Include full location details (frontLocation, backLocation, colors) for quote-view.js display
@@ -391,7 +395,9 @@ class ScreenPrintQuoteService {
             const totalAmount = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee - discount).toFixed(2));
             const rawUpdRate = parseFloat(quoteData.taxRate);
             const updTaxRateDecimal = !isNaN(rawUpdRate) ? (rawUpdRate > 1 ? rawUpdRate / 100 : rawUpdRate) : this.taxRate;
-            const salesTax = parseFloat((totalAmount * updTaxRateDecimal).toFixed(2));
+            // [2026-06-08] P1: tax base MUST include shipping (WA taxes it; /invoice trusts this saved TaxAmount). Mirror EMB.
+            const _updShipFee = parseFloat(quoteData.shippingFee) || 0;
+            const salesTax = parseFloat(((totalAmount + _updShipFee) * updTaxRateDecimal).toFixed(2));
 
             // Prepare print setup details for Notes field
             const printSetup = {
