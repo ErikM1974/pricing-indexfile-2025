@@ -1,3 +1,8 @@
+## v2026.06.09.7 (2026.06.09)
+
+- fix(deploy-skill): cache-bust .jsx files + kill basename-collision over-bump
+- fix(order-form push): normalize orderDate/requestedShipDate to YYYY-MM-DD
+
 ## v2026.06.09.6 (2026.06.09)
 
 - docs(memory): SCP/sticker Pricing=API done (v2026.06.09.5) + emblem note
