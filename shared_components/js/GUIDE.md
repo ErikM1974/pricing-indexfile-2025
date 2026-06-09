@@ -44,8 +44,8 @@
 | `dtg-integration.js` | Coordinates calculator, adapter, events |
 | `dtg-page-setup.js` | DTG calculator page initialization |
 | `dtg-pricing-service.js` | DTG pricing API service |
-| `dtg-quote-pricing.js` | DTG quote pricing engine (⚠️ legacy — dead-code candidate) |
-| `dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — dead-code candidate) |
+| ~~`dtg-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead legacy DTG quote pricing engine (no HTML loaded it) |
+| `dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — dead-code candidate; refs deleted DTGQuotePricing) |
 | `dtg-quote-system.js` | DTG quote system orchestrator |
 | `dtg-product-recommendations.js` | Product recommendations for DTG |
 | `dtg-product-recommendations-modal.js` | Recommendations modal UI |
@@ -60,7 +60,7 @@
 | `dtf-integration.js` | Coordinates calculator, adapter, events |
 | `dtf-pricing-calculator.js` | DTF calculator UI & pricing logic |
 | `dtf-pricing-service.js` | DTF API data fetcher & transformer |
-| `dtf-quote-adapter.js` | DTF quote data adapter |
+| ~~`dtf-quote-adapter.js`~~ | **DELETED 2026-06-09** — orphaned DTF adapter w/ hardcoded price grid (re-wire trap) |
 | `dtf-quote-builder.js` | DTF quote builder controller |
 | `dtf-quote-pricing.js` | DTF pricing + config + service (consolidated) |
 | `dtf-quote-products.js` | DTF quote product manager |
@@ -86,11 +86,11 @@
 | File | Purpose |
 |------|---------|
 | `cap-embroidery-pricing-service.js` | Cap embroidery pricing adapter |
-| `cap-quote-builder.js` | Cap quote builder controller |
-| `cap-quote-logos.js` | Cap logo position management |
-| `cap-quote-pricing.js` | Cap quote pricing engine |
-| `cap-quote-products.js` | Cap quote product manager |
-| `cap-quote-service.js` | Cap quote save/email service |
+| ~~`cap-quote-builder.js`~~ | **DELETED 2026-06-09** — dead cap-quote system (EMB builder handles caps) |
+| `cap-quote-logos.js` | Cap logo position management (⚠️ orphaned 2026-06-09 — controller deleted) |
+| ~~`cap-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead cap-quote pricing engine |
+| `cap-quote-products.js` | Cap quote product manager (⚠️ orphaned 2026-06-09 — controller deleted) |
+| ~~`cap-quote-service.js`~~ | **DELETED 2026-06-09** — dead cap-quote save/email service |
 
 ## Screen Print System
 

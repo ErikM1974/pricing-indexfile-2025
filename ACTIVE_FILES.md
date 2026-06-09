@@ -282,8 +282,8 @@
 | `/calculators/dtg-manual-pricing.html` | ~~DELETED~~ Manual DTG pricing — superseded by `/calculators/manual-pricing.html` (unified) | — | ❌ Deleted |
 | `/calculators/archive/manual-pricing-deprecated/dtg-manual-pricing.html` | Archived pre-unification DTG manual calculator | — | 📦 Archived |
 | `/quote-builders/dtg-quote-builder.html` | **DTG flagship (v14, 2026-05-19+).** Manual-first inline-form DTG quote builder + DTG AI bot + Submit-to-ShopWorks + sales tax (per-address WA DOR lookup, exempt/pickup/out-of-state) + order-summary band. Legacy iframe REMOVED (legacy builder deleted 2026-06-08; `/quote-builders/dtg-quote-builder-legacy.html` 301-redirects here). This is the sole DTG builder. | dtg-inline-form.js, dtg-quote-page.js, dtg-pricing-service.js, quote-order-summary.js | ✅ Active |
-| `/shared_components/js/dtg-quote-pricing.js` | DTG quote pricing engine | Caspio API | ✅ Active |
-| `/shared_components/js/dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — was loaded by the deleted legacy builder; dead-code candidate) | SanMar API | ⚠️ Orphan? |
+| ~~`/shared_components/js/dtg-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead legacy DTG quote pricing engine; only consumer was the also-dead dtg-quote-products.js. No HTML loaded it. | — | ❌ Deleted |
+| `/shared_components/js/dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — was loaded by the deleted legacy builder; dead-code candidate; refs now-deleted DTGQuotePricing) | SanMar API | ⚠️ Orphan? |
 | `/shared_components/js/dtg-quote-system.js` | DTG quote system orchestrator (⚠️ legacy — dead-code candidate) | — | ⚠️ Orphan? |
 
 ### DTF System
@@ -588,11 +588,11 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/cap-embroidery-pricing-logic.js` | Cap embroidery pricing logic (shared between manual + quote builder) | embroidery-pricing-service.js | ✅ Active |
 | `/shared_components/js/cap-embroidery-pricing-service.js` | Cap embroidery Caspio data adapter | Caspio API | ✅ Active |
-| `/shared_components/js/cap-quote-builder.js` | Cap quote builder controller | CapQuotePricing class | ✅ Active |
-| `/shared_components/js/cap-quote-logos.js` | Cap quote logo card management (positions, stitch tiers) | — | ✅ Active |
-| `/shared_components/js/cap-quote-pricing.js` | Cap quote pricing engine (LTM, stitch surcharges) | Caspio API | ✅ Active |
-| `/shared_components/js/cap-quote-products.js` | Cap quote product row manager | SanMar API | ✅ Active |
-| `/shared_components/js/cap-quote-service.js` | Cap quote save/update/email service | Caspio API, EmailJS | ✅ Active |
+| ~~`/shared_components/js/cap-quote-builder.js`~~ | **DELETED 2026-06-09** — dead cap-quote system (no HTML loads it; EMB builder handles caps via shared services). | — | ❌ Deleted |
+| `/shared_components/js/cap-quote-logos.js` | Cap quote logo card management (⚠️ orphaned 2026-06-09 — controller cap-quote-builder.js deleted; dead-code candidate) | — | ⚠️ Orphan? |
+| ~~`/shared_components/js/cap-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead cap-quote pricing engine (50/100 hardcodes, no HTML loads it). | — | ❌ Deleted |
+| `/shared_components/js/cap-quote-products.js` | Cap quote product row manager (⚠️ orphaned 2026-06-09 — see cap-quote-logos.js) | SanMar API | ⚠️ Orphan? |
+| ~~`/shared_components/js/cap-quote-service.js`~~ | **DELETED 2026-06-09** — dead cap-quote save/email service (50/100 hardcodes diverged saved totals). | — | ❌ Deleted |
 
 ### Art Invoice System
 | File | Purpose | Dependencies | Status |
@@ -621,7 +621,7 @@
 ### DTF Extended Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/dtf-quote-adapter.js` | DTF quote data adapter | dtf-pricing-service.js | ✅ Active |
+| ~~`/shared_components/js/dtf-quote-adapter.js`~~ | **DELETED 2026-06-09** — orphaned DTF quote adapter carrying a full hardcoded DTF price grid (re-wire trap). Zero script refs. | — | ❌ Deleted |
 | `/shared_components/js/dtf-quote-page.js` | DTF quote page initialization | — | ✅ Active |
 
 ### Embroidery Extended Services
