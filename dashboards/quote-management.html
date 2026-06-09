@@ -173,6 +173,9 @@
          (Caspio returns no TZ marker; default JS parse misinterprets as UTC,
          which shifts dashboard countdowns 7–8 h off). Use CaspioDate.parse(). -->
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.05.21.21"></script>
+    <!-- App config — single source of truth for the proxy API base URL
+         (Never-Break Rule #6: USE CONFIG for API URLs). -->
+    <script src="/config/app.config.js?v=20260609-1"></script>
 
     <script>
         // ============================================================
@@ -180,7 +183,10 @@
         // Created: 2026-01-13 (Phase 5 - Quote builder feature parity)
         // ============================================================
 
-        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Never-Break Rule #6 — proxy URL comes from APP_CONFIG, not a hardcode.
+        // Guarded fallback keeps the dashboard working if app.config.js fails to load.
+        const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
         // State
         let allQuotes = [];
@@ -915,6 +921,14 @@
                 builderUrl = '/quote-builders/dtf-quote-builder.html';
             } else if (prefix === 'SP' || prefix === 'SPC' || prefix === 'SSC') {
                 builderUrl = '/quote-builders/screenprint-quote-builder.html';
+            } else if (prefix === 'OF') {
+                // Order Form drafts (OF-NNNN) are NOT quote-builder quotes — they
+                // reopen in the React Order Form via ?draftId= (different app AND
+                // different param than the builders' ?edit=). Routing them to the
+                // EMB builder (the old default) opened an order-form-shaped quote
+                // in the wrong app → broken load. (2026-06-09)
+                window.open(`/pages/order-form.html?draftId=${encodeURIComponent(quoteId)}`, '_blank');
+                return;
             }
             // EMB / EMBC / CEMB and anything else → embroidery builder (default)
 
