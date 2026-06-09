@@ -12578,9 +12578,12 @@ function buildEmbroideryPricingData(allItems) {
     // Additional charges
     const charges = getAdditionalCharges();
 
-    // 3D puff upcharge
+    // 3D puff upcharge. getEmbellishmentUpcharges() returns { puff, patch }
+    // (embroidery-quote-pricing.js:574) — there is NO '3d-puff' key, so the old
+    // lookup always resolved to 0 and the PDF silently dropped the "3D Puff
+    // Upcharge" spec line (the charge was still in the total). Use .puff.
     const puffUpchargePerCap = (capEmbType === '3d-puff' && pricingCalculator)
-        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.['3d-puff'] || 0)
+        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.puff || 0)
         : 0;
 
     // Tax rate read here (was post-overridden in printQuote pre-3.1.0; contract

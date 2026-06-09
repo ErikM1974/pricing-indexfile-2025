@@ -104,6 +104,14 @@ class DTGPricingService {
      * @returns {number|null} Manual cost or null if not set
      */
     getManualCostOverride() {
+        // Staff-only feature — never resolve a manual cost override on a public
+        // (customer-facing) host, matching EMB/cap-EMB (embroidery-pricing-service.js:18).
+        // Prevents a ?manualCost= URL param or stale sessionStorage from substituting
+        // an arbitrary (too-low) base cost into a live DTG quote on production.
+        const host = window.location.hostname;
+        const isInternal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.herokuapp.com');
+        if (!isInternal) return null;
+
         // Check URL parameter first (priority)
         const urlParams = new URLSearchParams(window.location.search);
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
