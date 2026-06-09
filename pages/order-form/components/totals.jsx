@@ -151,7 +151,7 @@ function TotalsPanel({ deco, decoConfig, breakdown, customerMode }) {
           <span className="tp-val">{fmt$(subtotal)}</span>
         </div>
         <div className="tp-row tp-row--dim">
-          <span className="tp-lbl">Estimated tax (10.1%)</span>
+          <span className="tp-lbl">{breakdown?.taxLabel || 'Estimated tax'}</span>
           <span className="tp-val">{fmt$(tax)}</span>
         </div>
         <div className="tp-row tp-row--total">

@@ -265,7 +265,7 @@ class EmbroideryQuoteService {
                 // note (mirror of the cap gate below). (2026-06-04 cert audit)
                 PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
                 StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
-                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? 100 : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -274,7 +274,7 @@ class EmbroideryQuoteService {
                 // default 'CF'/8000, so production saw a spurious "Cap:" note. (2026-06-04 audit)
                 CapPrintLocation: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.position || '') : '',
                 CapStitchCount: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.stitchCount || 0) : 0,
-                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? 100 : 0,
+                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
                 // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
                 CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 // Additional stitch charges - SPLIT by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
@@ -757,12 +757,16 @@ class EmbroideryQuoteService {
 
         // Graphic Design (GRT-75)
         if (sessionData.GraphicDesignCharge > 0) {
+            // Unit price from the live Service_Codes 'GRT-75' rate (the same
+            // value the on-screen GraphicDesignCharge was computed from), NOT a
+            // literal 75 — keeps unit×qty == LineTotal and reflects Caspio. (Theme F)
+            const grt75Rate = (typeof getServicePrice === 'function') ? getServicePrice('GRT-75', 75) : 75;
             feeItems.push({
                 StyleNumber: 'GRT-75',
                 ProductName: 'Graphic Design Services',
                 Quantity: sessionData.GraphicDesignHours || 1,
-                BaseUnitPrice: 75,
-                FinalUnitPrice: 75,
+                BaseUnitPrice: grt75Rate,
+                FinalUnitPrice: grt75Rate,
                 LineTotal: sessionData.GraphicDesignCharge
             });
         }
@@ -1402,7 +1406,7 @@ class EmbroideryQuoteService {
                 // note (mirror of the cap gate below). (2026-06-04 cert audit)
                 PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
                 StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
-                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? 100 : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -1410,7 +1414,7 @@ class EmbroideryQuoteService {
                 // default 'CF'/8000, so production saw a spurious "Cap:" note. (2026-06-04 audit)
                 CapPrintLocation: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.position || '') : '',
                 CapStitchCount: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.stitchCount || 0) : 0,
-                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? 100 : 0,
+                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
                 // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
                 CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,

@@ -103,10 +103,23 @@ window.nwOrderAPI = (function () {
         scope: a.scope === 'order' ? 'order' : (a.scope?.rowId ? { rowId: String(a.scope.rowId) } : 'order'),
         params: (a.params && typeof a.params === 'object') ? { ...a.params } : undefined,
       }));
+    // Theme G (2026-06-09) — push the resolved tax rate + GL account so the
+    // ShopWorks Notes block emits "Tax Rate / Tax Account" instead of
+    // "NEEDS REVIEW" for taxable in-WA orders. breakdown.taxRate is the
+    // EFFECTIVE decimal rate (0 when exempt/wholesale/out-of-state — the
+    // backend buildOrderNote short-circuits those via info/ship before using
+    // the rate). Only override when the breakdown actually resolved a rate.
+    const taxShip = (breakdown && Number.isFinite(Number(breakdown.taxRate)))
+      ? {
+          taxRate: Number(breakdown.taxRate) || 0,
+          taxAccount: breakdown.taxAccount || ship?.taxAccount || '',
+          taxAccountName: breakdown.taxAccountName || ship?.taxAccountName || '',
+        }
+      : {};
     return {
       info: { ...info },
       rows: (rows || []).map(serializableRow),
-      ship: { ...ship },
+      ship: { ...ship, ...taxShip },
       orderNotes: orderNotes || '',
       files: (files || []).map(serializableFile),
       decoConfig: decoConfig || {},

@@ -173,7 +173,15 @@
     const tierRow = findTierRow(tiers, totalQty);
     if (!tierRow) return null;
 
-    const marginDenom = Number(tierRow.MarginDenominator) || 0.6;
+    // Fallback denominator aligned to 0.57 to match the DTG service
+    // (dtg-pricing-service.js:528) and every other surface — NOT 0.6, which
+    // booked 40% margin vs the canonical 43% if a Caspio tier row ever lacked
+    // MarginDenominator. Normal data always carries the live Caspio value.
+    let marginDenom = Number(tierRow.MarginDenominator);
+    if (!(marginDenom > 0)) {
+      marginDenom = 0.57;
+      console.warn('[OrderForm DTG] tier row missing MarginDenominator — using 0.57 fallback', tierRow);
+    }
     const ltmFee = Number(tierRow.LTM_Fee || 0);
     const isLTM = ltmFee > 0;
 

@@ -12559,9 +12559,16 @@ function buildEmbroideryPricingData(allItems) {
     const hasGarments = productList.some(p => !p.isCap) || serviceItems.some(s => s.serviceType === 'decg');
     const hasCaps = productList.some(p => p.isCap) || serviceItems.some(s => s.serviceType === 'decc');
 
-    // Setup fees (digitizing)
+    // Setup fees (digitizing). Use the SAME API source the on-screen total uses
+    // (pricingCalculator.digitizingFee ← /api/pricing-bundle), falling back to the
+    // Service_Codes 'DD' rate, NOT a literal 100 — so the printed PDF's Setup
+    // Fees / Subtotal lines never diverge from the screen when Erik changes the
+    // Caspio digitizing fee. (Theme F, 2026-06-09)
     const digitizingCount = allLogos.filter(l => l.needsDigitizing).length;
-    const setupFees = digitizingCount * 100;
+    const perLogoDigitizing = (pricingCalculator && Number(pricingCalculator.digitizingFee) > 0)
+        ? Number(pricingCalculator.digitizingFee)
+        : (typeof getServicePrice === 'function' ? getServicePrice('DD', 100) : 100);
+    const setupFees = digitizingCount * perLogoDigitizing;
 
     // Cap embellishment type
     const capEmbType = getCapEmbellishmentType();
@@ -12578,9 +12585,12 @@ function buildEmbroideryPricingData(allItems) {
     // Additional charges
     const charges = getAdditionalCharges();
 
-    // 3D puff upcharge
+    // 3D puff upcharge. getEmbellishmentUpcharges() returns { puff, patch }
+    // (embroidery-quote-pricing.js:574) — there is NO '3d-puff' key, so the old
+    // lookup always resolved to 0 and the PDF silently dropped the "3D Puff
+    // Upcharge" spec line (the charge was still in the total). Use .puff.
     const puffUpchargePerCap = (capEmbType === '3d-puff' && pricingCalculator)
-        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.['3d-puff'] || 0)
+        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.puff || 0)
         : 0;
 
     // Tax rate read here (was post-overridden in printQuote pre-3.1.0; contract

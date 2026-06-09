@@ -141,88 +141,92 @@
       return out;
     }
 
-    // The DTF service exposes calculatePriceForQuantity for a single (style, size, qty, locationCount).
-    // For a multi-location order, accumulate per-size unit pricing across all sizes.
-    // Easiest: ask the service for the canonical per-piece price using its built-in formula.
-    // Approximation here: take the first (largest) selected size as the transfer size used
-    // by the service's formula, and pass locationCount = slots.length so labor + freight scale.
-    const sizeOrder = ['large', 'medium', 'small'];
-    const primarySize = slots.map(s => s.size).sort((a, b) => sizeOrder.indexOf(a) - sizeOrder.indexOf(b))[0];
+    // ------------------------------------------------------------------
+    // Per-piece pricing — uses the SAME DTFPricingService the /pricing/dtf
+    // builder uses, so prices match exactly. The garment base cost (the
+    // blank) comes from the bundle's sizes[] (standard-size MAX_CASE_PRICE)
+    // in live mode, or the rep-typed manualCost in manual mode — NEVER a
+    // silent $0 fallback (a wrong-low price is worse than an error).
+    // ------------------------------------------------------------------
     const locationCount = slots.length;
+    const sizeKeys = slots.map(s => s.size);           // one transfer size per location
 
-    let perPieceUnit;
-    try {
-      // calculatePriceForQuantity returns a number (or object). Match the service's contract.
-      const res = svc().calculatePriceForQuantity?.({
-        bundle,
-        sizeKey: primarySize,
-        quantity: totalQty,
-        locationCount,
-      });
-      perPieceUnit = (typeof res === 'number') ? res : (res?.unitPrice ?? res?.finalPrice);
-    } catch (e) { /* fall through to bundle-walk below */ }
-
-    if (!Number.isFinite(perPieceUnit)) {
-      // Fallback: build it ourselves from the bundle's transferSizes + tiers.
-      const tier = tierForQty(totalQty);
-      const tiersR = bundle.tiersR || [];
-      const tierRow = tiersR.find(t => totalQty >= (Number(t.MinQuantity) || 0) && totalQty <= (Number(t.MaxQuantity) || Infinity)) || tiersR[0];
-      const marginDenom = Number(tierRow?.MarginDenominator) || 0.6;
-      const garmentCost = Number(bundle?.garmentCost ?? bundle?.standardGarmentBaseCostUsed ?? 0) || 0;
-      const ts = bundle?.transferSizes || {};
-      const tier1 = ts[primarySize]?.pricingTiers || [];
-      const tierMatch = tier1.find(t => totalQty >= (Number(t.minQty) || 0) && totalQty <= (Number(t.maxQty) || Infinity)) || tier1[0];
-      const transferCost = Number(tierMatch?.unitPrice) || 0;
-      const laborCost = Number(bundle?.laborCost) || 0;
-      const freightCost = Number(bundle?.freightCost) || 0;
-      const ltmPP = (totalQty < 24) ? (50 / totalQty) : 0;
-      const raw = (garmentCost / marginDenom) + transferCost + (laborCost + freightCost) * locationCount + ltmPP;
-      perPieceUnit = Math.ceil(raw * 2) / 2;  // HalfDollarUp
-      void tier; // referenced for possible future use
+    // Garment base cost (blank). bundle.raw.sizes is the proxy's garment
+    // MAX_CASE_PRICE per size (now populated for DTF too — see the pricing.js
+    // styleQueryStart fix). Use the standard (S / first) size as the base,
+    // mirroring the builder's product.baseCost.
+    const sizesArr = Array.isArray(bundle?.raw?.sizes) ? bundle.raw.sizes : [];
+    // Garment base = the MINIMUM size price — matches the builder exactly
+    // (dtf-quote-page.js:644 → Math.min(...blankBundle.sizes.map(s => s.price))).
+    const minSizePrice = sizesArr.length
+      ? Math.min(...sizesArr.map(s => Number(s.price) || Infinity))
+      : 0;
+    const baseGarmentCost = (row.manualMode && Number(row.manualCost) > 0)
+      ? Number(row.manualCost)
+      : (Number.isFinite(minSizePrice) ? minSizePrice : 0);
+    if (!(baseGarmentCost > 0)) {
+      out.error = 'DTF garment cost unavailable for this style — enter a blank cost manually';
+      return out;
     }
 
-    // DTF size upcharges — same convention as embroidery/DTG: relative dollar
-    // upcharges over the base size, additive on top of perPieceUnit. Pulled
-    // from the bundle's sellingPriceDisplayAddOns map (or fall back to no
-    // upcharges if the bundle doesn't expose them).
-    const upchargeMap = bundle?.sellingPriceDisplayAddOns || bundle?.upcharges || {};
-    const availableSizes = (bundle?.uniqueSizes && bundle.uniqueSizes.length)
-      ? bundle.uniqueSizes
-      : Object.keys(upchargeMap);
+    // Canonical formula (positional args — the service signature is
+    // calculatePriceForQuantity(garmentCost, data, sizeKeys, quantity)).
+    // NO silent fallback: surface any pricing error instead of under-billing.
+    let calc;
+    try {
+      calc = svc().calculatePriceForQuantity(baseGarmentCost, bundle, sizeKeys, totalQty);
+    } catch (e) {
+      out.error = `DTF pricing error: ${e?.message || e}`;
+      return out;
+    }
+    if (!calc || !Number.isFinite(calc.subtotalBeforeRounding)) {
+      out.error = 'DTF pricing unavailable for this quantity';
+      return out;
+    }
+
+    // Size upcharges (Standard_Size_Upcharges → sellingPriceDisplayAddOns).
+    // Added AFTER the margin division and rounded WITH the unit, exactly like
+    // the builder: applyRounding(garmentCost/margin + upcharge + transfer +
+    // labor + freight + ltmPerUnit). subtotalBeforeRounding already holds
+    // everything except the upcharge, so adding it pre-round matches.
+    const sellingAddOns = bundle?.raw?.sellingPriceDisplayAddOns || {};
+    const upFor = (sz) => Number(sellingAddOns[String(sz).toUpperCase()] || 0);
+    const roundHalfUp = (n) => Math.ceil(n * 2) / 2;          // DTF = HalfDollarCeil_Final
+    const baseFinal = roundHalfUp(calc.subtotalBeforeRounding);
+
+    const availableSizes = sizesArr.length ? sizesArr.map(s => s.size) : Object.keys(sellingAddOns);
     const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0] || 'S';
-    const baseAbs = Number(upchargeMap[baseSizeKey] || 0);
 
     Object.keys(row.sizes || {}).forEach(sizeKey => {
       const qty = Number(row.sizes[sizeKey]) || 0;
       if (!qty) return;
-      const sizeAbs = Number(upchargeMap[sizeKey] || 0);
-      const relativeUp = Math.max(0, sizeAbs - baseAbs);
-      const unit = perPieceUnit + relativeUp;
+      const up = upFor(sizeKey);
+      const unit = up > 0 ? roundHalfUp(calc.subtotalBeforeRounding + up) : baseFinal;
       out.unitPriceBySize[sizeKey] = unit;
       const lineSubtotal = unit * qty;
       out.sizeBreakdown.push({ size: sizeKey, qty, unitPrice: unit, lineSubtotal });
       out.rowSubtotal += lineSubtotal;
     });
 
-    // Sizing metadata for display — scope upcharges to product's actual sizes
-    // so reps don't see "+$2 2XL" on products that don't carry 2XL.
+    // Display upcharges scoped to the product's actual sizes.
     const availableSet = new Set(availableSizes.map(s => String(s).toUpperCase()));
     const sizeUpcharges = {};
-    Object.keys(upchargeMap).forEach(sz => {
+    Object.keys(sellingAddOns).forEach(sz => {
       if (!availableSet.has(String(sz).toUpperCase())) return;
-      const rel = Number(upchargeMap[sz] || 0) - baseAbs;
+      const rel = Number(sellingAddOns[sz] || 0);
       if (rel > 0) sizeUpcharges[sz] = rel;
     });
 
-    out.tier = tierForQty(totalQty);
+    out.tier = calc.tierLabel || tierForQty(totalQty);
+    out.ltmFee = Number(calc.ltmFee) || 0;     // API LTM_Fee (50 @ 10-23, else 0) — used by aggregate display total
     out.extras = {
       locations: slots.map(s => `${s.key}:${s.size}`),
       locationCount,
-      primarySize,
+      primarySize: sizeKeys[0],
       manualMode: !!row.manualMode,
       availableSizes,
       baseSizeKey,
-      basePrice: perPieceUnit,
+      basePrice: baseFinal,
       sizeUpcharges,
     };
     return out;
@@ -253,6 +257,7 @@
       catch (err) { return { row: r, error: err?.message || String(err) }; }
     }));
 
+    let resolvedLtmFee = 0;
     fetched.forEach(({ row, bundle, error }) => {
       if (error || !bundle) {
         out.errors.push({ rowId: row.id, message: error || 'No bundle' });
@@ -262,9 +267,12 @@
       const rb = priceRow({ row, formCtx, bundle, dtfConfig });
       out.byRow.set(row.id, rb);
       out.subtotal += rb.rowSubtotal;
+      if (Number(rb.ltmFee) > 0) resolvedLtmFee = Number(rb.ltmFee);
     });
 
-    if (out.tier === '10-23') out.ltmTotal = 50;
+    // LTM total for the display breakdown — the resolved tier's Caspio LTM_Fee
+    // (50 @ 10-23, 0 otherwise), NOT a hardcoded literal. Baked into per-piece.
+    out.ltmTotal = resolvedLtmFee;
     out.grandTotal = out.subtotal;
     return out;
   }

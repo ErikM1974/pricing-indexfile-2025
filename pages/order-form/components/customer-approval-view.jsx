@@ -327,7 +327,7 @@
         ))}
 
         <div className="cav-sum-row cav-sum-row--small">
-          <span className="cav-sum-lbl">Estimated tax (10.1%)</span>
+          <span className="cav-sum-lbl">{breakdown?.taxLabel || 'Estimated tax'}</span>
           <span className="cav-sum-val">{fmt$(tax)}</span>
         </div>
 

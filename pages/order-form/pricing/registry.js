@@ -93,10 +93,18 @@ window.OrderFormPricing = (function () {
       // already baked into the per-piece price by aggregate().
       S.applyAddOnsToBreakdown(result, addOns);
       // Tax / deposit derive from subtotal — every method gets these for free.
-      const td = S.computeTaxAndDeposit(result.subtotal || 0);
-      result.taxEstimate = td.tax;
-      result.depositDue  = td.deposit;
-      result.supported   = true;
+      // The rate is resolved from the customer + ship context (exempt / wholesale
+      // / out-of-state → 0; in-WA → DOR/default), NOT a flat 10.1% for everyone.
+      const taxCtx = S.resolveTaxContext(formCtx.info, formCtx.ship);
+      const td = S.computeTaxAndDeposit(result.subtotal || 0, taxCtx);
+      result.taxEstimate    = td.tax;
+      result.depositDue     = td.deposit;
+      result.taxRate        = td.rate;            // effective decimal rate (0 when exempt)
+      result.taxLabel       = taxCtx.label;       // UI label: "WA Sales Tax (10.1%)" / "Out of state — no tax"
+      result.taxExempt      = taxCtx.rate === 0;
+      result.taxAccount     = taxCtx.account;      // GL account for the ShopWorks push note
+      result.taxAccountName = taxCtx.accountName;
+      result.supported      = true;
       return result;
     } catch (err) {
       console.error('[OrderFormPricing] aggregate failed for', formCtx.deco, err);

@@ -79,6 +79,24 @@
       Visible: true,
       _spLocation: 'underbase',
     },
+    {
+      // Theme I (2026-06-09) — safety-stripe specialty-ink surcharge. The
+      // builder charges $2/location/piece (screenprint-quote-builder.js:3043);
+      // the Order Form previously omitted it entirely → under-charged hi-vis
+      // orders. SellPrice is the per-location/piece rate (TODO: migrate to
+      // Service_Codes per Erik's Pricing=API rule — Theme C).
+      ServiceCode: 'SP-STRIPE',
+      DisplayName: 'Safety Stripes',
+      ServiceType: 'SCREENPRINT',
+      RailGroup: 'SP Extras',
+      RailOrder: 20,
+      PricingMethod: 'CONFIGURATOR',
+      SellPrice: 2.00,
+      PerUnit: '+$2 / location / piece',
+      IsActive: true,
+      Visible: true,
+      _spLocation: 'safetyStripes',
+    },
   ];
   if (window.OrderFormServiceCodes?.registerVirtual) {
     window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
@@ -88,13 +106,18 @@
   // whiteUnderbase} shape the existing pricing math expects. Drops with no
   // colorCount fall back to _defaultColorCount → 1.
   function configFromAddOns(addOns) {
-    const out = { frontColors: 0, backColors: 0, sleeveColors: 0, whiteUnderbase: false };
+    const out = { frontColors: 0, backColors: 0, sleeveColors: 0, whiteUnderbase: false, safetyStripes: false, stripeRate: 2.00 };
     (addOns || []).forEach(a => {
       if (!a?.code) return;
       const sc = window.OrderFormServiceCodes?.get?.(a.code);
       const loc = sc?._spLocation;
       if (loc === 'underbase') {
         out.whiteUnderbase = true;
+        return;
+      }
+      if (loc === 'safetyStripes') {
+        out.safetyStripes = true;
+        out.stripeRate = Number(sc?.SellPrice) > 0 ? Number(sc.SellPrice) : 2.00;
         return;
       }
       if (loc === 'front' || loc === 'back' || loc === 'sleeve') {
@@ -142,6 +165,8 @@
       back:   Number(cfg.backColors   || 0),
       sleeve: Number(cfg.sleeveColors || 0),
       whiteUnderbase: !!cfg.whiteUnderbase,
+      safetyStripes: !!cfg.safetyStripes,
+      stripeRate: Number(cfg.stripeRate) > 0 ? Number(cfg.stripeRate) : 2.00,
     };
   }
 
@@ -186,6 +211,12 @@
       if (addRow) addPP += Number(addRow.pricePerPiece) || 0;
     });
 
+    // Theme I — safety-stripe specialty-ink surcharge: rate × active print
+    // locations, per piece. Matches the builder's 2.00 × locationCount
+    // (screenprint-quote-builder.js:3043). Added to the per-piece price.
+    const printLocCount = (loc.front > 0 ? 1 : 0) + (loc.back > 0 ? 1 : 0) + (loc.sleeve > 0 ? 1 : 0);
+    const stripePP = loc.safetyStripes ? (loc.stripeRate * printLocCount) : 0;
+
     Object.keys(row.sizes || {}).forEach(sizeKey => {
       const qty = Number(row.sizes[sizeKey]) || 0;
       if (!qty) return;
@@ -194,8 +225,13 @@
         out.sizeBreakdown.push({ size: sizeKey, qty, error: `No SP price for size ${sizeKey}` });
         return;
       }
-      const unit = primaryUnit + addPP + ltmPP;
-      const unitRounded = Math.ceil(unit * 2) / 2;  // SP uses HalfDollarUp (matches production)
+      // LTM parity (2026-06-09): round (primary + additional) — both already
+      // $0.50-rounded by the service, so this is idempotent — then add the raw
+      // per-piece LTM WITHOUT re-rounding. The quote builder adds raw ltmPerUnit
+      // to the already-rounded unit (screenprint-quote-pricing.js:197); the old
+      // code re-rounded primary+additional+LTM together, over-charging qty<24 by
+      // up to ~$0.49/pc.
+      const unitRounded = (Math.ceil((primaryUnit + addPP) * 2) / 2) + ltmPP + stripePP;
       out.unitPriceBySize[sizeKey] = unitRounded;
       const lineSubtotal = unitRounded * qty;
       out.sizeBreakdown.push({ size: sizeKey, qty, unitPrice: unitRounded, lineSubtotal });
@@ -208,7 +244,7 @@
     const availableSizes = Object.keys(primaryRow.prices || {});
     const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0];
     const baseRawPrice = Number(primaryRow.prices?.[baseSizeKey]) || 0;
-    const basePrice = Math.ceil((baseRawPrice + addPP + ltmPP) * 2) / 2;
+    const basePrice = (Math.ceil((baseRawPrice + addPP) * 2) / 2) + ltmPP + stripePP;
     const sizeUpcharges = {};
     availableSizes.forEach(sz => {
       const rel = Number(primaryRow.prices[sz]) - baseRawPrice;
@@ -221,6 +257,8 @@
       backColors: loc.back,
       sleeveColors: loc.sleeve,
       whiteUnderbase: loc.whiteUnderbase,
+      safetyStripes: loc.safetyStripes,
+      safetyStripePerPiece: stripePP,
       ltmPerPiece: ltmPP,
       additionalPerPiece: addPP,
       manualMode: !!row.manualMode,
@@ -286,6 +324,7 @@
     if (front > 0) parts.push(`Front: ${front}c${ub}`);
     if (back > 0)  parts.push(`Back: ${back}c`);
     if (sleeve > 0) parts.push(`Sleeve: ${sleeve}c`);
+    if (cfg.safetyStripes) parts.push('Safety Stripes');
     return [
       `SCREEN PRINT · ${parts.length ? parts.join(' · ') : 'no locations selected'}`,
       `Tier ${breakdown?.tier || '?'} · ${breakdown?.totalQty || 0} pcs`,

@@ -1549,7 +1549,7 @@ class EmbroideryInvoiceGenerator {
                     <span>$${adjustedSubtotal.toFixed(2)}</span>
                 </div>` : ''}
                 ${taxAmount > 0 ? `<div class="total-row tax-row">
-                    <span>WA Sales Tax (${taxPct}%):</span>
+                    <span>${Math.abs(Number(taxPct) - 10.1) < 0.01 ? 'WA Sales Tax' : 'Sales Tax'} (${taxPct}%):</span>
                     <span>$${taxAmount.toFixed(2)}</span>
                 </div>` : ''}
                 <div class="total-row grand-total">
