@@ -1445,6 +1445,12 @@
                 taxRate = Math.round((taxAmount / subtotal) * 10000) / 10000;
             }
             const isWholesale = !!priceQuote.isWholesale;
+            // [2026-06-09] Phase 2 — billed shipping (taxable in WA). TotalAmount stays PRE-tax
+            // but now includes the fee; TaxAmount already rides on (subtotal+fee) from
+            // computePriceQuoteFromState, so /invoice reconstructs grand = TotalAmount + TaxAmount
+            // correctly. AI-chat fallback quotes carry no shippingFee → 0 (unchanged).
+            const shippingFee = Number(priceQuote.shippingFee) || 0;
+            const preTaxTotal = Math.round((subtotal + shippingFee) * 100) / 100;
 
             // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
             // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
@@ -1466,9 +1472,13 @@
                 Phone: customer.phone || '',
                 TotalQuantity: lineItems.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0),
                 SubtotalAmount: subtotal,
+                // [2026-06-09] Phase 2 — billed shipping (0 unless the rep entered/estimated one).
+                ShippingFee: shippingFee,
                 LTMFeeTotal: lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0),
                 // PRE-tax (matches EMB/SCP/DTF). /quote + /invoice add TaxAmount on top.
-                TotalAmount: subtotal,
+                // [2026-06-09] Phase 2 — now subtotal + shipping (still pre-tax); TaxAmount below
+                // is computed on (subtotal + shipping), so grand = TotalAmount + TaxAmount holds.
+                TotalAmount: preTaxTotal,
                 // [2026-06-08] Phase 1 Chunk C — persist tax so saved record + /quote + /invoice
                 // + push agree. TaxRate is a DECIMAL (0.101) like EMB; readers normalize >1?/100.
                 TaxRate: taxRate,
