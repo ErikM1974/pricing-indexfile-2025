@@ -2504,6 +2504,21 @@ app.post('/api/submit-order-form', async (req, res) => {
       submissionId            // optional client-generated UUID for idempotent retries (audit fix H5)
     } = req.body || {};
 
+    // Normalize any date to YYYY-MM-DD before it flows into the ManageOrders
+    // payload (orderDate / requestedShipDate). The order-form date pickers emit
+    // YYYY-MM-DD already, but a malformed or MM/DD/YYYY value from any other
+    // caller would otherwise pass through raw and the downstream MO date
+    // formatter (which splits on '-') renders it "undefined/undefined/<date>"
+    // in ShopWorks. Belt-and-suspenders so a bad date can never land in SW.
+    const toISODate = (d) => {
+      if (!d) return '';
+      const s = String(d).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);              // already YYYY-MM-DD
+      const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);                // MM/DD/YYYY → YYYY-MM-DD
+      if (m) return `${m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+      return s; // unknown shape — pass through (better than swallowing)
+    };
+
     // Idempotency check (audit fix H5): if the client retried with the same
     // submissionId within the TTL window, return the cached response instead
     // of allocating a new OF-NNNN + re-pushing. Protects against double-submit
@@ -3269,9 +3284,9 @@ app.post('/api/submit-order-form', async (req, res) => {
       //                         Maps to ShopWorks's "Drop Dead Date" field.
       //   Previously both fields shared info.dateDue, which incorrectly
       //   shoved "today" into ShopWorks's Drop Dead column on every order.
-      orderDate: info.dateIn || new Date().toISOString().slice(0, 10),
-      requestedShipDate: info.dateDue || info.dateIn || new Date().toISOString().slice(0, 10),
-      dropDeadDate: info.dropDeadDate || '',
+      orderDate: toISODate(info.dateIn) || new Date().toISOString().slice(0, 10),
+      requestedShipDate: toISODate(info.dateDue || info.dateIn) || new Date().toISOString().slice(0, 10),
+      dropDeadDate: toISODate(info.dropDeadDate),
       // Customer routing — when the rep picked a known company from
       // autocomplete, info.companyId carries the real ShopWorks id_Customer
       // (e.g. 1276 for Aaberg's Rentals). Falls back to 2791 (catch-all
