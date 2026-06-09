@@ -2582,7 +2582,12 @@ app.post('/api/submit-order-form', async (req, res) => {
           // the right (tax-incl) number. Tax is left to OnSite (manual-apply pattern).
           TotalQuantity:   Number(breakdown?.totalQty) || 0,
           SubtotalAmount:  Number(breakdown?.subtotal) || 0,
-          LTMFeeTotal:     Number(breakdown?.ltmTotal) || 0,
+          // [2026-06-09] Caspio Quote_Sessions.LTMFeeTotal is INTEGER — a fractional value (DTG's
+          // amortized LTM, e.g. 49.92) 400s this OF-NNNN tracking-session create (caught + logged,
+          // so the SW push still succeeds, but the tracking row was silently dropped on DTG LTM
+          // pushes). Round to the whole-dollar nominal fee — informational column, matches the
+          // dtg-quote-page.js save fix. (No-op when ltmTotal is already integer, e.g. React OF.)
+          LTMFeeTotal:     Math.round(Number(breakdown?.ltmTotal) || 0),
           TotalAmount:     Number(breakdown?.grandTotal || breakdown?.subtotal) || 0,
           ExpiresAt: formattedExpiresAt,
           Notes: JSON.stringify({ info, rows, ship, orderNotes, files, decoConfig, staffFilled: [], submitFlow: 'staff-direct' })
