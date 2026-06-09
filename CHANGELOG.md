@@ -1,3 +1,17 @@
+## v2026.06.09.1 (2026.06.09)
+
+- docs(memory): DTG roadmap START-HERE → Phase 2 handoff (Phase 1 shipped v2026.06.08.23)
+- feat(dtg): Phase 2 (A) — billable shipping into tax base (inline-form)
+- feat(dtg): Phase 2 (B) — save shipping fee (TotalAmount incl fee, ShippingFee col)
+- feat(dtg): Phase 2 (C) — server.js cur_Shipping from ship.fee + buildOrderNote shipping-aware
+- feat(dtg): Phase 2 (D) — ship-fee field CSS + cache-bust v2026.06.09.1
+- test(dtg): Phase 2 (E) — lock billable-shipping tax base in dtg-tax-base.test.js
+- fix(dtg): Phase 2 review — SHIP line item + products-only TotalAmount (DTF/SCP parity)
+- fix(dtg): Phase 2 live-test — drop ShippingFee session write (SHIP item is canonical)
+- docs(memory): DTG Phase 2 built+verified — roadmap status, LESSONS entry, archive
+- docs(memory): DTG Phase 2 TEST push OF-0057 conversion-verified
+- Merge dtg-phase2-wip: DTG Phase 2 — billable shipping + UPS estimator
+
 ## v2026.06.08.23 (2026.06.08)
 
 - docs(memory): DTG parity roadmap + status (legacy deleted, exempt fixed, Phase 0 band done; Phases 1-2 planned)
