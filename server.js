@@ -2254,7 +2254,9 @@ app.post('/api/submit-3day-order', async (req, res) => {
       const dims = p.hIn ? `${p.wIn}w x ${p.hIn}h in` : `${p.wIn}in wide`;
       const dpi = p.effectiveDpi ? `, ${p.effectiveDpi} DPI${p.lowDpiAck ? ' (CUSTOMER ACCEPTED LOW-RES)' : ''}` : '';
       const proof = p.previewable === false ? ' — FILE NOT PREVIEWABLE, MATCH PLACEMENT + SEND PROOF' : '';
-      return `${label}: art ${dims}, ${horiz}, ${Number(p.yIn).toFixed(2)}in below print-area top${dpi}. Print from ${p.fileName || 'uploaded file'}.${proof}`;
+      const warns = Array.isArray(p.warnings) && p.warnings.length
+        ? ` WARNINGS: ${p.warnings.join(', ')}.` : '';
+      return `${label}: art ${dims}, ${horiz}, ${Number(p.yIn).toFixed(2)}in below print-area top${dpi}. Print from ${p.fileName || 'uploaded file'}.${proof}${warns}`;
     }
     const placement = orderSettings?.placement || {};
     const placementLines = [

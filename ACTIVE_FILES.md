@@ -167,6 +167,7 @@
 | `/tests/unit/3dt-pricing.test.js` | Behavioral spec: 7-step formula, sub-24 cost fallback, LTM, tax base | jest | ✅ Active |
 | `/tests/unit/3dt-shipdate.test.js` | Behavioral spec: cutoff/weekend/holiday/PST-PDT matrix | jest | ✅ Active |
 | `/tests/3dt-test-push-payload.json` | Reference webhook-equivalent payload for ManageOrders TEST pushes | — | ✅ Active |
+| `/tests/3dt-fire-test-webhook.js` | Fires a SIGNED synthetic checkout.session.completed at localhost — full post-payment pipeline test without a card (reads .env webhook secret) | node, .env | ✅ Active |
 
 > Deleted 2026-06-09 (legacy implementation): `/pages/js/3-day-tees.js`, `/pages/js/3-day-tees-debug.js`, `/pages/css/3-day-tees-redesign.css`, `/pages/js/services/ApiService.js`, `/pages/js/services/InventoryService.js`, `/pages/js/utils/debounce.js`, `/tests/test-3day-{inventory,multisku}.js`, `/tests/3-day-tees-{redesign-demo,performance-test}.html`, `/tests/3-day-tees-inventory-summary.md`. Recovery: `git show HEAD~1:<path>`.
 

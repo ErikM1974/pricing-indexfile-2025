@@ -277,6 +277,12 @@
             if (new URLSearchParams(location.search).get('canceled')) {
                 toast('Your order is saved — ready when you are.', 'success');
             }
+
+            // Dev/QA hook (localhost only): lets the calibration sweep and
+            // Preview-driven tests reach the designer + state directly.
+            if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+                window.__TDT = { S, designer: () => designer, quote: currentQuote, colorOf };
+            }
         } catch (e) {
             console.error('[3DT] Boot failed:', e);
             fatal('We couldn’t load live pricing or stock (' + e.message + ').');
@@ -384,6 +390,7 @@
         }
 
         slot.placement = designer.defaultPlacement(slotKey, slot.naturalW, slot.naturalH);
+        slot.artLum = slot.previewable && slot.bitmap ? computeArtLuminance(slot.bitmap) : null;
         if (slotKey === 'back' && !S.design.backEnabled) {
             S.design.backEnabled = true;
             $('back-toggle').checked = true;
@@ -394,6 +401,7 @@
         renderDesignControls();
         renderAll();
         persistSoon();
+        checkContrast();
     }
 
     async function decodeRaster(file) {
@@ -478,6 +486,101 @@
         if (!slot || slot.isVector || !slot.previewable) { return; }
         slot.effectiveDpi = Math.round(slot.naturalW / Math.max(0.1, slot.placement.wIn));
         if (slot.effectiveDpi >= DPI_AMBER) slot.lowDpiAck = false;
+    }
+
+    // ── Contrast guard (dark-art-on-dark-shirt = DTG reprint ticket) ───
+    // Alpha-weighted artwork luminance vs the garment's print-area patch;
+    // close values get a toast + ⚠ badge + a line in the review ack and the
+    // ShopWorks placement warnings. Advisory, never blocks (we print what
+    // the customer approves).
+    const CONTRAST_DELTA = 55;          // 0-255 luminance distance
+    const garmentLumCache = {};
+    const contrastToasted = new Set();
+
+    function computeArtLuminance(bitmap) {
+        try {
+            const c = document.createElement('canvas');
+            c.width = c.height = 48;
+            const x = c.getContext('2d');
+            x.drawImage(bitmap, 0, 0, 48, 48);
+            const d = x.getImageData(0, 0, 48, 48).data;
+            let sum = 0, wsum = 0;
+            for (let i = 0; i < 48 * 48; i++) {
+                const o = i * 4;
+                const a = d[o + 3] / 255;
+                if (a < 0.05) continue;     // transparent pixels don't print
+                sum += (0.2126 * d[o] + 0.7152 * d[o + 1] + 0.0722 * d[o + 2]) * a;
+                wsum += a;
+            }
+            return wsum > 0 ? sum / wsum : null;
+        } catch (_) { return null; }
+    }
+
+    function garmentLuminance(colorObj) {
+        const cc = colorObj.catalogColor;
+        if (cc in garmentLumCache) return Promise.resolve(garmentLumCache[cc]);
+        const src = colorObj.images.flatFront || colorObj.images.frontModel;
+        if (!src) { garmentLumCache[cc] = null; return Promise.resolve(null); }
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                try {
+                    const a = TDTCalibration.areaPx('flatFront', 'FF', cc, img.naturalWidth, img.naturalHeight);
+                    const c = document.createElement('canvas');
+                    c.width = c.height = 32;
+                    const x = c.getContext('2d');
+                    x.drawImage(img, a.x, a.y, a.w, a.h, 0, 0, 32, 32);
+                    const d = x.getImageData(0, 0, 32, 32).data;
+                    let sum = 0;
+                    for (let i = 0; i < 32 * 32; i++) {
+                        const o = i * 4;
+                        sum += 0.2126 * d[o] + 0.7152 * d[o + 1] + 0.0722 * d[o + 2];
+                    }
+                    garmentLumCache[cc] = sum / (32 * 32);
+                } catch (_) { garmentLumCache[cc] = null; }
+                resolve(garmentLumCache[cc]);
+            };
+            img.onerror = () => { garmentLumCache[cc] = null; resolve(null); };
+            img.src = '/api/image-proxy?url=' + encodeURIComponent(src);
+        });
+    }
+
+    async function checkContrast() {
+        const colors = new Set(S.cart.lines.map((l) => l.catalogColor));
+        if (S.design.previewColor) colors.add(S.design.previewColor);
+        let changed = false;
+        for (const k of ['front', 'back']) {
+            const slot = S.design[k];
+            if (!slot) continue;
+            if (slot.previewable && slot.artLum != null) {
+                for (const cc of colors) {
+                    const gl = await garmentLuminance(colorOf(cc));
+                    if (gl == null) continue;
+                    const warnKey = 'contrast:' + cc;
+                    const low = Math.abs(slot.artLum - gl) < CONTRAST_DELTA;
+                    const has = slot.warnings.includes(warnKey);
+                    if (low && !has) {
+                        slot.warnings.push(warnKey);
+                        changed = true;
+                        const tkey = `${slot.fileName}|${cc}|${k}`;
+                        if (!contrastToasted.has(tkey)) {
+                            contrastToasted.add(tkey);
+                            toast(`Heads up — your ${k} art may be hard to see on ${colorOf(cc).colorName}. We print exactly what you upload.`, 'error');
+                        }
+                    } else if (!low && has) {
+                        slot.warnings.splice(slot.warnings.indexOf(warnKey), 1);
+                        changed = true;
+                    }
+                }
+            }
+            // Drop contrast warnings for colors no longer in play
+            const before = slot.warnings.length;
+            slot.warnings = slot.warnings.filter((w) =>
+                !w.startsWith('contrast:') || colors.has(w.slice(9)));
+            if (slot.warnings.length !== before) changed = true;
+        }
+        if (changed) { renderDesignControls(); renderAll(); persistSoon(); }
     }
 
     function removeArtwork(slotKey, opts) {
@@ -697,6 +800,7 @@
             S.design.previewColor = catalogColor;
             designer.setColor(colorOf(catalogColor));
             renderStage2(); renderAll(); persistSoon();
+            checkContrast();
         }
     }
 
@@ -924,6 +1028,11 @@
             }
             if (s && !s.previewable) {
                 acks.push(`Your ${k} file (${escapeHTML(s.fileName)}) gets a human proof by email before we print.`);
+            }
+            if (s) {
+                (s.warnings || []).filter((w) => w.indexOf('contrast:') === 0).forEach((w) => {
+                    acks.push(`⚠ Your ${k} art may be hard to see on ${escapeHTML(colorOf(w.slice(9)).colorName)} — we print exactly what you upload.`);
+                });
             }
         });
         ackEl.innerHTML = acks.join('<br>');
@@ -1355,7 +1464,7 @@
         const slotLite = (s) => s ? {
             fileName: s.fileName, previewable: s.previewable, isVector: s.isVector,
             naturalW: s.naturalW, naturalH: s.naturalH, placement: s.placement,
-            effectiveDpi: s.effectiveDpi, lowDpiAck: s.lowDpiAck,
+            effectiveDpi: s.effectiveDpi, lowDpiAck: s.lowDpiAck, artLum: s.artLum,
             warnings: s.warnings, uploaded: s.uploaded,
         } : null;
         return {

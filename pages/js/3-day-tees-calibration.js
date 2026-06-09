@@ -36,7 +36,8 @@
         flatFront: {
             areas: {
                 LC: { xFrac: 0.559, yFrac: 0.255, wFrac: 0.1017, hFrac: 0.0678, wIn: 4, hIn: 4 },
-                FF: { xFrac: 0.3471, yFrac: 0.19, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
+                // FF top dropped 2″ (Erik 2026-06-09) — clears the collar zone
+                FF: { xFrac: 0.3471, yFrac: 0.224, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
             },
         },
         flatBack: {
@@ -47,8 +48,29 @@
     };
 
     // Per-color overrides for photo-set drift (catalogColor → partial VIEWS
-    // shape). Empty today — SanMar's 2021 PC54 flat set shares one framing.
-    const COLOR_OVERRIDES = {};
+    // shape). Pixel-measured 2026-06-09: the heather shots sit ~0.9% left of
+    // the Jet Black/Navy framing (garment center 0.491 vs 0.500) — enough to
+    // skew a left-chest print ~0.35″ without these.
+    const HEATHER_SHIFT = -0.009;
+    const HEATHER_VIEWS = {
+        flatFront: {
+            areas: {
+                LC: { xFrac: 0.559 + HEATHER_SHIFT, yFrac: 0.255, wFrac: 0.1017, hFrac: 0.0678, wIn: 4, hIn: 4 },
+                FF: { xFrac: 0.3471 + HEATHER_SHIFT, yFrac: 0.224, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
+            },
+        },
+        flatBack: {
+            areas: {
+                // Heather BACK shots drift half as far as the fronts
+                // (torso center 0.4955 vs 0.500 — measured 2026-06-09).
+                FB: { xFrac: 0.3471 + HEATHER_SHIFT / 2, yFrac: 0.194, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
+            },
+        },
+    };
+    const COLOR_OVERRIDES = {
+        'Ath Heather': HEATHER_VIEWS,
+        'Dk Hthr Grey': HEATHER_VIEWS,
+    };
 
     /**
      * Resolve the print-area rect for a view + location + color.
