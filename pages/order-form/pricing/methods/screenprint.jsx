@@ -176,8 +176,17 @@
       out.error = 'Drag at least one SP location from the rail (Front / Back / Sleeve)';
       return out;
     }
-    // Effective front colors: white underbase counts as +1 (same convention as quote builder)
-    const frontEffective = loc.front > 0 ? loc.front + (loc.whiteUnderbase ? 1 : 0) : 0;
+    // PARITY FIX (2026-06-09): white underbase does NOT change the per-piece
+    // print PRICE. The live SCP quote builder prices the per-piece on RAW front
+    // colors and charges underbase ONLY as one extra setup screen
+    // (screenprint-quote-builder.js:3093 raw frontColors for the per-piece;
+    // :109-122 frontColors+1 only for the screen/setup-fee count). The old code
+    // folded underbase into the per-piece lookup → over-charged every dark-garment
+    // order by a full color-step PER PIECE (e.g. +$2.50/pc × qty, vs the correct
+    // flat $30 setup), verified by scripts/capture-order-form-baselines.js
+    // (SCP-ADV-UB). The +1 underbase SCREEN belongs to the SPSU setup-fee flow,
+    // not here. Price on raw front colors:
+    const frontEffective = loc.front;
     const frontKey = String(frontEffective);
 
     // Find primary tier row

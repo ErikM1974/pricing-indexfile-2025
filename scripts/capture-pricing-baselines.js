@@ -702,4 +702,4 @@ Output: tests/pricing-baselines/baselines.captured.json
   });
 }
 
-module.exports = { captureAll, SCENARIOS, BUILDER_URLS };
+module.exports = { captureAll, SCENARIOS, BUILDER_URLS, PAGE_RUNNERS };

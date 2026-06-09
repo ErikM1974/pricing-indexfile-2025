@@ -343,3 +343,22 @@ body:not(.print-preview) .print-toolbar { display: none; }
   .ps-totals { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .ps-totals-row--total { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* ---- Multi-page print rules ----
+   The garments table is unbounded (a single multi-size style can tier-split
+   into several printed lines), so a long order spills onto a 2nd+ page. These
+   rules keep each page readable: the column headers repeat at the top of every
+   page, individual rows never split across a page boundary, and the totals /
+   footer / design / signature blocks each stay whole. */
+@media print {
+  /* Repeat the <thead> column headers on every printed page. */
+  .ps-table thead { display: table-header-group; }
+  /* Never split a garment row across a page break. */
+  .ps-table tr { break-inside: avoid; page-break-inside: avoid; }
+  /* Keep the closing blocks intact (no mid-element page split). */
+  .ps-totals,
+  .ps-footer,
+  .ps-design-row,
+  .ps-sig-line,
+  .ps-sig { break-inside: avoid; page-break-inside: avoid; }
+}

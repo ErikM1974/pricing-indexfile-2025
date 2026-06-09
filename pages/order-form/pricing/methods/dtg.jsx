@@ -168,62 +168,34 @@
   // the lowest non-LTM tier's costs (historical pattern, no data change needed).
   function priceForLocationCombo(bundle, combo, totalQty) {
     if (!bundle || !combo) return null;
-    const codes = String(combo).split('_');
     const tiers = bundle.tiers || [];
     const tierRow = findTierRow(tiers, totalQty);
     if (!tierRow) return null;
 
-    // Fallback denominator aligned to 0.57 to match the DTG service
-    // (dtg-pricing-service.js:528) and every other surface — NOT 0.6, which
-    // booked 40% margin vs the canonical 43% if a Caspio tier row ever lacked
-    // MarginDenominator. Normal data always carries the live Caspio value.
-    let marginDenom = Number(tierRow.MarginDenominator);
-    if (!(marginDenom > 0)) {
-      marginDenom = 0.57;
-      console.warn('[OrderForm DTG] tier row missing MarginDenominator — using 0.57 fallback', tierRow);
+    // PARITY FIX (2026-06-09): delegate the base per-size price to the SAME
+    // DTGPricingService method the DTG quote page uses, instead of re-deriving
+    // it here. The old local copy took the S/first size as the garment base,
+    // while the service uses Math.min(all valid size prices) — so the order
+    // form over-charged at qty>=24 (+$0.50/pc 24-71, +$1.50/pc 72+), verified
+    // by scripts/capture-order-form-baselines.js. calculateAllTierPricesForLocation
+    // returns base prices (no LTM) per tier using Math.min garment base +
+    // $0.50 ceil + combo split + the LTM print-cost fallback — the exact math
+    // calculateAllLocationPrices (the quote page) uses. LTM distribution is the
+    // caller's job (priceRow adds Math.floor(ltmFee/qty)/pc), matching the
+    // service's documented contract. One code path = no drift.
+    const perTier = svc().calculateAllTierPricesForLocation(bundle, combo);
+    const match = Array.isArray(perTier)
+      ? perTier.find(t => t.label === tierRow.TierLabel)
+      : null;
+    if (!match || !match.basePrices) {
+      console.warn('[OrderForm DTG] DTGPricingService returned no base price for tier', tierRow.TierLabel, 'combo', combo);
+      return null;
     }
-    const ltmFee = Number(tierRow.LTM_Fee || 0);
-    const isLTM = ltmFee > 0;
-
-    // Resolve the TierLabel we'll use to look up DTG_Costs rows. Default:
-    // the tier's own label. If LTM tier has no rows in DTG_Costs, fall back
-    // to the lowest non-LTM tier (preserves the historical "LTM uses 24-47
-    // print cost + LTM fee" pattern).
-    let costsTierLabel = tierRow.TierLabel;
-    if (isLTM) {
-      const hasCosts = (bundle.costs || []).some(c => c.TierLabel === tierRow.TierLabel);
-      if (!hasCosts) {
-        const nonLtm = tiers
-          .filter(t => Number(t.LTM_Fee || 0) === 0)
-          .sort((a, b) => Number(a.MinQuantity) - Number(b.MinQuantity));
-        if (nonLtm.length) costsTierLabel = nonLtm[0].TierLabel;
-      }
-    }
-
-    // Print cost: sum across all codes in the combo
-    let totalPrintCost = 0;
-    codes.forEach(code => {
-      const costEntry = (bundle.costs || []).find(c => c.PrintLocationCode === code && c.TierLabel === costsTierLabel);
-      if (costEntry) totalPrintCost += Number(costEntry.PrintCost) || 0;
-    });
-
-    // Garment selling base — use the smallest size's cost (typical convention)
-    const sizes = bundle.sizes || [];
-    const std = sizes.find(s => /^s$/i.test(s.size)) || sizes[0];
-    const garmentCost = Number(std?.price) || 0;
-    const markedUpGarment = garmentCost / marginDenom;
-
-    // Per-size price = (markedUpGarment + totalPrintCost) rounded up to $0.50
-    // + size upcharge for that size.
-    const upcharges = bundle.upcharges || {};
-    const out = {};
-    sizes.forEach(s => {
-      const baseRaw = markedUpGarment + totalPrintCost;
-      const baseRounded = Math.ceil(baseRaw * 2) / 2;
-      const up = Number(upcharges[s.size]) || 0;
-      out[s.size] = baseRounded + up;
-    });
-    return { unitPriceBySize: out, tierLabel: tierRow.TierLabel, ltmFee };
+    return {
+      unitPriceBySize: match.basePrices,
+      tierLabel: tierRow.TierLabel,
+      ltmFee: Number(match.ltmFee || 0),
+    };
   }
 
   function priceRow({ row, formCtx, bundle, locationCombo }) {

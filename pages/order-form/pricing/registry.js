@@ -100,6 +100,7 @@ window.OrderFormPricing = (function () {
       result.taxEstimate    = td.tax;
       result.depositDue     = td.deposit;
       result.taxRate        = td.rate;            // effective decimal rate (0 when exempt)
+      result.taxRateIsDefault = !!taxCtx.rateIsDefault; // true when the WA 10.1% Milton fallback drove the rate (no destination lookup) — UI surfaces a verify-rate warning
       result.taxLabel       = taxCtx.label;       // UI label: "WA Sales Tax (10.1%)" / "Out of state — no tax"
       result.taxExempt      = taxCtx.rate === 0;
       result.taxAccount     = taxCtx.account;      // GL account for the ShopWorks push note
