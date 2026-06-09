@@ -1,3 +1,15 @@
+## v2026.06.09.3 (2026.06.09)
+
+- docs(memory): LTMFeeTotal column INTEGER→CURRENCY (schema fix from parallel chip session)
+- docs(memory): full pricing-surface audit 2026-06-09 (47 verified findings) + resume checklist
+- fix(order-form): pricing + tax parity with quote builders (C1/C2 + Themes A/B/G/H/I)
+- fix(quote-mgmt): route OF quotes to Order Form + use APP_CONFIG for proxy URL (Theme J)
+- fix(quote-builders): EMB puff-line key, rate-aware invoice tax label, DTG/DTF manual-cost host gate
+- feat(pricing=api): migrate SCP/DTF/EMB charged fees to Caspio Service_Codes (Themes C/D/F)
+- fix(order-form,dtg): tax % label trailing zeros + DTG push excludes invalid-color rows
+- docs(memory): record pricing-audit fixes + LESSONS_LEARNED (order-form parity)
+- Deploy v2026.06.09.3: 12 files (ae-dashboard.html,art-hub-steve.html,bradley-screenprint.html...)
+
 ## v2026.06.09.2 (2026.06.09)
 
 - docs(memory): DTG Phase 2 SHIPPED LIVE v2026.06.09.1
