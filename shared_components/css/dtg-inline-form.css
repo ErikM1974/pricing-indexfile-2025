@@ -2453,3 +2453,21 @@
 .dtg-tax-ctl { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
 .dtg-tax-ctl input[type="number"] { width: 56px; padding: 2px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; text-align: center; }
 .dtg-tax-ctl input[type="checkbox"] { accent-color: #22c55e; }
+
+/* [2026-06-09] Phase 2 — billed shipping charge + UPS-Ground estimator (inside #dtgShipToBlock) */
+.dcp-shipfee-wrap { margin-top: 10px; }
+.dcp-shipfee-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.dcp-shipfee-prefix { font-size: 13px; font-weight: 600; color: #475569; }
+.dcp-shipfee-row input[type="number"] {
+    width: 90px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px;
+    font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;
+}
+.dcp-estimate-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
+    background: var(--pnw-forest, #2d5f3f); color: #fff; border: none; border-radius: 6px;
+    font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    transition: background 0.18s ease;
+}
+.dcp-estimate-btn:hover { background: var(--pnw-pine, #1f4a30); }
+.dcp-estimate-btn:disabled { opacity: 0.65; cursor: default; }
+.dcp-estimate-result { margin-top: 6px; font-size: 11.5px; line-height: 1.4; color: #64748b; min-height: 1em; }

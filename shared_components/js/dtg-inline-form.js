@@ -234,6 +234,11 @@
             // taxRateOverride: null = auto (DOR/pickup/exempt/etc.); a number (percent) = the manual rate the rep typed.
             includeTax: true,
             taxRateOverride: null,
+            // [2026-06-09] Phase 2 — billed shipping charge. Shipping is TAXABLE in WA
+            // (WAC 458-20-110), so this enters the tax BASE + the total at all 4 sites
+            // (screen / submit / PDF / save) via effectiveShipFee() (which zeroes it for
+            // pickup). 0 = no charge. Read through effectiveShipFee(), never directly.
+            fee: 0,
         },
         submitting: false,
         // C9 dirty-tracking: set to true when the rep touches any form field
@@ -463,6 +468,29 @@
         if (!Array.isArray(row.colorsAvailable) || row.colorsAvailable.length === 0) return false;
         // Color is set but no catalogColor → no dropdown match → invalid
         return !row.catalogColor || String(row.catalogColor).trim().length === 0;
+    }
+
+    // [2026-06-09] Phase 2 — the billed shipping charge that enters the tax base + total.
+    // SINGLE source of the pickup rule: a Customer-Pickup order never carries a shipping
+    // charge (the customer collects at Milton), so ALL FOUR total/tax sites (renderSummary,
+    // computePriceQuoteFromState, dtgPrintQuote, submitToShopWorks) + the save read THIS,
+    // never state.shipping.fee directly. Mirrors recomputeTaxRate being the single tax
+    // authority — wire one rule once so the four consumers can't desync on the taxed base.
+    function effectiveShipFee() {
+        if (isPickupMethod(state.shipping.method)) return 0;
+        const f = Number(state.shipping.fee);
+        return Number.isFinite(f) && f > 0 ? Math.round(f * 100) / 100 : 0;
+    }
+
+    // [2026-06-09] Phase 2 — pull the #dtgShipFee input into state. The shared estimator
+    // (quote-order-summary.estimateShipping) writes #dtgShipFee.value DIRECTLY, so its
+    // onApplied hook + the manual input handler both call this to sync state before the
+    // tax base re-renders.
+    function syncShipFeeFromDom() {
+        const el = document.getElementById('dtgShipFee');
+        if (!el) return;
+        const v = parseFloat(el.value);
+        state.shipping.fee = (Number.isFinite(v) && v > 0) ? v : 0;
     }
 
     // ----- Fetchers ----------------------------------------------------------
@@ -979,6 +1007,21 @@
                                     </div>
                                 </div>
                                 <div class="dcp-tax-status" id="dtgTaxStatus"></div>
+                                <!-- [2026-06-09] Phase 2 — billed shipping charge + UPS-Ground estimator.
+                                     Lives INSIDE #dtgShipToBlock (hidden under Customer Pickup) — pickup
+                                     orders never bill shipping, so the field is correctly out of reach there
+                                     and effectiveShipFee() zeroes any stale value. Shipping is TAXABLE in WA
+                                     (WAC 458-20-110) → the fee enters the tax base. The Estimate button calls
+                                     the shared global estimateShipping() (quote-order-summary.js). -->
+                                <div class="dcp-field-wrap dcp-shipfee-wrap">
+                                    <div class="dcp-field-label">Shipping charge <span class="dcp-optional">billed to customer · taxable in WA</span></div>
+                                    <div class="dcp-shipfee-row">
+                                        <span class="dcp-shipfee-prefix">$</span>
+                                        <input type="number" id="dtgShipFee" step="0.01" min="0" inputmode="decimal" autocomplete="off" placeholder="0.00" value="${Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : ''}">
+                                        <button type="button" id="dtgEstimateShipBtn" class="dcp-estimate-btn" onclick="estimateShipping()"><i class="fas fa-truck-fast"></i> Estimate UPS Ground</button>
+                                    </div>
+                                    <div class="dcp-estimate-result" id="dtgEstimateShipResult"></div>
+                                </div>
                             </div>
                             <!-- [2026-06-08] Phase 1 tax controls — include-tax / manual rate / wholesale.
                                  MOVED OUT of #dtgShipToBlock (which is hidden when Customer Pickup is ON)
@@ -1277,9 +1320,14 @@
         // destination city rate.
         const isPickup = isPickupMethod(state.shipping.method);
         const shState = (state.shipping.state || '').toUpperCase();
+        // [2026-06-09] Phase 2 — billed shipping is TAXABLE in WA (WAC 458-20-110), so the
+        // fee enters the tax BASE here, NOT added after tax. effectiveShipFee() is 0 for
+        // pickup. Same base formula at submit / PDF / save so the 4 sites can't desync.
+        const shipFee = effectiveShipFee();
         const taxRate = Number(state.shipping.taxRate);
-        const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
-        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
+        const taxBase = Math.round((subtotal + shipFee) * 100) / 100;
+        const taxEstimate = Math.round(taxBase * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
+        const grandTotal = Math.round((taxBase + taxEstimate) * 100) / 100;
         const taxPct = (taxRate * 100).toFixed(taxRate * 100 < 10 ? 1 : 2);
         // [2026-06-08] Phase 1 — label the new 0% sources (wholesale/exempt/opt-out/manual)
         // set by recomputeTaxRate. The DOLLAR amount is already correct (taxRate is 0 for
@@ -1307,6 +1355,7 @@
             </div>
             <div class="dps-totals-rows">
                 <div class="dps-totals-row"><span>Subtotal</span><span class="dps-mono">$${fmtMoney(subtotal)}</span></div>
+                ${shipFee > 0 ? `<div class="dps-totals-row dps-ship-row"><span>Shipping</span><span class="dps-mono">$${fmtMoney(shipFee)}</span></div>` : ''}
                 <div class="dps-totals-row dps-tax-row"><span>${taxLabel}</span><span class="dps-mono">$${fmtMoney(taxEstimate)}</span></div>
                 <div class="dps-totals-row dps-grand-row"><span>Order total</span><span class="dps-mono">$${fmtMoney(grandTotal)}</span></div>
             </div>
@@ -2290,6 +2339,17 @@
             if (it) it.checked = !wholeEl.checked;
             markDirty(); scheduleStateSave(); recomputeTaxRate();
         });
+        // [2026-06-09] Phase 2 — manual shipping-charge edits. The fee is in the tax base
+        // (taxable in WA), so re-render the summary (which recomputes tax on subtotal+fee).
+        // NOT recomputeTaxRate() — the fee doesn't change the RATE, and calling it would
+        // re-hit the DOR lookup on every keystroke. renderSummary() → renderBand() also
+        // refreshes the ship-to card's "· $X" line.
+        const shipFeeEl = document.getElementById('dtgShipFee');
+        if (shipFeeEl) shipFeeEl.addEventListener('input', () => {
+            syncShipFeeFromDom();
+            markDirty(); scheduleStateSave();
+            renderSummary();
+        });
     }
 
     // Sync the pickup toggle UI to whatever state.shipping.method currently is.
@@ -2312,10 +2372,11 @@
     // Writes status text into #dtgTaxStatus + updates state.shipping.taxRate.
     // Caller is responsible for renderSummary() afterwards.
     //
-    // Note: shipping CHARGES are taxable in WA (WAC 458-20-110) — currently
-    // not in our tax base because DTG form sends cur_Shipping: 0. If we ever
-    // bill the customer for shipping, the tax base must become
-    // (subtotal + shipping) × rate. Same comment in server.js getTaxAccount().
+    // Note: shipping CHARGES are taxable in WA (WAC 458-20-110). As of Phase 2 (2026-06-09)
+    // DTG BILLS shipping (state.shipping.fee via effectiveShipFee()), so the tax base is now
+    // (subtotal + shipping) × rate at all 4 sites (renderSummary / submit / PDF / save) and
+    // the push sends cur_Shipping = fee. recomputeTaxRate only owns the RATE — the fee doesn't
+    // change it, so the fee handler re-renders without calling this (avoids a redundant DOR hit).
     async function recomputeTaxRate() {
         const status = document.getElementById('dtgTaxStatus');
         const setStatus = (text, cls) => {
@@ -3821,6 +3882,13 @@
             const invoiceSubtotal = Math.round(invoiceProducts.reduce((s, p) =>
                 s + p.lineItems.reduce((ss, li) => ss + (Number(li.total) || 0), 0), 0) * 100) / 100;
 
+            // [2026-06-09] Phase 2 — billed shipping. The shared generator taxes preTaxSubtotal
+            // and renders the Shipping row + closing Subtotal as the breakdown of it; the FIRST
+            // "Subtotal:" row uses grandTotal (products only). So: grandTotal = products,
+            // preTaxSubtotal = products + fee (the TAXED base → shipping is taxed in WA),
+            // shippingFee = fee (the display row). Pickup → effectiveShipFee() = 0 (no change).
+            const shipFee = effectiveShipFee();
+            const preTaxWithShip = Math.round((invoiceSubtotal + shipFee) * 100) / 100;
             // Contract derives isDTG from method, normalizes tax, and zero-fills
             // any fee fields not set here (artCharge, rushFee, discount, etc.).
             const pricingData = window.QuotePricingData.buildPricingData({
@@ -3837,9 +3905,9 @@
                 ltmFee: 0,
                 ltmDistributed: true,
                 grandTotal: invoiceSubtotal,
-                preTaxSubtotal: invoiceSubtotal,
+                preTaxSubtotal: preTaxWithShip,
                 taxRate: Number(state.shipping?.taxRate) || 0,
-                shippingFee: 0
+                shippingFee: shipFee
             });
 
             const customerData = {
@@ -3922,12 +3990,18 @@
         // (recomputeTaxRate → state.shipping.taxRate, a DECIMAL). It is ALREADY 0 for
         // wholesale / exempt / out-of-state / opt-out, so no re-check is needed here.
         const taxRate = Number(state.shipping.taxRate) || 0;
-        const taxAmount = Math.round(subtotal * taxRate * 100) / 100;
-        const grandTotal = Math.round((subtotal + taxAmount) * 100) / 100;
+        // [2026-06-09] Phase 2 — billed shipping (taxable in WA) enters the tax base here too,
+        // so the SAVE (handleSaveQuote reads this) + the PDF foot to the same number the screen
+        // shows. effectiveShipFee() is 0 for pickup. subtotal stays products-only (→ SubtotalAmount).
+        const shippingFee = effectiveShipFee();
+        const taxBase = Math.round((subtotal + shippingFee) * 100) / 100;
+        const taxAmount = Math.round(taxBase * taxRate * 100) / 100;
+        const grandTotal = Math.round((taxBase + taxAmount) * 100) / 100;
         return {
             lineItems,
             combinedQuantity,
             subtotal,
+            shippingFee,
             grandTotal,
             totalLtmFee,
             tier: (_lastTier && (_lastTier.TierLabel || _lastTier.tierLabel)) || 'Standard',
@@ -3943,7 +4017,7 @@
             isWholesale: !!(state.customer && state.customer.isWholesale),
             isTaxExempt: !!(state.customer && state.customer.isTaxExempt),
             taxExemptNumber: (state.customer && state.customer.taxExemptNumber) || '',
-            totals: { subtotal, taxRate, taxAmount, grandTotal },
+            totals: { subtotal, shippingFee, taxRate, taxAmount, grandTotal },
         };
     }
 
@@ -4116,8 +4190,14 @@
         // MANUAL rate on an out-of-state ship-to (manual outranks out-of-state in the authority,
         // so screen/saved showed the manual rate but the push booked $0). Push now == screen.
         const taxRate = Number(state.shipping.taxRate);
-        const taxEstimate = Math.round(subtotal * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
-        const grandTotal = Math.round((subtotal + taxEstimate) * 100) / 100;
+        // [2026-06-09] Phase 2 — billed shipping (taxable in WA) enters the push tax base too,
+        // so the ShopWorks order + Notes On Order foot to the same total the rep saw on screen.
+        // effectiveShipFee() is 0 for pickup. server.js maps ship.fee → cur_Shipping and
+        // breakdown.shipping → the Notes "Shipping (taxable)" line + taxable base.
+        const shipFee = effectiveShipFee();
+        const taxBase = Math.round((subtotal + shipFee) * 100) / 100;
+        const taxEstimate = Math.round(taxBase * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
+        const grandTotal = Math.round((taxBase + taxEstimate) * 100) / 100;
 
         const body = {
             info: {
@@ -4189,6 +4269,9 @@
                 taxRateSource: state.shipping.taxRateSource || '',
                 taxAccount: state.shipping.taxAccount || '',
                 taxAccountName: state.shipping.taxAccountName || '',
+                // [2026-06-09] Phase 2 — billed shipping charge → server.js cur_Shipping
+                // (was hardcoded 0). 0 for pickup (effectiveShipFee zeroes it).
+                fee: shipFee,
             },
             orderNotes: `DTG quote — ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pcs · tier ${pricing.tier}${isPickup ? ' · CUSTOMER PICKUP' : ''}`,
             // New-artwork files (Erik 2026-05-20). When rep uploaded artwork
@@ -4211,6 +4294,9 @@
                 totalQty: Number(pricing.combinedQuantity) || 0,
                 tier: pricing.tier,
                 subtotal: Math.round(subtotal * 100) / 100,
+                // [2026-06-09] Phase 2 — billed shipping. server.js buildOrderNote reads this
+                // for the "Shipping (taxable)" Notes line + the taxable base = subtotal+shipping.
+                shipping: shipFee,
                 ltmTotal: Math.round(ltmTotal * 100) / 100,
                 taxEstimate,
                 depositDue: 0,
@@ -4502,6 +4588,9 @@
             // opt-out branch fired → every post-reset quote silently dropped to 0% tax while
             // the #include-tax checkbox still rendered checked (a money desync).
             includeTax: true, taxRateOverride: null,
+            // [2026-06-09] Phase 2 — re-seed the billed shipping charge or a prior quote's fee
+            // bleeds into the next "New Quote" (same reset-bleed class as the Phase 1 tax flags).
+            fee: 0,
         };
         // Schedule resets: re-auto-calc due date from qty (will land on 5 BDs
         // since qty starts at 0 → ≤24 branch).
@@ -4550,9 +4639,26 @@
             QuoteOrderSummary.configure({
                 orderRecap: '#order-recap',
                 shipToCard: '#ship-to-card',
-                ship: { address: '#dtgShipAddress1', city: '#dtgShipCity', state: '#dtgShipState', zip: '#dtgShipZip', method: '#dtgShipMethod' },
+                // [2026-06-09] Phase 2 — ship.fee wires the shared estimator's fee write +
+                // the ship-to card's "· $X" line to #dtgShipFee.
+                ship: { address: '#dtgShipAddress1', city: '#dtgShipCity', state: '#dtgShipState', zip: '#dtgShipZip', method: '#dtgShipMethod', fee: '#dtgShipFee' },
                 recap: { company: '#dtgCompanyInput', custNum: '#dtgCompanyId' },
                 logos: function () { return []; },
+                // [2026-06-09] Phase 2 — UPS-Ground estimator. collectProducts mirrors the
+                // PRICED rows (same isRowColorInvalid filter combinedQty uses) so the weight
+                // estimate matches what's billed. onApplied syncs the DOM fee → state then
+                // re-renders the summary (fee is in the tax base); no recomputeTaxRate here —
+                // the fee doesn't change the RATE, and skipping it avoids a redundant DOR hit.
+                estimateHooks: {
+                    collectProducts: function () {
+                        return state.rows
+                            .filter(function (r) { return r.style && !isRowColorInvalid(r); })
+                            .map(function (r) { return { style: r.style, color: r.color, catalogColor: r.catalogColor, sizeBreakdown: r.sizes }; });
+                    },
+                    onApplied: function () { syncShipFeeFromDom(); renderSummary(); },
+                    btn: '#dtgEstimateShipBtn',
+                    result: '#dtgEstimateShipResult',
+                },
             });
         }
         // Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
@@ -4673,6 +4779,9 @@
         state.shipping.city     = savedShip.city || '';
         state.shipping.state    = savedShip.state || '';
         state.shipping.zip      = savedShip.zip || '';
+        // [2026-06-09] Phase 2 — restore the billed shipping charge (Chunk E). Without this a
+        // reopened ship quote loses its fee → the taxed total drops on Save Revision.
+        state.shipping.fee      = Number(savedShip.fee) || 0;
         state.shipping.includeTax = (savedTax.includeTax != null) ? !!savedTax.includeTax
                                    : (savedShip.includeTax != null ? !!savedShip.includeTax : true);
         state.shipping.taxRateOverride = (savedTax.taxRateOverride != null) ? Number(savedTax.taxRateOverride)
@@ -4714,6 +4823,9 @@
             setShip('dtgShipCity', state.shipping.city);
             setShip('dtgShipState', state.shipping.state);
             setShip('dtgShipZip', state.shipping.zip);
+            // [2026-06-09] Phase 2 — re-sync the billed shipping-charge input (blank when 0).
+            const feeEl = document.getElementById('dtgShipFee');
+            if (feeEl) feeEl.value = Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : '';
             if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
         } catch (_) { /* controls may be absent on older markup */ }
 
@@ -5115,6 +5227,9 @@
                 taxAccountName: state.shipping.taxAccountName || '',
                 taxRateOverride: state.shipping.taxRateOverride,
                 includeTax: state.shipping.includeTax !== false,
+                // [2026-06-09] Phase 2 — persist the billed shipping charge so edit-reload
+                // (Chunk E) restores it from Notes.shipping.fee. effectiveShipFee() → 0 for pickup.
+                fee: effectiveShipFee(),
             };
             return pq;
         },
