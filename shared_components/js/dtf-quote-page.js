@@ -78,7 +78,7 @@ function updateTaxCalculation() {
 
     // Add graphic design fee
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designFee = designHours * 75;
+    const designFee = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
     subtotal += designFee;
 
     // Add rush fee if present
@@ -386,7 +386,7 @@ function updateFeeTableRows() {
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designTotal = designHours * 75;
+    const designTotal = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
@@ -425,7 +425,7 @@ function updateFeeTableRows() {
                 const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
                 const artCharge = document.getElementById('art-charge-toggle')?.checked
                     ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
+                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
                 const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
                 const ltmFee = document.getElementById('ltm-fee-row')?.style.display !== 'none'
                     ? parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;

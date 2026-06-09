@@ -118,7 +118,8 @@ function updatePrintConfig() {
     }
 
     printConfig.totalScreens = frontScreens + backScreens;
-    printConfig.setupFee = printConfig.totalScreens * SCREEN_FEE;
+    // Per-screen setup fee from Caspio Service_Codes 'SPSU' (fallback SCREEN_FEE). (Pricing=API)
+    printConfig.setupFee = printConfig.totalScreens * (typeof getServicePrice === 'function' ? getServicePrice('SPSU', SCREEN_FEE) : SCREEN_FEE);
 
     // Update front setup display
     const frontSetupEl = document.getElementById('front-setup-display');
@@ -382,7 +383,7 @@ function populateAdditionalCharges(session) {
         // Update the calculated total display
         const designTotalEl = document.getElementById('graphic-design-total');
         if (designTotalEl) {
-            designTotalEl.textContent = (session.GraphicDesignHours * 75).toFixed(2);
+            designTotalEl.textContent = (session.GraphicDesignHours * getServicePrice('GRT-75', 75)).toFixed(2);
         }
     }
 
@@ -837,6 +838,12 @@ function resetQuote() {
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', async function() {
+
+    // Load Caspio Service_Codes (SPSU screen-setup, GRT-75 design) so fees come
+    // from the API, not hardcoded literals (Erik's Pricing=API rule). Fire-and-
+    // forget — getServicePrice() returns the documented fallback until it resolves,
+    // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
+    if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => { try { recalculatePricing(); } catch (_) {} }); }
 
     // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
     // Adds design name input + per-file placement dropdown so the push payload
@@ -3473,7 +3480,7 @@ function updateTaxCalculation() {
 
     // Add graphic design fee
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designFee = designHours * 75;
+    const designFee = designHours * getServicePrice('GRT-75', 75);
     subtotal += designFee;
 
     // Add rush fee if present
@@ -3556,7 +3563,7 @@ function updateAdditionalCharges() {
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designFee = designHours * 75;
+    const designFee = designHours * getServicePrice('GRT-75', 75);
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
@@ -3655,7 +3662,9 @@ function updateFeeTableRows() {
     const setupFeeTotal = document.getElementById('setup-fee-total');
     if (setupFeeRow && printConfig) {
         const screens = printConfig.totalScreens || 1;
-        const fee = screens * SCREEN_FEE;
+        // Use the already-computed API-driven setup fee so the displayed row
+        // (read back into discountableSubtotal) matches the charged value.
+        const fee = (printConfig.setupFee != null) ? printConfig.setupFee : screens * SCREEN_FEE;
         setupScreensLabel.textContent = screens + ' screen' + (screens > 1 ? 's' : '');
         setupFeeUnit.textContent = '$' + fee.toFixed(2);
         setupFeeTotal.textContent = '$' + fee.toFixed(2);
@@ -3678,7 +3687,7 @@ function updateFeeTableRows() {
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designTotal = designHours * 75;
+    const designTotal = designHours * getServicePrice('GRT-75', 75);
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
@@ -3718,7 +3727,7 @@ function updateFeeTableRows() {
                 const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
                 const artCharge = document.getElementById('art-charge-toggle')?.checked
                     ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75;
+                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * getServicePrice('GRT-75', 75);
                 const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
                 const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || 0);
                 const ltmFee = window.currentPricingData?.ltmFee || 0;
@@ -3901,7 +3910,7 @@ function buildScreenprintPricingData(products) {
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
     const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const graphicDesignCharge = graphicDesignHours * 75;
+    const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
 
     // Get rush fee and discount from UI
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
@@ -4037,7 +4046,7 @@ async function saveAndGetLink() {
         const artChargeToggle = document.getElementById('art-charge-toggle');
         const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
         const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-        const graphicDesignCharge = graphicDesignHours * 75;
+        const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
         const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
         const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
         const discountType = document.getElementById('discount-type')?.value || 'fixed';

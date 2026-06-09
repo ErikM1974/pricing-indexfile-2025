@@ -11,6 +11,43 @@
  */
 
 // ============================================
+// SERVICE_CODES (Caspio) — shared fee loader
+// ============================================
+// Single source of truth for service fees = the Caspio Service_Codes table via
+// GET /api/service-codes. `getServicePrice(code, fallback)` returns the live
+// SellPrice, or the documented fallback WITH a visible warning if the API was
+// unreachable — never a silent wrong price (Erik's #1 rule). Shared by SCP/DTF
+// (EMB defines its own copy in embroidery-quote-builder.js — these guards yield
+// to it so there's no double-definition). (2026-06-09)
+if (typeof window !== 'undefined' && typeof window.loadServiceCodePrices !== 'function') {
+    window.loadServiceCodePrices = async function loadServiceCodePrices() {
+        try {
+            const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+                || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const resp = await fetch(`${base}/api/service-codes`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const json = await resp.json();
+            const map = {};
+            (json.data || []).forEach(sc => { if (sc.ServiceCode) map[String(sc.ServiceCode).toUpperCase()] = sc; });
+            window._serviceCodes = map;
+            return map;
+        } catch (e) {
+            console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
+            if (typeof showToast === 'function') showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
+            return null;
+        }
+    };
+}
+if (typeof window !== 'undefined' && typeof window.getServicePrice !== 'function') {
+    window.getServicePrice = function getServicePrice(code, fallback) {
+        const sc = window._serviceCodes && window._serviceCodes[String(code).toUpperCase()];
+        if (!sc) return fallback;
+        const sell = parseFloat(sc.SellPrice);
+        return isNaN(sell) ? fallback : sell;
+    };
+}
+
+// ============================================
 // STRING UTILITIES
 // ============================================
 
@@ -356,7 +393,8 @@ function toggleArtCharge() {
 function updateArtworkCharges() {
     const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designTotal = designHours * 75;
+    // GRT-75 design rate from Caspio Service_Codes (fallback 75). (Pricing=API)
+    const designTotal = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
 
     // Update graphic design total display (if element exists)
     const designTotalEl = document.getElementById('graphic-design-total');

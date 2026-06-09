@@ -449,7 +449,7 @@ class DTFQuoteBuilder {
             // Update the calculated total display
             const designTotalEl = document.getElementById('graphic-design-total');
             if (designTotalEl) {
-                designTotalEl.textContent = (session.GraphicDesignHours * 75).toFixed(2);
+                designTotalEl.textContent = (session.GraphicDesignHours * getServicePrice('GRT-75', 75)).toFixed(2);
             }
         }
 
@@ -2531,7 +2531,7 @@ class DTFQuoteBuilder {
             artCharge: document.getElementById('art-charge-toggle')?.checked
                 ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0,
             graphicDesignHours: parseFloat(document.getElementById('graphic-design-hours')?.value || 0),
-            graphicDesignCharge: parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * 75,
+            graphicDesignCharge: parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * getServicePrice('GRT-75', 75),
             rushFee: parseFloat(document.getElementById('rush-fee')?.value || 0),
             discount: (() => {
                 const amount = parseFloat(document.getElementById('discount-amount')?.value || 0);
@@ -2809,7 +2809,7 @@ class DTFQuoteBuilder {
 
         // Get graphic design fee
         const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-        const graphicDesignCharge = designHours * 75;
+        const graphicDesignCharge = designHours * getServicePrice('GRT-75', 75);
 
         // Get rush fee
         const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
@@ -3417,6 +3417,13 @@ let dtfQuoteBuilder;
 document.addEventListener('DOMContentLoaded', () => {
     dtfQuoteBuilder = new DTFQuoteBuilder();
     window.dtfQuoteBuilder = dtfQuoteBuilder;
+
+    // Load Caspio Service_Codes (GRT-75 design rate) so fees come from the API,
+    // not a hardcoded 75 (Erik's Pricing=API rule). Fire-and-forget — getServicePrice()
+    // returns the documented fallback until it resolves, then we re-price. (2026-06-09)
+    if (typeof loadServiceCodePrices === 'function') {
+        loadServiceCodePrices().then(() => { try { dtfQuoteBuilder.updatePricing(); } catch (_) {} });
+    }
 
     // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
     // Adds design name input + per-file placement dropdown so the push payload
