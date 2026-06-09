@@ -139,6 +139,47 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
     expect(item.PricingTier).toBe('1-23');
   });
 
+  // [2026-06-09] Phase 2 — billed shipping (taxable in WA). The form quote carries shippingFee
+  // and computes taxAmount on (subtotal + shippingFee). The saved record MUST: persist ShippingFee,
+  // make TotalAmount = subtotal + fee (still PRE-tax), keep TaxAmount = round((subtotal+fee)*rate),
+  // and foot so grand = TotalAmount + TaxAmount. subtotal 205.92, fee 25 → base 230.92.
+  test('PHASE 2 — WA-taxable 10.1% with shipping fee: ShippingFee saved, TotalAmount = subtotal+fee, tax on the base', async () => {
+    const { session } = await saveAndCapture(formQuote({
+      shippingFee: 25, taxRate: 0.101, taxAmount: 23.32, grandTotal: 254.24,
+      totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0.101, taxAmount: 23.32, grandTotal: 254.24 },
+    }));
+    expect(session.SubtotalAmount).toBeCloseTo(205.92, 2);   // products only
+    expect(session.ShippingFee).toBeCloseTo(25, 2);
+    expect(session.TotalAmount).toBeCloseTo(230.92, 2);       // PRE-tax, incl shipping (NOT 205.92, NOT 254.24)
+    expect(session.TotalAmount).not.toBeCloseTo(254.24, 2);
+    expect(session.TaxRate).toBeCloseTo(0.101, 4);
+    expect(session.TaxAmount).toBeCloseTo(23.32, 2);          // round((205.92+25)*0.101)
+    // /invoice reconstructs grand = TotalAmount + TaxAmount → must equal on-screen grand
+    expect(session.TotalAmount + session.TaxAmount).toBeCloseTo(254.24, 2);
+  });
+
+  test('PHASE 2 — out-of-state with shipping fee: fee present + in TotalAmount, tax still 0', async () => {
+    const { session } = await saveAndCapture(formQuote({
+      shippingFee: 25, taxRate: 0, taxAmount: 0, grandTotal: 230.92,
+      shipping: { method: 'UPS Ground', city: 'Portland', state: 'OR', zip: '97201', fee: 25, taxRate: 0, taxRateSource: 'out-of-state', taxAccount: '2202', taxAccountName: 'Out of State Sales', taxRateOverride: null, includeTax: true },
+      totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0, taxAmount: 0, grandTotal: 230.92 },
+    }));
+    expect(session.ShippingFee).toBeCloseTo(25, 2);
+    expect(session.TotalAmount).toBeCloseTo(230.92, 2);       // subtotal + fee, no tax
+    expect(session.TaxAmount).toBe(0);
+    expect(session.TaxRate).toBe(0);
+    expect(session.TotalAmount + session.TaxAmount).toBeCloseTo(230.92, 2);
+    // Notes.shipping carries the fee for edit-reload (Chunk E)
+    const notes = JSON.parse(session.Notes);
+    expect(notes.shipping.fee).toBeCloseTo(25, 2);
+  });
+
+  test('PICKUP with no fee: ShippingFee 0, TotalAmount unchanged (regression guard)', async () => {
+    const { session } = await saveAndCapture(formQuote());  // base quote, no shippingFee
+    expect(Number(session.ShippingFee) || 0).toBe(0);
+    expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // still products-only pre-tax
+  });
+
   test('Notes carries shipping + tax blocks for edit-reload (Chunk E round-trip)', async () => {
     const { session } = await saveAndCapture(formQuote({
       taxRate: 0, taxAmount: 0, grandTotal: 205.92,
