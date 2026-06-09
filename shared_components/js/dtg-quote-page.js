@@ -1479,7 +1479,15 @@
                 // + Notes.shipping.fee (edit-reload), NOT a session column. (Quote_Sessions DOES have
                 // a ShippingFee column, but we don't write it: DTF/SCP don't either, and the readers
                 // getShippingFee() foot off the SHIP item — a column write would be dead weight.)
-                LTMFeeTotal: lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0),
+                // [2026-06-09] Caspio Quote_Sessions.LTMFeeTotal is an INTEGER column — a fractional
+                // value (the amortized 49.92) 400s the WHOLE save ("value doesn't match the data type"),
+                // so LTM DTG quotes (qty<24) could not be saved at all. The trio (EMB/SCP/DTF) dodge it
+                // by writing the FLAT tier fee (a round ~$50 → serializes as an integer); DTG writes the
+                // amortized per-unit sum (floor-rounded per unit → fractional). LTMFeeTotal is
+                // informational (the LTM is already IN the per-unit line prices, NOT added to
+                // TotalAmount), so round to the nominal whole-dollar fee — recovers ~$50 and satisfies
+                // the integer column. (Fix for the qty<24 save-400 found in DTG Phase 2 live testing.)
+                LTMFeeTotal: Math.round(lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0)),
                 // PRE-tax, products-only (matches EMB/SCP/DTF). EXCLUDES shipping — the SHIP line
                 // item carries it. /quote + /invoice add SHIP + TaxAmount on top → grand foots.
                 TotalAmount: subtotal,

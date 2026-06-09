@@ -134,8 +134,13 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
 
   test('LTM is persisted on the saved item (not stripped): LTMFeeTotal + per-item LTM fields', async () => {
     const { session, item } = await saveAndCapture(formQuote());
-    expect(session.LTMFeeTotal).toBeCloseTo(49.92, 2);  // 4.16/pc * 12
-    expect(item.LTMPerUnit).toBeCloseTo(4.16, 2);
+    // [2026-06-09] LTMFeeTotal is ROUNDED to a whole dollar — Caspio's column is INTEGER and 400s a
+    // fractional value (the amortized 4.16/pc × 12 = 49.92 → 50). Without the round, LTM DTG quotes
+    // (qty<24) could not save at all. The LTM is already in the per-unit line prices, so this column
+    // is informational; the per-item LTMPerUnit below still carries the exact amortized value.
+    expect(session.LTMFeeTotal).toBe(50);                 // Math.round(49.92) — integer for the Caspio column
+    expect(Number.isInteger(session.LTMFeeTotal)).toBe(true);
+    expect(item.LTMPerUnit).toBeCloseTo(4.16, 2);         // exact amortized per-unit preserved on the item
     expect(item.BaseUnitPrice).toBeCloseTo(13, 2);
     expect(item.HasLTM).toBe('Yes');
     expect(item.LineTotal).toBeCloseTo(205.92, 2);
