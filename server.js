@@ -2572,8 +2572,14 @@ app.post('/api/submit-order-form', async (req, res) => {
           CustomerEmail: info.email || '',
           Phone: info.phone || '',
           // Pull dollar fields from breakdown (computed by frontend pricing modules).
-          // breakdown.grandTotal is subtotal-before-tax; breakdown.subtotal is the
-          // same thing the order form's Totals Panel shows. Tax is left to OnSite.
+          // NOTE: breakdown.grandTotal is pre-tax ONLY for the React Order Form
+          // (pricing/shared.js sets grandTotal = subtotal). The DTG flagship sends a
+          // tax+shipping-INCLUSIVE grandTotal here (dtg-inline-form submitToShopWorks),
+          // so this OF-NNNN audit row's TotalAmount is NOT a reliable pre-tax figure for
+          // DTG — the canonical customer record is the separate DTG-NNN quote_sessions row
+          // (dtg-quote-page.js, TotalAmount pre-tax + a SHIP item + a real TaxAmount). This
+          // OF row writes no TaxAmount, so /invoice's grand = TotalAmount + 0 still displays
+          // the right (tax-incl) number. Tax is left to OnSite (manual-apply pattern).
           TotalQuantity:   Number(breakdown?.totalQty) || 0,
           SubtotalAmount:  Number(breakdown?.subtotal) || 0,
           LTMFeeTotal:     Number(breakdown?.ltmTotal) || 0,
