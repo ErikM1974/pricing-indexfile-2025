@@ -55,6 +55,29 @@ function prettyPrintSize(s) {
   return raw;
 }
 
+// Spreadsheet-style keyboard nav for the size/qty grid (order-form UX redesign,
+// 2026-06-09). Tab moves ACROSS a row (browser default); ArrowUp / ArrowDown /
+// Enter move UP / DOWN the SAME size COLUMN to the previous / next product row —
+// so a rep can blaze a quantity down many styles without the mouse. The column
+// is matched by the visible size header (data-cell-size on each qty input), so
+// it works even when a product aliases the stored key (e.g. ladies styles store
+// XXL under the "2XL" column). No-op when there's no adjacent row in the column.
+function gridKeyNav(e) {
+  const k = e.key;
+  if (k !== 'ArrowDown' && k !== 'ArrowUp' && k !== 'Enter') return;
+  const col = e.target && e.target.dataset ? e.target.dataset.cellSize : null;
+  if (!col) return;
+  const cells = Array.from(document.querySelectorAll('input[data-cell-size="' + col + '"]'));
+  const idx = cells.indexOf(e.target);
+  if (idx < 0) return;
+  const target = k === 'ArrowUp' ? cells[idx - 1] : cells[idx + 1];
+  if (target) {
+    e.preventDefault();
+    target.focus();
+    if (typeof target.select === 'function') target.select();
+  }
+}
+
 // Popover picker for non-standard sizes. Renders inline chips for any non-
 // standard sizes already entered, plus a "+ Add" button that opens a menu
 // of remaining sizes the product offers (5XL, 6XL, 8XL, 10XL, LT, XLT, MT,
@@ -963,8 +986,10 @@ function PaperRow({ row, onChange, onRemove, canRemove, idx, customerMode, onLig
                 <input
                   className="t-in num"
                   inputMode="numeric"
+                  data-cell-size={s}
                   value={row.sizes[effectiveKey] || ''}
                   onChange={e => setSize(effectiveKey, e.target.value)}
+                  onKeyDown={gridKeyNav}
                   title={cellTitle}
                 />
                 {invKnown && (
@@ -1976,6 +2001,16 @@ function PaperForm({ info, setInfo, rows, setRows, ship, setShip, orderNotes, se
     if (!canSubmit) {
       setCaspioMsg({ kind: 'err', text: 'Add at least one row with a style and quantity before submitting.' });
       setTimeout(() => setCaspioMsg(null), 5000);
+      return;
+    }
+    // Money-safety gate (Erik's #1 rule: a wrong total is worse than an error).
+    // breakdown.errors collects any fee/service that couldn't be priced (missing
+    // Service_Code, $0 cold-cache tiered rate) plus method pricing errors. NEVER
+    // push an order with an unresolved price — block with the specific reason.
+    const priceErrors = (breakdown && Array.isArray(breakdown.errors)) ? breakdown.errors : [];
+    if (priceErrors.length > 0) {
+      setCaspioMsg({ kind: 'err', text: 'Cannot push — fix pricing first: ' + priceErrors.map(e => (e && (e.message || e.code)) || 'pricing error').join('; ') });
+      setTimeout(() => setCaspioMsg(null), 12000);
       return;
     }
     // Pre-flight: any 0-stock items? If so, confirm before pushing.

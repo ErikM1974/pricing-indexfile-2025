@@ -2132,6 +2132,7 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     if (shipping > 0) lines.push(`Shipping: $${shipping.toFixed(2)}`);
     lines.push(`Tax: EXEMPT — DO NOT APPLY`);
     lines.push(`Cert #: ${cert}`);
+    lines.push(`Tax Account: 2204 — Tax Exempt`);
     lines.push(`Reason: Customer marked Tax Exempt in CompanyContactsMerge2026`);
     lines.push(`Total: $${taxableBase.toFixed(2)} (no tax)`);
     return lines;

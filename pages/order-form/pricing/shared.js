@@ -122,23 +122,28 @@ window.OrderFormPricingShared = (function () {
     // "10.1" not "10.10", "8.8" not "8.80", "10.35" kept — strip trailing zeros.
     const fmtPct = (r) => String(parseFloat((r * 100).toFixed(2)));
     if (info.isWholesale) {
-      return { rate: 0, exempt: true, label: 'Wholesale / reseller — no tax', account: '2203', accountName: 'Wholesale Sales (WA reseller permit)' };
+      return { rate: 0, exempt: true, rateIsDefault: false, label: 'Wholesale / reseller — no tax', account: '2203', accountName: 'Wholesale Sales (WA reseller permit)' };
     }
     if (info.isTaxExempt) {
-      return { rate: 0, exempt: true, label: 'Tax exempt — no tax', account: '2204', accountName: 'Tax Exempt' };
+      return { rate: 0, exempt: true, rateIsDefault: false, label: 'Tax exempt — no tax', account: '2204', accountName: 'Tax Exempt' };
     }
     const destState = String(ship.state || info.state || '').toUpperCase();
     if (destState && destState !== 'WA') {
-      return { rate: 0, exempt: true, label: 'Out of state — no tax', account: '2202', accountName: 'Out of State Sales' };
+      return { rate: 0, exempt: true, rateIsDefault: false, label: 'Out of state — no tax', account: '2202', accountName: 'Out of State Sales' };
     }
     // In WA (or unknown → assume WA, the conservative taxable default). Use a
     // destination rate resolved upstream (DOR lookup → ship.taxRate, decimal)
-    // when present, else the Milton 10.1% default.
+    // when present, else the Milton 10.1% default. When we fall back to the
+    // default, flag it (rateIsDefault) so the UI can warn that the rate hasn't
+    // been verified against the real destination — Erik's #1 rule: never a
+    // silent possibly-wrong number.
     const lookedUp = Number(ship.taxRate);
-    const rate = (Number.isFinite(lookedUp) && lookedUp > 0) ? lookedUp : WA_TAX_RATE;
+    const haveLookedUpRate = Number.isFinite(lookedUp) && lookedUp > 0;
+    const rate = haveLookedUpRate ? lookedUp : WA_TAX_RATE;
     return {
       rate,
       exempt: false,
+      rateIsDefault: !haveLookedUpRate,
       label: `WA Sales Tax (${fmtPct(rate)}%)`,
       account: ship.taxAccount || '2200.101',
       accountName: ship.taxAccountName || `Wash:${fmtPct(rate)}%`,
@@ -272,13 +277,43 @@ window.OrderFormPricingShared = (function () {
     const SC = window.OrderFormServiceCodes;
     if (!SC) { breakdown._addOnsApplied = true; return; }
 
+    if (!Array.isArray(breakdown.fees)) breakdown.fees = [];
+    if (!Array.isArray(breakdown.errors)) breakdown.errors = [];
+    const tp = window.OrderFormTieredPricing;
+
+    // Record every resolved fee as a line in breakdown.fees[] — the SINGLE
+    // source of truth read by the totals panel, the printed PDF (PrintSheet),
+    // the customer-approval view, and the ShopWorks LinesOE. Itemizing here
+    // guarantees the printed fee lines always foot to the subtotal.
+    const labelFor = (sc, code) => sc?.DisplayName || sc?.ServiceName || sc?.Description || code;
+    const recordFee = (a, sc, amount) => {
+      breakdown.fees.push({
+        code: a.code,
+        label: labelFor(sc, a.code),
+        amount: Number(amount) || 0,
+        scope: (a.scope && a.scope.rowId) ? { rowId: a.scope.rowId } : 'order',
+      });
+    };
+
     const rushQueue = [];
     for (const a of addOns) {
       if (!a?.code) continue;
       if (a.code === 'RUSH') { rushQueue.push(a); continue; }
       const sc = SC.get?.(a.code);
-      if (!sc) continue;
+      if (!sc) {
+        // NEVER silently drop a referenced fee — surface it so the totals panel
+        // shows the error and the submit gate blocks. (Erik's #1 rule: a wrong
+        // total is worse than a visible error.)
+        breakdown.errors.push({ code: a.code, message: `Fee/service "${a.code}" couldn't be priced (not in Service_Codes) — refresh, or remove it before pushing.` });
+        continue;
+      }
       const lineTotal = addOnLineTotal(a, sc, breakdown) || 0;
+      // A TIERED service that resolves to $0 on a cold cache is a silent
+      // under-charge — flag it. (A genuinely $0 FIXED/FLAT service is fine.)
+      if (lineTotal === 0 && tp?.isTiered?.(a.code) && (Number(a.qty) || 0) > 0) {
+        breakdown.errors.push({ code: a.code, message: `Tiered service "${a.code}" priced at $0 (rates still loading) — wait a moment and recheck before pushing.` });
+      }
+      recordFee(a, sc, lineTotal);
       if (a.scope && typeof a.scope === 'object' && a.scope.rowId) {
         const rb = breakdown.byRow?.get?.(a.scope.rowId)
                 || (breakdown.byRow && breakdown.byRow[a.scope.rowId]);
@@ -293,8 +328,12 @@ window.OrderFormPricingShared = (function () {
     breakdown.subtotalForRush = breakdown.subtotal || 0;
     for (const a of rushQueue) {
       const sc = SC.get?.(a.code);
-      if (!sc) continue;
+      if (!sc) {
+        breakdown.errors.push({ code: 'RUSH', message: 'Rush charge couldn\'t be priced — refresh before pushing.' });
+        continue;
+      }
       const lineTotal = addOnLineTotal(a, sc, breakdown) || 0;
+      recordFee(a, sc, lineTotal);
       breakdown.subtotal = (breakdown.subtotal || 0) + lineTotal;
     }
     breakdown.grandTotal = breakdown.subtotal;

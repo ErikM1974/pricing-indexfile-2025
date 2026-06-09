@@ -79,8 +79,14 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
     }
   });
 
+  // Render ALL computed print rows — never truncate. A single multi-size style
+  // can tier-split into 3+ printed lines, so capping rows would silently DROP
+  // billable/production lines off the printed + PDF sheet (real data loss).
+  // For short orders we still pad UP to MIN_BLANK_ROWS so the page keeps the
+  // "paper form" look — but this is a COMPUTED minimum, never a cap.
+  const MIN_BLANK_ROWS = 14;
   const padded = [...printRows];
-  while (padded.length < 14) padded.push({ id: 'blank-' + padded.length, style: '', color: '', desc: '', sizes: {}, total: 0, lineDollar: 0, unitDollar: 0, _blank: true });
+  while (padded.length < MIN_BLANK_ROWS) padded.push({ id: 'blank-' + padded.length, style: '', color: '', desc: '', sizes: {}, total: 0, lineDollar: 0, unitDollar: 0, _blank: true });
 
   const designNo = info.designNumber || files.map(f => f.designNo).filter(Boolean).join(', ');
   const placements = [...new Set(files.flatMap(f => f.placements || []))].join(', ');
@@ -199,7 +205,7 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
           </tr>
         </thead>
         <tbody>
-          {padded.slice(0, 14).map((r, i) => (
+          {padded.map((r, i) => (
             <tr key={r.id}>
               <td>{r.style}</td>
               <td>{r.color || r.colorName}</td>
@@ -222,6 +228,16 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
       {/* Totals strip — printed only when auto-pricing computed something */}
       {supported && breakdown.subtotal > 0 && (
         <div className="ps-totals">
+          {/* Itemized service/setup fees (setup, rush, AL, etc.) — read from
+              breakdown.fees[] (single source). Printed BEFORE the subtotal so
+              garment line totals + these fee lines foot exactly to the subtotal
+              (the garment lines exclude fees; breakdown.subtotal includes them). */}
+          {Array.isArray(breakdown.fees) && breakdown.fees.map((f, i) => (
+            <div className="ps-totals-row ps-totals-row--dim" key={(f.code || 'fee') + '-' + i}>
+              <span>{f.label || f.code}{f.scope && f.scope.rowId ? ' (per item)' : ''}</span>
+              <span>{usd(f.amount)}</span>
+            </div>
+          ))}
           <div className="ps-totals-row">
             <span>Subtotal {breakdown.totalQty ? `(${breakdown.totalQty} pcs)` : ''}</span>
             <span>{usd(breakdown.subtotal)}</span>
