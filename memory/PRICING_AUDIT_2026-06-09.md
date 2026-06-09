@@ -4,6 +4,22 @@
 > Lens: Erik's rules — (1) Pricing = API never hardcoded, (2) all surfaces calc the SAME price, (3) no silent API fallback, (4) tax respects exempt/out-of-state/destination.
 > Status legend per item: ☐ open · ☑ fixed · ⏸ deferred.
 
+## ✅ FIX STATUS (2026-06-09) — coded + LIVE-VERIFIED in Preview, committed to `develop`, NOT YET DEPLOYED
+**Critical/High/Medium all fixed + verified live; only LOW polish + a dead-code-delete pass remain.**
+**DEPLOY PENDING ERIK'S OK** — both deploys were auto-blocked (prod) and need authorization:
+- **Backend (proxy)** commit `2fba436` on `develop` — `git push heroku develop:main`. The DTF `sizes` fix. **Deploy this FIRST** (the DTF Order-Form fix depends on it; until then DTF live mode shows a fail-safe "garment cost unavailable" error — verified, no under-charge).
+- **Frontend** commits `1a5a860`→`0ffa4d8` on `develop` — via `/deploy` (auto-bumps `?v=` cache-bust).
+
+DONE (committed): **C1** DTF arg+backend bug (proxy `pricing.js` styleQueryStart + `dtf.jsx` positional call, no silent fallback) · **C2** OF tax `resolveTaxContext` (shared.js+registry) · **G** OF push rate/account (shopworks.js) · **H** OF 3 tax labels · **A** OF EMB+SCP LTM re-round · **B** OF DTG margin 0.6→0.57 + EMB/DTF LTM from API · **I** OF SCP safety-stripe · **J** quote-mgmt OF edit route + APP_CONFIG URL · **C/D/F** SCP/DTF/EMB fees → Service_Codes (shared `getServicePrice` in quote-builder-utils) · MEDIUM: EMB puff key, invoice tax label, DTG/DTF manual-cost host gate, EMB digitizing/GRT-75 metadata · DTG cleanLines invalid-color filter.
+LIVE-VERIFIED (Preview, zero console errors): tax resolver (exempt/wholesale/OOS→0, in-WA 10.1%, lookup rate); EMB 6pc LTM exactly $50 (re-round fix); exempt order $0 tax/$500 deposit (was $505/$2752); SCP stripe +$2/loc; DTF manual $22.50; DTF live fail-safe error; SCP/DTF/EMB builders load Service_Codes (SPSU=30/GRT-75=75/DD=100); quote-mgmt APP_CONFIG + OF branch present. 1076/1076 unit tests pass.
+
+DEFERRED (LOW, no current money impact — own follow-up pass):
+- **Theme E** cap-quote-service.js 50/100 hardcode → **cap-quote-* is DEAD CODE (no HTML loads it)**; delete the trio instead of migrating.
+- DELETE dead files: `dtf-quote-adapter.js`, `dtg-quote-pricing.js`, legacy `sendQuoteEmail`/`generateProfessionalQuoteHTML` (+ update ACTIVE_FILES.md/GUIDE.md, grep refs first).
+- SCP LTM `Math.floor` (~$0.12 under-collect — but it's an intentional anti-overcharge per MEMORY; leave or align to calculator).
+- DTF `getTransferCostForProduct()` returns 0 (only in unreachable DOM-fallback) · DTF size-upcharge silent fallback warning · DTG `getTierForQuantity` throw-on-bad-data · EMB rounding fallback CeilDollar→HalfDollarUp (API-failure only) · SCP displayed tier-label source · sticker STK-NEW-ART virtual-card $50 · DTF separate-LTM-mode PDF footing (known P3) · safety-stripe needs a Caspio Service_Code row created to fully de-hardcode (SCP builder + OF card both use $2 fallback).
+
+
 ## Executive summary
 The **four quote builders' on-screen totals + ShopWorks pushes are sound** — every confirmed money bug there is a *display/footing* divergence, not a wrong charged total (grand total is driven by `#pre-tax-subtotal`, which shields it). The **Order Form (`pages/order-form/`) is the weakest surface**: it re-implements tier/LTM/rounding/tax math instead of reusing the shared services, and that re-implementation has drifted into one **critical under-charge (DTF)** and a **critical tax bug (flat WA 10.1%, no exempt/out-of-state path)**. Second theme across every surface: **Pricing=API violations** — charged fees ($30/screen, $2/stripe, $75/hr design, $50 LTM, $100 digitizing, margin denominators) hardcoded instead of read from Caspio, so a Caspio price edit silently fails to propagate.
 
