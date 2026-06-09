@@ -228,7 +228,7 @@ function PrintSheet({ info, rows, ship, orderNotes, files, decoConfig = {}, brea
           </div>
           {breakdown.taxEstimate > 0 && (
             <div className="ps-totals-row ps-totals-row--dim">
-              <span>Estimated tax (10.1%)</span>
+              <span>{breakdown.taxLabel || 'Estimated tax'}</span>
               <span>{usd(breakdown.taxEstimate)}</span>
             </div>
           )}

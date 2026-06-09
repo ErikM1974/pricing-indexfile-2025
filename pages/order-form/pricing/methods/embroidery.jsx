@@ -128,9 +128,15 @@
     if (!bundle.pricing[tier]) { out.error = `No pricing for tier ${tier}`; return out; }
 
     // LTM is per-CATEGORY too: 5 garments + 3 caps under the tier-1-7 threshold
-    // both get $50 LTM distributed within their own bucket. Matches the
+    // both get the LTM fee distributed within their own bucket. Matches the
     // embroidery quote builder rule (CLAUDE.md sync rule).
-    const ltmPP   = (tier === '1-7' && effectiveQty > 0) ? (50 / effectiveQty) : 0;
+    // Fee comes from Caspio Pricing_Tiers.LTM_Fee (bundle.tierData), NOT a
+    // hardcoded 50 — so a Caspio LTM change reaches the Order Form with no deploy
+    // (cf. dtg.jsx which reads tierRow.LTM_Fee). $50 is the current 1-7 value.
+    const ltmTierRow = (bundle.tierData || []).find(t =>
+      effectiveQty >= Number(t.MinQuantity) && effectiveQty <= Number(t.MaxQuantity));
+    const ltmFeeAmount = Number(ltmTierRow?.LTM_Fee) || 0;
+    const ltmPP   = (ltmFeeAmount > 0 && effectiveQty > 0) ? (ltmFeeAmount / effectiveQty) : 0;
     // Rounding rule: prefer the Caspio-supplied rule (in production both cap +
     // flat services pull it from the EmbroideryRules table, so the surfaces
     // agree). Fallback HARMONIZED with embroidery-quote-pricing.js — both cap
@@ -150,7 +156,13 @@
         out.sizeBreakdown.push({ size: sizeKey, qty, error: `No price for size ${sizeKey} (${capOrFlat})` });
         return;
       }
-      const unit = S.roundPrice(baseForSize + ltmPP, rule);
+      // LTM parity (2026-06-09): round the (already service-rounded) base
+      // ALONE, then add the raw per-piece LTM — do NOT re-round base+LTM
+      // together. The quote builder adds raw garmentLtmPerUnit to the rounded
+      // unit with no re-round (embroidery-quote-pricing.js:1569); re-rounding
+      // here over-charged qty 1-7 by up to ~$0.49/pc and let total LTM exceed
+      // $50/category. ltmPP × qty now sums to exactly the $50 LTM fee.
+      const unit = S.roundPrice(baseForSize, rule) + ltmPP;
       out.unitPriceBySize[sizeKey] = unit;
       const lineSubtotal = unit * qty;
       out.sizeBreakdown.push({ size: sizeKey, qty, unitPrice: unit, lineSubtotal });
@@ -165,7 +177,7 @@
       : Object.keys(bundle.pricing?.[tier] || {});
     const baseSizeKey = availableSizes.find(s => /^s$/i.test(s)) || availableSizes[0];
     const basePrice = bundle.pricing?.[tier]?.[baseSizeKey] != null
-      ? S.roundPrice(bundle.pricing[tier][baseSizeKey] + ltmPP, rule)
+      ? S.roundPrice(bundle.pricing[tier][baseSizeKey], rule) + ltmPP
       : null;
     // Scope upcharges to sizes the product actually offers. The bundle's
     // sellingPriceDisplayAddOns map is global (lists upcharges for every
@@ -274,11 +286,17 @@
     });
 
     // LTM total (for display only) — already baked into per-piece prices.
-    // Each category that lands in tier 1-7 carries its own $50 LTM, so a
-    // mixed order with 5 garments + 3 caps shows $100 total LTM.
+    // Each category that lands in an LTM tier carries its own Caspio LTM_Fee, so
+    // a mixed order with 5 garments + 3 caps shows 2× the fee. Read from the
+    // bundle's Pricing_Tiers (LTM_Fee), NOT a hardcoded 50.
+    const _anyTierData = (fetched.find(f => f.bundle && Array.isArray(f.bundle.tierData))?.bundle?.tierData) || [];
+    const _ltmFor = (qty) => {
+      const r = _anyTierData.find(t => qty >= Number(t.MinQuantity) && qty <= Number(t.MaxQuantity));
+      return Number(r?.LTM_Fee) || 0;
+    };
     let ltmTotal = 0;
-    if (out.garmentTier === '1-7') ltmTotal += 50;
-    if (out.capTier === '1-7') ltmTotal += 50;
+    if (garmentQty > 0) ltmTotal += _ltmFor(garmentQty);
+    if (capQty > 0) ltmTotal += _ltmFor(capQty);
     out.ltmTotal = ltmTotal;
 
     out.grandTotal = out.subtotal; // tax/deposit added by registry

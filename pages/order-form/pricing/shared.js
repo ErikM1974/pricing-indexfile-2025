@@ -101,14 +101,61 @@ window.OrderFormPricingShared = (function () {
     };
   }
 
-  // Default WA sales-tax rate. Same constant the DTG / DTF quote builders use.
+  // Default WA sales-tax rate (Milton seller location). Same constant the DTG /
+  // DTF quote builders use as the in-WA / pickup default.
   const WA_TAX_RATE = 0.101;
+  const DEPOSIT_RATE = 0.5;   // 50% deposit due
 
-  function computeTaxAndDeposit(subtotal) {
-    const tax     = Math.round(subtotal * WA_TAX_RATE * 100) / 100;
+  // Resolve the EFFECTIVE sales-tax rate + GL account from the customer + ship
+  // context. Mirrors dtg-inline-form.js recomputeTaxRate() (WA destination-based
+  // sourcing, WAC 458-20-145/193) so the Order Form agrees with the quote builders:
+  //   wholesale / reseller → 0%  (GL 2203)
+  //   tax-exempt customer  → 0%  (GL 2204)
+  //   out of WA state      → 0%  (GL 2202)
+  //   in WA / unknown      → ship.taxRate (DOR destination lookup, a DECIMAL set
+  //                          upstream) else WA default 0.101 (GL 2200.101 Wash:10.1%)
+  // NEVER a flat 10.1% for everyone (the old bug over-taxed exempt/out-of-state
+  // customers on the customer-facing total/deposit).
+  function resolveTaxContext(info, ship) {
+    info = info || {};
+    ship = ship || {};
+    const fmtPct = (r) => {
+      const p = r * 100;
+      return (p < 10 ? p.toFixed(1) : p.toFixed(2)).replace(/\.0+$/, '');
+    };
+    if (info.isWholesale) {
+      return { rate: 0, exempt: true, label: 'Wholesale / reseller — no tax', account: '2203', accountName: 'Wholesale Sales (WA reseller permit)' };
+    }
+    if (info.isTaxExempt) {
+      return { rate: 0, exempt: true, label: 'Tax exempt — no tax', account: '2204', accountName: 'Tax Exempt' };
+    }
+    const destState = String(ship.state || info.state || '').toUpperCase();
+    if (destState && destState !== 'WA') {
+      return { rate: 0, exempt: true, label: 'Out of state — no tax', account: '2202', accountName: 'Out of State Sales' };
+    }
+    // In WA (or unknown → assume WA, the conservative taxable default). Use a
+    // destination rate resolved upstream (DOR lookup → ship.taxRate, decimal)
+    // when present, else the Milton 10.1% default.
+    const lookedUp = Number(ship.taxRate);
+    const rate = (Number.isFinite(lookedUp) && lookedUp > 0) ? lookedUp : WA_TAX_RATE;
+    return {
+      rate,
+      exempt: false,
+      label: `WA Sales Tax (${fmtPct(rate)}%)`,
+      account: ship.taxAccount || '2200.101',
+      accountName: ship.taxAccountName || `Wash:${fmtPct(rate)}%`,
+    };
+  }
+
+  // Compute tax + 50% deposit from a resolved tax context. taxCtx.rate is the
+  // EFFECTIVE decimal rate (0 for exempt/wholesale/out-of-state). Back-compat:
+  // a missing taxCtx falls back to the WA default (old single-arg callers).
+  function computeTaxAndDeposit(subtotal, taxCtx) {
+    const rate = (taxCtx && Number.isFinite(Number(taxCtx.rate))) ? Number(taxCtx.rate) : WA_TAX_RATE;
+    const tax     = Math.round(subtotal * rate * 100) / 100;
     const total   = subtotal + tax;
-    const deposit = Math.round(total * 0.5 * 100) / 100;
-    return { tax, total, deposit };
+    const deposit = Math.round(total * DEPOSIT_RATE * 100) / 100;
+    return { tax, total, deposit, rate };
   }
 
   // ---------------------------------------------------------------------------
@@ -266,6 +313,7 @@ window.OrderFormPricingShared = (function () {
     emptyRowBreakdown,
     emptyOrderBreakdown,
     WA_TAX_RATE,
+    resolveTaxContext,
     computeTaxAndDeposit,
     filterRailServices,
     addOnLineTotal,
