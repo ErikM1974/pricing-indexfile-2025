@@ -1445,6 +1445,15 @@
                 taxRate = Math.round((taxAmount / subtotal) * 10000) / 10000;
             }
             const isWholesale = !!priceQuote.isWholesale;
+            // [2026-06-09] Phase 2 — billed shipping (taxable in WA). Mirror DTF/SCP: TotalAmount
+            // is products-only PRE-tax (EXCLUDES shipping); the fee rides as a separate SHIP line
+            // item (written below) so /quote + /invoice SHOW a Shipping row + foot. TaxAmount stays
+            // on (subtotal+fee) — shipping IS taxed. (The first cut baked the fee into TotalAmount
+            // with NO SHIP item: it footed, but the readers detect shipping ONLY via the SHIP item
+            // — never the ShippingFee column — so the shipping line was hidden + the Subtotal was
+            // silently inflated. Caught by the Phase 2 adversarial review.) AI-chat fallback quotes
+            // carry no shippingFee → 0 (no SHIP item, unchanged).
+            const shippingFee = Number(priceQuote.shippingFee) || 0;
 
             // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
             // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
@@ -1466,8 +1475,13 @@
                 Phone: customer.phone || '',
                 TotalQuantity: lineItems.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0),
                 SubtotalAmount: subtotal,
+                // [2026-06-09] Phase 2 — billed shipping is persisted as the SHIP line item (below)
+                // + Notes.shipping.fee (edit-reload), NOT a session column. (Quote_Sessions DOES have
+                // a ShippingFee column, but we don't write it: DTF/SCP don't either, and the readers
+                // getShippingFee() foot off the SHIP item — a column write would be dead weight.)
                 LTMFeeTotal: lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0),
-                // PRE-tax (matches EMB/SCP/DTF). /quote + /invoice add TaxAmount on top.
+                // PRE-tax, products-only (matches EMB/SCP/DTF). EXCLUDES shipping — the SHIP line
+                // item carries it. /quote + /invoice add SHIP + TaxAmount on top → grand foots.
                 TotalAmount: subtotal,
                 // [2026-06-08] Phase 1 Chunk C — persist tax so saved record + /quote + /invoice
                 // + push agree. TaxRate is a DECIMAL (0.101) like EMB; readers normalize >1?/100.
@@ -1572,6 +1586,27 @@
                 PricingTier: it.tier || 'Standard',
                 AddedAt: new Date().toISOString(),
             }));
+            // [2026-06-09] Phase 2 — append a SHIP fee line item so /quote + /invoice show + foot
+            // shipping (mirror DTF/SCP _saveShipFeeItem). getShippingFee() reads EmbellishmentType
+            // 'fee' & StyleNumber 'SHIP'; TotalAmount EXCLUDES shipping and tax is on the shipping-
+            // inclusive base, so the reader's (subtotalNet + SHIP + tax) foots with no double-count.
+            // Posted in BOTH paths (edit deletes old items first, so no dup). edit-reload ignores it
+            // — loadSavedDtgQuoteForEdit rebuilds rows on EmbellishmentType==='dtg' only.
+            if (shippingFee > 0) {
+                items.push({
+                    QuoteID: effectiveQuoteID,
+                    LineNumber: items.length + 1,
+                    StyleNumber: 'SHIP',
+                    ProductName: 'Shipping',
+                    Color: '',
+                    EmbellishmentType: 'fee',
+                    Quantity: 1,
+                    BaseUnitPrice: shippingFee,
+                    FinalUnitPrice: shippingFee,
+                    LineTotal: shippingFee,
+                    AddedAt: new Date().toISOString(),
+                });
+            }
             for (const it of items) {
                 const r = await fetch(API_BASE_URL + '/api/quote_items', {
                     method: 'POST',

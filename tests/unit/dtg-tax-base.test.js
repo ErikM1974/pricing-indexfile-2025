@@ -71,8 +71,11 @@ async function saveAndCapture(quote) {
   win.DTGInlineForm = { getSaveQuote: () => quote };
   await win.dtgSaveQuote();
   const session = captured.find(c => c.url.indexOf('/api/quote_sessions') !== -1);
-  const item = captured.find(c => c.url.indexOf('/api/quote_items') !== -1);
-  return { session: session && session.body, item: item && item.body };
+  const itemPosts = captured.filter(c => c.url.indexOf('/api/quote_items') !== -1 && c.method === 'POST' && c.body);
+  // [2026-06-09] Phase 2 — the product item (EmbellishmentType 'dtg') vs the SHIP fee item.
+  const item = itemPosts.find(c => c.body.EmbellishmentType === 'dtg') || (itemPosts[0] && itemPosts[0]);
+  const shipItem = itemPosts.find(c => c.body.StyleNumber === 'SHIP');
+  return { session: session && session.body, item: item && item.body, shipItem: shipItem && shipItem.body };
 }
 
 describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
@@ -137,6 +140,73 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
     expect(item.HasLTM).toBe('Yes');
     expect(item.LineTotal).toBeCloseTo(205.92, 2);
     expect(item.PricingTier).toBe('1-23');
+  });
+
+  // [2026-06-09] Phase 2 — billed shipping (taxable in WA). The form quote carries shippingFee
+  // and computes taxAmount on (subtotal + shippingFee). Mirroring DTF/SCP, the saved record MUST:
+  // keep TotalAmount = products-only PRE-tax (EXCLUDES shipping), write a SHIP fee line item, and
+  // keep TaxAmount = round((subtotal+fee)*rate). The readers (/quote, /invoice) foot via
+  // (TotalAmount + SHIP-item + tax). subtotal 205.92, fee 25, rate 10.1% → tax 23.32, grand 254.24.
+  test('PHASE 2 — WA-taxable 10.1% with shipping fee: TotalAmount products-only, SHIP item carries fee, tax on the base', async () => {
+    const { session, shipItem } = await saveAndCapture(formQuote({
+      shippingFee: 25, taxRate: 0.101, taxAmount: 23.32, grandTotal: 254.24,
+      totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0.101, taxAmount: 23.32, grandTotal: 254.24 },
+    }));
+    expect(session.SubtotalAmount).toBeCloseTo(205.92, 2);   // products only
+    expect(session.ShippingFee).toBeUndefined();             // we don't write a ShippingFee column (DTF/SCP don't) — fee lives in the SHIP item
+    expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // PRE-tax, products-only (EXCLUDES shipping)
+    expect(session.TotalAmount).not.toBeCloseTo(230.92, 2);   // NOT baked with the fee
+    expect(session.TaxRate).toBeCloseTo(0.101, 4);
+    expect(session.TaxAmount).toBeCloseTo(23.32, 2);          // round((205.92+25)*0.101) — shipping IS taxed
+    // SHIP line item written so /quote + /invoice show + foot a Shipping row (DTF/SCP convention)
+    expect(shipItem).toBeTruthy();
+    expect(shipItem.StyleNumber).toBe('SHIP');
+    expect(shipItem.EmbellishmentType).toBe('fee');
+    expect(shipItem.LineTotal).toBeCloseTo(25, 2);
+    // Reader footing: TotalAmount + SHIP + TaxAmount == on-screen grand
+    expect(session.TotalAmount + shipItem.LineTotal + session.TaxAmount).toBeCloseTo(254.24, 2);
+  });
+
+  test('PHASE 2 — out-of-state with shipping fee: SHIP item written, fee NOT in TotalAmount, tax still 0', async () => {
+    const { session, shipItem } = await saveAndCapture(formQuote({
+      shippingFee: 25, taxRate: 0, taxAmount: 0, grandTotal: 230.92,
+      shipping: { method: 'UPS Ground', city: 'Portland', state: 'OR', zip: '97201', fee: 25, taxRate: 0, taxRateSource: 'out-of-state', taxAccount: '2202', taxAccountName: 'Out of State Sales', taxRateOverride: null, includeTax: true },
+      totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0, taxAmount: 0, grandTotal: 230.92 },
+    }));
+    expect(session.ShippingFee).toBeUndefined();             // no session column — SHIP item carries the fee
+    expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // products only — fee is in the SHIP item
+    expect(session.TaxAmount).toBe(0);
+    expect(session.TaxRate).toBe(0);
+    expect(shipItem).toBeTruthy();
+    expect(shipItem.LineTotal).toBeCloseTo(25, 2);
+    expect(session.TotalAmount + shipItem.LineTotal + session.TaxAmount).toBeCloseTo(230.92, 2);
+    // Notes.shipping carries the fee for edit-reload (Chunk E)
+    const notes = JSON.parse(session.Notes);
+    expect(notes.shipping.fee).toBeCloseTo(25, 2);
+  });
+
+  test('PICKUP with no fee: ShippingFee 0, no SHIP item, TotalAmount unchanged (regression guard)', async () => {
+    const { session, shipItem } = await saveAndCapture(formQuote());  // base quote, no shippingFee
+    expect(Number(session.ShippingFee) || 0).toBe(0);
+    expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // still products-only pre-tax
+    expect(shipItem).toBeFalsy();                             // no SHIP item when fee is 0
+  });
+
+  // [2026-06-09] Phase 2 — STALE-PICKUP-FEE guard (adversarial-review finding 3). effectiveShipFee()
+  // in dtg-inline-form.js zeroes the fee for pickup, so getSaveQuote() yields shippingFee 0 even if a
+  // stale fee lingers in state. This test simulates that output (pickup quote, shippingFee 0) and
+  // asserts NO fee is billed/taxed + NO SHIP item — i.e. a pickup quote saved after a ship quote does
+  // not carry the prior shipping charge.
+  test('PHASE 2 — pickup with a stale fee zeroed upstream: no SHIP item, no fee in totals', async () => {
+    const { session, shipItem } = await saveAndCapture(formQuote({
+      shippingFee: 0, taxRate: 0.101, taxAmount: 20.80, grandTotal: 226.72,
+      shipping: { method: 'Customer Pickup', city: '', state: '', zip: '', fee: 0, taxRate: 0.101, taxRateSource: 'pickup-flat', taxAccount: '2200.101', taxAccountName: 'Wash:10.1%', taxRateOverride: null, includeTax: true },
+      totals: { subtotal: 205.92, shippingFee: 0, taxRate: 0.101, taxAmount: 20.80, grandTotal: 226.72 },
+    }));
+    expect(Number(session.ShippingFee) || 0).toBe(0);
+    expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // products only, no shipping folded in
+    expect(session.TaxAmount).toBeCloseTo(20.80, 2);          // tax on products only (no shipping)
+    expect(shipItem).toBeFalsy();
   });
 
   test('Notes carries shipping + tax blocks for edit-reload (Chunk E round-trip)', async () => {

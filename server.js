@@ -1959,11 +1959,13 @@ Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
 //                     (the basis for the "out-of-state ship = no WA tax" rule)
 //   - WAC 458-20-110  Delivery charges
 //                     ⚠ Shipping CHARGES are taxable too. The legally correct
-//                     tax base is (subtotal + shipping) × rate. We currently
-//                     send cur_Shipping: 0 from the DTG form (UPS cost is COGS,
-//                     not billed to the customer), so subtotal × rate is right
-//                     for today. WHEN we add a billed-shipping line to the
-//                     form, this formula MUST change.
+//                     tax base is (subtotal + shipping) × rate. As of DTG Phase 2
+//                     (2026-06-09) the DTG form BILLS shipping: it sends the fee
+//                     in ship.fee → cur_Shipping (above) and breakdown.shipping,
+//                     and buildOrderNote() uses taxableBase = subtotal + shipping.
+//                     The DTG frontend already computes breakdown.taxEstimate on
+//                     that base. (The React Order Form still sends no shipping →
+//                     shipping defaults to 0, so its notes/total are unchanged.)
 //   - DOR rate API:   webgis.dor.wa.gov/webapi/AddressRates.aspx
 //                     (called from /api/tax-rates/lookup in this server)
 //   - Live tool:      https://webgis.dor.wa.gov/taxratelookup/SalesTax.aspx
@@ -2088,11 +2090,18 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     lines.push(`Print Locations: ${locsClean}`);
   }
 
-  // 2. Tax block — subtotal / rate / amount / total / account, one per line.
+  // 2. Tax block — subtotal / shipping / rate / amount / total / account, one per line.
   const subtotal = Number(breakdown?.subtotal) || 0;
+  // [2026-06-09] DTG Phase 2 — billed shipping is TAXABLE in WA (WAC 458-20-110), so the
+  // taxable base is (subtotal + shipping) and the total includes it even when tax doesn't
+  // apply (wholesale/exempt/out-of-state). Defaults to 0 → unchanged for the React Order
+  // Form (which doesn't send breakdown.shipping). breakdown.taxEstimate is ALREADY computed
+  // on (subtotal+shipping) by the DTG frontend, so we only add the Shipping line + base/total.
+  const shipping = Number(breakdown?.shipping) || 0;
   const taxAmount = Number(breakdown?.taxEstimate) || 0;
   const taxRate = Number(ship?.taxRate) || 0;
-  const total = subtotal + taxAmount;
+  const taxableBase = subtotal + shipping;
+  const total = taxableBase + taxAmount;
 
   const isPickup = ship && (
     ship.method === 'Customer Pickup' ||
@@ -2108,10 +2117,11 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   // still books to 2203, not 2202. (2026-06-08 Phase 1 Chunk D — DTG/EMB/SCP/DTF)
   if (info?.isWholesale) {
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    if (shipping > 0) lines.push(`Shipping: $${shipping.toFixed(2)}`);
     lines.push(`Tax: DO NOT APPLY (wholesale / reseller)`);
     lines.push(`Tax Account: 2203 — Wholesale Sales (WA reseller permit)`);
     lines.push(`Reason: Customer marked Wholesale / reseller — sale for resale, no retail tax`);
-    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    lines.push(`Total: $${taxableBase.toFixed(2)} (no tax)`);
     return lines;
   }
 
@@ -2119,21 +2129,23 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   if (info?.isTaxExempt) {
     const cert = info.taxExemptNumber || '(no cert # on file)';
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    if (shipping > 0) lines.push(`Shipping: $${shipping.toFixed(2)}`);
     lines.push(`Tax: EXEMPT — DO NOT APPLY`);
     lines.push(`Cert #: ${cert}`);
     lines.push(`Reason: Customer marked Tax Exempt in CompanyContactsMerge2026`);
-    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    lines.push(`Total: $${taxableBase.toFixed(2)} (no tax)`);
     return lines;
   }
 
   // Out-of-state shipping → no tax (WAC 458-20-193)
   if (isOutOfState) {
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    if (shipping > 0) lines.push(`Shipping: $${shipping.toFixed(2)}`);
     lines.push(`Tax: DO NOT APPLY (out of state)`);
     lines.push(`State: ${shState}`);
     lines.push(`Tax Account: 2202 — Out of State Sales`);
     lines.push(`Reason: WAC 458-20-193 (no nexus on out-of-state delivery)`);
-    lines.push(`Total: $${subtotal.toFixed(2)} (no tax)`);
+    lines.push(`Total: $${taxableBase.toFixed(2)} (no tax)`);
     return lines;
   }
 
@@ -2166,6 +2178,10 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
       ? 'Milton pickup — flat'
       : `${ship?.city || 'WA destination'} — DOR lookup`;
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    if (shipping > 0) {
+      lines.push(`Shipping (taxable): $${shipping.toFixed(2)}`);
+      lines.push(`Taxable Base: $${taxableBase.toFixed(2)} (subtotal + shipping — WAC 458-20-110)`);
+    }
     lines.push(`Tax Rate: ${ratePct}% (${locationLabel})`);
     lines.push(`Tax Amount: $${taxAmount.toFixed(2)}`);
     lines.push(`Total with Tax: $${total.toFixed(2)}`);
@@ -2174,6 +2190,7 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   } else {
     // No rate / no account resolved — flag for rep review.
     lines.push(`Subtotal: $${subtotal.toFixed(2)}`);
+    if (shipping > 0) lines.push(`Shipping (taxable): $${shipping.toFixed(2)}`);
     lines.push(`Tax: NEEDS REVIEW`);
     lines.push(`Rep: Confirm destination + apply correct WA rate before invoicing`);
   }
@@ -2555,8 +2572,14 @@ app.post('/api/submit-order-form', async (req, res) => {
           CustomerEmail: info.email || '',
           Phone: info.phone || '',
           // Pull dollar fields from breakdown (computed by frontend pricing modules).
-          // breakdown.grandTotal is subtotal-before-tax; breakdown.subtotal is the
-          // same thing the order form's Totals Panel shows. Tax is left to OnSite.
+          // NOTE: breakdown.grandTotal is pre-tax ONLY for the React Order Form
+          // (pricing/shared.js sets grandTotal = subtotal). The DTG flagship sends a
+          // tax+shipping-INCLUSIVE grandTotal here (dtg-inline-form submitToShopWorks),
+          // so this OF-NNNN audit row's TotalAmount is NOT a reliable pre-tax figure for
+          // DTG — the canonical customer record is the separate DTG-NNN quote_sessions row
+          // (dtg-quote-page.js, TotalAmount pre-tax + a SHIP item + a real TaxAmount). This
+          // OF row writes no TaxAmount, so /invoice's grand = TotalAmount + 0 still displays
+          // the right (tax-incl) number. Tax is left to OnSite (manual-apply pattern).
           TotalQuantity:   Number(breakdown?.totalQty) || 0,
           SubtotalAmount:  Number(breakdown?.subtotal) || 0,
           LTMFeeTotal:     Number(breakdown?.ltmTotal) || 0,
@@ -3209,9 +3232,14 @@ app.post('/api/submit-order-form', async (req, res) => {
       // rep saw at quote time. The customer-facing quote (in the form preview)
       // still shows the correct tax — only the ShopWorks push omits it.
       taxTotal: 0,
-      cur_Shipping: 0,
+      // [2026-06-09] DTG Phase 2 — billed shipping. ship.fee carries the rep's charge
+      // (0 for pickup — the frontend's effectiveShipFee() zeroes it). Was hardcoded 0
+      // back when the DTG form never billed shipping (UPS cost treated as COGS). The
+      // customer-facing tax/total still live in the quote-view + Notes On Order block;
+      // OnSite sums line items + cur_Shipping for the order, tax applied manually.
+      cur_Shipping: Number(ship?.fee) || 0,
       totals: {
-        subtotal: 0, rushFee: 0, salesTax: 0, shipping: 0, grandTotal: 0
+        subtotal: 0, rushFee: 0, salesTax: 0, shipping: Number(ship?.fee) || 0, grandTotal: 0
       },
       payments: [],
       // Source/sales-rep fields — the proxy maps CustomerServiceRep → ShopWorks CSR.
