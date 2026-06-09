@@ -16,27 +16,11 @@
 
   const SIZES = ['2x2', '3x3', '4x4', '5x5'];
 
-  // Phase 5b — virtual rail card. STK-NEW-ART is a real $50 fee (FIXED) so
-  // it bills as its own line item via the shared addOn rollup — no special
-  // CONFIGURATOR handling needed. Singleton enforcement via ORDER_LEVEL_CODES
-  // means dropping again replaces the same instance instead of stacking.
-  const VIRTUAL_CARDS = [
-    {
-      ServiceCode: 'STK-NEW-ART',
-      DisplayName: 'New Artwork Setup',
-      ServiceType: 'STICKER',
-      RailGroup: 'Sticker Extras',
-      RailOrder: 10,
-      PricingMethod: 'FIXED',
-      SellPrice: 50,
-      PerUnit: 'one-time',
-      IsActive: true,
-      Visible: true,
-    },
-  ];
-  if (window.OrderFormServiceCodes?.registerVirtual) {
-    window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
-  }
+  // STK-NEW-ART ($50 FIXED new-artwork setup) is now a REAL Caspio Service_Code
+  // (created 2026-06-09: ServiceType STICKER, RailGroup 'Sticker Extras',
+  // SellPrice $50), so it loads into the rail from /api/service-codes and bills
+  // via the shared addOn rollup (resolvedPrice reads its live SellPrice). No
+  // virtual card — that would shadow the Caspio row (Pricing=API).
 
   async function fetchBundleForRow(_row, _formCtx) {
     const fetcher = async () => await svc().fetchPricingData();
