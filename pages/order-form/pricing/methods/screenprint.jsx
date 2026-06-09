@@ -79,24 +79,11 @@
       Visible: true,
       _spLocation: 'underbase',
     },
-    {
-      // Theme I (2026-06-09) — safety-stripe specialty-ink surcharge. The
-      // builder charges $2/location/piece (screenprint-quote-builder.js:3043);
-      // the Order Form previously omitted it entirely → under-charged hi-vis
-      // orders. SellPrice is the per-location/piece rate (TODO: migrate to
-      // Service_Codes per Erik's Pricing=API rule — Theme C).
-      ServiceCode: 'SP-STRIPE',
-      DisplayName: 'Safety Stripes',
-      ServiceType: 'SCREENPRINT',
-      RailGroup: 'SP Extras',
-      RailOrder: 20,
-      PricingMethod: 'CONFIGURATOR',
-      SellPrice: 2.00,
-      PerUnit: '+$2 / location / piece',
-      IsActive: true,
-      Visible: true,
-      _spLocation: 'safetyStripes',
-    },
+    // Safety-stripe (SP-STRIPE) is now a REAL Caspio Service_Code (created
+    // 2026-06-09: ServiceType SCREENPRINT, RailGroup 'SP Extras', SellPrice $2),
+    // so it loads into the rail from /api/service-codes and its rate is read
+    // LIVE (Pricing=API). No virtual card — that would shadow the Caspio row.
+    // configFromAddOns detects it by code (a.code === 'SP-STRIPE').
   ];
   if (window.OrderFormServiceCodes?.registerVirtual) {
     window.OrderFormServiceCodes.registerVirtual(VIRTUAL_CARDS);
@@ -115,7 +102,10 @@
         out.whiteUnderbase = true;
         return;
       }
-      if (loc === 'safetyStripes') {
+      // Safety stripe: detect by code (the real Caspio SP-STRIPE row has no
+      // _spLocation; QuoteBuilderField is 'safetyStripes'). Rate read LIVE from
+      // the Caspio SellPrice (fallback $2).
+      if (a.code === 'SP-STRIPE' || loc === 'safetyStripes' || sc?.QuoteBuilderField === 'safetyStripes') {
         out.safetyStripes = true;
         out.stripeRate = Number(sc?.SellPrice) > 0 ? Number(sc.SellPrice) : 2.00;
         return;
