@@ -1,3 +1,10 @@
+## v2026.06.09.2 (2026.06.09)
+
+- docs(memory): DTG Phase 2 SHIPPED LIVE v2026.06.09.1
+- fix(dtg): round LTMFeeTotal to integer — LTM quotes (qty<24) failed to save
+- docs(memory): LTMFeeTotal integer-column fix recorded (LESSONS + roadmap)
+- Deploy v2026.06.09.2: 1 files (dtg-quote-builder.html,...)
+
 ## v2026.06.09.1 (2026.06.09)
 
 - docs(memory): DTG roadmap START-HERE → Phase 2 handoff (Phase 1 shipped v2026.06.08.23)
