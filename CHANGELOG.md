@@ -1,3 +1,9 @@
+## v2026.06.09.5 (2026.06.09)
+
+- docs(memory): safety-stripe API + dead-code cleanup shipped (v2026.06.09.4)
+- feat(pricing=api): SCP LTM + calculator setup/stripe + sticker setup → Caspio
+- Deploy v2026.06.09.5: SCP/sticker Pricing=API cache-bust
+
 ## v2026.06.09.4 (2026.06.09)
 
 - docs(memory): mark pricing audit DEPLOYED (proxy v803 + frontend v2026.06.09.3)
