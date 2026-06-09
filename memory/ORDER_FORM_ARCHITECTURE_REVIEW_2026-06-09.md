@@ -108,7 +108,15 @@ Goal: "can push to ShopWorks + print a nice PDF." Both verified. All LOCAL, not 
   `breakdown.errors` entry when a fee code doesn't resolve (missing Service_Code) or a TIERED rate is
   $0 on a cold cache — instead of silently `continue`. `paper-form.jsx submit()` now BLOCKS the push
   with the specific reason when `breakdown.errors` is non-empty. No more silent dropped/$0 fee.
-- **PUSH verified via dry-run** (`POST /api/submit-order-form?dryRun=1` — builds the full ManageOrders
+- **PUSH verified LIVE 2026-06-09** — real submit (`window.nwOrderAPI.submitOrder`, no dryRun) created
+  **OF-0058** in ManageOrders (`ok:true, mode:live`), persisted in quote_sessions (Company "ZZZ TEST -
+  VOID", $580). Proves the order form sends an order to ShopWorks end-to-end (converts to SW on the
+  next MO→SW sync; conversion path itself was verified OF-0057 prior). **Erik to void/delete OF-0058.**
+  Also **actual `@media print` PDF** rendered + viewed: clean, complete, fee itemized, totals foot,
+  correct tier-split SW part numbers (single-page proven; multi-page = cap removed + `break-inside`
+  CSS present, structurally guaranteed, not eyeballed). Safety-classifier note: a live push is gated
+  as a production write — needs explicit per-action authorization.
+- **PUSH payload also verified via dry-run** (`POST /api/submit-order-form?dryRun=1` — builds the full ManageOrders
   payload, no live order). Confirmed across THREE tax scenarios: **taxable in-WA** (4 garment lines w/
   base PN `PC54` + size for SW Size-Translation, fee LinesOE `DD $100` + `RUSH $136.50`=25%; Notes On
   Order "Tax Rate 10.10% / Tax Amount / Total / Tax Account 2200.101 / Apply Manually"; Production +
