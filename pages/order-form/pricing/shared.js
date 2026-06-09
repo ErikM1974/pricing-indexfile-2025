@@ -119,10 +119,8 @@ window.OrderFormPricingShared = (function () {
   function resolveTaxContext(info, ship) {
     info = info || {};
     ship = ship || {};
-    const fmtPct = (r) => {
-      const p = r * 100;
-      return (p < 10 ? p.toFixed(1) : p.toFixed(2)).replace(/\.0+$/, '');
-    };
+    // "10.1" not "10.10", "8.8" not "8.80", "10.35" kept — strip trailing zeros.
+    const fmtPct = (r) => String(parseFloat((r * 100).toFixed(2)));
     if (info.isWholesale) {
       return { rate: 0, exempt: true, label: 'Wholesale / reseller — no tax', account: '2203', accountName: 'Wholesale Sales (WA reseller permit)' };
     }

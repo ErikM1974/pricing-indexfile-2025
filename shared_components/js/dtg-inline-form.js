@@ -4075,7 +4075,11 @@
         // Build lines array
         const code = effectiveLocationCode();
         const cleanLines = state.rows
-            .filter((r) => r.style && r.color && Object.keys(r.sizes || {}).length > 0)
+            // Exclude invalid-color rows so the push matches the on-screen total /
+            // PDF / saved record (the four other consumers all skip these). Without
+            // it, a row with an unmatched catalog color could reach the server
+            // re-price + land in ShopWorks with a blank color. (2026-06-09)
+            .filter((r) => r.style && r.color && !isRowColorInvalid(r) && Object.keys(r.sizes || {}).length > 0)
             .map((r) => ({ styleNumber: r.style, color: r.color, sizes: { ...r.sizes } }));
         if (!code || cleanLines.length === 0) {
             setStatus('error', 'Need a location + at least one filled row.');
