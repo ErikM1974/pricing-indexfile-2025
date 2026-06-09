@@ -3045,9 +3045,10 @@ async function recalculatePricing() {
     const ltmFee = (wouldHaveLTM && ltmEnabled) ? baseLtmFee : 0;
     const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
 
-    // Safety stripes: $2 per piece per location
+    // Safety stripes: per-piece-per-location surcharge from Caspio Service_Codes
+    // 'SP-STRIPE' (fallback $2). (Pricing=API)
     const locationCount = printConfig.backLocation ? 2 : 1;
-    const safetyStripesPerPiece = printConfig.isSafetyStripes ? (2.00 * locationCount) : 0;
+    const safetyStripesPerPiece = printConfig.isSafetyStripes ? (getServicePrice('SP-STRIPE', 2.00) * locationCount) : 0;
 
     let subtotal = 0;
     const pricedProducts = [];
@@ -3446,7 +3447,7 @@ function updateSidebarPrintConfig() {
     const stripesRow = document.getElementById('sidebar-stripes-row');
     if (printConfig.isSafetyStripes) {
         const locationCount = printConfig.backLocation ? 2 : 1;
-        document.getElementById('sidebar-stripes-cost').textContent = `+$${(2.00 * locationCount).toFixed(2)}/pc`;
+        document.getElementById('sidebar-stripes-cost').textContent = `+$${(getServicePrice('SP-STRIPE', 2.00) * locationCount).toFixed(2)}/pc`;
         stripesRow.style.display = 'flex';
     } else {
         stripesRow.style.display = 'none';
@@ -3903,7 +3904,7 @@ function buildScreenprintPricingData(products) {
     // Calculate safety stripes total for display as separate line item
     const locationCount = printConfig.backLocation ? 2 : 1;
     const safetyStripesTotal = printConfig.isSafetyStripes
-        ? (currentPricing.totalQuantity * 2.00 * locationCount)
+        ? (currentPricing.totalQuantity * getServicePrice('SP-STRIPE', 2.00) * locationCount)
         : 0;
 
     // Get art charge and graphic design from UI
@@ -4248,7 +4249,7 @@ function generateQuoteText(products, pricing) {
     }
     if (printConfig.isSafetyStripes) {
         const locationCount = printConfig.backLocation ? 2 : 1;
-        lines.push(`  Safety Stripes: +$${(2.00 * locationCount).toFixed(2)}/piece`);
+        lines.push(`  Safety Stripes: +$${(getServicePrice('SP-STRIPE', 2.00) * locationCount).toFixed(2)}/piece`);
     }
     lines.push(`  Total Screens: ${printConfig.totalScreens}`);
     lines.push(`  Setup Fee: $${printConfig.setupFee.toFixed(2)}`);
