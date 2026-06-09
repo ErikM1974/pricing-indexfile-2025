@@ -122,6 +122,33 @@ class ScreenPrintPricing {
         this.updateDarkGarmentToggleUI();  // Set initial dark garment toggle state
 
         this.updateDisplay();
+
+        // Pricing=API (2026-06-09): load per-screen setup (SPSU) + safety-stripe
+        // (SP-STRIPE) fees from Caspio Service_Codes so they match the SCP quote
+        // builder and a Caspio change needs no deploy. Fire-and-forget — the
+        // defaults stand (and act as the fallback) until it resolves, then re-render.
+        this.loadServiceFees().then(() => this.updateDisplay());
+    }
+
+    // Fetch the per-screen setup + safety-stripe sell prices from Caspio
+    // Service_Codes (inline — this calculator page doesn't load getServicePrice).
+    // Leaves the hardcoded defaults in place as a warned fallback on failure.
+    async loadServiceFees() {
+        try {
+            const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+                || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const resp = await fetch(`${base}/api/service-codes`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const json = await resp.json();
+            const map = {};
+            (json.data || []).forEach(sc => { if (sc.ServiceCode) map[String(sc.ServiceCode).toUpperCase()] = sc; });
+            const spsu = parseFloat(map['SPSU'] && map['SPSU'].SellPrice);
+            const stripe = parseFloat(map['SP-STRIPE'] && map['SP-STRIPE'].SellPrice);
+            if (Number.isFinite(spsu) && spsu > 0) this.config.setupFeePerColor = spsu;
+            if (Number.isFinite(stripe) && stripe > 0) this.state.safetyStripeSurcharge = stripe;
+        } catch (e) {
+            console.warn('[ScreenPrintV2] Service_Codes fetch failed — using default setup/stripe fees:', e.message);
+        }
     }
 
     cacheElements() {

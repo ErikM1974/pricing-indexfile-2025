@@ -3013,10 +3013,29 @@ async function recalculatePricing() {
     // Determine tier based on total quantity
     const tier = getScreenPrintTier(totalQty);
 
-    // LTM control panel — show/hide based on quantity
+    // LTM fee — from Caspio Pricing_Tiers.LTM_Fee (the matched qty tier), NOT
+    // hardcoded $75/$50 bands. The SCP service exposes `ltmFee` on each
+    // primaryLocationPricing tier row (the fee is the same across color counts).
+    // Fetch the first product's bundle (cached — the loop re-uses it) to read it.
+    // Fall back to the documented bands WITH a warning only if the API is silent,
+    // so a Caspio LTM change reaches the builder with no deploy (matches the
+    // /pricing/screen-print calculator, which already reads it from the API).
     let baseLtmFee = 0;
-    if (totalQty > 0 && totalQty <= 36) baseLtmFee = 75;
-    else if (totalQty <= 71) baseLtmFee = 50;
+    const _ltmStyle = productList.find(p => p.style)?.style;
+    if (_ltmStyle) {
+        try {
+            const _ltmBundle = await screenPrintPricingService.fetchPricingData(_ltmStyle);
+            const _plp = _ltmBundle && _ltmBundle.primaryLocationPricing;
+            const _anyTiers = _plp ? (Object.values(_plp).find(p => p && Array.isArray(p.tiers))?.tiers || []) : [];
+            let _m = _anyTiers.find(t => totalQty >= t.minQty && totalQty <= (t.maxQty ?? Infinity));
+            if (!_m && _anyTiers.length) _m = [..._anyTiers].sort((a, b) => a.minQty - b.minQty)[0]; // below lowest tier → use lowest (LTM territory)
+            if (_m && Number.isFinite(Number(_m.ltmFee))) baseLtmFee = Number(_m.ltmFee);
+        } catch (e) { /* fall through to the warned fallback below */ }
+    }
+    if (!baseLtmFee && totalQty > 0 && totalQty <= 71) {
+        baseLtmFee = totalQty <= 36 ? 75 : 50;
+        console.warn('[ScreenPrint] LTM fee unavailable from API — using fallback band $' + baseLtmFee);
+    }
     const wouldHaveLTM = baseLtmFee > 0;
 
     const ltmWrapper = document.getElementById('spc-ltm-wrapper');
