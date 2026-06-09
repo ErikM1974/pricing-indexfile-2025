@@ -1475,9 +1475,10 @@
                 Phone: customer.phone || '',
                 TotalQuantity: lineItems.reduce((s, it) => s + (Number(it.totalQuantity) || 0), 0),
                 SubtotalAmount: subtotal,
-                // [2026-06-09] Phase 2 — billed shipping (0 unless the rep entered/estimated one).
-                // Kept as audit metadata; the readers foot off the SHIP line item, not this column.
-                ShippingFee: shippingFee,
+                // [2026-06-09] Phase 2 — billed shipping is persisted as the SHIP line item (below)
+                // + Notes.shipping.fee (edit-reload), NOT a session column. (Quote_Sessions DOES have
+                // a ShippingFee column, but we don't write it: DTF/SCP don't either, and the readers
+                // getShippingFee() foot off the SHIP item — a column write would be dead weight.)
                 LTMFeeTotal: lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0),
                 // PRE-tax, products-only (matches EMB/SCP/DTF). EXCLUDES shipping — the SHIP line
                 // item carries it. /quote + /invoice add SHIP + TaxAmount on top → grand foots.

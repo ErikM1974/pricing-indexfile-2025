@@ -153,7 +153,7 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
       totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0.101, taxAmount: 23.32, grandTotal: 254.24 },
     }));
     expect(session.SubtotalAmount).toBeCloseTo(205.92, 2);   // products only
-    expect(session.ShippingFee).toBeCloseTo(25, 2);          // audit column
+    expect(session.ShippingFee).toBeUndefined();             // we don't write a ShippingFee column (DTF/SCP don't) — fee lives in the SHIP item
     expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // PRE-tax, products-only (EXCLUDES shipping)
     expect(session.TotalAmount).not.toBeCloseTo(230.92, 2);   // NOT baked with the fee
     expect(session.TaxRate).toBeCloseTo(0.101, 4);
@@ -173,7 +173,7 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
       shipping: { method: 'UPS Ground', city: 'Portland', state: 'OR', zip: '97201', fee: 25, taxRate: 0, taxRateSource: 'out-of-state', taxAccount: '2202', taxAccountName: 'Out of State Sales', taxRateOverride: null, includeTax: true },
       totals: { subtotal: 205.92, shippingFee: 25, taxRate: 0, taxAmount: 0, grandTotal: 230.92 },
     }));
-    expect(session.ShippingFee).toBeCloseTo(25, 2);
+    expect(session.ShippingFee).toBeUndefined();             // no session column — SHIP item carries the fee
     expect(session.TotalAmount).toBeCloseTo(205.92, 2);       // products only — fee is in the SHIP item
     expect(session.TaxAmount).toBe(0);
     expect(session.TaxRate).toBe(0);
