@@ -1,3 +1,8 @@
+## v2026.06.09.6 (2026.06.09)
+
+- docs(memory): SCP/sticker Pricing=API done (v2026.06.09.5) + emblem note
+- Deploy v2026.06.09.6: order-form push + PDF — parity-locked, fee itemization, $0-fee guard, SCP/DTG fixes
+
 ## v2026.06.09.5 (2026.06.09)
 
 - docs(memory): safety-stripe API + dead-code cleanup shipped (v2026.06.09.4)
