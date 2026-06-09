@@ -1,3 +1,10 @@
+## v2026.06.09.4 (2026.06.09)
+
+- docs(memory): mark pricing audit DEPLOYED (proxy v803 + frontend v2026.06.09.3)
+- feat(pricing=api): wire safety-stripe to Caspio Service_Codes SP-STRIPE
+- Deploy v2026.06.09.4: 8 files (safety-stripe SP-STRIPE API wiring cache-bust)
+- docs: record dead-code deletions (cap-quote-*, dtf-quote-adapter, dtg-quote-pricing, legacy EMB email)
+
 ## v2026.06.09.3 (2026.06.09)
 
 - docs(memory): LTMFeeTotal column INTEGER→CURRENCY (schema fix from parallel chip session)
