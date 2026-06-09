@@ -1,0 +1,84 @@
+{
+  "tempOrderNumber": "3DT-TEST-0609-7650",
+  "customerData": {
+    "firstName": "Verify",
+    "lastName": "Claude",
+    "email": "erik@nwcustomapparel.com",
+    "phone": "253-922-5793",
+    "company": "*** TEST ORDER - VOID ME (3DT rebuild verification) ***",
+    "address1": "",
+    "city": "",
+    "state": "WA",
+    "zip": "98354",
+    "deliveryMethod": "pickup",
+    "notes": ""
+  },
+  "colorConfigs": {
+    "Jet Black": {
+      "catalogColor": "Jet Black",
+      "displayColor": "Jet Black",
+      "totalQuantity": 3,
+      "sizeBreakdown": {
+        "L": {
+          "quantity": 3,
+          "unitPrice": 16.5
+        }
+      }
+    }
+  },
+  "orderTotals": {
+    "totalQuantity": 3,
+    "subtotal": 49.5,
+    "rushFee": 0,
+    "ltmFee": 75,
+    "shipping": 0,
+    "salesTax": 12.57,
+    "taxRate": 0.101,
+    "taxableBase": 124.5,
+    "taxAccount": "2200",
+    "taxAccountName": "Washington State Sales Tax",
+    "grandTotal": 137.07
+  },
+  "orderSettings": {
+    "printLocationCode": "LC",
+    "printLocationName": "Left Chest",
+    "frontLogo": {
+      "fileUrl": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/55d68892-c2ef-4aef-94b5-d15fdcfe345c",
+      "fileName": "verify-logo.png"
+    },
+    "backLogo": null,
+    "mockups": [
+      {
+        "color": "Jet Black",
+        "catalogColor": "Jet Black",
+        "view": "front",
+        "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/594905c9-e29a-4bff-b6de-500b17a21287"
+      }
+    ],
+    "placement": {
+      "front": {
+        "location": "LC",
+        "wIn": 3.2,
+        "xIn": 0,
+        "yIn": 1,
+        "hIn": 2,
+        "anchor": "top-center",
+        "effectiveDpi": 500,
+        "lowDpiAck": false,
+        "previewable": true,
+        "fileName": "verify-logo.png",
+        "warnings": []
+      },
+      "back": null
+    },
+    "shipPromise": {
+      "iso": "2026-06-15",
+      "label": "Monday, June 15, 2026",
+      "stampedAt": "2026-06-09T21:58:51.833Z"
+    },
+    "needsArtReview": false
+  },
+  "paymentConfirmed": true,
+  "stripeSessionId": "cs_test_VERIFY_3DT_REBUILD",
+  "paymentAmount": 13707
+}

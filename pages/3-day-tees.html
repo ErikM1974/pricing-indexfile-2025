@@ -2,672 +2,401 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fast 3-Day Turnaround Service - Custom DTG printed t-shirts with guaranteed 72-hour delivery">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Design your own custom DTG-printed tee in our live designer — upload artwork, see it on a real shirt, and it ships in 3 business days from Milton, WA.">
     <meta name="robots" content="index, follow">
 
-    <title>3-Day Tees - Fast Turnaround Service | Northwest Custom Apparel</title>
+    <title>3-Day Tees — Design Custom Shirts That Ship in 3 Days | Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <!-- EmailJS SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
-    <!-- Stripe.js SDK -->
-    <script src="https://js.stripe.com/v3/"></script>
-
-    <!-- Shared Components -->
-    <script src="../shared_components/js/dtg-pricing-service.js"></script>
-    <script src="../shared_components/js/sample-inventory-service.js"></script>
-    <script src="../shared_components/js/three-day-tees-order-service.js?v=4"></script>
-
-    <!-- Stripe Payment Service -->
-
-    <!-- Quote Builder Unified Step 1 Styles (includes toggle switches) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-unified-step1-v2.css">
-
-    <!-- DTG Quote Builder Styles (toggle-specific) -->
-    <link rel="stylesheet" href="/shared_components/css/dtg-quote-builder.css">
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="css/3-day-tees-redesign.css">
-    <link rel="stylesheet" href="css/utilities.css">
+    <link rel="stylesheet" href="css/3-day-tees.css?v=20260609">
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-    </div>
+    <a class="skip-link" href="#stage-design">Skip to the designer</a>
 
-    <!-- Success Modal -->
-    <div class="modal" id="successModal">
-        <div class="modal-content">
-            <i class="fas fa-check-circle"></i>
-            <h3>Order Submitted Successfully!</h3>
-            <p class="text-lg mb-sm">Your 3-Day Tees rush order has been submitted.</p>
-            <div class="order-number" id="orderNumber"></div>
+    <div id="tdt-toasts" class="tdt-toasts" aria-live="polite"></div>
 
-            <!-- Estimated Delivery -->
-            <div class="info-box">
-                <div class="flex-center gap-sm">
-                    <i class="fas fa-calendar-check icon-success"></i>
-                    <strong>Estimated Delivery:</strong>
-                    <span id="estimatedDelivery" class="text-accent font-bold"></span>
-                </div>
-            </div>
-
-            <!-- Next Steps Timeline -->
-            <div class="text-left mb-lg p-md">
-                <h4 class="text-center mb-md text-primary">What Happens Next:</h4>
-                <div class="timeline-steps">
-                    <div class="timeline-step">
-                        <i class="fas fa-check-circle icon-success"></i>
-                        <span><strong>Confirmation Email Sent</strong><br><small>Check your inbox for order details</small></span>
-                    </div>
-                    <div class="timeline-step">
-                        <i class="fas fa-palette icon-primary"></i>
-                        <span><strong>Artwork Review (Today)</strong><br><small>Our team will contact you to approve artwork</small></span>
-                    </div>
-                    <div class="timeline-step">
-                        <i class="fas fa-print icon-primary"></i>
-                        <span><strong>Production Begins (Day 1)</strong><br><small>DTG printing starts after artwork approval</small></span>
-                    </div>
-                    <div class="timeline-step">
-                        <i class="fas fa-shipping-fast icon-primary"></i>
-                        <span><strong>Ships Within 72 Hours</strong><br><small>Guaranteed delivery in 3 business days</small></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Contact Information -->
-            <p class="text-sm text-muted mt-md">
-                Questions? Call us at <strong class="text-accent">253-922-5793</strong>
-            </p>
-
-            <button class="btn btn-primary mt-md" onclick="location.reload()">Start New Order</button>
+    <!-- Fatal boot error (pricing/config unavailable) -->
+    <div id="tdt-fatal" class="tdt-fatal" hidden>
+        <div class="tdt-fatal-card">
+            <i class="fas fa-triangle-exclamation"></i>
+            <h2>We can’t load live pricing right now</h2>
+            <p id="tdt-fatal-msg">Please refresh the page — or call us and we’ll take your order by phone.</p>
+            <p class="tdt-fatal-phone"><a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a></p>
+            <button type="button" class="btn btn-primary" id="tdt-fatal-retry">Try again</button>
         </div>
     </div>
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="logo-section">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
-                <div class="logo-text">
-                    <h1>Northwest Custom Apparel</h1>
-                    <div class="service-name">3-Day Tees - Fast Turnaround</div>
-                </div>
-            </div>
-            <div class="contact-cta">
-                <span class="location"><i class="fas fa-map-marker-alt"></i> All orders ship from Milton, Washington</span>
-                <span class="phone"><i class="fas fa-phone"></i> 253-922-5793</span>
-                <span class="email"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</span>
+    <!-- ── Header ─────────────────────────────────────────────────── -->
+    <header class="site-head">
+        <div class="site-head-inner">
+            <a class="brand" href="/">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="brand-logo">
+                <span class="brand-text">
+                    <strong>Northwest Custom Apparel</strong>
+                    <em>3-Day Tees <span class="rush-spark">⚡</span> fast turnaround</em>
+                </span>
+            </a>
+            <div class="head-contact">
+                <span><i class="fas fa-location-dot"></i> Ships from Milton, WA</span>
+                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
             </div>
         </div>
     </header>
 
-    <!-- Ship Date Banner -->
-    <div id="shipDateBanner" class="ship-date-banner">
-        <div class="ship-date-content">
-            <i class="fas fa-shipping-fast"></i>
-            <div class="ship-date-text">
-                <div class="ship-date-main" id="shipDateMessage">
-                    Loading ship date...
-                </div>
-                <div class="ship-date-sub" id="shipDateCountdown"></div>
+    <!-- ── Promise banner (rush tag) ──────────────────────────────── -->
+    <div class="promise-banner" id="promise-banner">
+        <div class="promise-tag">
+            <i class="fas fa-truck-fast"></i>
+            <div class="promise-copy">
+                <strong id="promise-main">Checking today’s production schedule…</strong>
+                <span id="promise-sub"></span>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Progress Indicator (3 steps) -->
-        <div class="phase-nav">
-            <div class="phase-step active" id="phase-1-nav">
-                <div class="phase-step-number">1</div>
-                <div class="phase-step-label">Location</div>
-            </div>
-            <div class="phase-connector" id="connector-1"></div>
-            <div class="phase-step" id="phase-2-nav">
-                <div class="phase-step-number">2</div>
-                <div class="phase-step-label">Colors & Qty</div>
-            </div>
-            <div class="phase-connector" id="connector-2"></div>
-            <div class="phase-step" id="phase-3-nav">
-                <div class="phase-step-number">3</div>
-                <div class="phase-step-label">Checkout</div>
-            </div>
-        </div>
-
-        <!-- Phase 1: Location Selection -->
-        <section id="location-phase" class="phase-section active">
-            <div class="phase-header">
-                <h2><span class="phase-number">1</span> Print Location</h2>
-                <p>Select print location for your order</p>
-            </div>
-            
-            <div class="content-container">
-                <div class="product-grid">
-                    <!-- Left Column: Product Image -->
-                    <div>
-                        <div class="card p-sm">
-                            <div class="product-hero">
-                                <img id="heroProductImage" class="product-hero-image d-block"
-                                     src=""
-                                     alt="Port alt="Port & Company PC54 - Jet Black with DTG Print" Company PC54">
-                                <div class="product-title">Port & Company PC54</div>
-                                <p class="product-description">Premium 100% cotton tee, perfect for DTG printing</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column: Configuration -->
-                    <div>
-                        <div class="location-selector">
-                            <div class="toggle-section">
-                                <div class="toggle-section-title">
-                                    <i class="fas fa-layer-group"></i>
-                                    Front Print Location
-                                </div>
-                                <div class="toggle-section-subtitle">
-                                    Choose Left Chest OR Full Front (mutually exclusive)
-                                </div>
-
-                                <!-- Front Locations (mutually exclusive) -->
-                                <div class="location-grid">
-                                    <div class="toggle-item" id="toggle-LC" data-location="LC">
-                                        <div class="toggle-item-label">
-                                            <span>Left Chest</span>
-                                            <span class="toggle-item-size">4"×4"</span>
-                                        </div>
-                                        <div class="toggle-switch">
-                                            <div class="toggle-switch-slider"></div>
-                                        </div>
-                                    </div>
-
-                                    <div class="toggle-item" id="toggle-FF" data-location="FF">
-                                        <div class="toggle-item-label">
-                                            <span>Full Front</span>
-                                            <span class="toggle-item-size">12"×16"</span>
-                                        </div>
-                                        <div class="toggle-switch">
-                                            <div class="toggle-switch-slider"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="toggle-section-title mt-xl">
-                                    <i class="fas fa-layer-group"></i>
-                                    Back Print Location
-                                </div>
-                                <div class="toggle-section-subtitle">
-                                    Optional - Add Full Back printing
-                                </div>
-
-                                <!-- Back Location (optional) -->
-                                <div class="location-grid">
-                                    <div class="toggle-item" id="toggle-FB" data-location="FB">
-                                        <div class="toggle-item-label">
-                                            <span>Full Back</span>
-                                            <span class="toggle-item-size">12"×16"</span>
-                                        </div>
-                                        <div class="toggle-switch">
-                                            <div class="toggle-switch-slider"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Pricing Information Table -->
-                            <div id="pricing-info-table" class="d-none mt-xl">
-                                <h3 class="pricing-table-heading">
-                                    Pricing Information
-                                </h3>
-
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th class="table-header">Quantity Range</th>
-                                            <th class="table-header-right">Price Per Piece</th>
-                                            <th class="table-header">Notes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="pricing-table-body">
-                                        <!-- Rows populated by updatePricingTable() -->
-                                    </tbody>
-                                </table>
-
-                                <div class="pricing-notes">
-                                    <p>* All prices include 25% rush fee for 3-day service</p>
-                                    <p>* 2XL adds $2/piece, 3XL adds $3/piece</p>
-                                </div>
-                            </div>
-
-                            <!-- Selected Location Display -->
-                            <div id="selected-location-display" class="mt-xl p-lg selected-location-box rounded-md d-none">
-                                <h4 class="mb-sm selected-location-heading">
-                                    <i class="fas fa-check-circle"></i> Selected Location
-                                </h4>
-                                <p id="selected-location-text" class="selected-location-text"></p>
-                            </div>
-                        </div>
-                    </div>
+    <!-- ── Hero ───────────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <h1>Custom tees, printed &amp; shipped in <span class="hero-underline">3 business days</span>.</h1>
+                <p class="hero-sub">Upload your art, see it on a real Port &amp; Company tee, and check out in minutes. Full-color DTG printing. No setup fees. No minimums.</p>
+                <button type="button" class="btn btn-hero" id="hero-cta">
+                    <i class="fas fa-cloud-arrow-up"></i> Upload your art — see it on a shirt
+                </button>
+                <div class="hero-trust">
+                    <span><i class="fas fa-lock"></i> Stripe secure checkout</span>
+                    <span><i class="fas fa-house-flag"></i> Family-owned, Milton WA — since 1977</span>
                 </div>
             </div>
-            
-            <div class="phase-actions">
-                <button id="continue-to-products" class="btn btn-primary" disabled>
-                    Continue to Colors & Quantities <i class="fas fa-arrow-right"></i>
-                </button>
+            <div class="hero-visual">
+                <img id="hero-shirt" src="/api/image-proxy?url=https%3A%2F%2Fcdnm.sanmar.com%2Fimglib%2Fmresjpg%2F2021%2Ff11%2FPC54_jetblack_model_front.jpg" alt="Port & Company PC54 tee" loading="eager">
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Phase 2: Colors & Quantities -->
-        <section id="product-phase" class="phase-section d-none">
-            <div class="phase-header">
-                <h2><span class="phase-number">2</span> Colors & Quantities</h2>
-                <p>Select colors and enter quantities for each size. Location: <strong id="phase2-location"></strong></p>
-            </div>
+    <!-- ── Studio ─────────────────────────────────────────────────── -->
+    <main class="studio" id="studio">
+        <div class="studio-grid">
 
-        <div class="product-grid">
-            <!-- Left Column: Product Configuration -->
-            <div>
-                <div class="card">
-                    <div class="flex-between-center">
-                        <h3>1. Choose Colors</h3>
-                        <!-- Development tool - hidden from customers
-                        <button onclick="clearInventoryCache()" class="btn btn-sm btn-link text-sm text-accent">
-                            <i class="fas fa-sync"></i> Refresh Inventory
+            <!-- LEFT: the designer (sticky on desktop) -->
+            <div class="studio-canvas-col" id="stage-design">
+                <div class="stage-head">
+                    <span class="stage-num">1</span>
+                    <h2>Design your shirt</h2>
+                </div>
+
+                <div class="canvas-card">
+                    <div class="view-tabs" role="tablist" aria-label="Shirt side">
+                        <button type="button" class="view-tab is-active" id="tab-front" role="tab" aria-selected="true">
+                            Front <span class="tab-badge" id="tab-front-badge" hidden></span>
                         </button>
-                        -->
+                        <button type="button" class="view-tab" id="tab-back" role="tab" aria-selected="false">
+                            Back <span class="tab-badge" id="tab-back-badge" hidden></span>
+                        </button>
                     </div>
-                    <p class="text-secondary text-sm mb-md">Select all colors needed for your order:</p>
-                    <div class="color-selector">
-                        <div class="color-swatches-container" id="colorGrid">
-                            <!-- Colors populated by JavaScript -->
-                        </div>
+                    <div class="canvas-wrap" id="canvas-wrap">
+                        <canvas id="tdt-canvas" tabindex="0" role="application"
+                                aria-label="T-shirt designer. Drag your artwork to position it. Arrow keys nudge, plus and minus resize, C centers."></canvas>
+                        <div class="canvas-note" id="canvas-note" hidden></div>
+                        <div class="canvas-loading" id="canvas-loading"><i class="fas fa-spinner fa-spin"></i></div>
                     </div>
-
-                    <!-- Selected Colors with Size Breakdown -->
-                    <div id="selectedColorsContainer" class="mt-lg">
-                        <!-- Selected color cards populated by JavaScript -->
-                    </div>
+                    <p class="canvas-hint" id="canvas-hint">Tap inside the dashed area to add your artwork</p>
+                    <div class="sr-live" id="designer-live" aria-live="polite"></div>
                 </div>
 
-
-                    <!-- Live Pricing Display Panel -->
-                    <div id="pricingPanel" class="d-none mt-lg pricing-panel rounded-md p-lg">
-                        <h4 class="pricing-panel-heading flex-start-center gap-sm">
-                            <i class="fas fa-calculator"></i> Your Pricing
-                        </h4>
-
-                        <div class="price-range-display">
-                            <!-- Standard Sizes -->
-                            <div class="price-tier flex-between-center rounded">
-                                <span class="tier-label">
-                                    <i class="fas fa-tshirt tier-label-icon"></i>
-                                    Standard Sizes (S-XL)
-                                </span>
-                                <span id="standardSizesPrice" class="tier-price">$0.00 each</span>
-                            </div>
-
-                            <!-- 2XL Pricing (conditional) -->
-                            <div id="pricing-2xl" class="price-tier flex-between-center rounded d-none">
-                                <span class="tier-label">
-                                    <i class="fas fa-expand-arrows-alt tier-label-icon-info"></i>
-                                    2XL
-                                </span>
-                                <span id="price2XL" class="tier-price-info">$0.00 each</span>
-                            </div>
-
-                            <!-- 3XL Pricing (conditional) -->
-                            <div id="pricing-3xl" class="price-tier flex-between-center rounded d-none">
-                                <span class="tier-label">
-                                    <i class="fas fa-expand-arrows-alt tier-label-icon-info"></i>
-                                    3XL
-                                </span>
-                                <span id="price3XL" class="tier-price-info">$0.00 each</span>
-                            </div>
+                <div class="designer-controls">
+                    <!-- Location -->
+                    <div class="control-block">
+                        <label class="control-label">Front print location</label>
+                        <div class="seg-control" id="loc-control">
+                            <button type="button" class="seg-btn is-active" id="loc-LC">
+                                Left Chest <small>4″×4″ · <span id="loc-LC-price">$—</span></small>
+                            </button>
+                            <button type="button" class="seg-btn" id="loc-FF">
+                                Full Front <small>12″×16″ · <span id="loc-FF-price">$—</span></small>
+                            </button>
                         </div>
-
-                        <!-- Selection Summary -->
-                        <div class="selection-summary mt-md p-sm bg-white rounded border">
-                            <div class="flex-between-center">
-                                <span class="text-secondary font-medium">
-                                    <i class="fas fa-shopping-bag mr-sm"></i>
-                                    Your Selection:
-                                </span>
-                                <span id="selection-breakdown" class="font-semibold text-primary">0 pieces</span>
-                            </div>
-                        </div>
-
-                        <p class="mt-md mb-0 text-sm text-center bg-white p-sm rounded-sm text-blue-dark">
-                            <i class="fas fa-check-circle text-success"></i> All prices shown include rush production (25% surcharge)
-                        </p>
                     </div>
-                </div>
 
-                <div class="card mt-md" id="uploadArtworkCard">
-                    <h3 class="collapsible-header">
-                        4. Upload Artwork
-                        <i class="fas fa-chevron-down collapse-icon"></i>
-                    </h3>
-                    <div class="collapsible-content">
-                        <!-- Front Logo Upload (Required) -->
-                        <div class="file-upload mt-md">
-                            <div class="flex-start-center gap-sm mb-sm">
-                                <h4 class="m-0">Front Logo</h4>
-                                <span class="required-badge">REQUIRED</span>
-                            </div>
-                            <div class="upload-zone" id="frontUploadZone">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p class="font-semibold mb-sm">Click or Drag Front Logo Here</p>
-                                <p class="text-sm">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
-                            </div>
-                            <input type="file" id="frontFileInput" class="d-none" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
-                            <div class="file-list" id="frontFileList"></div>
+                    <!-- Back print toggle -->
+                    <div class="control-block">
+                        <label class="toggle-row" for="back-toggle">
+                            <input type="checkbox" id="back-toggle">
+                            <span class="toggle-pill" aria-hidden="true"></span>
+                            <span class="toggle-text">Add a back print <small id="back-delta">12″×16″</small></span>
+                        </label>
+                    </div>
+
+                    <!-- Upload -->
+                    <div class="control-block">
+                        <label class="control-label" id="drop-label">Front artwork</label>
+                        <div class="art-drop" id="art-drop" tabindex="0" role="button" aria-describedby="drop-formats">
+                            <i class="fas fa-cloud-arrow-up"></i>
+                            <strong>Drop your art here</strong> <span>or click to browse</span>
+                            <small id="drop-formats">PNG · JPG · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>
                         </div>
+                        <input type="file" id="art-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden>
+                        <div class="art-file" id="art-file" hidden>
+                            <span class="art-file-thumb" id="art-file-thumb"></span>
+                            <span class="art-file-meta">
+                                <strong id="art-file-name"></strong>
+                                <small id="art-file-size"></small>
+                            </span>
+                            <button type="button" class="art-file-remove" id="art-remove" aria-label="Remove artwork"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="art-warning" id="art-warning" hidden></div>
+                    </div>
 
-                        <!-- Back Logo Upload (Optional) -->
-                        <div class="file-upload mt-lg">
-                            <div class="flex-start-center gap-sm mb-sm">
-                                <h4 class="m-0">Back Logo</h4>
-                                <span class="optional-badge">OPTIONAL</span>
-                            </div>
-                            <div class="upload-zone upload-zone-optional" id="backUploadZone">
-                                <i class="fas fa-cloud-upload-alt"></i>
-                                <p class="font-semibold mb-sm">Click or Drag Back Logo Here</p>
-                                <p class="text-sm">Accepted: AI, EPS, PDF, PNG, JPG, TIFF, PSD (max 20MB)</p>
-                            </div>
-                            <input type="file" id="backFileInput" class="d-none" accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd">
-                            <div class="file-list" id="backFileList"></div>
+                    <!-- Size + position -->
+                    <div class="control-block" id="size-block" hidden>
+                        <label class="control-label" for="art-size">Artwork width — <strong id="art-size-label">3.2″</strong></label>
+                        <input type="range" id="art-size" min="0.5" max="12" step="0.1" value="3.2">
+                        <div class="art-actions">
+                            <button type="button" class="chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line"></i> Center</button>
+                            <button type="button" class="chip-btn" id="art-fit"><i class="fas fa-maximize"></i> Fit width</button>
+                            <button type="button" class="chip-btn" id="art-reset"><i class="fas fa-rotate-left"></i> Reset</button>
+                        </div>
+                        <div class="dpi-meter" id="dpi-meter" hidden>
+                            <span class="dpi-dot" id="dpi-dot"></span>
+                            <span id="dpi-text">—</span>
+                        </div>
+                        <div class="dpi-ack" id="dpi-ack-row" hidden>
+                            <label><input type="checkbox" id="dpi-ack"> I understand it may print blurry.</label>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Column: Order Summary & Checkout -->
-            <div class="sticky-sidebar">
-                <div class="card">
-                    <h3>Order Summary</h3>
-                    <div class="pricing-summary">
-                        <div class="pricing-row">
-                            <span class="pricing-label">Subtotal:</span>
-                            <span class="pricing-value" id="step2-subtotal">$0.00</span>
-                        </div>
-                        <!-- Rush fee is built into per-shirt prices, not shown as separate line -->
-                        <div class="pricing-row d-none" id="step2-ltmFeeRow">
-                            <span class="pricing-label">LTM Fee:</span>
-                            <span class="pricing-value" id="step2-ltmFee">$0.00</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-label">Sales Tax:</span>
-                            <span class="pricing-value text-sm text-gray-600" id="step2-salesTax">Calculated at checkout</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-label" id="step2-shippingLabel">Shipping (UPS Ground):</span>
-                            <span class="pricing-value" id="step2-shipping">$30.00</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span>Grand Total:</span>
-                            <span id="step2-grandTotal">$0.00</span>
-                        </div>
+            <!-- RIGHT: quantities + checkout -->
+            <div class="studio-flow-col">
+
+                <!-- Stage 2: colors & sizes -->
+                <section class="stage" id="stage-colors">
+                    <div class="stage-head">
+                        <span class="stage-num">2</span>
+                        <h2>Colors &amp; sizes</h2>
                     </div>
 
-                    <div class="rush-terms-box mb-lg">
-                        <p class="text-amber-dark font-semibold mb-sm">
-                            <i class="fas fa-info-circle"></i> Rush Service Terms
-                        </p>
-                        <p class="text-amber-dark text-sm">
-                            Orders ship within 72 hours from artwork approval. All prices include 25% rush fee. Minimum 6 pieces required. Orders of 6-23 pieces include $75 LTM (Less Than Minimum) fee.
-                        </p>
+                    <div class="color-chips" id="color-chips" aria-label="Add a shirt color"></div>
+                    <div class="color-cards" id="color-cards"></div>
+
+                    <div class="tier-meter-card" id="tier-card" hidden>
+                        <div class="tier-meter" id="tier-meter"></div>
+                        <p class="nudge-line" id="nudge-line"></p>
                     </div>
-                </div>
+                    <p class="inventory-stamp" id="inventory-stamp"></p>
+                    <div class="inventory-error" id="inventory-error" hidden>
+                        <i class="fas fa-triangle-exclamation"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type="button" class="link-btn" id="inventory-retry">Retry</button>
+                    </div>
+                </section>
 
-                <button class="btn btn-primary btn-full mt-md" id="continueToCheckout">
-                    Continue to Checkout <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-        </section>
+                <!-- Stage 3: checkout -->
+                <section class="stage" id="stage-checkout">
+                    <div class="stage-head">
+                        <span class="stage-num">3</span>
+                        <h2>Checkout</h2>
+                    </div>
 
-        <!-- Phase 3: Checkout (Combined Contact, Shipping, Review & Pay) -->
-        <section id="checkout-phase" class="phase-section d-none">
-            <div class="phase-header">
-                <h2><span class="phase-number">3</span> Checkout</h2>
-                <p>Review your order and complete checkout</p>
-            </div>
-
-            <div class="product-grid">
-                <!-- Left Column: Review Cards + Forms + Payment -->
-                <div>
-                    <!-- Artwork Files Review -->
-                    <div class="card">
-                        <h3><i class="fas fa-palette"></i> Artwork Files</h3>
-                        <div id="artworkReview">
-                            <div class="mb-md">
-                                <div class="flex-start-center gap-sm mb-sm">
-                                    <i class="fas fa-file-image icon-primary"></i>
-                                    <strong>Front Logo:</strong>
-                                </div>
-                                <div id="frontFileReview" class="pl-nested text-secondary">
-                                    No file uploaded
-                                </div>
+                    <div class="form-card">
+                        <h3><i class="fas fa-user"></i> Contact</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="f-first">First name *</label>
+                                <input type="text" id="f-first" autocomplete="given-name" required>
                             </div>
-                            <div>
-                                <div class="flex-start-center gap-sm mb-sm">
-                                    <i class="fas fa-file-image icon-info"></i>
-                                    <strong>Back Logo:</strong>
-                                    <span class="optional-badge ml-xs">OPTIONAL</span>
-                                </div>
-                                <div id="backFileReview" class="pl-nested text-secondary">
-                                    No file uploaded
-                                </div>
+                            <div class="form-field">
+                                <label for="f-last">Last name *</label>
+                                <input type="text" id="f-last" autocomplete="family-name" required>
                             </div>
-                            <div class="mt-md p-md bg-light rounded text-sm text-secondary">
-                                <i class="fas fa-info-circle icon-info"></i>
-                                Need to change files? Go back to <a href="#" onclick="goToPhase(2); return false;" class="link-primary">Step 2</a>.
+                            <div class="form-field form-span">
+                                <label for="f-email">Email *</label>
+                                <input type="email" id="f-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="f-phone">Phone *</label>
+                                <input type="tel" id="f-phone" autocomplete="tel" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="f-company">Company</label>
+                                <input type="text" id="f-company" autocomplete="organization">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Order Details Review -->
-                    <div class="card mt-md">
-                        <h3><i class="fas fa-clipboard-check"></i> Order Details</h3>
-                        <div id="reviewSummary">
-                            <div class="mb-md">
-                                <strong>Print Location:</strong>
-                                <span id="reviewLocation"></span>
-                            </div>
-                            <div class="mb-md">
-                                <strong>Total Pieces:</strong>
-                                <span id="reviewTotalPieces"></span>
-                            </div>
-                            <div class="mb-md">
-                                <strong>Colors Selected:</strong>
-                                <span id="reviewColors"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contact Information -->
-                    <div class="card mt-md">
-                        <h3><i class="fas fa-user"></i> Contact Information</h3>
-                        <div class="form-group">
-                            <label for="firstName">First Name *</label>
-                            <input type="text" id="firstName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="lastName">Last Name *</label>
-                            <input type="text" id="lastName" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input type="email" id="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="phone">Phone *</label>
-                            <input type="tel" id="phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="company">Company Name</label>
-                            <input type="text" id="company">
-                        </div>
-                    </div>
-
-                    <!-- Shipping / Pickup -->
-                    <div class="card mt-md">
-                        <h3><i class="fas fa-shipping-fast"></i> Delivery Method</h3>
-
-                        <!-- Delivery Method Selector -->
-                        <div class="form-group">
-                            <div class="delivery-method-group">
-                                <label class="delivery-option">
-                                    <input type="radio" name="deliveryMethod" value="ship" id="deliveryShip" checked>
-                                    <span class="delivery-option-content">
-                                        <i class="fas fa-shipping-fast"></i>
-                                        <span>
-                                            <strong>Ship to Address</strong>
-                                            <small>UPS Ground - $30.00</small>
-                                        </span>
-                                    </span>
-                                </label>
-                                <label class="delivery-option">
-                                    <input type="radio" name="deliveryMethod" value="pickup" id="deliveryPickup">
-                                    <span class="delivery-option-content">
-                                        <i class="fas fa-store"></i>
-                                        <span>
-                                            <strong>Customer Pickup</strong>
-                                            <small>FREE - Milton, WA</small>
-                                        </span>
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Pickup Notice (hidden by default) -->
-                        <div id="pickupNotice" class="pickup-notice d-none">
-                            <i class="fas fa-store"></i>
-                            <div>
-                                <strong>Pickup Location</strong>
-                                <p>NW Custom Apparel, Milton, WA 98354</p>
-                                <small>You will be contacted when your order is ready for pickup.</small>
-                            </div>
-                        </div>
-
-                        <!-- Shipping Address Fields (hidden when pickup selected) -->
-                        <div id="shippingAddressFields">
-                            <div class="form-group">
-                                <label for="address1">Street Address *</label>
-                                <input type="text" id="address1" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="city">City *</label>
-                                <input type="text" id="city" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="state">State *</label>
-                                <input type="text" id="state" required maxlength="2" placeholder="WA">
-                            </div>
-                            <div class="form-group">
-                                <label for="zip">ZIP Code *</label>
-                                <input type="text" id="zip" required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="notes">Special Instructions</label>
-                            <textarea id="notes" placeholder="Any special requirements or notes..."></textarea>
-                        </div>
-                    </div>
-
-                    <!-- Billing Address -->
-                    <div class="card mt-md">
-                        <h3><i class="fas fa-file-invoice-dollar"></i> Billing Address</h3>
-                        <div class="form-group checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="sameAsShipping" class="modern-checkbox" checked>
-                                <span>Same as shipping address</span>
+                    <div class="form-card">
+                        <h3><i class="fas fa-truck-fast"></i> Delivery</h3>
+                        <div class="delivery-cards">
+                            <label class="delivery-card">
+                                <input type="radio" name="delivery" id="d-ship" value="ship" checked>
+                                <span class="delivery-card-body">
+                                    <i class="fas fa-truck"></i>
+                                    <strong>Ship it</strong>
+                                    <small id="ship-fee-label">UPS Ground — $—</small>
+                                </span>
+                            </label>
+                            <label class="delivery-card">
+                                <input type="radio" name="delivery" id="d-pickup" value="pickup">
+                                <span class="delivery-card-body">
+                                    <i class="fas fa-store"></i>
+                                    <strong>Pick up free</strong>
+                                    <small>Milton, WA</small>
+                                </span>
                             </label>
                         </div>
-                        <div id="billingAddressFields" class="d-none">
-                            <div class="form-group">
-                                <label for="billingAddress1">Street Address *</label>
-                                <input type="text" id="billingAddress1">
+
+                        <div id="pickup-card" class="pickup-card" hidden>
+                            <i class="fas fa-store"></i>
+                            <div>
+                                <strong>NW Custom Apparel — Milton, WA 98354</strong>
+                                <p>We’ll call you the moment your order is ready. Pickup orders are taxed at the Milton rate.</p>
                             </div>
-                            <div class="form-group">
-                                <label for="billingCity">City *</label>
-                                <input type="text" id="billingCity">
+                        </div>
+
+                        <div id="address-fields">
+                            <div class="form-grid">
+                                <div class="form-field form-span">
+                                    <label for="f-addr1">Street address *</label>
+                                    <input type="text" id="f-addr1" autocomplete="address-line1" required>
+                                </div>
+                                <div class="form-field">
+                                    <label for="f-city">City *</label>
+                                    <input type="text" id="f-city" autocomplete="address-level2" required>
+                                </div>
+                                <div class="form-field form-field-sm">
+                                    <label for="f-state">State *</label>
+                                    <input type="text" id="f-state" autocomplete="address-level1" maxlength="2" placeholder="WA" required>
+                                </div>
+                                <div class="form-field form-field-sm">
+                                    <label for="f-zip">ZIP *</label>
+                                    <input type="text" id="f-zip" autocomplete="postal-code" inputmode="numeric" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="billingState">State *</label>
-                                <input type="text" id="billingState" maxlength="2" placeholder="WA">
+                            <p class="tax-stamp" id="tax-stamp"></p>
+                            <div class="tax-error" id="tax-error" hidden>
+                                <i class="fas fa-triangle-exclamation"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="link-btn" id="tax-retry">Retry</button>
                             </div>
-                            <div class="form-group">
-                                <label for="billingZip">ZIP Code *</label>
-                                <input type="text" id="billingZip">
-                            </div>
+                        </div>
+
+                        <div class="form-field form-span">
+                            <label for="f-notes">Special instructions</label>
+                            <textarea id="f-notes" rows="2" placeholder="Anything we should know?"></textarea>
                         </div>
                     </div>
 
-                </div>
+                    <!-- Review -->
+                    <div class="form-card review-card" id="review-card">
+                        <h3><i class="fas fa-clipboard-check"></i> Review your order</h3>
+                        <div class="review-mockups" id="review-mockups"></div>
+                        <div class="review-lines" id="review-lines"></div>
+                        <div class="review-totals" id="review-totals"></div>
+                        <p class="review-promise" id="review-promise"></p>
+                        <div class="review-ack" id="review-ack" hidden></div>
 
-                <!-- Right Column: Order Summary (Sticky) -->
-                <div class="sticky-sidebar">
-                    <div class="card" id="orderSummary">
-                        <h3>Order Summary</h3>
-                        <div id="summaryContent" class="mb-md">
-                            <p class="summary-placeholder">No items selected yet</p>
-                        </div>
-
-                        <div class="pricing-summary">
-                            <div class="pricing-row">
-                                <span class="pricing-label">Subtotal:</span>
-                                <span class="pricing-value" id="step3-subtotal">$0.00</span>
-                            </div>
-                            <div class="pricing-row d-none" id="step3-ltmFeeRow">
-                                <span class="pricing-label">LTM Fee:</span>
-                                <span class="pricing-value" id="step3-ltmFee">$0.00</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span class="pricing-label" id="step3-shippingLabel">Shipping:</span>
-                                <span class="pricing-value" id="step3-shipping">$30.00</span>
-                            </div>
-                            <div class="pricing-row">
-                                <span class="pricing-label">Tax:</span>
-                                <span class="pricing-value" id="step3-salesTax">$0.00</span>
-                            </div>
-                            <div class="pricing-row order-total">
-                                <span>Order Total:</span>
-                                <span id="step3-grandTotal">$0.00</span>
-                            </div>
-                        </div>
+                        <div class="pay-reasons" id="pay-reasons"></div>
+                        <button type="button" class="btn btn-pay" id="pay-btn" disabled>
+                            <i class="fas fa-lock"></i> <span id="pay-btn-label">Pay</span>
+                        </button>
+                        <p class="stripe-note"><i class="fab fa-stripe"></i> You’ll be redirected to Stripe — we never see your card number.</p>
                     </div>
-
-                    <!-- Payment Button -->
-                    <button id="payButton" class="btn btn-primary btn-full mt-md">
-                        <i class="fas fa-lock"></i> Proceed to Secure Checkout - <span id="payButtonAmount">$0.00</span>
-                    </button>
-
-                    <!-- Security Badge -->
-                    <div class="security-badge mt-sm text-center">
-                        <i class="fas fa-shield-alt icon-success"></i>
-                        Secure payment powered by Stripe
-                    </div>
-                </div>
+                </section>
             </div>
-        </section>
+        </div>
+    </main>
+
+    <!-- ── Marketing band ─────────────────────────────────────────── -->
+    <section class="band band-how">
+        <h2 class="band-title">How it works</h2>
+        <div class="how-grid">
+            <div class="how-step"><span>1</span><strong>Upload</strong><p>Drop your artwork into the live designer and place it exactly where you want it.</p></div>
+            <div class="how-step"><span>2</span><strong>Approve the preview</strong><p>What you see on the shirt is the approval record our printers work from.</p></div>
+            <div class="how-step"><span>3</span><strong>We print</strong><p>Full-color DTG on Port &amp; Company PC54 tees, in our Milton WA shop.</p></div>
+            <div class="how-step"><span>4</span><strong>Ships in 3 days</strong><p>Order before 9 AM Pacific and the 3-business-day clock starts today.</p></div>
+        </div>
+    </section>
+
+    <section class="band band-faq">
+        <h2 class="band-title">Questions, answered</h2>
+        <div class="faq" id="faq">
+            <details><summary>When exactly will my order ship?</summary><p>Orders placed before 9 AM Pacific on a business day ship 3 business days later — the exact date is shown on the Pay button before you’re charged. Weekends and holidays don’t count as business days.</p></details>
+            <details><summary>What if my artwork is low resolution?</summary><p>The designer measures your file’s print resolution live. If it’s too low to print crisply we’ll flag it before checkout — you can shrink it, swap the file, or accept how it will look.</p></details>
+            <details><summary>Can I upload AI / EPS / PDF files?</summary><p>Yes. Browsers can’t preview those formats, so you’ll position a sized box where you want the art, and our team will match it and email you a proof before printing — usually within 2 business hours. Your 3-day clock starts at proof approval.</p></details>
+            <details><summary>Why is there a small-batch fee under 24 pieces?</summary><p>Short runs carry the same setup work as full runs. The fee disappears at 24+ pieces — the designer shows you exactly how close you are.</p></details>
+            <details><summary>Can I return custom-printed shirts?</summary><p>Because every order is printed just for you, we can’t resell returns. If we got something wrong — wrong size shipped, print defect — we’ll reprint or refund, no drama.</p></details>
+            <details><summary>Do you charge sales tax?</summary><p>Washington destination sales tax applies to orders shipped within WA (and pickup orders at the Milton rate). Out-of-state shipments aren’t taxed.</p></details>
+        </div>
+    </section>
+
+    <section class="band band-guarantee">
+        <div class="guarantee-tag">
+            <i class="fas fa-handshake"></i>
+            <div>
+                <strong>If we miss the ship date, shipping’s on us.</strong>
+                <p>We’ve been printing in Milton, Washington since 1977. Call us at <a href="tel:253-922-5793">253-922-5793</a> — a human answers.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-foot">
+        <p>© Northwest Custom Apparel · 3-Day Tees · Milton, WA · <a href="tel:253-922-5793">253-922-5793</a> · <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+    </footer>
+
+    <!-- ── Sticky order bar ───────────────────────────────────────── -->
+    <div class="order-bar" id="order-bar">
+        <button type="button" class="order-bar-summary" id="order-bar-summary" aria-haspopup="dialog">
+            <strong id="bar-total">$0.00</strong>
+            <span id="bar-meta">0 shirts</span>
+        </button>
+        <button type="button" class="btn btn-cta" id="smart-cta">Upload your art</button>
     </div>
-    <!-- External JavaScript -->
-    <!-- Tier 1: Service Layer (loads before main application) -->
-    <script src="js/utils/debounce.js"></script>
-    <script src="js/services/ApiService.js"></script>
-    <script src="js/services/InventoryService.js"></script>
-    <!-- Main Application -->
-    <script src="js/3-day-tees.js"></script>
+
+    <!-- ── Summary sheet ──────────────────────────────────────────── -->
+    <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+    <div class="summary-sheet" id="summary-sheet" role="dialog" aria-label="Order summary" hidden>
+        <div class="sheet-grab" aria-hidden="true"></div>
+        <h3>Your order so far</h3>
+        <div id="sheet-lines"></div>
+        <div id="sheet-totals"></div>
+        <p class="review-promise" id="sheet-promise"></p>
+        <button type="button" class="btn btn-primary" id="sheet-close">Keep building</button>
+    </div>
+
+    <!-- ── Checkout pipeline modal ────────────────────────────────── -->
+    <div class="modal-backdrop" id="pipeline-backdrop" hidden>
+        <div class="pipeline-modal" role="dialog" aria-label="Placing your order">
+            <h3>Placing your order…</h3>
+            <ol class="pipeline-steps">
+                <li id="pl-step-1"><i class="far fa-circle"></i> Confirming stock</li>
+                <li id="pl-step-2"><i class="far fa-circle"></i> Uploading your artwork &amp; mockups</li>
+                <li id="pl-step-3"><i class="far fa-circle"></i> Saving your order</li>
+                <li id="pl-step-4"><i class="far fa-circle"></i> Opening secure checkout</li>
+            </ol>
+            <div class="pipeline-error" id="pipeline-error" hidden></div>
+            <button type="button" class="btn btn-ghost" id="pipeline-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ── Stock conflict modal ───────────────────────────────────── -->
+    <div class="modal-backdrop" id="conflict-backdrop" hidden>
+        <div class="pipeline-modal" role="dialog" aria-label="Stock changed">
+            <h3><i class="fas fa-triangle-exclamation"></i> Stock changed while you were designing</h3>
+            <div id="conflict-list"></div>
+            <button type="button" class="btn btn-primary" id="conflict-apply">Apply fixes &amp; continue</button>
+            <button type="button" class="btn btn-ghost" id="conflict-close">Back to my order</button>
+        </div>
+    </div>
+
+    <!-- Config + modules (order matters) -->
+    <script src="../config/app.config.js"></script>
+    <script src="js/3-day-tees-pricing.js?v=20260609"></script>
+    <script src="js/3-day-tees-shipdate.js?v=20260609"></script>
+    <script src="js/3-day-tees-calibration.js?v=20260609"></script>
+    <script src="js/3-day-tees-designer.js?v=20260609"></script>
+    <script src="js/3-day-tees-app.js?v=20260609"></script>
 </body>
 </html>

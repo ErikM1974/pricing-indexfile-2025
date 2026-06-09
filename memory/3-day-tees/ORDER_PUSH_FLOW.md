@@ -1,8 +1,69 @@
 # 3-Day Tees - Complete Order Push Flow
 
-**Last Updated:** 2026-01-11
+**Last Updated:** 2026-06-09 (design-studio rebuild)
 **Purpose:** Comprehensive documentation of Stripe payment + ManageOrders PUSH to ShopWorks
-**Status:** Production-Ready (v2026.01)
+**Status:** Production-Ready (v2026.06 rebuild)
+
+---
+
+## ⚡ 2026-06-09 REBUILD — what changed (read this first)
+
+The customer-facing app was fully rebuilt as a single-page **design studio**
+(`pages/3-day-tees.html` + `pages/js/3-day-tees-{app,pricing,shipdate,calibration,designer,success}.js`).
+The server flow below (webhook → `/api/submit-3day-order` → ManageOrders) is PRESERVED,
+with these changes:
+
+1. **Server-side authoritative reprice** — `POST /api/create-checkout-session` no longer
+   trusts client line_items. It re-derives the entire quote via `rebuildTdtQuote()`
+   (requires `pages/js/3-day-tees-pricing.js` — the SAME module the browser runs) from
+   `/api/pricing-bundle` + Caspio **Service_Codes 3DT-RUSH (25%) / 3DT-LTM ($75) /
+   3DT-SHIP ($30 = FALLBACK only)** + the DOR tax lookup. Client total mismatch > 1¢ →
+   HTTP 409. Stripe line_items are built server-side (per color/size + LTM + shipping +
+   tax) and sum EXACTLY to the charged total. The saved `ColorConfigsJSON` is also
+   server-SANITIZED (whitelisted S–3XL sizes, server unit prices, CATALOG_COLOR keys) —
+   the push reads it, so client-doctored carts can't reach ShopWorks. **Erik changes
+   prices in Caspio Service_Codes — no deploy.**
+1b. **Real UPS Ground shipping (2026-06-09, Erik)** — shipped orders are billed the SAME
+   negotiated-rate estimator the EMB builder uses, NOT the flat fee:
+   `resolveTdtShipping()` (server.js) = PC54 piece weight (SanMar `/api/inventory`) ×
+   qty → boxes via `/api/shipping/box-density` (T-Shirt 58) → proxy
+   `POST /api/shipping/estimate-ups-ground` (residential ON). The page DISPLAYS the
+   number via `POST /api/three-day-tees/shipping-estimate` (same resolver → display ==
+   charge, ever). Estimator failure → 3DT-SHIP flat $30, labeled "(flat rate)".
+   `orderTotals.shippingSource` records which ('ups-estimate' | 'flat' | 'pickup').
+2. **Tax** — destination-based via proxy `POST /api/tax-rates/lookup` (pickup → Milton,
+   out-of-state → $0/acct 2202, in-WA → DOR rate). Tax base = shirts + LTM + **billable
+   shipping** (platform ruling 2026-06-09). Push sends dynamic `taxPartNumber`
+   (`Tax_<pct>`) + account-named description — no more hardcoded `Tax_10.1` on every order.
+3. **Binding ship promise** — `TDT_SHIPDATE.promise()` (same module as the browser banner)
+   is stamped into `OrderSettingsJSON.shipPromise` at checkout-session creation and lands
+   in the ShopWorks order note (`PROMISED SHIP DATE: …`).
+4. **Designer payload additions** — `OrderSettingsJSON` now carries `placement`
+   (inches, top-center anchor per location: wIn/hIn/xIn/yIn + effectiveDpi + lowDpiAck +
+   previewable), `mockups[]` (hosted customer-approved composites), `needsArtReview`.
+   The push renders a human-readable `PRINT PLACEMENT` block in Notes On Order and
+   attaches the mockups; `designs[].imageUrl` stays the ORIGINAL artwork (production
+   prints from the original, never a canvas render).
+5. **Cache discipline (CRITICAL)** — every quote_sessions read in the money path passes
+   `&refresh=true` (the proxy caches lookups 5 min; the pre-create uniqueness check
+   poisons the key otherwise — see LESSONS_LEARNED 2026-06-09). SessionID is stamped via
+   `PUT /quote_sessions/{PK_ID}` (the legacy `PUT ?filter=` never matched a route).
+6. **Webhook hardening** — exact `.find(QuoteID===id)` match, `result.success === true`
+   check (HTTP 200 + `{success:false}` used to mark failed pushes 'Processed'),
+   `alert3DT()` Slack/console alert on push failure and payment-without-record
+   (env `SLACK_ORDER_ALERT_WEBHOOK_URL`, falls back to `SLACK_QUOTE_DELETE_WEBHOOK_URL`).
+7. **QuoteID uniqueness** — generated ID is checked against Caspio (refresh=true) with
+   regeneration; rate limiter actually mounted on `/api/create-checkout-session`
+   (was on a nonexistent path).
+8. **Success page** (`3-day-tees-success.html` + `3-day-tees-success.js`, external JS now)
+   polls with refresh=true and sends the SAME EmailJS templates
+   (`service_1c4k67j` / `template_sample_customer` + `template_sample_sales`) once,
+   sourced from the Caspio JSON blobs.
+
+Verified 2026-06-09: full pipeline live-tested (uploads → Caspio → Stripe TEST session,
+server reprice matched client to the cent on ship+tax and pickup carts), ManageOrders
+accepted TEST push `3DT-TEST-0609-7650` (void in ShopWorks). Unit specs:
+`tests/unit/3dt-pricing.test.js`, `tests/unit/3dt-shipdate.test.js`.
 
 ---
 

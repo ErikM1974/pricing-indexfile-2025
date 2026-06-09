@@ -8,6 +8,12 @@ const stripe = require('stripe');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 
+// 3-Day Tees shared modules — the SAME files the browser loads, so the
+// server-side authoritative reprice + binding ship-date stamp can never
+// disagree with what the customer saw (dual window/module.exports pattern).
+const TDT_PRICING = require('./pages/js/3-day-tees-pricing.js');
+const TDT_SHIPDATE = require('./pages/js/3-day-tees-shipdate.js');
+
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
 dotenv.config();
@@ -24,14 +30,14 @@ dotenv.config();
 //   L414  Body parsing (JSON, urlencoded)
 //
 // STRIPE & PAYMENTS
-//   L272  POST /api/stripe/webhook
-//   L1004 GET  /api/stripe-config
-//   L1025 POST /api/create-payment-intent
-//   L1095 POST /api/create-checkout-session
-//   L1210 POST /api/verify-checkout-session
+//   L530  POST /api/stripe/webhook          — signature-verified; pushes paid 3DT orders to ShopWorks
+//   L1490 GET  /api/stripe-config
+//   L1510 POST /api/create-payment-intent
+//   L1585 POST /api/create-checkout-session — 3DT studio: server-side authoritative reprice + unique QuoteID + promise stamp
+//   L1800 POST /api/verify-checkout-session
 //
-// 3-DAY TEES
-//   L1271 POST /api/submit-3day-order
+// 3-DAY TEES (studio rebuild 2026-06-09 — helpers ~L770: getTdtPricingConfig/resolveTdtTax/rebuildTdtQuote)
+//   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels
 //
 // ONLINE ORDER FORM
 //   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
@@ -485,19 +491,45 @@ const apiLimiter = rateLimit({
 // Apply rate limiting to API routes
 app.use('/api/', apiLimiter);
 
+// Process-internal call key: the Stripe webhook self-POSTs /api/submit-3day-order
+// through BASE_URL — without this skip, every paid order consumes the shared
+// 20/hr strictLimiter bucket (one dyno IP) and order bursts/webhook retries
+// would rate-limit REAL paid orders into 'ShopWorks Failed'. The key never
+// leaves this process. (3DT rebuild review fix, 2026-06-09)
+const INTERNAL_CALL_KEY = require('crypto').randomBytes(24).toString('hex');
+
 // Stricter limit for sensitive endpoints
 const strictLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 20, // 20 requests per hour
   message: {
     error: 'Too many requests to this endpoint, please try again later'
-  }
+  },
+  skip: (req) => req.get('x-nwca-internal') === INTERNAL_CALL_KEY
 });
 
 // Apply strict limiting to order submission endpoints
 app.use('/api/submit-3day-order', strictLimiter);
 app.use('/api/submit-order-form', strictLimiter);
-app.use('/api/stripe/create-checkout-session', strictLimiter);
+// Fixed 2026-06-09: this limiter was mounted on /api/stripe/create-checkout-session,
+// a path that doesn't exist — the REAL checkout route ran unlimited.
+app.use('/api/create-checkout-session', strictLimiter);
+
+// Staff alert for money-path failures (paid order that didn't reach
+// ShopWorks, payment with no Caspio record). Fire-and-forget Slack webhook;
+// falls back to the quote-delete channel hook, and ALWAYS error-logs so
+// Papertrail catches it even with no Slack configured.
+function alert3DT(text) {
+  console.error('[3DT ALERT] ' + text);
+  const hook = process.env.SLACK_ORDER_ALERT_WEBHOOK_URL
+    || process.env.SLACK_QUOTE_DELETE_WEBHOOK_URL || '';
+  if (!hook) return;
+  fetch(hook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: '🚨 3-Day Tees: ' + text }),
+  }).catch(() => {/* alerting must never throw */});
+}
 
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
@@ -544,17 +576,47 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       console.log('[Webhook] Processing payment for QuoteID:', quoteID);
 
       // Check idempotency - has this webhook already been processed?
-      const checkUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=QuoteID='${quoteID}'`;
+      // refresh=true bypasses the proxy's 5-min lookup cache — a stale []
+      // here would orphan a PAID order (cache primed by the pre-create
+      // uniqueness check), and a stale Status would break idempotency.
+      const checkUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
       const checkResponse = await fetch(checkUrl);
+      if (!checkResponse.ok) {
+        // A FAILED lookup is not "no record" — return 5xx so Stripe RETRIES
+        // the webhook (transient Caspio outages must self-heal, not orphan a
+        // paid order behind a misleading no-record alert).
+        console.error('[Webhook] Quote lookup failed with HTTP', checkResponse.status, '— asking Stripe to retry');
+        return res.status(503).send('Quote lookup unavailable — retry');
+      }
       const quoteSessions = await checkResponse.json();
 
-      if (quoteSessions && quoteSessions.length > 0) {
-        const quoteSession = quoteSessions[0];
+      // Exact-match the QuoteID — never sessions[0] (the 2026-06-01
+      // wrong-quote lesson: an unfiltered list once made [0] a DIFFERENT order).
+      const sessionList = Array.isArray(quoteSessions) ? quoteSessions : (quoteSessions?.data || []);
+      const matched = sessionList.find(s => s.QuoteID === quoteID);
 
-        // If already processed, skip
-        if (quoteSession.Status === 'Payment Confirmed' || quoteSession.Status === 'Processed') {
+      if (!matched) {
+        // Customer PAID but we have no order record — this must never be silent.
+        alert3DT(`PAYMENT WITHOUT ORDER RECORD — Stripe session ${session.id} paid $${(session.amount_total / 100).toFixed(2)} for QuoteID ${quoteID}, but no quote_sessions row matches. Recover from the Stripe dashboard.`);
+        return res.json({ received: true, status: 'no-record' });
+      }
+
+      {
+        const quoteSession = matched;
+
+        // Idempotency: 'Processed' and 'ShopWorks Failed' are terminal.
+        // 'Payment Confirmed' is INTERMEDIATE — a crash between the status
+        // PUT and the push would strand a paid order there forever; a Stripe
+        // redelivery that finds it raises an alert instead of silently
+        // skipping. (3DT rebuild review fix, 2026-06-09)
+        if (quoteSession.Status === 'Processed'
+            || String(quoteSession.Status).indexOf('ShopWorks Failed') !== -1) {
           console.log('[Webhook] Already processed, skipping:', quoteID);
           return res.json({ received: true, status: 'duplicate' });
+        }
+        if (quoteSession.Status === 'Payment Confirmed') {
+          alert3DT(`Webhook redelivery found ${quoteID} stuck at 'Payment Confirmed' — the ShopWorks push may not have completed. Verify in ShopWorks before re-pushing (duplicate-order risk).`);
+          return res.json({ received: true, status: 'stuck-payment-confirmed' });
         }
 
         // Update status to Payment Confirmed
@@ -588,7 +650,9 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
           const baseUrl = process.env.BASE_URL || `http://localhost:${PORT}`;
           const shopWorksResponse = await fetch(`${baseUrl}/api/submit-3day-order`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            // Internal key: bypasses strictLimiter AND marks the payment as
+            // already signature-verified by this webhook.
+            headers: { 'Content-Type': 'application/json', 'x-nwca-internal': INTERNAL_CALL_KEY },
             body: JSON.stringify({
               tempOrderNumber: quoteID,
               customerData: orderData.customerData,
@@ -601,26 +665,36 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
             })
           });
 
-          if (shopWorksResponse.ok) {
-            const result = await shopWorksResponse.json();
-
-            // Update to Processed
-            await fetch(updateUrl, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                Status: 'Processed',
-                Notes: `${quoteSession.Notes}\nShopWorks Order Created: ${result.orderNumber || 'N/A'}\nSubmitted: ${new Date().toISOString()}`
-              })
-            });
-
-            console.log('[Webhook] ✓ ShopWorks order created:', quoteID);
-          } else {
-            throw new Error(`ShopWorks API returned ${shopWorksResponse.status}`);
+          // /api/submit-3day-order returns HTTP 200 with {success:false} on a
+          // ManageOrders rejection — checking only response.ok used to mark
+          // paid-but-unpushed orders 'Processed' with no alert (fixed 2026-06-09).
+          const result = shopWorksResponse.ok
+            ? await shopWorksResponse.json().catch(() => ({}))
+            : {};
+          if (!shopWorksResponse.ok || result.success !== true) {
+            throw new Error(result.error
+              || `ShopWorks API returned HTTP ${shopWorksResponse.status}`);
           }
+
+          // Update to Processed — and notice when the bookkeeping PUT itself
+          // fails (otherwise a redelivery could double-push to ShopWorks).
+          const processedPut = await fetch(updateUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Status: 'Processed',
+              Notes: `${quoteSession.Notes}\nShopWorks Order Created: ${result.orderNumber || 'N/A'}\nSubmitted: ${new Date().toISOString()}`
+            })
+          });
+          if (!processedPut.ok) {
+            alert3DT(`${quoteID} pushed to ShopWorks OK but the Caspio status update to 'Processed' failed (HTTP ${processedPut.status}) — fix the row manually or a webhook redelivery may double-push.`);
+          }
+
+          console.log('[Webhook] ✓ ShopWorks order created:', quoteID);
 
         } catch (shopWorksError) {
           console.error('[Webhook] ShopWorks submission failed:', shopWorksError);
+          alert3DT(`PAID ORDER NEEDS MANUAL PUSH — ${quoteID} ($${(session.amount_total / 100).toFixed(2)}, ${session.customer_email || 'no email'}) failed the ShopWorks push: ${shopWorksError.message}. Status set to 'Payment Confirmed - ShopWorks Failed'.`);
 
           // Update status to indicate failure
           await fetch(updateUrl, {
@@ -717,6 +791,185 @@ async function save3DTQuoteSession(data) {
   const result = await response.json();
   console.log('[3-Day Tees] Quote session created:', quoteID);
   return result;
+}
+
+// ── 3-Day Tees server-side authoritative pricing ────────────────────────────
+// The browser quote is advisory; the money Stripe charges is recomputed HERE
+// from the same Caspio sources (pricing-bundle + Service_Codes 3DT-*) via the
+// same TDT_PRICING module the page runs. A client/server mismatch over 1¢
+// rejects the checkout visibly — never charge a number we didn't derive.
+
+const TDT_PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const TDT_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+let _tdtCfgCache = null;
+let _tdtCfgAt = 0;
+
+async function getTdtPricingConfig() {
+  if (_tdtCfgCache && Date.now() - _tdtCfgAt < 5 * 60 * 1000) return _tdtCfgCache;
+
+  const grab = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status} from ${url.split('?')[0]}`);
+    return r.json();
+  };
+  const code = async (c) => {
+    const j = await grab(`${TDT_PROXY}/api/service-codes?code=${c}`);
+    const row = j && j.data && j.data[0];
+    if (!row || !row.IsActive || !(parseFloat(row.SellPrice) >= 0)) {
+      throw new Error(`Service code ${c} missing/inactive in Caspio`);
+    }
+    return parseFloat(row.SellPrice);
+  };
+
+  const [pricingData, rushPct, ltmFee, shipFee] = await Promise.all([
+    grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=PC54`),
+    code('3DT-RUSH'), code('3DT-LTM'), code('3DT-SHIP'),
+  ]);
+  const nonLtm = (pricingData.tiersR || [])
+    .filter(t => !parseFloat(t.LTM_Fee || 0))
+    .sort((a, b) => a.MinQuantity - b.MinQuantity);
+  if (!nonLtm.length) throw new Error('DTG pricing tiers missing a non-LTM tier');
+
+  _tdtCfgCache = {
+    pricingData,
+    config: { rushPct, ltmFee, shipFee, ltmThreshold: nonLtm[0].MinQuantity, sizes: TDT_SIZES },
+  };
+  _tdtCfgAt = Date.now();
+  return _tdtCfgCache;
+}
+
+// ── 3-Day Tees shipping: real UPS Ground estimate, flat-rate fallback ───────
+// Same estimator stack the EMB quote builder uses (negotiated-cost model,
+// proxy /api/shipping/estimate-ups-ground; box density from Caspio via
+// /api/shipping/box-density; PC54 piece weight from SanMar /api/inventory).
+// Lives ONLY here — the page asks this server for the number it displays
+// (POST /api/three-day-tees/shipping-estimate) and the reprice recomputes via
+// the same function, so the estimate shown and the amount charged can't drift.
+// Estimator failure falls back to the Caspio 3DT-SHIP flat rate (a defined
+// price, labeled "flat rate" — never a guess).
+let _tdtShipMetaCache = null;
+let _tdtShipMetaAt = 0;
+
+async function getTdtShipMeta() {
+  if (_tdtShipMetaCache && Date.now() - _tdtShipMetaAt < 60 * 60 * 1000) return _tdtShipMetaCache;
+  let pieceWeightLb = 0.44;   // PC54 catalog weight; refreshed from SanMar below
+  let perBox = 58;            // T-Shirt density; refreshed from Caspio below
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/shipping/box-density`);
+    if (r.ok) {
+      const j = await r.json();
+      const v = parseInt(j && j.density && j.density['T-Shirt'], 10);
+      if (v > 0) perBox = v;
+    }
+  } catch (e) { console.warn('[3DT ship] box-density fetch failed, using default 58:', e.message); }
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/inventory?styleNumber=PC54`);
+    if (r.ok) {
+      const j = await r.json();
+      const rows = Array.isArray(j) ? j : (j.data || j.result || []);
+      const w = parseFloat((rows.find(x => parseFloat(x.PIECE_WEIGHT) > 0) || {}).PIECE_WEIGHT);
+      if (w > 0) pieceWeightLb = w;
+    }
+  } catch (e) { console.warn('[3DT ship] piece-weight fetch failed, using default 0.44:', e.message); }
+  _tdtShipMetaCache = { pieceWeightLb, perBox };
+  _tdtShipMetaAt = Date.now();
+  return _tdtShipMetaCache;
+}
+
+// → { amount, source: 'ups-estimate'|'flat', detail? }. Throws only if BOTH
+// the estimator and the 3DT-SHIP flat fallback are unavailable.
+async function resolveTdtShipping(toZip, qty) {
+  const zip = String(toZip || '').trim().slice(0, 5);
+  const pieces = Math.max(1, parseInt(qty, 10) || 1);
+  if (/^\d{5}$/.test(zip)) {
+    try {
+      const meta = await getTdtShipMeta();
+      const boxes = Math.max(1, Math.ceil(pieces / meta.perBox));
+      const totalLb = pieces * meta.pieceWeightLb;
+      const boxWeightsLb = Array.from({ length: boxes }, () => Math.round((totalLb / boxes) * 100) / 100);
+      const r = await fetch(`${TDT_PROXY}/api/shipping/estimate-ups-ground`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // Residential ON: 3-Day Tees customers overwhelmingly ship to homes.
+        body: JSON.stringify({ toZip: zip, weightLb: totalLb, boxes, boxWeightsLb, residential: true }),
+      });
+      const j = r.ok ? await r.json() : null;
+      const est = j && parseFloat(j.estimate);
+      if (Number.isFinite(est) && est > 0) {
+        return {
+          amount: Math.round(est * 100) / 100,
+          source: 'ups-estimate',
+          detail: { boxes, weightLb: totalLb, zone: j.zone, residential: true },
+        };
+      }
+      console.warn('[3DT ship] estimator returned no usable estimate, falling back to flat');
+    } catch (e) {
+      console.warn('[3DT ship] UPS estimate failed, falling back to flat:', e.message);
+    }
+  }
+  const { config } = await getTdtPricingConfig();
+  return { amount: config.shipFee, source: 'flat' };
+}
+
+// Destination tax, server-derived (client value is advisory): pickup → Milton,
+// out-of-state → 0, in-WA → DOR destination lookup. Lookup failure THROWS —
+// checkout fails visibly rather than charging a guessed rate.
+async function resolveTdtTax(customerData) {
+  const pickup = customerData.deliveryMethod === 'pickup';
+  const state = String(customerData.state || '').trim().toUpperCase();
+  if (!pickup && state && state !== 'WA' && state !== 'WASHINGTON') {
+    return { rate: 0, account: '2202', accountName: 'Out of State Sales' };
+  }
+  const body = pickup
+    ? { address: '', city: 'Milton', state: 'WA', zip: '98354' }
+    : { address: customerData.address1 || '', city: customerData.city || '', state: 'WA', zip: customerData.zip || '' };
+  const r = await fetch(`${TDT_PROXY}/api/tax-rates/lookup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const j = r.ok ? await r.json() : null;
+  if (!j || j.success === false || !Number.isFinite(parseFloat(j.rate))) {
+    throw new Error('Sales-tax lookup failed for the shipping address');
+  }
+  return { rate: parseFloat(j.rate), account: j.account || null, accountName: j.accountName || null };
+}
+
+// Rebuild the full quote from the submitted cart using server-fetched config.
+async function rebuildTdtQuote(colorConfigs, orderSettings, customerData) {
+  const { pricingData, config } = await getTdtPricingConfig();
+  const tax = await resolveTdtTax(customerData);
+  const locCode = String(orderSettings?.printLocationCode || 'LC');
+  // Size whitelist is LOAD-BEARING: combinedQuantity counts EVERY qty key but
+  // only whitelisted sizes get priced — a crafted unknown size key would
+  // inflate the tier (cheaper rate / dropped LTM) while paying for nothing.
+  const cart = Object.values(colorConfigs || {}).map(c => {
+    const qty = {};
+    TDT_SIZES.forEach(size => {
+      const sd = (c.sizeBreakdown || {})[size];
+      const q = parseInt(sd && sd.quantity, 10) || 0;
+      if (q > 0) qty[size] = q;
+    });
+    return { catalogColor: c.catalogColor, colorName: c.displayColor || c.catalogColor, qty };
+  });
+  const method = customerData.deliveryMethod === 'pickup' ? 'pickup' : 'ship';
+
+  // Real UPS Ground estimate replaces the flat fee for shipped orders
+  // (2026-06-09, Erik). Falls back to the 3DT-SHIP flat rate internally.
+  let shipResolved = { amount: 0, source: 'pickup' };
+  if (method === 'ship') {
+    shipResolved = await resolveTdtShipping(customerData.zip, TDT_PRICING.combinedQuantity(cart));
+  }
+
+  const quote = TDT_PRICING.quote({
+    pricingData,
+    config: Object.assign({}, config, { shipFee: shipResolved.amount }),
+    cart,
+    location: locCode.indexOf('FF') === 0 ? 'FF' : 'LC',
+    backEnabled: locCode.indexOf('_FB') !== -1,
+    delivery: { method, taxRate: tax.rate },
+  });
+  return { quote, tax, config, shipping: shipResolved };
 }
 
 // Serve product.html routes BEFORE static middleware to avoid conflicts
@@ -1454,52 +1707,201 @@ app.post('/api/create-payment-intent', async (req, res) => {
   }
 });
 
+// POST /api/three-day-tees/shipping-estimate — the number the studio page
+// DISPLAYS for shipping. Same resolver the reprice charges with, so what the
+// customer sees is what Stripe bills. {toZip, qty} → {amount, source}.
+app.post('/api/three-day-tees/shipping-estimate', async (req, res) => {
+  try {
+    const { toZip, qty } = req.body || {};
+    const resolved = await resolveTdtShipping(toZip, qty);
+    res.json(resolved);
+  } catch (e) {
+    console.error('[3DT ship] estimate endpoint failed:', e);
+    res.status(502).json({ error: 'Shipping estimate unavailable' });
+  }
+});
+
 // POST /api/create-checkout-session - Create Stripe Checkout Session (hosted page)
+// Rewritten 2026-06-09 (3-Day Tees studio rebuild): the server RECOMPUTES the
+// whole price from Caspio (pricing-bundle + Service_Codes + DOR tax) and
+// builds the Stripe line_items itself — the client total is only validated
+// against it. Also: unique QuoteID (was random-collision-prone) and the
+// binding ship-promise date stamped here, not in the browser.
 app.post('/api/create-checkout-session', async (req, res) => {
   try {
     const {
-      line_items,         // Stripe line items from frontend
-      customer_email,      // Customer email
-      totalAmount,        // Total in dollars
-      metadata,           // { tempOrderNumber, customerName, totalQty, printLocation }
-      successUrl,         // Redirect URL on success
-      cancelUrl,          // Redirect URL on cancel
-      customerData,       // Full customer data (NEW - for Caspio save)
-      colorConfigs,       // Color configurations (NEW - for webhook metadata)
-      orderTotals,        // Order totals (NEW - for webhook metadata)
-      orderSettings       // Order settings (NEW - for webhook metadata)
+      customer_email,
+      customerData,
+      colorConfigs,
+      orderTotals,        // client quote — advisory, validated below
+      orderSettings
     } = req.body;
 
-    // Validate required fields
-    if (!totalAmount || !successUrl || !cancelUrl) {
+    if (!customerData || !colorConfigs || !orderTotals) {
       return res.status(400).json({
-        error: 'Missing required fields: totalAmount, successUrl, and cancelUrl are required'
+        error: 'Missing required fields: customerData, colorConfigs, orderTotals'
       });
     }
 
-    // Generate QuoteID first (Christmas Bundles pattern)
-    const quoteID = generate3DTQuoteID();
+    // Redirect URLs are pinned server-side (client-supplied URLs would be an
+    // open redirect off a payment flow).
+    const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
 
-    console.log('[3-Day Tees Checkout] Creating session for QuoteID:', quoteID);
+    // ── Authoritative server-side reprice ──────────────────────────────
+    let priced;
+    try {
+      priced = await rebuildTdtQuote(colorConfigs, orderSettings, customerData);
+    } catch (e) {
+      console.error('[3-Day Tees Checkout] Server reprice failed:', e);
+      return res.status(502).json({
+        error: 'Live pricing is unavailable right now — nothing was charged. Please try again or call 253-922-5793.'
+      });
+    }
+    const { quote, tax } = priced;
 
-    // Save to Caspio BEFORE Stripe redirect (prevents data loss)
-    if (customerData && orderTotals) {
-      try {
-        await save3DTQuoteSession({
-          quoteID,
-          customerData,
-          orderTotals,
-          colorConfigs,      // NEW: Store full config for webhook retrieval
-          orderSettings,     // NEW: Store settings for webhook retrieval
-          stripeSessionId: null // Will update when Stripe session created
-        });
-        console.log('[3-Day Tees Checkout] ✓ Order saved to Caspio:', quoteID);
-      } catch (error) {
-        console.error('[3-Day Tees Checkout] Failed to save to Caspio:', error);
-        return res.status(500).json({ error: 'Failed to save order data' });
+    if (!quote.combinedQty || !quote.lines.length) {
+      return res.status(400).json({ error: 'Order has no items' });
+    }
+    const clientTotal = parseFloat(orderTotals.grandTotal);
+    if (!Number.isFinite(clientTotal) || Math.abs(clientTotal - quote.total) > 0.01) {
+      console.error(`[3-Day Tees Checkout] PRICE MISMATCH client=$${clientTotal} server=$${quote.total}`);
+      return res.status(409).json({
+        error: `Pricing changed while you were designing (your screen: $${clientTotal?.toFixed ? clientTotal.toFixed(2) : clientTotal} · current: $${quote.total.toFixed(2)}). Refresh the page to reload live pricing — nothing was charged.`
+      });
+    }
+
+    // Sanitize colorConfigs server-side before they become the order of
+    // record: whitelisted sizes only, SERVER unit prices (the client's were
+    // advisory — the ShopWorks push reads this JSON, and a doctored payload
+    // must not ship uncharged shirts or mislabeled line prices).
+    const cleanConfigs = {};
+    Object.values(colorConfigs).forEach(c => {
+      if (!c || !c.catalogColor) return;
+      const sizeBreakdown = {};
+      let totalQuantity = 0;
+      TDT_SIZES.forEach(size => {
+        const q = parseInt((c.sizeBreakdown || {})[size] && c.sizeBreakdown[size].quantity, 10) || 0;
+        if (q > 0) {
+          sizeBreakdown[size] = { quantity: q, unitPrice: quote.unitBySize[size].finalPrice };
+          totalQuantity += q;
+        }
+      });
+      if (totalQuantity > 0) {
+        cleanConfigs[c.catalogColor] = {
+          catalogColor: c.catalogColor,
+          displayColor: c.displayColor || c.catalogColor,
+          totalQuantity,
+          sizeBreakdown
+        };
       }
-    } else {
-      console.warn('[3-Day Tees Checkout] Missing customerData or orderTotals - skipping Caspio save');
+    });
+
+    // Server-stamped numbers become the order of record.
+    const serverTotals = {
+      totalQuantity: quote.combinedQty,
+      subtotal: quote.shirtsSubtotal,
+      rushFee: 0,                              // rush lives inside unit prices
+      ltmFee: quote.ltmFee,
+      shipping: quote.shipping,
+      shippingSource: priced.shipping.source,  // 'ups-estimate' | 'flat' | 'pickup'
+      salesTax: quote.tax,
+      taxRate: quote.taxRate,
+      taxableBase: quote.taxableBase,
+      taxAccount: tax.account,
+      taxAccountName: tax.accountName,
+      grandTotal: quote.total
+    };
+
+    // Binding ship-promise date — stamped at payment time, echoed to the
+    // success page and the ShopWorks order note.
+    const promise = TDT_SHIPDATE.promise(new Date());
+    const settingsStamped = Object.assign({}, orderSettings || {}, {
+      shipPromise: {
+        iso: promise.shipDateIso,
+        label: promise.shipDateLong,
+        stampedAt: new Date().toISOString()
+      }
+    });
+
+    // ── Unique QuoteID (random suffix used to collide same-day) ───────
+    let quoteID = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const candidate = generate3DTQuoteID();
+      try {
+        // refresh=true is LOAD-BEARING: without it this pre-create lookup
+        // caches [] under this QuoteID for 5 min on the proxy, and the
+        // webhook's post-payment lookup reads that poisoned [] → "payment
+        // without record". (Found in live verification 2026-06-09.)
+        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`);
+        const rows = check.ok ? await check.json() : [];
+        const list = Array.isArray(rows) ? rows : (rows?.data || []);
+        if (!list.some(s => s.QuoteID === candidate)) { quoteID = candidate; break; }
+        console.warn('[3-Day Tees Checkout] QuoteID collision, regenerating:', candidate);
+      } catch (e) {
+        // Uniqueness check unavailable — accept the candidate rather than block checkout
+        quoteID = candidate;
+        break;
+      }
+    }
+    if (!quoteID) {
+      return res.status(500).json({ error: 'Could not allocate an order number — please try again.' });
+    }
+
+    console.log('[3-Day Tees Checkout] Creating session for QuoteID:', quoteID,
+      `($${quote.total.toFixed(2)}, ${quote.combinedQty} pcs, tax ${quote.taxRate ?? 0})`);
+
+    // Save to Caspio BEFORE Stripe redirect (fail-closed: no save, no charge)
+    try {
+      await save3DTQuoteSession({
+        quoteID,
+        customerData,
+        orderTotals: serverTotals,
+        colorConfigs: cleanConfigs,
+        orderSettings: settingsStamped,
+        stripeSessionId: null
+      });
+      console.log('[3-Day Tees Checkout] ✓ Order saved to Caspio:', quoteID);
+    } catch (error) {
+      console.error('[3-Day Tees Checkout] Failed to save to Caspio:', error);
+      return res.status(500).json({ error: 'Failed to save order data — nothing was charged. Please try again.' });
+    }
+
+    // ── Stripe line items built from the SERVER quote ──────────────────
+    const cents = (v) => Math.round(v * 100);
+    const line_items = quote.lines.map(l => ({
+      price_data: {
+        currency: 'usd',
+        product_data: { name: `PC54 Tee — ${l.colorName}, ${l.size}` },
+        unit_amount: cents(l.unitPrice)
+      },
+      quantity: l.quantity
+    }));
+    if (quote.ltmFee > 0) {
+      line_items.push({
+        price_data: { currency: 'usd', product_data: { name: `Small-batch fee (under ${priced.config.ltmThreshold} pieces)` }, unit_amount: cents(quote.ltmFee) },
+        quantity: 1
+      });
+    }
+    if (quote.shipping > 0) {
+      line_items.push({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: priced.shipping.source === 'ups-estimate'
+              ? 'UPS Ground shipping (estimated for your ZIP)'
+              : 'UPS Ground shipping (flat rate)'
+          },
+          unit_amount: cents(quote.shipping)
+        },
+        quantity: 1
+      });
+    }
+    if (quote.tax > 0) {
+      const pctLabel = String(Math.round(quote.taxRate * 10000) / 100);
+      line_items.push({
+        price_data: { currency: 'usd', product_data: { name: `Sales tax (${pctLabel}%)` }, unit_amount: cents(quote.tax) },
+        quantity: 1
+      });
     }
 
     const mode = process.env.STRIPE_MODE || 'development';
@@ -1520,8 +1922,8 @@ app.post('/api/create-checkout-session', async (req, res) => {
       line_items: line_items || [],
       mode: 'payment',
       customer_email: customer_email,
-      success_url: successUrl.replace('{CHECKOUT_SESSION_ID}', '{CHECKOUT_SESSION_ID}') + `&quote_id=${quoteID}`,
-      cancel_url: cancelUrl,
+      success_url: `${siteOrigin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`,
+      cancel_url: `${siteOrigin}/pages/3-day-tees.html?canceled=1`,
       metadata: {
         quoteID: quoteID,
         source: '3day-tees'
@@ -1535,11 +1937,17 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     console.log('[Stripe Checkout] Session created:', session.id);
 
-    // Update Caspio with Stripe session ID
-    if (customerData && orderTotals) {
-      try {
-        const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?filter=QuoteID='${quoteID}'`;
-        await fetch(updateUrl, {
+    // Update Caspio with the Stripe session ID. The proxy's PUT only routes
+    // by PK_ID (/quote_sessions/:id) — the legacy `PUT ?filter=QuoteID=` hit
+    // no route and 404'd silently for months (SessionID never updated).
+    // Bonus: this refresh=true read re-warms the lookup cache with the REAL
+    // row, un-poisoning the pre-create [] entry for the webhook/success page.
+    try {
+      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
+      const rows = lookup.ok ? await lookup.json() : [];
+      const row = (Array.isArray(rows) ? rows : (rows?.data || [])).find(s => s.QuoteID === quoteID);
+      if (row && row.PK_ID) {
+        await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1548,10 +1956,12 @@ app.post('/api/create-checkout-session', async (req, res) => {
           })
         });
         console.log('[3-Day Tees Checkout] ✓ Updated Caspio with Stripe session ID');
-      } catch (error) {
-        console.error('[3-Day Tees Checkout] Failed to update Caspio with session ID:', error);
-        // Don't fail the request - order is already in Caspio
+      } else {
+        console.warn('[3-Day Tees Checkout] Could not resolve PK_ID to stamp the Stripe session ID (non-fatal)');
       }
+    } catch (error) {
+      console.error('[3-Day Tees Checkout] Failed to update Caspio with session ID:', error);
+      // Don't fail the request - order is already in Caspio
     }
 
     res.json({
@@ -1658,6 +2068,28 @@ app.post('/api/submit-3day-order', async (req, res) => {
       });
     }
 
+    // paymentConfirmed from an EXTERNAL caller must be proven against Stripe —
+    // this endpoint is public (success-page fallback) and would otherwise let
+    // anyone inject "paid" orders into ShopWorks. The webhook self-call skips
+    // the round-trip (it already verified the Stripe signature) via the
+    // process-internal header. (3DT rebuild review fix, 2026-06-09)
+    if (paymentConfirmed && req.get('x-nwca-internal') !== INTERNAL_CALL_KEY) {
+      try {
+        const mode = process.env.STRIPE_MODE || 'development';
+        const secretKey = mode === 'production'
+          ? process.env.STRIPE_LIVE_SECRET_KEY
+          : process.env.STRIPE_TEST_SECRET_KEY;
+        const stripeInstance = stripe(secretKey);
+        const s = await stripeInstance.checkout.sessions.retrieve(String(stripeSessionId || ''));
+        if (!s || s.payment_status !== 'paid' || (s.metadata && s.metadata.quoteID && s.metadata.quoteID !== tempOrderNumber)) {
+          return res.status(403).json({ success: false, error: 'Payment could not be verified with Stripe' });
+        }
+      } catch (e) {
+        console.error('[3-Day Order] Stripe payment verification failed:', e.message);
+        return res.status(403).json({ success: false, error: 'Payment could not be verified with Stripe' });
+      }
+    }
+
     // Build line items from colorConfigs
     // Structure: { catalogColor: { displayColor, sizeBreakdown: { size: { quantity, unitPrice } } } }
     const lineItems = [];
@@ -1671,7 +2103,10 @@ app.post('/api/submit-3day-order', async (req, res) => {
             lineItems.push({
               partNumber: styleNumber,
               description: productName,
-              color: config.displayColor || catalogColor,
+              // CATALOG_COLOR keys ShopWorks/inventory — COLOR_NAME is display
+              // only ("Dark Heather Grey" would not match SKU color
+              // "Dk Hthr Grey"). Rule #2 in CLAUDE.md; review fix 2026-06-09.
+              color: config.catalogColor || catalogColor,
               size: size,
               quantity: parseInt(sizeData.quantity),
               price: sizeData.unitPrice || 0
@@ -1683,11 +2118,13 @@ app.post('/api/submit-3day-order', async (req, res) => {
 
     console.log('[3-Day Order] Built lineItems:', lineItems.length, 'items');
 
-    // Add Less Than Minimum fee as a line item (if applicable)
+    // Add Less Than Minimum fee as a line item (if applicable).
+    // partNumber stays 'LTM-75' (a stable ShopWorks SKU); the description
+    // reflects the ACTUAL fee from Caspio Service_Codes 3DT-LTM.
     if (orderTotals?.ltmFee && orderTotals.ltmFee > 0) {
       lineItems.push({
         partNumber: 'LTM-75',
-        description: 'Less Than Minimum $75.00',
+        description: `Less Than Minimum $${Number(orderTotals.ltmFee).toFixed(2)}`,
         color: '',
         size: '',
         quantity: 1,
@@ -1751,8 +2188,9 @@ app.post('/api/submit-3day-order', async (req, res) => {
         });
       }
 
-      // Add back location if we have a back logo or location includes back
-      if (backLogo) {
+      // Back location ONLY when the charged location includes the back —
+      // a stray backLogo on an LC/FF-priced order must not print free.
+      if (backLogo && printLocation.indexOf('_FB') !== -1) {
         design.locations.push({
           location: 'Full Back',
           colors: 'Full Color',  // DTG = Full Color
@@ -1785,7 +2223,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
         linkNote: 'Customer uploaded artwork (front)'
       });
     }
-    if (backLogo) {
+    if (backLogo && printLocation.indexOf('_FB') !== -1) {
       attachments.push({
         mediaUrl: backLogo,
         mediaName: `${tempOrderNumber} - Back Artwork`,
@@ -1793,7 +2231,55 @@ app.post('/api/submit-3day-order', async (req, res) => {
       });
     }
 
+    // Designer mockups (customer-approved composites) ride along so production
+    // sees EXACTLY what the customer approved. Capped to keep payloads sane.
+    (orderSettings?.mockups || []).slice(0, 8).forEach((m) => {
+      if (m && m.url) {
+        attachments.push({
+          mediaUrl: m.url,
+          mediaName: `${tempOrderNumber} - Approved mockup ${m.color || ''} ${m.view || ''}`.trim(),
+          linkNote: 'Customer-approved designer mockup'
+        });
+      }
+    });
+
     console.log('[3-Day Order] Built attachments:', attachments.length, 'attachment(s)');
+
+    // Human-readable placement spec for the press operator (mirrors the
+    // designer's inch-based, top-center-anchored placement contract).
+    function placementLine(label, p) {
+      if (!p) return null;
+      const horiz = !p.xIn ? 'centered'
+        : (p.xIn > 0 ? `${Math.abs(p.xIn).toFixed(2)}in right of center` : `${Math.abs(p.xIn).toFixed(2)}in left of center`);
+      const dims = p.hIn ? `${p.wIn}w x ${p.hIn}h in` : `${p.wIn}in wide`;
+      const dpi = p.effectiveDpi ? `, ${p.effectiveDpi} DPI${p.lowDpiAck ? ' (CUSTOMER ACCEPTED LOW-RES)' : ''}` : '';
+      const proof = p.previewable === false ? ' — FILE NOT PREVIEWABLE, MATCH PLACEMENT + SEND PROOF' : '';
+      return `${label}: art ${dims}, ${horiz}, ${Number(p.yIn).toFixed(2)}in below print-area top${dpi}. Print from ${p.fileName || 'uploaded file'}.${proof}`;
+    }
+    const placement = orderSettings?.placement || {};
+    const placementLines = [
+      placementLine(`FRONT - ${frontLocationName}`, placement.front),
+      printLocation.indexOf('_FB') !== -1 ? placementLine('BACK - Full Back', placement.back) : null,
+    ].filter(Boolean);
+    const placementBlock = placementLines.length
+      ? `\nPRINT PLACEMENT (from the customer's live designer, top-center anchor):\n${placementLines.join('\n')}\n`
+      : '';
+    const artReviewBanner = orderSettings?.needsArtReview
+      ? '\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; 3-day clock starts at proof approval ***\n'
+      : '';
+    const shipPromiseLine = orderSettings?.shipPromise?.label
+      ? `\nPROMISED SHIP DATE: ${orderSettings.shipPromise.label} (stamped at checkout)\n`
+      : '';
+
+    // Tax labeling — rate comes from the order (DOR destination lookup),
+    // never assume Milton 10.1 (legacy bug mislabeled out-of-town orders).
+    const taxRateNum = Number(orderTotals?.taxRate);
+    const taxPct = Number.isFinite(taxRateNum) && taxRateNum > 0
+      ? String(Math.round(taxRateNum * 10000) / 100) : null;
+    const taxPartNumber = taxPct ? `Tax_${taxPct}` : 'Tax_0';
+    const taxPartDescription = taxPct
+      ? `${orderTotals?.taxAccountName || 'WA Sales Tax'} ${taxPct}%${orderTotals?.taxAccount ? ` (acct ${orderTotals.taxAccount})` : ''}`
+      : 'No sales tax (out of state)';
 
     // Transform to ManageOrders API format
     const manageOrdersPayload = {
@@ -1835,7 +2321,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
       notes: [{
         type: 'Notes On Order',
         note: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.
-${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}
+${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${shipPromiseLine}${placementBlock}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
 Phone: ${customerData.phone}
@@ -1849,14 +2335,17 @@ Stripe Session: ${stripeSessionId || 'N/A'}
 Payment Amount: $${paymentAmount ? (paymentAmount / 100).toFixed(2) : orderTotals?.grandTotal || 0}
 Payment Status: ${paymentConfirmed ? 'succeeded' : 'pending'}
 
-Total: $${orderTotals?.grandTotal || 0} (includes sales tax 10.1%)`
+Total: $${orderTotals?.grandTotal || 0}${taxPct ? ` (includes ${taxPct}% sales tax${customerData.deliveryMethod === 'pickup' ? ', Milton pickup' : ''})` : ' (no sales tax - out of state)'}
+TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shipment'}`
       }],
       rushOrder: true,
       printLocation: orderSettings?.printLocationName || 'Left Chest',
-      // Tax fields - proxy expects at root level (not nested in totals)
+      // Tax fields - proxy expects at root level (not nested in totals).
+      // 3DT pushes REAL tax (unlike Order Form's TaxTotal=0) — rate + account
+      // come from the order's DOR destination lookup, not a Milton constant.
       taxTotal: orderTotals?.salesTax || 0,
-      taxPartNumber: 'Tax_10.1',
-      taxPartDescription: 'City of Milton Sales Tax 10.1%',
+      taxPartNumber: taxPartNumber,
+      taxPartDescription: taxPartDescription,
       // Shipping - proxy expects at root level
       cur_Shipping: orderTotals?.shipping || 0,
       totals: {

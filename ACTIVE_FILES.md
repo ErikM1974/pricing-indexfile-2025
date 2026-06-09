@@ -151,16 +151,24 @@
 | `/pages/js/thread-color-picker.js` | **NEW** Thread color picker modal — searchable RA catalog (~866 colors), family tabs, swatch grid | Vanilla JS, calls /api/embroidery/palette | ✅ Active |
 | `/pages/css/thread-color-picker.css` | **NEW** Thread color picker modal dark theme styles (overlay, search, family tabs, color grid) | CSS variables | ✅ Active |
 
-### 3-Day Tees System
+### 3-Day Tees System (design-studio rebuild 2026-06-09)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/3-day-tees.html` | 3-Day Tees ordering page (Stripe checkout) | 3-day-tees.js, 3-day-tees-redesign.css | ✅ Active |
-| `/pages/3-day-tees-success.html` | Post-purchase success/confirmation page | — | ✅ Active |
-| `/pages/js/3-day-tees.js` | 3-Day Tees order logic, Stripe integration, cart | ApiService.js, InventoryService.js | ✅ Active |
-| `/pages/css/3-day-tees-redesign.css` | 3-Day Tees page styles | — | ✅ Active |
-| `/pages/js/services/ApiService.js` | API service for 3-Day Tees (product, inventory, orders) | — | ✅ Active |
-| `/pages/js/services/InventoryService.js` | Inventory service for 3-Day Tees real-time stock | — | ✅ Active |
-| `/pages/js/utils/debounce.js` | Debounce utility for 3-Day Tees search | — | ✅ Active |
+| `/pages/3-day-tees.html` | 3-Day Tees design studio — single-page designer→colors→checkout flow, Stripe hosted checkout | 3-day-tees-app.js + modules below, 3-day-tees.css, app.config.js | ✅ Active |
+| `/pages/3-day-tees-success.html` | Post-payment confirmation — polls quote session, EmailJS confirmations, mockups + promise date | 3-day-tees-success.js, 3-day-tees-success.css | ✅ Active |
+| `/pages/js/3-day-tees-app.js` | App core: state + sessionStorage restore, API loads, UI renderers, 4-step checkout pipeline | TDTPricing/TDTShipDate/TDTCalibration/TDTDesigner | ✅ Active |
+| `/pages/js/3-day-tees-pricing.js` | PURE pricing engine (quote/unitPrice) — also require()d by server.js for the authoritative reprice | — (dual browser/Node) | ✅ Active |
+| `/pages/js/3-day-tees-shipdate.js` | PURE ship-promise engine (9AM Pacific cutoff, holiday calendar → 2032) — also require()d by server.js | — (dual browser/Node) | ✅ Active |
+| `/pages/js/3-day-tees-calibration.js` | Print-area calibration (pixel-measured PC54 ghost shots, LC/FF/FB rects in image fractions) | — | ✅ Active |
+| `/pages/js/3-day-tees-designer.js` | Canvas designer component: drag/pinch/keyboard placement in inches, per-color preview, hi-res mockup export | TDTCalibration, /api/image-proxy | ✅ Active |
+| `/pages/js/3-day-tees-success.js` | Success-page logic (status polling w/ refresh=true, EmailJS once-guard) | TDTShipDate, app.config.js | ✅ Active |
+| `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
+| `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
+| `/tests/unit/3dt-pricing.test.js` | Behavioral spec: 7-step formula, sub-24 cost fallback, LTM, tax base | jest | ✅ Active |
+| `/tests/unit/3dt-shipdate.test.js` | Behavioral spec: cutoff/weekend/holiday/PST-PDT matrix | jest | ✅ Active |
+| `/tests/3dt-test-push-payload.json` | Reference webhook-equivalent payload for ManageOrders TEST pushes | — | ✅ Active |
+
+> Deleted 2026-06-09 (legacy implementation): `/pages/js/3-day-tees.js`, `/pages/js/3-day-tees-debug.js`, `/pages/css/3-day-tees-redesign.css`, `/pages/js/services/ApiService.js`, `/pages/js/services/InventoryService.js`, `/pages/js/utils/debounce.js`, `/tests/test-3day-{inventory,multisku}.js`, `/tests/3-day-tees-{redesign-demo,performance-test}.html`, `/tests/3-day-tees-inventory-summary.md`. Recovery: `git show HEAD~1:<path>`.
 
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
