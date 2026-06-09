@@ -117,30 +117,46 @@ ONE version per deploy applied uniformly. No per-file divergence.
 
 ### Step 2 — Cache-bust auto-bump
 
-1. Identify changed JS/CSS (both committed-vs-remote and working-tree dirty):
+1. Identify changed JS/JSX/CSS (both committed-vs-remote and working-tree dirty):
 
 ```bash
-CHANGED_ASSETS=$( (git diff --name-only origin/develop HEAD -- '*.js' '*.css'; \
-                   git status --porcelain | awk '/\.(js|css)$/ {print $2}') | sort -u )
+CHANGED_ASSETS=$( (git diff --name-only origin/develop HEAD -- '*.js' '*.jsx' '*.css'; \
+                   git status --porcelain | awk '/\.(jsx?|css)$/ {print $2}') | sort -u )
 ```
+
+**`.jsx` MUST be included** (`*.jsx` pathspec + `jsx?` in the regex). The order form
+(`pages/order-form/`) is built from in-browser-Babel `.jsx` files referenced with `?v=`
+in `order-form.html`. A `(js|css)` filter silently skips them, so the deploy ships new
+`.jsx` that reps' browsers never load (stale cache) — a silent "deployed but nothing
+changed" failure (caught 2026-06-09).
 
 2. For each changed asset, find HTML refs and replace with `perl -i` (cross-platform — works in Windows git-bash, macOS, Linux; GNU `sed -i` does not):
 
 ```bash
 BUMPED_HTML=""
 for ASSET in $CHANGED_ASSETS; do
-  BASENAME=$(basename "$ASSET")
-  for HTML in $(grep -rl --include="*.html" "${BASENAME}?v=" .); do
-    perl -i -pe "s|(\Q${BASENAME}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
+  # Match on the LAST TWO path segments (e.g. "pricing/shared.js"), NOT the bare
+  # basename. Basenames like shared.js / print.css / index.js / utils.js collide
+  # across apps — a basename bump rewrites the ?v= of UNRELATED pages that
+  # reference a different file with the same name (caught 2026-06-09: an
+  # order-form pricing/shared.js change bumped 8 dashboards' shared.js). HTML refs
+  # are relative (e.g. "order-form/pricing/shared.js?v="), so a 2-segment suffix
+  # is specific enough to hit the right ref and skip same-name lookalikes.
+  # Last two path segments, pure-bash (NO `rev`/`cut` — `rev` is absent in
+  # Windows git-bash, the deploy host; an empty MATCH would bump EVERY ?v=).
+  BASE="${ASSET##*/}"; DIR="${ASSET%/*}"
+  if [ "$DIR" = "$ASSET" ]; then MATCH="$BASE"; else MATCH="${DIR##*/}/$BASE"; fi
+  for HTML in $(grep -rl --include="*.html" "${MATCH}?v=" .); do
+    perl -i -pe "s|(\Q${MATCH}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
     BUMPED_HTML="$BUMPED_HTML $HTML"
-    echo "  bumped $BASENAME in $HTML → ?v=${DEPLOY_VERSION}"
+    echo "  bumped ${MATCH} in $HTML → ?v=${DEPLOY_VERSION}"
   done
 done
 ```
 
-The regex `[^"' >]+` matches alphanumeric and any suffix format — `20260424b`, `v15`, `1.2.3-rc1` all replaced cleanly.
+The regex `[^"' >]+` matches alphanumeric and any suffix format — `20260424b`, `v15`, `1.2.3-rc1` all replaced cleanly. `\Q…\E` quotes the match token so the `/` and `.` in the 2-segment suffix are literal.
 
-If no JS/CSS files changed, skip this step.
+If no JS/JSX/CSS files changed, skip this step.
 
 ### Step 3 — Stage changes precisely
 
@@ -164,9 +180,12 @@ Catch it BEFORE committing:
 
 ```bash
 ORPHAN=""
-for ASSET in $(git ls-files --others --exclude-standard -- '*.js' '*.css'); do
-  BN=$(basename "$ASSET")
-  if grep -rqs --include="*.html" "$BN" .; then ORPHAN="$ORPHAN $ASSET"; fi
+for ASSET in $(git ls-files --others --exclude-standard -- '*.js' '*.jsx' '*.css'); do
+  # Same 2-segment match as Step 2 (pure-bash, no `rev`) — a bare basename would
+  # false-positive on a same-name file in another dir and abort spuriously. Incl .jsx.
+  BASE="${ASSET##*/}"; DIR="${ASSET%/*}"
+  if [ "$DIR" = "$ASSET" ]; then MATCH="$BASE"; else MATCH="${DIR##*/}/$BASE"; fi
+  if grep -rqs --include="*.html" "$MATCH" .; then ORPHAN="$ORPHAN $ASSET"; fi
 done
 if [ -n "$ORPHAN" ]; then
   echo "✗ DEPLOY ABORTED — untracked asset(s) referenced by HTML (would 404 in prod):"
