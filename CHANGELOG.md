@@ -1,3 +1,7 @@
+## v2026.06.10.3 (2026.06.10)
+
+- Deploy v2026.06.10.3: 3 files (dtg-quote-builder.html,dtg-inline-form.js,dtg-quote-page.js,)
+
 ## v2026.06.10.2 (2026.06.10)
 
 - feat(dtf): unsaved-changes tracking + leave-page guard (EMB/SCP parity)
