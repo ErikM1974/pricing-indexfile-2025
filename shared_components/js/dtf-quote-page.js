@@ -840,6 +840,11 @@ function selectColor(rowId, optionEl) {
     // Focus first size
     const firstSize = row.querySelector('.size-input:not(.xxxl-picker-btn)');
     if (firstSize) firstSize.focus();
+
+    // Color pick is a click — no input/change event for the tbody dirty-tracking
+    // delegation to catch. Edit-load also calls this, but loadQuoteForEditing()
+    // clears the flag with its trailing markAsSaved(). (2026-06-10)
+    if (window.dtfQuoteBuilder) window.dtfQuoteBuilder.markAsUnsaved();
 }
 
 /**
