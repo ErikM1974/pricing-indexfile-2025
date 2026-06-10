@@ -11,6 +11,10 @@
  *   3. On first confirmed status: send the customer + staff EmailJS
  *      confirmations ONCE (sessionStorage guard), from the Caspio JSON blobs
  *      (NOT browser state — works even if the tab was reopened).
+ *      2026-06-10: the Stripe webhook is now the AUTHORITATIVE sender — when
+ *      it stamps orderSettings.emailsSentAt, this page skips sending. Browser
+ *      sends remain the FALLBACK for when the stamp is absent (webhook email
+ *      failure, missing EmailJS env keys on the server).
  *
  * The quote row lookup uses ?quoteID= + .find(QuoteID===id) — never
  * sessions[0] (the 2026-06-01 wrong-quote lesson).
@@ -197,6 +201,16 @@
         emailed = true;
 
         const { customerData, colorConfigs, orderTotals, orderSettings } = parseBlobs(row);
+
+        // Webhook-authoritative sends (2026-06-10): the Stripe webhook sends
+        // both confirmation emails server-side and stamps emailsSentAt into
+        // OrderSettingsJSON before flipping the status. Stamp present →
+        // nothing to do here; absent → browser fallback sends as before.
+        if (orderSettings.emailsSentAt) {
+            console.log('[CTS Success] Emails already sent by webhook at', orderSettings.emailsSentAt, '— skipping browser sends');
+            return;
+        }
+
         if (!customerData.email) return;
 
         // Product name from the server-stamped order settings (multi-style);
@@ -284,6 +298,13 @@
             company_phone: '253-922-5793',
             reply_to: 'sales@nwcustomapparel.com',
         };
+
+        // Order-status link (token stamped into OrderSettingsJSON by the
+        // Stripe webhook). Absent token → omit the param; the template's
+        // {{order_status_url}} placeholder renders unresolved, acceptable.
+        if (orderSettings.statusToken) {
+            base.order_status_url = `${location.origin}/order-status?id=${encodeURIComponent(row.QuoteID)}&t=${encodeURIComponent(orderSettings.statusToken)}`;
+        }
 
         try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch (_) { /* already init */ }
         emailjs.send(EMAILJS_SERVICE, 'template_sample_customer', Object.assign({

@@ -7,6 +7,7 @@ const compression = require('compression');
 const stripe = require('stripe');
 const rateLimit = require('express-rate-limit');
 const session = require('express-session');
+const crypto = require('crypto');
 
 // 3-Day Tees shared modules — the SAME files the browser loads, so the
 // server-side authoritative reprice + binding ship-date stamp can never
@@ -48,6 +49,10 @@ dotenv.config();
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
 //   POST /api/three-day-tees/shipping-estimate — SHARED; accepts styleNumber for per-style UPS weight
+//   (webhook above ALSO sends the customer+sales confirmation emails server-side via EmailJS REST
+//    and stamps statusToken/emailsSentAt into OrderSettingsJSON — browser sends are fallback, 2026-06-10)
+//   GET  /order-status[.html]               — customer order-status page (HMAC-token link from the confirmation email, no login)
+//   GET  /api/order-status/:quoteId?t=      — token-gated customer-safe status JSON (timing-safe HMAC check; 404 on bad token)
 //
 // ONLINE ORDER FORM
 //   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
@@ -541,6 +546,228 @@ function alert3DT(text) {
   }).catch(() => {/* alerting must never throw */});
 }
 
+// ── Shared quote_sessions row fetch (webhook + order-status page) ───────────
+// refresh=true bypasses the proxy's 5-min lookup cache — a stale [] would
+// orphan a PAID order and a stale Status would break idempotency. Exact-match
+// the QuoteID — never rows[0] (the 2026-06-01 wrong-quote lesson). Throws on
+// a failed lookup (err.httpStatus carries the upstream code) so callers can
+// distinguish "no record" (resolves null) from "lookup unavailable" (throws).
+async function fetchQuoteSessionRow(quoteID) {
+  const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
+  const resp = await fetch(url);
+  if (!resp.ok) {
+    const err = new Error(`Quote lookup failed: HTTP ${resp.status}`);
+    err.httpStatus = resp.status;
+    throw err;
+  }
+  const rows = await resp.json();
+  const list = Array.isArray(rows) ? rows : (rows && rows.data) || [];
+  return list.find((s) => s.QuoteID === quoteID) || null;
+}
+
+// ── Customer order-status tokens (Feature B, 2026-06-10) ────────────────────
+// URL = the credential: /order-status?id=<QuoteID>&t=<first 12 hex chars of
+// HMAC-SHA256(quoteID, ORDER_STATUS_SECRET)>. No secret configured → tokens
+// simply don't exist (the API answers 503; we NEVER validate against a
+// hardcoded fallback secret).
+function computeOrderStatusToken(quoteID) {
+  const secret = process.env.ORDER_STATUS_SECRET;
+  if (!secret) return null;
+  return crypto.createHmac('sha256', secret).update(String(quoteID)).digest('hex').slice(0, 12);
+}
+
+const PUBLIC_SITE_ORIGIN = 'https://www.teamnwca.com';
+function buildOrderStatusUrl(quoteID, token) {
+  return `${PUBLIC_SITE_ORIGIN}/order-status?id=${encodeURIComponent(quoteID)}&t=${encodeURIComponent(token)}`;
+}
+
+// ── Server-authoritative order-confirmation emails (Feature A, 2026-06-10) ──
+// The Stripe webhook is the authoritative sender — a buyer who closes the tab
+// before the success page polls no longer loses the confirmation. The browser
+// (custom-tees-success.js sendEmailsOnce) stays as FALLBACK when the
+// orderSettings.emailsSentAt stamp is absent. This is a faithful server-side
+// port of that function's template params — keep the two in sync.
+// Service id is hardcoded to match the browser sender: the EMAILJS_SERVICE_ID
+// env var points at a DIFFERENT service in the same account — do not use it.
+const ORDER_EMAILJS_SERVICE = 'service_1c4k67j';
+const EMAILJS_SEND_URL = 'https://api.emailjs.com/api/v1.0/email/send';
+
+function escapeHTMLSrv(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+  }[c]));
+}
+const moneySrv = (v) => '$' + (Number(v) || 0).toFixed(2);
+
+// Builds the shared template params for template_sample_customer +
+// template_sample_sales from the Caspio row's JSON blobs. Returns
+// { params, customerEmail } or null when the row has no customer email.
+function buildOrderConfirmationParams(quoteSession, stripeSessionId, orderStatusUrl) {
+  const parse = (s) => { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } };
+  const customerData = parse(quoteSession.CustomerDataJSON);
+  const colorConfigs = parse(quoteSession.ColorConfigsJSON);
+  const orderTotals = parse(quoteSession.OrderTotalsJSON);
+  const orderSettings = parse(quoteSession.OrderSettingsJSON);
+  if (!customerData.email) return null;
+
+  const esc = escapeHTMLSrv;
+  const money = moneySrv;
+  const quoteID = quoteSession.QuoteID;
+  const sessionId = String(stripeSessionId || '');
+
+  // Product name from the server-stamped order settings (multi-style);
+  // legacy rows without one fall back to the PC54 name.
+  const productLabel = esc(orderSettings.styleName || 'Port & Company Core Cotton Tee')
+    + (orderSettings.rush ? ' <strong>(3-Day Rush)</strong>' : '');
+  let productsTable = '<table><thead><tr><th>Product</th><th>Color</th><th>Size</th><th>Qty</th><th>Price</th></tr></thead><tbody>';
+  Object.values(colorConfigs || {}).forEach((config) => {
+    Object.entries((config && config.sizeBreakdown) || {}).forEach(([size, sd]) => {
+      if (sd && sd.quantity > 0) {
+        productsTable += `<tr><td>${productLabel}</td><td>${esc(config.displayColor)}</td>` +
+          `<td>${esc(size)}</td><td>${sd.quantity}</td><td>${money(sd.unitPrice)}</td></tr>`;
+      }
+    });
+  });
+  productsTable += '</tbody></table>';
+
+  const paymentConfirmation =
+    `<div class="alert-success"><strong>✓ Payment Confirmed</strong><br>` +
+    `<span style="font-size:14px;">Amount: ${money(orderTotals.grandTotal)}</span><br>` +
+    `<span style="font-size:12px;color:#6b7280;">Stripe Session: ${esc(sessionId.substring(0, 20))}…</span></div>`;
+
+  const messageSection = customerData.notes
+    ? `<div class="section"><h2>📝 Special Instructions</h2><p style="background:#f9fafb;padding:15px;border-radius:6px;border-left:4px solid #2d5f3f;">${esc(customerData.notes)}</p></div>`
+    : '';
+
+  // Ship promise + delivery section (server-stamped — never recomputed)
+  const sp = orderSettings.shipPromise || {};
+  const shipPromiseLabel = sp.rangeLabel || sp.label || '7–10 business days';
+  const isPickup = customerData.deliveryMethod === 'pickup';
+  const deliverySection = isPickup
+    ? '<p><strong>Pickup</strong> — 2025 Freeman Rd E, Milton, WA 98354<br>' +
+      '<span style="font-size:13px;color:#6b7280;">We’ll call you the moment your order is ready.</span></p>'
+    : `<p><strong>Ship to (UPS Ground):</strong><br>` +
+      `${esc(`${customerData.firstName || ''} ${customerData.lastName || ''}`.trim())}<br>` +
+      `${esc(customerData.address1 || '')}<br>` +
+      `${esc(customerData.city || '')}, ${esc(customerData.state || '')} ${esc(customerData.zip || '')}</p>`;
+
+  // Money rows that make Subtotal → Total visibly foot. Empty string when the
+  // row doesn't apply so the template row collapses. A SHIP order with $0
+  // shipping is free-over-threshold → show FREE.
+  const totRow = (label, txt) =>
+    `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:14px;">` +
+    `<span>${label}</span><span>${txt}</span></div>`;
+  const shippingRow = isPickup ? ''
+    : totRow('UPS Ground shipping', orderTotals.shipping > 0 ? money(orderTotals.shipping) : 'FREE');
+  const taxRow = orderTotals.salesTax > 0 ? totRow('Sales tax', money(orderTotals.salesTax)) : '';
+  const ltmRow = orderTotals.ltmFee > 0 ? totRow('Small-batch fee', money(orderTotals.ltmFee)) : '';
+
+  const mailSubject = encodeURIComponent(`Order ${quoteID} — question or change`);
+  const questionsCta =
+    `<p style="font-size:13px;color:#374151;">Questions or changes? Call 253-922-5793 or email ` +
+    `<a href="mailto:sales@nwcustomapparel.com?subject=${mailSubject}">sales@nwcustomapparel.com</a> — ` +
+    `mention order ${esc(quoteID)}. Changes are free until we print.</p>`;
+
+  // Customer-typed fields are escaped — these land in HTML email bodies.
+  const params = {
+    order_number: esc(quoteID),
+    customer_name: esc(`${customerData.firstName || ''} ${customerData.lastName || ''}`.trim()),
+    customer_email: esc(customerData.email),
+    customer_phone: esc(customerData.phone || ''),
+    company_name: esc(customerData.company || ''),
+    print_location: esc(orderSettings.printLocationName || 'Left Chest'),
+    payment_confirmation: paymentConfirmation,
+    products_table: productsTable,
+    subtotal: money(orderTotals.subtotal),
+    total: money(orderTotals.grandTotal),
+    ship_promise: esc(shipPromiseLabel),
+    delivery_section: deliverySection,
+    shipping_row: shippingRow,
+    tax_row: taxRow,
+    ltm_row: ltmRow,
+    rush_flag: orderSettings.rush ? '3-DAY RUSH' : '',
+    // HTML banner block — yellow rush callout on rush orders, empty
+    // (collapses) on standard ones. Templates render {{{rush_banner}}}
+    // so ONE template serves both modes (EmailJS has no conditionals).
+    rush_banner: orderSettings.rush
+      ? '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;margin:14px 0;">' +
+        '<strong style="color:#92400e;">⚡ 3-Day Rush Service</strong>' +
+        '<span style="font-size:13px;color:#92400e;"> — this order is on the rush production schedule.</span></div>'
+      : '',
+    questions_cta: questionsCta,
+    message_section: messageSection,
+    company_phone: '253-922-5793',
+    reply_to: 'sales@nwcustomapparel.com',
+  };
+  // Status-page link (Feature B). Omitted when no token — the template's
+  // {{order_status_url}} placeholder renders unresolved, which is acceptable.
+  if (orderStatusUrl) params.order_status_url = orderStatusUrl;
+
+  return { params, customerEmail: customerData.email };
+}
+
+// One EmailJS REST send with an 8s timeout. Throws on failure — callers
+// catch; email errors must NEVER block the webhook or the ShopWorks push.
+async function sendEmailJSTemplate(templateId, templateParams) {
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), 8000);
+  try {
+    const resp = await fetch(EMAILJS_SEND_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        service_id: ORDER_EMAILJS_SERVICE,
+        template_id: templateId,
+        user_id: process.env.EMAILJS_PUBLIC_KEY,
+        accessToken: process.env.EMAILJS_PRIVATE_KEY,
+        template_params: templateParams,
+      }),
+      signal: ctl.signal,
+    });
+    if (!resp.ok) {
+      const body = await resp.text().catch(() => '');
+      throw new Error(`EmailJS HTTP ${resp.status}: ${body.slice(0, 200)}`);
+    }
+    return true;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Sends BOTH confirmation emails (customer + sales) in parallel. Fail-soft:
+// missing env keys → one warn + skip (local dev; browser fallback sends);
+// send errors → console.error, never throw. Returns { customerOk, salesOk }.
+async function sendOrderConfirmationEmails(quoteSession, stripeSessionId, statusToken) {
+  if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
+    console.warn('[Webhook] EMAILJS_PUBLIC_KEY / EMAILJS_PRIVATE_KEY not set — skipping server-side confirmation emails (browser fallback will send).');
+    return { customerOk: false, salesOk: false };
+  }
+  const orderStatusUrl = statusToken ? buildOrderStatusUrl(quoteSession.QuoteID, statusToken) : null;
+  const built = buildOrderConfirmationParams(quoteSession, stripeSessionId, orderStatusUrl);
+  if (!built) {
+    console.warn('[Webhook] No customer email on', quoteSession.QuoteID, '— skipping confirmation emails.');
+    return { customerOk: false, salesOk: false };
+  }
+  const { params, customerEmail } = built;
+  const [customerOk, salesOk] = await Promise.all([
+    sendEmailJSTemplate('template_sample_customer', Object.assign({
+      to_email: customerEmail,
+      to_name: params.customer_name,
+    }, params)).then(
+      () => { console.log('[Webhook] ✓ Customer confirmation email sent for', quoteSession.QuoteID); return true; },
+      (e) => { console.error('[Webhook] Customer confirmation email failed for', quoteSession.QuoteID, ':', e.message); return false; }
+    ),
+    sendEmailJSTemplate('template_sample_sales', Object.assign({
+      to_email: 'erik@nwcustomapparel.com',
+      to_name: 'NWCA Sales',
+    }, params)).then(
+      () => { console.log('[Webhook] ✓ Sales confirmation email sent for', quoteSession.QuoteID); return true; },
+      (e) => { console.error('[Webhook] Sales confirmation email failed for', quoteSession.QuoteID, ':', e.message); return false; }
+    ),
+  ]);
+  return { customerOk, salesOk };
+}
+
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -586,24 +813,19 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       console.log('[Webhook] Processing payment for QuoteID:', quoteID);
 
       // Check idempotency - has this webhook already been processed?
-      // refresh=true bypasses the proxy's 5-min lookup cache — a stale []
-      // here would orphan a PAID order (cache primed by the pre-create
-      // uniqueness check), and a stale Status would break idempotency.
-      const checkUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
-      const checkResponse = await fetch(checkUrl);
-      if (!checkResponse.ok) {
+      // fetchQuoteSessionRow: refresh=true bypasses the proxy's 5-min lookup
+      // cache (a stale [] here would orphan a PAID order) and exact-matches
+      // the QuoteID — never sessions[0] (the 2026-06-01 wrong-quote lesson).
+      let matched;
+      try {
+        matched = await fetchQuoteSessionRow(quoteID);
+      } catch (lookupErr) {
         // A FAILED lookup is not "no record" — return 5xx so Stripe RETRIES
         // the webhook (transient Caspio outages must self-heal, not orphan a
         // paid order behind a misleading no-record alert).
-        console.error('[Webhook] Quote lookup failed with HTTP', checkResponse.status, '— asking Stripe to retry');
+        console.error('[Webhook] Quote lookup failed:', lookupErr.message, '— asking Stripe to retry');
         return res.status(503).send('Quote lookup unavailable — retry');
       }
-      const quoteSessions = await checkResponse.json();
-
-      // Exact-match the QuoteID — never sessions[0] (the 2026-06-01
-      // wrong-quote lesson: an unfiltered list once made [0] a DIFFERENT order).
-      const sessionList = Array.isArray(quoteSessions) ? quoteSessions : (quoteSessions?.data || []);
-      const matched = sessionList.find(s => s.QuoteID === quoteID);
 
       if (!matched) {
         // Customer PAID but we have no order record — this must never be silent.
@@ -629,15 +851,46 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
           return res.json({ received: true, status: 'stuck-payment-confirmed' });
         }
 
-        // Update status to Payment Confirmed
+        // ── Server-authoritative confirmation emails (2026-06-10) ──────────
+        // Sent HERE (not the success page) so a closed tab can't lose the
+        // confirmation. Payment is already verified (signature + idempotency
+        // checks above) and the params come from the Caspio blobs, so this
+        // runs BEFORE the ShopWorks push — i.e. regardless of push outcome —
+        // and BEFORE the status flips to 'Payment Confirmed', so the success
+        // page's poller always sees the emailsSentAt dedup stamp together
+        // with a confirmed status (no duplicate-send race). Fail-soft: email
+        // errors never block the webhook or the push; when the stamp is
+        // absent the success page falls back to browser sends.
+        const statusToken = computeOrderStatusToken(quoteID); // null when ORDER_STATUS_SECRET unset
+        let emailResult = { customerOk: false, salesOk: false };
+        try {
+          emailResult = await sendOrderConfirmationEmails(quoteSession, session.id, statusToken);
+        } catch (emailErr) {
+          console.error('[Webhook] Confirmation email step failed (non-fatal):', emailErr);
+        }
+
+        // Merge the dedup stamp + order-status token into OrderSettingsJSON,
+        // preserving every existing key (the success page, push transformer
+        // and status API all read this blob).
+        let mergedSettingsJSON = null;
+        try {
+          const settings = JSON.parse(quoteSession.OrderSettingsJSON || '{}');
+          if (statusToken) settings.statusToken = statusToken;
+          if (emailResult.customerOk) settings.emailsSentAt = new Date().toISOString();
+          if (statusToken || emailResult.customerOk) mergedSettingsJSON = JSON.stringify(settings);
+        } catch (mergeErr) {
+          console.error('[Webhook] Could not merge OrderSettingsJSON stamps (non-fatal):', mergeErr.message);
+        }
+
+        // Update status to Payment Confirmed (+ email/status-token stamps)
         const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${quoteSession.PK_ID}`;
         await fetch(updateUrl, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify(Object.assign({
             Status: 'Payment Confirmed',
             Notes: `${quoteSession.Notes}\nPayment Confirmed: ${new Date().toISOString()}\nStripe Payment Intent: ${session.payment_intent}\nAmount: $${(session.amount_total / 100).toFixed(2)}`
-          })
+          }, mergedSettingsJSON ? { OrderSettingsJSON: mergedSettingsJSON } : {}))
         });
 
         console.log('[Webhook] ✓ Payment confirmed for:', quoteID);
@@ -1871,6 +2124,122 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
 // .html alias; the success page resolves via the static /pages mount.
 app.get(['/custom-tees', '/custom-tees.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-tees.html'));
+});
+
+// ── Customer order-status page (token link, no login — 2026-06-10) ──────────
+// Linked from the confirmation emails as {{order_status_url}}. Same clean-URL
+// pattern as /custom-tees; the page uses absolute /pages/... asset paths.
+app.get(['/order-status', '/order-status.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'order-status.html'));
+});
+
+// Dedicated limiter for the status API: customers re-check this page over
+// several days. The shared strictLimiter instance pools its 20/hr bucket with
+// the ORDER SUBMISSION endpoints — riding on it would let status refreshes
+// rate-limit real checkouts from the same IP.
+const orderStatusLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 60,
+  message: { error: 'Too many requests, please try again shortly' },
+});
+
+// GET /api/order-status/:quoteId?t=<12-hex token>
+// Token = first 12 hex chars of HMAC-SHA256(quoteId, ORDER_STATUS_SECRET),
+// compared timing-safe. Returns ONLY a customer-safe projection — never
+// CustomerNumber, Notes, push payloads, internal fees/margins, or staff
+// email addresses. Wrong/missing token and missing row are indistinguishable
+// (generic 404 — no oracle).
+app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
+  try {
+    const quoteId = String(req.params.quoteId || '');
+    if (!process.env.ORDER_STATUS_SECRET) {
+      // No secret → links can't exist. NEVER validate against a hardcoded
+      // fallback secret.
+      return res.status(503).json({ error: 'status links unavailable' });
+    }
+
+    const expected = computeOrderStatusToken(quoteId);
+    const supplied = Buffer.from(String(req.query.t || ''), 'utf8');
+    const wanted = Buffer.from(expected, 'utf8');
+    if (supplied.length !== wanted.length || !crypto.timingSafeEqual(supplied, wanted)) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+
+    let row;
+    try {
+      row = await fetchQuoteSessionRow(quoteId);
+    } catch (lookupErr) {
+      console.error('[OrderStatus] Lookup failed:', lookupErr.message);
+      return res.status(503).json({ error: 'Order status temporarily unavailable' });
+    }
+    if (!row) return res.status(404).json({ error: 'Order not found' });
+
+    const parse = (s) => { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } };
+    const customerData = parse(row.CustomerDataJSON);
+    const colorConfigs = parse(row.ColorConfigsJSON);
+    const orderTotals = parse(row.OrderTotalsJSON);
+    const orderSettings = parse(row.OrderSettingsJSON);
+
+    const deliveryMethod = customerData.deliveryMethod === 'pickup' ? 'pickup' : 'ship';
+    const trackingNumber = row.TrackingNumber || null;
+
+    // Customer-safe status ladder:
+    //   TrackingNumber                         → 'shipped'
+    //   ShippedAt w/o tracking on a pickup row → 'pickup-ready-soon'
+    //   'Processed' or PushedToShopWorks       → 'in-production'
+    //   'Payment Confirmed*' (incl. SW Failed) → 'paid'  (production state is internal)
+    //   anything else                          → 'pending-payment'
+    const rawStatus = String(row.Status || '');
+    let status = 'pending-payment';
+    if (rawStatus.indexOf('Payment Confirmed') !== -1) status = 'paid';
+    if (rawStatus.indexOf('Processed') !== -1 || row.PushedToShopWorks) status = 'in-production';
+    if (trackingNumber) {
+      status = 'shipped';
+    } else if (row.ShippedAt) {
+      status = deliveryMethod === 'pickup' ? 'pickup-ready-soon' : 'shipped';
+    }
+
+    const items = [];
+    Object.values(colorConfigs || {}).forEach((config) => {
+      Object.entries((config && config.sizeBreakdown) || {}).forEach(([size, sd]) => {
+        if (sd && sd.quantity > 0) {
+          items.push({
+            color: (config && config.displayColor) || '',
+            size,
+            qty: sd.quantity,
+            unitPrice: Number(sd.unitPrice) || 0,
+          });
+        }
+      });
+    });
+
+    res.json({
+      quoteID: row.QuoteID,
+      status,
+      deliveryMethod,
+      shipPromise: orderSettings.shipPromise || null,
+      rush: !!orderSettings.rush,
+      styleName: orderSettings.styleName || 'Port & Company Core Cotton Tee',
+      items,
+      totals: {
+        subtotal: Number(orderTotals.subtotal) || 0,
+        // Customer-PAID small-batch fee (0 on baked-pricing orders, >0 on
+        // legacy rows) — included so Subtotal → Total visibly foots; the
+        // confirmation emails + success page already show this line.
+        ltmFee: Number(orderTotals.ltmFee) || 0,
+        shipping: Number(orderTotals.shipping) || 0,
+        tax: Number(orderTotals.salesTax) || 0,
+        grandTotal: Number(orderTotals.grandTotal) || 0,
+      },
+      trackingNumber,
+      shippedAt: row.ShippedAt || null,
+      mockups: Array.isArray(orderSettings.mockups) ? orderSettings.mockups : [],
+      orderDate: row.DateOrderPlaced || row.CreatedAt_Quote || row.CreatedAt || null,
+    });
+  } catch (error) {
+    console.error('[OrderStatus] Error:', error);
+    res.status(500).json({ error: 'Order status unavailable' });
+  }
 });
 
 // Brands browse page
