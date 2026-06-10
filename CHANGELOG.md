@@ -1,3 +1,7 @@
+## v2026.06.10.2 (2026.06.10)
+
+- feat(dtf): unsaved-changes tracking + leave-page guard (EMB/SCP parity)
+
 ## v2026.06.10.1 (2026.06.10)
 
 - chore: delete orphaned cap-quote-logos.js + cap-quote-products.js (zero references)
