@@ -44,7 +44,7 @@ dotenv.config();
 //   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
 //   3DT entry URLs (/pages/3-day-tees.html, /3-day-tees[.html]) → 301 /custom-tees (cutover 2026-06-10, registered BEFORE /pages static; success page NOT redirected)
 //
-// CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote)
+// CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
 //   POST /api/three-day-tees/shipping-estimate — SHARED; accepts styleNumber for per-style UPS weight
@@ -1129,6 +1129,92 @@ async function rebuildCtsQuote(colorConfigs, orderSettings, customerData) {
   };
 }
 
+// ── Custom Tees live stock gate (2026-06-10) ────────────────────────────────
+// Confirms every requested color+size quantity against live stock AFTER the
+// authoritative reprice and BEFORE the Stripe session exists. Source is
+// RUSH-AWARE (Erik 2026-06-10): Milton local stock only matters when the
+// 3-day clock can't wait for replenishment — SanMar delivers to us next-day,
+// so STANDARD 7-10-business-day orders gate on SanMar even for PC54.
+//   PC54 + RUSH   → Milton warehouse (/api/manageorders/pc54-inventory — the
+//                   same feed the page polls; ?refresh=true busts its cache)
+//   everything else (incl. PC54 standard)
+//                 → SanMar PromoStandards (/api/sanmar/inventory/:style;
+//                   partColor IS the CATALOG_COLOR mainframe code, totalQty
+//                   already summed across warehouses; proxy caches ~5 min)
+// FAIL-OPEN by design (Erik): an inventory API hiccup logs a warning and
+// stamps stockChecked:false on the order — it NEVER blocks a sale. Only a
+// CONFIRMED shortage 409s, and confirmation always re-fetches fresh first so
+// a stale 60s cache can't turn away an order that's actually in stock.
+
+const CTS_STOCK_TTL_MS = 60 * 1000;
+const _ctsStockCache = new Map();   // 'STYLE|source' → { at, value: { colors:Set, bySize:Map } }
+
+async function fetchJsonTimeout(url, ms) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) throw new Error(`HTTP ${r.status} from ${url.split('?')[0]}`);
+    return await r.json();
+  } finally {
+    clearTimeout(t);
+  }
+}
+
+// → { colors: Set<COLOR>, bySize: Map<'COLOR|SIZE', qty> } (keys uppercased).
+// `rush` picks the source: Milton only gates PC54 RUSH orders; standard
+// orders (PC54 included) gate on SanMar — we restock from them next-day.
+async function getCtsStock(styleNumber, fresh, rush) {
+  const style = String(styleNumber || '').toUpperCase();
+  const useMilton = rush === true && style === 'PC54';
+  const cacheKey = `${style}|${useMilton ? 'milton' : 'sanmar'}`;
+  const hit = _ctsStockCache.get(cacheKey);
+  if (!fresh && hit && Date.now() - hit.at < CTS_STOCK_TTL_MS) return hit.value;
+
+  const colors = new Set();
+  const bySize = new Map();
+  if (useMilton) {
+    const j = await fetchJsonTimeout(`${TDT_PROXY}/api/manageorders/pc54-inventory${fresh ? '?refresh=true' : ''}`, 5000);
+    Object.entries((j && j.colors) || {}).forEach(([color, c]) => {
+      colors.add(color.toUpperCase());
+      Object.entries((c && c.sizes) || {}).forEach(([size, qty]) => {
+        bySize.set(`${color}|${size}`.toUpperCase(), parseInt(qty, 10) || 0);
+      });
+    });
+  } else {
+    const j = await fetchJsonTimeout(`${TDT_PROXY}/api/sanmar/inventory/${encodeURIComponent(style)}`, 5000);
+    ((j && j.inventory) || []).forEach((p) => {
+      if (!p || !p.color || !p.size) return;
+      const key = `${p.color}|${p.size}`.toUpperCase();
+      colors.add(String(p.color).toUpperCase());
+      bySize.set(key, (bySize.get(key) || 0) + (parseInt(p.totalQty, 10) || 0));
+    });
+  }
+  if (!bySize.size) throw new Error(`stock feed returned no rows for ${style}`);
+  const value = { colors, bySize };
+  _ctsStockCache.set(cacheKey, { at: Date.now(), value });
+  return value;
+}
+
+// Server-sanitized cleanConfigs vs a stock snapshot → [{catalogColor,
+// displayColor, size, want, have}]. A color the feed doesn't name at all is
+// skipped (fail-open — a naming mismatch must never read as "sold out").
+function ctsStockConflicts(cleanConfigs, stock) {
+  const conflicts = [];
+  Object.values(cleanConfigs || {}).forEach((c) => {
+    const colorKey = String(c.catalogColor).toUpperCase();
+    if (!stock.colors.has(colorKey)) return;
+    Object.entries(c.sizeBreakdown || {}).forEach(([size, sd]) => {
+      const want = sd.quantity;
+      const have = stock.bySize.get(`${colorKey}|${size.toUpperCase()}`) || 0;
+      if (want > have) {
+        conflicts.push({ catalogColor: c.catalogColor, displayColor: c.displayColor, size, want, have });
+      }
+    });
+  });
+  return conflicts;
+}
+
 // → { amount, source: 'ups-estimate'|'flat', detail? }. Throws only if BOTH
 // the estimator and the 3DT-SHIP flat fallback are unavailable.
 async function resolveTdtShipping(toZip, qty) {
@@ -2088,6 +2174,37 @@ app.post('/api/create-checkout-session', async (req, res) => {
       }
     });
 
+    // ── Live stock gate (CTS only, 2026-06-10) ─────────────────────────
+    // Validate every color+size qty against live stock (helpers ~L1135)
+    // BEFORE Stripe. Source is rush-aware: PC54 RUSH gates on Milton local
+    // stock; standard orders gate on SanMar (next-day replenishment).
+    // FAIL-OPEN: a feed error/timeout logs + stamps stockChecked:false
+    // (push note flags it) — it never blocks the sale. A would-be shortage
+    // is re-confirmed on a FRESH fetch before 409ing.
+    let stockChecked = false;
+    if (isCTS) {
+      try {
+        let stock = await getCtsStock(priced.style, false, priced.rush);
+        let conflicts = ctsStockConflicts(cleanConfigs, stock);
+        if (conflicts.length) {
+          stock = await getCtsStock(priced.style, true, priced.rush);
+          conflicts = ctsStockConflicts(cleanConfigs, stock);
+        }
+        if (conflicts.length) {
+          const what = conflicts.map(c => `${c.displayColor} ${c.size} (you want ${c.want}, ${c.have} left)`).join(', ');
+          console.warn(`${chLog} STOCK_CONFLICT ${priced.style}: ${what}`);
+          return res.status(409).json({
+            error: `Some sizes just sold out: ${what}. Adjust those quantities and try again — nothing was charged.`,
+            code: 'STOCK_CONFLICT',
+            conflicts
+          });
+        }
+        stockChecked = true;
+      } catch (e) {
+        console.warn(`${chLog} Stock check unavailable for ${priced.style} — continuing unchecked (fail-open):`, e.message);
+      }
+    }
+
     // Server-stamped numbers become the order of record.
     const serverTotals = {
       totalQuantity: quote.combinedQty,
@@ -2127,7 +2244,10 @@ app.post('/api/create-checkout-session', async (req, res) => {
       styleName: priced.productName,
       rush: priced.rush,
       frontLocation: priced.frontLocation,
-      backLocation: priced.backLocation
+      backLocation: priced.backLocation,
+      // false = the live stock gate couldn't run (inventory API hiccup,
+      // fail-open) — the push note tells production to verify garments.
+      stockChecked
     } : {});
 
     // ── Unique QuoteID (random suffix used to collide same-day) ───────
@@ -2606,6 +2726,11 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const rightsLine = orderSettings?.rightsAck && orderSettings.rightsAck.checked
       ? `\nCUSTOMER ATTESTED ARTWORK RIGHTS at checkout${orderSettings.rightsAck.ts ? ` (${orderSettings.rightsAck.ts})` : ''}.\n`
       : '';
+    // Stock gate fail-open marker (2026-06-10): the checkout-time inventory
+    // check couldn't run (feed error/timeout), so garments were NOT verified.
+    const stockLine = orderSettings?.channel === 'custom-tees' && orderSettings.stockChecked === false
+      ? '\n*** STOCK NOT VERIFIED AT CHECKOUT (inventory feed was down) — confirm garment availability before production ***\n'
+      : '';
     const shipPromiseLine = orderSettings?.shipPromise?.label
       ? `\nPROMISED SHIP DATE: ${orderSettings.shipPromise.label} (stamped at checkout)\n`
       : '';
@@ -2665,7 +2790,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
         note: `${(orderSettings?.channel === 'custom-tees' && !orderSettings?.rush)
           ? 'STANDARD DTG SERVICE - 7-10 business days from artwork approval.'
           : '3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.'}
-${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${rightsLine}${shipPromiseLine}${placementBlock}
+${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${stockLine}${rightsLine}${shipPromiseLine}${placementBlock}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
 Phone: ${customerData.phone}

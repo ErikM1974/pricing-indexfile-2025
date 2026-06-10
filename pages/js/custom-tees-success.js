@@ -271,6 +271,14 @@
             tax_row: taxRow,
             ltm_row: ltmRow,
             rush_flag: orderSettings.rush ? '3-DAY RUSH' : '',
+            // HTML banner block — yellow rush callout on rush orders, empty
+            // (collapses) on standard ones. Templates render {{{rush_banner}}}
+            // so ONE template serves both modes (EmailJS has no conditionals).
+            rush_banner: orderSettings.rush
+                ? '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;margin:14px 0;">' +
+                  '<strong style="color:#92400e;">⚡ 3-Day Rush Service</strong>' +
+                  '<span style="font-size:13px;color:#92400e;"> — this order is on the rush production schedule.</span></div>'
+                : '',
             questions_cta: questionsCta,
             message_section: messageSection,
             company_phone: '253-922-5793',

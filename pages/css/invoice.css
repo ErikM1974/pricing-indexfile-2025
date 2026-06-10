@@ -552,6 +552,103 @@ body {
 }
 .invoice-payment-body a:hover { text-decoration: underline; }
 
+/* === Customer Artwork & Mockups ==========================
+ * (2026-06-10) Custom T-Shirts storefront orders only — original
+ * uploaded art + approved mockups from OrderSettingsJSON. Mounted
+ * by invoice.js renderCustomerArtwork() between the line items and
+ * the totals. Screen-only: hidden in @media print so the printed /
+ * PDF invoice stays a clean one-pager.
+ */
+
+.cust-art-section {
+  margin: 14px 0;
+  padding: 12px;
+  background: var(--inv-bg-zebra);
+  border: 1px solid var(--inv-line-soft);
+  border-radius: var(--inv-radius);
+}
+.cust-art-heading {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--inv-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cust-art-subhead {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--inv-ink-mute);
+  margin: 10px 0 8px;
+}
+.cust-art-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+.cust-art-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  background: var(--inv-bg);
+  border: 1px solid var(--inv-line-soft);
+  border-radius: var(--inv-radius);
+}
+.cust-art-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--inv-radius);
+  overflow: hidden;
+  background: var(--inv-bg);
+  border: 1px solid var(--inv-line-soft);
+  text-decoration: none;
+  color: inherit;
+}
+.cust-art-thumb:hover { border-color: var(--inv-accent); }
+.cust-art-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.cust-art-thumb-icon {
+  font-size: 32px;
+  color: var(--inv-ink-mute);
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.cust-art-meta { text-align: center; }
+.cust-art-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--inv-ink);
+  margin-bottom: 2px;
+}
+.cust-art-filename {
+  font-size: 10px;
+  color: var(--inv-ink-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+.cust-art-download {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--inv-accent);
+  text-decoration: none;
+}
+.cust-art-download:hover { text-decoration: underline; }
+
 /* === Footer ============================================== */
 
 .invoice-footer {
@@ -618,6 +715,12 @@ body {
   .invoice-loading,
   .invoice-error,
   .toolbar-sync-status {
+    display: none !important;
+  }
+
+  /* Customer artwork strip is a staff/screen aid — keep the printed
+     invoice a clean one-pager. */
+  .cust-art-section {
     display: none !important;
   }
 

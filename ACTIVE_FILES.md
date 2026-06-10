@@ -121,6 +121,7 @@
 | `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
 | `/pages/golf-tournaments-2026.html` | **NEW** Summer 2026 golf tournament campaign landing page (MailChimp funnel target) | golf-tournament-showcase.js, .css, embroidery-pricing-service.js, EmailJS | ✅ Active |
 | `/pages/golf-tournament-product.html` | **NEW** Per-style detail page (colors/sizes/full pricing) — linked from golf-tournaments-2026.html product cards | golf-tournament-product.js, .css, embroidery-pricing-service.js | ✅ Active |
+| `/memory/emailjs-custom-tees-templates.md` | **NEW** Paste-ready Subject + HTML for EmailJS `template_sample_customer`/`template_sample_sales` (Custom T-Shirts rewire of the legacy 3DT templates) + wiring checklist | EmailJS dashboard | ✅ Reference |
 | `/pages/golf-tournament-lead-emailjs-template.html` | **NEW** Reference HTML for EmailJS `template_golf_lead` (paste into EmailJS dashboard) — internal lead alert to taneisha+nika+erik | EmailJS dashboard | ✅ Reference |
 | `/pages/golf-tournament-customer-emailjs-template.html` | **NEW** Reference HTML for EmailJS `template_golf_customer` (paste into EmailJS dashboard) — customer-facing "thanks, we got your inquiry" confirmation | EmailJS dashboard | ✅ Reference |
 | `/pages/quote-view.html` | **NEW** Public quote viewing page (shareable URL) | quote-view.js, quote-view.css | ✅ Active |
