@@ -2543,7 +2543,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
       printLocation.indexOf('_FB') !== -1 ? placementLine('BACK - Full Back', placement.back) : null,
     ].filter(Boolean);
     const placementBlock = placementLines.length
-      ? `\nPRINT PLACEMENT (from the customer's live designer, top-center anchor):\n${placementLines.join('\n')}\n`
+      ? `\nPRINT PLACEMENT (customer's designer preview, top-center anchor — ADVISORY: place at the STANDARD print location for the garment; use the spec below only when it clearly deviates on purpose):\n${placementLines.join('\n')}\n`
       : '';
     const _isCtsStandard = orderSettings?.channel === 'custom-tees' && !orderSettings?.rush;
     const artReviewBanner = orderSettings?.needsArtReview

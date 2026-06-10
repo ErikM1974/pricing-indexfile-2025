@@ -102,7 +102,11 @@
         },
         flatBack: {
             areas: {
-                FB: { xFrac: 0.3471, yFrac: 0.194, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
+                // FB top raised 0.194 → 0.165 (≈1.7″ higher, ~0.5″ below the
+                // collar) so back designs can sit at the standard upper-back
+                // position. Preview is advisory — production places at the
+                // standard print location. (Erik 2026-06-10)
+                FB: { xFrac: 0.3471, yFrac: 0.165, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
                 JB: { xFrac: PC54_JF_X, yFrac: PC54_JB_Y, wFrac: PC54_JF_W, hFrac: PC54_J_H, wIn: 16, hIn: 20 },
             },
         },
@@ -125,7 +129,8 @@
             areas: {
                 // Heather BACK shots drift half as far as the fronts
                 // (torso center 0.4955 vs 0.500 — measured 2026-06-09).
-                FB: { xFrac: 0.3471 + HEATHER_SHIFT / 2, yFrac: 0.194, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
+                // yFrac matches the main FB raise (0.165). (Erik 2026-06-10)
+                FB: { xFrac: 0.3471 + HEATHER_SHIFT / 2, yFrac: 0.165, wFrac: 0.305, hFrac: 0.271, wIn: 12, hIn: 16 },
                 JB: { xFrac: PC54_JF_X + HEATHER_SHIFT / 2, yFrac: PC54_JB_Y, wFrac: PC54_JF_W, hFrac: PC54_J_H, wIn: 16, hIn: 20 },
             },
         },
@@ -150,7 +155,8 @@
     //     forces hPx = hIn × pxPerInch for generic styles) and only the
     //     yFrac anchor drifts — accepted, this is the "approximate" preview.
     // Vertical anchors (press placement rules, in inches below the collar):
-    //   LC top 3″ · FF top 3.5″ · JF top 1.5″ · FB top 4″ · JB top 2″.
+    //   LC top 3″ · FF top 3.5″ · JF top 1.5″ · FB top 2″ · JB top 2″.
+    //   (FB raised 4″→2″ — Erik 2026-06-10: back designs sit upper-back.)
     const GEN_W_PER_IN = 0.60 / 22;            // ≈ 0.02727 wFrac per inch
     const GEN_H_PER_IN = GEN_W_PER_IN;         // square-image assumption
     const GEN_FRONT_COLLAR_Y = 0.18;
@@ -181,7 +187,7 @@
         },
         flatBack: {
             areas: {
-                FB: genRect(0.50, GEN_BACK_COLLAR_Y + 4 * GEN_H_PER_IN, 'FB'),
+                FB: genRect(0.50, GEN_BACK_COLLAR_Y + 2 * GEN_H_PER_IN, 'FB'),
                 JB: genRect(0.50, GEN_BACK_COLLAR_Y + 2 * GEN_H_PER_IN, 'JB'),
             },
         },
