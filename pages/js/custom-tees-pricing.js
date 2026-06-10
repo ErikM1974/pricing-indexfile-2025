@@ -243,14 +243,18 @@
             });
         });
 
-        // LTM — EXACT internal-DTG-builder math: the matched tier's LTM_Fee
-        // (the 1-23 tier carries $50) distributed per piece with floor-to-cent,
-        // order line = perPiece × qty (12 pcs → 4.16/pc → $49.92). The fee and
-        // its threshold live on the TIER ROW (per-style bundle), not in
-        // Service_Codes — one source shared with the internal builder.
+        // LTM — internal-DTG-builder MATH (distributed per piece, floor-to-cent,
+        // order line = perPiece × qty), but the online channel charges its OWN
+        // amount: config.ltmFee (Caspio Service_Code CTS-LTM, $25 — Erik
+        // 2026-06-10: self-serve orders cost less rep time than builder quotes)
+        // overrides the tier row's LTM_Fee ($50). The tier row still decides
+        // WHEN LTM applies (its LTM_Fee > 0 means the sub-24 tier matched).
         const tierLtmFee = matchedTier ? parseFloat(matchedTier.LTM_Fee || 0) : 0;
-        const ltmPerPiece = (!empty && tierLtmFee > 0)
-            ? Math.floor((tierLtmFee / combinedQty) * 100) / 100 : 0;
+        const cfgLtm = parseFloat(cfg.ltmFee);
+        const effectiveLtmFee = (tierLtmFee > 0 && Number.isFinite(cfgLtm) && cfgLtm >= 0)
+            ? cfgLtm : tierLtmFee;
+        const ltmPerPiece = (!empty && effectiveLtmFee > 0)
+            ? Math.floor((effectiveLtmFee / combinedQty) * 100) / 100 : 0;
         const ltmFee = r2(ltmPerPiece * combinedQty);
 
         const shipFee = parseFloat(cfg.shipFee);
@@ -310,10 +314,14 @@
         const there = unitPrice(input.pricingData, input.config, next.MinQuantity,
             input.location, backLocation, refSize, rush);
 
-        // LTM threshold/fee from the TIER ROWS (same source as the order math).
+        // LTM threshold from the TIER ROWS; fee amount honors the same
+        // config.ltmFee override the order math uses (CTS-LTM online fee).
         const hereTier = findTier(input.pricingData.tiersR, combinedQty);
         const thereTier = findTier(input.pricingData.tiersR, next.MinQuantity);
-        const hereLtmFee = hereTier ? parseFloat(hereTier.LTM_Fee || 0) : 0;
+        const hereTierLtm = hereTier ? parseFloat(hereTier.LTM_Fee || 0) : 0;
+        const nudgeCfgLtm = parseFloat(input.config.ltmFee);
+        const hereLtmFee = (hereTierLtm > 0 && Number.isFinite(nudgeCfgLtm) && nudgeCfgLtm >= 0)
+            ? nudgeCfgLtm : hereTierLtm;
         const thereLtmFee = thereTier ? parseFloat(thereTier.LTM_Fee || 0) : 0;
         if (hereLtmFee > 0 && !(thereLtmFee > 0)) {
             // Crossing out of the small-batch fee: compare whole-order totals

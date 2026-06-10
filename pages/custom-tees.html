@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.7">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.11">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -177,7 +177,8 @@
                         <div class="art-drop" id="art-drop" tabindex="0" role="button" aria-describedby="drop-formats">
                             <i class="fas fa-cloud-arrow-up"></i>
                             <strong>Drop your art here</strong> <span>or click to browse</span>
-                            <small id="drop-formats">PNG · JPG · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>
+                            <small id="drop-formats">PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>
+                            <small class="drop-quality">150+ DPI recommended · transparent PNG prints best</small>
                         </div>
                         <input type="file" id="art-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden>
                         <div class="art-file" id="art-file" hidden>
@@ -261,7 +262,7 @@
                                 <input type="tel" id="f-phone" autocomplete="tel" required>
                             </div>
                             <div class="form-field">
-                                <label for="f-company">Company</label>
+                                <label for="f-company">Company / group name (optional)</label>
                                 <input type="text" id="f-company" autocomplete="organization">
                             </div>
                         </div>
@@ -284,7 +285,7 @@
                                 <span class="delivery-card-body">
                                     <i class="fas fa-truck"></i>
                                     <strong>Ship it</strong>
-                                    <small id="ship-fee-label">UPS Ground — $—</small>
+                                    <small id="ship-fee-label">UPS Ground — enter your ZIP for the exact rate</small>
                                 </span>
                             </label>
                             <label class="delivery-card">
@@ -300,7 +301,7 @@
                         <div id="pickup-card" class="pickup-card" hidden>
                             <i class="fas fa-store"></i>
                             <div>
-                                <strong>NW Custom Apparel — Milton, WA 98354</strong>
+                                <strong>NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354</strong>
                                 <p>We’ll call you the moment your order is ready. Pickup orders are taxed at the Milton rate.</p>
                             </div>
                         </div>
@@ -345,11 +346,22 @@
                         <p class="review-promise" id="review-promise"></p>
                         <div class="review-ack" id="review-ack" hidden></div>
 
+                        <div class="rights-ack" id="rights-ack-row">
+                            <label><input type="checkbox" id="rights-ack"> <span><strong>I own this artwork or have permission to print it.</strong> It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal.</span></label>
+                        </div>
+
                         <div class="pay-reasons" id="pay-reasons"></div>
                         <button type="button" class="btn btn-pay" id="pay-btn" disabled>
                             <i class="fas fa-lock"></i> <span id="pay-btn-label">Pay</span>
                         </button>
                         <p class="stripe-note"><i class="fab fa-stripe"></i> You’ll be redirected to Stripe — we never see your card number.</p>
+                        <ul class="pay-fineprint">
+                            <li>Custom goods are made just for you — no returns, but if we get it wrong (defect, wrong item), we reprint or refund, no drama.</li>
+                            <li>Change or cancel free anytime before we print — call 253-922-5793 with your order number.</li>
+                            <li>If your file needs a proof, we email it within ~2 business hours; production starts when you approve.</li>
+                            <li>We may decline artwork we can’t legally or ethically print — full refund, and we’ll tell you why.</li>
+                            <li>We use your info only to produce and ship your order — we never sell it.</li>
+                        </ul>
                     </div>
                 </section>
             </div>
@@ -390,7 +402,7 @@
     </section>
 
     <footer class="site-foot">
-        <p>© Northwest Custom Apparel · Custom T-Shirts · Milton, WA · <a href="tel:253-922-5793">253-922-5793</a> · <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+        <p>© Northwest Custom Apparel · Custom T-Shirts · 2025 Freeman Rd E, Milton, WA 98354 · <a href="tel:253-922-5793">253-922-5793</a> · <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
     </footer>
 
     <!-- ── Sticky order bar ───────────────────────────────────────── -->
@@ -451,10 +463,10 @@
 
     <!-- Config + modules (order matters). Absolute paths — see head comment. -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.7"></script>
-    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.7"></script>
-    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.7"></script>
-    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.7"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.7"></script>
+    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.11"></script>
+    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.11"></script>
+    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.11"></script>
+    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.11"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.11"></script>
 </body>
 </html>

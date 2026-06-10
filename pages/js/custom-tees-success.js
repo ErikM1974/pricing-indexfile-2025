@@ -1,8 +1,8 @@
 /**
- * 3-day-tees-success.js — post-payment page for 3-Day Tees.
+ * custom-tees-success.js — post-payment page for the Custom T-Shirts storefront.
  *
  * Flow (webhook-driven, this page only OBSERVES):
- *   1. Stripe redirects here with ?session_id=…&quote_id=3DT….
+ *   1. Stripe redirects here with ?session_id=…&quote_id=….
  *   2. Poll the quote session in Caspio every 3s (max ~75s):
  *        'Processed'                          → full success
  *        'Payment Confirmed'                  → keep polling briefly, then success
@@ -67,7 +67,7 @@
     async function poll() {
         polls++;
         let row = null;
-        try { row = await fetchSession(); } catch (e) { console.error('[3DT Success] Lookup failed:', e); }
+        try { row = await fetchSession(); } catch (e) { console.error('[CTS Success] Lookup failed:', e); }
 
         if (!row) {
             // Transient lookup failures keep polling — never bail to the
@@ -146,7 +146,10 @@
         steps.push({
             icon: customerData.deliveryMethod === 'pickup' ? 'fa-store' : 'fa-truck-fast',
             title: customerData.deliveryMethod === 'pickup' ? 'Ready for pickup' : 'Ships UPS Ground',
-            sub: promise ? `Promised: ${promise}` : (isStandard ? 'Within 7–10 business days' : 'Within 3 business days'), done: false,
+            sub: customerData.deliveryMethod === 'pickup'
+                ? '2025 Freeman Rd E, Milton, WA 98354' + (promise ? ` · Promised: ${promise}` : '')
+                : (promise ? `Promised: ${promise}` : (isStandard ? 'Within 7–10 business days' : 'Within 3 business days')),
+            done: false,
         });
         $('s-timeline').innerHTML = steps.map((s) =>
             `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}"></i>` +
@@ -157,8 +160,24 @@
                 'Our team is completing your production setup by hand — your confirmation email may take a little longer.';
         }
 
-        // A confirmed order means the studio cart is done — start fresh next time.
-        try { sessionStorage.removeItem('3dt_studio_v1'); } catch (_) { /* ok */ }
+        // Questions / changes CTA — mailto carries the order # in the subject
+        const qEl = $('s-questions');
+        if (qEl) {
+            const subj = encodeURIComponent(`Order ${row.QuoteID} — question or change`);
+            qEl.innerHTML = `Questions or changes? Call <a href="tel:253-922-5793">253-922-5793</a> ` +
+                `or email <a href="mailto:sales@nwcustomapparel.com?subject=${subj}">sales@nwcustomapparel.com</a> — ` +
+                `mention order <strong>${escapeHTML(row.QuoteID)}</strong>. Changes are free until we print.`;
+        }
+
+        // A confirmed order means the studio cart is done — start fresh next
+        // time. Clear BOTH keys: the Custom T-Shirts storefront persists under
+        // cts_studio_v1; legacy 3-Day Tees used 3dt_studio_v1. Leaving the
+        // cts key behind reloaded the already-PAID cart on "Start another
+        // order" — a double-order waiting to happen.
+        try {
+            sessionStorage.removeItem('cts_studio_v1');
+            sessionStorage.removeItem('3dt_studio_v1');
+        } catch (_) { /* ok */ }
 
         show('s-done');
     }
@@ -200,6 +219,33 @@
             ? `<div class="section"><h2>📝 Special Instructions</h2><p style="background:#f9fafb;padding:15px;border-radius:6px;border-left:4px solid #2d5f3f;">${escapeHTML(customerData.notes)}</p></div>`
             : '';
 
+        // Ship promise + delivery section (server-stamped — never recomputed)
+        const sp = orderSettings.shipPromise || {};
+        const shipPromiseLabel = sp.rangeLabel || sp.label || '7–10 business days';
+        const isPickup = customerData.deliveryMethod === 'pickup';
+        const deliverySection = isPickup
+            ? '<p><strong>Pickup</strong> — 2025 Freeman Rd E, Milton, WA 98354<br>' +
+              '<span style="font-size:13px;color:#6b7280;">We’ll call you the moment your order is ready.</span></p>'
+            : `<p><strong>Ship to (UPS Ground):</strong><br>` +
+              `${escapeHTML(`${customerData.firstName || ''} ${customerData.lastName || ''}`.trim())}<br>` +
+              `${escapeHTML(customerData.address1 || '')}<br>` +
+              `${escapeHTML(customerData.city || '')}, ${escapeHTML(customerData.state || '')} ${escapeHTML(customerData.zip || '')}</p>`;
+
+        // Money rows that make Subtotal → Total visibly foot. Empty string
+        // when the charge is zero so the template row collapses.
+        const totRow = (label, val) =>
+            `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:14px;">` +
+            `<span>${label}</span><span>${money(val)}</span></div>`;
+        const shippingRow = !isPickup && orderTotals.shipping > 0 ? totRow('UPS Ground shipping', orderTotals.shipping) : '';
+        const taxRow = orderTotals.salesTax > 0 ? totRow('Sales tax', orderTotals.salesTax) : '';
+        const ltmRow = orderTotals.ltmFee > 0 ? totRow('Small-batch fee', orderTotals.ltmFee) : '';
+
+        const mailSubject = encodeURIComponent(`Order ${row.QuoteID} — question or change`);
+        const questionsCta =
+            `<p style="font-size:13px;color:#374151;">Questions or changes? Call 253-922-5793 or email ` +
+            `<a href="mailto:sales@nwcustomapparel.com?subject=${mailSubject}">sales@nwcustomapparel.com</a> — ` +
+            `mention order ${escapeHTML(row.QuoteID)}. Changes are free until we print.</p>`;
+
         // Customer-typed fields are escaped — these land in HTML email bodies.
         const base = {
             order_number: escapeHTML(row.QuoteID),
@@ -212,9 +258,16 @@
             products_table: productsTable,
             subtotal: money(orderTotals.subtotal),
             total: money(orderTotals.grandTotal),
+            ship_promise: escapeHTML(shipPromiseLabel),
+            delivery_section: deliverySection,
+            shipping_row: shippingRow,
+            tax_row: taxRow,
+            ltm_row: ltmRow,
+            rush_flag: orderSettings.rush ? '3-DAY RUSH' : '',
+            questions_cta: questionsCta,
             message_section: messageSection,
             company_phone: '253-922-5793',
-            reply_to: 'erik@nwcustomapparel.com',
+            reply_to: 'sales@nwcustomapparel.com',
         };
 
         try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch (_) { /* already init */ }
@@ -222,23 +275,25 @@
             to_email: customerData.email,
             to_name: base.customer_name,
         }, base)).then(
-            () => console.log('[3DT Success] Customer email sent'),
-            (e) => console.error('[3DT Success] Customer email failed:', e)
+            () => console.log('[CTS Success] Customer email sent'),
+            (e) => console.error('[CTS Success] Customer email failed:', e)
         );
         emailjs.send(EMAILJS_SERVICE, 'template_sample_sales', Object.assign({
             to_email: 'erik@nwcustomapparel.com',
             to_name: 'NWCA Sales',
         }, base)).then(
-            () => console.log('[3DT Success] Staff email sent'),
-            (e) => console.error('[3DT Success] Staff email failed:', e)
+            () => console.log('[CTS Success] Staff email sent'),
+            (e) => console.error('[CTS Success] Staff email failed:', e)
         );
     }
 
     // ── Go ──────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', () => {
         if (!quoteID) {
+            // No order reference — we can't claim anything is "recorded".
+            // The only thing we KNOW is that Stripe holds any payment safely.
             $('s-error-msg').textContent = 'This page needs an order reference in the link. ' +
-                'If you just paid, your payment is safe — call us and we’ll confirm your order.';
+                'If you just paid, your payment is safe with Stripe — call 253-922-5793 and we’ll find your order.';
             show('s-error');
             return;
         }

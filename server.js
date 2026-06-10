@@ -930,9 +930,13 @@ async function getCtsPricingConfig(styleNumber) {
     return parseFloat(row.SellPrice);
   };
 
-  const [pricingData, rushPct, shipFee] = await Promise.all([
+  const [pricingData, rushPct, shipFee, ltmFee] = await Promise.all([
     grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=${encodeURIComponent(style)}`),
     code('3DT-RUSH'), code('3DT-SHIP'),
+    // Online small-batch fee (CTS-LTM, $25 — cheaper than the builder's $50;
+    // Erik 2026-06-10). code() THROWS if the row is missing/inactive, which
+    // fails checkout closed rather than silently billing the wrong fee.
+    code('CTS-LTM'),
   ]);
   if (!Array.isArray(pricingData.tiersR) || !pricingData.tiersR.length) {
     throw new Error(`No DTG pricing tiers for style ${style}`);
@@ -948,7 +952,7 @@ async function getCtsPricingConfig(styleNumber) {
   if (!nonLtm.length) throw new Error(`DTG pricing tiers for ${style} missing a non-LTM tier`);
   const value = {
     pricingData,
-    config: { rushPct, shipFee, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
+    config: { rushPct, shipFee, ltmFee, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
   };
   _ctsCfgCache.set(style, { at: Date.now(), value });
   return value;
@@ -2011,9 +2015,18 @@ app.post('/api/create-checkout-session', async (req, res) => {
     const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
 
     // Channel: 'custom-tees' = the multi-style DTG storefront (per-style
-    // bundle, internal-builder LTM, opt-in rush); anything else = legacy 3DT.
+    // bundle, online LTM, opt-in rush); anything else = legacy 3DT.
     const isCTS = !!(orderSettings && orderSettings.channel === 'custom-tees');
     const chLog = isCTS ? '[Custom Tees Checkout]' : '[3-Day Tees Checkout]';
+
+    // Artwork-rights attestation is REQUIRED for storefront orders (legal
+    // record; the client checkbox is advisory — this is the enforcement).
+    // The ack object is stored verbatim in OrderSettingsJSON. (2026-06-10)
+    if (isCTS && !(orderSettings.rightsAck && orderSettings.rightsAck.checked)) {
+      return res.status(400).json({
+        error: 'Please confirm you own or have permission to print your artwork before checking out — nothing was charged.'
+      });
+    }
 
     // ── Authoritative server-side reprice ──────────────────────────────
     let priced;
@@ -2450,17 +2463,27 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const backLogo = orderSettings?.backLogo?.fileUrl || orderSettings?.uploadedFiles?.back;
     const printLocation = orderSettings?.printLocationCode || 'LC';
 
-    // Map location codes to exact ShopWorks dropdown values
-    // ShopWorks accepts: 'Full Back', 'Full Front', 'Left Chest', 'Right Chest'
-    const shopWorksLocationMap = {
-      'LC': 'Left Chest',
-      'FF': 'Full Front',
-      'LC_FB': 'Left Chest',   // Front part of combo
-      'FF_FB': 'Full Front'    // Front part of combo
-    };
-    const frontLocationName = shopWorksLocationMap[printLocation] || 'Left Chest';
+    // Side flags: CTS free-placement orders carry SERVER-VALIDATED
+    // frontLocation ('LC'|'FF'|'JF'|null) + backLocation ('FB'|'JB'|null)
+    // stamped at checkout; legacy 3DT only has printLocationCode. The old
+    // `indexOf('_FB')` gating silently DROPPED back art for the new JB/back-
+    // only codes — a paid Jumbo-Back print production never saw. (audit
+    // CRITICAL fix 2026-06-10)
+    const stampedFront = orderSettings?.frontLocation || null;
+    const stampedBack = orderSettings?.backLocation || null;
+    const frontCode = stampedFront || printLocation.split('_')[0];
+    const hasFrontPrint = stampedFront ? true : !/^(FB|JB)$/.test(printLocation);
+    const hasBackPrint = stampedBack ? true : /(^|_)(FB|JB)$/.test(printLocation);
 
-    console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation, frontLocationName });
+    // Map location codes to exact ShopWorks dropdown values.
+    // ShopWorks accepts: 'Full Back', 'Full Front', 'Left Chest', 'Right Chest'
+    // — jumbos map to the nearest dropdown value; the exact 16×20 dims ride in
+    // the location notes + placement spec. (audit HIGH fix 2026-06-10)
+    const SW_LOC = { LC: 'Left Chest', FF: 'Full Front', JF: 'Full Front', FB: 'Full Back', JB: 'Full Back' };
+    const frontLocationName = SW_LOC[frontCode] || 'Left Chest';
+    const backLocationName = SW_LOC[stampedBack] || 'Full Back';
+
+    console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation, frontCode, stampedBack, frontLocationName, hasFrontPrint, hasBackPrint });
 
     if (frontLogo || backLogo) {
       const design = {
@@ -2472,15 +2495,15 @@ app.post('/api/submit-3day-order', async (req, res) => {
         locations: []
       };
 
-      // Add front/left chest location if we have a front logo and location isn't Full Back only
-      if (frontLogo && printLocation !== 'FB') {
+      // Front location only when the order actually HAS a front print
+      if (frontLogo && hasFrontPrint) {
         design.locations.push({
           location: frontLocationName,  // Exact ShopWorks dropdown value
           colors: 'Full Color',  // DTG = Full Color
           code: `${tempOrderNumber}-FRONT`,
           imageUrl: frontLogo,
           customField01: frontLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
-          notes: 'Customer uploaded artwork',
+          notes: 'Customer uploaded artwork' + (frontCode === 'JF' ? ' — JUMBO FRONT 16×20″ (see placement spec)' : ''),
           details: [{
             color: 'Full Color DTG',
             paramLabel: 'Print Type',
@@ -2489,16 +2512,16 @@ app.post('/api/submit-3day-order', async (req, res) => {
         });
       }
 
-      // Back location ONLY when the charged location includes the back —
-      // a stray backLogo on an LC/FF-priced order must not print free.
-      if (backLogo && printLocation.indexOf('_FB') !== -1) {
+      // Back location ONLY when the charged order includes a back print —
+      // a stray backLogo on a front-only-priced order must not print free.
+      if (backLogo && hasBackPrint) {
         design.locations.push({
-          location: 'Full Back',
+          location: backLocationName,
           colors: 'Full Color',  // DTG = Full Color
           code: `${tempOrderNumber}-BACK`,
           imageUrl: backLogo,
           customField01: backLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
-          notes: 'Customer uploaded artwork (back) - See Attachments tab for image',
+          notes: 'Customer uploaded artwork (back) - See Attachments tab for image' + (stampedBack === 'JB' ? ' — JUMBO BACK 16×20″ (see placement spec)' : ''),
           details: [{
             color: 'Full Color DTG',
             paramLabel: 'Print Type',
@@ -2524,7 +2547,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
         linkNote: 'Customer uploaded artwork (front)'
       });
     }
-    if (backLogo && printLocation.indexOf('_FB') !== -1) {
+    if (backLogo && hasBackPrint) {
       attachments.push({
         mediaUrl: backLogo,
         mediaName: `${tempOrderNumber} - Back Artwork`,
@@ -2561,8 +2584,8 @@ app.post('/api/submit-3day-order', async (req, res) => {
     }
     const placement = orderSettings?.placement || {};
     const placementLines = [
-      placementLine(`FRONT - ${frontLocationName}`, placement.front),
-      printLocation.indexOf('_FB') !== -1 ? placementLine('BACK - Full Back', placement.back) : null,
+      hasFrontPrint ? placementLine(`FRONT - ${frontLocationName}${frontCode === 'JF' ? ' (JUMBO 16×20)' : ''}`, placement.front) : null,
+      hasBackPrint ? placementLine(`BACK - ${backLocationName}${stampedBack === 'JB' ? ' (JUMBO 16×20)' : ''}`, placement.back) : null,
     ].filter(Boolean);
     const placementBlock = placementLines.length
       ? `\nPRINT PLACEMENT (customer's designer preview, top-center anchor — ADVISORY: place at the STANDARD print location for the garment; use the spec below only when it clearly deviates on purpose):\n${placementLines.join('\n')}\n`
@@ -2570,6 +2593,11 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const _isCtsStandard = orderSettings?.channel === 'custom-tees' && !orderSettings?.rush;
     const artReviewBanner = orderSettings?.needsArtReview
       ? `\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; ${_isCtsStandard ? 'production clock' : '3-day clock'} starts at proof approval ***\n`
+      : '';
+    // Legal record on the production order: the customer attested artwork
+    // rights at checkout (storefront orders only). (2026-06-10)
+    const rightsLine = orderSettings?.rightsAck && orderSettings.rightsAck.checked
+      ? `\nCUSTOMER ATTESTED ARTWORK RIGHTS at checkout${orderSettings.rightsAck.ts ? ` (${orderSettings.rightsAck.ts})` : ''}.\n`
       : '';
     const shipPromiseLine = orderSettings?.shipPromise?.label
       ? `\nPROMISED SHIP DATE: ${orderSettings.shipPromise.label} (stamped at checkout)\n`
@@ -2630,7 +2658,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
         note: `${(orderSettings?.channel === 'custom-tees' && !orderSettings?.rush)
           ? 'STANDARD DTG SERVICE - 7-10 business days from artwork approval.'
           : '3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.'}
-${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${shipPromiseLine}${placementBlock}
+${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${rightsLine}${shipPromiseLine}${placementBlock}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
 Phone: ${customerData.phone}
