@@ -62,7 +62,6 @@
         },
         inventory: { byColor: {}, fetchedAt: 0, error: false, source: null },
         design: {
-            frontLocation: 'LC',
             backEnabled: false,
             previewColor: null,        // catalogColor shown on the canvas
             front: null,               // artwork slot | null
@@ -137,10 +136,35 @@
         return Object.assign({}, S.config, { rush: S.rush });
     }
 
-    // Back print location for pricing/payload ('FB' today; 'JB' reserved)
-    function backLoc() {
-        return S.design.backEnabled ? 'FB' : null;
+    // ── Free placement (Erik 2026-06-10): price follows the ART'S SIZE ──
+    // There is no location picker. Customers drag/resize anywhere inside the
+    // full 16×20 envelope; the PRICE TIER derives from the art's printed
+    // dimensions via TDTPricing.locationForArtSize() — the same pure rule the
+    // server reprice uses on orderSettings.placement dims.
+    function artDims(slot) {
+        const h = slot.placement.wIn * (slot.naturalH / slot.naturalW);
+        return { wIn: slot.placement.wIn, hIn: h };
     }
+
+    // 'LC' = the "from" rate before any art; null = back-only design
+    // (no front print cost — TDTPricing.unitPrice accepts location:null).
+    function derivedFrontLocation() {
+        const s = S.design.front;
+        if (s) {
+            const d = artDims(s);
+            return TDTPricing.locationForArtSize('front', d.wIn, d.hIn);
+        }
+        return S.design.back ? null : 'LC';
+    }
+
+    function derivedBackLocation() {
+        const s = S.design.back;
+        if (!s) return null;
+        const d = artDims(s);
+        return TDTPricing.locationForArtSize('back', d.wIn, d.hIn);
+    }
+
+    const LOC_NAMES = { LC: 'Left Chest', FF: 'Full Front', JF: 'Jumbo Front', FB: 'Full Back', JB: 'Jumbo Back' };
 
     // ── Ship promise (standard 7–10 days vs 3-Day Rush) ─────────────
     // Standard copy comes from TDTShipDate.standardPromise() when the
@@ -249,8 +273,8 @@
                     colorName: colorOf(l.catalogColor).colorName,
                     qty: l.qty,
                 })),
-                location: S.design.frontLocation,
-                backLocation: backLoc(),
+                location: derivedFrontLocation(),
+                backLocation: derivedBackLocation(),
                 delivery: { method: S.delivery.method, taxRate: S.delivery.tax.rate },
             });
         } catch (e) {
@@ -491,6 +515,10 @@
             refreshDpi(slot);
             designer.setSlot(k, slot);
         });
+        // Re-fit may move the art across a price-tier boundary — re-record
+        // silently instead of toasting a "tier changed" message.
+        tierToastState.front = null;
+        tierToastState.back = null;
         renderCurrentProduct();
         syncRushUI();
     }
@@ -699,6 +727,9 @@
                 slot.placement = placement;
                 refreshDpi(slot);
                 renderDesignControls();
+                // Resizing can cross a price-tier boundary (LC→FF→JF) —
+                // re-quote everything, not just the design panel.
+                renderAll();
                 persistSoon();
             },
             onTapEmptyArea() { $('art-input').click(); },
@@ -998,7 +1029,7 @@
             const badge = $(`tab-${k}-badge`);
             const s = S.design[k];
             if (!s) { badge.hidden = true; return; }
-            const warn = (s.effectiveDpi && s.effectiveDpi < DPI_AMBER) || s.warnings.length;
+            const warn = (s.effectiveDpi && s.effectiveDpi < DPI_AMBER) || (s.warnings || []).length;
             badge.textContent = warn ? '!' : '✓';
             badge.classList.toggle('is-warn', !!warn);
             badge.hidden = false;
@@ -1022,7 +1053,10 @@
                 thumb.textContent = '';
             } else {
                 thumb.style.backgroundImage = '';
-                thumb.textContent = slot.fileName.split('.').pop().toUpperCase();
+                // Guard: a slot without fileName must not throw here — an
+                // exception in this DISPLAY line kills the whole render chain
+                // (readout/totals stop updating). (found via QA probe 2026-06-10)
+                thumb.textContent = ((slot.fileName || 'ART').split('.').pop() || 'ART').toUpperCase();
             }
         } else {
             $('art-drop').hidden = false;
@@ -1089,26 +1123,103 @@
             warnEl.hidden = true;
         }
 
-        renderLocationPrices();
+        renderSizePriceReadout();
     }
 
-    function renderLocationPrices() {
+    // ── Print size & price readout (free placement) ─────────────────
+    // One row per side with art: "FRONT — 10.0″ × 7.5″ → Full Front ·
+    // $X.XX/shirt"; the BACK row shows its INCREMENTAL cost. Prices are the
+    // size-M per-shirt rate at the cart's combined quantity (or the lowest
+    // volume tier before any quantities exist).
+    function renderSizePriceReadout() {
         if (!S.boot.ready && !S.pricing) return;
-        const q = (loc) => {
-            try {
-                const qty = Math.max(1, TDTPricing.combinedQuantity(S.cart.lines));
-                return TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, loc, backLoc(), 'M', S.rush).finalPrice;
-            } catch (_) { return null; }
+        const el = $('size-price-readout');
+        if (!el) return;
+        const combined = TDTPricing.combinedQuantity(S.cart.lines);
+        const qty = combined || S.config.ltmThreshold || 24;
+        const fl = derivedFrontLocation();
+        const bl = derivedBackLocation();
+        const u = (loc, back) => TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, loc, back, 'M', S.rush).finalPrice;
+        const dimTxt = (slot) => {
+            const d = artDims(slot);
+            return `${d.wIn.toFixed(1)}″ × ${d.hIn.toFixed(1)}″`;
         };
-        const lc = q('LC'), ff = q('FF');
-        $('loc-LC-price').textContent = lc != null ? money(lc) + '/shirt' : '$—';
-        $('loc-FF-price').textContent = ff != null ? money(ff) + '/shirt' : '$—';
+        const rowHtml = (side, dims, tierName, price) =>
+            `<div class="spr-row">
+                <span class="spr-side">${side}</span>
+                <span class="spr-dims">${escapeHTML(dims)}</span>
+                <i class="fas fa-arrow-right spr-arrow" aria-hidden="true"></i>
+                <span class="spr-tier">${escapeHTML(tierName)}</span>
+                <span class="spr-price">${escapeHTML(price)}</span>
+            </div>`;
+        const emptyRow = (side, msg) =>
+            `<div class="spr-row is-empty"><span class="spr-side">${side}</span><span>${escapeHTML(msg)}</span></div>`;
+
+        let html = '';
         try {
-            const qty = Math.max(1, TDTPricing.combinedQuantity(S.cart.lines));
-            const without = TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, S.design.frontLocation, null, 'M', S.rush).finalPrice;
-            const withBack = TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, S.design.frontLocation, 'FB', 'M', S.rush).finalPrice;
-            $('back-delta').textContent = `12″×16″ · +${money(withBack - without)}/shirt`;
+            if (S.design.front && fl) {
+                html += rowHtml('FRONT', dimTxt(S.design.front), LOC_NAMES[fl], money(u(fl, null)) + '/shirt');
+            } else {
+                html += emptyRow('FRONT', 'add artwork (price starts at the Left Chest 4×4″ rate)');
+            }
+            if (S.design.back && bl) {
+                // Incremental cost of the back print on top of the front;
+                // back-only designs show the full per-shirt rate instead.
+                const price = fl
+                    ? '+' + money(u(fl, bl) - u(fl, null)) + '/shirt'
+                    : money(u(null, bl)) + '/shirt';
+                html += rowHtml('BACK', dimTxt(S.design.back), LOC_NAMES[bl], price);
+            } else if (S.design.backEnabled) {
+                html += emptyRow('BACK', 'add back artwork to price it');
+            }
+            html += `<div class="spr-foot">per shirt (size M) at ${combined || `${qty}+`} pieces${S.rush ? ' · 3-Day Rush' : ''}</div>`;
+        } catch (e) {
+            console.error('[CTS] Size/price readout failed:', e);
+            html = emptyRow('PRICE', 'unavailable — refresh to reload live pricing');
+        }
+        el.innerHTML = html;
+
+        // "Add a back print" toggle: live incremental rate for the current art
+        try {
+            if (fl) {
+                const withBack = u(fl, bl || 'FB');
+                $('back-delta').textContent = `+${money(withBack - u(fl, null))}/shirt — priced by your art’s size`;
+            } else {
+                $('back-delta').textContent = 'priced by your art’s size';
+            }
         } catch (_) { /* leave default */ }
+
+        scheduleTierToast();
+    }
+
+    // ── Tier-change feedback ────────────────────────────────────────
+    // Toast ONLY when a resize SETTLES on a different derived tier than the
+    // last one we toasted/recorded — dragging through a boundary and back
+    // stays quiet. First placement of a side records silently.
+    const tierToastState = { front: null, back: null, timer: null };
+    const LOC_RANK = { LC: 0, FF: 1, JF: 2, FB: 1, JB: 2 };
+    const LOC_LIMITS = { LC: '4×4″', FF: '12×16″', FB: '12×16″' };
+    function tierChangeMsg(side, from, to) {
+        const sideName = side === 'back' ? 'Back' : 'Front';
+        if (LOC_RANK[to] > LOC_RANK[from]) {
+            return `${sideName} print is now larger than ${LOC_LIMITS[from]} — the ${LOC_NAMES[to]} rate applies`;
+        }
+        return `${sideName} print now fits within ${LOC_LIMITS[to] || '12×16″'} — the ${LOC_NAMES[to]} rate applies`;
+    }
+    function scheduleTierToast() {
+        clearTimeout(tierToastState.timer);
+        tierToastState.timer = setTimeout(() => {
+            [['front', derivedFrontLocation], ['back', derivedBackLocation]].forEach(([side, derive]) => {
+                if (!S.design[side]) { tierToastState[side] = null; return; }
+                const now = derive();
+                if (!now) { tierToastState[side] = null; return; }
+                const last = tierToastState[side];
+                if (last && last !== now) {
+                    toast(tierChangeMsg(side, last, now), LOC_RANK[now] < LOC_RANK[last] ? 'success' : null);
+                }
+                tierToastState[side] = now;
+            });
+        }, 650);
     }
 
     // ── Promise banner (standard 7–10 days; 3-Day Rush when toggled) ─
@@ -1302,7 +1413,7 @@
             let label;
             try {
                 label = money(TDTPricing.unitPrice(S.pricing, pricingConfig(), t.MinQuantity,
-                    S.design.frontLocation, backLoc(), 'M', S.rush).finalPrice);
+                    derivedFrontLocation(), derivedBackLocation(), 'M', S.rush).finalPrice);
             } catch (_) { label = ''; }
             html += `<div class="tier-notch" style="left:${pct(t.MinQuantity)}%"></div>` +
                 `<div class="tier-notch-label" style="left:${pct(t.MinQuantity)}%">${t.MinQuantity}+ ${label}</div>`;
@@ -1450,11 +1561,20 @@
         return h;
     }
 
+    // Sides worth mocking up = sides with art (front-only fallback so an
+    // empty design still shows the blank garment).
+    function mockupViews() {
+        const v = [];
+        if (S.design.front) v.push('front');
+        if (S.design.back) v.push('back');
+        return v.length ? v : ['front'];
+    }
+
     let mockupKey = '';
     let mockupUrls = [];   // revoked on every replacement — blob URLs leak otherwise
     const renderReviewMockups = debounce(async function () {
         const wrap = $('review-mockups');
-        if (!S.design.front || !S.cart.lines.length) {
+        if ((!S.design.front && !S.design.back) || !S.cart.lines.length) {
             wrap.innerHTML = '';
             mockupKey = '';
             mockupUrls.forEach((u) => URL.revokeObjectURL(u));
@@ -1463,13 +1583,13 @@
         }
         const slotSig = (s) => s && [s.fileName, s.naturalW, s.naturalH, s.placement];
         const key = JSON.stringify([S.cart.lines.map((l) => l.catalogColor),
-            S.design.frontLocation, S.design.backEnabled,
+            derivedFrontLocation(), derivedBackLocation(),
             slotSig(S.design.front), slotSig(S.design.back)]);
         if (key === mockupKey) return;
         mockupKey = key;
 
         const colors = S.cart.lines.slice(0, 4).map((l) => colorOf(l.catalogColor));
-        const views = S.design.backEnabled && S.design.back ? ['front', 'back'] : ['front'];
+        const views = mockupViews();
         const out = [];
         for (const c of colors) {
             for (const v of views) {
@@ -1489,7 +1609,9 @@
     // ── Gates + smart CTA ───────────────────────────────────────────
     function gateReasons(q) {
         const reasons = [];
-        if (!S.design.front) reasons.push({ label: 'Add artwork', target: '#stage-design', act: () => $('art-input').click() });
+        // At least one side needs art (back-only designs are valid — the
+        // front then contributes no print cost).
+        if (!S.design.front && !S.design.back) reasons.push({ label: 'Add artwork', target: '#stage-design', act: () => $('art-input').click() });
         if (S.design.backEnabled && !S.design.back) reasons.push({ label: 'Add back artwork (or turn off back print)', target: '#stage-design' });
         ['front', 'back'].forEach((k) => {
             const s = S.design[k];
@@ -1532,7 +1654,7 @@
         renderTierMeter(q);
         renderReview(q);
         renderTaxStamp();
-        renderLocationPrices();
+        renderSizePriceReadout();
         const est = S.delivery.shipEstimate;
         $('ship-fee-label').textContent =
             est.status === 'done' && est.source === 'ups-estimate' ? `UPS Ground — ${money(est.amount)} estimated`
@@ -1577,7 +1699,7 @@
 
         // Smart CTA — always names the first incomplete thing
         const cta = $('smart-cta');
-        if (!S.design.front) {
+        if (!S.design.front && !S.design.back) {
             cta.textContent = 'Upload your art';
             cta.onclick = () => { document.querySelector('#stage-design').scrollIntoView({ behavior: 'smooth' }); setTimeout(() => $('art-input').click(), 350); };
         } else if (!q.combinedQty) {
@@ -1696,7 +1818,7 @@
             const mockups = [];
             for (const line of S.cart.lines) {
                 const c = colorOf(line.catalogColor);
-                const views = S.design.backEnabled && S.design.back ? ['front', 'back'] : ['front'];
+                const views = mockupViews();
                 for (const v of views) {
                     const blob = await designer.exportMockup(c, v, S.design, 1200);
                     if (!blob) continue;   // tainted/failed export NEVER blocks checkout
@@ -1768,8 +1890,14 @@
 
     function buildCheckoutPayload(mockups) {
         const q = currentQuote();
-        const locCode = S.design.frontLocation + (S.design.backEnabled && S.design.back ? '_FB' : '');
-        const locNames = { LC: 'Left Chest', FF: 'Full Front', LC_FB: 'Left Chest + Full Back', FF_FB: 'Full Front + Full Back' };
+        // Derived from the art's printed size — the server re-derives the
+        // tier from orderSettings.placement.{front,back}.{wIn,hIn} and these
+        // codes are advisory (push notes / display).
+        const frontLoc = derivedFrontLocation();
+        const backLocation = derivedBackLocation();
+        const locCode = [frontLoc, backLocation].filter(Boolean).join('_') || 'LC';
+        const locName = [frontLoc, backLocation].filter(Boolean)
+            .map((c) => LOC_NAMES[c] || c).join(' + ') || 'Left Chest';
         const sp = shipPromise();
 
         // colorConfigs — EXACT legacy shape (server push + webhook contract)
@@ -1794,8 +1922,10 @@
             const s = S.design[k];
             if (!s) return null;
             return {
-                location: k === 'back' ? 'FB' : S.design.frontLocation,
+                location: k === 'back' ? backLocation : frontLoc,
                 wIn: s.placement.wIn, xIn: s.placement.xIn, yIn: s.placement.yIn,
+                // hIn is REQUIRED: the server re-derives the price tier from
+                // wIn × hIn and rejects mismatched client codes.
                 hIn: Math.round(s.placement.wIn * (s.naturalH / s.naturalW) * 100) / 100,
                 anchor: 'top-center',
                 effectiveDpi: s.effectiveDpi,
@@ -1842,10 +1972,10 @@
                 styleNumber: S.styleNumber,
                 productTitle: S.product.title,
                 rush: S.rush,                            // server 400s rush on non-eligible styles
-                frontLocation: S.design.frontLocation,   // 'LC' | 'FF' ('JF' reserved)
-                backLocation: S.design.backEnabled && S.design.back ? 'FB' : null,
+                frontLocation: frontLoc,                 // 'LC'|'FF'|'JF' | null (back-only) — derived from art size
+                backLocation: backLocation,              // 'FB'|'JB' | null — derived from art size
                 printLocationCode: locCode,
-                printLocationName: locNames[locCode] || 'Left Chest',
+                printLocationName: locName,
                 frontLogo: S.design.front && S.design.front.uploaded
                     ? { fileUrl: S.design.front.uploaded.hostedUrl, fileName: S.design.front.uploaded.fileName } : null,
                 backLogo: S.design.back && S.design.back.uploaded
@@ -1869,11 +1999,12 @@
             warnings: s.warnings, uploaded: s.uploaded,
         } : null;
         return {
-            v: 2, ts: Date.now(),
+            // v3 (2026-06-10): frontLocation dropped — free placement derives
+            // the price tier from the persisted placement dims instead.
+            v: 3, ts: Date.now(),
             styleNumber: S.styleNumber,
             rush: S.rush,
             design: {
-                frontLocation: S.design.frontLocation,
                 backEnabled: S.design.backEnabled,
                 previewColor: S.design.previewColor,
                 front: slotLite(S.design.front),
@@ -1892,7 +2023,7 @@
     function readSnapshot() {
         let snap;
         try { snap = JSON.parse(sessionStorage.getItem(PERSIST_KEY) || 'null'); } catch (_) { return null; }
-        if (!snap || snap.v !== 2) return null;
+        if (!snap || snap.v !== 3) return null;
         if (Date.now() - snap.ts > 24 * 3600 * 1000) return null;
         return snap;
     }
@@ -1912,10 +2043,6 @@
             S.delivery.notes = snap.delivery.notes || '';
         }
         if (snap.design) {
-            S.design.frontLocation = snap.design.frontLocation === 'FF' ? 'FF' : 'LC';
-            // Sync the segmented control (HTML defaults to LC active)
-            $('loc-LC').classList.toggle('is-active', S.design.frontLocation === 'LC');
-            $('loc-FF').classList.toggle('is-active', S.design.frontLocation === 'FF');
             S.design.backEnabled = !!snap.design.backEnabled;
             ['front', 'back'].forEach((k) => {
                 const s = snap.design[k];
@@ -1944,7 +2071,6 @@
                 S.design.previewColor = snap.design.previewColor;
                 designer.setColor(colorOf(snap.design.previewColor));
             }
-            designer.setLocation(S.design.frontLocation);
         }
 
         // Re-fill form fields
@@ -2033,8 +2159,10 @@
             if (btn) { btn.disabled = false; }
             if (!url) { toast('Close-up unavailable for this view right now.'); return; }
             const slot = view === 'back' ? S.design.back : S.design.front;
-            const locCode = view === 'back' ? (S.design.backLocation || 'FB') : S.design.frontLocation;
-            const locName = { LC: 'Left Chest 4″×4″', FF: 'Full Front 12″×16″', JF: 'Jumbo Front 16″×20″', FB: 'Full Back 12″×16″', JB: 'Jumbo Back 16″×20″' }[locCode] || locCode;
+            const locCode = view === 'back' ? derivedBackLocation() : (slot ? derivedFrontLocation() : null);
+            const locName = slot && locCode
+                ? `${LOC_NAMES[locCode]} rate`
+                : 'print area up to 16″×20″';
             $('zoom-lightbox-img').src = url;
             $('zoom-lightbox-caption').textContent =
                 `${view === 'back' ? 'Back' : 'Front'} — ${locName}` +
@@ -2058,26 +2186,8 @@
             if (e.key === 'Escape' && !$('zoom-lightbox').hidden) closeZoomLightbox();
         });
 
-        // Location segmented control
-        $('loc-LC').addEventListener('click', () => setLocation('LC'));
-        $('loc-FF').addEventListener('click', () => setLocation('FF'));
-        function setLocation(loc) {
-            const prev = S.design.frontLocation;
-            S.design.frontLocation = loc;
-            $('loc-LC').classList.toggle('is-active', loc === 'LC');
-            $('loc-FF').classList.toggle('is-active', loc === 'FF');
-            designer.setLocation(loc);
-            const slot = S.design.front;
-            if (slot && prev !== loc) {
-                // Re-fit to the new area's default (4″→12″ areas read wrong at
-                // the old size); customer can resize after.
-                slot.placement = designer.defaultPlacement('front', slot.naturalW, slot.naturalH);
-                designer.setSlot('front', slot);
-                if (prev === 'FF' && loc === 'LC') toast('Resized to fit Left Chest (4″ max)');
-                refreshDpi(slot);
-            }
-            renderDesignControls(); renderAll(); persistSoon();
-        }
+        // (Location pills removed 2026-06-10 — free placement: the price
+        // tier follows the art's printed size, see renderSizePriceReadout.)
 
         // Back toggle
         $('back-toggle').addEventListener('change', (e) => {

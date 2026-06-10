@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.5">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.6">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -155,17 +155,11 @@
                 </div>
 
                 <div class="designer-controls">
-                    <!-- Location -->
+                    <!-- Print size & price (derived live from the art's printed size) -->
                     <div class="control-block">
-                        <label class="control-label">Front print location</label>
-                        <div class="seg-control" id="loc-control">
-                            <button type="button" class="seg-btn is-active" id="loc-LC">
-                                Left Chest <small>4″×4″ · <span id="loc-LC-price">$—</span></small>
-                            </button>
-                            <button type="button" class="seg-btn" id="loc-FF">
-                                Full Front <small>12″×16″ · <span id="loc-FF-price">$—</span></small>
-                            </button>
-                        </div>
+                        <label class="control-label">Print size &amp; price</label>
+                        <div class="size-price-readout" id="size-price-readout" aria-live="polite"></div>
+                        <p class="size-price-note">Price is set by print <strong>size</strong> — keep front art within 4″×4″ for the Left Chest rate.</p>
                     </div>
 
                     <!-- Back print toggle -->
@@ -173,7 +167,7 @@
                         <label class="toggle-row" for="back-toggle">
                             <input type="checkbox" id="back-toggle">
                             <span class="toggle-pill" aria-hidden="true"></span>
-                            <span class="toggle-text">Add a back print <small id="back-delta">12″×16″</small></span>
+                            <span class="toggle-text">Add a back print <small id="back-delta">priced by your art’s size</small></span>
                         </label>
                     </div>
 
@@ -200,7 +194,7 @@
                     <!-- Size + position -->
                     <div class="control-block" id="size-block" hidden>
                         <label class="control-label" for="art-size">Artwork width — <strong id="art-size-label">3.2″</strong></label>
-                        <input type="range" id="art-size" min="0.5" max="12" step="0.1" value="3.2">
+                        <input type="range" id="art-size" min="0.5" max="16" step="0.1" value="3.2">
                         <div class="art-actions">
                             <button type="button" class="chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line"></i> Center</button>
                             <button type="button" class="chip-btn" id="art-fit"><i class="fas fa-maximize"></i> Fit width</button>
@@ -457,10 +451,10 @@
 
     <!-- Config + modules (order matters). Absolute paths — see head comment. -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.5"></script>
-    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.5"></script>
-    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.5"></script>
-    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.5"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.5"></script>
+    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.6"></script>
+    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.6"></script>
+    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.6"></script>
+    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.6"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.6"></script>
 </body>
 </html>
