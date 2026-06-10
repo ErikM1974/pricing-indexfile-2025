@@ -845,6 +845,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
     if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => { try { recalculatePricing(); } catch (_) {} }); }
 
+    // Native leave-page warning while changes are unsaved (EMB-parity 2026-06-10)
+    if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
+
     // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
     // Adds design name input + per-file placement dropdown so the push payload
     // can carry Designs[{name, Locations[{Location, ImageURL}]}] when the rep

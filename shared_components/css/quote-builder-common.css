@@ -3283,8 +3283,8 @@ input[type="radio"] {
 }
 .ship-mode-btn i { font-size: 14px; }
 
-/* Muted "filled after import" hint (ShopWorks Order #) */
-.field-hint-muted { font-size: 10px; color: #94a3b8; font-weight: 400; }
+/* Muted "filled after import" hint (ShopWorks Order #) — #94a3b8→#64748b 2026-06-10 (WCAG AA: 10px text needs ≥4.5:1) */
+.field-hint-muted { font-size: 10px; color: #64748b; font-weight: 400; }
 
 /* Invoice-style summary (mirrors the printed PDF) */
 .invoice-summary {
@@ -3372,14 +3372,14 @@ input[type="radio"] {
     color: #475569;
 }
 .order-recap:empty { display: none; }
-.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; margin-bottom: 4px; } /* #94a3b8→#64748b 2026-06-10 WCAG AA */
 .order-recap .or-row { display: flex; gap: 8px; padding: 2px 0; line-height: 1.35; }
-.order-recap .or-label { color: #94a3b8; flex: 0 0 56px; }
+.order-recap .or-label { color: #64748b; flex: 0 0 56px; } /* #94a3b8→#64748b 2026-06-10 WCAG AA */
 .order-recap .or-val { color: #334155; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .order-recap .or-thumbs { display: flex; gap: 10px; padding: 6px 0 2px; flex-wrap: wrap; }
 .order-recap .or-thumb { margin: 0; text-align: center; }
 .order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: block; }
-.order-recap .or-thumb figcaption { font-size: 10px; color: #94a3b8; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.order-recap .or-thumb figcaption { font-size: 10px; color: #64748b; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } /* #94a3b8→#64748b 2026-06-10 WCAG AA */
 /* [2026-06-07] Ship-To address card — fills the open space between the order recap and the invoice totals (EMB only). */
 .emb-builder .invoice-totals-wrap { justify-content: flex-start; gap: 12px; }
 .emb-builder .order-recap { margin-right: 0; }
@@ -3396,7 +3396,7 @@ input[type="radio"] {
    The band POSITIONING (.invoice-totals-wrap flex / .order-recap margin above) stays per-builder. */
 .ship-to-card { flex: 1 1 260px; min-width: 0; align-self: stretch; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; }
 .ship-to-card:empty { display: none; }
-.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; margin-bottom: 4px; }
+.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; margin-bottom: 4px; } /* #94a3b8→#64748b 2026-06-10 WCAG AA */
 .ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
 .ship-to-card .st-co { font-weight: 600; }
 .ship-to-card .st-method { color: #64748b; font-size: 11px; margin-top: 2px; }

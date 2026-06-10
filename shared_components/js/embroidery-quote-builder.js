@@ -149,6 +149,105 @@ function mapStitchCountToTierValue(stitchCount, position) {
     return '8000';
 }
 
+// ============================================================
+// STITCH-COUNT ESTIMATOR (2026-06-10)
+// Kills the #1 quoting guess: rep enters the logo's W×H in inches +
+// coverage, gets an industry-rule estimate (stitches ≈ in² × density),
+// and one click sets the matching tier dropdown. Estimates only —
+// the digitized file is always authoritative.
+// ============================================================
+
+const STITCH_DENSITY = { light: 1000, medium: 1500, full: 2000 };
+
+function initStitchEstimators() {
+    [
+        { selId: 'primary-stitches', kind: 'garment' },
+        { selId: 'cap-primary-stitches', kind: 'cap' }
+    ].forEach(({ selId, kind }) => {
+        const sel = document.getElementById(selId);
+        if (!sel || sel.parentElement.querySelector('.stitch-estimate-btn')) return;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'stitch-estimate-btn';
+        btn.innerHTML = '<i class="fas fa-ruler-combined"></i>';
+        btn.title = 'Estimate stitch count from logo size';
+        btn.setAttribute('aria-label', 'Estimate stitch count from logo size');
+        btn.addEventListener('click', (e) => { e.preventDefault(); openStitchEstimator(selId, kind, btn); });
+        sel.insertAdjacentElement('afterend', btn);
+    });
+}
+
+function openStitchEstimator(selId, kind, anchorBtn) {
+    // One popover at a time
+    document.getElementById('stitch-estimator-pop')?.remove();
+    const pop = document.createElement('div');
+    pop.id = 'stitch-estimator-pop';
+    pop.className = 'stitch-estimator-pop';
+    pop.innerHTML = `
+        <div class="se-title"><i class="fas fa-ruler-combined"></i> Stitch estimate</div>
+        <div class="se-row">
+            <label>W <input type="number" id="se-width" min="0.5" max="16" step="0.25" value="3.5"> in</label>
+            <label>H <input type="number" id="se-height" min="0.5" max="16" step="0.25" value="2"> in</label>
+        </div>
+        <div class="se-row">
+            <label>Coverage
+                <select id="se-coverage">
+                    <option value="light">Light (text / outline)</option>
+                    <option value="medium" selected>Medium (mixed)</option>
+                    <option value="full">Full fill</option>
+                </select>
+            </label>
+        </div>
+        <div class="se-result" id="se-result"></div>
+        <div class="se-actions">
+            <button type="button" class="se-apply" id="se-apply">Apply to tier</button>
+            <button type="button" class="se-close" id="se-close">Close</button>
+        </div>
+        <div class="se-note">Rule-of-thumb only — the digitized file decides the real count.</div>`;
+    document.body.appendChild(pop);
+
+    // Position under the anchor button
+    const r = anchorBtn.getBoundingClientRect();
+    pop.style.top = `${window.scrollY + r.bottom + 6}px`;
+    pop.style.left = `${Math.max(8, window.scrollX + r.left - 120)}px`;
+
+    const compute = () => {
+        const w = parseFloat(document.getElementById('se-width')?.value) || 0;
+        const h = parseFloat(document.getElementById('se-height')?.value) || 0;
+        const density = STITCH_DENSITY[document.getElementById('se-coverage')?.value] || STITCH_DENSITY.medium;
+        const raw = w * h * density;
+        const est = Math.max(1000, Math.ceil(raw / 500) * 500);
+        const tierVal = mapStitchCountToTierValue(est, '');
+        const tierName = { '8000': 'Standard (≤10K)', '12000': 'Mid (10–15K)', '18000': 'Large (15–25K)', '25000': 'Full Back (25K+)' }[tierVal] || tierVal;
+        const resEl = document.getElementById('se-result');
+        if (resEl) resEl.innerHTML = (w > 0 && h > 0)
+            ? `≈ <strong>${est.toLocaleString()}</strong> stitches → <strong>${tierName}</strong>`
+            : 'Enter the logo dimensions';
+        return { est, tierVal };
+    };
+    ['se-width', 'se-height', 'se-coverage'].forEach(id => document.getElementById(id)?.addEventListener('input', compute));
+    compute();
+
+    document.getElementById('se-apply')?.addEventListener('click', () => {
+        const { est, tierVal } = compute();
+        const sel = document.getElementById(selId);
+        if (sel) {
+            sel.value = tierVal;
+            sel.dispatchEvent(new Event('change'));   // run the existing tier handlers
+            showToast(`Stitch tier set from estimate (≈${est.toLocaleString()} stitches)`, 'success');
+        }
+        pop.remove();
+    });
+    document.getElementById('se-close')?.addEventListener('click', () => pop.remove());
+    // Click-away dismiss
+    setTimeout(() => {
+        const away = (e) => {
+            if (!pop.contains(e.target) && e.target !== anchorBtn) { pop.remove(); document.removeEventListener('mousedown', away); }
+        };
+        document.addEventListener('mousedown', away);
+    }, 0);
+}
+
 function onPrimaryPositionChange() {
     const posSelect = document.getElementById('primary-position');
     const tierSelect = document.getElementById('primary-stitches');
@@ -735,62 +834,53 @@ function restoreEmbroideryDraft(draft) {
 
     _syncALArrays();
 
-    // Restore products
-    if (draft.products && draft.products.length > 0) {
-        // Clear any existing rows first
-        const tbody = document.getElementById('product-tbody');
-        if (tbody) tbody.innerHTML = '';
+    // Restore products through the REAL add path (style lookup → color select →
+    // size/child-row plumbing). The old hand-rolled restore read addNewRow()'s
+    // return value before it returned anything, so EVERY product silently failed
+    // to restore while the toast still said success. (audit 2026-06-10)
+    restoreDraftProducts(draft);
+}
 
-        draft.products.forEach(product => {
-            // Add product row with saved data
-            const rowId = addNewRow();
-            const row = document.getElementById(`row-${rowId}`);
-            if (!row) return;
-
-            // Set product data
-            row.dataset.style = product.style || '';
-            row.dataset.catalogColor = product.catalogColor || '';
-            row.dataset.colorName = product.color || '';
-            row.dataset.description = product.description || '';
-            row.dataset.imageUrl = product.imageUrl || '';
-            row.dataset.productType = product.productType || 'garment';
-
-            // Update display cells
-            const styleCell = row.querySelector('.cell-style');
-            if (styleCell) styleCell.textContent = product.style || '';
-
-            const descCell = row.querySelector('.cell-desc');
-            if (descCell) descCell.textContent = product.description || '';
-
-            const colorCell = row.querySelector('.cell-color');
-            if (colorCell) {
-                colorCell.innerHTML = `<span class="color-swatch" style="background: #ccc;"></span>${escapeHtml(product.color || '')}`;
-            }
-
-            // Restore size quantities
-            if (product.sizes || product.sizeBreakdown) {
-                const sizes = product.sizes || product.sizeBreakdown;
-                Object.entries(sizes).forEach(([size, qty]) => {
-                    if (qty > 0) {
-                        const sizeInput = row.querySelector(`input[data-size="${size}"]`);
-                        if (sizeInput) {
-                            sizeInput.value = qty;
-                            updateRowQuantityTotal(rowId);
-                        }
-                    }
-                });
-            }
-        });
-
-        // Check for caps/garments to show appropriate logo sections
-        updateCapLogoSectionVisibility();
-        updateGarmentLogoSectionVisibility();
-
-        // Recalculate pricing after restoring products
-        recalculatePricing();
+async function restoreDraftProducts(draft) {
+    const draftProducts = (draft && draft.products) || [];
+    if (draftProducts.length === 0) {
+        showToast('Draft restored successfully', 'success');
+        return;
     }
 
-    showToast('Draft restored successfully', 'success');
+    // Clear any existing rows first
+    const tbody = document.getElementById('product-tbody');
+    if (tbody) tbody.innerHTML = '';
+
+    let restored = 0;
+    for (const product of draftProducts) {
+        if (!product || !product.style) continue;
+        try {
+            await addProductFromQuote({
+                styleNumber: product.style,
+                color: product.color || product.catalogColor || '',
+                sizeBreakdown: product.sizes || product.sizeBreakdown || {},
+                priceOverride: parseFloat(product.priceOverride) || 0,
+                sizeOverrides: product.sizeOverrides || {}
+            });
+            restored++;
+        } catch (e) {
+            console.error('[Draft] Failed to restore product:', product.style, e);
+        }
+    }
+
+    // Check for caps/garments to show appropriate logo sections
+    updateCapLogoSectionVisibility();
+    updateGarmentLogoSectionVisibility();
+
+    // Recalculate pricing after restoring products
+    recalculatePricing();
+
+    if (restored === draftProducts.length) {
+        showToast(`Draft restored — ${restored} product${restored === 1 ? '' : 's'} recovered`, 'success');
+    } else {
+        showToast(`Draft partially restored: ${restored} of ${draftProducts.length} products recovered — re-add the missing ones.`, 'warning', 8000);
+    }
 }
 
 function markEmbroideryDirty() {
@@ -813,7 +903,7 @@ function markEmbroideryDirty() {
  * Load existing quote for editing
  * Populates all form fields with quote data
  */
-async function loadQuoteForEditing(quoteId) {
+async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
     // P0 guard (audit 2026-06-06): a pickup quote's restore re-fires the live Milton tax lookup async;
     // block lookupTaxRate() for the whole restore so it can't overwrite the saved rate. finally re-enables.
@@ -831,7 +921,9 @@ async function loadQuoteForEditing(quoteId) {
         // Phase 11.3.5 (Erik 2026-05-24): one-way SW sync — bail if the quote
         // is already in ShopWorks. assertQuoteEditable() alerts the rep and
         // redirects to read-only quote-view.
-        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+        // EXCEPTION: duplicate mode never writes to the source quote, so locked/
+        // pushed quotes (the classic reorder case) are fine to duplicate from.
+        if (!opts.forDuplicate && typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
             return;
         }
 
@@ -839,8 +931,8 @@ async function loadQuoteForEditing(quoteId) {
         editingQuoteId = quoteId;
         editingRevision = session.RevisionNumber || 1;
 
-        // Update page header to show edit mode
-        updateEditModeUI(quoteId, editingRevision);
+        // Update page header to show edit mode (duplicate mode sets its own banner)
+        if (!opts.forDuplicate) updateEditModeUI(quoteId, editingRevision);
 
         // Populate customer information
         populateCustomerInfo(session);
@@ -917,6 +1009,51 @@ async function loadQuoteForEditing(quoteId) {
             } catch (_) { /* legacy flat-array ImportNotes → no artwork object to restore */ }
         })();
 
+        // Reconstruct lastImportMetadata from the saved session. The save path reads
+        // designNumbers/digitizingFees/paidToDate/orderNotes/carrier/tracking/SW-audit
+        // exclusively from lastImportMetadata — which is null after a reload — so a
+        // Save Revision on an imported quote silently WIPED DesignNumbers, PaidToDate,
+        // Carrier/TrackingNumber, OrderNotes, the SW price audit, and DELETED the
+        // DGT/DDE/DDT digitizing fee items (they're only written from
+        // parsedServices.digitizingFees). Rebuild it from what was persisted. (audit 2026-06-10)
+        (function restoreImportMetadata() {
+            let designNumbers = [];
+            try { designNumbers = JSON.parse(session.DesignNumbers || '[]'); } catch (_) { /* legacy */ }
+            const digitizingCodes = (session.DigitizingCodes || '').split(',').map(s => s.trim()).filter(Boolean);
+            // Non-DD digitizing fee items only exist in the DB — recover them from the loaded items
+            const DGT_CODES = /^(DGT-\d+|DDE|DDT)$/i;
+            const digitizingFees = (items || [])
+                .filter(it => it.EmbellishmentType === 'fee' && DGT_CODES.test(it.StyleNumber || ''))
+                .map(it => ({ code: it.StyleNumber, description: it.ProductName, amount: parseFloat(it.BaseUnitPrice) || 0 }));
+            // Saved ImportNotes round-trip back into warnings[] so the next save re-persists them.
+            let savedNotes = [];
+            try {
+                const parsedIN = JSON.parse(session.ImportNotes || '[]');
+                savedNotes = Array.isArray(parsedIN) ? parsedIN : (Array.isArray(parsedIN.importNotes) ? parsedIN.importNotes : []);
+            } catch (_) { /* not JSON */ }
+            const hasImportData = designNumbers.length || digitizingCodes.length || digitizingFees.length
+                || parseFloat(session.PaidToDate) > 0 || session.OrderNotes || session.Carrier
+                || session.TrackingNumber || parseFloat(session.SWTotal) > 0 || savedNotes.length;
+            if (!hasImportData) return;   // nothing imported — keep null (save writes defaults)
+            lastImportMetadata = {
+                designNumbers,
+                digitizingCodes,
+                parsedServices: { digitizingFees },
+                warnings: savedNotes,
+                unmatchedLines: [],
+                reviewItems: [],
+                paidToDate: parseFloat(session.PaidToDate) || 0,
+                balanceAmount: parseFloat(session.BalanceAmount) || 0,
+                orderNotes: session.OrderNotes || '',
+                carrier: session.Carrier || '',
+                trackingNumber: session.TrackingNumber || '',
+                swTotal: parseFloat(session.SWTotal) || 0,
+                swSubtotal: parseFloat(session.SWSubtotal) || 0,
+                priceAuditJSONSnapshot: session.PriceAuditJSON || '',
+                restoredFromSession: true   // marks reconstruction (not a fresh paste-import)
+            };
+        })();
+
         // Populate products from line items
         await populateProducts(items);
 
@@ -948,11 +1085,23 @@ async function loadQuoteForEditing(quoteId) {
             });
         })();
 
-        // Restore tax rate and shipping from fee items
+        // Restore tax rate and shipping from fee items.
+        // session.TaxRate (decimal, the frozen rate-of-record) wins; the TAX item's
+        // BaseUnitPrice (percent) is the legacy source. 0 is a VALID rate — the old
+        // `|| 10.1` restored WA tax onto out-of-state quotes saved at 0%, and the
+        // next Save Revision baked it in.
         const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
         if (taxFeeItem) {
             const rateInput = document.getElementById('tax-rate-input');
-            if (rateInput) rateInput.value = taxFeeItem.BaseUnitPrice || 10.1;
+            if (rateInput) {
+                const sessionRate = parseFloat(session.TaxRate);
+                const itemRate = parseFloat(taxFeeItem.BaseUnitPrice);
+                // EMB stores TaxRate as a decimal (0.101), but normalize a percent-shaped
+                // legacy value (>1) instead of restoring "1010" into the input.
+                const sessionPct = sessionRate > 1 ? sessionRate : sessionRate * 100;
+                rateInput.value = Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
+                    : (Number.isFinite(itemRate) ? itemRate : 10.1);
+            }
         }
         // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
         // HTML, so without restoring it the reload re-applies WA tax to an exempt/out-of-state customer
@@ -996,13 +1145,32 @@ async function loadQuoteForEditing(quoteId) {
             recalculatePricing();
         }
 
-        showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
         // Enable the action-bar push button for this saved quote (gated on
         // Customer #). Reflect already-pushed state if applicable.
+        // (Duplicate mode clears all of this right after — see duplicateQuote.)
         _pushQuoteId = quoteId;
         _pushAlreadyDone = !!session.PushedToShopWorks;
         updatePushButtonState();
+
+        // "Customer viewed" badge (2026-06-10): /quote/:id records a customer_view
+        // analytics event per open — surface it so the rep knows the quote landed.
+        // Fire-and-forget; silence on failure (telemetry, not pricing).
+        (async () => {
+            try {
+                const resp = await fetch(`${API_BASE}/api/quote_analytics?quoteID=${encodeURIComponent(quoteId)}&eventType=customer_view`);
+                if (!resp.ok) return;
+                const events = await resp.json();
+                if (!Array.isArray(events) || events.length === 0) return;
+                const dates = events
+                    .map(ev => new Date(ev.Timestamp || ev.CreatedAt || ev.EventDate || ev.Date_Created || 0))
+                    .filter(d => !isNaN(d.getTime()) && d.getTime() > 0)
+                    .sort((a, b) => b - a);
+                const lastTxt = dates.length ? ` — last ${dates[0].toLocaleDateString()} ${dates[0].toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : '';
+                showToast(`👀 Customer viewed this quote ${events.length}×${lastTxt}`, 'info', 6000);
+            } catch (_) { /* telemetry only */ }
+        })();
 
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
@@ -1015,6 +1183,41 @@ async function loadQuoteForEditing(quoteId) {
         window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep
     }
 }
+
+/**
+ * Duplicate an existing quote as a brand-new one (repeat orders, 2026-06-10).
+ * Loads through the REAL edit path — so the engine reprices everything from the
+ * live API (last year's $19.00 polo correctly becomes today's price) — then
+ * clears all edit/push state so the next Save creates a NEW QuoteID. Works on
+ * pushed/locked quotes too (the classic reorder case): the source is never written.
+ */
+async function duplicateQuote(sourceQuoteId) {
+    await loadQuoteForEditing(sourceQuoteId, { forDuplicate: true });
+    if (!document.querySelector('#product-tbody tr')) return;   // load failed — error already shown
+
+    // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
+    editingQuoteId = null;
+    editingRevision = null;
+    lastImportMetadata = null;          // PaidToDate / SW audit / order # belong to the ORIGINAL order
+    _pushAlreadyDone = false;
+    _pushQuoteId = null;
+    if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+
+    // Order-specific fields must not carry over
+    const clearVal = (id) => { const el = document.getElementById(id); if (el) el.value = ''; };
+    clearVal('order-number');
+    clearVal('po-number');
+    if (typeof setQuoteDateDefaults === 'function') { try { setQuoteDateDefaults(); } catch (_) {} }
+
+    // Duplicate banner (updateEditModeUI was suppressed in duplicate mode)
+    const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.innerHTML = `<span style="color: #34d399;">📋 Duplicated from ${escapeHtml(String(sourceQuoteId))} — saving creates a NEW quote at today's prices</span>`;
+    }
+    markAsUnsaved();
+    showToast(`Duplicated ${sourceQuoteId} — prices refreshed to today's rates. Saving will create a new quote #.`, 'success', 7000);
+}
+window.duplicateQuote = duplicateQuote;
 
 // updateEditModeUI() → moved to quote-builder-utils.js
 
@@ -1047,8 +1250,13 @@ function populateCustomerInfo(session) {
     // Restore notes (plain text — not JSON)
     if (session.Notes) {
         let notesText = session.Notes;
-        // If Notes is JSON (DTG/DTF/SP), skip — those are structured config, not user notes
-        try { JSON.parse(notesText); notesText = ''; } catch (e) { /* plain text — use as-is */ }
+        // If Notes is structured JSON (DTG/DTF/SP config), skip. Only an OBJECT/ARRAY
+        // counts — a bare number like "12345" parses as JSON too, and the old check
+        // silently wiped such notes on every edit-reload.
+        try {
+            const parsed = JSON.parse(notesText);
+            if (parsed !== null && typeof parsed === 'object') notesText = '';
+        } catch (e) { /* plain text — use as-is */ }
         if (notesText) {
             const notesEl = document.getElementById('notes');
             if (notesEl) {
@@ -1456,6 +1664,13 @@ function populateAdditionalCharges(session) {
         }
     }
 
+    // Legacy sample fee: the sample inputs were removed from the EMB HTML, so a
+    // saved SampleFee can't be restored — without this warning a Save Revision
+    // silently drops the charge from the quote. (audit 2026-06-10)
+    if (parseFloat(session.SampleFee) > 0 && !document.getElementById('sample-fee')) {
+        showToast(`This quote has a saved $${session.SampleFee} sample fee that can't be restored (sample inputs were removed) — re-add it as a manual charge before saving a revision.`, 'warning', 10000);
+    }
+
     // Restore art charge toggle state
     const artChargeToggle = document.getElementById('art-charge-toggle');
     if (artChargeToggle && session.ArtCharge > 0) {
@@ -1469,37 +1684,45 @@ function populateAdditionalCharges(session) {
     // Update artwork charges display (badge and graphic design total)
     updateArtworkCharges();
 
-    // Handle discount
+    // Handle discount. The discount panel was removed from the EMB HTML, so these
+    // elements usually don't exist — the old bare getElementById writes threw a
+    // TypeError that ABORTED the whole edit-reload for any legacy discounted quote
+    // (fees/tax/LTM never restored, "Error loading quote"). Guard everything and
+    // tell the rep when a saved discount can't be represented. (audit 2026-06-10)
     if (session.Discount > 0 || session.DiscountPercent > 0) {
+        const discountType = document.getElementById('discount-type');
+        const discountAmount = document.getElementById('discount-amount');
         const discountPreset = document.getElementById('discount-preset');
-        if (session.DiscountPercent > 0) {
-            document.getElementById('discount-type').value = 'percent';
-            document.getElementById('discount-amount').value = session.DiscountPercent;
-            // Set preset dropdown based on value
-            if (discountPreset) {
-                const presetValues = ['5', '10', '15', '20', '25'];
-                const percentStr = String(session.DiscountPercent);
-                if (presetValues.includes(percentStr)) {
-                    discountPreset.value = percentStr;
-                } else {
-                    discountPreset.value = 'custom';
-                }
-            }
+        if (!discountType || !discountAmount) {
+            const saved = session.DiscountPercent > 0 ? `${session.DiscountPercent}%` : `$${session.Discount}`;
+            showToast(`This quote has a saved ${saved} discount, but the discount panel was removed — re-apply it via a price override before saving a revision.`, 'warning', 10000);
         } else {
-            document.getElementById('discount-type').value = 'fixed';
-            document.getElementById('discount-amount').value = session.Discount;
-            document.getElementById('discount-symbol').textContent = '$';
-        }
-        // Update UI to show correct input/preset based on type
-        if (typeof updateDiscountType === 'function') {
-            updateDiscountType();
-        }
-        // If custom percentage, ensure input wrapper is visible
-        if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
-            const inputWrapper = document.getElementById('discount-input-wrapper');
-            const symbol = document.getElementById('discount-symbol');
-            if (inputWrapper) inputWrapper.style.display = 'block';
-            if (symbol) symbol.textContent = '%';
+            if (session.DiscountPercent > 0) {
+                discountType.value = 'percent';
+                discountAmount.value = session.DiscountPercent;
+                // Set preset dropdown based on value
+                if (discountPreset) {
+                    const presetValues = ['5', '10', '15', '20', '25'];
+                    const percentStr = String(session.DiscountPercent);
+                    discountPreset.value = presetValues.includes(percentStr) ? percentStr : 'custom';
+                }
+            } else {
+                discountType.value = 'fixed';
+                discountAmount.value = session.Discount;
+                const sym = document.getElementById('discount-symbol');
+                if (sym) sym.textContent = '$';
+            }
+            // Update UI to show correct input/preset based on type
+            if (typeof updateDiscountType === 'function') {
+                updateDiscountType();
+            }
+            // If custom percentage, ensure input wrapper is visible
+            if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
+                const inputWrapper = document.getElementById('discount-input-wrapper');
+                const symbol = document.getElementById('discount-symbol');
+                if (inputWrapper) inputWrapper.style.display = 'block';
+                if (symbol) symbol.textContent = '%';
+            }
         }
     }
 
@@ -1805,19 +2028,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Setup unsaved changes tracking for form fields (UX improvement)
     setupUnsavedChangesTracking();
+    // Native leave-page warning while changes are unsaved (audit 2026-06-10)
+    if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
 
     try {
         // Initialize pricing calculator
         pricingCalculator = new EmbroideryPricingCalculator();
         await pricingCalculator.initializeConfig();
         updateStitchTierDropdownLabels();
+        initStitchEstimators();   // 📐 estimate-from-logo-size buttons (2026-06-10)
 
         // Initialize quote service
         quoteService = new EmbroideryQuoteService();
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = checkForEditMode();
-        if (editQuoteId) {
+        // Duplicate mode (?duplicate=EMB-2026-123): load a copy as a NEW quote (2026-06-10)
+        const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
+        if (duplicateQuoteId) {
+            await duplicateQuote(duplicateQuoteId);
+        } else if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await loadQuoteForEditing(editQuoteId);
         } else {
@@ -3102,7 +3332,14 @@ function showSearchSuggestions(products) {
     const suggestions = document.getElementById('search-suggestions');
 
     if (!products || products.length === 0) {
-        suggestions.innerHTML = '<div class="suggestion-item"><span>No products found</span></div>';
+        // Not a dead-end: offer the non-SanMar add path right here. The row-level
+        // style input already had this; the TOP search just said "No products
+        // found" and stranded the rep. (audit ux-flow 2026-06-10)
+        const q = (document.getElementById('product-search')?.value || '').trim();
+        const safeQ = escapeHtml(q);
+        suggestions.innerHTML = `
+            <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${safeQ}"` : ''}</span></div>
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" onclick="addNonSanmarFromSearch()" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Add "${safeQ}" as a non-SanMar product…</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
@@ -3223,7 +3460,7 @@ function addNewRow() {
             title="Double-click to override price">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #d1d5db; cursor: not-allowed; padding: 4px; font-size: 13px; opacity: 0.5;" disabled onmouseover="if(!this.disabled)this.style.color='#3b82f6'" onmouseout="if(!this.disabled)this.style.color='#94a3b8'"
+            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #d1d5db; cursor: not-allowed; padding: 4px; font-size: 13px; opacity: 0.5;" disabled onmouseover="if(!this.disabled)this.style.color='#3b82f6'" onmouseout="if(!this.disabled)this.style.color='#94a3b8'">
                 <i class="fas fa-copy"></i>
             </button>
             <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
@@ -3243,6 +3480,8 @@ function addNewRow() {
     setTimeout(() => {
         row.classList.remove('new-row');
     }, 1000);
+
+    return rowId;
 }
 
 async function addProductRow(styleNumber) {
@@ -3259,6 +3498,21 @@ async function addProductRow(styleNumber) {
 
     await onStyleChange(styleInput, parseInt(rowId));
 }
+
+/**
+ * Top-search "no results" → route the typed style into a table row, which runs
+ * the existing non-SanMar lookup (and its "Add to Non-SanMar database" button
+ * when the style is brand-new). (audit ux-flow 2026-06-10)
+ */
+async function addNonSanmarFromSearch() {
+    const searchEl = document.getElementById('product-search');
+    const q = (searchEl?.value || '').trim();
+    if (!q) return;
+    document.getElementById('search-suggestions')?.classList.remove('show');
+    if (searchEl) searchEl.value = '';
+    await addProductRow(q);
+}
+window.addNonSanmarFromSearch = addNonSanmarFromSearch;
 
 /**
  * Create a service product row (DECG, DECC, AL, FB, CB, MONOGRAM, etc.)
@@ -3387,35 +3641,14 @@ function createServiceProductRow(serviceType, data) {
     return row;
 }
 
-/**
- * Toggle the "Add Service" dropdown menu
- */
-function toggleServiceDropdown() {
-    const menu = document.getElementById('service-dropdown-menu');
-    if (!menu) return;
-    const isVisible = menu.style.display !== 'none';
-    menu.style.display = isVisible ? 'none' : 'block';
-    // Close on outside click
-    if (!isVisible) {
-        const closeHandler = (e) => {
-            if (!e.target.closest('.add-service-dropdown')) {
-                menu.style.display = 'none';
-                document.removeEventListener('click', closeHandler);
-            }
-        };
-        setTimeout(() => document.addEventListener('click', closeHandler), 0);
-    }
-}
+// toggleServiceDropdown removed 2026-06-10 — zero callers; its #service-dropdown-menu
+// target no longer exists (replaced by the Services bar).
 
 /**
  * Add a manual service row (Monogram, Name/Number, WEIGHT)
- * Called from the "Add Service" dropdown
+ * Called from the Services bar
  */
 function addManualServiceRow(serviceType, priceOverride) {
-    // Close dropdown
-    const menu = document.getElementById('service-dropdown-menu');
-    if (menu) menu.style.display = 'none';
-
     // Rush is a single, computed 25%-of-subtotal fee — never add a duplicate
     if (serviceType === 'RUSH' && document.querySelector('#product-tbody tr.service-product-row[data-service-type="rush"]')) {
         showToast('Rush Fee is already on the order', 'info');
@@ -3425,10 +3658,10 @@ function addManualServiceRow(serviceType, priceOverride) {
     // Default prices per service type
     const SERVICE_DEFAULTS = {
         'Monogram': { unitPrice: getServicePrice('Monogram', 12.50), quantity: 1 },
-        'Name/Number': { unitPrice: 15.00, quantity: 1 },
-        'WEIGHT': { unitPrice: 6.25, quantity: 1 },
-        'SEG': { unitPrice: 10.00, quantity: 1 },
-        'DT': { unitPrice: 50.00, quantity: 1 },
+        'Name/Number': { unitPrice: getServicePrice('Name/Number', 15.00), quantity: 1 },
+        'WEIGHT': { unitPrice: getServicePrice('WEIGHT', 6.25), quantity: 1 },
+        'SEG': { unitPrice: getServicePrice('SEG', 10.00), quantity: 1 },
+        'DT': { unitPrice: getServicePrice('DT', 50.00), quantity: 1 },
         'CTR-GARMT': { unitPrice: 0, quantity: 1 },
         'CTR-CAP': { unitPrice: 0, quantity: 1 },
         'GRT-50': { unitPrice: getServicePrice('GRT-50', 50), quantity: 1 },
@@ -4689,6 +4922,10 @@ async function detectAndAdjustSizeUI(rowId) {
 
     if (!styleNumber || !catalogColor) return;
 
+    // Stale guard: if the rep changes style/color while a lookup is in flight, the
+    // older response must NOT overwrite the newer row state. Checked after each await.
+    const isStale = () => row.dataset.style !== styleNumber || row.dataset.catalogColor !== catalogColor;
+
     // =========================================
     // CAP SPECIAL HANDLING
     // Caps use /api/sizes-by-style-color endpoint
@@ -4707,6 +4944,7 @@ async function detectAndAdjustSizeUI(rowId) {
 
             const capUrl = `${API_BASE}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
             const capResponse = await fetch(capUrl);
+            if (isStale()) return;
 
             let capSizes = ['OSFA']; // Default fallback
             if (capResponse.ok) {
@@ -4757,6 +4995,7 @@ async function detectAndAdjustSizeUI(rowId) {
         // Fetch all available sizes for this style+color
         const url = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(catalogColor)}`;
         const response = await fetch(url);
+        if (isStale()) return;
 
         if (!response.ok) {
             console.error(`[Size Detection] API failed for ${styleNumber}:`);
@@ -4768,6 +5007,7 @@ async function detectAndAdjustSizeUI(rowId) {
             try {
                 const altUrl = `${API_BASE}/api/sanmar-shopworks/import-format?styleNumber=${encodeURIComponent(styleNumber)}`;
                 const altResponse = await fetch(altUrl);
+                if (isStale()) return;
 
                 if (altResponse.ok) {
                     const skus = await altResponse.json();
@@ -4776,12 +5016,16 @@ async function detectAndAdjustSizeUI(rowId) {
                         const sizeInfo = analyzeSizeCategory(allSizes);
                         updateRowForSizeCategory(row, sizeInfo);
                         row.dataset.availableSizes = JSON.stringify(allSizes);
+                        showToast(`Size check for ${styleNumber} used style-level data (color lookup failed) — some sizes may not exist in ${row.dataset.color || 'this color'}.`, 'warning', 6000);
                         return;
                     }
                 }
             } catch (fallbackError) {
                 console.error('[Size Detection] Fallback also failed:', fallbackError);
             }
+            // Both lookups failed — the row keeps the default S–XL+extended grid, which may
+            // not map to real SKUs for this product. Say so (Erik's #1 rule: never silent).
+            showToast(`Couldn't verify available sizes for ${styleNumber} — using the standard size grid. Double-check sizes before saving.`, 'warning', 7000);
             return;
         }
 
@@ -6142,7 +6386,75 @@ window.syncRushRow = syncRushRow;
 async function estimateShipping() { return QuoteOrderSummary.estimateShipping(); }
 window.estimateShipping = estimateShipping;
 
+/**
+ * Which category (garment/cap) is nearer its next EMB tier break — they tier
+ * SEPARATELY, so the nudge must target one category, never the combined total.
+ * label is set only for mixed orders (where ambiguity exists). (2026-06-10)
+ */
+function computeEmbNudgeTarget(garmentQty, capQty) {
+    const breaks = [8, 24, 48, 72];
+    const nextBreak = q => breaks.find(b => q < b) || null;
+    const mixed = garmentQty > 0 && capQty > 0;
+    const mk = (q, category) => {
+        const nb = nextBreak(q);
+        return nb ? { qty: q, needed: nb - q, nextBreak: nb, category, label: mixed ? category : '' } : null;
+    };
+    const g = garmentQty > 0 ? mk(garmentQty, 'garment') : null;
+    const c = capQty > 0 ? mk(capQty, 'cap') : null;
+    if (g && c) return g.needed <= c.needed ? g : c;
+    return g || c || { qty: 0, needed: 0, nextBreak: null, category: '', label: '' };
+}
+
+/**
+ * Price-break ladder (2026-06-10): simulate the order at the next tier with the
+ * REAL engine (clone + pad the target category) and show the actual $/pc savings
+ * in the nudge — "Add 3 more garment pieces … save ~$1.62/piece". Fire-and-forget
+ * after each recalc; the seq guard discards stale results.
+ */
+async function computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmEnabled, pricing, mySeq) {
+    try {
+        const t = computeEmbNudgeTarget(pricing.garmentQuantity || 0, pricing.capQuantity || 0);
+        if (!t.qty || !t.needed || !t.nextBreak) return;
+        if (t.needed > Math.ceil(t.nextBreak * 0.30)) return;   // nudge not visible — skip the sim
+        const isCapTarget = t.category === 'cap';
+        const idx = productList.findIndex(p => !!p.isCap === isCapTarget);
+        if (idx === -1) return;
+        let clone;
+        try { clone = structuredClone(productList); } catch (_) { clone = JSON.parse(JSON.stringify(productList)); }
+        const target = clone[idx];
+        target.totalQuantity = (target.totalQuantity || 0) + t.needed;
+        const sb = target.sizeBreakdown || target.sizes;
+        if (sb && typeof sb === 'object') {
+            const k = Object.keys(sb).find(key => sb[key] > 0) || 'L';
+            sb[k] = (Number(sb[k]) || 0) + t.needed;
+        }
+        const sim = await pricingCalculator.calculateQuote(clone, allLogos, logoConfigs, { ltmEnabled });
+        if (mySeq !== window._embRecalcSeq) return;   // a newer recalc superseded this sim
+        if (!sim || sim.success === false) return;
+        const unitOf = (res) => {
+            const pp = (res.products || []).find(p => !!(p.product && p.product.isCap) === isCapTarget);
+            const li = pp && (pp.lineItems || [])[0];
+            const v = li && Number(li.unitPriceWithLTM ?? li.unitPrice);
+            return Number.isFinite(v) && v > 0 ? v : null;
+        };
+        const cur = unitOf(pricing);
+        const next = unitOf(sim);
+        if (cur == null || next == null) return;
+        const savings = cur - next;
+        if (savings > 0.01) {
+            updateQuantityNudge(t.qty, 'emb', savings, 'quantity-nudge', t.label);
+        }
+    } catch (e) {
+        console.warn('[Nudge] savings simulation skipped:', e);
+    }
+}
+
 async function recalculatePricing() {
+    // Stale-response guard: rapid edits fire overlapping recalcs, and an OLDER
+    // calculateQuote resolving after a newer one overwrote fresher totals on
+    // screen (the save path then snapshotted them). Only the latest call may
+    // apply results. (audit 2026-06-10)
+    const mySeq = (window._embRecalcSeq = (window._embRecalcSeq || 0) + 1);
     // Keep Additional-Logo rows tallied to the order's piece count + re-priced for the current
     // tier BEFORE we read the table — so a garment add/remove/qty change flows into the AL line.
     // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
@@ -6191,7 +6503,10 @@ async function recalculatePricing() {
         const capEmbType = getCapEmbellishmentType();
         const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
         const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
-        const patchSetupFee = showPatchSetup ? EMB_DEFAULTS.PATCH_SETUP_FEE : 0;
+        // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
+        const patchSetupFee = showPatchSetup
+            ? (Number.isFinite(pricingCalculator?.patchSetupFee) ? pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
+            : 0;
 
         // Determine tier based on total quantity
         const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
@@ -6230,13 +6545,15 @@ async function recalculatePricing() {
     if (ltmWrapper) {
         if (wouldHaveLTM) {
             ltmWrapper.style.display = '';
-            const garmentLtmFee = garmentHasLTM ? 50 : 0;
-            const capLtmFee = capHasLTM ? 50 : 0;
+            // Engine's ltmFee is the API-loaded LTM (Service_Codes); 50 is fallback-only.
+            const apiLtmFee = Number.isFinite(parseFloat(pricingCalculator?.ltmFee)) ? parseFloat(pricingCalculator.ltmFee) : 50;
+            const garmentLtmFee = garmentHasLTM ? apiLtmFee : 0;
+            const capLtmFee = capHasLTM ? apiLtmFee : 0;
             const totalLtmFee = garmentLtmFee + capLtmFee;
             // Build label showing which types have LTM
             let feeLabel = 'Small Order Fee';
             if (garmentHasLTM && capHasLTM) {
-                feeLabel = 'Small Order Fee — Garments ($50) + Caps ($50)';
+                feeLabel = `Small Order Fee — Garments ($${apiLtmFee}) + Caps ($${apiLtmFee})`;
             } else if (garmentHasLTM) {
                 feeLabel = 'Small Order Fee — Garments';
             } else if (capHasLTM) {
@@ -6268,6 +6585,9 @@ async function recalculatePricing() {
 
     try {
         const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
+
+        // A newer recalc started while we were awaiting — discard this stale result.
+        if (mySeq !== window._embRecalcSeq) return;
 
         // Never render $0.00 on a hard API/config failure — calculateQuote returns {success:false} in that
         // case; surface it instead of silently showing a wrong (zero) price. (review C4 — Erik's #1 rule)
@@ -6465,6 +6785,10 @@ async function recalculatePricing() {
             }
 
             updatePricingDisplay(pricing);
+
+            // Price-break ladder: fire-and-forget engine sim → fills in the real
+            // $/pc savings on the nudge when it lands (seq-guarded). (2026-06-10)
+            computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmEnabled, pricing, mySeq);
         }
     } catch (error) {
         console.error('Pricing calculation error:', error);
@@ -6645,15 +6969,32 @@ function updatePricingDisplay(pricing) {
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
     updatePerUnitPrice((pricing.subtotal || 0) + (pricing.ltmFee || 0), pricing.totalQuantity || 0);
-    // EMB savings calculation skipped — pricing depends on stitch count, garment/cap mix, and multiple logo configs
-    // which make a simple tier comparison unreliable. Nudge still shows quantity needed.
-    updateQuantityNudge(pricing.totalQuantity || 0, 'emb', null);
+    // Category-aware nudge: EMB caps + garments tier SEPARATELY, so the combined
+    // total promised tier breaks that adding the other category could never hit.
+    // Savings $/pc arrives async from a real engine simulation (recalculatePricing).
+    const nudgeTarget = computeEmbNudgeTarget(pricing.garmentQuantity || 0, pricing.capQuantity || 0);
+    updateQuantityNudge(nudgeTarget.qty, 'emb', null, 'quantity-nudge', nudgeTarget.label);
     document.getElementById('grand-total').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
 
-    // Minimum order warning banner (show when qty > 0 but <= 7)
+    // Minimum order warning banner — LTM is assessed PER CATEGORY (garments ≤7 and
+    // caps ≤7 independently). Keying off combined qty hid the banner on a 5+5 mixed
+    // order that carries TWO $50 fees, and understated when both applied.
     const minWarning = document.getElementById('min-order-warning');
     if (minWarning) {
-        minWarning.style.display = (totalQty > 0 && totalQty <= 7) ? 'flex' : 'none';
+        const gQ = pricing.garmentQuantity || 0;
+        const cQ = pricing.capQuantity || 0;
+        const gLtm = gQ > 0 && gQ <= 7;
+        const cLtm = cQ > 0 && cQ <= 7;
+        minWarning.style.display = (gLtm || cLtm) ? 'flex' : 'none';
+        const msgEl = minWarning.querySelector('.min-order-warning-text') || minWarning.querySelector('span') || minWarning;
+        const fee = Number.isFinite(parseFloat(pricingCalculator?.ltmFee)) ? parseFloat(pricingCalculator.ltmFee) : 50;
+        if (gLtm && cLtm) {
+            msgEl.textContent = `Garments (${gQ} pcs) and caps (${cQ} pcs) are each under the 8-piece minimum — two $${fee} small-order fees apply.`;
+        } else if (gLtm) {
+            msgEl.textContent = `Garments (${gQ} pcs) are under the 8-piece minimum — a $${fee} small-order fee applies.`;
+        } else if (cLtm) {
+            msgEl.textContent = `Caps (${cQ} pcs) are under the 8-piece minimum — a $${fee} small-order fee applies.`;
+        }
     }
 
     // Update products label based on embellishment type
@@ -7325,7 +7666,9 @@ function updateTaxCalculation() {
     const { adjustedSubtotal } = calculateDiscountableSubtotal();
 
     const rateInput = document.getElementById('tax-rate-input');
-    const taxRate = rateInput ? parseFloat(rateInput.value) / 100 : 0.101;
+    // parseRatePercent: an empty/cleared input rendered "$NaN" and saved a
+    // "Sales Tax (NaN%)" item; 0 stays a valid rate. Same fallback as the save path.
+    const taxRate = parseRatePercent(rateInput?.value, 10.1) / 100;
 
     const taxRow = document.getElementById('tax-row');
     const taxAmountEl = document.getElementById('tax-amount');
@@ -7374,13 +7717,24 @@ function updateTaxCalculation() {
     if (taxLabel) taxLabel.textContent = 'Sales Tax';
 
     if (includeTax) {
-        const tax = adjustedSubtotal * taxRate;
+        // Round tax BEFORE summing (gotcha rule) — the save path does, so an
+        // unrounded sum here could show a grand total 1¢ off the saved one.
+        const tax = Math.round(adjustedSubtotal * taxRate * 100) / 100;
         taxAmountEl.textContent = '$' + tax.toFixed(2);
         grandTotalWithTax.textContent = '$' + (adjustedSubtotal + tax).toFixed(2);
     } else {
         // Keep the tax row visible (it holds the re-enable checkbox); zero the amount.
         taxAmountEl.textContent = '$0.00';
         grandTotalWithTax.textContent = '$' + adjustedSubtotal.toFixed(2);
+    }
+
+    // Always-visible sidebar TOTAL bar (ux-flow 2026-06-10) — mirrors the invoice
+    // grand total so the running price never scrolls out of view while building.
+    const sidebarBar = document.getElementById('sidebar-total-bar');
+    const sidebarTotal = document.getElementById('sidebar-grand-total');
+    if (sidebarBar && sidebarTotal) {
+        sidebarTotal.textContent = grandTotalWithTax.textContent;
+        sidebarBar.hidden = false;
     }
 
     // Keep the Step-3 shipping summary's tax-rate in sync after a rate lookup.
@@ -7396,6 +7750,22 @@ function updateTaxCalculation() {
  * Uses EmbroideryQuoteService and QuoteShareModal
  */
 async function saveAndGetLink(opts = {}) {
+    // Re-entrancy guard: the save button was only disabled deep into the flow
+    // (after three awaits), so a double-click started two concurrent saves —
+    // duplicate quote sessions on a new quote, racing delete/insert in edit mode.
+    if (window._embSaveInFlight) {
+        showToast('Save already in progress…', 'info');
+        return;
+    }
+    window._embSaveInFlight = true;
+    try {
+        return await _saveAndGetLinkInner(opts);
+    } finally {
+        window._embSaveInFlight = false;
+    }
+}
+
+async function _saveAndGetLinkInner(opts = {}) {
     const skipShareModal = !!(opts && opts.skipShareModal);   // true from pushToShopWorks: auto-save → push, no share modal
     // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
     // so a stale value here would be persisted to the quote. (2026-06-04 audit hardening)
@@ -7611,13 +7981,15 @@ async function saveAndGetLink(opts = {}) {
             taxRate: (() => {
                 const includeTax = document.getElementById('include-tax')?.checked;
                 if (!includeTax) return 0;
-                const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                // parseRatePercent: 0 is a VALID rate (out-of-state) — `|| 10.1` was
+                // silently saving WA tax on quotes the screen showed at $0 tax.
+                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1);
                 return rateVal / 100;
             })(),
             taxAmount: (() => {
                 const includeTax = document.getElementById('include-tax')?.checked;
                 if (!includeTax) return 0;
-                const rateVal = parseFloat(document.getElementById('tax-rate-input')?.value) || 10.1;
+                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1);
                 const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
                 const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
                 // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
@@ -7653,6 +8025,10 @@ async function saveAndGetLink(opts = {}) {
             swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
             priceAuditJSON: (() => {
                 if (!lastImportMetadata || !lastImportMetadata.swSubtotal) return '';
+                // Reloaded quotes have no per-row _swUnitPrice (it only exists right after a
+                // paste-import), so recomputing here would write false MISMATCH flags. Keep
+                // the audit captured at import time verbatim. (audit 2026-06-10)
+                if (lastImportMetadata.restoredFromSession) return lastImportMetadata.priceAuditJSONSnapshot || '';
                 const swSub = lastImportMetadata.swSubtotal;
                 const ourSub = pricing.grandTotal || 0;
                 const delta = ourSub - swSub;
@@ -7690,7 +8066,7 @@ async function saveAndGetLink(opts = {}) {
                 });
                 (svc.monograms || []).forEach(m => {
                     const swU = parseFloat(m.unitPrice || m.price || 0);
-                    const ourU = 12.50;
+                    const ourU = getServicePrice('Monogram', 12.50);  // audit flags must track Caspio, not 2026-02 literals
                     const d = ourU - swU;
                     const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
                     prods.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
@@ -7699,7 +8075,7 @@ async function saveAndGetLink(opts = {}) {
                 });
                 (svc.weights || []).forEach(w => {
                     const swU = parseFloat(w.unitPrice || w.price || 0);
-                    const ourU = 6.25;
+                    const ourU = getServicePrice('WEIGHT', 6.25);  // audit flags must track Caspio, not 2026-02 literals
                     const d = ourU - swU;
                     const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
                     prods.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
@@ -7769,9 +8145,14 @@ async function saveAndGetLink(opts = {}) {
         }
 
         if (result && result.quoteID) {
-            // Warn if partial save (some items failed to persist)
-            if (result.partialSave && result.warning) {
-                showToast(result.warning, 'error');
+            // Partial save = NOT a success: items are missing from the DB, so the
+            // share link, /quote page, and a ShopWorks push would all under-bill.
+            // Keep the local draft (rep's data is the only complete copy), skip the
+            // share modal, and leave Push disabled. (audit 2026-06-10)
+            if (result.partialSave) {
+                showToast((result.warning || 'Some line items failed to save.') +
+                    ' The quote is incomplete — do NOT share or push it. Check your connection and save again.', 'error', 12000);
+                return;
             }
 
             const isUpdate = !!editingQuoteId;
@@ -8407,6 +8788,11 @@ function clearCustomerContextBanners() {
 
 function resetQuote() {
     clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote
+    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)
+    const _stb = document.getElementById('sidebar-total-bar');
+    if (_stb) _stb.hidden = true;
+    const _stg = document.getElementById('sidebar-grand-total');
+    if (_stg) _stg.textContent = '$0.00';
     // Clear all product rows and re-add empty state
     const tbody = document.getElementById('product-tbody');
     tbody.innerHTML = `
@@ -10621,7 +11007,7 @@ function renderImportPreview(data) {
         servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing (${codes.join(', ')})</span>`;
     }
     if (data.services.patchSetup) {
-        servicesHtml += '<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($50)</span>';
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($${Number.isFinite(parseFloat(pricingCalculator?.patchSetupFee)) ? parseFloat(pricingCalculator.patchSetupFee) : 50})</span>`;
     }
 
     // Handle new additionalLogos array
@@ -12576,7 +12962,10 @@ function buildEmbroideryPricingData(allItems) {
     // Patch setup fee
     const capHasStyle = hasCaps;
     const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
-    const capPatchSetupFee = showPatchSetup ? EMB_DEFAULTS.PATCH_SETUP_FEE : 0;
+    // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
+    const capPatchSetupFee = showPatchSetup
+        ? (Number.isFinite(pricingCalculator?.patchSetupFee) ? pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
+        : 0;
 
     // LTM state
     const ltmState = getLtmControlState('emb-ltm-panel');
@@ -12720,16 +13109,30 @@ function generateEmbQuoteText(products, serviceItems) {
         });
     }
 
-    // Summary
-    const grandTotalText = document.getElementById('grand-total')?.textContent || '$0.00';
+    // Summary — mirror the on-screen invoice totals exactly. #grand-total is
+    // merchandise only; the customer-facing TOTAL must include fees, shipping,
+    // discount, and tax (it was copying a number lower than the screen/PDF/save).
     const totalQty = document.getElementById('total-qty')?.textContent || '0';
     const tier = document.getElementById('pricing-tier')?.textContent || '1-7';
+    const { baseSubtotal, additionalCharges, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
+    const includeTax = document.getElementById('include-tax')?.checked;
+    const taxRatePct = includeTax ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1) : 0;
+    const taxAmount = Math.round(adjustedSubtotal * (taxRatePct / 100) * 100) / 100;
+    const copyTotal = adjustedSubtotal + taxAmount;
 
     lines.push('');
     lines.push('------------------------------------------------');
     lines.push(`Total Pieces: ${totalQty}`);
     lines.push(`Pricing Tier: ${tier}`);
-    lines.push(`TOTAL: ${grandTotalText}`);
+    lines.push(`Merchandise Subtotal: $${baseSubtotal.toFixed(2)}`);
+    if (additionalCharges > 0) lines.push(`Fees & Shipping: $${additionalCharges.toFixed(2)}`);
+    if (discount > 0) lines.push(`Discount: -$${discount.toFixed(2)}`);
+    if (includeTax) {
+        lines.push(`Sales Tax (${taxRatePct}%): $${taxAmount.toFixed(2)}`);
+    } else {
+        lines.push('Sales Tax: $0.00 (exempt/out of state)');
+    }
+    lines.push(`TOTAL: $${copyTotal.toFixed(2)}`);
     lines.push('');
     lines.push('Northwest Custom Apparel | 253-922-5793');
 
@@ -12740,6 +13143,11 @@ function generateEmbQuoteText(products, serviceItems) {
  * Print embroidery quote using EmbroideryInvoiceGenerator
  */
 async function printQuote() {
+    // Settle on-screen prices before snapshotting — same guard the save path has.
+    // AL rows + Rush are display-driven; printing during a pending recalc put a
+    // stale total on the PDF. (audit 2026-06-10)
+    try { await syncALRows(); await syncDECGRows(); await recalculatePricing(); } catch (e) { console.warn('[Print] pre-print recalc skipped', e); }
+
     const allItems = collectProductsFromTable();
     if (allItems.length === 0) {
         showToast('Add products before printing', 'error');
@@ -12809,10 +13217,16 @@ async function printQuote() {
  * Email embroidery quote — requires save first, then calls shared emailQuote()
  */
 async function embEmailQuote() {
-    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
-    if (!quoteId) {
-        showToast('Please save the quote first before emailing', 'error');
-        return;
+    let quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
+    // Unsaved (or edited-since-save) → auto-save first, exactly like Push does.
+    // The old dead-end ("save first" error) made the most common send action a
+    // two-step chore. saveAndGetLink validates + shows its own errors. (audit 2026-06-10)
+    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
+    if (!quoteId || dirty) {
+        showToast('Saving quote before emailing…', 'info', 2500);
+        await saveAndGetLink({ skipShareModal: true });
+        quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);
+        if (!quoteId) return;   // save failed/blocked — its error is already on screen
     }
     await emailQuote({
         quoteId,

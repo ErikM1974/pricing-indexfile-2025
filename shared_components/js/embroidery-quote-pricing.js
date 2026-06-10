@@ -346,22 +346,27 @@ class EmbroideryPricingCalculator {
                     }
                 }
 
-                // LTM (Less Than Minimum) fee
+                // LTM (Less Than Minimum) fee. parseFloat + finite check: Caspio can
+                // return SellPrice as a string, and 0 is a legitimate price (the old
+                // truthy check silently kept the hardcoded fallback for a $0 row).
                 const ltm = codes.find(c => c.ServiceCode === 'LTM');
-                if (ltm && ltm.SellPrice) {
-                    this.ltmFee = ltm.SellPrice;
+                const _ltmPrice = ltm ? parseFloat(ltm.SellPrice) : NaN;
+                if (Number.isFinite(_ltmPrice)) {
+                    this.ltmFee = _ltmPrice;
                 }
 
                 // GRT-50 (Patch Setup Fee)
                 const grt50 = codes.find(c => c.ServiceCode === 'GRT-50');
-                if (grt50 && grt50.SellPrice) {
-                    this.patchSetupFee = grt50.SellPrice;
+                const _grt50Price = grt50 ? parseFloat(grt50.SellPrice) : NaN;
+                if (Number.isFinite(_grt50Price)) {
+                    this.patchSetupFee = _grt50Price;
                 }
 
                 // Monogram pricing
                 const monogram = codes.find(c => c.ServiceCode === 'Monogram');
-                if (monogram && monogram.SellPrice) {
-                    this.monogramPrice = monogram.SellPrice;
+                const _monoPrice = monogram ? parseFloat(monogram.SellPrice) : NaN;
+                if (Number.isFinite(_monoPrice)) {
+                    this.monogramPrice = _monoPrice;
                 }
 
                 // CONFIG: Garment stitch rate
@@ -595,10 +600,16 @@ class EmbroideryPricingCalculator {
     }
 
     /**
-     * Get cap embroidery cost for tier
+     * Get cap embroidery cost for tier.
+     * $9 is a FALLBACK for a missing tier row — flag it so calculateQuote can
+     * surface a visible warning (Erik's #1 rule: never a silent wrong price).
      */
     getCapEmbroideryCost(tier) {
-        return this.capTiers[tier]?.embCost || 9.00; // Cap default if not loaded
+        const v = parseFloat(this.capTiers[tier]?.embCost);
+        if (Number.isFinite(v) && v > 0) return v;
+        this._costFallbackUsed = `cap tier ${tier}`;
+        console.error(`[EmbroideryPricing] No cap embroidery cost for tier ${tier} — using $9.00 fallback`);
+        return 9.00;
     }
 
     // Per-tier cap margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
@@ -630,7 +641,10 @@ class EmbroideryPricingCalculator {
         }
 
         const tier = this.getTier(totalQuantity);
-        const marginDenom = this.capMarginDenominator || 0.57;
+        // Per-tier cap margin (N2 parity, 2026-06-10): the global-only read meant a
+        // per-tier MarginDenominator in Caspio priced caps differently here than in
+        // the ShopWorks-import review modal (which uses getCapMarginDenominator).
+        const marginDenom = this.getCapMarginDenominator(tier);
 
         // Determine decoration cost based on embellishment type
         let decorationCost = 0;
@@ -798,18 +812,28 @@ class EmbroideryPricingCalculator {
     }
 
     /**
-     * Round price based on API rules
+     * Round price based on API rules.
+     * Known methods: 'CeilDollar' (caps) and 'HalfDollarUp'/'HalfDollarCeil_Final'
+     * (garments). An UNKNOWN/missing value silently became half-dollar before —
+     * now it's logged once so a Caspio typo can't quietly change rounding. The
+     * half-dollar default itself is unchanged. (audit hardening 2026-06-10)
      */
     roundPrice(price) {
         if (isNaN(price)) return null;
-        
+
         // Use API-specified rounding method
         if (this.roundingMethod === 'CeilDollar') {
             // Round up to nearest dollar
             return Math.ceil(price);
         }
-        
-        // Fallback to half-dollar rounding if different method specified
+
+        const KNOWN_HALF = ['HalfDollarUp', 'HalfDollarCeil_Final'];
+        if (this.roundingMethod && !KNOWN_HALF.includes(this.roundingMethod) && !this._warnedRounding) {
+            this._warnedRounding = true;
+            console.error(`[EmbroideryPricing] Unknown RoundingMethod "${this.roundingMethod}" from API — defaulting to half-dollar-up. Check Caspio Embroidery_Costs.`);
+        }
+
+        // Half-dollar-up rounding (garment default)
         if (price % 0.5 === 0) return price;
         return Math.ceil(price * 2) / 2;
     }
@@ -886,10 +910,16 @@ class EmbroideryPricingCalculator {
     }
 
     /**
-     * Get embroidery cost for tier
+     * Get embroidery cost for tier.
+     * $12 is a FALLBACK for a missing tier row — flag it so calculateQuote can
+     * surface a visible warning (Erik's #1 rule: never a silent wrong price).
      */
     getEmbroideryCost(tier) {
-        return this.tiers[tier]?.embCost || 12.00;
+        const v = parseFloat(this.tiers[tier]?.embCost);
+        if (Number.isFinite(v) && v > 0) return v;
+        this._costFallbackUsed = `garment tier ${tier}`;
+        console.error(`[EmbroideryPricing] No garment embroidery cost for tier ${tier} — using $12.00 fallback`);
+        return 12.00;
     }
 
     // Per-tier garment margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
@@ -1383,6 +1413,10 @@ class EmbroideryPricingCalculator {
             return null;
         }
 
+        // Reset the per-run cost-fallback flag — checked at the end so a missing
+        // Caspio tier row warns VISIBLY (once per run, not per product). (2026-06-10)
+        this._costFallbackUsed = null;
+
         // Ensure configuration is loaded
         if (!this.initialized) {
             await this.initializeConfig();
@@ -1671,16 +1705,22 @@ class EmbroideryPricingCalculator {
                             }
 
                             // STANDARD AL: Calculate additional logo price (NO margin division)
-                            // Use different base stitch count and rate for caps vs garments
-                            const baseStitches = isCap ? 5000 : this.baseStitchCount;
-                            const stitchRate = isCap ? this.capAdditionalStitchRate : this.additionalStitchRate;
+                            // Use appropriate tier for caps vs garments
+                            const alTier = isCap ? capTier : garmentTier;
+                            const alTierData = isCap ? this.capAlTiers : this.alTiers;
+
+                            // Per-tier Caspio BaseStitchCount/AdditionalStitchRate first — the
+                            // hardcoded 5000/global rates are fallback-only. Keeps this path
+                            // identical to getServiceUnitPrice() (the ShopWorks-import review
+                            // modal), which already honored the per-tier values; the two paths
+                            // could otherwise price the SAME AL differently. (audit 2026-06-10)
+                            const alTierInfo = alTierData[alTier] || {};
+                            const baseStitches = alTierInfo.baseStitchCount || (isCap ? 5000 : this.baseStitchCount);
+                            const stitchRate = alTierInfo.additionalStitchRate || (isCap ? this.capAdditionalStitchRate : this.additionalStitchRate);
                             const extraStitches = Math.max(0, logo.stitchCount - baseStitches);
                             const stitchCost = (extraStitches / 1000) * stitchRate;
 
                             // Use AL tier cost from API - ERROR if not available
-                            // Use appropriate tier for caps vs garments
-                            const alTier = isCap ? capTier : garmentTier;
-                            const alTierData = isCap ? this.capAlTiers : this.alTiers;
 
                             if (!alTierData[alTier] || !alTierData[alTier].embCost) {
                                 console.error('[EmbroideryPricingCalculator] AL pricing not available for tier:', alTier, 'isCap:', isCap);
@@ -1805,6 +1845,13 @@ class EmbroideryPricingCalculator {
 
         // Final totals - NOW includes additionalStitchTotal as a separate line item (not baked into product prices)
         const grandTotal = subtotal + ltmTotal + setupFees + additionalStitchTotal + additionalServicesTotal + puffUpchargeTotal + patchUpchargeTotal;
+
+        // A hardcoded decoration-cost fallback fired during this run (missing Caspio
+        // tier row) — make it VISIBLE once. Erik's #1 rule: a fallback price without
+        // a warning is a silent wrong price. (audit 2026-06-10)
+        if (this._costFallbackUsed && typeof showToast === 'function') {
+            showToast(`Pricing data incomplete (${this._costFallbackUsed} missing from Caspio) — quoted with the default decoration cost. Verify pricing before sending.`, 'warning', 8000);
+        }
 
         return {
             products: productPricing,

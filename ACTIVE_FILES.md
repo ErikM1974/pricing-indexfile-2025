@@ -164,6 +164,7 @@
 | `/pages/js/3-day-tees-success.js` | Success-page logic (status polling w/ refresh=true, EmailJS once-guard) | TDTShipDate, app.config.js | ✅ Active |
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
+| `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
 | `/tests/unit/3dt-pricing.test.js` | Behavioral spec: 7-step formula, sub-24 cost fallback, LTM, tax base | jest | ✅ Active |
 | `/tests/unit/3dt-shipdate.test.js` | Behavioral spec: cutoff/weekend/holiday/PST-PDT matrix | jest | ✅ Active |
 | `/tests/3dt-test-push-payload.json` | Reference webhook-equivalent payload for ManageOrders TEST pushes | — | ✅ Active |

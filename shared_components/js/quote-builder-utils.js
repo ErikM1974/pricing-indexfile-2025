@@ -48,6 +48,33 @@ if (typeof window !== 'undefined' && typeof window.getServicePrice !== 'function
 }
 
 // ============================================
+// STAFF MARKER (customer-view analytics)
+// ============================================
+// Any browser that has opened a quote builder is a STAFF browser. The customer
+// quote page (/quote/:id) checks this flag to avoid counting staff opens as
+// "customer viewed" events. Best-effort telemetry, never load-bearing. (2026-06-10)
+try { if (typeof localStorage !== 'undefined') localStorage.setItem('nwca_staff', '1'); } catch (_) { /* private mode */ }
+
+// ============================================
+// NUMBER PARSING
+// ============================================
+
+/**
+ * Parse a tax/fee rate (percent) treating 0 as VALID — only falls back on
+ * NaN/empty. The classic `parseFloat(v) || 10.1` coerces a legitimate 0%
+ * (out-of-state, exempt) to 10.1%, silently taxing customers the screen
+ * showed $0 tax for. Use this everywhere a rate input is read. (2026-06-10)
+ * @param {*} value - raw input value
+ * @param {number} fallback - rate to use when value is not a finite number
+ * @returns {number}
+ */
+function parseRatePercent(value, fallback) {
+    const n = parseFloat(value);
+    return Number.isFinite(n) ? n : fallback;
+}
+if (typeof window !== 'undefined') window.parseRatePercent = parseRatePercent;
+
+// ============================================
 // STRING UTILITIES
 // ============================================
 
@@ -372,9 +399,12 @@ function toggleArtCharge() {
         input.disabled = false;
         if (wrapper) wrapper.style.opacity = '1';
         input.style.opacity = '1';
-        // Set default value if currently 0
+        // Set default value if currently 0 — live Service_Codes GRT-50 price,
+        // literal 50 is fallback-only (affects all 4 builders). (audit 2026-06-10)
         if (parseFloat(input.value) === 0) {
-            input.value = '50.00';
+            const grt50 = (typeof window !== 'undefined' && typeof window.getServicePrice === 'function')
+                ? window.getServicePrice('GRT-50', 50) : 50;
+            input.value = Number(grt50).toFixed(2);
         }
     } else {
         input.disabled = true;
@@ -1011,6 +1041,24 @@ function hasUnsavedChanges() {
 }
 
 /**
+ * Warn before leaving the page with unsaved changes (browser-native dialog).
+ * Call once from builder init. The autosaved draft is best-effort recovery —
+ * this gives the rep the chance to Save properly instead of silently losing
+ * up to 30s of work to a back-button or Dashboard click. (2026-06-10)
+ */
+function setupBeforeUnloadGuard() {
+    window.addEventListener('beforeunload', function (e) {
+        try {
+            if (typeof hasUnsavedChanges === 'function' && hasUnsavedChanges()) {
+                e.preventDefault();
+                e.returnValue = '';   // required by Chromium to show the dialog
+            }
+        } catch (_) { /* builder without hasChanges tracking — never block navigation */ }
+    });
+}
+if (typeof window !== 'undefined') window.setupBeforeUnloadGuard = setupBeforeUnloadGuard;
+
+/**
  * Setup global keyboard shortcuts (Ctrl+S save, Ctrl+P print, Escape close popups).
  * Requires builder to define: saveQuote(), printQuote(), closeExtendedSizePopup()
  */
@@ -1403,7 +1451,7 @@ async function emailQuote(options = {}) {
  * @param {number|null} [savingsPerPiece=null] - Per-piece savings at next tier (optional)
  * @param {string} [containerId='quantity-nudge'] - ID of the nudge container div
  */
-function updateQuantityNudge(totalQty, method, savingsPerPiece = null, containerId = 'quantity-nudge') {
+function updateQuantityNudge(totalQty, method, savingsPerPiece = null, containerId = 'quantity-nudge', categoryLabel = '') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -1445,7 +1493,11 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         const tierEnd = breakIndex < breaks.length - 1 ? breaks[breakIndex + 1] - 1 : '+';
         const tierLabel = tierEnd === '+' ? `${nextBreak}+` : `${nextBreak}-${tierEnd}`;
 
-        let html = `<i class="fas fa-arrow-up" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more piece${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
+        // categoryLabel (e.g. "garment") matters when categories tier separately
+        // (EMB: caps + garments) — a bare "pieces" implied adding ANY product moves
+        // the tier, which is false for mixed orders.
+        const pieceWord = categoryLabel ? `${categoryLabel} piece` : 'piece';
+        let html = `<i class="fas fa-arrow-up" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
         if (savingsPerPiece && savingsPerPiece > 0.01) {
             html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
         }
@@ -1458,7 +1510,7 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle };
+    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded

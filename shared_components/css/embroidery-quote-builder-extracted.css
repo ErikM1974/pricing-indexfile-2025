@@ -194,11 +194,7 @@
     align-items: flex-start;
 }
 
-/* Right column - Artwork services */
-.artwork-services-column {
-    width: 280px;
-    flex-shrink: 0;
-}
+/* .artwork-services-column DELETED 2026-06-10 (audit) — retired markup, no longer in the HTML */
 
 /* Individual logo card */
 .logo-card {
@@ -708,49 +704,10 @@
     cursor: not-allowed;
 }
 
-/* Legacy Logo Section - kept for backwards compatibility */
-/* Logo Preset Bar */
-/* Logo Configuration Section */
-.logo-section {
-    background: #f8f9fa;
-    border-bottom: 1px solid var(--border-color);
-    padding: 15px 20px;
-}
-
-.primary-logo-config {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 12px;
-}
-
-.logo-section-label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    min-width: 120px;
-}
-
-.logo-section-label i {
-    margin-right: 6px;
-    color: var(--nwca-green);
-}
-
-.logo-controls {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-}
-
-.logo-select {
-    padding: 6px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 13px;
-    background: white;
-}
+/* Legacy Logo Section CSS DELETED 2026-06-10 (audit) — .logo-section / .primary-logo-config /
+   .logo-section-label / .logo-controls / .logo-select matched nothing in the HTML or any loaded JS
+   (only the empty legacy #cap-logo-section div remains, which these class selectors never matched).
+   .stitch-input-group KEPT — still rendered by embroidery-quote-builder.js (~line 10294). */
 
 .stitch-input-group {
     display: flex;
@@ -767,17 +724,7 @@
     font-size: 13px;
 }
 
-.digitizing-label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.digitizing-label input {
-    cursor: pointer;
-}
+/* .digitizing-label DELETED 2026-06-10 (audit) — retired markup; the live pattern is .digitizing-checkbox-label */
 
 /* Additional Logos Section */
 .additional-logos-section {
@@ -1297,7 +1244,10 @@ td.size-disabled input {
     border-top-color: #1e293b;
 }
 
-.keyboard-hint-container:hover .keyboard-hint-content {
+.keyboard-hint-container:hover .keyboard-hint-content,
+.keyboard-hint-container:focus-within .keyboard-hint-content {
+    /* :focus-within added 2026-06-10 (a11y audit) — the shortcuts panel opens on keyboard focus too
+       (.keyboard-hint-trigger now carries tabindex="0"), not just hover. */
     display: block;
 }
 
@@ -1332,6 +1282,22 @@ td.size-disabled input {
         max-height: none;
     }
 
+    /* [2026-06-10 audit] .emb-builder-scoped counter-rules — the Option C pin-sidebar re-skin (top of
+       this file) is scoped `.emb-builder .power-*` (0-2-0), which silently BEAT these unscoped (0-1-0)
+       responsive rules (media queries add no specificity). Without these, the stacked tablet sidebar
+       stayed sticky + viewport-capped with an inner scrollbar, and align-items:flex-start shrank
+       .power-content to content width. */
+    .emb-builder .power-main {
+        height: auto;
+        align-items: stretch;
+    }
+    .emb-builder .power-sidebar {
+        position: static;
+        align-self: auto;
+        max-height: none;
+        max-width: none;
+    }
+
     .power-content {
         padding: 16px;
     }
@@ -1346,31 +1312,16 @@ td.size-disabled input {
         flex-direction: column;
     }
 
-    .artwork-services-column {
-        width: 100%;
-    }
+    /* .artwork-services-column DELETED 2026-06-10 (audit) — retired markup */
 
     .logo-form-row {
         flex-wrap: wrap;
     }
 
-    .logo-section {
-        flex-direction: column;
-    }
-
-    .logo-controls {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .al-toggle-row {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 8px !important;
-    }
-
-    #garment-al-config,
-    #cap-al-config {
+    /* .logo-section / .logo-controls / .al-toggle-row DELETED 2026-06-10 (audit) — retired markup.
+       #garment-al-config / #cap-al-config renamed to the live *-new ids (HTML renamed them). */
+    #garment-al-config-new,
+    #cap-al-config-new {
         flex-wrap: wrap;
     }
 }
@@ -1422,14 +1373,7 @@ td.size-disabled input {
         padding: 12px;
     }
 
-    .logo-section {
-        padding: 12px;
-    }
-
-    .logo-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
+    /* .logo-section / .logo-controls DELETED 2026-06-10 (audit) — retired markup */
 
     .stitch-input-group {
         width: 100%;
@@ -1470,6 +1414,14 @@ td.size-disabled input {
         -webkit-overflow-scrolling: touch;
     }
 
+    /* [2026-06-10 audit] scoped counter-rule — the Option C `overflow: visible` (0-2-0, top of file)
+       beat this unscoped rule, so the 14-column table could never scroll inside its wrapper on a phone
+       and the whole page panned sideways. */
+    .emb-builder .product-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .product-table th,
     .product-table td {
         padding: 4px 2px;
@@ -1488,22 +1440,13 @@ td.size-disabled input {
         font-size: 14px;
     }
 
-    .sidebar-actions {
-        flex-direction: column;
-        gap: 8px;
-    }
-
-    .sidebar-actions button {
-        width: 100%;
-    }
+    /* .sidebar-actions DELETED 2026-06-10 (audit) — retired markup; the live action container is
+       .action-panel (already a column flex with full-width buttons, so no port needed).
+       .digitizing-label DELETED — retired markup. */
 
     /* Embroidery-specific: stitch inputs */
     .stitch-input-group input {
         width: 100%;
-    }
-
-    .digitizing-label {
-        font-size: 12px;
     }
 }
 
@@ -1511,10 +1454,11 @@ td.size-disabled input {
    PRINT STYLES
    ============================================ */
 @media print {
+    /* .sidebar-actions → .action-panel 2026-06-10 (audit) — the live action container */
     .power-header,
-    .sidebar-actions,
+    .action-panel,
     .search-row,
-    .keyboard-hint {
+    .keyboard-hint-container {
         display: none !important;
     }
 
@@ -2807,3 +2751,205 @@ td.size-disabled input {
     50% { box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
 }
 .btn-add-nonsanmar.pulse { animation: btnPulse 1.5s ease-in-out 3; }
+
+/* ============================================================
+   ACTION-PANEL BUTTONS (2026-06-10 audit) — de-inlined from the HTML.
+   Push to ShopWorks is the PRIMARY CTA: it now uses the unified PNW
+   green theme (quote-builder-shell.css maps --builder-primary →
+   --pnw-forest) instead of the old hardcoded steel blue. The
+   `disabled` property drives the dim state; JS also flips inline
+   opacity/cursor (same values) and paints the "Sent ✓" state inline.
+   ============================================================ */
+#emb-push-shopworks-btn {
+    background: var(--builder-primary, #2e5827);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 14px;
+    box-shadow: 0 2px 6px rgba(31, 73, 34, 0.35);
+}
+#emb-push-shopworks-btn:hover:not(:disabled) {
+    background: var(--builder-primary-dark, #1f4922);
+}
+#emb-push-shopworks-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Secondary actions — palettes preserved from the former inline styles */
+.btn-share-link {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #6ee7b7;
+}
+.btn-email-quote {
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #93c5fd;
+}
+
+/* ============================================================
+   SIDEBAR RUNNING TOTAL (2026-06-10 audit, ux-flow) — compact strip
+   between the scroll container and the action panel, so the with-tax
+   TOTAL is visible at the moment of Push/Print/Email. Stays hidden
+   ([hidden]) until JS binds #sidebar-grand-total in
+   updateTaxCalculation(). Normal flow inside the (sticky) sidebar —
+   no z-index needed, so no fight with the color-picker dropdown
+   (z-index 1000) or modals (2000+).
+   ============================================================ */
+.sidebar-total-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-top: 2px solid var(--builder-primary, #2e5827);
+}
+.sidebar-total-bar[hidden] { display: none; }
+.sidebar-total-bar .stb-label {
+    font-weight: 700;
+    font-size: 13px;
+    color: #166534;
+}
+.sidebar-total-bar .stb-tax-note {
+    font-weight: 500;
+    font-size: 10.5px;
+    color: #3f6212;
+}
+.sidebar-total-bar .stb-value {
+    font-weight: 700;
+    font-size: 17px;
+    color: #166534;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   STITCH-COUNT ESTIMATOR (2026-06-10) — JS-injected popover
+   (initStitchEstimators / openStitchEstimator in
+   embroidery-quote-builder.js). The trigger button sits inline right
+   after the #primary-stitches / #cap-primary-stitches selects; the
+   popover is appended to <body> (JS sets top/left).
+   ============================================================ */
+.stitch-estimate-btn {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.stitch-estimate-btn:hover {
+    border-color: var(--builder-primary, #2e5827);
+    color: var(--builder-primary-dark, #1f4922);
+    background: #f0fdf4;
+}
+
+.stitch-estimator-pop {
+    position: absolute;
+    z-index: 1100; /* above the color-picker dropdown (1000, color-picker-shared.css) + sticky thead/sidebar; below modals (2000+) */
+    width: 260px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+    padding: 12px;
+    font-size: 12.5px;
+    color: #334155;
+}
+.stitch-estimator-pop .se-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #1e293b;
+}
+.stitch-estimator-pop .se-title i { color: var(--builder-primary, #2e5827); }
+.stitch-estimator-pop .se-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+.stitch-estimator-pop .se-row label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: #475569;
+}
+.stitch-estimator-pop .se-row input[type="number"] {
+    width: 64px;
+    padding: 4px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 12.5px;
+}
+.stitch-estimator-pop .se-row select {
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+    padding: 4px 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 12.5px;
+    background: #fff;
+}
+.stitch-estimator-pop .se-result {
+    margin: 6px 0;
+}
+.stitch-estimator-pop .se-result strong { color: #16a34a; }
+.stitch-estimator-pop .se-actions {
+    display: flex;
+    gap: 8px;
+}
+.stitch-estimator-pop .se-apply {
+    flex: 1;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: var(--builder-primary, #2e5827);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.stitch-estimator-pop .se-apply:hover {
+    background: var(--builder-primary-dark, #1f4922);
+}
+.stitch-estimator-pop .se-close {
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: #f8fafc;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.stitch-estimator-pop .se-close:hover { background: #eef2f7; }
+.stitch-estimator-pop .se-note {
+    font-size: 10.5px;
+    color: #64748b; /* muted but ≥4.5:1 on white (WCAG AA) */
+    margin-top: 6px;
+}
+
+/* Hover counter-rules — .btn-secondary-action:hover (0-2-0) would otherwise repaint these
+   translucent white (the old inline styles used to win over it). */
+.btn-action.btn-share-link:hover {
+    background: #d1fae5;
+    color: #047857;
+}
+.btn-action.btn-email-quote:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}

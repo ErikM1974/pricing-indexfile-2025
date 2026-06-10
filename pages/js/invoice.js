@@ -846,7 +846,12 @@
         rateEl.textContent = cert ? `(Tax Exempt · Cert # ${cert})` : '(Tax Exempt)';
         rateEl.style.color = '#166534';  // forest green to match exempt status
       } else if (subtotal > 0 && tax === 0) {
-        rateEl.textContent = '(0% — Out of State)';
+        // Wholesale/resale (permit on file) is a different zero-tax reason than
+        // shipping out of state — saying "Out of State" on a Milton wholesaler's
+        // invoice reads as an error. (audit 2026-06-10)
+        const isWholesale = data.sessionRaw?.IsWholesale === 'Yes' || data.sessionRaw?.IsWholesale === true;
+        rateEl.textContent = isWholesale ? '(Wholesale / Resale — No Tax)' : '(0% — Out of State)';
+        if (isWholesale) rateEl.style.color = '#166534';
       } else {
         rateEl.textContent = '';
       }

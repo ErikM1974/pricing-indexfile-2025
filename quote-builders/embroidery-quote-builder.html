@@ -15,13 +15,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.08.16">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.10.1">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.07.15">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.10.1">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
@@ -92,7 +92,7 @@
                 <div class="logo-cards-column">
                     <!-- Primary Logo Card (Garments) - Hidden until garments added -->
                     <div class="logo-card" id="garment-logo-card" style="display: none;">
-                        <div class="logo-card-header" onclick="toggleLogoCard('garment-logo-card')">
+                        <div class="logo-card-header" onclick="toggleLogoCard('garment-logo-card')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                             <div class="logo-card-icon garment">
                                 <i class="fas fa-tshirt"></i>
                             </div>
@@ -152,7 +152,7 @@
                                            min="25000" max="100000" step="1000"
                                            oninput="onFullBackStitchCountChange()">
                                 </div>
-                                <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')">
+                                <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                     <input type="checkbox" id="primary-digitizing">
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
@@ -185,7 +185,7 @@
 
                     <!-- Cap Logo Card (hidden by default) -->
                     <div class="logo-card" id="cap-logo-card" style="display: none;">
-                        <div class="logo-card-header" onclick="toggleLogoCard('cap-logo-card')">
+                        <div class="logo-card-header" onclick="toggleLogoCard('cap-logo-card')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                             <div class="logo-card-icon cap">
                                 <i class="fas fa-hat-cowboy"></i>
                             </div>
@@ -243,7 +243,7 @@
                                             <option value="18000">Large +$10/pc (15-25K)</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')">
+                                    <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                         <input type="checkbox" id="cap-primary-digitizing">
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
@@ -281,7 +281,7 @@
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox checked" onclick="toggleDigitizingCheckbox(this, 'cap-patch-setup')">
+                                    <div class="digitizing-checkbox checked" onclick="toggleDigitizingCheckbox(this, 'cap-patch-setup')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                         <input type="checkbox" id="cap-patch-setup" checked>
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
@@ -321,8 +321,8 @@
                 <!-- Minimum Order Warning Banner -->
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Small Order Notice</strong> -
-                    Orders of 7 or fewer pieces include a $50 small order fee, built into the per-piece price.
+                    <strong>Small Order Notice</strong> —
+                    <span class="min-order-warning-text">Orders of 7 or fewer pieces include a $50 small order fee, built into the per-piece price.</span>
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -352,7 +352,7 @@
                                 <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
                                     <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
-                                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                                    <div style="font-size: 13px; color: #64748b; line-height: 1.8;">
                                         <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
                                         &nbsp;&bull;&nbsp;
                                         <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#6366f1; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
@@ -476,7 +476,7 @@
                             <!-- Graphic Design Row -->
                             <tr id="graphic-design-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
+                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs)
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="graphic-design-unit">$0.00</td>
@@ -523,7 +523,7 @@
                 <!-- Keyboard Hints -->
                 <!-- Keyboard Hints - Show on Hover -->
                 <div class="keyboard-hint-container">
-                    <div class="keyboard-hint-trigger">
+                    <div class="keyboard-hint-trigger" tabindex="0">
                         <i class="fas fa-keyboard"></i> Shortcuts
                     </div>
                     <div class="keyboard-hint-content">
@@ -646,7 +646,7 @@
                     <!-- Special Notes — relocated from the sidebar into a full-width row under the footer (Erik 2026-06-07) -->
                     <div class="footer-notes-row" id="footer-notes-row">
                         <div class="notes-section collapsed in-footer" id="notes-section" style="margin-bottom: 0;">
-                            <div class="notes-header" onclick="toggleNotesSection()">
+                            <div class="notes-header" onclick="toggleNotesSection()" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                 <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
                                     <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
                                     <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
@@ -894,6 +894,16 @@
 
             </div><!-- End sidebar-scroll-container -->
 
+            <!-- Running TOTAL (incl. tax) — compact always-visible strip above the action buttons so the rep
+                 sees the customer-facing number at the moment of Push/Print/Email (audit ux-flow 2026-06-10).
+                 Hidden until JS writes it: bind #sidebar-grand-total + un-hide #sidebar-total-bar inside
+                 updateTaxCalculation() where #grand-total-with-tax is set (single source — always matches the
+                 invoice footer). NOT #grand-total / #grand-total-with-tax: those ids are parsed as money state. -->
+            <div class="sidebar-total-bar" id="sidebar-total-bar" hidden>
+                <span class="stb-label">TOTAL <span class="stb-tax-note">incl. tax</span></span>
+                <span class="stb-value" id="sidebar-grand-total">$0.00</span>
+            </div>
+
             <!-- Action Buttons (Outside scroll container - always visible) -->
             <div class="action-panel">
                 <!-- Push-readiness checklist — shows the gates a successful push needs, so the rep isn't
@@ -903,13 +913,12 @@
                      quote first (pushToShopWorks), so the rep no longer has to hunt for "Save & Share".
                      Enabled once a Customer # is set. (Erik 2026-06-05) -->
                 <button class="btn-action" id="emb-push-shopworks-btn" onclick="pushToShopWorks()" disabled
-                    title="Enter the ShopWorks Customer # (top of the form) to enable push"
-                    style="background: #1a5276; color: white; opacity: 0.5; cursor: not-allowed; font-size: 16px; font-weight: 700; padding: 14px; box-shadow: 0 2px 6px rgba(26,82,118,0.35);">
+                    title="Enter the ShopWorks Customer # (top of the form) to enable push">
                     <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
                 </button>
                 <!-- Get Shareable Link — secondary, directly under Push (moved out of the retired "Save & Share"
                      panel; renamed from "Save & Get Shareable Link" since Push + this both auto-save now). Erik 2026-06-05 -->
-                <button class="btn-action btn-secondary-action" onclick="saveAndGetLink()" style="background: #ecfdf5; color: #059669; border-color: #6ee7b7;">
+                <button class="btn-action btn-secondary-action btn-share-link" onclick="saveAndGetLink()">
                     <i class="fas fa-link"></i> Get Shareable Link
                 </button>
                 <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
@@ -918,7 +927,7 @@
                 <button class="btn-action btn-secondary-action" onclick="printQuote()">
                     <i class="fas fa-print"></i> Print Quote
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="embEmailQuote()" style="background: #eff6ff; color: #2563eb; border-color: #93c5fd;">
+                <button class="btn-action btn-secondary-action btn-email-quote" onclick="embEmailQuote()">
                     <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
@@ -933,39 +942,8 @@
         </div>
     </div>
 
-    <!-- Custom Logo Modal -->
-    <div id="logo-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="logo-modal-title">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="logo-modal-title"><i class="fas fa-palette"></i> Custom Logo Setup</h3>
-                <button class="modal-close" onclick="closeLogoModal()" aria-label="Close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Position</label>
-                    <select id="logo-position">
-                        <option value="Left Chest">Left Chest</option>
-                        <option value="Right Chest">Right Chest</option>
-                        <option value="Center Chest">Center Chest</option>
-                        <option value="Full Front">Full Front</option>
-                        <option value="Full Back">Full Back</option>
-                        <option value="Upper Back">Upper Back</option>
-                        <option value="Left Sleeve">Left Sleeve</option>
-                        <option value="Right Sleeve">Right Sleeve</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Stitch Count</label>
-                    <input type="number" id="logo-stitches" value="8000" min="1000" step="1000">
-                    <small style="color: #666;">Min: 1,000 | Increment: 1,000</small>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-action btn-secondary-action" onclick="closeLogoModal()" style="background: #6c757d;">Cancel</button>
-                <button class="btn-action btn-primary-action" onclick="applyCustomLogo()">Apply</button>
-            </div>
-        </div>
-    </div>
+    <!-- Custom Logo Modal DELETED 2026-06-10 (audit) — dead markup: nothing ever opened #logo-modal and its
+         onclick handlers (closeLogoModal / applyCustomLogo) were never defined in any loaded script. -->
 
     <!-- Push to ShopWorks: preview + confirm modal -->
     <div class="shopworks-import-modal" id="emb-sw-push-modal" role="dialog" aria-modal="true" aria-labelledby="emb-sw-push-title">
