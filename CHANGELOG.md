@@ -1,3 +1,10 @@
+## v2026.06.09.8 (2026.06.09)
+
+- docs(memory): record date-normalizer deploy v1308 + OF-0059 verify
+- feat(3-day-tees): full design-studio rebuild — designer canvas, server-side reprice, real UPS shipping, hardened Stripe→ShopWorks flow
+- feat(3-day-tees): perfection pass — FF placement, per-color calibration, contrast guard, full payment-loop proof
+- Deploy v2026.06.09.8: 2 files (3-day-tees-success.html,3-day-tees.html...)
+
 ## v2026.06.09.7 (2026.06.09)
 
 - fix(deploy-skill): cache-bust .jsx files + kill basename-collision over-bump
