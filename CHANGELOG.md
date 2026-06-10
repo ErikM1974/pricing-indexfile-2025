@@ -1,3 +1,10 @@
+## v2026.06.10.4 (2026.06.10)
+
+- feat(custom-tees): multi-style DTG storefront — gallery, designer, Stripe checkout
+- fix(custom-tees): E2E-verified checkout leg + endpoint shape fixes
+- docs: ACTIVE_FILES — Custom T-Shirts system built (pre-launch status + test files)
+- feat(custom-tees): cutover — 3DT URLs 301 to /custom-tees, homepage card, rush-aware push notes
+
 ## v2026.06.10.3 (2026.06.10)
 
 - Deploy v2026.06.10.3: 3 files (dtg-quote-builder.html,dtg-inline-form.js,dtg-quote-page.js,)
