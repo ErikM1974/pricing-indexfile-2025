@@ -1,3 +1,11 @@
+## v2026.06.10.1 (2026.06.10)
+
+- chore: delete orphaned cap-quote-logos.js + cap-quote-products.js (zero references)
+- fix(emb): audit fix wave — money-path consistency, save robustness, UX + features
+- fix(emb): updatePushButtonState no longer re-applies inline steel-blue background
+- docs+fix: push-preview UNBILLED regex (cross-repo note contract), LESSONS entries, cache-busts
+- Deploy v2026.06.10.1: 5 files (invoice.html,dtf-quote-builder.html,dtg-quote-builder.html...)
+
 ## v2026.06.09.8 (2026.06.09)
 
 - docs(memory): record date-normalizer deploy v1308 + OF-0059 verify
