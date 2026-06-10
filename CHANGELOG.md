@@ -1,3 +1,7 @@
+## v2026.06.10.9 (2026.06.10)
+
+- feat(staff-dashboard): Custom Tees storefront + Tee Print-Box Calibration links in Quote Builders (Erik request)
+
 ## v2026.06.10.8 (2026.06.10)
 
 - feat(custom-tees): staff print-box calibration tool + Caspio-backed layouts
