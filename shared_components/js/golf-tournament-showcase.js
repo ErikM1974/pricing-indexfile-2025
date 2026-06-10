@@ -52,8 +52,21 @@
         config: null,
         pricing: new Map(), // styleNumber -> { '24': price, '48': price, ... } or { error: msg }
         embroideryService: null,
-        quoteService: null  // BaseQuoteService instance for Caspio saves (prefix: GOLF)
+        quoteService: null, // BaseQuoteService instance for Caspio saves (prefix: GOLF)
+        prefillStyle: null  // SKU the visitor arrived with (?prefill=) — becomes a dedicated line item
     };
+
+    // Interest checkbox value -> catalog category group name(s) from the garment-tracker config.
+    // 'hats' has no group in the current config, so it produces no auto line (stays in Notes only).
+    const INTEREST_GROUPS = {
+        polos: ['TravisMathew & Nike Polos', 'OGIO & Sport-Tek Tops'],
+        outerwear: ['TravisMathew Outerwear & Vests'],
+        bottoms: ['Sport-Tek Bottoms'],
+        towels: ['Golf Towels', 'Hemmed Towels'],
+        hats: []
+    };
+    // Preferred representative style per interest (falls back to the group's first priced style)
+    const INTEREST_PREFERRED = { polos: EXAMPLE_POLO, towels: EXAMPLE_TOWEL };
 
     // ============================================================
     // UTILS
@@ -88,6 +101,124 @@
         return `GOLF${mm}${dd}-${seq}`;
     }
 
+    // ============================================================
+    // LINE-ITEM GENERATION (auto-build a starter quote from interests)
+    // ============================================================
+
+    // Candidate styles for an interest: preferred SKU first, then the config group's styles.
+    function stylesForInterest(interest) {
+        const out = [];
+        if (INTEREST_PREFERRED[interest]) out.push(INTEREST_PREFERRED[interest]);
+        (INTEREST_GROUPS[interest] || []).forEach(groupName => {
+            const group = (state.config?.itemGroups || []).find(g => g.name === groupName);
+            if (group) out.push(...group.styles);
+        });
+        return [...new Set(out)];
+    }
+
+    // Which interest category a given style belongs to (used to dedupe the prefill style).
+    function interestForStyle(styleNumber) {
+        for (const [interest, groupNames] of Object.entries(INTEREST_GROUPS)) {
+            for (const groupName of groupNames) {
+                const group = (state.config?.itemGroups || []).find(g => g.name === groupName);
+                if (group && group.styles.includes(styleNumber)) return interest;
+            }
+        }
+        return null;
+    }
+
+    // Per-piece embroidered price for a style at a specific quantity.
+    // Prefers the already-loaded sample (form player counts match QTY_TIERS exactly),
+    // falls back to a direct (sessionStorage-cached) bundle fetch to avoid a load race.
+    async function priceStyleAtQty(styleNumber, qty) {
+        const cached = state.pricing.get(styleNumber);
+        if (cached && !cached.error && cached[qty] != null) {
+            return { unitPrice: Number(cached[qty]), size: cached.size, tier: tierLabelForQty(qty) };
+        }
+        try {
+            const bundle = await state.embroideryService.fetchPricingData(styleNumber);
+            const sizes = bundle.uniqueSizes || [];
+            const standardSize = sizes.find(s => s.toUpperCase() === 'S')
+                || sizes.find(s => s.toUpperCase() === 'OSFA')
+                || sizes[0];
+            if (!standardSize) return null;
+            const tier = tierLabelForQty(qty);
+            const price = bundle.pricing?.[tier]?.[standardSize];
+            if (price == null || isNaN(price)) return null;
+            return { unitPrice: Number(price), size: standardSize, tier };
+        } catch (err) {
+            console.warn(`[golf-showcase] priceStyleAtQty failed for ${styleNumber}:`, err.message);
+            return null;
+        }
+    }
+
+    /**
+     * Build starter line items from the customer's selected interests + player count.
+     * One representative style per interest, quantity = player count, priced live.
+     * The prefill style (if any) takes priority for its category. Returns
+     * { items, subtotal, totalQuantity } — empty when player count isn't a usable number.
+     */
+    async function buildLineItems(formData) {
+        const qty = parseInt(formData.playerCount, 10);
+        if (!qty || isNaN(qty)) return { items: [], subtotal: 0, totalQuantity: 0 }; // 'other' / not sure
+
+        const covered = new Set();
+        const targetStyles = [];
+
+        // 1) Specific style the visitor landed from (e.g. ?prefill=TW530) wins for its category
+        if (state.prefillStyle) {
+            targetStyles.push(state.prefillStyle);
+            const it = interestForStyle(state.prefillStyle);
+            if (it) covered.add(it);
+        }
+
+        // 2) One representative style per remaining checked interest
+        for (const interest of formData.interests) {
+            if (covered.has(interest)) continue;
+            const candidates = stylesForInterest(interest);
+            if (!candidates.length) continue; // e.g. hats — no catalog group, stays in Notes
+            for (const sku of candidates) {
+                const p = await priceStyleAtQty(sku, qty);
+                if (p && !targetStyles.includes(sku)) {
+                    targetStyles.push(sku);
+                    covered.add(interest);
+                    break;
+                }
+            }
+        }
+
+        // 3) Build the line-item objects
+        const items = [];
+        let subtotal = 0;
+        let totalQuantity = 0;
+        for (const sku of targetStyles) {
+            const priced = await priceStyleAtQty(sku, qty);
+            if (!priced) continue;
+            const cfgItem = state.config?.premiumItems?.[sku];
+            const lineTotal = priced.unitPrice * qty;
+            items.push({
+                styleNumber: sku,
+                productName: cfgItem ? cfgItem.name : sku,
+                color: '',
+                embellishmentType: 'embroidery',
+                printLocation: 'LC',
+                printLocationName: 'Left Chest',
+                quantity: qty,
+                hasLTM: qty <= 7 ? 'Yes' : 'No',
+                baseUnitPrice: priced.unitPrice,
+                finalUnitPrice: priced.unitPrice,
+                lineTotal: lineTotal,
+                pricingTier: priced.tier,
+                imageURL: getSanmarImageUrl(sku),
+                sizeBreakdown: JSON.stringify({ [priced.size]: qty })
+            });
+            subtotal += lineTotal;
+            totalQuantity += qty;
+        }
+
+        return { items, subtotal, totalQuantity };
+    }
+
     /**
      * Persist the lead to Caspio quote_sessions table (prefix: GOLF).
      * Returns { quoteID, savedToCaspio } — never throws. EmailJS fires regardless.
@@ -109,20 +240,33 @@
             formData.notes ? `Customer notes: ${formData.notes}` : null
         ].filter(Boolean).join(' | ');
 
+        // Auto-build a starter quote (representative style per interest, priced live at the
+        // player count). Never throws — if pricing is unavailable we fall back to a lead-only
+        // save so the inquiry is still captured.
+        let built = { items: [], subtotal: 0, totalQuantity: 0 };
+        try {
+            built = await buildLineItems(formData);
+        } catch (err) {
+            console.warn('[golf-showcase] Line-item build failed — saving as lead-only:', err.message);
+        }
+
         const result = await state.quoteService.saveQuote({
             customerEmail: formData.email,
             customerName: formData.name,
             companyName: formData.company,
-            totalQuantity: parseInt(formData.playerCount, 10) || 0,
-            subtotal: 0,        // Lead inquiry — sales team builds the actual quote later
+            // Sum of line quantities when we built items; else fall back to the player count
+            totalQuantity: built.totalQuantity || (parseInt(formData.playerCount, 10) || 0),
+            subtotal: built.subtotal,
             ltmFeeTotal: 0,
-            totalCost: 0,
-            notes: notesPayload
+            totalCost: built.subtotal,
+            notes: notesPayload,
+            items: built.items   // sales team refines styles/colors/sizes later
         });
 
         return {
             quoteID: result.quoteID,
             savedToCaspio: !!result.success,
+            itemCount: built.items.length,
             error: result.error
         };
     }
@@ -568,6 +712,9 @@
         const params = new URLSearchParams(window.location.search);
         const style = params.get('prefill');
         if (!style) return;
+
+        // Remember the specific style so the submit handler can quote it as a dedicated line item
+        state.prefillStyle = style.trim();
 
         const item = state.config?.premiumItems?.[style];
         const styleLine = item ? `${style} (${item.name})` : style;
