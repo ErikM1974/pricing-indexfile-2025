@@ -112,6 +112,12 @@ Goal: "can push to ShopWorks + print a nice PDF." Both verified. All LOCAL, not 
   **OF-0058** in ManageOrders (`ok:true, mode:live`), persisted in quote_sessions (Company "ZZZ TEST -
   VOID", $580). Proves the order form sends an order to ShopWorks end-to-end (converts to SW on the
   next MO→SW sync; conversion path itself was verified OF-0057 prior). **Erik to void/delete OF-0058.**
+  **Date-normalizer DEPLOYED v2026.06.09.7 / Heroku v1308** (`server.js toISODate` → orderDate/
+  requestedShipDate always YYYY-MM-DD). OF-0058's `date_OrderPlaced "undefined/undefined/06/09/2026"`
+  was a TEST-SCRIPT artifact (hardcoded MM/DD/YYYY; the real `<input type=date>` form emits YYYY-MM-DD
+  → always correct). Fix proven live (dry-run MM/DD/YYYY→`2026-06-09`) + 2nd test order **OF-0059**
+  (deployed build, MM/DD/YYYY input → clean date). **Erik to delete OF-0058 + OF-0059.** Deploy-skill
+  `.jsx` cache-bust + basename-collision fix also shipped in v1308.
   Also **actual `@media print` PDF** rendered + viewed: clean, complete, fee itemized, totals foot,
   correct tier-split SW part numbers (single-page proven; multi-page = cap removed + `break-inside`
   CSS present, structurally guaranteed, not eyeballed). Safety-classifier note: a live push is gated
