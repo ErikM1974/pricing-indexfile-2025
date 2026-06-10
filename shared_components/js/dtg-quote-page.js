@@ -1624,6 +1624,9 @@
                 if (!r.ok) console.warn('[dtg-ai] quote_items POST failed:', r.status);
             }
             aiState.savedQuoteID = effectiveQuoteID;
+            // Release the shared beforeunload leave-guard (quote-builder-utils.js;
+            // flag lives in dtg-inline-form.js) — the quote is now in Caspio.
+            if (typeof markAsSaved === 'function') markAsSaved();
             // Bump in-memory edit revision so consecutive saves keep
             // incrementing (Rev 2 → 3 → 4) without page reload.
             if (isEditMode) window._dtgEditingRevision = newRevision;

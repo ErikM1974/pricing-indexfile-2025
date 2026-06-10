@@ -25,6 +25,12 @@
  * POST /api/dtg/quote-pricing on submit so the wire-side price matches.
  */
 
+// Shared leave-guard flag (2026-06-10) — quote-builder-utils.js's global
+// markAsUnsaved()/markAsSaved()/hasUnsavedChanges() write/read this as a bare
+// identifier, so it MUST be a top-level script binding (outside the IIFE), same
+// as the `let hasChanges` in the EMB/SCP/DTF builders. Drives setupBeforeUnloadGuard().
+let hasChanges = false;
+
 (function () {
     'use strict';
 
@@ -274,7 +280,16 @@
     // Mark the form as having rep-edits since the last chat fill. Used to
     // guard against silent overwrite when the chat emits a new PRICE_QUOTE
     // while the rep is editing.
-    function markDirty() { state.dirtyAfterChatFill = true; }
+    // Two dirty flags with different jobs: dirtyAfterChatFill gates the chat
+    // controller's "overwrite your edits?" warning (cleared on fillFromQuote);
+    // the shared hasChanges (quote-builder-utils.js markAsUnsaved) drives the
+    // beforeunload leave-guard (cleared only on save/push/reset). Every USER
+    // mutation site calls markDirty(), so it feeds both; programmatic
+    // fills/loads call neither. (2026-06-10)
+    function markDirty() {
+        state.dirtyAfterChatFill = true;
+        if (typeof markAsUnsaved === 'function') markAsUnsaved();
+    }
     function clearDirty() { state.dirtyAfterChatFill = false; }
 
     // ----- C8 bulk size paste -----------------------------------------------
@@ -4352,8 +4367,10 @@
                     `<strong>Pushed to ShopWorks.</strong> Order: <code>${escapeHtml(id || 'submitted')}</code> · ${ctx.items.length} line${ctx.items.length === 1 ? '' : 's'} · $${fmtMoney(ctx.subtotal)}`
                 );
                 // Clear sessionStorage on success — the rep is done with
-                // this quote, next page load starts fresh.
+                // this quote, next page load starts fresh. Pushed = persisted
+                // in ShopWorks, so release the leave-guard too.
                 clearSessionState();
+                if (typeof markAsSaved === 'function') markAsSaved();
             } else {
                 renderRetryCard(setStatus, `HTTP ${r.status}: ${data.error || 'unknown error'}${data.detail ? ' — ' + data.detail : ''}`);
             }
@@ -4537,7 +4554,10 @@
 
         // C9 — clear dirty flag now that the form reflects the chat. Save
         // the current state to sessionStorage so refresh recovery works.
+        // The chat-filled quote itself is NOT yet in Caspio though, so the
+        // leave-guard arms (different flag, different job — see markDirty).
         clearDirty();
+        if (typeof markAsUnsaved === 'function') markAsUnsaved();
         scheduleStateSave();
         updateSubmitEnabled();
 
@@ -4610,6 +4630,8 @@
         };
         state.dirtyAfterChatFill = false;
         state.lastSubmit = null;
+        // A reset form has nothing left to lose — release the leave-guard.
+        if (typeof markAsSaved === 'function') markAsSaved();
         const statusEl = document.getElementById('dtgSubmitStatus');
         if (statusEl) statusEl.hidden = true;
         render();
@@ -4637,6 +4659,11 @@
     }
 
     function init() {
+        // [2026-06-10] Shared leave-guard (quote-builder-utils.js) — warn before
+        // navigating away with unsaved changes, same as EMB/SCP/DTF. Installed
+        // FIRST because the ?edit= branch below early-returns. Safe this early:
+        // hasChanges starts false and only user mutations (markDirty) set it.
+        if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
         // [2026-06-08] Phase 0: wire the shared order-summary band to DTG's own #dtgShip*/#dtgCompany* fields
         // (the module is selector-agnostic). No estimate/editOnclick yet → the module hides those buttons.
         if (typeof QuoteOrderSummary !== 'undefined') {
@@ -4691,6 +4718,10 @@
         render();
         if (restored) {
             showResumeBanner();
+            // A restored draft is unsaved work that dies with the tab — arm the
+            // leave-guard so closing without saving warns. (Edit-reopen is the
+            // opposite: content came FROM Caspio, so that path stays clean.)
+            if (typeof markAsUnsaved === 'function') markAsUnsaved();
             // Hydrate the restored rows' inventory + bundle data in the
             // background so the size cells + badges fill in.
             for (const row of state.rows) {
@@ -4918,6 +4949,13 @@
 
         // Show edit-mode banner — explains current rev + that next save is a revision.
         showEditModeBanner(quoteId, window._dtgEditingRevision);
+
+        // Loaded content came FROM Caspio — a freshly reopened quote is NOT
+        // dirty. Defensive clear in case any populate step above tripped the
+        // leave-guard (the DTF edit-load lesson, 2026-06-10). The async
+        // inventory/bundle hydration callbacks don't markDirty, so this can't
+        // be un-done by a late fetch.
+        if (typeof markAsSaved === 'function') markAsSaved();
     }
 
     function showEditModeBanner(quoteId, revision) {
@@ -5274,6 +5312,9 @@
             if (!changed) return effectiveLocationCode();
             state.front = f;
             state.back = b;
+            // Real (non-preview) mutation — arm the leave-guard. Skips
+            // markDirty on purpose (chat-driven, C9 guard shouldn't fire).
+            if (typeof markAsUnsaved === 'function') markAsUnsaved();
             scheduleStateSave();
             renderLocationPills();
             schedulePriceUpdate();
