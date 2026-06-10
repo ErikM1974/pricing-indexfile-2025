@@ -1,3 +1,7 @@
+## v2026.06.10.13 (2026.06.10)
+
+- feat(custom-tees): live stock all 20 styles + admin artwork downloads + email rewire
+
 ## v2026.06.10.12 (2026.06.10)
 
 - feat(custom-tees): UberPrints model — baked small-batch pricing + threshold shipping
