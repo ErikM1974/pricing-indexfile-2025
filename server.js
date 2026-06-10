@@ -41,7 +41,13 @@ dotenv.config();
 //   L1800 POST /api/verify-checkout-session
 //
 // 3-DAY TEES (studio rebuild 2026-06-09 — helpers ~L770: getTdtPricingConfig/resolveTdtTax/rebuildTdtQuote)
-//   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels
+//   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
+//   3DT entry URLs (/pages/3-day-tees.html, /3-day-tees[.html]) → 301 /custom-tees (cutover 2026-06-10, registered BEFORE /pages static; success page NOT redirected)
+//
+// CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote)
+//   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
+//   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
+//   POST /api/three-day-tees/shipping-estimate — SHARED; accepts styleNumber for per-style UPS weight
 //
 // ONLINE ORDER FORM
 //   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
@@ -1427,6 +1433,16 @@ app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));
 app.use('/product', express.static(path.join(__dirname, 'product'), staticOptions));
 app.use('/training', express.static(path.join(__dirname, 'training'), staticOptions));
 app.use('/shared_components', express.static(path.join(__dirname, 'shared_components'), staticOptions));
+
+// ── 3-Day Tees → Custom T-Shirts cutover (Erik approved 2026-06-10) ─────────
+// The multi-style storefront replaced 3DT; all old entry URLs 301 to
+// /custom-tees. MUST be registered BEFORE the /pages static mount or the
+// static file wins. The SUCCESS page is deliberately NOT redirected —
+// in-flight Stripe sessions still return to /pages/3-day-tees-success.html.
+app.get(['/pages/3-day-tees.html', '/3-day-tees.html', '/3-day-tees'], (req, res) => {
+  res.redirect(301, '/custom-tees');
+});
+
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
 // Serve CSS and JS files from root directory
@@ -1731,9 +1747,8 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'pricing-negotiation-policy.html'));
 });
 
-app.get('/3-day-tees.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', '3-day-tees.html'));
-});
+// /3-day-tees.html sendFile route removed 2026-06-10 — the cutover 301
+// (registered before the /pages static mount) now owns all 3DT entry URLs.
 
 // Custom T-Shirts — multi-style DTG storefront (2026-06-10). Clean URL +
 // .html alias; the success page resolves via the static /pages mount.
@@ -2530,8 +2545,9 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const placementBlock = placementLines.length
       ? `\nPRINT PLACEMENT (from the customer's live designer, top-center anchor):\n${placementLines.join('\n')}\n`
       : '';
+    const _isCtsStandard = orderSettings?.channel === 'custom-tees' && !orderSettings?.rush;
     const artReviewBanner = orderSettings?.needsArtReview
-      ? '\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; 3-day clock starts at proof approval ***\n'
+      ? `\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; ${_isCtsStandard ? 'production clock' : '3-day clock'} starts at proof approval ***\n`
       : '';
     const shipPromiseLine = orderSettings?.shipPromise?.label
       ? `\nPROMISED SHIP DATE: ${orderSettings.shipPromise.label} (stamped at checkout)\n`
@@ -2583,10 +2599,15 @@ app.post('/api/submit-3day-order', async (req, res) => {
         zip: customerData.billingZip || customerData.zip || '',
         country: 'USA'
       },
-      // Additional notes - send as array for proxy to process
+      // Additional notes - send as array for proxy to process.
+      // Service banner is channel/rush-aware (2026-06-10): legacy 3DT is
+      // always rush; Custom-Tees standard orders are 7-10 business days —
+      // a hardcoded RUSH banner here would make production rush them.
       notes: [{
         type: 'Notes On Order',
-        note: `3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.
+        note: `${(orderSettings?.channel === 'custom-tees' && !orderSettings?.rush)
+          ? 'STANDARD DTG SERVICE - 7-10 business days from artwork approval.'
+          : '3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.'}
 ${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${shipPromiseLine}${placementBlock}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
@@ -2604,7 +2625,8 @@ Payment Status: ${paymentConfirmed ? 'succeeded' : 'pending'}
 Total: $${orderTotals?.grandTotal || 0}${taxPct ? ` (includes ${taxPct}% sales tax${customerData.deliveryMethod === 'pickup' ? ', Milton pickup' : ''})` : ' (no sales tax - out of state)'}
 TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shipment'}`
       }],
-      rushOrder: true,
+      // Channel-aware: Custom-Tees standard orders are NOT rush (legacy 3DT always is)
+      rushOrder: orderSettings?.channel === 'custom-tees' ? !!orderSettings.rush : true,
       printLocation: orderSettings?.printLocationName || 'Left Chest',
       // Tax fields - proxy expects at root level (not nested in totals).
       // 3DT pushes REAL tax (unlike Order Form's TaxTotal=0) — rate + account
