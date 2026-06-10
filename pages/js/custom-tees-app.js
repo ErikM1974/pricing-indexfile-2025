@@ -70,7 +70,13 @@
             brand: '',
             rushEligible: false,
         },
-        inventory: { byColor: {}, fetchedAt: 0, error: false, source: null },
+        inventory: {
+            // Raw feeds (milton: PC54 local; sanmar: every style). byColor/
+            // fetchedAt/error are the ACTIVE projection — syncActiveInventory()
+            // picks milton when the rush toggle is on, sanmar otherwise.
+            feeds: { milton: null, sanmar: null },
+            byColor: {}, fetchedAt: 0, error: false, source: null,
+        },
         design: {
             backEnabled: false,
             previewColor: null,        // catalogColor shown on the canvas
@@ -273,7 +279,7 @@
     }
 
     function stockFor(catalogColor, size) {
-        if (!inventoryTracked()) return 9999;   // untracked style — no stock gating (v1)
+        if (!colorTracked(catalogColor)) return 9999;   // untracked — no stock gating
         const c = S.inventory.byColor[catalogColor];
         if (!c || !c.sizes) return 0;
         const n = parseInt(c.sizes[size], 10);
@@ -398,13 +404,18 @@
         const enc = encodeURIComponent(styleNumber);
         const styleChanged = S.styleNumber !== styleNumber;
 
-        const [pricing, details, styleColors, calRows] = await Promise.all([
+        const [pricing, details, styleColors, calRows, sanmarInv] = await Promise.all([
             fetchJson(`${API_BASE}/api/pricing-bundle?method=DTG&styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/product-details?styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/dtg/top-sellers?style=${enc}`),
             // Staff-laid print-box layouts (calibration tool) — best-effort:
             // failure just means the silhouette auto-fit keeps doing the work.
             fetchJson(`${API_BASE}/api/dtg-calibration?styleNumber=${enc}`).catch(() => null),
+            // Live SanMar stock (ALL styles — standard orders gate on it;
+            // PC54 rush additionally loads the Milton feed below) —
+            // best-effort: failure means untracked (fail-open; the
+            // server-side stock gate still confirms at order time).
+            fetchJson(`${API_BASE}/api/sanmar/inventory/${enc}`).catch(() => null),
         ]);
 
         if (calRows && calRows.data && calRows.data.length && window.CTS_CALIBRATION
@@ -427,27 +438,26 @@
             addCurated(c.catalog_color, c.color_name, c.swatch_image_url));
         if (!curated.length) throw new Error(`No print-tested colors for ${styleNumber}`);
 
-        // Inventory (style-aware, v1). PC54 = live Milton stock; everything
-        // else is untracked (no stock gating — server confirms at order time).
-        // A PC54 feed failure is NOT fatal: the inventory-error banner shows
-        // and quantities lock instead.
+        // Inventory (rush-aware dual feed, v3). SanMar feed already fetched
+        // above (every style — gates STANDARD orders); PC54 additionally
+        // loads the Milton feed (gates RUSH orders, fail-closed while rush
+        // is on). syncActiveInventory() below picks the active one per S.rush.
         if (styleChanged) {
+            S.inventory.feeds = { milton: null, sanmar: null };
             S.inventory.byColor = {};
             S.inventory.fetchedAt = 0;
             S.inventory.error = false;
+            S.inventory.source = null;
         }
         if (styleNumber === 'PC54') {
-            S.inventory.source = 'milton';
             try {
-                applyInventory(await fetchJson(`${API_BASE}/api/manageorders/pc54-inventory`));
+                applyMiltonInventory(await fetchJson(`${API_BASE}/api/manageorders/pc54-inventory`));
             } catch (e) {
-                console.error('[CTS] Inventory load failed:', e);
-                S.inventory.error = true;
+                console.error('[CTS] Milton inventory load failed:', e);
+                S.inventory.feeds.milton = { byColor: {}, fetchedAt: 0, error: true };
             }
-        } else {
-            S.inventory.source = 'untracked';
-            S.inventory.fetchedAt = Date.now();
         }
+        if (sanmarInv) applySanmarInventory(sanmarInv, curated.map((c) => c.catalogColor));
 
         S.styleNumber = styleNumber;
         S.pricing = pricing;
@@ -456,6 +466,7 @@
         S.product.brand = extractBrand(galleryItem.product_title);
         S.product.rushEligible = (window.CTS_RUSH_ELIGIBLE || []).indexOf(styleNumber) !== -1;
         if (!S.product.rushEligible) S.rush = false;
+        syncActiveInventory();   // rush state is now final for this load
 
         // LTM threshold = the lowest non-LTM tier's floor (API-driven, today 24)
         const nonLtm = (pricing.tiersR || [])
@@ -560,34 +571,117 @@
         $('rush-toggle').checked = S.rush;
     }
 
-    // ── Inventory (style-aware, v1) ─────────────────────────────────
-    // PC54 keeps the live Milton-warehouse feed (/api/manageorders/
-    // pc54-inventory — PC54-hardcoded on the proxy, per server stream).
-    // Every other style is UNTRACKED for v1: curated colors render without
-    // stock badges and quantities aren't stock-gated; the server confirms
-    // stock at order time.
-    function inventoryTracked() { return S.inventory.source === 'milton'; }
+    // ── Inventory (rush-aware dual feed, v3 2026-06-10) ─────────────
+    // Milton local stock can only fulfill the 3-Day RUSH promise, so the
+    // Milton feed (/api/manageorders/pc54-inventory — PC54-hardcoded on the
+    // proxy) gates RUSH orders ONLY, fail-CLOSED: a dead feed shows the
+    // banner and locks quantities while rush is on. STANDARD 7-10-day orders
+    // restock from SanMar next-day, so they gate on live SanMar warehouse
+    // totals (/api/sanmar/inventory/:style) — PC54 included — fail-OPEN: a
+    // dead feed just drops back to untracked, because the server-side stock
+    // gate re-confirms every color+size at order time anyway. Both feeds
+    // load for PC54 and live in S.inventory.feeds; syncActiveInventory()
+    // projects the rush-appropriate one onto S.inventory.{byColor,…} so
+    // every existing reader (stockFor, badges, grid caps) stays source-blind.
+    function inventoryTracked() {
+        return S.inventory.source === 'milton' || S.inventory.source === 'sanmar';
+    }
 
-    function applyInventory(inv) {
+    // Pick the active feed from the rush state. Call after S.rush changes
+    // (toggle, restore) and after any feed write — then re-render.
+    function syncActiveInventory() {
+        const f = S.inventory.feeds;
+        if (S.rush && f.milton) {
+            S.inventory.source = 'milton';
+            S.inventory.byColor = f.milton.byColor || {};
+            S.inventory.fetchedAt = f.milton.fetchedAt || 0;
+            S.inventory.error = !!f.milton.error;
+        } else if (f.sanmar) {
+            S.inventory.source = 'sanmar';
+            S.inventory.byColor = f.sanmar.byColor || {};
+            S.inventory.fetchedAt = f.sanmar.fetchedAt || 0;
+            S.inventory.error = false;
+        } else {
+            S.inventory.source = 'untracked';
+            S.inventory.byColor = {};
+            S.inventory.fetchedAt = Date.now();
+            S.inventory.error = false;
+        }
+    }
+
+    // Per-color gate: a SanMar-tracked style can carry curated colors the
+    // feed couldn't name-match — those are untracked per-color (no badges,
+    // no caps) rather than wrongly "sold out" over a naming mismatch.
+    function colorTracked(catalogColor) {
+        if (!inventoryTracked()) return false;
+        const c = S.inventory.byColor[catalogColor];
+        if (!c) return S.inventory.source === 'milton';   // Milton: missing color = genuinely 0
+        return !c.untracked;
+    }
+
+    function applyMiltonInventory(inv) {
         if (!inv || !inv.colors || !Object.keys(inv.colors).length) {
-            S.inventory.error = true;
+            S.inventory.feeds.milton = { byColor: {}, fetchedAt: 0, error: true };
             return;
         }
-        S.inventory.byColor = inv.colors;
-        S.inventory.fetchedAt = Date.now();
-        S.inventory.error = false;
+        S.inventory.feeds.milton = { byColor: inv.colors, fetchedAt: Date.now(), error: false };
+    }
+
+    // SanMar PromoStandards feed → the Milton shape stockFor()/the renderers
+    // expect: byColor[CATALOG_COLOR] = { total, sizes:{S:n,...} }. partColor
+    // IS the abbreviated mainframe code (= CATALOG_COLOR — same rule as
+    // everywhere else), matched case-insensitively; totalQty arrives already
+    // summed across all SanMar warehouses.
+    function applySanmarInventory(inv, catalogColors) {
+        const parts = (inv && inv.inventory) || [];
+        const colors = catalogColors || S.product.colors.map((c) => c.catalogColor);
+        const byPart = {};
+        parts.forEach((p) => {
+            if (!p || !p.color || !p.size) return;
+            const key = String(p.color).toLowerCase();
+            byPart[key] = byPart[key] || {};
+            byPart[key][p.size] = (byPart[key][p.size] || 0) + (parseInt(p.totalQty, 10) || 0);
+        });
+        const byColor = {};
+        let matched = 0;
+        colors.forEach((cc) => {
+            const sizes = byPart[String(cc).toLowerCase()];
+            if (sizes) {
+                matched++;
+                byColor[cc] = { total: Object.values(sizes).reduce((a, b) => a + b, 0), sizes };
+            } else {
+                byColor[cc] = { untracked: true };   // name mismatch ≠ sold out
+            }
+        });
+        if (!matched) {
+            // Feed unusable for this style — drop it (fail-open: with no
+            // SanMar feed the standard view falls back to untracked)
+            console.warn('[CTS] SanMar inventory matched no curated colors for', (inv && inv.style) || S.styleNumber, '— stock gating off');
+            S.inventory.feeds.sanmar = null;
+            return;
+        }
+        S.inventory.feeds.sanmar = { byColor, fetchedAt: Date.now() };
     }
 
     async function refreshInventory(bustCache) {
-        if (inventoryTracked()) {
+        if (!S.styleNumber) return;
+        const bust = bustCache ? `?t=${Date.now()}` : '';
+        if (S.styleNumber === 'PC54') {
             try {
-                const url = `${API_BASE}/api/manageorders/pc54-inventory` + (bustCache ? `?t=${Date.now()}` : '');
-                applyInventory(await fetchJson(url));
+                applyMiltonInventory(await fetchJson(`${API_BASE}/api/manageorders/pc54-inventory` + bust));
             } catch (e) {
-                console.error('[CTS] Inventory refresh failed:', e);
-                S.inventory.error = true;
+                console.error('[CTS] Milton inventory refresh failed:', e);
+                S.inventory.feeds.milton = { byColor: {}, fetchedAt: 0, error: true };
             }
         }
+        try {
+            applySanmarInventory(await fetchJson(`${API_BASE}/api/sanmar/inventory/${encodeURIComponent(S.styleNumber)}` + bust));
+        } catch (e) {
+            // Fail-open: keep the last good snapshot — a refresh hiccup
+            // never locks the grid (server gate is the backstop).
+            console.warn('[CTS] SanMar inventory refresh failed (keeping last snapshot):', e.message);
+        }
+        syncActiveInventory();
         renderStage2();
         renderAll();
     }
@@ -1265,7 +1359,7 @@
         renderColorCards();
         $('inventory-error').hidden = !S.inventory.error;
         $('inventory-stamp').textContent = inventoryTracked() && S.inventory.fetchedAt
-            ? `Live stock from our Milton warehouse · updated ${new Date(S.inventory.fetchedAt).toLocaleTimeString()}`
+            ? `${S.inventory.source === 'milton' ? 'Live stock from our Milton warehouse' : 'Live supplier stock'} · updated ${new Date(S.inventory.fetchedAt).toLocaleTimeString()}`
             : '';
     }
 
@@ -1282,7 +1376,7 @@
             btn.className = 'color-chip' + (inCart ? ' is-active' : '');
             btn.disabled = tracked && S.inventory.error;
             let stockHtml = '';
-            if (tracked) {
+            if (tracked && colorTracked(c.catalogColor)) {
                 const stockCls = total <= 0 ? 'is-out' : total <= 24 ? 'is-low' : '';
                 const stockTxt = total <= 0 ? 'Out of stock' : total <= 24 ? `${total} left` : 'In stock';
                 stockHtml = `<span class="chip-stock ${stockCls}">${stockTxt}</span>`;
@@ -1328,7 +1422,9 @@
             card.className = 'color-card';
             const count = Object.values(line.qty).reduce((a, b) => a + (b || 0), 0);
 
-            const tracked = inventoryTracked();
+            // Per-color: SanMar styles can carry a name-mismatched curated
+            // color (untracked — no badges/caps; server gate is the backstop)
+            const tracked = colorTracked(line.catalogColor);
             let cells = '';
             SIZES.forEach((size) => {
                 const stock = stockFor(line.catalogColor, size);
@@ -1841,14 +1937,26 @@
         }
 
         try {
-            // ① Stock recheck (fresh, cache-busted) — Milton-tracked styles
-            // only; untracked styles are stock-confirmed server-side at
-            // order time (v1).
+            // ① Stock recheck (fresh, cache-busted), rush-aware source:
+            // Milton gates RUSH orders only and stays fail-CLOSED — a dead
+            // feed blocks rush checkout; standard orders gate on SanMar and
+            // are fail-OPEN — the server gate re-confirms at session-create,
+            // so a recheck hiccup never blocks the sale here.
             plStep(1);
-            if (inventoryTracked()) {
-                const inv = await fetchJson(`${API_BASE}/api/manageorders/pc54-inventory?t=${Date.now()}`);
-                applyInventory(inv);
+            syncActiveInventory();
+            if (S.inventory.source === 'milton') {
+                applyMiltonInventory(await fetchJson(`${API_BASE}/api/manageorders/pc54-inventory?t=${Date.now()}`));
+                syncActiveInventory();
                 if (S.inventory.error) throw new Error('Live stock is unavailable right now');
+            } else if (S.inventory.source === 'sanmar') {
+                try {
+                    applySanmarInventory(await fetchJson(`${API_BASE}/api/sanmar/inventory/${encodeURIComponent(S.styleNumber)}?t=${Date.now()}`));
+                    syncActiveInventory();
+                } catch (e) {
+                    console.warn('[CTS] SanMar stock recheck failed (continuing — server re-checks):', e.message);
+                }
+            }
+            if (inventoryTracked()) {
                 const conflicts = [];
                 S.cart.lines.forEach((l) => {
                     SIZES.forEach((s) => {
@@ -1906,6 +2014,14 @@
                 body: JSON.stringify(payload),
             });
             const j = await resp.json().catch(() => ({}));
+            // Server-confirmed shortage (the gate re-fetched fresh stock
+            // before declaring it) — reuse the conflict modal, same row
+            // shape as the client recheck, instead of a generic error.
+            if (resp.status === 409 && j.code === 'STOCK_CONFLICT' && Array.isArray(j.conflicts) && j.conflicts.length) {
+                closePipeline();
+                showConflicts(j.conflicts);
+                return;
+            }
             if (!resp.ok || !j.url) {
                 throw new Error(j.error || j.message || 'Checkout could not be created');
             }
@@ -2106,6 +2222,7 @@
         if (!snap || snap.styleNumber !== S.styleNumber) return;
 
         S.rush = !!snap.rush && S.product.rushEligible;
+        syncActiveInventory();   // restored rush may switch Milton ↔ SanMar
         S.cart = snap.cart && Array.isArray(snap.cart.lines) ? snap.cart : S.cart;
         // Drop cart colors that are no longer in the curated list
         S.cart.lines = S.cart.lines.filter((l) =>
@@ -2195,9 +2312,13 @@
         // Change product → back to the catalog
         $('change-product').addEventListener('click', backToGallery);
 
-        // 3-Day Rush toggle (only visible on rush-eligible styles)
+        // 3-Day Rush toggle (only visible on rush-eligible styles). Rush
+        // also switches the stock source (Milton ↔ SanMar), so the color
+        // chips + size grids re-render with the new counts.
         $('rush-toggle').addEventListener('change', (e) => {
             S.rush = !!e.target.checked && S.product.rushEligible;
+            syncActiveInventory();
+            renderStage2();
             renderPromise();
             renderDesignControls();
             renderAll();

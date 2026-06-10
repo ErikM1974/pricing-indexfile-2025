@@ -435,6 +435,9 @@ class QuoteViewPage {
         // Design references (from ShopWorks import)
         this.renderDesignNumbers();
 
+        // Customer Artwork & Mockups (Custom T-Shirts storefront orders)
+        this.renderCustomerArtwork();
+
         // Totals with tax
         this.renderTotals();
 
@@ -3519,6 +3522,140 @@ class QuoteViewPage {
             div.className = 'sw-designs-artwork';
             div.innerHTML = html;
             section.appendChild(div);
+        }
+    }
+
+    /**
+     * Customer Artwork & Mockups (2026-06-10) — Custom T-Shirts storefront
+     * orders (QuoteID prefix DTG, e.g. DTG0610-1234) store the customer's
+     * ORIGINAL uploaded art files + the approved mockup renders in
+     * quote_sessions.OrderSettingsJSON:
+     *   frontLogo / backLogo: { fileUrl, fileName }   (Caspio Files via proxy)
+     *   mockups:  [{ color, catalogColor, view, url }, ...]
+     * Staff need to VIEW + DOWNLOAD these for production. Quote types that
+     * don't carry these keys never mount the section. Defensive: malformed
+     * JSON or missing fields must never break the rest of the page.
+     */
+    renderCustomerArtwork() {
+        try {
+            const raw = this.quoteData && this.quoteData.OrderSettingsJSON;
+            if (!raw) return;
+
+            let settings;
+            try {
+                settings = (typeof raw === 'string') ? JSON.parse(raw) : raw;
+            } catch (parseErr) {
+                console.warn('[quote-view] OrderSettingsJSON parse failed:', parseErr);
+                return;
+            }
+            if (!settings || typeof settings !== 'object') return;
+
+            // Collect original art files (front/back). Both optional.
+            const logos = [];
+            if (settings.frontLogo && settings.frontLogo.fileUrl) {
+                logos.push({ label: 'Front artwork', fileUrl: settings.frontLogo.fileUrl, fileName: settings.frontLogo.fileName || 'front-artwork' });
+            }
+            if (settings.backLogo && settings.backLogo.fileUrl) {
+                logos.push({ label: 'Back artwork', fileUrl: settings.backLogo.fileUrl, fileName: settings.backLogo.fileName || 'back-artwork' });
+            }
+
+            // Collect approved mockups. May be absent/empty.
+            const mockups = (Array.isArray(settings.mockups) ? settings.mockups : [])
+                .filter(m => m && m.url);
+
+            if (!logos.length && !mockups.length) return; // nothing to show
+
+            // The fileUrl has no extension (proxy /api/files/<key>), so sniff
+            // image-ness from the original fileName; non-images (PDF/AI/EPS)
+            // get a file icon instead of a broken <img>.
+            const isImageName = (name) => /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i.test(String(name || ''));
+
+            const logoCard = (logo) => {
+                const url = this.escapeHtml(logo.fileUrl);
+                const name = this.escapeHtml(logo.fileName);
+                const label = this.escapeHtml(logo.label);
+                const thumb = isImageName(logo.fileName)
+                    ? `<img src="${url}" alt="${label}" loading="lazy"
+                            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                       <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file"></i></div>`
+                    : `<div class="cust-art-thumb-icon"><i class="fas fa-file"></i></div>`;
+                return `
+                    <div class="cust-art-card">
+                        <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
+                            ${thumb}
+                        </a>
+                        <div class="cust-art-meta">
+                            <div class="cust-art-label">${label}</div>
+                            <div class="cust-art-filename" title="${name}">${name}</div>
+                            <a class="cust-art-download" href="${url}" download="${name}" target="_blank" rel="noopener">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const mockupCard = (m, i) => {
+                const url = this.escapeHtml(m.url);
+                const viewRaw = String(m.view || '');
+                const viewLabel = viewRaw ? viewRaw.charAt(0).toUpperCase() + viewRaw.slice(1) : `Mockup ${i + 1}`;
+                const label = this.escapeHtml([viewLabel, m.color].filter(Boolean).join(' — '));
+                const dlName = this.escapeHtml(
+                    [this.quoteId || 'mockup', viewRaw || (i + 1), m.catalogColor || m.color || '']
+                        .filter(Boolean).join('-').replace(/[^\w.-]+/g, '_') + '.png'
+                );
+                return `
+                    <div class="cust-art-card">
+                        <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
+                            <img src="${url}" alt="${label}" loading="lazy"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file-image"></i></div>
+                        </a>
+                        <div class="cust-art-meta">
+                            <div class="cust-art-label">${label}</div>
+                            <a class="cust-art-download" href="${url}" download="${dlName}" target="_blank" rel="noopener">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </div>
+                    </div>
+                `;
+            };
+
+            let html = '<h2>Customer Artwork &amp; Mockups</h2>';
+            if (logos.length) {
+                html += `
+                    <div class="cust-art-subhead">Customer Artwork (original files)</div>
+                    <div class="cust-art-grid">${logos.map(logoCard).join('')}</div>
+                `;
+            }
+            if (mockups.length) {
+                html += `
+                    <div class="cust-art-subhead">Approved Mockups</div>
+                    <div class="cust-art-grid">${mockups.map(mockupCard).join('')}</div>
+                `;
+            }
+
+            // Mount (idempotent): reuse the section if a re-render already
+            // created it, else insert right after the Quote Details items —
+            // before the Special Notes section.
+            let section = document.getElementById('customer-artwork-section');
+            if (!section) {
+                section = document.createElement('section');
+                section.id = 'customer-artwork-section';
+                section.className = 'cust-art-section';
+                const anchor = document.getElementById('special-notes-section');
+                if (anchor && anchor.parentNode) {
+                    anchor.parentNode.insertBefore(section, anchor);
+                } else {
+                    const content = document.getElementById('quote-content');
+                    if (!content) return;
+                    content.appendChild(section);
+                }
+            }
+            section.innerHTML = html;
+        } catch (err) {
+            // Never let artwork rendering break the rest of the quote page.
+            console.warn('[quote-view] customer artwork render failed:', err);
         }
     }
 

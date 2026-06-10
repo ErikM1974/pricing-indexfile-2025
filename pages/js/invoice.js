@@ -206,6 +206,7 @@
       this.renderShipTo(data, order, orig, pushed);
       this.renderDetails(data, order, orig);
       this.renderLineItems(data, order, lineItems, orig);
+      this.renderCustomerArtwork(data);
       this.renderTotals(data, order, orig);
       this.renderFooter(data, sw);
       this.renderSyncStatus(sw);
@@ -779,6 +780,131 @@
         result.push({ parent, children });
       }
       return result;
+    }
+
+    // ---------- customer artwork & mockups ----------
+
+    /**
+     * Customer Artwork & Mockups (2026-06-10) — Custom T-Shirts storefront
+     * orders (QuoteID prefix DTG, e.g. DTG0610-1234) store the customer's
+     * ORIGINAL uploaded art files + approved mockup renders in
+     * quote_sessions.OrderSettingsJSON:
+     *   frontLogo / backLogo: { fileUrl, fileName }   (Caspio Files via proxy)
+     *   mockups:  [{ color, catalogColor, view, url }, ...]
+     * Staff opening /invoice/:id need to view + download them. Quote types
+     * without these keys render nothing. The section is screen-only —
+     * @media print in invoice.css hides it so the PDF stays a clean invoice.
+     * Defensive: malformed JSON must never break the rest of the page.
+     */
+    renderCustomerArtwork(data) {
+      try {
+        const raw = data?.sessionRaw?.OrderSettingsJSON;
+        if (!raw) return;
+
+        let settings;
+        try {
+          settings = (typeof raw === 'string') ? JSON.parse(raw) : raw;
+        } catch (parseErr) {
+          console.warn('[invoice] OrderSettingsJSON parse failed:', parseErr);
+          return;
+        }
+        if (!settings || typeof settings !== 'object') return;
+
+        const logos = [];
+        if (settings.frontLogo && settings.frontLogo.fileUrl) {
+          logos.push({ label: 'Front artwork', fileUrl: settings.frontLogo.fileUrl, fileName: settings.frontLogo.fileName || 'front-artwork' });
+        }
+        if (settings.backLogo && settings.backLogo.fileUrl) {
+          logos.push({ label: 'Back artwork', fileUrl: settings.backLogo.fileUrl, fileName: settings.backLogo.fileName || 'back-artwork' });
+        }
+        const mockups = (Array.isArray(settings.mockups) ? settings.mockups : []).filter(m => m && m.url);
+        if (!logos.length && !mockups.length) return;
+
+        // fileUrl has no extension (proxy /api/files/<key>) — sniff image-ness
+        // from the original fileName so PDFs/AI files get a 📄 instead of a
+        // broken <img>.
+        const isImageName = (name) => /\.(png|jpe?g|gif|webp|svg|bmp|avif)$/i.test(String(name || ''));
+
+        const logoCard = (logo) => {
+          const url = escapeHTML(logo.fileUrl);
+          const name = escapeHTML(logo.fileName);
+          const label = escapeHTML(logo.label);
+          const thumb = isImageName(logo.fileName)
+            ? `<img src="${url}" alt="${label}" loading="lazy"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+               <div class="cust-art-thumb-icon" style="display:none;">📄</div>`
+            : `<div class="cust-art-thumb-icon">📄</div>`;
+          return `
+            <div class="cust-art-card">
+              <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">${thumb}</a>
+              <div class="cust-art-meta">
+                <div class="cust-art-label">${label}</div>
+                <div class="cust-art-filename" title="${name}">${name}</div>
+                <a class="cust-art-download" href="${url}" download="${name}" target="_blank" rel="noopener">⬇ Download</a>
+              </div>
+            </div>
+          `;
+        };
+
+        const mockupCard = (m, i) => {
+          const url = escapeHTML(m.url);
+          const viewRaw = String(m.view || '');
+          const viewLabel = viewRaw ? viewRaw.charAt(0).toUpperCase() + viewRaw.slice(1) : `Mockup ${i + 1}`;
+          const label = escapeHTML([viewLabel, m.color].filter(Boolean).join(' — '));
+          const dlName = escapeHTML(
+            [this.quoteId || 'mockup', viewRaw || (i + 1), m.catalogColor || m.color || '']
+              .filter(Boolean).join('-').replace(/[^\w.-]+/g, '_') + '.png'
+          );
+          return `
+            <div class="cust-art-card">
+              <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
+                <img src="${url}" alt="${label}" loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="cust-art-thumb-icon" style="display:none;">🖼</div>
+              </a>
+              <div class="cust-art-meta">
+                <div class="cust-art-label">${label}</div>
+                <a class="cust-art-download" href="${url}" download="${dlName}" target="_blank" rel="noopener">⬇ Download</a>
+              </div>
+            </div>
+          `;
+        };
+
+        let html = '<div class="cust-art-heading">Customer Artwork &amp; Mockups</div>';
+        if (logos.length) {
+          html += `
+            <div class="cust-art-subhead">Customer Artwork (original files)</div>
+            <div class="cust-art-grid">${logos.map(logoCard).join('')}</div>
+          `;
+        }
+        if (mockups.length) {
+          html += `
+            <div class="cust-art-subhead">Approved Mockups</div>
+            <div class="cust-art-grid">${mockups.map(mockupCard).join('')}</div>
+          `;
+        }
+
+        // Mount (idempotent across re-renders/syncs): between the line items
+        // table and the totals block.
+        let section = document.getElementById('customer-artwork-section');
+        if (!section) {
+          section = document.createElement('section');
+          section.id = 'customer-artwork-section';
+          section.className = 'cust-art-section';
+          const totals = document.querySelector('.invoice-totals');
+          if (totals && totals.parentNode) {
+            totals.parentNode.insertBefore(section, totals);
+          } else {
+            const invoice = $('invoice');
+            if (!invoice) return;
+            invoice.appendChild(section);
+          }
+        }
+        section.innerHTML = html;
+      } catch (err) {
+        // Never let artwork rendering break the rest of the invoice.
+        console.warn('[invoice] customer artwork render failed:', err);
+      }
     }
 
     // ---------- totals ----------

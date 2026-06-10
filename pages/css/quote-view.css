@@ -2186,6 +2186,118 @@ body {
 }
 
 /* ============================================================================
+   Customer Artwork & Mockups (2026-06-10) — Custom T-Shirts storefront orders.
+   Original uploaded art + approved mockup renders from OrderSettingsJSON.
+   Mounted by quote-view.js renderCustomerArtwork(); styled to match the
+   sw-designs-artwork strip above.
+   ============================================================================ */
+.cust-art-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+.cust-art-section h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px;
+}
+.cust-art-subhead {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin: 16px 0 12px;
+}
+.cust-art-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+.cust-art-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+.cust-art-thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+}
+.cust-art-thumb:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-color: var(--quote-green, #4caf50);
+}
+.cust-art-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.cust-art-thumb-icon {
+    font-size: 36px;
+    color: #94a3b8;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+.cust-art-meta {
+    text-align: center;
+}
+.cust-art-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+}
+.cust-art-filename {
+    font-size: 10.5px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+.cust-art-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    background: var(--quote-green, #4caf50);
+    border-radius: 6px;
+    text-decoration: none;
+}
+.cust-art-download:hover {
+    filter: brightness(0.95);
+}
+@media print {
+    .cust-art-card { break-inside: avoid; }
+    .cust-art-download { display: none; } /* links are useless on paper */
+}
+
+/* ============================================================================
    Phase 4d — Financial Summary panel
    ============================================================================ */
 .sw-financial-section {
