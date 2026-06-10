@@ -1,3 +1,7 @@
+## v2026.06.10.12 (2026.06.10)
+
+- feat(custom-tees): UberPrints model — baked small-batch pricing + threshold shipping
+
 ## v2026.06.10.11 (2026.06.10)
 
 - feat(custom-tees): e-commerce perfection pass — online $25 LTM, rights gate, trust copy, push fixes
