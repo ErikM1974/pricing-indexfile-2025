@@ -37,10 +37,16 @@ async function grab(url) {
   const taxRate = parseFloat(taxJ.rate);
   if (!Number.isFinite(taxRate)) throw new Error('tax lookup failed');
 
+  // Online LTM (CTS-LTM $25) — same Service_Code the server loads; without it
+  // the client/server totals diverge and the 409 mismatch guard fires.
+  const ltmResp = await grab(`${PROXY}/api/service-codes?code=CTS-LTM`);
+  const ltmFee = parseFloat(ltmResp.data && ltmResp.data[0] && ltmResp.data[0].SellPrice);
+  if (!Number.isFinite(ltmFee)) throw new Error('CTS-LTM service code missing');
+
   const cart = [{ catalogColor: 'Jet Black', colorName: 'Jet Black', qty: { M: 12 } }];
   const quote = CTS_PRICING.quote({
     pricingData,
-    config: { rushPct: 25, shipFee: 0, sizes },
+    config: { rushPct: 25, shipFee: 0, ltmFee, sizes },
     cart,
     location: 'LC',
     backLocation: null,
@@ -82,9 +88,11 @@ async function grab(url) {
       backLocation: null,
       printLocationCode: 'LC',
       printLocationName: 'Left Chest',
-      placement: { front: { wIn: 4, xIn: 0, yIn: 2.5 } },
+      placement: { front: { wIn: 4, hIn: 4, xIn: 0, yIn: 2.5 } },
       mockups: [],
       needsArtReview: true,
+      // Required since 2026-06-10: server 400s storefront orders without it
+      rightsAck: { checked: true, ts: new Date().toISOString() },
     },
   };
 

@@ -79,6 +79,10 @@
             shipEstimate: { status: 'idle', amount: null, source: null, key: '' },
         },
         checkout: { running: false, quoteId: null },
+        // Artwork-rights attestation — intentionally NOT persisted: each
+        // session re-checks it so the orderSettings.rightsAck timestamp is a
+        // fresh attestation (server 400s checkout without it).
+        rightsAck: false,
         ui: { celebratedTier: false },
     };
 
@@ -169,7 +173,18 @@
     // ── Ship promise (standard 7–10 days vs 3-Day Rush) ─────────────
     // Standard copy comes from TDTShipDate.standardPromise() when the
     // shipdate module exposes it; plain copy otherwise (no countdown).
+    // Pickup orders re-word the promise ("Ready for pickup …") — same dates,
+    // nothing leaves the building (mirrors the success-page wording).
     function shipPromise() {
+        const p = buildShipPromise();
+        if (S.delivery.method !== 'pickup') return p;
+        return Object.assign({}, p, {
+            long: p.long.replace(/^Ships\b/, 'Ready for pickup'),
+            short: p.short.replace(/^ships\b/, 'ready for pickup'),
+        });
+    }
+
+    function buildShipPromise() {
         if (S.rush) {
             const p = TDTShipDate.promise(new Date());
             return {
@@ -319,7 +334,10 @@
             // everything style-specific loads in selectProduct/loadProduct.
             const [rushPct, ltmFee, shipFee, catalog] = await Promise.all([
                 loadServiceCode('3DT-RUSH'),
-                loadServiceCode('3DT-LTM'),
+                // CTS-LTM ($25) — the ONLINE small-batch fee, intentionally lower
+                // than the internal builder's $50 tier fee (Erik 2026-06-10).
+                // Server reprice loads the same code; mismatch would 409 checkout.
+                loadServiceCode('CTS-LTM'),
                 loadServiceCode('3DT-SHIP'),
                 fetchJson(`${API_BASE}/api/dtg/top-sellers/styles`),
             ]);
@@ -1531,7 +1549,13 @@
 
         totals.innerHTML = buildTotalsHtml(q);
         const sp = shipPromise();
-        $('review-promise').innerHTML = `<i class="fas fa-truck-fast"></i> ${escapeHTML(sp.long)} from Milton, WA`;
+        const placeSuffix = S.delivery.method === 'pickup'
+            ? ' — 2025 Freeman Rd E, Milton, WA 98354'
+            : ' from Milton, WA';
+        $('review-promise').innerHTML =
+            `<i class="fas ${S.delivery.method === 'pickup' ? 'fa-store' : 'fa-truck-fast'}"></i> `
+            + escapeHTML(sp.long + placeSuffix)
+            + (needsArtReview() ? ' <small>(after proof approval)</small>' : '');
 
         // Low-DPI acknowledgment restated
         const ackEl = $('review-ack');
@@ -1621,6 +1645,14 @@
     }, 700);
 
     // ── Gates + smart CTA ───────────────────────────────────────────
+    // True when any side's art needs a human proof before the production
+    // clock starts (non-previewable formats, SVG with live text/links).
+    // Shared by the pay-button/review promise copy AND the checkout payload.
+    function needsArtReview() {
+        return ['front', 'back'].some((k) =>
+            S.design[k] && (!S.design[k].previewable || (S.design[k].warnings || []).includes('svg-needs-review')));
+    }
+
     function gateReasons(q) {
         const reasons = [];
         // At least one side needs art (back-only designs are valid — the
@@ -1654,6 +1686,10 @@
         } else if (S.delivery.tax.rate === null) {
             reasons.push({ label: S.delivery.tax.error ? 'Tax lookup failed — retry' : 'Confirming sales tax…', target: '#stage-checkout' });
         }
+        // Artwork-rights attestation (server 400s checkout without it)
+        if (!S.rightsAck) {
+            reasons.push({ label: 'Confirm you have rights to your artwork', target: '#review-card', act: () => $('rights-ack').focus() });
+        }
         return reasons;
     }
 
@@ -1669,11 +1705,16 @@
         renderReview(q);
         renderTaxStamp();
         renderSizePriceReadout();
+        // Delivery-card sub-copy mirrors the estimate lifecycle — the flat
+        // rate is only quoted once we KNOW the live estimator isn't coming
+        // back (done-flat / failed), never as the idle default.
         const est = S.delivery.shipEstimate;
         $('ship-fee-label').textContent =
             est.status === 'done' && est.source === 'ups-estimate' ? `UPS Ground — ${money(est.amount)} estimated`
             : est.status === 'loading' ? 'UPS Ground — estimating…'
-            : `UPS Ground — ${money(S.config.shipFee)} flat`;
+            : est.status === 'done' ? `UPS Ground — ${money(est.amount)} flat rate (estimator unavailable)`
+            : est.status === 'failed' ? `UPS Ground — ${money(S.config.shipFee)} flat rate (estimator unavailable)`
+            : 'UPS Ground — enter your ZIP for the exact rate';
 
         const reasons = gateReasons(q);
         const wrap = $('pay-reasons');
@@ -1693,8 +1734,10 @@
         const pay = $('pay-btn');
         const sp = shipPromise();
         pay.disabled = reasons.length > 0 || S.checkout.running;
+        // Proof-clock honesty: art that needs a human proof means the ship
+        // promise only starts at proof approval — say so on the button.
         $('pay-btn-label').textContent = reasons.length
-            ? 'Pay' : `Pay ${money(q.total)} — ${sp.short}`;
+            ? 'Pay' : `Pay ${money(q.total)} — ${sp.short}${needsArtReview() ? ' (after proof approval)' : ''}`;
     }
 
     let lastQuote = null;
@@ -1860,6 +1903,9 @@
             if (!resp.ok || !j.url) {
                 throw new Error(j.error || j.message || 'Checkout could not be created');
             }
+            // Cancel clicked while the session POST was in flight — without
+            // this check the browser redirected to Stripe anyway.
+            if (cancelled) return;
             persistNow();
             window.location.href = j.url;
         } catch (e) {
@@ -1997,7 +2043,10 @@
                 mockups,
                 placement: { front: placementOf('front'), back: placementOf('back') },
                 shipPromise: { iso: sp.iso, label: sp.label, rush: S.rush },
-                needsArtReview: ['front', 'back'].some((k) => S.design[k] && (!S.design[k].previewable || S.design[k].warnings.includes('svg-needs-review'))),
+                needsArtReview: needsArtReview(),
+                // Artwork-rights attestation — gateReasons() blocks Pay until
+                // checked; the server 400s any CTS order without it.
+                rightsAck: S.rightsAck ? { checked: true, ts: new Date().toISOString() } : null,
             },
             successUrl: `${location.origin}/pages/custom-tees-success.html?session_id={CHECKOUT_SESSION_ID}`,
             cancelUrl: `${location.origin}/custom-tees?canceled=1`,
@@ -2274,6 +2323,13 @@
             if (s) { s.lowDpiAck = e.target.checked; renderAll(); persistSoon(); }
         });
 
+        // Artwork-rights attestation — gates Pay. NOT persisted (fresh
+        // attestation each session, see S.rightsAck).
+        $('rights-ack').addEventListener('change', (e) => {
+            S.rightsAck = e.target.checked;
+            renderAll();
+        });
+
         // Inventory retry
         $('inventory-retry').addEventListener('click', () => refreshInventory(true));
 
@@ -2291,16 +2347,19 @@
         bind('f-email', S.customer, 'email');
         bind('f-phone', S.customer, 'phone');
         bind('f-company', S.customer, 'company');
-        bind('f-addr1', S.delivery.address, 'address1');
-        bind('f-city', S.delivery.address, 'city');
         // Editing the destination IMMEDIATELY invalidates the old tax rate —
         // otherwise Pay stays enabled with the previous address's rate during
         // the debounce window (stale-tax gate gap, review fix 2026-06-09).
+        // ALL FOUR address fields invalidate: WA's destination-based rates are
+        // street-level (a ZIP can straddle jurisdictions), so editing street
+        // or city after the ZIP must re-run the lookup too (audit 2026-06-10).
         const invalidateTaxThenLookup = () => {
             S.delivery.tax.rate = null;
             S.delivery.tax.error = false;
             lookupTax();
         };
+        bind('f-addr1', S.delivery.address, 'address1', invalidateTaxThenLookup);
+        bind('f-city', S.delivery.address, 'city', invalidateTaxThenLookup);
         bind('f-state', S.delivery.address, 'state', invalidateTaxThenLookup);
         bind('f-zip', S.delivery.address, 'zip', invalidateTaxThenLookup);
         $('f-notes').addEventListener('input', (e) => { S.delivery.notes = e.target.value; persistSoon(); });

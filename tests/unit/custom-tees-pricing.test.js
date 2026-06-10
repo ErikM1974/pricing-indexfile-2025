@@ -112,6 +112,23 @@ describe('LTM — DTG builder distributed math (tier LTM_Fee, floor per piece)',
         expect(r.shirtsSubtotal).toBe(156.0);
         expect(r.total).toBe(205.92);
     });
+
+    test('ONLINE override: config.ltmFee 25 (CTS-LTM) replaces the tier $50 — 12 pcs → 2.08/pc → $24.96', () => {
+        const r = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 25 }, delivery: { method: 'pickup', taxRate: null } });
+        expect(r.ltmPerPiece).toBe(2.08);
+        expect(r.ltmFee).toBe(24.96);
+        expect(r.total).toBe(180.96);   // 156 + 24.96
+    });
+
+    test('override 0 waives the online fee entirely (Erik can set CTS-LTM to 0 in Caspio)', () => {
+        const r = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 0 } });
+        expect(r.ltmFee).toBe(0);
+    });
+
+    test('override never APPLIES the fee above the tier threshold (tier gates WHEN, config gates HOW MUCH)', () => {
+        const r = q({ cart: cartOf(24), config: { ...CONFIG, ltmFee: 25 } });
+        expect(r.ltmFee).toBe(0);
+    });
 });
 
 describe('back locations FB/JB + front JF', () => {
