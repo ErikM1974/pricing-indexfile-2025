@@ -172,6 +172,17 @@
 
 > Deleted 2026-06-09 (legacy implementation): `/pages/js/3-day-tees.js`, `/pages/js/3-day-tees-debug.js`, `/pages/css/3-day-tees-redesign.css`, `/pages/js/services/ApiService.js`, `/pages/js/services/InventoryService.js`, `/pages/js/utils/debounce.js`, `/tests/test-3day-{inventory,multisku}.js`, `/tests/3-day-tees-{redesign-demo,performance-test}.html`, `/tests/3-day-tees-inventory-summary.md`. Recovery: `git show HEAD~1:<path>`.
 
+### Custom T-Shirts System (multi-style fork of 3-Day Tees, in build 2026-06-10)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/custom-tees.html` | Custom T-Shirts page (3DT design-studio fork, ~20 styles) | custom-tees-app.js + modules below | 🚧 In build |
+| `/pages/js/custom-tees-app.js` | App core (3DT clone, being adapted for multi-style) | TDTPricing/TDTShipDate/CTS_CALIBRATION/TDTDesigner | 🚧 In build |
+| `/pages/js/custom-tees-pricing.js` | Pricing engine (3DT clone, multi-style adaptation) | — (dual browser/Node) | 🚧 In build |
+| `/pages/js/custom-tees-shipdate.js` | Ship-promise engine (3DT clone) | — (dual browser/Node) | 🚧 In build |
+| `/pages/js/custom-tees-calibration.js` | Per-style print-area registry `window.CTS_CALIBRATION.forStyle()` — hybrid: PC54 hand-calibrated + generic flat-lay model for other styles; LC/FF/JF/FB/JB inches authoritative | — | 🚧 In build |
+| `/pages/js/custom-tees-designer.js` | Canvas designer (3DT fork): styleNumber-aware via CTS_CALIBRATION, JF/JB jumbo locations, approximate-preview flag for uncalibrated styles | CTS_CALIBRATION, /api/image-proxy | 🚧 In build |
+| `/pages/js/custom-tees-success.js` | Success-page logic (3DT clone) | TDTShipDate, app.config.js | 🚧 In build |
+
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|

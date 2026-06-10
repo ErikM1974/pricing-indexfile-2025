@@ -13,6 +13,10 @@ const session = require('express-session');
 // disagree with what the customer saw (dual window/module.exports pattern).
 const TDT_PRICING = require('./pages/js/3-day-tees-pricing.js');
 const TDT_SHIPDATE = require('./pages/js/3-day-tees-shipdate.js');
+// Custom T-Shirts (multi-style DTG storefront, 2026-06-10) — same dual-load
+// pattern; pricing is INTERNAL-DTG-BUILDER parity (rush opt-in, tier LTM).
+const CTS_PRICING = require('./pages/js/custom-tees-pricing.js');
+const CTS_SHIPDATE = require('./pages/js/custom-tees-shipdate.js');
 
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
@@ -747,6 +751,17 @@ function generate3DTQuoteID() {
   return `3DT${month}${day}-${paddedSequence}`;
 }
 
+// Custom T-Shirts orders carry the DTG prefix (Erik 2026-06-10) so they land
+// in Quote Management alongside the internal builder's DTG quotes. Same
+// date+random shape as 3DT; the checkout route's uniqueness check still applies.
+function generateCtsQuoteID() {
+  const date = new Date();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const sequence = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+  return `DTG${month}${day}-${sequence}`;
+}
+
 // Save 3-Day Tees order to quote_sessions (Christmas Bundles pattern)
 async function save3DTQuoteSession(data) {
   const { quoteID, customerData, orderTotals, stripeSessionId, colorConfigs, orderSettings } = data;
@@ -767,7 +782,9 @@ async function save3DTQuoteSession(data) {
     LTMFeeTotal: parseFloat((orderTotals.ltmFee || 0).toFixed(2)),
     TotalAmount: parseFloat((orderTotals.grandTotal || 0).toFixed(2)),
     ExpiresAt: formattedExpiresAt,
-    Notes: `3-Day Tees Rush Order${stripeSessionId ? ` | Stripe Session: ${stripeSessionId}` : ''}`,
+    Notes: (orderSettings && orderSettings.channel === 'custom-tees'
+      ? `Custom T-Shirts DTG Order${orderSettings.rush ? ' (3-Day Rush)' : ''} — ${orderSettings.styleNumber || ''}`
+      : '3-Day Tees Rush Order') + (stripeSessionId ? ` | Stripe Session: ${stripeSessionId}` : ''),
 
     // Store full order data as JSON (for webhook retrieval)
     // This eliminates Stripe metadata size constraints
@@ -874,6 +891,204 @@ async function getTdtShipMeta() {
   _tdtShipMetaCache = { pieceWeightLb, perBox };
   _tdtShipMetaAt = Date.now();
   return _tdtShipMetaCache;
+}
+
+// ── Custom T-Shirts: per-style config + reprice (2026-06-10) ────────────────
+// Multi-style DTG storefront. Pricing parity contract: a customer ordering N
+// pieces of style X at /custom-tees pays EXACTLY what the internal DTG quote
+// builder computes for the same inputs (tiers/costs/upcharges from the same
+// per-style pricing-bundle; LTM = the builder's distributed floor math, which
+// lives inside CTS_PRICING). Rush is OPT-IN (+3DT-RUSH %) and only on
+// whitelisted rush-eligible styles. All fail-closed — never a guessed price.
+
+const CTS_RUSH_ELIGIBLE = new Set(['PC54']);   // 3-Day Rush launch scope (config, expand later)
+
+const _ctsCfgCache = new Map();   // styleNumber → { at, value }
+async function getCtsPricingConfig(styleNumber) {
+  const style = String(styleNumber || '').trim().toUpperCase();
+  if (!/^[A-Z0-9_-]{2,20}$/.test(style)) throw new Error(`Invalid style number: ${styleNumber}`);
+  const hit = _ctsCfgCache.get(style);
+  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return hit.value;
+
+  const grab = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status} from ${url.split('?')[0]}`);
+    return r.json();
+  };
+  const code = async (c) => {
+    const j = await grab(`${TDT_PROXY}/api/service-codes?code=${c}`);
+    const row = j && j.data && j.data[0];
+    if (!row || !row.IsActive || !(parseFloat(row.SellPrice) >= 0)) {
+      throw new Error(`Service code ${c} missing/inactive in Caspio`);
+    }
+    return parseFloat(row.SellPrice);
+  };
+
+  const [pricingData, rushPct, shipFee] = await Promise.all([
+    grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=${encodeURIComponent(style)}`),
+    code('3DT-RUSH'), code('3DT-SHIP'),
+  ]);
+  if (!Array.isArray(pricingData.tiersR) || !pricingData.tiersR.length) {
+    throw new Error(`No DTG pricing tiers for style ${style}`);
+  }
+  // Per-style size whitelist comes from the SERVER-fetched bundle (load-bearing:
+  // an unknown client size key must never inflate the tier while pricing $0).
+  const sizes = (pricingData.sizes || []).map(s => s.size).filter(Boolean);
+  // LTM threshold (label use only — the FEE math lives on the tier rows inside
+  // CTS_PRICING) = first non-LTM tier's MinQuantity, same as the TDT loader.
+  const nonLtm = (pricingData.tiersR || [])
+    .filter(t => !parseFloat(t.LTM_Fee || 0))
+    .sort((a, b) => a.MinQuantity - b.MinQuantity);
+  if (!nonLtm.length) throw new Error(`DTG pricing tiers for ${style} missing a non-LTM tier`);
+  const value = {
+    pricingData,
+    config: { rushPct, shipFee, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
+  };
+  _ctsCfgCache.set(style, { at: Date.now(), value });
+  return value;
+}
+
+// Curated-catalog whitelist: customers may only order the ~20 DTG-tested top
+// sellers (same source the internal builder renders). Cached 1h; fail-closed.
+let _ctsCatalogCache = null;
+let _ctsCatalogAt = 0;
+async function getCtsCatalog() {
+  if (_ctsCatalogCache && Date.now() - _ctsCatalogAt < 60 * 60 * 1000) return _ctsCatalogCache;
+  const r = await fetch(`${TDT_PROXY}/api/dtg/top-sellers`);
+  if (!r.ok) throw new Error(`top-sellers fetch failed: HTTP ${r.status}`);
+  const j = await r.json();
+  const styles = Array.isArray(j) ? j : (j.data || j.styles || []);
+  if (!styles.length) throw new Error('top-sellers returned an empty catalog');
+  const map = new Map();
+  styles.forEach(s => { const k = String(s.style || s.styleNumber || '').toUpperCase(); if (k) map.set(k, s); });
+  _ctsCatalogCache = map;
+  _ctsCatalogAt = Date.now();
+  return map;
+}
+
+// Per-style piece weight for the UPS estimate (PC54's getTdtShipMeta is the
+// single-style original; this one keys the SanMar lookup by style, 1h cache).
+const _ctsShipMetaCache = new Map();
+async function getCtsShipMeta(styleNumber) {
+  const style = String(styleNumber || 'PC54').toUpperCase();
+  const hit = _ctsShipMetaCache.get(style);
+  if (hit && Date.now() - hit.at < 60 * 60 * 1000) return hit.value;
+  let pieceWeightLb = 0.44;   // tee-class default; refreshed from SanMar below
+  let perBox = 58;
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/shipping/box-density`);
+    if (r.ok) {
+      const j = await r.json();
+      const v = parseInt(j && j.density && j.density['T-Shirt'], 10);
+      if (v > 0) perBox = v;
+    }
+  } catch (e) { console.warn('[CTS ship] box-density fetch failed, using default 58:', e.message); }
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/inventory?styleNumber=${encodeURIComponent(style)}`);
+    if (r.ok) {
+      const j = await r.json();
+      const rows = Array.isArray(j) ? j : (j.data || j.result || []);
+      const w = parseFloat((rows.find(x => parseFloat(x.PIECE_WEIGHT) > 0) || {}).PIECE_WEIGHT);
+      if (w > 0) pieceWeightLb = w;
+    }
+  } catch (e) { console.warn(`[CTS ship] piece-weight fetch failed for ${style}, using default 0.44:`, e.message); }
+  const value = { pieceWeightLb, perBox };
+  _ctsShipMetaCache.set(style, { at: Date.now(), value });
+  return value;
+}
+
+// → { amount, source } like resolveTdtShipping, but weight keyed to the style.
+async function resolveCtsShipping(toZip, qty, styleNumber) {
+  const zip = String(toZip || '').trim().slice(0, 5);
+  const pieces = Math.max(1, parseInt(qty, 10) || 1);
+  if (/^\d{5}$/.test(zip)) {
+    try {
+      const meta = await getCtsShipMeta(styleNumber);
+      const boxes = Math.max(1, Math.ceil(pieces / meta.perBox));
+      const totalLb = pieces * meta.pieceWeightLb;
+      const boxWeightsLb = Array.from({ length: boxes }, () => Math.round((totalLb / boxes) * 100) / 100);
+      const r = await fetch(`${TDT_PROXY}/api/shipping/estimate-ups-ground`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ toZip: zip, weightLb: totalLb, boxes, boxWeightsLb, residential: true }),
+      });
+      const j = r.ok ? await r.json() : null;
+      const est = j && parseFloat(j.estimate);
+      if (Number.isFinite(est) && est > 0) {
+        return {
+          amount: Math.round(est * 100) / 100,
+          source: 'ups-estimate',
+          detail: { boxes, weightLb: totalLb, zone: j.zone, residential: true },
+        };
+      }
+      console.warn('[CTS ship] estimator returned no usable estimate, falling back to flat');
+    } catch (e) {
+      console.warn('[CTS ship] UPS estimate failed, falling back to flat:', e.message);
+    }
+  }
+  const { config } = await getCtsPricingConfig(styleNumber || 'PC54');
+  return { amount: config.shipFee, source: 'flat' };
+}
+
+// Rebuild the full Custom-Tees quote server-side (authoritative, like
+// rebuildTdtQuote but per-style + rush-aware). Returns the same shape plus
+// style/product metadata the checkout route stamps onto the order.
+async function rebuildCtsQuote(colorConfigs, orderSettings, customerData) {
+  const styleRaw = orderSettings && orderSettings.styleNumber;
+  const style = String(styleRaw || '').trim().toUpperCase();
+  const catalog = await getCtsCatalog();
+  if (!catalog.has(style)) {
+    throw Object.assign(new Error(`Style ${styleRaw || '(none)'} is not in the Custom T-Shirts catalog`), { code: 'STYLE_NOT_ALLOWED' });
+  }
+  const product = catalog.get(style);
+
+  const rushRequested = !!(orderSettings && orderSettings.rush);
+  if (rushRequested && !CTS_RUSH_ELIGIBLE.has(style)) {
+    throw Object.assign(new Error(`3-Day Rush is not available for style ${style}`), { code: 'RUSH_NOT_ELIGIBLE' });
+  }
+
+  const { pricingData, config } = await getCtsPricingConfig(style);
+  const tax = await resolveTdtTax(customerData);
+
+  const front = String(orderSettings?.frontLocation || orderSettings?.printLocationCode || 'LC').toUpperCase();
+  const frontLoc = ['LC', 'FF', 'JF'].includes(front.split('_')[0]) ? front.split('_')[0] : 'LC';
+  let backLoc = orderSettings?.backLocation ? String(orderSettings.backLocation).toUpperCase() : null;
+  if (!backLoc && /_FB/.test(front)) backLoc = 'FB';
+  if (!backLoc && /_JB/.test(front)) backLoc = 'JB';
+  if (backLoc && !['FB', 'JB'].includes(backLoc)) backLoc = null;
+
+  const sizes = config.sizes;
+  const cart = Object.values(colorConfigs || {}).map(c => {
+    const qty = {};
+    sizes.forEach(size => {
+      const sd = (c.sizeBreakdown || {})[size];
+      const q = parseInt(sd && sd.quantity, 10) || 0;
+      if (q > 0) qty[size] = q;
+    });
+    return { catalogColor: c.catalogColor, colorName: c.displayColor || c.catalogColor, qty };
+  });
+  const method = customerData.deliveryMethod === 'pickup' ? 'pickup' : 'ship';
+
+  let shipResolved = { amount: 0, source: 'pickup' };
+  if (method === 'ship') {
+    shipResolved = await resolveCtsShipping(customerData.zip, CTS_PRICING.combinedQuantity(cart), style);
+  }
+
+  const quote = CTS_PRICING.quote({
+    pricingData,
+    config: Object.assign({}, config, { shipFee: shipResolved.amount }),
+    cart,
+    location: frontLoc,
+    backLocation: backLoc,
+    rush: rushRequested,
+    delivery: { method, taxRate: tax.rate },
+  });
+  return {
+    quote, tax, config, shipping: shipResolved,
+    style, rush: rushRequested, frontLocation: frontLoc, backLocation: backLoc,
+    sizes,
+    productName: product.product_title || product.name || `${style} Tee`,
+  };
 }
 
 // → { amount, source: 'ups-estimate'|'flat', detail? }. Throws only if BOTH
@@ -1519,6 +1734,12 @@ app.get('/3-day-tees.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', '3-day-tees.html'));
 });
 
+// Custom T-Shirts — multi-style DTG storefront (2026-06-10). Clean URL +
+// .html alias; the success page resolves via the static /pages mount.
+app.get(['/custom-tees', '/custom-tees.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-tees.html'));
+});
+
 // Brands browse page
 app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));
@@ -1712,8 +1933,12 @@ app.post('/api/create-payment-intent', async (req, res) => {
 // customer sees is what Stripe bills. {toZip, qty} → {amount, source}.
 app.post('/api/three-day-tees/shipping-estimate', async (req, res) => {
   try {
-    const { toZip, qty } = req.body || {};
-    const resolved = await resolveTdtShipping(toZip, qty);
+    const { toZip, qty, styleNumber } = req.body || {};
+    // styleNumber present → Custom-Tees caller (per-style piece weight);
+    // absent → legacy 3DT page (PC54). Same resolver family either way.
+    const resolved = styleNumber
+      ? await resolveCtsShipping(toZip, qty, styleNumber)
+      : await resolveTdtShipping(toZip, qty);
     res.json(resolved);
   } catch (e) {
     console.error('[3DT ship] estimate endpoint failed:', e);
@@ -1747,12 +1972,22 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // open redirect off a payment flow).
     const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
 
+    // Channel: 'custom-tees' = the multi-style DTG storefront (per-style
+    // bundle, internal-builder LTM, opt-in rush); anything else = legacy 3DT.
+    const isCTS = !!(orderSettings && orderSettings.channel === 'custom-tees');
+    const chLog = isCTS ? '[Custom Tees Checkout]' : '[3-Day Tees Checkout]';
+
     // ── Authoritative server-side reprice ──────────────────────────────
     let priced;
     try {
-      priced = await rebuildTdtQuote(colorConfigs, orderSettings, customerData);
+      priced = isCTS
+        ? await rebuildCtsQuote(colorConfigs, orderSettings, customerData)
+        : await rebuildTdtQuote(colorConfigs, orderSettings, customerData);
     } catch (e) {
-      console.error('[3-Day Tees Checkout] Server reprice failed:', e);
+      console.error(`${chLog} Server reprice failed:`, e);
+      if (e.code === 'STYLE_NOT_ALLOWED' || e.code === 'RUSH_NOT_ELIGIBLE') {
+        return res.status(400).json({ error: e.message + ' — nothing was charged.' });
+      }
       return res.status(502).json({
         error: 'Live pricing is unavailable right now — nothing was charged. Please try again or call 253-922-5793.'
       });
@@ -1775,11 +2010,12 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // advisory — the ShopWorks push reads this JSON, and a doctored payload
     // must not ship uncharged shirts or mislabeled line prices).
     const cleanConfigs = {};
+    const sizeWhitelist = isCTS ? priced.sizes : TDT_SIZES;
     Object.values(colorConfigs).forEach(c => {
       if (!c || !c.catalogColor) return;
       const sizeBreakdown = {};
       let totalQuantity = 0;
-      TDT_SIZES.forEach(size => {
+      sizeWhitelist.forEach(size => {
         const q = parseInt((c.sizeBreakdown || {})[size] && c.sizeBreakdown[size].quantity, 10) || 0;
         if (q > 0) {
           sizeBreakdown[size] = { quantity: q, unitPrice: quote.unitBySize[size].finalPrice };
@@ -1813,20 +2049,35 @@ app.post('/api/create-checkout-session', async (req, res) => {
     };
 
     // Binding ship-promise date — stamped at payment time, echoed to the
-    // success page and the ShopWorks order note.
-    const promise = TDT_SHIPDATE.promise(new Date());
+    // success page and the ShopWorks order note. Custom-Tees standard orders
+    // promise the END of the 7-10 business-day window; the rush toggle (or
+    // legacy 3DT) uses the 3-day cutoff promise.
+    const promise = isCTS
+      ? (priced.rush ? CTS_SHIPDATE.promise(new Date()) : CTS_SHIPDATE.standardPromise(new Date()))
+      : TDT_SHIPDATE.promise(new Date());
     const settingsStamped = Object.assign({}, orderSettings || {}, {
       shipPromise: {
         iso: promise.shipDateIso,
         label: promise.shipDateLong,
+        mode: isCTS ? (priced.rush ? 'rush-3day' : 'standard-7to10') : 'rush-3day',
+        rangeLabel: promise.rangeLabel || null,    // standard mode only
         stampedAt: new Date().toISOString()
       }
-    });
+    }, isCTS ? {
+      // Server-validated style facts become the order of record (the client's
+      // were advisory) — the push + success page read THESE.
+      channel: 'custom-tees',
+      styleNumber: priced.style,
+      styleName: priced.productName,
+      rush: priced.rush,
+      frontLocation: priced.frontLocation,
+      backLocation: priced.backLocation
+    } : {});
 
     // ── Unique QuoteID (random suffix used to collide same-day) ───────
     let quoteID = null;
     for (let attempt = 0; attempt < 4; attempt++) {
-      const candidate = generate3DTQuoteID();
+      const candidate = isCTS ? generateCtsQuoteID() : generate3DTQuoteID();
       try {
         // refresh=true is LOAD-BEARING: without it this pre-create lookup
         // caches [] under this QuoteID for 5 min on the proxy, and the
@@ -1868,10 +2119,13 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     // ── Stripe line items built from the SERVER quote ──────────────────
     const cents = (v) => Math.round(v * 100);
+    const lineName = isCTS
+      ? (l) => `${priced.style} ${priced.productName ? '— ' + String(priced.productName).slice(0, 60) : 'Tee'} — ${l.colorName}, ${l.size}${priced.rush ? ' (3-Day Rush)' : ''}`
+      : (l) => `PC54 Tee — ${l.colorName}, ${l.size}`;
     const line_items = quote.lines.map(l => ({
       price_data: {
         currency: 'usd',
-        product_data: { name: `PC54 Tee — ${l.colorName}, ${l.size}` },
+        product_data: { name: lineName(l) },
         unit_amount: cents(l.unitPrice)
       },
       quantity: l.quantity
@@ -1922,11 +2176,15 @@ app.post('/api/create-checkout-session', async (req, res) => {
       line_items: line_items || [],
       mode: 'payment',
       customer_email: customer_email,
-      success_url: `${siteOrigin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`,
-      cancel_url: `${siteOrigin}/pages/3-day-tees.html?canceled=1`,
+      success_url: isCTS
+        ? `${siteOrigin}/pages/custom-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`
+        : `${siteOrigin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`,
+      cancel_url: isCTS
+        ? `${siteOrigin}/custom-tees?canceled=1`
+        : `${siteOrigin}/pages/3-day-tees.html?canceled=1`,
       metadata: {
         quoteID: quoteID,
-        source: '3day-tees'
+        source: isCTS ? 'custom-tees' : '3day-tees'
         // NOTE: Full order data now stored in Caspio (not Stripe metadata)
         // Webhook will query Caspio using quoteID to retrieve order data
         // This eliminates Stripe's 500-character metadata limit
@@ -1952,7 +2210,9 @@ app.post('/api/create-checkout-session', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             SessionID: `stripe_${session.id}`,
-            Notes: `3-Day Tees Rush Order | Stripe Session: ${session.id} | Status: Checkout Created`
+            Notes: isCTS
+              ? `Custom T-Shirts DTG Order${priced.rush ? ' (3-Day Rush)' : ''} — ${priced.style} | Stripe Session: ${session.id} | Status: Checkout Created`
+              : `3-Day Tees Rush Order | Stripe Session: ${session.id} | Status: Checkout Created`
           })
         });
         console.log('[3-Day Tees Checkout] ✓ Updated Caspio with Stripe session ID');
@@ -2092,9 +2352,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
 
     // Build line items from colorConfigs
     // Structure: { catalogColor: { displayColor, sizeBreakdown: { size: { quantity, unitPrice } } } }
+    // Style: Custom-Tees orders carry the SERVER-VALIDATED style in
+    // orderSettings (stamped at checkout from the curated-catalog whitelist);
+    // legacy 3DT orders fall through to PC54.
     const lineItems = [];
-    const styleNumber = pricingData?.styleNumber || 'PC54';
-    const productName = pricingData?.productName || 'Port & Company Core Cotton Tee';
+    const styleNumber = orderSettings?.styleNumber || pricingData?.styleNumber || 'PC54';
+    const productName = orderSettings?.styleName || pricingData?.productName || 'Port & Company Core Cotton Tee';
 
     for (const [catalogColor, config] of Object.entries(colorConfigs)) {
       if (config.sizeBreakdown) {

@@ -1,0 +1,53 @@
+/* 3-day-tees-success.css — post-payment confirmation page (rides on
+   3-day-tees.css tokens). */
+
+.success-body { padding-bottom: 0; }
+
+.success-main {
+    max-width: 640px; margin: 0 auto; padding: 40px 18px 60px;
+}
+.success-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    box-shadow: var(--shadow-card); padding: 34px 28px; text-align: center;
+}
+.success-card h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
+.success-card > p { color: var(--ink-soft); }
+
+.success-spin { font-size: 34px; color: var(--green-700); margin-bottom: 14px; }
+.success-check { font-size: 46px; color: var(--green-700); margin-bottom: 14px; }
+.success-check.is-amber { color: var(--warn); }
+
+.success-order { font-size: 15px; }
+.success-order strong { font-family: var(--font-display); font-size: 19px; letter-spacing: 0.02em; }
+.success-ship {
+    display: inline-block; background: var(--rush-soft); color: var(--rush-deep);
+    border: 1px dashed var(--rush); border-radius: 999px; padding: 7px 16px;
+    font-weight: 700; font-size: 14px; margin: 6px 0 16px;
+}
+
+.success-mockups { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin: 14px 0; }
+.success-mockups figure { margin: 0; width: 110px; }
+.success-mockups img { width: 100%; border-radius: 10px; border: 1px solid var(--line); background: var(--paper-deep); }
+.success-mockups figcaption { font-size: 11px; color: var(--ink-faint); margin-top: 3px; }
+
+.success-summary { text-align: left; margin: 18px auto 0; max-width: 420px; }
+.success-summary .tot-row { display: flex; justify-content: space-between; font-size: 14px; padding: 3px 0; }
+.success-summary .tot-row.is-grand {
+    font-family: var(--font-display); font-weight: 800; font-size: 18px;
+    border-top: 2px solid var(--ink); padding-top: 8px; margin-top: 6px;
+}
+
+.success-timeline { text-align: left; max-width: 420px; margin: 22px auto 0; display: grid; gap: 12px; }
+.success-step { display: flex; gap: 12px; align-items: flex-start; }
+.success-step i { color: var(--green-700); font-size: 17px; margin-top: 2px; width: 20px; }
+.success-step.is-pending i { color: var(--ink-faint); }
+.success-step strong { display: block; font-size: 14.5px; }
+.success-step small { color: var(--ink-faint); }
+
+.success-email-note { margin-top: 20px; font-size: 13px; color: var(--ink-faint); }
+.success-actions { margin-top: 16px; }
+
+@media (max-width: 560px) {
+    .success-card { padding: 26px 18px; }
+    .success-card h1 { font-size: 22px; }
+}
