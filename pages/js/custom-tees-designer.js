@@ -621,6 +621,64 @@
             });
         }
 
+        // ── Zoom crop (close-up of the print area, natural-res source) ───
+        // Renders the print area + margin from the FULL-RESOLUTION garment
+        // photo (1200×1800-class), art composited at the same inch→px map the
+        // mockup export uses — so the lightbox close-up is crisp, not a CSS
+        // blow-up of the on-screen canvas. (Erik 2026-06-10)
+        async function exportZoomCrop(view, outWidthPx) {
+            const colorObj = state.color;
+            if (!colorObj) return null;
+            const url = garmentUrl(colorObj, view);
+            if (!url) return null;
+            const p = proxied(url);
+            if (!imageCache[p]) imageCache[p] = loadImage(p);
+            let img;
+            try { img = await imageCache[p]; } catch (_) { return null; }
+
+            const slotKey = view === 'back' ? 'back' : 'front';
+            const slot = state.slots[slotKey];
+            const loc = locationFor(slotKey);
+            const a = cal.areaPx(view === 'back' ? 'flatBack' : 'flatFront', loc,
+                colorObj.catalogColor, img.naturalWidth, img.naturalHeight);
+            if (!a) return null;
+
+            // Crop = print area + breathing room (more above for collar context)
+            const mx = a.w * 0.30;
+            const myTop = a.h * 0.18;
+            const myBot = a.h * 0.10;
+            const sx = Math.max(0, a.x - mx);
+            const sy = Math.max(0, a.y - myTop);
+            const sw = Math.min(img.naturalWidth - sx, a.w + mx * 2);
+            const sh = Math.min(img.naturalHeight - sy, a.h + myTop + myBot);
+
+            const outW = outWidthPx || 1000;
+            const outH = Math.round(outW * (sh / sw));
+            const off = document.createElement('canvas');
+            off.width = outW;
+            off.height = outH;
+            const octx = off.getContext('2d');
+            octx.imageSmoothingQuality = 'high';
+            octx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+
+            if (slot && slot.previewable && slot.bitmap) {
+                const k = outW / sw;   // natural-px → crop-out px
+                const aspect = slot.naturalH / slot.naturalW;
+                const artW = slot.placement.wIn * a.pxPerInch;
+                const artH = artW * aspect;
+                const cx = a.x + a.w / 2 + slot.placement.xIn * a.pxPerInch;
+                const y = a.y + slot.placement.yIn * a.pxPerInch;
+                octx.save();
+                octx.beginPath();
+                octx.rect((a.x - sx) * k, (a.y - sy) * k, a.w * k, a.h * k);
+                octx.clip();
+                octx.drawImage(slot.bitmap, (cx - artW / 2 - sx) * k, (y - sy) * k, artW * k, artH * k);
+                octx.restore();
+            }
+
+            try { return off.toDataURL('image/jpeg', 0.9); } catch (_) { return null; }
+        }
+
         /** Boot-time taint canary — should never fire via the proxy. */
         async function taintCanary() {
             try {
@@ -700,6 +758,7 @@
             maxWidthIn,
             preload,
             exportMockup,
+            exportZoomCrop,
             taintCanary,
             render: requestRender,
             destroy() {

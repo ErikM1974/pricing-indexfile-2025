@@ -499,6 +499,8 @@
         S.boot.ready = true;
         $('studio').hidden = false;
         $('order-bar').hidden = false;
+        const zoomBtn = $('canvas-zoom-btn');
+        if (zoomBtn) zoomBtn.hidden = false;   // product loaded → close-up available
         syncDeliveryUI();
         syncRushUI();
         renderStage2();
@@ -2014,6 +2016,47 @@
             $('tab-back').setAttribute('aria-selected', String(v === 'back'));
             renderDesignControls();
         }
+
+        // ── Zoom lightbox: hi-res close-up of the print area (2026-06-10) ──
+        // exportZoomCrop renders from the NATURAL-resolution garment photo, so
+        // the close-up is crisp — not a blow-up of the on-screen canvas. The
+        // button unhides in enterStudio() once a product is loaded.
+        function currentView() {
+            return $('tab-back').classList.contains('is-active') ? 'back' : 'front';
+        }
+        async function openZoomLightbox() {
+            const view = currentView();
+            const btn = $('canvas-zoom-btn');
+            if (btn) { btn.disabled = true; }
+            let url = null;
+            try { url = await designer.exportZoomCrop(view, 1100); } catch (_) { /* fall through */ }
+            if (btn) { btn.disabled = false; }
+            if (!url) { toast('Close-up unavailable for this view right now.'); return; }
+            const slot = view === 'back' ? S.design.back : S.design.front;
+            const locCode = view === 'back' ? (S.design.backLocation || 'FB') : S.design.frontLocation;
+            const locName = { LC: 'Left Chest 4″×4″', FF: 'Full Front 12″×16″', JF: 'Jumbo Front 16″×20″', FB: 'Full Back 12″×16″', JB: 'Jumbo Back 16″×20″' }[locCode] || locCode;
+            $('zoom-lightbox-img').src = url;
+            $('zoom-lightbox-caption').textContent =
+                `${view === 'back' ? 'Back' : 'Front'} — ${locName}` +
+                (slot && slot.placement ? ` · art ${slot.placement.wIn}″ wide` : ' · no artwork placed yet') +
+                ' · placement preview is approximate';
+            $('zoom-lightbox').hidden = false;
+            document.body.style.overflow = 'hidden';
+            $('zoom-lightbox-close').focus();
+        }
+        function closeZoomLightbox() {
+            $('zoom-lightbox').hidden = true;
+            $('zoom-lightbox-img').src = '';
+            document.body.style.overflow = '';
+        }
+        $('canvas-zoom-btn').addEventListener('click', openZoomLightbox);
+        $('zoom-lightbox-close').addEventListener('click', closeZoomLightbox);
+        $('zoom-lightbox').addEventListener('click', (e) => {
+            if (e.target === $('zoom-lightbox')) closeZoomLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !$('zoom-lightbox').hidden) closeZoomLightbox();
+        });
 
         // Location segmented control
         $('loc-LC').addEventListener('click', () => setLocation('LC'));

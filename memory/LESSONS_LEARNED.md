@@ -8,6 +8,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Quote Builders
 
+### Cloned checkout flows carry channel hardcodes deep in the PUSH notes (2026-06-10)
+**Problem:** Custom-Tees (3DT clone) E2E push test produced a ShopWorks order whose Notes opened with "3-DAY RUSH SERVICE - Ship within 72 hours" + `rushOrder:true` — on a STANDARD 7-10-day order. Production would have rushed it.
+**Root Cause:** `/api/submit-3day-order` hardcoded the rush banner + flag (legacy 3DT is always-rush). The reprice/pricing layers were channel-aware, but the push-note copy was only audited visually, not by reading the actual ManageOrders payload.
+**Solution:** Banner, art-review clock copy, and `rushOrder` now gate on `orderSettings.channel==='custom-tees' && !rush`. Verified with a second REAL push (DTG0610-5121: standard banner, rushOrder false).
+**Prevention:** When forking an order channel, grep the push payload builder for EVERY literal the old channel assumed (service level, turnaround, part numbers) — and always eyeball one full real payload per channel before cutover. Clean URLs also break relative asset paths (`/custom-tees` resolved `js/...` to `/js/...` → all modules 404'd): pages served from clean URLs must use absolute `/pages/...` hrefs.
+
 ### Falsy-zero `|| 10.1` tax bug recurred in EMB after being fixed in DTF/SCP (2026-06-10)
 **Problem:** 187-agent EMB audit's one CRITICAL: out-of-state quotes showed $0 tax on screen but SAVED/pushed 10.1% — `parseFloat(input) || 10.1` in saveAndGetLink coerced a legitimate 0 to the fallback. The IDENTICAL bug was already found and fixed in DTF/SCP services on 2026-06-08 (P0, same comment text) — EMB's copy was missed because each builder hand-rolls its own rate parsing.
 **Root Cause:** Falsy-zero (`||` treats 0 as falsy) at FOUR independent EMB sites: save taxRate + taxAmount, screen updateTaxCalculation (NaN on empty), edit-reload restore (0% TAX item restored as 10.1 → Save Revision baked WA tax in), service fee item ("Sales Tax (NaN%)").

@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.4">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.5">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -145,8 +145,12 @@
                                 aria-label="T-shirt designer. Drag your artwork to position it. Arrow keys nudge, plus and minus resize, C centers."></canvas>
                         <div class="canvas-note" id="canvas-note" hidden></div>
                         <div class="canvas-loading" id="canvas-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                        <button type="button" class="canvas-zoom-btn" id="canvas-zoom-btn" title="Zoom in on your design" aria-label="Zoom in on your design" hidden>
+                            <i class="fas fa-magnifying-glass-plus"></i> Zoom
+                        </button>
                     </div>
                     <p class="canvas-hint" id="canvas-hint">Tap inside the dashed area to add your artwork</p>
+                    <p class="canvas-disclaimer">Placement preview is approximate — our print team positions your design at the standard print location for the garment.</p>
                     <div class="sr-live" id="designer-live" aria-live="polite"></div>
                 </div>
 
@@ -440,12 +444,23 @@
         </div>
     </div>
 
+    <!-- Zoom lightbox: hi-res close-up of the print area (front/back) -->
+    <div class="zoom-lightbox" id="zoom-lightbox" hidden role="dialog" aria-modal="true" aria-label="Design close-up">
+        <div class="zoom-lightbox-inner">
+            <img id="zoom-lightbox-img" alt="Close-up of your design on the shirt">
+            <p class="zoom-lightbox-caption" id="zoom-lightbox-caption"></p>
+            <button type="button" class="zoom-lightbox-close" id="zoom-lightbox-close" aria-label="Close close-up">
+                <i class="fas fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Config + modules (order matters). Absolute paths — see head comment. -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.4"></script>
-    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.4"></script>
-    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.4"></script>
-    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.4"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.4"></script>
+    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.5"></script>
+    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.5"></script>
+    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.5"></script>
+    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.5"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.5"></script>
 </body>
 </html>

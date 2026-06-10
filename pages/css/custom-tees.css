@@ -243,6 +243,45 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
     padding: 9px 12px; font-size: 13px;
 }
 .canvas-hint { text-align: center; font-size: 12.5px; color: var(--ink-faint); margin: 8px 0 0; }
+.canvas-disclaimer { text-align: center; font-size: 11.5px; color: var(--ink-faint); margin: 4px 14px 0; }
+
+/* ── Zoom close-up (button + lightbox) — 2026-06-10 ─────────────── */
+.canvas-zoom-btn {
+    position: absolute; right: 10px; bottom: 10px; z-index: 5;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 12px; font-size: 12.5px; font-weight: 600;
+    color: var(--green-900); background: rgba(255, 255, 255, 0.92);
+    border: 1px solid var(--line); border-radius: 999px;
+    box-shadow: 0 2px 8px rgba(18, 34, 22, 0.14); cursor: pointer;
+}
+.canvas-zoom-btn:hover { background: #fff; border-color: var(--green-700, #2d5f3f); }
+.canvas-zoom-btn:disabled { opacity: 0.6; cursor: wait; }
+.zoom-lightbox {
+    position: fixed; inset: 0; z-index: 160;   /* above tdt-fatal(150) family */
+    background: rgba(18, 34, 22, 0.78);
+    display: grid; place-items: center; padding: 18px;
+}
+.zoom-lightbox[hidden] { display: none; }
+.zoom-lightbox-inner { position: relative; max-width: min(920px, 96vw); }
+.zoom-lightbox-inner img {
+    display: block; width: 100%; max-height: 82vh; object-fit: contain;
+    border-radius: var(--radius); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+    background: #fff;
+}
+.zoom-lightbox-caption {
+    margin: 10px 4px 0; text-align: center; color: #fff;
+    font-size: 13px; opacity: 0.92;
+}
+.zoom-lightbox-close {
+    position: absolute; top: -14px; right: -14px;
+    width: 38px; height: 38px; border-radius: 50%;
+    border: none; background: #fff; color: var(--green-900);
+    font-size: 17px; cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+@media (max-width: 640px) {
+    .zoom-lightbox-close { top: 8px; right: 8px; }
+}
 
 /* ── Designer controls ───────────────────────────────────────────── */
 .designer-controls {
