@@ -135,11 +135,103 @@
             return { x: (cw - w) / 2, y: (ch - h) / 2, w, h, scale };
         }
 
+        // ── Garment silhouette auto-fit (Erik 2026-06-10) ────────────────
+        // SanMar's photo inventory is inconsistent per style/color (flats
+        // missing → model shots; framing varies per era). Static fractions
+        // can't survive that, so for UNCALIBRATED styles we detect the
+        // garment's bounding box in the actual photo (white background scan)
+        // and anchor the print envelope to it — flat lays scale by garment
+        // width; model shots use chest-band ratios of the person's box.
+        // Detection failure (e.g. white shirt on white bg) falls back to the
+        // static fractions — never worse than before. Hand-calibrated styles
+        // (PC54) skip all of this.
+        const geomCache = {};   // proxied url → {bbox,kind} | null
+
+        function detectGarmentGeometry(img, url) {
+            if (url in geomCache) return geomCache[url];
+            let out = null;
+            try {
+                const W = 96;
+                const H = Math.max(1, Math.round(W * img.naturalHeight / img.naturalWidth));
+                const c = document.createElement('canvas');
+                c.width = W;
+                c.height = H;
+                const cx2 = c.getContext('2d', { willReadFrequently: true });
+                cx2.drawImage(img, 0, 0, W, H);
+                const d = cx2.getImageData(0, 0, W, H).data;
+                let minX = W, minY = H, maxX = -1, maxY = -1, count = 0;
+                for (let y = 0; y < H; y++) {
+                    for (let x = 0; x < W; x++) {
+                        const i = (y * W + x) * 4;
+                        const bg = d[i + 3] < 24 || (d[i] > 236 && d[i + 1] > 236 && d[i + 2] > 236);
+                        if (!bg) {
+                            count++;
+                            if (x < minX) minX = x;
+                            if (x > maxX) maxX = x;
+                            if (y < minY) minY = y;
+                            if (y > maxY) maxY = y;
+                        }
+                    }
+                }
+                const coverage = count / (W * H);
+                if (maxX > minX && maxY > minY && coverage > 0.15) {
+                    const sx = img.naturalWidth / W;
+                    const sy = img.naturalHeight / H;
+                    const bbox = {
+                        x: minX * sx, y: minY * sy,
+                        w: (maxX - minX + 1) * sx, h: (maxY - minY + 1) * sy,
+                    };
+                    // People are tall; flat garments (sleeves spread) are wide.
+                    out = { bbox, kind: (bbox.h / bbox.w) > 1.35 ? 'model' : 'flat' };
+                }
+            } catch (_) { out = null; }   // tainted canvas → static fallback
+            geomCache[url] = out;
+            return out;
+        }
+
+        // Anchor ratios (tuned against live SanMar imagery 2026-06-10):
+        const FLAT_GARMENT_W_IN = 22;     // adult tee flat width
+        const MODEL_CHEST_W_FRAC = 0.52;  // 16″ envelope spans this much of the person bbox
+        const MODEL_CHEST_TOP_FRAC = 0.30;// envelope top, fraction of person bbox height
+        const MODEL_BACK_TOP_FRAC = 0.26; // back shots: yoke sits a touch higher
+
+        function detectedAreaPx(geom, isBackView, dims) {
+            const b = geom.bbox;
+            if (geom.kind === 'flat') {
+                const ppi = b.w / FLAT_GARMENT_W_IN;
+                const collarY = b.y + b.h * 0.02;
+                const topIn = isBackView ? 2 : 1.5;   // same press anchors as the static model
+                const w = dims.wIn * ppi;
+                const h = dims.hIn * ppi;
+                return { x: b.x + b.w / 2 - w / 2, y: collarY + topIn * ppi, w, h,
+                         wIn: dims.wIn, hIn: dims.hIn, pxPerInch: ppi };
+            }
+            const ppi = (b.w * MODEL_CHEST_W_FRAC) / 16;
+            const w = dims.wIn * ppi;
+            const h = dims.hIn * ppi;
+            const topFrac = isBackView ? MODEL_BACK_TOP_FRAC : MODEL_CHEST_TOP_FRAC;
+            return { x: b.x + b.w / 2 - w / 2, y: b.y + b.h * topFrac, w, h,
+                     wIn: dims.wIn, hIn: dims.hIn, pxPerInch: ppi };
+        }
+
+        /** areaPx with silhouette auto-fit for uncalibrated styles. */
+        function areaPxFor(view, loc, catalogColor, img, url) {
+            if (!cal || cal.calibrated !== false) {
+                return cal.areaPx(view, loc, catalogColor, img.naturalWidth, img.naturalHeight);
+            }
+            const geom = url ? detectGarmentGeometry(img, url) : null;
+            if (geom) {
+                const dims = (cal.locations && cal.locations[loc]) || { wIn: 16, hIn: 20 };
+                return detectedAreaPx(geom, view === 'flatBack', dims);
+            }
+            return cal.areaPx(view, loc, catalogColor, img.naturalWidth, img.naturalHeight);
+        }
+
         /** Print-area rect in canvas coords + pxPerInch at canvas scale. */
         function areaOnCanvas(img, rect) {
-            const a = cal.areaPx(viewKey(), activeLocation(),
+            const a = areaPxFor(viewKey(), activeLocation(),
                 state.color && state.color.catalogColor,
-                img.naturalWidth, img.naturalHeight);
+                img, proxied(garmentUrl(state.color, state.view) || ''));
             if (!a) return null;
             return {
                 x: rect.x + a.x * rect.scale,
@@ -667,8 +759,8 @@
             octx.drawImage(img, 0, 0, w, h);
 
             if (slot) {
-                const a = cal.areaPx(view === 'back' ? 'flatBack' : 'flatFront', loc,
-                    colorObj.catalogColor, img.naturalWidth, img.naturalHeight);
+                const a = areaPxFor(view === 'back' ? 'flatBack' : 'flatFront', loc,
+                    colorObj.catalogColor, img, p);
                 if (a) {
                     const scale = w / img.naturalWidth;
                     const area = { x: a.x * scale, y: a.y * scale, w: a.w * scale,
@@ -716,8 +808,8 @@
             const slotKey = view === 'back' ? 'back' : 'front';
             const slot = state.slots[slotKey];
             const loc = locationFor(slotKey);
-            const a = cal.areaPx(view === 'back' ? 'flatBack' : 'flatFront', loc,
-                colorObj.catalogColor, img.naturalWidth, img.naturalHeight);
+            const a = areaPxFor(view === 'back' ? 'flatBack' : 'flatFront', loc,
+                colorObj.catalogColor, img, p);
             if (!a) return null;
 
             // Crop = print area + breathing room (more above for collar context)
