@@ -1,0 +1,178 @@
+/**
+ * custom-tees-pricing.test.js — behavioral spec for the Custom T-Shirts engine.
+ *
+ * The engine is the 3DT module converted to INTERNAL-DTG-BUILDER parity
+ * (Erik 2026-06-10):
+ *   - rush is OPT-IN: standard orders take NO markup; rush applies rushPct
+ *   - LTM is the DTG builder's distributed math: tier LTM_Fee floor'd per
+ *     piece × qty (12 pcs @ $50 → $4.16/pc → $49.92, NOT flat $50/$75)
+ *   - back print can be FB or JB; front adds JF
+ * Fixture mirrors /api/pricing-bundle?method=DTG (same traps as the 3DT
+ * spec: LTM tier has no cost rows; orphaned 12-23 label).
+ */
+const CTSPricing = require('../../pages/js/custom-tees-pricing.js');
+
+const BUNDLE = {
+    tiersR: [
+        { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.53, LTM_Fee: 0 },
+        { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.53, LTM_Fee: 0 },
+        { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.53, LTM_Fee: 0 },
+        { TierLabel: '1-23', MinQuantity: 1, MaxQuantity: 23, MarginDenominator: 0.55, LTM_Fee: 50 },
+    ],
+    allDtgCostsR: [
+        { PrintLocationCode: 'LC', TierLabel: '12-23', PrintCost: 8.5 },
+        { PrintLocationCode: 'LC', TierLabel: '24-47', PrintCost: 7.5 },
+        { PrintLocationCode: 'LC', TierLabel: '48-71', PrintCost: 6.5 },
+        { PrintLocationCode: 'LC', TierLabel: '72+', PrintCost: 5.5 },
+        { PrintLocationCode: 'FF', TierLabel: '24-47', PrintCost: 10 },
+        { PrintLocationCode: 'FF', TierLabel: '48-71', PrintCost: 9 },
+        { PrintLocationCode: 'FF', TierLabel: '72+', PrintCost: 8 },
+        { PrintLocationCode: 'JF', TierLabel: '24-47', PrintCost: 12.5 },
+        { PrintLocationCode: 'JF', TierLabel: '48-71', PrintCost: 11.5 },
+        { PrintLocationCode: 'JF', TierLabel: '72+', PrintCost: 10.5 },
+        { PrintLocationCode: 'FB', TierLabel: '24-47', PrintCost: 10 },
+        { PrintLocationCode: 'FB', TierLabel: '48-71', PrintCost: 9 },
+        { PrintLocationCode: 'FB', TierLabel: '72+', PrintCost: 8 },
+        { PrintLocationCode: 'JB', TierLabel: '24-47', PrintCost: 12.5 },
+        { PrintLocationCode: 'JB', TierLabel: '48-71', PrintCost: 11.5 },
+        { PrintLocationCode: 'JB', TierLabel: '72+', PrintCost: 10.5 },
+    ],
+    sizes: [
+        { size: 'S', price: 3 }, { size: 'M', price: 3 }, { size: 'L', price: 3 },
+        { size: 'XL', price: 3 }, { size: '2XL', price: 4.25 }, { size: '3XL', price: 5.53 },
+    ],
+    sellingPriceDisplayAddOns: { '2XL': 2, '3XL': 3 },
+};
+
+const CONFIG = { rushPct: 25, shipFee: 30, sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'] };
+
+const cartOf = (qty, size = 'M', color = 'Jet Black') => [
+    { catalogColor: color, colorName: color, qty: { [size]: qty } },
+];
+
+const q = (over) => CTSPricing.quote(Object.assign({
+    pricingData: BUNDLE,
+    config: CONFIG,
+    cart: cartOf(24),
+    location: 'LC',
+    backLocation: null,
+    rush: false,
+    delivery: { method: 'ship', taxRate: null },
+}, over));
+
+describe('standard pricing — NO rush markup (internal-builder parity)', () => {
+    test('24-47 LC M standard: 3/0.53 + 7.50 → halfDollarCeil 13.50, NO ×1.25', () => {
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 24, 'LC', null, 'M', false);
+        expect(u.basePrice).toBe(13.5);
+        expect(u.finalPrice).toBe(13.5);     // rush off → final == base
+        expect(u.rushFee).toBe(0);
+        expect(u.tierLabel).toBe('24-47');
+    });
+
+    test('size upcharge added AFTER rounding, rush off (2XL +2)', () => {
+        expect(CTSPricing.unitPrice(BUNDLE, CONFIG, 24, 'LC', null, '2XL', false).finalPrice).toBe(15.5);
+    });
+
+    test('rush=true applies rushPct on top: 13.50 × 1.25 = 16.875 → ceil 17.00', () => {
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 24, 'LC', null, 'M', true);
+        expect(u.basePrice).toBe(13.5);
+        expect(u.finalPrice).toBe(17.0);
+        expect(u.rushFee).toBe(3.5);
+    });
+
+    test('rush=true with missing rushPct throws (never silent 0%)', () => {
+        expect(() => CTSPricing.unitPrice(BUNDLE, {}, 24, 'LC', null, 'M', true))
+            .toThrow(/Rush percent/);
+    });
+});
+
+describe('LTM — DTG builder distributed math (tier LTM_Fee, floor per piece)', () => {
+    test('12 pcs @ $50 tier fee → 4.16/pc → order LTM $49.92 (NOT flat 50)', () => {
+        const r = q({ cart: cartOf(12) });
+        expect(r.ltmPerPiece).toBe(4.16);
+        expect(r.ltmFee).toBe(49.92);
+        expect(r.tierLabel).toBe('1-23');
+    });
+
+    test('24 pcs → no LTM (tier fee 0)', () => {
+        const r = q({ cart: cartOf(24) });
+        expect(r.ltmFee).toBe(0);
+        expect(r.ltmPerPiece).toBe(0);
+    });
+
+    test('sub-24 print cost resolves at lowest non-LTM tier, never $0, never 12-23 orphan', () => {
+        // 1-23 tier: garment 3/0.55=5.4545 + LC@24-47 7.50 = 12.9545 → ceil 13.00
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 12, 'LC', null, 'M', false);
+        expect(u.basePrice).toBe(13.0);
+        expect(u.costLabel).toBe('24-47');
+    });
+
+    test('total parity example: 12×M LC standard = 12×13.00 + 49.92 = 205.92', () => {
+        const r = q({ cart: cartOf(12), delivery: { method: 'pickup', taxRate: null } });
+        expect(r.shirtsSubtotal).toBe(156.0);
+        expect(r.total).toBe(205.92);
+    });
+});
+
+describe('back locations FB/JB + front JF', () => {
+    test('JF front prices from the JF cost row', () => {
+        // 3/0.53 + 12.50 = 18.1604 → ceil 18.50
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 24, 'JF', null, 'M', false);
+        expect(u.basePrice).toBe(18.5);
+    });
+
+    test('JB back adds the JB cost row', () => {
+        // 3/0.53 + 7.50 + 12.50 = 25.6604 → ceil 26.00
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 24, 'LC', 'JB', 'M', false);
+        expect(u.basePrice).toBe(26.0);
+    });
+
+    test('legacy backEnabled:true still means FB', () => {
+        const r = q({ backLocation: undefined, backEnabled: true });
+        // 3/0.53 + 7.50 + 10 = 23.1604 → ceil 23.50
+        expect(r.unitBySize.M.basePrice).toBe(23.5);
+        expect(r.backLocation).toBe('FB');
+    });
+
+    test('missing back cost row throws — never a silent $0 back print', () => {
+        const noJb = { ...BUNDLE, allDtgCostsR: BUNDLE.allDtgCostsR.filter(c => c.PrintLocationCode !== 'JB') };
+        expect(() => CTSPricing.unitPrice(noJb, CONFIG, 24, 'LC', 'JB', 'M', false))
+            .toThrow(/No DTG print cost/);
+    });
+});
+
+describe('order math — shipping + WA tax base', () => {
+    test('shipping joins the tax base; tax rounds before summing', () => {
+        const r = q({ cart: cartOf(24), delivery: { method: 'ship', taxRate: 0.101 } });
+        // 24 × 13.50 = 324 + ship 30 = 354 taxable → 35.754 → 35.75
+        expect(r.shipping).toBe(30);
+        expect(r.taxableBase).toBe(354);
+        expect(r.tax).toBe(35.75);
+        expect(r.total).toBe(389.75);
+    });
+
+    test('pickup → no shipping, no ship tax', () => {
+        const r = q({ cart: cartOf(24), delivery: { method: 'pickup', taxRate: 0.101 } });
+        expect(r.shipping).toBe(0);
+        expect(r.taxableBase).toBe(324);
+    });
+
+    test('empty cart quotes $0 without throwing', () => {
+        const r = q({ cart: [] });
+        expect(r.total).toBe(0);
+        expect(r.combinedQty).toBe(0);
+    });
+});
+
+describe('nudge — tier-derived LTM', () => {
+    test('sub-24 nudge reports the LTM drop using distributed fee', () => {
+        const r = q({ cart: cartOf(20), delivery: { method: 'pickup', taxRate: null } });
+        expect(['ltm-drop', 'ltm-drop-saves']).toContain(r.nudge.type);
+        expect(r.nudge.addQty).toBe(4);
+    });
+
+    test('72+ is the best tier — no further nudge', () => {
+        const r = q({ cart: cartOf(100) });
+        expect(r.nudge.type).toBe('best');
+    });
+});

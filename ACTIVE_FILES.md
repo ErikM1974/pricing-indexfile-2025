@@ -172,6 +172,22 @@
 
 > Deleted 2026-06-09 (legacy implementation): `/pages/js/3-day-tees.js`, `/pages/js/3-day-tees-debug.js`, `/pages/css/3-day-tees-redesign.css`, `/pages/js/services/ApiService.js`, `/pages/js/services/InventoryService.js`, `/pages/js/utils/debounce.js`, `/tests/test-3day-{inventory,multisku}.js`, `/tests/3-day-tees-{redesign-demo,performance-test}.html`, `/tests/3-day-tees-inventory-summary.md`. Recovery: `git show HEAD~1:<path>`.
 
+### Custom T-Shirts System (multi-style DTG storefront, built 2026-06-10 — pre-launch, awaiting Erik review + redirect cutover)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/custom-tees.html` | Custom T-Shirts page at /custom-tees — gallery of the 20 DTG top sellers + designer + Stripe checkout | custom-tees-app.js + modules below (absolute /pages/ asset paths — clean-URL serving) | ✅ Built |
+| `/pages/custom-tees-success.html` | Post-payment success page | custom-tees-success.js | ✅ Built |
+| `/pages/js/custom-tees-app.js` | App core: gallery (/api/dtg/top-sellers/styles), per-style designer/state, rush toggle, checkout pipeline (channel:'custom-tees') | TDTPricing/TDTShipDate/CTS_CALIBRATION/TDTDesigner | ✅ Built |
+| `/pages/js/custom-tees-pricing.js` | PURE pricing engine — INTERNAL-DTG-BUILDER PARITY: rush opt-in, tier-row distributed LTM, FB/JB/JF locations. Jest-locked. | — (dual browser/Node; server requires it) | ✅ Built |
+| `/pages/js/custom-tees-shipdate.js` | Ship-promise engine: standardPromise() 7–10 biz-day window + rush 3-day cutoff promise. Jest-locked. | — (dual browser/Node) | ✅ Built |
+| `/pages/js/custom-tees-calibration.js` | Per-style print-area registry `window.CTS_CALIBRATION.forStyle()` — hybrid: PC54 hand-calibrated + generic flat-lay model for other styles; LC/FF/JF/FB/JB inches authoritative | — | ✅ Built |
+| `/pages/js/custom-tees-designer.js` | Canvas designer (3DT fork): styleNumber-aware via CTS_CALIBRATION, JF/JB jumbo locations, approximate-preview flag for uncalibrated styles | CTS_CALIBRATION, /api/image-proxy | ✅ Built |
+| `/pages/js/custom-tees-success.js` | Success-page logic: mode-aware promise copy, style-aware emails | TDTShipDate, app.config.js, EmailJS | ✅ Built |
+| `/pages/css/custom-tees.css` + `/pages/css/custom-tees-success.css` | Page styling (3DT theme + gallery band) | — | ✅ Built |
+| `/tests/unit/custom-tees-pricing.test.js` | Jest lock: rush opt-in, distributed LTM ($49.92/12pcs), FB/JB/JF, fail-closed (17 tests) | custom-tees-pricing.js | ✅ Active |
+| `/tests/unit/custom-tees-shipdate.test.js` | Jest lock: 7–10 day window, holiday skip, binding end date (7 tests) | custom-tees-shipdate.js | ✅ Active |
+| `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |
+
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
