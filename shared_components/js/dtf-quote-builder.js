@@ -12,6 +12,11 @@
 // API response cache (prevent 429 rate limit errors on extended size lookups)
 const sizeDetectionCache = new Map(); // key: "style-color" → extended sizes array
 
+// Unsaved-changes flag read by the shared hasUnsavedChanges()/setupBeforeUnloadGuard()
+// in quote-builder-utils.js (EMB/SCP pattern — top-level `let` so the shared functions
+// see the same binding). Mirrored by DTFQuoteBuilder.markAsUnsaved/markAsSaved. (2026-06-10)
+let hasChanges = false;
+
 class DTFQuoteBuilder {
     constructor() {
         // State
@@ -295,6 +300,11 @@ class DTFQuoteBuilder {
             searchInput.focus();
         }
 
+        // Unsaved-changes tracking + leave-page guard (EMB parity, 2026-06-10).
+        // Attached at the END of init so edit-load / draft recovery / sales-rep
+        // auto-select above never false-mark a pristine page as dirty.
+        this.setupUnsavedChangesTracking();
+        if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
     }
 
     async loadPricingData() {
@@ -673,6 +683,11 @@ class DTFQuoteBuilder {
                 showDtfPushButton(quoteId);
             }
 
+            // Populating the form above runs the same mutation paths a user would
+            // (updateSelectedLocations, synthetic size-input change events) — a
+            // freshly loaded quote has no unsaved work, so clear the dirty flag.
+            this.markAsSaved();
+
             if (typeof showToast === 'function') {
                 showToast(`Editing ${quoteId} (Rev ${this.editingRevision})`, 'success');
             }
@@ -737,6 +752,7 @@ class DTFQuoteBuilder {
         if (this.persistence) {
             this.persistence.markDirty();
         }
+        this.markAsUnsaved();
     }
 
     updateLocationSummary() {
@@ -1084,6 +1100,7 @@ class DTFQuoteBuilder {
         if (this.persistence) {
             this.persistence.markDirty();
         }
+        this.markAsUnsaved();
 
         // Setup input listeners for main row
         row.querySelectorAll('.size-input').forEach(input => {
@@ -1511,6 +1528,7 @@ class DTFQuoteBuilder {
         if (this.persistence) {
             this.persistence.markDirty();
         }
+        this.markAsUnsaved();
     }
 
     removeProductRow(productId) {
@@ -1533,6 +1551,7 @@ class DTFQuoteBuilder {
         if (this.persistence) {
             this.persistence.markDirty();
         }
+        this.markAsUnsaved();
     }
 
     // ==================== PRICING CALCULATIONS ====================
@@ -2092,6 +2111,7 @@ class DTFQuoteBuilder {
         const index = this.products.findIndex(p => p.id === rowId);
         if (index !== -1) {
             this.products.splice(index, 1);
+            this.markAsUnsaved();
         }
     }
 
@@ -2292,6 +2312,7 @@ class DTFQuoteBuilder {
         try {
             const result = await this.quoteService.saveQuote(quoteData);
             if (result.success) {
+                this.markAsSaved();
                 alert(`Quote saved successfully!\nQuote ID: ${quoteData.quoteId}`);
             }
         } catch (error) {
@@ -2585,6 +2606,7 @@ class DTFQuoteBuilder {
                 if (this.persistence) {
                     this.persistence.clearDraft();
                 }
+                this.markAsSaved();
 
                 // Reveal the Push-to-ShopWorks button after a successful save.
                 // Clicking it opens openDtfPushPreview() — a review-before-push
@@ -3204,6 +3226,7 @@ class DTFQuoteBuilder {
 
     markAsUnsaved() {
         this.hasChanges = true;
+        hasChanges = true;  // module-level mirror read by the shared beforeunload guard
         const indicator = document.getElementById('unsaved-indicator');
         if (indicator) {
             indicator.style.display = 'inline';
@@ -3212,6 +3235,7 @@ class DTFQuoteBuilder {
 
     markAsSaved() {
         this.hasChanges = false;
+        hasChanges = false;  // module-level mirror read by the shared beforeunload guard
         const indicator = document.getElementById('unsaved-indicator');
         if (indicator) {
             indicator.style.display = 'none';
@@ -3219,7 +3243,46 @@ class DTFQuoteBuilder {
     }
 
     hasUnsavedChanges() {
-        return this.hasChanges;
+        return this.hasChanges || hasChanges;
+    }
+
+    /**
+     * Attach dirty-flag listeners to every field that saveAndGetLink() persists
+     * (mirrors EMB's setupUnsavedChangesTracking). input/change only fire on real
+     * user interaction — programmatic .value sets during edit-load/draft restore
+     * don't trip them. Product-table edits are caught by delegation on the tbody;
+     * the synthetic change events loadQuoteForEditing() dispatches are cleared by
+     * its trailing markAsSaved(). (2026-06-10)
+     */
+    setupUnsavedChangesTracking() {
+        const fieldIds = [
+            // Customer info
+            'customer-name', 'customer-email', 'company-name', 'customer-lookup',
+            'sales-rep', 'customer-phone', 'project-name', 'customer-number', 'design-number',
+            // Additional charges
+            'rush-fee', 'discount-amount', 'discount-reason', 'discount-type',
+            'art-charge', 'art-charge-toggle', 'graphic-design-hours',
+            // Order & shipping
+            'order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
+            'ship-to-name', 'ship-address', 'ship-city', 'ship-state', 'ship-zip',
+            'ship-method', 'dtf-shipping-fee',
+            // Tax
+            'tax-rate-input', 'include-tax', 'wholesale-checkbox'
+        ];
+        fieldIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => this.markAsUnsaved());
+                el.addEventListener('change', () => this.markAsUnsaved());
+            }
+        });
+
+        // Product table: size quantities, style typing, color picks all bubble here
+        const tbody = document.getElementById('product-tbody');
+        if (tbody) {
+            tbody.addEventListener('input', () => this.markAsUnsaved());
+            tbody.addEventListener('change', () => this.markAsUnsaved());
+        }
     }
 
     // ============================================
