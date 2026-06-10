@@ -8257,10 +8257,12 @@ function updatePushButtonState() {
     const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
 
     if (label) label.textContent = 'Push to ShopWorks';
-    btn.style.background = '#1a5276';
+    // Theme comes from the #emb-push-shopworks-btn CSS class (PNW green) + its
+    // :disabled rule — clearing any inline background left by the "Sent ✓" state.
+    btn.style.background = '';
     btn.disabled = !enabled;
-    btn.style.opacity = enabled ? '1' : '0.5';
-    btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+    btn.style.opacity = '';
+    btn.style.cursor = '';
     btn.title = enabled
         ? 'Save + create this quote as an order in ShopWorks OnSite (saves automatically)'
         : 'Complete the “Before you push” checklist (Customer #, a product, name + email) to enable push';
@@ -8496,11 +8498,14 @@ function renderPushPreview(data) {
     if ((data.designCount || 0) === 0) {
         warnings.push('No design linked — a sales rep must assign the design manually in ShopWorks.');
     }
-    // [B4] (P2-4, audit 2026-06-06): surface any fee the transformer demoted to an order Note (buildNotes
-    // writes "Order notes: <fees>") instead of a billable line, so the rep catches an under-bill before push.
+    // [B4] (P2-4, audit 2026-06-06): surface any fee the transformer demoted to an order Note instead of a
+    // billable line, so the rep catches an under-bill before push. Transformer (audit 2026-06-10) emits one
+    // "UNBILLED FEE — add manually: …" / "UNBILLED ITEM [type] — add manually: …" note per skipped fee;
+    // the legacy comma-joined "Order notes: <fees>" blob is still matched for old pushes.
     for (const n of (Array.isArray(o.Notes) ? o.Notes : [])) {
         const t = String(n.Note || '');
-        if (/^Order notes:/i.test(t)) warnings.push('Fee sent as a note (not a billable line): ' + t.replace(/^Order notes:\s*/i, ''));
+        if (/^UNBILLED (FEE|ITEM)/i.test(t)) warnings.push(t);
+        else if (/^Order notes:/i.test(t)) warnings.push('Fee sent as a note (not a billable line): ' + t.replace(/^Order notes:\s*/i, ''));
     }
     if (warnings.length > 0) {
         html += '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> Heads up</h5><ul>';
