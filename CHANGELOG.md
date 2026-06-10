@@ -1,3 +1,7 @@
+## v2026.06.10.6 (2026.06.10)
+
+- feat(custom-tees): free placement + size-based pricing + drag-resize handle (Erik round 2)
+
 ## v2026.06.10.5 (2026.06.10)
 
 - docs(lessons): cloned-channel push hardcodes + clean-URL relative-path gotcha
