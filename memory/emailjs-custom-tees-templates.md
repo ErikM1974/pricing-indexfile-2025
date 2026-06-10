@@ -15,8 +15,9 @@ display names and replace Subject + Content with the blocks below.
 
 `order_number, customer_name, customer_email, customer_phone, company_name,
 print_location, subtotal, total, ship_promise, rush_flag, company_phone, reply_to,
-to_email, to_name` (plain) — `payment_confirmation, products_table, delivery_section,
-shipping_row, tax_row, ltm_row, rush_banner, message_section, questions_cta` (HTML).
+to_email, to_name, order_status_url` (plain) — `payment_confirmation, products_table,
+delivery_section, shipping_row, tax_row, ltm_row, rush_banner, message_section,
+questions_cta` (HTML).
 
 ---
 
@@ -88,6 +89,11 @@ shipping_row, tax_row, ltm_row, rush_banner, message_section, questions_cta` (HT
       <h2>Delivery</h2>
       {{{delivery_section}}}
       <div class="promise">📅 <strong>Promised:</strong> {{ship_promise}}</div>
+    </div>
+
+    <div style="text-align:center;margin:18px 0;">
+      <a href="{{order_status_url}}" style="display:inline-block;background:#2d5f3f;color:#ffffff;text-decoration:none;border-radius:8px;padding:12px 26px;font-size:15px;font-weight:bold;">📦 Track your order</a>
+      <div style="font-size:11px;color:#9ca3af;margin-top:6px;">Live status, tracking number, and your mockups — no login needed.</div>
     </div>
 
     <div class="section">

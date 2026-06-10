@@ -185,6 +185,9 @@
 | `/pages/js/custom-tees-designer.js` | Canvas designer (3DT fork): styleNumber-aware via CTS_CALIBRATION, JF/JB jumbo locations, approximate-preview flag for uncalibrated styles | CTS_CALIBRATION, /api/image-proxy | ✅ Built |
 | `/pages/js/custom-tees-success.js` | Success-page logic: mode-aware promise copy, style-aware emails | TDTShipDate, app.config.js, EmailJS | ✅ Built |
 | `/pages/css/custom-tees.css` + `/pages/css/custom-tees-success.css` | Page styling (3DT theme + gallery band) | — | ✅ Built |
+| `/pages/order-status.html` | Customer order-status page at /order-status?id=&t= — HMAC-token link from the confirmation email, no login (timeline, promise date, UPS tracking, mockups, summary) | order-status.js/.css + custom-tees.css tokens (absolute /pages/ paths — clean-URL serving) | ✅ Built |
+| `/pages/js/order-status.js` | Status-page logic: reads ?id&t, calls same-origin /api/order-status/:quoteId, renders 4-step timeline + totals; friendly 404 state; everything escaped | server.js GET /api/order-status | ✅ Built |
+| `/pages/css/order-status.css` | Status-page styling (rides on custom-tees.css tokens) | custom-tees.css | ✅ Built |
 | `/tests/unit/custom-tees-pricing.test.js` | Jest lock: rush opt-in, distributed LTM ($49.92/12pcs), FB/JB/JF, fail-closed (17 tests) | custom-tees-pricing.js | ✅ Active |
 | `/tests/unit/custom-tees-shipdate.test.js` | Jest lock: 7–10 day window, holiday skip, binding end date (7 tests) | custom-tees-shipdate.js | ✅ Active |
 | `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |

@@ -169,6 +169,13 @@
 
         const { customerData, colorConfigs, orderTotals, orderSettings } = parseBlobs(row);
         if (!customerData.email) return;
+        // Since 2026-06-10 the Stripe WEBHOOK sends the confirmation emails
+        // server-side and stamps emailsSentAt — browser send is only the
+        // fallback for rows the webhook couldn't email (mirrors custom-tees).
+        if (orderSettings && orderSettings.emailsSentAt) {
+            console.log('[3DT Success] Emails already sent server-side — skipping browser send.');
+            return;
+        }
 
         let productsTable = '<table><thead><tr><th>Product</th><th>Color</th><th>Size</th><th>Qty</th><th>Price</th></tr></thead><tbody>';
         Object.values(colorConfigs).forEach((config) => {

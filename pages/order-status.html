@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Order Status — Custom T-Shirts | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Absolute /pages/... paths — this page serves at the clean URL /order-status,
+         where relative paths would break. -->
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.14">
+    <link rel="stylesheet" href="/pages/css/order-status.css?v=2026.06.10.14">
+</head>
+<body class="status-body">
+    <header class="site-head">
+        <div class="site-head-inner">
+            <a class="brand" href="/">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="brand-logo">
+                <span class="brand-text">
+                    <strong>Northwest Custom Apparel</strong>
+                    <em>Custom T-Shirts · Full-Color DTG</em>
+                </span>
+            </a>
+            <div class="head-contact">
+                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="status-main">
+        <!-- Loading state -->
+        <section id="st-loading" class="status-card">
+            <div class="status-spin"><i class="fas fa-circle-notch fa-spin"></i></div>
+            <h1>Looking up your order…</h1>
+            <p>One moment while we fetch the latest status.</p>
+        </section>
+
+        <!-- Order state -->
+        <section id="st-order" class="status-card" hidden>
+            <p class="status-kicker">Order status</p>
+            <h1>Order <span id="st-order-num">—</span></h1>
+            <p class="status-style" id="st-style"></p>
+            <p class="status-promise" id="st-promise" hidden></p>
+
+            <div class="status-tracking" id="st-tracking" hidden></div>
+
+            <div class="status-timeline" id="st-timeline"></div>
+
+            <div class="status-pickup" id="st-pickup" hidden>
+                <i class="fas fa-store"></i>
+                <div>
+                    <strong>Pickup — Northwest Custom Apparel</strong>
+                    <span>2025 Freeman Rd E, Milton, WA 98354<br>We’ll call you the moment your order is ready.</span>
+                </div>
+            </div>
+
+            <div class="status-mockups" id="st-mockups"></div>
+
+            <h2 class="status-h2">Order summary</h2>
+            <div class="status-table-wrap">
+                <table class="status-table">
+                    <thead><tr><th>Color</th><th>Size</th><th>Qty</th><th>Each</th></tr></thead>
+                    <tbody id="st-items"></tbody>
+                </table>
+            </div>
+            <div class="status-summary" id="st-summary"></div>
+
+            <p class="status-questions" id="st-questions"></p>
+        </section>
+
+        <!-- Not found / error state -->
+        <section id="st-error" class="status-card" hidden>
+            <div class="status-check is-amber"><i class="fas fa-triangle-exclamation"></i></div>
+            <h1>We couldn’t find that order</h1>
+            <p id="st-error-msg">The link may be incomplete — try opening it again from your confirmation email. Or call us and we’ll look it up for you.</p>
+            <p class="status-phone"><a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a></p>
+        </section>
+    </main>
+
+    <footer class="site-foot">
+        <p>© Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · <a href="tel:253-922-5793">253-922-5793</a> · <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+    </footer>
+
+    <script src="/pages/js/order-status.js?v=2026.06.10.14"></script>
+</body>
+</html>
