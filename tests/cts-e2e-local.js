@@ -43,10 +43,16 @@ async function grab(url) {
   const ltmFee = parseFloat(ltmResp.data && ltmResp.data[0] && ltmResp.data[0].SellPrice);
   if (!Number.isFinite(ltmFee)) throw new Error('CTS-LTM service code missing');
 
+  // Threshold shipping codes (UberPrints model 2026-06-10) — mirror the page.
+  const shipCodes = await Promise.all(['CTS-SHIP-FLAT', 'CTS-SHIP-FREE-OVER'].map(async (c) => {
+    const j = await grab(`${PROXY}/api/service-codes?code=${c}`);
+    return parseFloat(j.data && j.data[0] && j.data[0].SellPrice);
+  }));
+
   const cart = [{ catalogColor: 'Jet Black', colorName: 'Jet Black', qty: { M: 12 } }];
   const quote = CTS_PRICING.quote({
     pricingData,
-    config: { rushPct: 25, shipFee: 0, ltmFee, sizes },
+    config: { rushPct: 25, ltmFee, bakeLtm: true, shipFlat: shipCodes[0], shipFreeOver: shipCodes[1], sizes },
     cart,
     location: 'LC',
     backLocation: null,
@@ -71,7 +77,7 @@ async function grab(url) {
       'Jet Black': {
         catalogColor: 'Jet Black', displayColor: 'Jet Black',
         totalQuantity: 12,
-        sizeBreakdown: { M: { quantity: 12, unitPrice: quote.unitBySize.M.finalPrice } },
+        sizeBreakdown: { M: { quantity: 12, unitPrice: quote.unitBySize.M.finalPrice } },   // baked price (15.08)
       },
     },
     orderTotals: {

@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.11">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.12">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -285,7 +285,9 @@
                                 <span class="delivery-card-body">
                                     <i class="fas fa-truck"></i>
                                     <strong>Ship it</strong>
-                                    <small id="ship-fee-label">UPS Ground — enter your ZIP for the exact rate</small>
+                                    <!-- Static default = the empty-cart state; renderAll() replaces
+                                         it with live Caspio values on first render. -->
+                                    <small id="ship-fee-label">FREE on orders $100+ · $7.99 under</small>
                                 </span>
                             </label>
                             <label class="delivery-card">
@@ -297,6 +299,7 @@
                                 </span>
                             </label>
                         </div>
+                        <p class="free-ship-nudge" id="ship-nudge" hidden></p>
 
                         <div id="pickup-card" class="pickup-card" hidden>
                             <i class="fas fa-store"></i>
@@ -385,7 +388,8 @@
             <details><summary>When exactly will my order ship?</summary><p>Standard orders ship in 7–10 business days. Select styles offer a 3-Day Rush upgrade — orders placed before 9 AM Pacific on a business day ship 3 business days later, and the exact date is shown on the Pay button before you’re charged. Weekends and holidays don’t count as business days.</p></details>
             <details><summary>What if my artwork is low resolution?</summary><p>The designer measures your file’s print resolution live. If it’s too low to print crisply we’ll flag it before checkout — you can shrink it, swap the file, or accept how it will look.</p></details>
             <details><summary>Can I upload AI / EPS / PDF files?</summary><p>Yes. Browsers can’t preview those formats, so you’ll position a sized box where you want the art, and our team will match it and email you a proof before printing — usually within 2 business hours. Your production clock starts at proof approval.</p></details>
-            <details><summary>Why is there a small-batch fee under 24 pieces?</summary><p>Short runs carry the same setup work as full runs. The fee disappears at 24+ pieces — the designer shows you exactly how close you are.</p></details>
+            <details><summary>How are small orders priced?</summary><p>Orders under 24 pieces are priced at our small-batch per-shirt rate — built into the price you see, no extra fees. Volume pricing kicks in at 24+ pieces, and the designer shows you exactly how close you are.</p></details>
+            <details><summary>How much is shipping?</summary><p>FREE UPS Ground shipping on orders $100+ ($7.99 flat under $100). Free pickup in Milton, WA.</p></details>
             <details><summary>Can I return custom-printed shirts?</summary><p>Because every order is printed just for you, we can’t resell returns. If we got something wrong — wrong size shipped, print defect — we’ll reprint or refund, no drama.</p></details>
             <details><summary>Do you charge sales tax?</summary><p>Washington destination sales tax applies to orders shipped within WA (and pickup orders at the Milton rate). Out-of-state shipments aren’t taxed.</p></details>
         </div>
@@ -410,6 +414,7 @@
         <button type="button" class="order-bar-summary" id="order-bar-summary" aria-haspopup="dialog">
             <strong id="bar-total">$0.00</strong>
             <span id="bar-meta">0 shirts</span>
+            <small class="bar-ship-nudge" id="bar-ship-nudge" hidden></small>
         </button>
         <button type="button" class="btn btn-cta" id="smart-cta">Pick your shirt</button>
     </div>
@@ -463,10 +468,10 @@
 
     <!-- Config + modules (order matters). Absolute paths — see head comment. -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.11"></script>
-    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.11"></script>
-    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.11"></script>
-    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.11"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.11"></script>
+    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.12"></script>
+    <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.12"></script>
+    <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.12"></script>
+    <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.12"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.12"></script>
 </body>
 </html>

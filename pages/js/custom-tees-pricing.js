@@ -255,14 +255,48 @@
             ? cfgLtm : tierLtmFee;
         const ltmPerPiece = (!empty && effectiveLtmFee > 0)
             ? Math.floor((effectiveLtmFee / combinedQty) * 100) / 100 : 0;
-        const ltmFee = r2(ltmPerPiece * combinedQty);
+        let ltmFee = r2(ltmPerPiece * combinedQty);
 
-        const shipFee = parseFloat(cfg.shipFee);
-        if (!empty && input.delivery && input.delivery.method === 'ship' && !(shipFee >= 0)) {
-            throw PricingError('Shipping fee not loaded', 'NO_SHIP_FEE');
+        // BAKED LTM (Erik 2026-06-10, UberPrints model): config.bakeLtm folds
+        // the distributed share into every unit price — no fee line anywhere
+        // (display, Stripe, invoice). EXACT: ltmFee = ltmPerPiece × qty, so
+        // adding ltmPerPiece to each unit reproduces the identical total.
+        // ltmBaked* fields keep the audit trail for push notes/records.
+        const baked = !!cfg.bakeLtm && ltmPerPiece > 0;
+        let ltmBakedTotal = 0;
+        if (baked) {
+            Object.keys(unitBySize).forEach((s) => {
+                unitBySize[s].finalPrice = r2(unitBySize[s].finalPrice + ltmPerPiece);
+            });
+            lines.forEach((l) => {
+                l.unitPrice = r2(l.unitPrice + ltmPerPiece);
+                l.extended = r2(l.quantity * l.unitPrice);
+            });
+            shirtsSubtotal = r2(lines.reduce((a, l) => a + l.extended, 0));
+            ltmBakedTotal = ltmFee;
+            ltmFee = 0;
         }
-        const shipping = !empty && input.delivery && input.delivery.method === 'ship'
-            ? r2(shipFee) : 0;
+
+        // SHIPPING — threshold model (Caspio CTS-SHIP-FLAT + CTS-SHIP-FREE-
+        // OVER; Erik 2026-06-10): merchandise at/over the threshold ships
+        // FREE, under it pays the flat rate. Legacy fixed config.shipFee
+        // applies only when the threshold pair isn't configured.
+        const merch = r2(shirtsSubtotal + ltmFee);
+        const shipFlat = parseFloat(cfg.shipFlat);
+        const shipFreeOver = parseFloat(cfg.shipFreeOver);
+        const thresholdModel = Number.isFinite(shipFlat) && Number.isFinite(shipFreeOver);
+        let shipping = 0;
+        let freeShipRemaining = null;
+        if (!empty && input.delivery && input.delivery.method === 'ship') {
+            if (thresholdModel) {
+                shipping = merch >= shipFreeOver ? 0 : r2(shipFlat);
+                freeShipRemaining = merch >= shipFreeOver ? 0 : r2(shipFreeOver - merch);
+            } else {
+                const shipFee = parseFloat(cfg.shipFee);
+                if (!(shipFee >= 0)) throw PricingError('Shipping fee not loaded', 'NO_SHIP_FEE');
+                shipping = r2(shipFee);
+            }
+        }
 
         // Billable shipping joins the tax base (platform ruling 2026-06-09).
         const taxRate = input.delivery && Number.isFinite(parseFloat(input.delivery.taxRate))
@@ -279,10 +313,16 @@
             lines: lines,
             shirtsSubtotal: shirtsSubtotal,
             ltmFee: ltmFee,
-            ltmPerPiece: ltmPerPiece,
+            ltmPerPiece: baked ? 0 : ltmPerPiece,
+            ltmBaked: baked,
+            ltmBakedPerPiece: baked ? ltmPerPiece : 0,
+            ltmBakedTotal: ltmBakedTotal,
             rush: rush,
             backLocation: backLocation,
             shipping: shipping,
+            shippingModel: thresholdModel ? 'threshold' : 'legacy',
+            freeShipRemaining: freeShipRemaining,
+            shipFreeOver: thresholdModel ? shipFreeOver : null,
             taxRate: taxRate,
             taxableBase: taxableBase,
             tax: tax,

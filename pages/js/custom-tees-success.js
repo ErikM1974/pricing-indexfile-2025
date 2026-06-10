@@ -127,8 +127,12 @@
         let h = '';
         const qty = orderTotals.totalQuantity || 0;
         h += `<div class="tot-row"><span>Shirts (${qty})</span><span>${money(orderTotals.subtotal)}</span></div>`;
+        // ltmFee is 0 on baked-small-batch orders (folded into unit prices) —
+        // the row only renders for legacy/unbaked orders.
         if (orderTotals.ltmFee > 0) h += `<div class="tot-row"><span>Small-batch fee</span><span>${money(orderTotals.ltmFee)}</span></div>`;
-        h += `<div class="tot-row"><span>${customerData.deliveryMethod === 'pickup' ? 'Pickup — Milton, WA' : 'UPS Ground shipping'}</span><span>${customerData.deliveryMethod === 'pickup' ? 'FREE' : money(orderTotals.shipping)}</span></div>`;
+        // $0 shipping on a SHIP order = free-over-threshold → say FREE, not $0.00.
+        const shipPaid = customerData.deliveryMethod !== 'pickup' && orderTotals.shipping > 0;
+        h += `<div class="tot-row"><span>${customerData.deliveryMethod === 'pickup' ? 'Pickup — Milton, WA' : 'UPS Ground shipping'}</span><span>${shipPaid ? money(orderTotals.shipping) : 'FREE'}</span></div>`;
         h += `<div class="tot-row"><span>Sales tax</span><span>${money(orderTotals.salesTax)}</span></div>`;
         h += `<div class="tot-row is-grand"><span>Paid</span><span>${money(orderTotals.grandTotal)}</span></div>`;
         $('s-summary').innerHTML = h;
@@ -232,13 +236,16 @@
               `${escapeHTML(customerData.city || '')}, ${escapeHTML(customerData.state || '')} ${escapeHTML(customerData.zip || '')}</p>`;
 
         // Money rows that make Subtotal → Total visibly foot. Empty string
-        // when the charge is zero so the template row collapses.
-        const totRow = (label, val) =>
+        // when the row doesn't apply so the template row collapses. A SHIP
+        // order with $0 shipping is free-over-threshold → show FREE (the
+        // ltm_row is naturally empty on baked-small-batch orders: ltmFee 0).
+        const totRow = (label, txt) =>
             `<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:14px;">` +
-            `<span>${label}</span><span>${money(val)}</span></div>`;
-        const shippingRow = !isPickup && orderTotals.shipping > 0 ? totRow('UPS Ground shipping', orderTotals.shipping) : '';
-        const taxRow = orderTotals.salesTax > 0 ? totRow('Sales tax', orderTotals.salesTax) : '';
-        const ltmRow = orderTotals.ltmFee > 0 ? totRow('Small-batch fee', orderTotals.ltmFee) : '';
+            `<span>${label}</span><span>${txt}</span></div>`;
+        const shippingRow = isPickup ? ''
+            : totRow('UPS Ground shipping', orderTotals.shipping > 0 ? money(orderTotals.shipping) : 'FREE');
+        const taxRow = orderTotals.salesTax > 0 ? totRow('Sales tax', money(orderTotals.salesTax)) : '';
+        const ltmRow = orderTotals.ltmFee > 0 ? totRow('Small-batch fee', money(orderTotals.ltmFee)) : '';
 
         const mailSubject = encodeURIComponent(`Order ${row.QuoteID} — question or change`);
         const questionsCta =

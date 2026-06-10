@@ -131,6 +131,64 @@ describe('LTM — DTG builder distributed math (tier LTM_Fee, floor per piece)',
     });
 });
 
+describe('BAKED LTM + threshold shipping (UberPrints model, Erik 2026-06-10)', () => {
+    const BAKED_CFG = { ...CONFIG, ltmFee: 25, bakeLtm: true, shipFlat: 7.99, shipFreeOver: 100 };
+
+    test('bake folds the per-piece share into unit prices — IDENTICAL total, no fee line', () => {
+        const sep = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 25 }, delivery: { method: 'pickup', taxRate: null } });
+        const bak = q({ cart: cartOf(12), config: BAKED_CFG, delivery: { method: 'pickup', taxRate: null } });
+        expect(bak.ltmFee).toBe(0);
+        expect(bak.ltmBaked).toBe(true);
+        expect(bak.ltmBakedPerPiece).toBe(2.08);
+        expect(bak.ltmBakedTotal).toBe(24.96);
+        expect(bak.unitBySize.M.finalPrice).toBe(15.08);          // 13.00 + 2.08
+        expect(bak.lines[0].unitPrice).toBe(15.08);
+        expect(bak.total).toBe(sep.total);                         // 180.96 either way
+    });
+
+    test('24+ pieces: nothing to bake — unit price is the clean tier price', () => {
+        const r = q({ cart: cartOf(24), config: BAKED_CFG, delivery: { method: 'pickup', taxRate: null } });
+        expect(r.ltmBaked).toBe(false);
+        expect(r.ltmBakedTotal).toBe(0);
+        expect(r.unitBySize.M.finalPrice).toBe(13.5);   // fixture's 24-47 M LC price, no bake added
+    });
+
+    test('threshold shipping: under $100 merch pays the flat $7.99', () => {
+        // 6 × 15.17 baked (13.00 + floor(25/6)=4.16... → 4.16) = 6×17.16 = 102.96? compute exact below
+        const r = q({ cart: cartOf(5), config: BAKED_CFG, delivery: { method: 'ship', taxRate: null } });
+        // 5 pcs: ltmPerPiece = floor(25/5*100)/100 = 5.00 → unit 18.00, merch 90.00 < 100
+        expect(r.unitBySize.M.finalPrice).toBe(18.0);
+        expect(r.shipping).toBe(7.99);
+        expect(r.shippingModel).toBe('threshold');
+        expect(r.freeShipRemaining).toBe(10.0);                    // 100 − 90
+    });
+
+    test('threshold shipping: at/over $100 merch ships FREE', () => {
+        const r = q({ cart: cartOf(12), config: BAKED_CFG, delivery: { method: 'ship', taxRate: null } });
+        expect(r.shipping).toBe(0);                                // merch 180.96 ≥ 100
+        expect(r.freeShipRemaining).toBe(0);
+    });
+
+    test('pickup never charges shipping regardless of threshold', () => {
+        const r = q({ cart: cartOf(5), config: BAKED_CFG, delivery: { method: 'pickup', taxRate: null } });
+        expect(r.shipping).toBe(0);
+        expect(r.freeShipRemaining).toBe(null);
+    });
+
+    test('WA tax bases on merch + flat shipping when charged', () => {
+        const r = q({ cart: cartOf(5), config: BAKED_CFG, delivery: { method: 'ship', taxRate: 0.101 } });
+        expect(r.taxableBase).toBe(97.99);                         // 90.00 + 7.99
+        expect(r.tax).toBe(9.9);                                   // r2(97.99 × .101) = 9.8970 → 9.90
+        expect(r.total).toBe(107.89);
+    });
+
+    test('legacy fixed shipFee still works when the threshold pair is absent', () => {
+        const r = q({ cart: cartOf(12), delivery: { method: 'ship', taxRate: null } });
+        expect(r.shipping).toBe(30);
+        expect(r.shippingModel).toBe('legacy');
+    });
+});
+
 describe('back locations FB/JB + front JF', () => {
     test('JF front prices from the JF cost row', () => {
         // 3/0.53 + 12.50 = 18.1604 → ceil 18.50
