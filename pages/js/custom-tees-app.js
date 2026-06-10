@@ -402,11 +402,19 @@
         const enc = encodeURIComponent(styleNumber);
         const styleChanged = S.styleNumber !== styleNumber;
 
-        const [pricing, details, styleColors] = await Promise.all([
+        const [pricing, details, styleColors, calRows] = await Promise.all([
             fetchJson(`${API_BASE}/api/pricing-bundle?method=DTG&styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/product-details?styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/dtg/top-sellers?style=${enc}`),
+            // Staff-laid print-box layouts (calibration tool) — best-effort:
+            // failure just means the silhouette auto-fit keeps doing the work.
+            fetchJson(`${API_BASE}/api/dtg-calibration?styleNumber=${enc}`).catch(() => null),
         ]);
+
+        if (calRows && calRows.data && calRows.data.length && window.CTS_CALIBRATION
+            && typeof window.CTS_CALIBRATION.applyRemoteOverrides === 'function') {
+            try { window.CTS_CALIBRATION.applyRemoteOverrides(styleNumber, calRows.data); } catch (_) { /* auto-fit fallback */ }
+        }
 
         // Curated colors = the print-tested list. Customers NEVER get the
         // full SanMar color run here — only colors we know print well.

@@ -187,6 +187,9 @@
 | `/tests/unit/custom-tees-pricing.test.js` | Jest lock: rush opt-in, distributed LTM ($49.92/12pcs), FB/JB/JF, fail-closed (17 tests) | custom-tees-pricing.js | ✅ Active |
 | `/tests/unit/custom-tees-shipdate.test.js` | Jest lock: 7–10 day window, holiday skip, binding end date (7 tests) | custom-tees-shipdate.js | ✅ Active |
 | `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |
+| `/tools/custom-tees-calibrate.html` | STAFF print-box calibration tool — lay the 16×20 envelope on each style's photo once; the storefront designer anchors to it (no-deploy edits) | custom-tees-calibrate.{js,css}, app.config.js, proxy /api/dtg-calibration | ✅ Active |
+| `/tools/custom-tees-calibrate.js` | Tool logic: style/color/view picker, drag/scale aspect-locked box, upsert to Caspio DTG_Calibration via proxy; silhouette auto-detect starting position | proxy /api/dtg-calibration + /api/dtg/top-sellers + /api/product-details | ✅ Active |
+| `/tools/custom-tees-calibrate.css` | Calibration-tool styling | — | ✅ Active |
 
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |

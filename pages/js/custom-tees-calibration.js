@@ -264,16 +264,58 @@
 
     const styleApiCache = {};
 
+    // ── Staff-tool overrides (Caspio DTG_Calibration via /api/dtg-calibration)
+    // Rows define the 16×20 PRINT ENVELOPE rect per style+view (+optional
+    // color). A style with overrides is treated as HAND-CALIBRATED — staff
+    // laid the box on the actual photo, which beats the silhouette auto-fit
+    // (and beats in-code entries: the tool reflects current intent).
+    const remoteOverrides = {};   // STYLE → def {calibrated:true, views, colorOverrides}
+
+    function applyRemoteOverrides(styleNumber, rows) {
+        const key = String(styleNumber || '').trim().toUpperCase();
+        if (!key || !Array.isArray(rows) || !rows.length) return false;
+        const def = { calibrated: true, views: { flatFront: { areas: {} }, flatBack: { areas: {} } }, colorOverrides: {} };
+        let applied = 0;
+        rows.forEach((r) => {
+            const v = r.ViewName === 'flatBack' ? 'flatBack' : (r.ViewName === 'flatFront' ? 'flatFront' : null);
+            const x = parseFloat(r.XFrac), y = parseFloat(r.YFrac), w = parseFloat(r.WFrac), h = parseFloat(r.HFrac);
+            if (!v || ![x, y, w, h].every(Number.isFinite) || !(w > 0.02)) return;
+            const envLoc = v === 'flatBack' ? 'JB' : 'JF';
+            const rect = { xFrac: x, yFrac: y, wFrac: w, hFrac: h, wIn: 16, hIn: 20 };
+            const color = String(r.CatalogColor || '').trim();
+            if (color) {
+                def.colorOverrides[color] = def.colorOverrides[color] || { flatFront: { areas: {} }, flatBack: { areas: {} } };
+                def.colorOverrides[color][v].areas[envLoc] = rect;
+            } else {
+                def.views[v].areas[envLoc] = rect;
+            }
+            applied++;
+        });
+        if (!applied) return false;
+        // Views with no override row fall back to the style's previous geometry
+        // (in-code entry or generic) so a front-only layout doesn't break the back.
+        const prior = STYLES[key] || GENERIC_DEF;
+        ['flatFront', 'flatBack'].forEach((v) => {
+            const envLoc = v === 'flatBack' ? 'JB' : 'JF';
+            if (!def.views[v].areas[envLoc] && prior.views[v] && prior.views[v].areas) {
+                def.views[v].areas = Object.assign({}, prior.views[v].areas, def.views[v].areas);
+            }
+        });
+        remoteOverrides[key] = def;
+        delete styleApiCache[key];   // re-resolve with the new layout
+        return true;
+    }
+
     /** Per-style calibration entry; unknown styles get the generic model. */
     function forStyle(styleNumber) {
         const key = String(styleNumber || '').trim().toUpperCase() || 'GENERIC';
         if (!styleApiCache[key]) {
-            styleApiCache[key] = makeStyleApi(key, STYLES[key] || GENERIC_DEF);
+            styleApiCache[key] = makeStyleApi(key, remoteOverrides[key] || STYLES[key] || GENERIC_DEF);
         }
         return styleApiCache[key];
     }
 
-    const CTS_CALIBRATION = { LOCATIONS, STYLES, forStyle };
+    const CTS_CALIBRATION = { LOCATIONS, STYLES, forStyle, applyRemoteOverrides };
 
     // ── Legacy facade — same surface the 3DT clone exported, PC54-bound ──
     // (kept so any code still addressing TDTCalibration.areaPx() keeps
