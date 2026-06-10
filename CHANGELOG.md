@@ -1,3 +1,7 @@
+## v2026.06.10.11 (2026.06.10)
+
+- feat(custom-tees): e-commerce perfection pass — online $25 LTM, rights gate, trust copy, push fixes
+
 ## v2026.06.10.10 (2026.06.10)
 
 - fix(calibration-tool): empty-state overlay swallowed all box drags
