@@ -8,6 +8,18 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ## Quote Builders
 
+### Falsy-zero `|| 10.1` tax bug recurred in EMB after being fixed in DTF/SCP (2026-06-10)
+**Problem:** 187-agent EMB audit's one CRITICAL: out-of-state quotes showed $0 tax on screen but SAVED/pushed 10.1% — `parseFloat(input) || 10.1` in saveAndGetLink coerced a legitimate 0 to the fallback. The IDENTICAL bug was already found and fixed in DTF/SCP services on 2026-06-08 (P0, same comment text) — EMB's copy was missed because each builder hand-rolls its own rate parsing.
+**Root Cause:** Falsy-zero (`||` treats 0 as falsy) at FOUR independent EMB sites: save taxRate + taxAmount, screen updateTaxCalculation (NaN on empty), edit-reload restore (0% TAX item restored as 10.1 → Save Revision baked WA tax in), service fee item ("Sales Tax (NaN%)").
+**Solution:** Shared `parseRatePercent(value, fallback)` in quote-builder-utils.js (finite-check; 0 valid) used at all four sites; edit-reload prefers session.TaxRate (decimal, percent-shape normalized). Locked by `tests/unit/parse-rate-percent.test.js`.
+**Prevention:** When a falsy-zero money bug is fixed in ONE builder, grep the other three for the same literal pattern THAT DAY (`\|\| 10\.1`, `\|\| 0\.101`) — the 2026-06-08 fix comment even said "P0" but nobody swept EMB. Rate inputs must always go through parseRatePercent.
+
+### PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10)
+**Problem:** A `(Get-Content -Raw) -replace ... | Set-Content` one-liner on embroidery-quote-service.js turned every em-dash/arrow into mojibake (`â€”`, `â†’`) across the whole file.
+**Root Cause:** PS 5.1 reads BOM-less UTF-8 as ANSI and `-Encoding utf8` writes UTF-16-adjacent BOM'd output — the decode/re-encode mangles multi-byte chars file-wide, not just on edited lines.
+**Solution:** `git checkout --` the file and re-applied every change with the Edit tool (encoding-safe). Verified with `git diff | Select-String "â€"` → 0.
+**Prevention:** NEVER round-trip repo source files through PS 5.1 Get-Content/Set-Content for find-replace — use the Edit tool (replace_all) or node. After ANY scripted bulk edit, grep the diff for `â€|Ã|â†` before continuing.
+
 ### Order-form push/PDF: server.js needs a RESTART to verify; fees need a single source (2026-06-09)
 **Problem:** Verifying the order form's ShopWorks push + PDF end-to-end. Two gotchas: (a) a `server.js` edit (the tax-exempt "Tax Account: 2204" note) did NOT appear in a `dryRun` push payload — the running `node server.js` had the OLD code in memory; (b) add-on fees were baked into `breakdown.subtotal` but never recorded, so the PDF showed garment lines that didn't foot to the subtotal (a $100 fee was invisible) AND an unresolved/$0 fee was dropped silently (violates Erik's #1 rule).
 **Root Cause:** (a) Node does NOT hot-reload — only the browser re-compiles the in-browser-Babel JSX per load, so frontend edits show live (parity gate/preview see them) but API/server.js changes are stale until the process restarts. (b) `applyAddOnsToBreakdown` (`pricing/shared.js`) added fee line totals to `subtotal` only — `breakdown.fees[]` stayed `[]`, and `if(!sc) continue` silently dropped unresolved fees.
@@ -116,6 +128,12 @@ Adding the UPS-Ground estimator to DTF/SCP (shipping fees now routine) surfaced 
 ---
 
 ## Order Processing & ShopWorks
+
+### EMB push-preview "demoted fee" warning silently died when the proxy note format changed (2026-06-10)
+**Problem:** The EMB push-preview modal's "Heads up" warning for fees demoted to order notes never fired — a rep could push an under-billed order with no flag.
+**Root Cause:** Frontend matched `/^Order notes:/i` against `o.Notes`, but the proxy transformer (audit 2026-06-10) switched to one `UNBILLED FEE — add manually: …` / `UNBILLED ITEM [type] — …` note per skipped fee. Cross-repo string contract broke with zero errors — the regex just stopped matching.
+**Solution:** `embroidery-quote-builder.js` ~8505 now matches `/^UNBILLED (FEE|ITEM)/i` (note text used verbatim — already self-explanatory) AND keeps the legacy `Order notes:` branch. Cache-bust `?v=2026.06.10.1`.
+**Prevention:** When a transformer changes any note/label string the frontend pattern-matches, grep BOTH repos for the old literal — preview/warning regexes are an undocumented cross-repo contract.
 
 ### EMB/SCP/DTF push parity hardening — dropped notes, blank SCP ship-to, daily-colliding ExtOrderIDs (2026-06-01)
 **Problem:** Follow-up audit of the three quote-builder→ShopWorks pushes (after the 2026-05-29 SCP/DTF fixes) found three more silent failures: (1) SCP+DTF order-level Notes (tax account, `** NO DESIGN LINKED **`, project, screen-print spec) never reached SW; (2) every SCP order imported with a BLANK ship-to; (3) SCP/DTF ExtOrderIDs collided — not annually but DAILY. EMB was the only fully-correct push.
