@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Custom Tees — Print-Box Calibration (Staff) | NWCA</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/tools/custom-tees-calibrate.css?v=2026.06.10.7">
+</head>
+<body>
+    <header class="cal-head">
+        <div>
+            <h1><i class="fas fa-crosshairs"></i> Custom Tees — Print-Box Calibration</h1>
+            <p>Drag the green box onto the chest area once per style — every order preview uses your layout from then on. The box is the 16″×20″ print envelope (aspect locked). Saves to Caspio instantly, no deploy.</p>
+        </div>
+        <a class="cal-link" href="/custom-tees" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i> Open storefront</a>
+    </header>
+
+    <main class="cal-main">
+        <!-- LEFT: style list -->
+        <aside class="cal-styles">
+            <h2>Styles</h2>
+            <div id="style-list" class="style-list">
+                <div class="cal-loading"><i class="fas fa-spinner fa-spin"></i> Loading catalog…</div>
+            </div>
+        </aside>
+
+        <!-- RIGHT: the canvas -->
+        <section class="cal-stage">
+            <div class="cal-toolbar">
+                <div class="cal-tabs" role="tablist">
+                    <button type="button" id="cal-tab-front" class="cal-tab is-active" role="tab">Front</button>
+                    <button type="button" id="cal-tab-back" class="cal-tab" role="tab">Back</button>
+                </div>
+                <select id="cal-color" class="cal-color" title="Color photo to lay out on"></select>
+                <label class="cal-coloronly">
+                    <input type="checkbox" id="cal-color-only"> Save for this color only
+                </label>
+            </div>
+
+            <div class="cal-canvas-wrap" id="cal-canvas-wrap">
+                <img id="cal-photo" alt="Garment photo" draggable="false">
+                <div id="cal-box" class="cal-box" hidden>
+                    <span class="cal-box-label">16″ × 20″ print envelope</span>
+                    <span class="cal-box-handle" id="cal-box-handle"><i class="fas fa-up-right-and-down-left-from-center"></i></span>
+                </div>
+                <div class="cal-empty" id="cal-empty">Pick a style on the left to start</div>
+            </div>
+
+            <div class="cal-readout" id="cal-readout"></div>
+
+            <div class="cal-actions">
+                <button type="button" id="cal-save" class="cal-btn cal-btn-primary"><i class="fas fa-floppy-disk"></i> Save layout</button>
+                <button type="button" id="cal-auto" class="cal-btn"><i class="fas fa-wand-magic-sparkles"></i> Reset to auto-detect</button>
+                <button type="button" id="cal-delete" class="cal-btn cal-btn-danger" hidden><i class="fas fa-trash-can"></i> Remove saved layout</button>
+                <button type="button" id="cal-copy" class="cal-btn"><i class="fas fa-copy"></i> Copy JSON</button>
+            </div>
+            <p class="cal-note" id="cal-status"></p>
+        </section>
+    </main>
+
+    <div id="cal-toasts" class="cal-toasts" aria-live="polite"></div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/tools/custom-tees-calibrate.js?v=2026.06.10.7"></script>
+</body>
+</html>
