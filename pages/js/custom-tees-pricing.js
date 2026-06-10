@@ -95,6 +95,26 @@
         return parseFloat(row.PrintCost);
     }
 
+    /**
+     * Price tier from the ART'S PRINTED SIZE (Erik 2026-06-10): customers
+     * place/resize freely; the location code — and therefore the DTG print
+     * cost — follows the size. Thresholds are the platen envelopes:
+     *   front: ≤4×4 → LC · ≤12×16 → FF · else JF (envelope max 16×20)
+     *   back:  ≤12×16 → FB · else JB (envelope max 16×20)
+     * Used by BOTH the browser (live readout + quote) and the server reprice
+     * (which re-derives from sanitized dimensions — client codes are advisory).
+     */
+    function locationForArtSize(side, wIn, hIn) {
+        const w = parseFloat(wIn) || 0;
+        const h = parseFloat(hIn) || 0;
+        if (String(side) === 'back') {
+            return (w <= 12 && h <= 16) ? 'FB' : 'JB';
+        }
+        if (w <= 4 && h <= 4) return 'LC';
+        if (w <= 12 && h <= 16) return 'FF';
+        return 'JF';
+    }
+
     /** Normalize the back-print input: legacy backEnabled:true means 'FB'. */
     function resolveBackLocation(input) {
         if (input.backLocation === 'FB' || input.backLocation === 'JB') return input.backLocation;
@@ -126,9 +146,15 @@
         const garment = Math.min.apply(null, prices) / parseFloat(tier.MarginDenominator);
 
         const costLabel = resolveCostLabel(pricingData.tiersR, pricingData.allDtgCostsR, tier);
-        let print = printCostFor(pricingData.allDtgCostsR, location, costLabel);
         const back = (backLocation === 'FB' || backLocation === 'JB') ? backLocation
             : (backLocation === true ? 'FB' : null);   // tolerate legacy boolean
+        // location may be NULL for a back-only design (free-placement model) —
+        // then the front contributes no print cost. NO print at all is an error:
+        // an undecorated shirt must never be silently priced as garment-only.
+        if (!location && !back) {
+            throw PricingError('No print on either side', 'NO_PRINT');
+        }
+        let print = location ? printCostFor(pricingData.allDtgCostsR, location, costLabel) : 0;
         if (back) print += printCostFor(pricingData.allDtgCostsR, back, costLabel);
 
         const base = halfDollarCeil(garment + print);
@@ -327,6 +353,7 @@
         halfDollarCeil: halfDollarCeil,
         findTier: findTier,
         resolveCostLabel: resolveCostLabel,
+        locationForArtSize: locationForArtSize,
     };
 
     if (typeof module !== 'undefined' && module.exports) {

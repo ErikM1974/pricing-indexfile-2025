@@ -291,15 +291,30 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
 }
 .control-label { display: block; font-size: 12.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
 
-.seg-control { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.seg-btn {
-    border: 1.5px solid var(--line-strong); background: var(--paper);
-    border-radius: var(--radius-sm); padding: 10px; font-weight: 700; color: var(--ink-soft);
-    display: grid; gap: 2px; text-align: center; min-height: 56px;
+/* Print size & price readout — free placement (2026-06-10): the price tier
+   follows the ART'S printed size, this card is the live "what am I paying
+   for" answer that replaced the location pills. */
+.size-price-readout {
+    border: 1.5px solid var(--green-700); background: var(--green-50);
+    border-radius: var(--radius-sm); padding: 2px 12px;
 }
-.seg-btn small { font-weight: 600; font-size: 12px; color: var(--ink-faint); }
-.seg-btn.is-active { border-color: var(--green-700); background: var(--green-50); color: var(--green-900); }
-.seg-btn.is-active small { color: var(--green-700); }
+.spr-row {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    padding: 9px 0; font-size: 13.5px;
+}
+.spr-row + .spr-row, .spr-foot { border-top: 1px dashed rgba(47, 125, 59, 0.35); }
+.spr-side {
+    font-weight: 800; font-size: 11px; letter-spacing: 0.07em;
+    color: var(--green-700); min-width: 44px; flex: none;
+}
+.spr-dims { font-weight: 700; color: var(--green-900); font-variant-numeric: tabular-nums; }
+.spr-arrow { font-size: 10px; color: var(--green-700); align-self: center; }
+.spr-tier { font-weight: 700; color: var(--green-900); }
+.spr-price { margin-left: auto; font-weight: 800; color: var(--green-900); font-variant-numeric: tabular-nums; }
+.spr-row.is-empty { color: var(--ink-faint); font-weight: 600; }
+.spr-foot { padding: 7px 0 9px; font-size: 12px; color: var(--green-700); font-weight: 600; }
+.size-price-note { margin: 8px 2px 0; font-size: 12.5px; color: var(--ink-faint); }
+.size-price-note strong { color: var(--ink-soft); text-transform: uppercase; font-size: 11.5px; letter-spacing: 0.04em; }
 
 .toggle-row { display: flex; align-items: center; gap: 10px; cursor: pointer; min-height: 44px; }
 .toggle-row input { position: absolute; opacity: 0; }

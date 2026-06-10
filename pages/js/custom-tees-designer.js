@@ -98,6 +98,7 @@
             outlineOpacity: 1,
             idleTimer: null,
             drag: null,             // { pointerId, startX, startY, startPlacement }
+            resize: null,           // { pointerId } — corner-handle drag-to-size
             pinch: null,            // { d0, w0 }
             pointers: new Map(),
             raf: 0,
@@ -110,8 +111,14 @@
         // ── Geometry ────────────────────────────────────────────────────
         function viewKey() { return state.view === 'back' ? 'flatBack' : 'flatFront'; }
         function activeSlotKey() { return state.view === 'back' ? 'back' : 'front'; }
-        function activeLocation() { return state.view === 'back' ? state.backLocation : state.location; }
-        function locationFor(slotKey) { return slotKey === 'back' ? state.backLocation : state.location; }
+        // FREE PLACEMENT (Erik 2026-06-10): the drawable area is the SIDE'S
+        // FULL ENVELOPE (JF front / JB back, 16×20) — customers place and size
+        // art anywhere inside it (right chest, center, low). The PRICE tier is
+        // derived from the art's printed size (TDTPricing.locationForArtSize),
+        // not from a picked location box. state.location/backLocation remain
+        // only as legacy inputs from setLocation() and no longer drive geometry.
+        function activeLocation() { return state.view === 'back' ? 'JB' : 'JF'; }
+        function locationFor(slotKey) { return slotKey === 'back' ? 'JB' : 'JF'; }
 
         function garmentUrl(colorObj, view) {
             const imgs = (colorObj && colorObj.images) || {};
@@ -154,6 +161,13 @@
             const y = area.y + slot.placement.yIn * area.ppi;
             return { x: cx - w / 2, y, w, h, cx };
         }
+
+        /** Resize-handle center (art bottom-right corner). */
+        function handlePoint(r) {
+            return { x: r.x + r.w, y: r.y + r.h };
+        }
+        const HANDLE_R = 9;            // drawn radius
+        const HANDLE_HIT = 16;         // pointer hit radius
 
         /** Keep the art fully inside the print area (inch space). */
         function clampPlacement(slot, area) {
@@ -227,6 +241,32 @@
                     ctx.stroke();
                     ctx.restore();
                 }
+
+                // Resize handle at the art's bottom-right corner (drag to size;
+                // pinch + the slider still work too). (Erik 2026-06-10)
+                const hp = handlePoint(r);
+                ctx.save();
+                ctx.globalAlpha = Math.max(state.outlineOpacity, 0.85);
+                ctx.beginPath();
+                ctx.arc(hp.x, hp.y, HANDLE_R, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = '#2f7d3b';
+                ctx.stroke();
+                // Diagonal resize glyph
+                ctx.beginPath();
+                ctx.moveTo(hp.x - 3.5, hp.y + 3.5);
+                ctx.lineTo(hp.x + 3.5, hp.y - 3.5);
+                ctx.moveTo(hp.x + 0.5, hp.y - 3.5);
+                ctx.lineTo(hp.x + 3.5, hp.y - 3.5);
+                ctx.lineTo(hp.x + 3.5, hp.y - 0.5);
+                ctx.moveTo(hp.x - 0.5, hp.y + 3.5);
+                ctx.lineTo(hp.x - 3.5, hp.y + 3.5);
+                ctx.lineTo(hp.x - 3.5, hp.y + 0.5);
+                ctx.lineWidth = 1.6;
+                ctx.stroke();
+                ctx.restore();
             }
 
             drawAreaOutline(area, !!slot);
@@ -394,6 +434,18 @@
             }
 
             const r = artRect(slot, g.area);
+
+            // Resize handle wins over move — its hit circle sits on the art corner.
+            const hp = handlePoint(r);
+            if (Math.hypot(pt.x - hp.x, pt.y - hp.y) <= HANDLE_HIT) {
+                state.resize = { pointerId: e.pointerId };
+                state.drag = null;
+                try { canvas.setPointerCapture(e.pointerId); } catch (_) { /* ok */ }
+                e.preventDefault();
+                pokeIdleFade();
+                return;
+            }
+
             if (pt.x >= r.x - HIT_SLOP_PX && pt.x <= r.x + r.w + HIT_SLOP_PX &&
                 pt.y >= r.y - HIT_SLOP_PX && pt.y <= r.y + r.h + HIT_SLOP_PX) {
                 state.drag = {
@@ -429,6 +481,25 @@
                 return;
             }
 
+            if (state.resize && state.resize.pointerId === e.pointerId) {
+                // Drag-to-size from the bottom-right corner; the art's
+                // TOP-CENTER anchor stays put (xIn/yIn unchanged), so growing
+                // feels like pulling the corner outward. Width follows
+                // whichever axis the pointer pulled further.
+                const pt = canvasPoint(e);
+                const aspect = slot.naturalH / slot.naturalW;
+                const cx = g.area.x + g.area.w / 2 + slot.placement.xIn * g.area.ppi;
+                const yTop = g.area.y + slot.placement.yIn * g.area.ppi;
+                const wFromX = (2 * (pt.x - cx)) / g.area.ppi;
+                const wFromY = ((pt.y - yTop) / g.area.ppi) / aspect;
+                slot.placement.wIn = Math.max(wFromX, wFromY);
+                clampPlacement(slot, g.area);
+                emitPlacement(slot);
+                pokeIdleFade();
+                e.preventDefault();
+                return;
+            }
+
             if (state.drag && state.drag.pointerId === e.pointerId) {
                 const pt = canvasPoint(e);
                 const dxIn = (pt.x - state.drag.startX) / g.area.ppi;
@@ -446,6 +517,12 @@
         function endPointer(e) {
             state.pointers.delete(e.pointerId);
             if (state.pointers.size < 2) state.pinch = null;
+            if (state.resize && state.resize.pointerId === e.pointerId) {
+                state.resize = null;
+                const slot = state.slots[activeSlotKey()];
+                if (slot) emitPlacement(slot, true);
+                requestRender();
+            }
             if (state.drag && state.drag.pointerId === e.pointerId) {
                 state.drag = null;
                 const slot = state.slots[activeSlotKey()];

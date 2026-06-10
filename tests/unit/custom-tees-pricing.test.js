@@ -139,6 +139,17 @@ describe('back locations FB/JB + front JF', () => {
         expect(() => CTSPricing.unitPrice(noJb, CONFIG, 24, 'LC', 'JB', 'M', false))
             .toThrow(/No DTG print cost/);
     });
+
+    test('back-only design (null front): no front print cost, back cost applies', () => {
+        // 3/0.53 + FB 10 = 15.6604 → ceil 16.00 (no LC 7.50 in there)
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 24, null, 'FB', 'M', false);
+        expect(u.basePrice).toBe(16.0);
+    });
+
+    test('NO print on either side throws — undecorated shirt never silently priced', () => {
+        expect(() => CTSPricing.unitPrice(BUNDLE, CONFIG, 24, null, null, 'M', false))
+            .toThrow(/No print/);
+    });
 });
 
 describe('order math — shipping + WA tax base', () => {
@@ -161,6 +172,34 @@ describe('order math — shipping + WA tax base', () => {
         const r = q({ cart: [] });
         expect(r.total).toBe(0);
         expect(r.combinedQty).toBe(0);
+    });
+});
+
+describe('locationForArtSize — size drives the price tier (Erik 2026-06-10)', () => {
+    const f = CTSPricing.locationForArtSize;
+    test('front: ≤4×4 is Left Chest', () => {
+        expect(f('front', 4, 4)).toBe('LC');
+        expect(f('front', 3.2, 2.4)).toBe('LC');
+    });
+    test('front: over 4″ in EITHER dimension jumps to Full Front', () => {
+        expect(f('front', 4.5, 3)).toBe('FF');
+        expect(f('front', 3, 4.5)).toBe('FF');
+        expect(f('front', 12, 16)).toBe('FF');
+    });
+    test('front: over 12×16 is Jumbo Front', () => {
+        expect(f('front', 12.5, 10)).toBe('JF');
+        expect(f('front', 10, 16.5)).toBe('JF');
+        expect(f('front', 16, 20)).toBe('JF');
+    });
+    test('back: ≤12×16 is Full Back, bigger is Jumbo Back', () => {
+        expect(f('back', 10, 12)).toBe('FB');
+        expect(f('back', 12, 16)).toBe('FB');
+        expect(f('back', 12.5, 12)).toBe('JB');
+        expect(f('back', 16, 20)).toBe('JB');
+    });
+    test('garbage dims fall to the smallest tier (fail-cheap is fail-VISIBLE: server clamps art to envelope before calling)', () => {
+        expect(f('front', null, undefined)).toBe('LC');
+        expect(f('back', NaN, NaN)).toBe('FB');
     });
 });
 

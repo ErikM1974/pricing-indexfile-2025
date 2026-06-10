@@ -1057,12 +1057,34 @@ async function rebuildCtsQuote(colorConfigs, orderSettings, customerData) {
   const { pricingData, config } = await getCtsPricingConfig(style);
   const tax = await resolveTdtTax(customerData);
 
-  const front = String(orderSettings?.frontLocation || orderSettings?.printLocationCode || 'LC').toUpperCase();
-  const frontLoc = ['LC', 'FF', 'JF'].includes(front.split('_')[0]) ? front.split('_')[0] : 'LC';
-  let backLoc = orderSettings?.backLocation ? String(orderSettings.backLocation).toUpperCase() : null;
-  if (!backLoc && /_FB/.test(front)) backLoc = 'FB';
-  if (!backLoc && /_JB/.test(front)) backLoc = 'JB';
-  if (backLoc && !['FB', 'JB'].includes(backLoc)) backLoc = null;
+  // FREE-PLACEMENT model (Erik 2026-06-10): the price tier derives from the
+  // ART'S PRINTED SIZE. The server re-derives it from the submitted placement
+  // dimensions (clamped to the 16×20 envelope) via the SAME pure rule the
+  // browser uses — the client's location codes are advisory; a doctored
+  // payload cannot buy jumbo art at the Left Chest rate.
+  const clampDim = (v, max) => Math.min(Math.max(parseFloat(v) || 0, 0), max);
+  const sideDims = (p) => {
+    if (!p || !(parseFloat(p.wIn) > 0)) return null;
+    const wIn = clampDim(p.wIn, 16);
+    const hIn = clampDim(p.hIn || p.wIn, 20);   // legacy payloads without hIn: assume square-ish
+    return { wIn, hIn };
+  };
+  const fDims = sideDims(orderSettings?.placement?.front);
+  const bDims = sideDims(orderSettings?.placement?.back);
+  let frontLoc;
+  let backLoc;
+  if (fDims || bDims) {
+    frontLoc = fDims ? CTS_PRICING.locationForArtSize('front', fDims.wIn, fDims.hIn) : null;
+    backLoc = bDims ? CTS_PRICING.locationForArtSize('back', bDims.wIn, bDims.hIn) : null;
+  } else {
+    // Legacy fallback (pre-free-placement payloads): trust the explicit codes.
+    const front = String(orderSettings?.frontLocation || orderSettings?.printLocationCode || 'LC').toUpperCase();
+    frontLoc = ['LC', 'FF', 'JF'].includes(front.split('_')[0]) ? front.split('_')[0] : 'LC';
+    backLoc = orderSettings?.backLocation ? String(orderSettings.backLocation).toUpperCase() : null;
+    if (!backLoc && /_FB/.test(front)) backLoc = 'FB';
+    if (!backLoc && /_JB/.test(front)) backLoc = 'JB';
+    if (backLoc && !['FB', 'JB'].includes(backLoc)) backLoc = null;
+  }
 
   const sizes = config.sizes;
   const cart = Object.values(colorConfigs || {}).map(c => {
