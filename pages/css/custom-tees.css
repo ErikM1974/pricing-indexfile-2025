@@ -495,6 +495,13 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
 .delivery-card input:checked + .delivery-card-body i { color: var(--green-700); }
 .delivery-card input:focus-visible + .delivery-card-body { outline: 3px solid rgba(47, 125, 59, 0.4); }
 
+/* Free-ship nudge — "Add $X.XX more for FREE shipping" (delivery card) */
+.free-ship-nudge {
+    margin: 8px 2px 0; font-size: 12.5px; font-weight: 600;
+    color: var(--green-700);
+}
+.free-ship-nudge::before { content: "↗ "; }
+
 .pickup-card {
     display: flex; gap: 12px; background: var(--green-50); border: 1px dashed var(--green-700);
     border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-size: 13.5px;
@@ -615,6 +622,8 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
 .order-bar-summary { background: none; border: none; color: #fff; text-align: left; display: grid; gap: 1px; min-height: 44px; }
 .order-bar-summary strong { font-family: var(--font-display); font-size: 19px; }
 .order-bar-summary span { font-size: 12px; opacity: 0.8; }
+/* Free-ship nudge in the dark bar — light green, quiet */
+.bar-ship-nudge { font-size: 11px; font-weight: 600; color: var(--green-100); }
 
 /* ── Summary sheet ───────────────────────────────────────────────── */
 .sheet-backdrop, .modal-backdrop {

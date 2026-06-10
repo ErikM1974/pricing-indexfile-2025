@@ -930,13 +930,16 @@ async function getCtsPricingConfig(styleNumber) {
     return parseFloat(row.SellPrice);
   };
 
-  const [pricingData, rushPct, shipFee, ltmFee] = await Promise.all([
+  const [pricingData, rushPct, shipFee, ltmFee, shipFlat, shipFreeOver] = await Promise.all([
     grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=${encodeURIComponent(style)}`),
     code('3DT-RUSH'), code('3DT-SHIP'),
     // Online small-batch fee (CTS-LTM, $25 — cheaper than the builder's $50;
     // Erik 2026-06-10). code() THROWS if the row is missing/inactive, which
     // fails checkout closed rather than silently billing the wrong fee.
     code('CTS-LTM'),
+    // UberPrints shipping model (Erik 2026-06-10): flat under the threshold,
+    // FREE at/over it. Both Caspio-tunable, both fail-closed via code().
+    code('CTS-SHIP-FLAT'), code('CTS-SHIP-FREE-OVER'),
   ]);
   if (!Array.isArray(pricingData.tiersR) || !pricingData.tiersR.length) {
     throw new Error(`No DTG pricing tiers for style ${style}`);
@@ -952,7 +955,7 @@ async function getCtsPricingConfig(styleNumber) {
   if (!nonLtm.length) throw new Error(`DTG pricing tiers for ${style} missing a non-LTM tier`);
   const value = {
     pricingData,
-    config: { rushPct, shipFee, ltmFee, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
+    config: { rushPct, shipFee, ltmFee, bakeLtm: true, shipFlat, shipFreeOver, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
   };
   _ctsCfgCache.set(style, { at: Date.now(), value });
   return value;
@@ -1102,20 +1105,22 @@ async function rebuildCtsQuote(colorConfigs, orderSettings, customerData) {
   });
   const method = customerData.deliveryMethod === 'pickup' ? 'pickup' : 'ship';
 
-  let shipResolved = { amount: 0, source: 'pickup' };
-  if (method === 'ship') {
-    shipResolved = await resolveCtsShipping(customerData.zip, CTS_PRICING.combinedQuantity(cart), style);
-  }
-
+  // Shipping is the UberPrints threshold model since 2026-06-10: the pricing
+  // module computes it from config.shipFlat/shipFreeOver vs the merchandise
+  // subtotal — no per-ZIP UPS resolver in the CTS charge path anymore
+  // (resolveCtsShipping stays for the legacy 3DT estimate endpoint).
   const quote = CTS_PRICING.quote({
     pricingData,
-    config: Object.assign({}, config, { shipFee: shipResolved.amount }),
+    config,
     cart,
     location: frontLoc,
     backLocation: backLoc,
     rush: rushRequested,
     delivery: { method, taxRate: tax.rate },
   });
+  const shipResolved = method === 'pickup'
+    ? { amount: 0, source: 'pickup' }
+    : { amount: quote.shipping, source: quote.shipping > 0 ? 'flat-under-threshold' : 'free-over-threshold' };
   return {
     quote, tax, config, shipping: shipResolved,
     style, rush: rushRequested, frontLocation: frontLoc, backLocation: backLoc,
@@ -2192,9 +2197,11 @@ app.post('/api/create-checkout-session', async (req, res) => {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: priced.shipping.source === 'ups-estimate'
-              ? 'UPS Ground shipping (estimated for your ZIP)'
-              : 'UPS Ground shipping (flat rate)'
+            name: priced.shipping.source === 'flat-under-threshold'
+              ? `UPS Ground shipping (orders $${quote.shipFreeOver || 100}+ ship FREE)`
+              : priced.shipping.source === 'ups-estimate'
+                ? 'UPS Ground shipping (estimated for your ZIP)'
+                : 'UPS Ground shipping (flat rate)'
           },
           unit_amount: cents(quote.shipping)
         },

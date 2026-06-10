@@ -12,7 +12,8 @@
  *
  * Money rules (Erik):
  *   - Every price comes from an API at runtime: /api/pricing-bundle +
- *     Service_Codes 3DT-RUSH / 3DT-LTM / 3DT-SHIP + /api/tax-rates/lookup.
+ *     Service_Codes 3DT-RUSH / CTS-LTM / CTS-SHIP-FLAT / CTS-SHIP-FREE-OVER
+ *     (3DT-SHIP kept as the engine's legacy fallback) + /api/tax-rates/lookup.
  *     Config failure = full-page fatal state. NEVER a guessed price.
  *   - All math lives in TDTPricing.quote() — this file only renders it.
  *     Rush is OFF by default; S.rush flows into every quote() call.
@@ -51,7 +52,16 @@
         styleNumber: null,             // selected garment (set by the gallery)
         rush: false,                   // 3-Day Rush upgrade — OFF by default
         gallery: { items: [], category: '', search: '' },
-        config: { rushPct: null, ltmFee: null, ltmThreshold: null, shipFee: null, sizes: SIZES },
+        config: {
+            rushPct: null, ltmFee: null, ltmThreshold: null,
+            // UberPrints model (Erik 2026-06-10): the small-batch fee is BAKED
+            // into unit prices (bakeLtm — no fee line anywhere) and shipping is
+            // threshold-based: CTS-SHIP-FLAT under CTS-SHIP-FREE-OVER, FREE
+            // at/over it. shipFee (3DT-SHIP) stays as the engine's legacy
+            // fallback only.
+            bakeLtm: true, shipFlat: null, shipFreeOver: null,
+            shipFee: null, sizes: SIZES,
+        },
         pricing: null,
         product: {
             colors: [],                // [{catalogColor, colorName, swatchImage, images:{...}}]
@@ -74,9 +84,8 @@
             address: { address1: '', city: '', state: '', zip: '' },
             notes: '',
             tax: { rate: null, account: null, accountName: null, source: null, error: false },
-            // Real UPS Ground estimate from /api/three-day-tees/shipping-estimate
-            // (server-resolved so display == charge). 'flat' = 3DT-SHIP fallback.
-            shipEstimate: { status: 'idle', amount: null, source: null, key: '' },
+            // Shipping PRICE no longer depends on ZIP (threshold model — the
+            // quote computes it); the address is still required for tax + label.
         },
         checkout: { running: false, quoteId: null },
         // Artwork-rights attestation — intentionally NOT persisted: each
@@ -96,6 +105,12 @@
         }[c]));
     }
     const money = (v) => '$' + (Number(v) || 0).toFixed(2);
+    // "$100" not "$100.00" for marketing copy (free-ship threshold); keeps
+    // cents only when the live Caspio value actually has them.
+    const moneyTrim = (v) => {
+        const n = Number(v) || 0;
+        return '$' + (n % 1 === 0 ? String(n) : n.toFixed(2));
+    };
     const fmtInt = (n) => (Number(n) || 0).toLocaleString('en-US');
     // 0.101 → "10.1", 0.1055 → "10.55" — never hide rate precision the
     // charge math actually uses.
@@ -224,64 +239,17 @@
         };
     }
 
-    // ── Shipping (server-resolved UPS estimate, flat fallback) ──────
-    function effectiveShip() {
-        const est = S.delivery.shipEstimate;
-        if (S.delivery.method === 'pickup') return { fee: 0, label: 'Pickup — Milton, WA', tag: 'pickup' };
-        if (est.status === 'done' && est.source === 'ups-estimate') {
-            return { fee: est.amount, label: 'UPS Ground shipping (estimated)', tag: 'estimated' };
-        }
-        if (est.status === 'done' && est.source === 'flat') {
-            return { fee: est.amount, label: 'UPS Ground shipping (flat rate)', tag: 'flat' };
-        }
-        // idle / loading / failed → provisional flat from Caspio 3DT-SHIP;
-        // Pay is gated while a live estimate is still loading.
-        return {
-            fee: S.config.shipFee,
-            label: est.status === 'loading' ? 'UPS Ground shipping (updating…)' : 'UPS Ground shipping (flat rate)',
-            tag: est.status === 'loading' ? 'loading' : 'flat',
-        };
-    }
-
-    let shipEstimateTimer = null;
-    function maybeRequestShipEstimate() {
-        const est = S.delivery.shipEstimate;
-        const zip = (S.delivery.address.zip || '').trim();
-        const qty = TDTPricing.combinedQuantity(S.cart.lines);
-        if (S.delivery.method !== 'ship' || !/^\d{5}(-\d{4})?$/.test(zip) || !qty || !S.styleNumber) return;
-        const key = `${zip.slice(0, 5)}|${qty}|${S.styleNumber}`;
-        if (est.key === key && (est.status === 'done' || est.status === 'loading')) return;
-        est.key = key;
-        est.status = 'loading';
-        clearTimeout(shipEstimateTimer);
-        shipEstimateTimer = setTimeout(async () => {
-            try {
-                const j = await fetchJson('/api/three-day-tees/shipping-estimate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ toZip: zip.slice(0, 5), qty, styleNumber: S.styleNumber }),
-                });
-                if (S.delivery.shipEstimate.key !== key) return; // stale
-                est.status = 'done';
-                est.amount = parseFloat(j.amount);
-                est.source = j.source;
-            } catch (e) {
-                console.error('[CTS] Shipping estimate failed (using flat rate):', e);
-                if (S.delivery.shipEstimate.key !== key) return;
-                est.status = 'failed';
-                est.amount = null;
-                est.source = null;
-            }
-            renderAll();
-        }, 350);
-    }
+    // (Per-ZIP UPS shipping-estimate machinery removed 2026-06-10 — the
+    // UberPrints threshold model prices shipping inside TDTPricing.quote():
+    // FREE at/over CTS-SHIP-FREE-OVER, CTS-SHIP-FLAT under it. ZIP no longer
+    // affects the shipping PRICE, only tax + the shipping label.)
 
     // ── Quote (single money source) ─────────────────────────────────
     function currentQuote() {
         try {
             return TDTPricing.quote({
                 pricingData: S.pricing,
-                config: Object.assign({}, pricingConfig(), { shipFee: effectiveShip().fee }),
+                config: pricingConfig(),   // shipping computed by the module (threshold model)
                 rush: S.rush,
                 cart: S.cart.lines.map((l) => ({
                     catalogColor: l.catalogColor,
@@ -332,19 +300,29 @@
         try {
             // Service-code config + the curated 20-style catalog load first;
             // everything style-specific loads in selectProduct/loadProduct.
-            const [rushPct, ltmFee, shipFee, catalog] = await Promise.all([
+            const [rushPct, ltmFee, shipFee, shipFlat, shipFreeOver, catalog] = await Promise.all([
                 loadServiceCode('3DT-RUSH'),
-                // CTS-LTM ($25) — the ONLINE small-batch fee, intentionally lower
-                // than the internal builder's $50 tier fee (Erik 2026-06-10).
+                // CTS-LTM ($25) — the ONLINE small-batch amount, intentionally
+                // lower than the internal builder's $50 tier fee (Erik
+                // 2026-06-10). Baked into unit prices via config.bakeLtm.
                 // Server reprice loads the same code; mismatch would 409 checkout.
                 loadServiceCode('CTS-LTM'),
+                // 3DT-SHIP — harmless legacy fallback; the threshold pair below
+                // wins whenever both load (they're required, so always).
                 loadServiceCode('3DT-SHIP'),
+                // Threshold shipping (Erik 2026-06-10): CTS-SHIP-FLAT under
+                // CTS-SHIP-FREE-OVER, FREE at/over it. Live Caspio values —
+                // the UI never prints a literal $7.99 / $100.
+                loadServiceCode('CTS-SHIP-FLAT'),
+                loadServiceCode('CTS-SHIP-FREE-OVER'),
                 fetchJson(`${API_BASE}/api/dtg/top-sellers/styles`),
             ]);
 
             S.config.rushPct = rushPct;
             S.config.ltmFee = ltmFee;
             S.config.shipFee = shipFee;
+            S.config.shipFlat = shipFlat;
+            S.config.shipFreeOver = shipFreeOver;
 
             S.gallery.items = (catalog && catalog.records) || [];
             if (!S.gallery.items.length) throw new Error('The curated catalog returned no styles');
@@ -535,7 +513,6 @@
             Object.keys(garmentLumCache).forEach((k) => { delete garmentLumCache[k]; });
             contrastToasted.clear();
             mockupKey = '';
-            S.delivery.shipEstimate = { status: 'idle', amount: null, source: null, key: '' };
         }
 
         initDesigner(preferColor);
@@ -1171,7 +1148,14 @@
         const qty = combined || S.config.ltmThreshold || 24;
         const fl = derivedFrontLocation();
         const bl = derivedBackLocation();
-        const u = (loc, back) => TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, loc, back, 'M', S.rush).finalPrice;
+        // Baked-price consistency: TDTPricing.unitPrice() returns the RAW rate;
+        // the live quote folds the small-batch share into every unit
+        // (config.bakeLtm). Add the same per-piece share here so the readout
+        // matches the cart lines exactly. Increments (the back-print delta)
+        // subtract two u() values, so the share cancels there — correct.
+        const bakeAdd = (combined && lastQuote && lastQuote.ltmBaked
+            && lastQuote.combinedQty === combined) ? lastQuote.ltmBakedPerPiece : 0;
+        const u = (loc, back) => TDTPricing.unitPrice(S.pricing, pricingConfig(), qty, loc, back, 'M', S.rush).finalPrice + bakeAdd;
         const dimTxt = (slot) => {
             const d = artDims(slot);
             return `${d.wIn.toFixed(1)}″ × ${d.hIn.toFixed(1)}″`;
@@ -1204,7 +1188,7 @@
             } else if (S.design.backEnabled) {
                 html += emptyRow('BACK', 'add back artwork to price it');
             }
-            html += `<div class="spr-foot">per shirt (size M) at ${combined || `${qty}+`} pieces${S.rush ? ' · 3-Day Rush' : ''}</div>`;
+            html += `<div class="spr-foot">per shirt (size M) at ${combined || `${qty}+`} pieces${bakeAdd > 0 ? ' · small-batch rate' : ''}${S.rush ? ' · 3-Day Rush' : ''}</div>`;
         } catch (e) {
             console.error('[CTS] Size/price readout failed:', e);
             html = emptyRow('PRICE', 'unavailable — refresh to reload live pricing');
@@ -1461,7 +1445,8 @@
         if (n.type === 'ltm-drop-saves') {
             el.textContent = `${n.hereQty} shirts = ${money(n.hereTotal)} · ${n.thereQty} shirts = ${money(n.thereTotal)} — adding ${n.addQty === 1 ? 'one shirt' : n.addQty + ' shirts'} saves you ${money(n.savings)}`;
         } else if (n.type === 'ltm-drop') {
-            el.textContent = `Add ${n.addQty} more shirt${n.addQty === 1 ? '' : 's'} to drop the ${money(n.ltmFee)} small-batch fee`;
+            // Baked model: there's no fee LINE to name — sell the rate drop.
+            el.textContent = `Add ${n.addQty} more shirt${n.addQty === 1 ? '' : 's'} to drop the small-batch rate`;
         } else if (n.type === 'tier-up') {
             el.textContent = `Add ${n.addQty} more → ${money(n.nextUnit)}/shirt (save ${money(n.perShirtSave)} each)`;
         } else {
@@ -1472,7 +1457,7 @@
         if (q.combinedQty >= S.config.ltmThreshold && !S.ui.celebratedTier) {
             S.ui.celebratedTier = true;
             el.classList.add('is-celebrate');
-            toast('Volume pricing unlocked — the small-batch fee is gone', 'success');
+            toast('Volume pricing unlocked — the small-batch rate is gone', 'success');
         }
         if (q.combinedQty < S.config.ltmThreshold) S.ui.celebratedTier = false;
     }
@@ -1585,11 +1570,14 @@
         if (S.rush) {
             h += `<div class="tot-row is-included"><span>3-Day Rush production</span><span>included ✓</span></div>`;
         }
+        // Baked model: q.ltmFee is 0 (folded into unit prices) so this row
+        // disappears — kept as the visible fallback if baking is ever off.
         if (q.ltmFee > 0) {
             h += `<div class="tot-row is-fee"><span>Small-batch fee <small>(under ${S.config.ltmThreshold} pieces)</small></span><span>${money(q.ltmFee)}</span></div>`;
         }
-        const ship = effectiveShip();
-        h += `<div class="tot-row"><span>${escapeHTML(ship.label)}</span><span>${S.delivery.method === 'pickup' ? 'FREE' : money(q.shipping)}</span></div>`;
+        const shipLabel = S.delivery.method === 'pickup' ? 'Pickup — Milton, WA' : 'UPS Ground shipping';
+        const shipValue = (S.delivery.method === 'pickup' || q.shipping === 0) ? 'FREE' : money(q.shipping);
+        h += `<div class="tot-row"><span>${escapeHTML(shipLabel)}</span><span>${shipValue}</span></div>`;
         if (q.taxRate === null && S.delivery.method === 'ship') {
             h += `<div class="tot-row"><span>Sales tax</span><span>enter address</span></div>`;
         } else {
@@ -1680,9 +1668,9 @@
                 reasons.push({ label: 'Tax lookup failed — retry', target: '#stage-checkout' });
             } else if (S.delivery.tax.rate === null) {
                 reasons.push({ label: 'Confirming sales tax…', target: '#stage-checkout' });
-            } else if (S.delivery.shipEstimate.status === 'loading') {
-                reasons.push({ label: 'Calculating shipping…', target: '#stage-checkout' });
             }
+            // (No shipping gate — the threshold model prices shipping inside
+            // the quote; the address above is still required for tax + label.)
         } else if (S.delivery.tax.rate === null) {
             reasons.push({ label: S.delivery.tax.error ? 'Tax lookup failed — retry' : 'Confirming sales tax…', target: '#stage-checkout' });
         }
@@ -1697,7 +1685,6 @@
 
     function renderAll() {
         if (!S.boot.ready && !S.pricing) return;
-        maybeRequestShipEstimate();
         const q = currentQuote();
         if (!q) return;
         renderBarWith(q);
@@ -1705,16 +1692,26 @@
         renderReview(q);
         renderTaxStamp();
         renderSizePriceReadout();
-        // Delivery-card sub-copy mirrors the estimate lifecycle — the flat
-        // rate is only quoted once we KNOW the live estimator isn't coming
-        // back (done-flat / failed), never as the idle default.
-        const est = S.delivery.shipEstimate;
+        // Delivery-card sub-copy — threshold shipping, all values live from
+        // Caspio (quote.shipFreeOver / config.shipFlat), never literals.
+        const freeOver = moneyTrim(q.shipFreeOver != null ? q.shipFreeOver : S.config.shipFreeOver);
+        const flatTxt = money(S.config.shipFlat);
         $('ship-fee-label').textContent =
-            est.status === 'done' && est.source === 'ups-estimate' ? `UPS Ground — ${money(est.amount)} estimated`
-            : est.status === 'loading' ? 'UPS Ground — estimating…'
-            : est.status === 'done' ? `UPS Ground — ${money(est.amount)} flat rate (estimator unavailable)`
-            : est.status === 'failed' ? `UPS Ground — ${money(S.config.shipFee)} flat rate (estimator unavailable)`
-            : 'UPS Ground — enter your ZIP for the exact rate';
+            !q.combinedQty ? `FREE on orders ${freeOver}+ · ${flatTxt} under`
+            : (S.delivery.method === 'ship' && q.shipping === 0)
+                ? `FREE shipping 🎉 (orders ${freeOver}+ ship free)`
+                : `${flatTxt} flat — FREE on orders ${freeOver}+`;
+
+        // Free-ship nudge (conversion): only while shipping and still short of
+        // the threshold; quote.freeShipRemaining is 0 when free, null on
+        // pickup/empty — both hide it.
+        const nudgeOn = S.delivery.method === 'ship' && q.freeShipRemaining > 0;
+        const shipNudge = $('ship-nudge');
+        if (shipNudge) {
+            shipNudge.hidden = !nudgeOn;
+            shipNudge.textContent = nudgeOn
+                ? `Add ${money(q.freeShipRemaining)} more for FREE shipping` : '';
+        }
 
         const reasons = gateReasons(q);
         const wrap = $('pay-reasons');
@@ -1744,6 +1741,15 @@
     function renderBarWith(q) {
         lastQuote = q;
         $('bar-total').textContent = money(q.total);
+        // Free-ship nudge mirrored in the sticky bar (same rules as the
+        // delivery card — hidden at 0 / pickup / empty cart).
+        const barNudge = $('bar-ship-nudge');
+        if (barNudge) {
+            const nudgeOn = S.delivery.method === 'ship' && q.freeShipRemaining > 0;
+            barNudge.hidden = !nudgeOn;
+            barNudge.textContent = nudgeOn
+                ? `Add ${money(q.freeShipRemaining)} more for FREE shipping` : '';
+        }
         const sp = shipPromise();
         $('bar-meta').textContent = q.combinedQty
             ? `${q.combinedQty} shirt${q.combinedQty === 1 ? '' : 's'} · ${sp.short}`
@@ -2019,7 +2025,7 @@
                 ltmFee: q.ltmFee,
                 shipping: q.shipping,
                 shippingSource: S.delivery.method === 'pickup' ? 'pickup'
-                    : (S.delivery.shipEstimate.source || 'flat'),
+                    : (q.shipping === 0 ? 'free-threshold' : 'flat'),
                 salesTax: q.tax,
                 taxRate: q.taxRate,
                 taxableBase: q.taxableBase,
@@ -2042,6 +2048,11 @@
                     ? { fileUrl: S.design.back.uploaded.hostedUrl, fileName: S.design.back.uploaded.fileName } : null,
                 mockups,
                 placement: { front: placementOf('front'), back: placementOf('back') },
+                // Baked small-batch audit record (UberPrints model): the fee is
+                // folded into unit prices, so orderTotals.ltmFee is 0 BY DESIGN;
+                // this keeps the per-piece/total share for production + audit.
+                ltmBaked: q.ltmBaked
+                    ? { perPiece: q.ltmBakedPerPiece, total: q.ltmBakedTotal } : null,
                 shipPromise: { iso: sp.iso, label: sp.label, rush: S.rush },
                 needsArtReview: needsArtReview(),
                 // Artwork-rights attestation — gateReasons() blocks Pay until
@@ -2371,7 +2382,6 @@
                 S.delivery.method = $('d-pickup').checked ? 'pickup' : 'ship';
                 S.delivery.tax.rate = null;
                 S.delivery.tax.error = false;
-                S.delivery.shipEstimate = { status: 'idle', amount: null, source: null, key: '' };
                 syncDeliveryUI();
                 lookupTax();
                 renderAll();
