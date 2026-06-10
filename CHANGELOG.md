@@ -1,3 +1,7 @@
+## v2026.06.10.14 (2026.06.10)
+
+- feat(custom-tees): webhook-side confirmation emails + customer order-status page
+
 ## v2026.06.10.13 (2026.06.10)
 
 - feat(custom-tees): live stock all 20 styles + admin artwork downloads + email rewire
