@@ -1,3 +1,7 @@
+## v2026.06.10.8 (2026.06.10)
+
+- feat(custom-tees): staff print-box calibration tool + Caspio-backed layouts
+
 ## v2026.06.10.7 (2026.06.10)
 
 - feat(custom-tees): garment silhouette auto-fit — print box anchors to the actual photo
