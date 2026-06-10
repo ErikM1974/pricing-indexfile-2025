@@ -1,3 +1,7 @@
+## v2026.06.10.7 (2026.06.10)
+
+- feat(custom-tees): garment silhouette auto-fit — print box anchors to the actual photo
+
 ## v2026.06.10.6 (2026.06.10)
 
 - feat(custom-tees): free placement + size-based pricing + drag-resize handle (Erik round 2)
