@@ -1,3 +1,7 @@
+## v2026.06.10.10 (2026.06.10)
+
+- fix(calibration-tool): empty-state overlay swallowed all box drags
+
 ## v2026.06.10.9 (2026.06.10)
 
 - feat(staff-dashboard): Custom Tees storefront + Tee Print-Box Calibration links in Quote Builders (Erik request)
