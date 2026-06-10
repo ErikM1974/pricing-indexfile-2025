@@ -954,10 +954,11 @@ let _ctsCatalogCache = null;
 let _ctsCatalogAt = 0;
 async function getCtsCatalog() {
   if (_ctsCatalogCache && Date.now() - _ctsCatalogAt < 60 * 60 * 1000) return _ctsCatalogCache;
-  const r = await fetch(`${TDT_PROXY}/api/dtg/top-sellers`);
+  // /styles is the aggregate list endpoint (the same one the gallery renders).
+  const r = await fetch(`${TDT_PROXY}/api/dtg/top-sellers/styles`);
   if (!r.ok) throw new Error(`top-sellers fetch failed: HTTP ${r.status}`);
   const j = await r.json();
-  const styles = Array.isArray(j) ? j : (j.data || j.styles || []);
+  const styles = Array.isArray(j) ? j : (j.records || j.data || j.styles || []);
   if (!styles.length) throw new Error('top-sellers returned an empty catalog');
   const map = new Map();
   styles.forEach(s => { const k = String(s.style || s.styleNumber || '').toUpperCase(); if (k) map.set(k, s); });
