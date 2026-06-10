@@ -1,3 +1,8 @@
+## v2026.06.10.5 (2026.06.10)
+
+- docs(lessons): cloned-channel push hardcodes + clean-URL relative-path gotcha
+- feat(custom-tees): design close-up zoom + raised back print area (Erik feedback)
+
 ## v2026.06.10.4 (2026.06.10)
 
 - feat(custom-tees): multi-style DTG storefront — gallery, designer, Stripe checkout
