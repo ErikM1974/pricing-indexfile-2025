@@ -784,11 +784,16 @@ class DTFQuoteService {
                             AddedAt: this.formatDateForCaspio(new Date())
                         };
 
-                        await fetch(`${this.baseURL}/quote_items`, {
+                        const itemResp = await fetch(`${this.baseURL}/quote_items`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(itemData)
                         });
+                        // Surface failed inserts — a non-ok POST left the revision
+                        // missing lines while the rep saw success. (EMB-parity 2026-06-10)
+                        if (!itemResp.ok) {
+                            throw new Error(`Line item ${product.styleNumber} failed to save (HTTP ${itemResp.status}) — the revision is incomplete. Try saving again.`);
+                        }
                     }
                 }
             }
@@ -844,30 +849,39 @@ class DTFQuoteService {
     }
 
     /**
-     * Delete existing quote items for a quote ID
+     * Delete existing quote items for a quote ID.
+     * Failures MUST surface (EMB-parity 2026-06-10): updateQuote deletes first,
+     * so a swallowed failure here meant the new inserts piled ON TOP of the old
+     * items — doubled lines in the saved quote while the rep saw success.
      */
     async deleteExistingItems(quoteID) {
-        try {
-            // Fetch existing items
-            const itemsResponse = await fetch(`${this.baseURL}/quote_items?QuoteID=${quoteID}`);
-            if (!itemsResponse.ok) return;
+        // Fetch existing items
+        const itemsResponse = await fetch(`${this.baseURL}/quote_items?QuoteID=${quoteID}`);
+        if (!itemsResponse.ok) {
+            throw new Error(`Could not list existing quote items (HTTP ${itemsResponse.status}) — revision not saved. Try again.`);
+        }
 
-            const items = await itemsResponse.json();
-            if (!items || items.length === 0) return;
+        const items = await itemsResponse.json();
+        if (!items || items.length === 0) return;
 
-            // Delete each item
-            for (const item of items) {
-                if (item.PK_ID) {
-                    await fetch(`${this.baseURL}/quote_items/${item.PK_ID}`, {
-                        method: 'DELETE'
-                    });
+        // Delete each item
+        let failed = 0;
+        for (const item of items) {
+            if (item.PK_ID) {
+                try {
+                    const resp = await fetch(`${this.baseURL}/quote_items/${item.PK_ID}`, { method: 'DELETE' });
+                    if (!resp.ok) { failed++; console.error(`[DTFQuoteService] DELETE item ${item.PK_ID} → HTTP ${resp.status}`); }
+                } catch (err) {
+                    failed++;
+                    console.error(`[DTFQuoteService] DELETE item ${item.PK_ID} failed:`, err);
                 }
             }
-
-            console.log('[DTFQuoteService] Deleted', items.length, 'existing items');
-        } catch (error) {
-            console.warn('[DTFQuoteService] Error deleting items:', error);
         }
+        if (failed > 0) {
+            throw new Error(`${failed} old line item(s) could not be removed — the quote would show duplicated lines. Try saving again.`);
+        }
+
+        console.log('[DTFQuoteService] Deleted', items.length, 'existing items');
     }
 
     /**

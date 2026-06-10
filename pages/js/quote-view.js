@@ -4,6 +4,15 @@
  * Matches PDF invoice format from EmbroideryInvoiceGenerator
  */
 
+// Debug logging gate — customer-facing page, so console.log output (including the
+// pricing-internals audit dump) only prints on localhost. console.error/warn stay live.
+const QV_DEBUG = window.location.hostname === 'localhost';
+
+// Inline-SVG product placeholder (neutral gray garment glyph). The old
+// /pages/images/product-placeholder.png never existed in the repo, so every
+// fallback 404'd into a broken-image icon. A data URI can't go missing.
+const QV_PLACEHOLDER_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f3f4f6'/%3E%3Cpath d='M22 14l-12 8 5 9 5-3v22h24V28l5 3 5-9-12-8a10 10 0 0 1-20 0z' fill='%23d1d5db'/%3E%3C/svg%3E";
+
 class QuoteViewPage {
     constructor() {
         this.quoteId = null;
@@ -86,6 +95,26 @@ class QuoteViewPage {
         // Load quote data
         await this.loadQuote();
 
+        // Customer-view beacon (2026-06-10): record that the customer opened this
+        // quote so reps see "Viewed" on it. Staff browsers are excluded two ways:
+        // the isStaff session check AND the nwca_staff localStorage flag (set by
+        // every quote builder). Telemetry only — failures stay in console.
+        try {
+            let staffBrowser = false;
+            try { staffBrowser = !!localStorage.getItem('nwca_staff'); } catch (_) {}
+            if (this.quoteData && !this.isStaff && !staffBrowser) {
+                fetch(`${this.apiBaseUrl}/api/quote_analytics`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        SessionID: 'qv_' + Math.random().toString(36).slice(2, 11),
+                        EventType: 'customer_view',
+                        QuoteID: this.quoteId
+                    })
+                }).catch(err => console.warn('[quote-view] view beacon failed:', err));
+            }
+        } catch (_) { /* never block rendering on telemetry */ }
+
         // Setup event listeners
         this.setupEventListeners();
 
@@ -156,8 +185,10 @@ class QuoteViewPage {
             this.quoteData = data.session;
             this.items = data.items || [];
 
-            console.log('[QuoteView] Loaded quote data:', this.quoteData);
-            console.log('[QuoteView] Loaded items:', this.items);
+            if (QV_DEBUG) {
+                console.log('[QuoteView] Loaded quote data:', this.quoteData);
+                console.log('[QuoteView] Loaded items:', this.items);
+            }
 
             // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.1%
             // Normalize percent-vs-decimal: EMB stores TaxRate as a DECIMAL (0.101) but
@@ -175,8 +206,11 @@ class QuoteViewPage {
                 }
             }
 
-            // Debug charge verification (2026-01-14)
-            this.debugChargeVerification();
+            // Debug charge verification (2026-01-14) — pricing-internals dump,
+            // localhost only so it never prints in a customer's console.
+            if (QV_DEBUG) {
+                this.debugChargeVerification();
+            }
 
             await this.renderQuote();
             this.showContent();
@@ -720,7 +754,9 @@ class QuoteViewPage {
             // Cache the result
             this.imageCache[cacheKey] = imageUrl;
 
-            console.log(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}${match ? ` (matched: ${match.COLOR_NAME})` : ''}`);
+            if (QV_DEBUG) {
+                console.log(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}${match ? ` (matched: ${match.COLOR_NAME})` : ''}`);
+            }
             return imageUrl;
 
         } catch (error) {
@@ -1174,14 +1210,19 @@ class QuoteViewPage {
             html += this.renderFeeRow('GRT-50', 'Logo Mockup & Print Review', 1, artCharge, artCharge);
         }
 
-        // 6. Graphic Design Services - ShopWorks SKU: GRT-75 @ $75/hr
+        // 6. Graphic Design Services - ShopWorks SKU: GRT-75
+        // Rate derived from the SAVED charge/hours — never a literal $75. The quote
+        // page must show what was saved with the quote, not today's Caspio rate.
         const graphicDesignHours = parseFloat(this.quoteData?.GraphicDesignHours) || 0;
         const graphicDesignCharge = parseFloat(this.quoteData?.GraphicDesignCharge) || 0;
         if (graphicDesignCharge > 0) {
+            const graphicDesignRate = graphicDesignHours > 0
+                ? graphicDesignCharge / graphicDesignHours
+                : graphicDesignCharge;
             const desc = graphicDesignHours > 0
-                ? `Graphic design services (${graphicDesignHours} hrs @ $75/hr)`
+                ? `Graphic design services (${graphicDesignHours} hrs @ ${this.formatCurrency(graphicDesignRate)}/hr)`
                 : 'Graphic design services';
-            html += this.renderFeeRow('GRT-75', desc, graphicDesignHours || 1, 75, graphicDesignCharge);
+            html += this.renderFeeRow('GRT-75', desc, graphicDesignHours || 1, graphicDesignRate, graphicDesignCharge);
         }
 
         // 7. Rush Fee (expedited processing) - ShopWorks SKU: RUSH
@@ -1236,7 +1277,10 @@ class QuoteViewPage {
         suppressIf(alGarmentCharge > 0 && garmentQty > 0, 'AL', 'AL-GARM');
         suppressIf(alCapCharge > 0 && capQty > 0, 'AL-CAP', 'CB');
         suppressIf(garmentDigitizing > 0, 'DD');
-        suppressIf(capDigitizing > 0, 'DD-CAP', 'GRT-50');
+        // Cap digitizing also suppresses 'DD': the save path stores the cap fee item
+        // with StyleNumber 'DD' (embroidery-quote-service "Digitizing - Caps"), so a
+        // cap-only quote (garmentDigitizing=0) would otherwise render it twice.
+        suppressIf(capDigitizing > 0, 'DD-CAP', 'GRT-50', 'DD');
         suppressIf(artCharge > 0, 'GRT-50');
         suppressIf(graphicDesignCharge > 0, 'GRT-75');
         suppressIf(rushFee > 0, 'RUSH');
@@ -1250,8 +1294,10 @@ class QuoteViewPage {
         );
         for (const fee of unhandledFees) {
             const desc = fee.ProductName || fee.StyleNumber || 'Service Fee';
+            // Raw values here — renderFeeRow() escapes both partNum and description
+            // (escaping twice rendered '&' as '&amp;amp;').
             html += this.renderFeeRow(
-                this.escapeHtml(fee.StyleNumber || ''),
+                fee.StyleNumber || '',
                 desc,
                 fee.Quantity || 1,
                 fee.FinalUnitPrice || fee.BaseUnitPrice || 0,
@@ -1299,7 +1345,7 @@ class QuoteViewPage {
         const modalStyle = document.getElementById('modal-style-number');
         const modalColor = document.getElementById('modal-color-name');
 
-        modalImage.src = group.imageUrl || '/pages/images/product-placeholder.png';
+        modalImage.src = group.imageUrl || QV_PLACEHOLDER_IMG;
         modalName.textContent = group.productName || 'Product';
         modalStyle.textContent = group.styleNumber;
         modalColor.textContent = group.color;
@@ -1435,12 +1481,14 @@ class QuoteViewPage {
         const lgCol = row.sizes['L'] || '';
         const xlCol = row.sizes['XL'] || '';
         const xxlCol = row.sizes['2XL'] || '';
-        // XXXL column is the catch-all (Size06): 3XL+, tall sizes, OSFA, combo sizes
-        const xxxlCol = row.sizes['3XL'] || row.sizes['4XL'] || row.sizes['5XL'] || row.sizes['6XL']
-                     || row.sizes['LT'] || row.sizes['XLT'] || row.sizes['2XLT'] || row.sizes['3XLT']
-                     || row.sizes['4XLT'] || row.sizes['5XLT'] || row.sizes['6XLT']
-                     || row.sizes['OSFA'] || row.sizes['S/M'] || row.sizes['M/L'] || row.sizes['L/XL']
-                     || row.sizes['ONE SIZE'] || row.sizes['ADJ'] || '';
+        // XXXL column is the catch-all (Size06): any size without a dedicated column
+        // (3XL+, tall, youth, toddler, big, OSFA/OSFM, combos, …). buildProductRows
+        // emits one row per extended size, so a generic lookup covers every size it
+        // can emit — the old hardcoded || chain missed youth/toddler/7XL+/OSFM and
+        // left the size cells blank.
+        const dedicatedSizeCols = ['S', 'M', 'L', 'XL', '2XL'];
+        const catchAllSize = Object.keys(row.sizes).find(s => !dedicatedSizeCols.includes(s));
+        const xxxlCol = (catchAllSize && row.sizes[catchAllSize]) || '';
 
         // Style column with clickable image for first row (opens modal)
         let styleCell;
@@ -1448,7 +1496,7 @@ class QuoteViewPage {
             styleCell = `
                 <td class="style-col clickable" onclick="window.quoteViewPage.openProductModal(${groupIndex})">
                     <div class="style-with-image">
-                        <img id="product-image-${groupIndex}" class="product-thumb" src="/pages/images/product-placeholder.png" alt="${this.escapeHtml(row.style)}">
+                        <img id="product-image-${groupIndex}" class="product-thumb" src="${QV_PLACEHOLDER_IMG}" alt="${this.escapeHtml(row.style)}">
                         <span>${this.escapeHtml(row.style)} - ${this.escapeHtml(row.description || '')}</span>
                     </div>
                 </td>
@@ -1529,7 +1577,9 @@ class QuoteViewPage {
             // Replace items with deduped list
             const dedupedItems = Array.from(seen.values());
             if (dedupedItems.length < group.items.length) {
-                console.log(`[QuoteView] Deduped ${group.styleNumber} ${group.color}: ${group.items.length} → ${dedupedItems.length} items`);
+                if (QV_DEBUG) {
+                    console.log(`[QuoteView] Deduped ${group.styleNumber} ${group.color}: ${group.items.length} → ${dedupedItems.length} items`);
+                }
                 group.items = dedupedItems;
             }
         });
@@ -1564,7 +1614,7 @@ class QuoteViewPage {
                 <div class="product-header">
                     <div class="product-image">
                         <img id="product-image-${index}"
-                             src="${storedImageUrl || '/pages/images/product-placeholder.png'}"
+                             src="${storedImageUrl || QV_PLACEHOLDER_IMG}"
                              alt="${this.escapeHtml(productGroup.styleNumber)}"
                              onload="this.nextElementSibling.style.display='none';"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -1638,7 +1688,9 @@ class QuoteViewPage {
         if (hasDuplicateSizeBreakdowns) {
             // OLD FORMAT: All items have same SizeBreakdown - aggregate and split by price tier
             // This fixes quotes where every row incorrectly shows ALL sizes
-            console.log('[QuoteView] Detected OLD format with duplicate SizeBreakdowns - using aggregated approach');
+            if (QV_DEBUG) {
+                console.log('[QuoteView] Detected OLD format with duplicate SizeBreakdowns - using aggregated approach');
+            }
 
             const aggregatedBreakdown = this.parseSizeBreakdown(productGroup.items[0].SizeBreakdown);
             const totalLineTotal = productGroup.items.reduce((sum, item) =>
@@ -2078,8 +2130,13 @@ class QuoteViewPage {
             // Phase 7: CEMB quotes that confirmed tax-exempt in the pre-flight
             // show "Tax-exempt" instead of "Out of State Sales" (which is
             // the existing default for other quote types with TaxRate=0).
+            // Wholesale/resale quotes (builder checkbox saves IsWholesale='Yes' with
+            // TaxRate 0) get their own label — they're not out of state.
+            const isWholesale = this.quoteData?.IsWholesale === 'Yes' || this.quoteData?.IsWholesale === true;
             const isCEMB = (this.quoteId || '').startsWith('CEMB');
-            const zeroTaxLabel = isCEMB ? 'Tax-exempt' : 'Out of State Sales';
+            const zeroTaxLabel = isWholesale
+                ? 'Wholesale / Resale — No Tax (permit on file)'
+                : (isCEMB ? 'Tax-exempt' : 'Out of State Sales');
             totalsHtml += `
                 <div class="total-row tax-row">
                     <span class="label">${zeroTaxLabel}:</span>
@@ -4134,6 +4191,8 @@ class QuoteViewPage {
      * Called when quote data loads - check browser console for output
      */
     debugChargeVerification() {
+        // Defense-in-depth: pricing internals must never print in a customer's console
+        if (!QV_DEBUG) return;
         console.group('📊 CHARGE VERIFICATION AUDIT');
 
         const q = this.quoteData;

@@ -164,6 +164,7 @@
 | `/pages/js/3-day-tees-success.js` | Success-page logic (status polling w/ refresh=true, EmailJS once-guard) | TDTShipDate, app.config.js | ✅ Active |
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
+| `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
 | `/tests/unit/3dt-pricing.test.js` | Behavioral spec: 7-step formula, sub-24 cost fallback, LTM, tax base | jest | ✅ Active |
 | `/tests/unit/3dt-shipdate.test.js` | Behavioral spec: cutoff/weekend/holiday/PST-PDT matrix | jest | ✅ Active |
 | `/tests/3dt-test-push-payload.json` | Reference webhook-equivalent payload for ManageOrders TEST pushes | — | ✅ Active |
@@ -600,9 +601,9 @@
 | `/shared_components/js/cap-embroidery-pricing-logic.js` | Cap embroidery pricing logic (shared between manual + quote builder) | embroidery-pricing-service.js | ✅ Active |
 | `/shared_components/js/cap-embroidery-pricing-service.js` | Cap embroidery Caspio data adapter | Caspio API | ✅ Active |
 | ~~`/shared_components/js/cap-quote-builder.js`~~ | **DELETED 2026-06-09** — dead cap-quote system (no HTML loads it; EMB builder handles caps via shared services). | — | ❌ Deleted |
-| `/shared_components/js/cap-quote-logos.js` | Cap quote logo card management (⚠️ orphaned 2026-06-09 — controller cap-quote-builder.js deleted; dead-code candidate) | — | ⚠️ Orphan? |
+| ~~`/shared_components/js/cap-quote-logos.js`~~ | **DELETED 2026-06-09** — orphaned after cap-quote-builder.js deletion; zero references verified. | — | ❌ Deleted |
 | ~~`/shared_components/js/cap-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead cap-quote pricing engine (50/100 hardcodes, no HTML loads it). | — | ❌ Deleted |
-| `/shared_components/js/cap-quote-products.js` | Cap quote product row manager (⚠️ orphaned 2026-06-09 — see cap-quote-logos.js) | SanMar API | ⚠️ Orphan? |
+| ~~`/shared_components/js/cap-quote-products.js`~~ | **DELETED 2026-06-09** — orphaned after cap-quote-builder.js deletion; zero references verified. | SanMar API | ❌ Deleted |
 | ~~`/shared_components/js/cap-quote-service.js`~~ | **DELETED 2026-06-09** — dead cap-quote save/email service (50/100 hardcodes diverged saved totals). | — | ❌ Deleted |
 
 ### Art Invoice System

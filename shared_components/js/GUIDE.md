@@ -87,9 +87,9 @@
 |------|---------|
 | `cap-embroidery-pricing-service.js` | Cap embroidery pricing adapter |
 | ~~`cap-quote-builder.js`~~ | **DELETED 2026-06-09** — dead cap-quote system (EMB builder handles caps) |
-| `cap-quote-logos.js` | Cap logo position management (⚠️ orphaned 2026-06-09 — controller deleted) |
+| ~~`cap-quote-logos.js`~~ | **DELETED 2026-06-09** — orphaned (controller deleted), zero references |
 | ~~`cap-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead cap-quote pricing engine |
-| `cap-quote-products.js` | Cap quote product manager (⚠️ orphaned 2026-06-09 — controller deleted) |
+| ~~`cap-quote-products.js`~~ | **DELETED 2026-06-09** — orphaned (controller deleted), zero references |
 | ~~`cap-quote-service.js`~~ | **DELETED 2026-06-09** — dead cap-quote save/email service |
 
 ## Screen Print System

@@ -74,18 +74,20 @@ class EmbroideryQuoteService {
             const { prefix, year, sequence } = await response.json();
             return `${prefix}-${year}-${String(sequence).padStart(3, '0')}`;
         } catch (error) {
-            // Fallback to old format if API fails (e.g., Heroku outage)
+            // Fallback to old format if API fails (e.g., Heroku outage).
+            // Random 4-digit suffix instead of a per-browser sessionStorage counter —
+            // the counter restarted at 1 in every browser, so two reps (or two tabs)
+            // could mint the SAME QuoteID on the same day. And tell the rep (Erik's
+            // #1 rule: no silent fallbacks). (audit 2026-06-10)
             console.warn('[EmbroideryQuoteService] Quote sequence API failed, using fallback:', error);
+            if (typeof showToast === 'function') {
+                showToast('Quote numbering service unreachable — using a temporary quote # (format EMBmmdd-nnnn).', 'warning', 6000);
+            }
             const now = new Date();
             const month = (now.getMonth() + 1).toString().padStart(2, '0');
             const day = now.getDate().toString().padStart(2, '0');
             const dateKey = `${month}${day}`;
-
-            // Daily sequence from sessionStorage as fallback
-            const storageKey = `${this.quotePrefix}_quote_sequence_${dateKey}`;
-            let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-            sessionStorage.setItem(storageKey, sequence.toString());
-
+            const sequence = Math.floor(Math.random() * 9000) + 1000;
             return `${this.quotePrefix}${dateKey}-${sequence}`;
         }
     }
@@ -118,35 +120,52 @@ class EmbroideryQuoteService {
     }
 
     /**
+     * The digitizing fee actually CHARGED on screen/PDF — engine value
+     * (Embroidery_Costs.DigitizingFee) first, Service_Codes DD as fallback.
+     * The save previously read ONLY Service_Codes DD, so when the two Caspio
+     * tables disagreed the saved fee diverged from the charged one. (2026-06-10)
+     */
+    _digitizingFeeValue() {
+        try {
+            if (typeof pricingCalculator !== 'undefined' && pricingCalculator && Number(pricingCalculator.digitizingFee) > 0) {
+                return Number(pricingCalculator.digitizingFee);
+            }
+        } catch (_) { /* engine not loaded — fall through */ }
+        return (typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100;
+    }
+
+    /**
      * Delete existing items by their PK_IDs.
      * If no itemIds provided, queries by quoteID (legacy behavior for saveQuote).
      */
     async deleteExistingItems(quoteID, itemIds) {
-        try {
-            let idsToDelete = itemIds;
+        let idsToDelete = itemIds;
 
-            // If no specific IDs provided, fetch them by quoteID
-            if (!idsToDelete) {
-                idsToDelete = await this.fetchExistingItemIds(quoteID);
-            }
+        // If no specific IDs provided, fetch them by quoteID
+        if (!idsToDelete) {
+            idsToDelete = await this.fetchExistingItemIds(quoteID);
+        }
 
-            if (!idsToDelete || !idsToDelete.length) return;
+        if (!idsToDelete || !idsToDelete.length) return;
 
-            // Delete items in parallel batches for speed (10 at a time to avoid overwhelming server)
-            const batchSize = 10;
-            for (let i = 0; i < idsToDelete.length; i += batchSize) {
-                const batch = idsToDelete.slice(i, i + batchSize);
-                await Promise.all(
-                    batch.map(id =>
-                        fetch(`${this.baseURL}/api/quote_items/${id}`, {
-                            method: 'DELETE'
-                        }).catch(err => console.warn(`Failed to delete item ${id}:`, err))
-                    )
-                );
-            }
-        } catch (error) {
-            console.warn('[EmbroideryQuoteService] Error deleting existing items:', error);
-            // Don't throw - allow save to continue
+        // Delete items in parallel batches for speed (10 at a time to avoid overwhelming server).
+        // Failures MUST surface: updateQuote inserts the new items first, so a swallowed DELETE
+        // failure left OLD+NEW items doubled in the quote while the rep saw "Revision saved
+        // successfully" — the doubled total then flowed to /quote, /invoice, and the SW push.
+        let failed = 0;
+        const batchSize = 10;
+        for (let i = 0; i < idsToDelete.length; i += batchSize) {
+            const batch = idsToDelete.slice(i, i + batchSize);
+            await Promise.all(
+                batch.map(id =>
+                    fetch(`${this.baseURL}/api/quote_items/${id}`, { method: 'DELETE' })
+                        .then(resp => { if (!resp.ok) { failed++; console.error(`[EmbroideryQuoteService] DELETE item ${id} → HTTP ${resp.status}`); } })
+                        .catch(err => { failed++; console.error(`[EmbroideryQuoteService] DELETE item ${id} failed:`, err); })
+                )
+            );
+        }
+        if (failed > 0) {
+            throw new Error(`${failed} old line item(s) could not be removed — the quote may show duplicated lines. Re-open the quote and save the revision again.`);
         }
     }
 
@@ -265,7 +284,7 @@ class EmbroideryQuoteService {
                 // note (mirror of the cap gate below). (2026-06-04 cert audit)
                 PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
                 StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
-                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? this._digitizingFeeValue() : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -274,7 +293,7 @@ class EmbroideryQuoteService {
                 // default 'CF'/8000, so production saw a spurious "Cap:" note. (2026-06-04 audit)
                 CapPrintLocation: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.position || '') : '',
                 CapStitchCount: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.stitchCount || 0) : 0,
-                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
+                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? this._digitizingFeeValue() : 0,
                 // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
                 CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 // Additional stitch charges - SPLIT by garment/cap per ShopWorks naming (AS-GARM, AS-CAP)
@@ -841,10 +860,13 @@ class EmbroideryQuoteService {
             });
         }
 
-        // Sales Tax (TAX) — stores rate in BaseUnitPrice, amount in LineTotal
+        // Sales Tax (TAX) — stores rate in BaseUnitPrice, amount in LineTotal.
+        // Finite-check (not ||): an empty input was saving "Sales Tax (NaN%)" items,
+        // and 0% is a valid rate. Same 10.1 fallback as the builder's save path.
         const includeTax = document.getElementById('include-tax')?.checked;
         const taxRateInput = document.getElementById('tax-rate-input');
-        const taxRateVal = taxRateInput ? parseFloat(taxRateInput.value) : 10.1;
+        const _rawRate = taxRateInput ? parseFloat(taxRateInput.value) : NaN;
+        const taxRateVal = Number.isFinite(_rawRate) ? _rawRate : 10.1;
         if (includeTax) {
             // Calculate tax amount from adjusted subtotal
             const grandTotalText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
@@ -1096,7 +1118,7 @@ class EmbroideryQuoteService {
                 // note (mirror of the cap gate below). (2026-06-04 cert audit)
                 PrintLocation: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.position || 'Left Chest') : '',
                 StitchCount: (pricingResults.garmentQuantity > 0) ? (primaryLogo?.stitchCount || 8000) : 0,
-                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
+                DigitizingFee: (pricingResults.garmentQuantity > 0 && primaryLogo?.needsDigitizing) ? this._digitizingFeeValue() : 0,
                 AdditionalLogoLocation: additionalLogo?.position || '',
                 // Get additional logo stitch count from additionalServices (not logos array)
                 AdditionalStitchCount: pricingResults.additionalServices?.find(s => !s.isCap && s.type === 'additional_logo')?.stitchCount || 0,
@@ -1104,7 +1126,7 @@ class EmbroideryQuoteService {
                 // default 'CF'/8000, so production saw a spurious "Cap:" note. (2026-06-04 audit)
                 CapPrintLocation: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.position || '') : '',
                 CapStitchCount: (pricingResults.capQuantity > 0) ? (capPrimaryLogo?.stitchCount || 0) : 0,
-                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? ((typeof getServicePrice === 'function') ? getServicePrice('DD', 100) : 100) : 0,
+                CapDigitizingFee: (pricingResults.capQuantity > 0 && capPrimaryLogo?.needsDigitizing) ? this._digitizingFeeValue() : 0,
                 // Cap embellishment type: 'embroidery', '3d-puff', or 'laser-patch'
                 CapEmbellishmentType: quoteData.capEmbellishmentType || pricingResults.capEmbellishmentType || 'embroidery',
                 GarmentStitchCharge: parseFloat(pricingResults.garmentStitchTotal?.toFixed(2)) || 0,

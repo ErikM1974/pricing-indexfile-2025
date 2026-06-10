@@ -523,7 +523,13 @@ class ScreenPrintQuoteService {
                 });
             });
 
-            await Promise.all(itemPromises);
+            // Surface failed inserts — a non-ok POST left the revision missing lines
+            // while the rep saw success. (EMB-parity 2026-06-10)
+            const itemResponses = await Promise.all(itemPromises);
+            const failedInserts = itemResponses.filter(r => !r || !r.ok).length;
+            if (failedInserts > 0) {
+                throw new Error(`${failedInserts} line item(s) failed to save — the revision is incomplete. Try saving again.`);
+            }
             await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] P1: SHIP fee row so the saved mirror shows + taxes shipping
 
             console.log('[ScreenPrintQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
@@ -544,30 +550,39 @@ class ScreenPrintQuoteService {
     }
 
     /**
-     * Delete existing quote items for a quote ID
+     * Delete existing quote items for a quote ID.
+     * Failures MUST surface (EMB-parity 2026-06-10): updateQuote deletes first,
+     * so a swallowed failure here meant the new inserts piled ON TOP of the old
+     * items — doubled lines in the saved quote while the rep saw success.
      */
     async deleteExistingItems(quoteID) {
-        try {
-            // Fetch existing items
-            const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?QuoteID=${quoteID}`);
-            if (!itemsResponse.ok) return;
+        // Fetch existing items
+        const itemsResponse = await fetch(`${this.baseURL}/api/quote_items?QuoteID=${quoteID}`);
+        if (!itemsResponse.ok) {
+            throw new Error(`Could not list existing quote items (HTTP ${itemsResponse.status}) — revision not saved. Try again.`);
+        }
 
-            const items = await itemsResponse.json();
-            if (!items || items.length === 0) return;
+        const items = await itemsResponse.json();
+        if (!items || items.length === 0) return;
 
-            // Delete each item
-            for (const item of items) {
-                if (item.PK_ID) {
-                    await fetch(`${this.baseURL}/api/quote_items/${item.PK_ID}`, {
-                        method: 'DELETE'
-                    });
+        // Delete each item
+        let failed = 0;
+        for (const item of items) {
+            if (item.PK_ID) {
+                try {
+                    const resp = await fetch(`${this.baseURL}/api/quote_items/${item.PK_ID}`, { method: 'DELETE' });
+                    if (!resp.ok) { failed++; console.error(`[ScreenPrintQuoteService] DELETE item ${item.PK_ID} → HTTP ${resp.status}`); }
+                } catch (err) {
+                    failed++;
+                    console.error(`[ScreenPrintQuoteService] DELETE item ${item.PK_ID} failed:`, err);
                 }
             }
-
-            console.log('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
-        } catch (error) {
-            console.warn('[ScreenPrintQuoteService] Error deleting items:', error);
         }
+        if (failed > 0) {
+            throw new Error(`${failed} old line item(s) could not be removed — the quote would show duplicated lines. Try saving again.`);
+        }
+
+        console.log('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
     }
 
     /**

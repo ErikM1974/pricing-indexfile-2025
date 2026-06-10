@@ -770,20 +770,53 @@ class EmbroideryInvoiceGenerator {
             <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
         `;
 
-        // Determine AL base rate from tier
+        // ---- Additional Logo (AL) per-piece prices actually charged -------------
+        // The builder prices ALs LIVE from /api/al-pricing (syncALRows) and passes
+        // them as service line items inside pricingData.products (styles AL / AL-CAP /
+        // DECG-FB, with the real per-piece unitPrice). Collect those so the printed
+        // spec line shows the price that was actually charged — the generator never
+        // fetches APIs; it prints what the builder passed. (audit 2026-06-10)
+        const alServiceItems = (pricingData.products || [])
+            .filter(p => p && (p.isService || (p.product && p.product.isService)))
+            .filter(p => ['AL', 'AL-CAP', 'DECG-FB'].includes(p.product && p.product.style))
+            .map(p => ({
+                isCap: !!(p.product && p.product.isCap),
+                position: String((p.product && p.product.position) || '').trim().toLowerCase(),
+                unitPrice: Number(p.lineItems && p.lineItems[0] && p.lineItems[0].unitPrice) || 0
+            }))
+            .filter(s => s.unitPrice > 0);
+
+        // FALLBACK ONLY — frozen 2026-02 garment AL tier table. Used solely when no
+        // actually-charged price reached pricingData (logo.unitPrice or a matching AL
+        // service line item). It can drift from Caspio Embroidery_Costs and applies
+        // GARMENT rates to cap ALs, so it must never override a real charged price.
         const tier = pricingData.tier || '1-7';
-        let alBaseRate = 13.50; // 2026-02 base rate
+        let alBaseRate = 13.50; // 2026-02 base rate (fallback only — see above)
         if (tier.includes('72')) alBaseRate = 8.50;
         else if (tier.includes('48')) alBaseRate = 9.50;
         else if (tier.includes('24')) alBaseRate = 11.50;
         else if (tier === '8-23') alBaseRate = 13.50;
+
+        // Per-logo digitizing rate, derived from the SAME numbers that feed the
+        // computed total — never a hardcoded "$100" (a Caspio DigitizingFee change
+        // would otherwise print arithmetic that doesn't foot). setupFees may include
+        // the cap patch setup fee, which is labeled separately below, so back it out
+        // before dividing. (audit 2026-06-10)
+        const digitizingLogoCount = pricingData.setupFeesCount ||
+            (pricingData.logos ? pricingData.logos.filter(l => l.needsDigitizing).length : 0);
+        const digitizingSubtotal = Math.max(0, (pricingData.setupFees || 0) - (pricingData.capPatchSetupFee || 0));
+        const digitizingRate = (digitizingLogoCount > 0 && digitizingSubtotal > 0)
+            ? digitizingSubtotal / digitizingLogoCount
+            : 0;
+
+        const logoListOpts = { alServiceItems, digitizingRate };
 
         // Handle new separate logo configs
         if (hasLogoConfigs) {
             // GARMENT EMBROIDERY SECTION
             if (pricingData.garmentLogos && pricingData.garmentLogos.length > 0 && pricingData.hasGarments) {
                 specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">GARMENT EMBROIDERY:</div>`;
-                specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment');
+                specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment', logoListOpts);
             }
 
             // CAP EMBELLISHMENT SECTION
@@ -815,7 +848,7 @@ class EmbroideryInvoiceGenerator {
                     }
                 } else {
                     // Embroidery display (flat or 3D puff)
-                    specsHTML += this.generateLogoListHTML(pricingData.capLogos, alBaseRate, 'cap');
+                    specsHTML += this.generateLogoListHTML(pricingData.capLogos, alBaseRate, 'cap', logoListOpts);
                     // Show 3D puff upcharge if applicable
                     if (capEmbType === '3d-puff' && pricingData.puffUpchargePerCap > 0) {
                         specsHTML += `
@@ -829,17 +862,17 @@ class EmbroideryInvoiceGenerator {
         } else {
             // Legacy: All logos are garment logos
             specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
-            specsHTML += this.generateLogoListHTML(pricingData.logos, alBaseRate, 'garment');
+            specsHTML += this.generateLogoListHTML(pricingData.logos, alBaseRate, 'garment', logoListOpts);
         }
 
-        // Add setup fees if present
+        // Add setup fees if present. The per-logo rate is DERIVED from the charged
+        // total (never a "$100" literal) so the printed arithmetic always foots.
         if (pricingData.setupFees > 0) {
-            const digitizingCount = pricingData.setupFeesCount ||
-                (pricingData.logos ? pricingData.logos.filter(l => l.needsDigitizing).length : 0);
-            if (digitizingCount > 0) {
+            if (digitizingLogoCount > 0) {
+                const rateLabel = digitizingRate > 0 ? digitizingRate.toFixed(2).replace(/\.00$/, '') : '100';
                 specsHTML += `
                     <div style="font-size: 10px; color: #666; margin-top: 5px;">
-                        <strong>Setup Fees:</strong> ${digitizingCount} logo${digitizingCount > 1 ? 's' : ''} × $100 digitizing = $${pricingData.setupFees.toFixed(2)}
+                        <strong>Setup Fees:</strong> ${digitizingLogoCount} logo${digitizingLogoCount > 1 ? 's' : ''} × $${rateLabel} digitizing = $${pricingData.setupFees.toFixed(2)}
                     </div>
                 `;
             }
@@ -861,10 +894,19 @@ class EmbroideryInvoiceGenerator {
     }
 
     /**
-     * Generate HTML for a list of logos (used by generateEmbroiderySpecs)
+     * Generate HTML for a list of logos (used by generateEmbroiderySpecs).
+     * opts.alServiceItems = AL prices ACTUALLY charged (from the builder's priced
+     * line items); opts.digitizingRate = per-logo digitizing derived from the
+     * charged setup total. The hardcoded alBaseRate table + "$100" literals are
+     * fallback-only — they can drift from Caspio. (audit 2026-06-10)
      */
-    generateLogoListHTML(logos, alBaseRate, type = 'garment') {
+    generateLogoListHTML(logos, alBaseRate, type = 'garment', opts = {}) {
         if (!logos || logos.length === 0) return '';
+
+        const alServiceItems = Array.isArray(opts.alServiceItems) ? opts.alServiceItems : [];
+        const digitizingLabel = (opts.digitizingRate > 0)
+            ? `$${opts.digitizingRate.toFixed(2).replace(/\.00$/, '')}`
+            : '$100';
 
         let html = '';
 
@@ -914,7 +956,7 @@ class EmbroideryInvoiceGenerator {
             if (primaryLogo.needsDigitizing) {
                 html += `
                     <div style="font-size: 10px; color: #666; margin: 2px 0; margin-left: 15px;">
-                        + Digitizing: $100
+                        + Digitizing: ${digitizingLabel}
                     </div>
                 `;
             }
@@ -932,12 +974,22 @@ class EmbroideryInvoiceGenerator {
                 const stitchCount = logo.stitchCount || (type === 'cap' ? 5000 : 8000);
                 const extraStitches = Math.max(0, stitchCount - 8000);
                 const extraK = extraStitches / 1000;
-                const stitchCost = extraK * 1.25;
-                const alUnitPrice = alBaseRate + stitchCost;
                 const needsDigitizing = logo.needsDigitizing || false;
 
+                // AL per-piece price ACTUALLY charged: the logo's own priced value,
+                // else the matching AL service line item the builder passed, else
+                // (fallback only) the frozen 2026-02 garment table + $1.25/1K.
+                let alUnitPrice = Number(logo.unitPrice);
+                if (!Number.isFinite(alUnitPrice) || alUnitPrice <= 0) {
+                    const wantCap = (type === 'cap');
+                    const posLc = String(logo.position || '').trim().toLowerCase();
+                    const match = alServiceItems.find(s => s.isCap === wantCap && s.position && s.position === posLc)
+                        || alServiceItems.find(s => s.isCap === wantCap);
+                    alUnitPrice = match ? match.unitPrice : (alBaseRate + extraK * 1.25);
+                }
+
                 const stitchNote = extraStitches > 0 ? ` (+${extraK}K stitches)` : '';
-                const digitizingText = needsDigitizing ? ' [+$100 Digitizing]' : '';
+                const digitizingText = needsDigitizing ? ` [+${digitizingLabel} Digitizing]` : '';
 
                 html += `
                     <div style="font-size: 11px; color: #333; margin: 4px 0;">
