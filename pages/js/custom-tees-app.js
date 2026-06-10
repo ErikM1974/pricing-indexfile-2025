@@ -488,9 +488,15 @@
                 colorName: (r && r.COLOR_NAME) || c.colorName,
                 swatchImage: (r && r.COLOR_SQUARE_IMAGE) || c.swatchImage,
                 images: r ? {
-                    flatFront: r.FRONT_FLAT || r.PRODUCT_IMAGE || r.FRONT_MODEL || '',
-                    flatBack: r.BACK_FLAT || r.BACK_MODEL || '',
-                    frontModel: r.FRONT_MODEL || '',
+                    // flatFront = TRUE flats only. PRODUCT_IMAGE is the style-level
+                    // catalog shot — usually a MODEL photo and ALWAYS the default
+                    // color, so using it as a flat fallback put the print box on a
+                    // person (PC61LS) and could show the wrong garment color. Model
+                    // shots route through frontModel, where the designer's silhouette
+                    // auto-fit applies model anchors. (Erik feedback 2026-06-10)
+                    flatFront: r.FRONT_FLAT || '',
+                    flatBack: r.BACK_FLAT || '',
+                    frontModel: r.FRONT_MODEL || r.PRODUCT_IMAGE || '',
                     backModel: r.BACK_MODEL || '',
                 } : {},
             };
