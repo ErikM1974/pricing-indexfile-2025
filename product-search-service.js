@@ -11,10 +11,11 @@ class ProductSearchService {
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         this.requestCache = new Map(); // Prevent duplicate concurrent requests
 
-        // Price calculation constants
-        // 43% margin (2026) - synced with API Pricing_Tiers.MarginDenominator
-        this.MARGIN = 0.57;
-        this.FIXED_ADDITION = 15.00;
+        // Display-price margin comes from Caspio (Pricing_Tiers via /api/pricing-bundle?method=BLANK).
+        // No hardcoded fallback — if the margin can't load, products show "QUOTE" instead of a wrong price.
+        this.MARGIN = null;
+        this._marginPromise = null;
+        this.FIXED_ADDITION = 15.00; // estimated basic-embroidery adder for display prices
 
         // Smart search - Brand name detection dictionary
         this.BRAND_KEYWORDS = {
@@ -188,10 +189,37 @@ class ProductSearchService {
     }
 
     /**
+     * Load the display-price margin denominator from Caspio (cached for the page life).
+     * Resolves to a number or null — never throws; a null margin renders "QUOTE".
+     */
+    async ensureMargin() {
+        if (this.MARGIN) return this.MARGIN;
+        if (!this._marginPromise) {
+            this._marginPromise = (async () => {
+                try {
+                    const response = await fetch(`${this.baseURL}/pricing-bundle?method=BLANK&styleNumber=PC54`);
+                    if (!response.ok) throw new Error(`pricing-bundle ${response.status}`);
+                    const bundle = await response.json();
+                    const margin = parseFloat(bundle?.tiersR?.[0]?.MarginDenominator);
+                    if (!margin || margin <= 0) throw new Error('missing MarginDenominator');
+                    this.MARGIN = margin;
+                    return margin;
+                } catch (error) {
+                    console.warn('[ProductSearch] Display margin unavailable — prices will show QUOTE:', error.message);
+                    this._marginPromise = null; // allow retry on next search
+                    return null;
+                }
+            })();
+        }
+        return this._marginPromise;
+    }
+
+    /**
      * Perform the actual API search
      */
     async performSearch(params) {
         try {
+            await this.ensureMargin();
             // Default parameters - increased to 48 for better initial display
             // Omit status to let backend default to 'Active' (hides Discontinued)
             const defaultParams = {
@@ -237,12 +265,12 @@ class ProductSearchService {
             // Calculate display price using the formula
             let displayPrice = null;
             
-            if (product.pricing) {
+            if (product.pricing && this.MARGIN) {
                 // Use the current price if available
                 const basePrice = product.pricing.current || product.pricing.minPrice;
-                
+
                 if (basePrice && basePrice > 0) {
-                    // Apply formula: (price / 0.60) + 15
+                    // (blank cost / Caspio margin denominator) + embroidery-estimate adder
                     displayPrice = (basePrice / this.MARGIN) + this.FIXED_ADDITION;
                 }
             }
