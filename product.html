@@ -22,7 +22,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.4">
-    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.06.11.7">
+    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.06.11.9">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -217,19 +217,47 @@
                 </div>
             </section>
 
-            <!-- Decoration pricing -->
+            <!-- Decoration pricing — 3-question configurator -->
             <section class="pdp-section" aria-labelledby="pricingHeading">
                 <div class="wrap">
                     <h2 id="pricingHeading">Decoration pricing</h2>
-                    <p class="pdp-panel-note">Per-piece price <strong>includes the garment and decoration</strong>, by order quantity. Live from our pricing system — final quote confirmed by a real person.</p>
-                    <div class="pdp-qty-row">
-                        <label for="qtyInput">How many do you need?</label>
-                        <input type="number" id="qtyInput" inputmode="numeric" min="1" max="9999" step="1" value="24">
-                        <span class="pdp-qty-hint">We highlight the price tier your quantity lands in.</span>
-                    </div>
+                    <p class="pdp-panel-note">Three quick questions, one live price — it <strong>includes the garment and decoration</strong>, straight from our pricing system.</p>
                     <div id="methodAlert" aria-live="polite"></div>
-                    <div class="pdp-tablist" id="methodTabs" role="tablist" aria-label="Decoration methods"></div>
-                    <div id="methodPanels"></div>
+                    <div class="pdp-cfg" id="pdpConfigurator" hidden>
+                        <div class="pdp-cfg-q">
+                            <h3 class="pdp-cfg-q-title"><span class="pdp-cfg-q-num" aria-hidden="true">1</span> How many do you need?</h3>
+                            <div class="pdp-cfg-stepper">
+                                <button class="pdp-cfg-step" id="cfgQtyMinus" type="button" aria-label="6 fewer">&minus;</button>
+                                <input type="number" id="cfgQtyInput" inputmode="numeric" min="1" max="9999" step="1" value="24" aria-label="Quantity">
+                                <button class="pdp-cfg-step" id="cfgQtyPlus" type="button" aria-label="6 more">+</button>
+                            </div>
+                            <span class="pdp-cfg-hint">Bigger runs unlock lower per-piece prices.</span>
+                        </div>
+                        <div class="pdp-cfg-q">
+                            <h3 class="pdp-cfg-q-title"><span class="pdp-cfg-q-num" aria-hidden="true">2</span> Where does your design go?</h3>
+                            <div class="pdp-cfg-chiprow" id="cfgLocations"></div>
+                            <div class="pdp-cfg-ink" id="cfgInkRow" hidden>
+                                <label for="cfgInkInput">Ink colors in your design</label>
+                                <div class="pdp-cfg-stepper pdp-cfg-stepper-sm">
+                                    <button class="pdp-cfg-step" id="cfgInkMinus" type="button" aria-label="One fewer ink color">&minus;</button>
+                                    <input type="number" id="cfgInkInput" inputmode="numeric" min="1" max="4" step="1" value="1" aria-label="Ink colors">
+                                    <button class="pdp-cfg-step" id="cfgInkPlus" type="button" aria-label="One more ink color">+</button>
+                                </div>
+                                <span class="pdp-cfg-hint">Screen print only — counts for the front and back.</span>
+                            </div>
+                        </div>
+                        <div class="pdp-cfg-q">
+                            <h3 class="pdp-cfg-q-title"><span class="pdp-cfg-q-num" aria-hidden="true">3</span> Pick a look</h3>
+                            <div id="cfgAlert" aria-live="polite"></div>
+                            <div class="pdp-cfg-methods" id="cfgMethods"></div>
+                        </div>
+                        <div class="pdp-cfg-total" id="cfgTotal" aria-live="polite"></div>
+                        <div class="pdp-cfg-expand">
+                            <button class="pdp-cfg-expand-btn" id="cfgMatrixToggle" type="button" aria-expanded="false" aria-controls="cfgMatrix">See every quantity price &#9662;</button>
+                            <div class="pdp-cfg-matrix" id="cfgMatrix" hidden></div>
+                        </div>
+                        <p class="pdp-cfg-teaser">Sleeves, names, or something special? Add it when you request your quote — your rep prices it on the proof.</p>
+                    </div>
                 </div>
             </section>
 
@@ -312,6 +340,11 @@
     <script src="/shared_components/js/dtg-pricing-service.js?v=2026.06.11.4" defer></script>
     <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.06.11.8" defer></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.11.4" defer></script>
-    <script src="/product/js/product-2026.js?v=2026.06.11.7" defer></script>
+    <!-- Quote-cart engine + its staff authorities (EMB calculator class, DTF location config) -->
+    <script src="/shared_components/js/embroidery-quote-pricing.js?v=2026.06.11.8" defer></script>
+    <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.11.8" defer></script>
+    <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.11.8" defer></script>
+    <script src="/product/js/pdp-configurator.js?v=2026.06.11.9" defer></script>
+    <script src="/product/js/product-2026.js?v=2026.06.11.9" defer></script>
 </body>
 </html>

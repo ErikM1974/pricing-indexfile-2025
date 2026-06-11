@@ -65,6 +65,26 @@ export class ProductInfo {
         `;
     }
 
+    /**
+     * Display-price margin denominator from Caspio (Pricing_Tiers via pricing-bundle).
+     * Returns a number or null — no hardcoded fallback (null renders "Call for pricing").
+     */
+    async fetchDisplayMargin() {
+        if (this._displayMargin) return this._displayMargin;
+        try {
+            const response = await fetch(`${this.api.caspioUrl}/pricing-bundle?method=BLANK&styleNumber=PC54`);
+            if (!response.ok) throw new Error(`pricing-bundle ${response.status}`);
+            const bundle = await response.json();
+            const margin = parseFloat(bundle?.tiersR?.[0]?.MarginDenominator);
+            if (!margin || margin <= 0) throw new Error('missing MarginDenominator');
+            this._displayMargin = margin;
+            return margin;
+        } catch (error) {
+            console.error('[ProductInfo] Display margin unavailable:', error.message);
+            return null;
+        }
+    }
+
     async calculateAndDisplayPrice(styleNumber) {
         try {
             console.log('Fetching base costs for:', styleNumber);
@@ -85,9 +105,15 @@ export class ProductInfo {
                 console.log('All costs:', costs);
                 const lowestCost = Math.min(...costs);
                 console.log('Lowest cost:', lowestCost);
-                
-                // Calculate price with 43% margin (2026) - synced with API MarginDenominator
-                const priceWithMargin = lowestCost / 0.57;
+
+                // Margin denominator from Caspio (Pricing_Tiers via pricing-bundle) — never hardcoded.
+                const marginDenominator = await this.fetchDisplayMargin();
+                if (!marginDenominator) {
+                    const priceElement = document.getElementById('estimated-price');
+                    if (priceElement) priceElement.textContent = 'Call for pricing';
+                    return;
+                }
+                const priceWithMargin = lowestCost / marginDenominator;
                 console.log('Price with margin:', priceWithMargin);
                 
                 // Add $15 for basic logo embroidery

@@ -6,15 +6,16 @@
  *   - /api/product-details?styleNumber=X   product info, per-color images + swatches
  *   - /api/sanmar/inventory/:style         live warehouse stock (CATALOG_COLOR keyed)
  *   - /api/products/search?category=...    related products
- *   - Decoration pricing via the SAME shared pricing services the
- *     calculators / quote builders use (formula source of truth):
- *       EmbroideryPricingService, CapEmbroideryPricingService,
- *       DTGPricingService, ScreenPrintPricingService, DTFPricingService
+ *   - Decoration pricing via the 3-question CONFIGURATOR
+ *     (product/js/pdp-configurator.js), powered by QuoteCartEngine —
+ *     the same authorities the staff quote builders use. This page owns
+ *     product/gallery/inventory/related/CTAs; the configurator owns
+ *     qty/placement/method selection and all price rendering.
  *   - Decoration METHOD ELIGIBILITY via shared DecorationMethods module
- *     (/api/decoration-methods): only producible tabs render; DTG cotton
- *     gate ('warn' → inline blend note, 'no' → tab absent); rules
- *     unavailable → embroidery-only tabs + visible alert-warn (methodAlert).
- *     Caps branch unchanged.
+ *     (/api/decoration-methods): only producible method chips render; DTG
+ *     cotton gate ('warn' → blend note on the chip, 'no' → chip absent);
+ *     rules unavailable → embroidery-only chip + visible alert-warn
+ *     (methodAlert). Caps branch: cap placements + cap-embroidery pricing.
  *
  * URL contract (preserved from the legacy /product app):
  *   ?style= | ?StyleNumber=    style number (required)
@@ -50,11 +51,7 @@
         view: 'front_model',
         isCap: false,
         inventoryRows: null, // raw rows from /api/sanmar/inventory (all colors)
-        qty: 24,
-        decoration: null,   // DecorationMethods.eligibleFor() result (garments only)
-        methods: [],        // [{ id, label, loader }]
-        panels: {},         // id -> { status: idle|loading|ready|error, data }
-        activeTab: null
+        decoration: null    // DecorationMethods.eligibleFor() result (garments only)
     };
 
     // ============================================================
@@ -70,12 +67,6 @@
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#39;');
-    }
-
-    function formatPrice(value) {
-        const n = Number(value);
-        if (value == null || isNaN(n)) return '—';
-        return '$' + n.toFixed(2);
     }
 
     function num(v) {
@@ -94,24 +85,6 @@
 
     function normColor(s) {
         return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
-    }
-
-    /** "24-47" → {min:24,max:47} · "72+" → {min:72,max:Infinity} */
-    function parseRange(label) {
-        const m = String(label || '').match(/^(\d+)\s*-\s*(\d+)/);
-        if (m) return { min: parseInt(m[1], 10), max: parseInt(m[2], 10) };
-        const p = String(label || '').match(/^(\d+)\s*\+/);
-        if (p) return { min: parseInt(p[1], 10), max: Infinity };
-        return { min: 0, max: Infinity };
-    }
-
-    /** Standard display size: S, else OSFA, else first — mirrors the pricing services. */
-    function pickStdSize(sizes) {
-        const list = (sizes || []).filter(Boolean);
-        return list.find(function (s) { return String(s).toUpperCase() === 'S'; })
-            || list.find(function (s) { return String(s).toUpperCase() === 'OSFA'; })
-            || list[0]
-            || null;
     }
 
     function sizeSortKey(size, idx) {
@@ -424,6 +397,10 @@
         renderInventory();
         updateCtas();
 
+        // EMB prices per color (/api/size-pricing matched on COLOR_NAME) —
+        // the configurator re-prices on swatch change.
+        if (window.PdpConfigurator) window.PdpConfigurator.setColor();
+
         // URL keeps the display COLOR_NAME (today's contract with homepage/catalog links)
         const url = new URL(window.location.href);
         url.searchParams.set('style', state.style);
@@ -501,7 +478,8 @@
     }
 
     // ============================================================
-    // DECORATION PRICING TABS
+    // DECORATION PRICING — 3-question configurator
+    // (qty → placement → priced method chips, product/js/pdp-configurator.js)
     // ============================================================
     /**
      * Garment eligibility via the shared DecorationMethods module.
@@ -526,24 +504,35 @@
         return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' };
     }
 
-    async function buildMethods() {
-        state.decoration = null;
-        if (state.isCap) {
-            // Caps branch unchanged — cap embroidery tab as-is
-            state.methods = [
-                { id: 'capemb', label: 'Embroidery', loader: loadCapEmb }
-            ];
-        } else {
-            const elig = await getEligibility();
-            state.decoration = elig;
-            state.methods = [
-                { id: 'emb', label: 'Embroidery', loader: loadEmb, on: elig.EMB },
-                { id: 'dtg', label: 'DTG Print', loader: loadDtg, on: elig.DTG !== 'no' },
-                { id: 'scp', label: 'Screen Print', loader: loadScp, on: elig.SCP },
-                { id: 'dtf', label: 'DTF Transfer', loader: loadDtf, on: elig.DTF }
-            ].filter(function (m) { return m.on; });
+    /**
+     * Resolve eligibility, then hand pricing entirely to the configurator.
+     * Eligibility gating decides which method chips render; the configurator
+     * + QuoteCartEngine own every price (never computed in page code).
+     */
+    async function initConfigurator() {
+        state.decoration = state.isCap ? null : await getEligibility();
+        renderMethodAlert();
+
+        if (!window.PdpConfigurator) {
+            // Script failed to load — visible failure, never a silent dead section
+            console.error('[product-2026] PdpConfigurator module missing');
+            $('methodAlert').innerHTML = alertHtml('error', 'Unable to load live pricing',
+                'The pricing tool didn\'t load. Please refresh, or call 253-922-5793 for a quote — we never guess at prices.');
+            return;
         }
-        state.methods.forEach(function (m) { state.panels[m.id] = { status: 'idle', data: null }; });
+
+        window.PdpConfigurator.init({
+            style: state.style,
+            isCap: state.isCap,
+            productName: state.product.name || state.style,
+            eligibility: state.decoration,
+            getColor: function () {
+                return state.selected
+                    ? { name: state.selected.name, catalog: state.selected.catalog }
+                    : null;
+            },
+            onChange: updateCtas
+        });
     }
 
     /** Visible warning whenever eligibility fell back to the safe set. */
@@ -558,328 +547,44 @@
         }
     }
 
-    function renderTabs() {
-        const tablist = $('methodTabs');
-        const panels = $('methodPanels');
-
-        if (state.methods.length === 0) {
-            // Shouldn't happen (eligibility fallback is embroidery-only), but
-            // never dead-end — route to a human instead of an empty section.
-            tablist.innerHTML = '';
-            panels.innerHTML = '<div class="empty-state">'
-                + '<div class="empty-state-icon" aria-hidden="true">🧵</div>'
-                + '<h3 class="empty-state-title">Let\'s price this one personally</h3>'
-                + '<p class="empty-state-sub">This garment needs a quick human look to pick the right decoration method — it takes a minute.</p>'
-                + '<a class="btn btn-primary" href="tel:253-922-5793">Call 253-922-5793</a> '
-                + '<a class="btn btn-ghost" href="mailto:' + SALES_EMAIL + '?subject='
-                + encodeURIComponent('Quote request — ' + state.style) + '">Email for a quote</a>'
-                + '</div>';
-            return;
-        }
-
-        tablist.innerHTML = state.methods.map(function (m, i) {
-            return '<button class="pdp-tab" type="button" role="tab" id="tab-' + m.id + '"'
-                + ' aria-controls="panel-' + m.id + '"'
-                + ' aria-selected="' + (i === 0 ? 'true' : 'false') + '"'
-                + ' tabindex="' + (i === 0 ? '0' : '-1') + '">'
-                + escapeHtml(m.label) + '</button>';
-        }).join('');
-
-        panels.innerHTML = state.methods.map(function (m, i) {
-            return '<div class="pdp-panel" role="tabpanel" id="panel-' + m.id + '"'
-                + ' aria-labelledby="tab-' + m.id + '"' + (i === 0 ? '' : ' hidden') + '></div>';
-        }).join('');
-
-        const tabs = Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]'));
-        tabs.forEach(function (tab, i) {
-            tab.addEventListener('click', function () { selectTab(state.methods[i].id); });
-        });
-        // ARIA tabs pattern: roving tabindex + arrow keys (selection follows focus)
-        tablist.addEventListener('keydown', function (e) {
-            const idx = state.methods.findIndex(function (m) { return m.id === state.activeTab; });
-            let next = -1;
-            if (e.key === 'ArrowRight') next = (idx + 1) % state.methods.length;
-            else if (e.key === 'ArrowLeft') next = (idx - 1 + state.methods.length) % state.methods.length;
-            else if (e.key === 'Home') next = 0;
-            else if (e.key === 'End') next = state.methods.length - 1;
-            if (next === -1) return;
-            e.preventDefault();
-            selectTab(state.methods[next].id);
-            $('tab-' + state.methods[next].id).focus();
-        });
-
-        selectTab(state.methods[0].id);
-    }
-
-    function selectTab(id) {
-        state.activeTab = id;
-        state.methods.forEach(function (m) {
-            const tab = $('tab-' + m.id);
-            const panel = $('panel-' + m.id);
-            const on = m.id === id;
-            tab.setAttribute('aria-selected', on ? 'true' : 'false');
-            tab.tabIndex = on ? 0 : -1;
-            panel.hidden = !on;
-        });
-        updateCtas();
-        if (state.panels[id].status === 'idle') loadMethod(id); // lazy: fetch on first open
-    }
-
-    async function loadMethod(id) {
-        const method = state.methods.find(function (m) { return m.id === id; });
-        const panel = $('panel-' + id);
-        state.panels[id].status = 'loading';
-        panel.setAttribute('aria-busy', 'true');
-        panel.innerHTML = '<div class="skeleton skeleton-title"></div><div class="skeleton skeleton-block"></div>';
-        try {
-            const data = await method.loader(state.style);
-            state.panels[id] = { status: 'ready', data: data };
-            renderPanel(id);
-        } catch (err) {
-            console.error('[product-2026] Pricing load failed for ' + id + ':', err);
-            state.panels[id] = { status: 'error', data: null };
-            // Visible failure, never a stale/hardcoded fallback (Erik's #1 rule)
-            panel.innerHTML = alertHtml('error', 'Unable to load ' + method.label + ' pricing',
-                'Live pricing is unavailable right now. Please retry, or call 253-922-5793 for a quote — we never guess at prices.')
-                + '<button class="btn btn-primary" type="button" data-retry="' + id + '">Retry</button>';
-            const retry = panel.querySelector('[data-retry]');
-            if (retry) retry.addEventListener('click', function () { loadMethod(id); });
-        } finally {
-            panel.removeAttribute('aria-busy');
-        }
-    }
-
-    /**
-     * Normalized tier model every loader returns:
-     *   { note, foot, warn?, stdSize, multiSize, tiers: [{label, min, max, price, ltmFee}] }
-     * `warn` (optional) renders as an inline alert-warn above the table
-     * (used by the DTG cotton gate's blend case).
-     */
-    function renderPanel(id) {
-        const panel = $('panel-' + id);
-        const d = state.panels[id].data;
-        const showFeeRow = d.tiers.some(function (t) { return t.ltmFee > 0; });
-
-        const head = d.tiers.map(function (t) {
-            return '<th data-min="' + t.min + '" data-max="' + (t.max === Infinity ? '' : t.max) + '">'
-                + escapeHtml(t.label) + '</th>';
-        }).join('');
-        const priceRow = d.tiers.map(function (t) {
-            return '<td>' + formatPrice(t.price) + '</td>';
-        }).join('');
-        const feeRow = showFeeRow ? '<tr><td>Small-order fee</td>' + d.tiers.map(function (t) {
-            return '<td>' + (t.ltmFee > 0 ? '+' + formatPrice(t.ltmFee) + ' per order' : '—') + '</td>';
-        }).join('') + '</tr>' : '';
-
-        panel.innerHTML =
-            (d.warn ? alertHtml('warn', 'Cotton-blend garment', d.warn) : '')
-            + '<p class="pdp-panel-note">' + escapeHtml(d.note) + '</p>'
-            + '<div class="table-wrap"><table class="data-table tier-table">'
-            + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
-            + '<tbody><tr><td>Price per piece</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
-            + '</table></div>'
-            + '<p class="pdp-panel-foot">'
-            + (d.multiSize ? 'Prices shown for size ' + escapeHtml(d.stdSize) + ' — extended sizes carry a small upcharge. ' : '')
-            + escapeHtml(d.foot || '')
-            + ' Final pricing is confirmed in your quote.</p>';
-
-        highlightTier(panel);
-    }
-
-    function highlightTier(panel) {
-        const table = panel.querySelector('table');
-        if (!table) return;
-        const ths = Array.prototype.slice.call(table.querySelectorAll('thead th'));
-        let activeCol = -1;
-        ths.forEach(function (th, col) {
-            if (!th.hasAttribute('data-min')) return;
-            const min = parseInt(th.getAttribute('data-min'), 10);
-            const maxAttr = th.getAttribute('data-max');
-            const max = maxAttr === '' ? Infinity : parseInt(maxAttr, 10);
-            if (state.qty >= min && state.qty <= max) activeCol = col;
-        });
-        ths.forEach(function (th, col) { th.classList.toggle('is-active-tier', col === activeCol); });
-        Array.prototype.forEach.call(table.querySelectorAll('tbody tr'), function (tr) {
-            Array.prototype.forEach.call(tr.children, function (td, col) {
-                td.classList.toggle('is-active-tier', col === activeCol);
-            });
-        });
-    }
-
-    function rehighlightAll() {
-        state.methods.forEach(function (m) {
-            if (state.panels[m.id].status === 'ready') highlightTier($('panel-' + m.id));
-        });
-    }
-
-    // ── Method loaders — each mirrors its calculator's shared service ──
-
-    /** Flat embroidery: EmbroideryPricingService (bundle.pricing[tier][size], CeilDollar, 8K stitches). */
-    async function loadEmb(style) {
-        if (typeof EmbroideryPricingService === 'undefined') throw new Error('EmbroideryPricingService not loaded');
-        const svc = new EmbroideryPricingService();
-        const b = await svc.fetchPricingData(style);
-        if (!b || !b.pricing) throw new Error('Empty embroidery pricing bundle');
-        const std = pickStdSize(b.uniqueSizes);
-        const tiers = (b.tierData || []).slice()
-            .sort(function (a, z) { return num(a.MinQuantity) - num(z.MinQuantity); })
-            .map(function (t) {
-                return {
-                    label: t.TierLabel,
-                    min: num(t.MinQuantity) || parseRange(t.TierLabel).min,
-                    max: t.MaxQuantity != null && num(t.MaxQuantity) > 0 ? num(t.MaxQuantity) : parseRange(t.TierLabel).max,
-                    price: b.pricing[t.TierLabel] ? b.pricing[t.TierLabel][std] : null,
-                    ltmFee: num(t.LTM_Fee)
-                };
-            });
-        if (tiers.length === 0) throw new Error('No embroidery tiers returned');
-        return {
-            note: 'Includes an embroidered logo up to 8,000 stitches in one location (left chest, sleeve, or back yoke).',
-            foot: 'Larger logos and extra locations are quoted per design.',
-            stdSize: std,
-            multiSize: (b.uniqueSizes || []).length > 1,
-            tiers: tiers
-        };
-    }
-
-    /** Cap embroidery: CapEmbroideryPricingService (8K-stitch front logo, CeilDollar, cap tiers). */
-    async function loadCapEmb(style) {
-        if (typeof CapEmbroideryPricingService === 'undefined') throw new Error('CapEmbroideryPricingService not loaded');
-        const svc = new CapEmbroideryPricingService();
-        const b = await svc.fetchPricingData(style);
-        if (!b || !b.pricing) throw new Error('Empty cap pricing bundle');
-        const std = pickStdSize(b.uniqueSizes);
-        const tiers = (b.tierData || []).slice()
-            .sort(function (a, z) { return num(a.MinQuantity) - num(z.MinQuantity); })
-            .map(function (t) {
-                return {
-                    label: t.TierLabel,
-                    min: num(t.MinQuantity) || parseRange(t.TierLabel).min,
-                    max: t.MaxQuantity != null && num(t.MaxQuantity) > 0 ? num(t.MaxQuantity) : parseRange(t.TierLabel).max,
-                    price: b.pricing[t.TierLabel] ? b.pricing[t.TierLabel][std] : null,
-                    ltmFee: num(t.LTM_Fee)
-                };
-            });
-        if (tiers.length === 0) throw new Error('No cap tiers returned');
-        return {
-            note: 'Includes an embroidered front logo up to 8,000 stitches.',
-            foot: 'Side and back logos are quoted per design.',
-            stdSize: std,
-            multiSize: (b.uniqueSizes || []).length > 1,
-            tiers: tiers
-        };
-    }
-
-    /** DTG: DTGPricingService.calculateAllTierPricesForLocation(data,'LC') — half-dollar-ceil, LTM 1-23. */
-    async function loadDtg(style) {
-        if (typeof DTGPricingService === 'undefined') throw new Error('DTGPricingService not loaded');
-        const svc = new DTGPricingService();
-        const data = await svc.fetchPricingData(style);
-        if (!data || !data.sizes || data.sizes.length === 0) throw new Error('Empty DTG pricing bundle');
-        const rows = svc.calculateAllTierPricesForLocation(data, 'LC');
-        if (!rows || rows.length === 0) throw new Error('No DTG tiers returned');
-        const std = pickStdSize(data.sizes.map(function (s) { return s.size; }));
-        const tiers = rows.map(function (r) {
-            const range = parseRange(r.label);
-            return {
-                label: r.label,
-                min: range.min,
-                max: range.max,
-                price: r.basePrices ? r.basePrices[std] : null,
-                ltmFee: num(r.ltmFee)
-            };
-        });
-        return {
-            note: 'Includes a full-color DTG print, left-chest size. Photo-quality, no color limits.',
-            warn: state.decoration && state.decoration.DTG === 'warn'
-                ? 'DTG prints best on 100% cotton — this blend prints with a softer, vintage look. We confirm on your proof.'
-                : '',
-            foot: 'Full-front, full-back, and combo placements are priced in your quote. DTG color availability is confirmed on your proof.',
-            stdSize: std,
-            multiSize: data.sizes.length > 1,
-            tiers: tiers
-        };
-    }
-
-    /** Screen print: ScreenPrintPricingService.finalPrices.PrimaryLocation[tier][colors][size]. */
-    async function loadScp(style) {
-        if (typeof ScreenPrintPricingService === 'undefined') throw new Error('ScreenPrintPricingService not loaded');
-        const svc = new ScreenPrintPricingService();
-        const b = await svc.fetchPricingData(style);
-        if (!b || !b.finalPrices || !b.finalPrices.PrimaryLocation) throw new Error('Empty screen print bundle');
-        const std = pickStdSize(b.uniqueSizes);
-        const counts = (b.availableColorCounts || []).slice().sort(function (a, z) { return a - z; });
-        const cc = String(counts[0] != null ? counts[0] : 1);
-        const tiers = Object.keys(b.tierData || {})
-            .map(function (label) { return b.tierData[label]; })
-            .sort(function (a, z) { return num(a.MinQuantity) - num(z.MinQuantity); })
-            .map(function (t) {
-                const cell = b.finalPrices.PrimaryLocation[t.TierLabel];
-                return {
-                    label: t.TierLabel,
-                    min: num(t.MinQuantity) || parseRange(t.TierLabel).min,
-                    max: t.MaxQuantity != null && num(t.MaxQuantity) > 0 ? num(t.MaxQuantity) : parseRange(t.TierLabel).max,
-                    price: cell && cell[cc] ? cell[cc][std] : null,
-                    ltmFee: num(t.LTM_Fee)
-                };
-            });
-        if (tiers.length === 0) throw new Error('No screen print tiers returned');
-        const setup = num(b.screenSetupFeePerScreen);
-        return {
-            note: 'Includes a ' + cc + '-color front print. The classic choice for bigger runs.',
-            foot: 'Plus a one-time screen setup of ' + formatPrice(setup) + ' per color. More colors and locations are quoted per design.',
-            stdSize: std,
-            multiSize: (b.uniqueSizes || []).length > 1,
-            tiers: tiers
-        };
-    }
-
-    /** DTF: DTFPricingService.calculateAllTierPrices(garmentCost, data, 'small') — garment cost from
-     *  the bundle's own sizes (S or first by sortOrder), matching the services' standard-garment rule. */
-    async function loadDtf(style) {
-        if (typeof DTFPricingService === 'undefined') throw new Error('DTFPricingService not loaded');
-        const svc = new DTFPricingService();
-        const data = await svc.fetchPricingData(style);
-        const rawSizes = (data && data.raw && data.raw.sizes) || [];
-        if (rawSizes.length === 0) throw new Error('DTF bundle missing garment sizes');
-        const sorted = rawSizes.slice().sort(function (a, z) {
-            return (a.sortOrder || Infinity) - (z.sortOrder || Infinity);
-        });
-        const stdEntry = sorted.find(function (s) { return String(s.size).toUpperCase() === 'S'; }) || sorted[0];
-        const garmentCost = num(stdEntry.price);
-        if (!(garmentCost > 0)) throw new Error('DTF bundle missing garment cost');
-        const sizeName = (data.transferSizes && data.transferSizes.small && data.transferSizes.small.name) || 'small';
-        const rows = svc.calculateAllTierPrices(garmentCost, data, 'small');
-        if (!rows || rows.length === 0) throw new Error('No DTF tiers returned');
-        const tiers = rows.map(function (r) {
-            const range = parseRange(r.label);
-            return { label: r.label, min: range.min, max: range.max, price: r.basePrice, ltmFee: num(r.ltmFee) };
-        });
-        return {
-            note: 'Includes a full-color DTF transfer (' + sizeName + ' — left-chest size) pressed in one location. Great on blends and dark garments.',
-            foot: 'Larger transfers and extra locations are quoted per design.',
-            stdSize: stdEntry.size,
-            multiSize: rawSizes.length > 1,
-            tiers: tiers
-        };
-    }
-
     // ============================================================
-    // CTAs (quote mailto / sample link) — kept in sync with selections
+    // CTAs (quote mailto / sample link) — kept in sync with the
+    // configurator selection (style/color/qty/placement/method/price)
     // ============================================================
     function updateCtas() {
         const name = state.product ? (state.product.name || state.style) : state.style;
-        const method = state.methods.find(function (m) { return m.id === state.activeTab; });
+        const sel = (window.PdpConfigurator && window.PdpConfigurator.getSelection)
+            ? window.PdpConfigurator.getSelection()
+            : null;
+
         const subject = 'Quote request — ' + state.style + ' ' + name;
-        const body = 'Hi NWCA,\n\nI\'d like a quote for:\n\n'
-            + 'Style: ' + state.style + ' — ' + name + '\n'
-            + 'Color: ' + (state.selected ? state.selected.name : '') + '\n'
-            + 'Quantity: ' + state.qty + '\n'
-            + 'Decoration: ' + (method ? method.label : '') + '\n\n'
-            + 'My name:\nCompany:\nPhone:\n';
+        const lines = [
+            'Hi NWCA,',
+            '',
+            'I\'d like a quote for:',
+            '',
+            'Style: ' + state.style + ' — ' + name,
+            'Color: ' + (state.selected ? state.selected.name : '')
+        ];
+        if (sel) {
+            lines.push('Quantity: ' + sel.qty);
+            lines.push('Placement: ' + sel.locationLabel);
+            lines.push('Method: ' + sel.methodLabel);
+            if (sel.inkColors != null) lines.push('Ink colors: ' + sel.inkColors);
+            if (sel.price) {
+                // Live engine price only — never an estimated/guessed number
+                lines.push('Online price: $' + sel.price.total.toFixed(2) + ' total — $'
+                    + sel.price.perPiece.toFixed(2) + '/pc (' + (sel.price.tierLabel || '') + ' tier)');
+                (sel.price.oneTimeFees || []).forEach(function (f) {
+                    lines.push('+ One-time ' + f.label + ': $' + Number(f.amount).toFixed(2));
+                });
+            }
+        }
+        lines.push('', 'My name:', 'Company:', 'Phone:', '');
+
         const href = 'mailto:' + SALES_EMAIL
             + '?subject=' + encodeURIComponent(subject)
-            + '&body=' + encodeURIComponent(body);
+            + '&body=' + encodeURIComponent(lines.join('\n'));
         $('ctaQuote').href = href;
         $('ctaQuoteMobile').href = href;
 
@@ -887,18 +592,6 @@
         const sample = '/pages/top-sellers-product.html?style=' + encodeURIComponent(state.style) + '&mode=sample';
         $('ctaSample').href = sample;
         $('ctaSampleMobile').href = sample;
-    }
-
-    function wireQty() {
-        const input = $('qtyInput');
-        input.addEventListener('input', function () {
-            const v = parseInt(input.value, 10);
-            if (!isNaN(v) && v > 0) {
-                state.qty = v;
-                rehighlightAll();
-                updateCtas();
-            }
-        });
     }
 
     // ============================================================
@@ -1029,26 +722,23 @@
         updateCtas();
 
         // Skeleton in the pricing section while eligibility rules load
-        $('methodAlert').innerHTML = '';
-        $('methodTabs').innerHTML = '';
-        $('methodPanels').innerHTML = '<div class="skeleton skeleton-block" aria-hidden="true"></div>';
+        $('methodAlert').innerHTML = '<div class="skeleton skeleton-block" aria-hidden="true"></div>';
+        $('pdpConfigurator').hidden = true;
         showContent();
 
         // Non-blocking secondary loads
         loadInventory();
         loadRelated();
 
-        // Decoration tabs gated by eligibility (cached 1h in sessionStorage)
-        await buildMethods();
-        renderMethodAlert();
-        renderTabs();
+        // Configurator gated by eligibility (cached 1h in sessionStorage);
+        // it calls onChange → updateCtas as prices land.
+        await initConfigurator();
         updateCtas();
     }
 
     function init() {
         wireChrome();
         wireGalleryFallback();
-        wireQty();
 
         const params = getParams();
         if (!params.style) {
