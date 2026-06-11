@@ -1,3 +1,7 @@
+## v2026.06.11.1 (2026.06.11)
+
+- wip(custom-tees): order-shipped email with tracking — wired, NOT yet deployed
+
 ## v2026.06.10.14 (2026.06.10)
 
 - feat(custom-tees): webhook-side confirmation emails + customer order-status page
