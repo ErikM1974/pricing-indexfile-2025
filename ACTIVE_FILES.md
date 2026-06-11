@@ -55,7 +55,9 @@
 | `product-styles.css` | Product page styles | product.html | Move to shared_components |
 | `modern-search-interface.css` | Modern search UI styles | NONE (no HTML links it, verified 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `catalog-search.css` | Catalog search base styles (autocomplete, product cards) — skinned by nwca-2026.css | index.html | ✅ Active |
-| `/shared_components/css/nwca-2026.css` | **NEW** 2026 site-wide design system ("press-room editorial" green refresh) — tokens, masthead, mega-nav, drawer, hero, bands, footer, catalog layer, modals | index.html (more customer pages migrating per memory/CUSTOMER_SITE_REDESIGN_2026-06.md) | ✅ Active (NEW 2026-06-11) |
+| `/shared_components/css/nwca-2026-core.css` | **NEW** 2026 design system CORE — tokens/base, buttons/chips, masthead + mega-nav, drawer, footer, interior-page primitives (page header, forms, tables, alerts, toasts, badges, pager, skeletons, cards, modal base, empty state). Load FIRST on every 2026-system page. Class reference: `NWCA-2026-GUIDE.md` | index.html (+ all interior pages migrating per memory/CUSTOMER_SITE_REDESIGN_2026-06.md) | ✅ Active (NEW 2026-06-11, split from nwca-2026.css) |
+| `/shared_components/css/nwca-2026.css` | 2026 design system HOMEPAGE layer ("press-room editorial" green refresh) — hero, homepage bands, catalog results layer, quick-view/compare modals. REQUIRES nwca-2026-core.css loaded first | index.html only | ✅ Active (NEW 2026-06-11; core layers split out 2026-06-11) |
+| `/shared_components/css/NWCA-2026-GUIDE.md` | **NEW** Class reference for nwca-2026-core.css interior-page primitives (one snippet per primitive) — read this instead of the CSS when building pages | Developers building 2026-system pages | 📖 Docs (NEW 2026-06-11) |
 | `brands.css` | Brands page styles | brands.html | Move to shared_components |
 
 ## 🎯 Core Entry Points
