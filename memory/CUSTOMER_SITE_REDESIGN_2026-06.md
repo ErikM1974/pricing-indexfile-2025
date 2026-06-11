@@ -54,6 +54,10 @@
 | 10 | Hats: digitizing/setup fee | **Free setup, always** — "free logo setup" marketing; absorb ~$75 internal DD cost; no CAPS-DIGITIZE checkout line | Erik 2026-06-11 |
 | 11 | Hats: proof flow | **Digital proof first** — emailed sew-out preview approved before production; promise = "ships N days after proof approval"; needsArtReview always-on | Erik 2026-06-11 |
 | 12 | Hats: v1 cap lineup | **Claude curates 6-10** SanMar-carried OSFA best-sellers, each API-verified (pricing, inventory, images); swappable via Caspio later | Erik 2026-06-11 |
+| 13 | Hats: artist routing | **artistId 24** (EMB push default — cap orders are embroidery orders) | Claude (Erik delegated) 2026-06-11 |
+| 14 | Hats: ship promise | **Proof within 2-3 business days; ships 7-10 business days after approval** — proof gate stated honestly | Claude (delegated) 2026-06-11 |
+| 15 | Hats: email templates | **Reuse tee EmailJS templates w/ caps params** (no new dashboard surface); fork only if copy diverges | Claude (delegated) 2026-06-11 |
+| 16 | Hats: shipping threshold | **Keep $100 free-over** — 8-cap min ⇒ every order ships free; storefront markets "Free shipping, always" | Claude (delegated) 2026-06-11 |
 
 ## Phase plan (merged sequence — supersedes the three conflicting per-auditor orders)
 

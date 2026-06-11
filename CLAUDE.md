@@ -143,7 +143,7 @@ After any builder change, ask: "Does this apply to the other 3? Should this move
 ## Quick Reference
 
 - **API Proxy**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
-- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF`
+- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF · CAP` (CAP = Custom Hats storefront — read-only in Quote Mgmt, never builder-editable)
 - **Dev**: `npm start` (port 3000)
 
 ## Security Checklist
