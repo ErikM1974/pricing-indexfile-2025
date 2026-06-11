@@ -7380,6 +7380,68 @@ async function buildShipStationItems(lineItems, originalSubmission) {
   return out;
 }
 
+// ── "Your order shipped" email (Erik 2026-06-10) ───────────────────────────
+// Fires from the shipstation-tracking endpoint below — the single chokepoint
+// where tracking lands (SHIP_NOTIFY webhook AND the hourly backfill cron both
+// write through it). Storefront orders only (orderSettings.channel
+// 'custom-tees' / '3-day-tees'): rep-managed quotes keep their human touch.
+// Dedup via orderSettings.shipEmailSentAt (backfill re-running can't double-
+// send). Fail-soft like the confirmation emails — never breaks the tracking
+// write.
+function trackingLinkFor(carrier, trackingNumber, explicitUrl) {
+  if (explicitUrl) return explicitUrl;
+  const c = String(carrier || '').toLowerCase();
+  const n = encodeURIComponent(trackingNumber || '');
+  if (c.includes('ups')) return `https://www.ups.com/track?tracknum=${n}`;
+  if (c.includes('usps') || c.includes('stamps')) return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${n}`;
+  if (c.includes('fedex')) return `https://www.fedex.com/fedextrack/?trknbr=${n}`;
+  return `https://www.google.com/search?q=${n}`;
+}
+
+async function sendOrderShippedEmail(quoteSession, payload) {
+  try {
+    if (!process.env.EMAILJS_PRIVATE_KEY || !process.env.EMAILJS_PUBLIC_KEY) return;
+    if (!payload.trackingNumber) return;
+    const parse = (s) => { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } };
+    const os = parse(quoteSession.OrderSettingsJSON);
+    const channel = String(os.channel || '');
+    if (channel !== 'custom-tees' && channel !== '3-day-tees') return;
+    if (os.shipEmailSentAt) return; // already notified
+    const customerData = parse(quoteSession.CustomerDataJSON);
+    const email = customerData.email || quoteSession.CustomerEmail;
+    if (!email) return;
+
+    const statusUrl = os.statusToken ? buildOrderStatusUrl(quoteSession.QuoteID, os.statusToken) : '';
+    const carrier = payload.trackingCarrier || 'UPS';
+    const name = `${customerData.firstName || ''} ${customerData.lastName || ''}`.trim()
+      || quoteSession.CustomerName || 'there';
+    const sent = await sendEmailJSTemplate('template_order_shipped', {
+      to_email: email,
+      to_name: escapeHTMLSrv(name),
+      order_number: escapeHTMLSrv(quoteSession.QuoteID),
+      customer_name: escapeHTMLSrv(name),
+      carrier: escapeHTMLSrv(carrier.toUpperCase()),
+      tracking_number: escapeHTMLSrv(payload.trackingNumber),
+      tracking_url: trackingLinkFor(carrier, payload.trackingNumber, payload.trackingUrl),
+      order_status_url: statusUrl,
+      style_name: escapeHTMLSrv(os.styleName || ''),
+      company_phone: '253-922-5793',
+      reply_to: 'sales@nwcustomapparel.com',
+    });
+    if (!sent) return; // logged inside the helper; backfill cron will NOT retry
+                       // (no stamp) only if a later tracking write happens — fine.
+
+    // Stamp the dedup marker, preserving every existing key.
+    const merged = Object.assign({}, os, { shipEmailSentAt: new Date().toISOString() });
+    await makeApiRequest(`/quote_sessions/${quoteSession.PK_ID}`, 'PUT', {
+      OrderSettingsJSON: JSON.stringify(merged),
+    });
+    console.log(`[shipped-email] ✓ ${quoteSession.QuoteID} → ${email} (${payload.trackingNumber})`);
+  } catch (e) {
+    console.error('[shipped-email] failed (tracking write unaffected):', e.message);
+  }
+}
+
 /**
  * POST /api/quote-sessions/:quoteId/shipstation-tracking
  *
@@ -7421,6 +7483,10 @@ app.post('/api/quote-sessions/:quoteId/shipstation-tracking', async (req, res) =
 
     await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', updates);
     console.log(`[shipstation-tracking] ✓ ${safeQuoteId} → tracking ${payload.trackingNumber} (${payload.trackingCarrier})`);
+
+    // Fire-and-forget "your order shipped" email for storefront orders —
+    // never blocks or fails the tracking write.
+    sendOrderShippedEmail(sessions[0], payload);
 
     return res.json({ success: true, updated: Object.keys(updates) });
   } catch (error) {
