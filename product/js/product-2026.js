@@ -10,6 +10,11 @@
  *     calculators / quote builders use (formula source of truth):
  *       EmbroideryPricingService, CapEmbroideryPricingService,
  *       DTGPricingService, ScreenPrintPricingService, DTFPricingService
+ *   - Decoration METHOD ELIGIBILITY via shared DecorationMethods module
+ *     (/api/decoration-methods): only producible tabs render; DTG cotton
+ *     gate ('warn' → inline blend note, 'no' → tab absent); rules
+ *     unavailable → embroidery-only tabs + visible alert-warn (methodAlert).
+ *     Caps branch unchanged.
  *
  * URL contract (preserved from the legacy /product app):
  *   ?style= | ?StyleNumber=    style number (required)
@@ -46,6 +51,7 @@
         isCap: false,
         inventoryRows: null, // raw rows from /api/sanmar/inventory (all colors)
         qty: 24,
+        decoration: null,   // DecorationMethods.eligibleFor() result (garments only)
         methods: [],        // [{ id, label, loader }]
         panels: {},         // id -> { status: idle|loading|ready|error, data }
         activeTab: null
@@ -497,25 +503,79 @@
     // ============================================================
     // DECORATION PRICING TABS
     // ============================================================
-    function buildMethods() {
+    /**
+     * Garment eligibility via the shared DecorationMethods module.
+     * Failure mode = embroidery-only safe set + a visible alert-warn
+     * (renderMethodAlert) — never silently offer a method we can't produce.
+     */
+    async function getEligibility() {
+        if (window.DecorationMethods) {
+            try {
+                return await window.DecorationMethods.eligibleFor({
+                    CATEGORY_NAME: state.product.category,
+                    SUBCATEGORY_NAME: state.product.subcategory,
+                    PRODUCT_DESCRIPTION: state.product.description,
+                    styleNumber: state.style
+                });
+            } catch (err) {
+                console.error('[product-2026] Eligibility lookup failed:', err);
+            }
+        } else {
+            console.error('[product-2026] DecorationMethods module missing — embroidery-only fallback');
+        }
+        return { EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' };
+    }
+
+    async function buildMethods() {
+        state.decoration = null;
         if (state.isCap) {
+            // Caps branch unchanged — cap embroidery tab as-is
             state.methods = [
                 { id: 'capemb', label: 'Embroidery', loader: loadCapEmb }
             ];
         } else {
+            const elig = await getEligibility();
+            state.decoration = elig;
             state.methods = [
-                { id: 'emb', label: 'Embroidery', loader: loadEmb },
-                { id: 'dtg', label: 'DTG Print', loader: loadDtg },
-                { id: 'scp', label: 'Screen Print', loader: loadScp },
-                { id: 'dtf', label: 'DTF Transfer', loader: loadDtf }
-            ];
+                { id: 'emb', label: 'Embroidery', loader: loadEmb, on: elig.EMB },
+                { id: 'dtg', label: 'DTG Print', loader: loadDtg, on: elig.DTG !== 'no' },
+                { id: 'scp', label: 'Screen Print', loader: loadScp, on: elig.SCP },
+                { id: 'dtf', label: 'DTF Transfer', loader: loadDtf, on: elig.DTF }
+            ].filter(function (m) { return m.on; });
         }
         state.methods.forEach(function (m) { state.panels[m.id] = { status: 'idle', data: null }; });
+    }
+
+    /** Visible warning whenever eligibility fell back to the safe set. */
+    function renderMethodAlert() {
+        const slot = $('methodAlert');
+        if (!slot) return;
+        if (!state.isCap && state.decoration && state.decoration.source === 'fallback') {
+            slot.innerHTML = alertHtml('warn', 'Showing embroidery pricing',
+                'Other decoration options may be available for this garment — call 253-922-5793 and a real person will confirm.');
+        } else {
+            slot.innerHTML = '';
+        }
     }
 
     function renderTabs() {
         const tablist = $('methodTabs');
         const panels = $('methodPanels');
+
+        if (state.methods.length === 0) {
+            // Shouldn't happen (eligibility fallback is embroidery-only), but
+            // never dead-end — route to a human instead of an empty section.
+            tablist.innerHTML = '';
+            panels.innerHTML = '<div class="empty-state">'
+                + '<div class="empty-state-icon" aria-hidden="true">🧵</div>'
+                + '<h3 class="empty-state-title">Let\'s price this one personally</h3>'
+                + '<p class="empty-state-sub">This garment needs a quick human look to pick the right decoration method — it takes a minute.</p>'
+                + '<a class="btn btn-primary" href="tel:253-922-5793">Call 253-922-5793</a> '
+                + '<a class="btn btn-ghost" href="mailto:' + SALES_EMAIL + '?subject='
+                + encodeURIComponent('Quote request — ' + state.style) + '">Email for a quote</a>'
+                + '</div>';
+            return;
+        }
 
         tablist.innerHTML = state.methods.map(function (m, i) {
             return '<button class="pdp-tab" type="button" role="tab" id="tab-' + m.id + '"'
@@ -591,7 +651,9 @@
 
     /**
      * Normalized tier model every loader returns:
-     *   { note, foot, stdSize, multiSize, tiers: [{label, min, max, price, ltmFee}] }
+     *   { note, foot, warn?, stdSize, multiSize, tiers: [{label, min, max, price, ltmFee}] }
+     * `warn` (optional) renders as an inline alert-warn above the table
+     * (used by the DTG cotton gate's blend case).
      */
     function renderPanel(id) {
         const panel = $('panel-' + id);
@@ -610,7 +672,8 @@
         }).join('') + '</tr>' : '';
 
         panel.innerHTML =
-            '<p class="pdp-panel-note">' + escapeHtml(d.note) + '</p>'
+            (d.warn ? alertHtml('warn', 'Cotton-blend garment', d.warn) : '')
+            + '<p class="pdp-panel-note">' + escapeHtml(d.note) + '</p>'
             + '<div class="table-wrap"><table class="data-table tier-table">'
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per piece</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
@@ -728,7 +791,10 @@
         });
         return {
             note: 'Includes a full-color DTG print, left-chest size. Photo-quality, no color limits.',
-            foot: 'Full-front, full-back, and combo placements are priced in your quote.',
+            warn: state.decoration && state.decoration.DTG === 'warn'
+                ? 'DTG prints best on 100% cotton — this blend prints with a softer, vintage look. We confirm on your proof.'
+                : '',
+            foot: 'Full-front, full-back, and combo placements are priced in your quote. DTG color availability is confirmed on your proof.',
             stdSize: std,
             multiSize: data.sizes.length > 1,
             tiers: tiers
@@ -926,14 +992,23 @@
         renderGallery();
         renderSwatches();
         renderDetails();
-        buildMethods();
-        renderTabs();
         updateCtas();
+
+        // Skeleton in the pricing section while eligibility rules load
+        $('methodAlert').innerHTML = '';
+        $('methodTabs').innerHTML = '';
+        $('methodPanels').innerHTML = '<div class="skeleton skeleton-block" aria-hidden="true"></div>';
         showContent();
 
         // Non-blocking secondary loads
         loadInventory();
         loadRelated();
+
+        // Decoration tabs gated by eligibility (cached 1h in sessionStorage)
+        await buildMethods();
+        renderMethodAlert();
+        renderTabs();
+        updateCtas();
     }
 
     function init() {

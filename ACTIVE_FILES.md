@@ -66,12 +66,12 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, API-driven decoration pricing tabs | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
+| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, decoration pricing tabs gated by method eligibility | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, decoration-methods.js, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
 | `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system | nwca-2026-core.css | ✅ Active |
-| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + 5 pricing-service tab loaders, ARIA tabs, SEO/JSON-LD | EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
-| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
+| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + eligibility-gated pricing-service tab loaders (DTG cotton-gate warn note, embroidery-only fallback alert), ARIA tabs, SEO/JSON-LD | DecorationMethods + EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
+| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, decoration-methods.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
 | `/pages/css/catalog-2026.css` | Catalog page layer CSS (facet rail + mobile filter drawer, cards, autocomplete v2) | nwca-2026-core.css | ✅ Active |
-| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets, server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only) | ✅ Active |
+| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets (incl. `?method=` Decoration filter from the decoration-methods rules feed), server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only), DecorationMethods | ✅ Active |
 
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
@@ -694,6 +694,7 @@
 ### Product Search & Filtering
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/shared_components/js/decoration-methods.js` | **NEW 2026-06-11** Decoration method eligibility — fetches `/api/decoration-methods` rules+overrides (sessionStorage 1h cache), `eligibleFor(product)` → EMB/SCP/DTF bools + DTG `'yes'/'warn'/'no'` cotton gate, `categoriesFor(method)` for the catalog Decoration filter; API down → embroidery-only fallback (`source:'fallback'`, caller must show a visible warning) | APP_CONFIG (optional) | ✅ Active |
 | `/shared_components/js/product-category-filter.js` | Single source of truth for cap-vs-flat-headwear classification | — | ✅ Active |
 | `/shared_components/js/product-filters.js` | Product filter UI (size, color, brand, etc.) | — | ✅ Active |
 | `/shared_components/js/product-grid.js` | Product grid display + lazy load | — | ✅ Active |

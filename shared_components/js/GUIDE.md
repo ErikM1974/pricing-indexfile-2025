@@ -108,6 +108,7 @@
 
 | File | Purpose |
 |------|---------|
+| `decoration-methods.js` | Decoration method eligibility (NEW 2026-06-11) — `/api/decoration-methods` rules+overrides, sessionStorage 1h cache. `eligibleFor(product)` → EMB/SCP/DTF bools + DTG 'yes'/'warn'/'no' cotton gate; `categoriesFor(method)` feeds the /catalog Decoration filter. API down → embroidery-only fallback (`source:'fallback'` — caller MUST show a visible warning). Used by product.html + /catalog. |
 | `product-search.js` | Product search functionality |
 | `product-grid.js` | Product grid display |
 | `product-filters.js` | Product filtering |
