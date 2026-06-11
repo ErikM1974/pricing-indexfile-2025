@@ -60,6 +60,7 @@
 | 14 | Hats: ship promise | **Proof within 2-3 business days; ships 7-10 business days after approval** — proof gate stated honestly | Claude (delegated) 2026-06-11 |
 | 15 | Hats: email templates | **Reuse tee EmailJS templates w/ caps params** (no new dashboard surface); fork only if copy diverges | Claude (delegated) 2026-06-11 |
 | 16 | Hats: shipping threshold | **Keep $100 free-over** — 8-cap min ⇒ every order ships free; storefront markets "Free shipping, always" | Claude (delegated) 2026-06-11 |
+| 17 | Customer pricing display | **Configurator-first ("quote like a storefront")**: product page leads with 3-question configurator (qty → design location → two priced method chips), ONE total, matrix demoted to "See every quantity price ▾" expandable. Add-to-quote cart pools per print type (demo'd to Erik, approved "I take your recommendation"). Storefront styles (tees/caps) get Buy-now in the same slot. Quote-cart design + parity rules: memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md (Phase 1 spec amended: configurator REPLACES tabs as primary, not pickers-on-tabs) | Erik→Claude 2026-06-11 |
 
 ## Phase plan (merged sequence — supersedes the three conflicting per-auditor orders)
 
