@@ -1,3 +1,11 @@
+## v2026.06.11.6 (2026.06.11)
+
+- docs(redesign): record v2026.06.11.5 — decoration gating live + hats core dormant + open Erik decisions
+- feat(quote-mgmt): CAP prefix routes to read-only quote view; document CAP in prefix list
+- feat(custom-caps): storefront + success page — the Custom Hats store UI (P4 step 3)
+- feat(custom-caps): register /custom-caps route + homepage card goes live
+- Deploy v2026.06.11.6: cache-bust
+
 ## v2026.06.11.5 (2026.06.11)
 
 - docs(redesign): record v2026.06.11.4 Wave 2 deploy + P3 remainders + P4 start
