@@ -910,6 +910,36 @@
             };
         }
 
+        // Resolve sample pricing from the API at add-to-cart time. URL params are
+        // customer-editable, so price/sampleType from the URL must never reach the
+        // cart (they previously flowed into ShopWorks order notes verbatim).
+        // Mirrors the showcase eligibility rule: blank cost < $10 → free sample;
+        // otherwise minCost ÷ tier-1 MarginDenominator, half-dollar ceiling.
+        async function resolveSamplePricing(style) {
+            const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(style)}`);
+            if (!response.ok) {
+                throw new Error(`Pricing API returned ${response.status}`);
+            }
+            const bundle = await response.json();
+            const costs = (bundle.sizes || []).map(s => parseFloat(s.price)).filter(p => p > 0);
+            if (!costs.length) {
+                throw new Error('No blank pricing data for style ' + style);
+            }
+            const minCost = Math.min(...costs);
+            const upcharges = bundle.sellingPriceDisplayAddOns || {};
+            if (minCost < 10) {
+                return { sampleType: 'free', price: 0, upcharges };
+            }
+            const tiers = bundle.tiersR || [];
+            const tier1 = tiers.find(t => Number(t.MinQuantity) <= 1 && Number(t.MaxQuantity) >= 1) || tiers[0];
+            const margin = parseFloat(tier1 && tier1.MarginDenominator);
+            if (!margin || margin <= 0 || margin >= 1) {
+                throw new Error('No margin data for style ' + style);
+            }
+            const price = Math.ceil((minCost / margin) * 2) / 2;
+            return { sampleType: 'paid', price, upcharges };
+        }
+
         // Initialize page
         async function initializePage() {
             const params = getUrlParams();
@@ -1652,7 +1682,7 @@
         }
 
         // Add samples to cart
-        function addToSampleCart() {
+        async function addToSampleCart() {
             // === ENHANCED DEBUGGING (Always enabled) ===
             console.log('🛒 [ADD TO CART] Function called');
             console.log('🛒 [ADD TO CART] selectedSamples:', selectedSamples);
@@ -1699,6 +1729,16 @@
                 cartArray = [];
             }
 
+            // Pricing comes from the API, never the URL (customer-editable → flowed into ShopWorks)
+            let samplePricing;
+            try {
+                samplePricing = await resolveSamplePricing(params.style);
+            } catch (error) {
+                console.error('[Sample Mode] Unable to verify sample pricing:', error);
+                alert('Unable to verify sample pricing right now. Please try again in a moment, or call 253-922-5793.');
+                return;
+            }
+
             // Create cart item
             const cartItem = {
                 style: params.style,
@@ -1707,9 +1747,10 @@
                 catalogColor: product.CATALOG_COLOR,  // Use CATALOG_COLOR for inventory API (no spaces/abbreviations)
                 imageUrl: product.FRONT_MODEL || product.FRONT_FLAT || '',
                 sizes: { ...selectedSamples },
-                type: params.sampleType || params.type || 'free',  // Use sampleType from URL
-                price: parseFloat(params.price) || 0,  // Use actual price from URL
-                sampleType: params.sampleType || 'free',  // For ShopWorks categorization
+                type: samplePricing.sampleType,
+                price: samplePricing.price,
+                sampleType: samplePricing.sampleType,  // For ShopWorks categorization
+                upcharges: samplePricing.upcharges,
                 addedAt: new Date().toISOString()
             };
 

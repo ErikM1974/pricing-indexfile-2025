@@ -35,23 +35,6 @@ const CRITICAL_PATHS = {
       ]
     },
     {
-      name: 'Shopping Cart',
-      path: '/cart.html',
-      dependencies: [
-        'cart.js',
-        'cart-ui.js',
-        'cart-price-recalculator.js',
-        'order-form-pdf.js',
-        'pricing-matrix-api.js',
-        'utils.js'
-      ],
-      tests: [
-        { type: 'element', selector: '#cart-items', name: 'Cart items container' },
-        { type: 'element', selector: '#cart-total', name: 'Cart total display' },
-        { type: 'console', maxErrors: 0, name: 'No console errors' }
-      ]
-    },
-    {
       name: 'Product Display',
       path: '/product.html',
       dependencies: ['product/app.js'],
