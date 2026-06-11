@@ -910,24 +910,58 @@
         const grid = $('relatedGrid');
         if (!cat) return; // no category to relate on — leave hidden
         try {
-            const url = API_BASE + '/api/products/search?category=' + encodeURIComponent(cat) + '&limit=9';
+            const url = API_BASE + '/api/products/search?category=' + encodeURIComponent(cat) + '&limit=24';
             const resp = await fetch(url);
             if (!resp.ok) throw new Error('Related search returned ' + resp.status);
             const json = await resp.json();
-            const products = ((json.data && json.data.products) || [])
-                .filter(function (p) { return p.styleNumber && p.styleNumber !== state.style; })
-                .slice(0, 4);
-            if (products.length === 0) return;
-            grid.innerHTML = products.map(function (p) {
-                const img = (p.images && (p.images.thumbnail || p.images.main))
-                    || SANMAR_CDN_FALLBACK + encodeURIComponent(p.styleNumber) + '.jpg';
+            const candidates = ((json.data && json.data.products) || [])
+                .filter(function (p) { return p.styleNumber && p.styleNumber !== state.style; });
+            if (candidates.length === 0) return;
+
+            // SanMar's catalog-search image URLs serve an "image not yet
+            // available" placeholder as a real jpg (HTTP 200) for some styles
+            // (Allmade — Erik flagged the blue badges 2026-06-11), and the CDN
+            // serves the same placeholder for ANY missing filename, so no URL
+            // or dimension heuristic can detect it reliably. The trustworthy
+            // photo source is /api/product-details FRONT_MODEL — real model
+            // photography exists there even when the catalog jpg is a
+            // placeholder (it's what this page's own hero uses). Fetch details
+            // for the four picks and render those photos.
+            const products = candidates.slice(0, 4);
+            const detailImages = await Promise.all(products.map(function (p) {
+                const detailUrl = API_BASE + '/api/product-details?styleNumber='
+                    + encodeURIComponent(p.styleNumber);
+                return fetch(detailUrl)
+                    .then(function (r) { return r.ok ? r.json() : null; })
+                    .then(function (rows) {
+                        if (!Array.isArray(rows)) return null;
+                        const row = rows.find(function (x) {
+                            return x && (x.FRONT_MODEL || x.FRONT_FLAT);
+                        });
+                        return row ? (row.FRONT_MODEL || row.FRONT_FLAT) : null;
+                    })
+                    .catch(function () { return null; });
+            }));
+            grid.innerHTML = products.map(function (p, i) {
+                const img = detailImages[i];
+                const photoHtml = img
+                    ? '<span class="pdp-related-photo"><img src="' + escapeHtml(img) + '" alt="" loading="lazy"></span>'
+                    : '<span class="pdp-related-photo is-pending">Photo coming soon</span>';
                 return '<a class="pdp-related-card" href="/product.html?style=' + encodeURIComponent(p.styleNumber) + '">'
-                    + '<span class="pdp-related-photo"><img src="' + escapeHtml(img) + '" alt="" loading="lazy"></span>'
+                    + photoHtml
                     + '<span class="pdp-related-body">'
                     + '<span class="pdp-related-style">' + escapeHtml(p.brand || '') + ' · ' + escapeHtml(p.styleNumber) + '</span>'
                     + '<span class="pdp-related-name">' + escapeHtml(cleanProductName(p.productName || p.styleNumber)) + '</span>'
                     + '</span></a>';
             }).join('');
+            // True load failures fall back to the same styled tile.
+            grid.querySelectorAll('.pdp-related-photo img').forEach(function (im) {
+                im.addEventListener('error', function () {
+                    const photo = im.parentElement;
+                    im.remove();
+                    if (photo) { photo.classList.add('is-pending'); photo.textContent = 'Photo coming soon'; }
+                });
+            });
             section.hidden = false;
         } catch (err) {
             console.error('[product-2026] Related products failed:', err);

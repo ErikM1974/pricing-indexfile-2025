@@ -1424,6 +1424,22 @@
             if (media.classList.contains('pcard-media')) media.classList.add('no-img');
         }, true);
 
+        // SanMar "image not yet available" placeholder: served as a REAL jpg
+        // (HTTP 200) at the normal catalog URL, so onerror never fires. The
+        // placeholder graphic is exactly 300×343 (verified 2026-06-11, e.g.
+        // Allmade AL6204/AL2100). Detect on load and fall back to the same
+        // no-img treatment as a broken image.
+        document.addEventListener('load', function (e) {
+            var img = e.target;
+            if (!img || img.tagName !== 'IMG') return;
+            if (img.src.indexOf('cdnm.sanmar.com') === -1) return;
+            if (img.naturalWidth !== 300 || img.naturalHeight !== 343) return;
+            var media = img.closest('.pcard-media, .ac-thumb, .qv-media');
+            if (!media) return;
+            img.remove();
+            if (media.classList.contains('pcard-media')) media.classList.add('no-img');
+        }, true);
+
         // Back/forward restores prior state
         window.addEventListener('popstate', function () {
             state = stateFromUrl();
