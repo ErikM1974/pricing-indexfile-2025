@@ -58,6 +58,9 @@ dotenv.config();
 // CUSTOM HATS (custom-caps storefront, 2026-06-11 — registry entry + rebuildCapsQuote; CAP{MMDD}-{rand4} QuoteIDs)
 //   GET /custom-caps[.html]                 — embroidered caps storefront (pages/custom-caps.html); success page via /pages static
 //
+// QUOTE CART (customer quote-cart Phase 2, 2026-06-11)
+//   GET /quote-cart[.html]                  — Add-to-Quote cart page (pages/quote-cart.html; sessionStorage store, engine-priced)
+//
 // CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
@@ -2414,6 +2417,12 @@ app.get(['/catalog', '/catalog.html'], (req, res) => {
 // Clean URL + .html alias; success page resolves via the static /pages mount.
 app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-caps.html'));
+});
+
+// Customer quote cart — sessionStorage quote builder (quote-cart Phase 2,
+// 2026-06-11). Clean URL + .html alias; same pattern as /custom-tees.
+app.get(['/quote-cart', '/quote-cart.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'quote-cart.html'));
 });
 
 // ── Customer order-status page (token link, no login — 2026-06-10) ──────────
