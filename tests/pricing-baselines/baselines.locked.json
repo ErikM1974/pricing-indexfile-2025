@@ -1,12 +1,15 @@
 {
   "_meta": {
-    "capturedAt": "2026-06-11T19:46:49.707Z",
+    "capturedAt": "2026-06-11T19:48:12.859Z",
     "capturedBy": "scripts/capture-pricing-baselines.js",
     "scenarios": 22,
     "successful": 22,
     "stubs": 0,
     "errors": 0,
-    "errorList": []
+    "errorList": [],
+    "approvedBy": "erik@nwcustomapparel.com",
+    "approvedAt": "2026-06-11",
+    "approvalNote": "Re-lock after intentional Caspio margin lift (Erik, 2026-05-24): DTG+DTF Pricing_Tiers MarginDenominator 0.57 -> 0.53 (tiers 24-47/48-71/72+) and 0.57 -> 0.55 (DTG 1-23 / DTF 10-23). Garment + print/transfer costs unchanged. Drift traced and reconciled arithmetically for all 5 affected scenarios (DTG-02/03/04, DTF-04/05); verified in builder pages and staff DTG calculator UI."
   },
   "DTG-01": {
     "builder": "DTG",
@@ -742,7 +745,7 @@
   },
   "SCP-01": {
     "builder": "SCP",
-    "description": "Simplest — 1 color 1 location",
+    "description": "Simplest \u00e2\u20ac\u201d 1 color 1 location",
     "inputs": {
       "style": "PC54",
       "color": "Black",
@@ -908,7 +911,7 @@
   },
   "SCP-05": {
     "builder": "SCP",
-    "description": "Tier break edge — qty 73",
+    "description": "Tier break edge \u00e2\u20ac\u201d qty 73",
     "inputs": {
       "style": "PC54",
       "color": "White",
