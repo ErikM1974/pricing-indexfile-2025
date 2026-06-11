@@ -1,3 +1,12 @@
+## v2026.06.11.8 (2026.06.11)
+
+- docs(quote-cart): parity rules (EMB/DTG/SCP/DTF) + customer quote-cart design + 5-phase plan
+- docs(redesign): decision 17 - configurator-first pricing display (quote like a storefront)
+- docs(redesign): decision 18 - configurator prices two locations exactly, disclaims the rest
+- fix(pricing): SCP calculator dark-garment parity + DTG unpriceable combos removed (Erik chip sessions)
+- feat(quote-cart): Phase 0 - pricing engine + 62-test parity lock + manual-cost gates (P0 hotfix)
+- Deploy v2026.06.11.8: cache-bust
+
 ## v2026.06.11.7 (2026.06.11)
 
 - docs(redesign): record v2026.06.11.6 hats store launch
