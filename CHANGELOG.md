@@ -1,3 +1,9 @@
+## v2026.06.11.3 (2026.06.11)
+
+- docs(redesign): mark v2026.06.11.2 deployed in pickup section
+- style(homepage): hero emphasis — orange color, not underline (read as spellcheck squiggle)
+- Deploy v2026.06.11.3: cache-bust nwca-2026.css
+
 ## v2026.06.11.2 (2026.06.11)
 
 - wip(customer-redesign): homepage rebuild on nwca-2026 + P0 hotfixes — NOT deployed, awaiting screenshot approval
