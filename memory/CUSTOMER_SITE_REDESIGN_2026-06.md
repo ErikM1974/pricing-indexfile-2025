@@ -1,14 +1,10 @@
 # Customer Site Redesign 2026-06 — Master Plan
 
-## ⏯️ PICKUP HERE (written 2026-06-11, Erik stepping away mid-session)
+## ⏯️ PICKUP HERE (updated 2026-06-11 post-deploy)
 
-**State**: Everything below is COMMITTED LOCALLY on `develop` (wip commit, NOT pushed, NOT deployed). Preview server was on port 3000 (`node server.js` via launch config `pricing-index`).
+**State**: ✅ **DEPLOYED LIVE `v2026.06.11.2`** — homepage redesign (incl. 4-print hero rotator), P0 dead-link/cart-retire fixes, P0b URL-price hole, search category-drift fix. Live-verified: homepage serves `?v=2026.06.11.2`, `/cart` 301→sample-cart, `/marketing.html` 404. Erik approved screenshots + all hats decisions (log below). develop == main == Heroku.
 
-**Waiting on Erik (the immediate gate)**:
-1. Approve/critique the 3 homepage preview screenshots (desktop, mobile, catalog-results view — in the session transcript; or just `npm start` → localhost:3000). Open questions put to him: headline/hero-photo reaction, nav items OK, and whether the hats "coming soon" teaser card should stay visible pre-launch or be hidden until P4 ships.
-2. After approval → `/deploy` ships homepage + P0 dead-link fixes + P0b price-hole fix together.
-
-**Then the next work items, in order**:
+**Next work items, in order**:
 1. P1 remainder: add interior-page primitives to nwca-2026.css (forms, pricing tables, alerts, toasts, interior page headers, cart components) + fix the 2 AA contrast edges the mobile-a11y audit flagged in nwca-2026.css + split a core layer so interior pages don't pull homepage band CSS.
 2. P2 catalog phase (see Phase plan below).
 3. P4 hats store can start in parallel with P2/P3 — lineup + pricing verified, chassis blueprint documented below; FIRST step is the channel-config registry extraction in server.js.

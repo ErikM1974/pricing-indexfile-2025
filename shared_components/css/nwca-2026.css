@@ -437,8 +437,9 @@ img { max-width: 100%; }
     letter-spacing: -0.018em; margin-bottom: 16px;
 }
 .hero-underline {
-    background-image: linear-gradient(transparent 70%, rgba(232, 89, 12, 0.35) 70%);
-    border-radius: 2px;
+    /* color emphasis, not an underline — the old bottom-wash band read as a
+       spell-check squiggle at headline size (Erik, 2026-06-11) */
+    color: var(--rush-deep);
 }
 .hero-sub { font-size: 17px; color: var(--ink-soft); max-width: 52ch; margin-bottom: 22px; }
 .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
