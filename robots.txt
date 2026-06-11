@@ -1,0 +1,23 @@
+User-agent: *
+# Internal/staff areas — not for search indexes
+Disallow: /dashboards/
+Disallow: /admin/
+Disallow: /art-tools/
+Disallow: /quote-builders/
+Disallow: /vendor-portals/
+Disallow: /tools/
+Disallow: /email-templates/
+Disallow: /mockups/
+Disallow: /tests/
+Disallow: /scripts/
+Disallow: /hr/
+Disallow: /guides/
+Disallow: /forms/
+Disallow: /training/
+Disallow: /staff-dashboard-v3/
+Disallow: /staff-dashboard.html
+# Share-link pages are credential-bearing URLs — never index
+Disallow: /quote/
+Disallow: /invoice/
+Disallow: /portal/
+Disallow: /order-status

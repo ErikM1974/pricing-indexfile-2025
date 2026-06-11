@@ -65,6 +65,7 @@ dotenv.config();
 //   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
 //
 // STATIC FILE SERVING
+//   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
@@ -1783,6 +1784,11 @@ app.post(
 console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-proxy/api/policies-ai-assist)');
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
+
+// robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
+app.get('/robots.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'robots.txt'));
+});
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));

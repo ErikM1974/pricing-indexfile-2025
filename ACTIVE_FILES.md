@@ -39,6 +39,7 @@
 | `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
 | `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
 | `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
+| `/robots.txt` | Crawler rules — staff/internal paths + credential share-links disallowed (2026-06-11) | served via server.js `/robots.txt` route | ✅ Active |
 | `/jest.config.js` | Jest test runner config (used by `tests/jest/`) | Jest | ⚙️ Tooling |
 
 ### Root-Level Stylesheets (legacy location)
