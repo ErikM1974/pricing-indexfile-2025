@@ -66,12 +66,12 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, API-driven decoration pricing tabs | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
+| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, decoration pricing tabs gated by method eligibility | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, decoration-methods.js, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
 | `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system | nwca-2026-core.css | ✅ Active |
-| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + 5 pricing-service tab loaders, ARIA tabs, SEO/JSON-LD | EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
-| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
+| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + eligibility-gated pricing-service tab loaders (DTG cotton-gate warn note, embroidery-only fallback alert), ARIA tabs, SEO/JSON-LD | DecorationMethods + EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
+| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, decoration-methods.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
 | `/pages/css/catalog-2026.css` | Catalog page layer CSS (facet rail + mobile filter drawer, cards, autocomplete v2) | nwca-2026-core.css | ✅ Active |
-| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets, server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only) | ✅ Active |
+| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets (incl. `?method=` Decoration filter from the decoration-methods rules feed), server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only), DecorationMethods | ✅ Active |
 
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
@@ -198,10 +198,18 @@
 | `/pages/css/order-status.css` | Status-page styling (rides on custom-tees.css tokens) | custom-tees.css | ✅ Built |
 | `/tests/unit/custom-tees-pricing.test.js` | Jest lock: rush opt-in, distributed LTM ($49.92/12pcs), FB/JB/JF, fail-closed (17 tests) | custom-tees-pricing.js | ✅ Active |
 | `/tests/unit/custom-tees-shipdate.test.js` | Jest lock: 7–10 day window, holiday skip, binding end date (7 tests) | custom-tees-shipdate.js | ✅ Active |
+| `/config/storefront-channels.js` | Storefront CHANNEL REGISTRY (pure half): per-channel QuoteID builders, ShopWorks push constants (designTypeId/artistId/SW_LOC/LTM part), banners, EmailJS templates, Stripe paths — server.js binds server-only behaviors on top; adding 'custom-caps' = one entry here + one in server.js CHANNELS | server.js (checkout/webhook emails/push/order-status/shipped email) | ✅ Active |
+| `/tests/unit/storefront-channels.test.js` | Characterization lock (28 tests): exact pre-registry strings/values for BOTH channels — QuoteID formats, note labels, banners, push ids, shipped-email gate, resolver default semantics | config/storefront-channels.js | ✅ Active |
 | `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |
 | `/tools/custom-tees-calibrate.html` | STAFF print-box calibration tool — lay the 16×20 envelope on each style's photo once; the storefront designer anchors to it (no-deploy edits) | custom-tees-calibrate.{js,css}, app.config.js, proxy /api/dtg-calibration | ✅ Active |
 | `/tools/custom-tees-calibrate.js` | Tool logic: style/color/view picker, drag/scale aspect-locked box, upsert to Caspio DTG_Calibration via proxy; silhouette auto-detect starting position | proxy /api/dtg-calibration + /api/dtg/top-sellers + /api/product-details | ✅ Active |
 | `/tools/custom-tees-calibrate.css` | Calibration-tool styling | — | ✅ Active |
+
+### Custom Hats System ('custom-caps' channel — server core built 2026-06-11, pages pending)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/js/custom-caps-pricing.js` | PURE pricing engine for Custom Hats — EMB CAP PARITY: blank OSFA ÷ tier margin + EmbroideryCost(tier, 8K) → CeilDollar; CAP-AL back-logo flat tier add-on; 8-cap minimum enforced (structured BELOW_MINIMUM error — 1-7 LTM tier unreachable); NO LTM/digitizing lines; CAPS-SHIP-* threshold shipping fail-closed. Jest-locked. | — (dual browser/Node; server.js requires it) | ✅ Built |
+| `/tests/unit/custom-caps-pricing.test.js` | Jest parity lock vs the verified 9-style lineup (112/C402/112PFP/256/258/220/C914/STC26/CT105298 @ qty 8/24/48/72), back-logo tiers, qty<8 structured error, fail-closed throws, CeilDollar edges | custom-caps-pricing.js | ✅ Active |
 
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
@@ -692,6 +700,7 @@
 ### Product Search & Filtering
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/shared_components/js/decoration-methods.js` | **NEW 2026-06-11** Decoration method eligibility — fetches `/api/decoration-methods` rules+overrides (sessionStorage 1h cache), `eligibleFor(product)` → EMB/SCP/DTF bools + DTG `'yes'/'warn'/'no'` cotton gate, `categoriesFor(method)` for the catalog Decoration filter; API down → embroidery-only fallback (`source:'fallback'`, caller must show a visible warning) | APP_CONFIG (optional) | ✅ Active |
 | `/shared_components/js/product-category-filter.js` | Single source of truth for cap-vs-flat-headwear classification | — | ✅ Active |
 | `/shared_components/js/product-filters.js` | Product filter UI (size, color, brand, etc.) | — | ✅ Active |
 | `/shared_components/js/product-grid.js` | Product grid display + lazy load | — | ✅ Active |

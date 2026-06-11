@@ -3,11 +3,19 @@
  *
  * URL-driven product discovery: every search/filter/sort/page change lives in
  * the query string (?q=&category=&subcategory=&brand=&color=&size=&minPrice=
- * &maxPrice=&sort=&page=) via history.pushState; popstate restores; landing
- * with params searches immediately. Data layer = product-search-service.js
- * (shared, read-only). Chrome population (mega-nav categories, drawer list,
- * brands flyout) comes from app-modern.js + brands-flyout.js — this file
- * intercepts their navigation so category/brand clicks stay on /catalog.
+ * &maxPrice=&sort=&page=&method=) via history.pushState; popstate restores;
+ * landing with params searches immediately. Data layer =
+ * product-search-service.js (shared, read-only). Chrome population (mega-nav
+ * categories, drawer list, brands flyout) comes from app-modern.js +
+ * brands-flyout.js — this file intercepts their navigation so category/brand
+ * clicks stay on /catalog.
+ *
+ * DECORATION FILTER (?method=emb|dtg|scp|dtf, single-select): maps the method
+ * to its eligible-category set from the shared DecorationMethods rules feed
+ * and applies it as the search API's category array param. Rules feed
+ * unavailable → the group renders DISABLED with a note (never hidden
+ * silently), and an active ?method= param shows a visible "not narrowed"
+ * warning instead of silently filtering wrong.
  *
  * PRICE RULE (Erik's iron rule): render server-computed displayPriceLabel
  * when the API provides it; otherwise a neutral "See pricing →" link.
@@ -24,6 +32,8 @@
     var POPULAR_CATEGORIES = ['T-Shirts', 'Caps', 'Sweatshirts/Fleece', 'Polos/Knits'];
     var SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
     var SORT_VALUES = ['', 'price_asc', 'price_desc', 'name_asc', 'name_desc', 'style', 'newest'];
+    var METHOD_VALUES = ['emb', 'dtg', 'scp', 'dtf'];
+    var METHOD_LABELS = { emb: 'Embroidery', dtg: 'DTG Print', scp: 'Screen Print', dtf: 'DTF Transfer' };
 
     function escapeHtml(value) {
         return String(value == null ? '' : value)
@@ -90,6 +100,7 @@
             q: '', category: '', subcategory: '',
             brand: [], color: [], size: [],
             minPrice: '', maxPrice: '',
+            method: '',
             sort: '', page: 1
         };
     }
@@ -97,8 +108,55 @@
     var state = defaultState();
     var lastResults = null;
     var lastFacets = null;
+    var lastShownProducts = [];
     var searchSeq = 0;
     var railUI = { expanded: {}, brandQuery: '' };
+
+    /* ── Decoration eligibility rules (shared DecorationMethods module) ──
+       status: 'loading' until the first load settles, then 'ready' (map
+       filled: method → eligible category array) or 'unavailable' (rules feed
+       unreachable / module missing — the filter group renders disabled). */
+    var deco = { status: 'loading', map: null, promise: null };
+
+    function loadDecoRules() {
+        if (deco.promise) return deco.promise;
+        if (!window.DecorationMethods) {
+            console.error('[Catalog] DecorationMethods module missing — Decoration filter disabled');
+            deco.status = 'unavailable';
+            deco.promise = Promise.resolve(null);
+            return deco.promise;
+        }
+        deco.promise = Promise.all(METHOD_VALUES.map(function (m) {
+            return window.DecorationMethods.categoriesFor(m);
+        })).then(function (lists) {
+            if (lists.some(function (l) { return l === null; })) {
+                deco.status = 'unavailable';
+                deco.map = null;
+            } else {
+                deco.map = {};
+                METHOD_VALUES.forEach(function (m, i) { deco.map[m] = lists[i]; });
+                deco.status = 'ready';
+            }
+            return deco.map;
+        }).catch(function (error) {
+            console.error('[Catalog] Decoration rules load failed:', error);
+            deco.status = 'unavailable';
+            deco.map = null;
+            return null;
+        });
+        return deco.promise;
+    }
+
+    function listHasCi(list, value) {
+        var want = String(value || '').trim().toLowerCase();
+        return list.some(function (v) { return String(v || '').trim().toLowerCase() === want; });
+    }
+
+    /** True when the active method filter contradicts the selected category. */
+    function methodCategoryConflict() {
+        return !!(state.method && deco.map && state.category &&
+            !listHasCi(deco.map[state.method] || [], state.category));
+    }
 
     function stateFromUrl() {
         var p = new URLSearchParams(window.location.search);
@@ -111,6 +169,8 @@
         s.size = p.getAll('size').filter(Boolean);
         s.minPrice = (p.get('minPrice') || '').trim();
         s.maxPrice = (p.get('maxPrice') || '').trim();
+        var method = (p.get('method') || '').trim().toLowerCase();
+        s.method = METHOD_VALUES.indexOf(method) !== -1 ? method : '';
         var sort = (p.get('sort') || '').trim();
         s.sort = SORT_VALUES.indexOf(sort) !== -1 ? sort : '';
         var page = parseInt(p.get('page'), 10);
@@ -128,6 +188,7 @@
         s.size.forEach(function (v) { p.append('size', v); });
         if (s.minPrice !== '') p.set('minPrice', s.minPrice);
         if (s.maxPrice !== '') p.set('maxPrice', s.maxPrice);
+        if (s.method) p.set('method', s.method);
         if (s.sort) p.set('sort', s.sort);
         if (s.page > 1) p.set('page', String(s.page));
         var qs = p.toString();
@@ -157,7 +218,8 @@
     function activeFilterCount() {
         return (state.category ? 1 : 0) + (state.subcategory ? 1 : 0) +
             state.brand.length + state.color.length + state.size.length +
-            ((state.minPrice !== '' || state.maxPrice !== '') ? 1 : 0);
+            ((state.minPrice !== '' || state.maxPrice !== '') ? 1 : 0) +
+            (state.method ? 1 : 0);
     }
 
     /* ── Document title / page header / breadcrumb ───────────────── */
@@ -222,6 +284,28 @@
         updateHeader(null);
 
         try {
+            // Decoration filter: resolve the method's eligible-category set
+            // first (cached after the first load; fails fast when the rules
+            // feed is down — in that case the filter is NOT applied and
+            // renderNotices shows a visible warning instead).
+            var methodCats = null;
+            if (state.method) {
+                // Earlier failure isn't terminal — the rules feed may be live
+                // now (module never caches failures), so retry per search.
+                if (deco.status === 'unavailable' && window.DecorationMethods) deco.promise = null;
+                await loadDecoRules();
+                if (seq !== searchSeq) return;
+                methodCats = deco.map ? (deco.map[state.method] || []) : null;
+            }
+
+            // Honest zero: selected category isn't producible with the
+            // selected method — skip the API call, renderNotices explains.
+            if (methodCats && state.category && !listHasCi(methodCats, state.category)) {
+                lastResults = { products: [], pagination: { page: 1, total: 0, totalPages: 1, limit: PAGE_SIZE } };
+                renderResults(lastResults);
+                return;
+            }
+
             var extras = buildExtraParams();
             var results;
 
@@ -229,14 +313,17 @@
                 // smartSearch handles style numbers, brand/category keyword
                 // detection, and the zero-result category-drift guard.
                 if (state.category) extras.category = state.category;
+                else if (methodCats) extras.category = methodCats.slice(); // category array param
                 if (state.subcategory) extras.subcategory = state.subcategory;
                 results = await service.smartSearch(state.q, extras);
             } else if (state.category) {
                 // Category landing — smart fallback (cat+sub → sub → cat) with
                 // metadata.searchStrategy so we can show a visible notice.
+                // (Method filter already validated above: category is eligible.)
                 results = await service.searchByCategory(state.category, state.subcategory || null, extras);
             } else {
                 extras.includeFacets = true;
+                if (methodCats) extras.category = methodCats.slice(); // category array param
                 results = await service.searchWithFacets(extras);
             }
 
@@ -364,7 +451,33 @@
                 '<svg class="alert-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 0a10 10 0 100 20 10 10 0 000-20zm1 15H9v-6h2v6zm0-8H9V5h2v2z"/></svg>' +
                 '<div class="alert-body"><p>Smart search applied — ' + parts + '</p></div></div>';
         }
+        html += decorationNoticesHtml();
         els.alertSlot.innerHTML = html;
+    }
+
+    /** Notices tied to the active ?method= filter (visible, never silent). */
+    function decorationNoticesHtml() {
+        if (!state.method) return '';
+        var label = METHOD_LABELS[state.method] || state.method;
+        if (deco.status === 'unavailable') {
+            // Rules feed down — the filter could NOT be applied. Say so.
+            return '<div class="alert alert-warn">' +
+                '<svg class="alert-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1 1 18h18L10 1zm1 13h-2v2h2v-2zm0-7h-2v5h2V7z"/></svg>' +
+                '<div class="alert-body"><strong class="alert-title">Decoration filter unavailable</strong>' +
+                '<p>These results are not narrowed to ' + escapeHtml(label) + ' right now. Each product page shows its available methods, or call <a href="tel:253-922-5793">253-922-5793</a>.</p></div></div>';
+        }
+        if (methodCategoryConflict()) {
+            return '<div class="alert alert-info">' +
+                '<svg class="alert-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 0a10 10 0 100 20 10 10 0 000-20zm1 15H9v-6h2v6zm0-8H9V5h2v2z"/></svg>' +
+                '<div class="alert-body"><p>' + escapeHtml(label) + ' isn’t offered on ' + escapeHtml(state.category) +
+                ' in our shop — remove the Decoration or Category filter to see results, or call <a href="tel:253-922-5793">253-922-5793</a>.</p></div></div>';
+        }
+        if (state.method === 'dtg') {
+            return '<div class="alert alert-info">' +
+                '<svg class="alert-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 0a10 10 0 100 20 10 10 0 000-20zm1 15H9v-6h2v6zm0-8H9V5h2v2z"/></svg>' +
+                '<div class="alert-body"><p>Showing categories DTG can print — exact fabric suitability is shown on each product.</p></div></div>';
+        }
+        return '';
     }
 
     function renderResults(results) {
@@ -380,6 +493,7 @@
         var pagination = (results && results.pagination) || { page: 1, total: rawProducts.length, totalPages: 1, limit: rawProducts.length };
         var total = pagination.total != null ? pagination.total : rawProducts.length;
 
+        lastShownProducts = products; // facet re-renders reuse the filtered set
         updateHeader(total);
         renderNotices(results);
         renderChips();
@@ -457,6 +571,7 @@
         if (state.q) html += chip('Search', '“' + state.q + '”', 'q', '');
         if (state.category) html += chip('Category', state.category, 'category', '');
         if (state.subcategory) html += chip('Type', state.subcategory, 'subcategory', '');
+        if (state.method) html += chip('Decoration', METHOD_LABELS[state.method] || state.method, 'method', '');
         state.brand.forEach(function (b) { html += chip('Brand', b, 'brand', b); });
         state.color.forEach(function (c) { html += chip('Color', c, 'color', c); });
         state.size.forEach(function (s) { html += chip('Size', s, 'size', s); });
@@ -483,6 +598,7 @@
             case 'color': navigate({ color: state.color.filter(function (v) { return v !== value; }) }); break;
             case 'size': navigate({ size: state.size.filter(function (v) { return v !== value; }) }); break;
             case 'price': navigate({ minPrice: '', maxPrice: '' }); break;
+            case 'method': navigate({ method: '' }); break;
         }
     }
 
@@ -497,10 +613,12 @@
 
     /* ── Facet rail ──────────────────────────────────────────────── */
 
-    function optionRow(group, inputType, value, label, count, checked) {
+    function optionRow(group, inputType, value, label, count, checked, disabled) {
         var name = 'f-' + group;
-        return '<li><label class="fopt">' +
-            '<input type="' + inputType + '" name="' + name + '" value="' + escapeHtml(value) + '"' + (checked ? ' checked' : '') + '>' +
+        return '<li><label class="fopt' + (disabled ? ' is-disabled' : '') + '"' +
+            (disabled ? ' title="Temporarily unavailable"' : '') + '>' +
+            '<input type="' + inputType + '" name="' + name + '" value="' + escapeHtml(value) + '"' +
+            (checked ? ' checked' : '') + (disabled ? ' disabled' : '') + '>' +
             '<span class="fopt-label">' + escapeHtml(label) + '</span>' +
             (count != null ? '<span class="fopt-count">' + formatCount(count) + '</span>' : '') +
             '</label></li>';
@@ -561,6 +679,24 @@
         return names.map(function (name) { return { name: name, count: counts[name] }; });
     }
 
+    /** "Decoration" facet group — radio single-select over the 4 methods. */
+    function decorationGroupHtml() {
+        var disabled = deco.status !== 'ready';
+        var note;
+        if (deco.status === 'unavailable') {
+            note = 'Temporarily unavailable — every product page still shows its decoration options.';
+        } else if (deco.status === 'loading') {
+            note = 'Loading decoration options…';
+        } else {
+            note = 'Methods we run in-house. Fabric fit is confirmed on each product.';
+        }
+        var rows = optionRow('method', 'radio', '', 'All methods', null, !state.method, disabled);
+        METHOD_VALUES.forEach(function (m) {
+            rows += optionRow('method', 'radio', m, METHOD_LABELS[m], null, state.method === m, disabled);
+        });
+        return facetGroup('method', 'Decoration', rows, { note: note });
+    }
+
     function renderFacets(facets, products) {
         var html = '';
 
@@ -588,6 +724,10 @@
             var catList = listWithOverflow(catItems, 9);
             html += facetGroup('category', 'Category', catList.html, { overflowCount: catList.overflow || 0 });
         }
+
+        // Decoration method (single-select, from the shared rules feed).
+        // Rules unavailable → disabled with a note, never hidden silently.
+        html += decorationGroupHtml();
 
         // Subcategory (taxonomy from app-modern.js's CATEGORY_DATA — the same
         // source the mega-menu uses; the API returns no subcategory facets)
@@ -749,6 +889,9 @@
                 navigate({ minPrice: parts[0] || '', maxPrice: parts[1] || '' });
                 break;
             }
+            case 'method':
+                navigate({ method: value });
+                break;
         }
     }
 
@@ -1131,7 +1274,7 @@
             if (catLink && catLink.dataset.category) {
                 e.preventDefault();
                 closeBrowseDrawer();
-                navigate({ q: '', category: catLink.dataset.category, subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '' });
+                navigate({ q: '', category: catLink.dataset.category, subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
                 els.searchInput.value = '';
                 return;
             }
@@ -1143,7 +1286,7 @@
                 closeBrowseDrawer();
                 var fly = document.getElementById('categoryFlyout');
                 if (fly) fly.classList.remove('show');
-                navigate({ q: '', category: flyout.dataset.category, subcategory: flyout.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '' });
+                navigate({ q: '', category: flyout.dataset.category, subcategory: flyout.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
                 els.searchInput.value = '';
                 return;
             }
@@ -1153,7 +1296,7 @@
             if (subLink && subLink.dataset.category) {
                 e.preventDefault();
                 closeMegaDropdown(subLink);
-                navigate({ q: '', category: subLink.dataset.category, subcategory: subLink.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '' });
+                navigate({ q: '', category: subLink.dataset.category, subcategory: subLink.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
                 els.searchInput.value = '';
                 return;
             }
@@ -1169,7 +1312,7 @@
                 if (brandName) {
                     e.preventDefault();
                     closeMegaDropdown(brandLink);
-                    navigate({ q: '', category: '', subcategory: '', brand: [brandName], color: [], size: [], minPrice: '', maxPrice: '' });
+                    navigate({ q: '', category: '', subcategory: '', brand: [brandName], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
                     els.searchInput.value = '';
                 }
                 return;
@@ -1219,7 +1362,7 @@
             var jump = e.target.closest('.js-cat-jump');
             if (jump) {
                 e.preventDefault();
-                navigate({ q: '', category: jump.getAttribute('data-category') || '', subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '' });
+                navigate({ q: '', category: jump.getAttribute('data-category') || '', subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
                 els.searchInput.value = '';
                 return;
             }
@@ -1301,6 +1444,12 @@
         syncControls();
         wirePage();
         runSearch(); // landing with params searches immediately; bare /catalog browses page 1
+
+        // Warm the decoration rules and refresh the rail once they settle so
+        // the Decoration group flips from "Loading…" to enabled/disabled.
+        loadDecoRules().then(function () {
+            if (lastResults) renderFacets(lastFacets, lastShownProducts);
+        });
     }
 
     if (document.readyState === 'loading') {

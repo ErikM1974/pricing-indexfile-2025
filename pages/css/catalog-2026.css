@@ -84,6 +84,12 @@
 }
 .fgroup-more:hover { color: var(--green-900); text-decoration: underline; }
 
+/* Decoration group while the rules feed is loading / unavailable —
+   visibly disabled (with the fgroup-note explaining why), never hidden */
+.fopt.is-disabled { color: var(--ink-faint); cursor: not-allowed; }
+.fopt.is-disabled:hover { background: none; color: var(--ink-faint); }
+.fopt.is-disabled input { cursor: not-allowed; }
+
 .fgroup-search { margin-bottom: 6px; }
 .fgroup-search input {
     width: 100%; min-height: 40px;

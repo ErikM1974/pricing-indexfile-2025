@@ -18,6 +18,13 @@ const TDT_SHIPDATE = require('./pages/js/3-day-tees-shipdate.js');
 // pattern; pricing is INTERNAL-DTG-BUILDER parity (rush opt-in, tier LTM).
 const CTS_PRICING = require('./pages/js/custom-tees-pricing.js');
 const CTS_SHIPDATE = require('./pages/js/custom-tees-shipdate.js');
+// Custom Hats ('custom-caps', 2026-06-11) — same dual-load pattern; pricing
+// is EMB-CAP-BUILDER parity (CeilDollar, 8-cap minimum, NO LTM/digitizing).
+const CAPS_PRICING = require('./pages/js/custom-caps-pricing.js');
+// Storefront channel registry — the PURE half (QuoteID prefixes, ShopWorks
+// push constants, banners, EmailJS templates; jest-locked). Bound to the
+// server-only behaviors in `const CHANNELS` in the storefront section below.
+const STOREFRONT_CHANNEL_CONFIG = require('./config/storefront-channels.js');
 
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
@@ -56,6 +63,14 @@ dotenv.config();
 //    and stamps statusToken/emailsSentAt into OrderSettingsJSON — browser sends are fallback, 2026-06-10)
 //   GET  /order-status[.html]               — customer order-status page (HMAC-token link from the confirmation email, no login)
 //   GET  /api/order-status/:quoteId?t=      — token-gated customer-safe status JSON (timing-safe HMAC check; 404 on bad token)
+//
+// CUSTOM HATS ('custom-caps' channel — server core 2026-06-11, pages pending;
+//   helpers next to the CTS ones: getCapsPricingConfig/getCapsCatalog/
+//   capsStockConflicts/rebuildCapsQuote)
+//   POST /api/create-checkout-session       — SHARED; orderSettings.channel='custom-caps' selects the caps
+//                                             reprice (CAP+CAP-AL bundles + CAPS-SHIP-* fail-closed, qty≥8 → 400)
+//   (NO /custom-caps page route yet — add the clean-URL sendFile WITH the page
+//    wave; registering it now would be a zombie route, P0 lesson 2026-06-11)
 //
 // ONLINE ORDER FORM
 //   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
@@ -621,8 +636,8 @@ function buildOrderConfirmationParams(quoteSession, stripeSessionId, orderStatus
   const sessionId = String(stripeSessionId || '');
 
   // Product name from the server-stamped order settings (multi-style);
-  // legacy rows without one fall back to the PC54 name.
-  const productLabel = esc(orderSettings.styleName || 'Port & Company Core Cotton Tee')
+  // legacy rows without one fall back to the channel's default (PC54 name).
+  const productLabel = esc(orderSettings.styleName || channelConfig(orderSettings.channel).fallbackProductName)
     + (orderSettings.rush ? ' <strong>(3-Day Rush)</strong>' : '');
   let productsTable = '<table><thead><tr><th>Product</th><th>Color</th><th>Size</th><th>Qty</th><th>Price</th></tr></thead><tbody>';
   Object.values(colorConfigs || {}).forEach((config) => {
@@ -754,15 +769,20 @@ async function sendOrderConfirmationEmails(quoteSession, stripeSessionId, status
     return { customerOk: false, salesOk: false };
   }
   const { params, customerEmail } = built;
+  // Template ids come from the channel registry (legacy/absent channel →
+  // 3DT default — both live channels share the tee templates today).
+  let osForTemplates = {};
+  try { osForTemplates = JSON.parse(quoteSession.OrderSettingsJSON || '{}'); } catch (_) { /* legacy row */ }
+  const emailCfg = channelConfig(osForTemplates.channel).emails;
   const [customerOk, salesOk] = await Promise.all([
-    sendEmailJSTemplate('template_sample_customer', Object.assign({
+    sendEmailJSTemplate(emailCfg.confirmationCustomerTemplate, Object.assign({
       to_email: customerEmail,
       to_name: params.customer_name,
     }, params)).then(
       () => { console.log('[Webhook] ✓ Customer confirmation email sent for', quoteSession.QuoteID); return true; },
       (e) => { console.error('[Webhook] Customer confirmation email failed for', quoteSession.QuoteID, ':', e.message); return false; }
     ),
-    sendEmailJSTemplate('template_sample_sales', Object.assign({
+    sendEmailJSTemplate(emailCfg.confirmationSalesTemplate, Object.assign({
       to_email: 'erik@nwcustomapparel.com',
       to_name: 'NWCA Sales',
     }, params)).then(
@@ -1005,26 +1025,11 @@ const staticOptions = {
 // 3-Day Tees Helper Functions (following Christmas Bundles pattern)
 // ============================================================================
 
-// Generate 3-Day Tees Quote ID (following Christmas Bundles pattern)
-function generate3DTQuoteID() {
-  const date = new Date();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const sequence = Math.floor(Math.random() * 10000);
-  const paddedSequence = String(sequence).padStart(4, '0');
-  return `3DT${month}${day}-${paddedSequence}`;
-}
-
-// Custom T-Shirts orders carry the DTG prefix (Erik 2026-06-10) so they land
-// in Quote Management alongside the internal builder's DTG quotes. Same
-// date+random shape as 3DT; the checkout route's uniqueness check still applies.
-function generateCtsQuoteID() {
-  const date = new Date();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const sequence = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
-  return `DTG${month}${day}-${sequence}`;
-}
+// Quote ID builders ('3DT{MMDD}-{rand4}' / 'DTG{MMDD}-{rand4}' — the DTG
+// prefix is deliberate, Erik 2026-06-10: storefront orders land in Quote
+// Management alongside the internal builder's DTG quotes) now live in the
+// channel registry: config/storefront-channels.js `buildQuoteId` (jest-locked
+// format). The checkout route's uniqueness check still applies per candidate.
 
 // Save 3-Day Tees order to quote_sessions (Christmas Bundles pattern)
 async function save3DTQuoteSession(data) {
@@ -1046,9 +1051,10 @@ async function save3DTQuoteSession(data) {
     LTMFeeTotal: parseFloat((orderTotals.ltmFee || 0).toFixed(2)),
     TotalAmount: parseFloat((orderTotals.grandTotal || 0).toFixed(2)),
     ExpiresAt: formattedExpiresAt,
-    Notes: (orderSettings && orderSettings.channel === 'custom-tees'
-      ? `Custom T-Shirts DTG Order${orderSettings.rush ? ' (3-Day Rush)' : ''} — ${orderSettings.styleNumber || ''}`
-      : '3-Day Tees Rush Order') + (stripeSessionId ? ` | Stripe Session: ${stripeSessionId}` : ''),
+    Notes: channelConfig(orderSettings && orderSettings.channel).orderNoteLabel({
+      rush: orderSettings && orderSettings.rush,
+      styleNumber: orderSettings && orderSettings.styleNumber,
+    }) + (stripeSessionId ? ` | Stripe Session: ${stripeSessionId}` : ''),
 
     // Store full order data as JSON (for webhook retrieval)
     // This eliminates Stripe metadata size constraints
@@ -1165,7 +1171,112 @@ async function getTdtShipMeta() {
 // lives inside CTS_PRICING). Rush is OPT-IN (+3DT-RUSH %) and only on
 // whitelisted rush-eligible styles. All fail-closed — never a guessed price.
 
-const CTS_RUSH_ELIGIBLE = new Set(['PC54']);   // 3-Day Rush launch scope (config, expand later)
+// 3-Day Rush launch scope — single source is the channel registry (the page's
+// window.CTS_RUSH_ELIGIBLE in custom-tees-app.js must be kept in sync; the
+// deferred catalog-admin rush_eligible-column plan replaces both).
+const CTS_RUSH_ELIGIBLE = new Set(STOREFRONT_CHANNEL_CONFIG.CHANNELS['custom-tees'].rushEligible);
+
+// ── Storefront channel registry (2026-06-11) ────────────────────────────────
+// ONE switchboard for everything that differs per storefront channel
+// (orderSettings.channel). The pure/static half (QuoteID builders, ShopWorks
+// push constants, banners, EmailJS templates) lives in
+// config/storefront-channels.js and is jest-locked by
+// tests/unit/storefront-channels.test.js; this const binds the SERVER-ONLY
+// behaviors on top. Adding a channel ('custom-caps') = one entry in the
+// config module + one matching entry here — see the field-by-field checklist
+// in that file. Do NOT add per-channel ternaries back into the routes.
+const CHANNELS = {
+  'custom-tees': Object.assign({}, STOREFRONT_CHANNEL_CONFIG.CHANNELS['custom-tees'], {
+    rebuildQuote: (colorConfigs, orderSettings, customerData) =>
+      rebuildCtsQuote(colorConfigs, orderSettings, customerData),
+    // Per-style size whitelist from the SERVER-fetched bundle (load-bearing:
+    // an unknown client size key must never inflate the tier while pricing $0).
+    sizeWhitelist: (priced) => priced.sizes,
+    stockGate: true,
+    // Per-channel conflict math: tees compare per color+size (the feed's
+    // size rows are real for garments).
+    stockConflicts: (cleanConfigs, stock) => ctsStockConflicts(cleanConfigs, stock),
+    // Standard orders promise the END of the 7-10 business-day window; the
+    // opt-in rush toggle uses the 3-day cutoff promise.
+    shipPromise: (priced) => (priced.rush
+      ? { promise: CTS_SHIPDATE.promise(new Date()), mode: 'rush-3day' }
+      : { promise: CTS_SHIPDATE.standardPromise(new Date()), mode: 'standard-7to10' }),
+    // Server-validated style facts become the order of record (the client's
+    // were advisory) — the push + success page read THESE.
+    stampedOrderSettings: (priced, stockChecked) => ({
+      channel: 'custom-tees',
+      styleNumber: priced.style,
+      styleName: priced.productName,
+      rush: priced.rush,
+      frontLocation: priced.frontLocation,
+      backLocation: priced.backLocation,
+      // false = the live stock gate couldn't run (inventory API hiccup,
+      // fail-open) — the push note tells production to verify garments.
+      stockChecked,
+    }),
+  }),
+  '3-day-tees': Object.assign({}, STOREFRONT_CHANNEL_CONFIG.CHANNELS['3-day-tees'], {
+    rebuildQuote: (colorConfigs, orderSettings, customerData) =>
+      rebuildTdtQuote(colorConfigs, orderSettings, customerData),
+    sizeWhitelist: () => TDT_SIZES,
+    stockGate: false,
+    stockConflicts: (cleanConfigs, stock) => ctsStockConflicts(cleanConfigs, stock),   // unreachable (no gate) — shape parity
+    shipPromise: () => ({ promise: TDT_SHIPDATE.promise(new Date()), mode: 'rush-3day' }),
+    stampedOrderSettings: () => ({}),
+  }),
+  // Custom Hats — OSFA cap embroidery storefront (server core 2026-06-11;
+  // pages pending). Erik's locked decisions: 8-cap minimum (NO LTM — the 1-7
+  // tier is unreachable), free logo setup (no digitizing line), proof-first
+  // always, back logo = flat tiered CAP-AL add-on.
+  'custom-caps': Object.assign({}, STOREFRONT_CHANNEL_CONFIG.CHANNELS['custom-caps'], {
+    rebuildQuote: (colorConfigs, orderSettings, customerData) =>
+      rebuildCapsQuote(colorConfigs, orderSettings, customerData),
+    sizeWhitelist: (priced) => priced.sizes,   // ['OSFA'] — one-click qty, no size grid
+    // SanMar live inventory gate (same getCtsStock SanMar path the tees use —
+    // caps never hit the Milton PC54 branch because rush is always false).
+    stockGate: true,
+    // C402 lesson (2026-06-11): cap feeds carry stale sized partIds (XL/SM
+    // rows at 0 qty next to the real OSFA rows) — conflicts must aggregate
+    // live qty by CATALOG_COLOR, never by size.
+    stockConflicts: (cleanConfigs, stock) => capsStockConflicts(cleanConfigs, stock),
+    // Proof-first promise: the 7-10 business-day window WORDING is "after
+    // proof approval" everywhere (banners/emails read the registry strings).
+    // PROPOSED window: digitizing 1-3 days + embroidery production, stamped
+    // as the end of a 7-10 biz-day window from checkout — assumes prompt
+    // proof approval. ERIK-DECISION: confirm 7-10 (vs a wider 10-12) before
+    // the page goes live; the binding date stamps at checkout, but the clock
+    // honestly starts at proof approval.
+    shipPromise: () => ({ promise: CTS_SHIPDATE.standardPromise(new Date()), mode: 'proof-first-standard' }),
+    // Server-validated cap facts become the order of record. Stitch counts
+    // are NEVER exposed (decision #2) — the 8K-included assumption lives in
+    // the pricing module, not on the order. needsArtReview is forced ON
+    // (proof-first, decision #11) regardless of what the client sent.
+    stampedOrderSettings: (priced, stockChecked) => ({
+      channel: 'custom-caps',
+      styleNumber: priced.style,
+      styleName: priced.productName,
+      rush: false,
+      frontLogo: true,
+      backLogo: priced.backLogo,
+      frontLocation: 'CF',                        // → 'Cap Front' via swLocationMap at push
+      backLocation: priced.backLogo ? 'CB' : null, // → 'Cap Back'
+      printLocationName: priced.backLogo ? 'Cap Front + Cap Back' : 'Cap Front',
+      needsArtReview: true,                       // ALWAYS proof-first
+      stockChecked,
+    }),
+  }),
+};
+
+// Absent/unknown channel → legacy 3DT (exactly the pre-registry `isCTS`
+// else-branch; historical Caspio rows have no channel stamped and must keep
+// working). Use channelConfigExact for whitelist-gated paths where an
+// unregistered channel must stay EXCLUDED (e.g. the shipped email).
+function channelConfig(channel) {
+  return CHANNELS[String(channel || '')] || CHANNELS[STOREFRONT_CHANNEL_CONFIG.DEFAULT_CHANNEL];
+}
+function channelConfigExact(channel) {
+  return CHANNELS[String(channel || '')] || null;
+}
 
 const _ctsCfgCache = new Map();   // styleNumber → { at, value }
 async function getCtsPricingConfig(styleNumber) {
@@ -1471,6 +1582,196 @@ function ctsStockConflicts(cleanConfigs, stock) {
     });
   });
   return conflicts;
+}
+
+// ── Custom Hats ('custom-caps') server core (2026-06-11) ────────────────────
+// Server twin of pages/js/custom-caps-pricing.js: fetches the CAP + CAP-AL
+// bundles and the CAPS-SHIP-* Service_Codes FRESH (fail-closed), reprices
+// server-side, and the shared checkout route enforces the 1-cent tolerance
+// against the client total. qty < 8 → the module's structured BELOW_MINIMUM
+// error → 400 (never a 1-7-tier price, never an LTM fee).
+
+const _capsCfgCache = new Map();   // styleNumber → { at, value }
+async function getCapsPricingConfig(styleNumber) {
+  const style = String(styleNumber || '').trim().toUpperCase();
+  if (!/^[A-Z0-9_-]{2,20}$/.test(style)) throw new Error(`Invalid style number: ${styleNumber}`);
+  const hit = _capsCfgCache.get(style);
+  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return hit.value;
+
+  const grab = async (url) => {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(`HTTP ${r.status} from ${url.split('?')[0]}`);
+    return r.json();
+  };
+  const code = async (c) => {
+    const j = await grab(`${TDT_PROXY}/api/service-codes?code=${c}`);
+    const row = j && j.data && j.data[0];
+    if (!row || !row.IsActive || !(parseFloat(row.SellPrice) >= 0)) {
+      throw new Error(`Service code ${c} missing/inactive in Caspio`);
+    }
+    return parseFloat(row.SellPrice);
+  };
+
+  // ALL fail-closed: a missing bundle or Caspio code 502s the checkout
+  // visibly — never a guessed price (Erik's #1 rule). NOTE the FREE-OVER
+  // trap: its SellPrice holds the THRESHOLD dollars (mirrors CTS).
+  const [capBundle, capAlBundle, shipFlat, shipFreeOver] = await Promise.all([
+    grab(`${TDT_PROXY}/api/pricing-bundle?method=CAP&styleNumber=${encodeURIComponent(style)}`),
+    grab(`${TDT_PROXY}/api/pricing-bundle?method=CAP-AL`),
+    code('CAPS-SHIP-FLAT'), code('CAPS-SHIP-FREE-OVER'),
+  ]);
+  if (!Array.isArray(capBundle.tiersR) || !capBundle.tiersR.length) {
+    throw new Error(`No cap pricing tiers for style ${style}`);
+  }
+  // OSFA-only store (v1): a fitted cap (S/M-M/L-L/XL) reaching this point is
+  // a catalog-seeding mistake — refuse it visibly rather than mis-price.
+  const hasOsfa = (capBundle.sizes || []).some(
+    (s) => String(s && s.size).trim().toUpperCase() === 'OSFA' && parseFloat(s.price) > 0
+  );
+  if (!hasOsfa) {
+    throw Object.assign(
+      new Error(`Style ${style} has no OSFA blank price (fitted caps are not sold on Custom Hats)`),
+      { code: 'STYLE_NOT_ALLOWED' }
+    );
+  }
+  const value = {
+    capBundle,
+    capAlBundle,
+    config: { shipFlat, shipFreeOver, sizes: ['OSFA'] },
+  };
+  _capsCfgCache.set(style, { at: Date.now(), value });
+  return value;
+}
+
+// Curated caps catalog — Caspio table CAPS_Catalog_2026 (one row per
+// style+hero-color, displayOrder + is_active) is the system of record,
+// served by the proxy route GET /api/caps/catalog. Until that proxy route
+// ships (follow-up — clone of dtg-top-sellers.js), the registry-pinned
+// CAPS_FALLBACK_LINEUP below mirrors the seeded rows so checkout works; the
+// fallback logs LOUDLY and only whitelists styles/names (every PRICE still
+// comes fail-closed from the APIs above). When the route goes live, Caspio
+// takes over automatically — no deploy.
+const CAPS_FALLBACK_LINEUP = [
+  { style: '112', product_title: 'Richardson Trucker Cap 112' },
+  { style: 'C402', product_title: 'Port Authority Snapback Trucker Cap. C402' },
+  { style: '112PFP', product_title: 'Richardson Printed Five-Panel Trucker 112PFP' },
+  { style: '256', product_title: 'Richardson Umpqua Gramps Cap 256' },
+  { style: '258', product_title: 'Richardson 5-Panel Classic Rope Cap 258' },
+  { style: '220', product_title: 'Richardson Relaxed Performance Lite 220' },
+  { style: 'C914', product_title: 'Port Authority Six-Panel Unstructured Twill Cap. C914' },
+  { style: 'STC26', product_title: 'Sport-Tek PosiCharge RacerMesh Cap. STC26' },
+  { style: 'CT105298', product_title: 'Carhartt Canvas Mesh Back Cap CT105298' },
+];
+let _capsCatalogCache = null;
+let _capsCatalogAt = 0;
+async function getCapsCatalog() {
+  if (_capsCatalogCache && Date.now() - _capsCatalogAt < 60 * 60 * 1000) return _capsCatalogCache;
+  const map = new Map();
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/caps/catalog`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const j = await r.json();
+    const rows = Array.isArray(j) ? j : (j.records || j.data || j.styles || []);
+    rows.forEach((row) => {
+      if (!row || row.is_active === false) return;
+      const k = String(row.style || row.styleNumber || '').toUpperCase();
+      if (k && !map.has(k)) map.set(k, row);
+    });
+    if (!map.size) throw new Error('caps catalog returned no active styles');
+  } catch (e) {
+    console.warn(`[Custom Caps] catalog API unavailable (${e.message}) — using the registry-pinned 9-style lineup (styles/names only; all pricing stays API-fed)`);
+    map.clear();
+    CAPS_FALLBACK_LINEUP.forEach((row) => map.set(row.style.toUpperCase(), row));
+  }
+  _capsCatalogCache = map;
+  _capsCatalogAt = Date.now();
+  return map;
+}
+
+// Caps stock conflicts — C402 lesson (2026-06-11): SanMar cap inventory
+// carries STALE SIZED partIds (e.g. style 112 returns 5 'XL' + 5 'SM' rows
+// at 0 qty next to the real OSFA rows), so per-size comparison would read a
+// fully-stocked color as sold out. Aggregate live qty by CATALOG_COLOR and
+// compare against the color's total wanted quantity. A color the feed
+// doesn't name at all is skipped (fail-open — naming mismatch must never
+// read as "sold out"), same as ctsStockConflicts.
+function capsStockConflicts(cleanConfigs, stock) {
+  const byColor = new Map();
+  stock.bySize.forEach((qty, key) => {
+    const color = key.slice(0, key.lastIndexOf('|'));
+    byColor.set(color, (byColor.get(color) || 0) + qty);
+  });
+  const conflicts = [];
+  Object.values(cleanConfigs || {}).forEach((c) => {
+    const colorKey = String(c.catalogColor).toUpperCase();
+    if (!stock.colors.has(colorKey)) return;
+    let want = 0;
+    Object.values(c.sizeBreakdown || {}).forEach((sd) => { want += (sd && sd.quantity) || 0; });
+    const have = byColor.get(colorKey) || 0;
+    if (want > have) {
+      conflicts.push({ catalogColor: c.catalogColor, displayColor: c.displayColor, size: 'OSFA', want, have });
+    }
+  });
+  return conflicts;
+}
+
+// Rebuild the full Custom-Hats quote server-side (authoritative). Same shape
+// contract as rebuildCtsQuote so the shared checkout route consumes it
+// unchanged: { quote, tax, config, shipping, style, rush, sizes, productName }
+// plus the caps facts (backLogo) stampedOrderSettings reads.
+async function rebuildCapsQuote(colorConfigs, orderSettings, customerData) {
+  const styleRaw = orderSettings && orderSettings.styleNumber;
+  const style = String(styleRaw || '').trim().toUpperCase();
+  const catalog = await getCapsCatalog();
+  if (!catalog.has(style)) {
+    throw Object.assign(new Error(`Style ${styleRaw || '(none)'} is not in the Custom Hats catalog`), { code: 'STYLE_NOT_ALLOWED' });
+  }
+  const product = catalog.get(style);
+
+  // NO rush on caps v1 (registry rushEligible is []) — digitizing + proof
+  // approval make a 3-day promise unsafe. A doctored rush flag 400s.
+  if (orderSettings && orderSettings.rush) {
+    throw Object.assign(new Error('Rush service is not available for Custom Hats'), { code: 'RUSH_NOT_ELIGIBLE' });
+  }
+
+  const { capBundle, capAlBundle, config } = await getCapsPricingConfig(style);
+  const tax = await resolveTdtTax(customerData);
+
+  // Back logo: a server-recognized FLAG (true, or an uploaded-file object) —
+  // pricing keys on the server's reading, never on client prices.
+  const bl = orderSettings && orderSettings.backLogo;
+  const backLogo = bl === true || !!(bl && typeof bl === 'object' && (bl.fileUrl || bl.url));
+
+  // OSFA-only cart: one quantity per color (sizeWhitelist is ['OSFA'], so an
+  // unknown size key can neither inflate the tier nor ride along unpriced).
+  const cart = Object.values(colorConfigs || {}).map((c) => {
+    const sd = (c && c.sizeBreakdown) || {};
+    const q = parseInt(sd.OSFA && sd.OSFA.quantity, 10) || 0;
+    return { catalogColor: c && c.catalogColor, colorName: (c && (c.displayColor || c.catalogColor)) || '', quantity: q };
+  }).filter((c) => c.catalogColor && c.quantity > 0);
+  const method = customerData.deliveryMethod === 'pickup' ? 'pickup' : 'ship';
+
+  // The module enforces the 8-cap minimum (BELOW_MINIMUM, mapped to 400 by
+  // the checkout route) and the CeilDollar EMB-cap chain; shipping is the
+  // CAPS-SHIP-* threshold model. NOTE: with the launch $100 threshold every
+  // ≥8-cap order ships free — Erik tunes CAPS-SHIP-FREE-OVER in Caspio.
+  const quote = CAPS_PRICING.quote({
+    capBundle,
+    capAlBundle,
+    config,
+    cart,
+    backLogo,
+    delivery: { method, taxRate: tax.rate },
+  });
+  const shipResolved = method === 'pickup'
+    ? { amount: 0, source: 'pickup' }
+    : { amount: quote.shipping, source: quote.shipping > 0 ? 'flat-under-threshold' : 'free-over-threshold' };
+  return {
+    quote, tax, config, shipping: shipResolved,
+    style, rush: false, backLogo,
+    sizes: config.sizes,
+    productName: product.product_title || product.productName || `${style} Cap`,
+  };
 }
 
 // → { amount, source: 'ups-estimate'|'flat', detail? }. Throws only if BOTH
@@ -2199,7 +2500,7 @@ app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
       deliveryMethod,
       shipPromise: orderSettings.shipPromise || null,
       rush: !!orderSettings.rush,
-      styleName: orderSettings.styleName || 'Port & Company Core Cotton Tee',
+      styleName: orderSettings.styleName || channelConfig(orderSettings.channel).fallbackProductName,
       items,
       totals: {
         subtotal: Number(orderTotals.subtotal) || 0,
@@ -2454,15 +2755,16 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // open redirect off a payment flow).
     const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
 
-    // Channel: 'custom-tees' = the multi-style DTG storefront (per-style
-    // bundle, online LTM, opt-in rush); anything else = legacy 3DT.
-    const isCTS = !!(orderSettings && orderSettings.channel === 'custom-tees');
-    const chLog = isCTS ? '[Custom Tees Checkout]' : '[3-Day Tees Checkout]';
+    // Channel registry dispatch: 'custom-tees' = the multi-style DTG
+    // storefront (per-style bundle, online LTM, opt-in rush); absent/unknown
+    // = legacy 3DT (the registry default — old rows must keep working).
+    const chCfg = channelConfig(orderSettings && orderSettings.channel);
+    const chLog = chCfg.logPrefix;
 
     // Artwork-rights attestation is REQUIRED for storefront orders (legal
     // record; the client checkbox is advisory — this is the enforcement).
     // The ack object is stored verbatim in OrderSettingsJSON. (2026-06-10)
-    if (isCTS && !(orderSettings.rightsAck && orderSettings.rightsAck.checked)) {
+    if (chCfg.requireRightsAck && !(orderSettings && orderSettings.rightsAck && orderSettings.rightsAck.checked)) {
       return res.status(400).json({
         error: 'Please confirm you own or have permission to print your artwork before checking out — nothing was charged.'
       });
@@ -2471,12 +2773,13 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // ── Authoritative server-side reprice ──────────────────────────────
     let priced;
     try {
-      priced = isCTS
-        ? await rebuildCtsQuote(colorConfigs, orderSettings, customerData)
-        : await rebuildTdtQuote(colorConfigs, orderSettings, customerData);
+      priced = await chCfg.rebuildQuote(colorConfigs, orderSettings, customerData);
     } catch (e) {
       console.error(`${chLog} Server reprice failed:`, e);
-      if (e.code === 'STYLE_NOT_ALLOWED' || e.code === 'RUSH_NOT_ELIGIBLE') {
+      // BELOW_MINIMUM: caps' structured 8-cap-minimum error (the module never
+      // prices the 1-7 tier) — a customer-fixable input problem, like the
+      // other two codes, so it 400s instead of 502ing.
+      if (e.code === 'STYLE_NOT_ALLOWED' || e.code === 'RUSH_NOT_ELIGIBLE' || e.code === 'BELOW_MINIMUM') {
         return res.status(400).json({ error: e.message + ' — nothing was charged.' });
       }
       return res.status(502).json({
@@ -2501,7 +2804,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // advisory — the ShopWorks push reads this JSON, and a doctored payload
     // must not ship uncharged shirts or mislabeled line prices).
     const cleanConfigs = {};
-    const sizeWhitelist = isCTS ? priced.sizes : TDT_SIZES;
+    const sizeWhitelist = chCfg.sizeWhitelist(priced);
     Object.values(colorConfigs).forEach(c => {
       if (!c || !c.catalogColor) return;
       const sizeBreakdown = {};
@@ -2531,13 +2834,15 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // (push note flags it) — it never blocks the sale. A would-be shortage
     // is re-confirmed on a FRESH fetch before 409ing.
     let stockChecked = false;
-    if (isCTS) {
+    if (chCfg.stockGate) {
       try {
+        // Conflict math is channel-bound: tees compare per color+size; caps
+        // aggregate by CATALOG_COLOR (stale sized partIds in cap feeds).
         let stock = await getCtsStock(priced.style, false, priced.rush);
-        let conflicts = ctsStockConflicts(cleanConfigs, stock);
+        let conflicts = chCfg.stockConflicts(cleanConfigs, stock);
         if (conflicts.length) {
           stock = await getCtsStock(priced.style, true, priced.rush);
-          conflicts = ctsStockConflicts(cleanConfigs, stock);
+          conflicts = chCfg.stockConflicts(cleanConfigs, stock);
         }
         if (conflicts.length) {
           const what = conflicts.map(c => `${c.displayColor} ${c.size} (you want ${c.want}, ${c.have} left)`).join(', ');
@@ -2574,35 +2879,25 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // success page and the ShopWorks order note. Custom-Tees standard orders
     // promise the END of the 7-10 business-day window; the rush toggle (or
     // legacy 3DT) uses the 3-day cutoff promise.
-    const promise = isCTS
-      ? (priced.rush ? CTS_SHIPDATE.promise(new Date()) : CTS_SHIPDATE.standardPromise(new Date()))
-      : TDT_SHIPDATE.promise(new Date());
+    const shipPlan = chCfg.shipPromise(priced);
+    const promise = shipPlan.promise;
     const settingsStamped = Object.assign({}, orderSettings || {}, {
       shipPromise: {
         iso: promise.shipDateIso,
         label: promise.shipDateLong,
-        mode: isCTS ? (priced.rush ? 'rush-3day' : 'standard-7to10') : 'rush-3day',
+        mode: shipPlan.mode,
         rangeLabel: promise.rangeLabel || null,    // standard mode only
         stampedAt: new Date().toISOString()
       }
-    }, isCTS ? {
-      // Server-validated style facts become the order of record (the client's
-      // were advisory) — the push + success page read THESE.
-      channel: 'custom-tees',
-      styleNumber: priced.style,
-      styleName: priced.productName,
-      rush: priced.rush,
-      frontLocation: priced.frontLocation,
-      backLocation: priced.backLocation,
-      // false = the live stock gate couldn't run (inventory API hiccup,
-      // fail-open) — the push note tells production to verify garments.
-      stockChecked
-    } : {});
+      // Channel-stamped style facts (custom-tees: server-validated channel/
+      // style/rush/locations/stockChecked become the order of record — the
+      // push + success page read THESE; legacy 3DT stamps nothing).
+    }, chCfg.stampedOrderSettings(priced, stockChecked));
 
     // ── Unique QuoteID (random suffix used to collide same-day) ───────
     let quoteID = null;
     for (let attempt = 0; attempt < 4; attempt++) {
-      const candidate = isCTS ? generateCtsQuoteID() : generate3DTQuoteID();
+      const candidate = chCfg.buildQuoteId();
       try {
         // refresh=true is LOAD-BEARING: without it this pre-create lookup
         // caches [] under this QuoteID for 5 min on the proxy, and the
@@ -2644,9 +2939,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
 
     // ── Stripe line items built from the SERVER quote ──────────────────
     const cents = (v) => Math.round(v * 100);
-    const lineName = isCTS
-      ? (l) => `${priced.style} ${priced.productName ? '— ' + String(priced.productName).slice(0, 60) : 'Tee'} — ${l.colorName}, ${l.size}${priced.rush ? ' (3-Day Rush)' : ''}`
-      : (l) => `PC54 Tee — ${l.colorName}, ${l.size}`;
+    const lineName = (l) => chCfg.stripeLineName(priced, l);
     const line_items = quote.lines.map(l => ({
       price_data: {
         currency: 'usd',
@@ -2703,15 +2996,11 @@ app.post('/api/create-checkout-session', async (req, res) => {
       line_items: line_items || [],
       mode: 'payment',
       customer_email: customer_email,
-      success_url: isCTS
-        ? `${siteOrigin}/pages/custom-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`
-        : `${siteOrigin}/pages/3-day-tees-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`,
-      cancel_url: isCTS
-        ? `${siteOrigin}/custom-tees?canceled=1`
-        : `${siteOrigin}/pages/3-day-tees.html?canceled=1`,
+      success_url: `${siteOrigin}${chCfg.stripeSuccessPath(quoteID)}`,
+      cancel_url: `${siteOrigin}${chCfg.stripeCancelPath()}`,
       metadata: {
         quoteID: quoteID,
-        source: isCTS ? 'custom-tees' : '3day-tees'
+        source: chCfg.stripeSource
         // NOTE: Full order data now stored in Caspio (not Stripe metadata)
         // Webhook will query Caspio using quoteID to retrieve order data
         // This eliminates Stripe's 500-character metadata limit
@@ -2737,9 +3026,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             SessionID: `stripe_${session.id}`,
-            Notes: isCTS
-              ? `Custom T-Shirts DTG Order${priced.rush ? ' (3-Day Rush)' : ''} — ${priced.style} | Stripe Session: ${session.id} | Status: Checkout Created`
-              : `3-Day Tees Rush Order | Stripe Session: ${session.id} | Status: Checkout Created`
+            Notes: `${chCfg.orderNoteLabel({ rush: priced.rush, styleNumber: priced.style })} | Stripe Session: ${session.id} | Status: Checkout Created`
           })
         });
         console.log('[3-Day Tees Checkout] ✓ Updated Caspio with Stripe session ID');
@@ -2877,14 +3164,19 @@ app.post('/api/submit-3day-order', async (req, res) => {
       }
     }
 
+    // Channel registry: push constants + banners come from the entry for
+    // orderSettings.channel (absent/unknown → legacy 3DT defaults).
+    const pushCfg = channelConfig(orderSettings && orderSettings.channel);
+    const pushC = pushCfg.push;
+
     // Build line items from colorConfigs
     // Structure: { catalogColor: { displayColor, sizeBreakdown: { size: { quantity, unitPrice } } } }
     // Style: Custom-Tees orders carry the SERVER-VALIDATED style in
     // orderSettings (stamped at checkout from the curated-catalog whitelist);
     // legacy 3DT orders fall through to PC54.
     const lineItems = [];
-    const styleNumber = orderSettings?.styleNumber || pricingData?.styleNumber || 'PC54';
-    const productName = orderSettings?.styleName || pricingData?.productName || 'Port & Company Core Cotton Tee';
+    const styleNumber = orderSettings?.styleNumber || pricingData?.styleNumber || pushC.fallbackStyleNumber;
+    const productName = orderSettings?.styleName || pricingData?.productName || pushCfg.fallbackProductName;
 
     for (const [catalogColor, config] of Object.entries(colorConfigs)) {
       if (config.sizeBreakdown) {
@@ -2909,11 +3201,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
     console.log('[3-Day Order] Built lineItems:', lineItems.length, 'items');
 
     // Add Less Than Minimum fee as a line item (if applicable).
-    // partNumber stays 'LTM-75' (a stable ShopWorks SKU); the description
-    // reflects the ACTUAL fee from Caspio Service_Codes 3DT-LTM.
+    // partNumber stays 'LTM-75' (a stable ShopWorks SKU, via the channel
+    // registry); the description reflects the ACTUAL fee from Caspio
+    // Service_Codes 3DT-LTM.
     if (orderTotals?.ltmFee && orderTotals.ltmFee > 0) {
       lineItems.push({
-        partNumber: 'LTM-75',
+        partNumber: pushC.ltmPartNumber,
         description: `Less Than Minimum $${Number(orderTotals.ltmFee).toFixed(2)}`,
         color: '',
         size: '',
@@ -2951,23 +3244,24 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const hasFrontPrint = stampedFront ? true : !/^(FB|JB)$/.test(printLocation);
     const hasBackPrint = stampedBack ? true : /(^|_)(FB|JB)$/.test(printLocation);
 
-    // Map location codes to exact ShopWorks dropdown values.
+    // Map location codes to exact ShopWorks dropdown values (channel
+    // registry — caps will use different OnSite dropdown values).
     // ShopWorks accepts: 'Full Back', 'Full Front', 'Left Chest', 'Right Chest'
     // — jumbos map to the nearest dropdown value; the exact 16×20 dims ride in
     // the location notes + placement spec. (audit HIGH fix 2026-06-10)
-    const SW_LOC = { LC: 'Left Chest', FF: 'Full Front', JF: 'Full Front', FB: 'Full Back', JB: 'Full Back' };
-    const frontLocationName = SW_LOC[frontCode] || 'Left Chest';
-    const backLocationName = SW_LOC[stampedBack] || 'Full Back';
+    const SW_LOC = pushC.swLocationMap;
+    const frontLocationName = SW_LOC[frontCode] || pushC.defaultFrontLocationName;
+    const backLocationName = SW_LOC[stampedBack] || pushC.defaultBackLocationName;
 
     console.log('[3-Day Order] Artwork URLs:', { frontLogo, backLogo, printLocation, frontCode, stampedBack, frontLocationName, hasFrontPrint, hasBackPrint });
 
     if (frontLogo || backLogo) {
       const design = {
         name: `${tempOrderNumber} - Customer Logo`,  // "name" field expected by proxy transformDesigns
-        externalId: `3DT-${tempOrderNumber}`,  // External ID for tracking
+        externalId: `${pushC.designExternalIdPrefix}${tempOrderNumber}`,  // External ID for tracking
         productColor: productColorsString,  // T-shirt colors from order → "For Product Colors" field
-        designTypeId: 45,  // DTG
-        artistId: 224,     // 3-Day Tees routing
+        designTypeId: pushC.designTypeId,  // 45 = DTG (channel registry)
+        artistId: pushC.artistId,          // 224 = 3-Day Tees routing
         locations: []
       };
 
@@ -2975,16 +3269,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
       if (frontLogo && hasFrontPrint) {
         design.locations.push({
           location: frontLocationName,  // Exact ShopWorks dropdown value
-          colors: 'Full Color',  // DTG = Full Color
+          colors: pushC.designLocationColors,  // DTG = Full Color
           code: `${tempOrderNumber}-FRONT`,
           imageUrl: frontLogo,
           customField01: frontLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
           notes: 'Customer uploaded artwork' + (frontCode === 'JF' ? ' — JUMBO FRONT 16×20″ (see placement spec)' : ''),
-          details: [{
-            color: 'Full Color DTG',
-            paramLabel: 'Print Type',
-            paramValue: 'Direct to Garment'
-          }]
+          details: pushC.designDetails()
         });
       }
 
@@ -2993,16 +3283,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
       if (backLogo && hasBackPrint) {
         design.locations.push({
           location: backLocationName,
-          colors: 'Full Color',  // DTG = Full Color
+          colors: pushC.designLocationColors,  // DTG = Full Color
           code: `${tempOrderNumber}-BACK`,
           imageUrl: backLogo,
           customField01: backLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
           notes: 'Customer uploaded artwork (back) - See Attachments tab for image' + (stampedBack === 'JB' ? ' — JUMBO BACK 16×20″ (see placement spec)' : ''),
-          details: [{
-            color: 'Full Color DTG',
-            paramLabel: 'Print Type',
-            paramValue: 'Direct to Garment'
-          }]
+          details: pushC.designDetails()
         });
       }
 
@@ -3066,9 +3352,8 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const placementBlock = placementLines.length
       ? `\nPRINT PLACEMENT (customer's designer preview, top-center anchor — ADVISORY: place at the STANDARD print location for the garment; use the spec below only when it clearly deviates on purpose):\n${placementLines.join('\n')}\n`
       : '';
-    const _isCtsStandard = orderSettings?.channel === 'custom-tees' && !orderSettings?.rush;
     const artReviewBanner = orderSettings?.needsArtReview
-      ? `\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; ${_isCtsStandard ? 'production clock' : '3-day clock'} starts at proof approval ***\n`
+      ? `\n*** ART NEEDS HUMAN PROOF BEFORE PRINTING — see placement spec; ${pushC.artReviewClock(!!orderSettings?.rush)} starts at proof approval ***\n`
       : '';
     // Legal record on the production order: the customer attested artwork
     // rights at checkout (storefront orders only). (2026-06-10)
@@ -3077,7 +3362,8 @@ app.post('/api/submit-3day-order', async (req, res) => {
       : '';
     // Stock gate fail-open marker (2026-06-10): the checkout-time inventory
     // check couldn't run (feed error/timeout), so garments were NOT verified.
-    const stockLine = orderSettings?.channel === 'custom-tees' && orderSettings.stockChecked === false
+    // Only channels with a stock gate (registry stockBanner) emit this.
+    const stockLine = pushC.stockBanner && orderSettings?.stockChecked === false
       ? '\n*** STOCK NOT VERIFIED AT CHECKOUT (inventory feed was down) — confirm garment availability before production ***\n'
       : '';
     const shipPromiseLine = orderSettings?.shipPromise?.label
@@ -3089,7 +3375,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
     const taxRateNum = Number(orderTotals?.taxRate);
     const taxPct = Number.isFinite(taxRateNum) && taxRateNum > 0
       ? String(Math.round(taxRateNum * 10000) / 100) : null;
-    const taxPartNumber = taxPct ? `Tax_${taxPct}` : 'Tax_0';
+    const taxPartNumber = pushC.taxPartNumber(taxPct);
     const taxPartDescription = taxPct
       ? `${orderTotals?.taxAccountName || 'WA Sales Tax'} ${taxPct}%${orderTotals?.taxAccount ? ` (acct ${orderTotals.taxAccount})` : ''}`
       : 'No sales tax (out of state)';
@@ -3131,14 +3417,12 @@ app.post('/api/submit-3day-order', async (req, res) => {
         country: 'USA'
       },
       // Additional notes - send as array for proxy to process.
-      // Service banner is channel/rush-aware (2026-06-10): legacy 3DT is
-      // always rush; Custom-Tees standard orders are 7-10 business days —
-      // a hardcoded RUSH banner here would make production rush them.
+      // Service banner is channel/rush-aware (2026-06-10, registry): legacy
+      // 3DT is always rush; Custom-Tees standard orders are 7-10 business
+      // days — a hardcoded RUSH banner here would make production rush them.
       notes: [{
         type: 'Notes On Order',
-        note: `${(orderSettings?.channel === 'custom-tees' && !orderSettings?.rush)
-          ? 'STANDARD DTG SERVICE - 7-10 business days from artwork approval.'
-          : '3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.'}
+        note: `${pushC.serviceBanner(!!orderSettings?.rush)}
 ${customerData.deliveryMethod === 'pickup' ? '\n*** CUSTOMER PICKUP - Milton, WA ***\n' : ''}${artReviewBanner}${stockLine}${rightsLine}${shipPromiseLine}${placementBlock}
 Customer: ${customerData.firstName} ${customerData.lastName}
 Email: ${customerData.email}
@@ -3156,8 +3440,9 @@ Payment Status: ${paymentConfirmed ? 'succeeded' : 'pending'}
 Total: $${orderTotals?.grandTotal || 0}${taxPct ? ` (includes ${taxPct}% sales tax${customerData.deliveryMethod === 'pickup' ? ', Milton pickup' : ''})` : ' (no sales tax - out of state)'}
 TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shipment'}`
       }],
-      // Channel-aware: Custom-Tees standard orders are NOT rush (legacy 3DT always is)
-      rushOrder: orderSettings?.channel === 'custom-tees' ? !!orderSettings.rush : true,
+      // Channel-aware (registry): Custom-Tees standard orders are NOT rush
+      // (legacy 3DT always is)
+      rushOrder: pushC.rushOrderFlag(orderSettings),
       printLocation: orderSettings?.printLocationName || 'Left Chest',
       // Tax fields - proxy expects at root level (not nested in totals).
       // 3DT pushes REAL tax (unlike Order Form's TaxTotal=0) — rate + account
@@ -7384,8 +7669,13 @@ async function sendOrderShippedEmail(quoteSession, payload) {
     if (!payload.trackingNumber) return;
     const parse = (s) => { try { return JSON.parse(s || '{}'); } catch (_) { return {}; } };
     const os = parse(quoteSession.OrderSettingsJSON);
-    const channel = String(os.channel || '');
-    if (channel !== 'custom-tees' && channel !== '3-day-tees') return;
+    // EXACT registry lookup (not the default-to-3DT resolver): rep-managed
+    // quotes and unregistered channels must stay silently excluded, exactly
+    // like the old hardcoded 'custom-tees'/'3-day-tees' whitelist. A new
+    // storefront channel gets this email by registering with
+    // emails.shippedEnabled: true — no hidden list to forget.
+    const shipChCfg = channelConfigExact(os.channel);
+    if (!shipChCfg || !shipChCfg.emails.shippedEnabled) return;
     if (os.shipEmailSentAt) return; // already notified
     const customerData = parse(quoteSession.CustomerDataJSON);
     const email = customerData.email || quoteSession.CustomerEmail;
@@ -7395,7 +7685,7 @@ async function sendOrderShippedEmail(quoteSession, payload) {
     const carrier = payload.trackingCarrier || 'UPS';
     const name = `${customerData.firstName || ''} ${customerData.lastName || ''}`.trim()
       || quoteSession.CustomerName || 'there';
-    const sent = await sendEmailJSTemplate('template_order_shipped', {
+    const sent = await sendEmailJSTemplate(shipChCfg.emails.shippedTemplate, {
       to_email: email,
       to_name: escapeHTMLSrv(name),
       order_number: escapeHTMLSrv(quoteSession.QuoteID),
