@@ -137,6 +137,31 @@ let hasChanges = false;
         { code: 'FB', label: 'Full Back', dim: '12″×16″' },
         { code: 'JB', label: 'Jumbo Back', dim: '16″×20″' },
     ];
+    // DATA GAP (2026-06-11 parity audit): the pricing layer only supports
+    // these 4 front+back combos — dtg-pricing-service.js `this.locations`
+    // and the server whitelist in caspio-pricing-proxy/lib/
+    // dtg-canonical-pricing.js. DTG_Costs has cost rows for the 5 single
+    // locations only; combos are synthesized from that fixed list, so
+    // FF_JB and JF_FB are unpriceable — the live preview rendered them as
+    // blank/$0 and POST /api/dtg/quote-pricing rejects them with
+    // bad_input (verified live). Never offer a combo the data can't back.
+    const SUPPORTED_COMBOS = ['LC_FB', 'FF_FB', 'JF_JB', 'LC_JB'];
+    function isComboSupported(front, back) {
+        if (!front || !back) return true; // single locations always price
+        return SUPPORTED_COMBOS.includes(`${front}_${back}`);
+    }
+    // Drop a back selection the data can't price with the current front.
+    // Returns the cleared back code ('' if nothing changed) so callers
+    // can surface the change to the rep.
+    function sanitizeLocationState() {
+        if (state.back && !isComboSupported(state.front, state.back)) {
+            const cleared = state.back;
+            console.warn(`[dtg-inline-form] Unpriceable location combo ${state.front}_${cleared} — back print cleared (no DTG_Costs rows; /api/dtg/quote-pricing rejects it).`);
+            state.back = '';
+            return cleared;
+        }
+        return '';
+    }
 
     // ----- Caches (same pattern as line-items.jsx in order form) -------------
     const _styleSearchCache = new Map(); // query → [{value,label}]
@@ -376,6 +401,7 @@ let hasChanges = false;
                 });
                 state.front = snap.front || 'LC';
                 state.back = snap.back || '';
+                sanitizeLocationState(); // stale session may hold FF_JB/JF_FB
                 if (snap.customer) state.customer = { ...state.customer, ...snap.customer };
                 if (snap.shipping) state.shipping = { ...state.shipping, ...snap.shipping };
                 return true;
@@ -1111,11 +1137,18 @@ let hasChanges = false;
             <button type="button" class="dtg-location-pill${state.back === '' ? ' selected' : ''}" data-loc-code="" data-loc-group="back">
                 None
             </button>
-        ` + BACK_LOCATIONS.map((loc) => `
-            <button type="button" class="dtg-location-pill${state.back === loc.code ? ' selected' : ''}" data-loc-code="${loc.code}" data-loc-group="back">
+        ` + BACK_LOCATIONS.map((loc) => {
+            // Unpriceable combos (FF_JB / JF_FB — see SUPPORTED_COMBOS) render
+            // disabled so the rep can't select a price the data can't back.
+            const supported = isComboSupported(state.front, loc.code);
+            const disabledAttrs = supported ? '' :
+                ` disabled title="Not available with ${escapeHtml(LOCATION_LABELS[state.front] || state.front)} — no pricing data for ${escapeHtml(state.front)}_${escapeHtml(loc.code)}"`;
+            return `
+            <button type="button" class="dtg-location-pill${state.back === loc.code ? ' selected' : ''}" data-loc-code="${loc.code}" data-loc-group="back"${disabledAttrs}>
                 ${escapeHtml(loc.label)}<span class="dim">${escapeHtml(loc.dim)}</span>
             </button>
-        `).join('');
+        `;
+        }).join('');
 
         const sum = document.getElementById('dtgLocationSummary');
         if (sum) {
@@ -1129,6 +1162,10 @@ let hasChanges = false;
         frontEl.querySelectorAll('.dtg-location-pill').forEach((btn) => {
             btn.addEventListener('click', () => {
                 state.front = btn.getAttribute('data-loc-code') || 'LC';
+                const clearedBack = sanitizeLocationState();
+                if (clearedBack) {
+                    showToastSafe(`${LOCATION_LABELS[clearedBack] || clearedBack} isn't available with ${LOCATION_LABELS[state.front] || state.front} — back print cleared.`);
+                }
                 markDirty();
                 scheduleStateSave();
                 renderLocationPills();
@@ -1137,7 +1174,11 @@ let hasChanges = false;
         });
         backEl.querySelectorAll('.dtg-location-pill').forEach((btn) => {
             btn.addEventListener('click', () => {
-                state.back = btn.getAttribute('data-loc-code') || '';
+                const code = btn.getAttribute('data-loc-code') || '';
+                // Belt-and-braces: disabled pills don't fire clicks, but never
+                // let an unpriceable combo into state regardless.
+                if (code && !isComboSupported(state.front, code)) return;
+                state.back = code;
                 markDirty();
                 scheduleStateSave();
                 renderLocationPills();
@@ -4447,6 +4488,7 @@ let hasChanges = false;
                 state.front = code;
                 state.back = '';
             }
+            sanitizeLocationState(); // never let an unpriceable combo in via chat fill
 
             // Build rows from PRICE_QUOTE lineItems
             const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
@@ -4892,6 +4934,7 @@ let hasChanges = false;
                     state.back = '';
                 }
             }
+            sanitizeLocationState(); // legacy quote may carry FF_JB/JF_FB
         }
 
         // Rebuild rows from quote_items. Each item carries Style/Color/SizeBreakdown.
@@ -5308,6 +5351,10 @@ let hasChanges = false;
             const b = String(back || '').toUpperCase();
             if (!VALID_FRONT.includes(f)) return null;
             if (!VALID_BACK.includes(b)) return null;
+            // FF_JB / JF_FB have no pricing data (see SUPPORTED_COMBOS) —
+            // reject so the chat reports failure instead of silently
+            // setting a combo that prices to $0.
+            if (b && !isComboSupported(f, b)) return null;
             const changed = (state.front !== f) || (state.back !== b);
             if (!changed) return effectiveLocationCode();
             state.front = f;

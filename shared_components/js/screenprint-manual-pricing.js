@@ -211,14 +211,14 @@ class ScreenPrintManualPricing {
                     <div id="sp-dark-tooltip" class="sp-dark-tooltip" style="display: none;">
                         <div class="sp-dark-tooltip-content">
                             <div class="sp-dark-tooltip-header">
-                                <i class="fas fa-tshirt"></i> Why Dark Garment Adds a Color
+                                <i class="fas fa-tshirt"></i> Why Dark Garments Add a Setup Screen
                             </div>
                             <div class="sp-dark-tooltip-body">
                                 When printing on black or dark-colored shirts, we must print a <strong>white underbase layer first</strong> so your ink colors appear vibrant and true to their intended shade.
                                 <br><br>
-                                This underbase requires an additional screen setup and counts as one color in your total.
+                                The underbase requires one additional screen, added to the one-time setup fee per printed location. It does not change your per-shirt print price.
                                 <br><br>
-                                <strong>Example:</strong> Red + Green + Yellow design on a black shirt = <strong>4 colors total</strong> (3 design colors + 1 white underbase)
+                                <strong>Example:</strong> Red + Green + Yellow design on a black shirt = 3-color per-shirt pricing + <strong>4 setup screens</strong> (3 design colors + 1 white underbase)
                                 <br><br>
                                 <em>The underbase is applied to ALL printed locations on the garment.</em>
                             </div>
@@ -1366,21 +1366,21 @@ class ScreenPrintManualPricing {
 
         if (!pricingData || quantity === 0) return pricing;
 
-        let effectiveFrontPrintColors = frontColors;
+        // Dark-garment white underbase is a SETUP screen (+1 per printed location), never a
+        // per-piece price bump — per-piece lookups use the raw design color count.
+        // Parity with screenprint-quote-builder.js (CLAUDE.md Rule 7); synced with screenprint-pricing-v2.js.
+        let frontScreens = frontColors;
         if (isDarkGarment && frontColors > 0) {
-            effectiveFrontPrintColors += 1;
+            frontScreens += 1;
         }
-        pricing.colorBreakdown.front = effectiveFrontPrintColors;
+        pricing.colorBreakdown.front = frontScreens;
 
-        // Cap effective colors at the maximum available in pricing data
+        // Cap lookup colors at the maximum available in pricing data
         const maxAvailableColors = Math.max(...Object.keys(pricingData.primaryLocationPricing || {})
             .filter(key => !isNaN(parseInt(key)))
             .map(key => parseInt(key)));
-        
-        if (effectiveFrontPrintColors > maxAvailableColors) {
-            console.log(`[ScreenPrintV2] Capping effective colors from ${effectiveFrontPrintColors} to ${maxAvailableColors} (max available in pricing data)`);
-            effectiveFrontPrintColors = maxAvailableColors;
-        }
+
+        const frontLookupColors = Math.min(frontColors, maxAvailableColors);
 
         // MANUAL MODE: Calculate price using manual base cost + API pricing rules
         if (this.config.isManualMode) {
@@ -1393,15 +1393,15 @@ class ScreenPrintManualPricing {
                 // Apply margin from API
                 const garmentWithMargin = manualBaseCost / tier.MarginDenominator;
 
-                // Get print cost from API
+                // Get print cost from API — raw design colors (underbase is setup-only, Rule 7)
                 let printCost = 0;
                 if (frontColors > 0) {
-                    printCost = this.getPrintCostFromAPI(pricingData, tier.TierLabel, effectiveFrontPrintColors, 'PrimaryLocation');
+                    printCost = this.getPrintCostFromAPI(pricingData, tier.TierLabel, frontLookupColors, 'PrimaryLocation');
                 }
 
-                // Apply flash charge PER COLOR (applies to ALL colors, including 1-color)
+                // Apply flash charge PER COLOR (applies to ALL colors, including 1-color) — raw design colors
                 const flashChargePerColor = parseFloat(pricingData.rulesR?.FlashCharge || 0);
-                const flashChargeTotal = flashChargePerColor * effectiveFrontPrintColors;
+                const flashChargeTotal = flashChargePerColor * frontColors;
 
                 // Apply margin to primary location print cost (matches pricing-v2.js logic)
                 const printCostWithMargin = (printCost + flashChargeTotal) / tier.MarginDenominator;
@@ -1449,7 +1449,7 @@ class ScreenPrintManualPricing {
             }
 
             if (frontColors > 0) {
-                const frontPricingData = pricingData.primaryLocationPricing?.[effectiveFrontPrintColors.toString()];
+                const frontPricingData = pricingData.primaryLocationPricing?.[frontLookupColors.toString()];
                 if (frontPricingData?.tiers) {
                     const tier = frontPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
                     if (tier?.prices) {
@@ -1484,23 +1484,25 @@ class ScreenPrintManualPricing {
 
             additionalLocations.forEach(loc => {
                 let costPerPieceForThisLoc = 0;
-                let designColorsThisLoc = loc.colors;
-                let effectiveColorsForThisLoc = designColorsThisLoc;
+                const designColorsThisLoc = loc.colors;
+                // Screens drive the setup fee (underbase +1 on darks); per-piece price
+                // lookups stay on the raw design color count (builder parity, Rule 7)
+                let screensForThisLoc = designColorsThisLoc;
 
                 if (designColorsThisLoc > 0) {
                     if (isDarkGarment) {
-                        effectiveColorsForThisLoc += 1;
+                        screensForThisLoc += 1;
                     }
 
                     // MANUAL MODE: Calculate additional location cost using API BasePrintCost
                     if (this.config.isManualMode) {
                         const tier = this.findTierForQuantity(quantity, pricingData.tierData);
                         if (tier) {
-                            // Get BasePrintCost for additional location from API
+                            // Get BasePrintCost for additional location from API — raw design colors
                             const additionalPrintCost = this.getPrintCostFromAPI(
                                 pricingData,
                                 tier.TierLabel,
-                                effectiveColorsForThisLoc,
+                                designColorsThisLoc,
                                 'AdditionalLocation'
                             );
 
@@ -1510,7 +1512,7 @@ class ScreenPrintManualPricing {
                             console.log('[Manual] Additional Location:', {
                                 location: loc.location,
                                 designColors: designColorsThisLoc,
-                                effectiveColors: effectiveColorsForThisLoc,
+                                screens: screensForThisLoc,
                                 printCost: additionalPrintCost,
                                 tierLabel: tier.TierLabel
                             });
@@ -1520,17 +1522,14 @@ class ScreenPrintManualPricing {
                         if (pricingData.additionalLocationPricing) {
                             const additionalPricingMaster = pricingData.additionalLocationPricing;
 
-                            // Cap effective colors at the maximum available in additional location pricing data
+                            // Cap lookup colors at the maximum available in additional location pricing data
                             const maxAvailableAddlColors = Math.max(...Object.keys(additionalPricingMaster || {})
                                 .filter(key => !isNaN(parseInt(key)))
                                 .map(key => parseInt(key)));
 
-                            if (effectiveColorsForThisLoc > maxAvailableAddlColors) {
-                                console.log(`[ScreenPrintV2] Capping additional location effective colors from ${effectiveColorsForThisLoc} to ${maxAvailableAddlColors} (max available in pricing data)`);
-                                effectiveColorsForThisLoc = maxAvailableAddlColors;
-                            }
+                            const lookupColorsForThisLoc = Math.min(designColorsThisLoc, maxAvailableAddlColors);
 
-                            const locPricingData = additionalPricingMaster[effectiveColorsForThisLoc.toString()];
+                            const locPricingData = additionalPricingMaster[lookupColorsForThisLoc.toString()];
                             if (locPricingData?.tiers) {
                                 const tier = locPricingData.tiers.find(t => quantity >= t.minQty && (!t.maxQty || quantity <= t.maxQty));
                                 if (tier?.pricePerPiece !== undefined) {
@@ -1542,11 +1541,11 @@ class ScreenPrintManualPricing {
                 }
 
                 pricing.additionalCost += costPerPieceForThisLoc;
-                const setupForThisLoc = effectiveColorsForThisLoc * this.config.setupFeePerColor;
+                const setupForThisLoc = screensForThisLoc * this.config.setupFeePerColor;
                 totalSetupForAdditionalLocations += setupForThisLoc;
                 pricing.colorBreakdown.locations.push({
                     ...loc,
-                    totalColors: effectiveColorsForThisLoc,
+                    totalColors: screensForThisLoc,
                     setupCost: setupForThisLoc,
                     costPerPiece: costPerPieceForThisLoc
                 });
@@ -1876,13 +1875,8 @@ class ScreenPrintManualPricing {
                 html += `<span>Shirt:</span><span>$${pricing.garmentCost.toFixed(2)}</span>`;
                 html += `</div>`;
 
-                // Determine print label - show design colors + underbase if dark garment
-                let printLabel;
-                if (this.state.isDarkGarment && this.state.frontColors > 0) {
-                    printLabel = `Print (${this.state.frontColors} design + 1 underbase)`;
-                } else {
-                    printLabel = `Print (${pricing.colorBreakdown.front} color${pricing.colorBreakdown.front !== 1 ? 's' : ''})`;
-                }
+                // Per-piece print price is by raw design colors (underbase is a setup screen only)
+                const printLabel = `Print (${this.state.frontColors} color${this.state.frontColors !== 1 ? 's' : ''})`;
 
                 html += `<div class="sp-breakdown-item">`;
                 html += `<span>${printLabel}:</span><span>$${pricing.frontPrintCost.toFixed(2)}</span>`;
@@ -1914,13 +1908,8 @@ class ScreenPrintManualPricing {
                     html += '<div class="sp-breakdown-section">';
                     html += `<div class="sp-breakdown-header">${locLabel}</div>`;
 
-                    // Determine print label for additional location
-                    let locPrintLabel;
-                    if (this.state.isDarkGarment && loc.colors > 0) {
-                        locPrintLabel = `Print (${loc.colors} design + 1 underbase)`;
-                    } else {
-                        locPrintLabel = `Print (${loc.totalColors} color${loc.totalColors !== 1 ? 's' : ''})`;
-                    }
+                    // Per-piece print price is by raw design colors (underbase is a setup screen only)
+                    const locPrintLabel = `Print (${loc.colors} color${loc.colors !== 1 ? 's' : ''})`;
 
                     html += `<div class="sp-breakdown-item">`;
                     html += `<span>${locPrintLabel}:</span><span>$${loc.costPerPiece.toFixed(2)}</span>`;
@@ -1966,13 +1955,11 @@ class ScreenPrintManualPricing {
             return;
         }
 
-        // Calculate effective colors for current selection
+        // Tier prices use the raw design color count — underbase is a setup screen,
+        // never part of the per-piece price (builder parity, Rule 7)
         let effectiveFrontColors = this.state.frontColors;
-        if (this.state.isDarkGarment && this.state.frontColors > 0) {
-            effectiveFrontColors += 1;
-        }
-        
-        // Cap effective colors at maximum available
+
+        // Cap at maximum available in pricing data
         const maxAvailableColors = Math.max(...Object.keys(this.state.pricingData.primaryLocationPricing || {})
             .filter(key => !isNaN(parseInt(key)))
             .map(key => parseInt(key)));
@@ -2030,8 +2017,7 @@ class ScreenPrintManualPricing {
             const colorText = this.state.frontColors === 1 ? '1 color' : `${this.state.frontColors} colors`;
 
             if (this.state.isDarkGarment && this.state.frontColors > 0) {
-                const totalColors = this.state.frontColors + 1;
-                noteText = `Prices include garment + ${this.state.frontColors} design color${this.state.frontColors > 1 ? 's' : ''} + 1 white underbase (${totalColors} total colors) front print.`;
+                noteText = `Prices shown are per shirt for garment + ${colorText} front print. Dark garments add one white underbase screen to the one-time setup fee — it does not change the per-shirt price.`;
             } else {
                 noteText = `Prices shown are per shirt for garment + ${colorText} front print.`;
             }
@@ -2097,9 +2083,8 @@ class ScreenPrintManualPricing {
         const hasSafetyStripes = this.state.frontHasSafetyStripes || 
             pricing.colorBreakdown.locations.some(loc => loc.hasSafetyStripes);
         
-        // Front print part - uses effective colors for label
+        // Front print part - per-piece price is by raw design colors (underbase is setup-only)
         if (this.state.frontColors > 0 && pricing.basePrice >= 0) {
-            // pricing.basePrice is garment + front print (incl. its underbase)
             const displayPrice = this.state.frontHasSafetyStripes ?
                 pricing.basePrice + this.state.safetyStripeSurcharge :
                 pricing.basePrice;
@@ -2107,24 +2092,23 @@ class ScreenPrintManualPricing {
             // Show breakdown: Shirt + Print with individual costs
             if (pricing.garmentCost && pricing.frontPrintCost) {
                 subtitleParts.push(
-                    `Shirt + ${pricing.colorBreakdown.front} Color Front: $${displayPrice.toFixed(2)} ` +
+                    `Shirt + ${this.state.frontColors} Color Front: $${displayPrice.toFixed(2)} ` +
                     `<span style="color: #666; font-size: 0.9em;">(Shirt: $${pricing.garmentCost.toFixed(2)} + Print: $${pricing.frontPrintCost.toFixed(2)})</span>`
                 );
             } else {
                 // Fallback if breakdown not available
-                subtitleParts.push(`${pricing.colorBreakdown.front} Color Front $${displayPrice.toFixed(2)}`);
+                subtitleParts.push(`${this.state.frontColors} Color Front $${displayPrice.toFixed(2)}`);
             }
         }
-    
-        // Additional locations part - uses effective colors for label
+
+        // Additional locations part - per-piece price is by raw design colors
         pricing.colorBreakdown.locations.forEach(loc => {
-            // loc.costPerPiece is already calculated with underbase if applicable
             if (loc.colors > 0 ) { // Only add if design colors > 0 for this location
                 const locLabel = this.config.locationOptions.find(opt => opt.value === loc.location)?.label || loc.location;
-                const displayPrice = loc.hasSafetyStripes ? 
-                    loc.costPerPiece + this.state.safetyStripeSurcharge : 
+                const displayPrice = loc.hasSafetyStripes ?
+                    loc.costPerPiece + this.state.safetyStripeSurcharge :
                     loc.costPerPiece;
-                subtitleParts.push(`${loc.totalColors} Color ${locLabel} $${displayPrice.toFixed(2)}`);
+                subtitleParts.push(`${loc.colors} Color ${locLabel} $${displayPrice.toFixed(2)}`);
             }
         });
     
@@ -2172,7 +2156,7 @@ class ScreenPrintManualPricing {
 
         let html = `
             <div class="sp-location-guide-header">
-                <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location (includes underbase cost if dark garment selected). Setup fees also apply per color, per location.</p>
+                <p>The table below shows the <strong>per-piece cost</strong> for adding a print to an additional location. Setup fees apply per screen, per location — dark garments add one white underbase screen per location (setup only, never per piece).</p>
             </div>
             <div class="sp-tiers-table-wrapper">
                 <table class="sp-tiers-table">
@@ -2205,10 +2189,8 @@ class ScreenPrintManualPricing {
             html += `<tr><td class="sp-tier-range">${displayLabel}</td>`;
             for (let i = 1; i <= 6; i++) { // Show up to 6 colors
                 let pricePerPiece = '-';
-                // Check for pricing with underbase if needed
-                const maxColors = 6;
-                const effectiveColors = Math.min(i + (this.state.isDarkGarment ? 1 : 0), maxColors);
-                const colorData = additionalPricing[effectiveColors.toString()];
+                // Per-piece price is by raw design color count (underbase is setup-only)
+                const colorData = additionalPricing[i.toString()];
                 if (colorData && colorData.tiers) {
                     const tierInfo = colorData.tiers.find(t => t.label === tierLabel);
                     if (tierInfo && tierInfo.pricePerPiece !== null && tierInfo.pricePerPiece !== undefined) {
@@ -2224,7 +2206,7 @@ class ScreenPrintManualPricing {
                     </tbody>
                 </table>
             </div>
-            <p class="sp-tiers-note">Prices include white underbase for dark garments if applicable. Setup fee per color, per additional location: $${this.config.setupFeePerColor.toFixed(2)}.</p>
+            <p class="sp-tiers-note">Setup fee per screen, per additional location: $${this.config.setupFeePerColor.toFixed(2)}. Dark garments add one white underbase screen per location (setup only — the per-piece price is unchanged).</p>
             <p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>
         `;
         this.elements.additionalLocationGuideContent.innerHTML = html;

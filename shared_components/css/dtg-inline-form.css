@@ -182,6 +182,17 @@
     margin-left: 4px;
 }
 .dtg-location-pill.selected .dim { color: rgba(255, 255, 255, 0.7); }
+/* Unpriceable front+back combo (FF_JB / JF_FB) — no DTG_Costs data backs it,
+   so the pill renders disabled with a title attr explaining why. */
+.dtg-location-pill:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+.dtg-location-pill:disabled:hover {
+    background: var(--pnw-birch);
+    border-color: #d6cdb8;
+}
 
 .dtg-location-summary {
     text-align: right;

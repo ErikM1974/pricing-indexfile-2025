@@ -71,6 +71,15 @@ class ScreenPrintPricingService {
      * @returns {number|null} Manual cost or null if not set
      */
     getManualCostOverride() {
+        // Staff-only feature — never resolve a manual cost override on a public
+        // (customer-facing) host, matching EMB/cap-EMB (embroidery-pricing-service.js:18)
+        // and DTG/DTF. Prevents a ?manualCost= URL param or stale sessionStorage from
+        // substituting an arbitrary (too-low) base cost into live screen print pricing
+        // on production. Fixed 2026-06-11 (customer quote-cart Phase 0 P0 hotfix).
+        const host = window.location.hostname;
+        const isInternal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.herokuapp.com');
+        if (!isInternal) return null;
+
         const urlParams = new URLSearchParams(window.location.search);
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {

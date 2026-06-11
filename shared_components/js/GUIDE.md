@@ -10,6 +10,7 @@
 | `quote-builder-base.js` | Base quote builder functionality |
 | `quote-builder-core.js` | Core quote builder shared logic (2026 consolidation) |
 | `quote-builder-utils.js` | Shared utilities: escapeHtml, formatPrice, showToast, copyShareableUrl |
+| `quote-cart-engine.js` | **Customer quote-cart engine (Phase 0, 2026-06-11)** — PURE orchestration (pooling, grouping, fees, honest-LTM, tier nudges, trace); zero price formulas: per-method adapters call the staff authorities (EMB calculator class / POST /api/dtg/quote-pricing / SCP service bundle + exact builder findPricingTier copy / DTFPricingService.calculatePriceForQuantity). `priceCart(cart)` + `singleItemPreview(item)`. Dual browser/Node; parity-locked by tests/unit/web-quote-cart-parity.test.js against memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md worked examples |
 | `quote-services-bar.js` | Persistent catalog-driven services bar; `render(mountId, catalog, onAdd)` → one-click chips that add services as line items (EMB/SCP/DTG/DTF, each with its own catalog) |
 | `quote-builder-step2-modern.js` | Modern Step 2 UI (embroidery/cap builders) |
 | `quote-formatter.js` | Quote formatting for display/print |
