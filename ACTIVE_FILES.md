@@ -39,6 +39,7 @@
 | `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
 | `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
 | `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
+| `/robots.txt` | Crawler rules — staff/internal paths + credential share-links disallowed (2026-06-11) | served via server.js `/robots.txt` route | ✅ Active |
 | `/jest.config.js` | Jest test runner config (used by `tests/jest/`) | Jest | ⚙️ Tooling |
 
 ### Root-Level Stylesheets (legacy location)
@@ -54,7 +55,9 @@
 | `product-styles.css` | Product page styles | product.html | Move to shared_components |
 | `modern-search-interface.css` | Modern search UI styles | NONE (no HTML links it, verified 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `catalog-search.css` | Catalog search base styles (autocomplete, product cards) — skinned by nwca-2026.css | index.html | ✅ Active |
-| `/shared_components/css/nwca-2026.css` | **NEW** 2026 site-wide design system ("press-room editorial" green refresh) — tokens, masthead, mega-nav, drawer, hero, bands, footer, catalog layer, modals | index.html (more customer pages migrating per memory/CUSTOMER_SITE_REDESIGN_2026-06.md) | ✅ Active (NEW 2026-06-11) |
+| `/shared_components/css/nwca-2026-core.css` | **NEW** 2026 design system CORE — tokens/base, buttons/chips, masthead + mega-nav, drawer, footer, interior-page primitives (page header, forms, tables, alerts, toasts, badges, pager, skeletons, cards, modal base, empty state). Load FIRST on every 2026-system page. Class reference: `NWCA-2026-GUIDE.md` | index.html (+ all interior pages migrating per memory/CUSTOMER_SITE_REDESIGN_2026-06.md) | ✅ Active (NEW 2026-06-11, split from nwca-2026.css) |
+| `/shared_components/css/nwca-2026.css` | 2026 design system HOMEPAGE layer ("press-room editorial" green refresh) — hero, homepage bands, catalog results layer, quick-view/compare modals. REQUIRES nwca-2026-core.css loaded first | index.html only | ✅ Active (NEW 2026-06-11; core layers split out 2026-06-11) |
+| `/shared_components/css/NWCA-2026-GUIDE.md` | **NEW** Class reference for nwca-2026-core.css interior-page primitives (one snippet per primitive) — read this instead of the CSS when building pages | Developers building 2026-system pages | 📖 Docs (NEW 2026-06-11) |
 | `brands.css` | Brands page styles | brands.html | Move to shared_components |
 
 ## 🎯 Core Entry Points
@@ -63,7 +66,12 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/product.html` | Product display | /product/app.js | ✅ Active |
+| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, API-driven decoration pricing tabs | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
+| `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system | nwca-2026-core.css | ✅ Active |
+| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + 5 pricing-service tab loaders, ARIA tabs, SEO/JSON-LD | EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
+| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
+| `/pages/css/catalog-2026.css` | Catalog page layer CSS (facet rail + mobile filter drawer, cards, autocomplete v2) | nwca-2026-core.css | ✅ Active |
+| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets, server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only) | ✅ Active |
 
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
@@ -767,7 +775,7 @@
 ### Product Page Modules (`/product/`)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/product/app.js` | Product page main app | components/*, services/* | ✅ Active |
+| `/product/app.js` | LEGACY old product app (+ components/*, services/*, styles/*) — no longer referenced by product.html since 2026-06-11 rewrite | — | 🚩 Dead — cutover cleanup pending |
 | `/product/components/decoration-selector.js` | Decoration method selector (DTG/EMB/SP/etc.) | — | ✅ Active |
 | `/product/components/gallery.js` | Product image gallery | — | ✅ Active |
 | `/product/components/image-zoom.js` | Image zoom/pan component | — | ✅ Active |

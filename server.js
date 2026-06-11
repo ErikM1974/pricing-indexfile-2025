@@ -45,6 +45,9 @@ dotenv.config();
 //   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
 //   3DT entry URLs (/pages/3-day-tees.html, /3-day-tees[.html]) → 301 /custom-tees (cutover 2026-06-10, registered BEFORE /pages static; success page NOT redirected)
 //
+// CATALOG (customer redesign P2, 2026-06-11)
+//   GET /catalog[.html]                     — URL-driven product discovery page (pages/catalog.html)
+//
 // CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
@@ -65,6 +68,7 @@ dotenv.config();
 //   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
 //
 // STATIC FILE SERVING
+//   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
@@ -1784,6 +1788,11 @@ console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-pro
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
+// robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
+app.get('/robots.txt', (req, res) => {
+  res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
@@ -2089,6 +2098,12 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
 // .html alias; the success page resolves via the static /pages mount.
 app.get(['/custom-tees', '/custom-tees.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-tees.html'));
+});
+
+// Catalog — dedicated URL-driven product discovery page (customer redesign P2,
+// 2026-06-11). Clean URL + .html alias; same pattern as /custom-tees.
+app.get(['/catalog', '/catalog.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'catalog.html'));
 });
 
 // ── Customer order-status page (token link, no login — 2026-06-10) ──────────

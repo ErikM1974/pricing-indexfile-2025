@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse thousands of customizable apparel styles — t-shirts, polos, caps, outerwear, and more from brands you know. Filter by brand, color, size, and price. Northwest Custom Apparel, Milton, WA.">
+    <title>Catalog — Northwest Custom Apparel</title>
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Product Catalog — Northwest Custom Apparel">
+    <meta property="og:description" content="Thousands of customizable styles live from our supplier catalog. Embroidery, screen print, DTG, and DTF — family-owned in Milton, WA since 1977.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+
+    <!-- Preconnect to CDNs for faster resource loading -->
+    <link rel="preconnect" href="https://cdn.caspio.com">
+    <link rel="preconnect" href="https://cdnm.sanmar.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdn.caspio.com">
+    <link rel="dns-prefetch" href="https://cdnm.sanmar.com">
+
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.4">
+    <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.06.11.4">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Utility strip (chrome copied from index.html — shared component is a later refactor) -->
+    <div class="util-strip">
+        <div class="util-inner">
+            <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
+            <div class="util-contact">
+                <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
+                <a href="tel:253-922-5793">253-922-5793</a>
+                <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Masthead -->
+    <header class="nav-bar">
+        <div class="nav-bar-inner">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="/" class="brand" title="Northwest Custom Apparel — Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="brand-logo" width="160" height="46">
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/catalog" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">
+                        Products
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div id="navDropdownSearch"></div>
+                            <div class="dropdown-categories" id="navCategories">
+                                <!-- Categories populated by app-modern.js -->
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item brands-nav-item" data-dropdown="brands">
+                    <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">
+                        Brands
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown brands-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div class="brands-grid" id="navBrandsGrid">
+                                <div class="brands-loading">Loading brands…</div>
+                            </div>
+                            <div class="brands-footer">
+                                <a href="/brands.html" class="view-all-brands-link">View all brands →</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/webstore-info.html" class="nav-link">Webstores</a>
+                </li>
+            </ul>
+
+            <div class="nav-search" role="search">
+                <input type="text"
+                       id="navSearchInput"
+                       class="nav-search-input"
+                       placeholder="Search styles — PC61, hoodies, caps…"
+                       autocomplete="off"
+                       role="combobox"
+                       aria-expanded="false"
+                       aria-autocomplete="list"
+                       aria-controls="navAutocompleteList"
+                       aria-label="Search products">
+                <div id="navAutocompleteList" class="nav-autocomplete-list" role="listbox" aria-label="Product suggestions"></div>
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Drawer (mobile menu + category browse) -->
+    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+        <div class="drawer-head">
+            <span class="drawer-head-title">Browse NWCA</span>
+            <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-links" aria-label="Quick links">
+            <a href="/">Home</a>
+            <a href="/catalog">Catalog</a>
+            <a href="/custom-tees">Custom T-Shirts <span class="flag-new">New</span></a>
+            <a href="/pages/top-sellers-showcase.html">Top Sellers &amp; Free Samples</a>
+            <a href="/brands.html">Brands</a>
+            <a href="/pages/webstore-info.html">Custom Webstores</a>
+        </nav>
+        <h3 class="drawer-subhead">Shop by category</h3>
+        <ul class="category-list" id="categoryList">
+            <!-- Categories populated by app-modern.js -->
+        </ul>
+        <div class="drawer-contact">
+            Questions? A human answers.<br>
+            <a href="tel:253-922-5793">253-922-5793</a><br>
+            <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+            2025 Freeman Rd E, Milton, WA 98354
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main id="main">
+        <!-- Page header band (category landing mode swaps the title/breadcrumb) -->
+        <header class="page-head">
+            <div class="wrap">
+                <nav class="crumbs" aria-label="Breadcrumb" id="catalogCrumbs">
+                    <a href="/">Home</a><span class="crumbs-sep">/</span>
+                    <span aria-current="page">Catalog</span>
+                </nav>
+                <div class="page-head-row">
+                    <div>
+                        <h1 class="page-title" id="catalogTitle">Product Catalog</h1>
+                        <p class="page-sub" id="catalogSub">Thousands of styles, live from our supplier catalog — filter by brand, color, size, and price.</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="catalog-shell wrap">
+            <!-- Filter rail (desktop) / slide-in drawer (mobile) -->
+            <aside class="filters-rail" id="filtersRail" aria-label="Filter products">
+                <div class="filters-rail-head">
+                    <h2 class="filters-rail-title">Filters</h2>
+                    <button class="drawer-close filters-rail-close" id="filtersClose" type="button" aria-label="Close filters">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div id="filterGroups">
+                    <!-- Facet groups rendered by catalog-2026.js -->
+                    <div class="fgroup" aria-hidden="true">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                    </div>
+                </div>
+                <button class="btn btn-ghost filters-clear-btn" id="clearAllFilters" type="button" hidden>Clear all filters</button>
+            </aside>
+            <div class="filters-overlay" id="filtersOverlay"></div>
+
+            <!-- Results -->
+            <section class="catalog-results" aria-label="Search results">
+                <div class="results-toolbar">
+                    <button class="btn btn-ghost filters-open-btn" id="filtersOpen" type="button" aria-controls="filtersRail" aria-expanded="false">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        Filters
+                        <span class="filters-open-count" id="filtersOpenCount" hidden></span>
+                    </button>
+                    <p class="results-status" id="resultsStatus" aria-live="polite" role="status">Loading catalog…</p>
+                    <div class="sort-wrap">
+                        <label class="sort-label" for="sortSelect">Sort</label>
+                        <select class="field-select sort-select" id="sortSelect">
+                            <option value="">Best match</option>
+                            <option value="price_asc">Price: low to high</option>
+                            <option value="price_desc">Price: high to low</option>
+                            <option value="name_asc">Name: A–Z</option>
+                            <option value="name_desc">Name: Z–A</option>
+                            <option value="style">Style number</option>
+                            <option value="newest">Newest</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="active-chips" id="activeChips"></div>
+                <div class="alert-slot" id="alertSlot"></div>
+
+                <div class="catalog-grid" id="resultsGrid"></div>
+
+                <nav class="pager" id="pager" aria-label="Pagination"></nav>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" width="180" height="52" loading="lazy">
+                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>
+                <span class="footer-est">Est. 1977 · Milton, WA</span>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/catalog">Product Catalog</a></li>
+                    <li><a href="/pages/top-sellers-showcase.html">Top Sellers</a></li>
+                    <li><a href="/brands.html">Brands</a></li>
+                    <li><a href="/custom-tees">Custom T-Shirts</a></li>
+                    <li><a href="/pages/top-sellers-showcase.html">Free Sample Program</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="/pages/golf-tournaments-2026.html?utm_source=catalog&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
+                    <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
+                    <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <address>
+                    2025 Freeman Rd E<br>
+                    Milton, WA 98354<br>
+                    <a href="tel:253-922-5793">253-922-5793</a><br>
+                    <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+                    Mon–Fri 8:30–5:00 PT
+                </address>
+                <ul>
+                    <li><a href="/staff-dashboard.html">Staff Portal</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-inner">
+                <span>© 2026 Northwest Custom Apparel</span>
+                <span>Family-owned &amp; operated since 1977</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Quick view modal (core .modal primitive; content filled by catalog-2026.js) -->
+    <div class="modal" id="quickViewModal" role="dialog" aria-modal="true" aria-labelledby="qvTitle" hidden>
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2 id="qvTitle">Quick view</h2>
+                <button class="modal-close" id="qvClose" type="button" aria-label="Close quick view">&times;</button>
+            </div>
+            <div class="modal-body" id="qvBody"></div>
+        </div>
+    </div>
+
+    <!-- Search + catalog machinery (product-search-service is the shared data layer, read-only) -->
+    <script src="/product-search-service.js?v=2026.06.11.2"></script>
+    <script src="/brands-flyout.js?v=4"></script>
+    <script src="/app-modern.js?v=4" defer></script>
+    <script src="/pages/js/catalog-2026.js?v=2026.06.11.4" defer></script>
+</body>
+</html>

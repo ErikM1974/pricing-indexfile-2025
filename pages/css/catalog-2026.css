@@ -1,0 +1,347 @@
+/* ============================================================================
+   catalog-2026.css — /catalog page layer (NWCA 2026 design system)
+   ----------------------------------------------------------------------------
+   REQUIRES nwca-2026-core.css loaded FIRST (tokens, masthead, drawer, footer,
+   interior primitives: page-head, alerts, pager, skeleton, modal, empty-state).
+   This file styles only what's unique to the catalog page:
+     1. Shell layout (filter rail + results)
+     2. Filter rail groups + mobile filter drawer
+     3. Results toolbar, applied-filter chips
+     4. Product cards + skeleton cards
+     5. Search autocomplete v2 (thumbnails)
+     6. Quick view modal internals
+     7. Responsive
+   ========================================================================== */
+
+/* ── 1. Shell layout ─────────────────────────────────────────────── */
+.catalog-shell {
+    display: grid;
+    grid-template-columns: 264px minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+    padding-top: 22px;
+    padding-bottom: 60px;
+    scroll-margin-top: 76px; /* clear the sticky masthead on page-change scroll */
+}
+
+.catalog-results { min-width: 0; }
+
+/* ── 2. Filter rail ──────────────────────────────────────────────── */
+.filters-rail {
+    position: sticky; top: 78px;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto; overscroll-behavior: contain;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-card);
+    padding: 16px 16px 18px;
+}
+.filters-rail-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; padding-bottom: 10px;
+    border-bottom: 1px dashed var(--line-strong);
+}
+.filters-rail-title { font-size: 16px; font-weight: 800; margin: 0; }
+.filters-rail-close { display: none; border-color: var(--line-strong); color: var(--ink-soft); }
+.filters-overlay {
+    position: fixed; inset: 0; z-index: 230;
+    background: rgba(18, 34, 22, 0.55);
+    opacity: 0; visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+.filters-overlay.show { opacity: 1; visibility: visible; }
+
+.fgroup { padding: 12px 0 6px; border-bottom: 1px dashed var(--line); }
+.fgroup:last-of-type { border-bottom: none; }
+.fgroup-title {
+    font-family: var(--font-display); font-size: 13px; font-weight: 800;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink);
+    margin: 0 0 8px;
+}
+.fgroup-note { font-size: 12px; color: var(--ink-soft); margin: -4px 0 8px; }
+.fopts { list-style: none; margin: 0; padding: 0; }
+.fopts li { margin: 0; }
+.fopts li.is-overflow { display: none; }
+.fgroup.expanded .fopts li.is-overflow { display: block; }
+.fopt {
+    display: flex; align-items: center; gap: 9px;
+    min-height: 44px; padding: 4px 6px; border-radius: var(--radius-sm);
+    font-size: 13.5px; color: var(--ink-soft); cursor: pointer;
+}
+.fopt:hover { background: var(--green-50); color: var(--green-900); }
+.fopt input {
+    accent-color: var(--green-700);
+    width: 17px; height: 17px; flex: none; margin: 0; cursor: pointer;
+}
+.fopt-label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.fopt input:checked ~ .fopt-label { color: var(--green-900); font-weight: 700; }
+.fopt-count {
+    flex: none; font-size: 11.5px; font-weight: 700; color: var(--green-700);
+    background: var(--green-50); border-radius: 999px; padding: 1px 8px;
+}
+.fgroup-more {
+    background: none; border: none; color: var(--green-700);
+    font-weight: 700; font-size: 13px; padding: 10px 6px; min-height: 44px;
+}
+.fgroup-more:hover { color: var(--green-900); text-decoration: underline; }
+
+.fgroup-search { margin-bottom: 6px; }
+.fgroup-search input {
+    width: 100%; min-height: 40px;
+    border: 1.5px solid var(--line-strong); border-radius: var(--radius-sm);
+    padding: 8px 12px; font-size: 13.5px; background: var(--paper);
+}
+.fgroup-search input:focus { outline: none; border-color: var(--green-700); }
+
+/* Custom price range row */
+.fprice-custom { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.fprice-custom input {
+    width: 100%; min-width: 0; min-height: 44px;
+    border: 1.5px solid var(--line-strong); border-radius: var(--radius-sm);
+    padding: 8px 10px; font-size: 13.5px;
+}
+.fprice-custom input:focus { outline: none; border-color: var(--green-700); }
+.fprice-sep { color: var(--ink-faint); flex: none; } /* decorative dash */
+.fprice-apply {
+    flex: none; background: var(--green-900); color: #fff; border: none;
+    border-radius: var(--radius-sm); font-weight: 700; font-size: 13px;
+    padding: 0 14px; min-height: 44px;
+}
+.fprice-apply:hover { background: var(--green-700); }
+
+.filters-clear-btn { width: 100%; margin-top: 14px; }
+
+/* ── 3. Results toolbar + chips ──────────────────────────────────── */
+.results-toolbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    padding-bottom: 12px; margin-bottom: 14px;
+    border-bottom: 1px dashed var(--line-strong);
+}
+.results-status {
+    flex: 1 1 auto; min-width: 0; margin: 0;
+    font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
+}
+.filters-open-btn { display: none; gap: 8px; position: relative; }
+.filters-open-count {
+    background: var(--green-900); color: #fff; border-radius: 999px;
+    font-size: 11px; font-weight: 800; padding: 1px 7px;
+}
+.sort-wrap { display: inline-flex; align-items: center; gap: 8px; flex: none; }
+.sort-label { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.sort-select { width: auto; min-width: 170px; font-size: 13.5px; }
+
+.active-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.active-chips:empty { display: none; }
+.fchip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--green-50); border: 1px solid var(--green-100); border-radius: 999px;
+    color: var(--green-900); font-size: 12.5px; font-weight: 700;
+    padding: 5px 5px 5px 12px; min-height: 36px;
+}
+.fchip-kind { font-weight: 600; color: var(--green-700); }
+.fchip-x {
+    background: none; border: none; color: var(--green-700); font-size: 16px;
+    width: 28px; height: 28px; border-radius: 50%; line-height: 1; padding: 0;
+}
+.fchip-x:hover { background: var(--green-100); color: var(--green-950); }
+.fchip-clear {
+    display: inline-flex; align-items: center;
+    background: none; border: none; color: var(--rush-deep);
+    font-weight: 700; font-size: 13px; padding: 5px 10px; min-height: 36px;
+}
+.fchip-clear:hover { text-decoration: underline; }
+
+.alert-slot { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.alert-slot:empty { display: none; margin-bottom: 0; }
+.alert-retry { margin-top: 8px; }
+
+/* ── 4. Product cards ────────────────────────────────────────────── */
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(218px, 1fr));
+    gap: 16px;
+}
+.catalog-grid > .empty-state, .catalog-grid > .alert { grid-column: 1 / -1; }
+
+.pcard {
+    position: relative;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); overflow: hidden;
+    display: flex; flex-direction: column;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.pcard:hover { transform: translateY(-3px); border-color: var(--green-700); box-shadow: var(--shadow-pop); }
+
+.pcard-media {
+    position: relative; display: grid; place-items: center;
+    background: var(--paper-deep); border-bottom: 1px dashed var(--line-strong);
+    height: 218px;
+    overflow: hidden;
+}
+.pcard-media-link {
+    position: absolute; inset: 0;
+    display: grid; place-items: center; padding: 12px;
+    text-decoration: none;
+}
+.pcard-media-link img {
+    /* absolute box, not percentage-of-grid-track — a 2:3 portrait photo
+       (e.g. Carhartt CTA205) otherwise overflows the 218px media area
+       because max-height:100% resolves against an indefinite track */
+    position: absolute; inset: 12px;
+    width: calc(100% - 24px); height: calc(100% - 24px);
+    object-fit: contain;
+    mix-blend-mode: multiply;
+}
+.pcard-media.no-img::after {
+    content: "Image coming soon";
+    font-size: 12.5px; font-weight: 600; color: var(--ink-soft);
+    border: 1.4px dashed var(--line-strong); border-radius: var(--radius-sm);
+    padding: 10px 14px;
+}
+.pcard-flag {
+    position: absolute; top: 10px; left: 10px; z-index: 2;
+    background: var(--rush-deep); color: #fff;
+    font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 4px 8px; border-radius: 5px;
+}
+.pcard-quick {
+    position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%);
+    z-index: 2; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--green-950); color: #fff; border: none; border-radius: 999px;
+    font-size: 12.5px; font-weight: 700; padding: 11px 18px; min-height: 44px;
+    opacity: 0; transition: opacity 0.15s ease;
+}
+.pcard:hover .pcard-quick, .pcard-quick:focus-visible { opacity: 1; }
+.pcard-quick:hover { background: var(--green-700); }
+
+.pcard-body { padding: 13px 15px 15px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.pcard-brand { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+.pcard-style {
+    font-size: 11.5px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--green-700); text-transform: uppercase;
+}
+.pcard-name { font-family: var(--font-display); font-size: 15.5px; font-weight: 700; line-height: 1.25; margin: 0; }
+.pcard-name a { color: var(--ink); text-decoration: none; }
+.pcard-name a::after { content: ""; position: absolute; inset: 0; } /* whole card clickable */
+.pcard:hover .pcard-name a { color: var(--green-900); }
+.pcard-colors { font-size: 12px; color: var(--ink-soft); margin: 0; flex: 1; }
+.pcard-price { font-weight: 800; color: var(--ink); font-size: 15px; margin: 7px 0 0; }
+.pcard-price-link {
+    position: relative; z-index: 2; /* above the stretched card link */
+    display: inline-block; margin-top: 7px;
+    font-weight: 700; font-size: 13.5px; color: var(--green-700); text-decoration: none;
+}
+.pcard-price-link:hover { color: var(--green-900); text-decoration: underline; }
+/* quick-view button sits above the stretched link too */
+.pcard-quick { z-index: 3; }
+
+/* Skeleton cards */
+.pcard-skel { pointer-events: none; }
+.pcard-skel-img { height: 218px; border-radius: 0; }
+.pcard-skel .pcard-body .skeleton { margin-bottom: 8px; }
+.skel-w40 { width: 40%; }
+.skel-w70 { width: 70%; }
+.skel-w55 { width: 55%; }
+
+/* ── 5. Autocomplete v2 (thumbnails) ─────────────────────────────── */
+/* Base layout lives here (core only themes border/hover) — this page does
+   not load the homepage's catalog-search.css. */
+.nav-autocomplete-list {
+    display: none;
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 120;
+    background: var(--card); overflow: hidden;
+}
+.nav-autocomplete-list.active { display: block; }
+.ac-list { max-height: min(60vh, 430px); overflow-y: auto; }
+.autocomplete-item {
+    display: flex; align-items: center; gap: 11px;
+    padding: 8px 12px; min-height: 56px; cursor: pointer;
+}
+.ac-thumb {
+    flex: none; width: 44px; height: 44px; border-radius: var(--radius-sm);
+    background: var(--paper-deep); display: grid; place-items: center; overflow: hidden;
+}
+.ac-thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.ac-thumb svg { color: var(--ink-faint); } /* decorative fallback icon */
+.ac-main { flex: 1 1 auto; min-width: 0; }
+.suggestion-style-number { font-size: 13.5px; font-weight: 800; }
+.ac-name {
+    font-size: 12.5px; color: var(--ink-soft);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ac-colors { font-size: 11.5px; color: var(--ink-soft); }
+.autocomplete-footer {
+    font-size: 12px; padding: 8px 12px;
+    border-top: 1px dashed var(--line-strong);
+}
+.autocomplete-footer kbd {
+    background: var(--card); border: 1px solid var(--line-strong);
+    border-radius: 4px; padding: 0 5px; font-size: 11px;
+}
+.ac-status { padding: 14px 12px; font-size: 13px; color: var(--ink-soft); text-align: center; }
+
+/* ── 6. Quick view modal internals ───────────────────────────────── */
+.qv-grid { display: grid; grid-template-columns: 5fr 6fr; gap: 24px; }
+.qv-media {
+    background: var(--paper-deep); border-radius: var(--radius-sm);
+    display: grid; place-items: center; min-height: 280px; padding: 14px;
+}
+.qv-media img { max-width: 100%; max-height: 380px; object-fit: contain; mix-blend-mode: multiply; }
+.qv-style {
+    font-size: 13px; font-weight: 800; letter-spacing: 0.07em;
+    color: var(--green-700); text-transform: uppercase; margin: 0 0 2px;
+}
+.qv-name { font-size: 22px; font-weight: 800; margin: 0 0 8px; }
+.qv-price { font-size: 17px; font-weight: 800; margin: 0 0 14px; }
+.qv-price-link { display: inline-block; font-weight: 700; color: var(--green-700); text-decoration: none; margin-bottom: 14px; }
+.qv-price-link:hover { color: var(--green-900); text-decoration: underline; }
+.qv-section { margin-bottom: 14px; }
+.qv-section h3 {
+    font-size: 12.5px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 7px;
+}
+.qv-selected-color { color: var(--green-700); text-transform: none; letter-spacing: normal; }
+.qv-sizes { font-size: 13.5px; color: var(--ink-soft); }
+.qv-desc { font-size: 13.5px; color: var(--ink-soft); margin: 0; }
+.qv-swatches { display: flex; gap: 7px; flex-wrap: wrap; }
+.qv-swatch {
+    width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+    border: 2px solid var(--line-strong); padding: 0; background: var(--paper-deep);
+    cursor: pointer;
+}
+.qv-swatch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qv-swatch:hover { border-color: var(--green-600); }
+.qv-swatch.selected { border-color: var(--green-900); box-shadow: 0 0 0 2px var(--green-100); }
+.qv-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.qv-loading { padding: 30px 0; text-align: center; color: var(--ink-soft); font-weight: 600; }
+
+/* ── 7. Responsive ───────────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .catalog-shell { grid-template-columns: 1fr; gap: 0; }
+
+    /* Rail becomes a slide-in drawer (same pattern as the browse drawer) */
+    .filters-rail {
+        position: fixed; top: 0; bottom: 0; left: 0; z-index: 240;
+        width: min(330px, 88vw); max-height: none;
+        border-radius: 0; border: none; border-right: 1px solid var(--line);
+        transform: translateX(-103%); transition: transform 0.22s ease;
+        box-shadow: var(--shadow-pop);
+        padding: 14px 16px 24px;
+    }
+    .filters-rail.show { transform: translateX(0); }
+    .filters-rail-close { display: inline-flex; }
+    .filters-open-btn { display: inline-flex; }
+
+    .qv-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+    .catalog-shell { padding-top: 14px; padding-bottom: 46px; }
+    .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); gap: 10px; }
+    .pcard-media, .pcard-skel-img { height: 165px; }
+    .pcard-quick { opacity: 1; padding: 9px 13px; min-height: 40px; } /* no hover on touch */
+    .results-toolbar { gap: 10px; }
+    .results-status { flex-basis: 100%; order: 3; }
+    .sort-wrap { margin-left: auto; }
+    .sort-select { min-width: 0; }
+}

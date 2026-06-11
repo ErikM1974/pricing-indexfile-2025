@@ -67,6 +67,36 @@
         }
     });
 
+    // P2 cutover (2026-06-11): category/brand navigation lands on /catalog
+    // (the URL-driven catalog page) instead of the legacy in-page homepage
+    // SPA. Capture phase so the legacy handlers in app-modern.js /
+    // catalog-search.js never fire. This file loads ONLY on index.html —
+    // the catalog page has its own client-side interceptors.
+    ready(function () {
+        document.addEventListener('click', function (e) {
+            const link = e.target.closest(
+                '.category-link, .nav-subcategory-link, .nav-view-all, ' +
+                '.category-flyout .flyout-item, .brand-link'
+            );
+            if (!link) return;
+
+            const params = new URLSearchParams();
+            if (link.classList.contains('brand-link')) {
+                const brand = new URL(link.href, location.origin).searchParams.get('brand');
+                if (!brand) return;
+                params.set('brand', brand);
+            } else {
+                const cat = link.dataset.category;
+                if (!cat) return;
+                params.set('category', cat);
+                if (link.dataset.subcategory) params.set('subcategory', link.dataset.subcategory);
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            window.location.href = '/catalog?' + params.toString();
+        }, true);
+    });
+
     // Hero rotator — crossfade the real product prints inside the
     // registration frame. Static first image when reduced-motion is set
     // or JS is unavailable (first <img> ships with .is-active).
