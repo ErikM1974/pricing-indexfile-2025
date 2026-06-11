@@ -61,11 +61,11 @@ class ProductSearchService {
             'coats': 'Outerwear',
             'vest': 'Outerwear',
             'vests': 'Outerwear',
-            'hoodie': 'Fleece',
-            'hoodies': 'Fleece',
-            'sweatshirt': 'Fleece',
-            'sweatshirts': 'Fleece',
-            'fleece': 'Fleece',
+            'hoodie': 'Sweatshirts/Fleece',
+            'hoodies': 'Sweatshirts/Fleece',
+            'sweatshirt': 'Sweatshirts/Fleece',
+            'sweatshirts': 'Sweatshirts/Fleece',
+            'fleece': 'Sweatshirts/Fleece',
 
             // Shirts
             'shirt': 'T-Shirts',
@@ -81,13 +81,13 @@ class ProductSearchService {
             'knit': 'Polos/Knits',
             'knits': 'Polos/Knits',
 
-            // Headwear
-            'hat': 'Headwear',
-            'hats': 'Headwear',
-            'cap': 'Headwear',
-            'caps': 'Headwear',
-            'beanie': 'Headwear',
-            'beanies': 'Headwear',
+            // Headwear — live category is 'Caps' ('Headwear' matched nothing)
+            'hat': 'Caps',
+            'hats': 'Caps',
+            'cap': 'Caps',
+            'caps': 'Caps',
+            'beanie': 'Caps',
+            'beanies': 'Caps',
 
             // Bags
             'bag': 'Bags',
@@ -463,11 +463,22 @@ class ProductSearchService {
                 console.log('[ProductSearch] Style search - fetching full product data for filtering');
 
                 // Use full product search to get complete data
-                const results = await this.searchProducts({
+                let results = await this.searchProducts({
                     ...searchParams,
                     q: searchQuery,
                     limit: 50  // Get enough results for filtering
                 });
+
+                // Drift guard: our keyword→category guess must never blank a search.
+                // If the category filter (OUR inference, not the user's) yields zero,
+                // retry without it — category names drift in the live data.
+                if (parsed.detectedCategory && (!results.products || results.products.length === 0)) {
+                    console.warn(`[ProductSearch] Category "${parsed.detectedCategory}" returned 0 results — retrying without category filter`);
+                    const retryParams = { ...searchParams, q: searchQuery, limit: 50 };
+                    delete retryParams.category;
+                    results = await this.searchProducts(retryParams);
+                    parsed.appliedFilters = parsed.appliedFilters.filter(f => f.type !== 'category');
+                }
 
                 if (!results.products || results.products.length === 0) {
                     return {
@@ -508,7 +519,19 @@ class ProductSearchService {
             }
         } else {
             // For non-style searches, use the broad search WITH FACETS
-            const result = await this.searchWithFacets({ ...searchParams, q: searchQuery });
+            let result = await this.searchWithFacets({ ...searchParams, q: searchQuery });
+
+            // Drift guard: our keyword→category guess must never blank a search.
+            // If the category filter (OUR inference, not the user's) yields zero,
+            // retry with the original query and no category — names drift in live data.
+            if (parsed.detectedCategory && (!result.products || result.products.length === 0)) {
+                console.warn(`[ProductSearch] Category "${parsed.detectedCategory}" returned 0 results — retrying without category filter`);
+                const retryParams = { ...searchParams, q: trimmedQuery };
+                delete retryParams.category;
+                result = await this.searchWithFacets(retryParams);
+                parsed.appliedFilters = parsed.appliedFilters.filter(f => f.type !== 'category');
+            }
+
             // Attach smart filters to result
             result.smartFilters = parsed.appliedFilters;
             return result;
