@@ -313,7 +313,7 @@ class DTFPricingService {
             const marginTier = data.pricingTiers.find(t =>
                 repQty >= t.minQuantity && repQty <= t.maxQuantity
             );
-            const marginDenom = marginTier ? marginTier.marginDenominator : 0.57;
+            const marginDenom = marginTier ? marginTier.marginDenominator : 0.53; // fallback only — Caspio Pricing_Tiers is authoritative (0.53 as of 2026-06)
 
             const freightTier = data.freightTiers.find(t =>
                 repQty >= t.minQty && repQty <= t.maxQty

@@ -123,7 +123,7 @@ code health, inline-form refactor) is *supporting infrastructure* for this.
 **Tooling**: use the `Explore` agent for the grep work; jscpd / madge / eslint as Node CLIs.
 
 #### Phase 6 — Apply SCP margin learning to DTG/EMB/DTF (NEW — emerged from today)
-**STATUS UPDATE 2026-06-11**: DTG + DTF portions SHIPPED — Erik changed Caspio `Pricing_Tiers` MarginDenominator on 2026-05-24: 0.57 → 0.53 (tiers 24-47/48-71/72+) and 0.57 → 0.55 (DTG 1-23 / DTF 10-23). Discovered via the Phase-0 pricing-baselines gate going red (5 scenarios); traced, Erik signed off, baselines re-locked 2026-06-11 (see LESSONS_LEARNED 2026-06-11 Pricing entry). **EMB remains 0.57 flat — still open.**
+**STATUS UPDATE 2026-06-11**: SHIPPED for ALL methods — Erik changed Caspio `Pricing_Tiers` MarginDenominator (2026-05-24): 0.57 → 0.53 (upper tiers) and 0.57 → 0.55 (lowest tier) across DTG, DTF, EMB, and CAP (live-verified via pricing-bundle 2026-06-11). Discovered via the Phase-0 pricing-baselines gate going red on 5 DTG/DTF scenarios (EMB/CAP absorbed the bump in rounding); traced, Erik signed off, baselines re-locked 2026-06-11 (see LESSONS_LEARNED 2026-06-11 Pricing entry). Same day: hardcoded-0.57 sweep across the frontend (search/product display prices now API-margin-driven; EMB/CAP manual-cost paths use API tiers).
 **Why**: today's SCP margin tighten (PK_ID 14→0.48, 15→0.50, 16→0.50) lifted projected revenue ~$7-9K/yr. DTG/EMB/DTF all use FLAT 0.57 margin across tiers. They're "leaving money on the table" the same way SCP was.
 
 **Proposed changes** (would need Erik's sign-off per-method):

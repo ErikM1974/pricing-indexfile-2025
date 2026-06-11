@@ -48,24 +48,36 @@ class EmbroideryPricingService {
     }
 
     /**
-     * Fetch embroidery costs from API using reference product
-     * @returns {Array} Embroidery costs from API
-     * @throws {Error} If API request fails
+     * Fetch the EMB pricing bundle (tiers + embroidery costs) from API using reference product
+     * @returns {Object} Full pricing-bundle response
+     * @throws {Error} If API request fails or required blocks are missing
      */
-    async fetchEmbroideryCosts() {
+    async fetchPricingBundle() {
         const url = `${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC61`;
 
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Failed to fetch embroidery costs from API: ${response.status}`);
+            throw new Error(`Failed to fetch embroidery pricing bundle from API: ${response.status}`);
         }
 
         const data = await response.json();
         if (!data.allEmbroideryCostsR) {
             throw new Error('Invalid API response: missing embroidery costs');
         }
+        if (!Array.isArray(data.tiersR) || data.tiersR.length === 0) {
+            throw new Error('Invalid API response: missing pricing tiers');
+        }
 
-        return data.allEmbroideryCostsR;
+        return data;
+    }
+
+    /**
+     * Fetch embroidery costs from API using reference product
+     * @returns {Array} Embroidery costs from API
+     * @throws {Error} If API request fails
+     */
+    async fetchEmbroideryCosts() {
+        return (await this.fetchPricingBundle()).allEmbroideryCostsR;
     }
 
     /**
@@ -75,18 +87,12 @@ class EmbroideryPricingService {
      */
     async generateManualPricingData(manualCost) {
 
-        // Default tiers matching API structure - 2026 margin (43%)
-        // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM)
-        const defaultTiers = [
-            { TierLabel: '1-7', MinQuantity: 1, MaxQuantity: 7, MarginDenominator: 0.57, LTM_Fee: 50 },
-            { TierLabel: '8-23', MinQuantity: 8, MaxQuantity: 23, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57, LTM_Fee: 0 }
-        ];
-
-        // Fetch current embroidery costs from API (throws error if fails - no silent fallback)
-        const defaultEmbroideryCosts = await this.fetchEmbroideryCosts();
+        // Tiers (margins/LTM) + embroidery costs come from the live API — Caspio
+        // Pricing_Tiers is the single source of truth for MarginDenominator,
+        // never a hardcoded table (throws if unavailable - no silent fallback).
+        const bundle = await this.fetchPricingBundle();
+        const defaultTiers = bundle.tiersR;
+        const defaultEmbroideryCosts = bundle.allEmbroideryCostsR;
 
         // Standard sizes with manual cost
         const defaultSizes = [

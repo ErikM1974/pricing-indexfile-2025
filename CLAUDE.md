@@ -126,7 +126,7 @@ PC54 has SKUs `PC54`, `PC54_2X`, `PC54_3X` mapped to `Size01–Size06`. **`PC54_
 - Tiers: 1-7 / 8-23 / 24-47 / 48-71 / 72+
 - **LTM threshold: `qty <= 7`** (NOT `< 24` like DTG/DTF — common mistake)
 - Caps and garments tier separately — never combine qty for a tier discount.
-- 5-tier structure + `MarginDenominator 0.57` + `LTM_Fee $50`. Detail: [emb-builder-details.md](memory/emb-builder-details.md).
+- 5-tier structure + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others as of 2026-06 — NEVER hardcode it) + `LTM_Fee $50`. Detail: [emb-builder-details.md](memory/emb-builder-details.md).
 
 ### Quote Builder Sync (all 4 builders)
 
