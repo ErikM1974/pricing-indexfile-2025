@@ -1,3 +1,9 @@
+## v2026.06.11.10 (2026.06.11)
+
+- fix(catalog): cap price margin from API only - removes last hardcoded 0.57 fallback (completes parallel session's margin cleanup)
+- fix(pricing): margins from Caspio everywhere - kill stale hardcoded 0.57 sweep
+- Deploy v2026.06.11.10: cache-bust
+
 ## v2026.06.11.9 (2026.06.11)
 
 - docs(redesign): record v2026.06.11.8 - quote-cart Phase 0 + pricing fixes live
