@@ -3,144 +3,313 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/product/styles/product.css">
-    <link rel="stylesheet" href="/product/styles/product-redesign.css">
-    <link rel="stylesheet" href="/product/styles/quote-modal.css">
+    <meta name="description" content="Custom apparel product details — live inventory and decoration pricing for embroidery, screen print, DTG, and DTF from Northwest Custom Apparel in Milton, WA.">
+    <title>Product Details | Northwest Custom Apparel</title>
+
+    <meta property="og:type" content="product">
+    <meta property="og:title" content="Product Details | Northwest Custom Apparel">
+    <meta property="og:description" content="Live inventory and decoration pricing for embroidery, screen print, DTG, and DTF.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+    <link rel="canonical" id="canonicalLink" href="https://www.teamnwca.com/product.html">
+
+    <link rel="preconnect" href="https://cdnm.sanmar.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnm.sanmar.com">
+
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.3">
+    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.06.11.4">
 </head>
 <body>
-    <!-- Enhanced Header -->
-    <header class="enhanced-header">
-        <div class="header-top">
-            <div class="header-top-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <span>(253) 922-5793</span>
-                    </div>
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>sales@nwcustomapparel.com</span>
-                    </div>
-                </div>
-                <div class="business-hours">
-                    <i class="fas fa-clock"></i>
-                    Monday - Friday: 8:30 AM - 5:00 PM PST
-                </div>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Utility strip -->
+    <div class="util-strip">
+        <div class="util-inner">
+            <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
+            <div class="util-contact">
+                <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
+                <a href="tel:253-922-5793">253-922-5793</a>
+                <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
             </div>
         </div>
-        
-        <div class="header-main">
-            <div class="header-content">
-                <a href="/" class="logo">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                         alt="Northwest Custom Apparel">
-                </a>
-                
-                <div class="header-search">
-                    <input type="text" class="search-input" placeholder="Search products by style number or name..." id="header-style-search">
-                    <button class="search-button">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
-                
-                <nav class="nav-links">
-                    <a href="/">Home</a>
-                </nav>
+    </div>
+
+    <!-- Masthead -->
+    <header class="nav-bar">
+        <div class="nav-bar-inner">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="/" class="brand" title="Northwest Custom Apparel — Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="brand-logo" width="160" height="46">
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/#shop-categories" class="nav-link">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/brands.html" class="nav-link">Brands</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/webstore-info.html" class="nav-link">Webstores</a>
+                </li>
+            </ul>
+
+            <div class="nav-search" role="search">
+                <input type="text"
+                       id="navSearchInput"
+                       class="nav-search-input"
+                       placeholder="Search styles — PC61, hoodies, caps…"
+                       autocomplete="off"
+                       aria-label="Search products">
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="main-container">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb">
-            <a href="/">Home</a> / Products / <span id="breadcrumb-product">Product</span>
+    <!-- Drawer (mobile menu + category browse) -->
+    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+        <div class="drawer-head">
+            <span class="drawer-head-title">Browse NWCA</span>
+            <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-links" aria-label="Quick links">
+            <a href="/">Home</a>
+            <a href="/custom-tees">Custom T-Shirts <span class="flag-new">New</span></a>
+            <a href="/pages/top-sellers-showcase.html">Top Sellers &amp; Free Samples</a>
+            <a href="/brands.html">Brands</a>
+            <a href="/pages/webstore-info.html">Custom Webstores</a>
+        </nav>
+        <h3 class="drawer-subhead">Shop by category</h3>
+        <ul class="category-list">
+            <li class="category-item"><a class="category-link" href="/?category=T-Shirts">T-Shirts</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Polos%2FKnits">Polos &amp; Knits</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Sweatshirts%2FFleece">Sweatshirts &amp; Fleece</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Caps">Caps</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Outerwear">Outerwear</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Workwear">Workwear</a></li>
+            <li class="category-item"><a class="category-link" href="/?category=Bags">Bags</a></li>
+        </ul>
+        <div class="drawer-contact">
+            Questions? A human answers.<br>
+            <a href="tel:253-922-5793">253-922-5793</a><br>
+            <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+            2025 Freeman Rd E, Milton, WA 98354
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main id="main">
+        <!-- Page header: breadcrumb + title block -->
+        <header class="page-head">
+            <div class="wrap">
+                <nav class="crumbs" aria-label="Breadcrumb">
+                    <a href="/">Home</a><span class="crumbs-sep">/</span>
+                    <a href="/#shop-categories" id="crumbCategory">Catalog</a><span class="crumbs-sep">/</span>
+                    <span aria-current="page" id="crumbStyle">Product</span>
+                </nav>
+                <div class="page-head-row">
+                    <div>
+                        <h1 class="page-title" id="productTitle">Loading product…</h1>
+                        <p class="page-sub" id="productSub"></p>
+                        <p class="page-sub" id="productBlurb"></p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Loading skeleton -->
+        <section class="pdp-section" id="pdpSkeleton" aria-busy="true" aria-label="Loading product">
+            <div class="wrap">
+                <div class="pdp-skeleton-grid">
+                    <div>
+                        <div class="skeleton skeleton-block"></div>
+                    </div>
+                    <div>
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-block"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fatal error / product not found -->
+        <section class="pdp-section" id="pdpFatal" hidden>
+            <div class="wrap">
+                <div class="empty-state">
+                    <div class="empty-state-icon" aria-hidden="true">🧵</div>
+                    <h2 class="empty-state-title" id="fatalTitle">We couldn't load this product</h2>
+                    <p class="empty-state-sub" id="fatalSub">Something went wrong fetching product data.</p>
+                    <button class="btn btn-primary" id="fatalRetry" type="button">Try again</button>
+                    <a class="btn btn-ghost" href="/#shop-categories">Browse the catalog</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product content -->
+        <div id="pdpContent" hidden>
+            <section class="pdp-section" aria-label="Product photos, colors, and availability">
+                <div class="wrap">
+                    <div class="pdp-grid">
+                        <!-- Gallery -->
+                        <div>
+                            <figure class="pdp-stage">
+                                <img id="galleryMainImg" src="" alt="">
+                            </figure>
+                            <div class="pdp-thumbs" id="galleryThumbs" role="group" aria-label="Product views"></div>
+                        </div>
+
+                        <!-- Side rail -->
+                        <div>
+                            <div class="pdp-block">
+                                <h2 class="pdp-block-title">Colors <span class="pdp-count" id="colorCount"></span></h2>
+                                <div class="pdp-swatches" id="swatchGrid" role="group" aria-label="Color options"></div>
+                                <p class="pdp-selected-color">Selected: <strong id="selectedColorName"></strong></p>
+                            </div>
+
+                            <div class="pdp-block">
+                                <h2 class="pdp-block-title">Availability <span class="pdp-count" id="invColorName"></span></h2>
+                                <div id="inventoryBody" aria-live="polite">
+                                    <div class="skeleton skeleton-block" aria-hidden="true"></div>
+                                </div>
+                            </div>
+
+                            <div class="pdp-cta-card">
+                                <h2>Ready to outfit your crew?</h2>
+                                <p>Tell us the style, color, and quantity — a real person quotes it, usually same day.</p>
+                                <a class="btn btn-cta" id="ctaQuote" href="mailto:sales@nwcustomapparel.com">Get a quote</a>
+                                <a class="btn btn-ghost" id="ctaSample" href="/pages/top-sellers-showcase.html">Order a sample</a>
+                                <p class="pdp-cta-phone">Or call <a href="tel:253-922-5793">253-922-5793</a><br>Mon–Fri 8:30–5:00 PT</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Decoration pricing -->
+            <section class="pdp-section" aria-labelledby="pricingHeading">
+                <div class="wrap">
+                    <h2 id="pricingHeading">Decoration pricing</h2>
+                    <p class="pdp-panel-note">Per-piece price <strong>includes the garment and decoration</strong>, by order quantity. Live from our pricing system — final quote confirmed by a real person.</p>
+                    <div class="pdp-qty-row">
+                        <label for="qtyInput">How many do you need?</label>
+                        <input type="number" id="qtyInput" inputmode="numeric" min="1" max="9999" step="1" value="24">
+                        <span class="pdp-qty-hint">We highlight the price tier your quantity lands in.</span>
+                    </div>
+                    <div class="pdp-tablist" id="methodTabs" role="tablist" aria-label="Decoration methods"></div>
+                    <div id="methodPanels"></div>
+                </div>
+            </section>
+
+            <!-- Product details -->
+            <section class="pdp-section" id="detailsSection" aria-labelledby="detailsHeading" hidden>
+                <div class="wrap">
+                    <h2 id="detailsHeading">Product details</h2>
+                    <ul class="pdp-details-list" id="detailBullets"></ul>
+                </div>
+            </section>
+
+            <!-- Related products -->
+            <section class="pdp-section" id="relatedSection" aria-labelledby="relatedHeading" hidden>
+                <div class="wrap">
+                    <h2 id="relatedHeading">You might also like</h2>
+                    <div class="pdp-related-grid" id="relatedGrid"></div>
+                </div>
+            </section>
         </div>
 
-        <!-- Decoration Method Selector - FULL WIDTH HERO BANNER -->
-        <section id="decoration-selector-banner" class="decoration-selector-banner">
-            <div class="banner-content">
-                <h2 class="banner-title">How would you like to customize this?</h2>
-                <div id="decoration-selector" class="decoration-selector-horizontal">
-                    <!-- Will be populated by JavaScript -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Product Search Section (Hidden - using header search instead) -->
-        <section id="product-search" class="search-section" style="display: none;">
-            <div class="search-container">
-                <label for="style-search">Search Products:</label>
-                <input
-                    type="text"
-                    id="style-search"
-                    placeholder="Enter style number (e.g., PC61)"
-                    autocomplete="off"
-                >
-                <div id="search-results" class="search-results hidden"></div>
-            </div>
-        </section>
-
-        <!-- Product Display Section -->
-        <section id="product-display" class="product-section hidden">
-            <div class="product-layout">
-                <!-- Left: Images Section (60%) - Gallery + Thumbnails -->
-                <div class="product-images-section">
-                    <div id="product-gallery" class="product-gallery">
-                        <!-- Gallery will be populated by JavaScript -->
-                    </div>
-
-                    <div id="product-thumbnails" class="product-thumbnails">
-                        <!-- Thumbnails will be populated by JavaScript -->
-                    </div>
-
-                    <!-- Inventory now shows inline in color swatches section -->
-                </div>
-
-                <!-- Right: Product Info (40%) -->
-                <div class="product-info-column">
-                    <div id="product-info" class="product-info">
-                        <!-- Product details will be populated by JavaScript -->
-                    </div>
-
-                    <!-- Color Swatches -->
-                    <div id="color-swatches" class="color-swatches">
-                        <!-- Swatches will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pricing Options Section (Hidden - functionality moved to decoration selector) -->
-        <section id="pricing-options" class="pricing-section hidden" style="display: none;">
-            <h2>Select Embellishment Type</h2>
-            <div class="pricing-cards">
-                <!-- Pricing cards will be populated by JavaScript -->
-            </div>
-        </section>
-
-        <!-- Real-time SanMar Inventory Grid (full width, below product layout) -->
-        <section id="inline-inventory" class="full-width-inventory">
-            <!-- Populated by swatches.js on color selection -->
-        </section>
+        <!-- Mobile sticky CTA bar -->
+        <div class="pdp-mobile-cta" id="mobileCtaBar" hidden>
+            <a class="btn btn-cta" id="ctaQuoteMobile" href="mailto:sales@nwcustomapparel.com">Get a quote</a>
+            <a class="btn btn-ghost" href="tel:253-922-5793">Call us</a>
+            <a class="btn btn-ghost" id="ctaSampleMobile" href="/pages/top-sellers-showcase.html">Sample</a>
+        </div>
     </main>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay hidden">
-        <div class="spinner"></div>
-    </div>
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" width="180" height="52" loading="lazy">
+                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>
+                <span class="footer-est">Est. 1977 · Milton, WA</span>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/pages/top-sellers-showcase.html">Top Sellers</a></li>
+                    <li><a href="/brands.html">Brands</a></li>
+                    <li><a href="/custom-tees">Custom T-Shirts</a></li>
+                    <li><a href="/pages/top-sellers-showcase.html">Free Sample Program</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="/pages/golf-tournaments-2026.html?utm_source=product&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
+                    <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
+                    <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <address>
+                    2025 Freeman Rd E<br>
+                    Milton, WA 98354<br>
+                    <a href="tel:253-922-5793">253-922-5793</a><br>
+                    <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+                    Mon–Fri 8:30–5:00 PT
+                </address>
+                <ul>
+                    <li><a href="/staff-dashboard.html">Staff Portal</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-inner">
+                <span>© 2026 Northwest Custom Apparel</span>
+                <span>Family-owned &amp; operated since 1977</span>
+            </div>
+        </div>
+    </footer>
 
-    <!-- Error Message -->
-    <div id="error-message" class="error-message hidden">
-        <p id="error-text"></p>
-        <button onclick="location.reload()">Reload Page</button>
-    </div>
-
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="/product/app.js" type="module"></script>
-    <script src="/product/components/image-zoom.js"></script>
+    <!-- Config + shared pricing services (the same formula sources the calculators and quote builders use) -->
+    <script src="/config/app.config.js?v=2026.06.11.4" defer></script>
+    <script src="/shared_components/js/embroidery-pricing-service.js?v=2026.06.11.4" defer></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js?v=2026.06.11.4" defer></script>
+    <script src="/shared_components/js/dtg-pricing-service.js?v=2026.06.11.4" defer></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.06.11.4" defer></script>
+    <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.11.4" defer></script>
+    <script src="/product/js/product-2026.js?v=2026.06.11.4" defer></script>
 </body>
 </html>

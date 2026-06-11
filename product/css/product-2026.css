@@ -1,0 +1,351 @@
+/* ============================================================
+   product-2026.css — page layer for the rebuilt product detail
+   page (root /product.html), on the NWCA 2026 design system.
+
+   Loads AFTER /shared_components/css/nwca-2026-core.css.
+   Chrome (masthead/drawer/footer), page-head, tables, badges,
+   alerts, skeletons, empty-state all come from core — this file
+   only adds product-page-specific layout.
+   ============================================================ */
+
+/* ── Page scaffold ─────────────────────────────────────────── */
+.pdp-section { padding: 26px 0; }
+.pdp-section + .pdp-section { border-top: 1px solid var(--line); }
+
+.pdp-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 36px;
+    align-items: start;
+}
+
+/* ── Gallery ───────────────────────────────────────────────── */
+.pdp-stage {
+    margin: 0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+.pdp-stage img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+}
+.pdp-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+}
+.pdp-thumb {
+    width: 76px;
+    height: 76px;
+    padding: 4px;
+    background: var(--card);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+.pdp-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+.pdp-thumb:hover { border-color: var(--green-700); }
+.pdp-thumb[aria-pressed="true"] {
+    border-color: var(--green-700);
+    box-shadow: 0 0 0 2px var(--green-100);
+}
+.pdp-thumb-label {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin-top: 2px;
+}
+
+/* ── Side rail blocks ──────────────────────────────────────── */
+.pdp-block { margin-bottom: 26px; }
+.pdp-block-title {
+    font-size: 15px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+.pdp-block-title .pdp-count {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
+/* Color swatches */
+.pdp-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 8px;
+}
+.pdp-swatch {
+    background: none;
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 5px 3px 4px;
+    cursor: pointer;
+    text-align: center;
+    min-height: 44px;
+}
+.pdp-swatch img {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    border: 1px solid var(--line-strong);
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+.pdp-swatch-name {
+    display: block;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.pdp-swatch:hover { border-color: var(--line-strong); background: var(--green-50); }
+.pdp-swatch[aria-pressed="true"] {
+    border-color: var(--green-700);
+    background: var(--green-50);
+}
+.pdp-swatch[aria-pressed="true"] .pdp-swatch-name { color: var(--green-900); font-weight: 800; }
+.pdp-selected-color {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 10px 0 0;
+}
+.pdp-selected-color strong { color: var(--ink); }
+
+/* Inventory size grid */
+.pdp-inv-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 8px;
+}
+.pdp-inv-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 9px 11px;
+}
+.pdp-inv-size { font-weight: 800; font-size: 14px; }
+.pdp-inv-note { font-size: 12px; color: var(--ink-soft); margin: 10px 0 0; }
+
+/* CTA card (desktop right rail) */
+.pdp-cta-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 20px;
+    position: sticky;
+    top: 86px;
+}
+.pdp-cta-card h2 { font-size: 17px; font-weight: 800; margin: 0 0 4px; }
+.pdp-cta-card p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 14px; }
+.pdp-cta-card .btn { width: 100%; justify-content: center; margin-bottom: 9px; }
+.pdp-cta-phone {
+    text-align: center;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 4px 0 0;
+}
+.pdp-cta-phone a {
+    color: var(--green-900);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 6px 4px;
+    display: inline-block;
+}
+.pdp-cta-phone a:hover { text-decoration: underline; }
+
+/* ── Mobile sticky CTA bar ─────────────────────────────────── */
+.pdp-mobile-cta {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200; /* under drawer (230+) and modals (260) */
+    background: var(--card);
+    border-top: 1px solid var(--line-strong);
+    box-shadow: 0 -6px 18px -8px rgba(24, 34, 25, 0.25);
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    gap: 8px;
+}
+.pdp-mobile-cta .btn { flex: 1 1 0; justify-content: center; padding: 11px 8px; font-size: 13.5px; }
+.pdp-mobile-cta[hidden] { display: none !important; } /* [hidden] must beat the ≤960px display:flex */
+
+/* ── Decoration pricing tabs ───────────────────────────────── */
+.pdp-qty-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0 0 16px;
+}
+.pdp-qty-row label { font-size: 14px; font-weight: 700; }
+.pdp-qty-row input {
+    width: 110px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 15px;
+    font-weight: 700;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--ink);
+}
+.pdp-qty-row input:focus {
+    outline: none;
+    border-color: var(--green-700);
+    box-shadow: 0 0 0 3px rgba(47, 125, 59, 0.15);
+}
+.pdp-qty-hint { font-size: 12.5px; color: var(--ink-soft); }
+
+.pdp-tablist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 2px solid var(--line);
+    margin-bottom: 0;
+}
+.pdp-tab {
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 11px 16px;
+    min-height: 44px;
+    font-family: var(--font-body);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+.pdp-tab:hover { color: var(--green-900); background: var(--green-50); }
+.pdp-tab[aria-selected="true"] {
+    color: var(--green-900);
+    border-bottom-color: var(--green-700);
+}
+.pdp-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 18px;
+}
+.pdp-panel-note {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+}
+.pdp-panel-foot {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 12px 0 0;
+}
+.pdp-panel .alert { margin: 4px 0; }
+.pdp-panel .btn { margin-top: 12px; }
+
+/* ── Product details bullets ───────────────────────────────── */
+.pdp-details-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--ink-soft);
+    columns: 2;
+    column-gap: 40px;
+}
+.pdp-details-list li { break-inside: avoid; }
+
+/* ── Related products ──────────────────────────────────────── */
+.pdp-related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+.pdp-related-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+}
+.pdp-related-card:hover { border-color: var(--green-700); }
+.pdp-related-photo {
+    background: var(--paper-deep);
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+.pdp-related-photo img { max-width: 88%; max-height: 88%; object-fit: contain; }
+.pdp-related-body { padding: 12px 14px 14px; }
+.pdp-related-style {
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--green-700);
+    display: block;
+}
+.pdp-related-name {
+    font-size: 14px;
+    font-weight: 700;
+    margin: 3px 0 0;
+    line-height: 1.35;
+}
+.pdp-related-card:hover .pdp-related-name { color: var(--green-900); }
+
+/* ── Loading skeleton layout ───────────────────────────────── */
+.pdp-skeleton-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 36px;
+}
+.pdp-skeleton-grid .skeleton-block { min-height: 420px; }
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .pdp-grid,
+    .pdp-skeleton-grid { grid-template-columns: 1fr; gap: 24px; }
+    .pdp-cta-card { position: static; }
+    .pdp-cta-card .btn-cta { display: none; } /* mobile bar covers the quote CTA */
+    .pdp-mobile-cta { display: flex; }
+    body.pdp-has-mobile-cta { padding-bottom: 76px; }
+    .pdp-skeleton-grid .skeleton-block { min-height: 280px; }
+    .pdp-details-list { columns: 1; }
+}
+
+@media (max-width: 560px) {
+    .pdp-thumb { width: 64px; height: 64px; }
+    .pdp-panel { padding: 14px 12px; }
+    .pdp-tab { padding: 11px 10px; font-size: 13.5px; }
+}

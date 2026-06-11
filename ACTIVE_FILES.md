@@ -66,7 +66,12 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/product.html` | Product display | /product/app.js | ✅ Active |
+| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, API-driven decoration pricing tabs | product/js/product-2026.js, product/css/product-2026.css, nwca-2026-core.css, 5 shared pricing services | ✅ Active (rewritten 2026-06-11) |
+| `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system | nwca-2026-core.css | ✅ Active |
+| `/product/js/product-2026.js` | product.html logic: product/inventory/related fetch + 5 pricing-service tab loaders, ARIA tabs, SEO/JSON-LD | EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active |
+| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
+| `/pages/css/catalog-2026.css` | Catalog page layer CSS (facet rail + mobile filter drawer, cards, autocomplete v2) | nwca-2026-core.css | ✅ Active |
+| `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets, server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only) | ✅ Active |
 
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
@@ -770,7 +775,7 @@
 ### Product Page Modules (`/product/`)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/product/app.js` | Product page main app | components/*, services/* | ✅ Active |
+| `/product/app.js` | LEGACY old product app (+ components/*, services/*, styles/*) — no longer referenced by product.html since 2026-06-11 rewrite | — | 🚩 Dead — cutover cleanup pending |
 | `/product/components/decoration-selector.js` | Decoration method selector (DTG/EMB/SP/etc.) | — | ✅ Active |
 | `/product/components/gallery.js` | Product image gallery | — | ✅ Active |
 | `/product/components/image-zoom.js` | Image zoom/pan component | — | ✅ Active |
