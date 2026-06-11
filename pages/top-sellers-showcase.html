@@ -173,8 +173,24 @@
                         console.log(`  → FREE sample`);
                         return result;
                     } else {
-                        // Calculate markup with half-dollar ceiling: (cost ÷ 0.57) rounded UP to nearest $0.50 (2026 margin)
-                        const priceWithMargin = minPrice / 0.57;
+                        // Margin comes from the BLANK pricing bundle (Caspio Pricing_Tiers),
+                        // never hardcoded — a stale 0.57 here had drifted from Caspio's value
+                        const bundleResp = await fetch(`${this.apiBase}/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(styleNumber)}`);
+                        if (!bundleResp.ok) {
+                            const result = { eligible: false, reason: 'api_error' };
+                            this.eligibilityCache[styleNumber] = result;
+                            return result;
+                        }
+                        const bundle = await bundleResp.json();
+                        const blankTiers = bundle.tiersR || [];
+                        const tier1 = blankTiers.find(t => Number(t.MinQuantity) <= 1 && Number(t.MaxQuantity) >= 1) || blankTiers[0];
+                        const marginDenominator = parseFloat(tier1 && tier1.MarginDenominator);
+                        if (!marginDenominator || marginDenominator <= 0 || marginDenominator >= 1) {
+                            const result = { eligible: false, reason: 'no_margin' };
+                            this.eligibilityCache[styleNumber] = result;
+                            return result;
+                        }
+                        const priceWithMargin = minPrice / marginDenominator;
                         const samplePrice = Math.ceil(priceWithMargin * 2) / 2;  // Half-dollar ceiling
 
                         const result = {

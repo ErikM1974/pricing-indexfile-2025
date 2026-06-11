@@ -1,14 +1,14 @@
 # Active Files Registry
-**Last Updated:** 2026-05-26
+**Last Updated:** 2026-06-11
 **Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
 ## ⚠️ Root Directory JavaScript Files (Legacy Location)
 
-**Note:** These files are still in root directory for historical reasons. They should eventually move to `/shared_components/js/` but currently index.html and cart.html depend on these paths.
+**Note:** These files are still in root directory for historical reasons. They should eventually move to `/shared_components/js/` but currently index.html depends on these paths.
 
-**⚠️ IMPORTANT:** DO NOT MOVE these files without updating all HTML references. Both index.html and cart.html have hardcoded paths to these root files.
+**⚠️ IMPORTANT:** DO NOT MOVE these files without updating all HTML references. index.html has hardcoded paths to these root files.
 
 | File | Purpose | Used By | Future Action |
 |------|---------|---------|---------------|
@@ -18,13 +18,14 @@
 | `brands.js` | Brands listing page logic | brands.html | Move to shared_components |
 | `brands-flyout.js` | Brands flyout/dropdown menu (header nav) | index.html, multiple | Move to shared_components |
 | `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
-| `cart.js` | Cart functionality | cart.html | Move to shared_components |
-| `cart-ui.js` | Cart UI components | cart.html | Move to shared_components |
-| `cart-price-recalculator.js` | Price recalculation | cart.html | Move to shared_components |
+| `cart.js` | Cart functionality | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `cart-ui.js` | Cart UI components | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `cart-price-recalculator.js` | Price recalculation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `catalog-search.js` | Catalog search | index.html | Move to shared_components |
+| `home-2026.js` | Homepage chrome glue (drawer close/Escape/scroll-lock, All-categories tile) — 2026 redesign | index.html | ✅ Active (NEW 2026-06-11) |
 | `dp5-helper.js` | Helper functions (root copy — see also `/shared_components/js/dp5-helper.js`) | Unknown | Verify if needed |
-| `order-form-pdf.js` | PDF generation | cart.html | Move to shared_components |
-| `pricing-matrix-api.js` | Pricing API (root copy — see also `/shared_components/js/pricing-matrix-api.js`) | cart.html | Move to shared_components |
+| `order-form-pdf.js` | PDF generation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `pricing-matrix-api.js` | Pricing API (root copy — see also `/shared_components/js/pricing-matrix-api.js`) | NONE (cart.html retired 2026-06-11; calculators use the shared_components copy) | 🚩 Dead — flagged for deletion |
 | `product-search-service.js` | Product search | index.html, multiple | Move to shared_components |
 | `utils.js` | Utility functions | Multiple pages | Move to shared_components |
 
@@ -33,7 +34,6 @@
 | File | Purpose | Notes | Status |
 |------|---------|-------|--------|
 | `/index.html` | Main catalog page | See "Main Pages" section | ✅ Active |
-| `/cart.html` | Shopping cart | See "Main Pages" section | ✅ Active |
 | `/product.html` | Product display page | See "Main Pages" section | ✅ Active |
 | `/brands.html` | Brands listing page | brands.js, brands.css, brands-flyout.js | ✅ Active |
 | `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
@@ -45,15 +45,16 @@
 
 | File | Purpose | Used By | Future Action |
 |------|---------|---------|---------------|
-| `main.css` | Primary global styles | index.html | Move to shared_components |
-| `main-redesign.css` | 2025 redesign styles | index.html | Move to shared_components |
-| `cart-styles.css` | Cart page styles | cart.html | Move to shared_components |
-| `gallery-styles.css` | Product gallery styles | index.html, product.html | Move to shared_components |
+| `main.css` | Primary global styles | NONE (index.html moved to nwca-2026.css 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `main-redesign.css` | 2025 redesign styles | brands.html ONLY (index.html moved to nwca-2026.css 2026-06-11) | ⚠️ Retire after brands.html migrates |
+| `cart-styles.css` | Cart page styles | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `gallery-styles.css` | Product gallery styles | NONE (no HTML links it, verified 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `pricing-pages.css` | Shared pricing page styles | Pricing pages | Move to shared_components |
 | `pricing-pages-enhanced.css` | Enhanced pricing page styles | Pricing pages | Move to shared_components |
 | `product-styles.css` | Product page styles | product.html | Move to shared_components |
-| `modern-search-interface.css` | Modern search UI styles | index.html | Move to shared_components |
-| `catalog-search.css` | Catalog search styles | index.html | Move to shared_components |
+| `modern-search-interface.css` | Modern search UI styles | NONE (no HTML links it, verified 2026-06-11) | 🚩 Dead — flagged for deletion |
+| `catalog-search.css` | Catalog search base styles (autocomplete, product cards) — skinned by nwca-2026.css | index.html | ✅ Active |
+| `/shared_components/css/nwca-2026.css` | **NEW** 2026 site-wide design system ("press-room editorial" green refresh) — tokens, masthead, mega-nav, drawer, hero, bands, footer, catalog layer, modals | index.html (more customer pages migrating per memory/CUSTOMER_SITE_REDESIGN_2026-06.md) | ✅ Active (NEW 2026-06-11) |
 | `brands.css` | Brands page styles | brands.html | Move to shared_components |
 
 ## 🎯 Core Entry Points
@@ -62,7 +63,6 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/cart.html` | Shopping cart | cart.js, cart-ui.js, cart-price-recalculator.js, order-form-pdf.js, pricing-matrix-api.js, utils.js | ✅ Active |
 | `/product.html` | Product display | /product/app.js | ✅ Active |
 
 ### Secondary Pages (/pages/ directory)
@@ -202,7 +202,6 @@
 | `/pages/richardson-112-product.css` | Richardson 112 page styles | — | ✅ Active |
 | `/pages/dtg-compatible-products.html` | DTG-compatible products listing | — | ✅ Active |
 | `/pages/sample-cart.html` | Sample ordering cart page | — | ✅ Active |
-| `/pages/order-confirmation.html` | Order confirmation page | — | ✅ Active |
 | `/pages/order-form.html` | **NEW** Online order form (embroidery/screenprint/DTG/DTF) — paper-style layout, pushes to ShopWorks ManageOrders | order-form/*.css, order-form/*.js, order-form/components/*.jsx | ✅ Active |
 | `/pages/order-form/init.js` | Order form tweak defaults (accent/font/layout) | — | ✅ Active |
 | `/pages/order-form/shopworks.js` | Order Form submit client — routes to `/api/submit-order-form` on server.js (mirrors 3-Day Tees flow) | — | ✅ Active |
@@ -951,6 +950,8 @@ cap-embroidery-fix.css
 ### Memory/Reference Documentation
 | File | Purpose | Status |
 |------|---------|--------|
+| `/memory/CUSTOMER_SITE_REDESIGN_2026-06.md` | **NEW** Customer-facing redesign master plan + Custom Hats store spec (2026-06-11) | ✅ Active |
+| `/memory/CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md` | **NEW** Full 8-agent discovery audit evidence for the redesign (2026-06-11) | ✅ Active |
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_RULES.md` | Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |

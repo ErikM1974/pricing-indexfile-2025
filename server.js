@@ -76,6 +76,7 @@ dotenv.config();
 //   /quote-builders/dtg-quote-builder-legacy.html → 301 → dtg-quote-builder.html (legacy deleted 2026-06-08)
 //
 // LEGACY REDIRECTS
+//   /cart → 301 /pages/sample-cart.html (legacy Bootstrap cart retired 2026-06-11; cart.html + pages/order-confirmation.html deleted; 7 zombie sendFile routes to missing files removed same day)
 //   L657  /calculators/embroidery-contract* → embroidery-pricing-all
 //   L662  /staff-dashboard.html → /dashboards/
 //   L666  /bundle-orders-dashboard.html → /dashboards/
@@ -1956,16 +1957,6 @@ app.get('/announcements-manage.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-manage.html'));
 });
 
-// Serve the standardized embroidery pricing page
-app.get('/embroidery-pricing-standardized.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-pricing-standardized.html'));
-});
-
-// Serve the professional embroidery pricing page
-app.get('/embroidery-pricing-professional.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'embroidery-pricing-professional.html'));
-});
-
 // Serve the embroidery quote builder
 app.get('/embroidery-quote-builder.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'quote-builders', 'embroidery-quote-builder.html'));
@@ -2030,16 +2021,6 @@ app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'archive', 'seasonal-2025', 'breast-cancer-awareness-bundle.html'));
 });
 
-// Marketing page
-app.get('/marketing.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'marketing.html'));
-});
-
-// Top Sellers Catalog page
-app.get('/top-sellers-catalog.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'top-sellers-catalog.html'));
-});
-
 // Serve the policies directory as static files
 app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOptions));
 
@@ -2054,22 +2035,6 @@ app.get('/sanmar-credits.html', (req, res) => {
 
 app.get('/sanmar-vendor-portal.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-vendor-portal.html'));
-});
-
-// Test files for new search implementation
-app.get('/index-new.html', (req, res) => {
-  console.log('Serving index-new.html for testing new search');
-  res.sendFile(path.join(__dirname, 'index-new.html'));
-});
-
-app.get('/test-api.html', (req, res) => {
-  console.log('Serving test-api.html for API testing');
-  res.sendFile(path.join(__dirname, 'tests', 'test-api.html'));
-});
-
-app.get('/test-catalog-layout.html', (req, res) => {
-  console.log('Serving test-catalog-layout.html for layout testing');
-  res.sendFile(path.join(__dirname, 'tests', 'test-catalog-layout.html'));
 });
 
 // Routes for pages moved to /pages/ directory
@@ -4852,9 +4817,9 @@ if (monitor) {
   });
 }
 
-// Serve cart.html for the /cart route (shopping cart page)
+// Legacy cart retired 2026-06-11 (orphaned Bootstrap flow, zero inbound links) — customers use the sample cart
 app.get('/cart', (req, res) => {
-  res.sendFile(path.join(__dirname, 'cart.html'));
+  res.redirect(301, '/pages/sample-cart.html');
 });
 
 // Removed duplicate route - inventory-details.html is now served from /pages/ directory (see line 307)
