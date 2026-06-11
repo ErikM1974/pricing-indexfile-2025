@@ -1,3 +1,10 @@
+## v2026.06.11.2 (2026.06.11)
+
+- wip(customer-redesign): homepage rebuild on nwca-2026 + P0 hotfixes — NOT deployed, awaiting screenshot approval
+- fix(search): stale hardcoded categories blanked 11 common search words — Fleece->Sweatshirts/Fleece, Headwear->Caps
+- feat(homepage): hero rotator — 4 real prints crossfade in the registration frame
+- Deploy v2026.06.11.2: 1 files (index.html...)
+
 ## v2026.06.11.1 (2026.06.11)
 
 - wip(custom-tees): order-shipped email with tracking — wired, NOT yet deployed
