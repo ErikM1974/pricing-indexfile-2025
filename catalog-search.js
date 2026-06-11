@@ -1689,15 +1689,19 @@ class CatalogSearch {
     /**
      * Calculate decorated cap price for a quantity tier
      * Formula: ceil((baseCapPrice / marginDenominator) + embroideryCost)
-     * MarginDenominator comes from API tiersR, fallback to 0.57 (2026 margin)
+     * MarginDenominator comes from API tiersR ONLY — a missing tier hides the
+     * price (returns null) rather than pricing with a stale hardcoded margin.
      */
     calculateCapPrice(basePrice, tierLabel, embroideryCosts, tiersR = []) {
         const embCost = embroideryCosts.find(e => e.TierLabel === tierLabel && e.StitchCount === 8000);
         if (!embCost) return null;
 
-        // Get margin from API tier data, fallback to 2026 default
         const tier = tiersR.find(t => t.TierLabel === tierLabel);
-        const marginDenominator = tier?.MarginDenominator || 0.57;
+        const marginDenominator = parseFloat(tier?.MarginDenominator);
+        if (!marginDenominator || marginDenominator <= 0) {
+            console.warn(`[CatalogSearch] No MarginDenominator for tier ${tierLabel} — hiding price`);
+            return null;
+        }
 
         const decorated = (basePrice / marginDenominator) + embCost.EmbroideryCost;
         return Math.ceil(decorated);
