@@ -205,9 +205,14 @@
 | `/tools/custom-tees-calibrate.js` | Tool logic: style/color/view picker, drag/scale aspect-locked box, upsert to Caspio DTG_Calibration via proxy; silhouette auto-detect starting position | proxy /api/dtg-calibration + /api/dtg/top-sellers + /api/product-details | ✅ Active |
 | `/tools/custom-tees-calibrate.css` | Calibration-tool styling | — | ✅ Active |
 
-### Custom Hats System ('custom-caps' channel — server core built 2026-06-11, pages pending)
+### Custom Hats System ('custom-caps' channel — server core built 2026-06-11; storefront pages built 2026-06-11, /custom-caps route NOT yet registered)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/pages/custom-caps.html` | Custom Hats storefront (future /custom-caps) — 9-style cap gallery (/api/caps/catalog), logo upload + proof panel, OSFA qty + tier ladder, Stripe checkout (channel:'custom-caps'). Absolute /pages/ asset paths — clean-URL serving | custom-caps-app.js, custom-caps-pricing.js, custom-caps.css, app.config.js | ✅ Built |
+| `/pages/custom-caps-success.html` | Post-payment success page (Stripe redirect target per registry stripeSuccessPath) | custom-caps-success.js, custom-caps.css | ✅ Built |
+| `/pages/js/custom-caps-app.js` | App core: catalog gallery w/ live from-prices, per-style CAP bundle loads, color-aggregated SanMar stock (never per-size — stale sized partIds), 8-cap-min inline error, back-logo CAP-AL add-on, tax lookup, 4-step checkout pipeline → POST /api/create-checkout-session | CAPSPricing, app.config.js, proxy /api/caps/catalog + /api/pricing-bundle + /api/sanmar/inventory + /api/service-codes + /api/tax-rates/lookup + /api/files/upload | ✅ Built |
+| `/pages/js/custom-caps-success.js` | Success-page logic: polls quote session (refresh=true), proof-first timeline/promise copy from server-stamped settings, clears caps_studio_v1, EmailJS FALLBACK sends gated on webhook emailsSentAt stamp | app.config.js, EmailJS | ✅ Built |
+| `/pages/css/custom-caps.css` | Storefront + success styling (press-room editorial tokens layered from the custom-tees look; cap-native: proof panel, tier ladder, OSFA steppers) | — | ✅ Built |
 | `/pages/js/custom-caps-pricing.js` | PURE pricing engine for Custom Hats — EMB CAP PARITY: blank OSFA ÷ tier margin + EmbroideryCost(tier, 8K) → CeilDollar; CAP-AL back-logo flat tier add-on; 8-cap minimum enforced (structured BELOW_MINIMUM error — 1-7 LTM tier unreachable); NO LTM/digitizing lines; CAPS-SHIP-* threshold shipping fail-closed. Jest-locked. | — (dual browser/Node; server.js requires it) | ✅ Built |
 | `/tests/unit/custom-caps-pricing.test.js` | Jest parity lock vs the verified 9-style lineup (112/C402/112PFP/256/258/220/C914/STC26/CT105298 @ qty 8/24/48/72), back-logo tiers, qty<8 structured error, fail-closed throws, CeilDollar edges | custom-caps-pricing.js | ✅ Active |
 

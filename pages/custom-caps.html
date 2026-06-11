@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="description" content="Custom embroidered hats — pick from 9 stocked cap styles, upload your logo, and order online. Free logo setup, digital proof before we stitch, free shipping. 8-cap minimum.">
+    <meta name="robots" content="index, follow">
+
+    <title>Custom Embroidered Hats — Design Online | Northwest Custom Apparel</title>
+
+    <!-- Social share cards -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Custom Embroidered Hats — your logo stitched on caps people actually wear">
+    <meta property="og:description" content="9 stocked cap styles from Richardson, Carhartt, Port Authority and more. Free logo setup, digital proof before anything stitches, free shipping. Order online in minutes — 8-cap minimum.">
+    <meta property="og:image" content="https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg">
+    <meta property="og:url" content="https://www.teamnwca.com/custom-caps">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Absolute asset paths: this page will serve from BOTH /custom-caps (clean
+         URL) and /pages/custom-caps.html — relative paths break on the former. -->
+    <link rel="stylesheet" href="/pages/css/custom-caps.css?v=2026.06.11">
+</head>
+<body>
+    <a class="skip-link" href="#stage-gallery">Skip to the cap lineup</a>
+
+    <div id="caps-toasts" class="tdt-toasts" aria-live="polite"></div>
+
+    <!-- Fatal boot error (pricing/config unavailable — never a guessed price) -->
+    <div id="caps-fatal" class="tdt-fatal" hidden>
+        <div class="tdt-fatal-card">
+            <i class="fas fa-triangle-exclamation"></i>
+            <h2>We can’t load live pricing right now</h2>
+            <p id="caps-fatal-msg">Please refresh the page — or call us and we’ll take your order by phone.</p>
+            <p class="tdt-fatal-phone"><a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a></p>
+            <button type="button" class="btn btn-primary" id="caps-fatal-retry">Try again</button>
+        </div>
+    </div>
+
+    <!-- ── Header ─────────────────────────────────────────────────── -->
+    <header class="site-head">
+        <div class="site-head-inner">
+            <a class="brand" href="/">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="brand-logo">
+                <span class="brand-text">
+                    <strong>Northwest Custom Apparel</strong>
+                    <em>Custom Hats · Embroidered</em>
+                </span>
+            </a>
+            <div class="head-contact">
+                <span><i class="fas fa-location-dot"></i> Embroidered in Milton, WA</span>
+                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ── Promise banner (proof-first) ───────────────────────────── -->
+    <div class="promise-banner">
+        <div class="promise-tag">
+            <i class="fas fa-stamp"></i>
+            <div class="promise-copy">
+                <strong>Digital proof within 2–3 business days — nothing stitches until you approve</strong>
+                <span>Embroidered in Milton, WA · ships 7–10 business days after proof approval</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Hero ───────────────────────────────────────────────────── -->
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-copy">
+                <h1>Custom embroidered hats — your logo, <span class="hero-underline">stitched</span> on caps people actually wear.</h1>
+                <p class="hero-sub">Pick from 9 stocked styles — Richardson, Carhartt, Port Authority and more. Upload your logo, approve a digital proof, and we embroider it in our Milton, WA shop. Front logo and setup included in the price.</p>
+                <button type="button" class="btn btn-hero" id="hero-cta">
+                    <i class="fas fa-hat-cowboy"></i> Pick your cap — see live pricing
+                </button>
+                <div class="hero-trust">
+                    <span><i class="fas fa-lock"></i> Stripe secure checkout</span>
+                    <span><i class="fas fa-house-flag"></i> Family-owned, Milton WA — since 1977</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg" alt="Richardson 112 trucker cap" loading="eager">
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Trust strip (locked decisions, verbatim intents) ───────── -->
+    <section class="trust-strip" aria-label="Why order here">
+        <div class="trust-strip-inner">
+            <div class="trust-item"><i class="fas fa-gift"></i><span><strong>Free logo setup</strong> Embroidered front logo included — free setup, always.</span></div>
+            <div class="trust-item"><i class="fas fa-stamp"></i><span><strong>Digital proof first</strong> Proof within 2–3 business days — nothing stitches until you approve.</span></div>
+            <div class="trust-item"><i class="fas fa-truck-fast"></i><span><strong>Free shipping, always</strong> Every order ships free, anywhere in the US.</span></div>
+            <div class="trust-item"><i class="fas fa-layer-group"></i><span><strong>8-cap minimum</strong> Small enough for a crew, priced better as you add caps.</span></div>
+        </div>
+    </section>
+
+    <!-- ── Step 1: cap gallery ────────────────────────────────────── -->
+    <section class="gallery-band" id="stage-gallery">
+        <div class="gallery-inner">
+            <div class="stage-head">
+                <span class="stage-num">1</span>
+                <h2>Pick your cap</h2>
+            </div>
+            <p class="gallery-sub">Our 9 best embroidery caps — every style stocked, every price live, front logo included.</p>
+            <div class="gallery-loading" id="gallery-loading"><i class="fas fa-spinner fa-spin"></i> Loading the cap lineup…</div>
+            <div class="gallery-error" id="gallery-error" hidden>
+                <i class="fas fa-triangle-exclamation"></i> <span id="gallery-error-msg">We couldn’t load the cap lineup.</span>
+                <button type="button" class="link-btn" id="gallery-retry">Retry</button>
+            </div>
+            <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+    </section>
+
+    <!-- ── Studio ─────────────────────────────────────────────────── -->
+    <main class="studio" id="studio" hidden>
+        <div class="studio-grid">
+
+            <!-- LEFT: logos (sticky on desktop) -->
+            <div class="studio-logo-col" id="stage-logos">
+                <div class="stage-head">
+                    <span class="stage-num">2</span>
+                    <h2>Add your logo</h2>
+                </div>
+
+                <div class="current-product" id="current-product">
+                    <span class="current-product-meta">
+                        <strong id="current-product-name">—</strong>
+                        <small id="current-product-style"></small>
+                    </span>
+                    <button type="button" class="chip-btn" id="change-product"><i class="fas fa-rotate-left"></i> Change cap</button>
+                </div>
+
+                <!-- Side-by-side proof panel: cap photo + your logo (no fake compositing) -->
+                <div class="proof-panel">
+                    <div class="proof-grid">
+                        <div class="proof-cap">
+                            <img id="proof-cap-img" src="" alt="" hidden>
+                            <i class="fas fa-hat-cowboy" id="proof-cap-placeholder" aria-hidden="true"></i>
+                            <span class="proof-cap-color" id="proof-cap-color" hidden></span>
+                        </div>
+                        <div class="proof-logos">
+                            <div class="proof-logo-slot" id="proof-front-slot">
+                                <span class="proof-logo-thumb" id="proof-front-thumb" hidden></span>
+                                <span class="proof-logo-empty" id="proof-front-empty">Your front logo appears here</span>
+                                <span class="location-chip"><i class="fas fa-location-crosshairs" aria-hidden="true"></i> Front — embroidered, up to 10,000 stitches included</span>
+                            </div>
+                            <div class="proof-logo-slot" id="proof-back-slot" hidden>
+                                <span class="proof-logo-thumb" id="proof-back-thumb" hidden></span>
+                                <span class="proof-logo-empty" id="proof-back-empty">Your back logo appears here</span>
+                                <span class="location-chip is-muted"><i class="fas fa-location-crosshairs" aria-hidden="true"></i> Back — small logo or text</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="proof-note">We don’t fake an on-cap preview — your emailed proof shows your logo digitized and placed on the exact cap, before anything stitches.</p>
+                </div>
+
+                <div class="logo-controls">
+                    <!-- FRONT logo (required) -->
+                    <div class="control-block">
+                        <label class="control-label" id="front-drop-label">Front logo <span class="included-tag">included — free setup</span></label>
+                        <div class="art-drop" id="front-drop" tabindex="0" role="button" aria-label="Upload your front logo" aria-describedby="front-drop-formats">
+                            <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
+                            <strong>Drop your logo here</strong> <span>or click to browse</span>
+                            <small id="front-drop-formats">PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>
+                        </div>
+                        <input type="file" id="front-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden>
+                        <div class="art-file" id="front-file" hidden>
+                            <span class="art-file-thumb" id="front-file-thumb"></span>
+                            <span class="art-file-meta">
+                                <strong id="front-file-name"></strong>
+                                <small id="front-file-size"></small>
+                            </span>
+                            <button type="button" class="art-file-remove" id="front-remove" aria-label="Remove front logo"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="art-warning" id="front-warning" hidden></div>
+                    </div>
+
+                    <!-- BACK logo (optional, priced live from CAP-AL) -->
+                    <div class="control-block">
+                        <label class="toggle-row" for="back-toggle">
+                            <input type="checkbox" id="back-toggle">
+                            <span class="toggle-pill" aria-hidden="true"></span>
+                            <span class="toggle-text">Add a back logo <small id="back-delta">priced per cap by quantity</small></span>
+                        </label>
+                        <div id="back-upload-block" hidden>
+                            <div class="art-drop" id="back-drop" tabindex="0" role="button" aria-label="Upload your back logo" aria-describedby="front-drop-formats">
+                                <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
+                                <strong>Drop your back logo here</strong> <span>or click to browse</span>
+                                <small>Small logo or text — same formats, 20 MB max</small>
+                            </div>
+                            <input type="file" id="back-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden>
+                            <div class="art-file" id="back-file" hidden>
+                                <span class="art-file-thumb" id="back-file-thumb"></span>
+                                <span class="art-file-meta">
+                                    <strong id="back-file-name"></strong>
+                                    <small id="back-file-size"></small>
+                                </span>
+                                <button type="button" class="art-file-remove" id="back-remove" aria-label="Remove back logo"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="art-warning" id="back-warning" hidden></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: colors/quantities + checkout -->
+            <div class="studio-flow-col">
+
+                <!-- Stage 3: colors & quantities -->
+                <section class="stage" id="stage-colors">
+                    <div class="stage-head">
+                        <span class="stage-num">3</span>
+                        <h2>Colors &amp; quantities</h2>
+                    </div>
+
+                    <div class="color-chips" id="color-chips" aria-label="Add a cap color"></div>
+                    <div class="color-cards" id="color-cards"></div>
+
+                    <div class="min-alert" id="min-alert" role="alert" hidden></div>
+
+                    <div class="ladder-card" id="ladder-card" hidden>
+                        <p class="ladder-title">Per-cap price — front logo included</p>
+                        <table class="tier-ladder" id="tier-ladder" aria-label="Quantity price ladder"></table>
+                        <p class="ladder-foot" id="ladder-foot"></p>
+                        <p class="nudge-line" id="nudge-line"></p>
+                    </div>
+                    <p class="inventory-stamp" id="inventory-stamp"></p>
+                    <div class="inventory-error" id="inventory-error" hidden>
+                        <i class="fas fa-triangle-exclamation"></i> Live stock is unavailable right now — we’ll confirm stock before charging your card. <button type="button" class="link-btn" id="inventory-retry">Retry</button>
+                    </div>
+                </section>
+
+                <!-- Stage 4: checkout -->
+                <section class="stage" id="stage-checkout">
+                    <div class="stage-head">
+                        <span class="stage-num">4</span>
+                        <h2>Checkout</h2>
+                    </div>
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-user"></i> Contact</h3>
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="f-first">First name *</label>
+                                <input type="text" id="f-first" autocomplete="given-name" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="f-last">Last name *</label>
+                                <input type="text" id="f-last" autocomplete="family-name" required>
+                            </div>
+                            <div class="form-field form-span">
+                                <label for="f-email">Email *</label>
+                                <input type="email" id="f-email" autocomplete="email" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="f-phone">Phone *</label>
+                                <input type="tel" id="f-phone" autocomplete="tel" required>
+                            </div>
+                            <div class="form-field">
+                                <label for="f-company">Company / group name (optional)</label>
+                                <input type="text" id="f-company" autocomplete="organization">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <h3><i class="fas fa-truck-fast"></i> Delivery</h3>
+                        <div class="delivery-cards">
+                            <label class="delivery-card">
+                                <input type="radio" name="delivery" id="d-ship" value="ship" checked>
+                                <span class="delivery-card-body">
+                                    <i class="fas fa-truck"></i>
+                                    <strong>Ship it</strong>
+                                    <small id="ship-fee-label">Free shipping, always</small>
+                                </span>
+                            </label>
+                            <label class="delivery-card">
+                                <input type="radio" name="delivery" id="d-pickup" value="pickup">
+                                <span class="delivery-card-body">
+                                    <i class="fas fa-store"></i>
+                                    <strong>Pick up free</strong>
+                                    <small>Milton, WA</small>
+                                </span>
+                            </label>
+                        </div>
+
+                        <div id="pickup-card" class="pickup-card" hidden>
+                            <i class="fas fa-store"></i>
+                            <div>
+                                <strong>NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354</strong>
+                                <p>We’ll call you the moment your caps are ready. Pickup orders are taxed at the Milton rate.</p>
+                            </div>
+                        </div>
+
+                        <div id="address-fields">
+                            <div class="form-grid">
+                                <div class="form-field form-span">
+                                    <label for="f-addr1">Street address *</label>
+                                    <input type="text" id="f-addr1" autocomplete="address-line1" required>
+                                </div>
+                                <div class="form-field">
+                                    <label for="f-city">City *</label>
+                                    <input type="text" id="f-city" autocomplete="address-level2" required>
+                                </div>
+                                <div class="form-field form-field-sm">
+                                    <label for="f-state">State *</label>
+                                    <input type="text" id="f-state" autocomplete="address-level1" maxlength="2" placeholder="WA" required>
+                                </div>
+                                <div class="form-field form-field-sm">
+                                    <label for="f-zip">ZIP *</label>
+                                    <input type="text" id="f-zip" autocomplete="postal-code" inputmode="numeric" required>
+                                </div>
+                            </div>
+                            <p class="tax-stamp" id="tax-stamp"></p>
+                            <div class="tax-error" id="tax-error" hidden>
+                                <i class="fas fa-triangle-exclamation"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="link-btn" id="tax-retry">Retry</button>
+                            </div>
+                        </div>
+
+                        <div class="form-field form-span">
+                            <label for="f-notes">Special instructions</label>
+                            <textarea id="f-notes" rows="2" placeholder="Thread colors, placement notes — anything we should know?"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Review -->
+                    <div class="form-card review-card" id="review-card">
+                        <h3><i class="fas fa-clipboard-check"></i> Review your order</h3>
+                        <div class="review-logos" id="review-logos"></div>
+                        <div class="review-lines" id="review-lines"></div>
+                        <div class="review-totals" id="review-totals" aria-live="polite"></div>
+                        <p class="review-promise" id="review-promise"></p>
+                        <div class="review-ack" id="review-ack" hidden></div>
+
+                        <div class="rights-ack" id="rights-ack-row">
+                            <label><input type="checkbox" id="rights-ack"> <span><strong>I own this logo or have permission to embroider it.</strong> It doesn’t contain trademarks, logos, or characters I don’t have rights to, and nothing hateful or illegal.</span></label>
+                        </div>
+
+                        <div class="pay-reasons" id="pay-reasons"></div>
+                        <button type="button" class="btn btn-pay" id="pay-btn" disabled>
+                            <i class="fas fa-lock"></i> <span id="pay-btn-label">Pay</span>
+                        </button>
+                        <p class="stripe-note"><i class="fab fa-stripe"></i> You’ll be redirected to Stripe — we never see your card number.</p>
+                        <ul class="pay-fineprint">
+                            <li>Your digital proof comes first — we email it within 2–3 business days and nothing stitches until you approve it.</li>
+                            <li>Custom caps are made just for you — no returns, but if we get it wrong (defect, wrong item), we re-stitch or refund, no drama.</li>
+                            <li>Change or cancel free anytime before we stitch — call 253-922-5793 with your order number.</li>
+                            <li>We may decline artwork we can’t legally or ethically embroider — full refund, and we’ll tell you why.</li>
+                            <li>We use your info only to produce and ship your order — we never sell it.</li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- ── Marketing bands ────────────────────────────────────────── -->
+    <section class="band band-how">
+        <h2 class="band-title">How it works</h2>
+        <div class="how-grid">
+            <div class="how-step"><span>1</span><strong>Pick &amp; upload</strong><p>Choose one of our 9 stocked cap styles and upload your logo — any common file format works.</p></div>
+            <div class="how-step"><span>2</span><strong>Approve your proof</strong><p>Within 2–3 business days we email a digital sew-out proof. Nothing stitches until you approve it.</p></div>
+            <div class="how-step"><span>3</span><strong>We embroider</strong><p>Your logo is stitched on the exact caps and colors you picked, in our Milton WA shop.</p></div>
+            <div class="how-step"><span>4</span><strong>Ships free</strong><p>Your caps ship 7–10 business days after proof approval — free shipping, always.</p></div>
+        </div>
+    </section>
+
+    <section class="band band-faq">
+        <h2 class="band-title">Questions, answered</h2>
+        <div class="faq">
+            <details><summary>When exactly will my caps ship?</summary><p>We email your digital proof within 2–3 business days of your order. Once you approve it, your caps ship 7–10 business days later. Weekends and holidays don’t count as business days — and nothing stitches until you’ve approved the proof.</p></details>
+            <details><summary>What’s included in the price?</summary><p>Everything on the front: the cap itself, logo setup and digitizing (free, always), and an embroidered front logo up to 10,000 stitches — which covers nearly every logo. A back logo is an optional per-cap add-on, priced live as you build your order.</p></details>
+            <details><summary>Why is there an 8-cap minimum?</summary><p>Embroidery setup makes one-off caps expensive — 8 caps is where the price gets fair. The price ladder shows exactly how the per-cap price drops at 24, 48, and 72 caps.</p></details>
+            <details><summary>What file should I upload?</summary><p>Anything common: PNG, JPG, SVG, AI, EPS, PDF, PSD, or TIFF up to 20 MB. Our digitizers convert it to stitches by hand and your emailed proof shows exactly how it will sew before we start.</p></details>
+            <details><summary>Can I mix cap colors?</summary><p>Yes — pick as many colors of the same style as you like. The combined quantity sets your price tier, so 12 black + 12 navy caps all get the 24-cap price.</p></details>
+            <details><summary>How much is shipping?</summary><p>Free. Every order ships free anywhere in the US, or pick up free at our shop in Milton, WA.</p></details>
+            <details><summary>Can I return custom caps?</summary><p>Because every cap is embroidered just for you, we can’t resell returns. If we got something wrong — wrong color shipped, stitching defect — we’ll re-stitch or refund, no drama.</p></details>
+            <details><summary>Do you charge sales tax?</summary><p>Washington destination sales tax applies to orders shipped within WA (and pickup orders at the Milton rate). Out-of-state shipments aren’t taxed.</p></details>
+        </div>
+    </section>
+
+    <section class="band band-guarantee">
+        <div class="guarantee-tag">
+            <i class="fas fa-handshake"></i>
+            <div>
+                <strong>Nothing stitches until you approve the proof.</strong>
+                <p>We’ve been embroidering in Milton, Washington since 1977. Call us at <a href="tel:253-922-5793">253-922-5793</a> — a human answers.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="site-foot">
+        <p>© Northwest Custom Apparel · Custom Embroidered Hats · 2025 Freeman Rd E, Milton, WA 98354 · <a href="tel:253-922-5793">253-922-5793</a> · <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a></p>
+    </footer>
+
+    <!-- ── Sticky order bar ───────────────────────────────────────── -->
+    <div class="order-bar" id="order-bar" hidden>
+        <button type="button" class="order-bar-summary" id="order-bar-summary" aria-haspopup="dialog">
+            <strong id="bar-total">$0.00</strong>
+            <span id="bar-meta">0 caps</span>
+            <small class="bar-min-note" id="bar-min-note" hidden></small>
+        </button>
+        <button type="button" class="btn btn-cta" id="smart-cta">Pick your cap</button>
+    </div>
+
+    <!-- ── Summary sheet ──────────────────────────────────────────── -->
+    <div class="sheet-backdrop" id="sheet-backdrop" hidden></div>
+    <div class="summary-sheet" id="summary-sheet" role="dialog" aria-label="Order summary" hidden>
+        <div class="sheet-grab" aria-hidden="true"></div>
+        <h3>Your order so far</h3>
+        <div id="sheet-lines"></div>
+        <div id="sheet-totals"></div>
+        <p class="review-promise" id="sheet-promise"></p>
+        <button type="button" class="btn btn-primary" id="sheet-close">Keep building</button>
+    </div>
+
+    <!-- ── Checkout pipeline modal ────────────────────────────────── -->
+    <div class="modal-backdrop" id="pipeline-backdrop" hidden>
+        <div class="pipeline-modal" role="dialog" aria-label="Placing your order">
+            <h3>Placing your order…</h3>
+            <ol class="pipeline-steps">
+                <li id="pl-step-1"><i class="far fa-circle"></i> Confirming live stock</li>
+                <li id="pl-step-2"><i class="far fa-circle"></i> Uploading your logo</li>
+                <li id="pl-step-3"><i class="far fa-circle"></i> Saving your order</li>
+                <li id="pl-step-4"><i class="far fa-circle"></i> Opening secure checkout</li>
+            </ol>
+            <div class="pipeline-error" id="pipeline-error" hidden></div>
+            <button type="button" class="btn btn-ghost" id="pipeline-cancel">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ── Stock conflict modal ───────────────────────────────────── -->
+    <div class="modal-backdrop" id="conflict-backdrop" hidden>
+        <div class="pipeline-modal" role="dialog" aria-label="Stock changed">
+            <h3><i class="fas fa-triangle-exclamation"></i> Stock changed while you were ordering</h3>
+            <div id="conflict-list"></div>
+            <button type="button" class="btn btn-primary" id="conflict-apply">Apply fixes &amp; continue</button>
+            <button type="button" class="btn btn-ghost" id="conflict-close">Back to my order</button>
+        </div>
+    </div>
+
+    <!-- Config + modules (order matters). Absolute paths — see head comment. -->
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/js/custom-caps-pricing.js?v=2026.06.11"></script>
+    <script src="/pages/js/custom-caps-app.js?v=2026.06.11"></script>
+</body>
+</html>
