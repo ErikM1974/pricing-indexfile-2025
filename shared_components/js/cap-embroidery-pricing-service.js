@@ -54,24 +54,36 @@ class CapEmbroideryPricingService {
     }
 
     /**
-     * Fetch cap embroidery costs from API using reference product
-     * @returns {Array} Embroidery costs from API
-     * @throws {Error} If API request fails
+     * Fetch the CAP pricing bundle (tiers + embroidery costs) from API using reference product
+     * @returns {Object} Full pricing-bundle response
+     * @throws {Error} If API request fails or required blocks are missing
      */
-    async fetchEmbroideryCosts() {
+    async fetchPricingBundle() {
         const url = `${this.baseURL}/api/pricing-bundle?method=CAP&styleNumber=C112`;
 
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Failed to fetch cap embroidery costs from API: ${response.status}`);
+            throw new Error(`Failed to fetch cap embroidery pricing bundle from API: ${response.status}`);
         }
 
         const data = await response.json();
         if (!data.allEmbroideryCostsR) {
             throw new Error('Invalid API response: missing cap embroidery costs');
         }
+        if (!Array.isArray(data.tiersR) || data.tiersR.length === 0) {
+            throw new Error('Invalid API response: missing cap pricing tiers');
+        }
 
-        return data.allEmbroideryCostsR;
+        return data;
+    }
+
+    /**
+     * Fetch cap embroidery costs from API using reference product
+     * @returns {Array} Embroidery costs from API
+     * @throws {Error} If API request fails
+     */
+    async fetchEmbroideryCosts() {
+        return (await this.fetchPricingBundle()).allEmbroideryCostsR;
     }
 
     /**
@@ -81,17 +93,12 @@ class CapEmbroideryPricingService {
      */
     async generateManualPricingData(manualCost) {
 
-        // Default tiers - 2026 margin (43%) - All 5 tiers to match flat embroidery
-        const defaultTiers = [
-            { TierLabel: '1-7', MinQuantity: 1, MaxQuantity: 7, MarginDenominator: 0.57, LTM_Fee: 50 },
-            { TierLabel: '8-23', MinQuantity: 8, MaxQuantity: 23, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.57, LTM_Fee: 0 },
-            { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.57, LTM_Fee: 0 }
-        ];
-
-        // Fetch current cap embroidery costs from API (throws error if fails - no silent fallback)
-        const defaultEmbroideryCosts = await this.fetchEmbroideryCosts();
+        // Tiers (margins/LTM) + embroidery costs come from the live API — Caspio
+        // Pricing_Tiers is the single source of truth for MarginDenominator,
+        // never a hardcoded table (throws if unavailable - no silent fallback).
+        const bundle = await this.fetchPricingBundle();
+        const defaultTiers = bundle.tiersR;
+        const defaultEmbroideryCosts = bundle.allEmbroideryCostsR;
 
         // Caps typically have OSFA (One Size Fits All)
         const defaultSizes = [

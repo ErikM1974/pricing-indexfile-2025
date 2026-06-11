@@ -17,7 +17,7 @@ class EmbroideryPricingCalculator {
             '72+': { embCost: 12.00, hasLTM: false }
         };
         
-        this.marginDenominator = 0.57; // 2026 margin (43%) - synced with API Pricing_Tiers.MarginDenominator
+        this.marginDenominator = 0.53; // initial value only — overwritten from API Pricing_Tiers.MarginDenominator (0.53 as of 2026-06)
         this.ltmFee = 50.00;
         this.digitizingFee = 100.00;
         this.additionalStitchRate = 1.25; // per 1000 stitches over 8000 (legacy linear rate, kept for AL/FB)
@@ -126,7 +126,7 @@ class EmbroideryPricingCalculator {
             if (data) {
                 // Extract configuration from tiersR
                 if (data.tiersR && data.tiersR.length > 0) {
-                    this.marginDenominator = data.tiersR[0].MarginDenominator || 0.57; // 2026 fallback
+                    this.marginDenominator = data.tiersR[0].MarginDenominator || 0.53; // fallback only — Caspio is authoritative
                     
                     // Build tiers object from API data
                     this.tiers = {};
@@ -472,7 +472,7 @@ class EmbroideryPricingCalculator {
                         this.capTiers[cost.TierLabel] = {
                             embCost: cost.EmbroideryCost,
                             hasLTM: cost.TierLabel === '1-7',
-                            marginDenominator: capMarginByTier[cost.TierLabel] || 0.57  // per-tier (N2); helper falls back to global
+                            marginDenominator: capMarginByTier[cost.TierLabel] || 0.53  // per-tier (N2); helper falls back to global
                         };
                         // Store cap-specific additional stitch rate (from first Cap record)
                         // Caps use $1.00/1K (NOT Shirt's $1.25/1K)
@@ -485,7 +485,7 @@ class EmbroideryPricingCalculator {
 
                 // Get margin denominator from tiers
                 if (data.tiersR && data.tiersR.length > 0) {
-                    this.capMarginDenominator = data.tiersR[0].MarginDenominator || 0.57;
+                    this.capMarginDenominator = data.tiersR[0].MarginDenominator || 0.53;
                 }
 
                 // Get rounding method
@@ -612,9 +612,9 @@ class EmbroideryPricingCalculator {
         return 9.00;
     }
 
-    // Per-tier cap margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
+    // Per-tier cap margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.53 (Caspio is authoritative).
     getCapMarginDenominator(tier) {
-        return this.capTiers[tier]?.marginDenominator || this.capMarginDenominator || 0.57;
+        return this.capTiers[tier]?.marginDenominator || this.capMarginDenominator || 0.53;
     }
 
     /**
@@ -922,9 +922,9 @@ class EmbroideryPricingCalculator {
         return 12.00;
     }
 
-    // Per-tier garment margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.57.
+    // Per-tier garment margin (N2 fix) — honor each tier's MarginDenominator; fall back to the global then 0.53 (Caspio is authoritative).
     getMarginDenominator(tier) {
-        return this.tiers[tier]?.marginDenominator || this.marginDenominator || 0.57;
+        return this.tiers[tier]?.marginDenominator || this.marginDenominator || 0.53;
     }
     
     /**

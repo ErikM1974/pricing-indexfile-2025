@@ -533,7 +533,7 @@ class DTGPricingService {
                 TierLabel: '24-47',
                 MinQuantity: 1,
                 MaxQuantity: 47,
-                MarginDenominator: 0.57, // 2026 margin (43%)
+                MarginDenominator: 0.53, // last-resort fallback — Caspio Pricing_Tiers is authoritative (0.53 as of 2026-06)
                 LTM_Fee: 0,
                 Note: 'Fallback tier - tiers parameter was invalid'
             };

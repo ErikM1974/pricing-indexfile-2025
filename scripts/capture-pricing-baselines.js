@@ -476,7 +476,7 @@ const PAGE_RUNNERS = {
       ltmFee: 0, // LTM is distributed into per-piece, not order-level in DTF
       ltmDistributedPerPiece: result.ltmFeePerUnit || 0,
       garmentBaseCost: baseCost,
-      garmentSellPerPiece: +(baseCost / (result.marginDenominator || 0.57)).toFixed(2),
+      garmentSellPerPiece: result.marginDenominator ? +(baseCost / result.marginDenominator).toFixed(2) : null,
       perSizeBreakdown: perSizeBreakdown,
       lineSubtotal: lineSubtotal,
       grandTotalBeforeTax: lineSubtotal

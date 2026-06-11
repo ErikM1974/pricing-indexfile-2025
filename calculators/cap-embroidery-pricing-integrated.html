@@ -1703,9 +1703,9 @@
         // Calculate cap pricing using the same formula as cap-quote-pricing.js
         function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
 
-            // Get margin from API data, fallback to 0.57 (2026 margin)
+            // Get margin from API data — Caspio Pricing_Tiers is authoritative (0.53 as of 2026-06)
             const tier = getTierForQuantity(quantity);
-            let marginDenominator = 0.57; // 2026 margin fallback
+            let marginDenominator = 0.53; // last-resort fallback only
             if (pricingData && pricingData.apiData && pricingData.apiData.tiersR) {
                 const tierData = pricingData.apiData.tiersR.find(t => t.TierLabel === tier);
                 if (tierData && tierData.MarginDenominator) {
