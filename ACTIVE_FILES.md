@@ -66,13 +66,16 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/index.html` | Main catalog page | app-modern.js, product-search-service.js, catalog-search.js, autocomplete-new.js | ✅ Active |
-| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, 3-question decoration CONFIGURATOR (qty → placement → priced method chips) gated by method eligibility; tier matrix demoted to "See every quantity price" expandable | product/js/product-2026.js, product/js/pdp-configurator.js, product/css/product-2026.css, nwca-2026-core.css, decoration-methods.js, quote-cart-engine.js, embroidery-quote-pricing.js, dtf-quote-pricing.js, 5 shared pricing services | ✅ Active (configurator 2026-06-11) |
-| `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system (incl. `.pdp-cfg-*` configurator styles) | nwca-2026-core.css | ✅ Active |
-| `/product/js/product-2026.js` | product.html page logic: product/inventory/related fetch, eligibility lookup (DecorationMethods), SEO/JSON-LD, CTA mailto built from the configurator selection; hands all pricing UI to PdpConfigurator | DecorationMethods, PdpConfigurator | ✅ Active |
-| `/product/js/pdp-configurator.js` | 3-question decoration configurator (Phase 1 quote-cart): qty stepper, placement chips (garment/cap), SCP ink stepper, per-method priced chips + total/LTM-honesty/nudge via QuoteCartEngine.singleItemPreview (zero local price math), location-aware tier-matrix expandable, per-chip visible error states | QuoteCartEngine + EmbroideryPricingCalculator + DTFConfig + EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active (NEW 2026-06-11) |
-| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog` | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, decoration-methods.js, app-modern.js, brands-flyout.js | ✅ Active (NEW 2026-06-11) |
+| `/product.html` | Product detail (2026 redesign) — gallery, swatches, live inventory, 3-question decoration CONFIGURATOR (qty → placement → priced method chips) gated by method eligibility; tier matrix demoted to "See every quantity price" expandable; "Add to quote" CTA + masthead quote badge + toast (Phase 2 quote-cart) | product/js/product-2026.js, product/js/pdp-configurator.js, product/css/product-2026.css, nwca-2026-core.css, decoration-methods.js, quote-cart-engine.js, quote-cart-store.js, embroidery-quote-pricing.js, dtf-quote-pricing.js, 5 shared pricing services | ✅ Active (quote-cart Phase 2 2026-06-11) |
+| `/product/css/product-2026.css` | Page-layer CSS for product.html on nwca-2026 system (incl. `.pdp-cfg-*` configurator styles + `.pdp-cfg-actions` add-to-quote block) | nwca-2026-core.css | ✅ Active |
+| `/product/js/product-2026.js` | product.html page logic: product/inventory/related fetch, eligibility lookup (DecorationMethods), SEO/JSON-LD, CTA mailto built from the configurator selection; Add-to-Quote wiring (pooling-scope conflict guard + toast w/ "View quote (N)" link — zero price math, selection from PdpConfigurator.getSelection); hands all pricing UI to PdpConfigurator | DecorationMethods, PdpConfigurator, QuoteCartStore | ✅ Active |
+| `/product/js/pdp-configurator.js` | 3-question decoration configurator (Phase 1 quote-cart): qty stepper, placement chips (garment/cap), SCP ink stepper, per-method priced chips + total/LTM-honesty/nudge via QuoteCartEngine.singleItemPreview (zero local price math), location-aware tier-matrix expandable, per-chip visible error states; getSelection() exposes status/engineMethod/sizes for the Add-to-Quote flow | QuoteCartEngine + EmbroideryPricingCalculator + DTFConfig + EMB/CAP/DTG/SCP/DTF PricingService globals | ✅ Active (NEW 2026-06-11) |
+| `/pages/catalog.html` | Dedicated customer catalog (URL state, facets, quick view, category landing) — served at `/catalog`; masthead quote badge (markup + quote-cart-store.js script only — catalog-2026.js untouched) | nwca-2026-core.css, catalog-2026.css/js, product-search-service.js, decoration-methods.js, app-modern.js, brands-flyout.js, quote-cart-store.js | ✅ Active (badge 2026-06-11) |
 | `/pages/css/catalog-2026.css` | Catalog page layer CSS (facet rail + mobile filter drawer, cards, autocomplete v2) | nwca-2026-core.css | ✅ Active |
 | `/pages/js/catalog-2026.js` | Catalog logic: URL state, facets (incl. `?method=` Decoration filter from the decoration-methods rules feed), server-price-only cards, autocomplete v2 w/ thumbnails, quick view | product-search-service.js (read-only), DecorationMethods | ✅ Active |
+| `/pages/quote-cart.html` | **NEW (2026-06-11, customer quote-cart Phase 2)** Customer cart page (clean URL `/quote-cart` — server route registration pending) — per-print-type group cards (pooled qty + tier badge + tier-progress meter), qty steppers, engine service/fee/LTM rows, amber tier nudges, totals panel (engine grandTotal ONLY — withheld w/ visible error when any group fails), Email-this-quote mailto, empty state. sessionStorage only — save/share is Phase 3 | nwca-2026-core.css, quote-cart.css, quote-cart-page.js, quote-cart-store.js, quote-cart-engine.js + authorities (embroidery-quote-pricing.js, screenprint-pricing-service.js, dtf-pricing-service.js, dtf-quote-pricing.js) | ✅ Active |
+| `/pages/css/quote-cart.css` | Quote-cart page layer CSS (group cards, tier-progress meter, line rows + steppers, fee rows, amber nudge box, sticky totals rail; 375px single-column) | nwca-2026-core.css | ✅ Active (NEW 2026-06-11) |
+| `/pages/js/quote-cart-page.js` | Quote-cart page logic: reprice via QuoteCartEngine.priceCart on every load + after every store mutation (ZERO local price math); group cards render engine results verbatim (baked-LTM honest lines foot via full-precision effectiveUnit, SCP itemized fees), per-group error card + Retry + grand-total withholding, qty steppers → QuoteCartStore.updateQty, mailto from the grouped summary | QuoteCartEngine, QuoteCartStore, EmbroideryPricingCalculator + DTFConfig + SCP/DTF services | ✅ Active (NEW 2026-06-11) |
 
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
@@ -548,6 +551,8 @@
 | `/shared_components/js/quote-builder-base.js` | Base functionality | All quote builders | ✅ Active |
 | `/shared_components/js/quote-builder-utils.js` | **NEW** Shared utilities: escapeHtml, formatPrice, showToast, etc. (2026-01-30 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-cart-engine.js` | **NEW (2026-06-11, customer quote-cart Phase 0)** PURE orchestration engine for the customer quote cart — pooling/grouping per staff-builder scope (EMB garments / EMB caps / DTG / SCP-per-design / DTF), fee assembly via /api/service-codes, honest-LTM display math, tier nudges, per-group trace. Owns ZERO price formulas: adapters call the staff authorities (EmbroideryPricingCalculator class, POST /api/dtg/quote-pricing, ScreenPrintPricingService bundle + exact builder findPricingTier copy, DTFPricingService.calculatePriceForQuantity). Dual browser/Node. API: `priceCart(cart)`, `singleItemPreview(item)`. Design: memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md | embroidery-quote-pricing.js, screenprint-pricing-service.js, dtf-pricing-service.js, /api/dtg/quote-pricing, /api/service-codes; locked by tests/unit/web-quote-cart-parity.test.js | ✅ Active |
+| `/shared_components/js/quote-cart-store.js` | **NEW (2026-06-11, customer quote-cart Phase 2)** sessionStorage cart store (`window.QuoteCartStore`) — key `nwca.quoteCart.v1`, schema v1, 24h TTL (mismatch/expiry/corruption → silent reset). Items carry style/color/qty/sizes/method/placement/inkColors ONLY — **zero prices stored**; pricing happens via quote-cart-engine at render time so Caspio changes reprice on next view. API: add/updateQty/remove/clear/getItems/count/totalPieces/onChange (same-tab pub/sub + storage events). Auto-wires masthead `[data-quote-badge]` elements (hidden at 0). Dual browser/Node | sessionStorage; consumed by product.html, pages/catalog.html, pages/quote-cart.html; locked by tests/unit/quote-cart-store.test.js | ✅ Active |
+| `/tests/unit/quote-cart-store.test.js` | **NEW (2026-06-11)** QuoteCartStore lock — add/updateQty(sizes rewrite, min-1)/remove/clear/deep-copy, 24h TTL expiry reset, schema-version-mismatch reset, corrupted-JSON reset, onChange pub/sub + unsubscribe, no-price-fields-stored guard (9 tests) | jest (node env, sessionStorage shim), quote-cart-store.js | ✅ Active |
 | `/tests/unit/web-quote-cart-parity.test.js` | **NEW (2026-06-11)** Quote-cart engine parity lock — every worked example from memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md asserted to the cent (EMB a-d, DTG a-d incl. 1-23 inversion + combo anti-double-count, SCP a-d separate-mode footing, DTF a-d), pooling/caps-separate/below-minimum guards, manual-cost host-gate coverage for all 5 pricing services, SCP findPricingTier source canary | jest, quote-cart-engine.js, tests/fixtures/pricing/ | ✅ Active |
 | `/tests/fixtures/pricing/` (24 JSON files) | **NEW (2026-06-11)** Live API captures backing the quote-cart parity tests: EMB/EMB-AL/CAP/CAP-AL/CAP-PUFF/PATCH bundles, size-pricing (PC61/PC90H/C112), ScreenPrint bundles (PC61/PC54), DTF + BLANK bundles, service-codes, 8 recorded POST /api/dtg/quote-pricing responses. Captured 2026-06-11 from caspio-pricing-proxy | jest fetch mock in web-quote-cart-parity.test.js | ✅ Active |
 | `/shared_components/js/quote-order-summary.js` | **Shared order-summary band** (Order Recap + Ship-To card + getShipFields accessor), selector-agnostic via `QuoteOrderSummary.configure()`. Extracted from EMB (2026-06-08, Phase 0 of DTF/SCP parity). MUST load before each `*-quote-builder.js`. | EMB (live); DTF/SCP (Phase 2/3) | ✅ Active |
@@ -794,26 +799,15 @@
 ### Product Page Modules (`/product/`)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/product/app.js` | LEGACY old product app (+ components/*, services/*, styles/*) — no longer referenced by product.html since 2026-06-11 rewrite | — | 🚩 Dead — cutover cleanup pending |
-| `/product/components/decoration-selector.js` | Decoration method selector (DTG/EMB/SP/etc.) | — | ✅ Active |
-| `/product/components/gallery.js` | Product image gallery | — | ✅ Active |
-| `/product/components/image-zoom.js` | Image zoom/pan component | — | ✅ Active |
-| `/product/components/info.js` | Product info display (title, brand, description) | — | ✅ Active |
-| `/product/components/inventory.js` | Product inventory display (per size/color) | services/api.js | ✅ Active |
-| `/product/components/inventory-summary.js` | Inventory summary widget | — | ✅ Active |
-| `/product/components/pricing.js` | Product pricing display | — | ✅ Active |
-| `/product/components/quote-modal.js` | Quote modal (request quote from product page) | services/quote-service.js | ✅ Active |
-| `/product/components/search.js` | In-page product search | — | ✅ Active |
-| `/product/components/swatches.js` | Color swatch picker | — | ✅ Active |
-| `/product/js/decoration-selector.js` | Legacy decoration selector (likely orphan — verify) | — | ⚠️ Verify |
-| `/product/services/api.js` | Product API service (fetch product, inventory, pricing) | Caspio API | ✅ Active |
-| `/product/services/email-service.js` | Product page email service (quote request emails) | EmailJS | ✅ Active |
-| `/product/services/quote-service.js` | Product page quote service (save quote to Caspio) | base-quote-service.js | ✅ Active |
-| `/product/services/state.js` | Product page state management | — | ✅ Active |
-| `/product/styles/product.css` | Product page core styles | — | ✅ Active |
-| `/product/styles/product-2025.css` | Product page 2025 redesign styles | — | ✅ Active |
-| `/product/styles/product-redesign.css` | Product page redesign overlay styles | — | ✅ Active |
-| `/product/styles/quote-modal.css` | Quote modal styles (request quote from product page) | — | ✅ Active |
+| `/product/js/pdp-configurator.js` | Product page 3-question configurator (2026-06-11 redesign) | QuoteCartEngine | ✅ Active |
+| `/product/js/product-2026.js` | Product page controller (2026-06-11 redesign) | — | ✅ Active |
+| `/product/css/product-2026.css` | Product page styles (2026-06-11 redesign) | — | ✅ Active |
+| `/product/js/decoration-selector.js` | Legacy decoration selector — zero references repo-wide (verified 2026-06-11), kept pending owner decision | — | 🚩 Orphan |
+| `/product/components/inventory.js` | Product inventory display (per size/color) — used by pages/inventory-details.html | services/api.js | ✅ Active |
+| `/product/services/api.js` | Product API service (fetch product, inventory, pricing) — used by pages/inventory-details.html | Caspio API | ✅ Active |
+| `/product/styles/product.css` | Inventory-details page styles (linked by pages/inventory-details.html) | — | ✅ Active |
+
+> 🗑️ **2026-06-11 legacy ES-module tree deleted** (dead since the product.html configurator rewrite; zero references verified): `app.js`, `components/{search,gallery,pricing,inventory-summary,info,swatches,decoration-selector,quote-modal,image-zoom}.js`, `services/{state,quote-service,email-service}.js`, `styles/{product-2025,product-redesign,quote-modal}.css`. Recovery: `git show <pre-cleanup-commit>:product/app.js`.
 
 ## 🎨 Stylesheets
 

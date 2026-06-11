@@ -21,8 +21,8 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.4">
-    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.06.11.9">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.11">
+    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.06.11.11">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -88,6 +88,17 @@
                     </svg>
                 </button>
             </div>
+
+            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
         </div>
     </header>
 
@@ -252,6 +263,11 @@
                             <div class="pdp-cfg-methods" id="cfgMethods"></div>
                         </div>
                         <div class="pdp-cfg-total" id="cfgTotal" aria-live="polite"></div>
+                        <div class="pdp-cfg-actions">
+                            <button class="btn btn-cta" id="cfgAddToQuote" type="button" disabled>Add to quote</button>
+                            <a class="btn btn-ghost" id="cfgEmailQuote" href="mailto:sales@nwcustomapparel.com">or email us directly</a>
+                            <span class="pdp-cfg-add-reason" id="cfgAddReason" aria-live="polite"></span>
+                        </div>
                         <div class="pdp-cfg-expand">
                             <button class="pdp-cfg-expand-btn" id="cfgMatrixToggle" type="button" aria-expanded="false" aria-controls="cfgMatrix">See every quantity price &#9662;</button>
                             <div class="pdp-cfg-matrix" id="cfgMatrix" hidden></div>
@@ -277,6 +293,9 @@
                 </div>
             </section>
         </div>
+
+        <!-- Toast stack (core primitive) — add-to-quote confirmations -->
+        <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
         <!-- Mobile sticky CTA bar -->
         <div class="pdp-mobile-cta" id="mobileCtaBar" hidden>
@@ -344,7 +363,8 @@
     <script src="/shared_components/js/embroidery-quote-pricing.js?v=2026.06.11.10" defer></script>
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.11.8" defer></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.11.8" defer></script>
-    <script src="/product/js/pdp-configurator.js?v=2026.06.11.9" defer></script>
-    <script src="/product/js/product-2026.js?v=2026.06.11.9" defer></script>
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.06.11.11" defer></script>
+    <script src="/product/js/pdp-configurator.js?v=2026.06.11.11" defer></script>
+    <script src="/product/js/product-2026.js?v=2026.06.11.11" defer></script>
 </body>
 </html>

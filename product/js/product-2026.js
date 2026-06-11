@@ -587,11 +587,120 @@
             + '&body=' + encodeURIComponent(lines.join('\n'));
         $('ctaQuote').href = href;
         $('ctaQuoteMobile').href = href;
+        const emailLink = $('cfgEmailQuote');
+        if (emailLink) emailLink.href = href;
+
+        updateAddToQuote(sel);
 
         // Existing sample flow (legacy param shape kept on purpose)
         const sample = '/pages/top-sellers-product.html?style=' + encodeURIComponent(state.style) + '&mode=sample';
         $('ctaSample').href = sample;
         $('ctaSampleMobile').href = sample;
+    }
+
+    // ============================================================
+    // ADD TO QUOTE (Phase 2 quote-cart) — pushes the configurator
+    // selection into QuoteCartStore. ZERO price math here: the price
+    // shown came from the engine, and the cart page re-prices through
+    // the same engine on every view.
+    // ============================================================
+    function updateAddToQuote(sel) {
+        const btn = $('cfgAddToQuote');
+        const reason = $('cfgAddReason');
+        if (!btn || !reason) return;
+        let ok = false;
+        let why = '';
+        if (!window.QuoteCartStore) {
+            why = 'The quote cart didn\'t load — use the email button instead.';
+        } else if (!sel) {
+            why = '';
+        } else if (sel.status === 'ok' && sel.price && sel.sizes) {
+            ok = true;
+        } else if (sel.status === 'loading') {
+            why = 'Getting your live price…';
+        } else if (sel.status === 'belowmin') {
+            why = 'DTF starts at 10 pieces — bump the quantity to add it.';
+        } else if (sel.status === 'unavailable') {
+            why = (sel.methodLabel || 'This method') + ' isn\'t offered for this placement — pick another look.';
+        } else {
+            why = 'Live pricing is unavailable — retry above, or email us.';
+        }
+        btn.disabled = !ok;
+        reason.textContent = why;
+        reason.hidden = !why;
+    }
+
+    /**
+     * Pooling-scope guard (staff-builder rule, design doc §Grouping): pieces
+     * of one decoration method share ONE placement/design so quantities pool —
+     * a mismatched add would price a configuration staff can't reproduce.
+     */
+    function quoteConflictMessage(sel) {
+        const existing = window.QuoteCartStore.getItems().filter(function (i) {
+            return i.method === sel.engineMethod;
+        });
+        if (existing.length === 0) return null;
+        const first = existing[0];
+        if (first.placement !== sel.locationKey) {
+            return 'Your quote\'s ' + (sel.methodLabel || 'decorated') + ' pieces use "'
+                + (first.placementLabel || first.placement)
+                + '" — one placement per decoration type so quantities pool for the discount. '
+                + 'Switch the placement to match, or email us for a mixed layout.';
+        }
+        if (sel.engineMethod === 'SCP' && Number(first.inkColors) !== Number(sel.inkColors)) {
+            return 'Your quote\'s screen print pieces use ' + first.inkColors
+                + ' ink color' + (Number(first.inkColors) === 1 ? '' : 's')
+                + ' — one design per quote so screens and discounts pool. Match the ink colors, or email us.';
+        }
+        return null;
+    }
+
+    function onAddToQuote() {
+        const sel = (window.PdpConfigurator && window.PdpConfigurator.getSelection)
+            ? window.PdpConfigurator.getSelection()
+            : null;
+        if (!window.QuoteCartStore || !sel || sel.status !== 'ok' || !sel.price || !sel.sizes) return;
+        const conflict = quoteConflictMessage(sel);
+        if (conflict) {
+            showToast('warn', escapeHtml(conflict));
+            return;
+        }
+        const name = state.product ? (state.product.name || state.style) : state.style;
+        window.QuoteCartStore.add({
+            style: state.style,
+            productTitle: name,
+            color: state.selected ? state.selected.name : '',
+            catalogColor: state.selected ? state.selected.catalog : '',
+            qty: sel.qty,
+            sizes: sel.sizes,
+            method: sel.engineMethod,
+            placement: sel.locationKey,
+            placementLabel: sel.locationLabel,
+            methodLabel: sel.methodLabel,
+            inkColors: sel.inkColors,
+            isCap: sel.isCap
+        });
+        const n = window.QuoteCartStore.count();
+        const unit = sel.isCap ? 'cap' : 'piece';
+        showToast('success', 'Added — ' + sel.qty + ' ' + unit + (sel.qty === 1 ? '' : 's')
+            + ' · ' + escapeHtml(sel.methodLabel)
+            + ' &nbsp;<a href="/quote-cart">View quote (' + n + ')</a>');
+    }
+
+    /** Core .toast primitive — html must already be escaped by the caller. */
+    function showToast(kind, html) {
+        const stack = $('toastStack');
+        if (!stack) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast' + (kind ? ' toast-' + kind : '');
+        toast.innerHTML = (kind === 'success'
+            ? '<svg class="toast-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6.5 11.2 3.3 8l-1 1 4.2 4.2 7.2-7.2-1-1z"/></svg>'
+            : '')
+            + '<span>' + html + '</span>'
+            + '<button class="toast-dismiss" type="button" aria-label="Dismiss">&times;</button>';
+        toast.querySelector('.toast-dismiss').addEventListener('click', function () { toast.remove(); });
+        stack.appendChild(toast);
+        setTimeout(function () { if (toast.parentNode) toast.remove(); }, 8000);
     }
 
     // ============================================================
@@ -748,6 +857,8 @@
         }
         state.style = params.style;
         $('fatalRetry').addEventListener('click', function () { loadAll(params.color); });
+        const addBtn = $('cfgAddToQuote');
+        if (addBtn) addBtn.addEventListener('click', onAddToQuote);
         loadAll(params.color);
     }
 

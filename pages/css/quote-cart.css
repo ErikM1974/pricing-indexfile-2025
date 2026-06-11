@@ -1,0 +1,342 @@
+/* quote-cart.css — customer quote-cart page (pages/quote-cart.html).
+   Built on nwca-2026-core.css primitives/tokens (NWCA-2026-GUIDE.md);
+   this layer only adds the cart layout: group cards, tier meter, line
+   rows + steppers, fee rows, amber nudge, totals panel. */
+
+.qc-section {
+    padding: 26px 0 60px;
+}
+
+/* Two-column layout: group cards + sticky summary rail */
+.qc-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 26px;
+    align-items: start;
+}
+.qc-layout.is-repricing .qc-groups,
+.qc-layout.is-repricing .qc-totals {
+    opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+/* ── Group cards ─────────────────────────────────────────────────── */
+.qc-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+}
+.qc-group {
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 18px 20px;
+}
+.qc-group-error {
+    border-color: var(--bad);
+}
+
+.qc-group-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 12px;
+    margin-bottom: 12px;
+}
+.qc-group-ico {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--green-50);
+    color: var(--green-900);
+}
+.qc-group-ico svg { width: 20px; height: 20px; }
+.qc-group-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.2;
+}
+.qc-group-sub {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+}
+.qc-group-pool {
+    margin-left: auto;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--green-900);
+    white-space: nowrap;
+}
+
+/* ── Tier-progress meter ─────────────────────────────────────────── */
+.qc-meter { margin: 2px 0 14px; }
+.qc-meter-bar {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--paper-deep);
+    border: 1px solid var(--line);
+    overflow: hidden;
+}
+.qc-meter-fill {
+    display: block;
+    height: 100%;
+    width: 0;
+    border-radius: 999px;
+    background: var(--green-700);
+    transition: width 0.25s ease;
+}
+.qc-meter-labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-soft);
+}
+
+/* ── Line rows ───────────────────────────────────────────────────── */
+.qc-lines {
+    border-top: 1px solid var(--line);
+}
+.qc-line {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto 36px;
+    gap: 8px 14px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+}
+.qc-line-info { min-width: 0; }
+.qc-line-name {
+    display: block;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.qc-line-meta {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+.qc-line-qty {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.qc-line-qty input {
+    width: 58px;
+    min-height: 38px;
+    text-align: center;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 14px;
+    -moz-appearance: textfield;
+}
+.qc-line-qty input::-webkit-outer-spin-button,
+.qc-line-qty input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qc-line-qty input:focus { outline: none; border-color: var(--green-700); }
+.qc-step {
+    width: 34px;
+    height: 38px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.qc-step:hover { border-color: var(--green-700); color: var(--green-700); }
+.qc-line-price { text-align: right; }
+.qc-line-each {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    white-space: nowrap;
+}
+.qc-line-total {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    white-space: nowrap;
+}
+.qc-remove {
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--ink-soft);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+.qc-remove:hover { color: var(--bad); background: var(--bad-soft); }
+
+/* ── Service + fee rows ──────────────────────────────────────────── */
+.qc-svc, .qc-fees { border-bottom: 1px solid var(--line); padding: 6px 0; }
+.qc-svc-row, .qc-fee-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 5px 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+}
+.qc-fee-row em { font-style: normal; color: var(--ink-soft); font-weight: 600; }
+.qc-svc-row .num, .qc-fee-row .num { font-weight: 800; white-space: nowrap; }
+
+/* Honest small-batch line (baked LTM) */
+.qc-ltm-note {
+    margin: 10px 0 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+/* Amber tier nudge */
+.qc-nudge {
+    margin-top: 12px;
+    padding: 11px 14px;
+    border: 1px solid var(--warn);
+    border-left-width: 4px;
+    border-radius: var(--radius-sm);
+    background: var(--warn-soft);
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--ink);
+}
+
+/* Group footer */
+.qc-group-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    margin-top: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-soft);
+}
+.qc-group-total {
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 800;
+    color: var(--green-900);
+}
+.qc-group-retry { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+
+/* Pooling info line between group cards */
+.qc-pool-note {
+    margin: 0;
+    padding: 0 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-align: center;
+}
+
+/* ── Totals panel ────────────────────────────────────────────────── */
+.qc-totals {
+    position: sticky;
+    top: 86px;
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 18px 20px;
+}
+.qc-totals-title {
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: var(--ink);
+}
+.qc-totals-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+}
+.qc-totals-row .num { font-weight: 800; white-space: nowrap; }
+.qc-grand {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    padding: 12px 0 4px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+}
+.qc-grand span:last-child {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--green-900);
+}
+.qc-totals .alert { margin: 12px 0 0; }
+.qc-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 14px;
+}
+.qc-actions .btn { width: 100%; }
+.qc-actions .btn[disabled] { opacity: 0.55; cursor: not-allowed; }
+.qc-totals-foot {
+    margin: 12px 0 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    line-height: 1.5;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+@media (max-width: 960px) {
+    .qc-layout { grid-template-columns: 1fr; }
+    .qc-totals { position: static; }
+}
+
+@media (max-width: 560px) {
+    .qc-group { padding: 14px; }
+    .qc-line {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-areas:
+            'info remove'
+            'qty price';
+    }
+    .qc-line-info { grid-area: info; }
+    .qc-remove { grid-area: remove; justify-self: end; }
+    .qc-line-qty { grid-area: qty; }
+    .qc-line-price { grid-area: price; align-self: center; }
+}
