@@ -66,4 +66,23 @@
             }).observe(hero, { attributes: true, attributeFilter: ['class'] });
         }
     });
+
+    // Hero rotator — crossfade the real product prints inside the
+    // registration frame. Static first image when reduced-motion is set
+    // or JS is unavailable (first <img> ships with .is-active).
+    ready(function () {
+        const frame = document.querySelector('.hero-shirt');
+        if (!frame) return;
+        const imgs = frame.querySelectorAll('img');
+        if (imgs.length < 2) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        let current = 0;
+        setInterval(function () {
+            if (document.hidden) return;
+            imgs[current].classList.remove('is-active');
+            current = (current + 1) % imgs.length;
+            imgs[current].classList.add('is-active');
+        }, 4500);
+    });
 })();

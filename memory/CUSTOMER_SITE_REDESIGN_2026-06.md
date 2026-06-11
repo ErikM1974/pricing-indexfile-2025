@@ -39,6 +39,9 @@
 | 2 | Hat pricing model | **Simple: logo included** — one price per cap incl. front logo; back logo flat add-on; customers never see stitch counts | Erik 2026-06-11 |
 | 3 | Go-live process | Preview screenshots first, then deploy on approval | Erik 2026-06-11 |
 | 4 | Golf tournament pages | Restyle to match new system (campaign stays live) | Erik 2026-06-11 |
+| 4a | Homepage | **APPROVED + deploy authorized** (screenshots reviewed post-restart) | Erik 2026-06-11 |
+| 4b | Hero photo | **Rotate several real prints** — 4-image crossfade (Setina tee / Fife hoodie / Carhartt jacket / engraved pint), 4.5s, reduced-motion-safe, zero CLS (verified 470px stable) | Erik 2026-06-11 |
+| 4c | Hats teaser card | **Keep visible** pre-launch (COMING SOON badge, no dead link) | Erik 2026-06-11 |
 | 5 | cart.html + order-confirmation.html fate | **RETIRE** (orphaned Bootstrap legacy, zero inbound links; no hotfix, no migration). `/cart` route → 301 to the sample-cart successor | Orchestrator ruling on auditor contradiction |
 | 6 | inventory-details.html fate | **FOLD into the new templated product page** (inventory summary/tab); not migrated standalone | Orchestrator ruling |
 | 7 | Catalog IA | **REPLACE** the in-page homepage SPA with a dedicated `/catalog` page (URL-driven state); homepage becomes marketing + entry points | Orchestrator ruling |

@@ -453,10 +453,14 @@ img { max-width: 100%; }
 .hero-stage { position: relative; min-height: 300px; }
 .hero-shirt { margin: 0; position: relative; display: grid; place-items: center; }
 .hero-shirt img {
+    grid-area: 1 / 1; /* all rotator frames stack in one cell — no layout shift */
     width: 100%; max-height: 470px; object-fit: contain;
     filter: drop-shadow(0 24px 34px rgba(24, 34, 25, 0.24));
     mix-blend-mode: multiply;
+    opacity: 0;
+    transition: opacity 0.9s ease;
 }
+.hero-shirt img.is-active { opacity: 1; }
 /* dashed print-registration corners behind the shirt */
 .hero-shirt::before {
     content: ""; position: absolute; inset: 6% 10%;
