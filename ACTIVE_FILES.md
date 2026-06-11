@@ -974,6 +974,7 @@ cap-embroidery-fix.css
 |------|---------|--------|
 | `/memory/CUSTOMER_SITE_REDESIGN_2026-06.md` | **NEW** Customer-facing redesign master plan + Custom Hats store spec (2026-06-11) | ✅ Active |
 | `/memory/CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md` | **NEW** Full 8-agent discovery audit evidence for the redesign (2026-06-11) | ✅ Active |
+| `/memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md` | **NEW** Customer quote-cart: builder parity rules EMB/DTG/SCP/DTF (worked examples = jest fixtures) + architect design + 5-phase plan (2026-06-11) | ✅ Active |
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_RULES.md` | Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
