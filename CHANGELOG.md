@@ -1,3 +1,11 @@
+## v2026.06.11.5 (2026.06.11)
+
+- docs(redesign): record v2026.06.11.4 Wave 2 deploy + P3 remainders + P4 start
+- refactor(storefront): extract CHANNELS registry — hats becomes an additive entry (P4 step 1)
+- feat(decoration): method eligibility gating — product tabs + catalog Decoration filter (Erik-approved matrix)
+- feat(custom-caps): channel entry + pure cap pricing module + server repricer (P4 step 2)
+- Deploy v2026.06.11.5: cache-bust
+
 ## v2026.06.11.4 (2026.06.11)
 
 - feat(seo): robots.txt — disallow staff/internal paths + credential-bearing share links
