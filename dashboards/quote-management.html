@@ -921,6 +921,13 @@
                 builderUrl = '/quote-builders/dtf-quote-builder.html';
             } else if (prefix === 'SP' || prefix === 'SPC' || prefix === 'SSC') {
                 builderUrl = '/quote-builders/screenprint-quote-builder.html';
+            } else if (prefix === 'CAP') {
+                // Custom Hats storefront orders (CAP{MMDD}-{rand4}, 2026-06-11).
+                // Stripe-paid storefront quotes have no builder — like CTS DTG
+                // rows they're normally caught by the locked-status guard above,
+                // but never route a CAP row into the EMB builder. Read-only view.
+                viewQuote(quoteId);
+                return;
             } else if (prefix === 'OF') {
                 // Order Form drafts (OF-NNNN) are NOT quote-builder quotes — they
                 // reopen in the React Order Form via ?draftId= (different app AND
