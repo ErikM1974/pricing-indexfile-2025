@@ -209,6 +209,71 @@ questions_cta` (HTML).
 
 ---
 
+## Template 3 — `template_order_shipped` (NEW — create it)
+
+- **Create New Template**, then set the Template ID to exactly `template_order_shipped`
+  (Settings tab → Template ID field). The code sends to this exact ID.
+- **Display name:** `Custom T-Shirts Order Shipped — Customer`
+- **Subject:** `📦 Your shirts are on the way! {{order_number}} — Northwest Custom Apparel`
+- **To Email:** `{{to_email}}` · **From Name:** `Northwest Custom Apparel`
+- **Reply To:** `sales@nwcustomapparel.com` · **Bcc:** `erik@nwcustomapparel.com` (optional)
+- Params sent: `to_email, to_name, order_number, customer_name, carrier,
+  tracking_number, tracking_url, order_status_url, style_name, company_phone, reply_to`
+  (all plain — no triple-stache needed in this one).
+
+**Content:**
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin:0; padding:0; background:#f3f4f6; font-family:Arial,Helvetica,sans-serif; color:#1f2937; }
+  .wrap { max-width:600px; margin:0 auto; background:#ffffff; }
+  .header { background:#2d5f3f; color:#ffffff; text-align:center; padding:28px 20px; }
+  .header h1 { margin:0 0 6px; font-size:24px; }
+  .header p { margin:0; font-size:14px; opacity:.9; }
+  .body { padding:24px; text-align:center; }
+  .order-box { background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px; padding:16px; margin:0 0 18px; }
+  .order-box .label { font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; }
+  .order-box .num { font-size:20px; font-weight:bold; color:#2d5f3f; margin-top:4px; }
+  .track-box { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:16px; margin:16px 0; }
+  .track-box .tn { font-size:17px; font-weight:bold; color:#1d4ed8; word-break:break-all; }
+  .btn { display:inline-block; background:#2d5f3f; color:#ffffff !important; text-decoration:none; border-radius:8px; padding:13px 28px; font-size:15px; font-weight:bold; margin:8px 6px; }
+  .btn-blue { background:#1d4ed8; }
+  .footer { background:#f3f4f6; text-align:center; font-size:12px; color:#6b7280; padding:18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>📦 Your shirts are on the way!</h1>
+    <p>Northwest Custom Apparel — printed in Milton, WA</p>
+  </div>
+  <div class="body">
+    <p style="font-size:15px;">Hi {{customer_name}} — great news: your custom shirts just shipped.</p>
+    <div class="order-box">
+      <div class="label">Order</div>
+      <div class="num">{{order_number}}</div>
+    </div>
+    <div class="track-box">
+      <div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;">{{carrier}} Tracking Number</div>
+      <div class="tn">{{tracking_number}}</div>
+    </div>
+    <a class="btn btn-blue" href="{{tracking_url}}">Track the package</a>
+    <a class="btn" href="{{order_status_url}}">View your order</a>
+    <p style="font-size:13px;color:#374151;margin-top:18px;">Questions? Call {{company_phone}} or reply to this email — mention order {{order_number}}.</p>
+  </div>
+  <div class="footer">
+    Northwest Custom Apparel · 2025 Freeman Rd E, Milton, WA 98354 · {{company_phone}}<br>
+    Family owned &amp; operated since 1977
+  </div>
+</div>
+</body>
+</html>
+```
+
 ## Wiring checklist (one-time, in the EmailJS dashboard)
 
 1. Open each template → rename per above → **Subject** per above.
