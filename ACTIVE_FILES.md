@@ -205,6 +205,12 @@
 | `/tools/custom-tees-calibrate.js` | Tool logic: style/color/view picker, drag/scale aspect-locked box, upsert to Caspio DTG_Calibration via proxy; silhouette auto-detect starting position | proxy /api/dtg-calibration + /api/dtg/top-sellers + /api/product-details | ✅ Active |
 | `/tools/custom-tees-calibrate.css` | Calibration-tool styling | — | ✅ Active |
 
+### Custom Hats System ('custom-caps' channel — server core built 2026-06-11, pages pending)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/js/custom-caps-pricing.js` | PURE pricing engine for Custom Hats — EMB CAP PARITY: blank OSFA ÷ tier margin + EmbroideryCost(tier, 8K) → CeilDollar; CAP-AL back-logo flat tier add-on; 8-cap minimum enforced (structured BELOW_MINIMUM error — 1-7 LTM tier unreachable); NO LTM/digitizing lines; CAPS-SHIP-* threshold shipping fail-closed. Jest-locked. | — (dual browser/Node; server.js requires it) | ✅ Built |
+| `/tests/unit/custom-caps-pricing.test.js` | Jest parity lock vs the verified 9-style lineup (112/C402/112PFP/256/258/220/C914/STC26/CT105298 @ qty 8/24/48/72), back-logo tiers, qty<8 structured error, fail-closed throws, CeilDollar edges | custom-caps-pricing.js | ✅ Active |
+
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|

@@ -20,6 +20,7 @@ const {
 
 const CTS = CHANNELS['custom-tees'];
 const TDT = CHANNELS['3-day-tees'];
+const CAPS = CHANNELS['custom-caps'];
 
 // The server.js resolver semantics (absent/unknown channel → legacy 3DT;
 // exact lookup for whitelist-gated paths). Mirrored here so the contract is
@@ -28,25 +29,26 @@ const resolve = (ch) => CHANNELS[String(ch || '')] || CHANNELS[DEFAULT_CHANNEL];
 const resolveExact = (ch) => CHANNELS[String(ch || '')] || null;
 
 describe('registry shape', () => {
-  test('exactly the two live channels exist — custom-caps is NOT registered yet', () => {
-    expect(Object.keys(CHANNELS).sort()).toEqual(['3-day-tees', 'custom-tees']);
-    expect(CHANNELS['custom-caps']).toBeUndefined();
+  test('exactly the three registered channels exist (custom-caps added 2026-06-11)', () => {
+    expect(Object.keys(CHANNELS).sort()).toEqual(['3-day-tees', 'custom-caps', 'custom-tees']);
   });
 
   test('default channel is legacy 3-day-tees (historical rows have no channel)', () => {
     expect(DEFAULT_CHANNEL).toBe('3-day-tees');
     expect(resolve(undefined)).toBe(TDT);
     expect(resolve('')).toBe(TDT);
-    expect(resolve('custom-caps')).toBe(TDT);   // unknown → legacy, same as the old `isCTS` binary
+    expect(resolve('not-a-channel')).toBe(TDT);   // unknown → legacy, same as the old `isCTS` binary
     expect(resolve('custom-tees')).toBe(CTS);
+    expect(resolve('custom-caps')).toBe(CAPS);
   });
 
   test('exact-match lookup (shipped-email whitelist semantics): unknown/absent stays silent', () => {
     expect(resolveExact('custom-tees')).toBe(CTS);
     expect(resolveExact('3-day-tees')).toBe(TDT);
+    expect(resolveExact('custom-caps')).toBe(CAPS);
     expect(resolveExact('')).toBeNull();
     expect(resolveExact(undefined)).toBeNull();
-    expect(resolveExact('custom-caps')).toBeNull();
+    expect(resolveExact('not-a-channel')).toBeNull();
   });
 
   test('every channel entry carries the full required field set (additive-entry contract)', () => {
@@ -248,16 +250,115 @@ describe('ShopWorks push constants (was inline in /api/submit-3day-order)', () =
 });
 
 describe('EmailJS wiring (confirmation + shipped)', () => {
-  test('both live channels share the tee templates today', () => {
-    [CTS, TDT].forEach((cfg) => {
+  test('all registered channels share the tee templates today (caps fork = open Erik decision)', () => {
+    [CTS, TDT, CAPS].forEach((cfg) => {
       expect(cfg.emails.confirmationCustomerTemplate).toBe('template_sample_customer');
       expect(cfg.emails.confirmationSalesTemplate).toBe('template_sample_sales');
       expect(cfg.emails.shippedTemplate).toBe('template_order_shipped');
     });
   });
 
-  test('shipped email enabled for both live channels (the old hardcoded whitelist)', () => {
+  test('shipped email enabled for all registered channels (the old hardcoded whitelist)', () => {
     expect(CTS.emails.shippedEnabled).toBe(true);
     expect(TDT.emails.shippedEnabled).toBe(true);
+    expect(CAPS.emails.shippedEnabled).toBe(true);
+  });
+});
+
+// ── custom-caps (Custom Hats, added 2026-06-11) ─────────────────────────────
+// Locks Erik's decisions #2 + #9-12 (memory/CUSTOMER_SITE_REDESIGN_2026-06.md)
+// into the registry: 8-cap minimum / no LTM, free setup, proof-first always,
+// embroidery-shaped push constants. These are NEW values, not characterization
+// of old code — changing one changes what production cap orders look like.
+describe('custom-caps channel entry', () => {
+  test('identity: CAP QuoteID prefix (NEW — not in the existing quote-prefix list; Quote Mgmt filter needs it)', () => {
+    expect(CAPS.label).toBe('Custom Hats');
+    expect(CAPS.logPrefix).toBe('[Custom Caps Checkout]');
+    expect(CAPS.quoteIdPrefix).toBe('CAP');
+    expect(CAPS.stripeSource).toBe('custom-caps');
+  });
+
+  test('CAP{MMDD}-{rand4} QuoteID shape', () => {
+    jest.useFakeTimers().setSystemTime(new Date(2026, 5, 11, 14, 30));
+    try {
+      for (let i = 0; i < 25; i++) {
+        expect(CAPS.buildQuoteId()).toMatch(/^CAP0611-\d{4}$/);
+      }
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test('rights ack required; NO rush styles on v1', () => {
+    expect(CAPS.requireRightsAck).toBe(true);
+    expect(CAPS.rushEligible).toEqual([]);
+  });
+
+  test('Caspio Notes label', () => {
+    expect(CAPS.orderNoteLabel({ styleNumber: '112' })).toBe('Custom Hats Embroidery Order — 112');
+    expect(CAPS.orderNoteLabel()).toBe('Custom Hats Embroidery Order — ');
+  });
+
+  test('Stripe line name: "<product> — <color> — Front logo embroidered (+ back logo)", no OSFA size', () => {
+    const line = { colorName: 'Black', size: 'OSFA' };
+    expect(CAPS.stripeLineName({ style: '112', productName: 'Richardson Trucker Cap 112', backLogo: false }, line))
+      .toBe('Richardson Trucker Cap 112 — Black — Front logo embroidered');
+    expect(CAPS.stripeLineName({ style: '112', productName: 'Richardson Trucker Cap 112', backLogo: true }, line))
+      .toBe('Richardson Trucker Cap 112 — Black — Front logo embroidered + back logo');
+    expect(CAPS.stripeLineName({ style: 'C914', productName: '', backLogo: false }, line))
+      .toBe('C914 Cap — Black — Front logo embroidered');
+  });
+
+  test('Stripe redirect paths', () => {
+    expect(CAPS.stripeSuccessPath('CAP0611-1234'))
+      .toBe('/pages/custom-caps-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=CAP0611-1234');
+    expect(CAPS.stripeCancelPath()).toBe('/custom-caps?canceled=1');
+  });
+
+  test('fallback product identity is the Richardson 112 flagship', () => {
+    expect(CAPS.push.fallbackStyleNumber).toBe('112');
+    expect(CAPS.fallbackProductName).toBe('Richardson Trucker Cap 112');
+  });
+
+  test('push ids are EMBROIDERY-shaped: designType 2 (NOT DTG 45), artist 24 (EMB push default), CAP- prefix', () => {
+    expect(CAPS.push.designTypeId).toBe(2);
+    expect(CAPS.push.designTypeId).not.toBe(45);
+    expect(CAPS.push.artistId).toBe(24);
+    expect(CAPS.push.designExternalIdPrefix).toBe('CAP-');
+    expect(CAPS.push.designLocationColors).toBe('Match customer artwork');
+    expect(CAPS.push.designDetails()).toEqual([{
+      color: 'Match customer artwork',
+      paramLabel: 'Decoration',
+      paramValue: 'Embroidery',
+    }]);
+    expect(CAPS.push.designDetails()).not.toBe(CAPS.push.designDetails());
+  });
+
+  test('SW location map uses the exact OnSite cap dropdown values', () => {
+    expect(CAPS.push.swLocationMap).toEqual({ CF: 'Cap Front', CB: 'Cap Back' });
+    expect(CAPS.push.defaultFrontLocationName).toBe('Cap Front');
+    expect(CAPS.push.defaultBackLocationName).toBe('Cap Back');
+  });
+
+  test('service banner mentions the 8-cap minimum + proof-first promise, regardless of rush arg', () => {
+    const expected = 'CUSTOM CAPS EMBROIDERY - 8-cap minimum. DIGITAL PROOF FIRST - ships 7-10 business days after proof approval.';
+    expect(CAPS.push.serviceBanner(false)).toBe(expected);
+    expect(CAPS.push.serviceBanner(true)).toBe(expected);
+  });
+
+  test('art-review clock is ALWAYS proof-first wording (renders "... starts at proof approval")', () => {
+    expect(CAPS.push.artReviewClock(false)).toBe('production clock');
+    expect(CAPS.push.artReviewClock(true)).toBe('production clock');
+  });
+
+  test('stock gate banner on; rushOrder NEVER set on ManageOrders pushes', () => {
+    expect(CAPS.push.stockBanner).toBe(true);
+    expect(CAPS.push.rushOrderFlag({ rush: true })).toBe(false);
+    expect(CAPS.push.rushOrderFlag(undefined)).toBe(false);
+  });
+
+  test('Tax_{pct} part convention shared with the tee channels', () => {
+    expect(CAPS.push.taxPartNumber('10.1')).toBe('Tax_10.1');
+    expect(CAPS.push.taxPartNumber(null)).toBe('Tax_0');
   });
 });

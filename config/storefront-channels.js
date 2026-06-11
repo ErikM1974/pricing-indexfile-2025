@@ -94,6 +94,23 @@ const taxPartNumber = (pct) => (pct ? `Tax_${pct}` : 'Tax_0');
 const RUSH_SERVICE_BANNER = '3-DAY RUSH SERVICE - Ship within 72 hours from artwork approval.';
 const STANDARD_SERVICE_BANNER = 'STANDARD DTG SERVICE - 7-10 business days from artwork approval.';
 
+// Custom Caps push constants — embroidery-shaped (NOT the DTG block above).
+// OnSite dropdown values verified against the EMB push transformer
+// (caspio-pricing-proxy lib/embroidery-push-transformer.js default
+// 'Cap Front') and Embroidery_Costs LogoPositions 'Cap Front,Cap Back,Cap
+// Side'. CF/CB are the pricing-bundle CAP location codes (v1 = front+back).
+const CAPS_SW_LOCATION_MAP = Object.freeze({
+  CF: 'Cap Front', CB: 'Cap Back',
+});
+const capsDesignDetails = () => [{
+  color: 'Match customer artwork',
+  paramLabel: 'Decoration',
+  paramValue: 'Embroidery',
+}];
+
+const CAPS_SERVICE_BANNER =
+  'CUSTOM CAPS EMBROIDERY - 8-cap minimum. DIGITAL PROOF FIRST - ships 7-10 business days after proof approval.';
+
 const CHANNELS = {
   // Custom T-Shirts — multi-style DTG storefront (LIVE since 2026-06-10).
   'custom-tees': {
@@ -174,6 +191,75 @@ const CHANNELS = {
       taxPartNumber,
     },
     emails: {
+      confirmationCustomerTemplate: 'template_sample_customer',
+      confirmationSalesTemplate: 'template_sample_sales',
+      shippedEnabled: true,
+      shippedTemplate: 'template_order_shipped',
+    },
+  },
+
+  // Custom Hats — OSFA cap embroidery storefront (server core 2026-06-11,
+  // pages pending — Erik's locked decisions #2 + #9-12 in
+  // memory/CUSTOMER_SITE_REDESIGN_2026-06.md):
+  //   • simple logo-included pricing (front logo ≤10K stitches in the price;
+  //     customers never see stitch counts)
+  //   • 8-cap minimum — NO LTM anywhere (the 1-7 tier is unreachable)
+  //   • FREE logo setup — no digitizing line, ever
+  //   • proof-first: EVERY order ships with needsArtReview on; the promise is
+  //     "ships 7-10 business days after proof approval" (digitizing 1-3 days
+  //     + embroidery production — window proposed, see ERIK-DECISION notes)
+  //   • back logo = flat tiered CAP-AL add-on
+  // Pricing engine: pages/js/custom-caps-pricing.js (EMB cap parity,
+  // CeilDollar) — server twin rebuildCapsQuote in server.js.
+  'custom-caps': {
+    label: 'Custom Hats',
+    logPrefix: '[Custom Caps Checkout]',
+    // CAP prefix is NEW (deliberately NOT co-located with internal EMB/EMBC
+    // builder quotes — storefront cap orders get their own bucket). NOTE for
+    // Quote Mgmt: 'CAP' is not in the existing quote-prefix list
+    // (DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF) —
+    // the dashboard prefix filter needs the new entry when orders go live.
+    quoteIdPrefix: 'CAP',
+    buildQuoteId: () => buildDateRandQuoteId('CAP'),
+    requireRightsAck: true,   // same legal attestation as custom-tees
+    rushEligible: [],         // NO rush on caps v1 (digitizing makes 3-day unsafe)
+    orderNoteLabel: ({ styleNumber } = {}) =>
+      `Custom Hats Embroidery Order — ${styleNumber || ''}`,
+    stripeSource: 'custom-caps',
+    // "Richardson Trucker Cap 112 — Black — Front logo embroidered (+ back logo)"
+    // OSFA: no size in the customer-facing line name.
+    stripeLineName: (priced, l) =>
+      `${priced.productName || `${priced.style} Cap`} — ${l.colorName} — Front logo embroidered${priced.backLogo ? ' + back logo' : ''}`,
+    stripeSuccessPath: (quoteID) =>
+      `/pages/custom-caps-success.html?session_id={CHECKOUT_SESSION_ID}&quote_id=${quoteID}`,
+    stripeCancelPath: () => '/custom-caps?canceled=1',
+    fallbackProductName: 'Richardson Trucker Cap 112',
+    push: {
+      fallbackStyleNumber: '112',
+      // UNREACHABLE on this channel (8-cap minimum ⇒ quote.ltmFee is always
+      // 0) — kept for registry shape parity only.
+      ltmPartNumber: 'LTM-75',
+      designTypeId: 2,    // 2 = Embroidery (EMB push default; NOT DTG's 45)
+      artistId: 24,       // EMB push default id_Artist (ERIK-DECISION: cap/emb routing)
+      designExternalIdPrefix: 'CAP-',
+      designLocationColors: 'Match customer artwork',   // thread colors TBD at proofing
+      designDetails: capsDesignDetails,
+      swLocationMap: CAPS_SW_LOCATION_MAP,
+      defaultFrontLocationName: 'Cap Front',
+      defaultBackLocationName: 'Cap Back',
+      // No rush mode exists on this channel — one banner, always proof-first.
+      serviceBanner: () => CAPS_SERVICE_BANNER,
+      // Renders as "<clock> starts at proof approval" in the art-review
+      // banner — caps are ALWAYS proof-first (needsArtReview always on).
+      artReviewClock: () => 'production clock',
+      stockBanner: true,        // caps run the SanMar live stock gate
+      rushOrderFlag: () => false,
+      taxPartNumber,
+    },
+    emails: {
+      // Reuses the tee templates for launch — params are channel-neutral
+      // (product name/colors come from the order). ERIK-DECISION: fork
+      // caps-branded EmailJS templates, or keep sharing?
       confirmationCustomerTemplate: 'template_sample_customer',
       confirmationSalesTemplate: 'template_sample_sales',
       shippedEnabled: true,
