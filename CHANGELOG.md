@@ -1,3 +1,9 @@
+## v2026.06.11.7 (2026.06.11)
+
+- docs(redesign): record v2026.06.11.6 hats store launch
+- fix(product): related cards used SanMar placeholder jpgs - switch to real FRONT_MODEL photography
+- Deploy v2026.06.11.7: cache-bust
+
 ## v2026.06.11.6 (2026.06.11)
 
 - docs(redesign): record v2026.06.11.5 — decoration gating live + hats core dormant + open Erik decisions
