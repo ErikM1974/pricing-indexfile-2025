@@ -175,6 +175,7 @@
     position: relative; display: grid; place-items: center;
     background: var(--paper-deep); border-bottom: 1px dashed var(--line-strong);
     height: 218px;
+    overflow: hidden;
 }
 .pcard-media-link {
     position: absolute; inset: 0;
@@ -182,7 +183,12 @@
     text-decoration: none;
 }
 .pcard-media-link img {
-    max-width: 100%; max-height: 100%; object-fit: contain;
+    /* absolute box, not percentage-of-grid-track — a 2:3 portrait photo
+       (e.g. Carhartt CTA205) otherwise overflows the 218px media area
+       because max-height:100% resolves against an indefinite track */
+    position: absolute; inset: 12px;
+    width: calc(100% - 24px); height: calc(100% - 24px);
+    object-fit: contain;
     mix-blend-mode: multiply;
 }
 .pcard-media.no-img::after {
