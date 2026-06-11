@@ -1,3 +1,12 @@
+## v2026.06.11.4 (2026.06.11)
+
+- feat(seo): robots.txt — disallow staff/internal paths + credential-bearing share links
+- feat(design-system): nwca-2026-core.css — interior-page layer split + primitives + AA fixes
+- feat(redesign): /catalog page + rebuilt product.html — Wave 2 (P2+P3 core)
+- fix(catalog): portrait product photos overflowed the card media area
+- feat(homepage): cut category/brand navigation over to /catalog (P2 cutover)
+- Deploy v2026.06.11.4: cache-bust 3 files
+
 ## v2026.06.11.3 (2026.06.11)
 
 - docs(redesign): mark v2026.06.11.2 deployed in pickup section
