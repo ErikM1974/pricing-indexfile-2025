@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.10.13">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.12.6">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -86,7 +86,69 @@
                 </div>
             </div>
             <div class="hero-visual">
-                <img id="hero-shirt" src="/api/image-proxy?url=https%3A%2F%2Fcdnm.sanmar.com%2Fimglib%2Fmresjpg%2F2021%2Ff11%2FPC54_jetblack_model_front.jpg" alt="Port & Company PC54 tee" loading="eager">
+                <img id="hero-shirt" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/AI%20Artwork.jpg?ver=1" alt="Full-color DTG print on a black tee by Northwest Custom Apparel" loading="eager">
+            </div>
+        </div>
+    </section>
+
+    <!-- ── AI Artwork feature band ─────────────────────────────────────────
+         Sits between the hero and the product gallery. Styles in custom-tees.css.
+         CTA is an anchor styled as .btn .btn-hero → scrolls to #stage-gallery
+         via the page's smooth-scroll, no new JS.
+         5 PLACEHOLDER SLOTS (AI ART 1–5): swap each src for a real ~1200×1000
+         AI-art-on-tee photo on white/transparent; keep loading="lazy" + alt. -->
+    <section class="band band-ai" id="ai-artwork-band" aria-labelledby="ai-band-title">
+        <div class="ai-band-inner">
+            <div class="ai-band-head">
+                <p class="ai-band-eyebrow"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> AI Artwork + Full-Color DTG</p>
+                <h2 class="band-title ai-band-title" id="ai-band-title">Made it with AI? <span class="hero-underline">We&rsquo;ll print it</span> on a real shirt.</h2>
+                <p class="ai-band-sub">Design your art in ChatGPT, Midjourney, DALL&middot;E, or Adobe Firefly &mdash; any AI tool you like. Upload the file and we print it in vivid, full-color DTG on a real shirt. No setup fees, no minimums, printed right here in Milton, WA.</p>
+                <div class="ai-band-tools" aria-label="AI tools we print from">
+                    <span class="ai-tool-chip">ChatGPT</span>
+                    <span class="ai-tool-chip">Midjourney</span>
+                    <span class="ai-tool-chip">DALL&middot;E</span>
+                    <span class="ai-tool-chip">Adobe Firefly</span>
+                    <span class="ai-tool-chip ai-tool-chip-any">+ any AI tool</span>
+                </div>
+            </div>
+
+            <!-- 5 sample tiles — real AI-art-on-tee designs (Erik's AI artwork) -->
+            <div class="ai-band-gallery" role="list" aria-label="Sample AI-generated artwork printed by NWCA">
+                <figure class="ai-band-tile" role="listitem">
+                    <span class="ai-band-tag">1</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Squad%2051%20rat%20fink.jpg?ver=1" alt="Squad 51 cartoon fire-truck AI artwork printed full-color on a tee" loading="lazy">
+                    <figcaption class="ai-band-cap">Squad 51</figcaption>
+                </figure>
+                <figure class="ai-band-tile" role="listitem">
+                    <span class="ai-band-tag">2</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Momma%20Bear.jpg?ver=1" alt="Momma Bear AI artwork design printed full-color on a tee" loading="lazy">
+                    <figcaption class="ai-band-cap">Momma Bear</figcaption>
+                </figure>
+                <figure class="ai-band-tile" role="listitem">
+                    <span class="ai-band-tag">3</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/404%20knight.jpg?ver=1" alt="404 Knight cyber-skull AI artwork printed full-color on a tee" loading="lazy">
+                    <figcaption class="ai-band-cap">404 Knight</figcaption>
+                </figure>
+                <figure class="ai-band-tile" role="listitem">
+                    <span class="ai-band-tag">4</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/built%20for%20adventure.jpg?ver=1" alt="Built for Adventure outdoor AI artwork printed full-color on a tee" loading="lazy">
+                    <figcaption class="ai-band-cap">Built for Adventure</figcaption>
+                </figure>
+                <figure class="ai-band-tile" role="listitem">
+                    <span class="ai-band-tag">5</span>
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/dog%20mom.jpg?ver=1" alt="Dog Mom Yorkie AI artwork design printed full-color on a tee" loading="lazy">
+                    <figcaption class="ai-band-cap">Dog Mom</figcaption>
+                </figure>
+            </div>
+
+            <div class="ai-band-foot">
+                <p class="ai-band-spec">
+                    <i class="fas fa-file-image" aria-hidden="true"></i>
+                    Easy upload: just send a <strong>PNG with a see-through background</strong>, saved at <strong>300 DPI</strong> &mdash; that&rsquo;s all we need to print it sharp, edge to edge.
+                </p>
+                <a class="btn btn-hero ai-band-cta" href="#stage-gallery">
+                    <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Pick your shirt &mdash; upload your AI art
+                </a>
             </div>
         </div>
     </section>
