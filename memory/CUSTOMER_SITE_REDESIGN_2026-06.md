@@ -1,17 +1,21 @@
 # Customer Site Redesign 2026-06 — Master Plan
 
-## ⏯️ PICKUP HERE (updated 2026-06-11 post-deploy)
+## ⏯️ PICKUP HERE (updated 2026-06-11 end-of-day, Erik shutting down — 11 releases shipped)
 
-**State**: ✅ **DEPLOYED LIVE `v2026.06.11.2`** — homepage redesign (incl. 4-print hero rotator), P0 dead-link/cart-retire fixes, P0b URL-price hole, search category-drift fix. Live-verified: homepage serves `?v=2026.06.11.2`, `/cart` 301→sample-cart, `/marketing.html` 404. Erik approved screenshots + all hats decisions (log below). develop == main == Heroku.
+**State**: ✅ **EVERYTHING LIVE through `v2026.06.11.11`**, develop == main == prod, tree CLEAN. The .11 release was deployed by ERIK'S PARALLEL SESSION (55 files: its DTF refactor + legacy /product app deletion + christmas-bundles/laser-tumbler edits) and carried this session's quote-cart Phase 2 commits with it. LIVE today: homepage+rotator · /catalog · product.html w/ 3-question CONFIGURATOR (decisions 17+18) · **Add-to-Quote CART at /quote-cart** (badge, toasts, pooled per-method group cards, tier meters, nudges; sessionStorage nwca.quoteCart.v1; parity gate exact: pooled EMB $588 / DTG $348 / below-min $175) · decoration gating · 🎩 /custom-caps store · quote-cart-engine (62-fixture parity lock) · all 0.57 margins swept · baselines re-locked.
 
 **Next work items, in order**:
-1. P1 remainder: add interior-page primitives to nwca-2026.css (forms, pricing tables, alerts, toasts, interior page headers, cart components) + fix the 2 AA contrast edges the mobile-a11y audit flagged in nwca-2026.css + split a core layer so interior pages don't pull homepage band CSS.
-2. P2 catalog phase (see Phase plan below).
-3. P4 hats store can start in parallel with P2/P3 — lineup + pricing verified, chassis blueprint documented below; FIRST step is the channel-config registry extraction in server.js.
+1. **Post-deploy validation of v2026.06.11.11's foreign half**: I verified /quote-cart 200 + product wiring live, but the parallel session's DTF refactor + legacy-deletion portion shipped on ITS gates, not mine — run `npm run test:unit` (expect 39 suites / 1,273+; it added tests/unit/dtf-save-parity.test.js) + smoke the DTF builder + confirm no page references the deleted /product legacy files (grep app.js/components/).
+2. **Quote-cart PHASE 3** (the spec is in CUSTOMER_QUOTE_CART_DESIGN_2026-06.md phasing): web-quote-service.js — save cart as quote_sessions+quote_items with NEW prefix **WQ** (via /api/quote-sequence/WQ), pre-save forceRefresh parity check, artwork upload per print-type group (proxy files API pattern), EmailJS notification to sales@ + customer copy w/ /quote/WQ-... share link, quote-view mixed-method grouping tweak, printable PDF, 'Request final quote' handoff. Erik decisions already locked: immediate customer share link; v1 saved quotes frozen.
+3. Phase 4 backlog + P3 remainders (homepage search cutover to /catalog; quote-view reskin P5; calculators P6; SEO/analytics/legal/404 P7).
+
+**PENDING ERIK**: ~$200 hats E2E test order at /custom-caps (8× C914) → I verify webhook→Caspio→ShopWorks→emails → he VOIDS SW + refunds Stripe.
 
 **Session facts a fresh context needs**:
-- The ORIGINAL homepage background agent died silently (only output: nwca-2026.css). The orchestrator rebuilt index.html directly — do NOT wait for/expect any homepage agent.
-- Task board (harness): #3 P1 in_progress; #1 P0 + #2 P0b completed; #4-#9 = P2-P7 pending.
+- Harness task board: #1-#4 completed; #5 P3 + #6 P4 in_progress (both mostly done — see descriptions); #7-#9 pending.
+- **Parallel sessions share this checkout** — `git status` before ANY deploy; unknown dirt = STOP (lesson recorded in LESSONS_LEARNED 2026-06-11 after a sweep incident; second incident avoided by holding deploy until the other session shipped).
+- Preview gotchas: preview_screenshot wedges per-window (restart server); preview_click coords unreliable (use el.click() via eval); Node needs restart for server.js changes.
+- Engine deps: product/quote-cart pages must load EmbroideryPricingCalculator + DTFConfig + services before quote-cart-engine adapters run (see product.html script order).
 - index.html JS contract is LOAD-BEARING: `.hero-section` + `.homepage-sections` wrappers, all the #nav*/#results*/#filters* IDs — catalog-search.js has unguarded querySelectors (details in 2026-06-11 status entries below).
 - Erik's 4 hats decisions + 4 design decisions are all in the Decision log. Full audit evidence: CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md. Hat lineup table + C112→C402 gotcha below.
 - Known deferred nits: "$23.5" un-padded price formatting on showcase buttons (P3 rebuild); sample-cart sessionStorage still client-trusted until P5 server reprice; top-sellers-product still hardcodes the proxy URL (page-consistent; dies in P3 consolidation anyway).
