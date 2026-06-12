@@ -1,3 +1,11 @@
+## v2026.06.12.2 (2026.06.12)
+
+- fix(storefront): write quote_items + pre-tax TotalAmount/TaxAmount so /quote + /invoice render line items
+- docs(lessons): archive 2 old resolved entries to stay under the 300-line cap
+- docs(lessons): archive await-sync entry — under 300-line cap
+- docs(lessons): condense storefront entry under 300-line cap
+- docs(lessons): collapse archived stubs to single lines — under 300-line cap (300)
+
 ## v2026.06.12.1 (2026.06.12)
 
 - docs(redesign): decision 19 - decorated catalog card prices live (from X with logo at 72+)
