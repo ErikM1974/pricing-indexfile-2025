@@ -60,6 +60,10 @@ class LaserTumblerPage {
             // Hide loading state
             this.hideLoading();
 
+            // Reveal the customer logo-mockup + instant-quote section (optional
+            // progressive enhancement — no-op if its script didn't load)
+            window.laserTumblerMockup?.onPageReady(this);
+
             console.log('[LaserTumblerPage] Page loaded successfully with', this.allProducts.length, 'color variants');
 
         } catch (error) {
@@ -112,8 +116,9 @@ class LaserTumblerPage {
         console.log('[LaserTumblerPage] Loading all color variants...');
 
         try {
-            // Check sessionStorage cache first
-            const cacheKey = 'polar_camel_16oz_variants';
+            // Check sessionStorage cache first (v2: tiers computed from live JDS
+            // wholesale + Caspio JDS-MARGIN/JDS-LABOR, not hardcoded prices)
+            const cacheKey = 'polar_camel_16oz_variants_v2';
             const cached = sessionStorage.getItem(cacheKey);
 
             if (cached) {
@@ -145,17 +150,17 @@ class LaserTumblerPage {
 
             const data = await response.json();
 
-            // Process products with pricing calculations
-            this.allProducts = data.result.map(product => {
-                const pricing = this.apiService.calculatePrice(product.oneCase);
-                const tiers = this.apiService.getPricingTiers(product);
+            // Live JDS pricing config (Caspio Service_Codes JDS-* rows) must be
+            // loaded before computing prices — never price off stale defaults.
+            await this.apiService.ready;
 
-                return {
-                    ...product,
-                    customerPrice: pricing.customerPrice,
-                    tiers: tiers
-                };
-            });
+            // Process products with pricing calculations — tiers are computed from
+            // each product's live JDS wholesale prices (throws if wholesale missing,
+            // which lands in init()'s error state rather than showing a wrong price)
+            this.allProducts = data.result.map(product => ({
+                ...product,
+                tiers: this.apiService.getPricingTiers(product)
+            }));
 
             // Cache the results
             sessionStorage.setItem(cacheKey, JSON.stringify({
@@ -333,6 +338,9 @@ class LaserTumblerPage {
 
             // Announce to screen readers
             this.announceColorChange(colorName);
+
+            // Keep the logo mockup + quote in sync with the chosen color
+            window.laserTumblerMockup?.onColorChanged();
         }
 
         console.log('[LaserTumblerPage] Color selected:', product.name);
@@ -474,7 +482,7 @@ class LaserTumblerPage {
             row.innerHTML = `
                 <td class="tier-range">
                     <div class="tier-qty">${tier.range}</div>
-                    <div class="tier-desc">${tier.description}${tier.handlingFee && hasLocalInventory ? ' + $50 LTM fee' : ''}</div>
+                    <div class="tier-desc">${tier.description}${tier.handlingFee && hasLocalInventory ? ` + $${tier.handlingFee.toFixed(0)} LTM fee` : ''}</div>
                 </td>
                 <td class="tier-price">
                     <div class="price-large">$${tier.customerPrice.toFixed(2)}</div>
@@ -491,7 +499,7 @@ class LaserTumblerPage {
                 infoRow.innerHTML = `
                     <td colspan="2" class="pricing-info">
                         <i class="fas fa-info-circle"></i>
-                        <span>Less than minimum (LTM) fee of $50.00 applies to orders under 12 pieces. This covers personalized service and setup time for very small orders.</span>
+                        <span>Less than minimum (LTM) fee of $${tier.handlingFee.toFixed(2)} applies to orders under 12 pieces. This covers personalized service and setup time for very small orders.</span>
                     </td>
                 `;
                 tableBody.appendChild(infoRow);

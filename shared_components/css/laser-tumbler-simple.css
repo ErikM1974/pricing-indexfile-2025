@@ -993,3 +993,348 @@ body {
         display: none; /* Hide totals on very small screens */
     }
 }
+
+/* ============================================================
+   Logo Mockup + Instant Quote section (laser-tumbler-mockup.js)
+   ============================================================ */
+
+.mockup-section {
+    padding: 60px 0;
+    background: #f8faf9;
+    border-top: 3px solid #2d5f3f;
+}
+
+.mockup-section h2 {
+    color: #2d5f3f;
+    font-size: 32px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.mockup-subtitle {
+    text-align: center;
+    color: #555;
+    margin-bottom: 36px;
+}
+
+.mockup-layout {
+    display: grid;
+    grid-template-columns: minmax(300px, 420px) 1fr;
+    gap: 36px;
+    align-items: start;
+}
+
+.mockup-step {
+    background: #fff;
+    border: 1px solid #e2e8e4;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 18px;
+}
+
+.mockup-step h3 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2d5f3f;
+    font-size: 18px;
+    margin: 0 0 14px;
+}
+
+.mockup-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #2d5f3f;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Upload drop zone */
+.ltmk-drop-zone {
+    border: 2px dashed #9db8a8;
+    border-radius: 10px;
+    padding: 28px 16px;
+    text-align: center;
+    color: #555;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.ltmk-drop-zone i {
+    font-size: 28px;
+    color: #2d5f3f;
+    margin-bottom: 8px;
+}
+
+.ltmk-drop-zone:hover,
+.ltmk-drop-zone:focus-visible,
+.ltmk-drop-zone--active {
+    border-color: #2d5f3f;
+    background: #eef5f0;
+    outline: none;
+}
+
+.ltmk-logo-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 8px 10px;
+    background: #eef5f0;
+    border-radius: 8px;
+}
+
+.ltmk-logo-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    background-color: #fff;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid #d4e0d8;
+    flex-shrink: 0;
+}
+
+.ltmk-logo-name {
+    flex: 1;
+    font-size: 14px;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ltmk-logo-remove {
+    border: none;
+    background: none;
+    color: #b91c1c;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+}
+
+/* Artwork warning */
+.ltmk-warning {
+    margin-top: 12px;
+    padding: 14px;
+    background: #fff8eb;
+    border: 1px solid #f0d9a8;
+    border-radius: 8px;
+}
+
+.ltmk-warning h4 {
+    margin: 0 0 8px;
+    color: #92600a;
+    font-size: 15px;
+}
+
+.ltmk-warning p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #555;
+}
+
+.ltmk-warning-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Buttons */
+.ltmk-btn {
+    border: 1px solid #2d5f3f;
+    background: #fff;
+    color: #2d5f3f;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.ltmk-btn:hover {
+    background: #eef5f0;
+}
+
+.ltmk-btn--primary {
+    background: #2d5f3f;
+    color: #fff;
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 16px;
+}
+
+.ltmk-btn--primary:hover {
+    background: #234c32;
+}
+
+.ltmk-btn--secondary {
+    background: #fff;
+}
+
+/* Size controls */
+.ltmk-slider-label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+#ltmk-size-slider {
+    width: 100%;
+    accent-color: #2d5f3f;
+}
+
+.ltmk-size-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.ltmk-hint {
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #777;
+}
+
+/* Quote */
+.ltmk-qty-label {
+    display: block;
+    font-size: 14px;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+#ltmk-qty {
+    width: 120px;
+    padding: 9px 12px;
+    border: 1px solid #c4d4ca;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.ltmk-quote-result {
+    margin-top: 14px;
+}
+
+.ltmk-quote-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #444;
+    padding: 5px 0;
+}
+
+.ltmk-quote-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 700;
+    color: #2d5f3f;
+    border-top: 2px solid #2d5f3f;
+    margin-top: 8px;
+    padding-top: 10px;
+}
+
+.ltmk-quote-note {
+    margin: 10px 0 0;
+    font-size: 12px;
+    color: #888;
+}
+
+.ltmk-quote-warning {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 14px;
+    color: #92600a;
+    background: #fff8eb;
+    border: 1px solid #f0d9a8;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* Preview pane */
+.mockup-preview {
+    position: relative;
+    background: #fff;
+    border: 1px solid #e2e8e4;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+#ltmk-canvas {
+    max-width: 100%;
+    height: auto;
+    cursor: grab;
+    touch-action: none;
+    border-radius: 8px;
+}
+
+#ltmk-canvas:active {
+    cursor: grabbing;
+}
+
+#ltmk-canvas:focus-visible {
+    outline: 3px solid #2d5f3f;
+    outline-offset: 2px;
+}
+
+.ltmk-preview-empty {
+    padding: 90px 20px;
+    color: #999;
+}
+
+.ltmk-preview-empty i {
+    font-size: 42px;
+    margin-bottom: 12px;
+    display: block;
+    color: #c4d4ca;
+}
+
+.ltmk-preview-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+}
+
+.ltmk-preview-error {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fdf0ef;
+    border: 1px solid #f2c4c0;
+    border-radius: 8px;
+    color: #b91c1c;
+    font-size: 14px;
+}
+
+.ltmk-caption {
+    margin: 12px 0 0;
+    font-size: 13px;
+    color: #777;
+    font-style: italic;
+}
+
+@media (max-width: 900px) {
+    .mockup-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .mockup-section h2 {
+        font-size: 24px;
+    }
+}

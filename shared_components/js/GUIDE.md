@@ -11,6 +11,7 @@
 | `quote-builder-core.js` | Core quote builder shared logic (2026 consolidation) |
 | `quote-builder-utils.js` | Shared utilities: escapeHtml, formatPrice, showToast, copyShareableUrl |
 | `quote-cart-engine.js` | **Customer quote-cart engine (Phase 0, 2026-06-11)** — PURE orchestration (pooling, grouping, fees, honest-LTM, tier nudges, trace); zero price formulas: per-method adapters call the staff authorities (EMB calculator class / POST /api/dtg/quote-pricing / SCP service bundle + exact builder findPricingTier copy / DTFPricingService.calculatePriceForQuantity). `priceCart(cart)` + `singleItemPreview(item)`. Dual browser/Node; parity-locked by tests/unit/web-quote-cart-parity.test.js against memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md worked examples |
+| `quote-cart-store.js` | **Customer quote-cart store (Phase 2, 2026-06-11)** — `window.QuoteCartStore`: sessionStorage key `nwca.quoteCart.v1`, schema v1, 24h TTL (mismatch/expiry/corruption → silent reset). Stores items (style/color/qty/sizes/method/placement/inkColors) — **never prices**; the cart reprices via quote-cart-engine at render time. API: `add/updateQty/remove/clear/getItems/count/totalPieces/onChange` (same-tab pub/sub + `storage` events). Auto-wires masthead `[data-quote-badge]` elements (count into `[data-quote-badge-count]`, hidden at 0). Dual browser/Node; locked by tests/unit/quote-cart-store.test.js |
 | `quote-services-bar.js` | Persistent catalog-driven services bar; `render(mountId, catalog, onAdd)` → one-click chips that add services as line items (EMB/SCP/DTG/DTF, each with its own catalog) |
 | `quote-builder-step2-modern.js` | Modern Step 2 UI (embroidery/cap builders) |
 | `quote-formatter.js` | Quote formatting for display/print |
@@ -131,6 +132,7 @@
 | `pricing-pages.js` | Shared pricing page utilities |
 | `manual-mode-indicator.js` | Manual pricing mode UI indicator |
 | `laser-tumbler-simple.js` | Laser tumbler pricing logic |
+| `laser-tumbler-mockup.js` | Customer-facing logo mockup + instant quote on the laser tumbler page — reuses `jds-tumbler-template.js` engraving pipeline (page's 4 colors only), logo upload with customer-worded artwork warnings, drag/size canvas preview, PNG download, qty→price quote via `jds-api-service.js` formula pricing (no hardcoded prices). Hooked from `laser-tumbler-simple.js` (`onPageReady`/`onColorChanged`, optional-chained). |
 | `design-thumbnail-service.js` | Design thumbnail resolution service |
 | `sticker-pricing-service.js` | Sticker pricing fetcher (`/api/sticker-pricing`) — 50 SKUs (5 sizes × 10 qty tiers) with PartNumber. Used by order-form sticker method + sticker page. |
 | `sticker-pricing-page.js` | Sticker + Banner quote page logic — renders 5 sticker tables (`/api/sticker-pricing`) AND banner rate-card grid (`/api/banner-pricing`); drives AI chat (SSE to `/api/contract-sticker-ai/chat`, handles BOTH product lines); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights sticker rows OR banner rate cards based on `productType`; renders inline banner-quote card; saves to `quote_sessions` with STK prefix. |

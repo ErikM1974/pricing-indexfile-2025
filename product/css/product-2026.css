@@ -444,6 +444,25 @@
 .pdp-cfg-total .alert { margin: 0 0 10px; }
 .pdp-cfg-total .btn { margin-top: 10px; }
 
+/* Add-to-quote actions under the total block (Phase 2 quote-cart) */
+.pdp-cfg-actions {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+}
+.pdp-cfg-actions .btn[disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.pdp-cfg-add-reason {
+    flex: 1 1 100%;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+}
+
 /* "See every quantity price" expandable */
 .pdp-cfg-expand { margin-top: 14px; }
 .pdp-cfg-expand-btn {

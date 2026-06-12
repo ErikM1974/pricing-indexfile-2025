@@ -11,16 +11,20 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <!-- Styles -->
-    <link href="../shared_components/css/laser-tumbler-simple.css" rel="stylesheet">
+    <link href="../shared_components/css/laser-tumbler-simple.css?v=2026.06.11.11" rel="stylesheet">
 
     <!-- JDS API Service -->
-    <script src="../shared_components/js/jds-api-service.js"></script>
+    <script src="../shared_components/js/jds-api-service.js?v=2026.06.11.11"></script>
 
     <!-- ManageOrders Inventory Service -->
-    <script src="../shared_components/js/manageorders-inventory-service.js"></script>
+    <script src="../shared_components/js/manageorders-inventory-service.js?v=2026.06.11"></script>
 
     <!-- Page Logic -->
-    <script src="../shared_components/js/laser-tumbler-simple.js"></script>
+    <script src="../shared_components/js/laser-tumbler-simple.js?v=2026.06.11.11"></script>
+
+    <!-- Logo mockup + instant quote (shared engraving pipeline + customer module) -->
+    <script src="../shared_components/js/jds-tumbler-template.js?v=2026.06.11"></script>
+    <script src="../shared_components/js/laser-tumbler-mockup.js?v=2026.06.11.11"></script>
 </head>
 <body>
     <!-- Enhanced Pricing Header -->
@@ -158,6 +162,97 @@
             </div>
         </section>
 
+        <!-- Logo Mockup + Instant Quote (revealed by laser-tumbler-mockup.js once the page is ready) -->
+        <section class="mockup-section" id="mockup-section" hidden>
+            <div class="container">
+                <h2>Preview Your Logo &amp; Get a Price</h2>
+                <p class="mockup-subtitle">
+                    Upload your logo to see it engraved on the
+                    <strong id="ltmk-color-name">selected</strong> tumbler, then enter a
+                    quantity for an instant price. Use the color swatches above to switch colors.
+                </p>
+
+                <div class="mockup-layout">
+                    <div class="mockup-controls">
+                        <!-- Step 1: upload -->
+                        <div class="mockup-step">
+                            <h3><span class="mockup-step-num">1</span> Upload your logo</h3>
+                            <div id="ltmk-drop-zone" class="ltmk-drop-zone" tabindex="0" role="button"
+                                 aria-label="Upload your logo — PNG, JPG, or SVG">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p><strong>Drop your logo here</strong><br>or click to browse — PNG, JPG, SVG</p>
+                            </div>
+                            <input type="file" id="ltmk-file-input" accept=".png,.jpg,.jpeg,.svg,image/*" hidden>
+                            <div id="ltmk-logo-info" class="ltmk-logo-info" hidden>
+                                <span id="ltmk-logo-thumb" class="ltmk-logo-thumb" aria-hidden="true"></span>
+                                <span id="ltmk-logo-name" class="ltmk-logo-name"></span>
+                                <button type="button" id="ltmk-logo-remove" class="ltmk-logo-remove"
+                                        aria-label="Remove logo">&times;</button>
+                            </div>
+                            <div id="ltmk-warning" class="ltmk-warning" hidden>
+                                <h4 id="ltmk-warning-title"></h4>
+                                <p id="ltmk-warning-body"></p>
+                                <div class="ltmk-warning-actions">
+                                    <button type="button" id="ltmk-warning-continue" class="ltmk-btn ltmk-btn--secondary">
+                                        Preview it anyway
+                                    </button>
+                                    <button type="button" id="ltmk-warning-reupload" class="ltmk-btn">
+                                        Choose a different file
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: size & position -->
+                        <div class="mockup-step" id="ltmk-size-step" hidden>
+                            <h3><span class="mockup-step-num">2</span> Size &amp; position</h3>
+                            <label class="ltmk-slider-label" for="ltmk-size-slider">
+                                Logo size: <span id="ltmk-size-pct">70</span>%
+                            </label>
+                            <input type="range" id="ltmk-size-slider" min="30" max="110" step="2" value="70">
+                            <div class="ltmk-size-actions">
+                                <button type="button" id="ltmk-fit-btn" class="ltmk-btn ltmk-btn--secondary">Auto-fit</button>
+                                <button type="button" id="ltmk-center-btn" class="ltmk-btn ltmk-btn--secondary">Re-center</button>
+                            </div>
+                            <p class="ltmk-hint">Drag the logo on the preview to reposition it.</p>
+                        </div>
+
+                        <!-- Step 3: instant quote -->
+                        <div class="mockup-step">
+                            <h3><span class="mockup-step-num">3</span> Get your price</h3>
+                            <label class="ltmk-qty-label" for="ltmk-qty">How many tumblers?</label>
+                            <input type="number" id="ltmk-qty" min="1" max="9999" step="1" value="24" inputmode="numeric">
+                            <div id="ltmk-quote-result" class="ltmk-quote-result" aria-live="polite"></div>
+                        </div>
+
+                        <!-- Step 4: download -->
+                        <div class="mockup-step" id="ltmk-download-step" hidden>
+                            <button type="button" id="ltmk-download-btn" class="ltmk-btn ltmk-btn--primary">
+                                <i class="fas fa-download"></i> Download your mockup
+                            </button>
+                            <p class="ltmk-hint">Attach it when you call or email us and we'll take it from there.</p>
+                        </div>
+                    </div>
+
+                    <div class="mockup-preview">
+                        <canvas id="ltmk-canvas" tabindex="0"
+                                aria-label="Tumbler mockup preview — drag or use arrow keys to position your logo"></canvas>
+                        <div id="ltmk-preview-empty" class="ltmk-preview-empty">
+                            <i class="fas fa-image"></i>
+                            <p>Your mockup will appear here</p>
+                        </div>
+                        <div id="ltmk-preview-loading" class="ltmk-preview-loading" hidden>
+                            <div class="color-loading-spinner"></div>
+                        </div>
+                        <div id="ltmk-preview-error" class="ltmk-preview-error" role="alert" hidden></div>
+                        <p id="ltmk-caption" class="ltmk-caption" hidden>
+                            Live preview — engraving shows silver; on-screen colors are approximate.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Product Gallery -->
         <section class="gallery-section">
             <div class="container">
@@ -187,13 +282,5 @@
         <p>Phone: 253-922-5793 | Email: sales@nwcustomapparel.com</p>
     </footer>
 
-    <!-- Debug Console Commands -->
-    <script>
-        // Debug utilities for testing
-        console.log('%c[Laser Tumbler Page] Debug Commands Available:', 'color: #2d5f3f; font-weight: bold;');
-        console.log('refreshProduct() - Refresh product data from API');
-        console.log('window.laserTumblerPage - Access page instance');
-        console.log('window.laserTumblerPage.apiService - Access API service');
-    </script>
 </body>
 </html>

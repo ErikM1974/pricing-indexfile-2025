@@ -307,18 +307,25 @@ class DTFPricingService {
         const transferSize = data.transferSizes[primarySizeKey];
         if (!transferSize) return [];
 
-        return transferSize.pricingTiers.map(transferTier => {
+        const ladderRows = transferSize.pricingTiers.map(transferTier => {
             const repQty = transferTier.minQty;
 
             const marginTier = data.pricingTiers.find(t =>
                 repQty >= t.minQuantity && repQty <= t.maxQuantity
             );
-            const marginDenom = marginTier ? marginTier.marginDenominator : 0.53; // fallback only — Caspio Pricing_Tiers is authoritative (0.53 as of 2026-06)
-
             const freightTier = data.freightTiers.find(t =>
                 repQty >= t.minQty && repQty <= t.maxQty
             );
-            const freight = freightTier ? freightTier.costPerTransfer : 0;
+            // [2026-06-11] no hardcoded-literal pricing: if Caspio tier ranges
+            // drift (a transfer tier with no matching Pricing_Tiers/Freight row),
+            // SKIP the row loudly instead of rendering a price built on a
+            // hardcoded margin / $0 freight (file contract: NO FALLBACK VALUES).
+            if (!marginTier || !freightTier) {
+                console.error(`[DTFPricingService] Tier drift at qty ${repQty}: missing ${!marginTier ? 'Pricing_Tiers' : 'Transfer_Freight'} row — ladder row skipped`);
+                return null;
+            }
+            const marginDenom = marginTier.marginDenominator;
+            const freight = freightTier.costPerTransfer;
 
             let secondTransferPrice = 0;
             if (secondarySizeKey && data.transferSizes[secondarySizeKey]) {
@@ -342,6 +349,8 @@ class DTFPricingService {
                 basePrice: Math.ceil(rawTotal * 2) / 2
             };
         });
+        // [2026-06-11] drop tier rows skipped for Caspio tier drift (nulls)
+        return ladderRows.filter(Boolean);
     }
 
     /**
@@ -396,15 +405,25 @@ class DTFPricingService {
             totalTransferCost += transferTier.unitPrice;
         });
 
-        // Labor cost (one per location)
-        const laborCostPerLocation = data.laborCostPerLocation || 0;
+        // Labor cost (one per location). [2026-06-11] explicit undefined check —
+        // `|| 0` silently zeroed labor on missing API data while a legitimate $0
+        // PressingLaborCost stays valid (falsy-zero rule).
+        if (data.laborCostPerLocation === undefined || data.laborCostPerLocation === null) {
+            throw new Error('No labor cost in API data - cannot calculate price');
+        }
+        const laborCostPerLocation = data.laborCostPerLocation;
         const totalLaborCost = laborCostPerLocation * locationCount;
 
-        // Freight cost (one per location)
+        // Freight cost (one per location). [2026-06-11] throw instead of silently
+        // pricing with $0 freight — this function is the transactional authority
+        // (quote-cart-engine, order-form dtf.jsx).
         const freightTier = (data.freightTiers || []).find(t =>
             quantity >= t.minQty && quantity <= t.maxQty
         );
-        const freightPerTransfer = freightTier ? freightTier.costPerTransfer : 0;
+        if (!freightTier) {
+            throw new Error(`No freight tier for quantity ${quantity} - cannot calculate price`);
+        }
+        const freightPerTransfer = freightTier.costPerTransfer;
         const totalFreightCost = freightPerTransfer * locationCount;
 
         // LTM fee distributed per unit (floor to cents, matching dtf-pricing-calculator.js)
@@ -509,7 +528,9 @@ class DTFPricingService {
      * @throws {Error} if API data not loaded
      */
     getLaborCostPerLocation() {
-        if (!this.apiData?.laborCostPerLocation) {
+        // [2026-06-11] falsy-zero: a legitimate $0 PressingLaborCost must not
+        // throw — only missing data is an error
+        if (!this.apiData || this.apiData.laborCostPerLocation === undefined || this.apiData.laborCostPerLocation === null) {
             throw new Error('API data not loaded - cannot get labor cost');
         }
         return this.apiData.laborCostPerLocation;
@@ -531,7 +552,10 @@ class DTFPricingService {
             return this.roundUpToHalfDollar(price);
         }
 
-        return price; // No rounding if method unknown
+        // [2026-06-11] visible warning per Erik's rule — silently skipping
+        // rounding changes every displayed price
+        console.warn(`[DTFPricingService] Unrecognized RoundingMethod '${method}' — price NOT rounded`);
+        return price;
     }
 
     /**
@@ -545,8 +569,12 @@ class DTFPricingService {
      * Round up to nearest $0.50
      */
     roundUpToHalfDollar(price) {
-        if (price % 0.5 === 0) return price;
-        return Math.ceil(price * 2) / 2;
+        // [2026-06-11] round to cents first: FP residue (e.g. 18.500000000000004
+        // from a /marginDenom division) used to fail the exact-half check and
+        // bump the price a full $0.50
+        const cents = Math.round(price * 100) / 100;
+        if (cents % 0.5 === 0) return cents;
+        return Math.ceil(cents * 2) / 2;
     }
 
     /**

@@ -80,8 +80,10 @@ class EmbroideryInvoiceGenerator {
         const rawPre = pricingData.preTaxSubtotal;
         const hasPre = rawPre != null && rawPre !== '' && !isNaN(parseFloat(rawPre));
         const baseForTax = hasPre ? parseFloat(rawPre) : (Number(pricingData.grandTotal) || 0);
-        const taxAmount = includeTax ? baseForTax * taxRate : 0;
-        const totalWithTax = baseForTax + taxAmount;
+        // [2026-06-11] round tax to cents BEFORE summing (house tax rule) — the
+        // unrounded sum could disagree with the screen's rounded tax by a cent
+        const taxAmount = includeTax ? Math.round(baseForTax * taxRate * 100) / 100 : 0;
+        const totalWithTax = Math.round((baseForTax + taxAmount) * 100) / 100;
         
         return `
             <!DOCTYPE html>

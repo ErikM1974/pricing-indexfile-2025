@@ -16,7 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ctrl+S = Save
         if (e.ctrlKey && e.key === 's') {
             e.preventDefault();
-            if (dtfQuoteBuilder) dtfQuoteBuilder.saveQuote();
+            // [2026-06-11] was the dead legacy saveQuote() — it reads elements this
+            // page doesn't have (#quote-notes) and threw, so Ctrl+S silently no-oped
+            if (dtfQuoteBuilder) dtfQuoteBuilder.saveAndGetLink();
         }
 
         // Ctrl+P = Print
@@ -106,8 +108,11 @@ function updateTaxCalculation() {
     }
 
     // Use dynamic tax rate from input (default 10.1% WA)
+    // [2026-06-11] shared parseRatePercent (EMB 2026-06-10 fix, synced): a cleared
+    // input parsed to NaN and rendered "$NaN" totals that poisoned email/clipboard;
+    // 0 stays a VALID rate (out-of-state/exempt) — never falls back to 10.1.
     const rateInput = document.getElementById('tax-rate-input');
-    const taxRate = rateInput ? parseFloat(rateInput.value) / 100 : 0.101;
+    const taxRate = parseRatePercent(rateInput?.value, 10.1) / 100;
     const taxLabel = document.getElementById('tax-rate-label');
     const pct = (taxRate * 100).toFixed(1);
 
@@ -122,6 +127,16 @@ function updateTaxCalculation() {
         taxRowEl.style.display = 'none';
         grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
+
+    // Always-visible sidebar TOTAL bar (EMB parity 2026-06-11) — mirrors the
+    // grand total so the running price never scrolls out of view while building.
+    const sidebarBar = document.getElementById('sidebar-total-bar');
+    const sidebarTotal = document.getElementById('sidebar-grand-total');
+    if (sidebarBar && sidebarTotal) {
+        sidebarTotal.textContent = grandTotalEl.textContent;
+        sidebarBar.hidden = false;
+    }
+
     // [2026-06-08] keep the order-summary band (recap + ship-to card) current on every recalc / tax / fee change
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 }
@@ -340,7 +355,9 @@ function onShipZipBlur() {
 }
 
 async function dtfEmailQuote() {
-    const quoteId = window.dtfQuoteBuilder?.editingQuoteId;
+    // [2026-06-11] also accept lastSavedQuoteId — a fresh save never set
+    // editingQuoteId, so Email Quote was a dead end for never-edited quotes
+    const quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
     if (!quoteId) {
         showToast('Please save the quote first before emailing', 'error');
         return;
@@ -643,7 +660,20 @@ async function onStyleChange(input, rowId) {
             const baseSizePrice = blankSizes.length > 0
                 ? Math.min(...blankSizes.map(s => s.price))
                 : 0;
-            row.dataset.baseCost = baseSizePrice || firstDetail.CASE_PRICE || 0;
+            const resolvedBaseCost = baseSizePrice || firstDetail.CASE_PRICE || 0;
+            // [2026-06-11] $0 garment guard (Erik's #1 rule — never a silent wrong
+            // price): a BLANK bundle with no priced sizes (null CASE_PRICE rows or a
+            // transient sub-query failure 200s with sizes:[]) used to load the row
+            // normally and every surface priced the garment at $0 — decoration-only.
+            // Block the row visibly instead.
+            if (!(resolvedBaseCost > 0)) {
+                if (descInput) descInput.value = 'No garment cost — cannot quote';
+                if (typeof showToast === 'function') {
+                    showToast(`No garment cost available for ${styleNumber} — cannot price this style. Check the style number or re-add it after a refresh.`, 'error');
+                }
+                return;
+            }
+            row.dataset.baseCost = resolvedBaseCost;
             // Store sizeUpcharges from BLANK bundle (has actual upcharge data)
             // sellingPriceDisplayAddOns format: { "2XL": 2.00, "3XL": 3.00, "4XL": 4.00, ... }
             const upcharges = blankBundle.sellingPriceDisplayAddOns || {};
@@ -744,7 +774,9 @@ function onSizeChange(rowId) {
             xxlInput.style.color = '#999';
             xxlInput.value = '';  // Clear value so grayed input shows empty
         } else if (qty > 0 && existingChildId) {
-            // Update existing child row
+            // Update existing child row — JS state first (money source), then
+            // the display row (2026-06-11 P2)
+            if (dtfQuoteBuilder) dtfQuoteBuilder.setChildRowQty(existingChildId, qty);
             const childRow = document.getElementById(`row-${existingChildId}`);
             if (childRow) {
                 const childInput = childRow.querySelector('.extended-size-qty');
@@ -1051,6 +1083,17 @@ function createChildRow(parentRowId, size, qty) {
     if (!childRowMap[parentRowId]) childRowMap[parentRowId] = {};
     childRowMap[parentRowId][size] = childRowId;
 
+    // Mirror into JS state — calculateFromState()/getTotalQuantity()/save/print
+    // read THIS, never the DOM row, which is display-only (2026-06-11 P2)
+    let parsedUpcharges = {};
+    try { parsedUpcharges = JSON.parse(childRow.dataset.sizeUpcharges || '{}'); } catch (e) { /* keep {} */ }
+    dtfQuoteBuilder.registerChildRow(childRowId, {
+        parentId: parentRowId,
+        size: size,
+        qty: qty,
+        baseCost: childRow.dataset.baseCost,
+        sizeUpcharges: parsedUpcharges
+    });
 
     // Trigger pricing recalculation
     if (dtfQuoteBuilder) {
@@ -1093,6 +1136,10 @@ function removeChildRow(parentRowId, size) {
         if (dtfQuoteBuilder) {
             dtfQuoteBuilder.removeProduct(childRowId);
             dtfQuoteBuilder.recalculatePricing();
+            // [2026-06-11] explicit dirty-flag: updatePricingFromRow no longer
+            // creates phantom this.products entries for child rows, so the
+            // removeProduct side effect can't be relied on to mark unsaved
+            if (typeof dtfQuoteBuilder.markAsUnsaved === 'function') dtfQuoteBuilder.markAsUnsaved();
         }
 
     }
@@ -1107,6 +1154,9 @@ function onChildSizeChange(childRowId, parentRowId, size) {
 
     const input = childRow.querySelector('.extended-size-qty');
     const qty = parseInt(input?.value) || 0;
+
+    // JS state first (money source), then the display cell (2026-06-11 P2)
+    if (dtfQuoteBuilder) dtfQuoteBuilder.setChildRowQty(childRowId, qty);
 
     // Update qty display
     const qtyCell = document.getElementById(`row-qty-${childRowId}`);
@@ -1170,11 +1220,23 @@ function getExtendedSizeQty(parentRowId, size) {
     // Normalize size aliases
     const normalizedSize = size === 'XXXL' ? '3XL' : size;
 
-    // DEBUG: Log what we're looking for
-
-    // Check if there's a child row for this size
-    if (childRowMap[parentRowId] && childRowMap[parentRowId][normalizedSize]) {
-        const childRowId = childRowMap[parentRowId][normalizedSize];
+    // Check if there's a child row for this size. Dual-alias lookup (2026-06-11):
+    // rows created before the XXXL→3XL key fix are stored under 'XXXL' — the old
+    // single-key lookup missed them, the popup prefilled 3XL as blank, and Apply
+    // then deleted the existing row (qty 0 + existing ⇒ remove).
+    const ids = childRowMap[parentRowId];
+    const childKey = ids && (ids[normalizedSize] != null ? normalizedSize
+        : (ids[size] != null ? size
+        : (normalizedSize === '3XL' && ids['XXXL'] != null ? 'XXXL'
+        : (normalizedSize === '2XL' && ids['XXL'] != null ? 'XXL' : null))));
+    if (ids && childKey) {
+        const childRowId = ids[childKey];
+        // Money source: JS state (2026-06-11 P2). The popup prefill drives the
+        // delete-on-Apply behavior (qty 0 + existing row ⇒ remove), so it must
+        // read the same source the totals bill from. DOM .cell-qty is a
+        // display-only fallback for rows that predate the state mirror.
+        const stateChild = window.dtfQuoteBuilder?.childRows?.get(Number(childRowId));
+        if (stateChild) return stateChild.qty || 0;
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow) {
             const qtyCell = childRow.querySelector('.cell-qty');

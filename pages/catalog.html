@@ -22,7 +22,7 @@
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.4">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.11">
     <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.06.11.5">
 </head>
 <body>
@@ -118,6 +118,17 @@
                     </svg>
                 </button>
             </div>
+
+            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
         </div>
     </header>
 
@@ -289,10 +300,11 @@
     </div>
 
     <!-- Search + catalog machinery (product-search-service is the shared data layer, read-only) -->
-    <script src="/product-search-service.js?v=2026.06.11.9"></script>
+    <script src="/product-search-service.js?v=2026.06.11.11"></script>
     <script src="/shared_components/js/decoration-methods.js?v=2026.06.11.5"></script>
     <script src="/brands-flyout.js?v=4"></script>
     <script src="/app-modern.js?v=4" defer></script>
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.06.11.11" defer></script>
     <script src="/pages/js/catalog-2026.js?v=2026.06.11.7" defer></script>
 </body>
 </html>

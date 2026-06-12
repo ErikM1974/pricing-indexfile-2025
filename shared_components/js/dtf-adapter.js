@@ -9,7 +9,6 @@
         constructor() {
             this.config = {
                 debug: true,
-                defaultGarmentMarkup: 1.4,
                 defaultQuantity: 24
             };
             this.currentData = {

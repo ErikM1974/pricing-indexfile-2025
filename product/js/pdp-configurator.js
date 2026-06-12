@@ -1052,8 +1052,12 @@
             locationLabel: loc ? loc.label : '',
             methodId: state.method,
             methodLabel: def ? def.label : '',
+            engineMethod: def ? def.engineMethod : null, // 'EMB'|'CAP'|'DTG'|'SCP'|'DTF'
+            isCap: !!(def && def.isCap),
             inkColors: state.method === 'scp' ? state.ink : null,
+            status: res ? res.status : 'loading',
             price: null,
+            sizes: null,
             belowMin: false
         };
         if (res && res.status === 'ok') {
@@ -1065,6 +1069,13 @@
                     return { label: f.label, amount: f.amount };
                 })
             };
+            // The exact size breakdown the engine priced (std size only) —
+            // the quote cart stores it so its reprices match this preview.
+            const inputs = res.preview && res.preview.trace && res.preview.trace.inputs;
+            const cfgItem = inputs && inputs.items && inputs.items.filter(function (i) {
+                return i.id === '__cfg__';
+            })[0];
+            if (cfgItem && cfgItem.sizes) sel.sizes = cfgItem.sizes;
         } else if (res && res.status === 'belowmin') {
             sel.belowMin = true;
         }
