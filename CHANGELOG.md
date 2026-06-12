@@ -1,3 +1,7 @@
+## v2026.06.12.4 (2026.06.12)
+
+- Deploy v2026.06.12.4: Express Order homepage section (Custom T-Shirts + Custom Hats), golf relocated
+
 ## v2026.06.12.3 (2026.06.12)
 
 - Deploy v2026.06.12.3: caps web orders route to Custom Embroidery (id_OrderType 21 / acct 4050)
