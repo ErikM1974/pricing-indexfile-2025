@@ -823,3 +823,106 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
     .order-bar-summary strong { font-size: 17px; }
     .stage-head h2 { font-size: 20px; }
 }
+
+/* ── AI Artwork feature band ─────────────────────────────────────────
+   Inserted between the hero and the product gallery on /custom-tees.
+   "Press-room editorial" fit: warm --green-50 ground (NOT a dark slab —
+   keeps the light gallery below from fighting it), --card tiles that
+   reuse the exact .gallery-card-hero treatment (--paper-deep +
+   mix-blend-mode: multiply), and a dashed registration tag lifted from
+   .stage-num. Reuses .band / .band-title / .btn .btn-hero / .hero-underline. */
+.band-ai {
+    background:
+        radial-gradient(120% 130% at 8% 0%, rgba(47, 125, 59, 0.07), transparent 62%),
+        var(--green-50);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+}
+.ai-band-inner { max-width: 1100px; margin: 0 auto; }
+
+/* Header block */
+.ai-band-head { max-width: 720px; }
+.ai-band-eyebrow {
+    display: inline-flex; align-items: center; gap: 7px; margin: 0 0 10px;
+    font-family: var(--font-display);
+    font-size: 12px; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--green-700);
+}
+.ai-band-eyebrow i { color: var(--rush); }
+.band-title.ai-band-title {
+    margin: 0 0 12px;
+    font-size: clamp(27px, 3.6vw, 38px); line-height: 1.06;
+}
+.ai-band-sub {
+    font-size: 16.5px; line-height: 1.5; color: var(--ink-soft);
+    max-width: 60ch; margin: 0 0 16px;
+}
+
+/* AI tool chips */
+.ai-band-tools { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
+.ai-tool-chip {
+    border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 6px 13px; font-size: 12.5px; font-weight: 700;
+    color: var(--ink-soft); background: var(--card);
+}
+.ai-tool-chip-any { color: var(--green-700); border-color: var(--green-600); border-style: dashed; }
+
+/* Horizontal row of 5 sample tiles — siblings of the catalog cards below */
+.ai-band-gallery {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px;
+    margin-bottom: 26px;
+}
+.ai-band-tile {
+    position: relative; margin: 0; background: var(--card);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); overflow: hidden;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.ai-band-tile:hover {
+    transform: translateY(-2px); border-color: var(--green-700);
+    box-shadow: var(--shadow-pop);
+}
+.ai-band-tile img {
+    /* AI-art designs come on their OWN background (some white, some black),
+       so NO multiply blend here — show each design true, in a bordered card.
+       Images are 1200×1000 (6:5) = the tile ratio, so cover never crops. */
+    display: block; width: 100%; aspect-ratio: 6 / 5; object-fit: cover;
+    background: var(--paper-deep);
+}
+/* numbered registration badge — echoes the dashed .stage-num motif */
+.ai-band-tag {
+    position: absolute; top: 8px; left: 8px; z-index: 2;
+    font-family: var(--font-display); font-weight: 800; font-size: 13px; color: var(--green-700);
+    width: 28px; height: 28px; display: grid; place-items: center;
+    background: rgba(255, 255, 255, 0.92); border: 1.4px dashed var(--green-700);
+    border-radius: 8px;
+}
+.ai-band-cap {
+    padding: 9px 12px; font-size: 12px; font-weight: 700; color: var(--ink-faint);
+    background: var(--card); border-top: 1px dashed var(--line-strong);
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+/* Foot: easy-upload spec line + CTA */
+.ai-band-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; flex-wrap: wrap;
+    border-top: 1px solid var(--line); padding-top: 22px;
+}
+.ai-band-spec {
+    margin: 0; flex: 1 1 380px; font-size: 14px; line-height: 1.5; color: var(--ink-soft);
+}
+.ai-band-spec i { color: var(--rush); margin-right: 7px; }
+.ai-band-spec strong { color: var(--ink); }
+.ai-band-cta { flex: none; text-decoration: none; }
+
+/* Responsive */
+@media (max-width: 1023px) {
+    .ai-band-gallery { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) {
+    .band-ai { padding: 36px 18px; }
+    .ai-band-gallery { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .ai-band-foot { flex-direction: column; align-items: stretch; }
+    .ai-band-cta { width: 100%; }
+}
