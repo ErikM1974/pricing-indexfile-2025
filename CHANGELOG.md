@@ -1,3 +1,14 @@
+## v2026.06.11.12 (2026.06.11)
+
+- docs(redesign): end-of-day pickup point - 11 releases live incl. Phase 2 cart via parallel session's v2026.06.11.11 deploy
+- docs(redesign): pickup additions - proxy push-note fix pending deploy + stash redundancy check
+- fix(quote-cart): screen print enforces its real 13-piece customer minimum (Erik 2026-06-11)
+- feat(quote-cart): Phase 3 - save/share/email as real WQ quotes
+- docs(redesign): record SCP minimum fix + Phase 3 E2E proof (awaiting clean deploy window)
+- refactor(dtf): remove deprecated/duplicate code paths after the .11 single-source refactor
+- docs: AGENTS.md - Codex-targeted copy of the repo working rules
+- Deploy v2026.06.11.12: cache-bust
+
 ## v2026.06.11.11 (2026.06.11)
 
 - feat(quote-cart): Phase 2 - Add-to-Quote cart with pooled per-method pricing
