@@ -74,12 +74,7 @@
 }
 .hero-sticker em { display: block; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; opacity: 0.92; }
 
-/* Secondary duo: golf concierge + hats teaser */
-.hero-duo {
-    max-width: var(--wrap); margin: 0 auto;
-    padding: 14px 20px 42px;
-    display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 18px;
-}
+/* Golf promo banner (relocated to its own homepage band) + Express Order pair */
 .duo-golf {
     position: relative; display: flex; flex-direction: column; justify-content: flex-end;
     min-height: 240px; border-radius: var(--radius); overflow: hidden;
@@ -105,22 +100,29 @@
 .duo-golf:hover .duo-golf-cta { text-decoration: underline; }
 .duo-golf:hover .duo-golf-img { opacity: 0.65; }
 
-.duo-hats {
-    border: 1.6px dashed var(--line-strong); border-radius: var(--radius);
-    background: var(--card); padding: 22px 24px 20px;
-    display: flex; flex-direction: column; justify-content: flex-end; gap: 2px;
-    position: relative; min-height: 240px;
-    /* now a live link to /custom-caps (store launched 2026-06-11) */
-    text-decoration: none; color: var(--ink);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+/* Express Order — homepage hero pair (Custom T-Shirts + Custom Hats).
+   Photo-card pattern modeled on .shelf-card; replaces the old .duo-hats teaser. */
+.express-section { max-width: var(--wrap); margin: 0 auto; padding: 4px 20px 40px; }
+.express-head { margin-bottom: 14px; }
+.express-head .band-eyebrow { margin-bottom: 4px; }
+.express-sub { color: var(--ink-soft); font-size: 14px; margin: 0; max-width: 80ch; }
+.express-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.express-card {
+    display: flex; flex-direction: column; overflow: hidden;
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow-card); color: var(--ink); text-decoration: none;
+    transition: transform 0.12s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
-.duo-hats:hover { border-color: var(--green-700); box-shadow: var(--shadow-card); }
-.duo-hats-icon { color: var(--green-700); margin-bottom: auto; }
-.duo-hats .duo-badge { align-self: flex-start; background: var(--rush-soft); border-color: var(--rush); color: var(--rush-deep); }
-.duo-hats h3 { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-.duo-hats p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 10px; }
-.duo-hats-cta { font-weight: 800; font-family: var(--font-display); font-size: 15px; color: var(--green-700); }
-.duo-hats:hover .duo-hats-cta { text-decoration: underline; }
+.express-card:hover { transform: translateY(-3px); border-color: var(--green-700); box-shadow: var(--shadow-pop); }
+.express-photo { height: 200px; overflow: hidden; background: var(--paper-deep); }
+.express-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.express-body { padding: 15px 18px 17px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.express-kicker { font-size: 11.5px; font-weight: 800; letter-spacing: 0.07em; color: var(--green-700); text-transform: uppercase; }
+.express-body h3 { font-family: var(--font-display); font-size: 19px; font-weight: 800; }
+.express-body p { font-size: 13.5px; color: var(--ink-soft); margin: 2px 0 0; flex: 1 1 auto; }
+.express-cta { font-weight: 800; font-family: var(--font-display); font-size: 15px; color: var(--green-700); margin-top: 10px; }
+.express-card:hover .express-cta { text-decoration: underline; color: var(--green-900); }
+@media (max-width: 760px) { .express-grid { grid-template-columns: 1fr; } }
 
 /* Trust band */
 .trust-strip { background: linear-gradient(100deg, var(--green-950), var(--green-900)); color: #fff; }
@@ -559,8 +561,8 @@
     .hero-copy > *:nth-child(4) { animation-delay: 0.21s; }
     .hero-copy > *:nth-child(5) { animation-delay: 0.28s; }
     .hero-stage { animation: rise 0.6s 0.12s ease backwards; }
-    .hero-duo > * { animation: rise 0.55s 0.25s ease backwards; }
-    .hero-duo > *:nth-child(2) { animation-delay: 0.33s; }
+    .express-grid > * { animation: rise 0.55s 0.25s ease backwards; }
+    .express-grid > *:nth-child(2) { animation-delay: 0.33s; }
     @keyframes rise { from { opacity: 0; transform: translateY(14px); } }
 }
 
@@ -575,10 +577,7 @@
     .hero-stage { order: -1; min-height: 0; }
     .hero-shirt img { max-height: 250px; }
     .hero-sticker { font-size: 14px; padding: 10px 12px; top: 0; right: 2%; }
-    .hero-duo { grid-template-columns: 1fr; padding-bottom: 30px; }
-    .duo-golf, .duo-hats { min-height: 0; }
-    .duo-hats { padding-top: 18px; }
-    .duo-hats-icon { display: none; }
+    .duo-golf { min-height: 0; }
     .trust-strip ul { justify-content: flex-start; gap: 8px 22px; padding: 12px 18px; }
 
     .quick-view-body { grid-template-columns: 1fr; }

@@ -29,7 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="catalog-search.css?v=4">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.06.11.11">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.06.11.6">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.06.12.4">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -98,7 +98,7 @@
                     <a href="/pages/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
+                    <a href="/#express-order" class="nav-link">Express Order <span class="flag-new">New</span></a>
                 </li>
                 <li class="nav-item">
                     <a href="/pages/webstore-info.html" class="nav-link">Webstores</a>
@@ -137,6 +137,7 @@
         <nav class="drawer-links" aria-label="Quick links">
             <a href="/">Home</a>
             <a href="/custom-tees">Custom T-Shirts <span class="flag-new">New</span></a>
+            <a href="/custom-caps">Custom Hats <span class="flag-new">New</span></a>
             <a href="/pages/top-sellers-showcase.html">Top Sellers &amp; Free Samples</a>
             <a href="/brands.html">Brands</a>
             <a href="/pages/webstore-info.html">Custom Webstores</a>
@@ -199,28 +200,37 @@
                 </div>
             </div>
 
-            <div class="hero-duo">
-                <a class="duo-golf" href="/pages/golf-tournaments-2026.html?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=hero">
-                    <img class="duo-golf-img" src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388098"
-                         alt="" width="720" height="300" loading="lazy">
-                    <div class="duo-golf-body">
-                        <span class="duo-badge">⛳ Summer 2026</span>
-                        <h3>Tournament outfitting, concierge-style</h3>
-                        <p>Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike &amp; OGIO — we handle every detail.</p>
-                        <span class="duo-golf-cta">See tournament apparel →</span>
-                    </div>
-                </a>
-                <a class="duo-hats" href="/custom-caps">
-                    <svg class="duo-hats-icon" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                        <path d="M3 14c0-5 4-9 9-9s9 4 9 9"></path>
-                        <path d="M3 14h18c0 1.5-1 2.5-2.5 2.5h-13C4 16.5 3 15.5 3 14z"></path>
-                        <path d="M12 5v2"></path>
-                    </svg>
-                    <span class="duo-badge">New — order online</span>
-                    <h3>Custom hats, built online</h3>
-                    <p>Pick a cap, upload your logo, check out in minutes — embroidered front logo included, free setup, free shipping.</p>
-                    <span class="duo-hats-cta">Design your caps →</span>
-                </a>
+            <div class="express-section" id="express-order">
+                <div class="express-head">
+                    <p class="band-eyebrow">⚡ Express Order — order online</p>
+                    <p class="express-sub">Design and pay online in minutes — our team proofs every order and confirms the details with you before production. Perfect for events and quick one-time orders.</p>
+                </div>
+                <div class="express-grid">
+                    <a class="express-card" href="/custom-tees">
+                        <div class="express-photo">
+                            <img src="https://cdnm.sanmar.com/imglib/mresjpg/2021/f11/PC54_jetblack_model_front.jpg"
+                                 alt="Custom full-color DTG printed t-shirt" width="560" height="400" loading="lazy">
+                        </div>
+                        <div class="express-body">
+                            <span class="express-kicker">Full-color DTG · No minimums</span>
+                            <h3>Custom T-Shirts</h3>
+                            <p>Pick a style, upload your art, see it on a real shirt, and check out in minutes. Ships in 7–10 business days — 3-day rush available.</p>
+                            <span class="express-cta">Start your t-shirt order →</span>
+                        </div>
+                    </a>
+                    <a class="express-card" href="/custom-caps">
+                        <div class="express-photo">
+                            <img src="https://cdnm.sanmar.com/imglib/mresjpg/2025/f29/112_black_hat_detail.jpg"
+                                 alt="Custom embroidered Richardson 112 cap" width="560" height="400" loading="lazy">
+                        </div>
+                        <div class="express-body">
+                            <span class="express-kicker">Embroidered · 8-cap minimum</span>
+                            <h3>Custom Hats</h3>
+                            <p>Pick a cap, upload your logo, and approve a digital proof. Free setup and free shipping — ships 7–10 business days after you approve.</p>
+                            <span class="express-cta">Start your cap order →</span>
+                        </div>
+                    </a>
+                </div>
             </div>
 
             <div class="trust-strip">
@@ -235,6 +245,21 @@
 
         <!-- Marketing bands (hidden by catalog-search.js when results show) -->
         <div class="homepage-sections">
+            <section class="band">
+                <div class="wrap">
+                    <a class="duo-golf" href="/pages/golf-tournaments-2026.html?utm_source=homepage&amp;utm_campaign=golf-2026-q2&amp;utm_medium=hero">
+                        <img class="duo-golf-img" src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9388098"
+                             alt="" width="720" height="300" loading="lazy">
+                        <div class="duo-golf-body">
+                            <span class="duo-badge">⛳ Summer 2026</span>
+                            <h3>Tournament outfitting, concierge-style</h3>
+                            <p>Free $100 logo digitizing plus a free OGIO Vision 2.0 golf bag ($239 value) on tournament orders of $2,000+. TravisMathew, Nike &amp; OGIO — we handle every detail.</p>
+                            <span class="duo-golf-cta">See tournament apparel →</span>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
             <section class="band">
                 <div class="wrap">
                     <div class="band-head">
@@ -456,6 +481,7 @@
                     <li><a href="/pages/top-sellers-showcase.html">Top Sellers</a></li>
                     <li><a href="/brands.html">Brands</a></li>
                     <li><a href="/custom-tees">Custom T-Shirts</a></li>
+                    <li><a href="/custom-caps">Custom Hats</a></li>
                     <li><a href="/pages/top-sellers-showcase.html">Free Sample Program</a></li>
                 </ul>
             </div>
