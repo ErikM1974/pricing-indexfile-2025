@@ -563,7 +563,11 @@
                 if (token !== state.seq) return;
                 if (!preview.ok) {
                     if (preview.error && preview.error.code === 'BELOW_MINIMUM') {
-                        state.results[id] = { status: 'belowmin', message: preview.error.message };
+                        state.results[id] = {
+                            status: 'belowmin',
+                            message: preview.error.message,
+                            minQuantity: preview.error.minQuantity
+                        };
                     } else {
                         throw new Error((preview.error && preview.error.message) || 'Pricing failed');
                     }
@@ -759,7 +763,11 @@
             noteEl.textContent = 'Ask your rep — add it in your quote notes';
         } else if (res.status === 'belowmin') {
             btn.classList.add('is-belowmin');
-            priceEl.textContent = 'Starts at 10 pieces';
+            // Per-method minimum from the engine's BELOW_MINIMUM error
+            // (DTF 10, screen print 13 — data-derived, never assume one number)
+            priceEl.textContent = res.minQuantity
+                ? 'Starts at ' + res.minQuantity + ' pieces'
+                : 'Below the order minimum';
             noteEl.textContent = 'Bump the quantity to see a price';
         } else {
             btn.classList.add('is-error');

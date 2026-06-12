@@ -604,6 +604,18 @@
             if (!primary || !primary.tiers) {
                 throw QuoteCartError('No screen print pricing for a ' + frontColors + '-color front (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
             }
+            // CUSTOMER minimum gate (Erik 2026-06-11): the builder's
+            // findPricingTier deliberately lets below-lowest-tier quantities
+            // fall into the lowest tier so a REP can consciously quote LTM
+            // territory — but customers can't order below the method's real
+            // minimum (lowest tier minQty from the live bundle, 13 today).
+            // Mirrors the DTF BELOW_MINIMUM gate; data-derived, never a literal.
+            var scpMinQty = primary.tiers.reduce(function (m, t) {
+                return (typeof t.minQty === 'number' && t.minQty < m) ? t.minQty : m;
+            }, Infinity);
+            if (isFinite(scpMinQty) && pooledQty < scpMinQty) {
+                throw QuoteCartError('Screen print starts at ' + scpMinQty + ' pieces (you have ' + pooledQty + ').', 'BELOW_MINIMUM', { minQuantity: scpMinQty });
+            }
             var tierRow = findPricingTier(primary.tiers, pooledQty);
             if (!tierRow) {
                 throw QuoteCartError('No screen print price tier for quantity ' + pooledQty + ' (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
@@ -1014,7 +1026,15 @@
                 }
                 results.push(gr);
             } catch (e2) {
-                errors.push({ groupId: group.groupId, method: group.method, code: e2.code || 'PRICING_ERROR', message: e2.message });
+                errors.push({
+                    groupId: group.groupId,
+                    method: group.method,
+                    code: e2.code || 'PRICING_ERROR',
+                    message: e2.message,
+                    // carry QuoteCartError extras (e.g. BELOW_MINIMUM's
+                    // minQuantity) so UIs can render per-method copy
+                    minQuantity: e2.minQuantity
+                });
             }
         }
         var grandTotal = errors.length > 0 ? null : r2(results.reduce(function (s, g) { return s + g.groupTotal; }, 0));
