@@ -163,14 +163,14 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ## UI Patterns
 
-### Richardson page CSS rewrite — JS-emitted class drift (2026-05-29) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: when JS builds DOM, the CSS contract IS the JS class string — grep `innerHTML`/`className` for exact names before/after any refactor (both sides fail silently); `max-height` transitions don't advance in the headless preview — verify show/hide via computed `display` + `getBoundingClientRect()`.
+### Richardson CSS JS-class drift (2026-05-29) · combobox DOM-regen-on-hover (2026-05-20) — ARCHIVED 2026-06-11/12
+In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when JS builds DOM the CSS contract IS the class string (grep `innerHTML`/`className` both sides before a refactor); never regenerate DOM nodes during hover/mid-click (toggle classes in place); `max-height` transitions don't advance headless — verify via computed `display`.
 
-### Don't regenerate combobox menu DOM on hover (2026-05-20)
-**Problem:** Customer search dropdown — Erik hovered a row, then mouse-clicked, but the click never selected. Keyboard ArrowDown+Enter worked fine. Took 4 deploys to find the real root cause.
-**Root Cause:** On `mouseenter`, the handler called `paint()` which set `menu.innerHTML = ...` — destroying every DOM node and recreating them with the active class on the hovered one. Real mouse motion between mousedown and click had enough latency for the destroy-and-recreate to lose the click target intermittently. Synthetic `dispatchEvent(new MouseEvent('mousedown'))` smoke tests gave false positives because they're synchronous (no DOM churn between event dispatch and listener execution).
-**Solution:** On hover, toggle the `.active` class via `classList.toggle()` on existing items — don't regenerate the HTML. Same fix applied to all 3 free-typing comboboxes in `shared_components/js/dtg-inline-form.js` (style, color, customer) that had the pattern.
-**Prevention:** Never regenerate DOM nodes during user interactions (hover, mid-click). Update CSS classes / text content in-place. Smoke tests for interactive selection should use the full `mousedown + mouseup + click` sequence with proper `button: 0, buttons: 1` props — bare `dispatchEvent('mousedown')` is a false-positive trap.
+### Storefront orders stored cart in JSON blobs only — /quote + /invoice showed "No items" + mis-taxed (2026-06-12)
+**Problem:** A real test cap order (CAP0612-5539) viewed at /quote showed "No items in this quote" and double-taxed to $894.61; the proforma /invoice showed "$0 tax — Out of State." The order data was actually fine (captured in the JSON blobs).
+**Root Cause:** The shared storefront save (`save3DTQuoteSession`, tees+caps) wrote the cart ONLY into JSON blobs and set `TotalAmount = grandTotal` (tax-INCL) with NO `TaxAmount`/no `quote_items`. But /quote + /invoice read line items from quote_items and treat `TotalAmount` as PRE-tax → /quote recomputed tax on the tax-incl figure (812.54×1.101=894.61), /invoice trusted absent TaxAmount as $0. (Separately: it never reached ShopWorks because it was UNPAID — Stripe `status:unpaid`; the webhook→push only runs on a completed charge = working as designed.)
+**Solution:** `save3DTQuoteSession` now writes `TotalAmount`=pre-tax subtotal + `TaxAmount` + `TaxRate` AND synthesizes quote_items (new pure module `shared_components/js/storefront-quote-items.js`, jest-locked: row per color footing to subtotal + SHIP fee row when shipping>0) — fire-and-forget so a display-row write never blocks the sale. Backward-compat: Quote-Mgmt `getEffectiveAmount` + ShipStation `amountPaid` fallback read `TotalAmount+(TaxAmount||0)` (old rows TaxAmount 0 → unchanged). ShopWorks sync never writes quote_items (no dup). Live-verified both readers ($738+$74.54=$812.54).
+**Prevention:** Any customer-facing quote/invoice surface MUST write quote_items + obey the reader contract (`TotalAmount` PRE-tax, separate `TaxAmount`/`TaxRate`, shipping as a SHIP item) — JSON blobs are invisible to the readers. Grep EVERY `.TotalAmount`/`.TaxAmount` reader before changing the tax convention. "Storefront order didn't reach ShopWorks" → check Stripe payment_status FIRST.
 
 ### EMB save↔restore mismatches: dropped sizes, double-counted/lost fees, DECG double-save (2026-06-04)
 **Problem:** Cert audit of the EMB builder found edit-reload (`?edit=EMB-…`) produced a DIFFERENT total than the saved quote on three archetypes: (1) a saved 2XL garment line vanished on reload (under-charge $88); (2) the AS-Garm primary-stitch surcharge counted twice — once as a restored row, once recomputed (over-charge $116); (3) a 3D-puff cap reloaded as flat embroidery, losing the cap type AND dropping the puff fee on the next Save Revision.
@@ -210,11 +210,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ## Caspio API Gotchas
 
-### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix
-**Problem:** After deleting an orphan `1-23` tier from `Pricing_Tiers` (EmbroideryCaps), `/api/pricing-bundle?method=CAP` *still* returned the orphan, and `[CapEmbroideryPricingService] No 8000 stitch cost found for tier 1-23` kept firing on the order form.
-**Root Cause:** Sept 2025 commit `c160648` ("fix: add missing 1-23 tier") added a `response.tiersR.unshift({ TierLabel: '1-23', ... })` shim in `caspio-pricing-proxy/src/routes/pricing.js` to paper over a missing Caspio row. The 5-tier migration later split `1-23` into `1-7` + `8-23` and the shim was never removed — so even after the data was correct, the proxy clobbered it with the orphan on every CAP/CAP-AL response. Heroku log confirmed `Total records fetched: 5` from Caspio, but response had 6.
-**Solution:** Removed the shim block (proxy v612). Bundle now returns Caspio reality.
-**Prevention:** When backfilling missing data via proxy injection, leave a `// REMOVE WHEN <X> IS FIXED IN CASPIO` marker. Audit such shims any time the underlying table changes shape (tier migration, schema rename, etc.). Verify the *response* matches the *table* — not just the table.
+### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix (~2025-09) — ARCHIVED 2026-06-12
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when a proxy injects/backfills missing Caspio data, leave a `// REMOVE WHEN FIXED IN CASPIO` marker and re-audit on any table shape change; verify the response matches the table.
 
 ### Caspio v3 Pagination: q.limit + q.pageNumber = Overlapping Pages
 **Problem:** `fetchAllCaspioPages` returned only 1000 of 2794 ManageOrders_LineItems. Style index had 634 styles instead of 715.
@@ -253,21 +250,13 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 **Solution:** `this.taxRate ?? 0.101` — nullish coalescing only falls through on `null`/`undefined`.
 **Prevention:** Always `??` when `0`, `""`, or `false` are valid values. Reserve `||` for all-falsy defaults.
 
-### `await` in a sync fn that only looks like the async one — EMB recalc vs updatePricingDisplay (2026-06-03)
-**Problem:** Adding the Additional Logo bar line item, I put `await syncALRows()` beside `syncRushRow(); updateTaxCalculation();`, assuming that block ended `async recalculatePricing()`. It is actually the tail of `updatePricingDisplay(pricing)` — a SYNC fn that recalc calls. `SyntaxError: await is only valid in async functions` took the WHOLE `embroidery-quote-builder.js` down -> every global undefined, Services bar blank, console empty.
-**Root Cause:** `recalculatePricing()` (async) delegates rendering to `updatePricingDisplay()` (sync), and `syncRushRow`/`updateTaxCalculation` live at the end of the SYNC one.
-**Solution:** Keep the display fn sync. A tier-priced line only re-prices when its OWN qty/stitch/type change -> reprice in `addALLineItem` (await syncALRows) + `onServiceQtyChange` (`syncALRows().then(recalc)`); the sync recalc just sums the stored `dataset.unitPrice`. No async ripple into the save path, no duplicated math.
-**Prevention:** Run `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded." The block ending in `syncRushRow()`/`updateTaxCalculation()` is `updatePricingDisplay` (sync), NOT `recalculatePricing`.
+### `await` in a sync fn (2026-06-03, ARCHIVED 2026-06-12): `node --check <file>` BEFORE browser verify — one syntax error nukes the whole script ("nothing loaded"). In embroidery-quote-builder.js the `syncRushRow()`/`updateTaxCalculation()` block is the SYNC `updatePricingDisplay`, not `recalculatePricing`. Full entry in archive.
 
 ---
 
 ## Data Integrity
 
-### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs
-**Problem:** Two rapid saves could get the same sequence number.
-**Root Cause:** Caspio doesn't support atomic increment. GET-then-PUT isn't atomic.
-**Solution:** In-memory mutex lock per prefix. Concurrent requests serialized via promise queue.
-**Prevention:** Any read-modify-write on Caspio needs application-level locking.
+### Quote Sequence Race — duplicate IDs (ARCHIVED 2026-06-12): Caspio has no atomic increment — any read-modify-write needs an app-level lock (mutex per prefix). Full entry in archive.
 
 ### Art-request notes notification fan-out (2026-05-29) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: notifications belong on the backend write chokepoint, not the browser; audit/system note POSTs must send `notify:false` or they double-fire. Current state documented in MEMORY.md Art Hub section.
