@@ -340,6 +340,16 @@ describe('custom-caps channel entry', () => {
     expect(CAPS.push.defaultBackLocationName).toBe('Cap Back');
   });
 
+  test('OnSite order type 21 = Custom Embroidery (acct 4050) — caps book to embroidered sales, NOT the online-store default 6 (Erik 2026-06-12)', () => {
+    expect(CAPS.push.idOrderType).toBe(21);
+    // The tee channels MUST NOT set it — they inherit the proxy default 6
+    // (Online Store / acct 4003). Only caps overrides; this asserts the change
+    // stays caps-scoped (the storefront payload omits the field for tees, so
+    // their push is unchanged).
+    expect(CTS.push.idOrderType).toBeUndefined();
+    expect(TDT.push.idOrderType).toBeUndefined();
+  });
+
   test('service banner mentions the 8-cap minimum + proof-first promise, regardless of rush arg', () => {
     const expected = 'CUSTOM CAPS EMBROIDERY - 8-cap minimum. DIGITAL PROOF FIRST - ships 7-10 business days after proof approval.';
     expect(CAPS.push.serviceBanner(false)).toBe(expected);
