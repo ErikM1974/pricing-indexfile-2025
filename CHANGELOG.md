@@ -1,3 +1,7 @@
+## v2026.06.12.6 (2026.06.12)
+
+- Deploy v2026.06.12.6: custom-tees AI-art hero + 'AI Artwork + Full-Color DTG' feature section (5 samples)
+
 ## v2026.06.12.5 (2026.06.12)
 
 - Deploy v2026.06.12.5: real customer-job photos in hero rotator (9) + Express cards; remove Free-samples sticker
