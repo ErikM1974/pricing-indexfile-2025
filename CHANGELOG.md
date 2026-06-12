@@ -1,3 +1,7 @@
+## v2026.06.12.3 (2026.06.12)
+
+- Deploy v2026.06.12.3: caps web orders route to Custom Embroidery (id_OrderType 21 / acct 4050)
+
 ## v2026.06.12.2 (2026.06.12)
 
 - fix(storefront): write quote_items + pre-tax TotalAmount/TaxAmount so /quote + /invoice render line items
