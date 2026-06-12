@@ -1,3 +1,7 @@
+## v2026.06.12.1 (2026.06.12)
+
+- docs(redesign): decision 19 - decorated catalog card prices live (from X with logo at 72+)
+
 ## v2026.06.11.12 (2026.06.11)
 
 - docs(redesign): end-of-day pickup point - 11 releases live incl. Phase 2 cart via parallel session's v2026.06.11.11 deploy
