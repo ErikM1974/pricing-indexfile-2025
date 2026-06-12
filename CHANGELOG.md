@@ -1,3 +1,7 @@
+## v2026.06.12.5 (2026.06.12)
+
+- Deploy v2026.06.12.5: real customer-job photos in hero rotator (9) + Express cards; remove Free-samples sticker
+
 ## v2026.06.12.4 (2026.06.12)
 
 - Deploy v2026.06.12.4: Express Order homepage section (Custom T-Shirts + Custom Hats), golf relocated
