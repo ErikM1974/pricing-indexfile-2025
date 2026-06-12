@@ -338,7 +338,11 @@
                     }
                 } catch (_) { /* fall through to quote total */ }
             }
-            return parseFloat(quote.TotalAmount) || 0;
+            // TotalAmount is the PRE-TAX subtotal (storefront orders since
+            // 2026-06-12; builders always). Add TaxAmount for the grand total so
+            // the Amount column shows the all-in figure pre-ShopWorks-sync. Old
+            // rows have TaxAmount 0/null → (TotalAmount + 0) is unchanged.
+            return (parseFloat(quote.TotalAmount) || 0) + (parseFloat(quote.TaxAmount) || 0);
         }
 
         // 5-milestone workflow progress for the Progress column (Erik

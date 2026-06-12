@@ -25,6 +25,9 @@ const CAPS_PRICING = require('./pages/js/custom-caps-pricing.js');
 // push constants, banners, EmailJS templates; jest-locked). Bound to the
 // server-only behaviors in `const CHANNELS` in the storefront section below.
 const STOREFRONT_CHANNEL_CONFIG = require('./config/storefront-channels.js');
+// Synthesizes quote_items rows from a storefront order's colorConfigs so /quote
+// + /invoice render line items (2026-06-12). Pure logic, jest-locked.
+const { buildStorefrontQuoteItems } = require('./shared_components/js/storefront-quote-items.js');
 
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
@@ -1044,6 +1047,16 @@ async function save3DTQuoteSession(data) {
   const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
   const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
 
+  // Reader contract (2026-06-12, Erik): TotalAmount = PRE-TAX products subtotal,
+  // TaxAmount + TaxRate stored separately — so /invoice (trusts TaxAmount) and
+  // /quote (recomputes from TaxRate) both foot correctly + show the WA tax line.
+  // (Was: TotalAmount = grandTotal tax-inclusive with no TaxAmount → /quote
+  // double-taxed to $894.61, /invoice showed $0 tax.) The Stripe charge + the
+  // webhook→ShopWorks push read OrderTotalsJSON, NOT these columns — unaffected.
+  const subtotal = parseFloat((orderTotals.subtotal || 0).toFixed(2));
+  const salesTax = parseFloat((orderTotals.salesTax || 0).toFixed(2));
+  const taxRate = Number(orderTotals.taxRate) || 0;
+
   const sessionData = {
     QuoteID: quoteID,
     SessionID: stripeSessionId ? `stripe_${stripeSessionId}` : `3dt_${Date.now()}`,
@@ -1053,9 +1066,11 @@ async function save3DTQuoteSession(data) {
     CustomerEmail: customerData.email,
     Phone: customerData.phone || '',
     TotalQuantity: orderTotals.totalQuantity || 0,
-    SubtotalAmount: parseFloat((orderTotals.subtotal || 0).toFixed(2)),
+    SubtotalAmount: subtotal,
     LTMFeeTotal: parseFloat((orderTotals.ltmFee || 0).toFixed(2)),
-    TotalAmount: parseFloat((orderTotals.grandTotal || 0).toFixed(2)),
+    TotalAmount: subtotal,
+    TaxAmount: salesTax,
+    TaxRate: taxRate,
     ExpiresAt: formattedExpiresAt,
     Notes: channelConfig(orderSettings && orderSettings.channel).orderNoteLabel({
       rush: orderSettings && orderSettings.rush,
@@ -1083,6 +1098,31 @@ async function save3DTQuoteSession(data) {
 
   const result = await response.json();
   console.log('[3-Day Tees] Quote session created:', quoteID);
+
+  // Write quote_items rows so /quote + /invoice render line items. Fire-and-
+  // forget: a display-row failure must NEVER block the sale (the order data is
+  // fully in the JSON blobs and the ShopWorks push reads those). Sync never
+  // touches quote_items (verified 2026-06-12), so no duplicate risk.
+  try {
+    const lineItems = buildStorefrontQuoteItems(quoteID, colorConfigs, orderTotals, orderSettings);
+    const itemsUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items';
+    const results = await Promise.allSettled(lineItems.map((item) =>
+      fetch(itemsUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      }).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); })
+    ));
+    const failed = results.filter((r) => r.status === 'rejected').length;
+    if (failed > 0) {
+      console.error(`[Storefront] ${quoteID}: ${failed}/${lineItems.length} quote_items failed to write (order still valid — data is in JSON blobs).`);
+    } else {
+      console.log(`[Storefront] ${quoteID}: wrote ${lineItems.length} quote_items row(s).`);
+    }
+  } catch (itemsErr) {
+    console.error(`[Storefront] ${quoteID}: quote_items synthesis failed (non-fatal):`, itemsErr.message);
+  }
+
   return result;
 }
 
@@ -7387,7 +7427,10 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
 
       items,
 
-      amountPaid:    Number(order?.cur_TotalInvoice) || Number(session.TotalAmount) || 0,
+      // TotalAmount is pre-tax (2026-06-12); add TaxAmount for the grand total
+      // when no ShopWorks invoice exists yet. Old rows have TaxAmount 0/null →
+      // (TotalAmount + 0) preserves their tax-inclusive value. Backward-compatible.
+      amountPaid:    Number(order?.cur_TotalInvoice) || (Number(session.TotalAmount) + (Number(session.TaxAmount) || 0)) || 0,
       taxAmount:     Number(order?.cur_SalesTaxTotal) || 0,
       shippingAmount: 0,  // warehouse sets actual at label-purchase time
 
