@@ -15,7 +15,6 @@ class DTFQuoteService {
     constructor() {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
         this.quotePrefix = 'DTF';
-        this.taxRate = 0.101; // 10.1% WA sales tax
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
@@ -187,15 +186,22 @@ class DTFQuoteService {
                     locationCodes: locationCodes,
                     locationNames: locationNames,
                     locationCount: quoteData.selectedLocations?.length || 0,
-                    transferBreakdown: quoteData.transferBreakdown,
+                    // [2026-06-11] builder nests pricing snapshot under pricingMetadata —
+                    // the old top-level reads were always undefined in saved Notes
+                    transferBreakdown: quoteData.pricingMetadata?.transferBreakdown ?? quoteData.transferBreakdown,
                     productCount: quoteData.products.length,
                     tier: quoteData.tierLabel,
                     projectName: quoteData.projectName || '',
                     specialNotes: quoteData.notes || quoteData.specialNotes || '',
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
-                    marginDenominator: quoteData.marginDenominator,
-                    laborPerLocation: quoteData.laborCostPerLocation,
-                    freightPerLocation: quoteData.freightPerTransfer,
+                    marginDenominator: quoteData.pricingMetadata?.marginDenominator ?? quoteData.marginDenominator,
+                    laborPerLocation: quoteData.pricingMetadata?.laborCostPerLocation ?? quoteData.laborCostPerLocation,
+                    freightPerLocation: quoteData.pricingMetadata?.freightPerTransfer ?? quoteData.freightPerTransfer,
+                    // [2026-06-11] ship-to recipient — Quote_Sessions has no ShipToName
+                    // column (writing one 500s the save), so it rides in Notes JSON
+                    shipToName: quoteData.shipToName || '',
+                    // [2026-06-11] persisted for edit-reload restore (no session column)
+                    includeTax: quoteData.includeTax !== false,
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files now carry .placement per file
                     // when rich-mode widget was used; proxy reads them to emit
@@ -267,7 +273,11 @@ class DTFQuoteService {
                             StyleNumber: product.styleNumber,
                             ProductName: `${product.productName} - ${itemColor}`,
                             Color: itemColor,
-                            ColorCode: product.colorCode || '',
+                            // CATALOG_COLOR chain (2026-06-11): the builder passes catalogColor,
+                            // never colorCode — the old read saved '' and the ShopWorks push fell
+                            // back to display COLOR_NAME ("Brilliant Orange" vs "BrillOrng"),
+                            // the documented two-color-field "Unable to verify" bug class.
+                            ColorCode: sizeGroup.catalogColor || product.catalogColor || product.colorCode || '',
                             EmbellishmentType: 'dtf',
                             PrintLocation: locationCodes,
                             PrintLocationName: locationNames,
@@ -694,15 +704,22 @@ class DTFQuoteService {
                     locationCodes: locationCodes,
                     locationNames: locationNames,
                     locationCount: quoteData.selectedLocations?.length || 0,
-                    transferBreakdown: quoteData.transferBreakdown,
+                    // [2026-06-11] builder nests pricing snapshot under pricingMetadata —
+                    // the old top-level reads were always undefined in saved Notes
+                    transferBreakdown: quoteData.pricingMetadata?.transferBreakdown ?? quoteData.transferBreakdown,
                     productCount: quoteData.products.length,
                     tier: quoteData.tierLabel,
                     projectName: quoteData.projectName || '',
                     specialNotes: quoteData.notes || quoteData.specialNotes || '',
                     salesRep: quoteData.salesRep || 'sales@nwcustomapparel.com',
-                    marginDenominator: quoteData.marginDenominator,
-                    laborPerLocation: quoteData.laborCostPerLocation,
-                    freightPerLocation: quoteData.freightPerTransfer,
+                    marginDenominator: quoteData.pricingMetadata?.marginDenominator ?? quoteData.marginDenominator,
+                    laborPerLocation: quoteData.pricingMetadata?.laborCostPerLocation ?? quoteData.laborCostPerLocation,
+                    freightPerLocation: quoteData.pricingMetadata?.freightPerTransfer ?? quoteData.freightPerTransfer,
+                    // [2026-06-11] ship-to recipient — Quote_Sessions has no ShipToName
+                    // column (writing one 500s the save), so it rides in Notes JSON
+                    shipToName: quoteData.shipToName || '',
+                    // [2026-06-11] persisted for edit-reload restore (no session column)
+                    includeTax: quoteData.includeTax !== false,
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files now carry .placement per file
                     // when rich-mode widget was used.
@@ -768,7 +785,11 @@ class DTFQuoteService {
                             StyleNumber: product.styleNumber,
                             ProductName: `${product.productName} - ${itemColor}`,
                             Color: itemColor,
-                            ColorCode: product.colorCode || '',
+                            // CATALOG_COLOR chain (2026-06-11): the builder passes catalogColor,
+                            // never colorCode — the old read saved '' and the ShopWorks push fell
+                            // back to display COLOR_NAME ("Brilliant Orange" vs "BrillOrng"),
+                            // the documented two-color-field "Unable to verify" bug class.
+                            ColorCode: sizeGroup.catalogColor || product.catalogColor || product.colorCode || '',
                             EmbellishmentType: 'dtf',
                             PrintLocation: locationCodes,
                             PrintLocationName: locationNames,

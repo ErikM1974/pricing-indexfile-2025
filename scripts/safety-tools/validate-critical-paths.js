@@ -37,9 +37,9 @@ const CRITICAL_PATHS = {
     {
       name: 'Product Display',
       path: '/product.html',
-      dependencies: ['product/app.js'],
+      dependencies: ['product/js/pdp-configurator.js', 'product/js/product-2026.js'],
       tests: [
-        { type: 'element', selector: '#product-detail', name: 'Product detail section' },
+        { type: 'element', selector: '#pdpContent', name: 'Product detail section' },
         { type: 'console', maxErrors: 0, name: 'No console errors' }
       ]
     }

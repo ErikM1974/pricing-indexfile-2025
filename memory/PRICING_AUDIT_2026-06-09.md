@@ -42,8 +42,8 @@ The **four quote builders' on-screen totals + ShopWorks pushes are sound** — e
 - ☐ **Theme J — quote-management.html.** Hardcoded API URL `:183` (no `app.config.js` load, Never-Break #6); OF edit misroute `:909-922` (no `prefix==='OF'` branch → opens EMB builder `?edit=OF-NNNN`; OF expects `?draftId=`) → whole OF quote class non-editable from dashboard.
 
 ## MEDIUM — save/load + UI correctness
-- ☐ `dtf-quote-builder.js:1709,2799-2804` — separate-LTM-mode PDF doesn't foot (line items LTM-stripped, grand total LTM-inclusive; total correct). Derive PDF unit prices from `calculateFromState()`. (MEMORY known-deferred P3.)
-- ☐ `dtf-quote-builder.js:2756,2876-2899` — print path reads `.row-price`/`.cell-price` DOM instead of `calculateFromState()`.
+- ☑ `dtf-quote-builder.js:1709,2799-2804` — separate-LTM-mode PDF doesn't foot (line items LTM-stripped, grand total LTM-inclusive; total correct). Derive PDF unit prices from `calculateFromState()`. (MEMORY known-deferred P3.) **DONE 2026-06-11**: print path single-sourced from `calculateFromState()` (LTM-inclusive prices, `ltmDistributed: true`).
+- ☑ `dtf-quote-builder.js:2756,2876-2899` — print path reads `.row-price`/`.cell-price` DOM instead of `calculateFromState()`. **DONE 2026-06-11**: print/save fully state-sourced; child-row qtys too (`DTFQuoteBuilder.childRows` state model, locked by `dtf-childrow-state.test.js`).
 - ☐ `dtg-pricing-service.js:106-127` (+ `dtf-pricing-service.js:23`) — `getManualCostOverride()` not host-gated (EMB/cap gate on localhost/herokuapp). Add `isInternal` gate.
 - ☐ `embroidery-quote-builder.js:12582-12584` — 3D-puff read with key `['3d-puff']` but method returns `{puff,patch}` → always 0 → PDF omits puff line (charge still in total). Use `.puff`.
 - ☐ `embroidery-quote-invoice.js:1551-1554` — PDF label "WA Sales Tax (X%)" hardcoded even for OOS (amount correct). Mirror email path "Sales Tax/Out of State" (`embroidery-quote-service.js:980`).

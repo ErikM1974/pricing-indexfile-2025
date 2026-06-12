@@ -132,6 +132,7 @@
 | `pricing-pages.js` | Shared pricing page utilities |
 | `manual-mode-indicator.js` | Manual pricing mode UI indicator |
 | `laser-tumbler-simple.js` | Laser tumbler pricing logic |
+| `laser-tumbler-mockup.js` | Customer-facing logo mockup + instant quote on the laser tumbler page — reuses `jds-tumbler-template.js` engraving pipeline (page's 4 colors only), logo upload with customer-worded artwork warnings, drag/size canvas preview, PNG download, qty→price quote via `jds-api-service.js` formula pricing (no hardcoded prices). Hooked from `laser-tumbler-simple.js` (`onPageReady`/`onColorChanged`, optional-chained). |
 | `design-thumbnail-service.js` | Design thumbnail resolution service |
 | `sticker-pricing-service.js` | Sticker pricing fetcher (`/api/sticker-pricing`) — 50 SKUs (5 sizes × 10 qty tiers) with PartNumber. Used by order-form sticker method + sticker page. |
 | `sticker-pricing-page.js` | Sticker + Banner quote page logic — renders 5 sticker tables (`/api/sticker-pricing`) AND banner rate-card grid (`/api/banner-pricing`); drives AI chat (SSE to `/api/contract-sticker-ai/chat`, handles BOTH product lines); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights sticker rows OR banner rate cards based on `productType`; renders inline banner-quote card; saves to `quote_sessions` with STK prefix. |

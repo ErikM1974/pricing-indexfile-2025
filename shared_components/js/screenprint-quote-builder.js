@@ -3849,9 +3849,10 @@ function buildScreenprintPricingData(products) {
         const basePriceText = basePriceCell?.textContent || '$0.00';
         const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
 
-        // Base sizes (S, M, L, XL, XXL) - Note: L is internal, LG is display
-        // 2XL is NOT a base size - it goes in extendedSizes with its own upcharge
-        const baseSizes = ['S', 'M', 'L', 'LG', 'XL', 'XXL'];
+        // Base sizes (S, M, L, XL) - Note: L is internal, LG is display.
+        // XXL/2XL are NOT base — they live in child rows whose price cell carries
+        // any upcharge, so they price via the child-row loop below.
+        const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
         const baseSizeQtys = {};
         let baseQty = 0;
 
@@ -3864,7 +3865,18 @@ function buildScreenprintPricingData(products) {
             }
         });
 
-        if (baseQty > 0) {
+        // OSFA-only products (beanies, bags) store qty on the PARENT row — no child
+        // row exists, so the parent price cell is the right price source. The old
+        // childRowMap lookup found nothing and printed the OSFA line at $0.00.
+        const osfaQty = product.sizeBreakdown?.['OSFA'] || 0;
+        if (osfaQty > 0 && baseQty === 0) {
+            lineItems.push({
+                description: `OSFA(${osfaQty})`,
+                quantity: osfaQty,
+                unitPrice: baseUnitPrice,
+                total: osfaQty * baseUnitPrice
+            });
+        } else if (baseQty > 0) {
             // Build description like "S(2) M(3) LG(2)"
             const desc = Object.entries(baseSizeQtys)
                 .map(([size, qty]) => `${size}(${qty})`)
@@ -3878,25 +3890,29 @@ function buildScreenprintPricingData(products) {
             });
         }
 
-        // Extended sizes - read from child row price cells (includes 2XL which has upcharge)
-        const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA'];
-        extendedSizes.forEach(size => {
-            const qty = product.sizeBreakdown[size] || 0;
-            if (qty > 0) {
-                // Find child row's price cell
-                const childRowId = childRowMap[rowId]?.[size];
-                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                const childPriceText = childPriceCell?.textContent || '$0.00';
-                const unitPrice = parseFloat(childPriceText.replace('$', '').replace(',', '')) || 0;
+        // Extended / non-standard sizes — iterate ALL sizeBreakdown keys (NOT a
+        // hardcoded list) so tall (LT/XLT…), youth (YS/YM…), toddler, fitted-cap
+        // combos (S/M, L/XL), XS/XXS, 7XL+, pants (3032) and shorts (W30) are not
+        // dropped from the PDF while their $ stays in the grand total — the same
+        // under-footing the 2026-06-11 DTF audit caught (EMB got this fix 2026-06-04).
+        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+            if (!(qty > 0)) return;
+            if (baseSizes.includes(size)) return;             // already in the grouped base line
+            if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
+            // Read the child row's price cell (carries any size upcharge)
+            const childRowId = childRowMap[rowId]?.[size];
+            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+            const childPriceText = childPriceCell?.textContent || '';
+            let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+            if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row (remapped parent size) → parent price
 
-                lineItems.push({
-                    description: `${size}(${qty})`,
-                    quantity: qty,
-                    unitPrice: unitPrice,
-                    total: qty * unitPrice,
-                    hasUpcharge: true
-                });
-            }
+            lineItems.push({
+                description: `${size}(${qty})`,
+                quantity: qty,
+                unitPrice: unitPrice,
+                total: qty * unitPrice,
+                hasUpcharge: true
+            });
         });
 
         if (lineItems.length > 0) {

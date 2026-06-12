@@ -25,9 +25,19 @@ class DTFQuoteBuilder {
         this.pricingData = null;
         this.productIndex = 0;
 
+        // Extended-size child-row state — the SINGLE money source for
+        // calculateFromState()/getTotalQuantity()/save/print. DOM child rows are
+        // display-only. dtf-quote-page.js mirrors every DOM mutation here at the
+        // same chokepoints (createChildRow / onChildSizeChange / removeChildRow /
+        // parent-2XL sync). Keyed by numeric childRowId. (2026-06-11 P2 closure)
+        this.childRows = new Map(); // childRowId → { parentId, size, qty, baseCost, sizeUpcharges }
+
         // Edit mode state
         this.editingQuoteId = null;
         this.editingRevision = null;
+        // Duplicate mode (?duplicate=DTF-...): source quote id — keeps the loaded
+        // Notes meta (design link / artwork refs) flowing into the NEW quote's save
+        this._duplicatedFromQuoteId = null;
 
         // Unsaved changes tracking
         this.hasChanges = false;
@@ -109,16 +119,26 @@ class DTFQuoteBuilder {
     getCurrentQuoteData() {
         return {
             selectedLocations: this.selectedLocations,
-            products: this.products.map(p => ({
-                id: p.id,
-                style: p.style,
-                name: p.name,
-                color: p.color,
-                catalogColor: p.catalogColor,
-                baseCost: p.baseCost,
-                quantities: { ...p.quantities },
-                imageUrl: p.imageUrl
-            })),
+            products: this.products.map(p => {
+                // Merge extended-size child rows from JS state so the auto-saved
+                // draft carries them — restoreDraft() rebuilds them through
+                // addProductFromQuote → createChildRow. (2026-06-11 P2)
+                const quantities = { ...p.quantities };
+                this.getChildRowsForParent(p.id).forEach(child => {
+                    const size = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+                    if (child.qty > 0) quantities[size] = child.qty;
+                });
+                return {
+                    id: p.id,
+                    style: p.style,
+                    name: p.name,
+                    color: p.color,
+                    catalogColor: p.catalogColor,
+                    baseCost: p.baseCost,
+                    quantities,
+                    imageUrl: p.imageUrl
+                };
+            }),
             customerName: document.getElementById('customer-name')?.value || '',
             customerEmail: document.getElementById('customer-email')?.value || '',
             companyName: document.getElementById('company-name')?.value || '',
@@ -158,24 +178,30 @@ class DTFQuoteBuilder {
             this.updateSelectedLocations();
         }
 
-        // Restore products
+        // Restore products. [2026-06-11] the old code pushed raw product objects
+        // into this.products and called addProductRowFromData() — a function that
+        // has NEVER existed — so recovered drafts kept S-XL money in state with no
+        // visible rows and silently lost all extended-size pieces. Rebuild through
+        // the same path edit-reload uses (style load → color select → size events
+        // → child rows).
         if (draft.products && draft.products.length > 0) {
-            // Update productIndex to avoid ID collisions
-            if (draft.productIndex) {
-                this.productIndex = draft.productIndex;
-            }
-
-            // Restore each product
-            draft.products.forEach(product => {
-                this.products.push(product);
-                // Re-add the product row to the table
-                if (typeof addProductRowFromData === 'function') {
-                    addProductRowFromData(product);
+            (async () => {
+                for (const product of draft.products) {
+                    const sizeBreakdown = {};
+                    Object.entries(product.quantities || {}).forEach(([sz, q]) => {
+                        if (q > 0) sizeBreakdown[sz] = q;
+                    });
+                    if (Object.keys(sizeBreakdown).length === 0 && !product.styleNumber) continue;
+                    await this.addProductFromQuote({
+                        styleNumber: product.styleNumber,
+                        description: product.description,
+                        color: product.color,
+                        sizeBreakdown
+                    });
                 }
-            });
-
-            // Update pricing after all products are restored
-            this.updatePricing();
+                this.updatePricing();
+                if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
+            })();
         }
 
         // [2026-06-08] Repaint the order-summary band after a draft recovery — restoreDraft writes #customer-name /
@@ -209,7 +235,11 @@ class DTFQuoteBuilder {
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
-        if (editQuoteId) {
+        // Duplicate mode (?duplicate=DTF-...): load a copy as a NEW quote (EMB parity 2026-06-11)
+        const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
+        if (duplicateQuoteId) {
+            await this.duplicateQuote(duplicateQuoteId);
+        } else if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await this.loadQuoteForEditing(editQuoteId);
         } else {
@@ -379,12 +409,20 @@ class DTFQuoteBuilder {
         }
 
         // Populate order & shipping fields (2026.03 overhaul)
+        // [2026-06-11] shipToName lives in the Notes JSON (Quote_Sessions has no
+        // ShipToName column — the old session.ShipToName read was always undefined,
+        // so the recipient name was wiped on every Save Revision).
+        let notesMeta = {};
+        try { notesMeta = JSON.parse(session.Notes || '{}') || {}; } catch (e) { /* legacy free-text notes */ }
+        // Caspio returns datetimes ('2026-06-15T00:00:00') — <input type=date>
+        // rejects them, so saved dates loaded blank and were wiped on resave.
+        const toDateInput = (v) => (typeof v === 'string' && v.length >= 10) ? v.slice(0, 10) : (v || '');
         const orderFields = {
             'order-number': session.OrderNumber,
             'po-number': session.PurchaseOrderNumber,
-            'req-ship-date': session.ReqShipDate,
-            'drop-dead-date': session.DropDeadDate,
-            'ship-to-name': session.ShipToName,
+            'req-ship-date': toDateInput(session.ReqShipDate),
+            'drop-dead-date': toDateInput(session.DropDeadDate),
+            'ship-to-name': notesMeta.shipToName || '',
             'ship-address': session.ShipToAddress,
             'ship-city': session.ShipToCity,
             'ship-zip': session.ShipToZip,
@@ -593,14 +631,20 @@ class DTFQuoteBuilder {
         // Small delay to let colors load
         await new Promise(resolve => setTimeout(resolve, 150));
 
-        // Select the color
+        // Select the color. [2026-06-11] the parent-row picker renders
+        // .color-picker-option with data-color (CATALOG_COLOR) / data-display
+        // (COLOR_NAME) — the old query used .color-option + data-color-name /
+        // data-catalog-color, which match NOTHING here, so the saved color never
+        // restored, the size inputs stayed disabled, and quantities were dropped.
         const pickerDropdown = row.querySelector('.color-picker-dropdown');
         if (pickerDropdown) {
-            const colorOption = pickerDropdown.querySelector(
-                `[data-color-name="${product.color}"], [data-catalog-color="${product.color}"]`
-            ) || Array.from(pickerDropdown.querySelectorAll('.color-option')).find(opt =>
-                opt.textContent.includes(product.color)
-            );
+            const options = Array.from(pickerDropdown.querySelectorAll('.color-picker-option, .color-option'));
+            const colorOption = options.find(opt =>
+                opt.dataset.display === product.color ||
+                opt.dataset.color === product.color ||
+                opt.dataset.colorName === product.color ||
+                opt.dataset.catalogColor === product.color
+            ) || options.find(opt => opt.textContent.includes(product.color));
             if (colorOption && typeof selectColor === 'function') {
                 selectColor(parseInt(rowId), colorOption);
             }
@@ -612,16 +656,24 @@ class DTFQuoteBuilder {
         // Set size quantities
         for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
             if (qty > 0) {
-                const normalizedSize = size === 'XXL' ? '2XL' : size;
+                const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
 
                 if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
                     const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
                                      row.querySelector(`input[data-size="${size}"]`);
-                    if (sizeInput) {
+                    if (sizeInput && !sizeInput.disabled) {
                         sizeInput.value = qty;
                         sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    } else if (normalizedSize === '2XL' && typeof createChildRow === 'function') {
+                        // [2026-06-11] color-match failure used to leave the 2XL input
+                        // disabled (change event dead) — pieces silently dropped
+                        createChildRow(parseInt(rowId), '2XL', qty);
                     }
-                } else {
+                } else if (typeof createChildRow === 'function') {
+                    // [2026-06-11] extended sizes (3XL+, XS, talls): this branch was
+                    // EMPTY — edit-loading a quote silently dropped these pieces and
+                    // Save Revision then permanently deleted them.
+                    createChildRow(parseInt(rowId), normalizedSize, qty);
                 }
             }
         }
@@ -629,9 +681,10 @@ class DTFQuoteBuilder {
 
     /**
      * Load existing quote for editing
-     * Populates all form fields with quote data
+     * Populates all form fields with quote data.
+     * Returns true on success so duplicateQuote() can bail on a failed load.
      */
-    async loadQuoteForEditing(quoteId) {
+    async loadQuoteForEditing(quoteId, opts = {}) {
 
         // Show loading toast
         if (typeof showToast === 'function') {
@@ -650,16 +703,18 @@ class DTFQuoteBuilder {
             // Phase 11.3.5 (Erik 2026-05-24): one-way SW sync — bail if the
             // quote is already in ShopWorks. assertQuoteEditable() alerts +
             // redirects to read-only quote-view.
-            if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
-                return;
+            // EXCEPTION: duplicate mode never writes to the source quote, so locked/
+            // pushed quotes (the classic reorder case) are fine to duplicate from.
+            if (!opts.forDuplicate && typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+                return false;
             }
 
-            // Store edit mode state
+            // Store edit mode state (duplicate mode clears it right after — see duplicateQuote)
             this.editingQuoteId = quoteId;
             this.editingRevision = session.RevisionNumber || 1;
 
-            // Update page header to show edit mode
-            this.updateEditModeUI(quoteId, this.editingRevision);
+            // Update page header to show edit mode (duplicate mode sets its own banner)
+            if (!opts.forDuplicate) this.updateEditModeUI(quoteId, this.editingRevision);
 
             // Populate customer information
             this.populateCustomerInfo(session);
@@ -676,10 +731,40 @@ class DTFQuoteBuilder {
             // Recalculate pricing to update totals
             this.updatePricing();
 
+            // [2026-06-11] restore state that previously didn't round-trip —
+            // include-tax, LTM waive/display, design #, special notes. Without
+            // these a no-tax quote re-billed 10.1% on the next save, a waived
+            // LTM silently resurrected, and Save Revision wiped the design link.
+            let notesMeta = {};
+            try { notesMeta = JSON.parse(session.Notes || '{}') || {}; } catch (e) { /* legacy free-text notes */ }
+            this._loadedNotesMeta = notesMeta;
+            const designInput = document.getElementById('design-number');
+            if (designInput && notesMeta.designNumber) designInput.value = notesMeta.designNumber;
+            const notesInput = document.getElementById('dtf-notes');
+            if (notesInput && notesMeta.specialNotes) notesInput.value = notesMeta.specialNotes;
+            const includeTaxEl = document.getElementById('include-tax');
+            if (includeTaxEl) {
+                includeTaxEl.checked = (typeof notesMeta.includeTax === 'boolean')
+                    ? notesMeta.includeTax
+                    // legacy quotes: TaxAmount 0 with a non-zero rate ⇒ tax was off
+                    : !(Number(session.TaxAmount) === 0 && Number(session.TaxRate) > 0);
+            }
+            if (typeof setLtmControlState === 'function') {
+                const waived = session.LTM_Waived === true || session.LTM_Waived === 'true' || session.LTM_Waived === 'Yes';
+                setLtmControlState('dtf-ltm-panel', {
+                    enabled: !waived,
+                    displayMode: session.LTM_Display_Mode || 'builtin'
+                });
+            }
+            // Re-run pricing so the restored toggles flow into totals/tax
+            this.updatePricing();
+
             // Reveal Push-to-ShopWorks for this loaded (still-editable) quote so
             // the rep can push without re-saving. Already-pushed quotes never
             // reach here — assertQuoteEditable() sends them to read-only view.
-            if (typeof showDtfPushButton === 'function') {
+            // Duplicate mode: pushing the SOURCE id would re-order the original —
+            // the button stays hidden until the new quote is saved.
+            if (!opts.forDuplicate && typeof showDtfPushButton === 'function') {
                 showDtfPushButton(quoteId);
             }
 
@@ -688,9 +773,11 @@ class DTFQuoteBuilder {
             // freshly loaded quote has no unsaved work, so clear the dirty flag.
             this.markAsSaved();
 
-            if (typeof showToast === 'function') {
+            if (!opts.forDuplicate && typeof showToast === 'function') {
                 showToast(`Editing ${quoteId} (Rev ${this.editingRevision})`, 'success');
             }
+
+            return true;
 
         } catch (error) {
             console.error('[EditMode] Error loading quote:', error);
@@ -700,6 +787,40 @@ class DTFQuoteBuilder {
             // Clear edit mode
             this.editingQuoteId = null;
             this.editingRevision = null;
+            return false;
+        }
+    }
+
+    /**
+     * Duplicate an existing quote as a brand-new one (repeat orders — EMB parity 2026-06-11).
+     * Loads through the REAL edit path — so the engine reprices everything from the
+     * live API (last year's transfers correctly become today's price) — then clears
+     * all edit/push state so the next Save creates a NEW QuoteID. Works on
+     * pushed/locked quotes too (the classic reorder case): the source is never written.
+     */
+    async duplicateQuote(sourceQuoteId) {
+        const loaded = await this.loadQuoteForEditing(sourceQuoteId, { forDuplicate: true });
+        if (!loaded) return;   // load failed — error already shown
+
+        // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
+        this.editingQuoteId = null;
+        this.editingRevision = null;
+        this._duplicatedFromQuoteId = sourceQuoteId;   // saveAndGetLink: carry design link/artwork meta forward
+
+        // Order-specific fields must not carry over — order #/PO/dates belong to the ORIGINAL order
+        ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // Duplicate banner (updateEditModeUI was suppressed in duplicate mode)
+        const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
+        if (headerSubtitle) {
+            headerSubtitle.innerHTML = `<span style="color: #34d399;">📋 Duplicated from ${escapeHtml(String(sourceQuoteId))} — saving creates a NEW quote at today's prices</span>`;
+        }
+        this.markAsUnsaved();
+        if (typeof showToast === 'function') {
+            showToast(`Duplicated ${sourceQuoteId} — prices refreshed to today's rates. Saving will create a new quote #.`, 'success', 7000);
         }
     }
 
@@ -1355,22 +1476,26 @@ class DTFQuoteBuilder {
         // Build quantities using fallback function that checks BOTH child rows AND parent inputs
         const quantities = {};
         extendedSizes.forEach(size => {
-            // Handle 3XL/XXXL mapping - API returns '3XL', internal may use 'XXXL'
-            const lookupSize = size === '3XL' ? 'XXXL' : size;
-            quantities[size] = window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, lookupSize) : 0;
+            // [2026-06-11] use the API size directly — the old 3XL→'XXXL' alias made
+            // the prefill look up a key the map never... actually the REVERSE: rows
+            // were stored under 'XXXL' but getExtendedSizeQty normalized to '3XL'
+            // before its lookup, so an existing 3XL row prefilled as BLANK and the
+            // next Apply silently deleted it (qty 0 + existing row ⇒ remove).
+            quantities[size] = window.getExtendedSizeQty ? window.getExtendedSizeQty(productId, size) : 0;
         });
 
         // Render the size inputs
         body.innerHTML = `
             <div class="extended-sizes-grid">
                 ${extendedSizes.map(size => {
-                    // Use consistent display (3XL) but store internal key (XXXL for backwards compat)
-                    const internalSize = size === '3XL' ? 'XXXL' : size;
+                    // [2026-06-11] data-size = the API size ('3XL'), no 'XXXL' alias.
+                    // The alias made childRowMap keys, part-number suffixes (_XXXL
+                    // instead of _3XL), and the prefill lookup all disagree.
                     const currentQty = quantities[size] || '';
                     return `
                         <div class="ext-size-input-group">
                             <label>${size}</label>
-                            <input type="number" class="ext-size-input" data-size="${internalSize}"
+                            <input type="number" class="ext-size-input" data-size="${size}"
                                    min="0" value="${currentQty}"
                                    placeholder="0">
                         </div>
@@ -1415,11 +1540,19 @@ class DTFQuoteBuilder {
 
         // Process each extended size input from popup
         inputs.forEach(input => {
-            const size = input.dataset.size;
+            const rawSize = input.dataset.size;
             const qty = parseInt(input.value) || 0;
 
-            // Access global childRowMap (defined in HTML)
-            const existingChildRowId = window.childRowMap?.[productId]?.[size];
+            // Access global childRowMap. Legacy alias guard (2026-06-11): rows
+            // created before the XXXL→3XL key fix (restored drafts, open tabs)
+            // may still be keyed 'XXXL'/'XXL' — resolve to whichever key the map
+            // actually holds so update/remove hit the existing row instead of
+            // creating a duplicate.
+            const mapForProduct = window.childRowMap?.[productId] || {};
+            const aliasKey = rawSize === '3XL' ? 'XXXL' : (rawSize === '2XL' ? 'XXL' : null);
+            const size = (mapForProduct[rawSize] == null && aliasKey && mapForProduct[aliasKey] != null)
+                ? aliasKey : rawSize;
+            const existingChildRowId = mapForProduct[size];
 
             if (qty > 0 && !existingChildRowId) {
                 // CREATE NEW CHILD ROW using global function
@@ -1427,7 +1560,9 @@ class DTFQuoteBuilder {
                     createChildRow(productId, size, qty);
                 }
             } else if (qty > 0 && existingChildRowId) {
-                // UPDATE EXISTING CHILD ROW
+                // UPDATE EXISTING CHILD ROW — JS state first (money source),
+                // then the display row (2026-06-11 P2 closure)
+                this.setChildRowQty(existingChildRowId, qty);
                 const childRow = document.getElementById(`row-${existingChildRowId}`);
                 if (childRow) {
                     const qtyInput = childRow.querySelector('.extended-size-qty');
@@ -1623,6 +1758,9 @@ class DTFQuoteBuilder {
         // Get original LTM fee from API (not ltmPerUnit * qty which causes precision loss: $4.16 × 12 = $49.92)
         const tierData = this.pricingCalculator.getTierData(pricingQty);
         const totalLtmFee = tierData.ltmFee || 0;
+        // [2026-06-11] keep the static "$50 LTM" banner in sync with the API fee
+        const ltmBannerAmt = document.getElementById('ltm-fee-banner-amount');
+        if (ltmBannerAmt && totalLtmFee > 0) ltmBannerAmt.textContent = totalLtmFee.toFixed(0);
         const marginDenom = this.pricingCalculator.getMarginDenominator(pricingQty);
 
         // LTM control panel — show/hide based on whether LTM applies
@@ -1759,21 +1897,19 @@ class DTFQuoteBuilder {
             grandTotal += productTotal;
         });
 
-        // Process child rows (extended sizes) - they have different unit prices with upcharges
-        const childRows = document.querySelectorAll('#product-tbody .child-row');
-        childRows.forEach(childRow => {
-            const extendedSize = childRow.dataset.extendedSize;
-            const baseCost = parseFloat(childRow.dataset.baseCost) || 0;
-            const sizeUpcharges = childRow.dataset.sizeUpcharges ? JSON.parse(childRow.dataset.sizeUpcharges) : {};
-            const qtyDisplay = childRow.querySelector('.cell-qty');
-            const qty = parseInt(qtyDisplay?.textContent) || 0;
+        // Process child rows (extended sizes) - they have different unit prices with upcharges.
+        // Money fields (qty/baseCost/upcharges/size) come from this.childRows JS
+        // state; the DOM row is located only to PAINT its price/total cells —
+        // display-only, mirroring the parent-row loop above. (2026-06-11 P2 closure)
+        this.childRows.forEach((child, childRowId) => {
+            const qty = child.qty || 0;
 
             if (qty > 0) {
                 // Get size upcharge for this extended size (XXL/2XL, 3XL/XXXL, 4XL, 5XL, 6XL)
-                const upcharge = this.getSizeUpcharge(extendedSize, sizeUpcharges);
+                const upcharge = this.getSizeUpcharge(child.size, child.sizeUpcharges);
 
                 // Calculate unit price with upcharge (add AFTER margin, not before)
-                const garmentCost = baseCost / marginDenom + upcharge;
+                const garmentCost = child.baseCost / marginDenom + upcharge;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + effectiveLtmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
@@ -1786,15 +1922,17 @@ class DTFQuoteBuilder {
                     displayPrice = this.pricingCalculator.applyRounding(priceWithoutLTM);
                 }
 
-                // Display unit price on child row (use querySelector for robustness)
-                const priceCell = childRow.querySelector('.cell-price');
-                if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                // Paint the display row (if present — pricing math doesn't need it)
+                const childRow = document.getElementById(`row-${childRowId}`);
+                if (childRow) {
+                    const priceCell = childRow.querySelector('.cell-price');
+                    if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
 
-                // Update child row total (qty × price)
-                const childTotalCell = childRow.querySelector('.cell-total');
-                if (childTotalCell) {
-                    const childTotal = displayPrice * qty;
-                    childTotalCell.textContent = qty > 0 ? `$${childTotal.toFixed(2)}` : '-';
+                    // Update child row total (qty × price)
+                    const childTotalCell = childRow.querySelector('.cell-total');
+                    if (childTotalCell) {
+                        childTotalCell.textContent = `$${(displayPrice * qty).toFixed(2)}`;
+                    }
                 }
 
                 // Always use roundedPrice for grand total (LTM baked in by pricing engine rounding)
@@ -1869,11 +2007,10 @@ class DTFQuoteBuilder {
                 .reduce((s, [, q]) => s + (q || 0), 0);
         }, 0);
 
-        // Add child row quantities (extended sizes)
-        const childRows = document.querySelectorAll('#product-tbody .child-row');
-        childRows.forEach(childRow => {
-            const qtyDisplay = childRow.querySelector('.cell-qty');
-            total += parseInt(qtyDisplay?.textContent) || 0;
+        // Add child row quantities (extended sizes) — from this.childRows JS
+        // state, never the DOM (2026-06-11 P2 closure)
+        this.childRows.forEach(child => {
+            total += child.qty || 0;
         });
 
         return total;
@@ -1948,18 +2085,14 @@ class DTFQuoteBuilder {
             subtotal += productTotal;
         });
 
-        // Child rows (extended sizes — same as updatePricing lines 1597-1638)
-        const childRows = document.querySelectorAll('#product-tbody .child-row');
-        childRows.forEach(childRow => {
-            const extendedSize = childRow.dataset.extendedSize;
-            const baseCost = parseFloat(childRow.dataset.baseCost) || 0;
-            const sizeUpcharges = childRow.dataset.sizeUpcharges ? JSON.parse(childRow.dataset.sizeUpcharges) : {};
-            const qtyDisplay = childRow.querySelector('.cell-qty');
-            const qty = parseInt(qtyDisplay?.textContent) || 0;
-
+        // Child rows (extended sizes) — from this.childRows JS state, NEVER the
+        // DOM (2026-06-11 P2 closure: this was the last DOM read in the money
+        // path). Keys stay `row-${id}` so save/print lookups are unchanged.
+        this.childRows.forEach((child, childRowId) => {
+            const qty = child.qty || 0;
             if (qty > 0) {
-                const upcharge = this.getSizeUpcharge(extendedSize, sizeUpcharges);
-                const garmentCost = baseCost / marginDenom + upcharge;
+                const upcharge = this.getSizeUpcharge(child.size, child.sizeUpcharges);
+                const garmentCost = child.baseCost / marginDenom + upcharge;
                 const unitPrice = garmentCost + transferCost + laborCost + freightCost + ltmPerUnit;
                 const roundedPrice = this.pricingCalculator.applyRounding(unitPrice);
 
@@ -1967,12 +2100,53 @@ class DTFQuoteBuilder {
                 const displayPrice = roundedPrice;
 
                 const childTotal = roundedPrice * qty;
-                childTotals.set(childRow.id || childRow.dataset.rowId, { total: childTotal, unitPrice: displayPrice });
+                childTotals.set(`row-${childRowId}`, { total: childTotal, unitPrice: displayPrice });
                 subtotal += childTotal;
             }
         });
 
         return { subtotal, productTotals, childTotals };
+    }
+
+    /**
+     * Compute the adjusted pre-tax subtotal, tax, and grand total from state +
+     * fee inputs, mirroring updateTaxCalculation() (dtf-quote-page.js) exactly:
+     * percent discount applies to products + art + design + rush; discount is
+     * clamped at $0; shipping is added AFTER the discount (not discountable,
+     * taxable in WA); tax is rounded to cents before summing.
+     * SINGLE SOURCE for saveAndGetLink() and buildPricingDataForInvoice() so the
+     * saved quote and the printed PDF always foot to the on-screen totals.
+     * (2026-06-11 — the PDF previously taxed the screen's pre-tax subtotal while
+     * footing line items from a divergent DOM/fallback path: $493.50 lines under
+     * a $1,018.98 grand total on a real customer quote.)
+     */
+    computeFeesAndTotals(stateCalc) {
+        const subtotal = stateCalc.subtotal;
+        const artCharge = document.getElementById('art-charge-toggle')?.checked
+            ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+        const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+        const graphicDesignCharge = designHours * getServicePrice('GRT-75', 75);
+        const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
+        const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
+        const discountType = document.getElementById('discount-type')?.value || 'fixed';
+        // Percent base = products + fees (same as updateTaxCalculation, NOT products-only)
+        const discountBase = subtotal + artCharge + graphicDesignCharge + rushFee;
+        const discount = discountType === 'percent' ? discountBase * (discountAmount / 100) : discountAmount;
+        const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
+        const preTaxSubtotal = Math.max(0, discountBase - discount) + shippingFee;
+        const includeTax = document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true;
+        // Shared parseRatePercent: 0 is a VALID rate; only NaN/empty falls back (2026-06-10 EMB fix, synced)
+        const taxRatePct = (typeof parseRatePercent === 'function')
+            ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1)
+            : (Number.isFinite(parseFloat(document.getElementById('tax-rate-input')?.value))
+                ? parseFloat(document.getElementById('tax-rate-input')?.value) : 10.1);
+        const taxAmount = includeTax ? Math.round(preTaxSubtotal * (taxRatePct / 100) * 100) / 100 : 0;
+        const grandTotal = preTaxSubtotal + taxAmount;
+        return {
+            subtotal, artCharge, designHours, graphicDesignCharge, rushFee,
+            discountAmount, discountType, discount, shippingFee,
+            preTaxSubtotal, includeTax, taxRatePct, taxAmount, grandTotal
+        };
     }
 
     showError(message) {
@@ -2031,7 +2205,10 @@ class DTFQuoteBuilder {
             '6XL': getValue('6XL', '6X') ?? defaults['6XL']
         };
 
-        const result = upchargeMap[normalizedSize] ?? 0;
+        // Sizes outside 2XL-6XL (XS, talls LT/XLT/2XLT…, youth): use the API
+        // upcharge directly when present — the old map returned 0 for ALL of
+        // them, so tall/XS child rows priced without their upcharge. (2026-06-11)
+        const result = upchargeMap[normalizedSize] ?? getValue(normalizedSize) ?? 0;
         return result;
     }
 
@@ -2052,6 +2229,14 @@ class DTFQuoteBuilder {
      * @param {HTMLElement} row - The row element
      */
     updatePricingFromRow(rowId, row) {
+        // [2026-06-11] child rows are priced via their parent + childRowMap —
+        // creating a this.products entry for them made phantom products (blank
+        // style/desc) that leaked into clipboard text and the email payload,
+        // and every money path had to know to filter them.
+        if (row && row.classList && row.classList.contains('child-row')) {
+            this.updatePricing();
+            return;
+        }
         // Find or create the product entry in this.products array
         let product = this.products.find(p => p.id === rowId);
 
@@ -2113,6 +2298,53 @@ class DTFQuoteBuilder {
             this.products.splice(index, 1);
             this.markAsUnsaved();
         }
+        // Child rows live in this.childRows, not this.products — both
+        // removeChildRow() and deleteRow() funnel through here with the
+        // child's rowId, so this is the single state-removal chokepoint.
+        if (this.childRows.delete(Number(rowId))) {
+            this.markAsUnsaved();
+        }
+    }
+
+    // ==================== CHILD ROW STATE (extended sizes) ====================
+    // DOM child rows are display-only; these three methods are the ONLY writers
+    // of this.childRows. dtf-quote-page.js calls them at the exact chokepoints
+    // that mutate the DOM (createChildRow / onChildSizeChange / parent-2XL sync);
+    // removal funnels through removeProduct(). (2026-06-11 P2 closure)
+
+    /**
+     * Register a newly created child row in JS state.
+     * @param {number} childRowId - row id from getNextRowId()
+     * @param {{parentId: number, size: string, qty: number, baseCost: number, sizeUpcharges: object}} data
+     */
+    registerChildRow(childRowId, data) {
+        this.childRows.set(Number(childRowId), {
+            parentId: Number(data.parentId),
+            size: data.size,
+            qty: parseInt(data.qty) || 0,
+            baseCost: parseFloat(data.baseCost) || 0,
+            sizeUpcharges: data.sizeUpcharges || {}
+        });
+    }
+
+    /**
+     * Update a child row's quantity in JS state.
+     */
+    setChildRowQty(childRowId, qty) {
+        const child = this.childRows.get(Number(childRowId));
+        if (child) child.qty = parseInt(qty) || 0;
+    }
+
+    /**
+     * All child rows belonging to a parent product, as [{id, ...entry}] in
+     * insertion order (matches the legacy childRowMap iteration order).
+     */
+    getChildRowsForParent(parentId) {
+        const result = [];
+        this.childRows.forEach((child, id) => {
+            if (child.parentId === Number(parentId)) result.push({ id, ...child });
+        });
+        return result;
     }
 
     /**
@@ -2168,19 +2400,14 @@ class DTFQuoteBuilder {
                 }
             });
 
-            // Add child row quantities
-            const childMap = window.childRowMap?.[p.id] || {};
-            Object.entries(childMap).forEach(([size, childRowId]) => {
-                const childRow = document.getElementById(`row-${childRowId}`);
-                if (childRow) {
-                    const qtyDisplay = childRow.querySelector('.cell-qty');
-                    const qty = parseInt(qtyDisplay?.textContent) || 0;
-                    if (qty > 0) {
-                        // Normalize display size (XXL->2XL, XXXL->3XL)
-                        const displaySize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
-                        allQuantities[displaySize] = qty;
-                        totalQty += qty;
-                    }
+            // Add child row quantities — from JS state, not the DOM (2026-06-11 P2)
+            this.getChildRowsForParent(p.id).forEach(child => {
+                const qty = child.qty || 0;
+                if (qty > 0) {
+                    // Normalize display size (XXL->2XL, XXXL->3XL)
+                    const displaySize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+                    allQuantities[displaySize] = qty;
+                    totalQty += qty;
                 }
             });
 
@@ -2203,7 +2430,7 @@ class DTFQuoteBuilder {
         const totalQty = this.getTotalQuantity();
         const tier = this.getTierForQuantity(totalQty);
         // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
 
         document.getElementById('summary-pricing').innerHTML = `
             <div class="summary-pricing-row">
@@ -2243,7 +2470,7 @@ class DTFQuoteBuilder {
 
         const totalQty = this.getTotalQuantity();
         // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
 
         // Build complete quote data with all pricing metadata
         const quoteData = {
@@ -2268,17 +2495,12 @@ class DTFQuoteBuilder {
                     allQuantities[size] = p.quantities[size] || 0;
                 });
 
-                // Add child row quantities (extended sizes)
-                const childMap = window.childRowMap?.[p.id] || {};
-                Object.entries(childMap).forEach(([size, childRowId]) => {
-                    const childRow = document.getElementById(`row-${childRowId}`);
-                    if (childRow) {
-                        const qtyDisplay = childRow.querySelector('.cell-qty');
-                        const qty = parseInt(qtyDisplay?.textContent) || 0;
-                        // Normalize size names (XXL->2XL, XXXL->3XL)
-                        const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
-                        allQuantities[normalizedSize] = qty;
-                    }
+                // Add child row quantities (extended sizes) — from JS state,
+                // not the DOM (2026-06-11 P2)
+                this.getChildRowsForParent(p.id).forEach(child => {
+                    // Normalize size names (XXL->2XL, XXXL->3XL)
+                    const normalizedSize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+                    allQuantities[normalizedSize] = child.qty || 0;
                 });
 
                 return {
@@ -2364,26 +2586,56 @@ class DTFQuoteBuilder {
             return;
         }
 
+        // Pricing-loaded guard: calculateFromState() returns all zeros when the
+        // pricing snapshot is missing (API failed / save raced edit-load). Saving
+        // would persist a $0 quote with a success modal — Erik's #1 rule: visible
+        // failure, never a silent wrong price. (2026-06-11)
+        if (!this.currentPricingData || !this.pricingCalculator) {
+            this.showError('Pricing data is not loaded — cannot save. Please refresh and try again.');
+            return;
+        }
+
         // Generate quote ID
         const quoteId = this.generateQuoteId();
         // Calculate from internal state (not DOM text) to avoid stale/drift issues
         const stateCalc = this.calculateFromState();
+        if (!(stateCalc.subtotal > 0)) {
+            this.showError('Quote totals computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before saving.');
+            return;
+        }
         const subtotal = stateCalc.subtotal;
         const ltmFee = this.currentPricingData?.totalLtmFee || 0;
-        // Grand total = subtotal + fees - discount + tax (read tax from DOM since it's user-toggled)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '')) || subtotal;
+        // Fees/tax/grand total from the SAME state math the screen uses — never
+        // scraped from DOM text (the old `parseFloat(...) || subtotal` silently
+        // saved a products-only total whenever the DOM read failed, and treated a
+        // legitimate $0.00 grand total as falsy). (2026-06-11)
+        const totals = this.computeFeesAndTotals(stateCalc);
+        const grandTotal = totals.grandTotal;
 
         // Build quote data
         // Phase 9 — include uploaded reference artwork file refs (if any)
         // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
         // from the rich-mode widget, so the proxy can emit Designs[{name, Locations[]}]
         // for new-artwork pushes (creates a fresh design record in ShopWorks).
-        const referenceArtwork = (window._dtfArtwork && typeof window._dtfArtwork.getFiles === 'function')
+        let referenceArtwork = (window._dtfArtwork && typeof window._dtfArtwork.getFiles === 'function')
             ? window._dtfArtwork.getFiles()
             : [];
-        const newDesignName = (window._dtfArtwork && typeof window._dtfArtwork.getDesignName === 'function')
+        let newDesignName = (window._dtfArtwork && typeof window._dtfArtwork.getDesignName === 'function')
             ? (window._dtfArtwork.getDesignName() || '').trim()
             : '';
+        // [2026-06-11] Save Revision: the artwork widget starts empty on edit-load
+        // (no restore API), so revisions silently wiped referenceArtwork/newDesignName
+        // from Notes and the push lost its design link. Carry the loaded values
+        // forward unless the rep uploaded replacements. Duplicate mode too: a reorder
+        // keeps the same design files, just under a new quote #.
+        if ((this.editingQuoteId || this._duplicatedFromQuoteId) && this._loadedNotesMeta) {
+            if ((!referenceArtwork || referenceArtwork.length === 0) && Array.isArray(this._loadedNotesMeta.referenceArtwork)) {
+                referenceArtwork = this._loadedNotesMeta.referenceArtwork;
+            }
+            if (!newDesignName && this._loadedNotesMeta.newDesignName) {
+                newDesignName = this._loadedNotesMeta.newDesignName;
+            }
+        }
 
         // Phase 11.1 — include design # if rep picked one from the combobox
         const designNumber = document.getElementById('design-number')?.value?.trim() || '';
@@ -2396,7 +2648,9 @@ class DTFQuoteBuilder {
             salesRep,
             // ShopWorks customer ID (#customer-number) — used as id_Customer on push
             customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
-            notes: '',
+            // [2026-06-11] was hardcoded '' — the rep's special instructions never
+            // persisted to Notes.specialNotes on the Save & Get Link path
+            notes: document.getElementById('dtf-notes')?.value?.trim() || '',
             referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
             newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
             designNumber,     // → quote-service writes to quote_sessions.Notes.designNumber
@@ -2408,7 +2662,6 @@ class DTFQuoteBuilder {
             })),
             products: this.products.map(p => {
                 const standardSizes = ['S', 'M', 'L', 'XL'];
-                const extendedSizes = ['2XL', '3XL', '4XL', '5XL', '6XL'];
                 const allQuantities = {};
                 const sizeGroups = [];
 
@@ -2427,16 +2680,12 @@ class DTFQuoteBuilder {
                     allQuantities[size] = p.quantities[size] || 0;
                 });
 
-                // Add child row quantities (extended sizes)
-                const childMap = window.childRowMap?.[p.id] || {};
-                Object.entries(childMap).forEach(([size, childRowId]) => {
-                    const childRow = document.getElementById(`row-${childRowId}`);
-                    if (childRow) {
-                        const qtyDisplay = childRow.querySelector('.cell-qty');
-                        const qty = parseInt(qtyDisplay?.textContent) || 0;
-                        const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
-                        allQuantities[normalizedSize] = qty;
-                    }
+                // Add child row quantities (extended sizes) — from JS state,
+                // not the DOM (2026-06-11 P2). One entry per actual child row.
+                const stateChildren = this.getChildRowsForParent(p.id);
+                stateChildren.forEach(child => {
+                    const normalizedSize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+                    allQuantities[normalizedSize] = child.qty || 0;
                 });
 
                 // Build sizeGroups with calculated unit prices from displayed table
@@ -2467,37 +2716,41 @@ class DTFQuoteBuilder {
                     });
                 }
 
-                // Extended sizes - each as separate group with their own unit price and color
-                extendedSizes.forEach(size => {
-                    const qty = allQuantities[size] || 0;
-                    if (qty > 0) {
-                        // Get unit price from child row's displayed "Unit $" cell
-                        // Try display size first, then internal size name (XXL=2XL, XXXL=3XL)
-                        const internalSize = size === '2XL' ? 'XXL' : (size === '3XL' ? 'XXXL' : size);
-                        const childRowId = childMap[size] || childMap[internalSize];
-                        const childRow = document.getElementById(`row-${childRowId}`);
+                // Extended sizes — one group per ACTUAL child row, from JS state
+                // (2026-06-11 P2: qty/price never read from the DOM). The old loop
+                // iterated a hardcoded ['2XL'..'6XL'] list, so any other popup
+                // size (XS, XXS, talls, youth, 7XL+) was charged in the totals
+                // but silently dropped from quote_items — quote-view didn't foot
+                // and the ShopWorks push under-billed those pieces. (2026-06-11)
+                stateChildren.forEach(child => {
+                    const qty = child.qty || 0;
+                    if (qty <= 0) return;
+                    // Normalize aliases the same way allQuantities does, so saved
+                    // SizeBreakdown keys match the push's SIZE_TO_SUFFIX lookups
+                    const size = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
 
-                        // Read color from CHILD row (may differ from parent if user changed it)
-                        const childColor = childRow?.dataset?.color || color;
-                        const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
-                        const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
+                    // Color may differ from parent if the rep changed it on the
+                    // child row — color is display metadata that lives on the DOM
+                    // row (state holds money fields only), parent fallback if gone
+                    const childRow = document.getElementById(`row-${child.id}`);
+                    const childColor = childRow?.dataset?.color || color;
+                    const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
+                    const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
 
-                        // Get unit price from calculated state (not DOM text)
-                        const childCalcKey = childRow?.id || childRow?.dataset?.rowId;
-                        const childCalcData = childCalcKey ? stateCalc.childTotals.get(childCalcKey) : null;
-                        const unitPrice = childCalcData?.unitPrice || 0;
+                    // Get unit price from calculated state (not DOM text)
+                    const childCalcData = stateCalc.childTotals.get(`row-${child.id}`);
+                    const unitPrice = childCalcData?.unitPrice || 0;
 
-                        sizeGroups.push({
-                            sizes: { [size]: qty },
-                            quantity: qty,
-                            unitPrice: unitPrice,
-                            total: qty * unitPrice,
-                            effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
-                            color: childColor,       // Use child row color (or parent fallback)
-                            catalogColor: childCatalogColor,
-                            imageUrl: childImageUrl
-                        });
-                    }
+                    sizeGroups.push({
+                        sizes: { [size]: qty },
+                        quantity: qty,
+                        unitPrice: unitPrice,
+                        total: qty * unitPrice,
+                        effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
+                        color: childColor,       // Use child row color (or parent fallback)
+                        catalogColor: childCatalogColor,
+                        imageUrl: childImageUrl
+                    });
                 });
 
                 return {
@@ -2520,7 +2773,9 @@ class DTFQuoteBuilder {
             grandTotal: grandTotal,
             // [2026-06-08] P0: pre-tax all-in (products + fees − discount + shipping) for the SAVE path — the
             // service stores SubtotalAmount=TotalAmount=this (mirror EMB) instead of double-taxing `total`.
-            preTaxSubtotal: parseFloat(document.getElementById('pre-tax-subtotal')?.textContent?.replace(/[$,]/g, '')) || subtotal,
+            // [2026-06-11] from computeFeesAndTotals (state math), not DOM text — the old
+            // `parseFloat(textContent) || subtotal` lost fees on any DOM hiccup and broke $0 quotes.
+            preTaxSubtotal: totals.preTaxSubtotal,
             includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
             isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
             pricingMetadata: this.currentPricingData ? {
@@ -2545,25 +2800,20 @@ class DTFQuoteBuilder {
             shipState: document.getElementById('ship-state')?.value || 'WA',
             shipZip: document.getElementById('ship-zip')?.value?.trim() || '',
             shipMethod: document.getElementById('ship-method')?.value || '',
-            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
+            // [2026-06-11] all fee/tax fields from computeFeesAndTotals — single source with the
+            // screen. The old inline discount IIFE used a products-only percent base while the
+            // screen discounts products+art+design+rush, so saved Discount disagreed with the
+            // tax base; taxRate's `|| '10.1'` also overwrote a legitimate cleared/0 rate.
+            taxRate: totals.taxRatePct,
             createdAt: new Date().toISOString(),
             builderVersion: '2026.03',
             // Additional charges (2026 fee refactor)
-            artCharge: document.getElementById('art-charge-toggle')?.checked
-                ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0,
-            graphicDesignHours: parseFloat(document.getElementById('graphic-design-hours')?.value || 0),
-            graphicDesignCharge: parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * getServicePrice('GRT-75', 75),
-            rushFee: parseFloat(document.getElementById('rush-fee')?.value || 0),
-            discount: (() => {
-                const amount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-                const type = document.getElementById('discount-type')?.value || 'fixed';
-                if (type === 'percent') {
-                    return (subtotal * amount / 100);
-                }
-                return amount;
-            })(),
-            discountPercent: document.getElementById('discount-type')?.value === 'percent'
-                ? parseFloat(document.getElementById('discount-amount')?.value || 0) : 0,
+            artCharge: totals.artCharge,
+            graphicDesignHours: totals.designHours,
+            graphicDesignCharge: totals.graphicDesignCharge,
+            rushFee: totals.rushFee,
+            discount: totals.discount,
+            discountPercent: totals.discountType === 'percent' ? totals.discountAmount : 0,
             discountReason: document.getElementById('discount-reason')?.value || '',
             // LTM display preferences (2026-03-22)
             ltmDisplayMode: getLtmControlState('dtf-ltm-panel').displayMode || 'builtin',
@@ -2601,6 +2851,10 @@ class DTFQuoteBuilder {
             }
 
             if (result.success) {
+
+                // [2026-06-11] remember the id so Email Quote works on a fresh
+                // save (editingQuoteId is only set by the ?edit= path)
+                this.lastSavedQuoteId = finalQuoteId;
 
                 // Clear draft after successful save
                 if (this.persistence) {
@@ -2683,7 +2937,10 @@ class DTFQuoteBuilder {
                 projectName: document.getElementById('project-name')?.value || '',
                 orderNumber: document.getElementById('order-number')?.value || '',
                 poNumber: document.getElementById('po-number')?.value || '',
-                reqShipDate: document.getElementById('req-ship-date')?.value || ''
+                reqShipDate: document.getElementById('req-ship-date')?.value || '',
+                // SPECIAL NOTES footer on the PDF (shared generator supports it;
+                // EMB passes it — DTF never did, so rep notes silently vanished)
+                notes: document.getElementById('dtf-notes')?.value?.trim() || ''
             };
 
             // Generate and open print window
@@ -2710,14 +2967,16 @@ class DTFQuoteBuilder {
      */
     buildPricingDataForInvoice() {
         const totalQty = this.getTotalQuantity();
-        // Use calculated state for reliable totals
+        // SINGLE SOURCE (2026-06-11): line items, subtotal, fees, tax base ALL come
+        // from calculateFromState() + computeFeesAndTotals() — the same math the
+        // save path uses. The old code computed line items from DOM-displayed
+        // prices + a broken per-product fallback (transferBreakdown[loc] never
+        // matched the {breakdown:[],total} shape, so the fallback silently dropped
+        // ALL transfer costs and LTM) while taxing the screen's pre-tax subtotal:
+        // a real customer PDF printed $15.50/unit lines footing to $493.50 under a
+        // $1,018.98 GRAND TOTAL (true unit price $39.50, true subtotal $925.50).
         const stateCalc = this.calculateFromState();
-        // PRE-TAX adjusted subtotal (products + art/graphic-design/rush − discount +
-        // shipping) — this is what the on-screen #grand-total-with-tax taxes. We used
-        // to read the tax-INCLUSIVE #grand-total-with-tax here and hand it to the
-        // generator as grandTotal, which then taxed it AGAIN → the printed PDF
-        // double-taxed the customer. Feed the generator the pre-tax base instead. (2026-06-01)
-        const preTaxSubtotalDom = parseFloat(document.getElementById('pre-tax-subtotal')?.textContent?.replace(/[$,]/g, ''));
+        const totals = this.computeFeesAndTotals(stateCalc);
         const quoteId = document.getElementById('quote-id')?.textContent || this.editingQuoteId || `DTF-${Date.now()}`;
 
         // Build products array with line items
@@ -2726,12 +2985,11 @@ class DTFQuoteBuilder {
         // Get pricing tier info
         const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
 
-        // Iterate through each product row
+        // Iterate through each product row. NO early qty-skip here: a product whose
+        // only pieces are extended sizes has all-zero standard quantities, and the
+        // old skip dropped it from the PDF entirely — the empty-lineItems guard at
+        // the bottom handles truly empty products. (2026-06-11)
         this.products.forEach(product => {
-            // Skip products with no quantities
-            const productQty = Object.values(product.quantities || {}).reduce((sum, q) => sum + (parseInt(q) || 0), 0);
-            if (productQty === 0) return;
-
             // Build line items - separate base sizes from extended sizes
             const lineItems = [];
 
@@ -2754,41 +3012,40 @@ class DTFQuoteBuilder {
                     .map(([size, qty]) => `${size}(${qty})`)
                     .join(' ');
 
-                // Calculate unit price for base sizes
-                const unitPrice = this.calculateUnitPrice(product, 'S'); // Base price
-
+                // Unit price + line total from state math (same source as save) —
+                // total uses standardTotal (per-size rounded sum), so lines always
+                // foot to stateCalc.subtotal even if per-size prices ever differ
+                const calcData = stateCalc.productTotals.get(product.id);
                 lineItems.push({
                     description: desc,
                     quantity: baseQty,
-                    unitPrice: unitPrice,
-                    total: baseQty * unitPrice
+                    unitPrice: calcData?.standardUnitPrice || 0,
+                    total: calcData?.standardTotal || 0
                 });
             }
 
-            // Extended sizes - query child rows from DOM using window.childRowMap
-            // Child rows are created by createChildRow() when user adds extended sizes
-            const childMap = window.childRowMap?.[product.id] || {};
+            // Extended sizes — from this.childRows JS state (2026-06-11 P2:
+            // the print path never reads the DOM). Qty from state; price/total
+            // from the same stateCalc the save path uses — in separate-LTM
+            // display mode the on-screen cell shows the LTM-stripped price
+            // while the tax base is LTM-inclusive (rows under-footed).
             const extendedItems = [];  // Collect extended items for sorting
-            Object.entries(childMap).forEach(([size, childRowId]) => {
-                const childRow = document.getElementById(`row-${childRowId}`);
-                if (childRow) {
-                    const qtyDisplay = childRow.querySelector('.cell-qty');
-                    const priceCell = childRow.querySelector('.cell-price');
-                    const qty = parseInt(qtyDisplay?.textContent) || 0;
-                    const unitPrice = parseFloat(priceCell?.textContent?.replace('$', '')) || 0;
+            this.getChildRowsForParent(product.id).forEach(child => {
+                const qty = child.qty || 0;
+                if (qty > 0) {
+                    const childCalcData = stateCalc.childTotals.get(`row-${child.id}`);
+                    const unitPrice = childCalcData?.unitPrice || 0;
 
-                    if (qty > 0) {
-                        // Normalize size display (XXL→2XL, XXXL→3XL for consistency)
-                        const displaySize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
-                        extendedItems.push({
-                            description: `${displaySize}(${qty})`,
-                            quantity: qty,
-                            unitPrice: unitPrice,
-                            total: qty * unitPrice,
-                            hasUpcharge: true,
-                            _sortKey: size  // Keep original size for sorting
-                        });
-                    }
+                    // Normalize size display (XXL→2XL, XXXL→3XL for consistency)
+                    const displaySize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+                    extendedItems.push({
+                        description: `${displaySize}(${qty})`,
+                        quantity: qty,
+                        unitPrice: unitPrice,
+                        total: childCalcData?.total ?? (qty * unitPrice),
+                        hasUpcharge: true,
+                        _sortKey: child.size  // Keep original size for sorting
+                    });
                 }
             });
 
@@ -2817,51 +3074,27 @@ class DTFQuoteBuilder {
             }
         });
 
-        // Calculate subtotal from line items
-        let subtotal = 0;
-        products.forEach(p => {
-            p.lineItems.forEach(item => {
-                subtotal += item.total;
-            });
-        });
-
-        // Get art charge if enabled
-        const artChargeToggle = document.getElementById('art-charge-toggle');
-        const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-
-        // Get graphic design fee
-        const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-        const graphicDesignCharge = designHours * getServicePrice('GRT-75', 75);
-
-        // Get rush fee
-        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-
-        // Get discount
-        const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-        const discountType = document.getElementById('discount-type')?.value || 'fixed';
+        // Subtotal/fees/discount/tax all from the shared state math (computed above).
+        // Line items were built from the SAME stateCalc, so the printed product rows
+        // foot exactly to totals.subtotal and the fee rows foot to preTaxSubtotal.
         const discountReason = document.getElementById('discount-reason')?.value || '';
-        let discount = 0;
-        if (discountType === 'percent') {
-            discount = subtotal * (discountAmount / 100);
-        } else {
-            discount = discountAmount;
-        }
-
-        const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
 
         return window.QuotePricingData.buildPricingData({
             method: 'DTF',
             quoteId: quoteId,
             tier: tier,
             products: products,
-            subtotal: subtotal,
-            grandTotal: subtotal,
+            subtotal: totals.subtotal,
+            grandTotal: totals.subtotal,
             // Authoritative pre-tax adjusted subtotal drives the PDF tax + GRAND TOTAL
             // so the printed total matches the on-screen #grand-total-with-tax.
-            preTaxSubtotal: !isNaN(preTaxSubtotalDom) ? preTaxSubtotalDom
-                : (subtotal + artCharge + graphicDesignCharge + rushFee + shippingFee - discount),
-            includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
-            taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
+            preTaxSubtotal: totals.preTaxSubtotal,
+            includeTax: totals.includeTax,
+            // Numeric percent via shared parseRatePercent — the old `value || '10.1'`
+            // silently printed 10.1% for a cleared field, and the generator treats
+            // values ≤1 as decimals (typing '1' printed 100% tax). String of a
+            // finite percent keeps the generator's >1 branch deterministic.
+            taxRate: String(totals.taxRatePct),
             setupFees: 0,
             additionalServicesTotal: 0,
             // Empty logos means embroidery specs section will be skipped
@@ -2874,95 +3107,33 @@ class DTFQuoteBuilder {
                 size: this.locationConfig[loc]?.size || ''
             })),
             ltmFee: this.currentPricingData?.totalLtmFee || 0,
-            ltmDistributed: (this.currentPricingData?.ltmDisplayMode || 'builtin') === 'builtin',
+            // ALWAYS true for DTF: the pricing engine bakes LTM into every unit
+            // price (both display modes), so a separate $50 fee row would double-
+            // display it and the PDF rows would over-foot by the LTM. The screen's
+            // "separate" mode row is informational-only ("included"). (2026-06-11)
+            ltmDistributed: true,
             totalQuantity: totalQty,
             // Artwork services
-            artCharge: artCharge,
-            graphicDesignCharge: graphicDesignCharge,
-            graphicDesignHours: designHours,
+            artCharge: totals.artCharge,
+            graphicDesignCharge: totals.graphicDesignCharge,
+            graphicDesignHours: totals.designHours,
             // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
-            shippingFee: shippingFee,
+            shippingFee: totals.shippingFee,
             // Rush and discount
-            rushFee: rushFee,
-            discount: discount,
-            discountType: discountType,
+            rushFee: totals.rushFee,
+            discount: totals.discount,
+            discountType: totals.discountType,
             discountReason: discountReason
         });
     }
 
-    /**
-     * Calculate unit price for a product at a given size
-     * Includes LTM distribution if enabled
-     */
-    calculateUnitPrice(product, size) {
-        // First try: Read displayed price from parent row DOM
-        const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
-        if (row) {
-            // Read from DOM: .row-price and .row-qty spans (see HTML template ~line 967-968)
-            const priceSpan = row.querySelector('.row-price');
-            const qtySpan = row.querySelector('.row-qty');
-            if (priceSpan && qtySpan) {
-                // The price cell shows UNIT price (not total), so no need to divide by qty
-                const displayedUnitPrice = parseFloat(priceSpan.textContent.replace('$', '')) || 0;
-                const qty = parseInt(qtySpan.textContent) || 0;
-                if (qty > 0 && displayedUnitPrice > 0) {
-                    // For base sizes (S, M, L, XL), return the displayed unit price directly
-                    // For extended sizes, the child row already has its own price with upcharge applied
-                    const standardSizes = ['S', 'M', 'L', 'XL'];
-                    if (standardSizes.includes(size)) {
-                        return displayedUnitPrice;
-                    }
-                    // For extended sizes called on parent row (shouldn't happen normally)
-                    // add the upcharge to base price
-                    const upcharge = this.getSizeUpcharge(size, product.sizeUpcharges || {});
-                    return Math.round((displayedUnitPrice + upcharge) * 100) / 100;
-                }
-            }
-        }
-
-        // Fallback: Calculate using CORRECT formula (matches updatePricing)
-        if (this.currentPricingData) {
-            const baseCost = parseFloat(product.baseCost) || 0;
-            const upcharge = product.sizeUpcharges?.[size] || 0;
-            const transferCost = this.getTransferCostForProduct(product);
-            const laborCostPerLoc = this.currentPricingData.laborCostPerLoc || 0;
-            const freightPerTransfer = this.currentPricingData.freightPerTransfer || 0;
-            const marginDenom = this.currentPricingData.marginDenom || 0.6;
-            const locationCount = this.selectedLocations.length || 1;
-
-            // Labor and freight are per-location (matches updatePricing)
-            const laborCost = laborCostPerLoc * locationCount;
-            const freightCost = freightPerTransfer * locationCount;
-
-            // Upcharge is a selling price add-on, add AFTER margin calculation
-            const garmentCost = baseCost / marginDenom + upcharge;
-            const unitPrice = garmentCost + transferCost + laborCost + freightCost;
-            // Note: LTM is always shown as separate line item, not added to unit price
-
-            // Apply rounding
-            return this.pricingCalculator?.applyRounding(unitPrice) || Math.ceil(unitPrice * 2) / 2;
-        }
-
-        return 0;
-    }
-
-    /**
-     * Get transfer cost for a product based on selected locations
-     */
-    getTransferCostForProduct(product) {
-        if (!this.currentPricingData?.transferBreakdown) return 0;
-
-        let totalTransferCost = 0;
-        // selectedLocations contains strings like "left-chest", not objects
-        this.selectedLocations.forEach(loc => {
-            const locBreakdown = this.currentPricingData.transferBreakdown[loc];
-            if (locBreakdown) {
-                totalTransferCost += locBreakdown.cost || 0;
-            }
-        });
-
-        return totalTransferCost;
-    }
+    // calculateUnitPrice() and getTransferCostForProduct() REMOVED 2026-06-11.
+    // They were the print path's per-product price source: a DOM read with a
+    // provably broken fallback (transferBreakdown[loc] never matched the
+    // {breakdown: [...], total} shape and read .cost where the field is
+    // .unitCost, so fallback prices silently dropped ALL transfer costs and
+    // LTM — a real customer PDF printed $15.50 for a $39.50 unit). The PDF now
+    // sources every number from calculateFromState()/computeFeesAndTotals().
 
     async emailQuote() {
         const customerName = document.getElementById('customer-name').value.trim();
@@ -2980,7 +3151,7 @@ class DTFQuoteBuilder {
 
         const totalQty = this.getTotalQuantity();
         // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
 
         // Build email data
         const emailData = {
@@ -3119,7 +3290,7 @@ class DTFQuoteBuilder {
     generateQuoteText() {
         const totalQty = this.getTotalQuantity();
         // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace('$', '') || '0');
+        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
         const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
 
         let text = '';
@@ -3332,10 +3503,12 @@ class DTFQuoteBuilder {
 
         // Reset state
         this.products = [];
+        this.childRows.clear();  // extended-size state — paired with window.childRowMap = {} below (2026-06-11 P2)
         this.productIndex = 0;
         this.selectedLocations = [];
         this.editingQuoteId = null;
         this.editingRevision = null;
+        this._duplicatedFromQuoteId = null;
 
         // Reset location radios to None
         document.querySelectorAll('input[name="front-location"]').forEach(r => {
@@ -3407,6 +3580,30 @@ class DTFQuoteBuilder {
         const discTypeSel = document.getElementById('discount-type');
         if (discTypeSel) discTypeSel.value = 'fixed';
 
+        // [2026-06-11] New Quote cleanup that was missing: stale childRowMap entries
+        // collided with the next quote's row IDs (phantom extended-size line items),
+        // #dtf-notes bled into the next quote's saved Notes, and the Push button +
+        // editing banner stayed bound to the previous quote.
+        window.childRowMap = {};
+        this._loadedNotesMeta = null;
+        const dtfNotesEl = document.getElementById('dtf-notes');
+        if (dtfNotesEl) dtfNotesEl.value = '';
+        const pushBtnReset = document.getElementById('dtf-push-shopworks-btn');
+        if (pushBtnReset) pushBtnReset.style.display = 'none';
+        if (typeof _dtfPushQuoteId !== 'undefined') _dtfPushQuoteId = null;
+        // Hide + zero the sidebar TOTAL bar (re-shown on first recalc — EMB parity)
+        const _stb = document.getElementById('sidebar-total-bar');
+        if (_stb) _stb.hidden = true;
+        const _stg = document.getElementById('sidebar-grand-total');
+        if (_stg) _stg.textContent = '$0.00';
+        const headerSubtitleReset = document.querySelector('.power-header .power-header-subtitle');
+        if (headerSubtitleReset) headerSubtitleReset.textContent = 'Direct-to-Film Transfers';
+        const saveBtnReset = document.querySelector('.btn-save-quote');
+        if (saveBtnReset) saveBtnReset.innerHTML = '<i class="fas fa-link"></i> Save & Get Shareable Link';
+        if (window.location.search.includes('edit=') || window.location.search.includes('duplicate=')) {
+            try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+        }
+
         // Clear draft storage
         if (this.persistence) {
             this.persistence.clearDraft();
@@ -3415,9 +3612,11 @@ class DTFQuoteBuilder {
         // Mark as saved (no unsaved changes)
         this.markAsSaved();
 
-        // Update sidebar
+        // Update sidebar. [2026-06-11] updateSidebar() is defined NOWHERE — the
+        // call threw on every New Quote, aborting the reset midway (everything
+        // after this line, including the 2026-06-08 include-tax re-check, never
+        // ran — the source of several state-bleed bugs).
         this.updateSearchState();
-        this.updateSidebar();
 
         // Focus search bar for immediate typing
         const searchInput = document.getElementById('product-search');
@@ -3427,6 +3626,9 @@ class DTFQuoteBuilder {
 
         window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags, uncheck box, RE-CHECK include-tax on New Quote (else next quote bills $0 tax)
         { const _r = document.getElementById('ship-residential'); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
+        // [2026-06-11] repaint totals — the zero-qty branch blanks subtotal/grand
+        // (they previously kept the old quote's numbers until the next interaction)
+        this.updatePricing();
         this.showToast('Started new quote', 'success');
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] clear the order-summary band on New Quote (reset doesn't recalc)
     }
@@ -3485,7 +3687,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // not a hardcoded 75 (Erik's Pricing=API rule). Fire-and-forget — getServicePrice()
     // returns the documented fallback until it resolves, then we re-price. (2026-06-09)
     if (typeof loadServiceCodePrices === 'function') {
-        loadServiceCodePrices().then(() => { try { dtfQuoteBuilder.updatePricing(); } catch (_) {} });
+        loadServiceCodePrices().then(() => {
+            try { dtfQuoteBuilder.updatePricing(); } catch (_) {}
+            // [2026-06-11] sync the static "$75/hr" labels with the live GRT-75
+            // rate — the math was already API-driven, but a Caspio rate change
+            // left the on-screen labels contradicting the charged totals
+            try {
+                const rate = getServicePrice('GRT-75', 75);
+                const rateLabel = document.getElementById('design-rate-label');
+                if (rateLabel) rateLabel.textContent = String(rate);
+                const rateLabelSidebar = document.getElementById('design-rate-label-sidebar');
+                if (rateLabelSidebar) rateLabelSidebar.textContent = String(rate);
+            } catch (_) {}
+        });
     }
 
     // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.

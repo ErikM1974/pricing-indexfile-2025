@@ -11,11 +11,14 @@ class ProductSearchService {
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         this.requestCache = new Map(); // Prevent duplicate concurrent requests
 
-        // Display-price margin comes from Caspio (Pricing_Tiers via /api/pricing-bundle?method=BLANK).
-        // No hardcoded fallback — if the margin can't load, products show "QUOTE" instead of a wrong price.
+        // Display-price inputs come from Caspio — margin from Pricing_Tiers (via
+        // /api/pricing-bundle?method=BLANK), embroidery-estimate adder from Service_Codes
+        // CATALOG-EMB-EST (via /api/service-codes). No hardcoded fallback — if either
+        // can't load, products show "QUOTE" instead of a wrong price.
         this.MARGIN = null;
         this._marginPromise = null;
-        this.FIXED_ADDITION = 15.00; // estimated basic-embroidery adder for display prices
+        this.EMB_ADDER = null;
+        this._adderPromise = null;
 
         // Smart search - Brand name detection dictionary
         this.BRAND_KEYWORDS = {
@@ -215,11 +218,40 @@ class ProductSearchService {
     }
 
     /**
+     * Load the basic-embroidery estimate adder from Caspio Service_Codes (CATALOG-EMB-EST).
+     * Resolves to a number or null — never throws; a null adder renders "QUOTE".
+     */
+    async ensureEmbAdder() {
+        if (this.EMB_ADDER != null) return this.EMB_ADDER;
+        if (!this._adderPromise) {
+            this._adderPromise = (async () => {
+                try {
+                    const response = await fetch(`${this.baseURL}/service-codes?code=CATALOG-EMB-EST`);
+                    if (!response.ok) throw new Error(`service-codes ${response.status}`);
+                    const json = await response.json();
+                    const row = json?.data?.[0];
+                    const adder = parseFloat(row?.SellPrice);
+                    if (!row || row.IsActive === false || !Number.isFinite(adder) || adder < 0) {
+                        throw new Error('missing/inactive CATALOG-EMB-EST');
+                    }
+                    this.EMB_ADDER = adder;
+                    return adder;
+                } catch (error) {
+                    console.warn('[ProductSearch] Embroidery-estimate adder unavailable — prices will show QUOTE:', error.message);
+                    this._adderPromise = null; // allow retry on next search
+                    return null;
+                }
+            })();
+        }
+        return this._adderPromise;
+    }
+
+    /**
      * Perform the actual API search
      */
     async performSearch(params) {
         try {
-            await this.ensureMargin();
+            await Promise.all([this.ensureMargin(), this.ensureEmbAdder()]);
             // Default parameters - increased to 48 for better initial display
             // Omit status to let backend default to 'Active' (hides Discontinued)
             const defaultParams = {
@@ -265,13 +297,13 @@ class ProductSearchService {
             // Calculate display price using the formula
             let displayPrice = null;
             
-            if (product.pricing && this.MARGIN) {
+            if (product.pricing && this.MARGIN && this.EMB_ADDER != null) {
                 // Use the current price if available
                 const basePrice = product.pricing.current || product.pricing.minPrice;
 
                 if (basePrice && basePrice > 0) {
-                    // (blank cost / Caspio margin denominator) + embroidery-estimate adder
-                    displayPrice = (basePrice / this.MARGIN) + this.FIXED_ADDITION;
+                    // (blank cost / Caspio margin denominator) + Caspio embroidery-estimate adder
+                    displayPrice = (basePrice / this.MARGIN) + this.EMB_ADDER;
                 }
             }
             

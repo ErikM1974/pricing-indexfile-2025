@@ -178,6 +178,10 @@
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
 | `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
+| `/tests/unit/dtf-save-parity.test.js` | **NEW (2026-06-11)** DTF audit lock: every sizeGroup → quote_items row (XS incl.), ColorCode=CATALOG_COLOR chain, Notes JSON round-trips shipToName/includeTax/pricingMetadata | jest, dtf-quote-service.js | ✅ Active |
+| `/tests/unit/dtf-childrow-state.test.js` | **NEW (2026-06-11)** P2 closure lock: DTFQuoteBuilder.childRows JS-state model — calculateFromState/getTotalQuantity price extended-size child rows with ZERO DOM (document stub throws on any query) | jest, dtf-quote-builder.js | ✅ Active |
+| `/tests/unit/scp-save-parity.test.js` | **NEW (2026-06-11)** Rule-8 sweep lock: SCP save persists FULL sizeBreakdown (XS/LT/7XL) + foots to SubtotalAmount; print path (buildScreenprintPricingData) emits a PDF line for EVERY popup size, XXL child-row price, OSFA-only parent price | jest, screenprint-quote-service.js, screenprint-quote-builder.js | ✅ Active |
+| `/tests/unit/emb-save-parity.test.js` | **NEW (2026-06-11)** Rule-8 sweep lock: every EMB engine lineItem (XS + tall LT groups incl.) → quote_items row, foots to SubtotalAmount, ColorCode=CATALOG_COLOR | jest, embroidery-quote-service.js | ✅ Active |
 | `/tests/unit/3dt-pricing.test.js` | Behavioral spec: 7-step formula, sub-24 cost fallback, LTM, tax base | jest | ✅ Active |
 | `/tests/unit/3dt-shipdate.test.js` | Behavioral spec: cutoff/weekend/holiday/PST-PDT matrix | jest | ✅ Active |
 | `/tests/3dt-test-push-payload.json` | Reference webhook-equivalent payload for ManageOrders TEST pushes | — | ✅ Active |
@@ -478,7 +482,7 @@
 ### Laser Tumbler & Sticker Calculators
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/laser-tumbler-polarcamel.html` | Laser tumbler (Polar Camel) pricing calculator | laser-tumbler-calculator.js | ✅ Active |
+| `/calculators/laser-tumbler-polarcamel.html` | Laser tumbler (Polar Camel) customer product page — color picker, formula-priced tier table, logo mockup + instant quote section | laser-tumbler-simple.js, laser-tumbler-mockup.js, jds-tumbler-template.js, jds-api-service.js, manageorders-inventory-service.js | ✅ Active |
 | `/calculators/laser-tumbler-calculator.js` | Laser tumbler calculator logic | — | ✅ Active |
 | `/calculators/laser-tumbler-styles.css` | Laser tumbler page styles | — | ✅ Active |
 | `/calculators/laser-tumbler-quote-service.js` | Laser tumbler quote save service | base-quote-service.js | ✅ Active |
@@ -781,6 +785,7 @@
 | `/shared_components/js/design-thumbnail-service.js` | Fetch design thumbnails from `Shopworks_Thumbnail_Report` (cached) | /api/thumbnails | ✅ Active |
 | `/shared_components/js/jds-api-service.js` | JDS Industries API service (laser tumblers, 1hr cache) | /api/jds | ✅ Active |
 | `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
+| `/shared_components/js/laser-tumbler-mockup.js` | Customer logo mockup + instant quote on the laser tumbler page — page's 4 colors only, logo upload w/ artwork warnings, drag/size canvas preview, PNG download, qty→price via formula pricing | jds-tumbler-template.js, jds-api-service.js, laser-tumbler-simple.js, /api/jds-catalog | ✅ Active |
 | `/shared_components/js/dp5-helper.js` | Embroidery pricing UI helper — bridges hidden Caspio matrix to custom UI | Caspio datapage | ✅ Active |
 
 ### Staff Auth & Misc Dashboards

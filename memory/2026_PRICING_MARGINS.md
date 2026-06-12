@@ -272,7 +272,19 @@ DTF pricing is fully API-driven. The Caspio update is automatically reflected.
 
 JDS laser tumbler engraving labor was increased from $2.85 to $3.00 to match 2026 labor cost increases across other methods.
 
-### Updated JDS Costs (Frontend hardcoded - no Caspio table)
+> **2026-06-11 update:** `jds-api-service.js` now loads these from Caspio `Service_Codes`
+> rows **JDS-MARGIN / JDS-LABOR / JDS-SETUP / JDS-LOGO2 / JDS-LTM** (via
+> `GET /api/service-codes`). The rows were created 2026-06-11; Erik set **JDS-MARGIN 0.53**
+> and **JDS-LABOR 2.99** the same day; code literals were synced and remain only as
+> unreachable-API fallbacks. The tumbler page's tier prices are no longer hardcoded —
+> `getPricingTiers()` now COMPUTES `halfDollarUp(JDS wholesale ÷ JDS-MARGIN + JDS-LABOR)`
+> per JDS wholesale tier (Polar Camel 16oz: $19.50/$19.50/$17.00/$16.50/$16.00, within
+> +50¢ of the old $19/$19/$17/$16.50/$16 per Erik's directive; volume tiers identical).
+> Prices float automatically with JDS wholesale changes.
+> The catalog/search display adder also moved to Caspio: **CATALOG-EMB-EST** ($15),
+> read by `product-search-service.js` (missing row → "QUOTE", never a wrong price).
+
+### Updated JDS Costs (frontend fallbacks — live values from Service_Codes JDS-* rows when present)
 
 | Fee | 2025 | 2026 |
 |-----|------|------|
