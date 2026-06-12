@@ -509,7 +509,7 @@
     }
 
     function renderTotals(cart, res) {
-        const box = $('qcTotals');
+        const box = $('qcTotalsBody');
         const pieces = state.items.reduce(function (s, it) { return s + (Number(it.qty) || 0); }, 0);
         const groupCount = cart.order.length;
         const rows = [];
@@ -531,14 +531,17 @@
         }
 
         rows.push('<div class="qc-actions">');
-        rows.push('<a class="btn btn-cta" id="qcEmailQuote" href="' + escapeHtml(buildMailto(res)) + '">Email this quote</a>');
+        rows.push('<button class="btn btn-cta" type="button" id="qcSaveBtn"'
+            + (res.grandTotal == null ? ' disabled title="Fix or remove the unpriced group first"' : '')
+            + '>Save &amp; email my quote</button>');
+        rows.push('<a class="btn btn-ghost" id="qcEmailQuote" href="' + escapeHtml(buildMailto(res)) + '">Email instead</a>');
         rows.push('<a class="btn btn-ghost" href="/catalog">Keep shopping</a>');
-        rows.push('<button class="btn btn-ghost" type="button" disabled title="Coming soon">Save &amp; share link — coming soon</button>');
         rows.push('</div>');
         rows.push('<p class="qc-totals-foot">Prices are live from our pricing system and match what our team quotes. '
             + 'WA sales tax and shipping are added when your rep confirms. Final pricing confirmed with your free proof.</p>');
 
         box.innerHTML = rows.join('');
+        syncSavePanel(cart);
     }
 
     // ============================================================
@@ -580,6 +583,335 @@
             state.items.reduce(function (s, it) { return s + (Number(it.qty) || 0); }, 0) + ' pieces)';
         return 'mailto:sales@nwcustomapparel.com?subject=' + encodeURIComponent(subject)
             + '&body=' + encodeURIComponent(lines.join('\n'));
+    }
+
+    // ============================================================
+    // SAVE / SHARE / EMAIL (Phase 3 — web-quote-service.js, WQ prefix)
+    //
+    // The panel lives in #qcSavePanel, a SEPARATE container from the
+    // re-rendered totals body, so typing survives reprices. All money in the
+    // save comes from the engine result; the service re-prices with
+    // forceRefresh just before saving and gates on any change (1-cent
+    // tolerance) so we never save totals the customer didn't see.
+    //
+    // Saved quotes are FROZEN snapshots (locked decision): the success panel
+    // offers the share link + a request-changes mailto; the cart itself stays
+    // editable — edit + save again mints a NEW quote number.
+    // ============================================================
+
+    // Dry-run for preview walk-throughs only (localhost + ?dryrun=1): logs the
+    // exact payloads instead of POSTing. Production customers can never hit it.
+    const DRY_RUN = /[?&]dryrun=1\b/.test(window.location.search)
+        && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+    const MAX_ART_BYTES = 20 * 1024 * 1024; // proxy files API cap (custom-tees pattern)
+    const ART_OK = /\.(png|jpe?g|gif|webp|svg|pdf)$/i;
+
+    const saveState = {
+        open: false,
+        phase: 'form',            // form | saving | price-changed | success
+        fields: { name: '', email: '', phone: '', company: '', notes: '' },
+        files: {},                // gid → File (validated on pick)
+        errorMsg: '',
+        warnings: [],             // artwork-upload warnings (visible, non-blocking)
+        saved: null,              // successful saveQuote result
+        emailStatus: null,        // sendEmails result
+        gidsKey: ''               // group-set signature at last form render
+    };
+
+    function freshEngineDeps() {
+        // Fresh authority classes (NOT the page's warm singleton) so the
+        // service's forceRefresh reprice really re-fetches config.
+        const deps = {};
+        if (window.EmbroideryPricingCalculator) deps.EmbroideryPricingCalculator = window.EmbroideryPricingCalculator;
+        return deps;
+    }
+
+    function gidsKeyOf(cart) { return cart.order.join('|'); }
+
+    function fieldHtml(id, label, type, required, placeholder) {
+        return '<div class="field"><label class="field-label" for="' + id + '">' + label
+            + (required ? ' <span class="req" aria-hidden="true">*</span>' : '') + '</label>'
+            + '<input class="field-input" type="' + type + '" id="' + id + '" data-save-field="' + id.replace('qcSv', '').toLowerCase() + '"'
+            + (required ? ' required' : '') + ' placeholder="' + escapeHtml(placeholder || '') + '"'
+            + ' value="' + escapeHtml(saveState.fields[id.replace('qcSv', '').toLowerCase()] || '') + '">'
+            + '</div>';
+    }
+
+    function savePanelFormHtml(cart) {
+        const rows = [];
+        rows.push('<h2 class="qc-save-title">Save &amp; email my quote</h2>');
+        if (DRY_RUN) rows.push('<div class="alert alert-warn"><div class="alert-body"><p>DRY RUN — payloads will be logged, nothing saved.</p></div></div>');
+        if (saveState.errorMsg) rows.push(alertHtml('error', 'Couldn\'t save', saveState.errorMsg));
+        if (saveState.phase === 'price-changed') {
+            rows.push(alertHtml('warn', 'Prices refreshed',
+                'A price changed since you loaded the page. The cart above now shows the current numbers — review them, then save again to confirm.'));
+        }
+        rows.push(fieldHtml('qcSvName', 'Your name', 'text', true, 'Jane Smith'));
+        rows.push(fieldHtml('qcSvEmail', 'Email', 'email', true, 'jane@company.com'));
+        rows.push(fieldHtml('qcSvPhone', 'Phone', 'tel', false, '253-555-0100'));
+        rows.push(fieldHtml('qcSvCompany', 'Company', 'text', false, 'Acme Co.'));
+        rows.push('<div class="field"><label class="field-label" for="qcSvNotes">Anything else we should price?</label>'
+            + '<textarea class="field-textarea" id="qcSvNotes" data-save-field="notes" rows="3" '
+            + 'placeholder="Names &amp; numbers, rush date, extra locations, delivery — your rep prices these for you.">'
+            + escapeHtml(saveState.fields.notes || '') + '</textarea></div>');
+
+        // Optional artwork — one file per print-type group (proxy files API,
+        // 20 MB, image/PDF). Upload failures warn visibly; the save still goes.
+        rows.push('<fieldset class="qc-save-art"><legend>Artwork (optional)</legend>');
+        cart.order.forEach(function (gid) {
+            const items = state.items.filter(function (it) { return groupIdFor(it) === gid; });
+            const meta = METHOD_META[methodOf(gid, items)] || { label: gid };
+            const picked = saveState.files[gid];
+            rows.push('<div class="qc-art-row"><label class="qc-art-label" for="qcArt-' + escapeHtml(gid) + '">' + escapeHtml(meta.label) + '</label>'
+                + '<input type="file" id="qcArt-' + escapeHtml(gid) + '" accept="image/*,.pdf" data-art-gid="' + escapeHtml(gid) + '">'
+                + (picked ? '<span class="qc-art-picked">' + escapeHtml(picked.name) + '</span>' : '')
+                + '</div>');
+        });
+        rows.push('<p class="field-help">PNG, JPG, SVG or PDF up to 20&nbsp;MB each. No file yet? No problem — your rep will ask.</p>');
+        rows.push('</fieldset>');
+
+        rows.push('<div class="qc-save-actions">'
+            + '<button class="btn btn-cta" type="button" data-save-act="submit">'
+            + (saveState.phase === 'price-changed' ? 'Confirm new prices &amp; save' : 'Save my quote')
+            + '</button>'
+            + '<button class="btn btn-ghost" type="button" data-save-act="cancel">Cancel</button>'
+            + '</div>');
+        rows.push('<p class="field-help">Saving emails a copy to you and to our sales team, with a link you can share. '
+            + 'Saved quotes are a snapshot — keep editing here and save again for a new number.</p>');
+        return rows.join('');
+    }
+
+    function savePanelSavingHtml() {
+        return '<div class="qc-save-busy" role="status"><span class="qc-spin" aria-hidden="true"></span>'
+            + '<p>Confirming live prices and saving your quote&hellip;</p></div>';
+    }
+
+    function savePanelSuccessHtml() {
+        const saved = saveState.saved;
+        const rows = [];
+        rows.push('<h2 class="qc-save-title">Quote ' + escapeHtml(saved.quoteId) + ' saved' + (saved.dryRun ? ' (DRY RUN)' : '') + '</h2>');
+        if (saved.idFallback) {
+            rows.push(alertHtml('warn', 'Temporary quote number',
+                'Our numbering service was briefly unreachable, so this quote has a temporary number. Your rep will confirm it.'));
+        }
+        rows.push('<div class="qc-share"><label class="field-label" for="qcShareUrl">Your share link</label>'
+            + '<div class="qc-share-row">'
+            + '<input class="field-input" type="text" id="qcShareUrl" readonly value="' + escapeHtml(saved.shareUrl) + '">'
+            + '<button class="btn btn-primary" type="button" data-save-act="copy">Copy</button>'
+            + '</div>'
+            + '<a class="qc-share-open" href="' + escapeHtml(saved.sharePath) + '" target="_blank" rel="noopener">Open my quote &rarr;</a>'
+            + '</div>');
+        if (saved.warning) rows.push(alertHtml('warn', 'Heads up', saved.warning));
+        saveState.warnings.forEach(function (w) { rows.push(alertHtml('warn', 'Artwork', w)); });
+
+        const es = saveState.emailStatus;
+        let emailLine;
+        if (es == null) emailLine = 'Sending your email copy&hellip;';
+        else if (es.customerSent) emailLine = 'We emailed a copy to ' + escapeHtml(saveState.fields.email) + ' and alerted our sales team — we\'re on it.';
+        else if (es.salesSent) emailLine = 'Our sales team has been alerted. We couldn\'t send your email copy — bookmark the link above.';
+        else emailLine = 'We got your quote! The confirmation email didn\'t go through, so bookmark the link above — our team sees every saved quote.';
+        rows.push('<p class="qc-save-emailline" id="qcEmailLine">' + emailLine + '</p>');
+
+        const subject = 'Change request — quote ' + saved.quoteId;
+        const body = 'Hi NWCA,\n\nI\'d like to change my web quote ' + saved.quoteId + ' (' + saved.shareUrl + '):\n\n';
+        rows.push('<div class="qc-save-actions">'
+            + '<a class="btn btn-ghost" href="mailto:sales@nwcustomapparel.com?subject=' + encodeURIComponent(subject)
+            + '&body=' + encodeURIComponent(body) + '">Request changes</a>'
+            + '<button class="btn btn-ghost" type="button" data-save-act="close">Done</button>'
+            + '</div>');
+        rows.push('<p class="field-help">This saved quote is a frozen snapshot. Your cart is still editable — '
+            + 'change anything here and save again to get a new quote number.</p>');
+        return rows.join('');
+    }
+
+    function renderSavePanel(cart) {
+        const panel = $('qcSavePanel');
+        if (!panel) return;
+        panel.hidden = !saveState.open;
+        if (!saveState.open) return;
+        if (saveState.phase === 'saving') panel.innerHTML = savePanelSavingHtml();
+        else if (saveState.phase === 'success') panel.innerHTML = savePanelSuccessHtml();
+        else panel.innerHTML = savePanelFormHtml(cart);
+        saveState.gidsKey = gidsKeyOf(cart);
+    }
+
+    /** Called from renderTotals on every reprice — rebuild the form ONLY when
+     *  the group set changed (otherwise typing/file picks survive). */
+    function syncSavePanel(cart) {
+        if (!saveState.open) { renderSavePanel(cart); return; }
+        if (saveState.phase === 'saving' || saveState.phase === 'success') return;
+        if (gidsKeyOf(cart) !== saveState.gidsKey) {
+            // Drop artwork picks for groups that no longer exist
+            Object.keys(saveState.files).forEach(function (gid) {
+                if (cart.order.indexOf(gid) === -1) delete saveState.files[gid];
+            });
+            renderSavePanel(cart);
+        }
+    }
+
+    function openSavePanel() {
+        saveState.open = true;
+        saveState.phase = 'form';
+        saveState.errorMsg = '';
+        renderSavePanel(buildCart());
+        const panel = $('qcSavePanel');
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const name = $('qcSvName');
+        if (name) name.focus();
+    }
+
+    function readSaveFields() {
+        ['qcSvName', 'qcSvEmail', 'qcSvPhone', 'qcSvCompany', 'qcSvNotes'].forEach(function (id) {
+            const el = $(id);
+            if (el) saveState.fields[id.replace('qcSv', '').toLowerCase()] = el.value.trim();
+        });
+    }
+
+    async function doSave() {
+        readSaveFields();
+        const f = saveState.fields;
+        if (!f.name || !f.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) {
+            saveState.errorMsg = 'Please enter your name and a valid email so we can send your quote.';
+            renderSavePanel(buildCart());
+            return;
+        }
+        if (!window.WebQuoteService) {
+            saveState.errorMsg = 'The save service didn\'t load — please refresh, or call 253-922-5793.';
+            renderSavePanel(buildCart());
+            return;
+        }
+        if (!state.priced || state.priced.grandTotal == null) {
+            saveState.errorMsg = 'Your quote isn\'t fully priced yet — fix the group above first.';
+            renderSavePanel(buildCart());
+            return;
+        }
+
+        const cart = buildCart();
+        saveState.phase = 'saving';
+        saveState.errorMsg = '';
+        saveState.warnings = [];
+        renderSavePanel(cart);
+
+        const svc = new window.WebQuoteService({ engine: window.QuoteCartEngine, dryRun: DRY_RUN });
+
+        // Optional artwork uploads — failures warn visibly, never block the save.
+        const artwork = [];
+        for (const gid of Object.keys(saveState.files)) {
+            const file = saveState.files[gid];
+            if (!file) continue;
+            try {
+                const up = await svc.uploadArtwork(file);
+                artwork.push({ groupId: gid, externalKey: up.externalKey, fileName: up.fileName, url: up.url });
+            } catch (err) {
+                console.error('[quote-cart] Artwork upload failed for', gid, err);
+                saveState.warnings.push('We couldn\'t upload "' + file.name + '" — your quote saved without it. '
+                    + 'Email it to sales@nwcustomapparel.com and we\'ll attach it.');
+            }
+        }
+
+        let res;
+        try {
+            res = await svc.saveQuote({
+                cart: { items: cart.items, groups: cart.groups },
+                storeItems: cart.storeItems,
+                displayedResult: state.priced,
+                customer: { name: f.name, email: f.email, phone: f.phone, company: f.company, notes: f.notes },
+                artwork: artwork,
+                engineOptions: { deps: freshEngineDeps() }
+            });
+        } catch (err) {
+            console.error('[quote-cart] saveQuote threw:', err);
+            res = { success: false, code: 'SAVE_FAILED', message: err.message };
+        }
+
+        if (!res.success && res.code === 'PRICING_CHANGED') {
+            // Show the customer the CURRENT prices, then ask them to re-confirm.
+            state.priced = res.fresh;
+            render(cart, res.fresh);
+            saveState.phase = 'price-changed';
+            renderSavePanel(cart);
+            return;
+        }
+        if (!res.success) {
+            saveState.phase = 'form';
+            saveState.errorMsg = res.message || 'Something went wrong — nothing was saved. Please try again or call 253-922-5793.';
+            renderSavePanel(cart);
+            return;
+        }
+
+        saveState.saved = res;
+        saveState.emailStatus = null;
+        saveState.phase = 'success';
+        renderSavePanel(cart);
+
+        // Fire-and-forget notifications (locked decision: sales@ + immediate
+        // customer copy w/ the share link). Never blocks or fails the save.
+        svc.sendEmails({
+            quoteId: res.quoteId,
+            shareUrl: res.shareUrl,
+            customer: { name: f.name, email: f.email, company: f.company }
+        }).then(function (status) {
+            saveState.emailStatus = status;
+            if (saveState.phase === 'success') renderSavePanel(buildCart());
+        });
+    }
+
+    function onSavePanelClick(e) {
+        const btn = e.target.closest('[data-save-act]');
+        if (!btn) return;
+        const act = btn.getAttribute('data-save-act');
+        if (act === 'submit') { doSave(); return; }
+        if (act === 'cancel' || act === 'close') {
+            saveState.open = false;
+            if (act === 'close') { saveState.phase = 'form'; saveState.saved = null; }
+            renderSavePanel(buildCart());
+            return;
+        }
+        if (act === 'copy') {
+            const input = $('qcShareUrl');
+            if (!input) return;
+            const url = input.value;
+            const done = function () { btn.textContent = 'Copied!'; setTimeout(function () { btn.textContent = 'Copy'; }, 2000); };
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(done, function () { input.select(); });
+            } else {
+                input.select();
+                try { document.execCommand('copy'); done(); } catch (err) { /* selection left for manual copy */ }
+            }
+        }
+    }
+
+    function onSavePanelInput(e) {
+        const el = e.target.closest('[data-save-field]');
+        if (!el) return;
+        saveState.fields[el.getAttribute('data-save-field')] = el.value;
+    }
+
+    function onSavePanelChange(e) {
+        const input = e.target.closest('input[data-art-gid]');
+        if (!input) return;
+        const gid = input.getAttribute('data-art-gid');
+        const file = input.files && input.files[0];
+        if (!file) { delete saveState.files[gid]; return; }
+        if (file.size > MAX_ART_BYTES) {
+            alertInPanel('That file is over 20 MB — email it to sales@nwcustomapparel.com instead and we\'ll attach it.');
+            input.value = '';
+            delete saveState.files[gid];
+            return;
+        }
+        if (!ART_OK.test(file.name)) {
+            alertInPanel('We can take PNG, JPG, GIF, WEBP, SVG or PDF files here. Email other formats to sales@nwcustomapparel.com.');
+            input.value = '';
+            delete saveState.files[gid];
+            return;
+        }
+        saveState.files[gid] = file;
+    }
+
+    function alertInPanel(msg) {
+        saveState.errorMsg = msg;
+        renderSavePanel(buildCart());
     }
 
     // ============================================================
@@ -643,6 +975,15 @@
 
         $('qcGroups').addEventListener('click', onGroupsClick);
         $('qcGroups').addEventListener('change', onGroupsChange);
+
+        // Save panel (Phase 3) — the totals body re-renders on every reprice,
+        // so the save button binds by delegation on the static aside.
+        $('qcTotals').addEventListener('click', function (e) {
+            if (e.target.closest('#qcSaveBtn')) openSavePanel();
+        });
+        $('qcSavePanel').addEventListener('click', onSavePanelClick);
+        $('qcSavePanel').addEventListener('input', onSavePanelInput);
+        $('qcSavePanel').addEventListener('change', onSavePanelChange);
 
         // Store changes (this tab's steppers/removes AND other-tab storage
         // events) → debounced reprice. The badge updates itself via the
