@@ -163,11 +163,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ## UI Patterns
 
-### Richardson page CSS rewrite — JS-emitted class drift (2026-05-29) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: when JS builds DOM, the CSS contract IS the JS class string — grep `innerHTML`/`className` for exact names before/after any refactor (both sides fail silently); `max-height` transitions don't advance in the headless preview — verify show/hide via computed `display` + `getBoundingClientRect()`.
-
-### Don't regenerate combobox menu DOM on hover (2026-05-20) — ARCHIVED 2026-06-12
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: never regenerate DOM nodes during user interaction (hover/mid-click) — toggle classes in place; test selection with full mousedown+mouseup+click, not bare dispatchEvent.
+### Richardson CSS JS-class drift (2026-05-29) · combobox DOM-regen-on-hover (2026-05-20) — ARCHIVED 2026-06-11/12
+In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when JS builds DOM the CSS contract IS the class string (grep `innerHTML`/`className` both sides before a refactor); never regenerate DOM nodes during hover/mid-click (toggle classes in place); `max-height` transitions don't advance headless — verify via computed `display`.
 
 ### Storefront orders stored cart in JSON blobs only — /quote + /invoice showed "No items" + mis-taxed (2026-06-12)
 **Problem:** A real test cap order (CAP0612-5539) viewed at /quote showed "No items in this quote" and double-taxed to $894.61; the proforma /invoice showed "$0 tax — Out of State." The order data was actually fine (captured in the JSON blobs).
@@ -253,15 +250,13 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 **Solution:** `this.taxRate ?? 0.101` — nullish coalescing only falls through on `null`/`undefined`.
 **Prevention:** Always `??` when `0`, `""`, or `false` are valid values. Reserve `||` for all-falsy defaults.
 
-### `await` in a sync fn that only looks like the async one (2026-06-03) — ARCHIVED 2026-06-12
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded." In embroidery-quote-builder.js the block ending in `syncRushRow()`/`updateTaxCalculation()` is the SYNC `updatePricingDisplay`, not `recalculatePricing`.
+### `await` in a sync fn (2026-06-03, ARCHIVED 2026-06-12): `node --check <file>` BEFORE browser verify — one syntax error nukes the whole script ("nothing loaded"). In embroidery-quote-builder.js the `syncRushRow()`/`updateTaxCalculation()` block is the SYNC `updatePricingDisplay`, not `recalculatePricing`. Full entry in archive.
 
 ---
 
 ## Data Integrity
 
-### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs — ARCHIVED 2026-06-12
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: Caspio has no atomic increment — any read-modify-write needs an application-level lock (in-memory mutex per prefix).
+### Quote Sequence Race — duplicate IDs (ARCHIVED 2026-06-12): Caspio has no atomic increment — any read-modify-write needs an app-level lock (mutex per prefix). Full entry in archive.
 
 ### Art-request notes notification fan-out (2026-05-29) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: notifications belong on the backend write chokepoint, not the browser; audit/system note POSTs must send `notify:false` or they double-fire. Current state documented in MEMORY.md Art Hub section.
