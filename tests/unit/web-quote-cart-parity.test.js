@@ -548,6 +548,20 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
         expect(g.lines[0].effectiveUnitDisplay).toBe(18.25);
     });
 
+    test('(c2) 12× PC61 below the 13-piece floor: hard block, never priced (customer gate, Erik 2026-06-11)', async () => {
+        // The builder's findPricingTier deliberately lets a REP clamp below
+        // the lowest tier; customers cannot order below the method minimum.
+        // Min is data-derived from the bundle's lowest tier (13 today).
+        const res = await run({
+            items: [scpItem('PC61', { S: 3, M: 3, L: 3, XL: 3 })],
+            groups: { 'scp:design-1': SCP_1C }
+        });
+        expect(res.errors).toHaveLength(1);
+        expect(res.errors[0].code).toBe('BELOW_MINIMUM');
+        expect(res.errors[0].message).toMatch(/starts at 13 pieces/);
+        expect(res.grandTotal).toBeNull();
+    });
+
     test('(d) pooling proof: 24 PC61 + 24 PC54, one design → ONE tier/LTM/screen set, $680.00 vs $882.00 quoted separately', async () => {
         const pooled = await run({
             items: [scpItem('PC61', { M: 24 }, 's1'), scpItem('PC54', { M: 24 }, 's2')],

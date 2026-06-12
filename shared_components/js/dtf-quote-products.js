@@ -155,64 +155,9 @@ class DTFQuoteProducts {
         }
     }
 
-    /**
-     * Load product details with colors and base costs
-     */
-    async loadProductDetails(styleNumber) {
-        try {
-            console.log('[DTFQuoteProducts] Loading product:', styleNumber);
-
-            // Fetch both DTF pricing bundle AND BLANK bundle for size upcharges
-            // NOTE: DTF pricing-bundle returns empty sellingPriceDisplayAddOns
-            // BLANK pricing-bundle returns the actual size upcharges
-            const [bundleResponse, blankResponse, colorsResponse] = await Promise.all([
-                fetch(`${this.apiBase}/api/pricing-bundle?method=DTF&styleNumber=${encodeURIComponent(styleNumber)}`),
-                fetch(`${this.apiBase}/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(styleNumber)}`),
-                fetch(`${this.apiBase}/api/color-swatches?styleNumber=${encodeURIComponent(styleNumber)}`)
-            ]);
-
-            if (!bundleResponse.ok) {
-                throw new Error(`Failed to load product bundle: ${bundleResponse.status}`);
-            }
-
-            const bundleData = await bundleResponse.json();
-            const blankData = blankResponse.ok ? await blankResponse.json() : {};
-
-            let colors = [];
-            if (colorsResponse.ok) {
-                const colorsData = await colorsResponse.json();
-                colors = colorsData.colors || [];
-            }
-
-            // Extract product info
-            // Get sizeUpcharges from BLANK bundle (has actual upcharge data)
-            const product = {
-                styleNumber: styleNumber,
-                title: bundleData.product?.PRODUCT_TITLE || styleNumber,
-                description: bundleData.product?.description || '',
-                brand: bundleData.product?.brand || '',
-                colors: colors,
-                baseCost: bundleData.garmentCost || 0,
-                sizeUpcharges: this.extractSizeUpcharges(blankData.sellingPriceDisplayAddOns),
-                availableSizes: bundleData.sizes || [],
-                pricingBundle: bundleData
-            };
-
-            this.currentProduct = product;
-            console.log('[DTFQuoteProducts] Product loaded:', {
-                styleNumber: product.styleNumber,
-                baseCost: product.baseCost,
-                colorCount: product.colors.length,
-                sizeUpcharges: product.sizeUpcharges
-            });
-
-            return product;
-
-        } catch (error) {
-            console.error('[DTFQuoteProducts] Error loading product:', error);
-            throw error;
-        }
-    }
+    // loadProductDetails() REMOVED 2026-06-11 (dead: zero callers; it read a
+    // bundleData.garmentCost field the pricing-bundle API has never exposed, so
+    // any future caller would have priced every garment at $0).
 
     /**
      * Extract size upcharges from API response
@@ -290,52 +235,8 @@ class DTFQuoteProducts {
         }
     }
 
-    /**
-     * Add product to quote
-     */
-    async addProduct(productData) {
-        try {
-            // Ensure we have base cost
-            let baseCost = productData.baseCost;
-            if (!baseCost && productData.styleNumber) {
-                baseCost = await this.getBaseCost(productData.styleNumber);
-            }
-
-            // Get size upcharges if not provided
-            let sizeUpcharges = productData.sizeUpcharges || {};
-            if (Object.keys(sizeUpcharges).length === 0 && this.currentProduct?.sizeUpcharges) {
-                sizeUpcharges = this.currentProduct.sizeUpcharges;
-            }
-
-            // Create product entry
-            const product = {
-                id: Date.now(),
-                styleNumber: productData.styleNumber,
-                productName: productData.productName || productData.title || productData.styleNumber,
-                color: productData.color,
-                colorCode: productData.colorCode || productData.CATALOG_COLOR || '',
-                imageUrl: productData.imageUrl || '',
-                sizeQuantities: productData.sizeQuantities || {},
-                baseCost: baseCost,
-                sizeUpcharges: sizeUpcharges,
-                totalQuantity: this.calculateProductQuantity(productData.sizeQuantities)
-            };
-
-            this.products.push(product);
-            console.log('[DTFQuoteProducts] Product added:', {
-                styleNumber: product.styleNumber,
-                color: product.color,
-                baseCost: product.baseCost,
-                quantity: product.totalQuantity
-            });
-
-            return product;
-
-        } catch (error) {
-            console.error('[DTFQuoteProducts] Error adding product:', error);
-            throw error;
-        }
-    }
+    // addProduct() REMOVED 2026-06-11 (dead: zero callers — the builder uses
+    // this class for search only; rows are created by addNewRow()/onStyleChange()).
 
     /**
      * Remove product from quote

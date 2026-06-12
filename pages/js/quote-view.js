@@ -37,7 +37,19 @@ class QuoteViewPage {
             'LT': 'Laser Tumblers',
             'PATCH': 'Embroidered Emblems',
             'STK': 'Die-Cut Stickers & Vinyl Banners',
-            'OF':  'Order Form'  // A4 (2026-05-22): OF-NNNN was falling through to "Custom Quote"
+            'OF':  'Order Form',  // A4 (2026-05-22): OF-NNNN was falling through to "Custom Quote"
+            'WQ':  'Web Quote Request'  // Phase 3 customer quote-cart (2026-06-11)
+        };
+
+        // Method subhead labels for MIXED-method quotes (WQ web-cart quotes can
+        // carry several EmbellishmentTypes; staff quotes are single-method so
+        // these subheads never render for existing prefixes).
+        this.methodLabels = {
+            'embroidery': 'Embroidery',
+            'cap': 'Cap Embroidery',
+            'dtg': 'DTG Print',
+            'screenprint': 'Screen Print',
+            'dtf': 'DTF Transfer'
         };
 
         // DTF Location configuration
@@ -818,9 +830,24 @@ class QuoteViewPage {
                     <tbody>
         `;
 
-        // Render rows for each product group
+        // Render rows for each product group.
+        // MIXED-method quotes (WQ web-cart): emit a method subhead row whenever
+        // the EmbellishmentType changes between product groups. Single-method
+        // quotes (every staff prefix) have one type, so nothing changes for them.
+        const distinctMethods = [...new Set(this.productItems.map(i => String(i.EmbellishmentType || '').toLowerCase()))];
+        const isMixedMethods = distinctMethods.length > 1;
+        let lastMethodSubhead = null;
         let rowIndex = 0;
         groups.forEach((group, groupIndex) => {
+            if (isMixedMethods) {
+                const m = String(group.embellishmentType || '').toLowerCase();
+                if (m !== lastMethodSubhead) {
+                    const label = this.methodLabels[m] || (m ? m.toUpperCase() : 'Other');
+                    const locSuffix = group.printLocation ? ` — ${group.printLocation}` : '';
+                    html += `<tr class="method-subhead"><td colspan="11">${this.escapeHtml(label + locSuffix)}</td></tr>`;
+                    lastMethodSubhead = m;
+                }
+            }
             const rows = this.buildProductRows(group, groupIndex);
             rows.forEach((row, i) => {
                 html += this.renderProductRow(row, i === 0, groupIndex);
@@ -894,6 +921,14 @@ class QuoteViewPage {
     renderEmbroideryInfo() {
         // Determine quote type from prefix
         const prefix = this.quoteId?.split(/[\d-]/)[0] || '';
+
+        // Mixed-method WQ (web-cart) quotes: a single "Location:" header would
+        // show only the FIRST item's location and mislead — the per-method
+        // subhead rows in the items table carry method + location instead.
+        if (prefix === 'WQ') {
+            const types = new Set((this.productItems || []).map(i => String(i.EmbellishmentType || '').toLowerCase()));
+            if (types.size > 1) return '';
+        }
         // CEMB (Contract Embroidery, AI-drafted) added 2026-05-14 (Phase 5)
         // so the Location + Stitches detail row renders on CEMB quote views.
         const isEmbroideryQuote = ['EMB', 'EMBC', 'CEMB', 'RICH', 'CAP'].includes(prefix);
@@ -2137,9 +2172,14 @@ class QuoteViewPage {
             // TaxRate 0) get their own label — they're not out of state.
             const isWholesale = this.quoteData?.IsWholesale === 'Yes' || this.quoteData?.IsWholesale === true;
             const isCEMB = (this.quoteId || '').startsWith('CEMB');
+            // WQ web-cart quotes save TaxRate 0 by design (no shipping address
+            // yet — the rep calculates tax at confirmation), so "Out of State
+            // Sales" would be wrong/alarming for them.
+            const isWebQuote = (this.quoteId || '').startsWith('WQ');
             const zeroTaxLabel = isWholesale
                 ? 'Wholesale / Resale — No Tax (permit on file)'
-                : (isCEMB ? 'Tax-exempt' : 'Out of State Sales');
+                : (isCEMB ? 'Tax-exempt'
+                    : (isWebQuote ? 'Sales tax — calculated by your rep' : 'Out of State Sales'));
             totalsHtml += `
                 <div class="total-row tax-row">
                     <span class="label">${zeroTaxLabel}:</span>

@@ -25,27 +25,30 @@ class DTFQuoteService {
     }
 
     /**
-     * Generate unique Quote ID with daily sequence
-     * Format: DTF[MMDD]-[sequence]
+     * Generate unique quote ID using the Caspio-backed sequence counter
+     * (format DTF-2026-001; resets annually, persists across sessions/browsers).
+     * The old sessionStorage daily counter restarted at 1 in every browser, so
+     * two reps (or two tabs) could mint the SAME QuoteID on the same day.
+     * The proxy's buildExtOrderID handles the year-led tail unchanged. (2026-06-11)
      */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-
-        // Daily sequence reset using sessionStorage
-        const storageKey = `${this.quotePrefix}_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
-
-        // Clean up old sequences
-        this.cleanupOldSequences(dateKey);
-
-        const quoteID = `${this.quotePrefix}${dateKey}-${sequence}`;
-        console.log('[DTFQuoteService] Generated Quote ID:', quoteID);
-
-        return quoteID;
+    async generateQuoteID() {
+        try {
+            const response = await fetch(`${this.baseURL}/quote-sequence/${this.quotePrefix}`);
+            if (!response.ok) throw new Error(`API returned ${response.status}`);
+            const { prefix, year, sequence } = await response.json();
+            return `${prefix}-${year}-${String(sequence).padStart(3, '0')}`;
+        } catch (error) {
+            // Visible fallback (Erik's #1 rule) — random suffix, NOT a per-browser counter
+            console.warn('[DTFQuoteService] Quote sequence API failed, using fallback:', error);
+            if (typeof showToast === 'function') {
+                showToast('Quote numbering service unreachable — using a temporary quote # (format DTFmmdd-nnnn).', 'warning', 6000);
+            }
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const sequence = Math.floor(Math.random() * 9000) + 1000;
+            return `${this.quotePrefix}${month}${day}-${sequence}`;
+        }
     }
 
     /**
@@ -55,19 +58,8 @@ class DTFQuoteService {
         return `dtf_quote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    /**
-     * Clean up old sequence keys from sessionStorage
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keysToRemove = [];
-        for (let i = 0; i < sessionStorage.length; i++) {
-            const key = sessionStorage.key(i);
-            if (key && key.startsWith(`${this.quotePrefix}_quote_sequence_`) && !key.includes(currentDateKey)) {
-                keysToRemove.push(key);
-            }
-        }
-        keysToRemove.forEach(key => sessionStorage.removeItem(key));
-    }
+    // cleanupOldSequences() REMOVED 2026-06-11 — only served the retired
+    // sessionStorage quote-id counter.
 
     /**
      * Format date for Caspio (remove milliseconds)
@@ -140,7 +132,7 @@ class DTFQuoteService {
         try {
             console.log('[DTFQuoteService] Saving quote:', quoteData);
 
-            const quoteID = quoteData.quoteId || this.generateQuoteID();
+            const quoteID = quoteData.quoteId || await this.generateQuoteID();  // [2026-06-11] async now (server sequence)
             const sessionID = this.generateSessionID();
 
             // Calculate expiry date (30 days from now)
@@ -282,8 +274,11 @@ class DTFQuoteService {
                             PrintLocation: locationCodes,
                             PrintLocationName: locationNames,
                             Quantity: parseInt(sizeGroup.quantity),
-                            HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
-                            BaseUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
+                            // [2026-06-11] waive-aware (was a hardcoded qty<24 that said Yes
+                            // even when the rep waived the fee) + a true pre-LTM base price
+                            // (Base==Final and LTMPerUnit==0 made the baked LTM unrecoverable)
+                            HasLTM: (parseFloat(quoteData.ltmFee) || 0) > 0 ? 'Yes' : 'No',
+                            BaseUnitPrice: parseFloat((sizeGroup.unitPrice - (sizeGroup.pricing?.ltmPerUnit || 0)).toFixed(2)),
                             LTMPerUnit: parseFloat((sizeGroup.pricing?.ltmPerUnit || 0).toFixed(2)),
                             FinalUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
                             LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
@@ -394,7 +389,7 @@ class DTFQuoteService {
                 }
             }
 
-            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
+            await this._saveShipFeeItem(quoteID, quoteData, lineNumber);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
 
             console.log('[DTFQuoteService] Quote saved:', quoteID,
                 failedItems > 0 ? `(${failedItems} items failed)` : '');
@@ -417,174 +412,11 @@ class DTFQuoteService {
         }
     }
 
-    /**
-     * Send quote email
-     */
-    async sendQuoteEmail(quoteData) {
-        try {
-            console.log('[DTFQuoteService] Preparing email for DTF quote');
-
-            const emailData = {
-                // System fields
-                to_email: quoteData.customerEmail,
-                from_name: 'Northwest Custom Apparel',
-                reply_to: quoteData.salesRep || 'sales@nwcustomapparel.com',
-
-                // Quote identification
-                quote_type: 'DTF Transfer',
-                quote_id: quoteData.quoteID,
-                quote_date: new Date().toLocaleDateString(),
-
-                // Customer info
-                customer_name: quoteData.customerName,
-                customer_email: quoteData.customerEmail,
-                company_name: quoteData.companyName || '',
-                customer_phone: quoteData.customerPhone || '',
-
-                // Project info
-                project_name: quoteData.projectName || '',
-                special_notes: quoteData.specialNotes || '',
-
-                // Pricing
-                grand_total: `$${quoteData.total.toFixed(2)}`,
-                total_quantity: quoteData.totalQuantity,
-                pricing_tier: quoteData.tierLabel,
-
-                // Locations
-                location_names: this.formatLocationNames(quoteData.selectedLocations || []),
-                location_count: quoteData.selectedLocations?.length || 0,
-
-                // Sales rep
-                sales_rep_name: this.getSalesRepName(quoteData.salesRep),
-                sales_rep_email: quoteData.salesRep || 'sales@nwcustomapparel.com',
-                sales_rep_phone: '253-922-5793',
-
-                // Company
-                company_year: '1977',
-
-                // Quote details (HTML)
-                products_html: this.generateQuoteHTML(quoteData),
-                expiry_date: quoteData.expiryDate?.toLocaleDateString() || ''
-            };
-
-            console.log('[DTFQuoteService] Email data prepared:', emailData);
-
-            // When EmailJS template is ready, uncomment:
-            // await emailjs.send('service_jgrave3', 'template_dtf_quote', emailData);
-
-            return {
-                success: true,
-                message: 'Email functionality pending template creation'
-            };
-
-        } catch (error) {
-            console.error('[DTFQuoteService] Error sending email:', error);
-            return {
-                success: false,
-                error: error.message
-            };
-        }
-    }
-
-    /**
-     * Generate HTML for quote email
-     */
-    generateQuoteHTML(quoteData) {
-        const locationNames = this.formatLocationNames(quoteData.selectedLocations || []);
-
-        let html = `
-            <div style="font-family: Arial, sans-serif;">
-                <h3 style="color: #10b981;">DTF Transfer Quote</h3>
-                <p><strong>Transfer Locations:</strong> ${locationNames}</p>
-                <p><strong>Tier:</strong> ${quoteData.tierLabel} (${quoteData.totalQuantity} pieces)</p>
-
-                <h4 style="margin-top: 20px;">Transfer Breakdown</h4>
-                <table style="width: auto; border-collapse: collapse; margin: 10px 0;">
-                    <tbody>`;
-
-        // Add transfer location costs
-        if (quoteData.transferBreakdown?.breakdown) {
-            quoteData.transferBreakdown.breakdown.forEach(loc => {
-                html += `
-                    <tr>
-                        <td style="padding: 5px 15px 5px 0;">${loc.locationName}:</td>
-                        <td style="padding: 5px;">${loc.sizeName}</td>
-                        <td style="padding: 5px; text-align: right;">$${loc.unitCost.toFixed(2)}</td>
-                    </tr>`;
-            });
-        }
-
-        html += `
-                    </tbody>
-                </table>
-
-                <h4 style="margin-top: 20px;">Products</h4>
-                <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                    <thead>
-                        <tr style="background: #f5f5f5;">
-                            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Product</th>
-                            <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Quantity</th>
-                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">Unit Price</th>
-                            <th style="padding: 10px; text-align: right; border: 1px solid #ddd;">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-        quoteData.products.forEach(product => {
-            if (product.sizeGroups && Array.isArray(product.sizeGroups)) {
-                product.sizeGroups.forEach(group => {
-                    const sizeList = Object.entries(group.sizes || {})
-                        .map(([size, qty]) => `${size}(${qty})`)
-                        .join(' ');
-
-                    html += `
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #ddd;">
-                                ${product.productName} - ${product.color}<br>
-                                <small>${sizeList}</small>
-                            </td>
-                            <td style="padding: 10px; border: 1px solid #ddd;">${group.quantity}</td>
-                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${group.unitPrice.toFixed(2)}</td>
-                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${group.total.toFixed(2)}</td>
-                        </tr>`;
-                });
-            } else {
-                const sizeList = Object.entries(product.sizeQuantities || {})
-                    .filter(([size, qty]) => qty > 0)
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
-
-                html += `
-                    <tr>
-                        <td style="padding: 10px; border: 1px solid #ddd;">
-                            ${product.productName} - ${product.color}<br>
-                            <small>${sizeList || 'N/A'}</small>
-                        </td>
-                        <td style="padding: 10px; border: 1px solid #ddd;">${product.totalQuantity || 0}</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">-</td>
-                        <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${(product.subtotal || 0).toFixed(2)}</td>
-                    </tr>`;
-            }
-        });
-
-        html += `
-                    </tbody>
-                    <tfoot>
-                        <tr style="font-weight: bold;">
-                            <td colspan="3" style="padding: 10px; text-align: right; border: 1px solid #ddd;">Grand Total:</td>
-                            <td style="padding: 10px; text-align: right; border: 1px solid #ddd;">$${quoteData.total.toFixed(2)}</td>
-                        </tr>
-                    </tfoot>
-                </table>`;
-
-        if (quoteData.totalQuantity < 24) {
-            html += `<p style="font-size: 12px; color: #666;">*Orders under 24 pieces include a $50 small batch fee distributed across all pieces</p>`;
-        }
-
-        html += `</div>`;
-
-        return html;
-    }
+    // sendQuoteEmail() + generateQuoteHTML() REMOVED 2026-06-11 (dead pipeline:
+    // zero callers after the builder's dead emailQuote() was removed; the
+    // emailjs.send call was commented out so it never sent; its HTML read
+    // product.sizeQuantities/productName/subtotal — fields the builder never
+    // produces — and hardcoded a $50 LTM blurb).
 
     /**
      * Get sales rep name from email
@@ -794,8 +626,11 @@ class DTFQuoteService {
                             PrintLocation: locationCodes,
                             PrintLocationName: locationNames,
                             Quantity: parseInt(sizeGroup.quantity),
-                            HasLTM: quoteData.totalQuantity < 24 ? 'Yes' : 'No',
-                            BaseUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
+                            // [2026-06-11] waive-aware (was a hardcoded qty<24 that said Yes
+                            // even when the rep waived the fee) + a true pre-LTM base price
+                            // (Base==Final and LTMPerUnit==0 made the baked LTM unrecoverable)
+                            HasLTM: (parseFloat(quoteData.ltmFee) || 0) > 0 ? 'Yes' : 'No',
+                            BaseUnitPrice: parseFloat((sizeGroup.unitPrice - (sizeGroup.pricing?.ltmPerUnit || 0)).toFixed(2)),
                             LTMPerUnit: parseFloat((sizeGroup.pricing?.ltmPerUnit || 0).toFixed(2)),
                             FinalUnitPrice: parseFloat(sizeGroup.unitPrice.toFixed(2)),
                             LineTotal: parseFloat(sizeGroup.total.toFixed(2)),
@@ -819,7 +654,7 @@ class DTFQuoteService {
                 }
             }
 
-            await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
+            await this._saveShipFeeItem(quoteID, quoteData, lineNumber);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
 
             console.log('[DTFQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
 
@@ -844,16 +679,18 @@ class DTFQuoteService {
      * tax is on the shipping-inclusive base, so the mirror's (subtotalNet + SHIP + tax) foots with NO double-count.
      * Mirror of SCP. Called after the product items in BOTH save paths; updateQuote deletes all items first → no dup.
      */
-    async _saveShipFeeItem(quoteID, quoteData) {
+    async _saveShipFeeItem(quoteID, quoteData, lineNumber) {
         const shipFee = parseFloat(quoteData.shippingFee) || 0;
-        if (shipFee <= 0) return;
+        if (shipFee <= 0) return true;
         try {
-            await fetch(`${this.baseURL}/quote_items`, {
+            const resp = await fetch(`${this.baseURL}/quote_items`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     QuoteID: quoteID,
-                    LineNumber: (quoteData.products?.length || 0) + 1,
+                    // [2026-06-11] caller passes the live item counter — the old
+                    // products.length+1 collided with sizeGroup line numbers
+                    LineNumber: lineNumber || (quoteData.products?.length || 0) + 1,
                     StyleNumber: 'SHIP',
                     ProductName: 'Shipping',
                     EmbellishmentType: 'fee',
@@ -864,8 +701,16 @@ class DTFQuoteService {
                     AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
                 })
             });
+            // [2026-06-11] a swallowed SHIP-row failure silently dropped shipping
+            // (and its tax) from /quote + /invoice — fail loudly instead
+            if (!resp.ok) throw new Error(`SHIP item HTTP ${resp.status}`);
+            return true;
         } catch (e) {
-            console.warn('[DTFQuoteService] SHIP fee item save failed:', e);
+            console.error('[DTFQuoteService] SHIP fee item save FAILED — saved quote will not show shipping:', e);
+            if (typeof showToast === 'function') {
+                showToast('Shipping line failed to save — the quote link will be missing shipping. Re-save the quote.', 'error', 8000);
+            }
+            return false;
         }
     }
 

@@ -1114,125 +1114,11 @@ class DTFQuoteBuilder {
 
     // ==================== PRODUCT TABLE ====================
 
-    /**
-     * @deprecated This method creates rows with different event handlers than addNewRow().
-     * Use selectProduct() which now calls addNewRow() + onStyleChange() instead.
-     * This ensures child rows are properly created for extended sizes (2XL, 3XL, etc.).
-     * Keeping for backward compatibility but should not be called directly.
-     */
-    addProductRow(product) {
-        const tbody = document.getElementById('product-tbody');
-        const emptyMessage = document.getElementById('empty-table-message');
-
-        if (emptyMessage) emptyMessage.style.display = 'none';
-
-        // Build color options HTML - compact list pattern matching Embroidery/Screen Print
-        const colorOptionsHTML = product.colors.length > 0
-            ? product.colors.map((c) => {
-                const colorName = c.COLOR_NAME || c.colorName || c;
-                const catalogColor = c.CATALOG_COLOR || c.catalogColor || colorName;
-                const imageUrl = c.COLOR_SQUARE_IMAGE || c.colorImage || '';
-                return `
-                    <div class="color-picker-option"
-                         data-color="${catalogColor}"
-                         data-display="${colorName}"
-                         data-image="${imageUrl}">
-                        <span class="color-swatch" style="background-image: url('${imageUrl}'); background-color: #e5e7eb;"></span>
-                        <span class="color-name">${colorName}</span>
-                    </div>
-                `;
-            }).join('')
-            : '<div class="color-picker-option disabled"><span class="color-name">No colors available</span></div>';
-
-        const row = document.createElement('tr');
-        row.id = `row-${product.id}`;
-        row.dataset.productId = product.id;
-        row.dataset.style = product.styleNumber;
-        row.dataset.baseCost = product.baseCost;
-        // Store additional data for child row inheritance
-        row.dataset.colors = JSON.stringify(product.colors || []);
-        row.dataset.sizeUpcharges = JSON.stringify(product.sizeUpcharges || {});
-        row.dataset.productName = product.description || '';
-        row.innerHTML = `
-            <td>
-                <input type="text" class="cell-input style-input"
-                       placeholder="Style #"
-                       data-field="style"
-                       value="${product.styleNumber}"
-                       readonly>
-            </td>
-            <td class="desc-cell">
-                <div class="desc-row">
-                    <input type="text" class="cell-input desc-input"
-                           value="${product.description}"
-                           title="${product.description}"
-                           placeholder="(auto)"
-                           data-field="description"
-                           readonly>
-                </div>
-                <div class="pricing-breakdown" id="breakdown-${product.id}"></div>
-            </td>
-            <td class="color-col">
-                <div class="color-picker-wrapper" data-product-id="${product.id}">
-                    <div class="color-picker-selected" tabindex="0">
-                        <span class="color-swatch empty"></span>
-                        <span class="color-name placeholder">Select color...</span>
-                        <i class="fas fa-chevron-down picker-arrow"></i>
-                    </div>
-                    <div class="color-picker-dropdown hidden" id="color-dropdown-${product.id}">
-                        ${colorOptionsHTML}
-                    </div>
-                </div>
-            </td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col"><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" disabled onchange="onSizeChange(${product.id})" onkeydown="handleCellKeydown(event, this)"></td>
-            <td class="size-col extended-picker-cell">
-                <button type="button" class="btn-extended-picker" data-product-id="${product.id}" title="Click for XS, 3XL, 4XL, 5XL, 6XL" onclick="openExtendedSizePopup(${product.id})" disabled>
-                    <span class="ext-qty-badge" id="ext-badge-${product.id}">+</span>
-                </button>
-            </td>
-            <td class="qty-col"><span class="row-qty">0</span></td>
-            <td class="price-col"><span class="row-price">$0.00</span></td>
-            <td class="actions-col">
-                <button class="btn-remove-row" onclick="dtfQuoteBuilder.removeProductRow(${product.id})">
-                    <i class="fas fa-times"></i>
-                </button>
-            </td>
-        `;
-
-        tbody.appendChild(row);
-
-        // Add to products array with extended sizes stored
-        this.products.push({
-            id: product.id,
-            styleNumber: product.styleNumber,
-            description: product.description,
-            baseCost: product.baseCost,
-            sizeUpcharges: product.sizeUpcharges,
-            color: '',           // Display name for UI
-            catalogColor: '',    // CATALOG_COLOR for API/ShopWorks
-            quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0, '6XL': 0 }
-        });
-
-        // Mark dirty for auto-save
-        if (this.persistence) {
-            this.persistence.markDirty();
-        }
-        this.markAsUnsaved();
-
-        // Setup input listeners for main row
-        row.querySelectorAll('.size-input').forEach(input => {
-            input.addEventListener('input', () => this.handleSizeInputChange(product.id));
-            input.addEventListener('keydown', (e) => this.handleCellKeydown(e, input));
-        });
-
-        // Setup color picker handlers
-        this.setupColorPicker(row, product.id);
-
-    }
+    // addProductRow() REMOVED 2026-06-11 (deprecated, zero callers). It built
+    // rows with .row-price/.row-qty markup + its own handlers, conflicting with
+    // the live addNewRow()/onSizeChange() path — its 2XL input wrote quantities
+    // into a bucket every money path ignored. setupColorPicker() below is now
+    // unreferenced and kept only for the EMB-pattern reference.
 
     /**
      * Setup color picker dropdown functionality - MATCHES Embroidery/Screen Print pattern
@@ -1619,75 +1505,11 @@ class DTFQuoteBuilder {
         }
     }
 
-    /**
-     * @deprecated This method was used by the deprecated addProductRow() and does NOT create child rows.
-     * Rows created via selectProduct() now use addNewRow() which uses onchange="onSizeChange()"
-     * handlers that properly create child rows for extended sizes (2XL, 3XL, etc.).
-     */
-    handleSizeInputChange(productId) {
-        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-        if (!row) return;
+    // handleSizeInputChange() REMOVED 2026-06-11 (deprecated, only wired by the
+    // removed addProductRow()).
 
-        const productData = this.products.find(p => p.id === productId);
-        if (!productData) return;
-
-        // Collect quantities from main row (S, M, L, XL, 2XL)
-        let rowTotal = 0;
-        row.querySelectorAll('.size-input').forEach(input => {
-            const size = input.dataset.size;
-            const qty = parseInt(input.value) || 0;
-            productData.quantities[size] = qty;
-            rowTotal += qty;
-        });
-
-        // Add extended sizes from stored data (XS, XXXL, 4XL, 5XL, 6XL)
-        const extendedSizes = ['XS', 'XXXL', '4XL', '5XL', '6XL'];
-        let extTotal = 0;
-        extendedSizes.forEach(size => {
-            const qty = productData.quantities[size] || 0;
-            rowTotal += qty;
-            extTotal += qty;
-        });
-
-        // Update row quantity display
-        const qtySpan = row.querySelector('.row-qty');
-        if (qtySpan) qtySpan.textContent = rowTotal;
-
-        // Update extended badge
-        this.updateExtendedBadge(productId, extTotal);
-
-        // Update pricing
-        this.updatePricing();
-
-        // Mark dirty for auto-save
-        if (this.persistence) {
-            this.persistence.markDirty();
-        }
-        this.markAsUnsaved();
-    }
-
-    removeProductRow(productId) {
-        const row = document.querySelector(`tr[data-product-id="${productId}"]`);
-        if (row) row.remove();
-
-        // Remove from products array
-        const index = this.products.findIndex(p => p.id === productId);
-        if (index > -1) this.products.splice(index, 1);
-
-        // Show empty message if no products
-        if (this.products.length === 0) {
-            const emptyMessage = document.getElementById('empty-table-message');
-            if (emptyMessage) emptyMessage.style.display = 'block';
-        }
-
-        this.updatePricing();
-
-        // Mark dirty for auto-save
-        if (this.persistence) {
-            this.persistence.markDirty();
-        }
-        this.markAsUnsaved();
-    }
+    // removeProductRow() REMOVED 2026-06-11 (deprecated, only referenced by the
+    // removed addProductRow() template; live rows use deleteRow()/removeChildRow()).
 
     // ==================== PRICING CALCULATIONS ====================
 
@@ -2374,8 +2196,9 @@ class DTFQuoteBuilder {
         const modal = document.getElementById('summary-modal');
         if (!modal) return;
 
-        // Generate quote ID
-        const quoteId = this.generateQuoteId();
+        // [2026-06-11] real id when one exists; never a random provisional id
+        // (it leaked onto #quote-id, which the printed PDF reads as the quote #)
+        const quoteId = this.editingQuoteId || this.lastSavedQuoteId || 'Pending save';
         document.getElementById('quote-id').textContent = quoteId;
 
         // Build locations summary
@@ -2450,98 +2273,14 @@ class DTFQuoteBuilder {
         modal.style.display = 'flex';
     }
 
-    generateQuoteId() {
-        const now = new Date();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const seq = String(Math.floor(Math.random() * 9999)).padStart(4, '0');
-        return `DTF${month}${day}-${seq}`;
-    }
+    // generateQuoteId() REMOVED 2026-06-11 — Math.random() 4-digit/day was
+    // collision-prone across reps/tabs. saveAndGetLink() now mints ids from the
+    // Caspio-backed /api/quote-sequence/DTF via quoteService.generateQuoteID().
 
-    async saveQuote() {
-        const customerName = document.getElementById('customer-name').value.trim();
-        const customerEmail = document.getElementById('customer-email').value.trim();
-        const notes = document.getElementById('quote-notes').value.trim();
-
-        if (!customerName || !customerEmail) {
-            alert('Please enter customer name and email');
-            return;
-        }
-
-        const totalQty = this.getTotalQuantity();
-        // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
-
-        // Build complete quote data with all pricing metadata
-        const quoteData = {
-            quoteId: document.getElementById('quote-id').textContent,
-            customerName,
-            customerEmail,
-            notes,
-            // Location data
-            selectedLocations: this.selectedLocations,
-            locationDetails: this.selectedLocations.map(loc => ({
-                code: loc,
-                label: this.locationConfig[loc]?.label,
-                size: this.locationConfig[loc]?.size
-            })),
-            // Product data with catalogColor for inventory API
-            // Includes child row quantities for extended sizes
-            products: this.products.map(p => {
-                // Start with standard sizes from products array
-                const standardSizes = ['S', 'M', 'L', 'XL'];
-                const allQuantities = {};
-                standardSizes.forEach(size => {
-                    allQuantities[size] = p.quantities[size] || 0;
-                });
-
-                // Add child row quantities (extended sizes) — from JS state,
-                // not the DOM (2026-06-11 P2)
-                this.getChildRowsForParent(p.id).forEach(child => {
-                    // Normalize size names (XXL->2XL, XXXL->3XL)
-                    const normalizedSize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
-                    allQuantities[normalizedSize] = child.qty || 0;
-                });
-
-                return {
-                    styleNumber: p.styleNumber,
-                    description: p.description,
-                    color: p.color,              // Display name
-                    catalogColor: p.catalogColor, // CATALOG_COLOR for API/ShopWorks
-                    baseCost: p.baseCost,
-                    sizeUpcharges: p.sizeUpcharges,
-                    quantities: allQuantities
-                };
-            }),
-            // Quantity and pricing
-            totalQuantity: totalQty,
-            grandTotal: grandTotal,
-            // Pricing metadata from API (for audit/verification)
-            pricingMetadata: this.currentPricingData ? {
-                tier: this.currentPricingData.tier,
-                marginDenominator: this.currentPricingData.marginDenom,
-                laborCostPerLocation: this.currentPricingData.laborCostPerLoc,
-                freightPerTransfer: this.currentPricingData.freightPerTransfer,
-                ltmPerUnit: this.currentPricingData.ltmPerUnit,
-                totalLtmFee: this.currentPricingData.totalLtmFee,
-                transferBreakdown: this.currentPricingData.transferBreakdown
-            } : null,
-            // Metadata
-            createdAt: new Date().toISOString(),
-            builderVersion: '2026.01'
-        };
-
-        try {
-            const result = await this.quoteService.saveQuote(quoteData);
-            if (result.success) {
-                this.markAsSaved();
-                alert(`Quote saved successfully!\nQuote ID: ${quoteData.quoteId}`);
-            }
-        } catch (error) {
-            console.error('[DTFQuoteBuilder] Save error:', error);
-            alert('Error saving quote. Please try again.');
-        }
-    }
+    // Legacy saveQuote() REMOVED 2026-06-11 (dead: Ctrl+S now routes to
+    // saveAndGetLink(); this path read #quote-notes — an element this page
+    // doesn't have — and threw, and its payload lacked subtotal/taxRate/
+    // includeTax so the service priced items at wholesale baseCost).
 
     /**
      * Save quote and show shareable link modal
@@ -2595,8 +2334,9 @@ class DTFQuoteBuilder {
             return;
         }
 
-        // Generate quote ID
-        const quoteId = this.generateQuoteId();
+        // Quote ID: keep the id when editing; otherwise mint from the Caspio-backed
+        // sequence (collision-safe across reps/tabs — the old Math.random() id was not)
+        const quoteId = this.editingQuoteId || await this.quoteService.generateQuoteID();
         // Calculate from internal state (not DOM text) to avoid stale/drift issues
         const stateCalc = this.calculateFromState();
         if (!(stateCalc.subtotal > 0)) {
@@ -2709,6 +2449,8 @@ class DTFQuoteBuilder {
                         quantity: stdTotalQty,
                         unitPrice: unitPrice,
                         total: stdTotalQty * unitPrice,
+                        // [2026-06-11] LTM component for quote_items metadata
+                        pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
                         effectiveCost: p.baseCost,
                         color: color,            // Include parent row color
                         catalogColor: catalogColor,
@@ -2746,6 +2488,8 @@ class DTFQuoteBuilder {
                         quantity: qty,
                         unitPrice: unitPrice,
                         total: qty * unitPrice,
+                        // [2026-06-11] LTM component for quote_items metadata
+                        pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
                         effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
                         color: childColor,       // Use child row color (or parent fallback)
                         catalogColor: childCatalogColor,
@@ -2855,6 +2599,14 @@ class DTFQuoteBuilder {
                 // [2026-06-11] remember the id so Email Quote works on a fresh
                 // save (editingQuoteId is only set by the ?edit= path)
                 this.lastSavedQuoteId = finalQuoteId;
+
+                // [2026-06-11] surface partial saves — some quote_items POSTs
+                // failed but the old code showed the clean success modal anyway
+                // (an under-billing quote went out looking verified)
+                if (result.partialSave) {
+                    this.showError(result.warning || 'Some line items FAILED to save — open the quote link and verify every line before sending.');
+                    this.showToast('Quote saved INCOMPLETE — verify line items', 'error');
+                }
 
                 // Clear draft after successful save
                 if (this.persistence) {
@@ -3135,54 +2887,9 @@ class DTFQuoteBuilder {
     // LTM — a real customer PDF printed $15.50 for a $39.50 unit). The PDF now
     // sources every number from calculateFromState()/computeFeesAndTotals().
 
-    async emailQuote() {
-        const customerName = document.getElementById('customer-name').value.trim();
-        const customerEmail = document.getElementById('customer-email').value.trim();
-
-        if (!customerEmail) {
-            alert('Please enter customer email');
-            return;
-        }
-
-        if (!customerName) {
-            alert('Please enter customer name');
-            return;
-        }
-
-        const totalQty = this.getTotalQuantity();
-        // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
-
-        // Build email data
-        const emailData = {
-            quoteID: document.getElementById('quote-id').textContent,
-            customerName,
-            customerEmail,
-            selectedLocations: this.selectedLocations,
-            products: this.products,
-            totalQuantity: totalQty,
-            total: grandTotal,
-            tierLabel: this.currentPricingData?.tier || this.getTierForQuantity(totalQty),
-            specialNotes: document.getElementById('quote-notes')?.value || ''
-        };
-
-        try {
-            const result = await this.quoteService.sendQuoteEmail(emailData);
-            if (result.success) {
-                if (result.message?.includes('pending')) {
-                    // Template not ready yet
-                    alert('Email template not yet configured. Please use Print to share the quote.');
-                } else {
-                    alert(`Quote emailed successfully to ${customerEmail}`);
-                }
-            } else {
-                alert('Error sending email: ' + (result.error || 'Unknown error'));
-            }
-        } catch (error) {
-            console.error('[DTFQuoteBuilder] Email error:', error);
-            alert('Error sending email. Please try again or use Print.');
-        }
-    }
+    // emailQuote() REMOVED 2026-06-11 (dead: zero callers — the live email path
+    // is dtf-quote-page.js dtfEmailQuote() → shared emailQuote() in
+    // quote-builder-utils.js, which emails the SAVED quote link).
 
     // ==================== UTILITY FUNCTIONS ====================
 
@@ -3288,24 +2995,26 @@ class DTFQuoteBuilder {
      * Generate plain text quote for clipboard
      */
     generateQuoteText() {
+        // [2026-06-11] rebuilt from state math (calculateFromState +
+        // computeFeesAndTotals): the old text read the DOM grand total, dropped
+        // ALL extended sizes (2XL+), could print blank phantom product lines, and
+        // showed a tax-inclusive GRAND TOTAL with no subtotal/fees/tax disclosure.
         const totalQty = this.getTotalQuantity();
-        // DTF uses grand-total-with-tax (not grand-total)
-        const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
+        const stateCalc = this.calculateFromState();
+        const totals = this.computeFeesAndTotals(stateCalc);
         const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
 
         let text = '';
-
-        // Header
         text += `NORTHWEST CUSTOM APPAREL\n`;
         text += `2025 Freeman Road East, Milton, WA 98354\n`;
         text += `Phone: (253) 922-5793 | Email: sales@nwcustomapparel.com\n\n`;
 
-        // Quote Header
         text += `DTF TRANSFER QUOTE\n`;
+        const quoteRef = this.editingQuoteId || this.lastSavedQuoteId;
+        if (quoteRef) text += `Quote ID: ${quoteRef}\n`;
         text += `Date: ${new Date().toLocaleDateString()}\n`;
         text += `Valid for: 30 days\n\n`;
 
-        // Locations
         text += `TRANSFER LOCATIONS:\n`;
         this.selectedLocations.forEach(loc => {
             const config = this.locationConfig[loc];
@@ -3313,32 +3022,50 @@ class DTFQuoteBuilder {
         });
         text += `\n`;
 
-        // Products
         text += `PRODUCTS:\n`;
+        const standardSizes = ['S', 'M', 'L', 'XL'];
         this.products.forEach(product => {
-            const totalProductQty = Object.values(product.quantities).reduce((s, q) => s + (q || 0), 0);
-            if (totalProductQty === 0) return;
-
+            const calcData = stateCalc.productTotals.get(product.id);
+            const stdParts = standardSizes
+                .filter(s => (product.quantities[s] || 0) > 0)
+                .map(s => `${s}(${product.quantities[s]})`);
+            const stdQty = standardSizes.reduce((s, sz) => s + (product.quantities[sz] || 0), 0);
+            const childLines = [];
+            this.childRows.forEach((child, childRowId) => {
+                if (Number(child.parentId) === Number(product.id) && child.qty > 0) {
+                    const childCalc = stateCalc.childTotals.get(`row-${childRowId}`);
+                    childLines.push(`  ${child.size}(${child.qty}) @ $${(childCalc?.unitPrice || 0).toFixed(2)} = $${(childCalc?.total || 0).toFixed(2)}`);
+                }
+            });
+            if (stdQty === 0 && childLines.length === 0) return; // nothing quotable (incl. phantom rows)
             text += `${product.styleNumber} - ${product.description}\n`;
             text += `  Color: ${product.color || 'Not selected'}\n`;
-
-            // Size breakdown
-            const sizeStr = Object.entries(product.quantities)
-                .filter(([_, qty]) => qty > 0)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(' ');
-            text += `  Sizes: ${sizeStr}\n`;
-            text += `  Quantity: ${totalProductQty} pieces\n\n`;
+            if (stdQty > 0) {
+                text += `  ${stdParts.join(' ')} @ $${(calcData?.standardUnitPrice || 0).toFixed(2)} = $${(calcData?.standardTotal || 0).toFixed(2)}\n`;
+            }
+            childLines.forEach(l => { text += l + `\n`; });
+            text += `\n`;
         });
 
-        // Pricing
         text += `PRICING SUMMARY:\n`;
         text += `  Total Quantity: ${totalQty} pieces\n`;
         text += `  Pricing Tier: ${tier}\n`;
         if (this.currentPricingData?.totalLtmFee > 0) {
             text += `  Small Batch Fee: $${this.currentPricingData.totalLtmFee.toFixed(2)} (included in pricing)\n`;
         }
-        text += `  GRAND TOTAL: $${grandTotal.toFixed(2)}\n\n`;
+        text += `  Products Subtotal: $${totals.subtotal.toFixed(2)}\n`;
+        if (totals.artCharge > 0) text += `  Art/Logo Charge: $${totals.artCharge.toFixed(2)}\n`;
+        if (totals.graphicDesignCharge > 0) text += `  Graphic Design: $${totals.graphicDesignCharge.toFixed(2)}\n`;
+        if (totals.rushFee > 0) text += `  Rush Fee: $${totals.rushFee.toFixed(2)}\n`;
+        if (totals.discount > 0) text += `  Discount: -$${totals.discount.toFixed(2)}\n`;
+        if (totals.shippingFee > 0) text += `  Shipping: $${totals.shippingFee.toFixed(2)}\n`;
+        text += `  Subtotal: $${totals.preTaxSubtotal.toFixed(2)}\n`;
+        if (totals.includeTax) {
+            text += `  Sales Tax (${totals.taxRatePct}%): $${totals.taxAmount.toFixed(2)}\n`;
+        } else {
+            text += `  Sales tax not included\n`;
+        }
+        text += `  GRAND TOTAL: $${totals.grandTotal.toFixed(2)}\n\n`;
 
         text += `Thank you for your business!\n`;
         text += `Northwest Custom Apparel | Since 1977\n`;

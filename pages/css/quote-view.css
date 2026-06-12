@@ -1162,6 +1162,18 @@ body {
     color: #92400e;
 }
 
+/* Method subheads — mixed-method (WQ web-cart) quotes only (2026-06-11) */
+.product-table tr.method-subhead td {
+    padding: 8px 10px 6px;
+    background-color: #f8fafc;
+    border-top: 2px solid #cbd5e1;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #334155;
+}
+
 /* Fee line items (Additional Stitches, AL charges, Digitizing) */
 .product-table tr.fee-row {
     background-color: #f0fdf4;

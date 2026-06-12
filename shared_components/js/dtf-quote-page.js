@@ -148,7 +148,15 @@ function updateAdditionalCharges() {
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
 
-    const netCharges = rushFee - discountAmount;
+    // [2026-06-11] badge now reflects ALL charges (art + design + rush − discount,
+    // with a percent discount converted to dollars) — it used to ignore art/design
+    // and subtract a percent value as if it were dollars
+    const b = window.dtfQuoteBuilder;
+    const t = (b && typeof b.computeFeesAndTotals === 'function' && b.currentPricingData)
+        ? b.computeFeesAndTotals(b.calculateFromState()) : null;
+    const netCharges = t
+        ? (t.artCharge + t.graphicDesignCharge + t.rushFee - t.discount)
+        : (rushFee - discountAmount);
     if (netCharges !== 0) {
         badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
         badge.classList.remove('hidden');
@@ -438,17 +446,19 @@ function updateFeeTableRows() {
             discountRow.style.display = 'table-row';
             let actualDiscount = discountAmount;
             if (discountType === 'percent') {
-                // Calculate discountable subtotal (products + additional services)
-                const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
-                const artCharge = document.getElementById('art-charge-toggle')?.checked
-                    ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
-                const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-                const ltmFee = document.getElementById('ltm-fee-row')?.style.display !== 'none'
-                    ? parseFloat(document.getElementById('ltm-row-total')?.textContent?.replace(/[$,]/g, '') || 0) : 0;
-
-                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + ltmFee;
-                actualDiscount = discountableSubtotal * (discountAmount / 100);
+                // [2026-06-11] same source as the charged totals. The old inline
+                // math parsed #ltm-row-total — which shows '(included)' in separate
+                // LTM mode → NaN → the row printed '-$NaN' — and double-counted the
+                // baked LTM into the discount base vs updateTaxCalculation.
+                const b = window.dtfQuoteBuilder;
+                const t = (b && typeof b.computeFeesAndTotals === 'function' && b.currentPricingData)
+                    ? b.computeFeesAndTotals(b.calculateFromState()) : null;
+                if (t) {
+                    actualDiscount = t.discount;
+                } else {
+                    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0) || 0;
+                    actualDiscount = productsSubtotal * (discountAmount / 100);
+                }
             }
             const reasonLabel = document.getElementById('discount-reason-label');
             if (reasonLabel) {
