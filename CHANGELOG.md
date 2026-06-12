@@ -1,3 +1,9 @@
+## v2026.06.11.11 (2026.06.11)
+
+- feat(quote-cart): Phase 2 - Add-to-Quote cart with pooled per-method pricing
+- feat(quote-cart): register /quote-cart clean-URL route + TOC
+- Deploy v2026.06.11.11: 55 files (ACTIVE_FILES.md,christmas-bundles.html,laser-tumbler-polarcamel.html...)
+
 ## v2026.06.11.10 (2026.06.11)
 
 - fix(catalog): cap price margin from API only - removes last hardcoded 0.57 fallback (completes parallel session's margin cleanup)
