@@ -240,6 +240,14 @@ const CHANNELS = {
       // 0) — kept for registry shape parity only.
       ltmPartNumber: 'LTM-75',
       designTypeId: 2,    // 2 = Embroidery (EMB push default; NOT DTG's 45)
+      // OnSite ORDER type → production queue + GL account. 21 = Custom
+      // Embroidery (account 4050 Custom Embroidered Sales). Erik 2026-06-12:
+      // web cap orders book to embroidered sales, not the generic Online Store
+      // (id 6 / acct 4003). Caps-ONLY — the tee channels deliberately OMIT this
+      // so they keep inheriting the proxy default 6 (DTG, no order-type change
+      // was asked for). ID verified against the server.js Order-Form
+      // ORDER_TYPE_ID map + the 2026-05-02 OnSite Order-Types screenshot.
+      idOrderType: 21,
       artistId: 24,       // EMB push default id_Artist (ERIK-DECISION: cap/emb routing)
       designExternalIdPrefix: 'CAP-',
       designLocationColors: 'Match customer artwork',   // thread colors TBD at proofing

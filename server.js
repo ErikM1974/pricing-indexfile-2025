@@ -3498,6 +3498,13 @@ Payment Status: ${paymentConfirmed ? 'succeeded' : 'pending'}
 Total: $${orderTotals?.grandTotal || 0}${taxPct ? ` (includes ${taxPct}% sales tax${customerData.deliveryMethod === 'pickup' ? ', Milton pickup' : ''})` : ' (no sales tax - out of state)'}
 TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shipment'}`
       }],
+      // OnSite ORDER type → production queue + GL account. Channel-set: caps
+      // send 21 (Custom Embroidery / acct 4050). When a channel omits it (the
+      // DTG tee channels), the field is ABSENT and the proxy's push-client
+      // defaults to 6 (Online Store / acct 4003) — byte-identical to the
+      // pre-2026-06-12 storefront payload, so this is a caps-only change. The
+      // proxy reads root-level `idOrderType` (same as the Order Form push).
+      ...(pushC.idOrderType ? { idOrderType: pushC.idOrderType } : {}),
       // Channel-aware (registry): Custom-Tees standard orders are NOT rush
       // (legacy 3DT always is)
       rushOrder: pushC.rushOrderFlag(orderSettings),
