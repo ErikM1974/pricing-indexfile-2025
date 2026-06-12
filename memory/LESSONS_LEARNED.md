@@ -253,11 +253,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 **Solution:** `this.taxRate ?? 0.101` — nullish coalescing only falls through on `null`/`undefined`.
 **Prevention:** Always `??` when `0`, `""`, or `false` are valid values. Reserve `||` for all-falsy defaults.
 
-### `await` in a sync fn that only looks like the async one — EMB recalc vs updatePricingDisplay (2026-06-03)
-**Problem:** Adding the Additional Logo bar line item, I put `await syncALRows()` beside `syncRushRow(); updateTaxCalculation();`, assuming that block ended `async recalculatePricing()`. It is actually the tail of `updatePricingDisplay(pricing)` — a SYNC fn that recalc calls. `SyntaxError: await is only valid in async functions` took the WHOLE `embroidery-quote-builder.js` down -> every global undefined, Services bar blank, console empty.
-**Root Cause:** `recalculatePricing()` (async) delegates rendering to `updatePricingDisplay()` (sync), and `syncRushRow`/`updateTaxCalculation` live at the end of the SYNC one.
-**Solution:** Keep the display fn sync. A tier-priced line only re-prices when its OWN qty/stitch/type change -> reprice in `addALLineItem` (await syncALRows) + `onServiceQtyChange` (`syncALRows().then(recalc)`); the sync recalc just sums the stored `dataset.unitPrice`. No async ripple into the save path, no duplicated math.
-**Prevention:** Run `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded." The block ending in `syncRushRow()`/`updateTaxCalculation()` is `updatePricingDisplay` (sync), NOT `recalculatePricing`.
+### `await` in a sync fn that only looks like the async one (2026-06-03) — ARCHIVED 2026-06-12
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded." In embroidery-quote-builder.js the block ending in `syncRushRow()`/`updateTaxCalculation()` is the SYNC `updatePricingDisplay`, not `recalculatePricing`.
 
 ---
 

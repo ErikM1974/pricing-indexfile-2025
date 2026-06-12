@@ -1945,3 +1945,9 @@ _(Shipping/Freight: UPS Ground estimator lesson archived 2026-06-09 → LESSONS_
 
 ### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs [archived 2026-06-12]
 **Problem:** Two rapid saves could get the same sequence number. **Root Cause:** Caspio has no atomic increment; GET-then-PUT isn't atomic. **Solution:** In-memory mutex lock per prefix (promise queue). **Prevention:** Any read-modify-write on Caspio needs application-level locking.
+
+### `await` in a sync fn that only looks like the async one — EMB recalc vs updatePricingDisplay (2026-06-03) [archived 2026-06-12]
+**Problem:** Adding the Additional Logo bar line item, I put `await syncALRows()` beside `syncRushRow(); updateTaxCalculation();`, assuming that block ended `async recalculatePricing()`. It is actually the tail of `updatePricingDisplay(pricing)` — a SYNC fn. `SyntaxError: await is only valid in async functions` took the WHOLE embroidery-quote-builder.js down → every global undefined, Services bar blank.
+**Root Cause:** `recalculatePricing()` (async) delegates rendering to `updatePricingDisplay()` (sync); `syncRushRow`/`updateTaxCalculation` live at the end of the SYNC one.
+**Solution:** Keep the display fn sync; re-price a tier-priced line only on its own qty/stitch/type change.
+**Prevention:** Run `node --check <file>` BEFORE browser verification — one syntax error nukes the whole script and reads as "nothing loaded."
