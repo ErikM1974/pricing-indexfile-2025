@@ -1936,3 +1936,12 @@ _(Shipping/Freight: UPS Ground estimator lesson archived 2026-06-09 → LESSONS_
 **Root Cause:** On `mouseenter`, the handler called `paint()` which set `menu.innerHTML = ...` — destroying every DOM node and recreating them with the active class on the hovered one. Real mouse motion between mousedown and click had enough latency for the destroy-and-recreate to lose the click target intermittently. Synthetic `dispatchEvent(new MouseEvent('mousedown'))` smoke tests gave false positives because they're synchronous (no DOM churn between event dispatch and listener execution).
 **Solution:** On hover, toggle the `.active` class via `classList.toggle()` on existing items — don't regenerate the HTML. Same fix applied to all 3 free-typing comboboxes in `shared_components/js/dtg-inline-form.js` (style, color, customer) that had the pattern.
 **Prevention:** Never regenerate DOM nodes during user interactions (hover, mid-click). Update CSS classes / text content in-place. Smoke tests for interactive selection should use the full `mousedown + mouseup + click` sequence with proper `button: 0, buttons: 1` props — bare `dispatchEvent('mousedown')` is a false-positive trap.
+
+### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix (~2025-09) [archived 2026-06-12]
+**Problem:** After deleting an orphan `1-23` tier from `Pricing_Tiers` (EmbroideryCaps), `/api/pricing-bundle?method=CAP` *still* returned the orphan.
+**Root Cause:** A proxy shim `response.tiersR.unshift({TierLabel:'1-23',...})` (commit c160648) papered over a missing Caspio row; the later 5-tier migration split 1-23 into 1-7+8-23 but the shim was never removed, clobbering correct data on every CAP response.
+**Solution:** Removed the shim (proxy v612).
+**Prevention:** When backfilling missing data via proxy injection, leave a `// REMOVE WHEN <X> IS FIXED IN CASPIO` marker; audit such shims whenever the table changes shape. Verify the response matches the table, not just the table.
+
+### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs [archived 2026-06-12]
+**Problem:** Two rapid saves could get the same sequence number. **Root Cause:** Caspio has no atomic increment; GET-then-PUT isn't atomic. **Solution:** In-memory mutex lock per prefix (promise queue). **Prevention:** Any read-modify-write on Caspio needs application-level locking.

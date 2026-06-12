@@ -213,11 +213,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ## Caspio API Gotchas
 
-### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix
-**Problem:** After deleting an orphan `1-23` tier from `Pricing_Tiers` (EmbroideryCaps), `/api/pricing-bundle?method=CAP` *still* returned the orphan, and `[CapEmbroideryPricingService] No 8000 stitch cost found for tier 1-23` kept firing on the order form.
-**Root Cause:** Sept 2025 commit `c160648` ("fix: add missing 1-23 tier") added a `response.tiersR.unshift({ TierLabel: '1-23', ... })` shim in `caspio-pricing-proxy/src/routes/pricing.js` to paper over a missing Caspio row. The 5-tier migration later split `1-23` into `1-7` + `8-23` and the shim was never removed — so even after the data was correct, the proxy clobbered it with the orphan on every CAP/CAP-AL response. Heroku log confirmed `Total records fetched: 5` from Caspio, but response had 6.
-**Solution:** Removed the shim block (proxy v612). Bundle now returns Caspio reality.
-**Prevention:** When backfilling missing data via proxy injection, leave a `// REMOVE WHEN <X> IS FIXED IN CASPIO` marker. Audit such shims any time the underlying table changes shape (tier migration, schema rename, etc.). Verify the *response* matches the *table* — not just the table.
+### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix (~2025-09) — ARCHIVED 2026-06-12
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when a proxy injects/backfills missing Caspio data, leave a `// REMOVE WHEN FIXED IN CASPIO` marker and re-audit on any table shape change; verify the response matches the table.
 
 ### Caspio v3 Pagination: q.limit + q.pageNumber = Overlapping Pages
 **Problem:** `fetchAllCaspioPages` returned only 1000 of 2794 ManageOrders_LineItems. Style index had 634 styles instead of 715.
@@ -266,11 +263,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 
 ## Data Integrity
 
-### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs
-**Problem:** Two rapid saves could get the same sequence number.
-**Root Cause:** Caspio doesn't support atomic increment. GET-then-PUT isn't atomic.
-**Solution:** In-memory mutex lock per prefix. Concurrent requests serialized via promise queue.
-**Prevention:** Any read-modify-write on Caspio needs application-level locking.
+### Quote Sequence Race Condition — Concurrent Requests Get Duplicate IDs — ARCHIVED 2026-06-12
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: Caspio has no atomic increment — any read-modify-write needs an application-level lock (in-memory mutex per prefix).
 
 ### Art-request notes notification fan-out (2026-05-29) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: notifications belong on the backend write chokepoint, not the browser; audit/system note POSTs must send `notify:false` or they double-fire. Current state documented in MEMORY.md Art Hub section.
