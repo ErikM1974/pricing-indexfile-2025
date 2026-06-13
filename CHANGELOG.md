@@ -1,3 +1,7 @@
+## v2026.06.12.7 (2026.06.12)
+
+- Deploy v2026.06.12.7: SanMar-style gallery cards (blurbs+live 12pc/ladder pricing+varied colors+sort+badges), About-this-shirt specs panel, Caspio-driven PC54 sale (CTS-SALE-{STYLE}), service-code burst fixes
+
 ## v2026.06.12.6 (2026.06.12)
 
 - Deploy v2026.06.12.6: custom-tees AI-art hero + 'AI Artwork + Full-Color DTG' feature section (5 samples)
