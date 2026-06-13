@@ -51,7 +51,10 @@
         boot: { ready: false, fatal: null },
         styleNumber: null,             // selected garment (set by the gallery)
         rush: false,                   // 3-Day Rush upgrade — OFF by default
-        gallery: { items: [], category: '', search: '' },
+        // extras: null = loading (cards show a price skeleton); { styles } =
+        // loaded; { failed:true } = endpoint down → every card shows a visible
+        // "Pricing unavailable" (NEVER a stale/guessed number — Erik's #1 rule).
+        gallery: { items: [], category: '', search: '', sort: 'popular', extras: null },
         config: {
             rushPct: null, ltmFee: null, ltmThreshold: null,
             // UberPrints model (Erik 2026-06-10): the small-batch fee is BAKED
@@ -306,7 +309,7 @@
         try {
             // Service-code config + the curated 20-style catalog load first;
             // everything style-specific loads in selectProduct/loadProduct.
-            const [rushPct, ltmFee, shipFee, shipFlat, shipFreeOver, catalog] = await Promise.all([
+            const [rushPct, ltmFee, shipFee, shipFlat, shipFreeOver, catalog, salesRows] = await Promise.all([
                 loadServiceCode('3DT-RUSH'),
                 // CTS-LTM ($25) — the ONLINE small-batch amount, intentionally
                 // lower than the internal builder's $50 tier fee (Erik
@@ -322,7 +325,18 @@
                 loadServiceCode('CTS-SHIP-FLAT'),
                 loadServiceCode('CTS-SHIP-FREE-OVER'),
                 fetchJson(`${API_BASE}/api/dtg/top-sellers/styles`),
+                // Per-style SALES (CTS-SALE-{STYLE} codes, 2026-06-12) — ONE
+                // category call for every sale; OPTIONAL/best-effort: failure
+                // means regular prices (the safe direction), never a block.
+                fetchJson(`${API_BASE}/api/service-codes?category=${encodeURIComponent('Custom Tees')}`).catch(() => null),
             ]);
+
+            S.salesByStyle = {};
+            (((salesRows || {}).data) || []).forEach((row) => {
+                const m = /^CTS-SALE-(.+)$/.exec(String(row.ServiceCode || ''));
+                const off = parseFloat(row.SellPrice);
+                if (m && row.IsActive && off > 0) S.salesByStyle[m[1].toUpperCase()] = off;
+            });
 
             S.config.rushPct = rushPct;
             S.config.ltmFee = ltmFee;
@@ -335,6 +349,10 @@
 
             $('gallery-loading').hidden = true;
             renderGallery();
+            // Card blurbs + reference prices (server-computed by the SAME
+            // engine that reprices checkout). Non-blocking: cards render
+            // immediately with a price skeleton, then re-render on arrival.
+            loadGalleryExtras();
             wireEverything();
             renderPromise();
             setInterval(renderPromise, 30000);
@@ -418,6 +436,11 @@
             fetchJson(`${API_BASE}/api/sanmar/inventory/${enc}`).catch(() => null),
         ]);
 
+        // Per-style SALE (CTS-SALE-{STYLE}, loaded once at boot) — ALWAYS
+        // overwrite: a style without a sale clears the previous discount.
+        // Server reprice loads the same Caspio code → checkout 409 parity.
+        S.config.saleOff = (S.salesByStyle && S.salesByStyle[styleNumber.toUpperCase()]) || 0;
+
         if (calRows && calRows.data && calRows.data.length && window.CTS_CALIBRATION
             && typeof window.CTS_CALIBRATION.applyRemoteOverrides === 'function') {
             try { window.CTS_CALIBRATION.applyRemoteOverrides(styleNumber, calRows.data); } catch (_) { /* auto-fit fallback */ }
@@ -494,6 +517,9 @@
 
         // Curated colors joined to SanMar imagery (CATALOG_COLOR keys both)
         const rows = Array.isArray(details) ? details : (details.result || []);
+        // SanMar's full product copy (same on every color row) → the step-2
+        // "About this shirt" panel. Missing copy is cosmetic — panel hides.
+        S.product.description = (rows[0] && rows[0].PRODUCT_DESCRIPTION) || '';
         const byCatalog = new Map();
         rows.forEach((r) => { if (!byCatalog.has(r.CATALOG_COLOR)) byCatalog.set(r.CATALOG_COLOR, r); });
         S.product.colors = curated.map((c) => {
@@ -564,6 +590,28 @@
         // product_title already leads with the brand — no need to prepend it
         $('current-product-name').textContent = S.product.title || S.styleNumber || '—';
         $('current-product-style').textContent = S.styleNumber ? `Style ${S.styleNumber} · ${S.product.curated.length} print-tested colors` : '';
+
+        // "About this shirt" — SanMar's lead sentence + spec bullets (parsed
+        // by CTS_MERCH from the copy loadProduct stashed). textContent only —
+        // external data never reaches innerHTML.
+        const about = $('product-about');
+        const parsed = (window.CTS_MERCH && S.product.description)
+            ? CTS_MERCH.extractSpecs(S.product.description) : { lead: '', specs: [] };
+        if (!parsed.lead) {
+            about.hidden = true;
+        } else {
+            $('product-about-lead').textContent = parsed.lead;
+            const ul = $('product-about-specs');
+            ul.textContent = '';
+            parsed.specs.forEach((s) => {
+                const li = document.createElement('li');
+                li.textContent = s;
+                ul.appendChild(li);
+            });
+            ul.hidden = !parsed.specs.length;
+            about.hidden = false;
+            about.open = false;   // collapsed on every product switch
+        }
     }
 
     function syncRushUI() {
@@ -704,20 +752,57 @@
         return String(title || '').replace(/\.?\s*[A-Z0-9]+\s*$/, '').trim();
     }
 
+    // Card blurbs + per-piece reference prices, computed server-side by the
+    // SAME CTS_PRICING engine that reprices checkout (Rule 7 parity). Failure
+    // is VISIBLE: cards show "Pricing unavailable" + a toast — the designer
+    // still loads full live pricing per style, so ordering keeps working.
+    async function loadGalleryExtras() {
+        try {
+            const j = await fetchJson('/api/cts/gallery-extras');
+            if (!j || !j.styles) throw new Error('empty gallery-extras response');
+            S.gallery.extras = j;
+        } catch (e) {
+            console.error('[CTS] gallery extras failed:', e);
+            S.gallery.extras = { failed: true, styles: {} };
+            toast('Live card pricing is unavailable right now — full pricing still loads when you pick a shirt.', 'error');
+        }
+        renderGalleryGrid();
+    }
+
     function galleryFiltered() {
         const cat = S.gallery.category;
         const q = S.gallery.search.trim().toLowerCase();
-        return S.gallery.items.filter((it) => {
+        const items = S.gallery.items.filter((it) => {
             if (cat && (it.category || 'Other') !== cat) return false;
             if (q && (`${it.style} ${it.product_title}`).toLowerCase().indexOf(q) === -1) return false;
             return true;
         });
+        const sort = S.gallery.sort || 'popular';
+        if (sort === 'price') {
+            // 12-pc reference price; unpriced styles sort last, never hidden.
+            const ea = (it) => {
+                const x = S.gallery.extras && S.gallery.extras.styles && S.gallery.extras.styles[it.style];
+                return x && x.prices && x.prices['12'] != null ? x.prices['12'] : Infinity;
+            };
+            items.sort((a, b) => ea(a) - ea(b) || (Number(a.style_rank) || 999) - (Number(b.style_rank) || 999));
+        } else if (sort === 'name') {
+            items.sort((a, b) => String(a.product_title || '').localeCompare(String(b.product_title || '')));
+        } else {
+            items.sort((a, b) => (Number(a.style_rank) || 999) - (Number(b.style_rank) || 999));
+        }
+        return items;
     }
 
     function renderGallery() {
         renderGalleryChips();
         renderGalleryGrid();
     }
+
+    // Merchandising order + plural display labels. Keyed on the CANONICAL API
+    // category values (Caspio DTG_Top_Sellers.category) — data stays canonical,
+    // only the label changes; unknown categories fall through untouched.
+    const CAT_ORDER = { 'T-Shirt': 1, 'Long Sleeve Tee': 2, 'Hoodie': 3, 'Youth Tee': 4 };
+    const CAT_LABELS = { 'T-Shirt': 'T-Shirts', 'Long Sleeve Tee': 'Long Sleeve Tees', 'Hoodie': 'Hoodies', 'Youth Tee': 'Youth Tees' };
 
     function renderGalleryChips() {
         const wrap = $('gallery-chips');
@@ -726,13 +811,14 @@
             const c = it.category || 'Other';
             if (cats.indexOf(c) === -1) cats.push(c);
         });
+        cats.sort((a, b) => (CAT_ORDER[a] || 99) - (CAT_ORDER[b] || 99) || a.localeCompare(b));
         const chip = (label, value) => {
             const n = value
                 ? S.gallery.items.filter((i) => (i.category || 'Other') === value).length
                 : S.gallery.items.length;
             return `<button type="button" class="gallery-chip${S.gallery.category === value ? ' is-active' : ''}" data-cat="${escapeHTML(value)}">${escapeHTML(label)} <small>${n}</small></button>`;
         };
-        wrap.innerHTML = chip('All', '') + cats.map((c) => chip(c, c)).join('');
+        wrap.innerHTML = chip('All', '') + cats.map((c) => chip(CAT_LABELS[c] || c, c)).join('');
         wrap.querySelectorAll('.gallery-chip').forEach((b) => {
             b.addEventListener('click', () => {
                 S.gallery.category = b.dataset.cat || '';
@@ -742,15 +828,47 @@
         });
     }
 
-    function galleryCardHtml(it) {
+    // Per-card price block. extras===null → skeleton (still loading);
+    // priced → "$X.XX/shirt · 12 shirts, full-front print" + the 24/48/72
+    // ladder; anything else → VISIBLE "Pricing unavailable" (never a guess).
+    function galleryPriceHtml(it) {
+        if (S.gallery.extras === null) {
+            return '<div class="gallery-card-pricing"><span class="gallery-price-loading">Loading price…</span></div>';
+        }
+        const ex = S.gallery.extras.styles && S.gallery.extras.styles[it.style];
+        if (ex && ex.prices && ex.prices['12'] != null) {
+            const fmt = (v) => '$' + Number(v).toFixed(2);
+            const was = ex.wasPrices && ex.wasPrices['12'] > ex.prices['12'] ? ex.wasPrices['12'] : null;
+            const ladder = ['24', '48', '72']
+                .filter((q) => ex.prices[q] != null)
+                .map((q) => `${q}+ ${fmt(ex.prices[q])}`).join(' · ');
+            return `<div class="gallery-card-pricing">
+                <span class="gallery-price-main">
+                    ${was ? '<span class="gallery-price-sale-chip">Sale</span>' : ''}
+                    ${fmt(ex.prices['12'])}<small>/shirt</small>
+                    ${was ? `<s class="gallery-price-was">${fmt(was)}</s>` : ''}
+                </span>
+                <small class="gallery-price-qual">12 shirts · full-front print</small>
+                ${ladder ? `<small class="gallery-price-ladder">${escapeHTML(ladder)} per shirt</small>` : ''}
+            </div>`;
+        }
+        return '<div class="gallery-card-pricing"><span class="gallery-price-unavail"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> Pricing unavailable</span></div>';
+    }
+
+    function galleryCardHtml(it, heroColor) {
         const colors = Array.isArray(it.top_colors) ? it.top_colors : [];
-        const def = colors[0] || null;
+        // Featured color from the variety pass (grid de-dupes Jet Black);
+        // falls back to the style's #1 seller.
+        const def = heroColor || colors[0] || null;
         const hero = (def && def.front_image_url) || it.main_image_url || '';
         const brand = extractBrand(it.product_title);
         const name = stripStyleSuffix(it.product_title) || it.style;
+        const ex = S.gallery.extras && S.gallery.extras.styles ? S.gallery.extras.styles[it.style] : null;
+        const bestSeller = Number(it.style_rank) >= 1 && Number(it.style_rank) <= 3;
         const swatches = colors.slice(0, 6).map((c) => `
             <button type="button" class="gallery-swatch"
                     data-style="${escapeHTML(it.style)}" data-cc="${escapeHTML(c.catalog_color)}"
+                    data-img="${escapeHTML(c.front_image_url || '')}"
                     title="${escapeHTML(c.color_name)} — print-tested"
                     aria-label="Customize ${escapeHTML(it.style)} in ${escapeHTML(c.color_name)}">
                 ${c.swatch_image_url
@@ -763,17 +881,22 @@
                      aria-label="Customize ${escapeHTML(name)}">
                 <div class="gallery-card-hero">
                     ${hero
-                        ? `<img src="${escapeHTML(hero)}" alt="${escapeHTML(name)}" loading="lazy">`
+                        ? `<img src="${escapeHTML(hero)}" alt="${escapeHTML(name)}${def ? ' in ' + escapeHTML(def.color_name || '') : ''}" loading="lazy">`
                         : '<i class="fas fa-shirt" aria-hidden="true"></i>'}
                 </div>
                 <div class="gallery-card-body">
-                    ${brand ? `<small class="gallery-card-brand">${escapeHTML(brand)}</small>` : ''}
+                    <div class="gallery-card-topline">
+                        ${brand ? `<small class="gallery-card-brand">${escapeHTML(brand)}</small>` : '<span></span>'}
+                        ${bestSeller ? '<span class="gallery-card-badge"><i class="fas fa-fire" aria-hidden="true"></i> Best Seller</span>' : ''}
+                    </div>
                     <strong class="gallery-card-name">${escapeHTML(name)}</strong>
-                    <small class="gallery-card-style">${escapeHTML(it.style)} · ${escapeHTML(it.category || 'Other')}</small>
+                    <small class="gallery-card-style">${escapeHTML(it.style)} · ${escapeHTML(it.category || 'Other')}${ex && ex.fabric ? ` · ${escapeHTML(ex.fabric)}` : ''}</small>
+                    ${ex && ex.blurb ? `<p class="gallery-card-blurb">${escapeHTML(ex.blurb)}</p>` : ''}
                     <div class="gallery-card-swatches">
                         ${swatches}
                         ${it.color_count > 6 ? `<span class="gallery-swatch-more">+${Math.max(0, (Number(it.color_count) || 0) - 6)}</span>` : ''}
                     </div>
+                    ${galleryPriceHtml(it)}
                     <div class="gallery-card-foot">
                         <span class="gallery-card-proof"><i class="fas fa-fire" aria-hidden="true"></i> ${fmtInt(it.total_units_sold)} printed</span>
                         <span class="gallery-card-cta">Customize <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
@@ -786,7 +909,11 @@
         const grid = $('gallery-grid');
         const items = galleryFiltered();
         $('gallery-empty').hidden = items.length > 0;
-        grid.innerHTML = items.map(galleryCardHtml).join('');
+        // Variety pass: stop the wall of Jet Black — each card gets its most
+        // popular color not already featured nearby (CTS_MERCH is pure+locked).
+        const heroBy = (window.CTS_MERCH && typeof CTS_MERCH.pickVariedHeroColors === 'function')
+            ? CTS_MERCH.pickVariedHeroColors(items, 3) : {};
+        grid.innerHTML = items.map((it) => galleryCardHtml(it, heroBy[it.style])).join('');
         grid.querySelectorAll('.gallery-card').forEach((card) => {
             card.addEventListener('click', () => selectProduct(card.dataset.style, card.dataset.cc || null));
             card.addEventListener('keydown', (e) => {
@@ -800,6 +927,12 @@
             sw.addEventListener('click', (e) => {
                 e.stopPropagation();
                 selectProduct(sw.dataset.style, sw.dataset.cc);
+            });
+            // Hovering a swatch previews that color on the card photo (the
+            // model JPG loads on first hover only — no upfront weight).
+            sw.addEventListener('mouseenter', () => {
+                const img = sw.dataset.img && sw.closest('.gallery-card')?.querySelector('.gallery-card-hero img');
+                if (img && img.src !== sw.dataset.img) img.src = sw.dataset.img;
             });
         });
     }
@@ -2308,6 +2441,11 @@
             S.gallery.search = e.target.value || '';
             renderGalleryGrid();
         }, 150));
+
+        $('gallery-sort').addEventListener('change', (e) => {
+            S.gallery.sort = e.target.value || 'popular';
+            renderGalleryGrid();
+        });
 
         // Change product → back to the catalog
         $('change-product').addEventListener('click', backToGallery);

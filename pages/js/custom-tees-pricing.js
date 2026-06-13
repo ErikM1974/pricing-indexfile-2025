@@ -223,6 +223,18 @@
             matchedTier = findTier(input.pricingData.tiersR, combinedQty);
         }
 
+        // PER-SHIRT SALE (2026-06-12, Erik): config.saleOff — Caspio Service_
+        // Code CTS-SALE-{STYLE}, loaded per style by BOTH the server config
+        // and the browser so card/studio/checkout stay in parity. OPTIONAL:
+        // absent/0 = no change (regular price — the safe direction). Applied
+        // to the final sticker (after rush, BEFORE the LTM bake), clamped ≥0.
+        const saleOff = parseFloat(cfg.saleOff) > 0 ? r2(parseFloat(cfg.saleOff)) : 0;
+        if (!empty && saleOff > 0) {
+            sizes.forEach((size) => {
+                unitBySize[size].finalPrice = Math.max(0, r2(unitBySize[size].finalPrice - saleOff));
+            });
+        }
+
         const lines = [];
         let shirtsSubtotal = 0;
         cart.forEach((line) => {
@@ -318,6 +330,7 @@
             ltmBakedPerPiece: baked ? ltmPerPiece : 0,
             ltmBakedTotal: ltmBakedTotal,
             rush: rush,
+            saleOff: saleOff,
             backLocation: backLocation,
             shipping: shipping,
             shippingModel: thresholdModel ? 'threshold' : 'legacy',

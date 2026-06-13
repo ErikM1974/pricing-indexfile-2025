@@ -12,7 +12,7 @@
     <meta property="og:type" content="website">
     <meta property="og:title" content="Custom T-Shirts — design yours online, full-color DTG printing">
     <meta property="og:description" content="Pick from 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. No setup fees, no minimums. Ships in 7-10 business days — 3-Day Rush available.">
-    <meta property="og:image" content="https://cdnm.sanmar.com/imglib/mresjpg/2021/f11/PC54_jetblack_model_front.jpg">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/AI%20Artwork.jpg?ver=1">
     <meta property="og:url" content="https://www.teamnwca.com/custom-tees">
     <meta name="twitter:card" content="summary_large_image">
 
@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.12.6">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.12.7">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -167,7 +167,13 @@
                     <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
                     <input type="search" id="gallery-search" placeholder="Search style # or name" aria-label="Search the catalog">
                 </div>
+                <select id="gallery-sort" class="gallery-sort" aria-label="Sort styles">
+                    <option value="popular" selected>Most popular</option>
+                    <option value="price">Price: low to high</option>
+                    <option value="name">Name A–Z</option>
+                </select>
             </div>
+            <p class="gallery-price-note">Card prices include a full-front print, per shirt — shipping &amp; tax are calculated at checkout.</p>
             <div class="gallery-loading" id="gallery-loading"><i class="fas fa-spinner fa-spin"></i> Loading the catalog…</div>
             <div class="gallery-grid" id="gallery-grid"></div>
             <p class="gallery-empty" id="gallery-empty" hidden>No styles match — try a different search or category.</p>
@@ -192,6 +198,15 @@
                     </span>
                     <button type="button" class="chip-btn" id="change-product"><i class="fas fa-rotate-left"></i> Change product</button>
                 </div>
+
+                <!-- SanMar product detail (lead + spec bullets, parsed from the
+                     PRODUCT_DESCRIPTION the page already fetches) — collapsed by
+                     default so the studio stays focused; hidden when no copy. -->
+                <details class="product-about" id="product-about" hidden>
+                    <summary><i class="fas fa-circle-info" aria-hidden="true"></i> About this shirt — fabric &amp; specs</summary>
+                    <p id="product-about-lead"></p>
+                    <ul id="product-about-specs"></ul>
+                </details>
 
                 <div class="canvas-card">
                     <div class="view-tabs" role="tablist" aria-label="Shirt side">
@@ -530,10 +545,11 @@
 
     <!-- Config + modules (order matters). Absolute paths — see head comment. -->
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.10.13"></script>
+    <script src="/pages/js/custom-tees-pricing.js?v=2026.06.12.7"></script>
     <script src="/pages/js/custom-tees-shipdate.js?v=2026.06.10.13"></script>
     <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.13"></script>
+    <script src="/pages/js/cts-gallery-merch.js?v=2026.06.12.7"></script>
     <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.13"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.06.10.13"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.06.12.7"></script>
 </body>
 </html>
