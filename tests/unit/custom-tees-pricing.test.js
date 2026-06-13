@@ -290,3 +290,44 @@ describe('nudge — tier-derived LTM', () => {
         expect(r.nudge.type).toBe('best');
     });
 });
+
+describe('per-shirt sale — config.saleOff (CTS-SALE-{STYLE} Caspio code, 2026-06-12)', () => {
+    test('saleOff 1.00 takes exactly $1 off every unit: 13.50 → 12.50, subtotal 24×12.50', () => {
+        const r = q({ config: Object.assign({}, CONFIG, { saleOff: 1.0 }) });
+        expect(r.unitBySize.M.finalPrice).toBe(12.5);
+        expect(r.shirtsSubtotal).toBe(300);
+        expect(r.perShirt).toBe(12.5);
+        expect(r.saleOff).toBe(1.0);
+    });
+
+    test('absent / 0 / negative saleOff changes NOTHING (regular price)', () => {
+        const base = q({});
+        expect(base.saleOff).toBe(0);
+        expect(base.unitBySize.M.finalPrice).toBe(13.5);
+        expect(q({ config: Object.assign({}, CONFIG, { saleOff: 0 }) }).unitBySize.M.finalPrice).toBe(13.5);
+        expect(q({ config: Object.assign({}, CONFIG, { saleOff: -5 }) }).unitBySize.M.finalPrice).toBe(13.5);
+        expect(q({ config: Object.assign({}, CONFIG, { saleOff: 'nope' }) }).unitBySize.M.finalPrice).toBe(13.5);
+    });
+
+    test('sale applies AFTER rush markup (off the sticker): 17.00 − 1.00 = 16.00', () => {
+        const r = q({ rush: true, config: Object.assign({}, CONFIG, { saleOff: 1.0 }) });
+        expect(r.unitBySize.M.finalPrice).toBe(16.0);
+    });
+
+    test('sale stacks with the baked LTM: unit = (13.50+1LC tier) discounted then +ltmPerPiece', () => {
+        // 12 pcs LC: 1-23 tier (12-23 cost row 8.50, MD 0.55) — with bakeLtm the
+        // distributed fee joins the unit AFTER the sale discount.
+        const cfg = Object.assign({}, CONFIG, { saleOff: 1.0, ltmFee: 25, bakeLtm: true });
+        const withSale = q({ cart: cartOf(12), config: cfg });
+        const noSale = q({ cart: cartOf(12), config: Object.assign({}, cfg, { saleOff: 0 }) });
+        // exactly $1/shirt apart, LTM bake identical on both sides
+        expect(noSale.perShirt - withSale.perShirt).toBeCloseTo(1.0, 2);
+        expect(withSale.ltmBakedTotal).toBe(noSale.ltmBakedTotal);
+    });
+
+    test('clamps at $0 — an oversized sale can never go negative', () => {
+        const r = q({ config: Object.assign({}, CONFIG, { saleOff: 999 }) });
+        expect(r.unitBySize.M.finalPrice).toBe(0);
+        expect(r.shirtsSubtotal).toBe(0);
+    });
+});

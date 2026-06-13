@@ -18,6 +18,10 @@ const TDT_SHIPDATE = require('./pages/js/3-day-tees-shipdate.js');
 // pattern; pricing is INTERNAL-DTG-BUILDER parity (rush opt-in, tier LTM).
 const CTS_PRICING = require('./pages/js/custom-tees-pricing.js');
 const CTS_SHIPDATE = require('./pages/js/custom-tees-shipdate.js');
+// Gallery merchandising helpers (2026-06-12): SanMar-description parsing +
+// featured-color variety for the /custom-tees card upgrade. Pure, jest-
+// locked, NO pricing math of its own (CTS_PRICING owns all money).
+const CTS_MERCH = require('./pages/js/cts-gallery-merch.js');
 // Custom Hats ('custom-caps', 2026-06-11) — same dual-load pattern; pricing
 // is EMB-CAP-BUILDER parity (CeilDollar, 8-cap minimum, NO LTM/digitizing).
 const CAPS_PRICING = require('./pages/js/custom-caps-pricing.js');
@@ -68,6 +72,7 @@ dotenv.config();
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
 //   POST /api/three-day-tees/shipping-estimate — SHARED; accepts styleNumber for per-style UPS weight
+//   GET  /api/cts/gallery-extras            — SanMar-card gallery data (2026-06-12): per-style blurb+fabric (parsed PRODUCT_DESCRIPTION) + per-piece ref prices @12/24/48/72 FF via the SAME CTS_PRICING.quote engine (fail-closed; 5-min cache)
 //   (webhook above ALSO sends the customer+sales confirmation emails server-side via EmailJS REST
 //    and stamps statusToken/emailsSentAt into OrderSettingsJSON — browser sends are fallback, 2026-06-10)
 //   GET  /order-status[.html]               — customer order-status page (HMAC-token link from the confirmation email, no login)
@@ -1324,6 +1329,69 @@ function channelConfigExact(channel) {
   return CHANNELS[String(channel || '')] || null;
 }
 
+// Service codes are STYLE-INDEPENDENT, so they get their own shared 5-min
+// promise-memo (2026-06-12): the per-style config previously re-fetched the
+// same 5 codes for every style — the gallery's 20-style reference pricing
+// burst-fired ~100 identical calls and the proxy 429'd. Staleness is
+// UNCHANGED (each style's config already cached the codes 5 min); failures
+// evict immediately so a transient error never sticks, and a missing/
+// inactive row still throws (fail-closed, Erik's #1 rule).
+const _ctsCodeCache = new Map();   // code → { at, promise }
+function getCtsServiceCode(c) {
+  const hit = _ctsCodeCache.get(c);
+  if (hit && Date.now() - hit.at < 5 * 60 * 1000) return hit.promise;
+  const promise = (async () => {
+    const r = await fetch(`${TDT_PROXY}/api/service-codes?code=${c}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} from ${TDT_PROXY}/api/service-codes`);
+    const j = await r.json();
+    const row = j && j.data && j.data[0];
+    if (!row || !row.IsActive || !(parseFloat(row.SellPrice) >= 0)) {
+      throw new Error(`Service code ${c} missing/inactive in Caspio`);
+    }
+    return parseFloat(row.SellPrice);
+  })();
+  _ctsCodeCache.set(c, { at: Date.now(), promise });
+  promise.catch(() => _ctsCodeCache.delete(c));
+  return promise;
+}
+
+// Per-style SALE (2026-06-12, Erik): Caspio code CTS-SALE-{STYLE} → $/shirt
+// off, strike-through on the gallery card. OPTIONAL — unlike fees, a sale is
+// safe to miss: absent/inactive row OR a fetch error → 0 (customer pays the
+// REGULAR price, never less). Erik runs/stops sales in Caspio, zero deploys.
+// ALL sales load in ONE ?category= call (5-min promise-memo) — a per-style
+// ?code= lookup ×20 styles re-created the burst that 429'd the proxy earlier.
+let _ctsSalesCache = { at: 0, promise: null };
+function getCtsSalesMap() {
+  if (_ctsSalesCache.promise && Date.now() - _ctsSalesCache.at < 5 * 60 * 1000) {
+    return _ctsSalesCache.promise;
+  }
+  const promise = (async () => {
+    const r = await fetch(`${TDT_PROXY}/api/service-codes?category=${encodeURIComponent('Custom Tees')}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} from service-codes?category`);
+    const j = await r.json();
+    const map = new Map();
+    (j && j.data || []).forEach((row) => {
+      const m = /^CTS-SALE-(.+)$/.exec(String(row.ServiceCode || ''));
+      const off = parseFloat(row.SellPrice);
+      if (m && row.IsActive && off > 0) map.set(m[1].toUpperCase(), off);
+    });
+    return map;
+  })();
+  _ctsSalesCache = { at: Date.now(), promise };
+  promise.catch(() => { _ctsSalesCache = { at: 0, promise: null }; });
+  return promise;
+}
+async function getCtsSaleOff(style) {
+  try {
+    const map = await getCtsSalesMap();
+    return map.get(String(style || '').toUpperCase()) || 0;
+  } catch (e) {
+    console.warn(`[CTS] sale lookup failed for ${style} (selling at regular price):`, e.message);
+    return 0;
+  }
+}
+
 const _ctsCfgCache = new Map();   // styleNumber → { at, value }
 async function getCtsPricingConfig(styleNumber) {
   const style = String(styleNumber || '').trim().toUpperCase();
@@ -1336,16 +1404,9 @@ async function getCtsPricingConfig(styleNumber) {
     if (!r.ok) throw new Error(`HTTP ${r.status} from ${url.split('?')[0]}`);
     return r.json();
   };
-  const code = async (c) => {
-    const j = await grab(`${TDT_PROXY}/api/service-codes?code=${c}`);
-    const row = j && j.data && j.data[0];
-    if (!row || !row.IsActive || !(parseFloat(row.SellPrice) >= 0)) {
-      throw new Error(`Service code ${c} missing/inactive in Caspio`);
-    }
-    return parseFloat(row.SellPrice);
-  };
+  const code = getCtsServiceCode;
 
-  const [pricingData, rushPct, shipFee, ltmFee, shipFlat, shipFreeOver] = await Promise.all([
+  const [pricingData, rushPct, shipFee, ltmFee, shipFlat, shipFreeOver, saleOff] = await Promise.all([
     grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=${encodeURIComponent(style)}`),
     code('3DT-RUSH'), code('3DT-SHIP'),
     // Online small-batch fee (CTS-LTM, $25 — cheaper than the builder's $50;
@@ -1355,6 +1416,8 @@ async function getCtsPricingConfig(styleNumber) {
     // UberPrints shipping model (Erik 2026-06-10): flat under the threshold,
     // FREE at/over it. Both Caspio-tunable, both fail-closed via code().
     code('CTS-SHIP-FLAT'), code('CTS-SHIP-FREE-OVER'),
+    // Per-style sale — OPTIONAL (0 when absent; errors → 0, regular price).
+    getCtsSaleOff(style),
   ]);
   if (!Array.isArray(pricingData.tiersR) || !pricingData.tiersR.length) {
     throw new Error(`No DTG pricing tiers for style ${style}`);
@@ -1370,7 +1433,7 @@ async function getCtsPricingConfig(styleNumber) {
   if (!nonLtm.length) throw new Error(`DTG pricing tiers for ${style} missing a non-LTM tier`);
   const value = {
     pricingData,
-    config: { rushPct, shipFee, ltmFee, bakeLtm: true, shipFlat, shipFreeOver, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
+    config: { rushPct, shipFee, ltmFee, bakeLtm: true, shipFlat, shipFreeOver, saleOff, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
   };
   _ctsCfgCache.set(style, { at: Date.now(), value });
   return value;
@@ -1543,6 +1606,113 @@ async function rebuildCtsQuote(colorConfigs, orderSettings, customerData) {
     productName: product.product_title || product.name || `${style} Tee`,
   };
 }
+
+// ── Custom-Tees gallery extras: card blurbs + reference prices (2026-06-12) ─
+// ONE fetch powers the SanMar-style gallery cards (Erik's card upgrade): per
+// style → a blurb + fabric chip parsed from SanMar's PRODUCT_DESCRIPTION
+// (already in Caspio Sanmar_Bulk — API-driven copy, zero authored text in
+// code; a future Caspio Card_Blurb column overrides when non-empty) and
+// per-piece reference prices at the nudge quantities, computed by the SAME
+// pure CTS_PRICING.quote() + locationForArtSize rule the configurator AND the
+// checkout 409-gate run (Rule 7 parity by construction). Tax + shipping are
+// excluded (pickup/taxRate 0 — subtotal only); the gallery footnote says so.
+// Fail-closed per Erik's #1 rule: a style whose price can't compute returns
+// priceError and its card renders "Pricing unavailable" — NEVER a stale or
+// guessed number. Copy failures are cosmetic: blurb omitted, console.warn.
+const CTS_REF_ART = { wIn: 8, hIn: 8 };       // → 'FF' (full-front) via locationForArtSize
+const CTS_REF_QTYS = [12, 24, 48, 72];        // card price @12 + the hover ladder
+const _ctsStyleCopyCache = new Map();          // style → { at, value: { blurb, fabric } }
+let _ctsGalleryExtrasCache = { at: 0, value: null };
+
+async function getCtsStyleCopy(style) {
+  const hit = _ctsStyleCopyCache.get(style);
+  if (hit && Date.now() - hit.at < 24 * 60 * 60 * 1000) return hit.value;
+  let value = { blurb: '', fabric: '' };
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/product-details?styleNumber=${encodeURIComponent(style)}`);
+    if (r.ok) {
+      const rows = await r.json();
+      const desc = (Array.isArray(rows) && rows[0] && rows[0].PRODUCT_DESCRIPTION) || '';
+      value = {
+        blurb: CTS_MERCH.extractBlurb(desc),
+        fabric: CTS_MERCH.extractFabric(desc).label,
+      };
+    } else {
+      console.warn(`[CTS gallery] product-details HTTP ${r.status} for ${style} — card ships without a blurb`);
+    }
+  } catch (e) {
+    console.warn(`[CTS gallery] product-details failed for ${style} — card ships without a blurb:`, e.message);
+  }
+  _ctsStyleCopyCache.set(style, { at: Date.now(), value });
+  return value;
+}
+
+// Per-piece reference prices for one style at the ladder quantities. Reuses
+// the 5-min-cached getCtsPricingConfig (bundle + fail-closed Service_Codes,
+// incl. the baked CTS-LTM at 12) and the pure quote engine — identical inputs
+// to what checkout reprices, minus tax/shipping (excluded by design).
+async function priceCtsStyleRefs(style) {
+  const { pricingData, config } = await getCtsPricingConfig(style);
+  const loc = CTS_PRICING.locationForArtSize('front', CTS_REF_ART.wIn, CTS_REF_ART.hIn);
+  const sizes = config.sizes || [];
+  const sizeKey = sizes.includes('M') ? 'M' : sizes[0];
+  if (!sizeKey) throw new Error(`No priced sizes for ${style}`);
+  const onSale = parseFloat(config.saleOff) > 0;
+  const runQuote = (qty, cfg) => CTS_PRICING.quote({
+    pricingData, config: cfg,
+    cart: [{ catalogColor: 'REF', colorName: 'Reference', qty: { [sizeKey]: qty } }],
+    location: loc, backLocation: null, rush: false,
+    delivery: { method: 'pickup', taxRate: 0 },
+  });
+  const prices = {};
+  const wasPrices = {};
+  CTS_REF_QTYS.forEach((qty) => {
+    // perShirt is the ENGINE'S own per-piece figure — (merch + LTM) / qty,
+    // baked-LTM aware — the same number the configurator shows customers.
+    const ea = Number(runQuote(qty, config).perShirt);
+    if (!(ea > 0)) throw new Error(`Reference quote for ${style} @ ${qty} produced no per-shirt price`);
+    prices[String(qty)] = ea;
+    if (onSale) {
+      // Strike-through "was" = the SAME quote with the sale zeroed.
+      wasPrices[String(qty)] = Number(runQuote(qty, { ...config, saleOff: 0 }).perShirt);
+    }
+  });
+  return onSale
+    ? { prices, wasPrices, salePerShirt: parseFloat(config.saleOff) }
+    : { prices };
+}
+
+// GET /api/cts/gallery-extras — { qtys, refLocation, styles: { STYLE:
+//   { blurb, fabric, prices: { '12': ea, ... } } | { ..., priceError } } }
+app.get('/api/cts/gallery-extras', async (req, res) => {
+  try {
+    if (_ctsGalleryExtrasCache.value
+      && Date.now() - _ctsGalleryExtrasCache.at < 5 * 60 * 1000) {  // ≤ the 5-min config cache — card prices must not outlive the configurator's
+      return res.json(_ctsGalleryExtrasCache.value);
+    }
+    const catalog = await getCtsCatalog();
+    const styles = [...catalog.keys()];
+    const out = {};
+    const CHUNK = 5;   // limit cold-cache proxy fan-out (bundle+codes per style)
+    for (let i = 0; i < styles.length; i += CHUNK) {
+      await Promise.all(styles.slice(i, i + CHUNK).map(async (style) => {
+        const copy = await getCtsStyleCopy(style);
+        try {
+          out[style] = { ...copy, ...(await priceCtsStyleRefs(style)) };
+        } catch (e) {
+          console.error(`[CTS gallery] reference pricing failed for ${style}:`, e.message);
+          out[style] = { ...copy, priceError: 'Pricing unavailable' };
+        }
+      }));
+    }
+    const value = { qtys: CTS_REF_QTYS, refLocation: 'FF', styles: out };
+    _ctsGalleryExtrasCache = { at: Date.now(), value };
+    res.json(value);
+  } catch (e) {
+    console.error('[CTS gallery] gallery-extras failed:', e.message);
+    res.status(502).json({ error: 'Gallery pricing is unavailable right now.' });
+  }
+});
 
 // ── Custom Tees live stock gate (2026-06-10) ────────────────────────────────
 // Confirms every requested color+size quantity against live stock AFTER the

@@ -196,6 +196,7 @@
 | `/pages/custom-tees-success.html` | Post-payment success page | custom-tees-success.js | ✅ Built |
 | `/pages/js/custom-tees-app.js` | App core: gallery (/api/dtg/top-sellers/styles), per-style designer/state, rush toggle, checkout pipeline (channel:'custom-tees') | TDTPricing/TDTShipDate/CTS_CALIBRATION/TDTDesigner | ✅ Built |
 | `/pages/js/custom-tees-pricing.js` | PURE pricing engine — INTERNAL-DTG-BUILDER PARITY: rush opt-in, tier-row distributed LTM, FB/JB/JF locations. Jest-locked. | — (dual browser/Node; server requires it) | ✅ Built |
+| `/pages/js/cts-gallery-merch.js` | **NEW (2026-06-12)** PURE gallery merchandising helpers: SanMar PRODUCT_DESCRIPTION → card blurb + fabric facts; featured-color variety pass (de-dupes Jet Black across the grid). NO pricing math — card prices come from server `GET /api/cts/gallery-extras` via CTS_PRICING.quote().perShirt. Jest-locked. | — (dual browser/Node; server requires it) | ✅ Built |
 | `/pages/js/custom-tees-shipdate.js` | Ship-promise engine: standardPromise() 7–10 biz-day window + rush 3-day cutoff promise. Jest-locked. | — (dual browser/Node) | ✅ Built |
 | `/pages/js/custom-tees-calibration.js` | Per-style print-area registry `window.CTS_CALIBRATION.forStyle()` — hybrid: PC54 hand-calibrated + generic flat-lay model for other styles; LC/FF/JF/FB/JB inches authoritative | — | ✅ Built |
 | `/pages/js/custom-tees-designer.js` | Canvas designer (3DT fork): styleNumber-aware via CTS_CALIBRATION, JF/JB jumbo locations, approximate-preview flag for uncalibrated styles | CTS_CALIBRATION, /api/image-proxy | ✅ Built |
@@ -206,6 +207,7 @@
 | `/pages/css/order-status.css` | Status-page styling (rides on custom-tees.css tokens) | custom-tees.css | ✅ Built |
 | `/tests/unit/custom-tees-pricing.test.js` | Jest lock: rush opt-in, distributed LTM ($49.92/12pcs), FB/JB/JF, fail-closed (17 tests) | custom-tees-pricing.js | ✅ Active |
 | `/tests/unit/custom-tees-shipdate.test.js` | Jest lock: 7–10 day window, holiday skip, binding end date (7 tests) | custom-tees-shipdate.js | ✅ Active |
+| `/tests/unit/cts-gallery-merch.test.js` | **NEW (2026-06-12)** Jest lock for cts-gallery-merch: real-PC54-copy blurb/fabric parsing, entity decode, variety-pass de-dupe/lookback/determinism | cts-gallery-merch.js | ✅ Active |
 | `/config/storefront-channels.js` | Storefront CHANNEL REGISTRY (pure half): per-channel QuoteID builders, ShopWorks push constants (designTypeId/artistId/SW_LOC/LTM part), banners, EmailJS templates, Stripe paths — server.js binds server-only behaviors on top; adding 'custom-caps' = one entry here + one in server.js CHANNELS | server.js (checkout/webhook emails/push/order-status/shipped email) | ✅ Active |
 | `/tests/unit/storefront-channels.test.js` | Characterization lock (28 tests): exact pre-registry strings/values for BOTH channels — QuoteID formats, note labels, banners, push ids, shipped-email gate, resolver default semantics | config/storefront-channels.js | ✅ Active |
 | `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |
