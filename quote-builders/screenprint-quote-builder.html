@@ -324,6 +324,55 @@
                 </div>
             </div>
 
+            <!-- Services & Fees bar — relocated from the sidebar into the content area below the product table
+                 (EMB services-bar position, 2026-06-14). Same controls + handlers as before (pricing unchanged);
+                 laid out horizontally and shown by default instead of a collapsed sidebar panel. -->
+            <div class="additional-charges-panel" style="margin: 0 0 14px;">
+                <div class="charges-header" onclick="toggleFeesCharges()">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>Services &amp; Fees</span>
+                        <span id="charges-badge" class="charges-badge hidden">$0.00</span>
+                    </div>
+                    <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
+                </div>
+                <div id="fees-charges-content" class="charges-content">
+                    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
+                        <div class="charge-field" style="margin:0;">
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()">
+                                <span>Logo Mockup &amp; Review</span>
+                            </label>
+                            <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
+                                <span class="prefix">$</span>
+                                <input type="number" id="art-charge" class="quote-input"
+                                       min="0" step="0.01" value="0" disabled
+                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                            </div>
+                        </div>
+                        <div class="charge-field" style="margin:0;">
+                            <label class="quote-label">Graphic Design ($75/hr)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
+                                       min="0" step="0.5" placeholder="0"
+                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                                <span class="text-muted">hrs</span>
+                                <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
+                            </div>
+                        </div>
+                        <div class="charge-field" style="margin:0;">
+                            <label class="quote-label">Rush Fee</label>
+                            <div class="input-with-prefix">
+                                <span class="prefix">$</span>
+                                <input type="number" id="rush-fee" class="quote-input"
+                                       min="0" step="0.01" placeholder="0.00"
+                                       onchange="updateAdditionalCharges()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Invoice footer band (EMB flagship parity 2026-06-14): Order Recap + Ship-To + Order Details +
                  the Subtotal/Tax/TOTAL block, relocated from the sidebar so the quote reads like an invoice
                  top-to-bottom (products → fees → order details → totals). Every element id is preserved, so
@@ -524,56 +573,9 @@
 
             </div>
 
-            <!-- Artwork Services Panel -->
-            <!-- Fees & Charges Panel (merged artwork + additional charges) -->
-            <div class="additional-charges-panel">
-                <div class="charges-header" onclick="toggleFeesCharges()">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>Fees & Charges</span>
-                        <span id="charges-badge" class="charges-badge hidden">$0.00</span>
-                    </div>
-                    <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
-                </div>
-                <div id="fees-charges-content" class="charges-content hidden">
-                    <!-- Art / Design subsection -->
-                    <div class="charge-subsection-label">Art & Design</div>
-                    <div class="charge-field">
-                        <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
-                            <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()">
-                            <span>Logo Mockup & Review</span>
-                        </label>
-                        <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
-                            <span class="prefix">$</span>
-                            <input type="number" id="art-charge" class="quote-input"
-                                   min="0" step="0.01" value="0" disabled
-                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
-                        </div>
-                    </div>
-                    <div class="charge-field">
-                        <label class="quote-label">Graphic Design ($75/hr)</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
-                                   min="0" step="0.5" placeholder="0"
-                                   onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
-                            <span class="text-muted">hrs</span>
-                            <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
-                        </div>
-                    </div>
-                    <!-- Rush / Discount subsection -->
-                    <div class="charge-subsection-label" style="margin-top: 10px;">Additional</div>
-                    <div class="charge-field">
-                        <label class="quote-label">Rush Fee</label>
-                        <div class="input-with-prefix">
-                            <span class="prefix">$</span>
-                            <input type="number" id="rush-fee" class="quote-input"
-                                   min="0" step="0.01" placeholder="0.00"
-                                   onchange="updateAdditionalCharges()">
-                        </div>
-                    </div>
-                    <!-- Discount controls removed 2026-03-23 -->
-                </div>
-            </div>
+            <!-- Services & Fees relocated to a horizontal bar in the content area below the product table
+                 (EMB services-bar position, 2026-06-14). -->
+
 
             <!-- LTM Control Panel (shown only when qty <= 71) -->
             <div id="spc-ltm-wrapper" style="display: none; margin-bottom: 12px;">
