@@ -1,3 +1,7 @@
+## v2026.06.14.7 (2026.06.14)
+
+- SCP/DTF polish: badge accuracy + footer CSS to shared (responsive) + remove dead save-quote CSS
+
 ## v2026.06.14.6 (2026.06.14)
 
 - Trio polish: EMB dead-code cleanup + collapsible customer panel; SCP estimator call aligned
