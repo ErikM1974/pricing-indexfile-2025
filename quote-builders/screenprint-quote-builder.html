@@ -173,6 +173,16 @@
                 </div>
             </div>
 
+            <!-- Reference Artwork — moved into the content area (top, beside the method config) to match the
+                 EMB flagship, where artwork lives prominently with the design instead of buried in a sidebar
+                 panel (2026-06-14). Mount id #scp-artwork-mount preserved so artwork-upload.js still targets it. -->
+            <div class="logo-section reference-artwork-section">
+                <div class="primary-logo-config">
+                    <span class="logo-section-label"><i class="fas fa-image"></i> Reference Artwork <span class="hint-text" style="font-weight:400;">— optional; attach the customer's art file</span></span>
+                    <div id="scp-artwork-mount" style="margin-top: 8px;"></div>
+                </div>
+            </div>
+
             <!-- Product Grid Section -->
             <div class="product-grid-section">
                 <!-- Search Row -->
@@ -559,22 +569,7 @@
                 <div id="estimate-ship-result" class="estimate-ship-result"></div>
             </div>
 
-            <!-- Reference Artwork (Collapsible). Save & Push were moved OUT of here into the
-                 always-visible .action-panel below (flagship/EMB alignment 2026-06-14) so the Save
-                 button can never be collapsed shut or scrolled away. -->
-            <div class="save-quote-panel-collapsible">
-                <div class="save-quote-header" onclick="toggleSaveShare()">
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-image"></i>
-                        <span>Reference Artwork</span>
-                    </div>
-                    <i id="save-share-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
-                </div>
-                <div id="save-share-content" class="save-share-content">
-                    <!-- Phase 9 (2026-05-23): reference artwork upload widget -->
-                    <div id="scp-artwork-mount"></div>
-                </div>
-            </div>
+            <!-- Reference Artwork moved to a content-area card at the top (EMB flagship parity 2026-06-14). -->
 
             </div><!-- End sidebar-scroll-container -->
 

@@ -150,6 +150,17 @@
                 </div>
             </div>
 
+            <!-- Reference Artwork — moved into the content area (top, beside the method config) to match the
+                 EMB flagship, where artwork lives prominently with the design instead of buried in a sidebar
+                 panel (2026-06-14). Mount id #dtf-artwork-mount preserved so artwork-upload.js still targets it. -->
+            <div class="location-config-section reference-artwork-section">
+                <div class="location-header">
+                    <span class="location-label"><i class="fas fa-image"></i> Reference Artwork</span>
+                    <span class="location-hint">Optional — attach the customer's art file.</span>
+                </div>
+                <div id="dtf-artwork-mount" style="margin-top: 8px;"></div>
+            </div>
+
             <!-- Product Grid Section -->
             <div class="product-grid-section">
                 <!-- Search Row -->
@@ -482,7 +493,7 @@
                 <div class="save-quote-header" onclick="toggleSaveShare()">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-clipboard-list"></i>
-                        <span>Order Details & Artwork</span>
+                        <span>Order Details & Shipping</span>
                     </div>
                     <i id="save-share-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
                 </div>
@@ -606,9 +617,8 @@
                         </div>
                     </div>
 
-                    <!-- Phase 9 (2026-05-23): reference artwork upload (drop-in widget) -->
-                    <div id="dtf-artwork-mount"></div>
-                    <!-- Save + Push moved to the always-visible .action-panel below (flagship alignment 2026-06-14). -->
+                    <!-- Reference Artwork moved to a content-area card at the top (EMB flagship parity 2026-06-14).
+                         Save + Push live in the always-visible .action-panel below. -->
                 </div>
             </div>
 
