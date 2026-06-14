@@ -1,3 +1,7 @@
+## v2026.06.14.2 (2026.06.14)
+
+- SCP/DTF: move reference-artwork upload to a top content card (EMB flagship parity)
+
 ## v2026.06.14.1 (2026.06.14)
 
 - Align SCP/DTF action areas to EMB flagship + restore Save-button JS hooks
