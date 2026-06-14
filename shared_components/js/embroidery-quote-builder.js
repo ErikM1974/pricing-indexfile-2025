@@ -3187,11 +3187,6 @@ function updateCapLogoSectionVisibility() {
             updateEmbellishmentDropdownLabels();
         }
     }
-    // Legacy fallback
-    const capSection = document.getElementById('cap-logo-section');
-    if (capSection) {
-        capSection.style.display = hasCaps ? 'block' : 'none';
-    }
     // Also update artwork services visibility
     updateArtworkServicesVisibility();
 }
