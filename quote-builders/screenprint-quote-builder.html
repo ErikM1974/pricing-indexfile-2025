@@ -323,6 +323,64 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Invoice footer band (EMB flagship parity 2026-06-14): Order Recap + Ship-To + Order Details +
+                 the Subtotal/Tax/TOTAL block, relocated from the sidebar so the quote reads like an invoice
+                 top-to-bottom (products → fees → order details → totals). Every element id is preserved, so
+                 updateTaxCalculation()/save/estimate keep working unchanged. -->
+            <div class="invoice-totals-wrap order-footer" style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; margin:16px 0 6px;">
+                <div class="order-recap" id="order-recap" style="margin-right:auto;"></div>
+                <div class="ship-to-card" id="ship-to-card"></div>
+                <!-- Order Details (relocated from sidebar). #spc-order-fields renders its own collapsible
+                     "Order & Shipping" panel, so no extra title/card wrapper here (avoids a card-in-card). -->
+                <div style="flex:1 1 320px; min-width:280px; max-width:460px;">
+                    <div id="spc-order-fields"></div>
+                    <!-- Shared UPS Ground estimator — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
+                    <div class="estimate-ship-row" id="spc-estimate-row" style="margin: 8px 0 0;">
+                        <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
+                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="QuoteOrderSummary.estimateShipping()">
+                            <i class="fas fa-truck-fast"></i> Estimate UPS Ground
+                        </button>
+                        <div id="estimate-ship-result" class="estimate-ship-result"></div>
+                    </div>
+                </div>
+                <!-- Totals (relocated from sidebar) -->
+                <div style="flex:0 1 320px; min-width:280px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                    <div class="pricing-totals-section">
+                        <div class="pricing-row">
+                            <span class="label" style="font-weight: 600;">Subtotal:</span>
+                            <span class="value" id="pre-tax-subtotal">$0.00</span>
+                        </div>
+                        <div class="pricing-row" id="tax-toggle-row">
+                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                                <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
+                                <span style="font-size: 12px;">Include Tax</span>
+                            </label>
+                            <div class="d-flex align-items-center gap-1">
+                                <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                                       style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                                       onchange="updateTaxCalculation()" title="Tax rate %">
+                                <span style="font-size: 11px; color: #64748b;">%</span>
+                            </div>
+                        </div>
+                        <!-- Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
+                        <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
+                            <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
+                                <input type="checkbox" id="wholesale-checkbox" onchange="toggleWholesale()">
+                                <span>Wholesale / Reseller — no tax (WA permit on file)</span>
+                            </label>
+                        </div>
+                        <div class="pricing-row" id="tax-row">
+                            <span class="label text-muted">Sales Tax:</span>
+                            <span class="value" id="tax-amount">$0.00</span>
+                        </div>
+                        <div class="pricing-row grand-total-row">
+                            <span class="label">TOTAL:</span>
+                            <span class="value" id="grand-total-with-tax">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Right: Pricing Sidebar -->
@@ -460,45 +518,9 @@
                     <span class="value" id="per-unit-price" style="font-style: italic; font-weight: 500;">-</span>
                 </div>
 
-                <!-- Tax Section -->
-                <div class="pricing-totals-section">
-                    <div class="pricing-row">
-                        <span class="label" style="font-weight: 600;">Subtotal:</span>
-                        <span class="value" id="pre-tax-subtotal">$0.00</span>
-                    </div>
-                    <div class="pricing-row" id="tax-toggle-row">
-                        <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
-                            <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
-                            <span style="font-size: 12px;">Include Tax</span>
-                        </label>
-                        <div class="d-flex align-items-center gap-1">
-                            <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
-                                   style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
-                                   onchange="updateTaxCalculation()" title="Tax rate %">
-                            <span style="font-size: 11px; color: #64748b;">%</span>
-                        </div>
-                    </div>
-                    <!-- [2026-06-08] Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
-                    <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
-                        <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
-                            <input type="checkbox" id="wholesale-checkbox" onchange="toggleWholesale()">
-                            <span>Wholesale / Reseller — no tax (WA permit on file)</span>
-                        </label>
-                    </div>
-                    <div class="pricing-row" id="tax-row">
-                        <span class="label text-muted">Sales Tax:</span>
-                        <span class="value" id="tax-amount">$0.00</span>
-                    </div>
-                    <div class="pricing-row grand-total-row">
-                        <span class="label">TOTAL:</span>
-                        <span class="value" id="grand-total-with-tax">$0.00</span>
-                    </div>
-                </div>
-                <!-- [2026-06-08] Shared order-summary band (DTF/SCP parity Phase 3) — Order Recap + Ship-To card
-                     stacked under the totals in the Quote Summary sidebar. Filled by renderOrderRecap(); hidden
-                     via :empty until populated. Card + recap CSS are shared (quote-builder-common.css). -->
-                <div class="order-recap" id="order-recap"></div>
-                <div class="ship-to-card" id="ship-to-card"></div>
+                <!-- Subtotal/Tax/TOTAL, Order Recap + Ship-To relocated to the footer invoice band below the
+                     product table (EMB flagship parity 2026-06-14). The sidebar keeps the Quote Summary
+                     (config + pieces + tier + products subtotal). -->
 
             </div>
 
@@ -558,20 +580,19 @@
                 <div id="spc-ltm-panel"></div>
             </div>
 
-            <!-- Order & Shipping (top-level panel, not nested in Save) -->
-            <div id="spc-order-fields" style="margin-bottom: 12px;"></div>
-            <!-- [2026-06-08] Shared UPS Ground estimator (Commit 6) — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
-            <div class="estimate-ship-row" id="spc-estimate-row" style="margin: -4px 0 12px;">
-                <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
-                <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="QuoteOrderSummary.estimateShipping()">
-                    <i class="fas fa-truck-fast"></i> Estimate UPS Ground
-                </button>
-                <div id="estimate-ship-result" class="estimate-ship-result"></div>
-            </div>
-
-            <!-- Reference Artwork moved to a content-area card at the top (EMB flagship parity 2026-06-14). -->
+            <!-- Order & Shipping + the UPS Ground estimator relocated to the footer invoice band (EMB flagship
+                 parity 2026-06-14). Reference Artwork moved to a content-area card at the top. -->
 
             </div><!-- End sidebar-scroll-container -->
+
+            <!-- Running TOTAL (incl. tax) — compact always-visible strip above the action buttons (EMB/DTF
+                 parity 2026-06-14). Now that Subtotal/Tax/TOTAL moved to the footer band, this keeps the
+                 customer-facing total glance-able at the Save/Push moment. Bound by updateTaxCalculation()
+                 (#sidebar-grand-total mirrors #grand-total-with-tax). Styles: quote-builder-common.css .sidebar-total-bar -->
+            <div class="sidebar-total-bar" id="sidebar-total-bar" hidden>
+                <span class="stb-label">TOTAL <span class="stb-tax-note">incl. tax</span></span>
+                <span class="stb-value" id="sidebar-grand-total">$0.00</span>
+            </div>
 
             <!-- Action Buttons — flagship-aligned (2026-06-14): Save + Push now live in this
                  always-visible panel (outside the scroll container) matching the EMB layout, so the
@@ -668,7 +689,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.14.1"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.14.3"></script>
 
 </body>
 </html>
