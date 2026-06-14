@@ -387,7 +387,7 @@
                     <!-- Shared UPS Ground estimator — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
                     <div class="estimate-ship-row" id="spc-estimate-row" style="margin: 8px 0 0;">
                         <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
-                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="QuoteOrderSummary.estimateShipping()">
+                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="estimateShipping()">
                             <i class="fas fa-truck-fast"></i> Estimate UPS Ground
                         </button>
                         <div id="estimate-ship-result" class="estimate-ship-result"></div>

@@ -79,6 +79,48 @@ killed these for months; this work re-pointed the selector to the `onclick` so a
 **If you re-class/rename the Save button, grep these 6 sites first.** DTG = LEAVE IT (already has an
 always-visible `#dtgSaveBtn` in its sticky inline form; no buried-save problem).
 
+### ✅ FULL page-layout alignment SCP+DTF → EMB DONE + LIVE (2026-06-14, releases v2026.06.14.2–.5)
+SCP + DTF now read top-to-bottom like an invoice, matching EMB. **Content column order:** method config
+(SCP Print Configuration / DTF Transfer Locations — KEPT method-specific) → **Reference Artwork card**
+(`#scp/dtf-artwork-mount` lifted from a sidebar collapsible to a top content card) → product table →
+**`Services & Fees` bar** (`.additional-charges-panel` moved from sidebar to a horizontal, default-OPEN bar
+below the table) → **footer invoice band** (`.invoice-totals-wrap.order-footer`: `#order-recap` +
+`#ship-to-card` + Order Details/shipping + the `Subtotal/Tax/TOTAL` box). **Sidebar slimmed to:** Customer →
+Quote Summary (pieces/tier/products-subtotal only) → LTM → sticky `#sidebar-total-bar` (SCP got one too;
+`#sidebar-grand-total` mirrors `#grand-total-with-tax` in `updateTaxCalculation`) → `.action-panel`.
+
+**HOW it was done safely (Erik's #1 rule):** every move was a **DOM relocation with element ids preserved** —
+the tax/totals/fee/save handlers were NOT rewritten (`updateTaxCalculation`, `updateArtworkCharges`,
+`updateAdditionalCharges`, save/load all key off `getElementById`, so location-independent). DTF's big inline
+ship-to form was moved **verbatim via a Python splice** (zero transcription risk) and its redundant outer
+`.save-quote-panel-collapsible`/`toggleSaveShare` wrapper was dropped (now a single `toggleOrderDetails`
+collapsible). The **Services bar is NOT EMB's editable-row chip grid** — Erik chose to keep SCP/DTF's proven
+summary-row fee model (panel inputs → `#fees-tbody`), just relocated, so pricing is untouched.
+Verified live both builders (correct tax math, no dup ids, all save-parity/tax-base tests green).
+**Known pre-existing (NOT from this work, left alone):** `charges-badge` only refreshes on rush-fee change;
+`.save-quote-panel-collapsible` CSS now orphaned; footer flex has no <768px media query; SCP tax-row label
+static vs DTF's dynamic `#tax-rate-label`.
+
+### Final consistency audit (2026-06-14, 19-agent + live): trio IS in unison on what matters
+**Sales tax = CONSISTENT** across EMB/SCP/DTF (base=subtotal+billable-shipping after discount; falsy-zero 0%
+exempt guard; `Math.round(amt*rate*100)/100`; wholesale→GL 2203; identical Caspio fields + frozen TaxRate on
+push; all tax ids survived the footer move). Live-verified SCP≡DTF byte-identical ($110.10 / $100 exempt /
+$100 off); fee changes live-update the total (updateArtworkCharges/updateAdditionalCharges both chain to
+updateTaxCalculation). **Core layout = ALIGNED** (footer band, sidebar pattern, total bar, product grid).
+
+**⚠️ DO NOT "align away" these — they are INTENTIONAL EMB flagship features, not drift (an audit recommended
+downgrading them; that's wrong):** (1) EMB's catalog **chip Services bar** (`#emb-services-bar` via
+quote-services-bar.js) — SCP/DTF use the simpler `.additional-charges-panel` by Erik's explicit choice (their
+fee model is summary-row); (2) EMB's **indigo** `.emb-builder .tier-badge`/`.pricing-title i` (#6366f1) —
+documented brand accent (2026-06-05 C34); (3) EMB's **design-integrated artwork** inside the logo card;
+(4) the method-config sections (logo/print-location/transfer) are correctly per-method CONTENT.
+
+**Genuine small polish backlog (optional, low-risk, NOT done):** EMB dead `#cap-logo-section` div + hidden
+legacy `#artwork-services-step`/`#optional-charges-step` panels → delete; EMB customer panel → collapsible
+like SCP/DTF; EMB `charges-badge` inline styles → shared class; tax-row hide-when-off (SCP/DTF) vs always-shown
+(EMB) → pick one; DTF dynamic "Sales Tax (10.1%)" label vs EMB/SCP static → align; SCP `QuoteOrderSummary.
+estimateShipping()` vs EMB/DTF bare `estimateShipping()` → align; SCP/DTF indigo step-pills vs green badges.
+
 ## The five order surfaces (all push to ManageOrders)
 | Surface | Pattern | Core JS |
 |---|---|---|

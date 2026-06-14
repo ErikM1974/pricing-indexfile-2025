@@ -297,9 +297,6 @@
 
             </div>
 
-            <!-- Legacy hidden elements for backwards compatibility with existing JS -->
-            <div id="cap-logo-section" style="display: none;"></div>
-
             <!-- Product Grid Section -->
             <div class="product-grid-section">
                 <!-- Search Row -->
@@ -672,11 +669,12 @@
 
                 <!-- Customer Info Section (always visible, top of sidebar) -->
                 <div class="customer-info-section" id="customer-info-section">
-                    <div class="section-header-compact">
+                    <div class="section-header-compact" onclick="document.getElementById('emb-customer-body').classList.toggle('hidden')" style="cursor:pointer;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                         <span class="flow-step-num">1</span>
                         <i class="fas fa-user"></i> Customer
+                        <i class="fas fa-chevron-down" style="margin-left:auto; font-size:11px; color:#94a3b8;"></i>
                     </div>
-                    <div class="customer-info-body">
+                    <div class="customer-info-body" id="emb-customer-body">
                         <!-- Customer Lookup -->
                         <div class="customer-field customer-lookup-container">
                             <label class="sr-only" for="customer-lookup">Search for a customer by company, name, or email</label>
@@ -1485,7 +1483,7 @@ Company:Absher Construction Company
     <!-- [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — Phase 0 of DTF/SCP parity.
          MUST load before embroidery-quote-builder.js (which calls QuoteOrderSummary.configure() at eval time). -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.14.1"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.14.6"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
