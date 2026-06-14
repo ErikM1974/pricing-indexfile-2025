@@ -1,3 +1,7 @@
+## v2026.06.14.8 (2026.06.14)
+
+- Tax UX level-up (best-of-both) across EMB/SCP/DTF — dynamic rate label + always-visible row
+
 ## v2026.06.14.7 (2026.06.14)
 
 - SCP/DTF polish: badge accuracy + footer CSS to shared (responsive) + remove dead save-quote CSS
