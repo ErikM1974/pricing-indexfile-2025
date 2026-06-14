@@ -7707,9 +7707,13 @@ function updateTaxCalculation() {
     const subtotalDisplay = document.getElementById('invoice-subtotal-display');
     if (subtotalDisplay) subtotalDisplay.textContent = '$' + (adjustedSubtotal - shippingFee).toFixed(2);
 
-    // Keep the Sales Tax label simple — the editable % is shown right beside it.
+    // Sales Tax label shows the effective rate when charged; "(exempt)"/"(not charged)" when $0,
+    // and the row stays visible for invoice transparency (best-of-both level-up 2026-06-14).
     const taxLabel = document.getElementById('tax-label');
-    if (taxLabel) taxLabel.textContent = 'Sales Tax';
+    const _embRateRaw = (document.getElementById('tax-rate-input')?.value || '').trim();
+    if (taxLabel) taxLabel.textContent = (includeTax && parseFloat(_embRateRaw) > 0)
+        ? `Sales Tax (${_embRateRaw}%)`
+        : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');
 
     if (includeTax) {
         // Round tax BEFORE summing (gotcha rule) — the save path does, so an

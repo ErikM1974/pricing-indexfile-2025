@@ -116,15 +116,19 @@ function updateTaxCalculation() {
     const taxLabel = document.getElementById('tax-rate-label');
     const pct = (taxRate * 100).toFixed(1);
 
+    // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
+    // "(exempt)"/"(not charged)" when $0 (best-of-both level-up 2026-06-14).
+    const _dtfRateRaw = (rateInput?.value || '').trim();
+    if (taxRowEl) taxRowEl.style.display = 'flex';
+    if (taxLabel) taxLabel.textContent = (includeTax && parseFloat(_dtfRateRaw) > 0)
+        ? `Sales Tax (${_dtfRateRaw}%)`
+        : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');
     if (includeTax) {
         const tax = Math.round(subtotal * taxRate * 100) / 100;
-        const total = subtotal + tax;
-        taxRowEl.style.display = 'flex';
         taxAmountEl.textContent = '$' + tax.toFixed(2);
-        grandTotalEl.textContent = '$' + total.toFixed(2);
-        if (taxLabel) taxLabel.textContent = `Sales Tax (${pct}%)`;
+        grandTotalEl.textContent = '$' + (subtotal + tax).toFixed(2);
     } else {
-        taxRowEl.style.display = 'none';
+        taxAmountEl.textContent = '$0.00';
         grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
 

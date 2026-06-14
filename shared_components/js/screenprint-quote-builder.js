@@ -3537,14 +3537,19 @@ function updateTaxCalculation() {
     const taxRateInput = Number.isFinite(_scpRate) ? _scpRate : 10.1;
     const taxRate = taxRateInput / 100;
 
+    // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
+    // "(exempt)"/"(not charged)" when $0 (best-of-both level-up 2026-06-14).
+    const _scpTaxLabel = document.getElementById('tax-rate-label');
+    if (taxRowEl) taxRowEl.style.display = 'flex';
+    if (_scpTaxLabel) _scpTaxLabel.textContent = (includeTax && taxRateInput > 0)
+        ? `Sales Tax (${taxRateInput}%)`
+        : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');
     if (includeTax) {
         const tax = Math.round(subtotal * taxRate * 100) / 100;
-        const total = subtotal + tax;
-        taxRowEl.style.display = 'flex';
         taxAmountEl.textContent = '$' + tax.toFixed(2);
-        grandTotalEl.textContent = '$' + total.toFixed(2);
+        grandTotalEl.textContent = '$' + (subtotal + tax).toFixed(2);
     } else {
-        taxRowEl.style.display = 'none';
+        taxAmountEl.textContent = '$0.00';
         grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
     // Mirror the grand TOTAL into the sticky sidebar total bar (EMB/DTF parity 2026-06-14) so the rep sees
