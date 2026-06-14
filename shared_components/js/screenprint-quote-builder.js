@@ -3547,6 +3547,11 @@ function updateTaxCalculation() {
         taxRowEl.style.display = 'none';
         grandTotalEl.textContent = '$' + subtotal.toFixed(2);
     }
+    // Mirror the grand TOTAL into the sticky sidebar total bar (EMB/DTF parity 2026-06-14) so the rep sees
+    // the customer-facing total even though the Subtotal/Tax/TOTAL box moved to the footer invoice band.
+    { const _sgt = document.getElementById('sidebar-grand-total'); const _stb = document.getElementById('sidebar-total-bar');
+      if (_sgt) _sgt.textContent = grandTotalEl.textContent;
+      if (_stb) _stb.hidden = false; }
 }
 
 // toggleAdditionalCharges() moved to quote-builder-utils.js
