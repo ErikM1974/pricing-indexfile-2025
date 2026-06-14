@@ -1,3 +1,7 @@
+## v2026.06.14.5 (2026.06.14)
+
+- DTF: wrap footer tax-rate input + % so they group right (parity with SCP)
+
 ## v2026.06.14.4 (2026.06.14)
 
 - SCP/DTF: relocate Fees & Charges to a horizontal Services & Fees bar in the content area (EMB parity)
