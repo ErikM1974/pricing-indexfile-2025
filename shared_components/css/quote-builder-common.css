@@ -956,6 +956,48 @@ body {
     color: #1d4ed8;
 }
 
+/* --- SCP/DTF footer invoice band (promoted from inline styles 2026-06-14). Scoped to the two
+   builders so EMB's own .invoice-totals-wrap.order-footer layout is untouched. Adds the responsive
+   stack the inline version lacked. --- */
+.scp-builder .invoice-totals-wrap.order-footer,
+.dtf-builder .invoice-totals-wrap.order-footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+    margin: 16px 0 6px;
+}
+.scp-builder .invoice-totals-wrap.order-footer > .order-recap,
+.dtf-builder .invoice-totals-wrap.order-footer > .order-recap {
+    margin-right: auto;
+}
+.if-order-details-col {
+    flex: 1 1 320px;
+    min-width: 280px;
+    max-width: 460px;
+}
+.if-totals-col {
+    flex: 0 1 320px;
+    min-width: 280px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+@media (max-width: 768px) {
+    .scp-builder .invoice-totals-wrap.order-footer,
+    .dtf-builder .invoice-totals-wrap.order-footer {
+        flex-direction: column;
+    }
+    .if-order-details-col,
+    .if-totals-col {
+        flex: 1 1 auto;
+        min-width: 0;
+        max-width: none;
+        width: 100%;
+    }
+}
+
 /* Coming Soon Accordion — REMOVED 2026-03-23 (feature never shipped) */
 
 /* ============================================
@@ -2237,32 +2279,8 @@ textarea:disabled {
     display: none;
 }
 
-/* ============================================
-   SAVE & SHARE PANEL (Collapsible)
-   ============================================ */
-.save-quote-panel-collapsible {
-    background: #f8fafc;
-    border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    border: 1px solid #e2e8f0;
-}
-
-.save-quote-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-}
-
-.save-quote-title {
-    font-size: 14px;
-    font-weight: 600;
-    color: #334155;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+/* SAVE & SHARE PANEL (Collapsible) CSS removed 2026-06-14 — orphaned after the layout refactor
+   (the .save-quote-panel-collapsible / .save-quote-header / .save-quote-title markup no longer exists). */
 
 /* Colors */
 .text-primary { color: var(--nwca-blue, #003f7f) !important; }

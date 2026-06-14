@@ -21,13 +21,13 @@
     <script src="/config/app.config.js"></script>
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.14.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.06.14.7">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- DTF Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.06.07.8">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.06.14.7">
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
     <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
@@ -302,14 +302,14 @@
                     <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
                         <div class="charge-field" style="margin:0;">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
-                                <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge()">
+                                <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge(); updateAdditionalCharges();">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
                             <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
                                 <span class="prefix">$</span>
                                 <input type="number" id="art-charge" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
-                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                                       onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                             </div>
                         </div>
                         <div class="charge-field" style="margin:0;">
@@ -317,7 +317,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
                                        min="0" step="0.5" placeholder="0"
-                                       onchange="updateArtworkCharges()" oninput="updateArtworkCharges()">
+                                       onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                                 <span class="text-muted">hrs</span>
                                 <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
                             </div>
@@ -338,11 +338,11 @@
             <!-- Invoice footer band (EMB flagship parity 2026-06-14): Order Recap + Ship-To + Order Details +
                  the Subtotal/Tax/TOTAL block, relocated from the sidebar so the quote reads like an invoice
                  top-to-bottom. Every element id is preserved, so updateTaxCalculation()/save/estimate keep working. -->
-            <div class="invoice-totals-wrap order-footer" style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start; margin:16px 0 6px;">
-                <div class="order-recap" id="order-recap" style="margin-right:auto;"></div>
+            <div class="invoice-totals-wrap order-footer">
+                <div class="order-recap" id="order-recap"></div>
                 <div class="ship-to-card" id="ship-to-card"></div>
                 <!-- Order Details (relocated; single collapsible — outer redundant wrapper dropped) -->
-                <div style="flex:1 1 320px; min-width:280px; max-width:460px;">
+                <div class="if-order-details-col">
                     <!-- Shipping & Order Details (collapsible) -->
                     <div class="dtf-order-details-panel">
                         <div class="charges-header" onclick="toggleOrderDetails()">
@@ -461,7 +461,7 @@
                     </div>
                 </div>
                 <!-- Totals (relocated) -->
-                <div style="flex:0 1 320px; min-width:280px; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+                <div class="if-totals-col">
                 <!-- Tax Section -->
                 <div class="pricing-totals-section">
                     <div class="pricing-row">
