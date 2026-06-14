@@ -1,3 +1,8 @@
+## v2026.06.14.6 (2026.06.14)
+
+- Trio polish: EMB dead-code cleanup + collapsible customer panel; SCP estimator call aligned
+- Docs: record full-layout alignment + final consistency audit in quote-builder manifest
+
 ## v2026.06.14.5 (2026.06.14)
 
 - DTF: wrap footer tax-rate input + % so they group right (parity with SCP)
