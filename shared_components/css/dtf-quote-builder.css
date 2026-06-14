@@ -1385,56 +1385,8 @@
 
 /* Child Row Styles — now in quote-builder-common.css (2026-03-23) */
 
-/* =============================================
-   SAVE & SHARE SECTION (Sidebar Panel)
-   ============================================= */
-.save-quote-panel {
-    background: white;
-    margin: 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-}
-
-.save-quote-title {
-    background: #f8f9fa;
-    padding: 10px 14px;
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--text-dark);
-    border-bottom: 1px solid var(--border-color);
-}
-
-.save-quote-title i {
-    margin-right: 8px;
-    color: var(--dtf-primary);
-}
-
-.save-quote-form {
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.save-quote-form .quote-input {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.save-quote-form .quote-input:focus {
-    outline: none;
-    border-color: var(--dtf-primary);
-    box-shadow: 0 0 0 3px var(--dtf-primary-50);
-}
-
-.save-quote-form .quote-input::placeholder {
-    color: #9ca3af;
-}
+/* SAVE & SHARE SECTION (Sidebar Panel) CSS removed 2026-06-14 — orphaned after the layout refactor
+   (.save-quote-panel / .save-quote-title / .save-quote-form markup no longer exists). */
 
 .btn-save-quote {
     width: calc(100% - 28px);
@@ -1708,14 +1660,12 @@
 }
 
 .additional-charges-panel,
-.save-quote-panel-collapsible,
 .dtf-order-details-panel {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
     transition: box-shadow 0.2s;
 }
 
 .additional-charges-panel:hover,
-.save-quote-panel-collapsible:hover,
 .dtf-order-details-panel:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
