@@ -39,6 +39,46 @@ content → stays EMB. 3. SCP/DTF adopt the shared piece + wire their own config
 force its UI to match; a full fold-in is a separate, much-later project). 5. Record shared-vs-per-method
 below so the next change routes itself.
 
+## ✅ Save IS decoupled from Push — all 4 builders (verified 2026-06-14, code audit)
+**The "you can't save without pushing to ShopWorks" claim is FALSE.** All four builders persist
+to Caspio `quote_sessions`/`quote_items` via a save action that touches ZERO ShopWorks endpoints.
+The actual coupling is the **reverse**: in EMB/SCP/DTF the *Push* button stays hidden until a save
+succeeds (`showPushButton`/`showScpPushButton`/`showDtfPushButton`), and clicking Push *force-saves
+first if dirty* — so you can't push without saving, but you can always save without pushing.
+
+| Builder | Save fn (Caspio-only) | Push fn (separate, ShopWorks) | Prefix |
+|---|---|---|---|
+| EMB | `saveAndGetLink()` → `/api/quote_sessions` (`embroidery-quote-builder.js:7752`) | `pushToShopWorks()` → `/api/embroidery-push/push` (`:8338`) | `EMB` |
+| SCP | `saveAndGetLink()` → `/api/quote_sessions` (`screenprint-quote-builder.js:4029`) | `confirmScpPush()` → `/api/scp-push/push-quote` (`:4467`) | `SPC`/`SSC` |
+| DTF | `saveAndGetLink()` → `/api/quote_sessions` (`dtf-quote-builder.js:2289`) | `confirmDtfPush()` → `/api/dtf-push/push-quote` (`:3676`) | `DTF` |
+| DTG | `handleSaveQuote()` → `/api/quote_sessions` (`dtg-quote-page.js:1392`) | `submitToShopWorks()` → `/api/submit-order-form` (`dtg-inline-form.js:4122`) | `DTG` |
+
+Copy-to-Clipboard and Print are local-only (no persist). **Root cause of the confusion was a LAYOUT
+gap, not a missing feature:** SCP & DTF had buried "Save & Get Shareable Link" in a collapsible
+"Save & Share" panel (inside the scroll container), so it could be collapsed/scrolled away.
+
+### ✅ Action-bar flagship alignment DONE (2026-06-14)
+SCP + DTF now mirror EMB's pinned, always-visible `.action-panel` (OUTSIDE `#sidebar-scroll-container`):
+order = **Push → Save → Copy → Print → Email**. Save & Push were lifted out of the collapsible panel
+(SCP's leftover panel relabeled "Reference Artwork"; DTF's "Order Details & Artwork" — it still holds
+the shipping sub-panel + artwork mount). Push id preserved (`#scp/dtf-push-shopworks-btn`) so the
+hide-until-saved reveal (`showScpPushButton`/`showDtfPushButton`) still works.
+
+**Shared button vocabulary now in `quote-builder-common.css`** (promoted from EMB-extracted so all
+trio builders use it, no inline colors): `.btn-action.btn-share-link` (pale-green Save), `.btn-action.btn-push-shopworks`
+(forest-green primary Push, mirrors EMB's `#emb-push-shopworks-btn`), `.btn-action.btn-email-quote`
+(blue Email) + their `:hover` counter-rules (need the extra `.btn-action` class to beat
+`.btn-secondary-action:hover`). EMB's duplicate copies were deleted from `embroidery-quote-builder-extracted.css`.
+
+**⚠️ SAVE-HOOK GOTCHA (cost a regression here):** the Save button's JS hooks — Saving-spinner,
+disable-during-save (double-submit guard), edit-mode "Save Revision" relabel — select it via
+`document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]')` in EMB/SCP/DTF saveAndGetLink +
+shared `quote-builder-utils.js updateEditModeUI` + DTF resetQuote. They're all `if(saveBtn)`-guarded, so
+a selector miss fails SILENTLY. EMB's own flagship migration had dropped `.btn-save-quote` and silently
+killed these for months; this work re-pointed the selector to the `onclick` so all three fire again.
+**If you re-class/rename the Save button, grep these 6 sites first.** DTG = LEAVE IT (already has an
+always-visible `#dtgSaveBtn` in its sticky inline form; no buried-save problem).
+
 ## The five order surfaces (all push to ManageOrders)
 | Surface | Pattern | Core JS |
 |---|---|---|

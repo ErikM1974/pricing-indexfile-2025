@@ -920,6 +920,42 @@ body {
     font-size: 14px;
 }
 
+/* --- Flagship action-bar button vocabulary (promoted from EMB so all builders share it,
+   2026-06-14). EMB defines identical .btn-share-link rules in its own extracted CSS; the
+   values here match, so EMB is unaffected by load order. .btn-push-shopworks is new/shared
+   and mirrors EMB's #emb-push-shopworks-btn theme so SCP/DTF can drop their inline colors. --- */
+.btn-action.btn-share-link {
+    background: #ecfdf5;
+    color: #059669;
+}
+.btn-action.btn-share-link:hover {
+    background: #d1fae5;
+    color: #047857;
+}
+.btn-action.btn-push-shopworks {
+    background: var(--builder-primary, #2e5827);
+    color: #fff;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(31, 73, 34, 0.35);
+}
+.btn-action.btn-push-shopworks:hover:not(:disabled) {
+    background: var(--builder-primary-dark, #1f4922);
+}
+.btn-action.btn-push-shopworks:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.btn-action.btn-email-quote {
+    background: #eff6ff;
+    color: #2563eb;
+}
+/* Hover counter-rule: .btn-secondary-action:hover (0-2-0) would otherwise repaint these
+   translucent-white, so the share/email hovers need the extra (.btn-action) class to win. */
+.btn-action.btn-email-quote:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
 /* Coming Soon Accordion — REMOVED 2026-03-23 (feature never shipped) */
 
 /* ============================================

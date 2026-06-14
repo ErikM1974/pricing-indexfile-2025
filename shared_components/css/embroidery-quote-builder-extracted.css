@@ -2776,17 +2776,8 @@ td.size-disabled input {
     cursor: not-allowed;
 }
 
-/* Secondary actions — palettes preserved from the former inline styles */
-.btn-share-link {
-    background: #ecfdf5;
-    color: #059669;
-    border-color: #6ee7b7;
-}
-.btn-email-quote {
-    background: #eff6ff;
-    color: #2563eb;
-    border-color: #93c5fd;
-}
+/* Secondary-action palettes (.btn-share-link / .btn-email-quote base + hover) were promoted to the
+   shared quote-builder-common.css (2026-06-14) so SCP/DTF share them. Defined there now — not here. */
 
 /* SIDEBAR RUNNING TOTAL (.sidebar-total-bar) moved to
    quote-builder-common.css 2026-06-11 when DTF adopted the bar —
@@ -2911,13 +2902,4 @@ td.size-disabled input {
     margin-top: 6px;
 }
 
-/* Hover counter-rules — .btn-secondary-action:hover (0-2-0) would otherwise repaint these
-   translucent white (the old inline styles used to win over it). */
-.btn-action.btn-share-link:hover {
-    background: #d1fae5;
-    color: #047857;
-}
-.btn-action.btn-email-quote:hover {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
+/* Share/email hover counter-rules moved to shared quote-builder-common.css (2026-06-14). */

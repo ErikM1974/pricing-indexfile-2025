@@ -374,7 +374,7 @@ class DTFQuoteBuilder {
         }
 
         // Update save button text
-        const saveBtn = document.querySelector('.btn-save-quote');
+        const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
         if (saveBtn) {
             saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
         }
@@ -2568,7 +2568,7 @@ class DTFQuoteBuilder {
         };
 
         // Show saving state on button
-        const saveBtn = document.querySelector('.btn-save-quote');
+        const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
         const originalText = saveBtn?.innerHTML;
         if (saveBtn) {
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -3325,7 +3325,7 @@ class DTFQuoteBuilder {
         if (_stg) _stg.textContent = '$0.00';
         const headerSubtitleReset = document.querySelector('.power-header .power-header-subtitle');
         if (headerSubtitleReset) headerSubtitleReset.textContent = 'Direct-to-Film Transfers';
-        const saveBtnReset = document.querySelector('.btn-save-quote');
+        const saveBtnReset = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
         if (saveBtnReset) saveBtnReset.innerHTML = '<i class="fas fa-link"></i> Save & Get Shareable Link';
         if (window.location.search.includes('edit=') || window.location.search.includes('duplicate=')) {
             try { history.replaceState(null, '', window.location.pathname); } catch (_) {}

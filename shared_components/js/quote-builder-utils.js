@@ -963,7 +963,7 @@ function updateEditModeUI(quoteId, revision) {
     if (headerSubtitle) {
         headerSubtitle.innerHTML = `<span style="color: #fbbf24;">✏️ Editing: ${escapeHtml(String(quoteId))} • Rev ${escapeHtml(String(revision))}</span>`;
     }
-    const saveBtn = document.querySelector('.btn-save-quote');
+    const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
     if (saveBtn) {
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
     }
