@@ -4045,7 +4045,7 @@ async function saveAndGetLink() {
     }
 
     // Get save button for loading state
-    const saveBtn = document.querySelector('.btn-save-quote');
+    const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
     const originalText = saveBtn?.innerHTML;
     if (saveBtn) {
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
