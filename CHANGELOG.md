@@ -1,3 +1,7 @@
+## v2026.06.14.4 (2026.06.14)
+
+- SCP/DTF: relocate Fees & Charges to a horizontal Services & Fees bar in the content area (EMB parity)
+
 ## v2026.06.14.3 (2026.06.14)
 
 - SCP/DTF: relocate Order Details + Shipping + Subtotal/Tax/TOTAL to a footer invoice band (EMB parity)
