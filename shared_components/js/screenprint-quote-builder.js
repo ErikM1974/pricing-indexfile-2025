@@ -671,6 +671,9 @@ async function loadQuoteForEditing(quoteId) {
         // recalc, which can short-circuit on zero qty)
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
+        // Record the loaded quote id + gate the always-visible Push button (parity with DTF's edit-load).
+        if (typeof showScpPushButton === 'function') showScpPushButton(quoteId);
+
         showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
 
     } catch (error) {
@@ -696,6 +699,15 @@ async function loadQuoteForEditing(quoteId) {
 // confirmNewQuote() → moved to quote-builder-utils.js
 
 function resetQuote() {
+    // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
+    _scpPushQuoteId = null;
+    const _scpPush = document.getElementById('scp-push-shopworks-btn');
+    if (_scpPush) {
+        delete _scpPush.dataset.pushed;
+        _scpPush.style.background = '';
+        const _l = document.getElementById('scp-push-shopworks-label'); if (_l) _l.textContent = 'Push to ShopWorks';
+    }
+    if (typeof updateScpPushButtonState === 'function') updateScpPushButtonState();
     // Clear all product rows and re-add empty state
     const tbody = document.getElementById('product-tbody');
     tbody.innerHTML = `
@@ -3557,6 +3569,8 @@ function updateTaxCalculation() {
     { const _sgt = document.getElementById('sidebar-grand-total'); const _stb = document.getElementById('sidebar-total-bar');
       if (_sgt) _sgt.textContent = grandTotalEl.textContent;
       if (_stb) _stb.hidden = false; }
+    // Keep the always-visible Push button + readiness checklist in lock-step with product/fee changes.
+    try { if (typeof updateScpPushButtonState === 'function') updateScpPushButtonState(); } catch (_) {}
 }
 
 // toggleAdditionalCharges() moved to quote-builder-utils.js
@@ -4036,7 +4050,7 @@ function getLocationName(code) {
  * Save quote and get shareable link
  * Uses ScreenPrintQuoteService and QuoteShareModal
  */
-async function saveAndGetLink() {
+async function saveAndGetLink(opts = {}) {
     const products = collectProductsFromTable();
     if (products.length === 0) {
         showToast('Add products before saving', 'error');
@@ -4200,8 +4214,11 @@ async function saveAndGetLink() {
                 showScpPushButton(result.quoteID);
             }
 
-            // Show success modal with shareable link
-            if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+            // Show success modal with shareable link — SKIPPED on the silent auto-save before a Push
+            // (scpPushToShopWorks passes skipShareModal:true; the push preview opens instead).
+            if (opts.skipShareModal) {
+                /* auto-saved for Push to ShopWorks — no share modal */
+            } else if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
                 QuoteShareModal.show(result.quoteID, editingQuoteId ? `Updated to Rev ${editingRevision}` : null);
             } else {
                 // Fallback
@@ -4354,19 +4371,46 @@ let _scpPushQuoteId = null;
 
 function showScpPushButton(quoteId) {
     _scpPushQuoteId = quoteId;
-    // Phase 8 gate LIFTED 2026-05-23 — SCP push live to all reps.
-    // Orders currently land under EMB integration customer (id=3739) in
-    // OnSite until Erik creates a dedicated SCP integration. Defaults in
-    // caspio-pricing-proxy/config/manageorders-scp-config.js.
-    const btn = document.getElementById('scp-push-shopworks-btn');
-    if (btn) {
-        btn.style.display = '';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        const label = document.getElementById('scp-push-shopworks-label');
-        if (label) label.textContent = 'Push to ShopWorks';
+    // The Push button is ALWAYS visible now (disabled-until-ready, EMB parity 2026-06-14); this just
+    // records the saved quote id (the /preview endpoint needs it) and re-gates the button.
+    if (typeof updateScpPushButtonState === 'function') updateScpPushButtonState();
+}
+
+// Always-visible Push button + "Before you push" readiness checklist gate (EMB parity 2026-06-14).
+// Uses the shared renderBuilderPushReadiness() (quote-builder-utils.js) — gates: Customer #, ≥1 item,
+// customer name, customer email — so the button is enabled only when a push/save can actually succeed.
+function updateScpPushButtonState() {
+    if (typeof renderBuilderPushReadiness !== 'function') return;
+    renderBuilderPushReadiness({
+        btnId: 'scp-push-shopworks-btn',
+        hasProducts: () => { try { return collectProductsFromTable().length > 0; } catch (_) { return false; } }
+    });
+}
+window.updateScpPushButtonState = updateScpPushButtonState;
+
+// One-click Push: auto-SAVE first (silent — no share modal), then open the review/confirm preview.
+// The button is gated by the checklist, so we only reach here when ready. The proxy's PushedToShopWorks
+// 409 guard prevents a duplicate order if it is somehow clicked twice. (EMB-parity pushToShopWorks)
+let _scpPushInFlight = false;
+async function scpPushToShopWorks() {
+    if (_scpPushInFlight) return;                 // re-entrancy guard (a double-click must not save/push twice)
+    _scpPushInFlight = true;
+    const label = document.getElementById('scp-push-shopworks-label');
+    if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+    try {
+        // NOTE: do NOT disable the button here — openScpPushPreview() bails if the button is disabled.
+        await saveAndGetLink({ skipShareModal: true });   // silent save → showScpPushButton sets _scpPushQuoteId + re-gates the button enabled
+        if (!_scpPushQuoteId) return;                      // save failed / validation blocked it (error already shown)
+        await openScpPushPreview();
+    } finally {
+        _scpPushInFlight = false;
+        const _b = document.getElementById('scp-push-shopworks-btn');
+        // Don't clobber the "Pushed ✓" success label once the push completed.
+        if (label && (!_b || _b.dataset.pushed !== '1')) label.textContent = 'Push to ShopWorks';
+        updateScpPushButtonState();   // renderBuilderPushReadiness skips re-gating when dataset.pushed==='1'
     }
 }
+window.scpPushToShopWorks = scpPushToShopWorks;
 
 // Minimal HTML escaper for preview output (self-contained — no util dependency).
 function _scpEsc(s) {
@@ -4516,7 +4560,7 @@ async function confirmScpPush(directFallback) {
 
         // Success
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
-        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; }
+        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; mainBtn.dataset.pushed = '1'; }
         if (typeof showToast === 'function') showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[SCP Push] Success:', data);
         closeScpPushPreview();
