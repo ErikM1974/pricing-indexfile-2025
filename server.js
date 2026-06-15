@@ -7436,6 +7436,138 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
   }
 });
 
+// ── Inbound vendor-shipment helpers (mirror the proxy's, kept local) ──
+function buildVendorTrackingUrl(carrier, trackingNumber) {
+  if (!trackingNumber) return null;
+  const c = String(carrier || '').toLowerCase();
+  const t = encodeURIComponent(String(trackingNumber).trim());
+  if (c.includes('ups')) return `https://www.ups.com/track?tracknum=${t}`;
+  if (c.includes('fedex')) return `https://www.fedex.com/fedextrack/?trknbr=${t}`;
+  if (c.includes('usps')) return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${t}`;
+  if (c.includes('spee')) return `https://www.speedeedelivery.com/tools/track-shipment/?tracking=${t}`;
+  return null;
+}
+function mapVendorState(statusRaw) {
+  const s = String(statusRaw || '').trim().toLowerCase();
+  if (s === 'shipped') return 'shipped';
+  if (s === 'partially shipped') return 'partial';
+  if (s === 'complete') return 'complete';
+  if (s === 'confirmed' || s === 'received') return 'confirmed';
+  if (s === 'canceled' || s === 'cancelled') return 'canceled';
+  return 'unknown';
+}
+
+/**
+ * GET /api/quote-sessions/:quoteId/vendor-shipment
+ *
+ * INBOUND blank-goods shipment status (vendor SanMar → NWCA) for the order's
+ * work order. Composes two EXISTING proxy endpoints:
+ *   1) /api/sanmar-orders/lookup?woId=  → SanMar PO(s) + synced status/shipments
+ *   2) /api/sanmar-shipments/po/:po     → LIVE PromoStandards OSN tracking
+ * Same-origin so the quote-view auto-loads it. Never claims "shipped" without
+ * backing (Erik #1): on a live-OSN error it falls back to the synced shipment
+ * rows and flags live:false + error.
+ *
+ * Query: ?woId=<work order #> (quote-view passes snapshot.order.id_Order);
+ * falls back to the row's ShopWorks_Order_Number.
+ */
+app.get('/api/quote-sessions/:quoteId/vendor-shipment', async (req, res) => {
+  try {
+    const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
+
+    // Resolve the work order number.
+    let woId = null;
+    const qWo = Number(req.query.woId);
+    if (Number.isInteger(qWo) && qWo > 0 && qWo < 100000000) {
+      woId = qWo;
+    } else {
+      try {
+        const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
+        const session = Array.isArray(sessions) ? sessions[0] : null;
+        const colWo = Number(session && session.ShopWorks_Order_Number);
+        if (Number.isInteger(colWo) && colWo > 0) woId = colWo;
+      } catch (_) { /* fall through to not-linked */ }
+    }
+    if (!woId) return res.json({ woId: null, linked: false, pos: [] });
+
+    // 1) WO → SanMar PO(s) (Caspio-backed, synced status + shipments).
+    let lookup;
+    try {
+      const r = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-orders/lookup?woId=${encodeURIComponent(woId)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      lookup = await r.json();
+    } catch (e) {
+      return res.status(502).json({ woId, linked: false, pos: [], error: `SanMar lookup failed: ${e.message}` });
+    }
+    const orders = (lookup && Array.isArray(lookup.orders)) ? lookup.orders : [];
+    if (orders.length === 0) return res.json({ woId, linked: false, pos: [] });
+
+    // 2) Per PO, pull LIVE OSN tracking; fall back to synced shipments on error.
+    const pos = [];
+    for (const o of orders) {
+      const po = o.SanMar_PO || null;
+      const baseState = mapVendorState(o.SanMar_Status);
+      let boxes = [];
+      let live = false;
+      let error = null;
+      if (po) {
+        const poDigits = (String(po).match(/^\d+/) || [''])[0] || po;
+        try {
+          const sr = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-shipments/po/${encodeURIComponent(poDigits)}`);
+          const sj = await sr.json().catch(() => ({}));
+          if (sr.ok && sj && sj.success && sj.data && Array.isArray(sj.data.boxes)) {
+            boxes = sj.data.boxes.map(b => ({
+              boxNumber: b.boxNumber,
+              trackingNumber: b.trackingNumber || null,
+              carrier: b.carrier || '',
+              trackingUrl: buildVendorTrackingUrl(b.carrier, b.trackingNumber),
+              shipDate: b.shipmentDate ? String(b.shipmentDate).split('T')[0] : '',
+              shippingMethod: b.shippingMethod || '',
+              items: b.items || [],
+            }));
+            live = true;
+          } else if (sj && sj.error) {
+            error = sj.error;
+          }
+        } catch (e) {
+          error = e.message;
+        }
+        // Fall back to the synced shipment rows when live OSN gave us nothing.
+        if (!live && Array.isArray(o.shipments) && o.shipments.length) {
+          boxes = o.shipments.filter(s => s.Tracking_Number).map((s, i) => ({
+            boxNumber: i + 1,
+            trackingNumber: s.Tracking_Number,
+            carrier: s.Carrier || '',
+            trackingUrl: buildVendorTrackingUrl(s.Carrier, s.Tracking_Number),
+            shipDate: s.Ship_Date || '',
+            shippingMethod: s.Ship_Method || '',
+            items: [],
+          }));
+        }
+      }
+      const hasTracking = boxes.some(b => b.trackingNumber);
+      const state = (hasTracking && (baseState === 'confirmed' || baseState === 'unknown')) ? 'shipped' : baseState;
+      const shipped = ['shipped', 'partial', 'complete'].includes(state) || hasTracking;
+      pos.push({
+        po,
+        salesOrder: o.SanMar_Sales_Order || '',
+        status: o.SanMar_Status || '',
+        state,
+        shipped,
+        estimatedDelivery: o.Estimated_Delivery || '',
+        boxes,
+        live,
+        error,
+      });
+    }
+
+    res.json({ woId, linked: true, pos });
+  } catch (error) {
+    console.error('[vendor-shipment] error:', error);
+    res.status(500).json({ error: 'vendor-shipment failed', details: error.message });
+  }
+});
+
 /**
  * POST /api/quote-sessions/bulk-sync-from-shopworks
  *

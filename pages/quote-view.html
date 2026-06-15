@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.06.11.12">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.06.15.5">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260602-phase11-4" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -419,6 +419,16 @@
                 </div>
             </section>
 
+            <!-- Blank Goods — INBOUND vendor (SanMar) shipment (2026-06-15).
+                 Distinct from the outbound Shipping section above (us → customer):
+                 this shows whether the blank garments shipped from SanMar → us. -->
+            <section id="sw-vendor-shipment-section" class="sw-vendor-section" style="display: none;">
+                <h2>Blank Goods — from SanMar</h2>
+                <div class="sw-vendor-body" id="sw-vendor-body">
+                    <span class="sw-vendor-loading">Checking SanMar…</span>
+                </div>
+            </section>
+
             <!-- Quote Totals -->
             <section class="quote-totals">
                 <div class="totals-card">
@@ -551,6 +561,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.06.15.4"></script>
+    <script src="/pages/js/quote-view.js?v=2026.06.15.5"></script>
 </body>
 </html>
