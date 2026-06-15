@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.05.28.3">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.15.1">
 </head>
 <body>
     <!-- Header -->
@@ -26,6 +26,10 @@
         <h1>Quote Management</h1>
         <div class="header-actions">
             <span class="user-info" id="user-display">Loading...</span>
+            <button id="btn-sync-sw" class="btn-header" onclick="syncFromShopWorks()"
+                    title="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.">
+                <i class="fas fa-sync"></i> Sync from ShopWorks
+            </button>
             <a href="/staff-dashboard.html" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </a>
@@ -130,6 +134,7 @@
                         </th>
                         <th>Quote ID</th>
                         <th>Customer</th>
+                        <th>Salesperson</th>
                         <th>Items</th>
                         <th style="text-align: right;">Amount</th>
                         <th>Status</th>
@@ -259,6 +264,49 @@
             }
         }
 
+        // On-demand ShopWorks reconciliation (Erik 2026-06-15).
+        // Calls the SAME endpoint the hourly Heroku Scheduler cron drives
+        // (caspio-pricing-proxy/scripts/sync-quote-sessions-from-shopworks.js
+        // → POST /api/quote-sessions/bulk-sync-from-shopworks). For every
+        // Processed/pushed quote in the window it re-pulls ManageOrders state
+        // and writes back ShopWorks order #, status, production milestones, and
+        // the salesperson (order.CustomerServiceRep). Exposed as a button so
+        // staff can refresh on demand — and so the dashboard is not blind if the
+        // scheduler is paused. Same-origin relative URL → the pricing-index app
+        // (NOT the proxy), which owns these sync endpoints.
+        async function syncFromShopWorks() {
+            const btn = document.getElementById('btn-sync-sw');
+            if (!btn || btn.disabled) return;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing…';
+            try {
+                const resp = await fetch('/api/quote-sessions/bulk-sync-from-shopworks', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // olderThanMin:5 is the endpoint floor — forces a refresh of
+                    // anything not synced in the last 5 min. daysBack:90 covers
+                    // the widest dashboard date filter.
+                    body: JSON.stringify({ daysBack: 90, olderThanMin: 5 }),
+                });
+                const result = await resp.json().catch(() => ({}));
+                if (!resp.ok || !result.success) {
+                    throw new Error(result.error || `HTTP ${resp.status}`);
+                }
+                showToast(`✓ ShopWorks sync: ${result.imported || 0} imported · ${result.pending || 0} pending · ${result.deleted || 0} cancelled · ${result.errors || 0} errors`);
+                // Reload so order #, status, progress, and salesperson reflect the
+                // freshly-written ShopWorks_* columns.
+                await loadQuotes();
+            } catch (err) {
+                // Erik's #1 rule — surface the failure, never fail silently.
+                console.error('[QuoteManagement] syncFromShopWorks failed:', err);
+                alert(`ShopWorks sync failed:\n${err.message}\n\nIf this keeps happening, check the pricing-index app logs (the same reconciliation also runs hourly via the caspio-pricing-proxy scheduler).`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
         function applyFilters() {
             // Get filter values
             const statusFilter = document.getElementById('filter-status').value;
@@ -385,6 +433,40 @@
                         </span>`;
             }).join('');
             return `<div class="milestone-pills">${pills}</div>`;
+        }
+
+        // Salesperson column (Erik 2026-06-15). The authoritative salesperson is
+        // the ShopWorks order owner — order.CustomerServiceRep on the synced
+        // snapshot (e.g. "Erik Mickelson"). That only exists once the order has
+        // been pulled back from ManageOrders, so fall back to the quote-time
+        // SalesRepName for rows not yet synced. Storefront orders carry no
+        // quote-time rep, so they show "—" until the ShopWorks snapshot lands —
+        // which is itself the tell that the ShopWorks sync hasn't run for that row.
+        function getSalespersonInfo(quote) {
+            // 1. ShopWorks snapshot — source of truth.
+            if (quote.ShopWorks_Snapshot) {
+                try {
+                    const rep = JSON.parse(quote.ShopWorks_Snapshot)?.order?.CustomerServiceRep;
+                    if (rep && String(rep).trim()) {
+                        return {
+                            html: escapeHtml(String(rep).trim()),
+                            tooltip: `From ShopWorks (Customer Service Rep on WO #${quote.ShopWorks_Order_Number || '?'})`,
+                        };
+                    }
+                } catch (_) { /* malformed snapshot — fall through */ }
+            }
+            // 2. Quote-time rep (builder quotes capture this; storefront orders don't).
+            if (quote.SalesRepName && String(quote.SalesRepName).trim()) {
+                return {
+                    html: escapeHtml(String(quote.SalesRepName).trim()),
+                    tooltip: 'From the quote (ShopWorks not yet synced)',
+                };
+            }
+            // 3. Nothing yet.
+            return {
+                html: '<span class="milestone-na">—</span>',
+                tooltip: 'No salesperson yet — ShopWorks order not synced',
+            };
         }
 
         // Tooltip explaining where the displayed amount came from. Hover on
@@ -610,6 +692,7 @@
             tbody.innerHTML = pageQuotes.map(quote => {
                 const statusClass = getStatusClass(quote);
                 const expiresInfo = getExpiresInfo(quote);
+                const salespersonInfo = getSalespersonInfo(quote);
                 const isCancelled = quote.Status === 'Cancelled_in_ShopWorks';
                 const isProcessed = quote.Status === 'Processed';
                 const isFailed = quote.Status === 'Processed - ShopWorks Failed';
@@ -721,6 +804,7 @@
                             <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
                             <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>
                         </td>
+                        <td class="salesperson-cell" title="${escapeHtml(salespersonInfo.tooltip)}">${salespersonInfo.html}</td>
                         <td>${quote.TotalQuantity || 0}</td>
                         <td class="quote-amount" title="${getAmountTooltip(quote)}">${formatCurrency(getEffectiveAmount(quote))}</td>
                         <td>${statusCellHtml}</td>

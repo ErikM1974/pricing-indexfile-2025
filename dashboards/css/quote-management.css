@@ -443,6 +443,14 @@ body {
     color: #888;
 }
 
+/* Salesperson column — ShopWorks order owner (order.CustomerServiceRep),
+   falls back to the quote-time rep. Secondary-text weight so it doesn't
+   compete with the customer name. (Erik 2026-06-15) */
+.salesperson-cell {
+    color: #444;
+    white-space: nowrap;
+}
+
 .quote-amount {
     font-weight: 600;
     text-align: right;

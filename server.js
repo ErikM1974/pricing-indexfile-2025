@@ -403,6 +403,19 @@ app.use((req, res, next) => {
       return next();
     }
 
+    // Internal loopback self-calls must NOT be redirected (2026-06-15). The
+    // hourly reconciliation crons fetch `http://localhost:$PORT/...` from
+    // inside the dyno; that request carries no `x-forwarded-proto` header, so
+    // the redirect below would send it to `https://` + req.hostname — and
+    // Express's req.hostname strips the port, yielding `https://localhost`
+    // (→ :443), which has no listener → ECONNREFUSED. That silently broke the
+    // ManageOrders sync-back AND ShipStation tracking crons (rows only ever
+    // updated via browser page-load syncs over real HTTPS). Loopback traffic
+    // cannot originate externally on Heroku, so it is safe to pass through.
+    if (req.hostname === 'localhost' || req.hostname === '127.0.0.1') {
+      return next();
+    }
+
     // The 'x-forwarded-proto' header is set by Heroku
     if (req.headers['x-forwarded-proto'] !== 'https') {
       // Redirect to HTTPS
@@ -8080,7 +8093,10 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
       try {
         const r = await fetch(`http://localhost:${process.env.PORT || 3000}/api/quote-sessions/${encodeURIComponent(s.QuoteID)}/sync-from-shopworks`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          // x-forwarded-proto marks this as an already-secure internal call so
+          // the force-HTTPS middleware never 302s it to https://localhost
+          // (the loopback bypass also covers this; belt-and-suspenders). 2026-06-15
+          headers: { 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' },
           body: JSON.stringify({}),
         });
         const data = await r.json().catch(() => ({}));
@@ -8256,7 +8272,10 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
         })();
         const wr = await fetch(writeUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          // See sync-from-shopworks self-call above — internal loopback call,
+          // x-forwarded-proto keeps the force-HTTPS middleware from 302-ing it
+          // to https://localhost (→ ECONNREFUSED). 2026-06-15
+          headers: { 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' },
           body: JSON.stringify({
             trackingNumber:   ship.trackingNumber,
             trackingCarrier:  ship.carrierCode,
