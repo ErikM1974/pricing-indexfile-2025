@@ -1,3 +1,7 @@
+## v2026.06.15.2 (2026.06.15)
+
+- Deploy v2026.06.15.2: 4 files (quote-management.html,LESSONS_LEARNED.md,LESSONS_LEARNED_ARCHIVE.md,...)
+
 ## v2026.06.15.1 (2026.06.15)
 
 - Test+docs: lock SCP/DTF push-button async binding (fix shipped in v2026.06.14.10)
