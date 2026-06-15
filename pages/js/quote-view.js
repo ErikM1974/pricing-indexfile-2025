@@ -2786,6 +2786,10 @@ class QuoteViewPage {
         // Phase 4d+ — Tracking section on shipping panel (NEW)
         this._renderTrackingInShippingPanel(snapshot.tracking || [], order);
 
+        // Inbound vendor (SanMar) blank-goods shipment (2026-06-15). Async,
+        // fire-and-forget so it never blocks the rest of the overlay.
+        this._renderVendorShipmentPanel();
+
         // Phase 4e — View Original Submission audit panel
         this._renderOriginalSubmissionPanel(order);
 
@@ -3129,6 +3133,73 @@ class QuoteViewPage {
             `;
             shipSection.appendChild(block);
         }
+    }
+
+    // Inbound vendor (SanMar) blank-goods shipment. Looks up the SanMar PO for
+    // this order's work order and shows whether the blanks shipped from SanMar
+    // to us (carrier + tracking once shipped). Auto-loaded on overlay; async so
+    // it never blocks rendering. Backed by /api/quote-sessions/:id/vendor-shipment.
+    async _renderVendorShipmentPanel() {
+        const section = document.getElementById('sw-vendor-shipment-section');
+        const body = document.getElementById('sw-vendor-body');
+        if (!section || !body) return;
+        const woId = this._currentSnapshot?.order?.id_Order
+            || this.fullData?.shopWorks?.orderNumber
+            || this.quoteData?.ShopWorks_Order_Number;
+        if (!woId) return; // not imported into ShopWorks yet → no WO# to look up
+        section.style.display = '';
+        body.innerHTML = '<span class="sw-vendor-loading">Checking SanMar…</span>';
+        try {
+            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/vendor-shipment?woId=${encodeURIComponent(woId)}`);
+            const data = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+            body.innerHTML = this._vendorShipmentHtml(data);
+        } catch (e) {
+            // Erik's #1 rule — surface the failure, never a wrong "shipped".
+            body.innerHTML = `<span class="sw-vendor-error">Couldn't check SanMar shipment status (${this.escapeHtml(e.message)}).</span>`;
+        }
+    }
+
+    _vendorShipmentHtml(data) {
+        if (!data || !data.linked || !Array.isArray(data.pos) || data.pos.length === 0) {
+            return `<span class="sw-vendor-empty">No SanMar PO linked to this order yet.</span>`;
+        }
+        const STATE_LABEL = {
+            shipped: 'Shipped', partial: 'Partially shipped', complete: 'Complete',
+            confirmed: 'Confirmed — not yet shipped', canceled: 'Canceled', unknown: 'Status unknown',
+        };
+        return data.pos.map(po => {
+            const state = po.state || 'unknown';
+            const label = STATE_LABEL[state] || (po.status || 'Status unknown');
+            const head = `
+                <div class="sw-vendor-head">
+                    <span class="sw-vendor-po">SanMar PO ${this.escapeHtml(po.po || '—')}</span>
+                    <span class="sw-vendor-pill sw-vendor-pill--${this.escapeHtml(state)}">${this.escapeHtml(label)}</span>
+                    ${po.estimatedDelivery ? `<span class="sw-vendor-eta">Est. ${this.escapeHtml(this.formatDate(po.estimatedDelivery))}</span>` : ''}
+                </div>`;
+            let bodyHtml;
+            if (po.boxes && po.boxes.length) {
+                bodyHtml = `<ul class="sw-tracking-list">` + po.boxes.map(b => {
+                    const num = b.trackingNumber || '';
+                    const linkHtml = (b.trackingUrl && num)
+                        ? `<a href="${this.escapeHtml(b.trackingUrl)}" target="_blank" rel="noopener">${this.escapeHtml(num)}</a>`
+                        : this.escapeHtml(num || '—');
+                    return `<li>
+                        <span class="sw-tracking-carrier">${this.escapeHtml(b.carrier || 'Carrier')}</span>
+                        <span class="sw-tracking-num">${linkHtml}</span>
+                        ${b.shipDate ? `<span class="sw-tracking-date">${this.escapeHtml(this.formatDate(b.shipDate))}</span>` : ''}
+                    </li>`;
+                }).join('') + `</ul>`;
+            } else if (po.shipped) {
+                bodyHtml = `<div class="sw-vendor-note">Marked shipped — tracking not available yet.</div>`;
+            } else {
+                bodyHtml = `<div class="sw-vendor-note">Blanks not yet shipped from SanMar.</div>`;
+            }
+            const warn = po.error
+                ? `<div class="sw-vendor-note sw-vendor-note--warn">Live status unavailable — showing last synced data.</div>`
+                : '';
+            return `<div class="sw-vendor-po-block">${head}${bodyHtml}${warn}</div>`;
+        }).join('');
     }
 
     _renderOriginalSubmissionPanel(order) {

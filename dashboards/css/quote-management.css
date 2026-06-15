@@ -489,6 +489,28 @@ body {
     white-space: nowrap;
 }
 
+/* Inbound vendor (SanMar) shipment indicator (Erik 2026-06-15). Blank goods
+   shipping vendor → us, distinct from the outbound Progress milestones. */
+.inbound-cell { text-align: center; }
+.inbound-na { color: #cbd5e1; }
+.inbound-pending { color: #cbd5e1; font-weight: 700; }
+.inbound-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 12px;
+    text-decoration: none;
+    border: 1px solid transparent;
+}
+.inbound-confirmed { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
+.inbound-partial   { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.inbound-shipped   { background: #dcfce7; color: #166534; border-color: #86efac; }
+.inbound-canceled  { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+a.inbound-pill:hover { filter: brightness(0.95); }
+
 .quote-amount {
     font-weight: 600;
     text-align: right;

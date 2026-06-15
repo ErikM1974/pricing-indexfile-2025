@@ -1960,6 +1960,42 @@ body {
     border-bottom: 2px solid var(--quote-green, #4caf50);
     padding-bottom: 8px;
 }
+
+/* Blank Goods — inbound vendor (SanMar) shipment (2026-06-15). Mirrors the
+   shipping panel; reuses .sw-tracking-* for the per-box list. */
+.sw-vendor-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
+.sw-vendor-section h2 {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--quote-green, #4caf50);
+    border-bottom: 2px solid var(--quote-green, #4caf50);
+    padding-bottom: 8px;
+}
+.sw-vendor-po-block { margin-bottom: 14px; }
+.sw-vendor-po-block:last-child { margin-bottom: 0; }
+.sw-vendor-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sw-vendor-po { font-weight: 700; color: #334155; font-size: 14px; }
+.sw-vendor-pill { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; border: 1px solid transparent; }
+.sw-vendor-pill--confirmed,
+.sw-vendor-pill--unknown { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+.sw-vendor-pill--partial { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.sw-vendor-pill--shipped,
+.sw-vendor-pill--complete { background: #dcfce7; color: #166534; border-color: #86efac; }
+.sw-vendor-pill--canceled { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.sw-vendor-eta { font-size: 12px; color: #64748b; }
+.sw-vendor-note { font-size: 13px; color: #475569; padding: 4px 0; }
+.sw-vendor-note--warn { color: #92400e; }
+.sw-vendor-loading { font-size: 13px; color: #94a3b8; }
+.sw-vendor-empty { font-size: 13px; color: #64748b; }
+.sw-vendor-error { font-size: 13px; color: #b91c1c; }
+
 .sw-shipping-meta {
     display: flex;
     gap: 24px;

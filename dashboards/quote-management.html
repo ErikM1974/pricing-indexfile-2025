@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.15.3">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.15.5">
 </head>
 <body>
     <!-- Header -->
@@ -154,6 +154,7 @@
                         <th style="text-align: right;">Amount</th>
                         <th>Status</th>
                         <th>Progress</th>
+                        <th title="Blank goods inbound from SanMar (vendor → us)">Inbound</th>
                         <th>Created</th>
                         <th>Actions</th>
                     </tr>
@@ -210,6 +211,9 @@
 
         // State
         let allQuotes = [];
+        // Inbound SanMar shipment status per work order (woId → {state,shipped,po,...}
+        // or null once fetched-but-no-PO). Populated by one batched call after load.
+        const inboundStatusMap = new Map();
         let filteredQuotes = [];          // tab-filtered set rendered in the table
         let baseFilteredQuotes = [];      // status/date/search-filtered, PRE-tab — stats + tab counts read this so they stay stable across tabs
         let currentPage = 1;
@@ -309,6 +313,10 @@
 
                 // Apply initial filters
                 applyFilters();
+
+                // One batched SanMar inbound-status lookup for all loaded WOs
+                // (fire-and-forget; re-renders the table when it returns).
+                fetchInboundStatuses();
 
             } catch (error) {
                 console.error('[QuoteManagement] Error loading quotes:', error);
@@ -516,6 +524,51 @@
             return isStatusYes(order.sts_Shipped)
                 && isStatusYes(order.sts_Invoiced)
                 && isStatusYes(order.sts_Paid);
+        }
+
+        // ── Inbound vendor (SanMar) shipment indicator (2026-06-15) ──
+        // The work order # for a quote (ShopWorks_Order_Number, or the snapshot's
+        // id_Order fallback). Null for quotes not yet in ShopWorks.
+        function getWoId(quote) {
+            let wo = Number(quote.ShopWorks_Order_Number) || 0;
+            if (!wo && quote.ShopWorks_Snapshot) {
+                try { wo = Number(JSON.parse(quote.ShopWorks_Snapshot)?.order?.id_Order) || 0; } catch (_) { /* malformed */ }
+            }
+            return wo || null;
+        }
+
+        // One-line inbound indicator. Reads inboundStatusMap (populated async by
+        // fetchInboundStatuses); never triggers its own SanMar call.
+        function renderInboundIndicator(quote) {
+            const wo = getWoId(quote);
+            if (!wo) return '<span class="inbound-na" title="Not in ShopWorks yet">—</span>';
+            const info = inboundStatusMap.get(String(wo));
+            if (info === undefined) return `<span class="inbound-pending" title="Checking SanMar…">·</span>`;
+            if (info === null) return '<span class="inbound-na" title="No SanMar PO linked">—</span>';
+            const LABEL = { shipped: 'Shipped', partial: 'Partially shipped', complete: 'Complete', confirmed: 'Ordered — not shipped', canceled: 'Canceled', unknown: (info.status || 'Unknown') };
+            const cls = info.shipped ? (info.state === 'partial' ? 'inbound-partial' : 'inbound-shipped')
+                      : (info.state === 'canceled' ? 'inbound-canceled' : 'inbound-confirmed');
+            const title = `SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
+            const icon = '<i class="fas fa-truck"></i>';
+            if (info.shipped && info.trackingUrl) {
+                return `<a class="inbound-pill ${cls}" href="${info.trackingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`;
+            }
+            return `<span class="inbound-pill ${cls}" title="${escapeHtml(title)}">${icon}</span>`;
+        }
+
+        // ONE batched call for all loaded work orders we haven't checked yet.
+        // SYNCED data via the proxy (no per-row SOAP). Non-fatal on failure.
+        async function fetchInboundStatuses() {
+            const woIds = [...new Set((allQuotes || []).map(getWoId).filter(Boolean).map(String))]
+                .filter(wo => !inboundStatusMap.has(wo));
+            if (woIds.length === 0) return;
+            try {
+                const resp = await fetch(`${API_BASE}/api/sanmar-orders/batch-status?woIds=${encodeURIComponent(woIds.join(','))}`);
+                if (!resp.ok) return; // leave unfetched; indicator stays neutral
+                const data = await resp.json().catch(() => ({}));
+                woIds.forEach(wo => inboundStatusMap.set(wo, (data && data[wo]) ? data[wo] : null));
+                renderTable(); // re-render so indicators appear
+            } catch (_) { /* non-fatal */ }
         }
 
         function renderMilestonePills(quote) {
@@ -917,6 +970,7 @@
                         <td class="quote-amount" title="${getAmountTooltip(quote)}">${formatCurrency(getEffectiveAmount(quote))}</td>
                         <td>${statusCellHtml}</td>
                         <td>${renderMilestonePills(quote)}</td>
+                        <td class="inbound-cell" onclick="event.stopPropagation();">${renderInboundIndicator(quote)}</td>
                         <td>
                             <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
                             ${retentionInfo || (expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : '')}
