@@ -1,3 +1,8 @@
+## v2026.06.14.10 (2026.06.14)
+
+- Fix 2 silent-wrong-price gaps: SCP save now gates tax on the Include Tax checkbox (was billing full WA tax while the screen showed $0); DTF print now guards on pricing-loaded (could print a $0 PDF on an API outage)
+- Docs: record Path 1 push-button parity (always-visible Push + readiness checklist) in quote-builder manifest
+
 ## v2026.06.14.9 (2026.06.14)
 
 - Deploy v2026.06.14.9: always-visible Push to ShopWorks + readiness checklist for SCP/DTF (EMB parity); DTG relabel
