@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.15.1">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.15.3">
 </head>
 <body>
     <!-- Header -->
@@ -116,6 +116,21 @@
                 </div>
             </div>
 
+            <!-- Active / Completed / All tabs (Erik 2026-06-15). Completed =
+                 shipped + invoiced + paid in ShopWorks, so finished orders drop
+                 out of the default Active view. -->
+            <div class="qm-tabs" role="tablist">
+                <button type="button" class="qm-tab qm-tab--active" data-tab="active" onclick="switchTab('active')">
+                    Active <span class="qm-tab-count" id="tab-count-active"></span>
+                </button>
+                <button type="button" class="qm-tab" data-tab="completed" onclick="switchTab('completed')">
+                    Completed <span class="qm-tab-count" id="tab-count-completed"></span>
+                </button>
+                <button type="button" class="qm-tab" data-tab="all" onclick="switchTab('all')">
+                    All <span class="qm-tab-count" id="tab-count-all"></span>
+                </button>
+            </div>
+
             <div id="table-loading" class="loading-overlay">
                 <div class="loading-spinner"></div>
             </div>
@@ -195,10 +210,14 @@
 
         // State
         let allQuotes = [];
-        let filteredQuotes = [];
+        let filteredQuotes = [];          // tab-filtered set rendered in the table
+        let baseFilteredQuotes = [];      // status/date/search-filtered, PRE-tab — stats + tab counts read this so they stay stable across tabs
         let currentPage = 1;
         const ITEMS_PER_PAGE = 25;
         let currentUserEmail = null;
+        // Active / Completed / All tab (Erik 2026-06-15). "Completed" = fully
+        // shipped + invoiced + paid in ShopWorks (derived from the snapshot).
+        let currentTab = 'active';
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', async function() {
@@ -353,8 +372,9 @@
                 dateCutoff.setDate(dateCutoff.getDate() - parseInt(dateFilter));
             }
 
-            // Apply filters
-            filteredQuotes = allQuotes.filter(quote => {
+            // Base set = status + date + search (PRE-tab). Stats and the tab
+            // counts read this so they stay stable no matter which tab is open.
+            baseFilteredQuotes = allQuotes.filter(quote => {
                 // Status filter
                 if (statusFilter && quote.Status !== statusFilter) {
                     return false;
@@ -385,17 +405,49 @@
                 return true;
             });
 
+            // Stats + tab counts from the pre-tab base.
+            updateStats();
+            updateTabCounts();
+
+            // Apply the Active/Completed/All tab to get the rendered set.
+            filteredQuotes = baseFilteredQuotes.filter(quote => {
+                if (currentTab === 'completed') return isCompletedQuote(quote);
+                if (currentTab === 'active') return !isCompletedQuote(quote);
+                return true; // 'all'
+            });
+
             // Sort by created date (newest first)
             filteredQuotes.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
 
             // Reset to first page
             currentPage = 1;
 
-            // Update stats
-            updateStats();
-
             // Render table
             renderTable();
+        }
+
+        // Counts shown on the tabs, from the pre-tab base set.
+        function updateTabCounts() {
+            const completed = baseFilteredQuotes.filter(isCompletedQuote).length;
+            const all = baseFilteredQuotes.length;
+            const active = all - completed;
+            const set = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = `(${n})`; };
+            set('tab-count-active', active);
+            set('tab-count-completed', completed);
+            set('tab-count-all', all);
+        }
+
+        // Tab switch. Active defaults to the last-30-days window; Completed/All
+        // widen to All Time so finished orders don't fall out of view (the date
+        // dropdown updates visibly so it's not hidden magic).
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.qm-tab').forEach(btn => {
+                btn.classList.toggle('qm-tab--active', btn.dataset.tab === tab);
+            });
+            const dateEl = document.getElementById('filter-date');
+            if (dateEl) dateEl.value = (tab === 'active') ? '30' : 'all';
+            applyFilters();
         }
 
         // Get the "effective" amount for a quote: SW cur_TotalInvoice when
@@ -448,6 +500,22 @@
             if (s === 'yes' || s === 'y' || s === 'true' || s === '1') return true;
             const n = Number(raw);
             return !Number.isNaN(n) && n > 0;
+        }
+
+        // A quote is COMPLETED when its ShopWorks order is fully shipped +
+        // invoiced + paid (Erik 2026-06-15). Read straight from the synced
+        // snapshot's sts_* flags — the same source as the Progress pills, so a
+        // row only counts as completed once the sync has confirmed it in
+        // ShopWorks. Anything without a snapshot (open quotes, unsynced) is NOT
+        // completed → stays in Active.
+        function isCompletedQuote(quote) {
+            if (!quote || !quote.ShopWorks_Snapshot) return false;
+            let order;
+            try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
+            catch (_) { return false; }
+            return isStatusYes(order.sts_Shipped)
+                && isStatusYes(order.sts_Invoiced)
+                && isStatusYes(order.sts_Paid);
         }
 
         function renderMilestonePills(quote) {
@@ -645,7 +713,7 @@
             let failedCount = 0;
             let totalValue = 0;
 
-            filteredQuotes.forEach(quote => {
+            baseFilteredQuotes.forEach(quote => {
                 if (quote.Status === 'Cancelled_in_ShopWorks') {
                     // Cancelled — counted separately and EXCLUDED from totals.
                     cancelledCount++;
@@ -669,13 +737,18 @@
                     //     processing in ShopWorks.
                     //   • Payment Confirmed — payment received, ShopWorks
                     //     order hasn't been created yet (transient).
-                    activeCount++;
-                    // Check if expiring within 7 days (Open only — Processed
-                    // orders don't expire, they're already submitted).
-                    if (quote.Status === 'Open' && quote.ExpiresAt) {
-                        const expiresDate = new Date(quote.ExpiresAt);
-                        if (expiresDate <= sevenDaysFromNow) {
-                            expiringCount++;
+                    // Completed orders (shipped+invoiced+paid) are DONE, not
+                    // active — they live in the Completed tab and are excluded
+                    // from the Active count (Erik 2026-06-15).
+                    if (!isCompletedQuote(quote)) {
+                        activeCount++;
+                        // Check if expiring within 7 days (Open only — Processed
+                        // orders don't expire, they're already submitted).
+                        if (quote.Status === 'Open' && quote.ExpiresAt) {
+                            const expiresDate = new Date(quote.ExpiresAt);
+                            if (expiresDate <= sevenDaysFromNow) {
+                                expiringCount++;
+                            }
                         }
                     }
                 } else if (quote.Status === 'Accepted') {

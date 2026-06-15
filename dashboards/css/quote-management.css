@@ -397,6 +397,44 @@ body {
     color: #666;
 }
 
+/* Active / Completed / All tabs (Erik 2026-06-15). Completed orders
+   (shipped+invoiced+paid in ShopWorks) move out of the default Active view. */
+.qm-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 4px;
+}
+.qm-tab {
+    appearance: none;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+}
+.qm-tab:hover {
+    color: var(--pnw-forest, #2e4a62);
+}
+.qm-tab--active {
+    color: var(--pnw-forest, #2e4a62);
+    border-bottom-color: var(--pnw-forest, #2e4a62);
+}
+.qm-tab-count {
+    font-weight: 500;
+    color: #9ca3af;
+    font-size: 13px;
+}
+.qm-tab--active .qm-tab-count {
+    color: var(--pnw-forest, #2e4a62);
+}
+
 .quotes-table {
     width: 100%;
     border-collapse: collapse;
