@@ -7091,6 +7091,15 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
       const newSnap = {
         order: snapshot.order,
         lineItems: snapshot.lineItems,
+        // Persist the /order-pull `pushed` block (Designs[] + Attachments +
+        // ShippingAddresses). The quote-view Designs table reads
+        // `snapshot.pushed.Designs[]` for each design's TYPE (id_DesignType,
+        // e.g. 45→DTG) and per-location name (e.g. "Full Front"). Dropping it
+        // here forced the page into its fallback branch, which renders
+        // "Unknown" type + a hardcoded "Left Chest" location even when
+        // ShopWorks clearly says Full Front / DTG (fixed 2026-06-15). The proxy
+        // already trims `pushed` to those 3 arrays, so it stays small.
+        pushed: snapshot.pushed || null,
         fetchedAt: snapshot.fetchedAt,
       };
       const changes = diffSnapshots(oldSnap, newSnap);
@@ -7131,6 +7140,7 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
         snapshot: {
           order: snapshot.order,
           lineItems: snapshot.lineItems,
+          pushed: snapshot.pushed || null,   // see newSnap above — Designs/type/location for the quote-view
           fetchedAt: snapshot.fetchedAt,
         },
       });

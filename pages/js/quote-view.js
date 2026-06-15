@@ -3468,8 +3468,18 @@ class QuoteViewPage {
                 const locationsCount = submittedPrintLocs
                     ? submittedPrintLocs.split(/[+,&]/).filter(s => s.trim()).length
                     : 1;
-                const locationsNames = submittedPrintLocs || 'Left Chest';
-                const methodFallback = this.fullData?.originalSubmission?.decoConfig?.method;
+                // Don't invent a specific location when none was submitted —
+                // a hardcoded 'Left Chest' rendered blank-location quotes as a
+                // wrong fact (it's what made a Full Front DTG read "Left Chest"
+                // before the snapshot persisted `pushed`). (2026-06-15)
+                const locationsNames = submittedPrintLocs || '(unspecified)';
+                // Type fallback when `pushed` is absent (legacy / never-resynced
+                // quote) and the /v1 order has no id_DesignType: derive the method
+                // from the quote-ID prefix so it resolves to a real method
+                // instead of 'Unknown'.
+                const PREFIX_METHOD = { DTG: 'dtg', EMB: 'embroidery', EMBC: 'embroidery', CEMB: 'embroidery', SP: 'screenprint', SPC: 'screenprint', SSC: 'screenprint', DTF: 'dtf' };
+                const idPrefix = (String(this.quoteId || '').match(/^[A-Za-z]+/) || [''])[0].toUpperCase();
+                const methodFallback = this.fullData?.originalSubmission?.decoConfig?.method || PREFIX_METHOD[idPrefix] || '';
                 const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType, methodFallback);
                 tbody.innerHTML = `
                     <tr>
