@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (dtfQuoteBuilder) dtfQuoteBuilder.printQuote();
         }
     });
+
+    // Render the always-visible Push button + "Before you push" checklist on load (EMB parity 2026-06-14).
+    // Deferred so dtfQuoteBuilder + #push-readiness exist; thereafter it refreshes on every recalc/customer change.
+    setTimeout(function () { if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState(); }, 0);
 });
 
 // Extended size popup functions
@@ -143,6 +147,8 @@ function updateTaxCalculation() {
 
     // [2026-06-08] keep the order-summary band (recap + ship-to card) current on every recalc / tax / fee change
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
+    // Keep the always-visible Push button + readiness checklist in lock-step with product/fee changes.
+    try { if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState(); } catch (_) {}
 }
 
 // toggleAdditionalCharges() moved to quote-builder-utils.js

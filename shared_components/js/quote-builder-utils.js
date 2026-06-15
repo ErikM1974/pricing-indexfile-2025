@@ -970,6 +970,45 @@ function updateEditModeUI(quoteId, revision) {
 }
 
 /**
+ * Shared "Before you push" readiness checklist + Push-button gate for SCP/DTF — modeled on EMB's
+ * getPushReadiness()/renderPushReadiness() (2026-06-14). The caller passes the push button id and a
+ * hasProducts() check; this renders #push-readiness and enables/disables the button in lock-step.
+ * Gates: ShopWorks Customer #, ≥1 item, customer name, customer email (mirrors the save validation).
+ * Returns the 4 gate booleans so the caller can decide whether a click should proceed.
+ */
+function renderBuilderPushReadiness(cfg) {
+    const btn = cfg && document.getElementById(cfg.btnId);
+    const el = document.getElementById('push-readiness');
+    // Already pushed this session — clear the checklist + leave the button in its "Sent ✓" locked state.
+    // The push success path sets btn.dataset.pushed='1'; resetQuote()/New Quote clears it. (review fix 2026-06-14)
+    if (btn && btn.dataset.pushed === '1') {
+        if (el) el.innerHTML = '';
+        return { hasCustomer: true, hasProducts: true, hasName: true, hasEmail: true };
+    }
+    const val = (id) => (document.getElementById(id)?.value || '').trim();
+    let hasProducts = false;
+    try { hasProducts = !!(cfg && typeof cfg.hasProducts === 'function' && cfg.hasProducts()); } catch (_) {}
+    const r = { hasCustomer: !!val('customer-number'), hasProducts, hasName: !!val('customer-name'), hasEmail: !!val('customer-email') };
+    if (el) {
+        const item = (ok, label) => `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
+        el.innerHTML = '<div class="pr-title">Before you push</div>' +
+            item(r.hasCustomer, 'ShopWorks Customer #') + item(r.hasProducts, 'At least one item') +
+            item(r.hasName, 'Customer name') + item(r.hasEmail, 'Customer email');
+    }
+    if (btn) {
+        const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
+        btn.disabled = !enabled;
+        btn.style.opacity = enabled ? '1' : '0.5';
+        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        btn.title = enabled
+            ? 'Save + create this quote as a ShopWorks order (saves automatically)'
+            : 'Complete the "Before you push" checklist (Customer #, a product, name + email) to enable push';
+    }
+    return r;
+}
+if (typeof window !== 'undefined') window.renderBuilderPushReadiness = renderBuilderPushReadiness;
+
+/**
  * Show/hide the loading overlay.
  * @param {boolean} show
  */

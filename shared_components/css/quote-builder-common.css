@@ -998,6 +998,30 @@ body {
     }
 }
 
+/* --- "Before you push" readiness checklist (promoted from EMB-extracted so SCP/DTF share it,
+   2026-06-14). EMB still defines identical rules in its own extracted CSS; values match. --- */
+.push-readiness {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+.push-readiness:empty { display: none; }
+.push-readiness .pr-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+.push-readiness .pr-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+.push-readiness .pr-item i { width: 14px; text-align: center; }
+.push-readiness .pr-ok { color: #16a34a; }
+.push-readiness .pr-no { color: #b45309; }
+.push-readiness .pr-no i { color: #cbd5e1; }
+
 /* Coming Soon Accordion — REMOVED 2026-03-23 (feature never shipped) */
 
 /* ============================================

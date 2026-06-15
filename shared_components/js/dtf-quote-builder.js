@@ -2286,7 +2286,7 @@ class DTFQuoteBuilder {
      * Save quote and show shareable link modal
      * Called from "Save & Get Shareable Link" button
      */
-    async saveAndGetLink() {
+    async saveAndGetLink(opts = {}) {
         const customerName = document.getElementById('customer-name')?.value?.trim() || '';
         const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
@@ -2623,9 +2623,11 @@ class DTFQuoteBuilder {
                     showDtfPushButton(finalQuoteId);
                 }
 
-                // Show success modal with shareable link
-                // Prefer shared QuoteShareModal module (2026 consolidation)
-                if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                // Show success modal with shareable link — SKIPPED on the silent auto-save before a Push
+                // (dtfPushToShopWorks passes skipShareModal:true; the push preview opens instead).
+                if (opts.skipShareModal) {
+                    /* auto-saved for Push to ShopWorks — no share modal */
+                } else if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
                     QuoteShareModal.show(finalQuoteId, this.editingQuoteId ? `Updated to Rev ${this.editingRevision}` : null);
                 } else if (typeof showSaveModal === 'function') {
                     // Fallback to inline modal if shared module not loaded
@@ -3198,6 +3200,15 @@ class DTFQuoteBuilder {
     }
 
     resetQuote() {
+        // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
+        _dtfPushQuoteId = null;
+        const _dtfPush = document.getElementById('dtf-push-shopworks-btn');
+        if (_dtfPush) {
+            delete _dtfPush.dataset.pushed;
+            _dtfPush.style.background = '';
+            const _l = document.getElementById('dtf-push-shopworks-label'); if (_l) _l.textContent = 'Push to ShopWorks';
+        }
+        if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState();
         // Clear all product rows and re-add empty state
         const tbody = document.getElementById('product-tbody');
         tbody.innerHTML = `
@@ -3525,15 +3536,44 @@ let _dtfPushQuoteId = null;
 
 function showDtfPushButton(quoteId) {
     _dtfPushQuoteId = quoteId;
-    const btn = document.getElementById('dtf-push-shopworks-btn');
-    if (btn) {
-        btn.style.display = '';
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        const label = document.getElementById('dtf-push-shopworks-label');
-        if (label) label.textContent = 'Push to ShopWorks';
+    // The Push button is ALWAYS visible now (disabled-until-ready, EMB parity 2026-06-14); this just
+    // records the saved quote id (the /preview endpoint needs it) and re-gates the button.
+    if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState();
+}
+
+// Always-visible Push button + "Before you push" readiness checklist gate (EMB parity 2026-06-14).
+// Shared renderBuilderPushReadiness() (quote-builder-utils.js) — gates: Customer #, ≥1 item, name, email.
+function updateDtfPushButtonState() {
+    if (typeof renderBuilderPushReadiness !== 'function') return;
+    renderBuilderPushReadiness({
+        btnId: 'dtf-push-shopworks-btn',
+        hasProducts: () => { try { return !!(window.dtfQuoteBuilder && dtfQuoteBuilder.getTotalQuantity() > 0); } catch (_) { return false; } }
+    });
+}
+window.updateDtfPushButtonState = updateDtfPushButtonState;
+
+// One-click Push: auto-SAVE first (silent — no share modal), then open the review/confirm preview.
+// Button is gated by the checklist; proxy PushedToShopWorks 409 guards against a duplicate order.
+let _dtfPushInFlight = false;
+async function dtfPushToShopWorks() {
+    if (_dtfPushInFlight) return;
+    _dtfPushInFlight = true;
+    const label = document.getElementById('dtf-push-shopworks-label');
+    if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+    try {
+        // Do NOT disable the button — openDtfPushPreview() bails if the button is disabled.
+        await dtfQuoteBuilder.saveAndGetLink({ skipShareModal: true });   // → showDtfPushButton sets _dtfPushQuoteId + re-gates
+        if (!_dtfPushQuoteId) return;
+        await openDtfPushPreview();
+    } finally {
+        _dtfPushInFlight = false;
+        const _b = document.getElementById('dtf-push-shopworks-btn');
+        // Don't clobber the "Pushed ✓" success label once the push completed.
+        if (label && (!_b || _b.dataset.pushed !== '1')) label.textContent = 'Push to ShopWorks';
+        updateDtfPushButtonState();   // renderBuilderPushReadiness skips re-gating when dataset.pushed==='1'
     }
 }
+window.dtfPushToShopWorks = dtfPushToShopWorks;
 
 // Minimal HTML escaper for preview output (self-contained — no util dependency).
 function _dtfEsc(s) {
@@ -3694,7 +3734,7 @@ async function confirmDtfPush(directFallback) {
 
         // Success
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
-        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; }
+        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; mainBtn.dataset.pushed = '1'; }
         notifyToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[DTF Push] Success:', data);
         closeDtfPushPreview();

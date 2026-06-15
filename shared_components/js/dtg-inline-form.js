@@ -1085,7 +1085,7 @@ let hasChanges = false;
                         <div id="dtgPreflightPanel" class="dtg-preflight-panel"></div>
 
                         <button type="button" class="dtg-submit-btn" id="dtgSubmitBtn">
-                            <i class="fas fa-truck"></i> Submit to ShopWorks
+                            <i class="fas fa-upload"></i> Push to ShopWorks
                         </button>
                         <div id="dtgSubmitStatus" class="dtg-submit-status" hidden></div>
 
