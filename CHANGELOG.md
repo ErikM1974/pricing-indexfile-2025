@@ -1,3 +1,8 @@
+## v2026.06.15.1 (2026.06.15)
+
+- Test+docs: lock SCP/DTF push-button async binding (fix shipped in v2026.06.14.10)
+- Deploy v2026.06.15.1: 6 files (quote-management.css,quote-management.html,CUSTOMER_SITE_REDESIGN_2026-06.md,...)
+
 ## v2026.06.14.10 (2026.06.14)
 
 - Fix 2 silent-wrong-price gaps: SCP save now gates tax on the Include Tax checkbox (was billing full WA tax while the screen showed $0); DTF print now guards on pricing-loaded (could print a $0 PDF on an API outage)
