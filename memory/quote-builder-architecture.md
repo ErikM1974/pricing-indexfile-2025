@@ -42,9 +42,11 @@ below so the next change routes itself.
 ## ✅ Save IS decoupled from Push — all 4 builders (verified 2026-06-14, code audit)
 **The "you can't save without pushing to ShopWorks" claim is FALSE.** All four builders persist
 to Caspio `quote_sessions`/`quote_items` via a save action that touches ZERO ShopWorks endpoints.
-The actual coupling is the **reverse**: in EMB/SCP/DTF the *Push* button stays hidden until a save
-succeeds (`showPushButton`/`showScpPushButton`/`showDtfPushButton`), and clicking Push *force-saves
-first if dirty* — so you can't push without saving, but you can always save without pushing.
+The actual coupling is the **reverse**: clicking Push *force-saves first* — so you can't push without
+saving, but you can always save without pushing. **(Update 2026-06-14, Path 1 below):** SCP/DTF no
+longer *hide* the Push button until a save — it is now **always visible** with a readiness checklist
++ auto-save-on-click, matching EMB. `showScpPushButton`/`showDtfPushButton` now just record the saved
+quote id and re-gate the button rather than reveal it.
 
 | Builder | Save fn (Caspio-only) | Push fn (separate, ShopWorks) | Prefix |
 |---|---|---|---|
@@ -99,7 +101,28 @@ summary-row fee model (panel inputs → `#fees-tbody`), just relocated, so prici
 Verified live both builders (correct tax math, no dup ids, all save-parity/tax-base tests green).
 **Known pre-existing (NOT from this work, left alone):** `charges-badge` only refreshes on rush-fee change;
 `.save-quote-panel-collapsible` CSS now orphaned; footer flex has no <768px media query; SCP tax-row label
-static vs DTF's dynamic `#tax-rate-label`.
+static vs DTF's dynamic `#tax-rate-label`. *(badge + footer media-query + SCP tax label all FIXED in the
+v2026.06.14.7/.8 polish + tax level-up deploys — `.save-quote-panel-collapsible` CSS removed too.)*
+
+### ✅ Push-to-ShopWorks button PARITY — Path 1 DONE + LIVE (2026-06-14, v2026.06.14.9)
+SCP/DTF now match EMB's push UX exactly: the **Push to ShopWorks button is always visible** (no longer
+revealed only after a save) with a **4-item readiness checklist** above it (`#push-readiness`: customer #,
+products, name, email) and **auto-save-on-click**. DTG's button relabeled `Submit` → `Push to ShopWorks`.
+- **Shared renderer** `renderBuilderPushReadiness(cfg)` in `quote-builder-utils.js` (CSS `.push-readiness`/
+  `.pr-item`/`.pr-ok`/`.pr-no` in `quote-builder-common.css`) — gates the button enabled/disabled + draws
+  the checklist. Per-builder wrappers `updateScpPushButtonState()` / `updateDtfPushButtonState()` supply the
+  `hasProducts` predicate + are re-invoked from each builder's `updateTaxCalculation` and customer-field
+  `oninput`. SCP `hasProducts` = `collectProductsFromTable().length>0`; DTF = `dtfQuoteBuilder.getTotalQuantity()>0`.
+- **Auto-save-on-click**: `scpPushToShopWorks()` / `dtfPushToShopWorks()` `await saveAndGetLink({skipShareModal:true})`
+  (new `opts.skipShareModal` gates the share modal so the push flow doesn't pop it), then open the preview.
+  `_scp/_dtfPushInFlight` guard prevents double-submit (NOT a manual `btn.disabled`, which would make the
+  preview opener bail).
+- **⚠️ POST-PUSH LOCK (review-caught HIGH bug, fixed):** on push success the confirm handler sets
+  `btn.dataset.pushed='1'` (green + disabled). `renderBuilderPushReadiness` **early-returns** when
+  `dataset.pushed==='1'` (clears the checklist, leaves it locked) so a later customer-field edit can't
+  re-enable the button with a stale quote id. `resetQuote()` (both builders) clears the lock + re-gates.
+  Verified in-browser: locked button survives field edits; reset restores the 4-item checklist + label.
+- Locked by the existing `scp-save-parity` / `dtf-save-parity` jest suites (24 green) + parser (792).
 
 ### Final consistency audit (2026-06-14, 19-agent + live): trio IS in unison on what matters
 **Sales tax = CONSISTENT** across EMB/SCP/DTF (base=subtotal+billable-shipping after discount; falsy-zero 0%
