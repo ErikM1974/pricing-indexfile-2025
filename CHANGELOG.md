@@ -1,3 +1,7 @@
+## v2026.06.14.9 (2026.06.14)
+
+- Deploy v2026.06.14.9: always-visible Push to ShopWorks + readiness checklist for SCP/DTF (EMB parity); DTG relabel
+
 ## v2026.06.14.8 (2026.06.14)
 
 - Tax UX level-up (best-of-both) across EMB/SCP/DTF — dynamic rate label + always-visible row
