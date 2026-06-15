@@ -4180,7 +4180,13 @@ async function saveAndGetLink(opts = {}) {
             // [2026-06-08] P0 (review woaaypuz4): the SCP save quoteData NEVER passed taxRate (getOrderShippingData omits it),
             // so the service fell back to 10.1% → every out-of-state / exempt / non-10.1 SCP quote saved TaxRate=10.1 and the
             // /quote + /invoice mirror billed full WA tax. Pass it explicitly (mirror DTF). Erik's #1 rule.
-            taxRate: parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
+            // [2026-06-14] Gate on the Include Tax checkbox (parity with DTF L1965 / EMB save). Unchecking it shows $0 tax
+            // on screen (updateTaxCalculation L3559) + on the PDF (buildScreenprintPricingData includeTax), but save used to
+            // pass the raw rate input (still 10.1, since only wholesale/CRM-exempt zero it) → the saved/mirrored/pushed quote
+            // billed full WA tax while the rep saw $0 = silent wrong price (Erik's #1 rule). Unchecked → save TaxRate 0.
+            taxRate: (document.getElementById('include-tax') && !document.getElementById('include-tax').checked)
+                ? 0
+                : parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
             // Order & shipping fields (2026-03-22)
             ...getOrderShippingData('spc-order-fields')
         };
@@ -4580,15 +4586,19 @@ function closeScpPushPreview() {
     if (modal) modal.classList.remove('show');
 }
 
-// Back-compat alias — the button + older callers reference scpPushToShopWorks.
-function scpPushToShopWorks() { return openScpPushPreview(); }
+// NOTE: scpPushToShopWorks (async, auto-save → preview) is declared above near the
+// button-state helper and is the ONE bound to window.scpPushToShopWorks + the HTML
+// onclick. Do NOT re-declare a back-compat alias here — a second `function
+// scpPushToShopWorks()` at module scope hoists OVER the async version, so the button
+// would call openScpPushPreview() WITHOUT the auto-save and silently no-op on a
+// never-saved quote (_scpPushQuoteId === null). Call openScpPushPreview() directly if
+// you need the bare preview. (regression fixed 2026-06-14)
 
 // Expose for HTML onclick + cross-file callers
 window.openScpPushPreview = openScpPushPreview;
 window.renderScpPushPreview = renderScpPushPreview;
 window.confirmScpPush = confirmScpPush;
 window.closeScpPushPreview = closeScpPushPreview;
-window.scpPushToShopWorks = scpPushToShopWorks;
 window.showScpPushButton = showScpPushButton;
 
 // [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 3.

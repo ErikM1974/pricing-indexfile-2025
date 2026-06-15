@@ -2677,6 +2677,19 @@ class DTFQuoteBuilder {
             return;
         }
 
+        // Pricing-loaded guard (parity with saveAndGetLink L2332/L2342): if the pricing snapshot is
+        // missing (API down at page load — init() keeps the form interactive), calculateFromState()
+        // returns all zeros, so Print would emit a $0.00 customer PDF with no error. Erik's #1 rule:
+        // visible failure, never a silent wrong price. (2026-06-14)
+        if (!this.currentPricingData || !this.pricingCalculator) {
+            this.showError('Pricing data is not loaded — cannot print. Please refresh and try again.');
+            return;
+        }
+        if (!(this.calculateFromState().subtotal > 0)) {
+            this.showError('Quote totals computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before printing.');
+            return;
+        }
+
         try {
             // Build pricing data in format expected by EmbroideryInvoiceGenerator
             const pricingData = this.buildPricingDataForInvoice();
@@ -3754,13 +3767,17 @@ function closeDtfPushPreview() {
     if (modal) modal.classList.remove('show');
 }
 
-// Back-compat alias — older callers reference dtfPushToShopWorks.
-function dtfPushToShopWorks() { return openDtfPushPreview(); }
+// NOTE: dtfPushToShopWorks (async, auto-save → preview) is declared above near the
+// button-state helper and is the ONE bound to window.dtfPushToShopWorks + the HTML
+// onclick. Do NOT re-declare a back-compat alias here — a second `function
+// dtfPushToShopWorks()` at module scope hoists OVER the async version, so the button
+// would call openDtfPushPreview() WITHOUT the auto-save and silently no-op on a
+// never-saved quote (_dtfPushQuoteId === null). Call openDtfPushPreview() directly if
+// you need the bare preview. (regression fixed 2026-06-14)
 
 // Expose for HTML onclick + cross-file callers
 window.openDtfPushPreview = openDtfPushPreview;
 window.renderDtfPushPreview = renderDtfPushPreview;
 window.confirmDtfPush = confirmDtfPush;
 window.closeDtfPushPreview = closeDtfPushPreview;
-window.dtfPushToShopWorks = dtfPushToShopWorks;
 window.showDtfPushButton = showDtfPushButton;
