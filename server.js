@@ -6327,10 +6327,105 @@ app.put('/api/quote_sessions/:id', async (req, res) => {
   }
 });
 
-// DELETE session
+// ============================================================================
+// QUOTE DELETE — ROLE-BASED SERVER-SIDE ENFORCEMENT (2026-06-15)
+//
+// The dashboard already hides the delete control for quotes a rep doesn't own,
+// but per the CRM auth model ("role checks happen server-side; frontend
+// permissions are for UX only" — CRM_DASHBOARD_AUTH.md) the real gate lives
+// here. We trust the logged-in identity from the express session
+// (req.session.crmUser, established by /api/crm-session post-Caspio-login) —
+// the SAME mechanism that guards the CRM dashboards — never a client-supplied
+// claim on the delete request itself.
+//
+//   • master (Erik)            → may delete ANY quote
+//   • any other logged-in rep  → may delete ONLY quotes they own
+//   • no session               → 401 (refresh + log in)
+//   • someone else's quote     → 403
+// ============================================================================
+const QUOTE_STAFF_EMAIL_MAP = {
+  'Adriyella': 'adriyella@nwcustomapparel.com',
+  'Bradley Wright': 'bradley@nwcustomapparel.com',
+  'Erik Mickelson': 'erik@nwcustomapparel.com',
+  'Jim Mickelson': 'jim@nwcustomapparel.com',
+  'Nika Lao': 'nika@nwcustomapparel.com',
+  'Ruth Nhong': 'ruth@nwcustomapparel.com',
+  'Steve Deland': 'art@nwcustomapparel.com',
+  'Taneisha Clark': 'taneisha@nwcustomapparel.com',
+};
+const QUOTE_MASTER_DELETE_EMAILS = new Set(['erik@nwcustomapparel.com']);
+
+function quoteStaffNameToEmail(name) {
+  if (!name) return null;
+  const hit = QUOTE_STAFF_EMAIL_MAP[String(name).trim()];
+  return hit ? hit.toLowerCase() : null;
+}
+
+// Owner email for a quote_sessions row — mirrors the dashboard's getQuoteOwnerEmail:
+//   SalesRepEmail → ShopWorks snapshot CustomerServiceRep → SalesRepName.
+function quoteOwnerEmailFromRow(row) {
+  if (!row) return null;
+  if (row.SalesRepEmail && String(row.SalesRepEmail).trim()) {
+    return String(row.SalesRepEmail).trim().toLowerCase();
+  }
+  if (row.ShopWorks_Snapshot) {
+    try {
+      const rep = JSON.parse(row.ShopWorks_Snapshot)?.order?.CustomerServiceRep;
+      const email = quoteStaffNameToEmail(rep);
+      if (email) return email;
+    } catch (_) { /* malformed snapshot */ }
+  }
+  return quoteStaffNameToEmail(row.SalesRepName);
+}
+
+// DELETE session — role-gated (see block above).
 app.delete('/api/quote_sessions/:id', async (req, res) => {
   try {
-    await makeApiRequest(`/quote_sessions/${req.params.id}`, 'DELETE');
+    const pkId = Number(req.params.id);
+    if (!Number.isInteger(pkId) || pkId <= 0) {
+      return res.status(400).json({ error: 'Invalid quote id' });
+    }
+
+    // 1. Identity must come from the trusted session, not the request body.
+    const caller = req.session && req.session.crmUser;
+    if (!caller) {
+      return res.status(401).json({ error: 'Unauthorized', message: 'Your session expired — refresh the page and log in, then try again.' });
+    }
+    const callerEmail = String(caller.email || quoteStaffNameToEmail(caller.name) || '').toLowerCase();
+    const isMaster = caller.firstName === 'Erik' || QUOTE_MASTER_DELETE_EMAILS.has(callerEmail);
+
+    // 2. Non-master: fetch the row and verify ownership before deleting.
+    if (!isMaster) {
+      let row = null;
+      try {
+        // Single-record read by PK via the PATH param — a filtered list read
+        // (`?q.where=PK_ID=N`) is NOT honored here (returns ALL rows → row[0] is
+        // the wrong quote → owner mismatch → a rep can't delete their own). See
+        // the "verify fresh writes by PK_ID, never a filtered list read" rule.
+        const resp = await makeApiRequest(`/quote_sessions/${pkId}`);
+        const list = Array.isArray(resp) ? resp
+          : (resp && Array.isArray(resp.Result) ? resp.Result
+          : (resp ? [resp] : []));
+        row = list.find(r => r && String(r.PK_ID) === String(pkId)) || null;
+      } catch (e) {
+        return res.status(500).json({ error: 'Failed to verify quote ownership', details: e.message });
+      }
+      if (!row) {
+        return res.status(404).json({ error: 'Quote not found' });
+      }
+      const ownerEmail = quoteOwnerEmailFromRow(row);
+      if (!ownerEmail || ownerEmail !== callerEmail) {
+        console.warn(`[quote-delete] BLOCKED ${caller.name || callerEmail} (${callerEmail}) from deleting PK ${pkId} owned by ${ownerEmail || 'unknown'}`);
+        return res.status(403).json({
+          error: 'Forbidden',
+          message: 'You can only delete your own quotes. Ask the owner — or Erik — to delete it.',
+        });
+      }
+    }
+
+    // 3. Authorized — perform the delete.
+    await makeApiRequest(`/quote_sessions/${pkId}`, 'DELETE');
+    console.log(`[quote-delete] ${caller.name || callerEmail} deleted quote PK ${pkId}${isMaster ? ' (master)' : ' (owner)'}`);
     res.json({ success: true });
   } catch (error) {
     console.error('Error deleting quote session:', error);
@@ -8162,11 +8257,142 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
 
     const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
     console.log(`[bulk-sync] ${stats.synced} synced (${stats.imported} imported, ${stats.deleted} soft-deleted, ${stats.pending} pending, ${stats.errors} errors, ${purgeStats.purged} purged) in ${elapsedSec}s`);
+    // Watchdog (2026-06-15): record this run so the proxy's hourly
+    // check-quote-sync-health.js cron can detect the sync silently failing —
+    // e.g. the localhost-self-call ECONNREFUSED regression that returned
+    // synced:0/errors:N every hour. See GET/POST /api/quote-sync-health below.
+    recordQuoteSyncRun(stats, candidates.length);
     res.json({ success: true, ...stats, ...purgeStats, elapsedSec, candidateCount: candidates.length, totalProcessedInWindow: inWindow.length });
   } catch (error) {
     console.error('[bulk-sync] unexpected error:', error);
     res.status(500).json({ success: false, error: 'Bulk sync failed', details: error.message });
   }
+});
+
+// ============================================================================
+// QUOTE-SYNC FRESHNESS WATCHDOG (2026-06-15)
+//
+// Catches the failure class that hid the ManageOrders sync-back outage for
+// weeks: the hourly cron FIRED but its work no-op'd (the localhost self-call
+// was 302'd to https://localhost → ECONNREFUSED → synced:0/errors:N every run,
+// exit 0, no alarm). Mirrors the proxy's supacolor-health watchdog: an
+// in-process record of the last bulk-sync run + a health endpoint the proxy's
+// `check-quote-sync-health.js` Heroku Scheduler cron polls; on unhealthy it
+// fires a deduped Slack alert.
+//
+// In-process state (resets to coldStart on dyno cycle, like supacolor). The
+// hourly bulk-sync repopulates it within the hour.
+let lastQuoteSyncAtMs = 0;
+let lastQuoteSyncResult = null;
+
+function recordQuoteSyncRun(stats, candidateCount) {
+  lastQuoteSyncAtMs = Date.now();
+  lastQuoteSyncResult = {
+    synced: Number(stats.synced) || 0,
+    imported: Number(stats.imported) || 0,
+    deleted: Number(stats.deleted) || 0,
+    pending: Number(stats.pending) || 0,
+    errors: Number(stats.errors) || 0,
+    candidateCount: Number(candidateCount) || 0,
+  };
+}
+
+// Cron runs hourly; >90 min since the last successful bulk-sync = ~1.5 missed
+// runs = the trigger stopped. uptime guard catches "cron never scheduled at
+// all" (coldStart that never clears) once the dyno has been up long enough
+// that a sync SHOULD have happened.
+const QUOTE_SYNC_STALE_AFTER_MIN = 90;
+const QUOTE_SYNC_NO_BOOT_SYNC_AFTER_MIN = 150;
+
+function computeQuoteSyncHealth() {
+  const now = Date.now();
+  const coldStart = !lastQuoteSyncAtMs;
+  const lastSyncAgoMin = coldStart ? null : Math.round((now - lastQuoteSyncAtMs) / 60000);
+  const uptimeMin = Math.round(process.uptime() / 60);
+  const r = lastQuoteSyncResult || {};
+
+  const reasons = [];
+  // Never synced since boot, yet the dyno has been up long enough that the
+  // hourly cron should have run — the Scheduler job is missing/disabled.
+  if (coldStart && uptimeMin >= QUOTE_SYNC_NO_BOOT_SYNC_AFTER_MIN) reasons.push('no-sync-since-boot');
+  // Cron ran before but has gone quiet.
+  if (!coldStart && lastSyncAgoMin >= QUOTE_SYNC_STALE_AFTER_MIN) reasons.push('stale-cron');
+  // Cron ran but threw on rows (the ECONNREFUSED regression signature).
+  if (!coldStart && Number(r.errors) > 0) reasons.push('sync-errors');
+  // Cron ran, had work to do, but synced nothing (also the regression signature).
+  if (!coldStart && Number(r.candidateCount) > 0 && Number(r.synced) === 0) reasons.push('sync-noop');
+
+  const reason = reasons.length ? reasons.join('+') : null;
+  return {
+    ok: !reason,
+    reason,
+    coldStart,
+    uptimeMin,
+    lastSyncAgo_min: lastSyncAgoMin,
+    lastSyncResult: lastQuoteSyncResult,
+    thresholds: { staleAfterMin: QUOTE_SYNC_STALE_AFTER_MIN, noBootSyncAfterMin: QUOTE_SYNC_NO_BOOT_SYNC_AFTER_MIN },
+  };
+}
+
+// Deduped, fire-and-forget Slack notify (same shape as the proxy's
+// slack-supacolor-health-notify.js: 4-hour dedup per reason; unset webhook =
+// silent no-op so the watchdog can ship before the Slack channel exists).
+const SLACK_QUOTE_SYNC_HEALTH_WEBHOOK = process.env.SLACK_QUOTE_SYNC_HEALTH_WEBHOOK_URL || '';
+const QUOTE_SYNC_HEALTH_DEDUP_TTL_MS = 4 * 60 * 60 * 1000;
+const _quoteSyncHealthDedup = new Map();
+
+async function notifyQuoteSyncHealth(health) {
+  if (!SLACK_QUOTE_SYNC_HEALTH_WEBHOOK) return { sent: false, skipped: 'no-webhook' };
+  const key = `quote-sync-health|${health.reason || 'unknown'}`;
+  const now = Date.now();
+  const expiresAt = _quoteSyncHealthDedup.get(key);
+  if (expiresAt && expiresAt > now) return { sent: false, skipped: 'dedup' };
+  _quoteSyncHealthDedup.set(key, now + QUOTE_SYNC_HEALTH_DEDUP_TTL_MS);
+
+  const r = health.lastSyncResult || {};
+  const lastRun = health.coldStart
+    ? `never since boot (${health.uptimeMin}m uptime)`
+    : `${health.lastSyncAgo_min}m ago — synced:${r.synced} imported:${r.imported} errors:${r.errors} candidates:${r.candidateCount}`;
+  const text = [
+    `🚨 *Quote→ShopWorks sync unhealthy*`,
+    `*Reason:* ${health.reason}`,
+    `*Last bulk-sync:* ${lastRun}`,
+    `\n<https://www.teamnwca.com/dashboards/quote-management.html|Open Quote Management> · check \`heroku logs --app sanmar-inventory-app | grep bulk-sync\``,
+  ].join('\n');
+
+  try {
+    const resp = await fetch(SLACK_QUOTE_SYNC_HEALTH_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text }),
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    return { sent: true };
+  } catch (err) {
+    _quoteSyncHealthDedup.delete(key); // let the next poll retry
+    return { sent: false, error: err.message };
+  }
+}
+
+/**
+ * GET  /api/quote-sync-health        — read-only health snapshot
+ * POST /api/quote-sync-health/alert  — same, plus fires a deduped Slack alert
+ *                                      when unhealthy (the cron hits this one)
+ *
+ * Top-level path (not under /api/quote-sessions/) to avoid colliding with the
+ * /api/quote-sessions/:quoteId/* routes.
+ */
+app.get('/api/quote-sync-health', (req, res) => {
+  res.json({ success: true, ...computeQuoteSyncHealth() });
+});
+
+app.post('/api/quote-sync-health/alert', async (req, res) => {
+  const health = computeQuoteSyncHealth();
+  let notify = { sent: false, skipped: 'healthy' };
+  if (!health.ok) {
+    notify = await notifyQuoteSyncHealth(health).catch(err => ({ sent: false, error: err.message }));
+  }
+  res.json({ success: true, ...health, notify });
 });
 
 /**

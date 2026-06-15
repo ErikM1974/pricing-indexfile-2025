@@ -207,6 +207,13 @@
             // Get logged-in user info
             initUserDisplay();
 
+            // Establish the Express session (httpOnly cookie) so the server-side
+            // delete gate can identify this user. The dashboard login already
+            // authenticated via Caspio (sessionStorage); this mirrors what
+            // staff-login.html does. Best-effort + awaited so the cookie is set
+            // before any delete; the page works regardless.
+            await establishCrmSession();
+
             // Load quotes
             await loadQuotes();
 
@@ -228,6 +235,32 @@
                 const name = sessionStorage.getItem('nwca_user_name');
                 currentUserEmail = sessionStorage.getItem('nwca_user_email');
                 userDisplay.textContent = name || 'Guest';
+            }
+        }
+
+        // Establish the server session used for server-side delete enforcement.
+        // Same POST staff-login.html makes; idempotent. Non-CRM staff get a 403
+        // (they just can't delete) — logged, never fatal. Identity is the
+        // already-Caspio-authenticated sessionStorage name/email.
+        async function establishCrmSession() {
+            const name = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.getLoggedInStaffName())
+                || sessionStorage.getItem('nwca_user_name');
+            const email = currentUserEmail || sessionStorage.getItem('nwca_user_email') || '';
+            if (!name) return; // not logged in — nothing to establish
+            try {
+                const resp = await fetch('/api/crm-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ name, email }),
+                });
+                if (resp.ok) {
+                    console.log('[QuoteManagement] CRM session established for', name);
+                } else {
+                    console.warn(`[QuoteManagement] CRM session not established (HTTP ${resp.status}) — server-side delete will require it`);
+                }
+            } catch (e) {
+                console.warn('[QuoteManagement] CRM session establish failed:', e.message);
             }
         }
 
@@ -691,6 +724,7 @@
             // Render rows
             tbody.innerHTML = pageQuotes.map(quote => {
                 const statusClass = getStatusClass(quote);
+                const userCanDelete = canDeleteQuote(quote);
                 const expiresInfo = getExpiresInfo(quote);
                 const salespersonInfo = getSalespersonInfo(quote);
                 const isCancelled = quote.Status === 'Cancelled_in_ShopWorks';
@@ -797,6 +831,7 @@
                                    data-pk-id="${quote.PK_ID}"
                                    data-quote-id="${quote.QuoteID}"
                                    data-status="${quote.Status || 'Open'}"
+                                   ${userCanDelete ? '' : 'disabled title="You can only delete your own quotes"'}
                                    onchange="updateCheckboxSelection()">
                         </td>
                         <td><span class="quote-id">${quote.QuoteID || '-'}</span></td>
@@ -853,9 +888,13 @@
                                 <i class="fas fa-chart-bar"></i>
                             </button>
                             ${renderShipStationButton(quote)}
-                            <button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
+                            ${userCanDelete
+                                ? `<button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
                                 <i class="fas fa-trash"></i>
-                            </button>
+                            </button>`
+                                : `<button class="action-btn action-btn--locked" disabled onclick="event.stopPropagation();" title="Only the quote owner or Erik can delete this quote">
+                                <i class="fas fa-trash"></i>
+                            </button>`}
                         </td>
                     </tr>
                 `;
@@ -1124,7 +1163,9 @@
             const checkboxes = document.querySelectorAll('.quote-checkbox');
 
             checkboxes.forEach(cb => {
-                cb.checked = selectAllCheckbox.checked;
+                // Skip rows the user can't delete (disabled checkbox) — "select
+                // all" must not arm a bulk-delete of someone else's quotes.
+                if (!cb.disabled) cb.checked = selectAllCheckbox.checked;
             });
 
             updateCheckboxSelection();
@@ -1138,7 +1179,9 @@
             selectedQuotes.clear();
 
             checkboxes.forEach(cb => {
-                if (cb.checked) {
+                // Defensive: never count a disabled (non-owned) row, even if its
+                // checked state was somehow set programmatically.
+                if (cb.checked && !cb.disabled) {
                     selectedQuotes.add({
                         pkId: cb.dataset.pkId,
                         quoteId: cb.dataset.quoteId,
@@ -1147,9 +1190,10 @@
                 }
             });
 
-            // Update select all checkbox state
+            // Update select all checkbox state — measured against the rows the
+            // user is actually allowed to select (deletable / not disabled).
             const checkedCount = selectedQuotes.size;
-            const totalCount = checkboxes.length;
+            const totalCount = Array.from(checkboxes).filter(cb => !cb.disabled).length;
 
             if (checkedCount === 0) {
                 selectAllCheckbox.checked = false;
@@ -1174,8 +1218,85 @@
             btn.disabled = selectedQuotes.size === 0;
         }
 
+        // ============================================================
+        // ROLE-BASED DELETE PERMISSIONS (Erik 2026-06-15)
+        // Master user (Erik) may delete ANY quote; every other rep may delete
+        // ONLY quotes they own. Keyed off the staff login (StaffAuthHelper →
+        // sessionStorage nwca_user_email/name).
+        //
+        // ⚠️ This is a UI-level guard to keep reps from deleting each other's
+        // quotes ("copacetic") — NOT a hard security boundary. The delete API
+        // (DELETE /api/quote_sessions/:id) is not auth-gated server-side, so a
+        // determined user could still call it directly. Server-side enforcement
+        // is a tracked follow-up (needs the logged-in identity plumbed to the
+        // delete endpoint). See LESSONS_LEARNED.
+        // ============================================================
+        const MASTER_DELETE_EMAILS = new Set(['erik@nwcustomapparel.com']);
+
+        function isMasterUser() {
+            return !!currentUserEmail && MASTER_DELETE_EMAILS.has(String(currentUserEmail).toLowerCase());
+        }
+
+        // Map a staff display name ("Erik Mickelson") → email via the shared
+        // StaffAuthHelper map. Returns null if unknown.
+        function staffNameToEmail(name) {
+            if (!name) return null;
+            // NOTE: StaffAuthHelper is a top-level `const` in staff-auth-helper.js,
+            // so it is a global binding but NOT a property of `window` — reference
+            // it by bare name (guarded with typeof), never `window.StaffAuthHelper`
+            // (that is undefined and would silently empty this map → nobody but the
+            // master could delete their own quotes).
+            const map = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.STAFF_EMAIL_MAP) || {};
+            const hit = map[String(name).trim()];
+            return hit ? hit.toLowerCase() : null;
+        }
+
+        // Best-effort owner email for a quote:
+        //   1) explicit SalesRepEmail column
+        //   2) ShopWorks CustomerServiceRep name → email (authoritative once synced)
+        //   3) quote-time SalesRepName → email
+        function getQuoteOwnerEmail(quote) {
+            if (quote.SalesRepEmail && String(quote.SalesRepEmail).trim()) {
+                return String(quote.SalesRepEmail).trim().toLowerCase();
+            }
+            if (quote.ShopWorks_Snapshot) {
+                try {
+                    const rep = JSON.parse(quote.ShopWorks_Snapshot)?.order?.CustomerServiceRep;
+                    const email = staffNameToEmail(rep);
+                    if (email) return email;
+                } catch (_) { /* malformed snapshot */ }
+            }
+            return staffNameToEmail(quote.SalesRepName);
+        }
+
+        // Can the logged-in user delete this quote?
+        //   • master (Erik)           → always
+        //   • not logged in / unknown → never (safe default)
+        //   • otherwise               → only if they own it
+        function canDeleteQuote(quote) {
+            if (!quote) return false;
+            if (isMasterUser()) return true;
+            if (!currentUserEmail) return false;
+            const owner = getQuoteOwnerEmail(quote);
+            return !!owner && owner === String(currentUserEmail).toLowerCase();
+        }
+
+        // Delete handlers only receive a pkId — resolve back to the quote row.
+        function findQuoteByPk(pkId) {
+            return (allQuotes || []).find(q => String(q.PK_ID) === String(pkId)) || null;
+        }
+
         // Single quote delete
         function deleteQuote(pkId, quoteId, status) {
+            // Permission gate (defensive — the row button/checkbox are already
+            // disabled for non-owners; re-check here in case of stale UI).
+            const quote = findQuoteByPk(pkId);
+            if (!canDeleteQuote(quote)) {
+                const owner = quote ? getQuoteOwnerEmail(quote) : null;
+                alert(`You can only delete your own quotes.\n\n${quoteId} belongs to ${owner || 'another rep'}. Ask them — or Erik — to delete it.`);
+                return;
+            }
+
             let message = `Are you sure you want to delete quote <strong>${quoteId}</strong>?`;
 
             if (status === 'Accepted') {
@@ -1242,16 +1363,18 @@
 
             let successCount = 0;
             let failCount = 0;
+            const errorMessages = new Set();
 
             for (const item of pendingDeleteData) {
                 try {
-                    const success = await deleteQuoteAPI(item.pkId);
-                    if (success) {
+                    const result = await deleteQuoteAPI(item.pkId);
+                    if (result && result.ok) {
                         successCount++;
                         // Remove from local data
                         allQuotes = allQuotes.filter(q => q.PK_ID != item.pkId);
                     } else {
                         failCount++;
+                        if (result && result.message) errorMessages.add(result.message);
                     }
                 } catch (error) {
                     console.error(`[QuoteManagement] Failed to delete ${item.quoteId}:`, error);
@@ -1270,13 +1393,15 @@
             document.getElementById('select-all').checked = false;
             updateBulkDeleteButton();
 
-            // Show result
+            // Show result — surface the server's reason (e.g. "You can only
+            // delete your own quotes") rather than failing silently.
+            const detail = errorMessages.size ? ' — ' + [...errorMessages].join('; ') : '';
             if (failCount === 0) {
                 showToast(`Successfully deleted ${successCount} quote(s)`);
             } else if (successCount > 0) {
-                showToast(`Deleted ${successCount} quote(s), ${failCount} failed`);
+                showToast(`Deleted ${successCount}, ${failCount} blocked${detail}`);
             } else {
-                showToast(`Failed to delete quotes. Please try again.`);
+                alert(`Could not delete:\n\n${[...errorMessages].join('\n') || 'Please try again.'}`);
             }
 
             // Re-apply filters to refresh table
@@ -1285,19 +1410,32 @@
 
         // API call to delete quote
         async function deleteQuoteAPI(pkId) {
+            // Routed through THIS app (pricing-index), NOT the proxy, so the
+            // httpOnly session cookie rides along and the server-side role gate
+            // can enforce ownership (DELETE /api/quote_sessions/:id). Returns
+            // { ok, status, message }.
+            const doDelete = () => fetch(`/api/quote_sessions/${pkId}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+            });
             try {
-                const response = await fetch(`${API_BASE}/api/quote_sessions/${pkId}`, {
-                    method: 'DELETE'
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API returned ${response.status}`);
+                let response = await doDelete();
+                // Session expired (MemoryStore cleared on dyno restart) — try to
+                // re-establish once, then retry.
+                if (response.status === 401) {
+                    await establishCrmSession();
+                    response = await doDelete();
                 }
-
-                return true;
+                if (!response.ok) {
+                    let message = `HTTP ${response.status}`;
+                    try { const j = await response.json(); if (j && j.message) message = j.message; } catch (_) { /* non-JSON */ }
+                    console.error(`[QuoteManagement] Delete blocked/failed (${response.status}):`, message);
+                    return { ok: false, status: response.status, message };
+                }
+                return { ok: true };
             } catch (error) {
                 console.error('[QuoteManagement] Delete API error:', error);
-                return false;
+                return { ok: false, status: 0, message: error.message };
             }
         }
 
