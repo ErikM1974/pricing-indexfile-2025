@@ -510,18 +510,43 @@
             return !Number.isNaN(n) && n > 0;
         }
 
+        // ── Shipped-evidence gate (Erik 2026-06-16) ───────────────────────────
+        // ONE definition of "is this order shipped?", used by BOTH the Progress
+        // pill AND isCompletedQuote (tab membership) so the two can never disagree
+        // on the same row. Mirrors pages/js/quote-view.js _renderStatusGrid — KEEP
+        // THE THREE IN SYNC. A bare non-zero sts_Shipped is NOT trusted: per
+        // memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md the codes are
+        // 0=No, 1=Yes, .5=Partial, 8=N/A, 222=N/A — so the old any-nonzero rule
+        // read the "8" N/A sentinel as shipped on orders that never shipped.
+        function shipMethodOf(quote, snap) {
+            let m = (snap && snap.pushed && snap.pushed.ShippingAddresses && snap.pushed.ShippingAddresses[0] && snap.pushed.ShippingAddresses[0].ShipMethod) || quote.ShipMethod || '';
+            if (!m && quote.Notes) { try { m = (JSON.parse(quote.Notes)?.ship?.method) || ''; } catch (_) { /* not JSON */ } }
+            return String(m);
+        }
+        function isPickupMethod(m) { return /pickup|will\s*call/i.test(m || ''); }
+        function isShippedForDisplay(quote, snap, order) {
+            if (isPickupMethod(shipMethodOf(quote, snap))) return isStatusYes(order.sts_Shipped); // pickup: fulfilled flag
+            // Non-pickup: the documented canonical "1"=Yes (NOT the "8" N/A sentinel),
+            // OR real evidence of an outbound shipment (ship date / tracking).
+            const sts = String(order.sts_Shipped == null ? '' : order.sts_Shipped).trim().toLowerCase();
+            const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
+            const hasShipDate = !!(order.date_Shippied || order.date_Shipped);
+            const hasTracking = !!(quote.TrackingNumber && String(quote.TrackingNumber).trim())
+                || (Array.isArray(snap && snap.tracking) && snap.tracking.length > 0);
+            return stsConfirmed || hasShipDate || hasTracking;
+        }
+
         // A quote is COMPLETED when its ShopWorks order is fully shipped +
-        // invoiced + paid (Erik 2026-06-15). Read straight from the synced
-        // snapshot's sts_* flags — the same source as the Progress pills, so a
-        // row only counts as completed once the sync has confirmed it in
-        // ShopWorks. Anything without a snapshot (open quotes, unsynced) is NOT
-        // completed → stays in Active.
+        // invoiced + paid (Erik 2026-06-15). Uses the SAME shipped-evidence gate
+        // as the Progress pill (isShippedForDisplay) so the Completed tab can't
+        // disagree with a row's own "Shipped: No" pill. Anything without a
+        // snapshot (open quotes, unsynced) is NOT completed → stays in Active.
         function isCompletedQuote(quote) {
             if (!quote || !quote.ShopWorks_Snapshot) return false;
-            let order;
-            try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
+            let snap, order;
+            try { snap = JSON.parse(quote.ShopWorks_Snapshot) || {}; order = snap.order || {}; }
             catch (_) { return false; }
-            return isStatusYes(order.sts_Shipped)
+            return isShippedForDisplay(quote, snap, order)
                 && isStatusYes(order.sts_Invoiced)
                 && isStatusYes(order.sts_Paid);
         }
@@ -548,8 +573,11 @@
             const LABEL = { shipped: 'Shipped', partial: 'Partially shipped', complete: 'Complete', confirmed: 'Ordered — not shipped', canceled: 'Canceled', unknown: (info.status || 'Unknown') };
             const cls = info.shipped ? (info.state === 'partial' ? 'inbound-partial' : 'inbound-shipped')
                       : (info.state === 'canceled' ? 'inbound-canceled' : 'inbound-confirmed');
-            const title = `SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
-            const icon = '<i class="fas fa-truck"></i>';
+            // "dolly" (inbound/receiving) — visually distinct from the outbound
+            // Progress "Shipped" truck so a SanMar blanks delivery is never misread
+            // as the customer's order shipping out (Erik 2026-06-16).
+            const title = `Inbound blanks · SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
+            const icon = '<i class="fas fa-dolly"></i>';
             if (info.shipped && info.trackingUrl) {
                 return `<a class="inbound-pill ${cls}" href="${info.trackingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`;
             }
@@ -575,15 +603,25 @@
             if (!quote.ShopWorks_Snapshot) {
                 return `<span class="milestone-na" title="ShopWorks not yet synced">—</span>`;
             }
-            let order;
-            try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
+            let snap, order;
+            try { snap = JSON.parse(quote.ShopWorks_Snapshot) || {}; order = snap.order || {}; }
             catch (_) { return `<span class="milestone-na" title="Snapshot parse error">—</span>`; }
 
+            // Shipped pill uses the shared isShippedForDisplay gate (Erik 2026-06-16)
+            // so it agrees with the Completed-tab logic AND the quote-view tile.
+            // Pickup orders relabel to "Ready for Pickup" with a store icon.
+            const isPickup = isPickupMethod(shipMethodOf(quote, snap));
+
             const pills = MILESTONE_ICONS.map(({ label, icon, fields }) => {
-                const done = fields.every(f => isStatusYes(order[f]));
+                let done = fields.every(f => isStatusYes(order[f]));
+                let useLabel = label, useIcon = icon;
+                if (fields.length === 1 && fields[0] === 'sts_Shipped') {
+                    if (isPickup) { useLabel = 'Ready for Pickup'; useIcon = 'fa-store'; }
+                    done = isShippedForDisplay(quote, snap, order);
+                }
                 const tone = done ? 'done' : 'pending';
-                return `<span class="milestone-pill milestone-pill--${tone}" title="${label}: ${done ? 'Yes' : 'No'}">
-                            <i class="fas ${icon}"></i>
+                return `<span class="milestone-pill milestone-pill--${tone}" title="${escapeHtml(useLabel)}: ${done ? 'Yes' : 'No'}">
+                            <i class="fas ${useIcon}"></i>
                         </span>`;
             }).join('');
             return `<div class="milestone-pills">${pills}</div>`;

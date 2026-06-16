@@ -7100,6 +7100,18 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
         // ShopWorks clearly says Full Front / DTG (fixed 2026-06-15). The proxy
         // already trims `pushed` to those 3 arrays, so it stays small.
         pushed: snapshot.pushed || null,
+        // Persist live MO /v1 tracking + payments too (Erik 2026-06-16). The proxy
+        // snapshot endpoint fetches these on every pull, but they were dropped here —
+        // so the quote-view outbound tracking block + Date Shipped (and the new
+        // Shipped-tile "real shipment" gate) only ever saw empty arrays, even on a
+        // genuinely shipped order. Persisting them lets cron-synced rows surface
+        // outbound tracking/carrier/ship date, not just a live page re-fetch.
+        // NOTE: unlike `pushed` (which the proxy trims to Designs/Attachments/
+        // ShippingAddresses), tracking/payments come through UNTRIMMED — so cap them
+        // defensively here to keep ShopWorks_Snapshot well under its Text(64000)
+        // column limit regardless of how large an upstream multi-shipment payload is.
+        tracking: Array.isArray(snapshot.tracking) ? snapshot.tracking.slice(0, 50) : (snapshot.tracking || null),
+        payments: Array.isArray(snapshot.payments) ? snapshot.payments.slice(0, 50) : (snapshot.payments || null),
         fetchedAt: snapshot.fetchedAt,
       };
       const changes = diffSnapshots(oldSnap, newSnap);
@@ -7141,6 +7153,8 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
           order: snapshot.order,
           lineItems: snapshot.lineItems,
           pushed: snapshot.pushed || null,   // see newSnap above — Designs/type/location for the quote-view
+          tracking: snapshot.tracking || null,  // keep the manual-refresh response in lockstep with newSnap
+          payments: snapshot.payments || null,
           fetchedAt: snapshot.fetchedAt,
         },
       });

@@ -160,6 +160,12 @@ In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: the f
 ### ShopWorks ManageOrders integration ignores per-order TaxPartNumber (2026-05-20) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: integration-level Tax Line Item/Account defaults stamp every `TaxTotal > 0` order and IGNORE payload tax fields — send `TaxTotal: 0` + Notes-On-Order tax block (current pattern; see the 2026-06-07 "OnSite DROPS the pushed order-level tax field" entry).
 
+### Quote page froze the push-time design name + read ShopWorks N/A code "8" as "Shipped" (2026-06-16)
+**Problem:** `/quote/:id` showed the generic pushed design name (`DTG…-Customer Logo`) not the operator-renamed ShopWorks name (`40th Birthday…`); a Customer-Pickup order read **Shipped: Yes** though nothing shipped (the on-screen UPS # was the INBOUND SanMar blanks, a separate feed).
+**Root Cause:** The hourly sync writes the WHOLE snapshot into one Caspio column — `order` = live `/v1/orders`, `pushed` = `/order-pull` FROZEN at push. The Designs panel preferred `pushed.Designs[0].DesignName` (frozen) over live `order.DesignName`. The Shipped tile used any-nonzero `sts_Shipped`, but per MANAGEORDERS_CRM_CAPABILITY_REFERENCE the codes are 0=No/1=Yes/.5=Partial/**8=N/A**/222=N/A. Live MO `tracking`+`payments` were fetched then DROPPED before persist, so outbound tracking/ship-date never displayed.
+**Solution:** Primary design (i===0) now prefers live `order.DesignName`. One shared `isShippedForDisplay()` feeds the quote-view tile, the dashboard pill AND `isCompletedQuote`: pickup→"Ready for Pickup" on the fulfilled flag; else canonical `sts_Shipped==='1'` OR ship date OR tracking (rejects the "8" sentinel). Persist `tracking`+`payments` (slice 50) into ShopWorks_Snapshot. Inbound SanMar indicator → dolly icon + "Inbound blanks" (was a truck, same as Shipped).
+**Prevention:** The ShopWorks sync writes a snapshot BLOB, not flat columns — name/ship status render LIVE from JSON, and `pushed.*` NEVER reflects post-push edits (only `order.*` does). Never read a ShopWorks `sts_*` as boolean (8/222 = N/A); gate "shipped" on real evidence and derive the SAME answer everywhere (one helper) so a tab can't disagree with a pill. Builder quotes (EMB/SCP/DTF/OF) link by **ExtOrderID, not PO==QuoteID** (storefront-only) — `scripts/dry-run-backfill-shopworks-wo.js` (read-only) audits the storefront class.
+
 ---
 
 ## UI Patterns
@@ -195,10 +201,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 ### DTG LTM fee/threshold lived in 4 different files (2026-05-18) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: pricing constants with a Caspio column MUST be read from the column (`Pricing_Tiers.LTM_Fee`); when the LTM tier has no `DTG_Costs` rows, the canonical fallback is the lowest non-LTM tier's costs.
 
-### ALWAYS Pull Pricing From Caspio API — Never Hardcode
-**Problem:** Hardcoded 3D Puff upcharge ($5/cap) in JavaScript.
-**Solution:** ALL pricing values from Caspio tables, fetched via API. No code deploys for price changes.
-**Prevention:** Single source of truth in Caspio. Sales team adjusts without developer involvement.
+### ALWAYS pull pricing from Caspio API — never hardcode
+Keep-alive (also CLAUDE.md "Pricing = API"): EVERY price/fee/upcharge/% comes from Caspio via API — a hardcoded number is a fallback ONLY + visible warning. Sales adjusts prices with no deploy.
 
 ---
 
@@ -220,11 +224,8 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 **Solution:** Use `q.pageSize` (not `q.limit`) for pagination. Delete `q.limit` before paginating. Fixed in `caspio.js:fetchAllCaspioPages`.
 **Prevention:** Never use `q.limit` with `q.pageNumber` on Caspio v3. Always `q.pageSize`.
 
-### Caspio multi-select List columns are unwritable via REST API + Triggered Actions (2026-05-09)
-**Problem:** AE intake forms (JDS, Sticker, Banner) tried writing `Order_Type: 'Roland Stickers'` (or array `['Roland Stickers']`) to ArtRequests. Caspio returned `InvalidInputValue: ... Order_Type` (500). Even Caspio's visual Triggered Action builder hid multi-select fields from assignment-target dropdowns — the trigger workaround we tried also didn't work.
-**Root Cause:** `Order_Type` is a `List - String` multi-select column. Caspio's REST API and Triggered Action builder both lack the internal encoding the DataPage UI uses for these columns. Reads return the dict shape `{'9': 'Roland Stickers'}`; writes need a wire format we can't produce externally.
-**Solution:** Parallel-column workaround. Added `Order_Type_Source` (Text 255) to ArtRequests in Caspio admin. New REST forms write `Order_Type_Source`; legacy Garment DataPage continues writing `Order_Type`. Each record has exactly one populated; never both. Dashboards coalesce on read: `req.Order_Type || req.Order_Type_Source`.
-**Prevention:** **Never include a Caspio `List - String` multi-select column in a REST POST payload — the entire submission will 500.** The same parallel-column + dashboard-coalesce pattern applies to any future multi-select that needs REST writes.
+### Caspio multi-select List columns unwritable via REST/Triggered Actions (2026-05-09) — ARCHIVED 2026-06-16
+In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: NEVER put a Caspio `List - String` multi-select column in a REST POST/PUT — the whole submission 500s. Workaround = a parallel Text column (`Order_Type_Source`) + read-coalesce (`Order_Type || Order_Type_Source`).
 
 ### Proxy quote_sessions lookups cache 5 min — a pre-create existence check POISONS the key your webhook reads (2026-06-09)
 **Problem:** 3-Day Tees rebuild added a QuoteID-uniqueness check (`GET /api/quote_sessions?quoteID=X`) BEFORE creating the row. In live verification, every subsequent lookup of that QuoteID — webhook idempotency, success-page polling, SessionID stamping — returned `[]` even though the row existed (unfiltered GET showed it).
@@ -273,7 +274,6 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 
 ### WA DOR tax-rate lookup discarded valid rates on ResultCode 2 (2026-06-03) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: DOR ResultCode 2 still carries a VALID ZIP-level rate (only `Rate=-1` is a true miss); retry ZIP-only before any hardcoded default.
-
 
 ### Routes outlive files — 7 zombie sendFile routes + a live nav item pointed at deleted pages (2026-06-11)
 **Problem:** Customer-facing nav item "Marketing" (index.html + webstore-info footer) 404'd; server.js still had `app.get` → `sendFile` for 7 files that no longer exist (marketing, top-sellers-catalog, index-new, embroidery-pricing-standardized/-professional, test-api, test-catalog-layout). Legacy cart.html (Bootstrap 4) + pages/order-confirmation.html were orphaned (zero inbound links) but still served at `/cart` — an unmaintained checkout flow with stale pricing logic a customer could reach by URL.
