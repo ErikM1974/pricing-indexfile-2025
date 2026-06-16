@@ -535,6 +535,14 @@
                 || (Array.isArray(snap && snap.tracking) && snap.tracking.length > 0);
             return stsConfirmed || hasShipDate || hasTracking;
         }
+        // Produced has the SAME 8=N/A trap as Shipped (Erik 2026-06-16): trust only
+        // the canonical "1"=Yes OR a real production date — never a bare non-zero
+        // code. KEEP IN SYNC with quote-view.js _renderStatusGrid.
+        function isProducedForDisplay(order) {
+            const sts = String(order.sts_Produced == null ? '' : order.sts_Produced).trim().toLowerCase();
+            const confirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
+            return confirmed || !!(order.date_Produced);
+        }
 
         // A quote is COMPLETED when its ShopWorks order is fully shipped +
         // invoiced + paid (Erik 2026-06-15). Uses the SAME shipped-evidence gate
@@ -618,6 +626,8 @@
                 if (fields.length === 1 && fields[0] === 'sts_Shipped') {
                     if (isPickup) { useLabel = 'Ready for Pickup'; useIcon = 'fa-store'; }
                     done = isShippedForDisplay(quote, snap, order);
+                } else if (fields.length === 1 && fields[0] === 'sts_Produced') {
+                    done = isProducedForDisplay(order);
                 }
                 const tone = done ? 'done' : 'pending';
                 return `<span class="milestone-pill milestone-pill--${tone}" title="${escapeHtml(useLabel)}: ${done ? 'Yes' : 'No'}">

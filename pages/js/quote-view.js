@@ -3894,6 +3894,13 @@ class QuoteViewPage {
                     const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
                     yes = stsConfirmed || hasShipDate || hasOutboundTracking;
                 }
+            } else if (field === 'sts_Produced') {
+                // Same 8=N/A trap as Shipped: trust the canonical "1"=Yes OR a real
+                // production date, never a bare non-zero code. KEEP IN SYNC with
+                // dashboards/quote-management.html isProducedForDisplay.
+                const sts = String(order?.sts_Produced == null ? '' : order.sts_Produced).trim().toLowerCase();
+                const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
+                yes = stsConfirmed || !!(order?.date_Produced);
             } else if (composite) {
                 yes = composite.every(f => this._isStatusYes(order?.[f]));
             } else {
