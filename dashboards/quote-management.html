@@ -30,6 +30,10 @@
                     title="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.">
                 <i class="fas fa-sync"></i> Sync from ShopWorks
             </button>
+            <button id="btn-refresh-inbound" class="btn-header" onclick="refreshInboundLive()"
+                    title="Check SanMar LIVE for the inbound blanks on the visible orders. The Inbound dot normally reads a once-a-day synced status that can lag a same-day shipment — this asks SanMar's shipment feed directly so an order that just shipped flips to Shipped (with tracking) right now.">
+                <i class="fas fa-dolly"></i> Refresh Inbound
+            </button>
             <a href="/staff-dashboard.html" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </a>
@@ -361,6 +365,82 @@
                 // Erik's #1 rule — surface the failure, never fail silently.
                 console.error('[QuoteManagement] syncFromShopWorks failed:', err);
                 alert(`ShopWorks sync failed:\n${err.message}\n\nIf this keeps happening, check the pricing-index app logs (the same reconciliation also runs hourly via the caspio-pricing-proxy scheduler).`);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = original;
+            }
+        }
+
+        // Manual on-demand inbound refresh (Erik 2026-06-16). The Inbound dot
+        // normally reads the once-a-day SYNCED SanMar status (batch-status), which
+        // lags a same-day shipment because SanMar's order-status feed and its
+        // shipment feed are different services. This button asks the LIVE shipment
+        // feed directly (the same source the /quote page uses) for the visible
+        // orders that aren't already showing Shipped, and updates their dot +
+        // tracking on the spot. Bounded (≤25 POs, 4 concurrent) so it stays fast;
+        // a live read only — it doesn't write the synced table, so it reflects the
+        // truth the moment you ask rather than waiting for the daily sync.
+        function buildTrackUrl(carrier, tn) {
+            if (!tn) return null;
+            const t = encodeURIComponent(String(tn).trim());
+            const c = String(carrier || '').toUpperCase();
+            if (c.includes('FEDEX')) return `https://www.fedex.com/fedextrack/?trknbr=${t}`;
+            if (c.includes('USPS'))  return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${t}`;
+            return `https://www.ups.com/track?tracknum=${t}`; // SanMar ships UPS by default
+        }
+        async function refreshInboundLive() {
+            const btn = document.getElementById('btn-refresh-inbound');
+            if (!btn || btn.disabled) return;
+            const original = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
+            try {
+                // Visible rows that have a linked SanMar PO and aren't already shipped.
+                const seen = new Set();
+                const targets = [];
+                for (const q of (allQuotes || [])) {
+                    const wo = getWoId(q);
+                    if (!wo) continue;
+                    const info = inboundStatusMap.get(String(wo));
+                    if (!info || !info.po || info.shipped) continue; // no PO, or already shipped
+                    if (seen.has(info.po)) continue;
+                    seen.add(info.po);
+                    targets.push({ wo: String(wo), po: info.po, base: info });
+                    if (targets.length >= 25) break; // cap — keep it snappy
+                }
+                if (targets.length === 0) {
+                    showToast('Inbound already current — no open SanMar POs to re-check.');
+                    return;
+                }
+                let updated = 0;
+                const queue = targets.slice();
+                const worker = async () => {
+                    while (queue.length) {
+                        const t = queue.shift();
+                        try {
+                            const r = await fetch(`${API_BASE}/api/sanmar-shipments/po/${encodeURIComponent(t.po)}`);
+                            const d = await r.json().catch(() => ({}));
+                            const boxes = (d && d.data && d.data.boxes) || [];
+                            if (boxes.length) {
+                                const first = boxes.find(b => b.trackingNumber) || boxes[0];
+                                const tn = first.trackingNumber || '';
+                                const carrier = first.carrier || 'UPS';
+                                inboundStatusMap.set(t.wo, {
+                                    ...t.base, shipped: true, state: 'shipped', status: 'Shipped',
+                                    trackingNumber: tn, carrier, trackingUrl: buildTrackUrl(carrier, tn),
+                                });
+                                updated++;
+                            }
+                        } catch (_) { /* skip this PO — non-fatal */ }
+                    }
+                };
+                await Promise.all([worker(), worker(), worker(), worker()]);
+                renderTable();
+                showToast(`✓ Inbound refreshed live from SanMar: ${updated} now Shipped (${targets.length} checked).`);
+            } catch (err) {
+                // Erik's #1 rule — surface the failure, never fail silently.
+                console.error('[QuoteManagement] refreshInboundLive failed:', err);
+                alert(`Inbound refresh failed:\n${err.message}`);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = original;
