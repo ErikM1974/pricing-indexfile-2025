@@ -1,3 +1,7 @@
+## v2026.06.16.6 (2026.06.16)
+
+- Deploy v2026.06.16.6: $0 orders (Paid=n/a) now count as completed — drop off Active tab
+
 ## v2026.06.16.5 (2026.06.16)
 
 - Deploy v2026.06.16.5: move SanMar inbound block under Order Status (staff quote view)
