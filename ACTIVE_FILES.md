@@ -1199,7 +1199,7 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
   - `pages/` (incl. js/, css/, order-form/, services/, utils/): 76 files
   - `shared_components/css/`: 61 files
   - `dashboards/` (incl. js/, css/, reports/): 39 files
-  - `training/`: 38 files
+  - `training/`: 41 files
   - Root (HTML/JS/CSS only): 34 files
   - `product/` (incl. components/, services/, styles/, js/): 20 files
   - `scripts/` (incl. safety-tools/): 20 files
@@ -1236,7 +1236,7 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 
 ## 📁 Additional Directories
 
-### Training Materials (`/training/` — 38 files)
+### Training Materials (`/training/` — 41 files)
 
 Operational guides, training modules, and Adriyella's daily-task tooling. Most are standalone HTML pages with embedded JS/CSS.
 
@@ -1271,6 +1271,9 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/sales-coordinator-manual.html` | Sales coordinator manual | ✅ Active |
 | `/training/sales-coordinator-training-schedule.html` | Sales coordinator training schedule | ✅ Active |
 | `/training/sales-tax-code-trainer.html` | Sales tax code trainer | ✅ Active |
+| `/training/shipping-receiving-guide.html` | Shipping & Receiving Clerk training guide (receiving/shipping/pickups/close-day/hand-off) | ✅ Active |
+| `/training/shipping-receiving-guide.css` | Styles for the Shipping & Receiving training guide (print-friendly) | ✅ Active |
+| `/training/shipping-receiving-guide.js` | Shipping & Receiving guide behaviour: print, persistent checklists, back-to-top | ✅ Active |
 | `/training/shopworks-customer-setup.html` | ShopWorks customer setup guide | ✅ Active |
 | `/training/shopworks-customer-setup-enhanced.html` | ShopWorks customer setup (enhanced) | ✅ Active |
 | `/training/shopworks-customer-setup-working.html` | ShopWorks customer setup (working draft) | ⚠️ Verify |

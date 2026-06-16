@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Shipping &amp; Receiving Clerk — Training Guide | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="/training/shipping-receiving-guide.css">
+</head>
+<body>
+    <main class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <img class="header-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Staff Dashboard</a>
+                        <span>/</span>
+                        <a href="/staff-dashboard.html#training">Training</a>
+                        <span>/</span>
+                        <span>Shipping &amp; Receiving</span>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <button class="btn-print" type="button" data-action="print">
+                        <i class="fas fa-print" aria-hidden="true"></i> Print
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Title -->
+        <h1 class="page-title">
+            <i class="fas fa-truck-ramp-box" aria-hidden="true"></i> Shipping &amp; Receiving Clerk — Training Guide
+        </h1>
+        <p class="page-subtitle">
+            Everything you need to run the dock at Northwest Custom Apparel — receiving against purchase orders,
+            shipping orders out on time, customer pickups, closing the day in ShopWorks, and covering the role
+            when the clerk is on vacation. Family-owned since 1977 · Milton, WA.
+        </p>
+
+        <!-- Quick Nav -->
+        <nav class="quicknav" aria-label="On this page">
+            <h2>On this page</h2>
+            <ul>
+                <li><a href="#overview"><span class="num">1</span> The Job in One View</a></li>
+                <li><a href="#receiving"><span class="num">2</span> Receiving</a></li>
+                <li><a href="#shipping"><span class="num">3</span> Shipping</a></li>
+                <li><a href="#packing"><span class="num">4</span> Packing</a></li>
+                <li><a href="#pickups"><span class="num">5</span> Customer Pickups</a></li>
+                <li><a href="#closing"><span class="num">6</span> Closing the Day</a></li>
+                <li><a href="#special"><span class="num">7</span> Special Situations</a></li>
+                <li><a href="#handoff"><span class="num">8</span> Vacation / Coverage Hand-Off</a></li>
+                <li><a href="#systems"><span class="num">9</span> Systems &amp; Logins</a></li>
+                <li><a href="#contacts"><span class="num">10</span> Who to Call</a></li>
+            </ul>
+        </nav>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             1 · THE JOB IN ONE VIEW
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider receive-theme" id="overview">
+            <i class="fas fa-eye" aria-hidden="true"></i> 1 · The Job in One View
+        </h2>
+
+        <div class="pillars">
+            <div class="pillar">
+                <span class="pillar-step">1</span>
+                <h3>Receive In</h3>
+                <p>Match each delivery to its PO in ShopWorks, count it, mark it received, and move it to production staging.</p>
+            </div>
+            <div class="pillar">
+                <span class="pillar-step">2</span>
+                <h3>Ship Out</h3>
+                <p>Pack orders by priority, pick the carrier, print the label, and mark shipped in ShopWorks with cost + tracking.</p>
+            </div>
+            <div class="pillar">
+                <span class="pillar-step">3</span>
+                <h3>Close the Day</h3>
+                <p>Import carrier tracking (Import via ODBC → Today Only), clear the Customer Pickup clipboard, stage for pickup, tidy up.</p>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-heart" aria-hidden="true"></i> Why this role matters</h3>
+            </div>
+            <div class="ref-card-body">
+                <div class="philosophy">
+                    <p class="lead">"When UPS drops off a load of boxes, they aren't cartons of shirts — they're boxes of money."</p>
+                    <p>Every shirt that is unaccounted for, missing, or the wrong style or color costs the company money. Receiving's
+                    number-one job is to prevent that financial loss — and the clock is always ticking, because production needs to
+                    start soon. <strong>Anything received today is counted today. No exceptions.</strong></p>
+                    <p>Shipping is the last checkpoint. If every department does its job perfectly but shipping misses the date, the
+                    method, or the address, we fumbled the ball on the one-yard line. Jobs go out <strong>on time, by the right method,
+                    to the right address</strong> — that's the whole game.</p>
+                </div>
+                <div class="callout callout-info">
+                    <i class="fas fa-compass" aria-hidden="true"></i> <strong>Golden rule:</strong> When you're unsure, ask — never guess. A miscount or a
+                    lost shirt is lost money, and that's the part of this job that matters most.
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-book-open" aria-hidden="true"></i> The official policies behind this guide</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>This page is the all-in-one <strong>training guide</strong> for the role. The authoritative, individually-maintained
+                policies live in the <a href="/pages/policies-hub.html">Company Policies Hub</a> — read them for the fine print:</p>
+                <ul class="bullets">
+                    <li><a href="/pages/policy-detail.html?id=shipping-receiving-handbook">Shipping &amp; Receiving Handbook</a> — role overview, roster, daily routine, 10-day training plan</li>
+                    <li><a href="/pages/policy-detail.html?id=receiving-procedures">Receiving Procedures</a> — full receiving SOP (garment + non-garment)</li>
+                    <li><a href="/pages/policy-detail.html?id=shipping-procedures">Shipping Procedures</a> — full shipping SOP, carriers, handling fee, prepaid freight</li>
+                    <li><a href="/pages/policy-detail.html?id=customer-order-pickup">Customer Order Pickup</a> · <a href="/pages/policy-detail.html?id=team-coverage-during-absences">Team Coverage During Absences</a> · <a href="/pages/policy-detail.html?id=vacation-scheduling-policy-2026">Vacation Scheduling Policy (2026)</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             2 · RECEIVING
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider receive-theme" id="receiving">
+            <i class="fas fa-box-open" aria-hidden="true"></i> 2 · Receiving
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-truck" aria-hidden="true"></i> Carriers &amp; delivery times</h3>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table compact-table">
+                    <thead><tr><th>Carrier</th><th>When</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>UPS</strong></td><td>8 AM – 2 PM</td><td>Primary carrier</td></tr>
+                        <tr><td><strong>FedEx</strong></td><td>Throughout the day</td><td>Sometimes two deliveries in one day</td></tr>
+                        <tr><td><strong>PSST (SanMar)</strong></td><td>Via UPS</td><td>"Pack Separately, Ship Together." Large orders ship via Oak Harbor</td></tr>
+                        <tr><td><strong>US Mail</strong></td><td>10 AM – 12 PM</td><td>—</td></tr>
+                    </tbody>
+                </table>
+                <div class="callout callout-tip">
+                    <i class="fas fa-toolbox" aria-hidden="true"></i> <strong>Tools to gather first:</strong> highlighter, box cutter, pen, clipboard.
+                    Keep them in the same spot so you're not hunting for them.
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-list-ol" aria-hidden="true"></i> Receiving priority order</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Count the most urgent first. Purchasing notifies you about rushes, replacements, and back orders — print the SanMar
+                PSST daily manifest and check rush orders with the purchasing clerk.</p>
+                <div class="priority">
+                    <span class="chip first">1 · Rush</span><span class="arrow">→</span>
+                    <span class="chip">2 · Replacements</span><span class="arrow">→</span>
+                    <span class="chip">3 · Back orders</span><span class="arrow">→</span>
+                    <span class="chip">4 · Web orders</span><span class="arrow">→</span>
+                    <span class="chip">5 · Past-due</span><span class="arrow">→</span>
+                    <span class="chip">6 · Regular (by due date)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-clipboard-check" aria-hidden="true"></i> Step-by-step: receiving a garment shipment</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Sort freight by PO.</strong> Print the PSST daily manifest from SanMar. Find the PO number on each box and
+                        group boxes with the same PO together. Verify the box count against the PO (e.g., 10 of 10 boxes arrived).</li>
+                    <li><strong>Pull the paperwork.</strong> Open the PO in ShopWorks (the PO number is on the packing slip). Print the
+                        work order and the box labels — you'll need them in the next steps.</li>
+                    <li><strong>Check in the shipment.</strong> Remove the packing slip. Cut the <em>top</em> of the box first, then the
+                        sides, to avoid cutting the contents; dump from the bottom so items stay stacked. Sort by style and color, and
+                        count quickly (dozens for t-shirts, sixes for hoodies).</li>
+                    <li><strong>Verify the garments.</strong> Confirm the packing slip, the PO, and the actual garments all agree on
+                        <strong>style, color, and size</strong>. Highlight verified lines on the work order so finished checks are obvious.</li>
+                    <li><strong>Mark received in ShopWorks.</strong> Put the garments back in the box and change the PO status from
+                        <code>Ordered</code> → <code>Received</code> (or <em>partially received</em>). Note any missing pieces on the
+                        order's front/main note page. Print the box label. <strong>Do NOT put the work order inside the box.</strong></li>
+                    <li><strong>Stage for production.</strong> Whoever counts <strong>initials and dates the packing slip</strong>. Move
+                        the box to the embroidery / DTG staging area, staged by the <strong>last digit of the work order number</strong>.
+                        Lay hoodies face-down (they print last) so fuzz doesn't transfer onto the t-shirts. Attach the work order + box
+                        label to the stack.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-tag" aria-hidden="true"></i> Box labels &amp; partial orders</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Print a box label and stick it on the <strong>upper-left corner of the short side</strong> of the box. Every label shows:
+                work order #, ship date, order name, and client name.</p>
+                <ul class="bullets">
+                    <li><strong>Complete:</strong> mark complete in ShopWorks, label the box, stage in the production inventory area by the
+                        last digit of the work order #.</li>
+                    <li><strong>Partial:</strong> mark partial and note what's missing. Write a big black <strong>"P"</strong> on the label
+                        with a fat marker and stage it in the <strong>receiving partial inventory area</strong> (by last digit). When the
+                        rest arrives, add it to the box, update ShopWorks, print a fresh label over the "P", and move it to production.</li>
+                </ul>
+                <div class="callout callout-info">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i> A partial can go straight to production if the remainder will arrive within
+                    <strong>2–3 business days</strong> (check the SanMar site for where/when the rest ships; ask the purchasing clerk for
+                    other vendors). Otherwise it waits on the partial shelf.
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Discrepancies &amp; no-PO boxes</h3>
+            </div>
+            <div class="ref-card-body">
+                <ul class="bullets">
+                    <li>Wrong or extra item? Keep receiving the rest, set the incorrect item aside in the designated return space (this is
+                        a partial receive), and note the missing garment on the front page of the work order.</li>
+                    <li>After the full UPS shipment is in, tell the <strong>purchasing clerk (Bradley)</strong> about the incorrect garments.
+                        Purchasing reorders and gets an RA number + label.</li>
+                    <li><strong>No PO on a box? Don't receive it.</strong> Isolate it in the holding area and notify Bradley. Nothing goes
+                        into stock without a matching ShopWorks PO.</li>
+                    <li><strong>Damaged in transit?</strong> Photograph everything and notify purchasing — Bradley handles the carrier claim
+                        (see <a href="#special">Special Situations</a>).</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-flask" aria-hidden="true"></i> Supplies, DTG ink &amp; the Amazon exception</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Non-garment supplies (ink, thread, transfers, patches, leatherette, Uline boxes, JDS blanks, office/maintenance items)
+                also need a PO. Receive them within 24 hours and route to the right department.</p>
+                <ul class="bullets">
+                    <li><strong>DTG ink from Kornit</strong> (ordered by Erik): verify against the PO, inspect for leaks, mark received,
+                        then write the <strong>PO # + date received on every bottle</strong> with a permanent marker. Store FIFO
+                        (new stock behind old — ink expires) and tell <strong>Brian</strong>.</li>
+                    <li><strong>No PO found</strong> (non-Amazon vendor): set it aside and notify the likely purchaser (Bradley, or Erik for
+                        Kornit ink) before doing anything else.</li>
+                    <li><strong>Amazon packages addressed to a person:</strong> do <em>not</em> open them — they're personal. Hand them to the
+                        named employee. But if an Amazon box is unusually large/heavy or looks like blank apparel
+                        stock, don't open it — check with Bradley or Ruthie first; it may be a business drop-ship.</li>
+                </ul>
+                <div class="callout callout-tip">
+                    <i class="fas fa-lightbulb" aria-hidden="true"></i> <strong>Ordering from SanMar?</strong> Use the <strong>Attention line</strong> —
+                    Customer Name + logo type (DTG / Embroidery / Screenprint). It makes the package much faster to identify when it lands
+                    on the dock.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             3 · SHIPPING
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider ship-theme" id="shipping">
+            <i class="fas fa-paper-plane" aria-hidden="true"></i> 3 · Shipping
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-list-ol" aria-hidden="true"></i> Shipping priority order</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Pull a schedule of everything that has to ship today first thing in the morning, then work the queue in order. Address
+                problems early — not at 3:42 in the afternoon.</p>
+                <div class="priority">
+                    <span class="chip first">1 · Rushes &amp; events</span><span class="arrow">→</span>
+                    <span class="chip">2 · Past dues</span><span class="arrow">→</span>
+                    <span class="chip">3 · Replacements</span><span class="arrow">→</span>
+                    <span class="chip">4 · Back orders</span><span class="arrow">→</span>
+                    <span class="chip">5 · Web orders</span><span class="arrow">→</span>
+                    <span class="chip">6 · Normal scheduled</span>
+                </div>
+                <div class="callout callout-warn">
+                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i> <strong>"Best way" is not a ship method.</strong> If an order reaches you with
+                    no method, check ShopWorks for an updated address, then contact the CSR who wrote it; if they're unavailable, contact the
+                    customer.
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-clipboard-list" aria-hidden="true"></i> Step-by-step: shipping an order</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Verify the live ship-to in ShopWorks.</strong> The printed work order may be weeks old and the account
+                        executive may have changed the address or method since — always confirm against ShopWorks before you print a label.</li>
+                    <li><strong>Pick the carrier</strong> — UPS, FedEx, or USPS, based on destination, size, weight, and speed.
+                        <strong>PO Boxes must ship USPS</strong> (UPS and FedEx can't deliver to a PO Box).</li>
+                    <li><strong>Pack it and print the label.</strong> Add the customer's email so the carrier emails them the tracking number.</li>
+                    <li><strong>Add the $4.50/box handling fee.</strong> UPS and FedEx add it to the freight automatically; on
+                        <strong>USPS / Stamps.com you must add it by hand.</strong> Add the freight + handling to the invoice in ShopWorks.</li>
+                    <li><strong>Mark shipped in ShopWorks</strong> with the cost + tracking number, then put the box in the designated ship
+                        area for carrier pickup.</li>
+                    <li><strong>Turn paperwork in to billing.</strong> Verify the shipping amount and handling fee, then hand the work order
+                        to billing.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-stamp" aria-hidden="true"></i> USPS / Stamps.com tips</h3>
+            </div>
+            <div class="ref-card-body">
+                <ul class="bullets">
+                    <li>Labels print from the <strong>white Zebra thermal label printer</strong>.</li>
+                    <li><strong>Priority Mail</strong> for ~99% of corporate orders; <strong>First Class</strong> for items under 1 lb
+                        (Shopify / InkSoft tees).</li>
+                    <li>Postage is <strong>live on Erik's credit card</strong> — weigh the box carefully, because a misprinted label means
+                        you have to request a refund.</li>
+                    <li>The scale <strong>doesn't talk to Stamps.com</strong> — enter the weight by hand. (The DYMO scale <em>does</em> work
+                        with ShipStation.)</li>
+                    <li>Remember to add the $4.50/box handling and enter the customer's email for tracking.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-bolt" aria-hidden="true"></i> Rush, COD &amp; prepaid-with-freight</h3>
+            </div>
+            <div class="ref-card-body">
+                <ul class="bullets">
+                    <li><strong>Rush:</strong> ship <strong>UPS Next Day Air / 2nd Day Air</strong> — UPS comes daily, so no pickup call is
+                        needed. For <strong>FedEx priority</strong> (next-day / 2nd-day) you must <strong>call FedEx for pickup</strong>
+                        (they use a different truck).</li>
+                    <li><strong>Shipping on a customer's account:</strong> confirm the account isn't closed — if it is, we eat the freight.</li>
+                    <li><strong>COD:</strong> we can't ship COD without payment in hand.</li>
+                    <li><strong>Prepaid orders with freight:</strong> easiest is to tell the customer up front that freight is added after
+                        shipment. If we need to be paid in full, estimate the freight and add ~20% wiggle room. If actual freight comes in
+                        <strong>more than $20 over</strong> the estimate, notify the sales rep and bookkeeper to bill the difference.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             4 · PACKING
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider pack-theme" id="packing">
+            <i class="fas fa-boxes-packing" aria-hidden="true"></i> 4 · Packing
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-box" aria-hidden="true"></i> Pack it safely and professionally</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Gather supplies</strong> — right-sized boxes/bags, bubble wrap, tape, scissors, markers (clean and undamaged).</li>
+                    <li><strong>Wrap delicate items individually</strong> in tissue or plastic, with the embroidered design visible so the
+                        client can inspect on arrival.</li>
+                    <li><strong>Pack the box</strong> — line the bottom with bubble wrap/paper, stack the wrapped items neatly, and fill voids
+                        so nothing shifts.</li>
+                    <li><strong>Label &amp; document</strong> — client name, order number, and any packing list / invoice inside.</li>
+                    <li><strong>Seal &amp; shake-test</strong> — tape all openings, gently shake; if anything moves, add filler.</li>
+                    <li><strong>Special requests</strong> — gift wrap or branded packaging if requested; "Fragile" labels for fragile goods;
+                        customs forms for international.</li>
+                </ol>
+                <div class="callout callout-tip">
+                    <i class="fas fa-snowflake" aria-hidden="true"></i> <strong>Shipping to Alaska?</strong> Boxes take a rough trip north — bag the items in
+                    plastic before they go in the box (keeps moisture/dirt out if the box gets beat up) and tape the box up well.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             5 · CUSTOMER PICKUPS
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider pickup-theme" id="pickups">
+            <i class="fas fa-handshake" aria-hidden="true"></i> 5 · Customer Pickups &amp; Payments
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-store" aria-hidden="true"></i> When a customer comes to collect</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Stage the box on the Customer Pickup shelf</strong> — boxes are arranged <strong>alphabetically by customer
+                        name</strong>. Note on the order's front page: <em>"Date Stamped: In Customer Pickup."</em></li>
+                    <li><strong>Pull the order in ShopWorks and check the balance</strong> — do they still owe money?</li>
+                    <li><strong>Collect before release.</strong> If there's a balance, take payment before the order leaves. Run the
+                        credit-card terminal (insert / tap / swipe) or take a check. (Already paid online? Just note it and release.)</li>
+                    <li><strong>Record the payment in ShopWorks</strong> so the balance clears to zero.</li>
+                    <li><strong>Close it out</strong> — mark the order picked up / shipped in ShopWorks, note on the front page that the
+                        customer picked up, and have the customer <strong>sign the pickup book</strong>.</li>
+                </ol>
+                <div class="callout callout-warn">
+                    <i class="fas fa-circle-question" aria-hidden="true"></i> <strong>Unsure about a balance or how to apply a payment? Ask Bradley (accounting)
+                    before releasing the order.</strong>
+                </div>
+                <div class="callout callout-info">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i> <strong>Switching a pickup to a shipment?</strong> Let the customer know the freight
+                    amount and add the shipping to the invoice.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             6 · CLOSING THE DAY
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider close-theme" id="closing">
+            <i class="fas fa-clipboard-check" aria-hidden="true"></i> 6 · Closing the Day
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-right-from-bracket" aria-hidden="true"></i> End-of-day routine</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Import carrier tracking.</strong> In ShopWorks, run <strong>Import via ODBC → Today Only</strong>. This pulls
+                        the day's <strong>FedEx</strong> tracking onto the work orders. We don't have UPS integrated, so the
+                        <strong>"UPS didn't import" error is normal</strong> — click past it. Verify by opening a work order and checking the
+                        <strong>Shipping</strong> tab.</li>
+                    <li><strong>Check the Customer Pickup clipboard / shelf</strong> for anything missed.</li>
+                    <li><strong>Stage all outgoing packages</strong> so the carrier can pick them up.</li>
+                    <li><strong>Tidy the area</strong> and clock out in TimeClick.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="ref-card checklist-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-square-check" aria-hidden="true"></i> Daily checklist</h3>
+                <span class="btn-link badge-static"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saves in your browser</span>
+            </div>
+            <div class="ref-card-body">
+                <div class="checklist-grid" data-checklist="daily">
+                    <label class="checklist-item"><input type="checkbox"><span>Checked email &amp; Slack; reviewed the day's ship schedule</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Received all deliveries against POs — counted same day</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Shipped rushes &amp; past-dues first</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Customer pickups: checked balance &amp; took payment</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Imported tracking (ShopWorks: Import via ODBC → Today Only)</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Cleared the Customer Pickup shelf / clipboard</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Area tidy; packages staged for UPS pickup</span></label>
+                </div>
+                <button class="checklist-reset" type="button" data-reset="daily">Reset checklist</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             7 · SPECIAL SITUATIONS
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider special-theme" id="special">
+            <i class="fas fa-puzzle-piece" aria-hidden="true"></i> 7 · Special Situations
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-location-dot" aria-hidden="true"></i> Shipping address changes mid-process</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>When an address changes after an order is already in production, a printed work order with the wrong address is floating
+                around and must be destroyed.</p>
+                <ul class="bullets">
+                    <li>The sales rep updates the new address in ShopWorks and emails the production + shipping departments to destroy the
+                        old printed work order.</li>
+                    <li><strong>Shipping always re-verifies</strong> that the address in ShopWorks matches the printed work order before
+                        shipping — to be safe.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-rotate-left" aria-hidden="true"></i> Returning samples to SanMar</h3>
+            </div>
+            <div class="ref-card-body">
+                <ul class="bullets">
+                    <li>Enter the order type <strong>"Sample Return to Vendor."</strong></li>
+                    <li>Charge the <strong>6-piece embroidery price</strong> as a <strong>MEMO bill</strong> so it's clear the customer pays
+                        if the sample isn't returned.</li>
+                    <li>The customer may keep the sample <strong>1 week</strong>; we have <strong>30 days</strong> to return it to SanMar.
+                        The customer ships it back to us and pays the freight.</li>
+                    <li><strong>Return the entire sample order</strong> — do not pull pieces to add to the order — and get an
+                        <strong>RA number</strong> from your SanMar rep first.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-calendar-days" aria-hidden="true"></i> Forma Construction — bi-weekly shipping</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>A standing program for a single customer — not part of the daily flow.</p>
+                <ul class="bullets">
+                    <li>Orders from the 1st–10th ship on the <strong>15th</strong>; orders from the 11th–25th ship on the <strong>30th</strong>
+                        (last day of month).</li>
+                    <li>Bag &amp; label each employee's order separately by name (e.g., "Jill Williams: 1 fleece pullover").</li>
+                    <li>Combine all individual orders into one master box with a detailed packing list.</li>
+                    <li>Ship via the cheapest reliable carrier (FedEx or USPS) and bill Forma the <strong>exact freight, no markup</strong>.</li>
+                    <li>Email the tracking number + a copy of the packing list to <strong>Jennifer Harper</strong>.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-print" aria-hidden="true"></i> Screen prints — coordinate with Ed</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Ed at <strong>L&amp;P Printing</strong> runs our screen prints. You prep, pack, log, and count — <strong>Erik</strong>
+                drives them over and brings them back.</p>
+                <ul class="bullets">
+                    <li>Prep &amp; pack the screen-print orders; make sure every piece is packed.</li>
+                    <li>Count all pieces and boxes before they leave so you have a starting number.</li>
+                    <li>Log everything in the screen-print log (with Erik): what's at Ed's and how many boxes. Coordinate due dates with Ed
+                        and tell Erik when orders are ready for pickup.</li>
+                    <li>When orders return, count every piece again and reconcile the log so nothing is missing.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-box-open" aria-hidden="true"></i> UPS missing / damaged boxes &amp; FOB terms</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Custom apparel can't be returned or restocked, so every lost or damaged shipment is a complete loss. We ship
+                <strong>FOB Shipping Point, Milton, WA</strong> — title and risk transfer to the buyer when the carrier accepts the shipment,
+                so the customer technically owns the goods in transit. Even so, we usually help make it right.</p>
+                <ul class="bullets">
+                    <li><strong>Document before it ships:</strong> photograph completed items with the order sheet, close-ups of the
+                        print/embroidery, the items going into the box, and the sealed box with the label visible. This proves condition and
+                        is required for claims.</li>
+                    <li><strong>If a box is lost or damaged:</strong> photograph everything (item, packaging, the 1Z label, the outer box) and
+                        give it to <strong>Bradley</strong>, who files the carrier claim.</li>
+                    <li><strong>Deadlines:</strong> UPS allows <strong>60 days</strong> to file loss/damage claims (but file within <strong>~30 days</strong> for the best success rate); <strong>15 days</strong>
+                        for late-delivery (service-guarantee) refunds. UPS's default liability is only <strong>$100/package</strong>.</li>
+                </ul>
+                <table class="ref-table compact-table">
+                    <thead><tr><th>Order value</th><th>What we do</th></tr></thead>
+                    <tbody>
+                        <tr><td>Under $200</td><td>Absorb the loss, replace immediately (admin time exceeds recovery)</td></tr>
+                        <tr><td>$200 – $500</td><td>Case-by-case — file if documentation is easy</td></tr>
+                        <tr><td>Over $500</td><td>Always file a claim; add declared value at shipment. Resolve the customer right away — don't let the claim delay them</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             8 · VACATION / COVERAGE HAND-OFF
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider handoff-theme" id="handoff">
+            <i class="fas fa-people-arrows" aria-hidden="true"></i> 8 · Vacation / Coverage Hand-Off
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-clipboard-user" aria-hidden="true"></i> Before the clerk leaves</h3>
+            </div>
+            <div class="ref-card-body">
+                <div class="callout callout-key">
+                    <i class="fas fa-star" aria-hidden="true"></i> <strong>Main priority:</strong> the departing clerk sits with their cover (e.g., Ruthie),
+                    finishes pending tasks together, and walks the checklist below to confirm everything's covered.
+                </div>
+                <div class="callout callout-info">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i> <strong>Requesting the time off is a separate, company-wide process.</strong>
+                    Submit vacation requests <strong>in writing two weeks ahead</strong> and follow the approval / coverage workflow in the
+                    <a href="/pages/policy-detail.html?id=vacation-scheduling-policy-2026">Vacation Scheduling Policy (2026)</a> and
+                    <a href="/pages/policy-detail.html?id=hb-13-leave-time-off">Employee Handbook Ch. 13 — Leave &amp; Time Off</a>
+                    (the authority on PTO). The steps below are the <em>dock-specific</em> hand-off; for the company-wide coverage rules see
+                    <a href="/pages/policy-detail.html?id=team-coverage-during-absences">Team Coverage During Absences</a>.
+                </div>
+                <ol class="steps">
+                    <li><strong>Set every login</strong> for the cover — Computer/PC, Stamps.com, ShipStation, UPS, ShopWorks (see
+                        <a href="#systems">Systems &amp; Logins</a>).</li>
+                    <li><strong>Confirm payments are covered</strong> — how to run the credit-card terminal and record a payment in ShopWorks.</li>
+                    <li><strong>Walk the floor together</strong> — Customer Pickup shelf, production staging, hold / return shelf, and supplies.</li>
+                    <li><strong>Document open items</strong> — pending shipments, expected deliveries with dates, and anything that needs
+                        follow-up. Hand off each open task to a specific person.</li>
+                    <li><strong>Set an out-of-office reply</strong> directing inquiries to the covering clerk.</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="ref-card checklist-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-list-check" aria-hidden="true"></i> Hand-off checklist</h3>
+                <span class="btn-link badge-static"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saves in your browser</span>
+            </div>
+            <div class="ref-card-body">
+                <div class="checklist-grid" data-checklist="handoff">
+                    <label class="checklist-item"><input type="checkbox"><span>Vacation requested in writing two weeks ahead (per Vacation Scheduling Policy 2026)</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>All pending shipments &amp; receipts completed or handed off</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Open items documented (refs, expected dates, follow-ups), each assigned to a person</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Logins set for cover: PC, ShopWorks, Stamps.com, ShipStation, UPS</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Cover knows how to take &amp; record payments (terminal + ShopWorks)</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Walked the floor: pickup shelf, production staging, hold/return shelf, supplies</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Out-of-office reply set, pointing to the covering clerk</span></label>
+                </div>
+                <button class="checklist-reset" type="button" data-reset="handoff">Reset checklist</button>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> The other 30% — stop and ask the cover, don't wing it</h3>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table">
+                    <thead><tr><th>Situation</th><th>What to do</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>No PO on a box</strong></td><td>Don't receive it. Set it aside and ask Bradley.</td></tr>
+                        <tr><td><strong>Damaged / missing in transit</strong></td><td>Photograph everything; Bradley handles the carrier claim.</td></tr>
+                        <tr><td><strong>SanMar sample return</strong></td><td>Contact your SanMar rep (Cherie) for a Return Authorization (RA). Return the whole order.</td></tr>
+                        <tr><td><strong>DTG ink from Kornit</strong></td><td>Mark each bottle with PO # + date, store oldest-in-front, tell Brian.</td></tr>
+                        <tr><td><strong>Screen-print runs</strong></td><td>Erik drives orders to/from Ed at L&amp;P Printing — coordinate with Erik.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             9 · SYSTEMS & LOGINS
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider close-theme" id="systems">
+            <i class="fas fa-desktop" aria-hidden="true"></i> 9 · Systems &amp; Logins
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-laptop-code" aria-hidden="true"></i> The software you'll use</h3>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table">
+                    <thead><tr><th>System</th><th>What it's for</th></tr></thead>
+                    <tbody>
+                        <tr><td><strong>ShopWorks</strong> (OnSite)</td><td>The main program — orders, inventory, receiving, shipping updates, tracking.</td></tr>
+                        <tr><td><strong>Stamps.com</strong></td><td>USPS labels (First Class / Priority Mail). Live postage on Erik's card.</td></tr>
+                        <tr><td><strong>UPS WorldShip</strong></td><td>UPS labels &amp; tracking.</td></tr>
+                        <tr><td><strong>FedEx Ship Manager</strong></td><td>FedEx labels &amp; tracking (when applicable).</td></tr>
+                        <tr><td><strong>ShipStation</strong></td><td>Online-store (InkSoft / Shopify) orders; merges carriers. Works with the DYMO scale.</td></tr>
+                        <tr><td><strong>Slack</strong></td><td>Quick questions and daily department updates.</td></tr>
+                        <tr><td><strong>TimeClick</strong></td><td>Clock in / out and track hours.</td></tr>
+                        <tr><td><strong>Zoom</strong></td><td>Virtual meetings (weekly team check-ins).</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-key" aria-hidden="true"></i> New-hire / coverage login checklist</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>Have logins ready before day one (or before the cover starts):</p>
+                <ul class="bullets cols-2">
+                    <li>Windows / PC</li>
+                    <li>OnSite / ShopWorks</li>
+                    <li>Google account (Shipping)</li>
+                    <li>Email / Outlook</li>
+                    <li>Slack</li>
+                    <li>Stamps.com / USPS</li>
+                    <li>UPS account</li>
+                    <li>FedEx.com</li>
+                    <li>ShipStation.com</li>
+                    <li>SanMar</li>
+                    <li>JotForm.com</li>
+                    <li>Canva.com</li>
+                    <li>SweetProcess.com</li>
+                    <li>TimeClick</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             10 · WHO TO CALL
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider handoff-theme" id="contacts">
+            <i class="fas fa-address-book" aria-hidden="true"></i> 10 · Who to Call
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-body">
+                <div class="contacts">
+                    <div class="contact-card"><div class="who">Bradley Wright</div><div class="role">Accounting / Purchasing / E-Commerce</div><div class="for">Purchasing, no-PO boxes, carrier claims, pickup balances</div></div>
+                    <div class="contact-card"><div class="who">Brian Beardsley</div><div class="role">DTG Supervisor</div><div class="for">DTG ink &amp; supplies (Kornit)</div></div>
+                    <div class="contact-card"><div class="who">Ruthie Nhoung</div><div class="role">Production Manager</div><div class="for">Production / embroidery; covers Shipping &amp; Receiving</div></div>
+                    <div class="contact-card"><div class="who">Erik Mickelson</div><div class="role">Operations Manager (COO)</div><div class="for">Screen-print runs, Kornit ink orders &amp; anything else</div></div>
+                    <div class="contact-card"><div class="who">Cherie @ SanMar</div><div class="role">SanMar Rep</div><div class="for">Return Authorizations (RAs)</div></div>
+                    <div class="contact-card"><div class="who">Ed @ L&amp;P Printing</div><div class="role">Screen-Print Vendor</div><div class="for">Screen-print due dates</div></div>
+                    <div class="contact-card"><div class="who">Jennifer Harper</div><div class="role">Forma Construction</div><div class="for">Bi-weekly Forma shipment tracking + packing list</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sources -->
+        <div class="sources-note">
+            <i class="fas fa-book" aria-hidden="true"></i> <strong>Sources.</strong> Compiled from NWCA's Shipping &amp; Receiving procedures
+            (SweetProcess, 2019–2026): Receiving SOP, Receiving Incoming Products with POs (2025), Receiving DTG Ink from Kornit (2025),
+            SOP Receiving Non-Garment Supplies (2025), Checklist: Shipping Procedure, Stamps.com tips, Packing, Customer Pickup procedure,
+            Forma Construction Bi-Weekly Shipping, Samples Returning to SanMar, UPS Missing Box or Items (2026, FOB &amp; claims), the
+            Shipping &amp; Receiving Handbook (2025), and the Fill-In Cheat Sheet. Most of these are now consolidated into the
+            <a href="/pages/policy-detail.html?id=shipping-receiving-handbook">Shipping &amp; Receiving Handbook</a>,
+            <a href="/pages/policy-detail.html?id=receiving-procedures">Receiving Procedures</a>, and
+            <a href="/pages/policy-detail.html?id=shipping-procedures">Shipping Procedures</a> policies in the Hub. Defers to the
+            Employee Handbook on all HR / PTO matters.
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            <p>
+                <a href="/staff-dashboard.html#training"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Training Hub</a>
+                &nbsp;&middot;&nbsp;
+                <a href="/staff-dashboard.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Staff Dashboard</a>
+            </p>
+            <p>Northwest Custom Apparel · Shipping &amp; Receiving Clerk Training Guide</p>
+        </div>
+    </main>
+
+    <button class="back-to-top" type="button" data-action="top" aria-label="Back to top"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+
+    <!-- Scripts -->
+    <script src="/training/shipping-receiving-guide.js"></script>
+</body>
+</html>

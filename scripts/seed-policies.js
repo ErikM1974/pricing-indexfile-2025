@@ -55,6 +55,18 @@ const SEED = [
         Status: 'Published',
         Sort_Order: 110
     },
+    {
+        Policy_ID: 'shipping-receiving-clerk-guide',
+        Category: 'Operations',
+        Title: 'Shipping & Receiving Clerk Guide',
+        Summary: 'How we run the dock — receiving against POs, shipping by priority, packing, customer pickups, closing the day in ShopWorks, special situations, and covering the role on vacation. Defers to the Employee Handbook on all HR/PTO matters.',
+        Body_HTML: '',
+        External_URL: '/training/shipping-receiving-guide.html',
+        Owner_Name: 'Erik M.',
+        Owner_Email: 'erik@nwcustomapparel.com',
+        Status: 'Published',
+        Sort_Order: 105
+    },
 
     // Seven draft skeletons — files don't exist; Erik authors via TipTap.
     // Body_HTML carries a starter outline so the editor opens with structure.
