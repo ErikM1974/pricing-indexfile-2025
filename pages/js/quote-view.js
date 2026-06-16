@@ -3832,6 +3832,33 @@ class QuoteViewPage {
     // Phase 4c — Status grid, Notes, Shipping panels
     // ====================================================================
 
+    // ShopWorks sts_* code → display state, mirroring exactly what the OnSite
+    // order screen shows. Encoding (memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md:45):
+    //   0 = No · 1 = Yes · .5 = Partial · 8 = N/A · 222 = N/A.
+    // Empty/missing → "—" (not yet synced). Unknown non-empty code → n/a (never a
+    // false Yes/No). KEEP IN SYNC with dashboards/quote-management.html mapSwStatus.
+    _mapSwStatus(raw) {
+        if (raw == null || String(raw).trim() === '') return { state: 'unknown', label: '—' };
+        const s = String(raw).trim().toLowerCase();
+        if (s === '1' || s === 'yes' || s === 'y' || s === 'true')  return { state: 'yes',     label: 'Yes' };
+        if (s === '0' || s === 'no'  || s === 'n' || s === 'false') return { state: 'no',      label: 'No' };
+        if (s === '.5' || s === '0.5' || s === 'partial')           return { state: 'partial', label: 'Partial' };
+        if (s === '8' || s === '222' || s === 'n/a' || s === 'na')  return { state: 'na',      label: 'n/a' };
+        return { state: 'na', label: 'n/a' };
+    }
+
+    // Combine two ShopWorks fields into one milestone (e.g. Purchase Received =
+    // Purchased AND Received): No wins if either is No; else Partial if either is
+    // Partial; else Yes only if BOTH Yes; else n/a if any is n/a; else "—".
+    _combineSwStatus(parts) {
+        const states = parts.map(p => p.state);
+        if (states.includes('no'))            return { state: 'no',      label: 'No' };
+        if (states.includes('partial'))       return { state: 'partial', label: 'Partial' };
+        if (states.every(s => s === 'yes'))   return { state: 'yes',     label: 'Yes' };
+        if (states.includes('na'))            return { state: 'na',      label: 'n/a' };
+        return { state: 'unknown', label: '—' };
+    }
+
     _renderStatusGrid(order) {
         const section = document.getElementById('sw-status-section');
         const grid = document.getElementById('sw-status-grid');
@@ -3857,61 +3884,22 @@ class QuoteViewPage {
             { label: 'Paid',              field: 'sts_Paid' },
         ];
 
-        // Shipped-tile truthing (Erik 2026-06-16). A ShopWorks substatus code
-        // alone (e.g. sts_Shipped="8") is NOT proof that a carrier shipment left
-        // the building — "8" is an OnSite multi-state placeholder that the old
-        // any-nonzero rule wrongly read as "Yes" on orders that never shipped
-        // (date_Shippied null, zero outbound tracking). Pickup orders never ship
-        // at all. So the Shipped tile now:
-        //   - Pickup  → relabels to "Ready for Pickup", driven by the fulfilled
-        //               flag (sts_Shipped non-zero in ShopWorks).
-        //   - Else    → reads "Yes" on the documented canonical sts_Shipped="1"
-        //               (per memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE the codes
-        //               are 0=No,1=Yes,.5=Partial,8=N/A,222=N/A — so the "8" N/A
-        //               sentinel is rejected) OR real evidence of an outbound
-        //               shipment: a ship date (order.date_Shippied) OR tracking.
-        // KEEP IN SYNC with the dashboard pill (dashboards/quote-management.html
-        // renderMilestonePills / isShippedForDisplay) per the surface-sync rule.
-        const shipMethod = (this._currentSnapshot?.pushed?.ShippingAddresses?.[0]?.ShipMethod
-            || this.quoteData?.ShipMethod
-            || this.fullData?.originalSubmission?.ship?.method
-            || '').toString();
-        const isPickup = /pickup|will\s*call/i.test(shipMethod);
-        const hasShipDate = !!(order?.date_Shippied || order?.date_Shipped);
-        const outboundTracking = this._currentSnapshot?.tracking;
-        const hasOutboundTracking = !!(this.quoteData?.TrackingNumber && String(this.quoteData.TrackingNumber).trim())
-            || (Array.isArray(outboundTracking) && outboundTracking.length > 0);
-
-        const cells = STATUS_FIELDS.map(({ label, field, composite }) => {
-            let yes;
-            let displayLabel = label;
-            if (field === 'sts_Shipped') {
-                if (isPickup) {
-                    displayLabel = 'Ready for Pickup';
-                    yes = this._isStatusYes(order?.sts_Shipped);
-                } else {
-                    const sts = String(order?.sts_Shipped == null ? '' : order.sts_Shipped).trim().toLowerCase();
-                    const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
-                    yes = stsConfirmed || hasShipDate || hasOutboundTracking;
-                }
-            } else if (field === 'sts_Produced') {
-                // Same 8=N/A trap as Shipped: trust the canonical "1"=Yes OR a real
-                // production date, never a bare non-zero code. KEEP IN SYNC with
-                // dashboards/quote-management.html isProducedForDisplay.
-                const sts = String(order?.sts_Produced == null ? '' : order.sts_Produced).trim().toLowerCase();
-                const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
-                yes = stsConfirmed || !!(order?.date_Produced);
-            } else if (composite) {
-                yes = composite.every(f => this._isStatusYes(order?.[f]));
-            } else {
-                yes = this._isStatusYes(order?.[field]);
-            }
-            const tone = yes ? 'yes' : 'no';
-            const display = yes ? 'Yes' : 'No';
+        // Mirror ShopWorks status FAITHFULLY (Erik 2026-06-16). Per
+        // memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md:45 every sts_* uses:
+        //   0 = No, 1 = Yes, .5 = Partial, 8 = N/A, 222 = N/A.
+        // ShopWorks itself shows Yes / No / n/a per milestone (a Customer Pickup
+        // order reads Ship: n/a, Prod: n/a), so the tile shows the SAME state — not
+        // a forced Yes/No, and not the earlier "Ready for Pickup" / ship-date guess
+        // (which did NOT match the OnSite order screen). Empty → "—".
+        // KEEP IN SYNC with dashboards/quote-management.html mapSwStatus.
+        const cells = STATUS_FIELDS.map(({ label, composite, field }) => {
+            const st = composite
+                ? this._combineSwStatus(composite.map(f => this._mapSwStatus(order?.[f])))
+                : this._mapSwStatus(order?.[field]);
             return `
                 <div class="sw-status-cell">
-                    <div class="sw-status-cell-label">${this.escapeHtml(displayLabel)}</div>
-                    <div class="sw-status-cell-value sw-status-cell-value--${tone}">${display}</div>
+                    <div class="sw-status-cell-label">${this.escapeHtml(label)}</div>
+                    <div class="sw-status-cell-value sw-status-cell-value--${st.state}">${this.escapeHtml(st.label)}</div>
                 </div>
             `;
         }).join('');

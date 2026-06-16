@@ -335,6 +335,19 @@ body {
     color: #94a3b8;
     border-color: #e2e8f0;
 }
+/* ShopWorks Partial (.5) and N/A (8/222) / unknown ("—") states (Erik 2026-06-16)
+   so dashboard pills mirror the OnSite order screen, not a forced done/pending. */
+.milestone-pill--partial {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+.milestone-pill--na,
+.milestone-pill--unknown {
+    background: #f8fafc;
+    color: #cbd5e1;
+    border-color: #e2e8f0;
+}
 .milestone-na {
     color: #94a3b8;
     font-style: italic;
