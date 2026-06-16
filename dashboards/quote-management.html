@@ -545,10 +545,15 @@
             let order;
             try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
             catch (_) { return false; }
+            // Paid=n/a must ALSO not block: a $0 order (e.g. OF-0049/50/51) shows
+            // Paid=n/a but is fully shipped+invoiced → it's done. Invoiced stays a
+            // strict Yes (the financial close) so an all-n/a order can't falsely
+            // complete. (Erik 2026-06-16)
             const ship = mapSwStatus(order.sts_Shipped).state;
+            const paid = mapSwStatus(order.sts_Paid).state;
             return (ship === 'yes' || ship === 'na')
                 && mapSwStatus(order.sts_Invoiced).state === 'yes'
-                && mapSwStatus(order.sts_Paid).state === 'yes';
+                && (paid === 'yes' || paid === 'na');
         }
 
         // ── Inbound vendor (SanMar) shipment indicator (2026-06-15) ──
