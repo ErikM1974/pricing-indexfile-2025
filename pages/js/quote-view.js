@@ -3575,7 +3575,22 @@ class QuoteViewPage {
                     );
                     // First design uses the order's id_Design; additional ones use ExtDesignID or "—"
                     const dispId = (i === 0 && idDesign) ? idDesign : (d?.id_Design || d?.ExtDesignID || '—');
-                    const dispName = d?.DesignName || order.DesignName || '(no name)';
+                    // Name source (Erik 2026-06-16): for the PRIMARY design (i===0)
+                    // prefer the LIVE ShopWorks name (order.DesignName from /v1/orders)
+                    // over the frozen push-time name (d.DesignName from /order-pull).
+                    // pushed.Designs[0] carries the generic placeholder we pushed at
+                    // order creation (e.g. "DTG0613-8320 - Customer Logo"); when an
+                    // operator renames the design in ShopWorks (e.g. "40th Birthday
+                    // National Lampoons (Full Front)"), that edit lands in /v1
+                    // order.DesignName but the panel was showing the stale pushed name.
+                    // This mirrors the dispId logic above, which already treats
+                    // pushed.Designs[0] as the order's primary design. Additional
+                    // rows (i>0) keep their own pushed names (order.DesignName only
+                    // describes the primary). Falls back to the pushed name when the
+                    // live name is absent, so legacy/never-synced quotes are unchanged.
+                    const dispName = (i === 0)
+                        ? (order.DesignName || d?.DesignName || '(no name)')
+                        : (d?.DesignName || order.DesignName || '(no name)');
                     return `
                         <tr>
                             <td class="sw-designs-id">${this.escapeHtml(String(dispId))}</td>
@@ -3842,15 +3857,53 @@ class QuoteViewPage {
             { label: 'Paid',              field: 'sts_Paid' },
         ];
 
+        // Shipped-tile truthing (Erik 2026-06-16). A ShopWorks substatus code
+        // alone (e.g. sts_Shipped="8") is NOT proof that a carrier shipment left
+        // the building — "8" is an OnSite multi-state placeholder that the old
+        // any-nonzero rule wrongly read as "Yes" on orders that never shipped
+        // (date_Shippied null, zero outbound tracking). Pickup orders never ship
+        // at all. So the Shipped tile now:
+        //   - Pickup  → relabels to "Ready for Pickup", driven by the fulfilled
+        //               flag (sts_Shipped non-zero in ShopWorks).
+        //   - Else    → reads "Yes" on the documented canonical sts_Shipped="1"
+        //               (per memory/MANAGEORDERS_CRM_CAPABILITY_REFERENCE the codes
+        //               are 0=No,1=Yes,.5=Partial,8=N/A,222=N/A — so the "8" N/A
+        //               sentinel is rejected) OR real evidence of an outbound
+        //               shipment: a ship date (order.date_Shippied) OR tracking.
+        // KEEP IN SYNC with the dashboard pill (dashboards/quote-management.html
+        // renderMilestonePills / isShippedForDisplay) per the surface-sync rule.
+        const shipMethod = (this._currentSnapshot?.pushed?.ShippingAddresses?.[0]?.ShipMethod
+            || this.quoteData?.ShipMethod
+            || this.fullData?.originalSubmission?.ship?.method
+            || '').toString();
+        const isPickup = /pickup|will\s*call/i.test(shipMethod);
+        const hasShipDate = !!(order?.date_Shippied || order?.date_Shipped);
+        const outboundTracking = this._currentSnapshot?.tracking;
+        const hasOutboundTracking = !!(this.quoteData?.TrackingNumber && String(this.quoteData.TrackingNumber).trim())
+            || (Array.isArray(outboundTracking) && outboundTracking.length > 0);
+
         const cells = STATUS_FIELDS.map(({ label, field, composite }) => {
-            const yes = composite
-                ? composite.every(f => this._isStatusYes(order?.[f]))
-                : this._isStatusYes(order?.[field]);
+            let yes;
+            let displayLabel = label;
+            if (field === 'sts_Shipped') {
+                if (isPickup) {
+                    displayLabel = 'Ready for Pickup';
+                    yes = this._isStatusYes(order?.sts_Shipped);
+                } else {
+                    const sts = String(order?.sts_Shipped == null ? '' : order.sts_Shipped).trim().toLowerCase();
+                    const stsConfirmed = sts === '1' || sts === 'yes' || sts === 'y' || sts === 'true';
+                    yes = stsConfirmed || hasShipDate || hasOutboundTracking;
+                }
+            } else if (composite) {
+                yes = composite.every(f => this._isStatusYes(order?.[f]));
+            } else {
+                yes = this._isStatusYes(order?.[field]);
+            }
             const tone = yes ? 'yes' : 'no';
             const display = yes ? 'Yes' : 'No';
             return `
                 <div class="sw-status-cell">
-                    <div class="sw-status-cell-label">${this.escapeHtml(label)}</div>
+                    <div class="sw-status-cell-label">${this.escapeHtml(displayLabel)}</div>
                     <div class="sw-status-cell-value sw-status-cell-value--${tone}">${display}</div>
                 </div>
             `;
