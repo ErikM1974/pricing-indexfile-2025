@@ -1896,6 +1896,19 @@ body {
     color: #7f1d1d;
     border-color: #fca5a5;
 }
+/* ShopWorks 3rd/4th states (Erik 2026-06-16): Partial (.5), N/A (8/222), and
+   unknown/not-yet-synced ("—") — mirror the OnSite order screen, neutral tones. */
+.sw-status-cell-value--partial {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fcd34d;
+}
+.sw-status-cell-value--na,
+.sw-status-cell-value--unknown {
+    background: #f1f5f9;
+    color: #64748b;
+    border-color: #cbd5e1;
+}
 
 /* Notes To Production — numbered list mirroring the ShopWorks PDF */
 .sw-notes-section {
