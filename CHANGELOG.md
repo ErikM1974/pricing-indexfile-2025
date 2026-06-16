@@ -1,3 +1,7 @@
+## v2026.06.16.5 (2026.06.16)
+
+- Deploy v2026.06.16.5: move SanMar inbound block under Order Status (staff quote view)
+
 ## v2026.06.16.4 (2026.06.16)
 
 - Deploy v2026.06.16.4: 6 files (quote-management.css,quote-management.html,LESSONS_LEARNED.md,...)
