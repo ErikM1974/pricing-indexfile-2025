@@ -280,7 +280,19 @@
             <section id="sw-status-section" class="sw-status-section" style="display: none;">
                 <h2>Order Status</h2>
                 <div class="sw-status-grid" id="sw-status-grid">
-                    <!-- 10 cells populated by JS — each cell: label + Yes/No pill -->
+                    <!-- 5 cells populated by JS — each cell: label + state (Yes/No/Partial/n/a) -->
+                </div>
+            </section>
+
+            <!-- Blank Goods — INBOUND vendor (SanMar) shipment. Sits RIGHT UNDER
+                 Order Status (Erik 2026-06-16) because the inbound blanks ARE the
+                 backstory of the "Purchase Received" milestone — staff see the status
+                 and where the blanks are in one place. Distinct from the OUTBOUND
+                 Shipping section further down (us → customer). Staff-only overlay. -->
+            <section id="sw-vendor-shipment-section" class="sw-vendor-section" style="display: none;">
+                <h2>Blank Goods — from SanMar</h2>
+                <div class="sw-vendor-body" id="sw-vendor-body">
+                    <span class="sw-vendor-loading">Checking SanMar…</span>
                 </div>
             </section>
 
@@ -416,16 +428,6 @@
                     <span class="sw-shipping-mode-pill" data-mode="single">Single Address</span>
                     <span class="sw-shipping-mode-pill" data-mode="multiple">Multiple Addresses</span>
                     <span class="sw-shipping-mode-pill" data-mode="none">No Shipping</span>
-                </div>
-            </section>
-
-            <!-- Blank Goods — INBOUND vendor (SanMar) shipment (2026-06-15).
-                 Distinct from the outbound Shipping section above (us → customer):
-                 this shows whether the blank garments shipped from SanMar → us. -->
-            <section id="sw-vendor-shipment-section" class="sw-vendor-section" style="display: none;">
-                <h2>Blank Goods — from SanMar</h2>
-                <div class="sw-vendor-body" id="sw-vendor-body">
-                    <span class="sw-vendor-loading">Checking SanMar…</span>
                 </div>
             </section>
 
