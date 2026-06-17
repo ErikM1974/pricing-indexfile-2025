@@ -1,3 +1,7 @@
+## v2026.06.17.4 (2026.06.17)
+
+- Deploy v2026.06.17.4: fix quote-view req-ship/drop-dead/ship-date off-by-one (UTC-midnight cal dates)
+
 ## v2026.06.17.3 (2026.06.17)
 
 - Deploy v2026.06.17.3: Due column = requested ship date only (drop-dead omitted — not in MO API)
