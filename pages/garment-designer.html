@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-Shirt Designer — Northwest Custom Apparel</title>
+<!--
+  ============================================================
+  NWCA Art File Viewer
+  Opens & previews: .ai (PDF-compatible), .psd, .psb, .cdr (embedded
+  preview), .pdf, and common images (png/jpg/gif/webp/svg).
+  100% client-side — files are never uploaded to a server.
+
+  To embed on your site:
+    <iframe src="/art-file-viewer.html" style="width:100%;height:700px;border:0;"></iframe>
+  or link to it directly.
+
+  Brand colors: tweak the CSS variables in :root below.
+  ============================================================
+-->
+<script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=1">
+</head>
+<body class="customer-easy clean-layout left-controls-layout">
+
+<header>
+  <div class="logo-badge">NW</div>
+  <div class="titles">
+    <h1>NWCA Easy Shirt Designer</h1>
+    <div class="sub">Northwest Custom Apparel · Front, back, color, spin, proof</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="privacy-note"><span class="wow-tag">WOW Mode</span><br><b>Private &amp; secure:</b> files open right in your browser.</div>
+</header>
+
+<main>
+  <!-- File list -->
+  <aside id="sidebar">
+    <div class="side-head">
+      <span>Artwork</span>
+      <button class="tbtn" style="padding:3px 8px;font-size:11px;" onclick="pickFiles()">+ Add</button>
+    </div>
+    <div id="fileList"></div>
+    <div id="leftControlsMount">
+      <div class="left-controls-head">Artwork controls</div>
+      <div class="left-controls-note">Use these controls to place, size, and fine-tune the active logo or DST embroidery file.</div>
+    </div>
+  </aside>
+
+  <!-- Viewer -->
+  <div id="viewerCol">
+    <div id="toolbar" class="visible">
+      <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
+      <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
+      <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
+      <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
+      <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
+      <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
+      <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
+      <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
+      <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects best print method">
+        <option value="cotton" selected>Cotton shirt</option>
+        <option value="blend">Cotton/poly blend</option>
+        <option value="polyester">Polyester</option>
+        <option value="nylon">Nylon</option>
+        <option value="unknown">Fabric unknown</option>
+      </select>
+      <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
+      <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
+
+      <div class="easy-hidden-tools" aria-hidden="true">
+        <button class="tbtn" onclick="pickFiles()">📂 Open files</button>
+        <button class="tbtn" onclick="zoomBy(0.8)">−</button>
+        <span id="zoomLabel">100%</span>
+        <button class="tbtn" onclick="zoomBy(1.25)">+</button>
+        <button class="tbtn" onclick="zoom100()">1:1</button>
+        <button class="tbtn" id="flipBtn" onclick="toggleFlip()">⇄</button>
+        <button class="tbtn" id="knockBtn" onclick="toggleKnockout()">⬜ White BG</button>
+        <button class="tbtn" id="eraseBtn" onclick="toggleEraser()">🧽 Erase white</button>
+        <button class="tbtn" id="eraseAllBtn" onclick="eraseAllWhite()" style="display:none">Erase ALL white</button>
+        <span class="bgswatches" id="bgSwatches"><span class="lbl">BG:</span></span>
+        <input type="color" id="bgCustom" value="#3a6ea5">
+        <button class="tbtn" id="eyeBtn" onclick="toggleEyedrop()">💧</button>
+        <span id="eyeChip"><span class="dot" id="eyeDot"></span><span id="eyeHex"></span></span>
+        <div id="pageNav"><button class="tbtn" id="prevPage" onclick="changePage(-1)">‹</button><span id="pageLabel">Page 1 / 1</span><button class="tbtn" id="nextPage" onclick="changePage(1)">›</button></div>
+        <button class="tbtn" id="mockBtn" onclick="toggleMockup()">👕 Mockup</button>
+        <button class="tbtn" id="sideFrontBtn" onclick="setPrintSide('front')">Front</button>
+        <button class="tbtn" id="sideBackBtn" onclick="setPrintSide('back')">Back</button>
+        <button class="tbtn" id="sideBothBtn" onclick="setPrintSide('both')">Both</button>
+        <button class="tbtn" id="viewFlipBtn" onclick="flipView()">◫ Both sides</button>
+        <button class="tbtn" id="photoBtn" onclick="pickShirtPhoto()">📷 Shirt photo</button>
+        <button class="tbtn" id="specBtn" onclick="printSpecSheet()">📋 Spec sheet</button>
+        <button class="tbtn" id="fsBtn" onclick="toggleFullscreen()">⛶</button>
+        <button class="tbtn" id="infoToggle" onclick="toggleInfo()">ℹ️ Info</button>
+        <button class="tbtn" id="emailBtn" onclick="emailUs()">✉ Email us</button>
+      </div>
+    </div>
+
+    <div id="colorDrawer"></div>
+    <div id="stageWrap">
+      <div id="stage">
+        <div id="canvasHolder"></div>
+        <div class="stage-empty-note" id="stageEmptyNote">Use <b>Add Front Logo</b> or <b>Add Back Logo</b>. Artwork will stay on the shirt model automatically.</div>
+        <div id="stageMsg">
+          <div class="spinner" id="msgSpinner"></div>
+          <div class="msg-title" id="msgTitle">Loading…</div>
+          <div class="msg-body" id="msgBody"></div>
+        </div>
+        <!-- Designer landing -->
+        <div id="dropzone" class="easy-landing">
+          <div class="easy-hero">
+            <div class="easy-hero-card">
+              <h2>Start with the shirt.</h2>
+              <p class="lead">Upload artwork directly to the front or back. Then pick the shirt color, adjust placement, spin it, and print a customer proof.</p>
+              <canvas id="landingPreview" style="border-radius:14px;box-shadow:0 6px 24px rgba(20,40,10,.12);"></canvas>
+            </div>
+            <div class="easy-hero-card">
+              <h2>What are you adding?</h2>
+              <div class="easy-upload-grid">
+                <div class="easy-upload-card" onclick="pickSide('front')">
+                  <strong>⬆ Front Logo</strong>
+                  <span>Use this for left chest, full front, or center chest artwork.</span>
+                </div>
+                <div class="easy-upload-card" onclick="pickSide('back')">
+                  <strong>⬆ Back Logo</strong>
+                  <span>Use this for full back, shoulder blade, or event graphics.</span>
+                </div>
+              </div>
+              <div class="easy-step-strip">
+                <div><b>1. Add Art</b>Front or back.</div>
+                <div><b>2. Pick Color</b>Choose shirt color.</div>
+                <div><b>3. Place It</b>Size and center.</div>
+                <div><b>4. Approve</b>Spin and proof.</div>
+              </div>
+              <p style="margin-top:14px;font-size:12px;color:var(--text-dim);line-height:1.5;">PNG, JPG, SVG, WEBP, AI, PSD, CDR, and PDF files open right in the browser. Nothing uploads to a server.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info panel -->
+      <aside id="infoPanel">
+        <div class="side-head">Designer controls</div>
+        <div class="start-panel">
+          <h3>Start Here</h3>
+          <p>Choose where the uploaded artwork should go. Front uploads can snap to Left Chest or Full Front. Back uploads can snap to Upper Back or Full Back.</p>
+          <div class="start-big-grid">
+            <button class="start-big" onclick="pickSide('front')"><span class="icon">F</span><span><b>Add Front Artwork</b><span>Left chest, center chest, or full front.</span></span></button>
+            <button class="start-big" onclick="pickSide('back')"><span class="icon">B</span><span><b>Add Back Artwork</b><span>Full back or event artwork.</span></span></button>
+          </div>
+        </div>
+        <div class="advisor-card" id="printAdvisorCard">
+          <div class="advisor-head">
+            <div class="advisor-title">Print Method Advisor</div>
+            <div class="advisor-pill" id="advisorMethodPill">—</div>
+          </div>
+          <div class="advisor-main" id="advisorMain">Upload artwork for a print recommendation.</div>
+          <div class="advisor-copy" id="advisorCopy">The app checks color count, screen-print limits, fabric type, and logo clarity.</div>
+          <div class="advisor-metrics">
+            <div class="advisor-metric"><b>Colors</b><span id="advisorColors">—</span></div>
+            <div class="advisor-metric"><b>Clarity</b><span id="advisorQuality">—</span></div>
+            <div class="advisor-metric"><b>Fabric</b><span id="advisorFabric">Cotton</span></div>
+            <div class="advisor-metric"><b>Screen print</b><span id="advisorScreen">—</span></div>
+          </div>
+          <div class="advisor-actions">
+            <button onclick="openArtDetails()">Art Details</button>
+            <button onclick="printProofSheet()">Proof</button>
+          </div>
+        </div>
+        <div class="emb-card" id="embroideryAdvisorCard">
+          <div class="emb-head">
+            <div class="emb-title">Embroidery Advisor</div>
+            <div class="emb-pill" id="embStatusPill">—</div>
+          </div>
+          <div class="emb-main" id="embMain">Upload artwork for an embroidery estimate.</div>
+          <div class="emb-copy" id="embCopy">The app estimates stitch count, thread colors, and embroidery friendliness.</div>
+          <div class="emb-metrics">
+            <div class="emb-metric"><b>Stitches</b><span id="embStitches">—</span></div>
+            <div class="emb-metric"><b>Thread colors</b><span id="embThreads">—</span></div>
+            <div class="emb-metric"><b>Size</b><span id="embSize">—</span></div>
+            <div class="emb-metric"><b>Best use</b><span id="embBestUse">—</span></div>
+          </div>
+          <div class="emb-note" id="embNote">Best embroidery results usually use 3–4 thread colors. 4–6 colors is workable. Up to 10 colors may be possible but should be reviewed by the art team.</div>
+        </div>
+        <div class="placement-only-title">Selected artwork controls</div>
+        <div class="panel-card" id="placementCard">
+          <div class="pc-head">
+            <div>
+              <div class="pc-title">Front / back placement</div>
+              <div class="pc-sub">Control the active artwork on the shirt.</div>
+            </div>
+            <div class="mini-chip" id="pcStatusChip">No art selected</div>
+          </div>
+          <div class="side-grid">
+            <button class="place-btn" id="pcFrontBtn" onclick="designerSetSide('front')">Front</button>
+            <button class="place-btn" id="pcBackBtn" onclick="designerSetSide('back')">Back</button>
+            <button class="place-btn" id="pcBothBtn" onclick="designerSetSide('both')">Both</button>
+          </div>
+          <div class="preset-grid">
+            <button class="place-btn soft" id="pcLeftChestBtn" onclick="designerSetPreset('Left Chest')">Left Chest</button>
+            <button class="place-btn soft" id="pcFullFrontBtn" onclick="designerSetPreset('Full Front')">Full Front</button>
+            <button class="place-btn soft" id="pcUpperBackBtn" onclick="designerSetPreset('Upper Back')">Upper Back</button>
+            <button class="place-btn soft" id="pcFullBackBtn" onclick="designerSetPreset('Full Back')">Full Back</button>
+            <button class="place-btn soft" id="pcCenterBtn" onclick="designerCenterPlacement()">Center Art</button>
+          </div>
+          <div class="ctrl-row">
+            <div class="ctrl-head"><label for="pcWidthRange">Print width</label><span id="pcWidthLabel">12 in</span></div>
+            <div class="ctrl-inline"><input type="range" id="pcWidthRange" min="0.5" max="60" step="0.5"><input type="number" id="pcWidthNumber" min="0.5" max="60" step="0.5"></div>
+          </div>
+          <div class="two-col">
+            <div class="ctrl-row">
+              <div class="ctrl-head"><label for="pcXRange">Left / right</label><span id="pcXLabel">0</span></div>
+              <div class="ctrl-inline"><input type="range" id="pcXRange" min="-220" max="220" step="1"><input type="number" id="pcXNumber" min="-220" max="220" step="1"></div>
+            </div>
+            <div class="ctrl-row">
+              <div class="ctrl-head"><label for="pcYRange">Up / down</label><span id="pcYLabel">0</span></div>
+              <div class="ctrl-inline"><input type="range" id="pcYRange" min="-220" max="220" step="1"><input type="number" id="pcYNumber" min="-220" max="220" step="1"></div>
+            </div>
+          </div>
+          <div class="nudge-grid">
+            <button class="place-btn soft" onclick="designerNudge(-5,0)">← Nudge</button>
+            <button class="place-btn soft" onclick="designerNudge(0,-5)">↑ Nudge</button>
+            <button class="place-btn soft" onclick="designerNudge(5,0)">Nudge →</button>
+            <button class="place-btn soft" onclick="designerNudge(0,5)">↓ Nudge</button>
+            <button class="place-btn soft" onclick="designerResetPlacement()">Reset</button>
+            <button class="place-btn soft" onclick="designerToggleVisible()">On / Off</button>
+          </div>
+          <div class="pc-hint">Tip: use <b>Left Chest</b> for small logos, <b>Full Front</b> for centered prints, and <b>Full Back</b> for back graphics. Transparent padding is auto-trimmed so the visible logo sizes correctly. Use Left Chest, Full Front, Upper Back, or Full Back to snap the art into place, then fine-tune if needed.</div>
+        </div>
+        <div class="advanced-note">Advanced file details are below. The main customer workflow is now front art, back art, shirt color, spin, and proof.</div>
+        <div class="side-head" style="border-top:1px solid var(--border);">File info</div>
+        <div class="info-rows" id="infoRows"></div>
+        <div class="info-note" id="infoNote" style="display:none;"></div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>Simple workflow: add front art, add back art, pick color, spin the shirt, and print a proof.</span>
+  <span>Northwest Custom Apparel</span>
+</footer>
+
+<div id="dragOverlay">
+  <div>Drop files to preview</div>
+  <div class="small">.ai · .psd · .psb · .cdr · .pdf · images</div>
+</div>
+
+
+<div id="placementChooser" class="chooser-overlay" onclick="if(event.target===this) closePlacementChooser()">
+  <div class="chooser-card" role="dialog" aria-modal="true" aria-labelledby="chooserTitle">
+    <div class="chooser-head">
+      <h3 id="chooserTitle">Choose a recommended placement</h3>
+      <p id="chooserSubtitle">Upload your artwork straight into a recommended print location.</p>
+    </div>
+    <div class="chooser-body" id="chooserBody"></div>
+    <div class="chooser-foot">
+      <button class="chooser-cancel" onclick="closePlacementChooser()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="artDetailsModal" class="art-details-overlay" onclick="if(event.target===this) closeArtDetails()">
+  <div class="art-details-card" role="dialog" aria-modal="true">
+    <div class="art-details-head">
+      <h3>Artwork Details</h3>
+      <button class="art-details-close" onclick="closeArtDetails()">Close</button>
+    </div>
+    <div class="art-details-body" id="artDetailsBody">
+      <div class="art-details-section">
+        <h4>File Info</h4>
+        <div class="detail-grid" id="artDetailsInfo"></div>
+      </div>
+      <div class="art-details-section">
+        <h4>Ink Colors / Print Check</h4>
+        <div id="artDetailsColors"></div>
+      </div>
+    </div>
+    <div class="art-details-foot">
+      <button onclick="printSpecSheet()">Print Spec Sheet</button>
+      <button onclick="closeArtDetails()">Done</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="threadColorsModal" class="thread-modal-overlay" onclick="if(event.target===this) closeThreadColors()">
+  <div class="thread-modal-card" role="dialog" aria-modal="true">
+    <div class="thread-modal-head">
+      <div>
+        <h3>DST Thread Colors</h3>
+        <p>Choose Robison-Anton Poly thread colors for each DST color stop.</p>
+      </div>
+      <button class="thread-modal-close" onclick="closeThreadColors()">Close</button>
+    </div>
+    <div class="thread-modal-summary" id="threadColorsSummary"></div>
+    <div class="thread-modal-body">
+      <p class="thread-modal-note">
+        DST files usually contain stitches and color stops, but they do not reliably contain the actual thread color names.
+        Use this screen to pick the Robison-Anton Poly thread colors you want to show on the mockup and customer proof.
+      </p>
+      <div id="threadColorsBody"></div>
+      <div class="thread-selected-list" id="threadColorsSelected"></div>
+    </div>
+    <div class="thread-modal-foot">
+      <button onclick="openArtDetails()">Art Details</button>
+      <button onclick="printProofSheet()">Customer Proof</button>
+      <button onclick="closeThreadColors()">Done</button>
+    </div>
+  </div>
+</div>
+
+<div id="specSheet"></div>
+
+<input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
+<input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+
+<script src="/pages/js/garment-designer.js?v=1"></script>
+</body>
+</html>
