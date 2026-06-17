@@ -1,3 +1,7 @@
+## v2026.06.17.2 (2026.06.17)
+
+- Deploy v2026.06.17.2: add Due (req-ship) column + drop-dead flag to Quote Mgmt; first-name salesperson
+
 ## v2026.06.17.1 (2026.06.17)
 
 - Deploy v2026.06.17.1: Refresh Inbound now PERSISTS via proxy catch-up (sticks across reloads)
