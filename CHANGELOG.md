@@ -1,3 +1,7 @@
+## v2026.06.17.7 (2026.06.17)
+
+- Deploy v2026.06.17.7: 7 files (ACTIVE_FILES.md,ae-dashboard.html,ae-submit-form.css,...)
+
 ## v2026.06.17.6 (2026.06.17)
 
 - Docs: garment art form — shipped record + notifications decision + LESSONS entry
