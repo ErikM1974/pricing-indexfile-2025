@@ -1,3 +1,7 @@
+## v2026.06.17.12 (2026.06.17)
+
+- Deploy v2026.06.17.12: 6 files (art-request-detail.html,art-request-detail.css,garment-designer.css,...)
+
 ## v2026.06.17.11 (2026.06.17)
 
 - Easy Shirt Designer: productionized standalone page + dashboard link
