@@ -1,3 +1,8 @@
+## v2026.06.17.5 (2026.06.17)
+
+- Garment art request: custom structured form replacing Caspio DataPage
+- Deploy v2026.06.17.5: cache-bust 5 files
+
 ## v2026.06.17.4 (2026.06.17)
 
 - Deploy v2026.06.17.4: fix quote-view req-ship/drop-dead/ship-date off-by-one (UTC-midnight cal dates)
