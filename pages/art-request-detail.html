@@ -60,6 +60,7 @@
                         title="Click to toggle rush status"></button>
                 <!-- Inline transfer badge (D.5) — populated by TransferActions.renderTransferStatusBadge() if a linked transfer exists -->
                 <span id="ard-transfer-status" class="ard-transfer-status-slot"></span>
+                <button type="button" class="ard-print-btn" id="ard-print-btn" title="Print a one-page job sheet">&#128424;&#65039; Print Job Sheet</button>
             </div>
         </div>
 
@@ -643,6 +644,10 @@
             <button type="button" class="share-customer-modal__btn-send" id="share-customer-send">Send to Customer</button>
         </div>
     </div>
+
+    <!-- Printable one-page job sheet — hidden on screen, shown only via @media print.
+         Populated by buildPrintSheet(req) from the same record data. -->
+    <div id="ard-print-sheet" class="ard-print-sheet" aria-hidden="true"></div>
 
     <!-- Footer -->
     <footer class="ard-footer">

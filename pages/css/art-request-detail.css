@@ -3776,3 +3776,58 @@ body.ard-customer-view .ard-footer {
     font-weight: 600;
     color: #065f46;
 }
+
+/* ── Printable one-page Art Job Sheet (2026-06-17) ─────────────────────── */
+.ard-print-btn {
+    background: #fff;
+    border: 1.5px solid var(--art-theme, #981e32);
+    color: var(--art-theme, #981e32);
+    border-radius: 8px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    margin-left: 8px;
+    white-space: nowrap;
+}
+.ard-print-btn:hover { background: var(--art-theme, #981e32); color: #fff; }
+
+/* Sheet is hidden on screen; revealed only when printing. */
+.ard-print-sheet { display: none; }
+
+.ps-doc { font-family: Arial, Helvetica, sans-serif; color: #111; font-size: 10pt; line-height: 1.35; }
+.ps-top { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #981e32; padding-bottom: 6px; margin-bottom: 8px; }
+.ps-doctitle { font-size: 15pt; font-weight: 800; color: #981e32; letter-spacing: 0.02em; white-space: nowrap; }
+.ps-jobid { font-size: 12.5pt; font-weight: 700; white-space: nowrap; }
+.ps-chips { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 48%; }
+.ps-chip { border: 1px solid #999; border-radius: 10px; padding: 1px 8px; font-size: 8.5pt; font-weight: 700; }
+.ps-chip--rush { border-color: #dc2626; color: #dc2626; }
+.ps-chip--green { border-color: #059669; color: #065f46; background: #ecfdf5; }
+.ps-chip--amber { border-color: #d97706; color: #9a3412; background: #fff7ed; }
+.ps-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.ps-sec { font-size: 8.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: #981e32; border-bottom: 1px solid #e5e5e5; margin: 8px 0 3px; }
+.ps-kv { width: 100%; border-collapse: collapse; }
+.ps-kv th { text-align: left; font-weight: 600; color: #444; width: 36%; vertical-align: top; padding: 1px 6px 1px 0; }
+.ps-kv td { vertical-align: top; padding: 1px 0; }
+.ps-tbl { width: 100%; border-collapse: collapse; margin: 2px 0 4px; }
+.ps-tbl th { text-align: left; font-size: 8pt; text-transform: uppercase; color: #666; border-bottom: 1px solid #ccc; padding: 2px 6px 2px 0; }
+.ps-tbl td { padding: 2px 6px 2px 0; border-bottom: 1px solid #eee; vertical-align: top; }
+.ps-exact { border: 1px solid #f0c000; background: #fffbe8; padding: 5px 8px; font-weight: 700; white-space: pre-wrap; word-wrap: break-word; }
+.ps-notes { white-space: pre-wrap; word-wrap: break-word; }
+.ps-line { padding: 1px 0; }
+.ps-check { margin-top: 8px; padding: 4px 8px; border: 1px solid #a7f3d0; background: #ecfdf5; color: #065f46; font-weight: 700; font-size: 9pt; display: inline-block; }
+.ps-foot { margin-top: 10px; padding-top: 5px; border-top: 1px solid #ddd; font-size: 7.5pt; color: #888; text-align: center; }
+
+@media print {
+    /* Hide all the on-screen UI; show only the job sheet. */
+    .ard-header, #ard-loading, #ard-error, .ard-content, .ard-footer,
+    .ard-modal-overlay, .art-modal-overlay, .ard-lightbox,
+    .approval-modal-overlay, .share-customer-modal, #share-customer-overlay,
+    .ard-print-btn { display: none !important; }
+    .ard-print-sheet { display: block !important; }
+    html, body { background: #fff !important; margin: 0; padding: 0; }
+    @page { size: letter portrait; margin: 0.45in; }
+    /* Avoid awkward breaks inside a section's table. */
+    .ps-tbl, .ps-kv, .ps-exact, .ps-check { page-break-inside: avoid; }
+}
