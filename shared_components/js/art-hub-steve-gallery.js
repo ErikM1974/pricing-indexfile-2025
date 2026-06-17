@@ -184,7 +184,10 @@
         // "Email recipient fix v2026.04.08"). On recent records Sales_Rep is
         // empty and User_Email holds the AE email — without User_Email in the
         // SELECT the rep first name in the card header has nothing to resolve.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Is_Rush,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        // Artwork_Status + Approval_Status are in the PRIMARY select only — if the
+        // ArtRequests table doesn't have them yet (pre-migration), the request 500s
+        // and falls back to selectFallback which omits them. Graceful degradation.
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Is_Rush,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         // 2-level fallback for legacy ArtRequests installs that don't have
         // Item_Type, JDS_SKU, or Order_Type_Source yet — strip them and retry.
@@ -308,6 +311,68 @@
         return brokenFetchInflight;
     }
 
+    // Compact labels for the structured status badges so they fit on cards.
+    // Dash-insensitive: the form writes an em-dash, but a hand-edit in Caspio
+    // could use a hyphen — normalize both so the badge still shortens.
+    function normStatusKey(s) {
+        return String(s || '').replace(/[—–]/g, '-').replace(/\s+/g, ' ').trim();
+    }
+    function shortArtworkStatus(s) {
+        var map = {
+            'New artwork from scratch': 'New Art',
+            'Mockup only': 'Mockup',
+            'Revision to existing proof': 'Revision',
+            'Repeat from previous order': 'Repeat',
+            'Final approved / production ready': 'Production'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortApprovalStatus(s) {
+        var map = {
+            'Not approved - Steve to create proof': 'Not Approved',
+            'Customer reviewing proof': 'In Review',
+            'Customer approved - ready for production': '✓ Approved',
+            'Internal revision only': 'Internal Rev',
+            'Post-approval change order': 'Change Order'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortColorMode(s) {
+        var map = {
+            'Use exact PMS colors': 'Exact PMS',
+            'Use closest match': 'Closest match',
+            'Match previous order': 'Match prev',
+            'Black only': 'Black only',
+            'White only': 'White only',
+            'Full color': 'Full color',
+            "AE/customer doesn't know - Steve to recommend": 'Steve to pick'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    // Compact at-a-glance art-spec line for cards: primary placement + size,
+    // color mode, and an "has exact text" flag. Detail page carries the full set.
+    function buildArtSpecLine(req) {
+        var parts = [];
+        var locs = [];
+        try { if (req.Artwork_Locations) { var arr = JSON.parse(req.Artwork_Locations); if (Array.isArray(arr)) locs = arr; } } catch (e) {}
+        var primary = locs[0];
+        var placeStr = '';
+        if (primary && primary.placement) {
+            placeStr = primary.placement;
+            if (primary.width && primary.height) placeStr += ' ' + primary.width + '×' + primary.height + '"';
+            else if (primary.width) placeStr += ' ' + primary.width + '"';
+            if (locs.length > 1) placeStr += ' +' + (locs.length - 1);
+        } else if (req.Garment_Placement) {
+            placeStr = req.Garment_Placement;
+        }
+        if (placeStr) parts.push('<span class="card-spec-item">\u{1F4CD} ' + escapeHtml(placeStr) + '</span>');
+        var cm = (req.Color_Mode || '').trim();
+        if (cm) parts.push('<span class="card-spec-item">\u{1F3A8} ' + escapeHtml(shortColorMode(cm)) + '</span>');
+        var exact = (req.Exact_Text || '').trim();
+        if (exact && exact.indexOf('No text') === -1) parts.push('<span class="card-spec-item">\u{1F4DD} text</span>');
+        return parts.length ? '<div class="card-artspec">' + parts.join('') + '</div>' : '';
+    }
+
     // ── Render: card ──────────────────────────────────────────────────────
     function buildCard(req) {
         var designId      = String(req.ID_Design || '');
@@ -397,6 +462,15 @@
             var jdsTitle = req.JDS_SKU ? ('JDS request — ' + req.JDS_SKU) : 'JDS vendor product request';
             badges += '<span class="card-badge card-badge--jds" title="' + escapeHtml(jdsTitle) + '">\u{1F3AF} JDS' + (req.JDS_SKU ? ' · ' + escapeHtml(req.JDS_SKU) : '') + '</span>';
         }
+        // Structured garment-form status badges (2026-06-17). Artwork_Status
+        // tells Steve the kind of work; Approval_Status whether it's cleared.
+        var artworkStatus = (req.Artwork_Status || '').trim();
+        if (artworkStatus) badges += '<span class="card-badge card-badge--artwork" title="' + escapeHtml(artworkStatus) + '">' + escapeHtml(shortArtworkStatus(artworkStatus)) + '</span>';
+        var approvalStatus = (req.Approval_Status || '').trim();
+        if (approvalStatus) {
+            var apCls = /approved/i.test(approvalStatus) ? ' card-badge--approved' : ' card-badge--approval';
+            badges += '<span class="card-badge' + apCls + '" title="' + escapeHtml(approvalStatus) + '">' + escapeHtml(shortApprovalStatus(approvalStatus)) + '</span>';
+        }
         if (rushBadge)        badges += '<span class="card-badge card-badge--rush">RUSH</span>';
         if (orderType)        badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';
         if (revCount > 0)     badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
@@ -432,6 +506,7 @@
             '<div class="card-thumb">' + thumbHtml + '</div>' +
             '<div class="card-body">' +
                 (badges ? '<div class="card-badges">' + badges + '</div>' : '') +
+                buildArtSpecLine(req) +
                 // 3 actions in workflow order: Send Mockup → Complete → Log Time.
                 // Labels shortened 2026-04-26 so all 3 fit on one row at typical
                 // card widths (was wrapping to 2 rows with "Send for Approval"

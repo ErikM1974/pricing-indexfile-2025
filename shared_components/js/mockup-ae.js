@@ -393,6 +393,17 @@ var MockupAeGallery = (function () {
             stitchCountText = isNaN(sc) ? String(mockup.Stitch_Count) : sc.toLocaleString();
         }
 
+        // Thread colors — structured column if present, else parse AE_Notes.
+        var threadColorsText = (mockup.Thread_Colors || '').trim();
+        if (!threadColorsText && mockup.AE_Notes) {
+            var tcm = String(mockup.AE_Notes).match(/Thread Colors:\s*([\s\S]*?)(?:\n\s*\n|Additional Instructions:|$)/i);
+            if (tcm) {
+                threadColorsText = tcm[1].split('\n')
+                    .map(function (l) { return l.replace(/^\s*\d+\.\s*/, '').trim(); })
+                    .filter(Boolean).join(', ');
+            }
+        }
+
         var badges = '';
         if (mockupType) {
             mockupType.split(', ').forEach(function (t) {
@@ -450,9 +461,10 @@ var MockupAeGallery = (function () {
             + thumbHtml
             + '<div class="card-body">'
             + (designName ? '<div class="card-design-name">' + designName + '</div>' : '')
-            + ((dimensions || stitchCountText) ? '<div class="card-meta">'
+            + ((dimensions || stitchCountText || threadColorsText) ? '<div class="card-meta">'
                 + (dimensions ? '<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ' + escapeHtml(dimensions) + '</div>' : '')
                 + (stitchCountText ? '<div class="card-meta-row"><span class="card-meta-label">Stitches:</span> ' + escapeHtml(stitchCountText) + '</div>' : '')
+                + (threadColorsText ? '<div class="card-meta-row"><span class="card-meta-label">Thread:</span> ' + escapeHtml(threadColorsText) + '</div>' : '')
                 + '</div>' : '')
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
             // REP meta-row removed 2026-04-26 — rep promoted to header inline

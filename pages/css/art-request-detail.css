@@ -3694,3 +3694,85 @@ body.ard-customer-view .ard-footer {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
+/* ── Art Specifications card (structured garment-form fields, 2026-06-17) ── */
+.ard-artwork-status-pill,
+.ard-approval-status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    background: #eef2ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
+}
+.ard-approval-status-pill {
+    background: #fff7ed;
+    color: #9a3412;
+    border-color: #fed7aa;
+}
+.ard-approval-status-pill--approved {
+    background: #ecfdf5;
+    color: #065f46;
+    border-color: #a7f3d0;
+}
+
+.ard-artspec-subhead {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+    margin: 14px 0 6px;
+}
+.ard-artspec-subhead:first-child { margin-top: 0; }
+
+.ard-loc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+.ard-loc-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    padding: 4px 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+.ard-loc-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #1f2937;
+    vertical-align: top;
+}
+.ard-loc-table tr:last-child td { border-bottom: none; }
+
+.ard-exact-text {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 4px solid #f59e0b;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-bottom: 8px;
+}
+
+.ard-checklist-confirmed {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #065f46;
+}

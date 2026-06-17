@@ -1922,7 +1922,7 @@
         // Note: Is_Rush is optional — added once the Caspio column exists.
         // If the select references a column Caspio doesn't have, the API 500s.
         // We fetch with Is_Rush and transparently fall back without it on 500.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Is_Rush';
+        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU,Is_Rush,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Garment_Placement';
         var selectFieldsFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type,Item_Type,JDS_SKU';
         // 2-level fallback if Item_Type / JDS_SKU don't exist in Caspio yet
         var selectFieldsLegacy = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,Due_Date,Date_Created,Revision_Count,Order_Type';
@@ -1989,6 +1989,60 @@
 
     var COMPLETED_SHOW_LIMIT = 5;
 
+    // Compact labels for the structured status badges so they fit kanban tiles.
+    // Dash-insensitive (form writes em-dash; a Caspio hand-edit might use a hyphen).
+    function normStatusKey(s) {
+        return String(s || '').replace(/[—–]/g, '-').replace(/\s+/g, ' ').trim();
+    }
+    function shortArtworkStatus(s) {
+        var map = {
+            'New artwork from scratch': 'New Art', 'Mockup only': 'Mockup',
+            'Revision to existing proof': 'Revision', 'Repeat from previous order': 'Repeat',
+            'Final approved / production ready': 'Production'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortApprovalStatus(s) {
+        var map = {
+            'Not approved - Steve to create proof': 'Not Approved', 'Customer reviewing proof': 'In Review',
+            'Customer approved - ready for production': '✓ Approved', 'Internal revision only': 'Internal Rev',
+            'Post-approval change order': 'Change Order'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortColorMode(s) {
+        var map = {
+            'Use exact PMS colors': 'Exact PMS', 'Use closest match': 'Closest match',
+            'Match previous order': 'Match prev', 'Black only': 'Black only',
+            'White only': 'White only', 'Full color': 'Full color',
+            "AE/customer doesn't know - Steve to recommend": 'Steve to pick'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    // Compact at-a-glance art-spec line for kanban tiles: primary placement +
+    // size, color mode, "has exact text" flag. Full set lives on the detail page.
+    function buildArtSpecLine(req) {
+        var parts = [];
+        var locs = [];
+        try { if (req.Artwork_Locations) { var arr = JSON.parse(req.Artwork_Locations); if (Array.isArray(arr)) locs = arr; } } catch (e) {}
+        var primary = locs[0];
+        var placeStr = '';
+        if (primary && primary.placement) {
+            placeStr = primary.placement;
+            if (primary.width && primary.height) placeStr += ' ' + primary.width + '×' + primary.height + '"';
+            else if (primary.width) placeStr += ' ' + primary.width + '"';
+            if (locs.length > 1) placeStr += ' +' + (locs.length - 1);
+        } else if (req.Garment_Placement) {
+            placeStr = req.Garment_Placement;
+        }
+        if (placeStr) parts.push('<span class="kanban-spec-item">\u{1F4CD} ' + escapeHtml(placeStr) + '</span>');
+        var cm = (req.Color_Mode || '').trim();
+        if (cm) parts.push('<span class="kanban-spec-item">\u{1F3A8} ' + escapeHtml(shortColorMode(cm)) + '</span>');
+        var exact = (req.Exact_Text || '').trim();
+        if (exact && exact.indexOf('No text') === -1) parts.push('<span class="kanban-spec-item">\u{1F4DD}</span>');
+        return parts.length ? '<div class="kanban-card-artspec">' + parts.join('') + '</div>' : '';
+    }
+
     function renderCardHtml(req) {
         var company = escapeHtml(req.CompanyName || 'Unknown');
         var designNum = req.Design_Num_SW || '';
@@ -2014,6 +2068,14 @@
             badges += '<span class="kanban-card-badge ' + itCls + '" title="' + itVal + ' request">' + itEmoji + ' ' + itVal + '</span>';
         }
         if (orderType) badges += '<span class="kanban-card-badge kanban-card-badge--type">' + escapeHtml(orderType) + '</span>';
+        // Structured garment-form status badges (2026-06-17)
+        var artworkStatus = (req.Artwork_Status || '').trim();
+        if (artworkStatus) badges += '<span class="kanban-card-badge kanban-card-badge--artwork" title="' + escapeHtml(artworkStatus) + '">' + escapeHtml(shortArtworkStatus(artworkStatus)) + '</span>';
+        var approvalStatus = (req.Approval_Status || '').trim();
+        if (approvalStatus) {
+            var apCls = /approved/i.test(approvalStatus) ? 'kanban-card-badge--approved' : 'kanban-card-badge--approval';
+            badges += '<span class="kanban-card-badge ' + apCls + '" title="' + escapeHtml(approvalStatus) + '">' + escapeHtml(shortApprovalStatus(approvalStatus)) + '</span>';
+        }
         if (revCount > 0) badges += '<span class="kanban-card-badge kanban-card-badge--rev">Rev ' + revCount + '</span>';
 
         var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
@@ -2031,6 +2093,7 @@
             + (due.text ? '<span class="kanban-card-due ' + due.cls + '">' + escapeHtml(due.text) + '</span>' : '')
             + '</div>'
             + (badges ? '<div class="kanban-card-badges">' + badges + '</div>' : '')
+            + buildArtSpecLine(req)
             + '</div>';
     }
 

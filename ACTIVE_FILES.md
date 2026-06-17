@@ -752,6 +752,7 @@
 | `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing) | — | ✅ Active |
 | `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
 | `/shared_components/js/sticker-banner-submit-form.js` | **NEW** AE Sticker/Banner art-request intake form (posts to /api/artrequests with Item_Type=Sticker/Banner + structured Item_Specs_Notes block) | /api/artrequests, /api/files/upload, EmailJS | ✅ Active |
+| `/shared_components/js/garment-submit-form.js` | **NEW (2026-06-17)** AE Garment art-request intake form — replaced Caspio DataPage a0e150009f0e9f9d4ff3457dae47. Fully structured fields (Artwork_Status, Approval_Status, Artwork_Locations JSON, Color_Mode/PMS/Thread/Underbase, Exact_Text, prev-order ref, Uploaded_File_Type, AE checklist). Style→Color cascade via /api/stylesearch + /api/product-colors. | /api/artrequests, /api/files/upload, /api/stylesearch, /api/product-colors, CompanyContactPicker, DesignNamePicker, WorkOrderPicker, EmailJS | ✅ Active |
 | `/shared_components/js/jds-tumbler-template.js` | **NEW** Algorithm module for JDS Tumbler Mockup Creator — mask coords, color sampling, engrave-color resolver, logo silhouette extractor. Shared by standalone page and (Phase 2) art-request integration. | (none — pure canvas logic) | ✅ Active |
 | `/pages/js/jds-mockup-creator.js` | Standalone JDS Mockup Creator page logic — color picker, file upload (PNG/JPG/SVG), live preview with pointer/touch drag + arrow-key nudge, auto-fit, recenter, toggleable imprint guide, branded presentation frame, full-res PNG download, copy-to-clipboard, multi-color comparison sheet, and an Edit/Preview-frame toggle. | jds-tumbler-template.js, /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
 | `/pages/css/jds-mockup-creator.css` | Standalone JDS Mockup Creator styling — 2026 design tokens (scoped :root), Inter, two-column layout, swatch grid, drop zone, segmented Edit/Preview control, compare grid, focus/reduced-motion a11y states, brand maroon accent. | jds-mockup-creator.html | ✅ Active |
@@ -897,6 +898,7 @@
 | `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
 | `/shared_components/css/sticker-banner-submit-form.css` | **NEW** Sticker/Banner intake form + Item-Type pill bar styles (ae-dashboard Submit Artwork tab) | ae-dashboard.html | ✅ Active |
+| `/shared_components/css/garment-submit-form.css` | **NEW (2026-06-17)** Garment art-request form styles (.gsf-* — sections, garment rows, location rows, AE checklist, style autocomplete) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/sticker-pricing-page.css` | **NEW (2026-05-15)** Sticker + Banner quote page styles — NWCA green theme, right-side drawer chat panel, row-highlight animation on AI-quoted SKU, dark-blue banner rate-card grid + live banner-quote card | sticker-manual-pricing.html | ✅ Active |
 | `/shared_components/css/ae-nav-v2.css` | **NEW** AE Dashboard two-tier navigation (Tier 1: Steve/Ruth/Transfers/Personalization sections; Tier 2: sub-tabs) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
@@ -1076,8 +1078,8 @@ cap-embroidery-fix.css
 | `/shared_components/js/art-hub-ae.js` | AE gallery card processing (maroon theme, View Details only) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/js/art-ae.js` | AE Steve Mockups tab — API-driven art request gallery (replaces Caspio DataPage) | art-hub.css, ae-dashboard.html | ✅ Active |
 | `/shared_components/css/ae-submit-form.css` | **NEW** AE submit art form styles (extracted from Caspio PageHeader) | ae-dashboard.html | ✅ Active |
-| `/shared_components/js/ae-submit-form.js` | **NEW** AE submit form JS: swatches, model images, row numbers, submission notification | ae-dashboard.html | ✅ Active |
-| `/shared_components/js/screenshot-fill.js` | ShopWorks screenshot paste → AI vision → auto-fill art request form | ae-dashboard.html | ✅ Active |
+| `/shared_components/js/ae-submit-form.js` | ⚠️ DEPRECATED 2026-06-17 — enhancement layer for the retired Garment Caspio DataPage. Unwired from ae-dashboard.html (replaced by garment-submit-form.js). Safe to delete after a release of soak. | (none — was ae-dashboard.html) | ⚠️ Dead code |
+| `/shared_components/js/screenshot-fill.js` | ⚠️ DEPRECATED 2026-06-17 — "Paste Order Text" auto-fill for the retired Garment DataPage. Unwired from ae-dashboard.html. Candidate to re-wire into garment-submit-form.js or delete. | (none — was ae-dashboard.html) | ⚠️ Dead code |
 | `/shared_components/js/ae-dashboard.js` | **NEW** AE dashboard: tab switching, modals, dropdown, notification polling + toasts | ae-dashboard.html | ✅ Active |
 | `/dashboards/css/taneisha-crm.css` | ⚠️ DEPRECATED - use rep-crm.css | - | ⚠️ Legacy |
 | `/dashboards/js/taneisha-crm.js` | ⚠️ DEPRECATED - use rep-crm.js | - | ⚠️ Legacy |
@@ -1243,6 +1245,7 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/training/garment-art-request-guide.md` | **NEW (2026-06-17)** AE field guide for the rebuilt Garment art-request form — each field, what's required, what "approved" means, repeat/revision how-tos, short-notes rule | ✅ Active |
 | `/training/adriyella-admin.html` | Adriyella admin landing page | ✅ Active |
 | `/training/adriyella-admin-dashboard.html` | Adriyella admin dashboard | ✅ Active |
 | `/training/adriyella-billing-dashboard.html` | Adriyella billing dashboard | ✅ Active |

@@ -284,6 +284,9 @@
             revBadge.style.display = 'inline-block';
         }
 
+        // Artwork + Approval status pills (garment-form structured fields)
+        renderStatusPills(req);
+
         // Rush toggle (renders for every request — clickable to mark/clear rush)
         renderRushToggle(req);
 
@@ -414,6 +417,10 @@
 
         // Garments & Colors
         renderGarments(req);
+
+        // Art Specifications (structured garment-form fields: locations, colors,
+        // exact text, prev-order ref, file type, AE checklist)
+        renderArtSpecs(req);
 
         // Billing
         const artMins = req.Art_Minutes || 0;
@@ -1533,6 +1540,110 @@
                     document.getElementById('ard-lightbox').style.display = 'flex';
                 });
             });
+        }
+    }
+
+    // ── Artwork + Approval status pills ───────────────────────────────────
+    function renderStatusPills(req) {
+        var aw = (req.Artwork_Status || '').trim();
+        var ap = (req.Approval_Status || '').trim();
+        var awEl = document.getElementById('ard-artwork-status-pill');
+        var apEl = document.getElementById('ard-approval-status-pill');
+        if (awEl && aw) {
+            awEl.textContent = aw;
+            awEl.style.display = 'inline-block';
+        }
+        // Approval pill is internal — keep it off the customer proof view.
+        if (apEl && ap && !isCustomerView) {
+            apEl.textContent = ap;
+            var approved = /approved/i.test(ap);
+            apEl.className = 'ard-approval-status-pill' + (approved ? ' ard-approval-status-pill--approved' : '');
+            apEl.style.display = 'inline-block';
+        }
+    }
+
+    // ── Art Specifications (structured garment-form fields) ───────────────
+    function parseLocations(raw) {
+        if (!raw) return [];
+        if (Array.isArray(raw)) return raw;
+        try {
+            var arr = JSON.parse(raw);
+            return Array.isArray(arr) ? arr : [];
+        } catch (e) { return []; }
+    }
+
+    function renderArtSpecs(req) {
+        var card = document.getElementById('ard-artspec-card');
+        var body = document.getElementById('ard-artspec-body');
+        if (!card || !body) return;
+
+        var html = '';
+        var any = false;
+        function field(label, value) {
+            if (value === null || value === undefined || value === '') return '';
+            any = true;
+            return '<div class="ard-field"><span class="ard-label">' + escapeHtml(label) + '</span>'
+                + '<span class="ard-value">' + escapeHtml(String(value)) + '</span></div>';
+        }
+
+        // Print locations table (from Artwork_Locations JSON)
+        var locs = parseLocations(req.Artwork_Locations);
+        if (locs.length) {
+            any = true;
+            html += '<div class="ard-artspec-subhead">Print Locations</div>';
+            html += '<table class="ard-loc-table"><thead><tr><th>Placement</th><th>Size</th><th>Instructions</th></tr></thead><tbody>';
+            locs.forEach(function (l) {
+                var size = '';
+                if (l.width && l.height) size = l.width + '" × ' + l.height + '"';
+                else if (l.width) size = l.width + '" wide';
+                else if (l.height) size = l.height + '" tall';
+                html += '<tr><td>' + escapeHtml(l.placement || '—') + '</td>'
+                    + '<td>' + escapeHtml(size || '—') + '</td>'
+                    + '<td>' + escapeHtml(l.notes || '—') + '</td></tr>';
+            });
+            html += '</tbody></table>';
+        }
+
+        // Colors
+        html += field('Color Direction', req.Color_Mode);
+        html += field('PMS Colors', req.PMS_Colors);
+        html += field('Thread Colors', req.Thread_Colors);
+        if (req.Underbase_Required) {
+            html += field('Underbase (dark garments)', req.Underbase_Required === 'Steve' ? 'Steve to decide' : req.Underbase_Required);
+        }
+
+        // Exact text — literal text Steve must reproduce, highlighted.
+        var exact = (req.Exact_Text || '').trim();
+        if (exact) {
+            any = true;
+            html += '<div class="ard-artspec-subhead">Exact Text in Artwork</div>';
+            html += '<div class="ard-exact-text">' + escapeHtml(exact) + '</div>';
+        }
+
+        // What was provided
+        html += field('File Provided', req.Uploaded_File_Type);
+
+        // Previous order reference
+        if (req.Prev_Order_Num || req.Prev_Design_Num || req.Repeat_Keep_Same || req.Repeat_Change) {
+            any = true;
+            html += '<div class="ard-artspec-subhead">Previous Order Reference</div>';
+            html += field('Previous Order #', req.Prev_Order_Num);
+            html += field('Previous Design #', req.Prev_Design_Num);
+            html += field('Keep the same', req.Repeat_Keep_Same);
+            html += field('What changes', req.Repeat_Change);
+        }
+
+        // AE checklist confirmed — internal (staff name); hidden in customer view.
+        var confirmed = req.AE_Checklist_Confirmed === true || req.AE_Checklist_Confirmed === 'Yes' || req.AE_Checklist_Confirmed === 1;
+        if (confirmed && !isCustomerView) {
+            any = true;
+            var by = req.AE_Checklist_Confirmed_By ? ' by ' + escapeHtml(String(req.AE_Checklist_Confirmed_By)) : '';
+            html += '<div class="ard-checklist-confirmed">✓ AE final checklist confirmed' + by + '</div>';
+        }
+
+        if (any) {
+            body.innerHTML = html;
+            card.style.display = '';
         }
     }
 
@@ -3953,6 +4064,15 @@
                 body: JSON.stringify({ status: 'Approved' })
             });
             if (!statusResp.ok) throw new Error(`Status update failed: ${statusResp.status}`);
+
+            // 1b. Reflect approval on the structured Approval_Status field so the
+            // garment-form data stays in sync. Fire-and-forget; never blocks the
+            // approval flow. (Field whitelisted in art.js EDITABLE_FIELDS.)
+            fetch(`${API_BASE}/api/art-requests/${id}/fields`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Approval_Status: 'Customer approved — ready for production' })
+            }).catch(function () {});
 
             // 2. Create approval note (includes which mockup was selected)
             const aeEmail = REP_MAP[aeName] || 'sales@nwcustomapparel.com';
