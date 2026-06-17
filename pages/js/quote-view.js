@@ -2745,14 +2745,14 @@ class QuoteViewPage {
 
         // Date fields (ShopWorks uses ISO dates or "MM/DD/YYYY" format)
         if (order.date_RequestedToShip) {
-            this._overrideField('req-ship-date', this.formatDate(order.date_RequestedToShip));
+            this._overrideField('req-ship-date', this.formatShopWorksDate(order.date_RequestedToShip));
             const row = document.getElementById('req-ship-date-row');
             if (row) row.style.display = 'flex';
         }
         // Drop Dead Date — ShopWorks field name varies; try several
         const dropDead = order.date_DropDead || order.date_OrderDropDead || order.DropDeadDate;
         if (dropDead) {
-            this._overrideField('drop-dead-date', this.formatDate(dropDead));
+            this._overrideField('drop-dead-date', this.formatShopWorksDate(dropDead));
             const row = document.getElementById('drop-dead-date-row');
             if (row) row.style.display = 'flex';
         }
@@ -4034,7 +4034,7 @@ class QuoteViewPage {
             const el = document.getElementById(id);
             if (el) el.textContent = value || '—';
         };
-        setMeta('sw-shipping-date', dateShipped ? this.formatDate(dateShipped) : '');
+        setMeta('sw-shipping-date', dateShipped ? this.formatShopWorksDate(dateShipped) : '');
 
         // # of Boxes — count of tracking numbers (rough proxy) when available
         // from the original Carrier/TrackingNumber fields on the quote row.
@@ -4309,6 +4309,21 @@ class QuoteViewPage {
             month: 'long',
             day: 'numeric'
         });
+    }
+
+    // ShopWorks/ManageOrders CALENDAR dates (req-ship, drop-dead, order ship date)
+    // arrive as 'YYYY-MM-DDT00:00:00.000Z' — a calendar day stamped at UTC midnight.
+    // formatDate() runs that through new Date() + local time, which shifts it a day
+    // back in Pacific (a 6/19 req-ship rendered "June 18"). This formats the Y-M-D
+    // parts as the literal calendar date so it matches the ShopWorks order screen.
+    // Falls back to formatDate for anything that isn't a Y-M-D date. (Erik 2026-06-17)
+    formatShopWorksDate(dateString) {
+        if (!dateString) return 'N/A';
+        const m = String(dateString).match(/(\d{4})-(\d{2})-(\d{2})/);
+        if (!m) return this.formatDate(dateString);
+        const date = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+        if (isNaN(date.getTime())) return 'N/A';
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
     formatCurrency(amount) {
