@@ -1849,3 +1849,38 @@
     margin: 0 0 4px;
   }
 
+/* ── Art-request pre-seed banner (opened from a request with context) ── */
+.seed-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #2f661e 0%, #3d7a26 100%);
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(20, 40, 10, .15);
+}
+.seed-banner-text {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seed-banner-icon { font-size: 18px; }
+.seed-banner-btn {
+  background: #fff;
+  color: #2f661e;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.seed-banner-btn:hover { background: #eafbe0; }
+
