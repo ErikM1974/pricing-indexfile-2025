@@ -1,3 +1,8 @@
+## v2026.06.17.11 (2026.06.17)
+
+- Easy Shirt Designer: productionized standalone page + dashboard link
+- Deploy v2026.06.17.11: cache-bust
+
 ## v2026.06.17.10 (2026.06.17)
 
 - Art job sheet: guarantee one page (auto shrink-to-fit)
