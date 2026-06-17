@@ -1,3 +1,8 @@
+## v2026.06.17.9 (2026.06.17)
+
+- Art job sheet: show artwork (original art + approved/primary mockup)
+- Deploy v2026.06.17.9: cache-bust
+
 ## v2026.06.17.8 (2026.06.17)
 
 - Art job sheet: printable one-page view on the art-request detail page
