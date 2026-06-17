@@ -1,3 +1,7 @@
+## v2026.06.17.6 (2026.06.17)
+
+- Docs: garment art form — shipped record + notifications decision + LESSONS entry
+
 ## v2026.06.17.5 (2026.06.17)
 
 - Garment art request: custom structured form replacing Caspio DataPage
