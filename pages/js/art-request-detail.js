@@ -1720,6 +1720,31 @@
         var quoted = req.Prelim_Charges || req.Charge_Quoted || '';
         var confirmed = req.AE_Checklist_Confirmed === true || req.AE_Checklist_Confirmed === 'Yes' || req.AE_Checklist_Confirmed === 1;
 
+        // Artwork images — original customer art + the approved/primary mockup.
+        // Same URL resolution the detail-page gallery uses (Box proxy / CDN direct).
+        function imgSrc(url) {
+            if (!url || isEmptySlot(url)) return '';
+            url = normalizeBoxProxyUrl(url);
+            if (url.indexOf('/api/box/') !== -1) return url;
+            if (/cdn\.caspio\.com/i.test(url)) return url;
+            if (/box\.com/i.test(url)) return API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url);
+            return url;
+        }
+        var artImgs = [];
+        var origArt = imgSrc(req.CDN_Link);
+        if (origArt) artImgs.push({ src: origArt, label: 'Original Artwork' });
+        var mock = imgSrc(req.Final_Approved_Mockup || req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup);
+        if (mock) artImgs.push({ src: mock, label: req.Final_Approved_Mockup ? 'Approved Mockup' : 'Mockup' });
+        var artHtml = '';
+        if (artImgs.length) {
+            artHtml = '<div class="ps-sec">Artwork</div><div class="ps-art">'
+                + artImgs.map(function (a) {
+                    return '<figure class="ps-art-fig"><img src="' + escapeHtml(a.src) + '" alt="' + escapeHtml(a.label)
+                        + '" onerror="this.parentNode.style.display=\'none\'"><figcaption>' + escapeHtml(a.label) + '</figcaption></figure>';
+                }).join('')
+                + '</div>';
+        }
+
         var now = new Date();
         var printedStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -1753,6 +1778,7 @@
             + '</div>'
             + (garmentRows ? '<div class="ps-sec">Garments</div><table class="ps-tbl"><thead><tr><th>#</th><th>Style</th><th>Color</th></tr></thead><tbody>' + garmentRows + '</tbody></table>' : '')
             + (locHtml ? '<div class="ps-sec">Print Locations &amp; Size</div>' + locHtml : '')
+            + artHtml
             + (exact ? '<div class="ps-sec">Exact Text in Artwork</div><div class="ps-exact">' + escapeHtml(exact) + '</div>' : '')
             + (hasPrev ? '<div class="ps-sec">Previous Order Reference</div><table class="ps-kv">' + prevKv + '</table>' : '')
             + (req.NOTES ? '<div class="ps-sec">Notes from Submitter</div><div class="ps-notes">' + escapeHtml(req.NOTES) + '</div>' : '')
