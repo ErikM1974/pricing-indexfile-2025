@@ -1,3 +1,8 @@
+## v2026.06.17.10 (2026.06.17)
+
+- Art job sheet: guarantee one page (auto shrink-to-fit)
+- Deploy v2026.06.17.10: cache-bust
+
 ## v2026.06.17.9 (2026.06.17)
 
 - Art job sheet: show artwork (original art + approved/primary mockup)
