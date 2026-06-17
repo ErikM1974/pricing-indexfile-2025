@@ -7472,6 +7472,37 @@ function mapVendorState(statusRaw) {
 }
 
 /**
+ * POST /api/sanmar-orders/sync-shipments
+ *
+ * Manual same-origin trigger for the proxy's bounded SanMar shipment catch-up
+ * (Erik 2026-06-16). The proxy endpoint is secret-gated (CRM_API_SECRET) so the
+ * browser can't call it directly; this passes the secret server-side. It pulls the
+ * live SanMar shipment feed for recent open orders that lack a tracking row and
+ * PERSISTS any tracking into the synced table, so the dashboard Inbound dots flip
+ * to "Shipped" (with tracking) and STAY that way across reloads. Bounded by the
+ * proxy (≤15 POs) to stay under the 30s request limit.
+ */
+app.post('/api/sanmar-orders/sync-shipments', async (req, res) => {
+  try {
+    const secret = process.env.CRM_API_SECRET;
+    if (!secret) return res.status(500).json({ success: false, error: 'CRM_API_SECRET not configured' });
+    const limit = Math.min(Math.max(parseInt(req.body && req.body.limit) || 15, 1), 15);
+    const r = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-orders/sync-shipments?limit=${limit}`, {
+      method: 'POST',
+      headers: { 'x-api-secret': secret, 'Content-Type': 'application/json' },
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      return res.status(502).json({ success: false, error: data.error || `proxy HTTP ${r.status}`, details: data.details });
+    }
+    return res.json({ success: true, ...data });
+  } catch (error) {
+    console.error('[sanmar sync-shipments proxy] error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * GET /api/quote-sessions/:quoteId/vendor-shipment
  *
  * INBOUND blank-goods shipment status (vendor SanMar → NWCA) for the order's
