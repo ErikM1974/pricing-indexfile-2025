@@ -575,19 +575,6 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .due-date { font-size: 13px; font-weight: 600; color: #334155; }
 .due-date.due-soon { color: #b45309; }            /* within 3 days / today — amber */
 .due-date.due-overdue { color: #b91c1c; }          /* past due — red */
-.drop-dead-flag {
-    margin-top: 3px;
-    display: inline-block;
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-size: 11px;
-    font-weight: 700;
-    white-space: nowrap;
-}
-.drop-dead-flag i { margin-right: 3px; }
 
 /* Empty State */
 .empty-state {
