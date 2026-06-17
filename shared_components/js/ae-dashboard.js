@@ -4,7 +4,7 @@
  * Extracted from ae-dashboard.html inline <script> (Rule #3 compliance).
  * Also adds real-time toast notifications when Steve updates AE's art requests.
  *
- * Depends on: art-hub.css (shared styles), ae-submit-form.css (form styles)
+ * Depends on: art-hub.css (shared styles)
  */
 (function () {
     'use strict';
