@@ -1,3 +1,8 @@
+## v2026.06.17.8 (2026.06.17)
+
+- Art job sheet: printable one-page view on the art-request detail page
+- Deploy v2026.06.17.8: cache-bust
+
 ## v2026.06.17.7 (2026.06.17)
 
 - Deploy v2026.06.17.7: 7 files (ACTIVE_FILES.md,ae-dashboard.html,ae-submit-form.css,...)
