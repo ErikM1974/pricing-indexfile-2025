@@ -1207,6 +1207,15 @@
             });
             if (!statusResp.ok) throw new Error('Status update ' + statusResp.status);
 
+            // Reflect the workflow on the structured Approval_Status field —
+            // Steve sending a mockup means the customer is now reviewing it.
+            // Fire-and-forget against the now-whitelisted field; never blocks.
+            fetch(API_BASE + '/api/art-requests/' + designId + '/fields', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Approval_Status: 'Customer reviewing proof' })
+            }).catch(function () {});
+
             var revLabel = revCount > 0 ? ' (Rev #' + revCount + ')' : '';
             var noteText = message
                 ? 'Mockup sent for approval' + revLabel + ': ' + message

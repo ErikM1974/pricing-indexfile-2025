@@ -469,6 +469,20 @@
             stitchCountText = isNaN(sc) ? String(mockup.Stitch_Count) : sc.toLocaleString();
         }
 
+        // Thread colors — the embroiderer's #1 need. Prefer a structured
+        // Thread_Colors column if it ever exists; otherwise parse the
+        // "Thread Colors:" block out of AE_Notes (where the submit form folds
+        // them today). Render-only — no schema change, no submit-form risk.
+        let threadColorsText = (mockup.Thread_Colors || '').trim();
+        if (!threadColorsText && mockup.AE_Notes) {
+            const tcm = String(mockup.AE_Notes).match(/Thread Colors:\s*([\s\S]*?)(?:\n\s*\n|Additional Instructions:|$)/i);
+            if (tcm) {
+                threadColorsText = tcm[1].split('\n')
+                    .map(function (l) { return l.replace(/^\s*\d+\.\s*/, '').trim(); })
+                    .filter(Boolean).join(', ');
+            }
+        }
+
         // Status class for left border + hover glow
         const statusSlug = (status || '').toLowerCase().replace(/\s+/g, '-');
         const cardStatusClass = statusSlug ? `mockup-card--${statusSlug}` : '';
@@ -501,6 +515,7 @@
                     ${mockup.Print_Location ? `<div class="card-meta-row"><span class="card-meta-label">Location:</span> ${escapeHtml(mockup.Print_Location)}</div>` : ''}
                     ${dimensions ? `<div class="card-meta-row"><span class="card-meta-label">Dimensions:</span> ${escapeHtml(dimensions)}</div>` : ''}
                     ${stitchCountText ? `<div class="card-meta-row"><span class="card-meta-label">Stitches:</span> ${escapeHtml(stitchCountText)}</div>` : ''}
+                    ${threadColorsText ? `<div class="card-meta-row"><span class="card-meta-label">Thread:</span> ${escapeHtml(threadColorsText)}</div>` : ''}
                 </div>
                 ${badges ? `<div class="card-badges">${badges}</div>` : ''}
             </div>

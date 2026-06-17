@@ -1,0 +1,493 @@
+/* garment-submit-form.css
+ * Styling for the custom Garment art-request form (GarmentSubmitForm) on
+ * dashboards/ae-dashboard.html (Submit Artwork to Steve tab). Mirrors the
+ * sticker-banner-submit-form.css design tokens (maroon --art-theme).
+ *
+ * Class prefix: .gsf-*
+ */
+
+.gsf-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    font-family: inherit;
+}
+
+/* Header banner */
+.gsf-banner {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 18px 22px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    color: #fff;
+    background: linear-gradient(135deg, #981e32 0%, #b92c43 100%);
+}
+
+.gsf-banner-emoji { font-size: 40px; line-height: 1; }
+.gsf-banner-text h3 { margin: 0 0 4px; font-size: 20px; font-weight: 600; }
+.gsf-banner-text p { margin: 0; font-size: 14px; opacity: 0.95; line-height: 1.4; }
+
+/* Form card */
+.gsf-form-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+}
+
+.gsf-form-body { padding: 22px; }
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+.gsf-section {
+    padding: 16px 0 18px;
+    border-bottom: 1px solid #f3f4f6;
+}
+.gsf-section:last-of-type { border-bottom: none; }
+
+.gsf-section-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.gsf-section-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--art-theme, #981e32);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    flex: 0 0 auto;
+}
+
+.gsf-section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.gsf-section-hint {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0 0 12px 34px;
+    line-height: 1.4;
+}
+
+/* Highlight a section that becomes required (repeat/revision prev-order). */
+.gsf-section--required {
+    background: #fffaf0;
+    border-radius: 10px;
+    padding-left: 12px;
+    padding-right: 12px;
+    margin: 0 -12px;
+    border: 1px solid #fde68a;
+}
+
+/* ── Field grid ──────────────────────────────────────────────────────── */
+.gsf-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.gsf-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 12px;
+}
+
+.gsf-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.gsf-mini-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.gsf-req { color: var(--art-theme, #981e32); font-weight: 700; margin-left: 2px; }
+
+.gsf-hint { font-size: 12px; color: #9ca3af; margin-top: 2px; line-height: 1.35; }
+
+.gsf-input,
+.gsf-select,
+.gsf-textarea {
+    padding: 9px 12px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    background: #fff;
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.gsf-input:focus,
+.gsf-select:focus,
+.gsf-textarea:focus {
+    outline: none;
+    border-color: var(--art-theme, #981e32);
+    box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+}
+
+.gsf-input.gsf-error,
+.gsf-select.gsf-error,
+.gsf-textarea.gsf-error {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.gsf-textarea { min-height: 80px; resize: vertical; }
+
+.gsf-err {
+    display: none;
+    font-size: 12px;
+    color: #ef4444;
+    margin-top: 2px;
+}
+
+.gsf-warn {
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+
+/* Approval reminder callout */
+.gsf-approval-warn {
+    margin-top: 6px;
+    padding: 12px 14px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-left: 4px solid #f97316;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #7c2d12;
+    line-height: 1.5;
+}
+
+/* ── Checkbox grids (decoration + checklist) ─────────────────────────── */
+.gsf-check-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 6px 16px;
+}
+
+.gsf-checklist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+}
+
+.gsf-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 13.5px;
+    color: #1f2937;
+    cursor: pointer;
+    line-height: 1.4;
+    padding: 4px 0;
+}
+
+.gsf-check input[type="checkbox"] {
+    accent-color: var(--art-theme, #981e32);
+    cursor: pointer;
+    margin-top: 2px;
+    flex: 0 0 auto;
+}
+
+.gsf-notext { margin-top: 8px; font-size: 13px; color: #6b7280; }
+
+.gsf-checklist-actions { margin-top: 8px; }
+
+.gsf-checkall {
+    background: none;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    font-family: inherit;
+}
+.gsf-checkall:hover { border-color: var(--art-theme, #981e32); color: var(--art-theme, #981e32); }
+
+/* ── Garment rows (Style → Color) ────────────────────────────────────── */
+.gsf-garment-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #eef0f2;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.gsf-row-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--art-theme, #981e32);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    flex: 0 0 auto;
+    margin-top: 6px;
+}
+
+.gsf-garment-style-field { flex: 1 1 40%; margin-bottom: 0; position: relative; }
+.gsf-garment-color-field { flex: 1 1 45%; margin-bottom: 0; }
+
+.gsf-swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    border: 1px solid #d1d5db;
+    object-fit: cover;
+    flex: 0 0 auto;
+    margin-top: 4px;
+}
+.gsf-swatch--empty { background: #f3f4f6; }
+
+/* Style autocomplete dropdown */
+.gsf-style-suggest {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+    max-height: 240px;
+    overflow-y: auto;
+    margin-top: 2px;
+}
+
+.gsf-style-opt {
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #1f2937;
+    cursor: pointer;
+}
+.gsf-style-opt:hover { background: #fff5f5; color: var(--art-theme, #981e32); }
+
+/* ── Location rows ───────────────────────────────────────────────────── */
+.gsf-location-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background: #fafafa;
+    border: 1px solid #eef0f2;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.gsf-loc-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.4fr 0.6fr 0.6fr 2fr;
+    gap: 10px;
+}
+.gsf-loc-grid .gsf-field { margin-bottom: 0; }
+
+/* Remove button on dynamic rows */
+.gsf-row-remove {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #e5e7eb;
+    color: #6b7280;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    flex: 0 0 auto;
+    margin-top: 4px;
+}
+.gsf-row-remove:hover { background: #ef4444; color: #fff; }
+
+/* Add-row button */
+.gsf-add-btn {
+    background: none;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.gsf-add-btn:hover {
+    border-color: var(--art-theme, #981e32);
+    color: var(--art-theme, #981e32);
+    background: #fff5f5;
+}
+
+/* ── File drop zone (shared visual language with .sbf-*) ─────────────── */
+.gsf-file-drop {
+    padding: 24px;
+    border: 2px dashed #d1d5db;
+    border-radius: 10px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: all 0.15s;
+}
+.gsf-file-drop:hover,
+.gsf-file-drop--active {
+    border-color: var(--art-theme, #981e32);
+    background: #fff5f5;
+    color: var(--art-theme, #981e32);
+}
+.gsf-file-drop-icon { width: 44px; height: 38px; margin: 0 auto 8px; display: block; color: #9ca3af; }
+.gsf-file-drop-cta { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 4px; }
+.gsf-file-drop-sub { font-size: 13px; color: #6b7280; margin-bottom: 12px; }
+.gsf-file-drop-dots { display: flex; justify-content: center; gap: 8px; margin-top: 4px; }
+.gsf-file-drop-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: transparent; border: 2px solid #d1d5db;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.gsf-file-drop-dot--filled { background: #10b981; border-color: #10b981; transform: scale(1.1); }
+.gsf-file-drop-types { font-size: 12px; color: #9ca3af; text-align: center; margin-top: 8px; }
+.gsf-file-drop--full { opacity: 0.6; cursor: not-allowed; background: #f3f4f6; }
+.gsf-file-drop--full:hover, .gsf-file-drop--full.gsf-file-drop--active {
+    border-color: #d1d5db; background: #f3f4f6; color: #6b7280;
+}
+.gsf-file-list { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.gsf-file-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f3f4f6; border-radius: 8px; font-size: 13px; }
+.gsf-file-name { flex: 1; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gsf-file-size { color: #6b7280; font-size: 12px; flex: 0 0 auto; }
+.gsf-file-remove {
+    width: 22px; height: 22px; border-radius: 50%; border: none;
+    background: #e5e7eb; color: #6b7280; cursor: pointer; font-size: 14px; line-height: 1; flex: 0 0 auto;
+}
+.gsf-file-remove:hover { background: #ef4444; color: #fff; }
+
+/* ── Rush toggle ─────────────────────────────────────────────────────── */
+.gsf-rush-field { justify-content: flex-end; }
+.gsf-rush-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 16px;
+    background: #fff;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 10px;
+    color: #6b7280;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.gsf-rush-toggle:hover { border-color: #ef4444; color: #ef4444; }
+.gsf-rush-toggle--active { background: #fef2f2; border-color: #ef4444; border-style: solid; color: #ef4444; }
+.gsf-rush-icon { font-size: 16px; }
+.gsf-rush-label { font-weight: 600; }
+.gsf-rush-hint { font-size: 12px; opacity: 0.85; }
+
+/* ── Submit ──────────────────────────────────────────────────────────── */
+.gsf-submit-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 16px;
+    margin-top: 8px;
+    border-top: 2px solid #f3f4f6;
+}
+.gsf-submit-btn {
+    padding: 13px 30px;
+    background: var(--art-theme, #981e32);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.gsf-submit-btn:hover { background: var(--art-theme-dark, #7a1828); }
+.gsf-submit-btn:disabled { background: #9ca3af; cursor: not-allowed; }
+.gsf-submit-status { color: #6b7280; font-size: 13px; }
+
+/* ── Success ─────────────────────────────────────────────────────────── */
+.gsf-success { text-align: center; padding: 40px 20px; }
+.gsf-success-icon { font-size: 56px; margin-bottom: 12px; }
+.gsf-success h3 { margin: 0 0 10px; font-size: 22px; color: #059669; font-weight: 600; }
+.gsf-success-id { color: var(--art-theme, #981e32); }
+.gsf-success p { color: #4b5563; line-height: 1.5; margin: 0 auto 20px; max-width: 480px; }
+.gsf-success-link {
+    display: inline-block; padding: 10px 20px; margin: 0 8px 8px 0;
+    background: #059669; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;
+}
+.gsf-success-link:hover { background: #047857; }
+.gsf-success-another {
+    padding: 10px 20px; background: #fff; color: var(--art-theme, #981e32);
+    border: 1.5px solid var(--art-theme, #981e32); border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.gsf-success-another:hover { background: var(--art-theme, #981e32); color: #fff; }
+
+/* ── Toast ───────────────────────────────────────────────────────────── */
+.gsf-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    padding: 12px 22px;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 9999;
+    max-width: 80%;
+    text-align: center;
+}
+.gsf-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.gsf-toast--info { background: #1f2937; }
+.gsf-toast--error { background: #ef4444; }
+.gsf-toast--success { background: #059669; }
+
+/* ── Responsive ──────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+    .gsf-row { grid-template-columns: 1fr; gap: 0; }
+    .gsf-checklist-grid { grid-template-columns: 1fr; }
+    .gsf-loc-grid { grid-template-columns: 1fr 1fr; }
+    .gsf-banner { flex-direction: column; text-align: center; gap: 10px; }
+    .gsf-garment-row { flex-wrap: wrap; }
+}

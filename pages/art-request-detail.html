@@ -53,6 +53,8 @@
                 <!-- Item-type badge (Sticker/Banner extension, 2026-05-06) — Garment renders no badge -->
                 <span class="ard-item-type-badge" id="ard-item-type-badge" style="display:none;"></span>
                 <span class="ard-status-badge" id="ard-status-badge"></span>
+                <span class="ard-artwork-status-pill" id="ard-artwork-status-pill" style="display:none;"></span>
+                <span class="ard-approval-status-pill" id="ard-approval-status-pill" style="display:none;"></span>
                 <span class="ard-revision-badge" id="ard-revision-badge" style="display:none;"></span>
                 <button type="button" class="ard-rush-toggle" id="ard-rush-toggle" style="display:none;"
                         title="Click to toggle rush status"></button>
@@ -208,6 +210,14 @@
                 <div class="ard-card" id="ard-garments-card" style="display:none;">
                     <div class="ard-card-header">Garments & Colors</div>
                     <div class="ard-card-body" id="ard-garments-body"></div>
+                </div>
+
+                <!-- Art Specifications — structured garment-form fields
+                     (locations, colors, exact text, prev-order ref, file type,
+                     AE checklist). Populated by renderArtSpecs(). -->
+                <div class="ard-card" id="ard-artspec-card" style="display:none;">
+                    <div class="ard-card-header">Art Specifications</div>
+                    <div class="ard-card-body" id="ard-artspec-body"></div>
                 </div>
 
                 <!-- Art Time & Billing Card -->

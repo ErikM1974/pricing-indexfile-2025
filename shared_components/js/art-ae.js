@@ -17,14 +17,19 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-    // Legacy fallback for installs that don't have Item_Type / JDS_SKU yet —
-    // strip them and retry. NULL Item_Type → 'Garment' at render time
-    // (resolveItemType).
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    // Legacy fallback for installs that don't have Item_Type / JDS_SKU /
+    // Artwork_Status / Approval_Status / art-spec columns yet — strip them and
+    // retry. NULL Item_Type → 'Garment' at render time (resolveItemType).
     var SELECT_FIELDS_LEGACY = SELECT_FIELDS
         .replace(',Item_Type', '')
         .replace(',JDS_SKU', '')
-        .replace(',Order_Type_Source', '');
+        .replace(',Order_Type_Source', '')
+        .replace(',Artwork_Status', '')
+        .replace(',Approval_Status', '')
+        .replace(',Artwork_Locations', '')
+        .replace(',Color_Mode', '')
+        .replace(',Exact_Text', '');
 
     function resolveItemType(raw) {
         if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
@@ -376,6 +381,60 @@ var ArtAeGallery = (function () {
             + '<span class="status-stat-label">' + label + '</span></div>';
     }
 
+    // Compact labels for the structured status badges so they fit on cards.
+    // Dash-insensitive (form writes em-dash; a Caspio hand-edit might use a hyphen).
+    function normStatusKey(s) {
+        return String(s || '').replace(/[—–]/g, '-').replace(/\s+/g, ' ').trim();
+    }
+    function shortArtworkStatus(s) {
+        var map = {
+            'New artwork from scratch': 'New Art', 'Mockup only': 'Mockup',
+            'Revision to existing proof': 'Revision', 'Repeat from previous order': 'Repeat',
+            'Final approved / production ready': 'Production'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortApprovalStatus(s) {
+        var map = {
+            'Not approved - Steve to create proof': 'Not Approved', 'Customer reviewing proof': 'In Review',
+            'Customer approved - ready for production': '✓ Approved', 'Internal revision only': 'Internal Rev',
+            'Post-approval change order': 'Change Order'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    function shortColorMode(s) {
+        var map = {
+            'Use exact PMS colors': 'Exact PMS', 'Use closest match': 'Closest match',
+            'Match previous order': 'Match prev', 'Black only': 'Black only',
+            'White only': 'White only', 'Full color': 'Full color',
+            "AE/customer doesn't know - Steve to recommend": 'Steve to pick'
+        };
+        return map[normStatusKey(s)] || s;
+    }
+    // Compact at-a-glance art-spec line for cards: primary placement + size,
+    // color mode, and an "has exact text" flag. Detail page carries the full set.
+    function buildArtSpecLine(req) {
+        var parts = [];
+        var locs = [];
+        try { if (req.Artwork_Locations) { var arr = JSON.parse(req.Artwork_Locations); if (Array.isArray(arr)) locs = arr; } } catch (e) {}
+        var primary = locs[0];
+        var placeStr = '';
+        if (primary && primary.placement) {
+            placeStr = primary.placement;
+            if (primary.width && primary.height) placeStr += ' ' + primary.width + '×' + primary.height + '"';
+            else if (primary.width) placeStr += ' ' + primary.width + '"';
+            if (locs.length > 1) placeStr += ' +' + (locs.length - 1);
+        } else if (req.Garment_Placement) {
+            placeStr = req.Garment_Placement;
+        }
+        if (placeStr) parts.push('<span class="card-spec-item">\u{1F4CD} ' + escapeHtml(placeStr) + '</span>');
+        var cm = (req.Color_Mode || '').trim();
+        if (cm) parts.push('<span class="card-spec-item">\u{1F3A8} ' + escapeHtml(shortColorMode(cm)) + '</span>');
+        var exact = (req.Exact_Text || '').trim();
+        if (exact && exact.indexOf('No text') === -1) parts.push('<span class="card-spec-item">\u{1F4DD} text</span>');
+        return parts.length ? '<div class="card-artspec">' + parts.join('') + '</div>' : '';
+    }
+
     function buildCard(req) {
         var designId = req.ID_Design || req.PK_ID;
         var company = escapeHtml(req.CompanyName || 'Unknown');
@@ -428,6 +487,14 @@ var ArtAeGallery = (function () {
         }
         if (orderType) {
             badges += '<span class="card-badge">' + escapeHtml(orderType) + '</span>';
+        }
+        // Structured garment-form status badges (2026-06-17)
+        var artworkStatus = (req.Artwork_Status || '').trim();
+        if (artworkStatus) badges += '<span class="card-badge card-badge--artwork" title="' + escapeHtml(artworkStatus) + '">' + escapeHtml(shortArtworkStatus(artworkStatus)) + '</span>';
+        var approvalStatus = (req.Approval_Status || '').trim();
+        if (approvalStatus) {
+            var apCls = /approved/i.test(approvalStatus) ? ' card-badge--approved' : ' card-badge--approval';
+            badges += '<span class="card-badge' + apCls + '" title="' + escapeHtml(approvalStatus) + '">' + escapeHtml(shortApprovalStatus(approvalStatus)) + '</span>';
         }
         if (revCount > 0) {
             badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
@@ -486,6 +553,7 @@ var ArtAeGallery = (function () {
             + (dueDateHtml || '')
             + '</div>'
             + (badges ? '<div class="card-badges">' + badges + '</div>' : '')
+            + buildArtSpecLine(req)
             + contactHtml
             + artChargeHtml
             + (elapsedBadge ? '<div style="margin-top:6px;">' + elapsedBadge + '</div>' : '')

@@ -534,11 +534,18 @@
         if (emptyState) emptyState.style.display = 'none';
         if (loading) loading.style.display = '';
 
-        var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval' +
-            '&select=ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES' +
-            '&orderBy=Date_Created%20DESC&limit=50';
+        // Approval_Status is in the primary select only; if the column doesn't
+        // exist yet (pre-migration) the request 500s and we retry without it.
+        var reviewBase = 'ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES';
+        var reviewTail = '&orderBy=Date_Created%20DESC&limit=50';
+        var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + ',Approval_Status' + reviewTail;
+        var urlFallback = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + reviewTail;
 
         fetch(url)
+            .then(function (resp) {
+                if (resp.status === 500) return fetch(urlFallback);
+                return resp;
+            })
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Failed to fetch: ' + resp.status);
                 return resp.json();
@@ -563,6 +570,7 @@
                     var revCount = parseInt(req.Revision_Count) || 0;
                     var dateModified = req.Date_Modified || '';
                     var notes = req.NOTES || '';
+                    var approvalStatus = (req.Approval_Status || '').trim();
 
                     // Mockup image fallback chain
                     var mockupUrl = req.Box_File_Mockup || '';
@@ -607,6 +615,7 @@
                             '<div class="ae-art-card__details">' +
                                 (dueDateDisplay ? '<span class="ae-art-card__detail">Due: ' + escapeHtml(dueDateDisplay) + '</span>' : '') +
                                 (dateModified ? '<span class="ae-art-card__sent">Sent ' + timeAgo(dateModified) + '</span>' : '') +
+                                (approvalStatus ? '<span class="ae-art-card__detail">' + escapeHtml(approvalStatus) + '</span>' : '') +
                             '</div>' +
                             (notes ? '<div class="ae-art-card__notes-preview">' + escapeHtml(notes.substring(0, 80)) + (notes.length > 80 ? '...' : '') + '</div>' : '') +
                         '</div>' +
