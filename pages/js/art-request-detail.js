@@ -422,6 +422,14 @@
         // exact text, prev-order ref, file type, AE checklist)
         renderArtSpecs(req);
 
+        // Printable one-page job sheet (Steve + AE; internal — hidden in customer view)
+        buildPrintSheet(req);
+        var ardPrintBtn = document.getElementById('ard-print-btn');
+        if (ardPrintBtn) {
+            if (isCustomerView) ardPrintBtn.style.display = 'none';
+            else ardPrintBtn.onclick = function () { window.print(); };
+        }
+
         // Billing
         const artMins = req.Art_Minutes || 0;
         const artHours = (Math.ceil(artMins / 15) * 0.25).toFixed(2);
@@ -1645,6 +1653,114 @@
             body.innerHTML = html;
             card.style.display = '';
         }
+    }
+
+    // ── Printable one-page Art Job Sheet ─────────────────────────────────
+    // Compact single-page sheet (all job info + the structured garment-form
+    // fields) Steve/AE can print to PDF to work the job. Hidden on screen;
+    // shown only via @media print. Same record data as the detail cards.
+    function buildPrintSheet(req) {
+        var sheet = document.getElementById('ard-print-sheet');
+        if (!sheet) return;
+
+        function val(v) { return (v === null || v === undefined || v === '') ? '' : String(v); }
+        function kv(label, value) {
+            var v = val(value);
+            if (!v) return '';
+            return '<tr><th>' + escapeHtml(label) + '</th><td>' + escapeHtml(v) + '</td></tr>';
+        }
+
+        var status = (req.Status || 'Submitted').replace(/[^\p{L}\p{N}\s-]/gu, '').trim();
+        var rush = !!req.Is_Rush;
+        var artworkStatus = val(req.Artwork_Status);
+        var approvalStatus = val(req.Approval_Status);
+        var approved = /approved/i.test(approvalStatus);
+
+        var orderType = '';
+        if (req.Order_Type) orderType = (typeof req.Order_Type === 'object') ? Object.values(req.Order_Type).join(', ') : req.Order_Type;
+        else if (req.Order_Type_Source) orderType = req.Order_Type_Source;
+
+        var rep = resolveRepName(req.Sales_Rep || req.User_Email || '');
+        var contactName = ((req.First_Name || req.First_name || '') + ' ' + (req.Last_Name || req.Last_name || '')).trim();
+        var email = req.Email_Contact || req.Email || '';
+
+        var garmentRows = '';
+        [['GarmentStyle', 'GarmentColor'], ['Garm_Style_2', 'Garm_Color_2'], ['Garm_Style_3', 'Garm_Color_3'], ['Garm_Style_4', 'Garm_Color_4']].forEach(function (g, i) {
+            var s = val(req[g[0]]), c = val(req[g[1]]);
+            if (!s && !c) return;
+            garmentRows += '<tr><td>' + (i + 1) + '</td><td>' + escapeHtml(s) + '</td><td>' + escapeHtml(c) + '</td></tr>';
+        });
+
+        var locs = parseLocations(req.Artwork_Locations);
+        var locHtml = '';
+        if (locs.length) {
+            locHtml = '<table class="ps-tbl"><thead><tr><th>Placement</th><th>Size</th><th>Instructions</th></tr></thead><tbody>';
+            locs.forEach(function (l) {
+                var size = '';
+                if (l.width && l.height) size = l.width + '" × ' + l.height + '"';
+                else if (l.width) size = l.width + '" W';
+                else if (l.height) size = l.height + '" H';
+                locHtml += '<tr><td>' + escapeHtml(l.placement || '—') + '</td><td>' + escapeHtml(size || '—') + '</td><td>' + escapeHtml(l.notes || '—') + '</td></tr>';
+            });
+            locHtml += '</tbody></table>';
+        } else if (req.Garment_Placement) {
+            locHtml = '<div class="ps-line"><b>Placement:</b> ' + escapeHtml(req.Garment_Placement) + '</div>';
+        }
+
+        var colorsKv = kv('Color Direction', req.Color_Mode) + kv('PMS Colors', req.PMS_Colors) + kv('Thread Colors', req.Thread_Colors)
+            + (req.Underbase_Required ? kv('Underbase', req.Underbase_Required === 'Steve' ? 'Steve to decide' : req.Underbase_Required) : '');
+
+        var exact = val(req.Exact_Text);
+        var prevKv = kv('Previous Order #', req.Prev_Order_Num) + kv('Previous Design #', req.Prev_Design_Num)
+            + kv('Keep Same', req.Repeat_Keep_Same) + kv('What Changes', req.Repeat_Change);
+        var hasPrev = !!(req.Prev_Order_Num || req.Prev_Design_Num || req.Repeat_Keep_Same || req.Repeat_Change);
+
+        var artMins = req.Art_Minutes || 0;
+        var billed = req.Amount_Art_Billed || 0;
+        var quoted = req.Prelim_Charges || req.Charge_Quoted || '';
+        var confirmed = req.AE_Checklist_Confirmed === true || req.AE_Checklist_Confirmed === 'Yes' || req.AE_Checklist_Confirmed === 1;
+
+        var now = new Date();
+        var printedStr = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        var html = ''
+            + '<div class="ps-doc">'
+            + '<div class="ps-top">'
+            + '<div class="ps-doctitle">ART JOB SHEET</div>'
+            + '<div class="ps-jobid">Design #' + escapeHtml(String(designId)) + '</div>'
+            + '<div class="ps-chips">'
+            + '<span class="ps-chip">' + escapeHtml(status) + '</span>'
+            + (rush ? '<span class="ps-chip ps-chip--rush">RUSH</span>' : '')
+            + (artworkStatus ? '<span class="ps-chip">' + escapeHtml(artworkStatus) + '</span>' : '')
+            + (approvalStatus ? '<span class="ps-chip ' + (approved ? 'ps-chip--green' : 'ps-chip--amber') + '">' + escapeHtml(approvalStatus) + '</span>' : '')
+            + '</div>'
+            + '</div>'
+            + '<div class="ps-grid2">'
+            + '<div><div class="ps-sec">Customer &amp; Order</div><table class="ps-kv">'
+            + kv('Company', req.CompanyName) + kv('SW Cust#', req.Shopwork_customer_number || req.Shopworks_Customer_Number)
+            + kv('Contact', contactName) + kv('Email', email)
+            + kv('Sales Rep', rep) + kv('Decoration', orderType)
+            + kv('Design #', req.Design_Num_SW) + kv('Order #', req.Order_Num_SW)
+            + kv('Due Date', formatDate(req.Due_Date)) + kv('Created', formatDate(req.Date_Created))
+            + '</table></div>'
+            + '<div><div class="ps-sec">Artwork Colors</div><table class="ps-kv">' + (colorsKv || '<tr><td>—</td></tr>') + '</table>'
+            + '<div class="ps-sec">Files &amp; Billing</div><table class="ps-kv">'
+            + kv('File Provided', req.Uploaded_File_Type)
+            + (quoted ? kv('Quoted Art', '$' + quoted) : '')
+            + (artMins ? kv('Art Minutes', artMins) : '')
+            + (billed ? kv('Billed', '$' + Number(billed).toFixed(2)) : '')
+            + '</table></div>'
+            + '</div>'
+            + (garmentRows ? '<div class="ps-sec">Garments</div><table class="ps-tbl"><thead><tr><th>#</th><th>Style</th><th>Color</th></tr></thead><tbody>' + garmentRows + '</tbody></table>' : '')
+            + (locHtml ? '<div class="ps-sec">Print Locations &amp; Size</div>' + locHtml : '')
+            + (exact ? '<div class="ps-sec">Exact Text in Artwork</div><div class="ps-exact">' + escapeHtml(exact) + '</div>' : '')
+            + (hasPrev ? '<div class="ps-sec">Previous Order Reference</div><table class="ps-kv">' + prevKv + '</table>' : '')
+            + (req.NOTES ? '<div class="ps-sec">Notes from Submitter</div><div class="ps-notes">' + escapeHtml(req.NOTES) + '</div>' : '')
+            + (confirmed ? '<div class="ps-check">✓ AE final checklist confirmed' + (req.AE_Checklist_Confirmed_By ? ' by ' + escapeHtml(String(req.AE_Checklist_Confirmed_By)) : '') + '</div>' : '')
+            + '<div class="ps-foot">Northwest Custom Apparel &middot; Art Job Sheet &middot; printed ' + escapeHtml(printedStr) + '</div>'
+            + '</div>';
+
+        sheet.innerHTML = html;
     }
 
     // ── Final Approved Mockup ────────────────────────────────────────────
