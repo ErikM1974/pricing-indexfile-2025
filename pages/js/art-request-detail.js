@@ -427,7 +427,7 @@
         var ardPrintBtn = document.getElementById('ard-print-btn');
         if (ardPrintBtn) {
             if (isCustomerView) ardPrintBtn.style.display = 'none';
-            else ardPrintBtn.onclick = function () { window.print(); };
+            else ardPrintBtn.onclick = printJobSheet;
         }
 
         // Billing
@@ -1787,6 +1787,32 @@
             + '</div>';
 
         sheet.innerHTML = html;
+    }
+
+    // Print the job sheet, auto-shrinking to a single Letter page if a very full
+    // request would otherwise spill to a 2nd page. Measures at the printable
+    // width, then applies `zoom` (reflows layout, so no phantom 2nd page) so ALL
+    // content always lands on ONE page.
+    function printJobSheet() {
+        var sheetEl = document.getElementById('ard-print-sheet');
+        var doc = sheetEl ? sheetEl.querySelector('.ps-doc') : null;
+        if (doc) {
+            doc.style.zoom = '';
+            var saved = { display: sheetEl.style.display, position: sheetEl.style.position, left: sheetEl.style.left, width: sheetEl.style.width };
+            // Render off-screen at the Letter printable width (8.5in − 0.9in margins ≈ 7.6in) to measure true print height.
+            sheetEl.style.position = 'absolute';
+            sheetEl.style.left = '-10000px';
+            sheetEl.style.width = '7.6in';
+            sheetEl.style.display = 'block';
+            var h = doc.scrollHeight;
+            var pageH = Math.round(9.9 * 96); // printable Letter height @0.45in margins, conservative (~950px)
+            if (h > pageH) doc.style.zoom = (pageH / h).toFixed(3);
+            sheetEl.style.display = saved.display;
+            sheetEl.style.position = saved.position;
+            sheetEl.style.left = saved.left;
+            sheetEl.style.width = saved.width;
+        }
+        window.print();
     }
 
     // ── Final Approved Mockup ────────────────────────────────────────────
