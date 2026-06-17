@@ -1,3 +1,7 @@
+## v2026.06.16.8 (2026.06.16)
+
+- Docs: record SanMar OSS-vs-OSN inbound feed-lag gotcha + the catch-up fix
+
 ## v2026.06.16.7 (2026.06.16)
 
 - Deploy v2026.06.16.7: manual 'Refresh Inbound' button — live SanMar shipment status on demand
