@@ -1,3 +1,7 @@
+## v2026.06.17.1 (2026.06.17)
+
+- Deploy v2026.06.17.1: Refresh Inbound now PERSISTS via proxy catch-up (sticks across reloads)
+
 ## v2026.06.16.8 (2026.06.16)
 
 - Docs: record SanMar OSS-vs-OSN inbound feed-lag gotcha + the catch-up fix
