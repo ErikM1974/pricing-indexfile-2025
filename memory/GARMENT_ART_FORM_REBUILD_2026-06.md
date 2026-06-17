@@ -67,5 +67,17 @@ placement/size/instructions is a **JSON array** in `Artwork_Locations` (not per-
 ## Verified (local preview)
 Form renders (11 sections, adaptive logic, validation, Style→Color); detail-page Art Spec card +
 pills; Steve gallery (30 cards) + AE gallery (8) badges; Ruth thread row live on 28/90 real
-records — all with zero console errors. **Live submit needs the new columns to exist** (Erik
-adds), then end-to-end test a real garment request.
+records — all with zero console errors.
+
+## SHIPPED LIVE 2026-06-17 — FE `v2026.06.17.5` (rel 1376) + proxy v813
+Erik added all 15 `ArtRequests` cols. Deployed via `/deploy` (cache-bust to ?v=2026.06.17.5 across
+ae-dashboard/art-hub-steve/art-hub-ruth/art-request-detail/mockup-detail). Production-verified by a
+4-agent sweep: all pages 200 + new ?v=; served JS/CSS contain new markers (not stale slug);
+proxy POST→PUT `/fields`→GET→DELETE round-trip clean (PUT whitelist v813 accepts the new cols);
+form-dep endpoints + new-col SELECT all 200 (not 500). Test records 52991/52992/52993 deleted.
+
+## Notifications — DECIDED 2026-06-17 (keep as-is; do NOT "restore" the dropped bits)
+Garment form intentionally matches the Sticker/Banner/JDS pattern, NOT the retired DataPage:
+- EmailJS (`service_jgrave3`/`template_art_note_added`): Steve `art@` + AE confirmation + sales-rep CC — same as before.
+- Backend Slack now fires for garment (`notifyArtRequestSubmission` + `notifyRushArtRequest`) because it routes through the proxy POST — the old DataPage bypassed the proxy so it never did. Intentional improvement (uniform across all 4 item types).
+- DROPPED on purpose (custom forms never had them): the `/api/art-notifications` dashboard toast, and the separate `sendRushConfirmation` rush EMAIL (rush is now the Slack ping). Erik confirmed keep-as-is — do NOT re-add as a "regression fix."

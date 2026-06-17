@@ -6,6 +6,10 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+## Art Hub
+
+**Garment art form: Caspio DataPage → custom REST form (2026-06-17, detail in [GARMENT_ART_FORM_REBUILD_2026-06.md](./GARMENT_ART_FORM_REBUILD_2026-06.md)) — reroutes notifications + a new column is a 4-surface change.** Replacing a Caspio DataPage with a custom form (`garment-submit-form.js`, like Sticker/Banner/JDS) changes behavior beyond the form: (1) **Notifications reroute** — the DataPage wrote straight to Caspio, *bypassing the proxy*, so it never fired backend Slack; the custom form POSTs `/api/artrequests`, so `notifyArtRequestSubmission`/`notifyRushArtRequest` now DO fire. EmailJS to Steve/AE is unchanged; the old `/api/art-notifications` toast + `sendRushConfirmation` rush-email are intentionally dropped (Erik keep-as-is — do NOT re-add as a "regression"). (2) `Order_Type` is REST-unwriteable (List-String) → write **`Order_Type_Source`** (dashboards coalesce both). (3) A new `ArtRequests` column must be wired in **4 places or it silently vanishes**: Caspio table + form payload + every gallery's PRIMARY `SELECT` (art-ae.js / art-hub-steve-gallery.js / art-hub-steve.js kanban — leave the legacy-fallback SELECT strings alone so they degrade gracefully when a column is missing) + each `buildCard`/detail renderer. (4) Repeating-group data (per-location placement/size) → ONE JSON column (`Artwork_Locations`) rendered as a table, not N columns. (5) Card status-string shorteners must be **dash-insensitive** (the form writes an em-dash; a Caspio hand-edit may use a hyphen) — normalize via `normStatusKey()`.
+
 ## Quote Builders
 
 ### SCP saved full WA tax when "Include Tax" was unchecked; DTF could print a $0 PDF with pricing unloaded (2026-06-14)
@@ -275,11 +279,7 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 ### WA DOR tax-rate lookup discarded valid rates on ResultCode 2 (2026-06-03) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: DOR ResultCode 2 still carries a VALID ZIP-level rate (only `Rate=-1` is a true miss); retry ZIP-only before any hardcoded default.
 
-### Routes outlive files — 7 zombie sendFile routes + a live nav item pointed at deleted pages (2026-06-11)
-**Problem:** Customer-facing nav item "Marketing" (index.html + webstore-info footer) 404'd; server.js still had `app.get` → `sendFile` for 7 files that no longer exist (marketing, top-sellers-catalog, index-new, embroidery-pricing-standardized/-professional, test-api, test-catalog-layout). Legacy cart.html (Bootstrap 4) + pages/order-confirmation.html were orphaned (zero inbound links) but still served at `/cart` — an unmaintained checkout flow with stale pricing logic a customer could reach by URL.
-**Root Cause:** Files were deleted over months without removing their server.js routes or grepping for inbound links (predates the file-lifecycle automation hook).
-**Solution:** Removed the 7 zombie routes; `/cart` → 301 `/pages/sample-cart.html`; deleted cart.html + order-confirmation.html; flagged their now-dead root JS/CSS (cart*.js, order-form-pdf.js, root pricing-matrix-api.js, cart-styles.css) in ACTIVE_FILES.md; repointed webstore-info/inventory-details dead links to mailto.
-**Prevention:** On ANY page delete: grep for the filename AND its route in server.js (route TOC at top), and check `scripts/safety-tools/validate-critical-paths.js` (it asserted cart.html as a critical path). Full customer-page inventory: memory/CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md.
+### Routes outlive files — 7 zombie sendFile routes (2026-06-11, ARCHIVED 2026-06-17, full entry in archive): on ANY page delete, grep the filename AND its `app.get`/`sendFile` route in server.js (route TOC) + check `scripts/safety-tools/validate-critical-paths.js` — routes outlive deleted files.
 
 ### Sample price rode in a customer-editable URL param into ShopWorks; sibling page's "same" margin had drifted from Caspio (2026-06-11)
 **Problem:** `pages/top-sellers-product.html` built its sample-cart item with `price: parseFloat(params.price)` + `sampleType: params.get('sampleType')` straight from the URL — `sample-order-service.js` then wrote "PAID SAMPLE - Invoice customer $X" into ShopWorks notes from that value, so `?price=0.01&sampleType=free` bought any paid sample for pennies. Separately, the showcase page that GENERATES those URLs computed the price with a hardcoded `/0.57` margin while Caspio's BLANK Pricing_Tiers said 0.53 — customers were systematically underquoted vs the intended margin.
