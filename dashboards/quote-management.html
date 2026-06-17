@@ -380,14 +380,13 @@
         // tracking on the spot. Bounded (≤25 POs, 4 concurrent) so it stays fast;
         // a live read only — it doesn't write the synced table, so it reflects the
         // truth the moment you ask rather than waiting for the daily sync.
-        function buildTrackUrl(carrier, tn) {
-            if (!tn) return null;
-            const t = encodeURIComponent(String(tn).trim());
-            const c = String(carrier || '').toUpperCase();
-            if (c.includes('FEDEX')) return `https://www.fedex.com/fedextrack/?trknbr=${t}`;
-            if (c.includes('USPS'))  return `https://tools.usps.com/go/TrackConfirmAction?tLabels=${t}`;
-            return `https://www.ups.com/track?tracknum=${t}`; // SanMar ships UPS by default
-        }
+        // Manual on-demand inbound refresh (Erik 2026-06-16). Triggers the proxy's
+        // bounded catch-up via a SAME-ORIGIN pricing-index endpoint (which holds the
+        // CRM secret the browser doesn't): it pulls the live SanMar shipment feed for
+        // recent open orders and PERSISTS any tracking into the synced table. We then
+        // re-pull inbound status with refresh=true, so the dots show the now-persisted
+        // "Shipped" + tracking — and, unlike a display-only refresh, it STICKS across
+        // page reloads (the synced batch-status is the source on every load).
         async function refreshInboundLive() {
             const btn = document.getElementById('btn-refresh-inbound');
             if (!btn || btn.disabled) return;
@@ -395,48 +394,16 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
             try {
-                // Visible rows that have a linked SanMar PO and aren't already shipped.
-                const seen = new Set();
-                const targets = [];
-                for (const q of (allQuotes || [])) {
-                    const wo = getWoId(q);
-                    if (!wo) continue;
-                    const info = inboundStatusMap.get(String(wo));
-                    if (!info || !info.po || info.shipped) continue; // no PO, or already shipped
-                    if (seen.has(info.po)) continue;
-                    seen.add(info.po);
-                    targets.push({ wo: String(wo), po: info.po, base: info });
-                    if (targets.length >= 25) break; // cap — keep it snappy
-                }
-                if (targets.length === 0) {
-                    showToast('Inbound already current — no open SanMar POs to re-check.');
-                    return;
-                }
-                let updated = 0;
-                const queue = targets.slice();
-                const worker = async () => {
-                    while (queue.length) {
-                        const t = queue.shift();
-                        try {
-                            const r = await fetch(`${API_BASE}/api/sanmar-shipments/po/${encodeURIComponent(t.po)}`);
-                            const d = await r.json().catch(() => ({}));
-                            const boxes = (d && d.data && d.data.boxes) || [];
-                            if (boxes.length) {
-                                const first = boxes.find(b => b.trackingNumber) || boxes[0];
-                                const tn = first.trackingNumber || '';
-                                const carrier = first.carrier || 'UPS';
-                                inboundStatusMap.set(t.wo, {
-                                    ...t.base, shipped: true, state: 'shipped', status: 'Shipped',
-                                    trackingNumber: tn, carrier, trackingUrl: buildTrackUrl(carrier, tn),
-                                });
-                                updated++;
-                            }
-                        } catch (_) { /* skip this PO — non-fatal */ }
-                    }
-                };
-                await Promise.all([worker(), worker(), worker(), worker()]);
-                renderTable();
-                showToast(`✓ Inbound refreshed live from SanMar: ${updated} now Shipped (${targets.length} checked).`);
+                const resp = await fetch('/api/sanmar-orders/sync-shipments', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ limit: 15 }),
+                });
+                const result = await resp.json().catch(() => ({}));
+                if (!resp.ok || !result.success) throw new Error(result.error || `HTTP ${resp.status}`);
+                await fetchInboundStatuses({ force: true }); // re-pull, bypassing the status cache
+                const added = result.shipmentsAdded || 0;
+                showToast(`✓ Inbound synced from SanMar: +${added} now Shipped (${result.checked || 0} checked${result.remaining ? `, ${result.remaining} still pending` : ''}).`);
             } catch (err) {
                 // Erik's #1 rule — surface the failure, never fail silently.
                 console.error('[QuoteManagement] refreshInboundLive failed:', err);
@@ -671,12 +638,14 @@
 
         // ONE batched call for all loaded work orders we haven't checked yet.
         // SYNCED data via the proxy (no per-row SOAP). Non-fatal on failure.
-        async function fetchInboundStatuses() {
-            const woIds = [...new Set((allQuotes || []).map(getWoId).filter(Boolean).map(String))]
-                .filter(wo => !inboundStatusMap.has(wo));
+        async function fetchInboundStatuses({ force = false } = {}) {
+            const allWo = [...new Set((allQuotes || []).map(getWoId).filter(Boolean).map(String))];
+            // Normal load: only fetch WOs we haven't checked. force=true (after a
+            // manual sync): re-fetch ALL and bust the proxy's synced-status cache.
+            const woIds = force ? allWo : allWo.filter(wo => !inboundStatusMap.has(wo));
             if (woIds.length === 0) return;
             try {
-                const resp = await fetch(`${API_BASE}/api/sanmar-orders/batch-status?woIds=${encodeURIComponent(woIds.join(','))}`);
+                const resp = await fetch(`${API_BASE}/api/sanmar-orders/batch-status?woIds=${encodeURIComponent(woIds.join(','))}${force ? '&refresh=true' : ''}`);
                 if (!resp.ok) return; // leave unfetched; indicator stays neutral
                 const data = await resp.json().catch(() => ({}));
                 woIds.forEach(wo => inboundStatusMap.set(wo, (data && data[wo]) ? data[wo] : null));
