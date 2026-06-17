@@ -430,6 +430,25 @@
             else ardPrintBtn.onclick = printJobSheet;
         }
 
+        // "Build Mockup" — opens the Easy Shirt Designer pre-seeded with this
+        // request's garment color + placement + company + design #. Internal only.
+        var buildBtn = document.getElementById('ard-build-mockup-btn');
+        if (buildBtn) {
+            if (isCustomerView) {
+                buildBtn.style.display = 'none';
+            } else {
+                var sp = new URLSearchParams();
+                var gColor = req.GarmentColor || req.Garm_Color_2 || '';
+                if (gColor) { sp.set('color', gColor); sp.set('garmentName', gColor); }
+                var firstLoc = (parseLocations(req.Artwork_Locations)[0] || {}).placement || req.Garment_Placement || '';
+                if (firstLoc) sp.set('placement', firstLoc);
+                if (req.CompanyName) sp.set('company', req.CompanyName);
+                if (designId) sp.set('designId', String(designId));
+                buildBtn.href = '/pages/garment-designer.html?' + sp.toString();
+                buildBtn.style.display = 'inline-flex';
+            }
+        }
+
         // Billing
         const artMins = req.Art_Minutes || 0;
         const artHours = (Math.ceil(artMins / 15) * 0.25).toFixed(2);

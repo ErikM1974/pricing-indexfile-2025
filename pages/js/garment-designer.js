@@ -5040,5 +5040,85 @@ function escapeHtml(s) {
 // Show info panel by default on wide screens
 if (window.innerWidth > 1000) $('infoPanel').classList.add('visible');
 
+// ── Art-request pre-seed ──────────────────────────────────────────────────
+// Lets the designer be opened straight from an art request, pre-configured:
+//   /pages/garment-designer.html?color=%23c8102e&garmentName=Red&placement=Left%20Chest&company=Acme&designId=52994
+// Sets the shirt color immediately, stashes the placement so the rep's next
+// upload lands there, and shows a context banner. Placement strings match the
+// designer's own set (Left Chest / Full Front / Upper Back / Full Back).
+window.__artRequestSeed = null;
+// Resolve a garment COLOR NAME (e.g. "Navy") to a hex via the designer's own
+// color tables — an art request stores color NAMES, not hex.
+function resolveGarmentHex(name) {
+  if (!name) return '';
+  const n = String(name).trim().toLowerCase();
+  const pools = [typeof PC61_COLORS !== 'undefined' ? PC61_COLORS : [], typeof GARMENT_COLORS !== 'undefined' ? GARMENT_COLORS : []];
+  for (const pool of pools) for (const pair of pool) {
+    if (pair[0] && pair[0].toLowerCase() === n && pair[1] && pair[1] !== 'checker') return pair[1];
+  }
+  for (const pool of pools) for (const pair of pool) {
+    if (pair[1] && pair[1] !== 'checker' && pair[0] && (pair[0].toLowerCase().indexOf(n) > -1 || n.indexOf(pair[0].toLowerCase()) > -1)) return pair[1];
+  }
+  return '';
+}
+function applyUrlPreseed() {
+  let p;
+  try { p = new URLSearchParams(window.location.search); } catch (e) { return; }
+  const color = (p.get('color') || p.get('garmentColor') || '').trim();
+  const garmentName = (p.get('garmentName') || p.get('colorName') || '').trim();
+  const placement = (p.get('placement') || '').trim();
+  const company = (p.get('company') || '').trim();
+  const designId = (p.get('designId') || p.get('id_design') || '').trim();
+  if (!color && !placement && !company && !designId) return;
+
+  window.__artRequestSeed = { color, garmentName, placement, company, designId };
+
+  // Garment color — immediate. setStageBg sets currentGarment; the shirt repaints
+  // with it now (if loaded) and again when initPhotoMock's photos finish.
+  if (color) {
+    let hex = '';
+    if (/^#?[0-9a-fA-F]{6}$/.test(color)) hex = color.charAt(0) === '#' ? color : '#' + color;
+    else hex = resolveGarmentHex(color) || resolveGarmentHex(garmentName);
+    if (hex) { try { setStageBg(hex, null, garmentName || color); } catch (e) {} }
+  }
+
+  const KNOWN = ['Left Chest', 'Full Front', 'Upper Back', 'Full Back'];
+  const seedLoc = KNOWN.indexOf(placement) > -1 ? placement : '';
+  renderSeedBanner({ company, designId, garmentName, color, seedLoc });
+}
+
+// "Upload artwork for this request" — set the seeded placement, then open the
+// file picker (a user gesture, so the browser allows it). The file-add handler
+// applies pendingPlacement to the new entry.
+function seedUpload(loc) {
+  if (loc) {
+    pendingSide = (loc === 'Full Back' || loc === 'Upper Back') ? 'back' : 'front';
+    pendingPlacement = loc;
+  }
+  const fi = document.getElementById('fileInput');
+  if (fi) fi.click();
+}
+
+function renderSeedBanner(seed) {
+  const viewer = document.getElementById('viewerCol');
+  if (!viewer || document.getElementById('seedBanner')) return;
+  const esc = (s) => escapeHtml(String(s == null ? '' : s));
+  const bits = [];
+  if (seed.company) bits.push('<b>' + esc(seed.company) + '</b>');
+  if (seed.designId) bits.push('Design #' + esc(seed.designId));
+  if (seed.garmentName || seed.color) bits.push(esc(seed.garmentName || seed.color));
+  if (seed.seedLoc) bits.push(esc(seed.seedLoc));
+  const banner = document.createElement('div');
+  banner.id = 'seedBanner';
+  banner.className = 'seed-banner';
+  banner.innerHTML =
+    '<div class="seed-banner-text"><span class="seed-banner-icon">🧵</span>Building a mockup for ' + bits.join(' · ') + '</div>'
+    + '<button type="button" class="seed-banner-btn" id="seedUploadBtn">⬆ Upload artwork for this request</button>';
+  viewer.insertBefore(banner, viewer.firstChild);
+  const btn = document.getElementById('seedUploadBtn');
+  if (btn) btn.addEventListener('click', function () { seedUpload(seed.seedLoc); });
+}
+
 // Load the embedded shirt right away so the landing preview appears instantly
 initPhotoMock();
+applyUrlPreseed();
