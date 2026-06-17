@@ -1,3 +1,7 @@
+## v2026.06.17.3 (2026.06.17)
+
+- Deploy v2026.06.17.3: Due column = requested ship date only (drop-dead omitted — not in MO API)
+
 ## v2026.06.17.2 (2026.06.17)
 
 - Deploy v2026.06.17.2: add Due (req-ship) column + drop-dead flag to Quote Mgmt; first-name salesperson
