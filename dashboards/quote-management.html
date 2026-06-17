@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.17.2">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.17.3">
 </head>
 <body>
     <!-- Header -->
@@ -159,7 +159,7 @@
                         <th>Status</th>
                         <th>Progress</th>
                         <th title="Blank goods inbound from SanMar (vendor → us)">Inbound</th>
-                        <th title="Requested ship date from ShopWorks. A red ⚠ flag means the order has a drop-dead date — complete urgently.">Due</th>
+                        <th title="Requested ship date from ShopWorks. Amber = due within 3 days; red = overdue.">Due</th>
                         <th>Created</th>
                         <th>Actions</th>
                     </tr>
@@ -716,23 +716,17 @@
             };
         }
 
-        // Due (Requested Ship) date + drop-dead, for the Due column (Erik 2026-06-17).
-        // Due date IS exposed by ManageOrders (snapshot.order.date_RequestedToShip);
-        // the drop-dead date is NOT returned by the MO /v1 pull, so it only appears
-        // for orders that carried one through OUR system (push/quote column) — an
-        // operator-set ShopWorks drop-dead can't be read back via the API.
+        // Due (Requested Ship) date for the Due column (Erik 2026-06-17). This is the
+        // ONLY due-type date ManageOrders exposes (snapshot.order.date_RequestedToShip).
+        // ShopWorks's operator-set drop-dead date is NOT in the MO /v1 Orders schema,
+        // so it is intentionally OMITTED (confirmed against the schema — Erik 2026-06-17).
         function getDueInfo(quote) {
-            let due = null, dropDead = null;
+            let due = null;
             if (quote.ShopWorks_Snapshot) {
-                try {
-                    const snap = JSON.parse(quote.ShopWorks_Snapshot) || {};
-                    due = (snap.order && snap.order.date_RequestedToShip) || null;
-                    dropDead = (snap.pushed && snap.pushed.date_OrderDropDead) || null;
-                } catch (_) { /* malformed */ }
+                try { due = (JSON.parse(quote.ShopWorks_Snapshot).order || {}).date_RequestedToShip || null; }
+                catch (_) { /* malformed */ }
             }
-            due = due || quote.ReqShipDate || quote.DateOrderRequestedToShip || null;
-            dropDead = dropDead || quote.DropDeadDate || null;
-            return { due, dropDead };
+            return due || quote.ReqShipDate || quote.DateOrderRequestedToShip || null;
         }
         // MO dates arrive as 'YYYY-MM-DDT00:00:00.000Z' — a CALENDAR date stamped at
         // UTC midnight. Parse the Y-M-D parts as a LOCAL date so it renders the exact
@@ -743,29 +737,17 @@
             return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
         }
         function renderDueCell(quote) {
-            const { due, dropDead } = getDueInfo(quote);
+            const dueD = calDate(getDueInfo(quote));
+            if (!dueD) return '<span class="milestone-na" title="No requested ship date synced from ShopWorks yet">—</span>';
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const days = Math.round((dueD - today) / 86400000);
+            let cls = 'due-normal', rel = `in ${days}d`;
+            if (days < 0) { cls = 'due-overdue'; rel = `${-days}d overdue`; }
+            else if (days === 0) { cls = 'due-soon'; rel = 'due today'; }
+            else if (days <= 3) { cls = 'due-soon'; }
             const fmt = (dt) => dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            let html = '';
-            const dueD = calDate(due);
-            if (dueD) {
-                const today = new Date(); today.setHours(0, 0, 0, 0);
-                const days = Math.round((dueD - today) / 86400000);
-                let cls = 'due-normal', rel = `in ${days}d`;
-                if (days < 0) { cls = 'due-overdue'; rel = `${-days}d overdue`; }
-                else if (days === 0) { cls = 'due-soon'; rel = 'due today'; }
-                else if (days <= 3) { cls = 'due-soon'; }
-                html += `<div class="due-date ${cls}" title="Requested ship date (from ShopWorks)">${fmt(dueD)}</div>`;
-                html += `<div class="date-relative">${rel}</div>`;
-            } else {
-                html += '<span class="milestone-na" title="No requested ship date synced from ShopWorks yet">—</span>';
-            }
-            const ddD = calDate(dropDead);
-            if (ddD) {
-                html += `<div class="drop-dead-flag" title="This order has a DROP-DEAD date and must be completed urgently.">
-                    <i class="fas fa-triangle-exclamation"></i> Drop-dead ${fmt(ddD)}
-                </div>`;
-            }
-            return html;
+            return `<div class="due-date ${cls}" title="Requested ship date (from ShopWorks)">${fmt(dueD)}</div>`
+                 + `<div class="date-relative">${rel}</div>`;
         }
 
         // Tooltip explaining where the displayed amount came from. Hover on
