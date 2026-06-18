@@ -2672,6 +2672,103 @@ body.ae-view .ard-status-step.active .ard-status-label {
     color: #dc2626;
 }
 
+/* ── Rep Reference Mockup (purple) — built in the Easy Shirt Designer ──
+   Distinct from the green Final Approved Mockup: this is a reference for Steve,
+   never the production proof, never shown to the customer. */
+.ard-rep-mockup-section {
+    background: linear-gradient(135deg, #faf5ff, #ede9fe);
+    border: 2px solid #8b5cf6;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+.ard-rep-mockup-section .ard-gallery-section-label {
+    color: #6d28d9;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+}
+.ard-rep-mockup-card {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: flex-start;
+    background: #fff;
+    border: 2px solid #c4b5fd;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.18);
+}
+.ard-rep-mockup-imgwrap {
+    position: relative;
+    flex: 1 1 280px;
+    min-width: 240px;
+    text-align: center;
+}
+.ard-rep-mockup-imgwrap img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+.ard-rep-mockup-badge {
+    background: #7c3aed;
+    color: #fff;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+.ard-rep-mockup-info {
+    flex: 1 1 260px;
+    padding: 14px 16px;
+    text-align: left;
+}
+.ard-rep-mockup-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+.ard-rep-chip {
+    background: #ede9fe;
+    color: #5b21b6;
+    border-radius: 999px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+}
+.ard-rep-mockup-threads {
+    font-size: 12.5px;
+    color: #4c1d95;
+    margin-bottom: 8px;
+    word-break: break-word;
+}
+.ard-rep-mockup-note {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    line-height: 1.4;
+}
+.ard-rep-mockup-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 700;
+}
+.ard-rep-mockup-open:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%);
+    color: #fff;
+    text-decoration: none;
+}
+
 /* "Set as Final" button on draft mockup slots */
 .ard-set-final-btn {
     position: absolute;

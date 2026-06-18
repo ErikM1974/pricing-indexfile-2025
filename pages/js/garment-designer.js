@@ -5085,6 +5085,12 @@ function applyUrlPreseed() {
   const KNOWN = ['Left Chest', 'Full Front', 'Upper Back', 'Full Back'];
   const seedLoc = KNOWN.indexOf(placement) > -1 ? placement : '';
   renderSeedBanner({ company, designId, garmentName, color, seedLoc });
+
+  // Reveal the "Save to Art Request" button only when opened from a real request.
+  if (designId) {
+    const sb = document.getElementById('saveReqBtn');
+    if (sb) sb.style.display = 'inline-flex';
+  }
 }
 
 // "Upload artwork for this request" — set the seeded placement, then open the
@@ -5117,6 +5123,97 @@ function renderSeedBanner(seed) {
   viewer.insertBefore(banner, viewer.firstChild);
   const btn = document.getElementById('seedUploadBtn');
   if (btn) btn.addEventListener('click', function () { seedUpload(seed.seedLoc); });
+}
+
+// ── Save to Art Request (rep reference mockup) ────────────────────────────
+// When the designer was opened from an art request (?designId=…), this uploads
+// the current clean mockup PNG to Caspio and attaches it to that request as a
+// REFERENCE for Steve (he still owns the production proof). It never touches the
+// Box mockup slots, the customer's File_Upload slots, or Approval_Status.
+const ART_PROXY_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+
+async function saveToArtRequest() {
+  const seed = window.__artRequestSeed;
+  if (!seed || !seed.designId) { showToast('Open this from an art request to save'); return; }
+
+  const e = current();
+  if (!e || e.status !== 'ready' || !e.mockOn || !e.mockCanvas) {
+    showToast('Add artwork and build a mockup first'); return;
+  }
+
+  const btn = document.getElementById('saveReqBtn');
+  const orig = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Saving…'; }
+
+  try {
+    // 1. Clean mockup PNG (no selection chrome) → Blob.
+    const clean = getCleanMock(e);
+    const blob = await new Promise((res, rej) => {
+      try { clean.toBlob(b => b ? res(b) : rej(new Error('Could not render mockup')), 'image/png'); }
+      catch (err) { rej(err); }
+    });
+
+    // 2. Upload to the Caspio Artwork folder. Filename carries the design # +
+    //    a timestamp so repeated saves never collide.
+    const fd = new FormData();
+    fd.append('file', blob, 'rep-mockup-' + seed.designId + '-' + Date.now() + '.png');
+    const upResp = await fetch(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd });
+    const up = await upResp.json().catch(() => ({}));
+    if (!upResp.ok || !up.success || !up.externalKey) {
+      throw new Error(up.error || ('Upload failed (' + upResp.status + ')'));
+    }
+    // Displayable URL: GET /api/files/:externalKey streams the image with its
+    // content-type, so an <img src> resolves directly (no CDN formula needed).
+    const imageUrl = ART_PROXY_BASE + '/api/files/' + up.externalKey;
+
+    // 3. Build the reference metadata (garment / placement / threads / date).
+    const isDst = e.kind === 'dst' && Array.isArray(e.dstThreads);
+    const threads = isDst ? e.dstThreads.map((t, i) => ({
+      code: t && t.code ? String(t.code) : '',
+      name: t && t.name ? String(t.name) : '',
+      element: (e.dstElements && e.dstElements[i]) ? String(e.dstElements[i]) : ''
+    })) : [];
+    let threadSummary = '';
+    try { if (isDst && typeof dstThreadSummaryInline === 'function') threadSummary = dstThreadSummaryInline(e) || ''; } catch (_) {}
+
+    const meta = {
+      source: 'shirt-designer',
+      designId: seed.designId,
+      date: new Date().toISOString(),
+      garmentColor: (typeof currentGarment !== 'undefined' && currentGarment !== 'checker') ? currentGarment : '',
+      garmentName: (typeof currentGarmentName !== 'undefined' ? currentGarmentName : '') || seed.garmentName || '',
+      placement: e.printLoc || seed.placement || '',
+      printWidthIn: e.printW || null,
+      kind: e.kind || '',
+      threadSummary: threadSummary,
+      threads: threads
+    };
+
+    // 4. Attach to the request (whitelisted fields only — reference, not a proof).
+    const putResp = await fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(seed.designId) + '/fields', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Rep_Mockup: imageUrl, Rep_Mockup_Meta: JSON.stringify(meta) })
+    });
+    if (!putResp.ok) {
+      const pe = await putResp.json().catch(() => ({}));
+      throw new Error(pe.error || ('Save failed (' + putResp.status + ')'));
+    }
+
+    showToast('✓ Saved to art request #' + seed.designId + ' — Steve will see it as a reference');
+
+    // Tell the opener (the art-request detail tab) to refresh so the card shows.
+    try {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage({ type: 'rep-mockup-saved', designId: seed.designId }, location.origin);
+      }
+    } catch (_) {}
+  } catch (err) {
+    console.error('[saveToArtRequest]', err);
+    showToast('Save failed: ' + (err && err.message ? err.message : 'unknown error'));
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+  }
 }
 
 // Load the embedded shirt right away so the landing preview appears instantly
