@@ -34,7 +34,7 @@
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=20260515-ai-chip">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.18.3">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
@@ -372,15 +372,26 @@
                                 <div class="tool-category-icon">
                                     <i class="fas fa-pen-ruler" aria-hidden="true"></i>
                                 </div>
-                                <span class="tool-category-title">Quote Builders</span>
-                                <span class="tool-category-count">7</span>
+                                <span class="tool-category-title">Quoting</span>
+                                <span class="tool-category-count">8</span>
+                            </div>
+                            <div class="quote-guide-mini">
+                                <span class="qg-chip">Same price on every tool</span><span class="qg-note">pick by how much detail you need — all pull live from Caspio.</span>
                             </div>
                             <div class="tool-buttons">
-                                <a href="/dashboards/quote-management.html" class="tool-btn"><i class="fas fa-list-alt" aria-hidden="true"></i> Quote Management</a>
+                                <div class="tool-subhead">Quick price</div>
+                                <a href="/calculators/quick-quote/" class="tool-btn tool-btn--new" title="Fast price for any style — type style + qty + print, see every method. For quotes that don't need the full workup. No customer record, no save. Same prices as the builders."><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
+
+                                <div class="tool-subhead">Full quote <span class="tool-subhead-note">sizes · shipping · saved → ShopWorks</span></div>
                                 <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Emb / Cap / Patch</a>
                                 <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> DTG</a>
                                 <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
                                 <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire" aria-hidden="true"></i> DTF</a>
+
+                                <div class="tool-subhead">Existing quotes</div>
+                                <a href="/dashboards/quote-management.html" class="tool-btn"><i class="fas fa-list-alt" aria-hidden="true"></i> Quote Management</a>
+
+                                <div class="tool-subhead">Customer self-serve</div>
                                 <a href="/custom-tees" class="tool-btn"><i class="fas fa-shirt" aria-hidden="true"></i> Custom Tees (customer)</a>
                                 <a href="/tools/custom-tees-calibrate.html" class="tool-btn"><i class="fas fa-crosshairs" aria-hidden="true"></i> Tee Print-Box Calibration</a>
                             </div>

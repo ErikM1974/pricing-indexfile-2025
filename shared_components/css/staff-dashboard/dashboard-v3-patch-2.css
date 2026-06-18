@@ -552,3 +552,83 @@
   color: #e0e7ff;                            /* indigo-100 */
   border-color: rgba(129, 140, 248, 0.55);
 }
+
+/* NEW chip — same mechanism as --beta, emerald to read as "fresh / good to use"
+   (not the indigo "still being refined" beta signal). */
+.tool-btn--new {
+  position: relative;
+  padding-right: 58px !important;            /* reserve room for the NEW chip */
+}
+.tool-btn--new::after {
+  content: "NEW";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  line-height: 1;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  background: rgba(52, 211, 153, 0.16);      /* emerald-400 @ 16% */
+  color: #a7f3d0;                            /* emerald-200 — readable on dark */
+  border: 1px solid rgba(52, 211, 153, 0.42);
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;                      /* chip is advisory only */
+}
+.tool-btn--new:hover::after {
+  background: rgba(52, 211, 153, 0.24);
+  color: #d1fae5;                            /* emerald-100 */
+  border-color: rgba(52, 211, 153, 0.55);
+}
+
+/* Compact "which to use" line — one short row instead of a block. The work of
+   telling reps what to click is done by the .tool-subhead group labels below. */
+.quote-guide-mini {
+  margin: 0 0 10px;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.quote-guide-mini .qg-chip {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #a7f3d0;                            /* emerald-200 */
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.28);
+  border-radius: 6px;
+  padding: 2px 7px;
+  margin-right: 6px;
+}
+.quote-guide-mini .qg-note { color: #94a3b8; }
+
+/* Sub-group labels inside a tool group — the grouping itself answers
+   "which do I click for what I'm trying to do". */
+.tool-subhead {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #8aa0b6;
+  margin: 9px 2px 2px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.tool-subhead:first-child { margin-top: 0; }
+.tool-subhead-note {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6b7c8f;
+}
