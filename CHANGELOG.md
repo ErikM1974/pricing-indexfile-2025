@@ -1,3 +1,8 @@
+## v2026.06.18.2 (2026.06.18)
+
+- Training: document Rep Reference Mockup (Save to Art Request) flow
+- Deploy v2026.06.18.2: add Shirt Designer link to staff dashboard Art & Design
+
 ## v2026.06.18.1 (2026.06.18)
 
 - Designer: record Phase 1b.1 shipped (pre-seed+sender) + lock 1b.2 save-to-Caspio design
