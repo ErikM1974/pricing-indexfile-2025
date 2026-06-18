@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.4">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.5">
 </head>
 <body>
 
@@ -91,8 +91,17 @@
                     <div class="qq-size-grid" id="qqSizeGrid"></div>
                 </div>
 
-                <div class="field">
-                    <label id="qqPlacementLabel">Where does the print go?</label>
+                <!-- Embroidery: logo-based (primary + additional logos), not placement-based -->
+                <div class="field qq-emb" id="qqEmbField" hidden>
+                    <label id="qqEmbLabel">Embroidery logos</label>
+                    <div id="qqEmbLogos" class="qq-emb-logos"></div>
+                    <button type="button" id="qqEmbAddBtn" class="qq-link-btn">+ Add another logo</button>
+                    <label class="qq-check qq-emb-dig"><input type="checkbox" id="qqEmbDigitizing"> New logo — add one-time digitizing</label>
+                    <p class="qq-emb-hint" id="qqEmbHint"></p>
+                </div>
+
+                <div class="field" id="qqPlacementField">
+                    <label id="qqPlacementLabel">Where does the print go? <span class="muted">· DTG / screen print / DTF</span></label>
                     <div class="qq-chips" id="qqPlacements" role="group" aria-labelledby="qqPlacementLabel"></div>
                 </div>
 
@@ -104,22 +113,7 @@
 
                 <!-- ===== Advanced ===== -->
                 <details class="qq-advanced" id="qqAdvanced">
-                    <summary>Advanced — exact stitch counts &amp; print options</summary>
-
-                    <div class="qq-adv-group" id="qqAdvEmb" hidden>
-                        <div class="qq-adv-title">Embroidery stitch counts</div>
-                        <div class="qq-adv-row">
-                            <div class="field">
-                                <label for="qqEmbStitch">Primary logo</label>
-                                <input id="qqEmbStitch" class="input num" type="number" min="1000" step="500" value="8000">
-                            </div>
-                            <div class="field" id="qqEmbBackField">
-                                <label for="qqEmbBackStitch" id="qqEmbBackLabel">Back logo</label>
-                                <input id="qqEmbBackStitch" class="input num" type="number" min="1000" step="500" value="8000">
-                            </div>
-                        </div>
-                        <label class="qq-check"><input type="checkbox" id="qqEmbDigitizing"> New logo — add one-time digitizing</label>
-                    </div>
+                    <summary>Advanced — screen-print options</summary>
 
                     <div class="qq-adv-group" id="qqAdvScp" hidden>
                         <div class="qq-adv-title">Screen-print options</div>
@@ -162,6 +156,6 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.4"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.5"></script>
 </body>
 </html>

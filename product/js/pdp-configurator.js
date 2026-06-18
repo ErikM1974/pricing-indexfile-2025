@@ -175,7 +175,7 @@
             engineMethod: 'EMB',
             supports: { leftChest: true, fullFront: false, back: true, frontBack: true },
             chipNote: function (loc) {
-                return loc === 'frontBack' ? 'Two stitched logos — 8K each' : 'Stitched logo up to 8K — included';
+                return loc === 'frontBack' ? 'Two stitched logos — 10K each' : 'Stitched logo up to 10K — included';
             },
             groups: function (loc) {
                 const primary = {
@@ -196,7 +196,7 @@
             isCap: true,
             supports: { front: true, frontBack: true },
             chipNote: function (loc) {
-                return loc === 'frontBack' ? 'Front + back logos included' : 'Front logo up to 8K — included';
+                return loc === 'frontBack' ? 'Front + back logos included' : 'Front logo up to 10K — included';
             },
             groups: function (loc) {
                 const additional = loc === 'frontBack'
@@ -305,8 +305,8 @@
                 }
                 return {
                     note: loc === 'frontBack'
-                        ? 'Per-piece price includes the garment plus TWO embroidered logos (left chest + back), up to 8,000 stitches each.'
-                        : 'Per-piece price includes the garment plus an embroidered logo up to 8,000 stitches ('
+                        ? 'Per-piece price includes the garment plus TWO embroidered logos (left chest + back), up to 10,000 stitches each.'
+                        : 'Per-piece price includes the garment plus an embroidered logo up to 10,000 stitches ('
                             + (loc === 'back' ? 'back' : 'left chest') + ').',
                     foot: 'Larger logos and extra locations are quoted per design.',
                     stdSize: std,
@@ -357,8 +357,8 @@
                 }
                 return {
                     note: loc === 'frontBack'
-                        ? 'Per-cap price includes a front logo (up to 8,000 stitches) plus a back logo.'
-                        : 'Per-cap price includes an embroidered front logo up to 8,000 stitches.',
+                        ? 'Per-cap price includes a front logo (up to 10,000 stitches) plus a back logo.'
+                        : 'Per-cap price includes an embroidered front logo up to 10,000 stitches.',
                     foot: 'Side logos, 3D puff, and leather patches are quoted per design.',
                     stdSize: std,
                     multiSize: (b.uniqueSizes || []).length > 1,

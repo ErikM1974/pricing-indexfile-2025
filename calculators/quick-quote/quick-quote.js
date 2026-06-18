@@ -93,31 +93,36 @@
     var METHODS = {
         emb: {
             label: 'Embroidery', engineMethod: 'EMB', icon: ICONS.emb,
-            supports: { leftChest: true, fullFront: false, back: true, frontBack: true },
+            // Embroidery is LOGO-based, not placement-based: a primary left-chest
+            // logo + any additional logos (each priced at the AL rate). It ignores
+            // the print-placement chips (those drive DTG/SCP/DTF only).
+            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
             groups: function () {
-                var primary = {
-                    position: state.loc === 'back' ? 'Back' : 'Left Chest',
-                    stitchCount: num(state.adv.embStitch) || 8000,
-                    needsDigitizing: !!state.adv.digitizing
+                return {
+                    'emb:garment': {
+                        logos: {
+                            primary: { position: 'Left Chest', stitchCount: num(state.adv.embStitch) || 8000, needsDigitizing: !!state.adv.digitizing },
+                            additional: state.embAddl.map(function (a) {
+                                return { position: 'Additional Logo', stitchCount: num(a.stitch) || 8000, needsDigitizing: false };
+                            })
+                        }
+                    }
                 };
-                var additional = state.loc === 'frontBack'
-                    ? [{ position: 'Back', stitchCount: num(state.adv.embBackStitch) || 8000, needsDigitizing: !!state.adv.digitizing }]
-                    : [];
-                return { 'emb:garment': { logos: { primary: primary, additional: additional } } };
             }
         },
         capemb: {
             label: 'Cap embroidery', engineMethod: 'CAP', isCap: true, icon: ICONS.capemb,
+            // Cap front (primary) + optional cap back(s) — cap back priced at the
+            // quote builder's cap-back rate. Ignores print placement.
             supports: { front: true, frontBack: true },
             groups: function () {
-                var additional = state.loc === 'frontBack'
-                    ? [{ position: 'Cap Back', stitchCount: num(state.adv.embBackStitch) || 5000, needsDigitizing: !!state.adv.digitizing }]
-                    : [];
                 return {
                     'emb:cap': {
                         logos: {
                             primary: { position: 'Cap Front', stitchCount: num(state.adv.embStitch) || 8000, needsDigitizing: !!state.adv.digitizing },
-                            additional: additional
+                            additional: state.embAddl.map(function (a) {
+                                return { position: 'Cap Back', stitchCount: num(a.stitch) || 5000, needsDigitizing: false };
+                            })
                         }
                     }
                 };
@@ -161,6 +166,7 @@
         loc: 'leftChest',
         ink: 1,
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
+        embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
         methods: [],          // [{id}]
         results: {},          // id -> { status, preview, summary, message }
         selectedMethod: null, // which method's price-breaks matrix is shown
@@ -337,11 +343,15 @@
         state.results = {}; // drop the previous product's cards while the new ones load
         state.selectedMethod = null;
         state.methodPinned = false;
+        state.embAddl = [];
         var mb = $('qqMatrix'); if (mb) mb.innerHTML = '';
+        // caps are embroidery-only — the print-placement chips don't apply to them
+        $('qqPlacementField').hidden = !!state.product.isCap;
         renderColorSwatches();
         renderThumb();
         renderPlacements();
         renderInkField();
+        renderEmbPanel();
         renderAdvancedGroups();
         syncAdvancedInputs();
         renderAll();
@@ -468,20 +478,49 @@
     }
 
     function renderAdvancedGroups() {
-        var hasEmb = state.methods.some(function (m) { return m.id === 'emb' || m.id === 'capemb'; });
         var hasScp = state.methods.some(function (m) { return m.id === 'scp'; });
-        $('qqAdvEmb').hidden = !hasEmb;
         $('qqAdvScp').hidden = !hasScp;
-        // Back-logo input only relevant on a front+back placement
-        $('qqEmbBackField').style.display = state.loc === 'frontBack' ? '' : 'none';
-        $('qqEmbBackLabel').textContent = (state.product && state.product.isCap) ? 'Cap back logo' : 'Back logo';
+        $('qqAdvanced').hidden = !hasScp; // stitch counts moved to the embroidery panel
     }
 
     function syncAdvancedInputs() {
-        $('qqEmbStitch').value = state.adv.embStitch;
-        $('qqEmbBackStitch').value = state.adv.embBackStitch;
         $('qqInk').value = state.ink;
         $('qqQty').value = state.qty;
+    }
+
+    // ---- Embroidery logo panel (logo-based, decoupled from print placement) ----
+    function embLogoRow(key, label, stitch, removable) {
+        var badge = key === 'primary' ? 'Logo 1' : 'Logo ' + (Number(key) + 2);
+        return '<div class="qq-emb-row">'
+            + '<span class="qq-emb-badge' + (key === 'primary' ? ' is-primary' : '') + '">' + badge + '</span>'
+            + '<span class="qq-emb-pos">' + esc(label) + '</span>'
+            + '<span class="qq-emb-stitchwrap">'
+            + '<input class="qq-emb-stitch input num" type="number" min="1000" step="500" data-logo="' + esc(key) + '" value="' + (num(stitch) || 8000) + '">'
+            + '<span class="qq-emb-st">stitches</span>'
+            + (removable ? '<button type="button" class="qq-emb-remove" data-i="' + esc(key) + '" aria-label="Remove logo">&times;</button>' : '')
+            + '</span></div>';
+    }
+
+    function renderEmbPanel() {
+        var field = $('qqEmbField');
+        var hasEmb = state.methods.some(function (m) { return m.id === 'emb' || m.id === 'capemb'; });
+        if (!hasEmb) { field.hidden = true; return; }
+        field.hidden = false;
+        var isCap = !!(state.product && state.product.isCap);
+        $('qqEmbLabel').textContent = isCap ? 'Cap embroidery logos' : 'Embroidery logos';
+        var rows = [embLogoRow('primary', isCap ? 'Cap front' : 'Left chest', state.adv.embStitch, false)];
+        state.embAddl.forEach(function (a, i) {
+            rows.push(embLogoRow(String(i), isCap ? 'Cap back' : 'Additional logo', a.stitch, true));
+        });
+        $('qqEmbLogos').innerHTML = rows.join('');
+        var addBtn = $('qqEmbAddBtn');
+        var atMax = isCap && state.embAddl.length >= 1;
+        addBtn.style.display = atMax ? 'none' : '';
+        addBtn.textContent = isCap ? '+ Add cap back' : '+ Add another logo';
+        $('qqEmbHint').textContent = isCap
+            ? 'Up to 10,000 stitches included. Cap back priced at our cap-back rate.'
+            : 'Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate.';
+        var dig = $('qqEmbDigitizing'); if (dig) dig.checked = !!state.adv.digitizing;
     }
 
     function buildSizeGrid() {
@@ -504,7 +543,7 @@
 
     function ladderKey(id) {
         return (state.product ? state.product.style : '') + '|' + id + '|' + state.loc + '|' + state.ink
-            + '|' + state.adv.embStitch + '|' + state.adv.embBackStitch
+            + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',')
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
     }
@@ -545,7 +584,11 @@
                 if (preview && preview.ok && preview.lines && preview.lines.length) {
                     var label = preview.tierLabel || ('q' + probes[i]);
                     if (!byTier[label]) {
-                        byTier[label] = { label: label, base: preview.lines[0].baseUnit, ltmFee: (preview.ltm && preview.ltm.fee) || 0, range: parseRange(label) };
+                        // per-piece = base unit + per-piece service lines (embroidery
+                        // stitch surcharge AS-GARM, additional-logo AL) ÷ qty. baseUnit
+                        // alone misses those, so a >10k or multi-logo emb tier would read low.
+                        var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / probes[i];
+                        byTier[label] = { label: label, base: r2(preview.lines[0].baseUnit + svcPerPc), ltmFee: (preview.ltm && preview.ltm.fee) || 0, range: parseRange(label) };
                     }
                 }
             }
@@ -729,8 +772,26 @@
             repriceDebounced();
         });
 
-        $('qqEmbStitch').addEventListener('input', function (e) { state.adv.embStitch = Math.max(1000, parseInt(e.target.value, 10) || 8000); repriceDebounced(); });
-        $('qqEmbBackStitch').addEventListener('input', function (e) { state.adv.embBackStitch = Math.max(1000, parseInt(e.target.value, 10) || 8000); repriceDebounced(); });
+        // embroidery logo panel (primary + additional logos)
+        $('qqEmbLogos').addEventListener('input', function (e) {
+            var inp = e.target.closest('.qq-emb-stitch'); if (!inp) return;
+            var key = inp.getAttribute('data-logo');
+            var val = Math.max(1000, parseInt(inp.value, 10) || 8000);
+            if (key === 'primary') state.adv.embStitch = val;
+            else if (state.embAddl[Number(key)]) state.embAddl[Number(key)].stitch = val;
+            repriceDebounced();
+        });
+        $('qqEmbLogos').addEventListener('click', function (e) {
+            var rm = e.target.closest('.qq-emb-remove'); if (!rm) return;
+            state.embAddl.splice(Number(rm.getAttribute('data-i')), 1);
+            renderEmbPanel(); repriceAll();
+        });
+        $('qqEmbAddBtn').addEventListener('click', function () {
+            var isCap = !!(state.product && state.product.isCap);
+            if (isCap && state.embAddl.length >= 1) return;
+            state.embAddl.push({ stitch: isCap ? 5000 : 8000 });
+            renderEmbPanel(); repriceAll();
+        });
         $('qqEmbDigitizing').addEventListener('change', function (e) { state.adv.digitizing = e.target.checked; repriceAll(); });
         $('qqScpDark').addEventListener('change', function (e) { state.adv.scpDark = e.target.checked; repriceAll(); });
         $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceAll(); });
