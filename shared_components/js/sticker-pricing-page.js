@@ -33,6 +33,7 @@
     // -----------------------------------------------------------------
     let pricingData = null;         // { grid: [...], setupFee: {...} }
     let bannerRates = null;         // { rates: [...], setupFee: {...} }
+    let decalData = null;           // { tiers: [...], minMaterial, setupFee, safeRollWidthIn }
     const aiState = {
         opened: false,
         messages: [],               // [{role, content}, ...]
@@ -56,10 +57,11 @@
 
     async function init() {
         wireChatPanel();
+        wireDecalCalculator();
         // Show the floating "Quote" button by default — hidden by the
         // openChatPanel call once the chat opens.
         showFloatingButton();
-        await Promise.all([loadAndRenderPricing(), loadAndRenderBannerRates()]);
+        await Promise.all([loadAndRenderPricing(), loadAndRenderBannerRates(), loadAndRenderDecalPricing()]);
         // Auto-open ONCE per browser session — greet the rep the first time
         // they land, but don't slam the drawer open on every refresh or
         // navigation. The greeting renders statically (see renderStaticGreeting),
@@ -223,6 +225,182 @@
         document.querySelectorAll('.banner-rate-card.highlighted').forEach(c => c.classList.remove('highlighted'));
         card.classList.add('highlighted');
         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // -----------------------------------------------------------------
+    // Custom & oversize decal — API-driven rate card + square-foot calculator
+    // Pricing comes ENTIRELY from /api/custom-decal-pricing (Rule #6: no
+    // hardcoded prices). Compute mirrors caspio-pricing-proxy
+    // src/routes/custom-decal-pricing.js computeDecalQuote() — keep in sync.
+    // -----------------------------------------------------------------
+    function round2(n) { return Math.round(n * 100) / 100; }
+
+    async function loadAndRenderDecalPricing() {
+        const grid = document.getElementById('decalRateGrid');
+        if (!grid) return;
+        try {
+            const r = await fetch(API_BASE_URL + '/api/custom-decal-pricing');
+            if (!r.ok) throw new Error('API returned ' + r.status);
+            const data = await r.json();
+            if (!Array.isArray(data.tiers) || data.tiers.length === 0) throw new Error('empty decal rate card');
+            data.tiers.sort((a, b) => Number(a.MaxSqFt) - Number(b.MaxSqFt));
+            decalData = data;
+            renderDecalRateCard(grid, data);
+            const minNote = document.getElementById('decalMinNote');
+            if (minNote) minNote.textContent = '$' + fmtMoney(Number(data.minMaterial) || 90) + ' material';
+            recomputeDecal(); // first paint now that rates are loaded
+        } catch (err) {
+            console.error('[sticker-page] decal rates load failed:', err);
+            grid.innerHTML = '<div class="banner-formula" style="background:rgba(159,31,31,0.10);color:var(--err);border-color:#e8b5b1;">Unable to load custom-decal rates — refresh or contact Erik.</div>';
+        }
+    }
+
+    // Human label for a tier given its index in the ascending-sorted list.
+    function decalTierLabel(tiers, idx) {
+        const t = tiers[idx];
+        const hi = Number(t.MaxSqFt);
+        const lo = idx === 0 ? 0 : Number(tiers[idx - 1].MaxSqFt);
+        if (hi >= 999999) return 'Over ' + fmtInt(lo) + ' sq ft';
+        if (idx === 0) return 'Up to ' + fmtInt(hi) + ' sq ft';
+        return fmtInt(lo) + '–' + fmtInt(hi) + ' sq ft';
+    }
+
+    function renderDecalRateCard(container, data) {
+        const tiers = data.tiers;
+        const minMaterial = Number(data.minMaterial) || 90;
+        const rows = tiers.map((t, idx) => {
+            const floor = Number(t.floor) || 0;
+            const floorCell = idx === 0
+                ? '$' + fmtMoney(minMaterial) + ' min'
+                : 'never &lt; $' + fmtMoney(floor);
+            return `<tr>
+                <td>${escapeHtml(decalTierLabel(tiers, idx))}</td>
+                <td class="price-highlight">$${fmtMoney(Number(t.RatePerSqFt))} / sq ft</td>
+                <td>${floorCell}</td>
+            </tr>`;
+        }).join('');
+        container.innerHTML = `
+            <table class="pricing-table decal-rate-table">
+                <thead><tr><th>Total finished sq ft</th><th>Rate</th><th>Tier minimum</th></tr></thead>
+                <tbody>${rows}</tbody>
+            </table>`;
+    }
+
+    function wireDecalCalculator() {
+        const rowsEl = document.getElementById('decalSizeRows');
+        if (!rowsEl) return;
+        addDecalRow(); // start with one empty row
+        const addBtn = document.getElementById('decalAddRow');
+        if (addBtn) addBtn.addEventListener('click', () => { addDecalRow(); recomputeDecal(); });
+        const art = document.getElementById('decalArtOnFile');
+        if (art) art.addEventListener('change', recomputeDecal);
+        const tax = document.getElementById('decalTaxRate');
+        if (tax) tax.addEventListener('input', recomputeDecal);
+        rowsEl.addEventListener('input', recomputeDecal);
+        rowsEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.decal-row-remove');
+            if (!btn) return;
+            if (rowsEl.querySelectorAll('.decal-row').length > 1) {
+                btn.closest('.decal-row').remove();
+                recomputeDecal();
+            }
+        });
+    }
+
+    function addDecalRow() {
+        const rowsEl = document.getElementById('decalSizeRows');
+        if (!rowsEl) return;
+        const row = document.createElement('div');
+        row.className = 'decal-row';
+        row.innerHTML = `
+            <input type="number" class="decal-w" min="0" step="0.25" inputmode="decimal" placeholder="W" aria-label="Width in inches">
+            <input type="number" class="decal-h" min="0" step="0.25" inputmode="decimal" placeholder="H" aria-label="Height in inches">
+            <input type="number" class="decal-q" min="0" step="1" inputmode="numeric" placeholder="Qty" aria-label="Quantity">
+            <span class="decal-row-sqft">—</span>
+            <button type="button" class="decal-row-remove" aria-label="Remove this size" title="Remove">&times;</button>`;
+        rowsEl.appendChild(row);
+    }
+
+    function recomputeDecal() {
+        if (!decalData) return;
+        const rowsEl = document.getElementById('decalSizeRows');
+        const out = document.getElementById('decalOutput');
+        const errEl = document.getElementById('decalCalcError');
+        const warnEl = document.getElementById('decalWarnings');
+        if (!rowsEl || !out) return;
+
+        const tiers = decalData.tiers; // already ascending-sorted
+        const minMaterial = Number(decalData.minMaterial) || 90;
+        const setupAmt = (decalData.setupFee && Number(decalData.setupFee.amount)) || 50;
+        const safeWidth = Number(decalData.safeRollWidthIn) || 52;
+
+        let totalSqFt = 0, anyFilled = false, invalid = false;
+        const warnings = [];
+
+        Array.from(rowsEl.querySelectorAll('.decal-row')).forEach(row => {
+            const wEl = row.querySelector('.decal-w');
+            const hEl = row.querySelector('.decal-h');
+            const qEl = row.querySelector('.decal-q');
+            const sqftCell = row.querySelector('.decal-row-sqft');
+            const w = parseFloat(wEl.value), h = parseFloat(hEl.value), q = parseInt(qEl.value, 10);
+            if (!wEl.value && !hEl.value && !qEl.value) { sqftCell.textContent = '—'; return; }
+            anyFilled = true;
+            if (!(w > 0) || !(h > 0) || !(q > 0)) { invalid = true; sqftCell.textContent = '—'; return; }
+            const lineSqFt = (w * h) / 144 * q;
+            totalSqFt += lineSqFt;
+            sqftCell.textContent = fmtMoney(round2(lineSqFt));
+            if (Math.min(w, h) > safeWidth) {
+                warnings.push(`A ${w}"×${h}" decal exceeds the ${safeWidth}" Roland print/cut width on both sides — it may need rotation, paneling, or custom production review.`);
+            }
+        });
+
+        const taxPctRaw = parseFloat(document.getElementById('decalTaxRate').value);
+        if (Number.isFinite(taxPctRaw) && taxPctRaw < 0) invalid = true;
+
+        if (!anyFilled) {
+            errEl.hidden = true; warnEl.innerHTML = '';
+            out.innerHTML = '<div class="decal-output-empty">Enter a size and quantity to see the price.</div>';
+            return;
+        }
+        if (invalid) {
+            errEl.hidden = false;
+            errEl.textContent = 'Enter a positive width, height, and quantity for each size (and a non-negative tax %).';
+            warnEl.innerHTML = ''; out.innerHTML = '';
+            return;
+        }
+        errEl.hidden = true;
+
+        let tierIdx = tiers.findIndex(t => totalSqFt <= Number(t.MaxSqFt));
+        if (tierIdx === -1) tierIdx = tiers.length - 1;
+        const tier = tiers[tierIdx];
+        const rate = Number(tier.RatePerSqFt);
+        const floor = tierIdx === 0 ? minMaterial : (Number(tier.floor) || minMaterial);
+        const rawMaterial = round2(totalSqFt * rate);
+        const material = Math.max(rawMaterial, floor);
+        const floorApplied = material > rawMaterial + 1e-9;
+
+        const artOnFile = document.getElementById('decalArtOnFile').checked;
+        const setup = artOnFile ? 0 : setupAmt;
+        const subtotal = round2(material + setup);
+        const taxPct = Number.isFinite(taxPctRaw) ? taxPctRaw : 0;
+        const tax = round2(subtotal * (taxPct / 100));
+        const total = round2(subtotal + tax);
+
+        if (floorApplied) {
+            warnings.unshift(`Tier minimum applied: ${fmtMoney(round2(totalSqFt))} sq ft × $${fmtMoney(rate)} = $${fmtMoney(rawMaterial)}, raised to the $${fmtMoney(floor)} tier minimum (volume-break cliff protection).`);
+        }
+        warnEl.innerHTML = warnings.map(w =>
+            `<div class="decal-warn"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(w)}</div>`
+        ).join('');
+
+        out.innerHTML = `
+            <div class="decal-out-line"><span>Total finished area</span><span>${fmtMoney(round2(totalSqFt))} sq ft</span></div>
+            <div class="decal-out-line"><span>Rate (${escapeHtml(decalTierLabel(tiers, tierIdx))})</span><span>$${fmtMoney(rate)} / sq ft</span></div>
+            <div class="decal-out-line"><span>Material${floorApplied ? ' (tier minimum)' : ''}</span><span>$${fmtMoney(material)}</span></div>
+            <div class="decal-out-line"><span>Art setup (GRT-50)${artOnFile ? ' — waived' : ''}</span><span>$${fmtMoney(setup)}</span></div>
+            <div class="decal-out-line subtotal"><span>Subtotal</span><span>$${fmtMoney(subtotal)}</span></div>
+            <div class="decal-out-line"><span>Sales tax (${taxPct}%)</span><span>$${fmtMoney(tax)}</span></div>
+            <div class="decal-out-line total"><span>Total quote</span><span>$${fmtMoney(total)}</span></div>`;
     }
 
     /**
