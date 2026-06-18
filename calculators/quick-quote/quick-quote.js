@@ -23,6 +23,13 @@
     function $(id) { return document.getElementById(id); }
     function r2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }
     function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+    function parseRange(label) {
+        var m = String(label || '').match(/^(\d+)\s*-\s*(\d+)/);
+        if (m) return { min: parseInt(m[1], 10), max: parseInt(m[2], 10) };
+        var p = String(label || '').match(/^(\d+)\s*\+/);
+        if (p) return { min: parseInt(p[1], 10), max: Infinity };
+        return { min: 0, max: Infinity };
+    }
     function fmt(v) { var n = Number(v); return (v == null || isNaN(n)) ? '—' : '$' + n.toFixed(2); }
     function esc(s) {
         if (s == null) return '';
@@ -154,8 +161,10 @@
         loc: 'leftChest',
         ink: 1,
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
-        methods: [],        // [{id}]
-        results: {},        // id -> { status, preview, summary, message }
+        methods: [],          // [{id}]
+        results: {},          // id -> { status, preview, summary, message }
+        selectedMethod: null, // which method's price-breaks matrix is shown
+        methodPinned: false,  // true once the rep clicks a card (stop auto-following best value)
         seq: 0
     };
 
@@ -326,6 +335,9 @@
             state.adv.embStitch = 8000; state.adv.embBackStitch = 8000;
         }
         state.results = {}; // drop the previous product's cards while the new ones load
+        state.selectedMethod = null;
+        state.methodPinned = false;
+        var mb = $('qqMatrix'); if (mb) mb.innerHTML = '';
         renderColorSwatches();
         renderThumb();
         renderPlacements();
@@ -479,6 +491,100 @@
         }).join('');
     }
 
+    // ============================================================
+    // PRICE-BREAKS MATRIX (selected method)
+    // Engine-authoritative: prices a representative qty in each tier through the
+    // SAME singleItemPreview() the cards use, so the ladder can't disagree with
+    // the quote. The base unit is constant within a tier; the small-batch (LTM)
+    // fee is shown on its own row, mirroring our standard pricing matrix.
+    // ============================================================
+    var PROBE_QTYS = { emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100], dtg: [12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100] };
+    var _ladderCache = {};
+    var _ladderFetching = {};
+
+    function ladderKey(id) {
+        return (state.product ? state.product.style : '') + '|' + id + '|' + state.loc + '|' + state.ink
+            + '|' + state.adv.embStitch + '|' + state.adv.embBackStitch
+            + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
+            + '|' + (state.color ? state.color.catalog : '');
+    }
+    function placementLabel() {
+        var l = currentLocations().filter(function (x) { return x.key === state.loc; })[0];
+        return l ? l.label : '';
+    }
+    function rangeLabel(t) {
+        var r = t.range || parseRange(t.label);
+        return (!isFinite(r.max)) ? r.min + '+' : r.min + '–' + r.max;
+    }
+
+    async function renderMatrix() {
+        var box = $('qqMatrix'); if (!box) return;
+        var id = state.selectedMethod;
+        if (!id || !state.product || !METHODS[id]) { box.innerHTML = ''; return; }
+        var def = METHODS[id];
+        if (!def.supports[state.loc]) {
+            box.innerHTML = '<p class="qq-matrix-title">Price breaks</p><p class="qq-matrix-msg">'
+                + esc(def.label) + " isn't offered for this placement.</p>";
+            return;
+        }
+        var key = ladderKey(id);
+        if (_ladderCache[key]) { paintMatrix(id, _ladderCache[key]); return; }
+        if (_ladderFetching[key]) { return; } // a probe for this exact config is already running
+        _ladderFetching[key] = true;
+        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + '</p><div class="qq-skeleton" style="height:84px"></div>';
+        var probes = PROBE_QTYS[id] || [12, 36, 60, 100];
+        var byTier = {};
+        try {
+            for (var i = 0; i < probes.length; i++) {
+                var item = buildItem(def);
+                item.sizes = {}; item.sizes[stdSize()] = probes[i];
+                var preview;
+                try {
+                    preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(), deps: engineDeps(), nudge: false });
+                } catch (e) { preview = null; }
+                if (preview && preview.ok && preview.lines && preview.lines.length) {
+                    var label = preview.tierLabel || ('q' + probes[i]);
+                    if (!byTier[label]) {
+                        byTier[label] = { label: label, base: preview.lines[0].baseUnit, ltmFee: (preview.ltm && preview.ltm.fee) || 0, range: parseRange(label) };
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('[quick-quote] price-breaks build failed:', err);
+        } finally {
+            delete _ladderFetching[key];
+        }
+        var tiers = Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
+        _ladderCache[key] = tiers;
+        // only paint if this is still the current selection/config
+        if (state.selectedMethod === id && ladderKey(id) === key) paintMatrix(id, tiers);
+    }
+
+    function paintMatrix(id, tiers) {
+        var box = $('qqMatrix'); if (!box) return;
+        var def = METHODS[id];
+        if (!tiers || !tiers.length) { box.innerHTML = ''; return; }
+        var unit = state.product.isCap ? 'cap' : 'pc';
+        var res = state.results[id];
+        var curTier = (res && res.status === 'ok' && res.summary) ? res.summary.tierLabel : null;
+        var hasLtm = tiers.some(function (t) { return t.ltmFee > 0; });
+        var head = tiers.map(function (t) { return '<th' + (t.label === curTier ? ' class="is-cur"' : '') + '>' + esc(rangeLabel(t)) + '</th>'; }).join('');
+        var priceRow = tiers.map(function (t) { return '<td' + (t.label === curTier ? ' class="is-cur"' : '') + '>' + fmt(t.base) + '</td>'; }).join('');
+        var ltmRow = '';
+        if (hasLtm) {
+            ltmRow = '<tr><td class="lbl">Small-batch fee</td>' + tiers.map(function (t) {
+                var cls = (t.label === curTier ? 'is-cur ' : '') + (t.ltmFee > 0 ? 'warn' : '');
+                return '<td' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '—') + '</td>';
+            }).join('') + '</tr>';
+        }
+        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + ' · ' + esc(placementLabel()) + '</p>'
+            + '<div class="qq-matrix-wrap"><table class="qq-matrix"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
+            + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + priceRow + '</tr>' + ltmRow + '</tbody></table></div>'
+            + '<p class="qq-matrix-note">Highlighted column = your current quantity. Per ' + unit + ' for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.</p>';
+    }
+
+    var refreshMatrix = debounce(function () { renderMatrix(); }, 250);
+
     function renderResults() {
         var box = $('qqResults');
         var sub = $('qqResultsSub');
@@ -497,12 +603,21 @@
             if (r && r.status === 'ok' && r.summary.total != null && r.summary.total < bestTotal) { bestTotal = r.summary.total; bestId = m.id; }
         });
 
+        // selected method (drives the price-breaks matrix): auto-follow the
+        // best-value method until the rep pins one by clicking it.
+        var stillValid = state.methods.some(function (m) { return m.id === state.selectedMethod; });
+        if (!state.methodPinned || !stillValid) {
+            state.selectedMethod = bestId || (state.selectedMethod && stillValid ? state.selectedMethod : (state.methods[0] && state.methods[0].id)) || null;
+        }
+
         box.innerHTML = state.methods.map(function (m) { return renderCard(m.id, m.id === bestId); }).join('');
 
         // wire retry buttons
         Array.prototype.forEach.call(box.querySelectorAll('.qq-retry'), function (btn) {
             btn.addEventListener('click', function () { var id = btn.getAttribute('data-id'); priceMethod(id, ++state.seq); });
         });
+
+        refreshMatrix();
     }
 
     function renderCard(id, isBest) {
@@ -510,21 +625,20 @@
         var r = state.results[id];
         var head = '<div class="qq-card-method">' + def.icon + '<span>' + esc(def.label) + '</span></div>';
 
+        var dm = ' data-method="' + esc(id) + '"';
         if (!r || r.status === 'loading') {
-            return '<div class="qq-card"><div class="qq-card-top">' + head + '<div class="qq-skeleton" style="width:120px"></div></div></div>';
+            return '<div class="qq-card"' + dm + '><div class="qq-card-top">' + head + '<div class="qq-skeleton" style="width:120px"></div></div></div>';
         }
-        if (r.status === 'unavailable') {
-            return '<div class="qq-card is-unavailable"><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
-        }
-        if (r.status === 'belowmin') {
-            return '<div class="qq-card is-unavailable"><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
+        if (r.status === 'unavailable' || r.status === 'belowmin') {
+            return '<div class="qq-card is-unavailable"' + dm + '><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
         }
         if (r.status === 'error') {
-            return '<div class="qq-card is-error"><div class="qq-card-top">' + head + '</div>'
+            return '<div class="qq-card is-error"' + dm + '><div class="qq-card-top">' + head + '</div>'
                 + '<div class="qq-card-msg">Pricing unavailable — ' + esc(r.message) + '</div>'
                 + '<button type="button" class="qq-retry" data-id="' + id + '">Retry</button></div>';
         }
 
+        var sel = (id === state.selectedMethod);
         var s = r.summary;
         var unitWord = state.product.isCap ? 'cap' : 'pc';
         var meta = [];
@@ -532,11 +646,12 @@
         if (s.ltm && s.ltm.fee > 0) meta.push('<span class="item ltm">incl. $' + Math.round(s.ltm.fee) + ' small-batch fee</span>');
         s.oneTimeFees.forEach(function (f) { meta.push('<span class="item fee">+ ' + fmt(f.amount) + ' ' + esc(f.label) + ' (one-time)</span>'); });
 
-        return '<div class="qq-card' + (isBest ? ' is-best' : '') + '">'
+        return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag">best value</span>' : '') + '</div></div></div>'
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
+            + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
             + '</div>';
     }
 
@@ -551,6 +666,18 @@
         if (!window.QuoteCartEngine) { $('qqEngineError').hidden = false; }
 
         $('qqStyle').addEventListener('input', debounce(function (e) { lookupStyle(e.target.value); }, 450));
+
+        // Click a priced method card to show its price-breaks matrix below.
+        $('qqResults').addEventListener('click', function (e) {
+            if (e.target.closest('.qq-retry')) return; // retry has its own handler
+            var card = e.target.closest('.qq-card[data-method]'); if (!card) return;
+            var id = card.getAttribute('data-method');
+            var r = state.results[id];
+            if (!r || r.status !== 'ok' || id === state.selectedMethod) return;
+            state.selectedMethod = id;
+            state.methodPinned = true;
+            renderResults();   // refresh selection highlight + matrix
+        });
 
         $('qqColorSwatches').addEventListener('click', function (e) {
             var b = e.target.closest('.qq-swatch'); if (!b || !state.product) return;

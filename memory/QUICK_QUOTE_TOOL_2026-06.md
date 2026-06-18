@@ -42,6 +42,18 @@ placement→code maps, all-in per-piece) is canary-locked by
 - **Advanced panel** — exact stitch count (EMB primary + back), digitizing toggle, SCP
   front/back ink + dark-garment + safety-stripes. The engine already accepts arbitrary
   values; only the customer configurator hardcoded them.
+- **Price-breaks matrix** (2026-06-18) — under the price, a quantity-tier table for the
+  SELECTED method (click a method card; caps auto-select the one method). Engine-authoritative:
+  prices a representative qty in each tier through the SAME `singleItemPreview()` the cards use
+  (PROBE_QTYS per method), so the ladder can't disagree with the quote. Highlights the current
+  qty's tier; small-batch (LTM) fee on its own row. `selectedMethod` auto-follows best value
+  until the rep pins one (`methodPinned`); ladders cached by `ladderKey` (style+method+placement
+  +ink+stitch+digit+dark+stripe+color). GOTCHA fixed same day: copied `parseRange()` usage from
+  the configurator but didn't port the helper → ReferenceError swallowed by the async probe loop
+  made it look like a hang (no console error). Lesson: give async build loops a real `catch`.
+- **Cache-bust:** quick-quote.{js,css} are referenced with ABSOLUTE paths (`/calculators/quick-quote/…`)
+  so the deploy's 2-segment `?v=` bump matches; relative refs (`quick-quote.js?v=`) silently skip
+  the bump → returning reps get stale JS.
 
 ## Verified live 2026-06-18 (localhost, prices == web-quote-cart-parity fixtures)
 PC61 24× LC → EMB $504 / DTG $348 / SCP $453 ($14.50 base + $75 LTM + $30 setup) / DTF $372.
