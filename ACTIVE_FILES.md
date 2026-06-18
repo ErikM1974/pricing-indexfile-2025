@@ -498,7 +498,7 @@
 | `/calculators/laser-tumbler-calculator.js` | Laser tumbler calculator logic | — | ✅ Active |
 | `/calculators/laser-tumbler-styles.css` | Laser tumbler page styles | — | ✅ Active |
 | `/calculators/laser-tumbler-quote-service.js` | Laser tumbler quote save service | base-quote-service.js | ✅ Active |
-| `/calculators/sticker-manual-pricing.html` | Sticker pricing table page | — | ✅ Active |
+| `/calculators/sticker-manual-pricing.html` | Sticker + banner + **custom/oversize decal** pricing page (AI quote chat). 2026-06-18: added the Custom & Oversize Decal square-foot calculator + API-driven rate card (cliff-protected ladder, $90 min, GRT-50 setup) for sizes >6×6 / odd dims the standard grid can't cover. Backed by proxy `/api/custom-decal-pricing`. | sticker-pricing-page.css, sticker-pricing-page.js, memory/CUSTOM_DECAL_PRICING_2026-06.md | ✅ Active |
 | `/calculators/laser-manual-pricing.html` | Laser pricing calculator (manual) | manual-calculator-styles.css | ✅ Active |
 
 ### Caspio-Embedded Forms
