@@ -260,6 +260,27 @@
         showError('Error Loading', 'Unable to load art request data. Please try again.');
     });
 
+    // When the Shirt Designer (opened via "Build Mockup") saves a rep reference
+    // mockup, it postMessages back here so the card appears without a manual
+    // refresh. Same-origin + same-design guarded.
+    window.addEventListener('message', function (ev) {
+        if (ev.origin !== location.origin) return;
+        var d = ev.data;
+        if (!d || d.type !== 'rep-mockup-saved' || !currentRequest) return;
+        if (String(d.designId) !== String(designId)) return;
+        fetch(`${API_BASE}/api/artrequests?id_design=${encodeURIComponent(designId)}&limit=1`)
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (rows) {
+                if (!rows || !rows[0]) return;
+                currentRequest.Rep_Mockup = rows[0].Rep_Mockup;
+                currentRequest.Rep_Mockup_Meta = rows[0].Rep_Mockup_Meta;
+                renderRepMockup(currentRequest);
+                var sec = document.getElementById('ard-rep-mockup-section');
+                if (sec && sec.style.display !== 'none') sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            })
+            .catch(function () {});
+    });
+
     // ── Render ──────────────────────────────────────────────────────────
     function render(req, notes, charges) {
         document.getElementById('ard-loading').style.display = 'none';
@@ -524,6 +545,7 @@
         // Final Approved Mockup + Mockup Gallery
         renderFinalMockup(req);
         renderMockupGallery(req);
+        renderRepMockup(req);
 
         const statusLower = statusClean.toLowerCase().replace(/\s+/g, '');
 
@@ -1754,6 +1776,10 @@
         if (origArt) artImgs.push({ src: origArt, label: 'Original Artwork' });
         var mock = imgSrc(req.Final_Approved_Mockup || req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup);
         if (mock) artImgs.push({ src: mock, label: req.Final_Approved_Mockup ? 'Approved Mockup' : 'Mockup' });
+        // Rep reference mockup (staff-only) — the job sheet is never printed in customer view.
+        if (!isCustomerView && req.Rep_Mockup && !isEmptySlot(req.Rep_Mockup)) {
+            artImgs.push({ src: imgSrc(req.Rep_Mockup), label: 'Rep Reference Mockup' });
+        }
         var artHtml = '';
         if (artImgs.length) {
             artHtml = '<div class="ps-sec">Artwork</div><div class="ps-art">'
@@ -1910,6 +1936,82 @@
         // Dim draft mockup slots
         var mockupsSection = document.getElementById('ard-mockups-section');
         if (mockupsSection) mockupsSection.classList.add('ard-drafts-dimmed');
+    }
+
+    // Rep Reference Mockup — built by a rep in the Easy Shirt Designer and
+    // attached via "Save to Art Request". It is a REFERENCE for Steve (who still
+    // owns the production proof / Final_Approved_Mockup); it is never shown to the
+    // customer and never affects Approval_Status. Lives in its own purple card.
+    function renderRepMockup(req) {
+        var section = document.getElementById('ard-rep-mockup-section');
+        var container = document.getElementById('ard-rep-mockup-container');
+        if (!section || !container) return;
+
+        var url = req.Rep_Mockup;
+        if (isCustomerView || !url || isEmptySlot(url)) {
+            section.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+
+        var meta = {};
+        try { if (req.Rep_Mockup_Meta) meta = JSON.parse(req.Rep_Mockup_Meta) || {}; } catch (e) { meta = {}; }
+
+        var builtTxt = '';
+        if (meta.date) {
+            var d = new Date(meta.date);
+            if (!isNaN(d.getTime())) builtTxt = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        var chips = [];
+        if (meta.garmentName) chips.push('👕 ' + escapeHtml(meta.garmentName));
+        if (meta.placement) chips.push('📍 ' + escapeHtml(meta.placement));
+        if (meta.printWidthIn) chips.push(escapeHtml(String(meta.printWidthIn)) + '" wide');
+        var chipsHtml = chips.map(function (c) { return '<span class="ard-rep-chip">' + c + '</span>'; }).join('');
+
+        // Raw (unescaped) string from either source — escaped once at injection below.
+        var threadTxt = meta.threadSummary
+            || (Array.isArray(meta.threads)
+                ? meta.threads.filter(function (t) { return t && (t.name || t.code); })
+                    .map(function (t) { return (t.code ? t.code + ' ' : '') + (t.name || ''); }).join(' · ')
+                : '');
+
+        // "Open in Designer" — reopen pre-seeded from this request (same as the
+        // Build Mockup sender), so a rep can iterate and re-save.
+        var sp = new URLSearchParams();
+        var gColor = meta.garmentName || req.GarmentColor || req.Garm_Color_2 || '';
+        if (gColor) { sp.set('color', gColor); sp.set('garmentName', gColor); }
+        var loc = meta.placement || (parseLocations(req.Artwork_Locations)[0] || {}).placement || req.Garment_Placement || '';
+        if (loc) sp.set('placement', loc);
+        if (req.CompanyName) sp.set('company', req.CompanyName);
+        sp.set('designId', String(designId));
+        var designerUrl = '/pages/garment-designer.html?' + sp.toString();
+
+        section.style.display = '';
+        container.innerHTML = '';
+
+        var card = document.createElement('div');
+        card.className = 'ard-rep-mockup-card';
+        card.innerHTML =
+            '<div class="ard-rep-mockup-imgwrap">'
+            + '<img src="' + escapeHtml(url) + '" alt="Rep Reference Mockup" loading="lazy">'
+            + '<div class="ard-rep-mockup-badge">Reference · not the production proof</div>'
+            + '</div>'
+            + '<div class="ard-rep-mockup-info">'
+            + (chipsHtml ? '<div class="ard-rep-mockup-chips">' + chipsHtml + '</div>' : '')
+            + (threadTxt ? '<div class="ard-rep-mockup-threads">🧵 ' + escapeHtml(threadTxt) + '</div>' : '')
+            + '<div class="ard-rep-mockup-note">Built by a rep in the Shirt Designer' + (builtTxt ? ' · ' + escapeHtml(builtTxt) : '') + '. Steve still creates the production proof.</div>'
+            + '<div class="ard-rep-mockup-actions"><a class="ard-rep-mockup-open" target="_blank" rel="noopener" href="' + escapeHtml(designerUrl) + '">🧵 Open in Designer</a></div>'
+            + '</div>';
+
+        var img = card.querySelector('img');
+        if (img) {
+            img.addEventListener('error', function () { handleImageError(img); });
+            img.style.cursor = 'zoom-in';
+            img.addEventListener('click', function () { openLightbox(url, 'Rep Reference Mockup'); });
+        }
+
+        container.appendChild(card);
     }
 
     function setFinalMockup(url) {

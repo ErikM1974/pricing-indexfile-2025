@@ -21,7 +21,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.17.12">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.18.1">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
 
@@ -68,6 +68,7 @@
         <option value="unknown">Fabric unknown</option>
       </select>
       <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
+      <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
       <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
 
       <div class="easy-hidden-tools" aria-hidden="true">
@@ -318,6 +319,6 @@
 <input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
 <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
 
-<script src="/pages/js/garment-designer.js?v=2026.06.17.12"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.18.1"></script>
 </body>
 </html>
