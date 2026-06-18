@@ -10,9 +10,11 @@
  * group builders + placement maps. This canary asserts those shapes match the
  * configurator verbatim, so a future edit to one can't silently desync the other.
  *
- * (The live behaviour was hand-verified on 2026-06-18: PC61 24-pc LC priced
- *  EMB $504 / DTG $348 / SCP $453 / DTF $372 and front+back $696 / $588 / $627 /
- *  $756 — exactly the web-quote-cart-parity fixtures; C112 8K cap = $480.)
+ * (Hand-verified 2026-06-18: PC61 24-pc, left-chest = EMB $504 / DTG $348 /
+ *  SCP $453 / DTF $372 — exactly the web-quote-cart-parity fixtures. Per-pc with
+ *  Full front + Full back = EMB $21 / DTG $27 / SCP $23.63 / DTF $39; Full front +
+ *  Jumbo back → DTG correctly blocked (no DTG_Costs data) while SCP/DTF still price;
+ *  +left sleeve moves only DTF. Embroidery is LOGO-based and ignores print placement.)
  */
 const fs = require('fs');
 const path = require('path');
@@ -28,12 +30,23 @@ function extractObj(src, name) {
 }
 
 describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
-    test('DTG_CODES placement→locationCode map is byte-identical to the configurator', () => {
-        const qq = extractObj(QQ, 'DTG_CODES');
-        const cfg = extractObj(CFG, 'DTG_CODES');
+    test('DTG location codes Quick Quote can produce == the engine whitelist (never an unpriceable combo)', () => {
+        const ENGINE = fs.readFileSync(path.join(ROOT, 'shared_components', 'js', 'quote-cart-engine.js'), 'utf8');
+        const qq = (QQ.match(/DTG_LOCATION_CODES\s*=\s*\[([^\]]*)\]/) || [])[1];
+        const eng = (ENGINE.match(/DTG_LOCATION_CODES\s*=\s*\[([^\]]*)\]/) || [])[1];
         expect(qq).toBeTruthy();
-        expect(cfg).toBeTruthy();
-        expect(qq).toBe(cfg);
+        expect(eng).toBeTruthy();
+        // the front/back picker can only build codes in this list, and it is the
+        // SAME list the engine + DTG builder accept → no desync, no bad_input.
+        expect(qq.replace(/\s+/g, '')).toBe(eng.replace(/\s+/g, ''));
+    });
+
+    test('print placement is an independent Front + Back + sleeves model (front/back → engine codes)', () => {
+        expect(QQ).toMatch(/FRONT_OPTS\s*=/);
+        expect(QQ).toMatch(/BACK_OPTS\s*=/);
+        expect(QQ).toMatch(/function dtgCode\(\)/);   // front_back combo code
+        expect(QQ).toContain('left-sleeve');          // DTF sleeves
+        expect(QQ).toContain('right-sleeve');
     });
 
     test('all five engine groupIds are wired (none renamed/dropped)', () => {
@@ -54,16 +67,20 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
         });
     });
 
-    test('DTF front+back maps to left-chest + full-back (same two-location combo as the configurator)', () => {
-        expect(QQ).toMatch(/frontBack:\s*\{\s*locations:\s*\['left-chest',\s*'full-back'\]/);
+    test('DTF placements map to the builder location strings (jumbo → the full/large transfer)', () => {
+        const front = extractObj(QQ, 'DTF_FRONT');
+        const back = extractObj(QQ, 'DTF_BACK');
+        expect(front).toBeTruthy();
+        expect(front).toContain("LC:'left-chest'");
+        expect(front).toContain("FF:'full-front'");
+        expect(front).toContain("JF:'full-front'"); // DTF has no jumbo → maps to the largest
+        expect(back).toContain("FB:'full-back'");
+        expect(back).toContain("JB:'full-back'");
     });
 
-    test('cap placements are cap-aware (front / frontBack) — never garment "fullFront"', () => {
-        const cap = QQ.match(/CAP_LOCATIONS\s*=\s*\[([\s\S]*?)\];/);
-        expect(cap).toBeTruthy();
-        expect(cap[1]).toContain("key: 'front'");
-        expect(cap[1]).toContain("key: 'frontBack'");
-        expect(cap[1]).not.toContain("key: 'fullFront'");
+    test('caps are embroidery-only: print placement hidden, cap back priced via the logo panel (CB rate)', () => {
+        expect(QQ).toContain('hidden = !!state.product.isCap'); // print-placement field hidden for caps
+        expect(QQ).toMatch(/position:\s*'Cap Back'/);          // cap back = an additional logo → CB rate
     });
 
     test('per-piece is all-in minus one-time fees — same summarize() contract as the configurator', () => {

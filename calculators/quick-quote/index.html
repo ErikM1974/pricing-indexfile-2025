@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.5">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.6">
 </head>
 <body>
 
@@ -102,7 +102,10 @@
 
                 <div class="field" id="qqPlacementField">
                     <label id="qqPlacementLabel">Where does the print go? <span class="muted">· DTG / screen print / DTF</span></label>
-                    <div class="qq-chips" id="qqPlacements" role="group" aria-labelledby="qqPlacementLabel"></div>
+                    <div class="qq-place-row"><span class="qq-place-lbl">Front</span><div class="qq-chips" id="qqFront" role="group" aria-label="Front placement"></div></div>
+                    <div class="qq-place-row"><span class="qq-place-lbl">Back</span><div class="qq-chips" id="qqBack" role="group" aria-label="Back placement"></div></div>
+                    <div class="qq-place-row"><span class="qq-place-lbl">Sleeves</span><div class="qq-sleeves"><label class="qq-check"><input type="checkbox" id="qqSleeveL"> Left</label><label class="qq-check"><input type="checkbox" id="qqSleeveR"> Right</label></div></div>
+                    <p class="qq-place-note">Pick any front + back. Screen print prices by ink colors (front size doesn't change it); sleeves are DTF only.</p>
                 </div>
 
                 <!-- SCP ink stepper (shown only when a garment with screen-print eligibility is loaded) -->
@@ -156,6 +159,6 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.5"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.6"></script>
 </body>
 </html>

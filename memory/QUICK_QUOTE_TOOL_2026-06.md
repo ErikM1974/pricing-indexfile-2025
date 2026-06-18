@@ -40,11 +40,22 @@ Calls **`QuoteCartEngine.singleItemPreview()`** — the SAME engine the customer
 Quote ↔ catalog ↔ Quote Builder cannot drift. The engine is penny-locked by
 `tests/unit/web-quote-cart-parity.test.js`; the tool's own engine-wiring (group shapes,
 placement→code maps, all-in per-piece) is canary-locked by
-`tests/unit/quick-quote-parity.test.js` (7 tests).
+`tests/unit/quick-quote-parity.test.js` (8 tests). **CONFIRMED 2026-06-18 after the placement
+rework: web-quote-cart-parity 63/63 + quick-quote-parity 8/8 green → all 3 surfaces still
+identical.** RULE: any pricing-related change here → re-run both + re-confirm this memory.
 
 ## More-detail-than-catalog features
-- **Cap-aware placements** — detects caps (`/api/product-details` CATEGORY/title), shows
-  "Cap front / Front+back" not "Full front/back"; caps → cap embroidery only.
+- **Print placement = independent Front + Back + DTF sleeves** (rework 2026-06-18, Taneisha's
+  ask): Front (None / Left chest / Full front / Jumbo) × Back (None / Full back / Jumbo) + DTF
+  sleeve checkboxes. Drives **DTG / SCP / DTF only** — embroidery is logo-based and IGNORES it;
+  caps hide the print placement entirely (`$('qqPlacementField').hidden = isCap`). Per-method
+  mapping: DTG → `dtgCode()` front_back combo (FF_JB / JF_FB have no DTG_Costs data → that card
+  shows "unavailable" while SCP/DTF still price); SCP → frontColors + backColors (location SIZE
+  is cosmetic — left-chest front == full-front front; sleeves ignored, builder can't either);
+  DTF → `dtfLocations()` array, **jumbo → the largest (full) transfer** (DTF has no jumbo),
+  sleeves add transfers. `state.front/back/sleeves`. Consistency LOCKED: Quick Quote's
+  `DTG_LOCATION_CODES` == the engine's whitelist; DTF maps to the builder's location strings.
+  Verified per-pc FF+FB (PC61 24): EMB $21 / DTG $27 / SCP $23.63 / DTF $39; +L sleeve → DTF only.
 - **Color swatches + product thumbnail** (polish 2026-06-18) — swatch picker (COLOR_SQUARE_IMAGE
   from `/api/product-details`) like the builders + a thumbnail that swaps per color
   (MAIN_IMAGE_URL/FRONT_MODEL). Color change re-prices (EMB cost varies by color).

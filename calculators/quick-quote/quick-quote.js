@@ -60,23 +60,39 @@
     // ============================================================
     // Placements (cap-aware) — same combos the staff authorities price natively.
     // ============================================================
-    var GARMENT_LOCATIONS = [
-        { key: 'leftChest', label: 'Left chest', sub: 'Logo size' },
-        { key: 'fullFront', label: 'Full front', sub: 'Big center print' },
-        { key: 'back', label: 'Back', sub: 'Full back' },
-        { key: 'frontBack', label: 'Front + back', sub: 'Left chest + full back' }
+    // Print placement (DTG/SCP/DTF only — embroidery is logo-based). Independent
+    // FRONT + BACK pickers + DTF sleeves, mirroring the staff builders.
+    var FRONT_OPTS = [
+        { code: '', label: 'None' },
+        { code: 'LC', label: 'Left chest' },
+        { code: 'FF', label: 'Full front' },
+        { code: 'JF', label: 'Jumbo front' }
     ];
-    var CAP_LOCATIONS = [
-        { key: 'front', label: 'Cap front', sub: 'Front logo' },
-        { key: 'frontBack', label: 'Front + back', sub: 'Front + back logos' }
+    var BACK_OPTS = [
+        { code: '', label: 'None' },
+        { code: 'FB', label: 'Full back' },
+        { code: 'JB', label: 'Jumbo back' }
     ];
-    var DTG_CODES = { leftChest: 'LC', fullFront: 'FF', back: 'FB', frontBack: 'LC_FB' };
-    var DTF_KEYS = {
-        leftChest: { locations: ['left-chest'] },
-        fullFront: { locations: ['full-front'] },
-        back: { locations: ['full-back'] },
-        frontBack: { locations: ['left-chest', 'full-back'] }
-    };
+    // DTG combos the canonical pricer accepts (FF_JB / JF_FB have no DTG_Costs data → blocked).
+    var DTG_LOCATION_CODES = ['LC', 'FF', 'FB', 'JF', 'JB', 'LC_FB', 'FF_FB', 'JF_JB', 'LC_JB'];
+    // DTF has no "jumbo" transfer size → jumbo maps to the largest (full) location.
+    var DTF_FRONT = { LC: 'left-chest', FF: 'full-front', JF: 'full-front' };
+    var DTF_BACK = { FB: 'full-back', JB: 'full-back' };
+    var FRONT_LABELS = { LC: 'Left chest', FF: 'Full front', JF: 'Jumbo front' };
+    var BACK_LABELS = { FB: 'Full back', JB: 'Jumbo back' };
+
+    // --- placement → per-method mapping (reads state.front / state.back / state.sleeves) ---
+    function dtgCode() { var f = state.front, b = state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
+    function dtgPriceable() { var c = dtgCode(); return !!c && DTG_LOCATION_CODES.indexOf(c) >= 0; }
+    function dtfLocations() {
+        var L = [];
+        if (state.front && DTF_FRONT[state.front]) L.push(DTF_FRONT[state.front]);
+        if (state.back && DTF_BACK[state.back]) L.push(DTF_BACK[state.back]);
+        if (state.sleeves.left) L.push('left-sleeve');
+        if (state.sleeves.right) L.push('right-sleeve');
+        return L;
+    }
+    function scpLocCount() { return (state.front ? 1 : 0) + (state.back ? 1 : 0); }
 
     var ICONS = {
         emb: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>',
@@ -96,7 +112,7 @@
             // Embroidery is LOGO-based, not placement-based: a primary left-chest
             // logo + any additional logos (each priced at the AL rate). It ignores
             // the print-placement chips (those drive DTG/SCP/DTF only).
-            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
+            available: function () { return true; },
             groups: function () {
                 return {
                     'emb:garment': {
@@ -114,7 +130,7 @@
             label: 'Cap embroidery', engineMethod: 'CAP', isCap: true, icon: ICONS.capemb,
             // Cap front (primary) + optional cap back(s) — cap back priced at the
             // quote builder's cap-back rate. Ignores print placement.
-            supports: { front: true, frontBack: true },
+            available: function () { return true; },
             groups: function () {
                 return {
                     'emb:cap': {
@@ -130,17 +146,17 @@
         },
         dtg: {
             label: 'DTG print', engineMethod: 'DTG', icon: ICONS.dtg,
-            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
-            groups: function () { return { 'dtg:main': { locationCode: DTG_CODES[state.loc] } }; }
+            available: function () { return dtgPriceable(); },
+            groups: function () { return { 'dtg:main': { locationCode: dtgCode() } }; }
         },
         scp: {
             label: 'Screen print', engineMethod: 'SCP', icon: ICONS.scp,
-            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
+            available: function () { return scpLocCount() >= 1; },
             groups: function () {
                 return {
                     'scp:design-1': {
-                        frontColors: state.ink,
-                        backColors: state.loc === 'frontBack' ? state.ink : 0,
+                        frontColors: state.ink,                          // location size is cosmetic for SCP
+                        backColors: scpLocCount() >= 2 ? state.ink : 0,  // 2nd location (back) = additional location
                         darkGarment: !!state.adv.scpDark,
                         safetyStripes: !!state.adv.scpStripes
                     }
@@ -149,8 +165,8 @@
         },
         dtf: {
             label: 'DTF transfer', engineMethod: 'DTF', icon: ICONS.dtf,
-            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
-            groups: function () { return { 'dtf:main': { locations: DTF_KEYS[state.loc].locations } }; }
+            available: function () { return dtfLocations().length >= 1; },
+            groups: function () { return { 'dtf:main': { locations: dtfLocations() } }; }
         }
     };
 
@@ -163,7 +179,9 @@
         qty: 24,
         useSizes: false,
         sizes: {},          // { 'S':n, ... } when useSizes
-        loc: 'leftChest',
+        front: 'LC',          // print FRONT placement: '' | LC | FF | JF
+        back: '',             // print BACK placement: '' | FB | JB
+        sleeves: { left: false, right: false }, // DTF sleeves
         ink: 1,
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
         embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
@@ -174,7 +192,14 @@
         seq: 0
     };
 
-    function currentLocations() { return state.product && state.product.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS; }
+    function placementLabel() {
+        var parts = [];
+        if (FRONT_LABELS[state.front]) parts.push(FRONT_LABELS[state.front]);
+        if (BACK_LABELS[state.back]) parts.push(BACK_LABELS[state.back]);
+        if (state.sleeves.left) parts.push('L sleeve');
+        if (state.sleeves.right) parts.push('R sleeve');
+        return parts.join(' + ') || '—';
+    }
     function sizeList() { return (state.product && state.product.sizes) || []; }
     function defaultSizes() { return (state.product && state.product.isCap) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
     function stdSize() {
@@ -327,7 +352,7 @@
     function applyProduct(elig) {
         if (state.product.isCap) {
             state.methods = [{ id: 'capemb' }];
-            state.loc = 'front';
+            state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
             state.adv.embStitch = 8000; state.adv.embBackStitch = 5000;
         } else {
             var e = elig || { EMB: true, DTG: 'no', SCP: false, DTF: false };
@@ -337,7 +362,7 @@
                 { id: 'scp', on: e.SCP },
                 { id: 'dtf', on: e.DTF }
             ].filter(function (m) { return m.on; }).map(function (m) { return { id: m.id }; });
-            state.loc = 'leftChest';
+            state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
             state.adv.embStitch = 8000; state.adv.embBackStitch = 8000;
         }
         state.results = {}; // drop the previous product's cards while the new ones load
@@ -390,8 +415,11 @@
         state.results[id] = { status: 'loading' };
         renderResults();
         var run;
-        if (!def.supports[state.loc]) {
-            state.results[id] = { status: 'unavailable', message: def.label + " isn't offered for this placement." };
+        if (def.available && !def.available()) {
+            var pmsg = id === 'dtg' && dtgCode()
+                ? "DTG can't combine those front + back sizes — try Full front + Full back, or Left chest + back."
+                : 'Pick a front or back placement above.';
+            state.results[id] = { status: 'unavailable', message: pmsg };
             renderResults(); return;
         }
         if (!window.QuoteCartEngine) {
@@ -464,12 +492,17 @@
     }
 
     function renderPlacements() {
-        var box = $('qqPlacements');
-        box.innerHTML = currentLocations().map(function (l) {
-            return '<button type="button" class="qq-chip' + (l.key === state.loc ? ' is-active' : '')
-                + '" data-loc="' + l.key + '"><span class="t">' + esc(l.label) + '</span>'
-                + '<span class="s">' + esc(l.sub) + '</span></button>';
-        }).join('');
+        function chips(opts, sel, kind) {
+            return opts.map(function (o) {
+                return '<button type="button" class="qq-place-chip' + (o.code === sel ? ' is-active' : '')
+                    + '" data-kind="' + kind + '" data-code="' + esc(o.code) + '">' + esc(o.label) + '</button>';
+            }).join('');
+        }
+        $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front');
+        $('qqBack').innerHTML = chips(BACK_OPTS, state.back, 'back');
+        var sl = $('qqSleeveL'), sr = $('qqSleeveR');
+        if (sl) sl.checked = !!state.sleeves.left;
+        if (sr) sr.checked = !!state.sleeves.right;
     }
 
     function renderInkField() {
@@ -542,15 +575,13 @@
     var _ladderFetching = {};
 
     function ladderKey(id) {
-        return (state.product ? state.product.style : '') + '|' + id + '|' + state.loc + '|' + state.ink
+        return (state.product ? state.product.style : '') + '|' + id
+            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.ink
             + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',')
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
     }
-    function placementLabel() {
-        var l = currentLocations().filter(function (x) { return x.key === state.loc; })[0];
-        return l ? l.label : '';
-    }
+    // (placementLabel defined above — combo of front/back/sleeves)
     function rangeLabel(t) {
         var r = t.range || parseRange(t.label);
         return (!isFinite(r.max)) ? r.min + '+' : r.min + '–' + r.max;
@@ -561,9 +592,9 @@
         var id = state.selectedMethod;
         if (!id || !state.product || !METHODS[id]) { box.innerHTML = ''; return; }
         var def = METHODS[id];
-        if (!def.supports[state.loc]) {
+        if (def.available && !def.available()) {
             box.innerHTML = '<p class="qq-matrix-title">Price breaks</p><p class="qq-matrix-msg">'
-                + esc(def.label) + " isn't offered for this placement.</p>";
+                + esc(def.label) + " isn't available for this placement.</p>";
             return;
         }
         var key = ladderKey(id);
@@ -759,13 +790,17 @@
             repriceDebounced();
         });
 
-        $('qqPlacements').addEventListener('click', function (e) {
-            var btn = e.target.closest('.qq-chip'); if (!btn) return;
-            state.loc = btn.getAttribute('data-loc');
+        function onPlaceChip(e) {
+            var btn = e.target.closest('.qq-place-chip'); if (!btn) return;
+            var kind = btn.getAttribute('data-kind'), code = btn.getAttribute('data-code');
+            if (kind === 'front') state.front = code; else state.back = code;
             renderPlacements();
-            renderAdvancedGroups();
             repriceAll();
-        });
+        }
+        $('qqFront').addEventListener('click', onPlaceChip);
+        $('qqBack').addEventListener('click', onPlaceChip);
+        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; repriceAll(); });
+        $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; repriceAll(); });
 
         $('qqInk').addEventListener('input', function (e) {
             state.ink = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
