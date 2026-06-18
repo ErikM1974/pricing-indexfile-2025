@@ -106,6 +106,21 @@ Recommended wording to the customer before approval:
 
 ---
 
+## Rep Reference Mockup (Easy Shirt Designer)
+
+On any art request (staff/AE view — never the customer view), the **🧵 Build Mockup** button
+opens the Easy Shirt Designer pre-filled with that job's garment color, placement, and company.
+Add the artwork (incl. Tajima **DST**), set thread colors + placement, then click
+**💾 Save to Art Request**. The mockup attaches back as a purple **"Rep Reference Mockup"** card
+(with garment / placement / thread specs) and prints on the job sheet.
+
+- It is a **reference for Steve** — it does **not** become the customer proof and does **not**
+  change Approval Status. Steve still creates and approves the production mockup.
+- Customers never see it. **Re-edit** re-opens the designer pre-seeded, but you re-upload the
+  artwork (the designer doesn't keep the source file).
+
+---
+
 *Form: `shared_components/js/garment-submit-form.js`. Submissions post to ShopWorks via
 `/api/artrequests` and appear on Steve's dashboard, the AE galleries, and
 `/art-request/{design#}` with every field rendered structurally.*
