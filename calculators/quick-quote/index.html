@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Quick Quote — Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="quick-quote.css?v=2026.06.18.1">
+</head>
+<body>
+
+    <!-- ========== Top bar ========== -->
+    <header class="topbar">
+        <a href="/staff-dashboard.html" class="logo" title="Back to Staff Dashboard">
+            <img class="logo-img" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+        </a>
+        <nav class="crumbs">
+            <a href="/staff-dashboard.html">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                Dashboard
+            </a>
+            <span class="sep">/</span>
+            <span class="here">Quick Quote</span>
+        </nav>
+        <div class="spacer"></div>
+        <span class="theme-chip"><span class="dot"></span> Staff · Same prices as the Quote Builder</span>
+    </header>
+
+    <main class="page">
+
+        <section class="hero">
+            <div>
+                <div class="eyebrow">Phone quote · no customer record needed</div>
+                <h1 class="page-title">Quick Quote</h1>
+                <p class="lede">
+                    Type a style, a quantity, and where the print goes &mdash; see every method's price at once.
+                    Same pricing engine as the full Quote Builder and the customer catalog, so the numbers match.
+                    For a real order, build it in the Quote Builder.
+                </p>
+            </div>
+        </section>
+
+        <!-- Engine-not-loaded banner (shown by JS only if a pricing script fails to load) -->
+        <div id="qqEngineError" class="qq-banner qq-banner--error" hidden>
+            <strong>Pricing engine didn't load.</strong> Refresh the page. If it keeps happening, tell Erik &mdash; we never show a guessed price.
+        </div>
+
+        <section class="qq-grid">
+
+            <!-- ===== Inputs ===== -->
+            <div class="qq-panel qq-inputs">
+
+                <div class="field">
+                    <label for="qqStyle">Style number</label>
+                    <input id="qqStyle" class="input" type="text" inputmode="text" autocomplete="off"
+                           placeholder="e.g. PC61, C112, PC90H" aria-describedby="qqStyleStatus">
+                    <div id="qqStyleStatus" class="qq-style-status" aria-live="polite"></div>
+                </div>
+
+                <div class="qq-product" id="qqProduct" hidden>
+                    <img id="qqThumb" class="qq-thumb" alt="" referrerpolicy="no-referrer">
+                    <div class="qq-product-meta">
+                        <div id="qqProductName" class="qq-product-name"></div>
+                        <div id="qqColorSelected" class="qq-color-selected"></div>
+                    </div>
+                </div>
+
+                <div class="field" id="qqColorField" hidden>
+                    <label>Color <span class="muted">· tap a swatch</span></label>
+                    <div id="qqColorSwatches" class="qq-swatches" role="group" aria-label="Color"></div>
+                </div>
+
+                <div class="qq-qtyrow">
+                    <div class="field qty-field">
+                        <label for="qqQty">Quantity</label>
+                        <input id="qqQty" class="input num" type="number" min="1" step="1" value="24">
+                    </div>
+                    <button type="button" id="qqSizesToggle" class="qq-link-btn" aria-expanded="false" aria-controls="qqSizes">
+                        + Add sizes (2XL upcharges)
+                    </button>
+                </div>
+
+                <div class="qq-sizes" id="qqSizes" hidden>
+                    <p class="qq-sizes-note">Enter a per-size breakdown — extended sizes (2XL+) carry their upcharge. Quantity becomes the total.</p>
+                    <div class="qq-size-grid" id="qqSizeGrid"></div>
+                </div>
+
+                <div class="field">
+                    <label id="qqPlacementLabel">Where does the print go?</label>
+                    <div class="qq-chips" id="qqPlacements" role="group" aria-labelledby="qqPlacementLabel"></div>
+                </div>
+
+                <!-- SCP ink stepper (shown only when a garment with screen-print eligibility is loaded) -->
+                <div class="field qq-ink" id="qqInkField" hidden>
+                    <label for="qqInk">Screen-print ink colors <span class="muted">· front &amp; back</span></label>
+                    <input id="qqInk" class="input num" type="number" min="1" max="6" step="1" value="1">
+                </div>
+
+                <!-- ===== Advanced ===== -->
+                <details class="qq-advanced" id="qqAdvanced">
+                    <summary>Advanced — exact stitch counts &amp; print options</summary>
+
+                    <div class="qq-adv-group" id="qqAdvEmb" hidden>
+                        <div class="qq-adv-title">Embroidery stitch counts</div>
+                        <div class="qq-adv-row">
+                            <div class="field">
+                                <label for="qqEmbStitch">Primary logo</label>
+                                <input id="qqEmbStitch" class="input num" type="number" min="1000" step="500" value="8000">
+                            </div>
+                            <div class="field" id="qqEmbBackField">
+                                <label for="qqEmbBackStitch" id="qqEmbBackLabel">Back logo</label>
+                                <input id="qqEmbBackStitch" class="input num" type="number" min="1000" step="500" value="8000">
+                            </div>
+                        </div>
+                        <label class="qq-check"><input type="checkbox" id="qqEmbDigitizing"> New logo — add one-time digitizing</label>
+                    </div>
+
+                    <div class="qq-adv-group" id="qqAdvScp" hidden>
+                        <div class="qq-adv-title">Screen-print options</div>
+                        <label class="qq-check"><input type="checkbox" id="qqScpDark"> Dark garment (adds a white underbase screen)</label>
+                        <label class="qq-check"><input type="checkbox" id="qqScpStripes"> Safety stripes</label>
+                    </div>
+
+                    <p class="qq-adv-foot">Other placements, sleeves, names/numbers, 3D puff and oversize logos are quoted on the proof — build those in the full Quote Builder.</p>
+                </details>
+
+            </div>
+
+            <!-- ===== Results ===== -->
+            <div class="qq-panel qq-results">
+                <div class="qq-results-head">
+                    <span id="qqResultsTitle">Price</span>
+                    <span class="qq-results-sub" id="qqResultsSub">Enter a style to begin</span>
+                </div>
+                <div id="qqResults" class="qq-cards" aria-live="polite"></div>
+                <p class="qq-foot">Per-piece prices are all-in (garment + decoration, including any small-batch fee). Setup fees, where they apply, are shown separately. Not a saved quote.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Config first (APP_CONFIG.API.BASE_URL — Rule #6) -->
+    <script src="/config/app.config.js?v=2026.06.18.1"></script>
+    <!-- Method eligibility -->
+    <script src="/shared_components/js/decoration-methods.js?v=2026.06.18.1"></script>
+    <!-- Pricing services (window globals the engine resolves) -->
+    <script src="/shared_components/js/embroidery-pricing-service.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/dtg-pricing-service.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
+    <!-- Quote-cart engine + its staff authorities -->
+    <script src="/shared_components/js/embroidery-quote-pricing.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
+    <!-- Page logic -->
+    <script src="quick-quote.js?v=2026.06.18.1"></script>
+</body>
+</html>

@@ -322,6 +322,13 @@
 
 ## 📊 Calculators & Quote Builders
 
+### Quick Quote (staff rapid all-method)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/calculators/quick-quote/index.html` | Staff rapid price lookup — type style + qty + placement → every eligible method priced at once. No customer record/save. Linked from staff dashboard "Quote Builders". | quick-quote.js, quick-quote.css, quote-cart-engine.js, all 5 pricing services, decoration-methods.js, app.config.js | ✅ Active |
+| `/calculators/quick-quote/quick-quote.js` | Page logic — drives `QuoteCartEngine.singleItemPreview()` (SAME engine as the Quote Builder + customer catalog, so prices can't drift). Cap-aware placements, per-size 2XL+ breakdown, advanced stitch-count/ink/dark/stripes inputs. Style lookup via `/api/product-details`; eligibility via DecorationMethods. | quote-cart-engine.js, embroidery-quote-pricing.js, all 5 *-pricing-service.js, decoration-methods.js, /api/product-details | ✅ Active |
+| `/calculators/quick-quote/quick-quote.css` | Page styles — self-contained light card UI | — | ✅ Active |
+
 ### Unified Manual Pricing Calculator
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
