@@ -1,5 +1,23 @@
 # Quick Quote tool (staff rapid all-method price) — 2026-06-18
 
+**DEPLOYED LIVE** `/calculators/quick-quote/` (first v2026.06.18.3; embroidery rework +
+price-breaks matrix + catalog copy fix in a later release). Staff dashboard → **"Quoting"**
+group → 2nd tile **"Quick Quote"** (green `NEW` badge), under Quote Management.
+
+## THE 3 PRICE SURFACES — all identical, by construction (Erik: keep them in sync)
+Exactly three places a price is shown; they MUST always match:
+1. **Customer Catalog** — `/catalog` + `product.html` (`pdp-configurator.js`). Customer
+   self-serve, simplified (standard size, preset locations, embroidery "up to 10K").
+2. **Quick Quote** — `/calculators/quick-quote/`. Staff rapid all-method estimate; more detail
+   than the catalog, less ceremony than the builder.
+3. **Full Quote Builder** — `/quote-builders/{emb,dtg,screenprint,dtf}-quote-builder.html`. Tool
+   of record: customer, sizes, shipping, save, ShopWorks push.
+All three price through the SAME path → Caspio via the proxy
+(`QuoteCartEngine.singleItemPreview` → the staff `*-pricing-service` classes /
+`EmbroideryPricingCalculator` / DTG endpoint). Change a price in Caspio → all three update, no
+deploy. Penny-locked by `web-quote-cart-parity.test.js`. NEVER add a 4th pricing path or a
+hardcoded number.
+
 ## Why
 Reps on the phone / mid-order in ShopWorks need a fast price ("how much for 25 PC61
 front+back? 25 caps with a 12K-stitch logo?") without the full Quote Builder ceremony
@@ -11,9 +29,10 @@ tool fills the rapid-quote gap between the two.)
 
 ## What
 `/calculators/quick-quote/` — `index.html` + `quick-quote.js` + `quick-quote.css`.
-Type style → qty → placement → every eligible method priced at once. Linked from the staff
-dashboard "Quote Builders" section (first tile, `fa-bolt`; count 7→8 in
-`staff-dashboard-v3/index.html`, served at `/staff-dashboard.html`).
+Type style → qty → placement → every eligible method priced at once. Dashboard **"Quoting"**
+group (regrouped from "Quote Builders" into sub-headers: Quick price / Full quote→ShopWorks /
+Existing quotes / Customer self-serve) in `staff-dashboard-v3/index.html`, served
+`/staff-dashboard.html`. Tee Print-Box Calibration moved to Art & Design (BETA).
 
 ## Consistency guarantee (the whole point)
 Calls **`QuoteCartEngine.singleItemPreview()`** — the SAME engine the customer catalog
@@ -39,9 +58,19 @@ placement→code maps, all-in per-piece) is canary-locked by
 - **Per-size breakdown** ("Add sizes") — engine applies real 2XL…6XL upcharges per size
   (catalog quotes the standard size only and hides them). Verified: PC61 20 S + 4 5XL → EMB
   $22.00/pc wtd (5XL +$6).
-- **Advanced panel** — exact stitch count (EMB primary + back), digitizing toggle, SCP
-  front/back ink + dark-garment + safety-stripes. The engine already accepts arbitrary
-  values; only the customer configurator hardcoded them.
+- **Embroidery = LOGO-based, not placement-based** (rework 2026-06-18): EMB/CAP cards IGNORE
+  the print-placement chips. "Embroidery logos" panel = primary logo (Left chest / Cap front,
+  default 8K) + **"+ Add another logo"** → additional logos each with its own stitch, priced at
+  the **AL** rate (garment, $8/pc @ 8K) / **cap-back CB** rate (cap, $4.75/cap) — same services
+  as the EMB quote builder (`state.embAddl[]`). Caps: front + **max 1 cap back**, print-placement
+  chips HIDDEN. EMB base covers **up to 10,000 stitches** (≤10k = base tier; >10k adds
+  AS-GARM/AS-CAP +$4/pc). VERIFIED the engine applies the AS-GARM garment-stitch surcharge as a
+  service line → Quick Quote/catalog match the builder (8k=$504, 11k=$600), NO gap. Customer
+  catalog copy fixed "8K"→"10K" (6 spots, `pdp-configurator.js`). Matrix per-pc = baseUnit +
+  serviceLines/qty so it folds in the stitch/AL/CB surcharge; `ladderKey` includes `embAddl`.
+- **Advanced panel** — now just SCP options (front/back ink, dark-garment, safety-stripes);
+  embroidery stitch counts moved to the logo panel. Engine accepts arbitrary values; only the
+  customer configurator hardcodes them.
 - **Price-breaks matrix** (2026-06-18) — under the price, a quantity-tier table for the
   SELECTED method (click a method card; caps auto-select the one method). Engine-authoritative:
   prices a representative qty in each tier through the SAME `singleItemPreview()` the cards use
@@ -61,7 +90,7 @@ PC61 24× front+back → $696 / $588 / $627 / $756. C112 8K cap 24× → $480. 2
 8K=10K=$20/cap, 12K=$24/cap (AS-CAP flat-tier surcharge). PC61 20 S + 5 2XL → 2XL +$2 on
 every method (EMB $21.40 wtd, etc.).
 
-## Not done / deferred
-- Not deployed (built on develop, verified local). Deploy is Erik's call.
-- DTG/DTF exact-location override + sleeves/names/3D-puff left to the full builder (advanced
-  panel notes this). No "copy price to clipboard" button yet (possible follow-up).
+## Deferred (post-deploy)
+- DTG/DTF exact-location override + sleeves/names/3D-puff left to the full builder. No "copy
+  price to clipboard" button yet (possible follow-up). `/api/sizes-by-style-color` 500 still
+  open upstream (builders + Quick Quote both fall back to the BLANK-bundle size list).
