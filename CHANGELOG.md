@@ -1,3 +1,7 @@
+## v2026.06.18.5 (2026.06.18)
+
+- Deploy v2026.06.18.5: 6 files (index.html,quick-quote.css,quick-quote.js,...)
+
 ## v2026.06.18.4 (2026.06.18)
 
 - Deploy v2026.06.18.4: 5 files (index.html,quick-quote.css,quick-quote.js,...)
