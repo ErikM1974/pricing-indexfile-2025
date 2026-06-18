@@ -1,3 +1,8 @@
+## v2026.06.18.1 (2026.06.18)
+
+- Designer: record Phase 1b.1 shipped (pre-seed+sender) + lock 1b.2 save-to-Caspio design
+- Deploy v2026.06.18.1: 7 files (SHIRT_DESIGNER_INTEGRATION_2026-06.md,art-request-detail.html,art-request-detail.css,...)
+
 ## v2026.06.17.12 (2026.06.17)
 
 - Deploy v2026.06.17.12: 6 files (art-request-detail.html,art-request-detail.css,garment-designer.css,...)
