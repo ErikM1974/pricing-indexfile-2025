@@ -1,3 +1,7 @@
+## v2026.06.18.3 (2026.06.18)
+
+- Deploy v2026.06.18.3: 9 files (ACTIVE_FILES.md,index.html,quick-quote.css,...)
+
 ## v2026.06.18.2 (2026.06.18)
 
 - Training: document Rep Reference Mockup (Save to Art Request) flow
