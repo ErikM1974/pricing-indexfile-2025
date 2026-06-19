@@ -88,4 +88,16 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
         expect(QQ).toMatch(/groupTotal\s*-\s*oneTime/);
         expect(CFG).toMatch(/groupTotal\s*-\s*oneTime/);
     });
+
+    test('cap embellishment (flat / 3D puff / laser patch) flows to the engine via the cap primary logo', () => {
+        expect(QQ).toMatch(/CAP_EMB_OPTS\s*=/);
+        expect(QQ).toContain("'3d-puff'");
+        expect(QQ).toContain("'laser-patch'");
+        expect(QQ).toMatch(/embellishmentType:\s*state\.capEmb/); // passed on the cap primary logo
+    });
+
+    test('next-tier nudge is enabled for the method cards (engine computes it)', () => {
+        // priceMethod requests nudge:true; the matrix probe stays nudge:false
+        expect(QQ).toMatch(/singleItemPreview\(buildItem\(def\)[\s\S]{0,120}nudge:\s*true/);
+    });
 });

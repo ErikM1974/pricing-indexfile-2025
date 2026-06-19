@@ -45,6 +45,17 @@ rework: web-quote-cart-parity 63/63 + quick-quote-parity 8/8 green → all 3 sur
 identical.** RULE: any pricing-related change here → re-run both + re-confirm this memory.
 
 ## More-detail-than-catalog features
+- **Audit vs builders (2026-06-18, 5-method Workflow) → 3 adds SHIPPED**: (1) **next-tier NUDGE** on
+  each card ("↑ Add N more → $X/pc · small-batch fee gone") — `priceMethod` now requests `nudge:true`
+  (matrix probes stay false); (2) **cap embellishment selector** (Flat / 3D Puff +$5/cap / Laser Patch
+  +$5/cap + $50 setup) — passed as `embellishmentType` on the cap PRIMARY logo, the engine prices it
+  (verified flat $480 / puff $600 / patch $650 @24 C112). ⚠️ GOTCHA: the puff/patch upcharge lands ONLY
+  in `groupTotal`, NOT in `lines`/`serviceLines` — so the CARD (groupTotal-based) is right but the matrix
+  per-pc had to add a clamped residual `(groupTotal − oneTime − ltm − (baseUnit+svc)·qty)/qty` (clamp ≥0
+  so DTG's LTM floor never shaves a cent); (3) **qty preset buttons** 24/48/72/144. Audit confirmed
+  everything else present or intentionally deferred (customer / save / ship / tax / discount / design /
+  artwork / names-numbers / specialty-ink / full-back-embroidery [Erik: rare → quote separately] / rush
+  [Erik skipped]). Locked: quick-quote-parity 10 + web-quote-cart-parity 63.
 - **Print placement = independent Front + Back + DTF sleeves** (rework 2026-06-18, Taneisha's
   ask): Front (None / Left chest / Full front / Jumbo) × Back (None / Full back / Jumbo) + DTF
   sleeve checkboxes. Drives **DTG / SCP / DTF only** — embroidery is logo-based and IGNORES it;

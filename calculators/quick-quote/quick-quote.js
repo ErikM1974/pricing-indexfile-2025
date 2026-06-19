@@ -73,6 +73,12 @@
         { code: 'FB', label: 'Full back' },
         { code: 'JB', label: 'Jumbo back' }
     ];
+    // Cap embellishment type (cap embroidery only) — priced by the engine via the cap primary logo.
+    var CAP_EMB_OPTS = [
+        { code: 'embroidery', label: 'Flat embroidery' },
+        { code: '3d-puff', label: '3D puff' },
+        { code: 'laser-patch', label: 'Laser patch' }
+    ];
     // DTG combos the canonical pricer accepts (FF_JB / JF_FB have no DTG_Costs data → blocked).
     var DTG_LOCATION_CODES = ['LC', 'FF', 'FB', 'JF', 'JB', 'LC_FB', 'FF_FB', 'JF_JB', 'LC_JB'];
     // DTF has no "jumbo" transfer size → jumbo maps to the largest (full) location.
@@ -135,7 +141,7 @@
                 return {
                     'emb:cap': {
                         logos: {
-                            primary: { position: 'Cap Front', stitchCount: num(state.adv.embStitch) || 8000, needsDigitizing: !!state.adv.digitizing },
+                            primary: { position: 'Cap Front', stitchCount: num(state.adv.embStitch) || 8000, needsDigitizing: !!state.adv.digitizing, embellishmentType: state.capEmb },
                             additional: state.embAddl.map(function (a) {
                                 return { position: 'Cap Back', stitchCount: num(a.stitch) || 5000, needsDigitizing: false };
                             })
@@ -185,6 +191,7 @@
         ink: 1,
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
         embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
+        capEmb: 'embroidery', // cap embellishment: 'embroidery' | '3d-puff' | 'laser-patch'
         methods: [],          // [{id}]
         results: {},          // id -> { status, preview, summary, message }
         selectedMethod: null, // which method's price-breaks matrix is shown
@@ -369,6 +376,7 @@
         state.selectedMethod = null;
         state.methodPinned = false;
         state.embAddl = [];
+        state.capEmb = 'embroidery';
         var mb = $('qqMatrix'); if (mb) mb.innerHTML = '';
         // caps are embroidery-only — the print-placement chips don't apply to them
         $('qqPlacementField').hidden = !!state.product.isCap;
@@ -406,7 +414,8 @@
             oneTimeFees: fees.filter(function (f) { return f.oneTime; }),
             ltm: p.ltm || { fee: 0 },
             tierLabel: p.tierLabel,
-            serviceLines: p.serviceLines || []
+            serviceLines: p.serviceLines || [],
+            nudge: p.nudge || null
         };
     }
 
@@ -427,7 +436,7 @@
             renderResults(); return;
         }
         try {
-            run = window.QuoteCartEngine.singleItemPreview(buildItem(def), { groups: def.groups(), deps: engineDeps(), nudge: false });
+            run = window.QuoteCartEngine.singleItemPreview(buildItem(def), { groups: def.groups(), deps: engineDeps(), nudge: true });
         } catch (e) {
             state.results[id] = { status: 'error', message: e.message || 'pricing error' };
             renderResults(); return;
@@ -541,6 +550,17 @@
         field.hidden = false;
         var isCap = !!(state.product && state.product.isCap);
         $('qqEmbLabel').textContent = isCap ? 'Cap embroidery logos' : 'Embroidery logos';
+        // cap embellishment selector (flat / 3D puff / laser patch) — caps only
+        var capWrap = $('qqCapEmbWrap');
+        if (isCap) {
+            capWrap.hidden = false;
+            $('qqCapEmbType').innerHTML = CAP_EMB_OPTS.map(function (o) {
+                return '<button type="button" class="qq-place-chip' + (o.code === state.capEmb ? ' is-active' : '')
+                    + '" data-cap-emb="' + o.code + '">' + esc(o.label) + '</button>';
+            }).join('');
+        } else {
+            capWrap.hidden = true;
+        }
         var rows = [embLogoRow('primary', isCap ? 'Cap front' : 'Left chest', state.adv.embStitch, false)];
         state.embAddl.forEach(function (a, i) {
             rows.push(embLogoRow(String(i), isCap ? 'Cap back' : 'Additional logo', a.stitch, true));
@@ -577,7 +597,7 @@
     function ladderKey(id) {
         return (state.product ? state.product.style : '') + '|' + id
             + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.ink
-            + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',')
+            + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',') + '|' + state.capEmb
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
     }
@@ -615,11 +635,17 @@
                 if (preview && preview.ok && preview.lines && preview.lines.length) {
                     var label = preview.tierLabel || ('q' + probes[i]);
                     if (!byTier[label]) {
-                        // per-piece = base unit + per-piece service lines (embroidery
-                        // stitch surcharge AS-GARM, additional-logo AL) ÷ qty. baseUnit
-                        // alone misses those, so a >10k or multi-logo emb tier would read low.
-                        var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / probes[i];
-                        byTier[label] = { label: label, base: r2(preview.lines[0].baseUnit + svcPerPc), ltmFee: (preview.ltm && preview.ltm.fee) || 0, range: parseRange(label) };
+                        // per-piece base = baseUnit + per-piece service lines (AS-GARM stitch
+                        // surcharge, additional-logo AL) + any residual per-piece upcharge that
+                        // only shows in groupTotal (cap 3D-puff / laser-patch). Clamp >=0 so a
+                        // DTG LTM tier's floor under-recovery never shaves a cent.
+                        var pq = probes[i];
+                        var bu = preview.lines[0].baseUnit;
+                        var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / pq;
+                        var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+                        var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
+                        var residual = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * pq) / pq);
+                        byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
                     }
                 }
             }
@@ -651,7 +677,10 @@
                 return '<td' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '—') + '</td>';
             }).join('') + '</tr>';
         }
-        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + ' · ' + esc(placementLabel()) + '</p>'
+        var descr = (id === 'emb' || id === 'capemb')
+            ? (state.product.isCap && state.capEmb !== 'embroidery' ? (state.capEmb === '3d-puff' ? '3D puff' : 'Laser patch') : '')
+            : placementLabel();
+        box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + (descr ? ' · ' + esc(descr) : '') + '</p>'
             + '<div class="qq-matrix-wrap"><table class="qq-matrix"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + priceRow + '</tr>' + ltmRow + '</tbody></table></div>'
             + '<p class="qq-matrix-note">Highlighted column = your current quantity. Per ' + unit + ' for a standard size — extended sizes (2XL+) add their upcharge. Small-batch fee is one-time per order.</p>';
@@ -720,11 +749,21 @@
         if (s.ltm && s.ltm.fee > 0) meta.push('<span class="item ltm">incl. $' + Math.round(s.ltm.fee) + ' small-batch fee</span>');
         s.oneTimeFees.forEach(function (f) { meta.push('<span class="item fee">+ ' + fmt(f.amount) + ' ' + esc(f.label) + ' (one-time)</span>'); });
 
+        var nudgeHtml = '';
+        if (s.nudge && s.nudge.addQty > 0 && (s.nudge.nextPerPiece != null || s.nudge.perPieceSavings > 0)) {
+            var n = s.nudge;
+            var to = n.nextPerPiece != null ? (' → ' + fmt(n.nextPerPiece) + '/' + unitWord) : '';
+            var save = (n.nextPerPiece == null && n.perPieceSavings > 0) ? (' — save ' + fmt(n.perPieceSavings) + '/' + unitWord) : '';
+            nudgeHtml = '<div class="qq-card-nudge">↑ Add ' + n.addQty + ' more' + to
+                + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</div>';
+        }
+
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag">best value</span>' : '') + '</div></div></div>'
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
+            + nudgeHtml
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
             + '</div>';
     }
@@ -766,6 +805,13 @@
             if (state.useSizes) return; // qty is computed from sizes
             state.qty = Math.max(1, parseInt(e.target.value, 10) || 0);
             repriceDebounced();
+        });
+
+        $('qqQtyPresets').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-qty]'); if (!b || state.useSizes) return;
+            state.qty = parseInt(b.getAttribute('data-qty'), 10);
+            $('qqQty').value = state.qty;
+            repriceAll();
         });
 
         $('qqSizesToggle').addEventListener('click', function () {
@@ -828,6 +874,11 @@
             renderEmbPanel(); repriceAll();
         });
         $('qqEmbDigitizing').addEventListener('change', function (e) { state.adv.digitizing = e.target.checked; repriceAll(); });
+        $('qqCapEmbType').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-cap-emb]'); if (!b) return;
+            state.capEmb = b.getAttribute('data-cap-emb');
+            renderEmbPanel(); repriceAll();
+        });
         $('qqScpDark').addEventListener('change', function (e) { state.adv.scpDark = e.target.checked; repriceAll(); });
         $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceAll(); });
 
