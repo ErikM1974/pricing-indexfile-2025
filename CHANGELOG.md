@@ -1,3 +1,8 @@
+## v2026.06.18.9 (2026.06.18)
+
+- Memory: mark Laser Leatherette Patch shipped (v2026.06.18.8)
+- Deploy v2026.06.18.9: 5 files (index.html,quick-quote.css,quick-quote.js,...)
+
 ## v2026.06.18.8 (2026.06.18)
 
 - Deploy v2026.06.18.8: 8 files (ae-dashboard.html,CUSTOM_DECAL_PRICING_2026-06.md,GARMENT_ART_FORM_REBUILD_2026-06.md,...)
