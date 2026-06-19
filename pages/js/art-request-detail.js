@@ -1621,6 +1621,15 @@
         } catch (e) { return []; }
     }
 
+    // Laser leatherette patch specs travel inside the Artwork_Locations JSON —
+    // each patch placement carries a `patch` object. Return the first one.
+    function findPatchSpec(locs) {
+        for (var i = 0; i < (locs || []).length; i++) {
+            if (locs[i] && locs[i].patch && typeof locs[i].patch === 'object') return locs[i].patch;
+        }
+        return null;
+    }
+
     function renderArtSpecs(req) {
         var card = document.getElementById('ard-artspec-card');
         var body = document.getElementById('ard-artspec-body');
@@ -1651,6 +1660,21 @@
                     + '<td>' + escapeHtml(l.notes || '—') + '</td></tr>';
             });
             html += '</tbody></table>';
+        }
+
+        // Laser leatherette patch specs (ride inside Artwork_Locations JSON).
+        var patch = findPatchSpec(locs);
+        if (patch) {
+            any = true;
+            html += '<div class="ard-artspec-subhead">Laser Leatherette Patch</div>';
+            html += field('Leatherette Color', patch.material);
+            html += field('Patch Shape', patch.shape);
+            var psize = '';
+            if (patch.width && patch.height) psize = patch.width + '" × ' + patch.height + '"';
+            else if (patch.width) psize = patch.width + '" wide';
+            html += field('Patch Size', psize);
+            html += field('Edge / Border', patch.edge);
+            html += field('Attachment to Cap', patch.attach);
         }
 
         // Colors
@@ -1748,6 +1772,21 @@
             locHtml = '<div class="ps-line"><b>Placement:</b> ' + escapeHtml(req.Garment_Placement) + '</div>';
         }
 
+        var patch = findPatchSpec(locs);
+        var patchHtml = '';
+        if (patch) {
+            var psize = '';
+            if (patch.width && patch.height) psize = patch.width + '" × ' + patch.height + '"';
+            else if (patch.width) psize = patch.width + '" W';
+            patchHtml = '<table class="ps-kv">'
+                + kv('Leatherette Color', patch.material)
+                + kv('Shape', patch.shape)
+                + kv('Patch Size', psize)
+                + kv('Edge / Border', patch.edge)
+                + kv('Attachment', patch.attach)
+                + '</table>';
+        }
+
         var colorsKv = kv('Color Direction', req.Color_Mode) + kv('PMS Colors', req.PMS_Colors) + kv('Thread Colors', req.Thread_Colors)
             + (req.Underbase_Required ? kv('Underbase', req.Underbase_Required === 'Steve' ? 'Steve to decide' : req.Underbase_Required) : '');
 
@@ -1823,6 +1862,7 @@
             + '</div>'
             + (garmentRows ? '<div class="ps-sec">Garments</div><table class="ps-tbl"><thead><tr><th>#</th><th>Style</th><th>Color</th></tr></thead><tbody>' + garmentRows + '</tbody></table>' : '')
             + (locHtml ? '<div class="ps-sec">Print Locations &amp; Size</div>' + locHtml : '')
+            + (patchHtml ? '<div class="ps-sec">Laser Leatherette Patch</div>' + patchHtml : '')
             + artHtml
             + (exact ? '<div class="ps-sec">Exact Text in Artwork</div><div class="ps-exact">' + escapeHtml(exact) + '</div>' : '')
             + (hasPrev ? '<div class="ps-sec">Previous Order Reference</div><table class="ps-kv">' + prevKv + '</table>' : '')

@@ -49,10 +49,11 @@ quote     = material + $50 GRT-50 setup (new art; waived if on file) + sales tax
   `sticker-pricing-page.css` (`.decal-*`). Cache-bust JS `?v=2026.06.18.6`, CSS `?v=20260618-decal`.
 - **Test**: `caspio-pricing-proxy/tests/jest/custom-decal-pricing.test.js` — 12 tests, locks the ladder +
   Erik's 6 spec test cases + the monotonic sweep.
-- **Caspio table** `Custom_Decal_Pricing` (cols PartNumber, Description, MinSqFt, MaxSqFt, RatePerSqFt,
-  FlatAmount, Notes). NOT created yet → route runs on the inline fallback. Import CSV (on Erik's disk,
-  gitignored): `caspio-pricing-proxy/scripts/custom-decal-pricing-caspio-import.csv`. DECAL-MIN row holds
-  the flat $90 in FlatAmount. After import, the rate card is editable with no deploy.
+- **Caspio table** `Custom_Decal_Pricing` — **CREATED + CONNECTED 2026-06-18 (verified `source: caspio`).**
+  Cols: PartNumber/Description/Notes=Text(255), MinSqFt/MaxSqFt/FlatAmount=Integer, RatePerSqFt=Number.
+  6 tier rows (DECAL-SQFT-T1..T6) + DECAL-MIN (FlatAmount=90). Edit `RatePerSqFt`/`FlatAmount` in Caspio →
+  live, no deploy (floors auto-derive). Import CSV (gitignored, on Erik's disk + Downloads):
+  `caspio-pricing-proxy/scripts/custom-decal-pricing-caspio-import.csv`.
 
 ## Deploy
 
@@ -60,5 +61,5 @@ quote     = material + $50 GRT-50 setup (new art; waived if on file) + sales tax
   `/quote` return correct ladder/floors; source `inline`.
 - Frontend: shipped 2026-06-18 (calculator verified in preview against live proxy — VCT = $504.26, cliff,
   width warning, art-waive all correct, no console errors).
-- **PENDING (Erik)**: create the `Custom_Decal_Pricing` Caspio table + import the CSV to make rates
-  editable without a deploy (works on inline fallback until then).
+- **DONE 2026-06-18**: `Custom_Decal_Pricing` Caspio table created + CSV imported; endpoint verified
+  serving `source: caspio`. Rates now editable in Caspio with no deploy.

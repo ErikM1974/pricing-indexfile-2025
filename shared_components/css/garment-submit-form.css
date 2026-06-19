@@ -90,6 +90,29 @@
     border: 1px solid #fde68a;
 }
 
+/* ── Laser leatherette patch panel (conditional) ─────────────────────── */
+.gsf-patch-section {
+    background: #fbf7f2;
+    border: 1px solid #e7d9c6;
+    border-left: 4px solid #8b5e3c;
+    border-radius: 10px;
+    padding: 14px 16px 16px;
+    margin: 4px 0 0;
+}
+.gsf-patch-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #8b5e3c;
+    color: #fff;
+    font-size: 13px;
+    flex: 0 0 auto;
+}
+.gsf-patch-hint { margin-left: 34px; }
+
 /* ── Field grid ──────────────────────────────────────────────────────── */
 .gsf-row {
     display: grid;
