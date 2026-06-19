@@ -106,7 +106,10 @@ size/edge; offer 4 attachment options.
   only appear when the method is picked).
 - **Verified (local preview harness)**: panel hidden by default, reveals on check, hides on uncheck,
   "Other" toggle works, all option lists correct, renders cleanly in the form's 2-col grid, zero
-  console errors. Not yet deployed — `/deploy` will cache-bust the `?v=` tags.
+  console errors.
+- **SHIPPED LIVE 2026-06-18 — FE `v2026.06.18.8` (Heroku rel 1391).** Prod-verified: ae-dashboard +
+  art-request-detail serve `?v=2026.06.18.8`; live `garment-submit-form.js` + `art-request-detail.js`
+  contain the patch markers (not a stale slug). Tests 49 suites / 1363 green; parser gate 792 green.
 - **Leatherette color list** lives only in `PATCH_MATERIALS` (JS array) — Erik can edit it; no
   Caspio dependency. **Old pre-2026-06-18 records** simply have no `patch` in their locations →
   the new blocks correctly stay hidden.
