@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.6">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.18.9">
 </head>
 <body>
 
@@ -85,6 +85,12 @@
                         + Add sizes (2XL upcharges)
                     </button>
                 </div>
+                <div class="qq-qty-presets" id="qqQtyPresets" aria-label="Quantity presets">
+                    <button type="button" data-qty="24">24</button>
+                    <button type="button" data-qty="48">48</button>
+                    <button type="button" data-qty="72">72</button>
+                    <button type="button" data-qty="144">144</button>
+                </div>
 
                 <div class="qq-sizes" id="qqSizes" hidden>
                     <p class="qq-sizes-note">Enter a per-size breakdown — extended sizes (2XL+) carry their upcharge. Quantity becomes the total.</p>
@@ -94,6 +100,10 @@
                 <!-- Embroidery: logo-based (primary + additional logos), not placement-based -->
                 <div class="field qq-emb" id="qqEmbField" hidden>
                     <label id="qqEmbLabel">Embroidery logos</label>
+                    <div class="qq-capemb" id="qqCapEmbWrap" hidden>
+                        <span class="qq-capemb-lbl">Embellishment</span>
+                        <div class="qq-chips" id="qqCapEmbType" role="group" aria-label="Cap embellishment"></div>
+                    </div>
                     <div id="qqEmbLogos" class="qq-emb-logos"></div>
                     <button type="button" id="qqEmbAddBtn" class="qq-link-btn">+ Add another logo</button>
                     <label class="qq-check qq-emb-dig"><input type="checkbox" id="qqEmbDigitizing"> New logo — add one-time digitizing</label>
@@ -159,6 +169,6 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.6"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.18.9"></script>
 </body>
 </html>

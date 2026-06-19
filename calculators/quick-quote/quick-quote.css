@@ -252,3 +252,13 @@ table.qq-matrix td.warn { color: #7a541a; font-weight: 500; font-family: "Geist"
 .qq-sleeves { display: flex; gap: 16px; }
 .qq-sleeves .qq-check { font-size: 13px; margin: 0; }
 .qq-place-note { font-size: 11px; color: var(--qq-muted); margin: 6px 0 0; line-height: 1.5; }
+
+/* Next-tier nudge on a method card */
+.qq-card-nudge { margin-top: 8px; font-size: 11.5px; font-weight: 500; color: var(--qq-green-dark); background: #eef6f0; border-radius: 7px; padding: 5px 9px; }
+
+/* Cap embellishment selector + quantity presets */
+.qq-capemb { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.qq-capemb-lbl { font-size: 12px; color: var(--qq-muted); flex: none; }
+.qq-qty-presets { display: flex; gap: 6px; margin: -4px 0 14px; }
+.qq-qty-presets button { font-size: 12px; padding: 4px 12px; border: 1px solid var(--qq-line-2); border-radius: 7px; background: #fff; cursor: pointer; color: var(--qq-muted); font-family: inherit; }
+.qq-qty-presets button:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
