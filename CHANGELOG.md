@@ -1,3 +1,7 @@
+## v2026.06.18.8 (2026.06.18)
+
+- Deploy v2026.06.18.8: 8 files (ae-dashboard.html,CUSTOM_DECAL_PRICING_2026-06.md,GARMENT_ART_FORM_REBUILD_2026-06.md,...)
+
 ## v2026.06.18.7 (2026.06.18)
 
 - Deploy v2026.06.18.7: 10 files (.gitignore,ACTIVE_FILES.md,index.html,...)
