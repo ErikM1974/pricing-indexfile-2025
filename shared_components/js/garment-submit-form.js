@@ -51,7 +51,43 @@ var GarmentSubmitForm = (function () {
     ];
     var DECORATION_METHODS = [
         'Screen Print', 'DTG', 'Embroidery', 'Transfer',
-        'Sticker', 'Banner', 'JDS Product', 'Not sure — Steve to advise'
+        'Sticker', 'Banner', 'JDS Product', 'Laser Leatherette Patch', 'Not sure — Steve to advise'
+    ];
+    // ── Laser leatherette patch (laser-engraved patch applied to caps) ──────
+    // When the AE picks this decoration method, a conditional "Patch Specs"
+    // panel appears so Steve gets the patch-only details the print/embroidery
+    // fields don't cover. Ships with NO new Caspio columns: the specs ride
+    // inside the existing Artwork_Locations JSON (each patch placement carries
+    // a `patch` object) + a readable block prepended to NOTES. Erik 2026-06-18.
+    var PATCH_METHOD = 'Laser Leatherette Patch';
+    var PATCH_MATERIAL_OTHER = 'Other — specify exact stock';
+    // Surface color / laser-reveal color. Edit this list as stock changes —
+    // it is the only place the color options are defined.
+    var PATCH_MATERIALS = [
+        'Black / Silver engrave',
+        'Black / Gold engrave',
+        'Black / White engrave',
+        'Black / Red engrave',
+        'Gray / Black engrave',
+        'Light Gray / Black engrave',
+        'White / Black engrave',
+        'Brown / Black engrave',
+        'Rawhide (Light Brown) / Black engrave',
+        'Dark Brown / Black engrave',
+        'Tan / Black engrave',
+        'Navy / White engrave',
+        PATCH_MATERIAL_OTHER
+    ];
+    var PATCH_SHAPES = [
+        'Rectangle', 'Rounded Rectangle', 'Square', 'Circle', 'Oval',
+        'Shield / Crest', 'Custom die-cut (describe in notes)'
+    ];
+    var PATCH_EDGES = [
+        'Clean laser-cut edge', 'Stitched (merrowed) border', 'Steve to advise'
+    ];
+    var PATCH_ATTACHMENTS = [
+        'Heat press (adhesive backing)', 'Sewn / stitched',
+        'Heat press + tack stitch', 'Steve to advise'
     ];
     var COLOR_MODES = [
         'Use exact PMS colors',
@@ -137,6 +173,8 @@ var GarmentSubmitForm = (function () {
         renderLocations();
         applyArtworkStatusAdaptive();
         applyApprovalAdaptive();
+        applyPatchVisibility();
+        applyPatchMaterialOther();
     }
 
     // ── Build Form HTML ────────────────────────────────────────────────────
@@ -154,6 +192,7 @@ var GarmentSubmitForm = (function () {
             + buildCustomerSection()
             + buildStatusSection()
             + buildDecorationSection()
+            + buildPatchSection()
             + buildGarmentSection()
             + buildLocationsSection()
             + buildColorsSection()
@@ -287,6 +326,61 @@ var GarmentSubmitForm = (function () {
         return sectionHeader('3', 'Decoration Method', 'How this art will be produced — pick all that apply.')
             + '<div class="gsf-check-grid">' + boxes + '</div>'
             + '<span class="gsf-err" id="gsf-decoration-error">Select at least one decoration method</span>'
+            + '</div>';
+    }
+
+    // Conditional panel — only revealed when "Laser Leatherette Patch" is a
+    // chosen decoration method. Not numbered (uses a leather badge) so it does
+    // not disturb the 1–11 section numbering the checklist + prev-order logic
+    // depend on.
+    function buildPatchSection() {
+        return '<div class="gsf-section gsf-patch-section" id="gsf-patch-section" style="display:none;">'
+            + '<div class="gsf-section-head">'
+            + '  <span class="gsf-patch-badge">\u{1FAA1}</span>'
+            + '  <span class="gsf-section-title">Laser Leatherette Patch Specs</span>'
+            + '</div>'
+            + '<div class="gsf-section-hint gsf-patch-hint">Shown because you picked <strong>Laser Leatherette Patch</strong>. Tell Steve exactly what to laser-cut and engrave, and how it attaches to the cap. The cap itself goes in the Garment section below; placement (e.g. Cap Front) goes in Artwork Placement.</div>'
+            + '<div class="gsf-row">'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Leatherette Color <span class="gsf-req">*</span></label>'
+            + '    <select class="gsf-select" id="gsf-patch-material">' + optionList(PATCH_MATERIALS, '- select color -') + '</select>'
+            + '    <span class="gsf-hint">Surface color / laser-reveal color.</span>'
+            + '    <span class="gsf-err" id="gsf-patch-material-error">Pick the leatherette color</span>'
+            + '  </div>'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Patch Shape <span class="gsf-req">*</span></label>'
+            + '    <select class="gsf-select" id="gsf-patch-shape">' + optionList(PATCH_SHAPES, '- select shape -') + '</select>'
+            + '    <span class="gsf-err" id="gsf-patch-shape-error">Pick the patch shape</span>'
+            + '  </div>'
+            + '</div>'
+            + '<div class="gsf-field" id="gsf-patch-material-other-field" style="display:none;">'
+            + '  <label class="gsf-label">Exact material / stock name <span class="gsf-req">*</span></label>'
+            + '  <input type="text" class="gsf-input" id="gsf-patch-material-other" placeholder="e.g. JDS Rawhide laserable leatherette">'
+            + '  <span class="gsf-err" id="gsf-patch-material-other-error">Type the exact material</span>'
+            + '</div>'
+            + '<div class="gsf-row">'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Patch Width&quot; <span class="gsf-req">*</span></label>'
+            + '    <input type="number" class="gsf-input" id="gsf-patch-width" placeholder="W" min="0.1" step="0.1">'
+            + '    <span class="gsf-hint">Finished patch size (also fills the Cap placement size).</span>'
+            + '    <span class="gsf-err" id="gsf-patch-width-error">Enter the patch width</span>'
+            + '  </div>'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Patch Height&quot;</label>'
+            + '    <input type="number" class="gsf-input" id="gsf-patch-height" placeholder="H" min="0.1" step="0.1">'
+            + '  </div>'
+            + '</div>'
+            + '<div class="gsf-row">'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Edge / Border Finish</label>'
+            + '    <select class="gsf-select" id="gsf-patch-edge">' + optionList(PATCH_EDGES, '- select finish -') + '</select>'
+            + '  </div>'
+            + '  <div class="gsf-field">'
+            + '    <label class="gsf-label">Attachment to Cap <span class="gsf-req">*</span></label>'
+            + '    <select class="gsf-select" id="gsf-patch-attach">' + optionList(PATCH_ATTACHMENTS, '- select attachment -') + '</select>'
+            + '    <span class="gsf-err" id="gsf-patch-attach-error">Pick how the patch attaches</span>'
+            + '  </div>'
+            + '</div>'
             + '</div>';
     }
 
@@ -674,6 +768,13 @@ var GarmentSubmitForm = (function () {
             if (artworkLocations.length < MAX_LOCATIONS) { artworkLocations.push(newLocation()); renderLocations(); }
         });
 
+        // Reveal the patch-specs panel when "Laser Leatherette Patch" is ticked.
+        document.querySelectorAll('.gsf-decoration').forEach(function (cb) {
+            cb.addEventListener('change', applyPatchVisibility);
+        });
+        var patchMat = document.getElementById('gsf-patch-material');
+        if (patchMat) patchMat.addEventListener('change', applyPatchMaterialOther);
+
         var artStatus = document.getElementById('gsf-artwork-status');
         if (artStatus) artStatus.addEventListener('change', applyArtworkStatusAdaptive);
         var approval = document.getElementById('gsf-approval-status');
@@ -742,6 +843,53 @@ var GarmentSubmitForm = (function () {
             if (nums[i].textContent === num) return nums[i].closest('.gsf-section');
         }
         return null;
+    }
+
+    // ── Laser leatherette patch helpers ────────────────────────────────────
+    function isPatchSelected() {
+        var sel = false;
+        document.querySelectorAll('.gsf-decoration:checked').forEach(function (cb) {
+            if (cb.value === PATCH_METHOD) sel = true;
+        });
+        return sel;
+    }
+    function applyPatchVisibility() {
+        var sec = document.getElementById('gsf-patch-section');
+        if (sec) sec.style.display = isPatchSelected() ? '' : 'none';
+    }
+    function applyPatchMaterialOther() {
+        var sel = document.getElementById('gsf-patch-material');
+        var field = document.getElementById('gsf-patch-material-other-field');
+        if (field) field.style.display = (sel && sel.value === PATCH_MATERIAL_OTHER) ? '' : 'none';
+    }
+    // The patch attributes as a single object, ready to ride inside the
+    // Artwork_Locations JSON. Empty keys are dropped so the detail renderer
+    // only shows fields the AE actually filled.
+    function buildPatchSpec() {
+        var material = getVal('gsf-patch-material');
+        if (material === PATCH_MATERIAL_OTHER) material = getVal('gsf-patch-material-other') || 'Other (see notes)';
+        var spec = {
+            material: material,
+            shape: getVal('gsf-patch-shape'),
+            width: getVal('gsf-patch-width'),
+            height: getVal('gsf-patch-height'),
+            edge: getVal('gsf-patch-edge'),
+            attach: getVal('gsf-patch-attach')
+        };
+        Object.keys(spec).forEach(function (k) { if (!spec[k]) delete spec[k]; });
+        return spec;
+    }
+    function patchNotesBlock(spec) {
+        var lines = ['LASER LEATHERETTE PATCH'];
+        if (spec.material) lines.push('• Material: ' + spec.material);
+        if (spec.shape) lines.push('• Shape: ' + spec.shape);
+        var size = '';
+        if (spec.width && spec.height) size = spec.width + '" × ' + spec.height + '"';
+        else if (spec.width) size = spec.width + '" wide';
+        if (size) lines.push('• Size: ' + size);
+        if (spec.edge) lines.push('• Edge: ' + spec.edge);
+        if (spec.attach) lines.push('• Attachment: ' + spec.attach);
+        return lines.join('\n');
     }
 
     // ── Pickers ────────────────────────────────────────────────────────────
@@ -929,6 +1077,22 @@ var GarmentSubmitForm = (function () {
         showInlineError('gsf-decoration-error', !decoChecked);
         if (!decoChecked) valid = false;
 
+        // Laser leatherette patch: require the patch-only specs when chosen.
+        if (isPatchSelected()) {
+            req('gsf-patch-material', !!getVal('gsf-patch-material'));
+            if (getVal('gsf-patch-material') === PATCH_MATERIAL_OTHER) {
+                req('gsf-patch-material-other', !!getVal('gsf-patch-material-other'));
+            } else {
+                clearError('gsf-patch-material-other');
+            }
+            req('gsf-patch-shape', !!getVal('gsf-patch-shape'));
+            req('gsf-patch-width', !!getVal('gsf-patch-width'));
+            req('gsf-patch-attach', !!getVal('gsf-patch-attach'));
+        } else {
+            clearError('gsf-patch-material'); clearError('gsf-patch-material-other');
+            clearError('gsf-patch-shape'); clearError('gsf-patch-width'); clearError('gsf-patch-attach');
+        }
+
         // At least one location with placement + width
         syncLocationsFromDom();
         var hasLoc = artworkLocations.some(function (l) { return l.placement && l.width; });
@@ -1086,6 +1250,34 @@ var GarmentSubmitForm = (function () {
         var noText = document.getElementById('gsf-no-text');
         var exactText = (noText && noText.checked) ? '— No text in this design —' : getVal('gsf-exact-text');
 
+        // Laser leatherette patch — specs ride INSIDE the existing columns (no
+        // new Caspio fields): each kept placement carries a `patch` object in
+        // the Artwork_Locations JSON, the patch size back-fills the placement
+        // size, and a readable block is prepended to NOTES for surfaces that
+        // don't parse the JSON (galleries, emails).
+        var isPatch = decos.indexOf(PATCH_METHOD) !== -1;
+        var patchSpec = isPatch ? buildPatchSpec() : null;
+        var keptLocs = artworkLocations.filter(function (l) { return l.placement || l.width; });
+        var locsOut = keptLocs.map(function (l) {
+            var o = { placement: l.placement, width: l.width, height: l.height, notes: l.notes };
+            if (isPatch && patchSpec) {
+                if (!o.width && patchSpec.width) o.width = patchSpec.width;
+                if (!o.height && patchSpec.height) o.height = patchSpec.height;
+                o.patch = patchSpec;
+            }
+            return o;
+        });
+        // Patch picked but no placement entered → keep the specs from being lost.
+        if (isPatch && patchSpec && locsOut.length === 0) {
+            locsOut.push({ placement: 'Cap Front', width: patchSpec.width || '', height: patchSpec.height || '', notes: '', patch: patchSpec });
+        }
+
+        var notesOut = getVal('gsf-notes');
+        if (isPatch && patchSpec) {
+            var block = patchNotesBlock(patchSpec);
+            notesOut = notesOut ? block + '\n\n' + notesOut : block;
+        }
+
         var payload = {
             CompanyName: companyName,
             Status: 'Submitted',
@@ -1103,7 +1295,7 @@ var GarmentSubmitForm = (function () {
             User_Email: aeEmail,
             Is_Rush: !!isRush,
             Revision_Count: 0,
-            NOTES: getVal('gsf-notes'),
+            NOTES: notesOut,
 
             // New structured fields
             Artwork_Status: artworkStatus,
@@ -1120,7 +1312,7 @@ var GarmentSubmitForm = (function () {
             Uploaded_File_Type: getVal('gsf-file-type'),
             AE_Checklist_Confirmed: true,
             AE_Checklist_Confirmed_By: aeName,
-            Artwork_Locations: JSON.stringify(artworkLocations.filter(function (l) { return l.placement || l.width; }))
+            Artwork_Locations: JSON.stringify(locsOut)
         };
 
         // Primary placement → existing single Garment_Placement (back-compat

@@ -189,6 +189,94 @@ describe('GarmentSubmitForm payload contract', () => {
         expect(JSON.parse(payload.Artwork_Locations)).toHaveLength(1);
     });
 
+    test('Laser leatherette patch: specs ride in Artwork_Locations + NOTES, no new columns', () => {
+        global.document = makeDoc({
+            'gsf-company': 'Cascade Roofing', 'gsf-cust-num': '777', 'gsf-customer-id': '777',
+            'gsf-contact-name': 'Pat Lee', 'gsf-contact-email': 'pat@cascade.com',
+            'gsf-due-date': '2026-06-30', 'gsf-design-num': '53001', 'gsf-order-num': '91002',
+            'gsf-prelim': '', 'gsf-artwork-status': 'New artwork from scratch',
+            'gsf-approval-status': 'Not approved — Steve to create proof',
+            'gsf-color-mode': 'Black only', 'gsf-underbase': '', 'gsf-pms': '', 'gsf-thread': '',
+            'gsf-exact-text': 'CASCADE ROOFING', 'gsf-no-text': { checked: false },
+            'gsf-prev-order': '', 'gsf-prev-design': '', 'gsf-keep-same': '', 'gsf-change': '',
+            'gsf-file-type': 'Customer vector file (AI, EPS, PDF, SVG)', 'gsf-notes': 'Hat order',
+            // Patch panel fields
+            'gsf-patch-material': 'Black / Silver engrave',
+            'gsf-patch-material-other': '',
+            'gsf-patch-shape': 'Rounded Rectangle',
+            'gsf-patch-width': '3', 'gsf-patch-height': '2.25',
+            'gsf-patch-edge': 'Stitched (merrowed) border',
+            'gsf-patch-attach': 'Heat press + tack stitch'
+        }, ['Laser Leatherette Patch']);
+
+        var payload = GarmentSubmitForm._buildPayloadForTest({
+            companyName: 'Cascade Roofing', aeName: 'Erik', aeEmail: 'erik@nwcustomapparel.com',
+            salesRep: 'Erik', isRush: false,
+            garmentRows: [{ style: '112', colorName: 'Black/White', catalogColor: '', swatch: '', image: '' }],
+            // Cap Front placement, size left blank → patch size must back-fill it.
+            artworkLocations: [{ placement: 'Cap Front', width: '', height: '', notes: 'centered' }],
+            uploaded: []
+        });
+
+        // Method flows through the existing decoration column → badge everywhere.
+        expect(payload.Order_Type_Source).toBe('Laser Leatherette Patch');
+
+        // Patch object rides inside the existing Artwork_Locations JSON column.
+        var locs = JSON.parse(payload.Artwork_Locations);
+        expect(locs).toHaveLength(1);
+        expect(locs[0].placement).toBe('Cap Front');
+        // Patch size back-fills the empty placement size.
+        expect(locs[0].width).toBe('3');
+        expect(locs[0].height).toBe('2.25');
+        expect(locs[0].patch).toMatchObject({
+            material: 'Black / Silver engrave',
+            shape: 'Rounded Rectangle',
+            width: '3', height: '2.25',
+            edge: 'Stitched (merrowed) border',
+            attach: 'Heat press + tack stitch'
+        });
+
+        // Readable block prepended to NOTES for non-JSON surfaces (galleries/email).
+        expect(payload.NOTES).toContain('LASER LEATHERETTE PATCH');
+        expect(payload.NOTES).toContain('Material: Black / Silver engrave');
+        expect(payload.NOTES).toContain('Attachment: Heat press + tack stitch');
+        expect(payload.NOTES).toContain('Hat order'); // original note preserved
+
+        // No new top-level columns were introduced (ship-now, no Caspio change).
+        expect(payload.Patch_Material).toBeUndefined();
+        expect(payload.Patch_Specs).toBeUndefined();
+    });
+
+    test('Patch material "Other" uses the typed stock name', () => {
+        global.document = makeDoc({
+            'gsf-company': 'X', 'gsf-customer-id': '', 'gsf-contact-name': '', 'gsf-contact-email': '',
+            'gsf-due-date': '', 'gsf-design-num': '', 'gsf-order-num': '', 'gsf-prelim': '',
+            'gsf-artwork-status': 'New artwork from scratch', 'gsf-approval-status': '',
+            'gsf-color-mode': '', 'gsf-underbase': '', 'gsf-pms': '', 'gsf-thread': '',
+            'gsf-exact-text': '', 'gsf-no-text': { checked: false },
+            'gsf-prev-order': '', 'gsf-prev-design': '', 'gsf-keep-same': '', 'gsf-change': '',
+            'gsf-file-type': '', 'gsf-notes': '',
+            'gsf-patch-material': 'Other — specify exact stock',
+            'gsf-patch-material-other': 'JDS Rawhide laserable leatherette',
+            'gsf-patch-shape': 'Shield / Crest', 'gsf-patch-width': '2.5', 'gsf-patch-height': '',
+            'gsf-patch-edge': '', 'gsf-patch-attach': 'Sewn / stitched'
+        }, ['Laser Leatherette Patch']);
+
+        var payload = GarmentSubmitForm._buildPayloadForTest({
+            companyName: 'X', aeName: 'Erik', aeEmail: 'e@e.com', salesRep: 'Erik', isRush: false,
+            garmentRows: [{ style: '', colorName: '', swatch: '', image: '' }],
+            artworkLocations: [{ placement: 'Cap Front', width: '2.5', height: '', notes: '' }],
+            uploaded: []
+        });
+
+        var locs = JSON.parse(payload.Artwork_Locations);
+        expect(locs[0].patch.material).toBe('JDS Rawhide laserable leatherette');
+        // Empty patch fields are dropped, not stored as blanks.
+        expect(locs[0].patch.edge).toBeUndefined();
+        expect(locs[0].patch.height).toBeUndefined();
+        expect(payload.NOTES).toContain('Material: JDS Rawhide laserable leatherette');
+    });
+
     test('Empty/partial locations are filtered out of Artwork_Locations', () => {
         global.document = makeDoc({
             'gsf-company': 'X', 'gsf-customer-id': '', 'gsf-contact-name': '',

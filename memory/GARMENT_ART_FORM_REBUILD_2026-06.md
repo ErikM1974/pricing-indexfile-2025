@@ -76,6 +76,41 @@ ae-dashboard/art-hub-steve/art-hub-ruth/art-request-detail/mockup-detail). Produ
 proxy POST→PUT `/fields`→GET→DELETE round-trip clean (PUT whitelist v813 accepts the new cols);
 form-dep endpoints + new-col SELECT all 200 (not 500). Test records 52991/52992/52993 deleted.
 
+## Laser Leatherette Patch decoration method — ADDED 2026-06-18 (front-end only, no Caspio change)
+New decoration method for laser-engraved leatherette patches applied to caps. Erik-confirmed
+design (3 AskUserQuestion answers): **ship now, no Caspio columns**; capture material/shape/
+size/edge; offer 4 attachment options.
+
+- **`garment-submit-form.js`**: `'Laser Leatherette Patch'` added to `DECORATION_METHODS`. New
+  conditional **"Laser Leatherette Patch Specs"** panel (`buildPatchSection`, `#gsf-patch-section`)
+  inserted between Decoration (3) and Garment (4) — **NON-numbered** (leather `.gsf-patch-badge`
+  🪡) so it doesn't disturb the 1–11 numbering that `findSectionByNum('8')` + checklist depend on.
+  Fields: Leatherette Color (`PATCH_MATERIALS` list + "Other — specify exact stock" → reveals
+  `#gsf-patch-material-other`), Patch Shape, Width"/Height", Edge/Border Finish, Attachment to Cap.
+  Shown/hidden via `applyPatchVisibility()` on any `.gsf-decoration` change; "Other" text via
+  `applyPatchMaterialOther()`. Required-when-picked validation in `validate()` (material/shape/
+  width/attach + other-text).
+- **Storage = existing columns ONLY (no new Caspio fields):** `buildPayload` builds `patchSpec`
+  (empty keys dropped) and (a) attaches it as a nested `patch` object on each kept
+  `Artwork_Locations` entry, back-filling the placement width/height from the patch size when
+  blank (synthesizes a `Cap Front` entry if no placement given so specs are never lost); and
+  (b) prepends a readable `LASER LEATHERETTE PATCH` block to `NOTES` for surfaces that don't
+  parse the JSON. Method name rides in `Order_Type_Source` → **auto-renders as a badge** on
+  Steve/AE galleries + kanban with zero gallery changes.
+- **`art-request-detail.js`**: `findPatchSpec(locs)` helper; `renderArtSpecs` adds a "Laser
+  Leatherette Patch" subhead block (color/shape/size/edge/attachment) after the locations table;
+  `buildPrintSheet` adds a matching `ps-kv` section to the printable Job Sheet.
+- **`garment-submit-form.css`**: `.gsf-patch-section` (leather `#8b5e3c` left accent) + `.gsf-patch-badge`.
+- **Tests**: 2 new cases in `garment-submit-form-payload.test.js` (patch specs in Artwork_Locations
+  + NOTES + size back-fill; "Other" material) — **5/5 green**. Existing 3 unaffected (patch keys
+  only appear when the method is picked).
+- **Verified (local preview harness)**: panel hidden by default, reveals on check, hides on uncheck,
+  "Other" toggle works, all option lists correct, renders cleanly in the form's 2-col grid, zero
+  console errors. Not yet deployed — `/deploy` will cache-bust the `?v=` tags.
+- **Leatherette color list** lives only in `PATCH_MATERIALS` (JS array) — Erik can edit it; no
+  Caspio dependency. **Old pre-2026-06-18 records** simply have no `patch` in their locations →
+  the new blocks correctly stay hidden.
+
 ## Notifications — DECIDED 2026-06-17 (keep as-is; do NOT "restore" the dropped bits)
 Garment form intentionally matches the Sticker/Banner/JDS pattern, NOT the retired DataPage:
 - EmailJS (`service_jgrave3`/`template_art_note_added`): Steve `art@` + AE confirmation + sales-rep CC — same as before.
