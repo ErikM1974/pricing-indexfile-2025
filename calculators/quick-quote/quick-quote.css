@@ -283,3 +283,26 @@ table.qq-matrix td.warn { color: #7a541a; font-weight: 500; font-family: "Geist"
 .qq-qty-presets { display: flex; gap: 6px; margin: -4px 0 14px; }
 .qq-qty-presets button { font-size: 12px; padding: 4px 12px; border: 1px solid var(--qq-line-2); border-radius: 7px; background: #fff; cursor: pointer; color: var(--qq-muted); font-family: inherit; }
 .qq-qty-presets button:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
+
+/* ===== Config chips on result cards — the live options that shaped THIS price (2026-06-20) ===== */
+.qq-card-config { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.qq-cfg-chip { font-size: 11.5px; color: var(--qq-muted); background: var(--qq-bg); border: 1px solid var(--qq-line); border-radius: 7px; padding: 2px 8px; white-space: nowrap; }
+.qq-cfg-chip.on { color: var(--qq-green-dark); background: #eef6f0; border-color: var(--qq-green); font-weight: 500; }
+
+/* Tasteful "price changed" flash — a brief, subtle wash (corporate; no bounce) */
+@keyframes qq-flash { from { background: #eef6f0; } to { background: var(--qq-card); } }
+.qq-card[data-flash] { animation: qq-flash .7s ease-out; }
+
+/* Below-minimum gets its own clearer treatment (was lumped under .is-unavailable) */
+.qq-card.is-belowmin { opacity: 1; border-color: var(--qq-warn-line); background: var(--qq-warn-bg); }
+.qq-card.is-belowmin .qq-card-msg { color: #7a541a; font-weight: 500; }
+
+/* Keyboard focus rings — were invisible on the button chips/swatches/presets */
+.qq-swatch:focus-visible,
+.qq-chip:focus-visible,
+.qq-qty-presets button:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .qq-card[data-flash] { animation: none; }
+    .qq-swatch, .qq-example-thumb { transition: none; }
+}
