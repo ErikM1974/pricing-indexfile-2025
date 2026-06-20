@@ -1,3 +1,7 @@
+## v2026.06.20.5 (2026.06.20)
+
+- Deploy v2026.06.20.5: pricing-audit fixes — SCP tier label + below-min message, DTF size-upcharge warning + lock test
+
 ## v2026.06.20.4 (2026.06.20)
 
 - Deploy v2026.06.20.4: 6 files (ae-dashboard.html,SHIRT_DESIGNER_INTEGRATION_2026-06.md,garment-designer.css,...)
