@@ -3025,8 +3025,12 @@ async function recalculatePricing() {
         totalQty += p.totalQty || 0;
     });
 
-    // Determine tier based on total quantity
+    // Determine tier based on total quantity. NOTE: getScreenPrintTier's labels are a
+    // STATIC fallback only — the real displayed/saved tier label is derived below from the
+    // matched Caspio bundle tier. SCREENPRINT_TIERS drifted from Caspio's boundaries after the
+    // 2026-06-19 remap (it labels qty 48 "37-72" while Caspio prices the "48-71" tier).
     const tier = getScreenPrintTier(totalQty);
+    let caspioTierLabel = null;
 
     // LTM fee — from Caspio Pricing_Tiers.LTM_Fee (the matched qty tier), NOT
     // hardcoded $75/$50 bands. The SCP service exposes `ltmFee` on each
@@ -3122,6 +3126,10 @@ async function recalculatePricing() {
             if (!firstPricing) {
                 firstPricing = primaryPricing;
                 firstTierData = tierData;
+                // Caspio-accurate tier label from the MATCHED bundle tier (not the static
+                // SCREENPRINT_TIERS map) — mirrors the engine (quote-cart-engine.js:624-632).
+                const _hasMax = tierData.maxQty != null && isFinite(Number(tierData.maxQty));
+                caspioTierLabel = _hasMax ? (tierData.minQty + '-' + tierData.maxQty) : (tierData.minQty + '+');
             }
 
             // Get additional location pricing if back location enabled
@@ -3217,7 +3225,7 @@ async function recalculatePricing() {
             pricedProducts.push({
                 product,
                 prices: tierData.prices,
-                tier: tier,
+                tier: caspioTierLabel || tier.label,
                 // save-ready fields (consumed by saveAndGetLink → ScreenPrintQuoteService)
                 style: product.style,
                 productName: product.productName || product.style,
@@ -3267,7 +3275,7 @@ async function recalculatePricing() {
         // Update pricing display sidebar
         updatePricingDisplay({
             totalQuantity: totalQty,
-            tier: tier.label,
+            tier: caspioTierLabel || tier.label,
             subtotal: subtotal,
             ltmFee: ltmFee,
             ltmDisplayMode: ltmDisplayMode,
