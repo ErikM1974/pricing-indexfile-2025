@@ -52,8 +52,12 @@ differ). `buildMatrix` kept for note/foot + as a fallback ladder. Verified all 4
 (48-71), DTF $16.17+$50→$19.50, DTG $13.99+$50→$18.16, EMB $21 LC / $29 FB-incl-AL — all = headline.
 
 **HIGH leverage (follow-up)**
-- **DTG**: add a server↔client equality regression test + reconcile the 0.53/0.57 fallback
-  drift (DTG-1 / DTG-4). Long-term: client delegates to the canonical module (one formula).
+- **DTG** — ✅ #2 PARTLY SHIPPED 2026-06-20: reconciled the drifted empty-tiers fallback margin
+  (server `dtg-canonical-pricing.js` 0.57→**0.53** to match the client; proxy deployed rel 818) +
+  locked it with `tests/unit/dtg-canonical-fallback-parity.test.js` (cross-repo, skip-if-absent).
+  STILL OPEN (recommended): the full COLLAPSE (DTG-1 — client delegates to the canonical module so
+  there's ONE formula) + surfacing the empty-tiers fallback as a VISIBLE warning on the customer
+  surfaces (low-value, Caspio-outage-only).
 - **SCP-2** (quick fix): staff builder shows/saves a STALE hardcoded tier label
   (`SCREENPRINT_TIERS` 24-36/37-72/...) — at qty 48 it labels "37-72" while pricing Caspio's
   "48-71". Price right, label wrong. Derive label from the bundle (`screenprint-quote-builder.js:2967`).
