@@ -345,6 +345,41 @@
 }
 .pdp-cfg-stripe-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green-700); }
 .pdp-cfg-stripe .pdp-cfg-hint { margin-left: 0; }
+/* Safety-stripes example image (reuses .pdp-thumb idiom; ~square front+back photo, click to enlarge) */
+.pdp-cfg-stripe-example {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    padding: 4px;
+    background: var(--card);
+    border: 1.5px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    cursor: zoom-in;
+    text-decoration: none;
+}
+.pdp-cfg-stripe-example img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.18s ease;
+}
+.pdp-cfg-stripe-example:hover,
+.pdp-cfg-stripe-example:focus-visible {
+    border-color: var(--green-700);
+    box-shadow: 0 0 0 2px var(--green-100);
+    outline: none;
+}
+@media (hover: hover) {
+    .pdp-cfg-stripe-example:hover img { transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .pdp-cfg-stripe-example img { transition: none; }
+    .pdp-cfg-stripe-example:hover img { transform: none; }
+}
 
 /* Method chips — always rendered (states swap, no layout jumps) */
 .pdp-cfg-methods {
