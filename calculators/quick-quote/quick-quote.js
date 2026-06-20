@@ -549,6 +549,14 @@
         var sl = $('qqSleeveL'), sr = $('qqSleeveR');
         if (sl) sl.checked = !!state.sleeves.left;
         if (sr) sr.checked = !!state.sleeves.right;
+        // highlight the common-placement preset that matches the current front/back (no sleeves)
+        var presets = $('qqPlacePresets');
+        if (presets) Array.prototype.forEach.call(presets.querySelectorAll('button'), function (b) {
+            var m = (b.getAttribute('data-front') || '') === (state.front || '')
+                && (b.getAttribute('data-back') || '') === (state.back || '')
+                && !state.sleeves.left && !state.sleeves.right;
+            b.classList.toggle('is-active', m);
+        });
     }
 
     function renderInkField() {
@@ -805,14 +813,14 @@
             var n = s.nudge;
             var to = n.nextPerPiece != null ? (' → ' + fmt(n.nextPerPiece) + '/' + unitWord) : '';
             var save = (n.nextPerPiece == null && n.perPieceSavings > 0) ? (' — save ' + fmt(n.perPieceSavings) + '/' + unitWord) : '';
-            nudgeHtml = '<div class="qq-card-nudge">↑ Add ' + n.addQty + ' more' + to
-                + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</div>';
+            nudgeHtml = '<button type="button" class="qq-card-nudge" data-addqty="' + n.addQty + '" title="Bump the quantity to this price break">↑ Add ' + n.addQty + ' more' + to
+                + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</button>';
         }
 
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
-            + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag">best value</span>' : '') + '</div></div></div>'
+            + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>best value</span>' : '') + '</div></div></div>'
             + configChips(id)
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
@@ -835,6 +843,13 @@
         // Click a priced method card to show its price-breaks matrix below.
         $('qqResults').addEventListener('click', function (e) {
             if (e.target.closest('.qq-retry')) return; // retry has its own handler
+            var nudge = e.target.closest('.qq-card-nudge[data-addqty]');
+            if (nudge) { // one-click "add N more" → bump qty to the next price break
+                if (state.useSizes) return;
+                var add = parseInt(nudge.getAttribute('data-addqty'), 10) || 0;
+                if (add > 0) { state.qty = (num(state.qty) || 0) + add; $('qqQty').value = state.qty; repriceAll(); }
+                return;
+            }
             var card = e.target.closest('.qq-card[data-method]'); if (!card) return;
             var id = card.getAttribute('data-method');
             var r = state.results[id];
@@ -863,6 +878,15 @@
             var b = e.target.closest('[data-qty]'); if (!b || state.useSizes) return;
             state.qty = parseInt(b.getAttribute('data-qty'), 10);
             $('qqQty').value = state.qty;
+            repriceAll();
+        });
+
+        $('qqPlacePresets').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-front]'); if (!b) return;
+            state.front = b.getAttribute('data-front') || '';
+            state.back = b.getAttribute('data-back') || '';
+            state.sleeves = { left: false, right: false }; // presets set a clean common combo
+            renderPlacements();
             repriceAll();
         });
 
