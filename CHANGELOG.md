@@ -1,3 +1,7 @@
+## v2026.06.20.12 (2026.06.20)
+
+- Deploy v2026.06.20.12: Quick Quote Phase 2 — placement preset buttons, one-click next-tier nudge, best-value star (UI only, prices unchanged)
+
 ## v2026.06.20.11 (2026.06.20)
 
 - Deploy v2026.06.20.11: Quick Quote UX — config chips on cards + matrix, tasteful price-flash, safety stripes inline, a11y focus rings (UI only, prices unchanged) + CLAUDE.md Rule 9 + pricing memory
