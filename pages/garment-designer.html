@@ -19,7 +19,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.4">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.8">
 <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.06.20.3">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
@@ -55,6 +55,7 @@
       <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
       <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
       <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
+      <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
       <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
       <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
       <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
@@ -377,6 +378,6 @@
 <script src="/shared_components/js/work-order-picker.js?v=1"></script>
 <script src="/shared_components/js/staff-auth-helper.js"></script>
 <script src="/shared_components/js/garment-submit-form.js?v=2026.06.20.4"></script>
-<script src="/pages/js/garment-designer.js?v=2026.06.20.4"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.20.8"></script>
 </body>
 </html>

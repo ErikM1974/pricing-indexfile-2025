@@ -3767,11 +3767,20 @@ function recolorFrame(F, garment) {
   ctx.drawImage(F.baseCanvas, 0, 0);
   const img = ctx.getImageData(0, 0, W, H);
   const d = img.data;
+  // Light and/or desaturated garments (white, natural, ash, sport-gray, heathers)
+  // otherwise compress the photo's fold shading into a narrow flat band — the
+  // "white shirt looks like a paper cutout" problem. Expand the shade variance
+  // for those so creases and drape stay visible. Saturated mid/dark colors
+  // (navy, red, forest, black) score ~0 here and keep the original, already-
+  // convincing recolor.
+  const flatRisk = Math.max((tL - 0.78) / 0.22, (0.35 - tS) / 0.35, 0);
+  const shadeBoost = flatRisk > 0 ? 1 + Math.min(1, flatRisk) * 0.7 : 1;
   for (let p = 0; p < W * H; p++) {
     const mv = F.mask[p];
     if (mv <= 0) continue;
-    const shade = F.lum[p] / F.avgLum;
-    const l = Math.min(0.98, Math.max(0.02, tL * shade));
+    let shade = F.lum[p] / F.avgLum;
+    if (shadeBoost !== 1) shade = 1 + (shade - 1) * shadeBoost;   // deepen folds on flat colors
+    const l = Math.min(0.985, Math.max(0.02, tL * shade));
     const [r, g, b] = pmRgb(tH, tS, l);
     const i = p * 4;
     d[i]     = Math.round(d[i] * (1 - mv) + r * mv);
@@ -3957,8 +3966,23 @@ function mockFingerprint() {
 }
 
 // Build one complete shirt view (frame + every placed logo), no UI chrome.
+// When the placed art's luminance is too close to the garment's (a white logo
+// on a white/ash shirt, or dark art on a black shirt), return a subtle
+// contrasting halo color so the print stays visible in the mockup. Pairs with
+// the toolbar contrast warning. Returns null when there's enough contrast.
+function lowContrastHaloColor(entry, gLum) {
+  if (gLum == null || !entry || entry.kind !== 'canvas') return null;
+  const al = artMeanLuminance(entry);
+  if (al == null) return null;
+  if (Math.abs(al - gLum) >= 55) return null;                 // enough contrast already
+  if (al > 150 && gLum > 150) return 'rgba(70,70,70,0.5)';    // light on light → dark halo
+  if (al < 95 && gLum < 95) return 'rgba(240,240,240,0.5)';   // dark on dark → light halo
+  return null;                                                 // mid-tones: visible enough
+}
+
 function buildPhotoView(entry, fi) {
   const F = PHOTO.frames[fi];
+  const gLum = currentGarmentLuminance();
   // Compose at display resolution so logos stay crisp even on small frames
   const K = Math.max(1, Math.min(3, Math.round(900 / F.H)));
   const W = F.W * K, H = F.H * K;
@@ -3999,6 +4023,18 @@ function buildPhotoView(entry, fi) {
       t.globalCompositeOperation = 'destination-in';
       t.drawImage(artSrc, 0, 0, w, h);
       t.drawImage(F.maskCanvas, p.x, p.y, p.w, p.h, 0, 0, w, h);
+      // Low-contrast art (e.g. white logo on a white shirt) gets a soft
+      // contrasting halo so it doesn't vanish in the proof.
+      const halo = lowContrastHaloColor(e2, gLum);
+      if (halo) {
+        ctx.save();
+        ctx.globalAlpha = p.vis;
+        ctx.shadowColor = halo;
+        ctx.shadowBlur = Math.max(2, Math.round(w * 0.014));
+        ctx.drawImage(tmp, x, y);                  // two passes build a visible ring
+        ctx.drawImage(tmp, x, y);
+        ctx.restore();
+      }
       ctx.globalAlpha = p.vis;
       ctx.drawImage(tmp, x, y);
       ctx.globalAlpha = 1;
@@ -5190,7 +5226,10 @@ function escapeHtml(s) {
 }
 
 // Show info panel by default on wide screens
-if (window.innerWidth > 1000) $('infoPanel').classList.add('visible');
+// Advisor panel is always available; on narrow screens it stacks below the stage
+// (see responsive CSS) instead of being hidden, so it doesn't get frozen-off at
+// a small page-load width.
+$('infoPanel').classList.add('visible');
 
 // ── Art-request pre-seed ──────────────────────────────────────────────────
 // Lets the designer be opened straight from an art request, pre-configured:
@@ -5567,6 +5606,76 @@ async function doSendToCustomer() {
   }
 }
 
+// ============================================================
+//  Phase 3 — Garment style picker
+//  "Crew Tee" is the built-in PC61 model photo; the others are SanMar flat
+//  laydowns (same-origin assets) fed through the same analyzeShirtImage /
+//  recolor pipeline, so they recolor + composite art exactly like the tee.
+// ============================================================
+const GARMENT_STYLES = [
+  { id: 'tee',        name: 'Crew Tee',    builtIn: true },
+  { id: 'polo',       name: 'Polo',        front: '/images/garments/polo_front.jpg',       back: '/images/garments/polo_back.jpg' },
+  { id: 'hoodie',     name: 'Hoodie',      front: '/images/garments/hoodie_front.jpg',     back: '/images/garments/hoodie_back.jpg' },
+  { id: 'longsleeve', name: 'Long Sleeve', front: '/images/garments/longsleeve_front.jpg', back: '/images/garments/longsleeve_back.jpg' },
+  { id: 'ladies',     name: 'Ladies Tee',  front: '/images/garments/ladies_front.jpg',     back: '/images/garments/ladies_back.jpg' },
+];
+let currentGarmentStyle = 'tee';
+
+function loadGarmentImage(url) {
+  return new Promise((res, rej) => {
+    const im = new Image();
+    im.crossOrigin = 'anonymous';                 // same-origin, but keeps the canvas un-tainted
+    im.onload = () => res(im);
+    im.onerror = () => rej(new Error('Could not load ' + url));
+    im.src = url;
+  });
+}
+
+async function setGarmentStyle(styleId) {
+  const st = GARMENT_STYLES.find(s => s.id === styleId);
+  if (!st) return;
+  currentGarmentStyle = styleId;
+
+  // Back to the built-in crew-tee model photo.
+  if (st.builtIn) {
+    PHOTO.state = 'idle';
+    PHOTO.frames = [];
+    PHOTO.viewCache.clear();
+    initPhotoMock();                              // async; PHOTO.pending drives the rebuild
+    const e = current();
+    if (e && e.status === 'ready') { e._customerForceMock = true; rebuildMockup(e); refreshStage(e); renderInfo(e); }
+    showToast('Crew tee');
+    return;
+  }
+
+  showToast('Loading ' + st.name + '…');
+  try {
+    const loaded = [];
+    for (const [url, angle] of [[st.front, 0], [st.back, 180]]) {
+      const img = await loadGarmentImage(url);
+      const fr = analyzeShirtImage(img);          // chroma-key + shade/mask, same as the tee
+      if (!fr) continue;
+      fr.angle = angle;
+      loaded.push(fr);
+    }
+    if (!loaded.length) { showToast('Could not read ' + st.name + ' artwork'); return; }
+    loaded.sort((a, b) => a.angle - b.angle);
+    PHOTO.frames = loaded;
+    PHOTO.idx = 0; PHOTO.pos = 0;
+    PHOTO.viewCache.clear();
+    PHOTO.state = 'ready';
+    const e = current();
+    if (e && e.status === 'ready') {
+      if (!e.mockOn) toggleMockup();
+      else { rebuildMockup(e); refreshStage(e); renderInfo(e); }
+    }
+    showToast(st.name + ' loaded');
+  } catch (err) {
+    console.error('[setGarmentStyle]', err);
+    showToast('Could not load ' + st.name + ' — staying on the current garment');
+  }
+}
+
 // Wire the new buttons + modals (addEventListener, not inline onclick).
 (function wireSendActions() {
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
@@ -5581,6 +5690,14 @@ async function doSendToCustomer() {
     if (m) m.addEventListener('click', (ev) => { if (ev.target === m) dsModalClose(id); });
   });
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { dsModalClose('steveModal'); dsModalClose('custModal'); } });
+
+  // Garment-style picker: populate from GARMENT_STYLES + swap the mockup garment.
+  const gsel = document.getElementById('garmentStyleSelect');
+  if (gsel) {
+    gsel.innerHTML = GARMENT_STYLES.map(s => '<option value="' + s.id + '">' + escapeHtml(s.name) + '</option>').join('');
+    gsel.value = currentGarmentStyle;
+    gsel.addEventListener('change', () => setGarmentStyle(gsel.value));
+  }
 })();
 
 // Load the embedded shirt right away so the landing preview appears instantly
