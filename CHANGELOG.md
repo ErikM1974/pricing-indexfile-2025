@@ -1,3 +1,7 @@
+## v2026.06.20.7 (2026.06.20)
+
+- Deploy v2026.06.20.7: audit hygiene #3 — SCP per-screen display + LTM fallback warning, DTF design-rate warning, SCP comment
+
 ## v2026.06.20.6 (2026.06.20)
 
 - Deploy v2026.06.20.6: catalog price matrices now engine-probed — single source = the quoted headline (audit #1)
