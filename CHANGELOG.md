@@ -1,5 +1,9 @@
 ## v2026.06.20.8 (2026.06.20)
 
+- Deploy v2026.06.20.8: audit #2 — DTG fallback-margin parity lock (test + doc; proxy 0.57->0.53 deployed separately)
+
+## v2026.06.20.8 (2026.06.20)
+
 - Deploy v2026.06.20.8: 13 files (ACTIVE_FILES.md,hoodie_back.jpg,hoodie_front.jpg,...)
 
 ## v2026.06.20.7 (2026.06.20)
