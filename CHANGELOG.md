@@ -1,3 +1,7 @@
+## v2026.06.20.3 (2026.06.20)
+
+- Deploy v2026.06.20.3: 6 files (index.html,quick-quote.css,product.html,...) — safety-stripes example image on all 3 SCP surfaces
+
 ## v2026.06.20.2 (2026.06.20)
 
 - chore(pricing-baselines): re-lock SCP (clean Ed_Cost/0.53 model) + DTF (freight bump)
