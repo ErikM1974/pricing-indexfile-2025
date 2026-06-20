@@ -1,3 +1,7 @@
+## v2026.06.20.4 (2026.06.20)
+
+- Deploy v2026.06.20.4: 6 files (ae-dashboard.html,SHIRT_DESIGNER_INTEGRATION_2026-06.md,garment-designer.css,...)
+
 ## v2026.06.20.3 (2026.06.20)
 
 - Deploy v2026.06.20.3: 6 files (index.html,quick-quote.css,product.html,...) — safety-stripes example image on all 3 SCP surfaces
