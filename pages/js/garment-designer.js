@@ -668,9 +668,20 @@ window.addEventListener('drop', (e) => {
   if (e.dataTransfer && e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
 });
 
+// Large customer art (layered PSDs, high-DPI PDFs) can be 100-300MB and decode
+// to several times that in RAM. Warn above this so a big file doesn't silently
+// freeze or crash the AE's tab mid-demo (no hard block — just an honest heads-up).
+const BIG_FILE_BYTES = 60 * 1024 * 1024;
+
 function handleFiles(fileList) {
   const files = Array.from(fileList);
   if (!files.length) return;
+  const big = files.filter(f => f.size > BIG_FILE_BYTES);
+  if (big.length) {
+    const names = big.map(f => f.name + ' (' + fmtSize(f.size) + ')').join(', ');
+    showToast('Heads up — large file may be slow to open: ' + names + '. A flattened PNG or PDF export opens faster.');
+  }
+  const batch = [];
   for (const f of files) {
     const entry = {
       id: nextId++,
@@ -693,8 +704,11 @@ function handleFiles(fileList) {
     };
     entries.push(entry);
     addFileItem(entry);
-    openEntry(entry);
+    batch.push(entry);
   }
+  // Decode sequentially, not all-at-once: a multi-select of big files would
+  // otherwise kick off simultaneous full-resolution decodes and OOM the tab.
+  (async () => { for (const en of batch) { try { await openEntry(en); } catch (e) { /* openEntry sets entry.status='error' itself */ } } })();
   const wasDesigning = !pendingSide && !pendingPlacement && (() => {
     const c = entries.find(x => x.id === activeId);
     return !!(c && c.mockOn);
@@ -752,11 +766,7 @@ async function openEntry(entry) {
     } else if (ext === 'cdr') {
       await openCDR(entry);
     } else if (ext === 'eps') {
-      throw {
-        friendly: true,
-        title: 'EPS preview not supported',
-        body: 'EPS files can’t be previewed in a browser. Open it in Illustrator, or re-save it as an .ai (with PDF compatibility) or .pdf and try again.'
-      };
+      await openEPS(entry);
     } else if (entry.file.type.startsWith('image/') || ['png','jpg','jpeg','gif','webp','svg','bmp'].includes(ext)) {
       await openImage(entry);
     } else {
@@ -778,11 +788,14 @@ async function openEntry(entry) {
       }
       analyzeEntry(entry);
       // Flattened logo on a white box? Knock the background out automatically.
-      if (entry.kind === 'canvas' && entry.hasTransparency === false && borderMostlyWhite(entry.canvas)) {
+      // Skip photographs (a person/product shot on white) — flood-fill can eat
+      // soft light edges; the AE can remove it manually if they want.
+      if (entry.kind === 'canvas' && entry.hasTransparency === false && !entry.photographic && borderMostlyWhite(entry.canvas)) {
         entry.knockOn = true;
         entry.knockCanvas = null;
         analyzeEntry(entry);     // recount inks without the white background
-        showToast('White background removed — use ⬜ to restore it');
+        syncRemoveBgBtn(entry);
+        showToast('White background removed automatically', { label: 'Undo', fn: () => { const e = current(); if (e) toggleKnockout(); } });
       }
       if (entry._autoMock) {
         entry._autoMock = false;
@@ -945,6 +958,41 @@ async function renderPdfPage(entry, forExport) {
   entry.pageCanvas = canvas;
   entry.pageScale = scale;                    // px per pt
   return canvas;
+}
+
+/* ---------- EPS ---------- */
+// Many Illustrator EPS files carry an embedded PDF stream that pdf.js can read.
+// Try that first; only if it genuinely can't be decoded do we fall back to the
+// actionable "re-save as .ai/.pdf" message (instead of always dead-ending).
+async function openEPS(entry) {
+  const buf = await entry.file.arrayBuffer();
+  let pdfDoc;
+  try {
+    pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+  } catch (e) {
+    throw {
+      friendly: true,
+      title: 'This EPS has no browser-readable preview',
+      body: 'EPS files only sometimes contain a preview a browser can read. Open it in Illustrator and re-save as .ai (with "Create PDF Compatible File" checked) or .pdf, then try again.'
+    };
+  }
+  entry.kind = 'pdf';
+  entry.pdfDoc = pdfDoc;
+  entry.pageCount = pdfDoc.numPages;
+  entry.pageNum = 1;
+  await renderPdfPage(entry);
+
+  const page = await pdfDoc.getPage(1);
+  const vp = page.getViewport({ scale: 1 });
+  const wIn = (vp.width / 72), hIn = (vp.height / 72);
+  entry.info = {
+    'Type': 'EPS (embedded preview)',
+    'Artboard size': vp.width.toFixed(0) + ' × ' + vp.height.toFixed(0) + ' pt  (' + wIn.toFixed(2) + '" × ' + hIn.toFixed(2) + '")',
+    'Pages': pdfDoc.numPages,
+    'File size': fmtSize(entry.size)
+  };
+  entry.note = 'Showing the preview embedded in the EPS file.';
+  makeThumb(entry, entry.pageCanvas);
 }
 
 /* ---------- CorelDRAW ---------- */
@@ -3029,11 +3077,36 @@ function toggleKnockout() {
   e.sepIndex = null;
   e.sepCanvas = null;
   $('knockBtn').classList.toggle('primary', e.knockOn);
+  syncRemoveBgBtn(e);
   try { analyzeEntry(e); } catch (err) { /* non-fatal */ }
   if (e.mockOn) rebuildMockup(e);
   refreshStage(e);
   renderInfo(e);
   showToast(e.knockOn ? 'White background removed' : 'White background restored');
+}
+
+// Keep the visible main-toolbar "Remove White BG" button's label + active state
+// in sync with the current entry. (The legacy ⬜ knockBtn lives in the hidden
+// tools; this is the customer-/AE-facing control.)
+function syncRemoveBgBtn(e) {
+  const rb = $('removeBgBtn');
+  if (!rb) return;
+  const on = !!(e && e.knockOn);
+  rb.classList.toggle('primary', on);
+  rb.innerHTML = on ? '✓ White BG Removed' : '⬜ Remove White BG';
+  rb.setAttribute('aria-pressed', on ? 'true' : 'false');
+}
+
+// Main-toolbar handler: remove (or restore) the white background of the active
+// logo. Gives the AE a reachable control instead of the auto-only heuristic.
+function removeBgClick() {
+  const e = current();
+  if (!e || e.status !== 'ready') { showToast('Add a logo first'); return; }
+  if (e.kind !== 'canvas') {
+    showToast('Background removal works on logo images (PNG, JPG, AI, PSD) — not this file type');
+    return;
+  }
+  toggleKnockout();
 }
 
 /* ---------- T-shirt mockup ---------- */
@@ -4521,10 +4594,66 @@ function composeSpinMock(entry) {
   mockSwapIfNeeded(entry);
 }
 function rebuildMockup(entry) {
-  if (PHOTO.state === 'ready') { composePhotoMock(entry); return; }
+  if (PHOTO.state === 'ready') { composePhotoMock(entry); maybeWarnLowContrast(entry); return; }
   if (PHOTO.state === 'idle') { initPhotoMock(); }
   if (PHOTO.state === 'loading') { PHOTO.pending = entry; }
   composeDrawnMock(entry);                       // interim / fallback
+  maybeWarnLowContrast(entry);
+}
+
+/* ---------- Art-vs-garment contrast safeguard ----------
+   A white/light logo on a white/light shirt (or dark-on-dark) all but vanishes
+   under the multiply blend, so a customer could approve a "blank" shirt. We
+   can't fix the physics, but we can warn the AE. Cheap: sample a downscaled
+   copy of the placed art and compare its mean luminance to the garment's. */
+function hexLuminance(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return 0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
+}
+function currentGarmentLuminance() {
+  if (typeof currentGarment === 'undefined') return null;
+  if (currentGarment === 'checker') return 110;          // brown-ish photo blank
+  const l = hexLuminance(currentGarment);
+  return l == null ? 150 : l;
+}
+function artMeanLuminance(entry) {
+  let src = null;
+  try { src = (typeof getKnockedArt === 'function' ? getKnockedArt(entry) : null) || entry.canvas; }
+  catch (e) { src = entry && entry.canvas; }
+  if (!src || !src.width || !src.height) return null;
+  const W = 32, H = Math.max(1, Math.round(W * src.height / src.width));
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  try { ctx.drawImage(src, 0, 0, W, H); } catch (e) { return null; }   // tainted canvas guard
+  let img;
+  try { img = ctx.getImageData(0, 0, W, H); } catch (e) { return null; }
+  const d = img.data;
+  let sum = 0, n = 0;
+  for (let i = 0; i < d.length; i += 4) {
+    if (d[i + 3] < 30) continue;                                        // ignore transparent
+    sum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+    n++;
+  }
+  return n ? sum / n : null;
+}
+function maybeWarnLowContrast(entry) {
+  const el = $('contrastWarn');
+  if (!el) return;
+  let warn = '';
+  if (entry && entry.mockOn && entry.kind === 'canvas') {
+    const al = artMeanLuminance(entry);
+    const gl = currentGarmentLuminance();
+    if (al != null && gl != null && Math.abs(al - gl) < 60) {
+      warn = (al > 150 && gl > 150) ? '⚠ Light art on a light shirt may be hard to see — preview only'
+           : (al < 105 && gl < 105) ? '⚠ Dark art on a dark shirt may be hard to see — preview only'
+           : '⚠ Low art/shirt contrast — the print may be hard to see';
+    }
+  }
+  el.textContent = warn;
+  el.style.display = warn ? 'inline-flex' : 'none';
 }
 
 /* ---- Load shirt photo(s) picked by the user (works locally too) ----
@@ -4824,6 +4953,7 @@ function buildProofSheet(e) {
     + (e.kind === 'dst' ? '<div class="proof-upgrade-note"><b>Selected thread colors and elements:</b> ' + escapeHtml(dstThreadSummaryInline(e)) + '</div>' : '')
     + '<div class="proof-upgrade-note"><b>Please review carefully before approval.</b><br>'
     + 'Confirm shirt color, artwork, spelling, size, location, and front/back placement. Screen colors are approximate.</div>'
+    + '<div class="proof-upgrade-note">Mockup shown on a Port &amp; Company PC61 crew tee for color and placement reference; your ordered garment style may differ.</div>'
     + '<div class="sp-grid">'
     + '<div><b>Garment:</b> Port &amp; Company PC61 Essential Tee</div>'
     + '<div><b>Color:</b> ' + escapeHtml(garment) + '</div>'
@@ -4967,17 +5097,39 @@ function copyText(text) {
 }
 
 let toastTimer = null;
-function showToast(msg) {
+// showToast(message) — transient feedback.
+// showToast(message, { label, fn }) — sticky toast with one clickable action
+// (e.g. "Undo"); stays longer and is clickable (the toast is pointer-events:none
+// by default, so we flip it on while an action is present).
+function showToast(msg, action) {
   let t = $('toast');
   if (!t) {
     t = document.createElement('div');
     t.id = 'toast';
+    t.setAttribute('role', 'status');        // announce to screen readers
+    t.setAttribute('aria-live', 'polite');
     document.body.appendChild(t);
   }
-  t.textContent = msg;
+  const hasAction = !!(action && action.label && typeof action.fn === 'function');
+  t.innerHTML = '';
+  const span = document.createElement('span');
+  span.textContent = msg;                      // textContent — never inject markup
+  t.appendChild(span);
+  if (hasAction) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'toast-action';
+    btn.textContent = action.label;
+    btn.addEventListener('click', () => {
+      t.classList.remove('show');
+      try { action.fn(); } catch (e) { /* non-fatal */ }
+    });
+    t.appendChild(btn);
+  }
+  t.classList.toggle('has-action', hasAction);
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+  toastTimer = setTimeout(() => t.classList.remove('show'), hasAction ? 6000 : 1800);
 }
 
 /* ============================================================
@@ -5130,7 +5282,10 @@ function renderSeedBanner(seed) {
 // the current clean mockup PNG to Caspio and attaches it to that request as a
 // REFERENCE for Steve (he still owns the production proof). It never touches the
 // Box mockup slots, the customer's File_Upload slots, or Approval_Status.
-const ART_PROXY_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+// Per Never-Break Rule 6: take the proxy host from APP_CONFIG (config/app.config.js,
+// loaded in the page <head>); the literal is only a fallback if config is absent.
+const ART_PROXY_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+  || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
 async function saveToArtRequest() {
   const seed = window.__artRequestSeed;

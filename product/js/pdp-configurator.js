@@ -152,6 +152,8 @@
         qty: 24,
         loc: null,          // placement key
         ink: 1,             // SCP ink colors (asked once — front AND back)
+        scpStripes: false,  // SCP safety-stripes upcharge (Caspio Service_Codes SP-STRIPE, +$2/pc/location)
+        scpStripeFee: 0,    // captured from the engine preview so the matrix uses the API fee, not a constant
         method: null,       // selected method id
         results: {},        // id -> { status:'loading'|'ok'|'unavailable'|'belowmin'|'error', preview, summary, message }
         matrixOpen: false,
@@ -241,7 +243,7 @@
                         frontColors: state.ink,
                         backColors: loc === 'frontBack' ? state.ink : 0,
                         darkGarment: false,
-                        safetyStripes: false
+                        safetyStripes: state.scpStripes
                     }
                 };
             },
@@ -429,6 +431,11 @@
             buildMatrix: async function (loc, ink) {
                 const cc = String(ink);
                 const addl = b.additionalLocationPricing && b.additionalLocationPricing[cc];
+                // Safety stripes are a flat per-piece adder ($2 × print locations) — the same
+                // number on every tier. state.scpStripeFee is the API value captured from the
+                // last engine preview (falls back to $2 only if the preview hasn't run yet).
+                const stripeAdder = state.scpStripes
+                    ? (num(state.scpStripeFee) || 2) * (loc === 'frontBack' ? 2 : 1) : 0;
                 const rows = tiers.map(function (t) {
                     const cell = b.finalPrices.PrimaryLocation[t.label];
                     let price = cell && cell[cc] ? cell[cc][std] : null;
@@ -439,12 +446,14 @@
                         price = (aRow && typeof aRow.pricePerPiece === 'number')
                             ? r2(price + aRow.pricePerPiece) : null;
                     }
+                    if (price != null && stripeAdder) price = r2(price + stripeAdder);
                     return { label: t.label, min: t.min, max: t.max, price: price, ltmFee: t.ltmFee };
                 });
                 const screens = loc === 'frontBack' ? ink * 2 : ink;
                 return {
                     note: 'Per-piece price includes the garment plus a ' + ink + '-color print'
-                        + (loc === 'frontBack' ? ' on the front AND back.' : '.'),
+                        + (loc === 'frontBack' ? ' on the front AND back' : '')
+                        + (stripeAdder ? ', plus safety stripes' : '') + '.',
                     foot: 'Plus a one-time screen setup of ' + formatPrice(setup) + ' per screen ('
                         + screens + ' screen' + (screens === 1 ? '' : 's') + ' for this design). '
                         + 'Dark garments may need a white underbase screen — confirmed on your proof.',
@@ -573,6 +582,9 @@
                     }
                 } else {
                     state.results[id] = { status: 'ok', preview: preview, summary: summarize(preview) };
+                    if (id === 'scp' && preview.trace && preview.trace.fees && preview.trace.fees.stripe != null) {
+                        state.scpStripeFee = preview.trace.fees.stripe; // API stripe fee → matrix uses it, not a constant
+                    }
                 }
             }
         } catch (err) {
@@ -641,11 +653,14 @@
 
     function renderInkRow() {
         const row = $('cfgInkRow');
+        const stripeRow = $('cfgStripeRow');
         const eligible = !state.ctx.isCap
             && state.methods.some(function (m) { return m.id === 'scp'; });
         row.hidden = !eligible;
+        if (stripeRow) stripeRow.hidden = !eligible;
         if (!eligible) return;
         $('cfgInkInput').value = state.ink;
+        if ($('cfgStripeInput')) $('cfgStripeInput').checked = state.scpStripes;
     }
 
     function setInk(v) {
@@ -654,6 +669,18 @@
         state.ink = n;
         $('cfgInkInput').value = n;
         // Ink only changes SCP pricing (and its matrix)
+        delete state.matrixCache[matrixKey('scp')];
+        priceMethod('scp', state.seq);
+        if (state.method === 'scp') renderMatrix();
+        notifyChange();
+    }
+
+    function setStripes(on) {
+        const v = !!on;
+        if (v === state.scpStripes) return;
+        state.scpStripes = v;
+        if ($('cfgStripeInput')) $('cfgStripeInput').checked = v;
+        // Safety stripes only change SCP pricing (and its matrix)
         delete state.matrixCache[matrixKey('scp')];
         priceMethod('scp', state.seq);
         if (state.method === 'scp') renderMatrix();
@@ -691,6 +718,8 @@
         $('cfgInkMinus').addEventListener('click', function () { setInk(state.ink - 1); });
         $('cfgInkPlus').addEventListener('click', function () { setInk(state.ink + 1); });
         $('cfgInkInput').addEventListener('change', function () { setInk($('cfgInkInput').value); });
+        const stripeInput = $('cfgStripeInput');
+        if (stripeInput) stripeInput.addEventListener('change', function () { setStripes(stripeInput.checked); });
 
         const toggle = $('cfgMatrixToggle');
         toggle.addEventListener('click', function () {
@@ -889,7 +918,7 @@
     // RENDER — "See every quantity price" matrix
     // ============================================================
     function matrixKey(methodId) {
-        return methodId + '|' + state.loc + '|' + (methodId === 'scp' ? state.ink : '-');
+        return methodId + '|' + state.loc + '|' + (methodId === 'scp' ? state.ink + (state.scpStripes ? 'S' : '') : '-');
     }
 
     let matrixSeq = 0;
@@ -1005,6 +1034,8 @@
         state.ctx.dtgBlendWarn = !ctx.isCap && ctx.eligibility && ctx.eligibility.DTG === 'warn';
         state.qty = 24;
         state.ink = 1;
+        state.scpStripes = false;
+        state.scpStripeFee = 0;
         state.loc = ctx.isCap ? 'front' : 'leftChest';
         state.results = {};
         state.matrixCache = {};
@@ -1063,6 +1094,7 @@
             engineMethod: def ? def.engineMethod : null, // 'EMB'|'CAP'|'DTG'|'SCP'|'DTF'
             isCap: !!(def && def.isCap),
             inkColors: state.method === 'scp' ? state.ink : null,
+            safetyStripes: state.method === 'scp' ? state.scpStripes : false,
             status: res ? res.status : 'loading',
             price: null,
             sizes: null,

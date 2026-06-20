@@ -678,6 +678,7 @@
             placementLabel: sel.locationLabel,
             methodLabel: sel.methodLabel,
             inkColors: sel.inkColors,
+            safetyStripes: sel.safetyStripes,
             isCap: sel.isCap
         });
         const n = window.QuoteCartStore.count();
