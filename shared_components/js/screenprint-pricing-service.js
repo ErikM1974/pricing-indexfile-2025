@@ -13,8 +13,8 @@
  *
  * Key pricing logic implemented here:
  * - Flash charge per color calculation (ALL colors)
- * - Primary location: base cost + flash, then apply margin
- * - Additional location: use BasePrintCost as-is (margin included)
+ * - Primary location: (garment + Ed_Cost + flash×colors) ÷ margin (2026-06-20 Ed_Cost model)
+ * - Additional location (back): Ed_Cost ÷ margin — same markup as the front, no flash
  * - Rounding: HalfDollarCeil_Final (round UP to $0.50)
  *
  * ⚠️ CRITICAL: CALCULATOR SYNCHRONIZATION REQUIREMENTS
