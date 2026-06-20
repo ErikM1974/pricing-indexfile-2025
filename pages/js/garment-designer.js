@@ -4643,12 +4643,7 @@ function rebuildMockup(entry) {
    under the multiply blend, so a customer could approve a "blank" shirt. We
    can't fix the physics, but we can warn the AE. Cheap: sample a downscaled
    copy of the placed art and compare its mean luminance to the garment's. */
-function hexLuminance(hex) {
-  const m = /^#?([0-9a-f]{6})$/i.exec(hex || '');
-  if (!m) return null;
-  const n = parseInt(m[1], 16);
-  return 0.2126 * ((n >> 16) & 255) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
-}
+function hexLuminance(hex) { return GarmentTextEngine.hexLuminance(hex); }
 function currentGarmentLuminance() {
   if (typeof currentGarment === 'undefined') return null;
   if (currentGarment === 'checker') return 110;          // brown-ish photo blank
@@ -4684,13 +4679,7 @@ function maybeWarnLowContrast(entry) {
   if (!el) return;
   let warn = '';
   if (entry && entry.mockOn && entry.kind === 'canvas') {
-    const al = artMeanLuminance(entry);
-    const gl = currentGarmentLuminance();
-    if (al != null && gl != null && Math.abs(al - gl) < 60) {
-      warn = (al > 150 && gl > 150) ? '⚠ Light art on a light shirt may be hard to see — preview only'
-           : (al < 105 && gl < 105) ? '⚠ Dark art on a dark shirt may be hard to see — preview only'
-           : '⚠ Low art/shirt contrast — the print may be hard to see';
-    }
+    warn = GarmentTextEngine.pickContrastWarning(artMeanLuminance(entry), currentGarmentLuminance());
   }
   el.textContent = warn;
   el.style.display = warn ? 'inline-flex' : 'none';
@@ -5726,12 +5715,10 @@ function ensureTextFont(m) {
   if (!document.fonts || !document.fonts.load) return Promise.resolve();
   return document.fonts.load(spec).then(function () { _loadedTextFonts.add(spec); }).catch(function () {});
 }
-function _txtCase(t, mode) {
-  if (mode === 'upper') return t.toUpperCase();
-  if (mode === 'lower') return t.toLowerCase();
-  if (mode === 'title') return t.replace(/\w\S*/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); });
-  return t;
-}
+// Pure text/contrast math lives in shared_components/js/garment-text-engine.js
+// (loaded before this script) so it can be unit-tested. These thin wrappers keep
+// the existing call sites working.
+function _txtCase(t, mode) { return GarmentTextEngine.txtCase(t, mode); }
 function _txtFont(m) { return (m.italic ? 'italic ' : '') + (m.weight || 700) + ' ' + TEXT_RENDER_PX + 'px "' + (m.font || 'Anton') + '", sans-serif'; }
 
 function renderTextCanvas(model) {
@@ -5786,38 +5773,29 @@ function _txtArc(text, m, s) {
   meas.font = _txtFont(m);
   var chars = Array.from(text);
   var widths = chars.map(function (ch) { return meas.measureText(ch).width + s.tracking; });
-  var total = Math.max(1, widths.reduce(function (a, b) { return a + b; }, 0));
-  var span = Math.abs(s.bend) * Math.PI, up = s.bend > 0;
-  var R = total / span;
-  var chordW = 2 * R * Math.sin(span / 2), sagitta = R * (1 - Math.cos(span / 2)), glyphH = px * 1.5;
-  var pad = s.strokeW * 1.6 + px * 0.3;
-  var W = Math.ceil(chordW + glyphH + 2 * pad), H = Math.ceil(sagitta + glyphH + 2 * pad);
-  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  // Pure layout geometry from the engine module (unit-tested separately).
+  var lay = GarmentTextEngine.arcLayout(widths, s.bend, px, s.strokeW);
+  var c = document.createElement('canvas'); c.width = lay.W; c.height = lay.H;
   var ctx = c.getContext('2d');
   ctx.font = _txtFont(m); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
-  var cx = W / 2, cy = up ? (pad + glyphH / 2 + R) : (H - pad - glyphH / 2 - R), acc = 0;
   for (var i = 0; i < chars.length; i++) {
-    var wq = widths[i], frac = (acc + wq / 2) / total, theta = (-span / 2 + frac * span);
-    var sx = cx + R * Math.sin(theta), sy = up ? (cy - R * Math.cos(theta)) : (cy + R * Math.cos(theta));
-    ctx.save(); ctx.translate(sx, sy); ctx.rotate(up ? theta : -theta);
+    var pc = lay.perChar[i];
+    ctx.save(); ctx.translate(pc.x, pc.y); ctx.rotate(pc.rot);
     if (s.strokeOn && s.strokeW > 0) { ctx.strokeStyle = s.stroke; ctx.lineWidth = s.strokeW; ctx.strokeText(chars[i], 0, 0); }
     ctx.fillStyle = s.fill; ctx.fillText(chars[i], 0, 0);
-    ctx.restore(); acc += wq;
+    ctx.restore();
   }
   return c;
 }
 function _txtRotate(src, deg) {
-  var rad = deg * Math.PI / 180, sin = Math.abs(Math.sin(rad)), cos = Math.abs(Math.cos(rad));
-  var W = Math.ceil(src.width * cos + src.height * sin), H = Math.ceil(src.width * sin + src.height * cos);
-  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var b = GarmentTextEngine.rotatedBounds(src.width, src.height, deg);
+  var c = document.createElement('canvas'); c.width = b.W; c.height = b.H;
   var ctx = c.getContext('2d');
-  ctx.translate(W / 2, H / 2); ctx.rotate(rad); ctx.drawImage(src, -src.width / 2, -src.height / 2);
+  ctx.translate(b.W / 2, b.H / 2); ctx.rotate(deg * Math.PI / 180); ctx.drawImage(src, -src.width / 2, -src.height / 2);
   return c;
 }
 
-function _defaultTextModel() {
-  return { text: 'YOUR TEXT', font: 'Anton', weight: 700, italic: false, fill: '#1c2841', strokeOn: false, stroke: '#ffffff', strokeW: 8, tracking: 0, lineHeight: 1.1, align: 'center', arc: 0, rotation: 0, caseMode: 'none' };
-}
+function _defaultTextModel() { return GarmentTextEngine.defaultTextModel(); }
 function addTextEntry() {
   const model = _defaultTextModel();
   const entry = {
