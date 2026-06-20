@@ -1,3 +1,8 @@
+## v2026.06.20.2 (2026.06.20)
+
+- chore(pricing-baselines): re-lock SCP (clean Ed_Cost/0.53 model) + DTF (freight bump)
+- Deploy v2026.06.20.2: 14 files (PRINT_METHOD_MARGIN_STRATEGY_2026-06.md,SHIRT_DESIGNER_INTEGRATION_2026-06.md,catalog.html,...)
+
 ## v2026.06.20.1 (2026.06.20)
 
 - Deploy v2026.06.20.1: 16 files (ACTIVE_FILES.md,index.html,PRINT_METHOD_MARGIN_STRATEGY_2026-06.md,...) — SCP Ed_Cost÷0.53 clean model
