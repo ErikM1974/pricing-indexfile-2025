@@ -1,3 +1,7 @@
+## v2026.06.20.10 (2026.06.20)
+
+- Deploy v2026.06.20.10: Text tool for Easy Shirt Designer (fonts, arc, outline, multi-line)
+
 ## v2026.06.20.9 (2026.06.20)
 
 - Deploy v2026.06.20.8: audit #2 — DTG fallback-margin parity lock (test + doc; proxy 0.57->0.53 deployed separately)
