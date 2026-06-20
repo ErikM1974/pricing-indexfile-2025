@@ -1,3 +1,7 @@
+## v2026.06.20.15 (2026.06.20)
+
+- Deploy v2026.06.20.15: Quick Quote embroidery — typical-stitch helper + >25K primary-logo under-pricing guardrail (UI only, prices unchanged)
+
 ## v2026.06.20.14 (2026.06.20)
 
 - Deploy v2026.06.20.14: designer upload timeouts + accessible modal focus management
