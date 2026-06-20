@@ -1,3 +1,10 @@
+## v2026.06.20.9 (2026.06.20)
+
+- Deploy v2026.06.20.8: audit #2 — DTG fallback-margin parity lock (test + doc; proxy 0.57->0.53 deployed separately)
+- Release v2026.06.20.8
+- Changelog v2026.06.20.8
+- Deploy v2026.06.20.9: 7 files (ACTIVE_FILES.md,ae-dashboard.html,garment-designer.css,...)
+
 ## v2026.06.20.8 (2026.06.20)
 
 - Deploy v2026.06.20.8: audit #2 — DTG fallback-margin parity lock (test + doc; proxy 0.57->0.53 deployed separately)
