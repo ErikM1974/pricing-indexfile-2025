@@ -306,3 +306,17 @@ table.qq-matrix td.warn { color: #7a541a; font-weight: 500; font-family: "Geist"
     .qq-card[data-flash] { animation: none; }
     .qq-swatch, .qq-example-thumb { transition: none; }
 }
+
+/* ===== Phase 2: placement presets, one-click nudge, best-value star (2026-06-20) ===== */
+.qq-place-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.qq-place-presets button { font-size: 12px; padding: 4px 12px; border: 1px solid var(--qq-line-2); border-radius: 7px; background: #fff; cursor: pointer; color: var(--qq-muted); font-family: inherit; }
+.qq-place-presets button:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
+.qq-place-presets button.is-active { border-color: var(--qq-green); background: #eef6f0; color: var(--qq-green-dark); font-weight: 500; }
+.qq-place-presets button:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
+
+button.qq-card-nudge { display: block; width: 100%; border: none; text-align: left; cursor: pointer; font-family: inherit; }
+button.qq-card-nudge:hover { background: #e2f0e7; }
+button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 2px; }
+
+.qq-best-tag { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
+.qq-best-tag .qq-star { flex: none; }

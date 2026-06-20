@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.20.11">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.20.12">
 </head>
 <body>
 
@@ -112,6 +112,11 @@
 
                 <div class="field" id="qqPlacementField">
                     <label id="qqPlacementLabel">Where does the print go? <span class="muted">· DTG / screen print / DTF</span></label>
+                    <div class="qq-place-presets" id="qqPlacePresets" role="group" aria-label="Common placements">
+                        <button type="button" data-front="LC" data-back="">Left chest</button>
+                        <button type="button" data-front="LC" data-back="FB">Front + back</button>
+                        <button type="button" data-front="FF" data-back="">Full front</button>
+                    </div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Front</span><div class="qq-chips" id="qqFront" role="group" aria-label="Front placement"></div></div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Back</span><div class="qq-chips" id="qqBack" role="group" aria-label="Back placement"></div></div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Sleeves</span><div class="qq-sleeves"><label class="qq-check"><input type="checkbox" id="qqSleeveL"> Left</label><label class="qq-check"><input type="checkbox" id="qqSleeveR"> Right</label></div></div>
@@ -174,6 +179,6 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.20.11"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.20.12"></script>
 </body>
 </html>
