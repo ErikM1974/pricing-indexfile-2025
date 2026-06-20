@@ -768,6 +768,7 @@
 | `/pages/css/jds-mockup-creator.css` | Standalone JDS Mockup Creator styling — 2026 design tokens (scoped :root), Inter, two-column layout, swatch grid, drop zone, segmented Edit/Preview control, compare grid, focus/reduced-motion a11y states, brand maroon accent. | jds-mockup-creator.html | ✅ Active |
 | `/pages/js/garment-designer.js` | **NEW (2026-06-17)** Easy Shirt Designer logic (extracted from the single-file app, 5028 lines) — entries[] model, DST decoder/renderer, RA-Poly thread system (per-stitch element naming), drawn/photo shirt mockup compositor, Customer Proof, PNG/proof export. Fixed: duplicate proof thread line, malformed-DST guard. | garment-designer.html, ag-psd, pdf.js, jszip | ✅ Active |
 | `/pages/css/garment-designer.css` | **NEW (2026-06-17)** Easy Shirt Designer styling (extracted, 1851 lines). | garment-designer.html | ✅ Active |
+| `/images/garments/{polo,hoodie,longsleeve,ladies}_{front,back}.jpg` | **NEW (2026-06-20)** SanMar flat-laydown garment photos (K500 polo, PC78H hoodie, PC54LS long-sleeve, LPC54 ladies tee — solid colors, 1200×1800) for the Easy Shirt Designer "Garment style" picker. Same-origin so the recolor canvas can read pixels (SanMar CDN lacks CORS). Sourced via proxy `/api/product-details`. | garment-designer.js (GARMENT_STYLES) | ✅ Active |
 
 ### Sample Order System
 | File | Purpose | Dependencies | Status |

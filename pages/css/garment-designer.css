@@ -1406,11 +1406,8 @@
     display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
   }
 
-  @media (max-width: 760px) {
-    #infoPanel { display: none !important; }
-    #sidebar { width: 160px; }
-    .privacy-note { display: none; }
-  }
+  /* (Old ≤760px block removed — the Phase 3 responsive rules at the end of this
+     file now stack the 3 columns instead of hiding the advisor panel.) */
 
   /* Print Method Advisor Upgrade */
   .fabric-select {
@@ -2007,4 +2004,70 @@
   white-space: nowrap;
 }
 .seed-banner-btn:hover { background: #eafbe0; }
+
+/* ============================================================
+   Phase 3 — responsive (tablet + phone)
+   The 3-column layout (#sidebar | #stage | #infoPanel) has fixed
+   widths down to 1400px, so on an iPad portrait the two side
+   panels (≈640px) crush the stage. Trim at landscape-tablet,
+   then stack everything vertically with natural page scroll.
+   ============================================================ */
+
+/* Landscape iPad (~1024px): shrink the side panels so the stage stays usable */
+@media (max-width: 1180px) {
+  body.left-controls-layout #sidebar { width: 270px; min-width: 270px; max-width: 270px; }
+  body.left-controls-layout #infoPanel { width: 250px; min-width: 250px; max-width: 250px; }
+}
+
+/* Tablet portrait + phone (≤900px): stack the columns, scroll the page */
+@media (max-width: 900px) {
+  html, body { height: auto; }
+  body { min-height: 100vh; }
+  main { flex-direction: column; flex: 0 0 auto; min-height: 0; }
+
+  /* toolbar + shirt first, controls below */
+  #viewerCol { order: 0; flex: 0 0 auto; }
+  body.left-controls-layout #sidebar,
+  #sidebar.visible {
+    order: 2;
+    width: 100%; min-width: 0; max-width: none;
+    flex: 0 0 auto;
+    height: auto; max-height: none; overflow: visible;
+    border-right: none; border-top: 1px solid var(--border);
+  }
+  body.left-controls-layout #fileList { max-height: 150px; }
+  body.left-controls-layout #leftControlsMount { overflow: visible; }
+
+  /* stage above the advisor panel; give the canvas a real height */
+  #stageWrap { flex-direction: column; flex: 0 0 auto; min-height: 0; }
+  #stage { flex: 0 0 auto; height: 60vh; min-height: 320px; }
+  #infoPanel,
+  body.left-controls-layout #infoPanel,
+  body.clean-layout #infoPanel {
+    width: 100%; min-width: 0; max-width: none;
+    flex: 0 0 auto;
+    overflow: visible;
+    border-left: none; border-top: 1px solid var(--border);
+  }
+  #infoPanel.visible { display: flex; }
+
+  /* touch-sized controls */
+  #toolbar { gap: 8px; }
+  .easy-main-btn, .details-btn, .ds-btn-primary, .ds-btn-ghost { min-height: 40px; }
+}
+
+/* Phone (≤560px): trim chrome + full-bleed modals */
+@media (max-width: 560px) {
+  header { padding: 8px 12px; }
+  .privacy-note { display: none; }
+  .easy-status { display: none; }   /* the step hint otherwise eats a whole toolbar row */
+  /* one swipeable row of actions instead of an 8-row wrap that buries the shirt */
+  #toolbar { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+  #toolbar .easy-main-btn, #toolbar .details-btn, #toolbar .fabric-select {
+    flex: 0 0 auto; padding: 8px 11px; font-size: 12px;
+  }
+  #stage { height: 52vh; min-height: 280px; }
+  .ds-modal-overlay { padding: 12px 8px; }
+  .ds-modal-card, .ds-modal-card.ds-modal-wide { max-width: 100%; }
+}
 
