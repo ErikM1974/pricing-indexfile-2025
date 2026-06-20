@@ -1,3 +1,7 @@
+## v2026.06.20.11 (2026.06.20)
+
+- Deploy v2026.06.20.11: Quick Quote UX — config chips on cards + matrix, tasteful price-flash, safety stripes inline, a11y focus rings (UI only, prices unchanged) + CLAUDE.md Rule 9 + pricing memory
+
 ## v2026.06.20.10 (2026.06.20)
 
 - Deploy v2026.06.20.10: Text tool for Easy Shirt Designer (fonts, arc, outline, multi-line)
