@@ -320,3 +320,6 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 
 .qq-best-tag { display: inline-flex; align-items: center; gap: 3px; vertical-align: middle; }
 .qq-best-tag .qq-star { flex: none; }
+
+/* Embroidery >25K-stitch under-pricing guardrail */
+.qq-emb-warn { margin: 6px 0 0; font-size: 12px; color: #7a541a; background: var(--qq-warn-bg); border: 1px solid var(--qq-warn-line); border-radius: 7px; padding: 6px 9px; line-height: 1.45; }
