@@ -1,3 +1,7 @@
+## v2026.06.20.6 (2026.06.20)
+
+- Deploy v2026.06.20.6: catalog price matrices now engine-probed — single source = the quoted headline (audit #1)
+
 ## v2026.06.20.5 (2026.06.20)
 
 - Deploy v2026.06.20.5: pricing-audit fixes — SCP tier label + below-min message, DTF size-upcharge warning + lock test
