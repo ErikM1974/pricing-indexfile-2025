@@ -923,6 +923,53 @@
         return methodId + '|' + state.loc + '|' + (methodId === 'scp' ? state.ink + (state.scpStripes ? 'S' : '') : '-');
     }
 
+    // Engine-authoritative price ladder: prices a representative qty in each tier through the
+    // SAME QuoteCartEngine.singleItemPreview() the headline uses, so the "see every quantity"
+    // matrix can NEVER disagree with the quoted price (the safety-stripe matrix gap is impossible
+    // once the matrix IS the engine). Itemized-LTM methods (SCP/EMB) keep the small-order fee on
+    // its own row (base is LTM-stripped); baked-LTM methods (DTG/DTF) bake it into the per-piece
+    // (ltmFee→0 so no row, no double-count). Mirrors calculators/quick-quote.js. (2026-06-20 audit #1)
+    const MATRIX_PROBE_QTYS = {
+        emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100],
+        dtg: [12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100]
+    };
+    async function probeLadder(methodId, loc) {
+        const def = METHODS[methodId];
+        const prepData = await prep(methodId);
+        const probes = MATRIX_PROBE_QTYS[methodId] || [12, 36, 60, 100];
+        const byTier = {};
+        for (let i = 0; i < probes.length; i++) {
+            const pq = probes[i];
+            const item = buildItem(def, prepData);
+            item.sizes = {};
+            item.sizes[prepData.stdSize] = pq;
+            let preview;
+            try {
+                preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(loc), deps: engineDeps(), nudge: false });
+            } catch (e) { preview = null; }
+            if (preview && preview.ok && preview.lines && preview.lines.length) {
+                const label = preview.tierLabel;
+                if (label && !byTier[label]) {
+                    // Per-tier base rate = everything that scales with qty EXCEPT the one-time
+                    // setup fees and the flat small-order (LTM) fee (disclosed on its own row).
+                    // base + ltmFlat/qty === the headline's all-in per-piece EXACTLY for every
+                    // method — itemized (SCP/EMB) where baseUnit is LTM-stripped AND baked
+                    // (DTG/DTF) where it isn't — so the matrix can never disagree with the quote.
+                    // (groupTotal already folds in per-piece service lines: stitch surcharge, AL.)
+                    const oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+                    const ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
+                    const range = parseRange(label);
+                    byTier[label] = {
+                        label: label, min: range.min, max: range.max,
+                        price: r2((preview.groupTotal - oneTimeT - ltmFlat) / pq),
+                        ltmFee: ltmFlat
+                    };
+                }
+            }
+        }
+        return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.min - b.min; });
+    }
+
     let matrixSeq = 0;
     async function renderMatrix() {
         if (!state.matrixOpen) return;
@@ -941,7 +988,21 @@
             box.innerHTML = '<div class="skeleton skeleton-block" aria-hidden="true"></div>';
             try {
                 const prepData = await prep(state.method);
-                model = await prepData.buildMatrix(state.loc, state.ink);
+                // Engine-authoritative ladder (single source = the quoted headline). buildMatrix
+                // is kept for the note/foot text + as a fallback ladder if the probe yields
+                // nothing (engine hiccup → show the prepared ladder rather than erroring).
+                const probed = await probeLadder(state.method, state.loc);
+                let meta = null;
+                try { meta = await prepData.buildMatrix(state.loc, state.ink); } catch (e) { meta = null; }
+                const tiers = (probed && probed.length) ? probed : ((meta && meta.tiers) || []);
+                if (!tiers.length) throw new Error('No price tiers returned');
+                model = {
+                    note: (meta && meta.note) || '',
+                    foot: (meta && meta.foot) || '',
+                    stdSize: prepData.stdSize,
+                    multiSize: prepData.multiSize,
+                    tiers: tiers
+                };
                 state.matrixCache[key] = model;
             } catch (err) {
                 if (token !== matrixSeq) return;
