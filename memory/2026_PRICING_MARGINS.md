@@ -2,6 +2,12 @@
 
 ## Overview
 
+> ⚠️ NUMBERS BELOW ARE STALE — this doc records the **Jan 2, 2026** update (40%→43%, MD 0.60→0.57). The margin was
+> raised AGAIN on **2026-05-24** to the CURRENT values: **MarginDenominator 0.53 (0.55 on the lowest tier) = 47% margin**
+> across DTG/DTF/EMB/CAP and (since 2026-06-20) ScreenPrint. Always read the live value from
+> `Pricing_Tiers.MarginDenominator` via the API — **never quote 0.57/43%.** Current model + the 4 hand-calc formulas +
+> the cost-vs-sell table decision: see `PRINT_METHOD_MARGIN_STRATEGY_2026-06.md`.
+
 On January 2, 2026, the pricing margin was updated from 40% to 43% across the system.
 
 ## Technical Details

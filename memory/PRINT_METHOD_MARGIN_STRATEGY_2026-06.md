@@ -193,6 +193,27 @@ judgment/tooling, not priced. **All 3 formulas compared (verified):** DTF & DTG 
 decoration_at_face)` — DTG's PrintCost is a retail # (margin baked in), DTF's transfer unit_price is too;
 ScreenPrint = `roundUp((garment+print)÷margin) + setup` (marks up BOTH).
 
+## The 4 hand-calc formulas + the cost-vs-sell table DECISION (2026-06-20)
+
+**Rep cheat-sheet — one idea, four methods.** Every method:
+`price/pc = RoundUp( blank ÷ 0.53 + decoration ) + one-time setup + $50 small-batch under the min`.
+Blank markup is IDENTICAL (÷0.53 = 47% margin; lowest tier ÷0.55 for EMB/DTG/DTF; SCP is always 0.53, min 24). Only
+"decoration" changes (EMB/DTG/DTF add it FLAT — pre-margined sell price; SCP marks it up ÷0.53 — Ed gives a cost):
+- **EMB** — stitch cost by qty ($18/$14/$13/$12, ≤10K stitches); round to **$1**; setup **$100 digitizing** (new logo); LTM $50 at **qty ≤7**. (24pc: 6.66+14=20.66 → **$21/pc**.)
+- **DTG** — print cost by **LOCATION** (LC≈$7.84, flat — NOT by color count); round **50¢**; no setup; LTM $50 at **1–23**. (24pc LC: 6.66+7.84 = **$14.50/pc**.)
+- **DTF** — transfer(size) + **$2.50** labor + freight, **PER LOCATION**; round 50¢; no setup; LTM $50 at **10–23** (min 10). (48pc large LC: 6.66+10.50+2.50+0.75 → **$20.50/pc**.)
+- **SCP** — **(Ed_Cost + $0.35×colors) ÷ 0.53** front; Ed_Cost÷0.53 each extra location; round 50¢; setup **$30×screens** (colors×locations); LTM $50 at **24–47**. (37pc 3c: 6.66+8.81=15.47 → **$15.50/pc** +$90+$50.)
+Rep one-pager visual built in chat 2026-06-20. The LIVE price is ALWAYS Quick Quote / the builder (Caspio) — hand-math is gut-check only.
+
+**⭐ DECISION (Erik, 2026-06-20): KEEP the two table models as-is — do NOT standardize EMB/DTG/DTF onto Ed's
+cost+margin model.** Today SCP `Screenprint_Costs` stores Ed's **cost** (margin ÷0.53 applied at calc); EMB/DTG/DTF
+tables store the **pre-margined selling price** (added flat). Standardizing is the cleaner long-term model (one margin
+knob + transparency) BUT only pays off with a REAL cost sheet (Ed's caught the 2.3× back-print error) —
+back-deriving cost = sell × 0.53 is **circular** (risk, no accuracy gain), it erases per-item margin control (DTF
+transfers carry an intentional **47–63%** spread), and each conversion is a customer-facing re-pricing + parity re-lock.
+So convert ONLY where real cost data improves accuracy (**DTF is the best future candidate** if the transfer vendor's
+cost sheet appears); otherwise the selling-price ladders stay. Don't re-litigate this without new cost data.
+
 ## Next-session quick prompts
 - "Model the DTF transfer-markup options."  → margin vs price-impact table.
 - "Write the screen-print min-24 Caspio remap checklist."  → exact `Screenprint_Costs` + `Pricing_Tiers` edits.

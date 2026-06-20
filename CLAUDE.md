@@ -2,7 +2,7 @@
 
 Guidance for Claude Code when working in this repository.
 
-## 🔴 Top 8 Never-Break Rules
+## 🔴 Top 9 Never-Break Rules
 
 1. **NO version-suffix files** — Never create `-backup`, `-FINAL`, `-FIXED`, `-old`, `-v2`. Use Git branches.
 2. **NO test files in root** — ALL tests go in `/tests/` (ui/api/unit subdirectories). No exceptions.
@@ -12,6 +12,7 @@ Guidance for Claude Code when working in this repository.
 6. **USE CONFIG for API URLs** — Don't hardcode `caspio-pricing-proxy` URL. Use `APP_CONFIG.API.BASE_URL`.
 7. **SYNC calculator + quote builder prices** — If both exist for a method, test identical inputs match.
 8. **SYNC all 4 quote builders** — A change to one (DTG/DTF/EMB/SCP) usually applies to all four. Always check.
+9. **3 PRICE SURFACES = ONE engine** — Customer Catalog, Quick Quote, and the Quote Builders all price through `QuoteCartEngine.singleItemPreview` → Caspio (identical *by construction*). ANY price change (Caspio OR a `*-pricing-service.js`) MUST re-run `web-quote-cart-parity` + `quick-quote-parity` and verify ALL 3 — never just one. Never add a 4th pricing path or a hardcoded price.
 
 ## Pre-Flight Checklist
 

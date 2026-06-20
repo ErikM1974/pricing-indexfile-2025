@@ -196,7 +196,9 @@
         results: {},          // id -> { status, preview, summary, message }
         selectedMethod: null, // which method's price-breaks matrix is shown
         methodPinned: false,  // true once the rep clicks a card (stop auto-following best value)
-        seq: 0
+        seq: 0,
+        prevPP: {},           // id -> last REAL per-piece price (survives the loading flicker)
+        flashUntil: {}        // id -> timestamp; the tasteful "price changed" flash window
     };
 
     function placementLabel() {
@@ -207,6 +209,41 @@
         if (state.sleeves.right) parts.push('R sleeve');
         return parts.join(' + ') || '—';
     }
+
+    // Per-method config summary — the live options that shaped THIS method's price, so each
+    // result card + its matrix can say exactly what's included (cards were option-blind before).
+    // UI ONLY — reads the same state the engine reads; never changes the engine inputs.
+    function configParts(id) {
+        var parts = [];
+        if (id === 'scp') {
+            parts.push({ text: state.ink + '-color' });
+            parts.push({ text: scpLocCount() >= 2 ? 'front + back' : 'front' });
+            if (state.adv.scpDark) parts.push({ text: 'dark garment' });
+            if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
+        } else if (id === 'dtg' || id === 'dtf') {
+            var pl = placementLabel();
+            if (pl && pl !== '—') parts.push({ text: pl });
+        } else if (id === 'emb' || id === 'capemb') {
+            var n = 1 + state.embAddl.length;
+            parts.push({ text: n + (n === 1 ? ' logo' : ' logos') });
+            if (id === 'capemb' && state.capEmb !== 'embroidery') {
+                parts.push({ text: state.capEmb === '3d-puff' ? '3D puff' : 'laser patch', on: true });
+            }
+            if (state.adv.digitizing) parts.push({ text: 'digitizing', on: true });
+        }
+        return parts;
+    }
+    function configChips(id) {
+        var parts = configParts(id);
+        if (!parts.length) return '';
+        return '<div class="qq-card-config">' + parts.map(function (p) {
+            return '<span class="qq-cfg-chip' + (p.on ? ' on' : '') + '">' + esc(p.text) + '</span>';
+        }).join('') + '</div>';
+    }
+    function configText(id) {
+        return configParts(id).map(function (p) { return p.text; }).join(', ');
+    }
+
     function sizeList() { return (state.product && state.product.sizes) || []; }
     function defaultSizes() { return (state.product && state.product.isCap) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
     function stdSize() {
@@ -517,6 +554,7 @@
     function renderInkField() {
         var hasScp = state.methods.some(function (m) { return m.id === 'scp'; });
         $('qqInkField').hidden = !hasScp;
+        $('qqStripesField').hidden = !hasScp; // safety stripes surfaced inline (one-click upsell)
     }
 
     function renderAdvancedGroups() {
@@ -677,9 +715,7 @@
                 return '<td' + (cls.trim() ? ' class="' + cls.trim() + '"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '—') + '</td>';
             }).join('') + '</tr>';
         }
-        var descr = (id === 'emb' || id === 'capemb')
-            ? (state.product.isCap && state.capEmb !== 'embroidery' ? (state.capEmb === '3d-puff' ? '3D puff' : 'Laser patch') : '')
-            : placementLabel();
+        var descr = configText(id);
         box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + (descr ? ' · ' + esc(descr) : '') + '</p>'
             + '<div class="qq-matrix-wrap"><table class="qq-matrix"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + priceRow + '</tr>' + ltmRow + '</tbody></table></div>'
@@ -713,7 +749,21 @@
             state.selectedMethod = bestId || (state.selectedMethod && stillValid ? state.selectedMethod : (state.methods[0] && state.methods[0].id)) || null;
         }
 
-        box.innerHTML = state.methods.map(function (m) { return renderCard(m.id, m.id === bestId); }).join('');
+        // Arm a short "price changed" flash window per method on a real price MOVE. Compare
+        // real->real only (and never clobber prevPP with null) so the streaming per-method
+        // re-renders + loading flicker don't false-trigger or cut the flash short.
+        var nowT = Date.now();
+        state.methods.forEach(function (m) {
+            var rr = state.results[m.id];
+            var pp = (rr && rr.status === 'ok' && rr.summary) ? rr.summary.perPiece : null;
+            if (pp == null) return;
+            if (state.prevPP[m.id] != null && state.prevPP[m.id] !== pp) state.flashUntil[m.id] = nowT + 600;
+            state.prevPP[m.id] = pp;
+        });
+        box.innerHTML = state.methods.map(function (m) {
+            var changed = !!(state.flashUntil[m.id] && nowT < state.flashUntil[m.id]);
+            return renderCard(m.id, m.id === bestId, changed);
+        }).join('');
 
         // wire retry buttons
         Array.prototype.forEach.call(box.querySelectorAll('.qq-retry'), function (btn) {
@@ -723,7 +773,7 @@
         refreshMatrix();
     }
 
-    function renderCard(id, isBest) {
+    function renderCard(id, isBest, changed) {
         var def = METHODS[id];
         var r = state.results[id];
         var head = '<div class="qq-card-method">' + def.icon + '<span>' + esc(def.label) + '</span></div>';
@@ -733,7 +783,8 @@
             return '<div class="qq-card"' + dm + '><div class="qq-card-top">' + head + '<div class="qq-skeleton" style="width:120px"></div></div></div>';
         }
         if (r.status === 'unavailable' || r.status === 'belowmin') {
-            return '<div class="qq-card is-unavailable"' + dm + '><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
+            var stCls = (r.status === 'belowmin') ? 'is-belowmin' : 'is-unavailable';
+            return '<div class="qq-card ' + stCls + '"' + dm + '><div class="qq-card-top">' + head + '</div><div class="qq-card-msg">' + esc(r.message) + '</div></div>';
         }
         if (r.status === 'error') {
             return '<div class="qq-card is-error"' + dm + '><div class="qq-card-top">' + head + '</div>'
@@ -758,10 +809,11 @@
                 + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</div>';
         }
 
-        return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + dm + '>'
+        return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag">best value</span>' : '') + '</div></div></div>'
+            + configChips(id)
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
