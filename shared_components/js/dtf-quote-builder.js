@@ -1952,7 +1952,15 @@ class DTFQuoteBuilder {
         const artCharge = document.getElementById('art-charge-toggle')?.checked
             ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
         const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
-        const graphicDesignCharge = designHours * getServicePrice('GRT-75', 75);
+        const grtRate = getServicePrice('GRT-75', 75);
+        // A load FAILURE already toasts via loadServiceCodePrices(); this covers the silent case
+        // where codes loaded but GRT-75 is missing, so a rep never bills the $75 default unwarned.
+        if (designHours > 0 && !(window._serviceCodes && window._serviceCodes['GRT-75']) && !window._dtfGrtFallbackWarned) {
+            window._dtfGrtFallbackWarned = true;
+            const m = 'Graphic-design rate is an estimate ($' + grtRate.toFixed(2) + '/hr) — live pricing didn\'t return it. Verify before saving.';
+            if (typeof this.showToast === 'function') this.showToast(m, 'warning'); else if (typeof showToast === 'function') showToast(m, 'warning');
+        }
+        const graphicDesignCharge = designHours * grtRate;
         const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
         const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
         const discountType = document.getElementById('discount-type')?.value || 'fixed';

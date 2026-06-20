@@ -119,23 +119,27 @@ function updatePrintConfig() {
 
     printConfig.totalScreens = frontScreens + backScreens;
     // Per-screen setup fee from Caspio Service_Codes 'SPSU' (fallback SCREEN_FEE). (Pricing=API)
-    printConfig.setupFee = printConfig.totalScreens * (typeof getServicePrice === 'function' ? getServicePrice('SPSU', SCREEN_FEE) : SCREEN_FEE);
+    // Use the SAME perScreen value in the breakdown strings so a Caspio SPSU change can't make
+    // the displayed "× $X" math disagree with the charged total. (2026-06-20 audit SCP-4)
+    const perScreen = (typeof getServicePrice === 'function' ? getServicePrice('SPSU', SCREEN_FEE) : SCREEN_FEE);
+    printConfig.setupFee = printConfig.totalScreens * perScreen;
+    const _ps = perScreen.toFixed(2);
 
     // Update front setup display
     const frontSetupEl = document.getElementById('front-setup-display');
     if (printConfig.isDarkGarment) {
-        frontSetupEl.textContent = `${printConfig.frontColors} + 1 underbase = ${frontScreens} screens × $30 = $${(frontScreens * SCREEN_FEE).toFixed(2)}`;
+        frontSetupEl.textContent = `${printConfig.frontColors} + 1 underbase = ${frontScreens} screens × $${_ps} = $${(frontScreens * perScreen).toFixed(2)}`;
     } else {
-        frontSetupEl.textContent = `${frontScreens} screen${frontScreens > 1 ? 's' : ''} × $30 = $${(frontScreens * SCREEN_FEE).toFixed(2)}`;
+        frontSetupEl.textContent = `${frontScreens} screen${frontScreens > 1 ? 's' : ''} × $${_ps} = $${(frontScreens * perScreen).toFixed(2)}`;
     }
 
     // Update back setup display (if visible)
     if (printConfig.backLocation) {
         const backSetupEl = document.getElementById('back-setup-display');
         if (printConfig.isDarkGarment) {
-            backSetupEl.textContent = `${printConfig.backColors} + 1 underbase = ${backScreens} screens × $30 = $${(backScreens * SCREEN_FEE).toFixed(2)}`;
+            backSetupEl.textContent = `${printConfig.backColors} + 1 underbase = ${backScreens} screens × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
         } else {
-            backSetupEl.textContent = `${backScreens} screen${backScreens > 1 ? 's' : ''} × $30 = $${(backScreens * SCREEN_FEE).toFixed(2)}`;
+            backSetupEl.textContent = `${backScreens} screen${backScreens > 1 ? 's' : ''} × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
         }
     }
 
@@ -3051,9 +3055,16 @@ async function recalculatePricing() {
             if (_m && Number.isFinite(Number(_m.ltmFee))) baseLtmFee = Number(_m.ltmFee);
         } catch (e) { /* fall through to the warned fallback below */ }
     }
-    if (!baseLtmFee && totalQty > 0 && totalQty <= 71) {
-        baseLtmFee = totalQty <= 36 ? 75 : 50;
-        console.warn('[ScreenPrint] LTM fee unavailable from API — using fallback band $' + baseLtmFee);
+    // Fallback ONLY when the API is silent (rare). Matches the CURRENT Caspio model ($50 LTM at
+    // the 24-47 tier; none at 48+) — was the stale pre-2026-06-19 $75/$50 bands. Surfaces a VISIBLE
+    // warning (de-duped) so a rep never saves a silently-estimated fee. (2026-06-20 audit SCP-5)
+    if (!baseLtmFee && totalQty > 0 && totalQty <= 47) {
+        baseLtmFee = 50;
+        console.warn('[ScreenPrint] LTM fee unavailable from API — using $' + baseLtmFee + ' fallback');
+        if (!window._scpLtmFallbackWarned && typeof showToast === 'function') {
+            window._scpLtmFallbackWarned = true;
+            showToast('Small-batch fee is an estimate — live pricing didn\'t return it. Verify before saving.', 'warning');
+        }
     }
     const wouldHaveLTM = baseLtmFee > 0;
 
