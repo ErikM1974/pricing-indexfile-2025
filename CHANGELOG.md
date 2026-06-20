@@ -1,3 +1,7 @@
+## v2026.06.20.8 (2026.06.20)
+
+- Deploy v2026.06.20.8: 13 files (ACTIVE_FILES.md,hoodie_back.jpg,hoodie_front.jpg,...)
+
 ## v2026.06.20.7 (2026.06.20)
 
 - Deploy v2026.06.20.7: audit hygiene #3 — SCP per-screen display + LTM fallback warning, DTF design-rate warning, SCP comment
