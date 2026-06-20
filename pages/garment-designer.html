@@ -19,8 +19,12 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.9">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.10">
 <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.06.20.3">
+<!-- Text tool — curated decoration fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo+Black&family=Alfa+Slab+One&family=Russo+One&family=Staatliches&family=Graduate&family=Black+Ops+One&family=Bungee&family=Pacifico&family=Great+Vibes&family=Lobster&family=Satisfy&family=Shadows+Into+Light&family=Permanent+Marker&family=Bangers&family=Oswald:wght@400;700&family=Montserrat:wght@400;700&family=Roboto+Slab:wght@400;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Dancing+Script:wght@400;700&family=Caveat:wght@400;700&family=Fredoka:wght@400;700&display=swap">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
 
@@ -54,6 +58,7 @@
     <div id="toolbar" class="visible">
       <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
       <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
+      <button class="easy-main-btn" id="addTextBtn" title="Add editable text to the mockup">➕ Add Text</button>
       <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
       <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
       <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
@@ -366,6 +371,43 @@
   </div>
 </div>
 
+<!-- Text editor — docked panel, updates the mockup live -->
+<div id="textPanel" class="text-panel" aria-label="Text editor">
+  <div class="tp-head"><span>✏️ Text</span><button type="button" class="tp-x" id="tpClose" aria-label="Close text editor">×</button></div>
+  <div class="tp-body">
+    <textarea id="txt-text" class="tp-text" rows="2" placeholder="Type your text…" aria-label="Text"></textarea>
+    <select id="txt-font" class="tp-font" aria-label="Font"></select>
+    <div class="tp-row">
+      <button type="button" class="tp-toggle" id="txt-bold" title="Bold"><b>B</b></button>
+      <button type="button" class="tp-toggle" id="txt-italic" title="Italic"><i>I</i></button>
+      <span class="tp-seg" role="group" aria-label="Alignment">
+        <button type="button" class="tp-seg-btn" data-align="left" title="Align left">⬱</button>
+        <button type="button" class="tp-seg-btn" data-align="center" title="Align center">≡</button>
+        <button type="button" class="tp-seg-btn" data-align="right" title="Align right">⭲</button>
+      </span>
+    </div>
+    <div class="tp-row">
+      <span class="tp-seg tp-seg-wide" role="group" aria-label="Letter case">
+        <button type="button" class="tp-seg-btn" data-case="none" title="As typed">Aa</button>
+        <button type="button" class="tp-seg-btn" data-case="upper" title="UPPERCASE">AA</button>
+        <button type="button" class="tp-seg-btn" data-case="lower" title="lowercase">aa</button>
+        <button type="button" class="tp-seg-btn" data-case="title" title="Title Case">Ab</button>
+      </span>
+    </div>
+    <div class="tp-field tp-inline"><label for="txt-fill">Text color</label><input type="color" id="txt-fill" value="#1c2841"></div>
+    <div class="tp-field tp-inline">
+      <label><input type="checkbox" id="txt-stroke-on"> Outline</label>
+      <input type="color" id="txt-stroke" value="#ffffff" aria-label="Outline color">
+      <input type="range" id="txt-strokeW" min="0" max="30" step="1" value="8" aria-label="Outline thickness">
+    </div>
+    <div class="tp-field"><label for="txt-tracking">Letter spacing <span id="txt-tracking-v">0</span></label><input type="range" id="txt-tracking" min="-20" max="60" step="1" value="0"></div>
+    <div class="tp-field"><label for="txt-lh">Line spacing <span id="txt-lh-v">1.10</span></label><input type="range" id="txt-lh" min="0.8" max="2" step="0.05" value="1.1"></div>
+    <div class="tp-field"><label for="txt-arc">Curve <span id="txt-arc-v">0</span></label><input type="range" id="txt-arc" min="-100" max="100" step="1" value="0"></div>
+    <div class="tp-field"><label for="txt-rot">Rotate <span id="txt-rot-v">0°</span></label><input type="range" id="txt-rot" min="-180" max="180" step="1" value="0"></div>
+  </div>
+  <div class="tp-foot"><button type="button" class="tp-del" id="tpDelete">Delete</button><button type="button" class="tp-done" id="tpDone">Done</button></div>
+</div>
+
 <input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
 <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
 
@@ -379,6 +421,6 @@
 <script src="/shared_components/js/work-order-picker.js?v=1"></script>
 <script src="/shared_components/js/staff-auth-helper.js"></script>
 <script src="/shared_components/js/garment-submit-form.js?v=2026.06.20.4"></script>
-<script src="/pages/js/garment-designer.js?v=2026.06.20.8"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.20.10"></script>
 </body>
 </html>
