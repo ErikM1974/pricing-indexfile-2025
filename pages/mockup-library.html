@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Saved Mockups - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=13">
+    <link rel="stylesheet" href="/pages/css/mockup-library.css?v=2026.06.20.9">
+</head>
+<body>
+    <header class="ml-header">
+        <div class="ml-header-inner">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="ml-logo">
+            <div class="ml-header-text">
+                <h1>🧵 Saved Mockups</h1>
+                <a href="/dashboards/ae-dashboard.html" class="ml-back-link">Back to AE Dashboard</a>
+            </div>
+            <a class="ml-new-btn" href="/pages/garment-designer.html">+ New Mockup</a>
+        </div>
+    </header>
+
+    <div class="ml-toolbar">
+        <input type="search" id="ml-search" class="ml-search" placeholder="Search by company or design #…" autocomplete="off" aria-label="Search saved mockups">
+        <span class="ml-count" id="ml-count"></span>
+    </div>
+
+    <div class="ml-state" id="ml-loading"><div class="ml-spinner"></div><p>Loading saved mockups…</p></div>
+    <div class="ml-state" id="ml-error" style="display:none;"></div>
+    <div class="ml-state" id="ml-empty" style="display:none;">
+        <p>No saved mockups yet.</p>
+        <p class="ml-sub">Build one in the <a href="/pages/garment-designer.html">Shirt Designer</a> and use <b>Send to Steve</b>, <b>Send to Customer</b>, or <b>Save to Art Request</b> — it'll show up here.</p>
+    </div>
+
+    <div class="ml-grid" id="ml-grid"></div>
+
+    <!-- Lightbox -->
+    <div id="ml-lightbox" class="ml-lightbox" role="dialog" aria-modal="true" aria-label="Mockup preview">
+        <button type="button" class="ml-lightbox-close" id="ml-lightbox-close" aria-label="Close">×</button>
+        <img id="ml-lightbox-img" alt="Mockup preview">
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/js/mockup-library.js?v=2026.06.20.9"></script>
+</body>
+</html>
