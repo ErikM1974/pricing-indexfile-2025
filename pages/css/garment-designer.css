@@ -2145,3 +2145,12 @@
   .text-panel { left: 0; right: 0; bottom: 0; top: auto; width: 100%; max-width: none; max-height: 64vh; border-radius: 14px 14px 0 0; }
 }
 
+/* Toolbar workflow groups (ADD / STYLE / PREVIEW / DELIVER / DETAILS), separated
+   by the existing .easy-divider. On narrow screens groups dissolve so buttons
+   flow/wrap as direct toolbar children (preserves the mobile single-row swipe). */
+.tb-group { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+@media (max-width: 900px) {
+  .tb-group { display: contents; }
+  #toolbar > .easy-divider { display: none; }
+}
+

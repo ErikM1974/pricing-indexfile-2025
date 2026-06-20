@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+  var API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
     || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
   var $ = function (id) { return document.getElementById(id); };
@@ -101,15 +101,20 @@
       + '</div>';
   }
 
-  function applySearch() {
-    var q = ($('ml-search').value || '').trim().toLowerCase();
-    if (!q) { render(allRows); return; }
-    var filtered = allRows.filter(function (r) {
+  // Pure search predicate (unit-tested): case-insensitive match on company + design#.
+  function filterRows(rows, q) {
+    q = String(q == null ? '' : q).trim().toLowerCase();
+    if (!q) return (rows || []).slice();
+    return (rows || []).filter(function (r) {
       return (String(r.CompanyName || '').toLowerCase().indexOf(q) > -1)
         || (String(r.ID_Design || '').toLowerCase().indexOf(q) > -1);
     });
+  }
+  function applySearch() {
+    var q = ($('ml-search').value || '').trim();
+    var filtered = filterRows(allRows, q);
     render(filtered);
-    if (!filtered.length) { $('ml-grid').innerHTML = '<div class="ml-state">No mockups match &ldquo;' + escapeHtml(q) + '&rdquo;.</div>'; }
+    if (q && !filtered.length) { $('ml-grid').innerHTML = '<div class="ml-state">No mockups match &ldquo;' + escapeHtml(q.toLowerCase()) + '&rdquo;.</div>'; }
   }
 
   function openLightbox(src) {
@@ -119,13 +124,22 @@
   }
   function closeLightbox() { $('ml-lightbox').classList.remove('open'); $('ml-lightbox-img').src = ''; }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    load();
-    var s = $('ml-search');
-    var t = null;
-    if (s) s.addEventListener('input', function () { clearTimeout(t); t = setTimeout(applySearch, 180); });
-    $('ml-lightbox-close').addEventListener('click', closeLightbox);
-    $('ml-lightbox').addEventListener('click', function (e) { if (e.target === $('ml-lightbox')) closeLightbox(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLightbox(); });
-  });
+  // DOM wiring only runs in the browser; skipped under Node (Jest) so the pure
+  // helpers below can be require()d for unit tests.
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', function () {
+      load();
+      var s = $('ml-search');
+      var t = null;
+      if (s) s.addEventListener('input', function () { clearTimeout(t); t = setTimeout(applySearch, 180); });
+      $('ml-lightbox-close').addEventListener('click', closeLightbox);
+      $('ml-lightbox').addEventListener('click', function (e) { if (e.target === $('ml-lightbox')) closeLightbox(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLightbox(); });
+    });
+  }
+
+  // Expose pure helpers for unit testing.
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { parseMeta: parseMeta, escapeHtml: escapeHtml, filterRows: filterRows };
+  }
 })();

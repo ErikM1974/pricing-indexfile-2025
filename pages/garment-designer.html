@@ -19,7 +19,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.10">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.13">
 <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.06.20.3">
 <!-- Text tool — curated decoration fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -56,28 +56,47 @@
   <!-- Viewer -->
   <div id="viewerCol">
     <div id="toolbar" class="visible">
-      <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
-      <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
-      <button class="easy-main-btn" id="addTextBtn" title="Add editable text to the mockup">➕ Add Text</button>
-      <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
-      <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
-      <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
-      <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
-      <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
-      <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
-      <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
-      <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
-      <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects best print method">
-        <option value="cotton" selected>Cotton shirt</option>
-        <option value="blend">Cotton/poly blend</option>
-        <option value="polyester">Polyester</option>
-        <option value="nylon">Nylon</option>
-        <option value="unknown">Fabric unknown</option>
-      </select>
-      <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
-      <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
-      <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
-      <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
+      <!-- ADD -->
+      <div class="tb-group">
+        <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
+        <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
+        <button class="easy-main-btn" id="addTextBtn" title="Add editable text to the mockup">➕ Add Text</button>
+      </div>
+      <div class="easy-divider"></div>
+      <!-- STYLE -->
+      <div class="tb-group">
+        <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
+        <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
+        <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
+        <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects best print method">
+          <option value="cotton" selected>Cotton shirt</option>
+          <option value="blend">Cotton/poly blend</option>
+          <option value="polyester">Polyester</option>
+          <option value="nylon">Nylon</option>
+          <option value="unknown">Fabric unknown</option>
+        </select>
+      </div>
+      <div class="easy-divider"></div>
+      <!-- PREVIEW -->
+      <div class="tb-group">
+        <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
+        <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
+        <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
+      </div>
+      <div class="easy-divider"></div>
+      <!-- DELIVER -->
+      <div class="tb-group">
+        <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
+        <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
+        <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
+        <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
+      </div>
+      <div class="easy-divider"></div>
+      <!-- DETAILS -->
+      <div class="tb-group">
+        <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
+        <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
+      </div>
       <div id="contrastWarn" class="contrast-warn" role="alert" style="display:none;"></div>
       <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
 
@@ -421,6 +440,7 @@
 <script src="/shared_components/js/work-order-picker.js?v=1"></script>
 <script src="/shared_components/js/staff-auth-helper.js"></script>
 <script src="/shared_components/js/garment-submit-form.js?v=2026.06.20.4"></script>
-<script src="/pages/js/garment-designer.js?v=2026.06.20.10"></script>
+<script src="/shared_components/js/garment-text-engine.js?v=2026.06.20.13"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.20.13"></script>
 </body>
 </html>
