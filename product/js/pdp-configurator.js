@@ -850,7 +850,9 @@
             return;
         }
         if (res.status === 'belowmin') {
-            box.innerHTML = '<p class="pdp-cfg-total-msg">DTF transfers start at <strong>10 pieces</strong> — bump the quantity above, or pick another look.</p>';
+            const minTxt = res.minQuantity ? escapeHtml(String(res.minQuantity)) + ' pieces' : 'a higher quantity';
+            box.innerHTML = '<p class="pdp-cfg-total-msg"><strong>' + escapeHtml(def.label) + '</strong> starts at <strong>'
+                + minTxt + '</strong> — bump the quantity above, or pick another look.</p>';
             return;
         }
         if (res.status === 'error') {

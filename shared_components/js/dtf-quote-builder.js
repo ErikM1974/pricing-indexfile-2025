@@ -1856,6 +1856,10 @@ class DTFQuoteBuilder {
             return { subtotal: 0, productTotals: new Map(), childTotals: new Map() };
         }
 
+        // Reset the per-run fallback tracker; getSizeUpcharge() repopulates it and
+        // _surfaceUpchargeFallbackWarning() (below) surfaces any hardcoded upcharge actually used.
+        this._upchargeFallbackSizes = new Set();
+
         const totalQty = this.getTotalQuantity();
         const locationCount = this.selectedLocations.length;
         const isUnderMinimum = totalQty > 0 && totalQty < 10;
@@ -1927,6 +1931,7 @@ class DTFQuoteBuilder {
             }
         });
 
+        this._surfaceUpchargeFallbackWarning();
         return { subtotal, productTotals, childTotals };
     }
 
@@ -1991,19 +1996,21 @@ class DTFQuoteBuilder {
     }
 
     getSizeUpcharge(size, upcharges) {
+        // Documented extended-size fallbacks. Per Erik's #1 rule a hardcoded price is allowed
+        // ONLY as a fallback AND must surface a visible warning — so whenever we actually USE
+        // one (the API didn't return that size) we flag it via _flagUpchargeFallback();
+        // calculateFromState() then shows a toast so a rep never saves/bills a silent estimated
+        // upcharge. (The customer engine THROWS PRICE_UNAVAILABLE in the same situation —
+        // quote-cart-engine.js dtfSizeUpcharge.)
+        const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
+        const sizeAliases = { 'XXL': '2XL', 'XXXL': '3XL' };
+        const normalizedSize = sizeAliases[size] || size;
+
         if (!upcharges || Object.keys(upcharges).length === 0) {
-            // Fallback defaults if no API data
-            const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
-            const normalizedSize = size === 'XXL' ? '2XL' : (size === 'XXXL' ? '3XL' : size);
+            // No API upcharge data at all.
+            if (defaults[normalizedSize] != null) this._flagUpchargeFallback(normalizedSize);
             return defaults[normalizedSize] || 0;
         }
-
-        // Normalize size aliases (XXL -> 2XL, XXXL -> 3XL)
-        const sizeAliases = {
-            'XXL': '2XL',
-            'XXXL': '3XL'
-        };
-        const normalizedSize = sizeAliases[size] || size;
 
         // Helper to get value (uses nullish coalescing to handle 0 values correctly)
         const getValue = (...keys) => {
@@ -2015,23 +2022,45 @@ class DTFQuoteBuilder {
             return null;
         };
 
-        // Defaults if API doesn't have the size
-        const defaults = { '2XL': 2.00, '3XL': 3.00, '4XL': 4.00, '5XL': 5.00, '6XL': 6.00 };
-
-        // Try API values first, then fall back to defaults
-        const upchargeMap = {
-            '2XL': getValue('2XL', '2X', 'XXL') ?? defaults['2XL'],
-            '3XL': getValue('3XL', '3X', 'XXXL') ?? defaults['3XL'],
-            '4XL': getValue('4XL', '4X') ?? defaults['4XL'],
-            '5XL': getValue('5XL', '5X') ?? defaults['5XL'],
-            '6XL': getValue('6XL', '6X') ?? defaults['6XL']
+        const apiByKeys = {
+            '2XL': getValue('2XL', '2X', 'XXL'),
+            '3XL': getValue('3XL', '3X', 'XXXL'),
+            '4XL': getValue('4XL', '4X'),
+            '5XL': getValue('5XL', '5X'),
+            '6XL': getValue('6XL', '6X')
         };
 
-        // Sizes outside 2XL-6XL (XS, talls LT/XLT/2XLT…, youth): use the API
-        // upcharge directly when present — the old map returned 0 for ALL of
-        // them, so tall/XS child rows priced without their upcharge. (2026-06-11)
-        const result = upchargeMap[normalizedSize] ?? getValue(normalizedSize) ?? 0;
-        return result;
+        if (defaults[normalizedSize] != null) {
+            // Extended size: prefer the live API upcharge; fall back (flagged) if absent.
+            if (apiByKeys[normalizedSize] != null) return apiByKeys[normalizedSize];
+            this._flagUpchargeFallback(normalizedSize);
+            return defaults[normalizedSize];
+        }
+
+        // Sizes outside 2XL-6XL (XS, talls LT/XLT/2XLT…, youth) have no hardcoded default —
+        // use the API upcharge directly when present, else 0. (2026-06-11)
+        return getValue(normalizedSize) ?? 0;
+    }
+
+    /** Record that a hardcoded extended-size upcharge was substituted because live pricing
+     *  lacked it. Surfaced as a visible warning by calculateFromState() (Erik's #1 rule). */
+    _flagUpchargeFallback(size) {
+        if (!this._upchargeFallbackSizes) this._upchargeFallbackSizes = new Set();
+        this._upchargeFallbackSizes.add(size);
+    }
+
+    /** Show ONE visible warning (de-duped per fallback set) when calculateFromState used any
+     *  hardcoded extended-size upcharge fallback this run. */
+    _surfaceUpchargeFallbackWarning() {
+        const fb = this._upchargeFallbackSizes;
+        const key = fb && fb.size > 0 ? [...fb].sort().join(', ') : '';
+        if (!key) { this._upchargeWarnShownFor = ''; return; }
+        if (key === this._upchargeWarnShownFor) return; // already warned for this exact set
+        this._upchargeWarnShownFor = key;
+        const msg = 'Size upcharge for ' + key + ' is an ESTIMATE — live pricing didn\'t return it. Verify before saving/printing.';
+        if (typeof this.showToast === 'function') this.showToast(msg, 'warning');
+        else if (typeof showToast === 'function') showToast(msg, 'warning');
+        console.warn('[DTF] ' + msg + ' (sellingPriceDisplayAddOns missing these sizes)');
     }
 
     // ==================== BRIDGE METHODS FOR ROW-BASED INPUT ====================
