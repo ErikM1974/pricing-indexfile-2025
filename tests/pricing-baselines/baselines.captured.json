@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "capturedAt": "2026-06-11T20:45:49.072Z",
+    "capturedAt": "2026-06-20T11:56:37.084Z",
     "capturedBy": "scripts/capture-pricing-baselines.js",
     "scenarios": 22,
     "successful": 22,
@@ -522,22 +522,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
-          "perPiece": 20,
-          "sizeTotal": 80
+          "perPiece": 20.5,
+          "sizeTotal": 82
         },
         "L": {
           "qty": 3,
-          "perPiece": 20,
-          "sizeTotal": 60
+          "perPiece": 20.5,
+          "sizeTotal": 61.5
         },
         "XL": {
           "qty": 3,
-          "perPiece": 20,
-          "sizeTotal": 60
+          "perPiece": 20.5,
+          "sizeTotal": 61.5
         }
       },
-      "lineSubtotal": 200,
-      "grandTotalBeforeTax": 200
+      "lineSubtotal": 205,
+      "grandTotalBeforeTax": 205
     }
   },
   "DTF-02": {
@@ -568,22 +568,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
-          "perPiece": 20,
-          "sizeTotal": 80
+          "perPiece": 20.5,
+          "sizeTotal": 82
         },
         "L": {
           "qty": 3,
-          "perPiece": 20,
-          "sizeTotal": 60
+          "perPiece": 20.5,
+          "sizeTotal": 61.5
         },
         "XL": {
           "qty": 3,
-          "perPiece": 20,
-          "sizeTotal": 60
+          "perPiece": 20.5,
+          "sizeTotal": 61.5
         }
       },
-      "lineSubtotal": 200,
-      "grandTotalBeforeTax": 200
+      "lineSubtotal": 205,
+      "grandTotalBeforeTax": 205
     }
   },
   "DTF-03": {
@@ -618,22 +618,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 8,
-          "perPiece": 30.5,
-          "sizeTotal": 244
+          "perPiece": 31,
+          "sizeTotal": 248
         },
         "L": {
           "qty": 8,
-          "perPiece": 30.5,
-          "sizeTotal": 244
+          "perPiece": 31,
+          "sizeTotal": 248
         },
         "XL": {
           "qty": 8,
-          "perPiece": 30.5,
-          "sizeTotal": 244
+          "perPiece": 31,
+          "sizeTotal": 248
         }
       },
-      "lineSubtotal": 732,
-      "grandTotalBeforeTax": 732
+      "lineSubtotal": 744,
+      "grandTotalBeforeTax": 744
     }
   },
   "DTF-04": {
@@ -672,22 +672,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 16,
-          "perPiece": 34.5,
-          "sizeTotal": 552
+          "perPiece": 35,
+          "sizeTotal": 560
         },
         "L": {
           "qty": 16,
-          "perPiece": 34.5,
-          "sizeTotal": 552
+          "perPiece": 35,
+          "sizeTotal": 560
         },
         "XL": {
           "qty": 16,
-          "perPiece": 34.5,
-          "sizeTotal": 552
+          "perPiece": 35,
+          "sizeTotal": 560
         }
       },
-      "lineSubtotal": 1656,
-      "grandTotalBeforeTax": 1656
+      "lineSubtotal": 1680,
+      "grandTotalBeforeTax": 1680
     }
   },
   "DTF-05": {
@@ -722,22 +722,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 8,
-          "perPiece": 26.5,
-          "sizeTotal": 212
+          "perPiece": 27,
+          "sizeTotal": 216
         },
         "L": {
           "qty": 8,
-          "perPiece": 26.5,
-          "sizeTotal": 212
+          "perPiece": 27,
+          "sizeTotal": 216
         },
         "XL": {
           "qty": 8,
-          "perPiece": 26.5,
-          "sizeTotal": 212
+          "perPiece": 27,
+          "sizeTotal": 216
         }
       },
-      "lineSubtotal": 636,
-      "grandTotalBeforeTax": 636
+      "lineSubtotal": 648,
+      "grandTotalBeforeTax": 648
     }
   },
   "SCP-01": {
@@ -756,29 +756,29 @@
       }
     },
     "expected": {
-      "tier": "13-36",
-      "ltmFee": 75,
+      "tier": "24-47",
+      "ltmFee": 50,
       "screenSetupFee": 30,
       "totalColors": 1,
       "perSizeBreakdown": {
         "M": {
           "qty": 8,
-          "perPiece": 13.5,
-          "sizeTotal": 108
+          "perPiece": 11.5,
+          "sizeTotal": 92
         },
         "L": {
           "qty": 8,
-          "perPiece": 13.5,
-          "sizeTotal": 108
+          "perPiece": 11.5,
+          "sizeTotal": 92
         },
         "XL": {
           "qty": 8,
-          "perPiece": 13.5,
-          "sizeTotal": 108
+          "perPiece": 11.5,
+          "sizeTotal": 92
         }
       },
-      "lineSubtotal": 324,
-      "grandTotalBeforeTax": 429
+      "lineSubtotal": 276,
+      "grandTotalBeforeTax": 356
     }
   },
   "SCP-02": {
@@ -797,29 +797,29 @@
       }
     },
     "expected": {
-      "tier": "37-71",
-      "ltmFee": 50,
+      "tier": "48-71",
+      "ltmFee": 0,
       "screenSetupFee": 120,
       "totalColors": 4,
       "perSizeBreakdown": {
         "M": {
           "qty": 16,
-          "perPiece": 17,
-          "sizeTotal": 272
+          "perPiece": 14,
+          "sizeTotal": 224
         },
         "L": {
           "qty": 16,
-          "perPiece": 17,
-          "sizeTotal": 272
+          "perPiece": 14,
+          "sizeTotal": 224
         },
         "XL": {
           "qty": 16,
-          "perPiece": 17,
-          "sizeTotal": 272
+          "perPiece": 14,
+          "sizeTotal": 224
         }
       },
-      "lineSubtotal": 816,
-      "grandTotalBeforeTax": 986
+      "lineSubtotal": 672,
+      "grandTotalBeforeTax": 792
     }
   },
   "SCP-03": {
@@ -840,29 +840,29 @@
       }
     },
     "expected": {
-      "tier": "13-36",
-      "ltmFee": 75,
+      "tier": "24-47",
+      "ltmFee": 50,
       "screenSetupFee": 60,
       "totalColors": 2,
       "perSizeBreakdown": {
         "M": {
           "qty": 8,
-          "perPiece": 19.5,
-          "sizeTotal": 156
+          "perPiece": 17,
+          "sizeTotal": 136
         },
         "L": {
           "qty": 8,
-          "perPiece": 19.5,
-          "sizeTotal": 156
+          "perPiece": 17,
+          "sizeTotal": 136
         },
         "XL": {
           "qty": 8,
-          "perPiece": 19.5,
-          "sizeTotal": 156
+          "perPiece": 17,
+          "sizeTotal": 136
         }
       },
-      "lineSubtotal": 468,
-      "grandTotalBeforeTax": 603
+      "lineSubtotal": 408,
+      "grandTotalBeforeTax": 518
     }
   },
   "SCP-04": {
@@ -881,29 +881,29 @@
       }
     },
     "expected": {
-      "tier": "37-71",
-      "ltmFee": 50,
+      "tier": "48-71",
+      "ltmFee": 0,
       "screenSetupFee": 180,
       "totalColors": 6,
       "perSizeBreakdown": {
         "M": {
           "qty": 16,
-          "perPiece": 20,
-          "sizeTotal": 320
+          "perPiece": 16,
+          "sizeTotal": 256
         },
         "L": {
           "qty": 16,
-          "perPiece": 20,
-          "sizeTotal": 320
+          "perPiece": 16,
+          "sizeTotal": 256
         },
         "XL": {
           "qty": 16,
-          "perPiece": 20,
-          "sizeTotal": 320
+          "perPiece": 16,
+          "sizeTotal": 256
         }
       },
-      "lineSubtotal": 960,
-      "grandTotalBeforeTax": 1190
+      "lineSubtotal": 768,
+      "grandTotalBeforeTax": 948
     }
   },
   "SCP-05": {
@@ -929,22 +929,22 @@
       "perSizeBreakdown": {
         "M": {
           "qty": 25,
-          "perPiece": 12.5,
-          "sizeTotal": 312.5
+          "perPiece": 11.5,
+          "sizeTotal": 287.5
         },
         "L": {
           "qty": 24,
-          "perPiece": 12.5,
-          "sizeTotal": 300
+          "perPiece": 11.5,
+          "sizeTotal": 276
         },
         "XL": {
           "qty": 24,
-          "perPiece": 12.5,
-          "sizeTotal": 300
+          "perPiece": 11.5,
+          "sizeTotal": 276
         }
       },
-      "lineSubtotal": 912.5,
-      "grandTotalBeforeTax": 972.5
+      "lineSubtotal": 839.5,
+      "grandTotalBeforeTax": 899.5
     }
   }
 }

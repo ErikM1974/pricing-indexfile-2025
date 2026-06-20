@@ -327,6 +327,25 @@
 .pdp-cfg-ink label { font-size: 13.5px; font-weight: 700; }
 .pdp-cfg-ink .pdp-cfg-hint { margin-left: 0; }
 
+/* SCP safety-stripes row */
+.pdp-cfg-stripe {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.pdp-cfg-stripe-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.pdp-cfg-stripe-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green-700); }
+.pdp-cfg-stripe .pdp-cfg-hint { margin-left: 0; }
+
 /* Method chips — always rendered (states swap, no layout jumps) */
 .pdp-cfg-methods {
     display: grid;

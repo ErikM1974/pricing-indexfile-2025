@@ -341,6 +341,49 @@
     transition: opacity .25s;
   }
   #toast.show { opacity: 1; }
+  /* A sticky toast carrying an action (e.g. "Undo") must be clickable — the base
+     toast is pointer-events:none. */
+  #toast.has-action { pointer-events: auto; }
+  .toast-action {
+    margin-left: 12px;
+    background: rgba(255, 255, 255, .14);
+    border: 1px solid rgba(255, 255, 255, .7);
+    color: #fff;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .toast-action:hover { background: rgba(255, 255, 255, .28); }
+
+  /* Amber low-contrast warning chip shown in the toolbar when the art may be hard
+     to see on the chosen shirt color (e.g. white art on a white shirt). */
+  .contrast-warn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff4d6;
+    border: 1px solid #e1b844;
+    color: #5d4700;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  /* Accessibility: keyboard focus was invisible across the whole tool. Give every
+     interactive control a clear, consistent focus ring. */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
   #canvasHolder canvas, #canvasHolder img { display: block; }
 
   /* Drop zone / empty state */

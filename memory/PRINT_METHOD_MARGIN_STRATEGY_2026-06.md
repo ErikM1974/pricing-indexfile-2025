@@ -1,11 +1,14 @@
 # Print-Method Margin & Screen-Print Pricing Strategy — 2026-06-19
 
-> # 🚨 RESUME HERE FIRST (2026-06-19, end of session) — SCP PRICING IS DOWN, FIX IS CODED BUT NOT DEPLOYED
+> # ✅ SCP REVAMP DEPLOYED & LIVE — v2026.06.20.1 (2026-06-20)
 >
-> **STATE:** The full screen-print pricing **revamp is set in Caspio (all live)** but the matching
-> **code change is made in the working tree and NOT deployed.** Because Caspio's `BasePrintCost` column
-> was deleted but the *deployed* code still reads it, **live SCP quotes return NaN right now.** The
-> uncommitted code edit fixes it. **#1 action on return: verify → run/fix tests → `/deploy`.**
+> **DONE.** The full screen-print clean model is **live and verified**: `screenprint-pricing-service.js`
+> reads `Ed_Cost ÷ 0.53` (front: +flash; back: same markup), engine reuses the service (one file = all 3
+> surfaces), HalfDollarCeil rounding. Deployed JS confirmed reading `Ed_Cost` (BasePrintCost refs = 0).
+> 111 SCP/parity tests green; full unit suite 1408 green; SCP fixtures re-captured to the live model.
+> **One test-infra follow-up:** `tests/pricing-baselines/baselines.locked.json` still holds OLD SCP prices
+> → the Puppeteer `pricing-baselines.test.js` (needs a :3000 server) will mismatch SCP until re-locked.
+> Not in the deploy gate (`test:parser`), so it didn't block. Re-lock when convenient.
 >
 > **DO THIS, IN ORDER:**
 > 1. **Verify the code edit** in `shared_components/js/screenprint-pricing-service.js` (2 edits, ~line 348-382):

@@ -15,7 +15,7 @@
  * Schema (sessionStorage key `nwca.quoteCart.v1`, 24h TTL):
  *   { v:1, createdAt, items:[{ id, style, productTitle, color, catalogColor,
  *     qty, sizes:{SIZE:qty}, method:'EMB'|'CAP'|'DTG'|'SCP'|'DTF',
- *     placement, placementLabel, methodLabel, inkColors, isCap, addedAt }] }
+ *     placement, placementLabel, methodLabel, inkColors, safetyStripes, isCap, addedAt }] }
  *   - `sizes` is the engine-ready size breakdown captured at add time (one
  *     standard size in Phase 2); `qty` mirrors its sum for display.
  *   - Version mismatch, TTL expiry, or unparseable JSON → silent reset to an
@@ -138,6 +138,7 @@
             placementLabel: item.placementLabel || '',
             methodLabel: item.methodLabel || '',
             inkColors: item.inkColors != null ? item.inkColors : null,
+            safetyStripes: item.safetyStripes === true,
             isCap: item.isCap === true,
             addedAt: now()
         };

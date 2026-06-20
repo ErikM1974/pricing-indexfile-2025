@@ -123,6 +123,7 @@
             var parts = ['Front ' + (options.frontColors || 1) + '-color'];
             if (Number(options.backColors) > 0) parts.push('Back ' + options.backColors + '-color');
             var label = parts.join(' + ');
+            if (options.safetyStripes) label += ' + Safety stripes';
             return { code: label, name: label };
         }
         if (method === 'DTF') {

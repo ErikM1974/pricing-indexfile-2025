@@ -172,7 +172,7 @@
                 frontColors: Number(item.inkColors) || 1,
                 backColors: loc === 'frontBack' ? (Number(item.inkColors) || 1) : 0,
                 darkGarment: false,
-                safetyStripes: false
+                safetyStripes: !!item.safetyStripes
             };
         }
         if (m === 'DTF') return { locations: DTF_LOCS[loc] || DTF_LOCS.leftChest };

@@ -6,14 +6,12 @@
 <title>T-Shirt Designer — Northwest Custom Apparel</title>
 <!--
   ============================================================
-  NWCA Art File Viewer
-  Opens & previews: .ai (PDF-compatible), .psd, .psb, .cdr (embedded
-  preview), .pdf, and common images (png/jpg/gif/webp/svg).
-  100% client-side — files are never uploaded to a server.
-
-  To embed on your site:
-    <iframe src="/art-file-viewer.html" style="width:100%;height:700px;border:0;"></iframe>
-  or link to it directly.
+  NWCA Easy Shirt Designer (internal AE tool)
+  Opens .ai (PDF-compatible), .psd, .psb, .cdr (embedded preview),
+  .pdf, .eps (embedded preview), .dst, and common images
+  (png/jpg/gif/webp/svg) and builds a recolorable shirt mockup.
+  Files are read client-side; a mockup uploads to the proxy only
+  when the AE clicks Save to Art Request (or, later, Send).
 
   Brand colors: tweak the CSS variables in :root below.
   ============================================================
@@ -21,7 +19,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.18.1">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.2">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
 
@@ -32,7 +30,7 @@
     <div class="sub">Northwest Custom Apparel · Front, back, color, spin, proof</div>
   </div>
   <div class="spacer"></div>
-  <div class="privacy-note"><span class="wow-tag">WOW Mode</span><br><b>Private &amp; secure:</b> files open right in your browser.</div>
+  <div class="privacy-note"><b>Account Executive tool</b><br>Build a customer mockup, then save it or send it for approval.</div>
 </header>
 
 <main>
@@ -56,6 +54,7 @@
       <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
       <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
       <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
+      <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
       <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
       <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
       <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
@@ -69,6 +68,7 @@
       </select>
       <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
       <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
+      <div id="contrastWarn" class="contrast-warn" role="alert" style="display:none;"></div>
       <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
 
       <div class="easy-hidden-tools" aria-hidden="true">
@@ -102,7 +102,7 @@
     <div id="colorDrawer"></div>
     <div id="stageWrap">
       <div id="stage">
-        <div id="canvasHolder"></div>
+        <div id="canvasHolder" role="img" aria-label="T-shirt mockup preview — use the controls to change shirt color, placement, and artwork"></div>
         <div class="stage-empty-note" id="stageEmptyNote">Use <b>Add Front Logo</b> or <b>Add Back Logo</b>. Artwork will stay on the shirt model automatically.</div>
         <div id="stageMsg">
           <div class="spinner" id="msgSpinner"></div>
@@ -135,7 +135,7 @@
                 <div><b>3. Place It</b>Size and center.</div>
                 <div><b>4. Approve</b>Spin and proof.</div>
               </div>
-              <p style="margin-top:14px;font-size:12px;color:var(--text-dim);line-height:1.5;">PNG, JPG, SVG, WEBP, AI, PSD, CDR, and PDF files open right in the browser. Nothing uploads to a server.</p>
+              <p style="margin-top:14px;font-size:12px;color:var(--text-dim);line-height:1.5;">PNG, JPG, SVG, WEBP, AI, PSD, CDR, and PDF files are read right in your browser. Mockups upload only when you Save or Send.</p>
             </div>
           </div>
         </div>
@@ -319,6 +319,7 @@
 <input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
 <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
 
-<script src="/pages/js/garment-designer.js?v=2026.06.18.1"></script>
+<script src="/config/app.config.js"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.20.2"></script>
 </body>
 </html>
