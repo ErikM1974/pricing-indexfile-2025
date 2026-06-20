@@ -1,3 +1,7 @@
+## v2026.06.20.14 (2026.06.20)
+
+- Deploy v2026.06.20.14: designer upload timeouts + accessible modal focus management
+
 ## v2026.06.20.13 (2026.06.20)
 
 - Deploy v2026.06.20.13: harden Shirt Designer — proxy-safe inputs, text-engine module + 36 tests, toolbar IA regroup
