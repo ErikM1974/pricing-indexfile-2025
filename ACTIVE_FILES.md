@@ -770,6 +770,9 @@
 | `/pages/js/garment-designer.js` | **NEW (2026-06-17)** Easy Shirt Designer logic (extracted from the single-file app, 5028 lines) — entries[] model, DST decoder/renderer, RA-Poly thread system (per-stitch element naming), drawn/photo shirt mockup compositor, Customer Proof, PNG/proof export. Fixed: duplicate proof thread line, malformed-DST guard. | garment-designer.html, ag-psd, pdf.js, jszip | ✅ Active |
 | `/pages/css/garment-designer.css` | **NEW (2026-06-17)** Easy Shirt Designer styling (extracted, 1851 lines). | garment-designer.html | ✅ Active |
 | `/images/garments/{polo,hoodie,longsleeve,ladies}_{front,back}.jpg` | **NEW (2026-06-20)** SanMar flat-laydown garment photos (K500 polo, PC78H hoodie, PC54LS long-sleeve, LPC54 ladies tee — solid colors, 1200×1800) for the Easy Shirt Designer "Garment style" picker. Same-origin so the recolor canvas can read pixels (SanMar CDN lacks CORS). Sourced via proxy `/api/product-details`. | garment-designer.js (GARMENT_STYLES) | ✅ Active |
+| `/pages/mockup-library.html` | **NEW (2026-06-20)** Saved Mockups library — gallery of every art request with a `Rep_Mockup` (Shirt Designer mockups). Search + re-open in designer + open request. No new Caspio table (reads existing `Rep_Mockup`). Linked from AE dashboard nav + designer header. | mockup-library.js/.css, art-hub.css, app.config.js | ✅ Active |
+| `/pages/js/mockup-library.js` | **NEW (2026-06-20)** Saved Mockups logic — fetches `/api/artrequests?repMockup=true`, renders cards (image + company + design# + meta chips), company/design# search, lightbox, visible-error handling. | mockup-library.html, proxy `/api/artrequests` | ✅ Active |
+| `/pages/css/mockup-library.css` | **NEW (2026-06-20)** Saved Mockups library styling (reuses art-hub.css tokens) — responsive card grid, lightbox. | mockup-library.html | ✅ Active |
 
 ### Sample Order System
 | File | Purpose | Dependencies | Status |
