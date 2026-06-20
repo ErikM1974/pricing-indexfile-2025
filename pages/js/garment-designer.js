@@ -5344,7 +5344,7 @@ async function saveToArtRequest() {
     //    a timestamp so repeated saves never collide.
     const fd = new FormData();
     fd.append('file', blob, 'rep-mockup-' + seed.designId + '-' + Date.now() + '.png');
-    const upResp = await fetch(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd });
+    const upResp = await fetchWithTimeout(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd }, 45000);
     const up = await upResp.json().catch(() => ({}));
     if (!upResp.ok || !up.success || !up.externalKey) {
       throw new Error(up.error || ('Upload failed (' + upResp.status + ')'));
@@ -5377,11 +5377,11 @@ async function saveToArtRequest() {
     };
 
     // 4. Attach to the request (whitelisted fields only — reference, not a proof).
-    const putResp = await fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(seed.designId) + '/fields', {
+    const putResp = await fetchWithTimeout(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(seed.designId) + '/fields', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Rep_Mockup: imageUrl, Rep_Mockup_Meta: JSON.stringify(meta) })
-    });
+    }, 20000);
     if (!putResp.ok) {
       const pe = await putResp.json().catch(() => ({}));
       throw new Error(pe.error || ('Save failed (' + putResp.status + ')'));
@@ -5414,8 +5414,53 @@ const EMAILJS_SERVICE_ID = 'service_jgrave3';
 const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
 const SITE_ORIGIN = 'https://www.teamnwca.com';
 
-function dsModalOpen(id) { const m = document.getElementById(id); if (m) m.classList.add('open'); }
-function dsModalClose(id) { const m = document.getElementById(id); if (m) m.classList.remove('open'); }
+// fetch with an abort timeout so a stalled upload/PUT can't hang the UI forever.
+function fetchWithTimeout(url, opts, ms) {
+  opts = opts || {};
+  if (typeof AbortController === 'undefined') return fetch(url, opts);
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms || 30000);
+  return fetch(url, Object.assign({}, opts, { signal: ctrl.signal }))
+    .finally(() => clearTimeout(t));
+}
+
+// Accessible modal open/close: move focus into the dialog on open, return it to
+// the trigger on close, and trap Tab within the dialog while it's open.
+let _dsLastFocus = null;
+function _dsFocusables(m) {
+  return Array.prototype.filter.call(
+    m.querySelectorAll('input, select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])'),
+    function (el) { return el.offsetParent !== null && !el.disabled; });
+}
+function dsModalOpen(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  _dsLastFocus = document.activeElement;
+  m.classList.add('open');
+  const f = _dsFocusables(m)[0];
+  if (f) { try { f.focus(); } catch (e) { /* non-fatal */ } }
+}
+function dsModalClose(id) {
+  const m = document.getElementById(id);
+  if (!m) return;
+  m.classList.remove('open');
+  if (_dsLastFocus && typeof _dsLastFocus.focus === 'function') {
+    try { _dsLastFocus.focus(); } catch (e) { /* non-fatal */ }
+    _dsLastFocus = null;
+  }
+}
+// Tab-trap for the overlay modals (Steve / Customer). The docked text panel is
+// non-modal (the shirt stays interactive) so it is intentionally not trapped.
+document.addEventListener('keydown', function (ev) {
+  if (ev.key !== 'Tab') return;
+  const m = document.querySelector('.ds-modal-overlay.open');
+  if (!m) return;
+  const list = _dsFocusables(m);
+  if (!list.length) return;
+  const first = list[0], last = list[list.length - 1];
+  if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+  else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+});
 
 // Both send actions need a built mockup. Returns the active entry or null (+toast).
 function requireMockup() {
@@ -5442,7 +5487,13 @@ async function uploadCleanMockup(e, namePrefix) {
   const fileName = (namePrefix || 'designer-mockup') + '-' + Date.now() + '.png';
   const fd = new FormData();
   fd.append('file', blob, fileName);
-  const resp = await fetch(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd });
+  let resp;
+  try {
+    resp = await fetchWithTimeout(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd }, 45000);
+  } catch (err) {
+    if (err && err.name === 'AbortError') throw new Error('Upload timed out — check your connection and try again');
+    throw err;
+  }
   const up = await resp.json().catch(() => ({}));
   if (!resp.ok || !up.success || !up.externalKey) {
     throw new Error(up.error || ('Upload failed (' + resp.status + ')'));
