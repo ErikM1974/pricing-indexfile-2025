@@ -1,1 +1,556 @@
-{"tiersR":[{"PK_ID":13,"TierID":13,"DecorationMethod":"ScreenPrint","TierLabel":"13-36","MinQuantity":13,"MaxQuantity":36,"MarginDenominator":0.45,"TargetMargin":0,"LTM_Fee":75},{"PK_ID":14,"TierID":14,"DecorationMethod":"ScreenPrint","TierLabel":"37-71","MinQuantity":37,"MaxQuantity":71,"MarginDenominator":0.48,"TargetMargin":0,"LTM_Fee":50},{"PK_ID":15,"TierID":15,"DecorationMethod":"ScreenPrint","TierLabel":"72-144","MinQuantity":72,"MaxQuantity":144,"MarginDenominator":0.5,"TargetMargin":0,"LTM_Fee":0},{"PK_ID":16,"TierID":16,"DecorationMethod":"ScreenPrint","TierLabel":"145-576","MinQuantity":145,"MaxQuantity":576,"MarginDenominator":0.5,"TargetMargin":0,"LTM_Fee":0}],"rulesR":{"RoundingMethod":"HalfDollarCeil_Final","FlashCharge":"0.35","SetupFeePerColor":"30"},"locations":[{"code":"LC","name":"Left Chest"},{"code":"FB","name":"Full Back"}],"allScreenprintCostsR":[{"PK_ID":1,"ScreenPrintCostID":1,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":1,"BasePrintCost":2.6,"Ed_Cost":2.35},{"PK_ID":2,"ScreenPrintCostID":2,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":2,"BasePrintCost":3.35,"Ed_Cost":2.85},{"PK_ID":3,"ScreenPrintCostID":3,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":3,"BasePrintCost":3.9,"Ed_Cost":3.15},{"PK_ID":4,"ScreenPrintCostID":4,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":4,"BasePrintCost":4.45,"Ed_Cost":3.45},{"PK_ID":5,"ScreenPrintCostID":5,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":5,"BasePrintCost":4.95,"Ed_Cost":3.7},{"PK_ID":6,"ScreenPrintCostID":6,"CostType":"PrimaryLocation","TierLabel":"13-36","ColorCount":6,"BasePrintCost":5.45,"Ed_Cost":3.95},{"PK_ID":7,"ScreenPrintCostID":7,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":1,"BasePrintCost":2.3,"Ed_Cost":2.05},{"PK_ID":8,"ScreenPrintCostID":8,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":2,"BasePrintCost":2.65,"Ed_Cost":2.15},{"PK_ID":9,"ScreenPrintCostID":9,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":3,"BasePrintCost":3.1,"Ed_Cost":2.35},{"PK_ID":10,"ScreenPrintCostID":10,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":4,"BasePrintCost":3.55,"Ed_Cost":2.55},{"PK_ID":11,"ScreenPrintCostID":11,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":5,"BasePrintCost":4,"Ed_Cost":2.75},{"PK_ID":12,"ScreenPrintCostID":12,"CostType":"PrimaryLocation","TierLabel":"37-71","ColorCount":6,"BasePrintCost":4.4,"Ed_Cost":2.9},{"PK_ID":13,"ScreenPrintCostID":13,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":1,"BasePrintCost":2.2,"Ed_Cost":1.95},{"PK_ID":14,"ScreenPrintCostID":14,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":2,"BasePrintCost":2.5,"Ed_Cost":2},{"PK_ID":15,"ScreenPrintCostID":15,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":3,"BasePrintCost":2.85,"Ed_Cost":2.1},{"PK_ID":16,"ScreenPrintCostID":16,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":4,"BasePrintCost":3.2,"Ed_Cost":2.2},{"PK_ID":17,"ScreenPrintCostID":17,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":5,"BasePrintCost":3.65,"Ed_Cost":2.4},{"PK_ID":18,"ScreenPrintCostID":18,"CostType":"PrimaryLocation","TierLabel":"72-144","ColorCount":6,"BasePrintCost":4.1,"Ed_Cost":2.6},{"PK_ID":19,"ScreenPrintCostID":19,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":1,"BasePrintCost":2.05,"Ed_Cost":1.8},{"PK_ID":20,"ScreenPrintCostID":20,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":2,"BasePrintCost":2.35,"Ed_Cost":1.85},{"PK_ID":21,"ScreenPrintCostID":21,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":3,"BasePrintCost":2.7,"Ed_Cost":1.95},{"PK_ID":22,"ScreenPrintCostID":22,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":4,"BasePrintCost":3.05,"Ed_Cost":2.05},{"PK_ID":23,"ScreenPrintCostID":23,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":5,"BasePrintCost":3.45,"Ed_Cost":2.2},{"PK_ID":24,"ScreenPrintCostID":24,"CostType":"PrimaryLocation","TierLabel":"145-576","ColorCount":6,"BasePrintCost":3.8,"Ed_Cost":2.3},{"PK_ID":25,"ScreenPrintCostID":25,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":1,"BasePrintCost":5.75,"Ed_Cost":5.5},{"PK_ID":26,"ScreenPrintCostID":26,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":2,"BasePrintCost":6.5,"Ed_Cost":6},{"PK_ID":27,"ScreenPrintCostID":27,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":3,"BasePrintCost":7.75,"Ed_Cost":7},{"PK_ID":28,"ScreenPrintCostID":28,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":4,"BasePrintCost":8.5,"Ed_Cost":7.5},{"PK_ID":29,"ScreenPrintCostID":29,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":5,"BasePrintCost":9.25,"Ed_Cost":8},{"PK_ID":30,"ScreenPrintCostID":30,"CostType":"AdditionalLocation","TierLabel":"13-36","ColorCount":6,"BasePrintCost":10,"Ed_Cost":8.5},{"PK_ID":31,"ScreenPrintCostID":31,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":1,"BasePrintCost":5.25,"Ed_Cost":5},{"PK_ID":32,"ScreenPrintCostID":32,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":2,"BasePrintCost":6,"Ed_Cost":5.5},{"PK_ID":33,"ScreenPrintCostID":33,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":3,"BasePrintCost":6.75,"Ed_Cost":6},{"PK_ID":34,"ScreenPrintCostID":34,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":4,"BasePrintCost":7.5,"Ed_Cost":6.5},{"PK_ID":35,"ScreenPrintCostID":35,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":5,"BasePrintCost":8.25,"Ed_Cost":7},{"PK_ID":36,"ScreenPrintCostID":36,"CostType":"AdditionalLocation","TierLabel":"37-71","ColorCount":6,"BasePrintCost":9,"Ed_Cost":7.5},{"PK_ID":37,"ScreenPrintCostID":37,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":1,"BasePrintCost":4.75,"Ed_Cost":4.5},{"PK_ID":38,"ScreenPrintCostID":38,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":2,"BasePrintCost":5.5,"Ed_Cost":5},{"PK_ID":39,"ScreenPrintCostID":39,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":3,"BasePrintCost":6.25,"Ed_Cost":5.5},{"PK_ID":40,"ScreenPrintCostID":40,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":4,"BasePrintCost":7,"Ed_Cost":6},{"PK_ID":41,"ScreenPrintCostID":41,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":5,"BasePrintCost":7.75,"Ed_Cost":6.5},{"PK_ID":42,"ScreenPrintCostID":42,"CostType":"AdditionalLocation","TierLabel":"72-144","ColorCount":6,"BasePrintCost":8.5,"Ed_Cost":7},{"PK_ID":43,"ScreenPrintCostID":43,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":1,"BasePrintCost":4.25,"Ed_Cost":4},{"PK_ID":44,"ScreenPrintCostID":44,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":2,"BasePrintCost":5,"Ed_Cost":4.5},{"PK_ID":45,"ScreenPrintCostID":45,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":3,"BasePrintCost":5.75,"Ed_Cost":5},{"PK_ID":46,"ScreenPrintCostID":46,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":4,"BasePrintCost":6.5,"Ed_Cost":5.5},{"PK_ID":47,"ScreenPrintCostID":47,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":5,"BasePrintCost":7.25,"Ed_Cost":6},{"PK_ID":48,"ScreenPrintCostID":48,"CostType":"AdditionalLocation","TierLabel":"145-576","ColorCount":6,"BasePrintCost":8,"Ed_Cost":6.5}],"sizes":[{"size":"S","price":3.53,"sortOrder":22},{"size":"M","price":3.53,"sortOrder":23},{"size":"L","price":3.53,"sortOrder":24},{"size":"XL","price":3.53,"sortOrder":25},{"size":"2XL","price":4.69,"sortOrder":26},{"size":"3XL","price":5.13,"sortOrder":27},{"size":"4XL","price":5.13,"sortOrder":28},{"size":"5XL","price":5.13,"sortOrder":29},{"size":"6XL","price":5.13,"sortOrder":30}],"sellingPriceDisplayAddOns":{"2XL":2,"2XLT":5,"3XL":3,"3XLT":6,"4XL":4,"4XLT":7,"5XL":6,"6XL":7,"LT":4,"XLT":4,"XXL":2}}
+{
+  "tiersR": [
+    {
+      "PK_ID": 13,
+      "TierID": 13,
+      "DecorationMethod": "ScreenPrint",
+      "TierLabel": "24-47",
+      "MinQuantity": 24,
+      "MaxQuantity": 47,
+      "MarginDenominator": 0.53,
+      "TargetMargin": 0,
+      "LTM_Fee": 50
+    },
+    {
+      "PK_ID": 14,
+      "TierID": 14,
+      "DecorationMethod": "ScreenPrint",
+      "TierLabel": "48-71",
+      "MinQuantity": 48,
+      "MaxQuantity": 71,
+      "MarginDenominator": 0.53,
+      "TargetMargin": 0,
+      "LTM_Fee": 0
+    },
+    {
+      "PK_ID": 15,
+      "TierID": 15,
+      "DecorationMethod": "ScreenPrint",
+      "TierLabel": "72-144",
+      "MinQuantity": 72,
+      "MaxQuantity": 144,
+      "MarginDenominator": 0.53,
+      "TargetMargin": 0,
+      "LTM_Fee": 0
+    },
+    {
+      "PK_ID": 16,
+      "TierID": 16,
+      "DecorationMethod": "ScreenPrint",
+      "TierLabel": "145-576",
+      "MinQuantity": 145,
+      "MaxQuantity": 576,
+      "MarginDenominator": 0.53,
+      "TargetMargin": 0,
+      "LTM_Fee": 0
+    }
+  ],
+  "rulesR": {
+    "RoundingMethod": "HalfDollarCeil_Final",
+    "FlashCharge": "0.35"
+  },
+  "locations": [
+    {
+      "code": "LC",
+      "name": "Left Chest"
+    },
+    {
+      "code": "FB",
+      "name": "Full Back"
+    }
+  ],
+  "allScreenprintCostsR": [
+    {
+      "PK_ID": 1,
+      "ScreenPrintCostID": 1,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 1,
+      "Ed_Cost": 2.7,
+      "Notes": "Original price $2.35; added 15% on 6/19/2026 (new $2.70)"
+    },
+    {
+      "PK_ID": 2,
+      "ScreenPrintCostID": 2,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 2,
+      "Ed_Cost": 3.28,
+      "Notes": "Original price $2.85; added 15% on 6/19/2026 (new $3.28)"
+    },
+    {
+      "PK_ID": 3,
+      "ScreenPrintCostID": 3,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 3,
+      "Ed_Cost": 3.62,
+      "Notes": "Original price $3.15; added 15% on 6/19/2026 (new $3.62)"
+    },
+    {
+      "PK_ID": 4,
+      "ScreenPrintCostID": 4,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 4,
+      "Ed_Cost": 3.97,
+      "Notes": "Original price $3.45; added 15% on 6/19/2026 (new $3.97)"
+    },
+    {
+      "PK_ID": 5,
+      "ScreenPrintCostID": 5,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 5,
+      "Ed_Cost": 4.26,
+      "Notes": "Original price $3.70; added 15% on 6/19/2026 (new $4.26)"
+    },
+    {
+      "PK_ID": 6,
+      "ScreenPrintCostID": 6,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 6,
+      "Ed_Cost": 4.54,
+      "Notes": "Original price $3.95; added 15% on 6/19/2026 (new $4.54)"
+    },
+    {
+      "PK_ID": 7,
+      "ScreenPrintCostID": 7,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 1,
+      "Ed_Cost": 2.36,
+      "Notes": "Original price $2.05; added 15% on 6/19/2026 (new $2.36)"
+    },
+    {
+      "PK_ID": 8,
+      "ScreenPrintCostID": 8,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 2,
+      "Ed_Cost": 2.47,
+      "Notes": "Original price $2.15; added 15% on 6/19/2026 (new $2.47)"
+    },
+    {
+      "PK_ID": 9,
+      "ScreenPrintCostID": 9,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 3,
+      "Ed_Cost": 2.7,
+      "Notes": "Original price $2.35; added 15% on 6/19/2026 (new $2.70)"
+    },
+    {
+      "PK_ID": 10,
+      "ScreenPrintCostID": 10,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 4,
+      "Ed_Cost": 2.93,
+      "Notes": "Original price $2.55; added 15% on 6/19/2026 (new $2.93)"
+    },
+    {
+      "PK_ID": 11,
+      "ScreenPrintCostID": 11,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 5,
+      "Ed_Cost": 3.16,
+      "Notes": "Original price $2.75; added 15% on 6/19/2026 (new $3.16)"
+    },
+    {
+      "PK_ID": 12,
+      "ScreenPrintCostID": 12,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 6,
+      "Ed_Cost": 3.33,
+      "Notes": "Original price $2.90; added 15% on 6/19/2026 (new $3.33)"
+    },
+    {
+      "PK_ID": 13,
+      "ScreenPrintCostID": 13,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 1,
+      "Ed_Cost": 2.24,
+      "Notes": "Original price $1.95; added 15% on 6/19/2026 (new $2.24)"
+    },
+    {
+      "PK_ID": 14,
+      "ScreenPrintCostID": 14,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 2,
+      "Ed_Cost": 2.3,
+      "Notes": "Original price $2.00; added 15% on 6/19/2026 (new $2.30)"
+    },
+    {
+      "PK_ID": 15,
+      "ScreenPrintCostID": 15,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 3,
+      "Ed_Cost": 2.42,
+      "Notes": "Original price $2.10; added 15% on 6/19/2026 (new $2.42)"
+    },
+    {
+      "PK_ID": 16,
+      "ScreenPrintCostID": 16,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 4,
+      "Ed_Cost": 2.53,
+      "Notes": "Original price $2.20; added 15% on 6/19/2026 (new $2.53)"
+    },
+    {
+      "PK_ID": 17,
+      "ScreenPrintCostID": 17,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 5,
+      "Ed_Cost": 2.76,
+      "Notes": "Original price $2.40; added 15% on 6/19/2026 (new $2.76)"
+    },
+    {
+      "PK_ID": 18,
+      "ScreenPrintCostID": 18,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 6,
+      "Ed_Cost": 2.99,
+      "Notes": "Original price $2.60; added 15% on 6/19/2026 (new $2.99)"
+    },
+    {
+      "PK_ID": 19,
+      "ScreenPrintCostID": 19,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 1,
+      "Ed_Cost": 2.07,
+      "Notes": "Original price $1.80; added 15% on 6/19/2026 (new $2.07)"
+    },
+    {
+      "PK_ID": 20,
+      "ScreenPrintCostID": 20,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 2,
+      "Ed_Cost": 2.13,
+      "Notes": "Original price $1.85; added 15% on 6/19/2026 (new $2.13)"
+    },
+    {
+      "PK_ID": 21,
+      "ScreenPrintCostID": 21,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 3,
+      "Ed_Cost": 2.24,
+      "Notes": "Original price $1.95; added 15% on 6/19/2026 (new $2.24)"
+    },
+    {
+      "PK_ID": 22,
+      "ScreenPrintCostID": 22,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 4,
+      "Ed_Cost": 2.36,
+      "Notes": "Original price $2.05; added 15% on 6/19/2026 (new $2.36)"
+    },
+    {
+      "PK_ID": 23,
+      "ScreenPrintCostID": 23,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 5,
+      "Ed_Cost": 2.53,
+      "Notes": "Original price $2.20; added 15% on 6/19/2026 (new $2.53)"
+    },
+    {
+      "PK_ID": 24,
+      "ScreenPrintCostID": 24,
+      "CostType": "PrimaryLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 6,
+      "Ed_Cost": 2.64,
+      "Notes": "Original price $2.30; added 15% on 6/19/2026 (new $2.64)"
+    },
+    {
+      "PK_ID": 25,
+      "ScreenPrintCostID": 25,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 1,
+      "Ed_Cost": 2.7,
+      "Notes": "Original price $2.35; added 15% on 6/19/2026 (new $2.70)"
+    },
+    {
+      "PK_ID": 26,
+      "ScreenPrintCostID": 26,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 2,
+      "Ed_Cost": 3.28,
+      "Notes": "Original price $2.85; added 15% on 6/19/2026 (new $3.28)"
+    },
+    {
+      "PK_ID": 27,
+      "ScreenPrintCostID": 27,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 3,
+      "Ed_Cost": 3.62,
+      "Notes": "Original price $3.15; added 15% on 6/19/2026 (new $3.62)"
+    },
+    {
+      "PK_ID": 28,
+      "ScreenPrintCostID": 28,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 4,
+      "Ed_Cost": 3.97,
+      "Notes": "Original price $3.45; added 15% on 6/19/2026 (new $3.97)"
+    },
+    {
+      "PK_ID": 29,
+      "ScreenPrintCostID": 29,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 5,
+      "Ed_Cost": 4.26,
+      "Notes": "Original price $3.70; added 15% on 6/19/2026 (new $4.26)"
+    },
+    {
+      "PK_ID": 30,
+      "ScreenPrintCostID": 30,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "24-47",
+      "ColorCount": 6,
+      "Ed_Cost": 4.54,
+      "Notes": "Original price $3.95; added 15% on 6/19/2026 (new $4.54)"
+    },
+    {
+      "PK_ID": 31,
+      "ScreenPrintCostID": 31,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 1,
+      "Ed_Cost": 2.36,
+      "Notes": "Original price $2.05; added 15% on 6/19/2026 (new $2.36)"
+    },
+    {
+      "PK_ID": 32,
+      "ScreenPrintCostID": 32,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 2,
+      "Ed_Cost": 2.47,
+      "Notes": "Original price $2.15; added 15% on 6/19/2026 (new $2.47)"
+    },
+    {
+      "PK_ID": 33,
+      "ScreenPrintCostID": 33,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 3,
+      "Ed_Cost": 2.7,
+      "Notes": "Original price $2.35; added 15% on 6/19/2026 (new $2.70)"
+    },
+    {
+      "PK_ID": 34,
+      "ScreenPrintCostID": 34,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 4,
+      "Ed_Cost": 2.93,
+      "Notes": "Original price $2.55; added 15% on 6/19/2026 (new $2.93)"
+    },
+    {
+      "PK_ID": 35,
+      "ScreenPrintCostID": 35,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 5,
+      "Ed_Cost": 3.16,
+      "Notes": "Original price $2.75; added 15% on 6/19/2026 (new $3.16)"
+    },
+    {
+      "PK_ID": 36,
+      "ScreenPrintCostID": 36,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "48-71",
+      "ColorCount": 6,
+      "Ed_Cost": 3.33,
+      "Notes": "Original price $2.90; added 15% on 6/19/2026 (new $3.33)"
+    },
+    {
+      "PK_ID": 37,
+      "ScreenPrintCostID": 37,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 1,
+      "Ed_Cost": 2.24,
+      "Notes": "Original price $1.95; added 15% on 6/19/2026 (new $2.24)"
+    },
+    {
+      "PK_ID": 38,
+      "ScreenPrintCostID": 38,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 2,
+      "Ed_Cost": 2.3,
+      "Notes": "Original price $2.00; added 15% on 6/19/2026 (new $2.30)"
+    },
+    {
+      "PK_ID": 39,
+      "ScreenPrintCostID": 39,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 3,
+      "Ed_Cost": 2.42,
+      "Notes": "Original price $2.10; added 15% on 6/19/2026 (new $2.42)"
+    },
+    {
+      "PK_ID": 40,
+      "ScreenPrintCostID": 40,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 4,
+      "Ed_Cost": 2.53,
+      "Notes": "Original price $2.20; added 15% on 6/19/2026 (new $2.53)"
+    },
+    {
+      "PK_ID": 41,
+      "ScreenPrintCostID": 41,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 5,
+      "Ed_Cost": 2.76,
+      "Notes": "Original price $2.40; added 15% on 6/19/2026 (new $2.76)"
+    },
+    {
+      "PK_ID": 42,
+      "ScreenPrintCostID": 42,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "72-144",
+      "ColorCount": 6,
+      "Ed_Cost": 2.99,
+      "Notes": "Original price $2.60; added 15% on 6/19/2026 (new $2.99)"
+    },
+    {
+      "PK_ID": 43,
+      "ScreenPrintCostID": 43,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 1,
+      "Ed_Cost": 2.07,
+      "Notes": "Original price $1.80; added 15% on 6/19/2026 (new $2.07)"
+    },
+    {
+      "PK_ID": 44,
+      "ScreenPrintCostID": 44,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 2,
+      "Ed_Cost": 2.13,
+      "Notes": "Original price $1.85; added 15% on 6/19/2026 (new $2.13)"
+    },
+    {
+      "PK_ID": 45,
+      "ScreenPrintCostID": 45,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 3,
+      "Ed_Cost": 2.24,
+      "Notes": "Original price $1.95; added 15% on 6/19/2026 (new $2.24)"
+    },
+    {
+      "PK_ID": 46,
+      "ScreenPrintCostID": 46,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 4,
+      "Ed_Cost": 2.36,
+      "Notes": "Original price $2.05; added 15% on 6/19/2026 (new $2.36)"
+    },
+    {
+      "PK_ID": 47,
+      "ScreenPrintCostID": 47,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 5,
+      "Ed_Cost": 2.53,
+      "Notes": "Original price $2.20; added 15% on 6/19/2026 (new $2.53)"
+    },
+    {
+      "PK_ID": 48,
+      "ScreenPrintCostID": 48,
+      "CostType": "AdditionalLocation",
+      "TierLabel": "145-576",
+      "ColorCount": 6,
+      "Ed_Cost": 2.64,
+      "Notes": "Original price $2.30; added 15% on 6/19/2026 (new $2.64)"
+    }
+  ],
+  "sizes": [
+    {
+      "size": "S",
+      "price": 3.53,
+      "sortOrder": 22
+    },
+    {
+      "size": "M",
+      "price": 3.53,
+      "sortOrder": 23
+    },
+    {
+      "size": "L",
+      "price": 3.53,
+      "sortOrder": 24
+    },
+    {
+      "size": "XL",
+      "price": 3.53,
+      "sortOrder": 25
+    },
+    {
+      "size": "2XL",
+      "price": 4.69,
+      "sortOrder": 26
+    },
+    {
+      "size": "3XL",
+      "price": 5.13,
+      "sortOrder": 27
+    },
+    {
+      "size": "4XL",
+      "price": 5.13,
+      "sortOrder": 28
+    },
+    {
+      "size": "5XL",
+      "price": 5.13,
+      "sortOrder": 29
+    },
+    {
+      "size": "6XL",
+      "price": 5.13,
+      "sortOrder": 30
+    }
+  ],
+  "sellingPriceDisplayAddOns": {
+    "2XL": 2,
+    "2XLT": 5,
+    "3XL": 3,
+    "3XLT": 6,
+    "4XL": 4,
+    "4XLT": 7,
+    "5XL": 6,
+    "6XL": 7,
+    "LT": 4,
+    "XLT": 4,
+    "XXL": 2
+  }
+}

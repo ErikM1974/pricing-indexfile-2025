@@ -1498,7 +1498,7 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
     const tiers = {
         dtg: [12, 24, 48, 72],
         dtf: [10, 24, 48, 72],
-        scp: [24, 37, 73, 145],
+        scp: [24, 48, 72, 145], // 2026-06-19 remap: min 24 + DTG-aligned breaks (was [24,37,73,145])
         emb: [8, 24, 48, 72]
     };
 

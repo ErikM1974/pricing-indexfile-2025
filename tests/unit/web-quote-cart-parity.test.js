@@ -483,20 +483,20 @@ describe('DTG parity (POST /api/dtg/quote-pricing authority, consumed verbatim)'
 describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/rounding copies)', () => {
     const SCP_1C = { frontColors: 1, backColors: 0, darkGarment: false, safetyStripes: false };
 
-    test('(a) 48× PC61, 1-color front → $13.00 base, separate-mode GRAND $704.00 (LTM $50 lives at 37-71!)', async () => {
+    test('(a) 48× PC61, 1-color front → $12.00 base, GRAND $606.00 (48-71 tier, NO LTM; 2026-06-19 Ed_Cost÷0.53 model)', async () => {
         const res = await run({
             items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
             groups: { 'scp:design-1': SCP_1C }
         });
         expect(res.errors).toEqual([]);
         const g = groupOf(res, 'scp:design-1');
-        expect(g.tierLabel).toBe('37-71');
-        g.lines.forEach((l) => expect(l.baseUnit).toBe(13));
-        expect(g.subtotal).toBe(624);
-        expect(g.ltm).toMatchObject({ fee: 50, mode: 'itemized' });
+        expect(g.tierLabel).toBe('48-71');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(12));
+        expect(g.subtotal).toBe(576);
+        expect(g.ltm).toMatchObject({ fee: 0, mode: 'itemized' });
         expect(g.fees.find((f) => f.code === 'SPSU').amount).toBe(30);
-        expect(g.fees.find((f) => f.code === 'LTM').amount).toBe(50);
-        expect(g.groupTotal).toBe(704); // builder separate mode + calculator v2 both foot here (builtin floor $703.92 is a non-goal)
+        expect(g.fees.find((f) => f.code === 'LTM')).toBeUndefined(); // $0 LTM above 24-47 → no fee line
+        expect(g.groupTotal).toBe(606);
         expect(g.trace.source).toBe('scp-replica');
     });
 
@@ -506,80 +506,80 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
             groups: { 'scp:design-1': SCP_1C }
         });
         const g = groupOf(res, 'scp:design-1');
-        expect(g.lines.find((l) => l.size === '2XL').baseUnit).toBe(15);
-        expect(g.lines.find((l) => l.size === 'M').baseUnit).toBe(13);
+        expect(g.lines.find((l) => l.size === '2XL').baseUnit).toBe(14);
+        expect(g.lines.find((l) => l.size === 'M').baseUnit).toBe(12);
     });
 
-    test('(b) 2-color front + 1-color back: $14.50 + $5.50 (rounded SEPARATELY) = $20.00; setup 3×$30; GRAND $1,100.00', async () => {
+    test('(b) 2-color front + 1-color back: $13.00 + $4.50 (rounded SEPARATELY) = $17.50; setup 3×$30; GRAND $930.00', async () => {
         const res = await run({
             items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
             groups: { 'scp:design-1': { frontColors: 2, backColors: 1, darkGarment: false, safetyStripes: false } }
         });
         const g = groupOf(res, 'scp:design-1');
-        g.lines.forEach((l) => expect(l.baseUnit).toBe(20));
-        expect(g.subtotal).toBe(960);
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(17.5));
+        expect(g.subtotal).toBe(840);
         expect(g.fees.find((f) => f.code === 'SPSU').amount).toBe(90);
-        expect(g.groupTotal).toBe(1100);
+        expect(g.groupTotal).toBe(930);
     });
 
-    test('(b dark) underbase touches SETUP ONLY: per-piece identical, 5 screens = $150 → GRAND $1,160.00', async () => {
+    test('(b dark) underbase touches SETUP ONLY: per-piece identical, 5 screens = $150 → GRAND $990.00', async () => {
         const res = await run({
             items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
             groups: { 'scp:design-1': { frontColors: 2, backColors: 1, darkGarment: true, safetyStripes: false } }
         });
         const g = groupOf(res, 'scp:design-1');
-        g.lines.forEach((l) => expect(l.baseUnit).toBe(20)); // RAW design colors — never +1 on darks
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(17.5)); // RAW design colors — never +1 on darks
         expect(g.trace.screens).toBe(5);
         expect(g.fees.find((f) => f.code === 'SPSU').amount).toBe(150);
-        expect(g.groupTotal).toBe(1160);
+        expect(g.groupTotal).toBe(990);
     });
 
-    test('(c) 20× PC61 below-minimum: clamps to 13-36 row, $14.50 base, $75 LTM, GRAND $395.00', async () => {
+    test('(c) 24× PC61 lowest tier 24-47: $12.50 base, $50 LTM, GRAND $380.00 (2026-06-19 model)', async () => {
         const res = await run({
-            items: [scpItem('PC61', { S: 5, M: 5, L: 5, XL: 5 })],
+            items: [scpItem('PC61', { S: 6, M: 6, L: 6, XL: 6 })],
             groups: { 'scp:design-1': SCP_1C }
         });
         const g = groupOf(res, 'scp:design-1');
-        expect(g.tierLabel).toBe('13-36');
-        g.lines.forEach((l) => expect(l.baseUnit).toBe(14.5));
-        expect(g.ltm.fee).toBe(75);
-        expect(g.groupTotal).toBe(395);
-        // honest effective per-piece incl. LTM = $18.25
-        expect(g.lines[0].effectiveUnitDisplay).toBe(18.25);
+        expect(g.tierLabel).toBe('24-47');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(12.5));
+        expect(g.ltm.fee).toBe(50);
+        expect(g.groupTotal).toBe(380);
+        // honest effective per-piece incl. LTM = $14.58
+        expect(g.lines[0].effectiveUnitDisplay).toBe(14.58);
     });
 
-    test('(c2) 12× PC61 below the 13-piece floor: hard block, never priced (customer gate, Erik 2026-06-11)', async () => {
+    test('(c2) 12× PC61 below the 24-piece floor: hard block, never priced (customer gate, Erik 2026-06-11)', async () => {
         // The builder's findPricingTier deliberately lets a REP clamp below
         // the lowest tier; customers cannot order below the method minimum.
-        // Min is data-derived from the bundle's lowest tier (13 today).
+        // Min is data-derived from the bundle's lowest tier (24 since 2026-06-19).
         const res = await run({
             items: [scpItem('PC61', { S: 3, M: 3, L: 3, XL: 3 })],
             groups: { 'scp:design-1': SCP_1C }
         });
         expect(res.errors).toHaveLength(1);
         expect(res.errors[0].code).toBe('BELOW_MINIMUM');
-        expect(res.errors[0].message).toMatch(/starts at 13 pieces/);
+        expect(res.errors[0].message).toMatch(/starts at 24 pieces/);
         expect(res.grandTotal).toBeNull();
     });
 
-    test('(d) pooling proof: 24 PC61 + 24 PC54, one design → ONE tier/LTM/screen set, $680.00 vs $882.00 quoted separately', async () => {
+    test('(d) pooling proof: 24 PC61 + 24 PC54, one design → ONE tier/LTM/screen set, $582.00 vs $736.00 quoted separately', async () => {
         const pooled = await run({
             items: [scpItem('PC61', { M: 24 }, 's1'), scpItem('PC54', { M: 24 }, 's2')],
             groups: { 'scp:design-1': SCP_1C }
         });
         const g = groupOf(pooled, 'scp:design-1');
         expect(g.pooledQty).toBe(48);
-        expect(g.tierLabel).toBe('37-71');
-        expect(g.lines.find((l) => l.styleNumber === 'PC61').baseUnit).toBe(13);
-        expect(g.lines.find((l) => l.styleNumber === 'PC54').baseUnit).toBe(12);
-        expect(g.groupTotal).toBe(680);
+        expect(g.tierLabel).toBe('48-71');
+        expect(g.lines.find((l) => l.styleNumber === 'PC61').baseUnit).toBe(12);
+        expect(g.lines.find((l) => l.styleNumber === 'PC54').baseUnit).toBe(11);
+        expect(g.groupTotal).toBe(582);
 
         const sep61 = await run({ items: [scpItem('PC61', { M: 24 })], groups: { 'scp:design-1': SCP_1C } });
         const sep54 = await run({ items: [scpItem('PC54', { M: 24 })], groups: { 'scp:design-1': SCP_1C } });
         const separately = groupOf(sep61, 'scp:design-1').groupTotal + groupOf(sep54, 'scp:design-1').groupTotal;
-        expect(groupOf(sep61, 'scp:design-1').groupTotal).toBe(453);
-        expect(groupOf(sep54, 'scp:design-1').groupTotal).toBe(429);
-        expect(separately - g.groupTotal).toBe(202);
+        expect(groupOf(sep61, 'scp:design-1').groupTotal).toBe(380);
+        expect(groupOf(sep54, 'scp:design-1').groupTotal).toBe(356);
+        expect(separately - g.groupTotal).toBe(154);
     });
 
     test('safety stripes: flat $2/pc/location AFTER rounding, setup unchanged (rule-derived from builder :3070-3073)', async () => {
@@ -588,9 +588,9 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
             groups: { 'scp:design-1': { frontColors: 1, backColors: 0, darkGarment: false, safetyStripes: true } }
         });
         const g = groupOf(res, 'scp:design-1');
-        g.lines.forEach((l) => expect(l.baseUnit).toBe(15)); // 13 + $2 × 1 location
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(14)); // 12 + $2 × 1 location
         expect(g.fees.find((f) => f.code === 'SPSU').amount).toBe(30);
-        expect(g.groupTotal).toBe(800); // 720 + 50 + 30
+        expect(g.groupTotal).toBe(702); // 672 + 0 LTM (48-71) + 30 setup
     });
 
     test('unknown size hard-errors (no silent M→L fallback) and withholds the grand total', async () => {
@@ -610,7 +610,7 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
             groups: { 'scp:design-1': SCP_1C }
         });
         const g = groupOf(res, 'scp:design-1');
-        expect(g.groupTotal).toBe(704); // fallback constants match today's live values
+        expect(g.groupTotal).toBe(606); // fallback constants match today's live values
         expect(res.warnings.length).toBeGreaterThan(0);
         expect(res.warnings.join(' ')).toMatch(/service fees unavailable/i);
     });

@@ -349,7 +349,9 @@ class ScreenPrintPricingService {
             const costType = costEntry.CostType;
             const tierLabel = costEntry.TierLabel;
             const colorCount = costEntry.ColorCount;
-            const basePrintCost = parseFloat(costEntry.BasePrintCost);
+            // 2026-06-19 clean model: the table now holds ONE cost — Ed_Cost (Ed's price + cushion).
+            // BasePrintCost retired. Print sell = (Ed_Cost + flash) ÷ tier margin, front AND back.
+            const edCost = parseFloat(costEntry.Ed_Cost);
 
             if (!printCosts[costType]) {
                 console.warn('[ScreenPrintPricingService] Unknown cost type:', costType);
@@ -360,22 +362,19 @@ class ScreenPrintPricingService {
                 printCosts[costType][tierLabel] = {};
             }
 
+            // One tier margin (Pricing_Tiers, 0.53) for both garment and print.
+            const tier = tiersR.find(t => t.TierLabel === tierLabel);
+            const marginDenom = tier ? parseFloat(tier.MarginDenominator) : 0.53;
             let finalPrintCost;
 
             if (costType === 'PrimaryLocation') {
-                // Find the margin denominator for this tier
-                const tier = tiersR.find(t => t.TierLabel === tierLabel);
-                const marginDenom = tier ? parseFloat(tier.MarginDenominator) : 0.5;
-
-                // Apply flash charge per color, then margin
+                // Front: (Ed cost + flash per color) ÷ margin.
                 const flashChargeTotal = flashChargePerColor * colorCount;
-                const totalCost = basePrintCost + flashChargeTotal;
-                finalPrintCost = totalCost / marginDenom;
-
-                console.log(`[ScreenPrintPricingService] Primary ${tierLabel} ${colorCount}-color: Base $${basePrintCost.toFixed(2)} + Flash ($${flashChargePerColor} × ${colorCount}) = $${totalCost.toFixed(2)} → Sell $${finalPrintCost.toFixed(2)}`);
+                finalPrintCost = (edCost + flashChargeTotal) / marginDenom;
             } else {
-                // Additional locations already have margin built in - use as is
-                finalPrintCost = basePrintCost;
+                // Additional (back) location: Ed cost ÷ margin — same markup as the front.
+                // (Previously sold ~at cost; corrected 2026-06-19 to carry real margin.)
+                finalPrintCost = edCost / marginDenom;
             }
 
             printCosts[costType][tierLabel][colorCount] = finalPrintCost;
@@ -408,43 +407,6 @@ class ScreenPrintPricingService {
                             const rawTotal = garmentPrice + printPrice;
                             const roundedTotal = applyRounding(rawTotal, roundingMethod);
                             finalPrices[locationType][tierLabel][colorCount][sizeInfo.size] = roundedTotal;
-
-                            // 🔍 DETAILED TRACE: Log one complete example to verify full calculation
-                            if (tierLabel === '37-71' && colorCount === '2' && sizeInfo.size === 'M') {
-                                console.log('\n🔍 ═══════════════════════════════════════════════════════════');
-                                console.log('🔍 COMPLETE CALCULATION TRACE (37-71 tier, 2 colors, size M):');
-                                console.log('🔍 ═══════════════════════════════════════════════════════════');
-                                console.log('🔍 Step 1 - Input Values:');
-                                console.log('🔍   • Base garment cost: $' + standardGarmentCost.toFixed(2));
-                                console.log('🔍   • Tier: ' + tierLabel);
-                                console.log('🔍   • Colors: ' + colorCount);
-                                console.log('🔍   • Size: ' + sizeInfo.size);
-
-                                const tier = tiersR.find(t => t.TierLabel === tierLabel);
-                                console.log('🔍\nStep 2 - Garment with Margin:');
-                                console.log('🔍   • Margin denominator: ' + tier.MarginDenominator);
-                                console.log('🔍   • Garment selling price: $' + standardGarmentCost.toFixed(2) + ' ÷ ' + tier.MarginDenominator + ' = $' + garmentPrice.toFixed(2));
-
-                                console.log('🔍\nStep 3 - Print Cost Components:');
-                                const costEntry = allScreenprintCostsR.find(c =>
-                                    c.TierLabel === tierLabel && c.ColorCount === parseInt(colorCount) && c.CostType === 'PrimaryLocation'
-                                );
-                                if (costEntry) {
-                                    const flashTotal = flashChargePerColor * parseInt(colorCount);
-                                    console.log('🔍   • Base print cost (from API): $' + costEntry.BasePrintCost.toFixed(2));
-                                    console.log('🔍   • Flash charge: $' + flashChargePerColor.toFixed(2) + ' × ' + colorCount + ' = $' + flashTotal.toFixed(2));
-                                    console.log('🔍   • Total print cost: $' + costEntry.BasePrintCost.toFixed(2) + ' + $' + flashTotal.toFixed(2) + ' = $' + (costEntry.BasePrintCost + flashTotal).toFixed(2));
-                                    console.log('🔍   • Print with margin: $' + (costEntry.BasePrintCost + flashTotal).toFixed(2) + ' ÷ ' + tier.MarginDenominator + ' = $' + printPrice.toFixed(2));
-                                }
-
-                                console.log('🔍\nStep 4 - Combine & Round:');
-                                console.log('🔍   • Garment: $' + garmentPrice.toFixed(2));
-                                console.log('🔍   • Print: $' + printPrice.toFixed(2));
-                                console.log('🔍   • Raw total: $' + garmentPrice.toFixed(2) + ' + $' + printPrice.toFixed(2) + ' = $' + rawTotal.toFixed(2));
-                                console.log('🔍   • Rounding method: ' + roundingMethod);
-                                console.log('🔍   • FINAL PRICE (what customer sees): $' + roundedTotal.toFixed(2));
-                                console.log('🔍 ═══════════════════════════════════════════════════════════\n');
-                            }
                         }
                     });
                 });
