@@ -589,6 +589,19 @@
             + '</span></div>';
     }
 
+    function updateEmbWarn() {
+        var el = $('qqEmbWarn'); if (!el) return;
+        var isCap = !!(state.product && state.product.isCap);
+        // The PRIMARY (chest) logo's stitch surcharge CAPS at +$10 above ~25K — a large back/front
+        // must be its OWN logo to price per stitch. Warn instead of silently under-quoting.
+        if (!isCap && (num(state.adv.embStitch) || 0) > 25000) {
+            el.textContent = 'Heads up: over 25,000 stitches on the main logo caps the upcharge at +$10/pc. For a full back/front that large, add it as a separate logo so it prices per stitch.';
+            el.hidden = false;
+        } else {
+            el.hidden = true;
+        }
+    }
+
     function renderEmbPanel() {
         var field = $('qqEmbField');
         var hasEmb = state.methods.some(function (m) { return m.id === 'emb' || m.id === 'capemb'; });
@@ -618,7 +631,8 @@
         addBtn.textContent = isCap ? '+ Add cap back' : '+ Add another logo';
         $('qqEmbHint').textContent = isCap
             ? 'Up to 10,000 stitches included. Cap back priced at our cap-back rate.'
-            : 'Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate.';
+            : 'Up to 10,000 stitches included. Each additional logo priced at our additional-logo (AL) rate. Typical stitches — left chest ~8K · full front ~15–30K · jacket back ~25–40K (add a back/front as its own logo).';
+        updateEmbWarn();
         var dig = $('qqEmbDigitizing'); if (dig) dig.checked = !!state.adv.digitizing;
     }
 
@@ -936,6 +950,7 @@
             var val = Math.max(1000, parseInt(inp.value, 10) || 8000);
             if (key === 'primary') state.adv.embStitch = val;
             else if (state.embAddl[Number(key)]) state.embAddl[Number(key)].stitch = val;
+            updateEmbWarn();
             repriceDebounced();
         });
         $('qqEmbLogos').addEventListener('click', function (e) {
