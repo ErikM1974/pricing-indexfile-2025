@@ -1,3 +1,7 @@
+## v2026.06.20.13 (2026.06.20)
+
+- Deploy v2026.06.20.13: harden Shirt Designer — proxy-safe inputs, text-engine module + 36 tests, toolbar IA regroup
+
 ## v2026.06.20.12 (2026.06.20)
 
 - Deploy v2026.06.20.12: Quick Quote Phase 2 — placement preset buttons, one-click next-tier nudge, best-value star (UI only, prices unchanged)
