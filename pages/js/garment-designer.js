@@ -1222,7 +1222,7 @@ function selectEntry(id) {
   const item = $('fitem-' + id);
   if (item) item.classList.add('active');
   const entry = entries.find(e => e.id === id);
-  if (entry) { showEntry(entry); renderThreadColorsButtonState(); }
+  if (entry) { showEntry(entry); renderThreadColorsButtonState(); try { syncTextPanel(entry); } catch (e) { /* text tool optional */ } }
 }
 
 /* ============================================================
@@ -3102,6 +3102,7 @@ function syncRemoveBgBtn(e) {
 function removeBgClick() {
   const e = current();
   if (!e || e.status !== 'ready') { showToast('Add a logo first'); return; }
+  if (e.textModel) { showToast('This is text — set its color in the Text panel'); return; }
   if (e.kind !== 'canvas') {
     showToast('Background removal works on logo images (PNG, JPG, AI, PSD) — not this file type');
     return;
@@ -4656,7 +4657,10 @@ function currentGarmentLuminance() {
 }
 function artMeanLuminance(entry) {
   let src = null;
-  try { src = (typeof getKnockedArt === 'function' ? getKnockedArt(entry) : null) || entry.canvas; }
+  // Only use the knocked canvas when the entry is actually knocked out; otherwise
+  // read entry.canvas directly. (Text entries are never knocked — pulling a stale
+  // entry.knockCanvas here gave a false "dark on dark" warning.)
+  try { src = (entry && entry.knockOn && typeof getKnockedArt === 'function' ? getKnockedArt(entry) : null) || entry.canvas; }
   catch (e) { src = entry && entry.canvas; }
   if (!src || !src.width || !src.height) return null;
   const W = 32, H = Math.max(1, Math.round(W * src.height / src.width));
@@ -5698,6 +5702,246 @@ async function setGarmentStyle(styleId) {
     gsel.value = currentGarmentStyle;
     gsel.addEventListener('change', () => setGarmentStyle(gsel.value));
   }
+})();
+
+// ============================================================
+//  Text tool — add editable text as a first-class art entry.
+//  A text entry is kind:'canvas' (so it flows through placement,
+//  the mockup compositing, the proof, and Save/Send unchanged)
+//  with an attached .textModel describing how to render it.
+// ============================================================
+const TEXT_FONT_GROUPS = [
+  { group: 'Athletic / Block', fonts: ['Anton', 'Bebas Neue', 'Oswald', 'Archivo Black', 'Alfa Slab One', 'Russo One', 'Staatliches', 'Graduate', 'Black Ops One', 'Bungee'] },
+  { group: 'Sans / Serif', fonts: ['Montserrat', 'Roboto Slab', 'Playfair Display', 'Merriweather'] },
+  { group: 'Script / Handwritten', fonts: ['Pacifico', 'Dancing Script', 'Great Vibes', 'Lobster', 'Satisfy', 'Caveat', 'Shadows Into Light'] },
+  { group: 'Fun / Display', fonts: ['Permanent Marker', 'Bangers', 'Fredoka'] }
+];
+const TEXT_RENDER_PX = 220;
+const _loadedTextFonts = new Set();
+
+function ensureTextFont(m) {
+  var fam = m.font || 'Anton';
+  var spec = (m.italic ? 'italic ' : '') + (m.weight || 700) + ' ' + TEXT_RENDER_PX + 'px "' + fam + '"';
+  if (_loadedTextFonts.has(spec)) return Promise.resolve();
+  if (!document.fonts || !document.fonts.load) return Promise.resolve();
+  return document.fonts.load(spec).then(function () { _loadedTextFonts.add(spec); }).catch(function () {});
+}
+function _txtCase(t, mode) {
+  if (mode === 'upper') return t.toUpperCase();
+  if (mode === 'lower') return t.toLowerCase();
+  if (mode === 'title') return t.replace(/\w\S*/g, function (w) { return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase(); });
+  return t;
+}
+function _txtFont(m) { return (m.italic ? 'italic ' : '') + (m.weight || 700) + ' ' + TEXT_RENDER_PX + 'px "' + (m.font || 'Anton') + '", sans-serif'; }
+
+function renderTextCanvas(model) {
+  var m = model || {};
+  var raw = (m.text != null ? String(m.text) : '') || ' ';
+  var text = _txtCase(raw, m.caseMode);
+  var s = {
+    fill: m.fill || '#1c2841',
+    strokeOn: !!m.strokeOn,
+    stroke: m.stroke || '#ffffff',
+    strokeW: m.strokeOn ? Math.max(0, +m.strokeW || 0) : 0,
+    tracking: +m.tracking || 0,
+    lineHeight: +m.lineHeight || 1.1,
+    align: m.align || 'center',
+    bend: Math.max(-1, Math.min(1, (+m.arc || 0) / 100))
+  };
+  var out = (Math.abs(s.bend) < 0.06)
+    ? _txtStraight(text, m, s)
+    : _txtArc(text.replace(/\n/g, ' '), m, s);
+  var rot = +m.rotation || 0;
+  if (rot) out = _txtRotate(out, rot);
+  try { return trimTransparentArtCanvas(out); } catch (e) { return out; }
+}
+function _txtStraight(text, m, s) {
+  var px = TEXT_RENDER_PX, lines = text.split('\n');
+  var meas = document.createElement('canvas').getContext('2d');
+  meas.font = _txtFont(m);
+  if ('letterSpacing' in meas) meas.letterSpacing = s.tracking + 'px';
+  var maxW = 1;
+  lines.forEach(function (ln) { var w = meas.measureText(ln || ' ').width; if (w > maxW) maxW = w; });
+  var lineH = px * s.lineHeight;
+  var pad = s.strokeW * 1.6 + px * 0.45;
+  var W = Math.ceil(maxW + 2 * pad), H = Math.ceil(lines.length * lineH + 2 * pad);
+  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var ctx = c.getContext('2d');
+  ctx.font = _txtFont(m);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = s.tracking + 'px';
+  ctx.textBaseline = 'middle'; ctx.lineJoin = 'round'; ctx.miterLimit = 2;
+  for (var i = 0; i < lines.length; i++) {
+    var ln = lines[i], x = W / 2; ctx.textAlign = 'center';
+    if (s.align === 'left') { x = pad; ctx.textAlign = 'left'; }
+    else if (s.align === 'right') { x = W - pad; ctx.textAlign = 'right'; }
+    var y = pad + lineH * (i + 0.5);
+    if (s.strokeOn && s.strokeW > 0) { ctx.strokeStyle = s.stroke; ctx.lineWidth = s.strokeW; ctx.strokeText(ln, x, y); }
+    ctx.fillStyle = s.fill; ctx.fillText(ln, x, y);
+  }
+  return c;
+}
+function _txtArc(text, m, s) {
+  var px = TEXT_RENDER_PX;
+  var meas = document.createElement('canvas').getContext('2d');
+  meas.font = _txtFont(m);
+  var chars = Array.from(text);
+  var widths = chars.map(function (ch) { return meas.measureText(ch).width + s.tracking; });
+  var total = Math.max(1, widths.reduce(function (a, b) { return a + b; }, 0));
+  var span = Math.abs(s.bend) * Math.PI, up = s.bend > 0;
+  var R = total / span;
+  var chordW = 2 * R * Math.sin(span / 2), sagitta = R * (1 - Math.cos(span / 2)), glyphH = px * 1.5;
+  var pad = s.strokeW * 1.6 + px * 0.3;
+  var W = Math.ceil(chordW + glyphH + 2 * pad), H = Math.ceil(sagitta + glyphH + 2 * pad);
+  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var ctx = c.getContext('2d');
+  ctx.font = _txtFont(m); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+  var cx = W / 2, cy = up ? (pad + glyphH / 2 + R) : (H - pad - glyphH / 2 - R), acc = 0;
+  for (var i = 0; i < chars.length; i++) {
+    var wq = widths[i], frac = (acc + wq / 2) / total, theta = (-span / 2 + frac * span);
+    var sx = cx + R * Math.sin(theta), sy = up ? (cy - R * Math.cos(theta)) : (cy + R * Math.cos(theta));
+    ctx.save(); ctx.translate(sx, sy); ctx.rotate(up ? theta : -theta);
+    if (s.strokeOn && s.strokeW > 0) { ctx.strokeStyle = s.stroke; ctx.lineWidth = s.strokeW; ctx.strokeText(chars[i], 0, 0); }
+    ctx.fillStyle = s.fill; ctx.fillText(chars[i], 0, 0);
+    ctx.restore(); acc += wq;
+  }
+  return c;
+}
+function _txtRotate(src, deg) {
+  var rad = deg * Math.PI / 180, sin = Math.abs(Math.sin(rad)), cos = Math.abs(Math.cos(rad));
+  var W = Math.ceil(src.width * cos + src.height * sin), H = Math.ceil(src.width * sin + src.height * cos);
+  var c = document.createElement('canvas'); c.width = W; c.height = H;
+  var ctx = c.getContext('2d');
+  ctx.translate(W / 2, H / 2); ctx.rotate(rad); ctx.drawImage(src, -src.width / 2, -src.height / 2);
+  return c;
+}
+
+function _defaultTextModel() {
+  return { text: 'YOUR TEXT', font: 'Anton', weight: 700, italic: false, fill: '#1c2841', strokeOn: false, stroke: '#ffffff', strokeW: 8, tracking: 0, lineHeight: 1.1, align: 'center', arc: 0, rotation: 0, caseMode: 'none' };
+}
+function addTextEntry() {
+  const model = _defaultTextModel();
+  const entry = {
+    id: nextId++, kind: 'canvas', ext: 'text', name: 'Text', size: 0,
+    status: 'ready', textModel: model, canvas: renderTextCanvas(model),
+    info: {}, view: { z: 1, tx: 0, ty: 0, fitted: false }
+  };
+  entries.push(entry);
+  addFileItem(entry); refreshFileItem(entry); makeThumb(entry, entry.canvas);
+  try { analyzeEntry(entry); } catch (e) { /* non-fatal */ }
+  $('dropzone').classList.add('hidden');
+  $('toolbar').classList.add('visible');
+  updateSidebarVisibility();
+  applyRecommendedPlacement(entry, 'Full Front', true);
+  entry._customerForceMock = true;
+  selectEntry(entry.id);
+  if (!entry.mockOn) toggleMockup(); else { rebuildMockup(entry); refreshStage(entry); renderInfo(entry); }
+  ensureTextFont(model).then(function () { applyTextEntry(entry); });
+  openTextPanel(entry);
+  updateEasyStatus('Editing text — type, then pick a font, color, and curve');
+}
+function applyTextEntry(entry) {
+  ensureTextFont(entry.textModel).then(function () {
+    entry.canvas = renderTextCanvas(entry.textModel);
+    entry._trimmedArt = null;
+    // Bump eraseN so mockFingerprint() changes — the text content changed even
+    // when placement didn't, so the cached mockup composite must be rebuilt.
+    entry.eraseN = (entry.eraseN || 0) + 1;
+    var first = (entry.textModel.text || '').split('\n')[0].slice(0, 22) || 'Text';
+    entry.name = 'Text: ' + first;
+    var fi = $('fitem-' + entry.id);
+    if (fi) { var el = fi.querySelector('.fname'); if (el) { el.textContent = entry.name; el.title = entry.name; } }
+    makeThumb(entry, entry.canvas);
+    if (entry.id === activeId) redrawDesignerEntry(entry);
+    try { maybeWarnLowContrast(entry); } catch (e) {}
+  });
+}
+function txtActiveEntry() { const e = current(); return (e && e.textModel) ? e : null; }
+function txtSet(field, value) { const e = txtActiveEntry(); if (!e) return; e.textModel[field] = value; applyTextEntry(e); syncTextPanelControls(e); }
+
+function deleteTextEntry() {
+  const e = txtActiveEntry(); if (!e) return;
+  const idx = entries.findIndex(x => x.id === e.id);
+  if (idx > -1) entries.splice(idx, 1);
+  const fi = $('fitem-' + e.id); if (fi) fi.remove();
+  closeTextPanel();
+  updateSidebarVisibility();
+  const next = entries[entries.length - 1];
+  if (next) { selectEntry(next.id); if (next.mockOn || next._customerForceMock) rebuildMockup(next); refreshStage(next); }
+  else { $('dropzone').classList.remove('hidden'); $('toolbar').classList.remove('visible'); holder.innerHTML = ''; activeId = null; }
+  showToast('Text removed');
+}
+
+// ── Text editor panel ─────────────────────────────────────────────────────
+function openTextPanel(entry) {
+  const p = $('textPanel'); if (!p) return;
+  p.classList.add('open');
+  syncTextPanelControls(entry);
+  const ta = $('txt-text'); if (ta) { ta.focus(); ta.select(); }
+}
+function closeTextPanel() { const p = $('textPanel'); if (p) p.classList.remove('open'); }
+function syncTextPanel(entry) {
+  if (entry && entry.textModel) openTextPanel(entry); else closeTextPanel();
+}
+function _segActive(sel, attr, val) {
+  document.querySelectorAll(sel).forEach(function (b) { b.classList.toggle('on', b.getAttribute(attr) === val); });
+}
+function syncTextPanelControls(e) {
+  if (!e || !e.textModel) return;
+  const m = e.textModel, set = function (id, v) { const el = $(id); if (el) el.value = v; };
+  set('txt-text', m.text);
+  set('txt-font', m.font);
+  set('txt-fill', m.fill);
+  set('txt-stroke', m.stroke);
+  set('txt-strokeW', m.strokeW);
+  set('txt-tracking', m.tracking);
+  set('txt-lh', m.lineHeight);
+  set('txt-arc', m.arc);
+  set('txt-rot', m.rotation);
+  const so = $('txt-stroke-on'); if (so) so.checked = !!m.strokeOn;
+  const bold = $('txt-bold'); if (bold) bold.classList.toggle('on', (m.weight || 700) >= 700);
+  const ital = $('txt-italic'); if (ital) ital.classList.toggle('on', !!m.italic);
+  _segActive('.tp-seg-btn[data-align]', 'data-align', m.align || 'center');
+  _segActive('.tp-seg-btn[data-case]', 'data-case', m.caseMode || 'none');
+  const lab = function (id, v) { const el = $(id); if (el) el.textContent = v; };
+  lab('txt-tracking-v', m.tracking);
+  lab('txt-lh-v', (+m.lineHeight).toFixed(2));
+  lab('txt-arc-v', m.arc);
+  lab('txt-rot-v', m.rotation + '°');
+  const fontSel = $('txt-font'); if (fontSel) fontSel.style.fontFamily = '"' + m.font + '"';
+}
+
+(function wireTextTool() {
+  // populate font select
+  const sel = $('txt-font');
+  if (sel) {
+    TEXT_FONT_GROUPS.forEach(function (g) {
+      const og = document.createElement('optgroup'); og.label = g.group;
+      g.fonts.forEach(function (f) {
+        const o = document.createElement('option'); o.value = f; o.textContent = f; o.style.fontFamily = '"' + f + '"';
+        og.appendChild(o);
+      });
+      sel.appendChild(og);
+    });
+  }
+  const on = function (id, ev, fn) { const el = $(id); if (el) el.addEventListener(ev, fn); };
+  on('addTextBtn', 'click', addTextEntry);
+  on('txt-text', 'input', function () { txtSet('text', this.value); });
+  on('txt-font', 'change', function () { txtSet('font', this.value); });
+  on('txt-fill', 'input', function () { txtSet('fill', this.value); });
+  on('txt-stroke', 'input', function () { txtSet('stroke', this.value); });
+  on('txt-stroke-on', 'change', function () { txtSet('strokeOn', this.checked); });
+  on('txt-strokeW', 'input', function () { txtSet('strokeW', +this.value); });
+  on('txt-tracking', 'input', function () { txtSet('tracking', +this.value); });
+  on('txt-lh', 'input', function () { txtSet('lineHeight', +this.value); });
+  on('txt-arc', 'input', function () { txtSet('arc', +this.value); });
+  on('txt-rot', 'input', function () { txtSet('rotation', +this.value); });
+  on('txt-bold', 'click', function () { const e = txtActiveEntry(); if (e) txtSet('weight', (e.textModel.weight >= 700) ? 400 : 700); });
+  on('txt-italic', 'click', function () { const e = txtActiveEntry(); if (e) txtSet('italic', !e.textModel.italic); });
+  document.querySelectorAll('.tp-seg-btn[data-align]').forEach(function (b) { b.addEventListener('click', function () { txtSet('align', b.getAttribute('data-align')); }); });
+  document.querySelectorAll('.tp-seg-btn[data-case]').forEach(function (b) { b.addEventListener('click', function () { txtSet('caseMode', b.getAttribute('data-case')); }); });
+  on('tpClose', 'click', closeTextPanel);
+  on('tpDone', 'click', closeTextPanel);
+  on('tpDelete', 'click', deleteTextEntry);
 })();
 
 // Load the embedded shirt right away so the landing preview appears instantly
