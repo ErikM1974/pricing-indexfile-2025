@@ -384,6 +384,71 @@
     outline-offset: 2px;
     border-radius: 6px;
   }
+  /* Phase 2 — Send to Steve / Send to Customer toolbar buttons */
+  .easy-main-btn.send-steve {
+    background: #4f46e5; color: #fff; border-color: #4f46e5;
+  }
+  .easy-main-btn.send-steve:hover { background: #4338ca; border-color: #4338ca; }
+  .easy-main-btn.send-customer {
+    background: #2563eb; color: #fff; border-color: #2563eb;
+  }
+  .easy-main-btn.send-customer:hover { background: #1d4ed8; border-color: #1d4ed8; }
+
+  /* Phase 2 — designer modals (Send to Steve form host + Send to Customer email) */
+  .ds-modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(15, 25, 10, .55);
+    z-index: 1000;
+    align-items: flex-start; justify-content: center;
+    padding: 28px 16px; overflow-y: auto;
+  }
+  .ds-modal-overlay.open { display: flex; }
+  .ds-modal-card {
+    background: #fff; border-radius: 14px;
+    box-shadow: 0 18px 60px rgba(10, 20, 8, .35);
+    width: 100%; max-width: 460px; margin: auto;
+    display: flex; flex-direction: column;
+  }
+  .ds-modal-card.ds-modal-wide { max-width: 940px; }
+  .ds-modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .ds-modal-head h3 { margin: 0; font-size: 16px; color: var(--text); }
+  .ds-modal-close {
+    border: none; background: none; font-size: 26px; line-height: 1;
+    color: var(--text-dim); cursor: pointer; padding: 0 4px;
+  }
+  .ds-modal-close:hover { color: var(--text); }
+  .ds-modal-intro { padding: 12px 20px 0; font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+  .ds-modal-body { padding: 16px 20px; }
+  .ds-modal-wide .ds-modal-body { max-height: 72vh; overflow-y: auto; }
+  .ds-modal-foot {
+    display: flex; justify-content: flex-end; gap: 10px;
+    padding: 14px 20px; border-top: 1px solid var(--border);
+  }
+  .ds-field { margin-bottom: 14px; }
+  .ds-field label { display: block; font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 5px; }
+  .ds-req { color: #c8102e; }
+  .ds-field input, .ds-field textarea {
+    width: 100%; box-sizing: border-box;
+    border: 1px solid var(--border); border-radius: 9px;
+    padding: 9px 11px; font-size: 13px; font-family: inherit; color: var(--text);
+  }
+  .ds-field textarea { resize: vertical; }
+  .ds-modal-note { font-size: 12px; color: var(--text-dim); line-height: 1.5; margin-top: 4px; }
+  .ds-btn-ghost {
+    border: 1px solid var(--border); background: #fff; color: var(--text);
+    border-radius: 9px; padding: 9px 16px; font-size: 13px; font-weight: 800; cursor: pointer;
+  }
+  .ds-btn-ghost:hover { background: var(--brand-light); }
+  .ds-btn-primary {
+    border: 1px solid #2563eb; background: #2563eb; color: #fff;
+    border-radius: 9px; padding: 9px 18px; font-size: 13px; font-weight: 800; cursor: pointer;
+  }
+  .ds-btn-primary:hover { background: #1d4ed8; }
+  .ds-btn-primary:disabled, .ds-btn-ghost:disabled { opacity: .6; cursor: default; }
   #canvasHolder canvas, #canvasHolder img { display: block; }
 
   /* Drop zone / empty state */

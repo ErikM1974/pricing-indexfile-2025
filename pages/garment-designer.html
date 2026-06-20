@@ -19,7 +19,8 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.2">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.4">
+<link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.06.20.3">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
 
@@ -68,6 +69,8 @@
       </select>
       <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
       <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
+      <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
+      <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
       <div id="contrastWarn" class="contrast-warn" role="alert" style="display:none;"></div>
       <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
 
@@ -316,10 +319,64 @@
 
 <div id="specSheet"></div>
 
+<!-- Send to Steve — full art-submission form, pre-filled from the mockup -->
+<div id="steveModal" class="ds-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="steveModalTitle">
+  <div class="ds-modal-card ds-modal-wide">
+    <div class="ds-modal-head">
+      <h3 id="steveModalTitle">🧵 Send to Steve — complete the art request</h3>
+      <button type="button" class="ds-modal-close" id="steveModalClose" aria-label="Close">×</button>
+    </div>
+    <div class="ds-modal-intro">Your cleaned mockup is attached. Confirm the company, contact, and the checklist, then submit — Steve gets everything pre-filled.</div>
+    <div class="ds-modal-body"><div id="steveFormMount"></div></div>
+  </div>
+</div>
+
+<!-- Send to Customer — collect the email + message, then send the approval link -->
+<div id="custModal" class="ds-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="custModalTitle">
+  <div class="ds-modal-card">
+    <div class="ds-modal-head">
+      <h3 id="custModalTitle">📧 Send mockup to customer</h3>
+      <button type="button" class="ds-modal-close" id="custModalClose" aria-label="Close">×</button>
+    </div>
+    <div class="ds-modal-body">
+      <div class="ds-field" id="custCompanyField" style="display:none;">
+        <label for="custCompany">Company <span class="ds-req">*</span></label>
+        <input type="text" id="custCompany" placeholder="Company name">
+      </div>
+      <div class="ds-field">
+        <label for="custEmail">Customer email <span class="ds-req">*</span></label>
+        <input type="email" id="custEmail" placeholder="customer@example.com" autocomplete="off">
+      </div>
+      <div class="ds-field">
+        <label for="custName">Customer name</label>
+        <input type="text" id="custName" placeholder="First Last">
+      </div>
+      <div class="ds-field">
+        <label for="custMessage">Message</label>
+        <textarea id="custMessage" rows="4">Here is your mockup for review. Please click the link to approve it or request changes. Let me know if you have any questions.</textarea>
+      </div>
+      <div class="ds-modal-note" id="custModalNote"></div>
+    </div>
+    <div class="ds-modal-foot">
+      <button type="button" class="ds-btn-ghost" id="custModalCancel">Cancel</button>
+      <button type="button" class="ds-btn-primary" id="custModalSend">Send to customer</button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
 <input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
 
 <script src="/config/app.config.js"></script>
-<script src="/pages/js/garment-designer.js?v=2026.06.20.2"></script>
+<!-- Send-to-Customer email + Send-to-Steve art form (mirrors the AE dashboard mount) -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="/shared_components/js/customer-lookup-service.js"></script>
+<script src="/shared_components/js/company-contact-picker.js?v=2"></script>
+<script src="/shared_components/js/nwca-date-utils.js?v=1"></script>
+<script src="/shared_components/js/design-name-picker.js?v=3"></script>
+<script src="/shared_components/js/work-order-picker.js?v=1"></script>
+<script src="/shared_components/js/staff-auth-helper.js"></script>
+<script src="/shared_components/js/garment-submit-form.js?v=2026.06.20.4"></script>
+<script src="/pages/js/garment-designer.js?v=2026.06.20.4"></script>
 </body>
 </html>

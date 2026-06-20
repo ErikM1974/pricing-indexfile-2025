@@ -142,13 +142,59 @@ var GarmentSubmitForm = (function () {
     var garmentRows = [];
     // Artwork locations: { placement, width, height, notes }
     var artworkLocations = [];
+    // Optional callback fired with the new designId after a successful submit
+    // (used by the Shirt Designer's "Send to Steve" → then "Send to Customer").
+    var onSubmittedCb = null;
 
     // ── Init ───────────────────────────────────────────────────────────────
-    function init(containerIdParam) {
+    // init(containerId) — original signature, unchanged behavior.
+    // init(containerId, { prefill, onSubmitted }) — opens the form pre-filled
+    //   (e.g. from the Shirt Designer) and calls onSubmitted(designId, company)
+    //   after a successful create. prefill fields are all optional:
+    //   { company, contactName, contactEmail, decoration, colorMode, threadColors,
+    //     exactText, notes, artworkStatus, fileType, garmentStyle, garmentColor,
+    //     locations:[{placement,width}], files:[File] }.
+    function init(containerIdParam, opts) {
+        opts = opts || {};
         containerId = containerIdParam;
+        onSubmittedCb = (typeof opts.onSubmitted === 'function') ? opts.onSubmitted : null;
+        referenceFiles = [];                       // always start with no files
+        var pf = opts.prefill || null;
         garmentRows = [newGarmentRow()];
         artworkLocations = [newLocation()];
+        if (pf && pf.garmentStyle) garmentRows[0].style = pf.garmentStyle;
+        if (pf && pf.garmentColor) garmentRows[0].colorName = pf.garmentColor;
+        if (pf && Array.isArray(pf.locations) && pf.locations.length) {
+            artworkLocations = pf.locations.map(function (l) {
+                return { placement: l.placement || '', width: (l.width != null && l.width !== '') ? String(l.width) : '', height: '', notes: '' };
+            });
+        }
         renderForm();
+        if (pf) applyPrefill(pf);
+    }
+
+    // Seed DOM-level fields after the form is rendered (selects, checkboxes,
+    // the attached mockup file). Garment rows + locations are seeded in init
+    // before renderForm so they render directly.
+    function applyPrefill(pf) {
+        function set(id, val) { var el = document.getElementById(id); if (el && val != null && val !== '') el.value = val; }
+        set('gsf-company', pf.company);
+        set('gsf-contact-name', pf.contactName);
+        set('gsf-contact-email', pf.contactEmail);
+        set('gsf-artwork-status', pf.artworkStatus);
+        set('gsf-color-mode', pf.colorMode);
+        set('gsf-thread', pf.threadColors);
+        set('gsf-exact-text', pf.exactText);
+        set('gsf-notes', pf.notes);
+        set('gsf-file-type', pf.fileType);
+        if (pf.decoration) {
+            document.querySelectorAll('.gsf-decoration').forEach(function (cb) {
+                if (cb.value === pf.decoration) cb.checked = true;
+            });
+        }
+        if (Array.isArray(pf.files) && pf.files.length) addReferenceFiles(pf.files);
+        // Re-run the adaptive sections in case a seeded status/approval changed them.
+        try { applyArtworkStatusAdaptive(); applyApprovalAdaptive(); applyPatchVisibility(); } catch (e) { /* non-fatal */ }
     }
 
     function newGarmentRow() {
@@ -1221,6 +1267,7 @@ var GarmentSubmitForm = (function () {
                 statusEl.textContent = 'Notifying Steve...';
                 sendNotificationEmails(designId, companyName, aeName, aeEmail, salesRep, salesRepEmail);
                 showSuccess(designId, companyName);
+                if (onSubmittedCb) { try { onSubmittedCb(designId, companyName); } catch (e) { /* non-fatal */ } }
             })
             .catch(function (err) {
                 console.error('[GarmentSubmitForm] Submit error:', err);

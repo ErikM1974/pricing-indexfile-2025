@@ -5371,6 +5371,218 @@ async function saveToArtRequest() {
   }
 }
 
+// ============================================================
+//  Phase 2 — Send to Customer + Send to Steve
+//  Two toolbar actions that connect the designer to NWCA's existing
+//  customer-approval email (template_customer_mockup) and Steve's
+//  art-submission form (GarmentSubmitForm). The rep mockup stays a
+//  REFERENCE — Steve still produces the final production proof.
+// ============================================================
+const EMAILJS_SERVICE_ID = 'service_jgrave3';
+const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+const SITE_ORIGIN = 'https://www.teamnwca.com';
+
+function dsModalOpen(id) { const m = document.getElementById(id); if (m) m.classList.add('open'); }
+function dsModalClose(id) { const m = document.getElementById(id); if (m) m.classList.remove('open'); }
+
+// Both send actions need a built mockup. Returns the active entry or null (+toast).
+function requireMockup() {
+  const e = current();
+  if (!e || e.status !== 'ready' || !e.mockOn || !e.mockCanvas) {
+    showToast('Add artwork and build a mockup first');
+    return null;
+  }
+  return e;
+}
+
+// Render the active mockup to a clean PNG Blob (no selection chrome).
+function cleanMockBlob(e) {
+  const clean = getCleanMock(e);
+  return new Promise((res, rej) => {
+    try { clean.toBlob(b => b ? res(b) : rej(new Error('Could not render mockup')), 'image/png'); }
+    catch (err) { rej(err); }
+  });
+}
+
+// Upload the clean mockup PNG and return its displayable URL + keys.
+async function uploadCleanMockup(e, namePrefix) {
+  const blob = await cleanMockBlob(e);
+  const fileName = (namePrefix || 'designer-mockup') + '-' + Date.now() + '.png';
+  const fd = new FormData();
+  fd.append('file', blob, fileName);
+  const resp = await fetch(ART_PROXY_BASE + '/api/files/upload', { method: 'POST', body: fd });
+  const up = await resp.json().catch(() => ({}));
+  if (!resp.ok || !up.success || !up.externalKey) {
+    throw new Error(up.error || ('Upload failed (' + resp.status + ')'));
+  }
+  // GET /api/files/:externalKey streams the image directly (no CDN formula).
+  return { imageUrl: ART_PROXY_BASE + '/api/files/' + up.externalKey, externalKey: up.externalKey, fileName: up.fileName || fileName };
+}
+
+// ── Send to Steve — open the art-submission form pre-filled ────────────────
+function buildStevePrefill(e) {
+  const seed = window.__artRequestSeed || {};
+  let locs;
+  try {
+    const ents = (typeof mockEntries === 'function' ? mockEntries() : null);
+    const list = (ents && ents.length) ? ents : [e];
+    locs = list.map(x => ({
+      placement: x.printLoc || (sideOf(x) === 'back' ? 'Full Back' : 'Full Front'),
+      width: x.printW || ''
+    }));
+  } catch (_) { locs = [{ placement: e.printLoc || 'Full Front', width: e.printW || '' }]; }
+
+  const isDst = e.kind === 'dst';
+  let threadColors = '';
+  try { if (isDst && typeof dstThreadColorsOnly === 'function') threadColors = dstThreadColorsOnly(e) || ''; } catch (_) {}
+  const garmentColorName = (typeof currentGarmentName !== 'undefined' ? currentGarmentName : '') || seed.garmentName || '';
+
+  const notes = ['Mockup built in the NWCA Shirt Designer (cleaned art attached).'];
+  if (garmentColorName) notes.push('Mockup shirt color shown: ' + garmentColorName + '.');
+  notes.push('Shown on a PC61 crew tee for placement reference.');
+
+  return {
+    company: seed.company || '',
+    decoration: isDst ? 'Embroidery' : '',
+    threadColors: threadColors,
+    exactText: '',
+    notes: notes.join(' '),
+    artworkStatus: 'Mockup only',
+    fileType: 'Customer raster file (PNG / JPG)',
+    locations: locs,
+    garmentColor: garmentColorName
+  };
+}
+
+async function openSendToSteve() {
+  const e = requireMockup();
+  if (!e) return;
+  if (typeof GarmentSubmitForm === 'undefined') { showToast('Art form failed to load — refresh and try again'); return; }
+  const btn = document.getElementById('sendSteveBtn');
+  const orig = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Preparing…'; }
+  try {
+    const prefill = buildStevePrefill(e);
+    const blob = await cleanMockBlob(e);
+    prefill.files = [new File([blob], 'designer-mockup-' + Date.now() + '.png', { type: 'image/png' })];
+    GarmentSubmitForm.init('steveFormMount', {
+      prefill: prefill,
+      onSubmitted: function (designId) {
+        if (designId) {
+          window.__artRequestSeed = window.__artRequestSeed || {};
+          window.__artRequestSeed.designId = String(designId);
+        }
+        showToast(designId ? ('✓ Sent to Steve — request #' + designId + ' created. You can now Send to Customer.') : '✓ Sent to Steve');
+        setTimeout(() => dsModalClose('steveModal'), 1400);
+      }
+    });
+    dsModalOpen('steveModal');
+  } catch (err) {
+    console.error('[openSendToSteve]', err);
+    showToast('Could not open the art form: ' + (err && err.message ? err.message : 'unknown error'));
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+  }
+}
+
+// ── Send to Customer — email the mockup + a self-service approval link ──────
+function openSendToCustomer() {
+  const e = requireMockup();
+  if (!e) return;
+  const seed = window.__artRequestSeed || {};
+  // The approval link points at an art request, so one must exist first.
+  if (!seed.designId) {
+    showToast('Create the request first with “Send to Steve”, then send to the customer',
+      { label: 'Send to Steve', fn: openSendToSteve });
+    return;
+  }
+  const note = document.getElementById('custModalNote');
+  if (note) note.textContent = 'Emails an approve / request-changes link for request #' + seed.designId + '. Steve still produces the final production proof.';
+  const emailEl = document.getElementById('custEmail');
+  if (emailEl && !emailEl.value && seed.contactEmail) emailEl.value = seed.contactEmail;
+  dsModalOpen('custModal');
+  if (emailEl) emailEl.focus();
+}
+
+async function doSendToCustomer() {
+  const e = requireMockup();
+  if (!e) return;
+  const seed = window.__artRequestSeed || {};
+  const designId = seed.designId;
+  if (!designId) { showToast('No art request to send'); dsModalClose('custModal'); return; }
+
+  const emailEl = document.getElementById('custEmail');
+  const nameEl = document.getElementById('custName');
+  const msgEl = document.getElementById('custMessage');
+  const toEmail = ((emailEl && emailEl.value) || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) { showToast('Enter a valid customer email'); if (emailEl) emailEl.focus(); return; }
+  if (typeof emailjs === 'undefined') { showToast('Email service not loaded — refresh and try again'); return; }
+
+  const sendBtn = document.getElementById('custModalSend');
+  const orig = sendBtn ? sendBtn.textContent : '';
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; }
+  try {
+    // 1. Upload the current mockup + pin it as the request's Rep_Mockup reference.
+    const up = await uploadCleanMockup(e, 'rep-mockup-' + designId);
+    fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/fields', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Rep_Mockup: up.imageUrl })
+    }).catch(() => { /* best-effort; the email still carries the URL */ });
+
+    // 2. Email the customer the mockup + a self-service approval link.
+    emailjs.init(EMAILJS_PUBLIC_KEY);
+    const repName = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('nwca_user_name')) || 'Northwest Custom Apparel';
+    const repEmail = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('nwca_user_email')) || 'sales@nwcustomapparel.com';
+    await emailjs.send(EMAILJS_SERVICE_ID, 'template_customer_mockup', {
+      to_email: toEmail,
+      to_name: ((nameEl && nameEl.value) || '').trim() || 'Valued Customer',
+      company_name: seed.company || '',
+      design_number: designId,
+      message: ((msgEl && msgEl.value) || '').trim(),
+      mockup_url: up.imageUrl,
+      approval_url: SITE_ORIGIN + '/art-request/' + designId + '?view=customer',
+      from_name: repName,
+      rep_email: repEmail,
+      rep_phone: '253-922-5793'
+    });
+
+    // 3. Audit note + back-fill the contact email (both fire-and-forget).
+    fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/note', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ noteType: 'Customer Share', noteText: 'Mockup shared with customer: ' + toEmail + ' (via Shirt Designer)', noteBy: repEmail })
+    }).catch(() => {});
+    fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/fields', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ Email_Contact: toEmail })
+    }).catch(() => {});
+
+    dsModalClose('custModal');
+    showToast('✓ Mockup sent to ' + toEmail);
+    try { if (window.opener && !window.opener.closed) window.opener.postMessage({ type: 'rep-mockup-saved', designId: designId }, location.origin); } catch (_) {}
+  } catch (err) {
+    console.error('[doSendToCustomer]', err);
+    showToast('Send failed: ' + (err && err.message ? err.message : 'unknown error'));
+  } finally {
+    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = orig; }
+  }
+}
+
+// Wire the new buttons + modals (addEventListener, not inline onclick).
+(function wireSendActions() {
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  on('sendSteveBtn', openSendToSteve);
+  on('sendCustomerBtn', openSendToCustomer);
+  on('steveModalClose', () => dsModalClose('steveModal'));
+  on('custModalClose', () => dsModalClose('custModal'));
+  on('custModalCancel', () => dsModalClose('custModal'));
+  on('custModalSend', doSendToCustomer);
+  ['steveModal', 'custModal'].forEach(id => {
+    const m = document.getElementById(id);
+    if (m) m.addEventListener('click', (ev) => { if (ev.target === m) dsModalClose(id); });
+  });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') { dsModalClose('steveModal'); dsModalClose('custModal'); } });
+})();
+
 // Load the embedded shirt right away so the landing preview appears instantly
 initPhotoMock();
 applyUrlPreseed();
