@@ -19,24 +19,16 @@
     var API = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 
     // Per-method size ladders. Price keys on these.
-    var METHODS = {
-        dtf: {
-            label: 'DTF',
-            sizes: [
-                { key: 'small', label: 'Small', band: '≤ 5×5"' },
-                { key: 'medium', label: 'Medium', band: '≤ 9×12"' },
-                { key: 'large', label: 'Large', band: '≤ 12×16.5"' }
-            ]
-        },
-        dtg: {
-            label: 'DTG',
-            sizes: [
-                { key: 'small', label: 'Small', band: '~4×4" (left chest)' },
-                { key: 'large', label: 'Large', band: '~12×16" (full)' },
-                { key: 'jumbo', label: 'Jumbo', band: '~14×18"' }
-            ]
-        }
-    };
+    var METHODS = { dtf: { label: 'DTF' }, dtg: { label: 'DTG' } };
+    // ONE shared size ladder. Small + Large are the same size in both methods; Medium is
+    // DTF-only (DTG has no 9×12 rate) and Jumbo is DTG-only (DTF's biggest transfer is 12×16.5").
+    // `dtf`/`dtg` hold each method's dimension band, or null when that method can't do that size.
+    var SIZE_LADDER = [
+        { key: 'small',  label: 'Small',  dtf: '≤ 5×5"',     dtg: '4×4" · left chest' },
+        { key: 'medium', label: 'Medium', dtf: '≤ 9×12"',    dtg: null },
+        { key: 'large',  label: 'Large',  dtf: '≤ 12×16.5"', dtg: '12×16" · full' },
+        { key: 'jumbo',  label: 'Jumbo',  dtf: null,         dtg: '16×20"' }
+    ];
     // DTG size → DTG_Costs PrintLocationCode (front/back identical, so one each).
     var DTG_SIZE_CODE = { small: 'LC', large: 'FF', jumbo: 'JF' };
 
@@ -75,19 +67,20 @@
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
-    function sizesNow() { return METHODS[state.method].sizes; }
-    function sizeMeta(key) { return sizesNow().find(function (s) { return s.key === key; }) || sizesNow()[0]; }
+    function bandFor(key) { var s = SIZE_LADDER.find(function (x) { return x.key === key; }); return s ? s[state.method] : null; }
+    function available(key) { return !!bandFor(key); }
+    function sizeMeta(key) { return SIZE_LADDER.find(function (x) { return x.key === key; }) || SIZE_LADDER[0]; }
+    function onlyMethodLabel(s) { if (s.dtf && !s.dtg) return 'DTF'; if (s.dtg && !s.dtf) return 'DTG'; return null; }
     function baseGarment(sizes) {
         var prices = (sizes || []).map(function (x) { return Number(x.price) || 0; }).filter(function (p) { return p > 0; });
         return prices.length ? Math.min.apply(null, prices) : 0; // base (S–XL); 2XL+ carry upcharges
     }
     // Map a size to one valid for the current method (medium↔large, jumbo↔large).
     function clampSize(key) {
-        var valid = sizesNow().map(function (s) { return s.key; });
-        if (valid.indexOf(key) >= 0) return key;
-        if (key === 'medium') return valid.indexOf('large') >= 0 ? 'large' : valid[0];
-        if (key === 'jumbo') return valid.indexOf('large') >= 0 ? 'large' : valid[0];
-        return valid[0];
+        if (available(key)) return key;
+        if ((key === 'medium' || key === 'jumbo') && available('large')) return 'large'; // nearest available
+        var first = SIZE_LADDER.find(function (s) { return available(s.key); });
+        return first ? first.key : 'small';
     }
 
     // ---------- DTF pricing (live engine code) ----------
@@ -156,8 +149,10 @@
     function renderPrints() {
         var box = $('printsList');
         box.innerHTML = state.prints.map(function (p, i) {
-            var sizeOpts = sizesNow().map(function (s) {
-                return '<option value="' + s.key + '"' + (s.key === p.size ? ' selected' : '') + '>' + esc(s.label + ' (' + s.band + ')') + '</option>';
+            var sizeOpts = SIZE_LADDER.map(function (s) {
+                var band = s[state.method], avail = !!band;
+                var lbl = avail ? (s.label + ' (' + band + ')') : (s.label + ' — ' + onlyMethodLabel(s) + ' only');
+                return '<option value="' + s.key + '"' + (s.key === p.size ? ' selected' : '') + (avail ? '' : ' disabled') + '>' + esc(lbl) + '</option>';
             }).join('');
             var posOpts = POSITIONS.map(function (o) {
                 return '<option value="' + esc(o.value) + '"' + (o.value === p.position ? ' selected' : '') + '>' + esc(o.value) + '</option>';
@@ -187,7 +182,7 @@
         state.prints.forEach(function (p, i) {
             var m = sizeMeta(p.size);
             rows += '<div class="proto-bd-row"><span>Print ' + (i + 1) + ' &middot; ' + esc(m.label)
-                + ' <span class="proto-band">' + esc(m.band) + '</span> &middot; ' + esc(p.position) + '</span>'
+                + ' <span class="proto-band">' + esc(bandFor(p.size) || '') + '</span> &middot; ' + esc(p.position) + '</span>'
                 + '<span>+' + fmt(printCost(p.size)) + '/pc</span></div>';
         });
         if (res.ltmPerUnit > 0) {
