@@ -831,11 +831,27 @@
                 + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</button>';
         }
 
+        // Per-piece breakdown: garment + main logo, then each extra (additional logos / stitch
+        // surcharge) on its own line — so the AE sees what the 2nd logo adds. EMBROIDERY only
+        // (print methods return no serviceLines; their back location is baked into the base).
+        var breakdownHtml = '';
+        if (s.serviceLines && s.serviceLines.length) {
+            var svcSum = s.serviceLines.reduce(function (a, sl) { return a + (Number(sl.unitPrice) || 0); }, 0);
+            var baseUnit = r2((s.perPiece || 0) - svcSum);
+            var bdRows = ['<div class="qq-bd-row"><span>' + (state.product.isCap ? 'Cap' : 'Garment') + ' + main logo</span><span>' + fmt(baseUnit) + '/' + unitWord + '</span></div>'];
+            s.serviceLines.forEach(function (sl) {
+                var lbl = String(sl.label || '').replace(/^AL[\s-]+/i, ''); // "AL Additional Logo" → "Additional Logo"
+                bdRows.push('<div class="qq-bd-row"><span>+ ' + esc(lbl) + '</span><span>+' + fmt(Number(sl.unitPrice) || 0) + '/' + unitWord + '</span></div>');
+            });
+            breakdownHtml = '<div class="qq-card-breakdown">' + bdRows.join('') + '</div>';
+        }
+
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
             + '<div class="qq-card-price"><div class="qq-card-pp">' + fmt(s.perPiece) + '<span class="per">/' + unitWord + '</span></div>'
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>best value</span>' : '') + '</div></div></div>'
             + configChips(id)
+            + breakdownHtml
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
