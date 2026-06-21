@@ -1,0 +1,82 @@
+/*
+ * DTF Prints prototype — layers on top of quick-quote.css (reuses its tokens:
+ * --qq-green, --qq-ink, --qq-muted, --qq-line, --qq-card, --qq-bg, --qq-warn-*).
+ * Only the prints-list rows + result breakdown are new here.
+ */
+
+.proto-banner {
+    margin: 0 0 18px;
+    padding: 10px 14px;
+    background: #f3f8f3;
+    border: 1px solid var(--qq-line);
+    border-left: 3px solid var(--qq-green);
+    border-radius: 9px;
+    font-size: 13px;
+    color: #3c5a3c;
+    line-height: 1.5;
+}
+
+/* ---- prints list ---- */
+.proto-prints { margin-top: 18px; }
+.proto-prints > label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
+.proto-prints .muted { font-weight: 400; color: var(--qq-muted); }
+
+.proto-print-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--qq-line);
+}
+.proto-print-n {
+    flex: 0 0 auto;
+    width: 22px; height: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--qq-green); color: #fff;
+    border-radius: 50%;
+    font-size: 12px; font-weight: 600;
+}
+.proto-print-at { flex: 0 0 auto; color: var(--qq-muted); font-size: 13px; }
+.proto-print-size { flex: 0 0 auto; min-width: 150px; }
+.proto-print-pos { flex: 1 1 auto; min-width: 110px; }
+.proto-print-size, .proto-print-pos { padding: 7px 9px; font-size: 13px; }
+.proto-print-cost {
+    flex: 0 0 auto;
+    min-width: 78px; text-align: right;
+    font-family: "Geist Mono", monospace; font-size: 13px;
+    color: var(--qq-ink, #1a1d1a);
+}
+.proto-print-x {
+    flex: 0 0 auto;
+    width: 26px; height: 26px;
+    border: 1px solid var(--qq-line); background: #fff;
+    border-radius: 7px; cursor: pointer;
+    color: var(--qq-muted); font-size: 17px; line-height: 1;
+    transition: background .12s, color .12s, border-color .12s;
+}
+.proto-print-x:hover { background: #fdecec; color: #c0392b; border-color: #e7b7b1; }
+.proto-empty { color: var(--qq-muted); font-size: 13px; padding: 8px 0; }
+
+#addPrint { margin-top: 10px; }
+
+/* ---- result ---- */
+.proto-result { padding-top: 4px; }
+.proto-muted { color: var(--qq-muted); font-size: 14px; }
+
+.proto-headline {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap;
+    padding-bottom: 12px; margin-bottom: 12px;
+    border-bottom: 1px solid var(--qq-line);
+}
+.proto-pp { font-size: 30px; font-weight: 700; color: var(--qq-ink, #1a1d1a); letter-spacing: -.5px; }
+.proto-pp .per { font-size: 15px; font-weight: 500; color: var(--qq-muted); margin-left: 2px; }
+.proto-order { font-size: 14px; color: var(--qq-muted); font-family: "Geist Mono", monospace; }
+
+.proto-bd { display: flex; flex-direction: column; gap: 5px; }
+.proto-bd-row { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--qq-muted); }
+.proto-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, #1a1d1a); white-space: nowrap; }
+.proto-bd-row .proto-band { color: var(--qq-muted); font-size: 11px; font-family: "Geist Mono", monospace; }
+.proto-ltm span:last-child { color: #7a541a; }
+
+.proto-round { margin: 12px 0 0; font-size: 11.5px; color: var(--qq-muted); }
