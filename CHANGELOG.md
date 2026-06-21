@@ -1,3 +1,7 @@
+## v2026.06.21.6 (2026.06.21)
+
+- Prints prototype: ONE shared size ladder (Small/Medium/Large/Jumbo) across DTF+DTG — Medium=DTF-only, Jumbo=DTG-only flagged + disabled; method-neutral footer
+
 ## v2026.06.21.5 (2026.06.21)
 
 - Prints prototype: add DTG (size-based, Small/Large/Jumbo) — method toggle; DTG replica verified penny-match vs server canonical pricer
