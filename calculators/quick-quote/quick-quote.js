@@ -100,6 +100,23 @@
     }
     function scpLocCount() { return (state.front ? 1 : 0) + (state.back ? 1 : 0); }
 
+    // Print breakdown helpers: the back/sleeve location is priced INTO the per-piece base (no
+    // service line), so we derive its cost by re-pricing the FRONT only and showing the difference.
+    // printAddlLabel returns the additional-location label, or null when there's nothing to split.
+    function printAddlLabel(id) {
+        if ((id !== 'dtg' && id !== 'scp' && id !== 'dtf') || !state.front) return null;
+        var parts = [];
+        if (state.back && BACK_LABELS[state.back]) parts.push(BACK_LABELS[state.back]);
+        if (id === 'dtf') { if (state.sleeves.left) parts.push('L sleeve'); if (state.sleeves.right) parts.push('R sleeve'); }
+        return parts.length ? parts.join(' + ') : null;
+    }
+    function frontOnlyGroups(id) {
+        if (id === 'dtg') return { 'dtg:main': { locationCode: state.front } };
+        if (id === 'scp') return { 'scp:design-1': { frontColors: state.ink, backColors: 0, darkGarment: !!state.adv.scpDark, safetyStripes: !!state.adv.scpStripes } };
+        if (id === 'dtf') return { 'dtf:main': { locations: DTF_FRONT[state.front] ? [DTF_FRONT[state.front]] : [] } };
+        return null;
+    }
+
     var ICONS = {
         emb: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg>',
         capemb: '<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18l-2-2H5z"/><path d="M5 14c0-4.5 3-7 7-7s7 2.5 7 7"/></svg>',
@@ -488,6 +505,7 @@
                 }
             } else {
                 state.results[id] = { status: 'ok', preview: preview, summary: summarize(preview) };
+                if (printAddlLabel(id)) priceFrontOnly(id, token); // derive the back's cost for the card breakdown
             }
             renderResults();
         }).catch(function (err) {
@@ -497,6 +515,23 @@
             if (id === 'emb' || id === 'capemb') resetEmbCalc();
             renderResults();
         });
+    }
+
+    // Best-effort: re-price the FRONT location only so the card can show front vs back/sleeves.
+    // Non-blocking — the all-in price renders immediately; this patches the split in when it lands.
+    function priceFrontOnly(id, token) {
+        var def = METHODS[id], grp = frontOnlyGroups(id);
+        if (!grp) return;
+        var run;
+        try { run = window.QuoteCartEngine.singleItemPreview(buildItem(def), { groups: grp, deps: engineDeps(), nudge: false }); }
+        catch (e) { return; }
+        run.then(function (preview) {
+            if (token !== state.seq) return;
+            var r = state.results[id];
+            if (!r || r.status !== 'ok' || !preview.ok) return;
+            r.frontOnlyUnit = summarize(preview).perPiece;
+            renderResults();
+        }).catch(function () { /* breakdown is best-effort; never blocks the price */ });
     }
 
     function repriceAll() {
@@ -844,6 +879,16 @@
                 bdRows.push('<div class="qq-bd-row"><span>+ ' + esc(lbl) + '</span><span>+' + fmt(Number(sl.unitPrice) || 0) + '/' + unitWord + '</span></div>');
             });
             breakdownHtml = '<div class="qq-card-breakdown">' + bdRows.join('') + '</div>';
+        } else if (r.frontOnlyUnit != null) {
+            // print: front (main) location vs the additional back/sleeve location(s)
+            var addlU = r2((s.perPiece || 0) - r.frontOnlyUnit);
+            var addlLbl = printAddlLabel(id);
+            if (addlLbl && addlU > 0.005) {
+                breakdownHtml = '<div class="qq-card-breakdown">'
+                    + '<div class="qq-bd-row"><span>' + esc(FRONT_LABELS[state.front] || 'Front') + '</span><span>' + fmt(r.frontOnlyUnit) + '/' + unitWord + '</span></div>'
+                    + '<div class="qq-bd-row"><span>+ ' + esc(addlLbl) + '</span><span>+' + fmt(addlU) + '/' + unitWord + '</span></div>'
+                    + '</div>';
+            }
         }
 
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
