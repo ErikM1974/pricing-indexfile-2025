@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>DTF Prints — prototype · Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.21.4">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.21.4">
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="/staff-dashboard.html" class="logo" title="Back to Staff Dashboard">
+            <img class="logo-img" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+        </a>
+        <nav class="crumbs">
+            <a href="/calculators/quick-quote/">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(180deg)" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+                Quick Quote
+            </a>
+            <span class="sep">/</span>
+            <span class="here">DTF Prints (prototype)</span>
+        </nav>
+        <div class="spacer"></div>
+        <span class="theme-chip"><span class="dot"></span> Prototype · DTF only · live engine</span>
+    </header>
+
+    <main class="page">
+
+        <section class="hero">
+            <div>
+                <div class="eyebrow">Prototype · the &ldquo;logo = size + position&rdquo; model</div>
+                <h1 class="page-title">DTF Prints</h1>
+                <p class="lede">
+                    Add a print, pick its <strong>size</strong>, pick <strong>where</strong> it goes. The price comes from the
+                    size; the position is just placement. Prices run through the same DTF engine as the live tools.
+                </p>
+            </div>
+        </section>
+
+        <div class="proto-banner">
+            &#9879; Experiment to evaluate the size + position model for DTF. Not linked anywhere, changes no live tool, and a
+            small print prices the same wherever it lands (left chest, sleeve, neck&hellip;).
+        </div>
+
+        <div id="protoError" class="qq-banner qq-banner--error" hidden></div>
+
+        <section class="qq-grid">
+
+            <div class="qq-panel qq-inputs">
+                <div class="field">
+                    <label for="style">Style number</label>
+                    <input id="style" class="input" type="text" inputmode="text" autocomplete="off" placeholder="e.g. PC61, PC54, 3001C" value="PC61">
+                    <div id="styleStatus" class="qq-style-status" aria-live="polite"></div>
+                </div>
+
+                <div class="field qty-field">
+                    <label for="qty">Quantity</label>
+                    <input id="qty" class="input num" type="number" min="1" step="1" value="24">
+                </div>
+                <div class="qq-qty-presets">
+                    <button type="button" data-qty="12">12</button>
+                    <button type="button" data-qty="24">24</button>
+                    <button type="button" data-qty="48">48</button>
+                    <button type="button" data-qty="72">72</button>
+                </div>
+
+                <div class="proto-prints">
+                    <label>Prints <span class="muted">&middot; each one priced by its size</span></label>
+                    <div id="printsList"></div>
+                    <button type="button" id="addPrint" class="qq-link-btn">+ Add print</button>
+                </div>
+            </div>
+
+            <div class="qq-panel qq-results">
+                <div class="qq-results-head">
+                    <span>Price</span>
+                    <span class="qq-results-sub" id="resultSub">Enter a style to begin</span>
+                </div>
+                <div id="result" class="proto-result"></div>
+                <p class="qq-foot">Per-piece is all-in (garment + every print, incl. any small-batch fee). DTF gives no discount for extra locations &mdash; each print is its own transfer + labor + freight. Prototype, not a saved quote.</p>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="/config/app.config.js?v=2026.06.18.1"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.21.4"></script>
+</body>
+</html>
