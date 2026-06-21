@@ -47,10 +47,7 @@
     border-radius: 50%;
     font-size: 12px; font-weight: 600;
 }
-.proto-print-at { flex: 0 0 auto; color: var(--qq-muted); font-size: 13px; }
-.proto-print-size { flex: 0 0 auto; min-width: 150px; }
-.proto-print-pos { flex: 1 1 auto; min-width: 110px; }
-.proto-print-size, .proto-print-pos { padding: 7px 9px; font-size: 13px; }
+.proto-print-size { flex: 1 1 auto; min-width: 150px; padding: 7px 9px; font-size: 13px; }
 .proto-print-cost {
     flex: 0 0 auto;
     min-width: 78px; text-align: right;
@@ -89,5 +86,9 @@
 .proto-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, #1a1d1a); white-space: nowrap; }
 .proto-bd-row .proto-band { color: var(--qq-muted); font-size: 11px; font-family: "Geist Mono", monospace; }
 .proto-ltm span:last-child { color: #7a541a; }
+.proto-bd-row.proto-sub { margin-top: 4px; padding-top: 7px; border-top: 1px solid var(--qq-line); }
+.proto-bd-row.proto-rounding span:last-child { color: #7a541a; }
+.proto-bd-row.proto-total { margin-top: 4px; padding-top: 7px; border-top: 2px solid var(--qq-line); }
+.proto-bd-row.proto-total span, .proto-bd-row.proto-total span:last-child { color: var(--qq-ink, #1a1d1a); font-weight: 600; font-size: 13.5px; }
 
 .proto-round { margin: 12px 0 0; font-size: 11.5px; color: var(--qq-muted); }
