@@ -1,3 +1,9 @@
+## v2026.06.21.3 (2026.06.21)
+
+- Doc: Quick Quote per-piece breakdown on result cards (emb serviceLines + print front-only derive)
+- Doc: DTF live price reads DTF_Pricing.unit_price + PressingLaborCost (Supacolor_Cost/Margin_Pct/Decoration_Cost are reference-only)
+- Deploy v2026.06.21.3: Quick Quote — show DTF transfer-size band (≤5×5"/≤12×16.5") per location on the card (UI only, prices unchanged)
+
 ## v2026.06.21.2 (2026.06.21)
 
 - Deploy v2026.06.21.2: Quick Quote — front/back price breakdown on the DTG/SCP/DTF cards (derived via front-only re-price; UI only, prices unchanged)
