@@ -1,3 +1,7 @@
+## v2026.06.21.5 (2026.06.21)
+
+- Prints prototype: add DTG (size-based, Small/Large/Jumbo) — method toggle; DTG replica verified penny-match vs server canonical pricer
+
 ## v2026.06.21.4 (2026.06.21)
 
 - Doc: DTG is size-based too (FF=FB, JF=JB verified live) — EMB/DTF/DTG all price by size, only SCP by location count
