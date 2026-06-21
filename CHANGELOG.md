@@ -1,3 +1,7 @@
+## v2026.06.21.2 (2026.06.21)
+
+- Deploy v2026.06.21.2: Quick Quote — front/back price breakdown on the DTG/SCP/DTF cards (derived via front-only re-price; UI only, prices unchanged)
+
 ## v2026.06.21.1 (2026.06.21)
 
 - Deploy v2026.06.21.1: Quick Quote — per-piece breakdown on the embroidery card (garment + main logo, then each additional logo) (UI only, prices unchanged)
