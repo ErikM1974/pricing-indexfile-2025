@@ -35,19 +35,8 @@
     // DTG size → DTG_Costs PrintLocationCode (front/back identical, so one each).
     var DTG_SIZE_CODE = { small: 'LC', large: 'FF', jumbo: 'JF' };
 
-    // Positions are just placement labels — they do NOT change price. `typical`
-    // is the default size suggested when you pick that position.
-    var POSITIONS = [
-        { value: 'Left chest', typical: 'small' },
-        { value: 'Right chest', typical: 'small' },
-        { value: 'Left sleeve', typical: 'small' },
-        { value: 'Right sleeve', typical: 'small' },
-        { value: 'Back of neck', typical: 'small' },
-        { value: 'Center front', typical: 'medium' },
-        { value: 'Center back', typical: 'medium' },
-        { value: 'Full front', typical: 'large' },
-        { value: 'Full back', typical: 'large' }
-    ];
+    // No position picker: price is size-only and a print can go anywhere. Placement is a
+    // production detail that lives in the Quote Builder (PDF + ShopWorks), not in a rapid quote.
 
     var state = {
         method: 'dtf',
@@ -58,8 +47,8 @@
         bundleStyle: { dtf: null, dtg: null },  // which style each bundle is for
         garment: { dtf: 0, dtg: 0 },
         prints: [
-            { size: 'small', position: 'Left chest' },
-            { size: 'large', position: 'Full back' }
+            { size: 'small' },
+            { size: 'large' }
         ]
     };
 
@@ -162,15 +151,10 @@
                 var lbl = avail ? (s.label + ' (' + band + ')') : (s.label + ' — ' + onlyMethodLabel(s) + ' only');
                 return '<option value="' + s.key + '"' + (s.key === p.size ? ' selected' : '') + (avail ? '' : ' disabled') + '>' + esc(lbl) + '</option>';
             }).join('');
-            var posOpts = POSITIONS.map(function (o) {
-                return '<option value="' + esc(o.value) + '"' + (o.value === p.position ? ' selected' : '') + '>' + esc(o.value) + '</option>';
-            }).join('');
             var cost = state.bundles[state.method] ? ('+' + fmt(displayRate(p.size)) + '/pc') : '';
             return '<div class="proto-print-row" data-i="' + i + '">'
                 + '<span class="proto-print-n">' + (i + 1) + '</span>'
                 + '<select class="input proto-print-size" data-i="' + i + '" aria-label="Print ' + (i + 1) + ' size">' + sizeOpts + '</select>'
-                + '<span class="proto-print-at">at</span>'
-                + '<select class="input proto-print-pos" data-i="' + i + '" aria-label="Print ' + (i + 1) + ' position">' + posOpts + '</select>'
                 + '<span class="proto-print-cost">' + cost + '</span>'
                 + '<button type="button" class="proto-print-x" data-i="' + i + '" title="Remove this print" aria-label="Remove print ' + (i + 1) + '">×</button>'
                 + '</div>';
@@ -190,7 +174,7 @@
         res.prints.forEach(function (p, i) {
             var meta = sizeMeta(p.size);
             rows += '<div class="proto-bd-row"><span>Print ' + (i + 1) + ' &middot; ' + esc(meta.label)
-                + ' <span class="proto-band">' + esc(bandFor(p.size) || '') + '</span> &middot; ' + esc(p.position) + '</span>'
+                + ' <span class="proto-band">' + esc(bandFor(p.size) || '') + '</span></span>'
                 + '<span>+' + fmt(p.rate) + '/pc</span></div>';
         });
         if (res.ltmPerShirt > 0) {
@@ -259,19 +243,13 @@
             b.addEventListener('click', function () { state.qty = parseInt(b.getAttribute('data-qty'), 10); $('qty').value = state.qty; render(); });
         });
         $('addPrint').addEventListener('click', function () {
-            state.prints.push({ size: clampSize('small'), position: 'Left chest' });
+            state.prints.push({ size: clampSize('small') });
             render();
         });
         $('printsList').addEventListener('change', function (e) {
             var i = parseInt(e.target.getAttribute('data-i'), 10);
             if (isNaN(i) || !state.prints[i]) return;
             if (e.target.classList.contains('proto-print-size')) { state.prints[i].size = e.target.value; render(); }
-            else if (e.target.classList.contains('proto-print-pos')) {
-                state.prints[i].position = e.target.value;
-                var pos = POSITIONS.find(function (o) { return o.value === e.target.value; });
-                if (pos) state.prints[i].size = clampSize(pos.typical); // snap to the position's typical size
-                render();
-            }
         });
         $('printsList').addEventListener('click', function (e) {
             if (!e.target.classList.contains('proto-print-x')) return;
