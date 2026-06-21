@@ -1,3 +1,7 @@
+## v2026.06.21.9 (2026.06.21)
+
+- Prints prototype: add price-break matrix (12/24/48/72 + active qty) — full per-shirt build per quantity for the selected prints; click a row to set qty
+
 ## v2026.06.21.8 (2026.06.21)
 
 - Prints prototype: remove the location picker — price is size-only, a print goes anywhere; placement stays a Quote Builder (production) concern
