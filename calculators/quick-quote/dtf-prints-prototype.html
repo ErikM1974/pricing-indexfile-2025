@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>DTF Prints — prototype · Northwest Custom Apparel</title>
+    <title>Prints — prototype (DTF + DTG) · Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.21.4">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.21.4">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.21.5">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.21.5">
 </head>
 <body>
 
@@ -26,10 +26,10 @@
                 Quick Quote
             </a>
             <span class="sep">/</span>
-            <span class="here">DTF Prints (prototype)</span>
+            <span class="here">Prints (prototype)</span>
         </nav>
         <div class="spacer"></div>
-        <span class="theme-chip"><span class="dot"></span> Prototype · DTF only · live engine</span>
+        <span class="theme-chip"><span class="dot"></span> Prototype · DTF + DTG · live pricing</span>
     </header>
 
     <main class="page">
@@ -37,17 +37,18 @@
         <section class="hero">
             <div>
                 <div class="eyebrow">Prototype · the &ldquo;logo = size + position&rdquo; model</div>
-                <h1 class="page-title">DTF Prints</h1>
+                <h1 class="page-title">Prints</h1>
                 <p class="lede">
                     Add a print, pick its <strong>size</strong>, pick <strong>where</strong> it goes. The price comes from the
-                    size; the position is just placement. Prices run through the same DTF engine as the live tools.
+                    size; the position is just placement. Works for <strong>DTF and DTG</strong> &mdash; both price by print size.
+                    Numbers run through the live pricing (DTF engine; DTG matches the server pricer to the cent).
                 </p>
             </div>
         </section>
 
         <div class="proto-banner">
-            &#9879; Experiment to evaluate the size + position model for DTF. Not linked anywhere, changes no live tool, and a
-            small print prices the same wherever it lands (left chest, sleeve, neck&hellip;).
+            &#9879; Experiment to evaluate the size + position model for <strong>DTF and DTG</strong>. Not linked anywhere,
+            changes no live tool, and a small print prices the same wherever it lands (left chest, sleeve, neck&hellip;).
         </div>
 
         <div id="protoError" class="qq-banner qq-banner--error" hidden></div>
@@ -55,6 +56,13 @@
         <section class="qq-grid">
 
             <div class="qq-panel qq-inputs">
+                <div class="field">
+                    <label>Method</label>
+                    <div class="proto-method" id="methodToggle" role="group" aria-label="Decoration method">
+                        <button type="button" data-method="dtf" class="is-active">DTF</button>
+                        <button type="button" data-method="dtg">DTG</button>
+                    </div>
+                </div>
                 <div class="field">
                     <label for="style">Style number</label>
                     <input id="style" class="input" type="text" inputmode="text" autocomplete="off" placeholder="e.g. PC61, PC54, 3001C" value="PC61">
@@ -94,6 +102,6 @@
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.21.4"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.21.5"></script>
 </body>
 </html>
