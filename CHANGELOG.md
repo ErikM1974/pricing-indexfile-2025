@@ -1,3 +1,7 @@
+## v2026.06.21.1 (2026.06.21)
+
+- Deploy v2026.06.21.1: Quick Quote — per-piece breakdown on the embroidery card (garment + main logo, then each additional logo) (UI only, prices unchanged)
+
 ## v2026.06.20.15 (2026.06.20)
 
 - Deploy v2026.06.20.15: Quick Quote embroidery — typical-stitch helper + >25K primary-logo under-pricing guardrail (UI only, prices unchanged)
