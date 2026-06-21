@@ -136,6 +136,13 @@
             perPiece: perPiece, orderTotal: round2(perPiece * state.qty), tierLabel: tierLabel
         };
     }
+    // Price the CURRENT prints at an arbitrary quantity (for the price-break matrix).
+    function priceAtQty(q) {
+        var saved = state.qty; state.qty = q;
+        var r = priceAll();
+        state.qty = saved;
+        return r;
+    }
 
     // ---------- rendering ----------
     function renderMethod() {
@@ -189,7 +196,33 @@
                 ? 'Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($' + res.ltmFlat + ' spread across ' + state.qty + ' shirts) is the one line with odd cents &mdash; that&rsquo;s just $' + res.ltmFlat + ' &divide; ' + state.qty + '. The shirt price is all-in (tier ' + esc(res.tierLabel) + ').'
                 : 'Blank + each print are rounded to $0.50, so the lines add up to the per-shirt price by hand &mdash; no separate rounding step, and the shirt price is all-in (tier ' + esc(res.tierLabel) + ').') + '</p>';
     }
-    function render() { renderMethod(); renderPrints(); renderResult(); }
+    function renderMatrix() {
+        var box = $('protoMatrix'); if (!box) return;
+        if (!state.bundles[state.method] || !state.prints.length) { box.innerHTML = ''; return; }
+        var qtys = [12, 24, 48, 72];
+        if (qtys.indexOf(state.qty) < 0) qtys.push(state.qty); // always include the active qty
+        qtys.sort(function (a, b) { return a - b; });
+
+        var head = '<th>Qty</th><th>Blank</th>'
+            + state.prints.map(function (p) { return '<th>' + esc(sizeMeta(p.size).label) + '</th>'; }).join('')
+            + '<th>Small-batch</th><th>Per shirt</th><th>Order</th>';
+        var body = qtys.map(function (q) {
+            var r = priceAtQty(q);
+            if (!r || r.error) return '';
+            var cells = '<td>' + q + '</td><td>' + fmt(r.blank) + '</td>'
+                + r.prints.map(function (p) { return '<td>+' + fmt(p.rate) + '</td>'; }).join('')
+                + '<td>' + (r.ltmPerShirt > 0 ? '+' + fmt(r.ltmPerShirt) : '&mdash;') + '</td>'
+                + '<td class="proto-mx-pp">' + fmt(r.perPiece) + '</td>'
+                + '<td>' + fmt(r.orderTotal) + '</td>';
+            return '<tr data-qty="' + q + '"' + (q === state.qty ? ' class="is-current"' : '') + '>' + cells + '</tr>';
+        }).join('');
+        box.innerHTML = '<div class="proto-matrix">'
+            + '<div class="proto-matrix-head">Price by quantity <span class="muted">&middot; ' + esc(state.style) + ' &middot; ' + METHODS[state.method].label + ' &middot; your selected prints</span></div>'
+            + '<div class="proto-mx-scroll"><table class="proto-mx-table"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>'
+            + '<p class="proto-mx-note">Each row is the full per-shirt build at that quantity &mdash; blank + each print + small-batch all add across. Click a row to make it the active quantity.</p>'
+            + '</div>';
+    }
+    function render() { renderMethod(); renderPrints(); renderResult(); renderMatrix(); }
 
     // ---------- data load (lazy per method, cached) ----------
     function fetchDtgBundle(style) {
@@ -255,6 +288,11 @@
             if (!e.target.classList.contains('proto-print-x')) return;
             var i = parseInt(e.target.getAttribute('data-i'), 10);
             if (!isNaN(i)) { state.prints.splice(i, 1); render(); }
+        });
+        $('protoMatrix').addEventListener('click', function (e) {
+            var tr = e.target.closest('tr[data-qty]'); if (!tr) return;
+            var q = parseInt(tr.getAttribute('data-qty'), 10);
+            if (!isNaN(q)) { state.qty = q; $('qty').value = q; render(); }
         });
     }
 
