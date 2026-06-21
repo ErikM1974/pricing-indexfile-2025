@@ -117,6 +117,17 @@ DTG prices darks = lights (no dark surcharge in the pricer).
 **DTF formula (verified):** `HalfDollarCeil(garment/0.53 + transferUnitPrice + PressingLaborCost $2.50 + freight)`.
 DTF transfer cost (Small): 10-23 $6.50, 24-47 $5.75, 48-71 $4.50, 72+ $3.75. Freight: 0.50/0.35/0.25/0.15. Sizes: Small ≤5×5, Medium ≤9×12, Large ≤12×16.5.
 
+> 🔑 **WHICH `DTF_Pricing` COLUMN THE LIVE PRICE READS (Erik asked 2026-06-21):** the pricing code reads
+> **ONLY `unit_price` (the transfer SELLING price) + `PressingLaborCost`** (`dtf-pricing-service.js:257,259`).
+> `Supacolor_Cost`, `Margin_Pct`, `Decoration_Cost` are **reference / cost-tracking columns the code IGNORES.**
+> → To change a customer DTF price, **edit `unit_price`** (no deploy; served by `/api/pricing-bundle?method=DTF`,
+> proxy `pricing.js:840`). Editing `Supacolor_Cost` alone does NOT move the price (Margin_Pct is a Caspio
+> formula `([unit_price]-[Supacolor_Cost])/[unit_price]` — derived FROM unit_price, not the other way). Garment
+> margin (÷0.53) applies to the blank ONLY; transfer is added at its already-margined face; labor+freight are flat
+> pass-throughs. **No additional-location discount** — each location = full `unit_price`(by its size) + $2.50 + freight,
+> so a 2nd Large print adds ~$16.25 @24 (verified live: PC61 24pc LC+FB = $32.00/pc). Worked example + the
+> zone→size map (LC/sleeves=Small, full front/back=Large; `quote-cart-engine.js:81-89`) live in chat 2026-06-21.
+
 > ⚠️ **CORRECTION 2026-06-19 (live Supacolor data) — `unit_price` is NOT raw cost.** Earlier note said
 > "unit_price = OUR Supacolor cost (added RAW, no margin)" and the ~21% DTF GM rested on that. **WRONG.**
 > Pulled ACTUAL Supacolor per-transfer billing via `/api/supacolor-jobs/sync/{job}` → joblines.Unit_Price
