@@ -1,3 +1,7 @@
+## v2026.06.21.8 (2026.06.21)
+
+- Prints prototype: remove the location picker — price is size-only, a print goes anywhere; placement stays a Quote Builder (production) concern
+
 ## v2026.06.21.7 (2026.06.21)
 
 - Prints prototype: component-rounded ('round each part') pricing — blank + each print rounded to $0.50, small-batch fee as a per-shirt line item; all-in per-shirt price adds up by hand (model under eval, not live formula)
