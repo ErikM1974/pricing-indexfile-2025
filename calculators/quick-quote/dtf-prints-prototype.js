@@ -1,14 +1,19 @@
 /*
- * Prints prototype — the "logo = size + position" model (DTF + DTG)
+ * Prints prototype — "logo = size + position" model (DTF + DTG)
  * ------------------------------------------------------------------
- * Self-contained experiment. Prices a LIST of prints, each one a (size,
- * position), by SIZE — the price driver — for both DTF and DTG.
+ * COMPONENT-ROUNDED ("round each part") pricing experiment:
  *
- *   DTF  → DTFPricingService.calculatePriceForQuantity (the live engine code).
- *   DTG  → a replica of the server canonical pricer, VERIFIED to match it to
- *          the cent (probed 2026-06-21): baseUnit = ceil((garment/denom + ΣprintCost)*2)/2,
- *          finalUnit = round(baseUnit + floor(LTM/qty), cents). DTG size→rate:
- *          Small=LC, Large=FF(=FB), Jumbo=JF(=JB). qty<24 uses 24-47 print costs.
+ *     Price per shirt = Blank+margin (→$0.50) + Σ each print (→$0.50) + small-batch fee/shirt
+ *
+ * Every building block is rounded UP to the next $0.50, so the lines ADD UP to
+ * the per-shirt price by hand — no separate rounding step. The small-batch fee
+ * ($50 ÷ qty, floored to cents) is a per-shirt LINE ITEM, so the shirt price is
+ * all-in. The only line with odd cents is that fee (a flat $50 across N shirts).
+ *
+ * This is a DIFFERENT formula than the live tools (which round the final total
+ * once) — it's the model under evaluation. Rates are live: DTF = transfer+labor+
+ * freight from DTFPricingService; DTG = verified server-pricer rates (Small=LC,
+ * Large=FF/FB, Jumbo=JF/JB; qty<24 uses the 24-47 print costs).
  *
  * Touches no live tool. Not linked from anywhere. Safe to iterate on.
  */
@@ -18,11 +23,9 @@
     var dtfSvc = new window.DTFPricingService();
     var API = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 
-    // Per-method size ladders. Price keys on these.
     var METHODS = { dtf: { label: 'DTF' }, dtg: { label: 'DTG' } };
     // ONE shared size ladder. Small + Large are the same size in both methods; Medium is
     // DTF-only (DTG has no 9×12 rate) and Jumbo is DTG-only (DTF's biggest transfer is 12×16.5").
-    // `dtf`/`dtg` hold each method's dimension band, or null when that method can't do that size.
     var SIZE_LADDER = [
         { key: 'small',  label: 'Small',  dtf: '≤ 5×5"',     dtg: '4×4" · left chest' },
         { key: 'medium', label: 'Medium', dtf: '≤ 9×12"',    dtg: null },
@@ -67,6 +70,8 @@
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
+    function hdc(x) { return Math.ceil(x * 2 - 1e-9) / 2; }  // round UP to the next $0.50
+    function round2(x) { return Math.round(x * 100) / 100; }
     function bandFor(key) { var s = SIZE_LADDER.find(function (x) { return x.key === key; }); return s ? s[state.method] : null; }
     function available(key) { return !!bandFor(key); }
     function sizeMeta(key) { return SIZE_LADDER.find(function (x) { return x.key === key; }) || SIZE_LADDER[0]; }
@@ -83,7 +88,7 @@
         return first ? first.key : 'small';
     }
 
-    // ---------- DTF pricing (live engine code) ----------
+    // ---------- raw per-print rates (before the $0.50 round) ----------
     function dtfTransferRate(size) {
         var d = state.bundles.dtf; if (!d) return 0;
         var s = d.transferSizes[size]; if (!s) return 0;
@@ -96,15 +101,7 @@
         return f ? f.costPerTransfer : 0;
     }
     function dtfPrintCost(size) { return dtfTransferRate(size) + (state.bundles.dtf ? state.bundles.dtf.laborCostPerLocation : 0) + dtfFreight(); }
-    function priceDtf() {
-        var d = state.bundles.dtf; if (!d) return null;
-        try {
-            var r = dtfSvc.calculatePriceForQuantity(state.garment.dtf, d, state.prints.map(function (p) { return p.size; }), state.qty);
-            return { finalUnit: r.finalUnitPrice, garmentWithMargin: r.garmentWithMargin, ltmPerUnit: r.ltmFeePerUnit, ltmFee: r.ltmFee, tierLabel: r.tierLabel };
-        } catch (e) { return { error: e.message }; }
-    }
 
-    // ---------- DTG pricing (verified replica of the server canonical pricer) ----------
     function dtgMarginTier() {
         var b = state.bundles.dtg; if (!b) return null;
         return (b.tiersR || []).find(function (t) { return state.qty >= t.MinQuantity && state.qty <= t.MaxQuantity; });
@@ -123,21 +120,32 @@
         var row = (b.allDtgCostsR || []).find(function (c) { return c.PrintLocationCode === code && c.TierLabel === lbl; });
         return row ? Number(row.PrintCost) || 0 : 0;
     }
-    function priceDtg() {
-        var b = state.bundles.dtg; if (!b) return null;
-        var mt = dtgMarginTier(); if (!mt) return { error: 'No DTG tier for qty ' + state.qty };
-        var denom = Number(mt.MarginDenominator), ltmFee = Number(mt.LTM_Fee) || 0;
-        var printCost = state.prints.reduce(function (s, p) { return s + dtgRate(p.size); }, 0);
-        var garmentWithMargin = state.garment.dtg / denom;
-        var baseUnit = Math.ceil((garmentWithMargin + printCost) * 2) / 2;       // half-dollar round on garment+print
-        var ltm = ltmFee > 0 ? Math.floor((ltmFee / state.qty) * 100) / 100 : 0; // floored, added after
-        return { finalUnit: Math.round((baseUnit + ltm) * 100) / 100, garmentWithMargin: garmentWithMargin, ltmPerUnit: ltm, ltmFee: ltmFee, tierLabel: mt.TierLabel };
-    }
+    function rawRate(size) { return state.method === 'dtf' ? dtfPrintCost(size) : dtgRate(size); }
+    function displayRate(size) { return hdc(rawRate(size)); } // the published, rounded per-print rate
 
-    function printCost(size) { return state.method === 'dtf' ? dtfPrintCost(size) : dtgRate(size); }
+    // ---------- component-rounded price ----------
     function priceAll() {
-        if (!state.bundles[state.method] || !state.prints.length) return null;
-        return state.method === 'dtf' ? priceDtf() : priceDtg();
+        var m = state.method;
+        if (!state.bundles[m] || !state.prints.length) return null;
+        var denom, ltmFlat, tierLabel;
+        if (m === 'dtf') {
+            var mt = (state.bundles.dtf.pricingTiers || []).find(function (t) { return state.qty >= t.minQuantity && state.qty <= t.maxQuantity; });
+            if (!mt) return { error: 'No DTF price tier for qty ' + state.qty };
+            denom = mt.marginDenominator; ltmFlat = mt.ltmFee > 0 ? mt.ltmFee : 0; tierLabel = mt.tierLabel;
+        } else {
+            var mt2 = dtgMarginTier();
+            if (!mt2) return { error: 'No DTG price tier for qty ' + state.qty };
+            denom = Number(mt2.MarginDenominator); ltmFlat = Number(mt2.LTM_Fee) > 0 ? Number(mt2.LTM_Fee) : 0; tierLabel = mt2.TierLabel;
+        }
+        var blank = hdc(state.garment[m] / denom);
+        var prints = state.prints.map(function (p) { return { size: p.size, position: p.position, rate: displayRate(p.size) }; });
+        var printsSum = prints.reduce(function (s, p) { return s + p.rate; }, 0);
+        var ltmPerShirt = ltmFlat > 0 ? Math.floor((ltmFlat / state.qty) * 100) / 100 : 0; // flat $50 spread per shirt
+        var perPiece = round2(blank + printsSum + ltmPerShirt);
+        return {
+            blank: blank, prints: prints, ltmFlat: ltmFlat, ltmPerShirt: ltmPerShirt, ltmThreshold: 24,
+            perPiece: perPiece, orderTotal: round2(perPiece * state.qty), tierLabel: tierLabel
+        };
     }
 
     // ---------- rendering ----------
@@ -157,7 +165,7 @@
             var posOpts = POSITIONS.map(function (o) {
                 return '<option value="' + esc(o.value) + '"' + (o.value === p.position ? ' selected' : '') + '>' + esc(o.value) + '</option>';
             }).join('');
-            var cost = state.bundles[state.method] ? ('+' + fmt(printCost(p.size)) + '/pc') : '';
+            var cost = state.bundles[state.method] ? ('+' + fmt(displayRate(p.size)) + '/pc') : '';
             return '<div class="proto-print-row" data-i="' + i + '">'
                 + '<span class="proto-print-n">' + (i + 1) + '</span>'
                 + '<select class="input proto-print-size" data-i="' + i + '" aria-label="Print ' + (i + 1) + ' size">' + sizeOpts + '</select>'
@@ -176,24 +184,26 @@
 
         var res = priceAll();
         if (!res || res.error) { box.innerHTML = '<p class="proto-muted">' + esc((res && res.error) || 'Unable to price.') + '</p>'; return; }
-        sub.textContent = 'for ' + state.qty + ' pieces · ' + esc(state.style) + ' · ' + METHODS[state.method].label;
+        sub.textContent = 'for ' + state.qty + ' shirts · ' + esc(state.style) + ' · ' + METHODS[state.method].label;
 
-        var rows = '<div class="proto-bd-row"><span>Garment + margin</span><span>' + fmt(res.garmentWithMargin) + '/pc</span></div>';
-        state.prints.forEach(function (p, i) {
-            var m = sizeMeta(p.size);
-            rows += '<div class="proto-bd-row"><span>Print ' + (i + 1) + ' &middot; ' + esc(m.label)
+        var rows = '<div class="proto-bd-row"><span>Blank + margin</span><span>' + fmt(res.blank) + '/pc</span></div>';
+        res.prints.forEach(function (p, i) {
+            var meta = sizeMeta(p.size);
+            rows += '<div class="proto-bd-row"><span>Print ' + (i + 1) + ' &middot; ' + esc(meta.label)
                 + ' <span class="proto-band">' + esc(bandFor(p.size) || '') + '</span> &middot; ' + esc(p.position) + '</span>'
-                + '<span>+' + fmt(printCost(p.size)) + '/pc</span></div>';
+                + '<span>+' + fmt(p.rate) + '/pc</span></div>';
         });
-        if (res.ltmPerUnit > 0) {
-            rows += '<div class="proto-bd-row proto-ltm"><span>Small-batch fee ($' + res.ltmFee + ' ÷ ' + state.qty + ')</span><span>+' + fmt(res.ltmPerUnit) + '/pc</span></div>';
+        if (res.ltmPerShirt > 0) {
+            rows += '<div class="proto-bd-row proto-ltm"><span>Small-batch fee ($' + res.ltmFlat + ' ÷ ' + state.qty + ' shirts)</span><span>+' + fmt(res.ltmPerShirt) + '/pc</span></div>';
         }
-        box.innerHTML = '<div class="proto-headline"><span class="proto-pp">' + fmt(res.finalUnit) + '<span class="per">/pc</span></span>'
-            + '<span class="proto-order">' + fmt(res.finalUnit * state.qty) + ' total</span></div>'
+        rows += '<div class="proto-bd-row proto-total"><span>Price per shirt</span><span>' + fmt(res.perPiece) + '/pc</span></div>';
+
+        box.innerHTML = '<div class="proto-headline"><span class="proto-pp">' + fmt(res.perPiece) + '<span class="per">/pc</span></span>'
+            + '<span class="proto-order">' + fmt(res.orderTotal) + ' total</span></div>'
             + '<div class="proto-bd">' + rows + '</div>'
-            + '<p class="proto-round">' + (state.method === 'dtf'
-                ? 'Per-piece rounded up to the nearest $0.50 (tier ' + esc(res.tierLabel) + ').'
-                : 'Garment + print rounded up to $0.50, then the small-batch fee added (tier ' + esc(res.tierLabel) + ').') + '</p>';
+            + '<p class="proto-round">' + (res.ltmPerShirt > 0
+                ? 'Blank + each print are rounded to $0.50, so they add up by hand. The small-batch fee ($' + res.ltmFlat + ' spread across ' + state.qty + ' shirts) is the one line with odd cents &mdash; that&rsquo;s just $' + res.ltmFlat + ' &divide; ' + state.qty + '. The shirt price is all-in (tier ' + esc(res.tierLabel) + ').'
+                : 'Blank + each print are rounded to $0.50, so the lines add up to the per-shirt price by hand &mdash; no separate rounding step, and the shirt price is all-in (tier ' + esc(res.tierLabel) + ').') + '</p>';
     }
     function render() { renderMethod(); renderPrints(); renderResult(); }
 
