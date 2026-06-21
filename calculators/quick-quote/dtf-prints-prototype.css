@@ -16,6 +16,17 @@
     line-height: 1.5;
 }
 
+/* ---- method toggle ---- */
+.proto-method { display: inline-flex; gap: 0; border: 1px solid var(--qq-line); border-radius: 9px; overflow: hidden; }
+.proto-method button {
+    padding: 9px 22px; border: 0; background: #fff; cursor: pointer;
+    font: inherit; font-weight: 600; font-size: 14px; color: var(--qq-muted);
+    transition: background .12s, color .12s;
+}
+.proto-method button + button { border-left: 1px solid var(--qq-line); }
+.proto-method button.is-active { background: var(--qq-green); color: #fff; }
+.proto-method button:not(.is-active):hover { background: #f3f8f3; color: var(--qq-green-dark, #2f6b34); }
+
 /* ---- prints list ---- */
 .proto-prints { margin-top: 18px; }
 .proto-prints > label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 8px; }
