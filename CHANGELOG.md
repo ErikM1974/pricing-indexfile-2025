@@ -1,3 +1,8 @@
+## v2026.06.21.4 (2026.06.21)
+
+- Doc: DTG is size-based too (FF=FB, JF=JB verified live) — EMB/DTF/DTG all price by size, only SCP by location count
+- Add DTF Prints prototype: 'logo = size + position' model (DTF-only, noindex, unlinked; prices via live DTFPricingService, no live tool touched)
+
 ## v2026.06.21.3 (2026.06.21)
 
 - Doc: Quick Quote per-piece breakdown on result cards (emb serviceLines + print front-only derive)
