@@ -114,6 +114,16 @@ LTM: DTG/DTF $50 under 24/10; SCP $75/$50/$0/$0 (→ $50 on 24-47 after remap).
 **PC61 blank (size M) = $3.53.**  DTG all-in (M, live pricer): LC $14.50→13.50→12.50 (24/48/72+); FF $17→14.50→13.50.
 DTG prices darks = lights (no dark surcharge in the pricer).
 
+> 🔑 **DTG IS SIZE-BASED too (verified live 2026-06-21, PC61 `allDtgCostsR`).** `FF == FB` and `JF == JB`
+> EXACTLY at every tier — front vs back is ZERO price difference. The 5 DTG "locations" are really **3 sizes**:
+> **Small** (LC: 8.5/7.5/6.5/5.5) · **Large** (FF=FB: 11/10/7.5/6.75) · **Jumbo** (JF=JB: 13/12/9.5/8.75).
+> DTG combos = **sum of the two size rates** (`LC_FB` = LC+FB = small+large; pricer splits on `_`). So **EMB,
+> DTF, and DTG all price by SIZE** (position-independent) — **only Screen Print is by location count** (ink colors
+> × #locations, size-agnostic). Size ladders differ: DTG = Small/Large/**Jumbo**(14×18); DTF = Small/**Medium**/Large
+> (caps at 12×16.5, no jumbo); shared tiers = Small(left chest) + Large(full). → motivates a unified "logo = size +
+> position" model (the embroidery model) across EMB/DTF/DTG. DTG's 4-combo whitelist (`LC_FB/FF_FB/JF_JB/LC_JB`,
+> `quote-cart-engine.js:75`) is a code limit, not a data limit — rates already support summing any size pair.
+
 **DTF formula (verified):** `HalfDollarCeil(garment/0.53 + transferUnitPrice + PressingLaborCost $2.50 + freight)`.
 DTF transfer cost (Small): 10-23 $6.50, 24-47 $5.75, 48-71 $4.50, 72+ $3.75. Freight: 0.50/0.35/0.25/0.15. Sizes: Small ≤5×5, Medium ≤9×12, Large ≤12×16.5.
 
