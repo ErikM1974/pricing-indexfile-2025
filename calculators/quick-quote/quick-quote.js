@@ -86,6 +86,10 @@
     var DTF_BACK = { FB: 'full-back', JB: 'full-back' };
     var FRONT_LABELS = { LC: 'Left chest', FF: 'Full front', JF: 'Jumbo front' };
     var BACK_LABELS = { FB: 'Full back', JB: 'Jumbo back' };
+    // DTF prices by transfer SIZE (DTF_Pricing.unit_price keys on these bands). Show the band on
+    // the card so the AE sees what each location includes — size drives the price (bigger = pricier).
+    var DTF_LOC_LABEL = { 'left-chest': 'Left chest', 'full-front': 'Full front', 'full-back': 'Full back', 'left-sleeve': 'L sleeve', 'right-sleeve': 'R sleeve' };
+    var DTF_SIZE_BAND = { 'left-chest': '≤5×5"', 'full-front': '≤12×16.5"', 'full-back': '≤12×16.5"', 'left-sleeve': '≤5×5"', 'right-sleeve': '≤5×5"' };
 
     // --- placement → per-method mapping (reads state.front / state.back / state.sleeves) ---
     function dtgCode() { var f = state.front, b = state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
@@ -237,9 +241,14 @@
             parts.push({ text: scpLocCount() >= 2 ? 'front + back' : 'front' });
             if (state.adv.scpDark) parts.push({ text: 'dark garment' });
             if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
-        } else if (id === 'dtg' || id === 'dtf') {
+        } else if (id === 'dtg') {
             var pl = placementLabel();
             if (pl && pl !== '—') parts.push({ text: pl });
+        } else if (id === 'dtf') {
+            // one chip per location, tagged with its transfer-size band (≤5×5" / ≤12×16.5")
+            dtfLocations().forEach(function (loc) {
+                parts.push({ text: (DTF_LOC_LABEL[loc] || loc) + ' · ' + (DTF_SIZE_BAND[loc] || '') });
+            });
         } else if (id === 'emb' || id === 'capemb') {
             var n = 1 + state.embAddl.length;
             parts.push({ text: n + (n === 1 ? ' logo' : ' logos') });
