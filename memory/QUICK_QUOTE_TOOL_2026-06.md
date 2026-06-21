@@ -112,6 +112,20 @@ PC61 24× front+back → $696 / $588 / $627 / $756. C112 8K cap 24× → $480. 2
 8K=10K=$20/cap, 12K=$24/cap (AS-CAP flat-tier surcharge). PC61 20 S + 5 2XL → 2XL +$2 on
 every method (EMB $21.40 wtd, etc.).
 
+## Per-piece breakdown on result cards (2026-06-21, `v2026.06.21.1`+`.2`)
+
+Each card itemizes what makes up the per-piece price (Erik: "show the 2nd logo's price"):
+- **Embroidery** (`.1`): `Garment + main logo` + one line per extra. Source = `preview.serviceLines`
+  (additional logos / stitch surcharge / 3D-puff / patch each carry a per-piece `unitPrice`);
+  base = `perPiece − Σ serviceLines`. Label strips the `AL ` code prefix → "Additional Logo".
+- **DTG/SCP/DTF** (`.2`): `Front (LC)` + `+ Full back` (or `+ Full back + L sleeve`). Print returns
+  `serviceLines: []` (the back is baked into the per-piece base), so the back's cost is **DERIVED**:
+  `priceFrontOnly()` re-prices the FRONT location only via `singleItemPreview` (same engine → always
+  reconciles to the headline), stores `result.frontOnlyUnit`, and the card shows `perPiece − frontOnlyUnit`
+  as the additional-location line. Non-blocking (all-in price renders first; split patches in async).
+  Only fires when `printAddlLabel(id)` is truthy (a front AND a back/sleeve) — front-only shows no breakdown.
+- Renders in `renderCard` via `breakdownHtml`; CSS `.qq-card-breakdown`/`.qq-bd-row`. UI-only, parity green.
+
 ## Deferred (post-deploy)
 - DTG/DTF exact-location override + sleeves/names/3D-puff left to the full builder. No "copy
   price to clipboard" button yet (possible follow-up). `/api/sizes-by-style-color` 500 still
