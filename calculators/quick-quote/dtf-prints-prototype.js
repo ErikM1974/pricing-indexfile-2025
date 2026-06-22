@@ -24,8 +24,10 @@
     var dtfSvc = new window.DTFPricingService();
     var API = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 
-    var METHODS = { dtf: { label: 'DTF' }, dtg: { label: 'DTG' }, emb: { label: 'Embroidery' } };
+    var METHODS = { dtf: { label: 'DTF' }, dtg: { label: 'DTG' }, emb: { label: 'Embroidery' }, scp: { label: 'Screen print' } };
     function isEmb() { return state.method === 'emb'; }
+    function isScp() { return state.method === 'scp'; }
+    function partNoun() { return isScp() ? 'location' : isEmb() ? 'logo' : 'print'; }
 
     // Shared size ladder for the PRINT methods. Small + Large are the same in both; Medium is
     // DTF-only (DTG has no 9×12 rate), Jumbo is DTG-only (DTF caps at 12×16.5").
@@ -43,14 +45,14 @@
         style: 'PC61',
         qty: 24,
         loading: false,
-        bundles: { dtf: null, dtg: null, emb: null },
-        bundleStyle: { dtf: null, dtg: null, emb: null },
-        garment: { dtf: 0, dtg: 0, emb: 0 },
-        // every item carries BOTH a size (print methods) and a stitch count (EMB) so switching
-        // method needs no conversion — each method reads the field it cares about.
+        bundles: { dtf: null, dtg: null, emb: null, scp: null },
+        bundleStyle: { dtf: null, dtg: null, emb: null, scp: null },
+        garment: { dtf: 0, dtg: 0, emb: 0, scp: 0 },
+        // each item carries a size (print methods), a stitch count (EMB) and an ink-color count (SCP)
+        // so switching method needs no conversion — each method reads the field it cares about.
         prints: [
-            { size: 'small', stitches: 8000 },
-            { size: 'large', stitches: 8000 }
+            { size: 'small', stitches: 8000, colors: 1 },
+            { size: 'large', stitches: 8000, colors: 1 }
         ]
     };
 
@@ -136,6 +138,7 @@
         var m = state.method;
         if (!state.bundles[m] || !state.prints.length) return null;
         if (m === 'emb') return embPrice();
+        if (m === 'scp') return scpPrice();
 
         var denom, ltmFlat, tierLabel;
         if (m === 'dtf') {
@@ -169,6 +172,37 @@
         var ltmPerShirt = t.ltm > 0 ? Math.floor((t.ltm / state.qty) * 100) / 100 : 0;
         var perPiece = round2(blank + parts.reduce(function (s, p) { return s + p.rate; }, 0) + ltmPerShirt);
         return { blank: blank, parts: parts, ltmFlat: t.ltm, ltmPerShirt: ltmPerShirt, ltmThreshold: 8, perPiece: perPiece, orderTotal: round2(perPiece * state.qty), tierLabel: t.label };
+    }
+    // ---------- screen-print per-location rates (each part = a location at N ink colors) ----------
+    function scpTierFor(qty) {
+        var b = state.bundles.scp; if (!b) return null;
+        return b.tiers.find(function (t) { return qty >= t.min && qty <= t.max; });
+    }
+    function scpEdCost(costType, tierLabel, colors) {
+        var b = state.bundles.scp; if (!b) return 0;
+        var row = b.costs.find(function (c) { return c.CostType === costType && c.TierLabel === tierLabel && c.ColorCount === colors; });
+        return row ? row.Ed_Cost : 0;
+    }
+    function scpColors(i) { return Math.min(6, Math.max(1, parseInt(state.prints[i] && state.prints[i].colors, 10) || 1)); }
+    function scpLocRate(i) { // rounded per-location rate (front = +flash on every color; back = no flash)
+        var b = state.bundles.scp, t = scpTierFor(state.qty);
+        if (!b || !t || !state.prints[i]) return 0;
+        var colors = scpColors(i);
+        if (i === 0) return hdc((scpEdCost('PrimaryLocation', t.label, colors) + b.flash * colors) / t.denom);
+        return hdc(scpEdCost('AdditionalLocation', t.label, colors) / t.denom);
+    }
+    function scpPrice() {
+        var b = state.bundles.scp; if (!b) return null;
+        var t = scpTierFor(state.qty); if (!t) return { error: 'Screen print starts at 24 pieces (qty ' + state.qty + ' is below the minimum).' };
+        var blank = hdc(b.garment / t.denom);
+        var parts = state.prints.map(function (p, i) {
+            var colors = scpColors(i);
+            var loc = i === 0 ? 'Front' : (i === 1 ? 'Back' : 'Location ' + (i + 1));
+            return { label: loc + ' · ' + colors + '-color', short: loc, sub: i === 0 ? 'incl. flash' : '', rate: scpLocRate(i) };
+        });
+        var ltmPerShirt = t.ltm > 0 ? Math.floor((t.ltm / state.qty) * 100) / 100 : 0;
+        var perPiece = round2(blank + parts.reduce(function (s, p) { return s + p.rate; }, 0) + ltmPerShirt);
+        return { blank: blank, parts: parts, ltmFlat: t.ltm, ltmPerShirt: ltmPerShirt, ltmThreshold: 48, perPiece: perPiece, orderTotal: round2(perPiece * state.qty), tierLabel: t.label };
     }
     function priceAtQty(q) { var saved = state.qty; state.qty = q; var r = priceAll(); state.qty = saved; return r; }
 
@@ -245,8 +279,24 @@
     function renderPrints() {
         var box = $('printsList');
         var lbl = $('printsLabel'), addBtn = $('addPrint');
-        if (lbl) lbl.innerHTML = isEmb() ? 'Logos <span class="muted">&middot; each priced by stitch count</span>' : 'Prints <span class="muted">&middot; each one priced by its size</span>';
-        if (addBtn) addBtn.textContent = isEmb() ? '+ Add logo' : '+ Add print';
+        if (lbl) lbl.innerHTML = isScp() ? 'Locations <span class="muted">&middot; each priced by ink colors</span>' : isEmb() ? 'Logos <span class="muted">&middot; each priced by stitch count</span>' : 'Prints <span class="muted">&middot; each one priced by its size</span>';
+        if (addBtn) addBtn.textContent = isScp() ? '+ Add location' : isEmb() ? '+ Add logo' : '+ Add print';
+        if (isScp()) {
+            box.innerHTML = state.prints.map(function (p, i) {
+                var colors = scpColors(i);
+                var loc = i === 0 ? 'Front' : (i === 1 ? 'Back' : 'Location ' + (i + 1));
+                var cost = state.bundles.scp ? ('+' + fmt(scpLocRate(i)) + '/pc') : '';
+                return '<div class="proto-print-row" data-i="' + i + '">'
+                    + '<span class="proto-print-n">' + (i + 1) + '</span>'
+                    + '<span class="proto-logo-role">' + loc + (i === 0 ? ' <span class="proto-flash">+ flash</span>' : '') + '</span>'
+                    + '<input class="input proto-color-count" type="number" min="1" max="6" step="1" data-i="' + i + '" value="' + colors + '" aria-label="' + loc + ' ink colors">'
+                    + '<span class="proto-logo-unit">color' + (colors === 1 ? '' : 's') + '</span>'
+                    + '<span class="proto-print-cost">' + cost + '</span>'
+                    + '<button type="button" class="proto-print-x" data-i="' + i + '" title="Remove this location" aria-label="Remove location ' + (i + 1) + '">×</button>'
+                    + '</div>';
+            }).join('') || '<p class="proto-empty">No locations yet &mdash; add one to see pricing.</p>';
+            return;
+        }
         if (isEmb()) {
             box.innerHTML = state.prints.map(function (p, i) {
                 var st = (p.stitches != null) ? p.stitches : DEFAULT_STITCHES;
@@ -282,7 +332,7 @@
         var box = $('result'), sub = $('resultSub');
         if (state.loading) { box.innerHTML = '<p class="proto-muted">Loading pricing…</p>'; sub.textContent = ''; return; }
         if (!state.bundles[state.method]) { box.innerHTML = ''; sub.textContent = 'Enter a style to begin'; return; }
-        if (!state.prints.length) { box.innerHTML = '<p class="proto-muted">Add a ' + (isEmb() ? 'logo' : 'print') + ' to see pricing.</p>'; sub.textContent = ''; return; }
+        if (!state.prints.length) { box.innerHTML = '<p class="proto-muted">Add a ' + partNoun() + ' to see pricing.</p>'; sub.textContent = ''; return; }
 
         var res = priceAll();
         if (!res || res.error) { box.innerHTML = '<p class="proto-muted">' + esc((res && res.error) || 'Unable to price.') + '</p>'; return; }
@@ -302,8 +352,8 @@
             + '<span class="proto-order">' + fmt(res.orderTotal) + ' total</span></div>'
             + '<div class="proto-bd">' + rows + '</div>'
             + '<p class="proto-round">' + (res.ltmPerShirt > 0
-                ? 'Blank + each ' + (isEmb() ? 'logo' : 'print') + ' are rounded to $0.50, so they add up by hand. The small-batch fee ($' + res.ltmFlat + ' ÷ ' + state.qty + ' shirts) is the one line with odd cents. The shirt price is all-in (tier ' + esc(res.tierLabel) + ').'
-                : 'Blank + each ' + (isEmb() ? 'logo' : 'print') + ' are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier ' + esc(res.tierLabel) + ').'
+                ? 'Blank + each ' + partNoun() + ' are rounded to $0.50, so they add up by hand. The small-batch fee ($' + res.ltmFlat + ' ÷ ' + state.qty + ' shirts) is the one line with odd cents. The shirt price is all-in (tier ' + esc(res.tierLabel) + ').'
+                : 'Blank + each ' + partNoun() + ' are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier ' + esc(res.tierLabel) + ').'
               ) + (isEmb() ? ' <em>Live embroidery rounds to the whole dollar; this prototype uses $0.50 to match the print methods.</em>' : '') + '</p>';
     }
     function renderMatrix() {
@@ -325,9 +375,9 @@
             return '<tr data-qty="' + x.qty + '"' + (x.qty === state.qty ? ' class="is-current"' : '') + '>' + cells + '</tr>';
         }).join('');
         box.innerHTML = '<div class="proto-matrix">'
-            + '<div class="proto-matrix-head">Price by quantity <span class="muted">&middot; ' + esc(state.style) + ' &middot; ' + METHODS[state.method].label + ' &middot; your selected ' + (isEmb() ? 'logos' : 'prints') + '</span></div>'
+            + '<div class="proto-matrix-head">Price by quantity <span class="muted">&middot; ' + esc(state.style) + ' &middot; ' + METHODS[state.method].label + ' &middot; your selected ' + partNoun() + 's' + '</span></div>'
             + '<div class="proto-mx-scroll"><table class="proto-mx-table"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>'
-            + '<p class="proto-mx-note">Each row is the full per-shirt build at that quantity &mdash; blank + each ' + (isEmb() ? 'logo' : 'print') + ' + small-batch all add across. Click a row to make it the active quantity.</p>'
+            + '<p class="proto-mx-note">Each row is the full per-shirt build at that quantity &mdash; blank + each ' + partNoun() + ' + small-batch all add across. Click a row to make it the active quantity.</p>'
             + '</div>';
     }
     function render() { renderMethod(); renderPrints(); renderResult(); renderMatrix(); }
@@ -345,6 +395,18 @@
             return fetch(API + '/api/pricing-bundle?method=DTG&styleNumber=' + encodeURIComponent(style)).then(jsonOk).then(function (b) {
                 if (!b || !b.allDtgCostsR || !b.allDtgCostsR.length) throw new Error('No DTG pricing for ' + style);
                 state.bundles.dtg = b; state.garment.dtg = baseGarment(b.sizes); state.bundleStyle.dtg = style; return b;
+            });
+        }
+        if (method === 'scp') {
+            return fetch(API + '/api/pricing-bundle?method=ScreenPrint&styleNumber=' + encodeURIComponent(style)).then(jsonOk).then(function (d) {
+                if (!d || !d.allScreenprintCostsR || !d.tiersR) throw new Error('No screen-print pricing for ' + style);
+                var bundle = {
+                    garment: baseGarment(d.sizes),
+                    flash: Number((d.rulesR || {}).FlashCharge) || 0.35,
+                    tiers: d.tiersR.map(function (t) { return { label: t.TierLabel, min: t.MinQuantity, max: t.MaxQuantity, denom: Number(t.MarginDenominator), ltm: Number(t.LTM_Fee) || 0 }; }).sort(function (a, b) { return a.min - b.min; }),
+                    costs: d.allScreenprintCostsR.map(function (c) { return { CostType: c.CostType, TierLabel: c.TierLabel, ColorCount: Number(c.ColorCount), Ed_Cost: Number(c.Ed_Cost) }; })
+                };
+                state.bundles.scp = bundle; state.garment.scp = bundle.garment; state.bundleStyle.scp = style; return bundle;
             });
         }
         // emb — needs both the EMB bundle (primary + surcharge) and EMB-AL (additional logos)
@@ -404,7 +466,7 @@
             var b = e.target.closest('button'); if (!b) return;
             var m = b.getAttribute('data-method'); if (!m || m === state.method) return;
             state.method = m;
-            if (m !== 'emb') state.prints.forEach(function (p) { p.size = clampSize(p.size); }); // keep sizes valid for print methods
+            if (m === 'dtf' || m === 'dtg') state.prints.forEach(function (p) { p.size = clampSize(p.size); }); // keep sizes valid for print methods
             ensureBundle();
         });
         $('style').addEventListener('input', function (e) { state.style = e.target.value; ensureBundleDebounced(); });
@@ -413,7 +475,7 @@
             b.addEventListener('click', function () { state.qty = parseInt(b.getAttribute('data-qty'), 10); $('qty').value = state.qty; render(); });
         });
         $('addPrint').addEventListener('click', function () {
-            state.prints.push({ size: clampSize('small'), stitches: DEFAULT_STITCHES });
+            state.prints.push({ size: clampSize('small'), stitches: DEFAULT_STITCHES, colors: 1 });
             render();
         });
         $('printsList').addEventListener('change', function (e) {
@@ -421,15 +483,19 @@
             if (isNaN(i) || !state.prints[i]) return;
             if (e.target.classList.contains('proto-print-size')) { state.prints[i].size = e.target.value; render(); }
         });
-        // live stitch update — patch the row's cost + results WITHOUT re-rendering the input (keeps focus)
+        // live stitch / color update — patch the row's cost + results WITHOUT re-rendering the input (keeps focus)
         $('printsList').addEventListener('input', function (e) {
-            if (!e.target.classList.contains('proto-logo-stitch')) return;
             var i = parseInt(e.target.getAttribute('data-i'), 10);
             if (isNaN(i) || !state.prints[i]) return;
-            state.prints[i].stitches = Math.max(0, parseInt(e.target.value, 10) || 0);
+            var liveRate = null;
+            if (e.target.classList.contains('proto-logo-stitch')) {
+                state.prints[i].stitches = Math.max(0, parseInt(e.target.value, 10) || 0); liveRate = embLogoRate(i);
+            } else if (e.target.classList.contains('proto-color-count')) {
+                state.prints[i].colors = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1)); liveRate = scpLocRate(i);
+            } else { return; }
             var row = e.target.closest('.proto-print-row');
             var costSpan = row && row.querySelector('.proto-print-cost');
-            if (costSpan && state.bundles.emb) costSpan.textContent = '+' + fmt(embLogoRate(i)) + '/pc';
+            if (costSpan && state.bundles[state.method]) costSpan.textContent = '+' + fmt(liveRate) + '/pc';
             renderResult(); renderMatrix();
         });
         $('printsList').addEventListener('click', function (e) {
