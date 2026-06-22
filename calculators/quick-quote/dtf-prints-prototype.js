@@ -244,6 +244,9 @@
     }
     function renderPrints() {
         var box = $('printsList');
+        var lbl = $('printsLabel'), addBtn = $('addPrint');
+        if (lbl) lbl.innerHTML = isEmb() ? 'Logos <span class="muted">&middot; each priced by stitch count</span>' : 'Prints <span class="muted">&middot; each one priced by its size</span>';
+        if (addBtn) addBtn.textContent = isEmb() ? '+ Add logo' : '+ Add print';
         if (isEmb()) {
             box.innerHTML = state.prints.map(function (p, i) {
                 var st = (p.stitches != null) ? p.stitches : DEFAULT_STITCHES;

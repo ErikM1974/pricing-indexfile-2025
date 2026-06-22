@@ -4,15 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Prints — prototype (DTF + DTG) · Northwest Custom Apparel</title>
+    <title>Decoration pricing — prototype (DTF · DTG · Embroidery) · Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.2">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.2">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.3">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.3">
 </head>
 <body>
 
@@ -29,28 +29,27 @@
             <span class="here">Prints (prototype)</span>
         </nav>
         <div class="spacer"></div>
-        <span class="theme-chip"><span class="dot"></span> Prototype · DTF + DTG · live pricing</span>
+        <span class="theme-chip"><span class="dot"></span> Prototype · DTF · DTG · EMB · live pricing</span>
     </header>
 
     <main class="page">
 
         <section class="hero">
             <div>
-                <div class="eyebrow">Prototype · the &ldquo;logo = size + position&rdquo; model</div>
-                <h1 class="page-title">Prints</h1>
+                <div class="eyebrow">Prototype · the &ldquo;blank + decoration, round each part&rdquo; model</div>
+                <h1 class="page-title">Decoration pricing</h1>
                 <p class="lede">
-                    Add a print and pick its <strong>size</strong> &mdash; that&rsquo;s the price. A print can go anywhere on the
-                    shirt, and the spot doesn&rsquo;t change the cost, so there&rsquo;s no placement to pick (that&rsquo;s a
-                    production detail for the Quote Builder). Works for <strong>DTF and DTG</strong>. Each part is priced on its
-                    own &mdash; <strong>blank + each print, rounded to $0.50</strong> &mdash; so the shirt price adds up by hand.
+                    Price a decoration on its own: <strong>prints by size</strong> (DTF / DTG &mdash; goes anywhere, placement is
+                    a Quote-Builder detail), <strong>embroidery by stitch count</strong> (primary + additional logos). Every part
+                    &mdash; <strong>blank + each print/logo, rounded to $0.50</strong> &mdash; so the shirt price adds up by hand.
                     (A different model than the live tools, under evaluation.)
                 </p>
             </div>
         </section>
 
         <div class="proto-banner">
-            &#9879; Experiment to evaluate the size + position model for <strong>DTF and DTG</strong>. Not linked anywhere,
-            changes no live tool, and a small print prices the same wherever it lands (left chest, sleeve, neck&hellip;).
+            &#9879; Experiment to evaluate the &ldquo;blank + decoration line items&rdquo; model for <strong>DTF, DTG, and
+            embroidery</strong>. Not linked anywhere, changes no live tool, and every part is rounded to $0.50 so the price adds up by hand.
         </div>
 
         <div id="protoError" class="qq-banner qq-banner--error" hidden></div>
@@ -84,7 +83,7 @@
                 </div>
 
                 <div class="proto-prints">
-                    <label>Prints <span class="muted">&middot; each one priced by its size</span></label>
+                    <label id="printsLabel">Prints <span class="muted">&middot; each one priced by its size</span></label>
                     <div id="printsList"></div>
                     <button type="button" id="addPrint" class="qq-link-btn">+ Add print</button>
                 </div>
@@ -117,6 +116,6 @@
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.2"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.3"></script>
 </body>
 </html>
