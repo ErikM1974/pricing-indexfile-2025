@@ -6,7 +6,20 @@
 
 ## Where it lives
 - **Live URL (noindex, unlinked, changes no real tool):**
-  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.21.9`.
+  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.22.3` (**DTF · DTG · EMB**).
+
+## ✅ EMBROIDERY ADDED (2026-06-22, v2026.06.22.2-3) — 3rd method in the prototype
+Method toggle now DTF / DTG / **Embroidery**. EMB = LOGOS by **stitch count** (not size). Unified `parts`
+model: each method returns `{blank, parts:[{label,short,sub,rate}], ltmPerShirt, perPiece, ...}` → one
+renderResult/matrix. EMB formula (verified live, all tiers **denom 0.53**; tiers 1-7/8-23/24-47/48-71/72+):
+`perShirt = hdc(garment/0.53) + hdc(primaryBase + stitchSurcharge) + Σ hdc(AL) + per-shirt LTM`.
+- **Primary base** (Embroidery_Costs ItemType=Shirt, ≤10K incl): $18/$18/$14/$13/$12 by tier.
+- **Stitch surcharge** (AS-Garm): ≤10K $0 · ≤15K +$4 · ≤25K +$10 (>25K caps at $10 — known gap).
+- **Additional logo** (EMB-AL ItemType=AL): base $10/$9/$8/$7.50/$7 + $1.25 per 1K over 8K.
+- **LTM** $50 at **qty ≤7** (tier 1-7 only), per-shirt line. Live EMB rounds **whole-dollar (CeilDollar)**;
+  prototype rounds parts to $0.50 to match DTF/DTG (flagged in the result note). Verified: PC61 @24 primary 8K
+  +AL 8K = $7+$14+$8 = **$29**; primary 20K = +$10 surcharge → $24. Stitch input is live (no focus loss).
+- Rate card still DTF+DTG only (EMB stitch-based rate card = future). **REMAINING: Screen Print + 2XL upcharges**, then the live cutover.
 - **Files:** `calculators/quick-quote/dtf-prints-prototype.{html,js,css}` (in ACTIVE_FILES.md as 🧪 Prototype).
 - Reachable only by URL (crumb links back to Quick Quote); not in any nav.
 - Self-contained: loads `app.config.js` + `dtf-pricing-service.js` only; DTF via the live service,
