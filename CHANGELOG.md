@@ -1,3 +1,7 @@
+## v2026.06.22.7 (2026.06.22)
+
+- Prints prototype: inventory check — color picker (62 colors, CATALOG_COLOR) + per-size stock from /api/inventory with low/out badges + total; 'Unable to verify' fallback (3 of 3: cap + 2XL + inventory)
+
 ## v2026.06.22.6 (2026.06.22)
 
 - Prints prototype: 2XL+ size upcharges — allocate extended sizes (sellingPriceDisplayAddOns), each adds blank upcharge to per-shirt; blended order total + by-size breakdown; suppressed for caps (OSFA)
