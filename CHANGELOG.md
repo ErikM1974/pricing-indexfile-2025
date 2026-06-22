@@ -1,3 +1,8 @@
+## v2026.06.22.4 (2026.06.22)
+
+- Doc: prototype resume doc — EMB added (stitch-count logos, formula + verified values); remaining = SCP + 2XL
+- Prints prototype: add Screen Print (4th method) — locations by ink-color count (front +flash, back additional), component-rounded + per-shirt LTM, min-24 guard; all 4 methods now in the unified parts model
+
 ## v2026.06.22.3 (2026.06.22)
 
 - Prints prototype: copy + labels reflect all 3 methods (Decoration pricing; Prints↔Logos, +Add print↔+Add logo dynamic)
