@@ -6,7 +6,17 @@
 
 ## Where it lives
 - **Live URL (noindex, unlinked, changes no real tool):**
-  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.22.4` (**DTF · DTG · EMB · SCP — ALL 4 methods**).
+  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.22.7` (**ALL 4 methods + caps + 2XL + inventory**).
+
+## ✅ PRODUCTION-COMPLETENESS FEATURES (2026-06-22, v2026.06.22.5-7)
+- **Cap embroidery (`.5`):** auto-detect cap vs garment by style (`isCapStyle`: ^CP/^NE/^C\d/^\d{2,3}) + **Garment/Cap override toggle**.
+  Cap → CAP + CAP-AL bundles (ItemType Cap/AL-CAP): cap base $17/$17/$13/$11/$9.50, cap-back AL $6.50→$4.25 (5K base @ $1/1K),
+  AS-Cap surcharge ($4/$10, = AS-Garm), cap blank (OSFA, C112 $3.61). Labels "Cap front"/"Cap back". Verified C112 @24 = $28.
+- **2XL+ upcharges (`.6`):** `+ 2XL+ sizes` expander → allocate extended-size counts; each adds its blank upcharge (`sellingPriceDisplayAddOns`:
+  2XL+$2/3XL+$3/4XL+$4/5XL+$6/6XL+$7) to the per-shirt; blended order total + "Order by size" breakdown. Suppressed for caps (OSFA).
+- **Inventory check (`.7`):** color picker (`/api/product-colors`, **CATALOG_COLOR** — the inventory key, not COLOR_NAME) + per-size stock
+  from `/api/inventory?styleNumber&color=` (rows have **SIZE/QTY** uppercase, no warehouse split) with good(≥50)/low(<50)/out(0) badges + total;
+  "Unable to verify" fallback. Default first color; updates on color change.
 
 ## ✅ SCREEN PRINT ADDED (2026-06-22, v2026.06.22.4) — 4th method, model now complete
 SCP = LOCATIONS by **ink-color count** (not size/stitches). Unified `parts` model holds. Tiers
