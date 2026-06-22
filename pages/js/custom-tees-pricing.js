@@ -192,7 +192,7 @@
      * unloaded config) — never returns a guessed total.
      *
      * input = {
-     *   pricingData: per-style /api/pricing-bundle?method=DTG response,
+     *   pricingData: per-style /api/pricing-bundle?method=DTG_Store response,
      *   config: { rushPct, shipFee, sizes: ['S',...] },
      *   cart: [{ catalogColor, colorName, qty: { S: 2, ... } }],
      *   location: 'LC' | 'FF' | 'JF',
@@ -256,15 +256,13 @@
         });
 
         // LTM — internal-DTG-builder MATH (distributed per piece, floor-to-cent,
-        // order line = perPiece × qty), but the online channel charges its OWN
-        // amount: config.ltmFee (Caspio Service_Code CTS-LTM, $25 — Erik
-        // 2026-06-10: self-serve orders cost less rep time than builder quotes)
-        // overrides the tier row's LTM_Fee ($50). The tier row still decides
-        // WHEN LTM applies (its LTM_Fee > 0 means the sub-24 tier matched).
+        // order line = perPiece × qty). Both the AMOUNT and the tiers it applies
+        // to come straight from the DTG_Store rows in Caspio Pricing_Tiers
+        // (method=DTG_Store): LTM_Fee $25 on the 1-11/12-23 tiers, $0 at 24+.
+        // The table is the single source — change it in Caspio, no deploy.
+        // (Legacy CTS-LTM service-code override retired 2026-06-22.)
         const tierLtmFee = matchedTier ? parseFloat(matchedTier.LTM_Fee || 0) : 0;
-        const cfgLtm = parseFloat(cfg.ltmFee);
-        const effectiveLtmFee = (tierLtmFee > 0 && Number.isFinite(cfgLtm) && cfgLtm >= 0)
-            ? cfgLtm : tierLtmFee;
+        const effectiveLtmFee = tierLtmFee;
         const ltmPerPiece = (!empty && effectiveLtmFee > 0)
             ? Math.floor((effectiveLtmFee / combinedQty) * 100) / 100 : 0;
         let ltmFee = r2(ltmPerPiece * combinedQty);
@@ -367,14 +365,11 @@
         const there = unitPrice(input.pricingData, input.config, next.MinQuantity,
             input.location, backLocation, refSize, rush);
 
-        // LTM threshold from the TIER ROWS; fee amount honors the same
-        // config.ltmFee override the order math uses (CTS-LTM online fee).
+        // LTM threshold AND amount both from the TIER ROWS — the DTG_Store rows
+        // in Caspio decide the fee ($25 on 1-11/12-23, $0 at 24+).
         const hereTier = findTier(input.pricingData.tiersR, combinedQty);
         const thereTier = findTier(input.pricingData.tiersR, next.MinQuantity);
-        const hereTierLtm = hereTier ? parseFloat(hereTier.LTM_Fee || 0) : 0;
-        const nudgeCfgLtm = parseFloat(input.config.ltmFee);
-        const hereLtmFee = (hereTierLtm > 0 && Number.isFinite(nudgeCfgLtm) && nudgeCfgLtm >= 0)
-            ? nudgeCfgLtm : hereTierLtm;
+        const hereLtmFee = hereTier ? parseFloat(hereTier.LTM_Fee || 0) : 0;
         const thereLtmFee = thereTier ? parseFloat(thereTier.LTM_Fee || 0) : 0;
         if (hereLtmFee > 0 && !(thereLtmFee > 0)) {
             // Crossing out of the small-batch fee: compare whole-order totals

@@ -7,17 +7,20 @@
  *   - LTM is the DTG builder's distributed math: tier LTM_Fee floor'd per
  *     piece × qty (12 pcs @ $50 → $4.16/pc → $49.92, NOT flat $50/$75)
  *   - back print can be FB or JB; front adds JF
- * Fixture mirrors /api/pricing-bundle?method=DTG (same traps as the 3DT
- * spec: LTM tier has no cost rows; orphaned 12-23 label).
+ * Fixture mirrors /api/pricing-bundle?method=DTG_Store — the retail storefront's
+ * OWN tiers (Erik 2026-06-22): $25 LTM on the 1-11/12-23 tiers, margin 0.53.
+ * 1-11 has no cost rows so it falls back to the lowest non-LTM tier (24-47),
+ * while 12-23 has its own $8.50 row and uses it directly.
  */
 const CTSPricing = require('../../pages/js/custom-tees-pricing.js');
 
 const BUNDLE = {
     tiersR: [
+        { TierLabel: '1-11', MinQuantity: 1, MaxQuantity: 11, MarginDenominator: 0.53, LTM_Fee: 25 },
+        { TierLabel: '12-23', MinQuantity: 12, MaxQuantity: 23, MarginDenominator: 0.53, LTM_Fee: 25 },
         { TierLabel: '24-47', MinQuantity: 24, MaxQuantity: 47, MarginDenominator: 0.53, LTM_Fee: 0 },
         { TierLabel: '48-71', MinQuantity: 48, MaxQuantity: 71, MarginDenominator: 0.53, LTM_Fee: 0 },
         { TierLabel: '72+', MinQuantity: 72, MaxQuantity: 99999, MarginDenominator: 0.53, LTM_Fee: 0 },
-        { TierLabel: '1-23', MinQuantity: 1, MaxQuantity: 23, MarginDenominator: 0.55, LTM_Fee: 50 },
     ],
     allDtgCostsR: [
         { PrintLocationCode: 'LC', TierLabel: '12-23', PrintCost: 8.5 },
@@ -87,11 +90,11 @@ describe('standard pricing — NO rush markup (internal-builder parity)', () => 
 });
 
 describe('LTM — DTG builder distributed math (tier LTM_Fee, floor per piece)', () => {
-    test('12 pcs @ $50 tier fee → 4.16/pc → order LTM $49.92 (NOT flat 50)', () => {
+    test('12 pcs @ $25 tier fee (12-23) → 2.08/pc → order LTM $24.96', () => {
         const r = q({ cart: cartOf(12) });
-        expect(r.ltmPerPiece).toBe(4.16);
-        expect(r.ltmFee).toBe(49.92);
-        expect(r.tierLabel).toBe('1-23');
+        expect(r.ltmPerPiece).toBe(2.08);
+        expect(r.ltmFee).toBe(24.96);
+        expect(r.tierLabel).toBe('12-23');
     });
 
     test('24 pcs → no LTM (tier fee 0)', () => {
@@ -100,50 +103,58 @@ describe('LTM — DTG builder distributed math (tier LTM_Fee, floor per piece)',
         expect(r.ltmPerPiece).toBe(0);
     });
 
-    test('sub-24 print cost resolves at lowest non-LTM tier, never $0, never 12-23 orphan', () => {
-        // 1-23 tier: garment 3/0.55=5.4545 + LC@24-47 7.50 = 12.9545 → ceil 13.00
+    test('12-23 is a real tier: uses its own $8.50 print row → base 14.50 (no orphan fallback)', () => {
+        // 12-23 tier: garment 3/0.53=5.6604 + LC@12-23 8.50 = 14.1604 → ceil 14.50
         const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 12, 'LC', null, 'M', false);
-        expect(u.basePrice).toBe(13.0);
+        expect(u.basePrice).toBe(14.5);
+        expect(u.costLabel).toBe('12-23');
+    });
+
+    test('1-11 tier has no cost rows → falls back to lowest non-LTM (24-47), never $0', () => {
+        // 1-11 tier: garment 3/0.53=5.6604 + LC@24-47 7.50 = 13.1604 → ceil 13.50
+        const u = CTSPricing.unitPrice(BUNDLE, CONFIG, 5, 'LC', null, 'M', false);
+        expect(u.basePrice).toBe(13.5);
         expect(u.costLabel).toBe('24-47');
     });
 
-    test('total parity example: 12×M LC standard = 12×13.00 + 49.92 = 205.92', () => {
+    test('total parity example: 12×M LC standard = 12×14.50 + 24.96 = 198.96', () => {
         const r = q({ cart: cartOf(12), delivery: { method: 'pickup', taxRate: null } });
-        expect(r.shirtsSubtotal).toBe(156.0);
-        expect(r.total).toBe(205.92);
+        expect(r.shirtsSubtotal).toBe(174.0);
+        expect(r.total).toBe(198.96);
     });
 
-    test('ONLINE override: config.ltmFee 25 (CTS-LTM) replaces the tier $50 — 12 pcs → 2.08/pc → $24.96', () => {
-        const r = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 25 }, delivery: { method: 'pickup', taxRate: null } });
+    test('the DTG_Store tier LTM_Fee is the SOLE source — a stray config.ltmFee is ignored', () => {
+        // CTS-LTM override retired 2026-06-22: only the tier ($25 on 12-23) drives the fee.
+        const r = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 999 }, delivery: { method: 'pickup', taxRate: null } });
         expect(r.ltmPerPiece).toBe(2.08);
         expect(r.ltmFee).toBe(24.96);
-        expect(r.total).toBe(180.96);   // 156 + 24.96
+        expect(r.total).toBe(198.96);
     });
 
-    test('override 0 waives the online fee entirely (Erik can set CTS-LTM to 0 in Caspio)', () => {
-        const r = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 0 } });
-        expect(r.ltmFee).toBe(0);
-    });
-
-    test('override never APPLIES the fee above the tier threshold (tier gates WHEN, config gates HOW MUCH)', () => {
-        const r = q({ cart: cartOf(24), config: { ...CONFIG, ltmFee: 25 } });
+    test('to WAIVE the fee, set the tier LTM_Fee to 0 in Caspio (a 0-LTM tier charges nothing)', () => {
+        const zeroLtm = { ...BUNDLE, tiersR: BUNDLE.tiersR.map((t) => ({ ...t, LTM_Fee: 0 })) };
+        const r = CTSPricing.quote({
+            pricingData: zeroLtm, config: CONFIG, cart: cartOf(12),
+            location: 'LC', backLocation: null, rush: false,
+            delivery: { method: 'pickup', taxRate: null },
+        });
         expect(r.ltmFee).toBe(0);
     });
 });
 
 describe('BAKED LTM + threshold shipping (UberPrints model, Erik 2026-06-10)', () => {
-    const BAKED_CFG = { ...CONFIG, ltmFee: 25, bakeLtm: true, shipFlat: 7.99, shipFreeOver: 100 };
+    const BAKED_CFG = { ...CONFIG, bakeLtm: true, shipFlat: 7.99, shipFreeOver: 100 };
 
     test('bake folds the per-piece share into unit prices — IDENTICAL total, no fee line', () => {
-        const sep = q({ cart: cartOf(12), config: { ...CONFIG, ltmFee: 25 }, delivery: { method: 'pickup', taxRate: null } });
+        const sep = q({ cart: cartOf(12), delivery: { method: 'pickup', taxRate: null } });
         const bak = q({ cart: cartOf(12), config: BAKED_CFG, delivery: { method: 'pickup', taxRate: null } });
         expect(bak.ltmFee).toBe(0);
         expect(bak.ltmBaked).toBe(true);
         expect(bak.ltmBakedPerPiece).toBe(2.08);
         expect(bak.ltmBakedTotal).toBe(24.96);
-        expect(bak.unitBySize.M.finalPrice).toBe(15.08);          // 13.00 + 2.08
-        expect(bak.lines[0].unitPrice).toBe(15.08);
-        expect(bak.total).toBe(sep.total);                         // 180.96 either way
+        expect(bak.unitBySize.M.finalPrice).toBe(16.58);          // 14.50 + 2.08
+        expect(bak.lines[0].unitPrice).toBe(16.58);
+        expect(bak.total).toBe(sep.total);                         // 198.96 either way
     });
 
     test('24+ pieces: nothing to bake — unit price is the clean tier price', () => {
@@ -154,18 +165,18 @@ describe('BAKED LTM + threshold shipping (UberPrints model, Erik 2026-06-10)', (
     });
 
     test('threshold shipping: under $100 merch pays the flat $7.99', () => {
-        // 6 × 15.17 baked (13.00 + floor(25/6)=4.16... → 4.16) = 6×17.16 = 102.96? compute exact below
         const r = q({ cart: cartOf(5), config: BAKED_CFG, delivery: { method: 'ship', taxRate: null } });
-        // 5 pcs: ltmPerPiece = floor(25/5*100)/100 = 5.00 → unit 18.00, merch 90.00 < 100
-        expect(r.unitBySize.M.finalPrice).toBe(18.0);
+        // 5 pcs in the 1-11 tier: base 13.50 (LC falls back to 24-47 $7.50) +
+        // ltmPerPiece floor(25/5*100)/100 = 5.00 → unit 18.50, merch 92.50 < 100
+        expect(r.unitBySize.M.finalPrice).toBe(18.5);
         expect(r.shipping).toBe(7.99);
         expect(r.shippingModel).toBe('threshold');
-        expect(r.freeShipRemaining).toBe(10.0);                    // 100 − 90
+        expect(r.freeShipRemaining).toBe(7.5);                     // 100 − 92.50
     });
 
     test('threshold shipping: at/over $100 merch ships FREE', () => {
         const r = q({ cart: cartOf(12), config: BAKED_CFG, delivery: { method: 'ship', taxRate: null } });
-        expect(r.shipping).toBe(0);                                // merch 180.96 ≥ 100
+        expect(r.shipping).toBe(0);                                // merch 198.96 ≥ 100
         expect(r.freeShipRemaining).toBe(0);
     });
 
@@ -177,9 +188,9 @@ describe('BAKED LTM + threshold shipping (UberPrints model, Erik 2026-06-10)', (
 
     test('WA tax bases on merch + flat shipping when charged', () => {
         const r = q({ cart: cartOf(5), config: BAKED_CFG, delivery: { method: 'ship', taxRate: 0.101 } });
-        expect(r.taxableBase).toBe(97.99);                         // 90.00 + 7.99
-        expect(r.tax).toBe(9.9);                                   // r2(97.99 × .101) = 9.8970 → 9.90
-        expect(r.total).toBe(107.89);
+        expect(r.taxableBase).toBe(100.49);                        // 92.50 + 7.99
+        expect(r.tax).toBe(10.15);                                 // r2(100.49 × .101) = 10.1495 → 10.15
+        expect(r.total).toBe(110.64);
     });
 
     test('legacy fixed shipFee still works when the threshold pair is absent', () => {

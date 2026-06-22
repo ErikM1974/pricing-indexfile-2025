@@ -11,9 +11,9 @@
  * quote save + Stripe session → redirect).
  *
  * Money rules (Erik):
- *   - Every price comes from an API at runtime: /api/pricing-bundle +
- *     Service_Codes 3DT-RUSH / CTS-LTM / CTS-SHIP-FLAT / CTS-SHIP-FREE-OVER
- *     (3DT-SHIP kept as the engine's legacy fallback) + /api/tax-rates/lookup.
+ *   - Every price comes from an API at runtime: /api/pricing-bundle?method=
+ *     DTG_Store (tiers/margin/LTM) + Service_Codes 3DT-RUSH / CTS-SHIP-FLAT /
+ *     CTS-SHIP-FREE-OVER (3DT-SHIP = engine's legacy fallback) + /api/tax-rates/lookup.
  *     Config failure = full-page fatal state. NEVER a guessed price.
  *   - All math lives in TDTPricing.quote() — this file only renders it.
  *     Rush is OFF by default; S.rush flows into every quote() call.
@@ -56,7 +56,7 @@
         // "Pricing unavailable" (NEVER a stale/guessed number — Erik's #1 rule).
         gallery: { items: [], category: '', search: '', sort: 'popular', extras: null },
         config: {
-            rushPct: null, ltmFee: null, ltmThreshold: null,
+            rushPct: null, ltmThreshold: null,
             // UberPrints model (Erik 2026-06-10): the small-batch fee is BAKED
             // into unit prices (bakeLtm — no fee line anywhere) and shipping is
             // threshold-based: CTS-SHIP-FLAT under CTS-SHIP-FREE-OVER, FREE
@@ -309,13 +309,12 @@
         try {
             // Service-code config + the curated 20-style catalog load first;
             // everything style-specific loads in selectProduct/loadProduct.
-            const [rushPct, ltmFee, shipFee, shipFlat, shipFreeOver, catalog, salesRows] = await Promise.all([
+            const [rushPct, shipFee, shipFlat, shipFreeOver, catalog, salesRows] = await Promise.all([
                 loadServiceCode('3DT-RUSH'),
-                // CTS-LTM ($25) — the ONLINE small-batch amount, intentionally
-                // lower than the internal builder's $50 tier fee (Erik
-                // 2026-06-10). Baked into unit prices via config.bakeLtm.
-                // Server reprice loads the same code; mismatch would 409 checkout.
-                loadServiceCode('CTS-LTM'),
+                // Small-batch fee retired from CTS-LTM (2026-06-22): the DTG_Store
+                // tier rows now carry LTM_Fee ($25 on 1-11/12-23), so the store no
+                // longer loads the CTS-LTM service code. Client + server reprice
+                // both read the fee from the same DTG_Store tiers — can't drift.
                 // 3DT-SHIP — harmless legacy fallback; the threshold pair below
                 // wins whenever both load (they're required, so always).
                 loadServiceCode('3DT-SHIP'),
@@ -339,7 +338,6 @@
             });
 
             S.config.rushPct = rushPct;
-            S.config.ltmFee = ltmFee;
             S.config.shipFee = shipFee;
             S.config.shipFlat = shipFlat;
             S.config.shipFreeOver = shipFreeOver;
@@ -423,7 +421,11 @@
         const styleChanged = S.styleNumber !== styleNumber;
 
         const [pricing, details, styleColors, calRows, sanmarInv] = await Promise.all([
-            fetchJson(`${API_BASE}/api/pricing-bundle?method=DTG&styleNumber=${enc}`),
+            // method=DTG_Store: the retail storefront's OWN tiers/margin/LTM live in
+            // Caspio Pricing_Tiers under DecorationMethod='DTG_Store' (reuses DTG print
+            // costs). Decoupled from wholesale DTG so a wholesale tier change can't
+            // ripple into the store, and vice-versa (Erik 2026-06-22).
+            fetchJson(`${API_BASE}/api/pricing-bundle?method=DTG_Store&styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/product-details?styleNumber=${enc}`),
             fetchJson(`${API_BASE}/api/dtg/top-sellers?style=${enc}`),
             // Staff-laid print-box layouts (calibration tool) — best-effort:

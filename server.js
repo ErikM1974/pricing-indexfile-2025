@@ -1419,13 +1419,15 @@ async function getCtsPricingConfig(styleNumber) {
   };
   const code = getCtsServiceCode;
 
-  const [pricingData, rushPct, shipFee, ltmFee, shipFlat, shipFreeOver, saleOff] = await Promise.all([
-    grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG&styleNumber=${encodeURIComponent(style)}`),
+  const [pricingData, rushPct, shipFee, shipFlat, shipFreeOver, saleOff] = await Promise.all([
+    // method=DTG_Store — retail storefront's own tiers/margin/LTM (DecorationMethod=
+    // 'DTG_Store' in Pricing_Tiers; reuses DTG print costs). Decoupled from wholesale
+    // DTG. MUST match the client fetch (custom-tees-app.js) or the reprice would 409.
+    grab(`${TDT_PROXY}/api/pricing-bundle?method=DTG_Store&styleNumber=${encodeURIComponent(style)}`),
     code('3DT-RUSH'), code('3DT-SHIP'),
-    // Online small-batch fee (CTS-LTM, $25 — cheaper than the builder's $50;
-    // Erik 2026-06-10). code() THROWS if the row is missing/inactive, which
-    // fails checkout closed rather than silently billing the wrong fee.
-    code('CTS-LTM'),
+    // Small-batch fee now lives on the DTG_Store tier rows (LTM_Fee $25 on the
+    // 1-11/12-23 tiers); the legacy CTS-LTM service-code override was retired
+    // 2026-06-22, so we no longer load it here.
     // UberPrints shipping model (Erik 2026-06-10): flat under the threshold,
     // FREE at/over it. Both Caspio-tunable, both fail-closed via code().
     code('CTS-SHIP-FLAT'), code('CTS-SHIP-FREE-OVER'),
@@ -1446,7 +1448,7 @@ async function getCtsPricingConfig(styleNumber) {
   if (!nonLtm.length) throw new Error(`DTG pricing tiers for ${style} missing a non-LTM tier`);
   const value = {
     pricingData,
-    config: { rushPct, shipFee, ltmFee, bakeLtm: true, shipFlat, shipFreeOver, saleOff, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
+    config: { rushPct, shipFee, bakeLtm: true, shipFlat, shipFreeOver, saleOff, ltmThreshold: nonLtm[0].MinQuantity, sizes: sizes.length ? sizes : TDT_SIZES.slice() },
   };
   _ctsCfgCache.set(style, { at: Date.now(), value });
   return value;
@@ -1661,9 +1663,9 @@ async function getCtsStyleCopy(style) {
 }
 
 // Per-piece reference prices for one style at the ladder quantities. Reuses
-// the 5-min-cached getCtsPricingConfig (bundle + fail-closed Service_Codes,
-// incl. the baked CTS-LTM at 12) and the pure quote engine — identical inputs
-// to what checkout reprices, minus tax/shipping (excluded by design).
+// the 5-min-cached getCtsPricingConfig (DTG_Store bundle + fail-closed Service_
+// Codes; the baked small-batch fee at 12 comes from the DTG_Store tier) and the
+// pure quote engine — identical inputs to checkout's reprice, minus tax/shipping.
 async function priceCtsStyleRefs(style) {
   const { pricingData, config } = await getCtsPricingConfig(style);
   const loc = CTS_PRICING.locationForArtSize('front', CTS_REF_ART.wIn, CTS_REF_ART.hIn);
