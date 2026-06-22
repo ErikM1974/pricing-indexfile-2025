@@ -1,3 +1,8 @@
+## v2026.06.22.2 (2026.06.22)
+
+- Doc: PRINTS prototype rollout scope — rounding lives in 4 per-method services (shared chokepoint), EMB/SCP both round-the-total + per-piece LTM today, catalog matrix auto-inherits
+- Prints prototype: add Embroidery (3rd method) — logos by stitch count (primary base+surcharge, additional logo AL rate), component-rounded + per-shirt LTM; unified 'parts' model across DTF/DTG/EMB; matrix + live stitch input
+
 ## v2026.06.22.1 (2026.06.22)
 
 - Doc: PRINTS_SIZE_MODEL_PROTOTYPE resume doc — size-only/4-name-ladder/component-rounded/per-shirt-LTM/matrix model; decision pending to take live
