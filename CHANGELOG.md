@@ -1,3 +1,7 @@
+## v2026.06.22.3 (2026.06.22)
+
+- Prints prototype: copy + labels reflect all 3 methods (Decoration pricing; Prints↔Logos, +Add print↔+Add logo dynamic)
+
 ## v2026.06.22.2 (2026.06.22)
 
 - Doc: PRINTS prototype rollout scope — rounding lives in 4 per-method services (shared chokepoint), EMB/SCP both round-the-total + per-piece LTM today, catalog matrix auto-inherits
