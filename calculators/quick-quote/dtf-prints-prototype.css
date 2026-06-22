@@ -53,6 +53,15 @@
 .proto-logo-unit { flex: 0 0 auto; font-size: 12px; color: var(--qq-muted); }
 .proto-embtype { display: inline-flex; }
 .proto-embtype button { font-size: 12px; padding: 6px 14px; }
+.proto-extsizes { margin-top: 6px; }
+.proto-ext-note { font-size: 11.5px; color: var(--qq-muted); margin: 0 0 8px; }
+.proto-ext-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.proto-ext-cell { display: flex; flex-direction: column; gap: 3px; font-size: 12px; }
+.proto-ext-lbl { color: var(--qq-ink, #1a1d1a); font-weight: 500; }
+.proto-ext-count { width: 62px; padding: 6px 8px; font-size: 13px; font-family: "Geist Mono", monospace; text-align: right; }
+.proto-sizes-sec { margin-top: 10px; }
+.proto-sizes-head { font-weight: 600; font-size: 12px; color: var(--qq-muted); margin-bottom: 4px; }
+.proto-ext-warn { color: #b4421f; font-size: 11.5px; margin: 6px 0 0; }
 .proto-color-count { flex: 0 0 60px; width: 60px; padding: 7px 9px; font-size: 13px; font-family: "Geist Mono", monospace; text-align: right; }
 .proto-flash { color: var(--qq-muted); font-size: 11px; font-weight: 400; }
 .proto-print-cost {
