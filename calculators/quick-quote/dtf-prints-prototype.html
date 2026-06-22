@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.6">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.6">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.7">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.7">
 </head>
 <body>
 
@@ -72,6 +72,12 @@
                     <div id="styleStatus" class="qq-style-status" aria-live="polite"></div>
                 </div>
 
+                <div class="field proto-color-field" id="colorField" hidden>
+                    <label for="color">Color <span class="muted">&middot; stock check</span></label>
+                    <select id="color" class="input"></select>
+                    <div id="inventory" class="proto-inventory"></div>
+                </div>
+
                 <div class="field proto-embtype-field" id="embTypeField" hidden>
                     <label>Embroidery on <span class="muted">&middot; auto-detected from the style</span></label>
                     <div class="proto-method proto-embtype" id="embTypeToggle" role="group" aria-label="Embroidery item type">
@@ -127,6 +133,6 @@
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.6"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.7"></script>
 </body>
 </html>

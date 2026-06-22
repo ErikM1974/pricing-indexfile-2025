@@ -52,6 +52,10 @@
         addons: { dtf: {}, dtg: {}, emb: {}, scp: {} },  // size → blank upcharge (sellingPriceDisplayAddOns)
         extSizes: {},        // 2XL/3XL/… → how many of the order qty are this extended size
         extSizesOpen: false,
+        colors: [],          // [{cat, name, swatch}] for the current style (CATALOG_COLOR drives inventory)
+        color: null,         // selected CATALOG_COLOR
+        inventory: null,     // { size: qty } | 'error' | null
+        invLoading: false,
         // each item carries a size (print methods), a stitch count (EMB) and an ink-color count (SCP)
         // so switching method needs no conversion — each method reads the field it cares about.
         prints: [
@@ -535,6 +539,67 @@
     var loadTimer = null;
     function ensureBundleDebounced() { clearTimeout(loadTimer); loadTimer = setTimeout(ensureBundle, 350); }
 
+    // ---------- color + inventory (stock check; inventory keys on CATALOG_COLOR) ----------
+    function loadColors(style) {
+        state.colors = []; state.color = null; state.inventory = null; renderColor(); renderInventory();
+        if (!style) return;
+        fetch(API + '/api/product-colors?styleNumber=' + encodeURIComponent(style)).then(jsonOk).then(function (d) {
+            if ((state.style || '').trim().toUpperCase() !== style) return; // stale
+            var rows = (d && (d.colors || d.data)) || (Array.isArray(d) ? d : []);
+            var seen = {}, colors = [];
+            rows.forEach(function (r) {
+                var cc = r.CATALOG_COLOR || r.COLOR_NAME;
+                if (cc && !seen[cc]) { seen[cc] = 1; colors.push({ cat: cc, name: r.COLOR_NAME || cc, swatch: r.COLOR_SQUARE_IMAGE || '' }); }
+            });
+            state.colors = colors;
+            state.color = colors.length ? colors[0].cat : null;
+            renderColor();
+            loadInventory(style, state.color);
+        }).catch(function () { renderColor(); renderInventory(); });
+    }
+    function loadInventory(style, color) {
+        state.inventory = null; state.invLoading = !!(style && color); renderInventory();
+        if (!style || !color) return;
+        fetch(API + '/api/inventory?styleNumber=' + encodeURIComponent(style) + '&color=' + encodeURIComponent(color)).then(jsonOk).then(function (rows) {
+            if ((state.style || '').trim().toUpperCase() !== style || state.color !== color) return; // stale
+            var bySize = {};
+            (Array.isArray(rows) ? rows : []).forEach(function (r) {
+                var sz = r.SIZE || r.size; var q = parseInt(r.QTY != null ? r.QTY : r.quantity, 10) || 0;
+                if (sz) bySize[sz] = (bySize[sz] || 0) + q;
+            });
+            state.inventory = bySize; state.invLoading = false; renderInventory();
+        }).catch(function () {
+            if ((state.style || '').trim().toUpperCase() !== style || state.color !== color) return;
+            state.inventory = 'error'; state.invLoading = false; renderInventory();
+        });
+    }
+    var colorTimer = null;
+    function loadColorsDebounced() { clearTimeout(colorTimer); colorTimer = setTimeout(function () { loadColors((state.style || '').trim().toUpperCase()); }, 400); }
+    function renderColor() {
+        var f = $('colorField'), sel = $('color'); if (!f || !sel) return;
+        f.hidden = !state.colors.length;
+        sel.innerHTML = state.colors.map(function (c) {
+            return '<option value="' + esc(c.cat) + '"' + (c.cat === state.color ? ' selected' : '') + '>' + esc(c.name) + '</option>';
+        }).join('');
+    }
+    var SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA', 'S/M', 'M/L', 'L/XL'];
+    function renderInventory() {
+        var box = $('inventory'); if (!box) return;
+        if (!state.colors.length) { box.innerHTML = ''; return; }
+        if (state.invLoading) { box.innerHTML = '<div class="proto-inv-note">Checking stock…</div>'; return; }
+        if (state.inventory === 'error' || state.inventory == null) { box.innerHTML = '<div class="proto-inv-note proto-inv-err">Unable to verify inventory.</div>'; return; }
+        var sizes = Object.keys(state.inventory);
+        if (!sizes.length) { box.innerHTML = '<div class="proto-inv-note">No stock data for this color.</div>'; return; }
+        sizes.sort(function (a, b) { var ia = SIZE_ORDER.indexOf(a), ib = SIZE_ORDER.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+        var total = sizes.reduce(function (s, k) { return s + state.inventory[k]; }, 0);
+        box.innerHTML = '<div class="proto-inv-head">In stock <span class="muted">&middot; ' + esc(state.color) + ' &middot; ' + total.toLocaleString() + ' total</span></div>'
+            + '<div class="proto-inv-grid">' + sizes.map(function (sz) {
+                var q = state.inventory[sz];
+                var cls = q <= 0 ? 'out' : (q < 50 ? 'low' : 'good');
+                return '<span class="proto-inv-cell ' + cls + '"><span class="proto-inv-sz">' + esc(sz) + '</span><span class="proto-inv-qty">' + q.toLocaleString() + '</span></span>';
+            }).join('') + '</div>';
+    }
+
     // ---------- events ----------
     function bind() {
         $('methodToggle').addEventListener('click', function (e) {
@@ -552,7 +617,8 @@
             state.embCap = cap; state.bundles.emb = null; // force reload of the cap/garment variant
             ensureBundle();
         });
-        $('style').addEventListener('input', function (e) { state.style = e.target.value; if (isEmb()) state.embCap = isCapStyle(state.style); ensureBundleDebounced(); });
+        $('style').addEventListener('input', function (e) { state.style = e.target.value; if (isEmb()) state.embCap = isCapStyle(state.style); ensureBundleDebounced(); loadColorsDebounced(); });
+        $('color').addEventListener('change', function (e) { state.color = e.target.value; loadInventory((state.style || '').trim().toUpperCase(), state.color); });
         $('qty').addEventListener('input', function (e) { state.qty = Math.max(1, parseInt(e.target.value, 10) || 1); render(); });
         Array.prototype.forEach.call(document.querySelectorAll('.qq-qty-presets button'), function (b) {
             b.addEventListener('click', function () { state.qty = parseInt(b.getAttribute('data-qty'), 10); $('qty').value = state.qty; render(); });
@@ -610,6 +676,7 @@
         bind();
         render();
         ensureBundle();
+        loadColors((state.style || '').trim().toUpperCase());
     }
 
     if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); }
