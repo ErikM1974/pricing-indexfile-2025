@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.3">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.3">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.4">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.4">
 </head>
 <body>
 
@@ -29,7 +29,7 @@
             <span class="here">Prints (prototype)</span>
         </nav>
         <div class="spacer"></div>
-        <span class="theme-chip"><span class="dot"></span> Prototype · DTF · DTG · EMB · live pricing</span>
+        <span class="theme-chip"><span class="dot"></span> Prototype · DTF · DTG · EMB · SCP · live pricing</span>
     </header>
 
     <main class="page">
@@ -39,17 +39,17 @@
                 <div class="eyebrow">Prototype · the &ldquo;blank + decoration, round each part&rdquo; model</div>
                 <h1 class="page-title">Decoration pricing</h1>
                 <p class="lede">
-                    Price a decoration on its own: <strong>prints by size</strong> (DTF / DTG &mdash; goes anywhere, placement is
-                    a Quote-Builder detail), <strong>embroidery by stitch count</strong> (primary + additional logos). Every part
-                    &mdash; <strong>blank + each print/logo, rounded to $0.50</strong> &mdash; so the shirt price adds up by hand.
-                    (A different model than the live tools, under evaluation.)
+                    Price a decoration on its own: <strong>prints by size</strong> (DTF / DTG), <strong>embroidery by stitch
+                    count</strong> (primary + additional logos), <strong>screen print by ink colors</strong> (front + back
+                    locations). Every part &mdash; <strong>blank + each piece, rounded to $0.50</strong> &mdash; so the shirt price
+                    adds up by hand. (A different model than the live tools, under evaluation.)
                 </p>
             </div>
         </section>
 
         <div class="proto-banner">
-            &#9879; Experiment to evaluate the &ldquo;blank + decoration line items&rdquo; model for <strong>DTF, DTG, and
-            embroidery</strong>. Not linked anywhere, changes no live tool, and every part is rounded to $0.50 so the price adds up by hand.
+            &#9879; Experiment to evaluate the &ldquo;blank + decoration line items&rdquo; model for <strong>DTF, DTG,
+            embroidery, and screen print</strong>. Not linked anywhere, changes no live tool, and every part is rounded to $0.50 so the price adds up by hand.
         </div>
 
         <div id="protoError" class="qq-banner qq-banner--error" hidden></div>
@@ -63,6 +63,7 @@
                         <button type="button" data-method="dtf" class="is-active">DTF</button>
                         <button type="button" data-method="dtg">DTG</button>
                         <button type="button" data-method="emb">Embroidery</button>
+                        <button type="button" data-method="scp">Screen print</button>
                     </div>
                 </div>
                 <div class="field">
@@ -116,6 +117,6 @@
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.3"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.4"></script>
 </body>
 </html>
