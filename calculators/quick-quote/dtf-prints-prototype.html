@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.21.9">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.21.9">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.1">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.1">
 </head>
 <body>
 
@@ -102,10 +102,20 @@
 
         <section class="proto-matrix-wrap" id="protoMatrix"></section>
 
+        <div class="proto-ratecard-bar" id="rateCardBar">
+            <button type="button" id="rateCardBtn" class="proto-rc-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download rate card (PDF)
+            </button>
+            <span class="proto-rc-hint">One-page reference &mdash; every size &times; quantity for DTF &amp; DTG, for this style.</span>
+        </div>
+
+        <div id="rateCardSheet" aria-hidden="true"></div>
+
     </main>
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.21.9"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.1"></script>
 </body>
 </html>

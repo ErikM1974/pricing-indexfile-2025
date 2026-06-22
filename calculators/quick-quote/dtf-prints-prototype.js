@@ -230,24 +230,30 @@
             if (!r.ok) throw new Error('HTTP ' + r.status); return r.json();
         });
     }
+    // Load + cache one method's bundle for a style. Resolves with the bundle (used by the
+    // live view for the active method, and by the rate card for BOTH methods).
+    function loadMethodBundle(method, style) {
+        if (state.bundles[method] && state.bundleStyle[method] === style) return Promise.resolve(state.bundles[method]);
+        var pr = (method === 'dtf')
+            ? dtfSvc.fetchPricingData(style).then(function (d) {
+                if (!d || !d.transferSizes || !d.transferSizes.small) throw new Error('No DTF pricing for ' + style);
+                state.bundles.dtf = d; state.garment.dtf = baseGarment(d.raw && d.raw.sizes); state.bundleStyle.dtf = style; return d;
+            })
+            : fetchDtgBundle(style).then(function (b) {
+                if (!b || !b.allDtgCostsR || !b.allDtgCostsR.length) throw new Error('No DTG pricing for ' + style);
+                state.bundles.dtg = b; state.garment.dtg = baseGarment(b.sizes); state.bundleStyle.dtg = style; return b;
+            });
+        return pr;
+    }
     function ensureBundle() {
         var m = state.method, style = (state.style || '').trim().toUpperCase();
         $('protoError').hidden = true;
         if (!style) { state.bundles[m] = null; render(); return; }
         if (state.bundles[m] && state.bundleStyle[m] === style) { render(); return; }
         state.loading = true; $('styleStatus').textContent = 'Loading…'; renderResult();
-        var p = (m === 'dtf')
-            ? dtfSvc.fetchPricingData(style).then(function (d) {
-                if (!d || !d.transferSizes || !d.transferSizes.small) throw new Error('No DTF pricing for ' + style);
-                state.bundles.dtf = d; state.garment.dtf = baseGarment(d.raw && d.raw.sizes);
-            })
-            : fetchDtgBundle(style).then(function (b) {
-                if (!b || !b.allDtgCostsR || !b.allDtgCostsR.length) throw new Error('No DTG pricing for ' + style);
-                state.bundles.dtg = b; state.garment.dtg = baseGarment(b.sizes);
-            });
-        p.then(function () {
+        loadMethodBundle(m, style).then(function () {
             if ((state.style || '').trim().toUpperCase() !== style || state.method !== m) return; // stale
-            state.bundleStyle[m] = style; state.loading = false;
+            state.loading = false;
             $('styleStatus').textContent = style + ' · base garment ' + fmt(state.garment[m]);
             render();
         }).catch(function (err) {
@@ -256,6 +262,72 @@
             var e = $('protoError'); e.hidden = false;
             e.innerHTML = '<strong>Couldn’t load ' + METHODS[m].label + ' pricing for ' + esc(style) + '.</strong> ' + esc((err && err.message) || 'Check the style number.');
             render();
+        });
+    }
+
+    // ---------- rate card (printable one-page PDF, both methods) ----------
+    function rateCardData(method) {
+        var sm = state.method, sq = state.qty;
+        state.method = method;
+        var sizes = SIZE_LADDER.filter(function (s) { return s[method]; });
+        var rows = [12, 24, 48, 72].map(function (q) {
+            state.qty = q;
+            var denom = null, ltmFlat = 0;
+            if (method === 'dtf') {
+                var mt = (state.bundles.dtf.pricingTiers || []).find(function (t) { return q >= t.minQuantity && q <= t.maxQuantity; });
+                if (mt) { denom = mt.marginDenominator; ltmFlat = mt.ltmFee > 0 ? mt.ltmFee : 0; }
+            } else {
+                var mt2 = dtgMarginTier();
+                if (mt2) { denom = Number(mt2.MarginDenominator); ltmFlat = Number(mt2.LTM_Fee) > 0 ? Number(mt2.LTM_Fee) : 0; }
+            }
+            var blank = denom ? hdc(state.garment[method] / denom) : null;
+            var sizeRates = {};
+            sizes.forEach(function (s) { sizeRates[s.key] = displayRate(s.key); });
+            return { qty: q, blank: blank, ltm: ltmFlat > 0 ? Math.floor((ltmFlat / q) * 100) / 100 : 0, sizeRates: sizeRates };
+        });
+        state.method = sm; state.qty = sq;
+        return { sizes: sizes, rows: rows };
+    }
+    function rateCardTable(method) {
+        if (!state.bundles[method]) return '';
+        var d = rateCardData(method);
+        var head = '<th>' + METHODS[method].label + '</th>' + d.rows.map(function (r) { return '<th>' + r.qty + '</th>'; }).join('');
+        var body = '<tr class="rc-blank"><td>Blank + margin</td>' + d.rows.map(function (r) { return '<td>' + (r.blank != null ? fmt(r.blank) : '&mdash;') + '</td>'; }).join('') + '</tr>';
+        d.sizes.forEach(function (s) {
+            body += '<tr><td>+ ' + esc(s.label) + ' <span class="rc-band">' + esc(s[method]) + '</span></td>'
+                + d.rows.map(function (r) { return '<td>+' + fmt(r.sizeRates[s.key]) + '</td>'; }).join('') + '</tr>';
+        });
+        body += '<tr class="rc-ltm"><td>Small-batch / shirt</td>' + d.rows.map(function (r) { return '<td>' + (r.ltm > 0 ? '+' + fmt(r.ltm) : '&mdash;') + '</td>'; }).join('') + '</tr>';
+        return '<table class="rc-table"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table>';
+    }
+    function buildRateCardSheet(style) {
+        var now = new Date();
+        var date = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear();
+        $('rateCardSheet').innerHTML =
+            '<div class="rc-head">'
+            + '<img class="rc-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">'
+            + '<div class="rc-titlewrap"><div class="rc-title">Print Pricing Rate Card</div>'
+            + '<div class="rc-meta">Style ' + esc(style) + ' &middot; base garment ' + fmt(state.garment.dtf || state.garment.dtg) + ' &middot; ' + esc(date) + '</div></div>'
+            + '</div>'
+            + rateCardTable('dtf') + rateCardTable('dtg')
+            + '<p class="rc-howto"><strong>How to read:</strong> price per shirt = <strong>Blank + margin + each print&rsquo;s size</strong> (plus the small-batch fee on orders under 24). Every part is rounded to $0.50, so the lines add up by hand. A print prices the same wherever it goes on the shirt. Estimate only &mdash; not a saved quote.</p>';
+    }
+    function downloadRateCard() {
+        var style = (state.style || '').trim().toUpperCase();
+        if (!style) return;
+        var btn = $('rateCardBtn'), label = btn.innerHTML;
+        btn.disabled = true; btn.textContent = 'Preparing…';
+        Promise.all([
+            loadMethodBundle('dtf', style).catch(function () { return null; }),
+            loadMethodBundle('dtg', style).catch(function () { return null; })
+        ]).then(function () {
+            btn.disabled = false; btn.innerHTML = label;
+            if (!state.bundles.dtf && !state.bundles.dtg) {
+                var e = $('protoError'); e.hidden = false; e.innerHTML = '<strong>No pricing to build a rate card for ' + esc(style) + '.</strong>';
+                return;
+            }
+            buildRateCardSheet(style);
+            window.print();
         });
     }
     var loadTimer = null;
@@ -294,6 +366,7 @@
             var q = parseInt(tr.getAttribute('data-qty'), 10);
             if (!isNaN(q)) { state.qty = q; $('qty').value = q; render(); }
         });
+        $('rateCardBtn').addEventListener('click', downloadRateCard);
     }
 
     function init() {
