@@ -6,7 +6,19 @@
 
 ## Where it lives
 - **Live URL (noindex, unlinked, changes no real tool):**
-  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.22.3` (**DTF · DTG · EMB**).
+  `/calculators/quick-quote/dtf-prints-prototype.html` — currently `v2026.06.22.4` (**DTF · DTG · EMB · SCP — ALL 4 methods**).
+
+## ✅ SCREEN PRINT ADDED (2026-06-22, v2026.06.22.4) — 4th method, model now complete
+SCP = LOCATIONS by **ink-color count** (not size/stitches). Unified `parts` model holds. Tiers
+**24-47 / 48-71 / 72-144 / 145-576** (all denom 0.53; **min qty 24**; LTM $50 only in 24-47). Formula:
+`perShirt = hdc(garment/0.53) + hdc((Ed_Cost_front(tier,colors) + $0.35×colors)/0.53) + Σ hdc(Ed_Cost_back/0.53) + per-shirt LTM`.
+- **Front = primary** (Screenprint_Costs CostType=PrimaryLocation) **+ flash $0.35 × colors on EVERY color** (not just dark);
+  **Back = additional** (CostType=AdditionalLocation, **same Ed_Cost as front now**, NO flash).
+- Ed_Cost is a RAW cost marked up by ÷0.53 (unlike DTF/DTG/EMB which add pre-margined selling prices).
+- Color input live (1-6); below-24 shows a clean "starts at 24" guard; matrix skips qty<24. Verified: PC61 @24 front 1c+back 1c
+  = $7+$6+$5.50+$2.08 LTM = **$20.58**; front 3c = $9 (flash×3). Rate card still DTF+DTG (size grid) only.
+
+**All four methods now share: blank + decoration line items, each rounded to $0.50, per-shirt LTM. REMAINING: 2XL upcharges, then the live cutover.**
 
 ## ✅ EMBROIDERY ADDED (2026-06-22, v2026.06.22.2-3) — 3rd method in the prototype
 Method toggle now DTF / DTG / **Embroidery**. EMB = LOGOS by **stitch count** (not size). Unified `parts`
