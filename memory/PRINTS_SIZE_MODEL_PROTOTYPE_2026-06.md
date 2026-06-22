@@ -66,6 +66,20 @@ The model is **prototype-only.** To take it live (Erik decides when):
 4. Decide screen-print + embroidery fit: **SCP prices by location COUNT, not size** (a size label would be
    cosmetic there); **EMB is already logo + stitch-count** (this model's cousin). Only DTF + DTG are size-tiered.
 
+## ROLLOUT SCOPE — how to take it live (verified 2026-06-22, 3-agent audit)
+**The rounding lives in the 4 per-method SERVICES, which are the shared chokepoint** — the Quote Builders
+call the service directly; the catalog + Quick Quote call it through `QuoteCartEngine.singleItemPreview`
+(engine owns NO formulas, just orchestration). So changing ONE method's service rounding propagates to that
+method's **builder + catalog + Quick Quote at once.** The catalog price MATRIX re-probes `singleItemPreview`
+(`pdp-configurator.js` probeLadder), so it **auto-inherits — no separate edit.** → unit of work = **4 services, not 12 surfaces.**
+
+**All 4 methods currently ROUND-THE-TOTAL (same as DTF/DTG pre-prototype):**
+- **SCP** (`screenprint-pricing-service.js:296-300,407-408`): `applyRounding(garment+print)` once; addl locations rounded separately; LTM per-piece after. SCP prices by **colors × locations, not size** (size cosmetic) — additive unit = blank + each location's print cost (by colors) + LTM.
+- **EMB** (`embroidery-quote-pricing.js:1160-1164`): `HalfDollarUp(garment+emb)` once into `roundedBase`, upcharges/stitch fees added on top unrounded; **LTM split per-piece** (÷qty) when qty≤7 (`:1586,1611`). EMB does NOT go through the engine in the BUILDER (uses `EmbroideryPricingCalculator` directly) but the catalog/Quick Quote DO via `priceEmbGroup`→same Calculator → Calculator is the shared chokepoint.
+- **DTF/DTG**: as documented above (round-the-total in their services / DTG server pricer).
+
+**To publish the prototype model, per method change: (a) round-each-part** (round blank + each decoration component to $0.50, sum) **and (b) flat per-shirt LTM line** (stop the ÷qty spread). Files: the 4 `*-pricing-service.js` / `embroidery-quote-pricing.js` (+ their `*-manual-pricing.js` / `*-quote-pricing.js` variants), then re-baseline `web-quote-cart-parity` + `quick-quote-parity` + the per-method `*-save-parity` tests. Builders inherit IF the service changes; catalog matrix auto-inherits.
+
 ## Why the model is sound (facts established this session)
 - **EMB, DTF, and DTG all price by SIZE; only Screen Print prices by location count.** DTG proven size-based:
   `FF==FB` and `JF==JB` exactly; combos are sums of size rates (`LC_FB = LC+FB`). See
