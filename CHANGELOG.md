@@ -1,3 +1,7 @@
+## v2026.06.22.6 (2026.06.22)
+
+- Prints prototype: 2XL+ size upcharges — allocate extended sizes (sellingPriceDisplayAddOns), each adds blank upcharge to per-shirt; blended order total + by-size breakdown; suppressed for caps (OSFA)
+
 ## v2026.06.22.5 (2026.06.22)
 
 - Doc: prototype resume doc — Screen Print added (ink-colors model, formula + verified); all 4 methods built, remaining = 2XL + cutover
