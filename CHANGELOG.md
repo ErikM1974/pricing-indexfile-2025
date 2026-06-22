@@ -1,3 +1,8 @@
+## v2026.06.22.5 (2026.06.22)
+
+- Doc: prototype resume doc — Screen Print added (ink-colors model, formula + verified); all 4 methods built, remaining = 2XL + cutover
+- Prints prototype: cap embroidery — auto-detect cap vs garment by style + Garment/Cap override toggle; cap base/AL/blank + AS-Cap surcharge; Cap front/back labels (CAP + CAP-AL bundles)
+
 ## v2026.06.22.4 (2026.06.22)
 
 - Doc: prototype resume doc — EMB added (stitch-count logos, formula + verified values); remaining = SCP + 2XL
