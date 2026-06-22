@@ -1,3 +1,9 @@
+## v2026.06.22.8 (2026.06.22)
+
+- Doc: prototype resume doc — cap embroidery + 2XL upcharges + inventory check all added (v.5-7); remaining = live cutover
+- feat(custom-tees): price storefront off DTG_Store table (decoupled from wholesale)
+- Deploy v2026.06.22.8: 2 files (SHIRT_DESIGNER_INTEGRATION_2026-06.md,custom-tees.html,...)
+
 ## v2026.06.22.7 (2026.06.22)
 
 - Prints prototype: inventory check — color picker (62 colors, CATALOG_COLOR) + per-size stock from /api/inventory with low/out badges + total; 'Unable to verify' fallback (3 of 3: cap + 2XL + inventory)
