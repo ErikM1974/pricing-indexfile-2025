@@ -1,3 +1,8 @@
+## v2026.06.22.1 (2026.06.22)
+
+- Doc: PRINTS_SIZE_MODEL_PROTOTYPE resume doc — size-only/4-name-ladder/component-rounded/per-shirt-LTM/matrix model; decision pending to take live
+- Prints prototype: downloadable one-page rate-card PDF (both DTF+DTG, every size × 12/24/48/72) below the matrix; print-to-PDF, both bundles loaded on demand
+
 ## v2026.06.21.9 (2026.06.21)
 
 - Prints prototype: add price-break matrix (12/24/48/72 + active qty) — full per-shirt build per quantity for the selected prints; click a row to set qty
