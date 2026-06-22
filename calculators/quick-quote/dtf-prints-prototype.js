@@ -49,6 +49,9 @@
         bundles: { dtf: null, dtg: null, emb: null, scp: null },
         bundleStyle: { dtf: null, dtg: null, emb: null, scp: null },
         garment: { dtf: 0, dtg: 0, emb: 0, scp: 0 },
+        addons: { dtf: {}, dtg: {}, emb: {}, scp: {} },  // size → blank upcharge (sellingPriceDisplayAddOns)
+        extSizes: {},        // 2XL/3XL/… → how many of the order qty are this extended size
+        extSizesOpen: false,
         // each item carries a size (print methods), a stitch count (EMB) and an ink-color count (SCP)
         // so switching method needs no conversion — each method reads the field it cares about.
         prints: [
@@ -72,6 +75,25 @@
     function isCapStyle(s) { s = (s || '').trim().toUpperCase(); return /^(CP|NE)/.test(s) || /^C\d/.test(s) || /^\d{2,3}$/.test(s); }
     function fmtSt(st) { return (Number(st) || 0).toLocaleString() + ' st'; }
     function jsonOk(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+    var EXT_SIZES = ['2XL', '3XL', '4XL', '5XL', '6XL'];
+    function addonsNow() { return state.addons[state.method] || {}; }
+    function addonFor(sz) { return Number(addonsNow()[sz]) || 0; }
+    function extSizesOffered() {
+        if (state.method === 'emb' && state.embCap) return []; // caps are OSFA — no extended sizes
+        var a = addonsNow(); return EXT_SIZES.filter(function (s) { return Number(a[s]) > 0; });
+    }
+    // Blend the standard per-shirt with any extended-size allocations (2XL+ add their blank upcharge to the per-shirt).
+    function sizeBreakdown(res) {
+        var ext = [], extTotal = 0;
+        extSizesOffered().forEach(function (sz) {
+            var c = Math.max(0, parseInt(state.extSizes[sz], 10) || 0);
+            if (c > 0) { ext.push({ size: sz, count: c, add: addonFor(sz), pp: round2(res.perPiece + addonFor(sz)) }); extTotal += c; }
+        });
+        var over = extTotal > state.qty;
+        var stdCount = Math.max(0, state.qty - extTotal);
+        var orderTotal = round2(stdCount * res.perPiece + ext.reduce(function (s, e) { return s + e.count * e.pp; }, 0));
+        return { stdCount: stdCount, ext: ext, orderTotal: orderTotal, over: over };
+    }
     function bandFor(key) { var s = SIZE_LADDER.find(function (x) { return x.key === key; }); return s ? s[state.method] : null; }
     function available(key) { return !!bandFor(key); }
     function sizeMeta(key) { return SIZE_LADDER.find(function (x) { return x.key === key; }) || SIZE_LADDER[0]; }
@@ -355,9 +377,22 @@
         }
         rows += '<div class="proto-bd-row proto-total"><span>Price per shirt</span><span>' + fmt(res.perPiece) + '/pc</span></div>';
 
+        var sb = sizeBreakdown(res);
+        var sizesHtml = '';
+        if (sb.ext.length) {
+            sizesHtml = '<div class="proto-bd proto-sizes-sec"><div class="proto-sizes-head">Order by size</div>'
+                + '<div class="proto-bd-row"><span>S–XL × ' + sb.stdCount + '</span><span>' + fmt(res.perPiece) + '/pc</span></div>';
+            sb.ext.forEach(function (e) {
+                sizesHtml += '<div class="proto-bd-row"><span>' + esc(e.size) + ' × ' + e.count + ' <span class="proto-band">+' + fmt(e.add) + ' blank</span></span><span>' + fmt(e.pp) + '/pc</span></div>';
+            });
+            sizesHtml += '<div class="proto-bd-row proto-total"><span>Order total</span><span>' + fmt(sb.orderTotal) + '</span></div>'
+                + (sb.over ? '<p class="proto-ext-warn">Extended sizes exceed the quantity — raise the quantity.</p>' : '') + '</div>';
+        }
+
         box.innerHTML = '<div class="proto-headline"><span class="proto-pp">' + fmt(res.perPiece) + '<span class="per">/pc</span></span>'
-            + '<span class="proto-order">' + fmt(res.orderTotal) + ' total</span></div>'
+            + '<span class="proto-order">' + fmt(sb.orderTotal) + ' total</span></div>'
             + '<div class="proto-bd">' + rows + '</div>'
+            + sizesHtml
             + '<p class="proto-round">' + (res.ltmPerShirt > 0
                 ? 'Blank + each ' + partNoun() + ' are rounded to $0.50, so they add up by hand. The small-batch fee ($' + res.ltmFlat + ' ÷ ' + state.qty + ' shirts) is the one line with odd cents. The shirt price is all-in (tier ' + esc(res.tierLabel) + ').'
                 : 'Blank + each ' + partNoun() + ' are rounded to $0.50, so the lines add up to the per-shirt price by hand — no separate rounding step (tier ' + esc(res.tierLabel) + ').'
@@ -394,7 +429,23 @@
             b.classList.toggle('is-active', (b.getAttribute('data-embtype') === 'cap') === state.embCap);
         });
     }
-    function render() { renderMethod(); renderEmbType(); renderPrints(); renderResult(); renderMatrix(); }
+    function renderExtSizes() {
+        var toggle = $('extSizesToggle'), box = $('extSizes');
+        if (!toggle || !box) return;
+        var offered = state.bundles[state.method] ? extSizesOffered() : [];
+        if (!offered.length) { toggle.hidden = true; box.hidden = true; box.innerHTML = ''; return; }
+        toggle.hidden = false;
+        toggle.textContent = (state.extSizesOpen ? '− ' : '+ ') + '2XL+ sizes (upcharges)';
+        box.hidden = !state.extSizesOpen;
+        if (!state.extSizesOpen) { box.innerHTML = ''; return; }
+        box.innerHTML = '<p class="proto-ext-note">Allocate some of the ' + state.qty + ' to extended sizes — each adds its blank upcharge.</p>'
+            + '<div class="proto-ext-grid">' + offered.map(function (sz) {
+                var c = Math.max(0, parseInt(state.extSizes[sz], 10) || 0);
+                return '<label class="proto-ext-cell"><span class="proto-ext-lbl">' + sz + ' <span class="muted">+' + fmt(addonFor(sz)) + '</span></span>'
+                    + '<input class="input proto-ext-count" type="number" min="0" step="1" data-size="' + sz + '" value="' + c + '"></label>';
+            }).join('') + '</div>';
+    }
+    function render() { renderMethod(); renderEmbType(); renderExtSizes(); renderPrints(); renderResult(); renderMatrix(); }
 
     // ---------- data load (lazy per method, cached) ----------
     function loadMethodBundle(method, style) {
@@ -402,13 +453,15 @@
         if (method === 'dtf') {
             return dtfSvc.fetchPricingData(style).then(function (d) {
                 if (!d || !d.transferSizes || !d.transferSizes.small) throw new Error('No DTF pricing for ' + style);
-                state.bundles.dtf = d; state.garment.dtf = baseGarment(d.raw && d.raw.sizes); state.bundleStyle.dtf = style; return d;
+                state.bundles.dtf = d; state.garment.dtf = baseGarment(d.raw && d.raw.sizes); state.bundleStyle.dtf = style;
+                state.addons.dtf = (d.raw && d.raw.sellingPriceDisplayAddOns) || {}; return d;
             });
         }
         if (method === 'dtg') {
             return fetch(API + '/api/pricing-bundle?method=DTG&styleNumber=' + encodeURIComponent(style)).then(jsonOk).then(function (b) {
                 if (!b || !b.allDtgCostsR || !b.allDtgCostsR.length) throw new Error('No DTG pricing for ' + style);
-                state.bundles.dtg = b; state.garment.dtg = baseGarment(b.sizes); state.bundleStyle.dtg = style; return b;
+                state.bundles.dtg = b; state.garment.dtg = baseGarment(b.sizes); state.bundleStyle.dtg = style;
+                state.addons.dtg = b.sellingPriceDisplayAddOns || {}; return b;
             });
         }
         if (method === 'scp') {
@@ -420,7 +473,8 @@
                     tiers: d.tiersR.map(function (t) { return { label: t.TierLabel, min: t.MinQuantity, max: t.MaxQuantity, denom: Number(t.MarginDenominator), ltm: Number(t.LTM_Fee) || 0 }; }).sort(function (a, b) { return a.min - b.min; }),
                     costs: d.allScreenprintCostsR.map(function (c) { return { CostType: c.CostType, TierLabel: c.TierLabel, ColorCount: Number(c.ColorCount), Ed_Cost: Number(c.Ed_Cost) }; })
                 };
-                state.bundles.scp = bundle; state.garment.scp = bundle.garment; state.bundleStyle.scp = style; return bundle;
+                state.bundles.scp = bundle; state.garment.scp = bundle.garment; state.bundleStyle.scp = style;
+                state.addons.scp = d.sellingPriceDisplayAddOns || {}; return bundle;
             });
         }
         // emb — garment OR cap. cap = CAP + CAP-AL bundles (ItemType Cap / AL-CAP, AL base 5K @ $1/1K);
@@ -455,7 +509,8 @@
                 tiers: emb.tiersR.map(function (t) { return { label: t.TierLabel, min: t.MinQuantity, max: t.MaxQuantity, denom: Number(t.MarginDenominator), ltm: Number(t.LTM_Fee) || 0 }; }).sort(function (a, b) { return a.min - b.min; }),
                 embBase: embBase, surcharge: surcharge, al: alMap
             };
-            state.bundles.emb = bundle; state.garment.emb = bundle.garment; state.bundleStyle.emb = style; return bundle;
+            state.bundles.emb = bundle; state.garment.emb = bundle.garment; state.bundleStyle.emb = style;
+            state.addons.emb = emb.sellingPriceDisplayAddOns || {}; return bundle;
         });
     }
     function ensureBundle() {
@@ -537,6 +592,13 @@
             if (!isNaN(q)) { state.qty = q; $('qty').value = q; render(); }
         });
         $('rateCardBtn').addEventListener('click', downloadRateCard);
+        $('extSizesToggle').addEventListener('click', function () { state.extSizesOpen = !state.extSizesOpen; renderExtSizes(); });
+        $('extSizes').addEventListener('input', function (e) {
+            if (!e.target.classList.contains('proto-ext-count')) return;
+            var sz = e.target.getAttribute('data-size');
+            state.extSizes[sz] = Math.max(0, parseInt(e.target.value, 10) || 0);
+            renderResult(); // live (don't re-render the inputs → keep focus)
+        });
     }
 
     function init() {
