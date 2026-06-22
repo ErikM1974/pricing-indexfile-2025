@@ -45,6 +45,7 @@
         style: 'PC61',
         qty: 24,
         loading: false,
+        embCap: false,   // EMB only: is the current style a cap (cap embroidery costs) vs a garment?
         bundles: { dtf: null, dtg: null, emb: null, scp: null },
         bundleStyle: { dtf: null, dtg: null, emb: null, scp: null },
         garment: { dtf: 0, dtg: 0, emb: 0, scp: 0 },
@@ -65,6 +66,10 @@
     }
     function hdc(x) { return Math.ceil(x * 2 - 1e-9) / 2; }  // round UP to next $0.50
     function round2(x) { return Math.round(x * 100) / 100; }
+    // Cap detection (mirrors the builder's fallback patterns: CP*, NE*, C+digit, 2-3 digit Richardson).
+    // Beanies are flat headwear → garment pricing, so exclude obvious knit/beanie styles isn't needed at
+    // the style-number level; the user can flip the Garment/Cap toggle if a detection is wrong.
+    function isCapStyle(s) { s = (s || '').trim().toUpperCase(); return /^(CP|NE)/.test(s) || /^C\d/.test(s) || /^\d{2,3}$/.test(s); }
     function fmtSt(st) { return (Number(st) || 0).toLocaleString() + ' st'; }
     function jsonOk(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
     function bandFor(key) { var s = SIZE_LADDER.find(function (x) { return x.key === key; }); return s ? s[state.method] : null; }
@@ -163,11 +168,12 @@
         var b = state.bundles.emb; if (!b) return null;
         var t = embTierFor(state.qty); if (!t) return { error: 'No EMB price tier for qty ' + state.qty };
         var blank = hdc(b.garment / t.denom);
+        var cap = b.isCap;
         var parts = state.prints.map(function (p, i) {
             var st = Math.max(0, parseInt(p.stitches, 10) || 0);
-            return i === 0
-                ? { label: 'Primary logo', short: 'Primary', sub: fmtSt(st), rate: embLogoRate(i) }
-                : { label: 'Additional logo ' + (i + 1), short: 'Logo ' + (i + 1), sub: fmtSt(st), rate: embLogoRate(i) };
+            if (i === 0) return { label: cap ? 'Cap front' : 'Primary logo', short: cap ? 'Front' : 'Primary', sub: fmtSt(st), rate: embLogoRate(i) };
+            if (cap) return { label: i === 1 ? 'Cap back' : 'Cap location ' + (i + 1), short: i === 1 ? 'Back' : 'Loc ' + (i + 1), sub: fmtSt(st), rate: embLogoRate(i) };
+            return { label: 'Additional logo ' + (i + 1), short: 'Logo ' + (i + 1), sub: fmtSt(st), rate: embLogoRate(i) };
         });
         var ltmPerShirt = t.ltm > 0 ? Math.floor((t.ltm / state.qty) * 100) / 100 : 0;
         var perPiece = round2(blank + parts.reduce(function (s, p) { return s + p.rate; }, 0) + ltmPerShirt);
@@ -298,9 +304,10 @@
             return;
         }
         if (isEmb()) {
+            var cap = state.bundles.emb && state.bundles.emb.isCap;
             box.innerHTML = state.prints.map(function (p, i) {
                 var st = (p.stitches != null) ? p.stitches : DEFAULT_STITCHES;
-                var role = i === 0 ? 'Primary logo' : 'Additional logo';
+                var role = cap ? (i === 0 ? 'Cap front' : (i === 1 ? 'Cap back' : 'Cap loc ' + (i + 1))) : (i === 0 ? 'Primary logo' : 'Additional logo');
                 var cost = state.bundles.emb ? ('+' + fmt(embLogoRate(i)) + '/pc') : '';
                 return '<div class="proto-print-row" data-i="' + i + '">'
                     + '<span class="proto-print-n">' + (i + 1) + '</span>'
@@ -380,11 +387,18 @@
             + '<p class="proto-mx-note">Each row is the full per-shirt build at that quantity &mdash; blank + each ' + partNoun() + ' + small-batch all add across. Click a row to make it the active quantity.</p>'
             + '</div>';
     }
-    function render() { renderMethod(); renderPrints(); renderResult(); renderMatrix(); }
+    function renderEmbType() {
+        var f = $('embTypeField'); if (!f) return;
+        f.hidden = !isEmb();
+        Array.prototype.forEach.call(document.querySelectorAll('#embTypeToggle button'), function (b) {
+            b.classList.toggle('is-active', (b.getAttribute('data-embtype') === 'cap') === state.embCap);
+        });
+    }
+    function render() { renderMethod(); renderEmbType(); renderPrints(); renderResult(); renderMatrix(); }
 
     // ---------- data load (lazy per method, cached) ----------
     function loadMethodBundle(method, style) {
-        if (state.bundles[method] && state.bundleStyle[method] === style) return Promise.resolve(state.bundles[method]);
+        if (state.bundles[method] && state.bundleStyle[method] === style && !(method === 'emb' && state.bundles.emb.isCap !== state.embCap)) return Promise.resolve(state.bundles[method]);
         if (method === 'dtf') {
             return dtfSvc.fetchPricingData(style).then(function (d) {
                 if (!d || !d.transferSizes || !d.transferSizes.small) throw new Error('No DTF pricing for ' + style);
@@ -409,28 +423,34 @@
                 state.bundles.scp = bundle; state.garment.scp = bundle.garment; state.bundleStyle.scp = style; return bundle;
             });
         }
-        // emb — needs both the EMB bundle (primary + surcharge) and EMB-AL (additional logos)
+        // emb — garment OR cap. cap = CAP + CAP-AL bundles (ItemType Cap / AL-CAP, AL base 5K @ $1/1K);
+        // garment = EMB + EMB-AL (ItemType Shirt / AL, AL base 8K @ $1.25/1K). Same structure either way.
+        var cap = state.embCap;
+        var costMethod = cap ? 'CAP' : 'EMB', alMethod = cap ? 'CAP-AL' : 'EMB-AL';
+        var baseType = cap ? 'Cap' : 'Shirt', alType = cap ? 'AL-CAP' : 'AL';
+        var asType = cap ? 'AS-Cap' : 'AS-Garm', alBaseStitch = cap ? 5000 : 8000, alRate = cap ? 1 : 1.25;
         return Promise.all([
-            fetch(API + '/api/pricing-bundle?method=EMB&styleNumber=' + encodeURIComponent(style)).then(jsonOk),
-            fetch(API + '/api/pricing-bundle?method=EMB-AL&styleNumber=' + encodeURIComponent(style)).then(jsonOk).catch(function () { return null; })
+            fetch(API + '/api/pricing-bundle?method=' + costMethod + '&styleNumber=' + encodeURIComponent(style)).then(jsonOk),
+            fetch(API + '/api/pricing-bundle?method=' + alMethod + '&styleNumber=' + encodeURIComponent(style)).then(jsonOk).catch(function () { return null; })
         ]).then(function (res) {
             var emb = res[0], al = res[1];
-            if (!emb || !emb.allEmbroideryCostsR || !emb.tiersR) throw new Error('No EMB pricing for ' + style);
+            if (!emb || !emb.allEmbroideryCostsR || !emb.tiersR) throw new Error('No ' + (cap ? 'cap ' : '') + 'embroidery pricing for ' + style);
             var costs = emb.allEmbroideryCostsR;
             var embBase = {};
-            costs.filter(function (c) { return c.ItemType === 'Shirt'; }).forEach(function (c) { embBase[c.TierLabel] = Number(c.EmbroideryCost); });
-            var mid = costs.find(function (c) { return c.ItemType === 'AS-Garm' && c.TierLabel === 'Mid'; });
-            var large = costs.find(function (c) { return c.ItemType === 'AS-Garm' && c.TierLabel === 'Large'; });
+            costs.filter(function (c) { return c.ItemType === baseType; }).forEach(function (c) { embBase[c.TierLabel] = Number(c.EmbroideryCost); });
+            var mid = costs.find(function (c) { return c.ItemType === asType && c.TierLabel === 'Mid'; });
+            var large = costs.find(function (c) { return c.ItemType === asType && c.TierLabel === 'Large'; });
             var surcharge = [
                 { max: 10000, fee: 0 },
                 { max: 15000, fee: mid ? Number(mid.EmbroideryCost) : 4 },
                 { max: 25000, fee: large ? Number(large.EmbroideryCost) : 10 }
             ];
             var alMap = {};
-            ((al && al.allEmbroideryCostsR) || []).filter(function (c) { return c.ItemType === 'AL'; }).forEach(function (c) {
-                alMap[c.TierLabel] = { base: Number(c.EmbroideryCost), baseStitch: Number(c.BaseStitchCount) || 8000, rate: Number(c.AdditionalStitchRate) || 1.25 };
+            ((al && al.allEmbroideryCostsR) || []).filter(function (c) { return c.ItemType === alType; }).forEach(function (c) {
+                alMap[c.TierLabel] = { base: Number(c.EmbroideryCost), baseStitch: Number(c.BaseStitchCount) || alBaseStitch, rate: Number(c.AdditionalStitchRate) || alRate };
             });
             var bundle = {
+                isCap: cap,
                 garment: baseGarment(emb.sizes),
                 tiers: emb.tiersR.map(function (t) { return { label: t.TierLabel, min: t.MinQuantity, max: t.MaxQuantity, denom: Number(t.MarginDenominator), ltm: Number(t.LTM_Fee) || 0 }; }).sort(function (a, b) { return a.min - b.min; }),
                 embBase: embBase, surcharge: surcharge, al: alMap
@@ -442,7 +462,7 @@
         var m = state.method, style = (state.style || '').trim().toUpperCase();
         $('protoError').hidden = true;
         if (!style) { state.bundles[m] = null; render(); return; }
-        if (state.bundles[m] && state.bundleStyle[m] === style) { render(); return; }
+        if (state.bundles[m] && state.bundleStyle[m] === style && !(m === 'emb' && state.bundles.emb.isCap !== state.embCap)) { render(); return; }
         state.loading = true; $('styleStatus').textContent = 'Loading…'; renderResult();
         loadMethodBundle(m, style).then(function () {
             if ((state.style || '').trim().toUpperCase() !== style || state.method !== m) return;
@@ -467,9 +487,17 @@
             var m = b.getAttribute('data-method'); if (!m || m === state.method) return;
             state.method = m;
             if (m === 'dtf' || m === 'dtg') state.prints.forEach(function (p) { p.size = clampSize(p.size); }); // keep sizes valid for print methods
+            if (m === 'emb') state.embCap = isCapStyle(state.style); // auto-detect cap vs garment on switch
             ensureBundle();
         });
-        $('style').addEventListener('input', function (e) { state.style = e.target.value; ensureBundleDebounced(); });
+        $('embTypeToggle').addEventListener('click', function (e) {
+            var b = e.target.closest('button'); if (!b) return;
+            var cap = b.getAttribute('data-embtype') === 'cap';
+            if (cap === state.embCap) return;
+            state.embCap = cap; state.bundles.emb = null; // force reload of the cap/garment variant
+            ensureBundle();
+        });
+        $('style').addEventListener('input', function (e) { state.style = e.target.value; if (isEmb()) state.embCap = isCapStyle(state.style); ensureBundleDebounced(); });
         $('qty').addEventListener('input', function (e) { state.qty = Math.max(1, parseInt(e.target.value, 10) || 1); render(); });
         Array.prototype.forEach.call(document.querySelectorAll('.qq-qty-presets button'), function (b) {
             b.addEventListener('click', function () { state.qty = parseInt(b.getAttribute('data-qty'), 10); $('qty').value = state.qty; render(); });

@@ -11,8 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.4">
-    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.4">
+    <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.22.5">
+    <link rel="stylesheet" href="/calculators/quick-quote/dtf-prints-prototype.css?v=2026.06.22.5">
 </head>
 <body>
 
@@ -72,6 +72,14 @@
                     <div id="styleStatus" class="qq-style-status" aria-live="polite"></div>
                 </div>
 
+                <div class="field proto-embtype-field" id="embTypeField" hidden>
+                    <label>Embroidery on <span class="muted">&middot; auto-detected from the style</span></label>
+                    <div class="proto-method proto-embtype" id="embTypeToggle" role="group" aria-label="Embroidery item type">
+                        <button type="button" data-embtype="garment" class="is-active">Garment</button>
+                        <button type="button" data-embtype="cap">Cap</button>
+                    </div>
+                </div>
+
                 <div class="field qty-field">
                     <label for="qty">Quantity</label>
                     <input id="qty" class="input num" type="number" min="1" step="1" value="24">
@@ -117,6 +125,6 @@
 
     <script src="/config/app.config.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/dtf-pricing-service.js?v=2026.06.18.1"></script>
-    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.4"></script>
+    <script src="/calculators/quick-quote/dtf-prints-prototype.js?v=2026.06.22.5"></script>
 </body>
 </html>
