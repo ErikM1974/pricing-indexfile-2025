@@ -1,15 +1,12 @@
 {
   "_meta": {
-    "capturedAt": "2026-06-20T11:52:47.173Z",
+    "capturedAt": "2026-06-23T14:51:17.583Z",
     "capturedBy": "scripts/capture-pricing-baselines.js",
     "scenarios": 22,
     "successful": 22,
     "stubs": 0,
     "errors": 0,
-    "errorList": [],
-    "approvedBy": "erik@nwcustomapparel.com",
-    "approvedAt": "2026-06-20",
-    "approvalNote": "Re-lock after two intentional, live production pricing changes (DTG/EMB/caps byte-identical, verified). (1) SCP CLEAN MODEL revamp, deployed v2026.06.20.1: screenprint-pricing-service.js now prices from Ed_Cost/0.53 (front = HalfDollarCeil((garment + Ed_Cost + 0.35*colors)/0.53); back = HalfDollarCeil(Ed_Cost/0.53)); BasePrintCost retired; tiers 13-36/37-71 -> 24-47/48-71/72-144/145-576 at margin 0.53; LTM $75/$50 -> $50 on 24-47 / $0 above; rounding HalfDollarCeil_Final. All 5 SCP scenarios re-priced lower (e.g. SCP-01 PC54 1c@24 $13.50 -> $11.50/pc). (2) DTF freight bump (Caspio data change, 2026-06-19, no deploy): Transfer_Freight 0.50/0.35/0.25/0.15 -> 0.75/0.45/0.30/0.20 (+ Medium 10-23 transfer $10 -> $11.50); each of the 5 DTF scenarios rose exactly +$0.50/pc after HalfDollarCeil. Garment cost/margin unchanged (5.45/5.66). See memory/PRINT_METHOD_MARGIN_STRATEGY_2026-06.md."
+    "errorList": []
   },
   "DTG-01": {
     "builder": "DTG",
@@ -26,27 +23,27 @@
       }
     },
     "expected": {
-      "tier": "1-23",
-      "ltmFee": 50,
+      "tier": "12-23",
+      "ltmFee": 0,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         },
         "L": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         },
         "XL": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         }
       },
-      "lineSubtotal": 156,
-      "grandTotalBeforeTax": 206
+      "lineSubtotal": 174,
+      "grandTotalBeforeTax": 174
     }
   },
   "DTG-02": {
@@ -181,42 +178,42 @@
       }
     },
     "expected": {
-      "tier": "1-23",
-      "ltmFee": 50,
+      "tier": "12-23",
+      "ltmFee": 0,
       "perSizeBreakdown": {
         "M": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "L": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "XL": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "2XL": {
           "qty": 3,
-          "perPiece": 15,
-          "sizeTotal": 45
+          "perPiece": 16.5,
+          "sizeTotal": 49.5
         },
         "3XL": {
           "qty": 3,
-          "perPiece": 16,
-          "sizeTotal": 48
+          "perPiece": 17.5,
+          "sizeTotal": 52.5
         },
         "4XL": {
           "qty": 3,
-          "perPiece": 17,
-          "sizeTotal": 51
+          "perPiece": 18.5,
+          "sizeTotal": 55.5
         }
       },
-      "lineSubtotal": 183,
-      "grandTotalBeforeTax": 233
+      "lineSubtotal": 201,
+      "grandTotalBeforeTax": 201
     }
   },
   "EMB-01": {
@@ -521,7 +518,7 @@
       "ltmFee": 0,
       "ltmDistributedPerPiece": 5,
       "garmentBaseCost": 3,
-      "garmentSellPerPiece": 5.45,
+      "garmentSellPerPiece": 5.66,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
@@ -567,7 +564,7 @@
       "ltmFee": 0,
       "ltmDistributedPerPiece": 5,
       "garmentBaseCost": 3,
-      "garmentSellPerPiece": 5.45,
+      "garmentSellPerPiece": 5.66,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
