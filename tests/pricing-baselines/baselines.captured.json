@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "capturedAt": "2026-06-20T11:56:37.084Z",
+    "capturedAt": "2026-06-23T14:55:27.964Z",
     "capturedBy": "scripts/capture-pricing-baselines.js",
     "scenarios": 22,
     "successful": 22,
@@ -23,27 +23,27 @@
       }
     },
     "expected": {
-      "tier": "1-23",
-      "ltmFee": 50,
+      "tier": "12-23",
+      "ltmFee": 0,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         },
         "L": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         },
         "XL": {
           "qty": 4,
-          "perPiece": 13,
-          "sizeTotal": 52
+          "perPiece": 14.5,
+          "sizeTotal": 58
         }
       },
-      "lineSubtotal": 156,
-      "grandTotalBeforeTax": 206
+      "lineSubtotal": 174,
+      "grandTotalBeforeTax": 174
     }
   },
   "DTG-02": {
@@ -178,42 +178,42 @@
       }
     },
     "expected": {
-      "tier": "1-23",
-      "ltmFee": 50,
+      "tier": "12-23",
+      "ltmFee": 0,
       "perSizeBreakdown": {
         "M": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "L": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "XL": {
           "qty": 1,
-          "perPiece": 13,
-          "sizeTotal": 13
+          "perPiece": 14.5,
+          "sizeTotal": 14.5
         },
         "2XL": {
           "qty": 3,
-          "perPiece": 15,
-          "sizeTotal": 45
+          "perPiece": 16.5,
+          "sizeTotal": 49.5
         },
         "3XL": {
           "qty": 3,
-          "perPiece": 16,
-          "sizeTotal": 48
+          "perPiece": 17.5,
+          "sizeTotal": 52.5
         },
         "4XL": {
           "qty": 3,
-          "perPiece": 17,
-          "sizeTotal": 51
+          "perPiece": 18.5,
+          "sizeTotal": 55.5
         }
       },
-      "lineSubtotal": 183,
-      "grandTotalBeforeTax": 233
+      "lineSubtotal": 201,
+      "grandTotalBeforeTax": 201
     }
   },
   "EMB-01": {
@@ -518,7 +518,7 @@
       "ltmFee": 0,
       "ltmDistributedPerPiece": 5,
       "garmentBaseCost": 3,
-      "garmentSellPerPiece": 5.45,
+      "garmentSellPerPiece": 5.66,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
@@ -564,7 +564,7 @@
       "ltmFee": 0,
       "ltmDistributedPerPiece": 5,
       "garmentBaseCost": 3,
-      "garmentSellPerPiece": 5.45,
+      "garmentSellPerPiece": 5.66,
       "perSizeBreakdown": {
         "M": {
           "qty": 4,
