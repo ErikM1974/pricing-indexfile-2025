@@ -328,3 +328,5 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 .qq-card-breakdown { margin-top: 10px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: flex; flex-direction: column; gap: 3px; }
 .qq-bd-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--qq-muted); }
 .qq-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, #1a1d1a); white-space: nowrap; }
+.qq-bd-row.is-blank span:first-child { color: var(--qq-ink, #1a1d1a); font-weight: 500; }   /* garment blank — the base line */
+.qq-bd-row.is-ltm span { color: #7a541a; }   /* small-batch (per-shirt) — warn tone, matches the matrix LTM */

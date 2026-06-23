@@ -22,6 +22,7 @@
 
     function $(id) { return document.getElementById(id); }
     function r2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }
+    function hdc(v) { return Math.ceil(v * 2 - 1e-9) / 2; }   // round UP to the next $0.50 (matches the rate-card prototype)
     function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
     function parseRange(label) {
         var m = String(label || '').match(/^(\d+)\s*-\s*(\d+)/);
@@ -65,11 +66,13 @@
     var FRONT_OPTS = [
         { code: '', label: 'None' },
         { code: 'LC', label: 'Left chest' },
+        { code: 'CF', label: 'Center front' },
         { code: 'FF', label: 'Full front' },
         { code: 'JF', label: 'Jumbo front' }
     ];
     var BACK_OPTS = [
         { code: '', label: 'None' },
+        { code: 'CB', label: 'Center back' },
         { code: 'FB', label: 'Full back' },
         { code: 'JB', label: 'Jumbo back' }
     ];
@@ -81,18 +84,22 @@
     ];
     // DTG combos the canonical pricer accepts (FF_JB / JF_FB have no DTG_Costs data → blocked).
     var DTG_LOCATION_CODES = ['LC', 'FF', 'FB', 'JF', 'JB', 'LC_FB', 'FF_FB', 'JF_JB', 'LC_JB'];
-    // DTF has no "jumbo" transfer size → jumbo maps to the largest (full) location.
-    var DTF_FRONT = { LC: 'left-chest', FF: 'full-front', JF: 'full-front' };
-    var DTF_BACK = { FB: 'full-back', JB: 'full-back' };
-    var FRONT_LABELS = { LC: 'Left chest', FF: 'Full front', JF: 'Jumbo front' };
-    var BACK_LABELS = { FB: 'Full back', JB: 'Jumbo back' };
+    // DTG has no MEDIUM size band → a Center-front (≤9×12) prints as Full front; Center-back as Full back.
+    var DTG_FRONT_FROM = { CF: 'FF' };
+    var DTG_BACK_FROM = { CB: 'FB' };
+    // DTF size bands: Center-front/Center-back = the MEDIUM (≤9×12) transfer; DTF has no "jumbo" so
+    // Jumbo-front maps to the largest (full-front) location.
+    var DTF_FRONT = { LC: 'left-chest', CF: 'center-front', FF: 'full-front', JF: 'full-front' };
+    var DTF_BACK = { CB: 'center-back', FB: 'full-back', JB: 'full-back' };
+    var FRONT_LABELS = { LC: 'Left chest', CF: 'Center front', FF: 'Full front', JF: 'Jumbo front' };
+    var BACK_LABELS = { CB: 'Center back', FB: 'Full back', JB: 'Jumbo back' };
     // DTF prices by transfer SIZE (DTF_Pricing.unit_price keys on these bands). Show the band on
     // the card so the AE sees what each location includes — size drives the price (bigger = pricier).
-    var DTF_LOC_LABEL = { 'left-chest': 'Left chest', 'full-front': 'Full front', 'full-back': 'Full back', 'left-sleeve': 'L sleeve', 'right-sleeve': 'R sleeve' };
-    var DTF_SIZE_BAND = { 'left-chest': '≤5×5"', 'full-front': '≤12×16.5"', 'full-back': '≤12×16.5"', 'left-sleeve': '≤5×5"', 'right-sleeve': '≤5×5"' };
+    var DTF_LOC_LABEL = { 'left-chest': 'Left chest', 'center-front': 'Center front', 'full-front': 'Full front', 'center-back': 'Center back', 'full-back': 'Full back', 'left-sleeve': 'L sleeve', 'right-sleeve': 'R sleeve' };
+    var DTF_SIZE_BAND = { 'left-chest': '≤5×5"', 'center-front': '≤9×12"', 'full-front': '≤12×16.5"', 'center-back': '≤9×12"', 'full-back': '≤12×16.5"', 'left-sleeve': '≤5×5"', 'right-sleeve': '≤5×5"' };
 
     // --- placement → per-method mapping (reads state.front / state.back / state.sleeves) ---
-    function dtgCode() { var f = state.front, b = state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
+    function dtgCode() { var f = DTG_FRONT_FROM[state.front] || state.front, b = DTG_BACK_FROM[state.back] || state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
     function dtgPriceable() { var c = dtgCode(); return !!c && DTG_LOCATION_CODES.indexOf(c) >= 0; }
     function dtfLocations() {
         var L = [];
@@ -115,7 +122,7 @@
         return parts.length ? parts.join(' + ') : null;
     }
     function frontOnlyGroups(id) {
-        if (id === 'dtg') return { 'dtg:main': { locationCode: state.front } };
+        if (id === 'dtg') return { 'dtg:main': { locationCode: DTG_FRONT_FROM[state.front] || state.front } };
         if (id === 'scp') return { 'scp:design-1': { frontColors: state.ink, backColors: 0, darkGarment: !!state.adv.scpDark, safetyStripes: !!state.adv.scpStripes } };
         if (id === 'dtf') return { 'dtf:main': { locations: DTF_FRONT[state.front] ? [DTF_FRONT[state.front]] : [] } };
         return null;
@@ -515,6 +522,7 @@
             } else {
                 state.results[id] = { status: 'ok', preview: preview, summary: summarize(preview) };
                 if (printAddlLabel(id)) priceFrontOnly(id, token); // derive the back's cost for the card breakdown
+                loadGarmentMeta(id); // best-effort blank-garment cost so the breakdown can split off the "blank" line
             }
             renderResults();
         }).catch(function (err) {
@@ -541,6 +549,45 @@
             r.frontOnlyUnit = summarize(preview).perPiece;
             renderResults();
         }).catch(function () { /* breakdown is best-effort; never blocks the price */ });
+    }
+
+    // ---- garment ("blank") line for the rate-card-style breakdown ----------------
+    // DISPLAY ONLY. Quick Quote computes no PRICES (IRON RULE) — the per-piece + total
+    // ALWAYS come from the engine. This only re-derives the blank garment cost so the
+    // engine's first line can be SPLIT into "blank" + "the print on top" for the rep.
+    // The print/logo lines below are engine MARGINALS, so the rows sum to the engine's
+    // exact per-piece by construction; a wrong blank can only mislabel a line, never
+    // change a total — and buildBreakdown's parity guard drops the split if they don't sum.
+    var _garmentMeta = {};   // `${bundleMethod}|${style}` -> { garment, tiers:[{min,max,denom}] }
+    function bundleMethodFor(id) {
+        return { dtg: 'DTG', dtf: 'DTF', scp: 'ScreenPrint', emb: 'EMB', capemb: 'CAP' }[id] || null;
+    }
+    function loadGarmentMeta(id) {
+        var bm = bundleMethodFor(id); if (!bm || !state.product) return;
+        var style = state.product.style, key = bm + '|' + style;
+        if (_garmentMeta[key]) return;
+        _garmentMeta[key] = { loading: true };
+        fetch(API_BASE + '/api/pricing-bundle?method=' + bm + '&styleNumber=' + encodeURIComponent(style))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (b) {
+                if (!b) { delete _garmentMeta[key]; return; }
+                var prices = (b.sizes || []).map(function (s) { return Number(s.price) || 0; }).filter(function (p) { return p > 0; });
+                _garmentMeta[key] = {
+                    garment: prices.length ? Math.min.apply(null, prices) : 0,
+                    tiers: (b.tiersR || []).map(function (t) { return { min: Number(t.MinQuantity), max: Number(t.MaxQuantity), denom: Number(t.MarginDenominator) }; })
+                };
+                renderResults();
+            })
+            .catch(function () { delete _garmentMeta[key]; });   // best-effort: breakdown falls back to by-location
+    }
+    function blankUnit(id) {
+        var bm = bundleMethodFor(id); if (!bm || !state.product) return null;
+        var meta = _garmentMeta[bm + '|' + state.product.style];
+        if (!meta || meta.loading || !(meta.garment > 0)) return null;
+        var qty = totalQty();
+        var tier = (meta.tiers || []).find(function (t) { return qty >= t.min && qty <= t.max; }) || (meta.tiers || [])[0];
+        if (!tier || !(tier.denom > 0)) return null;
+        return hdc(meta.garment / tier.denom);
     }
 
     function repriceAll() {
@@ -839,6 +886,60 @@
         refreshMatrix();
     }
 
+    // Rate-card-style per-piece breakdown: blank garment + each print/logo + per-shirt
+    // small-batch line. The blank is display-only (loadGarmentMeta); every other line is an
+    // engine MARGINAL, so the rows reconstruct the engine per-piece by construction. The
+    // parity guard drops the whole split if the rows ever fail to sum (never mislead the rep).
+    function buildBreakdown(id, s, r, unitWord) {
+        var pp = s.perPiece || 0, qtyNow = totalQty(), blank = blankUnit(id);
+        var ltmPP = (s.ltm && s.ltm.fee > 0 && qtyNow > 0) ? Math.floor((s.ltm.fee / qtyNow) * 100) / 100 : 0;
+        var capBlankLbl = state.product.isCap ? 'Cap blank' : 'Garment (blank)';
+        var rows = [], sum = 0, didSplit = false;
+        function add(lbl, val, plus, cls) {
+            val = Number(val) || 0; sum += val;
+            rows.push('<div class="qq-bd-row' + (cls ? ' ' + cls : '') + '"><span>' + esc(lbl) + '</span><span>' + (plus ? '+' : '') + fmt(val) + '/' + unitWord + '</span></div>');
+        }
+        if (s.serviceLines && s.serviceLines.length) {
+            var svcSum = s.serviceLines.reduce(function (a, sl) { return a + (Number(sl.unitPrice) || 0); }, 0);
+            var baseUnit = r2(pp - svcSum);                       // garment + primary logo (+ LTM if any)
+            var primary = r2(baseUnit - (blank || 0) - ltmPP);
+            if (blank != null && primary > -0.005) {
+                add(capBlankLbl, blank, false, 'is-blank');
+                add(state.product.isCap ? 'Cap front logo' : 'Primary logo', primary, false);
+                didSplit = true;
+            } else {
+                add((state.product.isCap ? 'Cap' : 'Garment') + ' + main logo', baseUnit, false);
+            }
+            s.serviceLines.forEach(function (sl) { add(String(sl.label || '').replace(/^AL[\s-]+/i, ''), Number(sl.unitPrice) || 0, true); });
+        } else if (r.frontOnlyUnit != null && printAddlLabel(id)) {
+            var addlU = r2(pp - r.frontOnlyUnit);                 // back/sleeve marginal
+            var frontPrint = r2(r.frontOnlyUnit - (blank || 0) - ltmPP);
+            if (blank != null && frontPrint > -0.005) {
+                add(capBlankLbl, blank, false, 'is-blank');
+                add(FRONT_LABELS[state.front] || 'Front', frontPrint, false);
+                didSplit = true;
+            } else {
+                add(FRONT_LABELS[state.front] || 'Front', r.frontOnlyUnit, false);
+            }
+            add(printAddlLabel(id), addlU, true);
+        } else if (blank != null) {                              // single print location OR single logo
+            var printU = r2(pp - blank - ltmPP);
+            if (printU > -0.005) {
+                var soloLbl = (id === 'emb') ? 'Primary logo'
+                    : (id === 'capemb') ? 'Cap front logo'
+                    : (FRONT_LABELS[state.front] || 'Print');
+                add(capBlankLbl, blank, false, 'is-blank');
+                add(soloLbl, printU, false);
+                didSplit = true;
+            }
+        }
+        if (didSplit && ltmPP > 0) add('Small-batch (per ' + unitWord + ')', ltmPP, true, 'is-ltm');
+        if (!rows.length) return '';
+        // PARITY GUARD: the rows MUST reconstruct the engine per-piece (±1¢) or we show nothing.
+        if (Math.abs(sum - pp) > 0.01) { if (window.console && console.warn) console.warn('[quick-quote] breakdown parity off', id, sum, pp); return ''; }
+        return '<div class="qq-card-breakdown">' + rows.join('') + '</div>';
+    }
+
     function renderCard(id, isBest, changed) {
         var def = METHODS[id];
         var r = state.results[id];
@@ -875,30 +976,9 @@
                 + (n.ltmDisappears ? ' · small-batch fee gone' : '') + save + '</button>';
         }
 
-        // Per-piece breakdown: garment + main logo, then each extra (additional logos / stitch
-        // surcharge) on its own line — so the AE sees what the 2nd logo adds. EMBROIDERY only
-        // (print methods return no serviceLines; their back location is baked into the base).
-        var breakdownHtml = '';
-        if (s.serviceLines && s.serviceLines.length) {
-            var svcSum = s.serviceLines.reduce(function (a, sl) { return a + (Number(sl.unitPrice) || 0); }, 0);
-            var baseUnit = r2((s.perPiece || 0) - svcSum);
-            var bdRows = ['<div class="qq-bd-row"><span>' + (state.product.isCap ? 'Cap' : 'Garment') + ' + main logo</span><span>' + fmt(baseUnit) + '/' + unitWord + '</span></div>'];
-            s.serviceLines.forEach(function (sl) {
-                var lbl = String(sl.label || '').replace(/^AL[\s-]+/i, ''); // "AL Additional Logo" → "Additional Logo"
-                bdRows.push('<div class="qq-bd-row"><span>+ ' + esc(lbl) + '</span><span>+' + fmt(Number(sl.unitPrice) || 0) + '/' + unitWord + '</span></div>');
-            });
-            breakdownHtml = '<div class="qq-card-breakdown">' + bdRows.join('') + '</div>';
-        } else if (r.frontOnlyUnit != null) {
-            // print: front (main) location vs the additional back/sleeve location(s)
-            var addlU = r2((s.perPiece || 0) - r.frontOnlyUnit);
-            var addlLbl = printAddlLabel(id);
-            if (addlLbl && addlU > 0.005) {
-                breakdownHtml = '<div class="qq-card-breakdown">'
-                    + '<div class="qq-bd-row"><span>' + esc(FRONT_LABELS[state.front] || 'Front') + '</span><span>' + fmt(r.frontOnlyUnit) + '/' + unitWord + '</span></div>'
-                    + '<div class="qq-bd-row"><span>+ ' + esc(addlLbl) + '</span><span>+' + fmt(addlU) + '/' + unitWord + '</span></div>'
-                    + '</div>';
-            }
-        }
+        // Per-piece breakdown (rate-card style): blank garment + each print/logo location
+        // + a per-shirt small-batch line, all summing to the engine per-piece. See buildBreakdown.
+        var breakdownHtml = buildBreakdown(id, s, r, unitWord);
 
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
