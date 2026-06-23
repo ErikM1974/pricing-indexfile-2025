@@ -349,6 +349,7 @@
                 };
                 state.color = colors.length ? colors[0] : null;
                 statusEl.innerHTML = '';
+                loadInventory(); // blank-stock check for the default color
 
                 return resolveEligibility(state.product).then(function (elig) {
                     if (token !== lookupSeq) return;
@@ -626,6 +627,68 @@
         var imgUrl = state.color && state.color.image ? state.color.image : '';
         if (imgUrl) { img.src = imgUrl; img.style.display = ''; } else { img.removeAttribute('src'); img.style.display = 'none'; }
         colorEl.textContent = state.color ? state.color.name : '';
+    }
+
+    // ---- SanMar blank-garment inventory for the picked color (phone-quote aid) -----
+    // SOFT, glanceable signal: per-size blank stock + a discontinued / out-of-stock flag.
+    // It's the BLANK-garment availability (decoration is made-to-order on top) and reflects
+    // the SanMar sync — labelled "approx, confirm at order", NEVER a hard block on quoting.
+    var INV_SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '4XL', '5XL', '6XL', 'OSFA', 'S/M', 'M/L', 'L/XL'];
+    var _invSeq = 0;
+    function loadInventory() {
+        var box = $('qqInventory'); if (!box) return;
+        var style = state.product && state.product.style;
+        // The SanMar /api/inventory feed keys on COLOR_NAME ("Athletic Maroon"), NOT the
+        // abbreviated CATALOG_COLOR ("Ath. Maroon"). Try the display name first; fall back
+        // to the catalog code so it's robust for either keying.
+        var keys = [];
+        if (state.color) {
+            if (state.color.name) keys.push(state.color.name);
+            if (state.color.catalog && state.color.catalog !== state.color.name) keys.push(state.color.catalog);
+        }
+        state.inventory = null; state.invStatus = null;
+        if (!style || !keys.length) { box.innerHTML = ''; return; }
+        state.invLoading = true; renderInventory();
+        var token = ++_invSeq;
+        (function tryKey(i) {
+            if (i >= keys.length) { if (token === _invSeq) { state.inventory = {}; state.invLoading = false; renderInventory(); } return; }
+            fetch(API_BASE + '/api/inventory?styleNumber=' + encodeURIComponent(style) + '&color=' + encodeURIComponent(keys[i]))
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (token !== _invSeq) return;   // stale — color/style changed mid-flight
+                    var rows = data ? (Array.isArray(data) ? data : Object.keys(data).map(function (k) { return data[k]; })) : [];
+                    var sized = rows.filter(function (r) { return r && typeof r === 'object' && (r.SIZE || r.size); });
+                    if (!sized.length) { tryKey(i + 1); return; }   // this color key didn't match → try the next
+                    var bySize = {}, status = null;
+                    sized.forEach(function (r) {
+                        var sz = r.SIZE || r.size, q = parseInt(r.QTY != null ? r.QTY : r.quantity, 10);
+                        bySize[sz] = (bySize[sz] || 0) + (isNaN(q) ? 0 : q);
+                        if (r.PRODUCT_STATUS) status = r.PRODUCT_STATUS;
+                    });
+                    state.inventory = bySize; state.invStatus = status; state.invLoading = false;
+                    renderInventory();
+                })
+                .catch(function () { if (token === _invSeq) tryKey(i + 1); });
+        })(0);
+    }
+    function renderInventory() {
+        var box = $('qqInventory'); if (!box) return;
+        if (state.invLoading) { box.innerHTML = '<div class="qq-inv-note">Checking stock…</div>'; return; }
+        if (!state.inventory || typeof state.inventory !== 'object') { box.innerHTML = ''; return; }
+        var sizes = Object.keys(state.inventory);
+        if (!sizes.length) { box.innerHTML = ''; return; }
+        sizes.sort(function (a, b) { var ia = INV_SIZE_ORDER.indexOf(a), ib = INV_SIZE_ORDER.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+        var total = sizes.reduce(function (s, k) { return s + state.inventory[k]; }, 0);
+        var discontinued = state.invStatus && !/active/i.test(String(state.invStatus));
+        var html = '';
+        if (discontinued) html += '<div class="qq-inv-flag is-disc">⚠ ' + esc(state.invStatus) + ' — confirm before quoting</div>';
+        else if (total <= 0) html += '<div class="qq-inv-flag is-oos">⚠ Out of stock in this color</div>';
+        html += '<div class="qq-inv-head">Blank stock <span class="muted">· ' + total.toLocaleString() + ' total · approx — confirm at order</span></div>';
+        html += '<div class="qq-inv-grid">' + sizes.map(function (sz) {
+            var q = state.inventory[sz], cls = q <= 0 ? 'is-out' : (q < 100 ? 'is-low' : 'is-good'); // matches shared inventory-badges thresholds
+            return '<span class="qq-inv-cell ' + cls + '" title="' + q.toLocaleString() + ' in stock"><span class="qq-inv-sz">' + esc(sz) + '</span><span class="qq-inv-qty">' + q.toLocaleString() + '</span></span>';
+        }).join('') + '</div>';
+        box.innerHTML = html;
     }
 
     function renderPlacements() {
@@ -1029,6 +1092,7 @@
             state.color = (state.product.colors || []).filter(function (c) { return c.catalog === cat; })[0] || state.color;
             renderColorSwatches();
             renderThumb();
+            loadInventory(); // refresh blank-stock for the newly-picked color
             repriceAll(); // sizes are style-level; just re-price (EMB cost varies by color)
         });
 
