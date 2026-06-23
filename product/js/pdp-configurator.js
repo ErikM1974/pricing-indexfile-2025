@@ -126,8 +126,10 @@
     // ============================================================
     const GARMENT_LOCATIONS = [
         { key: 'leftChest', label: 'Left chest', sub: 'Logo size' },
+        { key: 'centerFront', label: 'Center front', sub: 'Medium print ≤9×12' },
         { key: 'fullFront', label: 'Full front', sub: 'Big center print' },
         { key: 'back', label: 'Back', sub: 'Full back' },
+        { key: 'centerBack', label: 'Center back', sub: 'Medium print ≤9×12' },
         { key: 'frontBack', label: 'Front + back', sub: 'Left chest + full back' }
     ];
     const CAP_LOCATIONS = [
@@ -138,8 +140,10 @@
     const DTG_CODES = { leftChest: 'LC', fullFront: 'FF', back: 'FB', frontBack: 'LC_FB' };
     const DTF_KEYS = {
         leftChest: { locations: ['left-chest'], sizeKeys: ['small'] },
+        centerFront: { locations: ['center-front'], sizeKeys: ['medium'] },
         fullFront: { locations: ['full-front'], sizeKeys: ['large'] },
         back: { locations: ['full-back'], sizeKeys: ['large'] },
+        centerBack: { locations: ['center-back'], sizeKeys: ['medium'] },
         frontBack: { locations: ['left-chest', 'full-back'], sizeKeys: ['small', 'large'] }
     };
 
@@ -252,7 +256,9 @@
         dtf: {
             label: 'DTF Transfer',
             engineMethod: 'DTF',
-            supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
+            // Center-front / Center-back = the DTF MEDIUM (<=9x12) transfer band; DTF-only via
+            // supports (DTG/SCP/EMB never list them, so the chips render for DTF alone).
+            supports: { leftChest: true, centerFront: true, fullFront: true, back: true, centerBack: true, frontBack: true },
             chipNote: function () { return 'Full-color transfer — great on blends'; },
             groups: function (loc) {
                 return { 'dtf:main': { locations: DTF_KEYS[loc].locations } };
