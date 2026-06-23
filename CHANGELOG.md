@@ -1,3 +1,9 @@
+## v2026.06.23.2 (2026.06.23)
+
+- test: re-lock DTG pricing baselines after the 1-23 -> 1-11/12-23 split
+- feat(quick-quote): SanMar blank-stock indicator per color
+- Deploy v2026.06.23.2: cache-bust quick-quote (inventory)
+
 ## v2026.06.23.1 (2026.06.23)
 
 - feat(quick-quote): rate-card breakdown + expose DTF Medium (catalog + quick quote)
