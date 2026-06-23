@@ -190,6 +190,15 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 }
 .qq-adv-foot { font-size: 12px; color: var(--qq-muted); margin: 12px 0 0; line-height: 1.5; }
 
+/* SCP ink colors — separate front + back steppers (each color = 1 screen) */
+.qq-ink-row { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
+.qq-ink-loc { display: flex; flex-direction: column; gap: 4px; }
+.qq-ink-lbl { font-size: 12px; color: var(--qq-muted); font-weight: 500; }
+.qq-ink-loc .input.num { width: 92px; }
+.qq-ink-note { font-size: 12px; color: var(--qq-muted); margin: 8px 0 0; line-height: 1.5; }
+/* SCP options (dark garment + safety stripes) — inline, delineated from the fields above */
+.qq-scp-opts { border-top: 1px solid var(--qq-line); padding-top: 12px; }
+
 /* ===== Results ===== */
 .qq-results-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
 #qqResultsTitle { font-size: 16px; font-weight: 600; }
@@ -330,6 +339,13 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 .qq-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, #1a1d1a); white-space: nowrap; }
 .qq-bd-row.is-blank span:first-child { color: var(--qq-ink, #1a1d1a); font-weight: 500; }   /* garment blank — the base line */
 .qq-bd-row.is-ltm span { color: #7a541a; }   /* small-batch (per-shirt) — warn tone, matches the matrix LTM */
+/* Section headers (Per piece / One-time setup) when both sections show */
+.qq-bd-head { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--qq-muted); font-weight: 600; margin-bottom: 2px; }
+.qq-bd-sub { text-transform: none; letter-spacing: 0; font-weight: 400; }
+/* One-time setup section — per order, visually separate from the per-piece rows */
+.qq-card-onetime { margin-top: 8px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.qq-card-onetime .qq-bd-row span:first-child { color: var(--qq-muted); }
+.qq-bd-row.is-total span { font-weight: 600; color: var(--qq-ink, #1a1d1a); }
 
 /* ---- SanMar blank-stock indicator (per-color availability, soft signal) ---- */
 .qq-inv { margin-top: 8px; }
@@ -346,3 +362,66 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 .qq-inv-cell.is-out { background: #fbeaea; color: #b4421f; }
 .qq-inv-sz { font-weight: 600; }
 .qq-inv-qty { font-family: "Geist Mono", monospace; }
+
+/* ===== Mode toggle (Quick Price / Line Sheet) — the active mode reads as a solid green pill
+   so the selected tool is unmistakable; Quick Price (default) leads with that emphasis. ===== */
+.qq-mode-toggle { display: inline-flex; gap: 4px; padding: 4px; background: var(--qq-bg); border: 1px solid var(--qq-line-2); border-radius: 12px; margin-bottom: 18px; }
+.qq-mode-toggle button { appearance: none; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .01em; color: var(--qq-muted); padding: 9px 22px; border-radius: 9px; cursor: pointer; transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.qq-mode-toggle button:hover:not(.is-active) { color: var(--qq-green-dark); background: rgba(46, 111, 64, .07); }
+.qq-mode-toggle button.is-active { background: var(--qq-green); color: #fff; box-shadow: 0 2px 7px rgba(46, 111, 64, .32); }
+.qq-mode-toggle button:focus-visible { outline: 2px solid var(--qq-green-dark); outline-offset: 2px; }
+@media (prefers-reduced-motion: no-preference) {
+    .qq-mode-toggle button.is-active { transform: translateY(-0.5px); }
+}
+
+/* ===== Line Sheet — input panel (style list) ===== */
+.qq-line-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+.qq-line-empty { font-size: 13px; color: var(--qq-muted); margin: 4px 0 8px; }
+.qq-line-row { border: 1px solid var(--qq-line); border-radius: 10px; padding: 9px 10px; background: var(--qq-card); }
+.qq-line-head { display: flex; align-items: center; gap: 8px; }
+.qq-line-style { flex: 1; min-width: 0; text-transform: uppercase; }
+.qq-line-ctrls { display: inline-flex; gap: 2px; flex: none; }
+.qq-line-mv, .qq-line-rm { appearance: none; border: 1px solid var(--qq-line); background: var(--qq-bg); color: var(--qq-muted); width: 28px; height: 28px; border-radius: 7px; cursor: pointer; font-size: 14px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+.qq-line-mv:hover:not([disabled]), .qq-line-rm:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
+.qq-line-mv[disabled] { opacity: .4; cursor: default; }
+.qq-line-rm:hover { border-color: #b4421f; color: #b4421f; }
+.qq-line-content { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.qq-line-content:empty { display: none; }
+.qq-line-thumb { width: 44px; height: 44px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: 7px; background: #fff; flex: none; }
+.qq-line-thumb.is-empty { display: inline-block; background: var(--qq-bg); }
+.qq-line-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
+.qq-line-name { font-size: 13px; font-weight: 500; color: var(--qq-ink); }
+.qq-line-color { font: inherit; font-size: 12.5px; padding: 3px 6px; border: 1px solid var(--qq-line); border-radius: 6px; background: #fff; max-width: 150px; }
+.qq-line-price { font-size: 12px; font-family: "Geist Mono", monospace; color: var(--qq-green-dark); font-weight: 500; }
+.qq-line-stat { font-size: 12px; color: var(--qq-muted); }
+.qq-line-stat.err { color: #b4421f; }
+.qq-line-actions { display: flex; gap: 8px; margin-top: 4px; }
+.qq-btn { appearance: none; font: inherit; font-size: 13.5px; font-weight: 500; padding: 9px 16px; border-radius: 8px; border: 1px solid var(--qq-line-2); background: var(--qq-card); color: var(--qq-ink); cursor: pointer; transition: border-color .12s, background .12s; }
+.qq-btn:hover:not([disabled]) { border-color: var(--qq-green); }
+.qq-btn-primary { background: var(--qq-green); border-color: var(--qq-green); color: #fff; }
+.qq-btn-primary:hover:not([disabled]) { background: var(--qq-green-dark); border-color: var(--qq-green-dark); }
+.qq-btn[disabled] { opacity: .5; cursor: default; }
+.qq-line-hint { font-size: 12px; color: var(--qq-muted); margin: 10px 0 0; line-height: 1.5; }
+
+/* ===== Line Sheet — on-screen preview (mirrors the printed sheet) ===== */
+.qq-sheet { background: var(--qq-card); border: 1px solid var(--qq-line); border-radius: 12px; padding: 22px 24px; color: var(--qq-ink); }
+.qq-sheet-placeholder { font-size: 13.5px; color: var(--qq-muted); padding: 28px 6px; text-align: center; }
+.qq-sheet-head { display: flex; align-items: center; gap: 16px; border-bottom: 2px solid var(--qq-green); padding-bottom: 12px; margin-bottom: 14px; }
+.qq-sheet-logo { height: 42px; width: auto; }
+.qq-sheet-brand { font-size: 16px; font-weight: 700; }
+.qq-sheet-sub { font-size: 12px; color: var(--qq-muted); margin-top: 2px; }
+.qq-sheet-body { display: flex; flex-direction: column; }
+.qq-sheet-item { display: flex; gap: 16px; align-items: flex-start; padding: 14px 0; border-bottom: 1px solid var(--qq-line); }
+.qq-sheet-item:last-child { border-bottom: 0; }
+.qq-sheet-img { width: 76px; height: 76px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: 7px; background: #fafafa; flex: none; }
+.qq-sheet-img.is-empty { display: inline-block; }
+.qq-sheet-item-main { flex: 1; min-width: 0; }
+.qq-sheet-item-head { font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
+.qq-sheet-style { font-family: "Geist Mono", monospace; }
+.qq-sheet-color { color: var(--qq-muted); font-weight: 400; margin-left: 10px; }
+.qq-sheet-ladder { width: 100%; border-collapse: collapse; font-size: 12px; }
+.qq-sheet-ladder th, .qq-sheet-ladder td { border: 1px solid var(--qq-line); padding: 5px 8px; text-align: center; }
+.qq-sheet-ladder .lbl { text-align: left; color: var(--qq-muted); font-weight: 500; }
+.qq-sheet-ladder td { font-family: "Geist Mono", monospace; }
+.qq-sheet-ladder .warn { color: #7a541a; }
+.qq-sheet-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--qq-line); font-size: 11px; color: var(--qq-muted); line-height: 1.5; }

@@ -289,6 +289,11 @@
 | `/pages/sanmar-catalog-color-audit.js` | Audit page controller — fetches `/api/sanmar/catalog-color-audit/:style`, renders 5 buckets (inSync / caspioMismatch / caspioOrphan / sanmarOnly / internalDrift), Copy-CSV per bucket | /api/sanmar/catalog-color-audit (proxy) | ✅ Active |
 | `/pages/sanmar-catalog-color-audit.css` | Audit page styles — summary cards, bucket tables, sticky headers | — | ✅ Active |
 
+### SanMar PO Integration — Planning Docs (NEW 2026-06-23)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/memory/sanmar-po/` | Outbound SanMar **PO submission** (blank ordering) — review/plan/field-mapping/onboarding + buildable PO templates (`po-payload.schema.json`, `po-sample.json`, `submitPO`/`getPreSubmitInfo` SOAP skeletons). Distinct from the read-side `/memory/SANMAR_API_REFERENCE.md`. Code (when built) lands in `caspio-pricing-proxy`. | PO Integration Guide v24.3; caspio-pricing-proxy `sanmar-soap.js` | 🟡 Reference (review/not built) |
+
 ### Box Labels - Shipping & Receiving (NEW 2026-04-01)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
@@ -329,8 +334,9 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/quick-quote/index.html` | Staff rapid price lookup — type style + qty + placement → every eligible method priced at once. No customer record/save. Linked from staff dashboard "Quote Builders". | quick-quote.js, quick-quote.css, quote-cart-engine.js, all 5 pricing services, decoration-methods.js, app.config.js | ✅ Active |
-| `/calculators/quick-quote/quick-quote.js` | Page logic — drives `QuoteCartEngine.singleItemPreview()` (SAME engine as the Quote Builder + customer catalog, so prices can't drift). Cap-aware placements, per-size 2XL+ breakdown, advanced stitch-count/ink/dark/stripes inputs. Style lookup via `/api/product-details`; eligibility via DecorationMethods. | quote-cart-engine.js, embroidery-quote-pricing.js, all 5 *-pricing-service.js, decoration-methods.js, /api/product-details | ✅ Active |
-| `/calculators/quick-quote/quick-quote.css` | Page styles — self-contained light card UI | — | ✅ Active |
+| `/calculators/quick-quote/quick-quote.js` | Page logic — drives `QuoteCartEngine.singleItemPreview()` (SAME engine as the Quote Builder + customer catalog, so prices can't drift). Cap-aware placements, per-size 2XL+ breakdown, advanced stitch-count/ink/dark/stripes inputs. Style lookup via `/api/product-details`; eligibility via DecorationMethods. **Two modes: Quick Price (1 style, every method) + Line Sheet (1 method, up to 6 styles → branded one-page PDF via window.print; each style priced independently via `probeLadder`, never summed).** | quote-cart-engine.js, embroidery-quote-pricing.js, all 5 *-pricing-service.js, decoration-methods.js, /api/product-details | ✅ Active |
+| `/calculators/quick-quote/quick-quote.css` | Page styles — self-contained light card UI; includes Line Sheet mode (mode toggle, style list, on-screen sheet preview) | — | ✅ Active |
+| `/calculators/quick-quote/linesheet-print.css` | Print stylesheet (`media="print"`) for Line Sheet mode — strips app chrome, prints only `#qqSheet` as a one-page NWCA line sheet (Print / Save as PDF). Scoped to `body.qq-mode-line`. | quick-quote.js (toggles body class), index.html | ✅ Active |
 | `/calculators/quick-quote/dtf-prints-prototype.html` | **Prototype** — DTF "logo = size + position" model: add prints, each a size + position, priced by size via the live DTFPricingService. Not linked from anywhere (noindex); evaluates a unified placement model before touching live tools. | dtf-prints-prototype.js, dtf-prints-prototype.css, quick-quote.css, dtf-pricing-service.js, app.config.js | 🧪 Prototype |
 | `/calculators/quick-quote/dtf-prints-prototype.js` | Prototype logic — prices a list of (size, position) prints through `DTFPricingService.calculatePriceForQuantity` (sums per-size transfer + $2.50 labor + freight). DTF-only, no engine/cart dependency. | dtf-pricing-service.js, app.config.js | 🧪 Prototype |
 | `/calculators/quick-quote/dtf-prints-prototype.css` | Prototype styles — layers on quick-quote.css tokens (prints rows + breakdown only) | quick-quote.css | 🧪 Prototype |

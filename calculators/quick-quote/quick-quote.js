@@ -111,6 +111,17 @@
     }
     function scpLocCount() { return (state.front ? 1 : 0) + (state.back ? 1 : 0); }
 
+    // Dark garments need a white underbase screen (a real cost driver). We SUGGEST it from the
+    // selected color name so a rushed AE doesn't under-quote a black tee — but never force it:
+    // once the AE toggles the box themselves (scpDarkUserSet) we stop overriding their choice.
+    function isDarkGarment(name) {
+        return /black|navy|royal|red|maroon|cardinal|forest|hunter|charcoal|graphite|purple|brown|chocolate|burgundy|wine|midnight|olive|teal|dark|deep|bottle/i.test(String(name || ''));
+    }
+    function maybeSuggestDark() {
+        if (!state.scpDarkUserSet) state.adv.scpDark = state.color ? isDarkGarment(state.color.name) : false;
+        var cb = $('qqScpDark'); if (cb) cb.checked = !!state.adv.scpDark;
+    }
+
     // Print breakdown helpers: the back/sleeve location is priced INTO the per-piece base (no
     // service line), so we derive its cost by re-pricing the FRONT only and showing the difference.
     // printAddlLabel returns the additional-location label, or null when there's nothing to split.
@@ -123,7 +134,7 @@
     }
     function frontOnlyGroups(id) {
         if (id === 'dtg') return { 'dtg:main': { locationCode: DTG_FRONT_FROM[state.front] || state.front } };
-        if (id === 'scp') return { 'scp:design-1': { frontColors: state.ink, backColors: 0, darkGarment: !!state.adv.scpDark, safetyStripes: !!state.adv.scpStripes } };
+        if (id === 'scp') return { 'scp:design-1': { frontColors: state.frontInk, backColors: 0, darkGarment: !!state.adv.scpDark, safetyStripes: !!state.adv.scpStripes } };
         if (id === 'dtf') return { 'dtf:main': { locations: DTF_FRONT[state.front] ? [DTF_FRONT[state.front]] : [] } };
         return null;
     }
@@ -189,8 +200,8 @@
             groups: function () {
                 return {
                     'scp:design-1': {
-                        frontColors: state.ink,                          // location size is cosmetic for SCP
-                        backColors: scpLocCount() >= 2 ? state.ink : 0,  // 2nd location (back) = additional location
+                        frontColors: state.frontInk,                          // primary location colors (front size is cosmetic for SCP)
+                        backColors: scpLocCount() >= 2 ? state.backInk : 0,   // 2nd location (back) prices on its OWN color count
                         darkGarment: !!state.adv.scpDark,
                         safetyStripes: !!state.adv.scpStripes
                     }
@@ -216,7 +227,9 @@
         front: 'LC',          // print FRONT placement: '' | LC | FF | JF
         back: '',             // print BACK placement: '' | FB | JB
         sleeves: { left: false, right: false }, // DTF sleeves
-        ink: 1,
+        frontInk: 1,          // SCP front (primary location) ink colors — each color = 1 screen
+        backInk: 1,           // SCP back (additional location) ink colors — priced on its own
+        scpDarkUserSet: false,// true once the AE manually toggles dark garment (stops auto-suggest)
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
         embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
         capEmb: 'embroidery', // cap embellishment: 'embroidery' | '3d-puff' | 'laser-patch'
@@ -226,8 +239,14 @@
         methodPinned: false,  // true once the rep clicks a card (stop auto-following best value)
         seq: 0,
         prevPP: {},           // id -> last REAL per-piece price (survives the loading flicker)
-        flashUntil: {}        // id -> timestamp; the tasteful "price changed" flash window
+        flashUntil: {},       // id -> timestamp; the tasteful "price changed" flash window
+        // ----- LINE SHEET MODE (method-first multi-style mini-catalog -> PDF) -----
+        mode: 'quick',        // 'quick' (one style, every method) | 'linesheet' (one method, many styles)
+        lineMethod: null,     // locked imprint method id for the sheet: emb|capemb|dtg|scp|dtf
+        lineStyles: [],       // [{ uid, raw, product, color, status, tiers, error }] — each priced independently
+        lineSeq: 0            // reprice token for the line-sheet rows
     };
+    var _lineUid = 0;
 
     function placementLabel() {
         var parts = [];
@@ -244,8 +263,13 @@
     function configParts(id) {
         var parts = [];
         if (id === 'scp') {
-            parts.push({ text: state.ink + '-color' });
-            parts.push({ text: scpLocCount() >= 2 ? 'front + back' : 'front' });
+            var twoLoc = scpLocCount() >= 2;
+            if (twoLoc && state.frontInk !== state.backInk) {
+                parts.push({ text: 'Front ' + state.frontInk + 'c + Back ' + state.backInk + 'c' });
+            } else {
+                parts.push({ text: state.frontInk + '-color' });
+                parts.push({ text: twoLoc ? 'front + back' : 'front' });
+            }
             if (state.adv.scpDark) parts.push({ text: 'dark garment' });
             if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
         } else if (id === 'dtg') {
@@ -279,11 +303,12 @@
 
     function sizeList() { return (state.product && state.product.sizes) || []; }
     function defaultSizes() { return (state.product && state.product.isCap) ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL']; }
-    function stdSize() {
-        var sizes = sizeList();
-        if (state.product && state.product.isCap) return sizes.indexOf('OSFA') >= 0 ? 'OSFA' : (sizes[0] || 'OSFA');
+    function stdSizeFor(product) {
+        var sizes = (product && product.sizes) || [];
+        if (product && product.isCap) return sizes.indexOf('OSFA') >= 0 ? 'OSFA' : (sizes[0] || 'OSFA');
         return sizes.indexOf('S') >= 0 ? 'S' : (sizes.indexOf('OSFA') >= 0 ? 'OSFA' : (sizes[0] || 'S'));
     }
+    function stdSize() { return stdSizeFor(state.product); }
 
     function totalQty() {
         if (state.useSizes) {
@@ -311,17 +336,14 @@
 
     var lookupSeq = 0;
     var sizeSeq = 0;
-    function lookupStyle(raw) {
-        var style = String(raw || '').trim().toUpperCase();
-        var statusEl = $('qqStyleStatus');
-        if (!style) { statusEl.innerHTML = ''; state.product = null; renderAll(); return; }
-        statusEl.innerHTML = '<span class="loading">Looking up ' + esc(style) + '…</span>';
-        var token = ++lookupSeq;
 
-        fetch(API_BASE + '/api/product-details?styleNumber=' + encodeURIComponent(style))
+    // Fetch + normalize a product (style -> { style, name, isCap, colors:[{name,catalog,swatch,image}] }).
+    // Pure: returns the product, mutates no global state — so BOTH the single-style lookup (Quick Price)
+    // and the Line Sheet's per-row add-style can reuse it.
+    function fetchProduct(style) {
+        return fetch(API_BASE + '/api/product-details?styleNumber=' + encodeURIComponent(style))
             .then(function (r) { if (!r.ok) throw new Error('not found (' + r.status + ')'); return r.json(); })
             .then(function (rows) {
-                if (token !== lookupSeq) return;
                 if (!Array.isArray(rows) || rows.length === 0) throw new Error('no product');
                 var meta = rows[0];
                 var title = meta.PRODUCT_TITLE || style;
@@ -329,8 +351,7 @@
                 var subcat = meta.SUBCATEGORY_NAME || '';
                 var desc = meta.PRODUCT_DESCRIPTION || '';
                 var cap = isCapProduct(category, title, style);
-
-                // unique colors keyed by CATALOG_COLOR (+ swatch & image for the picker)
+                // unique colors keyed by CATALOG_COLOR (+ swatch & image for the picker / line sheet)
                 var seen = {}, colors = [];
                 rows.forEach(function (row) {
                     var cat = row.CATALOG_COLOR; if (!cat || seen[cat]) return;
@@ -341,13 +362,28 @@
                         image: row.MAIN_IMAGE_URL || row.FRONT_MODEL || row.PRODUCT_IMAGE || row.FRONT_FLAT || ''
                     });
                 });
-
-                state.product = {
+                return {
                     style: style, name: cleanName(title, style), isCap: cap,
                     category: category, subcategory: subcat, description: desc,
                     colors: colors, sizes: null
                 };
-                state.color = colors.length ? colors[0] : null;
+            });
+    }
+
+    function lookupStyle(raw) {
+        var style = String(raw || '').trim().toUpperCase();
+        var statusEl = $('qqStyleStatus');
+        if (!style) { statusEl.innerHTML = ''; state.product = null; renderAll(); return; }
+        statusEl.innerHTML = '<span class="loading">Looking up ' + esc(style) + '…</span>';
+        var token = ++lookupSeq;
+
+        fetchProduct(style)
+            .then(function (product) {
+                if (token !== lookupSeq) return;
+                state.product = product;
+                state.color = product.colors.length ? product.colors[0] : null;
+                state.scpDarkUserSet = false;  // new style → let the color re-suggest underbase
+                maybeSuggestDark();
                 statusEl.innerHTML = '';
                 loadInventory(); // blank-stock check for the default color
 
@@ -450,7 +486,7 @@
         state.capEmb = 'embroidery';
         var mb = $('qqMatrix'); if (mb) mb.innerHTML = '';
         // caps are embroidery-only — the print-placement chips don't apply to them
-        $('qqPlacementField').hidden = !!state.product.isCap;
+        renderPlacementVisibility();
         renderColorSwatches();
         renderThumb();
         renderPlacements();
@@ -465,14 +501,17 @@
     // ============================================================
     // PRICING
     // ============================================================
-    function buildItem(def) {
-        var c = state.color || {};
+    function buildItemFor(def, product, color, sizes) {
+        var c = color || {};
         return {
             id: '__qq__', method: def.engineMethod,
-            styleNumber: state.product.style, title: state.product.name,
+            styleNumber: product.style, title: product.name,
             colorName: c.name || '', catalogColor: c.catalog || '',
-            isCap: def.isCap === true, sizes: currentSizes()
+            isCap: def.isCap === true, sizes: sizes
         };
+    }
+    function buildItem(def) {
+        return buildItemFor(def, state.product, state.color, currentSizes());
     }
 
     function summarize(p) {
@@ -711,22 +750,23 @@
                 && !state.sleeves.left && !state.sleeves.right;
             b.classList.toggle('is-active', m);
         });
+        renderInkField(); // back-colors stepper visibility tracks the back placement
     }
 
     function renderInkField() {
-        var hasScp = state.methods.some(function (m) { return m.id === 'scp'; });
+        var hasScp = hasActive('scp');
         $('qqInkField').hidden = !hasScp;
-        $('qqStripesField').hidden = !hasScp; // safety stripes surfaced inline (one-click upsell)
+        var backWrap = $('qqInkBackWrap'); if (backWrap) backWrap.hidden = !(hasScp && scpLocCount() >= 2);
+        $('qqScpOptsField').hidden = !hasScp; // dark garment + safety stripes, inline (one-click upsell)
     }
 
-    function renderAdvancedGroups() {
-        var hasScp = state.methods.some(function (m) { return m.id === 'scp'; });
-        $('qqAdvScp').hidden = !hasScp;
-        $('qqAdvanced').hidden = !hasScp; // stitch counts moved to the embroidery panel
-    }
+    function renderAdvancedGroups() { /* SCP options moved inline (see renderInkField); nothing advanced remains */ }
 
     function syncAdvancedInputs() {
-        $('qqInk').value = state.ink;
+        $('qqInkFront').value = state.frontInk;
+        $('qqInkBack').value = state.backInk;
+        $('qqScpDark').checked = !!state.adv.scpDark;
+        $('qqScpStripes').checked = !!state.adv.scpStripes;
         $('qqQty').value = state.qty;
     }
 
@@ -745,7 +785,7 @@
 
     function updateEmbWarn() {
         var el = $('qqEmbWarn'); if (!el) return;
-        var isCap = !!(state.product && state.product.isCap);
+        var isCap = configIsCap();
         // The PRIMARY (chest) logo's stitch surcharge CAPS at +$10 above ~25K — a large back/front
         // must be its OWN logo to price per stitch. Warn instead of silently under-quoting.
         if (!isCap && (num(state.adv.embStitch) || 0) > 25000) {
@@ -758,10 +798,10 @@
 
     function renderEmbPanel() {
         var field = $('qqEmbField');
-        var hasEmb = state.methods.some(function (m) { return m.id === 'emb' || m.id === 'capemb'; });
+        var hasEmb = hasActive('emb') || hasActive('capemb');
         if (!hasEmb) { field.hidden = true; return; }
         field.hidden = false;
-        var isCap = !!(state.product && state.product.isCap);
+        var isCap = configIsCap();
         $('qqEmbLabel').textContent = isCap ? 'Cap embroidery logos' : 'Embroidery logos';
         // cap embellishment selector (flat / 3D puff / laser patch) — caps only
         var capWrap = $('qqCapEmbWrap');
@@ -810,7 +850,7 @@
 
     function ladderKey(id) {
         return (state.product ? state.product.style : '') + '|' + id
-            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.ink
+            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.frontInk + 'x' + state.backInk
             + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',') + '|' + state.capEmb
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
@@ -819,6 +859,43 @@
     function rangeLabel(t) {
         var r = t.range || parseRange(t.label);
         return (!isFinite(r.max)) ? r.min + '+' : r.min + '–' + r.max;
+    }
+
+    // Engine-probe a per-piece price ladder for a product+color under a method's CURRENT shared
+    // config. Returns [{label, base, ltmFee, range}] sorted by tier. Prices a representative qty in
+    // each tier through the SAME singleItemPreview() the cards use, so a ladder can't disagree with
+    // a live quote. Shared by the Quick-Price matrix AND the Line Sheet (one ladder per style).
+    async function probeLadder(id, product, color) {
+        var def = METHODS[id];
+        if (!def || !product || !window.QuoteCartEngine) return [];
+        var probes = PROBE_QTYS[id] || [12, 36, 60, 100];
+        var size = stdSizeFor(product);
+        var byTier = {};
+        for (var i = 0; i < probes.length; i++) {
+            var sz = {}; sz[size] = probes[i];
+            var item = buildItemFor(def, product, color, sz);
+            var preview;
+            try {
+                preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(), deps: engineDeps(), nudge: false });
+            } catch (e) { preview = null; }
+            if (preview && preview.ok && preview.lines && preview.lines.length) {
+                var label = preview.tierLabel || ('q' + probes[i]);
+                if (!byTier[label]) {
+                    // per-piece base = baseUnit + per-piece service lines (AS-GARM stitch surcharge,
+                    // additional-logo AL) + any residual per-piece upcharge that only shows in
+                    // groupTotal (cap 3D-puff / laser-patch). Clamp >=0 so a DTG LTM tier's floor
+                    // under-recovery never shaves a cent.
+                    var pq = probes[i];
+                    var bu = preview.lines[0].baseUnit;
+                    var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / pq;
+                    var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+                    var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
+                    var residual = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * pq) / pq);
+                    byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
+                }
+            }
+        }
+        return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
     }
 
     async function renderMatrix() {
@@ -836,39 +913,10 @@
         if (_ladderFetching[key]) { return; } // a probe for this exact config is already running
         _ladderFetching[key] = true;
         box.innerHTML = '<p class="qq-matrix-title">Price breaks — ' + esc(def.label) + '</p><div class="qq-skeleton" style="height:84px"></div>';
-        var probes = PROBE_QTYS[id] || [12, 36, 60, 100];
-        var byTier = {};
-        try {
-            for (var i = 0; i < probes.length; i++) {
-                var item = buildItem(def);
-                item.sizes = {}; item.sizes[stdSize()] = probes[i];
-                var preview;
-                try {
-                    preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(), deps: engineDeps(), nudge: false });
-                } catch (e) { preview = null; }
-                if (preview && preview.ok && preview.lines && preview.lines.length) {
-                    var label = preview.tierLabel || ('q' + probes[i]);
-                    if (!byTier[label]) {
-                        // per-piece base = baseUnit + per-piece service lines (AS-GARM stitch
-                        // surcharge, additional-logo AL) + any residual per-piece upcharge that
-                        // only shows in groupTotal (cap 3D-puff / laser-patch). Clamp >=0 so a
-                        // DTG LTM tier's floor under-recovery never shaves a cent.
-                        var pq = probes[i];
-                        var bu = preview.lines[0].baseUnit;
-                        var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / pq;
-                        var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
-                        var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
-                        var residual = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * pq) / pq);
-                        byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
-                    }
-                }
-            }
-        } catch (err) {
-            console.error('[quick-quote] price-breaks build failed:', err);
-        } finally {
-            delete _ladderFetching[key];
-        }
-        var tiers = Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
+        var tiers = [];
+        try { tiers = await probeLadder(id, state.product, state.color); }
+        catch (err) { console.error('[quick-quote] price-breaks build failed:', err); }
+        finally { delete _ladderFetching[key]; }
         _ladderCache[key] = tiers;
         // only paint if this is still the current selection/config
         if (state.selectedMethod === id && ladderKey(id) === key) paintMatrix(id, tiers);
@@ -957,6 +1005,9 @@
         var pp = s.perPiece || 0, qtyNow = totalQty(), blank = blankUnit(id);
         var ltmPP = (s.ltm && s.ltm.fee > 0 && qtyNow > 0) ? Math.floor((s.ltm.fee / qtyNow) * 100) / 100 : 0;
         var capBlankLbl = state.product.isCap ? 'Cap blank' : 'Garment (blank)';
+        // SCP teaches its cost by color count: each color = 1 screen. Front + back price separately.
+        var scpFrontC = (id === 'scp') ? (' — ' + state.frontInk + ' color') : '';
+        var scpBackC = (id === 'scp') ? (' — ' + state.backInk + ' color') : '';
         var rows = [], sum = 0, didSplit = false;
         function add(lbl, val, plus, cls) {
             val = Number(val) || 0; sum += val;
@@ -979,18 +1030,18 @@
             var frontPrint = r2(r.frontOnlyUnit - (blank || 0) - ltmPP);
             if (blank != null && frontPrint > -0.005) {
                 add(capBlankLbl, blank, false, 'is-blank');
-                add(FRONT_LABELS[state.front] || 'Front', frontPrint, false);
+                add((FRONT_LABELS[state.front] || 'Front') + scpFrontC, frontPrint, false);
                 didSplit = true;
             } else {
-                add(FRONT_LABELS[state.front] || 'Front', r.frontOnlyUnit, false);
+                add((FRONT_LABELS[state.front] || 'Front') + scpFrontC, r.frontOnlyUnit, false);
             }
-            add(printAddlLabel(id), addlU, true);
+            add(printAddlLabel(id) + scpBackC, addlU, true);
         } else if (blank != null) {                              // single print location OR single logo
             var printU = r2(pp - blank - ltmPP);
             if (printU > -0.005) {
                 var soloLbl = (id === 'emb') ? 'Primary logo'
                     : (id === 'capemb') ? 'Cap front logo'
-                    : (FRONT_LABELS[state.front] || 'Print');
+                    : ((FRONT_LABELS[state.front] || 'Print') + scpFrontC);
                 add(capBlankLbl, blank, false, 'is-blank');
                 add(soloLbl, printU, false);
                 didSplit = true;
@@ -1000,7 +1051,24 @@
         if (!rows.length) return '';
         // PARITY GUARD: the rows MUST reconstruct the engine per-piece (±1¢) or we show nothing.
         if (Math.abs(sum - pp) > 0.01) { if (window.console && console.warn) console.warn('[quick-quote] breakdown parity off', id, sum, pp); return ''; }
-        return '<div class="qq-card-breakdown">' + rows.join('') + '</div>';
+        return '<div class="qq-card-breakdown">'
+            + ((s.oneTimeFees && s.oneTimeFees.length) ? '<div class="qq-bd-head">Per piece</div>' : '')
+            + rows.join('') + '</div>';
+    }
+
+    // One-time fees (screen setup, digitizing) shown as their OWN section below the per-piece
+    // breakdown — they're per-order, not per-piece, so they must NOT enter the parity-guarded sum.
+    function buildOneTime(s) {
+        if (!s.oneTimeFees || !s.oneTimeFees.length) return '';
+        var rows = s.oneTimeFees.map(function (f) {
+            return '<div class="qq-bd-row"><span>' + esc(f.label) + '</span><span>' + fmt(f.amount) + '</span></div>';
+        });
+        var html = '<div class="qq-bd-head">One-time setup <span class="qq-bd-sub">· per order, not per piece</span></div>' + rows.join('');
+        if (s.oneTimeFees.length > 1) {
+            var tot = s.oneTimeFees.reduce(function (a, f) { return a + (Number(f.amount) || 0); }, 0);
+            html += '<div class="qq-bd-row is-total"><span>One-time total</span><span>' + fmt(tot) + '</span></div>';
+        }
+        return '<div class="qq-card-onetime">' + html + '</div>';
     }
 
     function renderCard(id, isBest, changed) {
@@ -1028,7 +1096,7 @@
         var meta = [];
         if (s.tierLabel) meta.push('<span class="item tier">' + esc(s.tierLabel) + ' tier</span>');
         if (s.ltm && s.ltm.fee > 0) meta.push('<span class="item ltm">incl. $' + Math.round(s.ltm.fee) + ' small-batch fee</span>');
-        s.oneTimeFees.forEach(function (f) { meta.push('<span class="item fee">+ ' + fmt(f.amount) + ' ' + esc(f.label) + ' (one-time)</span>'); });
+        // one-time fees now render as their own section (buildOneTime), not a meta chip
 
         var nudgeHtml = '';
         if (s.nudge && s.nudge.addQty > 0 && (s.nudge.nextPerPiece != null || s.nudge.perPieceSavings > 0)) {
@@ -1042,6 +1110,7 @@
         // Per-piece breakdown (rate-card style): blank garment + each print/logo location
         // + a per-shirt small-batch line, all summing to the engine per-piece. See buildBreakdown.
         var breakdownHtml = buildBreakdown(id, s, r, unitWord);
+        var oneTimeHtml = buildOneTime(s);
 
         return '<div class="qq-card is-clickable' + (isBest ? ' is-best' : '') + (sel ? ' is-selected' : '') + '"' + (changed ? ' data-flash="1"' : '') + dm + '>'
             + '<div class="qq-card-top">' + head
@@ -1049,6 +1118,7 @@
             + '<div class="qq-card-total">' + fmt(s.total) + ' total' + (isBest ? ' <span class="qq-best-tag"><svg class="qq-star" viewBox="0 0 24 24" width="11" height="11" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.1 4.7 1.4 6.8L12 17.8 6 21.2l1.4-6.8L2.3 9.7l6.9-.7z"/></svg>best value</span>' : '') + '</div></div></div>'
             + configChips(id)
             + breakdownHtml
+            + oneTimeHtml
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
@@ -1056,8 +1126,285 @@
     }
 
     function renderAll() {
-        renderResults();
+        if (state.mode === 'linesheet') renderLinePreview();
+        else renderResults();
     }
+
+    // ============================================================
+    // LINE SHEET MODE — method-first multi-style mini-catalog -> PDF
+    // One imprint method, several styles. Each style is priced INDEPENDENTLY via
+    // probeLadder() (the same engine probe the matrix uses) and NEVER summed, so
+    // every number on the sheet is identical-by-construction to the rest of the app.
+    // ============================================================
+    var NWCA_LOGO = 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1';
+    var LINE_METHODS = [
+        { id: 'emb', label: 'Embroidery' },
+        { id: 'capemb', label: 'Cap embroidery' },
+        { id: 'dtg', label: 'DTG print' },
+        { id: 'scp', label: 'Screen print' },
+        { id: 'dtf', label: 'DTF transfer' }
+    ];
+    var LINE_MAX = 6;
+
+    // active method(s) for shared config-control visibility: quick = the eligible set; line = the locked one
+    function activeMethodIds() {
+        if (state.mode === 'linesheet') return state.lineMethod ? [state.lineMethod] : [];
+        return state.methods.map(function (m) { return m.id; });
+    }
+    function hasActive(id) { return activeMethodIds().indexOf(id) >= 0; }
+    function configIsCap() {
+        return state.mode === 'linesheet' ? (state.lineMethod === 'capemb') : !!(state.product && state.product.isCap);
+    }
+    function renderPlacementVisibility() {
+        var pf = $('qqPlacementField'); if (!pf) return;
+        if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));
+        else pf.hidden = !!(state.product && state.product.isCap);
+    }
+    function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
+    var repriceActiveDebounced = debounce(repriceActive, 350);
+    // refresh the shared config controls (placement / ink / embroidery) for the current mode+method
+    function renderConfigControls() {
+        renderPlacements();          // -> renderInkField (placement + ink visibility)
+        renderEmbPanel();
+        renderPlacementVisibility();
+        syncAdvancedInputs();
+    }
+
+    // ---- mode toggle ----
+    function setMode(mode) {
+        if (mode === state.mode) return;
+        state.mode = mode;
+        renderMode();
+        renderConfigControls();
+        renderAll();
+    }
+    function renderMode() {
+        var line = state.mode === 'linesheet';
+        document.body.classList.toggle('qq-mode-line', line); // scopes the print stylesheet
+        Array.prototype.forEach.call(document.querySelectorAll('#qqModeToggle [data-mode]'), function (b) {
+            b.classList.toggle('is-active', b.getAttribute('data-mode') === state.mode);
+        });
+        $('qqQuickInputs').hidden = line;        // style + color + qty (quick only)
+        $('qqLineMethodField').hidden = !line;   // method selector (line only)
+        $('qqLineStylesField').hidden = !line;   // style list (line only)
+        $('qqQuickResults').hidden = line;
+        $('qqLineResults').hidden = !line;
+    }
+
+    // ---- method selector ----
+    function renderLineMethods() {
+        var box = $('qqLineMethodChips'); if (!box) return;
+        box.innerHTML = LINE_METHODS.map(function (m) {
+            return '<button type="button" class="qq-place-chip' + (m.id === state.lineMethod ? ' is-active' : '')
+                + '" data-line-method="' + m.id + '">' + esc(m.label) + '</button>';
+        }).join('');
+    }
+    function setLineMethod(id) {
+        state.lineMethod = id;
+        if (id === 'scp' || id === 'dtg' || id === 'dtf') {
+            state.front = 'LC'; state.back = ''; state.sleeves = { left: false, right: false };
+            if (id === 'scp') { state.frontInk = 1; state.backInk = 1; }
+        }
+        if (id === 'emb' || id === 'capemb') { state.adv.embStitch = 8000; state.embAddl = []; state.capEmb = 'embroidery'; }
+        renderLineMethods();
+        renderConfigControls();
+        repriceLineAll();
+    }
+
+    // ---- style list (input panel) ----
+    function lineRow(uid) { return state.lineStyles.filter(function (r) { return r.uid === uid; })[0]; }
+    function addLineStyle() {
+        if (state.lineStyles.length >= LINE_MAX) return;
+        state.lineStyles.push({ uid: ++_lineUid, raw: '', product: null, color: null, status: 'empty', tiers: null, pricing: false, error: '' });
+        renderLineList();
+        var inp = document.querySelector('.qq-line-row:last-child .qq-line-style'); if (inp) inp.focus();
+    }
+    function removeLineStyle(uid) {
+        state.lineStyles = state.lineStyles.filter(function (r) { return r.uid !== uid; });
+        renderLineList(); renderLinePreview();
+    }
+    function moveLineStyle(uid, dir) {
+        var i = state.lineStyles.findIndex(function (r) { return r.uid === uid; });
+        var j = i + dir;
+        if (i < 0 || j < 0 || j >= state.lineStyles.length) return;
+        var a = state.lineStyles[i]; state.lineStyles[i] = state.lineStyles[j]; state.lineStyles[j] = a;
+        renderLineList(); renderLinePreview();
+    }
+
+    // renderLineList renders the row SHELLS (style input + controls) — called only on add/remove/move
+    // so the style input is never replaced mid-type. updateLineRow fills the dynamic content.
+    function renderLineList() {
+        var box = $('qqLineList'); if (!box) return;
+        if (!state.lineStyles.length) {
+            box.innerHTML = '<p class="qq-line-empty">Add a style to start the sheet.</p>';
+        } else {
+            box.innerHTML = state.lineStyles.map(function (r, idx) {
+                return '<div class="qq-line-row" data-uid="' + r.uid + '">'
+                    + '<div class="qq-line-head">'
+                    + '<input class="qq-line-style input" type="text" inputmode="text" autocomplete="off" placeholder="Style #" value="' + esc(r.raw) + '" data-uid="' + r.uid + '">'
+                    + '<div class="qq-line-ctrls">'
+                    + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="-1" aria-label="Move up"' + (idx === 0 ? ' disabled' : '') + '>&uarr;</button>'
+                    + '<button type="button" class="qq-line-mv" data-uid="' + r.uid + '" data-dir="1" aria-label="Move down"' + (idx === state.lineStyles.length - 1 ? ' disabled' : '') + '>&darr;</button>'
+                    + '<button type="button" class="qq-line-rm" data-uid="' + r.uid + '" aria-label="Remove style">&times;</button>'
+                    + '</div></div>'
+                    + '<div class="qq-line-content" id="qqlc-' + r.uid + '"></div>'
+                    + '</div>';
+            }).join('');
+            state.lineStyles.forEach(updateLineRow);
+        }
+        updateLineActions();
+    }
+    function updateLineRow(row) {
+        var el = document.getElementById('qqlc-' + row.uid); if (!el) return;
+        if (row.status === 'empty') { el.innerHTML = ''; return; }
+        if (row.status === 'loading') { el.innerHTML = '<span class="qq-line-stat loading">Looking up&hellip;</span>'; return; }
+        if (row.status === 'error') { el.innerHTML = '<span class="qq-line-stat err">' + esc(row.error || 'Not found') + '</span>'; return; }
+        var img = row.color && row.color.image;
+        var thumb = img
+            ? '<img class="qq-line-thumb" src="' + esc(img) + '" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">'
+            : '<span class="qq-line-thumb is-empty"></span>';
+        var colorSel = '';
+        if (row.product && row.product.colors.length) {
+            colorSel = '<select class="qq-line-color" data-uid="' + row.uid + '" aria-label="Color">'
+                + row.product.colors.map(function (c) {
+                    return '<option value="' + esc(c.catalog) + '"' + (row.color && c.catalog === row.color.catalog ? ' selected' : '') + '>' + esc(c.name) + '</option>';
+                }).join('') + '</select>';
+        }
+        var price = row.pricing ? '<span class="qq-line-stat loading">Pricing&hellip;</span>'
+            : (row.tiers && row.tiers.length) ? '<span class="qq-line-price">from ' + fmt(row.tiers[row.tiers.length - 1].base) + '/' + (row.product.isCap ? 'cap' : 'pc') + '</span>'
+            : (row.tiers && !row.tiers.length) ? '<span class="qq-line-stat err">No price for this method</span>' : '';
+        el.innerHTML = thumb + '<div class="qq-line-meta"><span class="qq-line-name">' + esc(row.product.name) + '</span>' + colorSel + price + '</div>';
+    }
+    function updateLineActions() {
+        var n = state.lineStyles.length;
+        $('qqLineAdd').disabled = n >= LINE_MAX;
+        $('qqLineAdd').textContent = n >= LINE_MAX ? 'Max ' + LINE_MAX + ' styles' : '+ Add style';
+        var hasPriced = state.lineStyles.some(function (r) { return r.tiers && r.tiers.length; });
+        $('qqLineDownload').disabled = !hasPriced;
+        $('qqLinePrint').disabled = !hasPriced;
+    }
+
+    function onLineStyleInput(uid, raw) {
+        var row = lineRow(uid); if (!row) return;
+        row.raw = raw;
+        var style = String(raw || '').trim().toUpperCase();
+        if (!style) { row.product = null; row.color = null; row.status = 'empty'; row.tiers = null; updateLineRow(row); updateLineActions(); renderLinePreview(); return; }
+        row.status = 'loading'; row.error = ''; updateLineRow(row);
+        var token = ++state.lineSeq; row._tok = token;
+        fetchProduct(style).then(function (product) {
+            if (row._tok !== token) return;
+            row.product = product;
+            row.color = product.colors.length ? product.colors[0] : null;
+            row.status = 'ok'; row.tiers = null;
+            return loadProductSizes(product).then(function () {
+                if (row._tok !== token) return;
+                updateLineRow(row);
+                priceLineRow(row);
+            });
+        }).catch(function () {
+            if (row._tok !== token) return;
+            row.product = null; row.color = null; row.status = 'error'; row.error = 'Not found'; row.tiers = null;
+            updateLineRow(row); updateLineActions(); renderLinePreview();
+        });
+    }
+    function onLineColorChange(uid, catalog) {
+        var row = lineRow(uid); if (!row || !row.product) return;
+        row.color = (row.product.colors || []).filter(function (c) { return c.catalog === catalog; })[0] || row.color;
+        row.tiers = null;
+        updateLineRow(row);
+        priceLineRow(row);
+    }
+
+    // Per-row size run (so stdSizeFor finds a real size). The bundle is the same one the engine
+    // fetches for pricing, so it's warm in cache; falls back to a default run on failure.
+    function loadProductSizes(product) {
+        if (!product || product.sizes) return Promise.resolve();
+        var fallback = product.isCap ? ['OSFA'] : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
+        return fetch(API_BASE + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(product.style))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (d) {
+                var arr = d && (d.sizes || (d.pricing && d.pricing.sizes) || (d.data && d.data.sizes));
+                product.sizes = (Array.isArray(arr) && arr.length)
+                    ? arr.map(function (s) { return (s && s.size) ? s.size : s; }).filter(Boolean) : fallback;
+            })
+            .catch(function () { product.sizes = fallback; });
+    }
+
+    // ---- pricing (each row independent — NEVER summed; Rule 9) ----
+    function repriceLineAll() {
+        if (state.mode !== 'linesheet') return;
+        if (!state.lineMethod) { renderLineList(); renderLinePreview(); return; }
+        state.lineStyles.forEach(function (row) { if (row.product) { row.tiers = null; priceLineRow(row); } });
+        renderLinePreview();
+    }
+    function priceLineRow(row) {
+        if (!state.lineMethod || !row.product) { renderLinePreview(); return; }
+        var token = ++state.lineSeq; row._ptok = token;
+        row.pricing = true; updateLineRow(row);
+        probeLadder(state.lineMethod, row.product, row.color).then(function (tiers) {
+            if (row._ptok !== token) return;
+            row.tiers = tiers; row.pricing = false;
+            updateLineRow(row); updateLineActions(); renderLinePreview();
+        }).catch(function () {
+            if (row._ptok !== token) return;
+            row.tiers = []; row.pricing = false;
+            updateLineRow(row); updateLineActions(); renderLinePreview();
+        });
+    }
+
+    // ---- the line-sheet preview (becomes the PDF via window.print) ----
+    function lineConfigLabel() {
+        if (!state.lineMethod) return '';
+        var m = LINE_METHODS.filter(function (x) { return x.id === state.lineMethod; })[0];
+        var cfg = configText(state.lineMethod);
+        return (m ? m.label : '') + (cfg ? ' · ' + cfg : '');
+    }
+    function lineLadderHtml(tiers, isCap) {
+        if (!tiers || !tiers.length) return '';
+        var unit = isCap ? 'cap' : 'pc';
+        var hasLtm = tiers.some(function (t) { return t.ltmFee > 0; });
+        var qcells = tiers.map(function (t) { return '<th>' + esc(rangeLabel(t)) + '</th>'; }).join('');
+        var pcells = tiers.map(function (t) { return '<td>' + fmt(t.base) + '</td>'; }).join('');
+        var ltmRow = hasLtm ? '<tr><td class="lbl">Small-batch</td>' + tiers.map(function (t) {
+            return '<td' + (t.ltmFee > 0 ? ' class="warn"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '&mdash;') + '</td>';
+        }).join('') + '</tr>' : '';
+        return '<table class="qq-sheet-ladder"><thead><tr><th class="lbl">Qty</th>' + qcells + '</tr></thead>'
+            + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + pcells + '</tr>' + ltmRow + '</tbody></table>';
+    }
+    function renderLinePreview() {
+        var box = $('qqSheet'); if (!box) return;
+        if (!state.lineMethod) {
+            box.innerHTML = '<div class="qq-sheet-placeholder">Pick an imprint method, then add styles to build the line sheet.</div>';
+            return;
+        }
+        var priced = state.lineStyles.filter(function (r) { return r.product && r.tiers && r.tiers.length; });
+        var head = '<div class="qq-sheet-head">'
+            + '<img class="qq-sheet-logo" src="' + NWCA_LOGO + '" alt="Northwest Custom Apparel" referrerpolicy="no-referrer">'
+            + '<div class="qq-sheet-htext"><div class="qq-sheet-brand">Northwest Custom Apparel</div>'
+            + '<div class="qq-sheet-sub">Line Sheet &middot; ' + esc(lineConfigLabel()) + '</div></div></div>';
+        var body;
+        if (!priced.length) {
+            body = '<div class="qq-sheet-placeholder">Add styles on the left &mdash; each appears here with its price ladder.</div>';
+        } else {
+            body = '<div class="qq-sheet-body">' + priced.map(function (r) {
+                var img = r.color && r.color.image;
+                var imgHtml = img
+                    ? '<img class="qq-sheet-img" src="' + esc(img) + '" alt="" referrerpolicy="no-referrer" onerror="this.style.visibility=\'hidden\'">'
+                    : '<span class="qq-sheet-img is-empty"></span>';
+                return '<div class="qq-sheet-item">' + imgHtml
+                    + '<div class="qq-sheet-item-main">'
+                    + '<div class="qq-sheet-item-head"><span class="qq-sheet-style">' + esc(r.product.style) + '</span> &middot; '
+                    + esc(r.product.name) + '<span class="qq-sheet-color">Color: ' + esc(r.color ? r.color.name : '') + '</span></div>'
+                    + lineLadderHtml(r.tiers, r.product.isCap)
+                    + '</div></div>';
+            }).join('') + '</div>';
+        }
+        var foot = '<div class="qq-sheet-foot">'
+            + '<div>Estimate only &middot; pricing valid 30 days &middot; confirm stock &amp; sizes at order time.</div>'
+            + '<div>Northwest Custom Apparel &middot; (253) 922-5793 &middot; sales@nwcustomapparel.com</div></div>';
+        box.innerHTML = head + body + foot;
+    }
+    function printLineSheet() { window.print(); }
 
     // ============================================================
     // WIRING
@@ -1090,6 +1437,7 @@
             var b = e.target.closest('.qq-swatch'); if (!b || !state.product) return;
             var cat = b.getAttribute('data-cat');
             state.color = (state.product.colors || []).filter(function (c) { return c.catalog === cat; })[0] || state.color;
+            maybeSuggestDark(); // re-suggest underbase for the newly-picked color (unless AE set it)
             renderColorSwatches();
             renderThumb();
             loadInventory(); // refresh blank-stock for the newly-picked color
@@ -1115,7 +1463,7 @@
             state.back = b.getAttribute('data-back') || '';
             state.sleeves = { left: false, right: false }; // presets set a clean common combo
             renderPlacements();
-            repriceAll();
+            repriceActive();
         });
 
         $('qqSizesToggle').addEventListener('click', function () {
@@ -1145,16 +1493,20 @@
             var kind = btn.getAttribute('data-kind'), code = btn.getAttribute('data-code');
             if (kind === 'front') state.front = code; else state.back = code;
             renderPlacements();
-            repriceAll();
+            repriceActive();
         }
         $('qqFront').addEventListener('click', onPlaceChip);
         $('qqBack').addEventListener('click', onPlaceChip);
-        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; repriceAll(); });
-        $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; repriceAll(); });
+        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; repriceActive(); });
+        $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; repriceActive(); });
 
-        $('qqInk').addEventListener('input', function (e) {
-            state.ink = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
-            repriceDebounced();
+        $('qqInkFront').addEventListener('input', function (e) {
+            state.frontInk = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
+            repriceActiveDebounced();
+        });
+        $('qqInkBack').addEventListener('input', function (e) {
+            state.backInk = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
+            repriceActiveDebounced();
         });
 
         // embroidery logo panel (primary + additional logos)
@@ -1165,28 +1517,57 @@
             if (key === 'primary') state.adv.embStitch = val;
             else if (state.embAddl[Number(key)]) state.embAddl[Number(key)].stitch = val;
             updateEmbWarn();
-            repriceDebounced();
+            repriceActiveDebounced();
         });
         $('qqEmbLogos').addEventListener('click', function (e) {
             var rm = e.target.closest('.qq-emb-remove'); if (!rm) return;
             state.embAddl.splice(Number(rm.getAttribute('data-i')), 1);
-            renderEmbPanel(); repriceAll();
+            renderEmbPanel(); repriceActive();
         });
         $('qqEmbAddBtn').addEventListener('click', function () {
-            var isCap = !!(state.product && state.product.isCap);
+            var isCap = configIsCap();
             if (isCap && state.embAddl.length >= 1) return;
             state.embAddl.push({ stitch: isCap ? 5000 : 8000 });
-            renderEmbPanel(); repriceAll();
+            renderEmbPanel(); repriceActive();
         });
-        $('qqEmbDigitizing').addEventListener('change', function (e) { state.adv.digitizing = e.target.checked; repriceAll(); });
+        $('qqEmbDigitizing').addEventListener('change', function (e) { state.adv.digitizing = e.target.checked; repriceActive(); });
         $('qqCapEmbType').addEventListener('click', function (e) {
             var b = e.target.closest('[data-cap-emb]'); if (!b) return;
             state.capEmb = b.getAttribute('data-cap-emb');
-            renderEmbPanel(); repriceAll();
+            renderEmbPanel(); repriceActive();
         });
-        $('qqScpDark').addEventListener('change', function (e) { state.adv.scpDark = e.target.checked; repriceAll(); });
-        $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceAll(); });
+        $('qqScpDark').addEventListener('change', function (e) { state.adv.scpDark = e.target.checked; state.scpDarkUserSet = true; repriceActive(); });
+        $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceActive(); });
 
+        // ----- Line Sheet mode wiring -----
+        $('qqModeToggle').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-mode]'); if (!b) return;
+            setMode(b.getAttribute('data-mode'));
+        });
+        $('qqLineMethodChips').addEventListener('click', function (e) {
+            var b = e.target.closest('[data-line-method]'); if (!b) return;
+            setLineMethod(b.getAttribute('data-line-method'));
+        });
+        $('qqLineAdd').addEventListener('click', addLineStyle);
+        var onLineStyleInputDebounced = debounce(function (uid, val) { onLineStyleInput(uid, val); }, 450);
+        $('qqLineList').addEventListener('input', function (e) {
+            var si = e.target.closest('.qq-line-style'); if (si) onLineStyleInputDebounced(Number(si.getAttribute('data-uid')), si.value);
+        });
+        $('qqLineList').addEventListener('change', function (e) {
+            var cs = e.target.closest('.qq-line-color'); if (cs) onLineColorChange(Number(cs.getAttribute('data-uid')), cs.value);
+        });
+        $('qqLineList').addEventListener('click', function (e) {
+            var mv = e.target.closest('.qq-line-mv'); if (mv && !mv.disabled) { moveLineStyle(Number(mv.getAttribute('data-uid')), Number(mv.getAttribute('data-dir'))); return; }
+            var rm = e.target.closest('.qq-line-rm'); if (rm) { removeLineStyle(Number(rm.getAttribute('data-uid'))); return; }
+        });
+        $('qqLineDownload').addEventListener('click', printLineSheet);
+        $('qqLinePrint').addEventListener('click', printLineSheet);
+
+        // init: render both modes' scaffolding (Quick Price is the default view)
+        renderMode();
+        renderLineMethods();
+        renderLineList();
+        renderLinePreview();
         renderResults();
     }
 
