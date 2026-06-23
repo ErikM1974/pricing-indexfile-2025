@@ -79,7 +79,7 @@ describe('Quick Quote ↔ configurator engine-wiring parity (Rule #7)', () => {
     });
 
     test('caps are embroidery-only: print placement hidden, cap back priced via the logo panel (CB rate)', () => {
-        expect(QQ).toContain('hidden = !!state.product.isCap'); // print-placement field hidden for caps
+        expect(QQ).toContain('state.product && state.product.isCap'); // print-placement field hidden for caps (renderPlacementVisibility, quick mode)
         expect(QQ).toMatch(/position:\s*'Cap Back'/);          // cap back = an additional logo → CB rate
     });
 
