@@ -1,3 +1,8 @@
+## v2026.06.23.3 (2026.06.23)
+
+- docs(lessons): log /api/inventory COLOR_NAME-not-CATALOG_COLOR gotcha; archive SCP dark-garment entry to stay under the 300-line cap
+- Deploy v2026.06.23.3: Quick Quote — SCP front/back ink split + two-section breakdown, Line Sheet mode (mini-catalog PDF), mode-toggle polish
+
 ## v2026.06.23.2 (2026.06.23)
 
 - test: re-lock DTG pricing baselines after the 1-23 -> 1-11/12-23 split
