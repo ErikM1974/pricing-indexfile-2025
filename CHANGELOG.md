@@ -1,3 +1,8 @@
+## v2026.06.23.1 (2026.06.23)
+
+- feat(quick-quote): rate-card breakdown + expose DTF Medium (catalog + quick quote)
+- Deploy v2026.06.23.1: cache-bust quick-quote + pdp-configurator
+
 ## v2026.06.22.8 (2026.06.22)
 
 - Doc: prototype resume doc — cap embroidery + 2XL upcharges + inventory check all added (v.5-7); remaining = live cutover
