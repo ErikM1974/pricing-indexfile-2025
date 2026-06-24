@@ -97,6 +97,9 @@
     // the card so the AE sees what each location includes — size drives the price (bigger = pricier).
     var DTF_LOC_LABEL = { 'left-chest': 'Left chest', 'center-front': 'Center front', 'full-front': 'Full front', 'center-back': 'Center back', 'full-back': 'Full back', 'left-sleeve': 'L sleeve', 'right-sleeve': 'R sleeve' };
     var DTF_SIZE_BAND = { 'left-chest': '≤5×5"', 'center-front': '≤9×12"', 'full-front': '≤12×16.5"', 'center-back': '≤9×12"', 'full-back': '≤12×16.5"', 'left-sleeve': '≤5×5"', 'right-sleeve': '≤5×5"' };
+    // DTG standard platen print sizes per location (dtg-pricing-service.js location set; 16×20 = the
+    // pricer's max platen clamp). DTG has no medium → Center front/back print FULL (FF/FB size). Info only.
+    var DTG_SIZE = { LC: '4×4"', CF: '12×16"', FF: '12×16"', JF: '16×20"', CB: '12×16"', FB: '12×16"', JB: '16×20"' };
 
     // --- placement → per-method mapping (reads state.front / state.back / state.sleeves) ---
     function dtgCode() { var f = DTG_FRONT_FROM[state.front] || state.front, b = DTG_BACK_FROM[state.back] || state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
@@ -273,8 +276,9 @@
             if (state.adv.scpDark) parts.push({ text: 'dark garment' });
             if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
         } else if (id === 'dtg') {
-            var pl = placementLabel();
-            if (pl && pl !== '—') parts.push({ text: pl });
+            // one chip per location with its print size, mirroring DTF (so AEs/customers see the size)
+            if (state.front && FRONT_LABELS[state.front]) parts.push({ text: FRONT_LABELS[state.front] + (DTG_SIZE[state.front] ? ' · ' + DTG_SIZE[state.front] : '') });
+            if (state.back && BACK_LABELS[state.back]) parts.push({ text: BACK_LABELS[state.back] + (DTG_SIZE[state.back] ? ' · ' + DTG_SIZE[state.back] : '') });
         } else if (id === 'dtf') {
             // one chip per location, tagged with its transfer-size band (≤5×5" / ≤12×16.5")
             dtfLocations().forEach(function (loc) {
