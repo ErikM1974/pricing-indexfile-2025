@@ -21,17 +21,33 @@
 
   const METHOD_COLORS = {
     'Embroidery': '#4cb354', 'Screen Print': '#2f6fed', 'DTG': '#f59e0b', 'DTF': '#8b5cf6',
-    'Sticker': '#ec4899', 'Emblem': '#14b8a6', 'Online Store': '#64748b', 'Other': '#9ca3af',
+    'Sticker': '#ec4899', 'Emblem': '#14b8a6', 'Online Store': '#64748b', 'Inksoft': '#d9622e', 'Other': '#9ca3af',
   };
 
   let modalEl = null;
   let lastData = null;
+  let labelPrintedOn = '';
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   function fmtNum(v) { return Math.round(Number(v) || 0).toLocaleString('en-US'); }
+  // Rep initials: "Taneisha Clark" → "TC", "Nika Lao" → "NL".
+  function initials(name) {
+    return String(name || '').trim().split(/\s+/).filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 3);
+  }
+  // Compact date for labels/cards: "2026-06-19" → "6-19-26".
+  function fmtShortDate(d) {
+    const s = String(d || '').slice(0, 10);
+    const [y, m, day] = s.split('-').map(Number);
+    if (!y) return '';
+    return `${m}-${day}-${String(y).slice(-2)}`;
+  }
+  function todayShort() {
+    const n = new Date();
+    return `${n.getMonth() + 1}-${n.getDate()}-${String(n.getFullYear()).slice(-2)}`;
+  }
   function fmtDate(d) {
     if (!d) return '';
     const [y, m, day] = String(d).split('-').map(Number);
@@ -111,27 +127,49 @@
     </div>`;
   }
 
+  // ── Logo thumbnail (screen) — ShopWorks design artwork, or a graceful "no logo" tile ──
+  function logoTile(o) {
+    return o.logoUrl
+      ? `<img class="sit-logo" src="${esc(o.logoUrl)}" alt="Design ${esc(o.designNumber || '')} artwork" loading="lazy" onerror="this.outerHTML='<div class=\\'sit-logo sit-logo--off\\' title=\\'artwork unavailable\\'>🎨</div>';">`
+      : `<div class="sit-logo sit-logo--off" title="No ShopWorks artwork on file for this design">🎨</div>`;
+  }
+
   // ── One PO card (screen) ──
   function poCard(o) {
-    const wo = o.workOrder ? `WO #${esc(o.workOrder)}` : '<span class="sit-na">no WO linked</span>';
+    const wo = o.workOrder ? `#${esc(o.workOrder)}` : '<span class="sit-na">no WO</span>';
     const company = o.company || '<span class="sit-na">unmatched</span>';
     const track = o.tracking
-      ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener">${esc(o.carrier || 'Track')} ${esc(o.tracking)}</a>` : `${esc(o.carrier)} ${esc(o.tracking)}`)
+      ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener">🚚 ${esc(o.carrier || 'Track')} ${esc(o.tracking)}</a>` : `🚚 ${esc(o.carrier)} ${esc(o.tracking)}`)
       : '';
+    const f = (lbl, val) => val ? `<span class="sit-f"><span class="sit-fl">${lbl}</span> <b>${esc(val)}</b></span>` : '';
     return `<div class="sit-card">
-      <div class="sit-card-head">
-        <div class="sit-card-title">
-          <span class="sit-company">${company}</span>
-          <span class="sit-po">PO #${esc(o.sanmarPO)}</span>
-          <span class="sit-wo">${wo}</span>
-          ${methodChip(o.method)}
-          ${issueBadge(o.issue)}
-        </div>
-        <div class="sit-card-meta">
-          <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>
-          <span>🧵 ${fmtNum(o.piecesShipped)} pcs${o.piecesOrdered !== o.piecesShipped ? ` <span class="sit-muted">/ ${fmtNum(o.piecesOrdered)} ord</span>` : ''}</span>
-          ${o.shipDate ? `<span class="sit-muted">shipped ${esc(o.shipDate)}${o.fromState ? ' · ' + esc(o.fromState) : ''}</span>` : ''}
-          ${track ? `<span>🚚 ${track}</span>` : ''}
+      <div class="sit-card-main">
+        ${logoTile(o)}
+        <div class="sit-card-info">
+          <div class="sit-card-head">
+            <div class="sit-card-title">
+              <span class="sit-company">${company}</span>
+              ${methodChip(o.method)}
+              ${issueBadge(o.issue)}
+            </div>
+            <span class="sit-wo">WO ${wo}</span>
+          </div>
+          <div class="sit-fields">
+            ${f('Due', fmtShortDate(o.dueDate))}
+            ${o.designNumber ? `<span class="sit-f"><span class="sit-fl">Design</span> <b>${esc(o.designNumber)}</b>${o.designName ? ' · ' + esc(o.designName) : ''}</span>` : ''}
+            ${f('Contact', o.contactName)}
+            ${f('Rep', initials(o.salesRep))}
+            ${f('Cust PO', o.customerPO)}
+            ${f('Terms', o.terms)}
+            ${f('Ordered', fmtShortDate(o.dateOrdered))}
+          </div>
+          <div class="sit-card-meta">
+            <span class="sit-f"><span class="sit-fl">SanMar PO</span> <b>${esc(o.sanmarPO)}</b></span>
+            <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>
+            <span>🧵 ${fmtNum(o.piecesShipped)} pcs${o.piecesOrdered !== o.piecesShipped ? ` <span class="sit-muted">/ ${fmtNum(o.piecesOrdered)} ord</span>` : ''}</span>
+            ${o.shipDate ? `<span class="sit-muted">shipped ${esc(o.shipDate)}${o.fromState ? ' · ' + esc(o.fromState) : ''}</span>` : ''}
+            ${track ? `<span>${track}</span>` : ''}
+          </div>
         </div>
       </div>
       ${contentsBlock(o)}
@@ -171,10 +209,24 @@
             <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
             <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td></tr>`).join('')}</tbody>
           </table>`;
+      const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
+      const psFields = [
+        fmtShortDate(o.dueDate) ? 'Due ' + fmtShortDate(o.dueDate) : '',
+        o.designNumber ? 'Design ' + o.designNumber + (o.designName ? ' ' + o.designName : '') : '',
+        o.contactName ? 'Contact ' + o.contactName : '',
+        o.salesRep ? 'Rep ' + initials(o.salesRep) : '',
+        o.customerPO ? 'Cust PO ' + o.customerPO : '',
+        o.terms ? 'Terms ' + o.terms : '',
+        o.dateOrdered ? 'Ordered ' + fmtShortDate(o.dateOrdered) : '',
+      ].filter(Boolean).map(esc).join(' · ');
       return `<div class="sit-ps-po">
         <div class="sit-ps-po-head">
-          <b>${esc(o.company || 'Unmatched')}</b> &nbsp; PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-          <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs</span>
+          ${psLogo}
+          <div class="sit-ps-po-htxt">
+            <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
+              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs</span></div>
+            ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
+          </div>
         </div>
         ${body}
       </div>`;
@@ -259,41 +311,44 @@
     const colTot = mx.cols.map(c => mx.rows.reduce((t, r) => t + (r.q[c] || 0), 0));
     const grand = colTot.reduce((a, b) => a + b, 0);
     const totalRow = `<tr class="sl-tot"><td colspan="3">TOTAL</td>${colTot.map(t => `<td class="sl-c">${fmtNum(t)}</td>`).join('')}<td class="sl-c">${fmtNum(grand)}</td></tr>`;
-    const sub = [order.contactName, order.salesRep ? ('Rep ' + order.salesRep) : ''].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
-    const sub2 = [order.customerPO ? ('Cust PO: ' + order.customerPO) : '', order.terms ? ('Terms: ' + order.terms) : ''].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    const logo = order.logoUrl
+      ? `<img class="sl-logo-img" src="${esc(order.logoUrl)}" alt="Design ${esc(order.designNumber || '')} artwork" onerror="this.outerHTML='<span class=\\'sl-logo-none\\'>artwork unavailable</span>';">`
+      : `<span class="sl-logo-none">No artwork on file</span>`;
     return `<div class="sit-label">
-      <div class="sl-type" style="border-left-color:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name" style="color:${mColor}">${esc(method.toUpperCase())}</span></div>
-      <div class="sl-head">
-        <div class="sl-company">${esc(order.company || '—')}</div>
+      <div class="sl-top">
+        <div class="sl-type" style="border-left-color:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name" style="color:${mColor}">${esc(method.toUpperCase())}</span></div>
         <div class="sl-woblock">
           <div class="sl-wolabel">WORK ORDER</div>
           <div class="sl-wo">#${esc(order.workOrder || '?')}</div>
-          ${order.dueDate ? `<div class="sl-duedate">DUE ${esc(fmtLabelDate(order.dueDate))}</div>` : ''}
+          ${order.dueDate ? `<div class="sl-duedate">Due: ${esc(fmtShortDate(order.dueDate))}</div>` : ''}
+          <div class="sl-ddbox"><span class="sl-ddlabel">DROP DEAD DATE</span></div>
         </div>
       </div>
-      ${sub ? `<div class="sl-sub">${sub}</div>` : ''}
-      ${sub2 ? `<div class="sl-sub2">${sub2}</div>` : ''}
-      <div class="sl-meta">
-        <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span></div>
-        <div class="sl-mb"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
+      <div class="sl-company">${esc(order.company || '—')}</div>
+      <div class="sl-contact">
+        <span class="sl-cname">${esc(order.contactName || '')}</span>
+        <span class="sl-cright">${order.salesRep ? `<span class="sl-rep">REP: ${esc(initials(order.salesRep))}</span>` : ''}${order.dateOrdered ? `<span class="sl-ord">Ordered: ${esc(fmtShortDate(order.dateOrdered))}</span>` : ''}</span>
       </div>
+      ${order.customerPO ? `<div class="sl-custpo">Cust PO: ${esc(order.customerPO)}</div>` : ''}
       <div class="sl-meta">
+        <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span>${order.designName ? `<span class="sl-dn">${esc(order.designName)}</span>` : ''}</div>
+        <div class="sl-mb sl-mb--ctr"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
+      </div>
+      <div class="sl-meta sl-meta--manual">
         <div class="sl-mb sl-fill" style="flex:1.7">
           <span class="sl-l">SHIP METHOD <span class="sl-hint">— circle one</span></span>
-          <span class="sl-ship"><b>PICKUP</b><b>SHIP</b><span class="sl-other">Other ________</span></span>
+          <span class="sl-ship"><b>PICKUP</b><b>SHIP</b><span class="sl-other">Other ______</span></span>
+          ${order.terms ? `<span class="sl-terms">Terms: ${esc(order.terms)}</span>` : ''}
         </div>
-        <div class="sl-mb sl-fill">
-          <span class="sl-l">DROP DEAD DATE</span>
-          <span class="sl-ddline"></span>
-        </div>
+        <div class="sl-mb sl-logo">${logo}</div>
       </div>
-      ${order.designName ? `<div class="sl-design">${esc(order.designName)}</div>` : ''}
       <table class="sl-mx${dense}"><thead>${head}</thead><tbody>${body}${totalRow}</tbody></table>
-      <div class="sl-foot">SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________</div>
+      <div class="sl-foot"><span>SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________</span>${labelPrintedOn ? `<span class="sl-printed">Printed ${esc(labelPrintedOn)}</span>` : ''}</div>
     </div>`;
   }
   function printLabels(pairs) {
     if (!pairs || !pairs.length) return;
+    labelPrintedOn = todayShort();
     const old = document.getElementById('sit-label-sheet'); if (old) old.remove();
     const sheet = document.createElement('div');
     sheet.id = 'sit-label-sheet';
@@ -321,6 +376,26 @@
     if (printBtn) printBtn.disabled = !lastData || !(lastData.orders && lastData.orders.length);
   }
 
+  // Attach a logo thumbnail URL to each order from its design number (ShopWorks design-thumbnail
+  // table via the existing /api/thumbnails endpoint). Cosmetic — never blocks the report on failure.
+  async function attachLogos(data) {
+    try {
+      const orders = data.orders || [];
+      const bases = [...new Set(orders.map(o => String(o.designNumber || '').split('.')[0]).filter(Boolean))];
+      if (!bases.length) return;
+      const map = {};
+      for (let i = 0; i < bases.length; i += 20) {
+        const chunk = bases.slice(i, i + 20);
+        const resp = await fetch(`${API_BASE}/api/thumbnails/by-designs?ids=${encodeURIComponent(chunk.join(','))}`);
+        if (!resp.ok) continue;
+        const j = await resp.json();
+        const th = j.thumbnails || {};
+        for (const k in th) { if (th[k] && th[k].found && th[k].imageUrl) map[k] = th[k].imageUrl; }
+      }
+      orders.forEach(o => { const b = String(o.designNumber || '').split('.')[0]; if (map[b]) o.logoUrl = map[b]; });
+    } catch (e) { console.warn('Inbound logo fetch failed (non-blocking):', e); }
+  }
+
   async function load(refresh) {
     lastData = null;
     setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading today’s inbound…</div>');
@@ -330,6 +405,7 @@
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       if (data.error) throw new Error(data.error);
+      await attachLogos(data);
       lastData = data;
       const dateLabel = modalEl.querySelector('#sit-date');
       if (dateLabel) dateLabel.textContent = fmtDate(data.date);
