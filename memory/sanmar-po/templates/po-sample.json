@@ -1,0 +1,29 @@
+{
+  "_comment": "SAMPLE / READY-TO-USE TEST PO. This is intentionally the multi-line, multi-style order SanMar REQUIRES for the Test environment before go-live (styles taken from the PO Guide v24.3 recommended test set). Before submitting: (1) confirm the shipTo is the real NWCA/decorator address you intend to use in production, (2) confirm each 'color' is the SANMAR_MAINFRAME_COLOR, (3) bump poNumber so it is unique. Validates against po-payload.schema.json.",
+  "poNumber": "NWCA-TEST-06-23-2026-1",
+  "orderDate": "2026-06-23T00:00:00",
+  "shipTo": {
+    "_comment": "CONFIRM before submit — this should be the address SanMar has on file for NWCA / the decorator.",
+    "attention": "Receiving",
+    "companyName": "Northwest Custom Apparel",
+    "address1": "2025 Freeman Rd E",
+    "address2": "",
+    "city": "Milton",
+    "state": "WA",
+    "zip": "98354",
+    "email": "erik@nwcustomapparel.com",
+    "residence": "N"
+  },
+  "shipMethod": "UPS",
+  "warehouseSelection": null,
+  "rush": false,
+  "notes": "",
+  "lines": [
+    { "lineNumber": 1, "style": "PC61",   "color": "Charcoal",       "size": "S",  "sizeIndex": 2, "inventoryKey": null, "quantity": 6 },
+    { "lineNumber": 2, "style": "PC61",   "color": "Brown",          "size": "S",  "sizeIndex": 2, "inventoryKey": null, "quantity": 6 },
+    { "lineNumber": 3, "style": "PC55",   "color": "Aquatic Blue",   "size": "S",  "sizeIndex": 2, "inventoryKey": null, "quantity": 6 },
+    { "lineNumber": 4, "style": "S508",   "color": "Maui Blue",      "size": "M",  "sizeIndex": 3, "inventoryKey": null, "quantity": 6 },
+    { "lineNumber": 5, "style": "DT5001", "color": "Kelly Green",    "size": "XS", "sizeIndex": 1, "inventoryKey": null, "quantity": 6 },
+    { "lineNumber": 6, "style": "T200",   "color": "White/Lime Shk", "size": "S",  "sizeIndex": 2, "inventoryKey": null, "quantity": 6 }
+  ]
+}

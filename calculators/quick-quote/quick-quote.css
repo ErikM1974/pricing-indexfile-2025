@@ -5,6 +5,7 @@
 :root {
     --qq-green: #2e6f40;
     --qq-green-dark: #1f4d2c;
+    --qq-green-tint: #eef6f0;   /* active-chip / accent fill, was sprinkled as #eef6f0 */
     --qq-ink: #1a1d1a;
     --qq-muted: #6b726b;
     --qq-line: #e4e7e3;
@@ -13,9 +14,16 @@
     --qq-card: #ffffff;
     --qq-warn-bg: #fff6e6;
     --qq-warn-line: #e3b261;
+    --qq-warn-text: #7a541a;
     --qq-err-bg: #fdecec;
     --qq-err-line: #d9534f;
+    --qq-err-text: #8a2b28;
+    --qq-success-text: #1f7a33;
     --qq-radius: 12px;
+    /* radius tiers (badges / controls / cards) */
+    --qq-radius-sm: 6px;
+    --qq-radius-md: 8px;
+    --qq-radius-lg: 12px;
 }
 
 * { box-sizing: border-box; }
@@ -58,10 +66,10 @@ body {
 /* ===== Page ===== */
 .page { max-width: 1080px; margin: 0 auto; padding: 28px 24px 64px; }
 
-.hero { margin-bottom: 24px; }
+.hero { margin-bottom: 20px; }
 .eyebrow { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--qq-green); font-weight: 600; }
-.page-title { font-size: 32px; line-height: 1.1; margin: 6px 0 10px; font-weight: 600; }
-.lede { font-size: 15px; line-height: 1.6; color: var(--qq-muted); max-width: 70ch; margin: 0; }
+.page-title { font-size: 30px; line-height: 1.1; margin: 6px 0 0; font-weight: 600; }
+.lede { font-size: 14px; line-height: 1.55; color: var(--qq-muted); max-width: 64ch; margin: 8px 0 0; }
 
 /* ===== Banners ===== */
 .qq-banner { border-radius: 10px; padding: 12px 16px; font-size: 14px; margin-bottom: 18px; }
@@ -71,7 +79,7 @@ body {
 /* ===== Layout ===== */
 .qq-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     gap: 20px;
     align-items: start;
 }
@@ -82,12 +90,22 @@ body {
     border: 1px solid var(--qq-line);
     border-radius: var(--qq-radius);
     padding: 20px;
+    box-shadow: 0 1px 3px rgba(26, 29, 26, .06);
 }
+.qq-results { position: sticky; top: 64px; }
+@media (max-width: 820px) { .qq-results { position: static; } }
 
 /* ===== Fields ===== */
 .field { margin-bottom: 16px; }
 .field > label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px; }
 .muted { color: var(--qq-muted); font-weight: 400; }
+
+/* ===== Input sections (Product / Decoration) — group the long stack into scannable zones ===== */
+.qq-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--qq-muted); font-weight: 600; margin: 0 0 14px; }
+.qq-section { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--qq-line); }
+#qqQuickInputs.qq-section { margin-top: 0; padding-top: 0; border-top: none; }   /* Product is first — no divider above */
+/* hide the Decoration section + its title when no decoration field shows (e.g. line mode before a method is picked) */
+.qq-deco:not(:has(> :not(.qq-section-title):not([hidden]))) { display: none; }
 
 .input {
     width: 100%;
@@ -200,9 +218,10 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 .qq-scp-opts { border-top: 1px solid var(--qq-line); padding-top: 12px; }
 
 /* ===== Results ===== */
-.qq-results-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
-#qqResultsTitle { font-size: 16px; font-weight: 600; }
-.qq-results-sub { font-size: 13px; color: var(--qq-muted); }
+.qq-results-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+#qqResultsTitle { font-size: 18px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; }
+#qqResultsTitle::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--qq-green); flex: none; }
+.qq-results-sub { font-size: 13px; color: var(--qq-muted); text-align: right; }
 
 .qq-cards { display: flex; flex-direction: column; gap: 10px; }
 
@@ -210,7 +229,7 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
     border: 1px solid var(--qq-line); border-radius: 11px;
     padding: 14px 16px; background: #fff;
 }
-.qq-card.is-best { border-color: var(--qq-green); box-shadow: 0 0 0 1px var(--qq-green) inset; }
+.qq-card.is-best, .qq-card.is-selected { border-color: var(--qq-line); border-left: 3px solid var(--qq-green); padding-left: 13px; }
 .qq-card-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .qq-card-method { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; }
 .qq-card-method .ico { width: 20px; height: 20px; color: var(--qq-green); }
@@ -240,7 +259,8 @@ select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csv
 
 /* ===== Selectable cards + price-breaks matrix ===== */
 .qq-card.is-clickable { cursor: pointer; }
-.qq-card.is-selected { border-color: var(--qq-green); box-shadow: 0 0 0 2px var(--qq-green); }
+.qq-card.is-clickable:hover { border-color: var(--qq-line-2); }
+.qq-card.is-selected { background: #fcfdfc; }
 .qq-card-selhint { margin-top: 8px; font-size: 11px; color: var(--qq-green); font-weight: 500; }
 
 .qq-matrix-box { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--qq-line); }
@@ -295,8 +315,8 @@ table.qq-matrix td.warn { color: #7a541a; font-weight: 500; font-family: "Geist"
 
 /* ===== Config chips on result cards — the live options that shaped THIS price (2026-06-20) ===== */
 .qq-card-config { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.qq-cfg-chip { font-size: 11.5px; color: var(--qq-muted); background: var(--qq-bg); border: 1px solid var(--qq-line); border-radius: 7px; padding: 2px 8px; white-space: nowrap; }
-.qq-cfg-chip.on { color: var(--qq-green-dark); background: #eef6f0; border-color: var(--qq-green); font-weight: 500; }
+.qq-cfg-chip { font-size: 11.5px; color: var(--qq-muted); background: transparent; border: 1px solid var(--qq-line); border-radius: var(--qq-radius-sm); padding: 2px 8px; white-space: nowrap; }
+.qq-cfg-chip.on { color: var(--qq-green-dark); background: var(--qq-green-tint); border-color: var(--qq-green); font-weight: 500; }
 
 /* Tasteful "price changed" flash — a brief, subtle wash (corporate; no bounce) */
 @keyframes qq-flash { from { background: #eef6f0; } to { background: var(--qq-card); } }
@@ -333,8 +353,11 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 /* Embroidery >25K-stitch under-pricing guardrail */
 .qq-emb-warn { margin: 6px 0 0; font-size: 12px; color: #7a541a; background: var(--qq-warn-bg); border: 1px solid var(--qq-warn-line); border-radius: 7px; padding: 6px 9px; line-height: 1.45; }
 
-/* Per-piece breakdown on the card (garment + main logo, then each additional logo) */
-.qq-card-breakdown { margin-top: 10px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+/* Per-piece breakdown on the card (garment + main logo, then each additional logo).
+   Shown only on the SELECTED card (the one driving the matrix) to keep sibling cards scannable —
+   pure CSS visibility; the rows are always rendered, so prices stay byte-identical. */
+.qq-card-breakdown { margin-top: 10px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: none; flex-direction: column; gap: 3px; }
+.qq-card.is-selected .qq-card-breakdown { display: flex; }
 .qq-bd-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; color: var(--qq-muted); }
 .qq-bd-row span:last-child { font-family: "Geist Mono", monospace; color: var(--qq-ink, #1a1d1a); white-space: nowrap; }
 .qq-bd-row.is-blank span:first-child { color: var(--qq-ink, #1a1d1a); font-weight: 500; }   /* garment blank — the base line */
@@ -342,8 +365,9 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 /* Section headers (Per piece / One-time setup) when both sections show */
 .qq-bd-head { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--qq-muted); font-weight: 600; margin-bottom: 2px; }
 .qq-bd-sub { text-transform: none; letter-spacing: 0; font-weight: 400; }
-/* One-time setup section — per order, visually separate from the per-piece rows */
-.qq-card-onetime { margin-top: 8px; border-top: 1px dashed var(--qq-line); padding-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+/* One-time setup — a distinct tinted block (per order, NOT per piece) with a warn-toned edge */
+.qq-card-onetime { margin-top: 10px; background: var(--qq-bg); border-left: 3px solid var(--qq-warn-line); border-radius: 0 var(--qq-radius-md) var(--qq-radius-md) 0; padding: 8px 11px; display: flex; flex-direction: column; gap: 3px; }
+.qq-card-onetime .qq-bd-head { color: var(--qq-warn-text); }
 .qq-card-onetime .qq-bd-row span:first-child { color: var(--qq-muted); }
 .qq-bd-row.is-total span { font-weight: 600; color: var(--qq-ink, #1a1d1a); }
 
@@ -365,8 +389,8 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 
 /* ===== Mode toggle (Quick Price / Line Sheet) — the active mode reads as a solid green pill
    so the selected tool is unmistakable; Quick Price (default) leads with that emphasis. ===== */
-.qq-mode-toggle { display: inline-flex; gap: 4px; padding: 4px; background: var(--qq-bg); border: 1px solid var(--qq-line-2); border-radius: 12px; margin-bottom: 18px; }
-.qq-mode-toggle button { appearance: none; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .01em; color: var(--qq-muted); padding: 9px 22px; border-radius: 9px; cursor: pointer; transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
+.qq-mode-toggle { display: flex; width: 100%; gap: 4px; padding: 4px; background: var(--qq-bg); border: 1px solid var(--qq-line-2); border-radius: var(--qq-radius-md); margin-bottom: 20px; }
+.qq-mode-toggle button { appearance: none; flex: 1; text-align: center; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 600; letter-spacing: .01em; color: var(--qq-muted); padding: 9px 16px; border-radius: var(--qq-radius-sm); cursor: pointer; transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
 .qq-mode-toggle button:hover:not(.is-active) { color: var(--qq-green-dark); background: rgba(46, 111, 64, .07); }
 .qq-mode-toggle button.is-active { background: var(--qq-green); color: #fff; box-shadow: 0 2px 7px rgba(46, 111, 64, .32); }
 .qq-mode-toggle button:focus-visible { outline: 2px solid var(--qq-green-dark); outline-offset: 2px; }
@@ -380,18 +404,19 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 .qq-line-row { border: 1px solid var(--qq-line); border-radius: 10px; padding: 9px 10px; background: var(--qq-card); }
 .qq-line-head { display: flex; align-items: center; gap: 8px; }
 .qq-line-style { flex: 1; min-width: 0; text-transform: uppercase; }
-.qq-line-ctrls { display: inline-flex; gap: 2px; flex: none; }
-.qq-line-mv, .qq-line-rm { appearance: none; border: 1px solid var(--qq-line); background: var(--qq-bg); color: var(--qq-muted); width: 28px; height: 28px; border-radius: 7px; cursor: pointer; font-size: 14px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+.qq-line-ctrls { display: inline-flex; gap: 6px; flex: none; }
+.qq-line-mv, .qq-line-rm { appearance: none; border: 1px solid var(--qq-line-2); background: var(--qq-bg); color: var(--qq-muted); width: 32px; height: 32px; border-radius: var(--qq-radius-md); cursor: pointer; font-size: 15px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: border-color .12s, color .12s, background .12s; }
 .qq-line-mv:hover:not([disabled]), .qq-line-rm:hover { border-color: var(--qq-green); color: var(--qq-green-dark); }
 .qq-line-mv[disabled] { opacity: .4; cursor: default; }
 .qq-line-rm:hover { border-color: #b4421f; color: #b4421f; }
 .qq-line-content { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
 .qq-line-content:empty { display: none; }
-.qq-line-thumb { width: 44px; height: 44px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: 7px; background: #fff; flex: none; }
+.qq-line-thumb { width: 56px; height: 56px; object-fit: contain; border: 1px solid var(--qq-line); border-radius: var(--qq-radius-md); background: #fff; flex: none; }
 .qq-line-thumb.is-empty { display: inline-block; background: var(--qq-bg); }
 .qq-line-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; min-width: 0; }
 .qq-line-name { font-size: 13px; font-weight: 500; color: var(--qq-ink); }
-.qq-line-color { font: inherit; font-size: 12.5px; padding: 3px 6px; border: 1px solid var(--qq-line); border-radius: 6px; background: #fff; max-width: 150px; }
+.qq-line-color { font: inherit; font-size: 12.5px; padding: 5px 9px; border: 1px solid var(--qq-line-2); border-radius: var(--qq-radius-sm); background: #fff; max-width: 160px; }
+.qq-line-color:focus-visible { outline: 2px solid var(--qq-green); outline-offset: 1px; }
 .qq-line-price { font-size: 12px; font-family: "Geist Mono", monospace; color: var(--qq-green-dark); font-weight: 500; }
 .qq-line-stat { font-size: 12px; color: var(--qq-muted); }
 .qq-line-stat.err { color: #b4421f; }
@@ -425,3 +450,20 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
 .qq-sheet-ladder td { font-family: "Geist Mono", monospace; }
 .qq-sheet-ladder .warn { color: #7a541a; }
 .qq-sheet-foot { margin-top: 16px; padding-top: 10px; border-top: 1px solid var(--qq-line); font-size: 11px; color: var(--qq-muted); line-height: 1.5; }
+.qq-sheet-ladder-wrap { overflow-x: auto; }   /* on-screen only; print stylesheet keeps it visible */
+
+/* ===== Mobile (≤480px) — reps may be quoting from their phone ===== */
+@media (max-width: 480px) {
+    .page { padding: 16px 14px 48px; }
+    .page-title { font-size: 24px; }
+    .qq-panel { padding: 16px; }
+    .field { margin-bottom: 12px; }
+    .qq-swatches { max-height: 140px; }
+    .qq-swatch { width: 34px; height: 34px; }            /* easier to tap */
+    .qq-place-chip, .qq-qty-presets button, .qq-place-presets button { min-height: 40px; display: inline-flex; align-items: center; }
+    .qq-chip { min-height: 48px; min-width: 84px; }
+    .qq-card-pp { font-size: 20px; }
+    table.qq-matrix { font-size: 12px; }
+    .qq-line-thumb { width: 48px; height: 48px; }
+    .qq-mode-toggle button { padding: 11px 12px; }       /* taller tap target */
+}

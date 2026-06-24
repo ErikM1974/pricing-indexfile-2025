@@ -1368,8 +1368,8 @@
         var ltmRow = hasLtm ? '<tr><td class="lbl">Small-batch</td>' + tiers.map(function (t) {
             return '<td' + (t.ltmFee > 0 ? ' class="warn"' : '') + '>' + (t.ltmFee > 0 ? '+' + fmt(t.ltmFee) : '&mdash;') + '</td>';
         }).join('') + '</tr>' : '';
-        return '<table class="qq-sheet-ladder"><thead><tr><th class="lbl">Qty</th>' + qcells + '</tr></thead>'
-            + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + pcells + '</tr>' + ltmRow + '</tbody></table>';
+        return '<div class="qq-sheet-ladder-wrap"><table class="qq-sheet-ladder"><thead><tr><th class="lbl">Qty</th>' + qcells + '</tr></thead>'
+            + '<tbody><tr><td class="lbl">Per ' + unit + '</td>' + pcells + '</tr>' + ltmRow + '</tbody></table></div>';
     }
     function renderLinePreview() {
         var box = $('qqSheet'); if (!box) return;

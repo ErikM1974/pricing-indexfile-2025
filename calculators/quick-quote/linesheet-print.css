@@ -33,6 +33,7 @@ body.qq-mode-line .qq-sheet-item-head { font-size: 13px; font-weight: 600; margi
 body.qq-mode-line .qq-sheet-style { font-family: "Geist Mono", monospace; }
 body.qq-mode-line .qq-sheet-color { color: #555; font-weight: 400; margin-left: 10px; }
 
+body.qq-mode-line .qq-sheet-ladder-wrap { overflow: visible; }
 body.qq-mode-line .qq-sheet-ladder { width: 100%; border-collapse: collapse; font-size: 12px; }
 body.qq-mode-line .qq-sheet-ladder th, body.qq-mode-line .qq-sheet-ladder td { border: 1px solid #e5e7e5; padding: 4px 8px; text-align: center; }
 body.qq-mode-line .qq-sheet-ladder .lbl { text-align: left; color: #555; font-weight: 500; }
