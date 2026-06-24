@@ -1,3 +1,7 @@
+## v2026.06.24.3 (2026.06.24)
+
+- Deploy v2026.06.24.3: Quick Quote — surface DTG 1-11 small-batch fee in line sheet + matrix (probe qty 6)
+
 ## v2026.06.24.2 (2026.06.24)
 
 - docs(sanmar-po): SanMar PO Integration plan, field-mapping, onboarding + buildable PO templates
