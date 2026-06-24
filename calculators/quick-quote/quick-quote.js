@@ -100,6 +100,21 @@
     // DTG standard platen print sizes per location (dtg-pricing-service.js location set; 16×20 = the
     // pricer's max platen clamp). DTG has no medium → Center front/back print FULL (FF/FB size). Info only.
     var DTG_SIZE = { LC: '4×4"', CF: '12×16"', FF: '12×16"', JF: '16×20"', CB: '12×16"', FB: '12×16"', JB: '16×20"' };
+    // Print size shown ON each front/back placement chip — method-aware (DTF size bands vs DTG platen
+    // sizes); '' for Screen Print / Embroidery (front size doesn't change SCP price). Uses the active
+    // size-bearing method: the locked Line-Sheet method, else the first eligible print method (DTF>DTG).
+    function sizeMethod() {
+        if (state.mode === 'linesheet') return (state.lineMethod === 'dtf' || state.lineMethod === 'dtg') ? state.lineMethod : null;
+        if (hasActive('dtf')) return 'dtf';
+        if (hasActive('dtg')) return 'dtg';
+        return null;
+    }
+    function chipSize(method, code, kind) {
+        if (!method || !code) return '';
+        if (method === 'dtg') return DTG_SIZE[code] || '';
+        if (method === 'dtf') { var loc = (kind === 'front') ? DTF_FRONT[code] : DTF_BACK[code]; return loc ? (DTF_SIZE_BAND[loc] || '') : ''; }
+        return '';
+    }
 
     // --- placement → per-method mapping (reads state.front / state.back / state.sleeves) ---
     function dtgCode() { var f = DTG_FRONT_FROM[state.front] || state.front, b = DTG_BACK_FROM[state.back] || state.back; return (f && b) ? (f + '_' + b) : (f || b || ''); }
@@ -736,9 +751,12 @@
 
     function renderPlacements() {
         function chips(opts, sel, kind) {
+            var m = sizeMethod();
             return opts.map(function (o) {
-                return '<button type="button" class="qq-place-chip' + (o.code === sel ? ' is-active' : '')
-                    + '" data-kind="' + kind + '" data-code="' + esc(o.code) + '">' + esc(o.label) + '</button>';
+                var sz = chipSize(m, o.code, kind);
+                return '<button type="button" class="qq-place-chip' + (o.code === sel ? ' is-active' : '') + (sz ? ' has-size' : '')
+                    + '" data-kind="' + kind + '" data-code="' + esc(o.code) + '">' + esc(o.label)
+                    + (sz ? '<span class="qq-chip-size">' + esc(sz) + '</span>' : '') + '</button>';
             }).join('');
         }
         $('qqFront').innerHTML = chips(FRONT_OPTS, state.front, 'front');

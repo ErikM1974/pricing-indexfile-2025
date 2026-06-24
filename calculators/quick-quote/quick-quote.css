@@ -299,6 +299,10 @@ table.qq-matrix td.warn { color: #7a541a; font-weight: 500; font-family: "Geist"
 .qq-place-chip { font-size: 12.5px; padding: 6px 12px; border: 1px solid var(--qq-line-2); border-radius: 8px; background: #fff; cursor: pointer; font-family: inherit; }
 .qq-place-chip:hover { border-color: var(--qq-green); }
 .qq-place-chip.is-active { border-color: var(--qq-green); background: #eef6f0; box-shadow: 0 0 0 1px var(--qq-green) inset; color: var(--qq-green-dark); font-weight: 500; }
+/* chips that carry a print-size sub-label become a tight two-line stack (always visible — no hover) */
+.qq-place-chip.has-size { display: inline-flex; flex-direction: column; align-items: center; gap: 1px; line-height: 1.2; padding-top: 5px; padding-bottom: 5px; }
+.qq-chip-size { font-size: 10px; font-weight: 400; color: var(--qq-muted); font-family: "Geist Mono", monospace; }
+.qq-place-chip.is-active .qq-chip-size { color: var(--qq-green-dark); }
 .qq-sleeves { display: flex; gap: 16px; }
 .qq-sleeves .qq-check { font-size: 13px; margin: 0; }
 .qq-place-note { font-size: 11px; color: var(--qq-muted); margin: 6px 0 0; line-height: 1.5; }
