@@ -34,3 +34,25 @@
 PMS/named-ink picker, specialty-ink toggles (metallic/puff/glow/discharge), PMS-match fee, screen-reset, oversize — all [NEEDS BACKEND] (new Caspio rows + engine input); setup/flash as per-piece rows (breaks the parity guard). Belong in the full Quote Builder, not the fast phone tool.
 
 Full report: workflow run `wf_33b35355-149`. Core fix line: `quick-quote.js:192-193`.
+
+---
+
+## ✅ SCP SLEEVES as additional print locations — SHIPPED LIVE v2026.06.24.17 (2026-06-24)
+
+Erik: "DTF sleeve = price like a left chest; DTG no sleeves; screen print = just another print location."
+**This is the FIRST sleeve change that touched the SHARED ENGINE** (the SCP front+back model was hard-coded).
+
+- **Engine** `quote-cart-engine.js priceScpGroup`: new opts `sleeveCount:0-2`, `sleeveColors:1-6`. Each
+  checked sleeve = an additional location priced at `additionalLocationPricing[sleeveColors]` (SAME table
+  as the back) × `sleeveCount`. Split `frontBackLocations` (drives safety stripes — sleeves get NO hi-vis
+  stripe) from `printedLocations = frontBackLocations + sleeveCount` (drives dark underbase — sleeves DO
+  get an underbase). Screens `+= sleeveCount*sleeveColors`. **`sleeveCount:0` ⇒ legacy front+back path
+  byte-identical** (existing SCP parity a–d unchanged). 1-color add-location on PC61 @48-71 = $4.50.
+- **QQ**: sleeve row now shows for DTF (≤5×5" transfer, no ink stepper) AND SCP ("screen print" label +
+  an ink-color stepper `#qqSleeveInk` shown only when SCP + a sleeve checked). DTG/EMB no sleeve row.
+  `state.sleeveInk` (default 1); SCP group sends `sleeveCount/sleeveColors`; cache key + `printAddlLabel`
+  + `configParts` updated. Line Sheet (default mode) inherits via `def.groups()` — same builder.
+- **Locked**: 4 new `web-quote-cart-parity` SCP-sleeve tests (1 sleeve $16.50/2 screens; 2 sleeves $21/3;
+  dark+sleeve 4 screens $912; stripes NOT ×sleeve $18.50). 81 green. Live PC61 dark+1-sleeve = $912.00,
+  cent-exact to the unit test.
+- **DTF sleeve size label** (≤5×5") shipped the same day in v2026.06.24.16 alongside print-size-on-chips.

@@ -642,6 +642,87 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
         expect(g.groupTotal).toBe(948); // 888 + 0 LTM + 60 setup
     });
 
+    // --- ASYMMETRIC sleeves (Erik 2026-06-24): left and right may carry DIFFERENT color counts.
+    //     `sleeveColorsList:[2,4]` ⇒ each sleeve priced at ITS OWN add-location rate + its own screens.
+    test('(sleeve asym) left 2-color + right 4-color price INDEPENDENTLY (self-derived, no fixture literals)', async () => {
+        const sizes = { S: 12, M: 12, L: 12, XL: 12 };
+        // Learn the 2c and 4c add-location rates from back-only quotes (front is a flat $12 here).
+        const back2 = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, backColors: 2 } } }), 'scp:design-1');
+        const back4 = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, backColors: 4 } } }), 'scp:design-1');
+        const addl2 = back2.lines[0].baseUnit - 12;
+        const addl4 = back4.lines[0].baseUnit - 12;
+        expect(addl2).toBeGreaterThan(0);
+        expect(addl4).toBeGreaterThan(addl2); // more colors → costs strictly more (sanity)
+
+        const asym = groupOf(await run({
+            items: [scpItem('PC61', sizes)],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveColorsList: [2, 4] } }
+        }), 'scp:design-1');
+        // each piece = $12 front + the 2c sleeve + the 4c sleeve (NOT 2× either one)
+        asym.lines.forEach((l) => expect(l.baseUnit).toBeCloseTo(12 + addl2 + addl4, 2));
+        expect(asym.trace.screens).toBe(7); // 1 front + 2 (L sleeve) + 4 (R sleeve)
+    });
+
+    test('(sleeve asym) order-independent: [4,2] equals [2,4] to the cent', async () => {
+        const sizes = { S: 12, M: 12, L: 12, XL: 12 };
+        const a = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, sleeveColorsList: [2, 4] } } }), 'scp:design-1');
+        const b = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, sleeveColorsList: [4, 2] } } }), 'scp:design-1');
+        expect(a.lines[0].baseUnit).toBe(b.lines[0].baseUnit);
+        expect(a.groupTotal).toBe(b.groupTotal);
+    });
+
+    test('(sleeve asym dark) underbase counts BOTH sleeve locations: 1 + (2+4) + 3 underbase = 10 screens', async () => {
+        const sizes = { S: 12, M: 12, L: 12, XL: 12 };
+        const g = groupOf(await run({
+            items: [scpItem('PC61', sizes)],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveColorsList: [2, 4], darkGarment: true } }
+        }), 'scp:design-1');
+        expect(g.trace.screens).toBe(10); // front 1 + sleeves 6 + dark×printedLocations(front+2 sleeves=3)
+    });
+
+    // CROSS-SURFACE (Rule #9): a sleeve is "another additional location". Prove a sleeve at N colors costs
+    // EXACTLY a BACK at N colors — same per-piece add, same screens, same total. The back location is
+    // already penny-parity-locked against the screen-print quote builder (test b + this file's scp-replica
+    // authority), so by transitivity a Quick Quote sleeve == the builder/catalog additional-location price.
+    test('(sleeve↔back parity) a sleeve at N colors == a back at N colors for N=1,2,4 (same add-location rate)', async () => {
+        const sizes = { S: 12, M: 12, L: 12, XL: 12 };
+        for (const n of [1, 2, 4]) {
+            const back = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, backColors: n } } }), 'scp:design-1');
+            const sleeve = groupOf(await run({ items: [scpItem('PC61', sizes)], groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveColorsList: [n] } } }), 'scp:design-1');
+            expect(sleeve.lines[0].baseUnit).toBe(back.lines[0].baseUnit); // identical per-piece add-location cost
+            expect(sleeve.trace.screens).toBe(back.trace.screens);         // identical setup screens (front + N)
+            expect(sleeve.groupTotal).toBe(back.groupTotal);               // identical grand total
+        }
+    });
+
+    // Guard the validation (NWCA rule #1: a bad sleeve input must ERROR, never quote a low price).
+    test('(sleeve validation) more than 2 sleeves is rejected — never priced', async () => {
+        const res = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, sleeveColorsList: [1, 1, 1] } }
+        });
+        expect(res.errors).toHaveLength(1);
+        expect(res.errors[0].code).toBe('BAD_OPTIONS');
+        expect(res.grandTotal).toBeNull();
+    });
+
+    test('(sleeve validation) an out-of-range sleeve color hard-errors (never under-charges)', async () => {
+        const hi = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, sleeveColorsList: [2, 7] } } // 7 > max 6
+        });
+        expect(hi.errors).toHaveLength(1);
+        expect(hi.errors[0].code).toBe('BAD_OPTIONS');
+        expect(hi.grandTotal).toBeNull();
+
+        const zero = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, sleeveColorsList: [0] } } // 0 colors invalid
+        });
+        expect(zero.errors[0].code).toBe('BAD_OPTIONS');
+        expect(zero.grandTotal).toBeNull();
+    });
+
     test('unknown size hard-errors (no silent M→L fallback) and withholds the grand total', async () => {
         const res = await run({
             items: [scpItem('PC61', { XS: 48 })],
