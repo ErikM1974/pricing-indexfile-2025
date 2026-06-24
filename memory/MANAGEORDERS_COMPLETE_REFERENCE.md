@@ -203,6 +203,25 @@ Maps external order ID to ShopWorks order number.
 
 ---
 
+### Per-Box Receiving Label field map (verified live 2026-06-24)
+
+For the SanMar per-box receiving label (extends `/api/sanmar-orders/inbound-today`), the extra header fields map as follows. **All come from `/v1/orders` (`fetchOrderByNumber`) and are also in the SYNCED Caspio `ManageOrders_Orders` table** (keyed by `id_Order`), EXCEPT ship method which is not available at receiving stage.
+
+| Label field | MO source field | Where to get it | Verified sample (WO 142254 Alexandria / 142241 HARTS) |
+|---|---|---|---|
+| Company name | `CustomerName` | Synced `ManageOrders_Orders` (or live `/v1/orders`) | "Alexandria" / "HARTS Services" |
+| Due / in-hands date | `date_RequestedToShip` (ISO datetime) | Synced or live — **there is NO `date_Due` field** | 2026-07-06 / 2026-07-03 |
+| Design number | `id_Design` (number, may be decimal e.g. 38464.01) | Synced or live | 30647 / 38464.01 |
+| Design name (bonus) | `DesignName` | Synced or live | "Alexandria Light house one color LC" / "Harts New Logo - Jackets" |
+| Contact name | `ContactFirstName` + `ContactLastName` | Synced or live | "Paul Macy" / "Julie Burr" |
+| Ship method | **NOT AVAILABLE** | n/a — see note below | (none) |
+
+**SHIP METHOD GOTCHA:** The `/v1/orders` response has NO ship-method field of any kind (verified by dumping all 41 keys for WO 142254 — only `date_RequestedToShip`, `date_Shippied` [typo, null until shipped], `sts_Shipped`, `cur_Shipping`). `ShipMethod` only lives in the PUSH-side `/order-pull` `ShippingAddresses[]` (returns `pushed:null` for orders entered directly in ShopWorks like these SanMar inbound WOs) and `ShippingMethod` in `/v1/tracking` (empty `[]` until the order ships — useless at receiving time). **Conclusion: ship method cannot be put on a receiving label from ManageOrders.** Options: omit it, or have OnSite/ShopWorks expose it via a separate field, or read it from the source order entry.
+
+**RECOMMENDATION:** Gather these from the synced `ManageOrders_Orders` Caspio table (same pattern as `src/routes/box-labels-data.js` — fast, no live MO call). That route ALREADY returns `company`, `contact`, `salesRep`, `designName`, `designNumber`, `requestedShipDate` via `q.select` on `ManageOrders_Orders`. The inbound-today list already has `id_Order`; join to `ManageOrders_Orders` on `id_Order` to enrich. Live `/v1/orders` is the fallback if a brand-new WO hasn't synced yet (sync runs daily; FileMaker MO-UPDATE every 15 min 07:00-19:00 Pacific).
+
+---
+
 ## GET /lineitems/{order_no}
 
 Retrieves line items for a specific order.
