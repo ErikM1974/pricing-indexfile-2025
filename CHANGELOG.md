@@ -1,3 +1,9 @@
+## v2026.06.24.16 (2026.06.24)
+
+- docs(lessons): DTF combined/range sizes (vests) — base size 0 upcharge fix + table guidance
+- docs(manageorders): per-box receiving-label field map + ship-method gotcha (SanMar inbound)
+- Deploy v2026.06.24.16: Quick Quote — print size shown inline on each placement chip (method-aware, no hover)
+
 ## v2026.06.24.15 (2026.06.24)
 
 - Deploy v2026.06.24.15: DTF fix — combined/range sizes (vests: S/M, L/XL) now price (base = 0 upcharge); guard test
