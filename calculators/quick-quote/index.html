@@ -39,11 +39,7 @@
             <div>
                 <div class="eyebrow">Phone quote · no customer record needed</div>
                 <h1 class="page-title">Quick Quote</h1>
-                <p class="lede">
-                    Type a style, a quantity, and where the print goes &mdash; see every method's price at once.
-                    Same pricing engine as the full Quote Builder and the customer catalog, so the numbers match.
-                    For a real order, build it in the Quote Builder.
-                </p>
+                <p class="lede">Every eligible method priced at once &mdash; same engine as the Quote Builder, so the numbers match. For a real order, build it there.</p>
             </div>
         </section>
 
@@ -70,7 +66,8 @@
                 </div>
 
                 <!-- QUICK PRICE inputs (style + color + quantity) — quick mode only -->
-                <div id="qqQuickInputs">
+                <div id="qqQuickInputs" class="qq-section">
+                <div class="qq-section-title">Product</div>
 
                 <div class="field">
                     <label for="qqStyle">Style number</label>
@@ -116,6 +113,10 @@
 
                 </div><!-- /qqQuickInputs -->
 
+                <!-- DECORATION (shared config) — embroidery / placement / ink / SCP options; auto-hides when empty -->
+                <div class="qq-section qq-deco" id="qqDecoSection">
+                <div class="qq-section-title">Decoration</div>
+
                 <!-- Embroidery: logo-based (primary + additional logos), not placement-based -->
                 <div class="field qq-emb" id="qqEmbField" hidden>
                     <label id="qqEmbLabel">Embroidery logos</label>
@@ -130,7 +131,7 @@
                     <p class="qq-emb-warn" id="qqEmbWarn" hidden></p>
                 </div>
 
-                <div class="field" id="qqPlacementField">
+                <div class="field" id="qqPlacementField" hidden>
                     <label id="qqPlacementLabel">Where does the print go? <span class="muted">· DTG / screen print / DTF</span></label>
                     <div class="qq-place-presets" id="qqPlacePresets" role="group" aria-label="Common placements">
                         <button type="button" data-front="LC" data-back="">Left chest</button>
@@ -166,6 +167,8 @@
                     <a class="qq-example-thumb" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1" target="_blank" rel="noopener noreferrer" title="Safety stripes example — front &amp; back (click to enlarge)" aria-label="Safety stripes example, front and back — opens full-size image in a new tab"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1" alt="Hoodie shown front and back with high-visibility safety stripes" loading="lazy" referrerpolicy="no-referrer"></a>
                     <p class="qq-adv-foot">Names/numbers, 3D puff, specialty inks and oversize prints are quoted on the proof — build those in the full Quote Builder.</p>
                 </div>
+
+                </div><!-- /qqDecoSection -->
 
                 <!-- LINE SHEET: the style list (add up to 6) + actions — line mode only -->
                 <div id="qqLineStylesField" hidden>

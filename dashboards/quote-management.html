@@ -34,6 +34,10 @@
                     title="Check SanMar LIVE for the inbound blanks on the visible orders. The Inbound dot normally reads a once-a-day synced status that can lag a same-day shipment — this asks SanMar's shipment feed directly so an order that just shipped flips to Shipped (with tracking) right now.">
                 <i class="fas fa-dolly"></i> Refresh Inbound
             </button>
+            <button id="btn-daily-inbound" class="btn-header" onclick="openDailyInboundModal()"
+                    title="Daily inbound graph: how many blank pieces, boxes, and orders are arriving from SanMar each day (actual ship date + a transit estimate to Milton), broken down by decoration method.">
+                <i class="fas fa-chart-column"></i> Daily Inbound
+            </button>
             <a href="/staff-dashboard.html" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </a>
@@ -202,6 +206,9 @@
     <!-- App config — single source of truth for the proxy API base URL
          (Never-Break Rule #6: USE CONFIG for API URLs). -->
     <script src="/config/app.config.js?v=20260609-1"></script>
+    <!-- Daily Inbound (SanMar) graph modal — self-contained, reads APP_CONFIG.
+         Defines window.openDailyInboundModal() for the header button. -->
+    <script src="/dashboards/js/sanmar-daily-inbound.js?v=2026.06.23.1"></script>
 
     <script>
         // ============================================================

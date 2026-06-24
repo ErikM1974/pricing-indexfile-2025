@@ -943,3 +943,129 @@ a.inbound-pill:hover { filter: brightness(0.95); }
         margin: 16px;
     }
 }
+
+/* ============================================================
+   Daily Inbound (SanMar) graph modal — see dashboards/js/sanmar-daily-inbound.js
+   ============================================================ */
+.di-modal-content {
+    max-width: 860px;
+    width: 94%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+.di-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.di-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+.di-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.di-close {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: #888;
+    cursor: pointer;
+    padding: 0 6px;
+}
+.di-close:hover { color: #333; }
+
+.di-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.di-stat {
+    flex: 1 1 120px;
+    background: #f6f8f6;
+    border: 1px solid #e4e9e4;
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: center;
+}
+.di-stat--muted { background: #f8f9fa; border-color: #e9ecef; }
+.di-stat-num {
+    display: block;
+    font-size: 22px;
+    font-weight: 700;
+    color: #2f6b34;
+}
+.di-stat--muted .di-stat-num { color: #6b7280; }
+.di-stat-lbl {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.di-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #444;
+}
+.di-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.di-swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+.di-chart { width: 100%; }
+.di-svg { width: 100%; height: auto; display: block; }
+.di-grid { stroke: #eceff1; stroke-width: 1; }
+.di-axis { stroke: #cfd6da; stroke-width: 1; }
+.di-today { stroke: #dc3545; stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.7; }
+.di-todaylabel { fill: #dc3545; font-size: 10px; }
+.di-ylabel { fill: #889; font-size: 10px; text-anchor: end; }
+.di-xlabel { fill: #667; font-size: 10px; }
+.di-total { fill: #333; font-size: 9.5px; font-weight: 600; }
+
+.di-note {
+    font-size: 11px;
+    color: #8a9097;
+    margin: 8px 0 14px;
+    line-height: 1.5;
+}
+.di-tablewrap { overflow-x: auto; }
+.di-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.di-table th, .di-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+}
+.di-table th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #6b7280;
+    background: #fafbfa;
+}
+.di-table .di-num { text-align: right; font-variant-numeric: tabular-nums; }
+.di-table .di-methods { color: #555; font-size: 12px; }
+
+.di-loading, .di-error, .di-empty {
+    padding: 32px 16px;
+    text-align: center;
+    color: #667;
+    font-size: 14px;
+}
+.di-error { color: #b4232f; }
+.di-error small { color: #888; }
+.di-error .btn-cancel { margin-top: 12px; }
