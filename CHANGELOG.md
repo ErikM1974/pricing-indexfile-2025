@@ -1,3 +1,8 @@
+## v2026.06.24.18 (2026.06.24)
+
+- Docs: record SCP-sleeve additional-location feature (v2026.06.24.17)
+- Deploy v2026.06.24.18: Quick Quote — screen-print sleeves price PER-SLEEVE (left/right may differ)
+
 ## v2026.06.24.17 (2026.06.24)
 
 - Deploy v2026.06.24.17: Quick Quote — screen-print sleeves price as additional locations; DTF sleeve shows ≤5×5" size
