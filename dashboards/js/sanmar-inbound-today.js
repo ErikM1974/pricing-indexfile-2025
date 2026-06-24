@@ -216,6 +216,26 @@
     if (!y) return '';
     return new Date(y, (m || 1) - 1, day || 1).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   }
+  const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
+  function sizeRank(s) { const i = SIZE_ORDER.indexOf(String(s || '').toUpperCase()); return i < 0 ? 999 : i; }
+  // Dark, print-legible color per method for the order-type band.
+  const METHOD_DARK = { 'Embroidery': '#2e6f40', 'Screen Print': '#185fa5', 'DTG': '#854f0b', 'DTF': '#534ab7', 'Sticker': '#993556', 'Emblem': '#0f6e56', 'Online Store': '#444', 'Inksoft': '#b23b0e', 'Other': '#444' };
+  // Pivot a box's flat items into a size matrix: one row per style+color, dynamic size columns
+  // (standard sizes XS..6XL first, then any others like OSFA/pant sizes/NB appended).
+  function buildMatrix(items) {
+    const rows = new Map(); const sizes = new Set();
+    for (const it of (items || [])) {
+      const key = (it.style || '') + '|' + (it.color || '');
+      let r = rows.get(key);
+      if (!r) { r = { style: it.style || '', title: it.title || '', color: it.color || '', q: {}, total: 0 }; rows.set(key, r); }
+      const sz = it.size || '—';
+      r.q[sz] = (r.q[sz] || 0) + (it.qty || 0);
+      r.total += (it.qty || 0);
+      sizes.add(sz);
+    }
+    const cols = [...sizes].sort((a, b) => { const ra = sizeRank(a), rb = sizeRank(b); return ra !== rb ? ra - rb : String(a).localeCompare(String(b)); });
+    return { rows: [...rows.values()], cols };
+  }
   // Resolve an order to its print-ready boxes (live box detail, or one synthesized box from PO lines).
   function boxesForOrder(order) {
     if (order.boxDetailAvailable && order.boxDetail && order.boxDetail.length) {
@@ -230,32 +250,46 @@
     return [{ order, box, boxNo: 1, boxTotal: 1 }];
   }
   function oneLabel(order, box, boxNo, boxTotal) {
-    const rows = (box.items || []).map(it => `<tr>
-      <td class="sl-style">${esc(it.style)}</td><td>${esc(it.title || '')}</td>
-      <td>${esc(it.color || '—')}</td><td class="sl-c">${esc(it.size)}</td><td class="sl-c">${fmtNum(it.qty)}</td></tr>`).join('');
-    const sub = [order.contactName, order.method, order.salesRep ? ('Rep ' + order.salesRep) : '']
-      .filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
-    const sub2 = [
-      order.customerPO ? ('Cust PO: ' + order.customerPO) : '',
-      order.terms ? ('Terms: ' + order.terms) : '',
-      order.dateOrdered ? ('Ordered: ' + fmtLabelDate(order.dateOrdered)) : '',
-    ].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    const method = order.method || 'Other';
+    const mColor = METHOD_DARK[method] || '#444';
+    const mx = buildMatrix(box.items);
+    const dense = (mx.rows.length > 14 || mx.cols.length > 9) ? ' sl-mx--dense' : '';
+    const head = `<tr><th>Style</th><th>Description</th><th>Color</th>${mx.cols.map(c => `<th class="sl-c">${esc(c)}</th>`).join('')}<th class="sl-c">Tot</th></tr>`;
+    const body = mx.rows.map(r => `<tr><td class="sl-style">${esc(r.style)}</td><td>${esc(r.title)}</td><td>${esc(r.color || '—')}</td>${mx.cols.map(c => { const q = r.q[c] || 0; return `<td class="sl-c${q ? '' : ' sl-z'}">${q ? fmtNum(q) : '·'}</td>`; }).join('')}<td class="sl-c sl-rt">${fmtNum(r.total)}</td></tr>`).join('');
+    const colTot = mx.cols.map(c => mx.rows.reduce((t, r) => t + (r.q[c] || 0), 0));
+    const grand = colTot.reduce((a, b) => a + b, 0);
+    const totalRow = `<tr class="sl-tot"><td colspan="3">TOTAL</td>${colTot.map(t => `<td class="sl-c">${fmtNum(t)}</td>`).join('')}<td class="sl-c">${fmtNum(grand)}</td></tr>`;
+    const sub = [order.contactName, order.salesRep ? ('Rep ' + order.salesRep) : ''].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    const sub2 = [order.customerPO ? ('Cust PO: ' + order.customerPO) : '', order.terms ? ('Terms: ' + order.terms) : ''].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
     return `<div class="sit-label">
+      <div class="sl-type" style="border-left-color:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name" style="color:${mColor}">${esc(method.toUpperCase())}</span></div>
       <div class="sl-head">
         <div class="sl-company">${esc(order.company || '—')}</div>
-        <div class="sl-woblock"><div class="sl-wolabel">WORK ORDER</div><div class="sl-wo">#${esc(order.workOrder || '?')}</div></div>
+        <div class="sl-woblock">
+          <div class="sl-wolabel">WORK ORDER</div>
+          <div class="sl-wo">#${esc(order.workOrder || '?')}</div>
+          ${order.dueDate ? `<div class="sl-duedate">DUE ${esc(fmtLabelDate(order.dueDate))}</div>` : ''}
+        </div>
       </div>
       ${sub ? `<div class="sl-sub">${sub}</div>` : ''}
       ${sub2 ? `<div class="sl-sub2">${sub2}</div>` : ''}
       <div class="sl-meta">
-        <div class="sl-mb"><span class="sl-l">DUE</span><span class="sl-v">${esc(fmtLabelDate(order.dueDate)) || '—'}</span></div>
         <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span></div>
         <div class="sl-mb"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
-        <div class="sl-mb"><span class="sl-l">PIECES</span><span class="sl-v">${fmtNum(box.pieces)}</span></div>
+      </div>
+      <div class="sl-meta">
+        <div class="sl-mb sl-fill" style="flex:1.7">
+          <span class="sl-l">SHIP METHOD <span class="sl-hint">— circle one</span></span>
+          <span class="sl-ship"><b>PICKUP</b><b>SHIP</b><span class="sl-other">Other ________</span></span>
+        </div>
+        <div class="sl-mb sl-fill">
+          <span class="sl-l">DROP DEAD DATE</span>
+          <span class="sl-ddline"></span>
+        </div>
       </div>
       ${order.designName ? `<div class="sl-design">${esc(order.designName)}</div>` : ''}
-      <table class="sl-tbl"><thead><tr><th>Style</th><th>Description</th><th>Color</th><th class="sl-c">Size</th><th class="sl-c">Qty</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="sl-foot">SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________&nbsp;&nbsp;Date ________</div>
+      <table class="sl-mx${dense}"><thead>${head}</thead><tbody>${body}${totalRow}</tbody></table>
+      <div class="sl-foot">SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________</div>
     </div>`;
   }
   function printLabels(pairs) {

@@ -1205,3 +1205,24 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sl-tbl .sl-style { font-weight: 700; }
 .sl-tbl .sl-c { text-align: center; }
 .sl-foot { margin-top: 16px; font-size: 10pt; color: #333; border-top: 1px solid #ccc; padding-top: 8px; }
+.sl-type { display: flex; align-items: baseline; gap: 12px; border-left: 11px solid #555; padding: 2px 0 8px 14px; margin-bottom: 10px; }
+.sl-type-l { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #666; }
+.sl-type-name { font-size: 28pt; font-weight: 800; line-height: 1; }
+.sl-duedate { font-size: 14pt; font-weight: 800; margin-top: 4px; }
+.sl-fill { border: 2px dashed #333; display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-height: 50px; }
+.sl-hint { font-weight: 400; color: #888; }
+.sl-ship { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
+.sl-ship b { font-size: 17pt; font-weight: 800; }
+.sl-other { font-size: 11pt; color: #666; }
+.sl-ddline { display: block; align-self: stretch; border-bottom: 1.5px solid #aaa; margin-top: 22px; }
+.sl-mx { width: 100%; border-collapse: collapse; font-size: 12pt; }
+.sl-mx th, .sl-mx td { border: 1.5px solid #222; padding: 5px 7px; text-align: left; }
+.sl-mx thead th { background: #ededed; font-size: 10.5pt; }
+.sl-mx .sl-c { text-align: center; }
+.sl-mx .sl-style { font-weight: 700; }
+.sl-mx .sl-z { color: #cfcfcf; }
+.sl-mx .sl-rt { font-weight: 700; }
+.sl-mx .sl-tot td { background: #f3f3f3; font-weight: 800; }
+.sl-mx .sl-tot td:first-child { text-align: right; }
+.sl-mx--dense { font-size: 10pt; }
+.sl-mx--dense th, .sl-mx--dense td { padding: 2px 5px; }
