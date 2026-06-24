@@ -1147,6 +1147,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-box-n { font-weight: 700; color: #2f6b34; }
 .sit-box-head a { color: #2f6fed; text-decoration: none; }
 .sit-box-head a:hover { text-decoration: underline; }
+.sit-label-btn { margin-left: auto; background: #2e6f40; color: #fff; border: none; border-radius: 5px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.sit-label-btn:hover { background: #25592f; }
 
 .sit-note { font-size: 11px; color: #8a9097; margin: 14px 0 0; line-height: 1.5; }
 .sit-loading, .sit-error, .sit-empty { padding: 32px 16px; text-align: center; color: #667; font-size: 14px; }
@@ -1174,3 +1176,31 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
 .sit-ps-tbl th { background: #fafafa; font-weight: 600; }
 .sit-ps-box { font-size: 10px; font-weight: 700; color: #2e6f40; margin: 4px 0 2px; }
+
+/* ── Per-box receiving LABEL (8.5×11 portrait, one page per box; sit-label-printing mode) ── */
+#sit-label-sheet { display: none; }
+@media print {
+    body.sit-label-printing > *:not(#sit-label-sheet) { display: none !important; }
+    body.sit-label-printing #sit-label-sheet { display: block !important; }
+    @page { size: letter portrait; margin: 0.5in; }
+}
+#sit-label-sheet { color: #111; font-family: system-ui, "Segoe UI", Arial, sans-serif; }
+.sit-label { page-break-after: always; }
+.sit-label:last-child { page-break-after: auto; }
+.sl-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; border-bottom: 4px solid #111; padding-bottom: 10px; }
+.sl-company { font-size: 34pt; font-weight: 800; line-height: 1.02; }
+.sl-woblock { text-align: right; flex: none; }
+.sl-wolabel { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #444; }
+.sl-wo { font-size: 32pt; font-weight: 800; line-height: 1; }
+.sl-sub { font-size: 13pt; margin-top: 10px; color: #222; }
+.sl-meta { display: flex; gap: 10px; margin: 14px 0; }
+.sl-mb { flex: 1; border: 2px solid #111; border-radius: 6px; padding: 8px 6px; text-align: center; }
+.sl-l { display: block; font-size: 9pt; font-weight: 700; letter-spacing: 0.05em; color: #444; }
+.sl-v { display: block; font-size: 19pt; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+.sl-design { font-size: 12pt; margin-bottom: 10px; color: #222; }
+.sl-tbl { width: 100%; border-collapse: collapse; font-size: 13pt; }
+.sl-tbl th, .sl-tbl td { border: 1.5px solid #222; padding: 6px 8px; text-align: left; }
+.sl-tbl th { background: #eee; font-size: 11pt; }
+.sl-tbl .sl-style { font-weight: 700; }
+.sl-tbl .sl-c { text-align: center; }
+.sl-foot { margin-top: 16px; font-size: 10pt; color: #333; border-top: 1px solid #ccc; padding-top: 8px; }

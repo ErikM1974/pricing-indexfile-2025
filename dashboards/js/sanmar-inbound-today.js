@@ -88,21 +88,27 @@
   }
 
   // ── One box block (screen): box # + tracking link + its exact contents ──
-  function boxBlock(b) {
+  function boxBlock(b, po) {
     const track = b.trackingNumber
       ? (b.trackingUrl ? `<a href="${esc(b.trackingUrl)}" target="_blank" rel="noopener">${esc(b.carrier || 'Track')} ${esc(b.trackingNumber)}</a>` : `${esc(b.carrier)} ${esc(b.trackingNumber)}`)
       : '<span class="sit-na">no tracking</span>';
     return `<div class="sit-box">
-      <div class="sit-box-head"><span class="sit-box-n">📦 Box ${fmtNum(b.boxNumber)}</span><span>🚚 ${track}</span><span class="sit-muted">${fmtNum(b.pieces)} pcs</span></div>
+      <div class="sit-box-head"><span class="sit-box-n">📦 Box ${fmtNum(b.boxNumber)}</span><span>🚚 ${track}</span><span class="sit-muted">${fmtNum(b.pieces)} pcs</span>
+        <button class="sit-label-btn" data-po="${esc(po)}" data-box="${fmtNum(b.boxNumber)}" title="Print this box's receiving label (8.5×11 PDF)">🏷 Label</button></div>
       ${boxItemsTable(b.items)}
     </div>`;
   }
 
   // Contents block: per-box when SanMar's live box detail is available, else the PO-level summary.
   function contentsBlock(o) {
-    return (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
-      ? o.boxDetail.map(boxBlock).join('')
-      : linesTable(o.lines);
+    if (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length) {
+      return o.boxDetail.map(b => boxBlock(b, o.sanmarPO)).join('');
+    }
+    return `<div class="sit-box">
+      <div class="sit-box-head"><span class="sit-muted">box contents unavailable — showing the PO line items</span>
+        <button class="sit-label-btn" data-po="${esc(o.sanmarPO)}" data-box="1" title="Print a receiving label for this order (8.5×11 PDF)">🏷 Label</button></div>
+      ${linesTable(o.lines)}
+    </div>`;
   }
 
   // ── One PO card (screen) ──
@@ -203,6 +209,71 @@
     setTimeout(() => { if (document.body.classList.contains('sit-printing')) cleanup(); }, 1500);
   }
 
+  // ── Per-box receiving LABEL (8.5×11 portrait, one page per box) ──
+  function fmtLabelDate(d) {
+    const s = String(d || '').slice(0, 10);
+    const [y, m, day] = s.split('-').map(Number);
+    if (!y) return '';
+    return new Date(y, (m || 1) - 1, day || 1).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  // Resolve an order to its print-ready boxes (live box detail, or one synthesized box from PO lines).
+  function boxesForOrder(order) {
+    if (order.boxDetailAvailable && order.boxDetail && order.boxDetail.length) {
+      const n = order.boxDetail.length;
+      return order.boxDetail.map(b => ({ order, box: b, boxNo: b.boxNumber, boxTotal: n }));
+    }
+    const box = {
+      pieces: order.piecesShipped || order.piecesOrdered || 0,
+      trackingNumber: order.tracking || '', carrier: order.carrier || '',
+      items: (order.lines || []).map(l => ({ style: l.style, title: l.title, color: l.color, size: l.size, qty: l.qtyShipped || l.qtyOrdered || 0 })),
+    };
+    return [{ order, box, boxNo: 1, boxTotal: 1 }];
+  }
+  function oneLabel(order, box, boxNo, boxTotal) {
+    const rows = (box.items || []).map(it => `<tr>
+      <td class="sl-style">${esc(it.style)}</td><td>${esc(it.title || '')}</td>
+      <td>${esc(it.color || '—')}</td><td class="sl-c">${esc(it.size)}</td><td class="sl-c">${fmtNum(it.qty)}</td></tr>`).join('');
+    const sub = [order.contactName, order.customerPO ? ('PO ' + order.customerPO) : '', order.salesRep, order.method]
+      .filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    return `<div class="sit-label">
+      <div class="sl-head">
+        <div class="sl-company">${esc(order.company || '—')}</div>
+        <div class="sl-woblock"><div class="sl-wolabel">WORK ORDER</div><div class="sl-wo">#${esc(order.workOrder || '?')}</div></div>
+      </div>
+      ${sub ? `<div class="sl-sub">${sub}</div>` : ''}
+      <div class="sl-meta">
+        <div class="sl-mb"><span class="sl-l">DUE</span><span class="sl-v">${esc(fmtLabelDate(order.dueDate)) || '—'}</span></div>
+        <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span></div>
+        <div class="sl-mb"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
+        <div class="sl-mb"><span class="sl-l">PIECES</span><span class="sl-v">${fmtNum(box.pieces)}</span></div>
+      </div>
+      ${order.designName ? `<div class="sl-design">${esc(order.designName)}</div>` : ''}
+      <table class="sl-tbl"><thead><tr><th>Style</th><th>Description</th><th>Color</th><th class="sl-c">Size</th><th class="sl-c">Qty</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="sl-foot">SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________&nbsp;&nbsp;Date ________</div>
+    </div>`;
+  }
+  function printLabels(pairs) {
+    if (!pairs || !pairs.length) return;
+    const old = document.getElementById('sit-label-sheet'); if (old) old.remove();
+    const sheet = document.createElement('div');
+    sheet.id = 'sit-label-sheet';
+    sheet.innerHTML = pairs.map(p => oneLabel(p.order, p.box, p.boxNo, p.boxTotal)).join('');
+    document.body.appendChild(sheet);
+    document.body.classList.add('sit-label-printing');
+    const cleanup = () => {
+      document.body.classList.remove('sit-label-printing');
+      const s = document.getElementById('sit-label-sheet'); if (s) s.remove();
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    setTimeout(() => { if (document.body.classList.contains('sit-label-printing')) cleanup(); }, 1500);
+  }
+  function printAllLabels() {
+    if (!lastData) return;
+    printLabels((lastData.orders || []).flatMap(boxesForOrder));
+  }
+
   function setContent(html) {
     const body = modalEl.querySelector('#sit-body');
     if (body) body.innerHTML = html;
@@ -245,6 +316,7 @@
             <div class="sit-date-line" id="sit-date"></div>
           </div>
           <div class="sit-header-actions">
+            <button class="btn-cancel" id="sit-labels" title="Print a receiving label for every box today (8.5×11, one per page)"><i class="fas fa-tags"></i> Box Labels</button>
             <button class="btn-cancel" id="sit-print" title="Print or save a PDF of the whole day’s incoming items"><i class="fas fa-print"></i> Print / PDF</button>
             <button class="btn-cancel" id="sit-refresh" title="Re-pull from SanMar synced data"><i class="fas fa-rotate"></i> Refresh</button>
             <button class="sit-close" id="sit-close" aria-label="Close">&times;</button>
@@ -258,6 +330,19 @@
     modalEl.querySelector('#sit-close').onclick = close;
     modalEl.querySelector('#sit-refresh').onclick = () => load(true);
     modalEl.querySelector('#sit-print').onclick = printReport;
+    modalEl.querySelector('#sit-labels').onclick = printAllLabels;
+    // Per-box "🏷 Label" buttons (delegated; #sit-body persists across reloads).
+    modalEl.querySelector('#sit-body').addEventListener('click', (e) => {
+      const btn = e.target.closest('.sit-label-btn');
+      if (!btn || !lastData) return;
+      const po = btn.getAttribute('data-po');
+      const boxNo = parseInt(btn.getAttribute('data-box'), 10) || 1;
+      const order = (lastData.orders || []).find(o => o.sanmarPO === po);
+      if (!order) return;
+      const all = boxesForOrder(order);
+      const pick = all.filter(p => p.boxNo === boxNo);
+      printLabels(pick.length ? pick : all.slice(0, 1));
+    });
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modalEl && modalEl.style.display !== 'none') close();
     });
