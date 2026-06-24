@@ -1072,8 +1072,7 @@ cap-embroidery-fix.css
 | `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |
 | `/dashboards/quote-management.html` | Quote management dashboard (search, edit, manage quotes) | quote-management.css | ✅ Active |
 | `/dashboards/css/quote-management.css` | Quote management dashboard styles | — | ✅ Active |
-| `/dashboards/js/sanmar-daily-inbound.js` | "Daily Inbound" modal — SanMar arriving-blanks graph (pieces/boxes/orders per day by decoration method); dependency-free SVG chart | APP_CONFIG, /api/sanmar-orders/daily-inbound (proxy) | ✅ Active |
-| `/dashboards/js/sanmar-inbound-today.js` | "Today's Inbound" modal — detailed POs arriving today (PO+WO, line items w/ color/size, pieces per WO) + printable PDF report | APP_CONFIG, /api/sanmar-orders/inbound-today (proxy) | ✅ Active |
+| `/dashboards/js/sanmar-inbound-today.js` | "SanMar Inbound Calendar" modal — pick any day → that day's POs (PO+WO, line items w/ color/size, per-box contents, logos), box labels + PDF; month-calendar picker | APP_CONFIG, /api/sanmar-orders/inbound-today + /daily-inbound (proxy) | ✅ Active |
 | `/dashboards/digitized-designs.html` | Digitized designs management dashboard | — | ✅ Active |
 | `/dashboards/old-designs.html` | Old designs archive search (Caspio embed) | old-designs.css, old-designs.js | ✅ Active |
 | `/dashboards/art-invoice-view.html` | Art invoice detail view page | — | ✅ Active |
