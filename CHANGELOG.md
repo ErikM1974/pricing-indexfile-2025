@@ -1,3 +1,7 @@
+## v2026.06.24.5 (2026.06.24)
+
+- Deploy v2026.06.24.5: Quick Quote — note DTG/DTF print sizes per location (LC 4x4, FF/FB 12x16, JF/JB 16x20; DTF bands)
+
 ## v2026.06.24.3 (2026.06.24)
 
 - Deploy v2026.06.24.3: Quick Quote — surface DTG 1-11 small-batch fee in line sheet + matrix (probe qty 6)
