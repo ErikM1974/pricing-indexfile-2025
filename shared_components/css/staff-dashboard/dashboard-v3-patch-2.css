@@ -589,6 +589,43 @@
   border-color: rgba(52, 211, 153, 0.55);
 }
 
+/* "Updated · <date>" badge — AMBER (vs green NEW=first-launch) so a refreshed tool re-catches the
+   eye after habituation. Reusable: bump the date in `content` + the tile's title each release; an
+   old date is the cue to refresh or retire it. The "what changed" detail lives in the tile tooltip. */
+.tool-btn--updated {
+  position: relative;
+  padding-right: 132px !important;           /* reserve room for the dated chip */
+}
+.tool-btn--updated::after {
+  content: "Updated · Jun 24";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  line-height: 1;
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+
+  background: rgba(251, 191, 36, 0.16);      /* amber-400 @ 16% */
+  color: #fde68a;                            /* amber-200 — readable on dark */
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;                      /* chip is advisory only */
+}
+.tool-btn--updated:hover::after {
+  background: rgba(251, 191, 36, 0.24);
+  color: #fef3c7;                            /* amber-100 */
+  border-color: rgba(251, 191, 36, 0.6);
+}
+
 /* Compact "which to use" line — one short row instead of a block. The work of
    telling reps what to click is done by the .tool-subhead group labels below. */
 .quote-guide-mini {

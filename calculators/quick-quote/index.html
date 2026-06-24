@@ -39,7 +39,7 @@
             <div>
                 <div class="eyebrow">Phone quote · no customer record needed</div>
                 <h1 class="page-title">Quick Quote</h1>
-                <p class="lede">Every eligible method priced at once &mdash; same engine as the Quote Builder, so the numbers match. For a real order, build it there.</p>
+                <p class="lede">Build a price sheet across several styles to send a customer, or switch to Quick Price for one style across every method. Same engine as the Quote Builder, so the numbers match.</p>
             </div>
         </section>
 
@@ -53,10 +53,10 @@
             <!-- ===== Inputs ===== -->
             <div class="qq-panel qq-inputs">
 
-                <!-- Mode: Quick Price (one style, every method) vs Line Sheet (one method, many styles -> PDF) -->
+                <!-- Mode: Line Sheet (one method, many styles -> PDF; the DEFAULT) vs Quick Price (one style, every method) -->
                 <div class="qq-mode-toggle" id="qqModeToggle" role="group" aria-label="Quote mode">
-                    <button type="button" class="is-active" data-mode="quick">Quick Price</button>
-                    <button type="button" data-mode="linesheet">Line Sheet</button>
+                    <button type="button" class="is-active" data-mode="linesheet">Line Sheet</button>
+                    <button type="button" data-mode="quick">Quick Price</button>
                 </div>
 
                 <!-- LINE SHEET: imprint method selector (locks the sheet to one method) — line mode only -->
@@ -140,8 +140,8 @@
                     </div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Front</span><div class="qq-chips" id="qqFront" role="group" aria-label="Front placement"></div></div>
                     <div class="qq-place-row"><span class="qq-place-lbl">Back</span><div class="qq-chips" id="qqBack" role="group" aria-label="Back placement"></div></div>
-                    <div class="qq-place-row"><span class="qq-place-lbl">Sleeves</span><div class="qq-sleeves"><label class="qq-check"><input type="checkbox" id="qqSleeveL"> Left</label><label class="qq-check"><input type="checkbox" id="qqSleeveR"> Right</label></div></div>
-                    <p class="qq-place-note">Pick any front + back. Screen print prices by ink colors (front size doesn't change it); sleeves are DTF only.</p>
+                    <div class="qq-place-row" id="qqSleeveRow"><span class="qq-place-lbl">Sleeves <span class="muted">&middot; DTF</span></span><div class="qq-sleeves"><label class="qq-check"><input type="checkbox" id="qqSleeveL"> Left</label><label class="qq-check"><input type="checkbox" id="qqSleeveR"> Right</label></div></div>
+                    <p class="qq-place-note">Pick any front + back. Screen print prices by ink colors (front size doesn't change it). Sleeve prints are a DTF add-on (priced by size); for an embroidered sleeve logo, add it under Embroidery logos.</p>
                 </div>
 
                 <!-- SCP ink colors — separate front + back (each color = 1 screen); SCP-eligible only -->
@@ -223,6 +223,6 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.18.1"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.24.5"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.24.8"></script>
 </body>
 </html>

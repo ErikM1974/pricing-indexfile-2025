@@ -244,7 +244,7 @@
         prevPP: {},           // id -> last REAL per-piece price (survives the loading flicker)
         flashUntil: {},       // id -> timestamp; the tasteful "price changed" flash window
         // ----- LINE SHEET MODE (method-first multi-style mini-catalog -> PDF) -----
-        mode: 'quick',        // 'quick' (one style, every method) | 'linesheet' (one method, many styles)
+        mode: 'linesheet',    // DEFAULT (AEs prefer line-item) | 'quick' (one style, every method)
         lineMethod: null,     // locked imprint method id for the sheet: emb|capemb|dtg|scp|dtf
         lineStyles: [],       // [{ uid, raw, product, color, status, tiers, error }] — each priced independently
         lineSeq: 0            // reprice token for the line-sheet rows
@@ -1166,6 +1166,9 @@
         var pf = $('qqPlacementField'); if (!pf) return;
         if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));
         else pf.hidden = !!(state.product && state.product.isCap);
+        // Sleeves price ONLY for DTF — hide the row unless DTF is active so the checkboxes aren't shown
+        // (inert) on DTG/SCP. Embroidered sleeve logos go through the logo panel instead.
+        var sleeveRow = $('qqSleeveRow'); if (sleeveRow) sleeveRow.hidden = !hasActive('dtf');
     }
     function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
     var repriceActiveDebounced = debounce(repriceActive, 350);
