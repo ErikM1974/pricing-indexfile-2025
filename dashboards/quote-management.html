@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.24.1">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.24.4">
 </head>
 <body>
     <!-- Header -->
@@ -37,6 +37,10 @@
             <button id="btn-daily-inbound" class="btn-header" onclick="openDailyInboundModal()"
                     title="Daily inbound graph: how many blank pieces, boxes, and orders are arriving from SanMar each day (actual ship date + a transit estimate to Milton), broken down by decoration method.">
                 <i class="fas fa-chart-column"></i> Daily Inbound
+            </button>
+            <button id="btn-inbound-today" class="btn-header" onclick="openInboundTodayModal()"
+                    title="Today's incoming SanMar orders in detail: each PO + work order, line items with color/size, pieces per work order — and a one-click PDF report of everything arriving today.">
+                <i class="fas fa-clipboard-list"></i> Today's Inbound
             </button>
             <a href="/staff-dashboard.html" class="btn-header">
                 <i class="fas fa-arrow-left"></i> Dashboard
@@ -209,6 +213,9 @@
     <!-- Daily Inbound (SanMar) graph modal — self-contained, reads APP_CONFIG.
          Defines window.openDailyInboundModal() for the header button. -->
     <script src="/dashboards/js/sanmar-daily-inbound.js?v=2026.06.24.1"></script>
+    <!-- Today's Inbound (SanMar) detail view + PDF report — self-contained, reads APP_CONFIG.
+         Defines window.openInboundTodayModal() for the header button. -->
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.06.24.4"></script>
 
     <script>
         // ============================================================

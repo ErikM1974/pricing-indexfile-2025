@@ -1069,3 +1069,79 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .di-error { color: #b4232f; }
 .di-error small { color: #888; }
 .di-error .btn-cancel { margin-top: 12px; }
+
+/* ============================================================
+   Today's Inbound (SanMar) detail modal + printable report
+   see dashboards/js/sanmar-inbound-today.js
+   ============================================================ */
+.sit-modal-content {
+    max-width: 960px;
+    width: 96%;
+    max-height: 92vh;
+    overflow-y: auto;
+}
+.sit-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.sit-header h3 { margin: 0; font-size: 18px; color: #333; }
+.sit-date-line { font-size: 13px; color: #6b7280; margin-top: 2px; }
+.sit-header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+.sit-header-actions .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+.sit-close { background: none; border: none; font-size: 26px; line-height: 1; color: #888; cursor: pointer; padding: 0 6px; }
+.sit-close:hover { color: #333; }
+
+.sit-summary { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.sit-stat { flex: 1 1 130px; background: #f6f8f6; border: 1px solid #e4e9e4; border-radius: 6px; padding: 10px 12px; text-align: center; }
+.sit-stat-num { display: block; font-size: 22px; font-weight: 700; color: #2f6b34; }
+.sit-stat-lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; margin-top: 2px; }
+
+.sit-cards { display: flex; flex-direction: column; gap: 14px; }
+.sit-card { border: 1px solid #e5e7e5; border-radius: 8px; overflow: hidden; }
+.sit-card-head { background: #fafbfa; padding: 10px 14px; border-bottom: 1px solid #eee; }
+.sit-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.sit-company { font-weight: 700; color: #222; }
+.sit-po { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; color: #444; }
+.sit-wo { font-size: 12px; color: #2f6fed; }
+.sit-chip { color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.sit-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 12px; color: #444; }
+.sit-card-meta a { color: #2f6fed; text-decoration: none; }
+.sit-card-meta a:hover { text-decoration: underline; }
+.sit-muted { color: #9097a0; }
+.sit-na { color: #b08; font-style: italic; }
+
+.sit-lines { width: 100%; border-collapse: collapse; font-size: 13px; }
+.sit-lines th, .sit-lines td { padding: 6px 14px; border-bottom: 1px solid #f0f0f0; text-align: left; }
+.sit-lines th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; background: #fff; }
+.sit-lines .sit-style { font-family: "Geist Mono", ui-monospace, monospace; }
+.sit-lines .sit-num { text-align: right; font-variant-numeric: tabular-nums; }
+.sit-lines tbody tr:last-child td { border-bottom: none; }
+
+.sit-note { font-size: 11px; color: #8a9097; margin: 14px 0 0; line-height: 1.5; }
+.sit-loading, .sit-error, .sit-empty { padding: 32px 16px; text-align: center; color: #667; font-size: 14px; }
+.sit-error { color: #b4232f; }
+.sit-error small { color: #888; }
+.sit-error .btn-cancel { margin-top: 12px; }
+
+/* ── Printable report (shown only when printing in sit-printing mode) ── */
+#sit-print-sheet { display: none; }
+@media print {
+    body.sit-printing > *:not(#sit-print-sheet) { display: none !important; }
+    body.sit-printing #sit-print-sheet { display: block !important; }
+    @page { size: letter portrait; margin: 0.5in; }
+}
+#sit-print-sheet { color: #1a1d1a; font-family: system-ui, "Segoe UI", sans-serif; font-size: 11px; }
+.sit-ps-head { border-bottom: 2px solid #2e6f40; padding-bottom: 8px; margin-bottom: 12px; }
+.sit-ps-brand { font-size: 15px; font-weight: 800; color: #2e6f40; }
+.sit-ps-title { font-size: 14px; font-weight: 700; margin-top: 2px; }
+.sit-ps-sub { font-size: 11px; color: #333; margin-top: 4px; }
+.sit-ps-note { font-size: 9.5px; color: #777; margin-top: 3px; }
+.sit-ps-po { margin-bottom: 12px; page-break-inside: avoid; }
+.sit-ps-po-head { background: #f1f5f1; padding: 5px 8px; font-size: 11px; border: 1px solid #dde5dd; }
+.sit-ps-po-head .sit-ps-r { float: right; color: #555; }
+.sit-ps-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
+.sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
+.sit-ps-tbl th { background: #fafafa; font-weight: 600; }
