@@ -178,6 +178,8 @@ These files are the single source of truth across all 3 NWCA projects.
 - [/memory/LESSONS_LEARNED.md](memory/LESSONS_LEARNED.md) — check first when debugging
 - [/memory/INDEX.md](memory/INDEX.md) — master navigation
 - [/memory/GLOSSARY.md](memory/GLOSSARY.md) — shared terminology
+- [/memory/SANMAR_API_REFERENCE.md](memory/SANMAR_API_REFERENCE.md) — SanMar **read-side** SOAP (product/inventory/order-status/shipment/invoice)
+- [/memory/sanmar-po/README.md](memory/sanmar-po/README.md) — SanMar **PO submission** (outbound blank ordering): plan, field-mapping, onboarding + buildable PO templates (🟡 review/not built, 2026-06-23)
 
 For deep research, use the Task tool with `subagent_type='Explore'`.
 

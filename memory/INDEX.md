@@ -26,7 +26,14 @@
 ├── DTG_PRICING_CONSISTENCY.md        # DTG pricing consistency
 ├── BUNDLE_CALCULATOR_GUIDE.md        # Promotional bundle calculator
 ├── SHOPWORKS_EDP_INTEGRATION.md      # ShopWorks EDP integration
-├── SANMAR_API_REFERENCE.md           # SanMar SOAP API — endpoints, size/color mapping, warehouses
+├── SANMAR_API_REFERENCE.md           # SanMar SOAP API (READ side) — endpoints, size/color mapping, warehouses
+├── /sanmar-po/                        # SanMar PO submission (WRITE side — outbound blank ordering)
+│   ├── README.md                     # Status, bottom line, decision log, file index (🟡 review)
+│   ├── BUILD-STATUS.md               # What's built where: backend ✅ (proxy branch sanmar-po-integration) / frontend ⛔ + API contract
+│   ├── INTEGRATION-PLAN.md           # Options A/B/C/D, recommended sequence, code touch-points
+│   ├── FIELD-MAPPING.md              # Caspio/ShopWorks → SanMar PO crosswalk (inventoryKey/sizeIndex/color)
+│   ├── ONBOARDING-CHECKLIST.md       # SanMar onboarding + Test-env steps with status boxes
+│   └── templates/                    # po-payload.schema.json + po-sample.json + submitPO/getPreSubmitInfo SOAP skeletons
 ├── SHOPWORKS_SIZE_MAPPING.md         # SanMar→ShopWorks data transformation
 ├── SHOPWORKS_EXTENDED_SKU_PATTERNS.md # Extended SKU patterns
 ├── PRODUCT_SKU_PATTERNS.md           # Product SKU patterns reference
@@ -164,7 +171,8 @@
 | ManageOrders PULL (detail) | [MANAGEORDERS_INTEGRATION.md](./MANAGEORDERS_INTEGRATION.md) → [/manageorders/](./manageorders/) |
 | ManageOrders PUSH (detail) | [MANAGEORDERS_PUSH_WEBSTORE.md](./MANAGEORDERS_PUSH_WEBSTORE.md) → [/manageorders-push/](./manageorders-push/) |
 | **CRM/Order Entry System** | **[MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md)** - Field glossary, capabilities |
-| **SanMar API Reference** | **[SANMAR_API_REFERENCE.md](./SANMAR_API_REFERENCE.md)** - SOAP API endpoints, size/color mapping, warehouses |
+| **SanMar API Reference (READ)** | **[SANMAR_API_REFERENCE.md](./SANMAR_API_REFERENCE.md)** - SOAP API endpoints, size/color mapping, warehouses |
+| **SanMar PO Submission (WRITE)** | **[sanmar-po/README.md](./sanmar-po/README.md)** - Outbound blank ordering: plan, field-mapping, onboarding, buildable PO templates |
 | **ManageOrders Official Fields** | **[MANAGEORDERS_API_GUIDE_OFFICIAL.md](./MANAGEORDERS_API_GUIDE_OFFICIAL.md)** - All PUSH object field lists from official PDF |
 
 ### Pricing References
