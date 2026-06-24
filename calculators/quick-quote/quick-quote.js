@@ -844,7 +844,10 @@
     // the quote. The base unit is constant within a tier; the small-batch (LTM)
     // fee is shown on its own row, mirroring our standard pricing matrix.
     // ============================================================
-    var PROBE_QTYS = { emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100], dtg: [12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100] };
+    // Each method's LOWEST probe must land inside its small-batch (LTM) tier so the matrix + line
+    // sheet surface the "+$50 small-batch" row: EMB 1-7 (probe 4), DTG 1-11 (probe 6), DTF 10-23
+    // (probe 15), SCP 24-47 (probe 24). DTG used to start at 12 and skipped its 1-11 LTM tier.
+    var PROBE_QTYS = { emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100], dtg: [6, 12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100] };
     var _ladderCache = {};
     var _ladderFetching = {};
 
