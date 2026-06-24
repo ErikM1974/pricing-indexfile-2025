@@ -1,3 +1,7 @@
+## v2026.06.24.15 (2026.06.24)
+
+- Deploy v2026.06.24.15: DTF fix — combined/range sizes (vests: S/M, L/XL) now price (base = 0 upcharge); guard test
+
 ## v2026.06.24.8 (2026.06.24)
 
 - Deploy v2026.06.24.8: Quick Quote — Line Sheet default + sleeves DTF-only; dashboard 'Updated · Jun 24' badge
