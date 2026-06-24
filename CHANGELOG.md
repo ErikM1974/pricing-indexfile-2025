@@ -1,3 +1,11 @@
+## v2026.06.24.2 (2026.06.24)
+
+- docs(sanmar-po): SanMar PO Integration plan, field-mapping, onboarding + buildable PO templates
+- docs(sanmar-po): wire SanMar PO docs into CLAUDE.md + INDEX.md discovery entry points
+- WIP combine: Quick Quote design cleanup + parallel dashboard edits (pre-reconcile)
+- Merge remote-tracking branch 'origin/develop' into develop
+- Deploy v2026.06.24.2: Quick Quote design cleanup (token scale, sectioned inputs, collapsed-breakdown cards, mobile) + merge SanMar dashboard/PO docs
+
 ## v2026.06.23.3 (2026.06.23)
 
 - docs(lessons): log /api/inventory COLOR_NAME-not-CATALOG_COLOR gotcha; archive SCP dark-garment entry to stay under the 300-line cap
