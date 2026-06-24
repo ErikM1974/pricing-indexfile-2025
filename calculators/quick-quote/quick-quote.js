@@ -220,8 +220,9 @@
                     'scp:design-1': {
                         frontColors: state.frontInk,                          // primary location colors (front size is cosmetic for SCP)
                         backColors: scpLocCount() >= 2 ? state.backInk : 0,   // 2nd location (back) prices on its OWN color count
-                        sleeveCount: (state.sleeves.left ? 1 : 0) + (state.sleeves.right ? 1 : 0),  // each sleeve = another add-location
-                        sleeveColors: state.sleeveInk,                        // sleeve prints on their OWN color count
+                        sleeveColorsList: [].concat(                          // each checked sleeve at its OWN color count (L/R may differ)
+                            state.sleeves.left ? [state.sleeveInkL] : [],
+                            state.sleeves.right ? [state.sleeveInkR] : []),
                         darkGarment: !!state.adv.scpDark,
                         safetyStripes: !!state.adv.scpStripes
                     }
@@ -249,7 +250,8 @@
         sleeves: { left: false, right: false }, // DTF (≤5×5" transfer) and/or SCP (add-location) sleeves
         frontInk: 1,          // SCP front (primary location) ink colors — each color = 1 screen
         backInk: 1,           // SCP back (additional location) ink colors — priced on its own
-        sleeveInk: 1,         // SCP sleeve ink colors — each checked sleeve is an additional location at this count
+        sleeveInkL: 1,        // SCP left-sleeve ink colors  — its own additional location
+        sleeveInkR: 1,        // SCP right-sleeve ink colors — its own additional location (may differ from left)
         scpDarkUserSet: false,// true once the AE manually toggles dark garment (stops auto-suggest)
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
         embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
@@ -291,8 +293,10 @@
                 parts.push({ text: state.frontInk + '-color' });
                 parts.push({ text: twoLoc ? 'front + back' : 'front' });
             }
-            var scpSleeves = (state.sleeves.left ? 1 : 0) + (state.sleeves.right ? 1 : 0);
-            if (scpSleeves) parts.push({ text: scpSleeves + (scpSleeves === 1 ? ' sleeve' : ' sleeves') + ' · ' + state.sleeveInk + 'c' });
+            var slv = [];
+            if (state.sleeves.left) slv.push('L ' + state.sleeveInkL + 'c');
+            if (state.sleeves.right) slv.push('R ' + state.sleeveInkR + 'c');
+            if (slv.length) parts.push({ text: (slv.length === 1 ? 'sleeve' : 'sleeves') + ' · ' + slv.join(' · ') });
             if (state.adv.scpDark) parts.push({ text: 'dark garment' });
             if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
         } else if (id === 'dtg') {
@@ -769,7 +773,8 @@
         var sl = $('qqSleeveL'), sr = $('qqSleeveR');
         if (sl) sl.checked = !!state.sleeves.left;
         if (sr) sr.checked = !!state.sleeves.right;
-        var si = $('qqSleeveInk'); if (si) si.value = state.sleeveInk;
+        var siL = $('qqSleeveInkL'); if (siL) siL.value = state.sleeveInkL;
+        var siR = $('qqSleeveInkR'); if (siR) siR.value = state.sleeveInkR;
         // highlight the common-placement preset that matches the current front/back (no sleeves)
         var presets = $('qqPlacePresets');
         if (presets) Array.prototype.forEach.call(presets.querySelectorAll('button'), function (b) {
@@ -881,7 +886,7 @@
 
     function ladderKey(id) {
         return (state.product ? state.product.style : '') + '|' + id
-            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.frontInk + 'x' + state.backInk + 's' + state.sleeveInk
+            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.frontInk + 'x' + state.backInk + 's' + state.sleeveInkL + '/' + state.sleeveInkR
             + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',') + '|' + state.capEmb
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
@@ -1032,13 +1037,22 @@
     // small-batch line. The blank is display-only (loadGarmentMeta); every other line is an
     // engine MARGINAL, so the rows reconstruct the engine per-piece by construction. The
     // parity guard drops the whole split if the rows ever fail to sum (never mislead the rep).
+    // SCP additional-location breakdown label — lists each add-location with ITS OWN color count
+    // (back + per-sleeve). The breakdown shows the COMBINED marginal cost on one line (parity-guarded);
+    // this label names what's in it so a 2c-left + 4c-right reads honestly.
+    function scpAddlBreakdownLabel() {
+        var parts = [];
+        if (scpLocCount() >= 2 && state.back && BACK_LABELS[state.back]) parts.push(BACK_LABELS[state.back] + ' ' + state.backInk + 'c');
+        if (state.sleeves.left) parts.push('L sleeve ' + state.sleeveInkL + 'c');
+        if (state.sleeves.right) parts.push('R sleeve ' + state.sleeveInkR + 'c');
+        return parts.join(' + ');
+    }
     function buildBreakdown(id, s, r, unitWord) {
         var pp = s.perPiece || 0, qtyNow = totalQty(), blank = blankUnit(id);
         var ltmPP = (s.ltm && s.ltm.fee > 0 && qtyNow > 0) ? Math.floor((s.ltm.fee / qtyNow) * 100) / 100 : 0;
         var capBlankLbl = state.product.isCap ? 'Cap blank' : 'Garment (blank)';
         // SCP teaches its cost by color count: each color = 1 screen. Front + back price separately.
         var scpFrontC = (id === 'scp') ? (' — ' + state.frontInk + ' color') : '';
-        var scpBackC = (id === 'scp') ? (' — ' + state.backInk + ' color') : '';
         var rows = [], sum = 0, didSplit = false;
         function add(lbl, val, plus, cls) {
             val = Number(val) || 0; sum += val;
@@ -1066,7 +1080,7 @@
             } else {
                 add((FRONT_LABELS[state.front] || 'Front') + scpFrontC, r.frontOnlyUnit, false);
             }
-            add(printAddlLabel(id) + scpBackC, addlU, true);
+            add(id === 'scp' ? scpAddlBreakdownLabel() : printAddlLabel(id), addlU, true);
         } else if (blank != null) {                              // single print location OR single logo
             var printU = r2(pp - blank - ltmPP);
             if (printU > -0.005) {
@@ -1206,8 +1220,8 @@
             if (scp) bits.push('screen print');
             lbl.innerHTML = 'Sleeves' + (bits.length ? ' <span class="muted">· ' + bits.join(' · ') + '</span>' : '');
         }
-        var inkWrap = $('qqSleeveInkWrap');
-        if (inkWrap) inkWrap.hidden = !(scp && (state.sleeves.left || state.sleeves.right));
+        var lWrap = $('qqSleeveInkLWrap'); if (lWrap) lWrap.hidden = !(scp && state.sleeves.left);
+        var rWrap = $('qqSleeveInkRWrap'); if (rWrap) rWrap.hidden = !(scp && state.sleeves.right);
     }
     function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
     var repriceActiveDebounced = debounce(repriceActive, 350);
@@ -1548,8 +1562,12 @@
         $('qqBack').addEventListener('click', onPlaceChip);
         $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; renderSleeveRow(); repriceActive(); });
         $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; renderSleeveRow(); repriceActive(); });
-        $('qqSleeveInk').addEventListener('input', function (e) {
-            state.sleeveInk = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
+        $('qqSleeveInkL').addEventListener('input', function (e) {
+            state.sleeveInkL = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
+            repriceActiveDebounced();
+        });
+        $('qqSleeveInkR').addEventListener('input', function (e) {
+            state.sleeveInkR = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
             repriceActiveDebounced();
         });
 

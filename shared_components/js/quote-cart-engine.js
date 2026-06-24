@@ -569,16 +569,29 @@
         if (backColors < 0 || backColors > 6) {
             throw QuoteCartError('Screen print back color count must be 0-6.', 'BAD_OPTIONS');
         }
-        // Sleeves: each checked sleeve is an ADDITIONAL print location, priced like the back
-        // (additionalLocationPricing × its own color count). 0 keeps the legacy front+back path exact.
-        var sleeveCount = parseInt(opts.sleeveCount || 0, 10) || 0;
-        var sleeveColors = parseInt(opts.sleeveColors || 0, 10) || 0;
-        if (sleeveCount < 0 || sleeveCount > 2) {
-            throw QuoteCartError('Screen print sleeve count must be 0-2.', 'BAD_OPTIONS');
+        // Sleeves: each entry = ONE sleeve print at its OWN ink-color count — left and right may
+        // differ (e.g. [2,4] = a 2-color left + a 4-color right). Each is an ADDITIONAL print
+        // location priced like the back (additionalLocationPricing at THAT color count). Canonical
+        // input is sleeveColorsList; legacy uniform sleeveCount+sleeveColors still accepted. An empty
+        // list keeps the legacy front+back path byte-identical.
+        var sleeveColorsList = Array.isArray(opts.sleeveColorsList)
+            ? opts.sleeveColorsList.map(function (c) { return parseInt(c, 10); })
+            : [];
+        if (!sleeveColorsList.length) {
+            var legacyCount = parseInt(opts.sleeveCount || 0, 10) || 0;
+            var legacyColors = parseInt(opts.sleeveColors || 0, 10) || 0;
+            for (var lsc = 0; lsc < legacyCount; lsc++) sleeveColorsList.push(legacyColors);
         }
-        if (sleeveCount > 0 && (sleeveColors < 1 || sleeveColors > 6)) {
-            throw QuoteCartError('Screen print sleeve color count must be 1-6.', 'BAD_OPTIONS');
+        if (sleeveColorsList.length > 2) {
+            throw QuoteCartError('Screen print supports at most 2 sleeves.', 'BAD_OPTIONS');
         }
+        sleeveColorsList.forEach(function (c) {
+            if (!Number.isFinite(c) || c < 1 || c > 6) {
+                throw QuoteCartError('Screen print sleeve color count must be 1-6 (each sleeve).', 'BAD_OPTIONS');
+            }
+        });
+        var sleeveCount = sleeveColorsList.length;
+        var sleeveScreens = sleeveColorsList.reduce(function (a, c) { return a + c; }, 0);
         var darkGarment = !!opts.darkGarment;
         var safetyStripes = !!opts.safetyStripes;
 
@@ -661,19 +674,20 @@
                 addlPerPiece = addlRow.pricePerPiece;
             }
 
-            // Each sleeve = another additional location, priced like the back at the sleeve's own
-            // color count; per-piece × number of sleeves (each is a separate print pass per piece).
+            // Each sleeve = another additional location, priced like the back at ITS OWN color count
+            // (left and right may differ). Summed per piece — each sleeve is a separate print pass.
             var addlSleevePerPiece = 0;
-            if (sleeveCount > 0) {
-                var sleeveAddl = bundle.additionalLocationPricing && bundle.additionalLocationPricing[String(sleeveColors)];
+            for (var svi = 0; svi < sleeveColorsList.length; svi++) {
+                var svColors = sleeveColorsList[svi];
+                var sleeveAddl = bundle.additionalLocationPricing && bundle.additionalLocationPricing[String(svColors)];
                 if (!sleeveAddl || !sleeveAddl.tiers) {
-                    throw QuoteCartError('No additional-location pricing for a ' + sleeveColors + '-color sleeve (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
+                    throw QuoteCartError('No additional-location pricing for a ' + svColors + '-color sleeve (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
                 }
                 var sleeveRow = findPricingTier(sleeveAddl.tiers, pooledQty);
                 if (!sleeveRow || typeof sleeveRow.pricePerPiece !== 'number') {
                     throw QuoteCartError('No additional-location price tier for quantity ' + pooledQty + ' (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
                 }
-                addlSleevePerPiece = sleeveRow.pricePerPiece * sleeveCount;
+                addlSleevePerPiece += sleeveRow.pricePerPiece;
             }
 
             var sizes = item.sizes || {};
@@ -716,7 +730,7 @@
         // Screens: front + back colors, +1 per printed location when dark —
         // setup ONLY, never the per-piece lookup (builder :108-122 and the
         // 2026-06-09 order-form parity ruling).
-        var screens = frontColors + (backColors > 0 ? backColors : 0) + (sleeveCount * sleeveColors) + (darkGarment ? printedLocations : 0);
+        var screens = frontColors + (backColors > 0 ? backColors : 0) + sleeveScreens + (darkGarment ? printedLocations : 0);
         var setupFee = r2(screens * spsu);
 
         subtotal = r2(subtotal);
@@ -743,7 +757,7 @@
             trace: {
                 source: 'scp-replica',
                 authority: 'ScreenPrintPricingService bundle + EXACT copies of screenprint-quote-builder.js findPricingTier (:2975-2985), per-size assembly (:3139-3152), screens (:108-122)',
-                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, sleeveCount: sleeveCount, sleeveColors: sleeveColors, darkGarment: darkGarment, safetyStripes: safetyStripes }),
+                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, sleeveColorsList: sleeveColorsList, darkGarment: darkGarment, safetyStripes: safetyStripes }),
                 tierTable: tierTable,
                 tier: tierLabel,
                 perStyle: perStyleTrace,
@@ -1034,7 +1048,7 @@
      *     emb:garment / emb:cap → { logos:{ primary:{position,stitchCount,needsDigitizing},
      *                                        additional:[{position,stitchCount,needsDigitizing}] } }
      *     dtg:main  → { locationCode:'LC'|'FF'|'FB'|'JF'|'JB'|'LC_FB'|'FF_FB'|'JF_JB'|'LC_JB' }
-     *     scp:*     → { frontColors:1-6, backColors:0-6, sleeveCount:0-2, sleeveColors:1-6, darkGarment, safetyStripes }
+     *     scp:*     → { frontColors:1-6, backColors:0-6, sleeveColorsList:[1-6,…] (≤2; or legacy sleeveCount/sleeveColors), darkGarment, safetyStripes }
      *     dtf:main  → { locations:['left-chest','full-back',...] }
      * @param {Object} options { deps, fetch, apiBase, forceRefresh, nudge }
      * @returns {Promise<{groups:Array, grandTotal:number|null, warnings:Array, errors:Array}>}
