@@ -233,14 +233,20 @@
     const rows = (box.items || []).map(it => `<tr>
       <td class="sl-style">${esc(it.style)}</td><td>${esc(it.title || '')}</td>
       <td>${esc(it.color || '—')}</td><td class="sl-c">${esc(it.size)}</td><td class="sl-c">${fmtNum(it.qty)}</td></tr>`).join('');
-    const sub = [order.contactName, order.customerPO ? ('PO ' + order.customerPO) : '', order.salesRep, order.method]
+    const sub = [order.contactName, order.method, order.salesRep ? ('Rep ' + order.salesRep) : '']
       .filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+    const sub2 = [
+      order.customerPO ? ('Cust PO: ' + order.customerPO) : '',
+      order.terms ? ('Terms: ' + order.terms) : '',
+      order.dateOrdered ? ('Ordered: ' + fmtLabelDate(order.dateOrdered)) : '',
+    ].filter(Boolean).map(esc).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
     return `<div class="sit-label">
       <div class="sl-head">
         <div class="sl-company">${esc(order.company || '—')}</div>
         <div class="sl-woblock"><div class="sl-wolabel">WORK ORDER</div><div class="sl-wo">#${esc(order.workOrder || '?')}</div></div>
       </div>
       ${sub ? `<div class="sl-sub">${sub}</div>` : ''}
+      ${sub2 ? `<div class="sl-sub2">${sub2}</div>` : ''}
       <div class="sl-meta">
         <div class="sl-mb"><span class="sl-l">DUE</span><span class="sl-v">${esc(fmtLabelDate(order.dueDate)) || '—'}</span></div>
         <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span></div>
