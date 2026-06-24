@@ -45,8 +45,10 @@
   function linesTable(lines) {
     const rows = (lines || []).map(l => {
       const color = l.color ? esc(l.color) : '<span class="sit-na">color n/a</span>';
+      const desc = l.title ? esc(l.title) : (l.brand ? esc(l.brand) : '<span class="sit-na">—</span>');
       return `<tr>
         <td class="sit-style">${esc(l.style)}</td>
+        <td class="sit-desc">${desc}</td>
         <td>${color}</td>
         <td>${esc(l.size)}</td>
         <td class="sit-num">${fmtNum(l.qtyOrdered)}</td>
@@ -55,7 +57,7 @@
       </tr>`;
     }).join('');
     return `<table class="sit-lines">
-      <thead><tr><th>Style</th><th>Color</th><th>Size</th><th class="sit-num">Ord</th><th class="sit-num">Ship</th><th>Status</th></tr></thead>
+      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Ord</th><th class="sit-num">Ship</th><th>Status</th></tr></thead>
       <tbody>${rows}</tbody></table>`;
   }
 
@@ -108,7 +110,7 @@
     const t = data.totals || {};
     const poBlocks = (data.orders || []).map(o => {
       const rows = (o.lines || []).map(l => `<tr>
-        <td>${esc(l.style)}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td>
+        <td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td>
         <td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>
       </tr>`).join('');
       return `<div class="sit-ps-po">
@@ -117,7 +119,7 @@
           <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.carrier ? ' · ' + esc(o.carrier) + ' ' + esc(o.tracking || '') : ''}</span>
         </div>
         <table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;

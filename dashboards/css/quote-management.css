@@ -1116,7 +1116,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-lines { width: 100%; border-collapse: collapse; font-size: 13px; }
 .sit-lines th, .sit-lines td { padding: 6px 14px; border-bottom: 1px solid #f0f0f0; text-align: left; }
 .sit-lines th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; background: #fff; }
-.sit-lines .sit-style { font-family: "Geist Mono", ui-monospace, monospace; }
+.sit-lines .sit-style { font-family: "Geist Mono", ui-monospace, monospace; white-space: nowrap; }
+.sit-lines .sit-desc { color: #555; font-size: 12px; max-width: 320px; }
 .sit-lines .sit-num { text-align: right; font-variant-numeric: tabular-nums; }
 .sit-lines tbody tr:last-child td { border-bottom: none; }
 
