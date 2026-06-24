@@ -147,7 +147,7 @@
         if ((id !== 'dtg' && id !== 'scp' && id !== 'dtf') || !state.front) return null;
         var parts = [];
         if (state.back && BACK_LABELS[state.back]) parts.push(BACK_LABELS[state.back]);
-        if (id === 'dtf') { if (state.sleeves.left) parts.push('L sleeve'); if (state.sleeves.right) parts.push('R sleeve'); }
+        if (id === 'dtf' || id === 'scp') { if (state.sleeves.left) parts.push('L sleeve'); if (state.sleeves.right) parts.push('R sleeve'); }
         return parts.length ? parts.join(' + ') : null;
     }
     function frontOnlyGroups(id) {
@@ -220,6 +220,8 @@
                     'scp:design-1': {
                         frontColors: state.frontInk,                          // primary location colors (front size is cosmetic for SCP)
                         backColors: scpLocCount() >= 2 ? state.backInk : 0,   // 2nd location (back) prices on its OWN color count
+                        sleeveCount: (state.sleeves.left ? 1 : 0) + (state.sleeves.right ? 1 : 0),  // each sleeve = another add-location
+                        sleeveColors: state.sleeveInk,                        // sleeve prints on their OWN color count
                         darkGarment: !!state.adv.scpDark,
                         safetyStripes: !!state.adv.scpStripes
                     }
@@ -244,9 +246,10 @@
         sizes: {},          // { 'S':n, ... } when useSizes
         front: 'LC',          // print FRONT placement: '' | LC | FF | JF
         back: '',             // print BACK placement: '' | FB | JB
-        sleeves: { left: false, right: false }, // DTF sleeves
+        sleeves: { left: false, right: false }, // DTF (≤5×5" transfer) and/or SCP (add-location) sleeves
         frontInk: 1,          // SCP front (primary location) ink colors — each color = 1 screen
         backInk: 1,           // SCP back (additional location) ink colors — priced on its own
+        sleeveInk: 1,         // SCP sleeve ink colors — each checked sleeve is an additional location at this count
         scpDarkUserSet: false,// true once the AE manually toggles dark garment (stops auto-suggest)
         adv: { embStitch: 8000, embBackStitch: 8000, digitizing: false, scpDark: false, scpStripes: false },
         embAddl: [],          // additional embroidery logos: [{stitch}] (garment AL / cap back)
@@ -288,6 +291,8 @@
                 parts.push({ text: state.frontInk + '-color' });
                 parts.push({ text: twoLoc ? 'front + back' : 'front' });
             }
+            var scpSleeves = (state.sleeves.left ? 1 : 0) + (state.sleeves.right ? 1 : 0);
+            if (scpSleeves) parts.push({ text: scpSleeves + (scpSleeves === 1 ? ' sleeve' : ' sleeves') + ' · ' + state.sleeveInk + 'c' });
             if (state.adv.scpDark) parts.push({ text: 'dark garment' });
             if (state.adv.scpStripes) parts.push({ text: 'safety stripes', on: true });
         } else if (id === 'dtg') {
@@ -764,6 +769,7 @@
         var sl = $('qqSleeveL'), sr = $('qqSleeveR');
         if (sl) sl.checked = !!state.sleeves.left;
         if (sr) sr.checked = !!state.sleeves.right;
+        var si = $('qqSleeveInk'); if (si) si.value = state.sleeveInk;
         // highlight the common-placement preset that matches the current front/back (no sleeves)
         var presets = $('qqPlacePresets');
         if (presets) Array.prototype.forEach.call(presets.querySelectorAll('button'), function (b) {
@@ -875,7 +881,7 @@
 
     function ladderKey(id) {
         return (state.product ? state.product.style : '') + '|' + id
-            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.frontInk + 'x' + state.backInk
+            + '|' + state.front + state.back + (state.sleeves.left ? 'L' : '') + (state.sleeves.right ? 'R' : '') + '|' + state.frontInk + 'x' + state.backInk + 's' + state.sleeveInk
             + '|' + state.adv.embStitch + '|A' + state.embAddl.map(function (a) { return a.stitch; }).join(',') + '|' + state.capEmb
             + '|' + (state.adv.digitizing ? 1 : 0) + '|' + (state.adv.scpDark ? 1 : 0) + '|' + (state.adv.scpStripes ? 1 : 0)
             + '|' + (state.color ? state.color.catalog : '');
@@ -1184,9 +1190,24 @@
         var pf = $('qqPlacementField'); if (!pf) return;
         if (state.mode === 'linesheet') pf.hidden = !(hasActive('dtg') || hasActive('scp') || hasActive('dtf'));
         else pf.hidden = !!(state.product && state.product.isCap);
-        // Sleeves price ONLY for DTF — hide the row unless DTF is active so the checkboxes aren't shown
-        // (inert) on DTG/SCP. Embroidered sleeve logos go through the logo panel instead.
-        var sleeveRow = $('qqSleeveRow'); if (sleeveRow) sleeveRow.hidden = !hasActive('dtf');
+        renderSleeveRow();
+    }
+    // Sleeve row: DTF (≤5×5" transfer, priced like a left chest) and/or screen print (each sleeve =
+    // an additional print location). DTG has no sleeves; embroidered sleeve logos go through the logo
+    // panel. Label is method-aware; the ink-color stepper shows only for SCP (a sleeve prices on colors).
+    function renderSleeveRow() {
+        var row = $('qqSleeveRow'); if (!row) return;
+        var dtf = hasActive('dtf'), scp = hasActive('scp');
+        row.hidden = !(dtf || scp);
+        var lbl = $('qqSleeveLabel');
+        if (lbl) {
+            var bits = [];
+            if (dtf) bits.push('DTF · ≤5×5"');
+            if (scp) bits.push('screen print');
+            lbl.innerHTML = 'Sleeves' + (bits.length ? ' <span class="muted">· ' + bits.join(' · ') + '</span>' : '');
+        }
+        var inkWrap = $('qqSleeveInkWrap');
+        if (inkWrap) inkWrap.hidden = !(scp && (state.sleeves.left || state.sleeves.right));
     }
     function repriceActive() { if (state.mode === 'linesheet') repriceLineAll(); else repriceAll(); }
     var repriceActiveDebounced = debounce(repriceActive, 350);
@@ -1525,8 +1546,12 @@
         }
         $('qqFront').addEventListener('click', onPlaceChip);
         $('qqBack').addEventListener('click', onPlaceChip);
-        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; repriceActive(); });
-        $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; repriceActive(); });
+        $('qqSleeveL').addEventListener('change', function (e) { state.sleeves.left = e.target.checked; renderSleeveRow(); repriceActive(); });
+        $('qqSleeveR').addEventListener('change', function (e) { state.sleeves.right = e.target.checked; renderSleeveRow(); repriceActive(); });
+        $('qqSleeveInk').addEventListener('input', function (e) {
+            state.sleeveInk = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));
+            repriceActiveDebounced();
+        });
 
         $('qqInkFront').addEventListener('input', function (e) {
             state.frontInk = Math.min(6, Math.max(1, parseInt(e.target.value, 10) || 1));

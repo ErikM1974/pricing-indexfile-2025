@@ -569,6 +569,16 @@
         if (backColors < 0 || backColors > 6) {
             throw QuoteCartError('Screen print back color count must be 0-6.', 'BAD_OPTIONS');
         }
+        // Sleeves: each checked sleeve is an ADDITIONAL print location, priced like the back
+        // (additionalLocationPricing × its own color count). 0 keeps the legacy front+back path exact.
+        var sleeveCount = parseInt(opts.sleeveCount || 0, 10) || 0;
+        var sleeveColors = parseInt(opts.sleeveColors || 0, 10) || 0;
+        if (sleeveCount < 0 || sleeveCount > 2) {
+            throw QuoteCartError('Screen print sleeve count must be 0-2.', 'BAD_OPTIONS');
+        }
+        if (sleeveCount > 0 && (sleeveColors < 1 || sleeveColors > 6)) {
+            throw QuoteCartError('Screen print sleeve color count must be 1-6.', 'BAD_OPTIONS');
+        }
         var darkGarment = !!opts.darkGarment;
         var safetyStripes = !!opts.safetyStripes;
 
@@ -576,10 +586,11 @@
         var spsu = getFee(ctx, 'SPSU', FEE_FALLBACKS['SPSU']);
         var stripeFee = getFee(ctx, 'SP-STRIPE', FEE_FALLBACKS['SP-STRIPE']);
 
-        var printedLocations = backColors > 0 ? 2 : 1;
-        // Safety stripes: $/piece × printed locations, flat AFTER rounding
-        // (builder :3070-3073).
-        var stripesPerPiece = safetyStripes ? stripeFee * printedLocations : 0;
+        var frontBackLocations = backColors > 0 ? 2 : 1;          // front + back (drives safety stripes)
+        var printedLocations = frontBackLocations + sleeveCount;  // + sleeves (dark underbase prints on each)
+        // Safety stripes: $/piece × FRONT/BACK locations only (sleeves don't get hi-vis stripes),
+        // flat AFTER rounding (builder :3070-3073).
+        var stripesPerPiece = safetyStripes ? stripeFee * frontBackLocations : 0;
 
         if (!ctx.scpSvc) ctx.scpSvc = new SvcClass();
         var svc = ctx.scpSvc;
@@ -650,6 +661,21 @@
                 addlPerPiece = addlRow.pricePerPiece;
             }
 
+            // Each sleeve = another additional location, priced like the back at the sleeve's own
+            // color count; per-piece × number of sleeves (each is a separate print pass per piece).
+            var addlSleevePerPiece = 0;
+            if (sleeveCount > 0) {
+                var sleeveAddl = bundle.additionalLocationPricing && bundle.additionalLocationPricing[String(sleeveColors)];
+                if (!sleeveAddl || !sleeveAddl.tiers) {
+                    throw QuoteCartError('No additional-location pricing for a ' + sleeveColors + '-color sleeve (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
+                }
+                var sleeveRow = findPricingTier(sleeveAddl.tiers, pooledQty);
+                if (!sleeveRow || typeof sleeveRow.pricePerPiece !== 'number') {
+                    throw QuoteCartError('No additional-location price tier for quantity ' + pooledQty + ' (' + item.styleNumber + ').', 'PRICE_UNAVAILABLE');
+                }
+                addlSleevePerPiece = sleeveRow.pricePerPiece * sleeveCount;
+            }
+
             var sizes = item.sizes || {};
             var sizeKeys = Object.keys(sizes);
             for (var s = 0; s < sizeKeys.length; s++) {
@@ -662,7 +688,7 @@
                     // engine refuses instead.
                     throw QuoteCartError('No ' + size + ' price for ' + item.styleNumber + ' at the ' + tierLabel + ' tier.', 'PRICE_UNAVAILABLE');
                 }
-                var unit = sizePrice + addlPerPiece + stripesPerPiece;
+                var unit = sizePrice + addlPerPiece + addlSleevePerPiece + stripesPerPiece;
                 var effective = unit + (ltmFee > 0 ? ltmFee / pooledQty : 0);
                 lines.push({
                     itemId: item.id,
@@ -690,7 +716,7 @@
         // Screens: front + back colors, +1 per printed location when dark —
         // setup ONLY, never the per-piece lookup (builder :108-122 and the
         // 2026-06-09 order-form parity ruling).
-        var screens = frontColors + (backColors > 0 ? backColors : 0) + (darkGarment ? printedLocations : 0);
+        var screens = frontColors + (backColors > 0 ? backColors : 0) + (sleeveCount * sleeveColors) + (darkGarment ? printedLocations : 0);
         var setupFee = r2(screens * spsu);
 
         subtotal = r2(subtotal);
@@ -717,7 +743,7 @@
             trace: {
                 source: 'scp-replica',
                 authority: 'ScreenPrintPricingService bundle + EXACT copies of screenprint-quote-builder.js findPricingTier (:2975-2985), per-size assembly (:3139-3152), screens (:108-122)',
-                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, darkGarment: darkGarment, safetyStripes: safetyStripes }),
+                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, sleeveCount: sleeveCount, sleeveColors: sleeveColors, darkGarment: darkGarment, safetyStripes: safetyStripes }),
                 tierTable: tierTable,
                 tier: tierLabel,
                 perStyle: perStyleTrace,
@@ -1008,7 +1034,7 @@
      *     emb:garment / emb:cap → { logos:{ primary:{position,stitchCount,needsDigitizing},
      *                                        additional:[{position,stitchCount,needsDigitizing}] } }
      *     dtg:main  → { locationCode:'LC'|'FF'|'FB'|'JF'|'JB'|'LC_FB'|'FF_FB'|'JF_JB'|'LC_JB' }
-     *     scp:*     → { frontColors:1-6, backColors:0-6, darkGarment, safetyStripes }
+     *     scp:*     → { frontColors:1-6, backColors:0-6, sleeveCount:0-2, sleeveColors:1-6, darkGarment, safetyStripes }
      *     dtf:main  → { locations:['left-chest','full-back',...] }
      * @param {Object} options { deps, fetch, apiBase, forceRefresh, nudge }
      * @returns {Promise<{groups:Array, grandTotal:number|null, warnings:Array, errors:Array}>}

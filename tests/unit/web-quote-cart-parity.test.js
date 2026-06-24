@@ -593,6 +593,55 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
         expect(g.groupTotal).toBe(702); // 672 + 0 LTM (48-71) + 30 setup
     });
 
+    // --- Sleeves as additional print locations (2026-06-24). Each checked sleeve prices like the
+    //     back at its OWN color count; sleeve screens add to setup; dark underbase prints on the
+    //     sleeve too; safety stripes stay front/back only. 1-color add-location on PC61 @ 48-71 = $4.50
+    //     (proven by test (b) above). sleeveCount:0 keeps the legacy front+back path exact (tests a–d).
+    test('(sleeve) 1 sleeve (1-color) = $12 base + $4.50 add-location = $16.50; setup 2 screens; GRAND $852.00', async () => {
+        const res = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveCount: 1, sleeveColors: 1, darkGarment: false, safetyStripes: false } }
+        });
+        expect(res.errors).toEqual([]);
+        const g = groupOf(res, 'scp:design-1');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(16.5));
+        expect(g.trace.screens).toBe(2); // 1 front + 1 sleeve
+        expect(g.fees.find((f) => f.code === 'SPSU').amount).toBe(60);
+        expect(g.groupTotal).toBe(852);
+    });
+
+    test('(sleeve) 2 sleeves (1-color each) = $12 + 2×$4.50 = $21.00; setup 3 screens; GRAND $1098.00', async () => {
+        const res = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveCount: 2, sleeveColors: 1, darkGarment: false, safetyStripes: false } }
+        });
+        const g = groupOf(res, 'scp:design-1');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(21));
+        expect(g.trace.screens).toBe(3); // 1 front + 2 sleeves
+        expect(g.groupTotal).toBe(1098);
+    });
+
+    test('(sleeve dark) underbase counts the sleeve location: per-piece unchanged $16.50, 4 screens → GRAND $912.00', async () => {
+        const res = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveCount: 1, sleeveColors: 1, darkGarment: true, safetyStripes: false } }
+        });
+        const g = groupOf(res, 'scp:design-1');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(16.5)); // dark = setup only
+        expect(g.trace.screens).toBe(4); // 1 front + 1 sleeve + 2 underbase (front+sleeve locations)
+        expect(g.groupTotal).toBe(912);
+    });
+
+    test('(sleeve stripes) safety stripes stay front/back only — NOT multiplied by sleeves: $12 + $4.50 + $2 = $18.50', async () => {
+        const res = await run({
+            items: [scpItem('PC61', { S: 12, M: 12, L: 12, XL: 12 })],
+            groups: { 'scp:design-1': { frontColors: 1, backColors: 0, sleeveCount: 1, sleeveColors: 1, darkGarment: false, safetyStripes: true } }
+        });
+        const g = groupOf(res, 'scp:design-1');
+        g.lines.forEach((l) => expect(l.baseUnit).toBe(18.5)); // 12 + 4.50 sleeve + 2 stripe×1 front/back location
+        expect(g.groupTotal).toBe(948); // 888 + 0 LTM + 60 setup
+    });
+
     test('unknown size hard-errors (no silent M→L fallback) and withholds the grand total', async () => {
         const res = await run({
             items: [scpItem('PC61', { XS: 48 })],
