@@ -1,3 +1,7 @@
+## v2026.06.24.8 (2026.06.24)
+
+- Deploy v2026.06.24.8: Quick Quote — Line Sheet default + sleeves DTF-only; dashboard 'Updated · Jun 24' badge
+
 ## v2026.06.24.5 (2026.06.24)
 
 - Deploy v2026.06.24.5: Quick Quote — note DTG/DTF print sizes per location (LC 4x4, FF/FB 12x16, JF/JB 16x20; DTF bands)
