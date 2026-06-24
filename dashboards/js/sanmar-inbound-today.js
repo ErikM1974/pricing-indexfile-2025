@@ -270,4 +270,16 @@
     modalEl.style.display = 'flex';
     load(false);
   };
+
+  // Auto-open when linked from the Staff Dashboard tile (?open=inbound-today).
+  try {
+    const want = new URLSearchParams(location.search).get('open') || '';
+    if (/^(inbound-today|inbound|sanmar-boxes)$/i.test(want)) {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => window.openInboundTodayModal());
+      } else {
+        window.openInboundTodayModal();
+      }
+    }
+  } catch (e) { /* no auto-open */ }
 })();
