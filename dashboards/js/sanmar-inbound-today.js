@@ -27,6 +27,9 @@
   let modalEl = null;
   let lastData = null;
   let labelPrintedOn = '';
+  let viewDate = null;   // ISO date currently shown (set after each load)
+  let calOpen = false;   // is the calendar shown in the body?
+  let calMonth = null;   // 'YYYY-MM' the calendar is showing
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
@@ -396,27 +399,121 @@
     } catch (e) { console.warn('Inbound logo fetch failed (non-blocking):', e); }
   }
 
-  async function load(refresh) {
-    lastData = null;
-    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading today’s inbound…</div>');
+  // ── Calendar (pick any day → load its inbound; same detail + box labels as today) ──
+  function todayISO() {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+  }
+  function addDaysISO(iso, n) {
+    const d = new Date((iso || todayISO()) + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function monthMeta(ym) {
+    const [y, m] = ym.split('-').map(Number);
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const firstDow = new Date(y, m - 1, 1).getDay();
+    return {
+      y, m, daysInMonth, firstDow,
+      start: `${ym}-01`, end: `${ym}-${String(daysInMonth).padStart(2, '0')}`,
+      label: new Date(y, m - 1, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
+    };
+  }
+  function updateDateUI(dateIso) {
+    const lbl = modalEl && modalEl.querySelector('#sit-date');
+    if (lbl) lbl.textContent = fmtDate(dateIso) + (dateIso === todayISO() ? '  ·  Today' : '');
+  }
+  async function fetchMonthCounts(ym) {
+    const mm = monthMeta(ym);
     try {
-      const url = `${API_BASE}/api/sanmar-orders/inbound-today${refresh ? '?refresh=true' : ''}`;
+      const resp = await fetch(`${API_BASE}/api/sanmar-orders/daily-inbound?start=${mm.start}&end=${mm.end}`);
+      if (!resp.ok) return {};
+      const j = await resp.json();
+      const map = {};
+      (j.days || []).forEach(d => { map[d.date] = { orders: d.orders, boxes: d.boxes, pieces: d.pieces }; });
+      return map;
+    } catch (e) { return {}; }
+  }
+  function renderCalendar(ym, counts) {
+    const mm = monthMeta(ym);
+    const max = Math.max(1, ...Object.values(counts).map(c => c.pieces || 0));
+    const today = todayISO();
+    let cells = '';
+    for (let i = 0; i < mm.firstDow; i++) cells += '<div class="sit-cal-cell sit-cal-blank"></div>';
+    for (let day = 1; day <= mm.daysInMonth; day++) {
+      const iso = `${ym}-${String(day).padStart(2, '0')}`;
+      const c = counts[iso];
+      const cls = ['sit-cal-cell'];
+      let style = '', chip = '', title = '';
+      if (c && (c.orders || c.pieces)) {
+        const a = 0.14 + 0.74 * Math.min(1, (c.pieces || 0) / max);
+        cls.push('sit-cal-has'); if (a > 0.5) cls.push('sit-cal-hot');
+        style = `background:rgba(46,111,64,${a.toFixed(3)})`;
+        chip = `<span class="sit-cal-chip">${fmtNum(c.orders)} PO</span>`;
+        title = `${fmtNum(c.orders)} POs · ${fmtNum(c.boxes)} boxes · ${fmtNum(c.pieces)} pcs`;
+      }
+      if (iso === today) cls.push('sit-cal-today');
+      if (iso === viewDate) cls.push('sit-cal-sel');
+      cells += `<div class="${cls.join(' ')}" ${c ? `data-caldate="${iso}"` : ''} style="${style}" title="${esc(title)}"><span class="sit-cal-dn">${day}</span>${chip}</div>`;
+    }
+    return `<div class="sit-cal">
+      <div class="sit-cal-head">
+        <button class="sit-cal-nav" data-cal="prev" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
+        <div class="sit-cal-title">${esc(mm.label)}</div>
+        <button class="sit-cal-nav" data-cal="next" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
+        <button class="sit-cal-todaybtn" data-cal="today">This month</button>
+      </div>
+      <div class="sit-cal-grid">
+        ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(w => `<div class="sit-cal-wd">${w}</div>`).join('')}
+        ${cells}
+      </div>
+      <div class="sit-cal-legend"><i class="fas fa-hand-pointer"></i> Click a day to view its inbound &amp; print box labels &nbsp;·&nbsp; shade = pieces arriving (darker = busier)</div>
+    </div>`;
+  }
+  async function showCalendar(ym) {
+    calOpen = true;
+    calMonth = ym || (viewDate || todayISO()).slice(0, 7);
+    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading calendar…</div>');
+    const counts = await fetchMonthCounts(calMonth);
+    if (!calOpen) return;
+    setContent(renderCalendar(calMonth, counts));
+  }
+  function calNav(dir) {
+    if (dir === 'today') return showCalendar(todayISO().slice(0, 7));
+    const [y, m] = calMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + (dir === 'next' ? 1 : -1), 1);
+    return showCalendar(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  }
+  function toggleCalendar() {
+    if (calOpen) { calOpen = false; if (lastData) setContent(renderBody(lastData)); else load(false, viewDate); }
+    else showCalendar();
+  }
+
+  async function load(refresh, dateStr) {
+    lastData = null;
+    calOpen = false;
+    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading inbound…</div>');
+    try {
+      const params = [];
+      if (refresh) params.push('refresh=true');
+      if (dateStr) params.push('date=' + encodeURIComponent(dateStr));
+      const url = `${API_BASE}/api/sanmar-orders/inbound-today${params.length ? '?' + params.join('&') : ''}`;
       const resp = await fetch(url);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const data = await resp.json();
       if (data.error) throw new Error(data.error);
       await attachLogos(data);
       lastData = data;
-      const dateLabel = modalEl.querySelector('#sit-date');
-      if (dateLabel) dateLabel.textContent = fmtDate(data.date);
+      viewDate = data.date;
+      updateDateUI(data.date);
       setContent(renderBody(data));
     } catch (err) {
       // Never-Break Rule #4 — show the error, never fake data.
       setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
-        Couldn't load today’s inbound.<br><small>${esc(err.message)}</small><br>
+        Couldn't load inbound.<br><small>${esc(err.message)}</small><br>
         <button class="btn-cancel" id="sit-retry">Retry</button></div>`);
       const retry = modalEl.querySelector('#sit-retry');
-      if (retry) retry.onclick = () => load(true);
+      if (retry) retry.onclick = () => load(true, viewDate);
     }
   }
 
@@ -428,8 +525,13 @@
       <div class="modal-content sit-modal-content">
         <div class="sit-header">
           <div>
-            <h3><i class="fas fa-clipboard-list"></i> Today’s Inbound from SanMar</h3>
-            <div class="sit-date-line" id="sit-date"></div>
+            <h3><i class="fas fa-clipboard-list"></i> SanMar Inbound</h3>
+            <div class="sit-datenav">
+              <button class="sit-daystep" id="sit-prevday" aria-label="Previous day" title="Previous day"><i class="fas fa-chevron-left"></i></button>
+              <button class="sit-datebtn" id="sit-datebtn" title="Pick a day from the calendar"><i class="fas fa-calendar-day"></i> <span class="sit-date-line" id="sit-date"></span> <i class="fas fa-caret-down sit-cal-caret"></i></button>
+              <button class="sit-daystep" id="sit-nextday" aria-label="Next day" title="Next day"><i class="fas fa-chevron-right"></i></button>
+              <button class="sit-todaybtn" id="sit-todaybtn" title="Jump to today’s inbound">Today</button>
+            </div>
           </div>
           <div class="sit-header-actions">
             <button class="btn-cancel" id="sit-labels" title="Print a receiving label for every box today (8.5×11, one per page)"><i class="fas fa-tags"></i> Box Labels</button>
@@ -444,11 +546,19 @@
 
     modalEl.addEventListener('click', (e) => { if (e.target === modalEl) close(); });
     modalEl.querySelector('#sit-close').onclick = close;
-    modalEl.querySelector('#sit-refresh').onclick = () => load(true);
+    modalEl.querySelector('#sit-refresh').onclick = () => load(true, viewDate);
     modalEl.querySelector('#sit-print').onclick = printReport;
     modalEl.querySelector('#sit-labels').onclick = printAllLabels;
-    // Per-box "🏷 Label" buttons (delegated; #sit-body persists across reloads).
+    modalEl.querySelector('#sit-datebtn').onclick = toggleCalendar;
+    modalEl.querySelector('#sit-prevday').onclick = () => load(false, addDaysISO(viewDate, -1));
+    modalEl.querySelector('#sit-nextday').onclick = () => load(false, addDaysISO(viewDate, 1));
+    modalEl.querySelector('#sit-todaybtn').onclick = () => load(false, todayISO());
+    // Per-box "🏷 Label" buttons + calendar clicks (delegated; #sit-body persists across reloads).
     modalEl.querySelector('#sit-body').addEventListener('click', (e) => {
+      const cell = e.target.closest('[data-caldate]');
+      if (cell) { load(false, cell.getAttribute('data-caldate')); return; }
+      const nav = e.target.closest('[data-cal]');
+      if (nav) { calNav(nav.getAttribute('data-cal')); return; }
       const btn = e.target.closest('.sit-label-btn');
       if (!btn || !lastData) return;
       const po = btn.getAttribute('data-po');
