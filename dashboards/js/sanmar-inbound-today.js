@@ -40,6 +40,14 @@
   function methodChip(m) {
     return `<span class="sit-chip" style="background:${METHOD_COLORS[m] || '#9ca3af'}">${esc(m)}</span>`;
   }
+  // SanMar backorder/hold badge (from order-status issues); empty when there's no issue.
+  function issueBadge(issue) {
+    if (!issue || (!issue.backorder && !issue.hold)) return '';
+    const isBo = issue.backorder;
+    const label = isBo ? 'Backorder' : 'Hold';
+    const tip = `SanMar ${isBo ? 'BACKORDER' : 'HOLD'}${issue.label ? ' — ' + issue.label : ''}`;
+    return `<span class="sit-issue ${isBo ? 'sit-issue--bo' : 'sit-issue--hold'}" title="${esc(tip)}">⚠ ${label}</span>`;
+  }
 
   // ── Line-item rows for one PO (screen) ──
   function linesTable(lines) {
@@ -111,6 +119,7 @@
           <span class="sit-po">PO #${esc(o.sanmarPO)}</span>
           <span class="sit-wo">${wo}</span>
           ${methodChip(o.method)}
+          ${issueBadge(o.issue)}
         </div>
         <div class="sit-card-meta">
           <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>

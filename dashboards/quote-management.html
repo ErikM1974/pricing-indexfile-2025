@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.24.7">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.24.9">
 </head>
 <body>
     <!-- Header -->
@@ -215,7 +215,7 @@
     <script src="/dashboards/js/sanmar-daily-inbound.js?v=2026.06.24.1"></script>
     <!-- Today's Inbound (SanMar) detail view + PDF report — self-contained, reads APP_CONFIG.
          Defines window.openInboundTodayModal() for the header button. -->
-    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.06.24.7"></script>
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.06.24.9"></script>
 
     <script>
         // ============================================================
@@ -645,10 +645,17 @@
             // as the customer's order shipping out (Erik 2026-06-16).
             const title = `Inbound blanks · SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
             const icon = '<i class="fas fa-dolly"></i>';
-            if (info.shipped && info.trackingUrl) {
-                return `<a class="inbound-pill ${cls}" href="${info.trackingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`;
+            const base = (info.shipped && info.trackingUrl)
+                ? `<a class="inbound-pill ${cls}" href="${info.trackingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`
+                : `<span class="inbound-pill ${cls}" title="${escapeHtml(title)}">${icon}</span>`;
+            // SanMar backorder / hold alert (from order-status issues). Erik 2026-06-24.
+            let alert = '';
+            if (info.issue && (info.issue.backorder || info.issue.hold)) {
+                const isBo = info.issue.backorder;
+                const aTitle = `SanMar ${isBo ? 'BACKORDER' : 'HOLD'}${info.issue.label ? ' · ' + info.issue.label : ''}`;
+                alert = ` <span class="inbound-alert ${isBo ? 'inbound-backorder' : 'inbound-hold'}" title="${escapeHtml(aTitle)}"><i class="fas fa-triangle-exclamation"></i> ${isBo ? 'Backorder' : 'Hold'}</span>`;
             }
-            return `<span class="inbound-pill ${cls}" title="${escapeHtml(title)}">${icon}</span>`;
+            return base + alert;
         }
 
         // ONE batched call for all loaded work orders we haven't checked yet.

@@ -524,6 +524,22 @@ body {
 .inbound-canceled  { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 a.inbound-pill:hover { filter: brightness(0.95); }
 
+/* SanMar backorder / hold alert pill (next to the inbound dot) */
+.inbound-alert {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid;
+    cursor: help;
+    white-space: nowrap;
+}
+.inbound-backorder { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.inbound-hold      { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+
 .quote-amount {
     font-weight: 600;
     text-align: right;
@@ -1107,6 +1123,9 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-po { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; color: #444; }
 .sit-wo { font-size: 12px; color: #2f6fed; }
 .sit-chip { color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.sit-issue { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; border: 1px solid; cursor: help; }
+.sit-issue--bo { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.sit-issue--hold { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
 .sit-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 12px; color: #444; }
 .sit-card-meta a { color: #2f6fed; text-decoration: none; }
 .sit-card-meta a:hover { text-decoration: underline; }
