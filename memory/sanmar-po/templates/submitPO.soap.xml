@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SanMar STANDARD submitPO — SOAP request skeleton (annotated)
+  ============================================================
+  Source: SanMar PO Integration Guide v24.3, "SanMar Standard submitPO Service".
+  This PLACES a purchase order. It is the first WRITE call to SanMar (today every
+  SanMar call in the proxy is read-only). Returns: <message>PO Submission successful</message>
+  or "Error: [description]".
+
+  WSDL:
+    TEST: https://test-ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort?wsdl
+    PROD: https://ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort?wsdl
+  (These 2 endpoints are NOT yet in caspio-pricing-proxy/src/utils/sanmar-soap.js ENDPOINTS — add them.)
+
+  Transport: reuse sanmar-soap.js makeSoapRequest() + xmlEscape(). Namespace is the same
+  'http://webservice.integration.sanmar.com/' already used for Standard Invoicing.
+
+  MAPPING from po-payload.schema.json:
+    arg0.poNum            <- poNumber
+    arg0.shipTo           <- shipTo.companyName
+    arg0.shipAddress1/2   <- shipTo.address1/2
+    arg0.shipCity/State/Zip <- shipTo.city/state/zip
+    arg0.shipMethod       <- shipMethod
+    arg0.shipEmail        <- shipTo.email
+    arg0.residence        <- shipTo.residence
+    arg0.attention        <- shipTo.attention
+    webServicePoDetailList (REPEAT per lines[]):
+      style/color/size + quantity  <- line.style / line.color(SANMAR_MAINFRAME_COLOR) / line.size / line.quantity
+      inventoryKey/sizeIndex       <- line.inventoryKey / line.sizeIndex (preferred; leave empty to use style+color+size)
+      whseNo                       <- warehouseSelection (leave empty unless Warehouse Selection mode)
+    arg1                  <- credentials (SANMAR_CUSTOMER_NUMBER / SANMAR_USERNAME / SANMAR_PASSWORD env)
+
+  RULES: no commas in any field (FTP-path safety; harmless on SOAP but keep clean).
+         Consolidate duplicate products into one detail line.
+-->
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:web="http://webservice.integration.sanmar.com/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <web:submitPO>
+      <arg0>
+        <attention>{{shipTo.attention}}</attention>
+        <notes>{{notes}}</notes>
+        <poNum>{{poNumber}}</poNum>
+        <shipTo>{{shipTo.companyName}}</shipTo>
+        <shipAddress1>{{shipTo.address1}}</shipAddress1>
+        <shipAddress2>{{shipTo.address2}}</shipAddress2>
+        <shipCity>{{shipTo.city}}</shipCity>
+        <shipState>{{shipTo.state}}</shipState>
+        <shipZip>{{shipTo.zip}}</shipZip>
+        <shipMethod>{{shipMethod}}</shipMethod>
+        <shipEmail>{{shipTo.email}}</shipEmail>
+        <residence>{{shipTo.residence}}</residence>
+        <department/>
+
+        <!-- REPEAT this block for each lines[] entry -->
+        <webServicePoDetailList>
+          <inventoryKey>{{line.inventoryKey}}</inventoryKey>
+          <sizeIndex>{{line.sizeIndex}}</sizeIndex>
+          <style>{{line.style}}</style>
+          <color>{{line.color}}</color>
+          <size>{{line.size}}</size>
+          <quantity>{{line.quantity}}</quantity>
+          <whseNo>{{warehouseSelection}}</whseNo>
+        </webServicePoDetailList>
+
+      </arg0>
+      <arg1>
+        <sanMarCustomerNumber>{{SANMAR_CUSTOMER_NUMBER}}</sanMarCustomerNumber>
+        <sanMarUserName>{{SANMAR_USERNAME}}</sanMarUserName>
+        <sanMarUserPassword>{{SANMAR_PASSWORD}}</sanMarUserPassword>
+      </arg1>
+    </web:submitPO>
+  </soapenv:Body>
+</soapenv:Envelope>

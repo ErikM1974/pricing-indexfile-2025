@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  SanMar STANDARD getPreSubmitInfo — SOAP request skeleton (annotated)
+  ===================================================================
+  Source: SanMar PO Integration Guide v24.3, "SanMar getPreSubmitInfo Service".
+  READ-ONLY availability pre-check. Confirms whether the requested qty/sizes can be
+  filled from the closest warehouse to the destination STATE. PLACES NOTHING.
+  This is the recommended low-risk FIRST build (Option A) — same kind of read call the
+  proxy already makes, but it proves the PO pipe + your line mapping before any money moves.
+
+  Response (per line, in webServicePoDetailList):
+    SUCCESS -> errorOccurred=false, message "Requested Quantity is confirmed and available
+               in warehouse '<whseNo>' to ship to your destination." (+ resolves inventoryKey/sizeIndex!)
+    FAIL    -> errorOccurred=true,  message "Requested Quantity is not in stock from any
+               warehouse or from requested warehouse".
+  Note: it returns the resolved inventoryKey + sizeIndex + whseNo — handy for enriching the PO.
+
+  WSDL: same port as submitPO
+    TEST: https://test-ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort?wsdl
+    PROD: https://ws.sanmar.com:8080/SanMarWebService/SanMarPOServicePort?wsdl
+
+  Transport: reuse sanmar-soap.js makeSoapRequest() + xmlEscape(); namespace
+  'http://webservice.integration.sanmar.com/'.
+
+  MAPPING from po-payload.schema.json: same as submitPO (poNum, ship*, detail list, arg1 creds).
+  The destination STATE (shipState) is what drives the availability answer.
+-->
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:web="http://webservice.integration.sanmar.com/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <web:getPreSubmitInfo>
+      <arg0>
+        <attention>{{shipTo.attention}}</attention>
+        <internalMessage/>
+        <notes/>
+        <poNum>{{poNumber}}</poNum>
+        <poSenderId/>
+        <residence>{{shipTo.residence}}</residence>
+        <department/>
+        <shipAddress1>{{shipTo.address1}}</shipAddress1>
+        <shipAddress2>{{shipTo.address2}}</shipAddress2>
+        <shipCity>{{shipTo.city}}</shipCity>
+        <shipEmail>{{shipTo.email}}</shipEmail>
+        <shipMethod>{{shipMethod}}</shipMethod>
+        <shipState>{{shipTo.state}}</shipState>
+        <shipTo>{{shipTo.companyName}}</shipTo>
+        <shipZip>{{shipTo.zip}}</shipZip>
+
+        <!-- REPEAT per lines[] entry. inventoryKey/sizeIndex may be empty -> use style+color+size. -->
+        <webServicePoDetailList>
+          <color>{{line.color}}</color>
+          <errorOccured/>
+          <inventoryKey>{{line.inventoryKey}}</inventoryKey>
+          <message/>
+          <poId/>
+          <quantity>{{line.quantity}}</quantity>
+          <size>{{line.size}}</size>
+          <sizeIndex>{{line.sizeIndex}}</sizeIndex>
+          <style>{{line.style}}</style>
+          <whseNo/>
+        </webServicePoDetailList>
+
+      </arg0>
+      <arg1>
+        <sanMarCustomerNumber>{{SANMAR_CUSTOMER_NUMBER}}</sanMarCustomerNumber>
+        <sanMarUserName>{{SANMAR_USERNAME}}</sanMarUserName>
+        <sanMarUserPassword>{{SANMAR_PASSWORD}}</sanMarUserPassword>
+      </arg1>
+    </web:getPreSubmitInfo>
+  </soapenv:Body>
+</soapenv:Envelope>

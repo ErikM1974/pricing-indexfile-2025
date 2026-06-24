@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://nwca/memory/sanmar-po/po-payload.schema.json",
+  "title": "SanMar Purchase Order (NWCA canonical payload)",
+  "description": "Vendor-neutral internal shape for a SanMar blank-goods purchase order. This is the document that 'becomes a PO': it is human-fillable AND machine-convertible into a SanMar Standard submitPO SOAP body (see templates/submitPO.soap.xml) or PromoStandards sendPO. Sourced from SanMar PO Integration Guide v24.3. Build one of these per SanMar PO, then a builder maps it to the SOAP envelope. RULE: no field may contain a comma in the FTP flat-file path (comma is SanMar's delimiter); SOAP path is comma-safe but keep data clean anyway.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["poNumber", "shipTo", "shipMethod", "lines"],
+  "properties": {
+    "_comment": {
+      "type": "string",
+      "description": "Free-text note for humans editing this file. Ignored by any builder."
+    },
+    "poNumber": {
+      "type": "string",
+      "maxLength": 28,
+      "pattern": "^[^,]+$",
+      "description": "Your PO number. <=28 chars, alphanumeric + dashes, MUST be unique per submission, NO commas. SanMar recommends a date+batch convention e.g. 06-23-2026-1. Once submitted via API you OWN this number -> exact linkage back to SanMar_Orders (kills the style+date fuzzy matching in proxy sanmar-orders.js)."
+    },
+    "orderDate": {
+      "type": "string",
+      "description": "ISO date-time of the PO, e.g. 2026-06-23T00:00:00. Used by PromoStandards sendPO (orderDate); optional for Standard submitPO."
+    },
+    "shipTo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["companyName", "address1", "city", "state", "zip", "residence"],
+      "description": "Becomes CustInfo (FTP) / the ship block (SOAP). For decorate-in-house, this is the NWCA decorator address; for drop-ship, the end customer. Use SanMar street abbreviations: ST, AVE, RD, DR, BLVD.",
+      "properties": {
+        "_comment": { "type": "string" },
+        "attention": {
+          "type": "string",
+          "maxLength": 35,
+          "description": "Receiver's name or PO ref. Optional."
+        },
+        "companyName": {
+          "type": "string",
+          "maxLength": 28,
+          "description": "Ship-to company name. <=28 chars (PromoStandards limit tightened to 28 in Sep 2025)."
+        },
+        "address1": { "type": "string", "maxLength": 35 },
+        "address2": { "type": "string", "maxLength": 35, "description": "Suite/Apt #. Optional." },
+        "city": { "type": "string", "maxLength": 35 },
+        "state": { "type": "string", "minLength": 2, "maxLength": 2, "description": "2-char US state abbreviation." },
+        "zip": {
+          "type": "string",
+          "pattern": "^[0-9]{5}(-[0-9]{4})?$",
+          "description": "5 digits or 5-4. Add preceding zeros if needed (min 5 chars)."
+        },
+        "email": {
+          "type": "string",
+          "maxLength": 105,
+          "description": "Order confirmation + shipment notification email. Optional but recommended; falls back to the account default if omitted."
+        },
+        "residence": {
+          "type": "string",
+          "enum": ["Y", "N"],
+          "description": "Is the ship-to a residence? Y or N."
+        }
+      }
+    },
+    "shipMethod": {
+      "type": "string",
+      "description": "Standard ship method OR a will-call warehouse code. Common: 'UPS' (Ground), 'UPS 2ND DAY', 'UPS NEXT DAY', 'USPS PP' (Ground Advantage), 'USPS APP' (Priority), 'PSST', 'TRUCK' (orders >200 lb). Will-call codes (require Warehouse Selection account mode): PRE=Seattle, CIN, COP=Dallas, REN=Reno, NJE, JAC, MSP, PHX, VA1. NWCA's closest = PRE (Seattle). NOTE: free ground freight on orders >$200 continental US (excl. bags)."
+    },
+    "warehouseSelection": {
+      "type": ["string", "null"],
+      "description": "Leave null unless your SanMar account is configured for Warehouse Selection mode (required for will-call). If set, SanMar ships every line from this warehouse # and will hold the order if any line is short there. Valid IDs: 1,2,3,4,5,6,7,12,31. Pre-check stock with the inventory service first."
+    },
+    "rush": {
+      "type": "boolean",
+      "description": "PromoStandards sendPO only (rush flag). Ignored by Standard submitPO."
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 54,
+      "description": "Order notes. DISCOURAGED by SanMar (may delay processing). Leave empty unless absolutely necessary. No commas (FTP path)."
+    },
+    "lines": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Order line items. IMPORTANT: consolidate duplicate products into ONE line with the summed qty — SanMar checks stock per line and duplicate lines can source from a short warehouse / error the PO.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lineNumber", "style", "color", "size", "quantity"],
+        "description": "Line identity: SanMar accepts EITHER (inventoryKey + sizeIndex) OR (style + color + size). Always populate style+color+size (buildable from Caspio today). Add inventoryKey+sizeIndex when available (SanMar-recommended, fewer errors) — resolve them via the Standard getPricing service or the SDL/EPDD files. See FIELD-MAPPING.md.",
+        "properties": {
+          "_comment": { "type": "string" },
+          "lineNumber": { "type": "integer", "minimum": 1 },
+          "style": {
+            "type": "string",
+            "pattern": "^[^,]+$",
+            "description": "SanMar style #, same as the catalog style. e.g. PC61. From Caspio STYLE."
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^[^,]+$",
+            "description": "MUST be the SANMAR_MAINFRAME_COLOR (SanMar's mainframe/order color key), NOT the customer-facing COLOR_NAME. From Caspio Sanmar_Bulk.SANMAR_MAINFRAME_COLOR. Usually equals CATALOG_COLOR but can differ — verify via the catalog-color-audit endpoint. e.g. 'Charcoal'."
+          },
+          "size": {
+            "type": "string",
+            "pattern": "^[^,]+$",
+            "description": "Human-readable size, e.g. S, M, L, XL, 2XL. From Caspio SIZE. (This is NOT the ShopWorks _2X/_3XL suffix and NOT sizeIndex.)"
+          },
+          "inventoryKey": {
+            "type": ["string", "null"],
+            "description": "OPTIONAL/preferred. SanMar 6-digit per-style+color internal id. Resolve via getPricing(style,color,size) or SDL/EPDD. Not stored in Caspio today."
+          },
+          "sizeIndex": {
+            "type": ["integer", "null"],
+            "description": "OPTIONAL/preferred. SMALL ORDINAL: 1=XS, 2=S, 3=M, 4=L, 5=XL, 6+=2XL.. (confirm 2XL+ from live getPricing). NOT a hundreds scheme. Resolve via getPricing. Not stored in Caspio today."
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Total qty for this consolidated line."
+          }
+        }
+      }
+    }
+  }
+}
