@@ -1,3 +1,7 @@
+## v2026.06.24.17 (2026.06.24)
+
+- Deploy v2026.06.24.17: Quick Quote — screen-print sleeves price as additional locations; DTF sleeve shows ≤5×5" size
+
 ## v2026.06.24.16 (2026.06.24)
 
 - docs(lessons): DTF combined/range sizes (vests) — base size 0 upcharge fix + table guidance
