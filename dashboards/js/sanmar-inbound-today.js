@@ -61,6 +61,42 @@
       <tbody>${rows}</tbody></table>`;
   }
 
+  // ── Per-box item table (screen) — used when live box contents are available ──
+  function boxItemsTable(items) {
+    const rows = (items || []).map(it => {
+      const color = it.color ? esc(it.color) : '<span class="sit-na">color n/a</span>';
+      const desc = it.title ? esc(it.title) : (it.brand ? esc(it.brand) : '<span class="sit-na">—</span>');
+      return `<tr>
+        <td class="sit-style">${esc(it.style)}</td>
+        <td class="sit-desc">${desc}</td>
+        <td>${color}</td>
+        <td>${esc(it.size)}</td>
+        <td class="sit-num">${fmtNum(it.qty)}</td>
+      </tr>`;
+    }).join('');
+    return `<table class="sit-lines">
+      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Qty</th></tr></thead>
+      <tbody>${rows}</tbody></table>`;
+  }
+
+  // ── One box block (screen): box # + tracking link + its exact contents ──
+  function boxBlock(b) {
+    const track = b.trackingNumber
+      ? (b.trackingUrl ? `<a href="${esc(b.trackingUrl)}" target="_blank" rel="noopener">${esc(b.carrier || 'Track')} ${esc(b.trackingNumber)}</a>` : `${esc(b.carrier)} ${esc(b.trackingNumber)}`)
+      : '<span class="sit-na">no tracking</span>';
+    return `<div class="sit-box">
+      <div class="sit-box-head"><span class="sit-box-n">📦 Box ${fmtNum(b.boxNumber)}</span><span>🚚 ${track}</span><span class="sit-muted">${fmtNum(b.pieces)} pcs</span></div>
+      ${boxItemsTable(b.items)}
+    </div>`;
+  }
+
+  // Contents block: per-box when SanMar's live box detail is available, else the PO-level summary.
+  function contentsBlock(o) {
+    return (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
+      ? o.boxDetail.map(boxBlock).join('')
+      : linesTable(o.lines);
+  }
+
   // ── One PO card (screen) ──
   function poCard(o) {
     const wo = o.workOrder ? `WO #${esc(o.workOrder)}` : '<span class="sit-na">no WO linked</span>';
@@ -83,7 +119,7 @@
           ${track ? `<span>🚚 ${track}</span>` : ''}
         </div>
       </div>
-      ${linesTable(o.lines)}
+      ${contentsBlock(o)}
     </div>`;
   }
 
@@ -109,19 +145,23 @@
     if (old) old.remove();
     const t = data.totals || {};
     const poBlocks = (data.orders || []).map(o => {
-      const rows = (o.lines || []).map(l => `<tr>
-        <td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td>
-        <td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>
-      </tr>`).join('');
+      const body = (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
+        ? o.boxDetail.map(b => `
+          <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs</div>
+          <table class="sit-ps-tbl">
+            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th></tr></thead>
+            <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td></tr>`).join('')}</tbody>
+          </table>`).join('')
+        : `<table class="sit-ps-tbl">
+            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
+            <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td></tr>`).join('')}</tbody>
+          </table>`;
       return `<div class="sit-ps-po">
         <div class="sit-ps-po-head">
           <b>${esc(o.company || 'Unmatched')}</b> &nbsp; PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-          <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.carrier ? ' · ' + esc(o.carrier) + ' ' + esc(o.tracking || '') : ''}</span>
+          <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs</span>
         </div>
-        <table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
+        ${body}
       </div>`;
     }).join('');
 
