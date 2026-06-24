@@ -747,11 +747,20 @@
         return fb ? { size: fb.size, zone: fb.zone } : null;
     }
 
-    function dtfSizeUpcharge(size, addons) {
+    function dtfSizeUpcharge(size, addons, blankSizes, baseCost) {
         var normalized = DTF_SIZE_ALIASES[size] || size;
         var v = addons ? addons[normalized] : undefined;
         if (v !== undefined && v !== null) return Number(v);
         if (DTF_ZERO_UPCHARGE_SIZES.indexOf(normalized) !== -1) return 0;
+        // Combined / range size NAMES (vests + jackets price as S/M, L/XL, 2/3X, 4/5X) aren't in the
+        // standard S–6XL upcharge map. If the garment's OWN size price equals the base cost, it's a
+        // BASE size → 0 upcharge (lets these products price at standard sizes). We do NOT invent a
+        // positive upcharge from the price delta — that would under-charge vs the real selling
+        // upcharge — so EXTENDED combined sizes (price > base) still error (Erik's #1 rule).
+        if (Array.isArray(blankSizes) && Number.isFinite(baseCost)) {
+            var row = blankSizes.find(function (bs) { return bs && bs.size === size; });
+            if (row && Number.isFinite(Number(row.price)) && Math.abs(Number(row.price) - baseCost) < 0.005) return 0;
+        }
         // Missing API upcharge for an extended size = visible error, never the
         // builder's hardcoded {2XL:$2...} fallback (Erik's #1 rule).
         throw QuoteCartError('No size-upcharge data for ' + size + ' — cannot price it.', 'PRICE_UNAVAILABLE');
@@ -831,7 +840,7 @@
                 var size = sizeNames[s];
                 var qty = Number(sizes[size]);
                 if (!(qty > 0)) continue;
-                var upcharge = dtfSizeUpcharge(size, addons);
+                var upcharge = dtfSizeUpcharge(size, addons, blankSizes, baseCost);
                 // Upcharge AFTER margin, half-dollar ceil as the FINAL step —
                 // identical to dtf-quote-builder.js:1776-1778 / 1961-1964.
                 var unit = upcharge > 0
