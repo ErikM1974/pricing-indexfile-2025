@@ -13,7 +13,7 @@
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
     <!-- Dashboard Styles -->
-    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.25.3">
+    <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.06.25.4">
 </head>
 <body>
     <!-- Header -->
@@ -622,6 +622,20 @@
             return wo || null;
         }
 
+        // ShopWorks order-number cross-check on the row (Erik 2026-06-25). Once an
+        // order is imported into ShopWorks it has a WO/order number (== ShopWorks
+        // order #, e.g. WO #142292), which the quote-detail page shows. Surface that
+        // same number on the LIST row, under the Quote ID, so staff can confirm an
+        // order landed in ShopWorks without drilling in. Status-independent: the
+        // "In ShopWorks #NNNNN" status badge only renders for Processed rows, so an
+        // Accepted/Open quote that's already in ShopWorks (e.g. a DTG storefront
+        // order) would otherwise never show its #. Hidden until a number exists.
+        function renderShopWorksRef(quote) {
+            const wo = getWoId(quote);
+            if (!wo) return '';
+            return `<div class="sw-ref" title="In ShopWorks — order #${wo}"><i class="fas fa-check-circle"></i> SW #${wo}</div>`;
+        }
+
         // One-line inbound indicator. Reads inboundStatusMap (populated async by
         // fetchInboundStatuses); never triggers its own SanMar call.
         function renderInboundIndicator(quote) {
@@ -1101,7 +1115,10 @@
                                    ${userCanDelete ? '' : 'disabled title="You can only delete your own quotes"'}
                                    onchange="updateCheckboxSelection()">
                         </td>
-                        <td><span class="quote-id">${quote.QuoteID || '-'}</span></td>
+                        <td>
+                            <span class="quote-id">${quote.QuoteID || '-'}</span>
+                            ${renderShopWorksRef(quote)}
+                        </td>
                         <td>
                             <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
                             <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>

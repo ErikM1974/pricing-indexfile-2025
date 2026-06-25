@@ -485,6 +485,24 @@ body {
     color: var(--pnw-forest, #2e4a62);
 }
 
+/* ShopWorks order-# cross-check, under the Quote ID (Erik 2026-06-25).
+   Confirms at a glance that the order landed in ShopWorks — mirrors the
+   green "ShopWorks ✓ #NNNNN" badge on the quote-detail page. Shown on any
+   row that has a WO#, regardless of status (an Accepted order can already
+   be in ShopWorks). */
+.sw-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #166534;
+    white-space: nowrap;
+}
+.sw-ref i { font-size: 10px; }
+.quote-row--cancelled .sw-ref { color: #9ca3af; }
+
 .customer-name {
     font-weight: 500;
 }

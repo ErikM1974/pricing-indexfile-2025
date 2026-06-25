@@ -105,7 +105,27 @@ Subtotal: $150.00
 Rep: confirm destination + apply correct WA rate before invoicing
 ```
 
-**Future option:** If the manual-application step becomes a bottleneck, ask Bradley if ManageOrders supports per-order tax part override. If supported, we can send the matched Caspio account directly and remove the human-in-loop step. Until then, the manual workflow is the right answer.
+**Future option:** If the manual-application step becomes a bottleneck, ask Bradley if ManageOrders supports per-order tax part override. **[2026-06-07 UPDATE: tested end-to-end — it does NOT. See the EMB section below.]**
+
+---
+
+## EMB/SCP/DTF push tax — UPDATE (2026-06-07): connection blanked, OnSite STILL drops the pushed tax field → MANUAL + accounting note
+
+Erik **blanked** the OnSite "Manage Orders" connection's **Tax Line Item + Tax Account** (Sales Tax Settings) to let our pushed per-destination tax part win. The proxy EMB transformer now derives + sends `TaxPartNumber: "Tax_<rate>"` + `coa_AccountSalesTax01: <acct>` per destination (`getTaxAccount` in `manageorders-emb-config.js`).
+
+**PROVEN it does NOT work (EMB-2026-298, order 142061):** we sent `TaxPartNumber: "Tax_9.6"` / `coa_AccountSalesTax01: "2200.96"`, but the MO→OnSite **conversion blanks them** (`TaxPartNumber: ""`, no account). OnSite always overwrites the order-level tax field with the connection's (now-blank) "Tax Line Item" — the pushed value is ignored. The OnSite "Tax Account" tooltip confirms: *"The Tax Line Item must be present on the order for this to work"* — and only the connection field (not our push) sets it. There is **no "Split Tax Line" toggle** in NWCA's OnSite version. **Order-level tax fields do NOT survive the conversion; LINE ITEMS do** (the Size→S service lines passed through untouched — so a tax LINE item is the only automation path, not the order field).
+
+**The working answer = MANUAL (verified on order 142061):** the rep selects the right account from the ShopWorks invoice **Tax dropdown** (e.g. `2200.96 — 9.6%`) → ShopWorks computes Sales Tax `$253.48` → total matches the note. `TaxTotal` stays `0`.
+
+**Two note guardrails (both pushed):**
+1. **Notes On Order** (`buildSalesTaxNote`) — tells the rep which rate/account to pick. NOW folds shipping into the total: `Subtotal → Shipping → Taxable: $X (subtotal + shipping) → Tax → Total with Tax`. Wholesale/out-of-state branches included. (Was previously showing `subtotal + tax` only — dropped shipping; fixed 2026-06-07.)
+2. **Notes To Accounting** (`buildAccountingTaxNote`, NEW) — gives the accountant the rate/account/taxable/amount/total to verify after invoicing.
+
+**Account routing — `getTaxAccount(taxRate, shipState)` → `{accountCode, description, partNumber}`:**
+- WA ship → exact per-address rate `2200.<rate>` / `Tax_<rate>` · Milton pickup → `2200.101` (10.1%) / `Tax_10.1` · out-of-state → `2202` / no part · **wholesale** (per-order `Quote_Sessions.IsWholesale` Yes/No checkbox, default No in code) → `2203` / no part.
+- Whole-number accts are `2200.8 / 2200.9 / 2200.1` (NOT `.80/.90/.100`) — code mirrors the Caspio `sales_tax_accounts_2026` table (which now also has a `Tax_Part_Number` column). Push does NOT read the table live — uses the hardcoded `TAX_ACCOUNT_LOOKUP` mirror.
+
+**Per-address DOR cache fix (2026-06-07):** `/api/tax-rates/lookup`'s DOR cache was keyed by **ZIP only** → a precise address could be served a neighbor's approximate (ZIP-centroid, resultCode 5) rate. Now keyed by **full address**. Verified: Sumner full-address = 9.6% exact (resultCode 0); ZIP-only = 9.5% approx. Also: Caspio returns `Account_Number` as a NUMBER → normalized to string in `fetchTaxAccounts` (the `=== '2200'` default match was silently failing).
 
 ---
 

@@ -38,13 +38,18 @@ Guidance for Claude Code when working in this repository.
 
 ## Auto-Update Memory (Don't Ask, Just Do)
 
-Memory updates are part of completing the task — not a separate ask-permission step.
+Memory updates are part of completing the task — not a separate ask-permission step. Route each fact per the table below, then notify Erik in one sentence (e.g. "Updated LESSONS_LEARNED.md and MEMORY.md"). **Full architecture, routing & budgets → [memory/MEMORY_SYSTEM.md](memory/MEMORY_SYSTEM.md)** — read it when unsure where a fact goes or when memory feels bloated.
 
-- **Bug fixes** → append to LESSONS_LEARNED.md; update MEMORY.md only if the fix changes documented behavior.
-- **API / integration changes** (ManageOrders, Caspio, Stripe, ShopWorks) → update the relevant section/topic file.
-- **New features** → one-liner in MEMORY.md or full detail in topic file (>2 lines → topic file).
-- Notify Erik in one sentence: "Updated LESSONS_LEARNED.md and MEMORY.md."
-- Memory rules in detail: `~/.claude/projects/.../memory/MEMORY.md` (auto-loaded each session).
+### Where things go (one fact, one home — never restate a fact in a second file)
+
+| What you learned | Where |
+|---|---|
+| Never-break rule / always-true convention | **CLAUDE.md** Critical Patterns |
+| Bug + root cause + fix + prevention | **LESSONS_LEARNED.md** (< 300 lines; archive oldest resolved when > 250) |
+| One-line "shipped / decided / gotcha" | **MEMORY.md** index (< 24 KB; age old lines down) |
+| > 2 lines of feature/domain detail | **topic file** in `/memory` + add to `INDEX.md` + 1-line pointer in MEMORY.md |
+
+Procedures → a **skill** in `.claude/skills/`; integration fields (ManageOrders/Caspio) → the routing table in MEMORY_SYSTEM.md. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
 
 ## File-Lifecycle Automation
 
