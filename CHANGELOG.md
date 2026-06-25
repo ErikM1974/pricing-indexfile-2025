@@ -1,3 +1,9 @@
+## v2026.06.25.2 (2026.06.25)
+
+- @ Multi-mockup send: select & send up to 6 mockups from the Send Mockup modal
+- @ Docs: mark multi-mockup feature committed + Caspio columns confirmed
+- Deploy v2026.06.25.2: 12 files (ae-dashboard.html,art-hub-ruth.html,art-hub-steve.html,...)
+
 ## v2026.06.25.1 (2026.06.25)
 
 - Screen Print Quote Builder sleeves
