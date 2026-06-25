@@ -1,3 +1,8 @@
+## v2026.06.25.6 (2026.06.25)
+
+- @ AE Dashboard: surface mockup slots 4-6 + responsive 6-slot grid
+- Deploy v2026.06.25.6: 2 files (ae-dashboard.html,art-request-detail.html,...)
+
 ## v2026.06.25.5 (2026.06.25)
 
 - Deploy v2026.06.25.5: 1 files (QUICK_QUOTE_SCP_REDESIGN_2026-06.md)
