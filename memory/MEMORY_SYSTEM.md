@@ -1,0 +1,100 @@
+# Memory System — how NWCA remembers code, gotchas & decisions
+
+> **This is the single source of truth for HOW our project memory works** (not what's in it).
+> Read this when you're unsure where a new fact belongs, or when memory feels bloated/stale.
+> Maintained as part of the 2026-06-25 memory-system pass. Run `/memory-maintain` to keep it healthy.
+
+---
+
+## TL;DR — "I just learned something. Where does it go?"
+
+| What you learned | Where it goes | Why |
+|---|---|---|
+| A **never-break rule / convention** that's always true | **CLAUDE.md** (Critical Patterns / Top rules) | Loads every turn; it's law |
+| A **bug + root cause + fix + prevention** (could recur) | **LESSONS_LEARNED.md** (repo) | The bug log; Problem/Root Cause/Solution/Prevention shape |
+| A **one-line "shipped X" / decision / gotcha pointer** | **MEMORY.md** index (`~/.claude/.../memory`) | The auto-loaded session index |
+| **>2 lines of feature/domain detail** | a **topic file** in repo `/memory` + add a line to `INDEX.md` and a pointer in `MEMORY.md` | Detail loads on-demand, index stays small |
+| A **repeatable procedure** (how to deploy, scaffold, audit) | a **skill** in `.claude/skills/` | Body loads only when invoked |
+| A **ManageOrders / Caspio / integration field or endpoint** | the routing table below | Keeps one master per integration |
+| A **personal preference / feedback about how to work** | a `feedback_*` / `user_*` per-fact file in `~/.claude/.../memory` | Auto-memory's modern per-fact format |
+
+**Golden rule: one fact, one home.** If it already lives somewhere, update that — don't restate it in a second file. Restated facts drift and become wrong (the #1 way our memory rots).
+
+### Integration routing (the existing ManageOrders table, generalized)
+| Discovery | Destination |
+|---|---|
+| ManageOrders fields/endpoints/implementations | `MANAGEORDERS_COMPLETE_REFERENCE.md` (master) |
+| ManageOrders bugs/gotchas | `LESSONS_LEARNED.md` (Order Processing) |
+| ManageOrders CRM/Order-Entry | `MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md` |
+| 3-Day Tees Stripe→ShopWorks flow | `3-day-tees/ORDER_PUSH_FLOW.md` |
+| Caspio API behavior/gotcha | `caspio-schema.md` / `CASPIO_API_CORE.md` (+ LESSONS if a bug) |
+| Pricing decision / parity baseline change | the method's `*-pricing` topic file + re-run the parity tests |
+| SanMar read API | `SANMAR_API_REFERENCE.md` · SanMar PO (write) | `sanmar-po/README.md` |
+
+---
+
+## The 5 memory surfaces (tiered by WHEN they load)
+
+| # | Surface | Location | Loads | Holds | Budget |
+|---|---|---|---|---|---|
+| 1 | **CLAUDE.md** | repo root | **every turn** | Never-break rules, conventions, where-things-go | **< 200 lines** |
+| 2 | **MEMORY.md** (index) | `~/.claude/projects/<proj>/memory/` | **every session** (first ~200 lines / 24 KB only) | One-liner index: open actions, recently-shipped (ages down), durable rules, topic-file pointers | **< 24 KB** |
+| 3 | **Topic files** | repo `/memory` (durable) · `~/.claude` (volatile) | **on-demand** (Read) | Deep per-domain/feature detail | keep each focused |
+| 4 | **LESSONS_LEARNED.md** (+ `_ARCHIVE`) | repo `/memory` | **on-demand** | Recurring bugs & gotchas (Problem/Root Cause/Solution/Prevention) | **< 300 lines, target < 250**; archive oldest resolved when over 250 |
+| 5 | **Skills** | `.claude/skills/<name>/SKILL.md` | description always; body on invoke | Repeatable procedures (`deploy`, `dash-page`, `memory-maintain`) | < 500 lines/skill |
+
+**Anything that exceeds its budget overflows DOWN a tier** (CLAUDE.md rule → topic file; MEMORY.md paragraph → topic file + one-line pointer). Budgets are not suggestions: MEMORY.md silently truncates past ~24 KB (bottom entries stop loading), and CLAUDE.md adherence drops past ~200 lines.
+
+---
+
+## Two trees — which copy is canonical
+
+We have **two** memory directories. Know the difference:
+
+- **`~/.claude/projects/<proj>/memory/`** — Claude's **auto-memory**. Machine-local, **NOT in git**, and on this OneDrive checkout it can be **silently reverted** mid-session. Holds the `MEMORY.md` index + modern per-fact files (`user_`/`feedback_`/`project_`/`reference_`) + a few topic files. **Treat as volatile.**
+- **repo `/memory/`** — git-tracked, shared across machines, survives. The durable references, guides, `LESSONS_LEARNED`, and session docs. **This is the canonical store.**
+
+**Rules:**
+1. Anything that must survive a machine change or be shared → put it in the **repo tree** (or commit it there).
+2. When a topic exists in **both** trees, the **repo copy is canonical**; the auto-memory keeps only a **one-line pointer**, never a second full copy. (Two divergent copies of a pricing/tax fact is a wrong-price risk — Erik's #1 rule.)
+3. After editing any repo memory file, **`git commit` immediately** — committed objects survive the OneDrive revert; working-tree edits may not.
+
+---
+
+## Code: store pointers, not bodies
+
+- **Never paste code bodies into memory** — they rot the moment the file changes. Store `file:line + one-sentence WHY + the gotcha`.
+  - Good: `screenprint-pricing-service.js priceScpGroup() — sleeves price as additional locations (== back); legacy sleeveCount:0 must stay byte-identical (Rule 9 parity).`
+  - Bad: pasting the function.
+- **Find fresh code with Grep/Glob/Explore**, not memory recall. Memory answers **WHY** (decision, risk, gotcha) and **WHERE** (file:line); the code itself answers HOW and is always re-fetched.
+- Keep a tiny **critical-files map** (the 3–5 single-source files: the pricing engine, the invoice generator, the push transformers) so a new session knows the load-bearing seams without grepping blind.
+
+---
+
+## Size budgets & aging-down
+
+The index has **fixed capacity** — it does not grow with the project; the project's knowledge grows in **topic files**. As new work ships, **age old index entries down**:
+
+`full one-liner` → `terse pointer in "Earlier Milestones"` → `dropped from the index` (detail stays in its topic file forever).
+
+Durable **rules/gotchas** graduate the other way: when a shipped item proves a lasting invariant, lift it OUT of "recently shipped" into CLAUDE.md (Critical Patterns) or a permanent reference — those are the only things that live in the index forever.
+
+---
+
+## Maintenance — keeping it current
+
+- **Every substantive session** updates memory per the decision tree above — it's part of finishing the task, not a separate ask (CLAUDE.md "Auto-Update Memory").
+- **Run `/memory-maintain`** when MEMORY.md > ~22 KB, LESSONS_LEARNED > 250 lines, or roughly monthly. It compacts the index, archives resolved lessons, de-dupes across the two trees, and regenerates `INDEX.md`.
+- **OneDrive:** commit memory edits immediately; re-Read/grep on disk after editing — never trust the edit-success message alone (this checkout reverts silently).
+- **Naming a new repo topic file:** `SCREAMING_SNAKE_YYYY-MM.md` for dated session/audit docs, `kebab-case.md` for durable references. **Always add a line to `INDEX.md`** when you create one.
+
+---
+
+## Known cleanup backlog (work the next `/memory-maintain` passes do)
+
+- [ ] **`wa-sales-tax-rules.md` exists in BOTH trees and the copies have DIVERGED** (140 vs 120 lines) — reconcile to one canonical (repo) copy; a tax-rule fork is a wrong-price risk. *(highest priority)*
+- [ ] **`INDEX.md` is stale** (stamped 2026-02-27): 2 orphan links, ~75 newer files missing. Regenerate from `git ls-files memory`.
+- [ ] **Archive ~30 one-time session/audit/pickup docs** in repo `/memory` (the `EMB_*` 8-file cluster, `NEXT_SESSION_PICKUP_*`, dated `*_AUDIT_*`/`*_FINDINGS` whose fixes shipped) into a `/memory/archive/` subfolder.
+- [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`.
+- [ ] **Graduate ~6 foundational LESSONS rules** (falsy-zero, Caspio pagination, pricing-from-API, parity disciplines) into CLAUDE.md Critical Patterns so the bug log drops under its 250 target.
+- [ ] **Consider `.claude/rules/*.md`** (path-scoped lazy-loaded rules with `paths:` frontmatter) for domain rules that only matter when editing certain files (e.g. quote-builder rules) — keeps CLAUDE.md lean.
