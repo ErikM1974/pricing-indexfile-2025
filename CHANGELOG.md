@@ -1,3 +1,7 @@
+## v2026.06.25.1 (2026.06.25)
+
+- Screen Print Quote Builder sleeves
+
 ## v2026.06.24.18 (2026.06.24)
 
 - Docs: record SCP-sleeve additional-location feature (v2026.06.24.17)
