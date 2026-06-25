@@ -104,8 +104,8 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 ## Known cleanup backlog (work the next `/memory-maintain` passes do)
 
 - [x] **`wa-sales-tax-rules.md`** — DONE 2026-06-25: promoted the newer superset (with the 2026-06-07 EMB tax findings) into the canonical repo copy; machine-local copy reduced to a pointer.
-- [ ] **`INDEX.md` is stale** (stamped 2026-02-27): 2 orphan links, ~75 newer files missing. Regenerate from `git ls-files memory`.
-- [ ] **Archive ~30 one-time session/audit/pickup docs** in repo `/memory` (the `EMB_*` 8-file cluster, `NEXT_SESSION_PICKUP_*`, dated `*_AUDIT_*`/`*_FINDINGS` whose fixes shipped) into a `/memory/archive/` subfolder.
+- [x] **`INDEX.md`** — DONE 2026-06-25: regenerated from `git ls-files memory` (108/108 files categorized, 0 uncategorized). The 2 "orphan links" the audit flagged actually exist on disk (untracked), so they were NOT removed. Now regenerable via `/memory-maintain`.
+- [x] **Archive one-time docs** — DONE 2026-06-25: moved 15 zero-reference historical docs (NEXT_SESSION_PICKUP_*, OVERNIGHT/PHASE_3, EMB_* pickups, 2026-01 audits, superseded plan) to `/memory/archive/`. 3 still-referenced (EMB_FINAL_VERDICT, EMB_TO100, QUOTE_BUILDER_UNIFICATION_PLAN) left in place; ~10 still-pointed-to audit docs bucketed under "historical" in INDEX rather than moved.
 - [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`.
 - [ ] **Graduate ~6 foundational LESSONS rules** (falsy-zero, Caspio pagination, pricing-from-API, parity disciplines) into CLAUDE.md Critical Patterns so the bug log drops under its 250 target.
 - [ ] **Consider `.claude/rules/*.md`** (path-scoped lazy-loaded rules with `paths:` frontmatter) for domain rules that only matter when editing certain files (e.g. quote-builder rules) — keeps CLAUDE.md lean.
