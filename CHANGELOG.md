@@ -1,3 +1,7 @@
+## v2026.06.25.5 (2026.06.25)
+
+- Deploy v2026.06.25.5: 1 files (QUICK_QUOTE_SCP_REDESIGN_2026-06.md)
+
 ## v2026.06.25.4 (2026.06.25)
 
 - Memory: archive 7 oldest resolved one-time fixes from LESSONS_LEARNED
