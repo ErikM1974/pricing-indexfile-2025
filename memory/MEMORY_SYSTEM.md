@@ -103,7 +103,7 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 
 ## Known cleanup backlog (work the next `/memory-maintain` passes do)
 
-- [ ] **`wa-sales-tax-rules.md` exists in BOTH trees and the copies have DIVERGED** (140 vs 120 lines) — reconcile to one canonical (repo) copy; a tax-rule fork is a wrong-price risk. *(highest priority)*
+- [x] **`wa-sales-tax-rules.md`** — DONE 2026-06-25: promoted the newer superset (with the 2026-06-07 EMB tax findings) into the canonical repo copy; machine-local copy reduced to a pointer.
 - [ ] **`INDEX.md` is stale** (stamped 2026-02-27): 2 orphan links, ~75 newer files missing. Regenerate from `git ls-files memory`.
 - [ ] **Archive ~30 one-time session/audit/pickup docs** in repo `/memory` (the `EMB_*` 8-file cluster, `NEXT_SESSION_PICKUP_*`, dated `*_AUDIT_*`/`*_FINDINGS` whose fixes shipped) into a `/memory/archive/` subfolder.
 - [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`.
