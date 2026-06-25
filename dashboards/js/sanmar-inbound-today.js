@@ -141,6 +141,19 @@
       : `<div class="sit-logo sit-logo--off" title="No ShopWorks artwork on file for this design">🎨</div>`;
   }
 
+  // UPS live-arrival chip — UPS's REAL delivery date when known (else nothing; the view's day is our
+  // business-day estimate). Rescheduled stands out in amber so a slipped arrival is obvious.
+  function upsChip(o) {
+    const u = o.upsDelivery;
+    if (!u || !u.date) return '';
+    const cfg = {
+      delivered: ['✅', 'UPS delivered', 'sit-ups--ok'],
+      scheduled: ['🚚', 'UPS arriving', 'sit-ups--ok'],
+      rescheduled: ['⚠️', 'UPS rescheduled →', 'sit-ups--resched'],
+    }[u.type] || ['🚚', 'UPS arriving', 'sit-ups--ok'];
+    return `<span class="sit-ups ${cfg[2]}" title="${esc(u.status || '')} — live delivery date from UPS">${cfg[0]} ${cfg[1]} ${esc(fmtShortDate(u.date))}</span>`;
+  }
+
   // ── One PO card (screen) ──
   function poCard(o) {
     const wo = o.workOrder ? `#${esc(o.workOrder)}` : '<span class="sit-na">no WO</span>';
@@ -171,6 +184,7 @@
             ${f('Ordered', fmtShortDate(o.dateOrdered))}
           </div>
           <div class="sit-card-meta">
+            ${upsChip(o)}
             <span class="sit-f"><span class="sit-fl">SanMar PO</span> <b>${esc(o.sanmarPO)}</b></span>
             <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>
             <span>🧵 ${fmtNum(o.piecesShipped)} pcs${o.piecesOrdered !== o.piecesShipped ? ` <span class="sit-muted">/ ${fmtNum(o.piecesOrdered)} ord</span>` : ''}</span>
@@ -234,7 +248,7 @@
           ${psLogo}
           <div class="sit-ps-po-htxt">
             <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}</span></div>
+              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
             ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
           </div>
         </div>
