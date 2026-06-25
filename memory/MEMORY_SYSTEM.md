@@ -90,22 +90,24 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 
 ---
 
-## 🔄 Resume here — memory-system redesign status (paused 2026-06-25)
+## ✅ Memory-system redesign — status (2026-06-25, substantially DONE)
 
-**Phase 1 DONE + committed** (`develop`, commits `8c06b638` archive · `42986c9d` system · `74d337fb`+`d1aa37c5` CLAUDE.md trim):
+**Phase 1 — foundation** (`develop`: `8c06b638` archive · `42986c9d` system · `74d337fb`+`d1aa37c5` CLAUDE.md trim):
 - `MEMORY.md` index compacted 47 KB → 24.4 KB (fully loads again; aging-down rule baked in).
-- `LESSONS_LEARNED.md` archived 300 → 271 lines (7 oldest resolved fixes → `_ARCHIVE.md`, keep-alive stubs left).
+- `LESSONS_LEARNED.md` archived 300 → 272 lines (7 oldest resolved fixes → `_ARCHIVE.md`, keep-alive stubs).
 - This `MEMORY_SYSTEM.md` + `CLAUDE.md` "Where things go" routing + the `/memory-maintain` skill created. CLAUDE.md back under 200 lines.
 
-**Open question for Erik (answer to resume):** run the deeper cleanup (the backlog below) now in one pass, or leave it to the spawned chip + future `/memory-maintain` runs?
+**Phase 2 — cleanup** (`develop`: `9a6f15f9` wa-sales-tax · `c2da4af5` INDEX+archive):
+- `wa-sales-tax-rules.md` reconciled to one canonical (repo) copy; machine-local copy stubbed.
+- `INDEX.md` regenerated from `git ls-files` (108/108 categorized); 15 zero-reference historical docs moved to `memory/archive/`.
 
-**Next when we resume:** (1) the `wa-sales-tax` reconcile — a chip was spawned (`task_845aae16`); (2) then work the backlog below, ideally by invoking `/memory-maintain`. Non-memory to-dos (decoration pricing decision, caps go-live checks, EmailJS bugs, test-data cleanup) live in the `MEMORY.md` "⏳ Open Actions" block.
+**Remaining = optional only** (see backlog below — all DEFERRED with rationale: frontmatter unify, LESSONS-to-250, `.claude/rules/`). Nothing blocking. Non-memory to-dos live in the `MEMORY.md` "⏳ Open Actions" block.
 
 ## Known cleanup backlog (work the next `/memory-maintain` passes do)
 
 - [x] **`wa-sales-tax-rules.md`** — DONE 2026-06-25: promoted the newer superset (with the 2026-06-07 EMB tax findings) into the canonical repo copy; machine-local copy reduced to a pointer.
 - [x] **`INDEX.md`** — DONE 2026-06-25: regenerated from `git ls-files memory` (108/108 files categorized, 0 uncategorized). The 2 "orphan links" the audit flagged actually exist on disk (untracked), so they were NOT removed. Now regenerable via `/memory-maintain`.
 - [x] **Archive one-time docs** — DONE 2026-06-25: moved 15 zero-reference historical docs (NEXT_SESSION_PICKUP_*, OVERNIGHT/PHASE_3, EMB_* pickups, 2026-01 audits, superseded plan) to `/memory/archive/`. 3 still-referenced (EMB_FINAL_VERDICT, EMB_TO100, QUOTE_BUILDER_UNIFICATION_PLAN) left in place; ~10 still-pointed-to audit docs bucketed under "historical" in INDEX rather than moved.
-- [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`.
-- [ ] **Graduate ~6 foundational LESSONS rules** (falsy-zero, Caspio pagination, pricing-from-API, parity disciplines) into CLAUDE.md Critical Patterns so the bug log drops under its 250 target.
-- [ ] **Consider `.claude/rules/*.md`** (path-scoped lazy-loaded rules with `paths:` frontmatter) for domain rules that only matter when editing certain files (e.g. quote-builder rules) — keeps CLAUDE.md lean.
+- [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`. *(DEFERRED 2026-06-25 — low value (cosmetic) on machine-local files that can revert; do opportunistically when touching a file, not as a batch.)*
+- [ ] **Graduate ~6 foundational LESSONS rules** to get the bug log under its 250 target. *(DEFERRED 2026-06-25 — LESSONS is at 272, under the 300 cap with runway. The foundational rules (falsy-zero, Caspio pagination) belong IN the bug log where debuggers look; the <250 target is best reached by natural aging as new fixes land, not by gutting valuable full entries into pointers.)*
+- [ ] **Consider `.claude/rules/*.md`** (path-scoped lazy-loaded rules with `paths:` frontmatter) for domain rules that only matter when editing certain files (e.g. quote-builder rules) — keeps CLAUDE.md lean. *(Optional upgrade; needs Erik's buy-in before introducing a new mechanism.)*
