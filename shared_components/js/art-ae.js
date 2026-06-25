@@ -17,7 +17,7 @@ var ArtAeGallery = (function () {
 
     var DAYS_DEFAULT = 90;
     var DATE_CUTOFF = '2026-03-15';
-    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+    var SELECT_FIELDS = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Sales_Rep,User_Email,Due_Date,Date_Created,Approval_Sent_Date,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Full_Name_Contact,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,Mockup_4,Mockup_5,Mockup_6,Revision_Count,Art_Minutes,Prelim_Charges,Amount_Art_Billed,NOTES,Mockup,Is_On_Hold,On_Hold_Since,On_Hold_Note';
     // Legacy fallback for installs that don't have Item_Type / JDS_SKU /
     // Artwork_Status / Approval_Status / art-spec columns yet — strip them and
     // retry. NULL Item_Type → 'Garment' at render time (resolveItemType).
@@ -29,7 +29,12 @@ var ArtAeGallery = (function () {
         .replace(',Approval_Status', '')
         .replace(',Artwork_Locations', '')
         .replace(',Color_Mode', '')
-        .replace(',Exact_Text', '');
+        .replace(',Exact_Text', '')
+        // Mockup slots 4-6 are newer columns — strip them too so installs that
+        // predate them still 500-retry cleanly (Caspio 500s on unknown q.select).
+        .replace(',Mockup_4', '')
+        .replace(',Mockup_5', '')
+        .replace(',Mockup_6', '');
 
     function resolveItemType(raw) {
         if (raw === 'Sticker' || raw === 'Banner' || raw === 'JDS') return raw;
@@ -462,8 +467,10 @@ var ArtAeGallery = (function () {
         var actualArt = req.Amount_Art_Billed;
         var notes = req.NOTES || '';
 
-        // Thumbnail
-        var thumbUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup || '';
+        // Thumbnail — falls back through all 6 mockup slots (slots fill 1→6 in
+        // order, so slot 1 normally wins; 4/5/6 only resolve if lower slots empty).
+        var thumbUrl = req.Box_File_Mockup || req.BoxFileLink || req.Company_Mockup
+            || req.Mockup_4 || req.Mockup_5 || req.Mockup_6 || '';
         var thumbHtml = '';
         if (thumbUrl) {
             thumbHtml = '<div class="card-thumb">'
