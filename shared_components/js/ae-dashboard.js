@@ -536,7 +536,7 @@
 
         // Approval_Status is in the primary select only; if the column doesn't
         // exist yet (pre-migration) the request 500s and we retry without it.
-        var reviewBase = 'ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES';
+        var reviewBase = 'ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,Mockup_4,Mockup_5,Mockup_6,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES';
         var reviewTail = '&orderBy=Date_Created%20DESC&limit=50';
         var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + ',Approval_Status' + reviewTail;
         var urlFallback = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + reviewTail;
@@ -572,10 +572,13 @@
                     var notes = req.NOTES || '';
                     var approvalStatus = (req.Approval_Status || '').trim();
 
-                    // Mockup image fallback chain
+                    // Mockup image fallback chain — all 6 mockup slots, then File_Upload.
                     var mockupUrl = req.Box_File_Mockup || '';
                     if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.BoxFileLink || '';
                     if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Company_Mockup || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Mockup_4 || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Mockup_5 || '';
+                    if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Mockup_6 || '';
                     if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.File_Upload || '';
                     if (BARE_CDN_RE.test(mockupUrl)) mockupUrl = '';
 

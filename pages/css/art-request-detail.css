@@ -696,11 +696,18 @@ body {
     border-top: 1px solid #e9ecef;
 }
 
-/* Fixed 3-column grid for mockup slots */
+/* 3-column grid for the (up to 6) mockup slots — 6 items wrap to a clean 3×2. */
 .ard-mockups-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
+}
+/* On narrow screens drop to 2 columns so 6 slots stay legible (2×3) instead of
+   three cramped thumbs per row. */
+@media (max-width: 480px) {
+    .ard-mockups-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Empty slot placeholder */
