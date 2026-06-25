@@ -60,8 +60,11 @@ let printConfig = {
     frontColors: 1,           // 1-6
     backLocation: '',         // '', FB, JB
     backColors: 1,            // 1-6
-    isDarkGarment: false,     // Adds white underbase (+1 screen per location)
-    isSafetyStripes: false,   // Adds $2/piece/location
+    leftSleeveColors: 0,      // 0 = off, else 1-6 — each sleeve is its OWN additional print location
+    rightSleeveColors: 0,     // 0 = off, else 1-6 (may differ from the left)
+    sleeveColorsList: [],     // engine-canonical [left?, right?] derived in updatePrintConfig
+    isDarkGarment: false,     // Adds white underbase (+1 screen per location, INCLUDING each sleeve)
+    isSafetyStripes: false,   // Adds $2/piece/location (front/back only — sleeves get no hi-vis stripe)
     totalScreens: 1,          // Calculated
     setupFee: 30.00           // Calculated: screens × $30
 };
@@ -92,6 +95,18 @@ function updatePrintConfig() {
     printConfig.isDarkGarment = document.getElementById('dark-garment-toggle').checked;
     printConfig.isSafetyStripes = document.getElementById('safety-stripes-toggle').checked;
 
+    // Sleeves — each checked sleeve is its OWN additional print location at its own ink-color count
+    const leftSleeveOn = document.getElementById('left-sleeve-toggle')?.checked;
+    const rightSleeveOn = document.getElementById('right-sleeve-toggle')?.checked;
+    const leftSleeveColorsRadio = document.querySelector('input[name="left-sleeve-colors"]:checked');
+    const rightSleeveColorsRadio = document.querySelector('input[name="right-sleeve-colors"]:checked');
+    printConfig.leftSleeveColors = leftSleeveOn ? (leftSleeveColorsRadio ? parseInt(leftSleeveColorsRadio.value) : 1) : 0;
+    printConfig.rightSleeveColors = rightSleeveOn ? (rightSleeveColorsRadio ? parseInt(rightSleeveColorsRadio.value) : 1) : 0;
+    // engine-canonical list: one entry per checked sleeve (left, right). Pricing is order-independent.
+    printConfig.sleeveColorsList = [];
+    if (printConfig.leftSleeveColors > 0) printConfig.sleeveColorsList.push(printConfig.leftSleeveColors);
+    if (printConfig.rightSleeveColors > 0) printConfig.sleeveColorsList.push(printConfig.rightSleeveColors);
+
     // Show/hide back colors section
     const backColorsSection = document.getElementById('back-colors-section');
     const backIcon = document.getElementById('back-icon');
@@ -105,19 +120,36 @@ function updatePrintConfig() {
         backIcon.style.color = '#888';
     }
 
-    // Calculate screens
+    // Show/hide each sleeve's ink-color section; tint the sleeve card icon when any sleeve is on
+    const leftSleeveSection = document.getElementById('left-sleeve-colors-section');
+    const rightSleeveSection = document.getElementById('right-sleeve-colors-section');
+    if (leftSleeveSection) leftSleeveSection.style.display = leftSleeveOn ? 'block' : 'none';
+    if (rightSleeveSection) rightSleeveSection.style.display = rightSleeveOn ? 'block' : 'none';
+    const sleeveIcon = document.getElementById('sleeve-icon');
+    if (sleeveIcon) {
+        const anySleeve = printConfig.sleeveColorsList.length > 0;
+        sleeveIcon.className = anySleeve ? 'fas fa-check-circle' : 'fas fa-plus-circle';
+        sleeveIcon.style.color = anySleeve ? '#28a745' : '#888';
+    }
+
+    // Calculate screens — front + back + EACH sleeve's colors; dark garments add +1 white-underbase
+    // screen PER printed location (front, back, and each sleeve). Mirrors engine quote-cart-engine.js.
     let frontScreens = printConfig.frontColors;
     let backScreens = printConfig.backLocation ? printConfig.backColors : 0;
+    let leftSleeveScreens = printConfig.leftSleeveColors > 0 ? printConfig.leftSleeveColors : 0;
+    let rightSleeveScreens = printConfig.rightSleeveColors > 0 ? printConfig.rightSleeveColors : 0;
 
-    // Add underbase for dark garments
+    // Add underbase for dark garments — one extra screen per printed location (incl. each sleeve)
     if (printConfig.isDarkGarment) {
         frontScreens += 1;
         if (printConfig.backLocation) {
             backScreens += 1;
         }
+        if (printConfig.leftSleeveColors > 0) leftSleeveScreens += 1;
+        if (printConfig.rightSleeveColors > 0) rightSleeveScreens += 1;
     }
 
-    printConfig.totalScreens = frontScreens + backScreens;
+    printConfig.totalScreens = frontScreens + backScreens + leftSleeveScreens + rightSleeveScreens;
     // Per-screen setup fee from Caspio Service_Codes 'SPSU' (fallback SCREEN_FEE). (Pricing=API)
     // Use the SAME perScreen value in the breakdown strings so a Caspio SPSU change can't make
     // the displayed "× $X" math disagree with the charged total. (2026-06-20 audit SCP-4)
@@ -141,6 +173,20 @@ function updatePrintConfig() {
         } else {
             backSetupEl.textContent = `${backScreens} screen${backScreens > 1 ? 's' : ''} × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
         }
+    }
+
+    // Update sleeve setup displays (if a sleeve is on)
+    if (printConfig.leftSleeveColors > 0) {
+        const lsEl = document.getElementById('left-sleeve-setup-display');
+        if (lsEl) lsEl.textContent = printConfig.isDarkGarment
+            ? `${printConfig.leftSleeveColors} + 1 underbase = ${leftSleeveScreens} screens × $${_ps} = $${(leftSleeveScreens * perScreen).toFixed(2)}`
+            : `${leftSleeveScreens} screen${leftSleeveScreens > 1 ? 's' : ''} × $${_ps} = $${(leftSleeveScreens * perScreen).toFixed(2)}`;
+    }
+    if (printConfig.rightSleeveColors > 0) {
+        const rsEl = document.getElementById('right-sleeve-setup-display');
+        if (rsEl) rsEl.textContent = printConfig.isDarkGarment
+            ? `${printConfig.rightSleeveColors} + 1 underbase = ${rightSleeveScreens} screens × $${_ps} = $${(rightSleeveScreens * perScreen).toFixed(2)}`
+            : `${rightSleeveScreens} screen${rightSleeveScreens > 1 ? 's' : ''} × $${_ps} = $${(rightSleeveScreens * perScreen).toFixed(2)}`;
     }
 
     // Update total setup fee display
@@ -281,6 +327,23 @@ function restoreScreenPrintDraft(draft) {
         if (draft.printConfig.backLocation) {
             const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${draft.printConfig.backColors}"]`);
             if (backColorsRadio) backColorsRadio.checked = true;
+        }
+
+        // Restore sleeves (toggle + per-sleeve colors). Radios don't re-check from data alone — without
+        // this an edit-reload silently drops sleeves and re-saves a cheaper quote (Rule 4).
+        const draftLeftSleeve = draft.printConfig.leftSleeveColors || 0;
+        const draftRightSleeve = draft.printConfig.rightSleeveColors || 0;
+        const leftSleeveToggleEl = document.getElementById('left-sleeve-toggle');
+        if (leftSleeveToggleEl) leftSleeveToggleEl.checked = draftLeftSleeve > 0;
+        if (draftLeftSleeve > 0) {
+            const lsRadio = document.querySelector(`input[name="left-sleeve-colors"][value="${draftLeftSleeve}"]`);
+            if (lsRadio) lsRadio.checked = true;
+        }
+        const rightSleeveToggleEl = document.getElementById('right-sleeve-toggle');
+        if (rightSleeveToggleEl) rightSleeveToggleEl.checked = draftRightSleeve > 0;
+        if (draftRightSleeve > 0) {
+            const rsRadio = document.querySelector(`input[name="right-sleeve-colors"][value="${draftRightSleeve}"]`);
+            if (rsRadio) rsRadio.checked = true;
         }
 
         // Restore dark garment toggle
@@ -491,6 +554,21 @@ function populatePrintConfigFromSession(session) {
         if (notes.backColors) {
             const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${notes.backColors}"]`);
             if (backColorsRadio) backColorsRadio.checked = true;
+        }
+
+        // Set sleeves (toggle + per-sleeve colors). Without this, edit-reload drops sleeves and
+        // re-saves a cheaper quote (Rule 4).
+        const noteLeftSleeve = notes.leftSleeveColors || 0;
+        const noteRightSleeve = notes.rightSleeveColors || 0;
+        if (noteLeftSleeve > 0) {
+            const lst = document.getElementById('left-sleeve-toggle'); if (lst) lst.checked = true;
+            const lsr = document.querySelector(`input[name="left-sleeve-colors"][value="${noteLeftSleeve}"]`);
+            if (lsr) lsr.checked = true;
+        }
+        if (noteRightSleeve > 0) {
+            const rst = document.getElementById('right-sleeve-toggle'); if (rst) rst.checked = true;
+            const rsr = document.querySelector(`input[name="right-sleeve-colors"][value="${noteRightSleeve}"]`);
+            if (rsr) rsr.checked = true;
         }
 
         // Set dark garment toggle
@@ -736,6 +814,9 @@ function resetQuote() {
         frontColors: 1,
         backLocation: '',
         backColors: 1,
+        leftSleeveColors: 0,
+        rightSleeveColors: 0,
+        sleeveColorsList: [],
         isDarkGarment: false,
         isSafetyStripes: false,
         totalScreens: 1,
@@ -759,6 +840,9 @@ function resetQuote() {
     if (frontColors1) frontColors1.checked = true;
     const backColors1 = document.querySelector('input[name="back-colors"][value="1"]');
     if (backColors1) backColors1.checked = true;
+    // Clear sleeves (toggles off + colors back to 1) so they don't bleed into the next quote
+    ['left-sleeve-toggle', 'right-sleeve-toggle'].forEach(id => { const t = document.getElementById(id); if (t) t.checked = false; });
+    ['left-sleeve-colors', 'right-sleeve-colors'].forEach(name => { const r = document.querySelector(`input[name="${name}"][value="1"]`); if (r) r.checked = true; });
     const darkGarmentToggle = document.getElementById('dark-garment-toggle');
     const safetyToggle = document.getElementById('safety-stripes-toggle');
     if (darkGarmentToggle) darkGarmentToggle.checked = false;
@@ -3154,6 +3238,29 @@ async function recalculatePricing() {
                 }
             }
 
+            // Sleeves — each checked sleeve is its OWN additional print location at its own color count,
+            // priced like the back (additionalLocationPricing[colors] at the POOLED qty), SUMMED, never
+            // re-rounded (pricePerPiece is already HalfDollarCeil'd in the service). Mirrors engine
+            // quote-cart-engine.js priceScpGroup so the builder matches the engine/Quick Quote to the cent.
+            let sleeveAddlPerPiece = 0;
+            let sleeveDropped = false;
+            for (const c of (printConfig.sleeveColorsList || [])) {
+                const sleevePricing = pricingData.additionalLocationPricing?.[String(c)];
+                if (!sleevePricing || !sleevePricing.tiers) {
+                    droppedProducts.push({ style, reason: `no add-location pricing for a ${c}-color sleeve` });
+                    sleeveDropped = true;
+                    break;
+                }
+                const sleeveTier = findPricingTier(sleevePricing.tiers, totalQty);
+                if (!sleeveTier || typeof sleeveTier.pricePerPiece !== 'number') {
+                    droppedProducts.push({ style, reason: `no add-location price tier (qty ${totalQty}) for a ${c}-color sleeve` });
+                    sleeveDropped = true;
+                    break;
+                }
+                sleeveAddlPerPiece += sleeveTier.pricePerPiece;
+            }
+            if (sleeveDropped) continue; // never silently price a sleeve at $0 (Rule 4)
+
             // Find parent row for this product
             const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
             if (!parentRow) continue;
@@ -3173,10 +3280,13 @@ async function recalculatePricing() {
                     sizePrice = tierData.prices?.['M'] || tierData.prices?.['L'] || 0;
                 }
 
-                // Add additional location price
+                // Add additional location price (back)
                 sizePrice += additionalPricePerPiece;
 
-                // Add safety stripes
+                // Add sleeve additional-location price(s) — left + right, each at its own color count
+                sizePrice += sleeveAddlPerPiece;
+
+                // Add safety stripes (front/back only — sleeves get no hi-vis stripe)
                 sizePrice += safetyStripesPerPiece;
 
                 // Display price: builtin mode adds LTM per-unit, separate mode shows base price
@@ -3323,6 +3433,19 @@ function updateRowBreakdownScreenPrint(rowId, product, tierData) {
         breakdownHtml += `
             <span class="breakdown-separator">+</span>
             <span class="breakdown-item">${backName} (${printConfig.backColors}-color)</span>
+        `;
+    }
+
+    if (printConfig.leftSleeveColors > 0) {
+        breakdownHtml += `
+            <span class="breakdown-separator">+</span>
+            <span class="breakdown-item">L Sleeve (${printConfig.leftSleeveColors}-color)</span>
+        `;
+    }
+    if (printConfig.rightSleeveColors > 0) {
+        breakdownHtml += `
+            <span class="breakdown-separator">+</span>
+            <span class="breakdown-item">R Sleeve (${printConfig.rightSleeveColors}-color)</span>
         `;
     }
 
@@ -3488,6 +3611,20 @@ function updateSidebarPrintConfig() {
         backRow.style.display = 'flex';
     } else {
         backRow.style.display = 'none';
+    }
+
+    // Sleeves (each its own color count)
+    const sleevesRow = document.getElementById('sidebar-sleeves-row');
+    if (sleevesRow) {
+        const sleeveBits = [];
+        if (printConfig.leftSleeveColors > 0) sleeveBits.push(`L ${printConfig.leftSleeveColors}-color`);
+        if (printConfig.rightSleeveColors > 0) sleeveBits.push(`R ${printConfig.rightSleeveColors}-color`);
+        if (sleeveBits.length) {
+            document.getElementById('sidebar-sleeves').textContent = sleeveBits.join(', ');
+            sleevesRow.style.display = 'flex';
+        } else {
+            sleevesRow.style.display = 'none';
+        }
     }
 
     // Total screens
@@ -3981,6 +4118,10 @@ function buildScreenprintPricingData(products) {
     // Build print config description for invoice
     const frontDesc = getLocationName(printConfig.frontLocation) + ` (${printConfig.frontColors}-color)`;
     const backDesc = printConfig.backLocation ? getLocationName(printConfig.backLocation) + ` (${printConfig.backColors}-color)` : null;
+    const sleeveParts = [];
+    if (printConfig.leftSleeveColors > 0) sleeveParts.push(`Left Sleeve (${printConfig.leftSleeveColors}-color)`);
+    if (printConfig.rightSleeveColors > 0) sleeveParts.push(`Right Sleeve (${printConfig.rightSleeveColors}-color)`);
+    const sleeveDesc = sleeveParts.length ? sleeveParts.join(', ') : null;
 
     // Calculate safety stripes total for display as separate line item
     const locationCount = printConfig.backLocation ? 2 : 1;
@@ -4037,6 +4178,7 @@ function buildScreenprintPricingData(products) {
         printConfig: {
             front: frontDesc,
             back: backDesc,
+            sleeves: sleeveDesc,
             isDarkGarment: printConfig.isDarkGarment,
             hasSafetyStripes: printConfig.isSafetyStripes,
             totalScreens: printConfig.totalScreens || 1
@@ -4174,6 +4316,10 @@ async function saveAndGetLink(opts = {}) {
             frontColors: printConfig.frontColors,
             backLocation: printConfig.backLocation,
             backColors: printConfig.backColors,
+            leftSleeveColors: printConfig.leftSleeveColors,
+            rightSleeveColors: printConfig.rightSleeveColors,
+            sleeveColorsList: printConfig.sleeveColorsList,
+            totalScreens: printConfig.totalScreens,
             isDarkGarment: printConfig.isDarkGarment,
             hasSafetyStripes: printConfig.isSafetyStripes,
             printSetup: {
@@ -4181,6 +4327,10 @@ async function saveAndGetLink(opts = {}) {
                 frontColors: printConfig.frontColors,
                 backLocation: printConfig.backLocation,
                 backColors: printConfig.backColors,
+                leftSleeveColors: printConfig.leftSleeveColors,
+                rightSleeveColors: printConfig.rightSleeveColors,
+                sleeveColorsList: printConfig.sleeveColorsList,
+                totalScreens: printConfig.totalScreens,
                 isDarkGarment: printConfig.isDarkGarment,
                 isSafetyStripes: printConfig.isSafetyStripes
             },

@@ -682,6 +682,15 @@ class EmbroideryInvoiceGenerator {
             `;
         }
 
+        // Sleeve locations with colors (if present — screen print only; other methods pass nothing)
+        if (printConfig.sleeves) {
+            specsHTML += `
+                <div style="font-size: 11px; color: #333; margin: 4px 0;">
+                    <strong>Sleeves:</strong> ${this.esc(printConfig.sleeves)}
+                </div>
+            `;
+        }
+
         // Dark garment indicator
         if (printConfig.isDarkGarment) {
             specsHTML += `

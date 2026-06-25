@@ -165,6 +165,47 @@
                             </div>
                         </div>
 
+                        <!-- Sleeve Locations with Ink Colors (Optional) — each sleeve prices as an additional print location -->
+                        <div class="location-group location-group-card" id="sleeve-location-group">
+                            <div class="section-label">
+                                <i class="fas fa-plus-circle" id="sleeve-icon" style="color: #666;"></i> SLEEVES <span style="font-weight: 400; color: #666;">(optional · each is an added location)</span>
+                            </div>
+                            <!-- Left Sleeve -->
+                            <label class="location-radio" style="margin-bottom: 6px;">
+                                <input type="checkbox" id="left-sleeve-toggle" onchange="updatePrintConfig()">
+                                <span>Left Sleeve</span>
+                            </label>
+                            <div id="left-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none; margin-bottom: 12px;">
+                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">LEFT SLEEVE INK COLORS</div>
+                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                </div>
+                                <div id="left-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                            </div>
+                            <!-- Right Sleeve -->
+                            <label class="location-radio" style="margin-bottom: 6px;">
+                                <input type="checkbox" id="right-sleeve-toggle" onchange="updatePrintConfig()">
+                                <span>Right Sleeve</span>
+                            </label>
+                            <div id="right-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none;">
+                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">RIGHT SLEEVE INK COLORS</div>
+                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                </div>
+                                <div id="right-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                            </div>
+                        </div>
+
                         <!-- Setup Fee Summary -->
                         <div class="location-summary" style="background: #e8f5e9; padding: 16px; border-radius: 8px; min-width: 180px; border: 1px solid #a5d6a7;">
                             <div style="font-size: 11px; color: #666; margin-bottom: 4px;">SETUP FEE</div>
@@ -533,6 +574,11 @@
                     <span class="value" id="sidebar-back">-</span>
                 </div>
 
+                <div class="pricing-row" id="sidebar-sleeves-row" style="display: none;">
+                    <span class="label">Sleeves:</span>
+                    <span class="value" id="sidebar-sleeves">-</span>
+                </div>
+
                 <div class="pricing-row">
                     <span class="label">Total Screens:</span>
                     <span class="value" id="sidebar-screens">1</span>
@@ -665,10 +711,10 @@
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.10.1"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.25.1"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.02.3"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.11.11"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.25.1"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -698,7 +744,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.20.7"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.25.1"></script>
 
 </body>
 </html>
