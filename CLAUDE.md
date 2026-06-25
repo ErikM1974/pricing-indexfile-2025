@@ -50,14 +50,12 @@ Memory updates are part of completing the task — not a separate ask-permission
 
 | What you learned | Where |
 |---|---|
-| Never-break rule / always-true convention | **CLAUDE.md** (Critical Patterns) |
+| Never-break rule / always-true convention | **CLAUDE.md** Critical Patterns |
 | Bug + root cause + fix + prevention | **LESSONS_LEARNED.md** (< 300 lines; archive oldest resolved when > 250) |
 | One-line "shipped / decided / gotcha" | **MEMORY.md** index (< 24 KB; age old lines down) |
 | > 2 lines of feature/domain detail | **topic file** in `/memory` + add to `INDEX.md` + 1-line pointer in MEMORY.md |
-| Repeatable procedure | **skill** in `.claude/skills/` |
-| ManageOrders/Caspio/integration field | the routing table in MEMORY_SYSTEM.md (keep one master per integration) |
 
-**Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch code with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory; when a topic is in both, the repo copy wins and auto-memory keeps a 1-line pointer. Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
+Procedures → a **skill** in `.claude/skills/`; integration fields (ManageOrders/Caspio) → the routing table in MEMORY_SYSTEM.md. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
 
 ## File-Lifecycle Automation
 
