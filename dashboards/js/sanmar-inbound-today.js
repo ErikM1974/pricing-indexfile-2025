@@ -36,6 +36,8 @@
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   function fmtNum(v) { return Math.round(Number(v) || 0).toLocaleString('en-US'); }
+  function fmtMoney(v) { return '$' + (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function fmtMoney0(v) { return '$' + Math.round(Number(v) || 0).toLocaleString('en-US'); }
   // Rep initials: "Taneisha Clark" → "TC", "Nika Lao" → "NL".
   function initials(name) {
     return String(name || '').trim().split(/\s+/).filter(Boolean).map(w => w[0].toUpperCase()).join('').slice(0, 3);
@@ -81,10 +83,11 @@
         <td class="sit-num">${fmtNum(l.qtyOrdered)}</td>
         <td class="sit-num">${fmtNum(l.qtyShipped)}</td>
         <td>${esc(l.status)}</td>
+        <td class="sit-num sit-cost-cell">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td>
       </tr>`;
     }).join('');
     return `<table class="sit-lines">
-      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Ord</th><th class="sit-num">Ship</th><th>Status</th></tr></thead>
+      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Ord</th><th class="sit-num">Ship</th><th>Status</th><th class="sit-num">Cost</th></tr></thead>
       <tbody>${rows}</tbody></table>`;
   }
 
@@ -99,10 +102,11 @@
         <td>${color}</td>
         <td>${esc(it.size)}</td>
         <td class="sit-num">${fmtNum(it.qty)}</td>
+        <td class="sit-num sit-cost-cell">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td>
       </tr>`;
     }).join('');
     return `<table class="sit-lines">
-      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Qty</th></tr></thead>
+      <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-num">Qty</th><th class="sit-num">Cost</th></tr></thead>
       <tbody>${rows}</tbody></table>`;
   }
 
@@ -112,7 +116,7 @@
       ? (b.trackingUrl ? `<a href="${esc(b.trackingUrl)}" target="_blank" rel="noopener">${esc(b.carrier || 'Track')} ${esc(b.trackingNumber)}</a>` : `${esc(b.carrier)} ${esc(b.trackingNumber)}`)
       : '<span class="sit-na">no tracking</span>';
     return `<div class="sit-box">
-      <div class="sit-box-head"><span class="sit-box-n">📦 Box ${fmtNum(b.boxNumber)}</span><span>🚚 ${track}</span><span class="sit-muted">${fmtNum(b.pieces)} pcs</span>
+      <div class="sit-box-head"><span class="sit-box-n">📦 Box ${fmtNum(b.boxNumber)}</span><span>🚚 ${track}</span><span class="sit-muted">${fmtNum(b.pieces)} pcs</span>${b.cost ? `<span class="sit-muted">${fmtMoney(b.cost)}</span>` : ''}
         <button class="sit-label-btn" data-po="${esc(po)}" data-box="${fmtNum(b.boxNumber)}" title="Print this box's receiving label (8.5×11 PDF)">🏷 Label</button></div>
       ${boxItemsTable(b.items)}
     </div>`;
@@ -170,6 +174,7 @@
             <span class="sit-f"><span class="sit-fl">SanMar PO</span> <b>${esc(o.sanmarPO)}</b></span>
             <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>
             <span>🧵 ${fmtNum(o.piecesShipped)} pcs${o.piecesOrdered !== o.piecesShipped ? ` <span class="sit-muted">/ ${fmtNum(o.piecesOrdered)} ord</span>` : ''}</span>
+            ${o.cost ? `<span class="sit-cost" title="Wholesale blank cost (what we paid SanMar)">💵 ${fmtMoney(o.cost)}</span>` : ''}
             ${o.shipDate ? `<span class="sit-muted">shipped ${esc(o.shipDate)}${o.fromState ? ' · ' + esc(o.fromState) : ''}</span>` : ''}
             ${track ? `<span>${track}</span>` : ''}
           </div>
@@ -190,8 +195,10 @@
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.workOrders)}</span><span class="sit-stat-lbl">work orders</span></div>
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.boxes)}</span><span class="sit-stat-lbl">boxes</span></div>
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.piecesShipped)}</span><span class="sit-stat-lbl">pieces arriving</span></div>
+        <div class="sit-stat sit-stat--cost"><span class="sit-stat-num">${fmtMoney0(t.cost)}</span><span class="sit-stat-lbl">blanks cost</span></div>
       </div>
       <div class="sit-cards">${data.orders.map(poCard).join('')}</div>
+      <p class="sit-costnote">💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival.</p>
       <p class="sit-note">${esc(data.note || '')}</p>`;
   }
 
@@ -203,14 +210,14 @@
     const poBlocks = (data.orders || []).map(o => {
       const body = (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
         ? o.boxDetail.map(b => `
-          <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs</div>
+          <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
           <table class="sit-ps-tbl">
-            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th></tr></thead>
-            <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td></tr>`).join('')}</tbody>
+            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th><th style="text-align:right">Cost</th></tr></thead>
+            <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td><td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td></tr>`).join('')}</tbody>
           </table>`).join('')
         : `<table class="sit-ps-tbl">
-            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th></tr></thead>
-            <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td></tr>`).join('')}</tbody>
+            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th><th style="text-align:right">Cost</th></tr></thead>
+            <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td><td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td></tr>`).join('')}</tbody>
           </table>`;
       const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
       const psFields = [
@@ -227,7 +234,7 @@
           ${psLogo}
           <div class="sit-ps-po-htxt">
             <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs</span></div>
+              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}</span></div>
             ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
           </div>
         </div>
@@ -241,8 +248,8 @@
       <div class="sit-ps-head">
         <div class="sit-ps-brand">Northwest Custom Apparel</div>
         <div class="sit-ps-title">Daily Inbound Report — SanMar Blanks</div>
-        <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces</div>
-        <div class="sit-ps-note">Arrival = SanMar ship date + ground-transit estimate to Milton, WA (no carrier ETA from SanMar).</div>
+        <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b></div>
+        <div class="sit-ps-note">Arrival = SanMar ship date + ground-transit estimate to Milton, WA (no carrier ETA from SanMar). Blank cost = SanMar wholesale (CASE_PRICE × qty).</div>
       </div>
       ${poBlocks || '<p>No shipments arriving this day.</p>'}`;
     document.body.appendChild(sheet);
@@ -430,7 +437,7 @@
       if (!resp.ok) return {};
       const j = await resp.json();
       const map = {};
-      (j.days || []).forEach(d => { map[d.date] = { orders: d.orders, boxes: d.boxes, pieces: d.pieces }; });
+      (j.days || []).forEach(d => { map[d.date] = { orders: d.orders, boxes: d.boxes, pieces: d.pieces, cost: d.cost || 0 }; });
       return map;
     } catch (e) { return {}; }
   }
@@ -444,17 +451,18 @@
       const iso = `${ym}-${String(day).padStart(2, '0')}`;
       const c = counts[iso];
       const cls = ['sit-cal-cell'];
-      let style = '', chip = '', title = '';
+      let style = '', chip = '', cost = '', title = '';
       if (c && (c.orders || c.pieces)) {
         const a = 0.14 + 0.74 * Math.min(1, (c.pieces || 0) / max);
         cls.push('sit-cal-has'); if (a > 0.5) cls.push('sit-cal-hot');
         style = `background:rgba(46,111,64,${a.toFixed(3)})`;
         chip = `<span class="sit-cal-chip">${fmtNum(c.orders)} PO</span>`;
-        title = `${fmtNum(c.orders)} POs · ${fmtNum(c.boxes)} boxes · ${fmtNum(c.pieces)} pcs`;
+        if (c.cost) cost = `<span class="sit-cal-cost">${fmtMoney0(c.cost)}</span>`;
+        title = `${fmtNum(c.orders)} POs · ${fmtNum(c.boxes)} boxes · ${fmtNum(c.pieces)} pcs · ${fmtMoney(c.cost)} blanks`;
       }
       if (iso === today) cls.push('sit-cal-today');
       if (iso === viewDate) cls.push('sit-cal-sel');
-      cells += `<div class="${cls.join(' ')}" ${c ? `data-caldate="${iso}"` : ''} style="${style}" title="${esc(title)}"><span class="sit-cal-dn">${day}</span>${chip}</div>`;
+      cells += `<div class="${cls.join(' ')}" ${c ? `data-caldate="${iso}"` : ''} style="${style}" title="${esc(title)}"><span class="sit-cal-dn">${day}</span>${cost}${chip}</div>`;
     }
     return `<div class="sit-cal">
       <div class="sit-cal-head">
@@ -467,7 +475,7 @@
         ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(w => `<div class="sit-cal-wd">${w}</div>`).join('')}
         ${cells}
       </div>
-      <div class="sit-cal-legend"><i class="fas fa-hand-pointer"></i> Click a day to view its inbound &amp; print box labels &nbsp;·&nbsp; shade = pieces arriving (darker = busier)</div>
+      <div class="sit-cal-legend"><i class="fas fa-hand-pointer"></i> Click a day to view its inbound &amp; print box labels &nbsp;·&nbsp; shade = pieces arriving (darker = busier) &nbsp;·&nbsp; $ = wholesale blank cost</div>
     </div>`;
   }
   async function showCalendar(ym) {
