@@ -871,6 +871,43 @@
         }
     }
 
+    // ── Multi-mockup send (up to 6) ───────────────────────────────────
+    // Steve can select several mockups at once and send them in one email.
+    // Selections live in a per-open Map on the modal element keyed by
+    // 'box:'+fileId or 'url:'+url, plus the manual paste field counts as 1.
+    var SEND_MOCKUP_CAP = 6;
+
+    function getSendSelection(modal) {
+        if (!modal._selectedMockups) modal._selectedMockups = new Map();
+        return modal._selectedMockups;
+    }
+
+    function pasteFieldHasValue() {
+        var el = document.getElementById('box-paste-url');
+        return !!(el && el.value && el.value.trim());
+    }
+
+    function getSelectedMockupCount(modal) {
+        return getSendSelection(modal).size + (pasteFieldHasValue() ? 1 : 0);
+    }
+
+    function updateSelectedMockupCount(modal) {
+        var n = getSelectedMockupCount(modal);
+        var countEl = document.getElementById('approval-selected-count');
+        if (countEl) countEl.textContent = n + ' of ' + SEND_MOCKUP_CAP + ' selected';
+        var btn = document.getElementById('approval-submit');
+        if (btn) btn.disabled = (n === 0);
+    }
+
+    // Visual nudge when a 7th selection is blocked.
+    function flashSelectionCap() {
+        var countEl = document.getElementById('approval-selected-count');
+        if (!countEl) return;
+        countEl.classList.remove('at-cap');
+        void countEl.offsetWidth; // restart the animation
+        countEl.classList.add('at-cap');
+    }
+
     /**
      * Send Mockup Modal (uses pre-existing #approval-modal HTML)
      * @param {string} designId
@@ -981,9 +1018,8 @@
         boxError.style.display = 'none';
         boxPasteFallback.style.display = 'none';
         if (boxPasteInput) boxPasteInput.value = '';
-        modal.dataset.selectedBoxFileId = '';
-        modal.dataset.selectedBoxFileUrl = '';
-        modal.dataset.existingMockupUrl = '';
+        // Multi-select: fresh selection set each time the modal opens.
+        modal._selectedMockups = new Map();
 
         (async function loadBoxFiles() {
             try {
@@ -1028,13 +1064,17 @@
                     if (boxCardImg) boxCardImg.addEventListener('error', function () { handleBoxImageError(boxCardImg); });
 
                     card.addEventListener('click', function () {
-                        boxGrid.querySelectorAll('.box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
-                        card.classList.add('selected');
-                        modal.dataset.selectedBoxFileId = file.id;
-                        modal.dataset.selectedBoxFileName = file.name;
-                        if (boxPasteInput) boxPasteInput.value = '';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Send Mockup';
+                        var sel = getSendSelection(modal);
+                        var selKey = 'box:' + file.id;
+                        if (card.classList.contains('selected')) {
+                            card.classList.remove('selected');
+                            sel.delete(selKey);
+                        } else {
+                            if (getSelectedMockupCount(modal) >= SEND_MOCKUP_CAP) { flashSelectionCap(); return; }
+                            card.classList.add('selected');
+                            sel.set(selKey, { kind: 'box', id: file.id, name: file.name, label: file.name, note: '' });
+                        }
+                        updateSelectedMockupCount(modal);
                     });
 
                     boxGrid.appendChild(card);
@@ -1058,9 +1098,12 @@
         var prevFileCount = 0;
 
         var prevFileFields = [
-            { key: 'Box_File_Mockup', label: 'Mockup', noteKey: 'Mockup_1_Note' },
+            { key: 'Box_File_Mockup', label: 'Mockup 1', noteKey: 'Mockup_1_Note' },
             { key: 'BoxFileLink', label: 'Mockup 2', noteKey: 'Mockup_2_Note' },
-            { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' }
+            { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' },
+            { key: 'Mockup_4', label: 'Mockup 4', noteKey: 'Mockup_4_Note' },
+            { key: 'Mockup_5', label: 'Mockup 5', noteKey: 'Mockup_5_Note' },
+            { key: 'Mockup_6', label: 'Mockup 6', noteKey: 'Mockup_6_Note' }
         ];
 
         if (artReqData) {
@@ -1086,15 +1129,17 @@
                 if (cardImg) cardImg.addEventListener('error', function () { handleBoxImageError(cardImg); });
 
                 fileCard.addEventListener('click', function () {
-                    // Deselect any Box file card
-                    boxGrid.querySelectorAll('.box-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
-                    modal.dataset.selectedBoxFileId = '';
-                    modal.dataset.selectedBoxFileName = '';
-                    // Deselect other prev cards, select this one
-                    filesGrid.querySelectorAll('.approval-file-card.selected').forEach(function (c) { c.classList.remove('selected'); });
-                    fileCard.classList.add('selected');
-                    // Fill paste URL with this mockup's URL
-                    if (boxPasteInput) boxPasteInput.value = fileCard.dataset.mockupUrl;
+                    var sel = getSendSelection(modal);
+                    var selKey = 'url:' + fileCard.dataset.mockupUrl;
+                    if (fileCard.classList.contains('selected')) {
+                        fileCard.classList.remove('selected');
+                        sel.delete(selKey);
+                    } else {
+                        if (getSelectedMockupCount(modal) >= SEND_MOCKUP_CAP) { flashSelectionCap(); return; }
+                        fileCard.classList.add('selected');
+                        sel.set(selKey, { kind: 'url', url: fileCard.dataset.mockupUrl, note: noteVal, label: field.label });
+                    }
+                    updateSelectedMockupCount(modal);
                 });
 
                 filesGrid.appendChild(fileCard);
@@ -1103,16 +1148,9 @@
 
         prevSection.style.display = prevFileCount > 0 ? 'block' : 'none';
 
-        // Auto-select the first previously sent mockup so Send works immediately
-        if (prevFileCount > 0) {
-            var firstCard = filesGrid.querySelector('.approval-file-card');
-            if (firstCard) {
-                firstCard.classList.add('selected');
-                if (boxPasteInput) boxPasteInput.value = firstCard.dataset.mockupUrl;
-                // Also store on modal for direct access
-                modal.dataset.existingMockupUrl = firstCard.dataset.mockupUrl;
-            }
-        }
+        // Multi-select: nothing is auto-selected. The counter starts at 0 and the
+        // Send button stays disabled until Steve picks at least one mockup.
+        updateSelectedMockupCount(modal);
 
         // Store data on modal for submit handler
         modal.dataset.designId = designId;
@@ -1144,53 +1182,108 @@
         try { artReqMeta = JSON.parse(modal.dataset.artReqJson || '{}'); } catch (e) { /* ignore */ }
         var revCount = artReqMeta.Revision_Count || 0;
 
-        var selectedBoxFileId = modal.dataset.selectedBoxFileId;
-        var pasteUrl = (document.getElementById('box-paste-url') || {}).value || '';
-        var existingMockupUrl = modal.dataset.existingMockupUrl || '';
-        var mockupUrls = [];
+        // ── Gather ALL selected mockups (up to 6) ─────────────────────
+        // Three additive sources: selected Box files, selected "Previously
+        // Sent" cards, and the manual paste field. submitSendForApproval used
+        // to read exactly one; now it collects every selection into mockupUrls[].
+        var selectionEntries = Array.from(getSendSelection(modal).values());
+        var pasteUrl = ((document.getElementById('box-paste-url') || {}).value || '').trim();
+        var totalSelected = selectionEntries.length + (pasteUrl ? 1 : 0);
 
-        // Validation: require at least one mockup file
-        if (!selectedBoxFileId && !pasteUrl.trim() && !existingMockupUrl.trim()) {
-            alert('Please select or upload at least one mockup before sending for approval.');
+        // Validation: require at least one mockup, cap at six.
+        if (totalSelected === 0) {
+            alert('Please select or paste at least one mockup before sending.');
+            return;
+        }
+        if (totalSelected > SEND_MOCKUP_CAP) {
+            alert('You can send at most ' + SEND_MOCKUP_CAP + ' mockups at once. Please deselect some.');
             return;
         }
 
-        if (selectedBoxFileId) {
-            submitBtn.textContent = 'Creating link...';
-            try {
-                var linkResp = await fetch(API_BASE + '/api/box/shared-link', {
+        var mockupUrls = [];
+        var mockupNotes = [];   // "label: note" lines for the email (escaped ONCE by the email layer)
+        var newBoxUrls = [];    // freshly-created Box links to persist back to Caspio
+
+        // Plain text only — sendNotificationEmail HTML-escapes each note line, so
+        // adding our own tags/escaping here would double-escape and show literally.
+        function pushNote(label, note) {
+            if (note && note.trim()) mockupNotes.push((label || 'Mockup') + ': ' + note.trim());
+        }
+
+        // 1) Previously Sent cards already carry resolved URLs + notes.
+        selectionEntries.filter(function (e) { return e.kind === 'url'; }).forEach(function (e) {
+            if (e.url) { mockupUrls.push(e.url); pushNote(e.label, e.note); }
+        });
+
+        // 2) Manual paste URL (no note).
+        if (pasteUrl) mockupUrls.push(pasteUrl);
+
+        // 3) Box files — one shared link per selected file, in parallel. Per
+        //    Erik's #1 rule, if ANY link fails we surface which file and send
+        //    NOTHING rather than a quietly-incomplete set.
+        var boxEntries = selectionEntries.filter(function (e) { return e.kind === 'box'; });
+        if (boxEntries.length > 0) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating links...';
+            var linkResults = await Promise.allSettled(boxEntries.map(function (e) {
+                return fetch(API_BASE + '/api/box/shared-link', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId: selectedBoxFileId })
-                });
-                if (!linkResp.ok) throw new Error('Shared link ' + linkResp.status);
-                var linkData = await linkResp.json();
-                mockupUrls = [linkData.downloadUrl || linkData.sharedLink];
-
-                var artReqPkId = artReqMeta.PK_ID;
-                if (artReqPkId && mockupUrls[0]) {
-                    fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup-url', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ pkId: artReqPkId, url: mockupUrls[0] })
-                    }).catch(function () { /* fire-and-forget */ });
+                    body: JSON.stringify({ fileId: e.id })
+                }).then(function (r) {
+                    if (!r.ok) throw new Error('Shared link ' + r.status);
+                    return r.json();
+                }).then(function (d) { return d.downloadUrl || d.sharedLink; });
+            }));
+            var failedNames = [];
+            linkResults.forEach(function (res, i) {
+                if (res.status === 'fulfilled' && res.value) {
+                    newBoxUrls.push(res.value);
+                    mockupUrls.push(res.value);
+                } else {
+                    failedNames.push(boxEntries[i].name || ('file ' + (i + 1)));
                 }
-            } catch (linkErr) {
-                console.error('Failed to create Box shared link:', linkErr);
-                alert('Could not create shared link for the selected file. Please try paste URL instead.');
+            });
+            if (failedNames.length > 0) {
+                console.error('Box shared-link failures:', linkResults);
+                alert('Could not create shared links for: ' + failedNames.join(', ') + '.\nNo email was sent — please retry.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Mockup';
                 return;
             }
-        } else if (pasteUrl.trim()) {
-            mockupUrls = [pasteUrl.trim()];
-        } else if (existingMockupUrl.trim()) {
-            mockupUrls = [existingMockupUrl.trim()];
-        } else {
-            alert('Please select a mockup file from Box or paste a URL.');
+        }
+
+        // Dedupe (preserve order) and hard-cap at six.
+        var seenUrls = {};
+        mockupUrls = mockupUrls.filter(function (u) {
+            if (!u || seenUrls[u]) return false;
+            seenUrls[u] = true;
+            return true;
+        }).slice(0, SEND_MOCKUP_CAP);
+
+        if (mockupUrls.length === 0) {
+            alert('No valid mockup URLs to send.');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Send Mockup';
             return;
+        }
+
+        // Persist newly-created Box links into the next empty Mockup_1..6 slots
+        // (sequential to avoid two writes racing for the same empty slot) so the
+        // AE also sees them in-app. Fire-and-forget — never blocks the email.
+        var artReqPkId = artReqMeta.PK_ID;
+        if (artReqPkId && newBoxUrls.length > 0) {
+            (async function persistBoxLinks() {
+                for (var i = 0; i < newBoxUrls.length; i++) {
+                    try {
+                        await fetch(API_BASE + '/api/art-requests/' + designId + '/upload-mockup-url', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ pkId: artReqPkId, url: newBoxUrls[i] })
+                        });
+                    } catch (e) { /* non-blocking */ }
+                }
+            })();
         }
 
         submitBtn.disabled = true;
@@ -1258,16 +1351,8 @@
                 });
             }
 
-            // Build mockup notes for email
-            var mockupNoteFields = [
-                { label: 'Mockup 1', key: 'Mockup_1_Note' },
-                { label: 'Mockup 2', key: 'Mockup_2_Note' },
-                { label: 'Mockup 3', key: 'Mockup_3_Note' }
-            ];
-            var noteLines = mockupNoteFields
-                .filter(function (f) { return artReqMeta[f.key] && artReqMeta[f.key].trim(); })
-                .map(function (f) { return '<strong>' + f.label + ':</strong> ' + escapeHtml(artReqMeta[f.key].trim()); });
-
+            // Mockup notes are built per-selection above (mockupNotes), so they
+            // line up with the mockups actually being sent.
             sendNotificationEmail(designId, 'approval', {
                 message: message,
                 revisionCount: revCount,
@@ -1276,7 +1361,7 @@
                 companyName: artReqMeta.CompanyName,
                 mockupUrls: mockupUrls,
                 ccEmails: ccEmails,
-                mockupNotes: noteLines
+                mockupNotes: mockupNotes
             });
 
             var repResolved = resolveRep(artReqMeta.Sales_Rep);
@@ -1356,6 +1441,15 @@
             var v = (parseInt(minsInput.value) || 0) - 15;
             minsInput.value = v < 0 ? 0 : v;
             updateApprovalCost();
+        });
+
+        // Multi-select: a typed/pasted URL counts as one of the six. Keep the
+        // counter + Send button in sync as Steve types. (#box-paste-url is
+        // static markup, so wiring it once here is safe.)
+        var pasteInput = document.getElementById('box-paste-url');
+        if (pasteInput) pasteInput.addEventListener('input', function () {
+            var modal = document.getElementById('approval-modal');
+            if (modal) updateSelectedMockupCount(modal);
         });
 
         // Escape key

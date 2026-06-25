@@ -2105,9 +2105,12 @@
     // ── Mockup Gallery (Unified Two-Section) ────────────────────────────
     // Writable mockup slots Steve controls
     const MOCKUP_SLOTS = [
-        { key: 'Box_File_Mockup', label: 'Mockup', noteKey: 'Mockup_1_Note' },
+        { key: 'Box_File_Mockup', label: 'Mockup 1', noteKey: 'Mockup_1_Note' },
         { key: 'BoxFileLink', label: 'Mockup 2', noteKey: 'Mockup_2_Note' },
-        { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' }
+        { key: 'Company_Mockup', label: 'Mockup 3', noteKey: 'Mockup_3_Note' },
+        { key: 'Mockup_4', label: 'Mockup 4', noteKey: 'Mockup_4_Note' },
+        { key: 'Mockup_5', label: 'Mockup 5', noteKey: 'Mockup_5_Note' },
+        { key: 'Mockup_6', label: 'Mockup 6', noteKey: 'Mockup_6_Note' }
     ];
     // Additional art file slots — AE + Steve/Ruth can upload
     const ADDITIONAL_ART_SLOTS = [
@@ -2247,7 +2250,7 @@
     }
 
     function renderMockupGallery(req) {
-        // Section 1: Writable mockup slots (always 3)
+        // Section 1: Writable mockup slots (up to 6 — Steve controls)
         var mockupsGrid = document.getElementById('ard-mockups-grid');
         mockupsGrid.innerHTML = '';
 
@@ -6046,8 +6049,8 @@
                     }
                 });
 
-                var slotOrder = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup'];
-                var slotLabels = { 'Box_File_Mockup': 'Mockup 1', 'BoxFileLink': 'Mockup 2', 'Company_Mockup': 'Mockup 3' };
+                var slotOrder = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup', 'Mockup_4', 'Mockup_5', 'Mockup_6'];
+                var slotLabels = { 'Box_File_Mockup': 'Mockup 1', 'BoxFileLink': 'Mockup 2', 'Company_Mockup': 'Mockup 3', 'Mockup_4': 'Mockup 4', 'Mockup_5': 'Mockup 5', 'Mockup_6': 'Mockup 6' };
                 var rendered = [];
 
                 slotOrder.forEach(function (slot) {

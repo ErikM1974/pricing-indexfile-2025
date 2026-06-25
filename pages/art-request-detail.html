@@ -7,7 +7,7 @@
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
     <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2026.06.18.1">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=13">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.06.25.2">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
 </head>
 <body>
@@ -576,7 +576,7 @@
                 <div id="approval-cc-options" class="approval-cc-checkbox-group"></div>
             </div>
             <div id="box-picker-section">
-                <div class="approval-section-label">Select mockup from Box:</div>
+                <div class="approval-section-label">Select mockups from Box (click to toggle, up to 6):</div>
                 <div id="box-picker-loading" class="box-picker-loading" style="display:none;">
                     <div class="box-picker-spinner"></div>
                     <span>Searching Box...</span>
@@ -592,7 +592,7 @@
                 </div>
             </div>
             <div id="approval-prev-section" style="display:none;">
-                <div class="approval-section-label approval-section-label--muted">Previously Sent (click to select):</div>
+                <div class="approval-section-label approval-section-label--muted">Previously Sent (click to toggle):</div>
                 <div id="approval-files" class="approval-files-grid approval-files-grid--small"></div>
                 <div id="approval-no-files" class="approval-no-files" style="display:none;">No mockups sent yet.</div>
             </div>
@@ -614,6 +614,7 @@
             </div>
         </div>
         <div class="approval-modal-footer">
+            <span id="approval-selected-count" class="approval-count">0 of 6 selected</span>
             <button id="approval-cancel" class="approval-btn-cancel">Cancel</button>
             <button id="approval-submit" class="approval-btn-submit">Send Mockup</button>
         </div>
@@ -663,8 +664,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
-    <script src="/shared_components/js/art-actions-shared.js?v=2026.06.17.5"></script>
+    <script src="/shared_components/js/art-actions-shared.js?v=2026.06.25.2"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.06.09.3"></script>
-    <script src="/pages/js/art-request-detail.js?v=2026.06.18.8"></script>
+    <script src="/pages/js/art-request-detail.js?v=2026.06.25.2"></script>
 </body>
 </html>
