@@ -106,10 +106,14 @@ class ScreenPrintQuoteService {
                 backLocation: quoteData.backLocation || '',
                 frontColors: quoteData.frontColors || 0,
                 backColors: quoteData.backColors || 0,
+                leftSleeveColors: quoteData.leftSleeveColors || 0,
+                rightSleeveColors: quoteData.rightSleeveColors || 0,
+                sleeveColorsList: quoteData.sleeveColorsList || quoteData.printSetup?.sleeveColorsList || [],
+                totalScreens: quoteData.totalScreens || 0,
                 isDarkGarment: quoteData.isDarkGarment || false,
                 hasSafetyStripes: quoteData.hasSafetyStripes || false
             };
-            
+
             // Create session record
             const sessionData = {
                 QuoteID: quoteID,
@@ -270,12 +274,15 @@ class ScreenPrintQuoteService {
             return quoteData.setupFees;
         }
 
-        // Otherwise calculate from print setup
-        let totalScreens = quoteData.printSetup?.frontColors || 1;
-
-        // Add underbase if dark garments
-        if (quoteData.printSetup?.isDarkGarment) {
-            totalScreens += 1;
+        // Otherwise calculate from print setup. Prefer the saved totalScreens (front + back + sleeves +
+        // dark underbase, already computed by the builder); fall back to the legacy front(+dark) estimate
+        // only if it's absent (old quotes).
+        let totalScreens = quoteData.printSetup?.totalScreens || quoteData.totalScreens || 0;
+        if (!totalScreens) {
+            totalScreens = quoteData.printSetup?.frontColors || 1;
+            if (quoteData.printSetup?.isDarkGarment) {
+                totalScreens += 1;
+            }
         }
 
         return totalScreens * screenFeePerColor;
@@ -408,6 +415,10 @@ class ScreenPrintQuoteService {
                 backLocation: quoteData.backLocation,
                 frontColors: quoteData.frontColors,
                 backColors: quoteData.backColors,
+                leftSleeveColors: quoteData.leftSleeveColors || 0,
+                rightSleeveColors: quoteData.rightSleeveColors || 0,
+                sleeveColorsList: quoteData.sleeveColorsList || quoteData.printSetup?.sleeveColorsList || [],
+                totalScreens: quoteData.totalScreens || 0,
                 isDarkGarment: quoteData.isDarkGarment,
                 hasSafetyStripes: quoteData.hasSafetyStripes
             };
