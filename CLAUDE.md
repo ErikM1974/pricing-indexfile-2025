@@ -38,13 +38,7 @@ Guidance for Claude Code when working in this repository.
 
 ## Auto-Update Memory (Don't Ask, Just Do)
 
-Memory updates are part of completing the task — not a separate ask-permission step.
-
-- **Bug fixes** → append to LESSONS_LEARNED.md; update MEMORY.md only if the fix changes documented behavior.
-- **API / integration changes** (ManageOrders, Caspio, Stripe, ShopWorks) → update the relevant section/topic file.
-- **New features** → one-liner in MEMORY.md or full detail in topic file (>2 lines → topic file).
-- Notify Erik in one sentence: "Updated LESSONS_LEARNED.md and MEMORY.md."
-- **Full memory architecture, routing & budgets → [memory/MEMORY_SYSTEM.md](memory/MEMORY_SYSTEM.md)** (read it when unsure where a fact goes or when memory feels bloated).
+Memory updates are part of completing the task — not a separate ask-permission step. Route each fact per the table below, then notify Erik in one sentence (e.g. "Updated LESSONS_LEARNED.md and MEMORY.md"). **Full architecture, routing & budgets → [memory/MEMORY_SYSTEM.md](memory/MEMORY_SYSTEM.md)** — read it when unsure where a fact goes or when memory feels bloated.
 
 ### Where things go (one fact, one home — never restate a fact in a second file)
 
