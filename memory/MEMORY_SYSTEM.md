@@ -90,6 +90,17 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 
 ---
 
+## 🔄 Resume here — memory-system redesign status (paused 2026-06-25)
+
+**Phase 1 DONE + committed** (`develop`, commits `8c06b638` archive · `42986c9d` system · `74d337fb`+`d1aa37c5` CLAUDE.md trim):
+- `MEMORY.md` index compacted 47 KB → 24.4 KB (fully loads again; aging-down rule baked in).
+- `LESSONS_LEARNED.md` archived 300 → 271 lines (7 oldest resolved fixes → `_ARCHIVE.md`, keep-alive stubs left).
+- This `MEMORY_SYSTEM.md` + `CLAUDE.md` "Where things go" routing + the `/memory-maintain` skill created. CLAUDE.md back under 200 lines.
+
+**Open question for Erik (answer to resume):** run the deeper cleanup (the backlog below) now in one pass, or leave it to the spawned chip + future `/memory-maintain` runs?
+
+**Next when we resume:** (1) the `wa-sales-tax` reconcile — a chip was spawned (`task_845aae16`); (2) then work the backlog below, ideally by invoking `/memory-maintain`. Non-memory to-dos (decoration pricing decision, caps go-live checks, EmailJS bugs, test-data cleanup) live in the `MEMORY.md` "⏳ Open Actions" block.
+
 ## Known cleanup backlog (work the next `/memory-maintain` passes do)
 
 - [ ] **`wa-sales-tax-rules.md` exists in BOTH trees and the copies have DIVERGED** (140 vs 120 lines) — reconcile to one canonical (repo) copy; a tax-rule fork is a wrong-price risk. *(highest priority)*
