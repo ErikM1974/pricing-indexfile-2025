@@ -1044,6 +1044,10 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-stat--cost { background: #eef7f0; border-color: #cfe6d4; }
 .sit-stat--cost .sit-stat-num { color: #1d7a3a; }
 .sit-cost { color: #1d7a3a; font-weight: 700; }
+/* UPS live-arrival chip */
+.sit-ups { font-weight: 700; padding: 1px 8px; border-radius: 10px; border: 1px solid; white-space: nowrap; }
+.sit-ups--ok { background: #e8f4ff; color: #0c447c; border-color: #b5d4f4; }
+.sit-ups--resched { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
 .sit-cost-cell { color: #1d4427; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sit-costnote { font-size: 11px; color: #5f7d68; margin: 12px 0 0; line-height: 1.5; }
 .sit-cal-cost { position: absolute; top: 5px; right: 7px; font-size: 11px; font-weight: 800; color: #1d4427; }
