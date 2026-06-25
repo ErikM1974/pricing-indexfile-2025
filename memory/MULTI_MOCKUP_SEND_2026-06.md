@@ -1,8 +1,9 @@
 # Multi-Mockup Send (up to 6) — Art Request "Send Mockup" modal
 
-**Status:** Code complete + adversarially reviewed + verified, 2026-06-24. **Caspio columns added ✅. Proxy test 9/9 ✅.
-COMMITTED to git branch `feature/multi-mockup-send` in BOTH repos** (Pricing Index `642c41ac`, proxy `2ea7116`) —
-protected from the OneDrive revert that hit twice. **NOT deployed yet** (user chose protect-only). Ready to deploy.
+**Status:** ✅ **SHIPPED LIVE + E2E-TESTED 2026-06-25.** Frontend `v2026.06.25.2` (Heroku v1453), proxy Heroku v836.
+Caspio cols added ✅, proxy test 9/9 ✅. Verified live in Chrome: 6-slot grid, toggle+counter+cap on detail AND Steve
+hub, EmailJS sent a 3-image email to Nika+Erik (template renders raw `<img>` — risk resolved), test job #53010 reverted.
+Steve notified on Slack. Shipped on branch `feature/multi-mockup-send` → merged to develop/main, tag `v2026.06.25.2`.
 Built for Steve to stage up to 6 mockup variations per job and email them all to the AE in one send.
 
 ## ⏯️ RESUME HERE (pickup checklist, in order)
