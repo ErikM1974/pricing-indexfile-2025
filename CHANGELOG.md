@@ -1,3 +1,16 @@
+## v2026.06.25.4 (2026.06.25)
+
+- Memory: archive 7 oldest resolved one-time fixes from LESSONS_LEARNED
+- Memory system: governance doc + CLAUDE.md routing + /memory-maintain skill
+- Memory: trim CLAUDE.md back under 200-line budget
+- Memory: de-dup Auto-Update routing bullets into the Where-things-go table
+- Memory: add resume/status note to MEMORY_SYSTEM.md (session pause 2026-06-25)
+- Memory: reconcile divergent wa-sales-tax-rules.md to one canonical copy
+- Memory: regenerate INDEX.md + archive 15 zero-reference historical docs
+- Memory: mark redesign substantially done; defer 3 optional backlog items
+- Quote Mgmt: show ShopWorks order # on the list row
+- Merge deployed UPS-delivery-dates (cf56321d) into develop alongside SW# row feature
+
 ## v2026.06.25.2 (2026.06.25)
 
 - @ Multi-mockup send: select & send up to 6 mockups from the Send Mockup modal
