@@ -56,3 +56,40 @@ Erik: "DTF sleeve = price like a left chest; DTG no sleeves; screen print = just
   dark+sleeve 4 screens $912; stripes NOT ×sleeve $18.50). 81 green. Live PC61 dark+1-sleeve = $912.00,
   cent-exact to the unit test.
 - **DTF sleeve size label** (≤5×5") shipped the same day in v2026.06.24.16 alongside print-size-on-chips.
+
+---
+
+## ✅ SCP QUOTE BUILDER (standalone, tool-of-record) — SLEEVES SHIPPED LIVE v2026.06.25.1 + proxy 84de847 (2026-06-25)
+
+Erik: "add the sleeve to the quote builder." The builder is a hand-ported REPLICA of the engine (NOT a caller),
+so the sleeve math was copied verbatim. 4 files: (1) `quote-builders/screenprint-quote-builder.html` — sleeve
+card (`#left/right-sleeve-toggle` + `name=*-sleeve-colors` 1-6 + per-sleeve `#*-sleeve-setup-display`) + a
+`#sidebar-sleeves-row`; (2) `shared_components/js/screenprint-quote-builder.js` — `printConfig.leftSleeveColors/
+rightSleeveColors/sleeveColorsList`; `updatePrintConfig` reads + builds the list + screens (`+ each sleeve's
+colors`, dark `+1 underbase per sleeve`) + per-sleeve setup text; `recalculatePricing` `sleeveAddlPerPiece` loop
+(`Σ findPricingTier(additionalLocationPricing[c], pooledQty).pricePerPiece`, never re-rounded, **dropped-product
+error if a sleeve color has no pricing — never silent $0, Rule 4**) `+ sizePrice`; `restoreScreenPrintDraft` +
+`populatePrintConfigFromSession` re-check the sleeve inputs (else edit-reload drops sleeves + re-saves cheaper);
+`resetQuote` clears them; `saveAndGetLink` writes `left/rightSleeveColors/sleeveColorsList/totalScreens`;
+breakdown + sidebar show them; (3) `screenprint-quote-service.js` Notes (save + update paths) carry the sleeve
+fields + the setup-fee fallback prefers `totalScreens`; (4) shared `embroidery-quote-invoice.js` — a `Sleeves:`
+line **gated on `printConfig.sleeves`** (only SCP sets it → EMB/DTF/DTG invoices untouched, Rule 8). Stripes stay
+front/back only. Verified LIVE on the real builder: PC61 L2c+R4c = **$23.00/pc** (12 base + 5 + 6), 7 screens
+**$210**; dark **10 screens $300**; no-sleeve **$12.00/pc** byte-identical. Each sleeve == back == standard
+add-location BY CONSTRUCTION. Mapped by a 5-agent workflow; engine GO + cross-surface PRICE-CONSISTENT workflows.
+
+**PROXY** (`../caspio-pricing-proxy/lib/scp-push-transformer.js`, commit `84de847`, heroku release ok): operator
+clarity only — `deriveScreenCountFromNotes` (fallback) + `formatScreenPrintSpec` + the production **"Screens to
+burn"** note now count each sleeve's screens + per-sleeve dark underbase. Billing was already correct (sleeve-
+inclusive `setupFeeTotal`/`totalScreens` in Notes). 4 new fixtures, 19 proxy tests green. Front/back byte-identical
+when no sleeves.
+
+**MULTI-MACHINE DEPLOY (hard — a parallel SanMar-dashboard session deployed v19/20/21 DURING my reconcile; BOTH
+repos behind origin + dirty):** technique that worked — (1) back up MY files byte-exact; (2) DISTINGUISH "stale
+synced-ahead" files (working tree == origin via OneDrive → DISCARD, take origin) from "real WIP" (art-hub-steve.html
+etc. → STASH, restore byte-exact); (3) isolate so only my files are dirty; (4) `git pull --ff-only` is allowed even
+with my files dirty because the incoming commits don't touch them; (5) deploy staging ONLY my files (NEVER `git add
+-u`) with a rebase-retry on the develop/main push to ride the churn; (6) restore parallel WIP byte-exact + `cmp`.
+Proxy: `heroku/main == origin/develop` already (SanMar session deployed the 11), so `git push heroku develop:main`
+shipped only my 1 commit. Reaffirms the art2 lesson: a parallel file that GREW = a concurrent edit to LEAVE; only
+discard/restore stale-synced-ahead or a true CRLF mangle.
