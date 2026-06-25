@@ -2620,6 +2620,24 @@ input.cbSearchButton {
 .approval-btn-submit:hover { opacity: 0.9; }
 .approval-btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Multi-mockup selection counter (sits left of the footer buttons) */
+.approval-count {
+    margin-right: auto;
+    align-self: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+.approval-count.at-cap {
+    color: #b91c1c;
+    animation: approvalCapFlash 0.4s ease;
+}
+@keyframes approvalCapFlash {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.14); }
+}
+
 /* ---------- Recipient + CC Row ---------- */
 .approval-recipient {
     background: #ecfdf5;

@@ -198,7 +198,7 @@
             </div>
             <!-- Box File Picker -->
             <div id="box-picker-section">
-                <div class="approval-section-label">Select mockup from Box:</div>
+                <div class="approval-section-label">Select mockups from Box (click to toggle, up to 6):</div>
                 <div id="box-picker-loading" class="box-picker-loading" style="display:none;">
                     <div class="box-picker-spinner"></div>
                     <span>Searching Box...</span>
@@ -216,7 +216,7 @@
             </div>
             <!-- Previously Sent Files (from Caspio) -->
             <div id="approval-prev-section" style="display:none;">
-                <div class="approval-section-label approval-section-label--muted">Previously Sent (click to select):</div>
+                <div class="approval-section-label approval-section-label--muted">Previously Sent (click to toggle):</div>
                 <div id="approval-files" class="approval-files-grid approval-files-grid--small"></div>
             </div>
             <div class="approval-section-label">Message to Sales Rep:</div>
@@ -237,6 +237,7 @@
             </div>
         </div>
         <div class="approval-modal-footer">
+            <span id="approval-selected-count" class="approval-count">0 of 6 selected</span>
             <button id="approval-cancel" class="approval-btn-cancel">Cancel</button>
             <button id="approval-submit" class="approval-btn-submit">Send Mockup</button>
         </div>
