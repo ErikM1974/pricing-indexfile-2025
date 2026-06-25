@@ -1,19 +1,21 @@
 # Multi-Mockup Send (up to 6) — Art Request "Send Mockup" modal
 
-**Status:** Code complete (frontend + proxy) + adversarially reviewed + verified on disk, 2026-06-24.
-NOT committed, NOT deployed. **BLOCKED on Erik adding Caspio columns, then deploy.**
+**Status:** Code complete + adversarially reviewed + verified, 2026-06-24. **Caspio columns added ✅. Proxy test 9/9 ✅.
+COMMITTED to git branch `feature/multi-mockup-send` in BOTH repos** (Pricing Index `642c41ac`, proxy `2ea7116`) —
+protected from the OneDrive revert that hit twice. **NOT deployed yet** (user chose protect-only). Ready to deploy.
 Built for Steve to stage up to 6 mockup variations per job and email them all to the AE in one send.
 
 ## ⏯️ RESUME HERE (pickup checklist, in order)
 
-1. **Re-confirm code on disk** (it clobbered once mid-session): grep `shared_components/js/art-actions-shared.js` for
-   `getSendSelection(modal).values()`, `Promise.allSettled`, and `pasteInput.addEventListener`. If any missing, restore
-   from `%TEMP%/art-actions-shared.BACKUP.js`. Run `node --check` on it.
-2. **Confirm the one proxy unit test is green** (I updated its 5→8 field assertion; a re-run was in flight at stop, result
-   unconfirmed): `cd ../caspio-pricing-proxy && npx jest tests/jest/recover-broken-mockup-slot-aware.test.js`.
-3. **Erik action (blocking):** add the 6 Caspio columns below to `ArtRequests`.
-4. **Deploy** (only after columns exist): commit ONLY this feature's files (list in "Pre-ship verification"), deploy the
-   proxy first, then the frontend via `/deploy`. Re-run `git status` first — the tree has unrelated WIP from other sessions.
+1. **If the working tree looks reverted again** (OneDrive did this twice): the work is safe in git. Restore with
+   `git checkout feature/multi-mockup-send` (or `git checkout feature/multi-mockup-send -- <files>`) in EACH repo.
+   Loose-file backups also exist in `%TEMP%/mockup6_backup/` (frontend) — git is the source of truth now.
+2. **Caspio columns:** DONE — `Mockup_4/5/6` (Text 255) + `Mockup_4/5/6_Note` (Text 64000) confirmed correct on `ArtRequests`.
+3. **Proxy test:** DONE — `recover-broken-mockup-slot-aware` 9/9 green (run with `--forceExit`; it has open handles).
+4. **DEPLOY (when user says go):** both branches are ready. Deploy the **proxy first** (Heroku `caspio-pricing-proxy`),
+   then the **frontend**. The branches contain ONLY this feature; unrelated WIP (SanMar/SCP/etc.) is NOT in them.
+   Merge `feature/multi-mockup-send` → `develop`/`main` per the normal flow, or cherry-pick. Bump the frontend `?v=`
+   cache-bust on `art-actions-shared.js` + `art-request-detail.js` + the 2 HTML files + `art-hub.css`.
 5. **EmailJS sanity check:** send a 2-mockup test → AE email shows TWO images (confirms `mockup_images_html` is raw HTML).
 6. Optional: the deferred dashboard-thumbnail follow-up (bottom of this file).
 
