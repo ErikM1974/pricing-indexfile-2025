@@ -1,3 +1,8 @@
+## v2026.06.26.2 (2026.06.26)
+
+- Memory: pickup note — quote-view size table not syncing from ShopWorks (diagnosis done, both fixes approved, code pending)
+- fix(quote-view): mirror ShopWorks size edits on the Quote Management screen
+
 ## v2026.06.26.1 (2026.06.26)
 
 - @ Docs: AE Dashboard surfaces mockups 4-6, shipped v2026.06.25.6
