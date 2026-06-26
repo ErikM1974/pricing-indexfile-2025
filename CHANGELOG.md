@@ -1,3 +1,8 @@
+## v2026.06.26.3 (2026.06.26)
+
+- Memory: SanMar fast-completing-order sync gap + fix (LESSONS, Order Processing & ShopWorks)
+- feat(quote-mgmt): manual catch-up for orders that fall between scheduled SanMar syncs
+
 ## v2026.06.26.2 (2026.06.26)
 
 - Memory: pickup note — quote-view size table not syncing from ShopWorks (diagnosis done, both fixes approved, code pending)
