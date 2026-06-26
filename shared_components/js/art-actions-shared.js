@@ -117,6 +117,14 @@
         for (var name in REP_EMAIL_MAP) {
             if (val.toLowerCase() === REP_EMAIL_MAP[name].toLowerCase()) return { displayName: name, email: REP_EMAIL_MAP[name] };
         }
+        // Full-name tolerance: the Caspio Sales_Rep field stores a full name
+        // ("Nika Lao", "Taneisha Clark") but REP_EMAIL_MAP is keyed by first
+        // name. Without this, full names fell through to the sales@ fallback and
+        // rep emails were silently misrouted. Mirrors backend resolveAEEmailLoose.
+        if (val.indexOf('@') === -1 && /\s/.test(val)) {
+            var firstTok = val.split(/\s+/)[0];
+            if (REP_EMAIL_MAP[firstTok]) return { displayName: firstTok, email: REP_EMAIL_MAP[firstTok] };
+        }
         if (val.indexOf('@') !== -1) {
             var local = val.substring(0, val.indexOf('@'));
             return { displayName: local.charAt(0).toUpperCase() + local.slice(1), email: val };
@@ -553,7 +561,7 @@
                 var statusResp = await fetch(API_BASE + '/api/art-requests/' + designId + '/status', {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: 'Completed', artMinutes: mins })
+                    body: JSON.stringify({ status: 'Completed', artMinutes: mins, actor: getLoggedInUser().firstName || 'Steve' })
                 });
                 if (!statusResp.ok) throw new Error('Status ' + statusResp.status);
 
@@ -577,11 +585,12 @@
                     })
                 }).catch(function (err) { console.warn('Completion note failed (non-blocking):', err); });
 
-                sendNotificationEmail(designId, 'completed', {
-                    artMinutes: currentMins + mins,
-                    salesRep: repEmail,
-                    companyName: companyName
-                });
+                // AE completion notification (email + Slack DM) is now sent
+                // SERVER-SIDE by the PUT /status handler — it resolves the AE from
+                // Sales_Rep/User_Email reliably. The old client-side EmailJS call
+                // here resolved the full-name Sales_Rep ("Nika Lao") through a
+                // first-name-keyed map and silently misrouted the email to
+                // sales@nwcustomapparel.com, so it has been removed.
 
                 fetch(API_BASE + '/api/art-notifications', {
                     method: 'POST',

@@ -686,10 +686,14 @@
     function markComplete(designId, btn) {
         if (!designId) return;
         if (btn) { btn.disabled = true; btn.textContent = 'Marking…'; }
+        // PUT — the backend only registers PUT for this route (PATCH 404s, which
+        // silently broke completion from the gallery). The PUT handler fires the
+        // AE completion notification (email + Slack DM) server-side. `actor` is
+        // this dashboard's owner so the Slack ping reads "Completed by Steve".
         fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/status', {
-            method: 'PATCH',
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: 'Completed' })
+            body: JSON.stringify({ status: 'Completed', actor: 'Steve' })
         })
         .then(function (r) {
             if (!r.ok) throw new Error('API ' + r.status);
