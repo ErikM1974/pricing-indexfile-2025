@@ -1,3 +1,11 @@
+## v2026.06.26.1 (2026.06.26)
+
+- @ Docs: AE Dashboard surfaces mockups 4-6, shipped v2026.06.25.6
+- Memory: trim LESSONS toward <250 — reduce 4 duplicated rules to pointers, archive 2
+- Memory: reduce EMB falsy-zero recurrence to a pointer — LESSONS now under 250
+- Memory: introduce .claude/rules/ path-scoped rules (item 3 of 3)
+- feat(quote-view): "Send to Steve" — pre-fill Steve's art form from a synced order
+
 ## v2026.06.25.6 (2026.06.25)
 
 - @ AE Dashboard: surface mockup slots 4-6 + responsive 6-slot grid
