@@ -2443,10 +2443,11 @@ class QuoteViewPage {
 
         // Line item fields: LineUnitPrice[PC600|Athletic Hthr] → "PC600 (Athletic Hthr) unit price"
         let label;
-        const lineMatch = field.match(/^(LineUnitPrice|LineQuantity|LineItem)\[(.+)\]$/);
+        const lineMatch = field.match(/^(LineUnitPrice|LineQuantity|LineSizes|LineItem)\[(.+)\]$/);
         if (lineMatch) {
             const what = lineMatch[1] === 'LineUnitPrice' ? 'unit price'
-                : lineMatch[1] === 'LineQuantity' ? 'qty' : '';
+                : lineMatch[1] === 'LineQuantity' ? 'qty'
+                : lineMatch[1] === 'LineSizes' ? 'sizes' : '';
             const [pn, color] = lineMatch[2].split('|');
             const garmentLabel = color ? `${pn} (${color})` : pn;
             label = `${garmentLabel}${what ? ' ' + what : ''}`;
@@ -2939,19 +2940,28 @@ class QuoteViewPage {
             });
         }
 
-        // 2. Overlay per-line Unit + Total cells in the product table.
-        // Match SW lineItems to rendered rows by PartNumber + PartColor.
-        // Color matching: exact first, then case-insensitive, then by
-        // PartNumber alone when only one SW line exists for that style.
+        // 2. Overlay per-line Unit + Total + SIZE breakdown + Qty from the SW
+        // snapshot. Match SW lineItems to rendered rows by base style + color.
+        //
+        // Why sizes (Erik 2026-06-26): the visible size cells are first rendered
+        // from the ORIGINAL quote_items.SizeBreakdown, which sync never rewrites.
+        // So a rep editing sizing in ShopWorks (e.g. swap an S for an M) — the
+        // source of truth — was invisible here whenever it kept the line's total
+        // qty + unit price constant (the only things this used to mirror). Now we
+        // also repaint the size columns + qty from the snapshot.
+        //
+        // MO /lineitems Size0N → display column mapping is positional & 1:1:
+        //   Size01→S  Size02→M  Size03→L(LG)  Size04→XL  Size05→2XL(XXL)
+        //   Size06→catch-all(XXXL: 3XL+, OSFA, tall, youth, …)
+        // Extended-SKU lines (PC54Y_2X / _3X / …) land their qty in the same
+        // positional column (a _2X line → Size05), so summing Size01..Size06
+        // across the base line + every extended-SKU variant for a style rebuilds
+        // the full per-column distribution with no double-counting.
         if (!Array.isArray(lineItems) || lineItems.length === 0) return;
         const normalize = (s) => String(s || '').trim().toLowerCase().replace(/[\s\-_/]/g, '');
-        const linesByStyle = new Map();
-        lineItems.forEach(li => {
-            const pn = String(li.PartNumber || '').trim().toUpperCase();
-            if (!pn) return;
-            if (!linesByStyle.has(pn)) linesByStyle.set(pn, []);
-            linesByStyle.get(pn).push(li);
-        });
+        const swLines = lineItems
+            .map(li => ({ li, pn: String(li.PartNumber || '').trim().toUpperCase() }))
+            .filter(x => x.pn);
 
         document.querySelectorAll('tr.first-row').forEach(tr => {
             const styleText = tr.querySelector('.style-col')?.textContent?.trim() || '';
@@ -2959,21 +2969,22 @@ class QuoteViewPage {
             const styleMatch = styleText.match(/^([A-Z0-9_-]+)/i);
             if (!styleMatch) return;
             const style = styleMatch[1].toUpperCase();
-            const candidates = linesByStyle.get(style);
-            if (!candidates || candidates.length === 0) return;
 
-            // Pick matching SW lines for this row's color.
+            // All SW lines for this style = exact base match OR a size-suffixed
+            // variant of it (PC54Y + PC54Y_2X + PC54Y_3X …).
+            const candidates = swLines.filter(x => x.pn === style || x.pn.startsWith(style + '_')).map(x => x.li);
+            if (candidates.length === 0) return;
+
+            // Narrow to this row's color; if exactly one SW line exists for the
+            // style, accept it even on a color-label mismatch (CATALOG_COLOR like
+            // "Athletic Hthr" vs display "Athletic Heather").
             let matches = candidates.filter(li => normalize(li.PartColor) === normalize(colorText));
-            if (matches.length === 0 && candidates.length === 1) {
-                // Single SW line for this style — accept it even with color mismatch
-                // (CATALOG_COLOR like "Athletic Hthr" vs display "Athletic Heather").
-                matches = candidates;
-            }
+            if (matches.length === 0 && candidates.length === 1) matches = candidates;
             if (matches.length === 0) return;
 
-            // Aggregate: sum qty × price across matching SW lines, then
-            // compute a weighted-avg unit price. For OF-0050 (single line)
-            // this collapses to just LineUnitPrice and LineQuantity.
+            // Aggregate weighted-avg unit price + positional size columns across
+            // every matching SW line (base + extended variants).
+            const cols = [0, 0, 0, 0, 0, 0];   // S, M, L, XL, 2XL, catch-all
             let totalQty = 0;
             let totalValue = 0;
             matches.forEach(li => {
@@ -2981,12 +2992,45 @@ class QuoteViewPage {
                 const p = Number(li.LineUnitPrice) || 0;
                 totalQty += q;
                 totalValue += q * p;
+                for (let i = 0; i < 6; i++) cols[i] += Number(li[`Size0${i + 1}`]) || 0;
             });
             const avgUnit = totalQty > 0 ? (totalValue / totalQty) : 0;
+
+            // Unit + line total: mirror SW dollars regardless of size data.
             const priceEl = tr.querySelector('.price-col');
             const totalEl = tr.querySelector('.total-col');
             if (priceEl) { priceEl.textContent = fmt(avgUnit); priceEl.classList.add('sw-mirrored'); }
             if (totalEl) { totalEl.textContent = fmt(totalValue); totalEl.classList.add('sw-mirrored'); }
+
+            // Size breakdown + qty: ONLY overlay when the per-size columns
+            // reconcile with the line totals (Σcols === Σ LineQuantity). If MO
+            // didn't populate Size0N (colSum 0) or the numbers don't add up, leave
+            // the original quote sizes rather than paint a wrong/zero distribution —
+            // price/total above are still corrected. (Erik's #1 rule: never silent-wrong.)
+            const colSum = cols.reduce((a, b) => a + b, 0);
+            if (colSum > 0 && colSum === totalQty) {
+                const sizeCells = tr.querySelectorAll('.size-col');
+                if (sizeCells.length >= 6) {
+                    for (let i = 0; i < 6; i++) {
+                        sizeCells[i].textContent = cols[i] > 0 ? String(cols[i]) : '';
+                        sizeCells[i].classList.add('sw-mirrored');
+                    }
+                    const qtyEl = tr.querySelector('.qty-col');
+                    if (qtyEl) { qtyEl.textContent = String(totalQty); qtyEl.classList.add('sw-mirrored'); }
+
+                    // The first row now carries all six size columns (matching how
+                    // ShopWorks itself shows the line), so collapse this group's
+                    // extended-size rows into it — otherwise stale quote-side
+                    // extended sizes would render alongside the corrected first row.
+                    let sib = tr.nextElementSibling;
+                    while (sib && sib.classList.contains('extended-row')) {
+                        const next = sib.nextElementSibling;
+                        sib.style.display = 'none';
+                        sib.classList.add('sw-collapsed');
+                        sib = next;
+                    }
+                }
+            }
         });
     }
 

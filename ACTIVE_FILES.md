@@ -39,6 +39,7 @@
 | `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
 | `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
 | `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
+| `/lib/quote-snapshot-diff.js` | **NEW (2026-06-26)** `diffSnapshots()` + helpers (`WATCHED_ORDER_FIELDS`, `normalizeForDiff`, `sizeColsOf`) extracted from server.js so the SW-snapshot change-detection is unit-testable (server.js boots on require). Now also diffs per-size `Size01..06` → `LineSizes[...]` change rows. | required by server.js (sync-from-shopworks) | ✅ Active |
 | `/robots.txt` | Crawler rules — staff/internal paths + credential share-links disallowed (2026-06-11) | served via server.js `/robots.txt` route | ✅ Active |
 | `/jest.config.js` | Jest test runner config (used by `tests/jest/`) | Jest | ⚙️ Tooling |
 
@@ -180,6 +181,7 @@
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
 | `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
+| `/tests/unit/quote-snapshot-diff.test.js` | **NEW (2026-06-26)** Locks the size-aware ShopWorks-snapshot diff: a per-size redistribution (S→M) at constant total qty + unit price now emits a `LineSizes[...]` change row (powers the quote-view "edited in ShopWorks" banner) — old diff missed it. | jest, lib/quote-snapshot-diff.js | ✅ Active |
 | `/tests/unit/dtf-save-parity.test.js` | **NEW (2026-06-11)** DTF audit lock: every sizeGroup → quote_items row (XS incl.), ColorCode=CATALOG_COLOR chain, Notes JSON round-trips shipToName/includeTax/pricingMetadata | jest, dtf-quote-service.js | ✅ Active |
 | `/tests/unit/dtf-childrow-state.test.js` | **NEW (2026-06-11)** P2 closure lock: DTFQuoteBuilder.childRows JS-state model — calculateFromState/getTotalQuantity price extended-size child rows with ZERO DOM (document stub throws on any query) | jest, dtf-quote-builder.js | ✅ Active |
 | `/tests/unit/dtf-location-size-lock-parity.test.js` | **NEW (2026-06-19)** Guards the DTF location→transfer-size lock (Small/Med/Large) against drift between its 2 hand-copies — `DTFConfig.transferLocations` (dtf-quote-pricing.js) ↔ `DTF_LOCATIONS_FALLBACK` (quote-cart-engine.js); also pins the audited mapping. Keeps all 3 DTF surfaces sizing identically (from the 2026-06-19 3-surface audit). | jest, dtf-quote-pricing.js, quote-cart-engine.js | ✅ Active |
