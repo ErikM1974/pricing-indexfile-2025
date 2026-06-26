@@ -7419,6 +7419,25 @@ app.post('/api/sanmar-orders/sync-recent-completed', async (req, res) => {
 });
 
 /**
+ * GET /api/sanmar-orders/sync-recent-completed-status
+ *
+ * Same-origin pass-through for the proxy's background catch-up status, so the
+ * "Refresh Inbound" button can poll until the async job finishes (the POST above
+ * returns 202 immediately). Read-only; no secret needed on the proxy GET.
+ */
+app.get('/api/sanmar-orders/sync-recent-completed-status', async (req, res) => {
+  try {
+    const r = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-orders/sync-recent-completed-status`);
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) return res.status(502).json({ success: false, error: `proxy HTTP ${r.status}` });
+    return res.json({ success: true, ...data });
+  } catch (error) {
+    console.error('[sanmar sync-recent-completed-status proxy] error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * GET /api/quote-sessions/:quoteId/vendor-shipment
  *
  * INBOUND blank-goods shipment status (vendor SanMar → NWCA) for the order's
