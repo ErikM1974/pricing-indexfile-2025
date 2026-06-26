@@ -1,3 +1,7 @@
+## v2026.06.26.4 (2026.06.26)
+
+- fix(quote-mgmt): make Refresh Inbound catch-up async (kick off + poll)
+
 ## v2026.06.26.3 (2026.06.26)
 
 - Memory: SanMar fast-completing-order sync gap + fix (LESSONS, Order Processing & ShopWorks)
