@@ -7384,6 +7384,41 @@ app.post('/api/sanmar-orders/sync-shipments', async (req, res) => {
 });
 
 /**
+ * POST /api/sanmar-orders/sync-recent-completed
+ *
+ * Same-origin manual trigger for the proxy's recently-completed catch-up (Erik
+ * 2026-06-26). The proxy endpoint is secret-gated; this passes the secret server-
+ * side (the browser can't). It discovers recently-INVOICED SanMar POs and fully
+ * ingests any the daily allOpen/lastUpdate passes missed — orders that raced
+ * placed→shipped→Complete BETWEEN scheduled syncs and so never entered the synced
+ * table at all (no PO, no tracking in the quote-view panel, the inbound dot, or the
+ * daily list — e.g. PO 113470 / WO 142292). Bounded SMALL (≤6) because this whole
+ * call must finish inside the 30s web-request limit: invoice discovery + per-PO
+ * poSearch + shipment SOAP is heavier than /sync-shipments. Returns `remaining` so
+ * the UI can prompt to run again for a larger backlog.
+ */
+app.post('/api/sanmar-orders/sync-recent-completed', async (req, res) => {
+  try {
+    const secret = process.env.CRM_API_SECRET;
+    if (!secret) return res.status(500).json({ success: false, error: 'CRM_API_SECRET not configured' });
+    const days = Math.min(Math.max(parseInt(req.body && req.body.days) || 7, 1), 30);
+    const limit = Math.min(Math.max(parseInt(req.body && req.body.limit) || 5, 1), 6);
+    const r = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-orders/sync-recent-completed?days=${days}&limit=${limit}`, {
+      method: 'POST',
+      headers: { 'x-api-secret': secret, 'Content-Type': 'application/json' },
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      return res.status(502).json({ success: false, error: data.error || `proxy HTTP ${r.status}`, details: data.details });
+    }
+    return res.json({ success: true, ...data });
+  } catch (error) {
+    console.error('[sanmar sync-recent-completed proxy] error:', error.message);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+/**
  * GET /api/quote-sessions/:quoteId/vendor-shipment
  *
  * INBOUND blank-goods shipment status (vendor SanMar → NWCA) for the order's

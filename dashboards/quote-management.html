@@ -31,7 +31,7 @@
                 <i class="fas fa-sync"></i> Sync from ShopWorks
             </button>
             <button id="btn-refresh-inbound" class="btn-header" onclick="refreshInboundLive()"
-                    title="Check SanMar LIVE for the inbound blanks on the visible orders. The Inbound dot normally reads a once-a-day synced status that can lag a same-day shipment — this asks SanMar's shipment feed directly so an order that just shipped flips to Shipped (with tracking) right now.">
+                    title="Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.">
                 <i class="fas fa-dolly"></i> Refresh Inbound
             </button>
             <button id="btn-inbound-today" class="btn-header" onclick="openInboundTodayModal()"
@@ -402,6 +402,25 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
             try {
+                // 1. Ingest orders that fell BETWEEN scheduled syncs (Erik 2026-06-26):
+                //    ones that raced placed→shipped→Complete in one hop, so the daily
+                //    allOpen/lastUpdate passes never saw them — they're absent from the
+                //    synced table entirely (no PO, no tracking anywhere). Bounded SMALL
+                //    + non-fatal so a slow/empty catch-up never blocks the shipment
+                //    refresh below; `remaining` tells the user to click again for more.
+                let ingested = 0, ingestRemaining = 0, ingestErr = null;
+                try {
+                    const cr = await fetch('/api/sanmar-orders/sync-recent-completed', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ days: 7, limit: 5 }),
+                    });
+                    const cres = await cr.json().catch(() => ({}));
+                    if (cr.ok && cres.success) { ingested = cres.ingested || 0; ingestRemaining = cres.remaining || 0; }
+                    else { ingestErr = cres.error || `HTTP ${cr.status}`; }
+                } catch (e) { ingestErr = e.message; }
+
+                // 2. Pull live tracking for in-table open orders (original behavior).
                 const resp = await fetch('/api/sanmar-orders/sync-shipments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -411,7 +430,8 @@
                 if (!resp.ok || !result.success) throw new Error(result.error || `HTTP ${resp.status}`);
                 await fetchInboundStatuses({ force: true }); // re-pull, bypassing the status cache
                 const added = result.shipmentsAdded || 0;
-                showToast(`✓ Inbound synced from SanMar: +${added} now Shipped (${result.checked || 0} checked${result.remaining ? `, ${result.remaining} still pending` : ''}).`);
+                const pending = (ingestRemaining || 0) + (result.remaining || 0);
+                showToast(`✓ Inbound synced from SanMar: ${ingested} new order(s) ingested, +${added} now Shipped${pending ? ` — ${pending} still pending, click again` : ''}.${ingestErr ? ` [catch-up skipped: ${ingestErr}]` : ''}`);
             } catch (err) {
                 // Erik's #1 rule — surface the failure, never fail silently.
                 console.error('[QuoteManagement] refreshInboundLive failed:', err);
