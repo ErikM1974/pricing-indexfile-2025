@@ -133,7 +133,11 @@ var GarmentSubmitForm = (function () {
 
     // ── State ──────────────────────────────────────────────────────────────
     var containerId = null;
-    var referenceFiles = [];          // File[] (max 4)
+    var referenceFiles = [];          // File[] the user picked/dropped (counts toward max 4)
+    // Artwork carried over from a quote ("Send to Steve"): already uploaded to
+    // the Caspio Artwork folder server-side via /api/files/import-from-url, so we
+    // hold only { fileName, displayName } — no File bytes. Counts toward max 4.
+    var prefilledUploads = [];
     var customerLookup = null;
     var selectedContact = null;
     var selectedDesign = null;
@@ -152,13 +156,16 @@ var GarmentSubmitForm = (function () {
     //   (e.g. from the Shirt Designer) and calls onSubmitted(designId, company)
     //   after a successful create. prefill fields are all optional:
     //   { company, contactName, contactEmail, decoration, colorMode, threadColors,
-    //     exactText, notes, artworkStatus, fileType, garmentStyle, garmentColor,
+    //     exactText, notes, artworkStatus, approvalStatus, fileType, garmentStyle, garmentColor,
+    //     salesRep, orderNum, designNum, custNum, customerId, dueDate,
+    //     artworkUrls:[{url, fileName, displayName}],  // server-imported reference files
     //     locations:[{placement,width}], files:[File] }.
     function init(containerIdParam, opts) {
         opts = opts || {};
         containerId = containerIdParam;
         onSubmittedCb = (typeof opts.onSubmitted === 'function') ? opts.onSubmitted : null;
         referenceFiles = [];                       // always start with no files
+        prefilledUploads = [];                     // and no carried-over art
         var pf = opts.prefill || null;
         garmentRows = [newGarmentRow()];
         artworkLocations = [newLocation()];
@@ -182,17 +189,31 @@ var GarmentSubmitForm = (function () {
         set('gsf-contact-name', pf.contactName);
         set('gsf-contact-email', pf.contactEmail);
         set('gsf-artwork-status', pf.artworkStatus);
+        set('gsf-approval-status', pf.approvalStatus);
         set('gsf-color-mode', pf.colorMode);
         set('gsf-thread', pf.threadColors);
         set('gsf-exact-text', pf.exactText);
         set('gsf-notes', pf.notes);
         set('gsf-file-type', pf.fileType);
+        // Order/identity fields carried over from a ShopWorks-synced quote.
+        set('gsf-sales-rep', pf.salesRep);
+        set('gsf-order-num', pf.orderNum);
+        set('gsf-design-num', pf.designNum);
+        set('gsf-cust-num', pf.custNum);
+        set('gsf-due-date', pf.dueDate);
+        // Hidden id_Customer — normally set by CompanyContactPicker.onSelect, but
+        // a quote handoff fills the company as plain text so set it explicitly.
+        var cidEl = document.getElementById('gsf-customer-id');
+        if (cidEl && pf.customerId != null && pf.customerId !== '') cidEl.value = pf.customerId;
         if (pf.decoration) {
             document.querySelectorAll('.gsf-decoration').forEach(function (cb) {
                 if (cb.value === pf.decoration) cb.checked = true;
             });
         }
         if (Array.isArray(pf.files) && pf.files.length) addReferenceFiles(pf.files);
+        // Carry the customer's artwork + approved mockups over as real reference
+        // files (server-side import — no manual download/re-upload).
+        if (Array.isArray(pf.artworkUrls) && pf.artworkUrls.length) importArtworkUrls(pf.artworkUrls);
         // Re-run the adaptive sections in case a seeded status/approval changed them.
         try { applyArtworkStatusAdaptive(); applyApprovalAdaptive(); applyPatchVisibility(); } catch (e) { /* non-fatal */ }
     }
@@ -538,6 +559,7 @@ var GarmentSubmitForm = (function () {
             + '  </div>'
             + '  <div class="gsf-file-drop-types">.AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes.</div>'
             + '  <input type="file" id="gsf-file-input" style="display:none;" accept="image/*,.pdf,.eps,.ai,.svg" multiple>'
+            + '  <div id="gsf-carried-art-status" class="gsf-carried-status" style="display:none;"></div>'
             + '  <div id="gsf-file-preview-area"></div>'
             + '</div>'
             + '</div>';
@@ -1027,7 +1049,7 @@ var GarmentSubmitForm = (function () {
 
     // ── Files ──────────────────────────────────────────────────────────────
     function addReferenceFiles(fileList) {
-        var allowed = MAX_FILES - referenceFiles.length;
+        var allowed = MAX_FILES - referenceFiles.length - prefilledUploads.length;
         for (var i = 0; i < fileList.length && i < allowed; i++) {
             var f = fileList[i];
             if (f.size > 20 * 1024 * 1024) { showToast('"' + f.name + '" is over 20MB and was skipped.', 'error'); continue; }
@@ -1051,7 +1073,7 @@ var GarmentSubmitForm = (function () {
         var subEl = document.getElementById('gsf-file-drop-sub');
         var dotsEl = document.getElementById('gsf-file-drop-dots');
         if (!dropEl || !ctaEl || !subEl || !dotsEl) return;
-        var n = referenceFiles.length;
+        var n = referenceFiles.length + prefilledUploads.length;
         var remaining = MAX_FILES - n;
         if (n === 0) {
             ctaEl.textContent = 'Drop files here';
@@ -1071,24 +1093,102 @@ var GarmentSubmitForm = (function () {
     function renderFilePreviews() {
         var area = document.getElementById('gsf-file-preview-area');
         if (!area) return;
-        if (referenceFiles.length === 0) { area.innerHTML = ''; return; }
+        if (referenceFiles.length === 0 && prefilledUploads.length === 0) { area.innerHTML = ''; return; }
         var html = '<div class="gsf-file-list">';
+        // Carried-over files first (already in the Artwork folder), tagged so the
+        // user can see they came from the quote and can remove them if needed.
+        prefilledUploads.forEach(function (u, idx) {
+            html += '<div class="gsf-file-item">'
+                + '<span class="gsf-file-name">' + escapeHtml(u.displayName || u.fileName) + '</span>'
+                + '<span class="gsf-file-badge">from quote</span>'
+                + '<button type="button" class="gsf-file-remove" data-kind="pre" data-idx="' + idx + '" title="Remove">×</button>'
+                + '</div>';
+        });
         referenceFiles.forEach(function (f, idx) {
             html += '<div class="gsf-file-item">'
                 + '<span class="gsf-file-name">' + escapeHtml(f.name) + '</span>'
                 + '<span class="gsf-file-size">' + formatFileSize(f.size) + '</span>'
-                + '<button type="button" class="gsf-file-remove" data-idx="' + idx + '" title="Remove">×</button>'
+                + '<button type="button" class="gsf-file-remove" data-kind="ref" data-idx="' + idx + '" title="Remove">×</button>'
                 + '</div>';
         });
         html += '</div>';
         area.innerHTML = html;
         area.querySelectorAll('.gsf-file-remove').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                referenceFiles.splice(parseInt(btn.getAttribute('data-idx')), 1);
+                var idx = parseInt(btn.getAttribute('data-idx'), 10);
+                if (btn.getAttribute('data-kind') === 'pre') prefilledUploads.splice(idx, 1);
+                else referenceFiles.splice(idx, 1);
                 renderFilePreviews();
                 updateFileDropState();
             });
         });
+    }
+
+    // Status line for the "carried over from the quote" flow. kind: '' | 'ok' | 'error'.
+    function renderCarriedStatus(message, kind) {
+        var el = document.getElementById('gsf-carried-art-status');
+        if (!el) return;
+        if (!message) { el.style.display = 'none'; el.textContent = ''; return; }
+        el.style.display = 'block';
+        el.className = 'gsf-carried-status'
+            + (kind === 'error' ? ' gsf-carried-status--error' : (kind === 'ok' ? ' gsf-carried-status--ok' : ''));
+        el.textContent = message;
+    }
+
+    // Import the customer's artwork + approved mockups (by URL) into the Caspio
+    // Artwork folder server-side, then show them as carried-over reference files.
+    // No browser CORS, no manual download/re-upload. Visible status on success
+    // AND failure — never silently drop a file (Erik's #1 rule).
+    function importArtworkUrls(list) {
+        var items = (list || []).filter(function (x) { return x && x.url; });
+        if (!items.length) return;
+        var truncated = 0;
+        if (items.length > MAX_FILES) { truncated = items.length - MAX_FILES; items = items.slice(0, MAX_FILES); }
+        var failed = [];
+        renderCarriedStatus('Carrying over ' + items.length + ' file(s) from the quote…');
+        function next(i) {
+            if (i >= items.length) {
+                renderFilePreviews();
+                updateFileDropState();
+                var okCount = prefilledUploads.length;
+                if (failed.length) {
+                    var msg = '⚠ ' + failed.length + ' file(s) could not be carried over — upload them manually: ' + failed.join(', ');
+                    renderCarriedStatus(msg, 'error');
+                    showToast(msg, 'error');
+                } else {
+                    var done = '✓ ' + okCount + ' file(s) carried over from the quote'
+                        + (truncated ? (' (' + truncated + ' more not attached — only 4 fit)') : '') + '.';
+                    renderCarriedStatus(done, 'ok');
+                }
+                return;
+            }
+            var it = items[i];
+            var label = it.displayName || it.fileName || it.url;
+            return fetch(API_BASE + '/api/files/import-from-url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: it.url, fileName: it.fileName || it.displayName || '' })
+            })
+                .then(function (r) {
+                    if (!r.ok) return r.text().then(function (b) { throw new Error('HTTP ' + r.status + (b ? (' ' + b) : '')); });
+                    return r.json();
+                })
+                .then(function (data) {
+                    if (data && data.success && data.fileName) {
+                        prefilledUploads.push({ fileName: data.fileName, displayName: label });
+                        renderFilePreviews();
+                        updateFileDropState();
+                    } else {
+                        failed.push(label);
+                    }
+                })
+                .catch(function (err) {
+                    console.warn('[GarmentSubmitForm] artwork import failed for', it.url, err);
+                    failed.push(label);
+                })
+                .then(function () { return next(i + 1); });
+        }
+        next(0);
     }
 
     // ── Validation ─────────────────────────────────────────────────────────
@@ -1153,7 +1253,7 @@ var GarmentSubmitForm = (function () {
 
         // Artwork source: a file OR a previous design # OR file type "must recreate"
         var fileType = getVal('gsf-file-type');
-        var hasSource = referenceFiles.length > 0 || !!getVal('gsf-prev-design') || (fileType === FILE_TYPES[4]) || (fileType === FILE_TYPES[3]);
+        var hasSource = referenceFiles.length > 0 || prefilledUploads.length > 0 || !!getVal('gsf-prev-design') || (fileType === FILE_TYPES[4]) || (fileType === FILE_TYPES[3]);
         setError('gsf-file-type', !(fileType && hasSource) && !hasSource);
         if (!hasSource) { setError('gsf-file-type', true); valid = false; }
         else if (!fileType) { setError('gsf-file-type', true); valid = false; }
@@ -1392,11 +1492,20 @@ var GarmentSubmitForm = (function () {
             if (row.image) payload[imageSlots[i]] = row.image;
         });
 
-        // Uploaded file paths → File_Upload_One..Four
+        // File paths → File_Upload_One..Four. Carried-over art (already in the
+        // Artwork folder via import-from-url) fills slots first, then newly
+        // uploaded files. If the combined set exceeds the 4 slots, warn — never
+        // silently drop (Erik's #1 rule).
         var slots = ['File_Upload_One', 'File_Upload_Two', 'File_Upload_Three', 'File_Upload_Four'];
-        uploaded.forEach(function (u, i) {
+        var allFiles = prefilledUploads
+            .map(function (u) { return { fileName: u.fileName }; })
+            .concat((uploaded || []).filter(Boolean));
+        allFiles.forEach(function (u, i) {
             if (i < slots.length && u && u.fileName) payload[slots[i]] = '/Artwork/' + u.fileName;
         });
+        if (allFiles.length > slots.length && typeof showToast === 'function') {
+            showToast('Only the first 4 files were attached to the request (' + allFiles.length + ' provided).', 'error');
+        }
 
         return payload;
     }
@@ -1499,6 +1608,7 @@ var GarmentSubmitForm = (function () {
 
     function resetForm() {
         referenceFiles = [];
+        prefilledUploads = [];
         selectedContact = null;
         selectedDesign = null;
         isRush = false;

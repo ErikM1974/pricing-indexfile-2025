@@ -2685,6 +2685,52 @@ body {
 }
 
 /* ============================================================================
+   Send to Steve modal (Erik 2026-06-26) — hosts the shared garment art form
+   ============================================================================ */
+.sts-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px 16px;
+    overflow-y: auto;
+}
+.sts-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+}
+.sts-modal-dialog {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 880px;
+    margin: auto;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35);
+    padding: 20px 20px 28px;
+}
+.sts-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 50%;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+}
+.sts-modal-close:hover { background: #e2e8f0; color: #0f172a; }
+
+/* ============================================================================
    Payments list (below Financial Summary)
    ============================================================================ */
 .sw-payments-list {
@@ -2802,7 +2848,8 @@ body {
     .sw-manual-wo-strip,
     .sw-actions-row,
     .sw-original-section,
-    .sw-sync-refresh-btn {
+    .sw-sync-refresh-btn,
+    .sts-modal {
         display: none !important;
     }
     /* Make panel headings consistent with the printed invoice tone */
