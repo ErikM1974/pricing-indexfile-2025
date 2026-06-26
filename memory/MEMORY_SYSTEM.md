@@ -33,7 +33,7 @@
 
 ---
 
-## The 5 memory surfaces (tiered by WHEN they load)
+## The 6 memory surfaces (tiered by WHEN they load)
 
 | # | Surface | Location | Loads | Holds | Budget |
 |---|---|---|---|---|---|
@@ -42,6 +42,7 @@
 | 3 | **Topic files** | repo `/memory` (durable) · `~/.claude` (volatile) | **on-demand** (Read) | Deep per-domain/feature detail | keep each focused |
 | 4 | **LESSONS_LEARNED.md** (+ `_ARCHIVE`) | repo `/memory` | **on-demand** | Recurring bugs & gotchas (Problem/Root Cause/Solution/Prevention) | **< 300 lines, target < 250**; archive oldest resolved when over 250 |
 | 5 | **Skills** | `.claude/skills/<name>/SKILL.md` | description always; body on invoke | Repeatable procedures (`deploy`, `dash-page`, `memory-maintain`) | < 500 lines/skill |
+| 6 | **Path-scoped rules** | `.claude/rules/*.md` | **lazy** — when Claude opens a file matching the rule's `paths:` globs | Domain rules that only matter in a subtree (`quote-builders`, `pricing-services`) | keep focused |
 
 **Anything that exceeds its budget overflows DOWN a tier** (CLAUDE.md rule → topic file; MEMORY.md paragraph → topic file + one-line pointer). Budgets are not suggestions: MEMORY.md silently truncates past ~24 KB (bottom entries stop loading), and CLAUDE.md adherence drops past ~200 lines.
 
@@ -108,6 +109,6 @@ Durable **rules/gotchas** graduate the other way: when a shipped item proves a l
 - [x] **`wa-sales-tax-rules.md`** — DONE 2026-06-25: promoted the newer superset (with the 2026-06-07 EMB tax findings) into the canonical repo copy; machine-local copy reduced to a pointer.
 - [x] **`INDEX.md`** — DONE 2026-06-25: regenerated from `git ls-files memory` (108/108 files categorized, 0 uncategorized). The 2 "orphan links" the audit flagged actually exist on disk (untracked), so they were NOT removed. Now regenerable via `/memory-maintain`.
 - [x] **Archive one-time docs** — DONE 2026-06-25: moved 15 zero-reference historical docs (NEXT_SESSION_PICKUP_*, OVERNIGHT/PHASE_3, EMB_* pickups, 2026-01 audits, superseded plan) to `/memory/archive/`. 3 still-referenced (EMB_FINAL_VERDICT, EMB_TO100, QUOTE_BUILDER_UNIFICATION_PLAN) left in place; ~10 still-pointed-to audit docs bucketed under "historical" in INDEX rather than moved.
-- [ ] **Unify auto-memory frontmatter** to one schema (nested `metadata.type`); 21 files still use the older flat `type:`. *(DEFERRED 2026-06-25 — low value (cosmetic) on machine-local files that can revert; do opportunistically when touching a file, not as a batch.)*
-- [ ] **Graduate ~6 foundational LESSONS rules** to get the bug log under its 250 target. *(DEFERRED 2026-06-25 — LESSONS is at 272, under the 300 cap with runway. The foundational rules (falsy-zero, Caspio pagination) belong IN the bug log where debuggers look; the <250 target is best reached by natural aging as new fixes land, not by gutting valuable full entries into pointers.)*
-- [ ] **Consider `.claude/rules/*.md`** (path-scoped lazy-loaded rules with `paths:` frontmatter) for domain rules that only matter when editing certain files (e.g. quote-builder rules) — keeps CLAUDE.md lean. *(Optional upgrade; needs Erik's buy-in before introducing a new mechanism.)*
+- [x] **Auto-memory frontmatter unified** — DONE 2026-06-25: all 21 flat `type:` files converted to the nested `metadata.node_type/type` schema (`originSessionId` and extra fields preserved). 0 flat-type files remain.
+- [x] **LESSONS under 250** — DONE 2026-06-25: 271 → 246 lines. Reduced 5 duplicated foundational rules to 1-line pointers (falsy-zero, Caspio pagination, pricing-from-API, OnSite-drops-tax, EMB falsy-zero recurrence) + archived 2 resolved one-time fixes (SCP `manualCost` gate, deploy `git add -u`).
+- [x] **`.claude/rules/` introduced** — DONE 2026-06-25: path-scoped `quote-builders.md` + `pricing-services.md` + README. The builder sync manifest moved OUT of CLAUDE.md into the rule (loads only when editing builder files); CLAUDE.md points to it.
