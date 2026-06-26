@@ -404,23 +404,35 @@
             try {
                 // 1. Ingest orders that fell BETWEEN scheduled syncs (Erik 2026-06-26):
                 //    ones that raced placed→shipped→Complete in one hop, so the daily
-                //    allOpen/lastUpdate passes never saw them — they're absent from the
-                //    synced table entirely (no PO, no tracking anywhere). Bounded SMALL
-                //    + non-fatal so a slow/empty catch-up never blocks the shipment
-                //    refresh below; `remaining` tells the user to click again for more.
-                let ingested = 0, ingestRemaining = 0, ingestErr = null;
+                //    allOpen/lastUpdate passes never saw them — absent from the synced
+                //    table entirely (no PO, no tracking anywhere). The catch-up runs ASYNC
+                //    on the server (invoice + lastUpdate discovery + per-PO SOAP would trip
+                //    Heroku's 30s limit synchronously), so we kick it off (202) then POLL
+                //    its status here. Non-fatal: any hiccup just skips to the shipment pull.
+                let ingested = 0, ingestErr = null;
                 try {
-                    const cr = await fetch('/api/sanmar-orders/sync-recent-completed', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ days: 7, limit: 5 }),
+                    const kick = await fetch('/api/sanmar-orders/sync-recent-completed', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ days: 7 }),
                     });
-                    const cres = await cr.json().catch(() => ({}));
-                    if (cr.ok && cres.success) { ingested = cres.ingested || 0; ingestRemaining = cres.remaining || 0; }
-                    else { ingestErr = cres.error || `HTTP ${cr.status}`; }
+                    const kres = await kick.json().catch(() => ({}));
+                    if (!kick.ok || !kres.success) throw new Error(kres.error || `HTTP ${kick.status}`);
+                    // Poll until the background job finishes (client-side, so no 30s limit) —
+                    // ~30s cap; if still running we proceed and it keeps ingesting server-side.
+                    for (let i = 0; i < 12; i++) {
+                        await new Promise(r => setTimeout(r, 2500));
+                        const s = await fetch('/api/sanmar-orders/sync-recent-completed-status').then(r => r.json()).catch(() => ({}));
+                        if (s && s.success && !s.running) {
+                            const lr = s.lastResult || {};
+                            if (lr.error) ingestErr = lr.error; else ingested = lr.ingested || 0;
+                            break;
+                        }
+                        if (s && s.progress) btn.innerHTML = `<i class="fas fa-dolly fa-spin"></i> Ingesting ${s.progress.ingested || 0}/${s.progress.pending || '…'}…`;
+                    }
                 } catch (e) { ingestErr = e.message; }
 
                 // 2. Pull live tracking for in-table open orders (original behavior).
+                btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
                 const resp = await fetch('/api/sanmar-orders/sync-shipments', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -430,8 +442,7 @@
                 if (!resp.ok || !result.success) throw new Error(result.error || `HTTP ${resp.status}`);
                 await fetchInboundStatuses({ force: true }); // re-pull, bypassing the status cache
                 const added = result.shipmentsAdded || 0;
-                const pending = (ingestRemaining || 0) + (result.remaining || 0);
-                showToast(`✓ Inbound synced from SanMar: ${ingested} new order(s) ingested, +${added} now Shipped${pending ? ` — ${pending} still pending, click again` : ''}.${ingestErr ? ` [catch-up skipped: ${ingestErr}]` : ''}`);
+                showToast(`✓ Inbound synced from SanMar: ${ingested} new order(s) ingested, +${added} now Shipped${result.remaining ? ` — ${result.remaining} still pending, click again` : ''}.${ingestErr ? ` [catch-up: ${ingestErr}]` : ''}`);
             } catch (err) {
                 // Erik's #1 rule — surface the failure, never fail silently.
                 console.error('[QuoteManagement] refreshInboundLive failed:', err);
