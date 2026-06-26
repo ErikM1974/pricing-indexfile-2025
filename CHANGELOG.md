@@ -1,3 +1,8 @@
+## v2026.06.26.6 (2026.06.26)
+
+- fix(rep-map): Ruthie/Ruth → ruth@ in REP_EMAIL_MAP / REP_MAP (sync w/ proxy)
+- Deploy v2026.06.26.6: 4 files (ae-dashboard.html,art-hub-steve.html,art-request-detail.html,...)
+
 ## v2026.06.26.5 (2026.06.26)
 
 - Memory: async catch-up + H12 lesson for SanMar recent-completed sync
