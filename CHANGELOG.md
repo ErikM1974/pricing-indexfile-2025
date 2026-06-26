@@ -1,3 +1,9 @@
+## v2026.06.26.5 (2026.06.26)
+
+- Memory: async catch-up + H12 lesson for SanMar recent-completed sync
+- fix(art-hub): AE completion notifications — gallery 404, email misroute, resolver
+- Deploy v2026.06.26.5: 4 files (ae-dashboard.html,art-hub-steve.html,art-request-detail.html,...)
+
 ## v2026.06.26.4 (2026.06.26)
 
 - fix(quote-mgmt): make Refresh Inbound catch-up async (kick off + poll)
