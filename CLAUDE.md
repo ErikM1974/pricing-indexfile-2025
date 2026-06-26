@@ -136,15 +136,7 @@ PC54 has SKUs `PC54`, `PC54_2X`, `PC54_3X` mapped to `Size01–Size06`. **`PC54_
 
 ### Quote Builder Sync (all 4 builders)
 
-Files: `quote-builders/{dtg,dtf,embroidery,screenprint}-quote-builder.html` + matching `shared_components/js/*-quote-builder.js`. Shared utils: `quote-builder-utils.js`. Shared CSS: `quote-builder-common.css`.
-
-**🔧 Before changing ANY quote-builder element, read [memory/quote-builder-architecture.md](memory/quote-builder-architecture.md)** — the shared-vs-per-builder manifest + change-routing cheat sheet. Key: **invoice/PDF/totals/tax = ONE shared file `embroidery-quote-invoice.js` → changes hit all 4 at once.** DTG uses a separate (inline-form) architecture, so trio UI changes don't reach it automatically.
-
-**Sync these across all 4**: CSS/layout/spacing · table structure · fee/charges panel · customer info panel · modal styling · utility functions in `quote-builder-utils.js`.
-
-**Do NOT sync** (method-specific): pricing logic · location selection UI · logo/artwork config · `*-pricing-service.js` / `*-quote-service.js` · `updateDiscountType()` / `updateAdditionalCharges()` / `updateFeeTableRows()`.
-
-After any builder change, ask: "Does this apply to the other 3? Should this move to `quote-builder-utils.js`? Does it affect `printQuote()` or `saveAndGetLink()`?"
+Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rules/quote-builders.md)** — a path-scoped rule that auto-loads when you open a builder file. Headlines: **Rule 8** — sync CSS/layout/table/fees/modals/utils across all 4; pricing/location/logo stay method-specific. **Invoice/PDF/totals/tax = ONE shared `embroidery-quote-invoice.js`** (hits all 4); DTG = separate inline-form. Before changing any builder element, read [memory/quote-builder-architecture.md](memory/quote-builder-architecture.md).
 
 ## Quick Reference
 

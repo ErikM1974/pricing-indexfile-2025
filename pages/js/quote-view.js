@@ -2811,6 +2811,10 @@ class QuoteViewPage {
         // B (2026-05-22): refresh the ShipStation button now that we know
         // the order's production state + ship method from the snapshot.
         this._updateShipStationButton(order, snapshot);
+
+        // Send to Steve (2026-06-26): a real ShopWorks order now exists, so the
+        // SW order ID + art/design number are available — reveal the button.
+        this._updateSendToSteveButton(order);
     }
 
     _updateShipStationButton(order, snapshot) {
@@ -3376,6 +3380,208 @@ class QuoteViewPage {
                 window.location.href = mailto;
             });
         }
+
+        // Send to Steve (2026-06-26). Visibility decided by
+        // _updateSendToSteveButton() once the ShopWorks snapshot lands.
+        const steveBtn = document.getElementById('sw-action-send-steve');
+        if (steveBtn) {
+            steveBtn.addEventListener('click', () => this._openSendToSteve());
+        }
+        const stsClose = document.getElementById('sts-modal-close');
+        const stsBackdrop = document.getElementById('sts-modal-backdrop');
+        const closeSts = () => { const m = document.getElementById('sts-modal'); if (m) m.style.display = 'none'; };
+        if (stsClose) stsClose.addEventListener('click', closeSts);
+        if (stsBackdrop) stsBackdrop.addEventListener('click', closeSts);
+    }
+
+    // ── Send to Steve (2026-06-26) ──────────────────────────────────────────
+    // Opens Steve's garment art form (shared GarmentSubmitForm) pre-filled from
+    // the ShopWorks-synced order, with the customer's art + approved mockups
+    // carried over as real reference files. Gated on a real ShopWorks order in
+    // ManageOrders — Erik: the SW order ID + art number must be present first.
+
+    _updateSendToSteveButton(order) {
+        const btn = document.getElementById('sw-action-send-steve');
+        if (!btn) return;
+        const hasOrder = !!(this.isStaff && order && order.id_Order);
+        btn.style.display = hasOrder ? '' : 'none';
+    }
+
+    async _openSendToSteve() {
+        const order = this._currentSnapshot && this._currentSnapshot.order;
+        if (!order || !order.id_Order) {
+            alert("This order isn't in ShopWorks yet. Sync the ShopWorks order first, then Send to Steve.");
+            return;
+        }
+        const btn = document.getElementById('sw-action-send-steve');
+        const orig = btn ? btn.innerHTML : '';
+        if (btn) { btn.disabled = true; btn.innerHTML = '<span class="sw-action-icon">⏳</span> Loading…'; }
+        try {
+            await this._ensureSteveFormLoaded();
+            if (typeof GarmentSubmitForm === 'undefined') throw new Error('art form bundle failed to load');
+            const prefill = this._buildSteveArtPrefill();
+            const modal = document.getElementById('sts-modal');
+            GarmentSubmitForm.init('sts-form-mount', {
+                prefill: prefill,
+                onSubmitted: (designId) => {
+                    if (modal) modal.style.display = 'none';
+                    alert(designId
+                        ? ('Sent to Steve — art request #' + designId + ' created.')
+                        : 'Sent to Steve.');
+                }
+            });
+            if (modal) modal.style.display = 'flex';
+        } catch (err) {
+            console.error('[quote-view] Send to Steve failed:', err);
+            alert("Couldn't open Steve's form: " + (err && err.message ? err.message : 'unknown error'));
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+        }
+    }
+
+    // Lazy-load the garment art form bundle on first use so this customer-facing
+    // page stays lean. Optional enhancers (pickers, date utils, emailjs) load
+    // tolerantly — the form degrades to plain inputs if any are missing — but the
+    // form JS itself must load. Cached after the first call.
+    _ensureSteveFormLoaded() {
+        if (this._steveFormLoading) return this._steveFormLoading;
+        if (typeof GarmentSubmitForm !== 'undefined') { this._steveFormLoading = Promise.resolve(); return this._steveFormLoading; }
+        const V = '2026.06.26.1';
+        const loadScript = (src) => new Promise((resolve, reject) => {
+            const base = src.split('?')[0];
+            if (document.querySelector('script[data-src="' + base + '"]')) return resolve();
+            const s = document.createElement('script');
+            s.src = src; s.setAttribute('data-src', base);
+            s.onload = () => resolve();
+            s.onerror = () => reject(new Error('Failed to load ' + base));
+            document.head.appendChild(s);
+        });
+        const loadCss = (href) => {
+            const base = href.split('?')[0];
+            if (document.querySelector('link[data-href="' + base + '"]')) return;
+            const l = document.createElement('link');
+            l.rel = 'stylesheet'; l.href = href; l.setAttribute('data-href', base);
+            document.head.appendChild(l);
+        };
+        loadCss('/shared_components/css/garment-submit-form.css?v=' + V);
+        // app-config.js first (defines APP_CONFIG for the pickers + form API base),
+        // then the optional enhancers (tolerant), then the required form JS.
+        this._steveFormLoading = loadScript('/shared_components/js/app-config.js')
+            .catch(() => {})
+            .then(() => Promise.allSettled([
+                loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js'),
+                loadScript('/shared_components/js/nwca-date-utils.js'),
+                loadScript('/shared_components/js/customer-lookup-service.js'),
+                loadScript('/shared_components/js/design-name-picker.js'),
+                loadScript('/shared_components/js/work-order-picker.js')
+            ]))
+            .then(() => loadScript('/shared_components/js/garment-submit-form.js?v=' + V));
+        return this._steveFormLoading;
+    }
+
+    _buildSteveArtPrefill() {
+        const snap = this._currentSnapshot || {};
+        const order = snap.order || {};
+        const q = this.quoteData || {};
+
+        const company = order.CustomerName || q.CompanyName || q.CustomerName || '';
+        const contactName = [order.ContactFirstName, order.ContactLastName].filter(Boolean).join(' ').trim()
+            || q.CustomerName || '';
+        const contactEmail = order.ContactEmail || q.CustomerEmail || '';
+        const salesRep = order.CustomerServiceRep || q.SalesRepName || q.SalesRep || '';
+        const orderNum = order.id_Order ? String(order.id_Order) : '';
+
+        // Primary design # (the art number), else the first pushed design.
+        let designNum = (order.id_Design !== undefined && order.id_Design !== null && order.id_Design !== '')
+            ? String(order.id_Design) : '';
+        if (!designNum) {
+            const d0 = (snap.pushed && Array.isArray(snap.pushed.Designs) && snap.pushed.Designs[0]) || null;
+            if (d0 && d0.id_Design != null && d0.id_Design !== '') designNum = String(d0.id_Design);
+        }
+
+        const custNum = order.id_Customer ? String(order.id_Customer) : '';
+        const artworkUrls = this._collectQuoteArtworkUrls();
+        const notes = 'Carried over from quote ' + (this.quoteId || '')
+            + (orderNum ? (' · WO ' + orderNum) : '')
+            + '. Customer art + approved mockups attached from the order.';
+
+        return {
+            company: company,
+            contactName: contactName,
+            contactEmail: contactEmail,
+            salesRep: salesRep,
+            orderNum: orderNum,
+            designNum: designNum,
+            custNum: custNum,
+            customerId: custNum,
+            dueDate: this._toDateInputValue(order.date_RequestedToShip),
+            decoration: this._steveDecorationFromQuote(),
+            locations: this._steveLocationsFromArt(artworkUrls),
+            notes: notes,
+            artworkUrls: artworkUrls
+        };
+    }
+
+    // Collect customer art + approved mockups from OrderSettingsJSON. Art first
+    // (fills the File_Upload slots before mockups). Same source as renderCustomerArtwork().
+    _collectQuoteArtworkUrls() {
+        const out = [];
+        try {
+            const raw = this.quoteData && this.quoteData.OrderSettingsJSON;
+            if (!raw) return out;
+            const s = (typeof raw === 'string') ? JSON.parse(raw) : raw;
+            if (!s || typeof s !== 'object') return out;
+            if (s.frontLogo && s.frontLogo.fileUrl) {
+                out.push({ url: s.frontLogo.fileUrl, fileName: s.frontLogo.fileName || 'front-artwork', displayName: 'Front artwork' });
+            }
+            if (s.backLogo && s.backLogo.fileUrl) {
+                out.push({ url: s.backLogo.fileUrl, fileName: s.backLogo.fileName || 'back-artwork', displayName: 'Back artwork' });
+            }
+            (Array.isArray(s.mockups) ? s.mockups : []).forEach((m, i) => {
+                if (!m || !m.url) return;
+                const view = (m.view ? String(m.view) : ('mockup-' + (i + 1)));
+                out.push({ url: m.url, fileName: (this.quoteId || 'mockup') + '-' + view + '.png', displayName: 'Mockup — ' + view });
+            });
+        } catch (e) {
+            console.warn('[quote-view] could not collect quote artwork:', e);
+        }
+        return out;
+    }
+
+    // Derive location rows from which art the customer provided (front/back).
+    _steveLocationsFromArt(artworkUrls) {
+        const locs = [];
+        (artworkUrls || []).forEach((a) => {
+            if (a.displayName === 'Front artwork') locs.push({ placement: 'Full Front', width: '' });
+            else if (a.displayName === 'Back artwork') locs.push({ placement: 'Full Back', width: '' });
+        });
+        return locs.length ? locs : [{ placement: 'Full Front', width: '' }];
+    }
+
+    // Map the quote prefix to a garment-form decoration value (best-effort —
+    // staff can change it). Values MUST match DECORATION_METHODS in garment-submit-form.js.
+    _steveDecorationFromQuote() {
+        const id = String(this.quoteId || '').toUpperCase();
+        const m = /^([A-Z]+)/.exec(id);
+        const prefix = m ? m[1] : '';
+        const MAP = {
+            DTG: 'DTG',
+            EMB: 'Embroidery', EMBC: 'Embroidery', CEMB: 'Embroidery', CAP: 'Embroidery', RICH: 'Embroidery',
+            DTF: 'Transfer',
+            SPC: 'Screen Print',
+            STK: 'Sticker', PATCH: 'Laser Leatherette Patch'
+        };
+        return MAP[prefix] || '';
+    }
+
+    _toDateInputValue(v) {
+        if (!v) return '';
+        const s = String(v).trim();
+        let m = /^(\d{4})-(\d{2})-(\d{2})/.exec(s);
+        if (m) return m[1] + '-' + m[2] + '-' + m[3];
+        m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
+        if (m) return m[3] + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2);
+        return '';
     }
 
     _renderStaleSyncWarning() {

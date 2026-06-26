@@ -81,14 +81,22 @@ Test updated: `recover-broken-mockup-slot-aware.test.js` (5→8 field list).
   backup is saved at `%TEMP%/art-actions-shared.BACKUP.js`. Lesson: after editing in this checkout, re-Read/grep on
   disk to confirm; don't trust the edit-success message alone.
 
-## Deferred follow-up (minor, flagged by review — NOT shipping with v1)
+## AE Dashboard follow-up — ✅ SHIPPED LIVE `v2026.06.25.6` (Heroku v1457, 2026-06-25)
 
-Dashboard CARD thumbnails (`art-hub-steve.js` ~539/629, `art-ae.js` ~190/399, `art-hub-steve-gallery.js` ~20/466,
-`ae-dashboard.js` ~576) use explicit `q.select` / fallback chains covering only the original 3 mockup fields. A record
-whose ONLY filled mockups are slots 4/5/6 would show no card thumbnail. **Rare** (slots auto-fill 1→6 in order, so 4/5/6
-fill only after 1/2/3) and cosmetic (cards need one representative image). The **Send modal is unaffected** — it does its
-own no-`select` fetch, so all 6 always appear as "Previously Sent." Extend those selects/fallbacks + the gallery label map
-(~3183) if Erik wants the new slots reflected on cards.
+The AE-facing surfaces now surface mockups 4/5/6. Verified live in Chrome: the AE detail view
+(`/art-request/:id?view=ae`, the "Art Request Review" page off the AE Dashboard) renders all 6 mockup slots as a
+clean **3×2 grid** (Mockup 1-3 filled, 4-6 "+Add Mockup" placeholders), no console errors.
+- `art-ae.js`: added `Mockup_4/5/6` to `SELECT_FIELDS` (+ stripped them in `SELECT_FIELDS_LEGACY` so pre-migration
+  installs still 500-retry) and extended the card `thumbUrl` fallback chain through all 6.
+- `ae-dashboard.js` (Review Mockups tab): added `Mockup_4/5/6` to `reviewBase` select + 3 `BARE_CDN_RE`-guarded
+  fallback steps before `File_Upload`.
+- `art-request-detail.css`: `.ard-mockups-grid` already wraps 6→3×2 (`repeat(3,1fr)`); added `@media(max-width:480px)`
+  → 2-col so 6 slots stay legible on mobile.
+- AE Dashboard cards are **single-thumbnail by design** (one representative image → click through to the 6-slot detail
+  view); no montage was built. The detail-page 6-slot grid + shared Send modal grid already rendered 6 — no change.
+- NOTE: Steve's own hub (`art-hub-steve.js` / `art-hub-steve-gallery.js`) card thumbnails still fall back to only the 3
+  original fields — left as-is (Steve fills slots in order from his own page; cosmetic, slot-4/5/6-only is rare). Extend
+  later if desired.
 
 ## Manual test checklist (staff, controlled)
 
