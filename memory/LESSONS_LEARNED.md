@@ -91,11 +91,7 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 ### Push button stranded disabled — spinner destroyed the label; checklist/button desync (2026-06-07) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: never replace a button's innerHTML when code reads a child by ID; gate the action button from the SAME function that renders its readiness checklist.
 
-### OnSite DROPS the pushed order-level tax field — tax stays manual (2026-06-07)
-**Problem:** To get per-destination sales tax onto EMB ShopWorks orders, Erik blanked the OnSite "Manage Orders" connection's Tax Line Item + Tax Account, and the proxy pushed `TaxPartNumber: "Tax_9.6"` + `coa_AccountSalesTax01: "2200.96"` per destination. The MO→OnSite conversion **blanked both** (`TaxPartNumber: ""`) — order 142061 / EMB-2026-298.
-**Root Cause:** OnSite always sets the order's tax line item from the **connection's** "Tax Line Item" field (now blank), overwriting whatever the push sends at the order level. The "Tax Account" only works *"if the Tax Line Item is present on the order"* — and only the connection sets it. No "Split Tax Line" toggle exists in NWCA's OnSite. **Order-level tax fields do NOT survive the MO→OnSite conversion; LINE ITEMS do** (the Size→S service lines passed through untouched).
-**Solution:** Keep tax **manual** — rep selects the account from the ShopWorks invoice Tax dropdown (`2200.96 — 9.6%`); ShopWorks computes it (verified $253.48 on 142061). Proxy still derives the rate/account and pushes a **Notes On Order** tax block (rep cheat-sheet, now includes shipping in the total) + a NEW **Notes To Accounting** note (`buildAccountingTaxNote`, accountant verify). `TaxTotal: 0`. Wholesale→2203 (per-order `IsWholesale` checkbox), OOS→2202, pickup→2200.101. Detail: `wa-sales-tax-rules.md` EMB section. Full automation, if ever needed, = push tax as a LinesOE line item (survives), not the order field.
-**Prevention:** Before building automation on a ManageOrders ORDER-LEVEL field, confirm it SURVIVES the MO→OnSite conversion (dump the converted JSON). Several are stripped/overwritten by the OnSite integration mapping: `coa_AccountSalesTax01`, `TaxPartNumber`, per-line `sts_EnableTax*`. Line items survive; order-level tax/account fields don't. Also: EMB date inputs are now `<input type=date>` (YYYY-MM-DD) — convert to/from the app's MM/DD/YYYY at the input boundary with PURE STRING ops (`dateToInputValue`/`dateFromInputValue`), never `new Date("2026-06-07")` which parses as UTC and shifts a day in Pacific. "Apply Designs" on a line is a ShopWorks Product-Class/master default (no push field) — set Product Class 1's default ON.
+### OnSite DROPS the pushed order-level tax field — tax stays manual (2026-06-07): order-level tax fields (`coa_AccountSalesTax01`, `TaxPartNumber`, per-line `sts_EnableTax*`) do NOT survive the MO->OnSite conversion; LINE ITEMS do. Push `TaxTotal:0` + Notes-On-Order/Accounting tax block; rep applies tax from the ShopWorks dropdown. Full detail -> wa-sales-tax-rules.md (EMB section).
 
 ### To-100 readiness: adversarial-verify caught money gaps in the FIXES themselves (2026-06-06/07, ARCHIVED 2026-06-25): adversarially verify your OWN fixes; persisted UI state must be set BEFORE the first async consumer on EVERY entry path. Full entry in archive.
 
@@ -179,8 +175,7 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 ### DTG LTM fee/threshold lived in 4 different files (2026-05-18) — ARCHIVED 2026-06-11
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: pricing constants with a Caspio column MUST be read from the column (`Pricing_Tiers.LTM_Fee`); when the LTM tier has no `DTG_Costs` rows, the canonical fallback is the lowest non-LTM tier's costs.
 
-### ALWAYS pull pricing from Caspio API — never hardcode
-Keep-alive (also CLAUDE.md "Pricing = API"): EVERY price/fee/upcharge/% comes from Caspio via API — a hardcoded number is a fallback ONLY + visible warning. Sales adjusts prices with no deploy.
+### ALWAYS pull pricing from Caspio API — never hardcode (fallback ONLY + visible warning; sales adjusts prices with no deploy). Full rule -> CLAUDE.md "Pricing = API" + MEMORY.md "Quote Builders — Sync Rules".
 
 ---
 
@@ -197,11 +192,7 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 ### Stale Caspio-Compat Shims in Proxy Outlive the Data Fix (~2025-09) — ARCHIVED 2026-06-12
 Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when a proxy injects/backfills missing Caspio data, leave a `// REMOVE WHEN FIXED IN CASPIO` marker and re-audit on any table shape change; verify the response matches the table.
 
-### Caspio v3 Pagination: q.limit + q.pageNumber = Overlapping Pages
-**Problem:** `fetchAllCaspioPages` returned only 1000 of 2794 ManageOrders_LineItems. Style index had 634 styles instead of 715.
-**Root Cause:** Caspio v3 API: `q.limit` + `q.pageNumber` causes overlapping pages. Pages 2+ return partial duplicates of page 1.
-**Solution:** Use `q.pageSize` (not `q.limit`) for pagination. Delete `q.limit` before paginating. Fixed in `caspio.js:fetchAllCaspioPages`.
-**Prevention:** Never use `q.limit` with `q.pageNumber` on Caspio v3. Always `q.pageSize`.
+### Caspio v3 Pagination — NEVER `q.limit` with `q.pageNumber` (overlapping/partial-dup pages; returned 1000 of 2794 rows). Always `q.pageSize`; delete `q.limit` before paginating (`caspio.js:fetchAllCaspioPages`). Full rule -> MEMORY.md "Backend".
 
 ### Caspio multi-select List columns unwritable via REST/Triggered Actions (2026-05-09) — ARCHIVED 2026-06-16
 In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: NEVER put a Caspio `List - String` multi-select column in a REST POST/PUT — the whole submission 500s. Workaround = a parallel Text column (`Order_Type_Source`) + read-coalesce (`Order_Type || Order_Type_Source`).
@@ -225,11 +216,7 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 
 ## JavaScript Patterns
 
-### Falsy-Zero Bug (Use ?? Instead of ||)
-**Problem:** Tax rate showed 10.1% for out-of-state quotes where `taxRate` was `0`.
-**Root Cause:** `this.taxRate || 0.101` — JS `||` treats `0` as falsy.
-**Solution:** `this.taxRate ?? 0.101` — nullish coalescing only falls through on `null`/`undefined`.
-**Prevention:** Always `??` when `0`, `""`, or `false` are valid values. Reserve `||` for all-falsy defaults.
+### Falsy-Zero Bug (Use ?? Instead of ||) — `||` treats `0` as falsy (tax `0` -> `0.101` fallback). Use `??` when `0`/`""`/`false` are valid. Full rule -> MEMORY.md "Top Critical Gotchas" + common-gotchas.md.
 
 ### `await` in a sync fn (2026-06-03, ARCHIVED 2026-06-12): `node --check <file>` BEFORE browser verify — one syntax error nukes the whole script ("nothing loaded"). In embroidery-quote-builder.js the `syncRushRow()`/`updateTaxCalculation()` block is the SYNC `updatePricingDisplay`, not `recalculatePricing`. Full entry in archive.
 
@@ -258,14 +245,6 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 **Solution:** New `resolveSamplePricing(style)` in top-sellers-product.html — at add-to-cart it re-derives free/paid + price from `GET /api/pricing-bundle?method=BLANK` (min blank cost <$10 → free; else minCost ÷ tier-1 MarginDenominator, half-dollar ceil), visible alert + no cart-add on API failure. Showcase margin now read from the same bundle (eligible:false on missing margin, never a hardcoded fallback). Verified in preview: URL claiming `price=99.99&sampleType=paid` for PC54 → cart stored free/$0; showcase buttons render API-margin prices ($192 CT104670 matches resolver exactly).
 **Prevention:** Anything that becomes money in an order must be RE-DERIVED server-/API-side at the point of trust, never parsed from a URL/storage the customer can edit (same class as the `_FB` push-gating rule: key on server-stamped facts). When two pages "share" a pricing rule by copy-paste, the literal WILL drift — point both at the API value. Residual (P5): sessionStorage cart is still client-trusted until the sample-cart rebuild adds a server-side reprice. **Same-day 2nd instance (search):** product-search-service.js CATEGORY_KEYWORDS hardcoded 'Fleece'/'Headwear' but live categories are 'Sweatshirts/Fleece'/'Caps' → 11 common words (hoodie, hats, caps…) returned ZERO products in production. Fixed values + drift guard: when OUR inferred filter (not the user's) yields 0 results, retry without it and log a warn — an inference must never blank a search. Full taxonomy fix (API-driven categories) = redesign P2.
 
-### SCP pricing service shipped with an UNGATED ?manualCost override — the 5th copy of a staff backdoor, 3rd copy-paste gate miss (2026-06-11)
-**Problem:** `ScreenPrintPricingService.getManualCostOverride()` (screenprint-pricing-service.js:73) honored `?manualCost=`/`?cost=` URL params AND persisted them in sessionStorage with NO host gate — any customer page instantiating the service could be repriced for a whole session by a crafted/shared link (`?cost=0.01`). EMB, cap-EMB, DTG, and DTF services all had the localhost/.herokuapp.com gate; SCP was the one miss (found by the customer quote-cart parity audit, same class as the just-fixed top-sellers URL-price hole above).
-**Root Cause:** The manual-cost feature was copy-pasted across 5 pricing services and the host gate was retrofitted per service (EMB at launch, cap-EMB 2026-05-03, DTG/DTF later) instead of centralized — each copy could (and one did) miss it.
-**Solution:** Mirrored the EMB gate verbatim into the SCP service (customer quote-cart Phase 0 P0 hotfix). `tests/unit/web-quote-cart-parity.test.js` now locks the gate across ALL FIVE services × 4 cases each: customer-host URL param ignored AND not persisted, stale sessionStorage blocked, localhost honored, .herokuapp.com honored.
-**Prevention:** A staff-only override that exists in N copies needs a gate test that ENUMERATES all N (the new `test.each` does) — a per-service fix without the enumeration is how the 3rd miss happened. Any new `*-pricing-service.js` gets the host gate from day one; the quote-cart engine only runs these services on customer hosts where the gate returns null.
+### SCP ungated `?manualCost` override — 5th staff-backdoor copy (2026-06-11, ARCHIVED 2026-06-25): EVERY `*-pricing-service.js` gets the localhost/.herokuapp.com `getManualCostOverride()` gate from day one; lock it across ALL copies with one `test.each` enumeration (`web-quote-cart-parity.test.js`). Full entry in archive.
 
-### Deploy cache-bust `git add -u` swept another session's uncommitted work into production (2026-06-11)
-**Problem:** The v2026.06.11.9 deploy's cache-bust step (`git add -u`) silently absorbed a parallel session's uncommitted edits (product-search-service.js + product/components/info.js hardcoded-0.57-margin removal) into the Deploy commit — unreviewed code reached production inside a "cache-bust" commit.
-**Root Cause:** Multiple concurrent sessions/chips share one checkout; the deploy skill stages ALL tracked modifications without checking provenance.
-**Solution:** Audited post-ship: the swept code was the planned P2 margin cleanup, house-style (fail-visible, no fallback), live-verified healthy ($31.92+ API-margin prices, 0 errors); third file (catalog-search.js) committed deliberately to complete the set.
-**Prevention:** Before ANY deploy: `git status` — every dirty file must be either (a) the release's own cache-bust bumps or (b) consciously committed first. Unknown dirt = STOP, identify the owning session, review, commit with a real message. Parallel chips + a shared checkout make this a standing risk.
+### Deploy `git add -u` swept a parallel session's work into a cache-bust commit (2026-06-11, ARCHIVED 2026-06-25): before ANY deploy run `git status` — every dirty file must be the release's own cache-bust bumps OR consciously committed first; unknown dirt = STOP (parallel chips share one checkout). Full entry in archive.
