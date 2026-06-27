@@ -157,8 +157,10 @@ The following service codes were identified from historical orders but are not y
 | ServiceCode | Uses | Description | ShopWorks Match | Notes |
 |-------------|------|-------------|-----------------|-------|
 | CDP | 108 | Customer Digital Print | Yes | Customer-supplied digital print application |
-| SPSU | 76 | Screen Print Set Up | Yes | Setup fee for screen printing jobs |
-| SPRESET | 9 | Screen Print Reset | No | Color/screen reset between runs |
+| SPSU | 76 | Screen Print Set Up Charge | Yes | $30/screen — NEW screens. In Caspio (PK 136). |
+| SPRESET | 9 | Re-Order Screenprint Setup | Yes | $30/screen — reorder/screens on file. In Caspio (PK 139). |
+| Vellum | — | Vellum Print | Yes | $10 film positive. Added to Caspio 2026-06-27 (Erik official list). |
+| Color Chg | — | Color Change | Yes | $15 press-run color change (literal space in part #). Added 2026-06-27. |
 
 ### Embroidery Services (Additional Positions)
 
@@ -216,7 +218,7 @@ For handling common typos and legacy code references. These are implemented in `
 | EXCESS STITCH | AS-GARM | Additional stitches (garment) |
 | SECC | DECC | Typo for DECC (customer-supplied caps) |
 | SEW | SEG | Alias for sewing |
-| COLOR CHG | COLOR CHANGE | Typo for color change service |
+| COLOR CHANGE | COLOR CHG | Normalize description spelling → canonical part 'Color Chg' (real billable screen-print fee since 2026-06-27, NOT a typo) |
 
 ### Implementation (shopworks-import-parser.js)
 
@@ -235,7 +237,7 @@ this.SERVICE_CODE_ALIASES = {
     'EXCESS STITCH': 'AS-GARM',
     'SECC': 'DECC',
     'SEW': 'SEG',
-    'COLOR CHG': 'COLOR CHANGE'
+    'COLOR CHANGE': 'COLOR CHG'  // → canonical billable part (2026-06-27); classified screen-print-fee
 };
 ```
 

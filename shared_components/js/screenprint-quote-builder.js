@@ -460,6 +460,19 @@ function populateAdditionalCharges(session) {
         rushFeeInput.value = session.RushFee;
     }
 
+    // Screen-print setup parts (Erik's official list, 2026-06-27) — these live in
+    // the Notes JSON (not session columns), so parse them out to restore the controls.
+    let _scpNotes = {};
+    try { _scpNotes = typeof session.Notes === 'string' ? JSON.parse(session.Notes || '{}') : (session.Notes || {}); } catch (_) { _scpNotes = {}; }
+    const vellumQtyInput = document.getElementById('vellum-qty');
+    if (vellumQtyInput && parseInt(_scpNotes.vellumQty, 10) > 0) {
+        vellumQtyInput.value = parseInt(_scpNotes.vellumQty, 10);
+    }
+    const colorChangeQtyInput = document.getElementById('color-change-qty');
+    if (colorChangeQtyInput && parseInt(_scpNotes.colorChangeQty, 10) > 0) {
+        colorChangeQtyInput.value = parseInt(_scpNotes.colorChangeQty, 10);
+    }
+
     // Discount
     const discountAmountInput = document.getElementById('discount-amount');
     const discountTypeSelect = document.getElementById('discount-type');
@@ -885,6 +898,11 @@ function resetQuote() {
     if (rushFee) rushFee.value = '';
     if (discountAmount) discountAmount.value = '';
     if (discountReason) discountReason.value = '';
+    // Reset screen-print setup parts (Erik's official list, 2026-06-27)
+    const vellumQtyReset = document.getElementById('vellum-qty');
+    const colorChangeQtyReset = document.getElementById('color-change-qty');
+    if (vellumQtyReset) vellumQtyReset.value = '';
+    if (colorChangeQtyReset) colorChangeQtyReset.value = '';
 
     // Reset artwork services
     const artChargeToggle = document.getElementById('art-charge-toggle');
@@ -3678,6 +3696,11 @@ function updateTaxCalculation() {
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     subtotal += rushFee;
 
+    // Add Vellum + Color Change setup fees (Erik's official parts, 2026-06-27).
+    // Added before discount so a percent discount applies to them (parity with art/rush).
+    const _xfTax = getScpExtraFees();
+    subtotal += _xfTax.vellumFee + _xfTax.colorChangeFee;
+
     // Subtract discount if present
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const discountType = document.getElementById('discount-type')?.value || 'fixed';
@@ -3771,7 +3794,14 @@ function updateAdditionalCharges() {
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
 
-    const netCharges = artCharge + designFee + rushFee - discountAmount;
+    // Vellum + Color Change (Erik's official setup parts, 2026-06-27)
+    const _xf = getScpExtraFees();
+    const vellumTotalEl = document.getElementById('vellum-charge-total');
+    if (vellumTotalEl) vellumTotalEl.textContent = _xf.vellumFee.toFixed(2);
+    const colorChangeTotalEl = document.getElementById('color-change-charge-total');
+    if (colorChangeTotalEl) colorChangeTotalEl.textContent = _xf.colorChangeFee.toFixed(2);
+
+    const netCharges = artCharge + designFee + rushFee + _xf.vellumFee + _xf.colorChangeFee - discountAmount;
     if (netCharges !== 0) {
         badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
         badge.classList.remove('hidden');
@@ -3857,6 +3887,21 @@ function handleDiscountReasonPresetChange() {
 // moved to quote-builder-utils.js
 // ============================================================
 
+// Vellum + Color Change — Erik's official screen-print setup parts (2026-06-27).
+// Prices come from Caspio Service_Codes via getServicePrice so a Caspio price
+// change needs no deploy (Pricing=API rule). One source for the tax calc,
+// fee-table rows, badge, and save path so they can't disagree.
+function getScpExtraFees() {
+    const vellumQty = Math.max(0, parseInt(document.getElementById('vellum-qty')?.value || 0, 10) || 0);
+    const vellumPrice = getServicePrice('Vellum', 10);
+    const colorChangeQty = Math.max(0, parseInt(document.getElementById('color-change-qty')?.value || 0, 10) || 0);
+    const colorChangePrice = getServicePrice('Color Chg', 15);
+    return {
+        vellumQty, vellumPrice, vellumFee: vellumQty * vellumPrice,
+        colorChangeQty, colorChangePrice, colorChangeFee: colorChangeQty * colorChangePrice,
+    };
+}
+
 function updateFeeTableRows() {
     // Setup fee row (always shown for screen print)
     const setupFeeRow = document.getElementById('setup-fee-table-row');
@@ -3868,6 +3913,10 @@ function updateFeeTableRows() {
         // Use the already-computed API-driven setup fee so the displayed row
         // (read back into discountableSubtotal) matches the charged value.
         const fee = (printConfig.setupFee != null) ? printConfig.setupFee : screens * SCREEN_FEE;
+        // SPSU "Screen Print Set Up Charge" — per-screen price from Caspio (Pricing=API).
+        const perScreen = getServicePrice('SPSU', SCREEN_FEE);
+        const perEl = document.getElementById('setup-per-screen-label');
+        if (perEl) perEl.textContent = '$' + (Number.isInteger(perScreen) ? perScreen : perScreen.toFixed(2));
         setupScreensLabel.textContent = screens + ' screen' + (screens > 1 ? 's' : '');
         setupFeeUnit.textContent = '$' + fee.toFixed(2);
         setupFeeTotal.textContent = '$' + fee.toFixed(2);
@@ -3915,6 +3964,35 @@ function updateFeeTableRows() {
         }
     }
 
+    // Vellum + Color Change rows (Erik's official setup parts, 2026-06-27)
+    const _xf = getScpExtraFees();
+    const vellumRow = document.getElementById('vellum-fee-row');
+    if (vellumRow) {
+        if (_xf.vellumQty > 0) {
+            vellumRow.style.display = 'table-row';
+            const vql = document.getElementById('vellum-qty-label'); if (vql) vql.textContent = _xf.vellumQty;
+            const vpl = document.getElementById('vellum-per-label'); if (vpl) vpl.textContent = '$' + (Number.isInteger(_xf.vellumPrice) ? _xf.vellumPrice : _xf.vellumPrice.toFixed(2));
+            const vqc = document.getElementById('vellum-qty-cell'); if (vqc) vqc.textContent = _xf.vellumQty;
+            const vu = document.getElementById('vellum-fee-unit'); if (vu) vu.textContent = '$' + _xf.vellumPrice.toFixed(2);
+            const vt = document.getElementById('vellum-fee-total'); if (vt) vt.textContent = '$' + _xf.vellumFee.toFixed(2);
+        } else {
+            vellumRow.style.display = 'none';
+        }
+    }
+    const colorChangeRow = document.getElementById('color-change-fee-row');
+    if (colorChangeRow) {
+        if (_xf.colorChangeQty > 0) {
+            colorChangeRow.style.display = 'table-row';
+            const cql = document.getElementById('color-change-qty-label'); if (cql) cql.textContent = _xf.colorChangeQty;
+            const cpl = document.getElementById('color-change-per-label'); if (cpl) cpl.textContent = '$' + (Number.isInteger(_xf.colorChangePrice) ? _xf.colorChangePrice : _xf.colorChangePrice.toFixed(2));
+            const cqc = document.getElementById('color-change-qty-cell'); if (cqc) cqc.textContent = _xf.colorChangeQty;
+            const cu = document.getElementById('color-change-fee-unit'); if (cu) cu.textContent = '$' + _xf.colorChangePrice.toFixed(2);
+            const ct = document.getElementById('color-change-fee-total'); if (ct) ct.textContent = '$' + _xf.colorChangeFee.toFixed(2);
+        } else {
+            colorChangeRow.style.display = 'none';
+        }
+    }
+
     // Discount row
     const discountRow = document.getElementById('discount-row');
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
@@ -3935,7 +4013,8 @@ function updateFeeTableRows() {
                 const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || 0);
                 const ltmFee = window.currentPricingData?.ltmFee || 0;
 
-                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + setupFee + ltmFee;
+                const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + setupFee + ltmFee
+                    + _xf.vellumFee + _xf.colorChangeFee;
                 actualDiscount = discountableSubtotal * (discountAmount / 100);
             }
             const reasonLabel = document.getElementById('discount-reason-label');
@@ -4137,6 +4216,13 @@ function buildScreenprintPricingData(products) {
 
     // Get rush fee and discount from UI
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    // Vellum + Color Change setup parts (Erik's official list, 2026-06-27). Read
+    // inline (like art/rush above) rather than via getScpExtraFees() so this PDF
+    // function stays self-contained for the brace-extracted unit test harness.
+    const vellumQtyPdf = Math.max(0, parseInt(document.getElementById('vellum-qty')?.value || 0, 10) || 0);
+    const vellumFeePdf = vellumQtyPdf * getServicePrice('Vellum', 10);
+    const colorChangeQtyPdf = Math.max(0, parseInt(document.getElementById('color-change-qty')?.value || 0, 10) || 0);
+    const colorChangeFeePdf = colorChangeQtyPdf * getServicePrice('Color Chg', 15);
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const discountType = document.getElementById('discount-type')?.value || 'fixed';
     const discountReason = document.getElementById('discount-reason')?.value || '';
@@ -4191,6 +4277,11 @@ function buildScreenprintPricingData(products) {
         graphicDesignHours: graphicDesignHours,
         graphicDesignCharge: graphicDesignCharge,
         rushFee: rushFee,
+        // Screen-print setup parts (Erik's official list, 2026-06-27) — itemized on the PDF
+        vellumQty: vellumQtyPdf,
+        vellumFee: vellumFeePdf,
+        colorChangeQty: colorChangeQtyPdf,
+        colorChangeFee: colorChangeFeePdf,
         discount: discount,
         discountReason: discountReason
     });
@@ -4272,11 +4363,16 @@ async function saveAndGetLink(opts = {}) {
         const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
         const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
         const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+        // Vellum + Color Change + Reorder — Erik's official setup parts (2026-06-27).
+        // Same getScpExtraFees() source the on-screen math + fee table use, so the
+        // saved/pushed total matches what the rep sees (parity rule).
+        const _xf = getScpExtraFees();
         const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
         const discountType = document.getElementById('discount-type')?.value || 'fixed';
         const discountReason = document.getElementById('discount-reason')?.value || '';
         // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
-        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (printConfig.setupFee || 0) + (pricing.ltmFee || 0);
+        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (printConfig.setupFee || 0) + (pricing.ltmFee || 0)
+            + _xf.vellumFee + _xf.colorChangeFee;
         const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
         const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
@@ -4339,6 +4435,11 @@ async function saveAndGetLink(opts = {}) {
             graphicDesignHours: graphicDesignHours,
             graphicDesignCharge: graphicDesignCharge,
             rushFee: rushFee,
+            // Screen-print setup parts (Erik's official list, 2026-06-27)
+            vellumQty: _xf.vellumQty,
+            vellumFee: _xf.vellumFee,
+            colorChangeQty: _xf.colorChangeQty,
+            colorChangeFee: _xf.colorChangeFee,
             discount: discount,
             discountPercent: discountPercent,
             discountReason: discountReason,

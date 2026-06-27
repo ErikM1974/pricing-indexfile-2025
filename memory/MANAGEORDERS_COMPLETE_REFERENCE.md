@@ -1816,10 +1816,14 @@ Reps can attach **29 NWCA fee/service codes** to an order via the picker UI. Eac
 | 23 | 3D-EMB | 3D Puff Embroidery | Embroidery |
 | 24 | GRT-50 | Logo Mockup & Print Review | GRT (Graphic) |
 | 25 | GRT-75 | Graphic design services | GRT (Graphic) |
-| 26 | SPRESET | Screen Reset Charge | Screenprint (LPP) |
-| 27 | SPSU | New Screen Set Up Charge | Screenprint (LPP) |
+| 26 | SPRESET | Re-Order Screenprint Setup | Screenprint (LPP) |
+| 27 | SPSU | Screen Print Set Up Charge | Screenprint (LPP) |
 | 28 | Laser Patch | Laser Faux Leather Patch | Embroidery |
 | 29 | SECC | Sew emblems to caps | Sewing |
+| 30 | Vellum | Vellum Print | Screenprint (LPP) |
+| 31 | Color Chg | Color Change | Screenprint (LPP) |
+
+**Screen-print setup parts (Erik's official list, 2026-06-27):** SPSU $30/screen (new), SPRESET $30/screen (reorder), Vellum $10 (film positive), Color Chg $15 (press-run color change — note the literal space in the part #). All four in Caspio `Service_Codes` (ServiceType SCREENPRINT, RailGroup "Setup Fees") + proxy `KNOWN_FEE_PNS`. The SCP push transformer synthesizes SPSU/Vellum/Color Chg LinesOE from the quote `Notes`; the SCP builder exposes Vellum + Color Change qty inputs (not SPRESET — reorder is not a builder option per Erik 2026-06-27). SPRESET stays a recognized part: a saved quote_item carrying it passes through `buildLinesOE`, and the import parser classifies it as a screen-print fee.
 
 **Case rule:** All three layers (Caspio Service_Codes table, proxy `KNOWN_FEE_PNS`, frontend picker) carry the EXACT mixed-case spelling from the table above. ShopWorks part numbers are case-sensitive on the receiving end. Proxy comparison normalizes via `isKnownFeeCode()` (case-insensitive helper, [config/manageorders-emb-config.js](../caspio-pricing-proxy/config/manageorders-emb-config.js)) so case-mismatched callers still route to LinesOE correctly — but the value sent to ShopWorks preserves the canonical spelling.
 

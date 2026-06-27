@@ -188,7 +188,7 @@ class ShopWorksImportParser {
             // SECC is cap sewing (NOT DECC) — separate service from customer-supplied caps
             'SEW': 'SEG',              // Alias Sew → SEG (sewing)
             'SEW-ON': 'SEG',           // Alias Sew-on → SEG (sewing)
-            'COLOR CHG': 'COLOR CHANGE', // Typo for color change service
+            'COLOR CHANGE': 'COLOR CHG', // Normalize description spelling → canonical ShopWorks part # 'Color Chg' (Erik official setup-parts list, 2026-06-27). Now a real billable screen-print fee, NOT a typo.
             'NAME_DROP': 'MONOGRAM',   // Reps manually typing — normalize to Monogram
             'NAME_DROP_BIG': 'MONOGRAM', // Reps manually typing — normalize to Monogram
             'NAME DROP': 'MONOGRAM',   // Space variant
@@ -1563,8 +1563,10 @@ class ShopWorksImportParser {
             pn = this.SERVICE_CODE_ALIASES[pn];
         }
 
-        // Rare items → reviewItems for manual handling
-        if (pn === 'COLOR CHANGE' || pn === 'STARS') {
+        // Rare items → reviewItems for manual handling. (COLOR CHANGE removed
+        // 2026-06-27 — it's now the billable 'Color Chg' screen-print fee, aliased
+        // to 'COLOR CHG' above and classified as screen-print-fee below.)
+        if (pn === 'STARS') {
             return 'invalid';
         }
 
@@ -1674,8 +1676,10 @@ class ShopWorksImportParser {
             return 'shipping';
         }
 
-        // Screen print fees (SPRESET = reset, SPSU = set up)
-        if (pn === 'SPRESET' || pn === 'SPSU') {
+        // Screen print fees — Erik's official setup-parts list (2026-06-27):
+        // SPSU = new screen setup, SPRESET = reorder/reset, VELLUM = film positive,
+        // COLOR CHG = press-run color change.
+        if (pn === 'SPRESET' || pn === 'SPSU' || pn === 'VELLUM' || pn === 'COLOR CHG') {
             return 'screen-print-fee';
         }
 

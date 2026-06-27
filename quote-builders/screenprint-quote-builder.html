@@ -285,7 +285,7 @@
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="setup-fee-table-row" class="fee-row">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-cog"></i> Setup Fee (<span id="setup-screens-label">1 screen</span> × $30)
+                                    <i class="fas fa-cog"></i> Screen Print Set Up Charge (<span id="setup-screens-label">1 screen</span> × <span id="setup-per-screen-label">$30</span>)
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="setup-fee-unit">$30.00</td>
@@ -326,6 +326,24 @@
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="rush-fee-unit">$0.00</td>
                                 <td class="cell-total" id="rush-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="vellum-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-file-image"></i> Vellum Print (<span id="vellum-qty-label">0</span> × <span id="vellum-per-label">$10</span>)
+                                </td>
+                                <td class="cell-qty" id="vellum-qty-cell">0</td>
+                                <td class="cell-price" id="vellum-fee-unit">$0.00</td>
+                                <td class="cell-total" id="vellum-fee-total">$0.00</td>
+                                <td class="cell-actions"></td>
+                            </tr>
+                            <tr id="color-change-fee-row" class="fee-row" style="display: none;">
+                                <td colspan="10" class="fee-label">
+                                    <i class="fas fa-fill-drip"></i> Color Change (<span id="color-change-qty-label">0</span> × <span id="color-change-per-label">$15</span>)
+                                </td>
+                                <td class="cell-qty" id="color-change-qty-cell">0</td>
+                                <td class="cell-price" id="color-change-fee-unit">$0.00</td>
+                                <td class="cell-total" id="color-change-fee-total">$0.00</td>
                                 <td class="cell-actions"></td>
                             </tr>
                             <!-- Discount row removed 2026-03-23 -->
@@ -411,6 +429,24 @@
                                 <input type="number" id="rush-fee" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges()">
+                            </div>
+                        </div>
+                        <div class="charge-field" style="margin:0;">
+                            <label class="quote-label">Vellum Print ($10 ea)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" id="vellum-qty" class="quote-input" style="width: 80px;"
+                                       min="0" step="1" placeholder="0"
+                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
+                                <span class="text-muted">= $<span id="vellum-charge-total">0.00</span></span>
+                            </div>
+                        </div>
+                        <div class="charge-field" style="margin:0;">
+                            <label class="quote-label">Color Change ($15 ea)</label>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" id="color-change-qty" class="quote-input" style="width: 80px;"
+                                       min="0" step="1" placeholder="0"
+                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
+                                <span class="text-muted">= $<span id="color-change-charge-total">0.00</span></span>
                             </div>
                         </div>
                     </div>
@@ -711,10 +747,10 @@
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.25.1"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.27.1"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
-    <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.02.3"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.25.1"></script>
+    <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.27.1"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -744,7 +780,7 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.25.1"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.27.1"></script>
 
 </body>
 </html>

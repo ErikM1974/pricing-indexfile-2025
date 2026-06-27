@@ -25,7 +25,9 @@
                         'discount', 'ltmFee',
                         'decgQty', 'decgUnit', 'decgTotal',
                         'deccQty', 'deccUnit', 'deccTotal',
-                        'capPatchSetupFee', 'puffUpchargePerCap'];
+                        'capPatchSetupFee', 'puffUpchargePerCap',
+                        // SCP setup parts (Erik's official list, 2026-06-27)
+                        'vellumFee', 'vellumQty', 'colorChangeFee', 'colorChangeQty'];
 
     // Percent (>1) → decimal; decimal kept as-is; blank/NaN → 0.
     function normalizeTaxRate(raw) {

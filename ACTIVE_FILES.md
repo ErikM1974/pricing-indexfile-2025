@@ -426,7 +426,6 @@
 |------|---------|--------------|--------|
 | `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
 | `/quote-builders/screenprint-quote-builder.html` | Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
-| `/shared_components/js/screenprint-quote-pricing.js` | Screen print quote pricing engine | Caspio API | ✅ Active |
 | `/shared_components/js/screenprint-quote-products.js` | Screen print quote product manager | SanMar API | ✅ Active |
 | `/shared_components/js/screenprint-quote-service.js` | Screen print quote save/email service | Caspio API, EmailJS | ✅ Active |
 | `/quote-builders/screenprint-fast-quote.html` | Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |

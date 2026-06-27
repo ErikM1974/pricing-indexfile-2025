@@ -1596,6 +1596,16 @@ class EmbroideryInvoiceGenerator {
                     <span>Rush Fee:</span>
                     <span>$${pricingData.rushFee.toFixed(2)}</span>
                 </div>` : ''}
+                ${(pricingData.vellumFee || 0) > 0 ? `
+                <div class="total-row">
+                    <span>Vellum Print${(pricingData.vellumQty || 0) > 0 ? ` (${pricingData.vellumQty} × $${(pricingData.vellumFee / pricingData.vellumQty).toFixed(2)})` : ''}:</span>
+                    <span>$${pricingData.vellumFee.toFixed(2)}</span>
+                </div>` : ''}
+                ${(pricingData.colorChangeFee || 0) > 0 ? `
+                <div class="total-row">
+                    <span>Color Change${(pricingData.colorChangeQty || 0) > 0 ? ` (${pricingData.colorChangeQty} × $${(pricingData.colorChangeFee / pricingData.colorChangeQty).toFixed(2)})` : ''}:</span>
+                    <span>$${pricingData.colorChangeFee.toFixed(2)}</span>
+                </div>` : ''}
                 ${(pricingData.shippingFee || 0) > 0 ? `
                 <div class="total-row">
                     <span>Shipping:</span>
@@ -1606,7 +1616,7 @@ class EmbroideryInvoiceGenerator {
                     <span>Discount${pricingData.discountReason ? ` (${this.esc(pricingData.discountReason)})` : ''}:</span>
                     <span>-$${pricingData.discount.toFixed(2)}</span>
                 </div>` : ''}
-                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || ((pricingData.ltmFee || 0) > 0 && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
+                ${(pricingData.additionalServicesTotal > 0 || pricingData.setupFees > 0 || ((pricingData.ltmFee || 0) > 0 && !pricingData.ltmDistributed) || pricingData.safetyStripesTotal > 0 || (pricingData.artCharge || 0) > 0 || (pricingData.graphicDesignFee || pricingData.graphicDesignCharge || 0) > 0 || (pricingData.rushFee || 0) > 0 || (pricingData.vellumFee || 0) > 0 || (pricingData.colorChangeFee || 0) > 0 || (pricingData.shippingFee || 0) > 0 || (pricingData.discount || 0) > 0) ? `
                 <div class="total-row subtotal-row">
                     <span>Subtotal:</span>
                     <span>$${adjustedSubtotal.toFixed(2)}</span>
