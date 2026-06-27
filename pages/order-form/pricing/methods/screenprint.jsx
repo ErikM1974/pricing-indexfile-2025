@@ -227,7 +227,7 @@
       // LTM parity (2026-06-09): round (primary + additional) — both already
       // $0.50-rounded by the service, so this is idempotent — then add the raw
       // per-piece LTM WITHOUT re-rounding. The quote builder adds raw ltmPerUnit
-      // to the already-rounded unit (screenprint-quote-pricing.js:197); the old
+      // to the already-rounded unit (see screenprint-quote-builder.js); the old
       // code re-rounded primary+additional+LTM together, over-charging qty<24 by
       // up to ~$0.49/pc.
       const unitRounded = (Math.ceil((primaryUnit + addPP) * 2) / 2) + ltmPP + stripePP;

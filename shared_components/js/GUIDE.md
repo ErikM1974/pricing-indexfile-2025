@@ -102,7 +102,6 @@
 | `screenprint-pricing-service.js` | Pricing data adapter (Caspio API) |
 | `screenprint-pricing-v2.js` | Main calculator logic (v2 = current active) |
 | `screenprint-manual-pricing.js` | Manual pricing calculator logic |
-| `screenprint-quote-pricing.js` | Quote builder pricing engine |
 | `screenprint-quote-products.js` | Quote product manager |
 | `screenprint-quote-service.js` | Quote save/email service |
 | `screenprint-fast-quote-service.js` | Fast quote (60 sec) service |
