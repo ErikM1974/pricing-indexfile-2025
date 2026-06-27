@@ -1,3 +1,10 @@
+## v2026.06.27.1 (2026.06.27)
+
+- Memory: archive 3 resolved DTF/SCP one-time fixes (2026-06-11) to keep LESSONS < 250
+- chore: remove dead screenprint-quote-pricing.js
+- feat(scp): Vellum + Color Change setup parts in SCP builder + invoice
+- Deploy v2026.06.27.1: 4 files (order-form.html,dtf-quote-builder.html,dtg-quote-builder.html,...)
+
 ## v2026.06.26.6 (2026.06.26)
 
 - fix(rep-map): Ruthie/Ruth → ruth@ in REP_EMAIL_MAP / REP_MAP (sync w/ proxy)
