@@ -77,13 +77,18 @@ class ScreenPrintQuoteService {
             const artCharge = parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0;
             const graphicDesignCharge = parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0;
             const rushFee = parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0;
+            // Screen-print setup parts (Erik's official list, 2026-06-27) — Vellum +
+            // Color Change are additional charges on top of baseTotal (like art/rush),
+            // so they MUST be in preTaxTotal or the saved/pushed total under-bills.
+            const vellumFee = parseFloat(quoteData.vellumFee) || 0;
+            const colorChangeFee = parseFloat(quoteData.colorChangeFee) || 0;
             const discount = parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0;
             // TotalAmount MUST be the PRE-TAX, fee-inclusive subtotal the report expects
             // (quote-view adds shipping + tax on top). The old code stored base*(1+tax)
             // — tax baked in AND art/design/rush/discount dropped — so the report
             // double-taxed it and the saved total was wrong on every SCP quote that
             // used a fee. Mirror EMB (embroidery-quote-service.js). (2026-06-01)
-            const preTaxTotal = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee - discount).toFixed(2));
+            const preTaxTotal = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee + vellumFee + colorChangeFee - discount).toFixed(2));
             const totalAmount = preTaxTotal;
             // TaxAmount is informational (the ShopWorks push note prints it; TaxTotal
             // stays 0). Use the quote's ACTUAL rate (normalized percent→decimal), not
@@ -134,6 +139,14 @@ class ScreenPrintQuoteService {
                     // screen-setup line (screens = setupFeeTotal / $30). Authoritative
                     // $ amount the customer was quoted — avoids re-deriving from colors.
                     setupFeeTotal: setupFees,
+                    // Screen-print setup parts (Erik's official list, 2026-06-27). The
+                    // SCP push transformer reads these from Notes to synthesize the
+                    // Vellum / Color Chg LinesOE. *Total fields are authoritative $ so a
+                    // Caspio price change flows through the push.
+                    vellumQty: parseInt(quoteData.vellumQty, 10) || 0,
+                    vellumTotal: parseFloat(quoteData.vellumFee) || 0,
+                    colorChangeQty: parseInt(quoteData.colorChangeQty, 10) || 0,
+                    colorChangeTotal: parseFloat(quoteData.colorChangeFee) || 0,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files carry .placement per file when
@@ -267,7 +280,10 @@ class ScreenPrintQuoteService {
      * Calculate setup fees based on print setup
      */
     calculateSetupFees(quoteData) {
-        const screenFeePerColor = 30; // $30 per screen/color
+        // Pricing=API: per-screen setup from Caspio Service_Codes 'SPSU' (fallback $30
+        // only when getServicePrice is unavailable). The builder normally passes
+        // quoteData.setupFees (already API-priced), so this is the fallback path.
+        const screenFeePerColor = (typeof getServicePrice === 'function') ? getServicePrice('SPSU', 30) : 30;
 
         // Get setup fees from quoteData if already calculated
         if (quoteData.setupFees !== undefined) {
@@ -398,8 +414,11 @@ class ScreenPrintQuoteService {
             const artCharge = parseFloat(quoteData.artCharge?.toFixed?.(2) || quoteData.artCharge) || 0;
             const graphicDesignCharge = parseFloat(quoteData.graphicDesignCharge?.toFixed?.(2) || quoteData.graphicDesignCharge) || 0;
             const rushFee = parseFloat(quoteData.rushFee?.toFixed?.(2) || quoteData.rushFee) || 0;
+            // Screen-print setup parts (Erik's official list, 2026-06-27) — see saveQuote.
+            const vellumFee = parseFloat(quoteData.vellumFee) || 0;
+            const colorChangeFee = parseFloat(quoteData.colorChangeFee) || 0;
             const discount = parseFloat(quoteData.discount?.toFixed?.(2) || quoteData.discount) || 0;
-            const totalAmount = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee - discount).toFixed(2));
+            const totalAmount = parseFloat((baseTotal + artCharge + graphicDesignCharge + rushFee + vellumFee + colorChangeFee - discount).toFixed(2));
             const rawUpdRate = parseFloat(quoteData.taxRate);
             const updTaxRateDecimal = !isNaN(rawUpdRate) ? (rawUpdRate > 1 ? rawUpdRate / 100 : rawUpdRate) : this.taxRate;
             // [2026-06-08] P1: tax base MUST include shipping (WA taxes it; /invoice trusts this saved TaxAmount). Mirror EMB.
@@ -441,6 +460,14 @@ class ScreenPrintQuoteService {
                     // screen-setup line (screens = setupFeeTotal / $30). Authoritative
                     // $ amount the customer was quoted — avoids re-deriving from colors.
                     setupFeeTotal: setupFees,
+                    // Screen-print setup parts (Erik's official list, 2026-06-27). The
+                    // SCP push transformer reads these from Notes to synthesize the
+                    // Vellum / Color Chg LinesOE. *Total fields are authoritative $ so a
+                    // Caspio price change flows through the push.
+                    vellumQty: parseInt(quoteData.vellumQty, 10) || 0,
+                    vellumTotal: parseFloat(quoteData.vellumFee) || 0,
+                    colorChangeQty: parseInt(quoteData.colorChangeQty, 10) || 0,
+                    colorChangeTotal: parseFloat(quoteData.colorChangeFee) || 0,
                     userNotes: quoteData.notes || '',
                     // Phase 9 (2026-05-23) — reference artwork file refs
                     // Phase 11.3 (2026-05-24) — files carry .placement per file when

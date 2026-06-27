@@ -206,7 +206,7 @@ The parser auto-corrects these, but entering the correct code saves time and avo
 | DESIGN PREP | GRT-75 | **GRT-75** |
 | EXCESS STITCH | AS-GARM | **AS-Garm** |
 | SEW / SEW-ON | SEG | **SEG** |
-| COLOR CHG | COLOR CHANGE | *(rare — ask Erik)* |
+| COLOR CHANGE | Color Chg | **Color Chg** ($15 screen-print fee) |
 
 The parser fixes these automatically, but entering the correct code in the first place means fewer warnings and cleaner data.
 
