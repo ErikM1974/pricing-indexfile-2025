@@ -107,12 +107,26 @@ a.ssr-card-link:hover { transform: translateY(-1px); }
 .ssr-add:hover { background: #276a2a; }
 .ssr-add.is-added { background: #1b5e20; border-color: #1b5e20; }
 
-/* Emphasized when the rep turns safety stripes on (SCP builder) */
-.ssr-panel.ssr-emphasis {
-  border-left-width: 6px;
-  box-shadow: 0 0 0 2px rgba(185, 211, 0, .35);
-  background: #f8fbe8;
+/* Collapsible accordion mode — collapsed by default; click the header to expand.
+   (SCP builder auto-expands when the rep turns safety stripes on.) */
+.ssr-panel.ssr-collapsible .ssr-head {
+  cursor: pointer;
+  user-select: none;
+  align-items: center;
+  margin-bottom: 0;
 }
+.ssr-panel.ssr-collapsible:not(.ssr-collapsed) .ssr-head { margin-bottom: 10px; }
+.ssr-panel.ssr-collapsible .ssr-head:hover .ssr-head-title { color: #1b5e20; }
+.ssr-head-count { color: #6b7177; font-weight: 500; }
+.ssr-head-chevron {
+  margin-left: auto;
+  color: #6b7177;
+  transition: transform .2s ease;
+  flex: 0 0 auto;
+}
+.ssr-panel.ssr-collapsed .ssr-head-chevron { transform: rotate(-90deg); }
+.ssr-panel.ssr-collapsed .ssr-head-sub { display: none; }
+.ssr-panel.ssr-collapsed .ssr-grid { display: none; }
 
 /* Customer/catalog variant — calmer, no Add button, whole-card link */
 .ssr-panel.ssr-customer { border-left-color: #ffb300; background: #fffdf5; }

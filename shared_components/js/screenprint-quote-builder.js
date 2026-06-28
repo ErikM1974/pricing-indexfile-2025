@@ -971,6 +971,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         SafetyStripeRecs.render('scp-safety-recs', {
             variant: 'builder',
             audience: 'staff',
+            collapsible: true,
             title: 'Recommended safety apparel',
             subtitle: 'Top hi-vis sellers that pair with safety stripes — click Add, then enter quantities',
             onAdd: function (style, color) {
@@ -980,12 +981,15 @@ document.addEventListener('DOMContentLoaded', async function() {
                 } catch (e) { console.error('[SCP] safety-rec add failed:', e); }
             }
         });
+        // Auto-expand the (collapsed-by-default) recs when the rep turns safety stripes on.
         var _spStripeToggle = document.getElementById('safety-stripes-toggle');
-        var _spRecsPanel = document.getElementById('scp-safety-recs');
-        if (_spStripeToggle && _spRecsPanel) {
+        if (_spStripeToggle) {
             _spStripeToggle.addEventListener('change', function () {
-                _spRecsPanel.classList.toggle('ssr-emphasis', _spStripeToggle.checked);
-                if (_spStripeToggle.checked) _spRecsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                if (_spStripeToggle.checked) {
+                    SafetyStripeRecs.expand('scp-safety-recs');
+                    var el = document.getElementById('scp-safety-recs');
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
             });
         }
     }

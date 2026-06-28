@@ -1048,7 +1048,7 @@
         if (!window.SafetyStripeRecs) return;
         var isLine = state.mode === 'linesheet';
         window.SafetyStripeRecs.render('qqSafetyRecs', {
-            variant: 'builder', audience: 'staff', limit: 6,
+            variant: 'builder', audience: 'staff', limit: 6, collapsible: true,
             addLabel: isLine ? 'Add to sheet' : 'Price this style',
             title: 'Safety apparel top sellers',
             subtitle: isLine ? 'Popular hi-vis garments — click to add one to the line sheet'
