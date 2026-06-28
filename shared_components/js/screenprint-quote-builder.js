@@ -963,6 +963,33 @@ document.addEventListener('DOMContentLoaded', async function() {
     // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
     if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => { try { recalculatePricing(); } catch (_) {} }); }
 
+    // Recommended safety apparel — curated hi-vis top sellers that pair with safety
+    // stripes (2026-06-28). Always shown in the SCP view; emphasized when the rep
+    // turns safety stripes on. One-click Add drops the style+safety color into the
+    // table via the same path as quote-load (rep then enters quantities).
+    if (window.SafetyStripeRecs) {
+        SafetyStripeRecs.render('scp-safety-recs', {
+            variant: 'builder',
+            audience: 'staff',
+            title: 'Recommended safety apparel',
+            subtitle: 'Top hi-vis sellers that pair with safety stripes — click Add, then enter quantities',
+            onAdd: function (style, color) {
+                try {
+                    addProductFromQuote({ styleNumber: style, color: (color && (color.color_name || color.catalog_color)) || '', sizeBreakdown: {} });
+                    showToast('Added ' + style + (color && color.color_name ? ' · ' + color.color_name : '') + ' — enter quantities', 'success');
+                } catch (e) { console.error('[SCP] safety-rec add failed:', e); }
+            }
+        });
+        var _spStripeToggle = document.getElementById('safety-stripes-toggle');
+        var _spRecsPanel = document.getElementById('scp-safety-recs');
+        if (_spStripeToggle && _spRecsPanel) {
+            _spStripeToggle.addEventListener('change', function () {
+                _spRecsPanel.classList.toggle('ssr-emphasis', _spStripeToggle.checked);
+                if (_spStripeToggle.checked) _spRecsPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+        }
+    }
+
     // Native leave-page warning while changes are unsaved (EMB-parity 2026-06-10)
     if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
 

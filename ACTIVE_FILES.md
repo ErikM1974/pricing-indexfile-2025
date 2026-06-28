@@ -619,6 +619,7 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/customer-lookup-service.js` | Customer autocomplete from Caspio Company_Contacts_Merge_ODBC | caspio-proxy API | ✅ Active |
 | `/shared_components/css/customer-lookup.css` | Autocomplete dropdown styling | - | ✅ Active |
+| `/shared_components/css/safety-stripe-recs.css` | **NEW (2026-06-28)** Styles for the shared safety-apparel recommendation cards (`.ssr-*`): hi-vis accent panel, responsive card grid, color swatch dots, rank/hi-vis badges, Add button. Paired with safety-stripe-recs.js. | safety-stripe-recs.js | ✅ Active |
 
 **Backend (caspio-pricing-proxy):**
 
@@ -752,6 +753,7 @@
 | `/shared_components/js/product-category-filter.js` | Single source of truth for cap-vs-flat-headwear classification | — | ✅ Active |
 | `/shared_components/js/product-filters.js` | Product filter UI (size, color, brand, etc.) | — | ✅ Active |
 | `/shared_components/js/product-grid.js` | Product grid display + lazy load | — | ✅ Active |
+| `/shared_components/js/safety-stripe-recs.js` | **NEW (2026-06-28)** Shared renderer for curated hi-vis "safety apparel" recommendation cards (`SafetyStripeRecs.render(mountId, {variant,audience,onAdd,limit})`). Used by all 4 quote builders, Quick Quote, and the customer catalog. Fetches `GET /api/safety-stripes/top-sellers/styles` (Caspio `Safety_Stripe_Top_Sellers_2026`); `variant:'builder'` = one-click Add, `variant:'catalog'` = customer card (no sales numbers). Fails quiet (optional cross-sell). | safety-stripe-recs.css, caspio-proxy API | ✅ Active |
 | `/shared_components/js/product-pricing-ui.js` | Product pricing UI rendering | universal-pricing-grid.js | ✅ Active |
 | `/shared_components/js/product-recommendations.js` | Product recommendation engine | — | ✅ Active |
 | `/shared_components/js/product-search.js` | Product search UI | product-search-service.js | ✅ Active |

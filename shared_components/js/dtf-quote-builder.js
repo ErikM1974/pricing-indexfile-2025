@@ -3471,6 +3471,22 @@ document.addEventListener('DOMContentLoaded', () => {
     dtfQuoteBuilder = new DTFQuoteBuilder();
     window.dtfQuoteBuilder = dtfQuoteBuilder;
 
+    // Recommended safety apparel — curated hi-vis garment cross-sell (2026-06-28).
+    // DTF doesn't offer safety stripes, so this is a plain garment cross-sell.
+    if (window.SafetyStripeRecs) {
+        SafetyStripeRecs.render('dtf-safety-recs', {
+            variant: 'builder', audience: 'staff',
+            title: 'Safety apparel top sellers',
+            subtitle: 'Popular hi-vis garments — click Add, then enter quantities',
+            onAdd: function (style, color) {
+                try {
+                    window.dtfQuoteBuilder.addProductFromQuote({ styleNumber: style, color: (color && (color.color_name || color.catalog_color)) || '', sizeBreakdown: {} });
+                    if (typeof showToast === 'function') showToast('Added ' + style + ' — enter quantities', 'success');
+                } catch (e) { console.error('[DTF] safety-rec add failed:', e); }
+            }
+        });
+    }
+
     // Load Caspio Service_Codes (GRT-75 design rate) so fees come from the API,
     // not a hardcoded 75 (Erik's Pricing=API rule). Fire-and-forget — getServicePrice()
     // returns the documented fallback until it resolves, then we re-price. (2026-06-09)

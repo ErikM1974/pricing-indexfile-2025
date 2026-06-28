@@ -1758,6 +1758,25 @@ function populateAdditionalCharges(session) {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // Recommended safety apparel — curated hi-vis garment cross-sell (2026-06-28).
+    // Embroidery doesn't offer safety stripes, so this is a plain garment cross-sell
+    // (no stripe text). One-click Add uses the same path as quote-load.
+    if (window.SafetyStripeRecs) {
+        SafetyStripeRecs.render('emb-safety-recs', {
+            variant: 'builder', audience: 'staff',
+            title: 'Safety apparel top sellers',
+            subtitle: 'Popular hi-vis garments — click Add, then enter quantities',
+            onAdd: function (style, color) {
+                try {
+                    if (typeof addProductFromQuote === 'function') {
+                        addProductFromQuote({ styleNumber: style, color: (color && (color.color_name || color.catalog_color)) || '', sizeBreakdown: {} });
+                        if (typeof showToast === 'function') showToast('Added ' + style + ' — enter quantities', 'success');
+                    }
+                } catch (e) { console.error('[EMB] safety-rec add failed:', e); }
+            }
+        });
+    }
+
     // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
     // Adds design name input + per-file placement dropdown so the push payload
     // can carry Designs[{name, Locations[{Location, ImageURL}]}] for new-design

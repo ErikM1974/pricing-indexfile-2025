@@ -1,0 +1,123 @@
+/* Safety-Stripe Garment Recommendations — shared component styles
+   Used by SafetyStripeRecs.render() across the 4 quote builders, Quick Quote,
+   and the customer catalog. Self-contained; hi-vis accent. */
+
+.ssr-panel {
+  margin: 16px 0;
+  padding: 14px 16px;
+  border: 1px solid #e3e6ea;
+  border-left: 4px solid #b9d300; /* hi-vis lime accent */
+  border-radius: 10px;
+  background: #fcfdf7;
+}
+
+.ssr-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-bottom: 10px;
+}
+.ssr-head-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c3033;
+  letter-spacing: .01em;
+}
+.ssr-head-icon { color: #ff6a13; margin-right: 6px; }
+.ssr-head-sub { font-size: 12px; color: #6b7177; }
+
+.ssr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+  gap: 12px;
+}
+
+.ssr-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e3e6ea;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+}
+.ssr-card:hover { box-shadow: 0 4px 14px rgba(0, 0, 0, .08); border-color: #cfd4d9; }
+a.ssr-card-link { text-decoration: none; color: inherit; }
+a.ssr-card-link:hover { transform: translateY(-1px); }
+
+.ssr-photo {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: #f4f6f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ssr-photo-img { width: 100%; height: 100%; object-fit: contain; }
+.ssr-photo-pending { font-size: 11px; color: #9aa0a6; }
+
+.ssr-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.ssr-badge-rank { background: #fff3e6; color: #c2410c; }
+.ssr-badge-hivis { background: #f0f7c2; color: #5b6b00; }
+
+.ssr-body { padding: 9px 10px 11px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+.ssr-style { font-size: 11px; font-weight: 700; color: #6b7177; letter-spacing: .02em; }
+.ssr-name { font-size: 12.5px; line-height: 1.3; color: #2c3033; font-weight: 600; }
+
+.ssr-swatches { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.ssr-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px #cfd4d9;
+  cursor: pointer;
+  padding: 0;
+  transition: box-shadow .12s ease, transform .12s ease;
+}
+.ssr-swatch:hover { transform: scale(1.12); }
+.ssr-swatch.is-selected { box-shadow: 0 0 0 2px #2c3033; }
+
+.ssr-note { font-size: 11px; color: #6b7177; font-style: italic; }
+
+.ssr-add {
+  margin-top: auto;
+  align-self: stretch;
+  border: 1px solid #2e7d32;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background .12s ease;
+}
+.ssr-add:hover { background: #276a2a; }
+.ssr-add.is-added { background: #1b5e20; border-color: #1b5e20; }
+
+/* Emphasized when the rep turns safety stripes on (SCP builder) */
+.ssr-panel.ssr-emphasis {
+  border-left-width: 6px;
+  box-shadow: 0 0 0 2px rgba(185, 211, 0, .35);
+  background: #f8fbe8;
+}
+
+/* Customer/catalog variant — calmer, no Add button, whole-card link */
+.ssr-panel.ssr-customer { border-left-color: #ffb300; background: #fffdf5; }
+.ssr-panel.ssr-customer .ssr-name { font-weight: 600; }
+
+@media (max-width: 600px) {
+  .ssr-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+}
