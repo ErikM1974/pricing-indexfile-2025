@@ -1,3 +1,7 @@
+## v2026.06.28.3 (2026.06.28)
+
+- fix(safety-recs): scope to screen print + DTF only (not EMB/cap-emb/DTG)
+
 ## v2026.06.28.2 (2026.06.28)
 
 - feat(safety-recs): add Quick Quote + customer catalog surfaces
