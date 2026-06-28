@@ -1,3 +1,7 @@
+## v2026.06.28.2 (2026.06.28)
+
+- feat(safety-recs): add Quick Quote + customer catalog surfaces
+
 ## v2026.06.28.1 (2026.06.28)
 
 - feat(safety-recs): hi-vis garment recommendation cards across the 4 quote builders
