@@ -32,6 +32,9 @@
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
 
+    <!-- Safety-Stripe Garment Recommendations (shared) -->
+    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.1">
+
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
@@ -355,6 +358,9 @@
                 <button class="add-row-btn" onclick="addNewRow()">
                     <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
                 </button>
+
+                <!-- Recommended safety apparel — curated hi-vis top sellers that pair with safety stripes -->
+                <div id="scp-safety-recs" hidden></div>
 
                 <!-- Keyboard Hints -->
                 <div class="keyboard-hint">
@@ -780,7 +786,8 @@
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.1"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.06.28.1"></script>
 
 </body>
 </html>
