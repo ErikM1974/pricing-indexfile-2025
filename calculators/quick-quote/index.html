@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/calculators/quick-quote/quick-quote.css?v=2026.06.24.18">
+    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.1">
     <link rel="stylesheet" href="/calculators/quick-quote/linesheet-print.css?v=2026.06.24.2" media="print">
 </head>
 <body>
@@ -202,6 +203,9 @@
                 <div id="qqLineResults" hidden>
                     <div class="qq-sheet" id="qqSheet"></div>
                 </div>
+                <!-- Recommended safety apparel — sibling of BOTH result panels so it shows in
+                     either mode (Quick Price or Line Sheet) when screen print + safety stripes are on -->
+                <div id="qqSafetyRecs" hidden></div>
             </div>
 
         </section>
@@ -223,6 +227,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.18.1"></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.06.24.18"></script>
     <!-- Page logic -->
-    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.24.18"></script>
+    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.2"></script>
+    <script src="/calculators/quick-quote/quick-quote.js?v=2026.06.28.2"></script>
 </body>
 </html>

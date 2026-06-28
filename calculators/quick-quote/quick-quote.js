@@ -1031,6 +1031,45 @@
         });
 
         refreshMatrix();
+        renderSafetyRecs();
+    }
+
+    // Recommended safety apparel (curated hi-vis top sellers) — shown ONLY when
+    // screen print is eligible AND safety stripes are on. Clicking a card prices
+    // that style here in Quick Quote. The component caches, so re-rendering on each
+    // reprice is cheap (and robust — no stale "shown once" flag to get stuck on).
+    function renderSafetyRecs() {
+        var el = document.getElementById('qqSafetyRecs');
+        if (!el) return;
+        // Quick Price: SCP eligible + a product loaded. Line Sheet: SCP is the picked
+        // imprint method (no single product). Both require safety stripes ON.
+        var show = !!state.adv.scpStripes && hasActive('scp') && (state.mode === 'linesheet' || !!state.product);
+        if (!show) { el.hidden = true; el.innerHTML = ''; return; }
+        if (!window.SafetyStripeRecs) return;
+        var isLine = state.mode === 'linesheet';
+        window.SafetyStripeRecs.render('qqSafetyRecs', {
+            variant: 'builder', audience: 'staff', limit: 6,
+            addLabel: isLine ? 'Add to sheet' : 'Price this style',
+            title: 'Pairs well with safety stripes',
+            subtitle: isLine ? 'Top hi-vis sellers — click to add one to the line sheet'
+                             : 'Top hi-vis sellers — click to price one here',
+            onAdd: function (style) {
+                if (state.mode === 'linesheet') {
+                    if (state.lineStyles.length >= LINE_MAX) return;  // sheet full
+                    addLineStyle();
+                    var last = state.lineStyles[state.lineStyles.length - 1];
+                    if (last) {
+                        var inp = document.querySelector('.qq-line-row[data-uid="' + last.uid + '"] .qq-line-style');
+                        if (inp) inp.value = style;
+                        onLineStyleInput(last.uid, style);
+                    }
+                } else {
+                    var input = document.getElementById('qqStyle');
+                    if (input) input.value = style;
+                    if (typeof lookupStyle === 'function') lookupStyle(style);
+                }
+            }
+        });
     }
 
     // Rate-card-style per-piece breakdown: blank garment + each print/logo + per-shirt
@@ -1173,6 +1212,7 @@
     function renderAll() {
         if (state.mode === 'linesheet') renderLinePreview();
         else renderResults();
+        renderSafetyRecs();  // safety-apparel recs (shows only when SCP + stripes; both modes)
     }
 
     // ============================================================
@@ -1272,6 +1312,7 @@
         renderLineMethods();
         renderConfigControls();
         repriceLineAll();
+        renderSafetyRecs();  // re-eval safety-apparel recs when the line method changes
     }
 
     // ---- style list (input panel) ----
@@ -1608,7 +1649,7 @@
             renderEmbPanel(); repriceActive();
         });
         $('qqScpDark').addEventListener('change', function (e) { state.adv.scpDark = e.target.checked; state.scpDarkUserSet = true; repriceActive(); });
-        $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceActive(); });
+        $('qqScpStripes').addEventListener('change', function (e) { state.adv.scpStripes = e.target.checked; repriceActive(); renderSafetyRecs(); });
 
         // ----- Line Sheet mode wiring -----
         $('qqModeToggle').addEventListener('click', function (e) {
