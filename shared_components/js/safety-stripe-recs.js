@@ -174,8 +174,29 @@
     });
   }
 
+  // Per-mount accordion collapsed-state, preserved across re-renders. Quick Quote
+  // re-renders on every reprice — without this, an expanded panel would snap back
+  // to its default each time. Keyed by mount id; default = collapsed.
+  var _collapsed = {};
+
+  function wireAccordion(root, mid) {
+    var head = root.querySelector('.ssr-head');
+    if (!head) return;
+    function toggle() {
+      _collapsed[mid] = !_collapsed[mid];
+      root.classList.toggle('ssr-collapsed', _collapsed[mid]);
+      head.setAttribute('aria-expanded', String(!_collapsed[mid]));
+    }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  }
+
   /**
    * Render recommendation cards into `mountId`.
+   * opts.collapsible — render as a click-to-expand accordion (collapsed by default;
+   * override with opts.defaultCollapsed:false). State persists across re-renders.
    * @returns {Promise<number>} count of styles rendered (0 = hidden)
    */
   function render(mountId, opts) {
@@ -185,20 +206,31 @@
 
     var title = opts.title || 'Recommended safety apparel';
     var subtitle = opts.subtitle || 'Top hi-vis sellers that pair with safety stripes';
+    var collapsible = !!opts.collapsible;
+    var mid = (typeof mountId === 'string') ? mountId : (root.id || 'ssr-panel');
 
     return fetchStyles().then(function (records) {
       if (!records.length) { root.hidden = true; root.innerHTML = ''; return 0; }
       var list = (opts.limit > 0) ? records.slice(0, opts.limit) : records;
+      if (collapsible && !(mid in _collapsed)) _collapsed[mid] = (opts.defaultCollapsed !== false);
+      var isCollapsed = collapsible && _collapsed[mid];
+
       root.classList.add('ssr-panel');
       root.classList.toggle('ssr-customer', opts.audience === 'customer');
+      root.classList.toggle('ssr-collapsible', collapsible);
+      root.classList.toggle('ssr-collapsed', !!isCollapsed);
       root.hidden = false;
+
+      var count = collapsible ? ' <span class="ssr-head-count">(' + list.length + ')</span>' : '';
       root.innerHTML =
-        '<div class="ssr-head">'
-        + '<span class="ssr-head-title"><i class="fas fa-bolt ssr-head-icon"></i>' + esc(title) + '</span>'
+        '<div class="ssr-head"' + (collapsible ? ' role="button" tabindex="0" aria-expanded="' + (!isCollapsed) + '"' : '') + '>'
+        + '<span class="ssr-head-title"><i class="fas fa-bolt ssr-head-icon"></i>' + esc(title) + count + '</span>'
         + (subtitle ? '<span class="ssr-head-sub">' + esc(subtitle) + '</span>' : '')
+        + (collapsible ? '<i class="fas fa-chevron-down ssr-head-chevron" aria-hidden="true"></i>' : '')
         + '</div>'
         + '<div class="ssr-grid">' + list.map(function (s) { return cardHtml(s, opts); }).join('') + '</div>';
       wire(root, list, opts);
+      if (collapsible) wireAccordion(root, mid);
       return list.length;
     }).catch(function (err) {
       // Optional cross-sell — fail quiet (hide), never block or show wrong data.
@@ -208,5 +240,17 @@
     });
   }
 
-  global.SafetyStripeRecs = { render: render, fetchStyles: fetchStyles, _apiBase: API_BASE };
+  // Programmatically expand a collapsible panel (e.g. SCP builder when the rep
+  // turns safety stripes on). No-op if not yet rendered / not collapsible.
+  function expand(mountId) {
+    var root = (typeof mountId === 'string') ? document.getElementById(mountId) : mountId;
+    if (!root) return;
+    var mid = (typeof mountId === 'string') ? mountId : (root.id || 'ssr-panel');
+    _collapsed[mid] = false;
+    root.classList.remove('ssr-collapsed');
+    var head = root.querySelector('.ssr-head');
+    if (head) head.setAttribute('aria-expanded', 'true');
+  }
+
+  global.SafetyStripeRecs = { render: render, expand: expand, fetchStyles: fetchStyles, _apiBase: API_BASE };
 })(window);

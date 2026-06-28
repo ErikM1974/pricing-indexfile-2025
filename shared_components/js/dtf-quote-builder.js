@@ -3475,7 +3475,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // DTF doesn't offer safety stripes, so this is a plain garment cross-sell.
     if (window.SafetyStripeRecs) {
         SafetyStripeRecs.render('dtf-safety-recs', {
-            variant: 'builder', audience: 'staff',
+            variant: 'builder', audience: 'staff', collapsible: true,
             title: 'Safety apparel top sellers',
             subtitle: 'Popular hi-vis garments — click Add, then enter quantities',
             onAdd: function (style, color) {
