@@ -49,30 +49,6 @@
         wireChatPanel();
         showFloatingButton();
 
-        // Recommended safety apparel — curated hi-vis garment cross-sell (2026-06-28).
-        // DTG doesn't offer safety stripes; one-click Add loads the style+color into
-        // the inline form via DTGInlineForm.previewStyle (same path as the DTG catalog).
-        if (window.SafetyStripeRecs) {
-            SafetyStripeRecs.render('dtg-safety-recs', {
-                variant: 'builder', audience: 'staff',
-                title: 'Safety apparel top sellers',
-                subtitle: 'Popular hi-vis garments — click Add to load into the form',
-                onAdd: function (style, color, rec) {
-                    try {
-                        if (window.DTGInlineForm && typeof window.DTGInlineForm.previewStyle === 'function') {
-                            window.DTGInlineForm.previewStyle({
-                                style: style,
-                                desc: (rec && rec.product_title) || style,
-                                color: color && color.color_name,
-                                colorsAvailable: color ? [{ COLOR_NAME: color.color_name, CATALOG_COLOR: color.catalog_color, COLOR_SQUARE_IMAGE: '' }] : []
-                            });
-                            var mount = document.getElementById('dtgInlineFormMount');
-                            if (mount) mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    } catch (e) { console.error('[DTG] safety-rec add failed:', e); }
-                }
-            });
-        }
         // 2026-05-19: chat no longer auto-opens. Rep clicks the floating
         // ✨ button when they want to research / ask a question.
     }

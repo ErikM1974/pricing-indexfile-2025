@@ -1041,18 +1041,18 @@
     function renderSafetyRecs() {
         var el = document.getElementById('qqSafetyRecs');
         if (!el) return;
-        // Quick Price: SCP eligible + a product loaded. Line Sheet: SCP is the picked
-        // imprint method (no single product). Both require safety stripes ON.
-        var show = !!state.adv.scpStripes && hasActive('scp') && (state.mode === 'linesheet' || !!state.product);
+        // Show only for screen print OR DTF — not embroidery / cap-emb / DTG (Erik 2026-06-28).
+        // Quick Price: SCP or DTF eligible + a product loaded. Line Sheet: SCP/DTF is the picked method.
+        var show = (hasActive('scp') || hasActive('dtf')) && (state.mode === 'linesheet' || !!state.product);
         if (!show) { el.hidden = true; el.innerHTML = ''; return; }
         if (!window.SafetyStripeRecs) return;
         var isLine = state.mode === 'linesheet';
         window.SafetyStripeRecs.render('qqSafetyRecs', {
             variant: 'builder', audience: 'staff', limit: 6,
             addLabel: isLine ? 'Add to sheet' : 'Price this style',
-            title: 'Pairs well with safety stripes',
-            subtitle: isLine ? 'Top hi-vis sellers — click to add one to the line sheet'
-                             : 'Top hi-vis sellers — click to price one here',
+            title: 'Safety apparel top sellers',
+            subtitle: isLine ? 'Popular hi-vis garments — click to add one to the line sheet'
+                             : 'Popular hi-vis garments — click to price one here',
             onAdd: function (style) {
                 if (state.mode === 'linesheet') {
                     if (state.lineStyles.length >= LINE_MAX) return;  // sheet full
