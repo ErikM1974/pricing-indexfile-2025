@@ -533,6 +533,25 @@
             },
             onChange: updateCtas
         });
+
+        renderSafetyStripeRecs();
+    }
+
+    // Recommended hi-vis styles for safety stripes — customer-facing cards shown
+    // whenever screen print is an available decoration method for this garment
+    // (per Erik 2026-06-28). No sales numbers (audience:'customer'); each card
+    // links to that style's product page.
+    function renderSafetyStripeRecs() {
+        var el = document.getElementById('cfgSafetyStripesRecs');
+        if (!el) return;
+        var scp = state.decoration && state.decoration.SCP;
+        var scpAvailable = !!scp && scp !== 'no';
+        if (!scpAvailable || !window.SafetyStripeRecs) { el.hidden = true; el.innerHTML = ''; return; }
+        window.SafetyStripeRecs.render('cfgSafetyStripesRecs', {
+            variant: 'catalog', audience: 'customer', limit: 6,
+            title: 'Recommended for safety stripes',
+            subtitle: 'Popular hi-vis styles — pair them with screen-printed safety stripes'
+        });
     }
 
     /** Visible warning whenever eligibility fell back to the safe set. */

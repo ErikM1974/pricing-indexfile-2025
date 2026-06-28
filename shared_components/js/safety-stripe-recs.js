@@ -111,7 +111,7 @@
     var action = isCatalog
       ? '' // catalog cards are whole-card links (built below)
       : '<button type="button" class="ssr-add" data-style="' + esc(style.style) + '">'
-          + '<i class="fas fa-plus"></i> Add to quote</button>';
+          + '<i class="fas fa-plus"></i> ' + esc(opts.addLabel || 'Add to quote') + '</button>';
 
     var inner =
       '<div class="ssr-photo">' + photo + rankBadge + '</div>'
