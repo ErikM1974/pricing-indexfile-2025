@@ -544,13 +544,15 @@
     function renderSafetyStripeRecs() {
         var el = document.getElementById('cfgSafetyStripesRecs');
         if (!el) return;
-        var scp = state.decoration && state.decoration.SCP;
-        var scpAvailable = !!scp && scp !== 'no';
-        if (!scpAvailable || !window.SafetyStripeRecs) { el.hidden = true; el.innerHTML = ''; return; }
+        // Show only when screen print OR DTF is an available method — not embroidery /
+        // cap-emb / DTG (Erik 2026-06-28).
+        var d = state.decoration || {};
+        var avail = function (v) { return !!v && v !== 'no'; };
+        if ((!avail(d.SCP) && !avail(d.DTF)) || !window.SafetyStripeRecs) { el.hidden = true; el.innerHTML = ''; return; }
         window.SafetyStripeRecs.render('cfgSafetyStripesRecs', {
             variant: 'catalog', audience: 'customer', limit: 6,
-            title: 'Recommended for safety stripes',
-            subtitle: 'Popular hi-vis styles — pair them with screen-printed safety stripes'
+            title: 'Recommended safety apparel',
+            subtitle: 'Popular hi-vis styles for screen print & DTF'
         });
     }
 

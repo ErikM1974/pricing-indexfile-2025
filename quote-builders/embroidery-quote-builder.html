@@ -32,9 +32,6 @@
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
 
-    <!-- Safety-Stripe Garment Recommendations (shared) -->
-    <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.1">
-
     <!-- ShopWorks Import Modal -->
     <link rel="stylesheet" href="/shared_components/css/shopworks-import.css?v=20260131">
 
@@ -519,9 +516,6 @@
                      quote-services-bar.js from EMB_SERVICE_CATALOG; the same pattern
                      drops onto SCP / DTG / DTF with their own catalogs. -->
                 <div class="service-bar" id="emb-services-bar"></div>
-
-                <!-- Recommended safety apparel — curated hi-vis garment cross-sell -->
-                <div id="emb-safety-recs" hidden></div>
 
                 <!-- Keyboard Hints -->
                 <!-- Keyboard Hints - Show on Hover -->
@@ -1489,8 +1483,7 @@ Company:Absher Construction Company
     <!-- [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — Phase 0 of DTF/SCP parity.
          MUST load before embroidery-quote-builder.js (which calls QuoteOrderSummary.configure() at eval time). -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.2"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.28.1"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.06.28.3"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from
