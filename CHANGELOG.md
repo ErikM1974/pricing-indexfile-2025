@@ -1,3 +1,7 @@
+## v2026.06.28.1 (2026.06.28)
+
+- feat(safety-recs): hi-vis garment recommendation cards across the 4 quote builders
+
 ## v2026.06.27.1 (2026.06.27)
 
 - Memory: archive 3 resolved DTF/SCP one-time fixes (2026-06-11) to keep LESSONS < 250
