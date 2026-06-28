@@ -1,3 +1,7 @@
+## v2026.06.28.4 (2026.06.28)
+
+- feat(safety-recs): collapsible accordion (collapsed by default) on all surfaces
+
 ## v2026.06.28.3 (2026.06.28)
 
 - fix(safety-recs): scope to screen print + DTF only (not EMB/cap-emb/DTG)
