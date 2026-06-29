@@ -123,7 +123,12 @@ NhhAYGmUdBmBISYsbrKeMtfdaBDDjGeZkCUiFqnI/Tl2cEgNqzz5CVxRcBMGoKCHhrXsNQPvVSAz
 OnGSu5fw/9AupCfzgUJ4vAc9qsY2YpBhbxFGeJWk+k6Y1bk=
 -----END CERTIFICATE-----
 ```
-  - **ALL SAML inputs now in hand** (our SP entity/ACS/logout/cert+key; Caspio issuer/SSO/SLO/cert). Ready to build the SP. SP private key still only in session scratchpad `saml-sp-key.pem` → set Heroku `SAML_SP_PRIVATE_KEY` at deploy (regenerate+re-upload SP cert if lost).
+  - **ALL SAML inputs now in hand** (our SP entity/ACS/logout/cert+key; Caspio issuer/SSO/SLO/cert). SP private key still only in session scratchpad `saml-sp-key.pem` → set Heroku `SAML_SP_PRIVATE_KEY` at deploy (regenerate+re-upload SP cert if lost).
+
+## BUILD STATUS (2026-06-29)
+- ✅ **SP endpoints BUILT + committed `41e5e93f`** (ADDITIVE, fail-safe): `lib/staff-saml.js` (@node-saml/node-saml v5.1.0; idpCert + audience + wantAssertionsSigned + clock-skew; signs our AuthnRequests; email-keyed role map preserving taneisha/nika/house/policies-admin perms) + `/auth/saml/{login,acs,logout}` in server.js (ACS regenerates session = no fixation; open-redirect-safe RelayState). Routes 503 until env set; existing login/gating UNCHANGED.
+- ✅ Local-verified: `getLoginUrl()` → signed AuthnRequest to Caspio SSO host + RelayState; role map resolves. (Real-assertion ACS verify needs a live login.)
+- ⏳ **NEXT (production, needs Erik OK):** (1) set Heroku `sanmar-inventory-app` config: `SAML_IDP_SSO_URL`, `SAML_IDP_ISSUER`, `SAML_IDP_CERT`, `SAML_SP_PRIVATE_KEY` (one `config:set` = one restart). (2) Deploy develop (additive — no behavior change). (3) Test real round-trip at `/auth/saml/login` → Caspio → `/api/crm-session/me` shows verified email+perms. (4) FLIP: replace forgeable `/api/crm-session` (server.js:2124) + add `requireStaff` to ungated dashboards + point staff-login.html at `/auth/saml/login`. (5) Later: durable session store (Phase 4, share with #6) + proxy side-door (Phase 5).
   - ⚠️ Connection shows **Users 0 / Groups 0** — nobody is granted access yet; assign the Staff group before testing.
 - **Roles:** directory has ONE "Staff" group (everyone) → groups can't differentiate admin/rep. Populate the per-user **`Role`** field (currently empty) OR map email→role in app initially.
 
