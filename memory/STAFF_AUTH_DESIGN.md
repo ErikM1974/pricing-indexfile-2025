@@ -91,6 +91,17 @@ Staff are all on Google Workspace (`@nwcustomapparel.com`).
 4. **Session store:** Redis vs Postgres add-on — match whatever #1 picks.
 5. **Proxy hardening scope:** staff-data endpoints now; whole-proxy auth is a separate larger project.
 
+## SP configuration — COMMITTED 2026-06-29 (Caspio App Connection)
+Our app = SAML SP. These values go in Caspio Directory "Staff" (`55u0q8`) → App connections → Create app connection, and our code MUST match them:
+- **Name:** `Staff Dashboard – teamnwca`
+- **User identifier:** `Email`
+- **Identifier (Entity ID):** `https://www.teamnwca.com/auth/saml/metadata`
+- **Reply URL (ACS):** `https://www.teamnwca.com/auth/saml/acs` ← POST endpoint to build
+- **Logout URL:** `https://www.teamnwca.com/auth/saml/logout`
+- **SP signing cert:** self-signed RSA-2048, `CN=teamnwca.com Staff SAML SP`, valid 2026-06-29 → 2036-06-26. Public cert pasted into Caspio. **Private key** generated to session scratchpad `saml-sp-key.pem` — must be installed on Heroku `sanmar-inventory-app` as config var **`SAML_SP_PRIVATE_KEY`** at build/deploy (NEVER commit). If lost before then, regenerate the pair + re-upload the cert to Caspio.
+- **After creating:** grant the Staff "Application access" to the connection; then capture Caspio's **IdP side** (login/SSO URL + IdP issuer/entity-id + Caspio's signing certificate) → required to verify assertions server-side.
+- **Roles:** directory has ONE "Staff" group (everyone) → groups can't differentiate admin/rep. Populate the per-user **`Role`** field (currently empty) OR map email→role in app initially.
+
 ## Open questions (do NOT build on these)
 - ⚠️ **Is `SESSION_SECRET` set on Heroku prod?** If unset, offline cookie forgery is live TODAY; AND fail-closed boot (Phase 0) would take prod down if not set first. Confirm before anything.
 - Caspio "SAML out" tier — only if SAML chosen.
