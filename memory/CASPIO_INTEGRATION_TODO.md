@@ -33,6 +33,12 @@ Depends on #3. Today notifications are app-coupled in `art.js`/`notify-art-compl
 ### #5 — On-demand task triggers
 6 real tasks: `Designs2026`, `Orders_ODBC`, `Sales Reps 2026-Daily`, `CustomerContactsMerge`, `PurchaseOrders`, `Thumbnail_Import`. `POST /v3/dataImportExportTasks/{ek}/run` then poll Status (fire-then-poll = Heroku-safe). **Decide Caspio-task-vs-Node-script ownership** per flow (don't double-run with `sync-design-lookup.js` etc.).
 
+## Phase 2 vision — authenticated customer portal (Erik, 2026-06-29 PM)
+Eventually customers LOG IN and see only their own company's data ("don't want them to see everything"). #1 is the foundation — the gated customer-safe data endpoint becomes the data layer; login replaces the URL token with a verified session (id_Customer). 3 phases: (1=#1) gated endpoint + signed URLs → (2) real login + per-customer session → (3) richer scope (order history, approvals, reorders, account pricing).
+- **No customer portal-with-login and NO customer Directory exist today** (probe: only 'Staff' dir).
+- **Recommended auth: magic-link / passwordless** (email → match company-contacts → emailed signed expiring single-use link → session). Reuses #1's HMAC discipline; avoids the staff client-trust gap (#2); no password-reset burden; scales via existing company-contacts (id_Customer+email) as registry, no Caspio account per customer. Alt: Caspio 'Customers' Directory + Caspio login (cleaner lifecycle, but a Caspio user per customer + client-token issue).
+- Unifying principle across #1/#2/#3/this: **server verifies identity, never trusts the browser.** Tracked as harness task #6 (blocked by #1).
+
 ## Open flags / decisions for Erik
 - **Branch:** the proxy's 2 doc/script commits (`e5d50ee`, `4fbdfcc`) are on `deploy/send-to-steve`, not `develop`. They'll arrive when that branch merges; or cherry-pick to `develop` if wanted sooner.
 - Possible **#6+**: `q.groupBy` server-side sales aggregation (`daily-sales-by-rep.js`); automate staff user provisioning via Directories REST (follow-on to #2); audit whether all 24 Zapier webhooks are still live.
