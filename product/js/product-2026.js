@@ -550,7 +550,7 @@
         var avail = function (v) { return !!v && v !== 'no'; };
         if ((!avail(d.SCP) && !avail(d.DTF)) || !window.SafetyStripeRecs) { el.hidden = true; el.innerHTML = ''; return; }
         window.SafetyStripeRecs.render('cfgSafetyStripesRecs', {
-            variant: 'catalog', audience: 'customer', limit: 6, collapsible: true,
+            variant: 'catalog', audience: 'customer', collapsible: true,
             title: 'Recommended safety apparel',
             subtitle: 'Popular hi-vis styles for screen print & DTF'
         });
