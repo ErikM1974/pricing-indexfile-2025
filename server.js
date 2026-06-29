@@ -2231,6 +2231,15 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
     });
   } catch (e) {
     console.error('[SAML] ACS verify failed:', e.message);
+    try { // TEMP diagnostic — what did Caspio actually send? (remove after fix)
+      const xml = Buffer.from(String(req.body.SAMLResponse || ''), 'base64').toString('utf8');
+      const g = (re) => { const m = xml.match(re); return m ? m[1] : '(none)'; };
+      const sigIdx = xml.search(/<(?:ds:|saml2?:|[\w]+:)?Signature[ >]/);
+      const assertIdx = xml.search(/<(?:saml2?:|[\w]+:)?Assertion[ >]/);
+      console.log('[SAML-DBG] xmlLen=' + xml.length + ' issuer=' + g(/<(?:[\w]+:)?Issuer[^>]*>([^<]+)</) + ' audience=' + g(/<(?:[\w]+:)?Audience[^>]*>([^<]+)</));
+      console.log('[SAML-DBG] sigIdx=' + sigIdx + ' assertIdx=' + assertIdx + ' sigBeforeAssertion=' + (sigIdx >= 0 && (assertIdx < 0 || sigIdx < assertIdx)));
+      console.log('[SAML-DBG] sigMethod=' + g(/SignatureMethod[^>]*Algorithm="([^"]+)"/) + ' c14n=' + g(/CanonicalizationMethod[^>]*Algorithm="([^"]+)"/) + ' digest=' + g(/DigestMethod[^>]*Algorithm="([^"]+)"/));
+    } catch (dbg) { console.log('[SAML-DBG] decode failed: ' + dbg.message); }
     res.status(401).send('Sign-in could not be verified. Please try again or contact IT.');
   }
 });
