@@ -13,7 +13,7 @@
 | # | Item | Type | Effort | Depends on |
 |---|---|---|---|---|
 | 1 | **Sign customer portal URLs with HMAC** + gate the portal data APIs | Security | S | — |
-| 2 | **Fix staff-dashboard auth** — server-side verify the Caspio login, then Directory-driven roles | Security | M–L | — |
+| 2 | **Fix staff-dashboard auth** — server can't verify Caspio (proven); use **Google Workspace OAuth** + data-driven roles. DESIGN DONE → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md). `/api/crm-session` mints full-admin from a client-posted name (live vuln); `SESSION_SECRET` confirmed SET on Heroku (no offline-forgery). Awaiting IdP decision. | Security | M | — |
 | 3 | **Caspio webhook receiver** + first webhook replacing the hourly Quote↔ShopWorks poll | Capability | M | — |
 | 4 | **ArtRequests.Status webhook notifications** (data-coupled; replaces app-coupled status notify) | Capability | M | #3 |
 | 5 | **On-demand Caspio task triggers** (`POST …/run`) | Capability | S | — |
