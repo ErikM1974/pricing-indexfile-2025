@@ -2931,6 +2931,98 @@ app.get('/api/portal/:customerId/art-request/:designId', portalLimiter, resolveP
   }
 });
 
+// ── Mockup detail customer view (#1 Stage C) ────────────────────────────────
+// Derive ONLY a first name from a rep's email — the customer sees "Your Rep:
+// Nika", never the raw staff email.
+function portalRepDisplayName(v) {
+  if (!v) return '';
+  const s = String(v);
+  const local = s.indexOf('@') >= 0 ? s.split('@')[0] : s;
+  const first = local.split(/[._\s]/)[0];
+  return first ? first.charAt(0).toUpperCase() + first.slice(1) : '';
+}
+// The customer notes list is hidden; notes only feed the status timeline, which
+// keyword-matches Note_Text/Note_Type/Created_Date. Return ONLY the status
+// keywords found (no real note content) so the timeline still dates its steps.
+const PORTAL_TIMELINE_KEYWORDS = ['mockup sent', 'awaiting approval', 'revision requested', 'revision', 'working', 'in progress', 'approved', 'completed'];
+function sanitizePortalNote(n) {
+  const t = String(n.Note_Text || '').toLowerCase();
+  return {
+    Note_Type: n.Note_Type || null,
+    Created_Date: n.Created_Date || null,
+    Note_Text: PORTAL_TIMELINE_KEYWORDS.filter((k) => t.indexOf(k) >= 0).join(' '),
+  };
+}
+function projectPortalVersion(v) { return { Slot_Key: v.Slot_Key, Version_Number: v.Version_Number }; }
+function projectPortalThread(t) { return { Mockup_Slot: t.Mockup_Slot, Thread_Sequence_JSON: t.Thread_Sequence_JSON }; }
+// ALLOWLIST projection for the mockup DETAIL customer view (mapped + verified).
+// Excludes AE_Notes, Artist_Notes, Sales_Rep, Work_Order_Number, Id_Customer,
+// Customer_Email, Box_Folder_ID, Deleted_*, Garment_*, Thread_Colors, Due/Completion
+// dates; Submitted_By is reduced to a first-name only.
+function projectPortalMockupDetail(m) {
+  return {
+    ID: m.ID, PK_ID: m.PK_ID,
+    Status: m.Status || null, Revision_Count: m.Revision_Count || null,
+    Is_On_Hold: m.Is_On_Hold || null, On_Hold_Note: m.On_Hold_Note || null,
+    Design_Number: m.Design_Number || null, Company_Name: m.Company_Name || null, Design_Name: m.Design_Name || null,
+    Mockup_Type: m.Mockup_Type || null, Print_Location: m.Print_Location || null,
+    Logo_Width: m.Logo_Width || null, Logo_Height: m.Logo_Height || null, Stitch_Count: m.Stitch_Count || null,
+    Design_Size: m.Design_Size || null, Size_Specs: m.Size_Specs || null,
+    Submitted_Date: m.Submitted_Date || null, Submitted_By: portalRepDisplayName(m.Submitted_By),
+    Customer_Name: m.Customer_Name || null, Customer_Approval_Sent_Date: m.Customer_Approval_Sent_Date || null,
+    Box_Mockup_1: m.Box_Mockup_1 || null, Box_Mockup_2: m.Box_Mockup_2 || null, Box_Mockup_3: m.Box_Mockup_3 || null,
+    Box_Mockup_4: m.Box_Mockup_4 || null, Box_Mockup_5: m.Box_Mockup_5 || null, Box_Mockup_6: m.Box_Mockup_6 || null,
+  };
+}
+// Fetch + authorize a mockup belongs to :customerId; returns the raw row or null.
+async function authorizePortalMockup(id, cid) {
+  const resp = await portalProxyGet(`/api/mockups/${encodeURIComponent(id)}`);
+  const rec = resp && resp.record;
+  if (!rec || String(rec.Id_Customer) !== String(cid)) return null;
+  return rec;
+}
+
+// GET /api/portal/:customerId/mockup/:id — bundled customer-safe mockup detail
+// (record + sanitized timeline notes + version badges). Mirrors the shapes the
+// client distributes ({success,record}, {notes}, {versions}).
+app.get('/api/portal/:customerId/mockup/:id', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!/^\d+$/.test(id)) return res.status(404).json({ error: 'Not found' });
+    const rec = await authorizePortalMockup(id, req.portalCustomerId);
+    if (!rec) return res.status(404).json({ error: 'Not found' });
+    const [notesResp, versionsResp] = await Promise.all([
+      portalProxyGet(`/api/mockup-notes/${encodeURIComponent(id)}`).catch(() => ({ notes: [] })),
+      portalProxyGet(`/api/mockup-versions/${encodeURIComponent(id)}`).catch(() => ({ versions: [] })),
+    ]);
+    res.json({
+      success: true,
+      record: projectPortalMockupDetail(rec),
+      notes: ((notesResp && notesResp.notes) || []).map(sanitizePortalNote),
+      versions: ((versionsResp && versionsResp.versions) || []).map(projectPortalVersion),
+    });
+  } catch (err) {
+    console.error('[Portal] mockup detail failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
+// GET /api/portal/:customerId/mockup/:id/threads — gated thread sequences
+// (EMB_Design_Files) for the customer mockup view: Mockup_Slot + JSON only.
+app.get('/api/portal/:customerId/mockup/:id/threads', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!/^\d+$/.test(id)) return res.status(404).json({ error: 'Not found' });
+    const rec = await authorizePortalMockup(id, req.portalCustomerId);
+    if (!rec) return res.status(404).json({ error: 'Not found' });
+    const resp = await portalProxyGet(`/api/emb-designs/by-mockup/${encodeURIComponent(id)}`).catch(() => ({ records: [] }));
+    res.json({ records: ((resp && resp.records) || []).map(projectPortalThread) });
+  } catch (err) {
+    console.error('[Portal] mockup threads failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
 // Brands browse page
 app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));

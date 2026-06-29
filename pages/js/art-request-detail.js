@@ -261,7 +261,8 @@
         // D.5 — Inline transfer badge, if a linked transfer exists for this design.
         // Non-blocking — if TransferActions hasn't loaded or no transfer found, badge slot stays empty.
         try {
-            if (window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
+            // Transfer (Supacolor) status badge is internal production info — staff/AE only.
+            if (!isCustomerView && window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
                 window.TransferActions.renderTransferStatusBadge({
                     targetEl: '#ard-transfer-status',
                     designNumber: currentRequest.Design_Number || currentRequest.Design_Num_SW

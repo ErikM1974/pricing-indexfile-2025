@@ -248,6 +248,7 @@
     var urlParams = new URLSearchParams(window.location.search);
     isAeView = urlParams.get('view') === 'ae' || urlParams.has('ae'); // '?ae' = =-free email-link flag (see send-art-note-email.js); legacy '?view=ae' still works for in-app links
     var isCustomerView = urlParams.get('view') === 'customer';
+    var portalCid = urlParams.get('cid'); // #1 Stage C — gates the customer-view data fetches
 
     // ── Smart Back Navigation (runs before view-mode branches) ──────────
     // AE view + customer view re-assign textContent/href below and override.
@@ -312,7 +313,19 @@
     }
 
     // ── Fetch & Render ─────────────────────────────────────────────────────
-    Promise.all([
+    Promise.all(isCustomerView ? [
+        // Customer view → ONE gated, customer-safe bundle (record + sanitized
+        // timeline notes + version badges). Server authorizes the mockup → cid.
+        fetch('/api/portal/' + encodeURIComponent(portalCid) + '/mockup/' + mockupId).then(function (r) {
+            if (r.status === 404) {
+                var e = new Error('This mockup request no longer exists — it was deleted by Ruth or an AE.');
+                e.code = 'DELETED';
+                throw e;
+            }
+            if (!r.ok) throw new Error('Server error (HTTP ' + r.status + ')');
+            return r.json();
+        })
+    ] : [
         fetch(API_BASE + '/api/mockups/' + mockupId).then(function (r) {
             if (r.status === 404) {
                 var e = new Error('This mockup request no longer exists — it was deleted by Ruth or an AE.');
@@ -331,9 +344,17 @@
             return r.json();
         })
     ]).then(function (results) {
-        var mockupData = results[0];
-        var notesData = results[1];
-        mockupVersions = (results[2] && results[2].versions) || [];
+        var mockupData, notesData;
+        if (isCustomerView) {
+            var bundle = results[0];
+            mockupData = { success: bundle.success, record: bundle.record };
+            notesData = { notes: bundle.notes || [] };
+            mockupVersions = bundle.versions || [];
+        } else {
+            mockupData = results[0];
+            notesData = results[1];
+            mockupVersions = (results[2] && results[2].versions) || [];
+        }
 
         if (!mockupData.success || !mockupData.record) {
             showError('Mockup Not Found', 'No mockup found with ID ' + mockupId);
@@ -347,7 +368,8 @@
         // D.5 — Inject inline transfer badge if this mockup has a linked transfer.
         // Non-blocking: if TransferActions isn't loaded yet, just skip.
         try {
-            if (window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
+            // Transfer (Supacolor) status badge is internal production info — staff/AE only.
+            if (!isCustomerView && window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
                 window.TransferActions.renderTransferStatusBadge({
                     targetEl: '#pmd-transfer-status',
                     mockupId: currentMockup.ID || currentMockup.PK_ID,
@@ -3433,7 +3455,9 @@
 
         var myVersion = ++_embLoadVersion;
 
-        fetch(API_BASE + '/api/emb-designs/by-mockup/' + mockupIdVal)
+        fetch(isCustomerView
+            ? ('/api/portal/' + encodeURIComponent(portalCid) + '/mockup/' + mockupIdVal + '/threads')
+            : (API_BASE + '/api/emb-designs/by-mockup/' + mockupIdVal))
         .then(function (resp) {
             if (!resp.ok) return null;
             return resp.json();
