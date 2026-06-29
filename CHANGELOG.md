@@ -1,3 +1,26 @@
+## v2026.06.29.3 (2026.06.29)
+
+- docs(memory): add Caspio platform REST v3 (Swagger) capability reference
+- docs(memory): fold live entitlement-probe results into Caspio reference
+- docs(memory): add Caspio integration build to-do + session resume note
+- docs(memory): add Phase 2 authenticated customer portal vision
+- docs(memory): verified portal endpoint design (#1) + Phase-2 auth
+- feat(portal): gated customer-safe data endpoint (#1 phase 1 — data-minimization)
+- docs(memory): portal #1 stage A+B shipped (data-minimization endpoint)
+- feat(portal): gate art-request detail customer view (#1 Stage C1)
+- feat(portal): gate mockup detail customer view (#1 Stage C2)
+- docs(memory): portal #1 Stage C complete (both detail pages gated)
+- docs(memory): verified staff-auth design (#2)
+- docs(memory): correct staff-auth IdP — company is M365, not Google
+- docs(memory): staff-auth IdP resolved — Caspio App Connection (custom SAML)
+- docs(memory): commit SAML SP config values for the Caspio App Connection
+- feat(nav): add NWCA link to homepage top nav → nwcustomapparel.net
+- docs(memory): capture Caspio IdP metadata for staff SAML connection
+- docs(memory): capture+validate Caspio IdP signing cert (staff SAML)
+- feat(staff-auth): SAML SSO endpoints (#2) — server-verified login via Caspio
+- docs(memory): staff SAML SP endpoints built (commit 41e5e93f) — next = env+deploy+test
+- Deploy v2026.06.29.3: 3 files (art-request-detail.html,customer-portal.html,mockup-detail.html,...)
+
 ## v2026.06.29.1 (2026.06.29)
 
 - fix(safety-recs): show all 9 curated styles in Quick Quote + catalog (was capped at 6)
