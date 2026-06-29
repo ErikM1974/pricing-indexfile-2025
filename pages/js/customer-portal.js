@@ -1,16 +1,15 @@
 /**
  * Customer Portal — /portal/:customerId
  * Shows all mockups and art requests for a company.
- * No login required — URL-based access (sales rep shares the link).
+ *
+ * Data comes from the gated, customer-safe APP endpoint /api/portal/:customerId
+ * (same-origin) — the server fetches raw rows from the proxy and returns an
+ * ALLOWLIST projection, so internal fields (YTD sales, staff emails, art
+ * charges, internal notes) never reach the browser. No login yet — Phase 2
+ * (magic-link) will add per-customer auth and the server endpoint stays the same.
  */
 (function () {
     'use strict';
-
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-
-    // Only show records from 2026 onwards (before that, images weren't consistently uploaded)
-    var DATE_CUTOFF = '2026-01-01T00:00:00';
 
     // ── Parse customer ID from URL ──
     var pathParts = window.location.pathname.split('/');
@@ -21,80 +20,23 @@
         return;
     }
 
-    // ── Load portal data ──
+    // ── Load portal data (single gated, same-origin call) ──
     loadPortalData(customerId);
 
     function loadPortalData(custId) {
-        // Step 1: Look up company name from customer ID
-        fetch(API_BASE + '/api/company-contacts/search?q=' + custId + '&limit=1&searchById=true')
+        fetch('/api/portal/' + encodeURIComponent(custId))
             .then(function (resp) {
-                if (!resp.ok) throw new Error('Contact lookup failed: ' + resp.status);
+                if (resp.status === 404) throw new Error('not found');
+                if (!resp.ok) throw new Error('Portal load failed: ' + resp.status);
                 return resp.json();
             })
-            .then(function (contactData) {
-                var contacts = contactData.contacts || contactData || [];
-                // Find contact matching this customer ID
-                var match = null;
-                if (Array.isArray(contacts)) {
-                    match = contacts.find(function (c) { return String(c.id_Customer) === String(custId); });
-                }
-
-                if (!match) {
-                    // Try direct by-customer lookup
-                    return fetch(API_BASE + '/api/company-contacts/by-customer/' + custId)
-                        .then(function (r) {
-                            if (!r.ok) throw new Error('not found');
-                            return r.json();
-                        })
-                        .then(function (data) {
-                            var arr = data.contacts || data || [];
-                            if (Array.isArray(arr) && arr.length > 0) return arr[0];
-                            throw new Error('not found');
-                        })
-                        .catch(function () {
-                            // Fallback: company may only have art requests (no contact record yet).
-                            // Look up company name from art requests by Shopwork_customer_number.
-                            return fetch(API_BASE + '/api/artrequests?shopworksCustomerId=' + custId + '&limit=1')
-                                .then(function (r) { return r.ok ? r.json() : null; })
-                                .then(function (data) {
-                                    if (!data) throw new Error('not found');
-                                    var records = Array.isArray(data) ? data : (data.records || []);
-                                    if (records.length > 0 && records[0].CompanyName) {
-                                        return { CustomerCompanyName: records[0].CompanyName, id_Customer: custId };
-                                    }
-                                    // Last resort: try mockups table
-                                    return fetch(API_BASE + '/api/mockups?idCustomer=' + custId)
-                                        .then(function (r2) { return r2.ok ? r2.json() : null; })
-                                        .then(function (mData) {
-                                            if (!mData) throw new Error('not found');
-                                            var mRecs = mData.records || mData || [];
-                                            if (Array.isArray(mRecs) && mRecs.length > 0 && mRecs[0].Company_Name) {
-                                                return { CustomerCompanyName: mRecs[0].Company_Name, id_Customer: custId };
-                                            }
-                                            throw new Error('not found');
-                                        });
-                                });
-                        });
-                }
-                return match;
-            })
-            .then(function (contact) {
-                var companyName = contact.CustomerCompanyName || contact.companyName || 'Customer';
+            .then(function (data) {
+                var companyName = (data.company && data.company.name) || 'Your Company';
                 document.getElementById('cp-company-name').textContent = companyName;
                 document.title = companyName + ' — Design Portal | NWCA';
 
-                // Step 2: Fetch mockups and art requests in parallel
-                return Promise.all([
-                    fetchMockups(companyName, customerId),
-                    fetchArtRequests(companyName, customerId)
-                ]);
-            })
-            .then(function (results) {
-                var mockups = results[0];
-                var artRequests = results[1];
-
-                renderMockups(mockups);
-                renderArtRequests(artRequests);
+                renderMockups(data.mockups || [], custId);
+                renderArtRequests(data.artRequests || [], custId);
 
                 // Show content, hide loading
                 document.getElementById('cp-loading').style.display = 'none';
@@ -110,68 +52,8 @@
             });
     }
 
-    // ── Fetch mockups by company name (2026+ with images only) ──
-    function fetchMockups(companyName, custId) {
-        // Query by customer ID (reliable) with company name fallback
-        var url = API_BASE + '/api/mockups?idCustomer=' + encodeURIComponent(custId)
-            + '&dateFrom=' + encodeURIComponent(DATE_CUTOFF);
-        return fetch(url)
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('Mockups fetch failed: ' + resp.status);
-                return resp.json();
-            })
-            .then(function (data) {
-                var records = data.records || data || [];
-                // Only show mockups that have at least one image
-                return records.filter(function (m) {
-                    return m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
-                });
-            })
-            .catch(function (err) {
-                console.error('Mockups fetch error:', err);
-                return [];
-            });
-    }
-
-    // ── Fetch art requests by company name + ShopWorks customer number (2026+ with images only) ──
-    function fetchArtRequests(companyName, custId) {
-        // Try by ShopWorks customer number first, fall back to company name
-        var url = API_BASE + '/api/artrequests?shopworksCustomerId=' + encodeURIComponent(custId)
-            + '&dateCreatedFrom=' + encodeURIComponent(DATE_CUTOFF);
-        return fetch(url)
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('Art requests fetch failed: ' + resp.status);
-                return resp.json();
-            })
-            .then(function (data) {
-                var records = Array.isArray(data) ? data : (data.records || []);
-                if (records.length > 0) return filterArtWithImages(records);
-
-                // Fallback: try by company name
-                var nameUrl = API_BASE + '/api/artrequests?companyName=' + encodeURIComponent(companyName)
-                    + '&dateCreatedFrom=' + encodeURIComponent(DATE_CUTOFF);
-                return fetch(nameUrl)
-                    .then(function (r) { return r.json(); })
-                    .then(function (d) {
-                        var recs = Array.isArray(d) ? d : (d.records || []);
-                        return filterArtWithImages(recs);
-                    });
-            })
-            .catch(function (err) {
-                console.error('Art requests fetch error:', err);
-                return [];
-            });
-    }
-
-    // Filter art requests to only those with at least one image
-    function filterArtWithImages(records) {
-        return records.filter(function (ar) {
-            return ar.MAIN_IMAGE_URL_1 || ar.MAIN_IMAGE_URL_2 || ar.MAIN_IMAGE_URL_3 || ar.MAIN_IMAGE_URL_4;
-        });
-    }
-
     // ── Render mockup cards ──
-    function renderMockups(mockups) {
+    function renderMockups(mockups, custId) {
         var grid = document.getElementById('cp-mockup-grid');
         var countEl = document.getElementById('cp-mockup-count');
         var emptyEl = document.getElementById('cp-mockup-empty');
@@ -197,10 +79,10 @@
             var imgUrl = m.Box_Mockup_1 ? ('/api/image-proxy?url=' + encodeURIComponent(m.Box_Mockup_1)) : '';
             var isAction = needsAction(m.Status);
             var designLabel = m.Design_Number ? ('Design #' + escapeHtml(m.Design_Number)) : 'Mockup';
-            var meta = [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' \u00B7 ');
+            var meta = [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · ');
 
             html += '<a class="cp-card' + (isAction ? ' cp-card--action-needed' : '') + '" '
-                + 'href="/mockup/' + m.ID + '?view=customer" target="_blank">'
+                + 'href="/mockup/' + encodeURIComponent(m.ID) + '?view=customer&cid=' + encodeURIComponent(custId) + '" target="_blank">'
                 + '<div class="cp-card-image">';
 
             if (imgUrl) {
@@ -233,7 +115,7 @@
     }
 
     // ── Render art request cards ──
-    function renderArtRequests(artRequests) {
+    function renderArtRequests(artRequests, custId) {
         var grid = document.getElementById('cp-art-grid');
         var countEl = document.getElementById('cp-art-count');
         var emptyEl = document.getElementById('cp-art-empty');
@@ -259,17 +141,13 @@
             var imgUrl = ar.MAIN_IMAGE_URL_1 ? ('/api/image-proxy?url=' + encodeURIComponent(ar.MAIN_IMAGE_URL_1)) : '';
             var isAction = needsAction(ar.Status);
             var designLabel = ar.Design_Num_SW ? ('Design #' + escapeHtml(String(ar.Design_Num_SW))) : 'Art Request';
-            var garmentInfo = [ar.GarmentStyle, ar.GarmentColor].filter(Boolean).join(' \u00B7 ');
-
-            // Get order type text (Caspio dropdowns can return objects)
+            var garmentInfo = [ar.GarmentStyle, ar.GarmentColor].filter(Boolean).join(' · ');
             var orderType = ar.Order_Type || '';
-            if (typeof orderType === 'object') {
-                var keys = Object.keys(orderType);
-                orderType = keys.length > 0 ? orderType[keys[0]] : '';
-            }
 
+            // Deep-link by ID_Design (the key the detail page queries on), carrying
+            // cid so the gated detail endpoint can authorize the row → this customer.
             html += '<a class="cp-card' + (isAction ? ' cp-card--action-needed' : '') + '" '
-                + 'href="/art-request/' + ar.PK_ID + '?view=customer" target="_blank">'
+                + 'href="/art-request/' + encodeURIComponent(ar.ID_Design) + '?view=customer&cid=' + encodeURIComponent(custId) + '" target="_blank">'
                 + '<div class="cp-card-image">';
 
             if (imgUrl) {

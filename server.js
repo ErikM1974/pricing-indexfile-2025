@@ -2766,6 +2766,116 @@ app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
   }
 });
 
+// =============================================================================
+// Customer Portal — gated, customer-safe data (#1, 2026-06-29)
+// =============================================================================
+// The portal pages used to read raw rows straight from the public proxy
+// (leaking YTD sales, staff emails, art charges, internal notes, and — via a
+// broken `searchById` — other companies' data). These app-server endpoints
+// fetch server-to-server and return an ALLOWLIST projection: raw proxy rows
+// never reach the browser. Phase 1 trusts the URL customerId (data-minimization
+// is the win); Phase 2 (magic-link login, #6) swaps `resolvePortalCustomer` to
+// derive the customer from a verified session — the projection core is unchanged.
+const PORTAL_PROXY = TDT_PROXY; // same caspio-pricing-proxy base
+const PORTAL_DATE_CUTOFF = '2026-01-01T00:00:00'; // pre-2026 lacked consistent images
+
+const portalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { error: 'Too many requests, please try again shortly' },
+});
+
+// Phase-1 identity seam = the URL customerId. Phase 2 replaces only this body
+// with a verified-session lookup; downstream code reads req.portalCustomerId.
+function resolvePortalCustomer(req, res, next) {
+  const customerId = String(req.params.customerId || '');
+  if (!/^\d+$/.test(customerId)) return res.status(404).json({ error: 'Not found' });
+  req.portalCustomerId = customerId;
+  next();
+}
+
+function portalOrderTypeText(v) {
+  if (v && typeof v === 'object') { const k = Object.keys(v); return k.length ? String(v[k[0]]) : ''; }
+  return v || '';
+}
+function portalOnOrAfterCutoff(dateStr) {
+  if (!dateStr) return true;            // never drop undated rows
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return true;
+  return d >= new Date(PORTAL_DATE_CUTOFF);
+}
+// ALLOWLIST projections — copy ONLY customer-safe fields; never spread the raw row.
+function projectPortalMockup(m) {
+  return {
+    ID: m.ID,
+    Design_Number: m.Design_Number || null,
+    Design_Name: m.Design_Name || null,
+    Print_Location: m.Print_Location || null,
+    Mockup_Type: m.Mockup_Type || null,
+    Status: m.Status || null,
+    Submitted_Date: m.Submitted_Date || null,
+    Box_Mockup_1: m.Box_Mockup_1 || null,
+  };
+}
+function projectPortalArt(a) {
+  return {
+    ID_Design: a.ID_Design || null,
+    Design_Num_SW: a.Design_Num_SW || null,
+    GarmentStyle: a.GarmentStyle || null,
+    GarmentColor: a.GarmentColor || null,
+    Order_Type: portalOrderTypeText(a.Order_Type),
+    Status: a.Status || null,
+    Date_Created: a.Date_Created || null,
+    MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null,
+  };
+}
+
+async function portalProxyGet(pathAndQuery) {
+  const r = await fetch(PORTAL_PROXY + pathAndQuery);
+  if (!r.ok) throw new Error(`proxy ${r.status}`);
+  return r.json();
+}
+
+// Customer-safe aggregate: company name + mockups-with-images + art-with-images (2026+).
+async function getPortalData(customerId) {
+  const cid = encodeURIComponent(customerId);
+  const cutoff = encodeURIComponent(PORTAL_DATE_CUTOFF);
+
+  const mResp = await portalProxyGet(`/api/mockups?idCustomer=${cid}&dateFrom=${cutoff}`);
+  const mRecs = (mResp && (mResp.records || (Array.isArray(mResp) ? mResp : []))) || [];
+
+  let aResp = await portalProxyGet(`/api/artrequests?shopworksCustomerId=${cid}&dateCreatedFrom=${cutoff}`);
+  let aRecs = Array.isArray(aResp) ? aResp : ((aResp && aResp.records) || []);
+
+  const companyName = (aRecs[0] && aRecs[0].CompanyName) || (mRecs[0] && mRecs[0].Company_Name) || null;
+
+  // Art rows sometimes lack Shopwork_customer_number — fall back to company name.
+  if (aRecs.length === 0 && companyName) {
+    const byName = await portalProxyGet(`/api/artrequests?companyName=${encodeURIComponent(companyName)}&dateCreatedFrom=${cutoff}`);
+    aRecs = Array.isArray(byName) ? byName : ((byName && byName.records) || []);
+  }
+
+  const mockups = mRecs
+    .filter((m) => (m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3) && portalOnOrAfterCutoff(m.Submitted_Date))
+    .map(projectPortalMockup);
+  const artRequests = aRecs
+    .filter((a) => (a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
+    .map(projectPortalArt);
+
+  return { company: { name: companyName }, mockups, artRequests };
+}
+
+// GET /api/portal/:customerId — customer-safe aggregate. Empty ≠ not-found:
+// a valid customer with no items returns 200 with empty arrays.
+app.get('/api/portal/:customerId', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    res.json(await getPortalData(req.portalCustomerId));
+  } catch (err) {
+    console.error('[Portal] aggregate failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
 // Brands browse page
 app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));
