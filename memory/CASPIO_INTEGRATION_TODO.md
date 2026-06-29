@@ -19,6 +19,7 @@
 | 5 | **On-demand Caspio task triggers** (`POST …/run`) | Capability | S | — |
 
 ### #1 — Portal HMAC (start here)
+**DESIGN DONE & verified (2026-06-29, 13-agent research) → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md).** Key shifts from the original plan: build on **APP server.js** (not the proxy — keeps proxy a dumb relay, enables Phase-2 first-party cookie); use a **single resolver + shared core** seam so the same endpoint works with a URL token now and a session later; found an **active cross-company leak** (`searchById` silently ignored → `LIKE '%id%'` substring-matches other companies). Phase-2 auth = **magic-link** (Caspio REST verified to have NO authenticate endpoint); **server-side email is CONFIRMED available** (APP already emails customers). Awaiting Erik's 7 open decisions (token length, grace window, etc.) before coding.
 `/portal/:customerId` ([server.js:2482](server.js:2482)) is gated only on `/^\d+$/` → any integer enumerates another customer's data (IDOR). Clone `computeOrderStatusToken` ([server.js:620](server.js:620), `crypto.createHmac('sha256',…)`) as `computePortalToken`; add `PORTAL_SECRET`; require+verify `?t=` (timingSafeEqual, generic 404, 503 if secret unset). **First step when resuming: trace which data endpoints `customer-portal.html`/its JS calls — must gate those too, not just the HTML route.** Decide a grace window for already-shared unsigned links.
 
 ### #2 — Staff auth (the real finding)

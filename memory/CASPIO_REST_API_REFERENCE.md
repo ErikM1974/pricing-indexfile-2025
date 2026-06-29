@@ -32,7 +32,7 @@
 - `GET/POST /v3/tables` · `GET /v3/tables/{t}`
 - `GET/POST /v3/tables/{t}/fields` · `GET/PUT/DELETE /v3/tables/{t}/fields/{f}` — **schema-as-API**
 - `GET/POST/PUT/DELETE /v3/tables/{t}/records` — the workhorse
-- `GET /v3/tables/{t}/passwordFields` · `PUT/DELETE /v3/tables/{t}/passwordFields/{pf}` — set/verify (`CheckPasswordFieldContext` + `q.where`) / reset a password field server-side
+- `GET /v3/tables/{t}/passwordFields` · `PUT/DELETE /v3/tables/{t}/passwordFields/{pf}` — **set/reset** a password field value server-side (PUT writes a hash; DELETE clears). ⚠️ This is a WRITE, NOT a credential-verify endpoint — Caspio REST has **no** "check these credentials" operation (confirmed by the 2026-06-29 portal-design research). Don't treat it as a login verifier.
 - `GET/PUT/DELETE /v3/tables/{t}/attachments/{field}[/{recordPkId}|/fileInfo]` — files stored ON a record
 - **Record query params:** `q.select` (projection — cuts payload), `q.where` (filter; **always sanitize**), `q.orderby`, `q.groupBy` (server-side aggregation), `q.pageSize` + `q.pageNumber` (**use `q.pageSize`, NOT `q.limit`, on v3** — `q.limit`+`q.pageNumber` overlaps pages). Pagination centralized in `fetchAllCaspioPages()`.
 
