@@ -32,6 +32,9 @@ const STOREFRONT_CHANNEL_CONFIG = require('./config/storefront-channels.js');
 // Synthesizes quote_items rows from a storefront order's colorConfigs so /quote
 // + /invoice render line items (2026-06-12). Pure logic, jest-locked.
 const { buildStorefrontQuoteItems } = require('./shared_components/js/storefront-quote-items.js');
+// Staff SAML SSO (#2) — this app is the SAML Service Provider against the Caspio
+// "Staff" directory App Connection (IdP). Replaces the forgeable /api/crm-session.
+const staffSaml = require('./lib/staff-saml.js');
 
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
@@ -2183,6 +2186,58 @@ app.get('/crm-logout', (req, res) => {
     // Clear only CRM-related session data (preserve Caspio session)
     delete req.session.crmUser;
   }
+  res.redirect('/dashboards/staff-login.html');
+});
+
+// =============================================================================
+// Staff SAML SSO (#2) — server-VERIFIED login (Caspio "Staff" directory = IdP)
+// =============================================================================
+// ADDITIVE: these routes add a login the SERVER can verify. They do NOT yet
+// change dashboard gating or remove the forgeable /api/crm-session — that flip
+// happens only after a real login is confirmed end-to-end on production.
+// Fails safe: returns 503 until the SAML_* env vars are configured.
+
+// SP-initiated start — redirect the browser to Caspio to authenticate.
+app.get('/auth/saml/login', async (req, res) => {
+  if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
+  try {
+    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/')) ? req.query.next : '/staff-dashboard.html';
+    res.redirect(await staffSaml.getLoginUrl(next));
+  } catch (e) {
+    console.error('[SAML] login init failed:', e.message);
+    res.status(500).send('Could not start sign-in. Please try again.');
+  }
+});
+
+// Assertion Consumer Service — Caspio POSTs the SIGNED assertion here. We verify
+// Caspio's signature + audience + timestamps, then establish the staff session.
+app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' }), async (req, res) => {
+  if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
+  try {
+    const identity = await staffSaml.verifyResponse(req.body.SAMLResponse);
+    const permissions = staffSaml.permissionsFor(identity.email);
+    // New session id on login (prevents session fixation).
+    req.session.regenerate((err) => {
+      if (err) { console.error('[SAML] session regenerate failed:', err.message); return res.status(500).send('Sign-in error.'); }
+      req.session.crmUser = {
+        name: identity.name,
+        email: identity.email,
+        firstName: (identity.name || '').split(' ')[0],
+        permissions,
+        via: 'saml',
+      };
+      const relay = (typeof req.body.RelayState === 'string' && req.body.RelayState.startsWith('/')) ? req.body.RelayState : '/staff-dashboard.html';
+      req.session.save(() => res.redirect(relay));
+    });
+  } catch (e) {
+    console.error('[SAML] ACS verify failed:', e.message);
+    res.status(401).send('Sign-in could not be verified. Please try again or contact IT.');
+  }
+});
+
+// Logout — clear our session.
+app.get('/auth/saml/logout', (req, res) => {
+  if (req.session) return req.session.destroy(() => res.redirect('/dashboards/staff-login.html'));
   res.redirect('/dashboards/staff-login.html');
 });
 

@@ -830,6 +830,7 @@
 ### Staff Auth & Misc Dashboards
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/lib/staff-saml.js` | Staff SAML SSO Service Provider (#2) — verifies Caspio "Staff" directory signed assertions server-side; replaces forgeable /api/crm-session. Used by `/auth/saml/*` routes in server.js | @node-saml/node-saml, SAML_* env vars | 🟡 Built 2026-06-29, awaiting deploy+test (see memory/STAFF_AUTH_DESIGN.md) |
 | `/shared_components/js/staff-auth-helper.js` | Staff auth gate (Caspio role lookup) — used by quote-audit and staff-only pages | /api/staff/auth | ✅ Active |
 | `/shared_components/js/staff-dashboard-employees.js` | Staff dashboard employee list/widget | /api/employees | ✅ Active |
 | `/shared_components/js/monogram-dashboard.js` | Monogram dashboard controller | — | ✅ Active |
