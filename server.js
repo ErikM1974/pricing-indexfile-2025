@@ -2876,6 +2876,61 @@ app.get('/api/portal/:customerId', portalLimiter, resolvePortalCustomer, async (
   }
 });
 
+// ALLOWLIST projection for the art-request DETAIL customer view. Mirrors exactly
+// the fields the ?view=customer render path displays (mapped + adversarially
+// verified 2026-06-29). Excludes NOTES, Sales_Rep, staff/contact emails, phone,
+// SW refs, art charges (Art_Minutes/Amount_Art_Billed/Prelim_Charges), internal
+// statuses, Rep_Mockup, working files (File_Upload/CDN_Link), and the per-slot
+// Mockup_N_Note fields (artist commentary, never shown to a customer).
+function projectPortalArtDetail(a) {
+  return {
+    PK_ID: a.PK_ID, ID_Design: a.ID_Design || null, // ids needed for the existing customer approve/revise writes
+    Status: a.Status || null, Revision_Count: a.Revision_Count || null, Artwork_Status: a.Artwork_Status || null,
+    Is_Rush: a.Is_Rush || null, Is_On_Hold: a.Is_On_Hold || null, On_Hold_Note: a.On_Hold_Note || null,
+    Request_Type: a.Request_Type || null, CompanyName: a.CompanyName || null,
+    Order_Type: portalOrderTypeText(a.Order_Type), Order_Type_Source: a.Order_Type_Source || null,
+    Item_Type: a.Item_Type || null, Item_Specs_Notes: a.Item_Specs_Notes || null,
+    JDS_SKU: a.JDS_SKU || null, JDS_Design_Name: a.JDS_Design_Name || null, JDS_Color: a.JDS_Color || null,
+    JDS_Placement: a.JDS_Placement || null, JDS_Quantity: a.JDS_Quantity || null,
+    Due_Date: a.Due_Date || null, Date_Created: a.Date_Created || null, Garment_Placement: a.Garment_Placement || null,
+    GarmentStyle: a.GarmentStyle || null, GarmentColor: a.GarmentColor || null,
+    Garm_Style_2: a.Garm_Style_2 || null, Garm_Style_3: a.Garm_Style_3 || null, Garm_Style_4: a.Garm_Style_4 || null,
+    Garm_Color_2: a.Garm_Color_2 || null, Garm_Color_3: a.Garm_Color_3 || null, Garm_Color_4: a.Garm_Color_4 || null,
+    Swatch_1: a.Swatch_1 || null, Swatch_2: a.Swatch_2 || null, Swatch_3: a.Swatch_3 || null, Swatch_4: a.Swatch_4 || null,
+    MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null, MAIN_IMAGE_URL_2: a.MAIN_IMAGE_URL_2 || null,
+    MAIN_IMAGE_URL_3: a.MAIN_IMAGE_URL_3 || null, MAIN_IMAGE_URL_4: a.MAIN_IMAGE_URL_4 || null,
+    Artwork_Locations: a.Artwork_Locations || null, Color_Mode: a.Color_Mode || null, PMS_Colors: a.PMS_Colors || null,
+    Thread_Colors: a.Thread_Colors || null, Underbase_Required: a.Underbase_Required || null, Exact_Text: a.Exact_Text || null,
+    Uploaded_File_Type: a.Uploaded_File_Type || null,
+    Prev_Order_Num: a.Prev_Order_Num || null, Prev_Design_Num: a.Prev_Design_Num || null,
+    Repeat_Keep_Same: a.Repeat_Keep_Same || null, Repeat_Change: a.Repeat_Change || null,
+    Final_Approved_Mockup: a.Final_Approved_Mockup || null,
+    Box_File_Mockup: a.Box_File_Mockup || null, BoxFileLink: a.BoxFileLink || null, Company_Mockup: a.Company_Mockup || null,
+    Mockup_4: a.Mockup_4 || null, Mockup_5: a.Mockup_5 || null, Mockup_6: a.Mockup_6 || null,
+  };
+}
+
+// GET /api/portal/:customerId/art-request/:designId — customer-safe single art
+// request (detail page customer view). Authorizes the row belongs to :customerId
+// before returning; generic 404 on miss/mismatch (no enumeration oracle).
+// Returns a 1-element array to match the client's existing [row]=artRequests shape.
+app.get('/api/portal/:customerId/art-request/:designId', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const designId = String(req.params.designId || '');
+    if (!/^\d+(\.\d+)?$/.test(designId)) return res.status(404).json({ error: 'Not found' });
+    const resp = await portalProxyGet(`/api/artrequests?id_design=${encodeURIComponent(designId)}&limit=1`);
+    const rows = Array.isArray(resp) ? resp : ((resp && resp.records) || []);
+    const row = rows[0];
+    const cid = req.portalCustomerId;
+    const owns = row && (String(row.id_customer) === cid || String(row.Shopwork_customer_number) === cid);
+    if (!owns) return res.status(404).json({ error: 'Not found' }); // missing OR not-this-customer → identical
+    res.json([projectPortalArtDetail(row)]);
+  } catch (err) {
+    console.error('[Portal] art-request detail failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
 // Brands browse page
 app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));
