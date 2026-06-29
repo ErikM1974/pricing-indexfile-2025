@@ -104,7 +104,26 @@ Our app = SAML SP. These values go in Caspio Directory "Staff" (`55u0q8`) → Ap
   - IdP Issuer (Identity provider identifier): `https://c3eku948.caspio.app/auth/idp/saml2/id/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
   - SSO URL (Single sign-on): `https://c3eku948.caspio.app/auth/idp/saml2/sso/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
   - SLO URL (Logout): `https://c3eku948.caspio.app/auth/idp/saml2/slo/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
-  - IdP signing cert: expires 2036-06-29; **PENDING** — download from the connection's "SAML signing certificate" → store as `SAML_IDP_CERT` for assertion verification.
+  - IdP signing cert: **CAPTURED & validated** — `CN=A0E15000-27c40c45-5771-47ae-9783-13d3318c2b73`, self-signed, valid 2026-06-28 → 2036-06-29, SHA-256 `70:0D:42:0B:83:61:8C:EE:FB:18:29:81:AC:E1:D4:C5:E1:4F:05:64:6A:56:ED:88:81:CA:1A:5C:89:83:85:81`. PEM →
+```
+-----BEGIN CERTIFICATE-----
+MIIDBDCCAeygAwIBAgIIdAe6XkqSj+wwDQYJKoZIhvcNAQELBQAwODE2MDQGA1UEAxMtQTBFMTUw
+MDAtMjdjNDBjNDUtNTc3MS00N2FlLTk3ODMtMTNkMzMxOGMyYjczMB4XDTI2MDYyODIzMDc1M1oX
+DTM2MDYyOTIzMDc1M1owODE2MDQGA1UEAxMtQTBFMTUwMDAtMjdjNDBjNDUtNTc3MS00N2FlLTk3
+ODMtMTNkMzMxOGMyYjczMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuep2Y1LJfkSh
+t8wPY+fnwNQ9CFzDsME/F1mn9XlpennU73oGpAkbYaKb/JlAm++Z7ElpVlywaZUvU1mScMUSTW8Q
+TVyTVZ5reboaoMdxmhpi/S9yjuQf5PQ0lJpPuHrkbBzo0xowaHNSZclJ0ejjYcDdJ6VyGIQEhq6o
+yeVOsjPmGmBMvfYCdt9IA8+Fbm8TQQTTM2XJs54UMTX74WE5vap1bmsBeQygeTevcPEXlPv8CA1c
+603xZxfWtONSCQHL+dvYdeLQx5+PSBKRfkyxP9d3ylRW6KZiQ/KKwj5R/GeVA5MaTdH4MGc3Wy9G
+6h8b4+VigaJ3avcm0AoLe1kyuQIDAQABoxIwEDAOBgNVHQ8BAf8EBAMCB4AwDQYJKoZIhvcNAQEL
+BQADggEBACFFo2CJOpxaIvEpWYNoyZoI5xfaGzquCjAd27xbg00vVOXDlf0jphzh4tmtD66bh7Vr
+YUOBGKBXlUzjibYQYvnlnLN+LaTlmK2W/Fl7ZjfC2E8dH5XMP5J6gImpkq1GvsEkEK48nR0kFeW5
+4HR6pRI31dzz/8h/MMh+P/0flyt7LfyYWkGyZcYt6njAtvrRW7AG+onU3+E49U8TciQyj2V+XAUQ
+NhhAYGmUdBmBISYsbrKeMtfdaBDDjGeZkCUiFqnI/Tl2cEgNqzz5CVxRcBMGoKCHhrXsNQPvVSAz
+OnGSu5fw/9AupCfzgUJ4vAc9qsY2YpBhbxFGeJWk+k6Y1bk=
+-----END CERTIFICATE-----
+```
+  - **ALL SAML inputs now in hand** (our SP entity/ACS/logout/cert+key; Caspio issuer/SSO/SLO/cert). Ready to build the SP. SP private key still only in session scratchpad `saml-sp-key.pem` → set Heroku `SAML_SP_PRIVATE_KEY` at deploy (regenerate+re-upload SP cert if lost).
   - ⚠️ Connection shows **Users 0 / Groups 0** — nobody is granted access yet; assign the Staff group before testing.
 - **Roles:** directory has ONE "Staff" group (everyone) → groups can't differentiate admin/rep. Populate the per-user **`Role`** field (currently empty) OR map email→role in app initially.
 
