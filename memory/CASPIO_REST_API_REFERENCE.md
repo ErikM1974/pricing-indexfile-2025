@@ -73,7 +73,7 @@
 
 - **⭐ Outgoing Webhooks FIRE on REST-originated writes — Triggered Actions do NOT.** Spec text: *"EventSources … valid values are: Datasheet, DataPages, RESTAPIs, TriggeredActions, Tasks. If not provided or empty, it defaults to all values."* This is the opposite of our long-standing "Caspio Triggered Actions DON'T fire on REST API updates" limitation (see LESSONS_LEARNED) — webhooks are the REST-era replacement and can finally push on changes the proxy itself makes. **Guard against feedback loops** (proxy write → webhook → proxy write) by scoping `EventSources`/`ObjectFields` + idempotent dedupe.
 - **Webhook `Secret` is returned only in the POST-create response** — capture it into Heroku config immediately; it's not re-fetchable.
-- **Plan-gating (verify before building):** Outgoing Webhooks, Directories, multicast `OutgoingUrls`/`CallThrottling`, Bridge deploy PUT, and attachment storage quota are account-tier dependent. Probe with a read/test call first (`GET /v3/outgoingWebhooks`, `GET /v3/directories`, `GET /v3/dataImportExportTasks`) — 403/404 = not entitled.
+- **Entitlement — CONFIRMED AVAILABLE (2026-06-29 read-only probe, `caspio-pricing-proxy/scripts/caspio-entitlement-probe.js`):** ALL 7 groups return **200** on this account. Live counts: Tables 156 · Views 19 · File-folders 10 · **Outgoing Webhooks 24 · Directories 1 · Data Import/Export Tasks 6 · Bridge Apps 14**. So nothing in this doc is plan-gated *for us* — see §7 for the actual objects. (Only remaining tier-dependent unknowns: multicast `OutgoingUrls` and attachment storage quota. Re-run the probe if the Caspio plan changes.)
 - **Webhook delivery is at-least-once and can miss silent upstream changes** — never remove a poll without leaving a reduced-frequency watchdog that alerts (Erik's #1 rule: stale/missed data is worse than an error).
 - Existing known query gotchas still apply: `q.pageSize` not `q.limit` (v3); 400 = stale token (not 401); `q.select` of a non-existent field → 500.
 
@@ -88,10 +88,10 @@
 | **Tables — passwordFields / attachments** | ❌ Untapped | files live in Box, not Caspio attachments |
 | **Views** | ✅ Some prod use | read-side |
 | **Files** | ✅ Prod use | uploads/downloads (`files-simple.js`, box-upload paths) |
-| **Outgoing Webhooks** | ❌ Untapped | zero `outgoingWebhooks` refs; note `box-webhooks.js` is *Box*, not Caspio. Polling crons stand in. |
-| **Directories / Users** | ❌ Untapped | staff use a Caspio **App login** (`c3eku948.caspio.app/users/55u0q8…`) but the Directories REST API is unused; `CRM_PERMISSIONS` map is hardcoded in `server.js` |
-| **Data Import/Export Tasks** | ❌ Untapped | our syncs are bespoke Node scripts, not Caspio import tasks — likely zero applicable targets |
-| **Bridge Applications** | ⚠️ Scripts only | read-only `explore-bridge-apps.js` / `dump-all-datapages.js`; deploy PUT unused |
+| **Outgoing Webhooks** | ❌ Untapped *by the proxy* | **24 active webhooks exist — ALL are Zapier subscriptions** (`Zapier-ZapID_subscription:*` → `hooks.zapier.com`, throttle 10). So Caspio webhooks are proven/entitled, but the NWCA proxy receives none directly; polling crons + Zapier stand in. (`box-webhooks.js` is *Box*, not Caspio.) |
+| **Directories / Users** | ⚠️ Exists, REST unused | 1 directory **"Staff" (11 users)**; staff log in via the Caspio **App login** (`…/users/55u0q8…`), but the Directories REST API is unused; `CRM_PERMISSIONS` hardcoded in `server.js` |
+| **Data Import/Export Tasks** | ⚠️ Scheduled, never API-triggered | **6 daily/weekly imports exist** (`Designs2026`, `Orders_ODBC`, `Sales Reps 2026-Daily`, `CustomerContactsMerge`, `PurchaseOrders`, `Thumbnail_Import`). `POST …/run` can fire any on-demand — see §6/§7. |
+| **Bridge Applications** | ⚠️ Scripts only | 14 apps; read-only `explore-bridge-apps.js` / `dump-all-datapages.js`; deploy PUT unused |
 
 ---
 
@@ -110,10 +110,26 @@ Clone `caspio-pricing-proxy/src/routes/box-webhooks.js` (battle-tested HMAC rece
 2. **Webhook receiver + first webhook on `Quote_Sessions`** (`recordUpdate`, `ObjectFields=[Status,PushedToShopWorks]`) → replaces the hourly Quote↔ShopWorks poll (`server.js:8236`, `sync-quote-sessions-from-shopworks.js`). First test-`POST /v3/outgoingWebhooks` for the `Secret` (entitlement check). Keep a thinned cron backstop. **Only fires if the ShopWorks→Caspio sync writes through Caspio — verify that path.**
 3. **Move staff role-of-record into a Caspio Directory** (`GET /v3/directories` first; 403/404 = not entitled) → derive `/api/crm-session` perms (`server.js:2124`, `CRM_PERMISSIONS` `server.js:469`) from a `Role` authfield instead of a hardcoded map + deploy. Remove `SESSION_SECRET='dev-secret-change-in-production'` fallback (`server.js:454`) in the same change so it fails closed.
 
-**Also worth it:** event-driven `ArtRequests.Status` notifications (start with status flips — not covered by note fan-out, so no double-fire); server-side `q.groupBy` aggregation for `NW_Daily_Sales_By_Rep` (`daily-sales-by-rep.js:68`, keep JS fallback).
+**Also worth it:**
+- Event-driven `ArtRequests.Status` notifications (start with status flips — not covered by note fan-out, so no double-fire).
+- Server-side `q.groupBy` aggregation for `NW_Daily_Sales_By_Rep` (`daily-sales-by-rep.js:68`, keep JS fallback).
+- **On-demand `POST /v3/dataImportExportTasks/{ek}/run`** *(REVISED — the 2026-06-29 probe found 6 real tasks; the original "no targets" call was wrong)*: force a fresh `Designs2026` or `Orders_ODBC` / `Sales Reps 2026-Daily` import instead of waiting for the daily schedule (e.g. after a known ShopWorks/SanMar change), surfacing task `Status`. Pairs with — doesn't replace — the existing bespoke Node syncs.
+- **Direct proxy webhook to continue the Zapier→backend migration:** the 24 Caspio webhooks all feed Zapier; a proxy-owned webhook (→ `caspio-webhooks.js`) lets specific flows skip the Zapier hop (lower latency, no per-task Zap, fits the documented move off Zaps to backend Slack). Also a cleanup signal: audit whether all 24 Zapier subscriptions are still live.
 
-**Deliberately skipped (don't pay off):** Box→Caspio attachment migration; `passwordFields` as a login store; Directory logins for the *customer* portal (no-login is the UX value — HMAC-sign instead); schema-via-REST migrations on the masters; `dataImportExportTasks/run` (no targets); Views & DataPage deploy-toggle (no concrete pain today).
+**Deliberately skipped (don't pay off):** Box→Caspio attachment migration; `passwordFields` as a login store; Directory logins for the *customer* portal (no-login is the UX value — HMAC-sign instead); schema-via-REST migrations on the masters; Views & DataPage deploy-toggle (no concrete pain today).
 
 ---
 
-**Cross-refs:** [CASPIO_API_CORE.md](CASPIO_API_CORE.md) (our proxy API) · [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md) · [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (Triggered-Actions-don't-fire-on-REST) · CLAUDE.md "Documentation Entry Points".
+---
+
+## 7) Live inventory (2026-06-29 read-only probe — re-run `caspio-pricing-proxy/scripts/caspio-entitlement-probe.js`)
+
+- **Outgoing Webhooks (24):** every one is `Zapier-ZapID_subscription:<id>` → `hooks.zapier.com`, Status=Active, throttle=10. (Zapier registers a Caspio outgoing webhook per zap.) The proxy receives none directly. URLs redacted — re-probe for live values.
+- **Data Import/Export Tasks (6), all Status=Ready, Pacific TZ:** `CustomerContactsMerge` (daily) · `Designs2026` (daily) · `Orders_ODBC` (daily) · `PurchaseOrders` (daily) · `Sales Reps 2026-Daily` (daily) · `Thumbnail_Import` (Friday). Trigger via `POST /v3/dataImportExportTasks/{externalKey}/run`.
+- **Directories (1):** `Staff` — 11 users. Manage via `…/directories/{id}/users` (+ `/activate`).
+- **Bridge Applications (14):** Eriks Credit Card · Human Resources 2025 · Inksoft Deposits · Monograms · Nika and Taneisha 2026 · Old Designs · Policies · Production · Safety Stripes · Sanmar Pricing 2026 · Shopworks API 2025 · Steve Art · Transfers_EMB_Stickers_JDS · Xmas Box Labels.
+- Controls (already in prod use): Tables 156 · Views 19 · File-folders 10.
+
+---
+
+**Cross-refs:** [CASPIO_API_CORE.md](CASPIO_API_CORE.md) (our proxy API) · [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md) · [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (Triggered-Actions-don't-fire-on-REST) · Zapier zaps (the 24 outgoing webhooks ARE the Zaps — see MEMORY "Zapier rules") · CLAUDE.md "Documentation Entry Points".
