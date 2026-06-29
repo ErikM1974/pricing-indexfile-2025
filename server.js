@@ -32,6 +32,9 @@ const STOREFRONT_CHANNEL_CONFIG = require('./config/storefront-channels.js');
 // Synthesizes quote_items rows from a storefront order's colorConfigs so /quote
 // + /invoice render line items (2026-06-12). Pure logic, jest-locked.
 const { buildStorefrontQuoteItems } = require('./shared_components/js/storefront-quote-items.js');
+// Staff SAML SSO (#2) — this app is the SAML Service Provider against the Caspio
+// "Staff" directory App Connection (IdP). Replaces the forgeable /api/crm-session.
+const staffSaml = require('./lib/staff-saml.js');
 
 // Load environment variables
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
@@ -2186,6 +2189,58 @@ app.get('/crm-logout', (req, res) => {
   res.redirect('/dashboards/staff-login.html');
 });
 
+// =============================================================================
+// Staff SAML SSO (#2) — server-VERIFIED login (Caspio "Staff" directory = IdP)
+// =============================================================================
+// ADDITIVE: these routes add a login the SERVER can verify. They do NOT yet
+// change dashboard gating or remove the forgeable /api/crm-session — that flip
+// happens only after a real login is confirmed end-to-end on production.
+// Fails safe: returns 503 until the SAML_* env vars are configured.
+
+// SP-initiated start — redirect the browser to Caspio to authenticate.
+app.get('/auth/saml/login', async (req, res) => {
+  if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
+  try {
+    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/')) ? req.query.next : '/staff-dashboard.html';
+    res.redirect(await staffSaml.getLoginUrl(next));
+  } catch (e) {
+    console.error('[SAML] login init failed:', e.message);
+    res.status(500).send('Could not start sign-in. Please try again.');
+  }
+});
+
+// Assertion Consumer Service — Caspio POSTs the SIGNED assertion here. We verify
+// Caspio's signature + audience + timestamps, then establish the staff session.
+app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' }), async (req, res) => {
+  if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
+  try {
+    const identity = await staffSaml.verifyResponse(req.body.SAMLResponse);
+    const permissions = staffSaml.permissionsFor(identity.email);
+    // New session id on login (prevents session fixation).
+    req.session.regenerate((err) => {
+      if (err) { console.error('[SAML] session regenerate failed:', err.message); return res.status(500).send('Sign-in error.'); }
+      req.session.crmUser = {
+        name: identity.name,
+        email: identity.email,
+        firstName: (identity.name || '').split(' ')[0],
+        permissions,
+        via: 'saml',
+      };
+      const relay = (typeof req.body.RelayState === 'string' && req.body.RelayState.startsWith('/')) ? req.body.RelayState : '/staff-dashboard.html';
+      req.session.save(() => res.redirect(relay));
+    });
+  } catch (e) {
+    console.error('[SAML] ACS verify failed:', e.message);
+    res.status(401).send('Sign-in could not be verified. Please try again or contact IT.');
+  }
+});
+
+// Logout — clear our session.
+app.get('/auth/saml/logout', (req, res) => {
+  if (req.session) return req.session.destroy(() => res.redirect('/dashboards/staff-login.html'));
+  res.redirect('/dashboards/staff-login.html');
+});
+
 // Protected CRM dashboard routes (MUST be before static middleware)
 // Each dashboard requires specific role permission via Caspio authentication
 app.get('/dashboards/taneisha-crm.html', requireCrmRole(['taneisha']), (req, res) => {
@@ -2763,6 +2818,263 @@ app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
   } catch (error) {
     console.error('[OrderStatus] Error:', error);
     res.status(500).json({ error: 'Order status unavailable' });
+  }
+});
+
+// =============================================================================
+// Customer Portal — gated, customer-safe data (#1, 2026-06-29)
+// =============================================================================
+// The portal pages used to read raw rows straight from the public proxy
+// (leaking YTD sales, staff emails, art charges, internal notes, and — via a
+// broken `searchById` — other companies' data). These app-server endpoints
+// fetch server-to-server and return an ALLOWLIST projection: raw proxy rows
+// never reach the browser. Phase 1 trusts the URL customerId (data-minimization
+// is the win); Phase 2 (magic-link login, #6) swaps `resolvePortalCustomer` to
+// derive the customer from a verified session — the projection core is unchanged.
+const PORTAL_PROXY = TDT_PROXY; // same caspio-pricing-proxy base
+const PORTAL_DATE_CUTOFF = '2026-01-01T00:00:00'; // pre-2026 lacked consistent images
+
+const portalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  message: { error: 'Too many requests, please try again shortly' },
+});
+
+// Phase-1 identity seam = the URL customerId. Phase 2 replaces only this body
+// with a verified-session lookup; downstream code reads req.portalCustomerId.
+function resolvePortalCustomer(req, res, next) {
+  const customerId = String(req.params.customerId || '');
+  if (!/^\d+$/.test(customerId)) return res.status(404).json({ error: 'Not found' });
+  req.portalCustomerId = customerId;
+  next();
+}
+
+function portalOrderTypeText(v) {
+  if (v && typeof v === 'object') { const k = Object.keys(v); return k.length ? String(v[k[0]]) : ''; }
+  return v || '';
+}
+function portalOnOrAfterCutoff(dateStr) {
+  if (!dateStr) return true;            // never drop undated rows
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return true;
+  return d >= new Date(PORTAL_DATE_CUTOFF);
+}
+// ALLOWLIST projections — copy ONLY customer-safe fields; never spread the raw row.
+function projectPortalMockup(m) {
+  return {
+    ID: m.ID,
+    Design_Number: m.Design_Number || null,
+    Design_Name: m.Design_Name || null,
+    Print_Location: m.Print_Location || null,
+    Mockup_Type: m.Mockup_Type || null,
+    Status: m.Status || null,
+    Submitted_Date: m.Submitted_Date || null,
+    Box_Mockup_1: m.Box_Mockup_1 || null,
+  };
+}
+function projectPortalArt(a) {
+  return {
+    ID_Design: a.ID_Design || null,
+    Design_Num_SW: a.Design_Num_SW || null,
+    GarmentStyle: a.GarmentStyle || null,
+    GarmentColor: a.GarmentColor || null,
+    Order_Type: portalOrderTypeText(a.Order_Type),
+    Status: a.Status || null,
+    Date_Created: a.Date_Created || null,
+    MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null,
+  };
+}
+
+async function portalProxyGet(pathAndQuery) {
+  const r = await fetch(PORTAL_PROXY + pathAndQuery);
+  if (!r.ok) throw new Error(`proxy ${r.status}`);
+  return r.json();
+}
+
+// Customer-safe aggregate: company name + mockups-with-images + art-with-images (2026+).
+async function getPortalData(customerId) {
+  const cid = encodeURIComponent(customerId);
+  const cutoff = encodeURIComponent(PORTAL_DATE_CUTOFF);
+
+  const mResp = await portalProxyGet(`/api/mockups?idCustomer=${cid}&dateFrom=${cutoff}`);
+  const mRecs = (mResp && (mResp.records || (Array.isArray(mResp) ? mResp : []))) || [];
+
+  let aResp = await portalProxyGet(`/api/artrequests?shopworksCustomerId=${cid}&dateCreatedFrom=${cutoff}`);
+  let aRecs = Array.isArray(aResp) ? aResp : ((aResp && aResp.records) || []);
+
+  const companyName = (aRecs[0] && aRecs[0].CompanyName) || (mRecs[0] && mRecs[0].Company_Name) || null;
+
+  // Art rows sometimes lack Shopwork_customer_number — fall back to company name.
+  if (aRecs.length === 0 && companyName) {
+    const byName = await portalProxyGet(`/api/artrequests?companyName=${encodeURIComponent(companyName)}&dateCreatedFrom=${cutoff}`);
+    aRecs = Array.isArray(byName) ? byName : ((byName && byName.records) || []);
+  }
+
+  const mockups = mRecs
+    .filter((m) => (m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3) && portalOnOrAfterCutoff(m.Submitted_Date))
+    .map(projectPortalMockup);
+  const artRequests = aRecs
+    .filter((a) => (a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
+    .map(projectPortalArt);
+
+  return { company: { name: companyName }, mockups, artRequests };
+}
+
+// GET /api/portal/:customerId — customer-safe aggregate. Empty ≠ not-found:
+// a valid customer with no items returns 200 with empty arrays.
+app.get('/api/portal/:customerId', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    res.json(await getPortalData(req.portalCustomerId));
+  } catch (err) {
+    console.error('[Portal] aggregate failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
+// ALLOWLIST projection for the art-request DETAIL customer view. Mirrors exactly
+// the fields the ?view=customer render path displays (mapped + adversarially
+// verified 2026-06-29). Excludes NOTES, Sales_Rep, staff/contact emails, phone,
+// SW refs, art charges (Art_Minutes/Amount_Art_Billed/Prelim_Charges), internal
+// statuses, Rep_Mockup, working files (File_Upload/CDN_Link), and the per-slot
+// Mockup_N_Note fields (artist commentary, never shown to a customer).
+function projectPortalArtDetail(a) {
+  return {
+    PK_ID: a.PK_ID, ID_Design: a.ID_Design || null, // ids needed for the existing customer approve/revise writes
+    Status: a.Status || null, Revision_Count: a.Revision_Count || null, Artwork_Status: a.Artwork_Status || null,
+    Is_Rush: a.Is_Rush || null, Is_On_Hold: a.Is_On_Hold || null, On_Hold_Note: a.On_Hold_Note || null,
+    Request_Type: a.Request_Type || null, CompanyName: a.CompanyName || null,
+    Order_Type: portalOrderTypeText(a.Order_Type), Order_Type_Source: a.Order_Type_Source || null,
+    Item_Type: a.Item_Type || null, Item_Specs_Notes: a.Item_Specs_Notes || null,
+    JDS_SKU: a.JDS_SKU || null, JDS_Design_Name: a.JDS_Design_Name || null, JDS_Color: a.JDS_Color || null,
+    JDS_Placement: a.JDS_Placement || null, JDS_Quantity: a.JDS_Quantity || null,
+    Due_Date: a.Due_Date || null, Date_Created: a.Date_Created || null, Garment_Placement: a.Garment_Placement || null,
+    GarmentStyle: a.GarmentStyle || null, GarmentColor: a.GarmentColor || null,
+    Garm_Style_2: a.Garm_Style_2 || null, Garm_Style_3: a.Garm_Style_3 || null, Garm_Style_4: a.Garm_Style_4 || null,
+    Garm_Color_2: a.Garm_Color_2 || null, Garm_Color_3: a.Garm_Color_3 || null, Garm_Color_4: a.Garm_Color_4 || null,
+    Swatch_1: a.Swatch_1 || null, Swatch_2: a.Swatch_2 || null, Swatch_3: a.Swatch_3 || null, Swatch_4: a.Swatch_4 || null,
+    MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null, MAIN_IMAGE_URL_2: a.MAIN_IMAGE_URL_2 || null,
+    MAIN_IMAGE_URL_3: a.MAIN_IMAGE_URL_3 || null, MAIN_IMAGE_URL_4: a.MAIN_IMAGE_URL_4 || null,
+    Artwork_Locations: a.Artwork_Locations || null, Color_Mode: a.Color_Mode || null, PMS_Colors: a.PMS_Colors || null,
+    Thread_Colors: a.Thread_Colors || null, Underbase_Required: a.Underbase_Required || null, Exact_Text: a.Exact_Text || null,
+    Uploaded_File_Type: a.Uploaded_File_Type || null,
+    Prev_Order_Num: a.Prev_Order_Num || null, Prev_Design_Num: a.Prev_Design_Num || null,
+    Repeat_Keep_Same: a.Repeat_Keep_Same || null, Repeat_Change: a.Repeat_Change || null,
+    Final_Approved_Mockup: a.Final_Approved_Mockup || null,
+    Box_File_Mockup: a.Box_File_Mockup || null, BoxFileLink: a.BoxFileLink || null, Company_Mockup: a.Company_Mockup || null,
+    Mockup_4: a.Mockup_4 || null, Mockup_5: a.Mockup_5 || null, Mockup_6: a.Mockup_6 || null,
+  };
+}
+
+// GET /api/portal/:customerId/art-request/:designId — customer-safe single art
+// request (detail page customer view). Authorizes the row belongs to :customerId
+// before returning; generic 404 on miss/mismatch (no enumeration oracle).
+// Returns a 1-element array to match the client's existing [row]=artRequests shape.
+app.get('/api/portal/:customerId/art-request/:designId', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const designId = String(req.params.designId || '');
+    if (!/^\d+(\.\d+)?$/.test(designId)) return res.status(404).json({ error: 'Not found' });
+    const resp = await portalProxyGet(`/api/artrequests?id_design=${encodeURIComponent(designId)}&limit=1`);
+    const rows = Array.isArray(resp) ? resp : ((resp && resp.records) || []);
+    const row = rows[0];
+    const cid = req.portalCustomerId;
+    const owns = row && (String(row.id_customer) === cid || String(row.Shopwork_customer_number) === cid);
+    if (!owns) return res.status(404).json({ error: 'Not found' }); // missing OR not-this-customer → identical
+    res.json([projectPortalArtDetail(row)]);
+  } catch (err) {
+    console.error('[Portal] art-request detail failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
+// ── Mockup detail customer view (#1 Stage C) ────────────────────────────────
+// Derive ONLY a first name from a rep's email — the customer sees "Your Rep:
+// Nika", never the raw staff email.
+function portalRepDisplayName(v) {
+  if (!v) return '';
+  const s = String(v);
+  const local = s.indexOf('@') >= 0 ? s.split('@')[0] : s;
+  const first = local.split(/[._\s]/)[0];
+  return first ? first.charAt(0).toUpperCase() + first.slice(1) : '';
+}
+// The customer notes list is hidden; notes only feed the status timeline, which
+// keyword-matches Note_Text/Note_Type/Created_Date. Return ONLY the status
+// keywords found (no real note content) so the timeline still dates its steps.
+const PORTAL_TIMELINE_KEYWORDS = ['mockup sent', 'awaiting approval', 'revision requested', 'revision', 'working', 'in progress', 'approved', 'completed'];
+function sanitizePortalNote(n) {
+  const t = String(n.Note_Text || '').toLowerCase();
+  return {
+    Note_Type: n.Note_Type || null,
+    Created_Date: n.Created_Date || null,
+    Note_Text: PORTAL_TIMELINE_KEYWORDS.filter((k) => t.indexOf(k) >= 0).join(' '),
+  };
+}
+function projectPortalVersion(v) { return { Slot_Key: v.Slot_Key, Version_Number: v.Version_Number }; }
+function projectPortalThread(t) { return { Mockup_Slot: t.Mockup_Slot, Thread_Sequence_JSON: t.Thread_Sequence_JSON }; }
+// ALLOWLIST projection for the mockup DETAIL customer view (mapped + verified).
+// Excludes AE_Notes, Artist_Notes, Sales_Rep, Work_Order_Number, Id_Customer,
+// Customer_Email, Box_Folder_ID, Deleted_*, Garment_*, Thread_Colors, Due/Completion
+// dates; Submitted_By is reduced to a first-name only.
+function projectPortalMockupDetail(m) {
+  return {
+    ID: m.ID, PK_ID: m.PK_ID,
+    Status: m.Status || null, Revision_Count: m.Revision_Count || null,
+    Is_On_Hold: m.Is_On_Hold || null, On_Hold_Note: m.On_Hold_Note || null,
+    Design_Number: m.Design_Number || null, Company_Name: m.Company_Name || null, Design_Name: m.Design_Name || null,
+    Mockup_Type: m.Mockup_Type || null, Print_Location: m.Print_Location || null,
+    Logo_Width: m.Logo_Width || null, Logo_Height: m.Logo_Height || null, Stitch_Count: m.Stitch_Count || null,
+    Design_Size: m.Design_Size || null, Size_Specs: m.Size_Specs || null,
+    Submitted_Date: m.Submitted_Date || null, Submitted_By: portalRepDisplayName(m.Submitted_By),
+    Customer_Name: m.Customer_Name || null, Customer_Approval_Sent_Date: m.Customer_Approval_Sent_Date || null,
+    Box_Mockup_1: m.Box_Mockup_1 || null, Box_Mockup_2: m.Box_Mockup_2 || null, Box_Mockup_3: m.Box_Mockup_3 || null,
+    Box_Mockup_4: m.Box_Mockup_4 || null, Box_Mockup_5: m.Box_Mockup_5 || null, Box_Mockup_6: m.Box_Mockup_6 || null,
+  };
+}
+// Fetch + authorize a mockup belongs to :customerId; returns the raw row or null.
+async function authorizePortalMockup(id, cid) {
+  const resp = await portalProxyGet(`/api/mockups/${encodeURIComponent(id)}`);
+  const rec = resp && resp.record;
+  if (!rec || String(rec.Id_Customer) !== String(cid)) return null;
+  return rec;
+}
+
+// GET /api/portal/:customerId/mockup/:id — bundled customer-safe mockup detail
+// (record + sanitized timeline notes + version badges). Mirrors the shapes the
+// client distributes ({success,record}, {notes}, {versions}).
+app.get('/api/portal/:customerId/mockup/:id', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!/^\d+$/.test(id)) return res.status(404).json({ error: 'Not found' });
+    const rec = await authorizePortalMockup(id, req.portalCustomerId);
+    if (!rec) return res.status(404).json({ error: 'Not found' });
+    const [notesResp, versionsResp] = await Promise.all([
+      portalProxyGet(`/api/mockup-notes/${encodeURIComponent(id)}`).catch(() => ({ notes: [] })),
+      portalProxyGet(`/api/mockup-versions/${encodeURIComponent(id)}`).catch(() => ({ versions: [] })),
+    ]);
+    res.json({
+      success: true,
+      record: projectPortalMockupDetail(rec),
+      notes: ((notesResp && notesResp.notes) || []).map(sanitizePortalNote),
+      versions: ((versionsResp && versionsResp.versions) || []).map(projectPortalVersion),
+    });
+  } catch (err) {
+    console.error('[Portal] mockup detail failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
+  }
+});
+
+// GET /api/portal/:customerId/mockup/:id/threads — gated thread sequences
+// (EMB_Design_Files) for the customer mockup view: Mockup_Slot + JSON only.
+app.get('/api/portal/:customerId/mockup/:id/threads', portalLimiter, resolvePortalCustomer, async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!/^\d+$/.test(id)) return res.status(404).json({ error: 'Not found' });
+    const rec = await authorizePortalMockup(id, req.portalCustomerId);
+    if (!rec) return res.status(404).json({ error: 'Not found' });
+    const resp = await portalProxyGet(`/api/emb-designs/by-mockup/${encodeURIComponent(id)}`).catch(() => ({ records: [] }));
+    res.json({ records: ((resp && resp.records) || []).map(projectPortalThread) });
+  } catch (err) {
+    console.error('[Portal] mockup threads failed:', err.message);
+    res.status(503).json({ error: 'Portal temporarily unavailable' });
   }
 });
 

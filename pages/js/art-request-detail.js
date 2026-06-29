@@ -188,6 +188,7 @@
     // Detect view mode at IIFE scope (must be before header setup)
     var iifeUrlParams = new URLSearchParams(window.location.search);
     var isCustomerView = iifeUrlParams.get('view') === 'customer';
+    var cid = iifeUrlParams.get('cid'); // portal customer id — gates the customer-view data fetch (#1 Stage C)
     var isAeView = iifeUrlParams.get('view') === 'ae' || iifeUrlParams.has('ae'); // '?ae' = =-free email-link flag (see send-art-note-email.js); legacy '?view=ae' still works for in-app links
     var selectedMockupSlot = null;
 
@@ -224,7 +225,18 @@
     let currentRequest = null;
 
     // ── Fetch Data ──────────────────────────────────────────────────────
-    Promise.all([
+    // Customer view (?view=customer&cid=) reads the gated, customer-safe app
+    // endpoint (server allowlists fields + authorizes the design belongs to cid).
+    // Notes + charges are never shown in customer view, so they're skipped.
+    // Staff/AE views keep hitting the raw proxy endpoints unchanged.
+    Promise.all(isCustomerView ? [
+        fetch('/api/portal/' + encodeURIComponent(cid) + '/art-request/' + encodeURIComponent(designId)).then(r => {
+            if (!r.ok) throw new Error(`Art request fetch failed: ${r.status}`);
+            return r.json();
+        }),
+        Promise.resolve([]),
+        Promise.resolve([])
+    ] : [
         fetch(`${API_BASE}/api/artrequests?id_design=${designId}&limit=1`).then(r => {
             if (!r.ok) throw new Error(`Art request fetch failed: ${r.status}`);
             return r.json();
@@ -249,7 +261,8 @@
         // D.5 — Inline transfer badge, if a linked transfer exists for this design.
         // Non-blocking — if TransferActions hasn't loaded or no transfer found, badge slot stays empty.
         try {
-            if (window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
+            // Transfer (Supacolor) status badge is internal production info — staff/AE only.
+            if (!isCustomerView && window.TransferActions && window.TransferActions.renderTransferStatusBadge) {
                 window.TransferActions.renderTransferStatusBadge({
                     targetEl: '#ard-transfer-status',
                     designNumber: currentRequest.Design_Number || currentRequest.Design_Num_SW
@@ -6026,6 +6039,11 @@
         var section = document.getElementById('ard-vision-section');
         var container = document.getElementById('ard-vision-container');
         if (!section || !container || !designId) return;
+        // AI Vision Analysis is internal QA (validation warnings, screen/print
+        // counts, extraction methods, design analysis) — NEVER customer-facing.
+        // Caught in browser testing 2026-06-29 (#1 Stage C): this fires via
+        // setTimeout with no view guard, so the customer was seeing it.
+        if (isCustomerView) { section.style.display = 'none'; return; }
 
         fetch(API_BASE + '/api/art-requests/' + designId + '/analysis')
             .then(function (r) { return r.ok ? r.json() : { analyses: [], printLocations: [] }; })
