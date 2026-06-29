@@ -25,8 +25,23 @@ Two identity surfaces that never cross-check: a real-but-browser-only Caspio ide
 > ⚠️ **CORRECTION (Erik, 2026-06-29 PM): staff are NOT on Google.** DNS proves the company runs **Microsoft 365** (MX → `*.ess.barracudanetworks.com` Barracuda filter; SPF `include:spf.protection.outlook.com` → Outlook/Exchange Online mailboxes). So Google OAuth is OUT. The §2 trust-boundary verdict is unchanged (still need a server-verified IdP); only the *which* changes. **Revised options (decision pending):**
 > - **A′. Microsoft 365 / Entra ID OAuth ("Sign in with Microsoft")** — the direct equivalent of the Google plan, using the platform they already have. Verify the Microsoft-signed ID token + restrict to THEIR Entra **tenant id (`tid`)** (not just any Microsoft account). Same S–M effort. Best if each staff member has/uses an individual M365 login. *Likely new PICK.*
 > - **D′. Magic-link email** — staff click a one-time link sent to their `@nwcustomapparel.com` inbox (proves mailbox control = identity, regardless of host). No SSO platform dependency; **reuses the EmailJS sender + the customer-portal magic-link work (#6)** — one mechanism for both. Friendlier if staff don't each log into Microsoft directly. Slightly clunkier UX (inbox round-trip).
-> - **Caspio SAML** — still possible (reuse existing Caspio logins) but plan-gated (Business+, unconfirmed).
-> Everything below that says "Google" generalizes: for A′ swap Google's `verifyIdToken`/JWKS + `hd` check for Microsoft's token validation + `tid` check; for D′ replace the OAuth verify with mint/verify of a single-use emailed nonce. The crm-session fix, roles, session infra, and gating (§4–§6) are otherwise identical.
+> - **★ Caspio App Connection (custom SAML 2.0) — CONFIRMED + NEW PICK (screenshots 2026-06-29 PM).**
+
+### ★ PICK: Caspio App Connection (custom SAML 2.0) — reuse the existing Caspio staff login
+**Confirmed from Erik's Caspio admin (Directory "Staff" `55u0q8`):**
+- Staff = 11 users, all **Sign-in method "Caspio"** (native Caspio passwords), **Role field EMPTY** for all, 2FA available but OFF.
+- **"Identity providers" tab is plan-gated** (external IdP → Caspio = "SAML in") — NOT needed.
+- **"App connections" tab is LIVE on the plan** and "Create app connection" exposes a **fully custom SAML 2.0 SP** form: *Name*, *User identifier = Email* (dropdown), **Service-provider settings** = *Identifier (Entity ID)\**, *Reply URL (ACS URL)\**, *Logout URL*, **SAML signing certificate (x.509)** (file or paste). So Caspio = SAML **IdP**, our Heroku app = SAML **SP**.
+
+**Why this is the pick:** reuses the EXACT login staff already have (Erik's instinct), server-verifiable (signed SAML assertion keyed on Email), **on-plan** (no upgrade), centralized in the Caspio directory they manage (can flip on 2FA there). Roles become data-driven once the (currently empty) `Role` field is populated.
+
+**Flow:** staff hit "Staff Login" → redirected to Caspio login (the one they use) → Caspio POSTs a signed SAML assertion to our **ACS endpoint** → our server verifies Caspio's IdP signature + audience + timestamps → reads `Email` (the User identifier) → keys the session on it → derives permissions from Role.
+
+**Build is collaborative (chicken-and-egg):** WE generate the SP side — pick an Entity ID, an ACS URL (e.g. `https://www.teamnwca.com/auth/saml/acs`), a Logout URL, and an SP x.509 cert — then ERIK pastes those into this Caspio "Create app connection" panel; Caspio then exposes its **IdP metadata (SSO URL + IdP signing cert)** which WE configure into the SP to verify assertions. Then test.
+
+**Tradeoffs vs the alternatives (still valid fallbacks):** SAML SP is **Medium** effort (a SAML lib e.g. `@node-saml/node-saml` or `passport-saml`, an ACS endpoint, cert handling, replay/audience/clock checks) and is **staff-only** (customers still use magic-link #6). **Magic-link (D′)** is simpler and one-mechanism-for-staff+customers, at the cost of a clunkier email-click login and not reusing the Caspio directory. **Microsoft OAuth (A′)** needs each staff member to have an individual M365 login. Given Erik wants to reuse Caspio and App Connections is confirmed on-plan, **SAML is the pick for staff.**
+
+Everything below (§4 crm-session fix, §5 roles/session, §6 gating) is otherwise identical — for SAML, the "verify Google/Microsoft token" step becomes "verify the Caspio SAML assertion at the ACS endpoint." (D′ magic-link / A′ Microsoft remain documented fallbacks.)
 
 ### (original, now superseded) Google Workspace OAuth
 Staff are all on Google Workspace (`@nwcustomapparel.com`).
