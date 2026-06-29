@@ -21,7 +21,14 @@ Two identity surfaces that never cross-check: a real-but-browser-only Caspio ide
 
 **Implication:** any "browser reads `[@authfield]` → POSTs identity" shape is unfixable in principle. The fix must introduce a **new server-verified identity** (external IdP the server cryptographically checks, or a server-issued signed assertion). Caspio Directory can be the **role-of-record store**, never a live-login verifier.
 
-## 3. Recommended architecture — **Google Workspace OAuth (verify ID token)**
+## 3. Recommended architecture
+> ⚠️ **CORRECTION (Erik, 2026-06-29 PM): staff are NOT on Google.** DNS proves the company runs **Microsoft 365** (MX → `*.ess.barracudanetworks.com` Barracuda filter; SPF `include:spf.protection.outlook.com` → Outlook/Exchange Online mailboxes). So Google OAuth is OUT. The §2 trust-boundary verdict is unchanged (still need a server-verified IdP); only the *which* changes. **Revised options (decision pending):**
+> - **A′. Microsoft 365 / Entra ID OAuth ("Sign in with Microsoft")** — the direct equivalent of the Google plan, using the platform they already have. Verify the Microsoft-signed ID token + restrict to THEIR Entra **tenant id (`tid`)** (not just any Microsoft account). Same S–M effort. Best if each staff member has/uses an individual M365 login. *Likely new PICK.*
+> - **D′. Magic-link email** — staff click a one-time link sent to their `@nwcustomapparel.com` inbox (proves mailbox control = identity, regardless of host). No SSO platform dependency; **reuses the EmailJS sender + the customer-portal magic-link work (#6)** — one mechanism for both. Friendlier if staff don't each log into Microsoft directly. Slightly clunkier UX (inbox round-trip).
+> - **Caspio SAML** — still possible (reuse existing Caspio logins) but plan-gated (Business+, unconfirmed).
+> Everything below that says "Google" generalizes: for A′ swap Google's `verifyIdToken`/JWKS + `hd` check for Microsoft's token validation + `tid` check; for D′ replace the OAuth verify with mint/verify of a single-use emailed nonce. The crm-session fix, roles, session infra, and gating (§4–§6) are otherwise identical.
+
+### (original, now superseded) Google Workspace OAuth
 Staff are all on Google Workspace (`@nwcustomapparel.com`).
 
 | Option | Server-verifies | Effort | Plan-gating | Verdict |
