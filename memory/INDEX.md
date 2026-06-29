@@ -96,7 +96,8 @@ _Read API + PO (write) side._
 
 ## 🗄️ Caspio / Backend / Auth / API
 
-- [CASPIO_API_CORE.md](CASPIO_API_CORE.md)
+- [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md) — ⭐ Caspio **platform** REST v3 (Swagger) capability map: tables/views/files/webhooks/directories/tasks/bridge-apps, what NWCA uses vs untapped, auth, plan-gating, webhook-fires-on-REST (+ `caspio-swagger-snapshot-2026-06-29.json`)
+- [CASPIO_API_CORE.md](CASPIO_API_CORE.md) — our **proxy's** API (distinct from the platform API above)
 - [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md)
 - [CASPIO_CSS_ISOLATION.md](CASPIO_CSS_ISOLATION.md)
 - [CRM_DASHBOARD_AUTH.md](CRM_DASHBOARD_AUTH.md)
