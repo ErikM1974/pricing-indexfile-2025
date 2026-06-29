@@ -100,6 +100,12 @@ Our app = SAML SP. These values go in Caspio Directory "Staff" (`55u0q8`) → Ap
 - **Logout URL:** `https://www.teamnwca.com/auth/saml/logout`
 - **SP signing cert:** self-signed RSA-2048, `CN=teamnwca.com Staff SAML SP`, valid 2026-06-29 → 2036-06-26. Public cert pasted into Caspio. **Private key** generated to session scratchpad `saml-sp-key.pem` — must be installed on Heroku `sanmar-inventory-app` as config var **`SAML_SP_PRIVATE_KEY`** at build/deploy (NEVER commit). If lost before then, regenerate the pair + re-upload the cert to Caspio.
 - **After creating:** grant the Staff "Application access" to the connection; then capture Caspio's **IdP side** (login/SSO URL + IdP issuer/entity-id + Caspio's signing certificate) → required to verify assertions server-side.
+- **CONNECTION CREATED 2026-06-29 — Caspio IdP metadata captured (connection "Staff Dashboard – teamnwca", our SP cert = Verified):**
+  - IdP Issuer (Identity provider identifier): `https://c3eku948.caspio.app/auth/idp/saml2/id/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
+  - SSO URL (Single sign-on): `https://c3eku948.caspio.app/auth/idp/saml2/sso/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
+  - SLO URL (Logout): `https://c3eku948.caspio.app/auth/idp/saml2/slo/55u0q8/67bf6501-5c30-4787-b3e8-7c133159e8ce`
+  - IdP signing cert: expires 2036-06-29; **PENDING** — download from the connection's "SAML signing certificate" → store as `SAML_IDP_CERT` for assertion verification.
+  - ⚠️ Connection shows **Users 0 / Groups 0** — nobody is granted access yet; assign the Staff group before testing.
 - **Roles:** directory has ONE "Staff" group (everyone) → groups can't differentiate admin/rep. Populate the per-user **`Role`** field (currently empty) OR map email→role in app initially.
 
 ## Open questions (do NOT build on these)
