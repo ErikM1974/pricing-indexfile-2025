@@ -1,3 +1,7 @@
+## v2026.06.29.1 (2026.06.29)
+
+- fix(safety-recs): show all 9 curated styles in Quick Quote + catalog (was capped at 6)
+
 ## v2026.06.28.4 (2026.06.28)
 
 - feat(safety-recs): collapsible accordion (collapsed by default) on all surfaces
