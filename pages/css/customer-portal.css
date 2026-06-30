@@ -301,6 +301,23 @@ body {
     color: #bbb;
 }
 
+/* ── Orders / Invoices tables (Phase 3) ── */
+.cp-table-wrap { background: white; border-radius: var(--cp-radius); overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.cp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cp-table th { text-align: left; padding: 12px 14px; background: var(--cp-theme-bg); color: var(--cp-theme-dark); font-weight: 600; white-space: nowrap; border-bottom: 1px solid #e0e0e0; }
+.cp-table td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+.cp-table tbody tr:last-child td { border-bottom: none; }
+.cp-table tbody tr:hover { background: var(--cp-theme-bg-hover); }
+.cp-table .cp-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Order + invoice status badges */
+.cp-status--shipped { background: #e8f5e9; color: #2e7d32; }
+.cp-status--in-production { background: #e3f2fd; color: #1565c0; }
+.cp-status--invoiced { background: #ede7f6; color: #5e35b1; }
+.cp-status--paid { background: #e8f5e9; color: #2e7d32; }
+.cp-status--partial { background: #fff3e0; color: #e65100; }
+.cp-status--open { background: #fce4ec; color: #c62828; }
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
     .cp-header { padding: 12px 16px; }
@@ -309,4 +326,5 @@ body {
     .cp-company-banner { padding: 18px 20px; }
     .cp-company-name { font-size: 18px; }
     .cp-card-grid { grid-template-columns: 1fr; gap: 14px; }
+    .cp-table th, .cp-table td { padding: 9px 10px; }
 }

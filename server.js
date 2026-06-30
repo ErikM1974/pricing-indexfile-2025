@@ -3214,6 +3214,58 @@ app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
   }
 });
 
+// ── Customer portal ORDERS + INVOICES (#6 Phase 3) ─────────────────────────
+// One ManageOrders fetch by id_Customer feeds BOTH the Orders table and the
+// Invoices/Balances table (each order row carries cur_TotalInvoice/Payments/Balance).
+// Status is derived from the milestone dates — reliable + customer-friendly. Only the
+// customer's own order/money fields are projected (no rep, no internal ids, no costs).
+function portalOrderStatus(o) {
+  if (o.date_Shippied) return 'Shipped';        // (ManageOrders spells the field "Shippied")
+  if (o.date_Produced) return 'In Production';
+  if (o.date_Invoiced) return 'Invoiced';
+  return 'In Progress';
+}
+function projectPortalOrder(o) {
+  const total = Number(o.cur_TotalInvoice) || 0;
+  const paid = Number(o.cur_Payments) || 0;
+  const balance = Number(o.cur_Balance) || 0;
+  return {
+    orderNumber: o.id_Order || null,
+    orderDate: o.date_Ordered || null,
+    invoiceDate: o.date_Invoiced || null,
+    shipDate: o.date_Shippied || null,
+    designName: o.DesignName || null,
+    poNumber: o.CustomerPurchaseOrder || null,
+    quantity: o.TotalProductQuantity || null,
+    status: portalOrderStatus(o),
+    total: total, paid: paid, balance: balance,
+    paidStatus: balance <= 0 ? (total > 0 ? 'Paid' : '—') : (paid > 0 ? 'Partial' : 'Open'),
+  };
+}
+
+// GET /api/portal/orders — the LOGGED-IN customer's orders + invoice balances (session-scoped).
+app.get('/api/portal/orders', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const cid = String(req.customerSession.portalCustomer.idCustomer);
+    const today = new Date();
+    const end = today.toISOString().slice(0, 10);
+    const startD = new Date(today); startD.setFullYear(today.getFullYear() - 3); // MO retains ~2yr
+    const start = startD.toISOString().slice(0, 10);
+    const url = `${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}` +
+                `&date_Ordered_start=${start}&date_Ordered_end=${end}`;
+    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    if (!r.ok) throw new Error('orders fetch ' + r.status);
+    const j = await r.json();
+    const orders = (j.result || [])
+      .map(projectPortalOrder)
+      .sort((a, b) => String(b.orderDate || '').localeCompare(String(a.orderDate || ''))); // newest first
+    res.json({ orders: orders });
+  } catch (err) {
+    console.error('[Portal] orders failed:', err.message);
+    res.status(503).json({ error: 'Orders temporarily unavailable' });
+  }
+});
+
 // ALLOWLIST projection for the art-request DETAIL customer view. Mirrors exactly
 // the fields the ?view=customer render path displays (mapped + adversarially
 // verified 2026-06-29). Excludes NOTES, Sales_Rep, staff/contact emails, phone,

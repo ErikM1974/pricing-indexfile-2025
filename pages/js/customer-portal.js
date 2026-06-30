@@ -15,6 +15,7 @@
     // Phase 2 (#6): the customer is identified by their verified LOGIN SESSION, not the URL.
     // The server returns this customer's id (data.customerId) so we can build detail links.
     loadPortalData();
+    loadOrders();
 
     function loadPortalData() {
         fetch('/api/portal', { credentials: 'same-origin' })
@@ -211,5 +212,70 @@
         document.getElementById('cp-error').style.display = 'block';
         document.getElementById('cp-error-title').textContent = title;
         document.getElementById('cp-error-message').textContent = message;
+    }
+
+    // ── Orders + Invoices (Phase 3) — one same-origin call feeds both tables ──
+    function loadOrders() {
+        fetch('/api/portal/orders', { credentials: 'same-origin' })
+            .then(function (resp) { return resp.ok ? resp.json() : { orders: [] }; })
+            .then(function (data) {
+                var orders = (data && data.orders) || [];
+                renderOrders(orders);
+                renderInvoices(orders);
+            })
+            .catch(function () { renderOrders([]); renderInvoices([]); });
+    }
+
+    function money(n) {
+        var v = Number(n) || 0;
+        return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function renderOrders(orders) {
+        document.getElementById('cp-orders-count').textContent = orders.length;
+        var wrap = document.getElementById('cp-orders-wrap');
+        var empty = document.getElementById('cp-orders-empty');
+        if (!orders.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        var rows = orders.map(function (o) {
+            return '<tr>' +
+                '<td>#' + escapeHtml(String(o.orderNumber || '')) + '</td>' +
+                '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
+                '<td>' + escapeHtml(o.designName || '—') + '</td>' +
+                '<td>' + escapeHtml(o.poNumber || '—') + '</td>' +
+                '<td class="cp-num">' + escapeHtml(String(o.quantity || '')) + '</td>' +
+                '<td class="cp-num">' + money(o.total) + '</td>' +
+                '<td>' + renderStatusBadge(o.status) + '</td>' +
+                '<td>' + (escapeHtml(formatDate(o.shipDate)) || '—') + '</td>' +
+                '</tr>';
+        }).join('');
+        wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
+            '<th>Order</th><th>Date</th><th>Design</th><th>PO</th><th class="cp-num">Qty</th>' +
+            '<th class="cp-num">Total</th><th>Status</th><th>Shipped</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+
+    function renderInvoices(orders) {
+        // Only invoiced orders (or with a money total) appear in the invoices/balances view.
+        var inv = orders.filter(function (o) { return o.invoiceDate || o.total > 0; });
+        document.getElementById('cp-invoices-count').textContent = inv.length;
+        var wrap = document.getElementById('cp-invoices-wrap');
+        var empty = document.getElementById('cp-invoices-empty');
+        if (!inv.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
+        empty.style.display = 'none';
+        var rows = inv.map(function (o) {
+            return '<tr>' +
+                '<td>#' + escapeHtml(String(o.orderNumber || '')) + '</td>' +
+                '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
+                '<td class="cp-num">' + money(o.total) + '</td>' +
+                '<td class="cp-num">' + money(o.paid) + '</td>' +
+                '<td class="cp-num">' + money(o.balance) + '</td>' +
+                '<td>' + renderStatusBadge(o.paidStatus) + '</td>' +
+                '</tr>';
+        }).join('');
+        wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
+            '<th>Order</th><th>Invoice Date</th><th class="cp-num">Total</th>' +
+            '<th class="cp-num">Paid</th><th class="cp-num">Balance</th><th>Status</th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table>';
     }
 })();
