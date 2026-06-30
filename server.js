@@ -2326,6 +2326,25 @@ function userMayAccessPage(crmUser, rule) {
   return roles.some(r => userPerms.includes(r)) || emails.includes(userEmail);
 }
 
+// Branded 403 page shown when a logged-in staffer opens a page they're not allowed on.
+// Self-contained (only the logo is external) so it renders even if assets are down.
+function accessRestrictedPage(firstName) {
+  const greeting = firstName ? `Sorry, ${firstName} — this` : 'This';
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Access Restricted — Northwest Custom Apparel</title></head>
+<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:linear-gradient(135deg,#f5f7f5 0%,#e3f0e7 100%);padding:20px">
+<div style="background:#fff;border-radius:16px;box-shadow:0 12px 44px rgba(26,71,42,.13);max-width:440px;width:100%;padding:2.75rem 2.5rem 2.5rem;text-align:center;position:relative;overflow:hidden">
+<div style="position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#1a472a 0%,#3a7c52 50%,#1a472a 100%)"></div>
+<img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Logo.png" alt="Northwest Custom Apparel" style="max-width:190px;height:auto;margin:.25rem 0 1.5rem;filter:drop-shadow(0 2px 4px rgba(0,0,0,.08))">
+<div style="width:66px;height:66px;margin:0 auto 1.25rem;border-radius:50%;background:#e8f5e9;display:flex;align-items:center;justify-content:center">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1a472a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+</div>
+<h1 style="color:#1a472a;font-size:1.5rem;margin:0 0 .65rem;font-weight:700">Access Restricted</h1>
+<p style="color:#444;font-size:1.02rem;line-height:1.55;margin:0 0 .45rem">${greeting} page is restricted, and your account doesn’t have access to it.</p>
+<p style="color:#8a8a8a;font-size:.9rem;line-height:1.5;margin:0 0 1.9rem">If you need access, please ask <strong style="color:#3a7c52">Erik</strong>.</p>
+<a href="/staff-dashboard.html" style="display:inline-block;background:#3a7c52;color:#fff;text-decoration:none;font-weight:600;font-size:.98rem;padding:.72rem 1.7rem;border-radius:9px;box-shadow:0 4px 14px rgba(58,124,82,.28)">← Back to Dashboard</a>
+</div></body></html>`;
+}
+
 // Reusable page gate: require a verified staff session + enforce the Staff_Page_Access
 // rule for this page (matched by filename). Used by the /dashboards middleware AND by
 // explicit root routes (e.g. the SanMar vendor-portal pages) so EVERY gated page is
@@ -2338,13 +2357,8 @@ async function gateStaffPage(req, res, next) {
     const rules = await getPageAccessRules();
     const page = (req.path.split('/').pop() || '').toLowerCase(); // the *.html filename
     if (!userMayAccessPage(req.session.crmUser, rules[page])) {
-      return res.status(403).type('html').send(
-        '<!doctype html><meta charset="utf-8"><title>Access restricted</title>' +
-        '<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:14vh auto;text-align:center;color:#1a472a">' +
-        '<h1 style="font-size:1.6rem">Access restricted</h1>' +
-        '<p style="color:#555">You don’t have permission to view this page.</p>' +
-        '<p style="color:#555">If you need access, ask Erik to grant it.</p>' +
-        '<p style="margin-top:2rem"><a href="/staff-dashboard.html" style="color:#3a7c52">← Back to dashboard</a></p></div>');
+      const fn = String(req.session.crmUser.firstName || '').replace(/[<>&"']/g, '');
+      return res.status(403).type('html').send(accessRestrictedPage(fn));
     }
   } catch (e) { console.error('[page-access] check error:', e.message); /* fail-open to any logged-in staff */ }
   return next();
