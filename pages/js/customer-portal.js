@@ -11,26 +11,20 @@
 (function () {
     'use strict';
 
-    // ── Parse customer ID from URL ──
-    var pathParts = window.location.pathname.split('/');
-    var customerId = pathParts[pathParts.length - 1];
+    // ── Load portal data (session-scoped, single gated same-origin call) ──
+    // Phase 2 (#6): the customer is identified by their verified LOGIN SESSION, not the URL.
+    // The server returns this customer's id (data.customerId) so we can build detail links.
+    loadPortalData();
 
-    if (!customerId || !/^\d+$/.test(customerId)) {
-        showError('Invalid Link', 'This link doesn\'t appear to be valid. Please contact your account representative for the correct link.');
-        return;
-    }
-
-    // ── Load portal data (single gated, same-origin call) ──
-    loadPortalData(customerId);
-
-    function loadPortalData(custId) {
-        fetch('/api/portal/' + encodeURIComponent(custId))
+    function loadPortalData() {
+        fetch('/api/portal', { credentials: 'same-origin' })
             .then(function (resp) {
-                if (resp.status === 404) throw new Error('not found');
+                if (resp.status === 401) { window.location.href = '/customer/login'; throw new Error('auth'); }
                 if (!resp.ok) throw new Error('Portal load failed: ' + resp.status);
                 return resp.json();
             })
             .then(function (data) {
+                var custId = data.customerId;
                 var companyName = (data.company && data.company.name) || 'Your Company';
                 document.getElementById('cp-company-name').textContent = companyName;
                 document.title = companyName + ' — Design Portal | NWCA';
@@ -43,12 +37,9 @@
                 document.getElementById('cp-content').style.display = 'block';
             })
             .catch(function (err) {
+                if (err && err.message === 'auth') return; // redirecting to login
                 console.error('Portal load error:', err);
-                if (err.message === 'not found') {
-                    showError('Company Not Found', 'We couldn\'t find an account with this ID. Please contact us at (253) 922-5793 for assistance.');
-                } else {
-                    showError('Unable to Load', 'Something went wrong loading your portal. Please refresh the page or call us at (253) 922-5793.');
-                }
+                showError('Unable to Load', 'Something went wrong loading your portal. Please refresh the page or call us at (253) 922-5793.');
             });
     }
 

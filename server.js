@@ -2698,17 +2698,17 @@ app.get('/mockup/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'mockup-detail.html'));
 });
 
-// Customer Portal — /portal/:customerId
-app.get('/portal/:customerId', (req, res) => {
-  const customerId = req.params.customerId;
-  if (!customerId || !/^\d+$/.test(customerId)) {
-    return res.status(400).send('Invalid customer ID');
-  }
+// Customer Portal — session-gated (#6 Phase 2). The page derives its data from the verified
+// customer LOGIN session (no id in the URL), so the old /portal/:customerId guess-the-id
+// enumeration is closed. Logged-out visitors are bounced to /customer/login.
+app.get('/portal', requireCustomer, (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
   res.sendFile(path.join(__dirname, 'pages', 'customer-portal.html'));
 });
+// Back-compat: old URL-token links now redirect to the gated portal (then login if needed).
+app.get('/portal/:customerId', (req, res) => res.redirect('/portal'));
 
 app.get('/announcements-create.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-create.html'));
@@ -3113,13 +3113,17 @@ const portalLimiter = rateLimit({
   message: { error: 'Too many requests, please try again shortly' },
 });
 
-// Phase-1 identity seam = the URL customerId. Phase 2 replaces only this body
-// with a verified-session lookup; downstream code reads req.portalCustomerId.
+// Identity seam (#6 Phase 2): the verified customer SESSION wins. Falls back to the URL
+// :customerId ONLY for the detail endpoints reached from un-logged-in art-approval EMAIL
+// links (those rows are authorized by an ownership check downstream). A logged-in customer
+// can therefore never be scoped to another company's id. The aggregate endpoint is
+// session-ONLY (it does not use this resolver) — that closes the old enumeration IDOR.
 function resolvePortalCustomer(req, res, next) {
+  const sid = req.customerSession && req.customerSession.portalCustomer && req.customerSession.portalCustomer.idCustomer;
+  if (sid && /^\d+$/.test(String(sid))) { req.portalCustomerId = String(sid); return next(); }
   const customerId = String(req.params.customerId || '');
-  if (!/^\d+$/.test(customerId)) return res.status(404).json({ error: 'Not found' });
-  req.portalCustomerId = customerId;
-  next();
+  if (/^\d+$/.test(customerId)) { req.portalCustomerId = customerId; return next(); }
+  return res.status(404).json({ error: 'Not found' });
 }
 
 function portalOrderTypeText(v) {
@@ -3193,11 +3197,14 @@ async function getPortalData(customerId) {
   return { company: { name: companyName }, mockups, artRequests };
 }
 
-// GET /api/portal/:customerId — customer-safe aggregate. Empty ≠ not-found:
-// a valid customer with no items returns 200 with empty arrays.
-app.get('/api/portal/:customerId', portalLimiter, resolvePortalCustomer, async (req, res) => {
+// GET /api/portal — customer-safe aggregate for the LOGGED-IN customer. SESSION-SCOPED:
+// the id comes ONLY from the verified session (#6 Phase 2), never the URL — this closes the
+// old /api/portal/:customerId enumeration IDOR. Empty ≠ not-found (200 with empty arrays).
+app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
   try {
-    res.json(await getPortalData(req.portalCustomerId));
+    const cid = String(req.customerSession.portalCustomer.idCustomer);
+    const data = await getPortalData(cid);
+    res.json(Object.assign({ customerId: cid }, data)); // customerId lets the page build its detail links
   } catch (err) {
     console.error('[Portal] aggregate failed:', err.message);
     res.status(503).json({ error: 'Portal temporarily unavailable' });
