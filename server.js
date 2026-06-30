@@ -7408,7 +7408,8 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
           (async () => {
             try {
               const delUrl = `${SYNC_PROXY_BASE}/api/shipstation/orders/${encodeURIComponent(session.ShipStation_Order_ID)}?reason=${encodeURIComponent('SW order deleted (cascade)')}`;
-              const r = await fetch(delUrl, { method: 'DELETE' });
+              // #9: proxy shipstation writes are CRM-gated — send the server-side secret.
+              const r = await fetch(delUrl, { method: 'DELETE', headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
               if (r.ok) {
                 console.log(`[sync-from-shopworks] ⊘ SS-cascade: deleted ShipStation #${session.ShipStation_Order_ID} for ${safeQuoteId}`);
                 // Also clear our local ShipStation columns so the dashboard
@@ -8215,7 +8216,7 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     let proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
       body: JSON.stringify(payload),
     });
     let result = await proxyResp.json().catch(() => ({}));
@@ -8229,7 +8230,7 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
       payload._retried = true;
       proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
         body: JSON.stringify(payload),
       });
       result = await proxyResp.json().catch(() => ({}));
