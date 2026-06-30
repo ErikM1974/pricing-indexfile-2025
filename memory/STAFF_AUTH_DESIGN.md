@@ -91,6 +91,9 @@ Staff are all on Google Workspace (`@nwcustomapparel.com`).
 4. **Session store:** Redis vs Postgres add-on — match whatever #1 picks.
 5. **Proxy hardening scope:** staff-data endpoints now; whole-proxy auth is a separate larger project.
 
+## ✅ #2 COMPLETE — staff login confirmed working post-flip (2026-06-29, release v1477)
+Erik logged out → `/staff-dashboard.html` → bounced to Caspio → signed in → landed on the full Staff Dashboard ("WELCOME, Erik", admin tools, correct role). Server-verified SAML login LIVE; forgeable `/api/crm-session` dead (401); all dashboards gated. Staff use the same Caspio password. Follow-ups (harness tasks #8/#9): durable session store (Redis, shared w/ #6 — currently MemoryStore logs everyone out on deploy), gate the public proxy staff-data endpoints (Phase 5), and move the in-code name/role maps to the Caspio Directory `Role` field. Rollback: `heroku releases:rollback`.
+
 ## SP configuration — COMMITTED 2026-06-29 (Caspio App Connection)
 Our app = SAML SP. These values go in Caspio Directory "Staff" (`55u0q8`) → App connections → Create app connection, and our code MUST match them:
 - **Name:** `Staff Dashboard – teamnwca`
