@@ -2260,6 +2260,11 @@ app.get('/dashboards/nika-crm.html', requireCrmRole(['nika']), (req, res) => {
 app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'house-accounts.html'));
 });
+// Access-Admin control panel — ADMIN ONLY (hard code gate, not just the table, since
+// this page edits the RBAC tables themselves). Registered before the /dashboards mount.
+app.get('/dashboards/access-admin.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'access-admin.html'));
+});
 
 // =============================================================================
 // CRM API PROXY ROUTES
@@ -2379,6 +2384,10 @@ app.all('/api/crm-proxy/policies*', ...createCrmProxy('policies', ['policies-adm
 // require 'policies-admin'. Public reads + posts hit
 // /api/policy-comments-public on the proxy directly, no role gate.
 app.all('/api/crm-proxy/policy-comments*', ...createCrmProxy('policy-comments', ['policies-admin']));
+
+// RBAC admin CRUD — ADMIN ONLY. Powers the Access-Admin UI (edits Staff_App_Roles +
+// Staff_Page_Access on the proxy). requireCrmRole(['admin']) + the proxy's secret gate.
+app.all('/api/crm-proxy/admin-rbac*', ...createCrmProxy('admin-rbac', ['admin']));
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.

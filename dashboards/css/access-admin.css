@@ -1,0 +1,56 @@
+/* Access Admin — Erik-only RBAC control panel. NWCA green theme; no inline styles. */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f7f5; color: #1f2a24; }
+
+.aa-wrap { max-width: 1080px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+.aa-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid #1a472a; padding-bottom: 1rem; margin-bottom: 1rem; }
+.aa-header h1 { color: #1a472a; font-size: 1.6rem; margin: 0; }
+.aa-sub { color: #5a665e; margin: .35rem 0 0; font-size: .92rem; max-width: 60ch; }
+.aa-back { color: #3a7c52; text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.aa-back:hover { color: #1a472a; }
+
+.aa-status { min-height: 1.4rem; margin: .25rem 0 .75rem; font-size: .9rem; font-weight: 500; }
+.aa-status.is-ok { color: #1a7c3a; }
+.aa-status.is-error { color: #b3261e; }
+.aa-status.is-info { color: #5a665e; }
+
+.aa-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.aa-tab { background: #e7ede9; border: none; color: #3a4a42; padding: .55rem 1.1rem; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; font-size: .95rem; }
+.aa-tab.is-active { background: #1a472a; color: #fff; }
+
+.aa-panel { display: none; background: #fff; border: 1px solid #e2e8e4; border-radius: 0 10px 10px 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,.05); }
+.aa-panel.is-active { display: block; }
+.aa-panel-head h2 { margin: 0 0 .25rem; color: #1a472a; font-size: 1.2rem; }
+.aa-panel-head p { margin: 0 0 1rem; color: #5a665e; font-size: .88rem; max-width: 78ch; }
+
+.aa-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.aa-table th { text-align: left; color: #3a4a42; font-size: .78rem; text-transform: uppercase; letter-spacing: .03em; border-bottom: 2px solid #e2e8e4; padding: .5rem .6rem; }
+.aa-table td { padding: .5rem .6rem; border-bottom: 1px solid #eef2ef; vertical-align: middle; }
+.aa-table tr:hover td { background: #fafcfa; }
+.aa-actions { white-space: nowrap; text-align: right; }
+.aa-page { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; }
+.aa-loading, .aa-err { color: #8a968e; text-align: center; padding: 1.25rem; }
+.aa-err { color: #b3261e; }
+
+.aa-table select, .aa-table input, .aa-add input, .aa-add select {
+  font: inherit; padding: .4rem .5rem; border: 1px solid #cdd8d1; border-radius: 6px; background: #fff; color: #1f2a24; width: 100%;
+}
+.aa-table input:focus, .aa-table select:focus, .aa-add input:focus, .aa-add select:focus { outline: 2px solid #3a7c52; outline-offset: 0; border-color: #3a7c52; }
+.aa-table-pages td input { min-width: 120px; }
+
+.aa-btn { font: inherit; font-weight: 600; font-size: .85rem; background: #3a7c52; color: #fff; border: none; padding: .42rem .85rem; border-radius: 6px; cursor: pointer; }
+.aa-btn:hover { background: #1a472a; }
+.aa-btn.aa-ghost { background: #fff; color: #b3261e; border: 1px solid #e3c9c7; }
+.aa-btn.aa-ghost:hover { background: #fdf2f1; }
+
+.aa-add { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #d8e0db; }
+.aa-add input { width: auto; flex: 1 1 200px; }
+.aa-add select { width: auto; }
+.aa-add-page input { flex: 1 1 150px; }
+.aa-add .aa-btn { flex: 0 0 auto; }
+
+@media (max-width: 640px) {
+  .aa-header { flex-direction: column; }
+  .aa-table-pages { display: block; overflow-x: auto; }
+}

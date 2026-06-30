@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Access Admin — Northwest Custom Apparel</title>
+  <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+  <link href="/dashboards/css/access-admin.css" rel="stylesheet">
+</head>
+<body>
+  <div class="aa-wrap">
+    <header class="aa-header">
+      <div>
+        <h1>Access Admin</h1>
+        <p class="aa-sub">Manage staff roles and which pages they can see. Changes apply on the person's next page load — no deploy.</p>
+      </div>
+      <a class="aa-back" href="/staff-dashboard.html">← Dashboard</a>
+    </header>
+
+    <div id="aa-status" class="aa-status" role="status" aria-live="polite"></div>
+
+    <nav class="aa-tabs">
+      <button class="aa-tab is-active" data-panel="roles" type="button">Staff Roles</button>
+      <button class="aa-tab" data-panel="pages" type="button">Page Access</button>
+    </nav>
+
+    <!-- ROLES -->
+    <section id="panel-roles" class="aa-panel is-active">
+      <div class="aa-panel-head">
+        <h2>Staff Roles</h2>
+        <p>What each person can do across the app. <strong>admin</strong> = everything (incl. financials); <strong>accountant</strong> = finance; <strong>sales / art / shipping / production</strong> = their area; <strong>staff</strong> = basic.</p>
+      </div>
+      <table class="aa-table">
+        <thead><tr><th>Email</th><th>Role</th><th class="aa-actions">Actions</th></tr></thead>
+        <tbody id="roles-body"><tr><td colspan="3" class="aa-loading">Loading…</td></tr></tbody>
+      </table>
+      <div class="aa-add">
+        <input id="new-role-email" type="email" placeholder="new.person@nwcustomapparel.com" autocomplete="off">
+        <select id="new-role-role"></select>
+        <button id="add-role-btn" type="button" class="aa-btn">Add / Update</button>
+      </div>
+    </section>
+
+    <!-- PAGES -->
+    <section id="panel-pages" class="aa-panel">
+      <div class="aa-panel-head">
+        <h2>Page Access</h2>
+        <p>Only the pages listed here are restricted. <strong>Any page not listed is visible to all logged-in staff.</strong> A person gets in if their role is in <em>Allowed Roles</em> OR their email is in <em>Allowed Emails</em>. (Admins always have access.)</p>
+      </div>
+      <table class="aa-table aa-table-pages">
+        <thead><tr><th>Page</th><th>Allowed Roles</th><th>Allowed Emails</th><th>Note</th><th class="aa-actions">Actions</th></tr></thead>
+        <tbody id="pages-body"><tr><td colspan="5" class="aa-loading">Loading…</td></tr></tbody>
+      </table>
+      <div class="aa-add aa-add-page">
+        <input id="new-page-name" type="text" placeholder="some-dashboard.html">
+        <input id="new-page-roles" type="text" placeholder="roles: admin,accountant">
+        <input id="new-page-emails" type="text" placeholder="emails: bradley@…,erik@…">
+        <input id="new-page-desc" type="text" placeholder="note (optional)">
+        <button id="add-page-btn" type="button" class="aa-btn">Add Rule</button>
+      </div>
+    </section>
+  </div>
+  <script src="/dashboards/js/access-admin.js"></script>
+</body>
+</html>
