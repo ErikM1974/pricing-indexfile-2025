@@ -1,3 +1,61 @@
+## v2026.06.30.1 (2026.06.30)
+
+- docs(memory): staff SAML deployed live (release v1473) — login-half verified; next=round-trip test
+- debug(saml): log assertion structure on ACS verify failure (temporary)
+- Debug SAML assertion structure
+- fix(saml): Caspio signs the response wrapper — wantAuthnResponseSigned not assertion
+- Fix SAML response-signature validation
+- chore(saml): remove temp diagnostic logging; add staff display-name map
+- SAML cleanup: remove debug, add name map
+- docs(memory): staff SAML SSO verified working end-to-end (v1476); remaining = the flip
+- feat(staff-auth): THE FLIP — require SAML session on dashboards; kill forgeable /api/crm-session (#2)
+- Staff-auth flip: SAML-gated dashboards, forgeable endpoint removed
+- docs(memory): staff-auth flip DONE (v1477) — hole closed, dashboards SAML-gated
+- docs(memory): #2 COMPLETE — staff SAML login confirmed working post-flip (v1477)
+- docs(memory): refresh resume note — #1 & #2 shipped live; next = #8 durable sessions
+- docs(memory): index new Caspio integration docs; /memory-maintain pass
+- security(session): fail-closed if SESSION_SECRET missing/default in prod
+- docs(security): proxy side-door audit (#9) — 98 open HIGH/CRITICAL endpoints
+- docs(security): #9 Phase-1 progress — customer-profile/industry-lookalikes + sales-archive writes gated (live)
+- chore(#9): cleanup-service-codes script sends x-crm-api-secret (writes now gated)
+- docs(security): #9 Phase-1 Batch 3 — pricing/service-code writes + files DELETE gated (v853)
+- security(#9): front-end sends x-crm-api-secret on proxy shipstation writes
+- docs(security): #9 Phase 1 COMPLETE (non-Inksoft) — 5 batches gated + verified live
+- feat(#8): durable staff sessions via cookie-session (survive deploys)
+- docs(memory): #8 durable sessions DONE (cookie-session); #9 Phase-1 complete; refresh resume note
+- docs(memory): #5 task-triggers DONE & LIVE; #3 webhook premise found unsound (reframe to #4)
+- docs(security): #9 Phase-5 digitized-designs/lookup trimmed (live); Phase-3 reality-check noted
+- feat(rbac): derive staff permissions from Caspio Staff_App_Roles (replace hardcoded map)
+- docs(rbac): Caspio-driven roles SHIPPED — Staff_App_Roles table, not directory Role field
+- feat(rbac): table-driven page access — gate /dashboards by Staff_Page_Access
+- docs(rbac): table-driven page access shipped — CLAUDE.md rule + design doc
+- feat(rbac): Access-Admin UI — Erik-only control panel for roles + page access
+- docs(memory): resume point — RBAC live; Access-Admin UI in 2 open PRs to review/merge
+- Merge PR #7: Access-Admin UI (Erik-only roles + page-access control panel)
+- feat(rbac): link Access Admin from the staff dashboard Administration section
+- docs(memory): Access-Admin UI merged+deployed+live (PRs #7/#2); RBAC fully self-service
+- security(rbac): gate SanMar vendor-portal pages (were PUBLIC) via shared table-driven gate
+- polish(rbac): branded 403 'Access Restricted' page (NWCA logo, card, personalized)
+- docs(memory): branch hygiene RECONCILED — both repos develop=main=deploy=live; proxy UPS features now live
+- security(staff-auth): close anonymous page backdoors — %2e gate bypass, ungated sibling mounts + root aliases
+- docs(security): record staff-dashboard seal audit + remediation (criticals closed, Phase-3 mapped)
+- docs(security): tee up Phase-3 side-door remediation — 4 waves, caller-mapped, ready to run
+- docs(security): Wave 1 side-door gates DONE + lesson on path-specific Express auth gates
+- feat(portal): magic-link customer login plumbing (Phase 1)
+- docs(portal): record Phase 0+1 SHIPPED (magic-link login live, dormant) + Phase 2/3 next
+- fix(branding): use the public logo URL — NWCA Logo.png 403s (broken on login + 403 + email)
+- feat(portal): Phase 2 — session-scoped portal, closes the enumeration IDOR
+- docs(portal): Phase 2 LIVE — session-scoped portal, enumeration IDOR closed (art-email flow kept)
+- polish(portal): show the invite's company name on an empty portal (not 'Your Company')
+- feat(portal): Phase 3 — Orders + Invoices/Balances sections (session-scoped)
+- fix(portal): derive paid amount from cur_Balance (cur_Payments is null in the feed)
+- docs(portal): Phase 3 LIVE — Orders + Invoices sections (paid derived from cur_Balance)
+- feat(portal): on-screen + downloadable ShopWorks-style invoice (#6)
+- docs(portal): record on-screen + downloadable invoice (ownership-checked)
+- polish(portal): invoice matches ShopWorks — NWCA address/accounting email, Date Due, Design ID
+- fix(portal): embed same-origin logo in invoice PDF + compact layout + UTC date fix
+- feat(portal): Customer Portals staff admin console — manage invites (add/enable/disable/delete), CRM lookup, send magic-link, preview portal, Account Rep + My customers filter
+
 ## v2026.06.29.3 (2026.06.29)
 
 - docs(memory): add Caspio platform REST v3 (Swagger) capability reference
