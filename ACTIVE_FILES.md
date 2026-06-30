@@ -1065,6 +1065,9 @@ cap-embroidery-fix.css
 | `/dashboards/access-admin.html` | **NEW (2026-06-30)** Erik-only RBAC control panel — manage staff roles (`Staff_App_Roles`) + page access (`Staff_Page_Access`). Code-gated `requireCrmRole(['admin'])`. | access-admin.js, access-admin.css, `/api/crm-proxy/admin-rbac/*` | ✅ Active |
 | `/dashboards/js/access-admin.js` | Access-Admin controller — roles + page-access CRUD via admin-gated crm-proxy | /api/crm-proxy/admin-rbac | ✅ Active |
 | `/dashboards/css/access-admin.css` | Access-Admin panel styles (NWCA green, no inline) | - | ✅ Active |
+| `/dashboards/customer-portal-admin.html` | **NEW (2026-06-30)** Customer Portals admin console — list/add/enable-disable/delete portal invites (`Customer_Portal_Access`), send magic-link login emails, preview a customer's portal. Role-gated `requireCrmRole(['admin','accountant','art','sales','taneisha','nika'])`. | dash-shell.css, dash-page-helpers.js, customer-portal-admin.css/js, `/api/crm-proxy/customer-portal-access/*`, `/api/portal-admin/*` | ✅ Active |
+| `/dashboards/js/customer-portal-admin.js` | Customer Portals console controller (CRUD + CRM lookup + send-link + preview) | DashPage, same-origin `/api/crm-proxy/*` + `/api/portal-admin/*` | ✅ Active |
+| `/dashboards/css/customer-portal-admin.css` | Customer Portals console page styles (table, modal, badges) | dash-shell.css, art-hub.css tokens | ✅ Active |
 | `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |

@@ -1,8 +1,14 @@
 (function () {
   'use strict';
 
-  var parts = location.pathname.split('/');
-  var orderNo = parts[parts.length - 1];
+  // Staff PREVIEW reuses this page at /portal-admin/preview/<id>/invoice/<orderNo>.
+  var PREVIEW = location.pathname.match(/^\/portal-admin\/preview\/(\d+)\/invoice\/(\d+)/);
+  var orderNo = PREVIEW ? PREVIEW[2] : (location.pathname.split('/').pop() || '');
+  var INVOICE_API = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW[1] + '/invoice/' + encodeURIComponent(orderNo)) : ('/api/portal/invoice/' + encodeURIComponent(orderNo));
+  var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
+  var BACK_URL = PREVIEW ? ('/portal-admin/preview/' + PREVIEW[1]) : '/portal';
+  // Point the "back" links at the right place for the mode we're in.
+  document.querySelectorAll('a[href="/portal"]').forEach(function (a) { a.setAttribute('href', BACK_URL); });
 
   function esc(s) { if (s == null) return ''; var d = document.createElement('div'); d.appendChild(document.createTextNode(String(s))); return d.innerHTML; }
   function money(n) { return '$' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
@@ -17,9 +23,9 @@
 
   if (!/^\d+$/.test(orderNo)) { fail(); return; }
 
-  fetch('/api/portal/invoice/' + encodeURIComponent(orderNo), { credentials: 'same-origin' })
+  fetch(INVOICE_API, { credentials: 'same-origin' })
     .then(function (r) {
-      if (r.status === 401) { location.href = '/customer/login'; throw new Error('auth'); }
+      if (r.status === 401) { location.href = LOGIN_URL; throw new Error('auth'); }
       if (!r.ok) throw new Error('load');
       return r.json();
     })
