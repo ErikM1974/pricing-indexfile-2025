@@ -151,6 +151,7 @@ When adding endpoints or rendering user data:
 - **XSS**: use `escapeHTML()` when rendering external/user data via `innerHTML`.
 - **CORS**: update `ALLOWED_ORIGINS` in server.js for new domains.
 - **Rate limit**: sensitive endpoints use `strictLimiter`.
+- **🔐 Staff RBAC = two Caspio tables (Erik-editable, no deploy)**: `Staff_App_Roles` (Email→Role: admin/accountant/sales/art/shipping/production/staff) drives `permissionsFromRole()` at SAML login; `Staff_Page_Access` (Page→Allowed_Roles/Allowed_Emails) gates `/dashboards/*.html` via the table-driven middleware (admin override; unlisted=any-staff). **When you build a NEW staff dashboard page that should be RESTRICTED, add a `Staff_Page_Access` row** (else it defaults to any logged-in staff). Detail → [memory/STAFF_AUTH_DESIGN.md](memory/STAFF_AUTH_DESIGN.md).
 
 ## Policies Hub ↔ Employee Handbook sync
 
