@@ -11,6 +11,17 @@
 (function () {
     'use strict';
 
+    // Staff PREVIEW mode: /portal-admin/preview/<id> reuses this page READ-ONLY so staff
+    // can see exactly what a customer sees. The server gates that route by staff role; here
+    // we just point the fetches at the staff mirror endpoints, fix the 401 target, and label
+    // the page. A logged-in CUSTOMER never lands here (different route + no staff session).
+    var PREVIEW = (function () { var m = location.pathname.match(/^\/portal-admin\/preview\/(\d+)/); return m ? m[1] : null; })();
+    var AGG_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW) : '/api/portal';
+    var ORDERS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/orders') : '/api/portal/orders';
+    var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
+    var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
+    if (PREVIEW) showPreviewRibbon();
+
     // ── Load portal data (session-scoped, single gated same-origin call) ──
     // Phase 2 (#6): the customer is identified by their verified LOGIN SESSION, not the URL.
     // The server returns this customer's id (data.customerId) so we can build detail links.
@@ -18,9 +29,9 @@
     loadOrders();
 
     function loadPortalData() {
-        fetch('/api/portal', { credentials: 'same-origin' })
+        fetch(AGG_URL, { credentials: 'same-origin' })
             .then(function (resp) {
-                if (resp.status === 401) { window.location.href = '/customer/login'; throw new Error('auth'); }
+                if (resp.status === 401) { window.location.href = LOGIN_URL; throw new Error('auth'); }
                 if (!resp.ok) throw new Error('Portal load failed: ' + resp.status);
                 return resp.json();
             })
@@ -214,9 +225,22 @@
         document.getElementById('cp-error-message').textContent = message;
     }
 
+    // Staff-preview banner — makes it unmistakable this is the staff console viewing a
+    // customer's portal (not a customer's own session). Styled by .cp-preview-ribbon.
+    function showPreviewRibbon() {
+        document.addEventListener('DOMContentLoaded', function () {
+            var bar = document.createElement('div');
+            bar.className = 'cp-preview-ribbon';
+            bar.innerHTML = '<span><strong>Staff preview</strong> &middot; this is exactly what the customer sees (read-only)</span>' +
+                '<a href="/dashboards/customer-portal-admin.html">&larr; Back to Customer Portals</a>';
+            document.body.insertBefore(bar, document.body.firstChild);
+            document.body.classList.add('cp-has-ribbon');
+        });
+    }
+
     // ── Orders + Invoices (Phase 3) — one same-origin call feeds both tables ──
     function loadOrders() {
-        fetch('/api/portal/orders', { credentials: 'same-origin' })
+        fetch(ORDERS_URL, { credentials: 'same-origin' })
             .then(function (resp) { return resp.ok ? resp.json() : { orders: [] }; })
             .then(function (data) {
                 var orders = (data && data.orders) || [];
@@ -239,7 +263,7 @@
         empty.style.display = 'none';
         var rows = orders.map(function (o) {
             return '<tr>' +
-                '<td><a class="cp-link" href="/portal/invoice/' + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
+                '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
                 '<td>' + escapeHtml(o.designName || '—') + '</td>' +
                 '<td>' + escapeHtml(o.poNumber || '—') + '</td>' +
@@ -265,7 +289,7 @@
         empty.style.display = 'none';
         var rows = inv.map(function (o) {
             return '<tr>' +
-                '<td><a class="cp-link" href="/portal/invoice/' + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
+                '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
                 '<td class="cp-num">' + money(o.paid) + '</td>' +

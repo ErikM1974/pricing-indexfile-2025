@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Customer Portals - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Customer Portals</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <p class="cpa-intro">
+                Manage who can log into the customer portal. Customers sign in with a one-click
+                email link (no password) and see only their own company's mockups, art, orders and invoices.
+            </p>
+
+            <!-- Stats -->
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-total">—</div>
+                    <div class="dash-stat-label">Invited Customers</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-enabled">—</div>
+                    <div class="dash-stat-label">Active</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-disabled">—</div>
+                    <div class="dash-stat-label">Disabled</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-loggedin">—</div>
+                    <div class="dash-stat-label">Have Signed In</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="cpa-controls">
+                <div class="cpa-search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="cpa-filter" placeholder="Filter by company, email, rep or customer #…" autocomplete="off">
+                </div>
+                <button class="cpa-btn cpa-btn-ghost" id="cpa-mine-btn" style="display:none;" title="Show only accounts you own">
+                    <i class="fas fa-user-check"></i> My customers
+                </button>
+                <button class="cpa-btn cpa-btn-primary" id="cpa-add-btn">
+                    <i class="fas fa-user-plus"></i> Add Customer
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Portal Access</h2>
+                    <span class="cpa-count" id="cpa-rowcount"></span>
+                </div>
+                <div id="content-root" class="dash-loading">Loading…</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add / Edit Customer modal -->
+    <div class="cpa-modal-overlay" id="cpa-modal" style="display:none;">
+        <div class="cpa-modal" role="dialog" aria-modal="true" aria-labelledby="cpa-modal-title">
+            <div class="cpa-modal-head">
+                <h3 id="cpa-modal-title">Add Customer</h3>
+                <button class="cpa-modal-close" id="cpa-modal-close" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cpa-modal-body">
+                <!-- Step 1: find the customer in the CRM -->
+                <label class="cpa-field" id="cpa-lookup-field">
+                    <span class="cpa-field-label">Find customer <small>(search company name or email)</small></span>
+                    <div class="cpa-search-wrap cpa-search-inline">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="cpa-lookup" placeholder="e.g. Lincoln High School" autocomplete="off">
+                    </div>
+                    <div class="cpa-lookup-results" id="cpa-lookup-results"></div>
+                </label>
+
+                <div class="cpa-divider"><span>then confirm the details</span></div>
+
+                <!-- Step 2: confirm / edit the invite fields -->
+                <label class="cpa-field">
+                    <span class="cpa-field-label">Email <small>(the login identity)</small></span>
+                    <input type="email" id="cpa-email" placeholder="buyer@company.com" autocomplete="off">
+                </label>
+                <div class="cpa-field-row">
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">Customer # <small>(ShopWorks id)</small></span>
+                        <input type="text" id="cpa-idcustomer" placeholder="13616" inputmode="numeric" autocomplete="off">
+                    </label>
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">Company name</span>
+                        <input type="text" id="cpa-company" placeholder="Company, Inc." autocomplete="off">
+                    </label>
+                </div>
+                <label class="cpa-checkline">
+                    <input type="checkbox" id="cpa-sendlink" checked>
+                    <span>Email them a login link right away</span>
+                </label>
+                <div class="cpa-modal-error" id="cpa-modal-error"></div>
+            </div>
+            <div class="cpa-modal-foot">
+                <button class="cpa-btn cpa-btn-ghost" id="cpa-cancel">Cancel</button>
+                <button class="cpa-btn cpa-btn-primary" id="cpa-save"><i class="fas fa-check"></i> Save & Invite</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="cpa-toast" id="cpa-toast"></div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/customer-portal-admin.js?v=2026.06.30.1"></script>
+</body>
+</html>

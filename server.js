@@ -2292,6 +2292,15 @@ app.get('/dashboards/access-admin.html', requireCrmRole(['admin']), (req, res) =
   res.sendFile(path.join(__dirname, 'dashboards', 'access-admin.html'));
 });
 
+// Customer Portal admin console — manage who can log into the customer portal
+// (Customer_Portal_Access invites). Open to the management team by ROLE (Erik=admin,
+// Bradley=accountant, Ruth=art, Taneisha/Nika=sales). The two rep tags are included so
+// Taneisha + Nika are covered regardless of their broader Staff_App_Roles role.
+const PORTAL_ADMIN_ROLES = ['admin', 'accountant', 'art', 'sales', 'taneisha', 'nika'];
+app.get('/dashboards/customer-portal-admin.html', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'customer-portal-admin.html'));
+});
+
 // =============================================================================
 // CRM API PROXY ROUTES
 // These routes protect the CRM API by validating session/role before forwarding
@@ -2455,6 +2464,14 @@ app.all('/api/crm-proxy/policy-comments*', ...createCrmProxy('policy-comments', 
 // RBAC admin CRUD — ADMIN ONLY. Powers the Access-Admin UI (edits Staff_App_Roles +
 // Staff_Page_Access on the proxy). requireCrmRole(['admin']) + the proxy's secret gate.
 app.all('/api/crm-proxy/admin-rbac*', ...createCrmProxy('admin-rbac', ['admin']));
+
+// Customer Portal admin — CRUD on the Customer_Portal_Access invite registry. Powers the
+// "Customer Portals" staff console. Role-gated (the management team) + the proxy's secret.
+app.all('/api/crm-proxy/customer-portal-access*', ...createCrmProxy('customer-portal-access', PORTAL_ADMIN_ROLES));
+// Customer lookup for the "add customer" search (resolve a contact → id_Customer + company).
+// company-contacts/search is already public (the quote builders use it), but proxying it
+// keeps the admin page same-origin + role-gated + carries the secret harmlessly.
+app.all('/api/crm-proxy/company-contacts*', ...createCrmProxy('company-contacts', PORTAL_ADMIN_ROLES));
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
@@ -3350,6 +3367,138 @@ app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (r
 // Invoice page (session-gated). Reads the order # from the URL; the page fetches the
 // secured /api/portal/invoice/:orderNo above (which re-checks ownership).
 app.get('/portal/invoice/:orderNo', requireCustomer, (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-invoice.html'));
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// Customer Portal ADMIN (staff console) — send a login link + PREVIEW a customer's
+// portal. All role-gated (PORTAL_ADMIN_ROLES). The preview endpoints are a READ-ONLY
+// staff mirror: they reuse getPortalData + the order/invoice projections but take the
+// id from the URL (not a customer session), so the customer security seam
+// (requireCustomer / resolvePortalCustomer) is UNTOUCHED. A customer can never reach
+// these — they require a verified STAFF (SAML) session with an allowed role.
+// ════════════════════════════════════════════════════════════════════════════
+
+// POST /api/portal-admin/send-link { email } — staff-initiated magic-link email. Unlike the
+// public request-link route (which never reveals account state), this sits behind a staff
+// role so it can tell the staffer whether the invite is enabled and the link went out.
+app.post('/api/portal-admin/send-link', requireCrmRole(PORTAL_ADMIN_ROLES), express.json(), async (req, res) => {
+  try {
+    if (!customerMagicLink.isConfigured()) return res.status(503).json({ error: 'Magic-link login is not configured (MAGIC_LINK_SECRET missing).' });
+    const email = String((req.body && req.body.email) || '').toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'valid email required' });
+    const access = await fetchPortalAccess(email);
+    if (!access) return res.status(404).json({ error: 'That email is not invited yet. Add them first.' });
+    if (!access.enabled) return res.status(409).json({ error: 'That invite is disabled. Enable it before sending a link.' });
+    if (!/^\d+$/.test(String(access.id_Customer))) return res.status(409).json({ error: 'That invite has no valid customer id.' });
+    const token = customerMagicLink.mintToken({ email, idCustomer: access.id_Customer });
+    const link = `${PUBLIC_SITE_ORIGIN}/auth/customer/verify?token=${encodeURIComponent(token)}`;
+    await sendEmailJSTemplate(CUSTOMER_MAGIC_LINK_TEMPLATE, {
+      to_email: email,
+      company_name: access.company_name || 'there',
+      magic_link: link,
+      expiry_minutes: String(customerMagicLink.LINK_TTL_MIN),
+    });
+    console.log(`[portal-admin] ${req.session.crmUser.email} sent a login link to ${email} (customer ${access.id_Customer})`);
+    res.json({ success: true, email, sent: true });
+  } catch (e) {
+    console.error('[portal-admin] send-link failed:', e.message);
+    res.status(502).json({ error: 'Could not send the login link. Please try again.' });
+  }
+});
+
+// Map staff email → their EXACT CustomerServiceRep name in Sales_Reps_2026 (the join key
+// for the console's "My customers" filter). These MUST match the Sales_Reps_2026 values
+// verbatim — note Ruth is "Ruthie Nhoung" there, not "Ruth Nhoung".
+const REP_NAME_BY_EMAIL = {
+  'erik@nwcustomapparel.com': 'Erik Mickelson',
+  'taneisha@nwcustomapparel.com': 'Taneisha Clark',
+  'nika@nwcustomapparel.com': 'Nika Lao',
+  'ruth@nwcustomapparel.com': 'Ruthie Nhoung',
+  'jim@nwcustomapparel.com': 'Jim Mickelson',
+};
+// GET /api/portal-admin/me — who's logged in (for the Account Rep / "My customers" filter).
+app.get('/api/portal-admin/me', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
+  const u = (req.session && req.session.crmUser) || {};
+  const email = String(u.email || '').toLowerCase();
+  const perms = (u.permissions || []).map(p => String(p).toLowerCase());
+  res.json({
+    email,
+    firstName: u.firstName || '',
+    repName: REP_NAME_BY_EMAIL[email] || null,
+    seesAll: perms.includes('admin') || perms.includes('accountant'),
+  });
+});
+
+// GET /api/portal-admin/preview/:id — the customer's portal aggregate (mockups + art +
+// company), exactly as the customer sees it. Staff-only, READ-ONLY.
+app.get('/api/portal-admin/preview/:id', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const data = await getPortalData(cid);
+    const companyName = (data.company && data.company.name) || '';
+    res.json(Object.assign({ customerId: cid, staffPreview: true }, data, { company: { name: companyName } }));
+  } catch (err) {
+    console.error('[portal-admin] preview aggregate failed:', err.message);
+    res.status(503).json({ error: 'Preview temporarily unavailable' });
+  }
+});
+
+// GET /api/portal-admin/preview/:id/orders — the customer's orders + invoice balances.
+app.get('/api/portal-admin/preview/:id/orders', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const today = new Date();
+    const end = today.toISOString().slice(0, 10);
+    const startD = new Date(today); startD.setFullYear(today.getFullYear() - 3);
+    const start = startD.toISOString().slice(0, 10);
+    const url = `${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}` +
+                `&date_Ordered_start=${start}&date_Ordered_end=${end}`;
+    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    if (!r.ok) throw new Error('orders fetch ' + r.status);
+    const j = await r.json();
+    const orders = (j.result || []).map(projectPortalOrder)
+      .sort((a, b) => String(b.orderDate || '').localeCompare(String(a.orderDate || '')));
+    res.json({ orders });
+  } catch (err) {
+    console.error('[portal-admin] preview orders failed:', err.message);
+    res.status(503).json({ error: 'Orders preview temporarily unavailable' });
+  }
+});
+
+// GET /api/portal-admin/preview/:id/invoice/:orderNo — one invoice, ownership-checked
+// against the PREVIEWED customer id (staff can't pull an order that isn't this customer's).
+app.get('/api/portal-admin/preview/:id/invoice/:orderNo', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  const orderNo = String(req.params.orderNo || '');
+  if (!/^\d+$/.test(cid) || !/^\d+$/.test(orderNo)) return res.status(400).json({ error: 'numeric ids required' });
+  try {
+    const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    if (!oR.ok) throw new Error('order ' + oR.status);
+    const oJ = await oR.json();
+    const o = Array.isArray(oJ.result) ? oJ.result[0] : (oJ.result || oJ);
+    if (!o || String(o.id_Customer) !== cid) return res.status(404).json({ error: 'Not found' });
+    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const lJ = lR.ok ? await lR.json() : { result: [] };
+    const items = (lJ.result || []).sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0)).map(projectPortalLineItem);
+    res.json(projectPortalInvoice(o, items));
+  } catch (err) {
+    console.error('[portal-admin] preview invoice failed:', err.message);
+    res.status(503).json({ error: 'Invoice preview temporarily unavailable' });
+  }
+});
+
+// Preview PAGES (staff-gated) — reuse the customer portal HTML, which detects the
+// /portal-admin/preview/ path and fetches the staff endpoints above (read-only).
+app.get('/portal-admin/preview/:id', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-portal.html'));
+});
+app.get('/portal-admin/preview/:id/invoice/:orderNo', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(__dirname, 'pages', 'customer-invoice.html'));
 });
