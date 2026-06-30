@@ -3364,6 +3364,154 @@ app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (r
   }
 });
 
+// ── Customer portal PHASE 4 — personalized catalog + request-to-rep re-order ──
+// Reuses the customer's own order history (orders → line items) → distinct products,
+// enriched with the SanMar image. Session-scoped + customer-safe (no costs/internal
+// fields). The re-order action is a REQUEST that routes to the rep — NO price/payment.
+
+const _portalPdCache = new Map(); // styleNumber → product-details rows (shared, static-ish)
+async function portalProductDisplay(style, color) {
+  let rows = _portalPdCache.get(style);
+  if (!rows) {
+    try {
+      const r = await fetch(`${CRM_API_BASE}/api/product-details?styleNumber=${encodeURIComponent(style)}`,
+        { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+      rows = r.ok ? await r.json() : [];
+    } catch (_) { rows = []; }
+    if (!Array.isArray(rows)) rows = [];
+    _portalPdCache.set(style, rows);
+  }
+  const want = String(color || '').toLowerCase();
+  const row = rows.find(x => String(x.COLOR_NAME || '').toLowerCase() === want)
+    || rows.find(x => want && String(x.COLOR_NAME || '').toLowerCase().includes(want))
+    || rows[0];
+  return {
+    image: row ? (row.PRODUCT_IMAGE || row.FRONT_MODEL || row.FRONT_FLAT || '') : '',
+    title: row ? row.PRODUCT_TITLE : '',
+  };
+}
+// ShopWorks PartNumber → base SanMar style + color; null for fee / non-garment lines.
+function portalNormalizePart(li) {
+  const pn = String(li.PartNumber || '').trim();
+  const color = String(li.PartColor || '').trim();
+  if (!pn || !color) return null;                          // fee lines carry no color
+  if (/^(SETUP|LTM|FEE|TAX|SHIP|DISC|RUSH|ART|GRT|MOCK|DIGI)/i.test(pn)) return null;
+  const style = pn.split('_')[0];                          // ST254_2X → ST254 (NWCA uses _ only for size suffixes)
+  return style ? { style, color } : null;
+}
+function portalSumSizes(li) {
+  return [li.Size01, li.Size02, li.Size03, li.Size04, li.Size05, li.Size06]
+    .reduce((s, v) => s + (Number(v) || 0), 0);
+}
+
+// GET /api/portal/my-products — the logged-in customer's personalized re-order catalog.
+app.get('/api/portal/my-products', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const cid = String(req.customerSession.portalCustomer.idCustomer);
+    const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+    const today = new Date();
+    const end = today.toISOString().slice(0, 10);
+    const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
+    const start = sd.toISOString().slice(0, 10);
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
+    if (!oR.ok) throw new Error('orders ' + oR.status);
+    const orders = ((await oR.json()).result || [])
+      .sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || '')))
+      .slice(0, 25); // bound the line-item fetches; recent orders capture the product variety
+    const products = new Map(); // baseStyle|color → product
+    for (const o of orders) {
+      if (!o.id_Order) continue;
+      let items = [];
+      try {
+        const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs });
+        if (lR.ok) items = (await lR.json()).result || [];
+      } catch (_) {}
+      for (const li of items) {
+        const norm = portalNormalizePart(li);
+        if (!norm) continue;
+        const key = norm.style.toUpperCase() + '|' + norm.color.toLowerCase();
+        const qty = Number(li.LineQuantity) || portalSumSizes(li);
+        const ex = products.get(key);
+        if (!ex) {
+          products.set(key, {
+            style: norm.style, color: norm.color,
+            description: li.PartDescription || '',
+            designNumber: o.id_Design || null, designName: o.DesignName || null,
+            lastOrdered: o.date_Ordered || null, lastQty: qty, timesOrdered: 1,
+          });
+        } else { ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty; }
+      }
+    }
+    const list = [...products.values()];
+    await Promise.all(list.map(async (p) => {
+      const pd = await portalProductDisplay(p.style, p.color);
+      p.image = pd.image; p.title = pd.title || p.description;
+    }));
+    list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
+    res.json({ products: list });
+  } catch (err) {
+    console.error('[Portal] my-products failed:', err.message);
+    res.status(503).json({ error: 'Catalog temporarily unavailable' });
+  }
+});
+
+// GET /api/portal/recommendations — the curated strip (Erik-managed), enriched with images.
+app.get('/api/portal/recommendations', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    if (!r.ok) throw new Error('recs ' + r.status);
+    const recs = ((await r.json()).recommendations || []).slice(0, 12);
+    await Promise.all(recs.map(async (rec) => {
+      const pd = await portalProductDisplay(rec.style, rec.color);
+      rec.image = pd.image; rec.title = rec.title || pd.title;
+    }));
+    res.json({ recommendations: recs.filter(x => x.image || x.title) });
+  } catch (err) {
+    console.error('[Portal] recommendations failed:', err.message);
+    res.json({ recommendations: [] }); // non-critical — empty, never an error banner
+  }
+});
+
+// POST /api/portal/reorder-request — customer asks to re-order (or order a recommended item).
+// Routes to the rep as a saved request + Slack ping. NO price/payment. The id_Customer,
+// company, and email come from the verified SESSION — the client cannot spoof another company.
+const reorderRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, max: 20,
+  message: { error: 'Too many requests — please wait a few minutes.' },
+});
+app.post('/api/portal/reorder-request', reorderRequestLimiter, requireCustomer, express.json(), async (req, res) => {
+  try {
+    const sess = req.customerSession.portalCustomer;
+    const cid = String(sess.idCustomer);
+    const b = req.body || {};
+    const style = String(b.style || '').trim();
+    if (!style) return res.status(400).json({ error: 'Please choose a product.' });
+    const payload = {
+      id_Customer: cid,
+      company_name: sess.companyName || '',
+      email: sess.email || '',
+      style: style.slice(0, 50),
+      color: String(b.color || '').slice(0, 80),
+      product_title: String(b.product_title || '').slice(0, 255),
+      design_number: String(b.design_number || '').slice(0, 50),
+      design_name: String(b.design_name || '').slice(0, 255),
+      qty: String(b.qty || '').slice(0, 30),
+      size_breakdown: String(b.size_breakdown || '').slice(0, 255),
+      note: String(b.note || '').slice(0, 255),
+      source: b.source === 'recommendation' ? 'recommendation' : 'reorder',
+    };
+    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/request`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(payload),
+    });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    res.json({ ok: true, requestNum: j.request && j.request.Request_Num, rep: j.request && j.request.Rep });
+  } catch (err) {
+    console.error('[Portal] reorder-request failed:', err.message);
+    res.status(502).json({ error: 'Could not send your request. Please try again or call (253) 922-5793.' });
+  }
+});
+
 // Invoice page (session-gated). Reads the order # from the URL; the page fetches the
 // secured /api/portal/invoice/:orderNo above (which re-checks ownership).
 app.get('/portal/invoice/:orderNo', requireCustomer, (req, res) => {
