@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-06-25 (regenerated from `git ls-files memory` by `/memory-maintain`)
+**Last Updated:** 2026-06-29 (regenerated from `git ls-files memory` by `/memory-maintain`)
 **Purpose:** Master navigation for `/memory`. How memory itself works → [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md).
 **Regenerate:** run `/memory-maintain` (do not hand-edit file-by-file — it drifts).
 
@@ -97,6 +97,9 @@ _Read API + PO (write) side._
 ## 🗄️ Caspio / Backend / Auth / API
 
 - [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md) — ⭐ Caspio **platform** REST v3 (Swagger) capability map: tables/views/files/webhooks/directories/tasks/bridge-apps, what NWCA uses vs untapped, auth, plan-gating, webhook-fires-on-REST (+ `caspio-swagger-snapshot-2026-06-29.json`)
+- [CASPIO_INTEGRATION_TODO.md](CASPIO_INTEGRATION_TODO.md) — ⭐ **9-item build list + session resume** (Swagger-driven security/integration roadmap; #1 portal-data-min & #2 staff SAML auth ✅ LIVE)
+- [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) — staff-dashboard auth via Caspio "Staff" App Connection SAML SSO (app=SP, Caspio=IdP); killed forgeable `/api/crm-session` (#2, LIVE v1477)
+- [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer-portal data-minimization (gated `/api/portal/*` allowlist projections) (#1, LIVE v1473+)
 - [CASPIO_API_CORE.md](CASPIO_API_CORE.md) — our **proxy's** API (distinct from the platform API above)
 - [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md)
 - [CASPIO_CSS_ISOLATION.md](CASPIO_CSS_ISOLATION.md)
