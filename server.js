@@ -3204,7 +3204,10 @@ app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);
     const data = await getPortalData(cid);
-    res.json(Object.assign({ customerId: cid }, data)); // customerId lets the page build its detail links
+    // Prefer the data-derived company name; fall back to the invite's name so an EMPTY
+    // portal still shows the real company instead of the generic "Your Company".
+    const companyName = (data.company && data.company.name) || req.customerSession.portalCustomer.companyName || '';
+    res.json(Object.assign({ customerId: cid }, data, { company: { name: companyName } }));
   } catch (err) {
     console.error('[Portal] aggregate failed:', err.message);
     res.status(503).json({ error: 'Portal temporarily unavailable' });
