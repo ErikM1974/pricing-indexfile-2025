@@ -100,6 +100,7 @@ _Read API + PO (write) side._
 - [CASPIO_INTEGRATION_TODO.md](CASPIO_INTEGRATION_TODO.md) — ⭐ **9-item build list + session resume** (Swagger-driven security/integration roadmap; #1 portal-data-min & #2 staff SAML auth ✅ LIVE)
 - [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) — staff-dashboard auth via Caspio "Staff" App Connection SAML SSO (app=SP, Caspio=IdP); killed forgeable `/api/crm-session` (#2, LIVE v1477)
 - [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer-portal data-minimization (gated `/api/portal/*` allowlist projections) (#1, LIVE v1473+)
+- [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) — 🔴 **#9 remediation plan**: 92 proxy routes audited, 98 HIGH/CRITICAL endpoints OPEN to the internet (only 7 gated). Severity table + Pattern A (secret) / B (SAML) + phased rollout. ~5 CRITICAL anonymous money/data holes gateable Phase-1 with zero customer risk.
 - [CASPIO_API_CORE.md](CASPIO_API_CORE.md) — our **proxy's** API (distinct from the platform API above)
 - [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md)
 - [CASPIO_CSS_ISOLATION.md](CASPIO_CSS_ISOLATION.md)

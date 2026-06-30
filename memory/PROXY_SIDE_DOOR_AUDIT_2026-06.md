@@ -1,0 +1,62 @@
+# Proxy "Side-Door" Security Audit & Remediation Plan (#9)
+
+> **Created 2026-06-29.** Multi-agent audit (57 agents) of the public `caspio-pricing-proxy` (92 route files / 210 endpoints). **98 HIGH/CRITICAL endpoints are reachable by anyone with the URL** — the only gate in the whole proxy (`requireCrmApiSecret`, `src/middleware/index.js:32`) is applied to just 7 mounts. CORS does NOT protect anything — it only constrains browsers; `curl` gets the full JSON. This is harness task **#9** and the canonical plan for closing it. Companion: [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) (#2, the SAML gate this leans on), [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) (#1, the `/api/portal/*` front-end-proxy pattern Pattern B reuses).
+
+## Pre-flight facts already RESOLVED (2026-06-29)
+- ✅ **`CRM_API_SECRET` IS set on the proxy** Heroku app `caspio-pricing-proxy` (64 chars) — so `requireCrmApiSecret` won't 500. (It returns 500 if the env var is unset.)
+- ✅ **`CRM_API_SECRET` IS set on the front-end** app `sanmar-inventory-app`; front-end already has `createCrmProxy()` (`server.js:2268`) that injects `X-CRM-API-Secret`, and a working SAML-gated **streaming** Claude proxy template at `POST /api/policies/ai-assist` (`server.js:2333`).
+- ⚠️ **`CRM_API_SECRET` must be SET on `inksoft-transform-8a3dc4e38097`** (Python Inksoft) to match the proxy — required before gating creditcard + gift-cert (Inksoft is their server-side caller). NOT yet done — needs Erik's OK.
+
+## Two remediation patterns
+- **Pattern A — `requireCrmApiSecret`** (cheap, low-risk): for endpoints whose ONLY callers are servers/crons/CLI (they can hold the secret). Wrap the mount, add the `x-crm-api-secret` header at the caller. No browser involved. **Deploy the caller's header BEFORE flipping the proxy gate** or it 401s instantly.
+- **Pattern B — route through a front-end SAML server endpoint** (the `/api/portal/*` pattern): for endpoints called directly from a staff BROWSER — a browser can't hold the server secret without leaking it. Add a `requireStaff`-gated route in front-end `server.js` (reuse `createCrmProxy()`), repoint the browser JS to the same-origin path, THEN flip the proxy gate. Deploy front-end first.
+
+## CRITICAL — anonymous money movement / data destruction / mass PII (Phase 1 = server-only callers, ZERO customer-facing risk)
+| Endpoint | Exposure | Caller | Fix |
+|---|---|---|---|
+| `POST /api/creditcard-atmos/upsert` | WRITE to BofA credit-card **reconciliation** table (amounts/ref-IDs/PO#s — not raw PAN) | server (Python Inksoft ×4) | A |
+| `DELETE /api/gift-certificates/clear` | Deletes ALL gift certs | server (Python Inksoft) | A |
+| `POST /api/gift-certificates/bulk` | Mint arbitrary gift-card balances | server | A |
+| `GET /api/gift-certificates` | All cert #s, balances, customer email/name | server | A |
+| `DELETE /api/caspio/daily-sales-by-rep/bulk` | Wipe master YTD sales archive via caller-supplied WHERE | server/cron | A |
+| `POST /api/commissions/approve` · `/mark-paid` | Unauthenticated payout approval/payment | browser (Inksoft Bonus Dashboard) | B (in Flask) |
+| `POST /api/manageorders/orders/create` | Inject real order into ShopWorks | mixed (2 server + 1 public sample page) | A + public sample endpoint |
+| `GET /api/manageorders/payments` | Customer payment/AR history | server | A |
+| `GET /api/customers` + CRUD | Full customer CRUD + enumerate all PII | browser (BOGO `POST` only) | A (keep `POST` public-hardened) |
+| `GET /api/customer-profile/:id` · `/by-company` | YTD, 10yr revenue, margin %, PII | server (emb-quote-ai loopback) | A (1-line header) |
+| `GET /api/company-contacts/search?q=a` | **Entire customer dir** + tax-exempt #s + YTD, 25/page | browser staff (quote builders) | B |
+| 6× AI `/chat` (emb/contract-*/dtg-quote-ai) | `lookup_customer`→PII; emb adds 10yr revenue | browser staff (SSE) | B (stream) |
+| EMB/DTF/SCP `POST .../push-quote` | Push real $ orders to ShopWorks by quoteId | browser staff | B |
+| `GET /api/box-labels/order-by-po/:po` | Customer PII + balances/paid-status | mixed | A + B |
+
+## HIGH (Phase 2 server-caller / Phase 3 browser-staff)
+Per-rep comp $ (`commissions/quarterly-report`), per-customer revenue (`{taneisha,nika,house}/daily-sales-by-account`, `daily-sales-by-rep`), wholesale COGS (`sanmar-invoices`, `sanmar-orders/inbound`), customer PII (`artrequests` family, `monograms`, `rosters`, `digitized-designs/search-all`, `transfer-orders`, `supacolor-jobs`, `manageorders` reads), destructive (`shipstation create/DELETE`, `thumbnails delete-by-year`, `files DELETE`, `admin/products/*`, `service-codes`/`pricing`/`embroidery-costs` writes), audit-trail (`quote-change-log`, `quote_sessions` staff paths, `assignment-history` — also currently 404-broken), `policy-comments-public` (forgeable author). Full per-endpoint table + caller map in the workflow output.
+
+## Hard cases (browser-called AND highly sensitive — get right)
+1. **6 AI `/chat`** — browser SSE returning customer PII; front-end proxy MUST pipe `text/event-stream` unbuffered (`X-Accel-Buffering: no`); template = `/api/policies/ai-assist`.
+2. **`company-contacts/search`** — wildcard dumps whole customer DB incl tax-exempt #s; 5 browser + 2 server callers. Highest-volume PII leak.
+3. **`commissions/approve`/`mark-paid`** — Inksoft `commissions.html` is itself NOT login-gated; gating the proxy just relocates the hole — the Flask page needs staff-login too.
+4. **`manageorders/orders/create`** — 2 server callers (easy) + 1 PUBLIC customer sample page (`sample-order-service.js`); add a public front-end `POST /api/submit-sample-order` that injects the secret server-side; don't `requireStaff` the public one.
+
+## False positives — correctly PUBLIC, DO NOT secret-gate (would 401 anonymous shoppers — Erik Rule 9)
+`GET /api/pricing-bundle` + all `pricing.js` reads · `GET /api/service-codes` reads · all `products.js` GETs · `GET /api/files/:externalKey` (`<img src>` on public pages; DELETE still gated) · `POST /api/files/upload` (public stores; harden not gate) · `GET /api/thumbnails/by-design[s]` · `GET /api/thread-colors` · `GET /api/mockups box/thumbnail|shared-image` · `GET /api/digitized-designs/lookup` (public `/design/:n` — but TRIM internal fields Sales_Rep/Customer_Type/Order_Count/Last_Order_Date) · `GET /api/quote_sessions?quoteID=` token-scoped (but CLOSE the no-filter→ALL-rows branch + rate-limit) · `POST /api/webhooks/shipstation` (host-validated). These still warrant hardening (sanitize raw-`q.where`, rate limits).
+
+## Safe rollout order (deploy caller changes BEFORE flipping the gate)
+- **Phase 1 — CRITICAL writes, Pattern A, zero browser callers:** creditcard-atmos, gift-certificates, daily-sales-by-rep/bulk+writes, shipstation outbound, thumbnails deletes, files DELETE, customer-profile/history/industry-lookalikes loopback (1-line in `emb-quote-ai.js`), service-codes/pricing writes, products admin, non-sanmar (scripts). Per route: deploy caller header → flip gate → curl-verify 401.
+- **Phase 2 — server-caller HIGH (A):** sanmar-invoices, sanmar-orders sync/lookup, manageorders (front-end `server.js:7251` + Inksoft `app.py` ×7 + Node scripts), commissions unused, rep-audit/house-daily-sales (MCP), quote-change-log. Gate `manageorders/orders/create` only AFTER the public `submit-sample-order` ships.
+- **Phase 3 — hard cases & browser staff (B):** build SAML-gated front-end proxies, repoint browser JS, then gate. Order by PII: AI `/chat` ×6 (SSE) → company-contacts → box-labels/sanmar-orders reads → push-quote ×3 → art-hub family → daily-sales archives → monograms/rosters/transfer-orders/supacolor → assignment-history. ALSO `requireStaff`-gate the host **pages** (art-hub-*.html, ae-dashboard.html, /mockup/:id, quote-builder pages, quote-management.html) — most are currently ungated static files.
+- **Phase 4 — Inksoft Bonus Dashboard:** add staff-login + admin-only to Flask `/commissions*` pages and approve/mark-paid routes, then gate the proxy.
+- **Phase 5 — harden public false-positives:** rate-limit + sanitize raw-`q.where` reads; close the unfiltered `quote_sessions` dump; trim `digitized-designs/lookup`.
+
+Verify each flip: `curl -s -o /dev/null -w "%{http_code}" <url>` → expect 401 (was 200); with `-H "x-crm-api-secret: $SECRET"` → 200. Then smoke-test the real UI. Watch proxy logs for a **401 surge on `/api/...`** = a caller you missed (or a hidden external consumer).
+
+## Open decisions for Erik
+1. ✅ RESOLVED — `CRM_API_SECRET` set on the proxy (verified).
+2. ⏳ OK to set `CRM_API_SECRET` on `inksoft-transform-8a3dc4e38097` + edit Python Inksoft `app.py` callers? (needed for creditcard + gift-cert gating)
+3. ⏳ **External/third-party consumers?** Code-only audit can't see Zapier zaps, Postman, Power BI/Excel pulls, partner integrations — esp. on `sanmar-invoices`, `manageorders`, `daily-sales`, gift-certs. Any of those would break silently when gated. Erik must answer.
+4. ⏳ Dead code? `online-store-commissions.js` + `rep-audit.js` look superseded — delete/unmount or keep+gate?
+5. ⏳ Add staff-login to Inksoft `commissions.html` / `gift_certificates.html` Flask pages (no login today)?
+6. ⏳ `POST /api/customers` (BOGO promo) — keep public-hardened or route through a new public front-end lead endpoint?
+7. ⏳ Phase 1 (CRITICAL writes) can ship this week, near-zero risk. Phased rollout or one batched release?
+
+**Bottom line:** ~5 CRITICAL holes let an anonymous request move money, mint/wipe gift cards, forge orders, or destroy the sales archive — all Phase-1 gateable with zero customer-facing risk (server-only callers). PII reads are the larger, mechanical Phase-3 lift. No new auth mechanism needed — both patterns ship in production today.

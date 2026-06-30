@@ -22,7 +22,7 @@
 | 6 | Phase-2 authenticated customer portal (magic-link login) | ⏳ pending (builds on #1) |
 | 7 | Gate customer-portal WRITE actions (approve/revise/rush/upload) | ⏳ pending |
 | 8 | **Durable session store (Redis)** — shared by #2 + #6; fixes logout-on-deploy | ⏳ **recommended next** |
-| 9 | Gate the public proxy staff-data endpoints (Phase 5 side-door) | ⏳ pending |
+| 9 | Gate the public proxy staff-data endpoints (side-door) — **AUDITED 2026-06-29: 98 HIGH/CRITICAL open endpoints, ~5 CRITICAL anonymous money/data holes** | 🔴 plan ready → [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) |
 
 ### #1 — Portal (DECIDED: ship data-minimization now; real gate = Phase-2 magic-link, #6)
 Design → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md). Decision: token gate / strict link-breaking would need #2 staff-auth to sign rep links (else open-oracle), so we ship data-minimization now and defer real confidentiality to Phase-2 login. Bare `/portal/:id` links keep working.
