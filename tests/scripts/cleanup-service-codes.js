@@ -16,6 +16,11 @@
 
 const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+// #9: service-codes WRITES are now CRM-gated. Run with CRM_API_SECRET in env
+// (local .env) or the DELETE/PUT/POST calls 401. Reads stay public.
+const CRM_API_SECRET = process.env.CRM_API_SECRET;
+const CRM_HEADERS = CRM_API_SECRET ? { 'x-crm-api-secret': CRM_API_SECRET } : {};
+
 const CODES_TO_DELETE = [
     'DGT-001', 'DGT-002', 'DGT-003',
     'CAP-DISCOUNT', 'emblem', 'Transfer', 'Shipping', 'WEIGHT',
@@ -105,14 +110,14 @@ async function fetchExisting() {
 }
 
 async function deleteRecord(pkId) {
-    const resp = await fetch(`${API_BASE_URL}/api/service-codes/${pkId}`, { method: 'DELETE' });
+    const resp = await fetch(`${API_BASE_URL}/api/service-codes/${pkId}`, { method: 'DELETE', headers: CRM_HEADERS });
     return { status: resp.status, data: await resp.json() };
 }
 
 async function updateRecord(pkId, fields) {
     const resp = await fetch(`${API_BASE_URL}/api/service-codes/${pkId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...CRM_HEADERS },
         body: JSON.stringify(fields)
     });
     return { status: resp.status, data: await resp.json() };
@@ -121,7 +126,7 @@ async function updateRecord(pkId, fields) {
 async function insertRecord(record) {
     const resp = await fetch(`${API_BASE_URL}/api/service-codes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...CRM_HEADERS },
         body: JSON.stringify(record)
     });
     return { status: resp.status, data: await resp.json() };
