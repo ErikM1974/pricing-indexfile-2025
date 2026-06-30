@@ -80,3 +80,19 @@
 | 7 | Customer scale/email coverage | **Measure first** — `CompanyContactsMerge2026` row + Email-non-null counts before committing to magic-link volume |
 
 **Unverified — do not build on:** `PK_ID==ID_Design` always; custom-SP SAML feasibility/plan-gating; exact full table column lists (derive the safe-field allowlist from live schemas before coding projections); whether `?t=` survives every EmailJS template (order-status `&t=` works — test the portal template; path-segment is the safe fallback).
+
+---
+
+## ✅ Customer Portals ADMIN CONSOLE — SHIPPED 2026-06-30 (FE v2026.06.30.1 + proxy v867)
+
+Staff console `/dashboards/customer-portal-admin.html`, role-gated `requireCrmRole(['admin','accountant','art','sales','taneisha','nika'])` (explicit route). Manages the `Customer_Portal_Access` invite registry.
+
+- **Proxy `src/routes/customer-portal-access.js`:** `GET /` (list, enriched with `account_rep`+`account_tier` from `Sales_Reps_2026` joined by `ID_Customer IN (...)`, best-effort), `POST /` (create; Email unique → 409 dup), `PUT /:pk` (enable/disable/edit), `DELETE /:pk`. Mounted `requireCrmApiSecret`.
+- **FE server.js:** crm-proxy mounts `customer-portal-access` + `company-contacts` (PORTAL_ADMIN_ROLES); `POST /api/portal-admin/send-link` (staff-fired magic link — reuses `customerMagicLink.mintToken` + EmailJS `template_utvx9iw`); `GET /api/portal-admin/me` → `repName` via `REP_NAME_BY_EMAIL` (**Ruth="Ruthie Nhoung"** to match Sales_Reps_2026); **preview** = staff-gated READ-ONLY mirror `/api/portal-admin/preview/:id[/orders|/invoice/:no]` reusing `getPortalData`+`projectPortalOrder`+`projectPortalInvoice`; preview PAGES `/portal-admin/preview/:id[...]` re-serve `customer-portal.html`/`customer-invoice.html` (their JS detects the `/portal-admin/preview/` path → fetch the staff endpoints). **Customer security seam UNTOUCHED** — preview needs a staff SAML session; a customer can never reach it.
+- **Add-customer search** = `/company-contacts/search?q=` (returns `id_Customer`,`CustomerCompanyName`,`ct_NameFull`,`ContactNumbersEmail`); result shows the account owner so reps recognise their live account.
+
+## ⏳ NEXT portal phases — catalog re-order + reward dollars (scoped 2026-06-30, NOT built)
+
+Reuse map (35-tool Explore):
+- **Personalized catalog / re-order — ~100% reusable:** `GET /api/product-details?styleNumber=&color=` + `GET /api/color-swatches` (proxy `products.js`, table `Sanmar_Bulk_251816_Feb2024`) for display; price via `window.QuoteCartEngine.singleItemPreview({method,styleNumber,colorName,sizes})` (`shared_components/js/quote-cart-engine.js:1100`). Customer's bought styles already on hand via invoice line items (`/api/portal/orders` + invoice). NO existing re-order flow; `Quote_Items` holds prior line config. Recommendations = start curated (top-sellers), not ML. Re-order flow decision: rep-quote (safe v1) vs self-serve price+checkout (later; price MUST run the engine).
+- **Reward dollars = money/ledger (financial subsystem):** **Head start — gift certs are ALREADY a balance-ledger:** Caspio `Inksoft_Gift_Certificates` (`GiftCertificateNumber`, `CurrentBalance` formula, `History` txn log) + gated `/api/gift-certificates*` (proxy `gift-certificates.js`). NO points/customer-credit ledger yet (net-new: immutable `Customer_Reward_Ledger` entries → balance=sum; Erik-editable accrual-rules table). Redemption flows as order-level `totalDiscounts`/`DiscountPartNumber` in `manageorders-push-client.js:147` (OnSite nets it — no special line handling). Must be server-authoritative + gated + accounting sign-off.
