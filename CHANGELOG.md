@@ -1,3 +1,9 @@
+## v2026.06.30.2 (2026.06.30)
+
+- docs(portal): Customer Portals admin console SHIPPED + catalog/rewards next-phase reuse map
+- docs(portal): Phase 4 build plan — personalized catalog + request-to-rep re-order
+- feat(portal-p4): personalized catalog (Your Products + recs) + request-to-rep re-order on the customer portal
+
 ## v2026.06.30.1 (2026.06.30)
 
 - docs(memory): staff SAML deployed live (release v1473) — login-half verified; next=round-trip test
