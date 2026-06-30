@@ -3227,8 +3227,14 @@ function portalOrderStatus(o) {
 }
 function projectPortalOrder(o) {
   const total = Number(o.cur_TotalInvoice) || 0;
-  const paid = Number(o.cur_Payments) || 0;
-  const balance = Number(o.cur_Balance) || 0;
+  // cur_Payments is often null in this feed; cur_Balance is the authoritative "owed" amount,
+  // so derive paid = total - balance (reliable for paid / partial / unpaid alike). If the
+  // balance is unknown, assume the full amount is owed rather than falsely showing "Paid".
+  const balRaw = o.cur_Balance;
+  const balanceKnown = balRaw !== null && balRaw !== undefined && balRaw !== '';
+  const balance = balanceKnown ? (Number(balRaw) || 0) : total;
+  const paid = Math.max(0, total - balance);
+  const paidStatus = !total ? '—' : (balance <= 0 ? 'Paid' : (balance < total ? 'Partial' : 'Open'));
   return {
     orderNumber: o.id_Order || null,
     orderDate: o.date_Ordered || null,
@@ -3239,7 +3245,7 @@ function projectPortalOrder(o) {
     quantity: o.TotalProductQuantity || null,
     status: portalOrderStatus(o),
     total: total, paid: paid, balance: balance,
-    paidStatus: balance <= 0 ? (total > 0 ? 'Paid' : '—') : (paid > 0 ? 'Partial' : 'Open'),
+    paidStatus: paidStatus,
   };
 }
 
