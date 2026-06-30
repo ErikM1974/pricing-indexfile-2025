@@ -1,22 +1,28 @@
 # Caspio Integration — Build To-Do & Session Resume
 
-> **STATUS: PAUSED 2026-06-29** (Erik turning laptop off, returning later same day). This is the durable resume point for the Caspio Swagger capability work — the harness task list (#1–#5) does **not** survive an app restart, so THIS file is the canonical list. Reference/detail → [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md).
+> **STATUS: PAUSED 2026-06-29 PM** (Erik turning computer off). Durable resume point — the harness task list does NOT survive a restart, so THIS file is canonical. Reference → [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md).
 >
-> **WHERE WE LEFT OFF:** the 5-item build list below is agreed. **No code started yet.** Next action = begin executing **#1 (portal HMAC)**. Erik said "keep going" then paused.
+> **SHIPPED LIVE TODAY:** ✅ **#1 customer-portal data-minimization** (Heroku release v1473+; → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md)) and ✅ **#2 staff-dashboard auth = Caspio SAML SSO** (release **v1477**; → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)). ⚠️ The staff-auth design's early "Google OAuth" pick was **SUPERSEDED** — staff are on M365 but we reused the existing Caspio login via the **Caspio "Staff" directory App Connection (custom SAML 2.0)**: app = SP, Caspio = IdP. Both verified live (Erik logged into the dashboard; forgeable `/api/crm-session` now 401s).
+>
+> **WHERE WE LEFT OFF / NEXT:** #1 & #2 done + verified live. **Recommended next = #8 durable session store (Redis)** — MemoryStore logs all staff out on every deploy; same store serves #6. Then #9 (gate public proxy side-door), the webhook/task items #3/#4/#5, and Phase-2 customer login #6/#7. Everything on `develop`, deployed; rollback = `heroku releases:rollback`. ⚠️ MEMORY.md auto-index ~23 KB — run `/memory-maintain` soon.
 
 ## Already DONE this session (don't redo)
 - Pulled + parsed the full Caspio REST v3 spec (70 ops / 7 groups). Wrote **CASPIO_REST_API_REFERENCE.md** + dated snapshot `caspio-swagger-snapshot-2026-06-29.json`; wired pointers into this repo's INDEX.md + CLAUDE.md, and the proxy's CLAUDE.md. Committed (`develop`: docs commits incl. `7524c727`).
 - Wrote + RAN a read-only **entitlement probe** (`caspio-pricing-proxy/scripts/caspio-entitlement-probe.js`). Result: **all 7 groups AVAILABLE** on the plan. Live inventory: **24 outgoing webhooks (all Zapier)**, **6 import/export tasks**, **1 "Staff" directory (11 users)**, **14 bridge apps**. (Probe committed in proxy on branch `deploy/send-to-steve`.)
 - Key verified fact: **Caspio Outgoing Webhooks fire on REST writes** (`EventSources` defaults to all incl `RESTAPIs`) — unlike Triggered Actions. This underpins #3/#4.
 
-## The build list (priority order)
-| # | Item | Type | Effort | Depends on |
-|---|---|---|---|---|
-| 1 | **Sign customer portal URLs with HMAC** + gate the portal data APIs | Security | S | — |
-| 2 | **Fix staff-dashboard auth** — server can't verify Caspio (proven); use **Google Workspace OAuth** + data-driven roles. DESIGN DONE → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md). `/api/crm-session` mints full-admin from a client-posted name (live vuln); `SESSION_SECRET` confirmed SET on Heroku (no offline-forgery). Awaiting IdP decision. | Security | M | — |
-| 3 | **Caspio webhook receiver** + first webhook replacing the hourly Quote↔ShopWorks poll | Capability | M | — |
-| 4 | **ArtRequests.Status webhook notifications** (data-coupled; replaces app-coupled status notify) | Capability | M | #3 |
-| 5 | **On-demand Caspio task triggers** (`POST …/run`) | Capability | S | — |
+## The build list (current status — harness tasks #1–#9 mirror this)
+| # | Item | Status |
+|---|---|---|
+| 1 | Customer-portal data-minimization (gated `/api/portal/*` allowlist projections) | ✅ **DONE & LIVE** (v1473+) → CASPIO_PORTAL_DESIGN.md |
+| 2 | Staff-dashboard auth — Caspio SAML SSO (killed forgeable `/api/crm-session`) | ✅ **DONE & LIVE** (v1477) → STAFF_AUTH_DESIGN.md |
+| 3 | Caspio webhook receiver + first webhook (Quote↔ShopWorks push) | ⏳ pending → CASPIO_REST_API_REFERENCE.md §6 |
+| 4 | ArtRequests.Status webhook notifications (data-coupled) | ⏳ pending (needs #3) |
+| 5 | On-demand Caspio task triggers (`POST …/run`; 6 real tasks exist) | ⏳ pending |
+| 6 | Phase-2 authenticated customer portal (magic-link login) | ⏳ pending (builds on #1) |
+| 7 | Gate customer-portal WRITE actions (approve/revise/rush/upload) | ⏳ pending |
+| 8 | **Durable session store (Redis)** — shared by #2 + #6; fixes logout-on-deploy | ⏳ **recommended next** |
+| 9 | Gate the public proxy staff-data endpoints (Phase 5 side-door) | ⏳ pending |
 
 ### #1 — Portal (DECIDED: ship data-minimization now; real gate = Phase-2 magic-link, #6)
 Design → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md). Decision: token gate / strict link-breaking would need #2 staff-auth to sign rep links (else open-oracle), so we ship data-minimization now and defer real confidentiality to Phase-2 login. Bare `/portal/:id` links keep working.
