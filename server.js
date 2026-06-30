@@ -453,8 +453,21 @@ if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
 }
 
+// Fail-closed: SESSION_SECRET signs the staff session cookie, which is the SOLE
+// proof of a verified SAML login (#2). A known/default secret = forgeable admin
+// cookie that bypasses SAML entirely. In production we refuse to boot rather than
+// sign cookies with the public default. (Local dev keeps the convenience fallback.)
+// Mirrors the fail-closed precedent of computeOrderStatusToken / staff-saml isConfigured.
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (process.env.NODE_ENV === 'production' &&
+    (!SESSION_SECRET || SESSION_SECRET === 'dev-secret-change-in-production')) {
+  console.error('FATAL: SESSION_SECRET is unset or the dev default in production. ' +
+    'Refusing to start — staff session cookies would be forgeable. Set a strong SESSION_SECRET.');
+  process.exit(1);
+}
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'dev-secret-change-in-production',
+  secret: SESSION_SECRET || 'dev-secret-change-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: {
