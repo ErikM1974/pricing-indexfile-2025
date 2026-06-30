@@ -1055,6 +1055,9 @@ cap-embroidery-fix.css
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
+| `/dashboards/access-admin.html` | **NEW (2026-06-30)** Erik-only RBAC control panel — manage staff roles (`Staff_App_Roles`) + page access (`Staff_Page_Access`). Code-gated `requireCrmRole(['admin'])`. | access-admin.js, access-admin.css, `/api/crm-proxy/admin-rbac/*` | ✅ Active |
+| `/dashboards/js/access-admin.js` | Access-Admin controller — roles + page-access CRUD via admin-gated crm-proxy | /api/crm-proxy/admin-rbac | ✅ Active |
+| `/dashboards/css/access-admin.css` | Access-Admin panel styles (NWCA green, no inline) | - | ✅ Active |
 | `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
