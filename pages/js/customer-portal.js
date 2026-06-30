@@ -194,7 +194,7 @@
             var d = new Date(dateStr);
             if (isNaN(d.getTime())) return '';
             var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+            return months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
         } catch (e) {
             return '';
         }

@@ -6,7 +6,8 @@
 
   function esc(s) { if (s == null) return ''; var d = document.createElement('div'); d.appendChild(document.createTextNode(String(s))); return d.innerHTML; }
   function money(n) { return '$' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-  function fdate(s) { if (!s) return ''; var d = new Date(s); if (isNaN(d.getTime())) return ''; var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; return m[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear(); }
+  // UTC components — ManageOrders dates are date-only at UTC midnight; local getDate() would shift them a day back.
+  function fdate(s) { if (!s) return ''; var d = new Date(s); if (isNaN(d.getTime())) return ''; var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']; return m[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
   var SIZE_LABELS = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 
   function fail() {
@@ -48,7 +49,7 @@
     var html =
       '<div class="ci-head">' +
         '<div class="ci-head-left">' +
-          '<img class="ci-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">' +
+          '<img class="ci-logo" src="/images/nwca-logo.png" alt="Northwest Custom Apparel" crossorigin="anonymous">' +
           '<div class="ci-from">2025 Freeman Rd. E, Milton, WA 98354<br>253-922-5793 &middot; accounting@nwcustomapparel.com</div>' +
         '</div>' +
         '<div class="ci-head-right">' +
