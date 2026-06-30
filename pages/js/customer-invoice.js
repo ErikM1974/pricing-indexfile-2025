@@ -47,10 +47,13 @@
     var balClass = (Number(d.balance) || 0) <= 0 ? 'bal paid' : 'bal';
     var html =
       '<div class="ci-head">' +
-        '<img class="ci-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">' +
+        '<div class="ci-head-left">' +
+          '<img class="ci-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">' +
+          '<div class="ci-from">2025 Freeman Rd. E, Milton, WA 98354<br>253-922-5793 &middot; accounting@nwcustomapparel.com</div>' +
+        '</div>' +
         '<div class="ci-head-right">' +
-          '<div class="ci-inv-title">INVOICE #' + esc(d.invoiceNumber) + '</div>' +
-          '<div class="ci-inv-meta">Date Ordered: ' + esc(fdate(d.dateOrdered)) + '<br>Date Invoiced: ' + esc(fdate(d.dateInvoiced) || '—') + '</div>' +
+          '<div class="ci-inv-title">Invoice: ' + esc(d.invoiceNumber) + '</div>' +
+          '<div class="ci-inv-meta">Date Ordered: ' + esc(fdate(d.dateOrdered)) + '<br>Date Invoiced: ' + esc(fdate(d.dateInvoiced) || '—') + '<br>Date Due: ' + esc(fdate(d.dueDate) || '—') + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="ci-parties">' +
@@ -58,14 +61,13 @@
           (d.contactName ? '<p>' + esc(d.contactName) + '</p>' : '') +
           (d.contactPhone ? '<p>' + esc(d.contactPhone) + '</p>' : '') +
           (d.contactEmail ? '<p>' + esc(d.contactEmail) + '</p>' : '') + '</div>' +
-        '<div class="ci-party" style="text-align:right"><h3>From</h3><p><strong>Northwest Custom Apparel</strong></p><p>Milton, WA</p><p>(253) 922-5793</p><p>sales@nwcustomapparel.com</p></div>' +
       '</div>' +
       '<div class="ci-meta-grid">' +
         '<div><div class="k">Customer #</div><div class="v">' + esc(d.customerNumber || '') + '</div></div>' +
         '<div><div class="k">PO Number</div><div class="v">' + esc(d.poNumber || '—') + '</div></div>' +
         '<div><div class="k">Terms</div><div class="v">' + esc(d.terms || '—') + '</div></div>' +
         '<div><div class="k">Salesperson</div><div class="v">' + esc(d.salesperson || '—') + '</div></div>' +
-        (d.designName ? '<div style="grid-column:1/-1"><div class="k">Design</div><div class="v">' + esc(d.designName) + '</div></div>' : '') +
+        ((d.designId || d.designName) ? '<div style="grid-column:1/-1"><div class="k">Design</div><div class="v">' + (d.designId ? '#' + esc(d.designId) + ' · ' : '') + esc(d.designName || '') + '</div></div>' : '') +
       '</div>' +
       '<table class="ci-table"><thead><tr><th class="num">Qty</th><th>Item</th><th class="num">Unit Price</th><th class="num">Total</th></tr></thead><tbody>' + rows + '</tbody></table>' +
       '<div class="ci-totals"><table>' +

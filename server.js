@@ -3290,10 +3290,17 @@ function projectPortalInvoice(o, items) {
   const balRaw = o.cur_Balance;
   const balanceKnown = balRaw !== null && balRaw !== undefined && balRaw !== '';
   const balance = balanceKnown ? (Number(balRaw) || 0) : total;
+  let dueDate = null;
+  if (o.date_Invoiced) {
+    const di = new Date(o.date_Invoiced);
+    if (!isNaN(di.getTime())) { di.setDate(di.getDate() + (Number(o.TermsDays) || 0)); dueDate = di.toISOString(); }
+  }
   return {
     invoiceNumber: o.id_Order,
     dateOrdered: o.date_Ordered || null,
     dateInvoiced: o.date_Invoiced || null,
+    dueDate: dueDate,
+    designId: o.id_Design || null,
     customerName: o.CustomerName || '',
     customerNumber: o.id_Customer || null,
     contactName: [o.ContactFirstName, o.ContactLastName].filter(Boolean).join(' '),
