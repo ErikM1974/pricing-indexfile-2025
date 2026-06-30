@@ -1,10 +1,10 @@
 # Caspio Integration — Build To-Do & Session Resume
 
-> **STATUS: PAUSED 2026-06-29 PM** (Erik turning computer off). Durable resume point — the harness task list does NOT survive a restart, so THIS file is canonical. Reference → [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md).
+> **STATUS: ACTIVE 2026-06-29 (late PM session).** Durable resume point — the harness task list does NOT survive a restart, so THIS file is canonical. Reference → [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md).
 >
-> **SHIPPED LIVE TODAY:** ✅ **#1 customer-portal data-minimization** (Heroku release v1473+; → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md)) and ✅ **#2 staff-dashboard auth = Caspio SAML SSO** (release **v1477**; → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)). ⚠️ The staff-auth design's early "Google OAuth" pick was **SUPERSEDED** — staff are on M365 but we reused the existing Caspio login via the **Caspio "Staff" directory App Connection (custom SAML 2.0)**: app = SP, Caspio = IdP. Both verified live (Erik logged into the dashboard; forgeable `/api/crm-session` now 401s).
+> **DONE & LIVE:** ✅ #1 portal data-min (v1473+) · ✅ #2 staff SAML SSO (v1477; app=SP, Caspio "Staff" App Connection=IdP — the early "Google OAuth" pick was SUPERSEDED) · ✅ SESSION_SECRET fail-closed guard (`093ee6cf`) · ✅ **#8 durable sessions = cookie-session** (FE `dd2fb1e5`; NOT Redis — free, signed cookie survives deploys; proven by local restart+tamper test) · 🟢 **#9 Phase 1 COMPLETE (non-Inksoft)** — 5 batches gated + curl-verified (proxy v851–v855 + FE `830bb9ac`): customer-profile/industry-lookalikes, daily-sales writes (archive-wipe), pricing/service-code writes + files DELETE (price tampering), admin-products/orders/thumbnails, shipstation (cross-repo). Detail → [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md).
 >
-> **WHERE WE LEFT OFF / NEXT:** #1 & #2 done + verified live. **Recommended next = #8 durable session store (Redis)** — MemoryStore logs all staff out on every deploy; same store serves #6. Then #9 (gate public proxy side-door), the webhook/task items #3/#4/#5, and Phase-2 customer login #6/#7. Everything on `develop`, deployed; rollback = `heroku releases:rollback`. ⚠️ MEMORY.md auto-index ~23 KB — run `/memory-maintain` soon.
+> **WHERE WE LEFT OFF / NEXT:** #9 remaining = **Inksoft round** (creditcard/gift-certs/commissions — needs Python Inksoft edits + `CRM_API_SECRET` on `inksoft-transform`) + **Phase 3 browser-staff Pattern-B** (company-contacts, AI chats, push-quote, art-hub — ~30 files). Then #3/#4/#5 (webhooks/tasks), #6/#7 (customer login). Everything on `develop` (FE) / `deploy/send-to-steve` (proxy), deployed; rollback = `heroku releases:rollback -a <app>`. ⚠️ Branch hygiene: both repos deploy from a branch ahead of `main` — reconcile later.
 
 ## Already DONE this session (don't redo)
 - Pulled + parsed the full Caspio REST v3 spec (70 ops / 7 groups). Wrote **CASPIO_REST_API_REFERENCE.md** + dated snapshot `caspio-swagger-snapshot-2026-06-29.json`; wired pointers into this repo's INDEX.md + CLAUDE.md, and the proxy's CLAUDE.md. Committed (`develop`: docs commits incl. `7524c727`).
@@ -21,7 +21,7 @@
 | 5 | On-demand Caspio task triggers (`POST …/run`; 6 real tasks exist) | ⏳ pending |
 | 6 | Phase-2 authenticated customer portal (magic-link login) | ⏳ pending (builds on #1) |
 | 7 | Gate customer-portal WRITE actions (approve/revise/rush/upload) | ⏳ pending |
-| 8 | **Durable session store (Redis)** — shared by #2 + #6; fixes logout-on-deploy | ⏳ **recommended next** |
+| 8 | Durable sessions — **cookie-session** (NOT Redis; free, no add-on); fixes logout-on-deploy | ✅ **DONE & LIVE** (FE `dd2fb1e5`) |
 | 9 | Gate the public proxy staff-data endpoints (side-door) — **AUDITED 2026-06-29: 98 HIGH/CRITICAL open endpoints, ~5 CRITICAL anonymous money/data holes** | 🔴 plan ready → [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) |
 
 ### #1 — Portal (DECIDED: ship data-minimization now; real gate = Phase-2 magic-link, #6)
