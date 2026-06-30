@@ -6,8 +6,8 @@ Repos: FE `sanmar-inventory-app` · PROXY `caspio-pricing-proxy` (deploy branch 
 
 ---
 
-## ▶ WAVE 1 — zero/low-breakage NOW (do this in the next session). ~0.5 day.
-No live browser caller anywhere; worst case a wrong-order deploy 401s a CLI cron. Highest value-per-risk — closes the financial-read leaks + no-caller writes.
+## ✅ WAVE 1 — DONE + live-verified 2026-06-30 (proxy `f0a8393`, Flask `02107ea`).
+Gated (anon→401): production-schedules, online-store-commissions, assignment-history (whole router), vendors/purchase-orders/supacolor-po-index (Flask atmos sends the secret), commissions/save+win-back+history. **2 corrections vs the generated plan:** (a) used PATH-SPECIFIC gates `app.use('/api/x', requireCrmApiSecret)` — the plan's `app.use('/api', requireCrmApiSecret, router)` would have 401'd EVERY public /api route mounted after it (see LESSONS); (b) gated only the no-caller commission routes — NOT all `/api/commissions` writes, since approve/mark-paid are browser-direct and would have broken the live Bonus Dashboard. **Deferred out of Wave 1:** `rep-audit` (pending the nwca-accounts MCP caller check — decision #4), `PUT /api/quote_items/:id` (→ Wave 3 quote-admin), the cron secret on annual-report (→ Wave 2 with full commission gate).
 
 **Caller edits first (2 repos):**
 1. PROXY cron: `caspio-pricing-proxy/scripts/sync-commissions.js:292-295` — add `headers:{'X-CRM-API-Secret':process.env.CRM_API_SECRET}` to the annual-report `axios.get`.
