@@ -2287,6 +2287,40 @@ async function fetchStaffRole(email) {
   }
 }
 
+// Cached Staff_Page_Access rules (Page → Allowed_Roles/Allowed_Emails), refetched on a
+// TTL. STALE-ON-ERROR: a transient proxy failure keeps the last-known rules so a
+// restricted page stays restricted (never silently opened). Cold-start + immediate
+// fetch failure → empty rules (every page falls back to any-logged-in-staff).
+let _pageAccessCache = { at: 0, rules: {} };
+const PAGE_ACCESS_TTL_MS = 60 * 1000;
+async function getPageAccessRules() {
+  const now = Date.now();
+  if (now - _pageAccessCache.at < PAGE_ACCESS_TTL_MS) return _pageAccessCache.rules;
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/staff-page-access`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    if (r.ok) {
+      const data = await r.json();
+      const rules = {};
+      (data.rules || []).forEach(row => { if (row.Page) rules[String(row.Page).toLowerCase()] = row; });
+      _pageAccessCache = { at: now, rules };
+    } else { console.error('[page-access] fetch HTTP', r.status); _pageAccessCache.at = now; }
+  } catch (e) { console.error('[page-access] fetch failed:', e.message); _pageAccessCache.at = now; }
+  return _pageAccessCache.rules;
+}
+
+// True if the logged-in user may view a /dashboards page per its table rule (if any).
+// Unlisted page (no rule) → any logged-in staff. Listed → role-in-Allowed_Roles OR
+// email-in-Allowed_Emails. Roles are matched against the user's derived permissions.
+function userMayAccessPage(crmUser, rule) {
+  const userPerms = (crmUser.permissions || []).map(p => String(p).toLowerCase());
+  if (userPerms.includes('admin')) return true; // admin override — sees every page, can't lock self out
+  if (!rule) return true;                        // unlisted page → any logged-in staff
+  const roles = String(rule.Allowed_Roles || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  const emails = String(rule.Allowed_Emails || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  const userEmail = String(crmUser.email || '').toLowerCase();
+  return roles.some(r => userPerms.includes(r)) || emails.includes(userEmail);
+}
+
 // Generic CRM proxy handler factory
 function createCrmProxy(endpoint, allowedRoles) {
   return [
@@ -2411,10 +2445,28 @@ app.use('/calculators', express.static(path.join(__dirname, 'calculators'), stat
 // page and non-HTML assets (css/js/img) stay public so there's no redirect loop.
 // Role-specific dashboards (taneisha/nika/house/policies) keep their own
 // requireCrmRole gates registered earlier; this catches the rest.
-app.use('/dashboards', (req, res, next) => {
+app.use('/dashboards', async (req, res, next) => {
   if (!req.path.endsWith('.html') || req.path === '/staff-login.html') return next();
-  if (req.session && req.session.crmUser) return next();
-  return res.redirect('/auth/saml/login?next=' + encodeURIComponent('/dashboards' + req.path));
+  if (!req.session || !req.session.crmUser) {
+    return res.redirect('/auth/saml/login?next=' + encodeURIComponent('/dashboards' + req.path));
+  }
+  // Table-driven page access (Staff_Page_Access): if this page has a rule, enforce it.
+  // Unlisted pages → any logged-in staff (unchanged default). The 3 per-rep dashboards
+  // (taneisha/nika/house) keep their own requireCrmRole gates registered earlier.
+  try {
+    const rules = await getPageAccessRules();
+    const page = req.path.replace(/^\//, '').toLowerCase();
+    if (!userMayAccessPage(req.session.crmUser, rules[page])) {
+      return res.status(403).type('html').send(
+        '<!doctype html><meta charset="utf-8"><title>Access restricted</title>' +
+        '<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:14vh auto;text-align:center;color:#1a472a">' +
+        '<h1 style="font-size:1.6rem">Access restricted</h1>' +
+        '<p style="color:#555">You don’t have permission to view this page.</p>' +
+        '<p style="color:#555">If you need access, ask Erik to grant it.</p>' +
+        '<p style="margin-top:2rem"><a href="/staff-dashboard.html" style="color:#3a7c52">← Back to dashboard</a></p></div>');
+    }
+  } catch (e) { console.error('[page-access] check error:', e.message); /* fail-open to any logged-in staff */ }
+  return next();
 });
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
 app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
