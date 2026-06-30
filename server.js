@@ -2326,6 +2326,30 @@ function userMayAccessPage(crmUser, rule) {
   return roles.some(r => userPerms.includes(r)) || emails.includes(userEmail);
 }
 
+// Reusable page gate: require a verified staff session + enforce the Staff_Page_Access
+// rule for this page (matched by filename). Used by the /dashboards middleware AND by
+// explicit root routes (e.g. the SanMar vendor-portal pages) so EVERY gated page is
+// managed the same table-driven way (admin override; page with no rule → any staff).
+async function gateStaffPage(req, res, next) {
+  if (!req.session || !req.session.crmUser) {
+    return res.redirect('/auth/saml/login?next=' + encodeURIComponent(req.originalUrl));
+  }
+  try {
+    const rules = await getPageAccessRules();
+    const page = (req.path.split('/').pop() || '').toLowerCase(); // the *.html filename
+    if (!userMayAccessPage(req.session.crmUser, rules[page])) {
+      return res.status(403).type('html').send(
+        '<!doctype html><meta charset="utf-8"><title>Access restricted</title>' +
+        '<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:14vh auto;text-align:center;color:#1a472a">' +
+        '<h1 style="font-size:1.6rem">Access restricted</h1>' +
+        '<p style="color:#555">You don’t have permission to view this page.</p>' +
+        '<p style="color:#555">If you need access, ask Erik to grant it.</p>' +
+        '<p style="margin-top:2rem"><a href="/staff-dashboard.html" style="color:#3a7c52">← Back to dashboard</a></p></div>');
+    }
+  } catch (e) { console.error('[page-access] check error:', e.message); /* fail-open to any logged-in staff */ }
+  return next();
+}
+
 // Generic CRM proxy handler factory
 function createCrmProxy(endpoint, allowedRoles) {
   return [
@@ -2454,28 +2478,12 @@ app.use('/calculators', express.static(path.join(__dirname, 'calculators'), stat
 // page and non-HTML assets (css/js/img) stay public so there's no redirect loop.
 // Role-specific dashboards (taneisha/nika/house/policies) keep their own
 // requireCrmRole gates registered earlier; this catches the rest.
-app.use('/dashboards', async (req, res, next) => {
+app.use('/dashboards', (req, res, next) => {
+  // Non-HTML assets (css/js/img) + the login page stay public; gate the rest via the
+  // shared table-driven gate (Staff_Page_Access). Per-rep dashboards (taneisha/nika/
+  // house) keep their own requireCrmRole gates registered earlier.
   if (!req.path.endsWith('.html') || req.path === '/staff-login.html') return next();
-  if (!req.session || !req.session.crmUser) {
-    return res.redirect('/auth/saml/login?next=' + encodeURIComponent('/dashboards' + req.path));
-  }
-  // Table-driven page access (Staff_Page_Access): if this page has a rule, enforce it.
-  // Unlisted pages → any logged-in staff (unchanged default). The 3 per-rep dashboards
-  // (taneisha/nika/house) keep their own requireCrmRole gates registered earlier.
-  try {
-    const rules = await getPageAccessRules();
-    const page = req.path.replace(/^\//, '').toLowerCase();
-    if (!userMayAccessPage(req.session.crmUser, rules[page])) {
-      return res.status(403).type('html').send(
-        '<!doctype html><meta charset="utf-8"><title>Access restricted</title>' +
-        '<div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:14vh auto;text-align:center;color:#1a472a">' +
-        '<h1 style="font-size:1.6rem">Access restricted</h1>' +
-        '<p style="color:#555">You don’t have permission to view this page.</p>' +
-        '<p style="color:#555">If you need access, ask Erik to grant it.</p>' +
-        '<p style="margin-top:2rem"><a href="/staff-dashboard.html" style="color:#3a7c52">← Back to dashboard</a></p></div>');
-    }
-  } catch (e) { console.error('[page-access] check error:', e.message); /* fail-open to any logged-in staff */ }
-  return next();
+  return gateStaffPage(req, res, next);
 });
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
 app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
@@ -2716,15 +2724,18 @@ app.get('/breast-cancer-awareness-bundle.html', (req, res) => {
 app.use('/policies', express.static(path.join(__dirname, 'policies'), staticOptions));
 
 // Sanmar Vendor Management Pages
-app.get('/sanmar-invoices.html', (req, res) => {
+// SanMar vendor-portal pages (wholesale invoices/credits/portal) — were PUBLIC; now
+// gated by the shared table-driven gate (login + Staff_Page_Access). Manage who sees
+// each in the Access-Admin UI. Unlisted → any logged-in staff (login now required).
+app.get('/sanmar-invoices.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-invoices.html'));
 });
 
-app.get('/sanmar-credits.html', (req, res) => {
+app.get('/sanmar-credits.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-credits.html'));
 });
 
-app.get('/sanmar-vendor-portal.html', (req, res) => {
+app.get('/sanmar-vendor-portal.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'vendor-portals', 'sanmar-vendor-portal.html'));
 });
 
