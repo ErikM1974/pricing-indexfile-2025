@@ -480,6 +480,32 @@ app.use(cookieSession({
   sameSite: 'lax',
 }));
 
+// ── Customer portal session (magic-link, #6) ───────────────────────────────
+// A PHYSICALLY SEPARATE signed cookie (nwca_customer) from the staff session, so a
+// staff principal and a customer principal can never be confused (privilege isolation).
+// Manually HMAC-signed (SESSION_SECRET, via lib/customer-magic-link) so it doesn't collide
+// with cookie-session's req.session. loadCustomerSession sets req.customerSession on every
+// request; it's null for anyone without a valid customer cookie.
+const customerMagicLink = require('./lib/customer-magic-link');
+function parseCookieHeader(req) {
+  const out = {}; const h = req.headers.cookie; if (!h) return out;
+  h.split(';').forEach((part) => {
+    const i = part.indexOf('='); if (i < 0) return;
+    const k = part.slice(0, i).trim();
+    if (k) out[k] = decodeURIComponent(part.slice(i + 1).trim());
+  });
+  return out;
+}
+app.use(function loadCustomerSession(req, res, next) {
+  req.customerSession = null;
+  const raw = parseCookieHeader(req)['nwca_customer'];
+  if (raw) {
+    const sess = customerMagicLink.verifySession(raw);
+    if (sess) req.customerSession = { portalCustomer: sess };
+  }
+  next();
+});
+
 // =============================================================================
 // CRM ROLE-BASED ACCESS CONTROL
 // =============================================================================
@@ -2852,6 +2878,111 @@ app.get(['/quote-cart', '/quote-cart.html'], (req, res) => {
 // pattern as /custom-tees; the page uses absolute /pages/... asset paths.
 app.get(['/order-status', '/order-status.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'order-status.html'));
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// Customer Portal — magic-link login (#6). Passwordless, invite-only. Identity is
+// the Customer_Portal_Access Caspio table (Erik enables contacts). A verified click
+// sets the separate nwca_customer signed cookie (see loadCustomerSession above).
+// ════════════════════════════════════════════════════════════════════════════
+const CUSTOMER_MAGIC_LINK_TEMPLATE = 'template_utvx9iw'; // EmailJS "Magic Link" template
+
+// Rate-limit link requests per IP — blunts email-bombing + email enumeration probing.
+const customerLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many sign-in requests. Please wait a few minutes and try again.' },
+});
+
+// Gate: require a verified customer session. API → 401 + loginUrl; page → redirect to login.
+function requireCustomer(req, res, next) {
+  const pc = req.customerSession && req.customerSession.portalCustomer;
+  if (pc && /^\d+$/.test(String(pc.idCustomer))) return next();
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(401).json({ error: 'Sign in required', loginUrl: '/customer/login' });
+  }
+  return res.redirect('/customer/login?next=' + encodeURIComponent(req.originalUrl));
+}
+
+// Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
+async function fetchPortalAccess(email) {
+  if (!CRM_API_SECRET) return null;
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/customer-portal-access/by-email/${encodeURIComponent(email)}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    return j && j.found ? j.access : null;
+  } catch (e) { console.error('[customer-login] access lookup error:', e.message); return null; }
+}
+
+// Login page (email entry). Public.
+app.get('/customer/login', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-login.html'));
+});
+
+// Request a magic link. ALWAYS returns { ok:true } (constant shape) → no account enumeration.
+app.post('/auth/customer/request-link', customerLoginLimiter, express.json(), async (req, res) => {
+  const ok = () => res.json({ ok: true });
+  try {
+    if (!customerMagicLink.isConfigured()) { console.warn('[customer-login] MAGIC_LINK_SECRET not configured'); return ok(); }
+    const email = String((req.body && req.body.email) || '').toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ok();
+    const access = await fetchPortalAccess(email);
+    if (!access || !access.enabled || !/^\d+$/.test(String(access.id_Customer))) {
+      console.log(`[customer-login] no enabled access for ${email}`);
+      return ok();
+    }
+    const token = customerMagicLink.mintToken({ email, idCustomer: access.id_Customer });
+    const link = `${PUBLIC_SITE_ORIGIN}/auth/customer/verify?token=${encodeURIComponent(token)}`;
+    await sendEmailJSTemplate(CUSTOMER_MAGIC_LINK_TEMPLATE, {
+      to_email: email,
+      company_name: access.company_name || 'there',
+      magic_link: link,
+      expiry_minutes: String(customerMagicLink.LINK_TTL_MIN),
+    }).catch((e) => console.error('[customer-login] email send failed:', e.message));
+    console.log(`[customer-login] link sent to ${email} (customer ${access.id_Customer})`);
+    return ok();
+  } catch (e) {
+    console.error('[customer-login] request-link error:', e.message);
+    return ok();
+  }
+});
+
+// Verify a magic link → live re-check Enabled → set the customer session cookie → /portal.
+app.get('/auth/customer/verify', async (req, res) => {
+  const fail = () => res.redirect('/customer/login?error=expired');
+  try {
+    if (!customerMagicLink.isConfigured()) return res.status(503).send('Customer login is temporarily unavailable.');
+    let claim;
+    try { claim = customerMagicLink.verifyToken(req.query.token); } catch (_) { return fail(); }
+    // Re-check the LIVE invite: revoking Enabled kills outstanding links immediately, and
+    // re-binds the token's claimed customer id to the table's truth (anti-tamper).
+    const access = await fetchPortalAccess(claim.email);
+    if (!access || !access.enabled || String(access.id_Customer) !== String(claim.idCustomer)) return fail();
+    const sessionToken = customerMagicLink.mintSession({
+      email: claim.email, idCustomer: access.id_Customer, companyName: access.company_name || '',
+    });
+    res.cookie('nwca_customer', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/portal')) ? req.query.next : '/portal';
+    return res.redirect(next);
+  } catch (e) {
+    console.error('[customer-login] verify error:', e.message);
+    return fail();
+  }
+});
+
+// Logout — clear the customer cookie.
+app.get('/auth/customer/logout', (req, res) => {
+  res.clearCookie('nwca_customer');
+  return res.redirect('/customer/login');
 });
 
 // Dedicated limiter for the status API: customers re-check this page over

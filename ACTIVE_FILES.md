@@ -309,6 +309,10 @@
 | `/pages/customer-portal.html` | Customer-facing portal at `/portal/:customerId` — mockups + art requests, no login (URL = token) | customer-portal.js, customer-portal.css, app-config.js | ✅ Active |
 | `/pages/js/customer-portal.js` | Portal controller — fetches mockups + art requests by customer ID | /api/mockups, /api/artrequests | ✅ Active |
 | `/pages/css/customer-portal.css` | Portal styling (responsive cards, branded) | — | ✅ Active |
+| `/pages/customer-login.html` | Magic-link login page at `/customer/login` — email entry → "check your email" (passwordless, invite-only, #6 Phase 1) | customer-login.js/.css | ✅ Active |
+| `/pages/js/customer-login.js` | Login logic — POSTs `/auth/customer/request-link`; always shows the same "check your email" state (no account enumeration) | server.js POST /auth/customer/request-link | ✅ Active |
+| `/pages/css/customer-login.css` | Login page styling (branded green card) | — | ✅ Active |
+| `/lib/customer-magic-link.js` | Magic-link + session token crypto (HMAC mint/verify; MAGIC_LINK_SECRET link / SESSION_SECRET cookie) for the authenticated customer portal | server.js (loadCustomerSession, /auth/customer/*) | ✅ Active |
 
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
