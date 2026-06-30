@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const compression = require('compression');
 const stripe = require('stripe');
 const rateLimit = require('express-rate-limit');
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 const crypto = require('crypto');
 
 // 3-Day Tees shared modules — the SAME files the browser loads, so the
@@ -47,7 +47,7 @@ dotenv.config();
 // INFRASTRUCTURE
 //   L17   Security: Input sanitization (sanitizeFilterInput, isValidIdentifier)
 //   L67   Security: CORS configuration
-//   L146  Session management (express-session)
+//   L146  Session management (cookie-session — durable across deploys, #8)
 //   L166  Rate limiting (apiLimiter, strictLimiter)
 //   L414  Body parsing (JSON, urlencoded)
 //
@@ -466,16 +466,18 @@ if (process.env.NODE_ENV === 'production' &&
   process.exit(1);
 }
 
-app.use(session({
-  secret: SESSION_SECRET || 'dev-secret-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    httpOnly: true,
-    sameSite: 'lax', // Required for cross-site cookie handling
-    maxAge: null // Session cookie - expires when browser closes
-  }
+// #8 durable sessions (2026-06-29): the staff session now lives IN a signed cookie
+// (cookie-session) instead of the in-memory store, so it SURVIVES dyno restarts and
+// deploys — no more "everyone logged out on every deploy." Payload is tiny + non-secret
+// (email + role names) and SIGNED (tamper-proof; SESSION_SECRET is the key, guarded
+// fail-closed above). Session cookie (no maxAge → expires on browser close), httpOnly,
+// secure in prod. Only set after login, so anonymous users get no cookie.
+app.use(cookieSession({
+  name: 'nwca_staff',
+  keys: [SESSION_SECRET || 'dev-secret-change-in-production'],
+  secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+  httpOnly: true,
+  sameSite: 'lax',
 }));
 
 // =============================================================================
@@ -2184,10 +2186,7 @@ app.get('/api/crm-session/me', (req, res) => {
 
 // Logout endpoint - clears CRM session
 app.get('/crm-logout', (req, res) => {
-  if (req.session) {
-    // Clear only CRM-related session data (preserve Caspio session)
-    delete req.session.crmUser;
-  }
+  req.session = null; // cookie-session: clear the staff cookie
   res.redirect('/dashboards/staff-login.html');
 });
 
@@ -2218,28 +2217,30 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
   try {
     const identity = await staffSaml.verifyResponse(req.body.SAMLResponse);
     const permissions = staffSaml.permissionsFor(identity.email);
-    // New session id on login (prevents session fixation).
-    req.session.regenerate((err) => {
-      if (err) { console.error('[SAML] session regenerate failed:', err.message); return res.status(500).send('Sign-in error.'); }
-      req.session.crmUser = {
+    // cookie-session: the signed cookie IS the session — there is no server-side
+    // session id to regenerate. Fixation doesn't apply: the cookie only ever holds
+    // what we set here, AFTER verifying Caspio's signed assertion. Reset then set.
+    req.session = null;
+    req.session = {
+      crmUser: {
         name: identity.name,
         email: identity.email,
         firstName: (identity.name || '').split(' ')[0],
         permissions,
         via: 'saml',
-      };
-      const relay = (typeof req.body.RelayState === 'string' && req.body.RelayState.startsWith('/')) ? req.body.RelayState : '/staff-dashboard.html';
-      req.session.save(() => res.redirect(relay));
-    });
+      },
+    };
+    const relay = (typeof req.body.RelayState === 'string' && req.body.RelayState.startsWith('/')) ? req.body.RelayState : '/staff-dashboard.html';
+    res.redirect(relay); // cookie-session writes the Set-Cookie automatically
   } catch (e) {
     console.error('[SAML] ACS verify failed:', e.message);
     res.status(401).send('Sign-in could not be verified. Please try again or contact IT.');
   }
 });
 
-// Logout — clear our session.
+// Logout — clear our session (cookie-session: null the cookie).
 app.get('/auth/saml/logout', (req, res) => {
-  if (req.session) return req.session.destroy(() => res.redirect('/dashboards/staff-login.html'));
+  req.session = null;
   res.redirect('/dashboards/staff-login.html');
 });
 
