@@ -2,6 +2,13 @@
 
 > **Created 2026-06-29.** Multi-agent audit (57 agents) of the public `caspio-pricing-proxy` (92 route files / 210 endpoints). **98 HIGH/CRITICAL endpoints are reachable by anyone with the URL** — the only gate in the whole proxy (`requireCrmApiSecret`, `src/middleware/index.js:32`) is applied to just 7 mounts. CORS does NOT protect anything — it only constrains browsers; `curl` gets the full JSON. This is harness task **#9** and the canonical plan for closing it. Companion: [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) (#2, the SAML gate this leans on), [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) (#1, the `/api/portal/*` front-end-proxy pattern Pattern B reuses).
 
+## 🟢 PHASE 1 PROGRESS (live — 2026-06-29 PM, proxy releases v851/v852)
+Erik approved "start Phase 1 now"; **skip Inksoft-dependent holes** (creditcard-atmos, gift-certs — their callers are in Python Inksoft) for a later round; **no external/non-code consumers** (Erik confirmed). Gating verified by curl: anon → 401, public reads → 200, secret → accepted.
+- ✅ **customer-profile + industry-lookalikes** (v851) — whole-mount `requireCrmApiSecret`; only caller = emb-quote-ai loopback (now sends `x-crm-api-secret` via `INTERNAL_AUTH_HEADERS`). Anon 401 / secret 200 verified.
+- ✅ **daily-sales-by-rep WRITES** (v852) — method-aware gate at mount (`gateSalesArchiveWrites`: GET public, all writes gated) closes the anon **YTD-archive-wipe** (`DELETE /bulk`) + inject. Updated all 3 write-calling scripts (archive-daily-sales CRON, reconcile, rebuild) to send the secret — they hit the endpoint, not Caspio direct. Anon write 401 / reads 200 verified.
+- ⏳ **NEXT Phase-1 (non-Inksoft):** `files DELETE` (keep GET/upload public), `service-codes`/`pricing`/`embroidery-costs` **writes** (keep GET reads public), `thumbnails` writes/deletes, `admin/products` (method-scoped inside mixed `products.js`), `shipstation` outbound, proxy `orders` (verify dead). All method/path-scoped — gate writes only, never the public reads (Rule 9).
+- ⚠️ **customer-history is NOT Pattern A** — it has a browser caller (`dtg-inline-form.js`); moved to Phase 3 (route through front-end SAML). The audit's "loopback-only" was incomplete — VERIFY callers before every gate flip.
+
 ## Pre-flight facts already RESOLVED (2026-06-29)
 - ✅ **`CRM_API_SECRET` IS set on the proxy** Heroku app `caspio-pricing-proxy` (64 chars) — so `requireCrmApiSecret` won't 500. (It returns 500 if the env var is unset.)
 - ✅ **`CRM_API_SECRET` IS set on the front-end** app `sanmar-inventory-app`; front-end already has `createCrmProxy()` (`server.js:2268`) that injects `X-CRM-API-Secret`, and a working SAML-gated **streaming** Claude proxy template at `POST /api/policies/ai-assist` (`server.js:2333`).
