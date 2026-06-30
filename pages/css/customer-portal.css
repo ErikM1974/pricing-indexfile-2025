@@ -309,6 +309,8 @@ body {
 .cp-table tbody tr:last-child td { border-bottom: none; }
 .cp-table tbody tr:hover { background: var(--cp-theme-bg-hover); }
 .cp-table .cp-num { text-align: right; font-variant-numeric: tabular-nums; }
+.cp-link { color: var(--cp-theme); text-decoration: none; font-weight: 600; }
+.cp-link:hover { text-decoration: underline; }
 
 /* Order + invoice status badges */
 .cp-status--shipped { background: #e8f5e9; color: #2e7d32; }

@@ -239,7 +239,7 @@
         empty.style.display = 'none';
         var rows = orders.map(function (o) {
             return '<tr>' +
-                '<td>#' + escapeHtml(String(o.orderNumber || '')) + '</td>' +
+                '<td><a class="cp-link" href="/portal/invoice/' + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
                 '<td>' + escapeHtml(o.designName || '—') + '</td>' +
                 '<td>' + escapeHtml(o.poNumber || '—') + '</td>' +
@@ -265,7 +265,7 @@
         empty.style.display = 'none';
         var rows = inv.map(function (o) {
             return '<tr>' +
-                '<td>#' + escapeHtml(String(o.orderNumber || '')) + '</td>' +
+                '<td><a class="cp-link" href="/portal/invoice/' + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
                 '<td class="cp-num">' + money(o.paid) + '</td>' +

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Invoice — Northwest Custom Apparel</title>
+  <link rel="stylesheet" href="/pages/css/customer-invoice.css?v=2026.06.30">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+  <div class="ci-toolbar" id="ci-toolbar">
+    <a href="/portal" class="ci-back">&larr; Back to portal</a>
+    <button id="ci-download" class="ci-btn" type="button">Download PDF</button>
+  </div>
+  <div class="ci-status" id="ci-loading">Loading invoice&hellip;</div>
+  <div class="ci-status" id="ci-error" style="display:none;">Couldn't load this invoice. <a href="/portal">Back to portal</a>.</div>
+  <div class="ci-paper" id="ci-paper" style="display:none;"></div>
+  <script src="/pages/js/customer-invoice.js?v=2026.06.30"></script>
+</body>
+</html>

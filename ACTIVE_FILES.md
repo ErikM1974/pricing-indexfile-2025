@@ -313,6 +313,9 @@
 | `/pages/js/customer-login.js` | Login logic — POSTs `/auth/customer/request-link`; always shows the same "check your email" state (no account enumeration) | server.js POST /auth/customer/request-link | ✅ Active |
 | `/pages/css/customer-login.css` | Login page styling (branded green card) | — | ✅ Active |
 | `/lib/customer-magic-link.js` | Magic-link + session token crypto (HMAC mint/verify; MAGIC_LINK_SECRET link / SESSION_SECRET cookie) for the authenticated customer portal | server.js (loadCustomerSession, /auth/customer/*) | ✅ Active |
+| `/pages/customer-invoice.html` | ShopWorks-style invoice page at `/portal/invoice/:orderNo` (session-gated) — on-screen + Download PDF (html2pdf) | customer-invoice.js/.css | ✅ Active |
+| `/pages/js/customer-invoice.js` | Fetches `/api/portal/invoice/:orderNo` (ownership-checked), renders the invoice (header/line-items/sizes/totals), wires html2pdf download | server.js GET /api/portal/invoice | ✅ Active |
+| `/pages/css/customer-invoice.css` | Invoice paper styling (print-friendly) | — | ✅ Active |
 
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |

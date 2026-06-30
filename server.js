@@ -3272,6 +3272,81 @@ app.get('/api/portal/orders', portalLimiter, requireCustomer, async (req, res) =
   }
 });
 
+// ── Customer portal INVOICE detail (#6 Phase 3) — ShopWorks-style, on-screen + PDF ──
+function projectPortalLineItem(li) {
+  return {
+    partNumber: li.PartNumber || '',
+    color: li.PartColor || '',
+    description: li.PartDescription || '',
+    quantity: Number(li.LineQuantity) || 0,
+    unitPrice: Number(li.LineUnitPrice) || 0,
+    lineTotal: (Number(li.LineQuantity) || 0) * (Number(li.LineUnitPrice) || 0),
+    // Size01-06 = S / M / L / XL / 2XL / 3XL (SHOPWORKS_SIZE_MAPPING)
+    sizes: [li.Size01, li.Size02, li.Size03, li.Size04, li.Size05, li.Size06],
+  };
+}
+function projectPortalInvoice(o, items) {
+  const total = Number(o.cur_TotalInvoice) || 0;
+  const balRaw = o.cur_Balance;
+  const balanceKnown = balRaw !== null && balRaw !== undefined && balRaw !== '';
+  const balance = balanceKnown ? (Number(balRaw) || 0) : total;
+  return {
+    invoiceNumber: o.id_Order,
+    dateOrdered: o.date_Ordered || null,
+    dateInvoiced: o.date_Invoiced || null,
+    customerName: o.CustomerName || '',
+    customerNumber: o.id_Customer || null,
+    contactName: [o.ContactFirstName, o.ContactLastName].filter(Boolean).join(' '),
+    contactPhone: o.ContactPhone || '',
+    contactEmail: o.ContactEmail || '',
+    poNumber: o.CustomerPurchaseOrder || '',
+    terms: o.TermsName || '',
+    salesperson: o.CustomerServiceRep || '',
+    designName: o.DesignName || '',
+    items: items,
+    totalQuantity: Number(o.TotalProductQuantity) || 0,
+    subtotal: Number(o.cur_SubTotal) || 0,
+    salesTax: Number(o.cur_SalesTaxTotal) || 0,
+    shipping: Number(o.cur_Shipping) || 0,
+    total: total,
+    paid: Math.max(0, total - balance),
+    balance: balance,
+  };
+}
+
+// GET /api/portal/invoice/:orderNo — full invoice (header + line items) for ONE of the
+// customer's orders. OWNERSHIP-VERIFIED against the session id_Customer (generic 404 on
+// mismatch — a customer can never pull another company's invoice by changing the number).
+app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const cid = String(req.customerSession.portalCustomer.idCustomer);
+    const orderNo = String(req.params.orderNo || '');
+    if (!/^\d+$/.test(orderNo)) return res.status(404).json({ error: 'Not found' });
+    const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    if (!oR.ok) throw new Error('order ' + oR.status);
+    const oJ = await oR.json();
+    const o = Array.isArray(oJ.result) ? oJ.result[0] : (oJ.result || oJ);
+    if (!o || String(o.id_Customer) !== cid) return res.status(404).json({ error: 'Not found' });
+    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const lJ = lR.ok ? await lR.json() : { result: [] };
+    const items = (lJ.result || [])
+      .sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0))
+      .map(projectPortalLineItem);
+    res.json(projectPortalInvoice(o, items));
+  } catch (err) {
+    console.error('[Portal] invoice failed:', err.message);
+    res.status(503).json({ error: 'Invoice temporarily unavailable' });
+  }
+});
+
+// Invoice page (session-gated). Reads the order # from the URL; the page fetches the
+// secured /api/portal/invoice/:orderNo above (which re-checks ownership).
+app.get('/portal/invoice/:orderNo', requireCustomer, (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-invoice.html'));
+});
+
 // ALLOWLIST projection for the art-request DETAIL customer view. Mirrors exactly
 // the fields the ?view=customer render path displays (mapped + adversarially
 // verified 2026-06-29). Excludes NOTES, Sales_Rep, staff/contact emails, phone,
