@@ -538,6 +538,17 @@ function requireCrmRole(allowedRoles) {
   };
 }
 
+// requireStaff (#2 flip 2026-06-29) — gate a page/route behind ANY verified
+// staff session (established only by the SAML ACS). Unauthenticated visitors are
+// BOUNCED to SSO login (never hard-locked-out); API calls get 401 + a loginUrl.
+function requireStaff(req, res, next) {
+  if (req.session && req.session.crmUser) return next();
+  if (req.originalUrl.startsWith('/api/')) {
+    return res.status(401).json({ error: 'Sign in required', loginUrl: '/auth/saml/login' });
+  }
+  return res.redirect('/auth/saml/login?next=' + encodeURIComponent(req.originalUrl));
+}
+
 // =============================================================================
 // SECURITY: Rate Limiting
 // =============================================================================
@@ -2125,37 +2136,15 @@ app.get('/product.html', (req, res) => {
 // Endpoint to establish CRM session after Caspio login
 // Called from staff-login.html after user authenticates with Caspio
 app.post('/api/crm-session', express.json(), (req, res) => {
-  const { name, email } = req.body;
-
-  if (!name) {
-    return res.status(400).json({ error: 'Name is required' });
+  // SSO-ONLY (#2 flip, 2026-06-29): we NO LONGER mint a session from a client-
+  // posted name — that was forgeable (a bare POST {"name":"Erik"} minted full
+  // admin). Identity now comes ONLY from a verified Caspio SAML login
+  // (/auth/saml/acs). Echo the existing verified session if present; else require SSO.
+  if (req.session && req.session.crmUser) {
+    const u = req.session.crmUser;
+    return res.json({ success: true, permissions: u.permissions || [], firstName: u.firstName });
   }
-
-  // Extract first name and look up permissions
-  const firstName = name.split(' ')[0];
-  const permissions = CRM_PERMISSIONS[firstName];
-
-  if (!permissions) {
-    // User authenticated with Caspio but not authorized for CRM dashboards
-    return res.status(403).json({
-      error: 'User not authorized for CRM access',
-      message: `${firstName} does not have permission to access CRM dashboards.`
-    });
-  }
-
-  // Store CRM user info in session
-  req.session.crmUser = {
-    name: name,
-    email: email || '',
-    firstName: firstName,
-    permissions: permissions
-  };
-
-  res.json({
-    success: true,
-    permissions: permissions,
-    firstName: firstName
-  });
+  return res.status(401).json({ error: 'Sign in required', loginUrl: '/auth/saml/login' });
 });
 
 // GET current CRM session — used by Policies Hub admin gate and any
@@ -2382,6 +2371,15 @@ app.get('/robots.txt', (req, res) => {
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));
+// #2 flip — gate staff dashboard PAGES behind a verified SAML session. The login
+// page and non-HTML assets (css/js/img) stay public so there's no redirect loop.
+// Role-specific dashboards (taneisha/nika/house/policies) keep their own
+// requireCrmRole gates registered earlier; this catches the rest.
+app.use('/dashboards', (req, res, next) => {
+  if (!req.path.endsWith('.html') || req.path === '/staff-login.html') return next();
+  if (req.session && req.session.crmUser) return next();
+  return res.redirect('/auth/saml/login?next=' + encodeURIComponent('/dashboards' + req.path));
+});
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
 app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
 app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
@@ -2443,8 +2441,8 @@ function noCacheHeaders(res) {
 //   now 301-redirect to canonical so old bookmarks still land on V3.
 //   Recovery: `git show v2026.05.27.5:staff-dashboard.html` (or :staff-dashboard-legacy.html).
 
-// Canonical URL — serves v3
-app.get('/staff-dashboard.html', (req, res) => {
+// Canonical URL — serves v3 (gated: verified SAML staff session required)
+app.get('/staff-dashboard.html', requireStaff, (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
@@ -2467,14 +2465,14 @@ app.get('/quote-builders/dtg-quote-builder-legacy.html', (req, res) => {
 
 // v3 dedicated URL — preserved so any direct /staff-dashboard-v3/ bookmarks
 // still resolve to the same content as the canonical URL.
-app.get('/staff-dashboard-v3/', (req, res) => {
+app.get('/staff-dashboard-v3/', requireStaff, (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
 app.get('/staff-dashboard-v3', (req, res) => {
   res.redirect(301, '/staff-dashboard-v3/');
 });
-app.get('/staff-dashboard-v3/index.html', (req, res) => {
+app.get('/staff-dashboard-v3/index.html', requireStaff, (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
