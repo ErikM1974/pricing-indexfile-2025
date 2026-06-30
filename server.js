@@ -2216,7 +2216,11 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
   if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
   try {
     const identity = await staffSaml.verifyResponse(req.body.SAMLResponse);
-    const permissions = staffSaml.permissionsFor(identity.email);
+    // Role-of-record now lives in Caspio (Staff_App_Roles table); fetch it server-side
+    // and derive permissions. Fail-safe: a lookup error yields no elevated permissions
+    // (deny, never grant wrong access) — the user can re-login once it recovers.
+    const role = await fetchStaffRole(identity.email);
+    const permissions = staffSaml.permissionsFromRole(role, identity.email);
     // cookie-session: the signed cookie IS the session — there is no server-side
     // session id to regenerate. Fixation doesn't apply: the cookie only ever holds
     // what we set here, AFTER verifying Caspio's signed assertion. Reset then set.
@@ -2226,6 +2230,7 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
         name: identity.name,
         email: identity.email,
         firstName: (identity.name || '').split(' ')[0],
+        role: role || null,
         permissions,
         via: 'saml',
       },
@@ -2264,6 +2269,23 @@ app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res)
 
 const CRM_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 const CRM_API_SECRET = process.env.CRM_API_SECRET;
+
+// Fetch a staff member's app-RBAC role from Caspio (Staff_App_Roles via the proxy),
+// server-side with the CRM secret. Returns the role string or null. Fail-safe: on any
+// error returns null (→ no elevated permissions), never throws into the login flow.
+async function fetchStaffRole(email) {
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/staff-app-role?email=${encodeURIComponent(email)}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+    });
+    if (!r.ok) { console.error('[staff-role] lookup HTTP', r.status, 'for', email); return null; }
+    const data = await r.json();
+    return data && data.role ? data.role : null;
+  } catch (e) {
+    console.error('[staff-role] lookup failed:', e.message);
+    return null;
+  }
+}
 
 // Generic CRM proxy handler factory
 function createCrmProxy(endpoint, allowedRoles) {
