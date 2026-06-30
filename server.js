@@ -2355,7 +2355,10 @@ async function gateStaffPage(req, res, next) {
   }
   try {
     const rules = await getPageAccessRules();
-    const page = (req.path.split('/').pop() || '').toLowerCase(); // the *.html filename
+    // Decode so an encoded filename (e.g. access-admin%2ehtml) resolves to the real rule.
+    let page;
+    try { page = decodeURIComponent(req.path.split('/').pop() || '').toLowerCase(); }
+    catch (e) { page = (req.path.split('/').pop() || '').toLowerCase(); } // the *.html filename
     if (!userMayAccessPage(req.session.crmUser, rules[page])) {
       const fn = String(req.session.crmUser.firstName || '').replace(/[<>&"']/g, '');
       return res.status(403).type('html').send(accessRestrictedPage(fn));
@@ -2492,18 +2495,37 @@ app.use('/calculators', express.static(path.join(__dirname, 'calculators'), stat
 // page and non-HTML assets (css/js/img) stay public so there's no redirect loop.
 // Role-specific dashboards (taneisha/nika/house/policies) keep their own
 // requireCrmRole gates registered earlier; this catches the rest.
-app.use('/dashboards', (req, res, next) => {
-  // Non-HTML assets (css/js/img) + the login page stay public; gate the rest via the
-  // shared table-driven gate (Staff_Page_Access). Per-rep dashboards (taneisha/nika/
-  // house) keep their own requireCrmRole gates registered earlier.
-  if (!req.path.endsWith('.html') || req.path === '/staff-login.html') return next();
+// Gate staff HTML pages behind a verified SAML session. SECURITY (2026-06-30): decode
+// the path FIRST so URL-encoding tricks (e.g. %2e for '.') can't slip a .html request
+// past the suffix test and reach the static mount un-gated. Non-HTML assets (css/js/img)
+// and the staff-login page stay public so there's no redirect loop. The per-page rule
+// itself is enforced table-driven in gateStaffPage (Staff_Page_Access; admin override).
+function gateStaffHtml(req, res, next) {
+  let p;
+  try { p = decodeURIComponent(req.path).toLowerCase(); }
+  catch (e) { p = String(req.path).toLowerCase(); }
+  if (!p.endsWith('.html') || p === '/staff-login.html') return next();
   return gateStaffPage(req, res, next);
-});
+}
+app.use('/dashboards', gateStaffHtml);
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
 app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
+// SECURITY (2026-06-30): vendor-portals (SanMar invoices/credits) + tools (internal
+// diagnostics) are staff-only — gate every .html the same way as /dashboards so the
+// sibling static mounts can't be used to bypass the root-route gate.
+app.use('/vendor-portals', gateStaffHtml);
 app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
 app.use('/art-tools', express.static(path.join(__dirname, 'art-tools'), staticOptions));
+app.use('/tools', gateStaffHtml);
 app.use('/tools', express.static(path.join(__dirname, 'tools'), staticOptions));
+// /admin is staff-only EXCEPT the customer-facing c112-bogo-promo landing page.
+app.use('/admin', (req, res, next) => {
+  let p;
+  try { p = decodeURIComponent(req.path).toLowerCase(); }
+  catch (e) { p = String(req.path).toLowerCase(); }
+  if (p === '/c112-bogo-promo.html') return next(); // public customer-facing promo page
+  return gateStaffHtml(req, res, next);
+});
 app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
 app.use('/email-templates', express.static(path.join(__dirname, 'email-templates'), staticOptions));
 app.use('/mockups', express.static(path.join(__dirname, 'mockups'), staticOptions));
@@ -2599,7 +2621,7 @@ app.get('/staff-dashboard-v3/index.html', requireStaff, (req, res) => {
 // caspio-isolation.js). Reuse staticOptions so these also send no-cache headers.
 app.use('/staff-dashboard-v3', express.static(path.join(__dirname, 'staff-dashboard-v3'), staticOptions));
 
-app.get('/bundle-orders-dashboard.html', (req, res) => {
+app.get('/bundle-orders-dashboard.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
 });
 
@@ -2616,7 +2638,7 @@ app.get('/wcttr-bundle.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'employee-bundles', 'wcttr-bundle.html'));
 });
 
-app.get('/art-invoices-dashboard.html', (req, res) => {
+app.get('/art-invoices-dashboard.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
 });
 
@@ -2630,15 +2652,15 @@ app.get('/art-invoice-unified-dashboard.html', (req, res) => {
 
 // Removed duplicate route - webstore-info.html is now served from /pages/ directory (see line 328)
 
-app.get('/universal-records-admin.html', (req, res) => {
+app.get('/universal-records-admin.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'universal-records-admin.html'));
 });
 
-app.get('/art-hub-steve.html', (req, res) => {
+app.get('/art-hub-steve.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-steve.html'));
 });
 
-app.get('/art-hub-ruth.html', (req, res) => {
+app.get('/art-hub-ruth.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'art-hub-ruth.html'));
 });
 
@@ -2662,11 +2684,11 @@ app.get('/portal/:customerId', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'customer-portal.html'));
 });
 
-app.get('/announcements-create.html', (req, res) => {
+app.get('/announcements-create.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-create.html'));
 });
 
-app.get('/announcements-manage.html', (req, res) => {
+app.get('/announcements-manage.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'admin', 'announcements-manage.html'));
 });
 
@@ -2706,7 +2728,7 @@ app.get('/ae-submit-art.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'art-tools', 'ae-submit-art.html'));
 });
 
-app.get('/ae-dashboard.html', (req, res) => {
+app.get('/ae-dashboard.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'ae-dashboard.html'));
 });
 
