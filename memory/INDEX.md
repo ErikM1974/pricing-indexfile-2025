@@ -162,6 +162,7 @@ _Forward-looking; verify status before trusting._
 - [TODO_QUOTE_ACCEPTANCE_EMAILS.md](TODO_QUOTE_ACCEPTANCE_EMAILS.md)
 - [QUOTE_BUILDER_UNIFICATION_PLAN.md](QUOTE_BUILDER_UNIFICATION_PLAN.md)
 - [CATALOG_PRICING_QUOTE_UX_AUDIT_2026-07.md](CATALOG_PRICING_QUOTE_UX_AUDIT_2026-07.md) — customer catalog/pricing/quote/PDF UX audit + prioritized enhancement proposal (2026-07-01)
+- [CALCULATOR_PRICING_AUDIT_2026-07.md](CALCULATOR_PRICING_AUDIT_2026-07.md) — 30-agent sweep of all 14 live calculators for hardcoded/drifted pricing + submit-flow bugs; ranked findings + fix order (2026-07-01)
 
 ## 🔎 Audit / findings detail — historical, still pointed-to (NOT current state)
 
