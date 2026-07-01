@@ -1,3 +1,8 @@
+## v2026.07.01.9 (2026-07-01)
+
+- docs(portal): My Logos shows approved proof + badge (v2026.07.01.8)
+- fix(portal): My Logos shows the real design proof + opens a lightbox (not the staff page)
+
 ## v2026.07.01.8 (2026-07-01)
 
 - docs(portal): My Logos Phase 0 SHIPPED + honest correction (Canva filename prefix is likely a design#, not customer id)
