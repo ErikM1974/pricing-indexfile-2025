@@ -327,6 +327,14 @@
             : '';
         var meta = (kind === 'product' && p.lastOrdered) ? 'Last ordered ' + formatDate(p.lastOrdered) : (p.blurb || '');
         var btnLabel = kind === 'product' ? 'Re-order' : 'Ask for a quote';
+        // Style-level volume ("you order a lot of this") — pieces over the ~3yr history window.
+        var totalLine = (kind === 'product' && Number(p.styleTotalQty) > 0)
+            ? '<div class="cp-product-total">You&rsquo;ve ordered ' + Number(p.styleTotalQty).toLocaleString() + '</div>'
+            : '';
+        // Ordered colors + per-color totals → the modal picker marks them and shows "N ordered".
+        var orderedColorsJson = JSON.stringify((kind === 'product' && p.colors ? p.colors : []).map(function (c) {
+            return { name: c.name, qty: Number(c.totalQty) || 0 };
+        }));
         // Reward pill (premium recommendations only) — marketing label, no money moves. Blank = hidden.
         var reward = (kind === 'rec' && p.rewardText)
             ? '<div class="cp-rec-reward"><span class="cp-rec-reward-star">&#9733;</span> ' + escapeHtml(p.rewardText) + '</div>'
@@ -339,6 +347,7 @@
                 '<div class="cp-product-title">' + escapeHtml(title) + '</div>' +
                 (sub ? '<div class="cp-product-sub">' + escapeHtml(sub) + '</div>' : '') +
                 swatches +
+                totalLine +
                 (meta ? '<div class="cp-product-meta">' + escapeHtml(meta) + '</div>' : '') +
                 reward +
                 '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
@@ -346,6 +355,7 @@
                     ' data-image="' + escapeHtml(p.image || '') + '"' +
                     ' data-title="' + escapeHtml(title) + '" data-design="' + escapeHtml(String(p.designNumber || '')) + '"' +
                     ' data-designname="' + escapeHtml(p.designName || '') + '"' +
+                    " data-colors='" + escapeAttr(orderedColorsJson) + "'" +
                     " data-sizes='" + escapeAttr(sizesJson) + "'>" +
                     btnLabel + '</button>' +
             '</div></div>';
@@ -394,6 +404,8 @@
     function openReqModal(btn) {
         var parsedSizes = {};
         try { parsedSizes = JSON.parse(btn.getAttribute('data-sizes') || '{}') || {}; } catch (e) { parsedSizes = {}; }
+        var parsedColors = [];
+        try { parsedColors = JSON.parse(btn.getAttribute('data-colors') || '[]') || []; } catch (e) { parsedColors = []; }
         reqState = {
             kind: btn.getAttribute('data-kind'),
             style: btn.getAttribute('data-style'),
@@ -402,7 +414,8 @@
             title: btn.getAttribute('data-title'),
             design: btn.getAttribute('data-design'),
             designName: btn.getAttribute('data-designname'),
-            sizes: parsedSizes
+            sizes: parsedSizes,
+            orderedColors: parsedColors
         };
         document.getElementById('cp-req-title').textContent = reqState.kind === 'product' ? 'Re-order this product' : 'Ask for a quote';
         document.getElementById('cp-req-product').innerHTML =
@@ -410,10 +423,10 @@
             '<div class="cp-req-prod-sub">' + escapeHtml('Style ' + (reqState.style || '') + (reqState.design ? ' · Design #' + reqState.design : '')) + '</div>';
         setReqImage(reqState.image);
         buildSizeGrid(reqState.sizes);
-        // Show the ordered color immediately, then enrich with the full color list.
-        var sel = document.getElementById('cp-req-color');
-        sel.innerHTML = '<option value="' + escapeHtml(reqState.color || '') + '" selected>' + escapeHtml(reqState.color || 'Same as before') + '</option>';
-        loadColorOptions(reqState.style, reqState.color, reqState.image);
+        // Catalog-style color picker: a hidden input (#cp-req-color) holds the chosen color;
+        // render the swatch grid, mark previously-ordered colors + their piece totals.
+        document.getElementById('cp-req-color').value = reqState.color || '';
+        renderColorPicker(reqState.style, reqState.color, reqState.image);
         document.getElementById('cp-req-note').value = '';
         document.getElementById('cp-req-error').textContent = '';
         document.getElementById('cp-req-modal').style.display = 'flex';
@@ -428,43 +441,95 @@
             : '<div class="cp-req-noimg">&#128085;</div>';
     }
 
-    // Fetch every available color for this style; rebuild the dropdown and swap the image on change.
-    function loadColorOptions(style, orderedColor, orderedImage) {
-        if (!style) return;
+    // ── Catalog-style color picker (replaces the old native <select>) ──
+    function normColor(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+    function orderedQtyMap() {
+        var map = {};
+        ((reqState && reqState.orderedColors) || []).forEach(function (c) {
+            if (c && c.name) map[normColor(c.name)] = Number(c.qty) || 0;
+        });
+        return map;
+    }
+    // Caption next to the "Color" label: "· N ordered before" for a previously-bought color.
+    function setColorStat(colorName) {
+        var el = document.getElementById('cp-req-colorstat');
+        if (!el) return;
+        var q = orderedQtyMap()[normColor(colorName)] || 0;
+        el.textContent = q > 0 ? ('· ' + q.toLocaleString() + ' ordered before') : '';
+    }
+
+    // Render the swatch grid: every available color, previously-ordered ones marked with their
+    // piece total and sorted to the front. Seeds instantly with the ordered color(s), then enriches
+    // from the live product-colors list. The chosen color lives in the hidden #cp-req-color input.
+    function renderColorPicker(style, orderedColor, orderedImage) {
+        var grid = document.getElementById('cp-req-colors');
+        if (!grid) return;
+        var qtyMap = orderedQtyMap();
+
+        function renderTiles(colors) {
+            reqState.colorImages = {};
+            var enriched = colors.map(function (c, i) {
+                var name = c.name || c.catalogColor || '';
+                return { name: name, image: c.image || '', swatch: c.swatch || '', qty: qtyMap[normColor(name)] || 0, i: i };
+            }).filter(function (c) { return c.name; });
+            // Make sure every ordered color shows even if it's discontinued (not in the live list).
+            var present = {};
+            enriched.forEach(function (c) { present[normColor(c.name)] = true; });
+            ((reqState && reqState.orderedColors) || []).forEach(function (oc) {
+                if (oc && oc.name && !present[normColor(oc.name)]) {
+                    enriched.unshift({ name: oc.name, image: (normColor(oc.name) === normColor(orderedColor) ? orderedImage : '') || '', swatch: '', qty: Number(oc.qty) || 0, i: -1 });
+                }
+            });
+            // Ordered colors first (by piece total desc), then the rest in catalog order.
+            enriched.sort(function (a, b) {
+                if ((b.qty > 0) !== (a.qty > 0)) return (b.qty > 0 ? 1 : 0) - (a.qty > 0 ? 1 : 0);
+                if (b.qty !== a.qty) return b.qty - a.qty;
+                return a.i - b.i;
+            });
+            var hidden = document.getElementById('cp-req-color');
+            if (!hidden.value && enriched.length) hidden.value = enriched[0].name;
+            var selNorm = normColor(hidden.value || orderedColor);
+            var topName = (enriched.length && enriched[0].qty > 0) ? enriched[0].name : null;
+            grid.innerHTML = enriched.map(function (c) {
+                reqState.colorImages[c.name] = c.image || '';
+                var isSel = normColor(c.name) === selNorm;
+                var sq = c.swatch
+                    ? '<span class="cp-swatch-sq"><img src="' + escapeHtml(c.swatch) + '" alt="" loading="lazy" onerror="this.remove();"></span>'
+                    : '<span class="cp-swatch-sq cp-swatch-sq--noimg"></span>';
+                var tag = (topName && c.name === topName) ? '<span class="cp-swatch-tag">Top color</span>' : '';
+                var qtyLine = c.qty > 0 ? '<span class="cp-swatch-qty">' + c.qty.toLocaleString() + ' ordered</span>' : '';
+                return '<button type="button" class="cp-swatch-btn' + (isSel ? ' is-selected' : '') + '" data-color="' + escapeHtml(c.name) + '">' +
+                    tag + sq + '<span class="cp-swatch-nm">' + escapeHtml(c.name) + '</span>' + qtyLine + '</button>';
+            }).join('');
+            setColorStat(hidden.value);
+            var selImg = reqState.colorImages[hidden.value] || orderedImage || '';
+            if (selImg) setReqImage(selImg);
+        }
+
+        // Seed with the ordered color(s) so the picker is never empty, then load the full list.
+        renderTiles(((reqState && reqState.orderedColors) || []).map(function (c) {
+            return { name: c.name, image: (normColor(c.name) === normColor(orderedColor) ? orderedImage : ''), swatch: '' };
+        }));
         fetch(COLORS_URL_BASE + encodeURIComponent(style), { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
-            .then(function (d) {
-                var colors = (d && d.colors) || [];
-                if (!colors.length) return; // keep the ordered-color-only dropdown
-                var sel = document.getElementById('cp-req-color');
-                var want = String(orderedColor || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                // Map each color name → its image so we can swap the preview without re-fetching.
-                reqState.colorImages = {};
-                var html = '';
-                var matched = false;
-                colors.forEach(function (c) {
-                    var name = c.name || c.catalogColor || '';
-                    if (!name) return;
-                    reqState.colorImages[name] = c.image || '';
-                    var norm = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                    var isOrdered = want && norm === want;
-                    if (isOrdered) matched = true;
-                    html += '<option value="' + escapeHtml(name) + '"' + (isOrdered ? ' selected' : '') + '>' +
-                        escapeHtml(name) + (isOrdered ? ' (your last order)' : '') + '</option>';
-                });
-                // If the ordered color isn't in the list, keep it as the first, selected option.
-                if (!matched && orderedColor) {
-                    reqState.colorImages[orderedColor] = orderedImage || '';
-                    html = '<option value="' + escapeHtml(orderedColor) + '" selected>' + escapeHtml(orderedColor) + ' (your last order)</option>' + html;
-                }
-                sel.innerHTML = html;
-                sel.onchange = function () {
-                    var img = reqState.colorImages[sel.value];
-                    setReqImage(img || orderedImage || '');
-                };
-            })
-            .catch(function () { /* dropdown already has the ordered color */ });
+            .then(function (d) { var colors = (d && d.colors) || []; if (colors.length) renderTiles(colors); })
+            .catch(function () { /* keep the seeded ordered-color tiles */ });
     }
+
+    // Swatch click → select that color (updates the hidden input, preview image, and caption).
+    document.addEventListener('click', function (e) {
+        var sw = e.target.closest && e.target.closest('.cp-swatch-btn');
+        if (!sw) return;
+        var grid = document.getElementById('cp-req-colors');
+        if (!grid || !grid.contains(sw)) return;
+        var name = sw.getAttribute('data-color') || '';
+        document.getElementById('cp-req-color').value = name;
+        var sibs = grid.querySelectorAll('.cp-swatch-btn');
+        for (var i = 0; i < sibs.length; i++) sibs[i].classList.remove('is-selected');
+        sw.classList.add('is-selected');
+        setReqImage((reqState && reqState.colorImages && reqState.colorImages[name]) || (reqState && reqState.image) || '');
+        setColorStat(name);
+    });
 
     function buildSizeGrid(sizes) {
         var grid = document.getElementById('cp-size-grid');
