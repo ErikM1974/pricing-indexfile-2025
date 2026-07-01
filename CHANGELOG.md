@@ -1,3 +1,8 @@
+## v2026.07.01.13 (2026-07-01)
+
+- docs(portal): My Logos — SanMar stock-photo fallback removed (real proofs only)
+- fix(portal): My Logos loads Box proofs DIRECTLY (no double-proxy) — fixes stalled images under page-load concurrency
+
 ## v2026.07.01.12 (2026-07-01)
 
 - docs(portal): My Logos lightbox uses full-res Box image (?size=large)
