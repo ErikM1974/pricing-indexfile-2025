@@ -219,14 +219,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 backImage: currentDesign.backImage
             };
             
-            // Save to database
+            // Save to database. The save and the confirmation email are INDEPENDENT
+            // operations — an email failure must never mask a saved design
+            // (2026-07-01, same fix as the SCP calculator). Especially important here
+            // because the EmailJS template below is still a placeholder, so the email
+            // currently fails on every submit even though the design saves fine.
             const saveResult = await quoteService.saveDesign(designData);
             const quoteID = saveResult.quoteID;
-            
-            if (!saveResult.success) {
+            const saved = !!saveResult.success;
+
+            if (!saved) {
                 console.error('Database save warning:', saveResult.error);
             }
-            
+
             // Send email - ALL variables must have values (never empty)
             const emailData = {
                 // Email routing
@@ -267,17 +272,31 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             console.log('Sending email with data:', emailData);
-            
-            await emailjs.send(
-                'service_jgrave3',
-                'template_stripe',  // TODO: Replace with actual template ID
-                emailData
-            );
-            
-            // Show success
-            showSuccess(quoteID);
-            closeSendModal();
-            
+
+            // Send email independently — a failure here must not report a saved design as failed.
+            let emailed = false;
+            try {
+                await emailjs.send(
+                    'service_jgrave3',
+                    'template_stripe',  // TODO: Replace with actual template ID
+                    emailData
+                );
+                emailed = true;
+            } catch (emailError) {
+                console.error('Confirmation email failed:', emailError);
+            }
+
+            // The design is real to the customer if EITHER path produced a record.
+            if (saved || emailed) {
+                if (saved && !emailed) {
+                    console.warn('Safety stripe design saved but confirmation email failed for', quoteID);
+                }
+                showSuccess(quoteID);
+                closeSendModal();
+            } else {
+                alert('Unable to submit the design. Please try again or call (253) 922-5793.');
+            }
+
         } catch (error) {
             console.error('Error sending design:', error);
             alert('Failed to send design. Please try again.');

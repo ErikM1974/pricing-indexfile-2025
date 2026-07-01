@@ -4,6 +4,21 @@
 **Method:** 30-agent workflow — discover every live calculator → deep-audit each (pricing source, hardcoded constants, 2 submit bugs) → **adversarially verify each hardcoded price against LIVE Caspio data** (hardcoded ≠ wrong; only hardcoded-AND-drifted is a real bug) → synthesize.
 **Fix policy:** audit-and-report first; pricing fixes applied by hand with parity testing after Erik greenlights (same as the SCP fix went).
 
+## ✅ Fix batch shipped 2026-07-01 (Erik's constraint: must match the quote builders + Express Order)
+
+**Shipped + live-verified** (all 4 confirmed against their live target file, not dead code):
+1. **Embroidery Pricing All — Full Back LTM $100 → $50.** `index.html:573` + `embroidery-pricing-all.js buildStitchChargesFullBackTable()` now render the LTM from live `CONTRACT_PRICING.fullBack.ltmFee`/`.ltmThreshold` (spans `#esFbLtmFee`/`#esFbLtmRange`), $50 fallback. **Parity proven before changing:** $50 matches the contract-pricing source AND the retail EMB builder (pricing-bundle EMB tier 1-7 = $50) AND `Service_Codes LTM` ($50); Express storefronts have no Full-Back-embroidery LTM to conflict. The old $100 agreed with nothing.
+2. **Deleted dead `laser-tumbler-calculator.js` + `laser-tumbler-quote-service.js`** (grep-confirmed zero HTML loads them; live page uses `laser-tumbler-simple.js` + `jds-api-service.js`). ACTIVE_FILES.md updated.
+3. **Christmas Bundles email-masks fix** — the 10s `Promise.race` email timeout now has its own try/catch so a hang/timeout can't reject into the outer submit catch and falsely report a saved order as failed.
+4. **Safety Stripe Creator email-masks fix** — save + email tracked independently; success shown if the design saved even when the (placeholder-template) email fails. This one fired on EVERY submit before, so it's a real UX fix.
+
+**⚠️ Audit correction found while fixing — the "Webstores Setup" finding (item #3) was against DEAD code.** `webstores-calculator.js` + `webstores-quote-service.js` are orphaned (only reference each other; nothing loads them). The LIVE webstore tool is the AI-chat `shared_components/js/webstore-pricing-page.js` (loaded by `webstores.html:291`), which handles BOTH webstore-setup AND fundraiser quotes via the backend `contract-webstore-ai.js`. So my submit-flow edits to the dead files were **reverted**, not shipped. The real webstore tool was never audited for the submit bugs.
+
+**Deferred (not in this batch):**
+- **Leatherette Patch** double-ID + tier-label drift — its only repo file is the quote-service; the real UI is an out-of-repo Caspio DataPage, so a fix here would be a no-op until that DataPage passes its shown ID. Needs the DataPage change.
+- **Webstores** — delete the 3 dead files (`webstores-calculator.js`, `webstores-quote-service.js`, `webstores-fundraiser.js`) AND audit/fix the LIVE `webstore-pricing-page.js` submit flow + wire `contract-webstore-ai.js` fundraiser defaults (margin/ccFee/embellishment/decoration) to Caspio (proxy repo — needs Erik's margin/ccFee policy call).
+- Everything under "Suggested fix order" items 5–7 (Webstores pricing→Service_Codes, Christmas retail values, latent-drift hardening on the 6 MATCHES_LIVE files).
+
 ## Bottom line
 
 **14 live calculators audited. NO calculator is auto-quoting a customer a wrong price today** — the SCP calculator was the one genuinely-broken surface, and it's already fixed. Findings:
