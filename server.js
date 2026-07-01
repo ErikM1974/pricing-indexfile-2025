@@ -3507,26 +3507,85 @@ async function buildMyProducts(cid) {
   list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
   return { products: list };
 }
-// Build the curated recommendations strip (Erik-managed table), enriched with images.
-async function buildRecommendations() {
+// Short-TTL memo so /my-products and /recommendations (both fired on portal load) SHARE one
+// order-history fetch per customer instead of doubling the ManageOrders round-trips.
+const _myProductsCache = new Map(); // cid → { t, promise }
+function buildMyProductsCached(cid) {
+  const key = String(cid);
+  const hit = _myProductsCache.get(key);
+  if (hit && (Date.now() - hit.t) < 120000) return hit.promise;
+  const promise = buildMyProducts(key).catch(err => { _myProductsCache.delete(key); throw err; });
+  _myProductsCache.set(key, { t: Date.now(), promise });
+  return promise;
+}
+
+// PER-CUSTOMER recommendations from the Erik-curated candidate pool (Portal_Recommendations):
+// drop anything the customer already buys, rank by absolute gross-margin $/pc, fill a fixed
+// 4-premium / 2-popular mix, and show each in the customer's usual color when it exists. The pool
+// carries the "Earn $X" Reward_Text (pill). Never throws the page empty. cid may be '' (staff w/o id).
+const REC_PREMIUM_SLOTS = 4, REC_POPULAR_SLOTS = 2, REC_TOTAL = 6;
+async function buildRecommendations(cid) {
   const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
   if (!r.ok) throw new Error('recs ' + r.status);
-  const recs = ((await r.json()).recommendations || []).slice(0, 12);
-  await Promise.all(recs.map(async (rec) => {
-    const pd = await portalProductDisplay(rec.style, rec.color);
+  const pool = ((await r.json()).recommendations || []).filter(x => x.style);
+
+  // What THIS customer already buys + the colors they order (best-effort; recs still work if it fails).
+  const ownedStyles = new Set(); const colorByStyle = {}; const colorCount = {};
+  if (cid) {
+    try {
+      const mine = (await buildMyProductsCached(cid)).products || [];
+      for (const p of mine) {
+        const bs = String(p.style || '').toUpperCase();
+        if (bs) ownedStyles.add(bs);
+        if (p.color) {
+          colorCount[p.color] = (colorCount[p.color] || 0) + (Number(p.timesOrdered) || 1);
+          if (bs && !colorByStyle[bs]) colorByStyle[bs] = p.color;
+        }
+      }
+    } catch (_) { /* no history → recommend from the whole pool */ }
+  }
+  const houseColor = Object.keys(colorCount).sort((a, b) => colorCount[b] - colorCount[a])[0] || '';
+
+  // Rank by absolute margin $/pc (Sell_Anchor × GP%); Erik's Priority is the tiebreak/override.
+  const score = x => (Number(x.sellAnchor) || 0) * (x.gpPct > 1 ? x.gpPct / 100 : (Number(x.gpPct) || 0));
+  const byRank = (a, b) => (a.priority - b.priority) || (score(b) - score(a));
+  const avail = pool.filter(x => !ownedStyles.has(String(x.style).toUpperCase()));
+  const premium = avail.filter(x => x.isPremium).sort(byRank);
+  const popular = avail.filter(x => !x.isPremium).sort(byRank);
+
+  // Fill 4 premium / 2 popular, backfilling from the other tier (premium first — that's the strategy).
+  const picked = [];
+  const fill = (arr, n) => { for (const x of arr) { if (picked.length >= REC_TOTAL || n <= 0) break; if (!picked.includes(x)) { picked.push(x); n--; } } };
+  fill(premium, REC_PREMIUM_SLOTS);
+  fill(popular, REC_POPULAR_SLOTS);
+  fill([...premium, ...popular].filter(x => !picked.includes(x)), REC_TOTAL - picked.length);
+  if (!picked.length) fill(pool.slice().sort(byRank), REC_TOTAL); // last-ditch: never empty
+
+  // Enrich with the customer's usual color + image; keep the reward pill text from the pool.
+  await Promise.all(picked.map(async (rec) => {
+    const preferred = rec.color || colorByStyle[String(rec.style).toUpperCase()] || houseColor || '';
+    const pd = await portalProductDisplay(rec.style, preferred);
+    rec.color = pd.matched ? preferred : '';   // only claim a color if it matched a real garment image
     rec.image = pd.image; rec.title = rec.title || pd.title; rec.comingSoon = !pd.image;
   }));
-  return { recommendations: recs.filter(x => x.style) }; // keep all; FE shows "Coming soon" when no image
+  // Customer-safe projection — NEVER ship internal margin/cost fields (gpPct, sellAnchor, brand,
+  // priority, isPremium) to the browser. Ranking above already used them; the card doesn't.
+  return {
+    recommendations: picked.map(r => ({
+      style: r.style, color: r.color, title: r.title, blurb: r.blurb, category: r.category,
+      image: r.image, comingSoon: r.comingSoon, rewardText: r.rewardText,
+    })),
+  };
 }
 
 // GET /api/portal/my-products — the logged-in customer's personalized re-order catalog.
 app.get('/api/portal/my-products', portalLimiter, requireCustomer, async (req, res) => {
-  try { res.json(await buildMyProducts(String(req.customerSession.portalCustomer.idCustomer))); }
+  try { res.json(await buildMyProductsCached(String(req.customerSession.portalCustomer.idCustomer))); }
   catch (err) { console.error('[Portal] my-products failed:', err.message); res.status(503).json({ error: 'Catalog temporarily unavailable' }); }
 });
-// GET /api/portal/recommendations — the curated strip (Erik-managed), enriched with images.
+// GET /api/portal/recommendations — PER-CUSTOMER recs (pool ranked vs this customer's history).
 app.get('/api/portal/recommendations', portalLimiter, requireCustomer, async (req, res) => {
-  try { res.json(await buildRecommendations()); }
+  try { res.json(await buildRecommendations(String(req.customerSession.portalCustomer.idCustomer))); }
   catch (err) { console.error('[Portal] recommendations failed:', err.message); res.json({ recommendations: [] }); }
 });
 // GET /api/portal/product-colors/:style — available colors (name + garment image + swatch) for
@@ -3732,12 +3791,15 @@ app.get('/api/portal-admin/preview/:id/orders', requireCrmRole(PORTAL_ADMIN_ROLE
 app.get('/api/portal-admin/preview/:id/my-products', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
   const cid = String(req.params.id || '');
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
-  try { res.json(await buildMyProducts(cid)); }
+  try { res.json(await buildMyProductsCached(cid)); }
   catch (err) { console.error('[portal-admin] preview my-products failed:', err.message); res.status(503).json({ error: 'Catalog preview unavailable' }); }
 });
-// GET /api/portal-admin/preview/:id/recommendations — the recs strip, for staff preview.
+// GET /api/portal-admin/preview/:id/recommendations — PER-CUSTOMER recs, for staff preview.
+// (Previously dropped :id and showed the generic list — now threads the previewed customer's id.)
 app.get('/api/portal-admin/preview/:id/recommendations', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
-  try { res.json(await buildRecommendations()); }
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try { res.json(await buildRecommendations(cid)); }
   catch (err) { console.error('[portal-admin] preview recs failed:', err.message); res.json({ recommendations: [] }); }
 });
 // GET /api/portal-admin/preview/:id/product-colors/:style — color options, for staff preview.
