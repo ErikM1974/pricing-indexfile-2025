@@ -1,3 +1,8 @@
+## v2026.07.01.11 (2026-07-01)
+
+- docs(portal): My Logos image+click fixes + 3 gotchas (MAIN_IMAGE=garment, /art-request=staff page, approv regex)
+- feat(portal): My Logos lightbox loads the LARGE Box image (?size=large → 1024/full), grid stays 256px
+
 ## v2026.07.01.10 (2026-07-01)
 
 - fix(portal): My Logos 'Approved' badge — exact-match status ('Awaiting Approval' was wrongly flagged approved)
