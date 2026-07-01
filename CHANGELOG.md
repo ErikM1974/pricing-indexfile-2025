@@ -1,3 +1,9 @@
+## v2026.07.01.12 (2026-07-01)
+
+- docs(portal): My Logos lightbox uses full-res Box image (?size=large)
+- docs(portal): decision — My Logos proof sheet stays as-is (it's what Steve sends the customer)
+- fix(portal): My Logos never shows the SanMar catalog stock photo — real design proofs only
+
 ## v2026.07.01.11 (2026-07-01)
 
 - docs(portal): My Logos image+click fixes + 3 gotchas (MAIN_IMAGE=garment, /art-request=staff page, approv regex)
