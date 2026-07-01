@@ -416,6 +416,15 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 }
 .cp-rec-reward-star { color: var(--cp-gold); }
 
+/* Ordered-color swatches on a "Your Products" card (one card per style, catalog-style) */
+.cp-swatches { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin: 1px 0 9px; }
+.cp-swatch {
+    width: 18px; height: 18px; border-radius: 4px; object-fit: cover;
+    border: 1px solid var(--cp-border); background: var(--cp-surface-2); flex: 0 0 auto;
+}
+.cp-swatch--noimg { background: var(--cp-gray-100); }
+.cp-swatch-more { font-size: 11px; font-weight: 700; color: var(--cp-ink-mute); margin-left: 2px; }
+
 /* ══ COMING-SOON PAIR — Mockups + Art & Designs (bottom of page) ══
    Does NOT touch .cp-card rendering, so real cards still show for
    customers who have them. */

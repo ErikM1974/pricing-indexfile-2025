@@ -3504,8 +3504,36 @@ async function buildMyProducts(cid) {
     p.image = pd.image; p.title = pd.title || p.description; p.colorMatched = pd.matched;
     delete p._sizesFrom;
   }));
-  list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
-  return { products: list };
+  // Collapse to ONE card per STYLE (catalog-style): the most-recent color is the primary image,
+  // and EVERY color the customer ordered becomes a swatch. (Was one card per style+color, which
+  // repeated the same garment many times for customers who buy a style in several colors.)
+  const byStyle = new Map();
+  for (const p of list) {
+    const k = String(p.style).toUpperCase();
+    if (!byStyle.has(k)) byStyle.set(k, []);
+    byStyle.get(k).push(p);
+  }
+  const grouped = [];
+  for (const items of byStyle.values()) {
+    items.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
+    const primary = items[0];                            // most-recent color → the card's main image + default
+    const rows = await portalStyleRows(primary.style);   // cached (portalProductDisplay already fetched it)
+    const seen = new Set(); const colors = [];
+    for (const it of items) {
+      const key = String(it.color || '').toLowerCase();
+      if (!it.color || seen.has(key)) continue;
+      seen.add(key);
+      const m = portalMatchColor(rows, it.color);
+      colors.push({ name: it.color, swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: it.image || (m ? portalRowImage(m) : '') });
+    }
+    grouped.push(Object.assign({}, primary, {
+      colors,                                            // every ordered color (name + swatch) — FE shows these
+      colorCount: colors.length,
+      timesOrdered: items.reduce((s, x) => s + (Number(x.timesOrdered) || 1), 0),
+    }));
+  }
+  grouped.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
+  return { products: grouped };
 }
 // Short-TTL memo so /my-products and /recommendations (both fired on portal load) SHARE one
 // order-history fetch per customer instead of doubling the ManageOrders round-trips.

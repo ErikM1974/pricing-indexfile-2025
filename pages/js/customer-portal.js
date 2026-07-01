@@ -332,7 +332,18 @@
         var img = p.image
             ? '<img src="' + escapeHtml(p.image) + '" alt="" loading="lazy" onerror="this.parentElement.classList.add(\'cp-noimg\');this.remove();">'
             : (comingSoon ? '<div class="cp-coming-soon">Coming soon</div>' : '');
-        var sub = [p.color, (p.designNumber ? 'Design #' + p.designNumber : '')].filter(Boolean).join(' · ');
+        var colors = (kind === 'product' && p.colors) ? p.colors : [];
+        var sub = (colors.length > 1)
+            ? (colors.length + ' colors ordered' + (p.designNumber ? ' · Design #' + p.designNumber : ''))
+            : [p.color, (p.designNumber ? 'Design #' + p.designNumber : '')].filter(Boolean).join(' · ');
+        // Ordered-color swatches (catalog style) — only when the style was bought in more than one color.
+        var swatches = (colors.length > 1)
+            ? ('<div class="cp-swatches">' + colors.slice(0, 8).map(function (c) {
+                return c.swatch
+                    ? '<img class="cp-swatch" src="' + escapeHtml(c.swatch) + '" alt="' + escapeHtml(c.name) + '" title="' + escapeHtml(c.name) + '" loading="lazy" onerror="this.style.display=\'none\'">'
+                    : '<span class="cp-swatch cp-swatch--noimg" title="' + escapeHtml(c.name) + '"></span>';
+              }).join('') + (colors.length > 8 ? '<span class="cp-swatch-more">+' + (colors.length - 8) + '</span>' : '') + '</div>')
+            : '';
         var meta = (kind === 'product' && p.lastOrdered) ? 'Last ordered ' + formatDate(p.lastOrdered) : (p.blurb || '');
         var btnLabel = kind === 'product' ? 'Re-order' : 'Ask for a quote';
         // Reward pill (premium recommendations only) — marketing label, no money moves. Blank = hidden.
@@ -346,6 +357,7 @@
             '<div class="cp-product-body">' +
                 '<div class="cp-product-title">' + escapeHtml(title) + '</div>' +
                 (sub ? '<div class="cp-product-sub">' + escapeHtml(sub) + '</div>' : '') +
+                swatches +
                 (meta ? '<div class="cp-product-meta">' + escapeHtml(meta) + '</div>' : '') +
                 reward +
                 '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
