@@ -1,6 +1,11 @@
-# Customer Portal — Phase 4 Build Plan: Personalized Catalog + Re-order
+# Customer Portal — Phase 4: Personalized Catalog + Re-order
 
-**Status:** PLANNED 2026-06-30, not built. Sits on top of the LIVE authenticated portal + admin console (→ CASPIO_PORTAL_DESIGN.md). Grounded in a 35-tool Explore of the catalog/cart/pricing/rewards code.
+**Status:** ✅ **4a + 4b SHIPPED LIVE 2026-06-30** (FE v2026.06.30.2 + proxy v2026.06.30.2). Sits on top of the LIVE authenticated portal + admin console (→ CASPIO_PORTAL_DESIGN.md).
+
+**What shipped:** `GET /api/portal/my-products` (order history → distinct base-style+color products, image via `/api/product-details` COLOR_NAME match; verified against Lincoln 13616 → ST254/PC54/TST254) · `GET /api/portal/recommendations` (Erik-curated `Portal_Recommendations`) · `POST /api/portal/reorder-request` (rate-limited, session-scoped, NO price) → proxy `src/routes/portal-reorder.js` writes `Portal_Reorder_Requests` (rep looked up from `Sales_Reps_2026`, Request_Num `RR-YYYYMMDD-HHMMSS`, Status=New) + best-effort Slack ping. Portal UI = "Your Products" + "Recommended for You" card grids + request modal (`customer-portal.{html,js,css}`); catalog skipped in staff-preview.
+**Remaining (fast-follows):** ① rep work-queue = a **Caspio DataPage** on `Portal_Reorder_Requests` (or a dash-page) — proxy already has `GET/PUT/DELETE /api/portal-reorder/requests`. ② curate `Portal_Recommendations` rows (none yet → strip hidden). ③ per-rep email + a real Slack webhook (`SLACK_PORTAL_REQUESTS_WEBHOOK_URL`) — today notification = the saved row + best-effort Slack. ④ "Build quote" deep-link prefill; customer "Your requests" status list; catalog-in-staff-preview.
+
+Original plan below (grounded in a 35-tool Explore of the catalog/cart/pricing/rewards code).
 
 ## Locked decisions (Erik, 2026-06-30)
 1. **Re-order action = Request → routes to the customer's rep.** Customer picks item + qty; it lands with their sales rep as a request the rep finishes into a real quote/order. **No customer-facing price, no payment.** (Self-serve price+checkout = a later Phase 4b; deliberately out of scope.)
