@@ -1,3 +1,8 @@
+## v2026.06.30.3 (2026.06.30)
+
+- docs(portal): Phase 4 catalog + re-order SHIPPED — status + remaining fast-follows
+- fix(portal-p4): show catalog in staff preview via mirror endpoints + seed recommendations (catalog was hidden in preview)
+
 ## v2026.06.30.2 (2026.06.30)
 
 - docs(portal): Customer Portals admin console SHIPPED + catalog/rewards next-phase reuse map
