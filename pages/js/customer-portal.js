@@ -82,7 +82,8 @@
         document.getElementById('cp-section-logos').style.display = 'block';
 
         // Approved/Completed = the customer's FINAL artwork ("Completed" = the job actually ran).
-        var isApproved = function (s) { return /(approv|complet)/i.test(String(s || '')); };
+        // Exact match — NOT a substring, or "Awaiting Approval" would wrongly count as approved.
+        var isApproved = function (s) { var t = String(s || '').trim().toLowerCase(); return t === 'approved' || t === 'completed' || t === 'complete'; };
         var items = [];
         (mockups || []).forEach(function (m) {
             var img = m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
