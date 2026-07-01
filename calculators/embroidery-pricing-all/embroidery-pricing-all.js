@@ -853,6 +853,17 @@ function buildStitchChargesFullBackTable() {
     html += '</tr>';
 
     tbody.innerHTML = html;
+
+    // LTM fee + range are LIVE from Caspio (contract-pricing fullBack.ltmFee/ltmThreshold),
+    // never hardcoded — matches the $50 the retail EMB builder + Service_Codes LTM use.
+    // (Fixed 2026-07-01: the static text said $100, contradicting the live $50 shown
+    //  everywhere else on the page.)
+    const ltmFeeEl = document.getElementById('esFbLtmFee');
+    const ltmRangeEl = document.getElementById('esFbLtmRange');
+    const fbLtmFee = CONTRACT_PRICING.fullBack.ltmFee;
+    const fbLtmThreshold = CONTRACT_PRICING.fullBack.ltmThreshold;
+    if (ltmFeeEl && Number.isFinite(fbLtmFee)) ltmFeeEl.textContent = formatPrice(fbLtmFee);
+    if (ltmRangeEl && Number.isFinite(fbLtmThreshold)) ltmRangeEl.textContent = `1–${fbLtmThreshold}`;
 }
 
 /**

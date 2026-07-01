@@ -58,8 +58,7 @@
                     document.title = 'Your Account | NWCA';
                 }
 
-                renderMockups(data.mockups || [], custId);
-                renderArtRequests(data.artRequests || [], custId);
+                renderMyLogos(data.mockups || [], data.artRequests || [], custId);
 
                 // Show content, hide loading
                 document.getElementById('cp-loading').style.display = 'none';
@@ -72,134 +71,69 @@
             });
     }
 
-    // ── Render mockup cards ──
-    function renderMockups(mockups, custId) {
-        var grid = document.getElementById('cp-mockup-grid');
-        var countEl = document.getElementById('cp-mockup-count');
-        var emptyEl = document.getElementById('cp-mockup-empty');
+    // ── My Logos: the customer's logos + design proofs (mockups + art), grouped by design ──
+    // Phase 0: pure front-end — /api/portal already returns customer-scoped, image-filtered,
+    // allowlist-projected mockups + art (2026+ per PORTAL_DATE_CUTOFF). We just merge, dedup by
+    // design #, and show one card per logo. (Phase 1 adds the not-date-gated brand-logo table.)
+    function renderMyLogos(mockups, artRequests, custId) {
+        var grid = document.getElementById('cp-logos-grid');
+        var countEl = document.getElementById('cp-logos-count');
+        var emptyEl = document.getElementById('cp-logos-empty');
+        document.getElementById('cp-section-logos').style.display = 'block';
 
-        countEl.textContent = mockups.length;
-
-        if (mockups.length === 0) {
-            grid.style.display = 'none';
-            emptyEl.style.display = 'flex'; // .cp-soon-panel is a centered flex column
-            return;
-        }
-
-        // Sort: action-needed first, then newest
-        mockups.sort(function (a, b) {
-            var aAction = needsAction(a.Status) ? 0 : 1;
-            var bAction = needsAction(b.Status) ? 0 : 1;
-            if (aAction !== bAction) return aAction - bAction;
-            return new Date(b.Submitted_Date || 0) - new Date(a.Submitted_Date || 0);
+        var items = [];
+        (mockups || []).forEach(function (m) {
+            if (!m.Box_Mockup_1) return;
+            items.push({
+                design: String(m.Design_Number || ''),
+                name: m.Design_Name || (m.Design_Number ? 'Design #' + m.Design_Number : 'Design'),
+                meta: [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · '),
+                img: m.Box_Mockup_1, date: m.Submitted_Date || '', kind: 'mockup',
+                href: '/mockup/' + encodeURIComponent(m.ID) + '?view=customer&cid=' + encodeURIComponent(custId)
+            });
+        });
+        (artRequests || []).forEach(function (a) {
+            if (!a.MAIN_IMAGE_URL_1) return;
+            items.push({
+                design: String(a.Design_Num_SW || ''),
+                name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
+                meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
+                img: a.MAIN_IMAGE_URL_1, date: a.Date_Created || '', kind: 'art',
+                href: '/art-request/' + encodeURIComponent(a.ID_Design) + '?view=customer&cid=' + encodeURIComponent(custId)
+            });
         });
 
-        var html = '';
-        mockups.forEach(function (m) {
-            var imgUrl = m.Box_Mockup_1 ? ('/api/image-proxy?url=' + encodeURIComponent(m.Box_Mockup_1)) : '';
-            var isAction = needsAction(m.Status);
-            var designLabel = m.Design_Number ? ('Design #' + escapeHtml(m.Design_Number)) : 'Mockup';
-            var meta = [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · ');
+        // Group by design # so a logo's mockup + art proof collapse into ONE card (prefer the
+        // mockup image; keep the newest). Undesigned items key by their own link so nothing is lost.
+        var byKey = {};
+        items.forEach(function (it) {
+            var key = it.design ? ('d:' + it.design) : ('u:' + it.href);
+            var ex = byKey[key];
+            if (!ex) { byKey[key] = it; return; }
+            var better = (it.kind === 'mockup' && ex.kind !== 'mockup') ||
+                (it.kind === ex.kind && String(it.date) > String(ex.date));
+            if (better) byKey[key] = it;
+        });
+        var logos = Object.keys(byKey).map(function (k) { return byKey[k]; })
+            .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
 
-            html += '<a class="cp-card' + (isAction ? ' cp-card--action-needed' : '') + '" '
-                + 'href="/mockup/' + encodeURIComponent(m.ID) + '?view=customer&cid=' + encodeURIComponent(custId) + '" target="_blank">'
-                + '<div class="cp-card-image">';
-
-            if (imgUrl) {
-                html += '<img src="' + imgUrl + '" alt="Mockup" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#128085;</div>\'">';
-            } else {
-                html += '<div class="cp-card-placeholder">&#128085;</div>';
-            }
-
-            if (isAction) {
-                html += '<div class="cp-action-badge">Action Needed</div>';
-            }
-
-            html += '</div>'
+        countEl.textContent = logos.length;
+        if (!logos.length) { grid.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
+        emptyEl.style.display = 'none';
+        grid.innerHTML = logos.map(function (l) {
+            var img = '<img src="/api/image-proxy?url=' + encodeURIComponent(l.img) + '" alt="" loading="lazy" '
+                + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
+            return '<a class="cp-card" href="' + l.href + '" target="_blank">'
+                + '<div class="cp-card-image">' + img + '</div>'
                 + '<div class="cp-card-body">'
-                + '<div class="cp-card-design">' + designLabel + '</div>'
-                + '<div class="cp-card-name">' + escapeHtml(m.Design_Name || '') + '</div>';
-
-            if (meta) {
-                html += '<div class="cp-card-meta">' + escapeHtml(meta) + '</div>';
-            }
-
-            html += '<div class="cp-card-footer">'
-                + renderStatusBadge(m.Status)
-                + '<div class="cp-card-date">' + formatDate(m.Submitted_Date) + '</div>'
-                + '</div>'
+                    + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
+                    + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')
+                    + '<div class="cp-card-footer">'
+                        + '<span class="cp-card-view">View design &rarr;</span>'
+                        + '<div class="cp-card-date">' + formatDate(l.date) + '</div>'
+                    + '</div>'
                 + '</div></a>';
-        });
-
-        grid.innerHTML = html;
-    }
-
-    // ── Render art request cards ──
-    function renderArtRequests(artRequests, custId) {
-        var grid = document.getElementById('cp-art-grid');
-        var countEl = document.getElementById('cp-art-count');
-        var emptyEl = document.getElementById('cp-art-empty');
-
-        countEl.textContent = artRequests.length;
-
-        if (artRequests.length === 0) {
-            grid.style.display = 'none';
-            emptyEl.style.display = 'flex'; // .cp-soon-panel is a centered flex column
-            return;
-        }
-
-        // Sort: action-needed first, then newest
-        artRequests.sort(function (a, b) {
-            var aAction = needsAction(a.Status) ? 0 : 1;
-            var bAction = needsAction(b.Status) ? 0 : 1;
-            if (aAction !== bAction) return aAction - bAction;
-            return new Date(b.Date_Created || 0) - new Date(a.Date_Created || 0);
-        });
-
-        var html = '';
-        artRequests.forEach(function (ar) {
-            var imgUrl = ar.MAIN_IMAGE_URL_1 ? ('/api/image-proxy?url=' + encodeURIComponent(ar.MAIN_IMAGE_URL_1)) : '';
-            var isAction = needsAction(ar.Status);
-            var designLabel = ar.Design_Num_SW ? ('Design #' + escapeHtml(String(ar.Design_Num_SW))) : 'Art Request';
-            var garmentInfo = [ar.GarmentStyle, ar.GarmentColor].filter(Boolean).join(' · ');
-            var orderType = ar.Order_Type || '';
-
-            // Deep-link by ID_Design (the key the detail page queries on), carrying
-            // cid so the gated detail endpoint can authorize the row → this customer.
-            html += '<a class="cp-card' + (isAction ? ' cp-card--action-needed' : '') + '" '
-                + 'href="/art-request/' + encodeURIComponent(ar.ID_Design) + '?view=customer&cid=' + encodeURIComponent(custId) + '" target="_blank">'
-                + '<div class="cp-card-image">';
-
-            if (imgUrl) {
-                html += '<img src="' + imgUrl + '" alt="Design" loading="lazy" onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
-            } else {
-                html += '<div class="cp-card-placeholder">&#127912;</div>';
-            }
-
-            if (isAction) {
-                html += '<div class="cp-action-badge">Action Needed</div>';
-            }
-
-            html += '</div>'
-                + '<div class="cp-card-body">'
-                + '<div class="cp-card-design">' + designLabel + '</div>';
-
-            if (garmentInfo) {
-                html += '<div class="cp-card-name">' + escapeHtml(garmentInfo) + '</div>';
-            }
-
-            if (orderType) {
-                html += '<div class="cp-card-meta">' + escapeHtml(String(orderType)) + '</div>';
-            }
-
-            html += '<div class="cp-card-footer">'
-                + renderStatusBadge(ar.Status)
-                + '<div class="cp-card-date">' + formatDate(ar.Date_Created) + '</div>'
-                + '</div>'
-                + '</div></a>';
-        });
-
-        grid.innerHTML = html;
+        }).join('');
     }
 
     // ── Helpers ──

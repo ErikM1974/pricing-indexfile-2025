@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.01.6">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.01.7">
 </head>
 <body>
     <!-- Header -->
@@ -72,6 +72,22 @@
             <div class="cp-product-grid" id="cp-recs-grid"></div>
         </section>
 
+        <!-- My Logos — the customer's logos + design proofs on file (auto-surfaced from mockups + art) -->
+        <section class="cp-section" id="cp-section-logos" style="display:none;">
+            <div class="cp-section-header">
+                <h2>My Logos</h2>
+                <span class="cp-section-count" id="cp-logos-count">0</span>
+            </div>
+            <p class="cp-section-sub">Your logos and design proofs we have on file — ready to run again.</p>
+            <div class="cp-card-grid" id="cp-logos-grid"></div>
+            <div class="cp-soon-panel" id="cp-logos-empty" style="display:none;">
+                <div class="cp-soon-icon" aria-hidden="true">&#127912;</div>
+                <div class="cp-soon-title">Your logos are on their way</div>
+                <div class="cp-soon-text">We&rsquo;re gathering your logos and design proofs here. Your rep has every file on hand today &mdash; just ask.</div>
+                <a class="cp-soon-cta" href="tel:12539225793">Call (253) 922-5793</a>
+            </div>
+        </section>
+
         <!-- Orders section (moved up — the customer's live business) -->
         <section class="cp-section" id="cp-section-orders">
             <div class="cp-section-header">
@@ -98,38 +114,6 @@
             </div>
         </section>
 
-        <!-- Mockups section (Coming Soon — portal display not fully wired) -->
-        <section class="cp-section cp-section--soon" id="cp-section-mockups">
-            <div class="cp-section-header">
-                <h2>Mockups</h2>
-                <span class="cp-section-count" id="cp-mockup-count">0</span>
-                <span class="cp-soon-pill">Coming Soon</span>
-            </div>
-            <div class="cp-card-grid" id="cp-mockup-grid"></div>
-            <!-- Same id (#cp-mockup-empty) so renderMockups keeps toggling it; only the class + inner markup changed. -->
-            <div class="cp-soon-panel" id="cp-mockup-empty" style="display:none;">
-                <div class="cp-soon-icon" aria-hidden="true">&#128444;</div>
-                <div class="cp-soon-title">Your mockups are coming soon</div>
-                <div class="cp-soon-text">We&rsquo;re wiring up live mockup previews for your account. In the meantime your rep can email or text any proof &mdash; just ask.</div>
-                <a class="cp-soon-cta" href="tel:12539225793">Call (253) 922-5793</a>
-            </div>
-        </section>
-
-        <!-- Art &amp; Designs section (Coming Soon — portal display not fully wired) -->
-        <section class="cp-section cp-section--soon" id="cp-section-art">
-            <div class="cp-section-header">
-                <h2>Art &amp; Designs</h2>
-                <span class="cp-section-count" id="cp-art-count">0</span>
-                <span class="cp-soon-pill">Coming Soon</span>
-            </div>
-            <div class="cp-card-grid" id="cp-art-grid"></div>
-            <div class="cp-soon-panel" id="cp-art-empty" style="display:none;">
-                <div class="cp-soon-icon" aria-hidden="true">&#127912;</div>
-                <div class="cp-soon-title">Your artwork is coming soon</div>
-                <div class="cp-soon-text">Approved designs and art proofs for your account will live here soon. Your rep has every file on hand today &mdash; reach out anytime.</div>
-                <a class="cp-soon-cta" href="tel:12539225793">Call (253) 922-5793</a>
-            </div>
-        </section>
     </main>
 
     <!-- Re-order request modal -->
@@ -200,6 +184,6 @@
     </div>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.01.6"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.01.7"></script>
 </body>
 </html>

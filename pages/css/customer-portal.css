@@ -176,6 +176,8 @@ body {
     border-top: 1px solid var(--cp-border-soft);
 }
 .cp-card-date { font-size: 11px; color: var(--cp-ink-mute); }
+.cp-card-view { font-size: 12px; font-weight: 700; color: var(--cp-theme-dark); }
+.cp-card:hover .cp-card-view { color: var(--cp-theme); }
 
 /* Action-needed highlight — thin, tokenized */
 .cp-card--action-needed {
