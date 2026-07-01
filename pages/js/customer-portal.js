@@ -81,6 +81,8 @@
         var emptyEl = document.getElementById('cp-logos-empty');
         document.getElementById('cp-section-logos').style.display = 'block';
 
+        // Approved/Completed = the customer's FINAL artwork ("Completed" = the job actually ran).
+        var isApproved = function (s) { return /(approv|complet)/i.test(String(s || '')); };
         var items = [];
         (mockups || []).forEach(function (m) {
             if (!m.Box_Mockup_1) return;
@@ -89,6 +91,7 @@
                 name: m.Design_Name || (m.Design_Number ? 'Design #' + m.Design_Number : 'Design'),
                 meta: [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · '),
                 img: m.Box_Mockup_1, date: m.Submitted_Date || '', kind: 'mockup',
+                approved: isApproved(m.Status),
                 href: '/mockup/' + encodeURIComponent(m.ID) + '?view=customer&cid=' + encodeURIComponent(custId)
             });
         });
@@ -99,19 +102,21 @@
                 name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
                 meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
                 img: a.MAIN_IMAGE_URL_1, date: a.Date_Created || '', kind: 'art',
+                approved: isApproved(a.Status),
                 href: '/art-request/' + encodeURIComponent(a.ID_Design) + '?view=customer&cid=' + encodeURIComponent(custId)
             });
         });
 
-        // Group by design # so a logo's mockup + art proof collapse into ONE card (prefer the
-        // mockup image; keep the newest). Undesigned items key by their own link so nothing is lost.
+        // Group by design # so a logo's proofs collapse into ONE card. Per design, prefer the
+        // APPROVED/Completed proof (the customer's final artwork) > a mockup over art > the newest.
+        // Nothing is hidden — a design with no approved proof yet still shows its latest.
+        var rank = function (it) { return (it.approved ? 100 : 0) + (it.kind === 'mockup' ? 10 : 0); };
         var byKey = {};
         items.forEach(function (it) {
             var key = it.design ? ('d:' + it.design) : ('u:' + it.href);
             var ex = byKey[key];
             if (!ex) { byKey[key] = it; return; }
-            var better = (it.kind === 'mockup' && ex.kind !== 'mockup') ||
-                (it.kind === ex.kind && String(it.date) > String(ex.date));
+            var better = rank(it) > rank(ex) || (rank(it) === rank(ex) && String(it.date) > String(ex.date));
             if (better) byKey[key] = it;
         });
         var logos = Object.keys(byKey).map(function (k) { return byKey[k]; })
@@ -123,8 +128,9 @@
         grid.innerHTML = logos.map(function (l) {
             var img = '<img src="/api/image-proxy?url=' + encodeURIComponent(l.img) + '" alt="" loading="lazy" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
+            var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
             return '<a class="cp-card" href="' + l.href + '" target="_blank">'
-                + '<div class="cp-card-image">' + img + '</div>'
+                + '<div class="cp-card-image">' + img + badge + '</div>'
                 + '<div class="cp-card-body">'
                     + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
                     + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')

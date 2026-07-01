@@ -178,6 +178,13 @@ body {
 .cp-card-date { font-size: 11px; color: var(--cp-ink-mute); }
 .cp-card-view { font-size: 12px; font-weight: 700; color: var(--cp-theme-dark); }
 .cp-card:hover .cp-card-view { color: var(--cp-theme); }
+/* "Approved" badge on a My Logos card (the customer's final artwork) */
+.cp-logo-approved {
+    position: absolute; top: 8px; left: 8px;
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #e4f3e6; color: #1b6b2c; border: 1px solid #b4dcbb;
+    font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+}
 
 /* Action-needed highlight — thin, tokenized */
 .cp-card--action-needed {
