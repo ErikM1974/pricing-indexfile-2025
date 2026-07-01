@@ -452,3 +452,20 @@ body {
 @media (max-width: 600px) {
     .cp-product-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 }
+
+/* ── Phase 5: reward dollars card ── */
+.cp-rewards {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    background: linear-gradient(135deg, #1b5e20, #2e7d32);
+    color: #fff; border-radius: var(--cp-radius); padding: 16px 22px; margin-bottom: 20px;
+    border: 1px solid #caa63a;
+}
+.cp-rewards-label { font-size: 13px; color: #d9f0dd; font-weight: 600; letter-spacing: .02em; }
+.cp-rewards-star { color: #ffd54f; }
+.cp-rewards-balance { font-size: 30px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+.cp-rewards-btn {
+    background: #ffd54f; color: #1b3a1e; border: none; border-radius: 8px;
+    padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
+    white-space: nowrap; transition: background .15s;
+}
+.cp-rewards-btn:hover { background: #ffca28; }
