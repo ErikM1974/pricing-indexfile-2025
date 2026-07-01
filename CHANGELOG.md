@@ -1,3 +1,12 @@
+## v2026.07.01.7 (2026-07-01)
+
+- docs(portal): Your Products catalog view (one card/style + swatches) shipped
+- docs(portal): My Logos brainstorm + full ID registry (Canva/Box folder ids, key discovery: logos are id-prefixed)
+- docs(memory): calculator pricing audit — 30-agent sweep of all 14 live calculators
+- docs(portal): My Logos refined design — auto-first hybrid, reference-not-copy, phased (P0 = expose getPortalData)
+- fix(calculators): live-source LTM display, delete dead laser code, submit-flow fixes
+- feat(portal): My Logos Phase 0 — one 'My Logos' gallery from existing mockups+art (grouped by design)
+
 ## v2026.07.01.6 (2026-07-01)
 
 - docs(portal): recs Phase 1 SHIPPED (candidate pool + margin ranking + reward pills); reward $ + accrual pending
