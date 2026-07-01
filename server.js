@@ -2472,6 +2472,9 @@ app.all('/api/crm-proxy/customer-portal-access*', ...createCrmProxy('customer-po
 // company-contacts/search is already public (the quote builders use it), but proxying it
 // keeps the admin page same-origin + role-gated + carries the secret harmlessly.
 app.all('/api/crm-proxy/company-contacts*', ...createCrmProxy('company-contacts', PORTAL_ADMIN_ROLES));
+// Re-order request work-queue (Phase 4) — the console's "Requests" tab lists/updates/deletes
+// Portal_Reorder_Requests via the proxy portal-reorder route (GET /requests, PUT/DELETE /requests/:pk).
+app.all('/api/crm-proxy/portal-reorder*', ...createCrmProxy('portal-reorder', PORTAL_ADMIN_ROLES));
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.

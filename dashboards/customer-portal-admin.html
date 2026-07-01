@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.1">
+    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.4">
 </head>
 <body>
     <div class="dash-shell">
@@ -50,6 +50,13 @@
                 email link (no password) and see only their own company's mockups, art, orders and invoices.
             </p>
 
+            <!-- Tabs -->
+            <div class="cpa-tabs">
+                <button class="cpa-tab cpa-tab-active" data-tab="access"><i class="fas fa-id-card-clip"></i> Portal Access</button>
+                <button class="cpa-tab" data-tab="requests"><i class="fas fa-cart-shopping"></i> Re-order Requests <span class="cpa-tab-badge" id="cpa-req-badge" style="display:none;">0</span></button>
+            </div>
+
+            <div id="cpa-view-access">
             <!-- Stats -->
             <div class="dash-stat-grid">
                 <div class="dash-stat-card dash-stat-card--accent">
@@ -91,6 +98,34 @@
                     <span class="cpa-count" id="cpa-rowcount"></span>
                 </div>
                 <div id="content-root" class="dash-loading">Loading…</div>
+            </div>
+            </div><!-- /cpa-view-access -->
+
+            <!-- Re-order Requests view -->
+            <div id="cpa-view-requests" style="display:none;">
+                <div class="cpa-controls">
+                    <div class="cpa-search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="cpa-req-filter" placeholder="Filter by company, product, design or rep…" autocomplete="off">
+                    </div>
+                    <select id="cpa-req-status" class="cpa-select">
+                        <option value="">All statuses</option>
+                        <option value="New">New</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Quoted">Quoted</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                    <button class="cpa-btn cpa-btn-ghost" id="cpa-req-mine-btn" style="display:none;" title="Show only your customers' requests">
+                        <i class="fas fa-user-check"></i> My requests
+                    </button>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title">Re-order Requests</h2>
+                        <span class="cpa-count" id="cpa-req-rowcount"></span>
+                    </div>
+                    <div id="requests-root" class="dash-loading">Loading…</div>
+                </div>
             </div>
         </main>
     </div>
@@ -150,6 +185,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/customer-portal-admin.js?v=2026.06.30.1"></script>
+    <script src="/dashboards/js/customer-portal-admin.js?v=2026.06.30.4"></script>
 </body>
 </html>

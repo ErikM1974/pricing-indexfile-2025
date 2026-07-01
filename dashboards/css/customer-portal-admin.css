@@ -245,3 +245,39 @@
   .cpa-table th.cpa-hide-sm, .cpa-table td.cpa-hide-sm { display: none; }
   .cpa-actions { justify-content: flex-start; }
 }
+
+/* ── Tabs + Re-order Requests view ── */
+.cpa-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--gray-200); margin: 0 0 1.25rem; }
+.cpa-tab {
+  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 10px 16px; font-size: .92rem; font-weight: 600; color: var(--gray-500);
+  cursor: pointer; font-family: inherit; display: inline-flex; align-items: center; gap: 7px;
+  transition: color .15s, border-color .15s;
+}
+.cpa-tab:hover { color: var(--cpa-green-dark); }
+.cpa-tab-active { color: var(--cpa-green-dark); border-bottom-color: var(--cpa-green); }
+.cpa-tab-badge {
+  background: #b3261e; color: #fff; font-size: .68rem; font-weight: 700;
+  min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.cpa-select {
+  padding: 9px 12px; border: 1px solid var(--gray-300); border-radius: var(--radius-md);
+  font-size: .9rem; font-family: inherit; background: #fff; color: var(--gray-700); cursor: pointer;
+}
+.cpa-select:focus { outline: none; border-color: var(--cpa-green); box-shadow: 0 0 0 3px rgba(58,124,82,.12); }
+
+.cpa-req-prod { font-weight: 600; color: var(--gray-900); font-size: .9rem; }
+.cpa-req-sub { font-size: .82rem; color: var(--gray-500); margin-top: 1px; }
+.cpa-req-note { font-size: .82rem; color: var(--gray-600); font-style: italic; margin-top: 3px; }
+
+.cpa-status-select {
+  padding: 5px 8px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm);
+  font-size: .82rem; font-weight: 600; font-family: inherit; cursor: pointer;
+}
+.cpa-status-select:focus { outline: none; border-color: var(--cpa-green); box-shadow: 0 0 0 3px rgba(58,124,82,.12); }
+.cpa-status-new { background: #fdecef; color: #a3203a; border-color: #f3c5cf; }
+.cpa-status-in-progress { background: #fff5e6; color: #8a5300; border-color: #f6d9a8; }
+.cpa-status-quoted { background: #eaf2fb; color: #1b4f8a; border-color: #c3d9f0; }
+.cpa-status-closed { background: var(--gray-100); color: var(--gray-500); border-color: var(--gray-200); }

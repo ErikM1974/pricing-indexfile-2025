@@ -57,7 +57,10 @@
   async function loadMe() {
     try {
       me = await api('/api/portal-admin/me');
-      if (me && me.repName) document.getElementById('cpa-mine-btn').style.display = '';
+      if (me && me.repName) {
+        document.getElementById('cpa-mine-btn').style.display = '';
+        document.getElementById('cpa-req-mine-btn').style.display = '';
+      }
     } catch (e) { if (e.message !== 'auth') console.warn('[portal-admin] whoami failed:', e.message); }
   }
 
@@ -288,6 +291,98 @@
     }
   }
 
+  // ═══ Re-order Requests tab (Phase 4) ═══
+  var REQ_API = '/api/crm-proxy/portal-reorder/requests';
+  var requests = [];
+  var reqFilter = '', reqStatusFilter = '', reqMyOnly = false;
+  var STATUSES = ['New', 'In Progress', 'Quoted', 'Closed'];
+
+  function switchTab(tab) {
+    var isReq = tab === 'requests';
+    document.getElementById('cpa-view-access').style.display = isReq ? 'none' : '';
+    document.getElementById('cpa-view-requests').style.display = isReq ? '' : 'none';
+    Array.prototype.forEach.call(document.querySelectorAll('.cpa-tab'), function (b) {
+      b.classList.toggle('cpa-tab-active', b.getAttribute('data-tab') === tab);
+    });
+    if (isReq) loadRequests();
+  }
+
+  async function loadRequests() {
+    var root = document.getElementById('requests-root');
+    root.className = 'dash-loading'; root.textContent = 'Loading…';
+    try {
+      var data = await api(REQ_API);
+      requests = (data && data.rows) || [];
+      requests.sort(function (a, b) { return String(b.Created || '').localeCompare(String(a.Created || '')); });
+      updateReqBadge();
+      renderRequests();
+    } catch (err) {
+      if (err.message === 'auth') return;
+      DashPage.showError('Unable to load requests: ' + err.message);
+      root.className = ''; root.innerHTML = '<div class="cpa-empty"><i class="fas fa-triangle-exclamation"></i>Could not load requests.</div>';
+    }
+  }
+
+  function updateReqBadge() {
+    var open = requests.filter(function (r) { return r.Status === 'New'; }).length;
+    var b = document.getElementById('cpa-req-badge');
+    if (open > 0) { b.textContent = open; b.style.display = ''; } else { b.style.display = 'none'; }
+  }
+
+  function reqFiltered() {
+    var list = requests;
+    if (reqMyOnly && me && me.repName) { var rn = me.repName.trim().toLowerCase(); list = list.filter(function (r) { return String(r.Rep || '').trim().toLowerCase() === rn; }); }
+    if (reqStatusFilter) list = list.filter(function (r) { return r.Status === reqStatusFilter; });
+    if (reqFilter) { var t = reqFilter.toLowerCase(); list = list.filter(function (r) { return [r.Company_Name, r.Style, r.Product_Title, r.Design_Number, r.Rep, r.Color].some(function (v) { return String(v || '').toLowerCase().indexOf(t) >= 0; }); }); }
+    return list;
+  }
+
+  function renderRequests() {
+    var root = document.getElementById('requests-root'); root.className = '';
+    var rows = reqFiltered();
+    document.getElementById('cpa-req-rowcount').textContent = rows.length + (rows.length === 1 ? ' request' : ' requests');
+    if (!requests.length) { root.innerHTML = '<div class="cpa-empty"><i class="fas fa-cart-shopping"></i>No re-order requests yet. They appear here when customers request from their portal.</div>'; return; }
+    if (!rows.length) { root.innerHTML = '<div class="cpa-empty"><i class="fas fa-magnifying-glass"></i>No requests match your filters.</div>'; return; }
+    var body = rows.map(function (r) {
+      var prod = r.Product_Title || r.Style;
+      var sub = [r.Style, r.Color, (r.Qty ? 'qty ' + r.Qty : '')].filter(Boolean).join(' · ');
+      var slug = String(r.Status || 'New').replace(/\s+/g, '-').toLowerCase();
+      var opts = STATUSES.map(function (s) { return '<option' + (s === r.Status ? ' selected' : '') + '>' + s + '</option>'; }).join('');
+      return '<tr>' +
+        '<td><div class="cpa-company">' + (esc(r.Company_Name) || '—') + '</div><div class="cpa-email">' + esc(r.Email) + '</div></td>' +
+        '<td><div class="cpa-req-prod">' + esc(prod) + '</div><div class="cpa-req-sub">' + esc(sub) + '</div>' + (r.Note ? '<div class="cpa-req-note">&ldquo;' + esc(r.Note) + '&rdquo;</div>' : '') + '</td>' +
+        '<td class="cpa-hide-sm">' + (r.Design_Number ? '#' + esc(r.Design_Number) : '—') + '</td>' +
+        '<td class="cpa-hide-sm cpa-rep">' + (esc(r.Rep) || '—') + '</td>' +
+        '<td><select class="cpa-status-select cpa-status-' + slug + '" data-pk="' + esc(r.PK_ID) + '">' + opts + '</select></td>' +
+        '<td class="cpa-hide-sm">' + fmtLastLogin(r.Created) + '</td>' +
+        '<td><div class="cpa-actions"><button class="cpa-btn-icon cpa-danger" data-req-action="delete" data-pk="' + esc(r.PK_ID) + '" title="Delete request"><i class="fas fa-trash"></i></button></div></td>' +
+      '</tr>';
+    }).join('');
+    root.innerHTML = '<div style="overflow-x:auto"><table class="cpa-table"><thead><tr><th>Customer</th><th>Product</th><th class="cpa-hide-sm">Design</th><th class="cpa-hide-sm">Rep</th><th>Status</th><th class="cpa-hide-sm">Requested</th><th style="text-align:right">Actions</th></tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+
+  async function onRequestsClick(e) {
+    var del = e.target.closest('button[data-req-action="delete"]');
+    if (!del) return;
+    if (!window.confirm('Delete this re-order request?')) return;
+    del.disabled = true;
+    try { await api(REQ_API + '/' + encodeURIComponent(del.getAttribute('data-pk')), { method: 'DELETE' }); toast('Request deleted'); await loadRequests(); }
+    catch (err) { if (err.message !== 'auth') { toast(err.message, true); del.disabled = false; } }
+  }
+  async function onRequestsChange(e) {
+    var sel = e.target.closest('select.cpa-status-select');
+    if (!sel) return;
+    var pk = sel.getAttribute('data-pk'), status = sel.value;
+    sel.disabled = true;
+    try {
+      await api(REQ_API + '/' + encodeURIComponent(pk), { method: 'PUT', body: JSON.stringify({ status: status }) });
+      toast('Status → ' + status);
+      var r = requests.find(function (x) { return String(x.PK_ID) === String(pk); });
+      if (r) r.Status = status;
+      updateReqBadge(); renderRequests();
+    } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; }
+  }
+
   // ---- wire up ----
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('content-root').addEventListener('click', onTableClick);
@@ -304,8 +399,18 @@
     document.getElementById('cpa-lookup').addEventListener('input', onLookupInput);
     document.getElementById('cpa-lookup-results').addEventListener('click', onLookupPick);
     document.getElementById('cpa-save').addEventListener('click', saveInvite);
+    // Tabs + Re-order Requests view
+    Array.prototype.forEach.call(document.querySelectorAll('.cpa-tab'), function (b) {
+      b.addEventListener('click', function () { switchTab(b.getAttribute('data-tab')); });
+    });
+    document.getElementById('cpa-req-filter').addEventListener('input', function (e) { reqFilter = e.target.value.trim(); renderRequests(); });
+    document.getElementById('cpa-req-status').addEventListener('change', function (e) { reqStatusFilter = e.target.value; renderRequests(); });
+    document.getElementById('cpa-req-mine-btn').addEventListener('click', function () { reqMyOnly = !reqMyOnly; this.classList.toggle('cpa-btn-active', reqMyOnly); renderRequests(); });
+    document.getElementById('requests-root').addEventListener('click', onRequestsClick);
+    document.getElementById('requests-root').addEventListener('change', onRequestsChange);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     loadMe();
     loadInvites();
+    loadRequests(); // populate the "New" badge on the Requests tab
   });
 })();
