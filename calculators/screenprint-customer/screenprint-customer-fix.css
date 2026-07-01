@@ -528,3 +528,67 @@ input:checked + .slider:before {
 .section {
     margin-bottom: 2rem;
 }
+
+/* Live-pricing error banner (Erik's #1 rule: never a silent/stale price) */
+.pricing-error-banner {
+    background: var(--warning-bg, #fef3c7);
+    color: var(--warning-text, #92400e);
+    border: 1px solid #f59e0b;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+/* Price-tier ladder — shows the bulk-discount price break before submission */
+.tier-ladder {
+    background: var(--hover-bg);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.tier-ladder-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.tier-ladder-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.tier-ladder-table td {
+    padding: 0.4rem 0.25rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tier-ladder-table tr:last-child td {
+    border-bottom: none;
+}
+
+.tier-ladder-table td.tier-qty {
+    color: var(--text-secondary);
+}
+
+.tier-ladder-table td.tier-price {
+    text-align: right;
+    font-weight: 600;
+}
+
+.tier-ladder-table tr.tier-current {
+    background: rgba(76, 179, 84, 0.12);
+}
+
+.tier-ladder-table tr.tier-current td {
+    color: var(--primary-color);
+}
+
+.tier-ladder-note {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}

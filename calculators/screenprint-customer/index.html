@@ -23,6 +23,11 @@
     <script src="../../shared_components/js/base-quote-service.js"></script>
     <!-- Calculator Utilities -->
     <script src="../../shared_components/js/calculator-utilities.js"></script>
+    <!-- Live Screen Print pricing authority (Caspio-backed) — SAME service Quick Quote
+         and the staff Screen Print Quote Builder use. Pricing = API, never hardcoded. -->
+    <script src="../../shared_components/js/screenprint-pricing-service.js"></script>
+    <!-- Shared pricing engine (screens/stripes/LTM/tier logic) — one engine, 3+ surfaces -->
+    <script src="../../shared_components/js/quote-cart-engine.js"></script>
     <!-- Customer Screen Print Quote Service -->
     <script src="screenprint-customer-quote-service.js"></script>
     <!-- Screen Print Calculator Class -->
@@ -97,7 +102,6 @@
                         <div class="form-group">
                             <label for="frontColors" class="form-label">Front Print Colors</label>
                             <select id="frontColors" class="form-control">
-                                <option value="0">0</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
                                 <option value="3">3</option>
@@ -143,10 +147,12 @@
 
                 <div class="results-section">
                     <h3>Your Quote</h3>
+                    <div id="pricingError" class="pricing-error-banner" style="display:none;"></div>
                     <div class="price-display prompt" id="priceDisplay">Enter Details</div>
                     <div class="price-display-label">Price per Shirt</div>
                     <hr style="border:none; border-top:1px solid #bbf7d0; margin: 1.5rem 0;">
                     <div class="order-summary" id="orderSummary"></div>
+                    <div class="tier-ladder" id="tierLadder" style="display:none;"></div>
                     <div class="quote-actions" id="quoteActions" style="display: none;">
                         <button type="button" class="btn btn-secondary" onclick="printQuote()">
                             <i class="fas fa-print"></i>

@@ -618,11 +618,23 @@
         var tierTable = null;
         var perStyleTrace = [];
 
+        // Customer-supplied-garment orders (calculators/screenprint-customer): the
+        // customer brings their own blank, so garment cost is $0 — reuse the SAME
+        // manual-cost machinery every other pricing service already exposes for
+        // "cost not looked up by style" (Order Form manual rows, screen-print-
+        // pricing.html's manual calculator; generateManualPricingData(0) runs the
+        // identical calculatePricing()/transformToExistingFormat() pipeline with a
+        // $0 garment cost substituted in). Print/tier/LTM data is style-INDEPENDENT
+        // (Ed_Cost rows aren't keyed by garment), so the fixed PC61 reference
+        // fetchPricingBundle() already uses internally is exact, not an approximation.
+        var customerSuppliedGarment = !!opts.customerSuppliedGarment;
         for (var i = 0; i < group.items.length; i++) {
             var item = group.items[i];
-            var bundle = await svc.fetchPricingData(item.styleNumber, { forceRefresh: ctx.forceRefresh });
+            var bundle = customerSuppliedGarment
+                ? await svc.generateManualPricingData(0)
+                : await svc.fetchPricingData(item.styleNumber, { forceRefresh: ctx.forceRefresh });
             if (!bundle) {
-                throw QuoteCartError('No screen print pricing data for ' + item.styleNumber + '.', 'PRICE_UNAVAILABLE');
+                throw QuoteCartError('No screen print pricing data' + (customerSuppliedGarment ? ' (customer-supplied garment).' : (' for ' + item.styleNumber + '.')), 'PRICE_UNAVAILABLE');
             }
             var primary = bundle.primaryLocationPricing && bundle.primaryLocationPricing[String(frontColors)];
             if (!primary || !primary.tiers) {
@@ -757,7 +769,7 @@
             trace: {
                 source: 'scp-replica',
                 authority: 'ScreenPrintPricingService bundle + EXACT copies of screenprint-quote-builder.js findPricingTier (:2975-2985), per-size assembly (:3139-3152), screens (:108-122)',
-                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, sleeveColorsList: sleeveColorsList, darkGarment: darkGarment, safetyStripes: safetyStripes }),
+                inputs: traceInputs(group, { frontColors: frontColors, backColors: backColors, sleeveColorsList: sleeveColorsList, darkGarment: darkGarment, safetyStripes: safetyStripes, customerSuppliedGarment: customerSuppliedGarment }),
                 tierTable: tierTable,
                 tier: tierLabel,
                 perStyle: perStyleTrace,
@@ -1048,7 +1060,7 @@
      *     emb:garment / emb:cap → { logos:{ primary:{position,stitchCount,needsDigitizing},
      *                                        additional:[{position,stitchCount,needsDigitizing}] } }
      *     dtg:main  → { locationCode:'LC'|'FF'|'FB'|'JF'|'JB'|'LC_FB'|'FF_FB'|'JF_JB'|'LC_JB' }
-     *     scp:*     → { frontColors:1-6, backColors:0-6, sleeveColorsList:[1-6,…] (≤2; or legacy sleeveCount/sleeveColors), darkGarment, safetyStripes }
+     *     scp:*     → { frontColors:1-6, backColors:0-6, sleeveColorsList:[1-6,…] (≤2; or legacy sleeveCount/sleeveColors), darkGarment, safetyStripes, customerSuppliedGarment (bool, default false — $0 garment cost via generateManualPricingData(0); calculators/screenprint-customer) }
      *     dtf:main  → { locations:['left-chest','full-back',...] }
      * @param {Object} options { deps, fetch, apiBase, forceRefresh, nudge }
      * @returns {Promise<{groups:Array, grandTotal:number|null, warnings:Array, errors:Array}>}
