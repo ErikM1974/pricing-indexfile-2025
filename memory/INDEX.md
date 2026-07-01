@@ -102,6 +102,7 @@ _Read API + PO (write) side._
 - [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer portal: data-minimization + magic-link auth + admin console + Phase 5 reward-dollars ledger (LIVE 2026-06-30)
 - [PORTAL_PHASE4_CATALOG_PLAN.md](PORTAL_PHASE4_CATALOG_PLAN.md) — customer portal Phase 4: personalized catalog + request-to-rep re-order (LIVE 2026-06-30)
 - [PORTAL_RECS_REWARDS_PROPOSAL_2026-07.md](PORTAL_RECS_REWARDS_PROPOSAL_2026-07.md) — PROPOSAL (awaiting Erik + 3 decisions): per-customer portal recs from the AE Sales Playbook, ranked by margin $/pc, + margin-tuned rewards
+- [PORTAL_MY_LOGOS.md](PORTAL_MY_LOGOS.md) — "My Logos" brainstorm + **ID REGISTRY** (Canva/Box MCP server ids, logo folder ids, Caspio design tables). KEY: Canva logo filenames are ShopWorks-id-prefixed → auto-linkable. Simple next step = `Customer_Logos` table + staff add-form + portal gallery
 - [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) — 🔴 **#9 remediation plan**: 92 proxy routes audited, 98 HIGH/CRITICAL endpoints OPEN to the internet (only 7 gated). Severity table + Pattern A (secret) / B (SAML) + phased rollout. ~5 CRITICAL anonymous money/data holes gateable Phase-1 with zero customer risk.
 - [CASPIO_API_CORE.md](CASPIO_API_CORE.md) — our **proxy's** API (distinct from the platform API above)
 - [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md)
