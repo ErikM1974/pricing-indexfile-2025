@@ -25,7 +25,16 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
      */
     async saveQuote(quoteData) {
         try {
-            const quoteID = this.generateQuoteID();
+            // Use the ID the caller already generated and showed the customer
+            // (handleQuoteSubmit) — calling generateQuoteID() again here produced
+            // a SECOND, different sequential ID, so the quote saved to Caspio
+            // never matched what the customer was told (2026-07-01 bug: customer
+            // sees SPC0701-1, the saved row is SPC0701-2 — a rep searching by the
+            // customer's ID finds nothing).
+            if (!quoteData.quoteId) {
+                throw new Error('saveQuote() requires quoteData.quoteId (the ID already shown to the customer).');
+            }
+            const quoteID = quoteData.quoteId;
             const sessionID = this.generateSessionID();
             
             console.log('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);
@@ -164,12 +173,13 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
 
         } catch (error) {
             console.error('[CustomerScreenPrintQuoteService] Error saving quote:', error);
-            // Still return the quote ID if we have one, even if database save failed
-            // This ensures the customer gets their quote
-            if (error.message.includes('Session created') || error.message.includes('Item creation failed')) {
+            // Still return the SAME quote ID the customer was already shown, even
+            // though the database save failed — minting a NEW id here would be a
+            // second id nobody can look anything up by.
+            if (error.message.includes('Session creation failed') || error.message.includes('Item creation failed')) {
                 return {
                     success: false,
-                    quoteID: this.generateQuoteID(),
+                    quoteID: quoteData.quoteId,
                     error: error.message
                 };
             }

@@ -335,6 +335,10 @@
         var sub = [p.color, (p.designNumber ? 'Design #' + p.designNumber : '')].filter(Boolean).join(' · ');
         var meta = (kind === 'product' && p.lastOrdered) ? 'Last ordered ' + formatDate(p.lastOrdered) : (p.blurb || '');
         var btnLabel = kind === 'product' ? 'Re-order' : 'Ask for a quote';
+        // Reward pill (premium recommendations only) — marketing label, no money moves. Blank = hidden.
+        var reward = (kind === 'rec' && p.rewardText)
+            ? '<div class="cp-rec-reward"><span class="cp-rec-reward-star">&#9733;</span> ' + escapeHtml(p.rewardText) + '</div>'
+            : '';
         // Carry the exact sizes the customer last ordered so the modal can pre-fill the grid.
         var sizesJson = JSON.stringify(p.sizes || {});
         return '<div class="cp-product-card' + (comingSoon ? ' cp-product-card--soon' : '') + '">' +
@@ -343,6 +347,7 @@
                 '<div class="cp-product-title">' + escapeHtml(title) + '</div>' +
                 (sub ? '<div class="cp-product-sub">' + escapeHtml(sub) + '</div>' : '') +
                 (meta ? '<div class="cp-product-meta">' + escapeHtml(meta) + '</div>' : '') +
+                reward +
                 '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
                     ' data-style="' + escapeHtml(p.style) + '" data-color="' + escapeHtml(p.color || '') + '"' +
                     ' data-image="' + escapeHtml(p.image || '') + '"' +

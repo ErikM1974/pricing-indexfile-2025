@@ -463,36 +463,47 @@ class CustomerScreenPrintCalculator {
             const quoteId = this.quoteService.generateQuoteID();
             quoteData.quoteId = quoteId;
 
-            // Save to database if enabled
+            // Save to database if enabled. The Caspio save and the confirmation
+            // email are two INDEPENDENT operations — one failing must never mask
+            // the other succeeding (2026-07-01: previously any email failure
+            // showed "Failed to send quote" even when the quote had already
+            // saved with a valid ID).
+            let saved = false;
             if (this.saveToDatabase.checked) {
-                const saveResult = await this.quoteService.saveQuote(quoteData);
-                if (!saveResult.success) {
-                    console.error('Database save failed:', saveResult.error);
+                try {
+                    const saveResult = await this.quoteService.saveQuote(quoteData);
+                    saved = !!saveResult.success;
+                    if (!saved) console.error('Database save failed:', saveResult.error);
+                } catch (saveError) {
+                    console.error('Database save threw:', saveError);
                 }
             }
 
-            // Send email
-            const emailData = this.buildEmailData(quoteData);
+            let emailed = false;
+            try {
+                const emailData = this.buildEmailData(quoteData);
+                await emailjs.send(this.emailConfig.serviceId, this.emailConfig.templateId, emailData);
+                emailed = true;
+            } catch (emailError) {
+                console.error('Confirmation email failed:', emailError);
+            }
 
-
-            await emailjs.send(
-                this.emailConfig.serviceId,
-                this.emailConfig.templateId,
-                emailData
-            );
-
-            // Show success
-            this.showSuccessModal(quoteId, quoteData);
-
-            // Close quote modal
-            this.closeQuoteModal();
-
-            // Reset form
-            this.quoteForm.reset();
+            // The quote is real to the customer if EITHER path produced a durable
+            // record: a Caspio row a rep can look up, or the emailed copy itself.
+            if (saved || emailed) {
+                if (this.saveToDatabase.checked && !saved) {
+                    console.warn('Quote emailed but NOT saved to the database — no rep-visible record exists for', quoteId);
+                }
+                this.showSuccessModal(quoteId, quoteData);
+                this.closeQuoteModal();
+                this.quoteForm.reset();
+            } else {
+                alert('Failed to submit quote. Please try again or call (253) 922-5793.');
+            }
 
         } catch (error) {
             console.error('Quote submission error:', error);
-            alert('Failed to send quote. Please try again.');
+            alert('Failed to submit quote. Please try again or call (253) 922-5793.');
         } finally {
             this.hideLoading();
         }
