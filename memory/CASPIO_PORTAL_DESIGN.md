@@ -109,3 +109,15 @@ Reuse map (35-tool Explore):
 - **UI:** portal gold **reward card** (shows when balance>0) + redeem modal (`customer-portal.{html,js,css}`); admin per-customer **"Rewards" 💰 button** → modal (balance + ledger + grant/adjust form) in `customer-portal-admin`.
 - **Verified in Erik's browser:** admin grant $50 → balance+ledger (Created_By=erik@) → customer preview shows "$50.00" reward card + Redeem. Ledger math + overdraw guard unit-verified (grant 25 → redeem 10 → 15; redeem 100 blocked).
 - **NEXT (Phase 5 full):** auto-accrual rules table (Erik-defined) + accounting sign-off; then earn-on-order automation. Gift-cert ledger `Inksoft_Gift_Certificates` is the precedent.
+
+## ✅ Portal-page REFINEMENTS (SHIPPED + browser-verified 2026-07-01, FE v2026.07.01.2)
+
+Erik's 6-item punch-list on the portal page — all live (`server.js` portal section + `pages/customer-portal.{html,js,css}`):
+1. **Rebrand** "Design Portal" → **"Your Account"** (h1 + `<title>` + tab). Alternatives offered (Customer Hub / My NWCA / Account Portal) — Erik didn't pick, so "Your Account" stands; trivially swappable in the h1/title/JS if he wants another.
+2. **"Your Company" bug fixed** — `resolvePortalCompany(cid)` fallback: when a customer has no art/mockups the aggregate's name is null, so we resolve it from order-history `CustomerName`. Wired into BOTH `/api/portal` (~3246) and preview mirror (~3699). Verified 8891 → "Adam's DJ Service & NW Event Lighting".
+3. **Re-order modal rebuilt** — shows the **color the customer actually ordered** (`portalMatchColor`, punctuation-insensitive `COLOR_NAME`/`CATALOG_COLOR` match — fixes the old "Jet Black showed white" bug) + garment image; **color dropdown** from new `GET /api/portal/product-colors/:style` (+ preview mirror) flags the ordered color "(your last order)" and swaps the image on change; **per-size qty grid** (S/M/L/XL/2XL/3XL) pre-filled from the last order's `Size01-06` (`portalSizeMap`), running total → `size_breakdown` ("S:2, M:4") + total qty POSTed to `/api/portal/reorder-request` (proxy already writes `Size_Breakdown`). NOTE: prefill only populates when the ShopWorks line item broke out sizes; qty-in-LineQuantity orders open with an empty (editable) grid — acceptable.
+4. **Recommendations** — `productCardHtml` renders a **"Coming soon"** striped placeholder when a rec has no product image (`rec.comingSoon = !pd.image`); button label "Ask for a quote".
+5. **Order status simplified** — `portalOrderStatus` returns only **"Invoiced"** (has `date_Invoiced`) or **"In Process"**; the Orders table **"Shipped" column was removed** (header + shipDate cell). Verified: all 5 Adam's orders show "Invoiced", 6-col table.
+6. Section order left as-is (Products → Recs → Mockups → Art → Orders → Invoices) — orders stay near the bottom (reference, below the re-order CTAs).
+
+Deploy note: shipped **portal-only** — the shared checkout had unrelated uncommitted work on `quote-cart-engine.js` (pricing engine!) + the screenprint-customer calculator; staged the 4 portal files by explicit path (NOT `git add -u`) so that work was left untouched. Zero console errors on the live preview.
