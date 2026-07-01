@@ -18,6 +18,8 @@
     var PREVIEW = (function () { var m = location.pathname.match(/^\/portal-admin\/preview\/(\d+)/); return m ? m[1] : null; })();
     var AGG_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW) : '/api/portal';
     var ORDERS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/orders') : '/api/portal/orders';
+    var MYPRODUCTS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/my-products') : '/api/portal/my-products';
+    var RECS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/recommendations') : '/api/portal/recommendations';
     var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
     if (PREVIEW) showPreviewRibbon();
@@ -27,9 +29,10 @@
     // The server returns this customer's id (data.customerId) so we can build detail links.
     loadPortalData();
     loadOrders();
-    // Phase 4 catalog — customer-only (the my-products/recommendations endpoints need a
-    // customer session, so they're skipped in staff preview; those sections stay hidden).
-    if (!PREVIEW) { loadProducts(); loadRecs(); }
+    // Phase 4 catalog — shows for customers AND in staff preview (preview uses the
+    // role-gated mirror endpoints). In preview the request button is view-only.
+    loadProducts();
+    loadRecs();
 
     function loadPortalData() {
         fetch(AGG_URL, { credentials: 'same-origin' })
@@ -332,7 +335,7 @@
     }
 
     function loadProducts() {
-        fetch('/api/portal/my-products', { credentials: 'same-origin' })
+        fetch(MYPRODUCTS_URL, { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { products: [] }; })
             .then(function (d) {
                 var list = (d && d.products) || [];
@@ -348,7 +351,7 @@
     }
 
     function loadRecs() {
-        fetch('/api/portal/recommendations', { credentials: 'same-origin' })
+        fetch(RECS_URL, { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { recommendations: [] }; })
             .then(function (d) {
                 var list = (d && d.recommendations) || [];
@@ -386,6 +389,7 @@
 
     function submitReq() {
         if (!reqState) return;
+        if (PREVIEW) { closeReqModal(); showToast('Staff preview — the customer would send this request to their rep.'); return; }
         var err = document.getElementById('cp-req-error');
         err.textContent = '';
         var submitBtn = document.getElementById('cp-req-submit');

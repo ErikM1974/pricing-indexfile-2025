@@ -3404,72 +3404,72 @@ function portalSumSizes(li) {
     .reduce((s, v) => s + (Number(v) || 0), 0);
 }
 
+// Build the personalized catalog for a customer id. Shared by the customer endpoint AND
+// the staff-preview mirror (so staff previewing a portal see the same catalog).
+async function buildMyProducts(cid) {
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  const today = new Date();
+  const end = today.toISOString().slice(0, 10);
+  const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
+  const start = sd.toISOString().slice(0, 10);
+  const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
+  if (!oR.ok) throw new Error('orders ' + oR.status);
+  const orders = ((await oR.json()).result || [])
+    .sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || '')))
+    .slice(0, 25); // bound the line-item fetches; recent orders capture the product variety
+  const products = new Map(); // baseStyle|color → product
+  for (const o of orders) {
+    if (!o.id_Order) continue;
+    let items = [];
+    try {
+      const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs });
+      if (lR.ok) items = (await lR.json()).result || [];
+    } catch (_) {}
+    for (const li of items) {
+      const norm = portalNormalizePart(li);
+      if (!norm) continue;
+      const key = norm.style.toUpperCase() + '|' + norm.color.toLowerCase();
+      const qty = Number(li.LineQuantity) || portalSumSizes(li);
+      const ex = products.get(key);
+      if (!ex) {
+        products.set(key, {
+          style: norm.style, color: norm.color,
+          description: li.PartDescription || '',
+          designNumber: o.id_Design || null, designName: o.DesignName || null,
+          lastOrdered: o.date_Ordered || null, lastQty: qty, timesOrdered: 1,
+        });
+      } else { ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty; }
+    }
+  }
+  const list = [...products.values()];
+  await Promise.all(list.map(async (p) => {
+    const pd = await portalProductDisplay(p.style, p.color);
+    p.image = pd.image; p.title = pd.title || p.description;
+  }));
+  list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
+  return { products: list };
+}
+// Build the curated recommendations strip (Erik-managed table), enriched with images.
+async function buildRecommendations() {
+  const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+  if (!r.ok) throw new Error('recs ' + r.status);
+  const recs = ((await r.json()).recommendations || []).slice(0, 12);
+  await Promise.all(recs.map(async (rec) => {
+    const pd = await portalProductDisplay(rec.style, rec.color);
+    rec.image = pd.image; rec.title = rec.title || pd.title;
+  }));
+  return { recommendations: recs.filter(x => x.image || x.title) };
+}
+
 // GET /api/portal/my-products — the logged-in customer's personalized re-order catalog.
 app.get('/api/portal/my-products', portalLimiter, requireCustomer, async (req, res) => {
-  try {
-    const cid = String(req.customerSession.portalCustomer.idCustomer);
-    const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
-    const today = new Date();
-    const end = today.toISOString().slice(0, 10);
-    const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
-    const start = sd.toISOString().slice(0, 10);
-    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
-    if (!oR.ok) throw new Error('orders ' + oR.status);
-    const orders = ((await oR.json()).result || [])
-      .sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || '')))
-      .slice(0, 25); // bound the line-item fetches; recent orders capture the product variety
-    const products = new Map(); // baseStyle|color → product
-    for (const o of orders) {
-      if (!o.id_Order) continue;
-      let items = [];
-      try {
-        const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs });
-        if (lR.ok) items = (await lR.json()).result || [];
-      } catch (_) {}
-      for (const li of items) {
-        const norm = portalNormalizePart(li);
-        if (!norm) continue;
-        const key = norm.style.toUpperCase() + '|' + norm.color.toLowerCase();
-        const qty = Number(li.LineQuantity) || portalSumSizes(li);
-        const ex = products.get(key);
-        if (!ex) {
-          products.set(key, {
-            style: norm.style, color: norm.color,
-            description: li.PartDescription || '',
-            designNumber: o.id_Design || null, designName: o.DesignName || null,
-            lastOrdered: o.date_Ordered || null, lastQty: qty, timesOrdered: 1,
-          });
-        } else { ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty; }
-      }
-    }
-    const list = [...products.values()];
-    await Promise.all(list.map(async (p) => {
-      const pd = await portalProductDisplay(p.style, p.color);
-      p.image = pd.image; p.title = pd.title || p.description;
-    }));
-    list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
-    res.json({ products: list });
-  } catch (err) {
-    console.error('[Portal] my-products failed:', err.message);
-    res.status(503).json({ error: 'Catalog temporarily unavailable' });
-  }
+  try { res.json(await buildMyProducts(String(req.customerSession.portalCustomer.idCustomer))); }
+  catch (err) { console.error('[Portal] my-products failed:', err.message); res.status(503).json({ error: 'Catalog temporarily unavailable' }); }
 });
-
 // GET /api/portal/recommendations — the curated strip (Erik-managed), enriched with images.
 app.get('/api/portal/recommendations', portalLimiter, requireCustomer, async (req, res) => {
-  try {
-    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
-    if (!r.ok) throw new Error('recs ' + r.status);
-    const recs = ((await r.json()).recommendations || []).slice(0, 12);
-    await Promise.all(recs.map(async (rec) => {
-      const pd = await portalProductDisplay(rec.style, rec.color);
-      rec.image = pd.image; rec.title = rec.title || pd.title;
-    }));
-    res.json({ recommendations: recs.filter(x => x.image || x.title) });
-  } catch (err) {
-    console.error('[Portal] recommendations failed:', err.message);
-    res.json({ recommendations: [] }); // non-critical — empty, never an error banner
-  }
+  try { res.json(await buildRecommendations()); }
+  catch (err) { console.error('[Portal] recommendations failed:', err.message); res.json({ recommendations: [] }); }
 });
 
 // POST /api/portal/reorder-request — customer asks to re-order (or order a recommended item).
@@ -3615,6 +3615,19 @@ app.get('/api/portal-admin/preview/:id/orders', requireCrmRole(PORTAL_ADMIN_ROLE
     console.error('[portal-admin] preview orders failed:', err.message);
     res.status(503).json({ error: 'Orders preview temporarily unavailable' });
   }
+});
+
+// GET /api/portal-admin/preview/:id/my-products — the customer's catalog, for staff preview.
+app.get('/api/portal-admin/preview/:id/my-products', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try { res.json(await buildMyProducts(cid)); }
+  catch (err) { console.error('[portal-admin] preview my-products failed:', err.message); res.status(503).json({ error: 'Catalog preview unavailable' }); }
+});
+// GET /api/portal-admin/preview/:id/recommendations — the recs strip, for staff preview.
+app.get('/api/portal-admin/preview/:id/recommendations', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  try { res.json(await buildRecommendations()); }
+  catch (err) { console.error('[portal-admin] preview recs failed:', err.message); res.json({ recommendations: [] }); }
 });
 
 // GET /api/portal-admin/preview/:id/invoice/:orderNo — one invoice, ownership-checked
