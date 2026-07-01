@@ -3491,11 +3491,11 @@ async function buildMyProducts(cid) {
           style: norm.style, color: norm.color,
           description: li.PartDescription || '',
           designNumber: o.id_Design || null, designName: o.DesignName || null,
-          lastOrdered: o.date_Ordered || null, lastQty: qty, timesOrdered: 1,
+          lastOrdered: o.date_Ordered || null, lastQty: qty, totalQty: qty, timesOrdered: 1,
           sizes: portalSizeMap(li), _sizesFrom: o.date_Ordered,
         });
       } else {
-        ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty;
+        ex.timesOrdered++; ex.totalQty = (ex.totalQty || 0) + qty; if (!ex.lastQty) ex.lastQty = qty;
         // accumulate the size breakdown across the product's line items in the SAME (latest) order
         if (o.date_Ordered && o.date_Ordered === ex._sizesFrom) {
           const m = portalSizeMap(li);
@@ -3530,11 +3530,13 @@ async function buildMyProducts(cid) {
       if (!it.color || seen.has(key)) continue;
       seen.add(key);
       const m = portalMatchColor(rows, it.color);
-      colors.push({ name: it.color, swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: it.image || (m ? portalRowImage(m) : '') });
+      colors.push({ name: it.color, swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: it.image || (m ? portalRowImage(m) : ''), totalQty: Number(it.totalQty) || 0 });
     }
+    colors.sort((a, b) => (b.totalQty || 0) - (a.totalQty || 0)); // most-ordered color first (the picker's "top color")
     grouped.push(Object.assign({}, primary, {
-      colors,                                            // every ordered color (name + swatch) — FE shows these
+      colors,                                            // every ordered color (name + swatch + total qty) — FE shows these
       colorCount: colors.length,
+      styleTotalQty: items.reduce((s, x) => s + (Number(x.totalQty) || 0), 0),  // pieces of this style over the ~3yr window
       timesOrdered: items.reduce((s, x) => s + (Number(x.timesOrdered) || 1), 0),
     }));
   }

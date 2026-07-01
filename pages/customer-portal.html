@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.01.10">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.01.15">
 </head>
 <body>
     <!-- Header -->
@@ -128,10 +128,11 @@
                     <div class="cp-req-image" id="cp-req-image"></div>
                     <div class="cp-req-product" id="cp-req-product"></div>
                 </div>
-                <label class="cp-field" id="cp-req-color-field">
-                    <span class="cp-field-label">Color</span>
-                    <select id="cp-req-color" class="cp-select"></select>
-                </label>
+                <div class="cp-field" id="cp-req-color-field">
+                    <span class="cp-field-label">Color <span id="cp-req-colorstat" class="cp-color-stat"></span></span>
+                    <div id="cp-req-colors" class="cp-swatch-picker"></div>
+                    <input type="hidden" id="cp-req-color">
+                </div>
                 <div class="cp-field">
                     <span class="cp-field-label">Sizes &amp; quantities <small>(fill in what you need)</small></span>
                     <div class="cp-size-grid" id="cp-size-grid"></div>
@@ -196,6 +197,6 @@
     </div>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.01.14"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.01.15"></script>
 </body>
 </html>
