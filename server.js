@@ -3181,6 +3181,12 @@ function projectPortalArt(a) {
     Order_Type: portalOrderTypeText(a.Order_Type),
     Status: a.Status || null,
     Date_Created: a.Date_Created || null,
+    // The actual DESIGN proof (garment + logo / the artwork) — customer-safe. Prefer these over
+    // MAIN_IMAGE_URL_1, which is a plain SanMar garment catalog photo ("just the shirt").
+    // Deliberately NOT exposed: Art_Minutes, Amount_Art_Billed, Artwork_Locations, file paths, internal notes.
+    Final_Approved_Mockup: a.Final_Approved_Mockup || null,
+    Box_File_Mockup: a.Box_File_Mockup || null,
+    Box_File_Link: a.BoxFileLink || null,
     MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null,
   };
 }
@@ -3214,7 +3220,7 @@ async function getPortalData(customerId) {
     .filter((m) => (m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3) && portalOnOrAfterCutoff(m.Submitted_Date))
     .map(projectPortalMockup);
   const artRequests = aRecs
-    .filter((a) => (a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
+    .filter((a) => (a.Final_Approved_Mockup || a.Box_File_Mockup || a.BoxFileLink || a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
     .map(projectPortalArt);
 
   return { company: { name: companyName }, mockups, artRequests };

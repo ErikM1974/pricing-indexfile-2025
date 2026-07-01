@@ -185,6 +185,33 @@ body {
     background: #e4f3e6; color: #1b6b2c; border: 1px solid #b4dcbb;
     font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
 }
+/* Clickable My Logos card (a <div role=button>, not the internal staff page) */
+.cp-logo-card { width: 100%; text-align: left; font: inherit; cursor: pointer; }
+.cp-logo-card:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; }
+/* My Logos card images show the whole design (contain), not a cropped garment (cover) */
+.cp-logo-card .cp-card-image img { object-fit: contain; }
+
+/* Lightbox — full-size design proof */
+.cp-lightbox {
+    position: fixed; inset: 0; z-index: 1200;
+    background: rgba(15,25,15,.82);
+    display: flex; align-items: center; justify-content: center; padding: 4vh 4vw;
+}
+.cp-lightbox-inner {
+    position: relative; max-width: 720px; width: 100%;
+    background: #fff; border-radius: var(--cp-radius-lg); overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+}
+.cp-lightbox-inner img { display: block; width: 100%; max-height: 78vh; object-fit: contain; background: var(--cp-surface-2); }
+.cp-lightbox-cap { padding: 14px 18px; }
+.cp-lightbox-title { font-size: 15px; font-weight: 700; color: var(--cp-ink); }
+.cp-lightbox-meta { font-size: 13px; color: var(--cp-ink-soft); margin-top: 2px; }
+.cp-lightbox-close {
+    position: absolute; top: 8px; right: 10px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%; border: none;
+    background: rgba(0,0,0,.5); color: #fff; font-size: 22px; line-height: 1; cursor: pointer;
+}
+.cp-lightbox-close:hover { background: rgba(0,0,0,.7); }
 
 /* Action-needed highlight — thin, tokenized */
 .cp-card--action-needed {
