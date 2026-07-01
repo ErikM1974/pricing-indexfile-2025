@@ -1,3 +1,9 @@
+## v2026.07.01.5 (2026-07-01)
+
+- docs(portal): capture per-customer recs + rewards PROPOSAL (2026-07-01 brainstorm, awaiting Erik's 3 decisions)
+- fix(screenprint): quote-ID mismatch + email-failure-masks-save in customer calculator
+- feat(portal): per-customer recommendations from the AE playbook pool + reward pills (Phase 1)
+
 ## v2026.07.01.4 (2026.07.01)
 
 - fix(screenprint): wire customer-supplied-garment calculator to live pricing engine
