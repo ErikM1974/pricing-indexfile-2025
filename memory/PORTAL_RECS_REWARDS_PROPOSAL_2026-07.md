@@ -45,3 +45,20 @@ Premium brand-name items win on dollars ~8× despite lower %. Rewards = a small 
 
 ## Resume pointer
 Erik was about to decide direction. Next action when he returns: get the 3 decisions → build Phase 1 (candidate-pool table via a `caspio-pricing-proxy/scripts/` script copying `create-portal-phase4-tables.js`; `buildRecommendations(cid)` rank + color; fix the preview-mirror `:id`; add `Reward_Text` pills) → verify in `/portal-admin/preview/<id>`.
+
+---
+
+## ✅ PHASE 1 SHIPPED + browser-verified 2026-07-01 (FE v2026.07.01.5 · proxy v2026.07.01.1)
+
+Erik's decisions: **top-3 premium brands** (Carhartt/Nike/North Face) · **4 premium / 2 popular** mix · **reward pills now, Erik sets the $**.
+
+- **Caspio `Portal_Recommendations` extended** into the candidate pool (added `Brand, GP_Pct, Sell_Anchor, Is_Premium, Priority, Reward_Text`; `Sell_Anchor` = INTERNAL rank anchor, never shown — Rule 9). Seeded 10 active rows via `caspio-pricing-proxy/scripts/setup-portal-recs-phase1.js` (idempotent upsert; deactivated old C112/CP90/PC55): 4 premium heroes **CT104670** (Carhartt Storm Defender jacket), **CTK121** (Carhartt hoodie), **NF0A3LGX** (North Face soft shell), **NKDC1963** (Nike polo) — each `Reward_Text='Earn reward dollars'`; 6 popular staples PC78H/112/PC54/PC61/ST650/PC90H (blank reward). **Erik edits this table in Caspio — no deploy.**
+- **Proxy `portal-reorder.js` GET /recommendations** now returns the pool + margin/premium/reward metadata (FE ranks).
+- **FE `server.js` `buildRecommendations(cid)`**: fetch pool → `buildMyProductsCached(cid)` (NEW 120s-TTL memo shared with /my-products, no double history fetch) → derive ownedStyles + houseColor + colorByStyle → hard-filter owned → rank `score=Sell_Anchor×GP%` (Priority tiebreak) → fill 4 premium/2 popular w/ backfill (never empty) → enrich with the customer's house color via `portalProductDisplay` → **customer-safe projection** (strips gpPct/sellAnchor/brand/priority/isPremium — margin never reaches the browser; caught by adversarial review). Fixed the preview mirror that **dropped `:id`**.
+- **FE `customer-portal.js`** renders a gold `.cp-rec-reward` pill from `rewardText` on rec cards only (marketing; NO money moves, nothing writes to the ledger).
+- **Verified (preview 8891, house color Jet Black):** 6 recs = 4 premium (pill) + 2 popular (no pill); Carhartt/Nike shown in Jet Black, North Face clean-falls-back (no Jet Black variant); owned W401/PC150 excluded; 0 console errors. Pricing Rule-9 parity re-run green (100 tests) since the release also carried the screenprint fix.
+
+## ⏳ PENDING (Phase 2/3)
+- **Erik to set reward $ amounts** — edit `Portal_Recommendations.Reward_Text` per premium row in Caspio (e.g. "Earn $10 in rewards"). Blank = no pill. (He chose "I'll set the $".)
+- **Phase 3 = real accrual** (needs accounting sign-off): system-grant into `Customer_Reward_Ledger` on an ACTUAL invoiced ShopWorks order (never the portal click), `Created_By='system:accrual'` minted server-side, idempotent via Order_Ref query-before-write.
+- **Phase 4 (opt):** ingest playbook "Missing Brands to Pitch" per customer for sharper targeting + expand the pool beyond 3 premium brands.
