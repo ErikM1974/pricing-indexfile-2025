@@ -20,6 +20,8 @@
     var ORDERS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/orders') : '/api/portal/orders';
     var MYPRODUCTS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/my-products') : '/api/portal/my-products';
     var RECS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/recommendations') : '/api/portal/recommendations';
+    // Live color list for a style (name + swatch + product image). Preview uses the staff mirror.
+    var COLORS_URL_BASE = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/product-colors/') : '/api/portal/product-colors/';
     var REWARDS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/rewards') : '/api/portal/rewards';
     var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
@@ -45,9 +47,16 @@
             })
             .then(function (data) {
                 var custId = data.customerId;
-                var companyName = (data.company && data.company.name) || 'Your Company';
-                document.getElementById('cp-company-name').textContent = companyName;
-                document.title = companyName + ' — Design Portal | NWCA';
+                var companyName = (data.company && data.company.name) || '';
+                var nameEl = document.getElementById('cp-company-name');
+                if (companyName) {
+                    nameEl.textContent = companyName;
+                    document.title = companyName + ' — Your Account | NWCA';
+                } else {
+                    // No company name on file — don't show the "Your Company" placeholder.
+                    nameEl.textContent = 'Your Account';
+                    document.title = 'Your Account | NWCA';
+                }
 
                 renderMockups(data.mockups || [], custId);
                 renderArtRequests(data.artRequests || [], custId);
@@ -278,12 +287,11 @@
                 '<td class="cp-num">' + escapeHtml(String(o.quantity || '')) + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
                 '<td>' + renderStatusBadge(o.status) + '</td>' +
-                '<td>' + (escapeHtml(formatDate(o.shipDate)) || '—') + '</td>' +
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
             '<th>Order</th><th>Date</th><th>Design</th><th>PO</th><th class="cp-num">Qty</th>' +
-            '<th class="cp-num">Total</th><th>Status</th><th>Shipped</th>' +
+            '<th class="cp-num">Total</th><th>Status</th>' +
             '</tr></thead><tbody>' + rows + '</tbody></table>';
     }
 
@@ -316,13 +324,16 @@
 
     function productCardHtml(p, kind) {
         var title = p.title || p.description || p.style;
+        var comingSoon = kind === 'rec' && p.comingSoon;
         var img = p.image
             ? '<img src="' + escapeHtml(p.image) + '" alt="" loading="lazy" onerror="this.parentElement.classList.add(\'cp-noimg\');this.remove();">'
-            : '';
+            : (comingSoon ? '<div class="cp-coming-soon">Coming soon</div>' : '');
         var sub = [p.color, (p.designNumber ? 'Design #' + p.designNumber : '')].filter(Boolean).join(' · ');
         var meta = (kind === 'product' && p.lastOrdered) ? 'Last ordered ' + formatDate(p.lastOrdered) : (p.blurb || '');
-        var btnLabel = kind === 'product' ? 'Request re-order' : 'Request this';
-        return '<div class="cp-product-card">' +
+        var btnLabel = kind === 'product' ? 'Re-order' : 'Ask for a quote';
+        // Carry the exact sizes the customer last ordered so the modal can pre-fill the grid.
+        var sizesJson = JSON.stringify(p.sizes || {});
+        return '<div class="cp-product-card' + (comingSoon ? ' cp-product-card--soon' : '') + '">' +
             '<div class="cp-product-img">' + img + '</div>' +
             '<div class="cp-product-body">' +
                 '<div class="cp-product-title">' + escapeHtml(title) + '</div>' +
@@ -330,10 +341,17 @@
                 (meta ? '<div class="cp-product-meta">' + escapeHtml(meta) + '</div>' : '') +
                 '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
                     ' data-style="' + escapeHtml(p.style) + '" data-color="' + escapeHtml(p.color || '') + '"' +
+                    ' data-image="' + escapeHtml(p.image || '') + '"' +
                     ' data-title="' + escapeHtml(title) + '" data-design="' + escapeHtml(String(p.designNumber || '')) + '"' +
-                    ' data-designname="' + escapeHtml(p.designName || '') + '" data-qty="' + escapeHtml(String(p.lastQty || '')) + '">' +
+                    ' data-designname="' + escapeHtml(p.designName || '') + '"' +
+                    " data-sizes='" + escapeAttr(sizesJson) + "'>" +
                     btnLabel + '</button>' +
             '</div></div>';
+    }
+
+    // JSON goes inside a single-quoted attribute — escape the few chars that would break it.
+    function escapeAttr(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
     }
 
     function loadProducts() {
@@ -369,39 +387,131 @@
         if (btn) openReqModal(btn);
     });
 
+    var SIZE_ORDER = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+
     function openReqModal(btn) {
+        var parsedSizes = {};
+        try { parsedSizes = JSON.parse(btn.getAttribute('data-sizes') || '{}') || {}; } catch (e) { parsedSizes = {}; }
         reqState = {
             kind: btn.getAttribute('data-kind'),
             style: btn.getAttribute('data-style'),
             color: btn.getAttribute('data-color'),
+            image: btn.getAttribute('data-image') || '',
             title: btn.getAttribute('data-title'),
             design: btn.getAttribute('data-design'),
-            designName: btn.getAttribute('data-designname')
+            designName: btn.getAttribute('data-designname'),
+            sizes: parsedSizes
         };
-        document.getElementById('cp-req-title').textContent = reqState.kind === 'product' ? 'Request a Re-order' : 'Request a Quote';
+        document.getElementById('cp-req-title').textContent = reqState.kind === 'product' ? 'Re-order this product' : 'Ask for a quote';
         document.getElementById('cp-req-product').innerHTML =
             '<div class="cp-req-prod-title">' + escapeHtml(reqState.title) + '</div>' +
-            '<div class="cp-req-prod-sub">' + escapeHtml([reqState.color, (reqState.design ? 'Design #' + reqState.design : '')].filter(Boolean).join(' · ')) + '</div>';
-        document.getElementById('cp-req-qty').value = btn.getAttribute('data-qty') || '';
+            '<div class="cp-req-prod-sub">' + escapeHtml('Style ' + (reqState.style || '') + (reqState.design ? ' · Design #' + reqState.design : '')) + '</div>';
+        setReqImage(reqState.image);
+        buildSizeGrid(reqState.sizes);
+        // Show the ordered color immediately, then enrich with the full color list.
+        var sel = document.getElementById('cp-req-color');
+        sel.innerHTML = '<option value="' + escapeHtml(reqState.color || '') + '" selected>' + escapeHtml(reqState.color || 'Same as before') + '</option>';
+        loadColorOptions(reqState.style, reqState.color, reqState.image);
         document.getElementById('cp-req-note').value = '';
         document.getElementById('cp-req-error').textContent = '';
         document.getElementById('cp-req-modal').style.display = 'flex';
     }
     function closeReqModal() { document.getElementById('cp-req-modal').style.display = 'none'; }
 
+    function setReqImage(url) {
+        var box = document.getElementById('cp-req-image');
+        if (!box) return;
+        box.innerHTML = url
+            ? '<img src="' + escapeHtml(url) + '" alt="" onerror="this.remove();">'
+            : '<div class="cp-req-noimg">&#128085;</div>';
+    }
+
+    // Fetch every available color for this style; rebuild the dropdown and swap the image on change.
+    function loadColorOptions(style, orderedColor, orderedImage) {
+        if (!style) return;
+        fetch(COLORS_URL_BASE + encodeURIComponent(style), { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
+            .then(function (d) {
+                var colors = (d && d.colors) || [];
+                if (!colors.length) return; // keep the ordered-color-only dropdown
+                var sel = document.getElementById('cp-req-color');
+                var want = String(orderedColor || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                // Map each color name → its image so we can swap the preview without re-fetching.
+                reqState.colorImages = {};
+                var html = '';
+                var matched = false;
+                colors.forEach(function (c) {
+                    var name = c.name || c.catalogColor || '';
+                    if (!name) return;
+                    reqState.colorImages[name] = c.image || '';
+                    var norm = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    var isOrdered = want && norm === want;
+                    if (isOrdered) matched = true;
+                    html += '<option value="' + escapeHtml(name) + '"' + (isOrdered ? ' selected' : '') + '>' +
+                        escapeHtml(name) + (isOrdered ? ' (your last order)' : '') + '</option>';
+                });
+                // If the ordered color isn't in the list, keep it as the first, selected option.
+                if (!matched && orderedColor) {
+                    reqState.colorImages[orderedColor] = orderedImage || '';
+                    html = '<option value="' + escapeHtml(orderedColor) + '" selected>' + escapeHtml(orderedColor) + ' (your last order)</option>' + html;
+                }
+                sel.innerHTML = html;
+                sel.onchange = function () {
+                    var img = reqState.colorImages[sel.value];
+                    setReqImage(img || orderedImage || '');
+                };
+            })
+            .catch(function () { /* dropdown already has the ordered color */ });
+    }
+
+    function buildSizeGrid(sizes) {
+        var grid = document.getElementById('cp-size-grid');
+        if (!grid) return;
+        grid.innerHTML = SIZE_ORDER.map(function (sz) {
+            var v = Number(sizes && sizes[sz]) || 0;
+            return '<label class="cp-size-cell">' +
+                '<span class="cp-size-name">' + sz + '</span>' +
+                '<input type="number" min="0" inputmode="numeric" class="cp-size-input" data-size="' + sz + '" value="' + (v > 0 ? v : '') + '" placeholder="0">' +
+                '</label>';
+        }).join('');
+        var inputs = grid.querySelectorAll('.cp-size-input');
+        for (var i = 0; i < inputs.length; i++) inputs[i].addEventListener('input', updateSizeTotal);
+        updateSizeTotal();
+    }
+
+    function collectSizes() {
+        var out = {}, total = 0;
+        var inputs = document.querySelectorAll('#cp-size-grid .cp-size-input');
+        for (var i = 0; i < inputs.length; i++) {
+            var n = parseInt(inputs[i].value, 10);
+            if (n > 0) { out[inputs[i].getAttribute('data-size')] = n; total += n; }
+        }
+        return { sizes: out, total: total };
+    }
+    function updateSizeTotal() {
+        var t = collectSizes().total;
+        var el = document.getElementById('cp-size-total');
+        if (el) el.textContent = t;
+    }
+
     function submitReq() {
         if (!reqState) return;
-        if (PREVIEW) { closeReqModal(); showToast('Staff preview — the customer would send this request to their rep.'); return; }
         var err = document.getElementById('cp-req-error');
         err.textContent = '';
+        var picked = collectSizes();
+        if (picked.total <= 0) { err.textContent = 'Enter a quantity for at least one size.'; return; }
+        if (PREVIEW) { closeReqModal(); showToast('Staff preview — the customer would send this request to their rep.'); return; }
+        var color = document.getElementById('cp-req-color').value || reqState.color || '';
+        var breakdown = SIZE_ORDER.filter(function (s) { return picked.sizes[s]; })
+            .map(function (s) { return s + ':' + picked.sizes[s]; }).join(', ');
         var submitBtn = document.getElementById('cp-req-submit');
         submitBtn.disabled = true; submitBtn.textContent = 'Sending…';
         fetch('/api/portal/reorder-request', {
             method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                style: reqState.style, color: reqState.color, product_title: reqState.title,
+                style: reqState.style, color: color, product_title: reqState.title,
                 design_number: reqState.design, design_name: reqState.designName,
-                qty: document.getElementById('cp-req-qty').value.trim(),
+                qty: String(picked.total), size_breakdown: breakdown,
                 note: document.getElementById('cp-req-note').value.trim(),
                 source: reqState.kind === 'rec' ? 'recommendation' : 'reorder'
             })
