@@ -1,3 +1,7 @@
+## v2026.06.30.4 (2026.06.30)
+
+- feat(portal-p4): rep re-order request work-queue in the Customer Portals console (Requests tab — list/status/delete/filter)
+
 ## v2026.06.30.3 (2026.06.30)
 
 - docs(portal): Phase 4 catalog + re-order SHIPPED — status + remaining fast-follows
