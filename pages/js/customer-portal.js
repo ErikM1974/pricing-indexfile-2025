@@ -129,12 +129,17 @@
         // The card opens a LIGHTBOX (not the internal staff art-request/mockup page, which errors
         // for customers). Store the proxied image so the lightbox shows the full design.
         grid.innerHTML = logos.map(function (l) {
+            // Grid = fast 256px thumbnail; lightbox = the LARGE version (Box ?size=large → 1024 / full
+            // original). ?size=large only applies to Box thumbnail URLs; other sources pass through.
+            var isBox = /\/api\/box\/thumbnail\//.test(l.img);
+            var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
             var proxied = '/api/image-proxy?url=' + encodeURIComponent(l.img);
+            var proxiedLarge = '/api/image-proxy?url=' + encodeURIComponent(largeRaw);
             var img = '<img src="' + proxied + '" alt="" loading="lazy" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
             var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
             return '<div class="cp-card cp-logo-card" role="button" tabindex="0"'
-                + ' data-img="' + escapeAttr(proxied) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
+                + ' data-img="' + escapeAttr(proxiedLarge) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
                 + '<div class="cp-card-image">' + img + badge + '</div>'
                 + '<div class="cp-card-body">'
                     + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
