@@ -1,3 +1,7 @@
+## v2026.07.01.3 (2026.07.01)
+
+- feat(portal): cohesive 'Your Account' redesign — unified cards, hero Orders/Invoices, Coming-Soon art/mockups
+
 ## v2026.07.01.2 (2026.07.01)
 
 - feat(portal): rebrand to Your Account + re-order color/size picker + Coming-soon recs + simplified order status
