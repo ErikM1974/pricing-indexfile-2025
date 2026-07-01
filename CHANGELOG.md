@@ -1,3 +1,8 @@
+## v2026.06.30.5 (2026.06.30)
+
+- docs(portal): Phase 4 COMPLETE + verified — catalog-in-preview fix + rep request queue
+- feat(portal-p5): reward-dollars foundation — portal balance card + redeem-as-request + admin grant/adjust ledger panel
+
 ## v2026.06.30.4 (2026.06.30)
 
 - feat(portal-p4): rep re-order request work-queue in the Customer Portals console (Requests tab — list/status/delete/filter)
