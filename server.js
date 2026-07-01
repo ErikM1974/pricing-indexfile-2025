@@ -3524,17 +3524,30 @@ async function buildMyProducts(cid) {
     items.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
     const primary = items[0];                            // most-recent color → the card's main image + default
     const rows = await portalStyleRows(primary.style);   // cached (portalProductDisplay already fetched it)
-    const seen = new Set(); const colors = [];
+    const primaryMatch = portalMatchColor(rows, primary.color);
+    // Resolve each ordered color (a ShopWorks CATALOG_COLOR, e.g. "Hthrd Charcoal") to its SanMar
+    // COLOR_NAME + swatch — portalMatchColor matches on CATALOG_COLOR — and MERGE spellings that map
+    // to the same COLOR_NAME (SanMar sometimes exposes two catalog codes per color) so the piece
+    // total isn't split. Display = COLOR_NAME; keep catalogColor so the FE can match on either.
+    const byColor = new Map();
     for (const it of items) {
-      const key = String(it.color || '').toLowerCase();
-      if (!it.color || seen.has(key)) continue;
-      seen.add(key);
+      if (!it.color) continue;
       const m = portalMatchColor(rows, it.color);
-      colors.push({ name: it.color, swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: it.image || (m ? portalRowImage(m) : ''), totalQty: Number(it.totalQty) || 0 });
+      const display = (m && m.COLOR_NAME) || it.color;
+      const key = display.toLowerCase();
+      const ex = byColor.get(key);
+      if (ex) { ex.totalQty += Number(it.totalQty) || 0; }
+      else byColor.set(key, {
+        name: display, catalogColor: it.color,
+        swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: it.image || (m ? portalRowImage(m) : ''),
+        totalQty: Number(it.totalQty) || 0,
+      });
     }
+    const colors = [...byColor.values()];
     colors.sort((a, b) => (b.totalQty || 0) - (a.totalQty || 0)); // most-ordered color first (the picker's "top color")
     grouped.push(Object.assign({}, primary, {
-      colors,                                            // every ordered color (name + swatch + total qty) — FE shows these
+      color: (primaryMatch && primaryMatch.COLOR_NAME) || primary.color,  // card default = COLOR_NAME (matched via CATALOG_COLOR)
+      colors,                                            // ordered colors (COLOR_NAME + catalogColor + swatch + total qty)
       colorCount: colors.length,
       styleTotalQty: items.reduce((s, x) => s + (Number(x.totalQty) || 0), 0),  // pieces of this style over the ~3yr window
       timesOrdered: items.reduce((s, x) => s + (Number(x.timesOrdered) || 1), 0),

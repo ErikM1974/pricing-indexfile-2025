@@ -333,7 +333,7 @@
             : '';
         // Ordered colors + per-color totals → the modal picker marks them and shows "N ordered".
         var orderedColorsJson = JSON.stringify((kind === 'product' && p.colors ? p.colors : []).map(function (c) {
-            return { name: c.name, qty: Number(c.totalQty) || 0 };
+            return { name: c.name, cat: c.catalogColor || '', qty: Number(c.totalQty) || 0 };
         }));
         // Reward pill (premium recommendations only) — marketing label, no money moves. Blank = hidden.
         var reward = (kind === 'rec' && p.rewardText)
@@ -442,21 +442,17 @@
     }
 
     // ── Catalog-style color picker (replaces the old native <select>) ──
-    // Match key: canonicalize common ShopWorks color abbreviations ("Hthrd Charcoal", "Lt Hthr
-    // Grey") so they bind to the SanMar catalog name ("Heathered Charcoal", "Light Heather Grey")
-    // for marking + dedupe. Used ONLY for matching — the displayed names are left untouched.
-    function colorKey(s) {
-        return String(s == null ? '' : s).toLowerCase()
-            .replace(/heathered|heather|hthrd|hthr/g, 'hthr')
-            .replace(/\blight\b|\blt\b/g, 'lt')
-            .replace(/\bdark\b|\bdrk\b|\bdk\b/g, 'dk')
-            .replace(/grey/g, 'gray')
-            .replace(/[^a-z0-9]/g, '');
-    }
+    // The color the customer ordered is a ShopWorks CATALOG_COLOR ("Hthrd Charcoal"); the backend
+    // resolves it to the SanMar COLOR_NAME ("Heathered Charcoal") and passes BOTH (name + cat), so
+    // we match ordered → available on EITHER field exactly — no abbreviation guessing.
+    function normColor(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
     function orderedQtyMap() {
         var map = {};
         ((reqState && reqState.orderedColors) || []).forEach(function (c) {
-            if (c && c.name) map[colorKey(c.name)] = Number(c.qty) || 0;
+            if (!c) return;
+            var q = Number(c.qty) || 0;
+            if (c.name) map[normColor(c.name)] = q;      // key by COLOR_NAME
+            if (c.cat) map[normColor(c.cat)] = q;        // …and by CATALOG_COLOR
         });
         return map;
     }
@@ -464,7 +460,7 @@
     function setColorStat(colorName) {
         var el = document.getElementById('cp-req-colorstat');
         if (!el) return;
-        var q = orderedQtyMap()[colorKey(colorName)] || 0;
+        var q = orderedQtyMap()[normColor(colorName)] || 0;
         el.textContent = q > 0 ? ('· ' + q.toLocaleString() + ' ordered before') : '';
     }
 
@@ -477,22 +473,27 @@
 
         function renderTiles(colors) {
             reqState.colorImages = {};
-            // Ordered colors, each with a match key + a one-time "used" flag so a qty binds to at
-            // most one catalog tile (never double-counts onto two similar colors).
+            // Ordered colors carry COLOR_NAME (name) + CATALOG_COLOR (cat); a one-time "used" flag
+            // binds each qty to at most one catalog tile (never double-counts).
             var ordered = ((reqState && reqState.orderedColors) || []).map(function (oc) {
-                return { name: oc.name, key: colorKey(oc.name), qty: Number(oc.qty) || 0, used: false };
+                return { name: oc.name, nk: normColor(oc.name), ck: normColor(oc.cat || ''), qty: Number(oc.qty) || 0, used: false };
             });
-            function takeOrdered(key) {
-                for (var i = 0; i < ordered.length; i++) { if (!ordered[i].used && ordered[i].key === key) { ordered[i].used = true; return ordered[i].qty; } }
+            function takeQty(nameKey, catKey) {
+                for (var i = 0; i < ordered.length; i++) {
+                    var o = ordered[i];
+                    if (o.used) continue;
+                    if ((o.nk && o.nk === nameKey) || (o.ck && catKey && o.ck === catKey)) { o.used = true; return o.qty; }
+                }
                 return 0;
             }
             var enriched = colors.map(function (c, i) {
                 var name = c.name || c.catalogColor || '';
-                return { name: name, image: c.image || '', swatch: c.swatch || '', qty: name ? takeOrdered(colorKey(name)) : 0, i: i };
+                var cat = c.catalogColor || '';
+                return { name: name, cat: cat, image: c.image || '', swatch: c.swatch || '', qty: name ? takeQty(normColor(name), normColor(cat)) : 0, i: i };
             }).filter(function (c) { return c.name; });
             // Ordered colors with no catalog tile (truly discontinued) → show as a no-image tile.
             ordered.forEach(function (o) {
-                if (!o.used) { enriched.unshift({ name: o.name, image: (o.key === colorKey(orderedColor) ? orderedImage : '') || '', swatch: '', qty: o.qty, i: -1 }); o.used = true; }
+                if (!o.used) { enriched.unshift({ name: o.name, cat: '', image: '', swatch: '', qty: o.qty, i: -1 }); o.used = true; }
             });
             // Ordered colors first (by piece total desc), then the rest in catalog order.
             enriched.sort(function (a, b) {
@@ -500,13 +501,13 @@
                 if (b.qty !== a.qty) return b.qty - a.qty;
                 return a.i - b.i;
             });
-            // Resolve the selected tile by match key (the default ordered color may be spelled
-            // differently than its catalog tile), then pin the hidden input to that real tile name.
+            // Default selection = the card's shown color (orderedColor may be a COLOR_NAME or a raw
+            // CATALOG_COLOR) → its tile; else the top-ordered color; else the first tile.
             var hidden = document.getElementById('cp-req-color');
-            var selKey = colorKey(hidden.value || orderedColor);
+            var selKey = normColor(hidden.value || orderedColor);
             var selName = '';
-            enriched.forEach(function (c) { if (!selName && colorKey(c.name) === selKey) selName = c.name; });
-            if (!selName && enriched.length) selName = enriched[0].name;
+            enriched.forEach(function (c) { if (!selName && selKey && (normColor(c.name) === selKey || normColor(c.cat) === selKey)) selName = c.name; });
+            if (!selName) { var top = enriched.filter(function (c) { return c.qty > 0; })[0]; selName = top ? top.name : (enriched[0] ? enriched[0].name : ''); }
             hidden.value = selName;
             var topName = (enriched.length && enriched[0].qty > 0) ? enriched[0].name : null;
             grid.innerHTML = enriched.map(function (c) {
@@ -527,7 +528,7 @@
 
         // Seed with the ordered color(s) so the picker is never empty, then load the full list.
         renderTiles(((reqState && reqState.orderedColors) || []).map(function (c) {
-            return { name: c.name, image: (colorKey(c.name) === colorKey(orderedColor) ? orderedImage : ''), swatch: '' };
+            return { name: c.name, catalogColor: c.cat || '', image: '', swatch: '' };
         }));
         fetch(COLORS_URL_BASE + encodeURIComponent(style), { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
