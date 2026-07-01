@@ -1,3 +1,7 @@
+## v2026.07.01.2 (2026.07.01)
+
+- feat(portal): rebrand to Your Account + re-order color/size picker + Coming-soon recs + simplified order status
+
 ## v2026.07.01.1 (2026.07.01)
 
 - docs(portal): Phase 5 reward-dollars foundation SHIPPED + verified (ledger/grant/redeem)
