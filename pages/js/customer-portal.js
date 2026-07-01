@@ -130,17 +130,20 @@
         // The card opens a LIGHTBOX (not the internal staff art-request/mockup page, which errors
         // for customers). Store the proxied image so the lightbox shows the full design.
         grid.innerHTML = logos.map(function (l) {
-            // Grid = fast 256px thumbnail; lightbox = the LARGE version (Box ?size=large → 1024 / full
-            // original). ?size=large only applies to Box thumbnail URLs; other sources pass through.
+            // Box proof URLs are ALREADY caspio-proxy image endpoints — load them DIRECTLY (grid +
+            // lightbox). Double-proxying through /api/image-proxy stalls under page-load concurrency
+            // (~30 images at once). Direct also puts them on a separate host from the product images.
+            // Grid = 256px thumbnail; lightbox = ?size=large (1024/full). Non-proxy URLs (raw box.com /
+            // sanmar) still go through the FE image-proxy.
             var isBox = /\/api\/box\/thumbnail\//.test(l.img);
+            var gridSrc = isBox ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
             var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
-            var proxied = '/api/image-proxy?url=' + encodeURIComponent(l.img);
-            var proxiedLarge = '/api/image-proxy?url=' + encodeURIComponent(largeRaw);
-            var img = '<img src="' + proxied + '" alt="" loading="lazy" '
+            var largeSrc = isBox ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
+            var img = '<img src="' + gridSrc + '" alt="" loading="lazy" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
             var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
             return '<div class="cp-card cp-logo-card" role="button" tabindex="0"'
-                + ' data-img="' + escapeAttr(proxiedLarge) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
+                + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
                 + '<div class="cp-card-image">' + img + badge + '</div>'
                 + '<div class="cp-card-body">'
                     + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
