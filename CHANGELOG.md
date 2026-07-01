@@ -1,3 +1,7 @@
+## v2026.07.01.14 (2026-07-01)
+
+- fix(portal): My Logos images load eager (lazy left them blank below the fold)
+
 ## v2026.07.01.13 (2026-07-01)
 
 - docs(portal): My Logos — SanMar stock-photo fallback removed (real proofs only)
