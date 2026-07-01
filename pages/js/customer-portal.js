@@ -96,9 +96,10 @@
             });
         });
         (artRequests || []).forEach(function (a) {
-            // The DESIGN proof (garment + logo / the artwork) — NOT MAIN_IMAGE_URL_1, which is a
-            // plain SanMar garment catalog photo ("just the shirt").
-            var img = a.Final_Approved_Mockup || a.Box_File_Mockup || a.Box_File_Link || a.MAIN_IMAGE_URL_1;
+            // ONLY a real design proof (the mockup Steve/AE made). MAIN_IMAGE_URL_1 is a plain SanMar
+            // catalog stock photo of the blank garment/model — deliberately NOT used. A design with no
+            // proof on file is SKIPPED (we never show "just the model" as if it were the logo).
+            var img = a.Final_Approved_Mockup || a.Box_File_Mockup || a.Box_File_Link;
             if (!img) return;
             items.push({
                 design: String(a.Design_Num_SW || ''),
