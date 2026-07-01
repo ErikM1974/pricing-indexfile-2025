@@ -82,7 +82,7 @@
 
         if (mockups.length === 0) {
             grid.style.display = 'none';
-            emptyEl.style.display = 'block';
+            emptyEl.style.display = 'flex'; // .cp-soon-panel is a centered flex column
             return;
         }
 
@@ -144,7 +144,7 @@
 
         if (artRequests.length === 0) {
             grid.style.display = 'none';
-            emptyEl.style.display = 'block';
+            emptyEl.style.display = 'flex'; // .cp-soon-panel is a centered flex column
             return;
         }
 
@@ -211,8 +211,12 @@
     }
 
     function renderStatusBadge(status) {
-        if (!status) return '<span class="cp-status">Unknown</span>';
-        var slug = status.toLowerCase().replace(/\s+/g, '-');
+        // Route null AND '—' (server's zero-total payment marker) to a neutral pill so
+        // we never emit a junk slug like "cp-status--—" or a naked (unstyled) pill.
+        if (!status || status === '—') {
+            return '<span class="cp-status cp-status--neutral">' + escapeHtml(status || 'Unknown') + '</span>';
+        }
+        var slug = status.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         return '<span class="cp-status cp-status--' + slug + '">' + escapeHtml(status) + '</span>';
     }
 

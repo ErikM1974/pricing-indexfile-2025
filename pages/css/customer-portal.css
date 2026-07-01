@@ -1,20 +1,58 @@
-/* Customer Portal — cp- prefix */
+/* Customer Portal — "Your Account" surface. cp- prefix.
+   ONE design language: one border/shadow/radius/ink/spacing scale keyed off the
+   NWCA green + gold tokens below. (Redesigned 2026-07-01.) */
 
 :root {
+    /* Brand */
     --cp-theme: #2e7d32;
     --cp-theme-dark: #1b5e20;
     --cp-theme-light: #4caf50;
     --cp-theme-bg: #f1f8e9;
     --cp-theme-bg-hover: #e8f5e9;
+
+    /* Gold accent (warm half of the brand — Coming-Soon pill, Partial/Revision badge, rewards hairline) */
+    --cp-gold: #c9a227;
+    --cp-gold-dark: #b8942a;
+    --cp-gold-ink: #6b5e1f;      /* AA on --cp-gold-bg */
+    --cp-gold-bg: #fbf4d9;
+    --cp-gold-border: #e6d48a;
+
+    /* Surfaces + warm neutral canvas */
+    --cp-surface: #ffffff;       /* every card/panel/table */
+    --cp-surface-2: #f6f8f4;     /* image wells, subtle insets */
+    --cp-cream: #fbfbf7;         /* soon-panel base */
+    --cp-page-bg: #f4f6f1;       /* faint green-tinted page */
+
+    /* One border + line ramp */
+    --cp-border: #e3e7e1;        /* the single card/table hairline */
+    --cp-border-soft: #eef1ec;   /* interior row dividers */
+    --cp-zebra: #f8faf6;         /* table even-row stripe */
+    --cp-gray-100: #f0f2ee;
+    --cp-gray-200: #e2e6df;
+
+    /* One ink ramp */
+    --cp-ink: #1f2a22;           /* headings / primary */
+    --cp-ink-soft: #5c6b5e;      /* body / secondary */
+    --cp-ink-mute: #8a938c;      /* meta / dates / faint */
+
+    /* One elevation scale */
+    --cp-shadow-1: 0 1px 3px rgba(27,60,27,.06), 0 1px 2px rgba(27,60,27,.04);
+    --cp-shadow-2: 0 6px 20px rgba(27,60,27,.10);
+
+    /* Radius + spacing scale */
     --cp-radius: 10px;
+    --cp-radius-sm: 8px;
+    --cp-radius-lg: 14px;        /* modals */
+    --cp-gap: 16px;             /* inside grids */
+    --cp-section-y: 32px;       /* between sections */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f5f5;
-    color: #333;
+    background: var(--cp-page-bg);
+    color: var(--cp-ink);
     line-height: 1.5;
 }
 
@@ -27,198 +65,129 @@ body {
     align-items: center;
     gap: 14px;
 }
-
-.cp-header-logo {
-    height: 40px;
-    width: auto;
-}
-
-.cp-header-text h1 {
-    font-size: 18px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-}
-
-.cp-header-text p {
-    font-size: 12px;
-    opacity: 0.85;
-}
+.cp-header-logo { height: 40px; width: auto; }
+.cp-header-text h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
+.cp-header-text p { font-size: 12px; opacity: 0.85; }
 
 /* ── Main content ── */
-.cp-main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px 20px 60px;
-}
+.cp-main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
 
 /* ── Company banner ── */
 .cp-company-banner {
-    background: white;
-    border-radius: var(--cp-radius);
-    padding: 24px 28px;
-    margin-bottom: 28px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
     border-left: 4px solid var(--cp-theme);
+    border-radius: var(--cp-radius);
+    box-shadow: var(--cp-shadow-1);
+    padding: 22px 26px;
+    margin-bottom: 22px;
 }
+.cp-company-name { font-size: 21px; font-weight: 700; color: var(--cp-ink); margin-bottom: 3px; }
+.cp-company-subtitle { font-size: 13px; color: var(--cp-ink-mute); }
 
-.cp-company-name {
-    font-size: 22px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin-bottom: 4px;
-}
-
-.cp-company-subtitle {
-    font-size: 13px;
-    color: #888;
-}
-
-/* ── Sections ── */
-.cp-section {
-    margin-bottom: 32px;
-}
-
+/* ── Sections (ONE header pattern) ── */
+.cp-section { margin-bottom: var(--cp-section-y); }
 .cp-section-header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--cp-theme-bg);
+    margin-bottom: 14px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--cp-border);
 }
-
-.cp-section-header h2 {
-    font-size: 17px;
-    font-weight: 600;
-    color: #333;
-}
-
+.cp-section-header h2 { font-size: 16px; font-weight: 700; letter-spacing: .01em; color: var(--cp-ink); }
 .cp-section-count {
-    background: var(--cp-theme);
-    color: white;
+    background: var(--cp-theme-bg);
+    color: var(--cp-theme-dark);
+    border: 1px solid var(--cp-theme-light);
     font-size: 12px;
-    font-weight: 600;
-    padding: 2px 10px;
-    border-radius: 12px;
-    min-width: 24px;
+    font-weight: 700;
+    padding: 1px 9px;
+    border-radius: 999px;
+    min-width: 22px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
 }
+.cp-section-sub { color: var(--cp-ink-soft); font-size: 13px; margin: -2px 0 14px; }
 
-/* ── Card grid ── */
-.cp-card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 18px;
-}
+/* ══ ONE CARD SYSTEM ═══════════════════════════════════════════════
+   Both grids read as one family: white surface + one hairline + one
+   shadow + one radius + identical hover lift. Only min-width differs
+   by content type (art/mockup cards vs the denser product/rec cards). */
+.cp-card-grid { display: grid; gap: var(--cp-gap); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.cp-product-grid { display: grid; gap: var(--cp-gap); grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
 
-/* ── Card ── */
-.cp-card {
-    background: white;
+.cp-card,
+.cp-product-card {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
     border-radius: var(--cp-radius);
+    box-shadow: var(--cp-shadow-1);
     overflow: hidden;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
     text-decoration: none;
     color: inherit;
-    display: block;
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
-
-.cp-card:hover {
+.cp-card { cursor: pointer; }   /* .cp-card is an <a> */
+.cp-card:hover,
+.cp-product-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    box-shadow: var(--cp-shadow-2);
+    border-color: var(--cp-theme-light);
+}
+.cp-card:focus-visible,
+.cp-product-card:focus-within {
+    outline: 2px solid var(--cp-theme);
+    outline-offset: 2px;
 }
 
+/* Art / mockup card internals */
 .cp-card-image {
     width: 100%;
     aspect-ratio: 4/3;
-    background: #f0f0f0;
+    background: var(--cp-surface-2);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
 }
-
-.cp-card-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.cp-card-placeholder {
-    color: #ccc;
-    font-size: 48px;
-}
-
-.cp-card-body {
-    padding: 14px 16px;
-}
-
-.cp-card-design {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1a1a1a;
-    margin-bottom: 2px;
-}
-
+.cp-card-image img { width: 100%; height: 100%; object-fit: cover; }
+.cp-card-placeholder { color: #ccd2cb; font-size: 48px; }
+.cp-card-body { padding: 14px 16px; }
+.cp-card-design { font-size: 14px; font-weight: 600; color: var(--cp-ink); margin-bottom: 2px; }
 .cp-card-name {
     font-size: 13px;
-    color: #666;
+    color: var(--cp-ink-soft);
     margin-bottom: 8px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
-.cp-card-meta {
-    font-size: 12px;
-    color: #888;
-    margin-bottom: 4px;
-}
-
+.cp-card-meta { font-size: 12px; color: var(--cp-ink-mute); margin-bottom: 4px; }
 .cp-card-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-top: 10px;
     padding-top: 8px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--cp-border-soft);
 }
+.cp-card-date { font-size: 11px; color: var(--cp-ink-mute); }
 
-.cp-card-date {
-    font-size: 11px;
-    color: #aaa;
-}
-
-/* ── Status badges ── */
-.cp-status {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 12px;
-    text-transform: capitalize;
-}
-
-.cp-status--submitted { background: #e3f2fd; color: #1565c0; }
-.cp-status--in-progress { background: #fff3e0; color: #e65100; }
-.cp-status--awaiting-approval { background: #fce4ec; color: #c62828; }
-.cp-status--revision-requested { background: #fff8e1; color: #f57f17; }
-.cp-status--approved { background: #e8f5e9; color: #2e7d32; }
-.cp-status--completed { background: #e8f5e9; color: #1b5e20; }
-
-/* Action needed indicator */
+/* Action-needed highlight — thin, tokenized */
 .cp-card--action-needed {
-    border: 2px solid #ff9800;
+    border-color: var(--cp-gold);
+    box-shadow: 0 0 0 1px var(--cp-gold), var(--cp-shadow-1);
 }
-
 .cp-action-badge {
     position: absolute;
     top: 8px;
     right: 8px;
-    background: #ff9800;
-    color: white;
+    background: var(--cp-gold);
+    color: #3a2f06;
     font-size: 10px;
     font-weight: 700;
     padding: 3px 8px;
@@ -227,111 +196,159 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* ── Loading ── */
-.cp-loading {
-    text-align: center;
-    padding: 80px 20px;
+/* ── Status badges — one legible system (order + payment + art/mockup) ──
+   tinted fill + darker matching border + AA-contrast ink + a redundant
+   leading color DOT so status never relies on color alone (WCAG 1.4.1). */
+.cp-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.4;
+    padding: 4px 10px 4px 9px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    text-transform: capitalize;
+    letter-spacing: .01em;
+}
+.cp-status::before {
+    content: "";
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .9;
+    flex: 0 0 auto;
 }
 
+/* Art / mockup workflow */
+.cp-status--submitted          { background: #e7f0fb; color: #14508a; border-color: #b9d4f0; }
+.cp-status--in-progress        { background: #fdf0dc; color: #8a4b00; border-color: #f0d3a0; }
+.cp-status--awaiting-approval  { background: #fde7ec; color: #9c1c33; border-color: #f2bcc7; }
+.cp-status--revision-requested { background: var(--cp-gold-bg); color: var(--cp-gold-ink); border-color: var(--cp-gold-border); }
+.cp-status--approved           { background: #e4f3e6; color: #1b6b2c; border-color: #b4dcbb; }
+.cp-status--completed          { background: #e4f3e6; color: #14612a; border-color: #b4dcbb; }
+
+/* Order status (server emits 'In Process' | 'Invoiced'; legacy kept) */
+.cp-status--in-process         { background: #e7f0fb; color: #14508a; border-color: #b9d4f0; }
+.cp-status--in-production      { background: #e7f0fb; color: #14508a; border-color: #b9d4f0; }
+.cp-status--shipped            { background: #e4f3e6; color: #1b6b2c; border-color: #b4dcbb; }
+.cp-status--invoiced           { background: #ece7f7; color: #4a2c93; border-color: #cabfe8; }
+
+/* Payment status (server emits 'Paid' | 'Partial' | 'Open' | '—') */
+.cp-status--paid               { background: #e4f3e6; color: #14612a; border-color: #b4dcbb; }
+.cp-status--partial            { background: #fdf0dc; color: #8a4b00; border-color: #f0d3a0; }
+.cp-status--open               { background: #fde7ec; color: #9c1c33; border-color: #f2bcc7; }
+.cp-status--unpaid             { background: #fde7ec; color: #9c1c33; border-color: #f2bcc7; }
+
+/* Neutral / unknown / em-dash (server sends '—' when total is 0) */
+.cp-status--neutral {
+    background: var(--cp-gray-100);
+    color: var(--cp-ink-soft);
+    border-color: var(--cp-gray-200);
+}
+.cp-status--neutral::before { display: none; }
+
+/* ── Loading ── */
+.cp-loading { text-align: center; padding: 80px 20px; }
 .cp-spinner {
-    width: 40px;
-    height: 40px;
+    width: 40px; height: 40px;
     border: 3px solid #e0e0e0;
     border-top-color: var(--cp-theme);
     border-radius: 50%;
     animation: cp-spin 0.8s linear infinite;
     margin: 0 auto 16px;
 }
-
-@keyframes cp-spin {
-    to { transform: rotate(360deg); }
-}
-
-.cp-loading-text {
-    font-size: 14px;
-    color: #888;
-}
+@keyframes cp-spin { to { transform: rotate(360deg); } }
+.cp-loading-text { font-size: 14px; color: var(--cp-ink-mute); }
 
 /* ── Error ── */
-.cp-error {
-    text-align: center;
-    padding: 80px 20px;
-}
+.cp-error { text-align: center; padding: 80px 20px; }
+.cp-error-icon { font-size: 48px; margin-bottom: 16px; }
+.cp-error-title { font-size: 18px; font-weight: 600; color: var(--cp-ink); margin-bottom: 8px; }
+.cp-error-message { font-size: 14px; color: var(--cp-ink-mute); max-width: 400px; margin: 0 auto; }
 
-.cp-error-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-}
-
-.cp-error-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 8px;
-}
-
-.cp-error-message {
-    font-size: 14px;
-    color: #888;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-/* ── Empty state ── */
+/* ── Empty state (Products / Orders / Invoices — NOT the soon panel) ── */
 .cp-empty {
     text-align: center;
-    padding: 40px 20px;
-    color: #aaa;
+    padding: 40px 24px;
+    color: var(--cp-ink-mute);
     font-size: 14px;
-    background: white;
+    background: var(--cp-surface);
+    border: 1.5px dashed var(--cp-border);
     border-radius: var(--cp-radius);
-    border: 1px dashed #ddd;
+    box-shadow: var(--cp-shadow-1);
 }
-
-.cp-empty-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-}
+.cp-empty-icon { font-size: 32px; margin-bottom: 8px; }
 
 /* ── Footer ── */
 .cp-footer {
     text-align: center;
     padding: 20px;
     font-size: 11px;
-    color: #bbb;
+    color: var(--cp-ink-mute);
+    border-top: 1px solid var(--cp-border);
+    margin-top: 8px;
 }
 
-/* ── Orders / Invoices tables (Phase 3) ── */
-.cp-table-wrap { background: white; border-radius: var(--cp-radius); overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-.cp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.cp-table th { text-align: left; padding: 12px 14px; background: var(--cp-theme-bg); color: var(--cp-theme-dark); font-weight: 600; white-space: nowrap; border-bottom: 1px solid #e0e0e0; }
-.cp-table td { padding: 11px 14px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+/* ── Orders / Invoices tables — the hero ── */
+.cp-table-wrap {
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: var(--cp-radius);
+    overflow-x: auto;
+    box-shadow: var(--cp-shadow-1);
+    -webkit-overflow-scrolling: touch;
+}
+.cp-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 13.5px;
+    color: var(--cp-ink);
+}
+.cp-table thead th {
+    text-align: left;
+    padding: 12px 16px;
+    background: var(--cp-theme-bg);
+    color: var(--cp-theme-dark);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--cp-theme-light);
+}
+.cp-table thead th:first-child { border-top-left-radius: var(--cp-radius); }
+.cp-table thead th:last-child  { border-top-right-radius: var(--cp-radius); }
+.cp-table tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--cp-border-soft);
+    white-space: nowrap;
+    vertical-align: middle;
+}
 .cp-table tbody tr:last-child td { border-bottom: none; }
-.cp-table tbody tr:hover { background: var(--cp-theme-bg-hover); }
-.cp-table .cp-num { text-align: right; font-variant-numeric: tabular-nums; }
-.cp-link { color: var(--cp-theme); text-decoration: none; font-weight: 600; }
-.cp-link:hover { text-decoration: underline; }
-
-/* Order + invoice status badges */
-.cp-status--shipped { background: #e8f5e9; color: #2e7d32; }
-.cp-status--in-production { background: #e3f2fd; color: #1565c0; }
-.cp-status--invoiced { background: #ede7f6; color: #5e35b1; }
-.cp-status--paid { background: #e8f5e9; color: #2e7d32; }
-.cp-status--partial { background: #fff3e0; color: #e65100; }
-.cp-status--open { background: #fce4ec; color: #c62828; }
-
-/* ── Responsive ── */
-@media (max-width: 640px) {
-    .cp-header { padding: 12px 16px; }
-    .cp-header-text h1 { font-size: 16px; }
-    .cp-main { padding: 16px 12px 40px; }
-    .cp-company-banner { padding: 18px 20px; }
-    .cp-company-name { font-size: 18px; }
-    .cp-card-grid { grid-template-columns: 1fr; gap: 14px; }
-    .cp-table th, .cp-table td { padding: 9px 10px; }
+.cp-table tbody tr:nth-child(even) td { background: var(--cp-zebra); }
+.cp-table tbody tr:hover td { background: var(--cp-theme-bg-hover); }
+.cp-table tbody td:first-child { font-weight: 600; }
+.cp-table .cp-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    color: var(--cp-ink);
 }
+.cp-table td.cp-num:last-of-type { font-weight: 700; }
+.cp-link {
+    color: var(--cp-theme-dark);
+    text-decoration: none;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+.cp-link:hover { color: var(--cp-theme); text-decoration: underline; }
+.cp-link:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; border-radius: 3px; }
 
-/* ── Staff preview ribbon (only shown when the staff console previews a portal) ── */
+/* ── Staff-preview ribbon (only shown when the staff console previews a portal) ── */
 .cp-preview-ribbon {
     background: #1a472a;
     color: #fff;
@@ -346,28 +363,12 @@ body {
 }
 .cp-preview-ribbon a { color: #d7f0df; text-decoration: none; font-weight: 600; white-space: nowrap; }
 .cp-preview-ribbon a:hover { text-decoration: underline; }
+body.cp-has-ribbon .cp-header { border-top: 0; }
 
-/* ── Phase 4: Your Products + Recommendations + request modal ── */
-.cp-section-sub { color: #777; font-size: 13.5px; margin: -4px 0 12px; }
-
-.cp-product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
-}
-.cp-product-card {
-    background: #fff;
-    border: 1px solid #e6e8e3;
-    border-radius: var(--cp-radius);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    transition: box-shadow .15s, border-color .15s;
-}
-.cp-product-card:hover { box-shadow: 0 4px 16px rgba(27,94,32,.10); border-color: var(--cp-theme-light); }
+/* ── Products + Recommendations ── */
 .cp-product-img {
     aspect-ratio: 1 / 1;
-    background: #f6f8f4;
+    background: var(--cp-surface-2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -376,34 +377,101 @@ body {
 .cp-product-img img { width: 100%; height: 100%; object-fit: contain; }
 .cp-product-img.cp-noimg::after { content: '👕'; font-size: 40px; opacity: .35; }
 .cp-product-body { padding: 11px 12px 13px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
-.cp-product-title { font-weight: 600; font-size: 13.5px; color: #222; line-height: 1.3; }
-.cp-product-sub { font-size: 12px; color: #5c6b5e; }
-.cp-product-meta { font-size: 11.5px; color: #999; margin-bottom: 8px; }
+.cp-product-title { font-weight: 600; font-size: 13.5px; color: var(--cp-ink); line-height: 1.3; }
+.cp-product-sub { font-size: 12px; color: var(--cp-ink-soft); }
+.cp-product-meta { font-size: 11.5px; color: var(--cp-ink-mute); margin-bottom: 8px; }
 .cp-product-btn {
     margin-top: auto;
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
     border: 1px solid var(--cp-theme-light);
-    border-radius: 7px;
+    border-radius: var(--cp-radius-sm);
     padding: 8px 10px;
     font-size: 12.5px;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    transition: background .15s, color .15s;
+    transition: background .15s, color .15s, border-color .15s;
 }
-.cp-product-btn:hover { background: var(--cp-theme); color: #fff; }
+.cp-product-btn:hover { background: var(--cp-theme); color: #fff; border-color: var(--cp-theme); }
 
-/* Recommendation with no artwork/mockup yet → "Coming soon" placeholder */
+/* Recommendation with no artwork/mockup image yet → striped "Coming soon" placeholder in the card image well */
 .cp-coming-soon {
     display: flex; align-items: center; justify-content: center;
     width: 100%; height: 100%;
     font-size: 13px; font-weight: 600; letter-spacing: .02em;
-    color: #9aa39a; background: repeating-linear-gradient(45deg, #f2f5f0, #f2f5f0 10px, #eef2ec 10px, #eef2ec 20px);
+    color: #4f5b50; background: repeating-linear-gradient(45deg, #f2f5f0, #f2f5f0 10px, #eef2ec 10px, #eef2ec 20px);
 }
 .cp-product-card--soon .cp-product-btn { opacity: .85; }
 
-/* Request modal */
+/* ══ COMING-SOON PAIR — Mockups + Art & Designs (bottom of page) ══
+   Does NOT touch .cp-card rendering, so real cards still show for
+   customers who have them. */
+.cp-section--soon .cp-section-header h2 { color: var(--cp-ink-soft); }
+.cp-section--soon .cp-section-count {
+    background: var(--cp-gray-100);
+    color: var(--cp-ink-soft);
+    border-color: var(--cp-gray-200);
+}
+/* Gold "Coming Soon" pill — sits on the section header, always visible (empty OR populated) */
+.cp-soon-pill {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--cp-gold-ink);
+    background: var(--cp-gold-bg);
+    border: 1px solid var(--cp-gold-border);
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.cp-soon-pill::before {
+    content: "";
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--cp-gold);
+    flex: 0 0 auto;
+}
+/* Rich empty panel — replaces the plain box when the grid is empty.
+   Laid out with flex → JS sets #cp-*-empty to display:flex. */
+.cp-soon-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 44px 24px;
+    border: 1.5px dashed var(--cp-gold-border);
+    border-radius: var(--cp-radius);
+    box-shadow: var(--cp-shadow-1);
+    background:
+        radial-gradient(140% 120% at 50% -20%, var(--cp-theme-bg) 0%, transparent 62%),
+        var(--cp-cream);
+}
+.cp-soon-icon { font-size: 38px; line-height: 1; filter: saturate(.6); opacity: .85; margin-bottom: 2px; }
+.cp-soon-title { font-size: 15px; font-weight: 700; color: var(--cp-theme-dark); }
+.cp-soon-text { font-size: 13px; line-height: 1.55; color: var(--cp-ink-soft); max-width: 440px; }
+.cp-soon-cta {
+    display: inline-block;
+    margin-top: 6px;
+    text-decoration: none;
+    background: var(--cp-theme);   /* white-on-green 5.1:1 (AA) — gold-on-gold failed */
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 9px 18px;
+    border-radius: var(--cp-radius-sm);
+    transition: background .15s, transform .15s;
+}
+.cp-soon-cta:hover { background: var(--cp-theme-dark); transform: translateY(-1px); }
+/* When a "soon" section DOES have real cards, dim a hair (still fully clickable) */
+.cp-section--soon .cp-card-grid .cp-card { opacity: .97; }
+
+/* ── Request modal ── */
 .cp-modal-overlay {
     position: fixed; inset: 0;
     background: rgba(20,30,20,.5);
@@ -411,7 +479,7 @@ body {
     padding: 5vh 16px; z-index: 1000; overflow-y: auto;
 }
 .cp-modal {
-    background: #fff; border-radius: 14px; width: 100%; max-width: 440px;
+    background: #fff; border-radius: var(--cp-radius-lg); width: 100%; max-width: 440px;
     box-shadow: 0 16px 48px rgba(0,0,0,.25);
 }
 .cp-modal-head {
@@ -432,7 +500,7 @@ body {
 .cp-req-top { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
 .cp-req-image {
     flex: 0 0 88px; width: 88px; height: 88px; border-radius: 10px; overflow: hidden;
-    background: #f6f8f4; border: 1px solid #e6e8e3;
+    background: var(--cp-surface-2); border: 1px solid var(--cp-border);
     display: flex; align-items: center; justify-content: center;
 }
 .cp-req-image img { width: 100%; height: 100%; object-fit: contain; }
@@ -457,9 +525,6 @@ body {
 .cp-size-input:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
 .cp-size-total { margin-top: 9px; font-size: 13px; color: #444; text-align: right; }
 .cp-size-total strong { color: var(--cp-theme-dark); font-size: 15px; }
-@media (max-width: 420px) {
-    .cp-size-grid { grid-template-columns: repeat(3, 1fr); }
-}
 
 .cp-field { display: block; margin-bottom: 14px; }
 .cp-field-label { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 5px; }
@@ -491,16 +556,12 @@ body {
 }
 .cp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-@media (max-width: 600px) {
-    .cp-product-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-}
-
-/* ── Phase 5: reward dollars card ── */
+/* ── Reward dollars card ── */
 .cp-rewards {
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
     background: linear-gradient(135deg, #1b5e20, #2e7d32);
-    color: #fff; border-radius: var(--cp-radius); padding: 16px 22px; margin-bottom: 20px;
-    border: 1px solid #caa63a;
+    color: #fff; border-radius: var(--cp-radius); padding: 16px 22px; margin-bottom: var(--cp-section-y);
+    border: 1px solid #caa63a; box-shadow: var(--cp-shadow-1);
 }
 .cp-rewards-label { font-size: 13px; color: #d9f0dd; font-weight: 600; letter-spacing: .02em; }
 .cp-rewards-star { color: #ffd54f; }
@@ -511,3 +572,22 @@ body {
     white-space: nowrap; transition: background .15s;
 }
 .cp-rewards-btn:hover { background: #ffca28; }
+
+/* ── Responsive — one predictable collapse for both grids ── */
+@media (max-width: 640px) {
+    .cp-header { padding: 12px 16px; }
+    .cp-header-text h1 { font-size: 16px; }
+    .cp-main { padding: 16px 12px 48px; }
+    .cp-section { margin-bottom: 26px; }
+    .cp-company-banner { padding: 18px 20px; }
+    .cp-company-name { font-size: 18px; }
+    .cp-card-grid, .cp-product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .cp-section-header { flex-wrap: wrap; }
+    .cp-soon-pill { margin-left: 8px; }
+    .cp-table thead th, .cp-table tbody td { padding: 10px 12px; }
+    .cp-table { font-size: 13px; }
+}
+@media (max-width: 420px) {
+    .cp-card-grid, .cp-product-grid { grid-template-columns: 1fr 1fr; }
+    .cp-size-grid { grid-template-columns: repeat(3, 1fr); }
+}
