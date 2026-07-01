@@ -139,7 +139,9 @@
             var gridSrc = isBox ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
             var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
             var largeSrc = isBox ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
-            var img = '<img src="' + gridSrc + '" alt="" loading="lazy" '
+            // eager (not lazy): My Logos is a small showcase below the fold — lazy left the proof
+            // images blank until the customer scrolled far enough. Few images, so eager is fine.
+            var img = '<img src="' + gridSrc + '" alt="" loading="eager" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
             var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
             return '<div class="cp-card cp-logo-card" role="button" tabindex="0"'
