@@ -1,3 +1,8 @@
+## v2026.07.01.4 (2026.07.01)
+
+- fix(screenprint): wire customer-supplied-garment calculator to live pricing engine
+- docs(portal): record 2026-07-01 cohesive redesign (unified cards, hero tables, Coming-Soon pair, badge fixes)
+
 ## v2026.07.01.3 (2026.07.01)
 
 - feat(portal): cohesive 'Your Account' redesign — unified cards, hero Orders/Invoices, Coming-Soon art/mockups
