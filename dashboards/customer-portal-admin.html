@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.4">
+    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.5">
 </head>
 <body>
     <div class="dash-shell">
@@ -178,6 +178,41 @@
         </div>
     </div>
 
+    <!-- Reward dollars modal -->
+    <div class="cpa-modal-overlay" id="cpa-rewards-modal" style="display:none;">
+        <div class="cpa-modal" role="dialog" aria-modal="true">
+            <div class="cpa-modal-head">
+                <h3 id="cpa-rw-title">Reward Dollars</h3>
+                <button class="cpa-modal-close" id="cpa-rw-close" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cpa-modal-body">
+                <div class="cpa-rw-balance">Current balance: <strong id="cpa-rw-balance">—</strong></div>
+                <div class="cpa-field-row">
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">Amount ($)</span>
+                        <input type="text" id="cpa-rw-amount" inputmode="decimal" placeholder="25" autocomplete="off">
+                    </label>
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">Type</span>
+                        <select id="cpa-rw-type" class="cpa-select cpa-rw-select">
+                            <option value="grant">Grant (add)</option>
+                            <option value="redeem">Redeem (subtract)</option>
+                            <option value="adjust">Adjust (+/−)</option>
+                        </select>
+                    </label>
+                </div>
+                <label class="cpa-field">
+                    <span class="cpa-field-label">Reason <small>(shows in the audit trail)</small></span>
+                    <input type="text" id="cpa-rw-reason" placeholder="e.g. Loyalty bonus, applied to order #…" autocomplete="off">
+                </label>
+                <div class="cpa-modal-error" id="cpa-rw-error"></div>
+                <button class="cpa-btn cpa-btn-primary cpa-rw-save-btn" id="cpa-rw-save"><i class="fas fa-plus"></i> Add ledger entry</button>
+                <div class="cpa-rw-ledger-head">Recent activity</div>
+                <div class="cpa-rw-ledger" id="cpa-rw-ledger">—</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="cpa-toast" id="cpa-toast"></div>
 
@@ -185,6 +220,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/customer-portal-admin.js?v=2026.06.30.4"></script>
+    <script src="/dashboards/js/customer-portal-admin.js?v=2026.06.30.5"></script>
 </body>
 </html>

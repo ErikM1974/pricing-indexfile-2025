@@ -2475,6 +2475,9 @@ app.all('/api/crm-proxy/company-contacts*', ...createCrmProxy('company-contacts'
 // Re-order request work-queue (Phase 4) — the console's "Requests" tab lists/updates/deletes
 // Portal_Reorder_Requests via the proxy portal-reorder route (GET /requests, PUT/DELETE /requests/:pk).
 app.all('/api/crm-proxy/portal-reorder*', ...createCrmProxy('portal-reorder', PORTAL_ADMIN_ROLES));
+// Reward dollars (Phase 5) — the console reads a customer's ledger/balance here. WRITES go
+// through the dedicated /api/portal-admin/rewards/entry (which stamps the staff email).
+app.all('/api/crm-proxy/customer-rewards*', ...createCrmProxy('customer-rewards', PORTAL_ADMIN_ROLES));
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
@@ -3515,6 +3518,49 @@ app.post('/api/portal/reorder-request', reorderRequestLimiter, requireCustomer, 
   }
 });
 
+// ── Customer portal PHASE 5 — reward dollars (READ balance + REDEEM as a request) ──
+// The customer can only READ their balance and REQUEST a redemption — never change the
+// ledger. All ledger writes are staff-initiated (admin console → /api/portal-admin/rewards/entry).
+
+// GET /api/portal/rewards — the logged-in customer's reward-dollar balance + recent activity.
+app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const cid = String(req.customerSession.portalCustomer.idCustomer);
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    if (!r.ok) throw new Error('rewards ' + r.status);
+    res.json(await r.json());
+  } catch (err) { console.error('[Portal] rewards failed:', err.message); res.json({ balance: 0, entries: [] }); }
+});
+
+// POST /api/portal/rewards/redeem-request — customer asks to apply reward $ to their next
+// order. Does NOT change the balance — it lands in the rep queue (Source=redeem); the rep
+// applies it to an order and records the deduction in the ledger via the admin console.
+app.post('/api/portal/rewards/redeem-request', reorderRequestLimiter, requireCustomer, express.json(), async (req, res) => {
+  try {
+    const sess = req.customerSession.portalCustomer;
+    const cid = String(sess.idCustomer);
+    const amt = Number((req.body || {}).amount);
+    if (!isFinite(amt) || amt <= 0) return res.status(400).json({ error: 'Enter a valid amount.' });
+    // Server-authoritative check against the live balance.
+    const bR = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    const bal = bR.ok ? (Number((await bR.json()).balance) || 0) : 0;
+    if (amt > bal + 0.001) return res.status(400).json({ error: `You have $${bal.toFixed(2)} available.` });
+    const payload = {
+      id_Customer: cid, company_name: sess.companyName || '', email: sess.email || '',
+      style: 'REWARD', color: '', product_title: 'Redeem reward dollars', qty: '',
+      note: `Customer requests to apply $${amt.toFixed(2)} of reward dollars to their next order.`,
+      source: 'redeem',
+    };
+    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/request`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(payload) });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    res.json({ ok: true, requestNum: j.request && j.request.Request_Num, rep: j.request && j.request.Rep });
+  } catch (err) {
+    console.error('[Portal] redeem-request failed:', err.message);
+    res.status(502).json({ error: 'Could not send your redemption request. Please try again.' });
+  }
+});
+
 // Invoice page (session-gated). Reads the order # from the URL; the page fetches the
 // secured /api/portal/invoice/:orderNo above (which re-checks ownership).
 app.get('/portal/invoice/:orderNo', requireCustomer, (req, res) => {
@@ -3631,6 +3677,24 @@ app.get('/api/portal-admin/preview/:id/my-products', requireCrmRole(PORTAL_ADMIN
 app.get('/api/portal-admin/preview/:id/recommendations', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
   try { res.json(await buildRecommendations()); }
   catch (err) { console.error('[portal-admin] preview recs failed:', err.message); res.json({ recommendations: [] }); }
+});
+// GET /api/portal-admin/preview/:id/rewards — reward-dollar balance, for staff preview.
+app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    res.json(r.ok ? await r.json() : { balance: 0, entries: [] });
+  } catch (err) { res.json({ balance: 0, entries: [] }); }
+});
+// POST /api/portal-admin/rewards/entry — staff grant/adjust/redeem a reward entry. Stamps the
+// STAFF email as Created_By (audit) — the client can't spoof it (that's why this isn't a raw crm-proxy write).
+app.post('/api/portal-admin/rewards/entry', requireCrmRole(PORTAL_ADMIN_ROLES), express.json(), async (req, res) => {
+  try {
+    const body = Object.assign({}, req.body, { created_by: (req.session.crmUser && req.session.crmUser.email) || 'staff' });
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+    res.status(r.status).json(await r.json());
+  } catch (err) { console.error('[portal-admin] rewards entry failed:', err.message); res.status(502).json({ error: 'Could not save the reward entry.' }); }
 });
 
 // GET /api/portal-admin/preview/:id/invoice/:orderNo — one invoice, ownership-checked

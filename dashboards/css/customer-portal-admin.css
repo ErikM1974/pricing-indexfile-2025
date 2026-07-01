@@ -281,3 +281,19 @@
 .cpa-status-in-progress { background: #fff5e6; color: #8a5300; border-color: #f6d9a8; }
 .cpa-status-quoted { background: #eaf2fb; color: #1b4f8a; border-color: #c3d9f0; }
 .cpa-status-closed { background: var(--gray-100); color: var(--gray-500); border-color: var(--gray-200); }
+
+/* ── Reward dollars modal (Phase 5) ── */
+.cpa-rw-balance { font-size: .95rem; color: var(--gray-700); margin-bottom: 16px; padding: 10px 14px; background: var(--cpa-green-soft); border-radius: var(--radius-md); }
+.cpa-rw-balance strong { color: var(--cpa-green-dark); font-size: 1.15rem; }
+.cpa-rw-select { width: 100%; }
+.cpa-rw-save-btn { width: 100%; justify-content: center; margin-top: 2px; }
+.cpa-rw-ledger-head { font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray-500); font-weight: 600; margin: 20px 0 8px; }
+.cpa-rw-ledger { max-height: 240px; overflow-y: auto; }
+.cpa-rw-entry { display: flex; align-items: center; gap: 12px; padding: 8px 2px; border-bottom: 1px solid var(--gray-100); }
+.cpa-rw-amt { font-weight: 700; font-size: .9rem; min-width: 74px; }
+.cpa-rw-amt.pos { color: var(--cpa-green-dark); }
+.cpa-rw-amt.neg { color: #b3261e; }
+.cpa-rw-mid { flex: 1; font-size: .88rem; color: var(--gray-800); }
+.cpa-rw-meta { font-size: .76rem; color: var(--gray-400); margin-top: 1px; }
+.cpa-rw-when { font-size: .78rem; color: var(--gray-400); white-space: nowrap; }
+.cpa-rw-empty { color: var(--gray-400); font-size: .85rem; padding: 12px 2px; }

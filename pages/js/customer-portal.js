@@ -20,6 +20,7 @@
     var ORDERS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/orders') : '/api/portal/orders';
     var MYPRODUCTS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/my-products') : '/api/portal/my-products';
     var RECS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/recommendations') : '/api/portal/recommendations';
+    var REWARDS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/rewards') : '/api/portal/rewards';
     var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
     if (PREVIEW) showPreviewRibbon();
@@ -33,6 +34,7 @@
     // role-gated mirror endpoints). In preview the request button is view-only.
     loadProducts();
     loadRecs();
+    loadRewards();
 
     function loadPortalData() {
         fetch(AGG_URL, { credentials: 'same-origin' })
@@ -427,5 +429,53 @@
         var cancel = document.getElementById('cp-req-cancel'); if (cancel) cancel.addEventListener('click', closeReqModal);
         var submit = document.getElementById('cp-req-submit'); if (submit) submit.addEventListener('click', submitReq);
         var ov = document.getElementById('cp-req-modal'); if (ov) ov.addEventListener('click', function (e) { if (e.target === ov) closeReqModal(); });
+    })();
+
+    // ── Phase 5: reward dollars (read balance + redeem-as-request) ──
+    var rewardBalance = 0;
+    function loadRewards() {
+        fetch(REWARDS_URL, { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : { balance: 0 }; })
+            .then(function (d) {
+                rewardBalance = Number(d && d.balance) || 0;
+                if (rewardBalance > 0) {
+                    document.getElementById('cp-rewards-balance').textContent = money(rewardBalance);
+                    document.getElementById('cp-rewards').style.display = 'flex';
+                }
+            })
+            .catch(function () { });
+    }
+    function openRedeem() {
+        if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }
+        document.getElementById('cp-redeem-avail').textContent = money(rewardBalance);
+        document.getElementById('cp-redeem-amt').value = '';
+        document.getElementById('cp-redeem-error').textContent = '';
+        document.getElementById('cp-redeem-modal').style.display = 'flex';
+    }
+    function closeRedeem() { document.getElementById('cp-redeem-modal').style.display = 'none'; }
+    function submitRedeem() {
+        var amt = parseFloat(document.getElementById('cp-redeem-amt').value);
+        var err = document.getElementById('cp-redeem-error');
+        err.textContent = '';
+        if (!(amt > 0)) { err.textContent = 'Enter a valid amount.'; return; }
+        if (amt > rewardBalance + 0.001) { err.textContent = 'You have ' + money(rewardBalance) + ' available.'; return; }
+        var btn = document.getElementById('cp-redeem-submit');
+        btn.disabled = true; btn.textContent = 'Sending…';
+        fetch('/api/portal/rewards/redeem-request', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: amt }) })
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+            .then(function (x) {
+                btn.disabled = false; btn.textContent = 'Send request to my rep';
+                if (!x.ok || !x.j.ok) { err.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
+                closeRedeem();
+                showToast('Redemption request sent! ' + (x.j.rep ? escapeHtml(x.j.rep) + ' will' : "We'll") + ' apply it to your next order.');
+            })
+            .catch(function () { btn.disabled = false; btn.textContent = 'Send request to my rep'; err.textContent = 'Could not send. Please try again.'; });
+    }
+    (function wireRedeem() {
+        var b = document.getElementById('cp-redeem-btn'); if (b) b.addEventListener('click', openRedeem);
+        var c = document.getElementById('cp-redeem-close'); if (c) c.addEventListener('click', closeRedeem);
+        var ca = document.getElementById('cp-redeem-cancel'); if (ca) ca.addEventListener('click', closeRedeem);
+        var s = document.getElementById('cp-redeem-submit'); if (s) s.addEventListener('click', submitRedeem);
+        var ov = document.getElementById('cp-redeem-modal'); if (ov) ov.addEventListener('click', function (e) { if (e.target === ov) closeRedeem(); });
     })();
 })();

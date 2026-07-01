@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Design Portal - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.06.30.2">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.06.30.5">
 </head>
 <body>
     <!-- Header -->
@@ -39,6 +39,15 @@
         <div class="cp-company-banner">
             <div class="cp-company-name" id="cp-company-name"></div>
             <div class="cp-company-subtitle" id="cp-company-subtitle">Your designs and mockups</div>
+        </div>
+
+        <!-- Reward dollars -->
+        <div class="cp-rewards" id="cp-rewards" style="display:none;">
+            <div class="cp-rewards-left">
+                <div class="cp-rewards-label"><span class="cp-rewards-star">&#9733;</span> Your Reward Dollars</div>
+                <div class="cp-rewards-balance" id="cp-rewards-balance">$0.00</div>
+            </div>
+            <button class="cp-rewards-btn" id="cp-redeem-btn" type="button">Redeem on your next order</button>
         </div>
 
         <!-- Your Products (re-order) -->
@@ -142,6 +151,31 @@
         </div>
     </div>
 
+    <!-- Redeem reward dollars modal -->
+    <div class="cp-modal-overlay" id="cp-redeem-modal" style="display:none;">
+        <div class="cp-modal" role="dialog" aria-modal="true">
+            <div class="cp-modal-head">
+                <h3>Redeem Reward Dollars</h3>
+                <button class="cp-modal-close" id="cp-redeem-close" aria-label="Close">&times;</button>
+            </div>
+            <div class="cp-modal-body">
+                <div class="cp-req-product">
+                    <div class="cp-req-prod-title">You have <span id="cp-redeem-avail">$0.00</span> in rewards</div>
+                    <div class="cp-req-prod-sub">Tell us how much to apply to your next order — your rep takes it from there.</div>
+                </div>
+                <label class="cp-field">
+                    <span class="cp-field-label">Amount to redeem</span>
+                    <input type="text" id="cp-redeem-amt" inputmode="decimal" placeholder="e.g. 25" autocomplete="off">
+                </label>
+                <div class="cp-req-error" id="cp-redeem-error"></div>
+            </div>
+            <div class="cp-modal-foot">
+                <button class="cp-btn-ghost" id="cp-redeem-cancel" type="button">Cancel</button>
+                <button class="cp-btn-primary" id="cp-redeem-submit" type="button">Send request to my rep</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast -->
     <div class="cp-toast" id="cp-toast"></div>
 
@@ -151,6 +185,6 @@
     </div>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.06.30.3"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.06.30.5"></script>
 </body>
 </html>

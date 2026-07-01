@@ -141,6 +141,7 @@
         '<td class="cpa-hide-sm">' + fmtLastLogin(r.last_login) + '</td>' +
         '<td><div class="cpa-actions">' +
           '<button class="cpa-btn-icon" data-action="preview" data-id="' + esc(r.id_Customer) + '" title="Preview their portal"><i class="fas fa-eye"></i></button>' +
+          '<button class="cpa-btn-icon" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Reward dollars"><i class="fas fa-coins"></i></button>' +
           '<button class="cpa-btn-icon" data-action="sendlink" data-email="' + esc(r.email) + '" title="Email a login link"><i class="fas fa-paper-plane"></i></button>' +
           '<button class="cpa-btn-icon" data-action="toggle" data-pk="' + esc(r.PK_ID) + '" data-enabled="' + (r.enabled ? '1' : '0') + '" title="' + toggleLabel + ' access"><i class="fas ' + toggleIcon + '"></i></button>' +
           '<button class="cpa-btn-icon cpa-danger" data-action="delete" data-pk="' + esc(r.PK_ID) + '" data-email="' + esc(r.email) + '" title="Remove access"><i class="fas fa-trash"></i></button>' +
@@ -163,6 +164,10 @@
 
     if (action === 'preview') {
       window.open('/portal-admin/preview/' + encodeURIComponent(btn.getAttribute('data-id')), '_blank', 'noopener');
+      return;
+    }
+    if (action === 'rewards') {
+      openRewardsModal(btn.getAttribute('data-id'), btn.getAttribute('data-company'));
       return;
     }
     if (action === 'sendlink') {
@@ -383,6 +388,69 @@
     } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; }
   }
 
+  // ═══ Reward dollars (Phase 5) ═══
+  var REWARDS_LEDGER_API = '/api/crm-proxy/customer-rewards/ledger';
+  var REWARDS_ENTRY_API = '/api/portal-admin/rewards/entry';
+  var rwCustomer = null;
+
+  function money2(n) { return '$' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+  function openRewardsModal(id, company) {
+    rwCustomer = { id: id, company: company || '' };
+    document.getElementById('cpa-rw-title').textContent = 'Reward Dollars — ' + (company || ('#' + id));
+    document.getElementById('cpa-rw-balance').textContent = '…';
+    document.getElementById('cpa-rw-amount').value = '';
+    document.getElementById('cpa-rw-reason').value = '';
+    document.getElementById('cpa-rw-type').value = 'grant';
+    document.getElementById('cpa-rw-error').textContent = '';
+    document.getElementById('cpa-rw-ledger').innerHTML = 'Loading…';
+    document.getElementById('cpa-rewards-modal').style.display = 'flex';
+    loadRewardLedger();
+  }
+  function closeRewardsModal() { document.getElementById('cpa-rewards-modal').style.display = 'none'; }
+
+  async function loadRewardLedger() {
+    if (!rwCustomer) return;
+    try {
+      var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(rwCustomer.id));
+      document.getElementById('cpa-rw-balance').textContent = money2(data.balance);
+      var entries = (data && data.entries) || [];
+      var el = document.getElementById('cpa-rw-ledger');
+      if (!entries.length) { el.innerHTML = '<div class="cpa-rw-empty">No activity yet.</div>'; return; }
+      el.innerHTML = entries.map(function (e) {
+        var pos = Number(e.amount) >= 0;
+        return '<div class="cpa-rw-entry">' +
+          '<div class="cpa-rw-amt ' + (pos ? 'pos' : 'neg') + '">' + (pos ? '+' : '−') + money2(Math.abs(e.amount)) + '</div>' +
+          '<div class="cpa-rw-mid"><div>' + (esc(e.reason) || esc(e.type)) + '</div><div class="cpa-rw-meta">' + esc(e.type) + (e.by ? ' · ' + esc(e.by) : '') + '</div></div>' +
+          '<div class="cpa-rw-when">' + fmtLastLogin(e.created) + '</div>' +
+        '</div>';
+      }).join('');
+    } catch (err) {
+      if (err.message !== 'auth') document.getElementById('cpa-rw-ledger').innerHTML = '<div class="cpa-rw-empty">Could not load: ' + esc(err.message) + '</div>';
+    }
+  }
+
+  async function submitRewardEntry() {
+    if (!rwCustomer) return;
+    var amount = parseFloat(document.getElementById('cpa-rw-amount').value);
+    var type = document.getElementById('cpa-rw-type').value;
+    var reason = document.getElementById('cpa-rw-reason').value.trim();
+    var err = document.getElementById('cpa-rw-error');
+    err.textContent = '';
+    if (!isFinite(amount) || amount === 0) { err.textContent = 'Enter a non-zero amount.'; return; }
+    var saveBtn = document.getElementById('cpa-rw-save');
+    saveBtn.disabled = true;
+    try {
+      var res = await api(REWARDS_ENTRY_API, { method: 'POST', body: JSON.stringify({ id_Customer: rwCustomer.id, company_name: rwCustomer.company, amount: amount, type: type, reason: reason }) });
+      toast('Balance now ' + money2(res.balance));
+      document.getElementById('cpa-rw-amount').value = '';
+      document.getElementById('cpa-rw-reason').value = '';
+      await loadRewardLedger();
+    } catch (e2) {
+      if (e2.message !== 'auth') err.textContent = e2.message;
+    } finally { saveBtn.disabled = false; }
+  }
+
   // ---- wire up ----
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('content-root').addEventListener('click', onTableClick);
@@ -408,6 +476,10 @@
     document.getElementById('cpa-req-mine-btn').addEventListener('click', function () { reqMyOnly = !reqMyOnly; this.classList.toggle('cpa-btn-active', reqMyOnly); renderRequests(); });
     document.getElementById('requests-root').addEventListener('click', onRequestsClick);
     document.getElementById('requests-root').addEventListener('change', onRequestsChange);
+    // Reward dollars modal
+    document.getElementById('cpa-rw-close').addEventListener('click', closeRewardsModal);
+    document.getElementById('cpa-rewards-modal').addEventListener('click', function (e) { if (e.target === this) closeRewardsModal(); });
+    document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     loadMe();
     loadInvites();
