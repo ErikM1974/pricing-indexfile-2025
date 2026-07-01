@@ -85,25 +85,25 @@
         var isApproved = function (s) { return /(approv|complet)/i.test(String(s || '')); };
         var items = [];
         (mockups || []).forEach(function (m) {
-            if (!m.Box_Mockup_1) return;
+            var img = m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
+            if (!img) return;
             items.push({
                 design: String(m.Design_Number || ''),
                 name: m.Design_Name || (m.Design_Number ? 'Design #' + m.Design_Number : 'Design'),
                 meta: [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · '),
-                img: m.Box_Mockup_1, date: m.Submitted_Date || '', kind: 'mockup',
-                approved: isApproved(m.Status),
-                href: '/mockup/' + encodeURIComponent(m.ID) + '?view=customer&cid=' + encodeURIComponent(custId)
+                img: img, date: m.Submitted_Date || '', kind: 'mockup', approved: isApproved(m.Status)
             });
         });
         (artRequests || []).forEach(function (a) {
-            if (!a.MAIN_IMAGE_URL_1) return;
+            // The DESIGN proof (garment + logo / the artwork) — NOT MAIN_IMAGE_URL_1, which is a
+            // plain SanMar garment catalog photo ("just the shirt").
+            var img = a.Final_Approved_Mockup || a.Box_File_Mockup || a.Box_File_Link || a.MAIN_IMAGE_URL_1;
+            if (!img) return;
             items.push({
                 design: String(a.Design_Num_SW || ''),
                 name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
                 meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
-                img: a.MAIN_IMAGE_URL_1, date: a.Date_Created || '', kind: 'art',
-                approved: isApproved(a.Status),
-                href: '/art-request/' + encodeURIComponent(a.ID_Design) + '?view=customer&cid=' + encodeURIComponent(custId)
+                img: img, date: a.Date_Created || '', kind: 'art', approved: isApproved(a.Status)
             });
         });
 
@@ -113,7 +113,7 @@
         var rank = function (it) { return (it.approved ? 100 : 0) + (it.kind === 'mockup' ? 10 : 0); };
         var byKey = {};
         items.forEach(function (it) {
-            var key = it.design ? ('d:' + it.design) : ('u:' + it.href);
+            var key = it.design ? ('d:' + it.design) : ('u:' + it.img);
             var ex = byKey[key];
             if (!ex) { byKey[key] = it; return; }
             var better = rank(it) > rank(ex) || (rank(it) === rank(ex) && String(it.date) > String(ex.date));
@@ -125,22 +125,51 @@
         countEl.textContent = logos.length;
         if (!logos.length) { grid.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
         emptyEl.style.display = 'none';
+        // The card opens a LIGHTBOX (not the internal staff art-request/mockup page, which errors
+        // for customers). Store the proxied image so the lightbox shows the full design.
         grid.innerHTML = logos.map(function (l) {
-            var img = '<img src="/api/image-proxy?url=' + encodeURIComponent(l.img) + '" alt="" loading="lazy" '
+            var proxied = '/api/image-proxy?url=' + encodeURIComponent(l.img);
+            var img = '<img src="' + proxied + '" alt="" loading="lazy" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
             var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
-            return '<a class="cp-card" href="' + l.href + '" target="_blank">'
+            return '<div class="cp-card cp-logo-card" role="button" tabindex="0"'
+                + ' data-img="' + escapeAttr(proxied) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
                 + '<div class="cp-card-image">' + img + badge + '</div>'
                 + '<div class="cp-card-body">'
                     + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
                     + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')
                     + '<div class="cp-card-footer">'
-                        + '<span class="cp-card-view">View design &rarr;</span>'
+                        + '<span class="cp-card-view">View design</span>'
                         + '<div class="cp-card-date">' + formatDate(l.date) + '</div>'
                     + '</div>'
-                + '</div></a>';
+                + '</div></div>';
         }).join('');
     }
+
+    // ── My Logos lightbox: click a design card → view the full design image (no staff page) ──
+    function openLogoLightbox(card) {
+        var lb = document.getElementById('cp-logo-lightbox');
+        if (!lb) return;
+        document.getElementById('cp-lightbox-img').src = card.getAttribute('data-img') || '';
+        document.getElementById('cp-lightbox-title').textContent = card.getAttribute('data-title') || '';
+        document.getElementById('cp-lightbox-meta').textContent = card.getAttribute('data-meta') || '';
+        lb.style.display = 'flex';
+    }
+    function closeLogoLightbox() {
+        var lb = document.getElementById('cp-logo-lightbox');
+        if (lb) { lb.style.display = 'none'; var im = document.getElementById('cp-lightbox-img'); if (im) im.src = ''; }
+    }
+    document.addEventListener('click', function (e) {
+        var card = e.target.closest && e.target.closest('.cp-logo-card');
+        if (card) { openLogoLightbox(card); return; }
+        var lb = document.getElementById('cp-logo-lightbox');
+        if (lb && lb.style.display !== 'none' && (e.target === lb || e.target.id === 'cp-lightbox-close')) closeLogoLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { closeLogoLightbox(); return; }
+        var card = e.target.closest && e.target.closest('.cp-logo-card');
+        if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openLogoLightbox(card); }
+    });
 
     // ── Helpers ──
 
