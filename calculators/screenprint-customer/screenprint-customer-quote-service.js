@@ -21,17 +21,6 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
     }
 
     /**
-     * Get pricing tier based on quantity
-     */
-    getPricingTier(quantity) {
-        if (quantity <= 71) return '24-71';
-        if (quantity <= 143) return '72-143';
-        if (quantity <= 287) return '144-287';
-        if (quantity <= 499) return '288-499';
-        return '500+';
-    }
-
-    /**
      * Save Customer Screen Print quote
      */
     async saveQuote(quoteData) {
@@ -137,7 +126,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                 FinalUnitPrice: parseFloat((quoteData.pricePerShirt || 0).toFixed(2)),
                 LineTotal: parseFloat((quoteData.orderSubtotal || 0).toFixed(2)),
                 SizeBreakdown: '{}',
-                PricingTier: this.getPricingTier(quoteData.quantity || 0),
+                PricingTier: quoteData.tierLabel || '',
                 ImageURL: '',
                 AddedAt: addedAt
             };
