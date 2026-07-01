@@ -1,3 +1,8 @@
+## v2026.07.01.6 (2026-07-01)
+
+- docs(portal): recs Phase 1 SHIPPED (candidate pool + margin ranking + reward pills); reward $ + accrual pending
+- feat(portal): Your Products = one card per style with ordered-color swatches (catalog view)
+
 ## v2026.07.01.5 (2026-07-01)
 
 - docs(portal): capture per-customer recs + rewards PROPOSAL (2026-07-01 brainstorm, awaiting Erik's 3 decisions)
