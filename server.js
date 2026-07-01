@@ -3223,13 +3223,28 @@ async function getPortalData(customerId) {
 // GET /api/portal — customer-safe aggregate for the LOGGED-IN customer. SESSION-SCOPED:
 // the id comes ONLY from the verified session (#6 Phase 2), never the URL — this closes the
 // old /api/portal/:customerId enumeration IDOR. Empty ≠ not-found (200 with empty arrays).
+// Resolve the real company name from the customer's ORDERS (CustomerName) — the reliable
+// fallback when the art/mockup-derived name is empty (a customer with no art on file), which
+// is why the staff preview showed the generic "Your Company".
+async function resolvePortalCompany(cid) {
+  try {
+    const today = new Date(); const end = today.toISOString().slice(0, 10);
+    const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3); const start = sd.toISOString().slice(0, 10);
+    const r = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`,
+      { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    if (!r.ok) return '';
+    const orders = (await r.json()).result || [];
+    for (const o of orders) { if (o.CustomerName) return String(o.CustomerName).trim(); }
+    return '';
+  } catch (_) { return ''; }
+}
+
 app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);
     const data = await getPortalData(cid);
-    // Prefer the data-derived company name; fall back to the invite's name so an EMPTY
-    // portal still shows the real company instead of the generic "Your Company".
-    const companyName = (data.company && data.company.name) || req.customerSession.portalCustomer.companyName || '';
+    let companyName = (data.company && data.company.name) || req.customerSession.portalCustomer.companyName || '';
+    if (!companyName) companyName = await resolvePortalCompany(cid);
     res.json(Object.assign({ customerId: cid }, data, { company: { name: companyName } }));
   } catch (err) {
     console.error('[Portal] aggregate failed:', err.message);
@@ -3242,11 +3257,10 @@ app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
 // Invoices/Balances table (each order row carries cur_TotalInvoice/Payments/Balance).
 // Status is derived from the milestone dates — reliable + customer-friendly. Only the
 // customer's own order/money fields are projected (no rep, no internal ids, no costs).
+// Erik 2026-07-01: customers only need "In Process" (still being worked) vs "Invoiced" (done).
+// Drop "Shipped"/"In Production" — the customer doesn't track those milestones here.
 function portalOrderStatus(o) {
-  if (o.date_Shippied) return 'Shipped';        // (ManageOrders spells the field "Shippied")
-  if (o.date_Produced) return 'In Production';
-  if (o.date_Invoiced) return 'Invoiced';
-  return 'In Progress';
+  return o.date_Invoiced ? 'Invoiced' : 'In Process';
 }
 function projectPortalOrder(o) {
   const total = Number(o.cur_TotalInvoice) || 0;
@@ -3376,7 +3390,7 @@ app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (r
 // fields). The re-order action is a REQUEST that routes to the rep — NO price/payment.
 
 const _portalPdCache = new Map(); // styleNumber → product-details rows (shared, static-ish)
-async function portalProductDisplay(style, color) {
+async function portalStyleRows(style) {
   let rows = _portalPdCache.get(style);
   if (!rows) {
     try {
@@ -3387,14 +3401,43 @@ async function portalProductDisplay(style, color) {
     if (!Array.isArray(rows)) rows = [];
     _portalPdCache.set(style, rows);
   }
-  const want = String(color || '').toLowerCase();
-  const row = rows.find(x => String(x.COLOR_NAME || '').toLowerCase() === want)
-    || rows.find(x => want && String(x.COLOR_NAME || '').toLowerCase().includes(want))
-    || rows[0];
-  return {
-    image: row ? (row.PRODUCT_IMAGE || row.FRONT_MODEL || row.FRONT_FLAT || '') : '',
-    title: row ? row.PRODUCT_TITLE : '',
-  };
+  return rows;
+}
+function portalRowImage(row) { return row ? (row.PRODUCT_IMAGE || row.FRONT_MODEL || row.FRONT_FLAT || '') : ''; }
+// Robust color match (exact → catalog code → contains, all punctuation/space-insensitive) so
+// "Jet Black" resolves to the Jet-Black garment image, not the style's default color. null = no match.
+function portalMatchColor(rows, color) {
+  const norm = s => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const want = norm(color);
+  if (!want) return null;
+  return rows.find(x => norm(x.COLOR_NAME) === want)
+    || rows.find(x => norm(x.CATALOG_COLOR) === want)
+    || rows.find(x => { const c = norm(x.COLOR_NAME); return c && (c.includes(want) || want.includes(c)); })
+    || null;
+}
+// Deduped color list (name + garment image + swatch) for the re-order color picker.
+function portalColorList(rows) {
+  const seen = new Set(), out = [];
+  for (const r of rows) {
+    const name = r.COLOR_NAME;
+    if (!name || seen.has(name.toLowerCase())) continue;
+    seen.add(name.toLowerCase());
+    out.push({ name, image: portalRowImage(r), swatch: r.COLOR_SQUARE_IMAGE || '', catalogColor: r.CATALOG_COLOR || '' });
+  }
+  return out;
+}
+async function portalProductDisplay(style, color) {
+  const rows = await portalStyleRows(style);
+  const match = portalMatchColor(rows, color);
+  const row = match || rows[0];
+  return { image: portalRowImage(row), title: row ? row.PRODUCT_TITLE : '', matched: !!match };
+}
+// {S:2, M:4, …} from a line item's Size01–06 (SHOPWORKS_SIZE_MAPPING), non-zero only.
+function portalSizeMap(li) {
+  const L = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+  const m = {};
+  [li.Size01, li.Size02, li.Size03, li.Size04, li.Size05, li.Size06].forEach((v, i) => { const n = Number(v) || 0; if (n > 0) m[L[i]] = n; });
+  return m;
 }
 // ShopWorks PartNumber → base SanMar style + color; null for fee / non-garment lines.
 function portalNormalizePart(li) {
@@ -3443,14 +3486,23 @@ async function buildMyProducts(cid) {
           description: li.PartDescription || '',
           designNumber: o.id_Design || null, designName: o.DesignName || null,
           lastOrdered: o.date_Ordered || null, lastQty: qty, timesOrdered: 1,
+          sizes: portalSizeMap(li), _sizesFrom: o.date_Ordered,
         });
-      } else { ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty; }
+      } else {
+        ex.timesOrdered++; if (!ex.lastQty) ex.lastQty = qty;
+        // accumulate the size breakdown across the product's line items in the SAME (latest) order
+        if (o.date_Ordered && o.date_Ordered === ex._sizesFrom) {
+          const m = portalSizeMap(li);
+          Object.keys(m).forEach(k => { ex.sizes[k] = (ex.sizes[k] || 0) + m[k]; });
+        }
+      }
     }
   }
   const list = [...products.values()];
   await Promise.all(list.map(async (p) => {
     const pd = await portalProductDisplay(p.style, p.color);
-    p.image = pd.image; p.title = pd.title || p.description;
+    p.image = pd.image; p.title = pd.title || p.description; p.colorMatched = pd.matched;
+    delete p._sizesFrom;
   }));
   list.sort((a, b) => String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || '')));
   return { products: list };
@@ -3462,9 +3514,9 @@ async function buildRecommendations() {
   const recs = ((await r.json()).recommendations || []).slice(0, 12);
   await Promise.all(recs.map(async (rec) => {
     const pd = await portalProductDisplay(rec.style, rec.color);
-    rec.image = pd.image; rec.title = rec.title || pd.title;
+    rec.image = pd.image; rec.title = rec.title || pd.title; rec.comingSoon = !pd.image;
   }));
-  return { recommendations: recs.filter(x => x.image || x.title) };
+  return { recommendations: recs.filter(x => x.style) }; // keep all; FE shows "Coming soon" when no image
 }
 
 // GET /api/portal/my-products — the logged-in customer's personalized re-order catalog.
@@ -3476,6 +3528,15 @@ app.get('/api/portal/my-products', portalLimiter, requireCustomer, async (req, r
 app.get('/api/portal/recommendations', portalLimiter, requireCustomer, async (req, res) => {
   try { res.json(await buildRecommendations()); }
   catch (err) { console.error('[Portal] recommendations failed:', err.message); res.json({ recommendations: [] }); }
+});
+// GET /api/portal/product-colors/:style — available colors (name + garment image + swatch) for
+// the re-order color picker. Public SanMar catalog data (no customer info), session-gated.
+app.get('/api/portal/product-colors/:style', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const style = String(req.params.style || '').trim();
+    if (!style) return res.status(400).json({ error: 'style required' });
+    res.json({ colors: portalColorList(await portalStyleRows(style)) });
+  } catch (err) { console.error('[Portal] product-colors failed:', err.message); res.json({ colors: [] }); }
 });
 
 // POST /api/portal/reorder-request — customer asks to re-order (or order a recommended item).
@@ -3635,7 +3696,8 @@ app.get('/api/portal-admin/preview/:id', requireCrmRole(PORTAL_ADMIN_ROLES), asy
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
   try {
     const data = await getPortalData(cid);
-    const companyName = (data.company && data.company.name) || '';
+    let companyName = (data.company && data.company.name) || '';
+    if (!companyName) companyName = await resolvePortalCompany(cid);
     res.json(Object.assign({ customerId: cid, staffPreview: true }, data, { company: { name: companyName } }));
   } catch (err) {
     console.error('[portal-admin] preview aggregate failed:', err.message);
@@ -3677,6 +3739,11 @@ app.get('/api/portal-admin/preview/:id/my-products', requireCrmRole(PORTAL_ADMIN
 app.get('/api/portal-admin/preview/:id/recommendations', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
   try { res.json(await buildRecommendations()); }
   catch (err) { console.error('[portal-admin] preview recs failed:', err.message); res.json({ recommendations: [] }); }
+});
+// GET /api/portal-admin/preview/:id/product-colors/:style — color options, for staff preview.
+app.get('/api/portal-admin/preview/:id/product-colors/:style', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  try { res.json({ colors: portalColorList(await portalStyleRows(String(req.params.style || ''))) }); }
+  catch (err) { res.json({ colors: [] }); }
 });
 // GET /api/portal-admin/preview/:id/rewards — reward-dollar balance, for staff preview.
 app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {

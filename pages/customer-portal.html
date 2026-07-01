@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Your Design Portal - Northwest Custom Apparel</title>
+    <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.06.30.5">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.01.1">
 </head>
 <body>
     <!-- Header -->
@@ -15,7 +15,7 @@
              alt="NWCA" class="cp-header-logo"
              onerror="this.style.display='none'">
         <div class="cp-header-text">
-            <h1>Your Design Portal</h1>
+            <h1>Your Account</h1>
             <p>Northwest Custom Apparel</p>
         </div>
     </header>
@@ -38,7 +38,7 @@
         <!-- Company banner -->
         <div class="cp-company-banner">
             <div class="cp-company-name" id="cp-company-name"></div>
-            <div class="cp-company-subtitle" id="cp-company-subtitle">Your designs and mockups</div>
+            <div class="cp-company-subtitle" id="cp-company-subtitle">Your account overview</div>
         </div>
 
         <!-- Reward dollars -->
@@ -133,14 +133,22 @@
                 <button class="cp-modal-close" id="cp-req-close" aria-label="Close">&times;</button>
             </div>
             <div class="cp-modal-body">
-                <div class="cp-req-product" id="cp-req-product"></div>
-                <label class="cp-field">
-                    <span class="cp-field-label">Quantity</span>
-                    <input type="text" id="cp-req-qty" inputmode="numeric" placeholder="e.g. 24" autocomplete="off">
+                <div class="cp-req-top">
+                    <div class="cp-req-image" id="cp-req-image"></div>
+                    <div class="cp-req-product" id="cp-req-product"></div>
+                </div>
+                <label class="cp-field" id="cp-req-color-field">
+                    <span class="cp-field-label">Color</span>
+                    <select id="cp-req-color" class="cp-select"></select>
                 </label>
+                <div class="cp-field">
+                    <span class="cp-field-label">Sizes &amp; quantities <small>(fill in what you need)</small></span>
+                    <div class="cp-size-grid" id="cp-size-grid"></div>
+                    <div class="cp-size-total">Total: <strong id="cp-size-total">0</strong></div>
+                </div>
                 <label class="cp-field">
-                    <span class="cp-field-label">Notes <small>(sizes, changes, deadline — optional)</small></span>
-                    <textarea id="cp-req-note" rows="3" placeholder="Same as last time, or tell us what's different"></textarea>
+                    <span class="cp-field-label">Notes <small>(deadline, other sizes/colors — optional)</small></span>
+                    <textarea id="cp-req-note" rows="2" placeholder="Anything the team should know"></textarea>
                 </label>
                 <div class="cp-req-error" id="cp-req-error"></div>
             </div>
@@ -185,6 +193,6 @@
     </div>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.06.30.5"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.01.1"></script>
 </body>
 </html>
