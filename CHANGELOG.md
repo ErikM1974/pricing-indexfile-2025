@@ -1,3 +1,10 @@
+## v2026.07.01.1 (2026.07.01)
+
+- docs(portal): Phase 5 reward-dollars foundation SHIPPED + verified (ledger/grant/redeem)
+- Memory: archive 3 oldest resolved lessons (259→247 lines) + index the new portal docs
+- docs(memory): add catalog/pricing/quote/PDF UX audit + enhancement proposal
+- feat(portal): add customer 'Sign In' button to the teamnwca.com masthead → /customer/login + login-page back link
+
 ## v2026.06.30.5 (2026.06.30)
 
 - docs(portal): Phase 4 COMPLETE + verified — catalog-in-preview fix + rep request queue
