@@ -1,3 +1,8 @@
+## v2026.07.01.8 (2026-07-01)
+
+- docs(portal): My Logos Phase 0 SHIPPED + honest correction (Canva filename prefix is likely a design#, not customer id)
+- feat(portal): My Logos shows the APPROVED proof per design + an 'Approved' badge
+
 ## v2026.07.01.7 (2026-07-01)
 
 - docs(portal): Your Products catalog view (one card/style + swatches) shipped
