@@ -1,3 +1,7 @@
+## v2026.07.01.10 (2026-07-01)
+
+- fix(portal): My Logos 'Approved' badge — exact-match status ('Awaiting Approval' was wrongly flagged approved)
+
 ## v2026.07.01.9 (2026-07-01)
 
 - docs(portal): My Logos shows approved proof + badge (v2026.07.01.8)
