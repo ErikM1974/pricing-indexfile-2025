@@ -802,3 +802,27 @@ img { max-width: 100%; }
 
     .footer-inner { grid-template-columns: 1fr; gap: 20px; padding: 34px 18px 20px; }
 }
+
+/* ── Customer "Sign In" button in the masthead (portal access) ── */
+.nav-signin {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-left: 14px;
+    padding: 8px 15px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 9px;
+    background: var(--card);
+    color: var(--green-900);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: border-color .15s, background .15s, color .15s;
+}
+.nav-signin:hover { border-color: var(--green-700); background: var(--green-50); color: var(--green-900); }
+.nav-signin svg { flex-shrink: 0; }
+@media (max-width: 960px) {
+    .nav-signin span { display: none; }
+    .nav-signin { padding: 8px 10px; margin-left: 8px; }
+}
