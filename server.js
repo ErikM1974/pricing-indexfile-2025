@@ -3573,6 +3573,100 @@ function buildMyProductsCached(cid) {
   return promise;
 }
 
+// Full product-detail for the portal PAGE: SanMar specs + ALL available colors + THIS customer's
+// own order history for the style (per-color size MATRIX + per-order list). Customer-safe — NO
+// cost/margin (PIECE_PRICE etc. are never copied out). null → unknown style (404).
+async function buildProductDetail(cid, style) {
+  const rows = await portalStyleRows(style);
+  if (!rows.length) return null;
+  const first = rows[0];
+  const product = {
+    style: first.STYLE || style,
+    title: first.PRODUCT_TITLE || style,
+    brand: first.BRAND_NAME || '',
+    category: first.CATEGORY_NAME || '',
+    subcategory: first.SUBCATEGORY_NAME || '',
+    description: String(first.PRODUCT_DESCRIPTION || '').replace(/\s+/g, ' ').trim(),
+    isCloseout: /discontinu|closeout|caution/i.test(String(first.PRODUCT_STATUS || '')),
+    colors: portalColorList(rows),                                   // every available color
+    companionStyles: String(first.COMPANION_STYLES || '').split(/[,;\s]+/).map(s => s.trim()).filter(Boolean),
+  };
+  const styleU = String(style).toUpperCase();
+
+  // The customer's ordered history for THIS style (same ~3yr / 25-order window as the catalog).
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  const today = new Date();
+  const end = today.toISOString().slice(0, 10);
+  const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
+  const start = sd.toISOString().slice(0, 10);
+  let orders = [];
+  try {
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
+    if (oR.ok) orders = ((await oR.json()).result || []).sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || ''))).slice(0, 25);
+  } catch (_) {}
+
+  const byColor = new Map();   // COLOR_NAME(lower) -> aggregate (size matrix + totals)
+  const history = [];          // per line: { orderNo, date, color, design, sizes, qty }
+  for (const o of orders) {
+    if (!o.id_Order) continue;
+    let items = [];
+    try { const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs }); if (lR.ok) items = (await lR.json()).result || []; } catch (_) {}
+    for (const li of items) {
+      const norm = portalNormalizePart(li);
+      if (!norm || norm.style.toUpperCase() !== styleU) continue;
+      const sizes = portalSizeMap(li);
+      const qty = Number(li.LineQuantity) || portalSumSizes(li);
+      if (qty <= 0) continue;
+      const m = portalMatchColor(rows, norm.color);
+      const display = (m && m.COLOR_NAME) || norm.color;   // CATALOG_COLOR -> COLOR_NAME (two-color-field rule)
+      const ck = display.toLowerCase();
+      history.push({ orderNo: o.id_Order, date: o.date_Ordered || '', color: display, design: o.id_Design || null, designName: o.DesignName || '', sizes, qty });
+      const ex = byColor.get(ck);
+      if (!ex) byColor.set(ck, { name: display, catalogColor: norm.color, swatch: (m && m.COLOR_SQUARE_IMAGE) || '', image: m ? portalRowImage(m) : '', sizes: Object.assign({}, sizes), totalQty: qty, orderCount: 1, lastOrdered: o.date_Ordered || '', firstOrdered: o.date_Ordered || '' });
+      else {
+        Object.keys(sizes).forEach(k => { ex.sizes[k] = (ex.sizes[k] || 0) + sizes[k]; });
+        ex.totalQty += qty; ex.orderCount++;
+        if ((o.date_Ordered || '') > ex.lastOrdered) ex.lastOrdered = o.date_Ordered || '';
+        if (!ex.firstOrdered || ((o.date_Ordered || '') && (o.date_Ordered || '') < ex.firstOrdered)) ex.firstOrdered = o.date_Ordered || '';
+      }
+    }
+  }
+  const orderedColors = [...byColor.values()].sort((a, b) => (b.totalQty || 0) - (a.totalQty || 0));
+  const styleTotalQty = orderedColors.reduce((s, c) => s + (c.totalQty || 0), 0);
+  const lastOrdered = orderedColors.reduce((d, c) => (c.lastOrdered > d ? c.lastOrdered : d), '');
+  const firstOrdered = orderedColors.reduce((d, c) => (!d || (c.firstOrdered && c.firstOrdered < d) ? c.firstOrdered : d), '');
+  const top = orderedColors[0] || product.colors[0] || null;
+  const lastDesign = history.find(h => h.design) || {};
+
+  return {
+    product,
+    ordered: { colors: orderedColors, styleTotalQty, lineCount: history.length, lastOrdered, firstOrdered },
+    history: history.slice(0, 40),
+    defaultColor: top ? top.name : '',
+    defaultCatalogColor: top ? (top.catalogColor || '') : '',
+    defaultImage: top ? (top.image || '') : '',
+    designNumber: lastDesign.design || '',
+    designName: lastDesign.designName || '',
+  };
+}
+
+// Per-size traffic light (in / low / out) from SanMar inventory for one style+color. Best-effort:
+// any failure returns null so the page never blocks on the live SanMar call. NEVER raw numbers.
+async function portalInventoryLights(style, color) {
+  try {
+    const url = `${CRM_API_BASE}/api/sanmar/inventory/${encodeURIComponent(style)}?color=${encodeURIComponent(color)}`;
+    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const lights = {};
+    (j.inventory || []).forEach((row) => {
+      const q = Number(row.totalQty) || 0;
+      lights[String(row.size)] = q <= 0 ? 'out' : (q < 48 ? 'low' : 'in');   // 48 ≈ a typical order run
+    });
+    return { color: j.color || color, lights };
+  } catch (_) { return null; }
+}
+
 // PER-CUSTOMER recommendations from the Erik-curated candidate pool (Portal_Recommendations):
 // drop anything the customer already buys, rank by absolute gross-margin $/pc, fill a fixed
 // 4-premium / 2-popular mix, and show each in the customer's usual color when it exists. The pool
@@ -3650,6 +3744,25 @@ app.get('/api/portal/product-colors/:style', portalLimiter, requireCustomer, asy
     if (!style) return res.status(400).json({ error: 'style required' });
     res.json({ colors: portalColorList(await portalStyleRows(style)) });
   } catch (err) { console.error('[Portal] product-colors failed:', err.message); res.json({ colors: [] }); }
+});
+
+// GET /api/portal/product/:style — full product-detail page data (specs + all colors + THIS
+// customer's order history/size matrix). Session-scoped; customer-safe (no cost/margin).
+app.get('/api/portal/product/:style', portalLimiter, requireCustomer, async (req, res) => {
+  try {
+    const style = String(req.params.style || '').trim();
+    if (!style) return res.status(400).json({ error: 'style required' });
+    const detail = await buildProductDetail(String(req.customerSession.portalCustomer.idCustomer), style);
+    if (!detail) return res.status(404).json({ error: 'Product not found' });
+    res.json(detail);
+  } catch (err) { console.error('[Portal] product detail failed:', err.message); res.status(503).json({ error: 'Product temporarily unavailable' }); }
+});
+// GET /api/portal/product/:style/availability?color= — per-size traffic light (async, best-effort).
+app.get('/api/portal/product/:style/availability', portalLimiter, requireCustomer, async (req, res) => {
+  const style = String(req.params.style || '').trim();
+  const color = String(req.query.color || '').trim();
+  if (!style || !color) return res.json({ lights: {} });
+  res.json((await portalInventoryLights(style, color)) || { lights: {} });
 });
 
 // POST /api/portal/reorder-request — customer asks to re-order (or order a recommended item).
@@ -3740,6 +3853,12 @@ app.post('/api/portal/rewards/redeem-request', reorderRequestLimiter, requireCus
 app.get('/portal/invoice/:orderNo', requireCustomer, (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(__dirname, 'pages', 'customer-invoice.html'));
+});
+// Product detail page (session-gated). The page reads the style from the URL + fetches the
+// secured /api/portal/product/:style above.
+app.get('/portal/product/:style', requireCustomer, (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-product.html'));
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -3861,6 +3980,22 @@ app.get('/api/portal-admin/preview/:id/product-colors/:style', requireCrmRole(PO
   try { res.json({ colors: portalColorList(await portalStyleRows(String(req.params.style || ''))) }); }
   catch (err) { res.json({ colors: [] }); }
 });
+// GET /api/portal-admin/preview/:id/product/:style — full product detail, for staff preview.
+app.get('/api/portal-admin/preview/:id/product/:style', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const detail = await buildProductDetail(cid, String(req.params.style || ''));
+    if (!detail) return res.status(404).json({ error: 'Product not found' });
+    res.json(detail);
+  } catch (err) { console.error('[portal-admin] preview product failed:', err.message); res.status(503).json({ error: 'Product preview unavailable' }); }
+});
+app.get('/api/portal-admin/preview/:id/product/:style/availability', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const style = String(req.params.style || '').trim();
+  const color = String(req.query.color || '').trim();
+  if (!style || !color) return res.json({ lights: {} });
+  res.json((await portalInventoryLights(style, color)) || { lights: {} });
+});
 // GET /api/portal-admin/preview/:id/rewards — reward-dollar balance, for staff preview.
 app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
   const cid = String(req.params.id || '');
@@ -3912,6 +4047,10 @@ app.get('/portal-admin/preview/:id', requireCrmRole(PORTAL_ADMIN_ROLES), (req, r
 app.get('/portal-admin/preview/:id/invoice/:orderNo', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(__dirname, 'pages', 'customer-invoice.html'));
+});
+app.get('/portal-admin/preview/:id/product/:style', requireCrmRole(PORTAL_ADMIN_ROLES), (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'customer-product.html'));
 });
 
 // ALLOWLIST projection for the art-request DETAIL customer view. Mirrors exactly

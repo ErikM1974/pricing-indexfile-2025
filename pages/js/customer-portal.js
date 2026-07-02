@@ -22,6 +22,8 @@
     var RECS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/recommendations') : '/api/portal/recommendations';
     // Live color list for a style (name + swatch + product image). Preview uses the staff mirror.
     var COLORS_URL_BASE = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/product-colors/') : '/api/portal/product-colors/';
+    // A "Your Products" card links to its full product-detail PAGE (preview-aware).
+    var PRODUCT_URL_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/product/') : '/portal/product/';
     var REWARDS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/rewards') : '/api/portal/rewards';
     var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
@@ -309,6 +311,8 @@
 
     function productCardHtml(p, kind) {
         var title = p.title || p.description || p.style;
+        // A "Your Products" card opens the full product-detail PAGE; recs keep the quick modal.
+        var productHref = (kind === 'product' && p.style) ? (PRODUCT_URL_BASE + encodeURIComponent(p.style)) : '';
         var comingSoon = kind === 'rec' && p.comingSoon;
         var img = p.image
             ? '<img src="' + escapeHtml(p.image) + '" alt="" loading="lazy" onerror="this.parentElement.classList.add(\'cp-noimg\');this.remove();">'
@@ -342,9 +346,9 @@
         // Carry the exact sizes the customer last ordered so the modal can pre-fill the grid.
         var sizesJson = JSON.stringify(p.sizes || {});
         return '<div class="cp-product-card' + (comingSoon ? ' cp-product-card--soon' : '') + '">' +
-            '<div class="cp-product-img">' + img + '</div>' +
+            '<div class="cp-product-img">' + (productHref ? '<a class="cp-product-imglink" href="' + productHref + '">' + img + '</a>' : img) + '</div>' +
             '<div class="cp-product-body">' +
-                '<div class="cp-product-title">' + escapeHtml(title) + '</div>' +
+                '<div class="cp-product-title">' + (productHref ? '<a class="cp-product-titlelink" href="' + productHref + '">' + escapeHtml(title) + '</a>' : escapeHtml(title)) + '</div>' +
                 (sub ? '<div class="cp-product-sub">' + escapeHtml(sub) + '</div>' : '') +
                 swatches +
                 totalLine +

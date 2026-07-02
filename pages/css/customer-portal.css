@@ -411,6 +411,9 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     overflow: hidden;
 }
 .cp-product-img img { width: 100%; height: 100%; object-fit: contain; }
+.cp-product-imglink { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; cursor: pointer; }
+.cp-product-titlelink { color: inherit; text-decoration: none; }
+.cp-product-titlelink:hover { color: var(--cp-theme-dark); text-decoration: underline; }
 .cp-product-img.cp-noimg::after { content: '👕'; font-size: 40px; opacity: .35; }
 .cp-product-body { padding: 11px 12px 13px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .cp-product-title { font-weight: 600; font-size: 13.5px; color: var(--cp-ink); line-height: 1.3; }

@@ -316,6 +316,9 @@
 | `/pages/customer-invoice.html` | ShopWorks-style invoice page at `/portal/invoice/:orderNo` (session-gated) — on-screen + Download PDF (html2pdf) | customer-invoice.js/.css | ✅ Active |
 | `/pages/js/customer-invoice.js` | Fetches `/api/portal/invoice/:orderNo` (ownership-checked), renders the invoice (header/line-items/sizes/totals), wires html2pdf download | server.js GET /api/portal/invoice | ✅ Active |
 | `/pages/css/customer-invoice.css` | Invoice paper styling (print-friendly) | — | ✅ Active |
+| `/pages/customer-product.html` | Portal product-detail page at `/portal/product/:style` (session-gated) — specs, all colors, order-history size matrix, traffic-light availability, re-order (Phase B, 2026-07-01) | customer-product.js/.css, customer-portal.css, app-config.js | ✅ Active |
+| `/pages/js/customer-product.js` | Fetches `/api/portal/product/:style` (+ preview mirror), renders specs/swatch gallery/size matrix/availability/re-order; POSTs `/api/portal/reorder-request` | server.js GET /api/portal/product | ✅ Active |
+| `/pages/css/customer-product.css` | Product-detail page styling (layers on customer-portal.css tokens) | customer-portal.css | ✅ Active |
 
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
