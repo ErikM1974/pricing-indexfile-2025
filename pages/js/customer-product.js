@@ -82,6 +82,8 @@
 
         h += reorderHtml();
 
+        if (d.upgrades && d.upgrades.length) h += upgradesHtml(d.upgrades);
+
         if (d.history && d.history.length) {
             h += '<section class="pp-section"><h2>Order history</h2>' + historyHtml(d.history) + '</section>';
         }
@@ -92,6 +94,7 @@
 
         renderSwatches();
         selectColor(state.color);
+        (d.upgrades || []).forEach(function (u, i) { priceUpgrade(i, u); });
     }
 
     function matrixHtml(colors) {
@@ -212,8 +215,136 @@
     document.addEventListener('click', function (e) {
         var sw = e.target.closest && e.target.closest('#pp-swatches .cp-swatch-btn');
         if (sw) { selectColor(sw.getAttribute('data-color')); return; }
-        if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); }
+        if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); return; }
+        var up = e.target.closest && e.target.closest('.pp-up-btn');
+        if (up) { requestUpgrade(parseInt(up.getAttribute('data-up'), 10)); }
     });
+
+    function requestUpgrade(i) {
+        var u = (state.data.upgrades || [])[i]; if (!u) return;
+        if (PREVIEW) { showToast('Staff preview — the customer would ask their rep about this embroidered upgrade.'); return; }
+        var note = 'Interested in upgrading to ' + u.title + ' (' + u.style + ') with an embroidered logo — ' + u.stitch + '-stitch ' + u.location + '. Please send a quote.';
+        fetch('/api/portal/reorder-request', {
+            method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                style: u.style, color: '', product_title: u.title + ' (embroidered upgrade)',
+                design_number: state.data.designNumber || '', design_name: state.data.designName || '',
+                qty: '', size_breakdown: '', note: note, source: 'reorder'
+            })
+        })
+            .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+            .then(function (x) {
+                if (x.ok && x.j.ok) showToast('Sent to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! They’ll follow up about your embroidered upgrade.');
+                else showToast('Could not send. Please call (253) 922-5793.');
+            })
+            .catch(function () { showToast('Could not send. Please call (253) 922-5793.'); });
+    }
+
+    // ── Upgrade to embroidery module (engine-priced matrix — same engine as Quick Quote, Rule 9) ──
+    function upgradesHtml(ups) {
+        var banner = (ups[0] && ups[0].pitchImage)
+            ? '<div class="pp-up-banner"><img src="' + esc(ups[0].pitchImage) + '" alt="Custom embroidery" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>'
+            : '';
+        var cards = ups.map(function (u, i) {
+            var sw = (u.colors || []).slice(0, 10).map(function (c) {
+                return c.swatch ? '<img class="cp-swatch" src="' + esc(c.swatch) + '" title="' + esc(c.name) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '';
+            }).join('');
+            return '<div class="pp-up-card">'
+                + '<div class="pp-up-top">'
+                + '<div class="pp-up-img">' + (u.image ? '<img src="' + esc(u.image) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</div>'
+                + '<div class="pp-up-info">'
+                + (u.tier ? '<span class="pp-up-tier">' + esc(u.tier) + '</span>' : '')
+                + '<div class="pp-up-name">' + esc(u.title) + '</div>'
+                + (u.brand ? '<div class="pp-up-brand">' + esc(u.brand) + '</div>' : '')
+                + (u.blurb ? '<div class="pp-up-blurb">' + esc(u.blurb) + '</div>' : '')
+                + (sw ? '<div class="pp-up-swatches">' + sw + '</div>' : '')
+                + '</div></div>'
+                + '<div class="pp-up-digit" id="pp-up-dig-' + i + '"><i>&#129525;</i> <span><strong>New to embroidery?</strong> We’ll digitize your logo for stitching at half off &mdash; a one-time setup, and the file’s yours to reuse on every future order.</span></div>'
+                + '<div class="pp-up-matrix" id="pp-up-mx-' + i + '"><div class="pp-up-mxload">Pricing an ' + Number(u.stitch).toLocaleString() + '-stitch embroidered logo&hellip;</div></div>'
+                + '<button class="cp-btn-primary pp-up-btn" type="button" data-up="' + i + '">Send this embroidered upgrade to my rep</button>'
+                + '</div>';
+        }).join('');
+        return '<section class="pp-section pp-upgrade"><h2>Upgrade to embroidery</h2>'
+            + '<p class="pp-section-sub">Your logo, embroidered on a premium garment &mdash; the upgraded version of what you already buy. Your rep quotes the final price.</p>'
+            + banner + cards + '</section>';
+    }
+
+    var _embCalc = null;
+    function embDeps() {
+        var d = {};
+        if (window.EmbroideryPricingCalculator) d.EmbroideryPricingCalculator = function (opts) { if (!_embCalc) _embCalc = new window.EmbroideryPricingCalculator(opts || { skipInit: true }); return _embCalc; };
+        return d;
+    }
+    function r2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }
+    function parseRange(label) {
+        var s = String(label || '');
+        var m = s.match(/(\d+)\s*[-–]\s*(\d+)/); if (m) return { min: +m[1], max: +m[2] };
+        var p = s.match(/(\d+)\s*\+/); if (p) return { min: +p[1], max: Infinity };
+        var n = s.match(/(\d+)/); return { min: n ? +n[1] : 0, max: Infinity };
+    }
+    function embGroups(stitch, digitize) {
+        return { 'emb:garment': { logos: { primary: { position: 'Left Chest', stitchCount: Number(stitch) || 8000, needsDigitizing: !!digitize }, additional: [] } } };
+    }
+    function embItem(style, qty) {
+        return { id: '__up__', method: 'EMB', styleNumber: style, title: style, colorName: '', catalogColor: '', isCap: false, sizes: { S: qty } };
+    }
+    // Probe a per-piece EMB price ladder + the digitizing base through the SAME engine Quick Quote uses.
+    function probeEmbLadder(style, stitch) {
+        var probes = [4, 12, 36, 60, 100];
+        var groups = embGroups(stitch, false);
+        var byTier = {};
+        var chain = probes.reduce(function (ch, q) {
+            return ch.then(function () {
+                return window.QuoteCartEngine.singleItemPreview(embItem(style, q), { groups: groups, deps: embDeps(), nudge: false })
+                    .then(function (pv) {
+                        if (pv && pv.ok && pv.lines && pv.lines.length) {
+                            var label = pv.tierLabel || ('q' + q);
+                            if (!byTier[label]) {
+                                var bu = pv.lines[0].baseUnit;
+                                var svcPerPc = (pv.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / q;
+                                var oneTimeT = (pv.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+                                var ltmFlat = (pv.ltm && pv.ltm.fee) || 0;
+                                var residual = Math.max(0, (pv.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * q) / q);
+                                byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
+                            }
+                        }
+                    }).catch(function () {});
+            });
+        }, Promise.resolve());
+        return chain
+            .then(function () { return window.QuoteCartEngine.singleItemPreview(embItem(style, 24), { groups: embGroups(stitch, true), deps: embDeps(), nudge: false }).catch(function () { return null; }); })
+            .then(function (digPv) {
+                var digBase = 0;
+                if (digPv && digPv.fees) digBase = digPv.fees.filter(function (f) { return /digit/i.test(f.label || ''); }).reduce(function (s, f) { return s + (Number(f.amount) || 0); }, 0);
+                var tiers = Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
+                return { tiers: tiers, digBase: r2(digBase) };
+            });
+    }
+    function rangeLabel(t) { return (!isFinite(t.range.max)) ? (t.range.min + '+') : (t.range.min + '–' + t.range.max); }
+    function embMatrixHtml(tiers, stitch) {
+        var hasLtm = tiers.some(function (t) { return t.ltmFee > 0; });
+        var head = tiers.map(function (t) { return '<th>' + rangeLabel(t) + '</th>'; }).join('');
+        var priceRow = tiers.map(function (t) { return '<td>$' + t.base.toFixed(2) + '</td>'; }).join('');
+        var ltmRow = hasLtm ? ('<tr><td class="lbl">Small-batch fee</td>' + tiers.map(function (t) { return '<td class="' + (t.ltmFee > 0 ? 'warn' : '') + '">' + (t.ltmFee > 0 ? '+$' + t.ltmFee.toFixed(2) : '—') + '</td>'; }).join('') + '</tr>') : '';
+        return '<div class="pp-up-mxtitle">Price breaks — ' + Number(stitch).toLocaleString() + '-stitch left-chest embroidery</div>'
+            + '<div class="pp-up-mxwrap"><table class="pp-up-mxtable"><thead><tr><th class="lbl">Quantity</th>' + head + '</tr></thead>'
+            + '<tbody><tr><td class="lbl">Per pc</td>' + priceRow + '</tr>' + ltmRow + '</tbody></table></div>'
+            + '<div class="pp-up-mxfoot">Per pc for a standard size; 2XL+ adds its upcharge. Digitizing is a separate one-time fee. Same pricing engine as our quote tools &mdash; your rep confirms the final quote.</div>';
+    }
+    function priceUpgrade(i, u) {
+        var box = document.getElementById('pp-up-mx-' + i);
+        if (!box) return;
+        if (!(window.QuoteCartEngine && window.EmbroideryPricingCalculator)) { box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>'; return; }
+        probeEmbLadder(u.style, u.stitch).then(function (res) {
+            if (!box) return;
+            if (!res || !res.tiers.length) box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>';
+            else box.innerHTML = embMatrixHtml(res.tiers, u.stitch);
+            if (res && res.digBase > 0) {
+                var dg = document.getElementById('pp-up-dig-' + i);
+                if (dg) dg.innerHTML = '<i>&#129525;</i> <span><strong>New to embroidery?</strong> We’ll digitize your logo &mdash; <strong>$' + (res.digBase / 2).toFixed(2) + '</strong> <s>$' + res.digBase.toFixed(2) + '</s>, half off. One-time setup, and the file’s yours to reuse.</span>';
+            }
+        }).catch(function () { if (box) box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>'; });
+    }
 
     function submitReorder() {
         var picked = collectSizes();
