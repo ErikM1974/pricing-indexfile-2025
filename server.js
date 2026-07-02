@@ -3573,6 +3573,15 @@ function buildMyProductsCached(cid) {
   return promise;
 }
 
+// Fetch JSON with a HARD timeout — a slow/hung upstream (ManageOrders) resolves to null instead of
+// blocking the page. Non-ok / network error / timeout all collapse to null (caller = "no data").
+function portalFetchJson(url, headers, ms) {
+  return Promise.race([
+    fetch(url, { headers }).then(r => (r.ok ? r.json() : null)).catch(() => null),
+    new Promise(resolve => setTimeout(() => resolve(null), ms || 8000)),
+  ]);
+}
+
 // Full product-detail for the portal PAGE: SanMar specs + ALL available colors + THIS customer's
 // own order history for the style (per-color size MATRIX + per-order list). Customer-safe — NO
 // cost/margin (PIECE_PRICE etc. are never copied out). null → unknown style (404).
@@ -3600,17 +3609,20 @@ async function buildProductDetail(cid, style) {
   const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
   const start = sd.toISOString().slice(0, 10);
   let orders = [];
-  try {
-    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
-    if (oR.ok) orders = ((await oR.json()).result || []).sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || ''))).slice(0, 25);
-  } catch (_) {}
+  const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, hdrs, 8000);
+  if (ordersJson && ordersJson.result) orders = ordersJson.result.sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || ''))).slice(0, 25);
+
+  // Fetch every order's line items IN PARALLEL, each bounded by a timeout — so a slow or hung
+  // ManageOrders call can't stall the page (was 25 SEQUENTIAL fetches → seconds, or an indefinite hang).
+  const lineJsons = await Promise.all(orders.map(o => o.id_Order
+    ? portalFetchJson(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, hdrs, 6000)
+    : Promise.resolve(null)));
 
   const byColor = new Map();   // COLOR_NAME(lower) -> aggregate (size matrix + totals)
   const history = [];          // per line: { orderNo, date, color, design, sizes, qty }
-  for (const o of orders) {
-    if (!o.id_Order) continue;
-    let items = [];
-    try { const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs }); if (lR.ok) items = (await lR.json()).result || []; } catch (_) {}
+  orders.forEach((o, oi) => {
+    if (!o.id_Order) return;
+    const items = (lineJsons[oi] && lineJsons[oi].result) || [];
     for (const li of items) {
       const norm = portalNormalizePart(li);
       if (!norm || norm.style.toUpperCase() !== styleU) continue;
@@ -3630,7 +3642,7 @@ async function buildProductDetail(cid, style) {
         if (!ex.firstOrdered || ((o.date_Ordered || '') && (o.date_Ordered || '') < ex.firstOrdered)) ex.firstOrdered = o.date_Ordered || '';
       }
     }
-  }
+  });
   const orderedColors = [...byColor.values()].sort((a, b) => (b.totalQty || 0) - (a.totalQty || 0));
   const styleTotalQty = orderedColors.reduce((s, c) => s + (c.totalQty || 0), 0);
   const lastOrdered = orderedColors.reduce((d, c) => (c.lastOrdered > d ? c.lastOrdered : d), '');
@@ -3672,6 +3684,18 @@ async function buildProductDetail(cid, style) {
     designName: lastDesign.designName || '',
     upgrades,
   };
+}
+
+// Short-TTL memo so re-viewing the same product (or a quick reload) is instant instead of
+// re-hitting ManageOrders. Keyed per (customer, style); errors are not cached.
+const _productDetailCache = new Map();
+function buildProductDetailCached(cid, style) {
+  const key = String(cid) + '|' + String(style).toUpperCase();
+  const hit = _productDetailCache.get(key);
+  if (hit && (Date.now() - hit.t) < 120000) return hit.promise;
+  const promise = buildProductDetail(cid, style).catch(err => { _productDetailCache.delete(key); throw err; });
+  _productDetailCache.set(key, { t: Date.now(), promise });
+  return promise;
 }
 
 // Per-size traffic light (in / low / out) from SanMar inventory for one style+color. Best-effort:
@@ -3776,7 +3800,7 @@ app.get('/api/portal/product/:style', portalLimiter, requireCustomer, async (req
   try {
     const style = String(req.params.style || '').trim();
     if (!style) return res.status(400).json({ error: 'style required' });
-    const detail = await buildProductDetail(String(req.customerSession.portalCustomer.idCustomer), style);
+    const detail = await buildProductDetailCached(String(req.customerSession.portalCustomer.idCustomer), style);
     if (!detail) return res.status(404).json({ error: 'Product not found' });
     res.json(detail);
   } catch (err) { console.error('[Portal] product detail failed:', err.message); res.status(503).json({ error: 'Product temporarily unavailable' }); }
@@ -4009,7 +4033,7 @@ app.get('/api/portal-admin/preview/:id/product/:style', requireCrmRole(PORTAL_AD
   const cid = String(req.params.id || '');
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
   try {
-    const detail = await buildProductDetail(cid, String(req.params.style || ''));
+    const detail = await buildProductDetailCached(cid, String(req.params.style || ''));
     if (!detail) return res.status(404).json({ error: 'Product not found' });
     res.json(detail);
   } catch (err) { console.error('[portal-admin] preview product failed:', err.message); res.status(503).json({ error: 'Product preview unavailable' }); }
