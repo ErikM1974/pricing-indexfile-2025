@@ -431,6 +431,19 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 }
 .cp-product-btn:hover { background: var(--cp-theme); color: #fff; border-color: var(--cp-theme); }
 
+/* Your Products discovery aids — search + sort + show-more (only shown when the list is long) */
+.cp-products-toolbar { display: flex; gap: 10px; margin: 0 0 16px; flex-wrap: wrap; }
+.cp-search {
+    flex: 1 1 220px; min-width: 170px; padding: 9px 12px; border: 1px solid var(--cp-border);
+    border-radius: var(--cp-radius-sm); font-size: 14px; font-family: inherit; background: var(--cp-surface); color: var(--cp-ink);
+}
+.cp-sortsel {
+    padding: 9px 11px; border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm);
+    font-size: 14px; font-family: inherit; background: var(--cp-surface); color: var(--cp-ink); cursor: pointer;
+}
+.cp-search:focus, .cp-sortsel:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+.cp-products-more { text-align: center; margin-top: 18px; }
+
 /* Recommendation with no artwork/mockup image yet → striped "Coming soon" placeholder in the card image well */
 .cp-coming-soon {
     display: flex; align-items: center; justify-content: center;
