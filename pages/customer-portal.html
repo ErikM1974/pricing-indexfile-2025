@@ -57,7 +57,18 @@
                 <span class="cp-section-count" id="cp-products-count">0</span>
             </div>
             <p class="cp-section-sub">Order again — pick a product and we'll send it straight to your rep for a fresh quote.</p>
+            <div class="cp-products-toolbar" id="cp-products-toolbar" style="display:none;">
+                <input type="search" id="cp-products-search" class="cp-search" placeholder="Search your products…" autocomplete="off">
+                <select id="cp-products-sort" class="cp-sortsel" aria-label="Sort your products">
+                    <option value="ordered">Most ordered</option>
+                    <option value="recent">Most recent</option>
+                    <option value="colors">Most colors</option>
+                </select>
+            </div>
             <div class="cp-product-grid" id="cp-products-grid"></div>
+            <div class="cp-products-more" id="cp-products-more" style="display:none;">
+                <button class="cp-btn-ghost" id="cp-products-more-btn" type="button">Show all</button>
+            </div>
             <div class="cp-empty" id="cp-products-empty" style="display:none;">
                 <div class="cp-empty-icon">&#128717;</div>
                 No past products on file yet.
@@ -197,6 +208,6 @@
     </div>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.01.17"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.01.18"></script>
 </body>
 </html>

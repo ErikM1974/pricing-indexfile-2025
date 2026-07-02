@@ -366,21 +366,71 @@
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
     }
 
+    // "Your Products" now supports search + sort + show-more so a 25-style account isn't a wall of cards.
+    var _products = [];
+    var _productSort = 'ordered';
+    var _productLimit = 12;
+
     function loadProducts() {
         fetch(MYPRODUCTS_URL, { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { products: [] }; })
             .then(function (d) {
-                var list = (d && d.products) || [];
+                _products = (d && d.products) || [];
                 document.getElementById('cp-section-products').style.display = 'block';
-                document.getElementById('cp-products-count').textContent = list.length;
-                var grid = document.getElementById('cp-products-grid');
                 var empty = document.getElementById('cp-products-empty');
-                if (!list.length) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+                var toolbar = document.getElementById('cp-products-toolbar');
+                if (!_products.length) {
+                    document.getElementById('cp-products-count').textContent = 0;
+                    document.getElementById('cp-products-grid').innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
                 empty.style.display = 'none';
-                grid.innerHTML = list.map(function (p) { return productCardHtml(p, 'product'); }).join('');
+                if (toolbar && _products.length > 6) toolbar.style.display = 'flex'; // aids only when they help
+                renderProducts();
             })
             .catch(function () { /* catalog is non-critical — stay quiet */ });
     }
+
+    function renderProducts() {
+        var grid = document.getElementById('cp-products-grid');
+        if (!grid) return;
+        var searchEl = document.getElementById('cp-products-search');
+        var q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
+        var list = _products.slice();
+        if (q) {
+            list = list.filter(function (p) {
+                var hay = [p.title, p.description, p.style, p.designNumber, p.designName]
+                    .concat((p.colors || []).map(function (c) { return c.name; }))
+                    .join(' ').toLowerCase();
+                return hay.indexOf(q) !== -1;
+            });
+        }
+        list.sort(function (a, b) {
+            if (_productSort === 'recent') return String(b.lastOrdered || '').localeCompare(String(a.lastOrdered || ''));
+            if (_productSort === 'colors') return (Number(b.colorCount) || 0) - (Number(a.colorCount) || 0);
+            return (Number(b.styleTotalQty) || 0) - (Number(a.styleTotalQty) || 0); // 'ordered' (default)
+        });
+        var total = list.length;
+        var shown = q ? list : list.slice(0, _productLimit); // a search shows all matches; browsing paginates
+        document.getElementById('cp-products-count').textContent = total;
+        grid.innerHTML = shown.map(function (p) { return productCardHtml(p, 'product'); }).join('');
+        var moreWrap = document.getElementById('cp-products-more');
+        var moreBtn = document.getElementById('cp-products-more-btn');
+        if (moreWrap) {
+            if (!q && total > _productLimit) { moreWrap.style.display = 'block'; if (moreBtn) moreBtn.textContent = 'Show all ' + total; }
+            else { moreWrap.style.display = 'none'; }
+        }
+    }
+
+    (function wireProductControls() {
+        var search = document.getElementById('cp-products-search');
+        var sort = document.getElementById('cp-products-sort');
+        var moreBtn = document.getElementById('cp-products-more-btn');
+        if (search) search.addEventListener('input', renderProducts);
+        if (sort) sort.addEventListener('change', function () { _productSort = sort.value; renderProducts(); });
+        if (moreBtn) moreBtn.addEventListener('click', function () { _productLimit = 9999; renderProducts(); });
+    })();
 
     function loadRecs() {
         fetch(RECS_URL, { credentials: 'same-origin' })

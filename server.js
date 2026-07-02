@@ -3409,7 +3409,10 @@ async function portalStyleRows(style) {
   }
   return rows;
 }
-function portalRowImage(row) { return row ? (row.PRODUCT_IMAGE || row.FRONT_MODEL || row.FRONT_FLAT || '') : ''; }
+// Prefer the per-COLOR model shot (FRONT_MODEL, e.g. DT6000_black_model_front.jpg) over the
+// generic style image (PRODUCT_IMAGE = one DT6000.jpg for every color) so cards/pickers show the
+// actual color the customer bought; fall back to the generic + flat when a color has no model shot.
+function portalRowImage(row) { return row ? (row.FRONT_MODEL || row.PRODUCT_IMAGE || row.FRONT_FLAT || '') : ''; }
 // Robust color match (exact → catalog code → contains, all punctuation/space-insensitive) so
 // "Jet Black" resolves to the Jet-Black garment image, not the style's default color. null = no match.
 function portalMatchColor(rows, color) {
@@ -3545,8 +3548,10 @@ async function buildMyProducts(cid) {
     }
     const colors = [...byColor.values()];
     colors.sort((a, b) => (b.totalQty || 0) - (a.totalQty || 0)); // most-ordered color first (the picker's "top color")
+    const topColor = colors[0];                          // the customer's #1 color for this style
     grouped.push(Object.assign({}, primary, {
-      color: (primaryMatch && primaryMatch.COLOR_NAME) || primary.color,  // card default = COLOR_NAME (matched via CATALOG_COLOR)
+      color: (topColor && topColor.name) || (primaryMatch && primaryMatch.COLOR_NAME) || primary.color,  // card + modal default = TOP color
+      image: (topColor && topColor.image) || primary.image,  // card shows the top-selling color's model shot (not the most-recent)
       colors,                                            // ordered colors (COLOR_NAME + catalogColor + swatch + total qty)
       colorCount: colors.length,
       styleTotalQty: items.reduce((s, x) => s + (Number(x.totalQty) || 0), 0),  // pieces of this style over the ~3yr window
