@@ -94,7 +94,11 @@
 
         renderSwatches();
         selectColor(state.color);
-        (d.upgrades || []).forEach(function (u, i) { priceUpgrade(i, u); });
+        (d.upgrades || []).forEach(function (u, i) {
+            priceUpgrade(i, u);
+            buildUpSizeGrid(i);
+            selectUpgradeColor(i, (u.colors && u.colors[0]) ? u.colors[0].name : '');
+        });
     }
 
     function matrixHtml(colors) {
@@ -122,7 +126,7 @@
 
     function reorderHtml() {
         return '<section class="pp-section pp-reorder"><h2>Re-order</h2>'
-            + '<p class="pp-section-sub">Color: <strong id="pp-req-colorlabel"></strong> &mdash; pick sizes and we’ll send it to your rep for a fresh quote.</p>'
+            + '<p class="pp-section-sub">Color: <strong id="pp-req-colorlabel"></strong> <span class="pp-req-hint">(tap any color above to switch)</span> &mdash; pick sizes and we’ll send it to your rep for a fresh quote.</p>'
             + '<div class="pp-field"><span class="pp-flabel">Sizes &amp; quantities</span>'
             + '<div class="cp-size-grid" id="pp-sizes"></div>'
             + '<div class="cp-size-total">Total: <strong id="pp-sizetotal">0</strong></div></div>'
@@ -216,28 +220,67 @@
         var sw = e.target.closest && e.target.closest('#pp-swatches .cp-swatch-btn');
         if (sw) { selectColor(sw.getAttribute('data-color')); return; }
         if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); return; }
+        var upsw = e.target.closest && e.target.closest('.pp-up-sw');
+        if (upsw) { selectUpgradeColor(parseInt(upsw.getAttribute('data-up'), 10), upsw.getAttribute('data-color')); return; }
         var up = e.target.closest && e.target.closest('.pp-up-btn');
         if (up) { requestUpgrade(parseInt(up.getAttribute('data-up'), 10)); }
     });
 
+    // Each upgrade card has its OWN color + size grid (same "pick color, fill sizes, submit" flow
+    // as the re-order). Sizes start blank (a premium product they haven't ordered before).
+    var upState = {};   // upgrade index -> { color, catalog }
+    function selectUpgradeColor(i, name) {
+        var u = (state.data.upgrades || [])[i]; if (!u) return;
+        var c = (u.colors || []).filter(function (x) { return x.name === name; })[0] || (u.colors || [])[0];
+        if (!c) { upState[i] = { color: '', catalog: '' }; return; }
+        upState[i] = { color: c.name, catalog: c.catalogColor || '' };
+        var cn = document.getElementById('pp-up-cn-' + i); if (cn) cn.textContent = c.name;
+        var box = document.getElementById('pp-up-colors-' + i);
+        if (box) { var bs = box.querySelectorAll('.pp-up-sw'); for (var j = 0; j < bs.length; j++) bs[j].classList.toggle('is-selected', bs[j].getAttribute('data-color') === c.name); }
+        var img = document.getElementById('pp-up-img-' + i);
+        if (img && c.image) img.innerHTML = '<img src="' + esc(c.image) + '" alt="" loading="lazy" onerror="this.remove();">';
+    }
+    function buildUpSizeGrid(i) {
+        var grid = document.getElementById('pp-up-sizes-' + i); if (!grid) return;
+        grid.innerHTML = SIZE_ORDER.map(function (sz) {
+            return '<label class="cp-size-cell"><span class="cp-size-name">' + sz + '</span>'
+                + '<input type="number" min="0" inputmode="numeric" class="cp-size-input" data-size="' + sz + '" value="" placeholder="0"></label>';
+        }).join('');
+        var ins = grid.querySelectorAll('.cp-size-input');
+        for (var k = 0; k < ins.length; k++) ins[k].addEventListener('input', (function (idx) { return function () { updateUpTotal(idx); }; })(i));
+        updateUpTotal(i);
+    }
+    function collectUpSizes(i) {
+        var out = {}, total = 0;
+        var ins = document.querySelectorAll('#pp-up-sizes-' + i + ' .cp-size-input');
+        for (var k = 0; k < ins.length; k++) { var n = parseInt(ins[k].value, 10); if (n > 0) { out[ins[k].getAttribute('data-size')] = n; total += n; } }
+        return { sizes: out, total: total };
+    }
+    function updateUpTotal(i) { var el = document.getElementById('pp-up-total-' + i); if (el) el.textContent = collectUpSizes(i).total; }
+
     function requestUpgrade(i) {
         var u = (state.data.upgrades || [])[i]; if (!u) return;
-        if (PREVIEW) { showToast('Staff preview — the customer would ask their rep about this embroidered upgrade.'); return; }
-        var note = 'Interested in upgrading to ' + u.title + ' (' + u.style + ') with an embroidered logo — ' + u.stitch + '-stitch ' + u.location + '. Please send a quote.';
+        if (PREVIEW) { showToast('Staff preview — the customer would send this embroidered upgrade to their rep.'); return; }
+        var st = upState[i] || {};
+        var picked = collectUpSizes(i);
+        var breakdown = SIZE_ORDER.filter(function (s) { return picked.sizes[s]; }).map(function (s) { return s + ':' + picked.sizes[s]; }).join(', ');
+        var note = 'Upgrade to EMBROIDERY on ' + u.title + ' (' + u.style + ')' + (st.color ? ' in ' + st.color : '') + ' — ' + u.stitch + '-stitch ' + u.location + ' logo.' + (picked.total ? '' : ' Please send a quote.');
+        var btn = document.querySelector('.pp-up-btn[data-up="' + i + '"]'); if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
         fetch('/api/portal/reorder-request', {
             method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                style: u.style, color: '', product_title: u.title + ' (embroidered upgrade)',
+                style: u.style, color: st.color || '', product_title: u.title + ' (embroidered upgrade)',
                 design_number: state.data.designNumber || '', design_name: state.data.designName || '',
-                qty: '', size_breakdown: '', note: note, source: 'reorder'
+                qty: picked.total ? String(picked.total) : '', size_breakdown: breakdown, note: note, source: 'reorder'
             })
         })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (x) {
+                if (btn) { btn.disabled = false; btn.textContent = 'Send this embroidered upgrade to my rep'; }
                 if (x.ok && x.j.ok) showToast('Sent to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! They’ll follow up about your embroidered upgrade.');
                 else showToast('Could not send. Please call (253) 922-5793.');
             })
-            .catch(function () { showToast('Could not send. Please call (253) 922-5793.'); });
+            .catch(function () { if (btn) { btn.disabled = false; btn.textContent = 'Send this embroidered upgrade to my rep'; } showToast('Could not send. Please call (253) 922-5793.'); });
     }
 
     // ── Upgrade to embroidery module (engine-priced matrix — same engine as Quick Quote, Rule 9) ──
@@ -246,21 +289,28 @@
             ? '<div class="pp-up-banner"><img src="' + esc(ups[0].pitchImage) + '" alt="Custom embroidery" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>'
             : '';
         var cards = ups.map(function (u, i) {
-            var sw = (u.colors || []).slice(0, 10).map(function (c) {
-                return c.swatch ? '<img class="cp-swatch" src="' + esc(c.swatch) + '" title="' + esc(c.name) + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' : '';
+            var swBtns = (u.colors || []).map(function (c) {
+                return '<button type="button" class="pp-up-sw" data-up="' + i + '" data-color="' + esc(c.name) + '" title="' + esc(c.name) + '">'
+                    + (c.swatch ? '<img src="' + esc(c.swatch) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</button>';
             }).join('');
             return '<div class="pp-up-card">'
                 + '<div class="pp-up-top">'
-                + '<div class="pp-up-img">' + (u.image ? '<img src="' + esc(u.image) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</div>'
+                + '<div class="pp-up-img" id="pp-up-img-' + i + '">' + (u.image ? '<img src="' + esc(u.image) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</div>'
                 + '<div class="pp-up-info">'
                 + (u.tier ? '<span class="pp-up-tier">' + esc(u.tier) + '</span>' : '')
                 + '<div class="pp-up-name">' + esc(u.title) + '</div>'
                 + (u.brand ? '<div class="pp-up-brand">' + esc(u.brand) + '</div>' : '')
                 + (u.blurb ? '<div class="pp-up-blurb">' + esc(u.blurb) + '</div>' : '')
-                + (sw ? '<div class="pp-up-swatches">' + sw + '</div>' : '')
                 + '</div></div>'
                 + '<div class="pp-up-digit" id="pp-up-dig-' + i + '"><i>&#129525;</i> <span><strong>New to embroidery?</strong> We’ll digitize your logo for stitching at half off &mdash; a one-time setup, and the file’s yours to reuse on every future order.</span></div>'
                 + '<div class="pp-up-matrix" id="pp-up-mx-' + i + '"><div class="pp-up-mxload">Pricing an ' + Number(u.stitch).toLocaleString() + '-stitch embroidered logo&hellip;</div></div>'
+                + '<div class="pp-up-order">'
+                + '<div class="pp-up-colorrow">Color: <strong class="pp-up-cn" id="pp-up-cn-' + i + '"></strong> <span class="pp-req-hint">(tap a swatch to change)</span></div>'
+                + (swBtns ? '<div class="pp-up-colors" id="pp-up-colors-' + i + '">' + swBtns + '</div>' : '')
+                + '<div class="pp-field"><span class="pp-flabel">Sizes &amp; quantities <small>(fill in what you need)</small></span>'
+                + '<div class="cp-size-grid" id="pp-up-sizes-' + i + '"></div>'
+                + '<div class="cp-size-total">Total: <strong id="pp-up-total-' + i + '">0</strong></div></div>'
+                + '</div>'
                 + '<button class="cp-btn-primary pp-up-btn" type="button" data-up="' + i + '">Send this embroidered upgrade to my rep</button>'
                 + '</div>';
         }).join('');
