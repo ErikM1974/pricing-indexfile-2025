@@ -3638,6 +3638,29 @@ async function buildProductDetail(cid, style) {
   const top = orderedColors[0] || product.colors[0] || null;
   const lastDesign = history.find(h => h.design) || {};
 
+  // The Erik-editable upgrade ladder for this category → the "upgrade to embroidery" module.
+  // Margin fields are already stripped by the proxy; here we enrich with the premium garment
+  // image + its colors + the pitch image. Best-effort — never blocks the page.
+  let upgrades = [];
+  if (product.category && CRM_API_SECRET) {
+    try {
+      const uR = await fetch(`${CRM_API_BASE}/api/product-upgrades?category=${encodeURIComponent(product.category)}&excludeStyle=${encodeURIComponent(product.style)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+      if (uR.ok) {
+        const list = ((await uR.json()).upgrades || []).slice(0, 2);
+        upgrades = await Promise.all(list.map(async (u) => {
+          const urows = await portalStyleRows(u.style);
+          const uf = urows[0] || {};
+          return {
+            style: u.style, title: u.title || uf.PRODUCT_TITLE || u.style, brand: uf.BRAND_NAME || '',
+            tier: u.tier || '', stitch: Number(u.stitch) || 8000, location: u.location || 'Left Chest',
+            blurb: u.blurb || '', pitchImage: u.image || '',
+            image: portalRowImage(uf) || '', colors: portalColorList(urows).slice(0, 12),
+          };
+        }));
+      }
+    } catch (_) {}
+  }
+
   return {
     product,
     ordered: { colors: orderedColors, styleTotalQty, lineCount: history.length, lastOrdered, firstOrdered },
@@ -3647,6 +3670,7 @@ async function buildProductDetail(cid, style) {
     defaultImage: top ? (top.image || '') : '',
     designNumber: lastDesign.design || '',
     designName: lastDesign.designName || '',
+    upgrades,
   };
 }
 
