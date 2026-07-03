@@ -3490,19 +3490,22 @@ async function buildMyProducts(cid) {
   const end = today.toISOString().slice(0, 10);
   const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
   const start = sd.toISOString().slice(0, 10);
-  const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, { headers: hdrs });
-  if (!oR.ok) throw new Error('orders ' + oR.status);
-  const orders = ((await oR.json()).result || [])
+  // Orders + line items — bounded + PARALLEL. WAS 25 SEQUENTIAL line-item fetches with NO timeout
+  // and a silent `catch(_){}`: one slow/flaky ManageOrders moment dropped orders and silently shrank
+  // the catalog to a partial set (sometimes a single product). Now every call is timeout-bounded,
+  // fetched in parallel, and retried once on a transient miss; the orders fetch surfaces a 503
+  // (visible error, Erik's rule) rather than hanging. Same fix as buildProductDetail (2026-07-02).
+  const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, hdrs, 8000);
+  if (!ordersJson) throw new Error('orders unavailable');
+  const orders = (ordersJson.result || [])
     .sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || '')))
     .slice(0, 25); // bound the line-item fetches; recent orders capture the product variety
+  const fetchLine = (id) => { const u = `${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(id)}`; return portalFetchJson(u, hdrs, 6000).then(j => j || portalFetchJson(u, hdrs, 6000)); };
+  const lineJsons = await Promise.all(orders.map(o => o.id_Order ? fetchLine(o.id_Order) : Promise.resolve(null)));
   const products = new Map(); // baseStyle|color → product
-  for (const o of orders) {
-    if (!o.id_Order) continue;
-    let items = [];
-    try {
-      const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, { headers: hdrs });
-      if (lR.ok) items = (await lR.json()).result || [];
-    } catch (_) {}
+  orders.forEach((o, oi) => {
+    if (!o.id_Order) return;
+    const items = (lineJsons[oi] && lineJsons[oi].result) || [];
     for (const li of items) {
       const norm = portalNormalizePart(li);
       if (!norm) continue;
@@ -3526,7 +3529,7 @@ async function buildMyProducts(cid) {
         }
       }
     }
-  }
+  });
   const list = [...products.values()];
   await Promise.all(list.map(async (p) => {
     const pd = await portalProductDisplay(p.style, p.color);
