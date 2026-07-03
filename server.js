@@ -3602,6 +3602,18 @@ function portalFetchJson(url, headers, ms) {
   ]);
 }
 
+// ORDER_ODBC.ORDER_TYPE (ShopWorks order category) → decoration METHOD (Erik-confirmed 2026-07-03):
+// Embroidery variants + Caps → EMB; Screenprint → SCP; Digital Printing / Contract DTG → DTG;
+// Transfers → DTF. Storefront (Inksoft/Shopify), Art, Blank Goods, Emblem, etc. → '' (customer picks).
+function orderTypeToMethod(orderType) {
+  const t = String(orderType || '').toLowerCase();
+  if (/embroider|\bcaps?\b/.test(t)) return 'EMB';
+  if (/screen ?print/.test(t)) return 'SCP';
+  if (/digital printing|\bdtg\b/.test(t)) return 'DTG';
+  if (/transfer|\bdtf\b/.test(t)) return 'DTF';
+  return '';
+}
+
 // Full product-detail for the portal PAGE: SanMar specs + ALL available colors + THIS customer's
 // own order history for the style (per-color size MATRIX + per-order list). Customer-safe — NO
 // cost/margin (PIECE_PRICE etc. are never copied out). null → unknown style (404).
@@ -3629,8 +3641,14 @@ async function buildProductDetail(cid, style) {
   const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);
   const start = sd.toISOString().slice(0, 10);
   let orders = [];
-  const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, hdrs, 8000);
+  const [ordersJson, orderOdbcJson] = await Promise.all([
+    portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${start}&date_Ordered_end=${end}`, hdrs, 8000),
+    portalFetchJson(`${CRM_API_BASE}/api/order-odbc?q.where=${encodeURIComponent('id_Customer=' + cid)}&q.limit=1000`, hdrs, 6000),
+  ]);
   if (ordersJson && ordersJson.result) orders = ordersJson.result.sort((a, b) => String(b.date_Ordered || '').localeCompare(String(a.date_Ordered || ''))).slice(0, 25);
+  // ORDER_ODBC (ShopWorks sync) → the decoration METHOD per past order, keyed by ID_Order (== ManageOrders id_Order).
+  const methodByOrder = new Map();
+  if (Array.isArray(orderOdbcJson)) orderOdbcJson.forEach(r => { const mm = orderTypeToMethod(r.ORDER_TYPE); if (r.ID_Order != null && mm) methodByOrder.set(String(r.ID_Order), mm); });
 
   // Fetch every order's line items IN PARALLEL, each bounded by a timeout — so a slow or hung
   // ManageOrders call can't stall the page (was 25 SEQUENTIAL fetches → seconds, or an indefinite hang).
@@ -3669,6 +3687,10 @@ async function buildProductDetail(cid, style) {
   const firstOrdered = orderedColors.reduce((d, c) => (!d || (c.firstOrdered && c.firstOrdered < d) ? c.firstOrdered : d), '');
   const top = orderedColors[0] || product.colors[0] || null;
   const lastDesign = history.find(h => h.design) || {};
+  // Default the re-order decoration method from the MOST RECENT past order of this style whose
+  // ORDER_TYPE maps to a method (history is newest-first). '' → customer picks (storefront/ambiguous).
+  let defaultMethod = '';
+  for (const h of history) { const mm = methodByOrder.get(String(h.orderNo)); if (mm) { defaultMethod = mm; break; } }
 
   // The Erik-editable upgrade ladder for this category → the "upgrade to embroidery" module.
   // Margin fields are already stripped by the proxy; here we enrich with the premium garment
@@ -3702,6 +3724,7 @@ async function buildProductDetail(cid, style) {
     defaultImage: top ? (top.image || '') : '',
     designNumber: lastDesign.design || '',
     designName: lastDesign.designName || '',
+    defaultMethod,
     upgrades,
   };
 }
