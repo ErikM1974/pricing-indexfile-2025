@@ -28,12 +28,23 @@
 
 /* Hero: image + colors */
 .pp-hero { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; }
+.pp-hero-media { flex: 0 0 300px; width: 300px; max-width: 100%; }
 .pp-hero-img {
-    flex: 0 0 300px; width: 300px; height: 340px; max-width: 100%;
+    width: 100%; height: 340px;
     background: var(--cp-surface-2); border: 1px solid var(--cp-border); border-radius: var(--cp-radius-lg);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .pp-hero-img img { width: 100%; height: 100%; object-fit: contain; }
+/* Thumbnail strip — one per available angle (Model front/back/side + Flat front/back) */
+.pp-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.pp-thumb {
+    width: 58px; height: 66px; padding: 0; overflow: hidden; cursor: pointer;
+    border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm); background: var(--cp-surface-2);
+    transition: border-color .12s;
+}
+.pp-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pp-thumb:hover { border-color: var(--cp-theme-light); }
+.pp-thumb.is-active { border: 2px solid var(--cp-theme); }
 .pp-hero-img.pp-noimg::after { content: '👕'; font-size: 60px; opacity: .3; }
 .pp-noimg-ico { font-size: 60px; opacity: .3; }
 .pp-hero-side { flex: 1; min-width: 240px; }
@@ -130,7 +141,31 @@
 .pp-up-sw:hover { border-color: var(--cp-theme-light); }
 .pp-up-sw.is-selected { border: 2px solid var(--cp-theme); }
 
+/* Quick-link chips — jump to page sections (portal-appropriate stand-in for SanMar's
+   "Check inventory and pricing": we route to a rep quote, not a public price) */
+.pp-quicklinks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.pp-ql {
+    display: inline-flex; align-items: center; font-size: 12.5px; font-weight: 600; text-decoration: none;
+    padding: 6px 13px; border-radius: 999px; background: var(--cp-surface-2); color: var(--cp-ink);
+    border: 1px solid var(--cp-border); transition: border-color .12s, color .12s;
+}
+.pp-ql:hover { border-color: var(--cp-theme-light); color: var(--cp-theme-dark); }
+.pp-ql--accent { background: var(--cp-theme-bg); color: var(--cp-theme-dark); border-color: var(--cp-theme-light); }
+html { scroll-behavior: smooth; }
+.pp-section { scroll-margin-top: 14px; }
+
+/* Product-page swatches a touch smaller than the shared modal picker (SanMar-style tighter grid).
+   Scoped to .pp-swatches so the main portal re-order modal picker is untouched. */
+.pp-swatches.cp-swatch-picker { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 7px; }
+.pp-swatches .cp-swatch-sq { width: 34px; height: 34px; }
+.pp-swatches .cp-swatch-btn { padding: 6px 4px; }
+.pp-swatches .cp-swatch-btn.is-selected { padding: 5px 3px; }
+.pp-swatches .cp-swatch-nm { font-size: 10.5px; }
+.pp-swatches .cp-swatch-qty { font-size: 10px; }
+.pp-swatches .cp-swatch-tag { font-size: 9px; padding: 1px 6px; }
+
 @media (max-width: 560px) {
-    .pp-hero-img { flex-basis: 100%; width: 100%; height: 300px; }
+    .pp-hero-media { flex-basis: 100%; width: 100%; }
+    .pp-hero-img { height: 300px; }
     .pp-title { font-size: 19px; }
 }

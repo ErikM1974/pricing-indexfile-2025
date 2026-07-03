@@ -3413,6 +3413,25 @@ async function portalStyleRows(style) {
 // generic style image (PRODUCT_IMAGE = one DT6000.jpg for every color) so cards/pickers show the
 // actual color the customer bought; fall back to the generic + flat when a color has no model shot.
 function portalRowImage(row) { return row ? (row.FRONT_MODEL || row.PRODUCT_IMAGE || row.FRONT_FLAT || '') : ''; }
+// Every product-image ANGLE we have for a color, in display order, deduped + non-empty — feeds the
+// product-page gallery. SanMar exposes Model Front/Back/Side + Flat Front/Back per color; we fetch
+// all but SIDE_MODEL today (add it to the proxy /api/product-details SELECT to light up the 5th
+// angle — this skips empties, so a color's Side appears automatically once present). Falls back to
+// the generic style image so a color with no shots still shows something.
+function portalRowImages(row) {
+  if (!row) return [];
+  const src = [
+    { url: row.FRONT_MODEL, label: 'Front' },
+    { url: row.BACK_MODEL, label: 'Back' },
+    { url: row.SIDE_MODEL, label: 'Side' },
+    { url: row.FRONT_FLAT, label: 'Flat front' },
+    { url: row.BACK_FLAT, label: 'Flat back' },
+  ];
+  const seen = new Set(), out = [];
+  for (const s of src) { const u = s.url && String(s.url).trim(); if (u && !seen.has(u)) { seen.add(u); out.push({ url: u, label: s.label }); } }
+  if (!out.length && row.PRODUCT_IMAGE) out.push({ url: row.PRODUCT_IMAGE, label: '' });
+  return out;
+}
 // Robust color match (exact → catalog code → contains, all punctuation/space-insensitive) so
 // "Jet Black" resolves to the Jet-Black garment image, not the style's default color. null = no match.
 function portalMatchColor(rows, color) {
@@ -3431,7 +3450,8 @@ function portalColorList(rows) {
     const name = r.COLOR_NAME;
     if (!name || seen.has(name.toLowerCase())) continue;
     seen.add(name.toLowerCase());
-    out.push({ name, image: portalRowImage(r), swatch: r.COLOR_SQUARE_IMAGE || '', catalogColor: r.CATALOG_COLOR || '' });
+    const imgs = portalRowImages(r);
+    out.push({ name, image: (imgs[0] && imgs[0].url) || portalRowImage(r), images: imgs, swatch: r.COLOR_SQUARE_IMAGE || '', catalogColor: r.CATALOG_COLOR || '' });
   }
   return out;
 }
