@@ -18,7 +18,7 @@
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
 
     var SIZE_ORDER = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-    var state = { data: null, color: '', catalogColor: '', colorInfo: {}, orderedByColor: {} };
+    var state = { data: null, color: '', catalogColor: '', colorInfo: {}, orderedByColor: {}, gallery: { images: [], idx: 0 } };
 
     var backEl = document.getElementById('pp-back');
     if (backEl) backEl.setAttribute('href', BACK);
@@ -46,7 +46,10 @@
     function render(d) {
         state.data = d;
         (d.ordered.colors || []).forEach(function (c) { state.orderedByColor[c.name.toLowerCase()] = c; });
-        (d.product.colors || []).forEach(function (c) { state.colorInfo[c.name.toLowerCase()] = { image: c.image, catalog: c.catalogColor }; });
+        (d.product.colors || []).forEach(function (c) {
+            var imgs = (c.images && c.images.length) ? c.images : (c.image ? [{ url: c.image, label: '' }] : []);
+            state.colorInfo[c.name.toLowerCase()] = { image: c.image, images: imgs, catalog: c.catalogColor };
+        });
         state.color = d.defaultColor || (d.product.colors[0] && d.product.colors[0].name) || '';
         state.catalogColor = d.defaultCatalogColor || '';
 
@@ -60,10 +63,18 @@
                 + (d.ordered.lastOrdered ? ' · last ordered ' + esc(formatDate(d.ordered.lastOrdered)) : '') + '</div>';
         }
         h += '</div>';
+
+        var ql = [];
+        if (p.description) ql.push('<a class="pp-ql" href="#pp-about">Product details</a>');
+        ql.push('<a class="pp-ql" href="#pp-reorder">Re-order</a>');
+        if (d.upgrades && d.upgrades.length) ql.push('<a class="pp-ql pp-ql--accent" href="#pp-upgrade">Upgrade to embroidery</a>');
+        if (d.history && d.history.length) ql.push('<a class="pp-ql" href="#pp-history">Order history</a>');
+        h += '<div class="pp-quicklinks">' + ql.join('') + '</div>';
+
         if (p.isCloseout) h += '<div class="pp-closeout"><i>&#9888;</i> This style is being discontinued &mdash; ask your rep about a great replacement.</div>';
 
         h += '<div class="pp-hero">'
-            + '<div class="pp-hero-img" id="pp-hero-img"></div>'
+            + '<div class="pp-hero-media"><div class="pp-hero-img" id="pp-hero-img"></div><div class="pp-thumbs" id="pp-thumbs"></div></div>'
             + '<div class="pp-hero-side">'
             + '<div class="pp-colorname" id="pp-colorname"></div>'
             + '<div class="pp-avail" id="pp-avail"></div>'
@@ -72,7 +83,7 @@
             + '</div>'
             + '</div>';
 
-        if (p.description) h += '<section class="pp-section"><h2>About this product</h2><p class="pp-desc">' + esc(p.description) + '</p></section>';
+        if (p.description) h += '<section class="pp-section" id="pp-about"><h2>About this product</h2><p class="pp-desc">' + esc(p.description) + '</p></section>';
 
         if (d.ordered.colors && d.ordered.colors.length) {
             h += '<section class="pp-section"><h2>What you’ve ordered</h2>'
@@ -85,7 +96,7 @@
         if (d.upgrades && d.upgrades.length) h += upgradesHtml(d.upgrades);
 
         if (d.history && d.history.length) {
-            h += '<section class="pp-section"><h2>Order history</h2>' + historyHtml(d.history) + '</section>';
+            h += '<section class="pp-section" id="pp-history"><h2>Order history</h2>' + historyHtml(d.history) + '</section>';
         }
 
         document.getElementById('pp-body').innerHTML = h;
@@ -125,7 +136,7 @@
     }
 
     function reorderHtml() {
-        return '<section class="pp-section pp-reorder"><h2>Re-order</h2>'
+        return '<section class="pp-section pp-reorder" id="pp-reorder"><h2>Re-order</h2>'
             + '<p class="pp-section-sub">Color: <strong id="pp-req-colorlabel"></strong> <span class="pp-req-hint">(tap any color above to switch)</span> &mdash; pick sizes and we’ll send it to your rep for a fresh quote.</p>'
             + '<div class="pp-field"><span class="pp-flabel">Sizes &amp; quantities</span>'
             + '<div class="cp-size-grid" id="pp-sizes"></div>'
@@ -167,10 +178,12 @@
         state.color = name;
         var info = state.colorInfo[name.toLowerCase()] || {};
         state.catalogColor = info.catalog || '';
-        var img = info.image || state.data.defaultImage || '';
-        document.getElementById('pp-hero-img').innerHTML = img
-            ? '<img src="' + esc(img) + '" alt="" onerror="this.parentElement.classList.add(\'pp-noimg\');this.remove();">'
-            : '<div class="pp-noimg-ico">&#128085;</div>';
+        state.gallery = {
+            images: (info.images && info.images.length) ? info.images
+                : (state.data.defaultImage ? [{ url: state.data.defaultImage, label: '' }] : []),
+            idx: 0
+        };
+        renderGallery();
         var cn = document.getElementById('pp-colorname'); if (cn) cn.textContent = name;
         var lbl = document.getElementById('pp-req-colorlabel'); if (lbl) lbl.textContent = name;
         var btns = document.querySelectorAll('#pp-swatches .cp-swatch-btn');
@@ -178,6 +191,37 @@
         var o = state.orderedByColor[name.toLowerCase()];
         buildSizeGrid(o ? o.sizes : {});
         fetchAvailability(state.catalogColor || name);
+    }
+
+    // Per-color image gallery: a main shot + a thumbnail strip of every angle we have (Model
+    // front/back/side + Flat front/back, deduped server-side). Rebuilt on each color change.
+    function renderGallery() {
+        var imgs = (state.gallery && state.gallery.images) || [];
+        var idx = (state.gallery && state.gallery.idx) || 0;
+        if (idx >= imgs.length) idx = 0;
+        var hero = document.getElementById('pp-hero-img');
+        if (hero) {
+            hero.classList.remove('pp-noimg');
+            var main = imgs[idx];
+            hero.innerHTML = main
+                ? '<img src="' + esc(main.url) + '" alt="' + esc(state.color + (main.label ? ' — ' + main.label : '')) + '" onerror="this.parentElement.classList.add(\'pp-noimg\');this.remove();">'
+                : '<div class="pp-noimg-ico">&#128085;</div>';
+        }
+        var th = document.getElementById('pp-thumbs');
+        if (!th) return;
+        if (imgs.length < 2) { th.innerHTML = ''; th.style.display = 'none'; return; }
+        th.style.display = '';
+        th.innerHTML = imgs.map(function (im, i) {
+            var lbl = im.label || ('View ' + (i + 1));
+            return '<button type="button" class="pp-thumb' + (i === idx ? ' is-active' : '') + '" data-idx="' + i + '" title="' + esc(lbl) + '" aria-label="' + esc(lbl) + '">'
+                + '<img src="' + esc(im.url) + '" alt="" loading="lazy" onerror="var b=this.closest(\'.pp-thumb\'); if(b){b.style.display=\'none\';}">'
+                + '</button>';
+        }).join('');
+    }
+    function setGalleryImage(i) {
+        if (!state.gallery) return;
+        state.gallery.idx = i || 0;
+        renderGallery();
     }
 
     function fetchAvailability(color) {
@@ -217,6 +261,8 @@
     function updateSizeTotal() { var el = document.getElementById('pp-sizetotal'); if (el) el.textContent = collectSizes().total; }
 
     document.addEventListener('click', function (e) {
+        var th = e.target.closest && e.target.closest('#pp-thumbs .pp-thumb');
+        if (th) { setGalleryImage(parseInt(th.getAttribute('data-idx'), 10) || 0); return; }
         var sw = e.target.closest && e.target.closest('#pp-swatches .cp-swatch-btn');
         if (sw) { selectColor(sw.getAttribute('data-color')); return; }
         if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); return; }
@@ -314,7 +360,7 @@
                 + '<button class="cp-btn-primary pp-up-btn" type="button" data-up="' + i + '">Send this embroidered upgrade to my rep</button>'
                 + '</div>';
         }).join('');
-        return '<section class="pp-section pp-upgrade"><h2>Upgrade to embroidery</h2>'
+        return '<section class="pp-section pp-upgrade" id="pp-upgrade"><h2>Upgrade to embroidery</h2>'
             + '<p class="pp-section-sub">Your logo, embroidered on a premium garment &mdash; the upgraded version of what you already buy. Your rep quotes the final price.</p>'
             + banner + cards + '</section>';
     }
