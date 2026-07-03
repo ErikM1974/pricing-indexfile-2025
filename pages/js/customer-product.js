@@ -18,7 +18,7 @@
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
 
     var SIZE_ORDER = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
-    var state = { data: null, color: '', catalogColor: '', colorInfo: {}, orderedByColor: {}, gallery: { images: [], idx: 0 } };
+    var state = { data: null, color: '', catalogColor: '', colorInfo: {}, orderedByColor: {}, gallery: { images: [], idx: 0 }, method: '', minBlocked: false };
 
     var backEl = document.getElementById('pp-back');
     if (backEl) backEl.setAttribute('href', BACK);
@@ -105,6 +105,7 @@
 
         renderSwatches();
         selectColor(state.color);
+        initMethods();
         (d.upgrades || []).forEach(function (u, i) {
             priceUpgrade(i, u);
             buildUpSizeGrid(i);
@@ -137,7 +138,10 @@
 
     function reorderHtml() {
         return '<section class="pp-section pp-reorder" id="pp-reorder"><h2>Re-order</h2>'
-            + '<p class="pp-section-sub">Color: <strong id="pp-req-colorlabel"></strong> <span class="pp-req-hint">(tap any color above to switch)</span> &mdash; pick sizes and we’ll send it to your rep for a fresh quote.</p>'
+            + '<p class="pp-section-sub">Color: <strong id="pp-req-colorlabel"></strong> <span class="pp-req-hint">(tap any color above to switch)</span> &mdash; pick your decoration + sizes and we’ll send it to your rep for a fresh quote.</p>'
+            + '<div class="pp-field"><span class="pp-flabel">Decoration <small>(how it’s made &mdash; defaults to your last order)</small></span>'
+            + '<div class="pp-methods" id="pp-methods"><span class="pp-avail-load">loading options&hellip;</span></div>'
+            + '<div class="pp-method-min" id="pp-method-min"></div></div>'
             + '<div class="pp-field"><span class="pp-flabel">Sizes &amp; quantities</span>'
             + '<div class="cp-size-grid" id="pp-sizes"></div>'
             + '<div class="cp-size-total">Total: <strong id="pp-sizetotal">0</strong></div></div>'
@@ -258,13 +262,98 @@
         for (var i = 0; i < ins.length; i++) { var n = parseInt(ins[i].value, 10); if (n > 0) { out[ins[i].getAttribute('data-size')] = n; total += n; } }
         return { sizes: out, total: total };
     }
-    function updateSizeTotal() { var el = document.getElementById('pp-sizetotal'); if (el) el.textContent = collectSizes().total; }
+    function updateSizeTotal() { var el = document.getElementById('pp-sizetotal'); if (el) el.textContent = collectSizes().total; checkMin(); }
+
+    // ── Decoration method: default from the customer's order history (server-derived via
+    //    ORDER_ODBC.ORDER_TYPE), then enforce that method's MINIMUM using the SAME Caspio
+    //    Pricing_Tiers Quick Quote reads — read-only, NO price ever shown. ──
+    var METHODS = [
+        { key: 'EMB', label: 'Embroidery', bundle: 'EMB', hint: 'Stitched logo' },
+        { key: 'SCP', label: 'Screen Print', bundle: 'ScreenPrint', hint: 'Ink — best for larger runs' },
+        { key: 'DTG', label: 'DTG', bundle: 'DTG', hint: 'Full-color print' },
+        { key: 'DTF', label: 'Transfers', bundle: 'DTF', hint: 'Transfer — good for small/complex art' }
+    ];
+    function methodByKey(k) { for (var i = 0; i < METHODS.length; i++) if (METHODS[i].key === k) return METHODS[i]; return null; }
+    function methodLabel(k) { var m = methodByKey(k); return m ? m.label : (k || ''); }
+    function initMethods() {
+        var box = document.getElementById('pp-methods'); if (!box) return;
+        var done = function (elig) {
+            var avail = METHODS.filter(function (m) {
+                if (m.key === 'DTG') return elig.DTG && elig.DTG !== 'no';
+                return !!elig[m.key];
+            });
+            if (!avail.length) avail = [methodByKey('EMB')];   // safety — always at least embroidery
+            state._methods = avail;
+            var pick = avail.filter(function (m) { return m.key === state.data.defaultMethod; })[0];
+            state.method = pick ? pick.key : avail[0].key;
+            renderMethods(elig.source === 'fallback');
+            checkMin();
+        };
+        if (window.DecorationMethods && DecorationMethods.eligibleFor) {
+            DecorationMethods.eligibleFor(state.data.product).then(done).catch(function () { done(DecorationMethods.fallbackResult()); });
+        } else {
+            done({ EMB: true, DTG: 'no', SCP: false, DTF: false, source: 'fallback' });
+        }
+    }
+    function renderMethods(isFallback) {
+        var box = document.getElementById('pp-methods'); if (!box) return;
+        var avail = state._methods || [];
+        box.innerHTML = avail.map(function (m) {
+            var sel = m.key === state.method;
+            var tag = (m.key === state.data.defaultMethod) ? '<span class="pp-method-tag">last time</span>' : '';
+            return '<button type="button" class="pp-method' + (sel ? ' is-selected' : '') + '" data-method="' + m.key + '">'
+                + tag + '<span class="pp-method-nm">' + esc(m.label) + '</span><span class="pp-method-hint">' + esc(m.hint) + '</span></button>';
+        }).join('')
+            + (isFallback ? '<div class="pp-method-note">Showing embroidery &mdash; call (253) 922-5793 for other decoration options.</div>' : '');
+    }
+    function setMethod(k) {
+        if (!k) return;
+        state.method = k;
+        var btns = document.querySelectorAll('#pp-methods .pp-method');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('is-selected', btns[i].getAttribute('data-method') === k);
+        checkMin();
+    }
+    var _minCache = {};
+    function getMethodMin(bundle) {
+        if (_minCache[bundle] != null) return Promise.resolve(_minCache[bundle]);
+        var api = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        return fetch(api + '/api/pricing-bundle?method=' + encodeURIComponent(bundle) + '&styleNumber=' + encodeURIComponent(state.data.product.style))
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (j) {
+                var tiers = (j && (j.tiersR || j.tiers)) || [];
+                var mins = tiers.map(function (t) { return Number(t.MinQuantity != null ? t.MinQuantity : t.minQty); }).filter(function (n) { return n > 0; });
+                var min = mins.length ? Math.min.apply(null, mins) : 1;
+                _minCache[bundle] = min;
+                return min;
+            })
+            .catch(function () { return 1; });   // fail-open: never false-block on a fetch hiccup (rep re-checks)
+    }
+    function checkMin() {
+        var box = document.getElementById('pp-method-min'); if (!box) return;
+        var m = methodByKey(state.method);
+        if (!m) { box.innerHTML = ''; state.minBlocked = false; return; }
+        var qty = collectSizes().total;
+        getMethodMin(m.bundle).then(function (min) {
+            if (methodByKey(state.method) !== m) return;   // method changed while fetching
+            if (min > 1 && qty > 0 && qty < min) {
+                state.minBlocked = true;
+                box.className = 'pp-method-min pp-method-min--warn';
+                box.innerHTML = '<i>&#9888;</i> <span>' + esc(m.label) + ' starts at ' + min + ' pieces (you have ' + qty + '). Add more, pick another decoration above, or your rep can suggest an option for smaller runs.</span>';
+            } else {
+                state.minBlocked = false;
+                box.className = 'pp-method-min';
+                box.innerHTML = '';
+            }
+        });
+    }
 
     document.addEventListener('click', function (e) {
         var th = e.target.closest && e.target.closest('#pp-thumbs .pp-thumb');
         if (th) { setGalleryImage(parseInt(th.getAttribute('data-idx'), 10) || 0); return; }
         var sw = e.target.closest && e.target.closest('#pp-swatches .cp-swatch-btn');
         if (sw) { selectColor(sw.getAttribute('data-color')); return; }
+        var mb = e.target.closest && e.target.closest('#pp-methods .pp-method');
+        if (mb) { setMethod(mb.getAttribute('data-method')); return; }
         if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); return; }
         var upsw = e.target.closest && e.target.closest('.pp-up-sw');
         if (upsw) { selectUpgradeColor(parseInt(upsw.getAttribute('data-up'), 10), upsw.getAttribute('data-color')); return; }
@@ -317,7 +406,7 @@
             body: JSON.stringify({
                 style: u.style, color: st.color || '', product_title: u.title + ' (embroidered upgrade)',
                 design_number: state.data.designNumber || '', design_name: state.data.designName || '',
-                qty: picked.total ? String(picked.total) : '', size_breakdown: breakdown, note: note, source: 'reorder'
+                qty: picked.total ? String(picked.total) : '', size_breakdown: breakdown, method: 'Embroidery', note: note, source: 'reorder'
             })
         })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
@@ -446,7 +535,9 @@
         var picked = collectSizes();
         var err = document.getElementById('pp-req-error'); err.textContent = '';
         if (picked.total <= 0) { err.textContent = 'Enter a quantity for at least one size.'; return; }
-        if (PREVIEW) { showToast('Staff preview — the customer would send this request to their rep.'); return; }
+        if (!state.method) { err.textContent = 'Pick a decoration method above.'; return; }
+        if (state.minBlocked) { err.textContent = 'Please meet the minimum for ' + methodLabel(state.method) + ', or choose another decoration.'; return; }
+        if (PREVIEW) { showToast('Staff preview — the customer would send this ' + methodLabel(state.method) + ' request to their rep.'); return; }
         var d = state.data;
         var breakdown = SIZE_ORDER.filter(function (s) { return picked.sizes[s]; }).map(function (s) { return s + ':' + picked.sizes[s]; }).join(', ');
         var btn = document.getElementById('pp-req-submit'); btn.disabled = true; btn.textContent = 'Sending…';
@@ -455,7 +546,7 @@
             body: JSON.stringify({
                 style: d.product.style, color: state.color, product_title: d.product.title,
                 design_number: d.designNumber || '', design_name: d.designName || '',
-                qty: String(picked.total), size_breakdown: breakdown,
+                qty: String(picked.total), size_breakdown: breakdown, method: methodLabel(state.method),
                 note: document.getElementById('pp-note').value.trim(), source: 'reorder'
             })
         })
