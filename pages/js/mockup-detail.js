@@ -5708,7 +5708,7 @@
     }
 
     function searchOrdersByCustomerId(customerId, companyName, container) {
-        fetch(API_BASE + '/api/manageorders/orders?id_Customer=' + encodeURIComponent(customerId))
+        moFetch('orders?id_Customer=' + encodeURIComponent(customerId))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5733,7 +5733,7 @@
     function searchOrderManual(orderNum, container) {
         if (!orderNum) return;
         container.innerHTML = '<div class="pmd-fo-loading">Looking up Order #' + escapeHtml(orderNum) + '...</div>';
-        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+        moFetch('orders/' + encodeURIComponent(orderNum))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5847,7 +5847,7 @@
         }
         btn.textContent = 'Loading...';
         btn.disabled = true;
-        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+        moFetch('lineitems/' + encodeURIComponent(orderNum))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5927,7 +5927,7 @@
 
     // ── ShopWorks Art Done Check ─────────────────────────────────────────
     function checkShopWorksArtDone(workOrderNumber) {
-        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(workOrderNumber))
+        moFetch('orders/' + encodeURIComponent(workOrderNumber))
             .then(function (r) {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();

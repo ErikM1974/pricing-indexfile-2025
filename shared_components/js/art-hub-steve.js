@@ -2398,10 +2398,10 @@
         // Both fetches need their own .catch() so one failure doesn't reject Promise.all
         // and silently drop the audit badge rendering.
         Promise.all([
-            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+            moFetch('orders/' + encodeURIComponent(orderNum))
                 .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .catch(function () { return { result: [] }; }),
-            fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            moFetch('lineitems/' + encodeURIComponent(orderNum))
                 .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .catch(function () { return { result: [] }; })
         ])

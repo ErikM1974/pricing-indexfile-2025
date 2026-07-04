@@ -73,13 +73,32 @@ Next Steps:
 
 ---
 
-## After Manual Steps - Claude Will Update
+## Code status — DONE (2026-07-04)
 
-Once the above is done, tell Claude to:
-1. Update `server.js` acceptance endpoint to use dedicated fields
-2. Add EmailJS calls to send both notification emails
+The server code is built and shipped fail-soft in `POST /api/public/quote/:quoteId/accept`
+(`server.js`), so it is safe to run BEFORE the manual steps below — it just skips whatever
+isn't set up yet:
 
-**File to modify:** `server.js` (lines ~2645-2685)
+- `sendQuoteAcceptedEmails(session, name, email)` fires both emails fire-and-forget after a
+  successful accept. Missing EmailJS keys OR a not-yet-created template → warn + skip, never
+  throws. Customer receipt → the accepting email; rep alert → `session.SalesRepEmail`
+  (fallback `sales@nwcustomapparel.com`).
+- Dedicated columns are written ONLY when env `QUOTE_ACCEPT_FIELDS_LIVE=1`; the acceptance
+  data is ALSO always stored in Notes JSON, so nothing is lost if the flag is off.
+
+### To turn it on (Erik):
+1. **Caspio** — add the 3 `quote_sessions` fields (table above), then
+   `heroku config:set QUOTE_ACCEPT_FIELDS_LIVE=1 --app sanmar-inventory-app`. Optional —
+   Notes JSON still captures acceptance without it.
+2. **EmailJS** — create the 2 templates with EXACTLY these ids + param names:
+   - `template_quote_accepted_customer` — `{{to_name}}`, `{{to_email}}` (To field),
+     `{{quote_id}}`, `{{quote_amount}}`
+   - `template_quote_accepted_staff` — `{{to_email}}` (To field), `{{quote_id}}`,
+     `{{customer_name}}`, `{{customer_email}}`, `{{company_name}}`, `{{quote_amount}}`, `{{quote_url}}`
+3. Once the templates exist, emails send automatically on the next acceptance — no deploy.
+   (Optional: add "a confirmation email is on its way" to the accept success modal in
+   `pages/js/quote-view.js` — held until templates are confirmed so we don't promise an
+   email that won't arrive.)
 
 ---
 

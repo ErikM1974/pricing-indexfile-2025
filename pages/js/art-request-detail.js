@@ -5506,9 +5506,9 @@
 
         // Fetch order header + line items in parallel
         Promise.all([
-            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+            moFetch('orders/' + encodeURIComponent(orderNum))
                 .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }),
-            fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+            moFetch('lineitems/' + encodeURIComponent(orderNum))
                 .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         ])
         .then(function (results) {
@@ -5604,7 +5604,7 @@
     }
 
     function searchOrdersByCustomerId(customerId, companyName, container) {
-        fetch(API_BASE + '/api/manageorders/orders?id_Customer=' + encodeURIComponent(customerId))
+        moFetch('orders?id_Customer=' + encodeURIComponent(customerId))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5657,7 +5657,7 @@
     function searchOrderManual(orderNum, container) {
         if (!orderNum) return;
         container.innerHTML = '<div class="ard-fo-loading">Looking up Order #' + escapeHtml(orderNum) + '...</div>';
-        fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum))
+        moFetch('orders/' + encodeURIComponent(orderNum))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5714,7 +5714,7 @@
         }
         btn.textContent = 'Loading...';
         btn.disabled = true;
-        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+        moFetch('lineitems/' + encodeURIComponent(orderNum))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -5783,7 +5783,7 @@
             if (findBtn) findBtn.style.display = 'none';
 
             // Step 2: Fetch order data to get Customer # and other info
-            return fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(orderNum));
+            return moFetch('orders/' + encodeURIComponent(orderNum));
         })
         .then(function (resp) { if (!resp.ok) throw new Error('HTTP ' + resp.status); return resp.json(); })
         .then(function (data) {
