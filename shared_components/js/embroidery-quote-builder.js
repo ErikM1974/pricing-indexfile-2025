@@ -9110,7 +9110,14 @@ function onLtmOverrideChange() {
 function updateAdditionalCharges() {
     const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
     const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
-    const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75); // GRT-75 rate from Service_Codes API (review C8)
+    const grtRate = getServicePrice('GRT-75', 75); // GRT-75 rate from Service_Codes API (review C8)
+    // Missing-service-code visible warning — shared helper (quote-builder-utils.js),
+    // synced with DTF/SCP (2026-07-04, Erik's #1 rule). Covers the silent case where
+    // codes loaded but GRT-75 is absent, so a rep never bills the $75 fallback unwarned.
+    if (graphicDesignHours > 0 && typeof window.warnIfServiceCodeMissing === 'function') {
+        window.warnIfServiceCodeMissing('GRT-75', grtRate, 'Graphic-design');
+    }
+    const graphicDesignCharge = graphicDesignHours * grtRate;
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
     const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
@@ -13155,6 +13162,19 @@ async function printQuote() {
     const allItems = collectProductsFromTable();
     if (allItems.length === 0) {
         showToast('Add products before printing', 'error');
+        return;
+    }
+
+    // Belt-and-braces $0-print guard (parity with DTF/SCP printQuote, 2026-07-04).
+    // The pre-print recalc above already settled on-screen prices; if the grand total
+    // still reads $0 (e.g. pricing bundle never loaded), block rather than emit a
+    // silent $0.00 customer PDF. Erik's #1 rule: visible failure, never a wrong price.
+    // Reads the on-screen total the customer would see (grand-total-with-tax, falling
+    // back to the pre-tax grand-total) rather than recomputing.
+    const _embTotalEl = document.getElementById('grand-total-with-tax') || document.getElementById('grand-total');
+    const _embTotal = parseFloat((_embTotalEl?.textContent || '').replace(/[$,]/g, ''));
+    if (!(Number.isFinite(_embTotal) && _embTotal > 0)) {
+        showToast('Quote total computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before printing.', 'error');
         return;
     }
 

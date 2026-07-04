@@ -1424,6 +1424,15 @@
 
             submitBtn.textContent = 'Sent!';
             submitBtn.style.background = '#28a745';
+
+            // Success toast naming the recipient(s) before the page reloads, so the
+            // sender gets confirmation of WHO was notified (not just a silent refresh).
+            var recipientLabel = repResolved.displayName || repResolved.email || 'the sales rep';
+            if (ccEmails.length > 0) {
+                recipientLabel += ' + ' + ccEmails.map(function (c) { return c.name; }).join(', ');
+            }
+            showActionToast('✓ Sent to ' + recipientLabel + ' — notified by email & Slack', 'success');
+
             var cbk = _pendingApprovalOnSuccess;
             _pendingApprovalOnSuccess = null;
             if (modal) modal._sending = false;

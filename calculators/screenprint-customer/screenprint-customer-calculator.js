@@ -224,6 +224,13 @@ class CustomerScreenPrintCalculator {
         this.priceDisplay.classList.remove('prompt');
         this.priceDisplay.textContent = `$${line.baseUnit.toFixed(2)}`;
 
+        // The big per-piece number is baseUnit — LTM-EXCLUDED — whereas Quick Quote /
+        // the product-page headline show the all-in per-piece ((groupTotal−oneTime)/qty,
+        // LTM baked in). Do NOT change the number (totals are parity-locked); instead
+        // surface a small "+ $NN small-batch fee" note beside it so a customer comparing
+        // the two surfaces understands the difference. Toggled off when no LTM applies.
+        this._setSmallBatchNote(ltmFeeTotal);
+
         let summaryHtml = `
             <div class="summary-item">
                 <span>Subtotal (${quantity} prints)</span>
@@ -250,6 +257,36 @@ class CustomerScreenPrintCalculator {
 
         this.orderSummary.innerHTML = summaryHtml;
         this.quoteActions.style.display = 'flex';
+    }
+
+    /**
+     * Show/hide a small "+ $NN small-batch fee" note next to the big per-piece number.
+     * The headline shows baseUnit (LTM-excluded); this note tells the customer a flat
+     * small-batch fee is added on top, so they don't misread it against Quick Quote /
+     * the product page (which fold LTM into their per-piece). Display-only — never
+     * touches a dollar total. The note node is created once and reused/toggled; it's
+     * injected right after #priceDisplay so it sits beside the price without needing an
+     * HTML edit (this file may only touch JS).
+     */
+    _setSmallBatchNote(ltmFeeTotal) {
+        const fee = Number(ltmFeeTotal) || 0;
+        if (!this._smallBatchNote) {
+            const note = document.createElement('div');
+            note.className = 'price-display-smallbatch';
+            note.id = 'priceSmallBatchNote';
+            note.style.cssText = 'font-size:0.85rem;color:#166534;margin-top:0.15rem;';
+            if (this.priceDisplay && this.priceDisplay.parentNode) {
+                this.priceDisplay.insertAdjacentElement('afterend', note);
+            }
+            this._smallBatchNote = note;
+        }
+        if (fee > 0) {
+            this._smallBatchNote.textContent = `+ $${fee.toFixed(2)} small-batch fee`;
+            this._smallBatchNote.style.display = '';
+        } else {
+            this._smallBatchNote.textContent = '';
+            this._smallBatchNote.style.display = 'none';
+        }
     }
 
     /**
@@ -339,6 +376,7 @@ class CustomerScreenPrintCalculator {
         this.orderSummary.innerHTML = '';
         this.quoteActions.style.display = 'none';
         this.tierLadder.style.display = 'none';
+        this._setSmallBatchNote(0); // clear the "+ small-batch fee" note
         this.currentCalculation = null;
     }
 
@@ -980,11 +1018,11 @@ function printQuote() {
             <div class="bill-to-section">
                 <div class="bill-to-title">BILL TO:</div>
                 <div class="bill-to-content">
-                    <strong>${data.customerName}</strong><br>
-                    ${data.companyName ? data.companyName + '<br>' : ''}
-                    ${data.customerEmail}<br>
-                    ${data.customerPhone ? 'Phone: ' + data.customerPhone + '<br>' : ''}
-                    ${data.projectName ? 'Project: ' + data.projectName : ''}
+                    <strong>${escapeHTML(data.customerName)}</strong><br>
+                    ${data.companyName ? escapeHTML(data.companyName) + '<br>' : ''}
+                    ${escapeHTML(data.customerEmail)}<br>
+                    ${data.customerPhone ? 'Phone: ' + escapeHTML(data.customerPhone) + '<br>' : ''}
+                    ${data.projectName ? 'Project: ' + escapeHTML(data.projectName) : ''}
                 </div>
             </div>
 
@@ -1063,7 +1101,7 @@ function printQuote() {
             ${data.notes ? `
             <div class="notes-section">
                 <div class="notes-title">Notes:</div>
-                <div class="notes-content">${data.notes}</div>
+                <div class="notes-content">${escapeHTML(data.notes)}</div>
             </div>` : ''}
 
             <!-- Terms & Conditions -->

@@ -653,7 +653,16 @@
         var meta = _garmentMeta[bm + '|' + state.product.style];
         if (!meta || meta.loading || !(meta.garment > 0)) return null;
         var qty = totalQty();
-        var tier = (meta.tiers || []).find(function (t) { return qty >= t.min && qty <= t.max; }) || (meta.tiers || [])[0];
+        var tiers = meta.tiers || [];
+        // Match findPricingTier's clamp semantics: exact-tier match, else if qty is
+        // ABOVE the top tier's max clamp to the TOP tier (NOT tiers[0] — that would
+        // silently use the lowest/LTM tier's MarginDenominator and misprice the blank
+        // display line at high qty). Display-only; the card total comes from the engine.
+        var tier = tiers.find(function (t) { return qty >= t.min && qty <= t.max; });
+        if (!tier && tiers.length) {
+            var top = tiers.reduce(function (a, b) { return (b.max > a.max) ? b : a; }, tiers[0]);
+            tier = (qty > top.max) ? top : tiers.reduce(function (a, b) { return (b.min < a.min) ? b : a; }, tiers[0]);
+        }
         if (!tier || !(tier.denom > 0)) return null;
         return hdc(meta.garment / tier.denom);
     }
@@ -907,31 +916,58 @@
         var probes = PROBE_QTYS[id] || [12, 36, 60, 100];
         var size = stdSizeFor(product);
         var byTier = {};
-        for (var i = 0; i < probes.length; i++) {
-            var sz = {}; sz[size] = probes[i];
+        var lastTierTable = null;   // discovered from the engine's own trace (live Caspio tiers)
+
+        // Probe ONE qty and, if new, record its tier row. Base = everything that scales
+        // with qty EXCEPT the one-time setup fees and the flat small-batch (LTM) fee,
+        // which is disclosed on its own row. Derive from groupTotal (which already folds
+        // in per-piece service lines — stitch surcharge, AL — and any cap upcharge) so it
+        // is mode-agnostic: correct whether the engine's baseUnit is LTM-stripped
+        // (EMB/SCP/DTG) OR LTM-inclusive (DTF). Mirrors pdp-configurator.js probe math so
+        // the 3 surfaces can't disagree. Guarded by `!byTier[label]` → additive only:
+        // re-probing an already-seen tier can NEVER overwrite/change its recorded price.
+        async function probeQty(pq) {
+            var sz = {}; sz[size] = pq;
             var item = buildItemFor(def, product, color, sz);
             var preview;
             try {
                 preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(), deps: engineDeps(), nudge: false });
             } catch (e) { preview = null; }
-            if (preview && preview.ok && preview.lines && preview.lines.length) {
-                var label = preview.tierLabel || ('q' + probes[i]);
-                if (!byTier[label]) {
-                    // Per-tier base rate = everything that scales with qty EXCEPT the one-time
-                    // setup fees and the flat small-batch (LTM) fee, which is disclosed on its own
-                    // row. Derive from groupTotal (which already folds in per-piece service lines —
-                    // stitch surcharge, AL — and any cap upcharge) so it is mode-agnostic: correct
-                    // whether the engine's baseUnit is LTM-stripped (EMB/SCP/DTG) OR LTM-inclusive
-                    // (DTF). The previous baseUnit-based math double-counted DTF's baked-in $50.
-                    // Mirrors pdp-configurator.js probe math so the 3 surfaces can't disagree.
-                    var pq = probes[i];
-                    var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
-                    var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
-                    var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);
-                    byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label) };
-                }
+            if (!(preview && preview.ok && preview.lines && preview.lines.length)) return;
+            if (preview.trace && preview.trace.tierTable && preview.trace.tierTable.length) {
+                lastTierTable = preview.trace.tierTable;
+            }
+            var label = preview.tierLabel || ('q' + pq);
+            if (byTier[label]) return;
+            var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+            var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
+            var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);
+            byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label) };
+        }
+
+        // 1) Bootstrap: probe the hardcoded representative qtys (one inside each tier we
+        //    KNOW about today). These also make the engine hand back its live tierTable.
+        for (var i = 0; i < probes.length; i++) {
+            await probeQty(probes[i]);
+        }
+
+        // 2) Self-heal against a Caspio tier restructure: probe the min qty of any LIVE
+        //    tier the constants didn't already land in, so a re-tiering (added/renamed
+        //    tier) can't silently drop a row from the ladder. Purely additive — tiers
+        //    already covered above are skipped by the `!byTier[label]` guard, and a
+        //    tier's base is constant within it, so this never changes an existing row.
+        if (lastTierTable) {
+            var seenMins = {};
+            Object.keys(byTier).forEach(function (k) { seenMins[byTier[k].range.min] = true; });
+            var missing = lastTierTable
+                .map(function (t) { return Number(t.minQty); })
+                .filter(function (m) { return Number.isFinite(m) && m > 0 && !seenMins[m]; })
+                .sort(function (a, b) { return a - b; });
+            for (var j = 0; j < missing.length; j++) {
+                await probeQty(missing[j]);
             }
         }
+
         return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
     }
 

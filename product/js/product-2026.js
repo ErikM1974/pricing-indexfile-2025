@@ -671,9 +671,10 @@
                 + 'Switch the placement to match, or email us for a mixed layout.';
         }
         if (sel.engineMethod === 'SCP' && Number(first.inkColors) !== Number(sel.inkColors)) {
-            return 'Your quote\'s screen print pieces use ' + first.inkColors
-                + ' ink color' + (Number(first.inkColors) === 1 ? '' : 's')
-                + ' — one design per quote so screens and discounts pool. Match the ink colors, or email us.';
+            return 'Screen printing runs one design per order — your quote already has a '
+                + first.inkColors + '-ink-color design, so every screen-print piece has to match it '
+                + '(that\'s how the screens and volume discount pool). Set the ink colors to '
+                + first.inkColors + ' to add this piece, or email us to price a separate second design.';
         }
         return null;
     }

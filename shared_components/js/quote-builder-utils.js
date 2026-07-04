@@ -47,6 +47,32 @@ if (typeof window !== 'undefined' && typeof window.getServicePrice !== 'function
     };
 }
 
+// Shared "hardcoded fallback surfaced a warning" guard (Erik's #1 rule). A load
+// FAILURE already toasts via loadServiceCodePrices(); this covers the SILENT case
+// where codes loaded but a specific code (e.g. GRT-75 design rate) is absent, so a
+// rep would bill the documented fallback price with no warning. Lifted out of the
+// DTF builder (was window._dtfGrtFallbackWarned) so SCP + EMB warn identically.
+// Once-per-page per code (guarded by a window flag). Returns true when it warned.
+// (2026-07-04 — sync fix)
+if (typeof window !== 'undefined' && typeof window.warnIfServiceCodeMissing !== 'function') {
+    window.warnIfServiceCodeMissing = function warnIfServiceCodeMissing(code, fallback, label) {
+        if (typeof window === 'undefined') return false;
+        const key = String(code).toUpperCase();
+        window._svcCodeFallbackWarned = window._svcCodeFallbackWarned || {};
+        if (window._svcCodeFallbackWarned[key]) return false;
+        // Only warn once codes have been fetched (map exists) but this one is missing.
+        // Before the fetch resolves, getServicePrice() legitimately uses the fallback.
+        if (!window._serviceCodes) return false;
+        if (window._serviceCodes[key]) return false;
+        window._svcCodeFallbackWarned[key] = true;
+        const rate = (typeof fallback === 'number') ? fallback : parseFloat(fallback) || 0;
+        const name = label || code;
+        const m = `${name} rate is an estimate ($${rate.toFixed(2)}) — live pricing didn't return it. Verify before saving.`;
+        if (typeof showToast === 'function') showToast(m, 'warning', 5000);
+        return true;
+    };
+}
+
 // ============================================
 // STAFF MARKER (customer-view analytics)
 // ============================================

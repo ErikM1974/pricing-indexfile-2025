@@ -98,6 +98,14 @@
 
     var DEFAULT_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // Module-level cache for the DTF BLANK-garment bundle (min size price). The
+    // ladder/matrix probes call priceDtfGroup once PER TIER for the SAME style, so
+    // without this each probe re-fetches /api/pricing-bundle?method=BLANK. Keyed by
+    // styleNumber; the cached VALUE is identical to what fetchJson returned, so this
+    // is pure caching — it cannot change any priced output (verified by the parity
+    // tests). Bypassed + refreshed when ctx.forceRefresh is set.
+    var _dtfBlankBundleCache = {};
+
     // ------------------------------------------------------------------
     // EXACT COPY — screenprint-quote-builder.js:2975-2985 (findPricingTier).
     // Includes the below-lowest-tier fallback (LTM territory) and the
@@ -818,6 +826,20 @@
         throw QuoteCartError('No size-upcharge data for ' + size + ' — cannot price it.', 'PRICE_UNAVAILABLE');
     }
 
+    // Fetch (and cache) the DTF BLANK-garment bundle for a style. Cache is a plain
+    // module-level object keyed by styleNumber; the stored value is exactly what
+    // fetchJson returned, so callers get the identical bundle every time — pure
+    // caching, no effect on price. forceRefresh re-fetches and overwrites the entry.
+    async function fetchDtfBlankBundle(ctx, styleNumber) {
+        var key = String(styleNumber);
+        if (!ctx.forceRefresh && Object.prototype.hasOwnProperty.call(_dtfBlankBundleCache, key)) {
+            return _dtfBlankBundleCache[key];
+        }
+        var blank = await fetchJson(ctx, ctx.apiBase + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(styleNumber));
+        _dtfBlankBundleCache[key] = blank;
+        return blank;
+    }
+
     async function priceDtfGroup(ctx, group) {
         var SvcClass = resolveDep(ctx, 'DTFPricingService');
         if (!SvcClass) {
@@ -872,7 +894,9 @@
             // Garment cost — BUILDER rule: min(BLANK bundle size prices)
             // (dtf-quote-page.js:643-646). No CASE_PRICE fallback here: missing
             // size data is a visible error on a customer surface.
-            var blank = await fetchJson(ctx, ctx.apiBase + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(item.styleNumber));
+            // Memoized per styleNumber (module-level) so repeated ladder/matrix
+            // probes for the same style don't re-fetch; forceRefresh bypasses it.
+            var blank = await fetchDtfBlankBundle(ctx, item.styleNumber);
             var blankSizes = (blank && blank.sizes) || [];
             if (!blankSizes.length) {
                 throw QuoteCartError('No blank garment pricing for ' + item.styleNumber + '.', 'PRICE_UNAVAILABLE');

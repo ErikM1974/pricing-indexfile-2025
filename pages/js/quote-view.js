@@ -4495,7 +4495,7 @@ class QuoteViewPage {
 
         } catch (error) {
             console.error('Error accepting quote:', error);
-            alert(error.message || 'Failed to accept quote. Please try again.');
+            alert('We couldn\'t record your acceptance just now. Please try again in a moment, or call us at (253) 922-5793 and we\'ll finish it for you.');
         } finally {
             // Reset button state
             acceptBtn.disabled = false;
