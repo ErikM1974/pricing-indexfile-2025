@@ -76,7 +76,7 @@
 
             <div class="filter-group">
                 <label>Search</label>
-                <input type="text" id="filter-search" placeholder="Customer name, email, or Quote ID...">
+                <input type="text" id="filter-search" placeholder="Customer, company, email, or Quote ID (e.g. DTG-12345)">
             </div>
 
             <button class="btn-search" onclick="applyFilters()">
@@ -300,9 +300,17 @@
         }
 
         function setupEventListeners() {
-            // Enter key on search
-            document.getElementById('filter-search').addEventListener('keypress', function(e) {
+            const searchEl = document.getElementById('filter-search');
+            // Enter key triggers the search.
+            searchEl.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+            // Clearing the field (empty value) re-applies so results reset without
+            // needing to click Search again.
+            searchEl.addEventListener('input', function(e) {
+                if (e.target.value.trim() === '') {
                     applyFilters();
                 }
             });
@@ -674,6 +682,7 @@
             if (!wo) return '<span class="inbound-na" title="Not in ShopWorks yet">—</span>';
             const info = inboundStatusMap.get(String(wo));
             if (info === undefined) return `<span class="inbound-pending" title="Checking SanMar…">·</span>`;
+            if (info === 'unavailable') return `<span class="inbound-na" title="SanMar status unavailable — refresh to retry">status unavailable</span>`;
             if (info === null) return '<span class="inbound-na" title="No SanMar PO linked">—</span>';
             const LABEL = { shipped: 'Shipped', partial: 'Partially shipped', complete: 'Complete', confirmed: 'Ordered — not shipped', canceled: 'Canceled', unknown: (info.status || 'Unknown') };
             const cls = info.shipped ? (info.state === 'partial' ? 'inbound-partial' : 'inbound-shipped')
@@ -683,8 +692,14 @@
             // as the customer's order shipping out (Erik 2026-06-16).
             const title = `Inbound blanks · SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
             const icon = '<i class="fas fa-dolly"></i>';
-            const base = (info.shipped && info.trackingUrl)
-                ? `<a class="inbound-pill ${cls}" href="${info.trackingUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`
+            // Only emit a real link when the tracking URL is a well-formed http(s)
+            // URL — trackingUrl comes from the SanMar batch-status API, so treat it
+            // as untrusted and always escapeHtml it (never interpolate raw). A blank
+            // or non-http value renders as a plain (non-link) pill.
+            const safeTrackUrl = (info.shipped && /^https?:\/\//i.test(String(info.trackingUrl || '')))
+                ? escapeHtml(info.trackingUrl) : '';
+            const base = safeTrackUrl
+                ? `<a class="inbound-pill ${cls}" href="${safeTrackUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`
                 : `<span class="inbound-pill ${cls}" title="${escapeHtml(title)}">${icon}</span>`;
             // SanMar backorder / hold alert (from order-status issues). Erik 2026-06-24.
             let alert = '';
@@ -706,11 +721,19 @@
             if (woIds.length === 0) return;
             try {
                 const resp = await fetch(`${API_BASE}/api/sanmar-orders/batch-status?woIds=${encodeURIComponent(woIds.join(','))}${force ? '&refresh=true' : ''}`);
-                if (!resp.ok) return; // leave unfetched; indicator stays neutral
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json().catch(() => ({}));
                 woIds.forEach(wo => inboundStatusMap.set(wo, (data && data[wo]) ? data[wo] : null));
                 renderTable(); // re-render so indicators appear
-            } catch (_) { /* non-fatal */ }
+            } catch (err) {
+                // Never leave the pending spinner spinning forever (Erik #1 rule —
+                // show a real state, not a fake "still checking"). Mark the WOs we
+                // tried as unavailable so their pills flip to a neutral label; a
+                // manual sync (force=true) re-fetches them.
+                console.error('[QuoteManagement] Inbound batch-status failed:', err);
+                woIds.forEach(wo => inboundStatusMap.set(wo, 'unavailable'));
+                renderTable();
+            }
         }
 
         function renderMilestonePills(quote) {
@@ -898,13 +921,23 @@
                         </button>`;
             }
             if (s.state === 'shipped') {
-                const url = s.trackingUrl || '#';
-                return `<a class="action-btn" href="${url}" target="_blank" rel="noopener"
+                // Untrusted tracking URL/number from ShipStation — escape everything
+                // and only emit an <a href> for a real http(s) URL (else a plain button).
+                const hasUrl = /^https?:\/\//i.test(String(s.trackingUrl || ''));
+                const title = `Shipped via ${escapeHtml(s.carrier || 'carrier')} · Tracking: ${escapeHtml(s.trackingNumber || '')}`;
+                return hasUrl
+                    ? `<a class="action-btn" href="${escapeHtml(s.trackingUrl)}" target="_blank" rel="noopener"
                            onclick="event.stopPropagation();"
                            style="text-decoration:none;color:#166534;background:#dcfce7;"
-                           title="Shipped via ${s.carrier || 'carrier'} · Tracking: ${s.trackingNumber}">
+                           title="${title}">
                             <span style="font-size:14px;">📦</span>
-                        </a>`;
+                        </a>`
+                    : `<span class="action-btn"
+                           onclick="event.stopPropagation();"
+                           style="text-decoration:none;color:#166534;background:#dcfce7;cursor:default;"
+                           title="${title}">
+                            <span style="font-size:14px;">📦</span>
+                        </span>`;
             }
             // ready
             return `<button class="action-btn"
@@ -1206,7 +1239,7 @@
                             </button>
                             ${renderShipStationButton(quote)}
                             ${userCanDelete
-                                ? `<button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${quote.QuoteID}', '${quote.Status || 'Open'}')" title="Delete Quote">
+                                ? `<button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${escapeJsAttr(quote.QuoteID)}', '${escapeJsAttr(quote.Status || 'Open')}')" title="Delete Quote">
                                 <i class="fas fa-trash"></i>
                             </button>`
                                 : `<button class="action-btn action-btn--locked" disabled onclick="event.stopPropagation();" title="Only the quote owner or Erik can delete this quote">
@@ -1463,6 +1496,17 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        // Safe to drop a value inside a SINGLE-quoted JS string that itself lives
+        // inside a double-quoted HTML onclick="" attribute (e.g. deleteQuote(...)).
+        // escapeHtml alone does NOT neutralize an apostrophe, so a QuoteID/Status
+        // containing ' or \ could break out of the JS string. Escape the JS-string
+        // metacharacters first, then HTML-escape so it's attribute-safe too.
+        function escapeJsAttr(str) {
+            return escapeHtml(String(str == null ? '' : str)
+                .replace(/\\/g, '\\\\')
+                .replace(/'/g, "\\'"));
         }
 
         // ============================================================

@@ -3196,7 +3196,10 @@ function projectPortalArt(a) {
 // response). AbortSignal.timeout rejects the fetch → the handler's existing try/catch → 503.
 const PORTAL_FETCH_TIMEOUT_MS = 12000;
 async function portalProxyGet(pathAndQuery) {
-  const r = await fetch(PORTAL_PROXY + pathAndQuery, { signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+  // Server-to-server: always send the CRM secret so the proxy's PII-read gate
+  // (artrequests/mockups) admits us. These calls carry no browser Origin.
+  const headers = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  const r = await fetch(PORTAL_PROXY + pathAndQuery, { headers, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
   if (!r.ok) throw new Error(`proxy ${r.status}`);
   return r.json();
 }
@@ -3948,7 +3951,13 @@ app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) 
     const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('rewards ' + r.status);
     res.json(await r.json());
-  } catch (err) { console.error('[Portal] rewards failed:', err.message); res.json({ balance: 0, entries: [] }); }
+  } catch (err) {
+    // Erik's #1 rule: never report a silent "$0" balance on failure — a customer
+    // with reward $ would see their card vanish. Surface a 503 so the FE shows
+    // "balance unavailable — refresh" instead of hiding the card.
+    console.error('[Portal] rewards failed:', err.message);
+    res.status(503).json({ error: 'rewards_unavailable' });
+  }
 });
 
 // POST /api/portal/rewards/redeem-request — customer asks to apply reward $ to their next

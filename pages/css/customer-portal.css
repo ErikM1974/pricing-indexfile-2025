@@ -68,6 +68,25 @@ body {
 .cp-header-logo { height: 40px; width: auto; }
 .cp-header-text h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
 .cp-header-text p { font-size: 12px; opacity: 0.85; }
+.cp-header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.cp-header-link {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    white-space: nowrap;
+    transition: background .12s;
+}
+.cp-header-link:hover { background: rgba(255, 255, 255, 0.16); }
+.cp-header-link--signout { border-color: rgba(255, 255, 255, 0.25); opacity: 0.92; }
+.cp-header-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+@media (max-width: 560px) {
+    .cp-header-actions { width: 100%; margin-left: 0; margin-top: 8px; justify-content: flex-end; }
+    .cp-header { flex-wrap: wrap; }
+}
 
 /* ── Main content ── */
 .cp-main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
@@ -788,3 +807,29 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     .cp-snap-val { font-size: 20px; }
     .cp-tab { padding: 10px 13px; }
 }
+
+/* ── Visible load-failure state (Erik's #1 rule: never a silent empty/$0) ── */
+.cp-load-error {
+    border: 1px solid #e6c9c9;
+    background: #fbf1f1;
+    border-radius: 12px;
+    padding: 20px 22px;
+    text-align: center;
+    color: #7a2b2b;
+}
+.cp-load-error p { margin: 0 0 6px; font-weight: 600; }
+.cp-load-error .cp-load-error-sub { font-weight: 400; font-size: 13px; color: var(--cp-ink-soft); }
+.cp-load-error a { color: var(--cp-theme-dark); font-weight: 600; }
+.cp-load-retry {
+    margin-top: 12px;
+    padding: 9px 20px;
+    border: 1px solid var(--cp-theme);
+    background: var(--cp-theme);
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.cp-load-retry:hover { background: var(--cp-theme-dark); border-color: var(--cp-theme-dark); }
+.cp-load-retry:focus-visible { outline: 2px solid var(--cp-theme-dark); outline-offset: 2px; }

@@ -13,12 +13,17 @@
     <!-- Header -->
     <header class="cp-header">
         <img src="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png"
-             alt="NWCA" class="cp-header-logo"
-             onerror="this.style.display='none'">
+             alt="NWCA" class="cp-header-logo" id="cp-header-logo">
         <div class="cp-header-text">
             <h1>Your Account</h1>
             <p>Northwest Custom Apparel</p>
         </div>
+        <!-- A customer needs a way OUT (shared computers) and a way to shop something
+             NEW (the portal only shows past products). -->
+        <nav class="cp-header-actions">
+            <a class="cp-header-link" href="/">Browse catalog</a>
+            <a class="cp-header-link cp-header-link--signout" href="/auth/customer/logout">Sign out</a>
+        </nav>
     </header>
 
     <!-- Loading State -->

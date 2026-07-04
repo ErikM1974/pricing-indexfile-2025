@@ -729,9 +729,9 @@ function handleFiles(fileList) {
     const ent = entries[entries.length - 1];
     const loc = pendingPlacement || (pendingSide === 'back' ? 'Full Back' : 'Full Front');
     applyRecommendedPlacement(ent, loc, true);
-    if (ent.ext === 'dst' && ent.dst && loc === 'Left Chest') {
-      ent.printW = Math.min(4.25, Math.max(2.25, +ent.dst.widthIn.toFixed(2)));
-    }
+    // NOTE: the DST Left-Chest real-stitch-width clamp used to live here, but ent.dst
+    // isn't populated yet — decode runs async in the IIFE above. The clamp now runs in
+    // openEntry()'s post-decode path (search "DST Left-Chest width clamp") so it applies.
     ent._autoMock = true;
     for (const o of entries) {
       if (o !== ent && o.onShirt !== false && !o.printBoth && sideOf(o) === pendingSide) {
@@ -785,6 +785,16 @@ async function openEntry(entry) {
         }
         entry._autoMock = true;
         entry.artSel = true;
+      }
+      // DST Left-Chest width clamp — runs here (post-decode) because entry.dst is now
+      // populated. Covers ALL Left-Chest DST paths, including the pendingSide flow that
+      // pre-sets entry.printLoc synchronously (so the block above is skipped for it) and
+      // the "already designing" auto-place. Clamps the proofed print width to the real
+      // stitch width (2.25"–4.25") instead of leaving the 3.75" Left-Chest default.
+      // Idempotent: re-clamping an already-clamped value is a no-op. Safe because this
+      // fires before any user resize, so printW is still the auto-placement default.
+      if (entry.kind === 'dst' && entry.dst && entry.onShirt !== false && (entry.printLoc || '') === 'Left Chest') {
+        entry.printW = Math.min(4.25, Math.max(2.25, +entry.dst.widthIn.toFixed(2)));
       }
       analyzeEntry(entry);
       // Flattened logo on a white box? Knock the background out automatically.
@@ -2568,7 +2578,11 @@ stage.addEventListener('pointercancel', endPan);
 // Keyboard shortcuts
 window.addEventListener('keydown', (ev) => {
   if (!currentCanvas()) return;
-  if (ev.target.tagName === 'INPUT') return;
+  // Don't hijack typing/navigation inside editable or form controls — arrow keys
+  // must move the caret in #txt-text / #custMessage and change <select> options,
+  // and Delete must delete text, not remove the art from the shirt.
+  const t = ev.target;
+  if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
   const ke = current();
   if (ke && ke.mockOn && ke.artSel && ke.onShirt !== false) {
     const step = ev.shiftKey ? 10 : 2;
@@ -5610,7 +5624,12 @@ async function doSendToCustomer() {
     fetch(ART_PROXY_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/fields', {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ Rep_Mockup: up.imageUrl })
-    }).catch(() => { /* best-effort; the email still carries the URL */ });
+    }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); }).catch(err => {
+      // The email still carries the URL, so the customer isn't blocked — but the request
+      // record didn't get the reference mockup attached. Surface it so the rep can refresh.
+      console.error('[doSendToCustomer] Rep_Mockup attach failed:', err);
+      showToast("Sent, but couldn't attach the reference mockup to request #" + designId + ' — refresh');
+    });
 
     // 2. Email the customer the mockup + a self-service approval link.
     emailjs.init(EMAILJS_PUBLIC_KEY);

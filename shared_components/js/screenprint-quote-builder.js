@@ -4535,6 +4535,10 @@ async function saveAndGetLink(opts = {}) {
                     : `Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`;
                 alert(message);
             }
+            // Return the freshly-saved ID so callers (Push) can confirm THIS save
+            // succeeded — never rely on a persistent _scpPushQuoteId from an earlier
+            // save, which would push a stale revision if this save just failed.
+            return result.quoteID;
         } else {
             throw new Error(result.error || 'Failed to save quote');
         }
@@ -4542,6 +4546,7 @@ async function saveAndGetLink(opts = {}) {
     } catch (error) {
         console.error('[ScreenPrint] Save error:', error);
         showToast('Error saving quote: ' + error.message, 'error');
+        return null; // signal failure to callers (Push must not proceed)
     } finally {
         // Restore button state
         if (saveBtn) {
@@ -4706,8 +4711,11 @@ async function scpPushToShopWorks() {
     if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
     try {
         // NOTE: do NOT disable the button here — openScpPushPreview() bails if the button is disabled.
-        await saveAndGetLink({ skipShareModal: true });   // silent save → showScpPushButton sets _scpPushQuoteId + re-gates the button enabled
-        if (!_scpPushQuoteId) return;                      // save failed / validation blocked it (error already shown)
+        // Gate the push on THIS save's return value — not the persistent _scpPushQuoteId,
+        // which survives from an edit-load/earlier save and would let a failed re-save
+        // push the previous (stale) revision to ShopWorks.
+        const savedId = await saveAndGetLink({ skipShareModal: true });
+        if (!savedId) return;                              // this save failed / was blocked (error already shown)
         await openScpPushPreview();
     } finally {
         _scpPushInFlight = false;
