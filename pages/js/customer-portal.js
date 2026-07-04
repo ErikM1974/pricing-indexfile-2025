@@ -354,14 +354,19 @@
                 totalLine +
                 (meta ? '<div class="cp-product-meta">' + escapeHtml(meta) + '</div>' : '') +
                 reward +
-                '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
-                    ' data-style="' + escapeHtml(p.style) + '" data-color="' + escapeHtml(p.color || '') + '"' +
-                    ' data-image="' + escapeHtml(p.image || '') + '"' +
-                    ' data-title="' + escapeHtml(title) + '" data-design="' + escapeHtml(String(p.designNumber || '')) + '"' +
-                    ' data-designname="' + escapeHtml(p.designName || '') + '"' +
-                    " data-colors='" + escapeAttr(orderedColorsJson) + "'" +
-                    " data-sizes='" + escapeAttr(sizesJson) + "'>" +
-                    btnLabel + '</button>' +
+                ((kind === 'product' && productHref)
+                    // Your Products re-order → the method-aware product PAGE (decoration picker + API
+                    // minimum live there). Same destination as the card image/title.
+                    ? '<a class="cp-product-btn" href="' + productHref + '">' + btnLabel + '</a>'
+                    // Recommendations → the quick "ask for a quote" modal (exploratory; no method needed).
+                    : '<button class="cp-product-btn" type="button" data-kind="' + kind + '"' +
+                        ' data-style="' + escapeHtml(p.style) + '" data-color="' + escapeHtml(p.color || '') + '"' +
+                        ' data-image="' + escapeHtml(p.image || '') + '"' +
+                        ' data-title="' + escapeHtml(title) + '" data-design="' + escapeHtml(String(p.designNumber || '')) + '"' +
+                        ' data-designname="' + escapeHtml(p.designName || '') + '"' +
+                        " data-colors='" + escapeAttr(orderedColorsJson) + "'" +
+                        " data-sizes='" + escapeAttr(sizesJson) + "'>" +
+                        btnLabel + '</button>') +
             '</div></div>';
     }
 
@@ -449,7 +454,7 @@
     }
 
     document.addEventListener('click', function (e) {
-        var btn = e.target.closest && e.target.closest('.cp-product-btn');
+        var btn = e.target.closest && e.target.closest('button.cp-product-btn'); // <a> product-page links navigate normally
         if (btn) openReqModal(btn);
     });
 

@@ -421,6 +421,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-product-meta { font-size: 11.5px; color: var(--cp-ink-mute); margin-bottom: 8px; }
 .cp-product-btn {
     margin-top: auto;
+    display: block; text-align: center; text-decoration: none;  /* works as <button> (recs) OR <a> (Your Products → product page) */
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
     border: 1px solid var(--cp-theme-light);
