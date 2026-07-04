@@ -327,7 +327,7 @@
         var orderNum = card.dataset.auditOrder;
         if (!orderNum) return;
 
-        fetch(API_BASE + '/api/manageorders/lineitems/' + encodeURIComponent(orderNum))
+        moFetch('lineitems/' + encodeURIComponent(orderNum))
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (data) {
                 var items = data.result || [];

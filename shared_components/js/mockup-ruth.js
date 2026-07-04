@@ -699,7 +699,7 @@
             if (card.dataset.auditQueued) return;
             card.dataset.auditQueued = '1';
 
-            fetch(API_BASE + '/api/manageorders/orders/' + encodeURIComponent(wo))
+            moFetch('orders/' + encodeURIComponent(wo))
                 .then(r => {
                     if (!r.ok) throw new Error('HTTP ' + r.status);
                     return r.json();

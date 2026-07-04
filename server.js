@@ -875,6 +875,44 @@ async function sendOrderConfirmationEmails(quoteSession, stripeSessionId, status
   return { customerOk, salesOk };
 }
 
+// Quote-acceptance emails (customer receipt + rep alert). Fully fail-soft — missing
+// env keys or not-yet-created EmailJS templates → warn + skip, NEVER throws, so it is
+// safe to ship before the templates exist. Templates (Erik creates on emailjs.com):
+//   template_quote_accepted_customer — params: to_name, to_email, quote_id, quote_amount
+//   template_quote_accepted_staff    — params: quote_id, customer_name, customer_email,
+//                                                company_name, quote_amount, quote_url, to_email
+const QUOTE_ACCEPTED_CUSTOMER_TEMPLATE = 'template_quote_accepted_customer';
+const QUOTE_ACCEPTED_STAFF_TEMPLATE = 'template_quote_accepted_staff';
+async function sendQuoteAcceptedEmails(session, acceptName, acceptEmail) {
+  if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
+    console.warn('[QuoteAccept] EMAILJS keys not set — skipping acceptance emails.');
+    return;
+  }
+  const quoteId = session.QuoteID;
+  const amount = Number(session.TotalAmount || 0).toFixed(2);
+  const companyName = session.CompanyName || '';
+  const repEmail = (session.SalesRepEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(session.SalesRepEmail))
+    ? session.SalesRepEmail : 'sales@nwcustomapparel.com';
+  const quoteUrl = `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`;
+  // Customer receipt → the person who just accepted.
+  sendEmailJSTemplate(QUOTE_ACCEPTED_CUSTOMER_TEMPLATE, {
+    to_email: acceptEmail, to_name: acceptName, quote_id: quoteId, quote_amount: amount,
+  }).then(
+    () => console.log('[QuoteAccept] ✓ customer receipt sent for', quoteId),
+    (e) => console.error('[QuoteAccept] customer receipt failed for', quoteId, ':', e.message)
+  );
+  // Rep alert → the quote's sales rep (fallback to the sales inbox).
+  sendEmailJSTemplate(QUOTE_ACCEPTED_STAFF_TEMPLATE, {
+    to_email: repEmail, to_name: session.SalesRepName || 'NWCA Sales',
+    quote_id: quoteId, customer_name: session.CustomerName || acceptName,
+    customer_email: session.CustomerEmail || acceptEmail, company_name: companyName,
+    quote_amount: amount, quote_url: quoteUrl,
+  }).then(
+    () => console.log('[QuoteAccept] ✓ rep alert sent for', quoteId),
+    (e) => console.error('[QuoteAccept] rep alert failed for', quoteId, ':', e.message)
+  );
+}
+
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -2965,6 +3003,33 @@ async function requireCustomer(req, res, next) {
   } catch (e) { console.error('[portal] requireCustomer recheck error:', e.message); /* fail open */ }
   return next();
 }
+
+// ── Authenticated same-origin forwarder for ManageOrders READS (airtight PII path) ──
+// Browser staff pages can call THESE (SAML-cookie authed, same-origin) instead of the
+// proxy directly, so the proxy's PII gate can later be tightened from secret-or-origin
+// to secret-only. Staff-session gated; forwards to the proxy WITH the CRM secret.
+// GET reads only. Callers use moFetch() (shared_components/js/mo-fetch.js), which falls
+// back to the direct proxy call if this route 401s (customer context) or errors — so the
+// migration can't break any page. The gate flip is the LAST, browser-verified step.
+function moForwardTo(buildSubPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const qi = req.originalUrl.indexOf('?');
+      const qs = qi >= 0 ? req.originalUrl.slice(qi) : '';
+      const url = `${CRM_API_BASE}/api/manageorders/${buildSubPath(req)}${qs}`;
+      const r = await fetch(url, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000) });
+      const body = await r.text();
+      res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+    } catch (e) {
+      console.error('[mo-forward]', req.originalUrl, e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  };
+}
+app.get('/api/mo/orders', requireStaff, moForwardTo(() => 'orders'));
+app.get('/api/mo/orders/:no', requireStaff, moForwardTo(req => 'orders/' + encodeURIComponent(req.params.no)));
+app.get('/api/mo/lineitems/:no', requireStaff, moForwardTo(req => 'lineitems/' + encodeURIComponent(req.params.no)));
 
 // Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
 async function fetchPortalAccess(email) {
@@ -10409,10 +10474,23 @@ app.post('/api/public/quote/:quoteId/accept', async (req, res) => {
       Status: 'Accepted',
       Notes: JSON.stringify(existingNotes)
     };
+    // Dedicated Caspio columns (AcceptedAt/AcceptedByName/AcceptedByEmail) are written
+    // ONLY when QUOTE_ACCEPT_FIELDS_LIVE=1 — Erik sets that env var AFTER creating the
+    // fields in Caspio. Writing unknown fields would 400 the whole PUT, so this stays
+    // off by default; Notes JSON always carries the data regardless.
+    if (process.env.QUOTE_ACCEPT_FIELDS_LIVE === '1') {
+      updateData.AcceptedAt = now;
+      updateData.AcceptedByName = sanitizeFilterInput(name);
+      updateData.AcceptedByEmail = sanitizeFilterInput(email);
+    }
 
     await makeApiRequest(`/quote_sessions/${session.PK_ID}`, 'PUT', updateData);
 
     console.log(`[QUOTE] Quote ${safeQuoteId} accepted by ${name} (${email})`);
+
+    // Fire acceptance emails (customer receipt + rep alert) — fully fail-soft and
+    // fire-and-forget so the customer's confirmation isn't delayed by EmailJS.
+    try { sendQuoteAcceptedEmails(session, name, email); } catch (e) { console.error('[QuoteAccept] email dispatch error:', e.message); }
 
     res.json({
       success: true,
