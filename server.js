@@ -3402,19 +3402,23 @@ app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (r
 // enriched with the SanMar image. Session-scoped + customer-safe (no costs/internal
 // fields). The re-order action is a REQUEST that routes to the rep — NO price/payment.
 
-const _portalPdCache = new Map(); // styleNumber → product-details rows (shared, static-ish)
+const _portalPdCache = new Map(); // styleNumber → { rows, t } (successful, non-empty only)
+const _PORTAL_PD_TTL_MS = 30 * 60 * 1000; // 30 min — a catalog change self-heals without a dyno restart
 async function portalStyleRows(style) {
-  let rows = _portalPdCache.get(style);
-  if (!rows) {
-    try {
-      const r = await fetch(`${CRM_API_BASE}/api/product-details?styleNumber=${encodeURIComponent(style)}`,
-        { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
-      rows = r.ok ? await r.json() : [];
-    } catch (_) { rows = []; }
-    if (!Array.isArray(rows)) rows = [];
-    _portalPdCache.set(style, rows);
-  }
-  return rows;
+  const hit = _portalPdCache.get(style);
+  if (hit && (Date.now() - hit.t) < _PORTAL_PD_TTL_MS) return hit.rows;
+  let rows;
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/product-details?styleNumber=${encodeURIComponent(style)}`,
+      { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    rows = r.ok ? await r.json() : [];
+  } catch (_) { rows = []; }
+  if (!Array.isArray(rows)) rows = [];
+  // Only cache a SUCCESSFUL, non-empty result — never poison the cache with a
+  // transient failure/empty, which previously 404'd the product page for EVERY
+  // customer until a dyno restart. On failure, fall back to any prior good rows.
+  if (rows.length) { _portalPdCache.set(style, { rows, t: Date.now() }); return rows; }
+  return (hit && hit.rows) || rows;
 }
 // Prefer the per-COLOR model shot (FRONT_MODEL, e.g. DT6000_black_model_front.jpg) over the
 // generic style image (PRODUCT_IMAGE = one DT6000.jpg for every color) so cards/pickers show the
