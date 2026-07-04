@@ -1,3 +1,10 @@
+## v2026.07.04.4 (2026.07.04)
+
+- docs(memory): record ManageOrders secret-only flip (residual closed, proxy v878)
+- fix(review backlog): remaining MED/LOW code + UX findings across all surfaces
+- Merge review backlog: remaining MED/LOW code + UX findings
+- Deploy v2026.07.04.4: cache-bust 18 files (review backlog)
+
 ## v2026.07.04.3 (2026.07.04)
 
 - feat(quote): quote-acceptance emails (customer receipt + rep alert), fail-soft
