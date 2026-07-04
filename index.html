@@ -124,6 +124,18 @@
                 </button>
             </div>
 
+            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) — so a
+                 customer mid-quote who lands back on the homepage still sees their cart. -->
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
+
             <a href="/customer/login" class="nav-signin" title="Customer sign in — see your designs, orders, and invoices">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
                 <span>Sign In</span>
@@ -544,5 +556,7 @@
     <script src="brands-flyout.js?v=4"></script>
     <script src="app-modern.js?v=4" defer></script>
     <script src="home-2026.js?v=2026.06.11.4" defer></script>
+    <!-- Quote-cart badge auto-wires from the stored cart (self-init on [data-quote-badge]). -->
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.1" defer></script>
 </body>
 </html>
