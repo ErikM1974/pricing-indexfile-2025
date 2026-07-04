@@ -1,5 +1,12 @@
 # Airtight PII proxy — rollout plan (2026-07-04)
 
+## ✅ ManageOrders reads are now SECRET-ONLY (2026-07-04, proxy v878)
+The origin-spoof residual on order/lineitem PII is CLOSED. `app.use('/api/manageorders/{orders,lineitems}', guardReadsOnly(requireCrmApiSecret))` (proxy server.js:629-630). Verified live: spoofed-Origin read → 401 (was 200), bare anon → 401, public endpoints → 200, artrequests (still secret-or-origin) → 200. Decision basis: the authed `/api/mo` forwarder path is proven-by-analogy to the working `/staff-dashboard.html` (both `requireStaff` + the GLOBAL `cookieSession` at server.js:475, so `req.session.crmUser` is populated on every same-origin request incl. XHRs). Instant rollback if staff report missing order data: `heroku releases:rollback --app caspio-pricing-proxy`.
+
+**Known accepted behavior change (was a LEAK, now correct):** a session-less viewer opening an art email link (`/art-request/:id?view=ae`, an UNGATED route) previously saw ShopWorks order/invoice data via the origin fallback — i.e. order PII leaked to anyone with the link. Post-flip the Invoice Audit panel there shows empty until they log in. The core art review/approve actions on that email link do NOT touch orders, so they're unaffected; only the secondary order panel requires auth now. (Adversarial workflow skeptic-A, 2026-07-04.)
+
+**Still on secret-OR-origin (lower-value internal data; residual remains):** `/api/artrequests` GET, `/api/mockups` GET, `/api/ups-tracking`. To fully close: repoint their browser callers through customer/staff-authed forwarders (same mo-fetch pattern), then tighten. Not yet done.
+
 ## Progress (2026-07-04)
 - ✅ **ManageOrders forwarders built + deployed-safe.** `/api/mo/{orders,orders/:no,lineitems/:no}`
   in `server.js` (`moForwardTo`, `requireStaff`, forwards with the CRM secret). Client helper
