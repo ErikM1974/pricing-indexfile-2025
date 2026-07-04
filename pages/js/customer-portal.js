@@ -40,6 +40,51 @@
     loadRecs();
     loadRewards();
 
+    // ── Tabs + snapshot (2026-07-04): a power account (25 products, 46 orders/invoices, 7
+    //    logos) was one giant scroll. Same 5 sections, now behind 4 tabs + a snapshot bar
+    //    that summarizes at a glance. Sections keep their own async load logic untouched —
+    //    the tab panel only controls WHICH group is visible; loaders control WHEN content
+    //    appears inside it. Snapshot values are polled from the count spans as data lands. ──
+    var _cpOpenBalance = 0, _cpOpenCount = 0;
+    setupTabs();
+    function setupTabs() {
+        var tabsEl = document.getElementById('cp-tabs'), snapEl = document.getElementById('cp-snapshot');
+        if (!tabsEl) return;
+        tabsEl.style.display = 'flex';
+        if (snapEl) snapEl.style.display = 'grid';
+        document.addEventListener('click', function (e) {
+            var t = e.target.closest && e.target.closest('.cp-tab[data-tab], .cp-snap[data-tab]');
+            if (t) { e.preventDefault(); switchTab(t.getAttribute('data-tab')); }
+        });
+        switchTab('products');
+        // Poll the snapshot for the first few seconds while the async loaders populate.
+        var tries = 0, timer = setInterval(function () { updateSnapshot(); if (++tries > 9) clearInterval(timer); }, 700);
+        updateSnapshot();
+    }
+    function switchTab(name) {
+        var panels = document.querySelectorAll('.cp-tabpanel');
+        for (var i = 0; i < panels.length; i++) panels[i].style.display = (panels[i].getAttribute('data-panel') === name) ? 'block' : 'none';
+        var tabs = document.querySelectorAll('.cp-tab');
+        for (var j = 0; j < tabs.length; j++) {
+            var on = tabs[j].getAttribute('data-tab') === name;
+            tabs[j].classList.toggle('is-active', on);
+            tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        }
+        try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* older browsers */ }
+    }
+    function updateSnapshot() {
+        var txt = function (id) { var el = document.getElementById(id); return el ? el.textContent : null; };
+        var set = function (id, v) { var el = document.getElementById(id); if (el && v != null && v !== '') el.textContent = v; };
+        set('cp-snap-products', txt('cp-products-count'));
+        set('cp-snap-orders', txt('cp-orders-count'));
+        set('cp-snap-logos', txt('cp-logos-count'));
+        var balEl = document.getElementById('cp-snap-balance');
+        if (balEl) {
+            balEl.textContent = _cpOpenCount ? money(_cpOpenBalance) : '$0';
+            balEl.classList.toggle('cp-snap-bal--due', _cpOpenCount > 0);
+        }
+    }
+
     function loadPortalData() {
         fetch(AGG_URL, { credentials: 'same-origin' })
             .then(function (resp) {
@@ -286,6 +331,9 @@
         // Only invoiced orders (or with a money total) appear in the invoices/balances view.
         var inv = orders.filter(function (o) { return o.invoiceDate || o.total > 0; });
         document.getElementById('cp-invoices-count').textContent = inv.length;
+        // Feed the snapshot "Open balance" chip (sum of unpaid balances).
+        _cpOpenBalance = inv.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
+        _cpOpenCount = inv.filter(function (o) { return (Number(o.balance) || 0) > 0.005; }).length;
         var wrap = document.getElementById('cp-invoices-wrap');
         var empty = document.getElementById('cp-invoices-empty');
         if (!inv.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }

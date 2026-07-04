@@ -697,3 +697,60 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     .cp-card-grid, .cp-product-grid { grid-template-columns: 1fr 1fr; }
     .cp-size-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* ── Snapshot bar + tabs (2026-07-04): tames the big-account single-scroll ── */
+.cp-snapshot {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 0 0 20px;
+}
+.cp-snap {
+    display: block;
+    background: var(--cp-surface);
+    border: 1px solid var(--cp-border);
+    border-radius: var(--cp-radius);
+    padding: 12px 14px;
+    text-decoration: none;
+    transition: border-color .12s ease, box-shadow .12s ease;
+}
+.cp-snap:hover { border-color: var(--cp-theme-light); box-shadow: 0 1px 4px rgba(46, 125, 50, .10); }
+.cp-snap-label { display: block; font-size: 12px; color: var(--cp-ink-mute); margin-bottom: 3px; }
+.cp-snap-val { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--cp-ink); }
+.cp-snap-val.cp-snap-bal--due { color: #b3261e; }
+
+.cp-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--cp-border);
+    margin: 0 0 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.cp-tabs::-webkit-scrollbar { display: none; }
+.cp-tab {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 11px 16px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cp-ink-soft);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease;
+}
+.cp-tab:hover { color: var(--cp-ink); }
+.cp-tab.is-active { color: var(--cp-theme-dark); border-bottom-color: var(--cp-theme); }
+
+/* Section already has its own top margin; kill the doubled gap at a panel's start. */
+.cp-tabpanel > .cp-section:first-child { margin-top: 0; }
+
+@media (max-width: 560px) {
+    .cp-snapshot { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .cp-snap-val { font-size: 20px; }
+    .cp-tab { padding: 10px 13px; }
+}
