@@ -5,7 +5,10 @@ The origin-spoof residual on order/lineitem PII is CLOSED. `app.use('/api/manage
 
 **Known accepted behavior change (was a LEAK, now correct):** a session-less viewer opening an art email link (`/art-request/:id?view=ae`, an UNGATED route) previously saw ShopWorks order/invoice data via the origin fallback — i.e. order PII leaked to anyone with the link. Post-flip the Invoice Audit panel there shows empty until they log in. The core art review/approve actions on that email link do NOT touch orders, so they're unaffected; only the secondary order panel requires auth now. (Adversarial workflow skeptic-A, 2026-07-04.)
 
-**Still on secret-OR-origin (lower-value internal data; residual remains):** `/api/artrequests` GET, `/api/mockups` GET, `/api/ups-tracking`. To fully close: repoint their browser callers through customer/staff-authed forwarders (same mo-fetch pattern), then tighten. Not yet done.
+**Still on secret-OR-origin (residual remains — DEFERRED as a supervised effort):** `/api/artrequests` GET, `/api/mockups` GET, `/api/ups-tracking`.
+- The review FINDING itself ("art/mockup rows served **anonymously**") is CLOSED: anonymous reads → 401 (verified 2026-07-04). What remains is only the origin-spoof residual (a targeted attacker spoofing an allowlisted Origin), on INTERNAL art data (Art_Minutes, Amount_Art_Billed, AE/artist notes, Box_Folder_ID) — not customer financial PII.
+- Full closure = the same repoint-then-flip as manageorders, but artrequests is called from **92+ browser sites across 14 files** (art-hub-steve/ae/ruth, mockup-detail/ae/ruth, art-request-detail, submit forms, ae-dashboard, portal-directory, art-invoice-service…) vs. 8 for manageorders. That is a large, high-breakage-risk repoint of the art team's daily tools that must NOT be done blind — it needs a browser-tested, supervised session (repoint a cluster → verify each art page loads → next cluster → adversarial customer-view check → flip). Deliberately NOT attempted headlessly.
+- Interim option if desired: narrow the PII-route origin allowlist to exact teamnwca.com/www + the NWCA app origins (drop the broad `*.herokuapp.com`/`*.caspio.com` wildcards) — marginal, still spoofable, but shrinks the surface without the repoint.
 
 ## Progress (2026-07-04)
 - ✅ **ManageOrders forwarders built + deployed-safe.** `/api/mo/{orders,orders/:no,lineitems/:no}`

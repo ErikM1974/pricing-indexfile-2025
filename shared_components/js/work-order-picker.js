@@ -55,8 +55,13 @@
         if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
             return Promise.resolve(cached.data);
         }
-        var url = DEFAULT_BASE_URL + '/api/manageorders/orders?id_Customer=' + encodeURIComponent(key);
-        return fetch(url)
+        // Self-contained: try the same-origin SAML-authed /api/mo/* forwarder first
+        // (sends the session cookie), fall back to the direct proxy so this tool works
+        // whether or not a staff session is present during the secret-only migration.
+        var qs = 'orders?id_Customer=' + encodeURIComponent(key);
+        var proxyUrl = DEFAULT_BASE_URL + '/api/manageorders/' + qs;
+        return fetch('/api/mo/' + qs, { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r : fetch(proxyUrl); }, function () { return fetch(proxyUrl); })
             .then(function (r) {
                 if (!r.ok) throw new Error('manageorders/orders ' + r.status);
                 return r.json();

@@ -93,9 +93,16 @@ class MonogramFormService {
     async lookupOrder(orderNumber) {
         try {
             // Fetch order header and line items in parallel
+            // Self-contained: try the same-origin SAML-authed /api/mo/* forwarder first
+            // (sends the session cookie), fall back to the direct proxy on any non-2xx /
+            // network error so this (ungated) tool can't break during the secret-only migration.
+            const baseURL = this.baseURL;
+            const moGet = (path) => fetch(`/api/mo/${path}`, { credentials: 'same-origin' })
+                .then(r => r.ok ? r : fetch(`${baseURL}/api/manageorders/${path}`))
+                .catch(() => fetch(`${baseURL}/api/manageorders/${path}`));
             const [orderResponse, lineItemsResponse] = await Promise.all([
-                fetch(`${this.baseURL}/api/manageorders/orders/${orderNumber}`),
-                fetch(`${this.baseURL}/api/manageorders/lineitems/${orderNumber}`)
+                moGet(`orders/${orderNumber}`),
+                moGet(`lineitems/${orderNumber}`)
             ]);
 
             // Check order response

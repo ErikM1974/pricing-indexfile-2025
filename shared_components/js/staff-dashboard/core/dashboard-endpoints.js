@@ -19,9 +19,11 @@ if (!BASE) {
    query-string params don't require touching call sites.
    ===================================================== */
 export const endpoints = {
-    // ManageOrders (ShopWorks)
-    manageOrders:          () => `${BASE}/manageorders/orders`,
-    lineItems:        (id) => `${BASE}/manageorders/lineitems/${encodeURIComponent(id)}`,
+    // ManageOrders (ShopWorks) — routed through the main app's SAML-authed
+    // /api/mo/* forwarder (same-origin, sends the session cookie) instead of the
+    // proxy directly, so the proxy's PII gate can be tightened to secret-only.
+    manageOrders:          () => `/api/mo/orders`,
+    lineItems:        (id) => `/api/mo/lineitems/${encodeURIComponent(id)}`,
 
     // Garment tracker (Caspio cache)
     garmentTracker:        () => `${BASE}/garment-tracker`,

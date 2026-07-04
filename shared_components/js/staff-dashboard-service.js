@@ -210,7 +210,9 @@ const StaffDashboardService = (function() {
      * Without this, a stalled connection hangs the dashboard indefinitely.
      */
     async function fetchOrders(startDate, endDate, refresh = false, retries = 2) {
-        const url = new URL(API_CONFIG.baseURL + API_CONFIG.endpoints.orders);
+        // Route ManageOrders reads through the main app's SAML-authed /api/mo/*
+        // forwarder (same-origin, sends the session cookie) — not the proxy directly.
+        const url = new URL('/api/mo/orders', window.location.origin);
         url.searchParams.append('date_Invoiced_start', startDate);
         url.searchParams.append('date_Invoiced_end', endDate);
         if (refresh) {
@@ -1005,7 +1007,7 @@ const StaffDashboardService = (function() {
      * @returns {Promise<Array>} Array of line items
      */
     async function fetchLineItems(orderNo) {
-        const url = `${API_CONFIG.baseURL}/manageorders/lineitems/${orderNo}`;
+        const url = `/api/mo/lineitems/${orderNo}`; // same-origin SAML-authed forwarder
         // ManageOrders can be slow under load — give it a generous bound but still cap it
         // so a single hung request can't lock up the whole sync loop.
         const response = await fetchWithTimeout(url, {}, 30000);
