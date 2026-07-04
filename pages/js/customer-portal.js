@@ -57,8 +57,10 @@
             if (t) { e.preventDefault(); switchTab(t.getAttribute('data-tab')); }
         });
         switchTab('products');
-        // Poll the snapshot for the first few seconds while the async loaders populate.
-        var tries = 0, timer = setInterval(function () { updateSnapshot(); if (++tries > 9) clearInterval(timer); }, 700);
+        // Belt: poll the snapshot while the async loaders populate. Window must outlast the
+        // 12s portal-fetch cap (v.28) so a slow Orders/Invoices load still updates the chips.
+        // Suspenders: renderOrders/renderInvoices also call updateSnapshot() the moment they land.
+        var tries = 0, timer = setInterval(function () { updateSnapshot(); if (++tries > 21) clearInterval(timer); }, 700);
         updateSnapshot();
     }
     function switchTab(name) {
@@ -306,6 +308,7 @@
 
     function renderOrders(orders) {
         document.getElementById('cp-orders-count').textContent = orders.length;
+        updateSnapshot();
         var wrap = document.getElementById('cp-orders-wrap');
         var empty = document.getElementById('cp-orders-empty');
         if (!orders.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
@@ -334,6 +337,7 @@
         // Feed the snapshot "Open balance" chip (sum of unpaid balances).
         _cpOpenBalance = inv.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
         _cpOpenCount = inv.filter(function (o) { return (Number(o.balance) || 0) > 0.005; }).length;
+        updateSnapshot();
         var wrap = document.getElementById('cp-invoices-wrap');
         var empty = document.getElementById('cp-invoices-empty');
         if (!inv.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
