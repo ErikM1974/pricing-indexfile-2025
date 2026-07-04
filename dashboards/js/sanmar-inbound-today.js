@@ -446,14 +446,15 @@
   }
   async function fetchMonthCounts(ym) {
     const mm = monthMeta(ym);
-    try {
-      const resp = await fetch(`${API_BASE}/api/sanmar-orders/daily-inbound?start=${mm.start}&end=${mm.end}`);
-      if (!resp.ok) return {};
-      const j = await resp.json();
-      const map = {};
-      (j.days || []).forEach(d => { map[d.date] = { orders: d.orders, boxes: d.boxes, pieces: d.pieces, cost: d.cost || 0 }; });
-      return map;
-    } catch (e) { return {}; }
+    // Let failures propagate — a swallowed error used to render a blank, fully
+    // unclickable month indistinguishable from "nothing inbound" (Never-Break
+    // Rule #4). showCalendar() catches this and shows a visible error + Retry.
+    const resp = await fetch(`${API_BASE}/api/sanmar-orders/daily-inbound?start=${mm.start}&end=${mm.end}`);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const j = await resp.json();
+    const map = {};
+    (j.days || []).forEach(d => { map[d.date] = { orders: d.orders, boxes: d.boxes, pieces: d.pieces, cost: d.cost || 0 }; });
+    return map;
   }
   function renderCalendar(ym, counts) {
     const mm = monthMeta(ym);
@@ -496,7 +497,21 @@
     calOpen = true;
     calMonth = ym || (viewDate || todayISO()).slice(0, 7);
     setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading calendar…</div>');
-    const counts = await fetchMonthCounts(calMonth);
+    let counts;
+    try {
+      counts = await fetchMonthCounts(calMonth);
+    } catch (err) {
+      if (!calOpen) return;
+      // Mirror the day-view error path (load()): visible error + Retry, never a
+      // silent blank month that looks like "nothing inbound".
+      console.error('[SanMarInbound] Calendar month counts failed:', err);
+      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
+        Couldn't load the calendar.<br><small>${esc(err.message)}</small><br>
+        <button class="btn-cancel" id="sit-cal-retry">Retry</button></div>`);
+      const retry = modalEl && modalEl.querySelector('#sit-cal-retry');
+      if (retry) retry.onclick = () => showCalendar(calMonth);
+      return;
+    }
     if (!calOpen) return;
     setContent(renderCalendar(calMonth, counts));
   }

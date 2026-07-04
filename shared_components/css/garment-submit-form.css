@@ -526,3 +526,31 @@
     .gsf-banner { flex-direction: column; text-align: center; gap: 10px; }
     .gsf-garment-row { flex-wrap: wrap; }
 }
+
+/* Colors-API failure state for a garment row — a transient load error must NOT
+   silently drop the style to "custom" (which loses CATALOG_COLOR). Shows a
+   visible warning + Retry instead. */
+.gsf-color-error {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #b02a2a;
+    background: #fbecec;
+    border: 1px solid #eccaca;
+    border-radius: 6px;
+    padding: 5px 10px;
+    margin-top: 4px;
+}
+.gsf-color-retry {
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    background: #4c7a2f;
+    border: 1px solid #3f6626;
+    border-radius: 5px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+.gsf-color-retry:hover { background: #3f6626; }
+.gsf-color-retry:focus-visible { outline: 2px solid #3f6626; outline-offset: 2px; }

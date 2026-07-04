@@ -26,6 +26,22 @@
         };
     }
 
+    // Minimal non-blocking toast. This shared file has no toast dependency and
+    // must never block the send flow, so this is self-contained (message set via
+    // textContent — never innerHTML).
+    function showActionToast(message, type) {
+        try {
+            var bg = type === 'error' ? '#dc3545' : (type === 'warn' ? '#e67e22' : '#059669');
+            var el = document.createElement('div');
+            el.textContent = message;
+            el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'
+                + bg + ';color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:600;'
+                + 'z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.2);max-width:90vw;text-align:center;';
+            document.body.appendChild(el);
+            setTimeout(function () { el.remove(); }, 5000);
+        } catch (e) { /* toast is best-effort */ }
+    }
+
     var EMAILJS_SERVICE_ID = 'service_jgrave3';
     var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     var SITE_ORIGIN = 'https://www.teamnwca.com';
@@ -909,7 +925,9 @@
         var countEl = document.getElementById('approval-selected-count');
         if (countEl) countEl.textContent = n + ' of ' + SEND_MOCKUP_CAP + ' selected';
         var btn = document.getElementById('approval-submit');
-        if (btn) btn.disabled = (n === 0);
+        // Never re-enable Send while a send is in flight (modal._sending) — typing
+        // in #box-paste-url must not un-disable the button and allow a dup send.
+        if (btn) btn.disabled = (n === 0) || !!(modal && modal._sending);
     }
 
     // Visual nudge when a 7th selection is blocked.
@@ -1299,6 +1317,13 @@
             })();
         }
 
+        // Dup-send guard: while a send is in flight the Send button is disabled,
+        // but typing in #box-paste-url calls updateSelectedMockupCount() which
+        // would re-enable it (btn.disabled = n===0), allowing a 2nd click that
+        // duplicates the status PUT + approval note + customer emails. Flag the
+        // modal so updateSelectedMockupCount keeps the button disabled until we
+        // finish (cleared in the success setTimeout and the catch below).
+        if (modal) modal._sending = true;
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending...';
 
@@ -1320,7 +1345,14 @@
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ Approval_Status: 'Customer reviewing proof' })
-            }).catch(function () {});
+            }).then(function (r) {
+                if (!r.ok) throw new Error('Approval_Status mirror PUT ' + r.status);
+            }).catch(function (err) {
+                // Status now says "Awaiting Approval" but the structured
+                // Approval_Status pill may disagree — surface it, don't swallow.
+                console.error('Approval_Status mirror write failed:', err);
+                showActionToast('Status pill sync failed — refresh to confirm', 'warn');
+            });
 
             var revLabel = revCount > 0 ? ' (Rev #' + revCount + ')' : '';
             var noteText = message
@@ -1394,6 +1426,7 @@
             submitBtn.style.background = '#28a745';
             var cbk = _pendingApprovalOnSuccess;
             _pendingApprovalOnSuccess = null;
+            if (modal) modal._sending = false;
             setTimeout(function () {
                 closeApprovalModal();
                 if (typeof cbk === 'function') {
@@ -1403,6 +1436,7 @@
                 }
             }, 600);
         } catch (err) {
+            if (modal) modal._sending = false;
             submitBtn.textContent = 'Error — retry';
             submitBtn.style.background = '#dc3545';
             submitBtn.disabled = false;

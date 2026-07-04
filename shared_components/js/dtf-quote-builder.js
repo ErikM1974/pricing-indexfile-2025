@@ -2677,12 +2677,17 @@ class DTFQuoteBuilder {
                         : `Quote saved!\n\nQuote ID: ${finalQuoteId}\n\nShareable Link:\n${url}`;
                     alert(message);
                 }
+                // Return the freshly-saved ID so Push can confirm THIS save succeeded
+                // instead of trusting a persistent _dtfPushQuoteId (which would push a
+                // stale revision if this re-save just failed).
+                return finalQuoteId;
             } else {
                 throw new Error(result.error || 'Failed to save quote');
             }
         } catch (error) {
             console.error('[DTFQuoteBuilder] Save error:', error);
             alert('Error saving quote: ' + (error.message || 'Please try again.'));
+            return null; // signal failure to callers (Push must not proceed)
         } finally {
             // Restore button state
             if (saveBtn) {
@@ -3628,8 +3633,10 @@ async function dtfPushToShopWorks() {
     if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
     try {
         // Do NOT disable the button — openDtfPushPreview() bails if the button is disabled.
-        await dtfQuoteBuilder.saveAndGetLink({ skipShareModal: true });   // → showDtfPushButton sets _dtfPushQuoteId + re-gates
-        if (!_dtfPushQuoteId) return;
+        // Gate on THIS save's return value, not the persistent _dtfPushQuoteId (which
+        // survives an edit-load and would push a stale revision if this re-save failed).
+        const savedId = await dtfQuoteBuilder.saveAndGetLink({ skipShareModal: true });
+        if (!savedId) return;
         await openDtfPushPreview();
     } finally {
         _dtfPushInFlight = false;

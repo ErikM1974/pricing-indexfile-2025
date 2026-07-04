@@ -440,8 +440,10 @@
                 // Safety stripes are a flat per-piece adder ($2 × print locations) — the same
                 // number on every tier. state.scpStripeFee is the API value captured from the
                 // last engine preview (falls back to $2 only if the preview hasn't run yet).
-                const stripeAdder = state.scpStripes
-                    ? (num(state.scpStripeFee) || 2) * (loc === 'frontBack' ? 2 : 1) : 0;
+                // Use ?? semantics, not ||, so a legitimate $0 stripe fee from the API
+                // isn't treated as "missing" and replaced with the $2 fallback.
+                const stripePer = state.scpStripeFee != null ? num(state.scpStripeFee) : 2;
+                const stripeAdder = state.scpStripes ? stripePer * (loc === 'frontBack' ? 2 : 1) : 0;
                 const rows = tiers.map(function (t) {
                     const cell = b.finalPrices.PrimaryLocation[t.label];
                     let price = cell && cell[cc] ? cell[cc][std] : null;
@@ -937,7 +939,9 @@
     // (ltmFee→0 so no row, no double-count). Mirrors calculators/quick-quote.js. (2026-06-20 audit #1)
     const MATRIX_PROBE_QTYS = {
         emb: [4, 12, 36, 60, 100], capemb: [4, 12, 36, 60, 100],
-        dtg: [12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100]
+        // DTG probes qty 6 so the 1-11 small-batch tier appears (quick-quote fixed
+        // this in 83c0e3ae; kept in sync so the catalog table isn't missing a tier).
+        dtg: [6, 12, 36, 60, 100], scp: [24, 50, 100, 200], dtf: [15, 36, 60, 100]
     };
     async function probeLadder(methodId, loc) {
         const def = METHODS[methodId];
@@ -1000,11 +1004,16 @@
                 const probed = await probeLadder(state.method, state.loc);
                 let meta = null;
                 try { meta = await prepData.buildMatrix(state.loc, state.ink); } catch (e) { meta = null; }
-                const tiers = (probed && probed.length) ? probed : ((meta && meta.tiers) || []);
+                const usedEngine = !!(probed && probed.length);
+                const tiers = usedEngine ? probed : ((meta && meta.tiers) || []);
                 if (!tiers.length) throw new Error('No price tiers returned');
                 model = {
                     note: (meta && meta.note) || '',
                     foot: (meta && meta.foot) || '',
+                    // Engine probe failed → this ladder is the non-engine fallback, which
+                    // can drift from the quoted headline. Flag it so we warn (never show a
+                    // silent approximate price as if it were live — Erik's #1 rule).
+                    approx: !usedEngine,
                     stdSize: prepData.stdSize,
                     multiSize: prepData.multiSize,
                     tiers: tiers
@@ -1033,7 +1042,8 @@
         }).join('') + '</tr>' : '';
 
         box.innerHTML =
-            '<p class="pdp-panel-note">' + escapeHtml(model.note) + '</p>'
+            (model.approx ? '<p class="pdp-panel-note pdp-panel-note--warn" role="status">⚠ Live pricing is temporarily unavailable — this table is approximate. Your free proof confirms exact pricing.</p>' : '')
+            + '<p class="pdp-panel-note">' + escapeHtml(model.note) + '</p>'
             + '<div class="table-wrap"><table class="data-table tier-table">'
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per ' + (state.ctx.isCap ? 'cap' : 'piece') + '</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
