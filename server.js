@@ -3191,8 +3191,12 @@ function projectPortalArt(a) {
   };
 }
 
+// Bound customer-portal upstream fetches: a stalled MO/proxy ABORTS to a visible 503 instead of
+// hanging the tab forever (generous 12s — under Heroku's 30s H12, still allows a slow-but-valid
+// response). AbortSignal.timeout rejects the fetch → the handler's existing try/catch → 503.
+const PORTAL_FETCH_TIMEOUT_MS = 12000;
 async function portalProxyGet(pathAndQuery) {
-  const r = await fetch(PORTAL_PROXY + pathAndQuery);
+  const r = await fetch(PORTAL_PROXY + pathAndQuery, { signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
   if (!r.ok) throw new Error(`proxy ${r.status}`);
   return r.json();
 }
@@ -3302,7 +3306,7 @@ app.get('/api/portal/orders', portalLimiter, requireCustomer, async (req, res) =
     const start = startD.toISOString().slice(0, 10);
     const url = `${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}` +
                 `&date_Ordered_start=${start}&date_Ordered_end=${end}`;
-    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('orders fetch ' + r.status);
     const j = await r.json();
     const orders = (j.result || [])
@@ -3373,12 +3377,12 @@ app.get('/api/portal/invoice/:orderNo', portalLimiter, requireCustomer, async (r
     const orderNo = String(req.params.orderNo || '');
     if (!/^\d+$/.test(orderNo)) return res.status(404).json({ error: 'Not found' });
     const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
-    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!oR.ok) throw new Error('order ' + oR.status);
     const oJ = await oR.json();
     const o = Array.isArray(oJ.result) ? oJ.result[0] : (oJ.result || oJ);
     if (!o || String(o.id_Customer) !== cid) return res.status(404).json({ error: 'Not found' });
-    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     const lJ = lR.ok ? await lR.json() : { result: [] };
     const items = (lJ.result || [])
       .sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0))
@@ -3767,7 +3771,7 @@ async function portalInventoryLights(style, color) {
 // carries the "Earn $X" Reward_Text (pill). Never throws the page empty. cid may be '' (staff w/o id).
 const REC_PREMIUM_SLOTS = 4, REC_POPULAR_SLOTS = 2, REC_TOTAL = 6;
 async function buildRecommendations(cid) {
-  const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+  const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/recommendations`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
   if (!r.ok) throw new Error('recs ' + r.status);
   const pool = ((await r.json()).recommendations || []).filter(x => x.style);
 
@@ -3941,7 +3945,7 @@ app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, ex
 app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);
-    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('rewards ' + r.status);
     res.json(await r.json());
   } catch (err) { console.error('[Portal] rewards failed:', err.message); res.json({ balance: 0, entries: [] }); }
@@ -4076,7 +4080,7 @@ app.get('/api/portal-admin/preview/:id/orders', requireCrmRole(PORTAL_ADMIN_ROLE
     const start = startD.toISOString().slice(0, 10);
     const url = `${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}` +
                 `&date_Ordered_start=${start}&date_Ordered_end=${end}`;
-    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {} });
+    const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('orders fetch ' + r.status);
     const j = await r.json();
     const orders = (j.result || []).map(projectPortalOrder)
@@ -4129,7 +4133,7 @@ app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROL
   const cid = String(req.params.id || '');
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
   try {
-    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     res.json(r.ok ? await r.json() : { balance: 0, entries: [] });
   } catch (err) { res.json({ balance: 0, entries: [] }); }
 });
@@ -4151,12 +4155,12 @@ app.get('/api/portal-admin/preview/:id/invoice/:orderNo', requireCrmRole(PORTAL_
   if (!/^\d+$/.test(cid) || !/^\d+$/.test(orderNo)) return res.status(400).json({ error: 'numeric ids required' });
   try {
     const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
-    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!oR.ok) throw new Error('order ' + oR.status);
     const oJ = await oR.json();
     const o = Array.isArray(oJ.result) ? oJ.result[0] : (oJ.result || oJ);
     if (!o || String(o.id_Customer) !== cid) return res.status(404).json({ error: 'Not found' });
-    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs });
+    const lR = await fetch(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     const lJ = lR.ok ? await lR.json() : { result: [] };
     const items = (lJ.result || []).sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0)).map(projectPortalLineItem);
     res.json(projectPortalInvoice(o, items));

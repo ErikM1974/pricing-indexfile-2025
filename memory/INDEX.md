@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-06-30 (regenerated from `git ls-files memory` by `/memory-maintain`)
+**Last Updated:** 2026-07-04 (regenerated from `git ls-files memory` by `/memory-maintain`)
 **Purpose:** Master navigation for `/memory`. How memory itself works → [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md).
 **Regenerate:** run `/memory-maintain` (do not hand-edit file-by-file — it drifts).
 
@@ -100,7 +100,9 @@ _Read API + PO (write) side._
 - [CASPIO_INTEGRATION_TODO.md](CASPIO_INTEGRATION_TODO.md) — ⭐ **9-item build list + session resume** (Swagger-driven security/integration roadmap; #1 portal-data-min & #2 staff SAML auth ✅ LIVE)
 - [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) — staff-dashboard auth via Caspio "Staff" App Connection SAML SSO (app=SP, Caspio=IdP); killed forgeable `/api/crm-session` (#2, LIVE v1477)
 - [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer portal: data-minimization + magic-link auth + admin console + Phase 5 reward-dollars ledger (LIVE 2026-06-30)
-- [PORTAL_PHASE4_CATALOG_PLAN.md](PORTAL_PHASE4_CATALOG_PLAN.md) — customer portal Phase 4: personalized catalog + request-to-rep re-order (LIVE 2026-06-30)
+- [STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md](STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md) — 58-agent adversarial audit that found + closed 3 anon staff-page backdoors around the gate (`gateStaffHtml`, gift-certs secret, creditcard-atmos)
+- [SIDE_DOOR_REMEDIATION_PLAN_2026-06.md](SIDE_DOOR_REMEDIATION_PLAN_2026-06.md) — public-proxy "side-door" gating plan (waves 1–4; Inksoft Flask routing + FE-dashboard SAML)
+- [PORTAL_PHASE4_CATALOG_PLAN.md](PORTAL_PHASE4_CATALOG_PLAN.md) — customer portal Phase 4: personalized catalog + product page + method-aware re-order + Re-order List (v.18–v.27, 2026-07)
 - [PORTAL_RECS_REWARDS_PROPOSAL_2026-07.md](PORTAL_RECS_REWARDS_PROPOSAL_2026-07.md) — PROPOSAL (awaiting Erik + 3 decisions): per-customer portal recs from the AE Sales Playbook, ranked by margin $/pc, + margin-tuned rewards
 - [PORTAL_MY_LOGOS.md](PORTAL_MY_LOGOS.md) — "My Logos" brainstorm + **ID REGISTRY** (Canva/Box MCP server ids, logo folder ids, Caspio design tables). KEY: Canva logo filenames are ShopWorks-id-prefixed → auto-linkable. Simple next step = `Customer_Logos` table + staff add-form + portal gallery
 - [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) — 🔴 **#9 remediation plan**: 92 proxy routes audited, 98 HIGH/CRITICAL endpoints OPEN to the internet (only 7 gated). Severity table + Pattern A (secret) / B (SAML) + phased rollout. ~5 CRITICAL anonymous money/data holes gateable Phase-1 with zero customer risk.
