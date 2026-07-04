@@ -99,10 +99,10 @@ class QuoteViewPage {
         // Set current year in footer
         document.getElementById('current-year').textContent = new Date().getFullYear();
 
-        // Check if staff mode
-        const urlParams = new URLSearchParams(window.location.search);
-        this.isStaff = urlParams.get('staff') === 'true'
-            || (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn());
+        // Staff mode is driven ONLY by a real logged-in staff session — never a URL
+        // param. `?staff=true` previously let anyone reveal the staff-only controls
+        // (ShopWorks sync, push internals) on a customer's quote with no auth.
+        this.isStaff = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn());
 
         // Load quote data
         await this.loadQuote();
