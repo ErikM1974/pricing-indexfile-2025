@@ -1,3 +1,10 @@
+## v2026.07.04.3 (2026.07.04)
+
+- feat(quote): quote-acceptance emails (customer receipt + rep alert), fail-soft
+- feat(security): route ManageOrders reads through a SAML-authed forwarder (fallback-safe)
+- Merge: quote-acceptance emails + airtight ManageOrders forwarder (fallback-safe)
+- Deploy v2026.07.04.3: 5 files (ae-dashboard.html,art-hub-ruth.html,art-hub-steve.html,...)
+
 ## v2026.07.04.2 (2026.07.04)
 
 - fix(review batch2): session revocation, cart persistence, funnel + quote-view UX
