@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.03.1">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.04.1">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.07.03.1">
 </head>
 <body>
@@ -51,6 +51,22 @@
             <button class="cp-rewards-btn" id="cp-redeem-btn" type="button">Redeem on your next order</button>
         </div>
 
+        <!-- Snapshot + tabs (2026-07-04 redesign — big accounts were one giant scroll) -->
+        <div class="cp-snapshot" id="cp-snapshot" style="display:none;">
+            <a class="cp-snap" data-tab="products" href="#"><span class="cp-snap-label">Products</span><span class="cp-snap-val" id="cp-snap-products">&mdash;</span></a>
+            <a class="cp-snap" data-tab="orders" href="#"><span class="cp-snap-label">Orders</span><span class="cp-snap-val" id="cp-snap-orders">&mdash;</span></a>
+            <a class="cp-snap" data-tab="invoices" href="#"><span class="cp-snap-label">Open balance</span><span class="cp-snap-val" id="cp-snap-balance">&mdash;</span></a>
+            <a class="cp-snap" data-tab="logos" href="#"><span class="cp-snap-label">Logos</span><span class="cp-snap-val" id="cp-snap-logos">&mdash;</span></a>
+        </div>
+        <div class="cp-tabs" id="cp-tabs" role="tablist" style="display:none;">
+            <button class="cp-tab is-active" type="button" role="tab" data-tab="products">Your products</button>
+            <button class="cp-tab" type="button" role="tab" data-tab="orders">Orders</button>
+            <button class="cp-tab" type="button" role="tab" data-tab="invoices">Invoices</button>
+            <button class="cp-tab" type="button" role="tab" data-tab="logos">My logos</button>
+        </div>
+
+        <!-- TAB: Your products (products + recommendations) -->
+        <div class="cp-tabpanel" data-panel="products">
         <!-- Your Products (re-order) -->
         <section class="cp-section" id="cp-section-products" style="display:none;">
             <div class="cp-section-header">
@@ -83,7 +99,10 @@
             </div>
             <div class="cp-product-grid" id="cp-recs-grid"></div>
         </section>
+        </div><!-- /TAB products -->
 
+        <!-- TAB: My logos -->
+        <div class="cp-tabpanel" data-panel="logos" style="display:none;">
         <!-- My Logos — the customer's logos + design proofs on file (auto-surfaced from mockups + art) -->
         <section class="cp-section" id="cp-section-logos" style="display:none;">
             <div class="cp-section-header">
@@ -99,7 +118,10 @@
                 <a class="cp-soon-cta" href="tel:12539225793">Call (253) 922-5793</a>
             </div>
         </section>
+        </div><!-- /TAB logos -->
 
+        <!-- TAB: Orders -->
+        <div class="cp-tabpanel" data-panel="orders" style="display:none;">
         <!-- Orders section (moved up — the customer's live business) -->
         <section class="cp-section" id="cp-section-orders">
             <div class="cp-section-header">
@@ -112,7 +134,10 @@
                 No orders on file yet.
             </div>
         </section>
+        </div><!-- /TAB orders -->
 
+        <!-- TAB: Invoices -->
+        <div class="cp-tabpanel" data-panel="invoices" style="display:none;">
         <!-- Invoices &amp; Balances section (moved up) -->
         <section class="cp-section" id="cp-section-invoices">
             <div class="cp-section-header">
@@ -125,6 +150,7 @@
                 No invoices on file yet.
             </div>
         </section>
+        </div><!-- /TAB invoices -->
 
     </main>
 
@@ -210,6 +236,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.03.1"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.03.1"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.04.1"></script>
 </body>
 </html>
