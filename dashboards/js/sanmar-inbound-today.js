@@ -619,13 +619,24 @@
     load(false);
   };
 
+  // When opened as a dedicated SanMar Inbound view, retitle the host page so
+  // receiving staff aren't disoriented by the underlying "Quote Management" header.
+  function applyInboundTitle() {
+    try {
+      document.title = 'SanMar Inbound';
+      const hdr = document.querySelector('.page-title, .header-title, h1');
+      if (hdr) hdr.textContent = 'SanMar Inbound';
+    } catch (e) { /* title update is non-critical */ }
+  }
+
   // Auto-open when linked from the Staff Dashboard tile (?open=inbound-today).
   try {
     const want = new URLSearchParams(location.search).get('open') || '';
     if (/^(inbound-today|inbound|sanmar-boxes)$/i.test(want)) {
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => window.openInboundTodayModal());
+        document.addEventListener('DOMContentLoaded', () => { applyInboundTitle(); window.openInboundTodayModal(); });
       } else {
+        applyInboundTitle();
         window.openInboundTodayModal();
       }
     }

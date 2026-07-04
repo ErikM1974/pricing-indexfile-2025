@@ -948,8 +948,17 @@
         const prepData = await prep(methodId);
         const probes = MATRIX_PROBE_QTYS[methodId] || [12, 36, 60, 100];
         const byTier = {};
-        for (let i = 0; i < probes.length; i++) {
-            const pq = probes[i];
+        let lastTierTable = null;   // discovered from the engine's own trace (live Caspio tiers)
+
+        // Probe ONE qty and, if new, record its tier row. Per-tier base rate = everything
+        // that scales with qty EXCEPT the one-time setup fees and the flat small-order (LTM)
+        // fee (disclosed on its own row). base + ltmFlat/qty === the headline's all-in
+        // per-piece EXACTLY for every method — itemized (SCP/EMB) where baseUnit is
+        // LTM-stripped AND baked (DTG/DTF) where it isn't — so the matrix can never disagree
+        // with the quote. (groupTotal already folds in per-piece service lines: stitch
+        // surcharge, AL.) Guarded by `!byTier[label]` → additive only: re-probing an
+        // already-seen tier can NEVER overwrite/change its recorded price.
+        async function probeQty(pq) {
             const item = buildItem(def, prepData);
             item.sizes = {};
             item.sizes[prepData.stdSize] = pq;
@@ -957,26 +966,45 @@
             try {
                 preview = await window.QuoteCartEngine.singleItemPreview(item, { groups: def.groups(loc), deps: engineDeps(), nudge: false });
             } catch (e) { preview = null; }
-            if (preview && preview.ok && preview.lines && preview.lines.length) {
-                const label = preview.tierLabel;
-                if (label && !byTier[label]) {
-                    // Per-tier base rate = everything that scales with qty EXCEPT the one-time
-                    // setup fees and the flat small-order (LTM) fee (disclosed on its own row).
-                    // base + ltmFlat/qty === the headline's all-in per-piece EXACTLY for every
-                    // method — itemized (SCP/EMB) where baseUnit is LTM-stripped AND baked
-                    // (DTG/DTF) where it isn't — so the matrix can never disagree with the quote.
-                    // (groupTotal already folds in per-piece service lines: stitch surcharge, AL.)
-                    const oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
-                    const ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
-                    const range = parseRange(label);
-                    byTier[label] = {
-                        label: label, min: range.min, max: range.max,
-                        price: r2((preview.groupTotal - oneTimeT - ltmFlat) / pq),
-                        ltmFee: ltmFlat
-                    };
-                }
+            if (!(preview && preview.ok && preview.lines && preview.lines.length)) return;
+            if (preview.trace && preview.trace.tierTable && preview.trace.tierTable.length) {
+                lastTierTable = preview.trace.tierTable;
+            }
+            const label = preview.tierLabel;
+            if (!label || byTier[label]) return;
+            const oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
+            const ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
+            const range = parseRange(label);
+            byTier[label] = {
+                label: label, min: range.min, max: range.max,
+                price: r2((preview.groupTotal - oneTimeT - ltmFlat) / pq),
+                ltmFee: ltmFlat
+            };
+        }
+
+        // 1) Bootstrap: probe the hardcoded representative qtys (one inside each tier we
+        //    KNOW about today). These also make the engine hand back its live tierTable.
+        for (let i = 0; i < probes.length; i++) {
+            await probeQty(probes[i]);
+        }
+
+        // 2) Self-heal against a Caspio tier restructure: probe the min qty of any LIVE
+        //    tier the constants didn't already land in, so a re-tiering (added/renamed
+        //    tier) can't silently drop a row from the catalog table. Purely additive —
+        //    tiers already covered above are skipped by the `!byTier[label]` guard, and a
+        //    tier's base is constant within it, so this never changes an existing row.
+        if (lastTierTable) {
+            const seenMins = {};
+            Object.keys(byTier).forEach(function (k) { seenMins[byTier[k].min] = true; });
+            const missing = lastTierTable
+                .map(function (t) { return Number(t.minQty); })
+                .filter(function (m) { return Number.isFinite(m) && m > 0 && !seenMins[m]; })
+                .sort(function (a, b) { return a - b; });
+            for (let j = 0; j < missing.length; j++) {
+                await probeQty(missing[j]);
             }
         }
+
         return Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.min - b.min; });
     }
 

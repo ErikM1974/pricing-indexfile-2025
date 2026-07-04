@@ -41,7 +41,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\\.\\d{3}Z$/, '');
+            const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
             
             const sessionData = {
                 QuoteID: quoteID,
@@ -97,7 +97,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
             console.log('[CustomerScreenPrintQuoteService] Session created:', sessionResult);
 
             // Step 2: Add item to quote
-            const addedAt = new Date().toISOString().replace(/\\.\\d{3}Z$/, '');
+            const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
             
             // Build product description
             let productName = 'Customer Supplied Screen Print';
@@ -163,6 +163,51 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                     errorMessage += ` - ${itemResponseText}`;
                 }
                 throw new Error(errorMessage);
+            }
+
+            // Step 3: itemize the one-time screen-setup fee as its OWN quote_items line
+            // so the saved record reconciles: Subtotal (line 1) + LTM (session) + this
+            // setup line === TotalAmount. Without it, Quote Management shows an
+            // unexplained gap (SubtotalAmount + LTMFeeTotal ≠ TotalAmount). Mirrors the
+            // staff builder's fee-line convention (screenprint-quote-service.js
+            // _saveShipFeeItem: EmbellishmentType='fee', Quantity 1, fee in *UnitPrice/
+            // LineTotal). Best-effort: a failure here must not fail the whole save (the
+            // product line + session already persisted with the correct TotalAmount).
+            const setupFee = parseFloat((quoteData.setupFee || 0).toFixed(2));
+            if (setupFee > 0) {
+                try {
+                    const setupItemData = {
+                        QuoteID: quoteID,
+                        LineNumber: 2,
+                        StyleNumber: 'SETUP',
+                        ProductName: 'Screen Setup Fee',
+                        Color: '',
+                        ColorCode: '',
+                        EmbellishmentType: 'fee',
+                        PrintLocation: '',
+                        PrintLocationName: '',
+                        Quantity: 1,
+                        HasLTM: 'No',
+                        BaseUnitPrice: setupFee,
+                        LTMPerUnit: 0,
+                        FinalUnitPrice: setupFee,
+                        LineTotal: setupFee,
+                        SizeBreakdown: '{}',
+                        PricingTier: quoteData.tierLabel || '',
+                        ImageURL: '',
+                        AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
+                    };
+                    const setupResponse = await fetch(`${this.baseURL}/api/quote_items`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(setupItemData)
+                    });
+                    if (!setupResponse.ok) {
+                        console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save failed:', setupResponse.status, await setupResponse.text());
+                    }
+                } catch (setupErr) {
+                    console.warn('[CustomerScreenPrintQuoteService] Setup-fee line save threw:', setupErr);
+                }
             }
 
             return {

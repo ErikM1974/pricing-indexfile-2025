@@ -419,7 +419,7 @@
                             </div>
                         </div>
                         <div class="charge-field" style="margin:0;">
-                            <label class="quote-label">Graphic Design ($75/hr)</label>
+                            <label class="quote-label">Graphic Design ($<span id="scp-design-rate-label">75</span>/hr)</label>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
                                        min="0" step="0.5" placeholder="0"
@@ -438,7 +438,7 @@
                             </div>
                         </div>
                         <div class="charge-field" style="margin:0;">
-                            <label class="quote-label">Vellum Print ($10 ea)</label>
+                            <label class="quote-label">Vellum Print ($<span id="scp-vellum-rate-label">10</span> ea)</label>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="vellum-qty" class="quote-input" style="width: 80px;"
                                        min="0" step="1" placeholder="0"
@@ -447,7 +447,7 @@
                             </div>
                         </div>
                         <div class="charge-field" style="margin:0;">
-                            <label class="quote-label">Color Change ($15 ea)</label>
+                            <label class="quote-label">Color Change ($<span id="scp-color-change-rate-label">15</span> ea)</label>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="color-change-qty" class="quote-input" style="width: 80px;"
                                        min="0" step="1" placeholder="0"
@@ -526,7 +526,7 @@
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
-                <div class="customer-panel-header" onclick="document.getElementById('spc-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;">
+                <div class="customer-panel-header" onclick="document.getElementById('spc-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                     <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #4cb354;"></i> Customer</h4>
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
@@ -749,7 +749,7 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.06.20.1"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.04.4"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
@@ -787,7 +787,7 @@
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.07.04.1"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.07.04.4"></script>
 
 </body>
 </html>

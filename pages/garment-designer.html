@@ -16,9 +16,13 @@
   Brand colors: tweak the CSS variables in :root below.
   ============================================================
 -->
-<script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- TODO(SRI): ag-psd is pinned to the "@27" semver RANGE, so jsdelivr serves the
+     latest matching patch and the bytes can change on a new publish. An SRI hash
+     would eventually mismatch and BLOCK this script. To add integrity, first pin an
+     EXACT version (e.g. ag-psd@27.0.0), then hash that exact file. crossorigin added now. -->
+<script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.13">
 <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.07.04.1">
 <!-- Text tool — curated decoration fonts -->
@@ -432,7 +436,11 @@
 
 <script src="/config/app.config.js"></script>
 <!-- Send-to-Customer email + Send-to-Steve art form (mirrors the AE dashboard mount) -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- TODO(SRI): @emailjs/browser is pinned to the "@4" semver RANGE — jsdelivr serves
+     the latest matching patch, so the bytes can change and an SRI hash would eventually
+     mismatch and BLOCK this script. To add integrity, pin an EXACT version (e.g.
+     @emailjs/browser@4.4.1) then hash that exact file. crossorigin added now. -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" crossorigin="anonymous"></script>
 <script src="/shared_components/js/customer-lookup-service.js"></script>
 <script src="/shared_components/js/company-contact-picker.js?v=2"></script>
 <script src="/shared_components/js/nwca-date-utils.js?v=1"></script>
@@ -441,6 +449,6 @@
 <script src="/shared_components/js/staff-auth-helper.js"></script>
 <script src="/shared_components/js/garment-submit-form.js?v=2026.07.04.1"></script>
 <script src="/shared_components/js/garment-text-engine.js?v=2026.06.20.13"></script>
-<script src="/pages/js/garment-designer.js?v=2026.07.04.1"></script>
+<script src="/pages/js/garment-designer.js?v=2026.07.04.4"></script>
 </body>
 </html>

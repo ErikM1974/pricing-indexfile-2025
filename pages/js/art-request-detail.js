@@ -944,10 +944,16 @@
         if (status === 'submitted' || status === 'revisionrequested') {
             buttons.unshift('<button type="button" class="ard-action-btn ard-action-working" id="ard-ae-btn-working">Mark In Progress</button>');
         } else if (status.includes('inprogress')) {
-            // In progress — AE can prompt Steve to send for approval
+            // In progress — AE can prompt Steve to send for approval. "Mark In Progress"
+            // is rendered DISABLED with a reason (was omitted) so the workflow gate is
+            // visible instead of the control silently disappearing.
+            buttons.unshift('<button type="button" class="ard-action-btn ard-action-working ard-action-btn--gated" id="ard-ae-btn-working" disabled title="Already In Progress — Steve is working on this.">Mark In Progress</button>');
             buttons.unshift('<span class="ard-ae-status-label">In Progress — Steve is working on this</span>');
         } else if (status === 'approved') {
+            buttons.unshift('<button type="button" class="ard-action-btn ard-action-working ard-action-btn--gated" id="ard-ae-btn-working" disabled title="Approved — waiting for Steve to finalize. Reopen to send it back.">Mark In Progress</button>');
             buttons.unshift('<span class="ard-ae-status-label">\u2705 Approved — Waiting for Steve to finalize</span>');
+        } else if (isCompleted) {
+            buttons.unshift('<button type="button" class="ard-action-btn ard-action-working ard-action-btn--gated" id="ard-ae-btn-working" disabled title="Request is completed — reopen it to set it back In Progress.">Mark In Progress</button>');
         }
         // Note: awaitingapproval is handled by the existing ard-action-bar above
 
@@ -1379,6 +1385,25 @@
         });
     }
 
+    // Show an action button DISABLED with an explanatory tooltip instead of hiding
+    // it, so the user can tell a workflow/permission gate ("not yet" / "not you")
+    // apart from a button that simply doesn't exist. Server-side enforcement is
+    // unchanged — this is UI affordance only.
+    function gateBtn(btn, reason) {
+        if (!btn) return;
+        btn.style.display = '';
+        btn.disabled = true;
+        btn.classList.add('ard-action-btn--gated');
+        btn.title = reason || 'Not available in the current status';
+    }
+    function ungateBtn(btn) {
+        if (!btn) return;
+        btn.style.display = '';
+        btn.disabled = false;
+        btn.classList.remove('ard-action-btn--gated');
+        btn.removeAttribute('title');
+    }
+
     // ── Steve's Action Bar ────────────────────────────────────────────────
     function renderSteveActions(req, statusClean, notes) {
         var bar = document.getElementById('ard-steve-actions');
@@ -1422,25 +1447,35 @@
             });
         }
 
+        // Show gated buttons DISABLED with a reason (was: display:none) so Steve can
+        // tell "not available yet in this workflow state" from "button doesn't exist".
+        // Server-side status/role enforcement is unchanged.
         if (isCompleted) {
-            btnWorking.style.display = 'none';
-            btnComplete.style.display = 'none';
-            btnMockup.style.display = 'none';
-            btnReminder.style.display = 'none';
-            btnReopen.style.display = '';
+            gateBtn(btnWorking, 'Request is completed — reopen it to make changes.');
+            gateBtn(btnComplete, 'Already completed — reopen the request first.');
+            gateBtn(btnMockup, 'Request is completed — reopen it to send another mockup.');
+            btnReminder.style.display = 'none'; // N/A when completed; ships hidden by default
+            ungateBtn(btnReopen);
         } else if (isApproved) {
             // Approved by AE/Customer — Steve gets final review + Mark Complete
-            btnWorking.style.display = 'none';
-            btnMockup.style.display = 'none';
-            btnReminder.style.display = 'none';
-            btnComplete.style.display = '';
-            btnReopen.style.display = '';
+            gateBtn(btnWorking, 'Already approved — no need to set In Progress.');
+            gateBtn(btnMockup, 'Approved by the customer — no new mockup needed. Reopen to revise.');
+            btnReminder.style.display = 'none'; // N/A once approved; ships hidden by default
+            ungateBtn(btnComplete);
+            ungateBtn(btnReopen);
         } else {
-            // Hide Send Mockup if status doesn't allow it
+            // Send Mockup only in statuses that allow a proof to go out — gate (was
+            // hidden) so Steve sees WHY it's unavailable rather than it vanishing.
             var canSendMockup = status.includes('submitted') || status.includes('inprogress') || status.includes('revisionrequested') || status.includes('awaitingapproval');
-            if (!canSendMockup) btnMockup.style.display = 'none';
-            // Show Send Reminder alongside Send Mockup when awaiting approval
-            if (status.includes('awaitingapproval')) btnReminder.style.display = '';
+            if (!canSendMockup) gateBtn(btnMockup, 'Send a mockup once the request is In Progress.');
+            else ungateBtn(btnMockup);
+            // Send Reminder only meaningful while awaiting approval; otherwise it stays
+            // at its default-hidden state (it's not a control the user is reaching for
+            // mid-build, so we don't surface a disabled button here).
+            if (status.includes('awaitingapproval')) ungateBtn(btnReminder);
+            else btnReminder.style.display = 'none';
+            // btnWorking / btnComplete keep their default (visible, enabled) state here —
+            // they were not hidden in active statuses, so we don't newly disable them.
         }
 
         var repEmail = req.Sales_Rep || req.User_Email || '';
@@ -2224,7 +2259,16 @@
             return;
         }
 
-        var authorName = revisionNote.Note_By || 'AE';
+        // Attribution: who requested the revision, their role, and how long ago.
+        // Note_By is often an email (see requestChanges) — resolve to a display name.
+        var rawAuthor = revisionNote.Note_By || 'AE';
+        var authorName = resolveRepName(rawAuthor) || rawAuthor;
+        // Role: revision requests come from the sales/AE side; honor an explicit
+        // Posted_By_Role when the note carries one, else label it AE.
+        var authorRole = revisionNote.Posted_By_Role
+            ? (revisionNote.Posted_By_Role.toLowerCase() === 'ae' ? 'AE' : revisionNote.Posted_By_Role)
+            : 'AE';
+        var whenAgo = timeAgo(revisionNote.Note_Date);
         var noteText = revisionNote.Note_Text || '';
         // Strip "Revision requested by Name: " prefix if present
         noteText = noteText.replace(/^Revision requested by [^:]+:\s*/, '');
@@ -2262,10 +2306,15 @@
             feedbackHtml = '<div class="ard-rev-text">' + escapeHtml(noteText) + '</div>';
         }
 
+        var attribution = 'Revision feedback from ' + escapeHtml(authorName)
+            + ' (' + escapeHtml(authorRole) + ')'
+            + (whenAgo ? ' · ' + escapeHtml(whenAgo) : '');
+
         banner.style.display = '';
         banner.innerHTML = '<div class="ard-rev-icon">&#9888;&#65039;</div>'
             + '<div class="ard-rev-content">'
             + '<div class="ard-rev-title">Changes Requested by ' + escapeHtml(authorName) + '</div>'
+            + '<div class="ard-rev-attribution">' + attribution + '</div>'
             + feedbackHtml
             + '</div>';
         // Wire up Box proxy fallback for revision banner thumbnails
@@ -5215,6 +5264,27 @@
         } catch (e) {
             return dateStr;
         }
+    }
+
+    // Fuzzy "3 hours ago" label for attribution lines. Returns '' when the date is
+    // missing/unparseable so callers can omit the clause cleanly.
+    function timeAgo(dateStr) {
+        if (!dateStr) return '';
+        var d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+        var secs = Math.floor((Date.now() - d.getTime()) / 1000);
+        if (secs < 0) secs = 0;
+        if (secs < 60) return 'just now';
+        var mins = Math.floor(secs / 60);
+        if (mins < 60) return mins + (mins === 1 ? ' minute ago' : ' minutes ago');
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + (hrs === 1 ? ' hour ago' : ' hours ago');
+        var days = Math.floor(hrs / 24);
+        if (days < 30) return days + (days === 1 ? ' day ago' : ' days ago');
+        var months = Math.floor(days / 30);
+        if (months < 12) return months + (months === 1 ? ' month ago' : ' months ago');
+        var years = Math.floor(days / 365);
+        return years + (years === 1 ? ' year ago' : ' years ago');
     }
 
     // Whose turn is it? A short actor hint rendered next to the status chip so

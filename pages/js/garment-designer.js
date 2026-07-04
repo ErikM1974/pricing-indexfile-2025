@@ -1197,7 +1197,7 @@ function addFileItem(entry) {
   div.id = 'fitem-' + entry.id;
   div.onclick = () => selectEntry(entry.id);
   div.innerHTML =
-    '<div class="thumb" id="thumb-' + entry.id + '">' + entry.ext.toUpperCase() + '</div>' +
+    '<div class="thumb" id="thumb-' + entry.id + '">' + escapeHtml(entry.ext.toUpperCase()) + '</div>' +
     '<div class="meta"><div class="fname" title="' + escapeHtml(entry.name) + '">' + escapeHtml(entry.name) + '</div>' +
     '<div class="fsize">' + fmtSize(entry.size) + '</div><div class="file-advice" id="advice-' + entry.id + '"></div></div>' +
     '<span class="badge load" id="badge-' + entry.id + '">…</span>';
@@ -5716,11 +5716,18 @@ async function setGarmentStyle(styleId) {
     const loaded = [];
     for (const [url, angle] of [[st.front, 0], [st.back, 180]]) {
       const img = await loadGarmentImage(url);
+      // Staleness guard: if the user picked a different garment while this image
+      // was decoding, abandon this load so a slow Polo request can't clobber the
+      // Hoodie the user is now on. currentGarmentStyle is the intended selection.
+      if (currentGarmentStyle !== styleId) return;
       const fr = analyzeShirtImage(img);          // chroma-key + shade/mask, same as the tee
       if (!fr) continue;
       fr.angle = angle;
       loaded.push(fr);
     }
+    // Re-check after all awaits before committing frames to PHOTO (the shared,
+    // globally-read mockup state) — a switch during the last decode still races here.
+    if (currentGarmentStyle !== styleId) return;
     if (!loaded.length) { showToast('Could not read ' + st.name + ' artwork'); return; }
     loaded.sort((a, b) => a.angle - b.angle);
     PHOTO.frames = loaded;
