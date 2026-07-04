@@ -48,13 +48,16 @@
     var _cpOpenBalance = 0, _cpOpenCount = 0;
     setupTabs();
     function setupTabs() {
-        var tabsEl = document.getElementById('cp-tabs'), snapEl = document.getElementById('cp-snapshot');
-        if (!tabsEl) return;
-        tabsEl.style.display = 'flex';
+        var barEl = document.getElementById('cp-tabs-bar'), snapEl = document.getElementById('cp-snapshot');
+        if (!barEl) return;
+        barEl.style.display = 'block';
         if (snapEl) snapEl.style.display = 'grid';
         document.addEventListener('click', function (e) {
-            var t = e.target.closest && e.target.closest('.cp-tab[data-tab], .cp-snap[data-tab]');
-            if (t) { e.preventDefault(); switchTab(t.getAttribute('data-tab')); }
+            if (!e.target.closest) return;
+            var tab = e.target.closest('.cp-tab[data-tab], .cp-snap[data-tab]');
+            if (tab) { e.preventDefault(); switchTab(tab.getAttribute('data-tab'), true); return; }
+            var more = e.target.closest('.cp-rows-more');
+            if (more) { toggleRows(more); return; }
         });
         switchTab('products');
         // Belt: poll the snapshot while the async loaders populate. Window must outlast the
@@ -63,9 +66,13 @@
         var tries = 0, timer = setInterval(function () { updateSnapshot(); if (++tries > 21) clearInterval(timer); }, 700);
         updateSnapshot();
     }
-    function switchTab(name) {
-        var panels = document.querySelectorAll('.cp-tabpanel');
-        for (var i = 0; i < panels.length; i++) panels[i].style.display = (panels[i].getAttribute('data-panel') === name) ? 'block' : 'none';
+    function switchTab(name, focusPanel) {
+        var panels = document.querySelectorAll('.cp-tabpanel'), active = null;
+        for (var i = 0; i < panels.length; i++) {
+            var show = panels[i].getAttribute('data-panel') === name;
+            panels[i].style.display = show ? 'block' : 'none';
+            if (show) active = panels[i];
+        }
         var tabs = document.querySelectorAll('.cp-tab');
         for (var j = 0; j < tabs.length; j++) {
             var on = tabs[j].getAttribute('data-tab') === name;
@@ -73,6 +80,10 @@
             tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
         }
         try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) { /* older browsers */ }
+        // On a USER-initiated switch, move focus into the revealed panel (role=tabpanel,
+        // tabindex=-1) so screen-reader + keyboard users land on the new content. preventScroll
+        // so it doesn't fight the scrollTo above. NOT done on the initial setup call (no focus steal).
+        if (focusPanel && active) { try { active.focus({ preventScroll: true }); } catch (e) { try { active.focus(); } catch (e2) { } } }
     }
     function updateSnapshot() {
         var txt = function (id) { var el = document.getElementById(id); return el ? el.textContent : null; };
@@ -306,6 +317,33 @@
         return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // ── Long-table cap: Orders/Invoices show the most-recent ROW_CAP rows; the rest reveal
+    //    on demand so a 46-row account isn't a wall even inside its tab. The count span still
+    //    shows the FULL total; only the visible rows are capped. ──
+    var ROW_CAP = 10;
+    function byDateDesc(field, alt) {
+        return function (a, b) {
+            var av = Date.parse(a[field] || (alt && a[alt]) || '') || 0;
+            var bv = Date.parse(b[field] || (alt && b[alt]) || '') || 0;
+            return bv - av; // newest first
+        };
+    }
+    function moreControl(total, noun) {
+        if (total <= ROW_CAP) return '';
+        var more = 'Show all ' + total + ' ' + noun;
+        return '<div class="cp-rows-morewrap"><button type="button" class="cp-rows-more" aria-expanded="false" ' +
+            'data-expanded="0" data-more="' + more + '" data-less="Show fewer">' + more + '</button></div>';
+    }
+    function toggleRows(btn) {
+        var wrap = btn.closest('.cp-table-wrap'); if (!wrap) return;
+        var expanded = btn.getAttribute('data-expanded') === '1';
+        var extras = wrap.querySelectorAll('.cp-row-extra');
+        for (var i = 0; i < extras.length; i++) extras[i].style.display = expanded ? 'none' : 'table-row';
+        btn.setAttribute('data-expanded', expanded ? '0' : '1');
+        btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+        btn.textContent = expanded ? btn.getAttribute('data-more') : btn.getAttribute('data-less');
+    }
+
     function renderOrders(orders) {
         document.getElementById('cp-orders-count').textContent = orders.length;
         updateSnapshot();
@@ -313,8 +351,9 @@
         var empty = document.getElementById('cp-orders-empty');
         if (!orders.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
         empty.style.display = 'none';
-        var rows = orders.map(function (o) {
-            return '<tr>' +
+        var list = orders.slice().sort(byDateDesc('orderDate')); // most-recent first for the cap
+        var rows = list.map(function (o, i) {
+            return '<tr' + (i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
                 '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
                 '<td>' + escapeHtml(o.designName || '—') + '</td>' +
@@ -327,7 +366,7 @@
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
             '<th>Order</th><th>Date</th><th>Design</th><th>PO</th><th class="cp-num">Qty</th>' +
             '<th class="cp-num">Total</th><th>Status</th>' +
-            '</tr></thead><tbody>' + rows + '</tbody></table>';
+            '</tr></thead><tbody>' + rows + '</tbody></table>' + moreControl(list.length, 'orders');
     }
 
     function renderInvoices(orders) {
@@ -342,8 +381,9 @@
         var empty = document.getElementById('cp-invoices-empty');
         if (!inv.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
         empty.style.display = 'none';
-        var rows = inv.map(function (o) {
-            return '<tr>' +
+        var list = inv.slice().sort(byDateDesc('invoiceDate', 'orderDate')); // most-recent first
+        var rows = list.map(function (o, i) {
+            return '<tr' + (i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
                 '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
@@ -355,7 +395,7 @@
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
             '<th>Order</th><th>Invoice Date</th><th class="cp-num">Total</th>' +
             '<th class="cp-num">Paid</th><th class="cp-num">Balance</th><th>Status</th>' +
-            '</tr></thead><tbody>' + rows + '</tbody></table>';
+            '</tr></thead><tbody>' + rows + '</tbody></table>' + moreControl(list.length, 'invoices');
     }
 
     // ── Phase 4: Your Products + Recommendations + request-to-rep ──
