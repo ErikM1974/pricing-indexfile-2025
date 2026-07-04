@@ -3899,6 +3899,40 @@ app.post('/api/portal/reorder-request', reorderRequestLimiter, requireCustomer, 
   }
 });
 
+// POST /api/portal/reorder-batch — a multi-item "Re-order List" → one grouped rep ask (Batch_Num).
+// id_Customer/company/email come from the verified SESSION (never the client). No price/payment.
+app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, express.json(), async (req, res) => {
+  try {
+    const sess = req.customerSession.portalCustomer;
+    const cid = String(sess.idCustomer);
+    const b = req.body || {};
+    const items = (Array.isArray(b.items) ? b.items : [])
+      .filter(it => it && String(it.style || '').trim())
+      .slice(0, 30)
+      .map(it => ({
+        style: String(it.style || '').slice(0, 50),
+        color: String(it.color || '').slice(0, 80),
+        product_title: String(it.product_title || '').slice(0, 255),
+        design_number: String(it.design_number || '').slice(0, 50),
+        design_name: String(it.design_name || '').slice(0, 255),
+        qty: String(it.qty || '').slice(0, 30),
+        size_breakdown: String(it.size_breakdown || '').slice(0, 255),
+        method: String(it.method || '').slice(0, 30),
+      }));
+    if (!items.length) return res.status(400).json({ error: 'Your list is empty.' });
+    const payload = { id_Customer: cid, company_name: sess.companyName || '', email: sess.email || '', items, note: String(b.note || '').slice(0, 255) };
+    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/batch`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(payload),
+    });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    res.json({ ok: true, batchNum: j.batchNum, count: j.count, rep: j.rep });
+  } catch (err) {
+    console.error('[Portal] reorder-batch failed:', err.message);
+    res.status(502).json({ error: 'Could not send your list. Please try again or call (253) 922-5793.' });
+  }
+});
+
 // ── Customer portal PHASE 5 — reward dollars (READ balance + REDEEM as a request) ──
 // The customer can only READ their balance and REQUEST a redemption — never change the
 // ledger. All ledger writes are staff-initiated (admin console → /api/portal-admin/rewards/entry).

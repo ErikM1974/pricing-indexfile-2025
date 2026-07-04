@@ -148,7 +148,10 @@
             + '<label class="pp-field"><span class="pp-flabel">Notes <small>(deadline, other sizes/colors &mdash; optional)</small></span>'
             + '<textarea id="pp-note" rows="2" placeholder="Anything the team should know"></textarea></label>'
             + '<div class="pp-req-error" id="pp-req-error"></div>'
+            + '<div class="pp-req-actions">'
             + '<button class="cp-btn-primary" id="pp-req-submit" type="button">Send to my rep</button>'
+            + '<button class="pp-addlist-btn" id="pp-req-addlist" type="button">+ Add to Re-order List</button>'
+            + '</div>'
             + '</section>';
     }
 
@@ -355,6 +358,7 @@
         var mb = e.target.closest && e.target.closest('#pp-methods .pp-method');
         if (mb) { setMethod(mb.getAttribute('data-method')); return; }
         if (e.target.closest && e.target.closest('#pp-req-submit')) { submitReorder(); return; }
+        if (e.target.closest && e.target.closest('#pp-req-addlist')) { addToReorderList(); return; }
         var upsw = e.target.closest && e.target.closest('.pp-up-sw');
         if (upsw) { selectUpgradeColor(parseInt(upsw.getAttribute('data-up'), 10), upsw.getAttribute('data-color')); return; }
         var up = e.target.closest && e.target.closest('.pp-up-btn');
@@ -557,6 +561,25 @@
                 showToast('Sent to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! We’ll follow up with a quote.');
             })
             .catch(function () { btn.disabled = false; btn.textContent = 'Send to my rep'; err.textContent = 'Could not send. Please try again.'; });
+    }
+
+    // Add the currently-configured re-order (color + method + sizes) to the shared Re-order List
+    // (sessionStorage, via portal-reorder-list.js) instead of sending it immediately. Same guards.
+    function addToReorderList() {
+        var picked = collectSizes();
+        var err = document.getElementById('pp-req-error'); err.textContent = '';
+        if (picked.total <= 0) { err.textContent = 'Enter a quantity for at least one size.'; return; }
+        if (!state.method) { err.textContent = 'Pick a decoration method above.'; return; }
+        if (state.minBlocked) { err.textContent = 'Please meet the minimum for ' + methodLabel(state.method) + ', or choose another decoration.'; return; }
+        if (!window.ReorderList) { err.textContent = 'List unavailable — use “Send to my rep” instead.'; return; }
+        var d = state.data;
+        var breakdown = SIZE_ORDER.filter(function (s) { return picked.sizes[s]; }).map(function (s) { return s + ':' + picked.sizes[s]; }).join(', ');
+        var img = (state.gallery && state.gallery.images && state.gallery.images[0] && state.gallery.images[0].url) || d.defaultImage || '';
+        window.ReorderList.add({
+            style: d.product.style, color: state.color, title: d.product.title, method: methodLabel(state.method),
+            sizeBreakdown: breakdown, qty: String(picked.total),
+            designNumber: d.designNumber || '', designName: d.designName || '', image: img
+        });
     }
 
     function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }

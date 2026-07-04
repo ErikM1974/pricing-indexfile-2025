@@ -319,6 +319,8 @@
 | `/pages/customer-product.html` | Portal product-detail page at `/portal/product/:style` (session-gated) — specs, all colors, order-history size matrix, traffic-light availability, re-order (Phase B, 2026-07-01) | customer-product.js/.css, customer-portal.css, app-config.js | ✅ Active |
 | `/pages/js/customer-product.js` | Fetches `/api/portal/product/:style` (+ preview mirror), renders specs/swatch gallery/size matrix/availability/re-order; POSTs `/api/portal/reorder-request` | server.js GET /api/portal/product | ✅ Active |
 | `/pages/css/customer-product.css` | Product-detail page styling (layers on customer-portal.css tokens) | customer-portal.css | ✅ Active |
+| `/pages/js/portal-reorder-list.js` | Shared multi-item "Re-order List" (2026-07-04) — floating FAB + drawer; sessionStorage-persisted across portal pages; "Send all" POSTs `/api/portal/reorder-batch` (grouped Batch_Num, no price). Loaded on product page + portal home | server.js POST /api/portal/reorder-batch | ✅ Active |
+| `/pages/css/portal-reorder-list.css` | Re-order List floating button + drawer styling (portal --cp-* tokens w/ fallbacks) | — | ✅ Active |
 
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
