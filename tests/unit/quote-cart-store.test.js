@@ -6,7 +6,7 @@
  * same-tab onChange pub/sub, and the "no pricing in the store" shape (items
  * carry sizes/qty/options only — never money).
  *
- * Node-env jest with a manual sessionStorage shim (repo convention — see
+ * Node-env jest with a manual localStorage shim (repo convention — see
  * tests/unit/web-quote-cart-parity.test.js).
  */
 
@@ -27,7 +27,7 @@ function makeStorage() {
 /** Fresh store module + fresh storage for every test. */
 function freshStore() {
     jest.resetModules();
-    global.sessionStorage = makeStorage();
+    global.localStorage = makeStorage();
     delete global.window; // node path: store binds to globalThis
     return require(STORE_PATH);
 }
@@ -51,7 +51,7 @@ function sampleItem(overrides) {
 
 describe('QuoteCartStore', () => {
     afterEach(() => {
-        delete global.sessionStorage;
+        delete global.localStorage;
     });
 
     test('add() stores the item with id + addedAt and count() reflects it', () => {
@@ -67,7 +67,7 @@ describe('QuoteCartStore', () => {
         expect(store.totalPieces()).toBe(24);
 
         // Persisted under the versioned key with schema v1
-        const raw = JSON.parse(global.sessionStorage.getItem(KEY));
+        const raw = JSON.parse(global.localStorage.getItem(KEY));
         expect(raw.v).toBe(1);
         expect(raw.items).toHaveLength(1);
         expect(raw.createdAt).toBeGreaterThan(0);
@@ -117,30 +117,30 @@ describe('QuoteCartStore', () => {
         store.add(sampleItem());
 
         // Backdate createdAt beyond the TTL
-        const raw = JSON.parse(global.sessionStorage.getItem(KEY));
+        const raw = JSON.parse(global.localStorage.getItem(KEY));
         raw.createdAt = Date.now() - (store.TTL_MS + 1000);
-        global.sessionStorage.setItem(KEY, JSON.stringify(raw));
+        global.localStorage.setItem(KEY, JSON.stringify(raw));
 
         expect(store.getItems()).toEqual([]);
         expect(store.count()).toBe(0);
         // and the reset was persisted with a fresh createdAt
-        const after = JSON.parse(global.sessionStorage.getItem(KEY));
+        const after = JSON.parse(global.localStorage.getItem(KEY));
         expect(after.items).toEqual([]);
         expect(Date.now() - after.createdAt).toBeLessThan(5000);
     });
 
     test('schema version mismatch resets to an empty v1 cart', () => {
         const store = freshStore();
-        global.sessionStorage.setItem(KEY, JSON.stringify({
+        global.localStorage.setItem(KEY, JSON.stringify({
             v: 2, createdAt: Date.now(), items: [{ id: 'x', style: 'PC61' }]
         }));
         expect(store.getItems()).toEqual([]);
-        expect(JSON.parse(global.sessionStorage.getItem(KEY)).v).toBe(1);
+        expect(JSON.parse(global.localStorage.getItem(KEY)).v).toBe(1);
     });
 
     test('corrupted JSON resets instead of throwing', () => {
         const store = freshStore();
-        global.sessionStorage.setItem(KEY, '{not json');
+        global.localStorage.setItem(KEY, '{not json');
         expect(store.getItems()).toEqual([]);
         expect(store.count()).toBe(0);
         // add() still works after the reset
@@ -172,7 +172,7 @@ describe('QuoteCartStore', () => {
         const stored = store.add(sampleItem({ price: { total: 504 }, perPiece: 21 }));
         expect(stored.price).toBeUndefined();
         expect(stored.perPiece).toBeUndefined();
-        const raw = JSON.parse(global.sessionStorage.getItem(KEY));
+        const raw = JSON.parse(global.localStorage.getItem(KEY));
         expect(JSON.stringify(raw)).not.toContain('504');
     });
 });

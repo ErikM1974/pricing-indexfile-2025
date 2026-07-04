@@ -606,8 +606,10 @@
         const href = 'mailto:' + SALES_EMAIL
             + '?subject=' + encodeURIComponent(subject)
             + '&body=' + encodeURIComponent(lines.join('\n'));
-        $('ctaQuote').href = href;
-        $('ctaQuoteMobile').href = href;
+        // The primary side-rail + mobile CTAs scroll to the live pricing configurator
+        // (the real conversion path) rather than a bare mailto: that silently dead-ends
+        // on phones/machines with no mail client. The rich pre-filled email stays on the
+        // in-configurator "email this quote" link.
         const emailLink = $('cfgEmailQuote');
         if (emailLink) emailLink.href = href;
 

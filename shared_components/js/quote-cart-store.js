@@ -1,5 +1,5 @@
 /**
- * quote-cart-store.js — sessionStorage-backed store for the customer
+ * quote-cart-store.js — localStorage-backed store for the customer
  * quote cart (Phase 2 of the customer quote-cart project).
  *
  * Design: memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md (§Cart → STORE).
@@ -12,7 +12,7 @@
  * orchestrator), so a Caspio price change reprices the cart on the next
  * view — no stale money ever persists here (Erik's #1 rule).
  *
- * Schema (sessionStorage key `nwca.quoteCart.v1`, 24h TTL):
+ * Schema (localStorage key `nwca.quoteCart.v1`, 24h TTL):
  *   { v:1, createdAt, items:[{ id, style, productTitle, color, catalogColor,
  *     qty, sizes:{SIZE:qty}, method:'EMB'|'CAP'|'DTG'|'SCP'|'DTF',
  *     placement, placementLabel, methodLabel, inkColors, safetyStripes, isCap, addedAt }] }
@@ -44,10 +44,12 @@
     var storageListenerWired = false;
 
     function storageArea() {
-        // sessionStorage access can throw in privacy modes — degrade to a
-        // memory-only cart rather than breaking the page.
+        // localStorage (not sessionStorage) so a customer's quote survives closing
+        // the tab — they can leave to check with a coworker and return within the 24h
+        // TTL. Still repriced through the engine on every view, so no stale money
+        // persists. Access can throw in privacy modes — degrade to memory-only.
         try {
-            var s = global.sessionStorage;
+            var s = global.localStorage;
             if (s) { return s; }
         } catch (e) { /* fall through */ }
         if (!storageArea._mem) {

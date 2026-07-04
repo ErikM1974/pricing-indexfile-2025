@@ -2917,14 +2917,53 @@ const customerLoginLimiter = rateLimit({
   message: { error: 'Too many sign-in requests. Please wait a few minutes and try again.' },
 });
 
-// Gate: require a verified customer session. API → 401 + loginUrl; page → redirect to login.
-function requireCustomer(req, res, next) {
-  const pc = req.customerSession && req.customerSession.portalCustomer;
-  if (pc && /^\d+$/.test(String(pc.idCustomer))) return next();
-  if (req.originalUrl.startsWith('/api/')) {
-    return res.status(401).json({ error: 'Sign in required', loginUrl: '/customer/login' });
+// Live "still enabled?" re-check, 60s-cached. The session cookie is a stateless
+// 30-day HMAC, so without this a revoked/disabled customer's cookie would keep
+// working until expiry. Returns true when we CAN'T determine (lookup error) so a
+// proxy blip never locks out every customer; a definitive disabled/not-found
+// (HTTP ok) revokes within ~60s.
+const _portalEnabledCache = new Map(); // email → { enabled, t }
+const PORTAL_ENABLED_TTL_MS = 60 * 1000;
+async function isPortalAccessEnabled(email) {
+  const key = String(email || '').toLowerCase().trim();
+  if (!key) return true;
+  const hit = _portalEnabledCache.get(key);
+  if (hit && (Date.now() - hit.t) < PORTAL_ENABLED_TTL_MS) return hit.enabled;
+  if (!CRM_API_SECRET) return true; // dev / unconfigured → can't check, fail open
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/customer-portal-access/by-email/${encodeURIComponent(key)}`,
+      { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(6000) });
+    if (!r.ok) return true; // lookup failed → fail open, don't cache (re-check next time)
+    const j = await r.json();
+    const enabled = !!(j && j.found && j.access && j.access.enabled);
+    _portalEnabledCache.set(key, { enabled, t: Date.now() });
+    return enabled;
+  } catch (e) {
+    console.error('[portal] enabled re-check failed:', e.message);
+    return true; // network/error → fail open, don't cache
   }
-  return res.redirect('/customer/login?next=' + encodeURIComponent(req.originalUrl));
+}
+
+// Gate: require a verified customer session. API → 401 + loginUrl; page → redirect to login.
+async function requireCustomer(req, res, next) {
+  const pc = req.customerSession && req.customerSession.portalCustomer;
+  if (!pc || !/^\d+$/.test(String(pc.idCustomer))) {
+    if (req.originalUrl.startsWith('/api/')) {
+      return res.status(401).json({ error: 'Sign in required', loginUrl: '/customer/login' });
+    }
+    return res.redirect('/customer/login?next=' + encodeURIComponent(req.originalUrl));
+  }
+  // Live revocation check — kills a disabled customer's cookie within ~60s.
+  try {
+    if (pc.email && !(await isPortalAccessEnabled(pc.email))) {
+      res.clearCookie('nwca_customer');
+      if (req.originalUrl.startsWith('/api/')) {
+        return res.status(401).json({ error: 'Access revoked', loginUrl: '/customer/login' });
+      }
+      return res.redirect('/customer/login');
+    }
+  } catch (e) { console.error('[portal] requireCustomer recheck error:', e.message); /* fail open */ }
+  return next();
 }
 
 // Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
