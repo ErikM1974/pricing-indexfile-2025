@@ -1,3 +1,11 @@
+## v2026.07.04.1 (2026.07.04)
+
+- fix(review): wrong-money + XSS + UX from post-jun12 review
+- docs(memory): record 3 recurring code patterns from post-Jun12 review
+- fix(portal): _portalPdCache — cache only successful non-empty rows + 30min TTL
+- Merge post-jun12 review fixes (security PII gate, wrong-money, XSS, UX)
+- Deploy v2026.07.04.1: 12 files (index.html,ae-dashboard.html,art-hub-steve.html,...)
+
 ## v2026.07.01.14 (2026-07-01)
 
 - fix(portal): My Logos images load eager (lazy left them blank below the fold)
