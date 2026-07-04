@@ -1,3 +1,9 @@
+## v2026.07.04.2 (2026.07.04)
+
+- fix(review batch2): session revocation, cart persistence, funnel + quote-view UX
+- Merge batch2: session revocation, cart persistence, funnel/quote-view UX
+- Deploy v2026.07.04.2: 5 files (index.html,catalog.html,quote-cart.html,...)
+
 ## v2026.07.04.1 (2026.07.04)
 
 - fix(review): wrong-money + XSS + UX from post-jun12 review
