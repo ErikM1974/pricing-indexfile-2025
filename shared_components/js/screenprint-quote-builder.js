@@ -961,7 +961,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     // from the API, not hardcoded literals (Erik's Pricing=API rule). Fire-and-
     // forget — getServicePrice() returns the documented fallback until it resolves,
     // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
-    if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => { try { recalculatePricing(); } catch (_) {} }); }
+    if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => {
+        try { recalculatePricing(); } catch (_) {}
+        // Sync the static "$75/hr", "$10 ea", "$15 ea" labels with the live Service_Codes
+        // rates (mirror DTF's #design-rate-label pattern). The math was already API-driven,
+        // but a Caspio price change left the on-screen labels contradicting the charged
+        // totals. Format money labels to 2 decimals; the /hr rate matches DTF (integer). (2026-07-04)
+        try {
+            const _designRateEl = document.getElementById('scp-design-rate-label');
+            if (_designRateEl) _designRateEl.textContent = String(getServicePrice('GRT-75', 75));
+            const _fmt = (v) => Number.isInteger(v) ? String(v) : v.toFixed(2);
+            const _vellumRateEl = document.getElementById('scp-vellum-rate-label');
+            if (_vellumRateEl) _vellumRateEl.textContent = _fmt(getServicePrice('Vellum', 10));
+            const _colorChangeRateEl = document.getElementById('scp-color-change-rate-label');
+            if (_colorChangeRateEl) _colorChangeRateEl.textContent = _fmt(getServicePrice('Color Chg', 15));
+        } catch (_) {}
+    }); }
 
     // Recommended safety apparel — curated hi-vis top sellers that pair with safety
     // stripes (2026-06-28). Always shown in the SCP view; emphasized when the rep
@@ -3820,7 +3835,14 @@ function updateAdditionalCharges() {
     const artChargeToggle = document.getElementById('art-charge-toggle');
     const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
     const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designFee = designHours * getServicePrice('GRT-75', 75);
+    const grtRate = getServicePrice('GRT-75', 75);
+    // Missing-service-code visible warning — shared helper (quote-builder-utils.js),
+    // synced with DTF/EMB (2026-07-04, Erik's #1 rule). Covers the silent case where
+    // codes loaded but GRT-75 is absent, so a rep never bills the $75 fallback unwarned.
+    if (designHours > 0 && typeof window.warnIfServiceCodeMissing === 'function') {
+        window.warnIfServiceCodeMissing('GRT-75', grtRate, 'Graphic-design');
+    }
+    const designFee = designHours * grtRate;
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
     const badge = document.getElementById('charges-badge');
@@ -4077,6 +4099,20 @@ async function printQuote() {
     const products = collectProductsFromTable();
     if (products.length === 0) {
         showToast('Add products before printing', 'error');
+        return;
+    }
+
+    // Pricing-loaded guard (ported from DTF dtf-quote-builder.js printQuote, 2026-07-04):
+    // if the pricing service never initialized (API down at page load — the form stays
+    // interactive) the products would price to $0, so Print would emit a silent $0.00
+    // customer PDF with no error. Erik's #1 rule: visible failure, never a silent wrong
+    // price. Two-part — (1) pricing loaded, (2) products subtotal > 0.
+    if (!window.currentPricingData || typeof screenPrintPricingService === 'undefined' || !screenPrintPricingService) {
+        showToast('Pricing data is not loaded — cannot print. Please refresh and try again.', 'error');
+        return;
+    }
+    if (!((window.currentPricingData.subtotal || 0) > 0)) {
+        showToast('Quote totals computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before printing.', 'error');
         return;
     }
 
@@ -4621,6 +4657,14 @@ function generateQuoteText(products, pricing) {
         const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
         lines.push(`  Back: ${backName} (${printConfig.backColors}-color)`);
     }
+    // Sleeve locations — mirror buildScreenprintPricingData's sleeveDesc so the copied
+    // text lists them (were silently omitted; sleeves are their own print locations). (2026-07-04)
+    if (printConfig.leftSleeveColors > 0) {
+        lines.push(`  Left Sleeve: (${printConfig.leftSleeveColors}-color)`);
+    }
+    if (printConfig.rightSleeveColors > 0) {
+        lines.push(`  Right Sleeve: (${printConfig.rightSleeveColors}-color)`);
+    }
     if (printConfig.isDarkGarment) {
         lines.push(`  Dark Garment: Yes (includes white underbase)`);
     }
@@ -4653,7 +4697,45 @@ function generateQuoteText(products, pricing) {
     if (pricing.ltmFee > 0) {
         lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
     }
-    lines.push(`TOTAL: $${(pricing.grandTotal || 0).toFixed(2)}`);
+
+    // Itemize the SAME fee set the on-screen footer / PDF / saved total charge
+    // (were all omitted here → copied TOTAL disagreed with the invoice). Read the
+    // fees from the same UI inputs buildScreenprintPricingData() uses. (2026-07-04)
+    const _artCharge = document.getElementById('art-charge-toggle')?.checked
+        ? (parseFloat(document.getElementById('art-charge')?.value || 0) || 0) : 0;
+    if (_artCharge > 0) lines.push(`Logo Mockup & Review: $${_artCharge.toFixed(2)}`);
+    const _designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) || 0;
+    const _designFee = _designHours * getServicePrice('GRT-75', 75);
+    if (_designFee > 0) lines.push(`Graphic Design (${_designHours} hr): $${_designFee.toFixed(2)}`);
+    const _rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0) || 0;
+    if (_rushFee > 0) lines.push(`Rush Fee: $${_rushFee.toFixed(2)}`);
+    const _xfCopy = getScpExtraFees();
+    if (_xfCopy.vellumFee > 0) lines.push(`Vellum Print (${_xfCopy.vellumQty}): $${_xfCopy.vellumFee.toFixed(2)}`);
+    if (_xfCopy.colorChangeFee > 0) lines.push(`Color Change (${_xfCopy.colorChangeQty}): $${_xfCopy.colorChangeFee.toFixed(2)}`);
+    const _shipFee = parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0;
+    if (_shipFee > 0) lines.push(`Shipping: $${_shipFee.toFixed(2)}`);
+    // Discount row (mirrors the on-screen #discount-total after % is resolved).
+    const _discTotalText = document.getElementById('discount-total')?.textContent || '';
+    const _discRow = document.getElementById('discount-row');
+    if (_discRow && _discRow.style.display !== 'none' && _discTotalText) {
+        lines.push(`Discount: ${_discTotalText}`);
+    }
+
+    lines.push('');
+    // Totals — read the DISPLAYED footer values (Subtotal / Tax / TOTAL) so the copied
+    // text always agrees with the on-screen footer, PDF, and saved total. Recomputing
+    // here previously excluded art/design/rush/vellum/color-change/tax → mismatch. (2026-07-04)
+    const _subEl = document.getElementById('pre-tax-subtotal');
+    const _taxEl = document.getElementById('tax-amount');
+    const _totalEl = document.getElementById('grand-total-with-tax');
+    const _subText = _subEl?.textContent?.trim();
+    const _taxText = _taxEl?.textContent?.trim();
+    const _totalText = _totalEl?.textContent?.trim();
+    // Fall back to the pricing object only if the footer isn't rendered yet.
+    lines.push(`Subtotal: ${_subText || ('$' + (pricing.grandTotal || 0).toFixed(2))}`);
+    const _taxLabelEl = document.getElementById('tax-rate-label');
+    lines.push(`${(_taxLabelEl?.textContent?.trim() || 'Sales Tax')}: ${_taxText || '$0.00'}`);
+    lines.push(`TOTAL: ${_totalText || ('$' + (pricing.grandTotal || 0).toFixed(2))}`);
     lines.push('');
     lines.push('Northwest Custom Apparel | 253-922-5793');
 

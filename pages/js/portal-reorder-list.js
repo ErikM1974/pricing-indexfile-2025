@@ -13,6 +13,7 @@
     'use strict';
 
     var KEY = 'nwca.reorderList.v1';
+    var MAX_ITEMS = 30;   // server hard-rejects a batch of >30 (server.js returns 400); cap here so a 31st item can't be queued and blow up the whole send.
     var PREVIEW = (function () { var m = location.pathname.match(/^\/portal-admin\/preview\/(\d+)\b/); return m ? m[1] : null; })();
     var API = '/api/portal/reorder-batch'; // preview never POSTs (read-only) — guarded in send()
 
@@ -23,6 +24,12 @@
     function add(item) {
         if (!item || !item.style) return;
         var a = read();
+        // Cap at MAX_ITEMS: the server 400s a batch of >30 on send, so refuse the 31st here with a
+        // visible message rather than let the customer build a list that fails to send (Erik's #1 rule).
+        if (a.length >= MAX_ITEMS) {
+            flash('Your Re-order List is full (' + MAX_ITEMS + ' items). Send it to your rep, then add more.');
+            return;
+        }
         a.push({
             style: item.style, color: item.color || '', title: item.title || item.style,
             method: item.method || '', sizeBreakdown: item.sizeBreakdown || '', qty: String(item.qty || ''),

@@ -139,7 +139,11 @@
                 </button>
             </div>
 
-            <div id="table-loading" class="loading-overlay">
+            <!-- Visible on FIRST PAINT (inline display:flex) so the spinner shows before
+                 any JS runs — no blank flash while quotes load. JS hides it via
+                 showLoading(false) at the end of the first renderTable(). Previously
+                 relied solely on the .loading-overlay CSS class being present. (2026-07-04) -->
+            <div id="table-loading" class="loading-overlay" style="display: flex;">
                 <div class="loading-spinner"></div>
             </div>
 
@@ -634,11 +638,21 @@
         // Customer Pickup order has Ship=n/a, which must NOT block completion — so
         // "shipped" counts as satisfied when its state is Yes OR n/a. Anything
         // without a snapshot (open/unsynced) is NOT completed → stays in Active.
+        // Memoized ShopWorks_Snapshot parse (2026-07-04): six per-row helpers each
+        // JSON.parse'd the same multi-KB snapshot on every render. Parse once, cache
+        // on the row object (quote.__snap), and every helper reads the cache. Returns
+        // {} on missing/malformed so callers can read .order without re-guarding.
+        function snapOf(quote) {
+            if (!quote) return {};
+            return quote.__snap ??= (() => {
+                try { return quote.ShopWorks_Snapshot ? (JSON.parse(quote.ShopWorks_Snapshot) || {}) : {}; }
+                catch (e) { return {}; }
+            })();
+        }
+
         function isCompletedQuote(quote) {
             if (!quote || !quote.ShopWorks_Snapshot) return false;
-            let order;
-            try { order = JSON.parse(quote.ShopWorks_Snapshot)?.order || {}; }
-            catch (_) { return false; }
+            const order = snapOf(quote).order || {};
             // Paid=n/a must ALSO not block: a $0 order (e.g. OF-0049/50/51) shows
             // Paid=n/a but is fully shipped+invoiced → it's done. Invoiced stays a
             // strict Yes (the financial close) so an all-n/a order can't falsely
@@ -656,7 +670,7 @@
         function getWoId(quote) {
             let wo = Number(quote.ShopWorks_Order_Number) || 0;
             if (!wo && quote.ShopWorks_Snapshot) {
-                try { wo = Number(JSON.parse(quote.ShopWorks_Snapshot)?.order?.id_Order) || 0; } catch (_) { /* malformed */ }
+                wo = Number(snapOf(quote)?.order?.id_Order) || 0;
             }
             return wo || null;
         }
@@ -740,9 +754,10 @@
             if (!quote.ShopWorks_Snapshot) {
                 return `<span class="milestone-na" title="ShopWorks not yet synced">—</span>`;
             }
-            let snap, order;
-            try { snap = JSON.parse(quote.ShopWorks_Snapshot) || {}; order = snap.order || {}; }
-            catch (_) { return `<span class="milestone-na" title="Snapshot parse error">—</span>`; }
+            // Memoized parse (snapOf). A malformed snapshot caches to {} → order = {} →
+            // the pills below all render as neutral "na" dashes, same visible outcome as
+            // the old dedicated parse-error dash.
+            const order = snapOf(quote).order || {};
 
             // Each pill mirrors the ShopWorks milestone state exactly (Erik
             // 2026-06-16): Yes / No / Partial / n/a / "—". Composite "Purchase
@@ -772,17 +787,15 @@
         // room for the Due column); the full name stays in the hover tooltip.
         function firstNameOf(n) { return String(n || '').trim().split(/\s+/)[0] || ''; }
         function getSalespersonInfo(quote) {
-            // 1. ShopWorks snapshot — source of truth.
+            // 1. ShopWorks snapshot — source of truth. (memoized parse via snapOf)
             if (quote.ShopWorks_Snapshot) {
-                try {
-                    const rep = JSON.parse(quote.ShopWorks_Snapshot)?.order?.CustomerServiceRep;
-                    if (rep && String(rep).trim()) {
-                        return {
-                            html: escapeHtml(firstNameOf(rep)),
-                            tooltip: `${String(rep).trim()} — From ShopWorks (Customer Service Rep on WO #${quote.ShopWorks_Order_Number || '?'})`,
-                        };
-                    }
-                } catch (_) { /* malformed snapshot — fall through */ }
+                const rep = snapOf(quote)?.order?.CustomerServiceRep;
+                if (rep && String(rep).trim()) {
+                    return {
+                        html: escapeHtml(firstNameOf(rep)),
+                        tooltip: `${String(rep).trim()} — From ShopWorks (Customer Service Rep on WO #${quote.ShopWorks_Order_Number || '?'})`,
+                    };
+                }
             }
             // 2. Quote-time rep (builder quotes capture this; storefront orders don't).
             if (quote.SalesRepName && String(quote.SalesRepName).trim()) {
@@ -805,8 +818,7 @@
         function getDueInfo(quote) {
             let due = null;
             if (quote.ShopWorks_Snapshot) {
-                try { due = (JSON.parse(quote.ShopWorks_Snapshot).order || {}).date_RequestedToShip || null; }
-                catch (_) { /* malformed */ }
+                due = (snapOf(quote).order || {}).date_RequestedToShip || null;
             }
             return due || quote.ReqShipDate || quote.DateOrderRequestedToShip || null;
         }
@@ -1145,9 +1157,9 @@
                                               onclick="event.stopPropagation();"
                                               onchange="updateQuoteStatus(this)">
                                           <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
-                                          <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled>Accepted</option>
+                                          <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled title="Set automatically when the customer accepts the quote — not manually selectable">Accepted</option>
                                           <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
-                                          <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled>Expired</option>
+                                          <option value="Expired" ${quote.Status === 'Expired' ? 'selected' : ''} disabled title="Set automatically when the quote passes its expiration date — not manually selectable">Expired</option>
                                        </select>`;
                 }
 
@@ -1585,12 +1597,15 @@
         // ONLY quotes they own. Keyed off the staff login (StaffAuthHelper →
         // sessionStorage nwca_user_email/name).
         //
-        // ⚠️ This is a UI-level guard to keep reps from deleting each other's
-        // quotes ("copacetic") — NOT a hard security boundary. The delete API
-        // (DELETE /api/quote_sessions/:id) is not auth-gated server-side, so a
-        // determined user could still call it directly. Server-side enforcement
-        // is a tracked follow-up (needs the logged-in identity plumbed to the
-        // delete endpoint). See LESSONS_LEARNED.
+        // This UI-level guard hides the delete control from reps who don't own a
+        // quote (fast feedback). It is BACKED by real server-side enforcement:
+        // deleteQuoteAPI() routes DELETE /api/quote_sessions/:id through THIS app
+        // (not the proxy) with credentials:'same-origin', so the httpOnly session
+        // cookie rides along and the server's role gate enforces ownership from the
+        // logged-in identity (returns 401 when the session is missing/expired — the
+        // client re-establishes it and retries once). A user hand-calling the
+        // endpoint without a valid session, or for a quote they don't own, is
+        // rejected server-side — the UI guard is no longer the only line of defense.
         // ============================================================
         const MASTER_DELETE_EMAILS = new Set(['erik@nwcustomapparel.com']);
 

@@ -2266,7 +2266,9 @@ app.get('/crm-logout', (req, res) => {
 app.get('/auth/saml/login', async (req, res) => {
   if (!staffSaml.isConfigured()) return res.status(503).send('Staff SSO is not configured yet.');
   try {
-    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/')) ? req.query.next : '/staff-dashboard.html';
+    // Only a genuine same-origin path: starts with '/' but NOT '//' or '/\' (which
+    // browsers treat as protocol-relative → an open-redirect to an external host).
+    const next = (typeof req.query.next === 'string' && /^\/(?![/\\])/.test(req.query.next)) ? req.query.next : '/staff-dashboard.html';
     res.redirect(await staffSaml.getLoginUrl(next));
   } catch (e) {
     console.error('[SAML] login init failed:', e.message);
@@ -2299,7 +2301,8 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
         via: 'saml',
       },
     };
-    const relay = (typeof req.body.RelayState === 'string' && req.body.RelayState.startsWith('/')) ? req.body.RelayState : '/staff-dashboard.html';
+    // Same-origin only — reject protocol-relative '//host' / '/\host' open-redirects.
+    const relay = (typeof req.body.RelayState === 'string' && /^\/(?![/\\])/.test(req.body.RelayState)) ? req.body.RelayState : '/staff-dashboard.html';
     res.redirect(relay); // cookie-session writes the Set-Cookie automatically
   } catch (e) {
     console.error('[SAML] ACS verify failed:', e.message);
@@ -4021,9 +4024,14 @@ app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, ex
     const sess = req.customerSession.portalCustomer;
     const cid = String(sess.idCustomer);
     const b = req.body || {};
-    const items = (Array.isArray(b.items) ? b.items : [])
-      .filter(it => it && String(it.style || '').trim())
-      .slice(0, 30)
+    const validItems = (Array.isArray(b.items) ? b.items : [])
+      .filter(it => it && String(it.style || '').trim());
+    // Refuse an over-cap batch with a clear error instead of silently dropping items
+    // past 30 (the client also caps at 30, but never rely on the client for this).
+    if (validItems.length > 30) {
+      return res.status(400).json({ error: 'Too many items — please send 30 or fewer per re-order request.' });
+    }
+    const items = validItems
       .map(it => ({
         style: String(it.style || '').slice(0, 50),
         color: String(it.color || '').slice(0, 80),

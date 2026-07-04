@@ -284,14 +284,13 @@
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        try {
-            var d = new Date(dateStr);
-            if (isNaN(d.getTime())) return '';
-            var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            return months[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear();
-        } catch (e) {
-            return '';
-        }
+        // Parse the DATE portion at LOCAL midnight (…T00:00:00), then render with LOCAL getters.
+        // The old code parsed with local time but rendered with getUTC* — shifting the day back
+        // for UTC+ viewers (e.g. a July 4 order showing July 3). Mirrors customer-product.js so
+        // both surfaces read the same day for the same order.
+        var d = new Date(String(dateStr).slice(0, 10) + 'T00:00:00');
+        if (isNaN(d.getTime())) return String(dateStr).slice(0, 10);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function escapeHtml(str) {
@@ -748,9 +747,17 @@
         renderTiles(((reqState && reqState.orderedColors) || []).map(function (c) {
             return { name: c.name, catalogColor: c.cat || '', image: '', swatch: '' };
         }));
+        // Stale-response guard: reqState is reassigned every time a modal opens. Capture the reqState
+        // this fetch belongs to; if the customer opens a different rec/product before it resolves, bail —
+        // otherwise we'd render modal A's colors (and its selected color) into modal B, and the WRONG
+        // color would go to the rep. Mirrors the checkMin() method-changed guard in customer-product.js.
+        var pickerReqState = reqState;
         fetch(COLORS_URL_BASE + encodeURIComponent(style), { credentials: 'same-origin' })
             .then(function (r) { return r.ok ? r.json() : { colors: [] }; })
-            .then(function (d) { var colors = (d && d.colors) || []; if (colors.length) renderTiles(colors); })
+            .then(function (d) {
+                if (reqState !== pickerReqState) return;   // a different modal opened while fetching — discard
+                var colors = (d && d.colors) || []; if (colors.length) renderTiles(colors);
+            })
             .catch(function () { /* keep the seeded ordered-color tiles */ });
     }
 

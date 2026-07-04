@@ -173,6 +173,13 @@
         if (tabName === 'review') loadReviewTab();
 
         localStorage.setItem('aeDashboardTab', tabName);
+        // Reflect the active tab in the URL hash so links are shareable/bookmarkable.
+        // Use replaceState (not location.hash =) to avoid firing a hashchange loop.
+        try {
+            if (('#' + tabName) !== location.hash) {
+                history.replaceState(null, '', '#' + tabName);
+            }
+        } catch (e) { /* hash update is non-critical */ }
     };
 
     // ── AeNav: wire section + sub-tab clicks ───────────────────────
@@ -219,7 +226,12 @@
     document.addEventListener('DOMContentLoaded', function () {
         initAeNav();
 
-        var savedTab = localStorage.getItem('aeDashboardTab');
+        // A shared/bookmarked #hash link wins over the local last-tab memory so
+        // teammates land on the tab the sender intended, not their own last tab.
+        var hashTab = (location.hash || '').replace(/^#/, '');
+        var savedTab = (hashTab && TAB_PANE_MAP.hasOwnProperty(hashTab))
+            ? hashTab
+            : localStorage.getItem('aeDashboardTab');
         if (!savedTab || !TAB_PANE_MAP.hasOwnProperty(savedTab)) {
             savedTab = 'submit';
             localStorage.setItem('aeDashboardTab', savedTab);

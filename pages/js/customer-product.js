@@ -234,8 +234,11 @@
     function fetchAvailability(color) {
         var box = document.getElementById('pp-avail'); if (!box || !color) { if (box) box.innerHTML = ''; return; }
         box.innerHTML = '<span class="pp-avail-load">checking availability&hellip;</span>';
+        // Distinguish "no stock data to show" (empty lights → blank, legitimate) from a genuine
+        // FAILURE (non-OK response or network error). On failure, never silently blank after promising
+        // "checking…" — tell the customer their rep will confirm (Erik's #1 rule).
         fetch(AVAIL + '?color=' + encodeURIComponent(color), { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { lights: {} }; })
+            .then(function (r) { if (!r.ok) throw new Error('avail ' + r.status); return r.json(); })
             .then(function (d) {
                 var lights = (d && d.lights) || {};
                 if (!Object.keys(lights).length) { box.innerHTML = ''; return; }
@@ -245,7 +248,7 @@
                     return '<span class="pp-dot pp-dot--' + lv + '" title="' + s + ': ' + labels[lv] + '">' + s + '</span>';
                 }).join('');
             })
-            .catch(function () { box.innerHTML = ''; });
+            .catch(function () { box.innerHTML = '<span class="pp-avail-note">Availability unavailable &mdash; your rep will confirm.</span>'; });
     }
 
     function buildSizeGrid(sizes) {
@@ -416,12 +419,21 @@
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (x) {
                 if (btn) { btn.disabled = false; btn.textContent = 'Send this embroidered upgrade to my rep'; }
-                if (x.ok && x.j.ok) showToast('Sent to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! They’ll follow up about your embroidered upgrade.');
+                if (x.ok && x.j.ok) showToast('Sent to your rep' + (x.j.rep ? ' (' + esc(x.j.rep) + ')' : '') + '! They’ll follow up about your embroidered upgrade.');
                 else showToast('Could not send. Please call (253) 922-5793.');
             })
             .catch(function () { if (btn) { btn.disabled = false; btn.textContent = 'Send this embroidered upgrade to my rep'; } showToast('Could not send. Please call (253) 922-5793.'); });
     }
 
+    // Digitizing "half off" promo multiplier. This is a customer-VISIBLE price promise (Erik's #1 rule).
+    // IDEALLY sourced from Caspio Service_Codes so Erik can change it with no deploy — BUT:
+    //   (a) this page does NOT load embroidery-quote-builder.js, so getServicePrice()/window._serviceCodes
+    //       are out of scope here (no service-code plumbing on customer-product.html), AND
+    //   (b) there is no discount-PERCENT service code to source anyway — the 50% is a marketing promo,
+    //       not a Caspio-configurable rate (Service_Codes has DD=$100 digitizing setup, but no "% off" code).
+    // So 0.5 stays a hardcoded fallback. ⚠️ Changing the promo currently REQUIRES a deploy. If Erik wants
+    // it Caspio-driven, add a discount-percent Service_Codes row + wire a /api/service-codes fetch here.
+    var DIGITIZING_DISCOUNT = 0.5;
     // ── Upgrade to embroidery module (engine-priced matrix — same engine as Quick Quote, Rule 9) ──
     function upgradesHtml(ups) {
         var banner = (ups[0] && ups[0].pitchImage)
@@ -482,6 +494,7 @@
         var probes = [4, 12, 36, 60, 100];
         var groups = embGroups(stitch, false);
         var byTier = {};
+        var probeFailed = false;   // Erik's #1 rule: a dropped tier = an incomplete (silently wrong) matrix.
         var chain = probes.reduce(function (ch, q) {
             return ch.then(function () {
                 return window.QuoteCartEngine.singleItemPreview(embItem(style, q), { groups: groups, deps: embDeps(), nudge: false })
@@ -496,8 +509,10 @@
                                 var residual = Math.max(0, (pv.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * q) / q);
                                 byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
                             }
+                        } else {
+                            probeFailed = true;   // engine returned but with no usable price for this tier
                         }
-                    }).catch(function () {});
+                    }).catch(function () { probeFailed = true; });
             });
         }, Promise.resolve());
         return chain
@@ -506,7 +521,10 @@
                 var digBase = 0;
                 if (digPv && digPv.fees) digBase = digPv.fees.filter(function (f) { return /digit/i.test(f.label || ''); }).reduce(function (s, f) { return s + (Number(f.amount) || 0); }, 0);
                 var tiers = Object.keys(byTier).map(function (k) { return byTier[k]; }).sort(function (a, b) { return a.range.min - b.range.min; });
-                return { tiers: tiers, digBase: r2(digBase) };
+                // If ANY probe failed, a price break is missing (e.g. no small-batch column) — never show a
+                // partial ladder that reads as complete. Signal incomplete so the caller falls back to the
+                // "ask your rep" note instead of a misleading matrix.
+                return { tiers: tiers, digBase: r2(digBase), incomplete: probeFailed };
             });
     }
     function rangeLabel(t) { return (!isFinite(t.range.max)) ? (t.range.min + '+') : (t.range.min + '–' + t.range.max); }
@@ -526,11 +544,14 @@
         if (!(window.QuoteCartEngine && window.EmbroideryPricingCalculator)) { box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>'; return; }
         probeEmbLadder(u.style, u.stitch).then(function (res) {
             if (!box) return;
-            if (!res || !res.tiers.length) box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>';
+            // res.incomplete = at least one tier probe failed → the ladder is missing a price break.
+            // Fall back to the "ask your rep" note rather than render a partial (silently-wrong) matrix.
+            if (!res || !res.tiers.length || res.incomplete) box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>';
             else box.innerHTML = embMatrixHtml(res.tiers, u.stitch);
             if (res && res.digBase > 0) {
                 var dg = document.getElementById('pp-up-dig-' + i);
-                if (dg) dg.innerHTML = '<i>&#129525;</i> <span><strong>New to embroidery?</strong> We’ll digitize your logo &mdash; <strong>$' + (res.digBase / 2).toFixed(2) + '</strong> <s>$' + res.digBase.toFixed(2) + '</s>, half off. One-time setup, and the file’s yours to reuse.</span>';
+                var discounted = r2(res.digBase * DIGITIZING_DISCOUNT);
+                if (dg) dg.innerHTML = '<i>&#129525;</i> <span><strong>New to embroidery?</strong> We’ll digitize your logo &mdash; <strong>$' + discounted.toFixed(2) + '</strong> <s>$' + res.digBase.toFixed(2) + '</s>, half off. One-time setup, and the file’s yours to reuse.</span>';
             }
         }).catch(function () { if (box) box.innerHTML = '<div class="pp-up-mxnote">Ask your rep for a quick embroidery quote.</div>'; });
     }
@@ -558,7 +579,7 @@
             .then(function (x) {
                 btn.disabled = false; btn.textContent = 'Send to my rep';
                 if (!x.ok || !x.j.ok) { err.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
-                showToast('Sent to your rep' + (x.j.rep ? ' (' + x.j.rep + ')' : '') + '! We’ll follow up with a quote.');
+                showToast('Sent to your rep' + (x.j.rep ? ' (' + esc(x.j.rep) + ')' : '') + '! We’ll follow up with a quote.');
             })
             .catch(function () { btn.disabled = false; btn.textContent = 'Send to my rep'; err.textContent = 'Could not send. Please try again.'; });
     }

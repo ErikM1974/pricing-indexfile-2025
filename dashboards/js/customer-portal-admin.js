@@ -27,6 +27,16 @@
     var d = new Date(s);
     if (isNaN(d.getTime())) return '<span class="cpa-lastlogin cpa-never">—</span>';
     var m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var now = new Date();
+    var isToday = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+    if (isToday) {
+      // Same-day rows show the time so staff can prioritize the newest re-order requests.
+      var h = d.getHours(), min = d.getMinutes();
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      var h12 = h % 12; if (h12 === 0) h12 = 12;
+      var tstr = h12 + ':' + (min < 10 ? '0' + min : min) + ' ' + ampm;
+      return '<span class="cpa-lastlogin cpa-today">Today ' + tstr + '</span>';
+    }
     return '<span class="cpa-lastlogin">' + m[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + '</span>';
   }
 
@@ -183,11 +193,14 @@
     }
     if (action === 'toggle') {
       var pk = btn.getAttribute('data-pk');
+      var temail = btn.getAttribute('data-email');
       var nowEnabled = btn.getAttribute('data-enabled') === '1';
       btn.disabled = true;
+      // Immediate feedback before the re-fetch so staff see the action registered.
+      toast((nowEnabled ? 'Disabling access' : 'Enabling access') + (temail ? ' for ' + temail : '') + '…');
       try {
         await api(ACCESS_API + '/' + encodeURIComponent(pk), { method: 'PUT', body: JSON.stringify({ enabled: nowEnabled ? 'No' : 'Yes' }) });
-        toast(nowEnabled ? 'Access disabled' : 'Access enabled');
+        toast((nowEnabled ? 'Access disabled' : 'Access enabled') + (temail ? ' for ' + temail : ''));
         await loadInvites();
       } catch (err) {
         if (err.message !== 'auth') { toast(err.message, true); btn.disabled = false; }
@@ -199,9 +212,10 @@
       var demail = btn.getAttribute('data-email');
       if (!window.confirm('Remove portal access for ' + demail + '?\n\nThey will no longer be able to log in. (You can always re-invite them later.)')) return;
       btn.disabled = true;
+      // Immediate success toast before the table re-fetch (Erik's review: no silent re-load).
+      toast('Access removed for ' + demail);
       try {
         await api(ACCESS_API + '/' + encodeURIComponent(dpk), { method: 'DELETE' });
-        toast('Access removed for ' + demail);
         await loadInvites();
       } catch (err) {
         if (err.message !== 'auth') { toast(err.message, true); btn.disabled = false; }
