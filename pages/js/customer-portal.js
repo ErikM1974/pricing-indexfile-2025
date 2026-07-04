@@ -29,6 +29,18 @@
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
     if (PREVIEW) showPreviewRibbon();
 
+    // Hide the header logo if it fails to load (was an inline onerror — moved here per
+    // the no-inline-code rule). In staff preview, "Sign out" would end the STAFF session,
+    // so point it at the preview exit instead.
+    (function () {
+        var logo = document.getElementById('cp-header-logo');
+        if (logo) logo.addEventListener('error', function () { this.style.display = 'none'; });
+        if (PREVIEW) {
+            var so = document.querySelector('.cp-header-link--signout');
+            if (so) { so.setAttribute('href', '/staff-dashboard.html'); so.textContent = 'Exit preview'; }
+        }
+    })();
+
     // ── Load portal data (session-scoped, single gated same-origin call) ──
     // Phase 2 (#6): the customer is identified by their verified LOGIN SESSION, not the URL.
     // The server returns this customer's id (data.customerId) so we can build detail links.
@@ -45,7 +57,7 @@
     //    that summarizes at a glance. Sections keep their own async load logic untouched —
     //    the tab panel only controls WHICH group is visible; loaders control WHEN content
     //    appears inside it. Snapshot values are polled from the count spans as data lands. ──
-    var _cpOpenBalance = 0, _cpOpenCount = 0;
+    var _cpOpenBalance = 0, _cpOpenCount = 0, _ordersLoaded = false, _ordersFailed = false;
     setupTabs();
     function setupTabs() {
         var barEl = document.getElementById('cp-tabs-bar'), snapEl = document.getElementById('cp-snapshot');
@@ -58,6 +70,8 @@
             if (tab) { e.preventDefault(); switchTab(tab.getAttribute('data-tab'), true); return; }
             var more = e.target.closest('.cp-rows-more');
             if (more) { toggleRows(more); return; }
+            var retry = e.target.closest('[data-cp-retry]');
+            if (retry) { e.preventDefault(); var what = retry.getAttribute('data-cp-retry'); if (what === 'orders') loadOrders(); else if (what === 'products') loadProducts(); return; }
         });
         switchTab('products');
         // Belt: poll the snapshot while the async loaders populate. Window must outlast the
@@ -93,8 +107,15 @@
         set('cp-snap-logos', txt('cp-logos-count'));
         var balEl = document.getElementById('cp-snap-balance');
         if (balEl) {
-            balEl.textContent = _cpOpenCount ? money(_cpOpenBalance) : '$0';
-            balEl.classList.toggle('cp-snap-bal--due', _cpOpenCount > 0);
+            if (_ordersFailed || !_ordersLoaded) {
+                // Never assert "$0" before invoices load or when the load failed —
+                // a false $0 to a customer who owes money is the worst-case bug.
+                balEl.textContent = '—';
+                balEl.classList.remove('cp-snap-bal--due');
+            } else {
+                balEl.textContent = _cpOpenCount ? money(_cpOpenBalance) : '$0';
+                balEl.classList.toggle('cp-snap-bal--due', _cpOpenCount > 0);
+            }
         }
     }
 
@@ -277,7 +298,10 @@
         if (!str) return '';
         var div = document.createElement('div');
         div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
+        // textContent→innerHTML escapes & < > but NOT " — and these values are
+        // concatenated into double-quoted attributes (data-title, title, alt).
+        // Escape the quote too so a value with " can't break out of the attribute.
+        return div.innerHTML.replace(/"/g, '&quot;');
     }
 
     function showError(title, message) {
@@ -302,14 +326,45 @@
 
     // ── Orders + Invoices (Phase 3) — one same-origin call feeds both tables ──
     function loadOrders() {
+        // Erik's #1 rule: never turn an API failure into a reassuring empty state.
+        // A 503/timeout must show a visible error + Retry, not "No orders yet" / "$0".
         fetch(ORDERS_URL, { credentials: 'same-origin' })
-            .then(function (resp) { return resp.ok ? resp.json() : { orders: [] }; })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('orders ' + resp.status);
+                return resp.json();
+            })
             .then(function (data) {
+                _ordersFailed = false; _ordersLoaded = true;
                 var orders = (data && data.orders) || [];
                 renderOrders(orders);
                 renderInvoices(orders);
             })
-            .catch(function () { renderOrders([]); renderInvoices([]); });
+            .catch(function (err) {
+                console.error('Portal orders load failed:', err);
+                _ordersFailed = true;
+                renderTableError('cp-orders-wrap', 'cp-orders-empty', 'cp-orders-count', 'orders', "We couldn't load your orders");
+                renderTableError('cp-invoices-wrap', 'cp-invoices-empty', 'cp-invoices-count', 'orders', "We couldn't load your invoices");
+                updateSnapshot();
+            });
+    }
+
+    // Visible failure state for a portal table: a retry banner in place of the
+    // table, count shown as "—" (not 0), and the empty-state copy suppressed so a
+    // failure never reads as "you have none".
+    function renderTableError(wrapId, emptyId, countId, retryKey, msg) {
+        var wrap = document.getElementById(wrapId);
+        var empty = document.getElementById(emptyId);
+        var count = document.getElementById(countId);
+        if (count) count.textContent = '—';
+        if (empty) empty.style.display = 'none';
+        if (wrap) {
+            wrap.innerHTML = '<div class="cp-load-error" role="alert">' +
+                '<p>' + escapeHtml(msg) + ' right now.</p>' +
+                '<p class="cp-load-error-sub">Refresh the page or call us at ' +
+                '<a href="tel:+12539225793">253-922-5793</a> and we\'ll help.</p>' +
+                '<button type="button" class="cp-load-retry" data-cp-retry="' + retryKey + '">Retry</button>' +
+                '</div>';
+        }
     }
 
     function money(n) {
@@ -464,7 +519,7 @@
 
     // JSON goes inside a single-quoted attribute — escape the few chars that would break it.
     function escapeAttr(s) {
-        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
     }
 
     // "Your Products" now supports search + sort + show-more so a 25-style account isn't a wall of cards.
@@ -474,7 +529,10 @@
 
     function loadProducts() {
         fetch(MYPRODUCTS_URL, { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { products: [] }; })
+            .then(function (r) {
+                if (!r.ok) throw new Error('products ' + r.status);
+                return r.json();
+            })
             .then(function (d) {
                 _products = (d && d.products) || [];
                 document.getElementById('cp-section-products').style.display = 'block';
@@ -490,7 +548,16 @@
                 if (toolbar && _products.length > 6) toolbar.style.display = 'flex'; // aids only when they help
                 renderProducts();
             })
-            .catch(function () { /* catalog is non-critical — stay quiet */ });
+            .catch(function (err) {
+                // Don't tell a customer with 25 past products they have none. Show a
+                // retry in place of the empty state so a 503 reads as "try again".
+                console.error('Portal products load failed:', err);
+                document.getElementById('cp-section-products').style.display = 'block';
+                var toolbar = document.getElementById('cp-products-toolbar');
+                if (toolbar) toolbar.style.display = 'none';
+                document.getElementById('cp-products-grid').innerHTML = '';
+                renderTableError('cp-products-grid', 'cp-products-empty', 'cp-products-count', 'products', "We couldn't load your products");
+            });
     }
 
     function renderProducts() {
@@ -783,7 +850,10 @@
     var rewardBalance = 0;
     function loadRewards() {
         fetch(REWARDS_URL, { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { balance: 0 }; })
+            .then(function (r) {
+                if (!r.ok) throw new Error('rewards ' + r.status);
+                return r.json();
+            })
             .then(function (d) {
                 rewardBalance = Number(d && d.balance) || 0;
                 if (rewardBalance > 0) {
@@ -791,7 +861,17 @@
                     document.getElementById('cp-rewards').style.display = 'flex';
                 }
             })
-            .catch(function () { });
+            .catch(function (err) {
+                // A blip must not silently hide a real balance. If the card is
+                // already showing a known balance, leave it; only surface the
+                // "unavailable" hint, never a false $0.
+                console.error('Portal rewards load failed:', err);
+                var balEl = document.getElementById('cp-rewards-balance');
+                if (balEl && !balEl.textContent.trim()) {
+                    balEl.textContent = 'Balance unavailable — refresh';
+                    document.getElementById('cp-rewards').style.display = 'flex';
+                }
+            });
     }
     function openRedeem() {
         if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }

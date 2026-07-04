@@ -917,17 +917,18 @@
             if (preview && preview.ok && preview.lines && preview.lines.length) {
                 var label = preview.tierLabel || ('q' + probes[i]);
                 if (!byTier[label]) {
-                    // per-piece base = baseUnit + per-piece service lines (AS-GARM stitch surcharge,
-                    // additional-logo AL) + any residual per-piece upcharge that only shows in
-                    // groupTotal (cap 3D-puff / laser-patch). Clamp >=0 so a DTG LTM tier's floor
-                    // under-recovery never shaves a cent.
+                    // Per-tier base rate = everything that scales with qty EXCEPT the one-time
+                    // setup fees and the flat small-batch (LTM) fee, which is disclosed on its own
+                    // row. Derive from groupTotal (which already folds in per-piece service lines —
+                    // stitch surcharge, AL — and any cap upcharge) so it is mode-agnostic: correct
+                    // whether the engine's baseUnit is LTM-stripped (EMB/SCP/DTG) OR LTM-inclusive
+                    // (DTF). The previous baseUnit-based math double-counted DTF's baked-in $50.
+                    // Mirrors pdp-configurator.js probe math so the 3 surfaces can't disagree.
                     var pq = probes[i];
-                    var bu = preview.lines[0].baseUnit;
-                    var svcPerPc = (preview.serviceLines || []).reduce(function (s, sl) { return s + (Number(sl.total) || 0); }, 0) / pq;
                     var oneTimeT = (preview.fees || []).reduce(function (s, f) { return s + (f.oneTime ? (Number(f.amount) || 0) : 0); }, 0);
                     var ltmFlat = (preview.ltm && preview.ltm.fee) || 0;
-                    var residual = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat - (bu + svcPerPc) * pq) / pq);
-                    byTier[label] = { label: label, base: r2(bu + svcPerPc + residual), ltmFee: ltmFlat, range: parseRange(label) };
+                    var base = Math.max(0, (preview.groupTotal - oneTimeT - ltmFlat) / pq);
+                    byTier[label] = { label: label, base: r2(base), ltmFee: ltmFlat, range: parseRange(label) };
                 }
             }
         }

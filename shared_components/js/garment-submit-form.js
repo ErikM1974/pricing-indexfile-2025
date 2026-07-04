@@ -610,7 +610,14 @@ var GarmentSubmitForm = (function () {
     function buildGarmentRowHtml(row, idx) {
         var num = idx + 1;
         var colorControl;
-        if (row.custom) {
+        if (row.colorsError) {
+            // Transient color-load failure — offer a retry instead of silently going custom
+            // (which would drop the inventory-critical CATALOG_COLOR).
+            colorControl = '<div class="gsf-color-error" id="gsf-color-err-' + idx + '">'
+                + '<span class="gsf-color-error-msg">⚠ Couldn’t load colors.</span>'
+                + ' <button type="button" class="gsf-color-retry" data-idx="' + idx + '">Retry</button>'
+                + '</div>';
+        } else if (row.custom) {
             colorControl = '<input type="text" class="gsf-input gsf-garment-color-text" id="gsf-color-' + idx + '" placeholder="Type color..." value="' + escapeAttr(row.colorName) + '">';
         } else if (row.colors && row.colors.length) {
             var opts = '<option value="">- color -</option>';
@@ -662,6 +669,13 @@ var GarmentSubmitForm = (function () {
             colorEl.addEventListener('change', function () { onColorChosen(idx, colorEl.value); });
             colorEl.addEventListener('input', function () { if (garmentRows[idx].custom) onColorChosen(idx, colorEl.value); });
         }
+        var retryBtn = document.querySelector('#gsf-color-err-' + idx + ' .gsf-color-retry');
+        if (retryBtn) {
+            retryBtn.addEventListener('click', function () {
+                var v = (garmentRows[idx] && garmentRows[idx].style) || '';
+                if (v) loadColorsForRow(idx, v);
+            });
+        }
         var removeBtn = document.querySelector('.gsf-row-remove[data-idx="' + idx + '"]');
         if (removeBtn) {
             removeBtn.addEventListener('click', function () {
@@ -710,8 +724,16 @@ var GarmentSubmitForm = (function () {
 
     function loadColorsForRow(idx, style) {
         if (!style) return;
+        if (garmentRows[idx]) garmentRows[idx].colorsError = false;
         fetch(API_BASE + '/api/product-colors?styleNumber=' + encodeURIComponent(style))
-            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (r) {
+                // A non-ok response is a TRANSIENT error, NOT "this style has no colors".
+                // Throw so it lands in .catch and shows a retry state — never silently
+                // switch a real style to custom (that would drop CATALOG_COLOR, which is
+                // inventory-critical for the ShopWorks PO).
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+            })
             .then(function (data) {
                 var raw = (data && (data.colors || data.data || data.Result)) || (Array.isArray(data) ? data : []);
                 var colors = (raw || []).map(function (c) {
@@ -723,6 +745,9 @@ var GarmentSubmitForm = (function () {
                     };
                 }).filter(function (c) { return c.name; });
                 garmentRows[idx].colors = colors;
+                garmentRows[idx].colorsError = false;
+                // A genuinely empty list (successful fetch, no colors) legitimately means
+                // "type a custom color". A fetch error does NOT reach this branch.
                 garmentRows[idx].custom = colors.length === 0;
                 if (colors.length === 0) {
                     garmentRows[idx].catalogColor = '';
@@ -731,9 +756,13 @@ var GarmentSubmitForm = (function () {
                 }
                 renderGarmentRows();
             })
-            .catch(function () {
+            .catch(function (err) {
+                // Transient failure: surface a visible retry state on the row and do NOT
+                // set custom=true, so a temporary API blip isn't baked into the request as
+                // a missing CATALOG_COLOR.
+                console.error('[GarmentSubmitForm] Failed to load colors for style "' + style + '":', err);
                 garmentRows[idx].colors = [];
-                garmentRows[idx].custom = true;
+                garmentRows[idx].colorsError = true;
                 renderGarmentRows();
             });
     }
@@ -1540,8 +1569,18 @@ var GarmentSubmitForm = (function () {
         return uploadNext(0);
     }
 
+    function notifySteveFailed() {
+        // The request WAS created — only the email to Steve didn't go through. Tell the
+        // rep so they can ping Steve directly instead of assuming he was notified.
+        showToast('Request created, but the email to Steve failed — please ping him directly.', 'error');
+    }
+
     function sendNotificationEmails(designId, companyName, aeName, aeEmail, salesRepName, salesRepEmail) {
-        if (typeof emailjs === 'undefined') return;
+        if (typeof emailjs === 'undefined') {
+            console.error('[GarmentSubmitForm] emailjs is undefined — Steve was NOT notified for design', designId);
+            notifySteveFailed();
+            return;
+        }
         try {
             emailjs.init('4qSbDO-SQs19TbP80');
             var detailLink = SITE_ORIGIN + '/art-request/' + (designId || '');
@@ -1556,7 +1595,10 @@ var GarmentSubmitForm = (function () {
                 header_title: 'New Garment Art Request',
                 detail_link: detailLink,
                 from_name: aeName
-            }).catch(function () {});
+            }).catch(function (err) {
+                console.error('[GarmentSubmitForm] EmailJS send to Steve failed for design', designId, err);
+                notifySteveFailed();
+            });
 
             if (aeEmail && aeEmail !== STEVE_EMAIL) {
                 emailjs.send('service_jgrave3', 'template_art_note_added', {
@@ -1588,7 +1630,8 @@ var GarmentSubmitForm = (function () {
                 }).catch(function () {});
             }
         } catch (e) {
-            console.warn('[GarmentSubmitForm] EmailJS failed:', e);
+            console.error('[GarmentSubmitForm] EmailJS setup failed — Steve was NOT notified for design', designId, e);
+            notifySteveFailed();
         }
     }
 

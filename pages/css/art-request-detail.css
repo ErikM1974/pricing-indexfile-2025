@@ -150,6 +150,15 @@ body {
     white-space: nowrap;
 }
 
+/* "Whose turn is it" hint shown next to the status chip (e.g. "· your approval"). */
+.ard-status-actor-hint {
+    align-self: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b7280;
+    white-space: nowrap;
+}
+
 .ard-status-badge--submitted { background: #f3e8ff; color: #6f42c1; }
 .ard-status-badge--inprogress { background: #e6f3ff; color: #0066cc; }
 .ard-status-badge--revision { background: #fff4e6; color: #cc6d00; }
@@ -3953,13 +3962,23 @@ body.ard-customer-view .ard-footer {
 .ps-art-fig figcaption { font-size: 7.5pt; color: #666; margin-top: 2px; }
 
 @media print {
-    /* Hide all the on-screen UI; show only the job sheet. */
-    .ard-header, #ard-loading, #ard-error, .ard-content, .ard-footer,
-    .ard-modal-overlay, .art-modal-overlay, .ard-lightbox,
-    .approval-modal-overlay, .share-customer-modal, #share-customer-overlay,
-    .ard-print-btn { display: none !important; }
-    .ard-print-sheet { display: block !important; }
-    html, body { background: #fff !important; margin: 0; padding: 0; }
+    /* Hide all the on-screen UI; show only the job sheet. Gated on
+       body.ard-has-print-sheet (added only when the internal sheet is built —
+       never in customer view) so customers can still print their proof page. */
+    body.ard-has-print-sheet .ard-header,
+    body.ard-has-print-sheet #ard-loading,
+    body.ard-has-print-sheet #ard-error,
+    body.ard-has-print-sheet .ard-content,
+    body.ard-has-print-sheet .ard-footer,
+    body.ard-has-print-sheet .ard-modal-overlay,
+    body.ard-has-print-sheet .art-modal-overlay,
+    body.ard-has-print-sheet .ard-lightbox,
+    body.ard-has-print-sheet .approval-modal-overlay,
+    body.ard-has-print-sheet .share-customer-modal,
+    body.ard-has-print-sheet #share-customer-overlay,
+    body.ard-has-print-sheet .ard-print-btn { display: none !important; }
+    body.ard-has-print-sheet .ard-print-sheet { display: block !important; }
+    body.ard-has-print-sheet { background: #fff !important; margin: 0; padding: 0; }
     @page { size: letter portrait; margin: 0.45in; }
     /* Avoid awkward breaks inside a section's table. */
     .ps-tbl, .ps-kv, .ps-exact, .ps-check { page-break-inside: avoid; }

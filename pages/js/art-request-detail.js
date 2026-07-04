@@ -313,6 +313,7 @@
         const statusClean = rawStatus.replace(/[^\p{L}\p{N}\s-]/gu, '').trim();
         statusBadge.textContent = statusClean;
         statusBadge.className = 'ard-status-badge ' + getStatusClass(statusClean);
+        renderStatusActorHint(statusBadge, statusClean);
 
         // Revision badge
         const revCount = req.Revision_Count || 0;
@@ -1744,6 +1745,14 @@
     function buildPrintSheet(req) {
         var sheet = document.getElementById('ard-print-sheet');
         if (!sheet) return;
+        // Internal job sheet — never build it in customer view. Otherwise a
+        // customer's Ctrl+P hits the @media print rule that hides all page
+        // content and shows only .ard-print-sheet, so they'd print the internal
+        // sheet and could never print their proof. The print CSS is gated on
+        // the body.ard-has-print-sheet class (added only below), so with the
+        // sheet unbuilt the print rule stays inert and normal printing works.
+        if (isCustomerView) return;
+        document.body.classList.add('ard-has-print-sheet');
 
         function val(v) { return (v === null || v === undefined || v === '') ? '' : String(v); }
         function kv(label, value) {
@@ -4421,7 +4430,14 @@
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ Approval_Status: 'Customer approved — ready for production' })
-            }).catch(function () {});
+            }).then(function (r) {
+                if (!r.ok) throw new Error('Approval_Status mirror PUT ' + r.status);
+            }).catch(function (err) {
+                // Status says "Approved" but the structured Approval_Status pill
+                // may now disagree — surface it instead of failing silently.
+                console.error('Approval_Status mirror write failed:', err);
+                showArdToast('Status pill sync failed — refresh to confirm', 'warn');
+            });
 
             // 2. Create approval note (includes which mockup was selected)
             const aeEmail = REP_MAP[aeName] || 'sales@nwcustomapparel.com';
@@ -4843,6 +4859,7 @@
         const badge = document.getElementById('ard-status-badge');
         badge.textContent = text;
         badge.className = 'ard-status-badge ' + cssClass;
+        renderStatusActorHint(badge, text);
     }
 
     // ── Notes Timeline ──────────────────────────────────────────────────
@@ -5200,6 +5217,36 @@
         }
     }
 
+    // Whose turn is it? A short actor hint rendered next to the status chip so
+    // work doesn't stall with each side waiting on the other. Derived from the
+    // status + current view/role. Text is escaped before insertion.
+    function statusActorHint(status) {
+        const lower = (status || '').toLowerCase().replace(/\s+/g, '');
+        if (lower.includes('awaitingapproval')) {
+            return isAeView ? 'your approval' : 'waiting on rep';
+        }
+        if (lower.includes('revisionrequested')) {
+            return 'waiting on art';
+        }
+        if (lower.includes('submitted') || lower.includes('inprogress')) {
+            return 'waiting on art';
+        }
+        return '';
+    }
+
+    function renderStatusActorHint(badgeEl, status) {
+        if (!badgeEl || !badgeEl.parentNode) return;
+        var existing = document.getElementById('ard-status-actor-hint');
+        if (existing) existing.remove();
+        var hint = statusActorHint(status);
+        if (!hint) return;
+        var span = document.createElement('span');
+        span.id = 'ard-status-actor-hint';
+        span.className = 'ard-status-actor-hint';
+        span.textContent = '· ' + hint;
+        badgeEl.parentNode.insertBefore(span, badgeEl.nextSibling);
+    }
+
     function getStatusClass(status) {
         const lower = status.toLowerCase().replace(/\s+/g, '');
         if (lower.includes('submitted')) return 'ard-status-badge--submitted';
@@ -5225,7 +5272,10 @@
     function escapeHtml(str) {
         const div = document.createElement('div');
         div.textContent = str;
-        return div.innerHTML;
+        // textContent→innerHTML does NOT escape double quotes; this output is
+        // interpolated into double-quoted src="…"/alt="…" attributes, so escape
+        // " too or a value containing a quote can break out of the attribute.
+        return div.innerHTML.replace(/"/g, '&quot;');
     }
 
     function showFinalChecklistModal(slotUrl) {

@@ -36,6 +36,12 @@
             <button class="btn-header btn-new-quote" onclick="dtgConfirmNewQuote()">
                 <i class="fas fa-plus"></i> New Quote
             </button>
+            <!-- Persistent Save so DTG matches EMB/DTF/SCP (Rule 8). Previously the ONLY
+                 save control lived inside the hidden AI chat panel, so reps thought DTG
+                 quotes couldn't be saved. Calls the same handleSaveQuote path. -->
+            <button class="btn-header btn-save-quote" onclick="window.dtgSaveQuote && window.dtgSaveQuote()">
+                <i class="fas fa-link"></i> Save &amp; Share Link
+            </button>
             <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
