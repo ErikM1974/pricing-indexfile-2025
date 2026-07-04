@@ -3004,6 +3004,33 @@ async function requireCustomer(req, res, next) {
   return next();
 }
 
+// ── Authenticated same-origin forwarder for ManageOrders READS (airtight PII path) ──
+// Browser staff pages can call THESE (SAML-cookie authed, same-origin) instead of the
+// proxy directly, so the proxy's PII gate can later be tightened from secret-or-origin
+// to secret-only. Staff-session gated; forwards to the proxy WITH the CRM secret.
+// GET reads only. Callers use moFetch() (shared_components/js/mo-fetch.js), which falls
+// back to the direct proxy call if this route 401s (customer context) or errors — so the
+// migration can't break any page. The gate flip is the LAST, browser-verified step.
+function moForwardTo(buildSubPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const qi = req.originalUrl.indexOf('?');
+      const qs = qi >= 0 ? req.originalUrl.slice(qi) : '';
+      const url = `${CRM_API_BASE}/api/manageorders/${buildSubPath(req)}${qs}`;
+      const r = await fetch(url, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000) });
+      const body = await r.text();
+      res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+    } catch (e) {
+      console.error('[mo-forward]', req.originalUrl, e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  };
+}
+app.get('/api/mo/orders', requireStaff, moForwardTo(() => 'orders'));
+app.get('/api/mo/orders/:no', requireStaff, moForwardTo(req => 'orders/' + encodeURIComponent(req.params.no)));
+app.get('/api/mo/lineitems/:no', requireStaff, moForwardTo(req => 'lineitems/' + encodeURIComponent(req.params.no)));
+
 // Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
 async function fetchPortalAccess(email) {
   if (!CRM_API_SECRET) return null;

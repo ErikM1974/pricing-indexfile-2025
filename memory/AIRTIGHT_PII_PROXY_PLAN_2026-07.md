@@ -1,6 +1,33 @@
 # Airtight PII proxy — rollout plan (2026-07-04)
 
-**Status:** PLANNED, not built. The live mitigation (`requireCrmSecretOrBrowserOrigin`,
+## Progress (2026-07-04)
+- ✅ **ManageOrders forwarders built + deployed-safe.** `/api/mo/{orders,orders/:no,lineitems/:no}`
+  in `server.js` (`moForwardTo`, `requireStaff`, forwards with the CRM secret). Client helper
+  `shared_components/js/mo-fetch.js` (`window.moFetch`) tries the forwarder first and FALLS BACK
+  to the direct proxy on 401/non-2xx/network — so no page can break. Unit-tested
+  (`tests/unit/mo-fetch.test.js`).
+- ✅ **Repointed the manageorders `orders`/`lineitems` reads** in art-hub-steve, art-hub-ae,
+  mockup-detail, mockup-ruth, art-request-detail (+ `mo-fetch.js` script on their 5 host pages).
+  `customers` calls left on the proxy (not PII-gated). The `?view=customer` art-detail branch is
+  safe via the fallback (forwarder 401s → proxy, which the customer's allowlisted-Origin browser
+  reaches).
+- ⏳ **REMAINING to make it airtight:** (1) repoint the same-pattern callers for `/api/artrequests`
+  GET and `/api/mockups` GET (more sites; add customer-scoped forwarders where a customer view reads
+  them); (2) build the customer-session forwarder `/api/portal/mo/*` if we want to remove the
+  fallback for the art-detail customer branch; (3) **flip the proxy PII gate** from
+  `requireCrmSecretOrBrowserOrigin` → `requireCrmApiSecret` — ONLY after browser-verifying every
+  repointed staff tool + the customer proof view. That flip is the step that removes the
+  origin-spoof residual. Until then the origin-or-secret gate stays as the live protection.
+
+## Browser verification checklist (before the gate flip)
+Log in as staff and confirm order/lineitem data still renders on: art-hub-steve, ae-dashboard
+(art-hub-ae), mockup-detail, art-hub-ruth (mockup-ruth), art-request-detail (staff view). Then open
+art-request-detail `?view=customer` via a real magic link and confirm order history still shows.
+Logged-out `curl /api/mo/orders?id_Customer=1` must return 401.
+
+---
+
+**Original status (superseded above):** PLANNED, not built. The live mitigation (`requireCrmSecretOrBrowserOrigin`,
 GET-only, deployed proxy v877) already blocks anonymous enumeration — verified in prod:
 anon PII read → 401, allowlisted-Origin → 200, public endpoints → 200. This plan closes
 the **residual**: a request that *spoofs* an allowlisted `Origin` still passes, because a
