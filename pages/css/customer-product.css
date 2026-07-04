@@ -103,6 +103,13 @@
 }
 .pp-reorder textarea:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
 .pp-req-error { color: #b3261e; font-size: 13px; min-height: 1em; margin-bottom: 6px; }
+.pp-req-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.pp-addlist-btn {
+    background: var(--cp-surface); color: var(--cp-theme-dark); border: 1px solid var(--cp-theme-light);
+    border-radius: 8px; padding: 11px 16px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
+    transition: background .12s, border-color .12s;
+}
+.pp-addlist-btn:hover { background: var(--cp-theme-bg); border-color: var(--cp-theme); }
 
 /* Decoration-method picker (re-order) — defaulted from history; enforces the API minimum, no price */
 .pp-methods { display: flex; flex-wrap: wrap; gap: 8px; }
