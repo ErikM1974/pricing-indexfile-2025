@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.04.1">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.04.3">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.07.03.1">
 </head>
 <body>
@@ -58,15 +58,17 @@
             <a class="cp-snap" data-tab="invoices" href="#"><span class="cp-snap-label">Open balance</span><span class="cp-snap-val" id="cp-snap-balance">&mdash;</span></a>
             <a class="cp-snap" data-tab="logos" href="#"><span class="cp-snap-label">Logos</span><span class="cp-snap-val" id="cp-snap-logos">&mdash;</span></a>
         </div>
-        <div class="cp-tabs" id="cp-tabs" role="tablist" style="display:none;">
-            <button class="cp-tab is-active" type="button" role="tab" data-tab="products">Your products</button>
-            <button class="cp-tab" type="button" role="tab" data-tab="orders">Orders</button>
-            <button class="cp-tab" type="button" role="tab" data-tab="invoices">Invoices</button>
-            <button class="cp-tab" type="button" role="tab" data-tab="logos">My logos</button>
+        <div class="cp-tabs-bar" id="cp-tabs-bar" style="display:none;">
+            <div class="cp-tabs" id="cp-tabs" role="tablist">
+                <button class="cp-tab is-active" type="button" role="tab" id="cp-tab-products" aria-controls="cp-panel-products" aria-selected="true" data-tab="products">Your products</button>
+                <button class="cp-tab" type="button" role="tab" id="cp-tab-orders" aria-controls="cp-panel-orders" aria-selected="false" data-tab="orders">Orders</button>
+                <button class="cp-tab" type="button" role="tab" id="cp-tab-invoices" aria-controls="cp-panel-invoices" aria-selected="false" data-tab="invoices">Invoices</button>
+                <button class="cp-tab" type="button" role="tab" id="cp-tab-logos" aria-controls="cp-panel-logos" aria-selected="false" data-tab="logos">My logos</button>
+            </div>
         </div>
 
         <!-- TAB: Your products (products + recommendations) -->
-        <div class="cp-tabpanel" data-panel="products">
+        <div class="cp-tabpanel" data-panel="products" id="cp-panel-products" role="tabpanel" aria-labelledby="cp-tab-products" tabindex="-1">
         <!-- Your Products (re-order) -->
         <section class="cp-section" id="cp-section-products" style="display:none;">
             <div class="cp-section-header">
@@ -102,7 +104,7 @@
         </div><!-- /TAB products -->
 
         <!-- TAB: My logos -->
-        <div class="cp-tabpanel" data-panel="logos" style="display:none;">
+        <div class="cp-tabpanel" data-panel="logos" id="cp-panel-logos" role="tabpanel" aria-labelledby="cp-tab-logos" tabindex="-1" style="display:none;">
         <!-- My Logos — the customer's logos + design proofs on file (auto-surfaced from mockups + art) -->
         <section class="cp-section" id="cp-section-logos" style="display:none;">
             <div class="cp-section-header">
@@ -121,7 +123,7 @@
         </div><!-- /TAB logos -->
 
         <!-- TAB: Orders -->
-        <div class="cp-tabpanel" data-panel="orders" style="display:none;">
+        <div class="cp-tabpanel" data-panel="orders" id="cp-panel-orders" role="tabpanel" aria-labelledby="cp-tab-orders" tabindex="-1" style="display:none;">
         <!-- Orders section (moved up — the customer's live business) -->
         <section class="cp-section" id="cp-section-orders">
             <div class="cp-section-header">
@@ -137,7 +139,7 @@
         </div><!-- /TAB orders -->
 
         <!-- TAB: Invoices -->
-        <div class="cp-tabpanel" data-panel="invoices" style="display:none;">
+        <div class="cp-tabpanel" data-panel="invoices" id="cp-panel-invoices" role="tabpanel" aria-labelledby="cp-tab-invoices" tabindex="-1" style="display:none;">
         <!-- Invoices &amp; Balances section (moved up) -->
         <section class="cp-section" id="cp-section-invoices">
             <div class="cp-section-header">
@@ -236,6 +238,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.03.1"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.04.2"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.04.4"></script>
 </body>
 </html>

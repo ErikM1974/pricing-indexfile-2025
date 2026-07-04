@@ -550,7 +550,9 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     position: fixed; inset: 0;
     background: rgba(20,30,20,.5);
     display: flex; align-items: center; justify-content: center;
-    padding: 5vh 16px; z-index: 1000; overflow-y: auto;
+    /* Above the reorder-list FAB (1000) AND its drawer (1001) so neither floats over an open
+       modal; still below the image lightbox (1200). (Pre-existing FAB/modal z-tie, fixed here.) */
+    padding: 5vh 16px; z-index: 1050; overflow-y: auto;
 }
 .cp-modal {
     background: #fff; border-radius: var(--cp-radius-lg); width: 100%; max-width: 440px;
@@ -719,11 +721,23 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-snap-val { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--cp-ink); }
 .cp-snap-val.cp-snap-bal--due { color: #b3261e; }
 
+.cp-tabs-bar {
+    /* Sticky so a customer scrolling a long Orders/Invoices table can still switch tabs.
+       No fixed header above (the green .cp-header AND the staff-preview ribbon both scroll
+       away in normal flow), so top:0 is correct. The opaque page-bg + padding-bottom — NOT a
+       transparent margin — means content scrolling under the stuck bar can't bleed through. */
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--cp-page-bg);
+    padding: 6px 0 20px;
+    margin: 0;
+}
 .cp-tabs {
     display: flex;
     gap: 2px;
     border-bottom: 1px solid var(--cp-border);
-    margin: 0 0 24px;
+    margin: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -748,6 +762,26 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 
 /* Section already has its own top margin; kill the doubled gap at a panel's start. */
 .cp-tabpanel > .cp-section:first-child { margin-top: 0; }
+/* Panel gets programmatic focus on tab switch (a11y) — it's a container, not a control, so
+   no visible ring; screen readers still announce it via role=tabpanel + aria-labelledby. */
+.cp-tabpanel:focus { outline: none; }
+
+/* Long tables (Orders/Invoices) cap at the recent ROW_CAP rows; the rest reveal on demand. */
+.cp-row-extra { display: none; }
+.cp-rows-morewrap { padding: 12px 8px 4px; text-align: center; }
+.cp-rows-more {
+    background: none;
+    border: none;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cp-theme-dark);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: var(--cp-radius-sm);
+    transition: background .12s ease;
+}
+.cp-rows-more:hover { background: var(--cp-theme-bg); }
 
 @media (max-width: 560px) {
     .cp-snapshot { grid-template-columns: repeat(2, 1fr); gap: 10px; }
