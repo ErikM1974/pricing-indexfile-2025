@@ -1,3 +1,10 @@
+## v2026.07.04.5 (2026.07.04)
+
+- docs(memory): artrequests/mockups finding closed (anon 401); secret-only flip deferred (92-site repoint, supervised)
+- docs(memory): revert manageorders to secret-or-origin after browser test caught un-repointed callers; add LESSON
+- security: repoint remaining ManageOrders callers through /api/mo forwarder
+- Deploy v2026.07.04.5: cache-bust 4 files (manageorders caller repoint)
+
 ## v2026.07.04.4 (2026.07.04)
 
 - docs(memory): record ManageOrders secret-only flip (residual closed, proxy v878)
