@@ -1297,17 +1297,6 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | File | Purpose | Status |
 |------|---------|--------|
 | `/training/garment-art-request-guide.md` | **NEW (2026-06-17)** AE field guide for the rebuilt Garment art-request form — each field, what's required, what "approved" means, repeat/revision how-tos, short-notes rule | ✅ Active |
-| `/training/adriyella-admin.html` | Adriyella admin landing page | ✅ Active |
-| `/training/adriyella-admin-dashboard.html` | Adriyella admin dashboard | ✅ Active |
-| `/training/adriyella-billing-dashboard.html` | Adriyella billing dashboard | ✅ Active |
-| `/training/adriyella-bonus-calculator.html` | Adriyella bonus calculator | ✅ Active |
-| `/training/adriyella-bonus-report.html` | Adriyella bonus report | ✅ Active |
-| `/training/adriyella-daily-tasks.html` | Adriyella daily tasks (v1) | ✅ Active |
-| `/training/adriyella-daily-tasks-v2.html` | Adriyella daily tasks (v2 — current) | ✅ Active |
-| `/training/adriyella-task-history.html` | Adriyella task history view | ✅ Active |
-| `/training/adriyella-test-guide.html` | Adriyella test guide | ✅ Active |
-| `/training/adriyella-performance-utils.js` | Adriyella performance utility functions | ✅ Active |
-| `/training/adriyella-task-service.js` | Adriyella task service (Caspio CRUD) | ✅ Active |
 | `/training/api-test-runner.html` | API test runner harness | ✅ Active |
 | `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
 | `/training/bonus-policy.html` | Bonus policy reference | ✅ Active |

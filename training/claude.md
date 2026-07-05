@@ -68,25 +68,14 @@ The `/training` directory contains all training materials, interactive games, ad
 | Team Match Game | `team-match-game.html` | Staff recognition and roles |
 | Get to Know Erik | `get-to-know-erik.html` | Company culture |
 
-## Adriyella's Administrative Dashboard
+## Adriyella's Administrative Dashboard — REMOVED 2026-07-05
 
-A comprehensive suite of tools for office administration and performance tracking:
-
-### Dashboard Components
-- **Main Dashboard** (`adriyella-admin-dashboard.html`) - Central control panel
-- **Admin Interface** (`adriyella-admin.html`) - Administrative functions
-- **Billing Dashboard** (`adriyella-billing-dashboard.html`) - Invoice and payment tracking
-- **Daily Tasks** (`adriyella-daily-tasks-v2.html`) - Task management system
-- ~~**Daily Reports** (`adriyella-daily-report.html`)~~ — REMOVED 2026-07-05 (feature retired; its `adriyella_daily_report` EmailJS template was never created, so the report always silently failed to send)
-- **Task History** (`adriyella-task-history.html`) - Historical task data
-- **Bonus Calculator** (`adriyella-bonus-calculator.html`) - Commission calculations
-- **Bonus Report** (`adriyella-bonus-report.html`) - Bonus tracking
-
-### Supporting Files
-- `adriyella-task-service.js` - Backend service for task management
-- `adriyella-performance-utils.js` - Performance calculation utilities
-- `adriyella-test-guide.html` - Testing documentation
-- `adriyella-workflow-test.md` - Workflow testing procedures
+The entire Adriyella task/bonus/report suite (12 files: `adriyella-admin*.html`,
+`adriyella-billing-dashboard.html`, `adriyella-bonus-*.html`, `adriyella-daily-*.html`,
+`adriyella-task-*.{html,js}`, `adriyella-performance-utils.js`, `adriyella-test-guide.html`,
+`adriyella-workflow-test.md`) was deleted — Adriyella no longer works at NWCA. The staff-dashboard
+nav links ("Adriyella's Bonus Tracker", "Adriyella Task Admin") were removed too. Recoverable from
+git history if ever needed. (Her name remains in sales-rep dropdowns/maps as historical CRM data.)
 
 ## Development Guidelines for Training Materials
 
