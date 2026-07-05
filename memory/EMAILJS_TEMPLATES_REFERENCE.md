@@ -3,6 +3,9 @@
 > Audited 2026-07-05 across all 3 repos (Pricing Index, caspio-pricing-proxy, Python Inksoft).
 > Locate any template's trigger fast: search this file by Template ID or feature.
 
+## ✔️ Content audit (2026-07-05) — CLEAN
+Pulled every template's HTML/subject/settings (from the dashboard React `dataSource`) and diffed each `{{variable}}` against the params the code sends. **All 32 active templates: content correct, variables align, recipients sensible.** Custom-tees order emails verified (code DOES send `products_table`/`payment_confirmation`/`customer_email` — full base object at `custom-tees-success.js:271`). `template_customer_mockup` intentionally "reply/call to approve" (no approval button by design). Two cosmetic-only notes (not bugs): `template_art_completed` (CC=`{{cc_email}}`) and `template_art_revision` (CC=`{{reply_to}}`) reference a var the code doesn't send → those internal art notifications never CC anyone (fix only if a rep-CC was intended).
+
 ## Services & keys
 - **`service_jgrave3`** — client-side `emailjs.send()` (public key `4qSbDO-SQs19TbP80`). Most builder / art / transfer / quote emails.
 - **`service_1c4k67j`** — server-side (EmailJS REST + `EMAILJS_PRIVATE_KEY`) AND some client sends (golf, free-sample, custom-tees, christmas). The "ORDER_EMAILJS_SERVICE".
