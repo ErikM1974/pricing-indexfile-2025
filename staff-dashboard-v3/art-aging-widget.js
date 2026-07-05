@@ -27,8 +27,11 @@
 (function () {
     'use strict';
 
+    // APP_CONFIG.API.BASE_URL already ends in '/api' — the fallback must too, so
+    // callers below append '/artrequests' (NOT '/api/artrequests', which would
+    // double up to '/api/api/...' → 404).
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
 
     // Same "new status system" cutoff the Steve gallery/kanban use — pre-cutoff
     // records are on the legacy status vocabulary and would flood the red bucket.
@@ -91,7 +94,7 @@
     function fetchOpenRequests() {
         // orderBy ASC so if the 500-row cap ever truncates, we keep the OLDEST
         // records — the ones this widget exists to surface.
-        var base = API_BASE + '/api/artrequests?orderBy=Date_Created ASC&limit=500&dateCreatedFrom=' + DATE_CUTOFF;
+        var base = API_BASE + '/artrequests?orderBy=Date_Created ASC&limit=500&dateCreatedFrom=' + DATE_CUTOFF;
         var selectFields = 'ID_Design,CompanyName,Status,Date_Created,Date_Updated,Is_On_Hold';
         // Graceful degradation if a field is missing on this install (same
         // 500-fallback pattern as art-hub-steve-gallery.js fetchRequests()).
