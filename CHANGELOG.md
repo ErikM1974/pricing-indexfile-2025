@@ -1,3 +1,7 @@
+## v2026.07.05.6 (2026.07.05)
+
+- cleanup: remove entire Adriyella task/bonus/report suite (she no longer works at NWCA)
+
 ## v2026.07.05.5 (2026.07.05)
 
 - docs(memory): EmailJS templates master reference — usage map, orphans, missing-in-emailjs findings
