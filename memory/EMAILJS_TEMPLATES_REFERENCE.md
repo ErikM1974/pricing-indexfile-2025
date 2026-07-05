@@ -99,16 +99,16 @@ These are the same class of bug as `template_quote_email` was. Each needs the te
 
 | Template ID | Live code (file:line) | What breaks | Service |
 |---|---|---|---|
-| `ArtInvoice` | `art-invoice-viewer.js:441` (`art-invoice-config.js:86`) | **Art invoices to customers** — billing artifact, high impact | jgrave3 |
-| `template_sample_request` | `pages/sample-cart.html:1880` | Sample-cart order notification to sales (order still saves) | 1c4k67j |
-| `template_fastquote_customer` | `screenprint-fast-quote-service.js:199` | Screen-print Fast Quote — customer copy | jgrave3 |
-| `template_fastquote_sales` | `screenprint-fast-quote-service.js:236` | Screen-print Fast Quote — sales alert | jgrave3 |
-| `template_v80ysfp` | `christmas-bundles.html:3729` (inline class) | Christmas Bundle — customer confirmation | 1c4k67j |
-| `template_sales_xmas` | `christmas-bundles.html:3759` (inline class) | Christmas Bundle — sales alert | 1c4k67j |
-| `template_stripe` | `safety-stripe-calculator.js:281` (`// TODO: real template ID`) | Safety-stripe design confirmation | jgrave3 |
-| `adriyella_daily_report` | `training/adriyella-daily-report.html:1868/2013` | Adriyella end-of-day staff report | 1c4k67j |
+| ✅ **`ArtInvoice`** | `art-invoice-viewer.js:441` (`art-invoice-config.js:86`) | **CREATED + verified 200 (2026-07-05)** — art invoices to sales rep | jgrave3 |
+| ✅ **`template_sample_request`** | `pages/sample-cart.html:1880` | **CREATED + verified 200 (2026-07-05)** — sample-cart order notification (To hardcoded erik@) | 1c4k67j |
+| ⚪ `template_fastquote_customer` | `screenprint-fast-quote-service.js:199` | OPTIONAL — Fast Quote customer; tool not linked in nav, nothing fails today | jgrave3 |
+| ⚪ `template_fastquote_sales` | `screenprint-fast-quote-service.js:236` | OPTIONAL — Fast Quote sales alert; tool not linked | jgrave3 |
+| 🟡 `template_v80ysfp` | `christmas-bundles.html:3729` (inline class) | DEFER to Q4 — Christmas Bundle customer (seasonal, offer expired Oct 2025) | 1c4k67j |
+| 🟡 `template_sales_xmas` | `christmas-bundles.html:3759` (inline class) | DEFER to Q4 — Christmas Bundle sales alert (seasonal) | 1c4k67j |
+| 🔴 ~~`template_stripe`~~ | `safety-stripe-calculator.js` | **RETIRED 2026-07-05** — dead send removed (TODO stub, orphaned tool) | — |
+| 🔴 ~~`adriyella_daily_report`~~ | ~~`training/adriyella-daily-report.html`~~ | **RETIRED 2026-07-05** — feature unused; page + send code deleted | — |
 
-> Verify each by test-send (see `template_quote_email` fix, 2026-07-05). If "template ID not found" → create it or delete the dead send.
+> Verify a create by test-send (see `template_quote_email` fix). If "template ID not found" → create it or delete the dead send.
 
 ---
 

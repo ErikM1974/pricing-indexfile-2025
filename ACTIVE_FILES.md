@@ -1302,7 +1302,6 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/adriyella-billing-dashboard.html` | Adriyella billing dashboard | ✅ Active |
 | `/training/adriyella-bonus-calculator.html` | Adriyella bonus calculator | ✅ Active |
 | `/training/adriyella-bonus-report.html` | Adriyella bonus report | ✅ Active |
-| `/training/adriyella-daily-report.html` | Adriyella daily report | ✅ Active |
 | `/training/adriyella-daily-tasks.html` | Adriyella daily tasks (v1) | ✅ Active |
 | `/training/adriyella-daily-tasks-v2.html` | Adriyella daily tasks (v2 — current) | ✅ Active |
 | `/training/adriyella-task-history.html` | Adriyella task history view | ✅ Active |
