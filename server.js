@@ -879,10 +879,12 @@ async function sendOrderConfirmationEmails(quoteSession, stripeSessionId, status
 // env keys or not-yet-created EmailJS templates → warn + skip, NEVER throws, so it is
 // safe to ship before the templates exist. Templates (Erik creates on emailjs.com):
 //   template_quote_accepted_customer — params: to_name, to_email, quote_id, quote_amount
-//   template_quote_accepted_staff    — params: quote_id, customer_name, customer_email,
+//   quote_accepted_staff             — params: quote_id, customer_name, customer_email,
 //                                                company_name, quote_amount, quote_url, to_email
+//   NOTE: EmailJS caps Template IDs at 24 chars, so the staff ID is short —
+//   "template_quote_accepted_staff" (29) gets silently truncated in their editor.
 const QUOTE_ACCEPTED_CUSTOMER_TEMPLATE = 'template_quote_accepted_customer';
-const QUOTE_ACCEPTED_STAFF_TEMPLATE = 'template_quote_accepted_staff';
+const QUOTE_ACCEPTED_STAFF_TEMPLATE = 'quote_accepted_staff';
 async function sendQuoteAcceptedEmails(session, acceptName, acceptEmail) {
   if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
     console.warn('[QuoteAccept] EMAILJS keys not set — skipping acceptance emails.');
