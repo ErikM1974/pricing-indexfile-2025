@@ -1,3 +1,7 @@
+## v2026.07.05.3 (2026.07.05)
+
+- polish: SCP/DTG duplicate-mode + review fixes + art-search server-gated (v2026.07.05.3)
+
 ## v2026.07.05.2 (2026.07.05)
 
 - feat: Tier 1+2 UX batch — 19 improvements across portal, PDP, builders, QM, art hub
