@@ -1,8 +1,16 @@
 # TODO: Quote Acceptance Email Notifications
 
 **Created:** 2026-01-15
-**Status:** Waiting for manual steps
-**Priority:** Medium
+**Status:** ✅ LIVE (2026-07-04, deploy v2026.07.04.6) — both EmailJS templates created; emails send on accept.
+**Priority:** Done (one OPTIONAL follow-up: the 3 Caspio audit fields)
+
+> ⚠️ **EmailJS Template IDs are capped at 24 characters.** `template_quote_accepted_staff` (29
+> chars) got silently truncated to `template_quote_accepted_` when typed into the EmailJS editor.
+> The staff template therefore uses the short id **`quote_accepted_staff`** (20 chars). The customer
+> id `template_quote_accepted_customer` (32) only survived because it was set programmatically
+> (bypassing the input's maxlength). **When creating any new EmailJS template, keep the id ≤ 24 chars.**
+> Both ids are hardcoded in `server.js:884-885` (`QUOTE_ACCEPTED_CUSTOMER_TEMPLATE` /
+> `QUOTE_ACCEPTED_STAFF_TEMPLATE`).
 
 ---
 
@@ -90,15 +98,14 @@ isn't set up yet:
 1. **Caspio** — add the 3 `quote_sessions` fields (table above), then
    `heroku config:set QUOTE_ACCEPT_FIELDS_LIVE=1 --app sanmar-inventory-app`. Optional —
    Notes JSON still captures acceptance without it.
-2. **EmailJS** — create the 2 templates with EXACTLY these ids + param names:
+2. **EmailJS** — ✅ DONE. Both templates exist with these ids + param names:
    - `template_quote_accepted_customer` — `{{to_name}}`, `{{to_email}}` (To field),
      `{{quote_id}}`, `{{quote_amount}}`
-   - `template_quote_accepted_staff` — `{{to_email}}` (To field), `{{quote_id}}`,
-     `{{customer_name}}`, `{{customer_email}}`, `{{company_name}}`, `{{quote_amount}}`, `{{quote_url}}`
-3. Once the templates exist, emails send automatically on the next acceptance — no deploy.
-   (Optional: add "a confirmation email is on its way" to the accept success modal in
-   `pages/js/quote-view.js` — held until templates are confirmed so we don't promise an
-   email that won't arrive.)
+   - `quote_accepted_staff` (short id — see 24-char cap note above) — `{{to_email}}` (To field),
+     `{{quote_id}}`, `{{customer_name}}`, `{{customer_email}}`, `{{company_name}}`, `{{quote_amount}}`, `{{quote_url}}`
+3. ✅ Templates exist + `server.js:885` deployed (v2026.07.04.6) — emails send automatically on
+   accept. (Optional not-yet-done: add "a confirmation email is on its way" to the accept success
+   modal in `pages/js/quote-view.js`.)
 
 ---
 

@@ -580,6 +580,13 @@
                 btn.disabled = false; btn.textContent = 'Send to my rep';
                 if (!x.ok || !x.j.ok) { err.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
                 showToast('Sent to your rep' + (x.j.rep ? ' (' + esc(x.j.rep) + ')' : '') + '! We’ll follow up with a quote.');
+                // Clear the form so a second glance doesn't read as "not sent yet" — and a
+                // follow-up request starts clean (mirrors the portal-home modal, which resets
+                // on reopen). Failure paths above leave everything filled for retry.
+                var ins = document.querySelectorAll('#pp-sizes .pp-size-input');
+                for (var i = 0; i < ins.length; i++) ins[i].value = '';
+                var note = document.getElementById('pp-note'); if (note) note.value = '';
+                updateSizeTotal();
             })
             .catch(function () { btn.disabled = false; btn.textContent = 'Send to my rep'; err.textContent = 'Could not send. Please try again.'; });
     }
