@@ -1092,7 +1092,8 @@ cap-embroidery-fix.css
 | `/dashboards/staff-login.html` | Staff authentication login page | — | ✅ Active |
 | `/dashboards/staff-portal-simple.html` | Simplified staff portal | — | ✅ Active |
 | `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |
-| `/dashboards/quote-management.html` | Quote management dashboard (search, edit, manage quotes) | quote-management.css | ✅ Active |
+| `/dashboards/quote-management.html` | Quote management dashboard (search, edit, manage quotes) | quote-management.css, js/quote-management.js | ✅ Active |
+| `/dashboards/js/quote-management.js` | Quote management page logic (extracted from inline `<script>` 2026-07-05 — Rule 3) | APP_CONFIG, staff-auth-helper, caspio-date-utils | ✅ Active |
 | `/dashboards/css/quote-management.css` | Quote management dashboard styles | — | ✅ Active |
 | `/dashboards/js/sanmar-inbound-today.js` | "SanMar Inbound Calendar" modal — pick any day → that day's POs (PO+WO, line items w/ color/size, per-box contents, logos), box labels + PDF; month-calendar picker | APP_CONFIG, /api/sanmar-orders/inbound-today + /daily-inbound (proxy) | ✅ Active |
 | `/dashboards/digitized-designs.html` | Digitized designs management dashboard | — | ✅ Active |
