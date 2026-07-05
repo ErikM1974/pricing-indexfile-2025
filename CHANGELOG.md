@@ -1,3 +1,10 @@
+## v2026.07.05.8 (2026.07.05)
+
+- docs: storefront checkout/catalog/funnel proposal (deposit-on-accepted-quote model)
+- feat: online deposit checkout on accepted quotes (Storefront Checkout Phase 0+1)
+- feat: pay-in-full online payment (DEPOSIT-PCT=100) — pct-aware wording
+- Deploy v2026.07.05.8: 2 files (quote-management.html,quote-view.html...)
+
 ## v2026.07.05.7 (2026.07.05)
 
 - cleanup: remove departed rep 'Adriyella' from selectable sales-rep dropdowns
