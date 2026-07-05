@@ -1,8 +1,47 @@
 # Storefront Checkout + Catalog + Funnel Proposal (2026-07-05)
 
-> **PROPOSAL — awaiting Erik's decisions.** No code written. Produced from a 3-agent code
-> exploration (payment/Stripe/tax infra · catalog/PDP · quote funnel). Decisions needed are
-> marked **[DECIDE]**. When approved, implementation starts with Phase 0 hardening.
+> **STATUS: Erik approved 2026-07-05 → Phase 0 + Phase 1 BUILT same day (committed to
+> develop, NOT yet deployed).** Catalog (Part 2) + remaining funnel fixes (Part 3) still
+> proposals. Remaining **[DECIDE]**s below still stand.
+
+## ✅ Built 2026-07-05 (Phase 0 + 1) — and Erik's go-live checklist
+
+**Shipped in code (develop):**
+- Phase 0: accept endpoint hardened (strictLimiter + JSON-only CSRF gate, server.js);
+  totals-hash binding (`computeQuoteTotalsHash`); `parseNotesJson` preserves legacy
+  plain-text Notes under `_legacyText`.
+- Phase 1: `POST /api/quotes/:quoteId/enable-deposit` (requireStaff; rep confirms shipping$
+  + taxRate%; DEPOSIT-PCT from Service_Codes fail-closed; terms+hash → Notes JSON `deposit`
+  block) · `POST /api/public/quote/:quoteId/deposit-checkout` (Stripe HOSTED session from
+  stored terms only, hash re-verified) · webhook `metadata.kind` branch (records
+  `payments[]` in Notes, 503-retry on write failure, dedup by sessionId, stale-hash alert,
+  Slack 💰 + fail-soft EmailJS receipts + fail-soft Order_Payments ledger mirror).
+- Money math: `shared_components/js/quote-deposit-math.js` (dual-load, 9 jest tests,
+  deposit+balance foot exactly; tax on subtotal+shipping per WA).
+- UI: quote-view customer deposit panel (`#deposit-panel`, pay button, paid/receipt state,
+  ?deposit=success|canceled banners; deposit card prints, pay button doesn't) + staff strip
+  (`#qv-deposit-strip`: shipping/tax inputs, live preview, Enable/Update + link copy) +
+  Quote Management deposit chips (`renderDepositChip`: "Deposit link live" / "Deposit paid ·
+  bal $" / "Paid in full").
+- Proxy: `src/routes/order-payments.js` (append-only ledger, CRM-gated, idempotent on
+  Stripe_Session_ID) mounted at `/api/order-payments`.
+
+**Erik must do before/at go-live (nothing deploys itself):**
+1. **Caspio Service_Codes**: add row `DEPOSIT-PCT`, SellPrice = deposit percent (e.g. 50),
+   IsActive. Enable-deposit 502s with a clear message until it exists.
+2. **Caspio table `Order_Payments`** (ledger mirror — payments still record in Notes JSON
+   without it): QuoteID T255 · Type T64 · Amount Number · Stripe_Session_ID T255 ·
+   Payment_Intent T255 · Payer_Email T255 · Customer_Name T255 · Company_Name T255 ·
+   Created T255. Spec repeated in the proxy route header.
+3. **EmailJS templates** (fail-soft until created; Slack alerts fire regardless):
+   `template_deposit_cust` (to_name/to_email/quote_id/amount_paid/balance_due/grand_total)
+   and `template_deposit_staff` (+customer_name/customer_email/company_name/quote_url) on
+   `service_1c4k67j` (server-side sender).
+4. **Deploy both repos** (main via /deploy; proxy via its usual push). No new env vars —
+   reuses STRIPE_* keys/webhook secret, EMAILJS keys, CRM_API_SECRET, Slack hooks.
+5. **Test-mode dry run** (STRIPE_MODE=development + 4242 card): accept a test WQ quote →
+   enable deposit → pay → verify Notes payments[], QM chip, Slack, webhook idempotency
+   (Stripe dashboard "resend webhook" → duplicate skip).
 
 ---
 

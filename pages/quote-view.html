@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.07.05.2">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.07.05.3">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260602-phase11-4" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,6 +111,36 @@
                 </div>
                 <div class="sw-manual-wo-help">
                     Find the WO# in ShopWorks (top-right of the order detail page) and paste it here. Stored once, used forever.
+                </div>
+            </div>
+
+            <!-- ============================================================
+                 Staff deposit strip (Storefront Checkout Phase 1, 2026-07-05).
+                 Staff-only: the rep confirms shipping $ + tax-rate % (the
+                 numbers WQ quotes intentionally save as 0), the server
+                 computes the grand total + deposit split (Service_Codes
+                 DEPOSIT-PCT) and freezes the terms + totals-hash into Notes
+                 JSON. Managed by quote-view.js setupDepositStrip().
+                 ============================================================ -->
+            <div id="qv-deposit-strip" class="qv-deposit-strip" style="display: none;">
+                <div class="qv-deposit-strip-head">
+                    <span class="qv-deposit-strip-icon">&#128176;</span>
+                    <span class="qv-deposit-strip-title">Online deposit</span>
+                    <span class="qv-deposit-strip-state" id="qv-deposit-state"></span>
+                </div>
+                <div class="qv-deposit-strip-form" id="qv-deposit-form" style="display: none;">
+                    <label class="qv-deposit-field">Shipping $
+                        <input type="number" id="qv-deposit-shipping" min="0" step="0.01" value="0">
+                    </label>
+                    <label class="qv-deposit-field">Tax rate %
+                        <input type="number" id="qv-deposit-taxrate" min="0" max="15" step="0.001" placeholder="e.g. 10.1">
+                    </label>
+                    <span class="qv-deposit-preview" id="qv-deposit-preview"></span>
+                    <button type="button" class="qv-deposit-enable-btn" id="qv-deposit-enable-btn">Enable deposit</button>
+                </div>
+                <div class="qv-deposit-strip-help">
+                    Confirms tax + shipping and turns on the customer's "Pay deposit" button on this page.
+                    Tax applies to subtotal + shipping (WA destination rate; enter 0 for out-of-state).
                 </div>
             </div>
 
@@ -240,6 +270,17 @@
                     <p id="accepted-info">Accepted on ---</p>
                 </div>
             </div>
+
+            <!-- ============================================================
+                 Online deposit panel (Storefront Checkout Phase 1, 2026-07-05).
+                 Customer-facing. Shown ONLY when the quote is Accepted AND a
+                 rep enabled the deposit (Notes JSON `deposit` block). Content
+                 is rendered by quote-view.js renderDepositPanel():
+                   enabled + unpaid → totals breakdown + "Pay deposit" (Stripe
+                                      hosted Checkout via deposit-checkout API)
+                   paid             → receipt summary + balance-due line
+                 ============================================================ -->
+            <section id="deposit-panel" class="deposit-panel" style="display: none;"></section>
 
             <!-- ============================================================
                  Quote Timeline (#15, 2026-07-05). Collapsible event history
@@ -607,6 +648,8 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.07.05.2"></script>
+    <!-- Deposit money-math (dual-load with the server; preview-only in the browser) -->
+    <script src="/shared_components/js/quote-deposit-math.js?v=2026.07.05.3"></script>
+    <script src="/pages/js/quote-view.js?v=2026.07.05.3"></script>
 </body>
 </html>

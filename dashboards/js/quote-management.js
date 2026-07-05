@@ -479,6 +479,39 @@ function renderShopWorksRef(quote) {
     return `<div class="sw-ref" title="In ShopWorks — order #${wo}"><i class="fas fa-check-circle"></i> SW #${wo}</div>`;
 }
 
+// Online deposit chip (Storefront Checkout Phase 1, 2026-07-05). Reads the
+// deposit terms block + payments[] the server keeps in the quote's Notes JSON
+// (written by enable-deposit + the Stripe webhook). Returns '' for quotes with
+// no deposit activity — the vast majority — so the status column stays clean.
+function renderDepositChip(quote) {
+    if (!quote || !quote.Notes) return '';
+    let notes;
+    try { notes = JSON.parse(quote.Notes); } catch (_) { return ''; }
+    if (!notes || typeof notes !== 'object' || Array.isArray(notes)) return '';
+    const payments = Array.isArray(notes.payments) ? notes.payments : [];
+    const dep = notes.deposit;
+    const depositPaid = payments.find(p => p && p.kind === 'deposit');
+    const balancePaid = payments.find(p => p && p.kind === 'balance');
+    const usd = (n) => `$${(Number(n) || 0).toFixed(2)}`;
+    if (balancePaid) {
+        return `<span class="status-badge deposit-chip deposit-chip--paid" title="Paid in full online via Stripe (deposit + balance).">
+                    <i class="fas fa-dollar-sign"></i> Paid in full
+                </span>`;
+    }
+    if (depositPaid) {
+        const bal = dep && isFinite(Number(dep.balanceAmount)) ? ` · bal ${usd(dep.balanceAmount)}` : '';
+        return `<span class="status-badge deposit-chip deposit-chip--paid" title="Deposit paid online via Stripe — ${usd(depositPaid.amount)}${dep ? ` of ${usd(dep.grandTotal)}` : ''}. Balance due after proof approval.">
+                    <i class="fas fa-dollar-sign"></i> Deposit paid${bal}
+                </span>`;
+    }
+    if (dep && dep.enabled) {
+        return `<span class="status-badge deposit-chip deposit-chip--live" title="Deposit link is live on the quote page — ${usd(dep.depositAmount)} (${Number(dep.depositPct) || 0}% of ${usd(dep.grandTotal)}). Waiting on the customer.">
+                    <i class="fas fa-link"></i> Deposit link live
+                </span>`;
+    }
+    return '';
+}
+
 // One-line inbound indicator. Reads inboundStatusMap (populated async by
 // fetchInboundStatuses); never triggers its own SanMar call.
 function renderInboundIndicator(quote) {
@@ -992,7 +1025,7 @@ function renderTable() {
                 <td class="salesperson-cell" title="${escapeHtml(salespersonInfo.tooltip)}">${salespersonInfo.html}</td>
                 <td>${quote.TotalQuantity || 0}</td>
                 <td class="quote-amount" title="${getAmountTooltip(quote)}">${formatCurrency(getEffectiveAmount(quote))}</td>
-                <td>${statusCellHtml}</td>
+                <td>${statusCellHtml}${renderDepositChip(quote)}</td>
                 <td>${renderMilestonePills(quote)}</td>
                 <td class="inbound-cell" onclick="event.stopPropagation();">${renderInboundIndicator(quote)}</td>
                 <td class="due-cell">${renderDueCell(quote)}</td>
