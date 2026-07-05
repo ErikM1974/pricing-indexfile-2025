@@ -154,6 +154,11 @@ class QuoteViewPage {
             this.setupPushButton();
         }
 
+        // Online deposit (Storefront Checkout Phase 1, 2026-07-05): customer
+        // "Pay deposit" panel + staff enable-deposit strip. Reads the deposit
+        // block + payments[] the server keeps in Notes JSON.
+        this.setupDepositUI(urlParams);
+
         // Phase 10 (+ Phase 11 update): if ?autoPdf=1 is in the URL,
         // trigger the print-to-PDF dialog automatically after a short
         // delay (lets the DOM finish painting + product images settle).
@@ -4668,6 +4673,228 @@ class QuoteViewPage {
             acceptBtn.disabled = false;
             btnText.style.display = 'inline';
             btnLoading.style.display = 'none';
+        }
+    }
+
+    // ====================================================================
+    // Online deposit (Storefront Checkout Phase 1, 2026-07-05)
+    // ====================================================================
+    // Customer panel + staff strip both read the server-owned Notes JSON
+    // (`deposit` terms block + `payments[]` written by the Stripe webhook).
+    // The browser NEVER computes the charged amount — "Pay deposit" calls
+    // the public deposit-checkout API, which builds the Stripe session from
+    // the stored terms after re-verifying the totals-hash.
+    // ====================================================================
+
+    _depositNotes() {
+        try {
+            const notes = JSON.parse(this.quoteData.Notes || '{}');
+            return (notes && typeof notes === 'object' && !Array.isArray(notes)) ? notes : {};
+        } catch (_) { return {}; }
+    }
+
+    setupDepositUI(urlParams) {
+        try {
+            this.renderDepositPanel(urlParams);
+            if (this.isStaff) this.setupDepositStrip();
+        } catch (e) {
+            console.warn('[quote-view] deposit UI failed (non-fatal):', e);
+        }
+    }
+
+    renderDepositPanel(urlParams) {
+        const panel = document.getElementById('deposit-panel');
+        if (!panel || !this.quoteData) return;
+        const notes = this._depositNotes();
+        const dep = notes.deposit;
+        const payments = Array.isArray(notes.payments) ? notes.payments : [];
+        const depositPaid = payments.find((p) => p && p.kind === 'deposit');
+        const returned = urlParams ? urlParams.get('deposit') : null;
+
+        if (!dep || !dep.enabled || this.quoteData.Status !== 'Accepted') {
+            panel.style.display = 'none';
+            return;
+        }
+
+        const fc = (n) => this.formatCurrency(Number(n) || 0);
+        // DEPOSIT-PCT=100 (Erik 2026-07-05) → pay-in-full wording; a lower pct
+        // in Caspio flips all of this back to deposit wording with no deploy.
+        const payInFull = Number(dep.depositPct) >= 100;
+        let banner = '';
+        if (returned === 'success' && !depositPaid) {
+            // The Stripe redirect can beat the webhook by a few seconds.
+            banner = '<div class="deposit-banner deposit-banner-ok">&#10003; Payment submitted — your receipt is on its way. This page may take a minute to catch up.</div>';
+        } else if (returned === 'canceled' && !depositPaid) {
+            banner = '<div class="deposit-banner deposit-banner-warn">Checkout was canceled — no charge was made. You can pay whenever you\'re ready.</div>';
+        }
+        const breakdown = `
+            <div class="deposit-breakdown">
+                <div class="deposit-line"><span>Quote subtotal</span><span>${fc(dep.subtotal)}</span></div>
+                <div class="deposit-line"><span>Shipping</span><span>${fc(dep.shipping)}</span></div>
+                <div class="deposit-line"><span>Sales tax (${Number(dep.taxRatePct) || 0}%)</span><span>${fc(dep.taxAmount)}</span></div>
+                <div class="deposit-line deposit-line-total"><span>Order total</span><span>${fc(dep.grandTotal)}</span></div>
+            </div>`;
+
+        if (depositPaid) {
+            const balanceLine = Number(dep.balanceAmount) > 0
+                ? `<div class="deposit-line deposit-line-total"><span>Balance due after proof approval</span><span>${fc(dep.balanceAmount)}</span></div>`
+                : '';
+            const paidNote = Number(dep.balanceAmount) > 0
+                ? "We'll start on your proof right away. The balance is due after you approve it."
+                : "You're paid in full. We'll start on your proof right away.";
+            panel.innerHTML = `
+                <div class="deposit-card">
+                    <h3 class="deposit-title">&#10003; Payment received — thank you!</h3>
+                    ${breakdown}
+                    <div class="deposit-line deposit-line-paid"><span>Paid${depositPaid.at ? ' on ' + this.escapeHtml(this.formatDate(depositPaid.at)) : ''}</span><span>&minus;${fc(depositPaid.amount)}</span></div>
+                    ${balanceLine}
+                    <p class="deposit-note">${paidNote}</p>
+                </div>`;
+            panel.style.display = '';
+            return;
+        }
+
+        const title = payInFull
+            ? 'Ready when you are — pay for your order online'
+            : `Ready when you are — pay your ${Number(dep.depositPct) || 0}% deposit online`;
+        const dueLabel = payInFull ? 'Total due now' : `Deposit due now (${Number(dep.depositPct) || 0}%)`;
+        const btnLabel = payInFull ? `Pay ${fc(dep.depositAmount)}` : `Pay ${fc(dep.depositAmount)} deposit`;
+        const note = payInFull
+            ? 'Secure checkout by Stripe — we never see your card number. Prefer phone? Call (253) 922-5793.'
+            : `Secure checkout by Stripe — we never see your card number. Balance of ${fc(dep.balanceAmount)} is due after proof approval. Prefer phone? Call (253) 922-5793.`;
+        panel.innerHTML = `
+            ${banner}
+            <div class="deposit-card">
+                <h3 class="deposit-title">${title}</h3>
+                ${breakdown}
+                <div class="deposit-line deposit-line-due"><span>${dueLabel}</span><span>${fc(dep.depositAmount)}</span></div>
+                <button type="button" class="btn btn-primary deposit-pay-btn" id="deposit-pay-btn">${btnLabel}</button>
+                <p class="deposit-note">${note}</p>
+            </div>`;
+        panel.style.display = '';
+        const btn = document.getElementById('deposit-pay-btn');
+        if (btn) btn.addEventListener('click', () => this.startDepositCheckout(btn));
+    }
+
+    async startDepositCheckout(btn) {
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Opening secure checkout…';
+        try {
+            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}/deposit-checkout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({})
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok || !data.url) throw new Error(data.error || 'Could not start checkout');
+            window.location.href = data.url;
+        } catch (e) {
+            console.error('[quote-view] deposit checkout failed:', e);
+            alert((e.message || 'Could not start checkout.') + ' Please try again, or call (253) 922-5793 and we\'ll take it by phone.');
+            btn.disabled = false;
+            btn.textContent = original;
+        }
+    }
+
+    setupDepositStrip() {
+        const strip = document.getElementById('qv-deposit-strip');
+        if (!strip || !this.quoteData) return;
+        const notes = this._depositNotes();
+        const dep = notes.deposit;
+        const payments = Array.isArray(notes.payments) ? notes.payments : [];
+        const depositPaid = payments.find((p) => p && p.kind === 'deposit');
+        const state = document.getElementById('qv-deposit-state');
+        const form = document.getElementById('qv-deposit-form');
+        strip.style.display = '';
+
+        if (depositPaid) {
+            state.textContent = `Paid ${this.formatCurrency(Number(depositPaid.amount) || 0)}${depositPaid.at ? ' on ' + this.formatDate(depositPaid.at) : ''}`;
+            state.className = 'qv-deposit-strip-state is-paid';
+            form.style.display = 'none';
+            return;
+        }
+        if (this.quoteData.Status !== 'Accepted') {
+            state.textContent = 'Waiting for customer acceptance';
+            state.className = 'qv-deposit-strip-state';
+            form.style.display = 'none';
+            return;
+        }
+        if (dep && dep.enabled) {
+            state.textContent = Number(dep.depositPct) >= 100
+                ? `Link live — ${this.formatCurrency(dep.depositAmount)} full payment`
+                : `Link live — ${this.formatCurrency(dep.depositAmount)} deposit (${Number(dep.depositPct) || 0}% of ${this.formatCurrency(dep.grandTotal)})`;
+            state.className = 'qv-deposit-strip-state is-live';
+            document.getElementById('qv-deposit-shipping').value = Number(dep.shipping) || 0;
+            document.getElementById('qv-deposit-taxrate').value = Number(dep.taxRatePct) || 0;
+            document.getElementById('qv-deposit-enable-btn').textContent = 'Update payment link';
+        } else {
+            state.textContent = 'Not enabled';
+            state.className = 'qv-deposit-strip-state';
+        }
+        form.style.display = '';
+
+        // Wire once — setupDepositStrip re-runs after enable/update.
+        if (!this._depositStripWired) {
+            this._depositStripWired = true;
+            const preview = () => this._updateDepositPreview();
+            document.getElementById('qv-deposit-shipping').addEventListener('input', preview);
+            document.getElementById('qv-deposit-taxrate').addEventListener('input', preview);
+            document.getElementById('qv-deposit-enable-btn').addEventListener('click', () => this.enableDeposit());
+        }
+        this._updateDepositPreview();
+    }
+
+    _updateDepositPreview() {
+        const el = document.getElementById('qv-deposit-preview');
+        if (!el) return;
+        try {
+            // depositPct 100 → grand-total math only. The REAL split comes from
+            // the server (Service_Codes DEPOSIT-PCT) when the rep clicks Enable —
+            // this preview exists so the rep sees tax/total before committing.
+            const t = window.QuoteDepositMath.computeDepositTerms({
+                subtotal: parseFloat(this.quoteData.TotalAmount),
+                shipping: parseFloat(document.getElementById('qv-deposit-shipping').value),
+                taxRatePct: parseFloat(document.getElementById('qv-deposit-taxrate').value),
+                depositPct: 100
+            });
+            el.textContent = `Order total ${this.formatCurrency(t.grandTotal)} (tax ${this.formatCurrency(t.taxAmount)})`;
+        } catch (_) {
+            el.textContent = '';
+        }
+    }
+
+    async enableDeposit() {
+        const btn = document.getElementById('qv-deposit-enable-btn');
+        const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);
+        const taxRatePct = parseFloat(document.getElementById('qv-deposit-taxrate').value);
+        if (!Number.isFinite(shipping) || !Number.isFinite(taxRatePct)) {
+            alert('Enter shipping dollars (0 for pickup) and the confirmed tax rate % (0 for out-of-state).');
+            return;
+        }
+        btn.disabled = true;
+        try {
+            const resp = await fetch(`/api/quotes/${encodeURIComponent(this.quoteId)}/enable-deposit`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ shipping, taxRatePct })
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok || !data.success) throw new Error(data.error || `HTTP ${resp.status}`);
+            // Refresh the local copy so both surfaces re-render the stored terms.
+            const notes = this._depositNotes();
+            notes.deposit = data.deposit;
+            this.quoteData.Notes = JSON.stringify(notes);
+            this.setupDepositStrip();
+            this.renderDepositPanel(null);
+            let copied = false;
+            try { await navigator.clipboard.writeText(data.payUrl); copied = true; } catch (_) { /* clipboard blocked */ }
+            alert(`Deposit enabled: ${this.formatCurrency(data.deposit.depositAmount)} of ${this.formatCurrency(data.deposit.grandTotal)}.` +
+                (copied ? ' Pay link copied to clipboard.' : ' Share the quote link with the customer.'));
+        } catch (e) {
+            alert('Enable deposit failed: ' + (e.message || 'unknown error'));
+        } finally {
+            btn.disabled = false;
         }
     }
 

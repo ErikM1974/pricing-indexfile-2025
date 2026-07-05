@@ -52,11 +52,13 @@ dotenv.config();
 //   L414  Body parsing (JSON, urlencoded)
 //
 // STRIPE & PAYMENTS
-//   L530  POST /api/stripe/webhook          — signature-verified; pushes paid 3DT orders to ShopWorks
+//   L530  POST /api/stripe/webhook          — signature-verified; metadata.kind branch records quote deposit/balance payments; else pushes paid 3DT orders to ShopWorks
 //   L1490 GET  /api/stripe-config
 //   L1510 POST /api/create-payment-intent
 //   L1585 POST /api/create-checkout-session — 3DT studio: server-side authoritative reprice + unique QuoteID + promise stamp
 //   L1800 POST /api/verify-checkout-session
+//   POST /api/quotes/:quoteId/enable-deposit        — STAFF: rep confirms shipping+tax, freezes deposit terms (Service_Codes DEPOSIT-PCT) into Notes JSON (Phase 1, 2026-07-05)
+//   POST /api/public/quote/:quoteId/deposit-checkout — PUBLIC: Stripe hosted Checkout for a rep-enabled deposit (server-stored amount + totals-hash re-verify)
 //
 // 3-DAY TEES (studio rebuild 2026-06-09 — helpers ~L770: getTdtPricingConfig/resolveTdtTax/rebuildTdtQuote)
 //   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
@@ -915,6 +917,116 @@ async function sendQuoteAcceptedEmails(session, acceptName, acceptEmail) {
   );
 }
 
+// ══ Online quote-deposit payments (Storefront Checkout Phase 1, 2026-07-05) ══
+// Rep-in-loop model: a rep ENABLES the deposit on an Accepted quote (confirming
+// the shipping $ + tax-rate % that WQ web quotes intentionally save as 0 — see
+// web-quote-service.js "rep calculates tax at confirmation"), the customer pays
+// through Stripe HOSTED Checkout from the quote page, and the shared Stripe
+// webhook records it via the metadata.kind branch. The deposit block + payments
+// array live in the quote's Notes JSON (primary record); the Order_Payments
+// Caspio ledger is a fail-soft mirror. Money math is in the dual-load module
+// below (jest-locked); deposit % comes from Service_Codes DEPOSIT-PCT.
+const QuoteDepositMath = require('./shared_components/js/quote-deposit-math.js');
+
+// Deposit receipts — fail-soft like the acceptance emails above; safe to ship
+// before the templates exist. Erik creates on emailjs.com (IDs ≤ 24 chars):
+//   template_deposit_cust  — to_name, to_email, quote_id, amount_paid, balance_due, grand_total
+//   template_deposit_staff — to_email, to_name, quote_id, customer_name, customer_email,
+//                            company_name, amount_paid, balance_due, quote_url
+const DEPOSIT_CUSTOMER_TEMPLATE = 'template_deposit_cust';
+const DEPOSIT_STAFF_TEMPLATE = 'template_deposit_staff';
+
+// Notes-JSON reader that never loses data: legacy plain-text Notes (3DT rows
+// append free text) are preserved under _legacyText instead of being clobbered
+// on the next JSON.stringify.
+function parseNotesJson(notesStr) {
+  if (!notesStr) return {};
+  try {
+    const v = JSON.parse(notesStr);
+    return (v && typeof v === 'object' && !Array.isArray(v)) ? v : { _legacyText: String(notesStr) };
+  } catch (_) {
+    return { _legacyText: String(notesStr) };
+  }
+}
+
+// Binds a payment link to the exact numbers the rep enabled. Recomputed from
+// the CURRENT row before every Stripe session and again at the webhook — a rep
+// edit after enablement can never be charged at stale amounts.
+function computeQuoteTotalsHash(quoteID, subtotal, grandTotal, depositAmount) {
+  return crypto.createHash('sha256')
+    .update([quoteID, Number(subtotal).toFixed(2), Number(grandTotal).toFixed(2), Number(depositAmount).toFixed(2)].join('|'))
+    .digest('hex').slice(0, 16);
+}
+
+// Money-path alert for quote payments (deposit paid / stale-hash / ledger
+// failure). Same Slack hooks as alert3DT, labeled for quotes.
+function alertQuotePay(text) {
+  console.error('[QUOTE PAY] ' + text);
+  const hook = process.env.SLACK_ORDER_ALERT_WEBHOOK_URL
+    || process.env.SLACK_QUOTE_DELETE_WEBHOOK_URL || '';
+  if (!hook) return;
+  fetch(hook, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: '💰 Quote payments: ' + text }),
+  }).catch(() => {/* alerting must never throw */});
+}
+
+// Append-only Order_Payments ledger mirror via the proxy. FAIL-SOFT: the quote
+// row's Notes JSON is the primary record — a ledger outage must never black-hole
+// a webhook — but every miss is alerted for manual backfill.
+async function recordOrderPayment(entry) {
+  try {
+    const r = await fetch(`${TDT_PROXY}/api/order-payments/entry`, {
+      method: 'POST',
+      headers: Object.assign(
+        { 'Content-Type': 'application/json' },
+        process.env.CRM_API_SECRET ? { 'X-CRM-API-Secret': process.env.CRM_API_SECRET } : {}
+      ),
+      body: JSON.stringify(entry),
+    });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  } catch (e) {
+    alertQuotePay(`${entry.quoteID}: payment RECORDED on the quote but the Order_Payments ledger write failed (${e.message}) — backfill the ledger row manually.`);
+  }
+}
+
+// Deposit/balance receipts (customer + rep). Fully fail-soft, fire-and-forget.
+function sendQuotePaymentEmails(row, payment) {
+  if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
+    console.warn('[QuoteDeposit] EMAILJS keys not set — skipping payment receipts.');
+    return;
+  }
+  const quoteId = row.QuoteID;
+  const dep = parseNotesJson(row.Notes).deposit || {};
+  const paid = Number(payment.amount || 0).toFixed(2);
+  const balance = payment.kind === 'balance' ? '0.00'
+    : Number(dep.balanceAmount != null ? dep.balanceAmount : 0).toFixed(2);
+  const grand = Number(dep.grandTotal != null ? dep.grandTotal : 0).toFixed(2);
+  const custEmail = payment.payerEmail || row.CustomerEmail || '';
+  const repEmail = (row.SalesRepEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.SalesRepEmail))
+    ? row.SalesRepEmail : 'sales@nwcustomapparel.com';
+  const quoteUrl = `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`;
+  if (custEmail) {
+    sendEmailJSTemplate(DEPOSIT_CUSTOMER_TEMPLATE, {
+      to_email: custEmail, to_name: row.CustomerName || 'there',
+      quote_id: quoteId, amount_paid: paid, balance_due: balance, grand_total: grand,
+    }).then(
+      () => console.log('[QuoteDeposit] ✓ customer receipt sent for', quoteId),
+      (e) => console.error('[QuoteDeposit] customer receipt failed for', quoteId, ':', e.message)
+    );
+  }
+  sendEmailJSTemplate(DEPOSIT_STAFF_TEMPLATE, {
+    to_email: repEmail, to_name: row.SalesRepName || 'NWCA Sales',
+    quote_id: quoteId, customer_name: row.CustomerName || '',
+    customer_email: row.CustomerEmail || custEmail, company_name: row.CompanyName || '',
+    amount_paid: paid, balance_due: balance, quote_url: quoteUrl,
+  }).then(
+    () => console.log('[QuoteDeposit] ✓ rep alert sent for', quoteId),
+    (e) => console.error('[QuoteDeposit] rep alert failed for', quoteId, ':', e.message)
+  );
+}
+
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
 app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
@@ -955,6 +1067,80 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       if (!quoteID) {
         console.warn('[Webhook] No quoteID in metadata');
         return res.json({ received: true });
+      }
+
+      // ── Quote deposit/balance payments (Storefront Checkout Phase 1) ──────
+      // Sessions carrying metadata.kind are PAYMENTS AGAINST AN EXISTING QUOTE.
+      // They must never fall through to the express-order path below (which
+      // would try to push a whole order to ShopWorks). Express sessions carry
+      // no `kind`, so the legacy path is untouched by construction.
+      if (metadata.kind) {
+        if (metadata.kind !== 'deposit' && metadata.kind !== 'balance') {
+          alertQuotePay(`Stripe session ${session.id} has unknown metadata.kind '${metadata.kind}' for ${quoteID} — payment NOT auto-recorded; check the Stripe dashboard.`);
+          return res.json({ received: true, status: 'unknown-kind' });
+        }
+        let row;
+        try {
+          row = await fetchQuoteSessionRow(quoteID);
+        } catch (lookupErr) {
+          // Failed lookup ≠ no record — 5xx so Stripe retries (same rule as 3DT).
+          console.error('[Webhook] Quote-payment lookup failed:', lookupErr.message, '— asking Stripe to retry');
+          return res.status(503).send('Quote lookup unavailable — retry');
+        }
+        if (!row) {
+          alertQuotePay(`PAYMENT WITHOUT QUOTE ROW — Stripe session ${session.id} paid $${(session.amount_total / 100).toFixed(2)} as a ${metadata.kind} for ${quoteID}, but no quote_sessions row matches. Recover from the Stripe dashboard.`);
+          return res.json({ received: true, status: 'no-record' });
+        }
+        const notes = parseNotesJson(row.Notes);
+        const payments = Array.isArray(notes.payments) ? notes.payments : [];
+        if (payments.some((p) => p && p.stripeSessionId === session.id)) {
+          console.log('[Webhook] Quote payment already recorded, skipping:', quoteID);
+          return res.json({ received: true, status: 'duplicate' });
+        }
+        // The paid session was bound to a totals-hash at creation. A rep edit
+        // between link-send and payment surfaces here — the money is already
+        // taken, so record it and alert loudly instead of failing.
+        if (notes.deposit && metadata.totalsHash && notes.deposit.totalsHash !== metadata.totalsHash) {
+          alertQuotePay(`${quoteID}: ${metadata.kind} of $${(session.amount_total / 100).toFixed(2)} was paid against a STALE totals-hash (quote edited after the pay link went out). Verify amounts with the customer.`);
+        }
+        const payment = {
+          kind: metadata.kind,
+          amount: Math.round(session.amount_total) / 100,
+          stripeSessionId: session.id,
+          paymentIntent: session.payment_intent || '',
+          payerEmail: (session.customer_details && session.customer_details.email) || session.customer_email || '',
+          at: new Date().toISOString(),
+        };
+        payments.push(payment);
+        notes.payments = payments;
+        if (notes.deposit) {
+          if (payment.kind === 'deposit') notes.deposit.paidAt = payment.at;
+          if (payment.kind === 'balance') notes.deposit.balancePaidAt = payment.at;
+        }
+        const notesPut = await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ Notes: JSON.stringify(notes) }),
+        });
+        if (!notesPut.ok) {
+          // Money is in Stripe but our record write failed — 5xx so Stripe
+          // redelivers (the sessionId dedup above makes the retry safe).
+          alertQuotePay(`${quoteID}: ${payment.kind} paid (session ${session.id}) but the quote_sessions Notes write failed (HTTP ${notesPut.status}) — Stripe will retry.`);
+          return res.status(503).send('Record write failed — retry');
+        }
+        // Ledger mirror + receipts + rep ping — all fail-soft (Notes is the record).
+        recordOrderPayment({
+          quoteID, type: payment.kind, amount: payment.amount,
+          stripeSessionId: session.id, paymentIntent: payment.paymentIntent,
+          payerEmail: payment.payerEmail, customerName: row.CustomerName || '',
+          companyName: row.CompanyName || '',
+        });
+        try { sendQuotePaymentEmails(row, payment); } catch (e) { console.error('[QuoteDeposit] receipt dispatch error:', e.message); }
+        const balDue = payment.kind === 'balance' ? 0
+          : Number((notes.deposit && notes.deposit.balanceAmount) || 0);
+        alertQuotePay(`✅ ${quoteID}: ${payment.kind} of $${payment.amount.toFixed(2)} PAID by ${payment.payerEmail || row.CustomerEmail || 'unknown'}${row.CompanyName ? ' (' + row.CompanyName + ')' : ''}. Balance due: $${balDue.toFixed(2)}.`);
+        console.log('[Webhook] ✓ Quote payment recorded:', quoteID, payment.kind, payment.amount);
+        return res.json({ received: true, status: 'quote-payment-recorded' });
       }
 
       console.log('[Webhook] Processing payment for QuoteID:', quoteID);
@@ -10466,8 +10652,15 @@ app.put('/api/quote-change-log/:id/acknowledge', async (req, res) => {
 });
 
 // Public API - Accept quote
-app.post('/api/public/quote/:quoteId/accept', async (req, res) => {
+// strictLimiter + JSON-only (Storefront Checkout Phase 0, 2026-07-05): a
+// cross-site form POST can't send application/json without a CORS preflight,
+// so this blocks drive-by acceptances from hostile pages; accepting is a
+// once-per-quote action, so 20/hr/IP is generous.
+app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) => {
   try {
+    if (!req.is('application/json')) {
+      return res.status(415).json({ error: 'JSON body required' });
+    }
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
     const { name, email } = req.body;
 
@@ -10554,6 +10747,168 @@ app.post('/api/public/quote/:quoteId/accept', async (req, res) => {
   } catch (error) {
     console.error('Error accepting quote:', error);
     res.status(500).json({ error: 'Failed to accept quote' });
+  }
+});
+
+// ── Online deposit payments (Storefront Checkout Phase 1, 2026-07-05) ────────
+// Staff API — a rep ENABLES the deposit on an Accepted quote, supplying the
+// rep-confirmed shipping $ + tax-rate % (WQ quotes save TaxAmount=0 by design;
+// this is where "a rep confirms tax and shipping" becomes a recorded number).
+// Deposit % comes from Service_Codes DEPOSIT-PCT — fail-closed, no hardcoded
+// fallback (Erik's rule). The full terms + totals-hash land in Notes JSON.
+app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) => {
+  try {
+    const quoteId = String(req.params.quoteId || '').trim();
+    const shipping = Number(req.body?.shipping);
+    const taxRatePct = Number(req.body?.taxRatePct);
+    if (!quoteId) return res.status(400).json({ error: 'quoteId required' });
+    if (!Number.isFinite(shipping) || !Number.isFinite(taxRatePct)) {
+      return res.status(400).json({ error: 'shipping and taxRatePct are required numbers' });
+    }
+
+    const row = await fetchQuoteSessionRow(quoteId);
+    if (!row) return res.status(404).json({ error: 'Quote not found' });
+    if (row.Status !== 'Accepted') {
+      return res.status(409).json({ error: `Quote status is '${row.Status}' — the customer must accept the quote before a deposit is collected.` });
+    }
+
+    const notes = parseNotesJson(row.Notes);
+    if (Array.isArray(notes.payments) && notes.payments.some((p) => p && p.kind === 'deposit')) {
+      return res.status(409).json({ error: 'A deposit has already been paid on this quote.' });
+    }
+
+    // Deposit % — Caspio-driven, fail-closed.
+    let depositPct;
+    try {
+      const r = await fetch(`${TDT_PROXY}/api/service-codes?code=DEPOSIT-PCT`);
+      if (!r.ok) throw new Error(`HTTP ${r.status} from service-codes`);
+      const j = await r.json();
+      const codeRow = j && j.data && j.data[0];
+      if (!codeRow || !codeRow.IsActive) throw new Error('DEPOSIT-PCT missing/inactive in Caspio Service_Codes');
+      depositPct = parseFloat(codeRow.SellPrice);
+      if (!(depositPct > 0 && depositPct <= 100)) throw new Error(`DEPOSIT-PCT SellPrice '${codeRow.SellPrice}' out of range (0-100]`);
+    } catch (e) {
+      return res.status(502).json({ error: `Deposit % unavailable: ${e.message}. Add/activate Service_Codes row DEPOSIT-PCT (SellPrice = percent, e.g. 50) and retry.` });
+    }
+
+    let terms;
+    try {
+      terms = QuoteDepositMath.computeDepositTerms({
+        subtotal: parseFloat(row.TotalAmount), shipping, taxRatePct, depositPct,
+      });
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+
+    const totalsHash = computeQuoteTotalsHash(quoteId, terms.subtotal, terms.grandTotal, terms.depositAmount);
+    notes.deposit = Object.assign({}, terms, {
+      enabled: true,
+      totalsHash,
+      enabledAt: new Date().toISOString(),
+      enabledBy: (req.session.crmUser && (req.session.crmUser.email || req.session.crmUser.Email || req.session.crmUser.name)) || 'staff',
+    });
+    await makeApiRequest(`/quote_sessions/${row.PK_ID}`, 'PUT', { Notes: JSON.stringify(notes) });
+
+    console.log(`[QuoteDeposit] ${quoteId} deposit enabled: $${terms.depositAmount.toFixed(2)} of $${terms.grandTotal.toFixed(2)} (${depositPct}%)`);
+    res.json({
+      success: true,
+      quoteId,
+      deposit: notes.deposit,
+      payUrl: `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`,
+    });
+  } catch (error) {
+    console.error('[QuoteDeposit] enable failed:', error);
+    res.status(500).json({ error: 'Failed to enable deposit' });
+  }
+});
+
+// Public API — start Stripe HOSTED Checkout for a rep-enabled deposit. The
+// amount comes ONLY from the server-stored deposit block (never the request),
+// and the block is re-verified against the row's CURRENT TotalAmount so a
+// quote edited after enablement can't be charged at stale numbers. PCI stays
+// SAQ-A: hosted Checkout only, no card data touches this server.
+app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (req, res) => {
+  try {
+    if (!req.is('application/json')) {
+      return res.status(415).json({ error: 'JSON body required' });
+    }
+    const quoteId = String(req.params.quoteId || '').trim();
+    if (!quoteId) return res.status(400).json({ error: 'quoteId required' });
+
+    const row = await fetchQuoteSessionRow(quoteId);
+    if (!row) return res.status(404).json({ error: 'Quote not found' });
+    const notes = parseNotesJson(row.Notes);
+    const dep = notes.deposit;
+    if (!dep || !dep.enabled) {
+      return res.status(409).json({ error: 'Deposit is not set up on this quote yet — your rep will activate it.' });
+    }
+    if (row.Status !== 'Accepted') {
+      return res.status(409).json({ error: 'The quote must be accepted before paying the deposit.' });
+    }
+    if (Array.isArray(notes.payments) && notes.payments.some((p) => p && p.kind === 'deposit')) {
+      return res.status(409).json({ error: 'Deposit already paid — thank you!' });
+    }
+    // Re-verify stored terms against the CURRENT row (rep edits invalidate).
+    const expectHash = computeQuoteTotalsHash(
+      quoteId, QuoteDepositMath.r2(parseFloat(row.TotalAmount)), dep.grandTotal, dep.depositAmount
+    );
+    if (expectHash !== dep.totalsHash) {
+      return res.status(409).json({ error: 'This quote changed after the deposit was set up. Ask your rep to re-enable the deposit.' });
+    }
+
+    const mode = process.env.STRIPE_MODE || 'development';
+    const secretKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_SECRET_KEY
+      : process.env.STRIPE_TEST_SECRET_KEY;
+    if (!secretKey) {
+      console.error('[QuoteDeposit] Stripe secret key not configured for mode:', mode);
+      return res.status(500).json({ error: 'Payments are not configured — please call (253) 922-5793.' });
+    }
+    const stripeInstance = stripe(secretKey);
+    const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      customer_email: row.CustomerEmail || undefined,
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            // DEPOSIT-PCT=100 (Erik 2026-07-05) → pay-in-full wording; any
+            // lower pct flips back to deposit wording with no deploy.
+            name: Number(dep.depositPct) >= 100
+              ? `Payment in full — Quote ${quoteId}`
+              : `${dep.depositPct}% deposit — Quote ${quoteId}`,
+            description: Number(dep.depositPct) >= 100
+              ? `Northwest Custom Apparel — order total $${Number(dep.grandTotal).toFixed(2)} incl. tax & shipping`
+              : `Northwest Custom Apparel — order total $${Number(dep.grandTotal).toFixed(2)} incl. tax & shipping; balance due after proof approval`,
+          },
+          unit_amount: Math.round(dep.depositAmount * 100),
+        },
+        quantity: 1,
+      }],
+      success_url: `${siteOrigin}/quote/${encodeURIComponent(quoteId)}?deposit=success`,
+      cancel_url: `${siteOrigin}/quote/${encodeURIComponent(quoteId)}?deposit=canceled`,
+      metadata: { quoteID: quoteId, kind: 'deposit', totalsHash: dep.totalsHash, source: 'quote-deposit' },
+    });
+
+    // Stamp the session id for staff visibility (fail-soft — the webhook keys
+    // off metadata, not this stamp).
+    try {
+      const stamped = parseNotesJson(row.Notes);
+      stamped.deposit = Object.assign({}, stamped.deposit, {
+        lastSessionId: session.id, lastSessionAt: new Date().toISOString(),
+      });
+      await makeApiRequest(`/quote_sessions/${row.PK_ID}`, 'PUT', { Notes: JSON.stringify(stamped) });
+    } catch (e) {
+      console.warn('[QuoteDeposit] session-id stamp failed (non-fatal):', e.message);
+    }
+
+    console.log('[QuoteDeposit] checkout session created for', quoteId, session.id);
+    res.json({ url: session.url });
+  } catch (error) {
+    console.error('[QuoteDeposit] checkout failed:', error);
+    res.status(500).json({ error: 'Failed to start the deposit checkout' });
   }
 });
 
