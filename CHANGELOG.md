@@ -1,3 +1,7 @@
+## v2026.07.05.2 (2026.07.05)
+
+- feat: Tier 1+2 UX batch — 19 improvements across portal, PDP, builders, QM, art hub
+
 ## v2026.07.05.1 (2026.07.05)
 
 - docs(memory): quote-accept emails LIVE — both templates created (EmailJS 24-char id cap)
