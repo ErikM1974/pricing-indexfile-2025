@@ -1,3 +1,7 @@
+## v2026.07.05.7 (2026.07.05)
+
+- cleanup: remove departed rep 'Adriyella' from selectable sales-rep dropdowns
+
 ## v2026.07.05.6 (2026.07.05)
 
 - cleanup: remove entire Adriyella task/bonus/report suite (she no longer works at NWCA)
