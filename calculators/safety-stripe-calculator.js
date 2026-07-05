@@ -271,26 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 company_year: '1977'
             };
             
-            console.log('Sending email with data:', emailData);
-
-            // Send email independently — a failure here must not report a saved design as failed.
-            let emailed = false;
-            try {
-                await emailjs.send(
-                    'service_jgrave3',
-                    'template_stripe',  // TODO: Replace with actual template ID
-                    emailData
-                );
-                emailed = true;
-            } catch (emailError) {
-                console.error('Confirmation email failed:', emailError);
-            }
-
-            // The design is real to the customer if EITHER path produced a record.
-            if (saved || emailed) {
-                if (saved && !emailed) {
-                    console.warn('Safety stripe design saved but confirmation email failed for', quoteID);
-                }
+            // Confirmation email removed 2026-07-05: the 'template_stripe' EmailJS template was
+            // never created (placeholder stub with a TODO), so this send always silently 400'd.
+            // The design save is the source of truth for a successful submission.
+            if (saved) {
                 showSuccess(quoteID);
                 closeSendModal();
             } else {

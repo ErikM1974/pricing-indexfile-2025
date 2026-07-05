@@ -77,7 +77,7 @@ A comprehensive suite of tools for office administration and performance trackin
 - **Admin Interface** (`adriyella-admin.html`) - Administrative functions
 - **Billing Dashboard** (`adriyella-billing-dashboard.html`) - Invoice and payment tracking
 - **Daily Tasks** (`adriyella-daily-tasks-v2.html`) - Task management system
-- **Daily Reports** (`adriyella-daily-report.html`) - Performance metrics
+- ~~**Daily Reports** (`adriyella-daily-report.html`)~~ — REMOVED 2026-07-05 (feature retired; its `adriyella_daily_report` EmailJS template was never created, so the report always silently failed to send)
 - **Task History** (`adriyella-task-history.html`) - Historical task data
 - **Bonus Calculator** (`adriyella-bonus-calculator.html`) - Commission calculations
 - **Bonus Report** (`adriyella-bonus-report.html`) - Bonus tracking
