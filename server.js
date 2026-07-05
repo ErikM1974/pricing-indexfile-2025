@@ -1020,7 +1020,9 @@ function sendQuotePaymentEmails(row, payment) {
     to_email: repEmail, to_name: row.SalesRepName || 'NWCA Sales',
     quote_id: quoteId, customer_name: row.CustomerName || '',
     customer_email: row.CustomerEmail || custEmail, company_name: row.CompanyName || '',
-    amount_paid: paid, balance_due: balance, quote_url: quoteUrl,
+    // grand_total included because the live template (created 2026-07-05 via
+    // dashboard clone) shares the receipt body with the customer template.
+    amount_paid: paid, balance_due: balance, grand_total: grand, quote_url: quoteUrl,
   }).then(
     () => console.log('[QuoteDeposit] ✓ rep alert sent for', quoteId),
     (e) => console.error('[QuoteDeposit] rep alert failed for', quoteId, ':', e.message)
