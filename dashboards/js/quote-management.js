@@ -1036,6 +1036,8 @@ function renderTable() {
                     <button class="action-btn" onclick="event.stopPropagation(); copyQuoteLink('${quote.QuoteID}')" title="Copy Link">
                         <i class="fas fa-link"></i>
                     </button>
+                    ${renderDuplicateButton(quote)}
+                    ${renderResendEmailButton(quote)}
                     <button class="action-btn action-audit" onclick="event.stopPropagation(); viewAudit('${quote.QuoteID}')" title="Pricing Audit">
                         <i class="fas fa-chart-bar"></i>
                     </button>
@@ -1230,6 +1232,147 @@ function copyQuoteLink(quoteId) {
         // Fallback
         prompt('Copy this link:', url);
     });
+}
+
+// ── Duplicate-as-new-quote (#4, 2026-07-05) ──────────────────────────
+// ?duplicate=<quoteId> loads a COPY of the source quote as a brand-NEW
+// quote at today's prices. It is READ-ONLY on the source (the builders'
+// loadQuoteForEditing runs with forDuplicate:true and never writes back),
+// so it's safe for ANY status — including Processed/locked/pushed rows,
+// which is exactly the reorder case Edit is locked for.
+//
+// Support today (verified 2026-07-05): only the DTF builder
+// (dtf-quote-builder.js ~line 239) and the embroidery builder
+// (embroidery-quote-builder.js ~line 2047) read the ?duplicate= param.
+// The SCP and DTG builders do NOT yet — support is being added
+// separately; UNCOMMENT their rows below the moment their builders honor
+// the param. Until then no Duplicate button renders for those prefixes,
+// so a click can never open a builder that silently ignores the copy.
+// Prefix→builder routing mirrors editQuote() above (leading letters only —
+// DTG0311-1 / DTF0601-1 / SP0601-9001 pack the date with NO hyphen).
+const DUPLICATE_BUILDERS = {
+    DTF:  '/quote-builders/dtf-quote-builder.html',
+    // EMB / EMBC / CEMB all route to the embroidery builder, same as Edit.
+    EMB:  '/quote-builders/embroidery-quote-builder.html',
+    EMBC: '/quote-builders/embroidery-quote-builder.html',
+    CEMB: '/quote-builders/embroidery-quote-builder.html',
+    // DTG:  '/quote-builders/dtg-quote-builder.html',        // pending ?duplicate= support
+    // SP / SPC / SSC → screenprint-quote-builder.html         // pending ?duplicate= support
+};
+
+// Leading-letters prefix of a QuoteID (same rule editQuote uses).
+function quoteIdPrefix(quoteId) {
+    return (String(quoteId).match(/^[A-Za-z]+/) || [''])[0].toUpperCase();
+}
+
+// Row button — only for prefixes whose builder honors ?duplicate= today.
+// Duplication is read-only on the source, so it renders for every status
+// (Open AND Processed/locked).
+function renderDuplicateButton(quote) {
+    if (!DUPLICATE_BUILDERS[quoteIdPrefix(quote.QuoteID)]) return '';
+    return `<button class="action-btn" onclick="event.stopPropagation(); duplicateQuote('${escapeJsAttr(quote.QuoteID)}')" title="Start a new quote pre-filled from this one">
+                <i class="fas fa-copy"></i>
+            </button>`;
+}
+
+function duplicateQuote(quoteId) {
+    const builderUrl = DUPLICATE_BUILDERS[quoteIdPrefix(quoteId)];
+    if (!builderUrl) {
+        // Defensive — the button never renders for unsupported prefixes.
+        alert(`${quoteId} can't be duplicated yet — its builder doesn't support pre-filling from an existing quote.`);
+        return;
+    }
+    window.open(`${builderUrl}?duplicate=${encodeURIComponent(quoteId)}`, '_blank');
+}
+
+// ── Resend quote email (#14, 2026-07-05) ─────────────────────────────
+// Re-sends the SAME customer quote-link email the builders send
+// (quote-builder-utils.js emailQuote(): EmailJS service_jgrave3 /
+// template_quote_email — existing template, never an invented ID). The
+// EmailJS browser SDK is loaded by quote-management.html with the same
+// <script> tag the builders use; init uses the builders' public key.
+const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+const EMAILJS_SERVICE_ID = 'service_jgrave3';
+const EMAILJS_TEMPLATE_QUOTE = 'template_quote_email';
+let emailJsInited = false;
+
+function ensureEmailJs() {
+    if (typeof emailjs === 'undefined') return false; // SDK failed to load
+    if (!emailJsInited) {
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+        emailJsInited = true;
+    }
+    return true;
+}
+
+// Row button — only for rows that have a customer email on file.
+function renderResendEmailButton(quote) {
+    const email = String(quote.CustomerEmail || '').trim();
+    if (!email) return '';
+    return `<button class="action-btn" onclick="event.stopPropagation(); resendQuoteEmail(${quote.PK_ID})" title="Resend quote email to ${escapeHtml(email)}">
+                <i class="fas fa-paper-plane"></i>
+            </button>`;
+}
+
+// Confirm (prompt pre-filled with the on-file address, editable) → send.
+// Keyed by PK_ID like deleteQuote so no email ever rides in an attribute.
+const resendInFlight = new Set();
+async function resendQuoteEmail(pkId) {
+    const quote = findQuoteByPk(pkId);
+    if (!quote) {
+        alert('Quote not found — refresh the page and try again.');
+        return;
+    }
+    const quoteId = quote.QuoteID;
+    if (resendInFlight.has(quoteId)) return; // double-click guard
+    if (!ensureEmailJs()) {
+        // Erik's #1 rule — a visible failure, never a silent no-op.
+        alert('Email service is unavailable (EmailJS SDK did not load).\nCheck your connection, refresh the page, and try again.');
+        return;
+    }
+
+    // Confirm + allow editing the address in one step: prompt pre-filled
+    // with the on-file email. Cancel aborts; OK sends to whatever's typed.
+    const onFile = String(quote.CustomerEmail || '').trim();
+    const entered = prompt(
+        `Resend quote ${quoteId} to this email?\n\nEdit the address below if needed, then click OK to send.`,
+        onFile
+    );
+    if (entered === null) return; // cancelled
+    const toEmail = entered.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) {
+        alert(`"${toEmail}" doesn't look like a valid email address. Nothing was sent.`);
+        return;
+    }
+
+    // Same customer link the builders' emailQuote builds — the public
+    // teamnwca.com origin, NOT window.location.origin (this dashboard can
+    // be open on the Heroku domain, which customers shouldn't see).
+    const siteOrigin = (window.APP_CONFIG && window.APP_CONFIG.SITE_ORIGIN) || 'https://www.teamnwca.com';
+    const quoteUrl = `${siteOrigin}/quote/${quoteId}`;
+
+    resendInFlight.add(quoteId);
+    showToast('Sending email…');
+    try {
+        // Params mirror quote-builder-utils.js emailQuote() exactly, so the
+        // template renders identically to the original send.
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_QUOTE, {
+            to_email: toEmail,
+            customer_name: quote.CustomerName || 'Customer',
+            quote_id: quoteId,
+            quote_link: quoteUrl,
+            reply_to: (quote.SalesRepEmail && String(quote.SalesRepEmail).trim()) || 'sales@nwcustomapparel.com',
+            company_name: 'Northwest Custom Apparel',
+            company_phone: '253-922-5793',
+        });
+        showToast(`✓ Email resent to ${toEmail}`);
+    } catch (err) {
+        // Erik's #1 rule — surface the failure, never fail silently.
+        console.error('[QuoteManagement] resendQuoteEmail failed:', err);
+        alert(`Failed to resend quote email for ${quoteId}:\n${(err && (err.text || err.message)) || err}`);
+    } finally {
+        resendInFlight.delete(quoteId);
+    }
 }
 
 function viewAudit(quoteId) {

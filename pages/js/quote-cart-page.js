@@ -537,11 +537,66 @@
         rows.push('<a class="btn btn-ghost" id="qcEmailQuote" href="' + escapeHtml(buildMailto(res)) + '">Email instead</a>');
         rows.push('<a class="btn btn-ghost" href="/catalog">Keep shopping</a>');
         rows.push('</div>');
+
+        // Email capture (#18, 2026-07-05): low-friction "Email me this quote"
+        // box that funnels into the EXISTING save/email flow (web-quote-service
+        // Phase 3) with the email pre-filled — no new email path, same
+        // engine-verified save. Hidden while the save panel itself is open.
+        rows.push(emailCaptureHtml(res));
         rows.push('<p class="qc-totals-foot">Prices are live from our pricing system and match what our team quotes. '
             + 'WA sales tax and shipping are added when your rep confirms. Final pricing confirmed with your free proof.</p>');
 
         box.innerHTML = rows.join('');
         syncSavePanel(cart);
+    }
+
+    // ============================================================
+    // EMAIL CAPTURE (#18, 2026-07-05)
+    //
+    // One email input + button under the totals actions. Submitting validates
+    // the address, pre-fills saveState.fields.email, and opens the EXISTING
+    // Phase 3 save panel (name focused) — the save + EmailJS send is 100%
+    // web-quote-service.js; this adds zero new email paths. The input value
+    // survives reprices because renderTotals re-injects captureState.email.
+    // ============================================================
+    var captureState = { email: '', error: '' };
+
+    function emailCaptureHtml(res) {
+        var disabled = res.grandTotal == null;
+        return '<div class="qc-capture" id="qcCaptureBox"' + (saveState.open ? ' hidden' : '') + '>'
+            + '<label class="field-label" for="qcCaptureEmail">Email me this quote</label>'
+            + '<div class="qc-capture-row">'
+            + '<input class="field-input" type="email" id="qcCaptureEmail" inputmode="email" autocomplete="email"'
+            + ' placeholder="you@company.com" value="' + escapeHtml(captureState.email) + '"'
+            + ' aria-describedby="qcCaptureHelp">'
+            + '<button class="btn btn-primary" type="button" id="qcCaptureBtn"'
+            + (disabled ? ' disabled title="Fix or remove the unpriced group first"' : '')
+            + '>Email it</button>'
+            + '</div>'
+            + (captureState.error ? '<p class="qc-capture-error" role="alert">' + escapeHtml(captureState.error) + '</p>' : '')
+            + '<p class="field-help" id="qcCaptureHelp">We save your quote and email you the link — just add your name on the next step.</p>'
+            + '</div>';
+    }
+
+    function setCaptureVisible(visible) {
+        var box = $('qcCaptureBox');
+        if (box) box.hidden = !visible;
+    }
+
+    function submitEmailCapture() {
+        var input = $('qcCaptureEmail');
+        if (input) captureState.email = input.value.trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(captureState.email)) {
+            captureState.error = 'Please enter a valid email address so we can send your quote.';
+            if (state.priced) renderTotals(buildCart(), state.priced);
+            var retry = $('qcCaptureEmail');
+            if (retry) retry.focus();
+            return;
+        }
+        captureState.error = '';
+        // Pre-fill the existing save form and open it — name gets focus there.
+        saveState.fields.email = captureState.email;
+        openSavePanel();
     }
 
     // ============================================================
@@ -754,6 +809,7 @@
         saveState.open = true;
         saveState.phase = 'form';
         saveState.errorMsg = '';
+        setCaptureVisible(false); // #18: the capture box duplicates the form's email field
         renderSavePanel(buildCart());
         const panel = $('qcSavePanel');
         if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -865,6 +921,7 @@
         if (act === 'cancel' || act === 'close') {
             saveState.open = false;
             if (act === 'close') { saveState.phase = 'form'; saveState.saved = null; }
+            setCaptureVisible(true); // #18: bring the capture box back
             renderSavePanel(buildCart());
             return;
         }
@@ -978,8 +1035,22 @@
 
         // Save panel (Phase 3) — the totals body re-renders on every reprice,
         // so the save button binds by delegation on the static aside.
+        // #18: the email-capture box lives in the same re-rendered body, so it
+        // delegates here too (click + Enter + input persistence).
         $('qcTotals').addEventListener('click', function (e) {
-            if (e.target.closest('#qcSaveBtn')) openSavePanel();
+            if (e.target.closest('#qcSaveBtn')) { openSavePanel(); return; }
+            if (e.target.closest('#qcCaptureBtn')) submitEmailCapture();
+        });
+        $('qcTotals').addEventListener('input', function (e) {
+            if (e.target && e.target.id === 'qcCaptureEmail') {
+                captureState.email = e.target.value;
+            }
+        });
+        $('qcTotals').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && e.target && e.target.id === 'qcCaptureEmail') {
+                e.preventDefault();
+                submitEmailCapture();
+            }
         });
         $('qcSavePanel').addEventListener('click', onSavePanelClick);
         $('qcSavePanel').addEventListener('input', onSavePanelInput);

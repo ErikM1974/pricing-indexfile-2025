@@ -228,6 +228,9 @@ var GarmentSubmitForm = (function () {
     function renderForm() {
         var container = document.getElementById(containerId);
         if (!container) return;
+        // Fresh form = fresh similar-request state (the card host is rebuilt).
+        lastSimilarKey = '';
+        if (similarTimer) { clearTimeout(similarTimer); similarTimer = null; }
         container.innerHTML = buildFormHtml();
         wireEvents();
         initCompanyAutocomplete();
@@ -455,6 +458,10 @@ var GarmentSubmitForm = (function () {
         return sectionHeader('4', 'Garment / Product', 'Style number and color for each garment. Type a style and tab out to load its colors.')
             + '<div id="gsf-garment-rows"></div>'
             + '<button type="button" class="gsf-add-btn" id="gsf-add-garment">+ Add another garment</button>'
+            // Similar-request detector (2026-07-05) — informational card injected
+            // here when this company already has a recent request for the same
+            // style. Never blocks submit; silent-skip on API failure.
+            + '<div id="gsf-similar-requests"></div>'
             + '</div>';
     }
 
@@ -725,6 +732,8 @@ var GarmentSubmitForm = (function () {
     function loadColorsForRow(idx, style) {
         if (!style) return;
         if (garmentRows[idx]) garmentRows[idx].colorsError = false;
+        // Style just landed — good moment to look for recent similar requests.
+        scheduleSimilarCheck();
         fetch(API_BASE + '/api/product-colors?styleNumber=' + encodeURIComponent(style))
             .then(function (r) {
                 // A non-ok response is a TRANSIENT error, NOT "this style has no colors".
@@ -914,6 +923,11 @@ var GarmentSubmitForm = (function () {
 
         var submitBtn = document.getElementById('gsf-submit-btn');
         if (submitBtn) submitBtn.addEventListener('click', handleSubmit);
+
+        // Similar-request detector — company blur covers free-typed companies
+        // (when CompanyContactPicker isn't loaded or no suggestion is picked).
+        var companyEl = document.getElementById('gsf-company');
+        if (companyEl) companyEl.addEventListener('blur', scheduleSimilarCheck);
     }
 
     // ── Adaptive behavior by Artwork / Approval status ─────────────────────
@@ -989,6 +1003,115 @@ var GarmentSubmitForm = (function () {
         return lines.join('\n');
     }
 
+    // ── Similar-request detector (2026-07-05) ──────────────────────────────
+    // When company + a garment style are both filled, look for this company's
+    // art requests from the last 30 days that used the same style, and show an
+    // informational "repeat order?" card. Purely advisory: it never blocks
+    // submit, and an API failure silently skips (console.warn only) — a hint
+    // widget must not add friction to the submit flow.
+    var similarTimer = null;
+    var lastSimilarKey = '';
+
+    function scheduleSimilarCheck() {
+        if (similarTimer) clearTimeout(similarTimer);
+        similarTimer = setTimeout(checkSimilarRequests, 600);
+    }
+
+    function clearSimilarCard() {
+        var host = document.getElementById('gsf-similar-requests');
+        if (host) host.innerHTML = '';
+    }
+
+    function checkSimilarRequests() {
+        var host = document.getElementById('gsf-similar-requests');
+        if (!host) return;
+        var company = getVal('gsf-company');
+        var styles = garmentRows
+            .map(function (r) { return (r.style || '').trim().toLowerCase(); })
+            .filter(function (s) { return s.length >= 2; });
+        if (!company || !styles.length) { lastSimilarKey = ''; clearSimilarCard(); return; }
+
+        // Dedupe — don't re-query while company + styles haven't changed.
+        var key = company.toLowerCase() + '|' + styles.slice().sort().join(',');
+        if (key === lastSimilarKey) return;
+        lastSimilarKey = key;
+
+        var from = new Date(Date.now() - 30 * 86400000);
+        var fromStr = from.getFullYear() + '-'
+            + String(from.getMonth() + 1).padStart(2, '0') + '-'
+            + String(from.getDate()).padStart(2, '0');
+
+        var url = API_BASE + '/api/artrequests?companyName=' + encodeURIComponent(company)
+            + '&dateCreatedFrom=' + fromStr
+            + '&orderBy=Date_Created DESC&limit=50'
+            + '&select=ID_Design,CompanyName,Design_Num_SW,Status,Date_Created,GarmentStyle,Garm_Style_2,Garm_Style_3,Garm_Style_4';
+
+        fetch(url)
+            .then(function (r) {
+                if (!r.ok) throw new Error('API ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                // The user may have kept typing — only render if inputs still match.
+                var companyNow = getVal('gsf-company');
+                if (!companyNow || companyNow.toLowerCase() !== company.toLowerCase()) return;
+                var rows = Array.isArray(data) ? data : [];
+                var matches = rows.filter(function (req) {
+                    var reqStyles = [req.GarmentStyle, req.Garm_Style_2, req.Garm_Style_3, req.Garm_Style_4]
+                        .map(function (s) { return String(s || '').trim().toLowerCase(); })
+                        .filter(Boolean);
+                    return reqStyles.some(function (rs) { return styles.indexOf(rs) !== -1; });
+                });
+                renderSimilarCard(matches, company);
+            })
+            .catch(function (err) {
+                // Advisory feature — silent skip, never surface an error to the AE.
+                console.warn('[GarmentSubmitForm] similar-request check skipped:', err && err.message);
+                clearSimilarCard();
+            });
+    }
+
+    function formatSimilarDate(s) {
+        if (window.CaspioDate && typeof window.CaspioDate.formatDate === 'function') {
+            return window.CaspioDate.formatDate(s);
+        }
+        return String(s || '').split('T')[0] || '—';
+    }
+
+    function renderSimilarCard(matches, company) {
+        var host = document.getElementById('gsf-similar-requests');
+        if (!host) return;
+        if (!matches.length) { host.innerHTML = ''; return; }
+        var shown = matches.slice(0, 5);
+        var items = shown.map(function (req) {
+            var id = String(req.ID_Design || '');
+            var designNum = String(req.Design_Num_SW || '').trim();
+            var label = designNum ? ('Design #' + designNum) : ('Request #' + id);
+            var reqStyles = [req.GarmentStyle, req.Garm_Style_2, req.Garm_Style_3, req.Garm_Style_4]
+                .map(function (s) { return String(s || '').trim(); })
+                .filter(Boolean)
+                .join(', ');
+            var status = typeof req.Status === 'object'
+                ? String(Object.values(req.Status || {})[0] || '')
+                : String(req.Status || '');
+            return '<li style="margin:2px 0;">'
+                + '<a href="/art-request/' + encodeURIComponent(id) + '" target="_blank" rel="noopener" style="font-weight:600;color:#1d4ed8;">'
+                + escapeHtml(label) + '</a>'
+                + ' — ' + escapeHtml(reqStyles || 'style n/a')
+                + ' · ' + escapeHtml(formatSimilarDate(req.Date_Created))
+                + (status ? ' · ' + escapeHtml(status) : '')
+                + '</li>';
+        }).join('');
+        host.innerHTML =
+            '<div class="gsf-similar-card" style="margin-top:10px;padding:10px 14px;border:1px solid #93c5fd;background:#eff6ff;border-radius:8px;font-size:.85rem;color:#1e3a5f;">'
+            + '<strong>\u{1F501} Found ' + matches.length + ' recent request' + (matches.length === 1 ? '' : 's')
+            + '</strong> for <strong>' + escapeHtml(company) + '</strong> with this garment style in the last 30 days. '
+            + 'Repeat order? Consider "Repeat from previous order" + the previous design # instead of a brand-new request:'
+            + '<ul style="margin:6px 0 0 18px;padding:0;">' + items + '</ul>'
+            + (matches.length > shown.length ? '<div style="margin-top:4px;opacity:.75;">+ ' + (matches.length - shown.length) + ' more not shown</div>' : '')
+            + '</div>';
+    }
+
     // ── Pickers ────────────────────────────────────────────────────────────
     function initCompanyAutocomplete() {
         if (typeof CompanyContactPicker === 'undefined') {
@@ -1007,8 +1130,9 @@ var GarmentSubmitForm = (function () {
                 // Mirror id_Customer into the visible SW Cust# box.
                 var custNum = document.getElementById('gsf-cust-num');
                 if (custNum && selection.customerId) custNum.value = String(selection.customerId);
+                scheduleSimilarCheck();
             },
-            onClear: function () { selectedContact = null; }
+            onClear: function () { selectedContact = null; scheduleSimilarCheck(); }
         });
     }
 

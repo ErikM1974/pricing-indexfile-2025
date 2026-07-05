@@ -103,6 +103,46 @@ body {
 }
 .cp-company-name { font-size: 21px; font-weight: 700; color: var(--cp-ink); margin-bottom: 3px; }
 .cp-company-subtitle { font-size: 13px; color: var(--cp-ink-mute); }
+/* "Your rep: <name> · <contact>" line under the company name (filled from the orders feed) */
+.cp-company-rep { font-size: 13px; color: var(--cp-ink-soft); margin-top: 7px; }
+.cp-company-rep strong { color: var(--cp-ink); font-weight: 600; }
+.cp-rep-link { color: var(--cp-theme-dark); font-weight: 600; text-decoration: none; }
+.cp-rep-link:hover { color: var(--cp-theme); text-decoration: underline; }
+.cp-rep-link:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; border-radius: 3px; }
+
+/* ── "Needs your approval" banner — same family as the awaiting-approval status pill ── */
+.cp-approval-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: #fde7ec;
+    border: 1px solid #f2bcc7;
+    color: #9c1c33;
+    border-radius: var(--cp-radius);
+    box-shadow: var(--cp-shadow-1);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    font-size: 13.5px;
+    font-weight: 600;
+}
+.cp-approval-icon { font-size: 16px; line-height: 1; flex: 0 0 auto; }
+.cp-approval-btn {
+    margin-left: auto;
+    background: #9c1c33;
+    color: #fff;
+    border: none;
+    border-radius: var(--cp-radius-sm);
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s;
+}
+.cp-approval-btn:hover { background: #7d1628; }
+.cp-approval-btn:focus-visible { outline: 2px solid #9c1c33; outline-offset: 2px; }
 
 /* ── Sections (ONE header pattern) ── */
 .cp-section { margin-bottom: var(--cp-section-y); }
@@ -402,6 +442,45 @@ body {
 }
 .cp-link:hover { color: var(--cp-theme); text-decoration: underline; }
 .cp-link:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; border-radius: 3px; }
+
+/* Orders search — mirrors the Your Products toolbar (shown only when the list is long) */
+.cp-orders-toolbar { display: flex; gap: 10px; margin: 0 0 14px; flex-wrap: wrap; }
+/* In-table "no search matches" state (NOT the section empty state — orders exist, none match) */
+.cp-table-noresults { padding: 28px 20px; text-align: center; color: var(--cp-ink-mute); font-size: 14px; }
+
+/* Due-date warn badge (Invoices "Due" column — balance owed and past due / due within 7 days) */
+.cp-due-badge {
+    display: inline-block;
+    margin-left: 7px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--cp-gold-bg);
+    color: var(--cp-gold-ink);
+    border: 1px solid var(--cp-gold-border);
+    vertical-align: 1px;
+}
+.cp-due-badge--past { background: #fde7ec; color: #9c1c33; border-color: #f2bcc7; }
+
+/* Per-row "Re-order" button in the Orders table (opens the existing request modal) */
+.cp-row-reorder {
+    background: var(--cp-theme-bg);
+    color: var(--cp-theme-dark);
+    border: 1px solid var(--cp-theme-light);
+    border-radius: var(--cp-radius-sm);
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.cp-row-reorder:hover:not(:disabled) { background: var(--cp-theme); color: #fff; border-color: var(--cp-theme); }
+.cp-row-reorder:disabled { opacity: .6; cursor: default; }
+.cp-row-reorder:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; }
 
 /* ── Staff-preview ribbon (only shown when the staff console previews a portal) ── */
 .cp-preview-ribbon {

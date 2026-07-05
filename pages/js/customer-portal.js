@@ -26,6 +26,8 @@
     var PRODUCT_URL_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/product/') : '/portal/product/';
     var REWARDS_URL = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/rewards') : '/api/portal/rewards';
     var INVOICE_BASE = PREVIEW ? ('/portal-admin/preview/' + PREVIEW + '/invoice/') : '/portal/invoice/';
+    // JSON invoice detail (header + line items) — feeds the row "Re-order" prefill.
+    var INVOICE_API_BASE = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/invoice/') : '/api/portal/invoice/';
     var LOGIN_URL = PREVIEW ? '/auth/saml/login' : '/customer/login';
     if (PREVIEW) showPreviewRibbon();
 
@@ -66,7 +68,7 @@
         if (snapEl) snapEl.style.display = 'grid';
         document.addEventListener('click', function (e) {
             if (!e.target.closest) return;
-            var tab = e.target.closest('.cp-tab[data-tab], .cp-snap[data-tab]');
+            var tab = e.target.closest('.cp-tab[data-tab], .cp-snap[data-tab], .cp-approval-btn[data-tab]');
             if (tab) { e.preventDefault(); switchTab(tab.getAttribute('data-tab'), true); return; }
             var more = e.target.closest('.cp-rows-more');
             if (more) { toggleRows(more); return; }
@@ -165,6 +167,10 @@
         // Approved/Completed = the customer's FINAL artwork ("Completed" = the job actually ran).
         // Exact match — NOT a substring, or "Awaiting Approval" would wrongly count as approved.
         var isApproved = function (s) { var t = String(s || '').trim().toLowerCase(); return t === 'approved' || t === 'completed' || t === 'complete'; };
+        // "Awaiting Approval" = the ball is in the CUSTOMER's court (drives the top banner +
+        // card badge). Deliberately NOT "Revision Requested" — there the customer already
+        // acted and the art team is working, so nagging them would be wrong.
+        var isAwaiting = function (s) { return String(s || '').trim().toLowerCase().replace(/\s+/g, '-') === 'awaiting-approval'; };
         var items = [];
         (mockups || []).forEach(function (m) {
             var img = m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
@@ -173,7 +179,7 @@
                 design: String(m.Design_Number || ''),
                 name: m.Design_Name || (m.Design_Number ? 'Design #' + m.Design_Number : 'Design'),
                 meta: [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · '),
-                img: img, date: m.Submitted_Date || '', kind: 'mockup', approved: isApproved(m.Status)
+                img: img, date: m.Submitted_Date || '', kind: 'mockup', approved: isApproved(m.Status), awaiting: isAwaiting(m.Status)
             });
         });
         (artRequests || []).forEach(function (a) {
@@ -186,7 +192,7 @@
                 design: String(a.Design_Num_SW || ''),
                 name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
                 meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
-                img: img, date: a.Date_Created || '', kind: 'art', approved: isApproved(a.Status)
+                img: img, date: a.Date_Created || '', kind: 'art', approved: isApproved(a.Status), awaiting: isAwaiting(a.Status)
             });
         });
 
@@ -204,6 +210,15 @@
         });
         var logos = Object.keys(byKey).map(function (k) { return byKey[k]; })
             .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+
+        // Designs with ANY proof awaiting the customer's approval → top banner + card badge.
+        // Keyed the same way as the grouping so a design whose SHOWN card is an older approved
+        // proof still gets flagged when a newer proof of that design awaits approval.
+        var actionKeys = {};
+        items.forEach(function (it) {
+            if (it.awaiting) actionKeys[it.design ? ('d:' + it.design) : ('u:' + it.img)] = true;
+        });
+        showApprovalBanner(Object.keys(actionKeys).length);
 
         countEl.textContent = logos.length;
         if (!logos.length) { grid.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
@@ -224,8 +239,11 @@
             // images blank until the customer scrolled far enough. Few images, so eager is fine.
             var img = '<img src="' + gridSrc + '" alt="" loading="eager" '
                 + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
-            var badge = l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '';
-            return '<div class="cp-card cp-logo-card" role="button" tabindex="0"'
+            var needs = !!actionKeys[l.design ? ('d:' + l.design) : ('u:' + l.img)];
+            var badge = needs
+                ? '<div class="cp-action-badge">Needs approval</div>'
+                : (l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '');
+            return '<div class="cp-card cp-logo-card' + (needs ? ' cp-card--action-needed' : '') + '" role="button" tabindex="0"'
                 + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
                 + '<div class="cp-card-image">' + img + badge + '</div>'
                 + '<div class="cp-card-body">'
@@ -270,6 +288,34 @@
         if (!status) return false;
         var s = status.toLowerCase().replace(/\s+/g, '-');
         return s === 'awaiting-approval' || s === 'revision-requested';
+    }
+
+    // Top "needs your approval" banner — shown when any design proof awaits the customer's
+    // OK (count computed in renderMyLogos). The button carries data-tab="logos" and rides
+    // the same delegated tab-switch handler as the snapshot chips.
+    function showApprovalBanner(count) {
+        var banner = document.getElementById('cp-approval-banner');
+        if (!banner) return;
+        if (!count) { banner.style.display = 'none'; return; }
+        var txt = document.getElementById('cp-approval-text');
+        if (txt) txt.textContent = count === 1
+            ? 'A design proof is waiting for your approval.'
+            : count + ' design proofs are waiting for your approval.';
+        banner.style.display = 'flex';
+    }
+
+    // "Your rep" line in the company banner — name from the customer's own orders feed
+    // (CustomerServiceRep, already shown on their invoices). Known rep → mailto link;
+    // unmapped/departed rep → the main line so the customer always has a working contact.
+    function renderRep(rep) {
+        var el = document.getElementById('cp-company-rep');
+        if (!el) return;
+        if (!rep || !rep.name) { el.style.display = 'none'; return; }
+        var contact = rep.email
+            ? '<a class="cp-rep-link" href="mailto:' + escapeAttr(rep.email) + '">' + escapeHtml(rep.email) + '</a>'
+            : '<a class="cp-rep-link" href="tel:+12539225793">(253) 922-5793</a>';
+        el.innerHTML = 'Your rep: <strong>' + escapeHtml(rep.name) + '</strong> &middot; ' + contact;
+        el.style.display = 'block';
     }
 
     function renderStatusBadge(status) {
@@ -334,13 +380,16 @@
             })
             .then(function (data) {
                 _ordersFailed = false; _ordersLoaded = true;
-                var orders = (data && data.orders) || [];
-                renderOrders(orders);
-                renderInvoices(orders);
+                _orders = (data && data.orders) || [];
+                renderRep(data && data.rep);
+                renderOrders();
+                renderInvoices(_orders);
             })
             .catch(function (err) {
                 console.error('Portal orders load failed:', err);
                 _ordersFailed = true;
+                var toolbar = document.getElementById('cp-orders-toolbar');
+                if (toolbar) toolbar.style.display = 'none';
                 renderTableError('cp-orders-wrap', 'cp-orders-empty', 'cp-orders-count', 'orders', "We couldn't load your orders");
                 renderTableError('cp-invoices-wrap', 'cp-invoices-empty', 'cp-invoices-count', 'orders', "We couldn't load your invoices");
                 updateSnapshot();
@@ -398,30 +447,68 @@
         btn.textContent = expanded ? btn.getAttribute('data-more') : btn.getAttribute('data-less');
     }
 
-    function renderOrders(orders) {
-        document.getElementById('cp-orders-count').textContent = orders.length;
+    // Full loaded set lives here so the search filters EVERYTHING (not just the visible
+    // ROW_CAP rows). Mirrors the Your Products search pattern.
+    var _orders = [];
+
+    function renderOrders() {
+        var all = _orders;
+        document.getElementById('cp-orders-count').textContent = all.length; // count = FULL total, never the filtered subset
         updateSnapshot();
         var wrap = document.getElementById('cp-orders-wrap');
         var empty = document.getElementById('cp-orders-empty');
-        if (!orders.length) { wrap.innerHTML = ''; empty.style.display = 'block'; return; }
+        var toolbar = document.getElementById('cp-orders-toolbar');
+        if (!all.length) {
+            if (toolbar) toolbar.style.display = 'none';
+            wrap.innerHTML = ''; empty.style.display = 'block'; return;
+        }
         empty.style.display = 'none';
-        var list = orders.slice().sort(byDateDesc('orderDate')); // most-recent first for the cap
+        if (toolbar) toolbar.style.display = all.length > 6 ? 'flex' : 'none'; // aids only when they help
+        var searchEl = document.getElementById('cp-orders-search');
+        var q = ((searchEl && searchEl.value) || '').trim().toLowerCase();
+        var list = all.slice().sort(byDateDesc('orderDate')); // most-recent first for the cap
+        if (q) {
+            list = list.filter(function (o) {
+                var hay = [o.designName, o.orderNumber, o.poNumber]
+                    .map(function (x) { return x == null ? '' : String(x); })
+                    .join(' ').toLowerCase();
+                return hay.indexOf(q) !== -1;
+            });
+        }
+        if (!list.length) {
+            wrap.innerHTML = '<div class="cp-table-noresults">No orders match &ldquo;' + escapeHtml(q) + '&rdquo;.</div>';
+            return;
+        }
         var rows = list.map(function (o, i) {
-            return '<tr' + (i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
+            // "Shipped <date>" pill rides next to the status when ManageOrders has an actual
+            // ship date (date_Shippied — [sic] the API's own field name, projected as shipDate).
+            var shipPill = o.shipDate
+                ? ' <span class="cp-status cp-status--shipped">Shipped ' + escapeHtml(formatDate(o.shipDate)) + '</span>'
+                : '';
+            // A search shows ALL matches (no cap); browsing keeps the recent-N cap.
+            return '<tr' + (!q && i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
                 '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
                 '<td>' + escapeHtml(o.designName || '—') + '</td>' +
                 '<td>' + escapeHtml(o.poNumber || '—') + '</td>' +
                 '<td class="cp-num">' + escapeHtml(String(o.quantity || '')) + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
-                '<td>' + renderStatusBadge(o.status) + '</td>' +
+                '<td>' + renderStatusBadge(o.status) + shipPill + '</td>' +
+                '<td><button type="button" class="cp-row-reorder"' +
+                    ' data-order="' + escapeAttr(String(o.orderNumber || '')) + '"' +
+                    ' data-design="' + escapeAttr(o.designName || '') + '">Re-order</button></td>' +
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
             '<th>Order</th><th>Date</th><th>Design</th><th>PO</th><th class="cp-num">Qty</th>' +
-            '<th class="cp-num">Total</th><th>Status</th>' +
-            '</tr></thead><tbody>' + rows + '</tbody></table>' + moreControl(list.length, 'orders');
+            '<th class="cp-num">Total</th><th>Status</th><th aria-label="Actions"></th>' +
+            '</tr></thead><tbody>' + rows + '</tbody></table>' + (q ? '' : moreControl(list.length, 'orders'));
     }
+
+    (function wireOrderSearch() {
+        var search = document.getElementById('cp-orders-search');
+        if (search) search.addEventListener('input', renderOrders);
+    })();
 
     function renderInvoices(orders) {
         // Only invoiced orders (or with a money total) appear in the invoices/balances view.
@@ -440,6 +527,7 @@
             return '<tr' + (i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
                 '<td><a class="cp-link" href="' + INVOICE_BASE + encodeURIComponent(o.orderNumber) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a></td>' +
                 '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
+                '<td>' + (escapeHtml(formatDate(o.dueDate)) || '—') + dueWarnBadge(o) + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
                 '<td class="cp-num">' + money(o.paid) + '</td>' +
                 '<td class="cp-num">' + money(o.balance) + '</td>' +
@@ -447,9 +535,23 @@
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
-            '<th>Order</th><th>Invoice Date</th><th class="cp-num">Total</th>' +
+            '<th>Order</th><th>Invoice Date</th><th>Due</th><th class="cp-num">Total</th>' +
             '<th class="cp-num">Paid</th><th class="cp-num">Balance</th><th>Status</th>' +
             '</tr></thead><tbody>' + rows + '</tbody></table>' + moreControl(list.length, 'invoices');
+    }
+
+    // Subtle warn badge next to the Due date — only for invoices that still OWE money and
+    // are past due / due within 7 days. Local-midnight comparison (same rule as formatDate:
+    // take the date portion, never UTC-shift), so "due today" reads correctly worldwide.
+    function dueWarnBadge(o) {
+        if (!o || !o.dueDate || !(Number(o.balance) > 0)) return '';
+        var due = new Date(String(o.dueDate).slice(0, 10) + 'T00:00:00');
+        if (isNaN(due.getTime())) return '';
+        var today = new Date(); today.setHours(0, 0, 0, 0);
+        var days = Math.round((due.getTime() - today.getTime()) / 86400000);
+        if (days < 0) return ' <span class="cp-due-badge cp-due-badge--past">Past due</span>';
+        if (days <= 7) return ' <span class="cp-due-badge">Due soon</span>';
+        return '';
     }
 
     // ── Phase 4: Your Products + Recommendations + request-to-rep ──
@@ -623,7 +725,7 @@
         try { parsedSizes = JSON.parse(btn.getAttribute('data-sizes') || '{}') || {}; } catch (e) { parsedSizes = {}; }
         var parsedColors = [];
         try { parsedColors = JSON.parse(btn.getAttribute('data-colors') || '[]') || []; } catch (e) { parsedColors = []; }
-        reqState = {
+        openReqModalState({
             kind: btn.getAttribute('data-kind'),
             style: btn.getAttribute('data-style'),
             color: btn.getAttribute('data-color'),
@@ -633,7 +735,13 @@
             designName: btn.getAttribute('data-designname'),
             sizes: parsedSizes,
             orderedColors: parsedColors
-        };
+        }, '');
+    }
+
+    // Shared modal opener — product cards build state from data-attributes (openReqModal above);
+    // the Orders-row "Re-order" builds it from the invoice line items and pre-fills the note.
+    function openReqModalState(state, note) {
+        reqState = state;
         document.getElementById('cp-req-title').textContent = reqState.kind === 'product' ? 'Re-order this product' : 'Ask for a quote';
         document.getElementById('cp-req-product').innerHTML =
             '<div class="cp-req-prod-title">' + escapeHtml(reqState.title) + '</div>' +
@@ -644,11 +752,81 @@
         // render the swatch grid, mark previously-ordered colors + their piece totals.
         document.getElementById('cp-req-color').value = reqState.color || '';
         renderColorPicker(reqState.style, reqState.color, reqState.image);
-        document.getElementById('cp-req-note').value = '';
+        document.getElementById('cp-req-note').value = note || '';
         document.getElementById('cp-req-error').textContent = '';
         document.getElementById('cp-req-modal').style.display = 'flex';
     }
     function closeReqModal() { document.getElementById('cp-req-modal').style.display = 'none'; }
+
+    // ── Quick re-order from an Orders row: pull THAT order's invoice line items (same
+    //    ownership-checked endpoint as the invoice page), derive the garment style/color/sizes,
+    //    and open the existing request modal pre-filled — note included. No new modal. ──
+    document.addEventListener('click', function (e) {
+        var rb = e.target.closest && e.target.closest('.cp-row-reorder');
+        if (rb) reorderFromOrder(rb);
+    });
+
+    function reorderFromOrder(btn) {
+        var orderNo = btn.getAttribute('data-order') || '';
+        var rowDesign = btn.getAttribute('data-design') || '';
+        if (!orderNo) return;
+        var orig = btn.textContent;
+        btn.disabled = true; btn.textContent = 'Loading…';
+        fetch(INVOICE_API_BASE + encodeURIComponent(orderNo), { credentials: 'same-origin' })
+            .then(function (r) {
+                if (!r.ok) throw new Error('invoice ' + r.status);
+                return r.json();
+            })
+            .then(function (inv) {
+                btn.disabled = false; btn.textContent = orig;
+                // First GARMENT line = the product (has a color; fee/service part numbers are
+                // skipped — same prefix rule the server uses in portalNormalizePart).
+                var items = (inv && inv.items) || [];
+                var feeRe = /^(SETUP|LTM|FEE|TAX|SHIP|DISC|RUSH|ART|GRT|MOCK|DIGI)/i;
+                var garment = null;
+                for (var i = 0; i < items.length; i++) {
+                    var it = items[i];
+                    if (it && it.partNumber && it.color && !feeRe.test(String(it.partNumber))) { garment = it; break; }
+                }
+                if (!garment) {
+                    showToast("We couldn't pull the products on order #" + escapeHtml(orderNo) + ' &mdash; use Your Products or call (253) 922-5793.');
+                    return;
+                }
+                var style = String(garment.partNumber).split('_')[0]; // ST254_2X → ST254 (size-suffix SKUs)
+                var color = garment.color || '';
+                // Merge sizes/qty across every line of the same base style + color (extended
+                // sizes ride separate SKU rows). sizes[] indexes = Size01–06 = S…3XL.
+                var sizes = {}, totalQty = 0;
+                items.forEach(function (it) {
+                    if (!it || !it.partNumber || feeRe.test(String(it.partNumber))) return;
+                    if (String(it.partNumber).split('_')[0] !== style || (it.color || '') !== color) return;
+                    (it.sizes || []).forEach(function (v, idx) {
+                        var n = Number(v) || 0;
+                        if (n > 0 && SIZE_ORDER[idx]) sizes[SIZE_ORDER[idx]] = (sizes[SIZE_ORDER[idx]] || 0) + n;
+                    });
+                    totalQty += Number(it.quantity) || 0;
+                });
+                var designName = (inv && inv.designName) || rowDesign || '';
+                openReqModalState({
+                    kind: 'product',
+                    style: style,
+                    color: color,
+                    image: '', // the color picker resolves the garment image from the live color list
+                    title: garment.description || style,
+                    design: String((inv && inv.designId) || ''),
+                    designName: designName,
+                    sizes: sizes,
+                    // PartColor is a ShopWorks CATALOG_COLOR — pass it as BOTH name and cat so the
+                    // picker's normalized match binds it to the right catalog tile either way.
+                    orderedColors: [{ name: color, cat: color, qty: totalQty }]
+                }, 'Re-order of order #' + orderNo + (designName ? ' — ' + designName : ''));
+            })
+            .catch(function (err) {
+                console.error('Portal re-order load failed:', err);
+                btn.disabled = false; btn.textContent = orig;
+                showToast("We couldn't load that order right now. Please try again or call (253) 922-5793.");
+            });
+    }
 
     function setReqImage(url) {
         var box = document.getElementById('cp-req-image');

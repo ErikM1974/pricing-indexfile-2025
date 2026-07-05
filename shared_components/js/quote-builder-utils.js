@@ -996,10 +996,69 @@ function updateEditModeUI(quoteId, revision) {
 }
 
 /**
+ * Build the push-blockers list for the "Before you push" checklist (audit #8 checklist upgrade).
+ * Returns [{ key, label, ok, focusId }] — one entry per push gate, each unmet ("blocker") entry
+ * carrying the id of the field a click should focus. Shared by renderBuilderPushReadiness()
+ * (SCP/DTF) and EMB's renderPushReadiness() so all 3 checklists behave identically.
+ * @param {{hasCustomer:boolean, hasProducts:boolean, hasName:boolean, hasEmail:boolean}} r
+ * @param {Object} [focus] — optional per-gate focus-target overrides
+ */
+function getPushBlockers(r, focus) {
+    focus = focus || {};
+    return [
+        { key: 'customer', label: 'ShopWorks Customer #', ok: !!r.hasCustomer, focusId: focus.customer || 'customer-number' },
+        { key: 'products', label: 'At least one item', ok: !!r.hasProducts, focusId: focus.products || 'product-search' },
+        { key: 'name', label: 'Customer name', ok: !!r.hasName, focusId: focus.name || 'customer-name' },
+        { key: 'email', label: 'Customer email', ok: !!r.hasEmail, focusId: focus.email || 'customer-email' },
+    ];
+}
+
+/**
+ * Focus + briefly highlight a push-blocker's field so the rep lands exactly where the
+ * missing data goes. Scrolls the field into view; the outline flash self-clears.
+ */
+function focusPushBlockerField(focusId) {
+    const target = focusId && document.getElementById(focusId);
+    if (!target) return;
+    try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { target.scrollIntoView(); }
+    try { target.focus({ preventScroll: true }); } catch (_) { target.focus(); }
+    const prevOutline = target.style.outline;
+    const prevOffset = target.style.outlineOffset;
+    target.style.outline = '2px solid #f59e0b';
+    target.style.outlineOffset = '2px';
+    setTimeout(() => { target.style.outline = prevOutline; target.style.outlineOffset = prevOffset; }, 1600);
+}
+
+/**
+ * Render the "Before you push" checklist into `el` from a blockers list (getPushBlockers()).
+ * Unmet items render as CLICKABLE buttons — clicking focuses the field that clears the blocker
+ * (delegated listener, wired once per element). Met items stay plain. Shared across EMB/SCP/DTF.
+ */
+function renderPushChecklist(el, blockers) {
+    if (!el) return;
+    const item = (b) => b.ok
+        ? `<div class="pr-item pr-ok"><i class="fas fa-check-circle"></i>${b.label}</div>`
+        : `<button type="button" class="pr-item pr-no" data-pr-focus="${escapeHtml(b.focusId)}"
+             title="Click to jump to this field"
+             style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;width:100%;text-align:left;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
+             <i class="fas fa-circle"></i>${b.label}</button>`;
+    el.innerHTML = '<div class="pr-title">Before you push</div>' + blockers.map(item).join('');
+    if (!el.dataset.prFocusWired) {
+        el.dataset.prFocusWired = '1';
+        el.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-pr-focus]');
+            if (btn) focusPushBlockerField(btn.getAttribute('data-pr-focus'));
+        });
+    }
+}
+
+/**
  * Shared "Before you push" readiness checklist + Push-button gate for SCP/DTF — modeled on EMB's
  * getPushReadiness()/renderPushReadiness() (2026-06-14). The caller passes the push button id and a
  * hasProducts() check; this renders #push-readiness and enables/disables the button in lock-step.
  * Gates: ShopWorks Customer #, ≥1 item, customer name, customer email (mirrors the save validation).
+ * Unmet checklist items are clickable → focus the field that clears the blocker (cfg.focus overrides
+ * the per-gate target ids; default products target is #product-search).
  * Returns the 4 gate booleans so the caller can decide whether a click should proceed.
  */
 function renderBuilderPushReadiness(cfg) {
@@ -1016,10 +1075,7 @@ function renderBuilderPushReadiness(cfg) {
     try { hasProducts = !!(cfg && typeof cfg.hasProducts === 'function' && cfg.hasProducts()); } catch (_) {}
     const r = { hasCustomer: !!val('customer-number'), hasProducts, hasName: !!val('customer-name'), hasEmail: !!val('customer-email') };
     if (el) {
-        const item = (ok, label) => `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
-        el.innerHTML = '<div class="pr-title">Before you push</div>' +
-            item(r.hasCustomer, 'ShopWorks Customer #') + item(r.hasProducts, 'At least one item') +
-            item(r.hasName, 'Customer name') + item(r.hasEmail, 'Customer email');
+        renderPushChecklist(el, getPushBlockers(r, cfg && cfg.focus));
     }
     if (btn) {
         const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
@@ -1032,7 +1088,12 @@ function renderBuilderPushReadiness(cfg) {
     }
     return r;
 }
-if (typeof window !== 'undefined') window.renderBuilderPushReadiness = renderBuilderPushReadiness;
+if (typeof window !== 'undefined') {
+    window.renderBuilderPushReadiness = renderBuilderPushReadiness;
+    window.getPushBlockers = getPushBlockers;
+    window.renderPushChecklist = renderPushChecklist;
+    window.focusPushBlockerField = focusPushBlockerField;
+}
 
 /**
  * Show/hide the loading overlay.
@@ -1571,6 +1632,203 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
     } else {
         container.style.display = 'none';
     }
+}
+
+// ============================================================
+// Quick Quote → builder handoff (item #6, 2026-07-05)
+// ============================================================
+/**
+ * Parse the Quick Quote "Open in quote builder" URL params (shared by all 4 builders).
+ *
+ * PARAM SCHEMA (?from=quickquote — written by calculators/quick-quote/quick-quote.js):
+ *   from=quickquote        sentinel — prefill only runs when present
+ *   style=PC54             style number
+ *   color=BrillOrng        CATALOG_COLOR (API/ShopWorks-safe code — matches the row pickers'
+ *                          data-catalog-color / data-color attributes)
+ *   colorName=Brilliant%20Orange  COLOR_NAME (display name; DTG fuzzy-matches on it)
+ *   qty=24                 total quantity (informational — sizes below is authoritative)
+ *   sizes=S:10,M:14        per-size breakdown as size:qty CSV — EXACTLY what Quick Quote
+ *                          priced (single-qty mode sends the standard size, e.g. S:24)
+ *   location=LC_FB         DTG ONLY — engine print-location code (front[_back])
+ *
+ * Method-specific config that is NOT transferred (rep re-enters in the builder):
+ * stitch counts / additional logos (EMB), ink colors + dark garment (SCP), transfer
+ * locations (DTF). Prefill flows through each builder's EXISTING add-product path,
+ * so pricing always comes from the same engine/services — never from these params.
+ *
+ * @returns {null | {style:string, color:string, colorName:string, qty:number,
+ *                   sizeBreakdown:Object<string,number>, location:string}}
+ */
+function getQuickQuotePrefill() {
+    let params;
+    try { params = new URLSearchParams(window.location.search); } catch (_) { return null; }
+    if (params.get('from') !== 'quickquote') return null;
+    const style = (params.get('style') || '').trim().toUpperCase();
+    if (!style) return null;
+    const qty = Math.max(0, parseInt(params.get('qty'), 10) || 0);
+    const sizeBreakdown = {};
+    (params.get('sizes') || '').split(',').forEach((pair) => {
+        const i = pair.lastIndexOf(':');
+        if (i <= 0) return;
+        const size = pair.slice(0, i).trim();
+        const q = parseInt(pair.slice(i + 1), 10);
+        if (size && q > 0) sizeBreakdown[size] = (sizeBreakdown[size] || 0) + q;
+    });
+    return {
+        style,
+        color: (params.get('color') || '').trim(),
+        colorName: (params.get('colorName') || '').trim(),
+        qty,
+        sizeBreakdown,
+        location: (params.get('location') || '').trim().toUpperCase(),
+    };
+}
+
+/**
+ * Strip the Quick Quote handoff params after a successful prefill so a page refresh
+ * doesn't re-add the product (same pattern the builders use for ?edit=/?duplicate=).
+ */
+function clearQuickQuoteParams() {
+    try {
+        if (window.location.search.includes('from=quickquote')) {
+            history.replaceState(null, '', window.location.pathname);
+        }
+    } catch (_) { /* history unavailable — harmless */ }
+}
+
+// ============================================================
+// "Recent orders" panel after customer selection (item #13, 2026-07-05)
+// ============================================================
+// ADVISORY feature: shows the picked customer's 3 most recent ShopWorks orders
+// (via the same-origin /api/mo/orders forwarder — PII-gated, staff-session-authed)
+// with a [Reference] action that drops order # + design name into the notes/project
+// field and prefills empty PO / design-name inputs. It NEVER reconstructs line items
+// and NEVER touches pricing. Every failure path is a silent skip (console.warn) —
+// a rep who can't see the panel has lost nothing.
+let _recentOrdersToken = 0;
+
+function removeRecentOrdersPanel() {
+    const old = document.getElementById('qb-recent-orders');
+    if (old) old.remove();
+}
+
+/**
+ * Fetch + render the recent-orders panel for a ShopWorks customer.
+ * @param {number|string} idCustomer — ShopWorks id_Customer (from the CRM contact pick)
+ * @param {Object} cfg
+ *   anchorId  — element the panel renders after (default 'customer-lookup')
+ *   notesId   — textarea that [Reference] appends to (falls back to projectId input)
+ *   projectId — project-name input (reference target fallback; only set when empty)
+ *   poId      — PO input to prefill from CustomerPurchaseOrder (only when empty)
+ *   designId  — design # / name input to prefill from DesignName (only when empty)
+ */
+function showRecentCustomerOrders(idCustomer, cfg) {
+    cfg = cfg || {};
+    removeRecentOrdersPanel();
+    const idNum = parseInt(idCustomer, 10);
+    if (!Number.isFinite(idNum) || idNum <= 0) return;
+    const anchor = document.getElementById(cfg.anchorId || 'customer-lookup');
+    if (!anchor) return;
+    const token = ++_recentOrdersToken;
+
+    const qs = 'orders?id_Customer=' + encodeURIComponent(idNum);
+    const fetchOrders = (typeof window !== 'undefined' && typeof window.moFetch === 'function')
+        ? window.moFetch(qs)
+        : fetch('/api/mo/' + qs, { credentials: 'same-origin' });
+
+    fetchOrders
+        .then((r) => { if (!r.ok) throw new Error('mo/orders ' + r.status); return r.json(); })
+        .then((data) => {
+            if (token !== _recentOrdersToken) return;   // stale — a newer customer was picked
+            const orders = ((data && data.result) || [])
+                .slice()
+                .sort((a, b) => new Date(b.date_Ordered || 0) - new Date(a.date_Ordered || 0))
+                .slice(0, 3);
+            if (!orders.length) return;                  // nothing to show — stay silent
+            _renderRecentOrdersPanel(anchor, orders, cfg);
+        })
+        .catch((err) => {
+            // Advisory only — NEVER surface an error for this panel (per spec: silent-skip).
+            console.warn('[RecentOrders] skipped:', err && err.message);
+        });
+}
+
+function _fmtOrderDate(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function _renderRecentOrdersPanel(anchor, orders, cfg) {
+    removeRecentOrdersPanel();
+    const host = anchor.closest('.form-group, .quote-form-group, .customer-info-grid, .section-body') || anchor.parentElement;
+    if (!host) return;
+    const panel = document.createElement('div');
+    panel.id = 'qb-recent-orders';
+    panel.style.cssText = 'margin-top:8px;padding:8px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#334155;';
+    const rows = orders.map((o, i) => {
+        const design = o.DesignName ? String(o.DesignName) : '(no design name)';
+        const date = _fmtOrderDate(o.date_Ordered);
+        return '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;">'
+            + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
+            + '<strong>#' + escapeHtml(String(o.id_Order || '')) + '</strong> · ' + escapeHtml(design)
+            + (date ? ' <span style="color:#94a3b8;">· ' + escapeHtml(date) + '</span>' : '')
+            + '</span>'
+            + '<button type="button" data-ro-ref="' + i + '" title="Insert this order # + design into the quote notes"'
+            + ' style="background:#fff;border:1px solid #cbd5e1;border-radius:4px;padding:2px 8px;font-size:11px;color:#334155;cursor:pointer;">Reference</button>'
+            + '</div>';
+    }).join('');
+    panel.innerHTML = '<div style="display:flex;align-items:center;margin-bottom:4px;">'
+        + '<strong style="flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;">'
+        + '<i class="fas fa-history" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'
+        + '<button type="button" data-ro-dismiss="1" aria-label="Dismiss recent orders"'
+        + ' style="background:none;border:none;color:#94a3b8;font-size:14px;cursor:pointer;line-height:1;padding:0 2px;">&times;</button>'
+        + '</div>' + rows;
+    panel.addEventListener('click', (e) => {
+        if (e.target.closest('[data-ro-dismiss]')) { removeRecentOrdersPanel(); return; }
+        const refBtn = e.target.closest('[data-ro-ref]');
+        if (!refBtn) return;
+        const order = orders[parseInt(refBtn.getAttribute('data-ro-ref'), 10)];
+        if (order) _applyOrderReference(order, cfg);
+    });
+    host.insertAdjacentElement('afterend', panel);
+}
+
+function _applyOrderReference(order, cfg) {
+    const setVal = (id, value, appendLine) => {
+        const el = id && document.getElementById(id);
+        if (!el || !value) return false;
+        if (appendLine) {
+            el.value = (el.value.trim() ? el.value.replace(/\s+$/, '') + '\n' : '') + value;
+        } else {
+            if (el.value.trim()) return false;   // light prefill — never clobber typed data
+            el.value = value;
+        }
+        // Fire the same events a keyboard entry fires so dirty-tracking / comboboxes react.
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+    };
+    const design = order.DesignName ? String(order.DesignName) : '';
+    const date = _fmtOrderDate(order.date_Ordered);
+    const refLine = 'Re-order ref: SW order #' + String(order.id_Order || '')
+        + (design ? ' — ' + design : '') + (date ? ' (' + date + ')' : '');
+    // order # + design → notes textarea (append) or, when the builder has none, the project field
+    const wroteNotes = setVal(cfg.notesId, refLine, true);
+    if (!wroteNotes) setVal(cfg.projectId, refLine, false);
+    // light prefills — empty fields only
+    setVal(cfg.poId, order.CustomerPurchaseOrder ? String(order.CustomerPurchaseOrder) : '', false);
+    setVal(cfg.designId, design || (order.id_Design ? String(order.id_Design) : ''), false);
+    if (typeof markAsUnsaved === 'function') { try { markAsUnsaved(); } catch (_) {} }
+    if (typeof showToast === 'function') showToast('Referenced order #' + String(order.id_Order || ''), 'success');
+}
+
+if (typeof window !== 'undefined') {
+    window.getQuickQuotePrefill = getQuickQuotePrefill;
+    window.clearQuickQuoteParams = clearQuickQuoteParams;
+    window.showRecentCustomerOrders = showRecentCustomerOrders;
+    window.removeRecentOrdersPanel = removeRecentOrdersPanel;
 }
 
 // Node.js export (testing) — pure functions only

@@ -192,9 +192,21 @@
     box-shadow: 0 -6px 18px -8px rgba(24, 34, 25, 0.25);
     padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
     gap: 8px;
+    flex-wrap: wrap; /* live-price line sits on its own row above the buttons */
 }
 .pdp-mobile-cta .btn { flex: 1 1 0; justify-content: center; padding: 11px 8px; font-size: 13.5px; }
 .pdp-mobile-cta[hidden] { display: none !important; } /* [hidden] must beat the ≤960px display:flex */
+/* Live price line — filled by pdp-configurator.js renderMobileBar(); hidden until a live engine price exists */
+.pdp-mobile-cta-price {
+    flex: 1 1 100%;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    margin: 0;
+}
+.pdp-mobile-cta-price[hidden] { display: none; }
 
 /* ── Decoration configurator (3 questions → one live price) ── */
 .pdp-panel-note {
@@ -492,6 +504,23 @@
 .pdp-cfg-total-lines li { padding: 2px 0; }
 .pdp-cfg-total-lines .is-ltm { font-weight: 700; color: var(--ink); }
 .pdp-cfg-total-lines .is-nudge { font-weight: 700; color: var(--green-900); }
+/* Dollar-savings nudge — a subtle link-style button that jumps the qty to the next tier */
+.pdp-cfg-nudge-btn {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    font-weight: 700;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-underline-offset: 3px;
+}
+.pdp-cfg-nudge-btn:hover,
+.pdp-cfg-nudge-btn:focus-visible { color: var(--green-700); text-decoration-style: solid; }
+.pdp-cfg-nudge-note { font-weight: 500; color: var(--ink-soft); }
 .pdp-cfg-total-foot {
     font-size: 12.5px;
     font-weight: 700;
@@ -630,7 +659,7 @@
     .pdp-cta-card { position: static; }
     .pdp-cta-card .btn-cta { display: none; } /* mobile bar covers the quote CTA */
     .pdp-mobile-cta { display: flex; }
-    body.pdp-has-mobile-cta { padding-bottom: 76px; }
+    body.pdp-has-mobile-cta { padding-bottom: 96px; } /* bar can carry a price line row */
     .pdp-skeleton-grid .skeleton-block { min-height: 280px; }
     .pdp-details-list { columns: 1; }
 }

@@ -2903,3 +2903,125 @@ body {
         max-height: 80pt;
     }
 }
+
+/* ============================================================================
+   Quote Timeline (#15, 2026-07-05) — collapsible event history.
+   Mirrors the .sw-original-* details/summary pattern above.
+   ============================================================================ */
+.qv-timeline-section {
+    margin: 16px 0 24px;
+}
+.qv-timeline-details {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.qv-timeline-summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+    user-select: none;
+    transition: background-color 120ms ease;
+}
+.qv-timeline-summary:hover {
+    background: #f8fafc;
+}
+.qv-timeline-details[open] .qv-timeline-summary {
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+.qv-timeline-summary::-webkit-details-marker {
+    display: none;
+}
+.qv-timeline-summary-icon {
+    font-size: 14px;
+    color: #94a3b8;
+    transition: transform 200ms ease;
+    display: inline-block;
+}
+.qv-timeline-details[open] .qv-timeline-summary-icon {
+    transform: rotate(90deg);
+}
+.qv-timeline-summary-title {
+    color: #0f172a;
+    font-weight: 700;
+}
+.qv-timeline-summary-meta {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+}
+.qv-timeline-list {
+    margin: 0;
+    padding: 16px 20px 16px 34px;
+    list-style: none;
+    position: relative;
+}
+.qv-timeline-item {
+    position: relative;
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 8px;
+    padding: 6px 0 6px 18px;
+    font-size: 13px;
+    color: #334155;
+}
+/* vertical connector line */
+.qv-timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+}
+.qv-timeline-item:first-child::before { top: 50%; }
+.qv-timeline-item:last-child::before { bottom: 50%; }
+.qv-timeline-item:only-child::before { display: none; }
+.qv-timeline-dot {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--quote-green, #4caf50);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 0 1px #e2e8f0;
+}
+.qv-timeline-item--staff .qv-timeline-dot {
+    background: #64748b;
+}
+.qv-timeline-label {
+    font-weight: 600;
+    color: #0f172a;
+}
+.qv-timeline-detail {
+    color: #64748b;
+}
+.qv-timeline-staff-chip {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 1px 8px;
+}
+/* Never print the timeline — staff-internal events must not land on
+   customer-facing PDFs (matches .sw-original-section print behavior). */
+@media print {
+    .qv-timeline-section { display: none !important; }
+}

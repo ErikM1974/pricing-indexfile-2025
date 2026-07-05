@@ -1994,6 +1994,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             renderOrderRecap();  // customer set → refresh the bottom Order Recap
             updatePushButtonState();  // customer # set programmatically (no 'input' event) → re-enable Push + refresh checklist (review C9 2026-06-05)
             showToast('Customer info loaded', 'success');
+
+            // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
+            // shared showRecentCustomerOrders() in quote-builder-utils.js. (item #13, 2026-07-05)
+            if (typeof showRecentCustomerOrders === 'function' && contact.id_Customer) {
+                showRecentCustomerOrders(contact.id_Customer, {
+                    notesId: 'notes', projectId: 'project-name', poId: 'po-number'
+                });
+            }
         };
 
         customerLookup.bindToInput('customer-lookup', {
@@ -2007,6 +2015,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 if (phoneInput) phoneInput.value = '';
                 _customerDesignGallery = null; // Invalidate gallery cache on customer clear
                 clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners
+                if (typeof removeRecentOrdersPanel === 'function') removeRecentOrdersPanel();  // item #13: no stale orders for the next customer
             }
         });
 
@@ -2045,11 +2054,32 @@ document.addEventListener('DOMContentLoaded', async function() {
         const editQuoteId = checkForEditMode();
         // Duplicate mode (?duplicate=EMB-2026-123): load a copy as a NEW quote (2026-06-10)
         const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
+        // Quick Quote handoff (?from=quickquote — param schema + parser in
+        // quote-builder-utils.js getQuickQuotePrefill()). Prefill flows through the
+        // SAME addProductFromQuote() path edit-load uses, so pricing/color/size
+        // handling is identical to a hand-added row. (item #6, 2026-07-05)
+        const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
         if (duplicateQuoteId) {
             await duplicateQuote(duplicateQuoteId);
         } else if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await loadQuoteForEditing(editQuoteId);
+        } else if (qqPrefill) {
+            // Prefill wins over draft recovery for this visit (like ?edit=/?duplicate=).
+            initEmbroideryPersistence();
+            if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
+            try {
+                await addProductFromQuote({
+                    styleNumber: qqPrefill.style,
+                    color: qqPrefill.color || qqPrefill.colorName,
+                    sizeBreakdown: qqPrefill.sizeBreakdown
+                });
+                showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify color, quantities & pricing', 'info', 6000);
+            } catch (e) {
+                console.error('[QuickQuote prefill] failed:', e);
+                showToast('Could not prefill ' + qqPrefill.style + ' from Quick Quote — add it manually', 'warning', 6000);
+            }
+            if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
         } else {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initEmbroideryPersistence();
@@ -8301,13 +8331,19 @@ function renderPushReadiness() {
     if (!el) return;
     if (_pushAlreadyDone) { el.innerHTML = ''; return; }   // already sent — nothing to check
     const r = getPushReadiness();
-    const item = (ok, label) =>
-        `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
-    el.innerHTML = '<div class="pr-title">Before you push</div>' +
-        item(r.hasCustomer, 'ShopWorks Customer #') +
-        item(r.hasProducts, 'At least one item') +
-        item(r.hasName, 'Customer name') +
-        item(r.hasEmail, 'Customer email');
+    // Shared clickable checklist (quote-builder-utils.js) — unmet items focus their field
+    // (item #8, 2026-07-05). Fallback keeps the old plain markup if utils didn't load.
+    if (typeof renderPushChecklist === 'function' && typeof getPushBlockers === 'function') {
+        renderPushChecklist(el, getPushBlockers(r));
+    } else {
+        const item = (ok, label) =>
+            `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
+        el.innerHTML = '<div class="pr-title">Before you push</div>' +
+            item(r.hasCustomer, 'ShopWorks Customer #') +
+            item(r.hasProducts, 'At least one item') +
+            item(r.hasName, 'Customer name') +
+            item(r.hasEmail, 'Customer email');
+    }
     // [2026-06-07] Keep the Push button in LOCK-STEP with this checklist so they can NEVER desync. Direct
     // renderPushReadiness() callers (e.g. a product change at ~line 6341) updated the checklist green but
     // never re-gated the button → it stayed stale-disabled even with all checks green (the bug Erik hit).

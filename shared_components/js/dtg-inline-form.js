@@ -4753,6 +4753,33 @@ let hasChanges = false;
             return;
         }
 
+        // Quick Quote handoff (?from=quickquote — param schema + parser:
+        // getQuickQuotePrefill() in quote-builder-utils.js). Prefills through
+        // fillFromQuote(), the SAME chat→form setter the AI quote fill uses (row
+        // hydrate, color fuzzy-match, inventory kick) — so pricing still comes from
+        // DTGPricingService, never from the URL. Wins over session-restore for this
+        // visit, same as ?edit=. (item #6, 2026-07-05)
+        const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
+        if (qqPrefill && qqPrefill.style) {
+            if (state.rows.length === 0) state.rows.push(newBlankRow());
+            render();
+            // locationCode was engine-whitelisted by Quick Quote (dtgCode());
+            // fillFromQuote's sanitizeLocationState() re-guards anyway.
+            fillFromQuote({
+                locationCode: qqPrefill.location || 'LC',
+                lineItems: [{
+                    styleNumber: qqPrefill.style,
+                    // COLOR_NAME preferred — fillFromQuote fuzzy-matches display names
+                    // and promotes the canonical name + CATALOG_COLOR itself.
+                    color: qqPrefill.colorName || qqPrefill.color,
+                    sizes: qqPrefill.sizeBreakdown || {}
+                }]
+            }, null);
+            if (typeof showToast === 'function') showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify details', 'info', 6000);
+            if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+            return;
+        }
+
         // B4 — try to restore from sessionStorage first. If we restored, show
         // a small banner offering to start fresh.
         const restored = restoreStateFromSession();

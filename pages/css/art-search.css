@@ -1,0 +1,237 @@
+/* ============================================================================
+   art-search.css — Cross-tool art request search (#17, 2026-07-05).
+   Page-specific styles for pages/art-search.html. Colors/radii come from the
+   2026 design tokens in shared_components/css/art-hub.css :root (loaded first)
+   — fallbacks included in case the token sheet fails to load.
+   ============================================================================ */
+
+.ars-container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
+}
+
+/* Header */
+.ars-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+.ars-logo {
+    height: 46px;
+    width: auto;
+}
+.ars-header-text h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+}
+.ars-back-link {
+    font-size: 13px;
+    color: var(--gray-500, #6b7280);
+    text-decoration: none;
+}
+.ars-back-link:hover { text-decoration: underline; }
+
+/* Buttons */
+.ars-btn {
+    display: inline-block;
+    padding: 10px 18px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md, 8px);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 120ms ease;
+}
+.ars-btn-primary {
+    background: #981e32;
+    color: #ffffff;
+}
+.ars-btn-primary:hover { background: #7a1828; }
+.ars-btn-secondary {
+    background: var(--surface-card, #ffffff);
+    border-color: var(--gray-300, #d1d5db);
+    color: var(--gray-700, #374151);
+}
+.ars-btn-secondary:hover { background: var(--gray-100, #f3f4f6); }
+.ars-btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+/* Search card */
+.ars-search-card {
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: var(--radius-lg, 12px);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.ars-search-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700, #374151);
+    margin-bottom: 8px;
+}
+.ars-search-row {
+    display: flex;
+    gap: 8px;
+}
+.ars-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border: 1px solid var(--gray-300, #d1d5db);
+    border-radius: var(--radius-md, 8px);
+    font-size: 15px;
+    color: var(--gray-900, #111827);
+}
+.ars-input:focus {
+    outline: 2px solid #981e32;
+    outline-offset: 1px;
+}
+.ars-search-help {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--gray-500, #6b7280);
+}
+
+/* Loading */
+.ars-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px 0;
+    color: var(--gray-500, #6b7280);
+}
+.ars-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--gray-200, #e5e7eb);
+    border-top-color: #981e32;
+    border-radius: 50%;
+    animation: ars-spin 0.8s linear infinite;
+}
+@keyframes ars-spin { to { transform: rotate(360deg); } }
+
+/* Error + empty states */
+.ars-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md, 8px);
+    color: #991b1b;
+    padding: 14px 16px;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+.ars-error .ars-btn { margin-left: 10px; }
+.ars-empty {
+    background: var(--surface-inset, #f3f4f6);
+    border: 1px dashed var(--gray-300, #d1d5db);
+    border-radius: var(--radius-md, 8px);
+    color: var(--gray-600, #4b5563);
+    padding: 24px 16px;
+    text-align: center;
+    font-size: 14px;
+}
+.ars-empty p { margin: 0 0 6px; }
+
+/* Results table */
+.ars-results-count {
+    font-size: 13px;
+    color: var(--gray-500, #6b7280);
+    margin: 0 0 10px;
+}
+.ars-table-wrap {
+    overflow-x: auto;
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: var(--radius-lg, 12px);
+}
+.ars-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.ars-table th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500, #6b7280);
+    background: var(--surface-elevated, #fcfcfd);
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+    white-space: nowrap;
+}
+.ars-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-100, #f3f4f6);
+    color: var(--gray-800, #1f2937);
+    vertical-align: middle;
+}
+.ars-table tbody tr:last-child td { border-bottom: none; }
+.ars-table tbody tr:hover td { background: var(--surface-hover, #f9fafb); }
+.ars-col-design { font-weight: 700; white-space: nowrap; }
+.ars-col-date { white-space: nowrap; color: var(--gray-500, #6b7280); }
+.ars-col-open { text-align: right; white-space: nowrap; }
+.ars-design-link {
+    color: #981e32;
+    text-decoration: none;
+}
+.ars-design-link:hover { text-decoration: underline; }
+
+/* Status pills — bucket colors mirror the art hub gallery chips */
+.ars-status {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: var(--radius-pill, 999px);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.ars-status--submitted { background: var(--gray-100, #f3f4f6); color: var(--gray-700, #374151); }
+.ars-status--progress  { background: #eff6ff; color: #1e40af; }
+.ars-status--review    { background: #fffbeb; color: #92400e; }
+.ars-status--revision  { background: #fef2f2; color: #991b1b; }
+.ars-status--done      { background: #ecfdf5; color: #065f46; }
+
+/* Auth gate (quote-audit pattern) */
+.ars-auth-gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+    padding: 24px;
+}
+.ars-auth-card {
+    background: var(--surface-card, #ffffff);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: var(--radius-lg, 12px);
+    padding: 36px 32px;
+    text-align: center;
+    max-width: 380px;
+}
+.ars-auth-icon { font-size: 32px; margin-bottom: 10px; }
+.ars-auth-card h2 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: var(--gray-900, #111827);
+}
+.ars-auth-card p {
+    margin: 0 0 18px;
+    font-size: 14px;
+    color: var(--gray-600, #4b5563);
+}
+
+@media (max-width: 560px) {
+    .ars-search-row { flex-direction: column; }
+    .ars-col-open { display: none; }
+}

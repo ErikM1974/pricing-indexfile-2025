@@ -627,6 +627,28 @@
                         </div>
                     </article>
 
+                    <!-- Art Requests Needing Attention (aging widget, 2026-07-05).
+                         Rendered entirely by /staff-dashboard-v3/art-aging-widget.js —
+                         lazy-loads after DOMContentLoaded on idle time, GET-only,
+                         self-contained failure state (retry button) so it can never
+                         block or break the rest of the hub. -->
+                    <article class="metrics-card col-span-full" id="artAgingCard" aria-labelledby="artAgingTitle">
+                        <header class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="artAgingTitle">
+                                    <i class="fas fa-hourglass-half" aria-hidden="true"></i> Art Requests Needing Attention
+                                </h3>
+                                <div class="metrics-date-range">Open requests by time sitting in current status</div>
+                            </div>
+                            <button type="button" class="refresh-btn" id="artAgingRefresh" aria-label="Refresh art requests" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div id="artAgingBody">
+                            <div class="metrics-date-range">Loading art requests…</div>
+                        </div>
+                    </article>
+
                     <!-- Production Schedule Predictor (full width below the two metrics cards) -->
                     <article class="production-widget-card col-span-full" data-widget="production">
                         <header class="production-header">
@@ -728,6 +750,13 @@
          (Note: legacy file hardcodes the proxy URL — known Rule #7 debt, isolated
          to this bridge.) -->
     <script src="/shared_components/js/staff-dashboard-service.js?v=2026.07.04.5"></script>
+
+    <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
+         Needed by the art-aging widget below; safe no-op for everything else. -->
+    <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.2"></script>
+    <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
+         fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.07.05.2" defer></script>
 
     <!-- ===================================================
          APP ENTRY (ES module)
