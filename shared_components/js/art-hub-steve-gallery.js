@@ -37,6 +37,13 @@
     // count + the 'broken' filter in getFiltered().
     var brokenDesignIdSet = new Set();      // Set<string designId> for O(1) hit-test
     var brokenFetchInflight = null;
+    // Bulk multi-select (2026-07-05): "Select" toggle turns cards into
+    // checkboxes; the sticky bar offers ONE bulk action — Mark Complete —
+    // which loops the exact same PUT the single-card Complete button uses.
+    // Send Mockup / Log Time stay single-card only (modal-entangled).
+    var selectMode = false;
+    var selectedIds = new Set();            // Set<string designId>
+    var bulkInflight = false;
 
     // ── Helpers (local copies of art-hub-steve.js fns to keep this module standalone) ──
     function escapeHtml(s) {
@@ -476,7 +483,23 @@
         if (revCount > 0)     badges += '<span class="card-badge card-badge--revision">Rev ' + revCount + '</span>';
         if (due.text)         badges += '<span class="card-badge ' + due.cls + '">' + escapeHtml(due.text) + '</span>';
 
-        return '<article class="mockup-card mockup-card--' + sKey + rushCls + onHoldCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '">' +
+        // Bulk select mode — checkbox overlay + selection outline. Inline styles
+        // (not new CSS) keep this module self-contained; pattern matches the
+        // existing inline display toggles elsewhere in the gallery.
+        var isSelected = selectMode && selectedIds.has(designId);
+        var selectBoxHtml = '';
+        if (selectMode) {
+            selectBoxHtml = '<label class="sg-card-selectbox" style="position:absolute;top:8px;left:8px;z-index:6;background:rgba(255,255,255,.92);border-radius:6px;padding:5px;line-height:0;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);">' +
+                '<input type="checkbox" data-action="bulk-select"' + (isSelected ? ' checked' : '') +
+                ' style="width:18px;height:18px;cursor:pointer;margin:0;" aria-label="Select ' + company + '">' +
+            '</label>';
+        }
+        var selectStyle = selectMode
+            ? ' style="position:relative;' + (isSelected ? 'outline:2px solid #4f46e5;outline-offset:2px;' : '') + '"'
+            : '';
+
+        return '<article class="mockup-card mockup-card--' + sKey + rushCls + onHoldCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '"' + selectStyle + '>' +
+            selectBoxHtml +
             '<div class="card-header">' +
                 '<div class="card-header-left">' +
                     '<div class="card-company">' + company + '</div>' +
@@ -621,6 +644,100 @@
         }
     }
 
+    // ─── Bulk multi-select (2026-07-05) ────────────────────────────────
+    function companyFor(designId) {
+        var req = allRequests.filter(function (r) { return String(r.ID_Design) === String(designId); })[0];
+        return (req && req.CompanyName) || '';
+    }
+
+    function toggleSelectMode() {
+        if (bulkInflight) return; // never flip mode mid-bulk-write
+        selectMode = !selectMode;
+        if (!selectMode) selectedIds.clear();
+        var btn = document.getElementById('steve-gallery-select');
+        if (btn) {
+            btn.textContent = selectMode ? 'Cancel selection' : 'Select';
+            btn.classList.toggle('sg-btn--active', selectMode);
+        }
+        renderGrid();
+        updateBulkBar();
+    }
+
+    function setSelected(designId, on) {
+        if (!designId) return;
+        if (on) selectedIds.add(String(designId));
+        else selectedIds.delete(String(designId));
+        renderGrid();
+        updateBulkBar();
+    }
+
+    function updateBulkBar() {
+        var bar = document.getElementById('steve-gallery-bulkbar');
+        if (!bar) return;
+        if (!selectMode) { bar.style.display = 'none'; return; }
+        bar.style.display = 'flex';
+        var n = selectedIds.size;
+        var countEl = document.getElementById('steve-gallery-bulk-count');
+        if (countEl) countEl.textContent = n === 0 ? 'Tap cards to select' : n + ' selected';
+        var completeBtn = document.getElementById('steve-gallery-bulk-complete');
+        if (completeBtn && !bulkInflight) {
+            completeBtn.disabled = n === 0;
+            completeBtn.textContent = n > 0 ? 'Mark ' + n + ' Complete' : 'Mark Complete';
+        }
+    }
+
+    // The ONE bulk action. Loops the SAME putComplete() the single-card button
+    // uses (never a new write path), via Promise.allSettled so one failure
+    // doesn't abort the rest. Failures stay selected + are listed visibly.
+    function bulkMarkComplete() {
+        if (bulkInflight) return;
+        var ids = Array.from(selectedIds);
+        if (!ids.length) return;
+        var preview = ids.slice(0, 5).map(function (id) {
+            var c = companyFor(id);
+            return '#' + id + (c ? ' — ' + c : '');
+        }).join('\n');
+        if (ids.length > 5) preview += '\n… and ' + (ids.length - 5) + ' more';
+        if (!confirm('Mark ' + ids.length + ' request(s) Complete?\n\n' + preview +
+            '\n\nEach AE gets the same completion notification as the single-card Complete button.')) return;
+
+        bulkInflight = true;
+        var completeBtn = document.getElementById('steve-gallery-bulk-complete');
+        if (completeBtn) { completeBtn.disabled = true; completeBtn.textContent = 'Marking…'; }
+
+        Promise.allSettled(ids.map(function (id) { return putComplete(id); }))
+            .then(function (results) {
+                var failed = [];
+                results.forEach(function (res, i) {
+                    if (res.status === 'rejected') failed.push(ids[i]);
+                });
+                // Keep only the failed ones selected so Steve can retry them.
+                selectedIds = new Set(failed);
+                bulkInflight = false;
+                return refresh().then(function () {
+                    if (failed.length) {
+                        updateBulkBar();
+                        alert('Completed ' + (ids.length - failed.length) + ' of ' + ids.length +
+                            ' request(s).\n\nFAILED (still selected — retry or use the card button):\n' +
+                            failed.map(function (id) {
+                                var c = companyFor(id);
+                                return '#' + id + (c ? ' — ' + c : '');
+                            }).join('\n'));
+                    } else {
+                        // All done — leave select mode (also clears selection + button label).
+                        if (selectMode) toggleSelectMode();
+                    }
+                });
+            })
+            .catch(function (err) {
+                // Defensive — allSettled shouldn't reject; refresh() errors render
+                // their own visible state.
+                bulkInflight = false;
+                console.error('[SteveGallery.bulkMarkComplete] unexpected:', err);
+                updateBulkBar();
+            });
+    }
+
     // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
     // Cap auto-recover fires per page-load + dedup per pkId so a wave of broken
     // thumbnails doesn't hammer the Box Search API.
@@ -683,20 +800,29 @@
         } catch (err) { /* defensive — never break the page on recovery failure */ }
     }
 
-    function markComplete(designId, btn) {
-        if (!designId) return;
-        if (btn) { btn.disabled = true; btn.textContent = 'Marking…'; }
-        // PUT — the backend only registers PUT for this route (PATCH 404s, which
-        // silently broke completion from the gallery). The PUT handler fires the
-        // AE completion notification (email + Slack DM) server-side. `actor` is
-        // this dashboard's owner so the Slack ping reads "Completed by Steve".
-        fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/status', {
+    // Single source of truth for the "mark this design Completed" write.
+    // PUT — the backend only registers PUT for this route (PATCH 404s, which
+    // silently broke completion from the gallery). The PUT handler fires the
+    // AE completion notification (email + Slack DM) server-side. `actor` is
+    // this dashboard's owner so the Slack ping reads "Completed by Steve".
+    // Used by the single-card Complete button AND the bulk action (which loops
+    // this exact function — never a separate write path).
+    function putComplete(designId) {
+        return fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(designId) + '/status', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status: 'Completed', actor: 'Steve' })
-        })
-        .then(function (r) {
+        }).then(function (r) {
             if (!r.ok) throw new Error('API ' + r.status);
+            return r;
+        });
+    }
+
+    function markComplete(designId, btn) {
+        if (!designId) return;
+        if (btn) { btn.disabled = true; btn.textContent = 'Marking…'; }
+        putComplete(designId)
+        .then(function () {
             return refresh();
         })
         .catch(function (err) {
@@ -760,6 +886,7 @@
         host.innerHTML =
             '<div class="sg-toolbar">' +
                 '<input type="search" id="steve-gallery-search" placeholder="Search company, design #, rep, or ID..." autocomplete="off">' +
+                '<button type="button" id="steve-gallery-select" class="sg-btn" title="Select multiple cards for a bulk action">Select</button>' +
                 '<button type="button" id="steve-gallery-archive" class="sg-btn">Show Archive</button>' +
                 '<span id="steve-gallery-count" class="sg-count"></span>' +
             '</div>' +
@@ -767,6 +894,13 @@
             '<div id="steve-gallery-grid" class="mockup-grid"></div>' +
             '<div class="sg-load-more-wrap">' +
                 '<button type="button" id="steve-gallery-load-more" class="sg-btn" style="display:none;"></button>' +
+            '</div>' +
+            // Bulk-action bar — sticky at the viewport bottom while select mode
+            // is on. Inline styles keep the module standalone (no CSS edit).
+            '<div id="steve-gallery-bulkbar" style="display:none;position:sticky;bottom:12px;z-index:40;margin-top:12px;padding:10px 16px;border-radius:10px;background:#1f2937;color:#f9fafb;box-shadow:0 4px 16px rgba(0,0,0,.35);align-items:center;gap:14px;">' +
+                '<span id="steve-gallery-bulk-count" style="font-weight:600;">Tap cards to select</span>' +
+                '<button type="button" id="steve-gallery-bulk-complete" class="sg-btn sg-btn--success" disabled>Mark Complete</button>' +
+                '<button type="button" id="steve-gallery-bulk-cancel" class="sg-btn" style="margin-left:auto;">Done</button>' +
             '</div>';
 
         // Search input — debounced 120ms
@@ -795,9 +929,32 @@
             applyStatus(chip.dataset.statusKey);
         });
 
+        // Bulk select controls
+        document.getElementById('steve-gallery-select').addEventListener('click', toggleSelectMode);
+        document.getElementById('steve-gallery-bulk-cancel').addEventListener('click', function () {
+            if (selectMode) toggleSelectMode();
+        });
+        document.getElementById('steve-gallery-bulk-complete').addEventListener('click', bulkMarkComplete);
+
         // Card + action button clicks — delegated
         var grid = document.getElementById('steve-gallery-grid');
         grid.addEventListener('click', function (e) {
+            // Select mode intercepts EVERY card click — checkbox, buttons, or
+            // card body all just toggle selection; nothing navigates or opens
+            // modals until Steve leaves select mode.
+            if (selectMode) {
+                var selCard = e.target.closest('.mockup-card');
+                if (!selCard || !selCard.dataset.designId) return;
+                var box = e.target.closest('input[data-action="bulk-select"]');
+                if (box) {
+                    // Checkbox already flipped natively — mirror its state.
+                    setSelected(selCard.dataset.designId, box.checked);
+                } else {
+                    e.preventDefault();
+                    setSelected(selCard.dataset.designId, !selectedIds.has(String(selCard.dataset.designId)));
+                }
+                return;
+            }
             // Click rep name → fill search box with the rep first name. Filter
             // happens automatically via the search input's debounced listener.
             var repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
@@ -882,6 +1039,7 @@
         applyStatus: applyStatus,
         handleThumbError: handleThumbError,
         markComplete: markComplete,
+        toggleSelectMode: toggleSelectMode,
         isActive: isActive
     };
 })();

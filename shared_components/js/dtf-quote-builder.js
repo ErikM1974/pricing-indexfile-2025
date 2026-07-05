@@ -237,11 +237,17 @@ class DTFQuoteBuilder {
         const editQuoteId = this.checkForEditMode();
         // Duplicate mode (?duplicate=DTF-...): load a copy as a NEW quote (EMB parity 2026-06-11)
         const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
+        // Quick Quote handoff (?from=quickquote — param schema + parser: getQuickQuotePrefill()
+        // in quote-builder-utils.js). Prefill wins over draft recovery for this visit,
+        // same as ?edit=/?duplicate=. (item #6, 2026-07-05)
+        const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
         if (duplicateQuoteId) {
             await this.duplicateQuote(duplicateQuoteId);
         } else if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await this.loadQuoteForEditing(editQuoteId);
+        } else if (qqPrefill) {
+            await this.applyQuickQuotePrefill(qqPrefill);
         } else {
             // Check for draft recovery (after DOM is ready)
             if (this.session && this.session.shouldShowRecovery()) {
@@ -295,6 +301,14 @@ class DTFQuoteBuilder {
 
                 this.showToast('Customer info loaded', 'success');
                 if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
+
+                // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
+                // shared showRecentCustomerOrders() in quote-builder-utils.js. (item #13, 2026-07-05)
+                if (typeof showRecentCustomerOrders === 'function' && contact.id_Customer) {
+                    showRecentCustomerOrders(contact.id_Customer, {
+                        notesId: 'dtf-notes', projectId: 'project-name', poId: 'po-number', designId: 'design-number'
+                    });
+                }
             };
 
             customerLookup.bindToInput('customer-lookup', {
@@ -305,6 +319,7 @@ class DTFQuoteBuilder {
                     document.getElementById('company-name').value = '';
                     window._taxExempt = false;  // [2026-06-08] P0: customer cleared → no longer exempt
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap when the lookup is cleared
+                    if (typeof removeRecentOrdersPanel === 'function') removeRecentOrdersPanel();  // item #13: no stale orders for the next customer
                 }
             });
 
@@ -677,6 +692,27 @@ class DTFQuoteBuilder {
                 }
             }
         }
+    }
+
+    /**
+     * Quick Quote handoff (?from=quickquote — param schema + parser: getQuickQuotePrefill()
+     * in quote-builder-utils.js). Routes through the SAME addProductFromQuote() path the
+     * edit-loader uses (parent row + createChildRow for extended sizes), so color/size
+     * handling + pricing are identical to a hand-added row. (item #6, 2026-07-05)
+     */
+    async applyQuickQuotePrefill(qq) {
+        try {
+            await this.addProductFromQuote({
+                styleNumber: qq.style,
+                color: qq.color || qq.colorName,
+                sizeBreakdown: qq.sizeBreakdown
+            });
+            this.showToast('Loaded ' + qq.style + ' from Quick Quote — verify color, quantities & pricing', 'info');
+        } catch (e) {
+            console.error('[QuickQuote prefill] failed:', e);
+            this.showToast('Could not prefill ' + qq.style + ' from Quick Quote — add it manually', 'error');
+        }
+        if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
     }
 
     /**

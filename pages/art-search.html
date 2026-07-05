@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Art Search - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <!-- art-hub.css supplies the 2026 design tokens (:root surface/gray/radius) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.06.25.2">
+    <link rel="stylesheet" href="/pages/css/art-search.css?v=2026.07.05.2">
+</head>
+<body>
+    <!-- Staff Auth Gate (same client-side pattern as pages/quote-audit.html —
+         /pages is a public static mount, so staff pages here gate in JS via
+         StaffAuthHelper + noindex; PII-bearing data only loads after the gate) -->
+    <div id="auth-gate" class="ars-auth-gate" style="display: none;">
+        <div class="ars-auth-card">
+            <div class="ars-auth-icon" aria-hidden="true">&#128274;</div>
+            <h2>Staff Login Required</h2>
+            <p>You must be logged in via the staff dashboard to search art requests.</p>
+            <a href="/staff-dashboard.html" class="ars-btn ars-btn-primary">Go to Staff Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div id="ars-content" class="ars-container" style="display: none;">
+        <header class="ars-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="ars-logo">
+            <div class="ars-header-text">
+                <h1>Art Search</h1>
+                <a href="/staff-dashboard.html" class="ars-back-link">Back to Staff Dashboard</a>
+            </div>
+        </header>
+
+        <section class="ars-search-card">
+            <form id="ars-form" role="search" aria-label="Search art requests">
+                <label class="ars-search-label" for="ars-input">Search by design ID, company, or customer name</label>
+                <div class="ars-search-row">
+                    <input type="search" id="ars-input" class="ars-input" autocomplete="off"
+                           placeholder="e.g. 53421, Boeing, or Jane Smith" autofocus>
+                    <button type="submit" class="ars-btn ars-btn-primary" id="ars-search-btn">Search</button>
+                </div>
+                <p class="ars-search-help">Numbers search the exact design ID. Text searches company names across all history and customer names in the most recent requests.</p>
+            </form>
+        </section>
+
+        <!-- Loading -->
+        <div id="ars-loading" class="ars-loading" style="display: none;" role="status">
+            <div class="ars-spinner" aria-hidden="true"></div>
+            <p>Searching art requests&hellip;</p>
+        </div>
+
+        <!-- Error (visible failure — Erik's #1 rule) -->
+        <div id="ars-error" class="ars-error" style="display: none;" role="alert">
+            <strong>Search failed.</strong>
+            <span id="ars-error-msg"></span>
+            <button type="button" class="ars-btn ars-btn-secondary" id="ars-retry-btn">Retry</button>
+        </div>
+
+        <!-- Empty -->
+        <div id="ars-empty" class="ars-empty" style="display: none;">
+            <p><strong>No art requests matched.</strong></p>
+            <p id="ars-empty-detail"></p>
+        </div>
+
+        <!-- Results -->
+        <section id="ars-results" class="ars-results" style="display: none;">
+            <p class="ars-results-count" id="ars-results-count" aria-live="polite"></p>
+            <div class="ars-table-wrap">
+                <table class="ars-table">
+                    <thead>
+                        <tr>
+                            <th>Design #</th>
+                            <th>Company</th>
+                            <th>Contact</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="ars-tbody"><!-- populated by JS --></tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js?v=2026.06.11.4"></script>
+    <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
+    <script src="/pages/js/art-search.js?v=2026.07.05.2"></script>
+</body>
+</html>

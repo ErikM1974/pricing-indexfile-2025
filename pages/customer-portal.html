@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.04.1">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.05.2">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.07.03.1">
 </head>
 <body>
@@ -45,6 +45,15 @@
         <div class="cp-company-banner">
             <div class="cp-company-name" id="cp-company-name"></div>
             <div class="cp-company-subtitle" id="cp-company-subtitle">Your account overview</div>
+            <!-- "Your rep" contact line — filled from the orders feed (CustomerServiceRep) -->
+            <div class="cp-company-rep" id="cp-company-rep" style="display:none;"></div>
+        </div>
+
+        <!-- Needs-your-approval banner — shown when a design proof awaits the customer's OK -->
+        <div class="cp-approval-banner" id="cp-approval-banner" style="display:none;" role="alert">
+            <span class="cp-approval-icon" aria-hidden="true">&#9888;</span>
+            <span id="cp-approval-text"></span>
+            <button class="cp-approval-btn" type="button" data-tab="logos">Review now</button>
         </div>
 
         <!-- Reward dollars -->
@@ -134,6 +143,9 @@
             <div class="cp-section-header">
                 <h2>Orders</h2>
                 <span class="cp-section-count" id="cp-orders-count">0</span>
+            </div>
+            <div class="cp-orders-toolbar" id="cp-orders-toolbar" style="display:none;">
+                <input type="search" id="cp-orders-search" class="cp-search" placeholder="Search orders &mdash; design, order #, or PO&hellip;" autocomplete="off" aria-label="Search orders">
             </div>
             <div class="cp-table-wrap" id="cp-orders-wrap"></div>
             <div class="cp-empty" id="cp-orders-empty" style="display:none;">
@@ -243,6 +255,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.04.4"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.04.4"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.05.2"></script>
 </body>
 </html>

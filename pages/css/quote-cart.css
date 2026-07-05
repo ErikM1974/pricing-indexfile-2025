@@ -437,3 +437,33 @@
     .qc-line-qty { grid-area: qty; }
     .qc-line-price { grid-area: price; align-self: center; }
 }
+
+/* ============================================================================
+   Email capture (#18, 2026-07-05) — "Email me this quote" box under the
+   totals actions. Funnels into the existing Phase 3 save panel (email
+   pre-filled); reuses the .field-* primitives the save panel already uses.
+   ============================================================================ */
+.qc-capture {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line, #e2e8f0);
+}
+.qc-capture-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+.qc-capture-row .field-input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.qc-capture-row .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+.qc-capture-error {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #b91c1c;
+}

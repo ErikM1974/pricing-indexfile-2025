@@ -22,7 +22,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.01.1">
-    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.07.04.1">
+    <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.07.05.2">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.4">
 </head>
 <body>
@@ -311,8 +311,9 @@
         <!-- Toast stack (core primitive) — add-to-quote confirmations -->
         <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
-        <!-- Mobile sticky CTA bar -->
+        <!-- Mobile sticky CTA bar (live price line filled by pdp-configurator.js renderMobileBar) -->
         <div class="pdp-mobile-cta" id="mobileCtaBar" hidden>
+            <span class="pdp-mobile-cta-price" id="cfgMobilePrice" aria-live="polite" hidden></span>
             <a class="btn btn-cta" id="ctaQuoteMobile" href="#pricingHeading">Price it</a>
             <a class="btn btn-ghost" href="tel:253-922-5793">Call us</a>
             <a class="btn btn-ghost" id="ctaSampleMobile" href="/pages/top-sellers-showcase.html">Sample</a>
@@ -378,7 +379,7 @@
     <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.06.11.8" defer></script>
     <script src="/shared_components/js/quote-cart-engine.js?v=2026.07.04.4" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
-    <script src="/product/js/pdp-configurator.js?v=2026.07.04.4" defer></script>
+    <script src="/product/js/pdp-configurator.js?v=2026.07.05.2" defer></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4" defer></script>
     <script src="/product/js/product-2026.js?v=2026.07.04.4" defer></script>
 </body>

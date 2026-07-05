@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.06.26.1">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.07.05.2">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20260602-phase11-4" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -240,6 +240,27 @@
                     <p id="accepted-info">Accepted on ---</p>
                 </div>
             </div>
+
+            <!-- ============================================================
+                 Quote Timeline (#15, 2026-07-05). Collapsible event history
+                 assembled from data ALREADY on the page — session CreatedAt,
+                 acceptance info in Notes JSON, customer_view analytics
+                 (staff-only fetch), PushedToShopWorks + ShopWorks ship date
+                 (reused from the sync snapshot, never refetched). Staff-
+                 internal events (push / ShopWorks) render only for staff.
+                 ============================================================ -->
+            <section id="qv-timeline-section" class="qv-timeline-section" style="display: none;">
+                <details class="qv-timeline-details">
+                    <summary class="qv-timeline-summary">
+                        <span class="qv-timeline-summary-icon">&#9656;</span>
+                        <span class="qv-timeline-summary-title">Timeline</span>
+                        <span class="qv-timeline-summary-meta" id="qv-timeline-summary-meta"></span>
+                    </summary>
+                    <ol class="qv-timeline-list" id="qv-timeline-list">
+                        <!-- populated by JS — one <li> per event that exists -->
+                    </ol>
+                </details>
+            </section>
 
             <!-- DTF Transfer Specs (populated by JS for DTF quotes) -->
             <section id="dtf-specs-section" class="dtf-specs-section" style="display: none;">
@@ -586,6 +607,6 @@
     </div>
 
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <script src="/pages/js/quote-view.js?v=2026.07.04.4"></script>
+    <script src="/pages/js/quote-view.js?v=2026.07.05.2"></script>
 </body>
 </html>

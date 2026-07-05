@@ -178,6 +178,7 @@
     const METHODS = {
         emb: {
             label: 'Embroidery',
+            short: 'Emb',       // mobile sticky-bar label (tight space)
             engineMethod: 'EMB',
             supports: { leftChest: true, fullFront: false, back: true, frontBack: true },
             chipNote: function (loc) {
@@ -198,6 +199,7 @@
         },
         capemb: {
             label: 'Embroidery',
+            short: 'Emb',
             engineMethod: 'CAP',
             isCap: true,
             supports: { front: true, frontBack: true },
@@ -221,6 +223,7 @@
         },
         dtg: {
             label: 'DTG Print',
+            short: 'DTG',
             engineMethod: 'DTG',
             supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
             chipNote: function () {
@@ -235,6 +238,7 @@
         },
         scp: {
             label: 'Screen Print',
+            short: 'Screen',
             engineMethod: 'SCP',
             supports: { leftChest: true, fullFront: true, back: true, frontBack: true },
             chipNote: function (loc) {
@@ -255,6 +259,7 @@
         },
         dtf: {
             label: 'DTF Transfer',
+            short: 'DTF',
             engineMethod: 'DTF',
             // Center-front / Center-back = the DTF MEDIUM (<=9x12) transfer band; DTF-only via
             // supports (DTG/SCP/EMB never list them, so the chips render for DTF alone).
@@ -729,6 +734,22 @@
         const stripeInput = $('cfgStripeInput');
         if (stripeInput) stripeInput.addEventListener('change', function () { setStripes(stripeInput.checked); });
 
+        // Mobile sticky-bar CTA: with a live price it triggers the EXISTING
+        // add-to-quote action (#cfgAddToQuote — wired by product-2026.js, so
+        // pooling-conflict guards + the toast all run); otherwise it falls
+        // through to its default anchor scroll to the configurator.
+        const mobileBtn = $('ctaQuoteMobile');
+        if (mobileBtn) {
+            mobileBtn.addEventListener('click', function (e) {
+                const add = $('cfgAddToQuote');
+                const res = state.results[state.method];
+                if (add && !add.disabled && res && res.status === 'ok') {
+                    e.preventDefault();
+                    add.click();
+                }
+            });
+        }
+
         const toggle = $('cfgMatrixToggle');
         toggle.addEventListener('click', function () {
             state.matrixOpen = !state.matrixOpen;
@@ -838,9 +859,20 @@
     }
 
     // ============================================================
-    // RENDER — total block
+    // RENDER — total block (+ mobile sticky bar, same chokepoint)
     // ============================================================
+    /**
+     * Single render chokepoint for the selected method's price: every caller
+     * (reprice, chip select, ink/stripe change) goes through here, so the
+     * mobile sticky bar can never disagree with the total card — same
+     * state.results[state.method].summary, zero duplicated math.
+     */
     function renderTotal() {
+        renderTotalCard();
+        renderMobileBar();
+    }
+
+    function renderTotalCard() {
         const box = $('cfgTotal');
         const res = state.results[state.method];
         const def = METHODS[state.method];
@@ -892,16 +924,26 @@
                 + ' small-batch fee included — ' + escapeHtml(formatPrice(s.perPiece)) + '/' + unitWord + ' all-in</li>');
         }
 
-        // Next-tier nudge from the engine (effective per-piece diff, never a hardcoded table)
-        if (s.nudge) {
+        // Next-tier dollar-savings nudge. Every figure is the ENGINE's own nudge
+        // (trace tierTable + a boosted re-probe INSIDE the same singleItemPreview
+        // call — see quote-cart-engine.js computeNudge) — never a parallel
+        // calculation, never an extra engine call. The engine returns null unless
+        // a higher tier exists AND the per-piece savings are > 0; if the data
+        // isn't there yet, no line renders. Clicking jumps the qty to the tier.
+        if (s.nudge && s.nudge.nextTierMinQty > state.qty
+            && s.nudge.nextPerPiece != null && num(s.nudge.perPieceSavings) > 0) {
             const n = s.nudge;
-            if (n.ltmDisappears) {
-                lines.push('<li class="is-nudge">Add ' + n.addQty + ' more and the $' + Math.round(s.ltm.fee)
-                    + ' small-batch fee disappears — ' + escapeHtml(formatPrice(n.nextPerPiece)) + '/' + unitWord + '</li>');
-            } else {
-                lines.push('<li class="is-nudge">' + n.addQty + ' more ' + unitWord + (n.addQty === 1 ? '' : 's')
-                    + ' drops the price to ' + escapeHtml(formatPrice(n.nextPerPiece)) + '/' + unitWord + '</li>');
-            }
+            lines.push('<li class="is-nudge">'
+                + '<button class="pdp-cfg-nudge-btn" id="cfgNudgeJump" type="button"'
+                + ' aria-label="Set the quantity to ' + n.nextTierMinQty + '">'
+                + 'At ' + n.nextTierMinQty + '+ ' + unitWord + 's: '
+                + escapeHtml(formatPrice(n.nextPerPiece)) + '/' + unitWord
+                + ' — save ' + escapeHtml(formatPrice(n.perPieceSavings)) + '/' + unitWord
+                + '</button>'
+                + (n.ltmDisappears
+                    ? ' <span class="pdp-cfg-nudge-note">(small-batch fee disappears)</span>'
+                    : '')
+                + '</li>');
         }
 
         if (state.method === 'dtg' && state.ctx.dtgBlendWarn) {
@@ -922,6 +964,39 @@
             + ' <span class="pdp-cfg-total-tier">' + escapeHtml(s.tierLabel || '') + ' tier</span></p>'
             + (lines.length ? '<ul class="pdp-cfg-total-lines">' + lines.join('') + '</ul>' : '')
             + '<p class="pdp-cfg-total-foot">Final pricing confirmed with your free proof.</p>';
+
+        const nudgeBtn = $('cfgNudgeJump');
+        if (nudgeBtn && s.nudge) {
+            const targetQty = s.nudge.nextTierMinQty;
+            nudgeBtn.addEventListener('click', function () { setQty(targetQty, true); });
+        }
+    }
+
+    /**
+     * Mobile sticky bar (product.html #mobileCtaBar): mirrors the selected
+     * method's LIVE engine summary — "24 × Emb · $14.50/pc · $348.00" — and
+     * flips the CTA to "Add to quote". No price yet (loading / error /
+     * unavailable / below-min) → the price line hides and the CTA reverts to
+     * "Price it" (the original scroll-to-configurator anchor). Reads the SAME
+     * res.summary the total card just rendered — never its own math.
+     */
+    function renderMobileBar() {
+        const priceEl = $('cfgMobilePrice');
+        const btn = $('ctaQuoteMobile');
+        if (!priceEl || !btn) return;
+        const def = METHODS[state.method];
+        const res = state.results[state.method];
+        if (def && res && res.status === 'ok' && res.summary) {
+            const s = res.summary;
+            priceEl.textContent = state.qty + ' × ' + (def.short || def.label)
+                + ' · ' + formatPrice(s.perPiece) + '/pc · ' + formatPrice(s.total);
+            priceEl.hidden = false;
+            btn.textContent = 'Add to quote';
+        } else {
+            priceEl.hidden = true;
+            priceEl.textContent = '';
+            btn.textContent = 'Price it';
+        }
     }
 
     // ============================================================

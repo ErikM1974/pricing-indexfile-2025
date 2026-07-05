@@ -37,6 +37,7 @@
 | `/product.html` | Product display page | See "Main Pages" section | ✅ Active |
 | `/brands.html` | Brands listing page | brands.js, brands.css, brands-flyout.js | ✅ Active |
 | `/staff-dashboard-v3/index.html` | Staff dashboard (V3 — sole canonical, served at `/staff-dashboard.html`) | See "Dashboard & Admin" section | ✅ Active |
+| `/staff-dashboard-v3/art-aging-widget.js` | Hub "Art Requests Needing Attention" card — aging counts (>7d red / 3-7d yellow) + 5 oldest, lazy-loaded, self-contained (2026-07-05) | config.js, caspio-date-utils.js, /api/artrequests | ✅ Active |
 | `/emailjs-template-mockup-customer-approval.html` | EmailJS HTML template — customer mockup approval email body | EmailJS service | ✅ Active |
 | `/server.js` | Express server (port 3000) — routes for `/api/submit-order-form`, `/api/3-day-tees-checkout`, etc. | Express, EmailJS, Stripe, Caspio proxy | ✅ Active |
 | `/lib/quote-snapshot-diff.js` | **NEW (2026-06-26)** `diffSnapshots()` + helpers (`WATCHED_ORDER_FIELDS`, `normalizeForDiff`, `sizeColsOf`) extracted from server.js so the SW-snapshot change-detection is unit-testable (server.js boots on require). Now also diffs per-size `Size01..06` → `LineSizes[...]` change rows. | required by server.js (sync-from-shopworks) | ✅ Active |
@@ -673,6 +674,9 @@
 | `/pages/quote-audit.html` | Staff-only pricing audit page (SW vs 2026) | quote-audit.js, quote-audit.css, staff-auth-helper.js | ✅ Active |
 | `/pages/js/quote-audit.js` | Audit data rendering, staff auth gate | staff-auth-helper.js | ✅ Active |
 | `/pages/css/quote-audit.css` | Audit page styling (self-contained) | Inter font | ✅ Active |
+| `/pages/art-search.html` | Staff-only cross-tool art search ("where is design 12345?") — client-side StaffAuthHelper gate, same pattern as quote-audit (2026-07-05) | art-search.js, art-search.css, staff-auth-helper.js | ✅ Active |
+| `/pages/js/art-search.js` | Art search logic: design # exact / company LIKE / contact client-filter over /api/artrequests; normalizeStatus pills; deep-link ?q= | staff-auth-helper.js, /api/artrequests | ✅ Active |
+| `/pages/css/art-search.css` | Art search styling (2026 art-hub tokens) | art-hub.css :root tokens | ✅ Active |
 
 **Server Routes (server.js):**
 - `GET /quote/:quoteId` - Serves public quote page

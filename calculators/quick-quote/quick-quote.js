@@ -1192,6 +1192,59 @@
         return '<div class="qq-card-onetime">' + html + '</div>';
     }
 
+    // ============================================================
+    // "Open in quote builder →" handoff (item #6, 2026-07-05)
+    // Each priced method card links to its staff quote builder with the CURRENT
+    // config URL-encoded, so the rep can graduate a phone quote into a real quote
+    // without retyping. The builder prefills through its EXISTING add-product path
+    // (same engine, same setters) — these params carry IDENTITY (style/color/qty),
+    // never a price.
+    //
+    // PARAM SCHEMA (canonical copy + parser: getQuickQuotePrefill() in
+    // shared_components/js/quote-builder-utils.js):
+    //   from=quickquote                      sentinel
+    //   style=PC54                           style number
+    //   color=<CATALOG_COLOR>                API-safe color code
+    //   colorName=<COLOR_NAME>               display name (DTG fuzzy-match)
+    //   qty=<total>                          total pieces
+    //   sizes=S:10,M:14                      size:qty CSV — exactly what was priced here
+    //   location=<code>                      DTG only — dtgCode() front[_back]
+    // NOT transferred (method-specific, rep re-enters): EMB stitch counts/logos,
+    // SCP ink colors/dark garment, DTF transfer locations.
+    // ============================================================
+    var BUILDER_PATHS = {
+        emb: '/quote-builders/embroidery-quote-builder.html',
+        capemb: '/quote-builders/embroidery-quote-builder.html',   // EMB builder handles caps
+        dtg: '/quote-builders/dtg-quote-builder.html',
+        scp: '/quote-builders/screenprint-quote-builder.html',
+        dtf: '/quote-builders/dtf-quote-builder.html'
+    };
+    function builderHref(id) {
+        if (!state.product || !BUILDER_PATHS[id]) return '';
+        var p = new URLSearchParams();
+        p.set('from', 'quickquote');
+        p.set('style', state.product.style);
+        if (state.color) {
+            if (state.color.catalog) p.set('color', state.color.catalog);
+            if (state.color.name) p.set('colorName', state.color.name);
+        }
+        var qty = totalQty();
+        if (qty > 0) p.set('qty', String(qty));
+        var sizes = currentSizes();
+        var csv = Object.keys(sizes).map(function (sz) { return sz + ':' + sizes[sz]; }).join(',');
+        if (csv) p.set('sizes', csv);
+        if (id === 'dtg') { var loc = dtgCode(); if (loc) p.set('location', loc); }
+        return BUILDER_PATHS[id] + '?' + p.toString();
+    }
+    function openBuilderHtml(id) {
+        var href = builderHref(id);
+        if (!href) return '';
+        return '<a class="qq-open-builder" href="' + esc(href) + '" target="_blank" rel="noopener"'
+            + ' title="Open the staff quote builder with this style, color and quantity prefilled"'
+            + ' style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#166534;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">'
+            + 'Open in quote builder &rarr;</a>';
+    }
+
     function renderCard(id, isBest, changed) {
         var def = METHODS[id];
         var r = state.results[id];
@@ -1242,6 +1295,7 @@
             + oneTimeHtml
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
+            + openBuilderHtml(id)
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
             + '</div>';
     }
@@ -1557,6 +1611,7 @@
 
         // Click a priced method card to show its price-breaks matrix below.
         $('qqResults').addEventListener('click', function (e) {
+            if (e.target.closest('.qq-open-builder')) return; // builder handoff link — let the browser navigate
             if (e.target.closest('.qq-retry')) return; // retry has its own handler
             var nudge = e.target.closest('.qq-card-nudge[data-addqty]');
             if (nudge) { // one-click "add N more" → bump qty to the next price break

@@ -144,6 +144,11 @@ class QuoteViewPage {
         // Quick action buttons (Print / Copy link / Email customer)
         this._setupQuickActions();
 
+        // Quote Timeline (#15, 2026-07-05): collapsible event history built from
+        // data already loaded (created / accepted) + a staff-only customer_view
+        // analytics fetch. Push/ShopWorks events re-render via applyShopWorksOverlay.
+        this._initTimeline();
+
         // Setup push-to-ShopWorks button (staff only, EMB quotes only)
         if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
             this.setupPushButton();
@@ -2816,6 +2821,168 @@ class QuoteViewPage {
         // Send to Steve (2026-06-26): a real ShopWorks order now exists, so the
         // SW order ID + art/design number are available — reveal the button.
         this._updateSendToSteveButton(order);
+
+        // Quote Timeline (#15): the snapshot may carry a ShopWorks ship date —
+        // re-render so the staff-only "Shipped" event appears. Reuses the
+        // already-fetched snapshot (this._currentSnapshot); no extra request.
+        this._renderTimeline();
+    }
+
+    // ====================================================================
+    // Quote Timeline (#15, 2026-07-05)
+    // ====================================================================
+    // Collapsible "Timeline" panel assembled ONLY from data the page already
+    // has (or one cheap staff-only analytics GET):
+    //   • Created            — quoteData.CreatedAt_Quote        (everyone)
+    //   • Customer viewed    — quote_analytics customer_view     (staff only)
+    //   • Accepted           — Notes JSON acceptedAt/ByName      (everyone)
+    //   • Pushed to ShopWorks— quoteData.PushedToShopWorks       (staff only)
+    //   • Shipped            — SW snapshot order.date_Shippied   (staff only)
+    // Events that don't exist simply don't render. All values are escaped.
+    // Caspio timestamps parse via window.CaspioDate.parse when available
+    // (never append 'Z' — see memory/caspio_pacific_timestamps.md).
+    // ====================================================================
+
+    async _initTimeline() {
+        if (!this.quoteData) return;
+
+        // Staff-only: fetch customer_view analytics (same endpoint + parse the
+        // EMB builder's "Customer viewed" toast uses — embroidery-quote-builder.js).
+        // Telemetry only — failures never block the timeline.
+        this._timelineViews = null;
+        if (this.isStaff) {
+            try {
+                const resp = await fetch(`${this.apiBaseUrl}/api/quote_analytics?quoteID=${encodeURIComponent(this.quoteId)}&eventType=customer_view`);
+                if (resp.ok) {
+                    const events = await resp.json();
+                    if (Array.isArray(events) && events.length > 0) {
+                        const dates = events
+                            .map(ev => this._parseTimelineTs(ev.Timestamp || ev.CreatedAt || ev.EventDate || ev.Date_Created))
+                            .filter(d => d)
+                            .sort((a, b) => b - a);
+                        this._timelineViews = { count: events.length, last: dates[0] || null };
+                    }
+                }
+            } catch (e) {
+                console.warn('[QuoteView/timeline] view analytics fetch failed:', e.message);
+            }
+        }
+
+        this._renderTimeline();
+    }
+
+    /** Guarded Caspio-timestamp parse (Pacific wall-clock — never append Z). */
+    _parseTimelineTs(raw) {
+        if (!raw) return null;
+        const d = (window.CaspioDate && window.CaspioDate.parse)
+            ? window.CaspioDate.parse(raw)
+            : new Date(raw);
+        return (d && !isNaN(d.getTime())) ? d : null;
+    }
+
+    /** "July 4, 2026, 2:15 PM" from a Date (time omitted when midnight-ish is unknown). */
+    _formatTimelineDateTime(date) {
+        if (!date || isNaN(date.getTime())) return '';
+        const dStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const tStr = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        return `${dStr}, ${tStr}`;
+    }
+
+    _renderTimeline() {
+        const section = document.getElementById('qv-timeline-section');
+        const list = document.getElementById('qv-timeline-list');
+        const meta = document.getElementById('qv-timeline-summary-meta');
+        if (!section || !list || !this.quoteData) return;
+
+        const events = [];
+
+        // 1. Created (everyone) — some session rows populate CreatedAt but not
+        // CreatedAt_Quote (e.g. imported/accepted DTG quotes), so fall back.
+        const createdRaw = this.quoteData.CreatedAt_Quote || this.quoteData.CreatedAt;
+        const createdTs = this._parseTimelineTs(createdRaw);
+        if (createdRaw) {
+            events.push({ ts: createdTs, label: 'Quote created', detail: this.formatDate(createdRaw), staff: false });
+        }
+
+        // 2. Customer viewed N× / last (staff only — analytics fetch in _initTimeline)
+        if (this.isStaff && this._timelineViews && this._timelineViews.count > 0) {
+            const v = this._timelineViews;
+            events.push({
+                ts: v.last,
+                label: `Customer viewed ${v.count}×`,
+                detail: v.last ? `last ${this._formatTimelineDateTime(v.last)}` : '',
+                staff: true
+            });
+        }
+
+        // 3. Accepted (everyone) — acceptance lives in Notes JSON, not a Caspio
+        // column (same source as showAcceptedState()). Name is user input → escaped.
+        if (this.quoteData.Status === 'Accepted') {
+            try {
+                const notes = JSON.parse(this.quoteData.Notes || '{}');
+                if (notes.acceptedAt) {
+                    events.push({
+                        ts: this._parseTimelineTs(notes.acceptedAt),
+                        label: 'Quote accepted',
+                        detail: this.formatDate(notes.acceptedAt)
+                            + (notes.acceptedByName ? ` by ${notes.acceptedByName}` : ''),
+                        staff: false
+                    });
+                }
+            } catch (e) { /* Notes not JSON — no acceptance detail to show */ }
+        }
+
+        // 4. Pushed to ShopWorks (staff only)
+        if (this.isStaff && this.quoteData.PushedToShopWorks) {
+            events.push({
+                ts: this._parseTimelineTs(this.quoteData.PushedToShopWorks),
+                label: 'Pushed to ShopWorks',
+                detail: this.formatDate(this.quoteData.PushedToShopWorks),
+                staff: true
+            });
+        }
+
+        // 5. Shipped (staff only) — reuse the already-synced SW snapshot.
+        // 'Shippied' is the real field name (API typo); it's a CALENDAR date,
+        // so display via formatShopWorksDate (no UTC-midnight day-shift).
+        const swOrder = this._currentSnapshot && this._currentSnapshot.order;
+        const swShipped = swOrder && (swOrder.date_Shippied || swOrder.date_Shipped);
+        if (this.isStaff && swShipped) {
+            const m = String(swShipped).match(/(\d{4})-(\d{2})-(\d{2})/);
+            const ts = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : this._parseTimelineTs(swShipped);
+            events.push({
+                ts: (ts && !isNaN(ts.getTime())) ? ts : null,
+                label: 'Shipped',
+                detail: this.formatShopWorksDate(swShipped),
+                staff: true
+            });
+        }
+
+        if (events.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        // Chronological order; events without a parseable timestamp sink to the end.
+        events.sort((a, b) => {
+            const ta = a.ts ? a.ts.getTime() : Infinity;
+            const tb = b.ts ? b.ts.getTime() : Infinity;
+            return ta - tb;
+        });
+
+        list.innerHTML = events.map(ev => `
+            <li class="qv-timeline-item${ev.staff ? ' qv-timeline-item--staff' : ''}">
+                <span class="qv-timeline-dot" aria-hidden="true"></span>
+                <span class="qv-timeline-label">${this.escapeHtml(ev.label)}</span>
+                ${ev.detail ? `<span class="qv-timeline-detail">${this.escapeHtml(ev.detail)}</span>` : ''}
+                ${ev.staff ? '<span class="qv-timeline-staff-chip" title="Only staff see this event">internal</span>' : ''}
+            </li>
+        `).join('');
+
+        if (meta) {
+            meta.textContent = `${events.length} event${events.length === 1 ? '' : 's'}`;
+        }
+        section.style.display = 'block';
     }
 
     _updateShipStationButton(order, snapshot) {

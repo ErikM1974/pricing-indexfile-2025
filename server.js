@@ -3394,11 +3394,19 @@ function projectPortalOrder(o) {
   const balance = balanceKnown ? (Number(balRaw) || 0) : total;
   const paid = Math.max(0, total - balance);
   const paidStatus = !total ? '—' : (balance <= 0 ? 'Paid' : (balance < total ? 'Partial' : 'Open'));
+  // Due date = date_Invoiced + TermsDays — same rule as projectPortalInvoice (the on-screen/PDF
+  // invoice), so the Invoices table "Due" column can never disagree with the invoice itself.
+  let dueDate = null;
+  if (o.date_Invoiced) {
+    const di = new Date(o.date_Invoiced);
+    if (!isNaN(di.getTime())) { di.setDate(di.getDate() + (Number(o.TermsDays) || 0)); dueDate = di.toISOString(); }
+  }
   return {
     orderNumber: o.id_Order || null,
     orderDate: o.date_Ordered || null,
     invoiceDate: o.date_Invoiced || null,
     shipDate: o.date_Shippied || null,
+    dueDate: dueDate,
     designName: o.DesignName || null,
     poNumber: o.CustomerPurchaseOrder || null,
     quantity: o.TotalProductQuantity || null,
@@ -3406,6 +3414,24 @@ function projectPortalOrder(o) {
     total: total, paid: paid, balance: balance,
     paidStatus: paidStatus,
   };
+}
+
+// Rep contact for the portal header card. The NAME comes from the customer's own orders
+// (CustomerServiceRep — already customer-visible on every invoice we render, so exposing it
+// here leaks nothing new). The EMAIL resolves through REP_NAME_BY_EMAIL (declared with the
+// portal-admin console below — evaluated at request time, so declaration order is fine).
+// Unknown/departed rep name → email null; the frontend falls back to the main line.
+function portalRepFromOrders(rawOrders) {
+  for (const o of rawOrders || []) {
+    const name = o && o.CustomerServiceRep ? String(o.CustomerServiceRep).trim() : '';
+    if (!name) continue;
+    let email = null;
+    for (const em of Object.keys(REP_NAME_BY_EMAIL)) {
+      if (String(REP_NAME_BY_EMAIL[em]).toLowerCase() === name.toLowerCase()) { email = em; break; }
+    }
+    return { name: name, email: email };
+  }
+  return null;
 }
 
 // GET /api/portal/orders — the LOGGED-IN customer's orders + invoice balances (session-scoped).
@@ -3421,10 +3447,11 @@ app.get('/api/portal/orders', portalLimiter, requireCustomer, async (req, res) =
     const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('orders fetch ' + r.status);
     const j = await r.json();
-    const orders = (j.result || [])
+    const raw = j.result || [];
+    const orders = raw
       .map(projectPortalOrder)
       .sort((a, b) => String(b.orderDate || '').localeCompare(String(a.orderDate || ''))); // newest first
-    res.json({ orders: orders });
+    res.json({ orders: orders, rep: portalRepFromOrders(raw) });
   } catch (err) {
     console.error('[Portal] orders failed:', err.message);
     res.status(503).json({ error: 'Orders temporarily unavailable' });
@@ -4210,9 +4237,10 @@ app.get('/api/portal-admin/preview/:id/orders', requireCrmRole(PORTAL_ADMIN_ROLE
     const r = await fetch(url, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('orders fetch ' + r.status);
     const j = await r.json();
-    const orders = (j.result || []).map(projectPortalOrder)
+    const raw = j.result || [];
+    const orders = raw.map(projectPortalOrder)
       .sort((a, b) => String(b.orderDate || '').localeCompare(String(a.orderDate || '')));
-    res.json({ orders });
+    res.json({ orders, rep: portalRepFromOrders(raw) });
   } catch (err) {
     console.error('[portal-admin] preview orders failed:', err.message);
     res.status(503).json({ error: 'Orders preview temporarily unavailable' });

@@ -697,6 +697,43 @@ async function addProductFromQuote(product) {
 }
 
 /**
+ * Quick Quote handoff (?from=quickquote — param schema + parser: getQuickQuotePrefill()
+ * in quote-builder-utils.js). Routes through the SAME addProductFromQuote() path the
+ * edit-loader uses, so color/size handling + pricing are identical to a hand-added row.
+ * Extended sizes (XS, 3XL+, talls) get their child rows created here, because
+ * addProductFromQuote() only fills the standard S–2XL parent inputs — without this,
+ * Quick Quote pieces would be silently dropped. (item #6, 2026-07-05)
+ */
+async function applyQuickQuotePrefillScp(qq) {
+    try {
+        await addProductFromQuote({
+            styleNumber: qq.style,
+            color: qq.color || qq.colorName,
+            sizeBreakdown: qq.sizeBreakdown
+        });
+        const parents = document.querySelectorAll('#product-tbody tr[data-row-id]:not(.child-row)');
+        const row = parents[parents.length - 1];
+        const rowId = row ? parseInt(row.dataset.rowId, 10) : NaN;
+        if (Number.isFinite(rowId)) {
+            const STANDARD = ['S', 'M', 'L', 'XL', '2XL'];
+            let addedExtended = false;
+            for (const [size, qty] of Object.entries(qq.sizeBreakdown || {})) {
+                if (qty > 0 && !STANDARD.includes(size) && typeof createChildRow === 'function') {
+                    createChildRow(rowId, size, qty);
+                    addedExtended = true;
+                }
+            }
+            if (addedExtended) onSizeChange(rowId);   // refresh qty display + recalculatePricing
+        }
+        showToast('Loaded ' + qq.style + ' from Quick Quote — verify color, quantities & pricing', 'info', 6000);
+    } catch (e) {
+        console.error('[QuickQuote prefill] failed:', e);
+        showToast('Could not prefill ' + qq.style + ' from Quick Quote — add it manually', 'warning', 6000);
+    }
+    if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+}
+
+/**
  * Load existing quote for editing
  * Populates all form fields with quote data
  */
@@ -1084,9 +1121,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = checkForEditMode();
+        // Quick Quote handoff (?from=quickquote) — prefill wins over draft recovery
+        // for this visit, same as ?edit=. (item #6, 2026-07-05)
+        const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
         if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await loadQuoteForEditing(editQuoteId);
+        } else if (qqPrefill) {
+            initScreenPrintPersistence();
+            await applyQuickQuotePrefillScp(qqPrefill);
         } else {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initScreenPrintPersistence();
@@ -1159,6 +1202,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 
                 showToast('Customer info loaded', 'success');
                 if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] refresh recap on customer pick
+
+                // Recent ShopWorks orders panel (advisory re-order aid; silent-skip on failure) —
+                // shared showRecentCustomerOrders() in quote-builder-utils.js. SCP has no notes
+                // textarea, so [Reference] targets the project-name field. (item #13, 2026-07-05)
+                if (typeof showRecentCustomerOrders === 'function' && contact.id_Customer) {
+                    showRecentCustomerOrders(contact.id_Customer, {
+                        projectId: 'project-name', designId: 'design-number'
+                    });
+                }
             };
 
             customerLookup.bindToInput('customer-lookup', {
@@ -1169,6 +1221,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     document.getElementById('company-name').value = '';
                     window._taxExempt = false;  // [2026-06-08] P0: customer cleared → no longer exempt
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap on lookup clear
+                    if (typeof removeRecentOrdersPanel === 'function') removeRecentOrdersPanel();  // item #13: no stale orders for the next customer
                 }
             });
 
