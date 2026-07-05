@@ -642,7 +642,6 @@ var JDSSubmitForm = (function () {
             //   so Sales_Rep column stays consistent with existing rows.
             + '          <select class="jds-input" id="jds-sales-rep">'
             + '            <option value="sales@nwcustomapparel.com">General Sales</option>'
-            + '            <option value="adriyella@nwcustomapparel.com">Adriyella</option>'
             + '            <option value="bradley@nwcustomapparel.com">Bradley Wright</option>'
             + '            <option value="erik@nwcustomapparel.com">Erik Mickelson</option>'
             + '            <option value="jim@nwcustomapparel.com">Jim Mickelson</option>'

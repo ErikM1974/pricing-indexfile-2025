@@ -258,7 +258,6 @@ function renderSampleRequests(requests) {
                         <option value="Taneisha" ${request.SalesRep === 'Taneisha' ? 'selected' : ''}>Taneisha</option>
                         <option value="Ruth" ${request.SalesRep === 'Ruth' ? 'selected' : ''}>Ruth</option>
                         <option value="Erik" ${request.SalesRep === 'Erik' ? 'selected' : ''}>Erik</option>
-                        <option value="Adriyella" ${request.SalesRep === 'Adriyella' ? 'selected' : ''}>Adriyella</option>
                     </select>
                 </td>
                 <td style="padding: 0.875rem;">
