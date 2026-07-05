@@ -1,3 +1,7 @@
+## v2026.07.05.9 (2026.07.05)
+
+- fix: pass grand_total to staff deposit-paid email (shared receipt body)
+
 ## v2026.07.05.8 (2026.07.05)
 
 - docs: storefront checkout/catalog/funnel proposal (deposit-on-accepted-quote model)
