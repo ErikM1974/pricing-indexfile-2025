@@ -774,6 +774,7 @@
         btn.disabled = true; btn.textContent = 'Loading…';
         fetch(INVOICE_API_BASE + encodeURIComponent(orderNo), { credentials: 'same-origin' })
             .then(function (r) {
+                if (r.status === 401) throw new Error('signedOut');
                 if (!r.ok) throw new Error('invoice ' + r.status);
                 return r.json();
             })
@@ -789,7 +790,11 @@
                     if (it && it.partNumber && it.color && !feeRe.test(String(it.partNumber))) { garment = it; break; }
                 }
                 if (!garment) {
-                    showToast("We couldn't pull the products on order #" + escapeHtml(orderNo) + ' &mdash; use Your Products or call (253) 922-5793.');
+                    // Service-only order (art/fees, no garment line) — it can never be
+                    // re-ordered through this flow, so DON'T leave the button live to
+                    // re-fail on every click. Disable it and say why.
+                    btn.disabled = true; btn.textContent = 'Service-only order';
+                    showToast("Order #" + escapeHtml(orderNo) + " has no garments to re-order &mdash; use Your Products or call (253) 922-5793.");
                     return;
                 }
                 var style = String(garment.partNumber).split('_')[0]; // ST254_2X → ST254 (size-suffix SKUs)
@@ -824,7 +829,11 @@
             .catch(function (err) {
                 console.error('Portal re-order load failed:', err);
                 btn.disabled = false; btn.textContent = orig;
-                showToast("We couldn't load that order right now. Please try again or call (253) 922-5793.");
+                if (err && err.message === 'signedOut') {
+                    showToast('Your session expired &mdash; please sign in again to re-order.');
+                } else {
+                    showToast("We couldn't load that order right now. Please try again or call (253) 922-5793.");
+                }
             });
     }
 

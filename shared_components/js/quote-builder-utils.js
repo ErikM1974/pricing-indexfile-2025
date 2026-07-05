@@ -1668,11 +1668,12 @@ function getQuickQuotePrefill() {
     const qty = Math.max(0, parseInt(params.get('qty'), 10) || 0);
     const sizeBreakdown = {};
     (params.get('sizes') || '').split(',').forEach((pair) => {
+        if (!pair) return;
         const i = pair.lastIndexOf(':');
-        if (i <= 0) return;
-        const size = pair.slice(0, i).trim();
-        const q = parseInt(pair.slice(i + 1), 10);
-        if (size && q > 0) sizeBreakdown[size] = (sizeBreakdown[size] || 0) + q;
+        const size = i > 0 ? pair.slice(0, i).trim() : '';
+        const q = i > 0 ? parseInt(pair.slice(i + 1), 10) : NaN;
+        if (size && q > 0) { sizeBreakdown[size] = (sizeBreakdown[size] || 0) + q; }
+        else { console.warn('[QuickQuote] dropped malformed size pair (verify the builder qty):', pair); }
     });
     return {
         style,
@@ -1800,6 +1801,9 @@ function _applyOrderReference(order, cfg) {
         const el = id && document.getElementById(id);
         if (!el || !value) return false;
         if (appendLine) {
+            // Idempotent: clicking [Reference] twice on the same order must not
+            // append the ref line twice (would pollute the notes pushed to ShopWorks).
+            if (el.value.indexOf(value) !== -1) return false;
             el.value = (el.value.trim() ? el.value.replace(/\s+$/, '') + '\n' : '') + value;
         } else {
             if (el.value.trim()) return false;   // light prefill — never clobber typed data

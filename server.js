@@ -3398,8 +3398,14 @@ function projectPortalOrder(o) {
   // invoice), so the Invoices table "Due" column can never disagree with the invoice itself.
   let dueDate = null;
   if (o.date_Invoiced) {
-    const di = new Date(o.date_Invoiced);
-    if (!isNaN(di.getTime())) { di.setDate(di.getDate() + (Number(o.TermsDays) || 0)); dueDate = di.toISOString(); }
+    // Parse the DATE portion as UTC midnight so setDate()/output stay on the same
+    // calendar day regardless of dyno timezone, then emit DATE-ONLY (YYYY-MM-DD) —
+    // the frontend parses it at local midnight, so a bare date can't day-shift.
+    const di = new Date(String(o.date_Invoiced).slice(0, 10) + 'T00:00:00Z');
+    if (!isNaN(di.getTime())) {
+      di.setUTCDate(di.getUTCDate() + (Number(o.TermsDays) || 0));
+      dueDate = di.toISOString().slice(0, 10);
+    }
   }
   return {
     orderNumber: o.id_Order || null,
@@ -3425,11 +3431,12 @@ function portalRepFromOrders(rawOrders) {
   for (const o of rawOrders || []) {
     const name = o && o.CustomerServiceRep ? String(o.CustomerServiceRep).trim() : '';
     if (!name) continue;
-    let email = null;
-    for (const em of Object.keys(REP_NAME_BY_EMAIL)) {
-      if (String(REP_NAME_BY_EMAIL[em]).toLowerCase() === name.toLowerCase()) { email = em; break; }
-    }
-    return { name: name, email: email };
+    // Resolve name → email. If TWO reps share a display name, we can't know which
+    // one this is, so return email null (name only, main-line fallback) rather than
+    // guess wrong and route the customer's email to the wrong rep.
+    const matches = Object.keys(REP_NAME_BY_EMAIL)
+      .filter((em) => String(REP_NAME_BY_EMAIL[em]).toLowerCase() === name.toLowerCase());
+    return { name: name, email: matches.length === 1 ? matches[0] : null };
   }
   return null;
 }
@@ -3478,8 +3485,14 @@ function projectPortalInvoice(o, items) {
   const balance = balanceKnown ? (Number(balRaw) || 0) : total;
   let dueDate = null;
   if (o.date_Invoiced) {
-    const di = new Date(o.date_Invoiced);
-    if (!isNaN(di.getTime())) { di.setDate(di.getDate() + (Number(o.TermsDays) || 0)); dueDate = di.toISOString(); }
+    // Parse the DATE portion as UTC midnight so setDate()/output stay on the same
+    // calendar day regardless of dyno timezone, then emit DATE-ONLY (YYYY-MM-DD) —
+    // the frontend parses it at local midnight, so a bare date can't day-shift.
+    const di = new Date(String(o.date_Invoiced).slice(0, 10) + 'T00:00:00Z');
+    if (!isNaN(di.getTime())) {
+      di.setUTCDate(di.getUTCDate() + (Number(o.TermsDays) || 0));
+      dueDate = di.toISOString().slice(0, 10);
+    }
   }
   return {
     invoiceNumber: o.id_Order,

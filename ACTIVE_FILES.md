@@ -674,9 +674,9 @@
 | `/pages/quote-audit.html` | Staff-only pricing audit page (SW vs 2026) | quote-audit.js, quote-audit.css, staff-auth-helper.js | ✅ Active |
 | `/pages/js/quote-audit.js` | Audit data rendering, staff auth gate | staff-auth-helper.js | ✅ Active |
 | `/pages/css/quote-audit.css` | Audit page styling (self-contained) | Inter font | ✅ Active |
-| `/pages/art-search.html` | Staff-only cross-tool art search ("where is design 12345?") — client-side StaffAuthHelper gate, same pattern as quote-audit (2026-07-05) | art-search.js, art-search.css, staff-auth-helper.js | ✅ Active |
-| `/pages/js/art-search.js` | Art search logic: design # exact / company LIKE / contact client-filter over /api/artrequests; normalizeStatus pills; deep-link ?q= | staff-auth-helper.js, /api/artrequests | ✅ Active |
-| `/pages/css/art-search.css` | Art search styling (2026 art-hub tokens) | art-hub.css :root tokens | ✅ Active |
+| `/tools/art-search.html` | Staff-only cross-tool art search ("where is design 12345?") — SERVER-gated via /tools gateStaffHtml + client StaffAuthHelper belt-and-braces (moved from /pages 2026-07-05) | art-search.js, art-search.css, staff-auth-helper.js | ✅ Active |
+| `/tools/art-search.js` | Art search logic: design # exact / company LIKE / contact client-filter over /api/artrequests; normalizeStatus pills; deep-link ?q= | staff-auth-helper.js, /api/artrequests | ✅ Active |
+| `/tools/art-search.css` | Art search styling (2026 art-hub tokens) | art-hub.css :root tokens | ✅ Active |
 
 **Server Routes (server.js):**
 - `GET /quote/:quoteId` - Serves public quote page
