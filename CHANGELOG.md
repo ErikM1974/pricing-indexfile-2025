@@ -1,3 +1,7 @@
+## v2026.07.05.4 (2026.07.05)
+
+- fix(hub): art-aging widget 404 — API_BASE already ends in /api on v3, drop the doubled /api/api/artrequests
+
 ## v2026.07.05.3 (2026.07.05)
 
 - polish: SCP/DTG duplicate-mode + review fixes + art-search server-gated (v2026.07.05.3)
