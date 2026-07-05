@@ -1,3 +1,7 @@
+## v2026.07.04.6 (2026.07.04)
+
+- fix(emails): staff quote-accept template id → quote_accepted_staff (EmailJS 24-char cap)
+
 ## v2026.07.04.5 (2026.07.04)
 
 - docs(memory): artrequests/mockups finding closed (anon 401); secret-only flip deferred (92-site repoint, supervised)
