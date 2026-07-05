@@ -1,3 +1,9 @@
+## v2026.07.05.5 (2026.07.05)
+
+- docs(memory): EmailJS templates master reference — usage map, orphans, missing-in-emailjs findings
+- docs(memory): EmailJS content audit result — all 32 active templates verified clean
+- cleanup(emailjs): retire dead Adriyella daily-report + template_stripe stub
+
 ## v2026.07.05.4 (2026.07.05)
 
 - fix(hub): art-aging widget 404 — API_BASE already ends in /api on v3, drop the doubled /api/api/artrequests
