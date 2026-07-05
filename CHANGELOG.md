@@ -1,3 +1,9 @@
+## v2026.07.05.1 (2026.07.05)
+
+- docs(memory): quote-accept emails LIVE — both templates created (EmailJS 24-char id cap)
+- fix+test+refactor: audit residuals — reorder form reset, numeric ladder lock, QM inline script extracted
+- Deploy v2026.07.05.1: cache-bust customer-product.js
+
 ## v2026.07.04.6 (2026.07.04)
 
 - fix(emails): staff quote-accept template id → quote_accepted_staff (EmailJS 24-char cap)
