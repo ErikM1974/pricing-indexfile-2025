@@ -26,22 +26,32 @@
 - Proxy: `src/routes/order-payments.js` (append-only ledger, CRM-gated, idempotent on
   Stripe_Session_ID) mounted at `/api/order-payments`.
 
-**Erik must do before/at go-live (nothing deploys itself):**
-1. **Caspio Service_Codes**: add row `DEPOSIT-PCT`, SellPrice = deposit percent (e.g. 50),
-   IsActive. Enable-deposit 502s with a clear message until it exists.
-2. **Caspio table `Order_Payments`** (ledger mirror — payments still record in Notes JSON
-   without it): QuoteID T255 · Type T64 · Amount Number · Stripe_Session_ID T255 ·
-   Payment_Intent T255 · Payer_Email T255 · Customer_Name T255 · Company_Name T255 ·
-   Created T255. Spec repeated in the proxy route header.
-3. **EmailJS templates** (fail-soft until created; Slack alerts fire regardless):
-   `template_deposit_cust` (to_name/to_email/quote_id/amount_paid/balance_due/grand_total)
-   and `template_deposit_staff` (+customer_name/customer_email/company_name/quote_url) on
-   `service_1c4k67j` (server-side sender).
-4. **Deploy both repos** (main via /deploy; proxy via its usual push). No new env vars —
-   reuses STRIPE_* keys/webhook secret, EMAILJS keys, CRM_API_SECRET, Slack hooks.
-5. **Test-mode dry run** (STRIPE_MODE=development + 4242 card): accept a test WQ quote →
-   enable deposit → pay → verify Notes payments[], QM chip, Slack, webhook idempotency
-   (Stripe dashboard "resend webhook" → duplicate skip).
+**Go-live checklist (updated 2026-07-05 PM — Erik chose PAY IN FULL):**
+1. ✅ **DONE — Caspio Service_Codes `DEPOSIT-PCT` SellPrice=100** (PK_ID 253, inserted via
+   `caspio-pricing-proxy/scripts/create-order-payments-table.js`). **100 = pay in full;
+   change SellPrice to 50 in Caspio to switch to 50% deposits — all wording (customer
+   panel, Stripe line item, QM chips, staff strip) is pct-aware, no deploy.**
+2. ✅ **DONE — Caspio table `Order_Payments`** created via the same script (9 STRING
+   columns, Customer_Reward_Ledger house pattern). NOTE: this account 404s on Caspio REST
+   v3 — v2 `POST /tables` works but only accepts minimal `{Name, Columns:[{Name,Type}]}`.
+3. ⬜ **EmailJS templates — Erik pastes manually** (EmailJS has NO template-creation API;
+   fail-soft until created — Slack 💰 alerts + Stripe receipts still fire). On the
+   **server-side service `service_1c4k67j`**, IDs ≤24 chars:
+   - `template_deposit_cust` — To: `{{to_email}}` · Subject: `Payment received — Quote
+     {{quote_id}} | Northwest Custom Apparel` · Body: Hi {{to_name}}, we received your
+     payment of ${{amount_paid}} for quote {{quote_id}}. Order total ${{grand_total}};
+     balance due ${{balance_due}}. We'll start on your proof right away — you'll approve
+     it before production. Questions? (253) 922-5793.
+   - `template_deposit_staff` — To: `{{to_email}}` · Subject: `💰 {{quote_id}} paid
+     ${{amount_paid}} online` · Body: {{customer_name}} ({{customer_email}},
+     {{company_name}}) paid ${{amount_paid}} via Stripe. Balance due ${{balance_due}}.
+     Quote: {{quote_url}}. Enter/verify the order in ShopWorks.
+   - Also recommended: Stripe Dashboard → Settings → Emails → enable "Successful
+     payments" receipts (customer gets Stripe's own receipt with zero setup).
+4. ✅ **Deployed 2026-07-05** (proxy + main). No new env vars.
+5. ⬜ **Test-mode dry run** (STRIPE_MODE=development + 4242 card): accept a test WQ quote →
+   enable payment link → pay → verify Notes payments[], QM chip, Slack, Order_Payments
+   row, webhook idempotency (Stripe dashboard "resend webhook" → duplicate skip).
 
 ---
 

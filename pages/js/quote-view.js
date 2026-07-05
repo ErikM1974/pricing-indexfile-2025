@@ -4717,6 +4717,9 @@ class QuoteViewPage {
         }
 
         const fc = (n) => this.formatCurrency(Number(n) || 0);
+        // DEPOSIT-PCT=100 (Erik 2026-07-05) → pay-in-full wording; a lower pct
+        // in Caspio flips all of this back to deposit wording with no deploy.
+        const payInFull = Number(dep.depositPct) >= 100;
         let banner = '';
         if (returned === 'success' && !depositPaid) {
             // The Stripe redirect can beat the webhook by a few seconds.
@@ -4733,26 +4736,40 @@ class QuoteViewPage {
             </div>`;
 
         if (depositPaid) {
+            const balanceLine = Number(dep.balanceAmount) > 0
+                ? `<div class="deposit-line deposit-line-total"><span>Balance due after proof approval</span><span>${fc(dep.balanceAmount)}</span></div>`
+                : '';
+            const paidNote = Number(dep.balanceAmount) > 0
+                ? "We'll start on your proof right away. The balance is due after you approve it."
+                : "You're paid in full. We'll start on your proof right away.";
             panel.innerHTML = `
                 <div class="deposit-card">
-                    <h3 class="deposit-title">&#10003; Deposit received — thank you!</h3>
+                    <h3 class="deposit-title">&#10003; Payment received — thank you!</h3>
                     ${breakdown}
-                    <div class="deposit-line deposit-line-paid"><span>Deposit paid${depositPaid.at ? ' on ' + this.escapeHtml(this.formatDate(depositPaid.at)) : ''}</span><span>&minus;${fc(depositPaid.amount)}</span></div>
-                    <div class="deposit-line deposit-line-total"><span>Balance due after proof approval</span><span>${fc(dep.balanceAmount)}</span></div>
-                    <p class="deposit-note">We'll start on your proof right away. The balance is due after you approve it.</p>
+                    <div class="deposit-line deposit-line-paid"><span>Paid${depositPaid.at ? ' on ' + this.escapeHtml(this.formatDate(depositPaid.at)) : ''}</span><span>&minus;${fc(depositPaid.amount)}</span></div>
+                    ${balanceLine}
+                    <p class="deposit-note">${paidNote}</p>
                 </div>`;
             panel.style.display = '';
             return;
         }
 
+        const title = payInFull
+            ? 'Ready when you are — pay for your order online'
+            : `Ready when you are — pay your ${Number(dep.depositPct) || 0}% deposit online`;
+        const dueLabel = payInFull ? 'Total due now' : `Deposit due now (${Number(dep.depositPct) || 0}%)`;
+        const btnLabel = payInFull ? `Pay ${fc(dep.depositAmount)}` : `Pay ${fc(dep.depositAmount)} deposit`;
+        const note = payInFull
+            ? 'Secure checkout by Stripe — we never see your card number. Prefer phone? Call (253) 922-5793.'
+            : `Secure checkout by Stripe — we never see your card number. Balance of ${fc(dep.balanceAmount)} is due after proof approval. Prefer phone? Call (253) 922-5793.`;
         panel.innerHTML = `
             ${banner}
             <div class="deposit-card">
-                <h3 class="deposit-title">Ready when you are — pay your ${Number(dep.depositPct) || 0}% deposit online</h3>
+                <h3 class="deposit-title">${title}</h3>
                 ${breakdown}
-                <div class="deposit-line deposit-line-due"><span>Deposit due now (${Number(dep.depositPct) || 0}%)</span><span>${fc(dep.depositAmount)}</span></div>
-                <button type="button" class="btn btn-primary deposit-pay-btn" id="deposit-pay-btn">Pay ${fc(dep.depositAmount)} deposit</button>
-                <p class="deposit-note">Secure checkout by Stripe — we never see your card number. Balance of ${fc(dep.balanceAmount)} is due after proof approval. Prefer phone? Call (253) 922-5793.</p>
+                <div class="deposit-line deposit-line-due"><span>${dueLabel}</span><span>${fc(dep.depositAmount)}</span></div>
+                <button type="button" class="btn btn-primary deposit-pay-btn" id="deposit-pay-btn">${btnLabel}</button>
+                <p class="deposit-note">${note}</p>
             </div>`;
         panel.style.display = '';
         const btn = document.getElementById('deposit-pay-btn');
@@ -4804,11 +4821,13 @@ class QuoteViewPage {
             return;
         }
         if (dep && dep.enabled) {
-            state.textContent = `Link live — ${this.formatCurrency(dep.depositAmount)} deposit (${Number(dep.depositPct) || 0}% of ${this.formatCurrency(dep.grandTotal)})`;
+            state.textContent = Number(dep.depositPct) >= 100
+                ? `Link live — ${this.formatCurrency(dep.depositAmount)} full payment`
+                : `Link live — ${this.formatCurrency(dep.depositAmount)} deposit (${Number(dep.depositPct) || 0}% of ${this.formatCurrency(dep.grandTotal)})`;
             state.className = 'qv-deposit-strip-state is-live';
             document.getElementById('qv-deposit-shipping').value = Number(dep.shipping) || 0;
             document.getElementById('qv-deposit-taxrate').value = Number(dep.taxRatePct) || 0;
-            document.getElementById('qv-deposit-enable-btn').textContent = 'Update deposit';
+            document.getElementById('qv-deposit-enable-btn').textContent = 'Update payment link';
         } else {
             state.textContent = 'Not enabled';
             state.className = 'qv-deposit-strip-state';

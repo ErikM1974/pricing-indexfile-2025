@@ -125,7 +125,7 @@
             <div id="qv-deposit-strip" class="qv-deposit-strip" style="display: none;">
                 <div class="qv-deposit-strip-head">
                     <span class="qv-deposit-strip-icon">&#128176;</span>
-                    <span class="qv-deposit-strip-title">Online deposit</span>
+                    <span class="qv-deposit-strip-title">Online payment</span>
                     <span class="qv-deposit-strip-state" id="qv-deposit-state"></span>
                 </div>
                 <div class="qv-deposit-strip-form" id="qv-deposit-form" style="display: none;">
@@ -136,10 +136,11 @@
                         <input type="number" id="qv-deposit-taxrate" min="0" max="15" step="0.001" placeholder="e.g. 10.1">
                     </label>
                     <span class="qv-deposit-preview" id="qv-deposit-preview"></span>
-                    <button type="button" class="qv-deposit-enable-btn" id="qv-deposit-enable-btn">Enable deposit</button>
+                    <button type="button" class="qv-deposit-enable-btn" id="qv-deposit-enable-btn">Enable payment link</button>
                 </div>
                 <div class="qv-deposit-strip-help">
-                    Confirms tax + shipping and turns on the customer's "Pay deposit" button on this page.
+                    Confirms tax + shipping and turns on the customer's Pay button on this page
+                    (amount = Service_Codes DEPOSIT-PCT: 100 = pay in full, lower = deposit).
                     Tax applies to subtotal + shipping (WA destination rate; enter 0 for out-of-state).
                 </div>
             </div>

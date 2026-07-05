@@ -499,14 +499,21 @@ function renderDepositChip(quote) {
                 </span>`;
     }
     if (depositPaid) {
+        // DEPOSIT-PCT=100 → zero balance = paid in full (Erik 2026-07-05).
+        if (dep && Number(dep.balanceAmount) === 0) {
+            return `<span class="status-badge deposit-chip deposit-chip--paid" title="Paid in full online via Stripe — ${usd(depositPaid.amount)}.">
+                        <i class="fas fa-dollar-sign"></i> Paid in full
+                    </span>`;
+        }
         const bal = dep && isFinite(Number(dep.balanceAmount)) ? ` · bal ${usd(dep.balanceAmount)}` : '';
         return `<span class="status-badge deposit-chip deposit-chip--paid" title="Deposit paid online via Stripe — ${usd(depositPaid.amount)}${dep ? ` of ${usd(dep.grandTotal)}` : ''}. Balance due after proof approval.">
                     <i class="fas fa-dollar-sign"></i> Deposit paid${bal}
                 </span>`;
     }
     if (dep && dep.enabled) {
-        return `<span class="status-badge deposit-chip deposit-chip--live" title="Deposit link is live on the quote page — ${usd(dep.depositAmount)} (${Number(dep.depositPct) || 0}% of ${usd(dep.grandTotal)}). Waiting on the customer.">
-                    <i class="fas fa-link"></i> Deposit link live
+        const label = Number(dep.depositPct) >= 100 ? 'Payment link live' : 'Deposit link live';
+        return `<span class="status-badge deposit-chip deposit-chip--live" title="Pay link is live on the quote page — ${usd(dep.depositAmount)}${Number(dep.depositPct) >= 100 ? ' (full order total)' : ` (${Number(dep.depositPct) || 0}% of ${usd(dep.grandTotal)})`}. Waiting on the customer.">
+                    <i class="fas fa-link"></i> ${label}
                 </span>`;
     }
     return '';

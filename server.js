@@ -10874,8 +10874,14 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `${dep.depositPct}% deposit — Quote ${quoteId}`,
-            description: `Northwest Custom Apparel — order total $${Number(dep.grandTotal).toFixed(2)} incl. tax & shipping; balance due after proof approval`,
+            // DEPOSIT-PCT=100 (Erik 2026-07-05) → pay-in-full wording; any
+            // lower pct flips back to deposit wording with no deploy.
+            name: Number(dep.depositPct) >= 100
+              ? `Payment in full — Quote ${quoteId}`
+              : `${dep.depositPct}% deposit — Quote ${quoteId}`,
+            description: Number(dep.depositPct) >= 100
+              ? `Northwest Custom Apparel — order total $${Number(dep.grandTotal).toFixed(2)} incl. tax & shipping`
+              : `Northwest Custom Apparel — order total $${Number(dep.grandTotal).toFixed(2)} incl. tax & shipping; balance due after proof approval`,
           },
           unit_amount: Math.round(dep.depositAmount * 100),
         },
