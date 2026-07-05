@@ -1241,13 +1241,11 @@ function copyQuoteLink(quoteId) {
 // so it's safe for ANY status — including Processed/locked/pushed rows,
 // which is exactly the reorder case Edit is locked for.
 //
-// Support today (verified 2026-07-05): only the DTF builder
-// (dtf-quote-builder.js ~line 239) and the embroidery builder
-// (embroidery-quote-builder.js ~line 2047) read the ?duplicate= param.
-// The SCP and DTG builders do NOT yet — support is being added
-// separately; UNCOMMENT their rows below the moment their builders honor
-// the param. Until then no Duplicate button renders for those prefixes,
-// so a click can never open a builder that silently ignores the copy.
+// Support (verified 2026-07-05): ALL 4 builders read the ?duplicate= param —
+// DTF (dtf-quote-builder.js ~line 239), embroidery (embroidery-quote-builder.js
+// ~line 2047), screen print (screenprint-quote-builder.js DOMContentLoaded init
+// + duplicateQuote), and DTG (dtg-inline-form.js init() + loadSavedDtgQuoteForEdit
+// forDuplicate mode).
 // Prefix→builder routing mirrors editQuote() above (leading letters only —
 // DTG0311-1 / DTF0601-1 / SP0601-9001 pack the date with NO hyphen).
 const DUPLICATE_BUILDERS = {
@@ -1256,8 +1254,11 @@ const DUPLICATE_BUILDERS = {
     EMB:  '/quote-builders/embroidery-quote-builder.html',
     EMBC: '/quote-builders/embroidery-quote-builder.html',
     CEMB: '/quote-builders/embroidery-quote-builder.html',
-    // DTG:  '/quote-builders/dtg-quote-builder.html',        // pending ?duplicate= support
-    // SP / SPC / SSC → screenprint-quote-builder.html         // pending ?duplicate= support
+    DTG:  '/quote-builders/dtg-quote-builder.html',
+    // SP / SPC / SSC all route to the screen print builder, same as Edit.
+    SP:   '/quote-builders/screenprint-quote-builder.html',
+    SPC:  '/quote-builders/screenprint-quote-builder.html',
+    SSC:  '/quote-builders/screenprint-quote-builder.html',
 };
 
 // Leading-letters prefix of a QuoteID (same rule editQuote uses).

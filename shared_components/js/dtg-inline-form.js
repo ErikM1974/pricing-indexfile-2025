@@ -4734,6 +4734,23 @@ let hasChanges = false;
                 },
             });
         }
+        // Duplicate mode (?duplicate=DTG0311-1): load a COPY of the source quote
+        // as a brand-NEW quote (EMB/DTF parity 2026-07-05). Read-only on the
+        // source — locked/pushed quotes are fine to duplicate (the classic
+        // reorder case). Rows reprice from the live API via schedulePriceUpdate()
+        // — the saved prices are never trusted. Wins over ?edit= and the
+        // session-restore flow, same param priority as DTF/EMB.
+        const dupParam = (new URLSearchParams(window.location.search)).get('duplicate');
+        if (dupParam && /^DTG/i.test(dupParam)) {
+            if (state.rows.length === 0) state.rows.push(newBlankRow());
+            render();
+            // Kick load in background; render shows immediately, fills in async.
+            loadSavedDtgQuoteForEdit(dupParam, { forDuplicate: true }).catch(err => {
+                console.error('[DTG Duplicate] Load failed:', err);
+            });
+            return;
+        }
+
         // Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
         // If URL has ?edit=DTG-NNN, fetch the saved quote, populate the form,
         // and enable revision-on-save. Mirrors EMB/DTF/SCP loadQuoteForEditing.
@@ -4826,7 +4843,7 @@ let hasChanges = false;
     // redirects to the read-only /quote/:id view — never populates the form.
     // This enforces Erik's one-way-sync rule at the load boundary.
     // ========================================================================
-    async function loadSavedDtgQuoteForEdit(quoteId) {
+    async function loadSavedDtgQuoteForEdit(quoteId, opts = {}) {
         const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
             || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         let res, data;
@@ -4849,7 +4866,9 @@ let hasChanges = false;
         const items = Array.isArray(data.quoteItems) ? data.quoteItems : [];
 
         // Lock guard — bail if quote is in ShopWorks.
-        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+        // EXCEPTION: duplicate mode never writes to the source quote, so locked/
+        // pushed quotes (the classic reorder case) are fine to duplicate from.
+        if (!opts.forDuplicate && typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
             return;
         }
 
@@ -4983,16 +5002,38 @@ let hasChanges = false;
 
         state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
 
-        // Stash editing context on window so dtg-quote-page.js's save path
-        // can branch into the PUT/revision flow.
-        window._dtgEditingQuoteId = quoteId;
-        window._dtgEditingPK_ID = session.PK_ID;
-        window._dtgEditingRevision = Number(session.RevisionNumber) || 1;
-        // Also make the quoteID visible to the existing getQuoteID() helper.
-        setQuoteID(quoteId);
-        // Mark aiState as already saved so the email button (Phase 11.5) works
-        // out of the box without requiring a fresh "Save & share link" click.
-        if (window.aiState) window.aiState.savedQuoteID = quoteId;
+        if (opts.forDuplicate) {
+            // Duplicate mode: this is a brand-NEW quote — never adopt the source's
+            // identifiers. Clear any stale editing/session ids so the next save
+            // CREATEs with a fresh sequence id from ensureQuoteID() (dtg-quote-page.js):
+            // window.open copies sessionStorage into the new tab in most browsers,
+            // so a stashed quoteID from the opener could otherwise be silently
+            // reused as this copy's QuoteID (duplicate-QuoteID collision).
+            try { delete window._dtgEditingQuoteId; } catch (_) {}
+            try { delete window._dtgEditingPK_ID; } catch (_) {}
+            try { delete window._dtgEditingRevision; } catch (_) {}
+            try { delete window.__dtgQuoteID; } catch (_) {}
+            try { sessionStorage.removeItem(QUOTEID_KEY); } catch (_) {}
+            // dtg-quote-page.js's ensureQuoteID() resume-stash uses its own
+            // hardcoded v1 key (NOT QUOTEID_KEY) — clear it too.
+            try { sessionStorage.removeItem('dtg.quoteID.v1'); } catch (_) {}
+            if (window.aiState) {
+                window.aiState.quoteID = null;
+                window.aiState.quoteIDPromise = null;
+                window.aiState.savedQuoteID = null;
+            }
+        } else {
+            // Stash editing context on window so dtg-quote-page.js's save path
+            // can branch into the PUT/revision flow.
+            window._dtgEditingQuoteId = quoteId;
+            window._dtgEditingPK_ID = session.PK_ID;
+            window._dtgEditingRevision = Number(session.RevisionNumber) || 1;
+            // Also make the quoteID visible to the existing getQuoteID() helper.
+            setQuoteID(quoteId);
+            // Mark aiState as already saved so the email button (Phase 11.5) works
+            // out of the box without requiring a fresh "Save & share link" click.
+            if (window.aiState) window.aiState.savedQuoteID = quoteId;
+        }
 
         // Render the populated form + kick inventory hydration so size cells
         // light up.
@@ -5017,6 +5058,17 @@ let hasChanges = false;
         }
         schedulePriceUpdate();
 
+        if (opts.forDuplicate) {
+            // Duplicate banner (edit banner intentionally not shown) + toast.
+            // The copy is UNSAVED work — arm the leave-guard (DTF/EMB parity).
+            showDuplicateModeBanner(quoteId);
+            if (typeof markAsUnsaved === 'function') markAsUnsaved();
+            if (typeof showToast === 'function') {
+                showToast(`Duplicated ${quoteId} — prices refreshed to today's rates. Saving will create a new quote #.`, 'success', 7000);
+            }
+            return;
+        }
+
         // Show edit-mode banner — explains current rev + that next save is a revision.
         showEditModeBanner(quoteId, window._dtgEditingRevision);
 
@@ -5026,6 +5078,32 @@ let hasChanges = false;
         // inventory/bundle hydration callbacks don't markDirty, so this can't
         // be un-done by a late fetch.
         if (typeof markAsSaved === 'function') markAsSaved();
+    }
+
+    // Duplicate-mode banner — green "this is a copy" variant of showEditModeBanner
+    // (EMB/DTF parity 2026-07-05: same wording pattern as their header subtitle).
+    function showDuplicateModeBanner(sourceQuoteId) {
+        try {
+            const mount = document.getElementById('dtgResumeBannerMount');
+            if (!mount) return;
+            mount.innerHTML = '';
+            const banner = document.createElement('div');
+            banner.className = 'dtg-duplicate-mode-banner';
+            banner.style.cssText =
+                'display:flex;align-items:center;gap:8px;padding:10px 14px;' +
+                'background:#ecfdf5;border:1px solid #34d399;border-left:4px solid #059669;' +
+                'border-radius:6px;color:#065f46;font-size:13px;line-height:1.4;margin-bottom:10px;';
+            banner.innerHTML = `
+                <i class="fas fa-copy"></i>
+                <div>
+                    <strong>Duplicated from ${escapeHtml(String(sourceQuoteId))}</strong>
+                    <span style="opacity:0.85;"> — saving creates a NEW quote at today's prices.</span>
+                </div>
+            `;
+            mount.appendChild(banner);
+        } catch (err) {
+            console.warn('[dtg-inline-form] showDuplicateModeBanner skipped:', err && err.message);
+        }
     }
 
     function showEditModeBanner(quoteId, revision) {

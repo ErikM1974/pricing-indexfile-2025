@@ -735,9 +735,10 @@ async function applyQuickQuotePrefillScp(qq) {
 
 /**
  * Load existing quote for editing
- * Populates all form fields with quote data
+ * Populates all form fields with quote data.
+ * Returns true on success so duplicateQuote() can bail on a failed load.
  */
-async function loadQuoteForEditing(quoteId) {
+async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
 
     try {
@@ -752,16 +753,18 @@ async function loadQuoteForEditing(quoteId) {
         // Phase 11.3.5 (Erik 2026-05-24): one-way SW sync — bail if the
         // quote is already in ShopWorks. assertQuoteEditable() alerts +
         // redirects to read-only quote-view.
-        if (typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
-            return;
+        // EXCEPTION: duplicate mode never writes to the source quote, so locked/
+        // pushed quotes (the classic reorder case) are fine to duplicate from.
+        if (!opts.forDuplicate && typeof assertQuoteEditable === 'function' && !assertQuoteEditable(session)) {
+            return false;
         }
 
-        // Store edit mode state
+        // Store edit mode state (duplicate mode clears it right after — see duplicateQuote)
         editingQuoteId = quoteId;
         editingRevision = session.RevisionNumber || 1;
 
-        // Update page header to show edit mode
-        updateEditModeUI(quoteId, editingRevision);
+        // Update page header to show edit mode (duplicate mode sets its own banner)
+        if (!opts.forDuplicate) updateEditModeUI(quoteId, editingRevision);
 
         // Populate customer information
         populateCustomerInfo(session);
@@ -804,9 +807,14 @@ async function loadQuoteForEditing(quoteId) {
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 
         // Record the loaded quote id + gate the always-visible Push button (parity with DTF's edit-load).
-        if (typeof showScpPushButton === 'function') showScpPushButton(quoteId);
+        // Duplicate mode: pushing the SOURCE id would re-order the original —
+        // _scpPushQuoteId stays null until the new quote is saved (saveAndGetLink
+        // calls showScpPushButton with the FRESH id).
+        if (!opts.forDuplicate && typeof showScpPushButton === 'function') showScpPushButton(quoteId);
 
-        showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+
+        return true;
 
     } catch (error) {
         console.error('[EditMode] Error loading quote:', error);
@@ -815,8 +823,42 @@ async function loadQuoteForEditing(quoteId) {
         editingQuoteId = null;
         editingRevision = null;
         addNewRow();
+        return false;
     }
 }
+
+/**
+ * Duplicate an existing quote as a brand-new one (repeat orders — EMB/DTF parity 2026-07-05).
+ * Loads through the REAL edit path — so the engine reprices everything from the
+ * live API (last year's tee correctly becomes today's price) — then clears
+ * all edit/push state so the next Save creates a NEW QuoteID. Works on
+ * pushed/locked quotes too (the classic reorder case): the source is never written.
+ */
+async function duplicateQuote(sourceQuoteId) {
+    const loaded = await loadQuoteForEditing(sourceQuoteId, { forDuplicate: true });
+    if (!loaded) return;   // load failed — error already shown
+
+    // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
+    editingQuoteId = null;
+    editingRevision = null;
+    _scpPushQuoteId = null;   // belt-and-suspenders: never let a push target the SOURCE id
+    if (typeof updateScpPushButtonState === 'function') { try { updateScpPushButtonState(); } catch (_) {} }
+
+    // Order-specific fields must not carry over — order #/PO/dates belong to the ORIGINAL order
+    ['.os-order-number', '.os-po-number', '.os-req-ship-date', '.os-drop-dead-date'].forEach(sel => {
+        const el = document.querySelector('#spc-order-fields ' + sel);
+        if (el) el.value = '';
+    });
+
+    // Duplicate banner (updateEditModeUI was suppressed in duplicate mode)
+    const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
+    if (headerSubtitle) {
+        headerSubtitle.innerHTML = `<span style="color: #34d399;">📋 Duplicated from ${escapeHtml(String(sourceQuoteId))} — saving creates a NEW quote at today's prices</span>`;
+    }
+    markAsUnsaved();
+    showToast(`Duplicated ${sourceQuoteId} — prices refreshed to today's rates. Saving will create a new quote #.`, 'success', 7000);
+}
+window.duplicateQuote = duplicateQuote;
 
 // ============================================
 // Unsaved Changes Tracking (UX Improvement)
@@ -957,6 +999,14 @@ function resetQuote() {
     // Clear edit mode
     editingQuoteId = null;
     editingRevision = null;
+
+    // Reset the edit/duplicate banner + strip ?edit=/?duplicate= from the URL so a
+    // refresh after "New Quote" doesn't reload/re-duplicate the old quote (DTF parity 2026-07-05)
+    const headerSubtitleReset = document.querySelector('.power-header .power-header-subtitle');
+    if (headerSubtitleReset) headerSubtitleReset.textContent = 'Screen Printing';
+    if (window.location.search.includes('edit=') || window.location.search.includes('duplicate=')) {
+        try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
+    }
 
     // Clear draft storage
     if (typeof screenPrintPersistence !== 'undefined' && screenPrintPersistence) {
@@ -1121,10 +1171,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = checkForEditMode();
+        // Duplicate mode (?duplicate=SPC-...): load a copy as a NEW quote (EMB/DTF parity 2026-07-05)
+        const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
         // Quick Quote handoff (?from=quickquote) — prefill wins over draft recovery
-        // for this visit, same as ?edit=. (item #6, 2026-07-05)
+        // for this visit, same as ?edit=/?duplicate=. (item #6, 2026-07-05)
         const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
-        if (editQuoteId) {
+        if (duplicateQuoteId) {
+            await duplicateQuote(duplicateQuoteId);
+        } else if (editQuoteId) {
             // Skip draft recovery and load the existing quote instead
             await loadQuoteForEditing(editQuoteId);
         } else if (qqPrefill) {

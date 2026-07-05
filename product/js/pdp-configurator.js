@@ -931,7 +931,7 @@
         // a higher tier exists AND the per-piece savings are > 0; if the data
         // isn't there yet, no line renders. Clicking jumps the qty to the tier.
         if (s.nudge && s.nudge.nextTierMinQty > state.qty
-            && s.nudge.nextPerPiece != null && num(s.nudge.perPieceSavings) > 0) {
+            && num(s.nudge.nextPerPiece) > 0 && num(s.nudge.perPieceSavings) > 0) {
             const n = s.nudge;
             lines.push('<li class="is-nudge">'
                 + '<button class="pdp-cfg-nudge-btn" id="cfgNudgeJump" type="button"'
