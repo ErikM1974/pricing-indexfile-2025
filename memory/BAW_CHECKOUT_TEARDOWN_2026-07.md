@@ -37,11 +37,20 @@ last step; canvas can't handle complex multi-location/pooled/contract orders).
 
 ## Adoption list (ranked, cheapest first)
 
-1. **Delivery-date promise on PDP/cart/header** — "Order today → ships by X" (proxy
-   already has production-schedules data). BAW's single strongest conversion device.
-2. **Pickup orders can skip the rep gate entirely** — pickup = $0 shipping + fixed Milton
-   tax rate, so accept→enable→pay can collapse into ONE session (auto-enable payment link
-   on accept for pickup). Biggest funnel unlock without new pricing machinery.
+1. ✅ **SHIPPED 2026-07-06 — Delivery-date promise on PDP + quote cart** ("Order today →
+   estimated to ship by X"). NOT production-schedules (that table = Ruthie's per-order
+   rows and the endpoint is staff-gated) — instead Service_Codes `LEAD-DAYS-{EMB|CAP|
+   DTG|SCP|DTF}` (SellPrice = business days, seeded at 10 via proxy
+   scripts/seed-lead-days.js; Erik tunes in Caspio, no deploy).
+   shared_components/js/delivery-promise.js + hooks in pdp-configurator
+   renderTotalCard + quote-cart group cards. Fail-soft hidden.
+2. ✅ **SHIPPED 2026-07-06 — Pickup orders skip the rep gate.** Accept modal asks
+   Pickup/Ship (required); pickup → server `autoEnablePickupDeposit()` (DOR Milton
+   lookup — returned **10.2%**, not the remembered 10.1%! — + DEPOSIT-PCT + $0 ship)
+   stamps the deposit block in the SAME Notes write as acceptance; response carries it
+   so the pay button renders instantly, success modal says "pay right now". Ship →
+   rep gate unchanged (deposit:null). FAIL-SOFT: lookup errors alert Slack + fall back
+   to plain acceptance (rep enables manually).
 3. **Cart add-ons upsell** via Service_Codes (fold/polybag etc.) — API-driven fees exist.
 4. **Cross-sell "apply this to another style"** on quote cart (engine can reprice same
    config on sibling styles — the PDP nudge logic already computes this).

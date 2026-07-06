@@ -324,6 +324,15 @@
         });
         $('qcGroups').innerHTML = parts.join('');
 
+        // Delivery promise per group (BAW adoption #1, 2026-07-06): method-aware
+        // ship-by estimate from Service_Codes LEAD-DAYS-*. Fills async; a miss
+        // just leaves the line hidden — never blocks or delays pricing render.
+        if (window.DeliveryPromise) {
+            document.querySelectorAll('.qc-delivery-promise').forEach(function (el) {
+                window.DeliveryPromise.render(el, el.getAttribute('data-method'));
+            });
+        }
+
         renderTotals(cart, res);
         wireGroupEvents();
     }
@@ -491,6 +500,8 @@
         rows.push('<footer class="qc-group-foot"><span>'
             + escapeHtml(meta.label) + ' subtotal</span><span class="qc-group-total">'
             + formatPrice(gr.groupTotal) + '</span></footer>');
+
+        rows.push('<p class="qc-delivery-promise" data-method="' + escapeHtml(method) + '" style="display:none"></p>');
 
         return '<section class="qc-group" data-gid="' + escapeHtml(gid) + '">' + rows.join('') + '</section>';
     }

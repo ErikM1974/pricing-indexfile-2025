@@ -577,7 +577,7 @@
                         <h4>Terms</h4>
                         <ul class="terms-list">
                             <li>Quote valid for 30 days</li>
-                            <li>50% deposit to begin</li>
+                            <li>Payment due before production begins</li>
                             <li>Production time begins after art approval</li>
                         </ul>
                     </div>
@@ -597,7 +597,7 @@
                     <button class="modal-close" id="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p class="modal-description">By accepting this quote, you agree to the pricing and terms shown. We'll reach out to finalize details and collect a deposit.</p>
+                    <p class="modal-description">By accepting this quote, you agree to the pricing and terms shown.</p>
 
                     <form id="accept-form">
                         <div class="form-group">
@@ -607,6 +607,20 @@
                         <div class="form-group">
                             <label for="accept-email">Your Email *</label>
                             <input type="email" id="accept-email" name="email" required placeholder="john@company.com">
+                        </div>
+                        <!-- Delivery method (pickup skip-the-rep, 2026-07-06): pickup has
+                             $0 shipping + fixed Milton tax, so the server auto-enables the
+                             online payment right at acceptance. Ship-to keeps the rep gate. -->
+                        <div class="form-group qv-delivery-choice">
+                            <label>How will you get your order? *</label>
+                            <label class="qv-delivery-option">
+                                <input type="radio" name="deliveryMethod" value="pickup" id="accept-pickup">
+                                <span><strong>Pickup — Milton, WA</strong><br><small>Free · pay online right after accepting</small></span>
+                            </label>
+                            <label class="qv-delivery-option">
+                                <input type="radio" name="deliveryMethod" value="ship" id="accept-ship">
+                                <span><strong>Ship it to me</strong><br><small>Your rep confirms shipping cost, then sends your pay link</small></span>
+                            </label>
                         </div>
                         <div class="form-info">
                             <p><strong>Quote Total:</strong> <span id="modal-total">$0.00</span></p>
@@ -630,7 +644,9 @@
             <div class="modal-content success-modal">
                 <div class="success-icon">&#10003;</div>
                 <h2>Quote Accepted!</h2>
-                <p>Thank you for accepting this quote. Our team will reach out shortly to discuss next steps and collect your deposit.</p>
+                <!-- Copy swapped by quote-view.js: pickup + auto-enabled payment gets
+                     "pay online right now"; ship-to gets the rep-will-confirm message. -->
+                <p id="success-next-steps">Thank you for accepting this quote. Our team will confirm the final details and send your online payment link.</p>
                 <p class="success-contact">Questions? Call us at <a href="tel:2539225793">(253) 922-5793</a></p>
                 <button class="btn btn-primary" id="success-close">Close</button>
             </div>

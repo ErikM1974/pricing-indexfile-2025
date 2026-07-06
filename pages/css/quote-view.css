@@ -3143,3 +3143,27 @@ body {
     .qv-deposit-strip { display: none !important; }
     .deposit-pay-btn { display: none !important; }
 }
+
+/* Delivery-method choice in the accept modal (pickup skip-the-rep, 2026-07-06) */
+.qv-delivery-choice > label:first-child {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+.qv-delivery-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.qv-delivery-option:hover { border-color: #94a3b8; }
+.qv-delivery-option:has(input:checked) {
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+.qv-delivery-option input { margin-top: 3px; }
+.qv-delivery-option small { color: #64748b; }
