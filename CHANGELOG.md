@@ -1,3 +1,9 @@
+## v2026.07.06.8 (2026.07.06)
+
+- chore: seed-top-sellers sends X-CRM-API-Secret (admin endpoint is gated); ran 2026-07-06 — 65/68 styles flagged
+- feat(samples): Stripe checkout for paid samples — 4th storefront channel
+- Deploy v2026.07.06.8: 3 files (catalog.html,sample-cart.html,product.html...)
+
 ## v2026.07.06.7 (2026.07.06)
 
 - chore: gitignore svc.json (service-account key — keep out of git)
