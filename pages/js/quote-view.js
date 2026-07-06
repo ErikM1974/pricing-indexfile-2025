@@ -91,6 +91,13 @@ class QuoteViewPage {
         // Get quote ID from URL
         this.quoteId = this.getQuoteIdFromUrl();
 
+        // URL query params — used below for ?deposit=success|canceled (deposit
+        // panel banner) and ?autoPdf=1. Declared here after a prior commit
+        // (a6ae37d1, 2026-07-04) removed the original declaration while closing
+        // the ?staff=true hole, leaving bare `urlParams` refs that threw a
+        // ReferenceError and aborted init() on every loaded quote. (fix 2026-07-06)
+        const urlParams = new URLSearchParams(window.location.search);
+
         if (!this.quoteId) {
             this.showError('Invalid quote URL');
             return;
@@ -2167,7 +2174,7 @@ class QuoteViewPage {
         // Add tax row with dynamic rate label
         if (this.taxRate > 0) {
             const ratePercent = (this.taxRate * 100).toFixed(1);
-            const rateLabel = `WA Sales Tax (%)`;
+            const rateLabel = `WA Sales Tax (${ratePercent}%)`;
             totalsHtml += `
                 <div class="total-row tax-row">
                     <span class="label">${rateLabel}:</span>
@@ -4659,10 +4666,13 @@ class QuoteViewPage {
             // Success
             this.closeAcceptModal();
 
-            // Update quote data - store in Notes JSON to match server storage
+            // Update quote data - store in Notes JSON to match server storage.
+            // _depositNotes() parses safely (plain-text Notes from the EMB
+            // builder → {}), so a non-JSON Notes value no longer throws and
+            // skips applying data.deposit for pickup. (audit fix 2026-07-06)
             this.quoteData.Status = 'Accepted';
             try {
-                const notes = JSON.parse(this.quoteData.Notes || '{}');
+                const notes = this._depositNotes();
                 notes.acceptedAt = data.acceptedAt;
                 notes.acceptedByName = name;
                 notes.acceptedByEmail = email;
