@@ -15,7 +15,13 @@
  * Safe to re-run (idempotent PUT). Styles not carried in Sanmar_Bulk are
  * reported as notFound and skipped (e.g. Richardson factory-direct caps).
  */
+require('dotenv').config(); // /api/admin/products/* is X-CRM-API-Secret gated
 const API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const SECRET = process.env.CRM_API_SECRET;
+if (!SECRET) {
+  console.error('CRM_API_SECRET not set (needed for the admin endpoint) — add it to .env');
+  process.exit(1);
+}
 
 // Extracted from the retired showcase's completeTopSellers grid (git 5d9547bb~1)
 const STYLES = [
@@ -33,7 +39,7 @@ const STYLES = [
 (async () => {
   const resp = await fetch(`${API}/api/admin/products/mark-as-topseller`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': SECRET },
     body: JSON.stringify({ styles: STYLES })
   });
   const data = await resp.json();

@@ -274,6 +274,65 @@ const CHANNELS = {
       shippedTemplate: 'template_order_shipped',
     },
   },
+
+  // Sample Program — BLANK samples checkout (2026-07-06, Erik). Free-only
+  // carts NEVER come here (they keep the direct ManageOrders push the free
+  // program has always used); a cart containing paid samples goes through
+  // Stripe hosted checkout via the DEDICATED /api/samples/create-checkout-
+  // session route (multi-STYLE carts don't fit the shared single-style
+  // route), then the webhook's metadata.kind === 'samples-order' branch
+  // pushes ONE ManageOrders order (paid + free lines, payment recorded).
+  // Pricing: shared_components/js/sample-pricing.js (dual-load — the browser
+  // buttons and the server reprice share the formula). Erik decisions:
+  // free shipping always; sample cost credited toward the first order
+  // (rep-side gesture, copy only); customer #2791 / web order type (proxy
+  // default — idOrderType deliberately OMITTED, like the tee channels).
+  'samples': {
+    label: 'Sample Program',
+    logPrefix: '[Samples Checkout]',
+    // SAM prefix is NEW — storefront sample orders get their own Quote Mgmt
+    // bucket (read-only: not in DUPLICATE_BUILDERS, no builder can edit it).
+    quoteIdPrefix: 'SAM',
+    buildQuoteId: () => buildDateRandQuoteId('SAM'),
+    requireRightsAck: false,   // blanks ship undecorated — no artwork attestation
+    rushEligible: [],
+    orderNoteLabel: () => 'Sample Order — blanks (Top Sellers sample program)',
+    stripeSource: 'samples',
+    // The dedicated samples route builds its own line names (multi-style cart)
+    stripeLineName: (priced, l) => l.name,
+    stripeSuccessPath: (quoteID) =>
+      `/pages/sample-cart.html?success=1&quote_id=${quoteID}`,
+    stripeCancelPath: () => '/pages/sample-cart.html?canceled=1',
+    fallbackProductName: 'Blank sample',
+    push: {
+      fallbackStyleNumber: 'PC54',
+      ltmPartNumber: 'LTM-75',      // unreachable — samples carry no LTM
+      designTypeId: 45,             // unreachable — sample pushes send NO design blocks
+      artistId: 224,                // unreachable — shape parity
+      designExternalIdPrefix: 'SAM-',
+      designLocationColors: 'N/A',
+      designDetails: () => [],
+      swLocationMap: Object.freeze({}),
+      defaultFrontLocationName: 'N/A',
+      defaultBackLocationName: 'N/A',
+      serviceBanner: () =>
+        'BLANK SAMPLE ORDER - ships blank, no decoration, no proof. PAID ONLINE via Stripe (see Payment Information below).',
+      artReviewClock: () => 'n/a',
+      stockBanner: false,
+      rushOrderFlag: () => false,
+      taxPartNumber,
+    },
+    emails: {
+      // Sales alert reuses the proven Sample-Order-API template the free
+      // program has always sent; customers get the Stripe receipt (plus the
+      // success-page confirmation) — matches free-flow parity (no customer
+      // email exists there either).
+      confirmationCustomerTemplate: 'template_sample_customer',
+      confirmationSalesTemplate: 'template_wjxuice',
+      shippedEnabled: true,
+      shippedTemplate: 'template_order_shipped',
+    },
+  },
 };
 
 // Rows with an absent/unknown channel are legacy 3DT — the pre-registry code

@@ -21,6 +21,7 @@ const {
 const CTS = CHANNELS['custom-tees'];
 const TDT = CHANNELS['3-day-tees'];
 const CAPS = CHANNELS['custom-caps'];
+const SAMPLES = CHANNELS['samples'];
 
 // The server.js resolver semantics (absent/unknown channel → legacy 3DT;
 // exact lookup for whitelist-gated paths). Mirrored here so the contract is
@@ -29,8 +30,8 @@ const resolve = (ch) => CHANNELS[String(ch || '')] || CHANNELS[DEFAULT_CHANNEL];
 const resolveExact = (ch) => CHANNELS[String(ch || '')] || null;
 
 describe('registry shape', () => {
-  test('exactly the three registered channels exist (custom-caps added 2026-06-11)', () => {
-    expect(Object.keys(CHANNELS).sort()).toEqual(['3-day-tees', 'custom-caps', 'custom-tees']);
+  test('exactly the four registered channels exist (custom-caps 2026-06-11, samples 2026-07-06)', () => {
+    expect(Object.keys(CHANNELS).sort()).toEqual(['3-day-tees', 'custom-caps', 'custom-tees', 'samples']);
   });
 
   test('default channel is legacy 3-day-tees (historical rows have no channel)', () => {
@@ -46,9 +47,27 @@ describe('registry shape', () => {
     expect(resolveExact('custom-tees')).toBe(CTS);
     expect(resolveExact('3-day-tees')).toBe(TDT);
     expect(resolveExact('custom-caps')).toBe(CAPS);
+    expect(resolveExact('samples')).toBe(SAMPLES);
     expect(resolveExact('')).toBeNull();
     expect(resolveExact(undefined)).toBeNull();
     expect(resolveExact('not-a-channel')).toBeNull();
+  });
+
+  test('samples channel constants (2026-07-06 — paid blanks via dedicated route)', () => {
+    expect(SAMPLES.quoteIdPrefix).toBe('SAM');
+    expect(SAMPLES.requireRightsAck).toBe(false);           // blanks — no artwork attestation
+    expect(SAMPLES.rushEligible).toEqual([]);
+    expect(SAMPLES.stripeSource).toBe('samples');
+    expect(SAMPLES.stripeSuccessPath('SAM0706-1234'))
+      .toBe('/pages/sample-cart.html?success=1&quote_id=SAM0706-1234');
+    expect(SAMPLES.stripeCancelPath()).toBe('/pages/sample-cart.html?canceled=1');
+    expect(SAMPLES.orderNoteLabel()).toBe('Sample Order — blanks (Top Sellers sample program)');
+    expect(SAMPLES.push.serviceBanner()).toContain('BLANK SAMPLE ORDER');
+    expect(SAMPLES.push.stockBanner).toBe(false);
+    expect(SAMPLES.push.rushOrderFlag()).toBe(false);
+    expect(SAMPLES.push.idOrderType).toBeUndefined();       // proxy default (web/2791), like the tee channels
+    expect(SAMPLES.emails.shippedEnabled).toBe(true);       // ShipStation shipped email fires for SAM orders
+    expect(SAMPLES.emails.confirmationSalesTemplate).toBe('template_wjxuice'); // proven Sample-Order-API alert
   });
 
   test('every channel entry carries the full required field set (additive-entry contract)', () => {

@@ -141,7 +141,7 @@ Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rule
 ## Quick Reference
 
 - **API Proxy**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
-- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF · CAP` (CAP = Custom Hats storefront — read-only in Quote Mgmt, never builder-editable)
+- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF · CAP · SAM` (CAP = Custom Hats storefront, SAM = paid sample orders — both read-only in Quote Mgmt, never builder-editable)
 - **Dev**: `npm start` (port 3000)
 
 ## Security Checklist
