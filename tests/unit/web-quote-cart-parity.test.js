@@ -89,6 +89,7 @@ const DTG_FIXTURES = {
 };
 
 let serviceCodesDown = false;
+let embShirt4871Down = false; // serve the EMB bundle WITHOUT the Shirt/48-71 cost row (Caspio tier-row-missing incident class)
 
 const mockFetch = jest.fn(async (url, opts = {}) => {
     url = String(url);
@@ -103,6 +104,12 @@ const mockFetch = jest.fn(async (url, opts = {}) => {
     }
     if (url.includes('/api/service-codes') && serviceCodesDown) {
         return { ok: false, status: 503, json: async () => ({}), text: async () => 'service unavailable' };
+    }
+    if (embShirt4871Down && url.includes('method=EMB&styleNumber=')) {
+        const b = fixture('emb-bundle-PC54.json'); // fixture() re-reads from disk — mutation stays local
+        b.allEmbroideryCostsR = b.allEmbroideryCostsR.filter(
+            (c) => !(c.ItemType === 'Shirt' && c.TierLabel === '48-71'));
+        return okJson(b);
     }
     const hit = GET_ROUTES.find(([key]) => url.includes(key));
     if (!hit) throw new Error('Unmocked URL in test: ' + url);
@@ -148,6 +155,7 @@ beforeAll(() => {
 });
 beforeEach(() => {
     serviceCodesDown = false;
+    embShirt4871Down = false;
     global.sessionStorage.clear();
     global.window.location.hostname = CUSTOMER_HOST;
     global.window.location.search = '';
@@ -383,6 +391,38 @@ describe('EMB parity (EmbroideryPricingCalculator authority)', () => {
         expect(direct.grandTotal).toBe(1290); // 696 garments + 594 caps
         expect(engineSum).toBe(direct.grandTotal);
         expect(res.grandTotal).toBe(1290);
+    });
+
+    test('missing Caspio Shirt/48-71 cost row → HARD ERROR, never the $12 fallback price (Rule 4)', async () => {
+        // Healthy control: 48× PC61 prices the 48-71 tier from Caspio ($13 cost → $20 unit).
+        const healthy = await run({
+            items: [pc61Emb({ M: 48 })],
+            groups: { 'emb:garment': EMB_LOGOS_LC }
+        });
+        expect(healthy.errors).toEqual([]);
+        const hg = groupOf(healthy, 'emb:garment');
+        expect(hg.tierLabel).toBe('48-71');
+        expect(hg.trace.embCost).toBe(13);
+        expect(hg.lines[0].baseUnit).toBe(20);
+
+        // Same cart, bundle missing the Embroidery_Costs Shirt/48-71 row (the DTG
+        // '1-23' incident class: tiersR has the tier, cost table doesn't). The staff
+        // calculator falls back to $12/pc + toast; the CUSTOMER engine must refuse
+        // to price — error out, never show the fallback-derived number.
+        embShirt4871Down = true;
+        const errSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+        try {
+            const res = await run({
+                items: [pc61Emb({ M: 48 })],
+                groups: { 'emb:garment': EMB_LOGOS_LC }
+            });
+            expect(res.errors).toHaveLength(1);
+            expect(res.errors[0].code).toBe('AUTHORITY_ERROR');
+            expect(res.errors[0].message).toMatch(/garment tier 48-71.*missing from Caspio/);
+            expect(res.grandTotal).toBeNull();
+        } finally {
+            errSpy.mockRestore();
+        }
     });
 });
 

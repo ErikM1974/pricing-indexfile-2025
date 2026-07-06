@@ -263,7 +263,7 @@ function cacheSubmitResponse(submissionId, response) {
 /**
  * Northwest Custom Apparel physical locations. Used for:
  *  - Customer Pickup shipping addresses (pickup orders ship to here)
- *  - Tax-zip lookups for pickup orders (Milton WA = 10.1%)
+ *  - Tax-zip lookups for pickup orders (Milton WA = 10.2% (DOR 2026-07-06))
  *  - Remit-to addresses on invoices
  * Centralizing here so a future move/relocation only updates one place.
  */
@@ -1017,7 +1017,7 @@ async function getDepositPct() {
 async function autoEnablePickupDeposit(quoteId, row, notes) {
   const depositPct = await getDepositPct();
   const tax = await resolveTdtTax({ deliveryMethod: 'pickup' }); // Milton DOR, same as 3DT pickup
-  const taxRatePct = Math.round(tax.rate * 100000) / 1000;       // decimal (0.101) → percent (10.1)
+  const taxRatePct = Math.round(tax.rate * 100000) / 1000;       // decimal (0.102) -> percent (10.2)
   const terms = QuoteDepositMath.computeDepositTerms({
     subtotal: parseFloat(row.TotalAmount), shipping: 0, taxRatePct, depositPct,
   });
@@ -1139,6 +1139,13 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
           console.log('[Webhook] Quote payment already recorded, skipping:', quoteID);
           return res.json({ received: true, status: 'duplicate' });
         }
+        // DOUBLE-PAYMENT guard (audit fix 2026-07-06): the per-session dedup
+        // above only catches Stripe REDELIVERIES of the same session. A DIFFERENT
+        // session of the same kind means the customer paid twice (e.g. two open
+        // pay tabs, or a shared quote link paid by two people). We still record
+        // it — the money is real and must appear in the ledger — but flag it
+        // LOUDLY as a refund-needed duplicate instead of a normal success.
+        const isDoublePayment = payments.some((p) => p && p.kind === metadata.kind);
         // The paid session was bound to a totals-hash at creation. A rep edit
         // between link-send and payment surfaces here — the money is already
         // taken, so record it and alert loudly instead of failing.
@@ -1178,11 +1185,15 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
           companyName: row.CompanyName || '',
         });
         try { sendQuotePaymentEmails(row, payment); } catch (e) { console.error('[QuoteDeposit] receipt dispatch error:', e.message); }
-        const balDue = payment.kind === 'balance' ? 0
-          : Number((notes.deposit && notes.deposit.balanceAmount) || 0);
-        alertQuotePay(`✅ ${quoteID}: ${payment.kind} of $${payment.amount.toFixed(2)} PAID by ${payment.payerEmail || row.CustomerEmail || 'unknown'}${row.CompanyName ? ' (' + row.CompanyName + ')' : ''}. Balance due: $${balDue.toFixed(2)}.`);
-        console.log('[Webhook] ✓ Quote payment recorded:', quoteID, payment.kind, payment.amount);
-        return res.json({ received: true, status: 'quote-payment-recorded' });
+        if (isDoublePayment) {
+          alertQuotePay(`🚨 DUPLICATE PAYMENT — REFUND NEEDED: ${quoteID} received a SECOND '${payment.kind}' of $${payment.amount.toFixed(2)} (session ${session.id}) on top of an earlier one. The customer was charged twice — issue a refund in Stripe.`);
+        } else {
+          const balDue = payment.kind === 'balance' ? 0
+            : Number((notes.deposit && notes.deposit.balanceAmount) || 0);
+          alertQuotePay(`✅ ${quoteID}: ${payment.kind} of $${payment.amount.toFixed(2)} PAID by ${payment.payerEmail || row.CustomerEmail || 'unknown'}${row.CompanyName ? ' (' + row.CompanyName + ')' : ''}. Balance due: $${balDue.toFixed(2)}.`);
+        }
+        console.log('[Webhook] ✓ Quote payment recorded:', quoteID, payment.kind, payment.amount, isDoublePayment ? '(DUPLICATE)' : '');
+        return res.json({ received: true, status: isDoublePayment ? 'quote-payment-duplicate-recorded' : 'quote-payment-recorded' });
       }
 
       console.log('[Webhook] Processing payment for QuoteID:', quoteID);
@@ -5576,7 +5587,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
       : '';
 
     // Tax labeling — rate comes from the order (DOR destination lookup),
-    // never assume Milton 10.1 (legacy bug mislabeled out-of-town orders).
+    // never assume Milton 10.2 (legacy bug mislabeled out-of-town orders).
     const taxRateNum = Number(orderTotals?.taxRate);
     const taxPct = Number.isFinite(taxRateNum) && taxRateNum > 0
       ? String(Math.round(taxRateNum * 10000) / 100) : null;
@@ -5753,7 +5764,7 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
 // ============================================================================
 
 // NWCA's tax account lookup. Per Erik's rules (2026-05-20):
-//   - Pickup at NWCA Milton, WA      → 10.1% flat (Milton rate)
+//   - Pickup at NWCA Milton, WA      -> 10.2% flat (Milton rate)
 //   - Shipping out of WA state        → 0.0% (no nexus)
 //   - Shipping IN WA state            → destination city rate (DOR lookup)
 //
@@ -5782,12 +5793,12 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
 // Motor-vehicle / boat / aircraft sales are an EXCEPTION (taxed at seller's
 // location even when delivered) — N/A for NWCA since we sell apparel.
 function getTaxAccount(state, isCustomerPickup) {
-  if (isCustomerPickup) return { code: '2200.101', label: 'Customer Pickup — Milton, WA 10.1%', rate: 0.101 };
+  if (isCustomerPickup) return { code: '2200.102', label: 'Customer Pickup — Milton, WA 10.2%', rate: 0.102 };
   if (state && state.toUpperCase() !== 'WA') return { code: '2202', label: 'Out of State Sales — No Tax', rate: 0 };
   // In-WA shipping: rate is destination-specific (city of ship-to). The
   // frontend's DOR lookup returns the authoritative rate; we report the GL
   // account here and trust the rate it computed.
-  return { code: '2200.101', label: 'WA Sales Tax — Destination City', rate: null };
+  return { code: '2200.102', label: 'WA Sales Tax — Destination City', rate: null };
 }
 
 // ============================================================================
@@ -5865,11 +5876,11 @@ function findTaxAccountByRate(rateDecimal) {
 // in a structured ShopWorks field — Order ID is the External ID field,
 // timestamp is Date Order Placed, company is the Customer header — and keep
 // ONLY the tax-application instructions, which Erik applies manually after
-// each order arrives (because the integration's hardcoded Tax_10.1 default
+// each order arrives (because the integration's hardcoded Tax_10.1 default (⚠️ Erik: bump ShopWorks integration to Tax_10.2/2200.102)
 // would mis-label non-Milton-pickup orders).
 //
 // 4 possible blocks:
-//   1. Pickup (always Milton, 10.1%)            → APPLY: 2200.101
+//   1. Pickup (always Milton, 10.2%)            -> APPLY: 2200.102
 //   2. In-WA shipping (DOR destination lookup)  → APPLY: matched Caspio account
 //   3. Out-of-state shipping                    → DO NOT APPLY
 //   4. No tax info available (defensive)        → FLAG: needs rep review
@@ -5960,7 +5971,7 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   //   1. ship.taxAccount — frontend's /api/tax-rates/lookup result (authoritative)
   //   2. findTaxAccountByRate(taxRate) — server-side lookup from cached
   //      sales_tax_accounts_2026 table (fallback if frontend dropped it)
-  //   3. Hardcoded '2200.101' for pickup (Milton, always 10.10%)
+  //   3. Hardcoded '2200.102' for pickup (Milton, 10.2% as of 2026-07)
   // We DON'T fall through to generic '2200' parent — that would land orders in
   // an unreconciled GL account and confuse AR.
   let taxAccount = ship?.taxAccount;
@@ -5973,8 +5984,8 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
     }
   }
   if (!taxAccount && isPickup) {
-    taxAccount = '2200.101';
-    taxAccountName = '10.10%';
+    taxAccount = '2200.102';   // Milton pickup — rose to 10.2% (DOR 2026-07-06)
+    taxAccountName = '10.20%';
   }
 
   const ratePct = taxRate > 0 ? (taxRate * 100).toFixed(2) : null;
@@ -10748,15 +10759,11 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
     // Store acceptance info in the existing Notes JSON field instead
     const now = new Date().toISOString();
 
-    // Parse existing Notes JSON and add acceptance info
-    let existingNotes = {};
-    try {
-      if (session.Notes) {
-        existingNotes = JSON.parse(session.Notes);
-      }
-    } catch (e) {
-      console.error('Error parsing existing notes:', e);
-    }
+    // Parse existing Notes JSON and add acceptance info. Use parseNotesJson
+    // (not bare JSON.parse) so a plain-text Notes value — the EMB builder saves
+    // customer production notes as raw text — is preserved under _legacyText
+    // instead of being clobbered by the acceptance JSON. (audit fix 2026-07-06)
+    let existingNotes = parseNotesJson(session.Notes);
 
     existingNotes.acceptedAt = now;
     existingNotes.acceptedByName = sanitizeFilterInput(name);
@@ -10864,19 +10871,29 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
     }
 
     const totalsHash = computeQuoteTotalsHash(quoteId, terms.subtotal, terms.grandTotal, terms.depositAmount);
-    notes.deposit = Object.assign({}, terms, {
+
+    // RE-FETCH before writing (audit fix 2026-07-06): getDepositPct() above is a
+    // network call, so a payment webhook could have written payments[] since we
+    // read `notes`. Re-read fresh, re-check the paid guard, and merge onto the
+    // latest Notes so we never clobber a recorded payment.
+    const fresh = await fetchQuoteSessionRow(quoteId);
+    const freshNotes = parseNotesJson((fresh && fresh.Notes) || row.Notes);
+    if (Array.isArray(freshNotes.payments) && freshNotes.payments.some((p) => p && p.kind === 'deposit')) {
+      return res.status(409).json({ error: 'A deposit has already been paid on this quote.' });
+    }
+    freshNotes.deposit = Object.assign({}, terms, {
       enabled: true,
       totalsHash,
       enabledAt: new Date().toISOString(),
       enabledBy: (req.session.crmUser && (req.session.crmUser.email || req.session.crmUser.Email || req.session.crmUser.name)) || 'staff',
     });
-    await makeApiRequest(`/quote_sessions/${row.PK_ID}`, 'PUT', { Notes: JSON.stringify(notes) });
+    await makeApiRequest(`/quote_sessions/${(fresh && fresh.PK_ID) || row.PK_ID}`, 'PUT', { Notes: JSON.stringify(freshNotes) });
 
     console.log(`[QuoteDeposit] ${quoteId} deposit enabled: $${terms.depositAmount.toFixed(2)} of $${terms.grandTotal.toFixed(2)} (${depositPct}%)`);
     res.json({
       success: true,
       quoteId,
-      deposit: notes.deposit,
+      deposit: freshNotes.deposit,
       payUrl: `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`,
     });
   } catch (error) {
@@ -10929,9 +10946,24 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
     }
     const stripeInstance = stripe(secretKey);
     const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+
+    // Double-charge guard (audit fix 2026-07-06): expire the previous checkout
+    // session before minting a new one, so at most ONE payable link exists per
+    // quote at a time. Without this, a customer who hits Back and clicks Pay
+    // again — or a colleague on the same shared quote link — could complete two
+    // live sessions and be charged twice. Fail-soft: an expire error (already
+    // completed/expired) must not block a legitimate new checkout.
+    if (dep.lastSessionId) {
+      try { await stripeInstance.checkout.sessions.expire(dep.lastSessionId); }
+      catch (e) { console.warn('[QuoteDeposit] prior session expire failed (non-fatal):', e.message); }
+    }
+
     const session = await stripeInstance.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
+      // Cap the payable window to 30 min so a stale abandoned tab can't be paid
+      // hours later against terms that may have changed (Stripe min 30 min).
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       customer_email: row.CustomerEmail || undefined,
       line_items: [{
         price_data: {
@@ -10956,13 +10988,18 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
     });
 
     // Stamp the session id for staff visibility (fail-soft — the webhook keys
-    // off metadata, not this stamp).
+    // off metadata, not this stamp). RE-FETCH before writing (audit fix
+    // 2026-07-06): the `row` snapshot was read BEFORE the ~1s Stripe call, so a
+    // payment webhook that landed during that call already wrote payments[] to
+    // the row. Writing the stale snapshot would erase it. Re-read fresh and
+    // only touch deposit.lastSessionId, preserving payments[] and everything else.
     try {
-      const stamped = parseNotesJson(row.Notes);
+      const fresh = await fetchQuoteSessionRow(quoteId);
+      const stamped = parseNotesJson((fresh && fresh.Notes) || row.Notes);
       stamped.deposit = Object.assign({}, stamped.deposit, {
         lastSessionId: session.id, lastSessionAt: new Date().toISOString(),
       });
-      await makeApiRequest(`/quote_sessions/${row.PK_ID}`, 'PUT', { Notes: JSON.stringify(stamped) });
+      await makeApiRequest(`/quote_sessions/${(fresh && fresh.PK_ID) || row.PK_ID}`, 'PUT', { Notes: JSON.stringify(stamped) });
     } catch (e) {
       console.warn('[QuoteDeposit] session-id stamp failed (non-fatal):', e.message);
     }

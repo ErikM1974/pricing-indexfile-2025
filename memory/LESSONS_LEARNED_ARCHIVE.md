@@ -4,6 +4,12 @@
 
 ---
 
+## PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10) (archived 2026-07-06)
+**Problem:** A `(Get-Content -Raw) -replace ... | Set-Content` one-liner on embroidery-quote-service.js turned every em-dash/arrow into mojibake (`â€”`, `â†’`) across the whole file.
+**Root Cause:** PS 5.1 reads BOM-less UTF-8 as ANSI and `-Encoding utf8` writes UTF-16-adjacent BOM'd output — the decode/re-encode mangles multi-byte chars file-wide, not just on edited lines.
+**Solution:** `git checkout --` the file and re-applied every change with the Edit tool (encoding-safe). Verified with `git diff | Select-String "â€"` → 0.
+**Prevention:** NEVER round-trip repo source files through PS 5.1 Get-Content/Set-Content for find-replace — use the Edit tool (replace_all) or node. After ANY scripted bulk edit, grep the diff for `â€|Ã|â†` before continuing.
+
 ## Routes outlive files — 7 zombie sendFile routes + a live nav item pointed at deleted pages (2026-06-11) (archived 2026-06-17)
 **Problem:** Customer-facing nav item "Marketing" (index.html + webstore-info footer) 404'd; server.js still had `app.get` → `sendFile` for 7 files that no longer exist (marketing, top-sellers-catalog, index-new, embroidery-pricing-standardized/-professional, test-api, test-catalog-layout). Legacy cart.html (Bootstrap 4) + pages/order-confirmation.html were orphaned (zero inbound links) but still served at `/cart` — an unmaintained checkout flow with stale pricing logic a customer could reach by URL.
 **Root Cause:** Files were deleted over months without removing their server.js routes or grepping for inbound links (predates the file-lifecycle automation hook).

@@ -359,6 +359,13 @@
             throw QuoteCartError('Unable to price: ' + result.failedProducts.map(function (f) { return f.style; }).join(', ') +
                 ' — size pricing unavailable.', 'PRICE_UNAVAILABLE');
         }
+        // The calculator priced this run on its hardcoded decoration-cost fallback (a
+        // Caspio tier row is missing/mislabeled). Staff builders show a toast and let a
+        // human verify; customer surfaces must show an ERROR, never the fallback price.
+        if (result.costFallbackUsed) {
+            throw QuoteCartError('Embroidery pricing data incomplete (' + result.costFallbackUsed +
+                ' missing from Caspio) — cannot quote.', 'AUTHORITY_ERROR');
+        }
 
         var pooledQty = isCap ? result.capQuantity : result.garmentQuantity;
         var tierLabel = isCap ? result.capTier : result.garmentTier;

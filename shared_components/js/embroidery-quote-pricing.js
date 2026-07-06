@@ -1856,6 +1856,7 @@ class EmbroideryPricingCalculator {
         return {
             products: productPricing,
             failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed
+            costFallbackUsed: this._costFallbackUsed || null,  // customer engine REFUSES fallback-derived prices (Rule 4)
             totalQuantity: totalQuantity,
             tier: garmentTier,  // Primary tier for backward compat (garment-based)
             garmentTier: garmentTier,  // NEW: Separate garment tier
