@@ -1,3 +1,10 @@
+## v2026.07.06.1 (2026.07.06)
+
+- docs: online payment go-live checklist complete (templates created, dry run passed)
+- docs: Broken Arrow Wear checkout teardown + ranked adoption list (Phase 3 research)
+- feat: delivery-promise chips + pickup skips the rep gate (BAW adoptions #1+#2)
+- Deploy v2026.07.06.1: 3 files (cache-bust)
+
 ## v2026.07.05.9 (2026.07.05)
 
 - fix: pass grand_total to staff deposit-paid email (shared receipt body)
