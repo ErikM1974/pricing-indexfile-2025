@@ -1,3 +1,7 @@
+## v2026.07.06.2 (2026.07.06)
+
+- fix: Milton WA sales tax 10.1% -> 10.2% everywhere (DOR-verified 2026-07-06)
+
 ## v2026.07.06.1 (2026.07.06)
 
 - docs: online payment go-live checklist complete (templates created, dry run passed)
