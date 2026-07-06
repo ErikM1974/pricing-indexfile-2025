@@ -580,15 +580,10 @@
             return card;
         }
 
-        // Navigate to product page
+        // Navigate to product page (modern PDP — "Order a sample" CTA lives there)
         function navigateToProduct(product) {
-            const params = new URLSearchParams({
-                style: product.style,
-                name: product.description,
-                sampleType: 'free',
-                price: '0'
-            });
-            window.location.href = `/pages/top-sellers-product.html?${params.toString()}`;
+            const params = new URLSearchParams({ style: product.style });
+            window.location.href = `/product.html?${params.toString()}`;
         }
 
         // Detect brand from product name

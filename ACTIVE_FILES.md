@@ -132,8 +132,7 @@
 | `/pages/resources.html` | Resources page | Various | ✅ Active |
 | `/pages/sale.html` | Sale page | Various | ✅ Active |
 | `/pages/webstore-info.html` | Webstore information | Various | ✅ Active |
-| `/pages/top-sellers-showcase.html` | Top sellers showcase (API-driven "New Products" filter - see CLAUDE.md § "Managing New Products") | Various | ✅ Active |
-| `/pages/top-sellers-product.html` | Top sellers product page | Various | ✅ Active |
+| `/pages/js/catalog-samples.js` | **NEW (2026-07-06)** Sample-program layer for /catalog Top Sellers view (`?topSellers=1`) — renders Request FREE sample / Order sample buttons into pcard slots, opens cart-drawer, syncs header Samples badge. Successor to the retired top-sellers-showcase page. | sample-cart-service.js, cart-drawer.js, catalog-2026.js | ✅ Active |
 | `/pages/golf-tournaments-2026.html` | **NEW** Summer 2026 golf tournament campaign landing page (MailChimp funnel target) | golf-tournament-showcase.js, .css, embroidery-pricing-service.js, EmailJS | ✅ Active |
 | `/pages/golf-tournament-product.html` | **NEW** Per-style detail page (colors/sizes/full pricing) — linked from golf-tournaments-2026.html product cards | golf-tournament-product.js, .css, embroidery-pricing-service.js | ✅ Active |
 | `/memory/emailjs-custom-tees-templates.md` | **NEW** Paste-ready Subject + HTML for EmailJS `template_sample_customer`/`template_sample_sales` (Custom T-Shirts rewire of the legacy 3DT templates) + wiring checklist | EmailJS dashboard | ✅ Reference |
@@ -220,6 +219,7 @@
 | `/config/storefront-channels.js` | Storefront CHANNEL REGISTRY (pure half): per-channel QuoteID builders, ShopWorks push constants (designTypeId/artistId/SW_LOC/LTM part), banners, EmailJS templates, Stripe paths — server.js binds server-only behaviors on top; adding 'custom-caps' = one entry here + one in server.js CHANNELS | server.js (checkout/webhook emails/push/order-status/shipped email) | ✅ Active |
 | `/tests/unit/storefront-channels.test.js` | Characterization lock (28 tests): exact pre-registry strings/values for BOTH channels — QuoteID formats, note labels, banners, push ids, shipped-email gate, resolver default semantics | config/storefront-channels.js | ✅ Active |
 | `/tests/cts-e2e-local.js` | Local E2E driver: checkout-session → Caspio stamp assertions → prints webhook-leg command | local server :3000 + live proxy | ✅ Active |
+| `/tools/seed-top-sellers.js` | **NEW (2026-07-06)** One-time CLI seed of Caspio IsTopSeller flags for the 68 styles the retired showcase page displayed (drives /catalog?topSellers=1); idempotent, undo via clear-topsellers endpoint | proxy /api/admin/products/mark-as-topseller | ✅ Utility |
 | `/tools/custom-tees-calibrate.html` | STAFF print-box calibration tool — lay the 16×20 envelope on each style's photo once; the storefront designer anchors to it (no-deploy edits) | custom-tees-calibrate.{js,css}, app.config.js, proxy /api/dtg-calibration | ✅ Active |
 | `/tools/custom-tees-calibrate.js` | Tool logic: style/color/view picker, drag/scale aspect-locked box, upsert to Caspio DTG_Calibration via proxy; silhouette auto-detect starting position | proxy /api/dtg-calibration + /api/dtg/top-sellers + /api/product-details | ✅ Active |
 | `/tools/custom-tees-calibrate.css` | Calibration-tool styling | — | ✅ Active |
@@ -238,8 +238,6 @@
 ### Other Pages (Undocumented Until 2026-02-27)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/richardson-112-product.html` | Richardson 112 product display page | richardson-112-product.css | ✅ Active |
-| `/pages/richardson-112-product.css` | Richardson 112 page styles | — | ✅ Active |
 | `/pages/dtg-compatible-products.html` | DTG-compatible products listing | — | ✅ Active |
 | `/pages/sample-cart.html` | Sample ordering cart page | — | ✅ Active |
 | `/pages/order-form.html` | **NEW** Online order form (embroidery/screenprint/DTG/DTF) — paper-style layout, pushes to ShopWorks ManageOrders | order-form/*.css, order-form/*.js, order-form/components/*.jsx | ✅ Active |
@@ -280,7 +278,6 @@
 | `/shared_components/js/order-form-size-suffix.js` | Isomorphic ShopWorks size-suffix mapping (PC61 → PC61_2X / PC61_3XL etc.) loaded by both browser (window.orderFormSizeSuffix) and server.js (require). Single source of truth — verified against the 15,152-row ShopWorks CSV | — | ✅ Active |
 | `/pages/order-form/pricing/methods/sticker.jsx` | Order Form pricing — Stickers method (form-wide size dropdown 2x2/3x3/4x4/5x5 + new artwork checkbox, ConfigBar) — BETA chip until verified | StickerPricingService, registry.js, shared.js | ✅ Active |
 | `/pages/order-form/pricing/methods/emblem.jsx` | Order Form pricing — Emblems/Patches method (form-wide width/height + metallic/velcro/extra-colors/new-design add-ons, ConfigBar) — BETA chip until verified | EmblemPricingService, registry.js, shared.js | ✅ Active |
-| `/pages/top-sellers-product.css` | Top sellers product page styles | — | ✅ Active |
 | `/pages/css/policies-hub.css` | Policies hub page styles | — | ✅ Active |
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |
 | `/pages/policies/dtg-artwork-checklist.html` | DTG artwork preparation checklist | — | ✅ Active |
@@ -809,6 +806,7 @@
 ### Sample Order System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/shared_components/js/sample-cart-service.js` | **NEW (2026-07-06)** Shared sample-program engine (extracted from retired top-sellers-showcase inline script) — API-driven eligibility/pricing (free <$10 blank, else Caspio BLANK-margin half-dollar ceiling), color/size variants, sessionStorage('sampleCart') CRUD, inventory gate, toasts. window.sampleCart singleton. | /api/size-pricing, /api/pricing-bundle?method=BLANK, /api/color-swatches, sample-inventory-service.js | ✅ Active |
 | `/shared_components/js/sample-inventory-service.js` | Real-time SanMar inventory check for sample products | /api/sanmar/inventory | ✅ Active |
 | `/shared_components/js/sample-order-service.js` | Free sample order submission to ShopWorks (customer #2791, $0.01/sample) | /api/manageorders, EmailJS | ✅ Active |
 
@@ -837,7 +835,7 @@
 | `/shared_components/js/enhanced-loading-animations.js` | Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |
 | `/shared_components/js/manual-mode-indicator.js` | Visual banner shown when pricing pages are in manual cost override mode | — | ✅ Active |
 | `/shared_components/js/header-button-functions.js` | Header button helper functions (shareQuote, etc.) | — | ✅ Active |
-| `/shared_components/js/cart-drawer.js` | Slide-in cart drawer UI | cart.js | ✅ Active |
+| `/shared_components/js/cart-drawer.js` | Slide-in sample-cart drawer (color/size picker) — used by /catalog Top Sellers view + product.html Order-a-sample CTA | sample-cart-service.js, cart-drawer.css | ✅ Active |
 | `/shared_components/js/confetti.js` | Canvas-based confetti animation (lightweight, no library) | — | ✅ Active |
 | `/shared_components/js/quote-indicator-manager.js` | Persistent quote-indicator widget (collapsible, real-time updates) | — | ✅ Active |
 | `/shared_components/js/design-thumbnail-service.js` | Fetch design thumbnails from `Shopworks_Thumbnail_Report` (cached) | /api/thumbnails | ✅ Active |

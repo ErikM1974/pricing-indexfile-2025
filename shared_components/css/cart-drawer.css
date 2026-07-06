@@ -422,6 +422,15 @@
     transform: translateX(-50%) translateY(0);
 }
 
+/* Type variants (service toasts: success is the .drawer-toast default) */
+.drawer-toast-warning {
+    background: #b45309;
+}
+
+.drawer-toast-info {
+    background: #37474f;
+}
+
 .drawer-toast i {
     font-size: 18px;
 }

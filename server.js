@@ -66,6 +66,9 @@ dotenv.config();
 //
 // CATALOG (customer redesign P2, 2026-06-11)
 //   GET /catalog[.html]                     — URL-driven product discovery page (pages/catalog.html)
+//   Top-sellers consolidation (2026-07-06): /[pages/]top-sellers-showcase.html → 301 /catalog?topSellers=1;
+//   /[pages/]top-sellers-product.html?style=X → 301 /product.html?style=X; /[pages/]richardson-112-product.html → 301 /product.html?style=112
+//   (legacy showcase/product/richardson pages deleted; sample program now = catalog Top Sellers view + PDP CTA via shared sample-cart-service.js)
 //
 // CUSTOM HATS (custom-caps storefront, 2026-06-11 — registry entry + rebuildCapsQuote; CAP{MMDD}-{rand4} QuoteIDs)
 //   GET /custom-caps[.html]                 — embroidered caps storefront (pages/custom-caps.html); success page via /pages static
@@ -3127,12 +3130,20 @@ app.get('/webstore-info.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'webstore-info.html'));
 });
 
-app.get('/top-sellers-showcase.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-showcase.html'));
+// Top Sellers consolidation (2026-07-06): the standalone showcase + per-style
+// sample pages retired into /catalog?topSellers=1 (IsTopSeller-driven view w/
+// sample program) and product.html ("Order a sample" CTA). 301s keep old
+// bookmarks, emails, and SEO alive. /pages/* forms fall through the static
+// mount once the files are gone.
+app.get(['/top-sellers-showcase.html', '/pages/top-sellers-showcase.html'], (req, res) => {
+  res.redirect(301, '/catalog?topSellers=1');
 });
 
-app.get('/top-sellers-product.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'top-sellers-product.html'));
+app.get(['/top-sellers-product.html', '/pages/top-sellers-product.html'], (req, res) => {
+  const style = (req.query.style || '').toString();
+  res.redirect(301, style
+    ? `/product.html?style=${encodeURIComponent(style)}`
+    : '/catalog?topSellers=1');
 });
 
 app.get('/sample-cart.html', (req, res) => {
@@ -3143,8 +3154,10 @@ app.get('/dtg-compatible-products.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'dtg-compatible-products.html'));
 });
 
-app.get('/richardson-112-product.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'richardson-112-product.html'));
+// Richardson 112 one-off page retired with the top-sellers consolidation
+// (2026-07-06) — the modern PDP serves style 112 through the shared engine.
+app.get(['/richardson-112-product.html', '/pages/richardson-112-product.html'], (req, res) => {
+  res.redirect(301, '/product.html?style=112');
 });
 
 app.get('/pricing-negotiation-policy.html', (req, res) => {

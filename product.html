@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.01.1">
     <link rel="stylesheet" href="/product/css/product-2026.css?v=2026.07.06.1">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.4">
+    <link rel="stylesheet" href="/shared_components/css/cart-drawer.css?v=2026.07.06.7">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -65,7 +66,7 @@
                     <a href="/brands.html" class="nav-link">Brands</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/pages/top-sellers-showcase.html" class="nav-link">Top Sellers</a>
+                    <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
                 </li>
                 <li class="nav-item">
                     <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
@@ -117,7 +118,7 @@
         <nav class="drawer-links" aria-label="Quick links">
             <a href="/">Home</a>
             <a href="/custom-tees">Custom T-Shirts <span class="flag-new">New</span></a>
-            <a href="/pages/top-sellers-showcase.html">Top Sellers &amp; Free Samples</a>
+            <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
             <a href="/brands.html">Brands</a>
             <a href="/pages/webstore-info.html">Custom Webstores</a>
         </nav>
@@ -221,7 +222,7 @@
                                 <h2>Ready to outfit your crew?</h2>
                                 <p>Tell us the style, color, and quantity — a real person quotes it, usually same day.</p>
                                 <a class="btn btn-cta" id="ctaQuote" href="#pricingHeading">Price it &amp; add to quote</a>
-                                <a class="btn btn-ghost" id="ctaSample" href="/pages/top-sellers-showcase.html">Order a sample</a>
+                                <a class="btn btn-ghost" id="ctaSample" href="/catalog?topSellers=1">Order a sample</a>
                                 <p class="pdp-cta-phone">Or call <a href="tel:253-922-5793">253-922-5793</a><br>Mon–Fri 8:30–5:00 PT</p>
                             </div>
                         </div>
@@ -316,7 +317,7 @@
             <span class="pdp-mobile-cta-price" id="cfgMobilePrice" aria-live="polite" hidden></span>
             <a class="btn btn-cta" id="ctaQuoteMobile" href="#pricingHeading">Price it</a>
             <a class="btn btn-ghost" href="tel:253-922-5793">Call us</a>
-            <a class="btn btn-ghost" id="ctaSampleMobile" href="/pages/top-sellers-showcase.html">Sample</a>
+            <a class="btn btn-ghost" id="ctaSampleMobile" href="/catalog?topSellers=1">Sample</a>
         </div>
     </main>
 
@@ -330,10 +331,10 @@
             <div class="footer-col">
                 <h3>Shop</h3>
                 <ul>
-                    <li><a href="/pages/top-sellers-showcase.html">Top Sellers</a></li>
+                    <li><a href="/catalog?topSellers=1">Top Sellers</a></li>
                     <li><a href="/brands.html">Brands</a></li>
                     <li><a href="/custom-tees">Custom T-Shirts</a></li>
-                    <li><a href="/pages/top-sellers-showcase.html">Free Sample Program</a></li>
+                    <li><a href="/catalog?topSellers=1">Free Sample Program</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -382,6 +383,10 @@
     <script src="/shared_components/js/delivery-promise.js?v=2026.07.06.1" defer></script>
     <script src="/product/js/pdp-configurator.js?v=2026.07.06.5" defer></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4" defer></script>
-    <script src="/product/js/product-2026.js?v=2026.07.04.4" defer></script>
+    <!-- Sample program: shared engine + drawer (Order a sample CTA) -->
+    <script src="/shared_components/js/sample-inventory-service.js?v=2026.07.06.7" defer></script>
+    <script src="/shared_components/js/sample-cart-service.js?v=2026.07.06.7" defer></script>
+    <script src="/shared_components/js/cart-drawer.js?v=2026.07.06.7" defer></script>
+    <script src="/product/js/product-2026.js?v=2026.07.06.7" defer></script>
 </body>
 </html>

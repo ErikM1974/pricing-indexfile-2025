@@ -1,7 +1,8 @@
 /**
  * Cart Drawer Component
  * Replaces modal with modern slide-out drawer for sample selection
- * Used by: top-sellers-showcase.html
+ * Used by: /catalog (top-sellers view) + product.html — reads window.sampleCart
+ * from shared_components/js/sample-cart-service.js
  *
  * Features:
  * - Slide-out animation from right
@@ -134,7 +135,8 @@ class CartDrawer {
     }
 
     open(product = null) {
-        console.log('[CartDrawer] Opening drawer', product ? 'with product' : 'view cart only');
+        // Drawer markup uses Font Awesome icons — lazy-load it on pages without it
+        if (window.sampleCartEnsureIcons) window.sampleCartEnsureIcons();
 
         this.isOpen = true;
         this.currentProduct = product;
@@ -284,7 +286,7 @@ class CartDrawer {
         addButton.disabled = !(this.selectedColor && this.selectedSize);
     }
 
-    addToCart() {
+    async addToCart() {
         if (!this.currentProduct || !this.selectedColor || !this.selectedSize) {
             console.error('[CartDrawer] Cannot add to cart - missing product, color, or size');
             return;
@@ -306,20 +308,18 @@ class CartDrawer {
             addedAt: new Date().toISOString()
         };
 
-        // Add to cart using existing SampleCart from top-sellers-showcase.html
-        if (window.sampleCart) {
-            window.sampleCart.addSample(cartItem);
-        } else {
+        if (!window.sampleCart) {
             console.error('[CartDrawer] SampleCart not found');
             alert('Error adding to cart. Please refresh the page.');
             return;
         }
 
-        // Show success message
-        this.showSuccessMessage(`${cartItem.name} added to cart!`);
-
-        // Update cart display
+        // addSample is async (live inventory gate) and returns false when
+        // blocked — it shows its own toast either way, so don't double-toast
+        // and don't collapse the picker on a failed add.
+        const added = await window.sampleCart.addSample(cartItem);
         this.updateCartDisplay();
+        if (!added) return;
 
         // Hide product selection section
         this.hideProductSelection();

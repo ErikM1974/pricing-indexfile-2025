@@ -5,6 +5,9 @@ node_modules/
 .vscode/
 npm-debug.log
 
+# Secrets / service-account keys (never commit)
+svc.json
+
 # Python
 __pycache__/
 *.pyc

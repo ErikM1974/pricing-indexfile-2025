@@ -178,6 +178,7 @@
 |------|---------|
 | `manageorders-customer-service.js` | ManageOrders customer API |
 | `manageorders-inventory-service.js` | ManageOrders inventory API |
+| `sample-cart-service.js` | Sample-program engine (API-driven eligibility/pricing, sessionStorage cart, `window.sampleCart`) — extracted 2026-07-06 from the retired top-sellers-showcase page; used by /catalog Top Sellers view + product.html |
 | `sample-inventory-service.js` | Sample inventory tracking |
 | `sample-order-service.js` | Sample order management |
 | `edp-generator-service.js` | EDP (Electronic Data Processing) service |

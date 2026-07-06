@@ -351,3 +351,21 @@
     .sort-wrap { margin-left: auto; }
     .sort-select { min-width: 0; }
 }
+
+/* ── Sample program (Top Sellers view) — buttons filled by catalog-samples.js ── */
+.pcard-sample-slot { margin-top: 8px; min-height: 0; }
+.pcard-sample-loading { font-size: 12px; color: var(--ink-soft); }
+.btn-sample {
+    width: 100%; min-height: 38px; padding: 8px 10px;
+    border-radius: var(--radius-sm); cursor: pointer;
+    font-family: var(--font-display); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.02em; transition: background 0.15s, color 0.15s, border-color 0.15s;
+    border: 1.5px solid var(--green-700); background: var(--card); color: var(--green-700);
+}
+.btn-sample:hover:not(:disabled) { background: var(--green-50); color: var(--green-900); border-color: var(--green-900); }
+.btn-sample:disabled { opacity: 0.6; cursor: wait; }
+.btn-sample.btn-sample-paid { border-style: dashed; }
+.btn-sample.in-cart { background: var(--green-700); border-color: var(--green-700); color: #fff; }
+
+/* Header Samples badge (shares .quote-badge base styles) */
+.sample-badge { margin-left: 8px; }
