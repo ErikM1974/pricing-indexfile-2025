@@ -1,3 +1,8 @@
+## v2026.07.06.3 (2026.07.06)
+
+- fix(emb): customer engine HARD-ERRORS on $12/$9 decoration-cost fallback (Rule 4)
+- fix: audit findings — quote-view init crash, tax label regression, money-path double-charge + Notes-race hardening
+
 ## v2026.07.06.2 (2026.07.06)
 
 - fix: Milton WA sales tax 10.1% -> 10.2% everywhere (DOR-verified 2026-07-06)
