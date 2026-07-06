@@ -615,10 +615,55 @@
 
         updateAddToQuote(sel);
 
-        // Existing sample flow (legacy param shape kept on purpose)
-        const sample = '/pages/top-sellers-product.html?style=' + encodeURIComponent(state.style) + '&mode=sample';
-        $('ctaSample').href = sample;
-        $('ctaSampleMobile').href = sample;
+        // Sample flow: open the shared sample drawer for THIS style (successor
+        // to the retired top-sellers-product.html?mode=sample page). The static
+        // href (/catalog?topSellers=1) stays as the no-JS / load-failure fallback.
+        wireSampleCta($('ctaSample'));
+        wireSampleCta($('ctaSampleMobile'));
+    }
+
+    // ============================================================
+    // ORDER A SAMPLE — shared sample-cart-service + cart-drawer.
+    // Eligibility/pricing is API-driven inside the service (free under $10
+    // blank, else margin-priced); ineligible styles get a visible notice,
+    // never a dead click.
+    // ============================================================
+    function wireSampleCta(link) {
+        if (!link || link.dataset.sampleWired) return;
+        link.dataset.sampleWired = '1';
+        link.addEventListener('click', async function (e) {
+            if (!window.sampleCart || !window.cartDrawer) return; // href fallback
+            e.preventDefault();
+            const cart = window.sampleCart;
+            const original = link.textContent;
+            link.textContent = 'Loading…';
+            try {
+                const [eligibility, variants] = await Promise.all([
+                    cart.checkEligibility(state.style),
+                    cart.getVariants(state.style)
+                ]);
+                if (!eligibility.eligible) {
+                    cart.showNotification('Samples aren’t available online for this style — call 253-922-5793', 'info');
+                    return;
+                }
+                window.cartDrawer.open({
+                    style: state.style,
+                    name: (state.product && state.product.name) || state.style,
+                    description: (state.product && state.product.brand) || '',
+                    imageUrl: (state.selected && state.selected.productImage) ||
+                        (state.product && state.product.fallbackImage) || '',
+                    price: eligibility.price,
+                    type: eligibility.type,
+                    colors: variants.colors,
+                    sizes: variants.sizes
+                });
+            } catch (error) {
+                console.error('[PDP] Sample drawer failed:', error);
+                cart.showNotification('Couldn’t load sample options — please try again', 'warning');
+            } finally {
+                link.textContent = original;
+            }
+        });
     }
 
     // ============================================================

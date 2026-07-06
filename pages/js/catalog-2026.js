@@ -100,7 +100,7 @@
             q: '', category: '', subcategory: '',
             brand: [], color: [], size: [],
             minPrice: '', maxPrice: '',
-            method: '',
+            method: '', topSellers: false,
             sort: '', page: 1
         };
     }
@@ -171,6 +171,7 @@
         s.maxPrice = (p.get('maxPrice') || '').trim();
         var method = (p.get('method') || '').trim().toLowerCase();
         s.method = METHOD_VALUES.indexOf(method) !== -1 ? method : '';
+        s.topSellers = p.get('topSellers') === '1';
         var sort = (p.get('sort') || '').trim();
         s.sort = SORT_VALUES.indexOf(sort) !== -1 ? sort : '';
         var page = parseInt(p.get('page'), 10);
@@ -189,6 +190,7 @@
         if (s.minPrice !== '') p.set('minPrice', s.minPrice);
         if (s.maxPrice !== '') p.set('maxPrice', s.maxPrice);
         if (s.method) p.set('method', s.method);
+        if (s.topSellers) p.set('topSellers', '1');
         if (s.sort) p.set('sort', s.sort);
         if (s.page > 1) p.set('page', String(s.page));
         var qs = p.toString();
@@ -219,7 +221,7 @@
         return (state.category ? 1 : 0) + (state.subcategory ? 1 : 0) +
             state.brand.length + state.color.length + state.size.length +
             ((state.minPrice !== '' || state.maxPrice !== '') ? 1 : 0) +
-            (state.method ? 1 : 0);
+            (state.method ? 1 : 0) + (state.topSellers ? 1 : 0);
     }
 
     /* ── Document title / page header / breadcrumb ───────────────── */
@@ -252,6 +254,14 @@
             sub = total != null
                 ? formatCount(total) + ' customizable style' + (total === 1 ? '' : 's') + ' — embroidery, screen print, DTG, and DTF done in-house.'
                 : 'Loading styles…';
+        } else if (state.topSellers) {
+            crumbsHtml += '<a href="/catalog">Catalog</a><span class="crumbs-sep">/</span>' +
+                '<span aria-current="page">Top Sellers</span>';
+            h1 = 'Top Sellers';
+            docTitle = 'Top Sellers — Northwest Custom Apparel';
+            sub = total != null
+                ? formatCount(total) + ' proven favorite' + (total === 1 ? '' : 's') + ' — and most offer a free sample so you can feel the quality first.'
+                : 'Loading our proven favorites…';
         } else {
             crumbsHtml += '<span aria-current="page">Catalog</span>';
             h1 = 'Product Catalog';
@@ -275,6 +285,8 @@
         if (state.minPrice !== '') params.minPrice = state.minPrice;
         if (state.maxPrice !== '') params.maxPrice = state.maxPrice;
         if (state.sort) params.sort = state.sort;
+        // Server-side flag filter (Caspio IsTopSeller via /api/products/search)
+        if (state.topSellers) params.isTopSeller = 'true';
         return params;
     }
 
@@ -393,7 +405,8 @@
         var imageUrl = images.display || images.main || images.thumbnail || '';
         var colorCount = Array.isArray(product.colors) ? product.colors.length : 0;
         var productUrl = '/product.html?style=' + encodeURIComponent(style);
-        var isTop = !!(product.features && product.features.isTopSeller);
+        // In the Top Sellers view every card is a top seller — skip the flag noise
+        var isTop = !state.topSellers && !!(product.features && product.features.isTopSeller);
 
         return '<article class="pcard" data-style="' + escapeHtml(style) + '">' +
             '<div class="pcard-media' + (imageUrl ? '' : ' no-img') + '">' +
@@ -411,6 +424,8 @@
             '<h3 class="pcard-name"><a href="' + escapeHtml(productUrl) + '">' + escapeHtml(product.productName || style) + '</a></h3>' +
             '<p class="pcard-colors">' + (colorCount > 1 ? formatCount(colorCount) + ' colors' : ' ') + '</p>' +
             priceHtml(product) +
+            // Sample-program slot (top-sellers view only) — filled by catalog-samples.js
+            (state.topSellers ? '<div class="pcard-sample-slot" data-style="' + escapeHtml(style) + '"></div>' : '') +
             '</div></article>';
     }
 
@@ -509,6 +524,12 @@
         els.grid.innerHTML = products.map(buildCard).join('');
         renderPager(pagination);
 
+        // Sample-program decoration (top-sellers view) — optional module; the
+        // catalog stays fully functional without it.
+        if (window.CatalogSamples) {
+            window.CatalogSamples.onResults(products, state.topSellers);
+        }
+
         var pageNum = pagination.page || 1;
         var pageSize = pagination.limit || rawProducts.length;
         var start = (pageNum - 1) * pageSize + 1;
@@ -569,6 +590,7 @@
     function renderChips() {
         var html = '';
         if (state.q) html += chip('Search', '“' + state.q + '”', 'q', '');
+        if (state.topSellers) html += chip('Collection', 'Top Sellers', 'topsellers', '');
         if (state.category) html += chip('Category', state.category, 'category', '');
         if (state.subcategory) html += chip('Type', state.subcategory, 'subcategory', '');
         if (state.method) html += chip('Decoration', METHOD_LABELS[state.method] || state.method, 'method', '');
@@ -599,6 +621,7 @@
             case 'size': navigate({ size: state.size.filter(function (v) { return v !== value; }) }); break;
             case 'price': navigate({ minPrice: '', maxPrice: '' }); break;
             case 'method': navigate({ method: '' }); break;
+            case 'topsellers': navigate({ topSellers: false }); break;
         }
     }
 
@@ -699,6 +722,11 @@
 
     function renderFacets(facets, products) {
         var html = '';
+
+        // Collection (Top Sellers — Erik curates via the Caspio IsTopSeller flag)
+        html += facetGroup('topsellers', 'Collection',
+            optionRow('topsellers', 'checkbox', '1', 'Top sellers', null, state.topSellers),
+            { note: 'Our proven favorites — most offer a free sample.' });
 
         // Category (single-select)
         var categories = (facets && facets.categories) || [];
@@ -891,6 +919,9 @@
             }
             case 'method':
                 navigate({ method: value });
+                break;
+            case 'topsellers':
+                navigate({ topSellers: input.checked });
                 break;
         }
     }
@@ -1274,7 +1305,7 @@
             if (catLink && catLink.dataset.category) {
                 e.preventDefault();
                 closeBrowseDrawer();
-                navigate({ q: '', category: catLink.dataset.category, subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
+                navigate({ q: '', category: catLink.dataset.category, subcategory: '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '', topSellers: false });
                 els.searchInput.value = '';
                 return;
             }
@@ -1286,7 +1317,7 @@
                 closeBrowseDrawer();
                 var fly = document.getElementById('categoryFlyout');
                 if (fly) fly.classList.remove('show');
-                navigate({ q: '', category: flyout.dataset.category, subcategory: flyout.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
+                navigate({ q: '', category: flyout.dataset.category, subcategory: flyout.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '', topSellers: false });
                 els.searchInput.value = '';
                 return;
             }
@@ -1296,7 +1327,7 @@
             if (subLink && subLink.dataset.category) {
                 e.preventDefault();
                 closeMegaDropdown(subLink);
-                navigate({ q: '', category: subLink.dataset.category, subcategory: subLink.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
+                navigate({ q: '', category: subLink.dataset.category, subcategory: subLink.dataset.subcategory || '', brand: [], color: [], size: [], minPrice: '', maxPrice: '', method: '', topSellers: false });
                 els.searchInput.value = '';
                 return;
             }
@@ -1312,7 +1343,7 @@
                 if (brandName) {
                     e.preventDefault();
                     closeMegaDropdown(brandLink);
-                    navigate({ q: '', category: '', subcategory: '', brand: [brandName], color: [], size: [], minPrice: '', maxPrice: '', method: '' });
+                    navigate({ q: '', category: '', subcategory: '', brand: [brandName], color: [], size: [], minPrice: '', maxPrice: '', method: '', topSellers: false });
                     els.searchInput.value = '';
                 }
                 return;

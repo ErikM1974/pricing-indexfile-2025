@@ -104,7 +104,7 @@ class UniversalCartHeader {
         return `
             <header class="universal-header">
                 <div class="header-container">
-                    <a href="/pages/top-sellers-showcase.html" class="logo-link">
+                    <a href="/catalog?topSellers=1" class="logo-link">
                         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                              alt="Northwest Custom Apparel"
                              class="company-logo">

@@ -113,7 +113,8 @@ class SampleInventoryService {
                 style: styleNumber,
                 color: colorName,
                 sizes: [],
-                totalStock: 0
+                totalStock: 0,
+                noData: true
             };
         }
     }
@@ -139,12 +140,17 @@ class SampleInventoryService {
         // Handle array response (API sometimes returns array)
         const inventoryData = Array.isArray(data) ? data[0] : data;
 
-        if (!inventoryData || !inventoryData.sizes || !inventoryData.warehouses) {
+        // No warehouse rows = NO inventory data (e.g. the endpoint's
+        // "sanmar-bulk" fallback carries no stock numbers) — flag it instead
+        // of reading structurally-empty data as "0 in stock everywhere"
+        if (!inventoryData || !inventoryData.sizes || !Array.isArray(inventoryData.warehouses) ||
+            inventoryData.warehouses.length === 0) {
             return {
                 style: inventoryData?.style || '',
                 color: inventoryData?.color || '',
                 sizes: [],
-                totalStock: 0
+                totalStock: 0,
+                noData: true
             };
         }
 
@@ -189,6 +195,20 @@ class SampleInventoryService {
      */
     async checkSizeAvailability(styleNumber, colorName, size, requestedQty = 1) {
         const inventory = await this.fetchInventoryLevels(styleNumber, colorName);
+
+        // No inventory DATA ≠ no inventory: fail open with a visible caveat
+        // (a human verifies stock at fulfillment) instead of blocking every
+        // add while the live-stock source is degraded
+        if (inventory.noData) {
+            return {
+                available: true,
+                dataUnavailable: true,
+                qtyInStock: null,
+                hasRecord: false,
+                isLowStock: false,
+                warehouse: 'Sanmar (Multiple Warehouses)'
+            };
+        }
 
         // Check if size exists in inventory
         const qtyAvailable = inventory.inventory?.[size] || 0;
