@@ -161,7 +161,7 @@
         method: null,       // selected method id
         results: {},        // id -> { status:'loading'|'ok'|'unavailable'|'belowmin'|'error', preview, summary, message }
         matrixOpen: false,
-        seq: 0,             // reprice token (stale-result guard)
+        seq: {},            // per-method reprice tokens (stale-result guard) — id -> counter
         qtyTimer: null,
         matrixCache: {},    // 'method|loc|ink' -> matrix model
         initialized: false
@@ -564,6 +564,14 @@
         };
     }
 
+    /** Bump and return this method's reprice token. Per-method so a single-method
+     *  re-price (setInk/setStripes/retryMethod) invalidates only its own in-flight
+     *  request — never a sibling method mid-flight from a concurrent repriceAll. */
+    function nextSeq(id) {
+        state.seq[id] = (state.seq[id] || 0) + 1;
+        return state.seq[id];
+    }
+
     async function priceMethod(id, token) {
         const def = METHODS[id];
         state.results[id] = { status: 'loading' };
@@ -577,12 +585,12 @@
                 throw new Error('Pricing engine not loaded');
             } else {
                 const prepData = await prep(id);
-                if (token !== state.seq) return;
+                if (token !== state.seq[id]) return;
                 const preview = await window.QuoteCartEngine.singleItemPreview(
                     buildItem(def, prepData),
                     { groups: def.groups(state.loc), deps: engineDeps(), nudge: true }
                 );
-                if (token !== state.seq) return;
+                if (token !== state.seq[id]) return;
                 if (!preview.ok) {
                     if (preview.error && preview.error.code === 'BELOW_MINIMUM') {
                         state.results[id] = {
@@ -601,13 +609,13 @@
                 }
             }
         } catch (err) {
-            if (token !== state.seq) return;
+            if (token !== state.seq[id]) return;
             console.error('[pdp-configurator] Pricing failed for ' + id + ':', err);
             state.results[id] = { status: 'error', message: err.message };
             if (id === 'emb' || id === 'capemb') resetEmbCalc(); // un-poison a failed init for retry
         }
 
-        if (token !== state.seq) return;
+        if (token !== state.seq[id]) return;
         renderMethodChip(id);
         renderAllFailedAlert();
         if (id === state.method) renderTotal();
@@ -615,16 +623,15 @@
     }
 
     function repriceAll() {
-        const token = ++state.seq;
         ensureSelectedSupported();
-        state.methods.forEach(function (m) { priceMethod(m.id, token); });
+        state.methods.forEach(function (m) { priceMethod(m.id, nextSeq(m.id)); });
         renderMatrix(); // re-renders only if open
     }
 
     function retryMethod(id) {
         delete prepCache[id];
         if (id === 'emb' || id === 'capemb') resetEmbCalc();
-        priceMethod(id, state.seq);
+        priceMethod(id, nextSeq(id));
         renderMatrix();
     }
 
@@ -683,7 +690,7 @@
         $('cfgInkInput').value = n;
         // Ink only changes SCP pricing (and its matrix)
         delete state.matrixCache[matrixKey('scp')];
-        priceMethod('scp', state.seq);
+        priceMethod('scp', nextSeq('scp'));
         if (state.method === 'scp') renderMatrix();
         notifyChange();
     }
@@ -695,7 +702,7 @@
         if ($('cfgStripeInput')) $('cfgStripeInput').checked = v;
         // Safety stripes only change SCP pricing (and its matrix)
         delete state.matrixCache[matrixKey('scp')];
-        priceMethod('scp', state.seq);
+        priceMethod('scp', nextSeq('scp'));
         if (state.method === 'scp') renderMatrix();
         notifyChange();
     }
