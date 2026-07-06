@@ -1121,7 +1121,7 @@ async function viewSampleDetails(quoteID) {
                                     <div>Shipping:</div><div style="text-align: right;">$${shippingAmount.toFixed(2)}</div>
                                 ` : ''}
                                 ${taxAmount > 0 ? `
-                                    <div>Tax (10.1%):</div><div style="text-align: right;">$${taxAmount.toFixed(2)}</div>
+                                    <div>Sales Tax:</div><div style="text-align: right;">$${taxAmount.toFixed(2)}</div>
                                 ` : ''}
                                 <div style="border-top: 1px solid #d1d5db; padding-top: 0.5rem; font-weight: 600;">Total:</div>
                                 <div style="border-top: 1px solid #d1d5db; padding-top: 0.5rem; text-align: right; font-weight: 600;">$${totalAmount.toFixed(2)}</div>

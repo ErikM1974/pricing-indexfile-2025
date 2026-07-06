@@ -63,7 +63,7 @@ window.APP_CONFIG = {
             ART: 'Art Invoice'
         },
         ID_PATTERN: '[PREFIX][MMDD]-[sequence]',
-        DEFAULT_TAX_RATE: 0.101,  // 10.1% Washington State
+        DEFAULT_TAX_RATE: 0.102,  // 10.2% Milton WA (DOR, updated 2026-07-06) — display default ONLY; real rates come from POST /api/tax-rates/lookup
         MINIMUM_ORDER: 50.00
     },
 

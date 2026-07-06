@@ -846,9 +846,9 @@
             // Phase 5: payment terms surface as "Terms: Net 10" in Quote
             // Details card. Empty by default — only set when CRM has one.
             PaymentTerms: customer.payment_terms || '',
-            // Phase 7: tax rate — 0 for tax-exempt, 0.101 for taxable.
+            // Phase 7: tax rate — 0 for tax-exempt, 0.102 for taxable (Milton DOR, updated 2026-07-06).
             // Renderer reads this and shows "Tax-exempt" vs "WA Sales Tax".
-            TaxRate: taxable ? 0.101 : 0,
+            TaxRate: taxable ? 0.102 : 0,
             TotalQuantity: calcContext.qty,
             SubtotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
             LTMFeeTotal: parseFloat((calcContext.ltmFee || 0).toFixed(2)),

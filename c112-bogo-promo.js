@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { minQty: 48, maxQty: 71, price: 16.00 },
         { minQty: 72, maxQty: Infinity, price: 15.50 } // Updated price for 72+
     ];
-    const MILTON_TAX_RATE = 0.101; // 10.1%
+    const MILTON_TAX_RATE = 0.102; // 10.2% (Milton DOR, updated 2026-07-06)
 
     let fetchedProductColors = []; // Will be populated by API
     let selectedOrderItems = []; // Array of { color: object, quantity: number }
@@ -857,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(`$${pdfNetSubtotal.toFixed(2)}`, amountsX, yPos, { align: 'right' });
         yPos += 6;
         doc.setFont(undefined, 'normal');
-        doc.text(`Milton Sales Tax (10.1%):`, totalsX, yPos);
+        doc.text(`Milton Sales Tax (10.2%):`, totalsX, yPos);
         doc.text(`$${pdfTaxAmount.toFixed(2)}`, amountsX, yPos, { align: 'right' });
         yPos += 7;
         doc.setFontSize(11);
