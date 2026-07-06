@@ -32,6 +32,11 @@ const STOREFRONT_CHANNEL_CONFIG = require('./config/storefront-channels.js');
 // Synthesizes quote_items rows from a storefront order's colorConfigs so /quote
 // + /invoice render line items (2026-06-12). Pure logic, jest-locked.
 const { buildStorefrontQuoteItems } = require('./shared_components/js/storefront-quote-items.js');
+// Sample Program (samples channel, 2026-07-06) — dual-load pricing (the SAME
+// module the browser's sample buttons use, so screen price === Stripe charge)
+// + the pure ManageOrders payload builder for paid sample orders.
+const SAMPLE_PRICING = require('./shared_components/js/sample-pricing.js');
+const { buildSamplesPushPayload } = require('./shared_components/js/samples-order-payload.js');
 // Staff SAML SSO (#2) — this app is the SAML Service Provider against the Caspio
 // "Staff" directory App Connection (IdP). Replaces the forgeable /api/crm-session.
 const staffSaml = require('./lib/staff-saml.js');
@@ -69,6 +74,12 @@ dotenv.config();
 //   Top-sellers consolidation (2026-07-06): /[pages/]top-sellers-showcase.html → 301 /catalog?topSellers=1;
 //   /[pages/]top-sellers-product.html?style=X → 301 /product.html?style=X; /[pages/]richardson-112-product.html → 301 /product.html?style=112
 //   (legacy showcase/product/richardson pages deleted; sample program now = catalog Top Sellers view + PDP CTA via shared sample-cart-service.js)
+//
+// SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
+//   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
+//     sample-pricing.js reprice, DOR tax on ship address, free shipping, free items ride as $0 lines);
+//     webhook metadata.kind==='samples-order' → ManageOrders push (payments block = PAID) + sales alert.
+//     Free-only carts skip this entirely (direct push via sample-order-service.js, unchanged).
 //
 // CUSTOM HATS (custom-caps storefront, 2026-06-11 — registry entry + rebuildCapsQuote; CAP{MMDD}-{rand4} QuoteIDs)
 //   GET /custom-caps[.html]                 — embroidered caps storefront (pages/custom-caps.html); success page via /pages static
@@ -636,6 +647,7 @@ app.use('/api/submit-order-form', strictLimiter);
 // Fixed 2026-06-09: this limiter was mounted on /api/stripe/create-checkout-session,
 // a path that doesn't exist — the REAL checkout route ran unlimited.
 app.use('/api/create-checkout-session', strictLimiter);
+app.use('/api/samples/create-checkout-session', strictLimiter);
 
 // Staff alert for money-path failures (paid order that didn't reach
 // ShopWorks, payment with no Caspio record). Fire-and-forget Slack webhook;
@@ -1120,6 +1132,12 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
       // would try to push a whole order to ShopWorks). Express sessions carry
       // no `kind`, so the legacy path is untouched by construction.
       if (metadata.kind) {
+        // Paid SAMPLE orders (samples channel, 2026-07-06) — full-order
+        // fulfillment (ManageOrders push), NOT a payment against an existing
+        // quote, so it branches before the deposit/balance handling.
+        if (metadata.kind === 'samples-order') {
+          return handleSamplesOrderPaid(session, quoteID, res);
+        }
         if (metadata.kind !== 'deposit' && metadata.kind !== 'balance') {
           alertQuotePay(`Stripe session ${session.id} has unknown metadata.kind '${metadata.kind}' for ${quoteID} — payment NOT auto-recorded; check the Stripe dashboard.`);
           return res.json({ received: true, status: 'unknown-kind' });
@@ -1396,6 +1414,128 @@ const staticOptions = {
 // format). The checkout route's uniqueness check still applies per candidate.
 
 // Save 3-Day Tees order to quote_sessions (Christmas Bundles pattern)
+// ══ Paid-sample fulfillment (webhook metadata.kind === 'samples-order') ═════
+// Mirrors the express-order webhook path's guarantees for the samples channel:
+// failed lookup → 5xx so Stripe retries; terminal statuses are idempotent;
+// 'Payment Confirmed' is stamped BEFORE the push; a failed push flags the row
+// for manual entry and alerts — the money is real either way. The payload
+// builder is pure + jest-locked (shared_components/js/samples-order-payload.js).
+async function handleSamplesOrderPaid(session, quoteID, res) {
+  const chCfg = channelConfig('samples');
+  const chLog = '[Samples Webhook]';
+  let row;
+  try {
+    row = await fetchQuoteSessionRow(quoteID);
+  } catch (lookupErr) {
+    console.error(`${chLog} Quote lookup failed:`, lookupErr.message, '— asking Stripe to retry');
+    return res.status(503).send('Quote lookup unavailable — retry');
+  }
+  if (!row) {
+    alert3DT(`PAYMENT WITHOUT ORDER RECORD — Stripe session ${session.id} paid $${(session.amount_total / 100).toFixed(2)} for SAMPLES ${quoteID}, but no quote_sessions row matches. Recover from the Stripe dashboard.`);
+    return res.json({ received: true, status: 'no-record' });
+  }
+  if (row.Status === 'Processed' || String(row.Status).indexOf('ShopWorks Failed') !== -1) {
+    console.log(`${chLog} Already processed, skipping:`, quoteID);
+    return res.json({ received: true, status: 'duplicate' });
+  }
+  if (row.Status === 'Payment Confirmed') {
+    alert3DT(`Webhook redelivery found SAMPLES ${quoteID} stuck at 'Payment Confirmed' — the ShopWorks push may not have completed. Verify in ShopWorks before re-pushing (duplicate-order risk).`);
+    return res.json({ received: true, status: 'stuck-payment-confirmed' });
+  }
+
+  // Idempotency marker BEFORE the push (a redelivery mid-push must not double-order)
+  await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      Status: 'Payment Confirmed',
+      Notes: `${row.Notes}\nPayment Confirmed: ${new Date().toISOString()}\nStripe Payment Intent: ${session.payment_intent}\nAmount: $${(session.amount_total / 100).toFixed(2)}`
+    })
+  });
+  console.log(`${chLog} ✓ Payment confirmed for:`, quoteID);
+
+  let customerData = {}, orderTotals = {}, orderSettings = {};
+  try {
+    customerData = JSON.parse(row.CustomerDataJSON || '{}');
+    orderTotals = JSON.parse(row.OrderTotalsJSON || '{}');
+    orderSettings = JSON.parse(row.OrderSettingsJSON || '{}');
+  } catch (parseErr) {
+    console.error(`${chLog} Blob parse failed for ${quoteID}:`, parseErr.message);
+  }
+  const samples = Array.isArray(orderSettings.samples) ? orderSettings.samples : [];
+
+  try {
+    if (!samples.length) throw new Error('No samples in OrderSettingsJSON — cannot build the push');
+    const payload = buildSamplesPushPayload({
+      quoteID,
+      customerData,
+      samples,
+      totals: {
+        paidSubtotal: orderTotals.subtotal,
+        salesTax: orderTotals.salesTax,
+        taxRate: orderTotals.taxRate,
+        grandTotal: orderTotals.grandTotal,
+        taxAccount: orderTotals.taxAccount,
+        taxAccountName: orderTotals.taxAccountName
+      },
+      stripeSessionId: session.id,
+      paymentAmount: session.amount_total,
+      serviceBanner: chCfg.push.serviceBanner(false)
+    });
+    const pushResp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const pushResult = await pushResp.json().catch(() => ({}));
+    if (!pushResp.ok || pushResult.success === false) {
+      throw new Error(`ManageOrders push failed (${pushResp.status}): ${pushResult.error || pushResult.message || 'unknown'}`);
+    }
+    const extOrderId = pushResult.extOrderId || pushResult.orderNumber || quoteID;
+    await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        Status: 'Processed',
+        Notes: `${row.Notes}\nShopWorks Order: ${extOrderId}\nProcessed: ${new Date().toISOString()}`
+      })
+    });
+    // Sales alert — the SAME proven Sample-Order-API template the free flow
+    // sends (registry emails.confirmationSalesTemplate). Customer gets the
+    // Stripe receipt + the success-page confirmation (free-flow parity).
+    sendEmailJSTemplate(chCfg.emails.confirmationSalesTemplate, {
+      to_email: 'erik@nwcustomapparel.com',
+      to_name: 'Erik',
+      subject: `PAID Sample Order ${extOrderId} - ${customerData.company || customerData.lastName || ''}`,
+      order_number: extOrderId,
+      company: customerData.company || customerData.lastName || '',
+      message: `Paid sample order ($${(session.amount_total / 100).toFixed(2)} via Stripe, session ${session.id}) pushed to ShopWorks. View details in OnSite.`,
+      order_date: new Date().toLocaleDateString()
+    }).then(
+      () => console.log(`${chLog} ✓ Sales alert email sent for`, quoteID),
+      (e) => console.error(`${chLog} Sales alert email failed for`, quoteID, ':', e.message)
+    );
+    alert3DT(`✅ SAMPLES ${quoteID}: $${(session.amount_total / 100).toFixed(2)} PAID (${samples.filter((s) => s.type === 'paid').length} paid + ${samples.filter((s) => s.type !== 'paid').length} free) → ShopWorks ${extOrderId}.`);
+    console.log(`${chLog} ✓ Pushed to ShopWorks:`, extOrderId);
+    return res.json({ received: true, status: 'samples-order-processed' });
+  } catch (pushErr) {
+    console.error(`${chLog} ShopWorks push failed for ${quoteID}:`, pushErr.message);
+    alert3DT(`PAID SAMPLE ORDER NEEDS MANUAL PUSH — ${quoteID} ($${(session.amount_total / 100).toFixed(2)}, ${session.customer_email || customerData.email || 'no email'}) failed the ShopWorks push: ${pushErr.message}. Status set to 'Payment Confirmed - ShopWorks Failed'.`);
+    try {
+      await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Status: 'Payment Confirmed - ShopWorks Failed' })
+      });
+    } catch (statusErr) {
+      console.error(`${chLog} Could not flag ${quoteID} as ShopWorks Failed:`, statusErr.message);
+    }
+    // Payment is recorded and a human is alerted — ack the webhook (a retry
+    // would find the terminal status and no-op).
+    return res.json({ received: true, status: 'samples-order-push-failed' });
+  }
+}
+
 async function save3DTQuoteSession(data) {
   const { quoteID, customerData, orderTotals, stripeSessionId, colorConfigs, orderSettings } = data;
 
@@ -1665,6 +1805,25 @@ const CHANNELS = {
       needsArtReview: true,                       // ALWAYS proof-first
       stockChecked,
     }),
+  }),
+  // Sample Program (2026-07-06) — registry entry exists so save3DTQuoteSession
+  // Notes labels, shipped emails, and channelConfig lookups resolve correctly,
+  // but sample carts are MULTI-STYLE and NEVER go through this shared
+  // single-style route: the dedicated POST /api/samples/create-checkout-session
+  // owns the reprice + Stripe session, and the webhook's
+  // metadata.kind === 'samples-order' branch owns fulfillment.
+  'samples': Object.assign({}, STOREFRONT_CHANNEL_CONFIG.CHANNELS['samples'], {
+    rebuildQuote: () => {
+      throw Object.assign(
+        new Error('Sample orders check out via /api/samples/create-checkout-session'),
+        { code: 'STYLE_NOT_ALLOWED' }   // → clean 400, never a 502
+      );
+    },
+    sizeWhitelist: () => [],
+    stockGate: false,
+    stockConflicts: () => [],
+    shipPromise: () => ({ promise: CTS_SHIPDATE.standardPromise(new Date()), mode: 'samples-2to3day' }),
+    stampedOrderSettings: () => ({}),
   }),
 };
 
@@ -5279,6 +5438,247 @@ app.post('/api/create-checkout-session', async (req, res) => {
       error: 'Failed to create checkout session',
       message: error.message
     });
+  }
+});
+
+// ══ POST /api/samples/create-checkout-session — Sample Program (2026-07-06) ══
+// Paid BLANK samples go through Stripe hosted checkout. Free-only carts never
+// come here (they keep the direct ManageOrders push the free program has
+// always used — sample-order-service.js). This route is DEDICATED because
+// sample carts are multi-STYLE (one unit per style) and don't fit the shared
+// single-style storefront route above. Money rules:
+//   • Server reprices EVERY sample via shared_components/js/sample-pricing.js
+//     — the SAME dual-load module the browser buttons use (client prices are
+//     advisory; a doctored payload can't buy a jacket for tee money).
+//   • Free items ride along as $0 Stripe lines so ONE ShopWorks order carries
+//     the whole cart (webhook 'samples-order' branch pushes it PAID).
+//   • Shipping is always FREE (Erik decision); WA tax = DOR destination
+//     lookup on the shipping address (lookup failure = visible 502, never a
+//     guessed rate).
+app.post('/api/samples/create-checkout-session', async (req, res) => {
+  const chCfg = channelConfig('samples');
+  const chLog = chCfg.logPrefix;
+  try {
+    const { customerData, samples, clientSubtotal } = req.body || {};
+    if (!customerData || !customerData.email || !Array.isArray(samples) || !samples.length) {
+      return res.status(400).json({ error: 'Missing required fields: customerData, samples' });
+    }
+    if (samples.length > 12) {
+      return res.status(400).json({ error: 'Sample carts are limited to 12 items — call 253-922-5793 for a larger request.' });
+    }
+    const siteOrigin = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+
+    // ── Authoritative server-side reprice (one sample per style) ─────────
+    const seen = new Set();
+    const priced = [];
+    for (const s of samples) {
+      const style = String((s && s.style) || '').trim().toUpperCase();
+      const size = String((s && s.size) || '').trim();
+      if (!style || !size) {
+        return res.status(400).json({ error: 'Each sample needs a style and a size — nothing was charged.' });
+      }
+      if (seen.has(style)) {
+        return res.status(400).json({ error: `Duplicate style in the cart: ${style} (one sample per style) — nothing was charged.` });
+      }
+      seen.add(style);
+
+      const spr = await fetch(`${TDT_PROXY}/api/size-pricing?styleNumber=${encodeURIComponent(style)}`);
+      const rows = spr.ok ? await spr.json() : null;
+      let result = SAMPLE_PRICING.priceSample({ sizePricingRows: rows, blankBundle: null, size });
+      if (!result.eligible && result.reason === 'no_margin') {
+        const br = await fetch(`${TDT_PROXY}/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(style)}`);
+        const bundle = br.ok ? await br.json() : null;
+        result = SAMPLE_PRICING.priceSample({ sizePricingRows: rows, blankBundle: bundle, size });
+      }
+      if (!result.eligible) {
+        console.warn(`${chLog} ${style} not sample-eligible (${result.reason})`);
+        return res.status(400).json({
+          error: result.reason === 'bad_size'
+            ? `${style} isn’t offered in size ${size} — remove it and try again. Nothing was charged.`
+            : `${style} isn’t available as an online sample right now — remove it and try again, or call 253-922-5793. Nothing was charged.`
+        });
+      }
+      priced.push({
+        style,
+        size,
+        name: String(s.name || style).slice(0, 120),
+        color: String(s.color || '').slice(0, 60),
+        catalogColor: String(s.catalogColor || s.color || '').slice(0, 60),
+        type: result.type,
+        price: result.price
+      });
+    }
+
+    const paidSubtotal = Math.round(priced.reduce((sum, p) => sum + (p.type === 'paid' ? p.price : 0), 0) * 100) / 100;
+    if (paidSubtotal <= 0) {
+      // Belt and braces — the page routes all-free carts to the request form.
+      return res.status(400).json({ error: 'Every sample in this cart is FREE — submit the request form instead (no payment needed).', code: 'FREE_ONLY' });
+    }
+
+    // WA destination tax on the SHIPPING address (samples always ship — the
+    // form has no pickup mode). Shipping is free, so taxable = paid subtotal.
+    let tax;
+    try {
+      tax = await resolveTdtTax({
+        deliveryMethod: 'ship',
+        state: customerData.shipping_state,
+        city: customerData.shipping_city,
+        zip: customerData.shipping_zip,
+        address1: customerData.shipping_address1
+      });
+    } catch (e) {
+      console.error(`${chLog} Tax lookup failed:`, e.message);
+      return res.status(502).json({ error: 'Sales-tax lookup is unavailable right now — nothing was charged. Please try again or call 253-922-5793.' });
+    }
+    const salesTax = Math.round(paidSubtotal * tax.rate * 100) / 100;
+    const grandTotal = Math.round((paidSubtotal + salesTax) * 100) / 100;
+
+    // Client comparison is PRE-TAX (the page never knows the DOR rate — tax
+    // renders as its own line on the Stripe page). Same 1¢ tolerance as the
+    // shared route's grand-total gate.
+    const client = parseFloat(clientSubtotal);
+    if (!Number.isFinite(client) || Math.abs(client - paidSubtotal) > 0.01) {
+      console.error(`${chLog} PRICE MISMATCH client=$${client} server=$${paidSubtotal} (pre-tax)`);
+      return res.status(409).json({
+        error: `Pricing changed while you were browsing (your screen: $${Number.isFinite(client) ? client.toFixed(2) : client} · current: $${paidSubtotal.toFixed(2)} before tax). Refresh the page to reload live pricing — nothing was charged.`
+      });
+    }
+
+    // ── Unique SAM QuoteID (same collision-retry loop as the shared route;
+    // refresh=true is LOAD-BEARING — see the shared route's comment) ──────
+    let quoteID = null;
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const candidate = chCfg.buildQuoteId();
+      try {
+        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`);
+        const rowsQ = check.ok ? await check.json() : [];
+        const list = Array.isArray(rowsQ) ? rowsQ : (rowsQ?.data || []);
+        if (!list.some((r) => r.QuoteID === candidate)) { quoteID = candidate; break; }
+        console.warn(`${chLog} QuoteID collision, regenerating:`, candidate);
+      } catch (e) {
+        quoteID = candidate;
+        break;
+      }
+    }
+    if (!quoteID) {
+      return res.status(500).json({ error: 'Could not allocate an order number — please try again.' });
+    }
+
+    const serverTotals = {
+      totalQuantity: priced.length,
+      subtotal: paidSubtotal,
+      ltmFee: 0,
+      shipping: 0,
+      shippingSource: 'free-samples',
+      salesTax,
+      taxRate: tax.rate,
+      taxableBase: paidSubtotal,
+      taxAccount: tax.account,
+      taxAccountName: tax.accountName,
+      grandTotal
+    };
+    const settingsStamped = {
+      channel: 'samples',
+      samples: priced,   // SERVER-priced — the webhook push reads THESE
+      creditNote: 'Sample cost credited toward first decorated order',
+      stampedAt: new Date().toISOString()
+    };
+
+    console.log(`${chLog} Creating session for`, quoteID,
+      `($${grandTotal.toFixed(2)}: ${priced.length} samples, ${priced.filter((p) => p.type === 'paid').length} paid, tax ${tax.rate})`);
+
+    // Save to Caspio BEFORE Stripe (fail-closed: no save, no charge).
+    // colorConfigs {} is deliberate: buildStorefrontQuoteItems returns [] for
+    // it, so no junk quote_items rows — the samples live in OrderSettingsJSON.
+    try {
+      await save3DTQuoteSession({
+        quoteID,
+        customerData,
+        orderTotals: serverTotals,
+        colorConfigs: {},
+        orderSettings: settingsStamped,
+        stripeSessionId: null
+      });
+      console.log(`${chLog} ✓ Order saved to Caspio:`, quoteID);
+    } catch (error) {
+      console.error(`${chLog} Failed to save to Caspio:`, error);
+      return res.status(500).json({ error: 'Failed to save order data — nothing was charged. Please try again.' });
+    }
+
+    // ── Stripe line items from the SERVER reprice ─────────────────────────
+    const cents = (v) => Math.round(v * 100);
+    const line_items = priced.map((p) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: p.type === 'paid'
+            ? `Sample — ${p.name} — ${p.color}, ${p.size}`
+            : `FREE sample — ${p.name} — ${p.color}, ${p.size}`
+        },
+        unit_amount: cents(p.type === 'paid' ? p.price : 0)
+      },
+      quantity: 1
+    }));
+    if (salesTax > 0) {
+      const pctLabel = String(Math.round(tax.rate * 10000) / 100);
+      line_items.push({
+        price_data: { currency: 'usd', product_data: { name: `Sales tax (${pctLabel}%)` }, unit_amount: cents(salesTax) },
+        quantity: 1
+      });
+    }
+
+    const mode = process.env.STRIPE_MODE || 'development';
+    const secretKey = mode === 'production'
+      ? process.env.STRIPE_LIVE_SECRET_KEY
+      : process.env.STRIPE_TEST_SECRET_KEY;
+    if (!secretKey) {
+      console.error(`${chLog} Secret key not configured for mode:`, mode);
+      return res.status(500).json({ error: 'Stripe secret key not configured' });
+    }
+    const stripeInstance = stripe(secretKey);
+
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items,
+      mode: 'payment',
+      customer_email: customerData.email,
+      // Single payable session per order + auto-expiry (double-charge
+      // hardening, same as the quote-deposit flow's 2026-07-06 audit fix)
+      expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
+      success_url: `${siteOrigin}${chCfg.stripeSuccessPath(quoteID)}`,
+      cancel_url: `${siteOrigin}${chCfg.stripeCancelPath()}`,
+      metadata: {
+        quoteID,
+        source: chCfg.stripeSource,
+        kind: 'samples-order'   // webhook fulfillment branch selector
+      }
+    });
+    console.log(`${chLog} Session created:`, session.id);
+
+    // Stamp the Stripe session id onto the Caspio row (PK_ID-routed PUT; the
+    // refresh=true read also un-poisons the pre-create [] lookup cache).
+    try {
+      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
+      const rowsL = lookup.ok ? await lookup.json() : [];
+      const row = (Array.isArray(rowsL) ? rowsL : (rowsL?.data || [])).find((r) => r.QuoteID === quoteID);
+      if (row && row.PK_ID) {
+        await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            SessionID: `stripe_${session.id}`,
+            Notes: `${chCfg.orderNoteLabel()} | Stripe Session: ${session.id} | Status: Checkout Created`
+          })
+        });
+      }
+    } catch (error) {
+      console.error(`${chLog} Failed to stamp Stripe session id (non-fatal):`, error);
+    }
+
+    res.json({ sessionId: session.id, quoteID, url: session.url });
+  } catch (error) {
+    console.error(`${chLog} Error creating session:`, error);
+    res.status(500).json({ error: 'Failed to create checkout session — nothing was charged.', message: error.message });
   }
 });
 

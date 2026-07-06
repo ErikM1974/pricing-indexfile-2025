@@ -237,7 +237,11 @@ class SampleInventoryService {
         if (!inventory.sizes || inventory.sizes.length === 0) {
             return {
                 status: 'unknown',
-                message: 'Unable to verify inventory',
+                // No inventory DATA ≠ out of stock (degraded feed) — checkout
+                // treats 'unknown' as a warning, never a block; a human
+                // verifies stock at fulfillment.
+                dataUnavailable: true,
+                message: 'Live stock couldn’t be verified — we’ll confirm availability when we process your request',
                 sizeAvailability: {},
                 allAvailable: false,
                 hasWarnings: true
@@ -375,12 +379,20 @@ class SampleInventoryService {
      * @returns {Object} Validation result
      */
     validateCheckout(samples) {
+        // Block ONLY on a CONFIRMED zero — 'unknown' means the live-stock feed
+        // had no data (degraded source), and blocking on absence-of-data was
+        // silently killing every checkout whenever the feed degraded
+        // (2026-07-06 lesson, same class as the checkSizeAvailability fix).
         const outOfStockItems = samples.filter(s =>
-            s.inventoryStatus === 'out_of_stock' || !s.allAvailable
+            s.inventoryStatus === 'out_of_stock'
         );
 
         const lowStockItems = samples.filter(s =>
             s.inventoryStatus === 'low_stock'
+        );
+
+        const unverifiedItems = samples.filter(s =>
+            s.inventoryStatus === 'unknown'
         );
 
         if (outOfStockItems.length > 0) {
@@ -393,15 +405,20 @@ class SampleInventoryService {
             };
         }
 
-        if (lowStockItems.length > 0) {
+        if (lowStockItems.length > 0 || unverifiedItems.length > 0) {
             return {
                 valid: true,
                 canProceed: true,
                 message: 'All items available',
                 outOfStockItems: [],
-                warnings: lowStockItems.map(item =>
-                    `${item.name} (${item.color}): Some sizes are low in stock`
-                )
+                warnings: [
+                    ...lowStockItems.map(item =>
+                        `${item.name} (${item.color}): Some sizes are low in stock`
+                    ),
+                    ...unverifiedItems.map(item =>
+                        `${item.name} (${item.color}): Live stock couldn't be verified — we'll confirm when we process your request`
+                    )
+                ]
             };
         }
 

@@ -74,6 +74,9 @@
 
         /**
          * Eligibility + sample price for a style (light: no variant fetches).
+         * The MATH lives in shared sample-pricing.js — the SAME module the
+         * server's /api/samples/create-checkout-session reprice uses, so the
+         * button price and the Stripe charge can never disagree.
          * → { eligible, type:'free'|'paid', price, minCost } or { eligible:false, reason }
          */
         async checkEligibility(styleNumber) {
@@ -82,23 +85,16 @@
             }
             var result;
             try {
+                if (!window.SamplePricing) throw new Error('sample-pricing.js not loaded');
                 var response = await fetch(this.apiBase + '/api/size-pricing?styleNumber=' + encodeURIComponent(styleNumber));
-                var data = response.ok ? await response.json() : null;
-                if (!data || data.error || !data.length) {
-                    result = { eligible: false, reason: 'not_sanmar' };
-                } else {
-                    var prices = (data[0] && data[0].basePrices) || {};
-                    var priceValues = Object.values(prices).filter(function (p) { return p > 0; });
-                    if (!priceValues.length) {
-                        result = { eligible: false, reason: 'no_pricing' };
-                    } else {
-                        var minPrice = Math.min.apply(Math, priceValues);
-                        if (minPrice < 10) {
-                            result = { eligible: true, type: 'free', price: 0, minCost: minPrice };
-                        } else {
-                            result = await this.pricePaidSample(styleNumber, minPrice);
-                        }
-                    }
+                var rows = response.ok ? await response.json() : null;
+                // The BLANK bundle only matters for paid styles — probe first,
+                // fetch the bundle only when the module asks for a margin
+                result = window.SamplePricing.priceSample({ sizePricingRows: rows, blankBundle: null });
+                if (!result.eligible && result.reason === 'no_margin') {
+                    var bundleResp = await fetch(this.apiBase + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(styleNumber));
+                    var bundle = bundleResp.ok ? await bundleResp.json() : null;
+                    result = window.SamplePricing.priceSample({ sizePricingRows: rows, blankBundle: bundle });
                 }
             } catch (error) {
                 console.error('[SampleCart] Eligibility check failed for ' + styleNumber + ':', error);
@@ -106,23 +102,6 @@
             }
             this.eligibilityCache[styleNumber] = result;
             return result;
-        }
-
-        /** Paid-sample price = minCost / Caspio BLANK MarginDenominator, half-dollar ceiling. */
-        async pricePaidSample(styleNumber, minPrice) {
-            var bundleResp = await fetch(this.apiBase + '/api/pricing-bundle?method=BLANK&styleNumber=' + encodeURIComponent(styleNumber));
-            if (!bundleResp.ok) return { eligible: false, reason: 'api_error' };
-            var bundle = await bundleResp.json();
-            var blankTiers = bundle.tiersR || [];
-            var tier1 = blankTiers.find(function (t) {
-                return Number(t.MinQuantity) <= 1 && Number(t.MaxQuantity) >= 1;
-            }) || blankTiers[0];
-            var marginDenominator = parseFloat(tier1 && tier1.MarginDenominator);
-            if (!marginDenominator || marginDenominator <= 0 || marginDenominator >= 1) {
-                return { eligible: false, reason: 'no_margin' };
-            }
-            var samplePrice = Math.ceil((minPrice / marginDenominator) * 2) / 2;
-            return { eligible: true, type: 'paid', price: samplePrice, minCost: minPrice };
         }
 
         /**

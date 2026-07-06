@@ -18,7 +18,10 @@
     <script src="../shared_components/js/sample-order-service.js"></script>
 
     <!-- Sample Inventory Service for Real-Time Stock Checking -->
-    <script src="../shared_components/js/sample-inventory-service.js"></script>
+    <script src="../shared_components/js/sample-inventory-service.js?v=2026.07.06.7"></script>
+
+    <!-- Paid-sample Stripe checkout (samples channel, 2026-07-06) -->
+    <script src="/pages/js/sample-checkout.js?v=2026.07.06.7"></script>
 
     <style>
         :root {
@@ -1800,6 +1803,15 @@
                 type: item.sampleType || 'free',
                 upcharges: item.upcharges || {}  // Size-specific upcharges from API
             }));
+
+            // Paid samples → Stripe hosted checkout (samples channel,
+            // 2026-07-06): the server reprices everything and the webhook
+            // pushes ONE ShopWorks order (paid + free lines) after payment.
+            // Free-only carts continue below on the direct request flow.
+            if (window.SampleCheckout && window.SampleCheckout.hasPaid(samplesForService)) {
+                window.SampleCheckout.start({ customerData: customerData, samples: samplesForService, form: e.target });
+                return;
+            }
 
             console.log('[Sample Cart] Submitting order with:', {
                 customer: customerData,
