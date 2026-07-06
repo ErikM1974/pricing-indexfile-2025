@@ -467,3 +467,12 @@
     font-weight: 600;
     color: #b91c1c;
 }
+
+/* Delivery promise (BAW adoption #1, 2026-07-06) — per-group "est. ship by"
+   line under the group subtotal. Hidden until delivery-promise.js fills it. */
+.qc-delivery-promise {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f7d3b;
+}

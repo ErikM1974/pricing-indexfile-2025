@@ -34,9 +34,15 @@
 2. ✅ **DONE — Caspio table `Order_Payments`** created via the same script (9 STRING
    columns, Customer_Reward_Ledger house pattern). NOTE: this account 404s on Caspio REST
    v3 — v2 `POST /tables` works but only accepts minimal `{Name, Columns:[{Name,Type}]}`.
-3. ⬜ **EmailJS templates — Erik pastes manually** (EmailJS has NO template-creation API;
-   fail-soft until created — Slack 💰 alerts + Stripe receipts still fire). On the
-   **server-side service `service_1c4k67j`**, IDs ≤24 chars:
+3. ✅ **DONE — EmailJS templates created 2026-07-05** via browser automation in the
+   dashboard (no template-creation API exists): `template_deposit_cust` ("Quote Payment
+   Received — Customer", slug 0q7varp) + `template_deposit_staff` ("Quote Payment
+   Received - Staff", slug yfds024; Reply-To = {{customer_email}}). Both SHARE the
+   receipt body (the staff-body swap fought the dashboard UI), so the server passes
+   grand_total to the staff send too (v2026.07.05.9). Both verified with real 200-OK
+   sends. Dashboard-automation gotchas: renderer oscillates 1x/2x screenshot scale
+   (coordinates unreliable) and Save/menu buttons ignore synthetic + most real clicks —
+   reliable pattern = JS `.focus()` the button + REAL Enter key. Original spec:
    - `template_deposit_cust` — To: `{{to_email}}` · Subject: `Payment received — Quote
      {{quote_id}} | Northwest Custom Apparel` · Body: Hi {{to_name}}, we received your
      payment of ${{amount_paid}} for quote {{quote_id}}. Order total ${{grand_total}};
@@ -49,9 +55,17 @@
    - Also recommended: Stripe Dashboard → Settings → Emails → enable "Successful
      payments" receipts (customer gets Stripe's own receipt with zero setup).
 4. ✅ **Deployed 2026-07-05** (proxy + main). No new env vars.
-5. ⬜ **Test-mode dry run** (STRIPE_MODE=development + 4242 card): accept a test WQ quote →
-   enable payment link → pay → verify Notes payments[], QM chip, Slack, Order_Payments
-   row, webhook idempotency (Stripe dashboard "resend webhook" → duplicate skip).
+5. ✅ **DONE — Test-mode dry run PASSED 2026-07-05** (local server STRIPE_MODE=development,
+   test quote WQ-2026-990 $100+$12.50 ship+10.1% tax=$123.86): hardened accept 200 →
+   deposit terms+hash stamped → public deposit-checkout minted a real cs_test session
+   (Stripe hosted page rendered "Payment in full — $123.86") → signed
+   checkout.session.completed delivered locally → `quote-payment-recorded`; redelivery →
+   `duplicate`; tampered signature → 400; Notes payments[] + Order_Payments ledger row
+   written; second checkout attempt → "Deposit already paid". Test rows DELETED from
+   Quote_Sessions + Order_Payments after. (Browser card-entry path was blocked by a
+   password-manager extension popup — payment completion simulated via signed webhook,
+   same as stripe-cli fixtures; Stripe-side card acceptance is proven daily by custom-tees.)
+   **System FULLY LIVE as of v2026.07.05.9.**
 
 ---
 

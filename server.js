@@ -991,6 +991,46 @@ async function recordOrderPayment(entry) {
   }
 }
 
+// Deposit % — Caspio Service_Codes DEPOSIT-PCT, fail-closed (never a hardcoded
+// percent, Erik's rule). Throws with an Erik-actionable message; callers pick
+// the surface (staff endpoint → 502, pickup auto-enable → fail-soft skip).
+async function getDepositPct() {
+  const r = await fetch(`${TDT_PROXY}/api/service-codes?code=DEPOSIT-PCT`);
+  if (!r.ok) throw new Error(`HTTP ${r.status} from service-codes`);
+  const j = await r.json();
+  const codeRow = j && j.data && j.data[0];
+  if (!codeRow || !codeRow.IsActive) throw new Error('DEPOSIT-PCT missing/inactive in Caspio Service_Codes');
+  const pct = parseFloat(codeRow.SellPrice);
+  if (!(pct > 0 && pct <= 100)) throw new Error(`DEPOSIT-PCT SellPrice '${codeRow.SellPrice}' out of range (0-100]`);
+  return pct;
+}
+
+// Pickup skip-the-rep (BAW teardown adoption #2, 2026-07-06 —
+// memory/BAW_CHECKOUT_TEARDOWN_2026-07.md): a pickup order has $0 shipping and
+// the fixed Milton DOR tax rate, so nothing is left for a rep to confirm — the
+// payment link auto-enables AT ACCEPTANCE and the customer can pay in the same
+// sitting. Ship-to orders keep the rep gate (shipping must be quoted).
+// Mutates `notes` with the same deposit block the staff enable-deposit endpoint
+// writes (enabledBy 'auto-pickup'); THROWS on any lookup/math failure — the
+// accept endpoint catches and falls back to plain acceptance (rep enables
+// manually, exactly the pre-existing flow; acceptance itself is never blocked).
+async function autoEnablePickupDeposit(quoteId, row, notes) {
+  const depositPct = await getDepositPct();
+  const tax = await resolveTdtTax({ deliveryMethod: 'pickup' }); // Milton DOR, same as 3DT pickup
+  const taxRatePct = Math.round(tax.rate * 100000) / 1000;       // decimal (0.101) → percent (10.1)
+  const terms = QuoteDepositMath.computeDepositTerms({
+    subtotal: parseFloat(row.TotalAmount), shipping: 0, taxRatePct, depositPct,
+  });
+  const totalsHash = computeQuoteTotalsHash(quoteId, terms.subtotal, terms.grandTotal, terms.depositAmount);
+  notes.deposit = Object.assign({}, terms, {
+    enabled: true,
+    totalsHash,
+    enabledAt: new Date().toISOString(),
+    enabledBy: 'auto-pickup',
+  });
+  return notes.deposit;
+}
+
 // Deposit/balance receipts (customer + rep). Fully fail-soft, fire-and-forget.
 function sendQuotePaymentEmails(row, payment) {
   if (!process.env.EMAILJS_PUBLIC_KEY || !process.env.EMAILJS_PRIVATE_KEY) {
@@ -10664,7 +10704,7 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
       return res.status(415).json({ error: 'JSON body required' });
     }
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
-    const { name, email } = req.body;
+    const { name, email, deliveryMethod } = req.body;
 
     // Validate required fields
     if (!name || !email) {
@@ -10675,6 +10715,12 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Invalid email format' });
+    }
+
+    // Delivery method (pickup skip-the-rep, 2026-07-06). Optional for backward
+    // compatibility with cached pages that don't send it yet.
+    if (deliveryMethod != null && deliveryMethod !== 'pickup' && deliveryMethod !== 'ship') {
+      return res.status(400).json({ error: "deliveryMethod must be 'pickup' or 'ship'" });
     }
 
     // Fetch quote session
@@ -10715,6 +10761,23 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
     existingNotes.acceptedAt = now;
     existingNotes.acceptedByName = sanitizeFilterInput(name);
     existingNotes.acceptedByEmail = sanitizeFilterInput(email);
+    if (deliveryMethod) existingNotes.acceptedDeliveryMethod = deliveryMethod;
+
+    // Pickup skip-the-rep: $0 shipping + Milton DOR rate leave nothing for a
+    // rep to confirm, so the payment link enables in the SAME write as the
+    // acceptance — the customer can pay right now on this page. FAIL-SOFT:
+    // any lookup error keeps plain acceptance (rep enables manually, as before).
+    let autoDeposit = null;
+    if (deliveryMethod === 'pickup'
+        && !(Array.isArray(existingNotes.payments) && existingNotes.payments.some((p) => p && p.kind === 'deposit'))) {
+      try {
+        autoDeposit = await autoEnablePickupDeposit(safeQuoteId, session, existingNotes);
+        console.log(`[QuoteAccept] ${safeQuoteId} pickup auto-enable: $${autoDeposit.depositAmount.toFixed(2)} of $${autoDeposit.grandTotal.toFixed(2)}`);
+      } catch (autoErr) {
+        console.warn(`[QuoteAccept] ${safeQuoteId} pickup auto-enable failed (non-fatal):`, autoErr.message);
+        alertQuotePay(`${safeQuoteId}: customer accepted as PICKUP but the payment link could not auto-enable (${autoErr.message}) — enable it manually from the quote page.`);
+      }
+    }
 
     const updateData = {
       Status: 'Accepted',
@@ -10743,7 +10806,11 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
       message: 'Quote accepted successfully',
       quoteId: safeQuoteId,
       acceptedAt: now,
-      acceptedBy: { name, email }
+      acceptedBy: { name, email },
+      deliveryMethod: deliveryMethod || null,
+      // Present ONLY when pickup auto-enable succeeded — the page renders the
+      // pay button immediately from this block (no reload, no cache lag).
+      deposit: autoDeposit,
     });
 
   } catch (error) {
@@ -10779,16 +10846,10 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
       return res.status(409).json({ error: 'A deposit has already been paid on this quote.' });
     }
 
-    // Deposit % — Caspio-driven, fail-closed.
+    // Deposit % — Caspio-driven, fail-closed (shared helper with pickup auto-enable).
     let depositPct;
     try {
-      const r = await fetch(`${TDT_PROXY}/api/service-codes?code=DEPOSIT-PCT`);
-      if (!r.ok) throw new Error(`HTTP ${r.status} from service-codes`);
-      const j = await r.json();
-      const codeRow = j && j.data && j.data[0];
-      if (!codeRow || !codeRow.IsActive) throw new Error('DEPOSIT-PCT missing/inactive in Caspio Service_Codes');
-      depositPct = parseFloat(codeRow.SellPrice);
-      if (!(depositPct > 0 && depositPct <= 100)) throw new Error(`DEPOSIT-PCT SellPrice '${codeRow.SellPrice}' out of range (0-100]`);
+      depositPct = await getDepositPct();
     } catch (e) {
       return res.status(502).json({ error: `Deposit % unavailable: ${e.message}. Add/activate Service_Codes row DEPOSIT-PCT (SellPrice = percent, e.g. 50) and retry.` });
     }

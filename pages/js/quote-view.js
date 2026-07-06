@@ -2220,17 +2220,20 @@ class QuoteViewPage {
         // Parse acceptance info from Notes JSON (since Caspio doesn't have AcceptedAt field)
         let acceptedDate = '';
         let acceptedBy = '';
+        let acceptedDm = '';
 
         try {
             const notes = JSON.parse(this.quoteData.Notes || '{}');
             acceptedDate = notes.acceptedAt ? this.formatDate(notes.acceptedAt) : '';
             acceptedBy = notes.acceptedByName || '';
+            acceptedDm = notes.acceptedDeliveryMethod === 'pickup' ? 'Pickup — Milton, WA'
+                : (notes.acceptedDeliveryMethod === 'ship' ? 'Ship to customer' : '');
         } catch (e) {
             console.error('Error parsing Notes JSON for acceptance info:', e);
         }
 
         const acceptedInfo = document.getElementById('accepted-info');
-        acceptedInfo.textContent = `Accepted on ${acceptedDate}${acceptedBy ? ` by ${acceptedBy}` : ''}`;
+        acceptedInfo.textContent = `Accepted on ${acceptedDate}${acceptedBy ? ` by ${acceptedBy}` : ''}${acceptedDm ? ` · ${acceptedDm}` : ''}`;
 
         // Hide accept button
         document.getElementById('accept-quote-btn').style.display = 'none';
@@ -4623,6 +4626,16 @@ class QuoteViewPage {
             return;
         }
 
+        // Delivery method (pickup skip-the-rep, 2026-07-06) — required so the
+        // server knows whether it can auto-enable the online payment (pickup)
+        // or a rep must confirm shipping first (ship).
+        const dmInput = document.querySelector('input[name="deliveryMethod"]:checked');
+        const deliveryMethod = dmInput ? dmInput.value : null;
+        if (!deliveryMethod) {
+            alert('Please choose pickup or shipping so we know how to get your order to you.');
+            return;
+        }
+
         // Show loading state
         acceptBtn.disabled = true;
         btnText.style.display = 'none';
@@ -4634,7 +4647,7 @@ class QuoteViewPage {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name, email })
+                body: JSON.stringify({ name, email, deliveryMethod })
             });
 
             const data = await response.json();
@@ -4653,6 +4666,11 @@ class QuoteViewPage {
                 notes.acceptedAt = data.acceptedAt;
                 notes.acceptedByName = name;
                 notes.acceptedByEmail = email;
+                notes.acceptedDeliveryMethod = deliveryMethod;
+                // Pickup auto-enabled payment: the server returns the deposit
+                // block it just stamped — render the pay button immediately
+                // (no reload; the proxy lookup cache would lag behind anyway).
+                if (data.deposit) notes.deposit = data.deposit;
                 this.quoteData.Notes = JSON.stringify(notes);
             } catch (e) {
                 console.error('Error updating Notes JSON:', e);
@@ -4661,8 +4679,20 @@ class QuoteViewPage {
             // Update UI
             this.renderStatus();
             this.showAcceptedState();
+            if (data.deposit) {
+                this.renderDepositPanel(null);
+                if (this.isStaff) this.setupDepositStrip();
+            }
 
-            // Show success modal
+            // Success modal — pickup-with-payment gets "pay right now" copy.
+            const nextSteps = document.getElementById('success-next-steps');
+            if (nextSteps) {
+                nextSteps.textContent = data.deposit
+                    ? 'Pickup order — you can pay online right now. Close this and use the green payment box below to finish up.'
+                    : (deliveryMethod === 'pickup'
+                        ? 'Pickup order — our team will send your online payment link shortly.'
+                        : 'Thank you for accepting this quote. Our team will confirm shipping and send your online payment link.');
+            }
             document.getElementById('success-modal').style.display = 'flex';
 
         } catch (error) {

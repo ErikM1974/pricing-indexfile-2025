@@ -963,7 +963,14 @@
             + ' · ' + escapeHtml(formatPrice(s.perPiece)) + '/' + unitWord
             + ' <span class="pdp-cfg-total-tier">' + escapeHtml(s.tierLabel || '') + ' tier</span></p>'
             + (lines.length ? '<ul class="pdp-cfg-total-lines">' + lines.join('') + '</ul>' : '')
+            + '<p class="pdp-delivery-promise" id="cfgDeliveryPromise" style="display:none"></p>'
             + '<p class="pdp-cfg-total-foot">Final pricing confirmed with your free proof.</p>';
+
+        // Delivery promise (BAW adoption #1, 2026-07-06): method-aware ship-by
+        // estimate from Service_Codes LEAD-DAYS-*. Fills async; hides on any miss.
+        if (window.DeliveryPromise) {
+            window.DeliveryPromise.render($('cfgDeliveryPromise'), def.engineMethod);
+        }
 
         const nudgeBtn = $('cfgNudgeJump');
         if (nudgeBtn && s.nudge) {
