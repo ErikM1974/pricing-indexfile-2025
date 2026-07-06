@@ -173,6 +173,12 @@ In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when 
 
 ## Pricing
 
+### Rate-change sweeps must grep the PUSHED tax-directive strings too, not just the rate constant (2026-07-06)
+**Problem:** The Milton 10.1→10.2% sweep (3c87ef65) updated display defaults + calculators but missed `sample-order-service.js`, which hardcoded `salesTaxRate = 0.101` AND the ShopWorks directive `Tax_10.1` / "City of Milton Sales Tax 10.1%" — and taxed every paid sample at the Milton rate regardless of ship-to (destination-sourcing violation, WAC 458-20-145).
+**Root Cause:** The sweep grep targeted rate constants/labels; the pushed-payload directive fields (`taxPartNumber`/`taxPartDescription`) are a SECOND copy of the same fact and didn't match the pattern.
+**Solution:** Service now derives the rate from `POST /api/tax-rates/lookup` on the ship-to address (out-of-state → 0), emits `Tax_<pct>` per the storefront-push convention (server.js buildManageOrdersPayload), and on lookup failure falls back to Milton 10.2% flagged with a "TAX — VERIFY AT INVOICING" order note — never silent. Lock: `tests/unit/sample-order-tax.test.js`.
+**Prevention:** On any rate change, grep the OLD rate in all 3 shapes — decimal (`0\.101`), percent (`10\.1`), part number (`Tax_10\.1`) — across shared_components/pages/config. Residual 10.1 hardcodes found this pass (chipped, not yet fixed): dtg-inline-form pickup-flat 0.101/2200.101, embroidery-quote-invoice + screenprint-quote-service defaults, order-form pricing/shared.js, shopworks-guide-generator, dtf-quote-builder.html static label.
+
 ### Pricing-baselines gate red — drift was Erik's own Caspio margin lift (2026-06-11, ARCHIVED 2026-07-04): when baselines drift by a uniform rounded half-dollar, suspect a Caspio `MarginDenominator` change (invisible to git) — trace the delta to a named upstream change BEFORE re-locking; never rubber-stamp; a passing scenario does NOT prove the margin didn't move (only a fingerprint like `garmentSellPerPiece` does). Full entry in archive.
 
 ### Richardson calculator drifted from the Embroidery Quote Builder — leatherette model, margin, tiers (2026-05-29) — ARCHIVED 2026-06-11
