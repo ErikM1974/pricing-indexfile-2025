@@ -1,3 +1,10 @@
+## v2026.07.06.7 (2026.07.06)
+
+- chore: gitignore svc.json (service-account key — keep out of git)
+- feat(catalog): Top Sellers view + sample program consolidation — retire legacy showcase pages
+- chore: seed script for IsTopSeller flags + memory/docs for top-sellers consolidation
+- Deploy v2026.07.06.7: 2 files (catalog.html,product.html...)
+
 ## v2026.07.06.6 (2026.07.06)
 
 - docs: document SCP preview reprice-race fix + archive one resolved lesson
