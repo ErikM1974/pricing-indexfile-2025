@@ -1,3 +1,9 @@
+## v2026.07.06.6 (2026.07.06)
+
+- docs: document SCP preview reprice-race fix + archive one resolved lesson
+- fix(quote-view): remove dead hardcoded size-upcharge map + legacy renderer (Rule 9 audit)
+- Deploy v2026.07.06.6: 1 files (quote-view.html,...)
+
 ## v2026.07.06.3 (2026.07.06)
 
 - fix(emb): customer engine HARD-ERRORS on $12/$9 decoration-cost fallback (Rule 4)
