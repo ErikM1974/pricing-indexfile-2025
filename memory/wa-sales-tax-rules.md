@@ -10,7 +10,7 @@ WA moved to **destination-based sourcing** in 2008. The customer-receives-the-go
 
 | Situation | Rate | Authority |
 |---|---|---|
-| **Customer picks up at NWCA Milton, WA** | **10.1%** (Milton rate, flat) | WAC 458-20-145 — seller's-location sourcing when customer takes possession at the seller's place of business |
+| **Customer picks up at NWCA Milton, WA** | **10.2%** (Milton rate, flat — DOR-verified 2026-07-06; was 10.1%) | WAC 458-20-145 — seller's-location sourcing when customer takes possession at the seller's place of business |
 | **Ship within WA** | **Destination city's rate** (varies 7.0% – 10.6%) | WAC 458-20-145 — destination-based sourcing when buyer receives goods elsewhere |
 | **Ship out of WA state** | **0%** (do not collect) | WAC 458-20-193 — interstate sales, no nexus on out-of-state delivery |
 
@@ -52,7 +52,7 @@ This is the SAME engine behind DOR's [public lookup tool](https://webgis.dor.wa.
 
 **Response shape**: `{ success: true, taxRate: 10.25, locationCode: "1234", outOfState: false, fallback: false }`. `taxRate` is a PERCENTAGE (e.g. `10.25`), not a float (`0.1025`). Divide by 100 before multiplying.
 
-**Fallback**: when DOR API is unreachable, the proxy returns a state-level default with `fallback: true`. UI should warn the rep ("Default rate 10.1% — DOR unavailable") and the rep can override if they know the right rate.
+**Fallback**: when DOR API is unreachable, the proxy returns a state-level default with `fallback: true`. UI should warn the rep ("Default rate 10.2% — DOR unavailable") and the rep can override if they know the right rate.
 
 ---
 
@@ -76,7 +76,7 @@ Single source of truth for "what RATE" is `recomputeTaxRate()` in `shared_compon
 
 **Order Form submit path (`/api/submit-order-form`) sends `taxTotal: 0` to ManageOrders.** This is intentional, not a bug.
 
-The reason: the ShopWorks ManageOrders integration is configured with hardcoded `Tax Line Item = "Tax_10.1"` and `Tax Account = "2200.101"`. Those defaults are stamped on EVERY order pulled by the integration — there's no per-order override mechanism. If we pushed `TaxTotal: $X` for a Seattle 10.35% order, ShopWorks would auto-create a line labeled `Tax_10.1 — City of Milton Sales Tax 10.1%` with the correct dollar amount but the wrong GL account and wrong description.
+⚠️ **STALE AS OF 2026-07-06 — Milton is now 10.2% (DOR-verified). ERIK ACTION: update the ShopWorks integration defaults to `Tax_10.2` / `2200.102` (create the part/account in ShopWorks if missing).** The reason: the ShopWorks ManageOrders integration is configured with hardcoded `Tax Line Item = "Tax_10.1"` and `Tax Account = "2200.101"`. Those defaults are stamped on EVERY order pulled by the integration — there's no per-order override mechanism. If we pushed `TaxTotal: $X` for a Seattle 10.35% order, ShopWorks would auto-create a line labeled `Tax_10.1 — City of Milton Sales Tax 10.1%` with the correct dollar amount but the wrong GL account and wrong description.
 
 **Erik's chosen workflow:**
 1. Form computes the correct destination-based tax for the customer-facing quote
@@ -122,7 +122,7 @@ Erik **blanked** the OnSite "Manage Orders" connection's **Tax Line Item + Tax A
 2. **Notes To Accounting** (`buildAccountingTaxNote`, NEW) — gives the accountant the rate/account/taxable/amount/total to verify after invoicing.
 
 **Account routing — `getTaxAccount(taxRate, shipState)` → `{accountCode, description, partNumber}`:**
-- WA ship → exact per-address rate `2200.<rate>` / `Tax_<rate>` · Milton pickup → `2200.101` (10.1%) / `Tax_10.1` · out-of-state → `2202` / no part · **wholesale** (per-order `Quote_Sessions.IsWholesale` Yes/No checkbox, default No in code) → `2203` / no part.
+- WA ship → exact per-address rate `2200.<rate>` / `Tax_<rate>` · Milton pickup → `2200.102` (10.2%) / `Tax_10.2` (rate rose from 10.1% — code updated 2026-07-06) · out-of-state → `2202` / no part · **wholesale** (per-order `Quote_Sessions.IsWholesale` Yes/No checkbox, default No in code) → `2203` / no part.
 - Whole-number accts are `2200.8 / 2200.9 / 2200.1` (NOT `.80/.90/.100`) — code mirrors the Caspio `sales_tax_accounts_2026` table (which now also has a `Tax_Part_Number` column). Push does NOT read the table live — uses the hardcoded `TAX_ACCOUNT_LOOKUP` mirror.
 
 **Per-address DOR cache fix (2026-06-07):** `/api/tax-rates/lookup`'s DOR cache was keyed by **ZIP only** → a precise address could be served a neighbor's approximate (ZIP-centroid, resultCode 5) rate. Now keyed by **full address**. Verified: Sumner full-address = 9.6% exact (resultCode 0); ZIP-only = 9.5% approx. Also: Caspio returns `Account_Number` as a NUMBER → normalized to string in `fetchTaxAccounts` (the `=== '2200'` default match was silently failing).

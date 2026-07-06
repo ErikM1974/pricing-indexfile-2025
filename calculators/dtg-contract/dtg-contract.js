@@ -692,7 +692,7 @@
             SalesRepEmail: customer.email_salesrep || 'ruth@nwcustomapparel.com',
             SalesRepName: customer.account_owner || 'Ruth Nhoung',
             PaymentTerms: customer.payment_terms || '',
-            TaxRate: taxable ? 0.101 : 0,
+            TaxRate: taxable ? 0.102 : 0,
             TotalQuantity: calcContext.qty,
             SubtotalAmount: parseFloat(calcContext.orderTotal.toFixed(2)),
             LTMFeeTotal: parseFloat((calcContext.ltmFee || 0).toFixed(2)),

@@ -20,7 +20,7 @@ class QuoteViewPage {
         this.items = [];
         this.productItems = [];
         this.customerSuppliedItems = [];
-        this.taxRate = 0.101; // 10.1% WA Sales Tax (default, may be overridden by TAX fee item)
+        this.taxRate = 0.102; // 10.2% Milton WA default (DOR, updated 2026-07-06) — overridden by the quote's frozen TaxRate / TAX fee item when present
         this.includeTax = true;
 
         // Quote type mapping
@@ -212,7 +212,7 @@ class QuoteViewPage {
                 console.log('[QuoteView] Loaded items:', this.items);
             }
 
-            // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.1%
+            // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.2%
             // Normalize percent-vs-decimal: EMB stores TaxRate as a DECIMAL (0.101) but
             // SCP/DTF store it as a PERCENT (10.1). Without this, an SCP/DTF quote rendered
             // tax at ~1010% on the report/invoice. (2026-06-01)
@@ -2167,7 +2167,7 @@ class QuoteViewPage {
         // Add tax row with dynamic rate label
         if (this.taxRate > 0) {
             const ratePercent = (this.taxRate * 100).toFixed(1);
-            const rateLabel = ratePercent === '10.1' ? 'WA Sales Tax (10.1%)' : `Sales Tax (${ratePercent}%)`;
+            const rateLabel = `WA Sales Tax (%)`;
             totalsHtml += `
                 <div class="total-row tax-row">
                     <span class="label">${rateLabel}:</span>
@@ -3854,7 +3854,7 @@ class QuoteViewPage {
 
         // Tax rate — computed from amount ÷ (subtotal + shipping). MO doesn't
         // expose the rate directly; this back-calculates it. Useful for AR
-        // to verify the destination rate is correct (10.1% Milton pickup,
+        // to verify the destination rate is correct (10.2% Milton pickup,
         // 9.5% Sumner, 10.35% Seattle, etc.). When taxable base is 0 or tax
         // is 0, leave blank (no rate to show).
         const taxRateEl = document.getElementById('sw-fin-tax-rate');
@@ -5282,7 +5282,7 @@ class QuoteViewPage {
 
         // 9. Tax calculation (shipping is taxable in WA state)
         console.group('9️⃣ Tax & Grand Total');
-        const taxRate = this.taxRate ?? 0.101;
+        const taxRate = this.taxRate ?? 0.102;
         const taxableAmount = totalAmount + shippingFee;
         const tax = Math.round(taxableAmount * taxRate * 100) / 100;
         const grandTotalWithTax = taxableAmount + tax;
