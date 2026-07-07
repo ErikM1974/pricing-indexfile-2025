@@ -97,7 +97,10 @@ function bucketByDay(orders, startYmd, endYmd) {
  * Throws DashboardApiError on failure.
  */
 export async function fetchOrders(startYmd, endYmd, { refresh = false } = {}) {
-    const url = new URL(endpoints.manageOrders());
+    // endpoints.manageOrders() is a RELATIVE path since the 2026-07-05 /api/mo
+    // repointing — new URL() needs the origin base or it throws Invalid URL
+    // (this was the "Couldn't load revenue" break on the dashboard).
+    const url = new URL(endpoints.manageOrders(), window.location.origin);
     url.searchParams.set('date_Invoiced_start', startYmd);
     url.searchParams.set('date_Invoiced_end', endYmd);
     if (refresh) url.searchParams.set('refresh', 'true');
