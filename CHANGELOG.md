@@ -1,3 +1,7 @@
+## v2026.07.06.11 (2026.07.06)
+
+- feat(staff-dashboard): Orders Inbox + Money Collected + Sample Follow-ups + Product Manager; announcements retired
+
 ## v2026.07.06.10 (2026.07.06)
 
 - fix(staff-dashboard): revenue widget dead since /api/mo repointing — new URL() needs an origin base
