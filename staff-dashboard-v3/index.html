@@ -26,7 +26,7 @@
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.07.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.07.5">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.06.11">
@@ -332,7 +332,7 @@
                                 <button type="button" class="quote-start-btn" id="quote-start-btn" aria-haspopup="dialog" aria-controls="quote-launcher">
                                     <span class="qs-icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
                                     <span class="qs-txt">
-                                        <span class="qs-title">New Quote</span>
+                                        <span class="qs-title">New Quote <span class="qs-new-badge">New · Jul 7</span></span>
                                         <span class="qs-sub">start here — pick the decoration, price it, send it</span>
                                     </span>
                                     <i class="fas fa-arrow-right qs-arrow" aria-hidden="true"></i>
@@ -340,6 +340,12 @@
                                 <a class="quote-continue-chip" id="quote-continue-chip" href="#" hidden>
                                     <i class="fas fa-rotate-right" aria-hidden="true"></i> <span id="quote-continue-label">Continue</span>
                                 </a>
+
+                                <!-- Quick Quote keeps its own visible spot (2026-07-07 follow-up:
+                                     it's the reps' trusted tool — never make a loved tool hard to
+                                     find during a transition). Also linked inside the launcher. -->
+                                <div class="tool-subhead">Quick price</div>
+                                <a href="/calculators/quick-quote/" class="tool-btn" title="Fast price for any style — no customer record, no save. Same prices as the builders. Line Sheet mode builds a multi-style price sheet PDF."><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
 
                                 <div class="tool-subhead">Existing quotes</div>
                                 <a href="/dashboards/quote-management.html" class="tool-btn"><i class="fas fa-list-alt" aria-hidden="true"></i> Quote Management</a>
@@ -801,8 +807,8 @@
             </a>
         </div>
         <div class="ql-alt">
-            <a href="/calculators/quick-quote/?mode=quick"><i class="fas fa-scale-balanced" aria-hidden="true"></i> Not sure — compare every method's price for one style</a>
-            <a href="/calculators/quick-quote/"><i class="fas fa-file-lines" aria-hidden="true"></i> Price sheet to email — several styles, no order yet</a>
+            <a href="/calculators/quick-quote/?mode=quick"><i class="fas fa-bolt" aria-hidden="true"></i> <strong>Quick Quote</strong>&nbsp;— not sure? compare every method's price for one style</a>
+            <a href="/calculators/quick-quote/"><i class="fas fa-bolt" aria-hidden="true"></i> <strong>Quick Quote line sheet</strong>&nbsp;— several styles, price sheet to email</a>
         </div>
     </div>
     <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
