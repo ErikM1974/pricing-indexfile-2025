@@ -7,7 +7,7 @@
 ## ⏸ RESUME POINT (updated 2026-07-07, after guided-quote Phase A)
 
 - **DEPLOYED v2026.07.07.1:** P1 #1 duplicate-row + #2 bulk size paste + #3 clickable nudge.
-- **BUILT on develop (guided-quote Phase A, NOT yet deployed):** P1 #4 lookup-first customer
+- **DEPLOYED v2026.07.07.2 (guided-quote Phase A, live-verified 2026-07-07):** P1 #4 lookup-first customer
   panel (trio; `details.customer-manual` + `syncCustomerManualDetails()` — auto-opens on
   lookup pick via `surfaceCustomerContext` hook / edit-load via `updateEditModeUI` / delayed
   safety syncs) · plain-English relabels (small-batch fee, new-logo setup, tier tooltips,
@@ -15,8 +15,9 @@
   default-collapsed ("More services & fees", `autoExpandFeesOnFirstCharge()` opens once when
   a saved fee loads; EMB chip bar untouched — already progressive) · Quick Quote handoff
   promoted to "Turn this into a full quote →" button CTA (`.qq-open-builder`).
-- **Next:** (1) Erik `/deploy` Phase A; (2) Erik runs the 30-min watch-Nika/Taneisha-quote
-  session; (3) Phase B guided shell (4-step header + one-open sections + sticky price
+- **Phase B BUILT on develop 2026-07-07 (commit 1f2519e5, NOT deployed):** 4-step Guided Quote shell (quote-builder-guided.js/.css, trio; tag-dont-wrap + 3 anchored relocations incl. EMB nested footer; "Show everything" workbench toggle, localStorage nwca-guided-mode; defensive no-op). Browser-verified all 3 + toggle round-trip.
+- **Next:** (1) Erik /deploy Phase B; (2) Erik runs the 30-min watch-Nika/Taneisha-quote
+  session; (2) Phase B guided shell (4-step header + one-open sections + sticky price
   ticker) — design in the pitch artifact + chat 2026-07-07. Full plan → guided-quote pitch.
 - **Not started:** P2/P3 items + price-display findings below (10.1 tax residuals, silent
   SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
