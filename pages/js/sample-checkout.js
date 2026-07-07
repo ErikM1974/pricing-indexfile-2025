@@ -116,14 +116,10 @@
         if (btn && paid) {
             btn.innerHTML = '<i class="fas fa-lock"></i> Continue to secure payment';
         }
-        var bar = document.getElementById('cartSummaryBar');
-        if (bar && paid && !document.getElementById('sampleCreditNote')) {
-            var note = document.createElement('p');
-            note.id = 'sampleCreditNote';
-            note.style.cssText = 'margin:0.5rem 0 0;font-size:0.9rem;color:#2d5f3f;font-weight:600;';
-            note.innerHTML = '<i class="fas fa-gift"></i> Paid samples check out securely online — the sample cost is credited toward your first decorated order. Free shipping, always.';
-            bar.appendChild(note);
-        }
+        // 2026 reskin: the credit note is static markup in the summary band
+        // (styled by pages/css/sample-cart.css) — reveal it for paid carts
+        var note = document.getElementById('sampleCreditNote');
+        if (paid && note) note.hidden = false;
     }
 
     /** Handle ?success=1&quote_id= / ?canceled=1 returns from Stripe. */

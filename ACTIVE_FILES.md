@@ -239,7 +239,9 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/pages/dtg-compatible-products.html` | DTG-compatible products listing | — | ✅ Active |
-| `/pages/sample-cart.html` | Sample ordering cart page | — | ✅ Active |
+| `/pages/sample-cart.html` | Sample ordering cart + checkout page — **RESKINNED on nwca-2026 (2026-07-06)**, inline monolith extracted per Rule 3 | sample-cart.css, sample-cart-page.js, sample-checkout.js, sample-order-service.js, sample-inventory-service.js, nwca-2026-core.css | ✅ Active |
+| `/pages/css/sample-cart.css` | **NEW (2026-07-06)** Sample Cart page styles on 2026 tokens (replaces the legacy inline style monolith); styles the SAME class names the extracted renderer emits + legacy token bridge (--primary-color → --green-700) | nwca-2026-core.css | ✅ Active |
+| `/pages/js/sample-cart-page.js` | **NEW (2026-07-06)** Sample Cart page controller — extracted VERBATIM from the legacy inline script (cart load + upcharge migration, inventory check, render, free-flow direct ShopWorks submit, EmailJS notify) minus debug chatter + old chrome; adds 2026 drawer/search wiring. Paid carts delegate to sample-checkout.js. | sample-order-service.js, sample-inventory-service.js, sample-checkout.js, EmailJS | ✅ Active |
 | `/pages/order-form.html` | **NEW** Online order form (embroidery/screenprint/DTG/DTF) — paper-style layout, pushes to ShopWorks ManageOrders | order-form/*.css, order-form/*.js, order-form/components/*.jsx | ✅ Active |
 | `/pages/order-form/init.js` | Order form tweak defaults (accent/font/layout) | — | ✅ Active |
 | `/pages/order-form/shopworks.js` | Order Form submit client — routes to `/api/submit-order-form` on server.js (mirrors 3-Day Tees flow) | — | ✅ Active |
