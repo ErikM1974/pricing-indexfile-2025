@@ -1,3 +1,7 @@
+## v2026.07.06.10 (2026.07.06)
+
+- fix(staff-dashboard): revenue widget dead since /api/mo repointing — new URL() needs an origin base
+
 ## v2026.07.06.9 (2026.07.06)
 
 - feat(sample-cart): full reskin on the nwca-2026 design system
