@@ -1,3 +1,7 @@
+## v2026.07.06.9 (2026.07.06)
+
+- feat(sample-cart): full reskin on the nwca-2026 design system
+
 ## v2026.07.06.8 (2026.07.06)
 
 - chore: seed-top-sellers sends X-CRM-API-Secret (admin endpoint is gated); ran 2026-07-06 — 65/68 styles flagged
