@@ -1,3 +1,8 @@
+## v2026.07.07.4 (2026.07.07)
+
+- docs(memory): Phase B deployed (v2026.07.07.3)
+- feat(dashboard): ONE door into quoting — New Quote launcher (guided-quote entry)
+
 ## v2026.07.07.3 (2026.07.07)
 
 - docs(memory): mark guided-quote Phase A deployed (v2026.07.07.2)
