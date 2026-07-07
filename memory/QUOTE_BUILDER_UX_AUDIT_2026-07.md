@@ -4,6 +4,17 @@
 > HIGH claim. Scope: order-entry clicks, line-item speed, price-display correctness, skin.
 > Full narrative delivered in-session 2026-07-06; this file = the durable, actionable core.
 
+## ⏸ RESUME POINT (session stopped 2026-07-06, after P1 #1)
+
+- **Shipped:** P1 #1 duplicate-row on SCP+DTF + EMB race fix = commit `d44728c8` on
+  **develop — NOT deployed** (Erik runs `/deploy` when ready). Browser-verified all 3
+  builders + 3,248 tests green. Details in the P1 list below.
+- **Next build (in order):** P1 #2 — wire DTG `parseBulkSizes()` (`dtg-inline-form.js:324`,
+  built but has no UI trigger; add "Paste sizes" affordance, then promote to all 4) →
+  P1 #3 clickable quantity-nudge → P1 #4 lookup-first customer panel.
+- **Not started:** all P2/P3 items + the price-display findings below (10.1 tax residuals,
+  silent SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
+
 ## Click scorecard (typical order: 1 style × 2 colors, ~48 pcs, 1 location, customer, save)
 
 | Builder | Clicks | Keystrokes | Standout strength | Biggest drag |
