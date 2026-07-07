@@ -110,6 +110,15 @@
         if (!contact) return;
         config = config || {};
 
+        // Phase A lookup-first panel (2026-07-07): a customer pick fills fields
+        // inside the collapsed "Enter details manually" section — reveal them so
+        // the rep sees exactly what the lookup applied. This fn is the shared
+        // post-pick chokepoint for every builder; setTimeout lets the caller's
+        // own field-fill finish first. No-op where the details element is absent.
+        if (typeof window.syncCustomerManualDetails === 'function') {
+            setTimeout(window.syncCustomerManualDetails, 0);
+        }
+
         // 1. Customer Warning banner — amber
         const warningEl = document.getElementById(config.warningContainerId || 'customer-warning-banner');
         if (warningEl) {

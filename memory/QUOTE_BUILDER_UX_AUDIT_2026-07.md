@@ -4,15 +4,22 @@
 > HIGH claim. Scope: order-entry clicks, line-item speed, price-display correctness, skin.
 > Full narrative delivered in-session 2026-07-06; this file = the durable, actionable core.
 
-## ⏸ RESUME POINT (updated 2026-07-06, after P1 #2)
+## ⏸ RESUME POINT (updated 2026-07-07, after guided-quote Phase A)
 
-- **Shipped:** P1 #1 duplicate-row (`d44728c8`) + P1 #2 bulk size paste + P1 #3 clickable
-  quantity-nudge — all on **develop — NOT deployed** (Erik runs `/deploy` when ready).
-- **Next build:** P1 #4 lookup-first customer panel (one prominent lookup field, manual
-  fields collapsed behind "enter manually"; EMB worst offender at 5 clicks + 5 fields;
-  DTG's company-lookup-first flow is the model).
-- **Not started:** all P2/P3 items + the price-display findings below (10.1 tax residuals,
-  silent SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
+- **DEPLOYED v2026.07.07.1:** P1 #1 duplicate-row + #2 bulk size paste + #3 clickable nudge.
+- **BUILT on develop (guided-quote Phase A, NOT yet deployed):** P1 #4 lookup-first customer
+  panel (trio; `details.customer-manual` + `syncCustomerManualDetails()` — auto-opens on
+  lookup pick via `surfaceCustomerContext` hook / edit-load via `updateEditModeUI` / delayed
+  safety syncs) · plain-English relabels (small-batch fee, new-logo setup, tier tooltips,
+  underbase hint — CHROME ONLY, saved/pushed strings untouched) · SCP+DTF services panels
+  default-collapsed ("More services & fees", `autoExpandFeesOnFirstCharge()` opens once when
+  a saved fee loads; EMB chip bar untouched — already progressive) · Quick Quote handoff
+  promoted to "Turn this into a full quote →" button CTA (`.qq-open-builder`).
+- **Next:** (1) Erik `/deploy` Phase A; (2) Erik runs the 30-min watch-Nika/Taneisha-quote
+  session; (3) Phase B guided shell (4-step header + one-open sections + sticky price
+  ticker) — design in the pitch artifact + chat 2026-07-07. Full plan → guided-quote pitch.
+- **Not started:** P2/P3 items + price-display findings below (10.1 tax residuals, silent
+  SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
 
 ## Click scorecard (typical order: 1 style × 2 colors, ~48 pcs, 1 location, customer, save)
 

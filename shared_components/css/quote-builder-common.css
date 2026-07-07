@@ -667,6 +667,71 @@ body {
 }
 
 /* ============================================
+   LOOKUP-FIRST CUSTOMER PANEL (2026-07-07 Phase A / P1 #4)
+   One prominent search field; manual fields live behind a
+   <details class="customer-manual"> that auto-opens when a
+   lookup pick / edit-load fills them (syncCustomerManualDetails).
+   ============================================ */
+.customer-lookup-hero .customer-lookup-input {
+    padding: 11px 12px !important;
+    font-size: 14px !important;
+    border: 2px solid #4cb354 !important;
+    border-radius: 8px !important;
+    background: #fff;
+}
+
+.customer-lookup-hero .customer-lookup-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.18);
+}
+
+details.customer-manual {
+    margin-top: 10px;
+}
+
+details.customer-manual > summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2563eb;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    user-select: none;
+}
+
+details.customer-manual > summary::-webkit-details-marker { display: none; }
+
+details.customer-manual > summary::before {
+    content: "▸";
+    font-size: 11px;
+    transition: transform .15s;
+}
+
+details.customer-manual[open] > summary::before { transform: rotate(90deg); }
+
+details.customer-manual > summary:hover { text-decoration: underline; }
+
+details.customer-manual > summary:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+details.customer-manual[open] > summary {
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+details.customer-manual > summary .cm-hint {
+    font-weight: 400;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* ============================================
    ADD ROW BUTTON (2026-03-23 consolidation)
    ============================================ */
 .add-row-btn {

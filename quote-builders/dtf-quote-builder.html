@@ -21,7 +21,7 @@
     <script src="/config/app.config.js"></script>
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.2">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
@@ -182,7 +182,7 @@
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Minimum Order: 10 pieces required.</strong>
-                    Orders of 10-23 pieces include a $<span id="ltm-fee-banner-amount">50</span> Less Than Minimum Fee.
+                    Orders of 10-23 pieces include a $<span id="ltm-fee-banner-amount">50</span> small-batch fee — it disappears at 24+.
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -227,7 +227,7 @@
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-info-circle"></i> Less Than Minimum Fee <small class="text-muted">(per piece)</small>
+                                    <i class="fas fa-info-circle"></i> <span title="Also called the Less Than Minimum (LTM) fee">Small-batch fee</span> <small class="text-muted">(per piece)</small>
                                 </td>
                                 <td class="cell-qty">0</td>
                                 <td class="cell-price" id="ltm-row-unit">$0.00</td>
@@ -292,18 +292,20 @@
             </div>
 
             <!-- Services & Fees bar — relocated from the sidebar into the content area below the product table
-                 (EMB services-bar position, 2026-06-14). Same controls + handlers as before (pricing unchanged);
-                 laid out horizontally and shown by default instead of a collapsed sidebar panel. -->
+                 (EMB services-bar position, 2026-06-14). Same controls + handlers as before (pricing unchanged).
+                 Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
+                 header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
             <div class="additional-charges-panel" style="margin: 0 0 14px;">
                 <div class="charges-header" onclick="toggleFeesCharges()">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>Services &amp; Fees</span>
+                        <i class="fas fa-plus-circle"></i>
+                        <span>More services &amp; fees</span>
+                        <span style="font-size:11px;color:#94a3b8;font-weight:400;">mockups · design time · rush</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
                 </div>
-                <div id="fees-charges-content" class="charges-content">
+                <div id="fees-charges-content" class="charges-content hidden" style="display:none">
                     <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
                         <div class="charge-field" style="margin:0;">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
@@ -520,9 +522,13 @@
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
                 <div id="dtf-customer-fields">
-                    <div class="customer-field customer-lookup-container" style="margin-bottom: 8px;">
+                    <!-- Lookup-first (2026-07-07 Phase A / P1 #4): the search field is the
+                         hero; manual fields collapse below and auto-open when a pick or an
+                         edit-load fills them (syncCustomerManualDetails). All input ids
+                         unchanged — save/load key off getElementById. -->
+                    <div class="customer-field customer-lookup-container customer-lookup-hero" style="margin-bottom: 8px;">
                         <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
-                        <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="quote-input customer-lookup-input">
+                        <input type="text" id="customer-lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
@@ -531,7 +537,8 @@
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
-                    <div class="customer-lookup-divider" style="text-align: center; font-size: 11px; color: #999; margin: 8px 0;">OR ENTER MANUALLY</div>
+                    <details class="customer-manual" id="dtf-customer-manual">
+                    <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
@@ -578,6 +585,7 @@
                             <input type="text" id="design-number" placeholder="Type design # or name…" class="quote-input">
                         </div>
                     </div>
+                    </details>
                 </div>
             </div>
 
@@ -599,7 +607,7 @@
 
                 <div class="pricing-row">
                     <span class="label">Pricing Tier:</span>
-                    <span class="tier-badge" id="pricing-tier">10-23</span>
+                    <span class="tier-badge" id="pricing-tier" title="Your price break — the more pieces on the order, the cheaper each piece gets">10-23</span>
                 </div>
                 <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
 
@@ -695,7 +703,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Quote Builder Shared Utilities (2026 consolidation) -->
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.1"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.2"></script>
 
     <!-- Exact Match Search Module -->
     <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
@@ -717,7 +725,7 @@
     <!-- Customer Lookup Autocomplete -->
     <script src="/shared_components/js/customer-lookup-service.js?v=2026.06.06.9"></script>
     <!-- Customer Context Banners (Erik 2026-05-23) — Warning/Tax/Tier autofill -->
-    <script src="/shared_components/js/customer-context-banners.js?v=2026.05.23.1"></script>
+    <script src="/shared_components/js/customer-context-banners.js?v=2026.07.07.2"></script>
 
     <!-- Sidebar Resize (2026 UX improvement) -->
     <script src="/shared_components/js/sidebar-resize.js?v=2026.05.26.1"></script>
@@ -793,7 +801,7 @@
     </div>
 
     <!-- Page controller + modal functions (extracted to external JS) -->
-    <script src="/shared_components/js/dtf-quote-page.js?v=2026.07.07.1"></script>
+    <script src="/shared_components/js/dtf-quote-page.js?v=2026.07.07.2"></script>
 
 </body>
 </html>

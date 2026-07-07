@@ -1239,10 +1239,13 @@
     function openBuilderHtml(id) {
         var href = builderHref(id);
         if (!href) return '';
+        // Promoted from a dotted text link to the card's primary next step
+        // (guided-quote Phase A, 2026-07-07): the builder is the FRONT DOOR the
+        // AEs reach through Quick Quote — style/color/sizes carry over, so they
+        // never face a blank builder. Styling: .qq-open-builder in quick-quote.css.
         return '<a class="qq-open-builder" href="' + esc(href) + '" target="_blank" rel="noopener"'
-            + ' title="Open the staff quote builder with this style, color and quantity prefilled"'
-            + ' style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#166534;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">'
-            + 'Open in quote builder &rarr;</a>';
+            + ' title="Opens the full quote builder with this style, color and sizes already filled in — add the customer and push it to ShopWorks">'
+            + 'Turn this into a full quote &rarr;</a>';
     }
 
     function renderCard(id, isBest, changed) {

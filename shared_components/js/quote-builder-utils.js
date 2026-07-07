@@ -771,10 +771,10 @@ function renderLtmControlPanel(containerId, options = {}) {
                 <span>${escapeHtml(feeLabel)}</span>
             </div>
             <div class="ltm-control-body">
-                <label class="ltm-checkbox-label">
+                <label class="ltm-checkbox-label" title="Also called the Less Than Minimum (LTM) fee — small orders carry a flat fee that disappears at the next price break">
                     <input type="checkbox" class="ltm-apply-checkbox" ${enabled ? 'checked' : ''}
                            data-ltm-container="${escapeHtml(containerId)}">
-                    Apply LTM Fee (<span class="ltm-fee-display">$${feeAmount.toFixed(2)}</span>)
+                    Apply small-batch fee (<span class="ltm-fee-display">$${feeAmount.toFixed(2)}</span>)
                     <span class="ltm-status-badge">${enabled ? 'Applied' : 'Waived'}</span>
                 </label>
                 <div class="ltm-mode-radios" ${!enabled ? 'style="opacity:0.4;pointer-events:none;"' : ''}>
@@ -993,6 +993,52 @@ function updateEditModeUI(quoteId, revision) {
     if (saveBtn) {
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
     }
+    // Phase A lookup-first panel: an edit-load restores customer fields inside the
+    // collapsed "Enter details manually" section — reveal them so nothing loads hidden.
+    if (typeof syncCustomerManualDetails === 'function') syncCustomerManualDetails();
+}
+
+// ============================================================
+// Lookup-first customer panel (2026-07-07, guided-quote Phase A / P1 #4)
+// ============================================================
+
+/**
+ * Open the "Enter details manually" <details> when any customer field holds a
+ * value — so a lookup pick, an edit-load, a draft restore, or a duplicate can
+ * never leave a filled name/email hidden behind the collapsed summary.
+ * Idempotent; safe to call any time. The trio's manual grids are wrapped in
+ * <details class="customer-manual"> (SCP/DTF/EMB builder HTML).
+ */
+function syncCustomerManualDetails() {
+    const details = document.querySelector('details.customer-manual');
+    if (!details || details.open) return;
+    const hasValue = ['customer-name', 'customer-email', 'company-name', 'customer-number']
+        .some(id => { const el = document.getElementById(id); return el && el.value && el.value.trim() !== ''; });
+    if (hasValue) details.open = true;
+}
+
+// Safety net for async fill paths this file can't see (draft restore, duplicate
+// mode): two delayed idempotent syncs after load. A no-op on pages without the
+// details element (DTG, non-builder pages).
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(syncCustomerManualDetails, 1200);
+        setTimeout(syncCustomerManualDetails, 3500);
+    });
+}
+
+/**
+ * Auto-expand the (now default-collapsed) Services & Fees panel the FIRST time
+ * a non-zero charge appears — an edit-load with saved fees must never leave a
+ * billed amount hidden. Once only: a rep who then collapses it stays collapsed.
+ */
+function autoExpandFeesOnFirstCharge() {
+    if (window._feesAutoExpandDone) return;
+    const badge = document.getElementById('charges-badge');
+    const content = document.getElementById('fees-charges-content');
+    if (!badge || !content || badge.classList.contains('hidden')) return;
+    window._feesAutoExpandDone = true;
+    if (content.classList.contains('hidden')) toggleFeesCharges();
 }
 
 /**
@@ -1999,6 +2045,8 @@ if (typeof window !== 'undefined') {
     window.removeRecentOrdersPanel = removeRecentOrdersPanel;
     window.parseBulkSizes = parseBulkSizes;
     window.wireBulkSizePaste = wireBulkSizePaste;
+    window.syncCustomerManualDetails = syncCustomerManualDetails;
+    window.autoExpandFeesOnFirstCharge = autoExpandFeesOnFirstCharge;
 }
 
 // Node.js export (testing) — pure functions only
