@@ -1,3 +1,9 @@
+## v2026.07.07.3 (2026.07.07)
+
+- docs(memory): mark guided-quote Phase A deployed (v2026.07.07.2)
+- feat(quote-builders): guided-quote Phase B — 4-step Guided Quote shell (trio)
+- docs(memory): Phase B built — resume point
+
 ## v2026.07.07.2 (2026.07.07)
 
 - docs(memory): mark quote-builder UX P1 batch deployed (v2026.07.07.1)
