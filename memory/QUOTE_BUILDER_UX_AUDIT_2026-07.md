@@ -4,14 +4,13 @@
 > HIGH claim. Scope: order-entry clicks, line-item speed, price-display correctness, skin.
 > Full narrative delivered in-session 2026-07-06; this file = the durable, actionable core.
 
-## ⏸ RESUME POINT (session stopped 2026-07-06, after P1 #1)
+## ⏸ RESUME POINT (updated 2026-07-06, after P1 #2)
 
-- **Shipped:** P1 #1 duplicate-row on SCP+DTF + EMB race fix = commit `d44728c8` on
-  **develop — NOT deployed** (Erik runs `/deploy` when ready). Browser-verified all 3
-  builders + 3,248 tests green. Details in the P1 list below.
-- **Next build (in order):** P1 #2 — wire DTG `parseBulkSizes()` (`dtg-inline-form.js:324`,
-  built but has no UI trigger; add "Paste sizes" affordance, then promote to all 4) →
-  P1 #3 clickable quantity-nudge → P1 #4 lookup-first customer panel.
+- **Shipped:** P1 #1 duplicate-row (`d44728c8`) + P1 #2 bulk size paste — both on
+  **develop — NOT deployed** (Erik runs `/deploy` when ready).
+- **Next build (in order):** P1 #3 clickable quantity-nudge (the nudge chip already
+  computes target tier + savings in each builder; make clicking it auto-distribute the
+  delta across entered sizes) → P1 #4 lookup-first customer panel.
 - **Not started:** all P2/P3 items + the price-display findings below (10.1 tax residuals,
   silent SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
 
@@ -64,8 +63,15 @@ EMB $12 tier-fallback chip, cart mailto chip; SCP preview reprice race FIXED 202
    (EMB's inline styles removed). Bonus fix: EMB's own duplicate targeted rows via the transient
    `tr.new-row` highlight class → wrong row on quick clicks; all 3 now use
    `product-tbody.lastElementChild` (→ LESSONS 2026-07-06). Browser-verified all 3 + 3,248 tests.
-2. Wire DTG's `parseBulkSizes()` (`dtg-inline-form.js:324` — built, never wired) to a
-   "Paste sizes" affordance; promote to all 4 builders.
+2. ✅ **DONE 2026-07-06** — Bulk size paste on all 4. CORRECTION to the audit: DTG's paste
+   handler was ALREADY wired (`dtg-inline-form.js` ~:1819 — the audit agent missed it); the
+   real gap was the trio + discoverability. Shipped: parser promoted to
+   `quote-builder-utils.js` (`parseBulkSizes` + self-attaching `wireBulkSizePaste` on
+   `#product-tbody`; DTG closure now delegates to the shared parser), paste "S:2 M:4 L:6"
+   into any trio size cell fills the row via real 'change' events (2XL child-row machinery
+   included; child rows + unknown sizes guarded, skipped sizes toasted), hints added to all
+   4 (trio keyboard-hint line, DTG input title). Lock: `tests/unit/parse-bulk-sizes.test.js`.
+   Browser-verified on all 4 builders.
 3. Make the quantity-nudge chip CLICKABLE (it already computes the target tier + savings);
    click auto-distributes the delta across entered sizes.
 4. Lookup-first customer panel: one prominent lookup field, manual fields collapsed behind
