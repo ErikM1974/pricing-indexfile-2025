@@ -26,7 +26,7 @@
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.07.4">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.06.11">
@@ -319,24 +319,42 @@
                                 <span class="tool-category-title">Quoting</span>
                                 <span class="tool-category-count">7</span>
                             </div>
+                            <!-- ONE DOOR IN (2026-07-07 guided-quote entry): the big New Quote
+                                 button opens the launcher (one question: what are we decorating?)
+                                 → guided builder. A quick price is just a full quote you stop
+                                 early, so Quick Quote no longer competes as a starting decision —
+                                 it lives in the launcher ("compare methods" / "price sheet") and
+                                 under All quoting tools below. All original links preserved. -->
                             <div class="quote-guide-mini">
-                                <span class="qg-chip">Same price on every tool</span><span class="qg-note">pick by how much detail you need — all pull live from Caspio.</span>
+                                <span class="qg-chip">Same price on every tool</span><span class="qg-note">one door in — stop after the first step for a quick price, or keep going to push it to ShopWorks.</span>
                             </div>
                             <div class="tool-buttons">
-                                <div class="tool-subhead">Quick price</div>
-                                <a href="/calculators/quick-quote/" class="tool-btn tool-btn--updated" title="Updated Jun 24 — NEW Line Sheet: build a multi-style price sheet PDF to send a customer. Plus print sizes on DTG/DTF, the small-batch fee shown on every method, and a cleaner layout. Fast price for any style; no customer record, no save — same prices as the builders."><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
-
-                                <div class="tool-subhead">Full quote <span class="tool-subhead-note">sizes · shipping · saved → ShopWorks</span></div>
-                                <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Emb / Cap / Patch</a>
-                                <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> DTG</a>
-                                <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
-                                <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire" aria-hidden="true"></i> DTF</a>
+                                <button type="button" class="quote-start-btn" id="quote-start-btn" aria-haspopup="dialog" aria-controls="quote-launcher">
+                                    <span class="qs-icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
+                                    <span class="qs-txt">
+                                        <span class="qs-title">New Quote</span>
+                                        <span class="qs-sub">start here — pick the decoration, price it, send it</span>
+                                    </span>
+                                    <i class="fas fa-arrow-right qs-arrow" aria-hidden="true"></i>
+                                </button>
+                                <a class="quote-continue-chip" id="quote-continue-chip" href="#" hidden>
+                                    <i class="fas fa-rotate-right" aria-hidden="true"></i> <span id="quote-continue-label">Continue</span>
+                                </a>
 
                                 <div class="tool-subhead">Existing quotes</div>
                                 <a href="/dashboards/quote-management.html" class="tool-btn"><i class="fas fa-list-alt" aria-hidden="true"></i> Quote Management</a>
 
-                                <div class="tool-subhead">Customer self-serve</div>
-                                <a href="/custom-tees" class="tool-btn"><i class="fas fa-shirt" aria-hidden="true"></i> Custom Tees (customer)</a>
+                                <details class="quote-all-tools">
+                                    <summary><i class="fas fa-chevron-right qat-chev" aria-hidden="true"></i> All quoting tools</summary>
+                                    <div class="tool-buttons qat-list">
+                                        <a href="/calculators/quick-quote/" class="tool-btn" title="Fast price for any style; no customer record, no save — same prices as the builders. Line Sheet mode builds a multi-style price sheet PDF."><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
+                                        <a href="/quote-builders/embroidery-quote-builder.html" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Emb / Cap / Patch</a>
+                                        <a href="/quote-builders/dtg-quote-builder.html" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> DTG</a>
+                                        <a href="/quote-builders/screenprint-quote-builder.html" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
+                                        <a href="/quote-builders/dtf-quote-builder.html" class="tool-btn"><i class="fas fa-fire" aria-hidden="true"></i> DTF</a>
+                                        <a href="/custom-tees" class="tool-btn"><i class="fas fa-shirt" aria-hidden="true"></i> Custom Tees (customer)</a>
+                                    </div>
+                                </details>
                             </div>
                         </div>
 
@@ -750,6 +768,44 @@
         </div>
     </dashboard-modal>
 
+    <!-- ============ New Quote launcher (2026-07-07 guided-quote entry) ============
+         Opened by #quote-start-btn in the Quoting card. ONE question — decoration
+         method — then straight into that guided builder. "Not sure" routes to Quick
+         Quote's Quick Price mode (?mode=quick) which compares every method for one
+         style. Behavior: /staff-dashboard-v3/quote-launcher.js -->
+    <div class="ql-backdrop" id="quote-launcher-backdrop" hidden></div>
+    <div class="ql-dialog" id="quote-launcher" role="dialog" aria-modal="true" aria-labelledby="ql-title" hidden>
+        <button type="button" class="ql-close" id="quote-launcher-close" aria-label="Close">&times;</button>
+        <h2 class="ql-title" id="ql-title">What are we decorating?</h2>
+        <p class="ql-sub">One question — the builder walks you through the rest. Need just a number? Stop after the first step.</p>
+        <div class="ql-grid">
+            <a class="ql-chip" data-method="emb" data-label="Embroidery" href="/quote-builders/embroidery-quote-builder.html">
+                <i class="fas fa-tshirt" aria-hidden="true"></i>
+                <span class="ql-name">Embroidery</span>
+                <span class="ql-desc">polos · jackets · caps · patches</span>
+            </a>
+            <a class="ql-chip" data-method="scp" data-label="Screen Print" href="/quote-builders/screenprint-quote-builder.html">
+                <i class="fas fa-layer-group" aria-hidden="true"></i>
+                <span class="ql-name">Screen Print</span>
+                <span class="ql-desc">24+ pieces · spot-color art</span>
+            </a>
+            <a class="ql-chip" data-method="dtg" data-label="DTG" href="/quote-builders/dtg-quote-builder.html">
+                <i class="fas fa-print" aria-hidden="true"></i>
+                <span class="ql-name">DTG</span>
+                <span class="ql-desc">full-color art · small runs</span>
+            </a>
+            <a class="ql-chip" data-method="dtf" data-label="DTF Transfers" href="/quote-builders/dtf-quote-builder.html">
+                <i class="fas fa-fire" aria-hidden="true"></i>
+                <span class="ql-name">DTF Transfers</span>
+                <span class="ql-desc">mixed garments · poly-friendly</span>
+            </a>
+        </div>
+        <div class="ql-alt">
+            <a href="/calculators/quick-quote/?mode=quick"><i class="fas fa-scale-balanced" aria-hidden="true"></i> Not sure — compare every method's price for one style</a>
+            <a href="/calculators/quick-quote/"><i class="fas fa-file-lines" aria-hidden="true"></i> Price sheet to email — several styles, no order yet</a>
+        </div>
+    </div>
+    <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
 
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor.
          Ported as plain script tags before the v3 module so production-controller.js

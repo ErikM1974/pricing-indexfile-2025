@@ -1771,6 +1771,12 @@
         $('qqLinePrint').addEventListener('click', printLineSheet);
 
         // init: render both modes' scaffolding (Quick Price is the default view)
+        // ?mode=quick — the dashboard's New Quote launcher deep-links straight to
+        // Quick Price ("not sure which method — compare them") (2026-07-07).
+        try {
+            var qMode = new URLSearchParams(window.location.search).get('mode');
+            if (qMode === 'quick') setMode('quick');
+        } catch (_) { }
         renderMode();
         renderLineMethods();
         renderLineList();

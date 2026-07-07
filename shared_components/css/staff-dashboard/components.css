@@ -1793,3 +1793,178 @@ dashboard-modal:not([open]) { display: none; }
 }
 
 }
+
+/* =====================================================
+   NEW QUOTE — one door in (2026-07-07 guided-quote entry)
+   The Quoting card's primary CTA + "Continue in X" chip +
+   collapsed "All quoting tools", and the launcher dialog
+   (#quote-launcher / quote-launcher.js).
+   ===================================================== */
+.quote-start-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    background: color-mix(in oklch, var(--accent) 22%, var(--surface-card));
+    border: 2px solid color-mix(in oklch, var(--accent) 55%, var(--border-base));
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--motion-fast) var(--ease-out),
+                border-color var(--motion-fast) var(--ease-out),
+                transform var(--motion-fast) var(--ease-out);
+}
+
+.quote-start-btn:hover {
+    background: color-mix(in oklch, var(--accent) 32%, var(--surface-card));
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px color-mix(in oklch, var(--accent) 28%, transparent);
+}
+
+.quote-start-btn .qs-icon {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #0c1510;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+}
+
+.quote-start-btn .qs-txt { display: flex; flex-direction: column; min-width: 0; }
+.quote-start-btn .qs-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-bold); }
+.quote-start-btn .qs-sub { font-size: var(--font-size-sm); color: var(--text-soft); white-space: normal; }
+.quote-start-btn .qs-arrow { margin-left: auto; color: var(--accent); }
+
+.quote-continue-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--accent);
+    text-decoration: none;
+    padding: 2px var(--space-2);
+}
+
+.quote-continue-chip:hover { text-decoration: underline; }
+
+.quote-all-tools { margin-top: var(--space-2); }
+
+.quote-all-tools > summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-soft);
+    padding: var(--space-2) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    user-select: none;
+}
+
+.quote-all-tools > summary::-webkit-details-marker { display: none; }
+.quote-all-tools > summary:hover { color: #fff; }
+.quote-all-tools .qat-chev { font-size: 10px; transition: transform var(--motion-fast) var(--ease-out); }
+.quote-all-tools[open] .qat-chev { transform: rotate(90deg); }
+.quote-all-tools .qat-list { margin-top: var(--space-2); }
+
+/* ---- launcher dialog ---- */
+.ql-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 10, 8, 0.66);
+    backdrop-filter: blur(3px);
+    z-index: 320;
+}
+
+.ql-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(680px, calc(100vw - 32px));
+    background: var(--surface-card);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    z-index: 321;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+}
+
+.ql-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    border: 0;
+    background: none;
+    color: var(--text-soft);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.ql-close:hover { color: #fff; }
+
+.ql-title { margin: 0 0 4px; font-size: 20px; font-weight: var(--font-weight-bold); color: #fff; }
+.ql-sub { margin: 0 0 var(--space-4); font-size: var(--font-size-sm); color: var(--text-soft); }
+
+.ql-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-3);
+}
+
+.ql-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: oklch(42% 0.016 250);
+    border: 2px solid var(--border-base);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    text-decoration: none;
+    color: #fff;
+    transition: border-color var(--motion-fast) var(--ease-out),
+                background var(--motion-fast) var(--ease-out),
+                transform var(--motion-fast) var(--ease-out);
+}
+
+.ql-chip:hover,
+.ql-chip:focus-visible {
+    border-color: var(--accent);
+    background: color-mix(in oklch, var(--accent) 12%, oklch(42% 0.016 250));
+    transform: translateY(-1px);
+}
+
+.ql-chip i { color: var(--accent); font-size: 16px; margin-bottom: 4px; }
+.ql-chip .ql-name { font-weight: var(--font-weight-bold); font-size: var(--font-size-md); }
+.ql-chip .ql-desc { font-size: var(--font-size-sm); color: var(--text-soft); }
+
+.ql-alt {
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-base);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.ql-alt a {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ql-alt a:hover { color: var(--accent); text-decoration: underline; }
