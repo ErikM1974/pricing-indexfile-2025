@@ -17,6 +17,7 @@
   promoted to "Turn this into a full quote →" button CTA (`.qq-open-builder`).
 - **Phase B DEPLOYED v2026.07.07.3 (Heroku v1572, live-verified 2026-07-07):** 4-step Guided Quote shell (quote-builder-guided.js/.css, trio; tag-dont-wrap + 3 anchored relocations incl. EMB nested footer; "Show everything" workbench toggle, localStorage nwca-guided-mode; defensive no-op). Browser-verified all 3 + toggle round-trip.
 - **Dashboard ONE-DOOR entry DEPLOYED v2026.07.07.4 (Heroku v1573):** Quoting card New Quote CTA + launcher + Continue-chip + QQ ?mode=quick.
+- **2026-07-07 SEQUEL: 5-expert audit (domain×3 + workflow + CSS) → [QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md](QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md)** — 62 NEW verified findings (none overlap this file): money leaks, endgame drift, guided-shell follow-ups, PNW-shell-never-switched-on. Work that list next, not this one.
 - **Next:** (1) Erik runs the 30-min watch-Nika/Taneisha-quote
   session; (2) Phase B guided shell (4-step header + one-open sections + sticky price
   ticker) — design in the pitch artifact + chat 2026-07-07. Full plan → guided-quote pitch.
