@@ -1,3 +1,7 @@
+## v2026.07.06.12 (2026.07.06)
+
+- fix(staff-dashboard): move Quick Access back to the top (above the new widgets)
+
 ## v2026.07.06.11 (2026.07.06)
 
 - feat(staff-dashboard): Orders Inbox + Money Collected + Sample Follow-ups + Product Manager; announcements retired
