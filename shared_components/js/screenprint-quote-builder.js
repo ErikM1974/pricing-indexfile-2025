@@ -4001,6 +4001,9 @@ function updateAdditionalCharges() {
     if (netCharges !== 0) {
         badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
         badge.classList.remove('hidden');
+        // Phase A: panel is collapsed by default — the first non-zero charge
+        // (edit-load, draft restore) pops it open ONCE so fees never load hidden.
+        if (typeof autoExpandFeesOnFirstCharge === 'function') autoExpandFeesOnFirstCharge();
     } else {
         badge.classList.add('hidden');
     }

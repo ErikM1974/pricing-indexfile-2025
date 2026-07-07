@@ -15,7 +15,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.2">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
@@ -157,7 +157,7 @@
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
                                     </div>
-                                    <span class="digitizing-checkbox-label">Digitizing</span>
+                                    <span class="digitizing-checkbox-label" title="Digitizing — converting the art into a stitch file. One-time charge per new logo; skip it if we've embroidered this logo before.">New-logo setup</span>
                                     <span class="digitizing-checkbox-price">$100</span>
                                 </div>
                                 <!-- Vertical divider -->
@@ -286,7 +286,7 @@
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
                                         </div>
-                                        <span class="digitizing-checkbox-label">Design Setup</span>
+                                        <span class="digitizing-checkbox-label" title="One-time setup for a new laser patch design — skip it if we've run this patch before.">Design Setup</span>
                                         <span class="digitizing-checkbox-price">$50</span>
                                     </div>
                                 </div>
@@ -319,7 +319,7 @@
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Small Order Notice</strong> —
-                    <span class="min-order-warning-text">Orders of 7 or fewer pieces include a $50 small order fee, built into the per-piece price.</span>
+                    <span class="min-order-warning-text">Orders of 7 or fewer pieces include a $50 small-batch fee, built into the per-piece price — it disappears at 8+.</span>
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -365,7 +365,7 @@
                             <!-- Garment LTM Row -->
                             <tr id="garment-ltm-table-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-tshirt"></i> Garment Less Than Minimum Fee
+                                    <i class="fas fa-tshirt"></i> <span title="Also called the Less Than Minimum (LTM) fee — applies to garment orders of 1–7 pieces">Garment small-batch fee</span>
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="garment-ltm-unit">$50.00</td>
@@ -375,7 +375,7 @@
                             <!-- Cap LTM Row -->
                             <tr id="cap-ltm-table-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-hat-cowboy"></i> Cap Less Than Minimum Fee
+                                    <i class="fas fa-hat-cowboy"></i> <span title="Also called the Less Than Minimum (LTM) fee — applies to cap orders of 1–7 pieces">Cap small-batch fee</span>
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="cap-ltm-unit">$50.00</td>
@@ -676,10 +676,13 @@
                         <i class="fas fa-chevron-down" style="margin-left:auto; font-size:11px; color:#94a3b8;"></i>
                     </div>
                     <div class="customer-info-body" id="emb-customer-body">
-                        <!-- Customer Lookup -->
-                        <div class="customer-field customer-lookup-container">
+                        <!-- Customer Lookup — lookup-first (2026-07-07 Phase A / P1 #4): the search
+                             field is the hero; manual fields collapse below and auto-open when a
+                             pick or an edit-load fills them (syncCustomerManualDetails). All input
+                             ids unchanged — save/load key off getElementById. -->
+                        <div class="customer-field customer-lookup-container customer-lookup-hero">
                             <label class="sr-only" for="customer-lookup">Search for a customer by company, name, or email</label>
-                            <input type="text" id="customer-lookup" placeholder="Search by company, name, or email..." class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <input type="text" id="customer-lookup" placeholder="Find customer — company, name, or email" class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
 
                             <!-- Customer context banners (Erik 2026-05-23) — populated by
                                  window.surfaceCustomerContext() after a customer is picked.
@@ -691,7 +694,8 @@
                                 <span id="customer-tier-badge" hidden></span>
                             </div>
                         </div>
-                        <div class="customer-lookup-divider">or enter manually</div>
+                        <details class="customer-manual" id="emb-customer-manual">
+                        <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                             <div class="customer-field" style="grid-column: span 2;">
                                 <label for="customer-name" style="font-size: 11px; color: #64748b; display: block;">Name *</label>
@@ -732,6 +736,7 @@
                                 <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
                             </div>
                         </div>
+                        </details>
                     </div>
                 </div>
 
@@ -762,7 +767,7 @@
 
                 <div class="pricing-row">
                     <span class="label">Pricing Tier:</span>
-                    <span class="tier-badge" id="pricing-tier">1-7</span>
+                    <span class="tier-badge" id="pricing-tier" title="Your price break — the more pieces on the order, the cheaper each piece gets">1-7</span>
                 </div>
                 <!-- Tier breakdown for mixed quotes -->
                 <div class="pricing-row sub-breakdown" id="garment-tier-row" style="display: none;">
@@ -1150,7 +1155,7 @@ Company:Absher Construction Company
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #92400e;">
                                 <input type="checkbox" id="spr-ltm-enabled" checked style="width: 15px; height: 15px; accent-color: #f59e0b;">
                                 <i class="fas fa-exclamation-triangle" style="color: #f59e0b;"></i>
-                                Apply LTM Fee ($50)
+                                <span title="Also called the Less Than Minimum (LTM) fee">Apply small-batch fee ($50)</span>
                                 <span id="spr-ltm-hint" style="font-size: 11px; color: #6b7280; margin-left: auto;"></span>
                             </label>
                         </div>
@@ -1439,7 +1444,7 @@ Company:Absher Construction Company
     <!-- Core Dependencies -->
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.1"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.2"></script>
     <script src="/shared_components/js/quote-services-bar.js?v=2026.06.07.1"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
@@ -1461,7 +1466,7 @@ Company:Absher Construction Company
     <!-- Customer Lookup Autocomplete -->
     <script src="/shared_components/js/customer-lookup-service.js?v=2026.06.06.9"></script>
     <!-- Customer Context Banners (Erik 2026-05-23) — Warning/Tax/Tier/Terms autofill -->
-    <script src="/shared_components/js/customer-context-banners.js?v=2026.05.23.1"></script>
+    <script src="/shared_components/js/customer-context-banners.js?v=2026.07.07.2"></script>
 
     <!-- Product Thumbnail Modal (click to enlarge) -->
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260424"></script>
