@@ -1,3 +1,12 @@
+## v2026.07.07.1 (2026.07.07)
+
+- docs(memory): quote-builder order-entry UX audit 2026-07 — scorecard, verified price risks, P1-P3 recs
+- feat(quote-builders): duplicate-row button on SCP + DTF (UX audit P1 #1) + fix EMB duplicate race
+- docs(memory): resume point after quote-builder UX P1 #1 (duplicate-row shipped)
+- feat(quote-builders): bulk size paste on all 4 builders (UX audit P1 #2)
+- feat(quote-builders): clickable quantity nudge on EMB/SCP/DTF (UX audit P1 #3)
+- Deploy v2026.07.07.1: 4 files (dtf-quote-builder.html,dtg-quote-builder.html,embroidery-quote-builder.html...)
+
 ## v2026.07.06.12 (2026.07.06)
 
 - fix(staff-dashboard): move Quick Access back to the top (above the new widgets)
