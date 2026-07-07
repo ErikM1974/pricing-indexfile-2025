@@ -20,6 +20,9 @@
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
+    <!-- Guided Quote shell (Phase B, 2026-07-07) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.3">
+
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.14.1">
 
@@ -1489,6 +1492,11 @@ Company:Absher Construction Company
          MUST load before embroidery-quote-builder.js (which calls QuoteOrderSummary.configure() at eval time). -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.07.07.1"></script>
+
+    <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
+         sections, sidebar stays the price rail; "Show everything" restores the
+         workbench. Loads LAST so it recomposes after the builder's own init. -->
+    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.3"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

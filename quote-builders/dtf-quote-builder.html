@@ -26,6 +26,9 @@
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
+    <!-- Guided Quote shell (Phase B, 2026-07-07) -->
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.3">
+
     <!-- DTF Quote Builder Styles (overrides common + shell) -->
     <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.06.14.7">
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
@@ -802,6 +805,11 @@
 
     <!-- Page controller + modal functions (extracted to external JS) -->
     <script src="/shared_components/js/dtf-quote-page.js?v=2026.07.07.2"></script>
+
+    <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
+         sections, sidebar stays the price rail; "Show everything" restores the
+         workbench. Loads LAST so it recomposes after the builder's own init. -->
+    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.3"></script>
 
 </body>
 </html>
