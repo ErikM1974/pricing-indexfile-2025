@@ -1968,3 +1968,27 @@ dashboard-modal:not([open]) { display: none; }
 }
 
 .ql-alt a:hover { color: var(--accent); text-decoration: underline; }
+
+/* Dated "New" chip on the New Quote CTA (2026-07-07 follow-up) — same amber
+   language as .tool-btn--updated so reps read it as "this changed". Bump the
+   text each time the CTA meaningfully changes; an old date = refresh or drop. */
+.qs-new-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 7px;
+    margin-left: 8px;
+    line-height: 1;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: rgba(251, 191, 36, 0.16);
+    color: #fde68a;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+    border-radius: 6px;
+    white-space: nowrap;
+    vertical-align: 2px;
+}
+
+.ql-alt a strong { color: #fff; font-weight: 700; }
+.ql-alt a:hover strong { color: var(--accent); }
