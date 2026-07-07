@@ -4,10 +4,11 @@
 > HIGH claim. Scope: order-entry clicks, line-item speed, price-display correctness, skin.
 > Full narrative delivered in-session 2026-07-06; this file = the durable, actionable core.
 
-## ⏸ RESUME POINT (updated 2026-07-06, after P1 #2)
+## ⏸ RESUME POINT (updated 2026-07-07, after deploy)
 
-- **Shipped:** P1 #1 duplicate-row (`d44728c8`) + P1 #2 bulk size paste + P1 #3 clickable
-  quantity-nudge — all on **develop — NOT deployed** (Erik runs `/deploy` when ready).
+- **Shipped + DEPLOYED:** P1 #1 duplicate-row + P1 #2 bulk size paste + P1 #3 clickable
+  quantity-nudge — **LIVE in production as `v2026.07.07.1`** (deployed 2026-07-07,
+  Heroku release v1570, live `?v=` verified).
 - **Next build:** P1 #4 lookup-first customer panel (one prominent lookup field, manual
   fields collapsed behind "enter manually"; EMB worst offender at 5 clicks + 5 fields;
   DTG's company-lookup-first flow is the model).
