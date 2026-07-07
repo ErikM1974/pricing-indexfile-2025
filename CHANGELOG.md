@@ -1,3 +1,8 @@
+## v2026.07.07.5 (2026.07.07)
+
+- docs(memory): one-door dashboard entry deployed (v2026.07.07.4)
+- feat(dashboard): Quick Quote stays findable + dated NEW badge on the CTA
+
 ## v2026.07.07.4 (2026.07.07)
 
 - docs(memory): Phase B deployed (v2026.07.07.3)
