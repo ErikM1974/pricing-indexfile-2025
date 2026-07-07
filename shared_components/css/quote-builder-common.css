@@ -648,6 +648,24 @@ body {
     color: #3b82f6;
 }
 
+/* Clickable quantity nudge (2026-07-06 P1 #3) — one click adds the missing
+   pieces proportionally across entered sizes (quote-builder-utils.js
+   updateQuantityNudge/applyQuantityNudge). */
+.quantity-nudge-clickable {
+    cursor: pointer;
+}
+
+.quantity-nudge-clickable .nudge-apply-hint {
+    color: #2563eb;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.quantity-nudge-clickable:hover .nudge-apply-hint,
+.quantity-nudge-clickable:focus-visible .nudge-apply-hint {
+    text-decoration: underline;
+}
+
 /* ============================================
    ADD ROW BUTTON (2026-03-23 consolidation)
    ============================================ */

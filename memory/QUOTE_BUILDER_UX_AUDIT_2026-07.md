@@ -6,11 +6,11 @@
 
 ## ⏸ RESUME POINT (updated 2026-07-06, after P1 #2)
 
-- **Shipped:** P1 #1 duplicate-row (`d44728c8`) + P1 #2 bulk size paste — both on
-  **develop — NOT deployed** (Erik runs `/deploy` when ready).
-- **Next build (in order):** P1 #3 clickable quantity-nudge (the nudge chip already
-  computes target tier + savings in each builder; make clicking it auto-distribute the
-  delta across entered sizes) → P1 #4 lookup-first customer panel.
+- **Shipped:** P1 #1 duplicate-row (`d44728c8`) + P1 #2 bulk size paste + P1 #3 clickable
+  quantity-nudge — all on **develop — NOT deployed** (Erik runs `/deploy` when ready).
+- **Next build:** P1 #4 lookup-first customer panel (one prominent lookup field, manual
+  fields collapsed behind "enter manually"; EMB worst offender at 5 clicks + 5 fields;
+  DTG's company-lookup-first flow is the model).
 - **Not started:** all P2/P3 items + the price-display findings below (10.1 tax residuals,
   silent SCP fallbacks, EMB stale-override warning, SCP LTM-mode persistence).
 
@@ -72,8 +72,14 @@ EMB $12 tier-fallback chip, cart mailto chip; SCP preview reprice race FIXED 202
    included; child rows + unknown sizes guarded, skipped sizes toasted), hints added to all
    4 (trio keyboard-hint line, DTG input title). Lock: `tests/unit/parse-bulk-sizes.test.js`.
    Browser-verified on all 4 builders.
-3. Make the quantity-nudge chip CLICKABLE (it already computes the target tier + savings);
-   click auto-distributes the delta across entered sizes.
+3. ✅ **DONE 2026-07-06** — Clickable quantity-nudge (trio; DTG has no nudge chip — its
+   quick-fill idea stays a DTG-specific backlog item). Shared `updateQuantityNudge`
+   renderer now appends "· click to add" + role=button/tabindex; click calls
+   `applyQuantityNudge(needed, categoryLabel)` → `distributeProportionally()` (largest
+   remainder, sums to EXACTLY the delta) across entered parent-row size cells via real
+   'change' events; EMB mixed orders filter by `row.dataset.isCap` (garment/cap tier
+   separately); chip hides on apply so a double-click can't add twice. Lock:
+   `tests/unit/distribute-proportionally.test.js`. Browser-verified EMB/SCP/DTF.
 4. Lookup-first customer panel: one prominent lookup field, manual fields collapsed behind
    "enter manually" (EMB worst offender at 5 clicks + 5 fields).
 
