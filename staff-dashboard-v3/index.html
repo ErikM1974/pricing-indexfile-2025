@@ -273,60 +273,7 @@
                 <!-- Announcements zone REMOVED 2026-07-06 (Erik: no longer needed).
                      Admin pages remain on disk, flagged dead in ACTIVE_FILES. -->
 
-                <!-- Zone 1: Orders Inbox (2026-07-06) — what came in + what needs a human -->
-                <section class="zone-orders-inbox" aria-labelledby="zoneOrdersInboxTitle">
-                    <header class="zone-header">
-                        <h2 id="zoneOrdersInboxTitle" class="zone-title">
-                            <i class="fas fa-inbox" aria-hidden="true"></i> Orders Inbox
-                        </h2>
-                        <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
-                        <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
-                            <i class="fas fa-rotate" aria-hidden="true"></i>
-                        </button>
-                    </header>
-                    <div id="ordersInboxAlerts"></div>
-                    <div class="inbox-columns">
-                        <div class="inbox-col" id="inboxPaidOrders">
-                            <h3 class="inbox-col-title"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid web orders</h3>
-                            <ul class="inbox-list" id="inboxPaidList" aria-busy="true"></ul>
-                        </div>
-                        <div class="inbox-col" id="inboxAccepted">
-                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid</h3>
-                            <ul class="inbox-list" id="inboxAcceptedList" aria-busy="true"></ul>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Zone 1b: Money row — payments collected + sample pipeline (2026-07-06) -->
-                <div class="zone-money-row">
-                    <section class="zone-payments" aria-labelledby="zonePaymentsTitle">
-                        <header class="zone-header">
-                            <h2 id="zonePaymentsTitle" class="zone-title">
-                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Money Collected
-                            </h2>
-                            <span class="zone-subtitle">Stripe payments — quotes, storefronts, samples</span>
-                        </header>
-                        <div class="pay-totals">
-                            <div class="pay-total"><div class="pay-total-label">Today</div><div class="pay-total-value" id="payToday">—</div></div>
-                            <div class="pay-total"><div class="pay-total-label">Last 7 days</div><div class="pay-total-value" id="payWeek">—</div></div>
-                            <div class="pay-total"><div class="pay-total-label">Last 30 days</div><div class="pay-total-value" id="payMonth">—</div></div>
-                        </div>
-                        <ul class="pay-list" id="payRecentList" aria-busy="true"></ul>
-                    </section>
-
-                    <section class="zone-sample-pipeline" aria-labelledby="zoneSamplesTitle">
-                        <header class="zone-header">
-                            <h2 id="zoneSamplesTitle" class="zone-title">
-                                <i class="fas fa-box-open" aria-hidden="true"></i> Sample Follow-ups
-                            </h2>
-                            <span class="zone-subtitle">Samples sent, no order yet — call these</span>
-                        </header>
-                        <div id="samplePipelineAlerts"></div>
-                        <ul class="pipeline-list" id="samplePipelineList" aria-busy="true"></ul>
-                    </section>
-                </div>
-
-                <!-- Zone 2: Quick Access (restructured 9 → 5 + Reference, Phase 4.2) -->
+                <!-- Zone 1: Quick Access (restructured 9 → 5 + Reference, Phase 4.2). Moved back to top per Erik 2026-07-06. -->
                 <section class="zone-quick-access" aria-labelledby="zoneQuickAccessTitle">
                     <header class="zone-header">
                         <h2 id="zoneQuickAccessTitle" class="zone-title">
@@ -597,6 +544,59 @@
 
                     </div>
                 </section>
+
+                <!-- Zone 2: Orders Inbox (2026-07-06) — what came in + what needs a human -->
+                <section class="zone-orders-inbox" aria-labelledby="zoneOrdersInboxTitle">
+                    <header class="zone-header">
+                        <h2 id="zoneOrdersInboxTitle" class="zone-title">
+                            <i class="fas fa-inbox" aria-hidden="true"></i> Orders Inbox
+                        </h2>
+                        <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
+                        <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
+                            <i class="fas fa-rotate" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div id="ordersInboxAlerts"></div>
+                    <div class="inbox-columns">
+                        <div class="inbox-col" id="inboxPaidOrders">
+                            <h3 class="inbox-col-title"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid web orders</h3>
+                            <ul class="inbox-list" id="inboxPaidList" aria-busy="true"></ul>
+                        </div>
+                        <div class="inbox-col" id="inboxAccepted">
+                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid</h3>
+                            <ul class="inbox-list" id="inboxAcceptedList" aria-busy="true"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Zone 1b: Money row — payments collected + sample pipeline (2026-07-06) -->
+                <div class="zone-money-row">
+                    <section class="zone-payments" aria-labelledby="zonePaymentsTitle">
+                        <header class="zone-header">
+                            <h2 id="zonePaymentsTitle" class="zone-title">
+                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Money Collected
+                            </h2>
+                            <span class="zone-subtitle">Stripe payments — quotes, storefronts, samples</span>
+                        </header>
+                        <div class="pay-totals">
+                            <div class="pay-total"><div class="pay-total-label">Today</div><div class="pay-total-value" id="payToday">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 7 days</div><div class="pay-total-value" id="payWeek">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 30 days</div><div class="pay-total-value" id="payMonth">—</div></div>
+                        </div>
+                        <ul class="pay-list" id="payRecentList" aria-busy="true"></ul>
+                    </section>
+
+                    <section class="zone-sample-pipeline" aria-labelledby="zoneSamplesTitle">
+                        <header class="zone-header">
+                            <h2 id="zoneSamplesTitle" class="zone-title">
+                                <i class="fas fa-box-open" aria-hidden="true"></i> Sample Follow-ups
+                            </h2>
+                            <span class="zone-subtitle">Samples sent, no order yet — call these</span>
+                        </header>
+                        <div id="samplePipelineAlerts"></div>
+                        <ul class="pipeline-list" id="samplePipelineList" aria-busy="true"></ul>
+                    </section>
+                </div>
 
                 <!-- Zone 3: Sales Metrics -->
                 <section class="zone-metrics" aria-labelledby="zoneMetricsTitle">
