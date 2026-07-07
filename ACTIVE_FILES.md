@@ -181,6 +181,8 @@
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
 | `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
+| `/tests/unit/parse-bulk-sizes.test.js` | **NEW (2026-07-06)** Locks the shared bulk-size-paste parser (UX audit P1 #2): "S:2 M:4 L:6" formats, XXL→2XL, non-size text → {} so plain pastes fall through | jest, quote-builder-utils.js | ✅ Active |
+| `/tests/unit/distribute-proportionally.test.js` | **NEW (2026-07-06)** Locks the clickable quantity-nudge math (UX audit P1 #3): additions sum to EXACTLY delta (largest remainder), zero-qty cells excluded, deterministic ties | jest, quote-builder-utils.js | ✅ Active |
 | `/tests/unit/quote-snapshot-diff.test.js` | **NEW (2026-06-26)** Locks the size-aware ShopWorks-snapshot diff: a per-size redistribution (S→M) at constant total qty + unit price now emits a `LineSizes[...]` change row (powers the quote-view "edited in ShopWorks" banner) — old diff missed it. | jest, lib/quote-snapshot-diff.js | ✅ Active |
 | `/tests/unit/dtf-save-parity.test.js` | **NEW (2026-06-11)** DTF audit lock: every sizeGroup → quote_items row (XS incl.), ColorCode=CATALOG_COLOR chain, Notes JSON round-trips shipToName/includeTax/pricingMetadata | jest, dtf-quote-service.js | ✅ Active |
 | `/tests/unit/dtf-childrow-state.test.js` | **NEW (2026-06-11)** P2 closure lock: DTFQuoteBuilder.childRows JS-state model — calculateFromState/getTotalQuantity price extended-size child rows with ZERO DOM (document stub throws on any query) | jest, dtf-quote-builder.js | ✅ Active |
@@ -1042,6 +1044,7 @@ cap-embroidery-fix.css
 | `/memory/CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md` | **NEW** Full 8-agent discovery audit evidence for the redesign (2026-06-11) | ✅ Active |
 | `/memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md` | **NEW** Customer quote-cart: builder parity rules EMB/DTG/SCP/DTF (worked examples = jest fixtures) + architect design + 5-phase plan (2026-06-11) | ✅ Active |
 | `/memory/QUOTE_BUILDER_GUIDE.md` | Complete guide for creating new quote builders | ✅ Active |
+| `/memory/QUOTE_BUILDER_UX_AUDIT_2026-07.md` | **NEW** Order-entry UX audit of all 4 quote builders — click scorecard, verified price-display risks, P1–P3 recommendations (2026-07-06) | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_RULES.md` | Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_PHILOSOPHY.md` | **NEW** Three-tier philosophy, loopholes, financial impact (2026-02-05) | ✅ Active |

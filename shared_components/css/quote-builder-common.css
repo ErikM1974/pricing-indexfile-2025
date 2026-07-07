@@ -625,6 +625,47 @@ body {
     color: var(--nwca-red);
 }
 
+/* Duplicate-row button — "add another color of this style" (EMB/SCP/DTF product
+   tables). Rendered disabled until the row's style loads; JS enables it by
+   removing [disabled] only — all visual states live here, not inline. */
+.btn-duplicate-row {
+    background: none;
+    border: none;
+    color: #d1d5db;
+    cursor: not-allowed;
+    padding: 4px;
+    font-size: 13px;
+    opacity: 0.5;
+}
+
+.btn-duplicate-row:not([disabled]) {
+    color: #94a3b8;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.btn-duplicate-row:not([disabled]):hover {
+    color: #3b82f6;
+}
+
+/* Clickable quantity nudge (2026-07-06 P1 #3) — one click adds the missing
+   pieces proportionally across entered sizes (quote-builder-utils.js
+   updateQuantityNudge/applyQuantityNudge). */
+.quantity-nudge-clickable {
+    cursor: pointer;
+}
+
+.quantity-nudge-clickable .nudge-apply-hint {
+    color: #2563eb;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.quantity-nudge-clickable:hover .nudge-apply-hint,
+.quantity-nudge-clickable:focus-visible .nudge-apply-hint {
+    text-decoration: underline;
+}
+
 /* ============================================
    ADD ROW BUTTON (2026-03-23 consolidation)
    ============================================ */

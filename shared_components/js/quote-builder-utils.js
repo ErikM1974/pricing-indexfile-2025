@@ -1627,11 +1627,96 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         if (savingsPerPiece && savingsPerPiece > 0.01) {
             html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
         }
+        // Clickable nudge (2026-07-06, UX audit P1 #3): one click adds the missing
+        // pieces, scaled proportionally across the sizes already entered.
+        html += ` <span class="nudge-apply-hint">· click to add</span>`;
         container.innerHTML = html;
         container.style.display = 'block';
+        container.classList.add('quantity-nudge-clickable');
+        container.setAttribute('role', 'button');
+        container.setAttribute('tabindex', '0');
+        container.title = `Add ${needed} ${pieceWord}${needed === 1 ? '' : 's'}, spread proportionally across the sizes you've entered`;
+        container.dataset.nudgeNeeded = String(needed);
+        container.dataset.nudgeCategory = categoryLabel || '';
+        container.onclick = () => {
+            const n = parseInt(container.dataset.nudgeNeeded, 10) || 0;
+            if (applyQuantityNudge(n, container.dataset.nudgeCategory || '')) {
+                // Hide immediately so a double-click can't add twice with a stale
+                // "needed" — the recalc the change events trigger re-renders it.
+                container.style.display = 'none';
+            }
+        };
+        container.onkeydown = (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); container.onclick(); }
+        };
     } else {
         container.style.display = 'none';
     }
+}
+
+/**
+ * Split `delta` pieces across current quantities proportionally (largest-
+ * remainder method, so the additions sum to EXACTLY delta and bigger sizes
+ * absorb more). Pure — locked by tests/unit/distribute-proportionally.test.js.
+ * quantities: array of current per-cell qtys (>0); returns array of additions.
+ */
+function distributeProportionally(quantities, delta) {
+    const adds = quantities.map(() => 0);
+    const total = quantities.reduce((s, q) => s + (q > 0 ? q : 0), 0);
+    if (!(total > 0) || !(delta > 0)) return adds;
+    const raw = quantities.map(q => (q > 0 ? (delta * q) / total : 0));
+    let left = delta;
+    raw.forEach((r, i) => { adds[i] = Math.floor(r); left -= adds[i]; });
+    // Hand the remaining pieces to the largest fractional remainders (stable
+    // index tie-break so the result is deterministic).
+    const order = raw.map((r, i) => [r - Math.floor(r), i])
+        .sort((a, b) => b[0] - a[0] || a[1] - b[1]);
+    for (const [, i] of order) {
+        if (left <= 0) break;
+        if (quantities[i] > 0) { adds[i]++; left--; }
+    }
+    return adds;
+}
+
+/**
+ * Apply a clicked quantity nudge: bump the trio's entered size cells by
+ * `needed` pieces, proportional to what's already typed, firing each cell's
+ * 'change' event so the builder's own onSizeChange/pricing runs as if typed
+ * (same proven mechanism as bulk size paste above). categoryLabel filters
+ * rows for EMB's separately-tiered mixed orders ('garment'/'cap' per
+ * row.dataset.isCap); child rows are single-size line items and are skipped.
+ */
+function applyQuantityNudge(needed, categoryLabel, tbodyId) {
+    const tbody = document.getElementById(tbodyId || 'product-tbody');
+    if (!tbody || !(needed > 0)) return false;
+    const cells = [];
+    tbody.querySelectorAll('tr').forEach(row => {
+        if (row.classList.contains('child-row')) return;
+        if (categoryLabel === 'garment' && row.dataset.isCap === 'true') return;
+        if (categoryLabel === 'cap' && row.dataset.isCap !== 'true') return;
+        row.querySelectorAll('input.size-input[data-size]:not([readonly])').forEach(inp => {
+            if (inp.disabled) return;
+            const q = parseInt(inp.value, 10) || 0;
+            if (q > 0) cells.push({ inp, q });
+        });
+    });
+    if (!cells.length) {
+        if (typeof showToast === 'function') showToast('Type at least one size quantity first — the nudge scales what you already entered.', 'info');
+        return false;
+    }
+    const adds = distributeProportionally(cells.map(c => c.q), needed);
+    let applied = 0;
+    cells.forEach((c, i) => {
+        if (adds[i] > 0) {
+            c.inp.value = String(c.q + adds[i]);
+            applied += adds[i];
+            c.inp.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    });
+    if (applied > 0 && typeof showToast === 'function') {
+        showToast(`Added ${applied} ${categoryLabel ? categoryLabel + ' ' : ''}piece${applied === 1 ? '' : 's'} across your entered sizes.`, 'success');
+    }
+    return applied > 0;
 }
 
 // ============================================================
@@ -1828,16 +1913,97 @@ function _applyOrderReference(order, cfg) {
     if (typeof showToast === 'function') showToast('Referenced order #' + String(order.id_Order || ''), 'success');
 }
 
+// ============================================================
+// Bulk size paste (2026-07-06, UX audit P1 #2)
+// ============================================================
+
+/**
+ * Parse a bulk size string like "S:2 M:4 L:6 2XL:1" (also / - = separators,
+ * commas/semicolons between tokens, XXL → 2XL alias) into { S:2, M:4, ... }.
+ * Returns {} when the text doesn't look like a size list, so plain pastes
+ * fall through untouched. Promoted from dtg-inline-form.js (C8) — DTG's
+ * closure now delegates here so all 4 builders parse identically.
+ */
+function parseBulkSizes(text) {
+    const result = {};
+    const re = /\b(XS|S|M|L|XL|2XL|3XL|4XL|5XL|6XL|XXL)\s*[:\/\-=]\s*(\d{1,4})\b/gi;
+    let m;
+    while ((m = re.exec(String(text || ''))) !== null) {
+        let key = m[1].toUpperCase();
+        if (key === 'XXL') key = '2XL';
+        const q = parseInt(m[2], 10);
+        if (Number.isFinite(q) && q >= 0) result[key] = q;
+    }
+    return result;
+}
+
+/**
+ * Delegated paste-to-fill on a trio product table. Pasting "S:2 M:4 L:6"
+ * into any size cell fills each parsed size's input in the SAME row and
+ * fires its 'change' event, so the builder's own onSizeChange (pricing
+ * recalc, SCP/DTF 2XL child-row machinery) runs exactly as if typed.
+ * Sizes with no editable cell in the row (3XL+/XS → extended popup, cap
+ * OSFA rows) are reported in the toast instead of silently dropped.
+ * Single values and non-size text keep the browser's default paste.
+ */
+function wireBulkSizePaste(tbodyId) {
+    const tbody = document.getElementById(tbodyId || 'product-tbody');
+    if (!tbody || tbody.dataset.bulkPasteWired === '1') return;
+    tbody.dataset.bulkPasteWired = '1';
+    tbody.addEventListener('paste', (e) => {
+        const input = e.target;
+        if (!input || !input.matches || !input.matches('input.size-input[data-size]:not([readonly])')) return;
+        const clip = e.clipboardData || window.clipboardData;
+        const parsed = parseBulkSizes(clip ? clip.getData('text') : '');
+        const sizes = Object.keys(parsed);
+        if (sizes.length < 2) return;
+        const row = input.closest('tr');
+        // Child rows are single-size line items (SCP/DTF 2XL+, EMB extended
+        // sizes) — bulk-filling their sibling size cells would corrupt them.
+        if (!row || row.classList.contains('child-row')) return;
+        const targets = [];
+        const skipped = [];
+        for (const sz of sizes) {
+            const cell = row.querySelector('input.size-input[data-size="' + sz + '"]:not([readonly])');
+            if (cell && !cell.disabled) targets.push([cell, parsed[sz]]);
+            else skipped.push(sz + ':' + parsed[sz]);
+        }
+        if (!targets.length) return;
+        e.preventDefault();
+        let pieces = 0;
+        for (const [cell, qty] of targets) {
+            cell.value = qty > 0 ? qty : '';
+            pieces += qty;
+            cell.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (typeof showToast === 'function') {
+            let msg = 'Filled ' + targets.length + ' sizes (' + pieces + ' pieces) from paste';
+            if (skipped.length) msg += ' — not auto-filled: ' + skipped.join(', ') + ' (use the + extended-sizes button)';
+            showToast(msg, skipped.length ? 'warning' : 'success', skipped.length ? 6000 : 3000);
+        }
+    });
+}
+
+// Self-attach for the trio: EMB/SCP/DTF all render product rows inside
+// #product-tbody with the same input.size-input[data-size] contract. DTG has
+// no #product-tbody (card layout, own paste handler in dtg-inline-form.js),
+// so this no-ops there. Delegated listener → rows added later are covered.
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => wireBulkSizePaste('product-tbody'));
+}
+
 if (typeof window !== 'undefined') {
     window.getQuickQuotePrefill = getQuickQuotePrefill;
     window.clearQuickQuoteParams = clearQuickQuoteParams;
     window.showRecentCustomerOrders = showRecentCustomerOrders;
     window.removeRecentOrdersPanel = removeRecentOrdersPanel;
+    window.parseBulkSizes = parseBulkSizes;
+    window.wireBulkSizePaste = wireBulkSizePaste;
 }
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent };
+    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded

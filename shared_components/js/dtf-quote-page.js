@@ -608,6 +608,9 @@ function addNewRow() {
         <td class="cell-price" id="row-price-${rowId}">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
+            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" aria-label="Duplicate row with a new color" disabled>
+                <i class="fas fa-copy"></i>
+            </button>
             <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row" aria-label="Delete product row">
                 <i class="fas fa-times"></i>
             </button>
@@ -699,6 +702,11 @@ async function onStyleChange(input, rowId) {
             const upcharges = blankBundle.sellingPriceDisplayAddOns || {};
             row.dataset.sizeUpcharges = JSON.stringify(upcharges);
 
+            // Enable "duplicate row" button — style loaded AND garment cost passed the
+            // $0 guard above (covers fresh entry, edit-load, quick-quote prefill)
+            const dupBtn = row.querySelector('.btn-duplicate-row');
+            if (dupBtn) dupBtn.disabled = false;
+
             // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
             if (colors && colors.length > 0) {
                 pickerDropdown.innerHTML = colors.map(c => `
@@ -728,6 +736,35 @@ async function onStyleChange(input, rowId) {
 }
 // Expose to window for JS class access
 window.onStyleChange = onStyleChange;
+
+/**
+ * Duplicate a product row for a different color of the same style (Rule 8:
+ * mirrors EMB's duplicateRowNewColor). Pre-fills the style number and runs
+ * onStyleChange() so the color picker loads — the rep just picks the new color.
+ */
+async function duplicateRowNewColor(sourceRowId) {
+    const sourceRow = document.getElementById(`row-${sourceRowId}`);
+    if (!sourceRow) return;
+
+    const style = sourceRow.dataset.style;
+    if (!style) {
+        showToast('No style loaded on this row', 'error');
+        return;
+    }
+
+    addNewRow();
+    // addNewRow() appends to product-tbody synchronously — the new row is the last one
+    const newRow = document.getElementById('product-tbody').lastElementChild;
+    if (!newRow || !newRow.dataset.rowId) return;
+
+    const styleInput = newRow.querySelector('.style-input');
+    if (styleInput) {
+        styleInput.value = style;
+        await onStyleChange(styleInput, parseInt(newRow.dataset.rowId));
+        showToast(`Select a new color for ${style}`, 'info', 3000);
+    }
+}
+window.duplicateRowNewColor = duplicateRowNewColor;
 
 /**
  * Handle keyboard navigation in cells

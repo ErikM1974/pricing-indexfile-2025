@@ -318,22 +318,13 @@ let hasChanges = false;
     function clearDirty() { state.dirtyAfterChatFill = false; }
 
     // ----- C8 bulk size paste -----------------------------------------------
-    // Parses "S:2 M:4 L:6 2XL:1" (and variants with /, -, =, comma, semicolon
-    // separators) into { S: 2, M: 4, L: 6, '2XL': 1 }. Returns empty object if
-    // the text doesn't look like a size list (so plain paste falls through).
+    // Parser PROMOTED to quote-builder-utils.js (2026-07-06, UX audit P1 #2)
+    // so all 4 builders parse "S:2 M:4 L:6" identically — this closure alias
+    // keeps the C8 paste handler's call site unchanged. Utils loads before
+    // this file (dtg-quote-builder.html); guard so a load failure degrades to
+    // "no bulk paste" instead of a ReferenceError killing the handler.
     function parseBulkSizes(text) {
-        const result = {};
-        // Tokens: SIZE [:/=\-\s] QTY  separated by [,;\s]
-        // Size names: XS, S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL (case insensitive)
-        const re = /\b(XS|S|M|L|XL|2XL|3XL|4XL|5XL|6XL|XXL)\s*[:\/\-=]\s*(\d{1,4})\b/gi;
-        let m;
-        while ((m = re.exec(text)) !== null) {
-            let key = m[1].toUpperCase();
-            if (key === 'XXL') key = '2XL'; // standardize
-            const q = parseInt(m[2], 10);
-            if (Number.isFinite(q) && q >= 0) result[key] = q;
-        }
-        return result;
+        return (typeof window.parseBulkSizes === 'function') ? window.parseBulkSizes(text) : {};
     }
 
     function showToastSafe(text) {
@@ -1260,7 +1251,7 @@ let hasChanges = false;
 
                 return `<div class="dtg-size-cell${overflow ? ' dtg-size-cell--overflow' : ''}${isOOS ? ' dtg-size-cell--oos' : ''}">
                     <div class="dtg-size-label">${escapeHtml(sz)}</div>
-                    <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}">
+                    <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}" title="Tip: paste S:2 M:4 L:6 here to fill all sizes at once">
                     <div class="dtg-size-price${isOOS ? ' dtg-size-price--oos' : ''}">${oosDot}${priceLabel}</div>
                     ${oosWarn}
                 </div>`;
