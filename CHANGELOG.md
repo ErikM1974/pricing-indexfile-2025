@@ -1,3 +1,7 @@
+## v2026.07.07.6 (2026.07.07)
+
+- style(dashboard): New Quote CTA redesign + drop the card's explainer line
+
 ## v2026.07.07.5 (2026.07.07)
 
 - docs(memory): one-door dashboard entry deployed (v2026.07.07.4)
