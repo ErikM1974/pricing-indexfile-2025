@@ -3485,7 +3485,7 @@ function addNewRow() {
             title="Double-click to override price">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" style="background: none; border: none; color: #d1d5db; cursor: not-allowed; padding: 4px; font-size: 13px; opacity: 0.5;" disabled onmouseover="if(!this.disabled)this.style.color='#3b82f6'" onmouseout="if(!this.disabled)this.style.color='#94a3b8'">
+            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" disabled>
                 <i class="fas fa-copy"></i>
             </button>
             <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
@@ -4025,13 +4025,9 @@ async function onStyleChange(input, rowId) {
             row.dataset.productName = cleanTitle || styleNumber;
 
             // Enable "duplicate row" button now that style is loaded
+            // (visual states live in quote-builder-common.css .btn-duplicate-row)
             const dupBtn = row.querySelector('.btn-duplicate-row');
-            if (dupBtn) {
-                dupBtn.disabled = false;
-                dupBtn.style.color = '#94a3b8';
-                dupBtn.style.cursor = 'pointer';
-                dupBtn.style.opacity = '1';
-            }
+            if (dupBtn) dupBtn.disabled = false;
 
         } else {
             // SanMar product not found — check Non-SanMar Products database
@@ -4101,13 +4097,9 @@ function populateNonSanmarRow(row, rowId, product) {
     delete row.dataset.notFound;
 
     // Enable "duplicate row" button for non-SanMar products too
+    // (visual states live in quote-builder-common.css .btn-duplicate-row)
     const dupBtn = row.querySelector('.btn-duplicate-row');
-    if (dupBtn) {
-        dupBtn.disabled = false;
-        dupBtn.style.color = '#94a3b8';
-        dupBtn.style.cursor = 'pointer';
-        dupBtn.style.opacity = '1';
-    }
+    if (dupBtn) dupBtn.disabled = false;
 
     // Detect cap vs garment
     const isCap = isCapProduct(product.StyleNumber, product.ProductName, product.Category || '');
@@ -5970,10 +5962,13 @@ async function duplicateRowNewColor(sourceRowId) {
         return;
     }
 
-    // Create a new row
+    // Create a new row. Find it via lastElementChild, NOT 'tr.new-row' — the
+    // .new-row highlight class lives on ANY row created in the last 1s, so a
+    // quick second duplicate used to grab the wrong (earlier) row and leave
+    // the new one empty. addNewRow() appends synchronously; last row wins.
     addNewRow();
-    const newRow = document.querySelector('tr.new-row');
-    if (!newRow) return;
+    const newRow = document.getElementById('product-tbody').lastElementChild;
+    if (!newRow || !newRow.dataset.rowId) return;
 
     const newRowId = parseInt(newRow.dataset.rowId);
     const styleInput = newRow.querySelector('.style-input');

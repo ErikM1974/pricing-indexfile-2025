@@ -48,8 +48,11 @@ EMB $12 tier-fallback chip, cart mailto chip; SCP preview reprice race FIXED 202
 ## Prioritized recommendations
 
 **P1 — line-entry speed (biggest bang):**
-1. Duplicate-row parity: give SCP + DTF the EMB duplicate-row / DTG clone-row button
-   (2nd color of same style = 1 click). One shared util per Rule 8.
+1. ✅ **DONE 2026-07-06** — Duplicate-row parity: SCP + DTF got `duplicateRowNewColor()` +
+   button (mirrors EMB); shared `.btn-duplicate-row` CSS promoted to `quote-builder-common.css`
+   (EMB's inline styles removed). Bonus fix: EMB's own duplicate targeted rows via the transient
+   `tr.new-row` highlight class → wrong row on quick clicks; all 3 now use
+   `product-tbody.lastElementChild` (→ LESSONS 2026-07-06). Browser-verified all 3 + 3,248 tests.
 2. Wire DTG's `parseBulkSizes()` (`dtg-inline-form.js:324` — built, never wired) to a
    "Paste sizes" affordance; promote to all 4 builders.
 3. Make the quantity-nudge chip CLICKABLE (it already computes the target tier + savings);
