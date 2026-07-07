@@ -75,6 +75,10 @@ dotenv.config();
 //   /[pages/]top-sellers-product.html?style=X → 301 /product.html?style=X; /[pages/]richardson-112-product.html → 301 /product.html?style=112
 //   (legacy showcase/product/richardson pages deleted; sample program now = catalog Top Sellers view + PDP CTA via shared sample-cart-service.js)
 //
+// STAFF DASHBOARD FORWARDERS (SAML-gated same-origin reads of secret-gated proxy data)
+//   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
+//   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
+//
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
 //     sample-pricing.js reprice, DOR tax on ship address, free shipping, free items ride as $0 lines);
@@ -1302,6 +1306,16 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 
         console.log('[Webhook] ✓ Payment confirmed for:', quoteID);
 
+        // Order_Payments ledger mirror (fail-soft, idempotent on session id) —
+        // storefront orders (3DT/CTS/CAP) now feed the staff dashboard's Money
+        // Collected widget like quote deposits and samples do (2026-07-06)
+        recordOrderPayment({
+          quoteID, type: 'order', amount: Math.round(session.amount_total) / 100,
+          stripeSessionId: session.id, paymentIntent: session.payment_intent || '',
+          payerEmail: (session.customer_details && session.customer_details.email) || session.customer_email || '',
+          customerName: quoteSession.CustomerName || '', companyName: quoteSession.CompanyName || '',
+        });
+
         // Now submit to ShopWorks
         try {
           // Retrieve order data from Caspio (instead of Stripe metadata)
@@ -1453,6 +1467,15 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
     })
   });
   console.log(`${chLog} ✓ Payment confirmed for:`, quoteID);
+
+  // Order_Payments ledger mirror (fail-soft, idempotent on session id) — feeds
+  // the staff dashboard's Money Collected widget (2026-07-06)
+  recordOrderPayment({
+    quoteID, type: 'samples-order', amount: Math.round(session.amount_total) / 100,
+    stripeSessionId: session.id, paymentIntent: session.payment_intent || '',
+    payerEmail: (session.customer_details && session.customer_details.email) || session.customer_email || '',
+    customerName: row.CustomerName || '', companyName: row.CompanyName || '',
+  });
 
   let customerData = {}, orderTotals = {}, orderSettings = {};
   try {
@@ -3446,6 +3469,25 @@ function moForwardTo(buildSubPath) {
 app.get('/api/mo/orders', requireStaff, moForwardTo(() => 'orders'));
 app.get('/api/mo/orders/:no', requireStaff, moForwardTo(req => 'orders/' + encodeURIComponent(req.params.no)));
 app.get('/api/mo/lineitems/:no', requireStaff, moForwardTo(req => 'lineitems/' + encodeURIComponent(req.params.no)));
+
+// Order_Payments ledger READ for the staff dashboard's Money Collected widget
+// (2026-07-06). The proxy mounts /api/order-payments behind the CRM secret
+// (payer emails = PII), so the browser goes through this staff-session-gated
+// same-origin forwarder — same airtight pattern as /api/mo/* above.
+app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  try {
+    const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 100, 1), 200);
+    const r = await fetch(`${CRM_API_BASE}/api/order-payments/recent?limit=${limit}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.error('[payments-forward]', e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
 
 // Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
 async function fetchPortalAccess(email) {

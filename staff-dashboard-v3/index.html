@@ -25,11 +25,11 @@
     -->
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.04.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.06.11">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -61,34 +61,6 @@
         <div id="auth-role">[@authfield:Role]</div>
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
-
-    <!-- Announcements data (kept inline per Erik's plan answer #2) -->
-    <script id="staffAnnouncementsData" type="application/json">
-[
-    {
-        "id": "ann-001",
-        "type": "training",
-        "title": "New LTM Order Policy Update",
-        "preview": "Framework for handling Less-Than-Minimum orders: existing vs. new customers, upselling, and referrals.",
-        "content": "Full policy details available in the policies hub.",
-        "date": "2025-09-09"
-    },
-    {
-        "id": "ann-002",
-        "type": "process",
-        "title": "Customer Notification SOP Updated",
-        "preview": "Standard procedure for notifying customers when orders are ready for pickup, including ShopWorks logging.",
-        "date": "2025-09-16"
-    },
-    {
-        "id": "ann-003",
-        "type": "general",
-        "title": "Welcome to Staff Dashboard v3",
-        "preview": "Polished, accessible, mobile-friendly. Half the CSS, modular JS, no silent fallbacks. v2 lives at /staff-dashboard-v2.html for 90 days.",
-        "date": "2026-05-12"
-    }
-]
-    </script>
 
     <div class="dashboard-container">
 
@@ -203,8 +175,6 @@
                             <div>
                                 <a href="/dashboards/access-admin.html" class="nav-link">Access Admin — Roles &amp; Page Access</a>
                                 <a href="/sanmar-vendor-portal.html" class="nav-link">Sanmar Vendor Portal</a>
-                                <a href="/admin/announcements-create.html" class="nav-link">Create Announcements</a>
-                                <a href="/admin/announcements-manage.html" class="nav-link">Manage Announcements</a>
                                 <a href="/universal-records-admin.html" class="nav-link">Universal Records Admin</a>
                                 <a href="/dashboards/commission-structure.html" class="nav-link">Commission Structure</a>
                             </div>
@@ -300,12 +270,61 @@
             <!-- Dashboard zones -->
             <div class="dashboard-zones">
 
-                <!-- Zone 1: Announcements -->
-                <section class="zone-announcements" aria-labelledby="zoneAnnouncementsTitle">
-                    <h2 id="zoneAnnouncementsTitle" class="visually-hidden">Announcements</h2>
-                    <div class="announcements-hero" id="announcementsHero"></div>
-                    <div class="announcements-list" id="announcementsList"></div>
+                <!-- Announcements zone REMOVED 2026-07-06 (Erik: no longer needed).
+                     Admin pages remain on disk, flagged dead in ACTIVE_FILES. -->
+
+                <!-- Zone 1: Orders Inbox (2026-07-06) — what came in + what needs a human -->
+                <section class="zone-orders-inbox" aria-labelledby="zoneOrdersInboxTitle">
+                    <header class="zone-header">
+                        <h2 id="zoneOrdersInboxTitle" class="zone-title">
+                            <i class="fas fa-inbox" aria-hidden="true"></i> Orders Inbox
+                        </h2>
+                        <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
+                        <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
+                            <i class="fas fa-rotate" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div id="ordersInboxAlerts"></div>
+                    <div class="inbox-columns">
+                        <div class="inbox-col" id="inboxPaidOrders">
+                            <h3 class="inbox-col-title"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid web orders</h3>
+                            <ul class="inbox-list" id="inboxPaidList" aria-busy="true"></ul>
+                        </div>
+                        <div class="inbox-col" id="inboxAccepted">
+                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid</h3>
+                            <ul class="inbox-list" id="inboxAcceptedList" aria-busy="true"></ul>
+                        </div>
+                    </div>
                 </section>
+
+                <!-- Zone 1b: Money row — payments collected + sample pipeline (2026-07-06) -->
+                <div class="zone-money-row">
+                    <section class="zone-payments" aria-labelledby="zonePaymentsTitle">
+                        <header class="zone-header">
+                            <h2 id="zonePaymentsTitle" class="zone-title">
+                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Money Collected
+                            </h2>
+                            <span class="zone-subtitle">Stripe payments — quotes, storefronts, samples</span>
+                        </header>
+                        <div class="pay-totals">
+                            <div class="pay-total"><div class="pay-total-label">Today</div><div class="pay-total-value" id="payToday">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 7 days</div><div class="pay-total-value" id="payWeek">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 30 days</div><div class="pay-total-value" id="payMonth">—</div></div>
+                        </div>
+                        <ul class="pay-list" id="payRecentList" aria-busy="true"></ul>
+                    </section>
+
+                    <section class="zone-sample-pipeline" aria-labelledby="zoneSamplesTitle">
+                        <header class="zone-header">
+                            <h2 id="zoneSamplesTitle" class="zone-title">
+                                <i class="fas fa-box-open" aria-hidden="true"></i> Sample Follow-ups
+                            </h2>
+                            <span class="zone-subtitle">Samples sent, no order yet — call these</span>
+                        </header>
+                        <div id="samplePipelineAlerts"></div>
+                        <ul class="pipeline-list" id="samplePipelineList" aria-busy="true"></ul>
+                    </section>
+                </div>
 
                 <!-- Zone 2: Quick Access (restructured 9 → 5 + Reference, Phase 4.2) -->
                 <section class="zone-quick-access" aria-labelledby="zoneQuickAccessTitle">
@@ -487,6 +506,7 @@
                                 </a>
                                 <a href="/calculators/webstores.html" class="tool-btn"><i class="fas fa-store" aria-hidden="true"></i> Webstore</a>
                                 <a href="/calculators/richardson-2025.html" class="tool-btn"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Richardson Non-Sanmar</a>
+                                <a href="/dashboards/product-manager.html" class="tool-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Product Manager</a>
                             </div>
                         </div>
 
@@ -730,10 +750,6 @@
         </div>
     </dashboard-modal>
 
-    <!-- Bootstrap announcements data into a global the controller reads.
-         (Reads from the JSON <script> block above; keeps Rule #3 nominally clean
-         since this is just a data hand-off, no logic.) -->
-    <script src="/staff-dashboard-v3/announcements-bootstrap.js?v=20260512h"></script>
 
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor.
          Ported as plain script tags before the v3 module so production-controller.js
@@ -759,6 +775,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.06.10"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.06.11"></script>
 </body>
 </html>

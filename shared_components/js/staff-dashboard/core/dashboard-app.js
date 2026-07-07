@@ -12,7 +12,8 @@ import './dashboard-events.js';   // installs document click delegator
 import { initTweaks }          from '../widgets/tweaks-fab.js';
 import { initAuth }            from '../controllers/auth-controller.js';
 import { initSidebar }         from '../controllers/sidebar-controller.js';
-import { initAnnouncements }   from '../controllers/announcements-controller.js';
+// announcements retired 2026-07-06 (Erik) — zone replaced by Orders Inbox + money widgets
+import { initOrdersInbox, initMoneyCollected, initSamplePipeline } from '../controllers/orders-inbox-controller.js';
 import { initSalesGoal }       from '../controllers/sales-goal-controller.js';
 import { initCelebrations }    from '../controllers/celebrations-controller.js';
 import { initMetrics }         from '../controllers/metrics-controller.js';
@@ -37,12 +38,14 @@ async function bootstrap() {
 
     // Synchronous controller init (fast, no network)
     initSidebar();
-    initAnnouncements();
     initSalesGoal();
     initCelebrations();
     initProduction();        // renders from static stats — no network
 
     // Async controllers — fetches from caspio-pricing-proxy
+    initOrdersInbox();       // quote_sessions last 7 days (paid web orders / accepted / push failures)
+    initMoneyCollected();    // Order_Payments ledger totals + recent list
+    initSamplePipeline();    // sample orders w/o a later order — rep call list
     initMetrics();           // ManageOrders revenue + sparkline + YoY
     initTeamPerformance();   // Caspio archive YTD per-rep
     initGarmentTracker();    // Caspio garment-tracker table (bridged to legacy service)

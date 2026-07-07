@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Product Manager - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/product-manager.css?v=2026.07.06.11">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Product Manager <span class="pm-subtitle">non-SanMar catalog items</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-total">—</div>
+                    <div class="dash-stat-label">Products</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-active">—</div>
+                    <div class="dash-stat-label">Live in catalog</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-incomplete">—</div>
+                    <div class="dash-stat-label">Missing image or cost</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Non-SanMar products</h2>
+                    <div class="pm-header-actions">
+                        <input type="search" id="pmFilter" class="pm-filter" placeholder="Filter by style, name, brand…" aria-label="Filter products">
+                        <button type="button" class="pm-btn pm-btn-primary" id="pmAddBtn">
+                            <i class="fas fa-plus"></i> Add product
+                        </button>
+                    </div>
+                </div>
+                <p class="pm-help">
+                    Products added here appear in the customer catalog next to SanMar goods.
+                    <strong>Enter your cost, never a sell price</strong> — the catalog computes the
+                    decorated "from $X with logo" price with the same margin machinery as SanMar items
+                    (fixed-price mode is for special cases only). Changes go live within 5 minutes, no deploy.
+                </p>
+                <div id="content-root" class="dash-loading">Loading products…</div>
+            </div>
+
+            <!-- Add / Edit form -->
+            <div class="dash-card pm-form-card" id="pmFormCard" hidden>
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title" id="pmFormTitle">Add product</h2>
+                    <button type="button" class="pm-btn pm-btn-ghost" id="pmFormClose"><i class="fas fa-times"></i> Close</button>
+                </div>
+                <form id="pmForm">
+                    <input type="hidden" id="fId">
+                    <div class="pm-grid">
+                        <div class="pm-field">
+                            <label for="fStyle">Style number <span class="pm-req">*</span></label>
+                            <input type="text" id="fStyle" required maxlength="40" placeholder="e.g. PC-TUMBLER-30">
+                            <small>Must be unique — this is the catalog + ShopWorks key.</small>
+                        </div>
+                        <div class="pm-field">
+                            <label for="fName">Product name <span class="pm-req">*</span></label>
+                            <input type="text" id="fName" required maxlength="120" placeholder="e.g. Polar Camel 30oz Tumbler">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fBrand">Brand <span class="pm-req">*</span></label>
+                            <input type="text" id="fBrand" required maxlength="60" placeholder="e.g. Polar Camel">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fCategory">Category</label>
+                            <select id="fCategory">
+                                <option value="T-Shirts">T-Shirts</option>
+                                <option value="Polos/Knits">Polos/Knits</option>
+                                <option value="Sweatshirts/Fleece">Sweatshirts/Fleece</option>
+                                <option value="Caps">Caps</option>
+                                <option value="Outerwear">Outerwear</option>
+                                <option value="Workwear">Workwear</option>
+                                <option value="Bags">Bags</option>
+                                <option value="Accessories">Accessories</option>
+                                <option value="Drinkware">Drinkware</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="pm-field">
+                            <label for="fCost">Your cost (per piece) <span class="pm-req">*</span></label>
+                            <input type="number" id="fCost" min="0" step="0.01" inputmode="decimal" placeholder="12.40">
+                            <small>The catalog margins this automatically — customers never see it.</small>
+                        </div>
+                        <div class="pm-field">
+                            <label for="fPricingMethod">Pricing</label>
+                            <select id="fPricingMethod">
+                                <option value="Margin">Automatic (cost ÷ margin + logo — same as SanMar)</option>
+                                <option value="FixedPrice">Fixed sell price (special cases)</option>
+                            </select>
+                        </div>
+                        <div class="pm-field" id="fSellWrap" hidden>
+                            <label for="fSell">Fixed sell price</label>
+                            <input type="number" id="fSell" min="0" step="0.01" inputmode="decimal" placeholder="49.00">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fSizes">Sizes (comma-separated)</label>
+                            <input type="text" id="fSizes" placeholder="S, M, L, XL, 2XL" maxlength="120">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fColors">Colors (comma-separated)</label>
+                            <input type="text" id="fColors" placeholder="Black, Navy, White" maxlength="240">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fVendor">Vendor code</label>
+                            <input type="text" id="fVendor" maxlength="40" placeholder="e.g. JDS">
+                        </div>
+                        <div class="pm-field">
+                            <label for="fVendorUrl">Vendor URL</label>
+                            <input type="url" id="fVendorUrl" maxlength="240" placeholder="https://…">
+                        </div>
+                        <div class="pm-field pm-span-2">
+                            <label for="fImageFile">Product image</label>
+                            <div class="pm-image-row">
+                                <img id="fImagePreview" class="pm-image-preview" alt="" hidden>
+                                <div class="pm-image-controls">
+                                    <input type="file" id="fImageFile" accept=".png,.jpg,.jpeg,.webp,.gif">
+                                    <small>PNG/JPG up to 20&nbsp;MB — uploads to our CDN and fills the URL below.</small>
+                                    <input type="url" id="fImageUrl" placeholder="…or paste an image URL" maxlength="400">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pm-field pm-span-2">
+                            <label for="fNotes">Notes / description (shows on the product page)</label>
+                            <textarea id="fNotes" rows="3" maxlength="1000"></textarea>
+                        </div>
+                    </div>
+                    <div class="pm-form-actions">
+                        <button type="submit" class="pm-btn pm-btn-primary" id="pmSaveBtn">
+                            <i class="fas fa-floppy-disk"></i> Save product
+                        </button>
+                        <label class="pm-active-toggle">
+                            <input type="checkbox" id="fActive" checked>
+                            <span>Live in catalog</span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/product-manager.js?v=2026.07.06.11"></script>
+</body>
+</html>
